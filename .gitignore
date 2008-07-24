@@ -1,5 +1,1 @@
-common/include/python2.5*
-common/include/j*
-common/include/zlib*
-common/lib/*
 install/*

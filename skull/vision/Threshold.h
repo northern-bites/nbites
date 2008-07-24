@@ -10,7 +10,9 @@ class Threshold;  // forward reference
 
 #include "ObjectFragments.h"
 #include "Pose.h"
+#ifndef NO_ZLIB
 #include "Zlib.h" 
+#endif
 #include "Profiler.h"
 //
 // COLOR TABLE CONSTANTS
