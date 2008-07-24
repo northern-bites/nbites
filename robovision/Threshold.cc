@@ -1,1 +1,0 @@
-../../../trunk/dog/Vision/Threshold.cc

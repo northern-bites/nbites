@@ -92,17 +92,13 @@ INSTALL_CMD := install
 INSTALL_OPTS := --install-lib=$(INSTALL_DIR) --record=$(RECORD_FILE)
 CLEAN_CMD := clean
 
+MAN_DIR := $(abspath ../man)
+
 LOGGING_DIR := robolog
 LOGGING_INSTALL := install_logging
 LOGGING_CLEAN := clean_logging
 LOGGING_RECORD := $(LOGGING_DIR)/.installed_files
 LOGGING_BUILD_DIR := $(LOGGING_DIR)/build
-
-CORTEX_DIR := robovision
-CORTEX_INSTALL := install_cortex
-CORTEX_CLEAN := clean_cortex
-CORTEX_RECORD := $(CORTEX_DIR)/.installed_files
-CORTEX_BUILD_DIR := $(CORTEX_DIR)/build
 
 JAR_FILE = TOOL.jar
 MANIFEST = MANIFEST.MF
@@ -127,8 +123,7 @@ endif
 
 TRUST_STORE := trustStore
 JAVA_OPTS := -Djavax.net.ssl.trustStore=$(TRUST_STORE)
-#JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar;."
-ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
+ifeq ($(PLATFORM),"CYGWIN_NT-5.1")
 JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar;."
 else
 JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar:."
@@ -155,15 +150,13 @@ TARGETS = \
 	$(WORLDCONTROLLER_DIR) \
 	$(LOGGING_INSTALL) \
 	$(LOGGING_CLEAN) \
-	$(CORTEX_INSTALL) \
-	$(CORTEX_CLEAN) \
 	$(JAVA_BUILD)
 	#$(PEDITOR_DIR) \
 	#$(ZSPACE_DIR) \
 
 .PHONY: all clean clean_java clean_python run prompt $(TARGETS)
 
-all: $(JAVA_BUILD) #$(LOGGING_INSTALL) $(CORTEX_INSTALL)
+all: $(JAVA_BUILD) #$(LOGGING_INSTALL)
 
 $(JAVA_BUILD): $(OBJS)
 
@@ -209,26 +202,6 @@ $(LOGGING_CLEAN):
 	@cd $(LOGGING_DIR) && \
 		$(PYTHON) $(SETUP_FILE) $(SETUP_OPTS) $(CLEAN_CMD)
 
-$(CORTEX_INSTALL): robovision.py
-robovision.py:
-	@echo $(PYTHON) $(SETUP_FILE) $(SETUP_OPTS) $(INSTALL_CMD) $(INSTALL_OPTS)
-	@cd $(CORTEX_DIR) && \
-	$(PYTHON) $(SETUP_FILE) $(SETUP_OPTS) $(INSTALL_CMD) $(INSTALL_OPTS)
-
-$(CORTEX_CLEAN):
-	$(RM) -r $(CORTEX_BUILD_DIR)
-	@echo -n "$(RM) " && \
-		$(AWK_STRIP_NEWLINE) $(CORTEX_RECORD) | $(SED_FIX_BACKSLASH) \
-		&& echo
-	@cd $(CORTEX_DIR) && \
-		$(AWK_STRIP_NEWLINE) $(RECORD_FILE) | $(SED_FIX_BACKSLASH) | \
-		xargs $(RM) && \
-		cat /dev/null > $(RECORD_FILE)
-
-	@echo $(PYTHON) $(SETUP_FILE) $(SETUP_OPTS) $(CLEAN_CMD)
-	@cd $(CORTEX_DIR) && \
-	$(PYTHON) $(SETUP_FILE) $(SETUP_OPTS) $(CLEAN_CMD)
-
 %.class: %.java
 	$(JAVAC) $(JAVACFLAGS) $<
 
@@ -245,6 +218,6 @@ clean_java:
 	find . -name "*.class" | xargs $(RM)
 	$(RM) $(JAR_FILE)
 
-clean_python: $(LOGGING_CLEAN) $(CORTEX_CLEAN)
+clean_python: #$(LOGGING_CLEAN)
 	find . -name "*.pyc" | xargs $(RM)
 	$(RM) $(PYTHON_OBJS)
