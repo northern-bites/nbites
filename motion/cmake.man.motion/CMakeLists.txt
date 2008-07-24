@@ -2,7 +2,7 @@
 
 ############################ PROJECT NAME
 # The name of this cmake project
-PROJECT( MAN_MOTION )
+PROJECT( MOTION )
 
 
 ############################ VERSION
@@ -42,7 +42,7 @@ INCLUDE( ${TRUNK_PATH}/cmake/base_definitions.cmake )
 # Display summary of options
 
 MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration -  MAN_MOTION ::::..." )
+MESSAGE( STATUS "...:::: Configuration -  MOTION ::::..." )
 MESSAGE( STATUS "" )
 
 
@@ -59,8 +59,8 @@ FIND_PACKAGE( TINYXML  REQUIRED )
 
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
-  ${MAN_MOTION_CMAKE_DIR}/motionconfig.in
-  ${MAN_MOTION_INCLUDE_DIR}/motionconfig.h
+  ${MOTION_CMAKE_DIR}/motionconfig.in
+  ${MOTION_INCLUDE_DIR}/motionconfig.h
   ESCAPE_QUOTES
   )
 
@@ -82,74 +82,74 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 		     ${TINYXML_INCLUDE_DIR}
                      ${PTHREAD_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
-                     ${MAN_MOTION_INCLUDE_DIR}
+                     ${MOTION_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
                      )
 
 
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
-SET( MAN_MOTION_SRCS ${MAN_MOTION_INCLUDE_DIR}/ActionCommand
-                     ${MAN_MOTION_INCLUDE_DIR}/CallbackAction
-                     ${MAN_MOTION_INCLUDE_DIR}/BodyJointCommand
-		     ${MAN_MOTION_INCLUDE_DIR}/HeadJointCommand
-		     ${MAN_MOTION_INCLUDE_DIR}/WalkParameters
-                     ${MAN_MOTION_INCLUDE_DIR}/MotionConstants
-                     ${MAN_MOTION_INCLUDE_DIR}/Motion.cpp
-                     ${MAN_MOTION_INCLUDE_DIR}/MotionCore
-                     ${MAN_MOTION_INCLUDE_DIR}/MotionInterface
-                     ${MAN_MOTION_INCLUDE_DIR}/_motionmodule
+SET( MOTION_SRCS ${MOTION_INCLUDE_DIR}/ActionCommand
+                     ${MOTION_INCLUDE_DIR}/CallbackAction
+                     ${MOTION_INCLUDE_DIR}/BodyJointCommand
+		     ${MOTION_INCLUDE_DIR}/HeadJointCommand
+		     ${MOTION_INCLUDE_DIR}/WalkParameters
+                     ${MOTION_INCLUDE_DIR}/MotionConstants
+                     ${MOTION_INCLUDE_DIR}/Motion.cpp
+                     ${MOTION_INCLUDE_DIR}/MotionCore
+                     ${MOTION_INCLUDE_DIR}/MotionInterface
+                     ${MOTION_INCLUDE_DIR}/_motionmodule
                      )
 
-IF( PYTHON_SHARED_MAN_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
-  LIST( APPEND MAN_MOTION_SRCS ${MAN_INCLUDE_DIR}/Sensors )
-ENDIF( PYTHON_SHARED_MAN_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+  LIST( APPEND MOTION_SRCS ${MAN_INCLUDE_DIR}/Sensors )
+ENDIF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
 
-SET( MAN_MOTION_PYTHON_DIRS ${MAN_MOTION_INCLUDE_DIR}/motion )
+SET( MOTION_PYTHON_DIRS ${MOTION_INCLUDE_DIR}/motion )
 
-SET( MAN_MOTION_TEST_DIR ${MAN_MOTION_INCLUDE_DIR}/test )
+SET( MOTION_TEST_DIR ${MOTION_INCLUDE_DIR}/test )
 
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
 # commands
 
-GET_TARGET_PROPERTY( MAN_MOTION_LOCATION ${MAN_MOTION_TARGET} LOCATION )
+GET_TARGET_PROPERTY( MOTION_LOCATION ${MOTION_TARGET} LOCATION )
 
 IF( ROBOT_NAO )
-  IF( PYTHON_SHARED_MAN_MOTION )
+  IF( PYTHON_SHARED_MOTION )
     ADD_LIBRARY(
-      ${MAN_MOTION_TARGET}
+      ${MOTION_TARGET}
       SHARED
-      ${MAN_MOTION_SRCS}
+      ${MOTION_SRCS}
       )
     # Install to _motionmodule.so, instead of lib_motion.so
     GET_TARGET_PROPERTY(
-      MAN_MOTION_TARGET_LOCATION ${MAN_MOTION_TARGET} LOCATION
+      MOTION_TARGET_LOCATION ${MOTION_TARGET} LOCATION
       )
     INSTALL(
-      FILES ${MAN_MOTION_TARGET_LOCATION}
+      FILES ${MOTION_TARGET_LOCATION}
       DESTINATION ${OUTPUT_ROOT_DIR_LIB}
       CONFIGURATIONS Debug
-      RENAME ${MAN_MOTION_TARGET}module.so
+      RENAME ${MOTION_TARGET}module.so
       )
-  ELSE( PYTHON_SHARED_MAN_MOTION )
+  ELSE( PYTHON_SHARED_MOTION )
     ADD_LIBRARY(
-      ${MAN_MOTION_TARGET}
+      ${MOTION_TARGET}
       STATIC
-      ${MAN_MOTION_SRCS}
+      ${MOTION_SRCS}
       )
     # No INSTALL target when static
-  ENDIF( PYTHON_SHARED_MAN_MOTION )
+  ENDIF( PYTHON_SHARED_MOTION )
 ENDIF( ROBOT_NAO )
 INSTALL(
-  DIRECTORY ${MAN_MOTION_PYTHON_DIRS}
+  DIRECTORY ${MOTION_PYTHON_DIRS}
   DESTINATION ${OUTPUT_ROOT_DIR_LIB}
   CONFIGURATIONS "" Debug Release
   PATTERN .svn EXCLUDE
   )
 INSTALL(
-  FILES ${MAN_MOTION_TEST_DIR}/test_motion.py
+  FILES ${MOTION_TEST_DIR}/test_motion.py
   DESTINATION ${OUTPUT_ROOT_DIR_LIB}
   CONFIGURATIONS Debug
   )
@@ -160,7 +160,7 @@ INSTALL(
 
 #IF( APPLE )
   SET_TARGET_PROPERTIES(
-    ${MAN_MOTION_TARGET} 
+    ${MOTION_TARGET} 
     PROPERTIES LINKER_LANGUAGE CXX
     )
 #ENDIF( APPLE )
@@ -168,7 +168,7 @@ INSTALL(
 
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
-  ${MAN_MOTION_TARGET}
+  ${MOTION_TARGET}
   ${NBCOMMON_LIBRARIES}
   ${ALCOMMON_LIBRARIES}
   ${TINYXML_LIBRARIES}

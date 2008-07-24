@@ -11,11 +11,11 @@
 
 
 // Compile man/motion as a shared library for Python dynamic loading
-#define PYTHON_SHARED_MAN_MOTION_${PYTHON_SHARED_MAN_MOTION}
-#ifdef  PYTHON_SHARED_MAN_MOTION_ON
-#  define PYTHON_SHARED_MAN_MOTION
+#define PYTHON_SHARED_MOTION_${PYTHON_SHARED_MOTION}
+#ifdef  PYTHON_SHARED_MOTION_ON
+#  define PYTHON_SHARED_MOTION
 #else
-#  undef  PYTHON_SHARED_MAN_MOTION
+#  undef  PYTHON_SHARED_MOTION
 #endif
 
 // Turn on/off the actual backend C++ calls to MotionInterface
