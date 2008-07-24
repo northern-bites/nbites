@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Main-Class: TOOL/TOOL
+Name: TOOL
+Specification-Title: "Offline Robotics TOOL"
+Specification-Vendor: "Bowdoin College's Northern Bites RoboCup"
+Implementation-Title: TOOL
