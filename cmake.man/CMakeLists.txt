@@ -131,12 +131,12 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 		     ${TINYXML_INCLUDE_DIR}
                      ${PTHREAD_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
-                     ${VISION_INCLUDE_DIR}
-                     ${NOGGIN_INCLUDE_DIR}
-                     ${CORPUS_INCLUDE_DIR}
                      ${COMM_INCLUDE_DIR}
+                     ${CORPUS_INCLUDE_DIR}
+                     ${MOTION_INCLUDE_DIR}
+                     ${NOGGIN_INCLUDE_DIR}
+                     ${VISION_INCLUDE_DIR}
                      ${MAN_INCLUDE_DIR}
-                     ${MAN_MOTION_INCLUDE_DIR}
                      )
 
 
@@ -187,12 +187,12 @@ TARGET_LINK_LIBRARIES(
   ${TINYXML_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${PYTHON_LIBRARIES}
-  ${SENSORS_TARGET}
-  ${LEDS_TARGET}
   ${COMM_TARGET}
+  ${LEDS_TARGET}
+  ${SENSORS_TARGET}
+  ${MOTION_TARGET}
   ${NOGGIN_TARGET}
   ${VISION_TARGET}
-  ${MAN_MOTION_TARGET}
   )
 
 
@@ -200,9 +200,9 @@ TARGET_LINK_LIBRARIES(
 # Set the sudirectories (some may not actually be subdirectories) to
 # include in this package
 SUBDIRS(
-  ${MAN_MOTION_CMAKE_DIR}
-  ${CORPUS_CMAKE_DIR}
   ${COMM_CMAKE_DIR}
+  ${CORPUS_CMAKE_DIR}
+  ${MOTION_CMAKE_DIR}
   ${NOGGIN_CMAKE_DIR}
   ${VISION_CMAKE_DIR}
   )

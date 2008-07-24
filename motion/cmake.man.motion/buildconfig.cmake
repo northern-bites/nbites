@@ -24,7 +24,7 @@ ENDIF( NOT DEFINED ROBOT_TYPE )
 
 # See documentation strings for descriptions
 OPTION(
-  PYTHON_SHARED_MAN_MOTION
+  PYTHON_SHARED_MOTION
   "Compile man/motion as a shared library for Python dynamic loading"
   OFF
   )

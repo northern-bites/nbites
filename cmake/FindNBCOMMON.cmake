@@ -34,29 +34,25 @@ SET( VISION_INCLUDE_DIR ${TRUNK_PATH}/skull/vision )
 SET( NOGGIN_INCLUDE_DIR ${TRUNK_PATH}/skull/noggin )
 SET( COMM_INCLUDE_DIR   ${TRUNK_PATH}/comm         )
 SET( CORPUS_INCLUDE_DIR ${TRUNK_PATH}/corpus       )
+SET( MOTION_INCLUDE_DIR ${TRUNK_PATH}/motion       )
 
 SET( MAN_INCLUDE_DIR         ${TRUNK_PATH}                  )
-SET( MAN_MOTION_INCLUDE_DIR  ${TRUNK_PATH}/motion           )
 
 SET( VISION_CMAKE_DIR     ${VISION_INCLUDE_DIR}/cmake.vision     )
 SET( NOGGIN_CMAKE_DIR     ${NOGGIN_INCLUDE_DIR}/cmake.noggin     )
 SET( COMM_CMAKE_DIR       ${COMM_INCLUDE_DIR}/cmake.comm         )
 SET( CORPUS_CMAKE_DIR     ${CORPUS_INCLUDE_DIR}/cmake.man.corpus )
+SET( MAN_CMAKE_DIR        ${MAN_INCLUDE_DIR}/cmake.man           )
+SET( MOTION_CMAKE_DIR     ${MOTION_INCLUDE_DIR}/cmake.man.motion )
 
-SET( MAN_CMAKE_DIR         ${MAN_INCLUDE_DIR}/cmake.man                 )
-SET( MAN_MOTION_CMAKE_DIR  ${MAN_MOTION_INCLUDE_DIR}/cmake.man.motion   )
 
-
-SET( VISION_TARGET      vision     )
-SET( NOGGIN_TARGET      noggin     )
-SET( COMM_TARGET        comm       )
-SET( MOTION_TARGET      motion     )
-SET( SENSORS_TARGET     _sensors   )
+SET( COMM_TARGET        _comm      )
 SET( LEDS_TARGET        _leds      )
-SET( AIBO_VISION_TARGET aibovision )
-SET( AIBO_VISION_BINARY Vision.bin )
 SET( MAN_TARGET         man        )
-SET( MAN_MOTION_TARGET  _motion    )
+SET( MOTION_TARGET      _motion    )
+SET( NOGGIN_TARGET      noggin     )
+SET( SENSORS_TARGET     _sensors   )
+SET( VISION_TARGET      vision     )
 
 
 SET( TRUNK_REVISION r$ENV{TRUNK_REVISION} CACHE STRING "SVN Revision number" )

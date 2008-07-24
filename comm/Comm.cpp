@@ -271,7 +271,7 @@ static PyMethodDef PyComm_methods[] = {
 static PyTypeObject PyCommType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "comm.Comm",               /*tp_name*/
+    "_comm.Comm",               /*tp_name*/
     sizeof(PyComm),            /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)PyComm_dealloc,/*tp_dealloc*/
@@ -338,8 +338,8 @@ PyComm_new (Comm *comm)
 
 static PyMethodDef module_methods[] = { {NULL} };
 
-PyMODINIT_FUNC
-initcomm (void)
+bool
+c_init_comm (void)
 {
   if (!Py_IsInitialized())
     Py_Initialize();
@@ -354,15 +354,15 @@ initcomm (void)
       PyErr_Print();
     else
       fprintf(stderr, "But no error available!\n");
-    return;
+    return false;
   }
   
-  comm_module = Py_InitModule3("comm", module_methods,
+  comm_module = Py_InitModule3("_comm", module_methods,
       "Container module for Comm proxy class to C++");
 
   if (comm_module == NULL) {
     fprintf(stderr, "Error initializing Comm Python module\n");
-    return;
+    return false;
   }
 
   Py_INCREF(&PyCommType);
@@ -415,6 +415,13 @@ initcomm (void)
   PyModule_AddObject(comm_module, "inst", pcomm);
 #endif
   
+  return true;
+}
+
+PyMODINIT_FUNC
+init_comm (void)
+{
+  c_init_comm();
 }
 
 
@@ -894,8 +901,12 @@ Comm::parse_packet (const CommPacketHeader &packet, const char* data, int size)
 void
 Comm::add_to_module ()
 {
-  if (comm_module == NULL)
-    initcomm();
+  if (comm_module == NULL) {
+    if (!c_init_comm()) {
+      cerr << "Comm module failed to initialize the backend" << endl;
+      PyErr_Print();
+    }
+  }
 
   if (comm_module != NULL) {
     PyObject *comm = PyComm_new(this);
