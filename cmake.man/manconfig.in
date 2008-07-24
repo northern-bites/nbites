@@ -1,0 +1,98 @@
+/* -*- C++ -*- Tell editors this is a C++ file (despite it's .in extension) */
+/* This is an auto generated file. Please do not edit it.*/
+
+
+#ifndef _manconfig_h
+#define _manconfig_h
+
+
+
+
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
+
+
+# define TARGET_HOST_UNKNOWN    0
+# define TARGET_HOST_LINUX      1
+# define TARGET_HOST_WINDOWS    2
+# define TARGET_HOST_MACOSX     3
+
+# define TARGET_HOST ${TARGET_HOST}
+
+# if TARGET_HOST == TARGET_HOST_UNKNOWN
+#   error "Target host not supported, or badly detected !"
+# endif // TARGET_HOST == TARGET_HOST_UNKNOWN
+
+
+
+//
+// Debugging flags
+//
+
+
+// Compile as a remote binary, versus a dynamic library (ON/OFF)
+#define MAN_IS_REMOTE_${MAN_IS_REMOTE}
+#ifdef  MAN_IS_REMOTE_ON
+#  define MAN_IS_REMOTE
+#else
+#  undef MAN_IS_REMOTE
+#endif
+
+// print about the initialization of the Man class
+#define DEBUG_MAN_INITIALIZATION_${DEBUG_MAN_INITIALIZATION}
+#ifdef  DEBUG_MAN_INITIALIZATION_ON
+#  define DEBUG_MAN_INITIALIZATION
+#else
+#  undef  DEBUG_MAN_INITIALIZATION
+#endif
+
+// print information before each pthreads thread, mutex, or condition call
+#define DEBUG_MAN_THREADING_${DEBUG_MAN_THREADING}
+#ifdef  DEBUG_MAN_THREADING_ON
+#  define DEBUG_MAN_THREADING
+#else
+#  undef  DEBUG_MAN_THREADING
+#endif
+
+// print when each image is requested from the robot
+#define DEBUG_IMAGE_REQUESTS_${DEBUG_IMAGE_REQUESTS}
+#ifdef  DEBUG_IMAGE_REQUESTS_ON
+#  define DEBUG_IMAGE_REQUESTS
+#else
+#  undef  DEBUG_IMAGE_REQUESTS
+#endif
+
+// print whether a ball is seen in each frame
+#define DEBUG_BALL_DETECTION_${DEBUG_BALL_DETECTION}
+#ifdef  DEBUG_BALL_DETECTION_ON
+#  define DEBUG_BALL_DETECTION
+#else
+#  undef  DEBUG_BALL_DETECTION
+#endif
+
+// turn on/off vision processing
+#define USE_VISION_${USE_VISION}
+#ifdef  USE_VISION_ON
+#  define USE_VISION
+#else
+#  undef USE_VISION
+#endif
+
+// turn on/off motion actions
+#define USE_MOTION_${USE_MOTION}
+#ifdef  USE_MOTION_ON
+#  define USE_MOTION
+#else
+#  undef USE_MOTION
+#endif
+
+// Customize image locking configuration.  Man uses locking.
+#define USE_SENSORS_IMAGE_LOCKING_${USE_SENSORS_IMAGE_LOCKING}
+#ifdef  USE_SENSORS_IMAGE_LOCKING_ON
+#  define USE_SENSORS_IMAGE_LOCKING
+#else
+#  undef USE_SENSORS_IMAGE_LOCKING
+#endif
+
+
+#endif // !_manconfig_h
+

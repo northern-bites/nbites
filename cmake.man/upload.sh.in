@@ -1,0 +1,31 @@
+
+# Exit on error
+set -e
+# No uninitialized variables
+set -o nounset
+
+if [ "${REMOTE_INSTALL}" != "ON" ]; then
+  #echo "[upload.sh] Error - remote install not specified in configuration" >&2
+  #exit 1
+  echo "No remote install"
+  exit 0
+fi
+
+PLATFORM=$(uname)
+SRC=install/*
+DEST=/opt/naoqi/modules
+ROBOT=${REMOTE_ADDRESS}
+if [ ! -n "$ROBOT" ]; then
+  echo "[upload.sh] Error - no remote address specified" >&2
+  exit 1
+fi
+DEST=root@$ROBOT:$DEST
+
+#if [ "$PLATFORM" = "Darwin" ]; then
+#  make install -j4
+#else
+#  make install
+#fi
+
+echo "Connecting to $ROBOT"
+rsync -rcLv $SRC $DEST/

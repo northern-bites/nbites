@@ -1,0 +1,79 @@
+
+
+import math
+
+import motion
+from sensors import inst as sensors
+
+###### PLAYER STATES ########
+def player(player):
+    return player.goLater('walkForward')
+
+def walkForward(player):
+    if player.firstFrame():
+        player.brain.nav.walkStraight()
+
+    elif player.counter>200:
+        player.brain.nav.stopWalking()
+        return player.goLater('spinLeft')
+
+    return player.stay()
+
+def spinLeft(player):
+    if player.firstFrame():
+        turn = motion.WalkTurn(180.,30)
+        player.brain.motion.setNextWalkCommand(turn)
+
+    elif not player.brain.motion.isWalkActive():
+        return player.goLater('walkForward')
+
+    return player.stay()
+
+
+##### GOALIE STATES
+def goalie(player):
+    return player.goLater('strafeLeft')
+
+def strafeLeft(player):
+    if player.firstFrame():
+        walkLeft = motion.WalkSideways(40.,30)
+        player.brain.motion.setNextWalkCommand(walkLeft)
+
+    elif not player.brain.motion.isWalkActive():
+        return player.goLater('strafeRight')
+
+    return player.stay()
+
+def strafeRight(player):
+    if player.firstFrame():
+        walkRight = motion.WalkSideways(-40.,30)
+        player.brain.motion.setNextWalkCommand(walkRight)
+
+    elif not player.brain.motion.isWalkActive():
+        return player.goLater('strafeLeft')
+
+    return player.stay()
+
+
+"""
+Game Controller States
+"""
+def gamePlaying(player):
+    return player.goNow('player')
+
+def gamePenalized(player):
+    return player.goNow('stop')
+
+def gameInitial(player):
+    return player.goNow('gamePlaying')
+#return player.stay()
+
+def gameSet(player):
+    return player.stay()
+
+def gameReady(player):
+    return player.stay()
+
+def gameFinish(player):
+    return player.stay()
+

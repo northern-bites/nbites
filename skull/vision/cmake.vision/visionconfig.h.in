@@ -1,0 +1,23 @@
+/* -*- C++ -*- Tell editors this is a C++ file (despite it's .in extension) */
+/* This is an auto generated file. Please do not edit it.*/
+
+
+#ifndef _visionconfig_h_DEFINED
+#define _visionconfig_h_DEFINED
+
+
+
+
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
+
+// Insert a 'fake' Vision object into the Python module
+#define USE_PYVISION_FAKE_BACKEND_${USE_PYVISION_FAKE_BACKEND}
+#ifdef  USE_PYVISION_FAKE_BACKEND_ON
+#  define USE_PYVISION_FAKE_BACKEND
+#else
+#  undef  USE_PYVISION_FAKE_BACKEND
+#endif
+
+
+#endif // !_visionconfig_h_DEFINED
+
