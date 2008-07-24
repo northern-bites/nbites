@@ -31,18 +31,19 @@ class SoccerPlayer(FSA.FSA):
         ''' Returns where to position from ball location.
         Puts the robot in line with ball and goal center.'''
         destX,destY,destH = 0,0,0
-        m = ((OPP_GOALBOX_TOP_Y-self.brain.ball.y)/(NogginConstants.MIDFIELD_X-self.brain.ball.x))
+        m = ((OPP_GOALBOX_TOP_Y - self.brain.ball.y) /
+             (NogginConstants.MIDFIELD_X - self.brain.ball.x))
              
-        destX = self.brain.ball.x - math.sqrt(dist**2/(1+m**2))
+        destX = self.brain.ball.x - math.sqrt(dist**2 / (1 + m**2))
 
-        destY = m*(destX-self.brain.ball.x)+self.brain.ball.y        
+        destY = m * (destX - self.brain.ball.x) + self.brain.ball.y        
         if m == 0:
             destH = 0
         else:
-            destH = MyMath.getRelativeHeading(destX,destY,
+            destH = MyMath.getRelativeHeading(destX, destY,
                                               self.brain.ball.x,
                                               self.brain.ball.y)
-        return destX,destY,destH
+        return destX, destY, destH
 
 
     def shouldRefind(self):
@@ -53,7 +54,7 @@ class SoccerPlayer(FSA.FSA):
     def shouldApproachBall(self):
         ''' Should we move to kicking position '''
         errors = self.brain.nav.getErrors()
-        distError = (errors[0]**2 + errors[1]**2)**.5
+        distError = (errors[0]**2 + errors[1]**2) ** .5
         headingError = errors[2]
         return (distError < PlayerConstants.DIST_ERROR_THRESH and
                 headingError < PlayerConstants.HEADING_ERROR_THRESH)
