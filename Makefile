@@ -14,6 +14,8 @@ CONFIG_FILE = manconfig.h
 CROSS_FILE = $(BUILD_DIR)/cross
 STRAIGHT_FILE = $(BUILD_DIR)/straight
 
+PYC_FILES = $(shell find . -name "*.pyc")
+
 CROSS_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
 CMAKE_DEFS = -DOE_CROSS_BUILD=OFF
 CMAKE_CROSS_DEFS = -DCMAKE_TOOLCHAIN_FILE=$(CROSS_TOOLCHAIN) -DOE_CROSS_BUILD=ON
@@ -93,6 +95,6 @@ clean:
 	@$(MAKE) -C skull/noggin clean
 	@$(MAKE) -C skull/vision clean
 	@$(MAKE) -C comm         clean
-	$(RM) -r install/*
+	$(RM) -r install/* $(PYC_FILES)
 
 

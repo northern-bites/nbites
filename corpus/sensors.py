@@ -1,14 +1,14 @@
 
 import sys
-import _sensors
+try:
+    import _sensors
+except ImportError:
+    print >>sys.stderr,"**** WARNING - no backend _sensors module located ****"
+    _sensors = None
 
-if not hasattr(_sensors, "inst"):
+if _sensors and not hasattr(_sensors, "inst"):
     raise ImportError("C++ _sensors backend is not initialized.  Did you mean "
                       "to compile with USE_PYSENSORS_FAKE_BACKEND?")
-
-#class Sensors(_sensors.Sensors):
-#    def __init__(self):
-#        _sensors.Sensors.__init__(self, _sensors.inst)
 
 
 def Sensors():
