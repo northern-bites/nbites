@@ -9,7 +9,7 @@
 # Ensure the TRUNK_PATH variable is set
 
 IF( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS 
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
@@ -54,6 +54,28 @@ IF( NOT EXISTS ${AL_DIR} )
 ENDIF( NOT EXISTS ${AL_DIR} )
 
 
+############################ MAN INSTALL PREFIX
+# Ensure the MAN_INSTALL_PREFIX variable is set
+
+IF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
+  GET_FILENAME_COMPONENT(
+    MAN_INSTALL_PREFIX ${TRUNK_PATH}/install ABSOLUTE
+    )
+  SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
+  MESSAGE( STATUS 
+    "Environment variable MAN_INSTALL_PREFIX was not set, reseting to default ${MAN_INSTALL_PREFIX}!" )
+ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
+  SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
+ENDIF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
+
+# Make it an editable cache variable
+#  ** Right now, can't figure this out, not editable ** - jfishman@
+#SET(
+#  MAN_INSTALL_PREFIX ${MAN_INSTALL_PREFIX}
+#  CACHE STRING "Install prefix."
+#  )
+
+
 ############################ CMAKE POLICY
 # Settings regarding various cmake policy changes from 2.6
 
@@ -94,7 +116,10 @@ ENDIF( ${ROBOT_TYPE} STREQUAL AIBO_ERS7 OR ${ROBOT_TYPE} STREQUAL AIBO_220)
 # Define output directories.  Binaries, documentation, and libraries are
 # copied to final locations depending on robot type.
 
-SET( CMAKE_INSTALL_PREFIX ${TRUNK_PATH}/install CACHE INTERNAL "Install prefix" FORCE )
+SET(
+  CMAKE_INSTALL_PREFIX ${MAN_INSTALL_PREFIX}
+  CACHE INTERNAL "Install prefix"
+  )
 
 SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin" )
 SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
