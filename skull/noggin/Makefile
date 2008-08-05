@@ -12,7 +12,7 @@ CMAKE_SRCS = \
 	nogginconfig.h
 CMAKE_SRC := $(addprefix $(CMAKE_DIR),$(CMAKE_SRC))
 CONFIG_FILE = nogginconfig.h
-SWITCH_FILE = noggin/players/Switch.py
+SWITCH_FILE = players/Switch.py
 VISION_DIR = $(abspath $(CUR_DIR)/../vision)
 
 TRUNK_REVISION = r0 #$(shell svn info | grep Revision | awk 'FS=" " {print $$2}')

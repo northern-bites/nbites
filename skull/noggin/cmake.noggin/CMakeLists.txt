@@ -85,8 +85,8 @@ CONFIGURE_FILE(
     ESCAPE_QUOTES
   )
 CONFIGURE_FILE(
-  "${NOGGIN_INCLUDE_DIR}/noggin/players/Switch.py.in"
-  "${NOGGIN_INCLUDE_DIR}/noggin/players/Switch.py"
+  "${NOGGIN_INCLUDE_DIR}/players/Switch.py.in"
+  "${NOGGIN_INCLUDE_DIR}/players/Switch.py"
   )
 
 
@@ -113,8 +113,26 @@ SET( NOGGIN_SRCS ${NOGGIN_INCLUDE_DIR}/Noggin.cpp
                  )
 
 
-SET( NOGGIN_PYTHON_DIRS ${NOGGIN_INCLUDE_DIR}/noggin
-                        ${NOGGIN_INCLUDE_DIR}/util )
+SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
+                        ${NOGGIN_INCLUDE_DIR}/Brain.py
+                        ${NOGGIN_INCLUDE_DIR}/EKF.py
+                        ${NOGGIN_INCLUDE_DIR}/GameController.py
+                        ${NOGGIN_INCLUDE_DIR}/GameStates.py
+                        ${NOGGIN_INCLUDE_DIR}/HeadTracking.py
+                        ${NOGGIN_INCLUDE_DIR}/PanningStates.py
+                        ${NOGGIN_INCLUDE_DIR}/NaoOutput.py
+                        ${NOGGIN_INCLUDE_DIR}/NavConstants.py
+                        ${NOGGIN_INCLUDE_DIR}/NavStates.py
+                        ${NOGGIN_INCLUDE_DIR}/Navigator.py
+                        ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
+                        ${NOGGIN_INCLUDE_DIR}/TrackingStates.py
+                        ${NOGGIN_INCLUDE_DIR}/TypeDefs.py
+                        )
+
+SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/playBook
+                           ${NOGGIN_INCLUDE_DIR}/players
+                           ${NOGGIN_INCLUDE_DIR}/robots
+                           ${NOGGIN_INCLUDE_DIR}/util )
 
 SET( NOGGIN_EXT_SRCS ${NOGGIN_INCLUDE_DIR}/_ext/comm.py
                      ${NOGGIN_INCLUDE_DIR}/_ext/naovision.py
@@ -131,16 +149,20 @@ ADD_LIBRARY(
   STATIC
   ${NOGGIN_SRCS}
   )
+#INSTALL(
+#  TARGETS ${NOGGIN_TARGET}
+#  ARCHIVE DESTINATION ${OUTPUT_ROOT_DIR_LIB}
+#  CONFIGURATIONS Debug
+#  )
 INSTALL(
-  TARGETS ${NOGGIN_TARGET}
-  ARCHIVE DESTINATION ${OUTPUT_ROOT_DIR_LIB}
-  CONFIGURATIONS Debug
+  FILES ${NOGGIN_PYTHON_SRCS}
+  DESTINATION ${NOGGIN_PYTHON_TARGET_DIR}
+  CONFIGURATIONS "" Debug Release
   )
 INSTALL(
-  DIRECTORY ${NOGGIN_PYTHON_DIRS}
-  DESTINATION ${OUTPUT_ROOT_DIR_LIB}
+  DIRECTORY ${NOGGIN_PYTHON_SUBDIRS}
+  DESTINATION ${NOGGIN_PYTHON_TARGET_DIR}/
   CONFIGURATIONS "" Debug Release
-  PATTERN .svn EXCLUDE
   )
 INSTALL(
   FILES ${NOGGIN_EXT_SRCS}

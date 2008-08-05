@@ -142,12 +142,13 @@ SET( COMM_SRCS ${COMM_INCLUDE_DIR}/Comm
                ${COMM_INCLUDE_DIR}/TOOLConnect
                )
 
-IF( PYTHON_SHARED_COMM AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+IF( PYTHON_SHARED_COMM )
   LIST( APPEND COMM_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
                          ${CORPUS_INCLUDE_DIR}/NaoPose
                          )
-ENDIF( PYTHON_SHARED_COMM AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+ENDIF( PYTHON_SHARED_COMM )
 
+SET( COMM_PYTHON_SRCS ${COMM_INCLUDE_DIR}/__init__.py )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -165,8 +166,8 @@ IF( PYTHON_SHARED_COMM )
     )
   INSTALL(
     FILES ${COMM_TARGET_LOCATION}
-    DESTINATION ${OUTPUT_ROOT_DIR_LIB}
-    CONFIGURATIONS Debug
+    DESTINATION ${COMM_PYTHON_TARGET_DIR}
+    CONFIGURATIONS "" Debug Release
     RENAME ${COMM_TARGET}module.so
     )
 ELSE( PYTHON_SHARED_COMM )
@@ -178,6 +179,11 @@ ELSE( PYTHON_SHARED_COMM )
   # No INSTALL target when static
 ENDIF( PYTHON_SHARED_COMM )
 
+INSTALL(
+  FILES ${COMM_PYTHON_SRCS}
+  DESTINATION ${COMM_PYTHON_TARGET_DIR}
+  CONFIGURATIONS "" Debug Release
+  )
 
 ############################ SET LIBRARIES TO LINK WITH
 IF( ROBOT_NAO )
