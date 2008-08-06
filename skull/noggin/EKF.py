@@ -9,7 +9,7 @@ from math import pi, sin, cos, atan2, fabs, hypot, e, log
 # Try to import the c++ matrix library.  If this import fails,
 # it means we are testing offline, so then use the python library.
 try:
-    import matrix
+    from ..vision import matrix
     OFFLINE = False
 except ImportError:
     from .util import Matrix as matrix
