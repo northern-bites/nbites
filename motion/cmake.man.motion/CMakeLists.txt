@@ -110,8 +110,6 @@ SET( MOTION_PYTHON_SRCS ${MOTION_INCLUDE_DIR}/__init__.py
                         ${MOTION_INCLUDE_DIR}/SweetMoves.py
                         )
 
-SET( MOTION_TEST_DIR ${MOTION_INCLUDE_DIR}/test )
-
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -148,11 +146,6 @@ INSTALL(
   FILES ${MOTION_PYTHON_SRCS}
   DESTINATION ${MOTION_PYTHON_TARGET_DIR}
   CONFIGURATIONS "" Debug Release
-  )
-INSTALL(
-  FILES ${MOTION_TEST_DIR}/test_motion.py
-  DESTINATION ${OUTPUT_ROOT_DIR_LIB}
-  CONFIGURATIONS Debug
   )
 
 
