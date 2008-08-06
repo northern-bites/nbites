@@ -124,8 +124,6 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteLandmark
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/FieldObjects
-                 ${VISION_INCLUDE_DIR}/matrix
-                 ${VISION_INCLUDE_DIR}/matrixmodule
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Pose
                  ${VISION_INCLUDE_DIR}/PoseMatrix
@@ -144,6 +142,10 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
+SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix
+                 ${VISION_INCLUDE_DIR}/matrixmodule
+                 )
+
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -157,6 +159,11 @@ IF( PYTHON_SHARED_VISION )
     SHARED
     ${VISION_SRCS}
     )
+  ADD_LIBRARY(
+    ${MATRIX_TARGET}
+    SHARED
+    ${MATRIX_SRCS}
+    )
   # Install to XXXvisionmodule.so, instead of libvision.so
   GET_TARGET_PROPERTY( VISION_TARGET_LOCATION ${VISION_TARGET} LOCATION )
   INSTALL(
@@ -165,13 +172,20 @@ IF( PYTHON_SHARED_VISION )
     CONFIGURATIONS "" Debug Release
     RENAME ${ROBOT_PREFIX}${VISION_TARGET}module.so
     )
+  GET_TARGET_PROPERTY( MATRIX_TARGET_LOCATION ${MATRIX_TARGET} LOCATION )
+  INSTALL(
+    FILES ${MATRIX_TARGET_LOCATION}
+    DESTINATION ${VISION_PYTHON_TARGET_DIR}
+    CONFIGURATIONS "" Debug Release
+    RENAME ${MATRIX_TARGET}module.so
+    )
 ELSE( PYTHON_SHARED_VISION )
   # Add static library target
   MESSAGE( STATUS "hey" )
   ADD_LIBRARY(
     ${VISION_TARGET}
     STATIC
-    ${VISION_SRCS}
+    ${VISION_SRCS} ${MATRIX_SRCS}
     )
 ENDIF( PYTHON_SHARED_VISION )
 
