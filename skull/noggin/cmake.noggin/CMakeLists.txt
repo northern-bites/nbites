@@ -139,8 +139,6 @@ SET( NOGGIN_EXT_SRCS ${NOGGIN_INCLUDE_DIR}/_ext/comm.py
                      ${NOGGIN_INCLUDE_DIR}/_ext/potentialfield.py
                      )
 
-SET( NOGGIN_TEST_DIR ${NOGGIN_INCLUDE_DIR}/test )
-
 
 ############################ BUILD TARGETS
 
@@ -166,12 +164,6 @@ INSTALL(
   )
 INSTALL(
   FILES ${NOGGIN_EXT_SRCS}
-  DESTINATION ${OUTPUT_ROOT_DIR_LIB}
-  CONFIGURATIONS Debug
-  )
-INSTALL(
-  FILES ${NOGGIN_TEST_DIR}/test_noggin.py
-        ${NOGGIN_TEST_DIR}/test_vision.py
   DESTINATION ${OUTPUT_ROOT_DIR_LIB}
   CONFIGURATIONS Debug
   )
