@@ -124,6 +124,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteLandmark
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/FieldObjects
+                 ${VISION_INCLUDE_DIR}/matrix
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Pose
                  ${VISION_INCLUDE_DIR}/PoseMatrix
