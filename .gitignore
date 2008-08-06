@@ -1,2 +1,6 @@
+build*
 install/*
+*config.h
 *.pyc
+upload.sh
+skull/noggin/players/Switch.py
