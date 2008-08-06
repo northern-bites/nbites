@@ -134,11 +134,6 @@ SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/playBook
                            ${NOGGIN_INCLUDE_DIR}/robots
                            ${NOGGIN_INCLUDE_DIR}/util )
 
-SET( NOGGIN_EXT_SRCS ${NOGGIN_INCLUDE_DIR}/_ext/comm.py
-                     ${NOGGIN_INCLUDE_DIR}/_ext/naovision.py
-                     ${NOGGIN_INCLUDE_DIR}/_ext/potentialfield.py
-                     )
-
 
 ############################ BUILD TARGETS
 
@@ -161,11 +156,6 @@ INSTALL(
   DIRECTORY ${NOGGIN_PYTHON_SUBDIRS}
   DESTINATION ${NOGGIN_PYTHON_TARGET_DIR}/
   CONFIGURATIONS "" Debug Release
-  )
-INSTALL(
-  FILES ${NOGGIN_EXT_SRCS}
-  DESTINATION ${OUTPUT_ROOT_DIR_LIB}
-  CONFIGURATIONS Debug
   )
 
 
