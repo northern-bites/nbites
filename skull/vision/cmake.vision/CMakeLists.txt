@@ -143,9 +143,11 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
-SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix
-                 ${VISION_INCLUDE_DIR}/matrixmodule
-                 )
+SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrixmodule )
+
+IF( PYTHON_SHARED_VISION )
+  APPEND( MATRIX_SRC ${VISION_INCLUDE_DIR}/matrix )
+ENDIF( PYTHON_SHARED_VISION )
 
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
@@ -154,7 +156,6 @@ SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix
 
 IF( PYTHON_SHARED_VISION )
   # Add shared library target
-  MESSAGE( STATUS "yo" )
   ADD_LIBRARY(
     ${VISION_TARGET}
     SHARED
@@ -182,7 +183,6 @@ IF( PYTHON_SHARED_VISION )
     )
 ELSE( PYTHON_SHARED_VISION )
   # Add static library target
-  MESSAGE( STATUS "hey" )
   ADD_LIBRARY(
     ${VISION_TARGET}
     STATIC
