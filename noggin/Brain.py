@@ -17,7 +17,7 @@ from . import NogginConstants as Constants
 from . import TypeDefs
 # Packages and modules from sub-directories
 from . import robots
-from .playBook import GoTeam
+from .playbook import GoTeam
 from .players import Switch
 
 
@@ -62,7 +62,7 @@ class Brain(object):
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
-        self.playBook = GoTeam.GoTeam(self)
+        self.playbook = GoTeam.GoTeam(self)
         self.gameController = GameController.GameController(self)
 
         #for taking pictures
@@ -338,5 +338,5 @@ class Brain(object):
                           self.ball.uncertX,
                           self.ball.uncertY,
                           self.ball.dist,
-                          self.playBook.currentSubRole,
+                          self.playbook.currentSubRole,
                           -1) # Chase Time
