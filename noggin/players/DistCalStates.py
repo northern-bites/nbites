@@ -1,3 +1,4 @@
+
 """
 This file is used for determining distance and variance calibration.
 
@@ -13,7 +14,6 @@ based on head speed.
 import math
 
 import man.motion as motion
-from man.corpus.sensors import inst as sensors
 
 def nothing(player):
     """

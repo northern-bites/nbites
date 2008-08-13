@@ -4,6 +4,7 @@ import errno
 import socket
 import sys
 import traceback
+
 from ..util import FSA
 
 class SoccerPlayer(FSA.FSA):

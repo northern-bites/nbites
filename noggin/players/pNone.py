@@ -1,5 +1,6 @@
 
 import man.motion as motion
+
 from ..util import FSA
 from . import NoneStates
 

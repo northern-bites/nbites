@@ -3,7 +3,6 @@
 import math
 
 import man.motion as motion
-from man.corpus.sensors import inst as sensors
 
 ###### PLAYER STATES ########
 def player(player):

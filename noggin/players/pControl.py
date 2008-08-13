@@ -1,6 +1,5 @@
 
 from ..util import FSA
-
 from . import KeyControlStates
 
 class SoccerPlayer(FSA.FSA):

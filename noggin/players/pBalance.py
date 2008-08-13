@@ -1,5 +1,4 @@
 
-import code
 import man.motion as motion
 
 for var in nao.deviceNames:
