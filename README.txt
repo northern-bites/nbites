@@ -21,7 +21,7 @@ your shell.  To do this in bash add the following to your config file
      export AL_DIR
 
 NOTE: Depending on how your system is setup, you may need root permissions in
-order to install to /usr/local.  If you don
+order to install to /usr/local.
 
 The script will prompt you for a username, you should enter your Bowdoin LDAP
 username, you will then be asked to enter your password, in which case you
@@ -31,16 +31,42 @@ The script will take a while to download everthing and compile. If all goes
 correctly you should see no error messages and be greated with a nice "Done!"
 
 
-COMPILING THE CODE
+COMPILING & INSTALLING
 
-We compile via cmake. To compile the code simply run make in the man directory.
+We use CMake for compiling and installing our code.  It has most of GNU Make's
+features along with some other niceties.
+
+How you are going to use the code greatly determines how you should configure
+the build.  For most applications you will be compiling code to be run on the
+robot.  Thus you want to execute the following commands to cross compile for the
+robot's OS.  Do so with the following commands (where $ROBOCUP_HOME is the path
+to your robocup directories):
 
    cd $ROBOCUP_HOME/man
-   make
+   make cross
 
 If it is your first time running you will be taken to a configuration screen.
-To simply generate the files and continue compiling type g.
-If you need to configure anything the help commands at the bottom are
-informative.
+If you want to simply test if your code compiles, than press c to begin
+configuration and then press g to generate the configuration files.
 
-INSTALLING THE SOURCE
+If you are compiling for the robot you should make sure @MAN_IS_REMOTE@ is set
+to ON.  If it is set to OFF, you can change it by moving over the OFF text area
+and hitting the enter key.  Here you should also set the appropriate player for
+the robot and the IP address. Help for the configuration tool is accesible by
+typing h while the tool is running.
+
+If there are errors compiling and you need to change configuration files you can
+delete the configuration files and make the codebase ready for recompiling via:
+
+   make clean
+
+If you have an error compiling and need to clean your codebase, but do not wish
+to delete your configuration files you can delete the binaries only by using the
+command:
+
+    make cclean
+
+Once you have built the binaries they can be installed on the robot with the
+following command:
+
+    make install
