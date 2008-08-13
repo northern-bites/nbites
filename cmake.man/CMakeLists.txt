@@ -151,7 +151,6 @@ SET( MAN_SRCS ${MAN_INCLUDE_DIR}/Man
               )
 
 SET( MAN_PYTHON_SRCS ${MAN_INCLUDE_DIR}/__init__.py )
-SET( SKULL_PYTHON_SRCS ${SKULL_INCLUDE_DIR}/__init__.py )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -180,11 +179,6 @@ INSTALL(
 INSTALL(
   FILES ${MAN_PYTHON_SRCS}
   DESTINATION ${MAN_PYTHON_TARGET_DIR}
-  CONFIGURATIONS "" Debug Release
-  )
-INSTALL(
-  FILES ${SKULL_PYTHON_SRCS}
-  DESTINATION ${SKULL_PYTHON_TARGET_DIR}
   CONFIGURATIONS "" Debug Release
   )
 
