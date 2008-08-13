@@ -129,7 +129,7 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/TypeDefs.py
                         )
 
-SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/playBook
+SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/playbook
                            ${NOGGIN_INCLUDE_DIR}/players
                            ${NOGGIN_INCLUDE_DIR}/robots
                            ${NOGGIN_INCLUDE_DIR}/util )
