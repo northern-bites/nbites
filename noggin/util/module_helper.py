@@ -1,5 +1,13 @@
 
 '''
+08/13/2008 - Disregard the following for now.  It is correct in
+    reference to imported attributes, but NOT for imported modules.
+    With the change to a new and more robust robot platform, however,
+    we will probably not need this at all anymore.
+
+    @jfishman
+
+ ****
 
  A note from Jeremy...
 
