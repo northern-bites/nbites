@@ -90,11 +90,11 @@ cclean: $(CMAKE_DEPEND)
 
 clean:
 	$(RM) -r $(BUILD_DIR) $(CONFIG_FILE) $(INSTALL_SCRIPT)
-	@$(MAKE) -C corpus       clean
-	@$(MAKE) -C motion       clean
-	@$(MAKE) -C skull/noggin clean
-	@$(MAKE) -C skull/vision clean
-	@$(MAKE) -C comm         clean
+	@$(MAKE) -C corpus clean
+	@$(MAKE) -C motion clean
+	@$(MAKE) -C noggin clean
+	@$(MAKE) -C vision clean
+	@$(MAKE) -C comm   clean
 	$(RM) -r install/* $(PYC_FILES)
 
 
