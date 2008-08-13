@@ -1,6 +1,10 @@
 
 from math import fabs
 
+from . import PBDefs
+from . import PBConstants
+from . import Strategies
+
 try:
     import potentialfield
 except ImportError:
@@ -10,9 +14,6 @@ except ImportError:
     print >>sys.stderr, '****    GoTeam module will FAIL upon running!   ****'
     print >>sys.stderr, '****************************************************'
 
-from . import PBDefs
-from . import PBConstants
-from . import Strategies
 
 class GoTeam:
     """

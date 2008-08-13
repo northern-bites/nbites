@@ -1,5 +1,6 @@
 
 from math import hypot
+
 from .. import NogginConstants
 from . import PBConstants
 
