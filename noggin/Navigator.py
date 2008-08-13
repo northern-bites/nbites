@@ -1,7 +1,8 @@
-from .util import FSA
-from .util import MyMath
+
 from . import NavStates
 from . import NavConstants
+from .util import FSA
+from .util import MyMath
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):

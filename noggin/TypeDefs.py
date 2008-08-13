@@ -2,6 +2,7 @@
 from math import fabs, radians, sin, cos
 import time
 
+from . import NogginConstants as Constants
 from .util.MyMath import (dist,
                           getRelativeBearing,
                           getRelativeVelocityX,
@@ -9,7 +10,6 @@ from .util.MyMath import (dist,
                           getRelativeX,
                           getRelativeY)
 
-from . import NogginConstants as Constants
 
 class MyInfo:
     '''

@@ -1,6 +1,8 @@
+
 """
 NaoOutput.py - File for holding all sorts of output and logging functions
 """
+
 # CONSTANTS
 # saveFrame
 FRAME_DIR = "picSet/"

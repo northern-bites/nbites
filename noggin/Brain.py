@@ -4,9 +4,9 @@ import time
 # Packages and modules from super-directories
 from man import comm
 from man import motion
+from man import vision
 from man.corpus import leds, sensors
 from man.motion import MotionConstants
-from man.skull  import vision
 # Modules from this directory
 from . import EKF
 from . import GameController

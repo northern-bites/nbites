@@ -5,6 +5,13 @@ where am I?
 
 from math import pi, sin, cos, atan2, fabs, hypot, e, log
 
+from man.motion import MotionConstants
+from . import NogginConstants as Constants
+from .util.MyMath import (dist,
+                          safe_atan2,
+                          sign,
+                          sub180Angle,
+                          sub180Diff)
 
 # Try to import the c++ matrix library.  If this import fails,
 # it means we are testing offline, so then use the python library.
@@ -17,9 +24,6 @@ except ImportError:
 #jf- whats the point of this?  can we just remove all OFFLINE stuff?
 OFFLINE = False
 
-from man.motion import MotionConstants
-from . import NogginConstants as Constants
-from .util.MyMath import sub180Angle, sub180Diff, dist, safe_atan2, sign
 
 class EKF:
     """
