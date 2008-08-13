@@ -28,8 +28,6 @@ class Noggin
   private:
     // Initialize the interpreter, the vision module, and PyVision instance
     void initializeVision(Vision *v);
-    // Load sys module and add current working directory to the module path
-    void modifySysPath();
     // Import the util.module_helper and noggin.Brain modules
     bool import_modules();
     // Instantiate a Brain instance

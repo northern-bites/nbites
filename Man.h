@@ -23,6 +23,20 @@
 #include "NaoPose.h"
 
 /**
+ * Preferences class to alter Python settings for our robot system.
+ *
+ * This is kind of a hack.
+ */
+class PythonPreferences
+{
+  public:
+    PythonPreferences();
+    virtual ~PythonPreferences() { }
+
+    void modifySysPath();
+};
+
+/**
  * The Naoqi module to run our main Nao robot system.
  *
  * @author Jeremy R. Fishman
@@ -113,6 +127,7 @@ class Man
     //   if the modules are not instantiated in this order, some dependedcies
     //   (i.e. the Python modules exported) will not be available by the time
     //   other modules are imported
+    PythonPreferences python_prefs;
     Profiler profiler;
     Sensors sensors;
     Motion motion;
