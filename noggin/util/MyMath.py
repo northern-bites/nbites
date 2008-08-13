@@ -1,8 +1,17 @@
+
 """
 myMath.py - a number of methods for simple often used math
 """
 
-from math import fabs, hypot, pi, atan2, sin, cos, radians, degrees
+from math import (atan2,
+                  cos,
+                  degrees,
+                  fabs,
+                  hypot,
+                  pi,
+                  radians,
+                  sin)
+
 
 def sub180Angle(angle):
     """

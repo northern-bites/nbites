@@ -1,6 +1,8 @@
+
 """
 This file contains an implementation of a finite state automaton.
 """
+
 import time
 
 DEBUG =False
