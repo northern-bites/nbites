@@ -15,13 +15,7 @@ from .util.MyMath import (dist,
 
 # Try to import the c++ matrix library.  If this import fails,
 # it means we are testing offline, so then use the python library.
-try:
-    from ..vision import matrix
-    OFFLINE = False
-except ImportError:
-    from .util import Matrix as matrix
-    OFFLINE = True
-#jf- whats the point of this?  can we just remove all OFFLINE stuff?
+from ..vision import matrix
 OFFLINE = False
 
 
