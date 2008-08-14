@@ -2,6 +2,7 @@
 try:
     from ._comm import (Comm,
                         GameController,
+                        inst,
                         PENALTY_BALL_HOLDING,
                         PENALTY_DAMAGE,
                         PENALTY_GOALIE_PUSHING,
