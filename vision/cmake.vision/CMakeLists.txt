@@ -142,7 +142,9 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/_matrixmodule
                  )
 
-SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
+SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py
+                        ${VISION_INCLUDE_DIR}/matrix.py
+                        )
 
 SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix
                  ${VISION_INCLUDE_DIR}/_matrixmodule
