@@ -124,7 +124,6 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteLandmark
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/FieldObjects
-                 ${VISION_INCLUDE_DIR}/matrix
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Pose
                  ${VISION_INCLUDE_DIR}/PoseMatrix
@@ -139,15 +138,15 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/VisualLandmark
                  ${VISION_INCLUDE_DIR}/VisualLine
                  #${VISION_INCLUDE_DIR}/Zlib
+                 ${VISION_INCLUDE_DIR}/matrix
+                 ${VISION_INCLUDE_DIR}/matrixmodule
                  )
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
-SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrixmodule )
-
-IF( PYTHON_SHARED_VISION )
-  LIST( APPEND MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix )
-ENDIF( PYTHON_SHARED_VISION )
+SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix
+                 ${VISION_INCLUDE_DIR}/matrixmodule
+                 )
 
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
@@ -186,7 +185,7 @@ ELSE( PYTHON_SHARED_VISION )
   ADD_LIBRARY(
     ${VISION_TARGET}
     STATIC
-    ${VISION_SRCS} ${MATRIX_SRCS}
+    ${VISION_SRCS}
     )
 ENDIF( PYTHON_SHARED_VISION )
 
