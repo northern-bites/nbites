@@ -11,7 +11,7 @@ class GameController(FSA.FSA):
         self.brain = brain
         self.gc = brain.comm.gc
         #jf- self.setTimeFunction(self.brain.nao.getSimulatedTime)
-        self.addStates(noggin.GameStates)
+        self.addStates(GameStates)
 	self.currentState = 'gameInitial'
         self.setName('GameController')
         self.setPrintStateChanges(True)
