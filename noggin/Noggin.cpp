@@ -58,7 +58,7 @@ Noggin::initializeVision(Vision *v)
   if (vision == NULL)
     cerr << "** Noggin extension could not initialize PyVision object **" <<
         endl;
-  vision_addToModule(reinterpret_cast<PyObject*>(vision), "inst");
+  vision_addToModule(reinterpret_cast<PyObject*>(vision), MODULE_HEAD);
 
   initpotentialfield();
   init_matrix();
