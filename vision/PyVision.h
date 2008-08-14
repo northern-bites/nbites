@@ -921,8 +921,8 @@ typedef struct PyVision_t {
   // Yellow goal left and right posts
   PyObject *ygrp, *yglp;
 
-  // Goal backstops
-  PyObject *bgBackstop, *ygBackstop;
+  // Goal crossbars
+  PyObject *bgCrossbar, *ygCrossbar;
 
   // Robot recognition
   PyObject *red1, *red2, *navy1, *navy2;
@@ -1001,10 +1001,10 @@ static PyMemberDef PyVision_members[] = {
     "Yellow goal right post"},
   {"yglp", T_OBJECT_EX, offsetof(PyVision, yglp), READONLY,
     "Yellow goal left post"},
-  {"bgBackstop", T_OBJECT_EX, offsetof(PyVision, bgBackstop), READONLY,
-    "Blue goal backstop"},
-  {"ygBackstop", T_OBJECT_EX, offsetof(PyVision, ygBackstop), READONLY,
-    "Yellow goal backstop"},
+  {"bgCrossbar", T_OBJECT_EX, offsetof(PyVision, bgCrossbar), READONLY,
+    "Blue goal crossbar"},
+  {"ygCrossbar", T_OBJECT_EX, offsetof(PyVision, ygCrossbar), READONLY,
+    "Yellow goal crossbar"},
 
 
   // Robot recognition

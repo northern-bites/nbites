@@ -15,7 +15,7 @@ def nothing(player):
     """
     Do nothing
     """
-    
+
     #player.brain.motion.setDefaultPosition()
 
 
@@ -139,7 +139,7 @@ def circleOnBallRight(player):
     if 22< player.counter<=30:
         if (player.brain.oppGoalLeftPost.on or
             player.brain.oppGoalRightPost.on or
-            player.brain.oppGoalBackstop.on):
+            player.brain.oppGoalCrossbar.on):
             print "i see opp goal"
             player.seenGoal += 1
 
@@ -364,7 +364,7 @@ def gameInitial(player):
     """
     if (player.brain.oppGoalLeftPost.on or
         player.brain.oppGoalRightPost.on or
-        player.brain.oppGoalBackstop.on):
+        player.brain.oppGoalCrossbar.on):
         print "i see opp goal"
         
 

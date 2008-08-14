@@ -92,10 +92,10 @@ class Brain(object):
         self.bgrp = TypeDefs.FieldObject(self.vision.bgrp,
                                          Constants.VISION_BGRP)
 
-        self.bgBackstop = TypeDefs.FieldObject(self.vision.bgBackstop,
-                                         Constants.VISION_BG_BACKSTOP)
-        self.ygBackstop = TypeDefs.FieldObject(self.vision.ygBackstop,
-                                         Constants.VISION_YG_BACKSTOP)
+        self.bgCrossbar = TypeDefs.FieldObject(self.vision.bgCrossbar,
+                                         Constants.VISION_BG_CROSSBAR)
+        self.ygCrossbar = TypeDefs.FieldObject(self.vision.ygCrossbar,
+                                         Constants.VISION_YG_CROSSBAR)
 
         
         # Now we setup the corners
@@ -116,24 +116,24 @@ class Brain(object):
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
-            self.oppGoalBackstop = self.ygBackstop
+            self.oppGoalCrossbar = self.ygCrossbar
 
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
-            self.myGoalBackstop = self.bgBackstop
-            
+            self.myGoalCrossbar = self.bgCrossbar
+
         # Yellow team setup
         else:
             # Yellow goal
             self.myGoalLeftPost = self.yglp
             self.myGoalRightPost = self.ygrp
-            self.myGoalBackstop = self.ygBackstop
+            self.myGoalCrossbar = self.ygCrossbar
 
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
-            self.oppGoalBackstop = self.bgBackstop
+            self.oppGoalCrossbar = self.bgCrossbar
 
         # Since, for ex.  bgrp points to the same thins as myGoalLeftPost,
         # we can set these regardless of our team color
@@ -236,8 +236,8 @@ class Brain(object):
         self.ygrp.updateVision(self.vision.ygrp)
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
-        self.ygBackstop.updateVision(self.vision.ygBackstop)
-        self.bgBackstop.updateVision(self.vision.bgBackstop)
+        self.ygCrossbar.updateVision(self.vision.ygCrossbar)
+        self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
         # Update the corner information
         self.corners = []

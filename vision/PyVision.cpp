@@ -1002,8 +1002,8 @@ PyVision_new (Vision *v)
     self->ygrp = PyFieldObject_new(v->ygrp);
     self->yglp = PyFieldObject_new(v->yglp);
 
-    self->bgBackstop = PyFieldObject_new(v->bgBackstop);
-    self->ygBackstop = PyFieldObject_new(v->ygBackstop);
+    self->bgCrossbar = PyFieldObject_new(v->bgBackstop);
+    self->ygCrossbar = PyFieldObject_new(v->ygBackstop);
 
 
     self->red1 = PyFieldObject_new(v->red1);
@@ -1022,7 +1022,7 @@ PyVision_new (Vision *v)
         self->bgrp == NULL       || self->bglp == NULL   ||
         self->ygrp == NULL       || self->yglp == NULL   ||
 
-        self->bgBackstop == NULL || self->ygBackstop == NULL ||
+        self->bgCrossbar == NULL || self->ygCrossbar == NULL ||
 
         self->red1 == NULL       || self->red2 == NULL   ||
         self->navy1 == NULL      || self->navy2 == NULL  ||
@@ -1053,8 +1053,8 @@ PyVision_update (PyVision *self)
   PyFieldObject_update((PyFieldObject *)self->ygrp);
   PyFieldObject_update((PyFieldObject *)self->yglp);
 
-  PyFieldObject_update((PyFieldObject *)self->bgBackstop);
-  PyFieldObject_update((PyFieldObject *)self->ygBackstop);
+  PyFieldObject_update((PyFieldObject *)self->bgCrossbar);
+  PyFieldObject_update((PyFieldObject *)self->ygCrossbar);
 
   PyFieldObject_update((PyFieldObject *)self->red1);
   PyFieldObject_update((PyFieldObject *)self->red2);

@@ -129,7 +129,7 @@ def checkOwnGoal(player):
 
     if (player.counter<7 and
         seenMyGoal<2):
-        if (player.brain.myGoalBackstop or
+        if (player.brain.myGoalCrossbar or
             player.brain.myGoalLeftPost or
             player.brain.myGoalRightPost):
             seenMyGoal+=1
@@ -170,7 +170,7 @@ def circleOnBallRight(player):
     if 22< player.counter<=30:
         if (player.brain.oppGoalLeftPost.on or
             player.brain.oppGoalRightPost.on or
-            player.brain.oppGoalBackstop.on):
+            player.brain.oppGoalCrossbar.on):
             print "i see opp goal"
             player.seenGoal += 1
 
@@ -380,7 +380,7 @@ def gameInitial(player):
     """
     if (player.brain.oppGoalLeftPost.on or
         player.brain.oppGoalRightPost.on or
-        player.brain.oppGoalBackstop.on):
+        player.brain.oppGoalCrossbar.on):
         print "i see opp goal"
         
 

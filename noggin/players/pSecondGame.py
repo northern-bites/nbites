@@ -55,8 +55,8 @@ class SoccerPlayer(FSA.FSA):
     def inlineWithGoal(self):
         shootingObjBearing = None
 
-        if self.brain.oppGoalBackstop.on:
-            shootingObjBearing = self.brain.oppGoalBackstop.bearing
+        if self.brain.oppGoalCrossbar.on:
+            shootingObjBearing = self.brain.oppGoalCrossbar.bearing
         elif self.brain.oppGoalLeftPost.on and self.brain.oppGoalRightPost.on:
             shootingObjBearing = (self.brain.oppGoalRightPost.bearing +
                                   self.brain.oppGoalLeftPost.bearing)/2
