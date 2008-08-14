@@ -10,7 +10,12 @@ try:
                         PENALTY_LEAVING,
                         PENALTY_MANUAL,
                         PENALTY_NONE,
-                        PENALTY_OBSTRUCTION)
+                        PENALTY_OBSTRUCTION,
+                        STATE_FINISHED,
+                        STATE_INITIAL,
+                        STATE_PLAYING,
+                        STATE_READY,
+                        STATE_SET)
 except ImportError:
     import sys
     print >>sys.stderr, "**** WARNING - No backend _comm module located ****"
