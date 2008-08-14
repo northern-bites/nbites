@@ -1,5 +1,5 @@
 """
-Here we house all of the things to help answer the existential question of\ 
+Here we house all of the things to help answer the existential question of
 where am I?
 """
 
@@ -15,7 +15,18 @@ from .util.MyMath import (dist,
 
 # Try to import the c++ matrix library.  If this import fails,
 # it means we are testing offline, so then use the python library.
+<<<<<<< HEAD:noggin/EKF.py
 from ..vision import matrix
+=======
+try:
+    from ..vision import matrix
+    OFFLINE = False
+except ImportError:
+    from .util import Matrix as matrix
+    OFFLINE = True
+#jf- whats the point of this?  can we just remove all OFFLINE stuff?
+#th- no!
+>>>>>>> Small commenting changes to EKF.py:skull/noggin/EKF.py
 OFFLINE = False
 
 
