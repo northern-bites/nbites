@@ -1,7 +1,7 @@
 
-#include "matrixmodule.h"
+#include "_matrixmodule.h"
 
-static char * ModuleName = "matrix";
+static char * ModuleName = "_matrix";
 
 static PyObject *MatrixError;  // forward reference
 
@@ -668,7 +668,7 @@ static PyMethodDef module_methods[] = {
 };
 
 PyMODINIT_FUNC
-initmatrix(void) 
+init_matrix(void)
 {
     if (!Py_IsInitialized())
       Py_Initialize();

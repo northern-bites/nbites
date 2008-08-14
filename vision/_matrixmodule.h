@@ -3,4 +3,4 @@
 #include "matrix.h"
 
 
-PyMODINIT_FUNC initmatrix();
+PyMODINIT_FUNC init_matrix();
