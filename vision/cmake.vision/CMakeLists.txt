@@ -139,13 +139,13 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/VisualLine
                  #${VISION_INCLUDE_DIR}/Zlib
                  ${VISION_INCLUDE_DIR}/matrix
-                 ${VISION_INCLUDE_DIR}/matrixmodule
+                 ${VISION_INCLUDE_DIR}/_matrixmodule
                  )
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
 SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix
-                 ${VISION_INCLUDE_DIR}/matrixmodule
+                 ${VISION_INCLUDE_DIR}/_matrixmodule
                  )
 
 
