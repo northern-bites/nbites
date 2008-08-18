@@ -6,6 +6,7 @@
  * @author Tucker Hermans
  */
 
+#include "MCL.h"
 
 /**
  * Initializes the sampel sets so that the first update works appropriately
@@ -13,6 +14,12 @@
 MCL::MCL()
 {
     // Initialize estimate to the center of the field
+    setXEst(CENTER_FIELD_X);
+    setYEst(CENTER_FIELD_Y);
+    setHEst(OPP_GOAL_HEADING);
+    setXUncert(MAX_UNCERT_X);
+    setYUncert(MAX_UNCERT_Y);
+    setHUncert(MAX_UNCERT_H);
 }
 
 MCL::~MCL()
@@ -29,12 +36,12 @@ MCL::~MCL()
  *
  * @return The set of particles representing the estimate of the current frame.
  */
-vector<Particle> MCL::updateLoc(vector<Particle> X_t_1, MotionModel u_t,
-                                vector<Measurement> z_t)
+void MCL::updateLocalization(MotionModel u_t, vector<Measurement> z_t)
 {
     // Initialize the current set of particles
+    vector<Particle> X_t_1 = X_t;
+    X_t = NULL;
     vector<Particle> X_bar_t; // A priori estimates
-    vector<Particle> X_t; // Posterior estimates
 
     // Run through the particles
     for (int m = 0; m < M; ++m) {
@@ -60,8 +67,8 @@ vector<Particle> MCL::updateLoc(vector<Particle> X_t_1, MotionModel u_t,
         }
     }
 
-    // Set estimates to weighted means
-
+    // Update pose and uncertainty estimates
+    updateEstimates();
     return X_t;
 }
 
@@ -102,4 +109,63 @@ poseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
 float MCL::updateMeasurementModel(vector<Measurement> z_t, PoseEst x_t,
                                   int m)
 {
+    // Give the particle a weight of 1 to begin with
+    float w = 1;
+
+    // Determine the likelihood of each observation
+    for (unsigned int i = 0; i < z_t.size(); ++i) {
+        // If unambiguous
+        // Determine divergence & likelihood
+
+        // If ambiguous
+        // Determine divergence & likelihood
+    }
+
+    return w;
+}
+
+/**
+ * Method to update the robot pose and uncertainty estimates.
+ * Calculates the weighted mean and biased standard deviations of the particles.
+ */
+void MCL::updateOdometery()
+{
+    PoseEst wMeans = {0.,0.,0.};
+    float weightSum = 0.;
+    PoseEst bSDs = {0., 0., 0.};
+
+    // Calculate the weighted mean
+    for (unsigned int i = 0; i < X_t.size(); ++i) {
+        // Sum the values
+        wMeans.x += X_t[i].pose.x*X_t[i].weight;
+        wMeans.y += X_t[i].pose.y*X_t[i].weight;
+        wMeans.h += X_t[i].pose.h*X_t[i].weight;
+
+        // Sum the weights
+        weightSum += X_t[i].weight;
+    }
+
+    wMeans.x /= weightSum;
+    wMeans.y /= weightSum;
+    wMeans.h /= weightSum;
+
+    // Calculate the biased variances
+    for (unsigned int i=0; i < X_t.size(); ++i) {
+        bSDs.x += X_t[i].weight * pow((X_t[i].pose.x - wMeans.x), 2.);
+        bSDs.y += X_t[i].weight * pow((X_t[i].pose.y - wMeans.y), 2.);
+        bSDs.h += X_t[i].weight * pow((X_t[i].pose.h - wMeans.h), 2.);
+    }
+
+    bSDs.x /= weightSum;
+    bSDs.x = sqrt(bSDs.x)
+
+    bSDs.y /= weightSum;
+    bSDs.y = sqrt(bSDs.y)
+
+    bSDS.h /= weightSum;
+    bSDs.h = sqrt(bSDs.h)
+
+    // Set class variables to reflect newly calculated values
+    curEst = wMeans;
+    curUncert = bSDs;
 }
