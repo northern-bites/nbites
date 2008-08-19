@@ -17,9 +17,13 @@ MCL::MCL()
     setXEst(CENTER_FIELD_X);
     setYEst(CENTER_FIELD_Y);
     setHEst(OPP_GOAL_HEADING);
+
+    // Initialize uncertainty to maximum values
     setXUncert(MAX_UNCERT_X);
     setYUncert(MAX_UNCERT_Y);
     setHUncert(MAX_UNCERT_H);
+
+    // Initialize particles to be equally spread about the field...
 }
 
 MCL::~MCL()
@@ -42,10 +46,11 @@ void MCL::updateLocalization(MotionModel u_t, vector<Measurement> z_t)
     vector<Particle> X_t_1 = X_t;
     X_t = NULL;
     vector<Particle> X_bar_t; // A priori estimates
+    float totalWeights = 0; // Must sum all weights for future use
 
     // Run through the particles
     for (int m = 0; m < M; ++m) {
-        Particle X_m;
+        Particle x_t_m;
         // Update motion model for the particle
         x_t_m.pose = updateOdometery(u_t, X_t_1[m].pose);
 
@@ -58,20 +63,18 @@ void MCL::updateLocalization(MotionModel u_t, vector<Measurement> z_t)
 
     // Resample the particles
     for (int m = 0; m < M; ++m) {
-        // Draw
-        int I = X_bar_t[m].weight;
+        // Determine the number of copies of this particle to add
+        int count = M * X_bar_t[m].weight / totalWeights;
 
-        // Add to particle set
-        for (int i = 0; i < I; ++i) {
-            X_t.push_back(X_bar_t[m])
+        // Add the particles to the resampled posterior
+        for (int i = 0; i < count; ++i) {
+            X_t.push_back(X_bar_t[m]);
         }
     }
 
     // Update pose and uncertainty estimates
     updateEstimates();
-    return X_t;
 }
-
 
 /**
  * Method updates the robot pose based on motion changes since the last frame.
