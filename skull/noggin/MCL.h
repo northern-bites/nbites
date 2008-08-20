@@ -18,23 +18,32 @@ using namespace std;
 
 // Structs
 // Pose Estimate
-struct PoseEst
+class PoseEst
 {
-    float x, y, h;
-};
+public:
+    float x;
+    float y;
+    float h;
+}
+
 // Odometery change
-struct MotionModel
+class MotionModel
 {
-    float deltaF, deltaL, deltaR;
-};
+public:
+    float deltaF;
+    flaot deltaL;
+    float deltaR;
+}
+
 // Particle
-struct Particle
+class Particle
 {
+public:
     PoseEst pose;
     float weight;
-    //EKF ball;
+    //BallEKF ball;
     //vector<EKF> opponents;
-};
+}
 
 // Math Macros
 #define DEG_TO_RAD (2. * PI) / 360.

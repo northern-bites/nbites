@@ -12,16 +12,16 @@ class EKF
 {
 public:
     // Constructors & Destructors
-    EKF(float initX, float initY,
-        float initVelX, float initVelY,
-        float initXUncert,float initYUncert,
-        float initVelXUncert, float initVelYUncert);
-    ~EKF();
+    EKF();
+    virtual ~EKF();
 
     // Core functions
-    void updateOdometery(MotionModel u_t);
-    void objectSighted(Measurement z_t);
-    void incorporateTeammateSighting(Measurement z_t);
-    void objectNotSighted();
+    virtual void timeUpdate(MotionModel u_t);
+    virtual void correctionStep(Measurement z_t);
+    virtual void noCorrectionStep();
+    //void incorporateTeammateSighting(Measurement z_t);
+
+//protected:
+
 }
 #endif _EKF_h_DEFINED

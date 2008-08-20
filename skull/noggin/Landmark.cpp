@@ -10,7 +10,22 @@
 
 /**
  *
+ * @param fo FieldObject that was seen to be passed into the filter
  */
-Landmark::Landmark()
+Landmark::Landmark(FieldObject fo)
+{
+}
+
+/**
+ * @param c Corner that was seen to be passed into the filter
+ */
+Landmark::Landmark(VisualCorner c)
+{
+}
+
+/**
+ * @param l Line that was seen to be passed into the filter.
+ */
+Landmark::Landmark(VisualLine l)
 {
 }
