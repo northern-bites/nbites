@@ -75,6 +75,7 @@ def generate_header_form(skel):
     f.write('\n')
     write_warning(f)
     write_copyright(f)
+    write_includes(f, skel)
     write_types(f, skel)
 
 def write_warning(f):
@@ -104,6 +105,14 @@ def write_copyright(f):
 
 ''')
 
+def write_includes(f, skel):
+    '''Write C++ header includes for a Skeleton definition to a file.'''
+    f.write('''\
+#include <Python.h>
+#include "%s.h"
+
+''' % skel.name)
+
 def write_types(f, skel):
     '''
     Write documentation and definitions for the types in a Skeleton to
@@ -115,9 +124,9 @@ def write_types(f, skel):
 def write_type(f, t):
     '''Write documentation and definitions for a type to a file.'''
 
-    funcs = [attr for attr, val in t.__dict__.iteritems()
+    funcs = dict((attr, val) for attr, val in t.__dict__.iteritems()
                     if not attr.startswith('__') and
-                       type(val) is types.FunctionType]
+                       type(val) is types.FunctionType)
     attrs = [attr for attr, val in t.__dict__.iteritems()
                     if not attr.startswith('__') and
                        attr not in funcs]
@@ -127,18 +136,70 @@ def write_type(f, t):
 //
 
 ''' % t.__name__)
+
+    write_type_struct(f, t, funcs, attrs)
+    write_type_methods(f, t, funcs, attrs)
+    write_type_attrs(f, t, funcs, attrs)
+    write_type_object(f, t, funcs, attrs)
+
+def write_type_struct(f, t, funcs, attrs):
     f.write('''\
 typedef struct Py%s_t
 {
     PyObject_HEAD
-    %s _%s;
+    %s* _%s;
 ''' % (t.__name__, t.__name__, t.__name__.lower()))
 
     if attrs:
         f.write('\n')
     for attr in attrs:
-        f.write('    TYPE %s;\n' % attr)
-    f.write('}\n\n\n')
+        f.write('    PyObject* %s;\n' % attr)
+    f.write('}\n\n')
+
+def write_type_methods(f, t, funcs, args):
+    f.write('''\
+// backend methods
+extern PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
+    PyObject* kwds);
+extern int Py%(type)s_init (PyObject* self, PyObject* arg, PyObject* kwds);
+extern void Py%(type)s_dealloc (PyObject* self);
+// C++ - accessible interface
+extern Py%(type)s *Py%(type)s_new (ARGS);
+// Python - accesible interface
+''' % {'type':t.__name__})
+
+    for func in sorted(funcs.keys()):
+        f.write('extern PyObject* Py%(type)s_%(func)s (PyObject* self, '
+                'PyObject* args);\n' % {'type':t.__name__, 'func':func})
+
+    f.write('''\
+
+// backend method list
+static PyMethodDef Py%(type)s_methods[] = {
+
+''' % {'type':t.__name__})
+
+    for func in sorted(funcs.keys()):
+        f.write('''\
+    {"%(func)s", reinterpret_case<PyCFunction>(Py%(type)s_%(func)s),
+      METH_VARARGS,
+      "%(doc)s"},
+
+''' % {'type':t.__name__, 'func':func,
+       'doc':funcs[func].__doc__.replace('\n', '\\n')})
+
+    f.write('''\
+    {NULL} // Sentinel
+};
+
+''')
+
+
+def write_type_attrs(f, t, funcs, attrs):
+    pass
+
+def write_type_object(f, t, funcs, attrs):
+    pass
 
 def generate_wrapper_form(skel):
     '''
