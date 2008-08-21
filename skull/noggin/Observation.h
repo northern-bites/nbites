@@ -1,20 +1,20 @@
 /**
- * Landmark.h
+ * Observation.h
  *
  * @author Tucker Hermans
  * @version %I%
  */
 
-#ifndef _Landmark_h_DEFINED
-#define _Landmark_h_DEFINED
+#ifndef Observation_h_DEFINED
+#define Observation_h_DEFINED
 using namespace std;
 
 #include "FieldConstants.h"
-#include "VisualCorner.h"
-#include "VisualLine.h"
+#include "ConcreteCorner.h"
+#include "ConcreteLine.h"
 
-// All possible landmark IDs
-enum LandmarkID
+// All possible observation IDs
+enum ObservationID
 {
     // Blue goal
     BLUE_GOAL_LEFT_POST;
@@ -31,14 +31,17 @@ enum LandmarkID
     // Lines
 };
 
-class Landmark
+class Observation
 {
 public:
+    // Fields
+    vector< pair<float, float> > posibilities;
+
     // Construcotrs & Destructors
-    Landmark(FieldObject fo);
-    Landmark(VisualCorner c);
-    Landmark(VisualLine l);
-    virtual ~Landmark();
+    Observation(FieldObject fo);
+    Observation(VisualCorner c);
+    Observation(VisualLine l);
+    virtual ~Observation();
 
     // Core Functions
 
@@ -54,14 +57,14 @@ public:
     /**
      * @return The standard deviation of the distance of the observation.
      */
-    float getDistSD() { return distSD; }
+    float getDistSD() { return sigma_d; }
     /*
      * @return The standard deviation of the bearing of the observation.
      */
-    float getBearingSD() { return bearingSD; }
+    float getBearingSD() { return sigma_b; }
 
     /*
-     * @return The ID of the landmark, element of LandmarkID enumeration.
+     * @return The ID of the landmark, element of ObservationID enumeration.
      */
     int getID() { return id; }
     /*
@@ -77,14 +80,16 @@ public:
      */
     float getY() { return y; }
 
+    bool isLine();
+
     // Setters
 
 private:
     // Vision information
     float visDist;
     float visBearing;
-    float distSD;
-    float bearingSD;
+    float sigma_d;
+    float sigma_b;
 
     // Identity information
     int id;
@@ -93,4 +98,4 @@ private:
     float y;
     float slope;
 }
-#endif // _Landmark_h_DEFINED
+#endif // _Observation_h_DEFINED

@@ -4,8 +4,8 @@
  * @author Tucker Hermans
  */
 
-#ifndef _MCL_h_DEFINED
-#define _MCL_h_DEFINED
+#ifndef MCL_h_DEFINED
+#define MCL_h_DEFINED
 using namespace std;
 
 // Includes
@@ -134,8 +134,12 @@ private:
     PoseEst updateOdometery(MotionModel u_t, PoseEst x_t);
     float updateMeasurementModel(vector<Observation> z_t, PoseEst x_t,
                                  int m);
-    // Helpers
     void updateEstimates();
+
+    // Helpers
+    float determinePointWeight(Observation z, PoseEst x_t);
+    float determineLineWeight(Observation z, PoseEst x_t);
+    float getSimilarity(float r_d, float r_a, float z);
 }
 
 #endif // _MCL_H_DEFINED

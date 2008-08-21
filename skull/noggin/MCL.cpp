@@ -109,58 +109,51 @@ poseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
  * @param m The particle ID
  * @return The particle weight
  */
-float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t,
-                                  int m)
+float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
 {
     // Give the particle a weight of 1 to begin with
     float w = 1;
-    // Expected dist and bearing
-    float d_hat;
-    float a_hat;
-    // Residuals of distance and bearing observations
-    float r_d;
-    float r_a;
-    // Similarity of observation and expectation
-    float s_d;
-    float s_a;
 
     // Determine the likelihood of each observation
     for (unsigned int i = 0; i < z_t.size(); ++i) {
 
-        // If unambiguous
-        if (not z_t[i].isAmbiguous()) {
-            // Determine expected distance to the landmark
-            d_hat = sqrt( pow(z_t.getX() - x_t.x, 2) +
-                          pow(z_t.getY() - x_t.y, 2));
-            // Expected bearing
-            a_hat = sub180Angle( atan2(z_t.getY() - x_t.y,
-                                       z_t.getX() - x_t.x) * RAD_TO_DEG -
-                                 90.0 - x_t.h);
-            // Calculate residuals
-            r_d = z_t.getDist() - d_hat;
-            r_a = z_t.getBearing() - a_hat;
+        if (z_t[i].isAmbiguous()) {
+            // Determine the most likely match
+            float p = 0; // Combined probability of observation
+            float pMax = -1; // Maximum combined probability
 
-            // Calculate the similarity of the observation and expectation
-            // Takes the form e^(-r_d^2/SD(d)^2)
-            s_d = exp(-pow(r_d,2) / pow(z_d.getDistSD(), 2));
-            s_a = exp(-pow(r_a,2) / pow(z_d.getBearingSD(), 2));
+            // Loop through all possible landmarks
+            for (unsigned int j = 0; j < z_t[i].possibilities.size(); ++j) {
+                if (z_t[i].isLine()) {
+                    p = determineLineWeight(z_t[i].possibilities[j], x_t);
+                } else {
+                    p = determinePointWeight(z_t[i].possibilities[j], x_t);
+                }
 
-            // Update the weight of the particle
-            w *= (s_d*s_a);
+                if( p > pMax) {
+                    pMax = p;
+                }
+            }
+            w *= pMax;
 
-        } else { // If ambiguous
-            // Determine divergence & likelihood
+        } else { // Unambiguous
+
+            if (z_t[i].isLine()) { // Line
+                w *= determineLineWeight(z_t[i], x_t);
+            } else { // Point
+                w *= determinePointWeight(z_t[i], x_t);
+            }
         }
     }
 
-    return w;
+    return w; // The combined weight of all observations
 }
 
 /**
  * Method to update the robot pose and uncertainty estimates.
  * Calculates the weighted mean and biased standard deviations of the particles.
  */
-void MCL::updateOdometery()
+void MCL::updateEstimates()
 {
     PoseEst wMeans = {0.,0.,0.};
     float weightSum = 0.;
@@ -200,4 +193,95 @@ void MCL::updateOdometery()
     // Set class variables to reflect newly calculated values
     curEst = wMeans;
     curUncert = bSDs;
+}
+
+//Helpers
+
+/**
+ * Determine the weight to compound the particle weight by for a single
+ * observation of an unambiguous point.
+ *
+ * @param z    the observation to determine the weight of
+ * @param x_t  the a priori estimate of the robot pose.
+ * @return     the probability of the observation
+ */
+MCL:float determinePointWeight(Observation z, PoseEst x_t)
+{
+    // Expected dist and bearing
+    float d_hat;
+    float a_hat;
+    // Residuals of distance and bearing observations
+    float r_d;
+    float r_a;
+
+    // Determine expected distance to the landmark
+    d_hat = sqrt( pow(z.getX() - x_t.x, 2) +
+                  pow(z.getY() - x_t.y, 2));
+    // Expected bearing
+    a_hat = sub180Angle( atan2(z.getY() - x_t.y, z.getX() - x_t.x) *
+                         RAD_TO_DEG - 90.0 - x_t.h);
+    // Calculate residuals
+    r_d = z.getVisDist() - d_hat;
+    r_a = z.getVisBearing() - a_hat;
+
+    return getSimilarity(r_d, r_a, z);
+}
+
+/**
+ * @param z    the observation to determine the weight of
+ * @param x_t  the a priori estimate of the robot pose.
+ * @return     the probability of the observation
+ */
+MCL::float determineLineWeight(Observation z, PoseEst x_t)
+{
+    // Distance and bearing for expected point
+    float d_hat;
+    float a_hat;
+
+    // Residuals of distance and bearing observations
+    float r_d;
+    float r_a;
+
+    // Determine nearest expected point on the line
+    point<float> pt_hat = {0., 0.};
+
+    // Get dist and bearing to expected point
+    d_hat = sqrt( pow(pt_hat.x - x_t.x, 2) +
+                  pow(pt_hat.y - x_t.y, 2));
+
+    // Expected bearing
+    a_hat = sub180Angle( atan2(pt_hat.y - x_t.y, pt_hat.x - x_t.x) *
+                         RAD_TO_DEG - 90.0 - x_t.h);
+
+    // Calculate residuals
+    r_d = fabs(z.getVisDist() - d_hat);
+    r_a = fabs(z.getVisBearing() - a_hat);
+
+    return getSimilarity(r_d, r_a, z);
+}
+
+/**
+ * Determine the similarity of an observation to a landmark location
+ *
+ * @param r_d     The difference between the expected and observed distance
+ * @param r_a     The difference between the expected and observed bearing
+ * @param sigma_d The standard deviation of the distance measurement
+ * @param sigma_a The standard deviation of the bearing measurement
+ * @return        The combined similarity of the landmark observation
+ */
+MCL::float getSimilarity(float r_d, float r_a, float sigma_d, float sigma_a)
+{
+    // Similarity of observation and expectation
+    float s_d;
+    float s_a;
+
+    // Calculate the similarity of the observation and expectation
+    // Takes the form e^(-r_d^2/SD(d)^2)
+    s_d = exp(-pow(r_d,2) / pow(sigma_d, 2));
+    s_a = exp(-pow(r_a,2) / pow(sigma_a, 2));
+
+    // Update the weight of the particle
+    // We multiple the weight till now with the combined probability of
+    // this iterations sighting
+    return s_d*s_a;
 }

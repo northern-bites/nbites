@@ -1,31 +1,41 @@
 /**
- * Landmark.cpp - The landmark class.  Here we house all those things needed
- * to describe a single landmark.  Landmarks can be field objects, corners (
- * line intersections), lines, and possibly other things in the future...
+ * Observation.cpp - The landmark observation class. Here we house all those
+ * things needed to describe a single landmark sighting.  Observations can be of
+ * field objects, corners (line intersections), lines, and possibly other
+ * things in the future (i.e. carpet edges)
  *
  * @author Tucker Hermans
  */
 
-#include "Landmark.h"
+#include "Observation.h"
 
 /**
+ * @param fo FieldObject that was seen and reported.
+ */
+Observation::Observation(FieldObject fo)
+{
+}
+
+/**
+ * @param c Corner that was seen and reported.
+ */
+Observation::Observation(ConcreteCorner c)
+{
+}
+
+/**
+ * @param l Line that was seen and reported.
+ */
+Observation::Observation(ConcreteLine l)
+{
+}
+
+/*
+ * Determines if the observed object is a line.
  *
- * @param fo FieldObject that was seen to be passed into the filter
+ * @return true if the observed object is a line
  */
-Landmark::Landmark(FieldObject fo)
+bool Observation::isLine()
 {
-}
-
-/**
- * @param c Corner that was seen to be passed into the filter
- */
-Landmark::Landmark(VisualCorner c)
-{
-}
-
-/**
- * @param l Line that was seen to be passed into the filter.
- */
-Landmark::Landmark(VisualLine l)
-{
+    return false;
 }
