@@ -1,5 +1,6 @@
 build*
 install/*
+tables/*/*
 *config.h
 *.pyc
 upload.sh
