@@ -13,8 +13,7 @@ using namespace std;
 #include <vector>
 #include <math.h>
 // Local
-//#include "FieldConstants.h"
-#include "Lnadmark.h"
+#include "Observation.h"
 
 // Structs
 // Pose Estimate
@@ -52,9 +51,6 @@ public:
 // Constants
 static const int M = 1000; // Number of particles
 
-// TypeDefs
-typedef pair<float, float> Measurement;
-
 // The Monte Carlo Localization class
 class MCL
 {
@@ -64,7 +60,7 @@ public:
     virtual ~MCL();
 
     // Core Functions
-    void updateLocalization(MotionModel u_t, vector<Measurement> z_t);
+    void updateLocalization(MotionModel u_t, vector<Observation> z_t);
 
     // Getters
     /**
@@ -136,7 +132,7 @@ private:
 
     // Core Functions
     PoseEst updateOdometery(MotionModel u_t, PoseEst x_t);
-    float updateMeasurementModel(vector<Measurement> z_t, PoseEst x_t,
+    float updateMeasurementModel(vector<Observation> z_t, PoseEst x_t,
                                  int m);
     // Helpers
     void updateEstimates();

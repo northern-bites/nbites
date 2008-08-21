@@ -36,11 +36,11 @@ MCL::~MCL()
  *
  * @param X_t_1 The set of particles from the previous update.
  * @param u_t The motion (odometery) change since the last update.
- * @param z_t The set of landmark sightings in the current frame.
+ * @param z_t The set of landmark observations in the current frame.
  *
  * @return The set of particles representing the estimate of the current frame.
  */
-void MCL::updateLocalization(MotionModel u_t, vector<Measurement> z_t)
+void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 {
     // Initialize the current set of particles
     vector<Particle> X_t_1 = X_t;
@@ -104,24 +104,53 @@ poseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
  * Method determines the weight of a particle based on the current landmark
  * observations.
  *
- * @param z_t The landmark sightings for the current frame.
+ * @param z_t The landmark observations for the current frame.
  * @param x_t The a priori estimate of the robot pose.
  * @param m The particle ID
  * @return The particle weight
  */
-float MCL::updateMeasurementModel(vector<Measurement> z_t, PoseEst x_t,
+float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t,
                                   int m)
 {
     // Give the particle a weight of 1 to begin with
     float w = 1;
+    // Expected dist and bearing
+    float d_hat;
+    float a_hat;
+    // Residuals of distance and bearing observations
+    float r_d;
+    float r_a;
+    // Similarity of observation and expectation
+    float s_d;
+    float s_a;
 
     // Determine the likelihood of each observation
     for (unsigned int i = 0; i < z_t.size(); ++i) {
-        // If unambiguous
-        // Determine divergence & likelihood
 
-        // If ambiguous
-        // Determine divergence & likelihood
+        // If unambiguous
+        if (not z_t[i].isAmbiguous()) {
+            // Determine expected distance to the landmark
+            d_hat = sqrt( pow(z_t.getX() - x_t.x, 2) +
+                          pow(z_t.getY() - x_t.y, 2));
+            // Expected bearing
+            a_hat = sub180Angle( atan2(z_t.getY() - x_t.y,
+                                       z_t.getX() - x_t.x) * RAD_TO_DEG -
+                                 90.0 - x_t.h);
+            // Calculate residuals
+            r_d = z_t.getDist() - d_hat;
+            r_a = z_t.getBearing() - a_hat;
+
+            // Calculate the similarity of the observation and expectation
+            // Takes the form e^(-r_d^2/SD(d)^2)
+            s_d = exp(-pow(r_d,2) / pow(z_d.getDistSD(), 2));
+            s_a = exp(-pow(r_a,2) / pow(z_d.getBearingSD(), 2));
+
+            // Update the weight of the particle
+            w *= (s_d*s_a);
+
+        } else { // If ambiguous
+            // Determine divergence & likelihood
+        }
     }
 
     return w;
