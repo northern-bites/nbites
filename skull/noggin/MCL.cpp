@@ -238,6 +238,8 @@ MCL::double determineLineWeight(Observation z, PoseEst x_t, LocLandmark l)
     double r_a;
 
     // Determine nearest expected point on the line
+    // NOTE:  This is currently too naive, we need to extrapolate the entire
+    // line from the vision inforamtion and find the closest expected distance
     point<double, double> pt_hat;
     if (z.isVertical()) {
         pt_hat.x = l.getX1();
