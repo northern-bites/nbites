@@ -26,9 +26,9 @@ ENDIF( NOT OE_CROSS_BUILD )
 # Defined package variable
 ##
 
-SET( NBCOMMON_INCLUDE_DIR "${TRUNK_PATH}/common/include" )
+SET( NBCOMMON_INCLUDE_DIR "${TRUNK_PATH}/include" )
 SET( NBCOMMON_LIBRARIES "" )
-SET( NBCOMMON_LIB_DIR "${TRUNK_PATH}/common/lib" )
+SET( NBCOMMON_LIB_DIR "${TRUNK_PATH}/lib" )
 
 SET( MAN_INCLUDE_DIR    ${TRUNK_PATH}                   )
 SET( COMM_INCLUDE_DIR   ${MAN_INCLUDE_DIR}/comm         )
