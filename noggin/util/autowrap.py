@@ -1,5 +1,6 @@
 
 import imp
+import pydoc
 import os
 import types
 
@@ -15,12 +16,7 @@ class Skeleton(object):
         return os.path.join(self.dirpath, '_' + self.name + 'module.h')
 
     def wrapper_name(self):
-        return os.path.join(self.dirpath, '_' + self.name +
-                            'module_autogen.h')
-
-    def form_name(self):
         return os.path.join(self.dirpath, '_' + self.name + 'module.cpp')
-
 
 
 def wrap_module(path):
@@ -75,7 +71,7 @@ def generate_header_form(skel):
     f.write('\n')
     write_warning(f)
     write_copyright(f)
-    write_includes(f, skel)
+    write_header_includes(f, skel)
     write_types(f, skel)
 
 def write_warning(f):
@@ -84,6 +80,7 @@ def write_warning(f):
 //  WARNING, this file was automatically generated using the Northern
 //  Bites' Python wrapper extension module generator.  Subsequent
 //  form-completion was done by hand.
+
 
 ''')
 
@@ -105,7 +102,7 @@ def write_copyright(f):
 
 ''')
 
-def write_includes(f, skel):
+def write_header_includes(f, skel):
     '''Write C++ header includes for a Skeleton definition to a file.'''
     f.write('''\
 #include <Python.h>
@@ -119,9 +116,9 @@ def write_types(f, skel):
     a file.
     '''
     for t in skel.types:
-        write_type(f, t)
+        write_type(f, skel, t)
 
-def write_type(f, t):
+def write_type(f, skel, t):
     '''Write documentation and definitions for a type to a file.'''
 
     funcs = dict((attr, val) for attr, val in t.__dict__.iteritems()
@@ -140,9 +137,10 @@ def write_type(f, t):
     write_type_struct(f, t, funcs, attrs)
     write_type_methods(f, t, funcs, attrs)
     write_type_attrs(f, t, funcs, attrs)
-    write_type_object(f, t, funcs, attrs)
+    write_type_object(f, skel, t, funcs, attrs)
 
 def write_type_struct(f, t, funcs, attrs):
+    '''Write the 'PyFoo_t' struct definition for the 'PyFoo' type.'''
     f.write('''\
 typedef struct Py%s_t
 {
@@ -157,6 +155,7 @@ typedef struct Py%s_t
     f.write('}\n\n')
 
 def write_type_methods(f, t, funcs, args):
+    '''Write the PyMethodDef array for a type to a file.'''
     f.write('''\
 // backend methods
 extern PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
@@ -198,14 +197,89 @@ static PyMethodDef Py%(type)s_methods[] = {
 def write_type_attrs(f, t, funcs, attrs):
     pass
 
-def write_type_object(f, t, funcs, attrs):
-    pass
+def write_type_object(f, skel, t, funcs, attrs):
+    '''Write the PyTypeObject for a type to a file.'''
+    f.write('''\
+// Py%(type)s type definition
+static PyTypeObject Py%(type)sType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "_%(module)s.%(type)s",    /*tp_name*/
+    sizeof(Py%(type)s),        /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Py%(type)s_dealloc,/*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "%(type)s object",         /* tp_doc */
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    Py%(type)s_methods,        /* tp_methods */
+    0,                         /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    0,                         /* tp_init */
+    0,                         /* tp_alloc */
+    (newfunc)Py%(type)s_new,   /* tp_new */
+};
+
+''' % {'type':t.__name__, 'module':skel.name})
+
 
 def generate_wrapper_form(skel):
     '''
     Generate a C++ source file wrapping the given skeleton definition.
     File is output to [skel.dirpath]/_[skel.name]module.cpp
     '''
+
+    f = file(skel.wrapper_name(), 'w')
+    f.write('\n')
+    write_warning(f)
+    write_copyright(f)
+    write_wrapper_includes(f, skel)
+    write_wrapper_methods(f, skel)
+
+def write_wrapper_includes(f, skel):
+    '''Write C++ wrapper includes for a Skeleton definition to a file.'''
+    f.write('#include "_%(module)smodule.h"\n' % {'module':skel.name})
+    f.write('\n\n')
+
+def write_wrapper_methods(f, skel):
+    for t in skel.types:
+        funcs = dict((attr, val) for attr, val in t.__dict__.iteritems()
+                        if not attr.startswith('__') and
+                        type(val) is types.FunctionType)
+        for func in sorted(funcs.keys()):
+            f.write('''\
+/**
+%(doc)s
+**/
+PyObject* Py%(type)s_%(func)s (PyObject* self, PyObject* args)
+{
+    Py_RETURN_NONE;
+}
+
+''' % {'type':t.__name__, 'func':func, 'doc':pydoc.getdoc(funcs[func])})
 
 
 if __name__ == '__main__':
