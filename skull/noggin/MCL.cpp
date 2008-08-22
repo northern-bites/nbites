@@ -46,7 +46,7 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
     vector<Particle> X_t_1 = X_t;
     X_t = NULL;
     vector<Particle> X_bar_t; // A priori estimates
-    float totalWeights = 0; // Must sum all weights for future use
+    double totalWeights = 0; // Must sum all weights for future use
 
     // Run through the particles
     for (int m = 0; m < M; ++m) {
@@ -86,8 +86,8 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 poseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
 {
     // Translate the relative change into the global coordinate system
-    float deltaX, deltaY, deltaH;
-    float calcFromAngle = (x_t.h + 90.) * DEG_TO_RAD;
+    double deltaX, deltaY, deltaH;
+    double calcFromAngle = (x_t.h + 90.) * DEG_TO_RAD;
     deltaX = u_t.deltaF * cos(calcFromAngle) - u_t.deltaL * sin(calcFromAngle);
     deltaY = u_t.deltaF * sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
     deltaH = deltaR; // Rotational change is the same as heading change
@@ -109,41 +109,32 @@ poseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
  * @param m The particle ID
  * @return The particle weight
  */
-float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
+double MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
 {
     // Give the particle a weight of 1 to begin with
-    float w = 1;
+    double w = 1;
 
     // Determine the likelihood of each observation
     for (unsigned int i = 0; i < z_t.size(); ++i) {
 
-        if (z_t[i].isAmbiguous()) {
-            // Determine the most likely match
-            float p = 0; // Combined probability of observation
-            float pMax = -1; // Maximum combined probability
+        // Determine the most likely match
+        double p = 0; // Combined probability of observation
+        double pMax = -1; // Maximum combined probability
 
-            // Loop through all possible landmarks
-            for (unsigned int j = 0; j < z_t[i].possibilities.size(); ++j) {
-                if (z_t[i].isLine()) {
-                    p = determineLineWeight(z_t[i].possibilities[j], x_t);
-                } else {
-                    p = determinePointWeight(z_t[i].possibilities[j], x_t);
-                }
-
-                if( p > pMax) {
-                    pMax = p;
-                }
+        // Loop through all possible landmarks
+        // If the observation is distinct, there will only be one possibility
+        for (unsigned int j = 0; j < z_t[i].possibilities.size(); ++j) {
+            if (z_t[i].isLine()) {
+                p = determineLineWeight(z_t[i], x_t, z_t.possibilities[j]);
+            } else {
+                p = determinePointWeight(z_t[i], x_t, z_t.possibilities[j]);
             }
-            w *= pMax;
 
-        } else { // Unambiguous
-
-            if (z_t[i].isLine()) { // Line
-                w *= determineLineWeight(z_t[i], x_t);
-            } else { // Point
-                w *= determinePointWeight(z_t[i], x_t);
+            if( p > pMax) {
+                pMax = p;
             }
         }
+        w *= pMax;
     }
 
     return w; // The combined weight of all observations
@@ -156,7 +147,7 @@ float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
 void MCL::updateEstimates()
 {
     PoseEst wMeans = {0.,0.,0.};
-    float weightSum = 0.;
+    double weightSum = 0.;
     PoseEst bSDs = {0., 0., 0.};
 
     // Calculate the weighted mean
@@ -199,20 +190,21 @@ void MCL::updateEstimates()
 
 /**
  * Determine the weight to compound the particle weight by for a single
- * observation of an unambiguous point.
+ * observation of an landmark point
  *
  * @param z    the observation to determine the weight of
  * @param x_t  the a priori estimate of the robot pose.
+ * @param l    the landmark to be used as basis for the observation
  * @return     the probability of the observation
  */
-MCL:float determinePointWeight(Observation z, PoseEst x_t)
+MCL:double determinePointWeight(Observation z, PoseEst x_t, Landmark l)
 {
     // Expected dist and bearing
-    float d_hat;
-    float a_hat;
+    double d_hat;
+    double a_hat;
     // Residuals of distance and bearing observations
-    float r_d;
-    float r_a;
+    double r_d;
+    double r_a;
 
     // Determine expected distance to the landmark
     d_hat = sqrt( pow(z.getX() - x_t.x, 2) +
@@ -228,22 +220,46 @@ MCL:float determinePointWeight(Observation z, PoseEst x_t)
 }
 
 /**
+ * Determine the simalirty between the observed and expected of a line.
+ *
  * @param z    the observation to determine the weight of
  * @param x_t  the a priori estimate of the robot pose.
+ * @param l    the landmark to be used as basis for the observation
  * @return     the probability of the observation
  */
-MCL::float determineLineWeight(Observation z, PoseEst x_t)
+MCL::double determineLineWeight(Observation z, PoseEst x_t, LocLandmark l)
 {
     // Distance and bearing for expected point
-    float d_hat;
-    float a_hat;
+    double d_hat;
+    double a_hat;
 
     // Residuals of distance and bearing observations
-    float r_d;
-    float r_a;
+    double r_d;
+    double r_a;
 
     // Determine nearest expected point on the line
-    point<float> pt_hat = {0., 0.};
+    point<double, double> pt_hat;
+    if (z.isVertical()) {
+        pt_hat.x = l.getX1();
+        pt_hat.y = x_t.getY();
+
+        // Make sure we aren't outside the line
+        if ( pt_hat.y < l.getY1()) {
+            pt_hat.y = l.getY1();
+        } else if ( pt_hat.y > l.getY2()) {
+            pt_hat.y = l.getY2();
+        }
+    } else { // Line is horizontal
+        pt_hat.x = x_t.getX();
+        pt_hat.y = l.getY1();
+
+        // Make sure we aren't outside the line
+        if ( pt_hat.x < l.getX1()) {
+            pt_hat.x = l.getX1();
+        } else if ( pt_hat.x > l.getX2()) {
+            pt_hat.x = l.getX2();
+        }
+    }
 
     // Get dist and bearing to expected point
     d_hat = sqrt( pow(pt_hat.x - x_t.x, 2) +
@@ -269,11 +285,12 @@ MCL::float determineLineWeight(Observation z, PoseEst x_t)
  * @param sigma_a The standard deviation of the bearing measurement
  * @return        The combined similarity of the landmark observation
  */
-MCL::float getSimilarity(float r_d, float r_a, float sigma_d, float sigma_a)
+MCL::double getSimilarity(double r_d, double r_a, double sigma_d,
+                          double sigma_a)
 {
     // Similarity of observation and expectation
-    float s_d;
-    float s_a;
+    double s_d;
+    double s_a;
 
     // Calculate the similarity of the observation and expectation
     // Takes the form e^(-r_d^2/SD(d)^2)

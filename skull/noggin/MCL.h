@@ -20,18 +20,18 @@ using namespace std;
 class PoseEst
 {
 public:
-    float x;
-    float y;
-    float h;
+    double x;
+    double y;
+    double h;
 }
 
 // Odometery change
 class MotionModel
 {
 public:
-    float deltaF;
+    double deltaF;
     flaot deltaL;
-    float deltaR;
+    double deltaR;
 }
 
 // Particle
@@ -39,7 +39,7 @@ class Particle
 {
 public:
     PoseEst pose;
-    float weight;
+    double weight;
     //BallEKF ball;
     //vector<EKF> opponents;
 }
@@ -66,63 +66,63 @@ public:
     /**
      * @return The current x esitamte of the robot
      */
-    float getXEst() { return curEst.x;}
+    double getXEst() { return curEst.x;}
 
     /**
      * @return The current y esitamte of the robot
      */
-    float getYEst() { return curEst.y;}
+    double getYEst() { return curEst.y;}
 
     /**
      * @return The current heading esitamte of the robot
      */
-    float getHEst() { return curEst.h;}
+    double getHEst() { return curEst.h;}
 
     /**
      * @return The uncertainty associated with the x estimate of the robot.
      */
-    float getXUncert() { return curUncert.x;}
+    double getXUncert() { return curUncert.x;}
 
     /**
      * @return The uncertainty associated with the y estimate of the robot.
      */
-    float getYUncert() { return curUncert.y;}
+    double getYUncert() { return curUncert.y;}
 
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncert() { return curUncert.h;}
+    double getHUncert() { return curUncert.h;}
 
     // Setters
     /**
      * @param xEst The current x esitamte of the robot
      */
-    void setXEst(float xEst) { curEst.x = xEst;}
+    void setXEst(double xEst) { curEst.x = xEst;}
 
     /**
      * @param yEst The current y esitamte of the robot
      */
-    void setYEst(float yEst) { curEst.y = yEst;}
+    void setYEst(double yEst) { curEst.y = yEst;}
 
     /**
      * @param hEst The current heading esitamte of the robot
      */
-    void setHEst(float hEst) { curEst.h = hEst;}
+    void setHEst(double hEst) { curEst.h = hEst;}
 
     /**
      * @param uncertX The uncertainty of the x estimate of the robot.
      */
-    void setXUncert(float uncertX) { curUncert.x = uncertX;}
+    void setXUncert(double uncertX) { curUncert.x = uncertX;}
 
     /**
      * @return uncertY The uncertainty of the y estimate of the robot.
      */
-    void setYUncert(float uncertY) { curUncert.y = uncertY;}
+    void setYUncert(double uncertY) { curUncert.y = uncertY;}
 
     /**
      * @param uncertH The uncertainty of the robot's heading estimate.
      */
-    void setHUncert(float uncertH) { curUncert.h = uncertH;}
+    void setHUncert(double uncertH) { curUncert.h = uncertH;}
 
 private:
     // Class variables
@@ -132,14 +132,14 @@ private:
 
     // Core Functions
     PoseEst updateOdometery(MotionModel u_t, PoseEst x_t);
-    float updateMeasurementModel(vector<Observation> z_t, PoseEst x_t,
+    double updateMeasurementModel(vector<Observation> z_t, PoseEst x_t,
                                  int m);
     void updateEstimates();
 
     // Helpers
-    float determinePointWeight(Observation z, PoseEst x_t);
-    float determineLineWeight(Observation z, PoseEst x_t);
-    float getSimilarity(float r_d, float r_a, float z);
+    double determinePointWeight(Observation z, PoseEst x_t, LocLandmark l);
+    double determineLineWeight(Observation z, PoseEst x_t, LocLandmark l);
+    double getSimilarity(double r_d, double r_a, double z);
 }
 
 #endif // _MCL_H_DEFINED

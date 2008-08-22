@@ -35,7 +35,7 @@ class Observation
 {
 public:
     // Fields
-    vector< pair<float, float> > posibilities;
+    vector< pair<double, double> > posibilities;
 
     // Construcotrs & Destructors
     Observation(FieldObject fo);
@@ -49,19 +49,19 @@ public:
     /**
      * @return The distance reported by the visual sighting
      */
-    float getVisDist() { return visDist; }
+    double getVisDist() { return visDist; }
     /*
      * @return The bearing reported by the visual sighting
      */
-    float getVisBearing() { return visBearing; }
+    double getVisBearing() { return visBearing; }
     /**
      * @return The standard deviation of the distance of the observation.
      */
-    float getDistSD() { return sigma_d; }
+    double getDistSD() { return sigma_d; }
     /*
      * @return The standard deviation of the bearing of the observation.
      */
-    float getBearingSD() { return sigma_b; }
+    double getBearingSD() { return sigma_b; }
 
     /*
      * @return The ID of the landmark, element of ObservationID enumeration.
@@ -74,11 +74,11 @@ public:
     /*
      * @return The x value of the landmark on the playing field.
      */
-    float getX() { return x; }
+    double getX() { return x; }
     /*
      * @return The y value of the landmark on the playing field.
      */
-    float getY() { return y; }
+    double getY() { return y; }
 
     bool isLine();
 
@@ -86,16 +86,17 @@ public:
 
 private:
     // Vision information
-    float visDist;
-    float visBearing;
-    float sigma_d;
-    float sigma_b;
+    double visDist;
+    double visBearing;
+    double sigma_d;
+    double sigma_b;
 
     // Identity information
     int id;
     bool ambiguous;
-    float x;
-    float y;
-    float slope;
+    double x;
+    double y;
+    double slope;
+    vector<Landmark> possibilities;
 }
 #endif // _Observation_h_DEFINED
