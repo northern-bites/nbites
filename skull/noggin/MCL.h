@@ -12,8 +12,11 @@ using namespace std;
 // STL
 #include <vector>
 #include <math.h>
+#include <time.h> // for srand(time(NULL))
+#include <cstdlib> // for MAX_RAND
 // Local
 #include "Observation.h"
+#include "FieldConstants.h"
 
 // Structs
 // Pose Estimate
@@ -23,7 +26,7 @@ public:
     double x;
     double y;
     double h;
-}
+};
 
 // Odometery change
 class MotionModel
@@ -32,7 +35,7 @@ public:
     double deltaF;
     flaot deltaL;
     double deltaR;
-}
+};
 
 // Particle
 class Particle
@@ -42,7 +45,7 @@ public:
     double weight;
     //BallEKF ball;
     //vector<EKF> opponents;
-}
+};
 
 // Math Macros
 #define DEG_TO_RAD (2. * PI) / 360.
@@ -140,6 +143,6 @@ private:
     double determinePointWeight(Observation z, PoseEst x_t, LocLandmark l);
     double determineLineWeight(Observation z, PoseEst x_t, LocLandmark l);
     double getSimilarity(double r_d, double r_a, double z);
-}
+};
 
 #endif // _MCL_H_DEFINED

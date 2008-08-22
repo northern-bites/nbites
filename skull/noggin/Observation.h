@@ -98,5 +98,5 @@ private:
     double y;
     double slope;
     vector<Landmark> possibilities;
-}
+};
 #endif // _Observation_h_DEFINED

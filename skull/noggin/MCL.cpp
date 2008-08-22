@@ -13,17 +13,23 @@
  */
 MCL::MCL()
 {
-    // Initialize estimate to the center of the field
-    setXEst(CENTER_FIELD_X);
-    setYEst(CENTER_FIELD_Y);
-    setHEst(OPP_GOAL_HEADING);
+    // Initialize particles to be randomly spread about the field...
+    srand(time(NULL));
+    for (int m = 0; m < M; ++m) {
+        Particle p_m;
+        PoseEst x_m;
+        // X bounded by width of the field
+        x_m.x = double(rand() % int(FIELD_WIDTH));
+        // Y bounded by height of the field
+        x_m.y = double(rand() % int(FIELD_HEIGHT));
+        // H between +-180
+        x_m.h = double((rand() % 360)-180);
+        p_m.pose = x_m;
+        p_m.weight = 1;
+        X_t.push_back(x_m);
+    }
 
-    // Initialize uncertainty to maximum values
-    setXUncert(MAX_UNCERT_X);
-    setYUncert(MAX_UNCERT_Y);
-    setHUncert(MAX_UNCERT_H);
-
-    // Initialize particles to be equally spread about the field...
+    updateEstimates();
 }
 
 MCL::~MCL()
