@@ -15,7 +15,7 @@
 #include <map>
 #include <string>
 #include <pthread.h>
-#include "Synchro.h"
+#include "synchro.h"
 
 using namespace std;
 
@@ -77,7 +77,7 @@ Synchro::~Synchro ()
     }
 }
 
-const Event* Synchro::create (string name)
+Event* Synchro::create (string name)
 {
     map<string, Event*>::iterator itr = events.find(name);
     if (itr != events.end())

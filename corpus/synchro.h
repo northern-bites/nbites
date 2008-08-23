@@ -53,7 +53,7 @@ class Synchro
     // Obtain a map of event names to Events
     const std::map<std::string, Event*>& available();
     // Create a new event with the given name
-    const Event* create(std::string event_name);
+    Event* create(std::string event_name);
 
     // Wait for an event to be signalled, and clear the signal
     void await(Event* ev);
