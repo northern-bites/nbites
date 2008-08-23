@@ -103,6 +103,9 @@ SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
                   ${VISION_INCLUDE_DIR}/matrix
                   )
 SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )
+SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
+                  ${CORPUS_INCLUDE_DIR}/_synchromodule
+                  )
 
 IF( PYTHON_SHARED_CORPUS )
   LIST( APPEND SENSORS_SRCS ${VISION_INCLUDE_DIR}/Pose
@@ -113,6 +116,7 @@ ENDIF( PYTHON_SHARED_CORPUS )
 SET( CORPUS_PYTHON_SRCS ${CORPUS_INCLUDE_DIR}/__init__.py
                         ${CORPUS_INCLUDE_DIR}/leds.py
                         ${CORPUS_INCLUDE_DIR}/sensors.py
+                        ${CORPUS_INCLUDE_DIR}/synchro.py
                         )
 
 SET( CORPUS_TEST_DIR ${CORPUS_INCLUDE_DIR}/test )
@@ -133,8 +137,14 @@ IF( PYTHON_SHARED_CORPUS )
     SHARED
     ${LEDS_SRCS}
     )
+  ADD_LIBRARY(
+    ${SYNCHRO_TARGET}
+    SHARED
+    ${SYNCHRO_SRCS}
+    )
   GET_TARGET_PROPERTY( SENSORS_TARGET_LOCATION ${SENSORS_TARGET} LOCATION )
   GET_TARGET_PROPERTY( LEDS_TARGET_LOCATION   ${LEDS_TARGET}   LOCATION )
+  GET_TARGET_PROPERTY( SYNCHRO_TARGET_LOCATION   ${SYNCHRO_TARGET}   LOCATION )
   # Install to TARGETmodule.so, instead of lib_TARGET.so
   INSTALL(
     FILES ${SENSORS_TARGET_LOCATION}
@@ -148,6 +158,12 @@ IF( PYTHON_SHARED_CORPUS )
     CONFIGURATIONS "" Debug Release
     RENAME ${LEDS_TARGET}module.so
     )
+  INSTALL(
+    FILES ${SYNCHRO_TARGET_LOCATION}
+    DESTINATION ${CORPUS_PYTHON_TARGET_DIR}
+    CONFIGURATIONS "" Debug Release
+    RENAME ${SYNCHRO_TARGET}module.so
+    )
 ELSE( PYTHON_SHARED_CORPUS )
   ADD_LIBRARY(
     ${SENSORS_TARGET}
@@ -158,6 +174,11 @@ ELSE( PYTHON_SHARED_CORPUS )
     ${LEDS_TARGET}
     STATIC
     ${LEDS_SRCS}
+    )
+  ADD_LIBRARY(
+    ${SYNCHRO_TARGET}
+    STATIC
+    ${SYNCHRO_SRCS}
     )
   # No INSTALL target when static
 ENDIF( PYTHON_SHARED_CORPUS )
@@ -187,6 +208,12 @@ TARGET_LINK_LIBRARIES( ${SENSORS_TARGET} ${NBCOMMON_LIBRARIES}
                                          ${VISION_LIBRARIES}
                                          )
 TARGET_LINK_LIBRARIES( ${LEDS_TARGET}   ${NBCOMMON_LIBRARIES}
+                                         ${ALCOMMON_LIBRARIES}
+                                         ${TINYXML_LIBRARIES}
+                                         ${PTHREAD_LIBRARIES}
+                                         ${PYTHON_LIBRARIES}
+                                         )
+TARGET_LINK_LIBRARIES( ${SYNCHRO_TARGET} ${NBCOMMON_LIBRARIES}
                                          ${ALCOMMON_LIBRARIES}
                                          ${TINYXML_LIBRARIES}
                                          ${PTHREAD_LIBRARIES}
