@@ -152,7 +152,11 @@ typedef struct Py%s_t
         f.write('\n')
     for attr in attrs:
         f.write('    PyObject* %s;\n' % attr)
-    f.write('}\n\n')
+    f.write('''\
+} Py%(type)s;
+
+
+''')
 
 def write_type_methods(f, t, funcs, args):
     '''Write the PyMethodDef array for a type to a file.'''
@@ -163,9 +167,9 @@ extern PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
 extern int Py%(type)s_init (PyObject* self, PyObject* arg, PyObject* kwds);
 extern void Py%(type)s_dealloc (PyObject* self);
 // C++ - accessible interface
-extern Py%(type)s *Py%(type)s_new (ARGS);
+extern PyObject* *Py%(type)s_new (%(type)s* %(lower)s
 // Python - accesible interface
-''' % {'type':t.__name__})
+''' % {'type':t.__name__, 'lower':t.__name__.lower()})
 
     for func in sorted(funcs.keys()):
         f.write('extern PyObject* Py%(type)s_%(func)s (PyObject* self, '
@@ -180,7 +184,7 @@ static PyMethodDef Py%(type)s_methods[] = {
 
     for func in sorted(funcs.keys()):
         f.write('''\
-    {"%(func)s", reinterpret_case<PyCFunction>(Py%(type)s_%(func)s),
+    {"%(func)s", reinterpret_cast<PyCFunction>(Py%(type)s_%(func)s),
       METH_VARARGS,
       "%(doc)s"},
 
@@ -238,7 +242,7 @@ static PyTypeObject Py%(type)sType = {
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
-    0,                         /* tp_init */
+    (initproc)Py%(type)s_init, /* tp_init */
     0,                         /* tp_alloc */
     (newfunc)Py%(type)s_new,   /* tp_new */
 };
@@ -267,19 +271,90 @@ def write_wrapper_includes(f, skel):
 def write_wrapper_methods(f, skel):
     for t in skel.types:
         funcs = dict((attr, val) for attr, val in t.__dict__.iteritems()
-                        if not attr.startswith('__') and
+                    if not attr.startswith('__') and
                         type(val) is types.FunctionType)
-        for func in sorted(funcs.keys()):
-            f.write('''\
+        attrs = [attr for attr, val in t.__dict__.iteritems()
+                    if not attr.startswith('__') and
+                        attr not in funcs]
+        write_wrapper_type_methods(f, skel, t, funcs, attrs)
+
+def write_wrapper_type_methods(f, skel, t, funcs, attrs):
+    f.write('''\
+/**
+Allocate a new Py%(type)s object.
+**/
+PyObject* Py%(type)s_alloc (PyTypeObject* type, PyObject* args,
+    PyObject* kwds)
+{
+    PyObject* self = type->tp_alloc(type, 0);
+    Py%(type)s* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
+
+    if (self != NULL) {
+        %(lower)s._%(lower)s = new %(type)s();
+''' % {'type':t.__name__, 'lower':t.__name__.lower()})
+
+    for attr in attrs:
+        f.write('        self.%(attr)s = NULL;\n')
+
+    f.write('''\
+    }
+
+    return self;
+}
+
+/**
+Initialize a Py%(type)s object.
+**/
+int Py%(type)s_init (PyObject* self, PyObject* args,
+    PyObject* kwds)
+{
+    Py%(type)s* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
+    return 0;
+}
+
+/**
+Deallocate memory for a deleted Py%(type)s object.
+**/
+void Py%(type)s_dealloc (PyObject* self)
+{
+    Py%(type)s* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
+    delete %(lower)s->_%(lower)s;
+    self->ob_type->tp_free(self);
+}
+
+/**
+Create a new Py%(type)s object from a C++ %(type)s object, from C++.
+**/
+PyObject* Py%(type)s_new (%(type)s* _%(lower)s)
+{
+    PyObject* self = Py%(type)sType.tp_alloc(&Py%(type)sType, 0);
+    Py%(type)* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
+
+    if (self != NULL) {
+        %(lower)s->_%(lower)s = _%(lower)s;
+    }
+
+    return self;
+}
+
+''' % {'type':t.__name__, 'lower':t.__name__.lower()})
+
+    for func in sorted(funcs.keys()):
+        f.write('''\
 /**
 %(doc)s
 **/
 PyObject* Py%(type)s_%(func)s (PyObject* self, PyObject* args)
 {
+    Py%(type)s* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
+    Py_BEGIN_ALLOW_THREADS;
+
+    Py_END_ALLOW_THREADS;
     Py_RETURN_NONE;
 }
 
-''' % {'type':t.__name__, 'func':func, 'doc':pydoc.getdoc(funcs[func])})
+''' % {'type':t.__name__, 'func':func, 'lower':t.__name__.lower(),
+       'doc':pydoc.getdoc(funcs[func])})
 
 
 if __name__ == '__main__':
