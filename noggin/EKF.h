@@ -8,6 +8,8 @@
 #define _EKF_h_DEFINED
 using namespace std;
 
+#include <boost/uBLAS>
+
 class EKF
 {
 public:
@@ -23,5 +25,5 @@ public:
 
 //protected:
 
-}
+};
 #endif _EKF_h_DEFINED
