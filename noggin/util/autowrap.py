@@ -262,6 +262,7 @@ def generate_wrapper_form(skel):
     write_copyright(f)
     write_wrapper_includes(f, skel)
     write_wrapper_methods(f, skel)
+    write_wrapper_init(f, skel)
 
 def write_wrapper_includes(f, skel):
     '''Write C++ wrapper includes for a Skeleton definition to a file.'''
@@ -328,7 +329,7 @@ Create a new Py%(type)s object from a C++ %(type)s object, from C++.
 PyObject* Py%(type)s_new (%(type)s* _%(lower)s)
 {
     PyObject* self = Py%(type)sType.tp_alloc(&Py%(type)sType, 0);
-    Py%(type)* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
+    Py%(type)s* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
 
     if (self != NULL) {
         %(lower)s->_%(lower)s = _%(lower)s;
@@ -356,6 +357,107 @@ PyObject* Py%(type)s_%(func)s (PyObject* self, PyObject* args)
 ''' % {'type':t.__name__, 'func':func, 'lower':t.__name__.lower(),
        'doc':pydoc.getdoc(funcs[func])})
 
+def write_wrapper_init(f, skel):
+    '''Write the module initialization code for a skeleton to a file.'''
+    write_wrapper_init_methoddef(f, skel)
+    write_wrapper_init_methods(f, skel)
+
+def write_wrapper_init_methoddef(f, skel):
+    '''Write the PyMethodDef for the methods in a skeleton to a file.'''
+    f.write('''\
+/**
+Module-level methods for _%(skel)s
+**/
+static PyMethodDef _%(skel)s_methods[] = {
+
+    {NULL} // Sentinel
+};
+
+''' % {'skel':skel.name})
+
+def write_wrapper_init_methods(f, skel):
+    '''
+    Write the module initialization methods for Python dynamic loading
+    and for C++ bakend initialization.
+    '''
+    f.write('''\
+/**
+Initialize the _%(skel)s module as a dynamic library.
+**/
+PyMODINIT_FUNC init_%(skel)s (void)
+{
+    // Initialize the type objects
+''' % {'skel':skel.name})
+
+    for t in skel.types:
+        f.write('''\
+    if (PyType_Ready(&Py%(type)sType) < 0)
+        return; // error handled by Python
+''' % {'type':t.__name__})
+
+    f.write('''\
+
+    // Initialize module
+    PyObject *module = Py_InitModule3("_%(skel)s",
+        _%(skel)s_methods,
+        "Python wrapped access to %(skel)s");
+    if (module == NULL)
+        return; // error handled by Python
+
+    // Add type object references to the module
+''' % {'skel':skel.name})
+
+    for t in skel.types:
+        f.write('''\
+    Py_INCREF(&Py%(type)sType);
+    PyModule_AddObject(module, "%(type)s",
+        reinterpret_cast<PyObject*>(&Py%(type)sType));
+''' % {'type':t.__name__})
+
+    f.write('''\
+
+}
+
+/**
+Initialize the _%(skel)s module from C++ as a backend extension.
+**/
+int c_init_%(skel)s (void)
+{
+    // Initialize the type objects
+''' % {'skel':skel.name})
+
+    for t in skel.types:
+        f.write('''\
+    if (PyType_Ready(&Py%(type)sType) < 0)
+        return -1;
+''' % {'type':t.__name__})
+
+    f.write('''\
+
+    // Initialize module
+    PyObject *module = Py_InitModule3("_%(skel)s",
+        _%(skel)s_methods,
+        "Python wrapped access to %(skel)s");
+    if (module == NULL)
+        return -1;
+
+    // Add type object references to the module
+''' % {'skel':skel.name})
+
+    for t in skel.types:
+        f.write('''\
+    Py_INCREF(&Py%(type)sType);
+    PyModule_AddObject(module, "%(type)s",
+        reinterpret_cast<PyObject*>(&Py%(type)sType));
+''' % {'type':t.__name__})
+
+    f.write('''\
+
+    return 0;
+}
+
+
+''')
 
 if __name__ == '__main__':
     import sys
