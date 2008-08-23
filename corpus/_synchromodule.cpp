@@ -222,3 +222,69 @@ PyObject* PyEvent_new (Event* _event)
     return self;
 }
 
+/**
+Module-level methods for _synchro
+**/
+static PyMethodDef _synchro_methods[] = {
+
+    {NULL} // Sentinel
+};
+
+/**
+Initialize the _synchro module as a dynamic library.
+**/
+PyMODINIT_FUNC init_synchro (void)
+{
+    // Initialize the type objects
+    if (PyType_Ready(&PySynchroType) < 0)
+        return; // error handled by Python
+    if (PyType_Ready(&PyEventType) < 0)
+        return; // error handled by Python
+
+    // Initialize module
+    PyObject *module = Py_InitModule3("_synchro",
+        _synchro_methods,
+        "Python wrapped access to synchro");
+    if (module == NULL)
+        return; // error handled by Python
+
+    // Add type object references to the module
+    Py_INCREF(&PySynchroType);
+    PyModule_AddObject(module, "Synchro",
+        reinterpret_cast<PyObject*>(&PySynchroType));
+    Py_INCREF(&PyEventType);
+    PyModule_AddObject(module, "Event",
+        reinterpret_cast<PyObject*>(&PyEventType));
+
+}
+
+/**
+Initialize the _synchro module from C++ as a backend extension.
+**/
+int c_init_synchro (void)
+{
+    // Initialize the type objects
+    if (PyType_Ready(&PySynchroType) < 0)
+        return -1;
+    if (PyType_Ready(&PyEventType) < 0)
+        return -1;
+
+    // Initialize module
+    PyObject *module = Py_InitModule3("_synchro",
+        _synchro_methods,
+        "Python wrapped access to synchro");
+    if (module == NULL)
+        return -1;
+
+    // Add type object references to the module
+    Py_INCREF(&PySynchroType);
+    PyModule_AddObject(module, "Synchro",
+        reinterpret_cast<PyObject*>(&PySynchroType));
+    Py_INCREF(&PyEventType);
+    PyModule_AddObject(module, "Event",
+        reinterpret_cast<PyObject*>(&PyEventType));
+
+    return 0;
+}
+
+
