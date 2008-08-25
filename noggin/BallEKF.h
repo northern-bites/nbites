@@ -38,42 +38,42 @@ public:
     /**
      * @return The current estimate of the ball x position
      */
-    getBallXEst() { return xhat_k[0]; }
+    getXEst() { return xhat_k[0]; }
 
     /**
      * @return The current estimate of the ball y position
      */
-    getBallYEst() { return xhat_k[1]; }
+    getYEst() { return xhat_k[1]; }
 
     /**
      * @return The current estimate of the ball x velocity
      */
-    getBallXVelocityEst() { return xhat_k[2]; }
+    getXVelocityEst() { return xhat_k[2]; }
 
     /**
      * @return The current estimate of the ball y velocity
      */
-    getBallYVelocityEst() { return xhat_k[3]; }
+    getYVelocityEst() { return xhat_k[3]; }
 
     /**
      * @return The current uncertainty for ball x position
      */
-    getBallXUncert() { return P_k[0][0]; }
+    getXUncert() { return P_k[0][0]; }
 
     /**
      * @return The current uncertainty for ball y position
      */
-    getBallYUncert() { return P_k[1][1]; }
+    getYUncert() { return P_k[1][1]; }
 
     /**
      * @return The current uncertainty for ball x velocity
      */
-    getBallXVelocityUncert() { return P_k[2][2]; }
+    getXVelocityUncert() { return P_k[2][2]; }
 
     /**
      * @return The current uncertainty for ball y velocity
      */
-    getBallYVelocityUncert() { return P_k[3][3]; }
+    getYVelocityUncert() { return P_k[3][3]; }
 
 private:
     ublas::vector<double> incorporateTimeUpdate(MotionModel u_k);

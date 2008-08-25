@@ -1,11 +1,3 @@
-/**
- * EKF.cpp - An abstract class which implements the computational components of
- *           an Extended Kalman Filter.
- *
- * @date August 2008
- * @author Tucker Hermans
- */
-
 EKF::EKF(int dimension)
 {
     // Declare 4 dimensional state thing
