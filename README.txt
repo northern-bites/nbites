@@ -55,6 +55,10 @@ and hitting the enter key.  Here you should also set the appropriate player for
 the robot and the IP address. Help for the configuration tool is accesible by
 typing h while the tool is running.
 
+Now to compile the code simply run:
+
+    make
+
 If there are errors compiling and you need to change configuration files you can
 delete the configuration files and make the codebase ready for recompiling via:
 
