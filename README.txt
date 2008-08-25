@@ -45,9 +45,9 @@ to your robocup directories):
    cd $ROBOCUP_HOME/man
    make cross
 
-If it is your first time running you will be taken to a configuration screen.
-If you want to simply test if your code compiles, than press c to begin
-configuration and then press g to generate the configuration files.
+This will take you to a configuration screen.  If you want to simply test if
+your code compiles, than press c to begin configuration and then press g to
+generate the configuration files.
 
 If you are compiling for the robot you should make sure @MAN_IS_REMOTE@ is set
 to ON.  If it is set to OFF, you can change it by moving over the OFF text area
