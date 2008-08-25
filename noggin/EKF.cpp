@@ -7,7 +7,7 @@ void EKF::timeUpdate(MotionModel u_k)
 {
     // Have the time update prediction incorporated
     // i.e. odometery, natural roll, etc.
-    xhat_k_bar = xhat_k + incorporateTimeUpdate(u_k);
+    xhat_k_bar = xhat_k + incorporateTimeUpdate(u_k, A_k, Q_k);
 
     // Update error covariance matrix
     P_k = prod(A_k, prod(P_k, trans(A_k))) + Q_k;

@@ -39,7 +39,7 @@ public:
     virtual void noCorrectionStep();
 private:
     // Pure virtual methods to be specified by implementing class
-    virtual void incorporateTimeUpdate(MotionModel u_k) = 0;
+    virtual void associateTimeUpdate(MotionModel u_k) = 0;
     virtual void incorporateCorrectionMeasurement() = 0;
 };
 #endif EKF_h_DEFINED

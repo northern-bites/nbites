@@ -76,6 +76,7 @@ public:
     getYVelocityUncert() { return P_k[3][3]; }
 
 private:
-    ublas::vector<double> incorporateTimeUpdate(MotionModel u_k);
+    // Core Functions
+    ublas::vector<double> associateTimeUpdate(MotionModel u_k);
 }
 #endif // File
