@@ -4,9 +4,10 @@
  * @author Tucker Hermans
  */
 
-#ifndef _BallEKF_h_DEFINED
-#define _BallEKF_h_DEFINED
-using namespace std;
+#ifndef BallEKF_h_DEFINED
+#define BallEKF_h_DEFINED
+
+#include "EKF.h"
 
 class BallEKF : public EKF
 {
@@ -15,5 +16,7 @@ public:
             float initVelX, float initVelY,
             float initXUncert,float initYUncert,
             float initVelXUncert, float initVelYUncert);
+
+    virtual void timeUpdate(MotionModel u_t);
 }
 #endif // File
