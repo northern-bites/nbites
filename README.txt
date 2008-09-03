@@ -1,4 +1,4 @@
-INSTALLING LIBRARIES AND CROSS COMPILER
+ INSTALLING LIBRARIES AND CROSS COMPILER
 
 In order to compile the man binaries, you must first have the NaoQI libraries  and associated cross compiler installed on your machine.  The archives needed to do this are available on our server. The default configuration is to install to /usr/local/nao.
 
