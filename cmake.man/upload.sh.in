@@ -1,31 +1,56 @@
+# This script installs the man code to where it needs to go.
+# There are two modes:
+#  1) REMOTE_INSTALLATION to a robot
+#  2) SIMULATOR_INSTALLATION to a local naoqi folder
 
 # Exit on error
 set -e
 # No uninitialized variables
 set -o nounset
 
-if [ "${REMOTE_INSTALL}" != "ON" ]; then
-  #echo "[upload.sh] Error - remote install not specified in configuration" >&2
-  #exit 1
-  echo "No remote install"
+#CMake configured options
+REMOTE="${REMOTE_INSTALL}"
+LOCAL="${OFFLINE}"
+ROBOT=${REMOTE_ADDRESS}
+LOCAL_DEST=${OFFLINE_NAOQI_PATH}/modules
+
+if [ $REMOTE = "ON" ] && [ $LOCAL = "ON" ]; then
+  echo "Install Error: Cannot instal both remotely and locally."
+  echo "               Please check your CMake options."
+  exit 1
+fi
+
+
+if [ $REMOTE = "ON" ]; then
+
+  echo "Installing remotly"
+
+  DEST=/opt/naoqi/modules
+
+  if [ ! -n "$ROBOT" ]; then
+    echo "[upload.sh] Error - no remote address specified" >&2
+    exit 1
+  fi
+  DEST=root@$ROBOT:$DEST
+
+elif [ $LOCAL = "ON" ]; then
+  echo "Installing locally"
+  DEST=$LOCAL_DEST
+  
+else
+  echo "No installation specified!"
   exit 0
 fi
 
-PLATFORM=$(uname)
-SRC=install/*
-DEST=/opt/naoqi/modules
-ROBOT=${REMOTE_ADDRESS}
-if [ ! -n "$ROBOT" ]; then
-  echo "[upload.sh] Error - no remote address specified" >&2
-  exit 1
-fi
-DEST=root@$ROBOT:$DEST
-
-#if [ "$PLATFORM" = "Darwin" ]; then
-#  make install -j4
-#else
-#  make install
+#if [ $REMOTE != "ON" ]; then
+#  #echo "[upload.sh] Error - remote install not specified in configuration" >&2
+#  #exit 1
+#  echo "No remote install"
+#  exit 0
 #fi
 
-echo "Connecting to $ROBOT"
+
+SRC=install/*
+
+echo "rsync -rcLv $SRC $DEST/"
 rsync -rcLv $SRC $DEST/

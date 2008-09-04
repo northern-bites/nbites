@@ -26,7 +26,7 @@ PROJECT( MAN )
 
 ############################ VERSION
 # Check cMake version
-CMAKE_MINIMUM_REQUIRED( VERSION 2.2.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 
 ############################ COLORIZE MAKEFILE
@@ -91,6 +91,22 @@ CONFIGURE_FILE(
   )
 
 
+############################ OFFLINE
+# Options pertaining to running the code on the simulator  (OFFLINE)
+OPTION( @OFFLINE@
+    "Set the code to run with the simulator"
+    OFF
+    )
+SET( OFFLINE ${@OFFLINE@} )
+
+SET( OFFLINE_NAOQI_PATH
+  $ENV{AL_DIR}
+  CACHE STRING
+  "The local path of the naoqi distribution to use with Webots"
+  )
+#SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
+
+
 ############################ REMOTE INSTALLATION
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
@@ -107,6 +123,7 @@ SET( @REMOTE_ADDRESS@
   )
 SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 
+#upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/upload.sh.in
   ${MAN_INCLUDE_DIR}/upload.sh
