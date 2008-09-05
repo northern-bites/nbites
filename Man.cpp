@@ -387,8 +387,11 @@ Man::run ()
     return;
   }
   
+
   frame_counter = 0;
+#ifdef USE_VISION
   visionHack();
+#endif
 
   while (running) {
 
@@ -412,13 +415,15 @@ Man::run ()
     sensors.updateVisionAngles();
 
     // Process current frame
-    if (frame_counter % 6 == 0)
-      //saveFrame();
+    //if (frame_counter % 6 == 0)
+    //saveFrame();
     frame_counter++;
 
+#ifdef USE_VISION
     if (hack_frames > 0)
       hackFrame();
-    
+#endif
+
     processFrame();
     // Make sure messages are printed
     fflush(stdout);
