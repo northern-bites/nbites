@@ -320,7 +320,8 @@ const ublas::matrix<float> Kinematics::buildHeelJacobian(const ChainID chainID,
 
         float j_3_2 = .5*FOOT_HEIGHT*(cosAR*(cosHR*(-1 + cosHYP) + sinHR*(cosHP*(1 + cosHYP) - root2*sinHP*sinHYP)) + sinAR*(-sinAP*(cosKP*((1 + cosHYP)*sinHP + root2*cosHP*sinHYP) + (cosHP*cosHR*(1 + cosHYP) + sinHR - cosHYP*sinHR - root2*cosHR*sinHP*sinHYP)*sinKP) + cosAP*(cosKP*(sinHR - cosHYP*sinHR - root2*cosHR*sinHP*sinHYP) - (1 + cosHYP)*sinHP*sinKP + cosHP*(cosHR*(1 + cosHYP)*cosKP - root2*sinHYP*sinKP))));
 
-        ublas::matrix<float> jacobian(3,2);
+        ublas::matrix<float>
+            jacobian(3,2);
         jacobian(0,0) = j_1_1;  jacobian(0,1) = j_1_2;
         jacobian(1,0) = j_2_1;  jacobian(1,1) = j_2_2;
         jacobian(2,0) = j_3_1;  jacobian(2,1) = j_3_2;
@@ -341,7 +342,8 @@ const ublas::matrix<float> Kinematics::buildHeelJacobian(const ChainID chainID,
     
         float j_3_2 = -.5*FOOT_HEIGHT*(cosAR*(cosHR*(-1 + cosHYP) - sinHR*(cosHP*(1 + cosHYP) - root2*sinHP*sinHYP)) + sinAR*(sinAP*(cosKP*((1 + cosHYP)*sinHP + root2*cosHP*sinHYP) + (cosHP*cosHR*(1 + cosHYP) + (-1 + cosHYP)*sinHR - root2*cosHR*sinHP*sinHYP)*sinKP) + cosAP*(cosKP*(sinHR - cosHYP*sinHR + root2*cosHR*sinHP*sinHYP) + (1 + cosHYP)*sinHP*sinKP - cosHP*(cosHR*(1 + cosHYP)*cosKP - root2*sinHYP*sinKP))));
 
-        ublas::matrix<float> jacobian(3,2);
+        ublas::matrix<float>
+            jacobian(3,2);
         jacobian(0,0) = j_1_1;  jacobian(0,1) = j_1_2;
         jacobian(1,0) = j_2_1;  jacobian(1,1) = j_2_2;
         jacobian(2,0) = j_3_1;  jacobian(2,1) = j_3_2;
@@ -425,8 +427,7 @@ const ublas::matrix<float> Kinematics::buildLegJacobian(const ChainID chainID,
 
 const float Kinematics::distance(const ublas::vector<float> a,
                                  const ublas::vector<float> b) {
-    const ublas::vector<float> difference = a - b;
-    return sqrt(inner_prod(difference, difference));
+    return norm_2(a-b);
 }
 
 
@@ -438,7 +439,7 @@ const ublas::vector<float> Kinematics::solve(ublas::matrix<float> A,
     int singularRow = lu_factorize(A, P);
     if (singularRow != 0) {
         // TODO: This case needs to be dealt with
-        throw "oops";
+        throw "the system had no solution";
     }
     ublas::vector<float> result(A.size2());
     result.assign(b);
@@ -451,12 +452,9 @@ Kinematics::adjustAnkle(const ChainID chainID,
                         const ublas::vector<float> &goal,
                         float startAngles[],
                         const float maxError = .1) {
-    int iterations = 0;
 
-    ublas::matrix<float> dampenMatrix =
+    const ublas::matrix<float> dampenMatrix =
         ublas::identity_matrix<float> (3)*(dampFactor*dampFactor);
-
-    ublas::zero_vector<float> origin(3);
 
     ChainID ankleChainID = (chainID == LLEG_CHAIN ?
                             LANKLE_CHAIN : RANKLE_CHAIN);
@@ -464,10 +462,10 @@ Kinematics::adjustAnkle(const ChainID chainID,
     bool ankleSuccess = false;
     // for error calculations
     float dist_e;
+    int iterations = 0;
 
     while (iterations < maxAnkleIterations) {
         iterations++;
-
         // Define the Jacobian that describes the linear approximation at the
         // current angle values.
         const ublas::matrix<float> j = buildLegJacobian(chainID, startAngles);
@@ -479,15 +477,15 @@ Kinematics::adjustAnkle(const ChainID chainID,
         const ublas::vector<float> e = goal - currentAnklePosition;
 
         // Check if we have gotten close enough
-        dist_e = distance(e, origin);
+        dist_e = norm_2(e); //distance(e, origin);
 
         if (dist_e < maxError) {
             ankleSuccess = true;
             break;
         }
 
-        ublas::matrix<float> temp = prod(j, j_t) + ublas::matrix<float>(dampenMatrix);
-
+        ublas::matrix<float> temp =
+            prod(j, j_t) + ublas::matrix<float>(dampenMatrix);
         // Now we need to find a vector that we'll call 'result' such that
         // temp*f = e. The solve method is a local implementation and not part
         // of the library (as dumb as that may seem).
@@ -517,28 +515,24 @@ Kinematics::adjustHeel(const ChainID chainID,
 
     ChainID ankleChainID = (chainID == LLEG_CHAIN ?
                             LANKLE_CHAIN : RANKLE_CHAIN);
-    ublas::matrix<float> dampenMatrix =
+    const ublas::matrix<float> dampenMatrix =
         ublas::identity_matrix<float> (3)*(dampFactor*dampFactor);
-    ublas::zero_vector<float> origin(3);
 
-    // We want the heel to move right below the ankle
-    const ublas::vector<float> currentAnklePosition =
-        forwardKinematics(ankleChainID,startAngles);
     int iterations = 0;
     bool heelSuccess = false;
     float dist_e_heel;
 
     while (iterations < maxHeelIterations) {
         iterations++;
-        ublas::matrix<float> jHeel =
+        const ublas::matrix<float> jHeel =
             buildHeelJacobian(chainID, startAngles);
-        ublas::matrix<float> jHeel_t = trans(jHeel);
+        const ublas::matrix<float> jHeel_t = trans(jHeel);
 
-        ublas::vector<float> currentHeelPosition =
+        const ublas::vector<float> currentHeelPosition =
             forwardKinematics(chainID,startAngles);
-        ublas::vector<float> eHeel = goal - currentHeelPosition;
+        const ublas::vector<float> eHeel = goal - currentHeelPosition;
 
-        dist_e_heel = distance(eHeel,origin);
+        dist_e_heel = norm_2(eHeel); //distance(eHeel,origin);
         if (dist_e_heel < maxError) {
             heelSuccess = true;
             break;
@@ -608,11 +602,12 @@ int main() {
     // George's test code
     Kinematics::IKLegResult result;
     for (int i=0; i<10000; i++) {
-        float startAngles[] = {0,-.7,0,0.8,-0.15,0};
+        //float startAngles[] = {0,0,0,0.2,0,0};
+        float startAngles[] = {0,-0.78,0,0.95,-0.2,0};
         ublas::vector<float> goal(3);
         goal(0) = 50;
-        goal(1) = 50;
-        goal(2) = -305;
+        goal(1) = 60;
+        goal(2) = -300;
         //bool jointMask[4] = {true,true,true,true};
         result =
             Kinematics::dls(Kinematics::LLEG_CHAIN,
@@ -620,20 +615,11 @@ int main() {
                             startAngles,
                             //jointMask,
                             1.0f, 0.1f);
-
-        /*std::cout << "Angles: ";
-        for(int i=0; i<6; i++) {
-            std::cout << result.angles[i] << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "Error: " << result.ankleError << std::endl;
-        */
     }
     std::cout << "Angles: ";
     for(int i=0; i<6; i++) {
         std::cout << result.angles[i] << " ";
     }
     std::cout << std::endl;
-    std::cout << "Error: " << result.ankleError << std::endl;
     return 0;
 }

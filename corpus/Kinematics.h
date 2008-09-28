@@ -12,8 +12,6 @@
  * It also supports the creation of rotation and translation matrices.
  */
 
-#include <exception>
-#include <string>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
@@ -347,7 +345,7 @@ namespace Kinematics {
      * Declarations for constants and methods concerning forward and inverse
      * kinematics.
      */
-    static const float dampFactor = 0.8f;
+    static const float dampFactor = 0.4f;
     static const float maxDeltaTheta = 0.5f;
     static const int maxAnkleIterations = 60;
     static const int maxHeelIterations = 20;
@@ -388,12 +386,5 @@ namespace Kinematics {
                     const float startAngles[],
                     const float maxError,
                     const float maxHeelError);
-    static const IKLegResult
-    dlsInverseKinematics(const ChainID chainID,
-                         const ublas::vector<float> &goal,
-                         const float startAngles[],
-                         const float maxError,
-                         const float maxHeelError);
-
 };
 #endif
