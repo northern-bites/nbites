@@ -347,8 +347,8 @@ namespace Kinematics {
      * Declarations for constants and methods concerning forward and inverse
      * kinematics.
      */
-    static const float dampFactor = 0.3f;
-    static const float maxDeltaTheta = 0.1f;
+    static const float dampFactor = 0.8f;
+    static const float maxDeltaTheta = 0.5f;
     static const int maxAnkleIterations = 60;
     static const int maxHeelIterations = 20;
 
@@ -366,6 +366,28 @@ namespace Kinematics {
     static const ublas::matrix<float> buildLegJacobian(const ChainID chainID,
                                                        const float angles[]);
 
+    // TODO: Move this method to a general math header. We might eventually need
+    //       a lot of helpers for uBLAS, so that would be even better.
+    static const ublas::vector<float>
+    Kinematics::solve(ublas::matrix<float> A,
+                      const ublas::vector<float> b);
+
+    const IKLegResult
+    adjustAnkle(const ChainID chainID,
+                const ublas::vector<float> &goal,
+                float startAngles[],
+                const float maxError);
+    static const IKLegResult
+    adjustHeel(const ChainID chainID,
+               const ublas::vector<float> &goal,
+               float startAngles[],
+               const float maxError);
+    const Kinematics::IKLegResult
+    Kinematics::dls(const ChainID chainID,
+                    const ublas::vector<float> &goal,
+                    const float startAngles[],
+                    const float maxError,
+                    const float maxHeelError);
     static const IKLegResult
     dlsInverseKinematics(const ChainID chainID,
                          const ublas::vector<float> &goal,
