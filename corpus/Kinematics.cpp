@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Kinematics.h"
 
 const float Kinematics::clip(const float value,
@@ -422,17 +423,25 @@ const ublas::matrix<float> Kinematics::buildLegJacobian(const ChainID chainID,
 }
 
 
-const IKLegResult 
+const float Kinematics::distance(const ublas::vector<float> a,
+                                 const ublas::vector<float> b) {
+    const ublas::vector<float> difference = a - b;
+    return sqrt(inner_prod(difference, difference));
+}
+
+
+const Kinematics::IKLegResult
 Kinematics::dlsInverseKinematics(const ChainID chainID,
-                                 const ublas::matrix<float> &goal,
+                                 const ublas::vector<float> &goal,
                                  const float startAngles[],
                                  const float maxError = .1,
                                  const float maxHeelError = .1) {
     // The goal of the heel coincides with where want to go, but the goal of
     // ankle is to be directly above the heel, so that we are stepping correctly
-    ublas::matrix<float> ankleGoal(goal);
+    ublas::vector<float> ankleGoal(3);
+    ankleGoal.assign(goal);
     // the ankle should be FOOT_HEIGHT above what the final goal is
-    ankleGoal.set(2,0,ankleGoal.get(2,0)+FOOT_HEIGHT);
+    ankleGoal(2) = ankleGoal(2) + FOOT_HEIGHT;
 
     float currentAngles[LEG_JOINTS];
     memcpy(currentAngles, startAngles, LEG_JOINTS*sizeof(float));
@@ -448,7 +457,7 @@ Kinematics::dlsInverseKinematics(const ChainID chainID,
     ublas::matrix<float> dampenMatrix = identity*(dampFactor*dampFactor);
 
     float values[] = {0.0f,0.0f,0.0f};
-    ublas::zero_matrix<float> origin(3,1);
+    ublas::zero_vector<float> origin(3);
 
     ChainID ankleChainID = (chainID == LLEG_CHAIN ?
                             LANKLE_CHAIN : RANKLE_CHAIN);
@@ -461,99 +470,117 @@ Kinematics::dlsInverseKinematics(const ChainID chainID,
         // Define the Jacobian that describes the linear approximation at the
         // current angle values.
         ublas::matrix<float> j = buildLegJacobian(chainID, currentAngles);
-        ublas::matrix<float> j_t = j.transpose();
+        ublas::matrix<float> j_t = trans(j);
 
-        ublas::matrix<float> currentAnklePosition = forwardKinematics(ankleChainID,
-                                                        currentAngles);
-        ublas::matrix<float> e = ankleGoal - currentAnklePosition;
+        ublas::vector<float> currentAnklePosition =
+            forwardKinematics(ankleChainID,
+                              currentAngles);
+        ublas::vector<float> e = ankleGoal - currentAnklePosition;
 
         // Check if we have gotten close enough
-        float dist_e = distance(e, origin);
+        const float dist_e = distance(e, origin);
 
         if (dist_e < maxError) {
             ankleSuccess = true;
             break;
         }
 
-        ublas::matrix<float> t1 = j * j_t;
-        t1 += dampenMatrix;
+        ublas::matrix<float> temp = prod(j, j_t);
+        temp += dampenMatrix;
+
+        // Now we need to find a vector that we'll call 'result' such that
+        // temp*f = e. Solve operations like this are a little tricky in
+        // ublas (sigh).
+        ublas::permutation_matrix <float> P(3);
+        int singularRow = lu_factorize(temp, P);
+        if (singularRow != 0) {
+            // TODO: This case needs to be dealt with
+            throw "oops";
+        }
+        ublas::vector<float> result(3);
+        result.assign(e);
+        lu_substitute(temp, P, result);
+        // Now we multiply j_t by result and we get delta_theta
+        ublas::vector<float> ankleDeltaTheta = prod(j_t, result);
+
+        /*
         Matrix t2 = t1.invert();
         Matrix ankleDeltaTheta = j_t * 2;
         ankleDeltaTheta *= e;
+        */
 
-        /*Matrix *t1 = fmmul(j,j_t);
-          fmaddeq(t1,dampenMatrix);
-          Matrix *t2 = fminvert(t1);
-          Matrix *ankleDeltaTheta = fmmul(j_t,t2);
-          fmmuleq(ankleDeltaTheta,e);
-          fmfree(t1);fmfree(t2);*/
-
-        currentAngles[1] += clip(ankleDeltaTheta.get(0,0),
+        currentAngles[1] += clip(ankleDeltaTheta(0),
                                  -maxDeltaTheta,
                                  maxDeltaTheta);
-        currentAngles[2] += clip(ankleDeltaTheta.get(1,0),
+        currentAngles[2] += clip(ankleDeltaTheta(1),
                                  -maxDeltaTheta,
                                  maxDeltaTheta);
-        currentAngles[3] += clip(ankleDeltaTheta.get(2,0),
+        currentAngles[3] += clip(ankleDeltaTheta(2),
                                  -maxDeltaTheta,
                                  maxDeltaTheta);
         clipChainAngles(chainID,currentAngles);
     }
 
+
+
     // Now we update the heel
     // We want it to move right below the ankle
-    Matrix currentAnklePosition = forwardKinematics(ankleChainID,currentAngles);
-    Matrix heelGoal(currentAnklePosition);
-    //Matrix *jHeel = buildHeelJacobian(chainID, currentAngles);
-
-    heelGoal.set(2,0,heelGoal.get(2,0) - FOOT_HEIGHT);
+    ublas::vector<float> currentAnklePosition =
+        forwardKinematics(ankleChainID,currentAngles);
+    ublas::vector<float> heelGoal(3);
+    heelGoal.assign(currentAnklePosition);
+    heelGoal(2) = heelGoal(2) - FOOT_HEIGHT;
 
     iterations = 0;
     bool heelSuccess = false;
-  
+
     while (iterations < maxHeelIterations) {
         iterations++;
-        Matrix jHeel = buildHeelJacobian(chainID, currentAngles);  
-        Matrix jHeel_t = jHeel.transpose();
-    
-        Matrix currentHeelPosition = forwardKinematics(chainID,currentAngles);
-        Matrix e_heel = heelGoal - currentHeelPosition;
+        ublas::matrix<float> jHeel = buildHeelJacobian(chainID, currentAngles);
+        ublas::matrix<float> jHeel_t = trans(jHeel);
 
-        float dist_e_heel = distance(e_heel,origin);
+        ublas::vector<float> currentHeelPosition =
+            forwardKinematics(chainID,currentAngles);
+        ublas::vector<float> eHeel = heelGoal - currentHeelPosition;
+
+        float dist_e_heel = distance(eHeel,origin);
         if (dist_e_heel < maxHeelError) {
             heelSuccess = true;
             break;
         }
 
-        Matrix t1 = jHeel * jHeel_t;
-        t1 += dampenMatrix;
-        Matrix t2 = t1.invert();
-        Matrix heelDeltaTheta = jHeel_t * t2;
-        heelDeltaTheta *= e_heel;
+        ublas::matrix<float> temp = prod(jHeel, jHeel_t);
+        temp += dampenMatrix;
+        ublas::permutation_matrix <float> P(3);
+        int singularRow = lu_factorize(temp, P);
+        if (singularRow != 0) {
+            // TODO: This case needs to be dealt with
+            throw "oops";
+        }
+        ublas::vector<float> result(3);
+        result.assign(eHeel);
+        lu_substitute(temp, P, result);
+        // Now we multiply j_t by result and we get delta_theta
+        ublas::vector<float> heelDeltaTheta = prod(jHeel_t, result);
 
-        /*Matrix *t1 = fmmul(jHeel, jHeel_t);
-          fmaddeq(t1,dampenMatrix);
-          Matrix *t2 = fminvert(t1);
-          Matrix *heelDeltaTheta = fmmul(jHeel_t,t2);
-          fmmuleq(heelDeltaTheta,e_heel);
-          fmfree(t1);fmfree(t2);*/
-
-        currentAngles[4] += clip(heelDeltaTheta.get(0,0),
+        currentAngles[4] += clip(heelDeltaTheta(0),
                                  -maxDeltaTheta,
                                  maxDeltaTheta);
-        currentAngles[5] += clip(heelDeltaTheta.get(1,0),
+        currentAngles[5] += clip(heelDeltaTheta(1),
                                  -maxDeltaTheta,
                                  maxDeltaTheta);
         clipChainAngles(chainID,currentAngles);
     }
 
-    // Do error calculations
-    Matrix e = ankleGoal - currentAnklePosition;
-    Matrix currentHeelPosition = forwardKinematics(chainID,currentAngles);
-    Matrix e_heel = heelGoal - currentHeelPosition;
 
+    // Do error calculations
+    ublas::vector<float> e = ankleGoal - currentAnklePosition;
+    ublas::vector<float> currentHeelPosition =
+        forwardKinematics(chainID,currentAngles);
+
+    ublas::vector<float> eHeel = heelGoal - currentHeelPosition;
     float dist_e = distance(e,origin);
-    float dist_e_heel = distance(e_heel,origin);
+    float dist_e_heel = distance(eHeel,origin);
 
     IKOutcome outcome;
     if (ankleSuccess && heelSuccess)
@@ -571,6 +598,28 @@ Kinematics::dlsInverseKinematics(const ChainID chainID,
 
 
 int main() {
+    // George's test code
+    for (int i=0; i<10000; i++) {
+        float startAngles[] = {0,0,0,0.2,0,0};
+        ublas::vector<float> goal(3);
+        goal(0) = 50;
+        goal(1) = 50;
+        goal(2) = -305;
+        //bool jointMask[4] = {true,true,true,true};
+        Kinematics::IKLegResult result =
+            Kinematics::dlsInverseKinematics(Kinematics::LLEG_CHAIN,
+                                             goal,
+                                             startAngles,
+                                             //jointMask,
+                                             0.1f);
 
+        /*
+        for(int i=0; i<6; i++) {
+            printf("%f ",result.angles[i]);
+        }
+        printf("\n");
+        printf("error: %f\n",result.ankleError);
+        */
+    }
     return 0;
 }

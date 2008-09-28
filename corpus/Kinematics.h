@@ -16,6 +16,10 @@
 #include <string>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/triangular.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
+#include <boost/numeric/ublas/io.hpp>              // for cout
 using namespace boost::numeric;
 
 #include <cmath>
@@ -144,6 +148,18 @@ namespace Kinematics {
         R_SHOULDER_ROLL,
         R_ELBOW_YAW,
         R_ELBOW_ROLL
+    };
+
+    enum IKOutcome {
+        STUCK = 1,
+        SUCCESS = 0
+    };
+
+    struct IKLegResult {
+        IKOutcome outcome;
+        float ankleError;
+        float heelError;
+        float angles[6];
     };
 
     enum Motion_IntFlag {
@@ -328,19 +344,34 @@ namespace Kinematics {
 
 
     /*
-     * Declarations for methods concerning forward and inverse kinematics.
+     * Declarations for constants and methods concerning forward and inverse
+     * kinematics.
      */
+    static const float dampFactor = 0.3f;
+    static const float maxDeltaTheta = 0.1f;
+    static const int maxAnkleIterations = 60;
+    static const int maxHeelIterations = 20;
+
     static const float clip(const float, const float, const float);
     static const void clipChainAngles(const ChainID id,
                                       float angles[]);
     static const float getMinValue(const ChainID id, const int jointNumber);
     static const float getMaxValue(const ChainID id, const int jointNumber);
-    const ublas::vector<float> forwardKinematics(const ChainID id,
-                                                 const float angles[]);
-    const ublas::matrix<float> buildHeelJacobian(const ChainID chainID,
-                                                 const float angles[]);
-    const ublas::matrix<float> buildLegJacobian(const ChainID chainID,
-                                                const float angles[]);
+    static const float distance(const ublas::vector<float> a,
+                                const ublas::vector<float> b);
+    static const ublas::vector<float> forwardKinematics(const ChainID id,
+                                                        const float angles[]);
+    static const ublas::matrix<float> buildHeelJacobian(const ChainID chainID,
+                                                        const float angles[]);
+    static const ublas::matrix<float> buildLegJacobian(const ChainID chainID,
+                                                       const float angles[]);
+
+    static const IKLegResult
+    dlsInverseKinematics(const ChainID chainID,
+                         const ublas::vector<float> &goal,
+                         const float startAngles[],
+                         const float maxError,
+                         const float maxHeelError);
 
 };
 #endif
