@@ -596,7 +596,7 @@ int main() {
         float startAngles[] = {0,-0.78,0,0.95,-0.2,0};
         Kinematics::ufvector3 goal(3);
         goal(0) = 50;
-        goal(1) = 60;
+        goal(1) = 50;
         goal(2) = -300;
         //bool jointMask[4] = {true,true,true,true};
         result = Kinematics::dls(Kinematics::LLEG_CHAIN,
