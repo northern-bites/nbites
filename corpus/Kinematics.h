@@ -149,14 +149,12 @@ namespace Kinematics {
     };
 
     enum IKOutcome {
-        STUCK = 1,
-        SUCCESS = 0
+        STUCK = 0,
+        SUCCESS = 1
     };
 
     struct IKLegResult {
         IKOutcome outcome;
-        float ankleError;
-        float heelError;
         float angles[6];
     };
 
@@ -350,41 +348,51 @@ namespace Kinematics {
     static const int maxAnkleIterations = 60;
     static const int maxHeelIterations = 20;
 
+    /*
+     * This saves me some nasty typing...
+     * uBLAS by default uses std::vector as its underlying storage data
+     * structure. By overriding the matrix type to use ublas::bounded_array
+     * we're forcing uBLAS to use arrays as the storage type which allows all
+     * variables to stay off the heap and on the stack. This offers a dramatic
+     * increase in performance with the slight inconvenience that the static
+     * array needs to be big enough to fit a n by n matrix. The biggest one I
+     * handle is 3x3, so a bounded array of size 9 is sufficient.
+     */
+    typedef ublas::matrix<float,
+                          ublas::row_major,
+                          ublas::bounded_array<float,9> > ufmatrix3;
+    typedef ublas::vector<float, ublas::bounded_array<float,3> > ufvector3;
+
     static const float clip(const float, const float, const float);
     static const void clipChainAngles(const ChainID id,
                                       float angles[]);
     static const float getMinValue(const ChainID id, const int jointNumber);
     static const float getMaxValue(const ChainID id, const int jointNumber);
-    static const float distance(const ublas::vector<float> a,
-                                const ublas::vector<float> b);
-    static const ublas::vector<float> forwardKinematics(const ChainID id,
-                                                        const float angles[]);
-    static const ublas::matrix<float> buildHeelJacobian(const ChainID chainID,
-                                                        const float angles[]);
-    static const ublas::matrix<float> buildLegJacobian(const ChainID chainID,
-                                                       const float angles[]);
+    static const ufvector3 forwardKinematics(const ChainID id,
+                                             const float angles[]);
+    static const ufmatrix3 buildHeelJacobian(const ChainID chainID,
+                                             const float angles[]);
+    static const ufmatrix3 buildLegJacobian(const ChainID chainID,
+                                            const float angles[]);
 
-    // TODO: Move this method to a general math header. We might eventually need
-    //       a lot of helpers for uBLAS, so that would be even better.
-    static const ublas::vector<float>
-    Kinematics::solve(ublas::matrix<float> A,
-                      const ublas::vector<float> b);
+    static const ufvector3 solve(ufmatrix3 A,
+                                 const ufvector3 b);
 
-    const IKLegResult
-    adjustAnkle(const ChainID chainID,
-                const ublas::vector<float> &goal,
-                float startAngles[],
-                const float maxError);
-    static const IKLegResult
-    adjustHeel(const ChainID chainID,
-               const ublas::vector<float> &goal,
-               float startAngles[],
-               const float maxError);
-    const Kinematics::IKLegResult
-    Kinematics::dls(const ChainID chainID,
-                    const ublas::vector<float> &goal,
-                    const float startAngles[],
-                    const float maxError,
-                    const float maxHeelError);
+    // Both adjustment methods return whether the search was successful.
+    // The correct angles required to fulfill the goal are returned through
+    // startAngles by reference.
+    static const bool adjustAnkle(const ChainID chainID,
+                                  const ufvector3 &goal,
+                                  float startAngles[],
+                                  const float maxError);
+    static const bool adjustHeel(const ChainID chainID,
+                                 const ufvector3 &goal,
+                                 float startAngles[],
+                                 const float maxError);
+    const IKLegResult dls(const ChainID chainID,
+                          const ufvector3 &goal,
+                          const float startAngles[],
+                          const float maxError,
+                          const float maxHeelError);
 };
 #endif
