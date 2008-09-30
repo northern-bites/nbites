@@ -375,8 +375,8 @@ namespace Kinematics {
     static const ufmatrix3 buildLegJacobian(const ChainID chainID,
                                             const float angles[]);
 
-    static const ufvector3 solve(ufmatrix3 A,
-                                 const ufvector3 b);
+    static const ufvector3 solve(ufmatrix3 &A,
+                                 const ufvector3 &b);
 
     // Both adjustment methods return whether the search was successful.
     // The correct angles required to fulfill the goal are returned through

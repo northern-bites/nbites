@@ -427,8 +427,8 @@ const Kinematics::ufmatrix3 Kinematics::buildLegJacobian(const ChainID chainID,
 // Solve the linear system Ax=b for the vector x.
 // NOTE: This method is hard coded to work for 3x3 matrices and 3-vectors.
 //       We can get superior performance this way.
-const Kinematics::ufvector3 Kinematics::solve(ufmatrix3 A,
-                                              const ufvector3 b) {
+const Kinematics::ufvector3 Kinematics::solve(ufmatrix3 &A,
+                                              const ufvector3 &b) {
     ublas::permutation_matrix
         <float, ublas::bounded_array<float, 9> >
         P(A.size1());
