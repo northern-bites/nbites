@@ -11,7 +11,7 @@
 #include "Sensors.h"
 
 class Motion
-  : public MotionCore
+//  : public MotionCore
 {
   public:
 #ifdef NAOQI1

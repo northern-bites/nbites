@@ -70,6 +70,14 @@
 #endif
 
 // turn on/off vision processing
+#define USE_NOGGIN_${USE_NOGGIN}
+#ifdef  USE_NOGGIN_ON
+#  define USE_NOGGIN
+#else
+#  undef USE_NOGGIN
+#endif
+
+// turn on/off vision processing
 #define USE_VISION_${USE_VISION}
 #ifdef  USE_VISION_ON
 #  define USE_VISION

@@ -70,12 +70,29 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
 #ifdef NAOQI1
       motion(getParentBroker()->getMotionProxy(),synchro, &sensors),
 #else
+<<<<<<< HEAD:Man.cpp
       motion(AL::ALMotionProxy::getInstance(),synchro, &sensors),
+=======
+    motion(AL::ALMotionProxy::getInstance(),synchro, &sensors),
 #endif
+    vision(new NaoPose(&sensors), &profiler),
+    comm(synchro, &sensors, &vision),
+    //BREAKS NAOQI1.0
+#ifndef NAOQI1
+#ifdef USE_NOGGIN
+    noggin(&sensors, &profiler, &vision),
+>>>>>>> Updated some ifdefs to turn off NOGGIN and VISION THROUGH CMAKE, to remove runtime errors in the simulator:Man.cpp
+#endif
+<<<<<<< HEAD:Man.cpp
       vision(new NaoPose(&sensors), &profiler),
       comm(synchro, &sensors, &vision),
       noggin(&sensors, &profiler, &vision),
       camera_active(false)
+=======
+#endif
+    frame_counter(0), saved_frames(0), hack_frames(0),
+    camera_active(false)
+>>>>>>> Updated some ifdefs to turn off NOGGIN and VISION THROUGH CMAKE, to remove runtime errors in the simulator:Man.cpp
 {
     // open lems
     initMan();
@@ -542,6 +559,7 @@ Man::run ()
         //vision_sig->signal();
     }
 
+<<<<<<< HEAD:Man.cpp
     // Finished with run loop, stop sub-threads and exit
     motion.stop();
     motion.getTrigger()->await_off();
@@ -549,6 +567,15 @@ Man::run ()
     comm.getTrigger()->await_off();
     // @jfishman - tool will not exit, due to socket blocking
     //comm.getTOOLTrigger()->await_off();
+=======
+  // Finished with run loop, stop sub-threads and exit
+  motion.stop();
+  //motion.getTrigger()->await_off();
+  comm.stop();
+  comm.getTrigger()->await_off();
+  // @jfishman - tool will not exit, due to socket blocking
+  //comm.getTOOLTrigger()->await_off();
+>>>>>>> Updated some ifdefs to turn off NOGGIN and VISION THROUGH CMAKE, to remove runtime errors in the simulator:Man.cpp
 
 #ifdef DEBUG_MAN_THREADING
     cout << "  run :: Signalling stop" << endl;
@@ -744,7 +771,9 @@ Man::processFrame ()
 #endif
 
     // run Python behaviors
+#ifdef USE_NOGGIN
     noggin.runStep();
+#endif
 
     PROF_EXIT(&profiler, P_FINAL);
     PROF_NFRAME(&profiler);

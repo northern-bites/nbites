@@ -83,6 +83,11 @@ OPTION(
   ON
   )
 OPTION(
+  USE_NOGGIN
+  "Turn on/off python behaviors"
+  ON
+  )
+OPTION(
   USE_MOTION
   "Turn on/off all motion actions"
   ON

@@ -6,7 +6,7 @@
 #include "Motion.h"
 #include "_motionmodule.h"
 
-using namespace boost;
+//using namespace boost;
 
 #ifdef NAOQI1
 Motion::Motion (ALPtr<ALMotionProxy> _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
