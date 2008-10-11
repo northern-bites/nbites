@@ -14,6 +14,9 @@
 #ifndef _MotionEnactor_h_DEFINED
 #define _MotionEnactor_h_DEFINED
 
+#include <iostream>
+#include <pthread.h>
+
 #include "MotionSwitchboard.h"
 
 class MotionEnactor {
@@ -22,10 +25,40 @@ public:
         : switchboard(_switchboard){};
     virtual ~MotionEnactor() { }
 
-    virtual void start() = 0;
+    void start() {
+#ifdef DEBUG_INITIALIZATION
+        cout << "Enactor::initializing" << endl;
+        cout << "  creating threads" << endl;
+#endif
+        fflush(stdout);
+
+        // set thread attributes
+        pthread_attr_t attr;
+        pthread_attr_init (&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+        // create & start thread.
+        pthread_create(&enactor_thread, &attr, runThread, (void *)this);
+        // destroy the used attributes
+        pthread_attr_destroy(&attr);
+    }
+
+
+    void stop() {
+        running = false;
+    }
+
+    static void* runThread(void *enactor) {
+        // This is a common routine for all possible enactors.
+        ((MotionEnactor*)enactor)->run();
+        pthread_exit(NULL);
+    }
+
+    virtual void run() = 0;
 
 protected:
-    MotionSwitchboard * switchboard;
+    bool running;
+    pthread_t enactor_thread;
+    MotionSwitchboard *switchboard;
 };
 
 #endif

@@ -3,13 +3,14 @@
 
 #include "MotionEnactor.h"
 
-class SimulatorEnactor : MotionEnactor {
+class SimulatorEnactor : public MotionEnactor {
 public:
     SimulatorEnactor(MotionSwitchboard * _switchboard)
         : MotionEnactor(_switchboard) {};
-    virtual ~SimulatorEnactor() { }
-    virtual void start() { }
+    virtual ~SimulatorEnactor() { };
 
+    virtual void run();
 };
 
 #endif
+
