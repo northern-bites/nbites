@@ -149,7 +149,9 @@ class Man
     PythonPreferences python_prefs;
     Profiler profiler;
     Sensors sensors;
+#ifdef USE_MOTION
     Motion motion;
+#endif
     Vision vision;
     Comm comm;
 

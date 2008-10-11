@@ -18,7 +18,7 @@ using namespace AL;
 
 
 // Static reference to the C MotionCore
-static MotionCore* core_reference = NULL;
+static MotionInterface* interface_reference = NULL;
 
 // Module initialization method (Python interface, shared library)
 //
@@ -27,7 +27,7 @@ init_motion (void)
 {
   // we need a reference to the motion core, set before import/init
 #ifdef USE_PYMOTION_CXX_BACKEND
-  if (core_reference == NULL) {
+  if (interface_reference == NULL) {
     PyErr_SetString(PyExc_SystemError,
                     "C++ _motion backend not ready for import");
     return;
@@ -101,7 +101,7 @@ c_init_motion (void)
 
   // we need a reference to the motion core, set before import/init
 #ifdef USE_PYMOTION_CXX_BACKEND
-  if (core_reference == NULL) {
+  if (interface_reference == NULL) {
     std::cerr <<
       "ERROR - could not initialize C++/Python motion interface" << std::endl;
     std::cerr << "C++ _motion backend not ready for import" << std::endl;
@@ -176,9 +176,10 @@ c_init_motion (void)
 //    steals a reference to the supplied MotionInterface
 //    can only be called once (subsequent calls ignored)
 void
-set_motion_interface (MotionCore *_core)
+set_motion_interface (MotionInterface *_interface)
 {
-  core_reference = _core;
+  //core_reference = _core;
+  interface_reference = _interface;
 }
 
 
@@ -190,7 +191,7 @@ static PyMotionInterface*
 PyMotionInterface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
 #ifdef USE_PYMOTION_CXX_BACKEND
-  if (core_reference == NULL) {
+  if (interface_reference == NULL) {
     PyErr_SetString(PyExc_SystemError, "C backend has been lost");
     return NULL;
   }
@@ -200,7 +201,7 @@ PyMotionInterface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     reinterpret_cast<PyMotionInterface*>(type->tp_alloc(type, 0));
 #ifdef USE_PYMOTION_CXX_BACKEND
   if (self != NULL)
-    self->_interface = new MotionInterface(core_reference);
+    self->_interface = interface_reference; 
 #endif
 
   return self;
@@ -209,11 +210,6 @@ PyMotionInterface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 static void
 PyMotionInterface_dealloc (PyMotionInterface *self)
 {
-  // remove and delete old interface to C++ motion
-#ifdef USE_PYMOTION_CXX_BACKEND
-  delete self->_interface;
-#endif
-  
   // deallocate the Python core
   self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }

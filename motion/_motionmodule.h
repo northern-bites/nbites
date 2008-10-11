@@ -17,7 +17,7 @@
 PyMODINIT_FUNC init_motion(void);
 void           c_init_motion(void);
 // C++ backend insertion (must be set before import)
-extern void    set_motion_interface(MotionCore *core);
+extern void    set_motion_interface(MotionInterface *interface);
 
 
 //

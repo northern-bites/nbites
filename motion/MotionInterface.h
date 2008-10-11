@@ -8,6 +8,7 @@
 #include "MotionCore.h"
 #include "WalkCommand.h"
 #include "BodyJointCommand.h"
+#include "MotionSwitchboard.h"
 
 /**
  * MotionInterface stores motion commands until
@@ -18,6 +19,7 @@
 class MotionInterface
 {
   public:
+    MotionInterface(MotionSwitchboard *_switchboard){}
     MotionInterface(MotionCore *_core) : core(_core) {}
     virtual ~MotionInterface() {}
 
