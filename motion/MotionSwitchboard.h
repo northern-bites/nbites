@@ -19,7 +19,7 @@ public:
     MotionSwitchboard();
     ~MotionSwitchboard();
 
-    const vector <float> getNextJoints(){return nextJoints; }
+    const vector <float> getNextJoints(){ return nextJoints; }
     
 
 private:

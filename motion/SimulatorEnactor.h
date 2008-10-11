@@ -7,8 +7,8 @@ class SimulatorEnactor : MotionEnactor {
 public:
     SimulatorEnactor(MotionSwitchboard * _switchboard)
         : MotionEnactor(_switchboard) {};
-     ~SimulatorEnactor(){};
-    virtual void start();
+    virtual ~SimulatorEnactor() { }
+    virtual void start() { }
 
 };
 

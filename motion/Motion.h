@@ -34,17 +34,15 @@ class Motion
 #else
     Motion(ALMotionProxy * _proxy,boost::shared_ptr<Synchro> synchro, Sensors *s);
 #endif
+    ~Motion();
 
-    virtual ~Motion() {}
-    void start();
+    int start();
     void stop();
 
 private:
     MotionSwitchboard switchboard;
-    
     SimulatorEnactor *enactor;
     MotionInterface interface;
-
 };
 
 #endif

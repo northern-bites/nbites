@@ -20,7 +20,7 @@ class MotionEnactor {
 public:
     MotionEnactor(MotionSwitchboard  * _switchboard)
         : switchboard(_switchboard){};
-    virtual ~MotionEnactor();
+    virtual ~MotionEnactor() { }
 
     virtual void start() = 0;
 

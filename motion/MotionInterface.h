@@ -19,7 +19,8 @@
 class MotionInterface
 {
   public:
-    MotionInterface(MotionSwitchboard *_switchboard){}
+    MotionInterface(MotionSwitchboard *_switchboard)
+        : switchboard(_switchboard) {}
     MotionInterface(MotionCore *_core) : core(_core) {}
     virtual ~MotionInterface() {}
 
@@ -66,6 +67,7 @@ class MotionInterface
     
   private:
     MotionCore *core;
+    MotionSwitchboard *switchboard;
     /*
     bool shouldStopHead;
     bool shouldStopBody;
