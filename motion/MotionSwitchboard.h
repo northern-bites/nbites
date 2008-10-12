@@ -11,19 +11,24 @@
 #ifndef _MotionSwitchboard_h_DEFINED
 #define _MotionSwitchboard_h_DEFINED
 
+#include <pthread.h>
 #include <vector>
 using namespace std;
+
+#include "Kinematics.h"
+#include "WalkProvider.h"
 
 class MotionSwitchboard {
 public:
     MotionSwitchboard();
     ~MotionSwitchboard();
 
-    const vector <float> getNextJoints(){ return nextJoints; }
-    
+    const vector <float> getNextJoints();
 
 private:
+    WalkProvider walkProvider;
     vector <float> nextJoints;
+    pthread_mutex_t next_joints_mutex;
 };
 
 #endif

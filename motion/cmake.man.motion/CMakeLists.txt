@@ -108,6 +108,7 @@ SET( MOTION_SRCS     ${MOTION_INCLUDE_DIR}/CallbackAction
 		     ${MOTION_INCLUDE_DIR}/MotionSwitchboard
 		     ${MOTION_INCLUDE_DIR}/MotionEnactor
 		     ${MOTION_INCLUDE_DIR}/SimulatorEnactor
+		     ${MOTION_INCLUDE_DIR}/WalkProvider
                      ${MOTION_INCLUDE_DIR}/_motionmodule
                      )
 

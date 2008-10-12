@@ -5,14 +5,22 @@
 #include <vector>
 using namespace std;
 
-class WalkProvider : MotionProvider {
+#include "MotionProvider.h"
+
+class WalkProvider : public MotionProvider {
 public:
+    WalkProvider();
+    virtual ~WalkProvider();
+
     void requestStop();
     void calculateNextJoints();
     void addWalkCommand();
 
 private:
-
+    // Walk vector variables
+    float x;
+    float y;
+    float theta;
 };
 
 #endif

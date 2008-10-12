@@ -22,7 +22,7 @@
 class MotionEnactor {
 public:
     MotionEnactor(MotionSwitchboard  * _switchboard)
-        : switchboard(_switchboard){};
+        : running(false), switchboard(_switchboard){};
     virtual ~MotionEnactor() { }
 
     void start() {
@@ -31,6 +31,8 @@ public:
         cout << "  creating threads" << endl;
 #endif
         fflush(stdout);
+
+        running = true;
 
         // set thread attributes
         pthread_attr_t attr;
@@ -57,8 +59,8 @@ public:
 
 protected:
     bool running;
-    pthread_t enactor_thread;
     MotionSwitchboard *switchboard;
+    pthread_t enactor_thread;
 };
 
 #endif

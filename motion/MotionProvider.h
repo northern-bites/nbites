@@ -12,23 +12,26 @@
 #include <vector>
 using namespace std;
 
+#include "Kinematics.h"
+
 class MotionProvider {
 public:
-    MotionProvider() { }
+    MotionProvider()
+        : _active(false), nextJoints(Kinematics::NUM_CHAINS, 0) { }
     virtual ~MotionProvider() { }
 
     virtual void requestStop() = 0;
-    bool isActive() const { return active; }
+    const bool isActive() const { return _active; }
     virtual void calculateNextJoints() = 0;
     const vector <float> getNextJoints() { return nextJoints; }
 
 protected:
     void setNextJoints(const vector <float> &joints) { nextJoints = joints; }
-    void active() { active = true; }
-    void inactive() { active = false; }
+    void active() { _active = true; }
+    void inactive() { _active = false; }
 
 private:
-    bool active;
+    bool _active;
     vector <float> nextJoints;
 };
 
