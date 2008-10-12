@@ -102,7 +102,7 @@ forwardKinematics(const ChainID id,
     float x=0,y=0,z=0;
 
     // Variables for legs. These will save computation by storing certain useful
-    // things only ones
+    // things only once
     float HYP, HP, HR, KP, AP, AR, sinHYP, cosHYP, sinHP, cosHP, sinHR, cosHR,
         sinKP, cosKP, sinAP, cosAP, sinAR, cosAR, root2, sinAPplusKP, cosAPplusKP;
 
