@@ -587,6 +587,8 @@ Kinematics::dls(const ChainID chainID,
     return result;
 }
 
+#ifdef 0
+//Usage example, code for offline testing:
 
 int main() {
     // George's test code
@@ -614,3 +616,4 @@ int main() {
     std::cout << std::endl;
     return 0;
 }
+#endif

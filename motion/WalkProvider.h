@@ -6,6 +6,7 @@
 using namespace std;
 
 #include "MotionProvider.h"
+#include "WalkingConstants.h"
 
 class WalkProvider : public MotionProvider {
 public:
@@ -14,13 +15,13 @@ public:
 
     void requestStop();
     void calculateNextJoints();
-    void addWalkCommand();
+    void setMotion(float x, float y, float theta);
+
+
 
 private:
-    // Walk vector variables
-    float x;
-    float y;
-    float theta;
+
+    WalkingParameters walkParameters;
 };
 
 #endif

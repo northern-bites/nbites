@@ -23,11 +23,20 @@ public:
     MotionSwitchboard();
     ~MotionSwitchboard();
 
+    void start();
+    void stop();
+    static void* runThread(void *switchboard);
+    void run();
+
     const vector <float> getNextJoints();
 
 private:
     WalkProvider walkProvider;
     vector <float> nextJoints;
+
+    bool running;
+    pthread_t       switchboard_thread;
+    pthread_cond_t  switchboard_cond;
     pthread_mutex_t next_joints_mutex;
 };
 

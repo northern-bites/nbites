@@ -8,11 +8,12 @@ void SimulatorEnactor::run() {
     motionProxy->setBodyStiffness(0.85f, 0.1f);
 
     while (running) {
-        if (!running)
-            break;
+
+        vector <float> result = switchboard->getNextJoints();
+
+        //for (int i=0;
 
         // Get the angles we want to go to this frame from the switchboard
-
         motionProxy->postGotoBodyAngles(switchboard->getNextJoints(),
                                         MOTION_FRAME_LENGTH_S,
                                         AL::ALMotionProxy::INTERPOLATION_LINEAR);

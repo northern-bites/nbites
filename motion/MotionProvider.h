@@ -13,26 +13,31 @@
 using namespace std;
 
 #include "Kinematics.h"
+using Kinematics::ChainID;
 
 class MotionProvider {
 public:
     MotionProvider()
-        : _active(false), nextJoints(Kinematics::NUM_CHAINS, 0) { }
+        : _active(false), nextJoints(Kinematics::NUM_CHAINS,vector<float>()) { }
     virtual ~MotionProvider() { }
 
     virtual void requestStop() = 0;
     const bool isActive() const { return _active; }
     virtual void calculateNextJoints() = 0;
-    const vector <float> getNextJoints() { return nextJoints; }
+    vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
 
 protected:
-    void setNextJoints(const vector <float> &joints) { nextJoints = joints; }
+    void setNextChainJoints(const ChainID id,
+                            const vector <float> &chainJoints) {
+        nextJoints[id] = chainJoints;
+    }
+
     void active() { _active = true; }
     void inactive() { _active = false; }
 
 private:
     bool _active;
-    vector <float> nextJoints;
+    vector < vector <float> > nextJoints;
 };
 
 #endif

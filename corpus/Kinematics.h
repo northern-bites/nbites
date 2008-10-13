@@ -392,7 +392,7 @@ namespace Kinematics {
     const IKLegResult dls(const ChainID chainID,
                           const ufvector3 &goal,
                           const float startAngles[],
-                          const float maxError,
-                          const float maxHeelError);
+                          const float maxError = 1.0f,
+                          const float maxHeelError = .1f);
 };
 #endif
