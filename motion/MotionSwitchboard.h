@@ -36,7 +36,7 @@ private:
 
     bool running;
     pthread_t       switchboard_thread;
-    pthread_cond_t  switchboard_cond;
+    pthread_cond_t  calc_new_joints_cond;
     pthread_mutex_t next_joints_mutex;
 };
 

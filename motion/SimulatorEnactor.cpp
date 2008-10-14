@@ -11,8 +11,13 @@ void SimulatorEnactor::run() {
 
         vector <float> result = switchboard->getNextJoints();
 
-        //for (int i=0;
-
+        /*
+        cout<<"Joints are : [";
+        for (unsigned int i=0; i <result.size(); i++){
+            cout << result[i]<<", ";
+        }
+        cout<<"]"<<endl;
+        */
         // Get the angles we want to go to this frame from the switchboard
         motionProxy->postGotoBodyAngles(switchboard->getNextJoints(),
                                         MOTION_FRAME_LENGTH_S,

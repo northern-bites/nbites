@@ -29,8 +29,8 @@ void WalkProvider::calculateNextJoints() {
 
 
 //Return the joints for the legs
-    setNextChainJoints(LLEG_CHAIN,vector<float>());
-    setNextChainJoints(RLEG_CHAIN,vector<float>());
+    setNextChainJoints(LLEG_CHAIN,vector<float>(LEG_JOINTS,0.2));
+    setNextChainJoints(RLEG_CHAIN,vector<float>(LEG_JOINTS,0.2));
 }
 
 void WalkProvider::setMotion(float x, float y, float theta) {
