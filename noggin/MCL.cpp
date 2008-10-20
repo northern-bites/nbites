@@ -69,8 +69,11 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 
     // Resample the particles
     for (int m = 0; m < M; ++m) {
-        // Select particles with probability associated with their weight
-        if(X_bar_t[m].weight > (rand() / (float(RAND_MAX)+1))) {
+        // Determine the number of copies of this particle to add
+        int count = M * X_bar_t[m].weight / totalWeights;
+
+        // Add the particles to the resampled posterior
+        for (int i = 0; i < count; ++i) {
             X_t.push_back(X_bar_t[m]);
         }
     }
