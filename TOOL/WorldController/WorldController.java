@@ -29,7 +29,8 @@ public class WorldController extends JPanel implements KeyListener,
 						       ChangeListener {
 
     //@todo integrate lines into simulation filter
-    //@todo force the simulator to restart when a new simulation made is selected
+    //@todo force the simulator to restart when a new simulation made is
+    // selected
     // DEBUG SWITCHES
     private boolean DEBUG_RECV_ODOMETRY = false;
     private boolean DEBUG_RECV_VISION = false;
@@ -44,7 +45,7 @@ public class WorldController extends JPanel implements KeyListener,
     WorldControllerPainter painter;
     // Displays the field + the painted info
     WorldControllerViewer viewer;
-    
+
     // Instance of the DebugViewer Class
     DebugViewer debugViewer;
 
@@ -53,8 +54,9 @@ public class WorldController extends JPanel implements KeyListener,
 
     // Object to handle the log 2.0 version of recording EKF off of robots
     LogHandler ekfLog;
-    
-    // Listen to live UDP data, used to visualize multiple dogs' world states simultaneously 
+
+    // Listen to live UDP data, used to visualize multiple dogs' world states
+    // simultaneously
     UDPServer udp_server;
 
     // Modes
@@ -90,7 +92,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final int NUM_DISPLAY_ESTIMATES_SLIDE_INIT = 5;
 
     // TCP Constants
-    // data coming off dog via tcp. 
+    // data coming off dog via tcp.
     static final int TCP_NUM_LOC_DATA = 21;
 
     // Loc Debug Data Indexes
@@ -130,7 +132,7 @@ public class WorldController extends JPanel implements KeyListener,
     public final static int LANDMARK_BALL = 6;
     public final static int LANDMARK_MY_CORNER_LEFT_L = 7;
     public final static int LANDMARK_MY_CORNER_RIGHT_L = 8;
-    public final static int LANDMARK_MY_GOAL_LEFT_T = 9; 
+    public final static int LANDMARK_MY_GOAL_LEFT_T = 9;
     public final static int LANDMARK_MY_GOAL_RIGHT_T = 10;
     public final static int LANDMARK_MY_GOAL_LEFT_L = 11;
     public final static int LANDMARK_MY_GOAL_RIGHT_L = 12;
@@ -153,7 +155,7 @@ public class WorldController extends JPanel implements KeyListener,
 
     // Button Strings
     public final static String PROGRAM_LABEL_STRING = "Options:";
-    public final static String PROGRAM_SPECIFIC_LABEL_STRING = "Option Specific:";
+    public final static String PROGRAM_SPECIFIC_LABEL_STRING="Option Specific:";
     public final static String SIMULATION_LABEL_STRING = "Simulation:";
     public final static String UDP_LABEL_STRING = "UDP Viewer:";
     public final static String CONNECTION_LABEL_STRING = "Connection:";
@@ -197,6 +199,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String SIMULATE_OFFLINE_STRING = "Simulate Offline";
     public static final String SIMULATE_WITH_DOG_DATA_STRING = "Simulate with Robot Data";
     public static final String VIEW_DOG_EKF_STRING = "View Robot EKF";
+    public static final String VIEW_ROBOT_MCL_STRING = "View Robot Particles";
     public static final String VIEW_DOG_LOG_STRING = "View Robot Log";
     public static final String VIEW_EKF_LOG_STRING = "View EKF Log";
     public static final String VIEW_UDP_PACKETS_STRING = "View UDP Packets";
@@ -208,6 +211,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String SIMULATE_OFFLINE_ACTION = "simulate offlineme";
     public static final String SIMULATE_WITH_DOG_DATA_ACTION = "simulate robot data";
     public static final String VIEW_DOG_EKF_ACTION = "view robot ekfs";
+    public static final String VIEW_ROBOT_MCL_ACTION = "view robot mcl";
     public static final String VIEW_DOG_LOG_ACTION = "viewrobotlog";
     public static final String VIEW_EKF_LOG_ACTION = "viewekflog";
     public static final String VIEW_UDP_PACKETS_ACTION = "viewudpaction";
@@ -262,6 +266,7 @@ public class WorldController extends JPanel implements KeyListener,
     private JLabel num_display_estimates_label;
     private JButton button_switch_fields;
     private JButton button_view_dog_ekf;
+    private JButton button_view_robot_mcl;
     private JButton button_view_udp_packets;
     private JButton button_view_dog_log;
     private JButton button_view_ekf_log;
@@ -273,7 +278,7 @@ public class WorldController extends JPanel implements KeyListener,
     private JButton draw_est_button;
     private JSlider fps_slide;
     private JSlider num_display_estimates_slide;
-    
+
     // for key listener
     private boolean key_pressed;
 
@@ -288,8 +293,6 @@ public class WorldController extends JPanel implements KeyListener,
         the_field = aiboField;
         viewer = new WorldControllerViewer(the_field);
         painter = viewer.getPainter();
-
-        
 
 	debugViewer = new DebugViewer(this, (int) (the_field.getPreferredSize().getWidth() + BUTTON_AREA_WIDTH + 150), 0);
 	log = new LogHandler(this, painter, debugViewer);
@@ -334,7 +337,7 @@ public class WorldController extends JPanel implements KeyListener,
 	playback_fps = DOG_FPS;
 
 	setFocusable(true);
-	requestFocusInWindow();				
+	requestFocusInWindow();
 
 	addKeyListener(this);
 
@@ -378,7 +381,7 @@ public class WorldController extends JPanel implements KeyListener,
 	waitToConnect = new Timer(CHECK_INTERVAL, taskPerformer);
     } // end constructor
 
-    
+
     // This is how WorldController used to work standalone
     // This method would get called forever and the methods inside would
     // sleep in order to keep the processor from being used 100%. I'm
@@ -401,7 +404,7 @@ public class WorldController extends JPanel implements KeyListener,
 	    }
 	    else if (mode == VIEW_UDP_PACKETS) {
 		// server is on its own thread, should work on its own
-		// We just need to tell the field that a frame has passed 
+		// We just need to tell the field that a frame has passed
                 // and that it should redraw accordingly, since it has no
                 // other way to understand the passage of time when its just
                 //listens in to the udp packets
@@ -514,7 +517,7 @@ public class WorldController extends JPanel implements KeyListener,
 		    }
 		}
 	    });
-	viewDogEKFThread.start();    
+	viewDogEKFThread.start();
     }
 
     /** Connect to dog, have it stream localization info, just use this program
@@ -525,18 +528,18 @@ public class WorldController extends JPanel implements KeyListener,
 
         String loc_receive = aibo.sendCommand("sendLandmarks");
 	//System.out.println("loc_receive: " + loc_receive);
-	
+
         if (loc_receive != null) {
-	    //if (loc_receive == 
+	    //if (loc_receive ==
 
 	    // split string into an array of values
             String[] response_values = loc_receive.split(" ");
 	    // check to see if length is less than min (and error if so)
             if (response_values.length < TCP_NUM_LOC_DATA) {
-		System.out.println("viewDogEKF() received " + 
-				   response_values.length + 
-				   " values, expected more than " + 
-				   TCP_NUM_LOC_DATA + " string is: " + 
+		System.out.println("viewDogEKF() received " +
+				   response_values.length +
+				   " values, expected more than " +
+				   TCP_NUM_LOC_DATA + " string is: " +
 				   loc_receive);
 		return;
 	    }
@@ -547,34 +550,34 @@ public class WorldController extends JPanel implements KeyListener,
 	    Double my_y = new Double(response_values[TCP_LOC_MY_Y]);
 	    Double my_h = new Double(response_values[TCP_LOC_MY_H]);
 	    Double my_pan = 0.;
-	    Double my_uncert_x = 
-		new Double(response_values[TCP_LOC_MY_UNCERT_X]);
-	    Double my_uncert_y = 
-		new Double(response_values[TCP_LOC_MY_UNCERT_Y]);
-	    Double my_uncert_h = 
-		new Double(response_values[TCP_LOC_MY_UNCERT_H]);
+	    Double my_uncert_x =
+            new Double(response_values[TCP_LOC_MY_UNCERT_X]);
+	    Double my_uncert_y =
+            new Double(response_values[TCP_LOC_MY_UNCERT_Y]);
+	    Double my_uncert_h =
+            new Double(response_values[TCP_LOC_MY_UNCERT_H]);
 	    Double ball_x = new Double(response_values[TCP_LOC_BALL_X]);
 	    Double ball_y = new Double(response_values[TCP_LOC_BALL_Y]);
-	    Double ball_uncert_x = 
-		new Double(response_values[TCP_LOC_BALL_UNCERT_X]);
-	    Double ball_uncert_y = 
-		new Double(response_values[TCP_LOC_BALL_UNCERT_Y]);
+	    Double ball_uncert_x =
+            new Double(response_values[TCP_LOC_BALL_UNCERT_X]);
+	    Double ball_uncert_y =
+            new Double(response_values[TCP_LOC_BALL_UNCERT_Y]);
 	    Double ball_vel_x = new Double(response_values[TCP_LOC_BALL_VEL_X]);
 	    Double ball_vel_y = new Double(response_values[TCP_LOC_BALL_VEL_Y]);
-	    Double ball_uncert_vel_x = 
-		new Double(response_values[TCP_LOC_BALL_UNCERT_VEL_X]);
-	    Double ball_uncert_vel_y = 
-		new Double(response_values[TCP_LOC_BALL_UNCERT_VEL_Y]);	    
+	    Double ball_uncert_vel_x =
+            new Double(response_values[TCP_LOC_BALL_UNCERT_VEL_X]);
+	    Double ball_uncert_vel_y =
+            new Double(response_values[TCP_LOC_BALL_UNCERT_VEL_Y]);
 	    Double ball_dist = new Double(response_values[TCP_LOC_BALL_DIST]);
-	    Double ball_bearing = 
-		new Double(response_values[TCP_LOC_BALL_BEARING]);
+	    Double ball_bearing =
+            new Double(response_values[TCP_LOC_BALL_BEARING]);
 	    Double odo_x = new Double(response_values[TCP_LOC_ODO_X]);
 	    Double odo_y = new Double(response_values[TCP_LOC_ODO_Y]);
 	    Double odo_h = new Double(response_values[TCP_LOC_ODO_H]);
 	    Double dbl_color = new Double(response_values[TCP_LOC_TEAM_COLOR]);
 	    int team_color = dbl_color.intValue();
-	    Double dbl_number = 
-		new Double(response_values[TCP_LOC_PLAYER_NUMBER]);
+	    Double dbl_number =
+            new Double(response_values[TCP_LOC_PLAYER_NUMBER]);
 	    int player_number = dbl_number.intValue();
 
 	    // update the debug viewer with loc data
@@ -595,21 +598,21 @@ public class WorldController extends JPanel implements KeyListener,
 				     + Math.pow(ball_vel_y.doubleValue(),2.0));
 	    debugViewer.ballVelAbs.setText("" + absBallVelocity);
 	    debugViewer.ballVelUncertX.setText("" + ball_uncert_vel_x);
-	    debugViewer.ballVelUncertY.setText("" + ball_uncert_vel_y);    
+	    debugViewer.ballVelUncertY.setText("" + ball_uncert_vel_y);
 	    debugViewer.odoX.setText("" + odo_x);
 	    debugViewer.odoY.setText("" + odo_y);
 	    debugViewer.odoH.setText("" + odo_h);
 
 	    // parse rest of string for landmark info
-	    for (int i = TCP_NUM_LOC_DATA; 
-		 i < response_values.length; 
+	    for (int i = TCP_NUM_LOC_DATA;
+		 i < response_values.length;
 		 i+= NUM_LANDMARK_VALUES) {
 		Double id = new Double(response_values[i+LANDMARK_ID_INDEX]);
 		Double x = new Double(response_values[i+LANDMARK_X_INDEX]);
 		Double y = new Double(response_values[i+LANDMARK_Y_INDEX]);
-		Double dist = 
+		Double dist =
 		    new Double(response_values[i+LANDMARK_DIST_INDEX]);
-		Double bearing = 
+		Double bearing =
 		    new Double(response_values[i+LANDMARK_BEARING_INDEX]);
 
 		// add landmarks to DebugViewer
@@ -617,33 +620,33 @@ public class WorldController extends JPanel implements KeyListener,
 		// add landmarks to Field viewer
 		painter.sawLandmark(x.intValue(),y.intValue(), team_color);
 	    }
-	    
+
 	    if (ball_dist > 0) {
-		debugViewer.addLandmark(LANDMARK_BALL,ball_dist,ball_bearing);
+            debugViewer.addLandmark(LANDMARK_BALL,ball_dist,ball_bearing);
 	    }
 
 	    // update ball data structure
-	    LocalizationPacket current_ball_localization_info = 
+	    LocalizationPacket current_ball_localization_info =
 		LocalizationPacket.
-		makeBallEstimateAndUncertPacket(ball_x, 
-						ball_y, 
-						ball_uncert_x, 
-						ball_uncert_y, 
-						ball_vel_x, 
+		makeBallEstimateAndUncertPacket(ball_x,
+						ball_y,
+						ball_uncert_x,
+						ball_uncert_y,
+						ball_vel_x,
 						ball_vel_y);
 	    painter.
 		reportUpdatedBallLocalization(current_ball_localization_info,
 					      team_color, player_number);
 
 	    // update self localization data structure
-	    LocalizationPacket current_localization_info = 
+	    LocalizationPacket current_localization_info =
 		LocalizationPacket.
-		makeEstimateAndUncertPacket(my_x, 
-					    my_y, 
-					    my_h, 
-					    my_pan, 
-					    my_uncert_x, 
-					    my_uncert_y, 
+		makeEstimateAndUncertPacket(my_x,
+					    my_y,
+					    my_h,
+					    my_pan,
+					    my_uncert_x,
+					    my_uncert_y,
 					    my_uncert_h);
 	    painter.reportUpdatedLocalization(current_localization_info,
 						team_color, player_number);
@@ -699,7 +702,7 @@ public class WorldController extends JPanel implements KeyListener,
 					    JLabel.CENTER);
         program_specific_label.setAlignmentX(Component.CENTER_ALIGNMENT);
         button_area.add(program_specific_label);
-	
+
 	button_one = new JButton(DISCONNECT_STRING);
         //button_one.setActionCommand(DISCONNECT_ACTION);
         button_one.addActionListener(this);
@@ -723,30 +726,35 @@ public class WorldController extends JPanel implements KeyListener,
         fps_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 	fps_label.setVisible(false);
         button_area.add(fps_label);
-	fps_slide = new JSlider(JSlider.HORIZONTAL, FPS_SLIDE_MIN, FPS_SLIDE_MAX, FPS_SLIDE_INIT);
+	fps_slide = new JSlider(JSlider.HORIZONTAL, FPS_SLIDE_MIN, FPS_SLIDE_MAX,
+                            FPS_SLIDE_INIT);
 	fps_slide.addChangeListener(this);
 	button_area.add(fps_slide);
 	fps_slide.setVisible(false);
-	
+
 	// estimates slide
-        num_display_estimates_label = new JLabel(NUM_DISPLAY_ESTIMATES_LABEL_STRING, JLabel.CENTER);
-        num_display_estimates_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+    num_display_estimates_label = new JLabel(NUM_DISPLAY_ESTIMATES_LABEL_STRING,
+                                             JLabel.CENTER);
+    num_display_estimates_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 	num_display_estimates_label.setVisible(false);
-        button_area.add(num_display_estimates_label);
-	num_display_estimates_slide = new JSlider(JSlider.HORIZONTAL, NUM_DISPLAY_ESTIMATES_SLIDE_MIN, NUM_DISPLAY_ESTIMATES_SLIDE_MAX, NUM_DISPLAY_ESTIMATES_SLIDE_INIT);
+    button_area.add(num_display_estimates_label);
+	num_display_estimates_slide = new JSlider(JSlider.HORIZONTAL,
+                                              NUM_DISPLAY_ESTIMATES_SLIDE_MIN,
+                                              NUM_DISPLAY_ESTIMATES_SLIDE_MAX,
+                                              NUM_DISPLAY_ESTIMATES_SLIDE_INIT);
 	num_display_estimates_slide.addChangeListener(this);
 	button_area.add(num_display_estimates_slide);
 	num_display_estimates_slide.setVisible(false);
     }
 
     public void nothingButtons() {
-	button_one.setVisible(false);
-	button_two.setVisible(false);
-	button_three.setVisible(false);
-	fps_label.setVisible(false);
-	fps_slide.setVisible(false);
-	num_display_estimates_label.setVisible(false);
-	num_display_estimates_slide.setVisible(false);
+        button_one.setVisible(false);
+        button_two.setVisible(false);
+        button_three.setVisible(false);
+        fps_label.setVisible(false);
+        fps_slide.setVisible(false);
+        num_display_estimates_label.setVisible(false);
+        num_display_estimates_slide.setVisible(false);
     }
 
     public void dogEKFButtons() {
@@ -770,7 +778,7 @@ public class WorldController extends JPanel implements KeyListener,
 	fps_label.setVisible(true);
 	fps_slide.setVisible(true);
 	num_display_estimates_label.setVisible(true);
-	num_display_estimates_slide.setVisible(true);	
+	num_display_estimates_slide.setVisible(true);
     }
     public void ekfLogButtons() {
 	button_one.setText(DRAW_EST_STRING);
@@ -785,8 +793,8 @@ public class WorldController extends JPanel implements KeyListener,
 	fps_label.setVisible(true);
 	fps_slide.setVisible(true);
 	num_display_estimates_label.setVisible(true);
-	num_display_estimates_slide.setVisible(true);	
-    }    
+	num_display_estimates_slide.setVisible(true);
+    }
     public void udpButtons() {
 	button_one.setText(DISCONNECT_STRING);
         button_one.setActionCommand(DISCONNECT_ACTION);
@@ -854,7 +862,7 @@ public class WorldController extends JPanel implements KeyListener,
 	fd.setDirectory(dir);
 	fd.setVisible(true);
 	String fullpath = fd.getDirectory() + fd.getFile();
-	fd.dispose();  
+	fd.dispose();
 	if (fd.getFile() == null) return null;
 	return fullpath;
     }
@@ -973,12 +981,12 @@ public class WorldController extends JPanel implements KeyListener,
 
 
     public void keyPressed(KeyEvent k){
-       
+
 	int key = k.getKeyCode();
 
 	if (mode == VIEW_DOG_EKF || mode == SIMULATE_WITH_DOG_DATA
 	    && !key_pressed) {
-	  	    
+
 	    double walkSpeed; double spinSpeed;
 	    double x = 0; double y = 0; double spin = 0;
 	    walkSpeed = 5;
