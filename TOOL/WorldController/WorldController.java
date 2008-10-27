@@ -26,8 +26,8 @@ import java.lang.Process;
 
 public class WorldController extends JPanel implements KeyListener,
 						       ActionListener,
-						       ChangeListener {
-
+						       ChangeListener
+{
     //@todo integrate lines into simulation filter
     //@todo force the simulator to restart when a new simulation made is
     // selected
@@ -829,7 +829,9 @@ public class WorldController extends JPanel implements KeyListener,
     // master method for getting dog log working
     public void startDogLog()
     {
-        log.initDogLog();
+        if(!log.initDogLog()) {
+            return;
+        }
         nothingButtons(); // nulls out all buttons (in case switching options)
         dogLogButtons();
         mode = VIEW_DOG_LOG;
@@ -837,7 +839,9 @@ public class WorldController extends JPanel implements KeyListener,
 
     public void startEKFLog()
     {
-        ekfLog.initEKFLog();
+        if(!ekfLog.initEKFLog()) {
+            return;
+        }
         nothingButtons();
         ekfLogButtons();
         mode = VIEW_EKF_LOG;
