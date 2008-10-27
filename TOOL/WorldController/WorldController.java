@@ -290,7 +290,7 @@ public class WorldController extends JPanel implements KeyListener,
         aiboField = new AiboField2008();
         naoField = new NaoField2008();
 
-        the_field = aiboField;
+        the_field = naoField;
         viewer = new WorldControllerViewer(the_field);
         painter = viewer.getPainter();
 
