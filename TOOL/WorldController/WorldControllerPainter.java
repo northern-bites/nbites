@@ -61,7 +61,6 @@ public class WorldControllerPainter implements DogListener
     public static final double PAN_HEADING_RADIUS = 15.;
     public static final double HEADING_UNCERT_RADIUS = 20.;
 
-
     // Ball drawing
     static final Color REAL_BALL_COLOR = Color.RED;
     static final Color ESTIMATED_BALL_COLOR = Color.ORANGE;
@@ -119,7 +118,7 @@ public class WorldControllerPainter implements DogListener
     /**
      * Constructs the painter to draw all possible localization information
      * @param toView Field on which the painter will paint.
-     * @param panel 
+     * @param panel
      */
     public WorldControllerPainter(Field toView, ImagePanel panel)
     {
