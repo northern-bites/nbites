@@ -46,12 +46,22 @@
  * TODO:
  *   - Need to fix the world frame, since it currently relies on the rotation of
  *     the foot also about the Z axis, which means when we are turning, for
- *     example, we will report distances relative to the foot instead of the body
+ *     example, we will report distances and more imporantly bearings relative
+ *     to the foot instead of the body. This has been hacked for now, in 
+ *     bodyEstimate.
+ *
  *   - While testing this code on the robot, we saw a significant, though
  *     infrequent, jump in the estimate for the horizon line. The cause could be
  *     one of bad joint information from the motion engine, a singular matrix
  *     inversion we do somewhere in the code, or something completely different.
  *     Needs to be looked at.
+ *
+ *   - While testing this code on the robot, we have noticed severe
+ *     discrepancies between distances reported from pixEstimate, and their
+ *     actual values. While the model seems to work well in general, there
+ *     needs to be a serious evaluation of these defects, since these
+ *     inaccuracies will have serious consequences for localization.
+ *
  */
 
 #ifndef _NaoPose_h_DEFINED
