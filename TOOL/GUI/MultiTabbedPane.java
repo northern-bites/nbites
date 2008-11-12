@@ -75,6 +75,11 @@ public class MultiTabbedPane extends JPanel implements ChangeListener {
         updateTabs();
         updateComponents();
     }
+    
+    public int getNumTabbedPanes() {
+        return tabs.size();
+    }
+
 
     public void addTab(int paneNumber, String componentName) {
         tabs.get(paneNumber).add(componentName, components.get(componentName));
@@ -224,7 +229,18 @@ public class MultiTabbedPane extends JPanel implements ChangeListener {
         tabs.get(tab).setSelectedIndex(names.indexOf(name));
     }
 
+    /**
+     * @param index which of the tabbed panes the tab is a part of
+     */
+    public String getSelectedTabName(int index) {
+        // Which of the tabbed panes are we dealing with?
+        TabPane t = tabs.get(index);
+        return t.getTitleAt(t.getSelectedIndex());
+    }
+
+
     public void handleTabSelection(int index) {
+      
         TabPane t = tabs.get(index);
 
         int component = t.getSelectedIndex();
@@ -296,11 +312,9 @@ public class MultiTabbedPane extends JPanel implements ChangeListener {
     //
 
     public void stateChanged(ChangeEvent e) {
-        
         int paneIndex = tabs.indexOf(e.getSource());
         handleTabSelection(paneIndex);
         int tabIndex = tabs.get(paneIndex).getSelectedIndex();
-              
 
         // alert the proper tool module of the selection of its tabs
         TOOLModule selected = tool.getModule(names.get(tabIndex));
@@ -320,9 +334,8 @@ public class MultiTabbedPane extends JPanel implements ChangeListener {
         public TabPane() {
             super();
         }
-   
 
-    
+
         protected void processMouseEvent(MouseEvent evt) {
             if (evt.getID() == MouseEvent.MOUSE_PRESSED
                 && evt.getButton() == MouseEvent.BUTTON3)
@@ -336,11 +349,11 @@ public class MultiTabbedPane extends JPanel implements ChangeListener {
                     super.processMouseEvent(evt);
                 }
         }
-        
+
         private JPopupMenu getTabPopup(final int index)
         {
             final String title = getTitleAt(index);
-            
+
             JPopupMenu pm = new JPopupMenu();
             JMenuItem close = new JMenuItem("Remove " + title);
             close.addActionListener(new ActionListener()
@@ -353,7 +366,7 @@ public class MultiTabbedPane extends JPanel implements ChangeListener {
                     }
                 });
             pm.add(close);
-            
+
             return pm;
         }
     }

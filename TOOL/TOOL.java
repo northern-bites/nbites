@@ -51,7 +51,7 @@ import edu.bowdoin.robocup.TOOL.PlayBookEditor.PlayBookEditorModule;
 import edu.bowdoin.robocup.TOOL.SQL.SQLModule;
 import edu.bowdoin.robocup.TOOL.WorldController.WorldControllerModule;
 
-import  java.util.prefs.*;
+import java.util.prefs.*;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
 import java.awt.Window;
@@ -125,6 +125,11 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     public static final String DEFAULT_X_STRING = "default_x";
     public static final String DEFAULT_Y_STRING = "default_y";
 
+    public static final String DEFAULT_1_TAB_STRING = "default_1_tab";
+    public static final String DEFAULT_1_TAB = "Data";
+
+    public static final String DEFAULT_2_TAB_STRING = "default_2_tab";
+    public static final String DEFAULT_2_TAB = "Calibrate";
 
 
 
@@ -148,7 +153,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // Setup the GUI
         initMainWindow();
 
-        mainWindow.addWindowListener(new WindowPreferenceListener(prefs));
+       
 
         // Initialize and add each of the modules
         //
@@ -187,9 +192,10 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         dataManager.addColorTableListener(calibrate);
         dataManager.addColorTableListener(colorEdit);
 
-
         setupPane();
 
+        // Listen to window closings so as to save preferences
+        mainWindow.addWindowListener(new WindowPreferenceListener(this));
 
         // Determine where window should launch
         int startX = prefs.getInt(DEFAULT_X_STRING, DEFAULT_X);
@@ -238,9 +244,17 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         multiPane = new MultiTabbedPane(this, DEFAULT_PANES, moduleMap);
         // add new pane
         mainWindow.getContentPane().add(multiPane);
+
+        String defaultModule1 = prefs.get(DEFAULT_1_TAB_STRING,
+                                          DEFAULT_1_TAB);
+
+        String defaultModule2 = prefs.get(DEFAULT_2_TAB_STRING,
+                                          DEFAULT_2_TAB);
+
+
         // select default initial panel
-        multiPane.performTabSelection(0, "Data");
-        multiPane.performTabSelection(1, "Calibrate");
+        multiPane.performTabSelection(0, defaultModule1);
+        multiPane.performTabSelection(1, defaultModule2);
         // will silently fail if there isn't more than one pane
     }
         
@@ -400,7 +414,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             displayControls();
         }
         else if (e.getSource() == about) {
-    
+            
         }
 	//added temporary way to load color tables
 	else if(e.getSource() == loadColorTable){
@@ -412,11 +426,11 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 	}else if(e.getSource() == newColorTable){
 	    newColorTable();
 	}else if (e.getSource() == addPane) {
-            multiPane.addPane();
-            if (multiPane.numPanes() > 1)
-                removePane.setEnabled(true);
-            mainWindow.validate();
-        }else if (e.getSource() == removePane) {
+        multiPane.addPane();
+        if (multiPane.numPanes() > 1)
+            removePane.setEnabled(true);
+        mainWindow.validate();
+    }else if (e.getSource() == removePane) {
             multiPane.removePane();
             if (multiPane.numPanes() == 1)
                 removePane.setEnabled(false);
@@ -492,7 +506,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
     }
     public void saveColorTable(){
-	colorTable.saveColorTable();
+        colorTable.saveColorTable();
     }
     public void saveColorTableAs(){
 	colorTable.saveColorTableAs();
@@ -517,42 +531,52 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
     }
 
+    public void savePreferences() {
+        saveWindowPrefs(prefs, mainWindow);
+        saveTabPrefs(prefs, multiPane);
+    }
+
+    public void saveWindowPrefs(Preferences prefs, Window w) {
+        prefs.putInt(DEFAULT_WIDTH_STRING, w.getWidth());
+        prefs.putInt(DEFAULT_HEIGHT_STRING, w.getWidth());
+        prefs.putInt(DEFAULT_X_STRING, w.getX());
+        prefs.putInt(DEFAULT_Y_STRING, w.getY());
+    }
+
+    public void saveTabPrefs(Preferences prefs, MultiTabbedPane tabs) {
+        prefs.put(DEFAULT_1_TAB_STRING, tabs.getSelectedTabName(0));
+        if (tabs.getNumTabbedPanes() > 1) {
+            prefs.put(DEFAULT_2_TAB_STRING, tabs.getSelectedTabName(1));
+        }
+    }
+
+
     public static void main(String[] args) {
         TOOL t = new TOOL();
     }
 
     /**
      * @author Nicholas Dunn
-     * On window close, merely writes out the current (x,y) location as well
-     * as width and height so that we can remember upon launching the
-     * TOOL again.
+     * On window close, alerts TOOL that it should save its preferences
      */
     public class WindowPreferenceListener implements WindowListener {
 
-        private Preferences prefs;
+        private TOOL tool;
 
-        public WindowPreferenceListener(Preferences prefs) {
-            this.prefs = prefs;
+        public WindowPreferenceListener(TOOL t) {
+            tool = t;
         }
 
         public void windowActivated(WindowEvent e) {}
         public void windowClosed(WindowEvent e) {
-            saveWindowPrefs(e.getWindow());
+            tool.savePreferences();
         }
         public void windowClosing(WindowEvent e) {
-            saveWindowPrefs(e.getWindow());
+            tool.savePreferences();
         }
         public void windowDeactivated(WindowEvent e) {}
         public void windowDeiconified(WindowEvent e) {}
         public void windowIconified(WindowEvent e) {}
         public void windowOpened(WindowEvent e) {}
-
-        public void saveWindowPrefs(Window mainWindow) {
-            prefs.putInt(DEFAULT_WIDTH_STRING, mainWindow.getWidth());
-            prefs.putInt(DEFAULT_HEIGHT_STRING, mainWindow.getWidth());
-            prefs.putInt(DEFAULT_X_STRING, mainWindow.getX());
-            prefs.putInt(DEFAULT_Y_STRING, mainWindow.getY());
-        }
-
     }
 }
