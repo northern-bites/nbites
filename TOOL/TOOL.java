@@ -74,7 +74,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     public static final String DEFAULT_IMAGE_DIRECTORY = "./";//"../frame_depot/closeYg/";
     public static final String DEFAULT_TABLE_PATH = "../../trunk/dog/tables/JohoLabFLHighFast/table.mtb";
 
-   
     public static final int DATA_MANAGER_HEIGHT  = 24;
     public static final int DEFAULT_PANES = 1;
 
@@ -106,7 +105,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private DataManager dataManager;
     private SourceManager sourceManager;
     private ColorTable colorTable;
-    
+
 
     private List<TOOLModule> modules;
     private HashMap<String, Component> moduleMap;
@@ -159,7 +158,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //
         // DataManager takes care of all image loading etc.
         addModule(new DataModule(this));
-        // We need to keep a reference to our calibrate module in order to 
+        // We need to keep a reference to our calibrate module in order to
         // clear the histories when creating a new table
         CalibrateModule calibrator = new CalibrateModule(this);
         calibrate = calibrator.getCalibrate();
@@ -214,21 +213,21 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // do this again, in case it didn't stick before window ws visible
         // (happens on linux)
         //mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        
-	final String fileSeparator = System.getProperty("file.separator");
-	sourceManager.addSource(".." + fileSeparator + "branches" + fileSeparator
+
+        final String fileSeparator = System.getProperty("file.separator");
+        sourceManager.addSource(".." + fileSeparator + "branches" + fileSeparator
                             +"frame_depot" + fileSeparator);
 
 	//temporary color table mod - make a null table
         try {
-            colorTable = new ColorTable(ColorTable.EMPTY, 
+            colorTable = new ColorTable(ColorTable.EMPTY,
                                         ColorTable.Dimension.LARGE);
             dataManager.notifyDependants();
             colorEdit.setTable(colorTable);
         }
-        catch (IOException e) { 
+        catch (IOException e) {
             CONSOLE.error(e.getMessage());
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
     }
 
@@ -236,7 +235,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         modules.add(m);
         moduleMap.put(m.getDisplayName(), m.getDisplayComponent());
     }
-    
+
     public void setupPane() {
         // remove old pane
         mainWindow.getContentPane().removeAll();
@@ -257,7 +256,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         multiPane.performTabSelection(1, defaultModule2);
         // will silently fail if there isn't more than one pane
     }
-        
+
     private void initMainWindow(){
 
         //start the main window
@@ -267,12 +266,11 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         if (System.getProperty("os.name").contains("Mac")) {
             mainWindow.setDefaultLookAndFeelDecorated(true);
         }
-    
+
         //init menu needs to happen here, but before everything else, or the
         //the menu doesnt display right
         initMenu();
-    
-        
+
         //and finally,  set size of the window
         mainWindow.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         //mainWindow.setExtendedState(JFrame.MAXIMIZED_VERT);
@@ -286,7 +284,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //make the file menu
         fileMenu = new JMenu("File");
 
-        quit = new JMenuItem("Quit");      
+        quit = new JMenuItem("Quit");
         quit.setActionCommand("quit");
         quit.addActionListener(this);
         quit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
