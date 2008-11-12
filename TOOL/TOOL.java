@@ -49,6 +49,13 @@ import TOOL.Net.RobotViewModule;
 import TOOL.PlayBookEditor.PlayBookEditorModule;
 import TOOL.SQL.SQLModule;
 import TOOL.WorldController.WorldControllerModule;
+
+import  java.util.prefs.*;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowEvent;
+import java.awt.Window;
+
+
 //import TOOL.ZSpace.ZModule;
 
 
@@ -66,14 +73,15 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     public static final String DEFAULT_IMAGE_DIRECTORY = "./";//"../frame_depot/closeYg/";
     public static final String DEFAULT_TABLE_PATH = "../../trunk/dog/tables/JohoLabFLHighFast/table.mtb";
 
-    public static final int DEFAULT_WIDTH = 900;
-    public static final int DEFAULT_HEIGHT = 800;
+   
     public static final int DATA_MANAGER_HEIGHT  = 24;
     public static final int DEFAULT_PANES = 1;
 
 
     public static TOOL instance = null;
     public static Console CONSOLE = null;
+
+    public static Preferences prefs;
 
     private JFrame mainWindow;
     private JSplitPane split_pane;
@@ -103,6 +111,22 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private HashMap<String, Component> moduleMap;
     private MultiTabbedPane multiPane;
 
+
+    public static final int DEFAULT_WIDTH = 900;
+    public static final int DEFAULT_HEIGHT = 800;
+
+    public static final String DEFAULT_WIDTH_STRING = "default_width";
+    public static final String DEFAULT_HEIGHT_STRING = "default_height";
+
+    public static final int DEFAULT_X = 0;
+    public static final int DEFAULT_Y = 0;
+
+    public static final String DEFAULT_X_STRING = "default_x";
+    public static final String DEFAULT_Y_STRING = "default_y";
+
+
+
+
     //starts an instance of a tool, which ties together all the sub modules
     public TOOL(){
 
@@ -117,8 +141,13 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         modules = new Vector<TOOLModule>();
         moduleMap = new HashMap<String, Component>();
 
+        // Initialize the preferences for the TOOL
+        prefs = Preferences.userNodeForPackage(this.getClass());
+
         // Setup the GUI
         initMainWindow();
+
+        mainWindow.addWindowListener(new WindowPreferenceListener(prefs));
 
         // Initialize and add each of the modules
         //
@@ -140,14 +169,14 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         NetworkModule net_mod = new NetworkModule(this);
         addModule(net_mod);
         // playbook - edit plays on a field model
-	addModule(new PlayBookEditorModule(this));
+        addModule(new PlayBookEditorModule(this));
         // robotview - view up-to-date information live from the robot
         //    depends on NetworkModule
         addModule(new RobotViewModule(this, net_mod));
         // sql - load datasets from the MySQL HiveMind database
         addModule(new SQLModule(this));
         // wordcontroller - view and control robot udp broadcasts in realtime
-	addModule(new WorldControllerModule(this));
+        addModule(new WorldControllerModule(this));
         // 3d rasterizer for fun and for viewing colortable/image distributions
         //addModule(new ZModule(this));
 
@@ -158,6 +187,19 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
 
         setupPane();
+
+
+        // Determine where window should launch
+        int startX = prefs.getInt(DEFAULT_X_STRING, DEFAULT_X);
+        int startY = prefs.getInt(DEFAULT_Y_STRING, DEFAULT_Y);
+
+
+        // Determine size window should start at
+        int startWidth = prefs.getInt(DEFAULT_WIDTH_STRING, DEFAULT_WIDTH);
+        int startHeight = prefs.getInt(DEFAULT_HEIGHT_STRING, DEFAULT_HEIGHT);
+
+        mainWindow.setLocation(startX, startY);
+        mainWindow.setSize(startWidth, startHeight);
 
         // Finally, make it visible.
         mainWindow.setVisible(true);
@@ -463,18 +505,52 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
             colorTable = temp;
             colorEdit.setTable(colorTable);
-        
+
             colorTable.setSoftColors(toggleSoftColors.isSelected());
             // If they had been editing a table earlier, clear out their
             // undos
             calibrate.clearHistory();
             dataManager.notifyDependants();
         }
-   
+
     }
 
     public static void main(String[] args) {
         TOOL t = new TOOL();
     }
 
+    /**
+     * @author Nicholas Dunn
+     * On window close, merely writes out the current (x,y) location as well
+     * as width and height so that we can remember upon launching the
+     * TOOL again.
+     */
+    public class WindowPreferenceListener implements WindowListener {
+
+        private Preferences prefs;
+
+        public WindowPreferenceListener(Preferences prefs) {
+            this.prefs = prefs;
+        }
+
+        public void windowActivated(WindowEvent e) {}
+        public void windowClosed(WindowEvent e) {
+            saveWindowPrefs(e.getWindow());
+        }
+        public void windowClosing(WindowEvent e) {
+            saveWindowPrefs(e.getWindow());
+        }
+        public void windowDeactivated(WindowEvent e) {}
+        public void windowDeiconified(WindowEvent e) {}
+        public void windowIconified(WindowEvent e) {}
+        public void windowOpened(WindowEvent e) {}
+
+        public void saveWindowPrefs(Window mainWindow) {
+            prefs.putInt(DEFAULT_WIDTH_STRING, mainWindow.getWidth());
+            prefs.putInt(DEFAULT_HEIGHT_STRING, mainWindow.getWidth());
+            prefs.putInt(DEFAULT_X_STRING, mainWindow.getX());
+            prefs.putInt(DEFAULT_Y_STRING, mainWindow.getY());
+        }
+
+    }
 }
