@@ -18,7 +18,7 @@ void WalkProvider::requestStop() {
 }
 
 void WalkProvider::calculateNextJoints() {
-
+    debugNextJoints();return;
 //Tick the step generator (ensure we have preview values ready)
 
 
@@ -34,5 +34,11 @@ void WalkProvider::calculateNextJoints() {
 }
 
 void WalkProvider::setMotion(float x, float y, float theta) {
+
+}
+
+//Test method to try out various ideas. currently moves the com a little using two legs
+void WalkProvider::debugNextJoints(){
+
 
 }

@@ -22,6 +22,9 @@ public:
 private:
 
     WalkingParameters walkParameters;
+
+    //Debug
+    void debugNextJoints();//test method
 };
 
 #endif

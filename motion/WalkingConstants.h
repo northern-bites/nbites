@@ -9,13 +9,6 @@ enum SupportMode{
     SWINGING
 };
 
-enum SupportLeg{
-    BOTH_LEGS = 0,
-    RIGHT_LEG,
-    LEFT_LEG
-};
-
-
 
 struct LegConstants{
     float hipOffsetY;

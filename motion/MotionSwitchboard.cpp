@@ -46,14 +46,26 @@ void* MotionSwitchboard::runThread(void *switchboard) {
 }
 
 
+/**
+ * The switchboard run method is continuously looping. At each iteration
+ * it grabs the appropriate joints from the designated provider, and
+ * then copies them into place so an enactor can send them to the low level.
+ * This threaed then ``hangs'' until the enactor signals it has read the current
+ * values. (This signaling is actually done in the getNextJoints method in
+ * this class)
+ *
+ * Potential problems: If the processing for the next joints
+ * takes too long, the enactor will send old joints.
+ */
 void MotionSwitchboard::run() {
     while(running) {
+        // Calculate the next joints and get them
         walkProvider.calculateNextJoints();
 
         vector <float > llegJoints = walkProvider.getChainJoints(LLEG_CHAIN);
         vector <float > rlegJoints = walkProvider.getChainJoints(RLEG_CHAIN);
 
-        //copy the new values into place, and wait to be signaled.
+        //Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
             nextJoints[L_HIP_YAW_PITCH + i] = llegJoints[i];

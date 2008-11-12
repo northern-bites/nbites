@@ -165,6 +165,13 @@ namespace Kinematics {
         INT_CMD         // Interruptable command
     };
 
+
+    enum SupportLeg{
+        BOTH_LEGS = 0,
+        RIGHT_LEG,
+        LEFT_LEG
+    };
+
     static const unsigned int HEAD_JOINTS = 2;
     static const unsigned int ARM_JOINTS = 4;
     static const unsigned int LEG_JOINTS = 6;
@@ -394,5 +401,9 @@ namespace Kinematics {
                           const float startAngles[],
                           const float maxError = 1.0f,
                           const float maxHeelError = .1f);
+
+    const void com(const ufvector3 &goal,
+                   const float startAngles[],
+                   const SupportLeg sm);
 };
 #endif
