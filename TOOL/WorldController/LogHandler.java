@@ -129,9 +129,8 @@ public class LogHandler
                 public void actionPerformed(ActionEvent evt) {
                     if (log_marker < log_num_frames-1) {
                         log_marker++;
-                    }
-                    // else we've run out of frames, so stop
-                    else {
+                    } else {
+                        // else we've run out of frames, so stop
                         playTimer.stop();
                     }
                     viewFromLog();
@@ -565,5 +564,191 @@ public class LogHandler
         playTimer.setDelay((int)1000./fps);
     }
 
-    
+
+    // Begin Monte Carlo stuff, hopefully this will be nicer than the things
+    // Which are above and kind of suck.
+    /**
+     * Initializes  MCL log for super duper Nao fun!
+     *
+     * @return true if the file succesfully loads, otherwise false.
+     */
+    public boolean initMCLLog()
+    {
+        logFile = wc.openDialog("Locate Log File to Load",
+                                (System.getProperty("user.dir") +
+                                 "/matrixlib/"),FileDialog.LOAD);
+
+        if (logFile == null) {
+            System.out.println("log file not chosen");
+            wc.setMode(wc.DO_NOTHING);
+            return false;
+        } else if (!loadMCLLog(logFile)) {
+            System.out.println("log file not unable to load");
+            return false;
+        }
+
+        logBox.slide.setMaximum(log_num_frames);
+        logBox.setVisible(true);
+        debugViewer.setVisible(true);
+        logMCLStartFrame();
+        return true;
+    }
+
+    /**
+     * Method to load in a MCL log file
+     *
+     * @return True if succesfully loads the log, otherwise false
+     */
+    public boolean loadMCLLog(String logFile)
+    {
+        BufferedReader dataIn = null;
+        System.out.println("Loading MCL log file: " + logFile + "... ");
+        log_strings.clear();
+
+        // Read in the passed in file
+        try {
+            dataIn = new BufferedReader(new FileReader(logFile));
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+
+        // Begin parsing the file for particle data
+        try {
+            // Pull out the lines one by one
+            while(dataIn.ready()) {
+                log_strings.add(dataIn.readLine());
+            }
+            log_num_frames = log_strings.size();
+
+            // set frame number in log box & debug viewer
+            logBox.frameNumber.setText("" + log_marker);
+            debugViewer.frameNumber.setText("" + log_marker);
+
+        } catch (IOException e2) {
+            System.err.println(e2.getMessage());
+            return false;
+        }finally {
+            // Close up before moving along
+            try {
+                dataIn.close();
+            }catch (IOException e3) {
+                System.err.println(e3.getMessage());
+                return false;
+            }
+            //viewFromMCLLog();
+            return true;
+        }
+    }
+
+    /**
+     * Creates a vector of particles from the given line of an MCL log file
+     *
+     * @param line The line of the log file to be parsed into particles
+     * @return A vector of all the particles from the read in line
+     */
+    public Vector< MCLParticle > parseParticleLine(String line)
+    {
+        Vector< MCLParticle > particles = new Vector<MCLParticle>();
+        String[] lineValues = line.split(" ");
+
+        // Pull off the data 4 items at a time for each particle
+        // The items are (x,y,h,weight)
+        for(int i = 2; i < lineValues.length; i += 4) {
+            particles.add(new MCLParticle(Float.parseFloat(lineValues[i]),
+                                          Float.parseFloat(lineValues[i+1]),
+                                          Float.parseFloat(lineValues[i+2]),
+                                          Float.parseFloat(lineValues[i+3])));
+        }
+        return particles;
+    }
+
+    /**
+     * View the current frame from the log...
+     */
+    public void viewFromMCLLog()
+    {
+        Vector< MCLParticle> particles;
+        if (log_strings.size() > 0) {
+            // set frame total in the log box
+            logBox.frameTotal.setText("" + log_num_frames);
+            debugViewer.frameTotal.setText("" + log_num_frames);
+
+            // set frame number in log box & debug viewer
+            logBox.frameNumber.setText("" + log_marker);
+            debugViewer.frameNumber.setText("" + log_marker);
+
+            // checks log_strings if current frame exists
+            if (log_strings != null && log_marker < log_strings.size()) {
+
+                particles = parseParticleLine(log_strings.get(log_marker));
+                // Paint the particles on the screen
+                for(MCLParticle p : particles) {
+
+                }
+
+            }
+
+            // Update the log box display to reflect the changes
+            logBox.slide.setValue(log_marker);
+            logBox.play_pause.setText(logBox.PLAY_STRING);
+
+        }
+    }
+    public void logMCLPlay()
+    {
+        // re-loop if end of queue
+        if (log_marker == log_num_frames ||
+            log_marker == log_num_frames-1) {
+            log_marker = 1;
+        }
+        logBox.play_pause.setText(logBox.PAUSE_STRING);
+        playTimer.setDelay((int)1000./wc.getPlaybackFps());
+        playTimer.start();
+    }
+
+    public void logMCLPause()
+    {
+        logBox.play_pause.setText(logBox.PLAY_STRING);
+        playTimer.stop();
+    }
+    public void logMCLLastFrame()
+    {
+        // make sure you don't do array out of bounds
+        if (log_marker > 1) {
+            log_marker--;
+        }
+        logBox.play_pause.setText(logBox.PLAY_STRING);
+        viewFromMCLLog();
+        playTimer.stop();
+    }
+    public void logMCLNextFrame()
+    {
+        // make sure you don't array out of bounds
+        if (log_marker < log_num_frames-1) {
+            log_marker++;
+        }
+
+        logBox.play_pause.setText(logBox.PLAY_STRING);
+        viewFromMCLLog();
+        playTimer.stop();
+    }
+    public void logMCLStartFrame() {
+        painter.clearSimulationHistory();
+        log_marker = 1;
+
+        logBox.play_pause.setText(logBox.PLAY_STRING);
+        logBox.slide.setValue(log_marker);
+        viewFromMCLLog();
+        playTimer.stop();
+    }
+    public void logMCLEndFrame() {
+        painter.clearSimulationHistory();
+        log_marker = log_num_frames;
+        logBox.play_pause.setText(logBox.PLAY_STRING);
+        logBox.slide.setValue(log_marker);
+        viewFromMCLLog();
+        playTimer.stop();
+    }
+
 }

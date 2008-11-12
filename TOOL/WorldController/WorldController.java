@@ -62,20 +62,13 @@ public class WorldController extends JPanel implements KeyListener,
     // Modes
     public static final int DO_NOTHING = -1;
     public static final int SIMULATE_OFFLINE = 0;
-    public static final int SIMULATE_WITH_DOG_DATA = 1;
     public static final int VIEW_DOG_EKF = 2;
     public static final int VIEW_DOG_LOG = 3;
     public static final int VIEW_UDP_PACKETS = 4;
     public static final int VIEW_EKF_LOG = 5;
+    public static final int VIEW_MCL_LOG = 6;
 
     // Speed paramaters
-    static final double MAX_SPEED_VARIABLE = 13.;
-    static final double MIN_SPEED_VARIABLE = -13.;
-    static final double MAX_SPEED_FORWARD = 43.;
-    static final double MAX_SPEED_BACKWARD = 17.;
-    static final double MAX_SPEED_LATERAL = 25.;
-    static final double MAX_SPEED_ROTATE = 162.;
-
     public static final int ROBOT_FPS = 30;
     public static final int DRAWING_FPS = ROBOT_FPS;
     public static final int LOG_FPS = 25;
@@ -179,7 +172,6 @@ public class WorldController extends JPanel implements KeyListener,
     public final static String CONNECTED_MESSAGE = "Connected!";
 
     // Button Action Commands
-
     public static final String SWITCH_FIELDS_ACTION = "switchfields";
     public static final String SWITCH_COLORS_ACTION = "switchcolors";
     public static final String SWITCH_TEAMS_ACTION = "switchteams";
@@ -195,25 +187,20 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String CLEAR_FIELD_ACTION = "clearfield";
 
     // Menu Strings
-    public static final String MODE_STRING = "Mode";
-    public static final String SIMULATE_OFFLINE_STRING = "Simulate Offline";
-    public static final String SIMULATE_WITH_DOG_DATA_STRING = "Simulate with Robot Data";
     public static final String VIEW_DOG_EKF_STRING = "View Robot EKF";
     public static final String VIEW_ROBOT_MCL_STRING = "View Robot Particles";
     public static final String VIEW_DOG_LOG_STRING = "View Robot Log";
     public static final String VIEW_EKF_LOG_STRING = "View EKF Log";
+    public static final String VIEW_MCL_LOG_STRING = "View MCL Log";
     public static final String VIEW_UDP_PACKETS_STRING = "View UDP Packets";
-    public static final String CIRCLE_LINE_GOALIE_STRING = "Circle/Line/Goalie";
-    public static final String GO_TO_XY_NORMAL_STRING = "Go To XY Normal";
-    public static final String GO_TO_XY_LOOK_AT_POINT_STRING = "Go To XY, Look at Point";
 
     // Menu Action Commands
-    public static final String SIMULATE_OFFLINE_ACTION = "simulate offlineme";
-    public static final String SIMULATE_WITH_DOG_DATA_ACTION = "simulate robot data";
+    // public static final String SIMULATE_OFFLINE_ACTION = "simulate offlineme";
     public static final String VIEW_DOG_EKF_ACTION = "view robot ekfs";
     public static final String VIEW_ROBOT_MCL_ACTION = "view robot mcl";
     public static final String VIEW_DOG_LOG_ACTION = "viewrobotlog";
     public static final String VIEW_EKF_LOG_ACTION = "viewekflog";
+    public static final String VIEW_MCL_LOG_ACTION = "viewmcllog";
     public static final String VIEW_UDP_PACKETS_ACTION = "viewudpaction";
     public static final String CIRCLE_LINE_GOALIE_ACTION = "circlelinegoalie";
     public static final String GO_TO_XY_NORMAL_ACTION = "gotoxy";
@@ -270,6 +257,7 @@ public class WorldController extends JPanel implements KeyListener,
     private JButton button_view_udp_packets;
     private JButton button_view_dog_log;
     private JButton button_view_ekf_log;
+    private JButton button_view_mcl_log;
     private JButton button_one;
     private JButton button_two;
     private JButton button_three;
@@ -299,7 +287,7 @@ public class WorldController extends JPanel implements KeyListener,
                                                   getWidth() +
                                                   BUTTON_AREA_WIDTH + 150), 0);
         log = new LogHandler(this, painter, debugViewer);
-        ekfLog = new LogHandler(this, painter, debugViewer);
+        //ekfLog = new LogHandler(this, painter, debugViewer);
         udp_server = new UDPServer();
         udp_server.addDogListener(painter);
 
@@ -398,30 +386,24 @@ public class WorldController extends JPanel implements KeyListener,
             delayFor(ROBOT_FPS);
             if (mode == DO_NOTHING) {
 
-            }
-            else if (mode == SIMULATE_WITH_DOG_DATA) {
-
-            }
-            else if (mode == VIEW_DOG_EKF) {
+            } else if (mode == VIEW_DOG_EKF) {
                 viewDogEKF();
-            }
-            else if (mode == VIEW_DOG_LOG) {
+            } else if (mode == VIEW_DOG_LOG) {
                 log.viewFromLog();
-            }
-            else if (mode == VIEW_UDP_PACKETS) {
+            } else if (mode == VIEW_UDP_PACKETS) {
                 // server is on its own thread, should work on its own
                 // We just need to tell the field that a frame has passed
                 // and that it should redraw accordingly, since it has no
                 // other way to understand the passage of time when its just
                 //listens in to the udp packets
                 painter.reportEndFrame();
-            }
-            else if (mode == VIEW_EKF_LOG) {
-                ekfLog.viewFromLog();
+            } else if (mode == VIEW_EKF_LOG) {
+                log.viewFromLog();
+            } else if (mode == VIEW_MCL_LOG) {
+                log.viewFromMCLLog();
             }
         }
     }
-
 
     /**
      * Method switches between AIBO and Nao fields dimensions and landmarks
@@ -437,7 +419,6 @@ public class WorldController extends JPanel implements KeyListener,
         // Takes care of sending info to the painter as well
         viewer.setField(the_field);
     }
-
 
     /**
      * Method required by ActionListener to deal with the various actions
@@ -464,15 +445,14 @@ public class WorldController extends JPanel implements KeyListener,
                 udp_server.setReceiving(false);
             }
             startDoNothing();
-        }
-        else if (cmd.equals(CLEAR_FIELD_ACTION)) {
+        } else if (cmd.equals(CLEAR_FIELD_ACTION)) {
             painter.clearSimulationHistory();
-        }
-        else if (cmd.equals(QUIT_LOG_ACTION)) {
+        } else if (cmd.equals(QUIT_LOG_ACTION)) {
             log.quitDogLog();
             startDoNothing();
         } else if (cmd.equals(QUIT_EKF_LOG_ACTION)) {
-            ekfLog.quitDogLog();
+            //ekfLog.quitDogLog();
+            log.quitDogLog();
             startDoNothing();
         } else if (cmd.equals(DRAW_REAL_ACTION)) {
             if (painter.getDrawReal()) {
@@ -496,9 +476,6 @@ public class WorldController extends JPanel implements KeyListener,
         } else if (cmd.equals(RELOAD_EKF_LOG_ACTION)) {
             startEKFLog();
             System.out.println("RELOADED EKF LOG");
-        } else if (cmd.equals(SIMULATE_WITH_DOG_DATA_ACTION)) {
-            mode = SIMULATE_WITH_DOG_DATA;
-            if (!aibo.isConnected()) connect();
         } else if (cmd.equals(VIEW_DOG_EKF_ACTION)) {
             startDogEKF();
         }
@@ -509,6 +486,8 @@ public class WorldController extends JPanel implements KeyListener,
             startDogUDP();
         } else if (cmd.equals(VIEW_EKF_LOG_ACTION)) {
             startEKFLog();
+        } else if (cmd.equals(VIEW_MCL_LOG_ACTION)) {
+            startMCLLog();
         }
 
         // keeps keyboard focus
@@ -709,6 +688,12 @@ public class WorldController extends JPanel implements KeyListener,
         button_view_ekf_log.addActionListener(this);
         button_area.add(button_view_ekf_log);
 
+        // setup MCL log button
+        button_view_mcl_log = new JButton(VIEW_MCL_LOG_STRING);
+        button_view_mcl_log.setActionCommand(VIEW_MCL_LOG_ACTION);
+        button_view_mcl_log.addActionListener(this);
+        button_area.add(button_view_mcl_log);
+
         // program specific label
         program_specific_label = new JLabel(PROGRAM_SPECIFIC_LABEL_STRING,
 					    JLabel.CENTER);
@@ -839,7 +824,7 @@ public class WorldController extends JPanel implements KeyListener,
 
     public void startEKFLog()
     {
-        if(!ekfLog.initEKFLog()) {
+        if(!log.initEKFLog()) {
             return;
         }
         nothingButtons();
@@ -873,7 +858,7 @@ public class WorldController extends JPanel implements KeyListener,
     {
         nothingButtons();
         udpButtons();
-        painter.prepareForUDP();
+        //painter.prepareForUDP();
         udp_server.setReceiving(true);
         mode = VIEW_UDP_PACKETS;
         painter.setPositionsToDraw(1);
@@ -946,11 +931,11 @@ public class WorldController extends JPanel implements KeyListener,
                                 connect_dialog.setTitle(CONNECT_MESSAGE);
 
                                 if (!aibo.isConnecting()) {
-				    startConnecting(
-						    optionPane.getInputValue().toString());
-				    // start waiting for a connection
-				    // timer defined in WorldController constructor
-				    waitToConnect.start();
+				    // startConnecting(
+					// 	    optionPane.getInputValue().toString());
+				    // // start waiting for a connection
+				    // // timer defined in WorldController constructor
+				    // waitToConnect.start();
 				}
                             }else {
                                 aibo.stopConnecting();
@@ -960,7 +945,7 @@ public class WorldController extends JPanel implements KeyListener,
                     }
                 });
 
-	connect_dialog.pack();
+        connect_dialog.pack();
         int x = (int)(getLocation().getX() + getWidth()/2 -
                 connect_dialog.getWidth()/2);
         int y = (int)(getLocation().getY() + getHeight()/2 -
@@ -969,20 +954,20 @@ public class WorldController extends JPanel implements KeyListener,
         connect_dialog.setVisible(true);
     }
 
-    private void startConnecting(String host) {
-        final String address = host;
-        //dogName = host;
-        connect_thread = new Thread(new Runnable() {
-            public void run() {
-                aibo.connectTo(address);
-                if (connect_dialog.isVisible()) {
-                    connect_dialog.setTitle(CONNECTED_MESSAGE);
-                    connect_dialog.setVisible(false);
-                }
-            }
-        });
-        connect_thread.start();
-    }
+    // private void startConnecting(String host) {
+    //     final String address = host;
+    //     //dogName = host;
+    //     connect_thread = new Thread(new Runnable() {
+    //         public void run() {
+    //             aibo.connectTo(address);
+    //             if (connect_dialog.isVisible()) {
+    //                 connect_dialog.setTitle(CONNECTED_MESSAGE);
+    //                 connect_dialog.setVisible(false);
+    //             }
+    //         }
+    //     });
+    //     connect_thread.start();
+    // }
 
     public boolean checkConnecting() {
         boolean result = isConnecting();
@@ -1014,8 +999,6 @@ public class WorldController extends JPanel implements KeyListener,
     public void disconnect() {
         aibo.disconnect();
     }
-
-
 
     public void keyPressed(KeyEvent k)
     {
@@ -1115,6 +1098,20 @@ public class WorldController extends JPanel implements KeyListener,
     public int getPlaybackFps() { return playback_fps; }
     public void setMode(int _mode) { mode = _mode; }
     public int getMode() { return mode; }
+
+    /**
+     * Method to test the output system of the mcl...
+     */
+    public void startMCLLog()
+    {
+        if(!log.initMCLLog()) {
+            return;
+        }
+        nothingButtons();
+        ekfLogButtons();
+        mode = VIEW_MCL_LOG;
+        //Vector< MCLParticle > particles = ekflog.parseParticleLine(startLine);
+    }
 }
 
 

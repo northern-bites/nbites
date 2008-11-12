@@ -1,13 +1,14 @@
+package TOOL.WorldController;
+
 /**
  * Class defines a particle to represent a particle for use with displaying
  * Monte Carlo Localization logs.
  */
-
 public class MCLParticle
 {
     // Class variables
-    private int x, y, h; // Position estimate variables
-    private float w; // The current weight of the particle; ranged [0,1]
+    private float x, y, h; // Position estimate variables
+    private float weight; // The current weight of the particle; ranged [0,1]
 
     // Constructors
     /**
@@ -16,16 +17,17 @@ public class MCLParticle
      * @param h The heading-value of the particle
      * @param w The current weight of the particle
      */
-    public MCLParticle(int x, int y, int h, float w)
+    public MCLParticle(float x, float y, float h, float w)
     {
         this.x = x;
         this.y = y;
         this.h = h;
-        this.w = w;
+        this.weight = w;
     }
 
     // Getters
-    public int getX() {return x;}
-    public int getY() {return y;}
-    public int getH() {return h;}
+    public float getX() {return x;}
+    public float getY() {return y;}
+    public float getH() {return h;}
+    public float getWeight() {return weight;}
 }
