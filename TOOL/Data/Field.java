@@ -123,7 +123,7 @@ public abstract class Field
 
     // Particle Junk
     public final int PARTICLE_LENGTH = 10;
-    public final double PARTICLE_STROKE = 4;
+    public final float PARTICLE_STROKE = 4.0f;
 
     /***********************************************************************
      * Member variable getters.
@@ -555,8 +555,8 @@ public abstract class Field
     public void drawParticle(Graphics2D drawing_on, Color in_color,
                              int x, int y, int h)
     {
-        int tipX = x + Math.sin(h)*PARTICLE_LENGTH;
-        int tipY = y + Math.sin(h)*PARTICLE_LENGTH;
-        drawArrow(g2d, in_color, x, y, tipX, tipY, PARTICLE_STROKE);
+        int tipX = (int) (x + Math.sin(h) * PARTICLE_LENGTH);
+        int tipY = (int) (y + Math.sin(h) * PARTICLE_LENGTH);
+        drawArrow(drawing_on, in_color, x, y, tipX, tipY, PARTICLE_STROKE);
     }
 }

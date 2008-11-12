@@ -363,16 +363,16 @@ public class LogHandler
             System.err.println("EKF log creation was aborted");
             System.err.println(f.getMessage());
         }
-        
+
         // Load our processed log
         System.out.println("..: " + System.getProperty("user.dir").concat(LOG_OUT_FILE));
        	return loadLog(System.getProperty("user.dir").concat(LOG_OUT_FILE));
     }
 
     public boolean loadLog(String fileName) {
-	
+
         BufferedReader file_input = null;
-	
+
         System.out.println("Loading log file: " + fileName + "... ");
 
         try {
@@ -411,7 +411,7 @@ public class LogHandler
 
                 // if the log line is a debug line, add to vector
                 if (read_line.substring(0,6).equals(LOG_DEBUG_STRING)) {
-                    one_debug.add(read_line);		   
+                    one_debug.add(read_line);
                 }
                 else if (read_line.substring(0,7).equals(LOG_CAMERA_STRING)) {
                     log_camera.add(read_line);
@@ -424,7 +424,7 @@ public class LogHandler
                     log_camera.add(null);
                     log_strings.add(read_line);
                 }
-            }	   
+            }
             log_num_frames = log_strings.size();
         }catch (IOException e2) {
             System.err.println(e2.getMessage());
@@ -439,7 +439,7 @@ public class LogHandler
             return true;
         }
     }
-        
+
     // parses line of text from log
     public void parseLogLine(String log_line) {
         System.out.println("\n----------New frame----------\n");
@@ -447,18 +447,18 @@ public class LogHandler
         String[] current_frame = log_line.split(" ");
         // gets length
         int log_length = current_frame.length;
-		
+
         // experimental
         //for (int i = 0; i < log_length; i++) {
         //    Double value = new Double(current_frame[i]);
         //    debugViewer.setLabel(i,value);
         //}
-	
+
         Integer color = new Integer(current_frame[TEAM_COLOR_INDEX]);
         team_color = color.intValue();
         Integer number = new Integer(current_frame[PLAYER_NUMBER_INDEX]);
         player_number = number.intValue();
-	
+
 
         // stores locally all the new variables from the log
         thinks_x = new Double(current_frame[MY_X_INDEX]);
@@ -473,9 +473,9 @@ public class LogHandler
         ball_uncert_y = new Double(current_frame[BALL_UNCERT_Y_INDEX]);
         ball_velocity_x = new Double(current_frame[BALL_VELOCITY_X_INDEX]);
         ball_velocity_y = new Double(current_frame[BALL_VELOCITY_Y_INDEX]);
-        ball_velocity_uncert_x = 
+        ball_velocity_uncert_x =
             new Double(current_frame[BALL_VELOCITY_UNCERT_X_INDEX]);
-        ball_velocity_uncert_y = 
+        ball_velocity_uncert_y =
             new Double(current_frame[BALL_VELOCITY_UNCERT_Y_INDEX]);
         ball_dist = new Double(current_frame[BALL_DIST_INDEX]);
         ball_bearing = new Double(current_frame[BALL_BEARING_INDEX]);
@@ -505,7 +505,7 @@ public class LogHandler
         debugViewer.odoX.setText("" + odo_x);
         debugViewer.odoY.setText("" + odo_y);
         debugViewer.odoH.setText("" + odo_h);
-	
+
         if (debugViewer.getNumLandmarks() > 0)
             debugViewer.removeLandmarks();
 
@@ -513,25 +513,25 @@ public class LogHandler
             debugViewer.addLandmark(wc.LANDMARK_BALL, ball_dist, ball_bearing);
         }
 
-        // cycle through list of filter 'used' landmarks, adding to 
+        // cycle through list of filter 'used' landmarks, adding to
         // debugViewer and painter
-        for (int i = NUM_LOG_LOC_INDEXES; 
-             i < current_frame.length; 
+        for (int i = NUM_LOG_LOC_INDEXES;
+             i < current_frame.length;
              i+= wc.NUM_LANDMARK_VALUES) {
 
             Double id = new Double(current_frame[i+wc.LANDMARK_ID_INDEX]);
 
             Double x = new Double(current_frame[i+wc.LANDMARK_X_INDEX]);
             Double y = new Double(current_frame[i+wc.LANDMARK_Y_INDEX]);
-            Double dist = 
+            Double dist =
                 new Double(current_frame[i+wc.LANDMARK_DIST_INDEX]);
-            Double bearing = 
+            Double bearing =
                 new Double(current_frame[i+wc.LANDMARK_BEARING_INDEX]);
-	    
+
             // add landmarks to DebugViewer
             debugViewer.addLandmark(id.intValue(),dist,bearing);
             // add landmarks to Painter viewer
-            painter.sawLandmark(x.intValue(),y.intValue(), team_color);	   
+            painter.sawLandmark(x.intValue(),y.intValue(), team_color);
         }
 
     }
@@ -541,27 +541,29 @@ public class LogHandler
         Double camera_thinks_x = new Double(current_frame[MY_X_INDEX]);
         Double camera_thinks_y = new Double(current_frame[MY_Y_INDEX]);
         Double camera_thinks_h = new Double(current_frame[MY_H_INDEX]);
-        System.out.println("cam thinks x: " + camera_thinks_x + 
+        System.out.println("cam thinks x: " + camera_thinks_x +
                            " y: "+ camera_thinks_y + " h: " + camera_thinks_h);
 
         //LocalizationPacket current_loc = LocalizationPacket.makeDogLocation(camera_thinks_x, camera_thinks_y, camera_thinks_h, 0.);
-	
+
         //painter.reportUpdatedLocalization(current_loc);
         //painter.reportEndFrame();
     }
 
     public void setupPythonEKFLink() {
-	
+
     }
 
-    public String formatDoubleForDisplay(Double debug_double) { 
+    public String formatDoubleForDisplay(Double debug_double) {
         return String.valueOf(debug_double.intValue());
     }
-    public int getLogNumFrames() { return log_num_frames; } 
+    public int getLogNumFrames() { return log_num_frames; }
     public void setLogMarker(int mark) { log_marker = mark; }
     public int getLogMarker() { return log_marker; }
     public boolean getPaused() { return !playTimer.isRunning(); }
     public void setPlaybackFps(int fps) {
         playTimer.setDelay((int)1000./fps);
     }
+
+    
 }
