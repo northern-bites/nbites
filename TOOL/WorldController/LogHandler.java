@@ -57,13 +57,18 @@ public class LogHandler
     public final static int ODO_H_INDEX = 22;
     public final static int NUM_LOG_LOC_INDEXES = 23;
 
+    // MCL Indices
+    public final static int MCL_TEAM_COLOR_INDEX = 0;
+    public final static int MCL_PLAYER_NUM_INDEX = 1;
+
     // log strings
     public static final String LOG_DEBUG_STRING = "debug:";
     public static final String LOG_CAMERA_STRING = "camera:";
     private static final String AIBO_OUT_FILE = "./logreader/aibo.tmp.log";
     private static final String NAO_OUT_FILE = "./logreader/nao.tmp.log";
     private static final String LOG_OUT_FILE = "/out.tmp.log";
-    private static final String PYTHON_COMMAND = "./TOOL/WorldController/logreader/outputEKF.py ";
+    private static final String PYTHON_COMMAND =
+        "./TOOL/WorldController/logreader/outputEKF.py ";
 
     // log types
     public static final String NAO_LOG_TYPE = "NAO";
@@ -275,7 +280,7 @@ public class LogHandler
                 //painter.sawYellowPost(log_yb_dist,log_yb_bearing);
 
             }
-            logBox.slide.setValue(log_marker);
+            //logBox.slide.setValue(log_marker);
 
             logBox.play_pause.setText(logBox.PLAY_STRING);
 
@@ -304,20 +309,32 @@ public class LogHandler
         if (log_marker > 1) {
             log_marker--;
         }
-        //System.out.println("logLastFrame: PLAY_STRING");
         logBox.play_pause.setText(logBox.PLAY_STRING);
-        viewFromLog();
+        logBox.slide.setValue(log_marker);
+        if (wc.getMode() == wc.VIEW_MCL_LOG) {
+            viewFromMCLLog();
+        } else {
+            viewFromLog();
+        }
         playTimer.stop();
     }
     public void logNextFrame()
     {
         // make sure you don't array out of bounds
-        if (log_marker < log_num_frames-1) {
+        if ((log_marker < log_num_frames &&
+             wc.getMode() == wc.VIEW_MCL_LOG) ||
+            log_marker < log_num_frames-1) {
             log_marker++;
         }
 
         logBox.play_pause.setText(logBox.PLAY_STRING);
-        viewFromLog();
+        logBox.slide.setValue(log_marker);
+        if (wc.getMode() == wc.VIEW_MCL_LOG) {
+            viewFromMCLLog();
+        } else {
+            viewFromLog();
+        }
+
         playTimer.stop();
     }
     public void logStartFrame() {
@@ -326,16 +343,29 @@ public class LogHandler
 
         logBox.play_pause.setText(logBox.PLAY_STRING);
         logBox.slide.setValue(log_marker);
-        viewFromLog();
+
+        if (wc.getMode() == wc.VIEW_MCL_LOG) {
+            viewFromMCLLog();
+        } else {
+            viewFromLog();
+        }
         playTimer.stop();
     }
     public void logEndFrame() {
         painter.clearSimulationHistory();
-        log_marker = log_num_frames-1;
-        //System.out.println("logEndFrame: PLAY_STRING");
+        if( wc.getMode() == wc.VIEW_MCL_LOG) {
+            log_marker = log_num_frames;
+        } else {
+            log_marker = log_num_frames-1;
+        }
         logBox.play_pause.setText(logBox.PLAY_STRING);
         logBox.slide.setValue(log_marker);
-        viewFromLog();
+        if (wc.getMode() == wc.VIEW_MCL_LOG) {
+            viewFromMCLLog();
+        } else {
+            viewFromLog();
+        }
+
         playTimer.stop();
     }
 
@@ -364,7 +394,8 @@ public class LogHandler
         }
 
         // Load our processed log
-        System.out.println("..: " + System.getProperty("user.dir").concat(LOG_OUT_FILE));
+        System.out.println("..: " +
+                           System.getProperty("user.dir").concat(LOG_OUT_FILE));
        	return loadLog(System.getProperty("user.dir").concat(LOG_OUT_FILE));
     }
 
@@ -549,10 +580,6 @@ public class LogHandler
         //painter.reportEndFrame();
     }
 
-    public void setupPythonEKFLink() {
-
-    }
-
     public String formatDoubleForDisplay(Double debug_double) {
         return String.valueOf(debug_double.intValue());
     }
@@ -590,7 +617,7 @@ public class LogHandler
         logBox.slide.setMaximum(log_num_frames);
         logBox.setVisible(true);
         debugViewer.setVisible(true);
-        logMCLStartFrame();
+        logStartFrame();
         return true;
     }
 
@@ -601,6 +628,11 @@ public class LogHandler
      */
     public boolean loadMCLLog(String logFile)
     {
+        // Make sure we have a Nao field and not an Aibo field
+        if (wc.the_field == wc.aiboField ) {
+            wc.switchFields();
+        }
+
         BufferedReader dataIn = null;
         System.out.println("Loading MCL log file: " + logFile + "... ");
         log_strings.clear();
@@ -621,10 +653,6 @@ public class LogHandler
             }
             log_num_frames = log_strings.size();
 
-            // set frame number in log box & debug viewer
-            logBox.frameNumber.setText("" + log_marker);
-            debugViewer.frameNumber.setText("" + log_marker);
-
         } catch (IOException e2) {
             System.err.println(e2.getMessage());
             return false;
@@ -636,7 +664,6 @@ public class LogHandler
                 System.err.println(e3.getMessage());
                 return false;
             }
-            //viewFromMCLLog();
             return true;
         }
     }
@@ -652,6 +679,9 @@ public class LogHandler
         Vector< MCLParticle > particles = new Vector<MCLParticle>();
         String[] lineValues = line.split(" ");
 
+        // Strip the team color and player number from the front of the line
+        team_color = Integer.parseInt(lineValues[MCL_TEAM_COLOR_INDEX]);
+        player_number = Integer.parseInt(lineValues[MCL_PLAYER_NUM_INDEX]);
         // Pull off the data 4 items at a time for each particle
         // The items are (x,y,h,weight)
         for(int i = 2; i < lineValues.length; i += 4) {
@@ -681,74 +711,26 @@ public class LogHandler
             // checks log_strings if current frame exists
             if (log_strings != null && log_marker < log_strings.size()) {
 
-                particles = parseParticleLine(log_strings.get(log_marker));
+                // Update the debug viewer
+
                 // Paint the particles on the screen
-                for(MCLParticle p : particles) {
-
-                }
-
+                particles = parseParticleLine(log_strings.get(log_marker));
+                painter.updateParticleSet(particles, team_color, player_number);
+                painter.reportEndFrame();
             }
-
-            // Update the log box display to reflect the changes
-            logBox.slide.setValue(log_marker);
-            logBox.play_pause.setText(logBox.PLAY_STRING);
-
         }
     }
-    public void logMCLPlay()
-    {
-        // re-loop if end of queue
-        if (log_marker == log_num_frames ||
-            log_marker == log_num_frames-1) {
-            log_marker = 1;
-        }
-        logBox.play_pause.setText(logBox.PAUSE_STRING);
-        playTimer.setDelay((int)1000./wc.getPlaybackFps());
-        playTimer.start();
-    }
 
-    public void logMCLPause()
+    /**
+     * Method to cleanup our mess when we leave the log
+     */
+    public void quitMCLLog()
     {
-        logBox.play_pause.setText(logBox.PLAY_STRING);
-        playTimer.stop();
-    }
-    public void logMCLLastFrame()
-    {
-        // make sure you don't do array out of bounds
-        if (log_marker > 1) {
-            log_marker--;
-        }
-        logBox.play_pause.setText(logBox.PLAY_STRING);
-        viewFromMCLLog();
-        playTimer.stop();
-    }
-    public void logMCLNextFrame()
-    {
-        // make sure you don't array out of bounds
-        if (log_marker < log_num_frames-1) {
-            log_marker++;
-        }
-
-        logBox.play_pause.setText(logBox.PLAY_STRING);
-        viewFromMCLLog();
-        playTimer.stop();
-    }
-    public void logMCLStartFrame() {
+        logBox.setVisible(false);
+        debugViewer.setVisible(false);
+        logStartFrame();
+        logBox.slide.setMaximum(log_num_frames);
         painter.clearSimulationHistory();
-        log_marker = 1;
-
-        logBox.play_pause.setText(logBox.PLAY_STRING);
-        logBox.slide.setValue(log_marker);
-        viewFromMCLLog();
-        playTimer.stop();
-    }
-    public void logMCLEndFrame() {
-        painter.clearSimulationHistory();
-        log_marker = log_num_frames;
-        logBox.play_pause.setText(logBox.PLAY_STRING);
-        logBox.slide.setValue(log_marker);
-        viewFromMCLLog();
-        playTimer.stop();
     }
 
 }

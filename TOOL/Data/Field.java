@@ -480,47 +480,6 @@ public abstract class Field
                             fixXCoord(x_1), fixYCoord(y_1));
     }
 
-    /**
-     * Draws an arrow directed from (xCenter, yCenter) to (x, y).
-     * @param g2d the graphics context onto which this method draws
-     * @param in_color the color of the arrow
-     * @param xCenter the x coordinate of starting location of arrow, in
-     *        field coordinates
-     * @param yCenter the y coordinate of startting location of arrow,
-     *        in field coordinates
-     * @param x the x coordiante of ending location of arrow, in field
-     *        coordinates
-     * @param y the y coordinate of endling location of arrow, in field
-     *        coordinates
-     * @param stroke the width of the lines comprising the arrow
-     */
-    // from http://forum.java.sun.com/thread.jspa?threadID=378460&tstart=135
-    public void drawArrow(Graphics2D g2d, Color in_color, int xCenter,
-                          int yCenter, int x, int y, float stroke) {
-        g2d.setColor(in_color);
-        double aDir=Math.atan2(xCenter-x,yCenter-y);
-        g2d.drawLine(fixXCoord(x),fixYCoord(y),fixXCoord(xCenter),
-                     fixYCoord(yCenter));
-        // make the arrow head solid even if dash pattern has been specified
-        g2d.setStroke(new BasicStroke(1f));
-        Polygon tmpPoly = new Polygon();
-        int i1=6+(int)(stroke*2);
-        // make the arrow head the same size regardless of the length length
-        int i2=3+(int)stroke;
-        // arrow tip
-        tmpPoly.addPoint(fixXCoord(x),fixYCoord(y));
-        tmpPoly.addPoint(fixXCoord(x+xCor(i1,aDir+.5)),
-                         fixYCoord(y+yCor(i1,aDir+.5)));
-        tmpPoly.addPoint(fixXCoord(x+xCor(i2,aDir)),
-                         fixYCoord(y+yCor(i2,aDir)));
-        tmpPoly.addPoint(fixXCoord(x+xCor(i1,aDir-.5)),
-                         fixYCoord(y+yCor(i1,aDir-.5)));
-        // arrow tip
-        tmpPoly.addPoint(fixXCoord(x),fixYCoord(y));
-        g2d.drawPolygon(tmpPoly);
-        // remove this line to leave arrow head unpainted
-        g2d.fillPolygon(tmpPoly);
-    }
 
     public int yCor(int len, double dir) {return (int)(len * Math.cos(dir));}
     public int xCor(int len, double dir) {return (int)(len * Math.sin(dir));}
@@ -541,22 +500,5 @@ public abstract class Field
         drawing_on.setColor(in_color);
         drawing_on.drawString(""+number, fixXCoord(left_x),
                               fixYCoord(bottom_y));
-    }
-
-    /**
-     * Draws a particle (arrow) on the field
-     *
-     * @param drawing_on the graphics context on which to draw the particle
-     * @param in_color the color of the particle to be drawn
-     * @param x the x estimate of the particle
-     * @param y the y estimate of the particle
-     * @param h the heading estimate of the particle
-     */
-    public void drawParticle(Graphics2D drawing_on, Color in_color,
-                             int x, int y, int h)
-    {
-        int tipX = (int) (x + Math.sin(h) * PARTICLE_LENGTH);
-        int tipY = (int) (y + Math.sin(h) * PARTICLE_LENGTH);
-        drawArrow(drawing_on, in_color, x, y, tipX, tipY, PARTICLE_STROKE);
     }
 }

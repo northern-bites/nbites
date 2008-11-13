@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.Vector;
 import java.lang.Exception;
 import java.util.ConcurrentModificationException;
 
@@ -115,6 +116,11 @@ public class WorldControllerPainter implements DogListener
     private static final int COLOR_INDEX = 2;
     private static final int LANDMARK_LINE_WIDTH = 1;
 
+    // Particle set for drawing...
+    private Vector< MCLParticle > currentParticles;
+    private int mclTeamColor;
+    private int mclPlayerNum;
+
     /**
      * Constructs the painter to draw all possible localization information
      * @param toView Field on which the painter will paint.
@@ -138,6 +144,9 @@ public class WorldControllerPainter implements DogListener
         single_dog.color = BLUE_TEAM;
         dog_histories.put(SINGLE_DOG_KEY, single_dog);
         numSeenLandmarks = 0;
+        currentParticles = new Vector<MCLParticle>();
+        mclTeamColor = 0;
+        mclPlayerNum = 1;
     }
 
     /**
@@ -152,6 +161,7 @@ public class WorldControllerPainter implements DogListener
         try {
             paintLandmarks(g2);
             paintDogInformation(g2);
+            paintParticleSet(g2);
         } catch (ConcurrentModificationException e) {
             // Ignore.  The painting and simulation threads are trying
             // to concurrently access elements in the same list
@@ -781,4 +791,62 @@ public class WorldControllerPainter implements DogListener
     public boolean getDrawEst() { return draw_est; }
     public int getPositionsToDraw() { return num_positions_to_draw; }
     public Dimension getPreferredSize() { return field.getPreferredSize(); }
+
+    // MCL Stuff
+    /**
+     * Updates the current set of data points to be drawn
+     *
+     * @param particles The set of particles to be drawn
+     * @param tColor The team color. Either RED_TEAM or BLUE_TEAM
+     * @param pNUm The player number of the robot being drawn
+     */
+    public void updateParticleSet(Vector<MCLParticle> particles, int tColor,
+                                  int pNum)
+    {
+        currentParticles = particles;
+        mclTeamColor = tColor;
+        mclPlayerNum = pNum;
+    }
+
+    /**
+     * Paints the current set of particles on the field.  Called by
+     * updateInfomration when the WorldControllerViewer is updated.
+     *
+     * @param g2 The graphics context to be drawn on.
+     */
+    public void paintParticleSet(Graphics2D g2) {
+        for(MCLParticle p : currentParticles) {
+            Color partColor;
+            if( mclTeamColor == RED_TEAM) {
+                partColor = DOG_COLOR_RED_TEAM;
+            } else {
+                partColor = DOG_COLOR_BLUE_TEAM;
+            }
+            drawParticle(g2, partColor, p.getX(), p.getY(), p.getH(),
+                               p.getWeight());
+        }
+    }
+
+    /**
+     * Draws a particle on the field
+     *
+     * @param drawing_on the graphics context on which to draw the particle
+     * @param in_color the color of the particle to be drawn
+     * @param x the x estimate of the particle
+     * @param y the y estimate of the particle
+     * @param h the heading estimate of the particle
+     */
+    public void drawParticle(Graphics2D drawing_on, Color in_color,
+                             float x, float y, float h, float weight)
+    {
+
+    }
+
+    /**
+     * Method draws an elipse of the associated position error centered at the
+     * weighted mean of the particle set.
+     */
+    public void drawMCLMeanAndVariance()
+    {
+    }
 }

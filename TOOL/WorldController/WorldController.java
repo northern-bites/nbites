@@ -52,9 +52,6 @@ public class WorldController extends JPanel implements KeyListener,
     // To handle recorder log input, parsing, and passing to display
     LogHandler log;
 
-    // Object to handle the log 2.0 version of recording EKF off of robots
-    LogHandler ekfLog;
-
     // Listen to live UDP data, used to visualize multiple dogs' world states
     // simultaneously
     UDPServer udp_server;
@@ -180,8 +177,10 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String DRAW_EST_ACTION = "drawest";
     public static final String RELOAD_LOG_ACTION = "reloadlog";
     public static final String RELOAD_EKF_LOG_ACTION = "reloadekflog";
+    public static final String RELOAD_MCL_LOG_ACTION = "reloadekflog";
     public static final String QUIT_LOG_ACTION = "quitlog";
     public static final String QUIT_EKF_LOG_ACTION = "quitekflog";
+    public static final String QUIT_MCL_LOG_ACTION = "quitmcllog";
     public static final String CONNECT_ACTION = "connectme";
     public static final String DISCONNECT_ACTION = "disconnectme";
     public static final String CLEAR_FIELD_ACTION = "clearfield";
@@ -195,7 +194,6 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String VIEW_UDP_PACKETS_STRING = "View UDP Packets";
 
     // Menu Action Commands
-    // public static final String SIMULATE_OFFLINE_ACTION = "simulate offlineme";
     public static final String VIEW_DOG_EKF_ACTION = "view robot ekfs";
     public static final String VIEW_ROBOT_MCL_ACTION = "view robot mcl";
     public static final String VIEW_DOG_LOG_ACTION = "viewrobotlog";
@@ -287,7 +285,6 @@ public class WorldController extends JPanel implements KeyListener,
                                                   getWidth() +
                                                   BUTTON_AREA_WIDTH + 150), 0);
         log = new LogHandler(this, painter, debugViewer);
-        //ekfLog = new LogHandler(this, painter, debugViewer);
         udp_server = new UDPServer();
         udp_server.addDogListener(painter);
 
@@ -400,7 +397,7 @@ public class WorldController extends JPanel implements KeyListener,
             } else if (mode == VIEW_EKF_LOG) {
                 log.viewFromLog();
             } else if (mode == VIEW_MCL_LOG) {
-                log.viewFromMCLLog();
+                log.viewFromLog();
             }
         }
     }
@@ -451,8 +448,10 @@ public class WorldController extends JPanel implements KeyListener,
             log.quitDogLog();
             startDoNothing();
         } else if (cmd.equals(QUIT_EKF_LOG_ACTION)) {
-            //ekfLog.quitDogLog();
             log.quitDogLog();
+            startDoNothing();
+        } else if (cmd.equals(QUIT_MCL_LOG_ACTION)) {
+            log.quitMCLLog();
             startDoNothing();
         } else if (cmd.equals(DRAW_REAL_ACTION)) {
             if (painter.getDrawReal()) {
@@ -476,10 +475,12 @@ public class WorldController extends JPanel implements KeyListener,
         } else if (cmd.equals(RELOAD_EKF_LOG_ACTION)) {
             startEKFLog();
             System.out.println("RELOADED EKF LOG");
+        } else if (cmd.equals(RELOAD_MCL_LOG_ACTION)) {
+            startMCLLog();
+            System.out.println("RELOADED MCL LOG");
         } else if (cmd.equals(VIEW_DOG_EKF_ACTION)) {
             startDogEKF();
-        }
-        else if (cmd.equals(VIEW_DOG_LOG_ACTION)) {
+        } else if (cmd.equals(VIEW_DOG_LOG_ACTION)) {
             startDogLog();
             //this.setVisible(true); // keeps focus
         } else if (cmd.equals(VIEW_UDP_PACKETS_ACTION)) {
@@ -800,6 +801,22 @@ public class WorldController extends JPanel implements KeyListener,
         num_display_estimates_label.setVisible(true);
         num_display_estimates_slide.setVisible(true);
     }
+    public void mclLogButtons()
+    {
+        button_one.setText(DRAW_EST_STRING);
+        button_one.setActionCommand(DRAW_EST_ACTION);
+        button_one.setVisible(true);
+        button_two.setText(RELOAD_LOG_STRING);
+        button_two.setActionCommand(RELOAD_MCL_LOG_ACTION);
+        button_two.setVisible(true);
+        button_three.setText(QUIT_LOG_STRING);
+        button_three.setActionCommand(QUIT_MCL_LOG_ACTION);
+        button_three.setVisible(true);
+        fps_label.setVisible(true);
+        fps_slide.setVisible(true);
+        num_display_estimates_label.setVisible(true);
+        num_display_estimates_slide.setVisible(true);
+    }
     public void udpButtons()
     {
         button_one.setText(DISCONNECT_STRING);
@@ -1047,16 +1064,16 @@ public class WorldController extends JPanel implements KeyListener,
                 System.out.println("RELOADED LOG FILE");
                 break;
             case KeyEvent.VK_P:
-                if (ekfLog.getPaused()) {
-                    ekfLog.logPlay();
+                if (log.getPaused()) {
+                    log.logPlay();
                 } else {
-                    ekfLog.logPause();
+                    log.logPause();
                 } break;
             case KeyEvent.VK_LEFT:
-                ekfLog.logLastFrame();
+                log.logLastFrame();
                 break;
             case KeyEvent.VK_RIGHT:
-                ekfLog.logNextFrame();
+                log.logNextFrame();
                 break;
             }
         }
@@ -1104,13 +1121,14 @@ public class WorldController extends JPanel implements KeyListener,
      */
     public void startMCLLog()
     {
+        mode = VIEW_MCL_LOG;
         if(!log.initMCLLog()) {
+            mode = DO_NOTHING;
+            nothingButtons();
             return;
         }
         nothingButtons();
-        ekfLogButtons();
-        mode = VIEW_MCL_LOG;
-        //Vector< MCLParticle > particles = ekflog.parseParticleLine(startLine);
+        mclLogButtons();
     }
 }
 
