@@ -68,6 +68,10 @@ public class WorldControllerPainter implements DogListener
     static final Color ESTIMATED_BALL_UNCERT_COLOR = Color.ORANGE;
     static final boolean DRAW_BALL_VELOCITY = true;
 
+    // Particle drawing
+    static final int PARTICLE_RADIUS = 3;
+    static final int PARTICLE_HEADING_DIST = 10;
+
     // This instance draws a line from the current estimate of the ball's
     // location to the the estimte of its location in
     // BALL_VELOCITY_DRAWING_MULTIPLIER_SECONDS seconds,
@@ -116,8 +120,10 @@ public class WorldControllerPainter implements DogListener
     private static final int COLOR_INDEX = 2;
     private static final int LANDMARK_LINE_WIDTH = 1;
 
+    // Information to be set for drawing particles
     // Particle set for drawing...
     private Vector< MCLParticle > currentParticles;
+    // Hold information about the player
     private int mclTeamColor;
     private int mclPlayerNum;
 
@@ -822,8 +828,9 @@ public class WorldControllerPainter implements DogListener
             } else {
                 partColor = DOG_COLOR_BLUE_TEAM;
             }
-            drawParticle(g2, partColor, p.getX(), p.getY(), p.getH(),
-                               p.getWeight());
+            drawParticle(g2, partColor, field.fieldToScreenX(p.getX()),
+                         field.fieldToScreenY(p.getY()), p.getH() - 90.0f,
+                         p.getWeight());
         }
     }
 
@@ -839,14 +846,25 @@ public class WorldControllerPainter implements DogListener
     public void drawParticle(Graphics2D drawing_on, Color in_color,
                              float x, float y, float h, float weight)
     {
+        // Draw a circle centered at the robots position
+        field.fillOval(drawing_on, in_color, field.DRAW_STROKE, x, y,
+                       (double)PARTICLE_RADIUS, (double)PARTICLE_RADIUS);
 
+        // Draw a line pointing in the direction of the heading
+        field.drawLine(drawing_on, in_color, field.DRAW_STROKE, x, y,
+                       x + PARTICLE_HEADING_DIST*Math.cos(h),
+                       y + PARTICLE_HEADING_DIST*Math.sin(h));
     }
 
     /**
      * Method draws an elipse of the associated position error centered at the
      * weighted mean of the particle set.
+     *
+     * @param meanX The weighted mean of the x estimate of the particles
+     * @param meanY The weighted mean of the y estimate of the particles
+     * @param meanH The weighted mean of the heading estimate of the particles
      */
-    public void drawMCLMeanAndVariance()
+    public void drawMCLMeanAndVariance(float meanX, float meanY, float meanH)
     {
     }
 }

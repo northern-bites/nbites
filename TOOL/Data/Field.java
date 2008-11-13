@@ -174,16 +174,19 @@ public abstract class Field
         return field;
     }
 
-    // (int) (SCALE * ( FIELD_HEIGHT - y) );
-    public int fieldToScreenY(int y) { return (int)(FIELD_HEIGHT - y);}
 
     // This is precisely the same conversion; note that the two are inverses.
     // FIELD_HEIGHT - (FIELD_HEIGHT - Y) = Y.
+    public int fieldToScreenY(int y) { return (int)(FIELD_HEIGHT - y);}
+    public float fieldToScreenY(float y) { return (float)FIELD_HEIGHT - y;}
     public int screenToFieldY(int y) { return fieldToScreenY(y); }
+    public float screenToFieldY(float y) { return fieldToScreenY(y); }
     // Our coordinate system doesn't change the x values; just return the scaled
     // x
     public int fieldToScreenX(int x) { return (x);}//(int) (SCALE * x); }
+    public float fieldToScreenX(float x) { return (x);}//(int) (SCALE * x); }
     public int screenToFieldX(int x) { return fieldToScreenX(x); }
+    public float screenToFieldX(float x) { return fieldToScreenX(x); }
 
     public int fixYCoord(double y) { return screenToFieldY((int)y); }
     public int fixXCoord(double x) { return screenToFieldX((int)x); }

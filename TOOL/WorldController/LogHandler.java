@@ -730,7 +730,9 @@ public class LogHandler
         debugViewer.setVisible(false);
         logStartFrame();
         logBox.slide.setMaximum(log_num_frames);
-        painter.clearSimulationHistory();
+        painter.updateParticleSet(new Vector<MCLParticle>(), team_color,
+                                  player_number);
+        painter.reportEndFrame();
     }
 
 }
