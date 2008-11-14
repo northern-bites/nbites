@@ -2,7 +2,6 @@ package edu.bowdoin.robocup.TOOL.WorldController;
 
 import edu.bowdoin.robocup.TOOL.TOOL;
 import edu.bowdoin.robocup.TOOL.Image.WorldControllerViewer;
-
 /*import edu.bowdoin.robocup.TOOL.WorldController.Field;
 import edu.bowdoin.robocup.TOOL.WorldController.UDPServer;
 */
@@ -150,7 +149,8 @@ public class WorldController extends JPanel implements KeyListener,
     public final static String UDP_LABEL_STRING = "UDP Viewer:";
     public final static String CONNECTION_LABEL_STRING = "Connection:";
     public final static String FPS_LABEL_STRING = "FPS Playback Speed:";
-    public final static String NUM_DISPLAY_ESTIMATES_LABEL_STRING = "# Estimates Displayed";
+    public final static String NUM_DISPLAY_ESTIMATES_LABEL_STRING =
+        "# Estimates Displayed";
     public final static String SWITCH_FIELDS_STRING = "Switch Fields";
     public final static String SWITCH_COLORS_STRING = "Switch Colors";
     public final static String SWITCH_TEAMS_STRING = "Switch Teams";
@@ -202,7 +202,8 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String VIEW_UDP_PACKETS_ACTION = "viewudpaction";
     public static final String CIRCLE_LINE_GOALIE_ACTION = "circlelinegoalie";
     public static final String GO_TO_XY_NORMAL_ACTION = "gotoxy";
-    public static final String GO_TO_XY_LOOK_AT_POINT_ACTION = "gotoxy lookatpoint";
+    public static final String GO_TO_XY_LOOK_AT_POINT_ACTION =
+        "gotoxy lookatpoint";
 
     // Values for the grid bag layout -- affects proportions of field and button
     // area

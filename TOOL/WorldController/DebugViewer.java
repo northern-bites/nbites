@@ -9,7 +9,7 @@ import java.awt.GridLayout;
 import java.util.HashMap;
 
 public class DebugViewer extends JFrame {
-       
+
     public static final int BOX_HEIGHT = 700;
     public static final int BOX_WIDTH = 300;
     public static final int LOC_PANEL_ENTRY_WIDTH = 400;
@@ -20,9 +20,9 @@ public class DebugViewer extends JFrame {
     // string constants
     public static final String FRAME_STRING = "Frame:";
     public static final String OUT_OF_STRING = "of";
-    public static final String 
+    public static final String
 	MY_ESTIMATES_STRING = "-----MY LOC ESTIMATES-----";
-    public static final String 
+    public static final String
 	BALL_ESTIMATES_STRING = "-----BALL ESTIMATES-----";
     public static final String LANDMARKS_STRING = "-----LANDMARKS-----";
     public static final String MY_XYH_STRING = "X,Y,H:";
@@ -41,30 +41,30 @@ public class DebugViewer extends JFrame {
     public static final String ODO_X_CHANGE_STRING = "Odo X:";
     public static final String ODO_Y_CHANGE_STRING = "Odo Y:";
     public static final String ODO_H_CHANGE_STRING = "Odo H:";
-    public static final String 
+    public static final String
 	LANDMARK_STUFF_STRING = "ID  :  Dist  /  Bearing";
-        
+
     // landmark string array
     public final static String[] LANDMARKS = {"My Goal Left Post",
 					      "My Goal Right Post",
 					      "Opp Goal Left Post",
 					      "Opp Goal Right Post",
-					      "Left Beacon", 
-					      "Right Beacon", 
+					      "Left Beacon",
+					      "Right Beacon",
 					      "Ball",
 					      "My Corner Left L",
 					      "My Corner Right L",
-					      "My Goal Left T", 
+					      "My Goal Left T",
 					      "My Goal Right T",
 					      "My Goal Left L",
 					      "My Goal Right L",
-					      "Center Left T", 
+					      "Center Left T",
 					      "Center Right T",
 					      "Opp Corner Left L",
 					      "Opp Corner Right L",
 					      "Opp Goal Left T",
 					      "Opp Goal Right T",
-					      "Opp Goal Left L", 
+					      "Opp Goal Left L",
 					      "Opp Goal Right L"};
     // takes a Point and maps it to a string
     public HashMap <Point2D.Double,String> cornerMap;
@@ -79,7 +79,7 @@ public class DebugViewer extends JFrame {
     private JPanel myEstimatesPanel;
     private JLabel ballEstimatesLabel;
     private JPanel ballEstimatesPanel;
-    private JLabel landmarksLabel; 
+    private JLabel landmarksLabel;
     private JPanel landmarksPanel;
     private JLabel landmarkStuffLabel;
     private JPanel landmarkStuffPanel;
@@ -97,7 +97,7 @@ public class DebugViewer extends JFrame {
     public JLabel myUncertY;
     public JLabel myUncertH;
     private JPanel myUncertXYHPanel;
-    
+
     // odometry values
     private JLabel odoXYHLabel;
     public JLabel odoX;
@@ -136,7 +136,7 @@ public class DebugViewer extends JFrame {
     private JLabel ballVelUncertYLabel;
     public JLabel ballVelUncertY;
     private JPanel ballVelUncertPanel;
-    
+
     private WorldController wc;
     private Container window;
     private Component bottom_space;
@@ -151,7 +151,7 @@ public class DebugViewer extends JFrame {
 	wc = _wc;
 
 	JFrame.setDefaultLookAndFeelDecorated(true);
-	
+
 	setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
 	window = getContentPane();
@@ -177,7 +177,7 @@ public class DebugViewer extends JFrame {
 	myEstimatesPanel = new JPanel();
 	myEstimatesPanel.add(myEstimatesLabel);
 	myEstimatesPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	// ball estimates label
@@ -185,7 +185,7 @@ public class DebugViewer extends JFrame {
 	ballEstimatesPanel = new JPanel();
 	ballEstimatesPanel.add(ballEstimatesLabel);
 	ballEstimatesPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	// landmarks label
@@ -193,14 +193,14 @@ public class DebugViewer extends JFrame {
 	landmarksPanel = new JPanel();
 	landmarksPanel.add(landmarksLabel);
 	landmarksPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	landmarkStuffLabel = new JLabel(LANDMARK_STUFF_STRING, JLabel.CENTER);
 	landmarkStuffPanel = new JPanel();
 	landmarkStuffPanel.add(landmarkStuffLabel);
 	landmarkStuffPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	// my estimates
@@ -214,7 +214,7 @@ public class DebugViewer extends JFrame {
 	myXYHPanel.add(myY);
 	myXYHPanel.add(myH);
 	myXYHPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	// my uncertainty estimates
@@ -228,7 +228,7 @@ public class DebugViewer extends JFrame {
 	myUncertXYHPanel.add(myUncertY);
 	myUncertXYHPanel.add(myUncertH);
 	myUncertXYHPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	// odometry estimate initializations
@@ -252,7 +252,7 @@ public class DebugViewer extends JFrame {
 	ballXYPanel.add(ballYLabel);
 	ballXYPanel.add(ballY);
 	ballXYPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	ballUncertXLabel = new JLabel(BALL_UNCERT_X_STRING, JLabel.CENTER);
@@ -265,7 +265,7 @@ public class DebugViewer extends JFrame {
 	ballUncertPanel.add(ballUncertYLabel);
 	ballUncertPanel.add(ballUncertY);
 	ballUncertPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	ballVelXLabel = new JLabel(BALL_VEL_X_STRING, JLabel.CENTER);
@@ -278,7 +278,7 @@ public class DebugViewer extends JFrame {
 	ballVelPanel.add(ballVelYLabel);
 	ballVelPanel.add(ballVelY);
 	ballVelPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 	// Add something to show absolute velocity
@@ -288,13 +288,13 @@ public class DebugViewer extends JFrame {
 	ballVelAbsPanel.add(ballVelAbsLabel);
 	ballVelAbsPanel.add(ballVelAbs);
 	ballVelPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
-	ballVelUncertXLabel = new JLabel(BALL_VEL_UNCERT_X_STRING, 
+	ballVelUncertXLabel = new JLabel(BALL_VEL_UNCERT_X_STRING,
 					 JLabel.CENTER);
 	ballVelUncertX = new JLabel("0", JLabel.CENTER);
-	ballVelUncertYLabel = new JLabel(BALL_VEL_UNCERT_Y_STRING, 
+	ballVelUncertYLabel = new JLabel(BALL_VEL_UNCERT_Y_STRING,
 					 JLabel.CENTER);
 	ballVelUncertY = new JLabel("0", JLabel.CENTER);
 	ballVelUncertPanel = new JPanel();
@@ -303,11 +303,11 @@ public class DebugViewer extends JFrame {
 	ballVelUncertPanel.add(ballVelUncertYLabel);
 	ballVelUncertPanel.add(ballVelUncertY);
 	ballVelUncertPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH, 
+	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
 					   LOC_PANEL_ENTRY_HEIGHT));
 
 
-	// CALIBRATE BUTTONS LAYOUT 
+	// CALIBRATE BUTTONS LAYOUT
 
 	locPanel = new JPanel();
 
@@ -325,7 +325,7 @@ public class DebugViewer extends JFrame {
 	locPanel.add(landmarksPanel);
 	locPanel.add(landmarkStuffPanel);
 
-	locPanel.setPreferredSize(new Dimension(LOC_PANEL_WIDTH, 
+	locPanel.setPreferredSize(new Dimension(LOC_PANEL_WIDTH,
 						LOC_PANEL_HEIGHT));
 	window.add(locPanel);
 
@@ -347,23 +347,23 @@ public class DebugViewer extends JFrame {
 
     public Dimension getMinimumSize()
     { return new Dimension(BOX_WIDTH,BOX_HEIGHT); }
-    
+
     public Dimension getPreferredSize()
     { return getMinimumSize(); }
-    
+
     public int getNumLandmarks() {
         return num_landmarks;
     }
 
     public void addLandmark(int id, double dist, double bearing) {
 	if (id < 0 || id >= wc.NUM_LANDMARKS) {
-	    System.out.println("DebugViewer.java sawLandmark(): " + 
+	    System.out.println("DebugViewer.java sawLandmark(): " +
 			       "Saw Non-Existant Landmark: " + id +
                                " at line " + frameNumber.getText());
 	    return;
 	}
-	//System.out.println("addLandmark id: " + id + 
-	//		   " dist: " + dist + 
+	//System.out.println("addLandmark id: " + id +
+	//		   " dist: " + dist +
 	//		   " bearing: " + bearing);
 
 	// label/panel declarations
@@ -392,7 +392,7 @@ public class DebugViewer extends JFrame {
 	// add panel to window
 	landmark_components[num_landmarks] = locPanel.add(panel);
 	//window.validate();
-	
+
 	// incremenet landmarks on window
 	num_landmarks++;
     }
@@ -401,7 +401,7 @@ public class DebugViewer extends JFrame {
 
     // removes all landmarks from debug viewer
     public void removeLandmarks() {
-	
+
 	//window.invalidate();
 	// remove landmarks
 	for (int i = 0; i < num_landmarks; i++) {

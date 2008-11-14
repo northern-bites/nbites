@@ -132,13 +132,18 @@ public class LogHandler
         // frame if the Log Viewer is in 'play' mode.
         ActionListener taskPerformer = new ActionListener () {
                 public void actionPerformed(ActionEvent evt) {
-                    if (log_marker < log_num_frames-1) {
+                    if (log_marker < log_num_frames) {
                         log_marker++;
                     } else {
                         // else we've run out of frames, so stop
                         playTimer.stop();
                     }
-                    viewFromLog();
+                    if (wc.getMode() == wc.VIEW_MCL_LOG) {
+                        viewFromMCLLog();
+                    } else {
+                        viewFromLog();
+                    }
+                    logBox.slide.setValue(log_marker);
                 }
             };
         playTimer = new Timer((int)1000./wc.ROBOT_FPS, taskPerformer);
@@ -289,9 +294,9 @@ public class LogHandler
 
     public void logPlay()
     {
-        // re-loop if end of queue
-        if (log_marker == log_num_frames || log_marker == log_num_frames-1) log_marker = 1;
-        //System.out.println("logPlay: PAUSE_STRING");
+        // Don't play if at end
+        if (log_marker >= log_num_frames) return;
+
         logBox.play_pause.setText(logBox.PAUSE_STRING);
         playTimer.setDelay((int)1000./wc.getPlaybackFps());
         playTimer.start();

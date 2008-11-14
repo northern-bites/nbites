@@ -10,16 +10,16 @@ import java.awt.Dimension;
 /**
  * Provides all the constants necessary to construct an image of the new
  * Nao field, as specified in the 2008 rules.
- * 
- * Dimensions taken from 
+ *
+ * Dimensions taken from
  * http://www.tzi.de/4legged/pub/Website/Downloads/NaoRules2008.pdf
- * 
- * @author Nicholas Dunn 
+ *
+ * @author Nicholas Dunn
  */
 public class NaoField2008 extends Field {
 
     public NaoField2008() {}
-    
+
     // 486 / 600 = .81
     public final double getLabScale() { return .81; }
 
@@ -33,7 +33,7 @@ public class NaoField2008 extends Field {
 
     // Note: These goal width and goal box width values look wrong, as they do
     // not correspond with the pictures we have been provided of the field.
-    // However, they are based off of the dimensions of the goal provided in 
+    // However, they are based off of the dimensions of the goal provided in
     // the NaoRules2008
 
     // The width between the two posts
@@ -77,40 +77,40 @@ public class NaoField2008 extends Field {
                 LANDMARK_TOP_GOAL_RIGHT_POST_Y);
 
         // draw left side of goal
-	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_TOP_GOAL_LEFT_POST_X, 
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y, 
-                 LANDMARK_TOP_GOAL_LEFT_POST_X, 
+	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_TOP_GOAL_LEFT_POST_X,
+                 LANDMARK_TOP_GOAL_LEFT_POST_Y,
+                 LANDMARK_TOP_GOAL_LEFT_POST_X,
                  LANDMARK_TOP_GOAL_LEFT_POST_Y+GOAL_SIDE_LENGTH);
 	// draw right side of goal
-	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X, 
-                 LANDMARK_TOP_GOAL_RIGHT_POST_Y, 
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X, 
+	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
+                 LANDMARK_TOP_GOAL_RIGHT_POST_Y,
+                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
                  LANDMARK_TOP_GOAL_LEFT_POST_Y+GOAL_SIDE_LENGTH);
-        // draw top goal left post	
-	fillOval(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_TOP_GOAL_LEFT_POST_X, 
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y, 
+        // draw top goal left post
+	fillOval(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_TOP_GOAL_LEFT_POST_X,
+                 LANDMARK_TOP_GOAL_LEFT_POST_Y,
                  GOAL_POST_RADIUS, GOAL_POST_RADIUS);
 	// draw top goal right post
-	fillOval(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X, 
-                 LANDMARK_TOP_GOAL_RIGHT_POST_Y, 
+	fillOval(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
+                 LANDMARK_TOP_GOAL_RIGHT_POST_Y,
                  GOAL_POST_RADIUS, GOAL_POST_RADIUS);
-        
+
         // draw crossbar
-	drawLine(g2, TOP_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS, 
-                 LANDMARK_TOP_GOAL_LEFT_POST_X, 
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y, 
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X, 
+	drawLine(g2, TOP_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS,
+                 LANDMARK_TOP_GOAL_LEFT_POST_X,
+                 LANDMARK_TOP_GOAL_LEFT_POST_Y,
+                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
                  LANDMARK_TOP_GOAL_RIGHT_POST_Y);
-        
-        
+
+
 
     }
 
-     /** 
+     /**
      * Draws the bottom goal on the given graphics context.
      * @param g2 the graphics context on which to draw
      */
@@ -123,42 +123,42 @@ public class NaoField2008 extends Field {
                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y - GOAL_SIDE_LENGTH);
 
         // draw left side of goal
-	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X, 
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y, 
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X, 
+	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
+                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y,
+                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
                  LANDMARK_BOTTOM_GOAL_LEFT_POST_Y-GOAL_SIDE_LENGTH);
 	// draw right side of goal
-	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X, 
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y, 
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X, 
+	drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
+                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y,
+                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
                  LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y-GOAL_SIDE_LENGTH);
 
         // draw bottom goal left post
-	fillOval(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X, 
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y, 
+	fillOval(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
+                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y,
                  GOAL_POST_RADIUS, GOAL_POST_RADIUS);
 	// draw bottom goal right post
-	fillOval(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS, 
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X, 
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y, 
+	fillOval(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
+                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y,
                  GOAL_POST_RADIUS, GOAL_POST_RADIUS);
 
 	// draw crossbar
-	drawLine(g2, BOTTOM_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS, 
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X, 
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y, 
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X, 
+	drawLine(g2, BOTTOM_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS,
+                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
+                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y,
+                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
                  LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y);
 
-        
+
     }
 
 
 
-    
+
     protected void drawNet(Graphics2D g2, Color col,double strokeWidth,
                            double x1, double y1, double x2, double y2) {
         g2.setColor(col);
@@ -174,9 +174,9 @@ public class NaoField2008 extends Field {
                             (int) MESH_SIZE, (int) MESH_SIZE);
             }
         }
-        
-        
+
+
         }
-                           
+
 
 }
