@@ -1,0 +1,7 @@
+*.NFRM
+*.mtb
+*.a
+*.dylib
+*.so
+*.class
+*.o

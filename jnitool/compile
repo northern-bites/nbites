@@ -1,0 +1,35 @@
+#!/bin/bash
+
+
+# Notes: This file currently works only for linux. By uncommenting 
+# the FOR MAC lines, and commenting the FOR LINUX, you can change this
+# The main difference being that linux g++ can compile directly to a shared
+# library, and on a mac you need to use libtool first to accomplish this
+#
+# If this doesnt work, make sure the inlcude paths (-I) are set correctly for
+# your version of the JVM, otherwise TOOLVisionLink.cpp can't find jni.h, etc
+
+MAN_HOME="../../man"
+
+#OS DEPENDANT VARS, like library extensions
+LEXT=".a"
+
+#Force the creation of the symbolic links to the libraries
+ln -sf $MAN_HOME/build/cmake.vision/libvision$LEXT libvision$LEXT
+ln -sf $MAN_HOME/build/cmake.man.corpus/lib_sensors$LEXT lib_sensors$LEXT
+
+
+javac TOOLVisionLink.java
+
+javah -jni TOOLVisionLink
+
+## FOR LINUX (ubuntu 8.04) ##
+#g++ -o libTOOLVisionLink.so TOOLVisionLink.cpp libvision.a lib_sensors.a -shared -fpic -lpython2.5 -I/usr/lib/jvm/java-6-sun-1.6.0.07/include/ -I/usr/lib/jvm/java-6-sun-1.6.0.07/include/linux/ -I$MAN_HOME/vision/ -I$MAN_HOME/include -I$MAN_HOME/corpus/ -I/usr/include/python2.5/ -DNO_ZLIB -DROBOT_TYPE=NAO_RL
+
+## FOR MAC -- untested, since we can't generate the .dylib libs yet##
+#g++ -dynamic -c -o TOOLVisionLink.o TOOLVisionLink.cpp libvision.dylib lib_sensors.dylib -lpython2.5 -I/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Headers -I/sw/include -I$MAN_HOME/vision/ -I$MAN_HOME/include -I$MAN_HOME/corpus/ -I/usr/include/python2.5/ -DNO_ZLIB -DROBOT_TYPE=NAO_RL
+
+#libtool -dynamic -flat_namespace -undefined suppress -o libTOOLVisionLink.jnilib TOOLVisionLink.o
+
+
+java  -Djava.library.path=./ TOOLVisionLink
