@@ -549,8 +549,8 @@ const Kinematics::IKLegResult
 Kinematics::dls(const ChainID chainID,
                 const ufvector3 &goal,
                 const float startAngles[],
-                const float maxError = .1,
-                const float maxHeelError = .1) {
+                const float maxError,
+                const float maxHeelError) {
     ChainID ankleChainID = (chainID == LLEG_CHAIN ?
                             LANKLE_CHAIN : RANKLE_CHAIN);
 
@@ -587,6 +587,7 @@ Kinematics::dls(const ChainID chainID,
     return result;
 }
 
+/*
 #ifdef 0
 //Usage example, code for offline testing:
 
@@ -617,3 +618,4 @@ int main() {
     return 0;
 }
 #endif
+*/

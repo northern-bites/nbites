@@ -111,9 +111,11 @@ SET( MOTION_SRCS     ${MOTION_INCLUDE_DIR}/CallbackAction
 		     ${MOTION_INCLUDE_DIR}/WalkProvider
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
                      ${MOTION_INCLUDE_DIR}/_motionmodule
+                     ${CORPUS_INCLUDE_DIR}/Kinematics
                      )
 
 IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+  MESSAGE( STATUS "Looking for extra motion sources in ${MAN_INCLUDE_DIR}" )
   LIST( APPEND MOTION_SRCS ${MAN_INCLUDE_DIR}/Sensors )
 ENDIF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
 

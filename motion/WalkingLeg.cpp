@@ -24,6 +24,11 @@ vector <float> WalkingLeg::step(float com_x, float com_y){
 }
 
 
+vector <float> WalkingLeg::swinging(float com_x, float com_y){
+    return vector<float>();
+
+}
+
 vector <float> WalkingLeg::supporting(float com_x, float com_y){
     /**
        this method calculates the angles for this leg when it is on the ground
@@ -38,7 +43,8 @@ vector <float> WalkingLeg::supporting(float com_x, float com_y){
     goal(2) = -walkParams->bodyHeight;         //targetZ
 
     IKLegResult result = dls(chainID,goal,lastJoints);
-    memcpy(result.angles, lastJoints, LEG_JOINTS*sizeof(float));
-    return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+//     memcpy(result.angles, lastJoints, LEG_JOINTS*sizeof(float));
+//     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    return vector<float>();
 };
 
