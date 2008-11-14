@@ -1,10 +1,11 @@
 #include "MotionSwitchboard.h"
-MotionSwitchboard::MotionSwitchboard()
-  : walkProvider(),
-    nextJoints(Kinematics::NUM_JOINTS, 0.0),
-    running(false)
+MotionSwitchboard::MotionSwitchboard(Sensors *s)
+    : sensors(s),
+      walkProvider(),
+      nextJoints(Kinematics::NUM_JOINTS, 0.0),
+      running(false)
 {
-
+    
     //Allow safe access to the next joints
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
@@ -73,6 +74,7 @@ void MotionSwitchboard::run() {
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
             nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints[i];
         }
+        sensors->setBodyAngles(nextJoints);
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
         pthread_mutex_unlock(&next_joints_mutex);
 

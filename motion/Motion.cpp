@@ -13,7 +13,7 @@ Motion::Motion (ALPtr<ALMotionProxy> _proxy,shared_ptr<Synchro> _synchro, Sensor
 #else
 Motion::Motion (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
 #endif
-    : switchboard(),
+    : switchboard(s),
       enactor(new SimulatorEnactor(&switchboard)),
       interface(&switchboard)
 {

@@ -17,10 +17,11 @@ using namespace std;
 
 #include "Kinematics.h"
 #include "WalkProvider.h"
+#include "Sensors.h"
 
 class MotionSwitchboard {
 public:
-    MotionSwitchboard();
+    MotionSwitchboard(Sensors *s);
     ~MotionSwitchboard();
 
     void start();
@@ -31,6 +32,7 @@ public:
     const vector <float> getNextJoints();
 
 private:
+    Sensors * sensors;
     WalkProvider walkProvider;
     vector <float> nextJoints;
 
