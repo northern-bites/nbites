@@ -24,7 +24,7 @@ javac TOOLVisionLink.java
 javah -jni TOOLVisionLink
 
 ## FOR LINUX (ubuntu 8.04) ##
-#g++ -o libTOOLVisionLink.so TOOLVisionLink.cpp libvision.a lib_sensors.a -shared -fpic -lpython2.5 -I/usr/lib/jvm/java-6-sun-1.6.0.07/include/ -I/usr/lib/jvm/java-6-sun-1.6.0.07/include/linux/ -I$MAN_HOME/vision/ -I$MAN_HOME/include -I$MAN_HOME/corpus/ -I/usr/include/python2.5/ -DNO_ZLIB -DROBOT_TYPE=NAO_RL
+g++ -o libTOOLVisionLink.so TOOLVisionLink.cpp libvision.a lib_sensors.a -shared -fpic -lpython2.5 -I/usr/lib/jvm/java-6-sun-1.6.0.07/include/ -I/usr/lib/jvm/java-6-sun-1.6.0.07/include/linux/ -I$MAN_HOME/vision/ -I$MAN_HOME/include -I$MAN_HOME/corpus/ -I/usr/include/python2.5/ -DNO_ZLIB -DROBOT_TYPE=NAO_RL
 
 ## FOR MAC -- untested, since we can't generate the .dylib libs yet##
 #g++ -dynamic -c -o TOOLVisionLink.o TOOLVisionLink.cpp libvision.dylib lib_sensors.dylib -lpython2.5 -I/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Headers -I/sw/include -I$MAN_HOME/vision/ -I$MAN_HOME/include -I$MAN_HOME/corpus/ -I/usr/include/python2.5/ -DNO_ZLIB -DROBOT_TYPE=NAO_RL
