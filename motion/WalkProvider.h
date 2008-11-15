@@ -23,6 +23,7 @@ using namespace std;
 #include "WalkController.h"
 #include "PreviewController.h"
 #include "WalkingLeg.h"
+#include "StepGenerator.h"
 
 class WalkProvider : public MotionProvider {
 public:
@@ -37,7 +38,7 @@ private:
     WalkingParameters walkParameters;
     WalkController *controller;
     WalkingLeg left, right;
-
+    StepGenerator stepGenerator;
 };
 
 #endif

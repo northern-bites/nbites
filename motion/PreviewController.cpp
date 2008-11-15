@@ -23,10 +23,13 @@ const float PreviewController::c_values[3] =
 { 0.0f, 0.0f, 1.0f };
 
 PreviewController::PreviewController()
-    : WalkController(), position(0),
+    : WalkController(), stateVector(ufvector3(3)),
       A_c(ufmatrix3(3,3)), b(ufvector3(3)), c(ufrowVector3(1,3)) {
     // instantiate the ublas matrices with their respective values
     // TODO: there might be a better way to do this.
+    for (int i=0; i < 3; i++)
+        stateVector(i) = 0.0f;
+
     for (int i=0; i < 3; i++)
         A_c(0, i) = A_c_values[i];
     for (int i=0; i < 3; i++)
@@ -42,13 +45,29 @@ PreviewController::PreviewController()
 
 }
 
+/**
+ * Tick calculates the next state vector for the robot, given the zmp_ref
+ *
+ */
+const float PreviewController::tick(const list<float> *zmp_ref) {
+    float control = 0.0f; // This is 'u' in mathematical notation
+    int counter = 0;
+    for (list<float>::const_iterator i = zmp_ref->begin();
+         counter < NUM_PREVIEW_FRAMES; counter++, i++) {
+        control += weights[counter]* (*i);
+    }
+    stateVector.assign(prod(A_c, stateVector) + b*control);
+    return getPosition();
+}
 
-const float PreviewController::tick(const float reference) {
-    static int frameNumber = 100;
+/*
+const float PreviewController::tick(const list<float> *zmp_ref) {
+    static int frameNumber = -100;
     frameNumber++;
 
     if (frameNumber > 0)
-        position = 50.0f*sin(frameNumber*180.0f/M_PI/1000); //std::min(20.0f, position + 1.0f);
+        position = 50.0f*sin(frameNumber*180.0f/M_PI/2000); //std::min(20.0f, position + 1.0f);
     return position;
 }
 
+*/

@@ -1,5 +1,16 @@
 /**
- * TODO: Put in some docs =)
+ * This class implements the 1D controller described by Kajita and Czarnetzki
+ * Each discrete time step, the tick method is called with the latest
+ * previewable ZMP_REF positions.
+ * Important: This controller models only one dimension at once, so you need
+ * two instances one for the x and one for the y direction.
+ * The weights and the time invariant system matrix A_c (see constructor, etc)
+ * are pre-calculated in Scilab (see preview-control.sci). The theory
+ * is described in Czarnetzki and Kajita and Katayama.
+ *
+ * @author George Slavov
+ * @author Johannes Strom
+ * @date November 2008 
  */
 
 #ifndef _PreviewController_h_DEFINED
@@ -9,24 +20,18 @@
 #include <boost/numeric/ublas/vector.hpp>
 using namespace boost::numeric;
 
+#include <list>
+using std::list;
+
 #include "WalkController.h"
 
 class PreviewController : public WalkController {
 public:
     PreviewController();
-    virtual const float tick(const float reference);
-    virtual const float getPosition() const { return position; }
+    virtual const float tick(const list<float> *zmp_ref);
+    virtual const float getPosition() const { return stateVector(0); }
 
 private:
-    float position;
-
-private: // Constants
-    static const int NUM_PREVIEW_FRAMES = 40;
-    static const float weights[NUM_PREVIEW_FRAMES];
-    static const float A_c_values[9];
-    static const float b_values[3];
-    static const float c_values[3];
-
     /*
      * This saves me some nasty typing...
      * uBLAS by default uses std::vector as its underlying storage data
@@ -45,16 +50,19 @@ private: // Constants
                           ublas::row_major,
                           ublas::bounded_array<float,3> > ufrowVector3;
 
+    ufvector3 stateVector;
+
+private: // Constants
+    static const int NUM_PREVIEW_FRAMES = 40;
+    static const float weights[NUM_PREVIEW_FRAMES];
+    static const float A_c_values[9];
+    static const float b_values[3];
+    static const float c_values[3];
+
     ufmatrix3 A_c;
     ufvector3 b;
     ufrowVector3 c;
 
-    /*
-    static const float R = 1.E-10;
-    static const float Qe = 1.0f;
-    static const float T = 0.02;
-    static const float g = 9.8; // do not worry that gravity is positive
-    */
 };
 
 #endif
