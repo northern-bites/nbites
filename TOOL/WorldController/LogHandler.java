@@ -752,8 +752,7 @@ public class LogHandler
 
                 // Update the observed landarmks information
                 // Check if any landmarks were sighted this frame
-                if (debugViewer.getNumLandmarks() > 0)
-                    debugViewer.removeLandmarks();
+                debugViewer.removeLandmarks();
                 if (t.hasMoreTokens()) {
                     landmarkInfo = t.nextToken();
                     processObservedLandmarkInfo(landmarkInfo);
