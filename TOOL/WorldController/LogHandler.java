@@ -752,6 +752,8 @@ public class LogHandler
 
                 // Update the observed landarmks information
                 // Check if any landmarks were sighted this frame
+                if (debugViewer.getNumLandmarks() > 0)
+                    debugViewer.removeLandmarks();
                 if (t.hasMoreTokens()) {
                     landmarkInfo = t.nextToken();
                     processObservedLandmarkInfo(landmarkInfo);
@@ -815,9 +817,6 @@ public class LogHandler
     {
         // Get info into an array
         String[] infos = newInfos.split(" ");
-
-        if (debugViewer.getNumLandmarks() > 0)
-            debugViewer.removeLandmarks();
 
         // Iterate through the landmark IDs getting the correct ones
         for(int i = 0; i < infos.length; i++) {
