@@ -4,7 +4,7 @@
 
 WalkingLeg::WalkingLeg(ChainID id,
                        WalkingParameters * walkP)
-    : chainID(id), walkParams(walkP), goal(ufvector3(3))
+  : supportMode(SUPPORTING),chainID(id), walkParams(walkP), goal(ufvector3(3))
 {
     if (chainID == LLEG_CHAIN)
         leg_sign = 1;
@@ -13,13 +13,13 @@ WalkingLeg::WalkingLeg(ChainID id,
     for ( unsigned int i = 0 ; i< LEG_JOINTS; i++) lastJoints[i]=0.0f;
 }
 
-vector <float> WalkingLeg::step(float com_x, float com_y){
+vector <float> WalkingLeg::tick(float com_x, float com_y){
     if (supportMode == SUPPORTING){
         return supporting(com_x, com_y);
     }else if(supportMode == SWINGING){
         return swinging(com_x, com_y);
     }else{
-        throw "Invalid SupportMode passed to WalkingLeg::step";
+        throw "Invalid SupportMode passed to WalkingLeg::tick";
     }
 }
 
@@ -42,9 +42,10 @@ vector <float> WalkingLeg::supporting(float com_x, float com_y){
     goal(1) = -com_y + leg_sign*HIP_OFFSET_Y;  //targetY
     goal(2) = -walkParams->bodyHeight;         //targetZ
 
-    IKLegResult result = dls(chainID,goal,lastJoints);
-//     memcpy(result.angles, lastJoints, LEG_JOINTS*sizeof(float));
-//     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
-    return vector<float>();
+    IKLegResult result = Kinematics::dls(chainID,goal,lastJoints);
+    memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
+    return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+
+    //return vector<float>(6);
 };
 

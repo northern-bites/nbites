@@ -545,6 +545,18 @@ const bool Kinematics::adjustHeel(const ChainID chainID,
     return false;
 }
 
+void hackJointOrder(float angles[]) {
+    float temp = angles[1];
+    angles[1] = angles[2];
+    angles[2] = temp;
+}
+
+/*
+ * NOTE on a giant hack:
+ *   This method still uses the old joint order: HYP, HP, HR, KP,...
+ *   Since then, the HP and HR angle values have switched positions. In order
+ *   to fully fix this, we need to redo forwardKinematics() in Mathematica.
+ */
 const Kinematics::IKLegResult
 Kinematics::dls(const ChainID chainID,
                 const ufvector3 &goal,
@@ -561,6 +573,8 @@ Kinematics::dls(const ChainID chainID,
 
     float currentAngles[LEG_JOINTS];
     memcpy(currentAngles, startAngles, LEG_JOINTS*sizeof(float));
+    hackJointOrder(currentAngles);
+
 
     // The optimization method hits a singularity if the leg is perfectly
     // straight, so we can virtually bend the knee .3 radians and go around
@@ -581,26 +595,29 @@ Kinematics::dls(const ChainID chainID,
     bool heelSuccess =
         adjustHeel(chainID, heelGoal, currentAngles, maxHeelError);
 
+    hackJointOrder(currentAngles);
+
     IKLegResult result;
     result.outcome = (ankleSuccess && heelSuccess ? SUCCESS : STUCK);
     memcpy(result.angles,currentAngles,LEG_JOINTS*sizeof(float));
     return result;
 }
 
-/*
-#ifdef 0
+
+
+//#ifdef 0
 //Usage example, code for offline testing:
 
 int main() {
     // George's test code
     Kinematics::IKLegResult result;
-    for (int i=0; i<50000; i++) {
+    for (int i=0; i<1; i++) {
         //float startAngles[] = {0,0,0,0.2,0,0};
         float startAngles[] = {0,-0.78,0,0.95,-0.2,0};
         Kinematics::ufvector3 goal(3);
-        goal(0) = 50;
-        goal(1) = 50;
-        goal(2) = -300;
+        goal(0) = 0;
+        goal(1) = 70;
+        goal(2) = -310;
         //bool jointMask[4] = {true,true,true,true};
         result = Kinematics::dls(Kinematics::LLEG_CHAIN,
                                  goal,
@@ -617,5 +634,5 @@ int main() {
     std::cout << std::endl;
     return 0;
 }
-#endif
-*/
+//#endif
+

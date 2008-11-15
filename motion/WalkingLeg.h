@@ -12,9 +12,9 @@ using namespace Kinematics;
 class WalkingLeg  {
 public:
     WalkingLeg(ChainID id, WalkingParameters * walkP);
-    ~WalkingLeg();
+    //~WalkingLeg() { };
 
-    vector <float> step(float com_x, float com_y);
+    vector <float> tick(float com_x, float com_y);
     void switchSupportMode(SupportMode newMode){supportMode=newMode;}
 
 private:

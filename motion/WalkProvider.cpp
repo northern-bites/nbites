@@ -4,7 +4,10 @@ using Kinematics::RLEG_CHAIN;
 
 WalkProvider::WalkProvider()
     : MotionProvider(),
-      walkParameters()
+      walkParameters(),
+      controller(new DummyController()),
+      left(LLEG_CHAIN,&walkParameters),
+      right(RLEG_CHAIN,&walkParameters)
 {
 
 }
@@ -18,27 +21,25 @@ void WalkProvider::requestStop() {
 }
 
 void WalkProvider::calculateNextJoints() {
-    debugNextJoints();return;
 //Tick the step generator (ensure we have preview values ready)
 
 
 //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
-
+    float reference_zmp = 0.0f; //dummy
+    float com_x = 0.0f;
+    float com_y = controller->tick(reference_zmp);
+    //cout << "Com x: " << com_x << endl;
 
 //Tick each leg (in: CoM x,y balance mode, out: joint angles)
-
+    vector<float> lleg_results = left.tick(com_x,com_y);
+    vector<float> rleg_results = right.tick(com_x,com_y);
 
 //Return the joints for the legs
-    setNextChainJoints(LLEG_CHAIN,vector<float>(LEG_JOINTS,0.2));
-    setNextChainJoints(RLEG_CHAIN,vector<float>(LEG_JOINTS,0.2));
+    setNextChainJoints(LLEG_CHAIN,lleg_results);
+    setNextChainJoints(RLEG_CHAIN,rleg_results);
 }
 
 void WalkProvider::setMotion(float x, float y, float theta) {
 
 }
 
-//Test method to try out various ideas. currently moves the com a little using two legs
-void WalkProvider::debugNextJoints(){
-
-
-}

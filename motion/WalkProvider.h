@@ -7,6 +7,9 @@ using namespace std;
 
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
+#include "WalkController.h"
+#include "DummyController.h"
+#include "WalkingLeg.h"
 
 class WalkProvider : public MotionProvider {
 public:
@@ -17,14 +20,11 @@ public:
     void calculateNextJoints();
     void setMotion(float x, float y, float theta);
 
-
-
 private:
-
     WalkingParameters walkParameters;
+    WalkController *controller;
+    WalkingLeg left, right;
 
-    //Debug
-    void debugNextJoints();//test method
 };
 
 #endif

@@ -37,7 +37,7 @@ struct WalkingParameters{
 
     //Default constructor, sets all the values to their defaults
     WalkingParameters(){
-        bodyHeight = 0.31; //meters
+        bodyHeight = 310; //millimeters
         hipOffsetX = 0.0f;
     }
     //Learning constructor: allows creation of new parameter sets at runtime

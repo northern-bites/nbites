@@ -10,6 +10,7 @@
  * It includes method definitions related to the calculation of forward and
  * inverse kinematics.
  * It also supports the creation of rotation and translation matrices.
+ * NOTE: All of the lengths are in millimeters.
  */
 
 #include <boost/numeric/ublas/matrix.hpp>
@@ -30,10 +31,12 @@ namespace Kinematics {
 #ifndef TO_RAD //also defined in almotionproxy.h
     static const float TO_RAD = M_PI/180.0f;
 #endif
+
     static const float M_TO_CM  = 100.0f;
     static const float CM_TO_M  = 0.01f;
     static const float CM_TO_MM = 10.0f;
     static const float MM_TO_CM = 0.1f;
+
 
     enum Axis {
         X_AXIS = 0,
@@ -370,40 +373,36 @@ namespace Kinematics {
                           ublas::bounded_array<float,9> > ufmatrix3;
     typedef ublas::vector<float, ublas::bounded_array<float,3> > ufvector3;
 
-    static const float clip(const float, const float, const float);
-    static const void clipChainAngles(const ChainID id,
-                                      float angles[]);
-    static const float getMinValue(const ChainID id, const int jointNumber);
-    static const float getMaxValue(const ChainID id, const int jointNumber);
-    static const ufvector3 forwardKinematics(const ChainID id,
-                                             const float angles[]);
-    static const ufmatrix3 buildHeelJacobian(const ChainID chainID,
-                                             const float angles[]);
-    static const ufmatrix3 buildLegJacobian(const ChainID chainID,
-                                            const float angles[]);
+    const float clip(const float, const float, const float);
+    const void clipChainAngles(const ChainID id,
+                               float angles[]);
+    const float getMinValue(const ChainID id, const int jointNumber);
+    const float getMaxValue(const ChainID id, const int jointNumber);
+    const ufvector3 forwardKinematics(const ChainID id,
+                                      const float angles[]);
+    const ufmatrix3 buildHeelJacobian(const ChainID chainID,
+                                      const float angles[]);
+    const ufmatrix3 buildLegJacobian(const ChainID chainID,
+                                     const float angles[]);
 
-    static const ufvector3 solve(ufmatrix3 &A,
-                                 const ufvector3 &b);
+    const ufvector3 solve(ufmatrix3 &A,
+                          const ufvector3 &b);
 
     // Both adjustment methods return whether the search was successful.
     // The correct angles required to fulfill the goal are returned through
     // startAngles by reference.
-    static const bool adjustAnkle(const ChainID chainID,
-                                  const ufvector3 &goal,
-                                  float startAngles[],
-                                  const float maxError);
-    static const bool adjustHeel(const ChainID chainID,
-                                 const ufvector3 &goal,
-                                 float startAngles[],
-                                 const float maxError);
+    const bool adjustAnkle(const ChainID chainID,
+                           const ufvector3 &goal,
+                           float startAngles[],
+                           const float maxError);
+    const bool adjustHeel(const ChainID chainID,
+                          const ufvector3 &goal,
+                          float startAngles[],
+                          const float maxError);
     const IKLegResult dls(const ChainID chainID,
                           const ufvector3 &goal,
                           const float startAngles[],
                           const float maxError = 1.0f,
                           const float maxHeelError = .1f);
-
-    const void com(const ufvector3 &goal,
-                   const float startAngles[],
-                   const SupportLeg sm);
 };
 #endif
