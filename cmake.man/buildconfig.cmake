@@ -27,7 +27,7 @@ SET( CMAKE_CXX_FLAGS
   "${CMAKE_CXX_FLAGS} -O2 -Wall -Wconversion -Wno-unused" )
 # Release build flags
 SET( CMAKE_CXX_FLAGS_RELEASE
-  "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wall -Wconversion -Wno-unused" )
+  "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -Wall -Wconversion -Wno-unused" )
 # Debug build flags
 SET( CMAKE_CXX_FLAGS_DEBUG
   "${CMAKE_CXX_FLAGS_DEBUG} -g3 -O3 -DNDEBUG -Wall -Wconversion -Wno-unused" )
