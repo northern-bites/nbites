@@ -14,7 +14,7 @@ using namespace std;
 
 
 enum cornerID {
-  L_INNER_CORNER = 0, 
+  L_INNER_CORNER = 0,
   L_OUTER_CORNER,
   T_CORNER,
   CENTER_CIRCLE,
@@ -66,7 +66,7 @@ class ConcreteCorner : public ConcreteLandmark {
    * this class.
    */
 private:
-  ConcreteCorner(const double fieldX, const double fieldY, const cornerID _id);
+  ConcreteCorner(const float fieldX, const float fieldY, const cornerID _id);
   // copy constructor
   ConcreteCorner(const ConcreteCorner&);
 
@@ -80,14 +80,14 @@ public: // Constants
   static const int NUM_CORNERS = NUM_L_CORNERS + NUM_T_CORNERS + NUM_CC_CORNERS;
   static const int NUM_YELLOW_GOAL_CORNERS = 4;
   static const int NUM_BLUE_GOAL_CORNERS = 4;
-  static const int NUM_GOAL_CORNERS = NUM_YELLOW_GOAL_CORNERS + 
+  static const int NUM_GOAL_CORNERS = NUM_YELLOW_GOAL_CORNERS +
     NUM_BLUE_GOAL_CORNERS;
   static const int NUM_YELLOW_ARC_CORNERS = 2;
   static const int NUM_BLUE_ARC_CORNERS = 2;
   static const int NUM_BLUE_GOAL_T_CORNERS = 2;
   static const int NUM_YELLOW_GOAL_T_CORNERS = 2;
 
-public:  
+public:
   // destructor
   virtual ~ConcreteCorner();
 
@@ -95,14 +95,14 @@ public:
   {
     return o << c.toString();
   }
-  
+
   ////////////////////////////////////////////////////////////
   // GETTERS
   ////////////////////////////////////////////////////////////
   const cornerID getID() const { return id; }
 
   virtual const string toString() const;
-  
+
   static const list <const ConcreteCorner*> getPossibleCorners(shape corner_type);
 
   // Private methods
@@ -132,14 +132,14 @@ private:
   static const ConcreteCorner* concreteCornerList[NUM_CORNERS];
 
  private: // These are only used internally by the getPossibleCorners method
-  
+
   static const ConcreteCorner* L_CORNERS[NUM_L_CORNERS];
   static const ConcreteCorner* T_CORNERS[NUM_T_CORNERS];
   static const ConcreteCorner* CC_CORNERS[NUM_CC_CORNERS];
-  
+
   static const ConcreteCorner* YELLOW_GOAL_CORNERS[NUM_YELLOW_GOAL_CORNERS];
   static const ConcreteCorner* BLUE_GOAL_CORNERS[NUM_BLUE_GOAL_CORNERS];
-  
+
   static const ConcreteCorner* YELLOW_ARC_CORNERS[NUM_YELLOW_ARC_CORNERS];
   static const ConcreteCorner* BLUE_ARC_CORNERS[NUM_BLUE_ARC_CORNERS];
 
@@ -174,13 +174,13 @@ class CornerOfField : public unary_function<const ConcreteCorner*, bool> {
  public:
 
   explicit CornerOfField() {}
-  bool operator() (const ConcreteCorner *c) const { 
-    return 
+  bool operator() (const ConcreteCorner *c) const {
+    return
       (c == &ConcreteCorner::blue_corner_left_l ||
        c == &ConcreteCorner::blue_corner_right_l ||
        c == &ConcreteCorner::yellow_corner_left_l ||
        c == &ConcreteCorner::yellow_corner_right_l);
-      
+
   }
 };
 
@@ -189,10 +189,10 @@ class InList : public unary_function<const ConcreteCorner*, bool> {
 
  public:
   explicit InList(const list<const ConcreteCorner *> &_possibilities) :
-  possibilities(_possibilities) { } 
+  possibilities(_possibilities) { }
 
   bool operator() (const ConcreteCorner *c) const {
-    
+
     // find will return possibilities.end() if c is not in the list.
     return find(possibilities.begin(), possibilities.end(), c) !=
       possibilities.end();

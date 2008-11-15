@@ -1,8 +1,8 @@
 #include "ConcreteCorner.h"
 
 
-ConcreteCorner::ConcreteCorner(const double _fieldX, const double _fieldY, 
-                               const cornerID _id) 
+ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
+                               const cornerID _id)
   : ConcreteLandmark(_fieldX, _fieldY) {
   id = _id;
 
@@ -10,7 +10,7 @@ ConcreteCorner::ConcreteCorner(const double _fieldX, const double _fieldY,
 }
 
 // Copy constructor - just pairwise copy the elements
-ConcreteCorner::ConcreteCorner(const ConcreteCorner& other) 
+ConcreteCorner::ConcreteCorner(const ConcreteCorner& other)
   : ConcreteLandmark(other) {
   id = other.id;
   cornerType = other.cornerType;
@@ -36,7 +36,7 @@ blue_corner_right_l(FIELD_WHITE_RIGHT_SIDELINE_X,
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_left_t(GOALBOX_LEFT_X,
-                 FIELD_WHITE_BOTTOM_SIDELINE_Y, 
+                 FIELD_WHITE_BOTTOM_SIDELINE_Y,
                  BLUE_GOAL_LEFT_T);
 
 const ConcreteCorner ConcreteCorner::
@@ -65,7 +65,7 @@ yellow_corner_right_l(FIELD_WHITE_LEFT_SIDELINE_X,
                       YELLOW_CORNER_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
-yellow_goal_left_t(GOALBOX_RIGHT_X, 
+yellow_goal_left_t(GOALBOX_RIGHT_X,
                    FIELD_WHITE_TOP_SIDELINE_Y,
                    YELLOW_GOAL_LEFT_T);
 
@@ -85,7 +85,7 @@ yellow_goal_right_l(GOALBOX_LEFT_X,
                     YELLOW_GOAL_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
-center_circle(MIDFIELD_X, 
+center_circle(MIDFIELD_X,
               MIDFIELD_Y,
               CENTER_CIRCLE);
 
@@ -99,7 +99,7 @@ center_yb_t(FIELD_WHITE_LEFT_SIDELINE_X,
             MIDFIELD_Y,
             CENTER_YB_T);
 
-const ConcreteCorner* ConcreteCorner::concreteCornerList[NUM_CORNERS] = 
+const ConcreteCorner* ConcreteCorner::concreteCornerList[NUM_CORNERS] =
   {&blue_corner_left_l,
    &blue_corner_right_l,
    &blue_goal_left_t,
@@ -229,7 +229,7 @@ const string ConcreteCorner::getShapeString(shape s) {
     return "Circle";
   case UNKNOWN:
     return "Unknown";
-  default: 
+  default:
     throw "Error, invalid shape";
   }
 
@@ -250,7 +250,7 @@ const string ConcreteCorner::toString() const {
     return "Blue Goal Left L";
   case BLUE_GOAL_RIGHT_L:
     return "Blue Goal Right L";
-    
+
     // Yellow ones
   case YELLOW_CORNER_RIGHT_L:
     return "Yellow Corner Right L";
@@ -270,15 +270,15 @@ const string ConcreteCorner::toString() const {
     return "Center YB T";
   case CENTER_BY_T:
     return "Center BY T";
-  case CENTER_CIRCLE: 
+  case CENTER_CIRCLE:
     return "Center Circle Corner";
- 
+
   default:
     return "Invalid Corner Id";
   }
 
 }
- 
+
 const shape ConcreteCorner::inferCornerType(const cornerID id) {
   switch (id) {
   case L_INNER_CORNER:

@@ -34,6 +34,11 @@ static const double FIELD_WHITE_LEFT_SIDELINE_X = GREEN_PAD_X;
 static const double FIELD_WHITE_RIGHT_SIDELINE_X = (FIELD_WHITE_WIDTH +
                                                     GREEN_PAD_X);
 
+static const double LANDMARK_RIGHT_BEACON_X = FIELD_GREEN_WIDTH - 5.;
+static const double LANDMARK_RIGHT_BEACON_Y = FIELD_GREEN_HEIGHT / 2.;
+static const double LANDMARK_LEFT_BEACON_X = 5.;
+static const double LANDMARK_LEFT_BEACON_Y = FIELD_GREEN_HEIGHT / 2.;
+
 // GOAL CONSTANTS
 // my left post is left of goalie defending my goal facing the opponent
 static const double LANDMARK_MY_GOAL_LEFT_POST_X = CENTER_FIELD_X - 70;

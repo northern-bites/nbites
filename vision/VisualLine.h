@@ -1,4 +1,4 @@
-#ifndef VisualLine__hpp 
+#ifndef VisualLine__hpp
 #define VisualLine__hpp
 
 #include <list>
@@ -19,19 +19,19 @@ enum ScanDirection {
 struct linePoint {
   int x; // x coordinate on the image screen
   int y; // y coordinate on the image screen
-  double lineWidth; // the width of the line where the point was found
-  double distance; // The distance pose estimates the point to be from robot's
+  float lineWidth; // the width of the line where the point was found
+  float distance; // The distance pose estimates the point to be from robot's
   // center
-  ScanDirection foundWithScan; 
+  ScanDirection foundWithScan;
 
-  linePoint (int _x = 0, int _y = 0, double _lineWidth = 0.0,
-             double _distance = 0.0,
+  linePoint (int _x = 0, int _y = 0, float _lineWidth = 0.0,
+             float _distance = 0.0,
              ScanDirection _scanFound = VERTICAL) :
-  x(_x), y(_y), lineWidth(_lineWidth), 
+  x(_x), y(_y), lineWidth(_lineWidth),
     distance(_distance), foundWithScan(_scanFound) {
   }
 
-  linePoint(const linePoint& l) : x(l.x), y(l.y), lineWidth(l.lineWidth), 
+  linePoint(const linePoint& l) : x(l.x), y(l.y), lineWidth(l.lineWidth),
     distance(l.distance),
     foundWithScan(l.foundWithScan) {
   }
@@ -48,14 +48,14 @@ struct linePoint {
     return
     x == secondLinePoint.x &&
     y == secondLinePoint.y &&
-    lineWidth == secondLinePoint.lineWidth && 
+    lineWidth == secondLinePoint.lineWidth &&
     distance == secondLinePoint.distance &&
     foundWithScan == secondLinePoint.foundWithScan;
   }
   bool operator!= (const linePoint &secondLinePoint) const {
     return !(*this == secondLinePoint);
   }
-  
+
 
     //  http://www.daniweb.com/forums/thread69005.html
   friend std::ostream& operator<< (std::ostream &o, const linePoint &c)
@@ -89,16 +89,16 @@ public:
   void setColorString(const string s) { colorStr = s; }
   void addPoints(const list <linePoint> &additionalPoints);
   void addPoints(const vector <linePoint> &additionalPoints);
-    
+
   static const linePoint DUMMY_LINEPOINT;
-  const double getSlope() const;
-  
+  const float getSlope() const;
+
   // Returns true if the line is more vertical on the screen than horizontal
   static const bool isVerticallyOriented(const VisualLine& line);
 
   static const bool isPerfectlyVertical(const VisualLine& line);
 
-  // Given a line, returns (a, b) where the line can be represented by 
+  // Given a line, returns (a, b) where the line can be represented by
   // ai + bj (i being the unit vector parallel to the x axis, j being
   // the unit vector parallel to the y axis).  Assumes that the line
   // is oriented left to right.
@@ -119,7 +119,7 @@ public:
   {
     return o << "start.x: " << l.start.x << " start.y: " << l.start.y
 	     << " end.x: " << l.end.x << " end.y: " << l.end.y;
-    /*     
+    /*
     << l.left << " " << l.right << " " << l.top << " " << l.bottom
     << l.angle << " " << l.a << " " << l.b << " " << l.length
     << " " << l.color << endl;
@@ -130,33 +130,33 @@ private: // Member functions
   void init();
   void calculateWidths();
 
-  static inline const double getLength(const VisualLine& line);
-  static inline const double getAngle(const VisualLine& line);
+  static inline const float getLength(const VisualLine& line);
+  static inline const float getAngle(const VisualLine& line);
 
-  
+
 
   // Use least squares to fit the line to the points
   // from http://www.efunda.com/math/leastsquares/lstsqr1dcurve.cfm
   // y = mx + b
   // returns a pair <m, b>
-  static pair <double, double> leastSquaresFit(const vector <linePoint> &thePoints);
+  static pair <float, float> leastSquaresFit(const vector <linePoint> &thePoints);
   // Using the points in the line, finds the line of best fit that corresponds
   // with those points.
-  static pair <double, double> leastSquaresFit(const VisualLine& l);
- 
+  static pair <float, float> leastSquaresFit(const VisualLine& l);
+
 public: // Member variables (public just for now)
   point <int> start, end;
   int left,right,bottom,top; // left, right x values, bottom, top y values
-  vector <linePoint> points; 
-  
-  double angle; // Angle from horizontal in degrees
+  vector <linePoint> points;
+
+  float angle; // Angle from horizontal in degrees
   // y = ax + b (a = slope, b = y-intercept)
-  double a, b; 
-  double length;
+  float a, b;
+  float length;
   int color; // Holds the color the line is being drawn as on the screen
   string colorStr;
 
-  double avgVerticalWidth, avgHorizontalWidth;
+  float avgVerticalWidth, avgHorizontalWidth;
   linePoint thinnestHorPoint, thickestHorPoint;
   linePoint thinnestVertPoint, thickestVertPoint;
 };

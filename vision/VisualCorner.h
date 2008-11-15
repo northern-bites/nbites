@@ -23,19 +23,19 @@ private: // Constants
   static const point <int> dogLocation;
 
  public:
-  VisualCorner(const int _x, const int _y, const double _distance,
-               const double _bearing,
-               const VisualLine l1, const VisualLine l2, const double _t1,
-               const double _t2);
+  VisualCorner(const int _x, const int _y, const float _distance,
+               const float _bearing,
+               const VisualLine l1, const VisualLine l2, const float _t1,
+               const float _t2);
   // destructor
   virtual ~VisualCorner();
   // copy constructor
   VisualCorner(const VisualCorner&);
-  
+
   friend std::ostream& operator<< (std::ostream &o, const VisualCorner &c)
   {
-    return o << setprecision(2) 
-             << "(" << c.getX() << "," << c.getY() << ") \tDistance: " 
+    return o << setprecision(2)
+             << "(" << c.getX() << "," << c.getY() << ") \tDistance: "
              << c.getDistance() << "\tBearing: " << c.getBearing()
              << "\tShape: " << ConcreteCorner::getShapeString(c.getShape());
   }
@@ -53,25 +53,25 @@ private: // Constants
 
 
   // See FieldLines.cc intersectLines to see how this is calculated and used
-  const double getT1() const { return t1; }
-  const double getT2() const { return t2; }
+  const float getT1() const { return t1; }
+  const float getT2() const { return t2; }
   const shape getShape() const { return cornerType; }
-  
-  
+
+
 
   // DO NOT USE THIS UNLESS getShape() returns inner or outer L; I have
   // not yet hooked up the angle thing for T corners
-  const double getAngleBetweenLines() const { return angleBetweenLines; }
+  const float getAngleBetweenLines() const { return angleBetweenLines; }
 
   ////////////////////////////////////////////////////////////
   // SETTERS
   ////////////////////////////////////////////////////////////
   void setPossibleCorners(list <const ConcreteCorner *> _possibleCorners) {
     possibleCorners = _possibleCorners; }
-  void setShape(const shape s) { cornerType = s; } 
+  void setShape(const shape s) { cornerType = s; }
   void setLine1(const VisualLine l1) { line1 = l1; }
   void setLine2(const VisualLine l2) { line2 = l2; }
-    
+
 private: // private methods
   void determineCornerShape(); // called on object instantiation
   const shape getLClassification();
@@ -81,22 +81,22 @@ private:
   // It will get set from within FieldLines.cc.
   list <const ConcreteCorner *> possibleCorners;
   shape cornerType;
-  
+
   VisualLine line1;
   VisualLine line2;
 
   // These indicate what distance the corner is from the startpoints of the
   // respective line (1 and 2).
-  double t1, t2;
+  float t1, t2;
 
    // Will not mean much unless the corner is actually a T
   VisualLine tBar;
   VisualLine tStem;
-  
+
   // The angle between the two lines whose intersection creates this corner.
   // In the case of a T corner, we report the smaller angle (the second
   // angle can be found by subtracting this angle from 180)
-  double angleBetweenLines; 
+  float angleBetweenLines;
 };
 
 // functor that checks if the shape of one corner equals the given shape
@@ -111,15 +111,15 @@ class LCornerNearEdgeOfScreen : public unary_function<VisualCorner, bool> {
   Rectangle edges;
   int minPixelSeparation;
  public:
-  explicit LCornerNearEdgeOfScreen(Rectangle _edges, int _pixels) : 
+  explicit LCornerNearEdgeOfScreen(Rectangle _edges, int _pixels) :
   edges(_edges), minPixelSeparation(_pixels) {}
-  bool operator() (const VisualCorner& c) const { 
+  bool operator() (const VisualCorner& c) const {
     int x = c.getX();
     int y = c.getY();
 
     // Must be an L..
     return (c.getShape() == INNER_L ||
-            c.getShape() == OUTER_L) && 
+            c.getShape() == OUTER_L) &&
       // Edges must match
       (abs(edges.left - x) < minPixelSeparation ||
        abs(edges.right - x) < minPixelSeparation ||

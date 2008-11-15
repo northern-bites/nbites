@@ -1,7 +1,7 @@
 #include "ConcreteLandmark.h"
 
-ConcreteLandmark::ConcreteLandmark(const double _fieldX,
-                                   const double _fieldY) :
+ConcreteLandmark::ConcreteLandmark(const float _fieldX,
+                                   const float _fieldY) :
   fieldX(_fieldX), fieldY(_fieldY) {
 }
 

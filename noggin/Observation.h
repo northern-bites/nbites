@@ -13,34 +13,62 @@ using namespace std;
 #include "ConcreteCorner.h"
 #include "ConcreteLine.h"
 
-// All possible observation IDs
-enum ObservationID
+// // All possible observation IDs
+// enum ObservationID
+// {
+//     // Blue goal
+//     BLUE_GOAL_LEFT_POST;
+//     BLUE_GOAL_RIGHT_POST;
+//     BLUE_GOAL_POST_UNCLER;
+
+//     // Yellow goal
+//     YELLOW_GOAL_LEFT_POST;
+//     YELLOW_GOAL_RIGHT_POST;
+//     YELLOW_GOAL_POST_UNCLER;
+
+//     // Line intersections
+
+//     // Lines
+// };
+
+// Structs
+
+/**
+ * Stores field location information about a concrete point landmark
+ */
+class PointLandmark
 {
-    // Blue goal
-    BLUE_GOAL_LEFT_POST;
-    BLUE_GOAL_RIGHT_POST;
-    BLUE_GOAL_POST_UNCLER;
-
-    // Yellow goal
-    YELLOW_GOAL_LEFT_POST;
-    YELLOW_GOAL_RIGHT_POST;
-    YELLOW_GOAL_POST_UNCLER;
-
-    // Line intersections
-
-    // Lines
+public:
+    float x;
+    float y;
 };
 
+/**
+ * Stores field location information about a concrete line landmark
+ */
+class LineLandmark : public Landmark
+{
+public:
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+};
+
+
+/**
+ * Class to hold the informations associated with the observation of a landmark
+ */
 class Observation
 {
 public:
     // Fields
-    vector< pair<double, double> > posibilities;
+    vector< pair<float, float> > posibilities;
 
     // Construcotrs & Destructors
-    Observation(FieldObject fo);
-    Observation(VisualCorner c);
-    Observation(VisualLine l);
+    Observation(FieldObject &_object);
+    Observation(VisualCorner &_corner);
+    Observation(VisualLine &_line);
     virtual ~Observation();
 
     // Core Functions
@@ -49,19 +77,19 @@ public:
     /**
      * @return The distance reported by the visual sighting
      */
-    double getVisDist() { return visDist; }
+    float getVisDist() { return visDist; }
     /*
      * @return The bearing reported by the visual sighting
      */
-    double getVisBearing() { return visBearing; }
+    float getVisBearing() { return visBearing; }
     /**
      * @return The standard deviation of the distance of the observation.
      */
-    double getDistSD() { return sigma_d; }
+    float getDistSD() { return sigma_d; }
     /*
      * @return The standard deviation of the bearing of the observation.
      */
-    double getBearingSD() { return sigma_b; }
+    float getBearingSD() { return sigma_b; }
 
     /*
      * @return The ID of the landmark, element of ObservationID enumeration.
@@ -74,29 +102,40 @@ public:
     /*
      * @return The x value of the landmark on the playing field.
      */
-    double getX() { return x; }
+    float getX() { return x; }
     /*
      * @return The y value of the landmark on the playing field.
      */
-    double getY() { return y; }
+    float getY() { return y; }
 
-    bool isLine();
+    /*
+     * @return true if the observed object is a line
+     */
+    bool isLine() { return line_truth; }
+
+    /*
+     * @return The number of possibilities for the landmark
+     */
+    unsigned int getNumPossibilities() { return numPossibilities; }
 
     // Setters
 
 private:
     // Vision information
-    double visDist;
-    double visBearing;
-    double sigma_d;
-    double sigma_b;
+    float visDist;
+    float visBearing;
+    float sigma_d;
+    float sigma_b;
 
     // Identity information
     int id;
     bool ambiguous;
-    double x;
-    double y;
-    double slope;
-    vector<Landmark> possibilities;
+    float x;
+    float y;
+    float slope;
+    bool line_truth;
+    vector<LineLandmark> linePossibilities;
+    vector<PointLandmark> pointPossibilities;
+    unsigned int numPossibilities;
 };
 #endif // _Observation_h_DEFINED

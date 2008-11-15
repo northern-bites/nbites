@@ -6,18 +6,18 @@ using namespace std;
 
 class ConcreteLandmark {
 public:
-  ConcreteLandmark(const double _fieldX, const double _fieldY);
+  ConcreteLandmark(const float _fieldX, const float _fieldY);
   ConcreteLandmark(const ConcreteLandmark& other);
   virtual ~ConcreteLandmark();
-  
+
   virtual const string toString() const = 0;
-  
-  const double getFieldX() const { return fieldX; }
-  const double getFieldY() const { return fieldY; }
+
+  const float getFieldX() const { return fieldX; }
+  const float getFieldY() const { return fieldY; }
 
 private:
-  //  point <const double> fieldLocation;
-  const double fieldX, fieldY;
+  //  point <const float> fieldLocation;
+  const float fieldX, fieldY;
 };
 
 #endif

@@ -22,8 +22,8 @@ MCL::MCL()
         x_m.x = float(rand() % int(FIELD_WIDTH));
         // Y bounded by height of the field
         x_m.y = float(rand() % int(FIELD_HEIGHT));
-        // H between +-180
-        x_m.h = float((rand() % 360)-180);
+        // H between +-pi
+        x_m.h = float((rand() % 2.*M_PI) - M_PI);
         p_m.pose = x_m;
         p_m.weight = 1;
         X_t.push_back(x_m);
@@ -129,11 +129,11 @@ float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
 
         // Loop through all possible landmarks
         // If the observation is distinct, there will only be one possibility
-        for (unsigned int j = 0; j < z_t[i].possibilities.size(); ++j) {
+        for (unsigned int j = 0; j < z_t[i].getNumPossibilities(); ++j) {
             if (z_t[i].isLine()) {
-                p = determineLineWeight(z_t[i], x_t, z_t.possibilities[j]);
+                p = determineLineWeight(z_t[i],x_t,z_t.linePossibilities[j]);
             } else {
-                p = determinePointWeight(z_t[i], x_t, z_t.possibilities[j]);
+                p = determinePointWeight(z_t[i],x_t,z_t.pointPossibilities[j]);
             }
 
             if( p > pMax) {
@@ -203,7 +203,7 @@ void MCL::updateEstimates()
  * @param l    the landmark to be used as basis for the observation
  * @return     the probability of the observation
  */
-float MCL::determinePointWeight(Observation z, PoseEst x_t, Landmark l)
+float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
 {
     // Expected dist and bearing
     float d_hat;
@@ -213,11 +213,10 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, Landmark l)
     float r_a;
 
     // Determine expected distance to the landmark
-    d_hat = sqrt( pow(z.getX() - x_t.x, 2) +
-                  pow(z.getY() - x_t.y, 2));
+    d_hat = sqrt( pow(landmark.x - x_t.x, 2) +
+                  pow(landmark.y - x_t.y, 2));
     // Expected bearing
-    a_hat = sub180Angle( atan2(z.getY() - x_t.y, z.getX() - x_t.x) *
-                         RAD_TO_DEG - 90.0 - x_t.h);
+    a_hat = atan2(landmark.y - x_t.y, landmark.x - x_t.x) - x_t.h;
     // Calculate residuals
     r_d = z.getVisDist() - d_hat;
     r_a = z.getVisBearing() - a_hat;
@@ -233,7 +232,7 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, Landmark l)
  * @param l    the landmark to be used as basis for the observation
  * @return     the probability of the observation
  */
-float MCL::determineLineWeight(Observation z, PoseEst x_t, LocLandmark l)
+float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
 {
     // Distance and bearing for expected point
     float d_hat;
@@ -302,8 +301,8 @@ float MCL::getSimilarity(float r_d, float r_a, float sigma_d,
 
     // Calculate the similarity of the observation and expectation
     // Takes the form e^(-r_d^2/SD(d)^2)
-    s_d = exp(-pow(r_d,2) / pow(sigma_d, 2));
-    s_a = exp(-pow(r_a,2) / pow(sigma_a, 2));
+    s_d = exp(-(r_d*r_d) / (sigma_d*sigma_d));
+    s_a = exp(-(r_a*r_a) / (sigma_a*sigma_a));
 
     // Update the weight of the particle
     // We multiple the weight till now with the combined probability of

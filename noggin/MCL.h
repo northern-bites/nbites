@@ -48,11 +48,11 @@ public:
 };
 
 // Math Macros
-#define DEG_TO_RAD (2. * PI) / 360.
-#define RAD_TO_DEG 360. / (2. * PI)
+#define DEG_TO_RAD (2. * M_PI) / 360.
+#define RAD_TO_DEG 360. / (2. * M_PI)
 
 // Constants
-static const int M = 1000; // Number of particles
+static const int M = 100; // Number of particles
 
 // The Monte Carlo Localization class
 class MCL
@@ -77,9 +77,14 @@ public:
     float getYEst() { return curEst.y;}
 
     /**
-     * @return The current heading esitamte of the robot
+     * @return The current heading esitamte of the robot in radians
      */
     float getHEst() { return curEst.h;}
+
+    /**
+     * @return The current heading esitamte of the robot in degrees
+     */
+    float getHEstDeg() { return curEst.h * RAD_TO_DEG;}
 
     /**
      * @return The uncertainty associated with the x estimate of the robot.
@@ -95,6 +100,11 @@ public:
      * @return The uncertainty associated with the robot's heading estimate.
      */
     float getHUncert() { return curUncert.h;}
+
+    /**
+     * @return The uncertainty associated with the robot's heading estimate.
+     */
+    float getHUncertDeg() { return curUncert.h * RAD_TO_DEG;}
 
     // Setters
     /**
@@ -135,13 +145,12 @@ private:
 
     // Core Functions
     PoseEst updateOdometery(MotionModel u_t, PoseEst x_t);
-    float updateMeasurementModel(vector<Observation> z_t, PoseEst x_t,
-                                 int m);
+    float updateMeasurementModel(vector<Observation> z_t, PoseEst x_t);
     void updateEstimates();
 
     // Helpers
-    float determinePointWeight(Observation z, PoseEst x_t, LocLandmark l);
-    float determineLineWeight(Observation z, PoseEst x_t, LocLandmark l);
+    float determinePointWeight(Observation z, PoseEst x_t, point landmark);
+    float determineLineWeight(Observation z, PoseEst x_t, line _line);
     float getSimilarity(float r_d, float r_a, float z);
 };
 
