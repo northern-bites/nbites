@@ -1,8 +1,13 @@
 package edu.bowdoin.robocup.TOOL.WorldController;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.StringTokenizer;
 import java.awt.FileDialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -58,8 +63,26 @@ public class LogHandler
     public final static int NUM_LOG_LOC_INDEXES = 23;
 
     // MCL Indices
+    // Raw data stuff
     public final static int MCL_TEAM_COLOR_INDEX = 0;
     public final static int MCL_PLAYER_NUM_INDEX = 1;
+    public final static int MCL_MY_X_INDEX = 2;
+    public final static int MCL_MY_Y_INDEX = 3;
+    public final static int MCL_MY_H_INDEX = 4;
+    public final static int MCL_UNCERT_X_INDEX = 5;
+    public final static int MCL_UNCERT_Y_INDEX = 6;
+    public final static int MCL_UNCERT_H_INDEX = 7;
+    public final static int MCL_BALL_X_INDEX = 8;
+    public final static int MCL_BALL_Y_INDEX = 9;
+    public final static int MCL_BALL_UNCERT_X_INDEX = 10;
+    public final static int MCL_BALL_UNCERT_Y_INDEX = 11;
+    public final static int MCL_BALL_VELOCITY_X_INDEX = 12;
+    public final static int MCL_BALL_VELOCITY_Y_INDEX = 13;
+    public final static int MCL_BALL_VELOCITY_UNCERT_X_INDEX = 14;
+    public final static int MCL_BALL_VELOCITY_UNCERT_Y_INDEX = 15;
+    public final static int MCL_ODO_X_INDEX = 16;
+    public final static int MCL_ODO_Y_INDEX = 17;
+    public final static int MCL_ODO_H_INDEX = 18;
 
     // log strings
     public static final String LOG_DEBUG_STRING = "debug:";
@@ -404,7 +427,8 @@ public class LogHandler
        	return loadLog(System.getProperty("user.dir").concat(LOG_OUT_FILE));
     }
 
-    public boolean loadLog(String fileName) {
+    public boolean loadLog(String fileName)
+    {
 
         BufferedReader file_input = null;
 
@@ -476,18 +500,13 @@ public class LogHandler
     }
 
     // parses line of text from log
-    public void parseLogLine(String log_line) {
-        System.out.println("\n----------New frame----------\n");
+    public void parseLogLine(String log_line)
+    {
+        //System.out.println("\n----------New frame----------\n");
         // splits line into an array of string
         String[] current_frame = log_line.split(" ");
         // gets length
         int log_length = current_frame.length;
-
-        // experimental
-        //for (int i = 0; i < log_length; i++) {
-        //    Double value = new Double(current_frame[i]);
-        //    debugViewer.setLabel(i,value);
-        //}
 
         Integer color = new Integer(current_frame[TEAM_COLOR_INDEX]);
         team_color = color.intValue();
@@ -512,8 +531,6 @@ public class LogHandler
             new Double(current_frame[BALL_VELOCITY_UNCERT_X_INDEX]);
         ball_velocity_uncert_y =
             new Double(current_frame[BALL_VELOCITY_UNCERT_Y_INDEX]);
-        ball_dist = new Double(current_frame[BALL_DIST_INDEX]);
-        ball_bearing = new Double(current_frame[BALL_BEARING_INDEX]);
         odo_x = new Double(current_frame[ODO_X_INDEX]);
         odo_y = new Double(current_frame[ODO_Y_INDEX]);
         odo_h = new Double(current_frame[ODO_H_INDEX]);
@@ -531,9 +548,9 @@ public class LogHandler
         debugViewer.ballUncertY.setText("" + ball_uncert_y);
         debugViewer.ballVelX.setText("" + ball_velocity_x);
         debugViewer.ballVelY.setText("" + ball_velocity_y);
-        double absBallVelocity = Math.sqrt(
-                                           Math.pow(ball_velocity_x.doubleValue(),2.0)
-                                           + Math.pow(ball_velocity_y.doubleValue(),2.0));
+        double absBallVelocity =
+            Math.sqrt( Math.pow(ball_velocity_x.doubleValue(),2.0)
+                       + Math.pow(ball_velocity_y.doubleValue(),2.0));
 	    debugViewer.ballVelAbs.setText("" + absBallVelocity);
         debugViewer.ballVelUncertX.setText("" + ball_velocity_uncert_x);
         debugViewer.ballVelUncertY.setText("" + ball_velocity_uncert_y);
@@ -571,7 +588,8 @@ public class LogHandler
 
     }
 
-    public void parseCameraLine(String camera_line) {
+    public void parseCameraLine(String camera_line)
+    {
         String[] current_frame = camera_line.split(" ");
         Double camera_thinks_x = new Double(current_frame[MY_X_INDEX]);
         Double camera_thinks_y = new Double(current_frame[MY_Y_INDEX]);
@@ -592,7 +610,8 @@ public class LogHandler
     public void setLogMarker(int mark) { log_marker = mark; }
     public int getLogMarker() { return log_marker; }
     public boolean getPaused() { return !playTimer.isRunning(); }
-    public void setPlaybackFps(int fps) {
+    public void setPlaybackFps(int fps)
+    {
         playTimer.setDelay((int)1000./fps);
     }
 
@@ -684,9 +703,6 @@ public class LogHandler
         Vector< MCLParticle > particles = new Vector<MCLParticle>();
         String[] lineValues = line.split(" ");
 
-        // Strip the team color and player number from the front of the line
-        team_color = Integer.parseInt(lineValues[MCL_TEAM_COLOR_INDEX]);
-        player_number = Integer.parseInt(lineValues[MCL_PLAYER_NUM_INDEX]);
         // Pull off the data 4 items at a time for each particle
         // The items are (x,y,h,weight)
         for(int i = 2; i < lineValues.length; i += 4) {
@@ -700,10 +716,17 @@ public class LogHandler
 
     /**
      * View the current frame from the log...
+     * MCL Log lines contain three groups of data separated by colons (:)
+     * The first group of information is information about the particles
      */
     public void viewFromMCLLog()
     {
+        // Method variables
         Vector< MCLParticle> particles;
+        String particleInfo, debugInfo, landmarkInfo;
+        StringTokenizer t;
+
+        // Make sure the line is not blank
         if (log_strings.size() > 0) {
             // set frame total in the log box
             logBox.frameTotal.setText("" + log_num_frames);
@@ -716,14 +739,134 @@ public class LogHandler
             // checks log_strings if current frame exists
             if (log_strings != null && log_marker < log_strings.size()) {
 
-                // Update the debug viewer
+                // Split the log at the :
+                t = new StringTokenizer(log_strings.get(log_marker),":");
 
                 // Paint the particles on the screen
-                particles = parseParticleLine(log_strings.get(log_marker));
+                particleInfo = t.nextToken();
+                particles = parseParticleLine(particleInfo);
+
+                // Update the debug viewer
+                debugInfo = t.nextToken();
+                processDebugInfo(debugInfo);
+
+                // Update the observed landarmks information
+                // Check if any landmarks were sighted this frame
+                if (t.hasMoreTokens()) {
+                    landmarkInfo = t.nextToken();
+                    processObservedLandmarkInfo(landmarkInfo);
+                }
+
+                // Update the screen view
                 painter.updateParticleSet(particles, team_color, player_number);
                 painter.reportEndFrame();
             }
         }
+    }
+
+    /**
+     * Method to print data to the debug viewer from an MCL log file
+     *
+     * @param newInfos The newest set of sensor info to display
+     */
+    private void processDebugInfo(String newInfos)
+    {
+        String[] updateInfos = newInfos.split(" ");
+        Double ball_velocity_x, ball_velocity_y;
+        // Strip the team color and player number from the front of the line
+        team_color = Integer.parseInt(updateInfos[MCL_TEAM_COLOR_INDEX]);
+        player_number = Integer.parseInt(updateInfos[MCL_PLAYER_NUM_INDEX]);
+        // Do boring converting from strings to appropriate types...
+        // put all the loc values into debugViewer
+        debugViewer.myX.setText(updateInfos[MCL_MY_X_INDEX]);
+        debugViewer.myY.setText(updateInfos[MCL_MY_Y_INDEX]);
+        debugViewer.myH.setText(updateInfos[MCL_MY_H_INDEX]);
+        debugViewer.myUncertX.setText(updateInfos[MCL_UNCERT_X_INDEX]);
+        debugViewer.myUncertY.setText(updateInfos[MCL_UNCERT_Y_INDEX]);
+        debugViewer.myUncertH.setText(updateInfos[MCL_UNCERT_H_INDEX]);
+        debugViewer.ballX.setText(updateInfos[MCL_BALL_X_INDEX]);
+        debugViewer.ballY.setText(updateInfos[MCL_BALL_Y_INDEX]);
+        debugViewer.ballUncertX.setText(updateInfos[MCL_BALL_UNCERT_X_INDEX]);
+        debugViewer.ballUncertY.setText(updateInfos[MCL_BALL_UNCERT_Y_INDEX]);
+        ball_velocity_x = new Double(updateInfos[MCL_BALL_VELOCITY_X_INDEX]);
+        ball_velocity_y = new Double(updateInfos[MCL_BALL_VELOCITY_Y_INDEX]);
+        debugViewer.ballVelX.setText(ball_velocity_x.toString());
+        debugViewer.ballVelY.setText(ball_velocity_y.toString());
+        double absBallVelocity =
+            Math.sqrt( Math.pow(ball_velocity_x.doubleValue(),2.0)
+                       + Math.pow(ball_velocity_y.doubleValue(),2.0));
+	    debugViewer.ballVelAbs.setText(""+absBallVelocity);
+        debugViewer.ballVelUncertX.
+            setText(updateInfos[MCL_BALL_VELOCITY_UNCERT_X_INDEX]);
+        debugViewer.ballVelUncertY.
+            setText(updateInfos[MCL_BALL_VELOCITY_UNCERT_Y_INDEX]);
+        debugViewer.odoX.setText(updateInfos[MCL_ODO_X_INDEX]);
+        debugViewer.odoY.setText(updateInfos[MCL_ODO_Y_INDEX]);
+        debugViewer.odoH.setText(updateInfos[MCL_ODO_H_INDEX]);
+    }
+
+    /**
+     * Method to print data to the debug viewer about sighted landmarks
+     * Circles reported landmarks on the field
+     *
+     * @param newInfos The newest set of sensor info to display
+     */
+    private void processObservedLandmarkInfo(String newInfos)
+    {
+        // Get info into an array
+        String[] infos = newInfos.split(" ");
+
+        if (debugViewer.getNumLandmarks() > 0)
+            debugViewer.removeLandmarks();
+
+        // Iterate through the landmark IDs getting the correct ones
+        for(int i = 0; i < infos.length; i++) {
+            int ID = Integer.parseInt(infos[i]);
+            float dist = Float.parseFloat(infos[i++]);
+            float bearing = Float.parseFloat(infos[i++]);
+
+            // Write sighted landmarks to the debug viewer
+            debugViewer.addLandmark(ID,dist,bearing);
+            // Circle observed landmarks on the field
+            decodeAndDisplayLandmark(ID);
+        }
+    }
+
+
+    /**
+     * Method to decode a landmark ID to (x,y) coordinates and highlight
+     * the landmark appropriately on the screen
+     * draws solid circles around distinct landmarks
+     * draws dashed circles arond all ambigious observation possibilities
+     *
+     * @param ID the ID of the landmark to be drawn
+
+     */
+    private void decodeAndDisplayLandmark(int ID)
+    {
+        // Determine the type of landmark and draw it
+        if (ID < debugViewer.BALL_ID) { // We have a distinct landmark
+            painter.sawLandmark(debugViewer.LANDMARK_X[ID],
+                                debugViewer.LANDMARK_Y[ID],
+                                0);
+        } else if (ID > debugViewer.BALL_ID) { // We have an ambigious landmark
+            // get the list of possible landmarks
+            for (int pos_id : getPossibleIDs(ID)) {
+                painter.sawLandmark(debugViewer.LANDMARK_X[pos_id],
+                                    debugViewer.LANDMARK_Y[pos_id],
+                                    1);
+            }
+        } else { // We Have a ball ignore...
+        }
+    }
+
+    /**
+     * @return A list of possible distinct lanmdark IDs for the
+     * ambigious landmark ID passed in
+     */
+    private int[] getPossibleIDs(int ID)
+    {
+        return new int[0];
     }
 
     /**
@@ -739,5 +882,4 @@ public class LogHandler
                                   player_number);
         painter.reportEndFrame();
     }
-
 }

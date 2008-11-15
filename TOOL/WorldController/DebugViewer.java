@@ -21,9 +21,9 @@ public class DebugViewer extends JFrame {
     public static final String FRAME_STRING = "Frame:";
     public static final String OUT_OF_STRING = "of";
     public static final String
-	MY_ESTIMATES_STRING = "-----MY LOC ESTIMATES-----";
+        MY_ESTIMATES_STRING = "-----MY LOC ESTIMATES-----";
     public static final String
-	BALL_ESTIMATES_STRING = "-----BALL ESTIMATES-----";
+        BALL_ESTIMATES_STRING = "-----BALL ESTIMATES-----";
     public static final String LANDMARKS_STRING = "-----LANDMARKS-----";
     public static final String MY_XYH_STRING = "X,Y,H:";
     public static final String UNCERT_XYH_STRING = "Uncert X,Y,H:";
@@ -42,30 +42,59 @@ public class DebugViewer extends JFrame {
     public static final String ODO_Y_CHANGE_STRING = "Odo Y:";
     public static final String ODO_H_CHANGE_STRING = "Odo H:";
     public static final String
-	LANDMARK_STUFF_STRING = "ID  :  Dist  /  Bearing";
+        LANDMARK_STUFF_STRING = "ID  :  Dist  /  Bearing";
 
     // landmark string array
     public final static String[] LANDMARKS = {"My Goal Left Post",
-					      "My Goal Right Post",
-					      "Opp Goal Left Post",
-					      "Opp Goal Right Post",
-					      "Left Beacon",
-					      "Right Beacon",
-					      "Ball",
-					      "My Corner Left L",
-					      "My Corner Right L",
-					      "My Goal Left T",
-					      "My Goal Right T",
-					      "My Goal Left L",
-					      "My Goal Right L",
-					      "Center Left T",
-					      "Center Right T",
-					      "Opp Corner Left L",
-					      "Opp Corner Right L",
-					      "Opp Goal Left T",
-					      "Opp Goal Right T",
-					      "Opp Goal Left L",
-					      "Opp Goal Right L"};
+                                              "My Goal Right Post",
+                                              "Opp Goal Left Post",
+                                              "Opp Goal Right Post",
+                                              "Left Beacon",
+                                              "Right Beacon",
+                                              "Ball",
+                                              "My Corner Left L",
+                                              "My Corner Right L",
+                                              "My Goal Left T",
+                                              "My Goal Right T",
+                                              "My Goal Left L",
+                                              "My Goal Right L",
+                                              "Center Left T",
+                                              "Center Right T",
+                                              "Opp Corner Left L",
+                                              "Opp Corner Right L",
+                                              "Opp Goal Left T",
+                                              "Opp Goal Right T",
+                                              "Opp Goal Left L",
+                                              "Opp Goal Right L"};
+
+    // Here we assume top is yellow, bottom is blue
+    // Left is left with yellow at top
+    // Left of a goal is left side looking through the back of the goal
+    public final static String[] LANDMARK_TAG = {"Blue Goal Left Post",
+                                                 "Blue Goal Right Post",
+                                                 "Yellow Goal Left Post",
+                                                 "Yellow Goal Right Post",
+                                                 "Blue Corner Left L",
+                                                 "Blue Corner Right L",
+                                                 "Blue Goal Left T",
+                                                 "Blue Goal Right T",
+                                                 "Blue Goal Left L",
+                                                 "Blue Goal Right L",
+                                                 "Center Left T",
+                                                 "Center Right T",
+                                                 "Yellow Corner Left L",
+                                                 "Yellow Corner Right L",
+                                                 "Yellow Goal Left T",
+                                                 "Yellow Goal Right T",
+                                                 "Yellow Goal Left L",
+                                                 "Yellow Goal Right L",
+                                                 "Ball",
+                                                 "Ambigious L",
+                                                 "Ambigious T"};
+    public int[] LANDMARK_X;
+    public int[] LANDMARK_Y;
+    public final static int BALL_ID = 18;
+
     // takes a Point and maps it to a string
     public HashMap <Point2D.Double,String> cornerMap;
 
@@ -145,204 +174,247 @@ public class DebugViewer extends JFrame {
     private int num_landmarks;
 
     public DebugViewer(WorldController _wc, int x, int y) {
-	super("Debug Viewer");
+        super("Debug Viewer");
 
-	// local copy of the WorldController instance
-	wc = _wc;
+        // local copy of the WorldController instance
+        wc = _wc;
 
-	JFrame.setDefaultLookAndFeelDecorated(true);
+        JFrame.setDefaultLookAndFeelDecorated(true);
 
-	setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
-	window = getContentPane();
-	num_landmarks = 0;
-	landmark_components = new Component[10];
+        window = getContentPane();
+        num_landmarks = 0;
+        landmark_components = new Component[10];
 
         cornerMap = new HashMap<Point2D.Double,String>();
 
-	// frame number
+        // frame number
 
         frameLabel1 = new JLabel(FRAME_STRING, JLabel.CENTER);
-	frameLabel2 = new JLabel(OUT_OF_STRING, JLabel.CENTER);
-	frameNumber = new JLabel("1", JLabel.CENTER);
-	frameTotal = new JLabel("1", JLabel.CENTER);
+        frameLabel2 = new JLabel(OUT_OF_STRING, JLabel.CENTER);
+        frameNumber = new JLabel("1", JLabel.CENTER);
+        frameTotal = new JLabel("1", JLabel.CENTER);
        	framePanel = new JPanel();
-	framePanel.add(frameLabel1);
-	framePanel.add(frameNumber);
-	framePanel.add(frameLabel2);
-	framePanel.add(frameTotal);
+        framePanel.add(frameLabel1);
+        framePanel.add(frameNumber);
+        framePanel.add(frameLabel2);
+        framePanel.add(frameTotal);
 
-	// estimates label
-	myEstimatesLabel = new JLabel(MY_ESTIMATES_STRING, JLabel.CENTER);
-	myEstimatesPanel = new JPanel();
-	myEstimatesPanel.add(myEstimatesLabel);
-	myEstimatesPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        // estimates label
+        myEstimatesLabel = new JLabel(MY_ESTIMATES_STRING, JLabel.CENTER);
+        myEstimatesPanel = new JPanel();
+        myEstimatesPanel.add(myEstimatesLabel);
+        myEstimatesPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	// ball estimates label
-	ballEstimatesLabel = new JLabel(BALL_ESTIMATES_STRING, JLabel.CENTER);
-	ballEstimatesPanel = new JPanel();
-	ballEstimatesPanel.add(ballEstimatesLabel);
-	ballEstimatesPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        // ball estimates label
+        ballEstimatesLabel = new JLabel(BALL_ESTIMATES_STRING, JLabel.CENTER);
+        ballEstimatesPanel = new JPanel();
+        ballEstimatesPanel.add(ballEstimatesLabel);
+        ballEstimatesPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	// landmarks label
-	landmarksLabel = new JLabel(LANDMARKS_STRING, JLabel.CENTER);
-	landmarksPanel = new JPanel();
-	landmarksPanel.add(landmarksLabel);
-	landmarksPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        // landmarks label
+        landmarksLabel = new JLabel(LANDMARKS_STRING, JLabel.CENTER);
+        landmarksPanel = new JPanel();
+        landmarksPanel.add(landmarksLabel);
+        landmarksPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	landmarkStuffLabel = new JLabel(LANDMARK_STUFF_STRING, JLabel.CENTER);
-	landmarkStuffPanel = new JPanel();
-	landmarkStuffPanel.add(landmarkStuffLabel);
-	landmarkStuffPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        landmarkStuffLabel = new JLabel(LANDMARK_STUFF_STRING, JLabel.CENTER);
+        landmarkStuffPanel = new JPanel();
+        landmarkStuffPanel.add(landmarkStuffLabel);
+        landmarkStuffPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	// my estimates
-	myXYHLabel = new JLabel(MY_XYH_STRING, JLabel.CENTER);
-	myX = new JLabel("0", JLabel.CENTER);
-	myY = new JLabel("0", JLabel.CENTER);
-	myH = new JLabel("0", JLabel.CENTER);
-	myXYHPanel = new JPanel();
-	myXYHPanel.add(myXYHLabel);
-	myXYHPanel.add(myX);
-	myXYHPanel.add(myY);
-	myXYHPanel.add(myH);
-	myXYHPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        // my estimates
+        myXYHLabel = new JLabel(MY_XYH_STRING, JLabel.CENTER);
+        myX = new JLabel("0", JLabel.CENTER);
+        myY = new JLabel("0", JLabel.CENTER);
+        myH = new JLabel("0", JLabel.CENTER);
+        myXYHPanel = new JPanel();
+        myXYHPanel.add(myXYHLabel);
+        myXYHPanel.add(myX);
+        myXYHPanel.add(myY);
+        myXYHPanel.add(myH);
+        myXYHPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	// my uncertainty estimates
-	myUncertXYHLabel = new JLabel(UNCERT_XYH_STRING, JLabel.CENTER);
-	myUncertX = new JLabel("0", JLabel.CENTER);
-	myUncertY = new JLabel("0", JLabel.CENTER);
-	myUncertH = new JLabel("0", JLabel.CENTER);
-	myUncertXYHPanel = new JPanel();
-	myUncertXYHPanel.add(myUncertXYHLabel);
-	myUncertXYHPanel.add(myUncertX);
-	myUncertXYHPanel.add(myUncertY);
-	myUncertXYHPanel.add(myUncertH);
-	myUncertXYHPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        // my uncertainty estimates
+        myUncertXYHLabel = new JLabel(UNCERT_XYH_STRING, JLabel.CENTER);
+        myUncertX = new JLabel("0", JLabel.CENTER);
+        myUncertY = new JLabel("0", JLabel.CENTER);
+        myUncertH = new JLabel("0", JLabel.CENTER);
+        myUncertXYHPanel = new JPanel();
+        myUncertXYHPanel.add(myUncertXYHLabel);
+        myUncertXYHPanel.add(myUncertX);
+        myUncertXYHPanel.add(myUncertY);
+        myUncertXYHPanel.add(myUncertH);
+        myUncertXYHPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	// odometry estimate initializations
-	odoXYHLabel = new JLabel(ODO_XYH_CHANGE_STRING, JLabel.CENTER);
-	odoX = new JLabel("0", JLabel.CENTER);
-	odoY = new JLabel("0", JLabel.CENTER);
-	odoH = new JLabel("0", JLabel.CENTER);
-	odoXYHPanel = new JPanel();
-	odoXYHPanel.add(odoXYHLabel);
-	odoXYHPanel.add(odoX);
-	odoXYHPanel.add(odoY);
-	odoXYHPanel.add(odoH);
+        // odometry estimate initializations
+        odoXYHLabel = new JLabel(ODO_XYH_CHANGE_STRING, JLabel.CENTER);
+        odoX = new JLabel("0", JLabel.CENTER);
+        odoY = new JLabel("0", JLabel.CENTER);
+        odoH = new JLabel("0", JLabel.CENTER);
+        odoXYHPanel = new JPanel();
+        odoXYHPanel.add(odoXYHLabel);
+        odoXYHPanel.add(odoX);
+        odoXYHPanel.add(odoY);
+        odoXYHPanel.add(odoH);
 
-	ballXLabel = new JLabel(BALL_X_STRING, JLabel.CENTER);
-	ballX = new JLabel("0", JLabel.CENTER);
-	ballYLabel = new JLabel(BALL_Y_STRING, JLabel.CENTER);
-	ballY = new JLabel("0", JLabel.CENTER);
-	ballXYPanel = new JPanel();
-	ballXYPanel.add(ballXLabel);
-	ballXYPanel.add(ballX);
-	ballXYPanel.add(ballYLabel);
-	ballXYPanel.add(ballY);
-	ballXYPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        ballXLabel = new JLabel(BALL_X_STRING, JLabel.CENTER);
+        ballX = new JLabel("0", JLabel.CENTER);
+        ballYLabel = new JLabel(BALL_Y_STRING, JLabel.CENTER);
+        ballY = new JLabel("0", JLabel.CENTER);
+        ballXYPanel = new JPanel();
+        ballXYPanel.add(ballXLabel);
+        ballXYPanel.add(ballX);
+        ballXYPanel.add(ballYLabel);
+        ballXYPanel.add(ballY);
+        ballXYPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	ballUncertXLabel = new JLabel(BALL_UNCERT_X_STRING, JLabel.CENTER);
-	ballUncertX = new JLabel("0", JLabel.CENTER);
-	ballUncertYLabel = new JLabel(BALL_UNCERT_Y_STRING, JLabel.CENTER);
-	ballUncertY = new JLabel("0", JLabel.CENTER);
-	ballUncertPanel = new JPanel();
-	ballUncertPanel.add(ballUncertXLabel);
-	ballUncertPanel.add(ballUncertX);
-	ballUncertPanel.add(ballUncertYLabel);
-	ballUncertPanel.add(ballUncertY);
-	ballUncertPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        ballUncertXLabel = new JLabel(BALL_UNCERT_X_STRING, JLabel.CENTER);
+        ballUncertX = new JLabel("0", JLabel.CENTER);
+        ballUncertYLabel = new JLabel(BALL_UNCERT_Y_STRING, JLabel.CENTER);
+        ballUncertY = new JLabel("0", JLabel.CENTER);
+        ballUncertPanel = new JPanel();
+        ballUncertPanel.add(ballUncertXLabel);
+        ballUncertPanel.add(ballUncertX);
+        ballUncertPanel.add(ballUncertYLabel);
+        ballUncertPanel.add(ballUncertY);
+        ballUncertPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	ballVelXLabel = new JLabel(BALL_VEL_X_STRING, JLabel.CENTER);
-	ballVelX = new JLabel("0", JLabel.CENTER);
-	ballVelYLabel = new JLabel(BALL_VEL_Y_STRING, JLabel.CENTER);
-	ballVelY = new JLabel("0", JLabel.CENTER);
-	ballVelPanel = new JPanel();
-	ballVelPanel.add(ballVelXLabel);
-	ballVelPanel.add(ballVelX);
-	ballVelPanel.add(ballVelYLabel);
-	ballVelPanel.add(ballVelY);
-	ballVelPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        ballVelXLabel = new JLabel(BALL_VEL_X_STRING, JLabel.CENTER);
+        ballVelX = new JLabel("0", JLabel.CENTER);
+        ballVelYLabel = new JLabel(BALL_VEL_Y_STRING, JLabel.CENTER);
+        ballVelY = new JLabel("0", JLabel.CENTER);
+        ballVelPanel = new JPanel();
+        ballVelPanel.add(ballVelXLabel);
+        ballVelPanel.add(ballVelX);
+        ballVelPanel.add(ballVelYLabel);
+        ballVelPanel.add(ballVelY);
+        ballVelPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	// Add something to show absolute velocity
-	ballVelAbsLabel = new JLabel(BALL_VEL_ABS_STRING, JLabel.CENTER);
-	ballVelAbs = new JLabel("0", JLabel.CENTER);
-	ballVelAbsPanel = new JPanel();
-	ballVelAbsPanel.add(ballVelAbsLabel);
-	ballVelAbsPanel.add(ballVelAbs);
-	ballVelPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        // Add something to show absolute velocity
+        ballVelAbsLabel = new JLabel(BALL_VEL_ABS_STRING, JLabel.CENTER);
+        ballVelAbs = new JLabel("0", JLabel.CENTER);
+        ballVelAbsPanel = new JPanel();
+        ballVelAbsPanel.add(ballVelAbsLabel);
+        ballVelAbsPanel.add(ballVelAbs);
+        ballVelPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
-	ballVelUncertXLabel = new JLabel(BALL_VEL_UNCERT_X_STRING,
-					 JLabel.CENTER);
-	ballVelUncertX = new JLabel("0", JLabel.CENTER);
-	ballVelUncertYLabel = new JLabel(BALL_VEL_UNCERT_Y_STRING,
-					 JLabel.CENTER);
-	ballVelUncertY = new JLabel("0", JLabel.CENTER);
-	ballVelUncertPanel = new JPanel();
-	ballVelUncertPanel.add(ballVelUncertXLabel);
-	ballVelUncertPanel.add(ballVelUncertX);
-	ballVelUncertPanel.add(ballVelUncertYLabel);
-	ballVelUncertPanel.add(ballVelUncertY);
-	ballVelUncertPanel.
-	    setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
-					   LOC_PANEL_ENTRY_HEIGHT));
+        ballVelUncertXLabel = new JLabel(BALL_VEL_UNCERT_X_STRING,
+                                         JLabel.CENTER);
+        ballVelUncertX = new JLabel("0", JLabel.CENTER);
+        ballVelUncertYLabel = new JLabel(BALL_VEL_UNCERT_Y_STRING,
+                                         JLabel.CENTER);
+        ballVelUncertY = new JLabel("0", JLabel.CENTER);
+        ballVelUncertPanel = new JPanel();
+        ballVelUncertPanel.add(ballVelUncertXLabel);
+        ballVelUncertPanel.add(ballVelUncertX);
+        ballVelUncertPanel.add(ballVelUncertYLabel);
+        ballVelUncertPanel.add(ballVelUncertY);
+        ballVelUncertPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
 
 
-	// CALIBRATE BUTTONS LAYOUT
+        // CALIBRATE BUTTONS LAYOUT
 
-	locPanel = new JPanel();
+        locPanel = new JPanel();
 
-	locPanel.add(framePanel);
-	locPanel.add(myEstimatesPanel);
-	locPanel.add(myXYHPanel);
-	locPanel.add(myUncertXYHPanel);
-	locPanel.add(odoXYHPanel);
-	locPanel.add(ballEstimatesPanel);
-	locPanel.add(ballXYPanel);
-	locPanel.add(ballUncertPanel);
-	locPanel.add(ballVelPanel);
-	locPanel.add(ballVelAbsPanel);
-	locPanel.add(ballVelUncertPanel);
-	locPanel.add(landmarksPanel);
-	locPanel.add(landmarkStuffPanel);
+        locPanel.add(framePanel);
+        locPanel.add(myEstimatesPanel);
+        locPanel.add(myXYHPanel);
+        locPanel.add(myUncertXYHPanel);
+        locPanel.add(odoXYHPanel);
+        locPanel.add(ballEstimatesPanel);
+        locPanel.add(ballXYPanel);
+        locPanel.add(ballUncertPanel);
+        locPanel.add(ballVelPanel);
+        locPanel.add(ballVelAbsPanel);
+        locPanel.add(ballVelUncertPanel);
+        locPanel.add(landmarksPanel);
+        locPanel.add(landmarkStuffPanel);
 
-	locPanel.setPreferredSize(new Dimension(LOC_PANEL_WIDTH,
-						LOC_PANEL_HEIGHT));
-	window.add(locPanel);
+        locPanel.setPreferredSize(new Dimension(LOC_PANEL_WIDTH,
+                                                LOC_PANEL_HEIGHT));
+        window.add(locPanel);
 
-	setLocation(x,y);
+        setLocation(x,y);
 
-	pack();
-	setVisible(false);
+        pack();
+        setVisible(false);
 
-	populateCornerMap();
+        populateCornerMap();
+        LANDMARK_X = new int[18];
+        LANDMARK_X[0] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_X;
+        LANDMARK_X[1] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_X;
+        LANDMARK_X[2] = (int) wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_X;
+        LANDMARK_X[3] = (int) wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_X;
+        LANDMARK_X[4] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
+        LANDMARK_X[5] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
+        LANDMARK_X[6] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+        LANDMARK_X[7] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        LANDMARK_X[8] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+        LANDMARK_X[9] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        LANDMARK_X[10] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
+        LANDMARK_X[11] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
+        LANDMARK_X[12] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
+        LANDMARK_X[13] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
+        LANDMARK_X[14] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        LANDMARK_X[15] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+        LANDMARK_X[16] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        LANDMARK_X[17] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+
+        LANDMARK_Y = new int[18];
+        LANDMARK_Y[0] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_Y;
+        LANDMARK_Y[1] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y;
+        LANDMARK_Y[2] = (int) wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_Y;
+        LANDMARK_Y[3] = (int) wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_Y;
+        LANDMARK_Y[4] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
+        LANDMARK_Y[5] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
+        LANDMARK_Y[6] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
+        LANDMARK_Y[7] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
+        LANDMARK_Y[8] = (int) (wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
+                               wc.the_field.GOAL_BOX_HEIGHT);
+        LANDMARK_Y[9] = (int) (wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
+                               wc.the_field.GOAL_BOX_HEIGHT);
+        LANDMARK_Y[10] = (int) wc.the_field.MIDFIELD_Y;
+        LANDMARK_Y[11] = (int) wc.the_field.MIDFIELD_Y;
+        LANDMARK_Y[12] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;
+        LANDMARK_Y[13] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;
+        LANDMARK_Y[14] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;
+        LANDMARK_Y[15] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;
+        LANDMARK_Y[16] = (int) (wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
+                                wc.the_field.GOAL_BOX_HEIGHT);
+        LANDMARK_Y[17] = (int) (wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
+                                wc.the_field.GOAL_BOX_HEIGHT);
     }
 
     private void populateCornerMap() {
-	// blue corner left l
-	Point2D.Double blueCornerLeftL =
-	    new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
-			       wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
-	cornerMap.put(blueCornerLeftL, "Blue Corner Left L");
+        // blue corner left l
+        Point2D.Double blueCornerLeftL =
+            new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+                               wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+        cornerMap.put(blueCornerLeftL, "Blue Corner Left L");
     }
 
     public Dimension getMinimumSize()
@@ -356,45 +428,45 @@ public class DebugViewer extends JFrame {
     }
 
     public void addLandmark(int id, double dist, double bearing) {
-	if (id < 0 || id >= wc.NUM_LANDMARKS) {
-	    System.out.println("DebugViewer.java sawLandmark(): " +
-			       "Saw Non-Existant Landmark: " + id +
+        if (id < 0 || id >= wc.NUM_LANDMARKS) {
+            System.out.println("DebugViewer.java sawLandmark(): " +
+                               "Saw Non-Existant Landmark: " + id +
                                " at line " + frameNumber.getText());
-	    return;
-	}
-	//System.out.println("addLandmark id: " + id +
-	//		   " dist: " + dist +
-	//		   " bearing: " + bearing);
+            return;
+        }
+        //System.out.println("addLandmark id: " + id +
+        //		   " dist: " + dist +
+        //		   " bearing: " + bearing);
 
-	// label/panel declarations
-	JLabel id_label, dist_label, bearing_label;
-	JLabel colon_label, slash_label;
-	JPanel panel;
+        // label/panel declarations
+        JLabel id_label, dist_label, bearing_label;
+        JLabel colon_label, slash_label;
+        JPanel panel;
 
-	// get id string from LANDMARKS array
-	id_label = new JLabel(LANDMARKS[id], JLabel.CENTER);
-	// convert dist/bearing to strings, add to labels
-	dist_label = new JLabel("" + dist, JLabel.CENTER);
-	bearing_label = new JLabel("" + bearing, JLabel.CENTER);
-	// make a colon and slash as JLabels
-	colon_label = new JLabel(":", JLabel.CENTER);
-	slash_label = new JLabel("/", JLabel.CENTER);
+        // get id string from LANDMARKS array
+        id_label = new JLabel(LANDMARKS[id], JLabel.CENTER);
+        // convert dist/bearing to strings, add to labels
+        dist_label = new JLabel("" + dist, JLabel.CENTER);
+        bearing_label = new JLabel("" + bearing, JLabel.CENTER);
+        // make a colon and slash as JLabels
+        colon_label = new JLabel(":", JLabel.CENTER);
+        slash_label = new JLabel("/", JLabel.CENTER);
 
-	// create and add to panel
-	panel = new JPanel();
-	panel.add(id_label);
-	panel.add(colon_label);
-	panel.add(dist_label);
-	panel.add(slash_label);
-	panel.add(bearing_label);
-	panel.setAlignmentY(Component.TOP_ALIGNMENT);
+        // create and add to panel
+        panel = new JPanel();
+        panel.add(id_label);
+        panel.add(colon_label);
+        panel.add(dist_label);
+        panel.add(slash_label);
+        panel.add(bearing_label);
+        panel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-	// add panel to window
-	landmark_components[num_landmarks] = locPanel.add(panel);
-	//window.validate();
+        // add panel to window
+        landmark_components[num_landmarks] = locPanel.add(panel);
+        //window.validate();
 
-	// incremenet landmarks on window
-	num_landmarks++;
+        // incremenet landmarks on window
+        num_landmarks++;
     }
 
     //public void addSeenCorner(
@@ -402,13 +474,13 @@ public class DebugViewer extends JFrame {
     // removes all landmarks from debug viewer
     public void removeLandmarks() {
 
-	//window.invalidate();
-	// remove landmarks
-	for (int i = 0; i < num_landmarks; i++) {
-	    locPanel.remove(landmark_components[i]);
-	}
-	locPanel.updateUI();
-	//window.validate();
+        //window.invalidate();
+        // remove landmarks
+        for (int i = 0; i < num_landmarks; i++) {
+            locPanel.remove(landmark_components[i]);
+        }
+        locPanel.updateUI();
+        //window.validate();
         num_landmarks = 0;
     }
 
@@ -418,49 +490,49 @@ public class DebugViewer extends JFrame {
     public void displayLocData(int id, Double value) {
 	JLabel lbl = myX;
 	if (id == wc.TCP_LOC_MY_X) {
-	    lbl = myX;
+    lbl = myX;
 	}
 	else if (id == wc.TCP_LOC_MY_Y) {
-	    lbl = myY;
+    lbl = myY;
 	}
 	else if (id == wc.TCP_LOC_MY_H) {
-	    lbl = myH;
+    lbl = myH;
 	}
 	else if (id == wc.TCP_LOC_MY_UNCERT_X) {
-	    lbl = myUncertX;
+    lbl = myUncertX;
 	}
 	else if (id == wc.TCP_LOC_MY_UNCERT_Y) {
-	    lbl = myUncertY;
+    lbl = myUncertY;
 	}
 	else if (id == wc.TCP_LOC_MY_UNCERT_H) {
-	    lbl = myUncertH;
+    lbl = myUncertH;
 	}
 	else if (id == wc.TCP_LOC_BALL_X) {
-	    lbl = ballX;
+    lbl = ballX;
 	}
 	else if (id == wc.TCP_LOC_BALL_Y) {
-	    lbl = ballY;
+    lbl = ballY;
 	}
 	else if (id == wc.TCP_LOC_BALL_UNCERT_X) {
-	    lbl = ballUncertX;
+    lbl = ballUncertX;
 	}
 	else if (id == wc.TCP_LOC_BALL_UNCERT_Y) {
-	    lbl = ballUncertY;
+    lbl = ballUncertY;
 	}
 	else if (id == wc.TCP_LOC_BALL_VEL_X) {
-	    lbl = ballVelX;
+    lbl = ballVelX;
 	}
 	else if (id == wc.TCP_LOC_BALL_VEL_Y) {
-	    lbl = ballVelY;
+    lbl = ballVelY;
 	}
 	else if (id == wc.TCP_LOC_ODO_X) {
-	    lbl = odoX;
+    lbl = odoX;
 	}
 	else if (id == wc.TCP_LOC_ODO_Y) {
-	    lbl = odoY;
+    lbl = odoY;
 	}
 	else if (id == wc.TCP_LOC_ODO_Y) {
-	    lbl = odoY;
+    lbl = odoY;
 	}
 
 

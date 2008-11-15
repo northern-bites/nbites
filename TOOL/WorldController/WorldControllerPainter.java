@@ -117,7 +117,7 @@ public class WorldControllerPainter implements DogListener
     private int numSeenLandmarks;
     private static final int X_INDEX = 0;
     private static final int Y_INDEX = 1;
-    private static final int COLOR_INDEX = 2;
+    private static final int DISTINCT_INDEX = 2;
     private static final int LANDMARK_LINE_WIDTH = 1;
 
     // Information to be set for drawing particles
@@ -187,41 +187,17 @@ public class WorldControllerPainter implements DogListener
         for (int i = 0; i < numSeenLandmarks; i++) {
             int x = seenLandmarks[i][X_INDEX];
             int y = seenLandmarks[i][Y_INDEX];
-            int team_color = seenLandmarks[i][COLOR_INDEX];
 
-            if (team_color == RED_TEAM) {
-                // Red team is on the opposite side of the field, so fix the
-                // x and y coords
-                x = (int)field.FIELD_GREEN_WIDTH - x;
-                y = (int)field.FIELD_GREEN_HEIGHT - y;
+            // Determine if it is ambigious or not
+            if (0 == seenLandmarks[i][DISTINCT_INDEX]) {
+                // Pass off the work to another helper method
+                drawSeenLandmark(g2, x, y);
+            } else {
+                drawAmbigiousLandmark(g2, x, y);
             }
-            // Pass off the work to another helper method
-            drawSeenLandmark(g2, x, y);
         }
         // Reset for the next frame
         numSeenLandmarks = 0;
-
-        if (DEBUG_SEEN_LANDMARKS) {
-            // draw seen by post
-            if (by_x != -1)
-                field.fillOval(g2,
-                               SAW_BLUE_BEACON_COLOR,
-                               LANDMARK_LINE_WIDTH,
-                               by_x,
-                               by_y,
-                               field.BEACON_RADIUS,
-                               field.BEACON_RADIUS);
-
-            // draw seen yb post
-            if (yb_x != -1)
-                field.fillOval(g2,
-                               SAW_YELLOW_BEACON_COLOR,
-                               LANDMARK_LINE_WIDTH,
-                               yb_x,
-                               yb_y,
-                               field.BEACON_RADIUS,
-                               field.BEACON_RADIUS);
-        }
     }
 
 
@@ -515,8 +491,10 @@ public class WorldControllerPainter implements DogListener
         field.drawOval(drawing_on, Color.black, 1, x, y, 10, 10);
     }
 
-
-
+    public void drawAmbigiousLandmark(Graphics2D drawing_on, int x, int y)
+    {
+        field.drawOval(drawing_on, Color.red, 1, x, y, 10, 10);
+    }
 
     public void reportUpdatedActualLocation(LocalizationPacket
                                             actual_location)
@@ -622,11 +600,12 @@ public class WorldControllerPainter implements DogListener
         dog_history.visible_landmarks.add(landmark_location);
     }
 
-    public void sawLandmark(int x, int y, int team_color)
+    // 0 true, 1 false
+    public void sawLandmark(int x, int y, int distinct)
     {
         seenLandmarks[numSeenLandmarks][0] = x;
         seenLandmarks[numSeenLandmarks][1] = y;
-        seenLandmarks[numSeenLandmarks][2] = team_color;
+        seenLandmarks[numSeenLandmarks][2] = distinct;
         numSeenLandmarks++;
     }
 
