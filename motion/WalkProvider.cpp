@@ -5,7 +5,7 @@ using Kinematics::RLEG_CHAIN;
 WalkProvider::WalkProvider()
     : MotionProvider(),
       walkParameters(),
-      controller(new DummyController()),
+      controller(new PreviewController()),
       left(LLEG_CHAIN,&walkParameters),
       right(RLEG_CHAIN,&walkParameters)
 {

@@ -21,7 +21,7 @@ using namespace std;
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
 #include "WalkController.h"
-#include "DummyController.h"
+#include "PreviewController.h"
 #include "WalkingLeg.h"
 
 class WalkProvider : public MotionProvider {
