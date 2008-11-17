@@ -197,24 +197,29 @@ const list <const ConcreteCorner*> ConcreteCorner::blueGoalCorners =
 
 const list <const ConcreteCorner*> ConcreteCorner::yellowGoalCorners =
   list <const ConcreteCorner*>(ConcreteCorner::YELLOW_GOAL_CORNERS,
-                               &ConcreteCorner::YELLOW_GOAL_CORNERS[NUM_YELLOW_GOAL_CORNERS] );
+                               &ConcreteCorner::YELLOW_GOAL_CORNERS[
+                                   NUM_YELLOW_GOAL_CORNERS] );
 
 const list <const ConcreteCorner*> ConcreteCorner::yellowArcCorners =
   list <const ConcreteCorner*>(ConcreteCorner::YELLOW_ARC_CORNERS,
-                               &ConcreteCorner::YELLOW_ARC_CORNERS[NUM_YELLOW_ARC_CORNERS] );
+                               &ConcreteCorner::YELLOW_ARC_CORNERS[
+                                   NUM_YELLOW_ARC_CORNERS] );
 
 const list <const ConcreteCorner*> ConcreteCorner::blueArcCorners =
   list <const ConcreteCorner*>(ConcreteCorner::BLUE_ARC_CORNERS,
-                               &ConcreteCorner::BLUE_ARC_CORNERS[NUM_BLUE_ARC_CORNERS] );
+                               &ConcreteCorner::BLUE_ARC_CORNERS[
+                                   NUM_BLUE_ARC_CORNERS] );
 
 
 const list <const ConcreteCorner*> ConcreteCorner::blueGoalTCorners =
   list <const ConcreteCorner*>(ConcreteCorner::BLUE_GOAL_T_CORNERS,
-                               &ConcreteCorner::BLUE_GOAL_T_CORNERS[NUM_BLUE_GOAL_T_CORNERS] );
+                               &ConcreteCorner::BLUE_GOAL_T_CORNERS[
+                                   NUM_BLUE_GOAL_T_CORNERS] );
 
 const list <const ConcreteCorner*> ConcreteCorner::yellowGoalTCorners =
   list <const ConcreteCorner*>(ConcreteCorner::YELLOW_GOAL_T_CORNERS,
-                               &ConcreteCorner::YELLOW_GOAL_T_CORNERS[NUM_YELLOW_GOAL_T_CORNERS] );
+                               &ConcreteCorner::YELLOW_GOAL_T_CORNERS[
+                                   NUM_YELLOW_GOAL_T_CORNERS] );
 
 
 const string ConcreteCorner::getShapeString(shape s) {

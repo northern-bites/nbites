@@ -103,7 +103,8 @@ public:
 
   virtual const string toString() const;
 
-  static const list <const ConcreteCorner*> getPossibleCorners(shape corner_type);
+  static const list <const ConcreteCorner*> getPossibleCorners(shape
+                                                               corner_type);
 
   // Private methods
 private:
