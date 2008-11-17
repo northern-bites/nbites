@@ -32,21 +32,21 @@ Vision::Vision(Pose *_pose, Profiler *_prof)
   // variable initialization
   
   /* declaring class pointers for field objects, ball, leds, lines*/
-  ygrp = new FieldObjects(this, YELLOW_GOAL_RIGHT_POST);
-  yglp = new FieldObjects(this, YELLOW_GOAL_LEFT_POST);
-  bgrp = new FieldObjects(this, BLUE_GOAL_RIGHT_POST);
-  bglp = new FieldObjects(this, BLUE_GOAL_LEFT_POST);
-  ygBackstop = new FieldObjects(this);
-  bgBackstop = new FieldObjects(this);
-  yellowArc = new FieldObjects(this);
-  blueArc = new FieldObjects(this);
-  yb = new FieldObjects(this, YELLOW_BLUE_BEACON);
-  by = new FieldObjects(this, BLUE_YELLOW_BEACON);
+  ygrp = new FieldObjects(YELLOW_GOAL_RIGHT_POST);
+  yglp = new FieldObjects(YELLOW_GOAL_LEFT_POST);
+  bgrp = new FieldObjects(BLUE_GOAL_RIGHT_POST);
+  bglp = new FieldObjects(BLUE_GOAL_LEFT_POST);
+  ygBackstop = new FieldObjects();
+  bgBackstop = new FieldObjects();
+  yellowArc = new FieldObjects();
+  blueArc = new FieldObjects();
+  yb = new FieldObjects(YELLOW_BLUE_BEACON);
+  by = new FieldObjects(BLUE_YELLOW_BEACON);
   ball = new Ball(this);
-  red1 = new FieldObjects(this);
-  red2 = new FieldObjects(this);
-  navy1 = new FieldObjects(this);
-  navy2 = new FieldObjects(this);
+  red1 = new FieldObjects();
+  red2 = new FieldObjects();
+  navy1 = new FieldObjects();
+  navy2 = new FieldObjects();
 #ifdef USE_PINK_BALL
   pinkBall = new Ball(this); //added for pink ball recognition
 #endif
