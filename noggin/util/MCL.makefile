@@ -1,7 +1,7 @@
 C++ = g++
 C++-FLAGS = -wall -02
 RM = rm -f
-INCLUDE = -I ../../include/ -I ../../vision/ -I ./../
+INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./
 
 VL_SRCS = ../../vision/VisualLine.cpp
 
@@ -19,6 +19,8 @@ FO_SRCS = ../../vision/FieldObjects.cpp
 
 CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp
 
+LOG_SRCS = MCLLogger.cpp
+
 OBJS = 	Utility.o \
 	visualLine.o \
 	visualCorner.o \
@@ -29,7 +31,10 @@ OBS_SRCS = ../Observation.cpp
 
 MCL_SRCS = ../MCL.cpp
 
-all : mclTest
+all : mclLogger
+
+mclLogger : $(LOG_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o mclLogger $(LOG_SRCS) $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
 
 mclTest : mclTest.cpp # $(OBJS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o mclTest mclTest.cpp $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
