@@ -56,6 +56,8 @@ FIND_PACKAGE( PYTHON   REQUIRED )
 
 IF( APPLE )
   MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
+ #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
+ #when we want to compile just the vision/sensors libraries for the TOOL
   FIND_PACKAGE( ALCOMMON )
   FIND_PACKAGE( TINYXML )
 ELSE( APPLE )

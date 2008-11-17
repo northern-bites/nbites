@@ -1,4 +1,5 @@
-
+# This file locates the fink distribution on a mac, which is where many
+# important headers are located (/sw)  (for example, boost1.33)
 
 ##
 # Includes
