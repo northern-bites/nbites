@@ -16,8 +16,55 @@ Observation::Observation(FieldObject &_object)
 {
     // We aren't a line
     line_truth = false;
-    // pointPossibilities = ;
-    // numPossibilities = ;
+    visDist = _object.getDist();
+    visBearing = _object.getBearing();
+    // sigma_d = _object.getDistanceSD();
+    // sigma_b = _object.getBearingSD();
+    sigma_d = visDist * 4.0f;
+    sigma_b = visBearing * 4.0f;
+
+    // Figure out which possible landmarks we have...
+    // This should be cleaner like in corners, once field objects is in line...
+    if (_object.getCertainty() == SURE) {
+        PointLandmark objectLandmark;
+        if ( _object.getID() == BLUE_GOAL_LEFT_POST) {
+            objectLandark.x = ConcreteFieldObject::blue_goal_left_post.getX();
+            objectLandark.y = ConcreteFieldObject::blue_goal_left_post.getY();
+        } else if( _object.getID() == BLUE_GOAL_RIGHT_POST) {
+            objectLandark.x = ConcreteFieldObject::blue_goal_right_post.getX();
+            objectLandark.y = ConcreteFieldObject::blue_goal_right_post.getY();
+        } else if ( _object.getID() == YELLOW_GOAL_LEFT_POST) {
+            objectLandark.x = ConcreteFieldObject::yellow_goal_left_post.getX();
+            objectLandark.y = ConcreteFieldObject::yellow_goal_left_post.getY();
+        } else if( _object.getID() == YELLOW_GOAL_RIGHT_POST) {
+            objectLandark.x =ConcreteFieldObject::yellow_goal_right_post.getX();
+            objectLandark.y =ConcreteFieldObject::yellow_goal_right_post.getY();
+        }
+        pointPossibilities.push_back(objectLandmark);
+        numPossibilities = 1;
+        return;
+    }
+
+    list <const ConcreteFieldObject *> objList;
+    if ( _object.getID() == BLUE_GOAL_LEFT_POST ||
+         _object.getID() == BLUE_GOAL_RIGHT_POST) {
+            objList = ConcreteFieldObject::blue_goal_posts;
+    } else {
+            objList = ConcreteFieldObject::yellow_goal_posts;
+    }
+    // Initialize to 0 possibilities
+    numPossibilites = 0;
+
+    list <const ConcreteFieldObject *>::iterator theIterator;
+    //list <const ConcreteFieldObject *> objList = _object.getPossibleFieldObjects();
+    for( theIterator = objList.begin(); theIterator != objList.end();
+         ++theIterator) {
+        PointLandmark objectLandmark;
+        objectLandmark.x = (*theIterator).getFieldX();
+        objectLandmark.y = (*theIterator).getFieldY();
+        pointPossibilities.push_back(objectLandmark);
+        ++numPossibilities;
+    }
 }
 
 /**
@@ -31,8 +78,10 @@ Observation::Observation(VisualCorner &_corner)
     // Get basic vision information
     visDist = _corner.getDistance();
     visBearing = _corner.getBearing();
-    sigma_d = _corner.getDistanceSD();
-    sigma_b = _corner.getBearingSD();
+    //sigma_d = _corner.getDistanceSD();
+    //sigma_b = _corner.getBearingSD();
+    sigma_d = visDist * 4.0f;
+    sigma_b = visBearing * 4.0f;
 
     // Build our possibilitiy list
     numPossibilities = 0;
@@ -58,10 +107,12 @@ Observation::Observation(VisualLine &_line)
     line_truth = true;
 
     // Get basic vision information
-    visDist = _corner.getDistance();
-    visBearing = _corner.getBearing();
-    sigma_d = _corner.getDistanceSD();
-    sigma_b = _corner.getBearingSD();
+    visDist = _line.getDistance();
+    visBearing = _line.getBearing();
+    // sigma_d = _line.getDistanceSD();
+    // sigma_b = _line.getBearingSD();
+    sigma_d = visDist * 4.0f;
+    sigma_b = visBearing * 4.0f;
 
     // Build our possibilitiy list
     numPossibilities = 0;
@@ -71,8 +122,10 @@ Observation::Observation(VisualLine &_line)
     for( theIterator = lineList.begin(); theIterator != lineList.end();
          ++theIterator) {
         LineLandmark addLine;
-        cornerLandmark.x = (*theIterator).getFieldX();
-        cornerLandmark.y = (*theIterator).getFieldY();
+        addLine.x1 = (*theIterator).getFieldX1();
+        addLine.y1 = (*theIterator).getFieldY1();
+        addLine.x2 = (*theIterator).getFieldX1();
+        addLine.y2 = (*theIterator).getFieldY1();
         linePossibilities.push_back(addLine);
         ++numPossibilities;
     }

@@ -12,6 +12,12 @@ using namespace std;
 #include "FieldConstants.h"
 #include "ConcreteCorner.h"
 #include "ConcreteLine.h"
+#include "ConcreteFieldObject.h"
+
+// Temporary until field objects gets in line with the rest of the world...
+#define SURE       2
+#define MILDLYSURE 1
+#define NOTSURE    0
 
 // // All possible observation IDs
 // enum ObservationID
