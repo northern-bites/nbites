@@ -1,6 +1,6 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
-import TOOL.Image.ImagePanel;
+import edu.bowdoin.robocup.TOOL.Image.ImagePanel;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -19,16 +19,16 @@ import java.util.Observable;
 
 import java.awt.geom.AffineTransform;
 
-import TOOL.Image.DefaultDrawingPanel;
+import edu.bowdoin.robocup.TOOL.Image.DefaultDrawingPanel;
 
-import TOOL.GUI.Rectangle;
-import TOOL.GUI.Ellipse;
-import TOOL.GUI.Line;
-import TOOL.GUI.Arc;
-import TOOL.GUI.Quadrilateral;
-import TOOL.GUI.Squiggle;
-import TOOL.GUI.CrossPoint;
-import TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.Rectangle;
+import edu.bowdoin.robocup.TOOL.GUI.Ellipse;
+import edu.bowdoin.robocup.TOOL.GUI.Line;
+import edu.bowdoin.robocup.TOOL.GUI.Arc;
+import edu.bowdoin.robocup.TOOL.GUI.Quadrilateral;
+import edu.bowdoin.robocup.TOOL.GUI.Squiggle;
+import edu.bowdoin.robocup.TOOL.GUI.CrossPoint;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

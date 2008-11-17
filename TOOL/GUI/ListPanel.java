@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.GUI;
+package edu.bowdoin.robocup.TOOL.GUI;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -47,7 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.border.Border;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 public class ListPanel<T extends ListObject>
         extends JScrollPane implements ItemSelectable,

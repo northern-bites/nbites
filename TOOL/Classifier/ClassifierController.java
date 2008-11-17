@@ -1,4 +1,4 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.*;
 
@@ -22,8 +22,8 @@ import javax.swing.JOptionPane;
 
 import java.awt.Point;
 
-import TOOL.GUI.DefinableShape;
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.TOOL;
 import javax.swing.*;
 
 

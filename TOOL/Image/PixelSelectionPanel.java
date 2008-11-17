@@ -1,5 +1,5 @@
 
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -11,6 +11,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.geom.AffineTransform;
 import java.awt.Color;
+
+import edu.bowdoin.robocup.TOOL.Calibrate.Calibrate;
+import edu.bowdoin.robocup.TOOL.Vision.Vision;
 
 
 /**
@@ -40,7 +43,7 @@ public class PixelSelectionPanel extends ImageMarkerPanel {
     public static final double DEFAULT_SWATCH_Y_RATIO = .9;
     
 
-    public static final int MAX_BRUSH_SIZE = TOOL.Calibrate.Calibrate.MAX_BRUSH_SIZE;
+    public static final int MAX_BRUSH_SIZE = Calibrate.MAX_BRUSH_SIZE;
 
     private double swatch_x_ratio,swatch_y_ratio,
 	cur_swatch_x_ratio,cur_swatch_y_ratio;
@@ -48,7 +51,7 @@ public class PixelSelectionPanel extends ImageMarkerPanel {
     private ImageSwatch swatch;
     private boolean drag_swatch;
 
-    private Color[] COLORS = TOOL.Vision.Vision.COLORS;
+    private Color[] COLORS = Vision.COLORS;
 	
     private int currentColor,brushSize;
 

@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 import java.io.*;
 import java.util.Vector;
 import java.util.Enumeration;

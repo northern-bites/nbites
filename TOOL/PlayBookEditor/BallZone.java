@@ -1,4 +1,4 @@
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 import java.util.LinkedList;
 
 public class BallZone

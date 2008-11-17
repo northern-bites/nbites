@@ -2,7 +2,7 @@
 CUR_DIR := .#$(shell pwd)
 PLATFORM := $(shell uname)
 
-TOOL_DIR := TOOL
+TOOL_DIR := edu/bowdoin/robocup/TOOL
 TOOL_SRCS := $(shell ls $(TOOL_DIR)/*.java)
 TOOL_OBJS := $(TOOL_SRCS:%.java=%.class)
 
@@ -101,6 +101,7 @@ LOGGING_RECORD := $(LOGGING_DIR)/.installed_files
 LOGGING_BUILD_DIR := $(LOGGING_DIR)/build
 
 JAR_FILE = TOOL.jar
+MAIN = edu.bowdoin.robocup.TOOL.TOOL
 MANIFEST = MANIFEST.MF
 PYTHON_TOOL = TOOL.py
 PYTHON_OBJS = TOOL.pyc
@@ -206,7 +207,7 @@ $(LOGGING_CLEAN):
 	$(JAVAC) $(JAVACFLAGS) $<
 
 run: all
-	$(JAVA) $(JAVA_OPTS) TOOL.TOOL #-jar $(JAR_FILE)
+	$(JAVA) $(JAVA_OPTS) $(MAIN) #-jar $(JAR_FILE)
 	@#$(PYTHON) $(PYTHON_TOOL)
 
 prompt: all

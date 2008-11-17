@@ -16,14 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Net;
+package edu.bowdoin.robocup.TOOL.Net;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import TOOL.TOOL;
-import TOOL.Data.RobotDef;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.Data.RobotDef;
 
 public class TOOLProtocol {
 

@@ -1,4 +1,4 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
@@ -6,8 +6,9 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.Rectangle;
 
-import TOOL.GUI.RectangularShape;
-import TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.RectangularShape;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 public abstract class RectangularFieldObject extends QuadrilateralFieldObject  {
 
@@ -44,8 +45,8 @@ public abstract class RectangularFieldObject extends QuadrilateralFieldObject  {
 
    
     public void getPointsFromShape(DefinableShape s, double scale) {
-        if (!(s instanceof TOOL.GUI.RectangularShape)) {
-            TOOL.TOOL.CONSOLE.error("Error: Tried to pass a non quadrilateral "+
+        if (!(s instanceof RectangularShape)) {
+            TOOL.CONSOLE.error("Error: Tried to pass a non quadrilateral "+
                                     "shape into the rectangular method..");
             return;
         }

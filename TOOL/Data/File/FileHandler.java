@@ -16,16 +16,16 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Data.File;
+package edu.bowdoin.robocup.TOOL.Data.File;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 
-import TOOL.TOOLException;
-import TOOL.Data.DataModule;
-import TOOL.Data.DataSource;
-import TOOL.Data.SourceHandler;
+import edu.bowdoin.robocup.TOOL.TOOLException;
+import edu.bowdoin.robocup.TOOL.Data.DataModule;
+import edu.bowdoin.robocup.TOOL.Data.DataSource;
+import edu.bowdoin.robocup.TOOL.Data.SourceHandler;
 
 /**
  * The FileHandler checks and opens resources stored on the system in a

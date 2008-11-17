@@ -1,4 +1,4 @@
-package TOOL.Calibrate;
+package edu.bowdoin.robocup.TOOL.Calibrate;
 
 /**
  * Simple class that holds a pair of objects.  Uses generics

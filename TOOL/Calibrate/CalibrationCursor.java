@@ -1,4 +1,4 @@
-package TOOL.Calibrate;
+package edu.bowdoin.robocup.TOOL.Calibrate;
 
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 import java.awt.AlphaComposite;
 import java.awt.GradientPaint;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 
 public class CalibrationCursor {

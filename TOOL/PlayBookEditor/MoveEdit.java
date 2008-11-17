@@ -1,4 +1,4 @@
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 import javax.swing.undo.*;
 import javax.swing.*;

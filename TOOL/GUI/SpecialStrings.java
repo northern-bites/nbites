@@ -1,4 +1,4 @@
-package TOOL.GUI;
+package edu.bowdoin.robocup.TOOL.GUI;
 
 public class SpecialStrings {
     

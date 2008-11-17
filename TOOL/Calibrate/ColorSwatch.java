@@ -1,4 +1,4 @@
-package TOOL.Calibrate;
+package edu.bowdoin.robocup.TOOL.Calibrate;
 
 import javax.swing.JRadioButton;
 import java.awt.Color;

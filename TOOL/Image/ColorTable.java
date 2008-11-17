@@ -1,4 +1,4 @@
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +14,9 @@ import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
     
 
-import TOOL.TOOL;
-import TOOL.Calibrate.ColorTableUpdate;
-import TOOL.Vision.Vision;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.Calibrate.ColorTableUpdate;
+import edu.bowdoin.robocup.TOOL.Vision.Vision;
 
 /**
  *

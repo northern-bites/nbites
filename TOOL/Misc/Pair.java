@@ -1,4 +1,4 @@
-package TOOL.Misc;
+package edu.bowdoin.robocup.TOOL.Misc;
 
 /**
  * Simple class that holds a pair of objects.  Uses generics

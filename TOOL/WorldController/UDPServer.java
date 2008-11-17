@@ -1,4 +1,4 @@
-package TOOL.WorldController;
+package edu.bowdoin.robocup.TOOL.WorldController;
 
 import java.io.IOException;
 import java.util.Iterator;

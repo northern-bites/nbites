@@ -1,4 +1,4 @@
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,8 +11,8 @@ import java.util.Stack;
 import java.awt.geom.*;
 import java.io.*;
 
-import TOOL.TOOL;
-import TOOL.Classifier.*;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.Classifier.*;
 
 
 public class DrawingPanel extends ImagePanel implements MouseListener,

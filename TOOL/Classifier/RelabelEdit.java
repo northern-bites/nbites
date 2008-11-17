@@ -1,6 +1,6 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
-import TOOL.GUI.ID_Changeable;
+import edu.bowdoin.robocup.TOOL.GUI.ID_Changeable;
 
 import javax.swing.undo.*;
 import javax.swing.*;

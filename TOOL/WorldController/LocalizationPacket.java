@@ -1,4 +1,4 @@
-package TOOL.WorldController;
+package edu.bowdoin.robocup.TOOL.WorldController;
 
 public class LocalizationPacket {
     public boolean includes_uncert;

@@ -1,12 +1,13 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 
-import TOOL.GUI.DefinableShape;
-import TOOL.GUI.Arc;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.Arc;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 public class CornerArc extends ClassifierObject {
 
@@ -114,7 +115,7 @@ public class CornerArc extends ClassifierObject {
 
     public void getPointsFromShape(DefinableShape s, double scale) {
         if (!(s instanceof Arc)) {
-            TOOL.TOOL.CONSOLE.error("Error: Tried to pass a non point shape "+
+            TOOL.CONSOLE.error("Error: Tried to pass a non point shape "+
                                     "into the arc method..");
             return;
         }

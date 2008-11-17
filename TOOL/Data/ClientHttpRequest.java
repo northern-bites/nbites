@@ -1,5 +1,5 @@
 
-package TOOL.Data;
+package edu.bowdoin.robocup.TOOL.Data;
 
 import java.net.URLConnection;
 import java.net.URL;

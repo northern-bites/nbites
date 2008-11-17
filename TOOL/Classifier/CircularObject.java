@@ -1,9 +1,10 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Shape;
-import TOOL.GUI.Ellipse;
-import TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.Ellipse;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 public abstract class CircularObject extends RectangularFieldObject {
     protected int id, x, y, width, height, r;
@@ -25,7 +26,7 @@ public abstract class CircularObject extends RectangularFieldObject {
     
     public void getPointsFromShape(DefinableShape s, double scale) {
         if (!(s instanceof Ellipse)) {
-            TOOL.TOOL.CONSOLE.error("Error: Tried to pass a non elliptical " +
+            TOOL.CONSOLE.error("Error: Tried to pass a non elliptical " +
                                     "shape into the corner method..");
             return;
         }

@@ -17,7 +17,7 @@
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
 
-package TOOL.Data.File;
+package edu.bowdoin.robocup.TOOL.Data.File;
 
 import java.io.File;
 import java.util.Comparator;

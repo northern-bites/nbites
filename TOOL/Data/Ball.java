@@ -1,4 +1,4 @@
-package TOOL.Data;
+package edu.bowdoin.robocup.TOOL.Data;
 
 public interface Ball {
 

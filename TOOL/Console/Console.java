@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Console;
+package edu.bowdoin.robocup.TOOL.Console;
 
 import java.awt.FileDialog;
 import java.io.File;
 import javax.swing.JFileChooser;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 public class Console {
 

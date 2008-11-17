@@ -1,4 +1,4 @@
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 import javax.swing.*;
 import javax.swing.undo.*;
@@ -11,7 +11,7 @@ import java.awt.event.InputEvent;
 import javax.swing.KeyStroke;
 import javax.swing.AbstractAction;
 
-import TOOL.Image.PlayBookEditorViewer;
+import edu.bowdoin.robocup.TOOL.Image.PlayBookEditorViewer;
 
 
 /**

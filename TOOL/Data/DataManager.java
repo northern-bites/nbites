@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Data;
+package edu.bowdoin.robocup.TOOL.Data;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -30,14 +30,14 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 
-import TOOL.TOOL;
-import TOOL.TOOLException;
-import TOOL.Calibrate.ColorTableUpdate;
-import TOOL.GUI.ListPanel;
-import TOOL.GUI.DataSetObject;
-import TOOL.GUI.DataSetOptionPanel;
-import TOOL.GUI.ListObject;
-import TOOL.Image.ColorTable;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOLException;
+import edu.bowdoin.robocup.TOOL.Calibrate.ColorTableUpdate;
+import edu.bowdoin.robocup.TOOL.GUI.ListPanel;
+import edu.bowdoin.robocup.TOOL.GUI.DataSetObject;
+import edu.bowdoin.robocup.TOOL.GUI.DataSetOptionPanel;
+import edu.bowdoin.robocup.TOOL.GUI.ListObject;
+import edu.bowdoin.robocup.TOOL.Image.ColorTable;
 
 public class DataManager implements ItemListener,
                                     SourceListener {

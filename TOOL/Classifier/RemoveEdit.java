@@ -1,6 +1,6 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
-//import TOOL.GUI.ID_Queryable;
+//import edu.bowdoin.robocup.TOOL.GUI.ID_Queryable;
 import javax.swing.undo.*;
 import javax.swing.*;
 import java.util.AbstractList;

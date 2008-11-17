@@ -1,5 +1,5 @@
 
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.awt.Color;
 import java.awt.Graphics;

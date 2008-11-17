@@ -1,4 +1,4 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 public class FieldObject implements java.io.Serializable {
     private int x1, y1, x2, y2, id;      

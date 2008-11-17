@@ -1,4 +1,4 @@
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 import java.awt.*;
 import javax.swing.*;
@@ -6,7 +6,7 @@ import javax.swing.undo.*;
 import java.awt.event.*;
 import java.util.Vector;
 import java.util.Enumeration;
-import TOOL.Image.PlayBookEditorViewer;
+import edu.bowdoin.robocup.TOOL.Image.PlayBookEditorViewer;
 
 
 /**

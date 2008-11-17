@@ -16,14 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.KeyboardFocusManager;
 
-import TOOL.TOOL;
-import TOOL.TOOLModule;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOLModule;
 
 public class PlayBookEditorModule extends TOOLModule {
 

@@ -1,14 +1,14 @@
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.util.LinkedList;
 
-import TOOL.TOOL;
-import TOOL.Calibrate.Pair;
-import TOOL.Calibrate.ColorTableUpdate;
-import TOOL.Calibrate.CalibratePanel;
-import TOOL.Vision.Vision;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.Calibrate.Pair;
+import edu.bowdoin.robocup.TOOL.Calibrate.ColorTableUpdate;
+import edu.bowdoin.robocup.TOOL.Calibrate.CalibratePanel;
+import edu.bowdoin.robocup.TOOL.Vision.Vision;
 
 public class ThresholdedImage extends TOOLImage {
     

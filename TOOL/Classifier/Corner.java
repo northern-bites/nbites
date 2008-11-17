@@ -1,12 +1,13 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.Rectangle;
-import TOOL.GUI.CrossPoint;
-import TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.CrossPoint;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 
 /**
@@ -154,7 +155,7 @@ public class Corner extends ClassifierObject implements java.io.Serializable {
 
     public void getPointsFromShape(DefinableShape s, double scale) {
         if (!(s instanceof CrossPoint)) {
-            TOOL.TOOL.CONSOLE.error("Error: Tried to pass a non point shape "+
+            TOOL.CONSOLE.error("Error: Tried to pass a non point shape "+
                                     "into the corner method..");
             return;
         }

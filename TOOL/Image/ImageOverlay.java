@@ -1,4 +1,4 @@
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,9 +9,9 @@ import java.awt.image.BufferedImage;
 import java.awt.AlphaComposite;
 import java.util.Iterator;
 
-import TOOL.TOOL;
-import TOOL.Calibrate.Pair;
-import TOOL.Vision.Vision;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.Calibrate.Pair;
+import edu.bowdoin.robocup.TOOL.Vision.Vision;
 
 
 /**

@@ -1,7 +1,7 @@
 /**
  * Class to hold a PlayBook strategy
  */
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 import java.util.Vector;
 import javax.swing.tree.*;

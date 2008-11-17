@@ -1,6 +1,6 @@
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
-import TOOL.Data.Field;
+import edu.bowdoin.robocup.TOOL.Data.Field;
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Shape;

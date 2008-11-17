@@ -16,9 +16,9 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.awt.Point;

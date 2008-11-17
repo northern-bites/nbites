@@ -1,4 +1,4 @@
-package TOOL.Image;    
+package edu.bowdoin.robocup.TOOL.Image;    
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -13,7 +13,7 @@ import java.awt.Component;
 import javax.swing.JButton;
 import javax.swing.*;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 /** 
  *

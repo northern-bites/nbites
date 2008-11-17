@@ -1,4 +1,4 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import javax.swing.*;
 import javax.swing.undo.*;
@@ -17,7 +17,7 @@ import javax.swing.ActionMap;
 import java.awt.event.InputEvent;
 import javax.swing.KeyStroke;
 import javax.swing.AbstractAction;
-import TOOL.GUI.SpecialStrings;
+import edu.bowdoin.robocup.TOOL.GUI.SpecialStrings;
 
 /**
  * @author Nicholas Dunn

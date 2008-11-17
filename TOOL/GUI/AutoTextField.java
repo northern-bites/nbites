@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.GUI;
+package edu.bowdoin.robocup.TOOL.GUI;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -36,7 +36,7 @@ import javax.swing.text.Document;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 public class AutoTextField extends JTextField implements DocumentListener {
 

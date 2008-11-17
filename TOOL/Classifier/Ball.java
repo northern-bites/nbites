@@ -1,11 +1,11 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-import TOOL.GUI.DefinableShape;
-import TOOL.GUI.Ellipse;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.Ellipse;
 
 public class Ball extends CircularObject implements java.io.Serializable {
 

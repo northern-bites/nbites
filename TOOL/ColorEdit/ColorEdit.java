@@ -1,5 +1,5 @@
 
-package TOOL.ColorEdit;
+package edu.bowdoin.robocup.TOOL.ColorEdit;
 
 import java.lang.Math;
 
@@ -22,20 +22,20 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
 
-import TOOL.TOOL;
-import TOOL.Data.ColorTableListener;
-import TOOL.GUI.IncrementalSliderParent;
-import TOOL.Calibrate.ColorSwatchPanel;
-import TOOL.Calibrate.ColorSwatchParent;
-import TOOL.Calibrate.ColorTableUpdate;
-import TOOL.Calibrate.VisionState;
-import TOOL.Data.DataListener;
-import TOOL.Data.DataSet;
-import TOOL.Data.Frame;
-import TOOL.Image.ColorTable;
-import TOOL.Image.ColorTablePanel;
-import TOOL.Image.YCbCrColorSpace;
-import TOOL.Vision.Vision;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.Data.ColorTableListener;
+import edu.bowdoin.robocup.TOOL.GUI.IncrementalSliderParent;
+import edu.bowdoin.robocup.TOOL.Calibrate.ColorSwatchPanel;
+import edu.bowdoin.robocup.TOOL.Calibrate.ColorSwatchParent;
+import edu.bowdoin.robocup.TOOL.Calibrate.ColorTableUpdate;
+import edu.bowdoin.robocup.TOOL.Calibrate.VisionState;
+import edu.bowdoin.robocup.TOOL.Data.DataListener;
+import edu.bowdoin.robocup.TOOL.Data.DataSet;
+import edu.bowdoin.robocup.TOOL.Data.Frame;
+import edu.bowdoin.robocup.TOOL.Image.ColorTable;
+import edu.bowdoin.robocup.TOOL.Image.ColorTablePanel;
+import edu.bowdoin.robocup.TOOL.Image.YCbCrColorSpace;
+import edu.bowdoin.robocup.TOOL.Vision.Vision;
 
 
 

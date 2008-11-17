@@ -1,4 +1,4 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import javax.swing.JToggleButton;
 import javax.swing.Icon;

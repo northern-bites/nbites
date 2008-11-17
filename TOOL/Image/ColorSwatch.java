@@ -1,5 +1,5 @@
 
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,9 +7,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 
+import edu.bowdoin.robocup.TOOL.Vision.Vision;
+
 public class ColorSwatch extends JPanel implements PropertyChangeListener {
 
-    public static final Color[] COLORS = TOOL.Vision.Vision.COLORS;
+    public static final Color[] COLORS = Vision.COLORS;
     public static final int DEFAULT_BRUSH_SIZE = 10;
 
     private double xScale;

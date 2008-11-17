@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Net;
+package edu.bowdoin.robocup.TOOL.Net;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -43,15 +43,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import TOOL.TOOL;
-import TOOL.TOOLModule;
-import TOOL.Data.DataSet;
-import TOOL.Data.DataSource;
-import TOOL.Data.SourceHandler;
-import TOOL.GUI.DataSetObject;
-import TOOL.GUI.ListPanel;
-import TOOL.GUI.ListObject;
-import TOOL.GUI.RobotOptionPanel;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOLModule;
+import edu.bowdoin.robocup.TOOL.Data.DataSet;
+import edu.bowdoin.robocup.TOOL.Data.DataSource;
+import edu.bowdoin.robocup.TOOL.Data.SourceHandler;
+import edu.bowdoin.robocup.TOOL.GUI.DataSetObject;
+import edu.bowdoin.robocup.TOOL.GUI.ListPanel;
+import edu.bowdoin.robocup.TOOL.GUI.ListObject;
+import edu.bowdoin.robocup.TOOL.GUI.RobotOptionPanel;
 
 public class NetworkModule extends TOOLModule implements DataSource,
         ItemListener, RobotListener, SourceHandler {

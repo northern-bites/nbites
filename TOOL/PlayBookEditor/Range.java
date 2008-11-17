@@ -1,4 +1,4 @@
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 /**
  * Simple class to hold a range of values

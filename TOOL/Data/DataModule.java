@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Data;
+package edu.bowdoin.robocup.TOOL.Data;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -34,10 +34,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import TOOL.TOOL;
-import TOOL.TOOLModule;
-import TOOL.Image.ColorTable;
-import TOOL.GUI.AutoTextField;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOLModule;
+import edu.bowdoin.robocup.TOOL.Image.ColorTable;
+import edu.bowdoin.robocup.TOOL.GUI.AutoTextField;
 
 /**
  * The module that handles displaying and controlling the Source and Data

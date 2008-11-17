@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Calibrate;
+package edu.bowdoin.robocup.TOOL.Calibrate;
 
 import java.awt.Component;
 
 
-import TOOL.TOOL;
-import TOOL.TOOLModule;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOLModule;
 
 public class CalibrateModule extends TOOLModule {
 

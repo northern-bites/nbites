@@ -1,4 +1,4 @@
-package TOOL.WorldController;
+package edu.bowdoin.robocup.TOOL.WorldController;
 
 import javax.swing.*;
 import javax.swing.event.*;

@@ -16,14 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Data;
+package edu.bowdoin.robocup.TOOL.Data;
 
 import java.awt.image.BufferedImage;
 import java.lang.Iterable;
 import java.util.Iterator;
 import java.util.Vector;
 
-import TOOL.TOOLException;
+import edu.bowdoin.robocup.TOOL.TOOLException;
 
 /**
  * Holds the contents of one set of Frame data points.  On the back end

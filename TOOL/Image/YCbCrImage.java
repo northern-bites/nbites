@@ -1,5 +1,5 @@
 
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -7,7 +7,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 /**
  * The YCbCrImage class is a wrapper for the image data contained in a YCrCb

@@ -1,12 +1,12 @@
-package TOOL.PlayBookEditor;
+package edu.bowdoin.robocup.TOOL.PlayBookEditor;
 
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.lang.Math;
-import TOOL.Data.Field;
-import TOOL.Image.PlayBookEditorViewer;
+import edu.bowdoin.robocup.TOOL.Data.Field;
+import edu.bowdoin.robocup.TOOL.Image.PlayBookEditorViewer;
 
 /**
  * A zone represents an area on the field which we classify.

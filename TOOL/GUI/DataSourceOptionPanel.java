@@ -16,12 +16,12 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.GUI;
+package edu.bowdoin.robocup.TOOL.GUI;
 
 import javax.swing.JPanel;
 
-import TOOL.Data.DataSource;
-import TOOL.Data.SourceManager;
+import edu.bowdoin.robocup.TOOL.Data.DataSource;
+import edu.bowdoin.robocup.TOOL.Data.SourceManager;
 
 public class DataSourceOptionPanel extends JPanel {
 

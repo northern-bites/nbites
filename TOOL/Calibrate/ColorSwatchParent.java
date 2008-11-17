@@ -1,4 +1,4 @@
-package TOOL.Calibrate;
+package edu.bowdoin.robocup.TOOL.Calibrate;
 
 public interface ColorSwatchParent {
 

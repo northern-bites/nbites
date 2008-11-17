@@ -1,4 +1,4 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
@@ -8,7 +8,9 @@ import java.awt.Rectangle;
 
 import java.util.Arrays;
 
-import TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.Quadrilateral;
+import edu.bowdoin.robocup.TOOL.TOOL;
 /**
  * Superclass to all field objects whose shape is generally rectangular;
  * this includes beacons and goals.  Specifically, this class is used to
@@ -78,8 +80,8 @@ public abstract class QuadrilateralFieldObject extends ClassifierObject {
     public static String[] getLabelArray(){ return null; }
 
     public void getPointsFromShape(DefinableShape s, double scale) {
-        if (!(s instanceof TOOL.GUI.Quadrilateral)) {
-            TOOL.TOOL.CONSOLE.error("Error: Tried to pass a non quadrilateral "+
+        if (!(s instanceof Quadrilateral)) {
+            TOOL.CONSOLE.error("Error: Tried to pass a non quadrilateral "+
                                     "shape into the corner method..");
             return;
         }

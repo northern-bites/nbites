@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.GUI;
+package edu.bowdoin.robocup.TOOL.GUI;
 
 import java.awt.BorderLayout;
 
 import javax.swing.JLabel;
 
-import TOOL.Data.DataSet;
+import edu.bowdoin.robocup.TOOL.Data.DataSet;
 
 public class DataSetObject extends ListObject {
 

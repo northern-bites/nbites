@@ -1,9 +1,9 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
 
-import TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
 
 /**
  * Holds the information regarding a piece of the goal; can either be

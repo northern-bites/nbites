@@ -1,11 +1,11 @@
-package TOOL.WorldController;
+package edu.bowdoin.robocup.TOOL.WorldController;
 
 // The area in which we draw things
 import java.awt.Component;
 
-import TOOL.TOOL;
-import TOOL.TOOLModule;
-//import TOOL.WorldController.WorldController;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOLModule;
+//import edu.bowdoin.robocup.TOOL.WorldController.WorldController;
 
 /**
  * This is the World Controller module. This program has been used a lot

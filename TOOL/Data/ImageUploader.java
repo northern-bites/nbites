@@ -1,9 +1,9 @@
-package TOOL.Data;
+package edu.bowdoin.robocup.TOOL.Data;
 
 import java.io.IOException;
-import TOOL.Data.ClientHttpRequest;
+import edu.bowdoin.robocup.TOOL.Data.ClientHttpRequest;
 import java.util.Vector;
-import TOOL.Image.TOOLImage;
+import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
 import java.nio.ByteBuffer;
 import java.io.InputStream;
 

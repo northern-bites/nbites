@@ -1,14 +1,14 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
-import TOOL.Image.TOOLImage;
-import TOOL.Data.DataListener;
-import TOOL.Data.DataSet;
-import TOOL.Data.Frame;
-import TOOL.Data.DataListener;
-import TOOL.Calibrate.VisionState;
-import TOOL.GUI.Movable;
+import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
+import edu.bowdoin.robocup.TOOL.Data.DataListener;
+import edu.bowdoin.robocup.TOOL.Data.DataSet;
+import edu.bowdoin.robocup.TOOL.Data.Frame;
+import edu.bowdoin.robocup.TOOL.Data.DataListener;
+import edu.bowdoin.robocup.TOOL.Calibrate.VisionState;
+import edu.bowdoin.robocup.TOOL.GUI.Movable;
 
 import java.util.Observable;
 import java.util.AbstractList;
@@ -18,7 +18,7 @@ import javax.swing.event.*;
 import javax.swing.undo.*;
 
 import java.awt.Point;
-import TOOL.Misc.Pair;
+import edu.bowdoin.robocup.TOOL.Misc.Pair;
 
 /**
  * @author Nicholas Dunn

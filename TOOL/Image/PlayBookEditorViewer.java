@@ -1,10 +1,10 @@
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
-import TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.TOOL;
 
 
-import TOOL.PlayBookEditor.*;
-import TOOL.Data.Field;
+import edu.bowdoin.robocup.TOOL.PlayBookEditor.*;
+import edu.bowdoin.robocup.TOOL.Data.Field;
 import java.awt.geom.*;
 import java.awt.geom.Ellipse2D.Float;
 import javax.swing.*;

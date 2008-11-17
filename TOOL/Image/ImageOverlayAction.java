@@ -1,8 +1,8 @@
-package TOOL.Image;
+package edu.bowdoin.robocup.TOOL.Image;
 
 import java.util.Vector;
 import java.util.Iterator;
-import TOOL.Calibrate.Pair;
+import edu.bowdoin.robocup.TOOL.Calibrate.Pair;
 
 /**
  * A class that represents a single action by the user which changes

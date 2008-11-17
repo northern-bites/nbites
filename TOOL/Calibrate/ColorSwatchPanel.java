@@ -1,4 +1,4 @@
-package TOOL.Calibrate;
+package edu.bowdoin.robocup.TOOL.Calibrate;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -17,7 +17,8 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import java.util.HashMap;
 
-import TOOL.ColorEdit.ColorEditPanel;
+import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEditPanel;
+import edu.bowdoin.robocup.TOOL.Vision.Vision;
 
 /**
  * A simple class which holds individual ColorSwatches.  Each
@@ -31,7 +32,7 @@ import TOOL.ColorEdit.ColorEditPanel;
 
 public class ColorSwatchPanel extends JPanel implements ActionListener, KeyListener {
 
-    private Color[] theColors = TOOL.Vision.Vision.COLORS;
+    private Color[] theColors = Vision.COLORS;
     private ColorSwatch[] theSwatches; 
     private ColorSwatchParent parent;
     
@@ -56,7 +57,7 @@ public class ColorSwatchPanel extends JPanel implements ActionListener, KeyListe
 	    // Set the text in the box to be 1 based indexing, but set the
 	    // tool text based on the constant in Tool.Vision.Vision
 	    theSwatches[i] = new ColorSwatch(size, ""+ (i+1), 
-			     TOOL.Vision.Vision.COLOR_STRINGS[i],
+			     Vision.COLOR_STRINGS[i],
 			     theColors[i]);
 	    add(theSwatches[i]);
 	    a.add(theSwatches[i]);

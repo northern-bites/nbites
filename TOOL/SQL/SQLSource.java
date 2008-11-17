@@ -16,17 +16,17 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.SQL;
+package edu.bowdoin.robocup.TOOL.SQL;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
-import TOOL.TOOLException;
-import TOOL.Data.DataSet;
-import TOOL.Data.DataSource;
-import TOOL.Data.SourceHandler;
+import edu.bowdoin.robocup.TOOL.TOOLException;
+import edu.bowdoin.robocup.TOOL.Data.DataSet;
+import edu.bowdoin.robocup.TOOL.Data.DataSource;
+import edu.bowdoin.robocup.TOOL.Data.SourceHandler;
 
 public class SQLSource implements DataSource {
 

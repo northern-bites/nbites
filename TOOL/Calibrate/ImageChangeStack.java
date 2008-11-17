@@ -1,11 +1,11 @@
-package TOOL.Calibrate;
+package edu.bowdoin.robocup.TOOL.Calibrate;
 
-import TOOL.Image.ImageOverlayAction;
+import edu.bowdoin.robocup.TOOL.Image.ImageOverlayAction;
 import java.util.Stack;
 import java.util.Vector;
 
-import TOOL.TOOL;
-import TOOL.Calibrate.Pair;
+import edu.bowdoin.robocup.TOOL.TOOL;
+import edu.bowdoin.robocup.TOOL.Calibrate.Pair;
 
 /**
  * A stack which holds the updates to both the color table and the image 

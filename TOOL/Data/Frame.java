@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package TOOL.Data;
+package edu.bowdoin.robocup.TOOL.Data;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import TOOL.TOOLException;
-import TOOL.Image.TOOLImage;
+import edu.bowdoin.robocup.TOOL.TOOLException;
+import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
 
 /**
  * Holds all data specific to one recorded frame in a robot's log.  May contain

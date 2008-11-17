@@ -1,6 +1,6 @@
-package TOOL.Classifier;
+package edu.bowdoin.robocup.TOOL.Classifier;
 
-import TOOL.GUI.DefinableShape;
+import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
 import java.awt.Color;
 
 
