@@ -107,10 +107,12 @@ Observation::Observation(VisualLine &_line)
     line_truth = true;
 
     // Get basic vision information
-    visDist = _line.getDistance();
-    visBearing = _line.getBearing();
+    // visDist = _line.getDistance();
+    // visBearing = _line.getBearing();
     // sigma_d = _line.getDistanceSD();
     // sigma_b = _line.getBearingSD();
+    visDist = 100;
+    visBearing = 200;
     sigma_d = visDist * 4.0f;
     sigma_b = visBearing * 4.0f;
 

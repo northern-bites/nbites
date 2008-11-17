@@ -9,10 +9,12 @@
 #define Observation_h_DEFINED
 using namespace std;
 
-#include "FieldConstants.h"
 #include "ConcreteCorner.h"
 #include "ConcreteLine.h"
 #include "ConcreteFieldObject.h"
+#include "VisualLine.h"
+#include "VisualCorner.h"
+#include "FieldObjects.h"
 
 // Temporary until field objects gets in line with the rest of the world...
 #define SURE       2
