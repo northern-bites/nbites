@@ -7,6 +7,7 @@
 
 #ifndef Observation_h_DEFINED
 #define Observation_h_DEFINED
+#include <vector>
 using namespace std;
 
 #include "ConcreteCorner.h"
@@ -15,29 +16,7 @@ using namespace std;
 #include "VisualLine.h"
 #include "VisualCorner.h"
 #include "FieldObjects.h"
-
-// Temporary until field objects gets in line with the rest of the world...
-#define SURE       2
-#define MILDLYSURE 1
-#define NOTSURE    0
-
-// // All possible observation IDs
-// enum ObservationID
-// {
-//     // Blue goal
-//     BLUE_GOAL_LEFT_POST;
-//     BLUE_GOAL_RIGHT_POST;
-//     BLUE_GOAL_POST_UNCLER;
-
-//     // Yellow goal
-//     YELLOW_GOAL_LEFT_POST;
-//     YELLOW_GOAL_RIGHT_POST;
-//     YELLOW_GOAL_POST_UNCLER;
-
-//     // Line intersections
-
-//     // Lines
-// };
+#include "Structs.h"
 
 // Structs
 
@@ -54,7 +33,7 @@ public:
 /**
  * Stores field location information about a concrete line landmark
  */
-class LineLandmark : public Landmark
+class LineLandmark
 {
 public:
     float x1;
@@ -74,7 +53,7 @@ public:
     vector< pair<float, float> > posibilities;
 
     // Construcotrs & Destructors
-    Observation(FieldObject &_object);
+    Observation(FieldObjects &_object);
     Observation(VisualCorner &_corner);
     Observation(VisualLine &_line);
     virtual ~Observation();
@@ -125,6 +104,16 @@ public:
      * @return The number of possibilities for the landmark
      */
     unsigned int getNumPossibilities() { return numPossibilities; }
+
+    /*
+     * @return The list of possible line landmarks
+     */
+    vector<LineLandmark> getLinePossibilities() { return linePossibilities; }
+
+    /*
+     * @return The list of possible point landmarks
+     */
+    vector<PointLandmark> getPointPossibilities() { return pointPossibilities; }
 
     // Setters
 

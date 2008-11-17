@@ -33,7 +33,7 @@ class MotionModel
 {
 public:
     float deltaF;
-    flaot deltaL;
+    float deltaL;
     float deltaR;
 };
 
@@ -50,6 +50,8 @@ public:
 // Math Macros
 #define DEG_TO_RAD (2. * M_PI) / 360.
 #define RAD_TO_DEG 360. / (2. * M_PI)
+#define FULL_CIRC 360
+#define HALF_CIRC 180
 
 // Constants
 static const int M = 100; // Number of particles
@@ -149,9 +151,10 @@ private:
     void updateEstimates();
 
     // Helpers
-    float determinePointWeight(Observation z, PoseEst x_t, point landmark);
-    float determineLineWeight(Observation z, PoseEst x_t, line _line);
-    float getSimilarity(float r_d, float r_a, float z);
+    float determinePointWeight(Observation z, PoseEst x_t,
+                               PointLandmark landmark);
+    float determineLineWeight(Observation z, PoseEst x_t, LineLandmark _line);
+    float getSimilarity(float r_d, float r_a, Observation &z);
 };
 
 #endif // _MCL_H_DEFINED

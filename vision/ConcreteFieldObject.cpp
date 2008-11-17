@@ -9,7 +9,7 @@ ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,
 }
 
 // Copy constructor - just pairwise copy the elements
-ConcreteFieldObject::ConcreteFieldObject(const ConcreteCorner& other)
+ConcreteFieldObject::ConcreteFieldObject(const ConcreteFieldObject& other)
     : ConcreteLandmark(other) {
     id = other.id;
 }
@@ -18,52 +18,45 @@ ConcreteFieldObject::ConcreteFieldObject(const ConcreteCorner& other)
 ConcreteFieldObject::~ConcreteFieldObject() {}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Constants for absolute coordinates on the field of the specific corners.
-// (0,0) is the lower left corner of the field when BLUE goal is at the
+// Constants for absolute coordinates on the field of the specific fieldObject.
+// (0,0) is the lower left fieldObject of the field when BLUE goal is at the
 // bottom
 ///////////////////////////////////////////////////////////////////////////////
-const ConcreteFieldObject ConcreteFieldObject::
-blue_goal_left_post(LANDMARK_MY_GOAL_LEFT_POST_X,
-                    LANDMARK_MY_GOAL_LEFT_POST_Y,
-                    BLUE_GOAL_LEFT_POST);
 
-const ConcreteFieldObject ConcreteFieldObject::
-blue_goal_right_post(LANDMARK_MY_GOAL_RIGHT_POST_X,
-                     LANDMARK_MY_GOAL_RIGHT_POST_Y,
-                     BLUE_GOAL_RIGHT_POST);
+const ConcreteFieldObject ConcreteFieldObject::blue_goal_left_post(
+    LANDMARK_MY_GOAL_LEFT_POST_X, LANDMARK_MY_GOAL_LEFT_POST_Y,
+    BLUE_GOAL_LEFT_POST);
 
-const ConcreteFieldObject ConcreteFieldObject::
-yellow_goal_left_post(LANDMARK_OPP_GOAL_LEFT_POST_X,
-                      LANDMARK_OPP_GOAL_LEFT_POST_Y,
-                      YELLOW_GOAL_LEFT_POST);
+const ConcreteFieldObject ConcreteFieldObject::blue_goal_right_post(
+    LANDMARK_MY_GOAL_RIGHT_POST_X, LANDMARK_MY_GOAL_RIGHT_POST_Y,
+    BLUE_GOAL_RIGHT_POST);
 
-const ConcreteFieldObject ConcreteFieldObject::
-yellow_goal_right_post(LANDMARK_OPP_GOAL_RIGHT_POST_X,
-                       LANDMARK_OPP_GOAL_RIGHT_POST_Y,
-                       YELLOW_GOAL_RIGHT_POST);
+const ConcreteFieldObject ConcreteFieldObject::yellow_goal_left_post(
+    LANDMARK_OPP_GOAL_LEFT_POST_X, LANDMARK_OPP_GOAL_LEFT_POST_Y,
+    YELLOW_GOAL_LEFT_POST);
 
-const ConcreteFieldObject* ConcreteFieldObject::
-concreteFieldObjectLists[NUM_FIELD_OBJECTS] = {&blue_goal_left_post,
-                                               &blue_goal_right_post,
-                                               &yellow_goal_left_post,
-                                               &yellow_goal_right_post};
+const ConcreteFieldObject ConcreteFieldObject::yellow_goal_right_post(
+    LANDMARK_OPP_GOAL_RIGHT_POST_X, LANDMARK_OPP_GOAL_RIGHT_POST_Y,
+    YELLOW_GOAL_RIGHT_POST);
 
-const Concretefieldobject* ConcreteFieldObject::
-BLUE_GOAL_POSTS[NUM_BLUE_GOAL_POSTS] = {&blue_goal_left_post,
-                                        &blue_goal_right_post};
+const ConcreteFieldObject* ConcreteFieldObject::concreteFieldObjectList[
+    NUM_FIELD_OBJECTS] = {&blue_goal_left_post, &blue_goal_right_post,
+                          &yellow_goal_left_post, &yellow_goal_right_post};
 
-const Concretefieldobject* ConcreteFieldObject::
-YELLOW_GOAL_POSTS[NUM_YELLOW_GOAL_POSTS] = {&yellow_goal_left_post,
-                                            &yellow_goal_right_post};
+const ConcreteFieldObject* ConcreteFieldObject::BLUE_GOAL_POSTS[
+    NUM_BLUE_GOAL_POSTS] = {&blue_goal_left_post, &blue_goal_right_post};
+
+const ConcreteFieldObject* ConcreteFieldObject::YELLOW_GOAL_POSTS[
+    NUM_YELLOW_GOAL_POSTS] = {&yellow_goal_left_post, &yellow_goal_right_post};
 
 
-const list <const ConcreteFieldObjects*> ConcreteFieldObject::blueGoalPosts =
-    list <const ConcreteFieldObjects*>( ConcreteFieldObject::BLUE_GOAL_POSTS,
+const list <const ConcreteFieldObject*> ConcreteFieldObject::blueGoalPosts =
+    list <const ConcreteFieldObject*>( ConcreteFieldObject::BLUE_GOAL_POSTS,
                                         &ConcreteFieldObject::
                                         BLUE_GOAL_POSTS[NUM_BLUE_GOAL_POSTS]);
 
-const list <const ConcreteFieldObjects*> ConcreteFieldObject::yellowGoalPosts =
-    list <const ConcreteFieldObjects*>( ConcreteFieldObject::YELLOW_GOAL_POSTS,
+const list <const ConcreteFieldObject*> ConcreteFieldObject::yellowGoalPosts =
+    list <const ConcreteFieldObject*>( ConcreteFieldObject::YELLOW_GOAL_POSTS,
                                         &ConcreteFieldObject::YELLOW_GOAL_POSTS[
                                             NUM_YELLOW_GOAL_POSTS]);
 
@@ -82,6 +75,6 @@ const string ConcreteFieldObject::toString() const {
     case YELLOW_GOAL_POST:
         return "Yellow Goal Post";
     default:
-        return "Invalid Corner ID";
+        return "Invalid Field Object ID";
     }
 }

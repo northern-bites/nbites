@@ -16,24 +16,29 @@ using namespace std;
 #include "ConcreteLandmark.h"
 
 enum fieldObjectID {
-    BLUE_GOAL_LEFT_POST = 0,
+    BLUE_GOAL_LEFT_POST = 100,
     BLUE_GOAL_RIGHT_POST,
     YELLOW_GOAL_LEFT_POST,
     YELLOW_GOAL_RIGHT_POST,
     BLUE_GOAL_POST,
-    YELLOW_GOAL_POST
+    YELLOW_GOAL_POST,
+    YELLOW_BLUE_BEACON,
+    BLUE_YELLOW_BEACON,
+    BLUE_ARC,
+    YELLOW_ARC,
+    UNKNOWN_FIELD_OBJECT
 };
 
-class ConcreteFieldObject : public ConcreteFieldObject {
+class ConcreteFieldObject : public ConcreteLandmark {
     /* Constructors are private because no one should ever have to create more
      * concrete field objects. All of them are defined as constant static
      * members of this class.
      */
 private:
-    ConcreteCorner(const float fieldX, const float fieldY,
-                   const fieldObjectID _id);
+    ConcreteFieldObject(const float fieldX, const float fieldY,
+                        const fieldObjectID _id);
     // copy constructor
-    ConcreteCorner(const ConcreteFieldObject&);
+    ConcreteFieldObject(const ConcreteFieldObject&);
 
 public: // Constants
     static const int NUM_BLUE_GOAL_POSTS = 2;
@@ -66,7 +71,8 @@ public:
                     blue_goal_post,
                     yellow_goal_post;
 
-    static const ConcreteFieldObject* concreteFieldObjectList[NUM_FIELD_OBJECTS];
+    static const ConcreteFieldObject* concreteFieldObjectList[
+        NUM_FIELD_OBJECTS];
 
 private:
     static const ConcreteFieldObject* BLUE_GOAL_POSTS[NUM_BLUE_GOAL_POSTS];

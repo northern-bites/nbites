@@ -5,20 +5,12 @@
 
 const float FieldObjects::WHITE_HEIGHT_ON_BEACON = 18.6;
 
-FieldObjects::FieldObjects(Vision *vis,
-                           const fieldObjectID _id)
-    : vision(vis), id(_id)
+FieldObjects::FieldObjects(const fieldObjectID _id)
+    : id(_id)
 {
     init();
 }
 
-
-FieldObjects::FieldObjects(Vision *vis)
-    // stores vision class pointer
-    : vision(vis), id(UNKNOWN_FIELD_OBJECT)
-{
-    init();
-}
 
 FieldObjects::FieldObjects() : id(UNKNOWN_FIELD_OBJECT) {
     init();

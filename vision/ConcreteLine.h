@@ -3,15 +3,20 @@
 
 // Forward reference
 class ConcreteLine;
+#include <ostream>
+#include <list>
+
 using namespace std;
 
 // Includes
 #include "FieldConstants.h"
 
+class ConcreteLine; // Forward reference
+
 // Line ID values
 enum lineID {
     // Ambiguous lines
-    UNKNOWN_LINE = 0,
+    UNKNOWN_LINE = 50,
     SIDE_OR_ENDLINE,
     SIDELINE_LINE,
     ENDLINE_LINE,

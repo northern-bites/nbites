@@ -1,22 +1,21 @@
-#include ConcreteLine.h
+#include "ConcreteLine.h"
 
 ConcreteLine::ConcreteLine(const float _fieldX1, const float _fieldY1,
                            const float _fieldX2, const float _fieldY2,
                            const lineID _id) :
-    fieldX1(_fieldX1), fieldX2(_fieldX2), fieldY1(_fieldY1), fieldY2(_fieldY2);
+    fieldX1(_fieldX1), fieldX2(_fieldX2), fieldY1(_fieldY1), fieldY2(_fieldY2)
 {
-
     id = _id;
 }
 
-ConcreteLine::ConcreteLine(const ConcreteLine& other)
+ConcreteLine::ConcreteLine(const ConcreteLine& other) :
     fieldX1(other.fieldX1), fieldX2(other.fieldX2), fieldY1(other.fieldY1),
-    fieldY2(other.fieldY2);
+    fieldY2(other.fieldY2)
 {
     id = other.getID();
 }
 
-virtual ConcreteLine::~ConcreteLine() {} // Nothing to delete
+ConcreteLine::~ConcreteLine() {} // Nothing to delete
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants for absolute coordinates on the field of the specific corners.
@@ -119,7 +118,7 @@ const list <const ConcreteLine*> ConcreteLine::concreteLines =
     list <const ConcreteLine*>( ConcreteLine::concreteLineList,
                                 &ConcreteLine::concreteLineList[NUM_LINES] );
 
-const string ConcreteCorner::toString() const
+const string ConcreteLine::toString() const
 {
     switch (id) {
     case BLUE_GOAL_ENDLINE:

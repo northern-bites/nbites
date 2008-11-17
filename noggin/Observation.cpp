@@ -12,7 +12,7 @@
 /**
  * @param fo FieldObject that was seen and reported.
  */
-Observation::Observation(FieldObject &_object)
+Observation::Observation(FieldObjects &_object)
 {
     // We aren't a line
     line_truth = false;
@@ -28,40 +28,48 @@ Observation::Observation(FieldObject &_object)
     if (_object.getCertainty() == SURE) {
         PointLandmark objectLandmark;
         if ( _object.getID() == BLUE_GOAL_LEFT_POST) {
-            objectLandark.x = ConcreteFieldObject::blue_goal_left_post.getX();
-            objectLandark.y = ConcreteFieldObject::blue_goal_left_post.getY();
+            objectLandmark.x = ConcreteFieldObject::
+                blue_goal_left_post.getFieldX();
+            objectLandmark.y = ConcreteFieldObject::
+                blue_goal_left_post.getFieldY();
         } else if( _object.getID() == BLUE_GOAL_RIGHT_POST) {
-            objectLandark.x = ConcreteFieldObject::blue_goal_right_post.getX();
-            objectLandark.y = ConcreteFieldObject::blue_goal_right_post.getY();
+            objectLandmark.x = ConcreteFieldObject::
+                blue_goal_right_post.getFieldX();
+            objectLandmark.y = ConcreteFieldObject::
+                blue_goal_right_post.getFieldY();
         } else if ( _object.getID() == YELLOW_GOAL_LEFT_POST) {
-            objectLandark.x = ConcreteFieldObject::yellow_goal_left_post.getX();
-            objectLandark.y = ConcreteFieldObject::yellow_goal_left_post.getY();
+            objectLandmark.x = ConcreteFieldObject::
+                yellow_goal_left_post.getFieldX();
+            objectLandmark.y = ConcreteFieldObject::
+                yellow_goal_left_post.getFieldY();
         } else if( _object.getID() == YELLOW_GOAL_RIGHT_POST) {
-            objectLandark.x =ConcreteFieldObject::yellow_goal_right_post.getX();
-            objectLandark.y =ConcreteFieldObject::yellow_goal_right_post.getY();
+            objectLandmark.x = ConcreteFieldObject::
+                yellow_goal_right_post.getFieldX();
+            objectLandmark.y = ConcreteFieldObject::
+                yellow_goal_right_post.getFieldY();
         }
         pointPossibilities.push_back(objectLandmark);
-        numPossibilities = 1;
+        Observation::numPossibilities = 1;
         return;
     }
 
     list <const ConcreteFieldObject *> objList;
     if ( _object.getID() == BLUE_GOAL_LEFT_POST ||
          _object.getID() == BLUE_GOAL_RIGHT_POST) {
-            objList = ConcreteFieldObject::blue_goal_posts;
+            objList = ConcreteFieldObject::blueGoalPosts;
     } else {
-            objList = ConcreteFieldObject::yellow_goal_posts;
+            objList = ConcreteFieldObject::yellowGoalPosts;
     }
     // Initialize to 0 possibilities
-    numPossibilites = 0;
+    numPossibilities = 0;
 
     list <const ConcreteFieldObject *>::iterator theIterator;
     //list <const ConcreteFieldObject *> objList = _object.getPossibleFieldObjects();
     for( theIterator = objList.begin(); theIterator != objList.end();
          ++theIterator) {
         PointLandmark objectLandmark;
-        objectLandmark.x = (*theIterator).getFieldX();
-        objectLandmark.y = (*theIterator).getFieldY();
+        objectLandmark.x = (**theIterator).getFieldX();
+        objectLandmark.y = (**theIterator).getFieldY();
         pointPossibilities.push_back(objectLandmark);
         ++numPossibilities;
     }
@@ -84,15 +92,15 @@ Observation::Observation(VisualCorner &_corner)
     sigma_b = visBearing * 4.0f;
 
     // Build our possibilitiy list
-    numPossibilities = 0;
+    numPossibilities= 0;
 
     list <const ConcreteCorner *>::iterator theIterator;
     list <const ConcreteCorner *> cornerList = _corner.getPossibleCorners();
     for( theIterator = cornerList.begin(); theIterator != cornerList.end();
          ++theIterator) {
         PointLandmark cornerLandmark;
-        cornerLandmark.x = (*theIterator).getFieldX();
-        cornerLandmark.y = (*theIterator).getFieldY();
+        cornerLandmark.x = (**theIterator).getFieldX();
+        cornerLandmark.y = (**theIterator).getFieldY();
         pointPossibilities.push_back(cornerLandmark);
         ++numPossibilities;
     }
@@ -117,19 +125,19 @@ Observation::Observation(VisualLine &_line)
     sigma_b = visBearing * 4.0f;
 
     // Build our possibilitiy list
-    numPossibilities = 0;
+    Observation::numPossibilities = 0;
 
     list <const ConcreteLine *>::iterator theIterator;
     list <const ConcreteLine *> lineList = _line.getPossibleLines();
     for( theIterator = lineList.begin(); theIterator != lineList.end();
          ++theIterator) {
         LineLandmark addLine;
-        addLine.x1 = (*theIterator).getFieldX1();
-        addLine.y1 = (*theIterator).getFieldY1();
-        addLine.x2 = (*theIterator).getFieldX1();
-        addLine.y2 = (*theIterator).getFieldY1();
+        addLine.x1 = (**theIterator).getFieldX1();
+        addLine.y1 = (**theIterator).getFieldY1();
+        addLine.x2 = (**theIterator).getFieldX1();
+        addLine.y2 = (**theIterator).getFieldY1();
         linePossibilities.push_back(addLine);
-        ++numPossibilities;
+        ++Observation::numPossibilities;
     }
 
 }
@@ -138,9 +146,4 @@ Observation::Observation(VisualLine &_line)
 /**
  * Deconstructor for our observation
  */
-virtual Observation::~Observation()
-{
-    if (line_truth) {
-    } else {
-    }
-}
+Observation::~Observation() {}

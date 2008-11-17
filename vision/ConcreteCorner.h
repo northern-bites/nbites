@@ -12,7 +12,6 @@ using namespace std;
 #include "FieldConstants.h"
 #include "ConcreteLandmark.h"
 
-
 enum cornerID {
   L_INNER_CORNER = 0,
   L_OUTER_CORNER,
@@ -165,10 +164,10 @@ private:
  private: // Instance variables recording location on field and identifier
   cornerID id;
   shape cornerType;
-  /*
-    Eventually we will have a "ConcreteLine" class just like this one
-  Line * line1;
-  Line * line2;*/
+
+  // // Eventually we will have a "ConcreteLine" class just like this one
+  // ConcreteLine * line1;
+  // ConcreteLine * line2;
 };
 
 class CornerOfField : public unary_function<const ConcreteCorner*, bool> {

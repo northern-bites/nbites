@@ -6,6 +6,7 @@ using namespace std;
 #include "Structs.h"
 #include "ifdefs.h"
 #include "FieldConstants.h"
+#include "ConcreteFieldObject.h"
 
 ////////////////////////////////////////////////////////////
 // Constants for absolute coordinates on the field of the six
@@ -63,25 +64,26 @@ static const point <float> YELLOW_GOAL_BLUE_ARC_CENTER_LOC =
 static const point <float> UNKNOWN_LOC =
     point<float>(-1, -1);
 
-enum fieldObjectID {
-    BLUE_GOAL_LEFT_POST,
-    BLUE_GOAL_RIGHT_POST,
-    YELLOW_GOAL_LEFT_POST,
-    YELLOW_GOAL_RIGHT_POST,
-    YELLOW_BLUE_BEACON,
-    BLUE_YELLOW_BEACON,
-    BLUE_ARC,
-    YELLOW_ARC,
-    UNKNOWN_FIELD_OBJECT
-};
+// enum fieldObjectID {
+//     BLUE_GOAL_LEFT_POST,
+//     BLUE_GOAL_RIGHT_POST,
+//     YELLOW_GOAL_LEFT_POST,
+//     YELLOW_GOAL_RIGHT_POST,
+//     YELLOW_BLUE_BEACON,
+//     BLUE_YELLOW_BEACON,
+//     BLUE_ARC,
+//     YELLOW_ARC,
+//     UNKNOWN_FIELD_OBJECT
+// };
 
 class FieldObjects;
 #include "Vision.h"
 
 class FieldObjects {
 public:
-    FieldObjects(Vision *vis, const fieldObjectID);
-    FieldObjects(Vision *vis);
+    //FieldObjects(Vision *vis, const fieldObjectID);
+    //FieldObjects(Vision *vis);
+    FieldObjects(const fieldObjectID);
     FieldObjects();
     virtual ~FieldObjects() {}
 
