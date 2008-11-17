@@ -11,10 +11,10 @@ using namespace std;
 // Line ID values
 enum lineID {
     // Ambiguous lines
-    UNKNOWN_LINE = 100,
+    UNKNOWN_LINE = 0,
     SIDE_OR_ENDLINE,
-    SIDELINE,
-    ENDLINE,
+    SIDELINE_LINE,
+    ENDLINE_LINE,
     GOALBOX_LINE,
     GOALBOX_SIDE_LINE,
     GOALBOX_TOP_LINE,
@@ -66,10 +66,10 @@ public:
 
     virtual const string toString() const;
 
-    const flost getFieldX1() const { return fieldX1; }
-    const flost getFieldY1() const { return fieldY1; }
-    const flost getFieldX2() const { return fieldX2; }
-    const flost getFieldY2() const { return fieldY2; }
+    const float getFieldX1() const { return fieldX1; }
+    const float getFieldY1() const { return fieldY1; }
+    const float getFieldX2() const { return fieldX2; }
+    const float getFieldY2() const { return fieldY2; }
 
 public:
     static const ConcreteLine blue_goal_endline,

@@ -296,7 +296,3 @@ pair <float, float> VisualLine::leastSquaresFit(const VisualLine& l) {
   return leastSquaresFit(l.points);
 }
 
-const list <const ConcreteLine *> VisualLine::getPossibleLines() const {
-    return possibleLines; }
-
-

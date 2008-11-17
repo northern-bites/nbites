@@ -7,6 +7,7 @@
 #include <sstream>
 using namespace std;
 
+#include "ConcreteLine.h"
 class VisualLine;
 
 
