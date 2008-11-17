@@ -3,7 +3,7 @@
 
 
 WalkingLeg::WalkingLeg(ChainID id,
-                       WalkingParameters * walkP)
+                       WalkingParameters *walkP)
   : supportMode(SUPPORTING),chainID(id), walkParams(walkP), goal(ufvector3(3))
 {
     if (chainID == LLEG_CHAIN)

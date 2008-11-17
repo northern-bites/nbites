@@ -32,7 +32,7 @@ public:
 
     void requestStop();
     void calculateNextJoints();
-    void setMotion(float x, float y, float theta);
+    void setMotion(const float x, const float y, const float theta);
 
 private:
     WalkingParameters walkParameters;
