@@ -30,6 +30,8 @@ public:
 
     const vector <float> getNextJoints();
 
+	
+
 private:
     Sensors * sensors;
     WalkProvider walkProvider;

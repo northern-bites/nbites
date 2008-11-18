@@ -121,6 +121,12 @@ namespace Kinematics {
         RANKLE_CHAIN
     };
 
+	// Interpolation types
+	enum InterpolationType {
+		INTERPOLATION_SMOOTH = 0,
+		INTERPOLATION_LINEAR
+	};
+
     /// Joint Name constants ///
     enum JointNames {
         HEAD_YAW = 0,

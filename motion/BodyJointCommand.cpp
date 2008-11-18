@@ -8,7 +8,7 @@ using namespace std;
 BodyJointCommand::BodyJointCommand
 (const float time,
  const vector<float> *bodyJoints,
- const AL::ALMotionProxy::INTERPOLATION_TYPE _type) 
+ const Kinematics::InterpolationType _type)
  : duration(time), type(_type)
 {
   unsigned int i = 0, j;
@@ -39,7 +39,7 @@ BodyJointCommand::BodyJointCommand
 
 BodyJointCommand::BodyJointCommand(const float time, ChainID chainID,
 				   const vector<float> *joints,
-				   const AL::ALMotionProxy::INTERPOLATION_TYPE _type)
+				   const Kinematics::InterpolationType _type)
   : duration(time), type(_type), larm_joints(0),
     lleg_joints(0), rleg_joints(0), rarm_joints(0)
 {
@@ -65,7 +65,7 @@ BodyJointCommand::BodyJointCommand(const float time, const vector<float> *larm,
 				   const vector<float> *lleg,
 				   const vector<float> *rleg,
 				   const vector<float> *rarm,
-				   const AL::ALMotionProxy::INTERPOLATION_TYPE _type)
+				   const Kinematics::InterpolationType _type)
   : duration(time), type(_type), larm_joints(larm),
     lleg_joints(lleg), rleg_joints(rleg), rarm_joints(rarm) 
 {

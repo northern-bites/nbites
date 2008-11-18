@@ -98,13 +98,14 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
-SET( MOTION_SRCS     ${MOTION_INCLUDE_DIR}/CallbackAction
+SET( MOTION_SRCS ${MOTION_INCLUDE_DIR}/ActionCommand
+  #${MOTION_INCLUDE_DIR}/CallbackAction
                      ${MOTION_INCLUDE_DIR}/BodyJointCommand
 		     ${MOTION_INCLUDE_DIR}/HeadJointCommand
 		     ${MOTION_INCLUDE_DIR}/WalkParameters
                      ${MOTION_INCLUDE_DIR}/Motion.cpp
-                     ${MOTION_INCLUDE_DIR}/MotionCore
-                     ${MOTION_INCLUDE_DIR}/MotionInterface
+                     #${MOTION_INCLUDE_DIR}/MotionCore
+                     #${MOTION_INCLUDE_DIR}/MotionInterface
 		     ${MOTION_INCLUDE_DIR}/MotionSwitchboard
 		     ${MOTION_INCLUDE_DIR}/MotionEnactor
 		     ${MOTION_INCLUDE_DIR}/SimulatorEnactor
@@ -114,7 +115,8 @@ SET( MOTION_SRCS     ${MOTION_INCLUDE_DIR}/CallbackAction
 		     ${MOTION_INCLUDE_DIR}/PreviewController
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/Kinematics
-		     ${MOTION_INCLUDE_DIR}/_motionmodule
+                     #${MOTION_INCLUDE_DIR}/_motionmodule
+                     ${MOTION_INCLUDE_DIR}/ChainQueue
                      )
 
 IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
