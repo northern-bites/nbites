@@ -109,6 +109,11 @@ public:
      */
     float getHUncertDeg() { return curUncert.h * RAD_TO_DEG;}
 
+    /**
+     * @return The current set of particles in the filter
+     */
+    vector<Particle> getParticles() { return X_t; }
+
     // Setters
     /**
      * @param xEst The current x esitamte of the robot

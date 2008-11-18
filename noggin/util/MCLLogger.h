@@ -24,10 +24,11 @@ using namespace std;
 #define MCL_LOG_SUFFIX ".mcl"
 
 // IO Functions
-void readRawFile(string fileName);
-void printMCLLog(int logNum);
+void printOutLogLine(fstream outputFile);
 
 // Core Functions
 void processLogLine(string current, MCL* myLoc);
+
+int team_color, player_number;
 
 #endif

@@ -17,8 +17,12 @@ int main(int argc, char* argv[])
     // We skip the first element of argv, as it is the command name
     for (int i =  1; i < argc; ++i) {
         // Read in the file
-        fstream inputFile;
+        fstream inputFile, outputFile;
         inputFile.open(argv[i], ios::in);
+        stringstream stringContents;
+        stringContents << MCL_LOG_PREFIX << argv[i] << MCL_LOG_SUFFIX;
+        string outfileName = stringContents.str();
+        outputFile.open(outfileName.c_str(), ios::out);
 
         // Initialize our localization system
         MCL *myLoc = new MCL;
@@ -26,13 +30,16 @@ int main(int argc, char* argv[])
         // process the file line by line
         string newLine;
         while(!inputFile.eof()) {
+            // Process the next line of the file
             getline(inputFile, newLine);
-
-            // Process the lines of the file
             processLogLine(newLine, myLoc);
+            printOutLogLine(outputFile, myLoc);
         }
-        // Print the log to file
-        printMCLLog(i);
+        inputFile.close();
+        outputFile.close();
+
+        // Cleanup
+        delete myLoc;
     }
 }
 
@@ -41,18 +48,31 @@ int main(int argc, char* argv[])
 ////////////////////////
 
 /**
- * Read in the raw data file
- */
-void readRawFile(const string fileName)
-{
-}
-
-/**
  * Prints the input to a log file to be read by the TOOL
  */
-void printMCLLog(int logNum)
+void printOutLogLine(fstream outputFile, MCL* myLoc)
 {
-    //sstream fileName =  MCL_LOG_PREFIX << logNum << MCL_LOG_SUFFIX;
+    // Output particle infos
+    vector<Particle> particles = myLoc->getParticles();
+    for(unsigned int j = 0; j < particles.size(); ++j) {
+        Particle p = particles[j];
+        outputfile << p.pose.x << " " << p.pose.y << " " << p.pose.h << " " <<
+            p.weight << " ";
+    }
+
+    fstream << ":";
+
+    // Output standard infos
+    fstream << team_color << " " << player_number << " " << myLoc->getXEst() <<
+        myLoc->getYEst() << " " << myLoc->getHEstDeg() << " " <<
+        myLoc->getXUncert() << " " << myLoc->getYUncert() << " " <<
+        myLoc->getHUncertDeg() << "0.0" << " " << "0.0" << " " << "0.0" <<
+        " " << "0.0" << " " << "0.0" << " " << "0.0" << " " << "0.0" << " " <<
+        "0.0" << " " << lastOdo.x << " " << lastOdo.y << " " << lastOdo.h;
+
+    fstream << ":";
+
+    // Output landmark infos
 }
 
 ////////////////////////
@@ -64,4 +84,7 @@ void printMCLLog(int logNum)
  */
 void processLogLine(string current, MCL* myLoc)
 {
+    MotionModel lastOdo;
+    vector<Observation> sightings;
+    myLoc->updateLocalization(lastOdo, sightings);
 }
