@@ -165,7 +165,7 @@ $(JAR_FILE): $(OBJS)
 	if [ ! -e $(JAR_FILE) ]; then \
 		$(JAR) cfm $(JAR_FILE) $(MANIFEST); \
 	fi
-	find . -name "*.class" | xargs	$(JAR) uf $(JAR_FILE)
+	find -L $(TOOL_DIR) -name "*.class" | xargs	$(JAR) uf $(JAR_FILE)
 
 $(TOOL_DIR): $(TOOL_OBJS)
 $(CALIBRATE_DIR): $(CALIBRATE_OBJS)
