@@ -1,4 +1,4 @@
-package TOOL.WorldController;
+package edu.bowdoin.robocup.TOOL.WorldController;
 
 /**
  * Class defines a particle to represent a particle for use with displaying

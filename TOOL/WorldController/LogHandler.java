@@ -705,7 +705,7 @@ public class LogHandler
 
         // Pull off the data 4 items at a time for each particle
         // The items are (x,y,h,weight)
-        for(int i = 2; i < lineValues.length; i += 4) {
+        for(int i = 0; i < lineValues.length; i += 4) {
             particles.add(new MCLParticle(Float.parseFloat(lineValues[i]),
                                           Float.parseFloat(lineValues[i+1]),
                                           Float.parseFloat(lineValues[i+2]),
