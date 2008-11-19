@@ -56,7 +56,7 @@ test:	all
 	$(MAKE) -C $(META_DIR) $(DIR)/$@
 
 clean_vision:
-	$(RM) $(NATIVE_VISION_TARGET)
+	$(RM) $(NATIVE_VISION_TARGET) 	$(NATIVE_VISION_CLASS).h
 
 vision: $(NATIVE_VISION_TARGET)
 

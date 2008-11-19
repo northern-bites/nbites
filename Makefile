@@ -213,7 +213,7 @@ run: all
 prompt: all
 	@$(PYTHON) -ic "from jpype import startJVM, JArray, java; startJVM();java.net.URLClassLoader(JArray(java.net.URL)(java.net.URL('jar:file:///home/jfishman/robo/branches/TOOL/mysql-connector-java-5.1.6-bin.jar!/'))).loadClass('com.mysql.jdbc.Driver')"
 
-clean: clean_java clean_python
+clean: clean_java clean_python clean_vision
 
 clean_java:
 	find . -name "*.class" | xargs $(RM)
@@ -222,3 +222,8 @@ clean_java:
 clean_python: #$(LOGGING_CLEAN)
 	find . -name "*.pyc" | xargs $(RM)
 	$(RM) $(PYTHON_OBJS)
+
+clean_vision:
+	@$(MAKE) $(MAKE_OPTIONS) -C $(VISION_DIR) clean_vision
+vision: 
+	@$(MAKE) $(MAKE_OPTIONS) -C $(VISION_DIR) vision
