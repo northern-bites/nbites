@@ -24,11 +24,12 @@ using namespace std;
 #define MCL_LOG_SUFFIX ".mcl"
 
 // IO Functions
-void printOutLogLine(fstream outputFile);
+void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
+                     sightings, MotionModel lastOdo);
 
 // Core Functions
-void processLogLine(string current, MCL* myLoc);
+void processLogLine(string current, MCL* myLoc, fstream* outputFile);
 
-int team_color, player_number;
+string team_color, player_number;
 
 #endif
