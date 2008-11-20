@@ -15,7 +15,7 @@
 #include <iostream>
 #include <vector>
 
-#include "TOOLVisionLink.h"
+#include "edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink.h"
 #include "Vision.h"
 #include "NaoPose.h"
 #include "Sensors.h"
@@ -61,7 +61,7 @@ micro_time (void)
  * rather than from a file.
  */
 
-JNIEXPORT void JNICALL Java_TOOLVisionLink_cppProcessImage
+JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppProcessImage
 (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
  jstring jtablePath, jobjectArray thresh_target){
     //Size checking -- we expect the sizes of the arrays to match
