@@ -123,7 +123,7 @@ PYTHON = python2.5
 endif
 
 TRUST_STORE := trustStore
-JAVA_OPTS := -Djavax.net.ssl.trustStore=$(TRUST_STORE)
+JAVA_OPTS := -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
 ifeq ($(PLATFORM),"CYGWIN_NT-5.1")
 JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar;."
 else
@@ -155,7 +155,7 @@ TARGETS = \
 	#$(PEDITOR_DIR) \
 	#$(ZSPACE_DIR) \
 
-.PHONY: all clean clean_java clean_python run prompt $(TARGETS)
+.PHONY: all clean clean_java clean_python clean_vision vision run prompt $(TARGETS)
 
 all: $(JAVA_BUILD) #$(LOGGING_INSTALL)
 
