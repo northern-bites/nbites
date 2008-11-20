@@ -67,7 +67,7 @@ public class RGBImage extends TOOLImage {
         }
     }
 
-    protected void writeByteArray(byte[] rawImage) {
+    public void writeByteArray(byte[] rawImage) {
         int i = 0;
         for (int r = 0; r < getHeight(); r++) {
             for (int c = 0; c < getWidth(); c+=2, i+=3) {

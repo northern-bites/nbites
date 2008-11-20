@@ -57,7 +57,7 @@ public abstract class TOOLImage {
      * differences in how pixel data is stored when packed in an array
      * (YCbCr row-by-row or interleaved, YUV422, RGB interleaved, etc.)
      */
-    protected abstract void writeByteArray(byte[] rawImage);
+    public abstract void writeByteArray(byte[] rawImage);
     
     
     /**
