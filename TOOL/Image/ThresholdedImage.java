@@ -30,6 +30,15 @@ public class ThresholdedImage extends TOOLImage {
         readByteArray(rawImage);
     }
 
+    public ThresholdedImage(byte[][] _thresholded, int width, int height) {
+        this(width, height);
+
+        thresholded = _thresholded;
+        //An instance of this class created directly from a thresholded
+        //array is not able to be re-classified at a later date
+        baseImage = null;
+    }
+
     public ThresholdedImage(int width, int height) {
 	super(width, height);
 	
