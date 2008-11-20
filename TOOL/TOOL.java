@@ -38,6 +38,7 @@ import edu.bowdoin.robocup.TOOL.Data.SourceManager;
 import edu.bowdoin.robocup.TOOL.Data.DataModule;
 import edu.bowdoin.robocup.TOOL.Calibrate.Calibrate;
 import edu.bowdoin.robocup.TOOL.Calibrate.CalibrateModule;
+import edu.bowdoin.robocup.TOOL.Vision.VisionModule;
 import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEditModule;
 import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEdit;
 import edu.bowdoin.robocup.TOOL.Classifier.ClassifierModule;
@@ -179,7 +180,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         addModule(new WorldControllerModule(this));
         // 3d rasterizer for fun and for viewing colortable/image distributions
         //addModule(new ZModule(this));
-
+        //Offline Vision debugger
+        addModule(new VisionModule(this));
         // Add color table listeners to the two modules that must be notified
         // whenever the color table changes
         dataManager.addColorTableListener(calibrate);
@@ -208,8 +210,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
         
 	final String fileSeparator = System.getProperty("file.separator");
-	sourceManager.addSource(".." + fileSeparator + "frame_depot" +
-				fileSeparator);
+	sourceManager.addSource(".." + fileSeparator + "branches" + fileSeparator
+                            +"frame_depot" + fileSeparator);
 
 	//temporary color table mod - make a null table
         try {
