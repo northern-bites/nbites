@@ -78,7 +78,7 @@ public class VisionModule extends TOOLModule  {
 
         tool.getDataManager().addDataListener(this);
         imgPanel = new ImagePanel();
-        visionLink = new TOOLVisionLink(tool);
+        visionLink = new TOOLVisionLink();
     }
 
     public String getDisplayName() {
