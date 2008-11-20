@@ -34,11 +34,14 @@
  *
  * In the future, we'd like to get back much more information --
  * like field objects, etc
+ *
+ * This class purposefully doesnt rely directly on the TOOL class,
+ * so that it is easier to generate the native headers. If desirable
+ * some work on the make file would allow you to pass in an instance of the
+ * tool, allowing you to write to the too.CONSOLE
  */
 
 package edu.bowdoin.robocup.TOOL.Vision;
-
-import edu.bowdoin.robocup.TOOL.TOOL;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -53,12 +56,10 @@ public class TOOLVisionLink {
     int width;
     int height;
 
-    TOOL tool;
     static private boolean visionLinkSuccessful;
 
-    public TOOLVisionLink(TOOL _t) {
+    public TOOLVisionLink() {
         setImageDimensions(DFLT_IMAGE_WIDTH, DFLT_IMAGE_HEIGHT);
-        tool = _t;
     }
 
     /**
@@ -83,13 +84,13 @@ public class TOOLVisionLink {
                 cppProcessImage(img_data,joint_data,
                                 colorTablePath,threshResult);
             }catch(Throwable e){
-                tool.CONSOLE.error("Error in cpp sub system. \n"+
+                System.err.println("Error in cpp sub system. \n"+
                                    "   Processing failed.");
             }
         }
         else
-            tool.CONSOLE.message("VisionLink inactive,"+
-                                 " so image processing failed");
+            System.out.println("VisionLink inactive,"+
+                               " so image processing failed");
         return threshResult;
 
     }
