@@ -1,10 +1,24 @@
 
 
 class Event(object):
-    name = None
+    '''
+    An abstract Event, recieved from a Synchronizer.
+
+    Used to pass and hold reference to a specific event.  A string name is
+    associated with the event, but the object itself is used in the backend
+    map.
+    '''
+    name = 'the name of this event'
 
 
 class Synchro(object):
+    '''
+    A generic Synchronizer object.
+
+    Maintains a collection of Events (mutexs), which may be polled or
+    awaited.
+    '''
+
     def available():
         '''Returns a list of events available for synchronization.'''
 
