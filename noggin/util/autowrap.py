@@ -167,7 +167,7 @@ extern PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
 extern int Py%(type)s_init (PyObject* self, PyObject* arg, PyObject* kwds);
 extern void Py%(type)s_dealloc (PyObject* self);
 // C++ - accessible interface
-extern PyObject* Py%(type)s_new (%(type)s* %(lower)s);
+extern PyObject* Py%(type)s_new (%(type)s* _%(lower)s);
 // Python - accesible interface
 ''' % {'type':t.__name__, 'lower':t.__name__.lower()})
 
