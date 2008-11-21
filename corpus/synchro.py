@@ -27,6 +27,6 @@ class Synchro(object):
         last call to poll() or await().
         '''
 
-    def register(event):
+    def create(name):
         '''Register a new event with the synchronizer.'''
 
