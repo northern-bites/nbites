@@ -284,7 +284,7 @@ def write_wrapper_type_methods(f, skel, t, funcs, attrs):
 /**
 Allocate a new Py%(type)s object.
 **/
-PyObject* Py%(type)s_alloc (PyTypeObject* type, PyObject* args,
+PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
     PyObject* kwds)
 {
     PyObject* self = type->tp_alloc(type, 0);
@@ -292,6 +292,11 @@ PyObject* Py%(type)s_alloc (PyTypeObject* type, PyObject* args,
 
     if (self != NULL) {
         %(lower)s->_%(lower)s = new %(type)s();
+        if (%(lower)s->%(lower)s == NULL) {
+            Py_DECREF(self);
+            PyErr_SetFromErrno(PyExc_SystemError);
+            return NULL;
+        }
 ''' % {'type':t.__name__, 'lower':t.__name__.lower()})
 
     for attr in attrs:
@@ -333,12 +338,19 @@ PyObject* Py%(type)s_new (%(type)s* _%(lower)s)
 
     if (self != NULL) {
         %(lower)s->_%(lower)s = _%(lower)s;
+''' % {'type':t.__name__, 'lower':t.__name__.lower()})
+
+    for attr in attrs:
+        f.write('        %(lower)s->%(attr)s = NULL;\n' %
+                {'lower':t.__name__.lower(), 'attr':attr})
+
+    f.write('''\
     }
 
     return self;
 }
 
-''' % {'type':t.__name__, 'lower':t.__name__.lower()})
+''')
 
     for func in sorted(funcs.keys()):
         f.write('''\
