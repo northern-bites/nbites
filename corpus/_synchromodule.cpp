@@ -131,6 +131,25 @@ PyObject* PySynchro_await (PyObject* self, PyObject* args)
 }
 
 /**
+Register a new event with the synchronizer.
+**/
+PyObject* PySynchro_create (PyObject* self, PyObject* args)
+{
+    PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
+    PyObject* result = NULL;
+    Py_BEGIN_ALLOW_THREADS;
+
+    char *name;
+    if (PyArg_ParseTuple(args, "s", &name)) {
+        Event* event = synchro->_synchro->create(name);
+        result = PyEvent_new(event);
+    }
+
+    Py_END_ALLOW_THREADS;
+    return result;
+}
+
+/**
 Return a boolean indicating whether the given event has
 occurred.
 
@@ -152,25 +171,6 @@ PyObject* PySynchro_poll (PyObject* self, PyObject* args)
                 reinterpret_cast<PyEvent*>(args)->_event->poll());
     }
 
-
-    Py_END_ALLOW_THREADS;
-    return result;
-}
-
-/**
-Register a new event with the synchronizer.
-**/
-PyObject* PySynchro_create (PyObject* self, PyObject* args)
-{
-    PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
-    PyObject* result = NULL;
-    Py_BEGIN_ALLOW_THREADS;
-
-    char *name;
-    if (PyArg_ParseTuple(args, "s", &name)) {
-        Event* event = synchro->_synchro->create(name);
-        result = PyEvent_new(event);
-    }
 
     Py_END_ALLOW_THREADS;
     return result;
