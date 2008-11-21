@@ -300,7 +300,8 @@ PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
 ''' % {'type':t.__name__, 'lower':t.__name__.lower()})
 
     for attr in attrs:
-        f.write('        self.%(attr)s = NULL;\n')
+        f.write('        %(lower)s->%(attr)s = NULL;\n' %
+                {'lower':t.__name__.lower(), 'attr':attr})
 
     f.write('''\
     }
