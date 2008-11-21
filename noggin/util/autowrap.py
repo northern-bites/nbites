@@ -156,7 +156,7 @@ typedef struct Py%s_t
 } Py%(type)s;
 
 
-''')
+''' % {'type':t.__name__})
 
 def write_type_methods(f, t, funcs, args):
     '''Write the PyMethodDef array for a type to a file.'''
@@ -167,7 +167,7 @@ extern PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
 extern int Py%(type)s_init (PyObject* self, PyObject* arg, PyObject* kwds);
 extern void Py%(type)s_dealloc (PyObject* self);
 // C++ - accessible interface
-extern PyObject* *Py%(type)s_new (%(type)s* %(lower)s
+extern PyObject* Py%(type)s_new (%(type)s* %(lower)s);
 // Python - accesible interface
 ''' % {'type':t.__name__, 'lower':t.__name__.lower()})
 
@@ -291,7 +291,7 @@ PyObject* Py%(type)s_alloc (PyTypeObject* type, PyObject* args,
     Py%(type)s* %(lower)s = reinterpret_cast<Py%(type)s*>(self);
 
     if (self != NULL) {
-        %(lower)s._%(lower)s = new %(type)s();
+        %(lower)s->_%(lower)s = new %(type)s();
 ''' % {'type':t.__name__, 'lower':t.__name__.lower()})
 
     for attr in attrs:
