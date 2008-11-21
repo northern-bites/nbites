@@ -18,12 +18,16 @@ class Skeleton(object):
     def wrapper_name(self):
         return os.path.join(self.dirpath, '_' + self.name + 'module.cpp')
 
+    def module_name(self):
+        return os.path.join(self.dirpath, self.name + '.py')
+
 
 def wrap_module(path):
     module = import_module(path)
     skel = process_module(module)
     generate_header_form(skel)
     generate_wrapper_form(skel)
+    generate_module_form(skel)
 
 def import_module(path):
     dirpath, mod_file = os.path.split(path)
@@ -56,7 +60,10 @@ def process_module(module):
     skel.instances = instances
 
     constants = dict((name, o) for name, o in objs.iteritems()
-                         if o not in type_objs and name not in instances)
+                         if o not in type_objs and
+                            name not in instances and
+                            not name.startswith('__'))
+
     skel.constants = constants
 
     return skel
@@ -492,6 +499,71 @@ int c_init_%(skel)s (void)
 
 
 ''')
+
+
+def generate_module_form(skel):
+    '''
+    Generate a Python module file wrapping the given skeleton definition.
+    File is output to [skel.dirpath]/[skel.name].py
+    '''
+    f = file(skel.module_name(), 'w')
+    f.write('\n')
+    write_python_warning(f)
+    write_python_copyright(f)
+    write_imports(f, skel)
+
+def write_python_warning(f):
+    '''Write a warning to a file indicating it was generated automatically'''
+    f.write('''\
+##  WARNING, this file was automatically generated using the Northern
+##  Bites' Python wrapper extension module generator.  Subsequent
+##  form-completion was done by hand.
+
+
+''')
+
+def write_python_copyright(f):
+    '''Write a GPLv3 copyright notice to a file.'''
+    f.write('''\
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+''')
+
+def write_imports(f, skel):
+    '''Write the import statements for the types defined in the backend.'''
+
+    # build a list of all the module attributes for import
+    attrs = []
+    for t in sorted(skel.types):
+        attrs.append(t.__name__)
+    attrs.extend(sorted(skel.instances.keys()))
+    attrs.extend(sorted(skel.constants.keys()))
+
+    f.write('\nfrom ._%(module)s import (' % {'module':skel.name})
+
+    assert len(attrs) > 0, 'module needs at least one attribute'
+    f.write(attrs[0] + ',\n')  # no indent
+
+    if len(attrs) > 1:
+        # indent remaining list entries 16 + len(skel.name) spaces
+        indent = ' ' * (16 + len(skel.name))
+        for i, attr in enumerate(attrs[1:]):
+            f.write(indent + attr + ',\n')
+        f.write(indent)
+
+    f.write(')\n\n')
+
 
 if __name__ == '__main__':
     import sys
