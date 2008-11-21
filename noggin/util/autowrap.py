@@ -113,6 +113,7 @@ def write_header_includes(f, skel):
     '''Write C++ header includes for a Skeleton definition to a file.'''
     f.write('''\
 #include <Python.h>
+#include <structmember.h>
 #include "%s.h"
 
 ''' % skel.name)
@@ -215,7 +216,7 @@ static PyMemberDef Py%(type)s_members[] = {
 
     for attr in sorted(attrs):
         f.write('''\
-    {"%(attr)s", T_OBJECT_EX, offsetof(Py%(type)s, %(attr)s, READONLY,
+    {"%(attr)s", T_OBJECT_EX, offsetof(Py%(type)s, %(attr)s), READONLY,
       "%(doc)s"},
 
 ''' % {'type':t.__name__, 'attr':attr, 'doc':attrs[attr].replace('\n', '\\n')})
@@ -320,7 +321,7 @@ PyObject* Py%(type)s_new (PyTypeObject* type, PyObject* args,
 
     if (self != NULL) {
         %(lower)s->_%(lower)s = new %(type)s();
-        if (%(lower)s->%(lower)s == NULL) {
+        if (%(lower)s->_%(lower)s == NULL) {
             Py_DECREF(self);
             PyErr_SetFromErrno(PyExc_SystemError);
             return NULL;
