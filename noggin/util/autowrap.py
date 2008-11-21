@@ -124,9 +124,9 @@ def write_type(f, skel, t):
     funcs = dict((attr, val) for attr, val in t.__dict__.iteritems()
                     if not attr.startswith('__') and
                        type(val) is types.FunctionType)
-    attrs = [attr for attr, val in t.__dict__.iteritems()
-                    if not attr.startswith('__') and
-                       attr not in funcs]
+    attrs = dict((attr, getattr(t, attr))
+                    for attr, val in t.__dict__.iteritems()
+                    if not attr.startswith('__') and attr not in funcs)
     f.write('''\
 //
 // Py%s definitions
@@ -136,6 +136,7 @@ def write_type(f, skel, t):
 
     write_type_struct(f, t, funcs, attrs)
     write_type_methods(f, t, funcs, attrs)
+    write_type_members(f, t, funcs, attrs)
     write_type_attrs(f, t, funcs, attrs)
     write_type_object(f, skel, t, funcs, attrs)
 
@@ -158,7 +159,7 @@ typedef struct Py%s_t
 
 ''' % {'type':t.__name__})
 
-def write_type_methods(f, t, funcs, args):
+def write_type_methods(f, t, funcs, attrs):
     '''Write the PyMethodDef array for a type to a file.'''
     f.write('''\
 // backend methods
@@ -197,6 +198,26 @@ static PyMethodDef Py%(type)s_methods[] = {
 
 ''')
 
+def write_type_members(f, t, funcs, attrs):
+    '''Write the PyMemberDef array for a type to a file.'''
+    f.write('''\
+// backend member list
+static PyMemberDef Py%(type)s_members[] = {
+
+''' % {'type':t.__name__})
+
+    for attr in sorted(attrs):
+        f.write('''\
+    {"%(attr)s", T_OBJECT_EX, offsetof(Py%(type)s, %(attr)s, READONLY,
+      "%(doc)s"},
+
+''' % {'type':t.__name__, 'attr':attr, 'doc':attrs[attr].replace('\n', '\\n')})
+
+    f.write('''\
+    {NULL} // Sentinel
+};
+
+''')
 
 def write_type_attrs(f, t, funcs, attrs):
     pass
@@ -235,7 +256,7 @@ static PyTypeObject Py%(type)sType = {
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
     Py%(type)s_methods,        /* tp_methods */
-    0,                         /* tp_members */
+    Py%(type)s_members,        /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
