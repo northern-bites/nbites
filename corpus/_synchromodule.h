@@ -18,6 +18,7 @@
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Python.h>
+#include <structmember.h>
 #include "synchro.h"
 
 //
@@ -30,6 +31,7 @@ typedef struct PySynchro_t
     Synchro* _synchro;
 } PySynchro;
 
+
 // backend methods
 extern PyObject* PySynchro_new (PyTypeObject* type, PyObject* args,
     PyObject* kwds);
@@ -40,8 +42,8 @@ extern PyObject* PySynchro_new (Synchro* _synchro);
 // Python - accesible interface
 extern PyObject* PySynchro_available (PyObject* self, PyObject* args);
 extern PyObject* PySynchro_await (PyObject* self, PyObject* args);
+extern PyObject* PySynchro_create (PyObject* self, PyObject* args);
 extern PyObject* PySynchro_poll (PyObject* self, PyObject* args);
-extern PyObject* PySynchro_register (PyObject* self, PyObject* args);
 
 // backend method list
 static PyMethodDef PySynchro_methods[] = {
@@ -54,13 +56,19 @@ static PyMethodDef PySynchro_methods[] = {
       METH_VARARGS,
       "\n        Wait, deferring processing time to other threads, until the\n        given event is signalled.\n\n        If the event has been signalled previously and hast not yet\n        been caught, this method will return immediately and clear the\n        signal.\n        "},
 
+    {"create", reinterpret_cast<PyCFunction>(PySynchro_create),
+      METH_VARARGS,
+      "Register a new event with the synchronizer."},
+
     {"poll", reinterpret_cast<PyCFunction>(PySynchro_poll),
       METH_VARARGS,
       "\n        Return a boolean indicating whether the given event has\n        occurred.\n\n        Returns True only if the event has been signalled after the\n        last call to poll() or await().\n        "},
 
-    {"register", reinterpret_cast<PyCFunction>(PySynchro_register),
-      METH_VARARGS,
-      "Register a new event with the synchronizer."},
+    {NULL} // Sentinel
+};
+
+// backend member list
+static PyMemberDef PySynchro_members[] = {
 
     {NULL} // Sentinel
 };
@@ -88,7 +96,7 @@ static PyTypeObject PySynchroType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Synchro object",         /* tp_doc */
+    "\n    A generic Synchronizer object.\n\n    Maintains a collection of Events (mutexs), which may be polled or\n    awaited.\n    ",                 /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
     0,                         /* tp_richcompare */
@@ -96,7 +104,7 @@ static PyTypeObject PySynchroType = {
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
     PySynchro_methods,        /* tp_methods */
-    0,                         /* tp_members */
+    PySynchro_members,        /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
@@ -120,17 +128,27 @@ typedef struct PyEvent_t
     PyObject* name;
 } PyEvent;
 
+
 // backend methods
 extern PyObject* PyEvent_new (PyTypeObject* type, PyObject* args,
     PyObject* kwds);
 extern int PyEvent_init (PyObject* self, PyObject* arg, PyObject* kwds);
 extern void PyEvent_dealloc (PyObject* self);
 // C++ - accessible interface
-extern PyObject* PyEvent_new (Event* event);
+extern PyObject* PyEvent_new (Event* _event);
 // Python - accesible interface
 
 // backend method list
 static PyMethodDef PyEvent_methods[] = {
+
+    {NULL} // Sentinel
+};
+
+// backend member list
+static PyMemberDef PyEvent_members[] = {
+
+    {"name", T_OBJECT_EX, offsetof(PyEvent, name), READONLY,
+      "the name of this event"},
 
     {NULL} // Sentinel
 };
@@ -158,7 +176,7 @@ static PyTypeObject PyEventType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Event object",         /* tp_doc */
+    "\n    An abstract Event, recieved from a Synchronizer.\n\n    Used to pass and hold reference to a specific event.  A string name is\n    associated with the event, but the object itself is used in the backend\n    map.\n    ",                 /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
     0,                         /* tp_richcompare */
@@ -166,7 +184,7 @@ static PyTypeObject PyEventType = {
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
     PyEvent_methods,        /* tp_methods */
-    0,                         /* tp_members */
+    PyEvent_members,        /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */

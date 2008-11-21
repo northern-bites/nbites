@@ -26,7 +26,7 @@ using namespace std;
 /**
 Allocate a new PySynchro object.
 **/
-PyObject* PySynchro_alloc (PyTypeObject* type, PyObject* args,
+PyObject* PySynchro_new (PyTypeObject* type, PyObject* args,
     PyObject* kwds)
 {
     PyObject* self = type->tp_alloc(type, 0);
@@ -34,6 +34,11 @@ PyObject* PySynchro_alloc (PyTypeObject* type, PyObject* args,
 
     if (self != NULL) {
         synchro->_synchro = new Synchro();
+        if (synchro->_synchro == NULL) {
+            Py_DECREF(self);
+            PyErr_SetFromErrno(PyExc_SystemError);
+            return NULL;
+        }
     }
 
     return self;
@@ -73,7 +78,6 @@ PyObject* PySynchro_new (Synchro* _synchro)
 
     return self;
 }
-
 
 /**
 Returns a list of events available for synchronization.
@@ -179,7 +183,7 @@ PyObject* PySynchro_poll (PyObject* self, PyObject* args)
 /**
 Allocate a new PyEvent object.
 **/
-PyObject* PyEvent_alloc (PyTypeObject* type, PyObject* args,
+PyObject* PyEvent_new (PyTypeObject* type, PyObject* args,
     PyObject* kwds)
 {
     PyErr_SetString(PyExc_SystemError,
@@ -217,6 +221,7 @@ PyObject* PyEvent_new (Event* _event)
 
     if (self != NULL) {
         event->_event = _event;
+        event->name = NULL;
     }
 
     return self;
