@@ -94,7 +94,8 @@ PyObject* PySynchro_available (PyObject* self, PyObject* args)
             itr != events.end(); itr++) {
         PyObject* pyevent = PyEvent_new(itr->second);
         if (pyevent != NULL)
-            PyDict_SetItemString(result, itr->first.c_str(), pyevent);
+            PyDict_SetItem(result, reinterpret_cast<PyEvent*>(pyevent)->name,
+                           pyevent);
         else {
             Py_DECREF(result);
             result = NULL;
@@ -146,7 +147,10 @@ PyObject* PySynchro_create (PyObject* self, PyObject* args)
     char *name;
     if (PyArg_ParseTuple(args, "s", &name)) {
         Event* event = synchro->_synchro->create(name);
-        result = PyEvent_new(event);
+        if (event != NULL)
+            result = PyEvent_new(event);
+        else
+            PyErr_SetFromErrno(PyExc_SystemError);
     }
 
     Py_END_ALLOW_THREADS;
@@ -221,7 +225,8 @@ PyObject* PyEvent_new (Event* _event)
 
     if (self != NULL) {
         event->_event = _event;
-        event->name = NULL;
+        event->name = PyString_FromStringAndSize(_event->name.data(),
+                                                 _event->name.size());
     }
 
     return self;
