@@ -80,7 +80,7 @@ Synchro::~Synchro ()
 Event* Synchro::create (string name)
 {
     map<string, Event*>::iterator itr = events.find(name);
-    if (itr != events.end())
+    if (itr == events.end())
         events[name] = new Event(name);
     return events[name];
 }
