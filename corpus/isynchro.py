@@ -1,4 +1,5 @@
 
+__name__ = 'synchro'
 
 class Event(object):
     '''
