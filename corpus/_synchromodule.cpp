@@ -137,6 +137,11 @@ PyObject* PySynchro_await (PyObject* self, PyObject* args)
 
 /**
 Register a new event with the synchronizer.
+
+Returns an Event object, which is also retrievable via available()
+and the Event's name.  The event object itself should be passed to
+any of the Synchronizer methods that act on Events, not the event's
+name.
 **/
 PyObject* PySynchro_create (PyObject* self, PyObject* args)
 {
@@ -181,6 +186,23 @@ PyObject* PySynchro_poll (PyObject* self, PyObject* args)
 
     Py_END_ALLOW_THREADS;
     return result;
+}
+
+/**
+Signal occurance of the event.
+
+If any threads are waiting for the Event, a single thread will
+resume from wait, immediately clearing the signal.  If no threads
+await, the signal will persist until the Event is polled or
+awaited.
+**/
+PyObject* PySynchro_signal (PyObject* self, PyObject* args)
+{
+    PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
+    Py_BEGIN_ALLOW_THREADS;
+
+    Py_END_ALLOW_THREADS;
+    Py_RETURN_NONE;
 }
 
 /**
@@ -229,6 +251,56 @@ PyObject* PyEvent_new (Event* _event)
     }
 
     return self;
+}
+
+/**
+Wait, deferring processing time to other threads, until the
+given event is signalled.
+
+If the event has been signalled previously and hast not yet
+been caught, this method will return immediately and clear the
+signal.
+**/
+PyObject* PyEvent_await (PyObject* self, PyObject* args)
+{
+    PyEvent* event = reinterpret_cast<PyEvent*>(self);
+    Py_BEGIN_ALLOW_THREADS;
+
+    Py_END_ALLOW_THREADS;
+    Py_RETURN_NONE;
+}
+
+/**
+Return a boolean indicating whether the given event has
+occurred.
+
+Returns True only if the event has been signalled after the
+last call to poll() or await().
+**/
+PyObject* PyEvent_poll (PyObject* self, PyObject* args)
+{
+    PyEvent* event = reinterpret_cast<PyEvent*>(self);
+    Py_BEGIN_ALLOW_THREADS;
+
+    Py_END_ALLOW_THREADS;
+    Py_RETURN_NONE;
+}
+
+/**
+Signal occurance of the event.
+
+If any threads are waiting for the Event, a single thread will
+resume from wait, immediately clearing the signal.  If no threads
+await, the signal will persist until the Event is polled or
+awaited.
+**/
+PyObject* PyEvent_signal (PyObject* self, PyObject* args)
+{
+    PyEvent* event = reinterpret_cast<PyEvent*>(self);
+    Py_BEGIN_ALLOW_THREADS;
+
+    Py_END_ALLOW_THREADS;
+    Py_RETURN_NONE;
 }
 
 /**

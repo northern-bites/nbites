@@ -44,6 +44,7 @@ extern PyObject* PySynchro_available (PyObject* self, PyObject* args);
 extern PyObject* PySynchro_await (PyObject* self, PyObject* args);
 extern PyObject* PySynchro_create (PyObject* self, PyObject* args);
 extern PyObject* PySynchro_poll (PyObject* self, PyObject* args);
+extern PyObject* PySynchro_signal (PyObject* self, PyObject* args);
 
 // backend method list
 static PyMethodDef PySynchro_methods[] = {
@@ -53,16 +54,20 @@ static PyMethodDef PySynchro_methods[] = {
       "Returns a list of events available for synchronization."},
 
     {"await", reinterpret_cast<PyCFunction>(PySynchro_await),
-      METH_VARARGS,
+      METH_O,
       "\n        Wait, deferring processing time to other threads, until the\n        given event is signalled.\n\n        If the event has been signalled previously and hast not yet\n        been caught, this method will return immediately and clear the\n        signal.\n        "},
 
     {"create", reinterpret_cast<PyCFunction>(PySynchro_create),
       METH_VARARGS,
-      "Register a new event with the synchronizer."},
+      "\n        Register a new event with the synchronizer.\n\n        Returns an Event object, which is also retrievable via available()\n        and the Event's name.  The event object itself should be passed to\n        any of the Synchronizer methods that act on Events, not the event's\n        name.\n        "},
 
     {"poll", reinterpret_cast<PyCFunction>(PySynchro_poll),
-      METH_VARARGS,
+      METH_O,
       "\n        Return a boolean indicating whether the given event has\n        occurred.\n\n        Returns True only if the event has been signalled after the\n        last call to poll() or await().\n        "},
+
+    {"signal", reinterpret_cast<PyCFunction>(PySynchro_signal),
+      METH_O,
+      "\n        Signal occurance of the event.\n\n        If any threads are waiting for the Event, a single thread will\n        resume from wait, immediately clearing the signal.  If no threads\n        await, the signal will persist until the Event is polled or\n        awaited.\n        "},
 
     {NULL} // Sentinel
 };
@@ -137,9 +142,24 @@ extern void PyEvent_dealloc (PyObject* self);
 // C++ - accessible interface
 extern PyObject* PyEvent_new (Event* _event);
 // Python - accesible interface
+extern PyObject* PyEvent_await (PyObject* self, PyObject* args);
+extern PyObject* PyEvent_poll (PyObject* self, PyObject* args);
+extern PyObject* PyEvent_signal (PyObject* self, PyObject* args);
 
 // backend method list
 static PyMethodDef PyEvent_methods[] = {
+
+    {"await", reinterpret_cast<PyCFunction>(PyEvent_await),
+      METH_VARARGS,
+      "\n        Wait, deferring processing time to other threads, until the\n        given event is signalled.\n\n        If the event has been signalled previously and hast not yet\n        been caught, this method will return immediately and clear the\n        signal.\n        "},
+
+    {"poll", reinterpret_cast<PyCFunction>(PyEvent_poll),
+      METH_VARARGS,
+      "\n        Return a boolean indicating whether the given event has\n        occurred.\n\n        Returns True only if the event has been signalled after the\n        last call to poll() or await().\n        "},
+
+    {"signal", reinterpret_cast<PyCFunction>(PyEvent_signal),
+      METH_VARARGS,
+      "\n        Signal occurance of the event.\n\n        If any threads are waiting for the Event, a single thread will\n        resume from wait, immediately clearing the signal.  If no threads\n        await, the signal will persist until the Event is polled or\n        awaited.\n        "},
 
     {NULL} // Sentinel
 };
