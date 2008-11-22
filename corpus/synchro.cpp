@@ -36,7 +36,7 @@ void Event::await ()
 {
     pthread_mutex_lock(&mutex);
 
-    if (!signalled)
+    while (!signalled)
         pthread_cond_wait(&cond, &mutex);
     signalled = false;
 
