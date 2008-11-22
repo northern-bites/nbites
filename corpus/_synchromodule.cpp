@@ -198,8 +198,16 @@ awaited.
 **/
 PyObject* PySynchro_signal (PyObject* self, PyObject* args)
 {
-    PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
+    //PySynchro* synchro = reinterpret_cast<PySynchro*>(self); // unused
     Py_BEGIN_ALLOW_THREADS;
+
+    if (!PyObject_TypeCheck(args, &PyEventType)) {
+        PyErr_Format(PyExc_TypeError,
+                     "signal() expected an Event object, got '%s'",
+                     args->ob_type->tp_name);
+    }else{
+        reinterpret_cast<PyEvent*>(args)->_event->signal();
+    }
 
     Py_END_ALLOW_THREADS;
     Py_RETURN_NONE;
@@ -266,6 +274,8 @@ PyObject* PyEvent_await (PyObject* self, PyObject* args)
     PyEvent* event = reinterpret_cast<PyEvent*>(self);
     Py_BEGIN_ALLOW_THREADS;
 
+    event->_event->await();
+
     Py_END_ALLOW_THREADS;
     Py_RETURN_NONE;
 }
@@ -280,10 +290,13 @@ last call to poll() or await().
 PyObject* PyEvent_poll (PyObject* self, PyObject* args)
 {
     PyEvent* event = reinterpret_cast<PyEvent*>(self);
+    PyObject* result = NULL;
     Py_BEGIN_ALLOW_THREADS;
 
+    result = PyBool_FromLong(event->_event->poll());
+
     Py_END_ALLOW_THREADS;
-    Py_RETURN_NONE;
+    return result;
 }
 
 /**
@@ -298,6 +311,8 @@ PyObject* PyEvent_signal (PyObject* self, PyObject* args)
 {
     PyEvent* event = reinterpret_cast<PyEvent*>(self);
     Py_BEGIN_ALLOW_THREADS;
+
+    event->_event->signal();
 
     Py_END_ALLOW_THREADS;
     Py_RETURN_NONE;
