@@ -10,7 +10,7 @@
  *
  * @author George Slavov
  * @author Johannes Strom
- * @date November 2008 
+ * @date November 2008
  */
 
 #ifndef _PreviewController_h_DEFINED
@@ -52,8 +52,9 @@ private:
 
     ufvector3 stateVector;
 
-private: // Constants
-    static const int NUM_PREVIEW_FRAMES = 40;
+public: //Constants
+    static const unsigned int NUM_PREVIEW_FRAMES = 60;
+private:
     static const float weights[NUM_PREVIEW_FRAMES];
     static const float A_c_values[9];
     static const float b_values[3];
@@ -62,6 +63,7 @@ private: // Constants
     ufmatrix3 A_c;
     ufvector3 b;
     ufrowVector3 c;
+
 
 };
 

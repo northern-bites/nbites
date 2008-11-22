@@ -18,6 +18,8 @@
 #include <vector>
 using namespace std;
 
+#include <boost/tuple/tuple.hpp>
+
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
 #include "WalkController.h"
@@ -25,6 +27,10 @@ using namespace std;
 #include "WalkingLeg.h"
 #include "StepGenerator.h"
 
+typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy;
+
+//NOTE: we need to get passed a reference to the switchboard so we can
+//know the length of a motion frame!!
 class WalkProvider : public MotionProvider {
 public:
     WalkProvider();
@@ -36,7 +42,8 @@ public:
 
 private:
     WalkingParameters walkParameters;
-    WalkController *controller;
+    WalkController *controller_x;
+    WalkController *controller_y;
     WalkingLeg left, right;
     StepGenerator stepGenerator;
 };

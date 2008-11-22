@@ -24,35 +24,40 @@
 #include <list>
 using std::list;
 
+#include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "Structs.h"
+#include "PreviewController.h"
 #include "WalkingConstants.h"
+#include "WalkingLeg.h"
+
+typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy;
 
 /**
  * Simple container to hold information about future steps.
  */
-struct Step {
-    float x;
-    float y;
-
-    Step(const float _x, const float _y) : x(_x), y(_y) { }
+struct Step:point<float> {
+    float theta;
+    float time;
+    Foot foot;
+    Step(const float _x, const float _y, const float _theta,
+         const float _time, const Foot _foot)
+        : point<float>(_x,_y), theta(_theta), time(_time), foot(_foot) {}
 };
 
 class StepGenerator {
 public:
-    StepGenerator(const WalkingParameters *params);
-    //const list<float> tick (float x, float y, float h);
-    const list<float>* tick();
+    StepGenerator(const WalkingParameters *params,
+                  WalkingLeg *_left, WalkingLeg *_right);
+    boost::tuple<const list<float>*,const list<float>*> tick();
 
     void setWalkVector(const float _x, const float _y, const float _theta);
 
 private: // Helper methods
-    void generateStep(const float x, const float y,
-                      const float theta);
-    static const int getNumStepFrames(const float x, const float y,
-                                      const float theta) {
-        return static_cast<int>(sqrt(x*x + y*y));
-    }
+    void generateStep(const float _x, const float _y,
+                      const float _theta);
+    void fillZMP(const boost::shared_ptr<Step> newStep );
 
 private:
     // Walk vector:
@@ -64,12 +69,17 @@ private:
     float y;
     float theta;
 
-    // need two zmp_ref in the future for the x and y directions
-    list<float> zmp_ref;
+
+    // need to store future zmp_ref values (points in xy)
+    list<float> zmp_ref_x, zmp_ref_y;
     list<boost::shared_ptr<Step> > futureSteps;
-    bool nextStepIsLeft;
+    boost::shared_ptr<Step> lastZMPDStep; //Last step turned into ZMP values
+    point<float> coordOffsetLastZMPDStep;
 
     const WalkingParameters *walkParameters;
+    bool nextStepIsLeft;
+
+    WalkingLeg *leftLeg, *rightLeg;
 };
 
 #endif

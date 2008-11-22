@@ -6,9 +6,15 @@ using namespace Kinematics;
 
 enum SupportMode{
     SUPPORTING=0,
-    SWINGING
+    SWINGING,
+    DOUBLE_SUPPORT,
+    PERSISTENT_DOUBLE_SUPPORT
 };
 
+enum Foot {
+    LEFT_FOOT = 0,
+    RIGHT_FOOT
+};
 
 struct LegConstants{
     float hipOffsetY;
@@ -32,19 +38,21 @@ struct LegConstants{
 };
 
 struct WalkingParameters{
+    float motion_frame_length_s;
     float bodyHeight;
     float hipOffsetX;
+    float stepDuration;
+    float stepHeight; // in mm
 
     // There are no defaults for walking parameters. All of them need to be
     // inputted.
 
-    WalkingParameters(const WalkingParameters &other)
-        : bodyHeight(other.bodyHeight), hipOffsetX(other.hipOffsetX) {
-
-    }
-
-    WalkingParameters(const float _bh, const float _hox)
-        : bodyHeight(_bh), hipOffsetX(_hox) {
+    WalkingParameters(const float _motion_frame_length_s, const float _bh,
+                      const float _hox, const float _dur,
+                      const float _stepHeight)
+        :  motion_frame_length_s( _motion_frame_length_s),
+           bodyHeight(_bh), hipOffsetX(_hox), stepDuration(_dur),
+           stepHeight(_stepHeight) {
 
     }
 };
