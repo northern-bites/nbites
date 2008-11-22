@@ -104,7 +104,7 @@ PyObject* PySynchro_available (PyObject* self, PyObject* args)
     }
 
     Py_END_ALLOW_THREADS;
-    Py_RETURN_NONE;
+    return result;
 }
 
 /**
@@ -178,7 +178,6 @@ PyObject* PySynchro_poll (PyObject* self, PyObject* args)
         result = PyBool_FromLong(
                 reinterpret_cast<PyEvent*>(args)->_event->poll());
     }
-
 
     Py_END_ALLOW_THREADS;
     return result;
