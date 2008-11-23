@@ -22,12 +22,9 @@ using namespace std;
 
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
-#include "WalkController.h"
-#include "PreviewController.h"
-#include "WalkingLeg.h"
 #include "StepGenerator.h"
 
-typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
+
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 
 //NOTE: we need to get passed a reference to the switchboard so we can
@@ -43,9 +40,6 @@ public:
 
 private:
     WalkingParameters walkParameters;
-    WalkController *controller_x;
-    WalkController *controller_y;
-    WalkingLeg left, right;
     StepGenerator stepGenerator;
 };
 

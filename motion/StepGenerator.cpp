@@ -1,8 +1,7 @@
 #include "StepGenerator.h"
 #include <iostream>
 
-StepGenerator::StepGenerator(const WalkingParameters *params,
-                             WalkingLeg *_left, WalkingLeg *_right)
+StepGenerator::StepGenerator(const WalkingParameters *params)
     : x(0.0f), y(0.0f), theta(0.0f),
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
       currentZMPDSteps(),

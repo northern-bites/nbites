@@ -66,8 +66,7 @@ struct Step:point<float> {
 
 class StepGenerator {
 public:
-    StepGenerator(const WalkingParameters *params,
-                  WalkingLeg *_left, WalkingLeg *_right);
+    StepGenerator(const WalkingParameters *params);
     ~StepGenerator();
 
     
