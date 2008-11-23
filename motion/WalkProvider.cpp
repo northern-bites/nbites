@@ -7,8 +7,8 @@ WalkProvider::WalkProvider()
       walkParameters(.02f, // motion frame length
                      310.0f, // COM height
                      0.0f, // hipOffsetX
-                     1.0f, //stepDuration
-                     15.0f), // steHeight
+                     0.75f, //stepDuration
+                     17.0f), // steHeight
       controller_x(new PreviewController()),
       controller_y(new PreviewController()),
       left(LLEG_CHAIN,&walkParameters),
@@ -37,7 +37,7 @@ void WalkProvider::calculateNextJoints() {
     float reference_zmp = 0.0f; //dummy
     float com_x = controller_x->tick(zmp_ref.get<0>());
     float com_y = controller_y->tick(zmp_ref.get<1>());
-    cout << "Com x: " << com_x << endl;
+    //cout << "Com x: " << com_x << endl;
 
     //Tick each leg (in: CoM x,y balance mode, out: joint angles)
     vector<float> lleg_results = left.tick(com_x,com_y);

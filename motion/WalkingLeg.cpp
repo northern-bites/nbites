@@ -41,7 +41,7 @@ vector <float> WalkingLeg::swinging(float com_x, float com_y) {
     int numChops = static_cast<int>(walkParams->stepDuration /
                                     walkParams->motion_frame_length_s);
 
-    int numFramesInDoubleSupport = numChops/5;
+    int numFramesInDoubleSupport = numChops/4;
 
     if (stage == 0) { // we are rising
         if (frameCounter > numFramesInDoubleSupport)

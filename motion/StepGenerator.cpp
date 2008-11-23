@@ -5,6 +5,7 @@ StepGenerator::StepGenerator(const WalkingParameters *params,
                              WalkingLeg *_left, WalkingLeg *_right)
     : x(0.0f), y(0.0f), theta(0.0f),
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
+      currentZMPDSteps(),
       lastZMPDStep(new Step(0,0,0,0,LEFT_FOOT)), coordOffsetLastZMPDStep(0,0),
       walkParameters(params), nextStepIsLeft(true),
       leftLeg(_left), rightLeg(_right) {
@@ -26,6 +27,7 @@ zmp_xy StepGenerator::tick() {
             futureSteps.pop_front();
 
             fillZMP(nextStep);
+
         }
     }
 
@@ -58,7 +60,7 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newStep ){
     float end_x = newStep->x + coordOffsetLastZMPDStep.x;
     float end_y = newStep->y + coordOffsetLastZMPDStep.y;
 
-    std::cout << "start_x: " << start_x << "end_x: " << end_x << std::endl;
+    //std::cout << "start_x: " << start_x << "end_x: " << end_x << std::endl;
 
     for(int i = 0; i< numChops; i++){
         float new_x =
@@ -76,6 +78,9 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newStep ){
     lastZMPDStep = newStep;
     coordOffsetLastZMPDStep.x += newStep->x;
     coordOffsetLastZMPDStep.y += newStep->y - sign*HIP_OFFSET_Y; //shift to 0
+    
+    //track which steps are ZMPD but still needed for coord. frame stuff
+    currentZMPDSteps.push_back(newStep);
 }
 
 
@@ -110,11 +115,12 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     }
 
     // This says that the next 30 zmp values are over the left leg
+    /*
     for (int i = 0; i < 50; i++){
         zmp_ref_y.push_back(50.0f);
         zmp_ref_x.push_back(0.0f);
     }
-
+    */
     // we start by using our left foot as support and the right as "double
     // support". The right foot will switch into swinging
     leftLeg->switchSupportMode(PERSISTENT_DOUBLE_SUPPORT);

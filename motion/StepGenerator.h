@@ -15,6 +15,19 @@
  *  - Figure out what the units are for the walk vector.
  *  - Figure out how to calculate number of required pre-planned steps,
  *    so that we always have enough previewable zmp_ref values.
+ *
+ *
+ *  COORDINATE FRAME NOTE:
+ *  There are four important coordinate frames:
+ *     - initial (i) is the coordinate frame centered where we begin walking
+           Since we expect not to walk a net distance of more than .5-1.0km in
+           one go, we don't need to worry about float overflow.
+       - foot (f) is the coord. frame centered on the supporting leg.
+           During walking, this frame changes frequently. It is switched
+           the instant when the swinging leg enters DOUBLE_PERSISTANT
+       - center of mass (c) is the coordinate frame centered at the robot's com
+       - step (s) is the coordinate frame relative to which we define a step
+           Typically this would be HIP_OFFSET to the inside of the step.
  */
 
 #ifndef _StepGenerator_h_DEFINED
@@ -26,11 +39,15 @@ using std::list;
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 
 #include "Structs.h"
 #include "PreviewController.h"
 #include "WalkingConstants.h"
 #include "WalkingLeg.h"
+#include "Kinematics.h"
+
+using namespace boost::numeric;
 
 typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy;
 
@@ -72,9 +89,17 @@ private:
 
     // need to store future zmp_ref values (points in xy)
     list<float> zmp_ref_x, zmp_ref_y;
-    list<boost::shared_ptr<Step> > futureSteps;
+    list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
+    //Stores currently relevant steps that are zmpd but not yet completed.
+    //A step is consider completed (obsolete/irrelevant) as soon as the foot
+    //enters into double support (perisistant) 
+    list<boost::shared_ptr<Step> > currentZMPDSteps;
+    
     boost::shared_ptr<Step> lastZMPDStep; //Last step turned into ZMP values
     point<float> coordOffsetLastZMPDStep;
+    //Translation matrix to transfer points in the non-changing 'i'
+    //coord. frame into points in the 'f' coord frame
+    ublas::matrix<float> if_Transform;
 
     const WalkingParameters *walkParameters;
     bool nextStepIsLeft;
