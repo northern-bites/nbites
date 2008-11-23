@@ -48,9 +48,10 @@ using std::list;
 #include "Kinematics.h"
 
 using namespace boost::numeric;
+using namespace Kinematics;
 
-typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy;
-
+typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
+typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 /**
  * Simple container to hold information about future steps.
  */
@@ -67,8 +68,15 @@ class StepGenerator {
 public:
     StepGenerator(const WalkingParameters *params,
                   WalkingLeg *_left, WalkingLeg *_right);
-    boost::tuple<const list<float>*,const list<float>*> tick();
+    ~StepGenerator();
 
+    
+    zmp_xy_tuple generate_zmp_ref();
+    
+    void tick_controller();
+    WalkLegsTuple tick_legs();
+
+    
     void setWalkVector(const float _x, const float _y, const float _theta);
 
 private: // Helper methods
@@ -86,6 +94,7 @@ private:
     float y;
     float theta;
 
+    float com_x, com_y; //x,y targets for the com from the controller
 
     // need to store future zmp_ref values (points in xy)
     list<float> zmp_ref_x, zmp_ref_y;
@@ -104,7 +113,9 @@ private:
     const WalkingParameters *walkParameters;
     bool nextStepIsLeft;
 
-    WalkingLeg *leftLeg, *rightLeg;
+    WalkingLeg leftLeg, rightLeg;
+
+    WalkController *controller_x, *controller_y;
 };
 
 #endif

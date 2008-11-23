@@ -11,7 +11,7 @@ using namespace Kinematics;
 
 class WalkingLeg  {
 public:
-    WalkingLeg(ChainID id, WalkingParameters * walkP);
+    WalkingLeg(ChainID id, const WalkingParameters * walkP);
     //~WalkingLeg() { };
 
     vector <float> tick(float com_x, float com_y);
@@ -44,7 +44,7 @@ private:
     SupportMode supportMode;
     //LegConstants * legConsts;
     ChainID chainID; //keep track of which leg this is
-    WalkingParameters *walkParams;
+    const WalkingParameters *walkParams;
     float lastJoints[LEG_JOINTS];
     ufvector3 goal;
     int leg_sign; //-1 for right leg, 1 for left leg

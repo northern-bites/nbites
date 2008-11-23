@@ -8,14 +8,20 @@ StepGenerator::StepGenerator(const WalkingParameters *params,
       currentZMPDSteps(),
       lastZMPDStep(new Step(0,0,0,0,LEFT_FOOT)), coordOffsetLastZMPDStep(0,0),
       walkParameters(params), nextStepIsLeft(true),
-      leftLeg(_left), rightLeg(_right) {
+      leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
+      controller_x(new PreviewController()),
+      controller_y(new PreviewController()){
 
     setWalkVector(0,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
+StepGenerator::~StepGenerator(){
+    delete controller_x; delete controller_y;
 
+}
 
-zmp_xy StepGenerator::tick() {
+//old method
+zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     static float lastZMP_x = 0;
     static float lastZMP_y = 0;
 
@@ -38,16 +44,33 @@ zmp_xy StepGenerator::tick() {
     // decided to go with a zmp curve instead of a step function, we would
     // be in trouble.
     if (newZMP_x != lastZMP_x || newZMP_y != lastZMP_y) {
-        leftLeg->switchSupportMode();
-        rightLeg->switchSupportMode();
+        leftLeg.switchSupportMode();
+        rightLeg.switchSupportMode();
     }
 
     lastZMP_x = newZMP_x;
     lastZMP_y = newZMP_y;
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
-    return zmp_xy(&zmp_ref_x, &zmp_ref_y);
+    return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
 }
+
+void StepGenerator::tick_controller(){
+    zmp_xy_tuple zmp_ref = generate_zmp_ref();
+    //std::cout<< "zmp y: " << zmp_ref->front() << endl;
+    //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
+
+    com_x = controller_x->tick(zmp_ref.get<0>());
+    com_y = controller_y->tick(zmp_ref.get<1>());
+    //cout << "Com x: " << com_x << endl;
+}
+
+WalkLegsTuple StepGenerator::tick_legs(){
+    vector<float> left = leftLeg.tick(com_x,com_y);
+    vector<float> right = rightLeg.tick(com_x,com_y);
+    return WalkLegsTuple(left,right);
+}
+
 
 
 //Step length always must be a multiple of the motion frame length
@@ -123,8 +146,8 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     */
     // we start by using our left foot as support and the right as "double
     // support". The right foot will switch into swinging
-    leftLeg->switchSupportMode(PERSISTENT_DOUBLE_SUPPORT);
-    rightLeg->switchSupportMode(DOUBLE_SUPPORT);
+    leftLeg.switchSupportMode(PERSISTENT_DOUBLE_SUPPORT);
+    rightLeg.switchSupportMode(DOUBLE_SUPPORT);
 
     //dummy
     lastZMPDStep = boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,

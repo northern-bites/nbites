@@ -16,6 +16,17 @@ enum Foot {
     RIGHT_FOOT
 };
 
+
+
+/*
+struct WalkLegsResult{
+    vector<float> left;
+    vector<float> right;
+    WalkLegsResult(vector<float> r, vector<float> l)
+        : left(l), right(r){}
+}
+*/
+
 struct LegConstants{
     float hipOffsetY;
     float hipOffsetZ;
