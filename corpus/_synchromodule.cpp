@@ -19,9 +19,11 @@
 
 #include <map>
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include "_synchromodule.h"
 
 using namespace std;
+using namespace boost;
 
 /**
 Allocate a new PySynchro object.
@@ -33,7 +35,7 @@ PyObject* PySynchro_new (PyTypeObject* type, PyObject* args,
     PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
 
     if (self != NULL) {
-        synchro->_synchro = new Synchro();
+        synchro->_synchro = shared_ptr<Synchro> (new Synchro());
         if (synchro->_synchro == NULL) {
             Py_DECREF(self);
             PyErr_SetFromErrno(PyExc_SystemError);
@@ -59,15 +61,15 @@ Deallocate memory for a deleted PySynchro object.
 **/
 void PySynchro_dealloc (PyObject* self)
 {
-    PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
-    delete synchro->_synchro;
+    //PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
+    //delete synchro->_synchro;
     self->ob_type->tp_free(self);
 }
 
 /**
 Create a new PySynchro object from a C++ Synchro object, from C++.
 **/
-PyObject* PySynchro_new (Synchro* _synchro)
+PyObject* PySynchro_new (shared_ptr<Synchro> _synchro)
 {
     PyObject* self = PySynchroType.tp_alloc(&PySynchroType, 0);
     PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
@@ -88,9 +90,9 @@ PyObject* PySynchro_available (PyObject* self, PyObject* args)
     PyObject* result = NULL;
     Py_BEGIN_ALLOW_THREADS;
 
-    map<string, Event*> events = synchro->_synchro->available();
+    map<string, shared_ptr<Event> > events = synchro->_synchro->available();
     result = PyDict_New();
-    for (map<string, Event*>::iterator itr = events.begin();
+    for (map<string, shared_ptr<Event> >::iterator itr = events.begin();
             itr != events.end(); itr++) {
         PyObject* pyevent = PyEvent_new(itr->second);
         if (pyevent != NULL)
@@ -151,7 +153,7 @@ PyObject* PySynchro_create (PyObject* self, PyObject* args)
 
     char *name;
     if (PyArg_ParseTuple(args, "s", &name)) {
-        Event* event = synchro->_synchro->create(name);
+        shared_ptr<Event> event = synchro->_synchro->create(name);
         if (event != NULL)
             result = PyEvent_new(event);
         else
@@ -247,7 +249,7 @@ void PyEvent_dealloc (PyObject* self)
 /**
 Create a new PyEvent object from a C++ Event object, from C++.
 **/
-PyObject* PyEvent_new (Event* _event)
+PyObject* PyEvent_new (shared_ptr<Event> _event)
 {
     PyObject* self = PyEventType.tp_alloc(&PyEventType, 0);
     PyEvent* event = reinterpret_cast<PyEvent*>(self);

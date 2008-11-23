@@ -19,6 +19,7 @@
 
 #include <Python.h>
 #include <structmember.h>
+#include <boost/shared_ptr.hpp>
 #include "synchro.h"
 
 //
@@ -28,7 +29,7 @@
 typedef struct PySynchro_t
 {
     PyObject_HEAD
-    Synchro* _synchro;
+    boost::shared_ptr<Synchro> _synchro;
 } PySynchro;
 
 
@@ -38,7 +39,7 @@ extern PyObject* PySynchro_new (PyTypeObject* type, PyObject* args,
 extern int PySynchro_init (PyObject* self, PyObject* arg, PyObject* kwds);
 extern void PySynchro_dealloc (PyObject* self);
 // C++ - accessible interface
-extern PyObject* PySynchro_new (Synchro* _synchro);
+extern PyObject* PySynchro_new (boost::shared_ptr<Synchro> _synchro);
 // Python - accesible interface
 extern PyObject* PySynchro_available (PyObject* self, PyObject* args);
 extern PyObject* PySynchro_await (PyObject* self, PyObject* args);
@@ -128,7 +129,7 @@ static PyTypeObject PySynchroType = {
 typedef struct PyEvent_t
 {
     PyObject_HEAD
-    Event* _event;
+    boost::shared_ptr<Event> _event;
 
     PyObject* name;
 } PyEvent;
@@ -140,7 +141,7 @@ extern PyObject* PyEvent_new (PyTypeObject* type, PyObject* args,
 extern int PyEvent_init (PyObject* self, PyObject* arg, PyObject* kwds);
 extern void PyEvent_dealloc (PyObject* self);
 // C++ - accessible interface
-extern PyObject* PyEvent_new (Event* _event);
+extern PyObject* PyEvent_new (boost::shared_ptr<Event> _event);
 // Python - accesible interface
 extern PyObject* PyEvent_await (PyObject* self, PyObject* args);
 extern PyObject* PyEvent_poll (PyObject* self, PyObject* args);
@@ -167,8 +168,8 @@ static PyMethodDef PyEvent_methods[] = {
 // backend member list
 static PyMemberDef PyEvent_members[] = {
 
-    {"name", T_OBJECT_EX, offsetof(PyEvent, name), READONLY,
-      "the name of this event"},
+    //{"name", T_OBJECT_EX, offsetof(PyEvent, name), READONLY,
+    //  "the name of this event"},
 
     {NULL} // Sentinel
 };
