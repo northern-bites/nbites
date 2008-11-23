@@ -15,9 +15,11 @@
 #include <map>
 #include <string>
 #include <pthread.h>
+#include <boost/shared_ptr.hpp>
 #include "synchro.h"
 
 using namespace std;
+using namespace boost;
 
 Event::Event (string _name)
     : name(_name), signalled(false)
@@ -71,21 +73,19 @@ Synchro::Synchro ()
 
 Synchro::~Synchro ()
 {
-    for (map<string, Event*>::iterator itr = events.begin();
-            itr != events.end(); itr++) {
-        delete itr->second;
-    }
 }
 
-Event* Synchro::create (string name)
+shared_ptr<Event> Synchro::create (string name)
 {
-    map<string, Event*>::iterator itr = events.find(name);
-    if (itr == events.end())
-        events[name] = new Event(name);
+    map<string, shared_ptr<Event> >::iterator itr = events.find(name);
+    if (itr == events.end()) {
+        const shared_ptr<Event> e(new Event(name));
+        events[name] = e;
+    }
     return events[name];
 }
 
-const map<string, Event*>& Synchro::available ()
+const map<string, shared_ptr<Event> >& Synchro::available ()
 {
     return events;
 }

@@ -18,6 +18,8 @@
 #include <map>
 #include <string>
 #include <pthread.h>
+#include <boost/shared_ptr.hpp>
+
 
 class Event
 {
@@ -51,9 +53,9 @@ class Synchro
 
   public:
     // Obtain a map of event names to Events
-    const std::map<std::string, Event*>& available();
+    const std::map<std::string, boost::shared_ptr<Event> >& available();
     // Create a new event with the given name
-    Event* create(std::string event_name);
+    boost::shared_ptr<Event> create(std::string event_name);
 
     // Wait for an event to be signalled, and clear the signal
     void await(Event* ev);
@@ -63,7 +65,7 @@ class Synchro
     void signal(Event* ev);
 
   private:
-    std::map<std::string, Event*> events;
+    std::map<std::string, boost::shared_ptr<Event> > events;
 };
 
 #endif // Synchro_h_DEFINED
