@@ -61,8 +61,8 @@ Deallocate memory for a deleted PySynchro object.
 **/
 void PySynchro_dealloc (PyObject* self)
 {
-    //PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
-    //delete synchro->_synchro;
+    PySynchro* synchro = reinterpret_cast<PySynchro*>(self);
+    synchro->_synchro.reset();
     self->ob_type->tp_free(self);
 }
 
@@ -90,15 +90,18 @@ PyObject* PySynchro_available (PyObject* self, PyObject* args)
     PyObject* result = NULL;
     Py_BEGIN_ALLOW_THREADS;
 
-    map<string, shared_ptr<Event> > events = synchro->_synchro->available();
+    const map<string, shared_ptr<Event> > events =
+        synchro->_synchro->available();
     result = PyDict_New();
-    for (map<string, shared_ptr<Event> >::iterator itr = events.begin();
+
+    for (map<string, shared_ptr<Event> >::const_iterator itr = events.begin();
             itr != events.end(); itr++) {
-        PyObject* pyevent = PyEvent_new(itr->second);
-        if (pyevent != NULL)
-            PyDict_SetItem(result, reinterpret_cast<PyEvent*>(pyevent)->name,
-                           pyevent);
-        else {
+        PyObject* event = PyEvent_new(itr->second);
+        if (event != NULL) {
+            PyDict_SetItem(result, reinterpret_cast<PyEvent*>(event)->name,
+                           event);
+            Py_DECREF(event);
+        }else {
             Py_DECREF(result);
             result = NULL;
             break;
@@ -241,8 +244,8 @@ Deallocate memory for a deleted PyEvent object.
 **/
 void PyEvent_dealloc (PyObject* self)
 {
-    //PyEvent* event = reinterpret_cast<PyEvent*>(self); // unused
-    //delete event->_event; // we don't own this pointer, so don't delete it
+    PyEvent* event = reinterpret_cast<PyEvent*>(self);
+    event->_event.reset();
     self->ob_type->tp_free(self);
 }
 
