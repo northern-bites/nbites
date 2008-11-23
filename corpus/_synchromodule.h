@@ -168,8 +168,8 @@ static PyMethodDef PyEvent_methods[] = {
 // backend member list
 static PyMemberDef PyEvent_members[] = {
 
-    //{"name", T_OBJECT_EX, offsetof(PyEvent, name), READONLY,
-    //  "the name of this event"},
+    {"name", T_OBJECT_EX, offsetof(PyEvent, name), READONLY,
+     "the name of this event"},
 
     {NULL} // Sentinel
 };
