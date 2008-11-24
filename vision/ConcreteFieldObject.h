@@ -16,7 +16,7 @@ using namespace std;
 #include "ConcreteLandmark.h"
 
 enum fieldObjectID {
-    BLUE_GOAL_LEFT_POST = 100,
+    BLUE_GOAL_LEFT_POST = 30,
     BLUE_GOAL_RIGHT_POST,
     YELLOW_GOAL_LEFT_POST,
     YELLOW_GOAL_RIGHT_POST,

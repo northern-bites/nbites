@@ -11,8 +11,8 @@ static const double FIELD_SCALE = OFFICIAL_SCALE;
 
 static const double FIELD_WHITE_WIDTH = 400. * FIELD_SCALE;
 static const double FIELD_WHITE_HEIGHT = 600. * FIELD_SCALE;
-static const double FIELD_GREEN_WIDTH = 540. * FIELD_SCALE;
-static const double FIELD_GREEN_HEIGHT = 740. * FIELD_SCALE;
+static const double FIELD_GREEN_WIDTH = 440. * FIELD_SCALE;
+static const double FIELD_GREEN_HEIGHT = 680. * FIELD_SCALE;
 static const double FIELD_WIDTH = FIELD_GREEN_WIDTH;
 static const double FIELD_HEIGHT = FIELD_GREEN_HEIGHT;
 
@@ -24,8 +24,8 @@ static const double FIELD_GREEN_RIGHT_SIDELINE_X = FIELD_GREEN_WIDTH;
 static const double FIELD_GREEN_BOTTOM_SIDELINE_Y = 0;
 static const double FIELD_GREEN_TOP_SIDELINE_Y = FIELD_GREEN_HEIGHT;
 
-static const double GREEN_PAD_Y = 70. * FIELD_SCALE;
-static const double GREEN_PAD_X = 70. * FIELD_SCALE;
+static const double GREEN_PAD_Y = 40. * FIELD_SCALE;
+static const double GREEN_PAD_X = 20. * FIELD_SCALE;
 
 static const double FIELD_WHITE_BOTTOM_SIDELINE_Y = GREEN_PAD_Y;
 static const double FIELD_WHITE_TOP_SIDELINE_Y = (FIELD_WHITE_HEIGHT +
@@ -56,10 +56,10 @@ static const double LANDMARK_OPP_GOAL_LEFT_POST_Y =
 static const double LANDMARK_OPP_GOAL_RIGHT_POST_Y =
     FIELD_WHITE_TOP_SIDELINE_Y+5.0;
 
-static const double CENTER_CIRCLE_RADIUS = 60.; // not scaled
+static const double CENTER_CIRCLE_RADIUS = 65.; // not scaled
 
-static const double GOALBOX_HEIGHT = 50.; // not scaled
-static const double GOALBOX_WIDTH = 300.; // not scaled
+static const double GOALBOX_HEIGHT = 60.; // not scaled
+static const double GOALBOX_WIDTH = 200.; // not scaled
 
 static const double MIDFIELD_X = FIELD_GREEN_WIDTH / 2.;
 static const double MIDFIELD_Y = FIELD_GREEN_HEIGHT / 2.;

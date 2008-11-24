@@ -1,7 +1,7 @@
 C++ = g++
-C++-FLAGS = -wall -02
+C++-FLAGS = -wall -02 -g
 RM = rm -f
-INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./
+INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
 
 VL_SRCS = ../../vision/VisualLine.cpp
 
@@ -19,7 +19,8 @@ FO_SRCS = ../../vision/FieldObjects.cpp
 
 CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp
 
-LOG_SRCS = MCLLogger.cpp
+LOG_SRCS = MCLLogger.cpp \
+	MCLLogger.h
 
 OBJS = 	Utility.o \
 	visualLine.o \
@@ -33,7 +34,7 @@ MCL_SRCS = ../MCL.cpp
 
 all : mclLogger
 
-mclLogger : $(LOG_SRCS)
+mclLogger : $(LOG_SRCS) $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o mclLogger $(LOG_SRCS) $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
 
 mclTest : mclTest.cpp # $(OBJS)
@@ -63,4 +64,4 @@ concreteFO.o : $(CCFO_SRCS)
 .Phony : clean
 
 clean :
-	$(RM) $(OBJS) mclTest
+	$(RM) $(OBJS) mclLogger

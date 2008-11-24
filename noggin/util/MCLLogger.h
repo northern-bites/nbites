@@ -13,15 +13,22 @@
 // STL
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
+#include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 using namespace std;
+using boost::lexical_cast;
+using boost::bad_lexical_cast;
 
 // Local
 #include "MCL.h"
 
 #define MCL_LOG_PREFIX "LOG"
 #define MCL_LOG_SUFFIX ".mcl"
+#define DEBUG_INPUT true
+#define DEBUG_INPUT_CORNERS true
+// Define a tokenizer type
+typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 // IO Functions
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>

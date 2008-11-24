@@ -23,26 +23,28 @@ Observation::Observation(FieldObjects &_object)
     sigma_d = visDist * 4.0f;
     sigma_b = visBearing * 4.0f;
 
+    id = _object.getID();
+
     // Figure out which possible landmarks we have...
     // This should be cleaner like in corners, once field objects is in line...
     if (_object.getCertainty() == SURE) {
         PointLandmark objectLandmark;
-        if ( _object.getID() == BLUE_GOAL_LEFT_POST) {
+        if ( id == BLUE_GOAL_LEFT_POST) {
             objectLandmark.x = ConcreteFieldObject::
                 blue_goal_left_post.getFieldX();
             objectLandmark.y = ConcreteFieldObject::
                 blue_goal_left_post.getFieldY();
-        } else if( _object.getID() == BLUE_GOAL_RIGHT_POST) {
+        } else if( id == BLUE_GOAL_RIGHT_POST) {
             objectLandmark.x = ConcreteFieldObject::
                 blue_goal_right_post.getFieldX();
             objectLandmark.y = ConcreteFieldObject::
                 blue_goal_right_post.getFieldY();
-        } else if ( _object.getID() == YELLOW_GOAL_LEFT_POST) {
+        } else if ( id == YELLOW_GOAL_LEFT_POST) {
             objectLandmark.x = ConcreteFieldObject::
                 yellow_goal_left_post.getFieldX();
             objectLandmark.y = ConcreteFieldObject::
                 yellow_goal_left_post.getFieldY();
-        } else if( _object.getID() == YELLOW_GOAL_RIGHT_POST) {
+        } else if( id == YELLOW_GOAL_RIGHT_POST) {
             objectLandmark.x = ConcreteFieldObject::
                 yellow_goal_right_post.getFieldX();
             objectLandmark.y = ConcreteFieldObject::
@@ -54,8 +56,8 @@ Observation::Observation(FieldObjects &_object)
     }
 
     list <const ConcreteFieldObject *> objList;
-    if ( _object.getID() == BLUE_GOAL_LEFT_POST ||
-         _object.getID() == BLUE_GOAL_RIGHT_POST) {
+    if ( id == BLUE_GOAL_LEFT_POST ||
+         id == BLUE_GOAL_RIGHT_POST) {
             objList = ConcreteFieldObject::blueGoalPosts;
     } else {
             objList = ConcreteFieldObject::yellowGoalPosts;
@@ -90,6 +92,7 @@ Observation::Observation(VisualCorner &_corner)
     //sigma_b = _corner.getBearingSD();
     sigma_d = visDist * 4.0f;
     sigma_b = visBearing * 4.0f;
+    //id = _corner.getID();
 
     // Build our possibilitiy list
     numPossibilities= 0;
@@ -123,6 +126,7 @@ Observation::Observation(VisualLine &_line)
     visBearing = 200;
     sigma_d = visDist * 4.0f;
     sigma_b = visBearing * 4.0f;
+    //id = _line.getID();
 
     // Build our possibilitiy list
     Observation::numPossibilities = 0;

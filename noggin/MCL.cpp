@@ -40,7 +40,6 @@ MCL::~MCL()
  * Method updates the set of particles and estimates the robots position.
  * Called every frame.
  *
- * @param X_t_1 The set of particles from the previous update.
  * @param u_t The motion (odometery) change since the last update.
  * @param z_t The set of landmark observations in the current frame.
  *
@@ -48,11 +47,12 @@ MCL::~MCL()
  */
 void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 {
-    // Initialize the current set of particles
+    // Set the current particles to be of time minus one.
     vector<Particle> X_t_1 = X_t;
-    //X_t = NULL;
+    // Clar the current set
+    X_t.clear();
     vector<Particle> X_bar_t; // A priori estimates
-    float totalWeights = 0; // Must sum all weights for future use
+    float totalWeights = 0.0f; // Must sum all weights for future use
 
     // Run through the particles
     for (int m = 0; m < M; ++m) {
@@ -62,7 +62,7 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 
         // Update measurement model
         x_t_m.weight = updateMeasurementModel(z_t, x_t_m.pose);
-
+        totalWeights += x_t_m.weight;
         // Add the particle to the current frame set
         X_bar_t.push_back(x_t_m);
     }
@@ -70,12 +70,14 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
     // Resample the particles
     for (int m = 0; m < M; ++m) {
         // Determine the number of copies of this particle to add
-        int count = M * X_bar_t[m].weight / totalWeights;
-
-        // Add the particles to the resampled posterior
-        for (int i = 0; i < count; ++i) {
-            X_t.push_back(X_bar_t[m]);
-        }
+        int count = int(float(M) * X_bar_t[m].weight / totalWeights);
+        //cout << "Count : " << count << endl;
+        X_t.push_back(X_bar_t[m]);
+        // // Add the particles to the resampled posterior!
+        // for (int i = 0; i < count; ++i) {
+        //     X_t.push_back(X_bar_t[m]);
+        //     cout << "Pushing back to x_t" << endl;
+        // }
     }
 
     // Update pose and uncertainty estimates
@@ -93,7 +95,7 @@ PoseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
 {
     // Translate the relative change into the global coordinate system
     float deltaX, deltaY, deltaH;
-    float calcFromAngle = (x_t.h + 90.) * DEG_TO_RAD;
+    float calcFromAngle = x_t.h + M_PI / 2.0f;
     deltaX = u_t.deltaF * cos(calcFromAngle) - u_t.deltaL * sin(calcFromAngle);
     deltaY = u_t.deltaF * sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
     deltaH = u_t.deltaR; // Rotational change is the same as heading change
