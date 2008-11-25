@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
             if(newLine == "") {
                 continue;
             }
-            cout << "Line number: " << k << endl;
+            // cout << "Line number: " << k << endl;
             processLogLine(newLine, myLoc, &outputFile);
         }
 

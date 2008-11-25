@@ -79,10 +79,9 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
         // Add the particles to the resampled posterior!
         for (int i = 0; i < count; ++i) {
             X_t.push_back(randomWalkParticle(X_bar_t[m]));
-            //cout << "Added particle" << endl;
         }
     }
-    cout << "Num particles: " << X_t.size() << endl;
+
     // Update pose and uncertainty estimates
     updateEstimates();
 }
@@ -185,9 +184,12 @@ void MCL::updateEstimates()
 
     // Calculate the biased variances
     for (unsigned int i=0; i < X_t.size(); ++i) {
-        bSDs.x += X_t[i].weight * pow((X_t[i].pose.x - wMeans.x), 2.0f);
-        bSDs.y += X_t[i].weight * pow((X_t[i].pose.y - wMeans.y), 2.0f);
-        bSDs.h += X_t[i].weight * pow((X_t[i].pose.h - wMeans.h), 2.0f);
+        bSDs.x += X_t[i].weight * (X_t[i].pose.x - wMeans.x)*
+            (X_t[i].pose.x - wMeans.x);
+        bSDs.y += X_t[i].weight * (X_t[i].pose.y - wMeans.y)*
+            (X_t[i].pose.y - wMeans.y);
+        bSDs.h += X_t[i].weight * (X_t[i].pose.h - wMeans.h)*
+            (X_t[i].pose.h - wMeans.h);
     }
 
     bSDs.x /= weightSum;
@@ -225,8 +227,8 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
     float r_a;
 
     // Determine expected distance to the landmark
-    d_hat = sqrt( pow(pt.x - x_t.x, 2) +
-                  pow(pt.y - x_t.y, 2));
+    d_hat = sqrt( (pt.x - x_t.x)*(pt.x - x_t.x) +
+                  (pt.y - x_t.y)*(pt.y - x_t.y));
     // Expected bearing
     a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
     // Calculate residuals
@@ -306,19 +308,17 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
 float MCL::getSimilarity(float r_d, float r_a, Observation &z)
 {
     // Similarity of observation and expectation
-    float s_d;
-    float s_a;
+    float s_d_a;
     float sigma_d = z.getDistSD();
     float sigma_a = z.getBearingSD();
     // Calculate the similarity of the observation and expectation
-    // Takes the form e^(-r_d^2/SD(d)^2)
-    s_d = exp(-(r_d*r_d) / (sigma_d*sigma_d));
-    s_a = exp(-(r_a*r_a) / (sigma_a*sigma_a));
+    s_d_a = exp((-(r_d*r_d) / (sigma_d*sigma_d))
+                -((r_a*r_a) / (sigma_a*sigma_a)));
 
-    // Update the weight of the particle
-    // We multiple the weight till now with the combined probability of
-    // this iterations sighting
-    return s_d*s_a;
+    if (s_d_a < MIN_SIMILARITY) {
+        s_d_a = MIN_SIMILARITY;
+    }
+    return s_d_a;
 }
 
 Particle MCL::randomWalkParticle(Particle p)

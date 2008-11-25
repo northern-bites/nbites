@@ -59,6 +59,7 @@ public:
 #define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 // Constants
 static const int M = 100; // Number of particles
+static const float MIN_SIMILARITY = 1.0e-15; // Minimum possible similarity
 
 // The Monte Carlo Localization class
 class MCL
