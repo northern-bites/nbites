@@ -7,8 +7,10 @@
 using namespace Kinematics;
 
 
-ScriptedProvider::ScriptedProvider(float motionFrameLength)
-    : MotionProvider(),FRAME_LENGTH_S(motionFrameLength), //Create the queues!
+ScriptedProvider::ScriptedProvider(float motionFrameLength,
+								   Sensors *s)
+    : MotionProvider(),FRAME_LENGTH_S(motionFrameLength),
+	  chopper(s),nextJoints()//Create the queues!
 {
 
 
@@ -32,11 +34,9 @@ void ScriptedProvider::calculateNextJoints() {
 }
 
 void ScriptedProvider::enqueue(const BodyJointCommand *command) {
-    // Go through BodyJointCommand and add to each chain queue
-
 	// Make new BodyJointCommand for each chain, from *command
 	// Add to each chain
-    std::vector<float> *joints;
+	
 
 
     }

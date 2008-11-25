@@ -2,15 +2,16 @@
 #define _ScriptedProvider_h_DEFINED
 
 #include <vector>
-using namespace std;
-
 #include "MotionProvider.h"
 #include "ChainQueue.h"
-
+#include "Sensors.h"
+#include "ChopShop.h"
+using namespace std;
 
 class ScriptedProvider : public MotionProvider {
 public:
-    ScriptedProvider(float motionFrameLength);
+    ScriptedProvider(float motionFrameLength,
+					 Sensors *s);
     virtual ~ScriptedProvider();
 
     void requestStop();
@@ -22,6 +23,8 @@ public:
 
 private:
 	float FRAME_LENGTH_S;
+	ChopShop chopper;
+	vector<vector<float> > nextJoints;
 };
 
 #endif
