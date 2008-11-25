@@ -3,13 +3,13 @@
 ConcreteLine::ConcreteLine(const float _fieldX1, const float _fieldY1,
                            const float _fieldX2, const float _fieldY2,
                            const lineID _id) :
-    fieldX1(_fieldX1), fieldX2(_fieldX2), fieldY1(_fieldY1), fieldY2(_fieldY2)
+    fieldX1(_fieldX1), fieldY1(_fieldY1), fieldX2(_fieldX2), fieldY2(_fieldY2)
 {
     id = _id;
 }
 
 ConcreteLine::ConcreteLine(const ConcreteLine& other) :
-    fieldX1(other.fieldX1), fieldX2(other.fieldX2), fieldY1(other.fieldY1),
+    fieldX1(other.fieldX1), fieldY1(other.fieldY1), fieldX2(other.fieldX2),
     fieldY2(other.fieldY2)
 {
     id = other.getID();

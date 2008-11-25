@@ -1,5 +1,5 @@
 C++ = g++
-C++-FLAGS = -wall -02 -g
+C++-FLAGS = -Wall -02 -g
 RM = rm -f
 INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
 

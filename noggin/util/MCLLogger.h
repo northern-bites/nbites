@@ -25,8 +25,8 @@ using boost::bad_lexical_cast;
 
 #define MCL_LOG_PREFIX "LOG"
 #define MCL_LOG_SUFFIX ".mcl"
-#define DEBUG_INPUT true
-#define DEBUG_INPUT_CORNERS true
+#define DEBUG_INPUT false
+#define DEBUG_INPUT_CORNERS false
 // Define a tokenizer type
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 

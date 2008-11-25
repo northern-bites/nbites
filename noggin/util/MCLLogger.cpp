@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     // Iterate through the inputed files
     // We skip the first element of argv, as it is the command name
     for (int i =  1; i < argc; ++i) {
-        cout << "Reading file" << i << endl;
+        //cout << "Reading file" << i << endl;
         // Read in the file
         fstream inputFile, outputFile;
         inputFile.open(argv[i], ios::in);
@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
 
         // process the file line by line
         string newLine;
-        vector<Observation>* sightings;
 
         // Process information from the first line
         getline(inputFile, newLine);
@@ -43,14 +42,18 @@ int main(int argc, char* argv[])
         player_number = *(++tok_iter);
 
         int k = 0;
+        vector<Observation> v;
+        MotionModel l;
+        printOutLogLine(&outputFile, myLoc, v, l);
         while(!inputFile.eof()) {
+            ++k;
             // Process the next line of the file
             getline(inputFile, newLine);
             // Ignore blank lines
             if(newLine == "") {
                 continue;
             }
-            cout << "Line number: " << ++k << endl;
+            cout << "Line number: " << k << endl;
             processLogLine(newLine, myLoc, &outputFile);
         }
 
@@ -211,15 +214,10 @@ void processLogLine(string current, MCL* myLoc, fstream* outputFile)
     // Head Yaw...
     ++tok_iter; // Skip, AIBO specific
 
-    if (++tok_iter == tokens.end()) {
-        // cout << "nothing  left" << endl;
-        return;
-    }
-
     // Corners...
+    ++tok_iter;
     int nextX, nextY;
     while(tok_iter != tokens.end()) {
-        //cout << "<" << *tok_iter << ">" << " ";
         if((*tok_iter).compare("c") == 0) {
             tempDist = lexical_cast<float>(*(++tok_iter));
             tempBearing = lexical_cast<float>(*(++tok_iter));

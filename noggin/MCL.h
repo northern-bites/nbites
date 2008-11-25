@@ -49,11 +49,14 @@ public:
 };
 
 // Math Macros
-#define DEG_TO_RAD (2. * M_PI) / 360.
-#define RAD_TO_DEG 360. / (2. * M_PI)
+#define DEG_TO_RAD (2.0f * M_PI) / 360.0f
+#define RAD_TO_DEG 360.0f / (2.0f * M_PI)
 #define FULL_CIRC 360
 #define HALF_CIRC 180
-
+#define MAX_CHANGE_X 10.0f
+#define MAX_CHANGE_Y 10.0f
+#define MAX_CHANGE_H M_PI / 6.0f
+#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 // Constants
 static const int M = 100; // Number of particles
 
@@ -161,6 +164,7 @@ private:
                                PointLandmark landmark);
     float determineLineWeight(Observation z, PoseEst x_t, LineLandmark _line);
     float getSimilarity(float r_d, float r_a, Observation &z);
+    Particle randomWalkParticle(Particle p);
 };
 
 #endif // _MCL_H_DEFINED

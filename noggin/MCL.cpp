@@ -52,7 +52,7 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
     // Clar the current set
     X_t.clear();
     vector<Particle> X_bar_t; // A priori estimates
-    float totalWeights = 0.0f; // Must sum all weights for future use
+    float totalWeights = 0.; // Must sum all weights for future use
 
     // Run through the particles
     for (int m = 0; m < M; ++m) {
@@ -70,16 +70,19 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
     // Resample the particles
     for (int m = 0; m < M; ++m) {
         // Determine the number of copies of this particle to add
-        int count = int(float(M) * X_bar_t[m].weight / totalWeights);
-        //cout << "Count : " << count << endl;
-        X_t.push_back(X_bar_t[m]);
-        // // Add the particles to the resampled posterior!
-        // for (int i = 0; i < count; ++i) {
-        //     X_t.push_back(X_bar_t[m]);
-        //     cout << "Pushing back to x_t" << endl;
-        // }
-    }
+        X_bar_t[m].weight /= totalWeights;
+        int count = float(M) * X_bar_t[m].weight;
 
+        //cout<< endl << "Weight: " << X_bar_t[m].weight << endl;
+        //cout << "Count: " << count << endl;
+
+        // Add the particles to the resampled posterior!
+        for (int i = 0; i < count; ++i) {
+            X_t.push_back(randomWalkParticle(X_bar_t[m]));
+            //cout << "Added particle" << endl;
+        }
+    }
+    cout << "Num particles: " << X_t.size() << endl;
     // Update pose and uncertainty estimates
     updateEstimates();
 }
@@ -122,6 +125,7 @@ float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
     // Give the particle a weight of 1 to begin with
     float w = 1;
 
+    //cout << "New Particle" << endl;
     // Determine the likelihood of each observation
     for (unsigned int i = 0; i < z_t.size(); ++i) {
 
@@ -142,10 +146,12 @@ float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
                 p = determinePointWeight(z_t[i], x_t, possiblePoints[j]);
             }
 
+            //cout << "p is: " << p << " ";
             if( p > pMax) {
                 pMax = p;
             }
         }
+        //cout << "pMax is: " << pMax << endl;
         w *= pMax;
     }
 
@@ -313,4 +319,12 @@ float MCL::getSimilarity(float r_d, float r_a, Observation &z)
     // We multiple the weight till now with the combined probability of
     // this iterations sighting
     return s_d*s_a;
+}
+
+Particle MCL::randomWalkParticle(Particle p)
+{
+    p.pose.x += MAX_CHANGE_X * (1.0f - p.weight)*UNIFORM_1_NEG_1;
+    p.pose.y += MAX_CHANGE_Y * (1.0f - p.weight)*UNIFORM_1_NEG_1;
+    p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
+    return p;
 }
