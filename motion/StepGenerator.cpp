@@ -19,7 +19,19 @@ StepGenerator::~StepGenerator(){
 
 }
 
-//old method
+/**
+ * Central method to get the previewed zmp_refernce values
+ * In the process of getting these values, this method handles the following:
+ *
+ *  * Handles transfer from futureSteps list to the currentZMPDsteps list.
+ *    When the Future ZMP values we want run out, we pop the next future step
+ *    add generate ZMP from it, and put it into the ZMPDsteps List
+ *
+
+ *    
+ *
+ *
+ */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     static float lastZMP_x = 0;
     static float lastZMP_y = 0;
@@ -29,9 +41,12 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
         else {
             boost::shared_ptr<Step> nextStep = futureSteps.front();
-            futureSteps.pop_front();
 
             fillZMP(nextStep);
+
+            //transfer the nextStep element from future to current list
+            futureSteps.pop_front();
+            currentZMPDSteps.push_back(nextStep);
 
         }
     }
@@ -64,9 +79,36 @@ void StepGenerator::tick_controller(){
     //cout << "Com x: " << com_x << endl;
 }
 
+/** Central method for moving the walking legs. It handles important stuff like:
+ *
+ *  * Switching support feet
+ *  * Handles poping from the ZMPDStep list when we switch support feet
+ */
+
+
 WalkLegsTuple StepGenerator::tick_legs(){
+    //Decide if this is the first frame in a new support mode.
+    bool switchedSupport = false;
+
+    if(switchedSupport){
+        //pop from the front of the current steps
+        
+        //update the translation matrix between i and f coord. frames
+
+        //express the supporting foot and swinging foots locations in f coord.
+
+    }
+
+
+    //calculate the f to c translation matrix
+    
+    //translate the targets for support and swinging foot into c frame
+
+    //update leftLeg, rightLeg with targets in c frame
+
     vector<float> left = leftLeg.tick(com_x,com_y);
     vector<float> right = rightLeg.tick(com_x,com_y);
+
     return WalkLegsTuple(left,right);
 }
 
@@ -100,9 +142,6 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newStep ){
     lastZMPDStep = newStep;
     coordOffsetLastZMPDStep.x += newStep->x;
     coordOffsetLastZMPDStep.y += newStep->y - sign*HIP_OFFSET_Y; //shift to 0
-    
-    //track which steps are ZMPD but still needed for coord. frame stuff
-    currentZMPDSteps.push_back(newStep);
 }
 
 
