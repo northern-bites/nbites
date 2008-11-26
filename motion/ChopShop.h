@@ -1,27 +1,36 @@
-#include "Sensors.h"
 #include <vector>
+
+#include "Sensors.h"
 #include "BodyJointCommand.h"
+#include "Kinematics.h"
 
 using namespace std;
+using namespace Kinematics;
 
-class ChopShop {
+class ChopShop
+{
 public:
-	ChopShop(Sensors *sensors);
+	ChopShop(Sensors *s, float motionFrameLength);
 	virtual ~ChopShop();
 
-	vector<vector<float> > chopCommand(BodyJointCommand *command);
+	vector<vector<vector<float> > > chopCommand(BodyJointCommand *command);
 
 private:
-	void chopSmooth(BodyJointCommand *command);
-	void chopLinear(BodyJointCommand *command);
+	vector<vector<vector<float> > > chopSmooth(BodyJointCommand *command);
+	vector<vector<vector<float> > > chopLinear(BodyJointCommand *command);
+
+	// Class objects
 	vector<float> finalJoints;
 	vector<float> diffPerChop;
-	
 
 	// Inside most vector: joint values for a chain
 	// Next: vector for each choppped move (holding each chain,
 	// instead of just holding the joint values in a row)
 	// Outside: vector to hold all the chopped moves
 	vector<vector<vector<float> > > choppedJoints;
+	Sensors* sensors;
+	float FRAME_LENGTH_S;
 
-}
+
+
+};
