@@ -69,13 +69,13 @@ public:
     StepGenerator(const WalkingParameters *params);
     ~StepGenerator();
 
-    
+
     zmp_xy_tuple generate_zmp_ref();
-    
+
     void tick_controller();
     WalkLegsTuple tick_legs();
 
-    
+
     void setWalkVector(const float _x, const float _y, const float _theta);
 
 private: // Helper methods
@@ -100,16 +100,16 @@ private:
     list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
     //Stores currently relevant steps that are zmpd but not yet completed.
     //A step is consider completed (obsolete/irrelevant) as soon as the foot
-    //enters into double support (perisistant) 
+    //enters into double support (perisistant)
     list<boost::shared_ptr<Step> > currentZMPDSteps;
-    
+
     boost::shared_ptr<Step> lastZMPDStep; //Last step turned into ZMP values
     point<float> coordOffsetLastZMPDStep;
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
     ublas::matrix<float> if_Transform;
 
-    const WalkingParameters *walkParameters;
+    const WalkingParameters *walkParams;
     bool nextStepIsLeft;
 
     WalkingLeg leftLeg, rightLeg;

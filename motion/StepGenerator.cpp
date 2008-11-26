@@ -6,7 +6,7 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
       currentZMPDSteps(),
       lastZMPDStep(new Step(0,0,0,0,LEFT_FOOT)), coordOffsetLastZMPDStep(0,0),
-      walkParameters(params), nextStepIsLeft(true),
+      walkParams(params), nextStepIsLeft(true),
       leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
       controller_x(new PreviewController()),
       controller_y(new PreviewController()){
@@ -27,10 +27,6 @@ StepGenerator::~StepGenerator(){
  *    When the Future ZMP values we want run out, we pop the next future step
  *    add generate ZMP from it, and put it into the ZMPDsteps List
  *
-
- *    
- *
- *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     static float lastZMP_x = 0;
@@ -46,21 +42,14 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
             //transfer the nextStep element from future to current list
             futureSteps.pop_front();
-            currentZMPDSteps.push_back(nextStep);
+            //NOT YET currentZMPDSteps.push_back(nextStep);
 
         }
     }
 
     float newZMP_x = zmp_ref_x.front();
     float newZMP_y = zmp_ref_y.front();
-    // Hackish. Since ZMP values stay the same throughout a support mode, this
-    // is an effective way of knowing when to switch support modes. If we
-    // decided to go with a zmp curve instead of a step function, we would
-    // be in trouble.
-    if (newZMP_x != lastZMP_x || newZMP_y != lastZMP_y) {
-        leftLeg.switchSupportMode();
-        rightLeg.switchSupportMode();
-    }
+
 
     lastZMP_x = newZMP_x;
     lastZMP_y = newZMP_y;
@@ -92,22 +81,28 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
     if(switchedSupport){
         //pop from the front of the current steps
-        
+
         //update the translation matrix between i and f coord. frames
 
         //express the supporting foot and swinging foots locations in f coord.
 
     }
 
-
     //calculate the f to c translation matrix
-    
+
     //translate the targets for support and swinging foot into c frame
 
     //update leftLeg, rightLeg with targets in c frame
 
-    vector<float> left = leftLeg.tick(com_x,com_y);
-    vector<float> right = rightLeg.tick(com_x,com_y);
+    //Temporary conversion to c frame for controller target
+    float dest_L_x = -com_x + walkParams->hipOffsetX; //targetX for this leg
+    float dest_L_y = -com_y + HIP_OFFSET_Y;  //targetY
+
+    float dest_R_x = -com_x + walkParams->hipOffsetX; //targetX for this leg
+    float dest_R_y = -com_y - HIP_OFFSET_Y;  //targetY
+
+    vector<float> left  = leftLeg.tick(dest_L_x,dest_L_y);
+    vector<float> right = rightLeg.tick(dest_R_x,dest_R_y);
 
     return WalkLegsTuple(left,right);
 }
@@ -118,7 +113,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
 void StepGenerator::fillZMP(const boost::shared_ptr<Step> newStep ){
     //look at the last ZMPD Step and the newStep, and make ZMP values
     float stepTime = newStep->time;
-    int numChops = static_cast<int>(stepTime / walkParameters->motion_frame_length_s);
+    int numChops = walkParams->stepDurationFrames;//static_cast<int>(stepTime / walkParams->motion_frame_length_s);
     float start_x = lastZMPDStep->x + coordOffsetLastZMPDStep.x;
     float start_y = lastZMPDStep->y + coordOffsetLastZMPDStep.y;
     float end_x = newStep->x + coordOffsetLastZMPDStep.x;
@@ -156,41 +151,23 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
 
-//     for(int i = 0; i < 4; i++){
-//         generateStep(x,y,theta);
-//     }
+    //Queue a dummy step, where we step, but do nothing with the ZMP
 
-    // and we create new plans. We would like to always have enough steps
-    // pre-planned, so that we always have enough previewable zmp_ref values.
-    // For now we'll create 4 future steps.
-
-    // Part of starting a walk is to create a zmp_ref that will end in the
-    // polygon of the supporting leg. Once it is there, we will consider
-    // taking steps.
-
-
-    // This says that the next 30 zmp values are over the left leg
-    for (int i = 0; i < 50; i++){
+    //we will take a dummy empty step, so push tons of zero ZMP values
+    for (int i = 0; i < walkParams->stepDurationFrames; i++){
         zmp_ref_y.push_back(0.0f);
         zmp_ref_x.push_back(0.0f);
     }
 
-    // This says that the next 30 zmp values are over the left leg
-    /*
-    for (int i = 0; i < 50; i++){
-        zmp_ref_y.push_back(50.0f);
-        zmp_ref_x.push_back(0.0f);
-    }
-    */
-    // we start by using our left foot as support and the right as "double
-    // support". The right foot will switch into swinging
-    leftLeg.switchSupportMode(PERSISTENT_DOUBLE_SUPPORT);
-    rightLeg.switchSupportMode(DOUBLE_SUPPORT);
+    //start off in a double support phase where the right leg swings first
+    leftLeg.startRight();//setSupportMode(PERSISTENT_DOUBLE_SUPPORT);
+    rightLeg.startRight();//setSupportMode(DOUBLE_SUPPORT);
 
-    //dummy
+    //setup memory to cooberate dummy step
     lastZMPDStep = boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                                    walkParameters->stepDuration, LEFT_FOOT));
+                                                    walkParams->stepDuration, LEFT_FOOT));
     coordOffsetLastZMPDStep = point<float>(0,0);
+    nextStepIsLeft = false;
 }
 
 
@@ -200,10 +177,9 @@ void StepGenerator::generateStep(const float _x,
                                  const float _theta) {
     boost::shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
                                              HIP_OFFSET_Y : -HIP_OFFSET_Y),
-                                          0, walkParameters->stepDuration,
+                                          0, walkParams->stepDuration,
                                           (nextStepIsLeft ?
                                            LEFT_FOOT : RIGHT_FOOT)));
-
 
     futureSteps.push_back(step);
     //switch feet after each step is generated

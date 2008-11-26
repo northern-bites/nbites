@@ -2,6 +2,32 @@
 #ifndef _WalkingLeg_h_DEFINED
 #define _WalkingLeg_h_DEFINED
 
+/**
+ *
+ * This class implements the basic strucutre of an FSA to model the 
+ * state transitions of a robot's leg during walking. Particularly,
+ * it switches between single and double support modes.
+ *
+ * This class is designed to switch states automatically, without external
+ * input. The only time it needs external input is when it should start
+ * Stopping is handled implicitly by ceasing calls to tick(), followed
+ * eventually (potentially?) by a call to startRight/startLeft
+ *
+ * Take note of the autonomous state switching because it will be critical
+ * to make sure the dest_x, dest_y sent to this class are calculated from
+ * ZMP values in sync with the state transitions of this class.
+ *
+ * Currently, the state transitions of this class are based on the walking
+ * parameters pointer stored locally. This means that items such as step
+ * length, etc are currently not variable per step. This will change eventually
+ *
+ * Eventually, the tick() method should probably be passed something like a
+ * LocalStep, which is a step defined in the c frame. If this step has attr.
+ * such as destination for the legs, duration, etc, we should be able to move
+ * forward with steps of variable length, etc 
+ *
+ */
+
 #include <vector>
 using namespace std;
 
@@ -14,46 +40,46 @@ public:
     WalkingLeg(ChainID id, const WalkingParameters * walkP);
     //~WalkingLeg() { };
 
-    vector <float> tick(float com_x, float com_y);
-    void switchSupportMode(SupportMode newMode){supportMode=newMode;}
-    void switchSupportMode() {
-        switch(supportMode) {
-        case DOUBLE_SUPPORT:
-            supportMode = SWINGING;
-            break;
-        case PERSISTENT_DOUBLE_SUPPORT:
-            supportMode = SUPPORTING;
-            break;
-        case SUPPORTING:
-            supportMode = SWINGING;
-            break;
-        case SWINGING:
-            supportMode = SUPPORTING;
-            stage = 0;
-            frameCounter = 0;
-            break;
-        default:
-            break;
-        }
-    }
+    vector <float> tick(float dest_x, float dest_y);
+
+    //Hopefully these never need to get called (architecturally).
+    //Instead, use methods like startLeft, right etc
+    //void setSupportMode(SupportMode newMode){setState(newMode);}
+    //void switchSupportMode() {nextState();}
+
+    //methods to setup starting the walk
+    void startLeft();
+    void startRight();
+
+    //Public FSA methods
+    SupportMode getSupportMode(){return state;}
+    //True if the next call to tick() will be in a different support mode
+    bool isSwitchingSupportMode(){return firstFrame();}
 
 private:
-    vector <float> supporting(float com_x, float com_y);
-    vector <float> swinging(float com_x, float com_y);
+    //Execution methods, get called depending on which state the leg is in
+    vector <float> supporting(float dest_x, float dest_y);
+    vector <float> swinging(float dest_x, float dest_y);
 
-    SupportMode supportMode;
-    //LegConstants * legConsts;
+    //FSA methods
+    void setState(SupportMode newState);
+    void switchToNextState();
+    SupportMode nextState();
+    bool shouldSwitchStates();
+    bool firstFrame(){return frameCounter == 0;}
+
+    //FSA Attributes
+    SupportMode state, lastState,lastDiffState;
+    SupportMode supportMode; //soon to be deprecated
+    int frameCounter;
+
+    //Leg Attributes
     ChainID chainID; //keep track of which leg this is
     const WalkingParameters *walkParams;
     float lastJoints[LEG_JOINTS];
     ufvector3 goal;
     int leg_sign; //-1 for right leg, 1 for left leg
 
-    /***   The following are used for the swinging leg   ***/
-
-    int stage; // of following the trapezoid shape
-    // used to keep track how many frames have passed since start of swing
-    int frameCounter;
 };
 
 #endif
