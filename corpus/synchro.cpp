@@ -104,3 +104,45 @@ void Synchro::signal (Event* ev)
 {
     ev->signal();
 }
+
+
+int
+Thread::start ()
+{
+    // Set thread attributes
+    pthread_attr_t attr;
+    pthread_attr_init (&attr);
+    pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
+
+    // Create thread
+    const int result = pthread_create(&thread, &attr, runThread, (void*)this);
+
+    // Free attribute data
+    pthread_attr_destroy(&attr);
+
+    return result;
+}
+
+void
+Thread::stop ()
+{
+    running = false;
+}
+
+void*
+Thread::runThread (void* _this)
+{
+    Thread* t = reinterpret_cast<Thread*>(_this);
+
+    t->running = true;
+    t->start_event->signal();
+    t->run();
+    t->stop_event->signal();
+
+    pthread_exit(NULL);
+}
+
+void
+Thread::run ()
+{
+}

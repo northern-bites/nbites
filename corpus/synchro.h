@@ -68,4 +68,43 @@ class Synchro
     std::map<std::string, boost::shared_ptr<Event> > events;
 };
 
+static const std::string THREAD_START_EVENT_SUFFIX("_start");
+static const std::string THREAD_STOP_EVENT_SUFFIX("_stop");
+class Thread
+{
+
+  public:
+    Thread(boost::shared_ptr<Synchro> _synchro, std::string _name)
+        : name(_name), running(false),
+          start_event(_synchro->create(_name + THREAD_START_EVENT_SUFFIX)),
+          stop_event(_synchro->create(_name + THREAD_STOP_EVENT_SUFFIX))
+    { }
+    ~Thread() { }
+
+  public:
+    int start();
+    void stop();
+
+    virtual void run();
+
+    // do not lock anything
+    const std::string getName() { return name; }
+    const bool isRunning() { return running; }
+
+    // these are only fired once!  be careful, or deadlock could ensue
+    const boost::shared_ptr<Event> getStart() { return start_event; }
+    const boost::shared_ptr<Event> getStop() { return stop_event; }
+
+  private:
+    static void* runThread(void* _thread);
+
+  private:
+    std::string name;
+    pthread_t thread;
+    bool running;
+
+    boost::shared_ptr<Event> start_event;
+    boost::shared_ptr<Event> stop_event;
+};
+
 #endif // Synchro_h_DEFINED
