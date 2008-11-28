@@ -74,22 +74,14 @@ class Thread
 {
 
   public:
-    Thread(boost::shared_ptr<Synchro> _synchro, std::string _name)
-        : name(_name), running(false),
-          start_event(_synchro->create(_name + THREAD_START_EVENT_SUFFIX)),
-          stop_event(_synchro->create(_name + THREAD_STOP_EVENT_SUFFIX))
-    { }
-    ~Thread() { }
+    Thread(boost::shared_ptr<Synchro> _synchro, std::string _name);
+    ~Thread();
 
   public:
     int start();
     void stop();
 
     virtual void run();
-
-    // do not lock anything
-    const std::string getName() { return name; }
-    const bool isRunning() { return running; }
 
     // these are only fired once!  be careful, or deadlock could ensue
     const boost::shared_ptr<Event> getStart() { return start_event; }
@@ -98,8 +90,10 @@ class Thread
   private:
     static void* runThread(void* _thread);
 
+  public:
+    const std::string name;
+
   private:
-    std::string name;
     pthread_t thread;
     bool running;
 

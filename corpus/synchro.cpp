@@ -106,6 +106,17 @@ void Synchro::signal (Event* ev)
 }
 
 
+Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
+  : name(_name), running(false),
+    start_event(_synchro->create(_name + THREAD_START_EVENT_SUFFIX)),
+    stop_event(_synchro->create(_name + THREAD_STOP_EVENT_SUFFIX))
+{
+}
+
+Thread::~Thread ()
+{
+}
+
 int
 Thread::start ()
 {
