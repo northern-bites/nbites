@@ -303,14 +303,16 @@ Man::run ()
 #ifdef DEBUG_MAN_THREADING
   cout << "  run :: Signalling start" << endl;
 #endif
-  getStart()->signal();
+
+  running = true;
+  start_event->signal();
 
   frame_counter = 0;
 #ifdef USE_VISION
   visionHack();
 #endif
 
-  while (isRunning()) {
+  while (running) {
 
 #ifdef USE_VISION
     // Wait for signal
@@ -323,7 +325,7 @@ Man::run ()
 #endif // USE_VISION
 
     // Break out of loop if thread should exit
-    if (!isRunning())
+    if (!running)
       break;
 
     // Synchronize noggin's information about joint angles with the motion
@@ -363,7 +365,7 @@ Man::run ()
 #endif
 
   // Signal stop event
-  getStop()->signal();
+  stop_event->signal();
 }
 
 void

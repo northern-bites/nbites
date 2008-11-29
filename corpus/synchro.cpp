@@ -107,7 +107,7 @@ void Synchro::signal (Event* ev)
 
 
 Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
-  : name(_name), running(false),
+  : name(_name), synchro(_synchro), running(false),
     start_event(_synchro->create(_name + THREAD_START_EVENT_SUFFIX)),
     stop_event(_synchro->create(_name + THREAD_STOP_EVENT_SUFFIX))
 {
@@ -143,10 +143,7 @@ Thread::stop ()
 void*
 Thread::runThread (void* _this)
 {
-    Thread* t = reinterpret_cast<Thread*>(_this);
-
-    t->running = true;
-    t->run();
+    reinterpret_cast<Thread*>(_this)->run();
 
     pthread_exit(NULL);
 }

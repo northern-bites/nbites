@@ -89,8 +89,6 @@ class Thread
     // These are/should only fired once!  be careful, or deadlock could ensue
     const boost::shared_ptr<Event> getStart() { return start_event; }
     const boost::shared_ptr<Event> getStop() { return stop_event; }
-    // Access the running bool from sub-classes
-    const bool isRunning() { return running; }
 
   private:
     static void* runThread(void* _thread);
@@ -100,8 +98,10 @@ class Thread
 
   private:
     pthread_t thread;
-    bool running;
 
+  protected:
+    boost::shared_ptr<Synchro> synchro;
+    bool running;
     boost::shared_ptr<Event> start_event;
     boost::shared_ptr<Event> stop_event;
 };
