@@ -120,6 +120,9 @@ Thread::~Thread ()
 int
 Thread::start ()
 {
+    if (running)
+        return -1;
+
     // Set thread attributes
     pthread_attr_t attr;
     pthread_attr_init (&attr);
