@@ -23,12 +23,14 @@
 #include <time.h>
 #include <sys/time.h>
 #include <Python.h>
+#include <boost/shared_ptr.hpp>
 
 #include "alvisionimage.h"
 #include "alvisiondefinitions.h"
 
 #include "Man.h"
 #include "manconfig.h"
+#include "corpus/synchro.h"
 
 using namespace std;
 using namespace AL;
@@ -59,6 +61,8 @@ micro_time (void)
 
 Man::Man ()
   : ALModule("Man"),
+    // this is not good usage of shared_ptr...  oh well
+    Thread(boost::shared_ptr<Synchro>(new Synchro()), "Man"),
     python_prefs(),
     profiler(&micro_time), sensors(),
     motion(&sensors),
@@ -67,10 +71,6 @@ Man::Man ()
     noggin(&sensors, &profiler, &vision),
     frame_counter(0), saved_frames(0), hack_frames(0)
 {
-  // Initialize Vision mutex and condition variable
-  pthread_mutex_init (&vision_mutex,  NULL);
-  pthread_cond_init  (&vision_cond,   NULL);
-
   // open lems
   initModule();
 }
@@ -82,10 +82,6 @@ Man::~Man ()
 
   // unregister lem
   closeModule();
-
-  // destroy mutex and condition variable
-  pthread_mutex_destroy (&vision_mutex);
-  pthread_cond_destroy  (&vision_cond);
 }
 
 void
@@ -100,15 +96,11 @@ Man::initModule()
   setModuleDescription("Nao robotic soccer player");
 
   // Define callable methods with there description
-  functionName("go", "Man", "Begin environment processing");
-  BIND_METHOD(Man::go);
+  //functionName("start", "Man", "Begin environment processing");
+  //BIND_METHOD(Man::start);
 
-  functionName("isRunning", "Man", 
-      "The running state of the main Nao processes");
-  BIND_METHOD(Man::isRunning);
-
-  functionName("stop", "Man", "Halt environment processing");
-  BIND_METHOD(Man::stop);
+  //functionName("stop", "Man", "Halt environment processing");
+  //BIND_METHOD(Man::stop);
 
   functionName("startProfiling", "Man", "Start vision frame profiling, "
     "for given number of frames");
@@ -287,59 +279,6 @@ Man::closeModule() {
 }
 
 void
-Man::go ()
-{
-#ifdef DEBUG_MAN_THREADING
-  cout << "Man::starting" << endl;
-#endif
-  // We've got to handle Vision's threading for it
-  // Set attributes for the vision thread
-  pthread_attr_t attr;
-  pthread_attr_init  (&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-#ifdef DEBUG_MAN_THREADING
-  cout << "  go  :: Locking vision mutex" << endl;
-#endif
-  // Lock mutex, so running must wait until we pthread_cond_wait
-  if (pthread_mutex_lock (&vision_mutex) != 0)
-    perror("Unable to lock vision mutex");
-
-#ifdef DEBUG_MAN_THREADING
-  cout << "  go  :: Creating vision thread" << endl;
-#endif
-  // Create (and start) vision thread
-  if (pthread_create(&vision_thread, &attr, runThread, (void *)this) != 0)
-    perror("Unable to create vision thread");
-
-#ifdef DEBUG_MAN_THREADING
-  cout << "  go  :: Waiting for 'running' broadcast" << endl;
-#endif
-  // wait for it to signal running
-  if (pthread_cond_wait (&vision_cond, &vision_mutex) != 0)
-    perror("Waiting on condition signal failed");
-
-#ifdef DEBUG_THREADING
-  cout << "  go  :: Releasing vision mutex" << endl;
-#endif
-  // release lock
-  if (pthread_mutex_unlock (&vision_mutex) != 0)
-    perror("Unable to release vision mutex lock");
-
-  // Destroy the used attributes
-  pthread_attr_destroy(&attr);
-  
-}
-
-void*
-Man::runThread (void *man)
-{
-  ((Man*)man)->run();
-
-  pthread_exit (NULL);
-}
-
-void
 Man::run ()
 {
 #ifdef DEBUG_MAN_THREADING
@@ -349,133 +288,81 @@ Man::run ()
   // Start Comm thread (it handles its own threading
   if (comm.start() != 0)
     cerr << "Comm failed to start" << endl;
+  //else
+  //  comm.getStart()->await();
 
 #ifdef USE_MOTION
 // Start Motion thread (it handles its own threading
-  motion.start();
+  if (motion.start() != 0)
+    cerr << "Motion failed to start" << endl;
+  //else
+  //  motion.getStart()->await();
 #endif
-
-  running = true;
 
 #ifdef DEBUG_MAN_THREADING
-  cout << "  run :: Locking vision mutex" << endl;
+  cout << "  run :: Signalling start" << endl;
 #endif
-  // wait until start is ready for our signal
-  if (pthread_mutex_lock (&vision_mutex) != 0) {
-    perror("Unable to lock vision mutex");
-    stop();
-    return;
-  }
-
-#ifdef DEBUG_MAN_THREADING
-  cout << "  run :: Broadcasting signal" << endl;
-#endif
-  // Broadcast that we have entered the run() method (running == true)
-  if (pthread_cond_broadcast (&vision_cond) != 0) {
-    perror("Unable to signal vision mutex");
-    stop();
-    return;
-  }
-
-#ifdef DEBUG_MAN_THREADING
-  cout << "  run :: Unlocking vision mutex" << endl;
-#endif
-  // Unlock, so start() can return
-  if (pthread_mutex_unlock (&vision_mutex) != 0) {
-    perror("Unable to release vision mutex lock");
-    stop();
-    return;
-  }
-  
+  getStart()->signal();
 
   frame_counter = 0;
 #ifdef USE_VISION
   visionHack();
 #endif
 
-  while (running) {
+  while (isRunning()) {
 
-    // Wait for signal
-    //pthread_cond_wait (&vision_cond, &vision_mutex);
-    // Break out of loop if thread should exit
-    //if (!running)
-      //break;
-    if (!running)
-      break;
 #ifdef USE_VISION
+    // Wait for signal
+    //image_sig->await();
     // wait for and retrieve the latest image
     waitForImage();
 #else
+    // simulate vision frame rate
     SleepMs(500);
 #endif // USE_VISION
+
+    // Break out of loop if thread should exit
+    if (!isRunning())
+      break;
 
     // Synchronize noggin's information about joint angles with the motion
     // thread's information
     sensors.updatePython();
     sensors.updateVisionAngles();
 
-    // Process current frame
+    // Image logging
     //if (frame_counter % 6 == 0)
-    //saveFrame();
-    frame_counter++;
+    //  saveFrame();
+    //frame_counter++;
 
 #ifdef USE_VISION
+    // Perform hack to correct flipped image resulting from driver errors
     if (hack_frames > 0)
       hackFrame();
 #endif
 
+    // Process current frame
     processFrame();
+
     // Make sure messages are printed
     fflush(stdout);
 
     // Broadcast a signal that we have finished processing this frame
-    //pthread_cond_broadcast (&vision_cond);
-    
+    //vision_sig->signal();
   }
 
-}
-
-bool
-Man::isRunning ()
-{
-  return running;
-}
-
-void
-Man::stop ()
-{
-  // Cause vision thread to exit on next loop
-  running = false;
-  // Signal, to assure vision is running
-  //notifyVision();
-  // Join thread to wait until it exits
-  //joinVision();
-  
-  // Tell Comm module to stop
-  comm.stop();
-#ifdef USE_MOTION
-  // Tell motion module to stop
+  // Finished with run loop, stop sub-threads and exit
   motion.stop();
+  //motion.getStop()->await();
+  comm.stop();
+  //comm.getStop()->await();
+
+#ifdef DEBUG_MAN_THREADING
+  cout << "  run :: Signalling stop" << endl;
 #endif
-}
 
-void
-Man::notifyVision ()
-{
-  pthread_cond_signal  (&vision_cond);
-  pthread_mutex_unlock (&vision_mutex);
-}
-
-void
-Man::joinVision ()
-{
-  pthread_join (vision_thread, NULL);
-}
-
-void
-Man::joinVisionLoop ()
-{
-  pthread_cond_wait (&vision_cond, &vision_mutex);
+  // Signal stop event
+  getStop()->signal();
 }
 
 void
@@ -544,9 +431,11 @@ Man::processFrame ()
 #ifdef USE_VISION
   //  This is called from Python right now
   vision.copyImage(sensors.getImage());
+#endif
   PROF_EXIT(&profiler, P_GETIMAGE);
 
   PROF_ENTER(&profiler, P_FINAL);
+#ifdef USE_VISION
   vision.notifyImage();
 #endif
 

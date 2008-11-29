@@ -40,6 +40,7 @@
 #include "Noggin.h"
 #include "Motion.h"
 #include "NaoPose.h"
+#include "corpus/synchro.h"
 
 /**
  * Preferences class to alter Python settings for our robot system.
@@ -62,7 +63,8 @@ class PythonPreferences
  * @author Bowdoin College Northern Bites
  */
 class Man
-  : public AL::ALModule
+  : public AL::ALModule,
+    public Thread
 {
   public:
 
@@ -91,25 +93,9 @@ class Man
     // Our methods
     //
 
-    // Man goes, and goes, and goes.  In a background thread.
-    void go();
-    // Man runs, and runs, and runs.  In the current thread.
+    // Man runs, and runs, and runs.  In the current thread.  Use start() and
+    // stop() (provided by the Thread class) to run in separate thread.
     void run();
-    // Signal that a new image is available for processing
-    void notifyVision();
-    // Join and wait on the vision thread.  Only one thread is allowed to do
-    // this
-    void joinVision();
-    // Return a boolean indicating whether the threads for the Man
-    // processes are currently running
-    bool isRunning();
-    // Wait on the condition variable until signaled that Vision has finished
-    // processing the current frame.  Again, only one thread is allowed to do
-    // this at once, as only one thread can lock the mutex at a given time
-    void joinVisionLoop();
-
-    // stops the vision thread
-    void stop();
 
     // Profiling methods
     void startProfiling(int nframes) {
@@ -161,12 +147,6 @@ class Man
     AL::ALProxy *camera;
     AL::ALProxy *lem;
     std::string lem_name;
-
-    // misc
-    bool running;
-    pthread_t       vision_thread;
-    pthread_mutex_t vision_mutex;
-    pthread_cond_t  vision_cond;
 
     int frame_counter;
     int saved_frames;
