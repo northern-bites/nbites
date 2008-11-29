@@ -491,7 +491,7 @@ MotionCore::processCommands (void)
 //  Thread methods
 //
 
-void
+int
 MotionCore::start (void)
 {
 #ifdef DEBUG_INITIALIZATION
@@ -505,13 +505,15 @@ MotionCore::start (void)
   pthread_attr_init  (&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
   // create & start thread
-  pthread_create(&motion_thread, &attr, runThread, (void *)this);
+  const int result = pthread_create(&motion_thread, &attr, runThread,
+                                    (void *)this);
   // destroy the used attributes
   pthread_attr_destroy(&attr);
 #ifdef DEBUG_INITIALIZATION
   cout << "Motion:DONE" << endl;
 #endif
 
+  return result;
 }
 
 void*

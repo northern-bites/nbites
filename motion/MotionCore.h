@@ -122,7 +122,7 @@ class MotionCore
     bool isRunning() { return running; }    
     void run    ();
     void runStep();
-    void start  ();
+    int  start  ();
     void stop   ();
 
 
