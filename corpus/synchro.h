@@ -28,7 +28,7 @@ class Event
   private:
     Event(std::string name);
   public:
-    ~Event();
+    virtual ~Event();
 
   public:
     void await();
@@ -49,7 +49,7 @@ class Synchro
 {
   public:
     Synchro();
-    ~Synchro();
+    virtual ~Synchro();
 
   public:
     // Obtain a map of event names to Events
@@ -75,7 +75,7 @@ class Thread
 
   public:
     Thread(boost::shared_ptr<Synchro> _synchro, std::string _name);
-    ~Thread();
+    virtual ~Thread();
 
   public:
     // To start and stop the thread.  Thread may be run repeatedly, but make
