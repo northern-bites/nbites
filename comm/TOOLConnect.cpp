@@ -4,6 +4,7 @@
 
 #if ROBOT(NAO)
 #include <sys/utsname.h> // uname()
+#include <boost/shared_ptr.hpp>
 #endif
 
 #include "TOOLConnect.h"
@@ -17,6 +18,8 @@
 #endif
 #include "SensorDef.h"
 
+
+using namespace boost;
 
 //
 // Debugging ifdef switches
@@ -37,8 +40,10 @@
 TOOLConnect::TOOLConnect (OVision *v)
   : state(TOOL_REQUESTING), vision(v)
 #else
-TOOLConnect::TOOLConnect (Sensors *s, Vision *v)
-  : running(false), state(TOOL_REQUESTING), sensors(s), vision(v)
+TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, Sensors *s, Vision *v)
+  : Thread(_synchro, "TOOLConnect"),
+    state(TOOL_REQUESTING),
+    sensors(s), vision(v)
 #endif
 {
 #if ROBOT(AIBO)
@@ -52,39 +57,10 @@ TOOLConnect::~TOOLConnect ()
 }
 
 #if ROBOT(NAO)
-int
-TOOLConnect::start ()
-{
-  if (running)
-    return EISCONN;
-
-  // Set thread attributes
-  pthread_attr_t attr;
-  pthread_attr_init (&attr);
-  pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE);
-
-  // Create thread
-  int result = pthread_create(&thread, &attr, runThread, (void*)this);
-
-  // Free attribute data
-  pthread_attr_destroy(&attr);
-
-  return result;
-}
-
-
-void*
-TOOLConnect::runThread (void *tool)
-{
-  ((TOOLConnect*)tool)->run();
-
-  pthread_exit (NULL);
-}
-
 void
 TOOLConnect::run ()
 {
-  running = true;
+  start_event->signal();
 
   try {
     serial.bind();
@@ -114,15 +90,10 @@ TOOLConnect::run ()
     }
   }
 
-  running = false;
-}
+  serial.closeAll();
 
-void
-TOOLConnect::join ()
-{
-  if (running)
-    // Wait for thread finish
-    pthread_join(thread, NULL);
+  running = false;
+  stop_event->signal();
 }
 
 #elif ROBOT(AIBO)
@@ -177,15 +148,6 @@ TOOLConnect::runStep ()
 #  error "Undefined robot type"
 
 #endif /* ROBOT(NAO|AIBO) */
-
-void
-TOOLConnect::stop ()
-{
-  // Will cause run() loop to exit
-  running = false;
-
-  serial.closeAll();
-}
 
 void
 TOOLConnect::reset ()

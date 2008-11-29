@@ -20,6 +20,8 @@
 #include <Python.h>
 #include <structmember.h>
 
+#include <boost/shared_ptr.hpp>
+
 #include "commconfig.h"
 #include "Comm.h"
 #include "NaoPose.h"
@@ -27,6 +29,7 @@
 #undef USE_GAMECONTROLLER
 #define USE_GAMECONTROLLER
 
+using namespace boost;
 
 static long long
 micro_time (void)
@@ -430,8 +433,8 @@ init_comm (void)
 // C++ Comm class methods
 //
 
-Comm::Comm (Sensors *s, Vision *v)
-  : running(false), tool(s,v),
+Comm::Comm (shared_ptr<Synchro> _synchro, Sensors *s, Vision *v)
+  : Thread(_synchro, "Comm"), tool(_synchro, s,v),
     latest(new list<vector<float> >), data(14,0),
     sensors(s), timer(&micro_time), gc()
 {
@@ -448,52 +451,15 @@ Comm::~Comm ()
 {
 }
 
-int
-Comm::start ()
-{
-  int result = 0;
-  // Start TOOLConnect thread
-  result = startTOOL();
-
-  if (result > 0)
-    // pthread_create returned an error.
-    // if -1, TOOLConnect is already started -> not an error
-    return result;
-
-  
-  pthread_mutex_lock (&comm_mutex);
-
-  if (running)
-    return -1;
-
-  // Set thread attributes
-  pthread_attr_t attr;
-  pthread_attr_init (&attr);
-  pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE);
-
-  // Create threads
-  result = pthread_create(&thread, &attr, runThread, (void*)this);
-
-  // Free attribute data
-  pthread_attr_destroy(&attr);
-
-  pthread_mutex_unlock (&comm_mutex);
-
-  return result;
-}
-
-void*
-Comm::runThread (void *comm)
-{
-  ((Comm*)comm)->run();
-
-  pthread_exit (NULL);
-}
-
 void
-Comm::run () throw(socket_error)
+Comm::run ()
 {
+  // Run the TOOLConenct thread
+  startTOOL();
+
+  // Signal thread start
   running = true;
+  start_event->signal();
 
   try {
     bind();
@@ -514,50 +480,31 @@ Comm::run () throw(socket_error)
     fprintf(stderr, "%s\n", e.what());
   }
 
+  // Close the UDP socket
+  ::close(sockn);
+
+  // Signal thread end
   running = false;
+  stop_event->signal();
 }
 
 int
 Comm::startTOOL ()
 {
-  pthread_mutex_lock (&comm_mutex);
-  
-  int result = tool.start();
-
-  pthread_mutex_unlock (&comm_mutex);
-
+  const int result = tool.start();
+  if (result > 0)
+    // if > 0 -> an error occurred
+    // if -1 -> TOOLConnect is already started -> not an error
+    fprintf(stderr, "Could not start TOOLConnect thread.\n");
   return result;
 }
 
 void
 Comm::stopTOOL ()
 {
-  pthread_mutex_lock (&comm_mutex);
-
   tool.stop();
-
-  pthread_mutex_unlock (&comm_mutex);
 }
 
-void
-Comm::stop ()
-{
-  pthread_mutex_lock (&comm_mutex);
-
-  // Stop the TOOLConnect thread
-  tool.stop();
-
-  if (running) {
-    // Will cause run() loop to exit
-    running = false;
-    // Wait for thread exit
-    pthread_join(thread, NULL);
-  }
-  // Close the UDP socket
-  ::close(sockn);
-
-  pthread_mutex_unlock (&comm_mutex);
-}
 
 void
 Comm::error(socket_error err) throw()
@@ -568,14 +515,6 @@ Comm::error(socket_error err) throw()
   fprintf(stderr, "  Partially recoverable, so TOOL will continue\n");
   fprintf(stderr, "  Call comm.stop() or stopTOOL() to stop TOOL as well\n");
   fprintf(stderr, "%s\n", err.what());
-}
-
-void
-Comm::join ()
-{
-  // Wait for thread finish
-  if (running)
-    pthread_join(thread, NULL);
 }
 
 void

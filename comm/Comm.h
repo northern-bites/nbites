@@ -10,8 +10,10 @@
 #include <string>
 #include <pthread.h>
 #include <arpa/inet.h>  // inet_aton(), htonl()
+#include <boost/shared_ptr.hpp>
 
 #include "Common.h"
+#include "corpus/synchro.h"
 #include "Sensors.h"
 #include "CommDef.h"
 #include "RoboCupGameControlData.h"
@@ -22,15 +24,13 @@
 
 
 class Comm
+  : public Thread
 {
   public:
-    Comm(Sensors *s, Vision* v);
+    Comm(boost::shared_ptr<Synchro> _synchro, Sensors *s, Vision* v);
     ~Comm();
 
-    void join();
-    void run() throw(socket_error);
-    int  start();
-    void stop();
+    void run();
     int  startTOOL();
     void stopTOOL();
 

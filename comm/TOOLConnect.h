@@ -9,6 +9,8 @@ class TOOLConnect; // forward reference
 #if ROBOT(AIBO)
 #  include "OVision.h"
 #elif ROBOT(NAO)
+#  include <boost/shared_ptr.hpp>
+#  include "corpus/synchro.h"
 #  include "Sensors.h"
 #  include "Vision.h"
 #else
@@ -57,23 +59,23 @@ setRequest (DataRequest &r, byte buf[SIZEOF_REQUEST])
 //
 
 class TOOLConnect
+#if ROBOT(NAO)
+  : public Thread
+#endif
 {
   public:
 #if ROBOT(AIBO)
     TOOLConnect(OVision *s);
 #else
-    TOOLConnect(Sensors *s, Vision *v);
+    TOOLConnect(boost::shared_ptr<Synchro> _synchro, Sensors *s, Vision *v);
 #endif
     ~TOOLConnect();
 
 #if ROBOT(AIBO)
     void runStep();
 #else
-    void join();
     void run();
-    int  start();
 #endif
-    void stop();
 
     std::string getRobotName();
     int getState() { return state; }
@@ -84,13 +86,6 @@ class TOOLConnect
     void handle_request(DataRequest& r) throw(socket_error&);
     void handle_command(int cmd)        throw(socket_error&);
 
-#if ROBOT(NAO)
-    static void* runThread(void *tool);
-
-    // Threading and state information
-    pthread_t thread;
-#endif
-    bool running;
     int state;
     // Serialized connection to remote host
     DataSerializer serial;

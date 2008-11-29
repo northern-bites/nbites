@@ -68,7 +68,7 @@ Man::Man ()
     profiler(&micro_time), sensors(),
     motion(&sensors),
     vision(new NaoPose(&sensors), &profiler),
-    comm(&sensors, &vision),
+    comm(synchro, &sensors, &vision),
     noggin(&sensors, &profiler, &vision),
     frame_counter(0), saved_frames(0), hack_frames(0)
 {
