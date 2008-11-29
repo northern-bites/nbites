@@ -146,9 +146,7 @@ Thread::runThread (void* _this)
     Thread* t = reinterpret_cast<Thread*>(_this);
 
     t->running = true;
-    t->start_event->signal();
     t->run();
-    t->stop_event->signal();
 
     pthread_exit(NULL);
 }
@@ -156,4 +154,9 @@ Thread::runThread (void* _this)
 void
 Thread::run ()
 {
+    // Signal when all startup operations are complete
+    start_event->signal();
+
+    // Signal when stop condition is met and shutdown operations are complete
+    stop_event->signal();
 }
