@@ -40,7 +40,11 @@ const vector<float> MotionCore::NOT_MOVING = vector<float>(3,0.0f); //zero motio
 MotionCore::MotionCore (Sensors *s)
   : sensors(s),
     bodyQueue(), headQueue(), headScanQueue(), nextWalkCommand(0),
+#ifndef NO_ACTUAL_MOTION
     motionProxy(AL::ALMotionProxy::getInstance()),
+#else
+    motionProxy(NULL),
+#endif
     walkIsStopping(false), running(false),
     latestOdometry(vector<float>(3,0.0f)), currentWalkVector(NOT_MOVING),
     odometryRead(false), lastHeadYaw(0.0f), lastHeadPitch(0.0f), headSpeed(0.0f)
