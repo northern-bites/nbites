@@ -34,6 +34,7 @@
 
 using namespace std;
 using namespace AL;
+using namespace boost;
 
 
 static const int NUM_HACK_FRAMES = 20;
@@ -41,7 +42,7 @@ static const int MIN_HACK_BALL_WIDTH = 20;
 #define DEBUG_VISION_HACK
 
 // reference to the running instance
-Man *lMan;
+shared_ptr<Man> lMan;
 
 /////////////////////////////////////////
 //                                     //
@@ -62,7 +63,7 @@ micro_time (void)
 Man::Man ()
   : ALModule("Man"),
     // this is not good usage of shared_ptr...  oh well
-    Thread(boost::shared_ptr<Synchro>(new Synchro()), "Man"),
+    Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
     python_prefs(),
     profiler(&micro_time), sensors(),
     motion(&sensors),
@@ -487,9 +488,9 @@ _createModule (ALBroker *pBroker)
   ALBroker::setInstance(pBroker);
       
   // create modules instance. This will register automatically to the broker
-  lMan = new Man();
+  lMan = shared_ptr<Man>(new Man());
   // start Man in a new thread, so as to run the libraries main functions
-  lMan->go();
+  lMan->start();
 
   return 0;
 }
@@ -498,11 +499,8 @@ ALCALL int
 _closeModule ()
 {
   // Delete module instance.  Will unregister automatically.
-  if (lMan != NULL) {
+  if (lMan != NULL)
     lMan->stop();
-    delete lMan;
-    lMan = NULL;
-  }
 
   return 0;
 }
@@ -525,7 +523,6 @@ _terminationHandler (int signum)
     // no direct exit, main thread will exit when finished
     cout << "Exiting Man." << endl;
     lMan->stop();
-    delete lMan;
   }
   else
     // fault, exit immediately
@@ -593,13 +590,11 @@ main (int argc, char **argv)
 #endif
 
   // Init Man. Module is automatically registered to the broker.
-  lMan = new Man();
-  //lMan->go();
-  // run the man processes in the current thread
-  lMan->run();
-
-  if (lMan != NULL)
-    delete lMan;
+  lMan = shared_ptr<Man>(new Man());
+  // Start the separate head thread
+  lMan->start();
+  // Wait for the head thread to exit
+  lMan->getStop()->await();
 
   // successful exit
   ::exit(0);
