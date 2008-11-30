@@ -16,7 +16,6 @@
 #include <string>
 #include <pthread.h>
 #include <boost/shared_ptr.hpp>
-#include <iostream>
 #include "synchro.h"
 
 using namespace std;
@@ -164,8 +163,6 @@ void* Thread::runThread (void* _this)
 {
     reinterpret_cast<Thread*>(_this)->run();
 
-    std::cout << "Thread '" << reinterpret_cast<Thread*>(_this)->name <<
-        "' exiting" << std::endl;
     pthread_exit(NULL);
 }
 
