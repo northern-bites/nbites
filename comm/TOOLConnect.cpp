@@ -60,7 +60,8 @@ TOOLConnect::~TOOLConnect ()
 void
 TOOLConnect::run ()
 {
-  start_event->signal();
+  running = true;
+  trigger->on();
 
   try {
     serial.bind();
@@ -93,7 +94,7 @@ TOOLConnect::run ()
   serial.closeAll();
 
   running = false;
-  stop_event->signal();
+  trigger->off();
 }
 
 #elif ROBOT(AIBO)

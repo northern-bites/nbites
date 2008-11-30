@@ -289,8 +289,8 @@ Man::run ()
   // Start Comm thread (it handles its own threading
   if (comm.start() != 0)
     cerr << "Comm failed to start" << endl;
-  //else
-  //  comm.getStart()->await();
+  else
+    comm.getTrigger()->await_on();
 
 #ifdef USE_MOTION
 // Start Motion thread (it handles its own threading
@@ -305,7 +305,7 @@ Man::run ()
 #endif
 
   running = true;
-  start_event->signal();
+  trigger->on();
 
   frame_counter = 0;
 #ifdef USE_VISION
@@ -358,14 +358,15 @@ Man::run ()
   motion.stop();
   //motion.getStop()->await();
   comm.stop();
-  //comm.getStop()->await();
+  comm.getTrigger()->await_off();
 
 #ifdef DEBUG_MAN_THREADING
   cout << "  run :: Signalling stop" << endl;
 #endif
 
   // Signal stop event
-  stop_event->signal();
+  running = false;
+  trigger->off();
 }
 
 void
@@ -523,12 +524,14 @@ _terminationHandler (int signum)
 {
   if (signum == SIGINT) {
     // no direct exit, main thread will exit when finished
-    cout << "Exiting Man." << endl;
+    cerr << "Exiting Man via thread stop." << endl;
     lMan->stop();
   }
-  else
+  else {
+    cerr << "Emergency stop -- exiting immediately" << endl;
     // fault, exit immediately
     ::exit(1);
+  }
 }
 
 int
@@ -595,11 +598,14 @@ main (int argc, char **argv)
   lMan = shared_ptr<Man>(new Man());
   // Start the separate head thread
   lMan->start();
+  lMan->getTrigger()->await_on();
   // Wait for the head thread to exit
-  lMan->getStop()->await();
+  lMan->getTrigger()->await_off();
+
+  cout << "Main method finished." << endl;
 
   // successful exit
-  ::exit(0);
+  return 0;
 }
 
 #endif // MAN_IS_REMOTE

@@ -459,7 +459,7 @@ Comm::run ()
 
   // Signal thread start
   running = true;
-  start_event->signal();
+  trigger->on();
 
   try {
     bind();
@@ -485,7 +485,7 @@ Comm::run ()
 
   // Signal thread end
   running = false;
-  stop_event->signal();
+  trigger->off();
 }
 
 int

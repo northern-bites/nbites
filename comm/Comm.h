@@ -72,10 +72,6 @@ class Comm
     void add_to_module();
 
   private:
-    // Threading and state information
-    pthread_t thread;
-    bool running;
-
     // TOOLConnect sub-thread controller
     TOOLConnect tool;
     int toolCommandState;
