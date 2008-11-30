@@ -451,12 +451,19 @@ Comm::~Comm ()
 {
 }
 
+int
+Comm::start ()
+{
+  // Run the TOOLConnect thread
+  startTOOL();
+
+  // Run the Comm (UDP+GameController) thread
+  return Thread::start();
+}
+
 void
 Comm::run ()
 {
-  // Run the TOOLConenct thread
-  startTOOL();
-
   // Signal thread start
   running = true;
   trigger->on();
@@ -486,6 +493,14 @@ Comm::run ()
   // Signal thread end
   running = false;
   trigger->off();
+}
+
+void
+Comm::stop ()
+{
+    tool.stop();
+
+    Thread::stop();
 }
 
 int

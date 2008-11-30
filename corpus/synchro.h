@@ -130,11 +130,11 @@ class Thread
   public:
     // To start and stop the thread.  Thread may be run repeatedly, but make
     // sure the thread has stopped before starting it once more.
-    int start();
-    void stop();
+    virtual int start();
+    virtual void stop();
 
     // Overload this method to run your thread code
-    virtual void run();
+    virtual void run() = 0;
 
     // These are/should only fired once!  be careful, or deadlock could ensue
     const boost::shared_ptr<TriggeredEvent> getTrigger() { return trigger; }

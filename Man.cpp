@@ -359,6 +359,8 @@ Man::run ()
   //motion.getStop()->await();
   comm.stop();
   comm.getTrigger()->await_off();
+  // @jfishman - tool will not exit, due to socket blocking
+  //comm.getTOOLTrigger()->await_off();
 
 #ifdef DEBUG_MAN_THREADING
   cout << "  run :: Signalling stop" << endl;

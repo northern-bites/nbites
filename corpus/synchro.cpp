@@ -15,12 +15,17 @@
 #include <map>
 #include <string>
 #include <pthread.h>
+#include <iostream>
 #include <boost/shared_ptr.hpp>
 #include "synchro.h"
 
 using namespace std;
 using namespace boost;
 
+
+//#define DEBUG_THREAD_CREATE
+//#define DEBUG_THREAD_START
+//#define DEBUG_THREAD_EXIT
 
 Event::Event (string _name)
   : name(_name), signalled(false)
@@ -129,6 +134,9 @@ Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
   : name(_name), synchro(_synchro), running(false),
     trigger(new Trigger(_synchro, _name, false))
 {
+#ifdef DEBUG_THREAD_CREATE
+    cout << "Create thread '" << name << "'" << endl;
+#endif
 }
 
 Thread::~Thread ()
@@ -139,6 +147,10 @@ int Thread::start ()
 {
     if (running)
         return -1;
+
+#ifdef DEBUG_THREAD_START
+    cout << "Start thread '" << name << "'" << endl;
+#endif
 
     // Set thread attributes
     pthread_attr_t attr;
@@ -163,16 +175,11 @@ void* Thread::runThread (void* _this)
 {
     reinterpret_cast<Thread*>(_this)->run();
 
+#ifdef DEBUG_THREAD_EXIT
+    cout << "Exit thread '" << reinterpret_cast<Thread*>(_this)->name << "'" <<
+        endl;
+#endif
     pthread_exit(NULL);
-}
-
-void Thread::run ()
-{
-    // Signal when all startup operations are complete
-    trigger->on();
-
-    // Signal when stop condition is met and shutdown operations are complete
-    trigger->off();
 }
 
 

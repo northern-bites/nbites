@@ -113,8 +113,6 @@ class Man
     // Hack the current image
     void hackFrame();
   private:
-    // static method to pass into a thread
-    static void* runThread(void*);
     // run Vision and call Noggin's main loop function
     void processFrame(void);
     // wait for and retrieve the latest image

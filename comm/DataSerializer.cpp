@@ -180,8 +180,8 @@ DataSerializer::closeAll () throw()
 {
   close();
 
-  if (bind_sockn != -1) 
-    if (SOCKETNS::close(bind_sockn) == -1) 
+  if (bind_sockn != -1)
+    if (SOCKETNS::close(bind_sockn) == -1)
       fprintf(stderr, "Error closing socket: #%i - %s\n", errno,
           strerror(errno));
   bind_sockn = -1;

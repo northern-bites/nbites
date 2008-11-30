@@ -96,8 +96,8 @@ MotionCore::~MotionCore (void)
   enqueue(new BodyJointCommand(SIT_DOWN));
   cout << "Sitting down" << endl;
   processCommands();
-  SleepMs(SIT_DOWN_TIME * 1000);
 #ifndef NO_ACTUAL_MOTION
+  SleepMs(SIT_DOWN_TIME * 1000);
   motionProxy->setBodyStiffness(0.0f, 1.0f);
 #endif
   

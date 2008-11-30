@@ -30,17 +30,20 @@ class Comm
     Comm(boost::shared_ptr<Synchro> _synchro, Sensors *s, Vision* v);
     ~Comm();
 
+    int start();
+    void stop();
     void run();
     int  startTOOL();
     void stopTOOL();
-
-    void error(socket_error err) throw();
+    const boost::shared_ptr<TriggeredEvent> getTOOLTrigger() {
+        return tool.getTrigger();
+    }
 
     void discover_broadcast();
+    void error(socket_error err) throw();
+    void send(const char *msg, int len, sockaddr_in &addr) throw(socket_error);
 
     GameController* getGC() { return &gc; }
-
-    void send(const char *msg, int len, sockaddr_in &addr) throw(socket_error);
 
     int getTOOLState();
     std::string getRobotName();
@@ -66,8 +69,6 @@ class Comm
                       int size)  throw();
     bool validate_packet(const char* msg, int len, CommPacketHeader& packet)
       throw();
-
-    static void* runThread  (void*);
 
     void add_to_module();
 

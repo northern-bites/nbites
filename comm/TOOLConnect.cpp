@@ -53,7 +53,6 @@ TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, Sensors *s, Vision *v)
 
 TOOLConnect::~TOOLConnect ()
 {
-  stop();
 }
 
 #if ROBOT(NAO)
@@ -73,7 +72,7 @@ TOOLConnect::run ()
 #endif
 
       try {
-        while (serial.connected()) {
+        while (running && serial.connected()) {
           receive();
         }
       }catch (socket_error& e) {
