@@ -111,7 +111,11 @@ class MotionCore
       motionProxy->postGotoTorsoOrientation(pX, pY, pTime, pType);
     }
 
+#ifdef USE_MOTION
     bool isWalkActive() { return motionProxy->walkIsActive(); }
+#else
+    bool isWalkActive() { return false; }
+#endif
     void setBodyStiffness(float percentStiffness,
 			  float time) {
       motionProxy->setBodyStiffness(percentStiffness,time); }

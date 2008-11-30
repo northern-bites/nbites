@@ -97,7 +97,9 @@ MotionCore::~MotionCore (void)
   cout << "Sitting down" << endl;
   processCommands();
   SleepMs(SIT_DOWN_TIME * 1000);
+#ifndef NO_ACTUAL_MOTION
   motionProxy->setBodyStiffness(0.0f, 1.0f);
+#endif
   
   pthread_mutex_destroy (&motion_mutex);
   pthread_mutex_destroy (&odometry_mutex);
@@ -169,6 +171,7 @@ MotionCore::getBalanceMode(){
 void
 MotionCore::stopHeadMoves() {
   if (chainTaskIDs[HEAD_CHAIN] != NO_TASK){
+#ifndef NO_ACTUAL_MOTION
     const bool success = motionProxy->killTask(chainTaskIDs[HEAD_CHAIN]);
     chainTaskIDs[HEAD_CHAIN] = NO_TASK;
 
@@ -177,9 +180,12 @@ MotionCore::stopHeadMoves() {
     else          cout << "Could not kill head task" << endl;
 #endif
 
+#endif
   }
   if (preemptiveChainTaskIDs[HEAD_CHAIN] != NO_TASK) {
+#ifndef NO_ACTUAL_MOTION
     const bool success = motionProxy->killTask(preemptiveChainTaskIDs[HEAD_CHAIN]);
+#endif
     preemptiveChainTaskIDs[HEAD_CHAIN] = NO_TASK;
 
 #ifdef DEBUG_TASK_KILLS
@@ -213,12 +219,14 @@ MotionCore::stopBodyMoves() {
 
   for (unsigned int i = 1; i < NUM_CHAINS; i++) {
     if (chainTaskIDs[i] !=  NO_TASK){
+#ifndef NO_ACTUAL_MOTION
       const bool success = motionProxy->killTask(chainTaskIDs[i]);
 #ifdef DEBUG_TASK_KILLS
       if (success)  cout << "Successfully killed task" << endl;
       else          cout << "Could not kill task" << endl;
 #endif
       bool success2 = motionProxy->killTask(preemptiveChainTaskIDs[i]);
+#endif
     }
     chainTaskIDs[i] = NO_TASK;
     preemptiveChainTaskIDs[i] = NO_TASK;
@@ -242,7 +250,9 @@ MotionCore::stopBodyMoves() {
 
   if (isWalkActive()) {
     cout << "Stopping the walk command" << endl;
+#ifndef NO_ACTUAL_MOTION
     motionProxy->endWalk();
+#endif
     walkIsStopping = true;
   }
 }
