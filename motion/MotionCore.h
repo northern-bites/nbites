@@ -21,6 +21,8 @@
 
 #include <vector>
 #include <pthread.h>
+#include <boost/shared_ptr.hpp>
+#include "synchro.h"
 
 // Aldebaran library includes
 #include "almotionproxy.h"
@@ -35,6 +37,7 @@
 using namespace Kinematics;
 
 class MotionCore
+  : public Thread
 {
  public:
   static const AL::ALMotionProxy::INTERPOLATION_TYPE SMOOTH_INTERPOLATION =
@@ -45,7 +48,7 @@ class MotionCore
     SMOOTH_INTERPOLATION;
 
   public:
-    MotionCore(Sensors *s);
+    MotionCore(boost::shared_ptr<Synchro> synchro, Sensors *s);
     virtual ~MotionCore(void);
 
     void setNextWalkCommand (const WalkCommand *command) {
@@ -123,12 +126,7 @@ class MotionCore
     const vector<float> getOdometry();
     const float getHeadSpeed();
 
-    bool isRunning() { return running; }    
     void run    ();
-    void runStep();
-    int  start  ();
-    void stop   ();
-
 
     void updateSensorsWithMotion();
  protected:

@@ -1,7 +1,9 @@
 
 #include <vector>
 #include <unistd.h>
+#include <boost/shared_ptr.hpp>
 
+#include "MotionCore.h"
 #include "CallbackAction.h"
 
 //#define NO_ACTUAL_MOTION
@@ -10,6 +12,7 @@
 //#define DEBUG_TASK_KILLS
 
 using namespace std;
+using namespace boost;
 
 const float MotionCore::GET_UP_BODY_JOINTS[NUM_BODY_JOINTS] =
   { 0.0f, 0.0f, 0.0f, 0.0f,                 // Left Arm
@@ -37,8 +40,8 @@ SIT_DOWN(GET_UP_TIME, new vector<float>(SIT_DOWN_BODY_JOINTS,
 
 const vector<float> MotionCore::NOT_MOVING = vector<float>(3,0.0f); //zero motion walk vector
 
-MotionCore::MotionCore (Sensors *s)
-  : sensors(s),
+MotionCore::MotionCore (shared_ptr<Synchro> _synchro, Sensors *s)
+  : Thread(_synchro, "MotionCore"), sensors(s),
     bodyQueue(), headQueue(), headScanQueue(), nextWalkCommand(0),
 #ifndef NO_ACTUAL_MOTION
     motionProxy(AL::ALMotionProxy::getInstance()),
@@ -100,6 +103,8 @@ MotionCore::~MotionCore (void)
   SleepMs(SIT_DOWN_TIME * 1000);
   motionProxy->setBodyStiffness(0.0f, 1.0f);
 #endif
+
+  stop();
   
   pthread_mutex_destroy (&motion_mutex);
   pthread_mutex_destroy (&odometry_mutex);
@@ -505,44 +510,12 @@ MotionCore::processCommands (void)
 //  Thread methods
 //
 
-int
-MotionCore::start (void)
-{
-#ifdef DEBUG_INITIALIZATION
-  cout << "Motion:initializing" << endl;
-  cout << "  creating threads" << endl;
-#endif
-  fflush(stdout);
-  
-  // set thread attributes
-  pthread_attr_t attr;
-  pthread_attr_init  (&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  // create & start thread
-  const int result = pthread_create(&motion_thread, &attr, runThread,
-                                    (void *)this);
-  // destroy the used attributes
-  pthread_attr_destroy(&attr);
-#ifdef DEBUG_INITIALIZATION
-  cout << "Motion:DONE" << endl;
-#endif
-
-  return result;
-}
-
-void*
-MotionCore::runThread (void *motion)
-{
-  ((MotionCore*)motion)->run();
-
-  pthread_exit(NULL);
-}
-
-
 void
 MotionCore::run (void)
 {
   running = true;
+  trigger->on();
+
   cout << "Running Motion" << endl;
   while (running) {
     updateSensorsWithMotion();
@@ -553,12 +526,9 @@ MotionCore::run (void)
 
     usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS));
   }
-}
 
-void
-MotionCore::stop (void)
-{
   running = false;
+  trigger->off();
 }
 
 

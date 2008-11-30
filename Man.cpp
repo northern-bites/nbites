@@ -66,7 +66,7 @@ Man::Man ()
     Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
     python_prefs(),
     profiler(&micro_time), sensors(),
-    motion(&sensors),
+    motion(synchro, &sensors),
     vision(new NaoPose(&sensors), &profiler),
     comm(synchro, &sensors, &vision),
     noggin(&sensors, &profiler, &vision),
@@ -356,7 +356,7 @@ Man::run ()
 
   // Finished with run loop, stop sub-threads and exit
   motion.stop();
-  //motion.getStop()->await();
+  motion.getTrigger()->await_off();
   comm.stop();
   comm.getTrigger()->await_off();
   // @jfishman - tool will not exit, due to socket blocking
