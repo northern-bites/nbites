@@ -16,54 +16,63 @@
 #include <string>
 #include <pthread.h>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 #include "synchro.h"
 
 using namespace std;
 using namespace boost;
 
+
 Event::Event (string _name)
-    : name(_name), signalled(false)
+  : name(_name), signalled(false)
 {
-    pthread_mutex_init(&mutex, NULL);
+    mutex = shared_ptr<pthread_mutex_t>(new pthread_mutex_t(), MutexDeleter());
+
+    pthread_mutex_init(mutex.get(), NULL);
+    pthread_cond_init(&cond, NULL);
+}
+
+Event::Event (string _name, shared_ptr<pthread_mutex_t> _mutex)
+  : name(_name), mutex(_mutex), signalled(false)
+{
     pthread_cond_init(&cond, NULL);
 }
 
 Event::~Event ()
 {
-    pthread_mutex_destroy(&mutex);
     pthread_cond_destroy(&cond);
 }
 
 void Event::await ()
 {
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(mutex.get());
 
     while (!signalled)
-        pthread_cond_wait(&cond, &mutex);
+        pthread_cond_wait(&cond, mutex.get());
     signalled = false;
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(mutex.get());
 }
 
 bool Event::poll ()
 {
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(mutex.get());
 
     const bool result = signalled;
     signalled = false;
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(mutex.get());
     return result;
 }
 
 void Event::signal ()
 {
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(mutex.get());
 
     signalled = true;
     pthread_cond_signal(&cond);
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(mutex.get());
 }
 
 Synchro::Synchro ()
@@ -80,6 +89,17 @@ shared_ptr<Event> Synchro::create (string name)
     map<string, shared_ptr<Event> >::iterator itr = events.find(name);
     if (itr == events.end()) {
         const shared_ptr<Event> e(new Event(name));
+        events[name] = e;
+    }
+    return events[name];
+}
+
+shared_ptr<Event>
+Synchro::create (string name, shared_ptr<pthread_mutex_t> mutex)
+{
+    map<string, shared_ptr<Event> >::iterator itr = events.find(name);
+    if (itr == events.end()) {
+        const shared_ptr<Event> e(new Event(name, mutex));
         events[name] = e;
     }
     return events[name];
@@ -108,8 +128,7 @@ void Synchro::signal (Event* ev)
 
 Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
   : name(_name), synchro(_synchro), running(false),
-    start_event(_synchro->create(_name + THREAD_START_EVENT_SUFFIX)),
-    stop_event(_synchro->create(_name + THREAD_STOP_EVENT_SUFFIX))
+    trigger(new Trigger(_synchro, _name, false))
 {
 }
 
@@ -117,8 +136,7 @@ Thread::~Thread ()
 {
 }
 
-int
-Thread::start ()
+int Thread::start ()
 {
     if (running)
         return -1;
@@ -137,26 +155,109 @@ Thread::start ()
     return result;
 }
 
-void
-Thread::stop ()
+void Thread::stop ()
 {
     running = false;
 }
 
-void*
-Thread::runThread (void* _this)
+void* Thread::runThread (void* _this)
 {
     reinterpret_cast<Thread*>(_this)->run();
 
+    std::cout << "Thread '" << reinterpret_cast<Thread*>(_this)->name <<
+        "' exiting" << std::endl;
     pthread_exit(NULL);
 }
 
-void
-Thread::run ()
+void Thread::run ()
 {
     // Signal when all startup operations are complete
-    start_event->signal();
+    trigger->on();
 
     // Signal when stop condition is met and shutdown operations are complete
-    stop_event->signal();
+    trigger->off();
+}
+
+
+Trigger::Trigger (shared_ptr<Synchro> _synchro, string name, bool _v)
+  : mutex(shared_ptr<pthread_mutex_t>(new pthread_mutex_t(), MutexDeleter())),
+    on_event(_synchro->create(name + TRIGGER_ON_SUFFIX, mutex)),
+    off_event(_synchro->create(name + TRIGGER_OFF_SUFFIX, mutex)),
+    flip_event(_synchro->create(name + TRIGGER_FLIP_SUFFIX, mutex)),
+    value(_v)
+{
+    // Set mutex to recursive (reentrant)
+    pthread_mutexattr_t attrs;
+    pthread_mutexattr_init(&attrs);
+    pthread_mutexattr_settype(&attrs, PTHREAD_MUTEX_RECURSIVE);
+    // Initialize mutex
+    pthread_mutex_init(mutex.get(), &attrs);
+}
+
+void Trigger::flip ()
+{
+    lock();
+
+    value = !value;
+    if (value)
+        on_event->signal();
+    else
+        off_event->signal();
+    flip_event->signal();
+
+    release();
+}
+
+void Trigger::on ()
+{
+    lock();
+
+    if (!value) {
+        // flip and signal
+        value = true;
+        on_event->signal();
+        flip_event->signal();
+    }
+
+    release();
+}
+
+void Trigger::off ()
+{
+    lock();
+
+    if (value) {
+        // flip and signal
+        value = false;
+        off_event->signal();
+        flip_event->signal();
+    }
+
+    release();
+}
+
+bool Trigger::poll ()
+{
+    lock();
+    const bool _v = value;
+    release();
+
+    return _v;
+}
+
+void Trigger::await_on ()
+{
+    if (!poll())
+        on_event->await();
+}
+
+void Trigger::await_off ()
+{
+    if (poll())
+        off_event->await();
+}
+
+void Trigger::await_flip ()
+{
+    flip_event->await();
 }
