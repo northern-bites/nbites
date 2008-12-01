@@ -119,7 +119,6 @@ void MotionSwitchboard::run() {
 
 		for(unsigned int i = 0; i < HEAD_JOINTS;i++){
 			nextJoints[HEAD_YAW + i] = headJoints.at(i);
-			cout << "headjoint is " << nextJoints[HEAD_YAW + i] << endl;
 		}
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
             nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);

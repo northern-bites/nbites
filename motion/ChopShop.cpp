@@ -20,7 +20,10 @@ queue<vector<vector<float> > >* ChopShop::chopCommand(const JointCommand *comman
 		return chopSmooth(command);
 	}
 
-
+	else {
+		cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING LINEARLY" << endl;
+		return chopLinear(command);
+	}
 }
 
 // Smooth interpolation motion
@@ -28,7 +31,7 @@ queue<vector<vector<float> > >*
 ChopShop::chopSmooth(const JointCommand *command) {
 
 	// PLACE HOLDER
-	queue<vector<vector<float> > >* a;
+	queue<vector<vector<float> > >* a = new queue<vector<vector<float> > >();
 	return a;
 }
 
@@ -75,7 +78,7 @@ vector<float> ChopShop::getCurrentJoints() {
 
 
 vector<float> ChopShop::getFinalJoints(const JointCommand *command,
-								  vector<float>* currentJoints) {
+									   vector<float>* currentJoints) {
 	vector<float> finalJoints;
 	vector<float>::iterator currentStart = currentJoints->begin();
 	vector<float>::iterator currentEnd = currentJoints->begin();
@@ -98,7 +101,7 @@ vector<float> ChopShop::getFinalJoints(const JointCommand *command,
 			finalJoints.insert( finalJoints.end(),
 								nextChain->begin(),
 								nextChain->end() );
-								}
+		}
 		// Set the start iterator into the right position for the
 		// next chain
 		currentStart += chain_lengths[chain];
@@ -114,7 +117,7 @@ vector<float> ChopShop::getDiffPerChop(int numChops,
 
 	for (unsigned int joint_id=0; joint_id < NUM_JOINTS ;++joint_id) {
 		diffPerChop.push_back( (final->at(joint_id) -
-								current->at(joint_id)) / numChops);
+								current->at(joint_id)) / (float)numChops);
 	}
 
 	return diffPerChop;
@@ -122,9 +125,9 @@ vector<float> ChopShop::getDiffPerChop(int numChops,
 
 // Takes final joint values and
 queue<vector<vector<float> > >* ChopShop::buildChops(int numChops,
-						  vector<float> *currentJoints,
-						  vector<float> *diffPerChop,
-						  const JointCommand *command) {
+													 vector<float> *currentJoints,
+													 vector<float> *diffPerChop,
+													 const JointCommand *command) {
 	queue<vector<vector<float> > >* choppedJoints = new queue<vector<vector<float> > >();
 	float nextVal;
 
@@ -143,7 +146,7 @@ queue<vector<vector<float> > >* ChopShop::buildChops(int numChops,
 			joint = chain_first_joint[*chain];
 
 			for ( ; joint <= lastChainJoint; joint++) {
-				nextVal = currentJoints->at(joint)+ diffPerChop->at(joint)*num_chopped;
+				nextVal = currentJoints->at(joint)+ diffPerChop->at(joint)*(float)num_chopped;
 				nextChopped.at(*chain).push_back(nextVal);
 //				if (*chain == 0)
 //					cout << "nextVal is" << nextVal << " for chain " << *chain << endl;

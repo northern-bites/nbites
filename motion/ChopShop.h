@@ -37,10 +37,10 @@ private:
 								 vector<float> *final);
 	void vectorToRad(vector<float> *vect);
 
-	queue<vector<vector<float> > >* buildChops(float numChops,
-					vector<float> *currentJoints,
-					vector<float> *diffPerChop,
-					const JointCommand *command);
+	queue<vector<vector<float> > >* buildChops(int numChops,
+											   vector<float> *currentJoints,
+											   vector<float> *diffPerChop,
+											   const JointCommand *command);
 };
 
 #endif
