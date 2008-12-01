@@ -1,5 +1,5 @@
-#ifndef _JointCommand_h_DEFINED
-#define _JointCommand_h_DEFINED
+#ifndef _HeadJointCommand_h_DEFINED
+#define _HeadJointCommand_h_DEFINED
 
 /**
  * Class to store joint commands specifically for the head.
@@ -11,27 +11,29 @@
 #include <vector>
 #include <string>
 
-#include "WalkCommand.h"
+//#include "WalkCommand.h"
 #include "Kinematics.h"
+#include "JointCommand.h"
+#include "MotionConstants.h"
+
+using namespace MotionConstants;
 using namespace Kinematics;
 
-class HeadJointCommand
-{
- public:
-  HeadJointCommand(const float time, const std::vector<float> *joints,
-		   const Kinematics::InterpolationType _type);
-  HeadJointCommand(const HeadJointCommand &other);
-  ~HeadJointCommand();
+class HeadJointCommand : public JointCommand {
+public:
+	HeadJointCommand(const float time, const std::vector<float> *joints,
+					 const Kinematics::InterpolationType _type);
+	HeadJointCommand(const HeadJointCommand &other);
+	~HeadJointCommand();
 
-  const float getDuration() const { return duration; }
-  const std::vector<float>* const getJoints(void) const { return headJoints; }
-  const Kinematics::InterpolationType getType() const { return type; }
-
- private:
-  const float duration;
-  //const skew_function skew_func;
-  const std::vector<float> *headJoints;
-  const Kinematics::InterpolationType type;
+	// TODO @JGM NEED A CHECK ON THE CHAINID REQUEST
+	virtual const std::vector<float>* getJoints(ChainID chain) const {
+		return headJoints;
+	}
+private:
+	//const skew_function skew_func;
+	const std::vector<float> *headJoints;
+	virtual void setChainList();
 };
 
 #endif

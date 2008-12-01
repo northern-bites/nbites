@@ -81,6 +81,7 @@ class MotionCore
       headScanQueue.push_back(command);
       pthread_mutex_unlock(&motion_mutex);
     }
+
     void enqueueSequence(std::vector<BodyJointCommand*> &seq);
 
     /*

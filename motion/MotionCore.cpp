@@ -110,7 +110,7 @@ MotionCore::~MotionCore (void)
 #endif
 
   stop();
-  
+
   pthread_mutex_destroy (&motion_mutex);
   pthread_mutex_destroy (&odometry_mutex);
   pthread_mutex_destroy (&head_speed_mutex);
@@ -327,7 +327,7 @@ void MotionCore::updateHeadSpeed() {
   // we imagine that speed is a vector of two components, and total speed is
   // the length of the vector.
   headSpeed = sqrt(dY*dY + dP*dP) * static_cast<float>(MOTION_FRAME_RATE);
-  
+
   lastHeadYaw = headYaw;
   lastHeadPitch = headPitch;
   pthread_mutex_unlock(&head_speed_mutex);
@@ -339,7 +339,7 @@ void MotionCore::updateSensorsWithMotion() {
   vector <float> alJointErrors = motionProxy->getBodyAngleErrors();
 
 
-  
+
   for(unsigned int i = 0; i < NUM_JOINTS; i++){
     alJointValues[i] += alJointErrors[i];
   }
@@ -418,7 +418,7 @@ MotionCore::processCommands (void)
 
     //cout << "headQueue.size() after scan 'if': " << headQueue.size() << endl;
 
-    // We have this problem where pointers point to objects both in 
+    // We have this problem where pointers point to objects both in
     // HeadJointCommand's and in HeadScanCommands, so we can't very well
     // delete them without being very careful. Think this through!!!
 
@@ -432,15 +432,15 @@ MotionCore::processCommands (void)
 #ifdef NAOQI1
       taskID = motionProxy->
       post.gotoChainAngles(CHAIN_STRINGS[HEAD_CHAIN],
-			    *command->getJoints(),
+			    *command->getJoints(HEAD_CHAIN),
 			    command->getDuration(),
-			    command->getType());
+			    command->getInterpolation());
 #else
 taskID = motionProxy->
       postGotoChainAngles(CHAIN_STRINGS[HEAD_CHAIN],
-			    *command->getJoints(),
+			    *command->getJoints(HEAD_CHAIN),
 			    command->getDuration(),
-			    command->getType());
+			    command->getInterpolation());
 #endif
       /*
       }catch( AL::ALError &e){
@@ -490,7 +490,7 @@ taskID = motionProxy->
 	      taskID = motionProxy->postGotoChainAngles(CHAIN_STRINGS[id],
 							*chainJoints,
 							command->getDuration(),
-							command->getType());
+							command->getInterpolation());
 #endif
 	      /*
 	    }catch( AL::ALError &e){
@@ -527,7 +527,7 @@ taskID = motionProxy->
     nextWalkCommand = 0;
   }
   //cout << "Size of bodyQueue: " << bodyQueue.size() << endl;
-  
+
   pthread_mutex_unlock(&motion_mutex);
 }
 

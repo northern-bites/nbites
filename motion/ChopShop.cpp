@@ -11,19 +11,19 @@ ChopShop::ChopShop (Sensors *s, float motionFrameLength)
 
 // Breaks command into FRAME_LENGTH_S size pieces,
 // adds it to the queue
-queue<vector<vector<float> > > ChopShop::chopCommand(const BodyJointCommand *command) {
+queue<vector<vector<float> > > ChopShop::chopCommand(const JointCommand *command) {
 	// It's a BJC so it deals with 4 chains
-	chainList = new vector<int>(0);
+	chainList = new list<int>(0);
 	chainList->push_back(1);
 	chainList->push_back(2);
 	chainList->push_back(3);
 	chainList->push_back(4);
 
-	if (command->getType() == INTERPOLATION_LINEAR) {
+	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
 		return chopLinear(command);
 	}
 
-	else if (command->getType() == INTERPOLATION_SMOOTH) {
+	else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
 		return chopSmooth(command);
 	}
 
@@ -32,7 +32,7 @@ queue<vector<vector<float> > > ChopShop::chopCommand(const BodyJointCommand *com
 
 // Smooth interpolation motion
 queue<vector<vector<float> > >
-ChopShop::chopSmooth(const BodyJointCommand *command) {
+ChopShop::chopSmooth(const JointCommand *command) {
 
 	// PLACE HOLDER
 	queue<vector<vector<float> > > a;
@@ -48,7 +48,7 @@ ChopShop::chopSmooth(const BodyJointCommand *command) {
  *
  */
 queue<vector<vector<float> > >
-ChopShop::chopLinear(const BodyJointCommand *command) {
+ChopShop::chopLinear(const JointCommand *command) {
 
 	// Clear previous queue and vectors
  	while (!choppedJoints.empty())
@@ -96,7 +96,7 @@ vector<float> ChopShop::getDiffPerChop(int numChops,
 	return diffPerChop;
 }
 
-vector<float> ChopShop::getFinalJoints(const BodyJointCommand *command,
+vector<float> ChopShop::getFinalJoints(const JointCommand *command,
 								  vector<float>* currentJoints) {
 	vector<float> finalJoints;
 	vector<float>::iterator currentStart = currentJoints->begin();
@@ -128,7 +128,7 @@ vector<float> ChopShop::getFinalJoints(const BodyJointCommand *command,
 }
 
 // Takes final joint values and
-void ChopShop::buildChops(float numChops, 
+void ChopShop::buildChops(float numChops,
 						  vector<float> *currentJoints,
 						  vector<float> *diffPerChop) {
 	float nextVal;
@@ -138,7 +138,7 @@ void ChopShop::buildChops(float numChops,
 
 		// NEEDS BETTER CHAIN LOGIC, MORE GENERAL
 		int lastChainJoint,joint = 0;
-		vector<int>::iterator chain;
+		list<int>::iterator chain;
 		chain = chainList->begin();
 
 		for ( ; chain != chainList->end() ; chain++) {

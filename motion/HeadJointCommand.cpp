@@ -3,18 +3,28 @@
 HeadJointCommand::HeadJointCommand(const float time,
 				   const std::vector<float> *joints,
 				   const Kinematics::InterpolationType _type)
-  : duration(time), headJoints(joints), type(_type) {
-
+	: JointCommand(BODY_JOINT, time, _type), headJoints(joints)
+{
+	setChainList();
 }
 
 HeadJointCommand::HeadJointCommand(const HeadJointCommand &other)
-  : duration(other.duration),
-    type(other.type) {
-  if(other.headJoints)
-    headJoints = new vector <float>(*other.headJoints);
+	: JointCommand(BODY_JOINT, other.getDuration(), other.getInterpolation())
+{
+	setChainList();
+
+	if(other.headJoints)
+		headJoints = new std::vector<float>(*other.headJoints);
 }
 
 HeadJointCommand::~HeadJointCommand() {
   if (headJoints != NULL)
     delete headJoints;
+}
+
+void
+HeadJointCommand::setChainList() {
+	chainList.insert(chainList.end(),
+					 HEAD_JOINT_CHAINS,
+					 HEAD_JOINT_CHAINS + HEAD_JOINT_NUM_CHAINS);
 }

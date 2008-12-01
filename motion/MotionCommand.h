@@ -8,21 +8,22 @@
  * It's only ability is to keep track of what kind of motion
  * it implements.
  */
-
-#include "MotionConstants.h";
+#include <list>
 
 class MotionCommand
 {
 public:
-	MotionCommand(MotionConstants::MotionType type) { motionType = _type; }
+	MotionCommand(MotionConstants::MotionType type)
+		: chainList(), motionType(type) { }
 
-	virtual ~MotionCommand() = 0;
+	MotionConstants::MotionType getType() { return motionType; }
+	std::list<int> getChainList() { return chainList; }
 
-	MotionConstants::MotionType getType() {return motionType;}
-
+protected:
+	std::list<int> chainList;
 private:
+	virtual void setChainList() = 0;
 	MotionConstants::MotionType motionType;
-
 };
 
 #endif

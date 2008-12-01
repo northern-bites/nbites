@@ -1,4 +1,4 @@
- #ifndef _ChopShop_h_DEFINED
+#ifndef _ChopShop_h_DEFINED
 #define _ChopShop_h_DEFINED
 
 #include <vector>
@@ -7,6 +7,7 @@
 #include "Sensors.h"
 #include "BodyJointCommand.h"
 #include "Kinematics.h"
+#include "JointCommand.h"
 
 using namespace std;
 using namespace Kinematics;
@@ -16,7 +17,7 @@ class ChopShop
 public:
  	ChopShop(Sensors *s, float motionFrameLength);
 
-	queue<vector<vector<float> > > chopCommand(const BodyJointCommand *command);
+	queue<vector<vector<float> > > chopCommand(const JointCommand *command);
 private:
 	// Class objects
 	vector<float> finalJoints;
@@ -33,12 +34,12 @@ private:
 	queue<vector<vector<float> > > choppedJoints;
 	const vector<float> *nextChain;
 
-	vector<int> *chainList;
-	queue<vector<vector<float> > > chopSmooth(const BodyJointCommand *command);
-	queue<vector<vector<float> > > chopLinear(const BodyJointCommand *command);
+	list<int> *chainList;
+	queue<vector<vector<float> > > chopSmooth(const JointCommand *command);
+	queue<vector<vector<float> > > chopLinear(const JointCommand *command);
 
 	vector<float> getCurrentJoints();
-	vector<float> getFinalJoints(const BodyJointCommand *command,
+	vector<float> getFinalJoints(const JointCommand *command,
 								 vector<float> *currentJoints);
 	vector<float> getDiffPerChop(int numChops,
 								 vector<float> *current,

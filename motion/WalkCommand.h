@@ -17,7 +17,9 @@ using namespace AL;
 #include "WalkParameters.h"
 #include "Kinematics.h"
 #include "MotionConstants.h"
+#include "MotionCommand.h"
 using namespace Kinematics;
+using namespace MotionConstants;
 
 class WalkCommand : public MotionCommand
 {
@@ -26,11 +28,13 @@ class WalkCommand : public MotionCommand
  public:
   WalkCommand(const int _numSamples,
 	      WalkParameters _params = WalkParameters::DEFAULT_PARAMS)
-	  : MotionCommand(MotionConstants::MotionType::WALK),
+	  : MotionCommand(MotionConstants::WALK),
 		numSamplesPerStep(_numSamples),
-		params(_params) { }
+		params(_params) { setChainList(); }
   WalkCommand(const WalkCommand &other)
-    : numSamplesPerStep(other.numSamplesPerStep), params(other.params) { }
+	  : MotionCommand(MotionConstants::WALK),
+		numSamplesPerStep(other.numSamplesPerStep),
+		params(other.params) { setChainList(); }
   virtual ~WalkCommand() {}
 #ifdef NAOQI1
     virtual const float execute(ALPtr<ALMotionProxy> proxy) const {}
@@ -43,10 +47,17 @@ class WalkCommand : public MotionCommand
     return vector<float>(temp,&temp[3]);
   };
 
+
  protected:
   const int numSamplesPerStep;
   const WalkParameters params;
   mutable float lastX, lastY, lastH;
+
+private:
+	virtual void setChainList() { chainList.assign(WALK_CHAINS,
+												   WALK_CHAINS +
+												   WALK_NUM_CHAINS); }
+
 };
 
 class WalkStraight : public WalkCommand {

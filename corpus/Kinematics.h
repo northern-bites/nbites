@@ -186,6 +186,7 @@ namespace Kinematics {
     static const unsigned int ARM_JOINTS = 4;
     static const unsigned int LEG_JOINTS = 6;
     static const unsigned int NUM_CHAINS = 5;
+	static const unsigned int NUM_BODY_CHAINS = 4;
 
     static const unsigned int NUM_JOINTS = HEAD_JOINTS + ARM_JOINTS*2 +
         LEG_JOINTS*2;
