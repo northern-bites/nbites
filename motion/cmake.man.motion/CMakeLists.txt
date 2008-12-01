@@ -98,7 +98,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
-SET( MOTION_SRCS ${MOTION_INCLUDE_DIR}/ActionCommand
+SET( MOTION_SRCS
   #${MOTION_INCLUDE_DIR}/CallbackAction
                      ${MOTION_INCLUDE_DIR}/BodyJointCommand
 		     ${MOTION_INCLUDE_DIR}/HeadJointCommand
