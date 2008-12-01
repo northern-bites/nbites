@@ -611,14 +611,14 @@ Sensors::add_to_module ()
     }
   }
   if (_sensors_module != NULL) {
-    if (pySensors != NULL)
-      Py_DECREF(reinterpret_cast<PySensors*>(pySensors));
-
-    pySensors = reinterpret_cast<PySensors*>(PySensors_new(this));
-    PyModule_AddObject(_sensors_module, "inst",
-		       reinterpret_cast<PyObject*>(pySensors));
+	  if (pySensors != NULL) {
+		  Py_DECREF(reinterpret_cast<PySensors*>(pySensors));
+	  }
+	  pySensors = reinterpret_cast<PySensors*>(PySensors_new(this));
+	  PyModule_AddObject(_sensors_module, "inst",
+						 reinterpret_cast<PyObject*>(pySensors));
   }else{
-    cout << "sensors modules is null" << endl;
+	  cout << "sensors modules is null" << endl;
   }
 }
 

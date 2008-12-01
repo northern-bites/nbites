@@ -22,6 +22,7 @@ struct mDHParam{
 };
 
 // Various Body Constants ALL IN MILLIMETERS
+
 static const float NECK_LENGTH = 80.0f;
 static const float CAMERA_YAW_Y_LENGTH = 81.06f;
 static const float CAMERA_YAW_Z_LENGTH = 14.6f;
@@ -38,7 +39,6 @@ static const float NECK_TILT2_TO_CAMERA_Z = -14.6f;
 static const float NECK_TILT_TO_TILT2 = 80.0f;
 static const float SHOULDER_TO_NECK_TILT_Y = 2.5f;
 static const float SHOULDER_TO_NECK_TILT_Z = 19.5f;
-
 // Horizon-Related Constants
 static const float MM_TO_PIX_X_PLANE = 0.0171014f;
 static const float MM_TO_PIX_Y_PLANE = 0.0171195f;

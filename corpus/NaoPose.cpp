@@ -6,7 +6,7 @@ const float NaoPose::IMAGE_WIDTH_MM = 2.36f;
 const float NaoPose::IMAGE_HEIGHT_MM = 1.76f;
 
 // Calculated from numbers in camera docs:
-  const float NaoPose::FOCAL_LENGTH_MM = (IMAGE_WIDTH_MM/2) / tan(FOV_X/2);
+const float NaoPose::FOCAL_LENGTH_MM = (float)((IMAGE_WIDTH_MM/2) / tan(FOV_X/2));
   // e.g. 3 mm * mm_to_pix = 176 pixels
   const float NaoPose::MM_TO_PIX_X = IMAGE_WIDTH/IMAGE_WIDTH_MM;
   const float NaoPose::MM_TO_PIX_Y = IMAGE_HEIGHT/IMAGE_HEIGHT_MM;
@@ -15,8 +15,8 @@ const float NaoPose::IMAGE_HEIGHT_MM = 1.76f;
   const float NaoPose::IMAGE_CENTER_X = (IMAGE_WIDTH-1)/2.0f;
   const float NaoPose::IMAGE_CENTER_Y = (IMAGE_HEIGHT-1)/2.0f;
 
-const float NaoPose::PIX_TO_DEG_X = FOV_X_DEG/IMAGE_WIDTH;
-const float NaoPose::PIX_TO_DEG_Y = FOV_Y_DEG/IMAGE_HEIGHT;
+const float NaoPose::PIX_TO_DEG_X = (float)FOV_X_DEG/IMAGE_WIDTH;
+const float NaoPose::PIX_TO_DEG_Y = (float)FOV_Y_DEG/IMAGE_HEIGHT;
 
 const estimate NaoPose::NULL_ESTIMATE = {0.0, 0.0, 0.0, 0.0, 0.0};
 
@@ -184,12 +184,11 @@ void NaoPose::calcImageHorizonLine() {
   horizonRight.x = IMAGE_WIDTH - 1;
   horizonRight.y = ROUND(height_pix_right);
 
-  horizonSlope = (height_pix_right - height_pix_left) /(IMAGE_WIDTH - 1.0f);
+  horizonSlope = (float)((height_pix_right - height_pix_left) /(IMAGE_WIDTH -1.0));
   if (horizonSlope != 0)
     perpenHorizonSlope = -1/horizonSlope;
   else
     perpenHorizonSlope = INFTY;
-  
 }
 
 /**
@@ -270,8 +269,8 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
   // declare x,y,z coordinate of pixel in relation to focal point
   ublas::vector <float> pixelInCameraFrame =
     vector4D(FOCAL_LENGTH_MM,
-	     (IMAGE_CENTER_X - pixelX) * PIX_X_TO_MM,
-	     (IMAGE_CENTER_Y - pixelY) * PIX_Y_TO_MM);
+			 ((float)IMAGE_CENTER_X - (float)pixelX) * (float)PIX_X_TO_MM,
+			 ((float)IMAGE_CENTER_Y - (float)pixelY) * (float)PIX_Y_TO_MM);
 
   // declare x,y,z coordinate of pixel in relation to body center
   ublas::vector <float> pixelInWorldFrame(4);
@@ -333,18 +332,17 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
   
   //all angle signs are according to right hand rule for the major axis
   // get bearing angle in image plane,left pos, right negative
-  double object_bearing = DEG2RAD((IMAGE_CENTER_X - x)*PIX_TO_DEG_X);
+  double object_bearing = DEG2RAD((IMAGE_CENTER_X - (float)x)*PIX_TO_DEG_X);
   // get elevation angle in image plane, up negative, down is postive
-  double object_elevation = DEG2RAD((y - IMAGE_CENTER_Y)*PIX_TO_DEG_Y);
+  double object_elevation = DEG2RAD(((float)y - IMAGE_CENTER_Y)*PIX_TO_DEG_Y);
   // convert dist estimate to mm
   double object_dist = dist*10;
 
   // object in the camera frame
   ublas::vector<float> objectInCameraFrame =
     vector4D(object_dist*cos(object_bearing)*cos(-object_elevation),
-	     object_dist*sin(object_bearing),
-	     object_dist*cos(object_bearing)*sin(-object_elevation));
-
+			 object_dist*sin(object_bearing),
+			 object_dist*cos(object_bearing)*sin(-object_elevation));
 
   // Hack for getting better bearing estimate at the moment!!!
   // object in world frame
@@ -478,10 +476,10 @@ const float NaoPose::getHomLength(const ublas::vector <float> &vec) {
 
 // returns the y coord for a given x coord on the horizon line
 const int NaoPose::getHorizonY(const int x) const {
-  return (int)(horizonLeft.y + (int)(horizonSlope * x));
+	return (int)(horizonLeft.y + (int)(horizonSlope * (float)x));
 }
 
 // returns the x coord for a given y coord on the horizon line
 const int NaoPose::getHorizonX(const int y) const {
-  return (int)((y - horizonLeft.y)/horizonSlope);
+	return (int)(((float)y - (float)horizonLeft.y)/horizonSlope);
 }

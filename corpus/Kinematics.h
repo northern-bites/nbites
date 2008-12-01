@@ -27,10 +27,10 @@ using namespace boost::numeric;
 namespace Kinematics {
 
 //Conversion constants
-
-    static const float TO_DEG = 180.0f/M_PI;
+	static const float M_PI_FLOAT = (float)M_PI;
+    static const float TO_DEG = 180.0f/M_PI_FLOAT;
 #ifndef TO_RAD //also defined in almotionproxy.h
-    static const float TO_RAD = M_PI/180.0f;
+    static const float TO_RAD = M_PI_FLOAT/180.0f;
 #endif
 
     static const float M_TO_CM  = 100.0f;
@@ -52,8 +52,8 @@ namespace Kinematics {
                                                   const float angle) {
         ublas::matrix <float> rot = ublas::identity_matrix <float>(4);
 
-        const float sinAngle = sin(angle);
-        const float cosAngle = cos(angle);
+        const float sinAngle = (float)sin(angle);
+        const float cosAngle = (float)cos(angle);
         if (angle == 0.0) { //OPTIMIZAION POINT
             return rot;
         }
@@ -257,33 +257,33 @@ namespace Kinematics {
 
     //                                  (alpha,  a ,  theta ,   d  )
     const float HEAD_MDH_PARAMS[2][4] = {{0.0f , 0.0f,  0.0f , 0.0f},
-                                         {-M_PI/2, 0.0f, -M_PI/2 , 0.0f}};
+                                         {-M_PI_FLOAT/2, 0.0f, -M_PI_FLOAT/2 , 0.0f}};
 
-    const float LEFT_ARM_MDH_PARAMS[4][4] = {{-M_PI/2,0.0f,0.0f,0.0f},
-                                             { M_PI/2,0.0f,M_PI/2,0.0f},
-                                             { M_PI/2,0.0f,0.0f,UPPER_ARM_LENGTH},
-                                             {-M_PI/2,0.0f,0.0f,0.0f}};
+    const float LEFT_ARM_MDH_PARAMS[4][4] = {{-M_PI_FLOAT/2,0.0f,0.0f,0.0f},
+                                             { M_PI_FLOAT/2,0.0f,M_PI_FLOAT/2,0.0f},
+                                             { M_PI_FLOAT/2,0.0f,0.0f,UPPER_ARM_LENGTH},
+                                             {-M_PI_FLOAT/2,0.0f,0.0f,0.0f}};
 
-    const float LEFT_LEG_MDH_PARAMS[6][4] = {{ -3*M_PI/4, 0.0f,  -M_PI/2, 0.0f},
-                                             { -M_PI/2,   0.0f,   M_PI/4, 0.0f},
-                                             { M_PI/2,    0.0f,     0.0f, 0.0f},
-                                             //{ M_PI/2,-THIGH_LENGTH,0.0f, 0.0f},
+    const float LEFT_LEG_MDH_PARAMS[6][4] = {{ -3*M_PI_FLOAT/4, 0.0f,  -M_PI_FLOAT/2, 0.0f},
+                                             { -M_PI_FLOAT/2,   0.0f,   M_PI_FLOAT/4, 0.0f},
+                                             { M_PI_FLOAT/2,    0.0f,     0.0f, 0.0f},
+                                             //{ M_PI_FLOAT/2,-THIGH_LENGTH,0.0f, 0.0f},
                                              {   0.0f,-THIGH_LENGTH,0.0f, 0.0f},
                                              {   0.0f,-TIBIA_LENGTH,0.0f, 0.0f},
-                                             {-M_PI/2,    0.0f,     0.0f, 0.0f}};
+                                             {-M_PI_FLOAT/2,    0.0f,     0.0f, 0.0f}};
 
-    const float RIGHT_LEG_MDH_PARAMS[6][4]= {{ -M_PI/4,  0.0f,   -M_PI/2, 0.0f},
-                                             { -M_PI/2,   0.0f,  -M_PI/4, 0.0f},
-                                             {  M_PI/2,    0.0f,    0.0f, 0.0f},
-                                             //{  M_PI/2,-THIGH_LENGTH,0.0f,0.0f},
+    const float RIGHT_LEG_MDH_PARAMS[6][4]= {{ -M_PI_FLOAT/4,  0.0f,   -M_PI_FLOAT/2, 0.0f},
+                                             { -M_PI_FLOAT/2,   0.0f,  -M_PI_FLOAT/4, 0.0f},
+                                             {  M_PI_FLOAT/2,    0.0f,    0.0f, 0.0f},
+                                             //{  M_PI_FLOAT/2,-THIGH_LENGTH,0.0f,0.0f},
                                              { 0.0f,-THIGH_LENGTH,0.0f, 0.0f},
                                              {0.0f,-TIBIA_LENGTH,0.0f,0.0f},
-                                             {-M_PI/2,0.0f,0.0f,0.0f}};
+                                             {-M_PI_FLOAT/2,0.0f,0.0f,0.0f}};
 
-    const float RIGHT_ARM_MDH_PARAMS[4][4] = {{-M_PI/2, 0.0f,0.0f,0.0f},
-                                              { M_PI/2, 0.0f,M_PI/2,0.0f},
-                                              { M_PI/2, 0.0f,0.0f,UPPER_ARM_LENGTH},
-                                              {-M_PI/2, 0.0f,0.0f,0.0f}};
+    const float RIGHT_ARM_MDH_PARAMS[4][4] = {{-M_PI_FLOAT/2, 0.0f,0.0f,0.0f},
+                                              { M_PI_FLOAT/2, 0.0f,M_PI_FLOAT/2,0.0f},
+                                              { M_PI_FLOAT/2, 0.0f,0.0f,UPPER_ARM_LENGTH},
+                                              {-M_PI_FLOAT/2, 0.0f,0.0f,0.0f}};
 
     static const float* MDH_PARAMS[NUM_CHAINS] = {&HEAD_MDH_PARAMS[0][0],
                                                   &LEFT_ARM_MDH_PARAMS[0][0],
@@ -326,17 +326,17 @@ namespace Kinematics {
 
     //Base transforms to get from body center to beg. of chain
     static const ublas::matrix <float> HEAD_END_TRANSFORMS[3]
-    = { rotation4D(X_AXIS, M_PI/2),
-        rotation4D(Y_AXIS,M_PI/2),
+    = { rotation4D(X_AXIS, M_PI_FLOAT/2),
+        rotation4D(Y_AXIS,M_PI_FLOAT/2),
         translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z) };
 
     static const ublas::matrix <float> LEFT_ARM_END_TRANSFORMS[2]
-    = { rotation4D(Z_AXIS, -M_PI/2),
+    = { rotation4D(Z_AXIS, -M_PI_FLOAT/2),
         translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
 
     static const ublas::matrix <float> LEFT_LEG_END_TRANSFORMS[3]
-    = { rotation4D(Z_AXIS, M_PI),
-        rotation4D(Y_AXIS, -M_PI/2),
+    = { rotation4D(Z_AXIS, M_PI_FLOAT),
+        rotation4D(Y_AXIS, -M_PI_FLOAT/2),
         translation4D(0.0f,
                       0.0f,
                       -FOOT_HEIGHT) };
