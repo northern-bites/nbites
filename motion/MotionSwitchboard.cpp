@@ -2,7 +2,7 @@
 MotionSwitchboard::MotionSwitchboard(Sensors *s)
     : sensors(s),
       walkProvider(),
-	  scriptedProvider(1/50.,s), // HOW SHOULD WE PASS FRAME_LENGTH??? FILE?
+	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? FILE?
       nextJoints(Kinematics::NUM_JOINTS, 0.0),
       running(false)
 {

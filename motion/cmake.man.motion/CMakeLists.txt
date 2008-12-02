@@ -107,6 +107,8 @@ SET( MOTION_SRCS ${MOTION_INCLUDE_DIR}/ActionCommand
                      ${MOTION_INCLUDE_DIR}/MotionCore
                      ${MOTION_INCLUDE_DIR}/MotionInterface
 		     ${MOTION_INCLUDE_DIR}/MotionSwitchboard
+		     ${MOTION_INCLUDE_DIR}/ScriptedProvider
+                     ${MOTION_INCLUDE_DIR}/ChainQueue
 		     ${MOTION_INCLUDE_DIR}/ChopShop
 		     ${MOTION_INCLUDE_DIR}/MotionEnactor
 		     ${MOTION_INCLUDE_DIR}/SimulatorEnactor
@@ -117,7 +119,6 @@ SET( MOTION_SRCS ${MOTION_INCLUDE_DIR}/ActionCommand
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/Kinematics
                      ${MOTION_INCLUDE_DIR}/_motionmodule
-                     ${MOTION_INCLUDE_DIR}/ChainQueue
                      )
 
 IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )

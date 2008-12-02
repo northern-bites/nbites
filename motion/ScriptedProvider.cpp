@@ -9,8 +9,9 @@ using namespace Kinematics;
 ScriptedProvider::ScriptedProvider(float motionFrameLength,
 								   Sensors *s)
 	: MotionProvider(),
+	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
-	  chopper(s, FRAME_LENGTH_S),
+	  chopper(sensors, FRAME_LENGTH_S),
 	  nextJoints(),
 	  choppedCommand(0),
 	  headQueue(HEAD_CHAIN),
@@ -56,19 +57,19 @@ void ScriptedProvider::enqueue(const BodyJointCommand *command) {
 	//Split command by chops
 	vector<vector<vector<float> > >::iterator choppedIter;
 	choppedIter = choppedCommand.begin();
-	for ( ; choppedIter != choppedCommand.end() ; choppedIter++){
-
+	for (int numPushed=0 ; numPushed < choppedCommand.size(); numPushed++){
+		
 		// Pass each chain to its chainqueue
-		headQueue.push(choppedIter[HEAD_CHAIN]);
-		lArmQueue.push(choppedIter[LARM_CHAIN]);
-		lLegQueue.push(choppedIter[LLEG_CHAIN]);
-		rLegQueue.push(choppedIter[RLEG_CHAIN]);
-		rArmQueue.push(choppedIter[RARM_CHAIN]);
+		headQueue.push(choppedCommand.at(numPushed).at(HEAD_CHAIN));
+		lArmQueue.push(choppedCommand.at(numPushed).at(LARM_CHAIN));
+		lLegQueue.push(choppedCommand.at(numPushed).at(LLEG_CHAIN));
+		rLegQueue.push(choppedCommand.at(numPushed).at(RLEG_CHAIN));
+		rArmQueue.push(choppedCommand.at(numPushed).at(RARM_CHAIN));
 	}
 
 }
 
-}
+
 
 void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand*> &seq) {
 	// Take in vec of commands and enqueue them all

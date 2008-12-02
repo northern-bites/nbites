@@ -24,6 +24,7 @@ public:
 	void enqueueSequence(std::vector<BodyJointCommand*> &seq);
 
 private:
+	Sensors *sensors;
 	float FRAME_LENGTH_S;
 	ChopShop chopper;
 	vector<vector<float> > nextJoints;
@@ -35,6 +36,8 @@ private:
 	ChainQueue lLegQueue;
 	ChainQueue rLegQueue;
 	ChainQueue rArmQueue;
+
+	pthread_mutex_t scripted_mutex;
 };
 
 #endif
