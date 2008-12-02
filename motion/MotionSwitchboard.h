@@ -20,7 +20,7 @@ using namespace std;
 #include "ScriptedProvider.h"
 #include "Sensors.h"
 
-
+#include "BodyJointCommand.h"
 
 class MotionSwitchboard {
 public:
@@ -45,6 +45,8 @@ private:
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
     pthread_mutex_t next_joints_mutex;
+
+	BodyJointCommand command;
 };
 
 #endif

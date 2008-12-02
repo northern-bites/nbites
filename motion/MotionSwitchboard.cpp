@@ -58,10 +58,14 @@ void MotionSwitchboard::run() {
         }
 
         // Calculate the next joints and get them
-        walkProvider.calculateNextJoints();
+        scriptedProvider.calculateNextJoints();
 
-        vector <float > llegJoints = walkProvider.getChainJoints(LLEG_CHAIN);
-        vector <float > rlegJoints = walkProvider.getChainJoints(RLEG_CHAIN);
+        vector <float > llegJoints = scriptedProvider.getChainJoints(LLEG_CHAIN);
+        vector <float > rlegJoints = scriptedProvider.getChainJoints(RLEG_CHAIN);
+
+		vector <float > rarmJoints = scriptedProvider.getChainJoints(RARM_CHAIN);
+		vector <float > larmJoints= scriptedProvider.getChainJoints(LARM_CHAIN);
+
 
         //Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);
