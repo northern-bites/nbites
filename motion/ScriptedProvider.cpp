@@ -76,7 +76,7 @@ void ScriptedProvider::setNextBodyCommand(){
 
 	// If there are no more commands, don't try to enqueue one
 	if ( !bodyCommandQueue.empty() ) {
-		
+
 		const BodyJointCommand *command = bodyCommandQueue.front();
 		bodyCommandQueue.pop();
 		choppedBodyCommand = chopper.chopCommand(command);

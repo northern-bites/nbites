@@ -191,6 +191,8 @@ namespace Kinematics {
         LEG_JOINTS*2;
     static const unsigned int NUM_BODY_JOINTS = ARM_JOINTS*2 + LEG_JOINTS*2;
     static const unsigned int chain_lengths[NUM_CHAINS] = {2, 4, 6, 6, 4};
+	static const unsigned int chain_first_joint[NUM_CHAINS] = {0,2,6,12,18};
+	static const unsigned int chain_last_joint[NUM_CHAINS] = {1,5,11,17,21};
 
     static const std::string CHAIN_STRINGS[NUM_CHAINS] =
     { "Head",

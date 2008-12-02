@@ -1,4 +1,4 @@
-#ifndef _ChopShop_h_DEFINED
+ #ifndef _ChopShop_h_DEFINED
 #define _ChopShop_h_DEFINED
 
 #include <vector>
@@ -33,16 +33,21 @@ private:
 	queue<vector<vector<float> > > choppedJoints;
 	const vector<float> *nextChain;
 
+	vector<int> *chainList;
 	queue<vector<vector<float> > > chopSmooth(const BodyJointCommand *command);
-
 	queue<vector<vector<float> > > chopLinear(const BodyJointCommand *command);
 
 	vector<float> getCurrentJoints();
-	void chopThat(float numChops, vector<float>* currentJoints);
-	vector<float> addFinalJoints(const BodyJointCommand *command, vector<float>* currentJoints);
+	vector<float> getFinalJoints(const BodyJointCommand *command,
+								 vector<float> *currentJoints);
+	vector<float> getDiffPerChop(int numChops,
+								 vector<float> *current,
+								 vector<float> *final);
+	void vectorToRad(vector<float> *vect);
 
-	void finalJointsToRad(vector<float> *finalJoints);
-
+	void buildChops(float numChops,
+					vector<float> *currentJoints,
+					vector<float> *diffPerChop);
 };
 
 #endif
