@@ -16,16 +16,19 @@ using namespace AL;
 // Ours
 #include "WalkParameters.h"
 #include "Kinematics.h"
+#include "MotionConstants.h"
 using namespace Kinematics;
 
-class WalkCommand
+class WalkCommand : public MotionCommand
 {
  public: // Constants
   static const int DEFAULT_SAMPLES_PER_STEP = 200;
  public:
   WalkCommand(const int _numSamples,
 	      WalkParameters _params = WalkParameters::DEFAULT_PARAMS)
-    : numSamplesPerStep(_numSamples), params(_params) { }
+	  : MotionCommand(MotionConstants::MotionType::WALK),
+		numSamplesPerStep(_numSamples),
+		params(_params) { }
   WalkCommand(const WalkCommand &other)
     : numSamplesPerStep(other.numSamplesPerStep), params(other.params) { }
   virtual ~WalkCommand() {}

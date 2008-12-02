@@ -112,7 +112,7 @@ void MotionSwitchboard::run() {
             nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
        }
 
-        sensors->setBodyAngles(nextJoints);
+        sensors->setBodyAngles(nextJoints); // WATCH THIS LINE!! IS IT RIGHT?
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
         pthread_mutex_unlock(&next_joints_mutex);
         fcount++;
