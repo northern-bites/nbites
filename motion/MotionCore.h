@@ -42,11 +42,11 @@ class MotionCore
   : public Thread
 {
  public:
-  static const AL::ALMotionProxy::INTERPOLATION_TYPE SMOOTH_INTERPOLATION =
-    AL::ALMotionProxy::INTERPOLATION_SMOOTH;
-  static const AL::ALMotionProxy::INTERPOLATION_TYPE LINEAR_INTERPOLATION =
-    AL::ALMotionProxy::INTERPOLATION_LINEAR;
-  static const AL::ALMotionProxy::INTERPOLATION_TYPE DEFAULT_INTERPOLATION =
+	static const Kinematics::InterpolationType SMOOTH_INTERPOLATION =
+    Kinematics::INTERPOLATION_SMOOTH;
+  static const Kinematics::InterpolationType LINEAR_INTERPOLATION =
+	  Kinematics::INTERPOLATION_LINEAR;
+  static const Kinematics::InterpolationType DEFAULT_INTERPOLATION =
     SMOOTH_INTERPOLATION;
 
   public:

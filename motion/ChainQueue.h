@@ -15,17 +15,14 @@ using namespace Kinematics;
 
 class ChainQueue : public queue<vector<float> > {
 public:
-	ChainQueue(ChainID newChainID, float motionFrameLength);
+	ChainQueue(ChainID newChainID);
 	void add(vector<vector<float> > nextJoints);
-	int getChainID();
+	ChainID getChainID() {return chainID;};
 	void clear();
 
 
 private:
 	ChainID chainID;
-	// Motion frame length in SECONDS
-	float FRAME_LENGTH_S;
-
 
 };
 

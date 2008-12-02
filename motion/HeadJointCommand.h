@@ -20,19 +20,19 @@ using namespace Kinematics;
 class HeadJointCommand {
  public:
   HeadJointCommand(const float time, const std::vector<float> *joints,
-		   const AL::ALMotionProxy::INTERPOLATION_TYPE _type);
+		   const Kinematics::InterpolationType _type);
   HeadJointCommand(const HeadJointCommand &other);
   ~HeadJointCommand();
 
   const float getDuration() const { return duration; }
   const std::vector<float>* const getJoints(void) const { return headJoints; }
-  const AL::ALMotionProxy::INTERPOLATION_TYPE getType() const { return type; }
+  const Kinematics::InterpolationType getType() const { return type; }
 
  private:
   const float duration;
   //const skew_function skew_func;
   const std::vector<float> *headJoints;
-  const AL::ALMotionProxy::INTERPOLATION_TYPE type;
+  const Kinematics::InterpolationType type;
 };
 
 #endif

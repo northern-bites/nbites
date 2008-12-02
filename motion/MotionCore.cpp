@@ -30,8 +30,8 @@ const float MotionCore::SIT_DOWN_BODY_JOINTS[NUM_BODY_JOINTS] =
 
 const BodyJointCommand MotionCore::
 GET_UP(GET_UP_TIME, new vector<float>(GET_UP_BODY_JOINTS,
-				      &GET_UP_BODY_JOINTS[NUM_BODY_JOINTS]),
-      SMOOTH_INTERPOLATION);
+									  &GET_UP_BODY_JOINTS[NUM_BODY_JOINTS]),
+	   SMOOTH_INTERPOLATION);
 
 const BodyJointCommand MotionCore::
 SIT_DOWN(GET_UP_TIME, new vector<float>(SIT_DOWN_BODY_JOINTS,
@@ -121,7 +121,7 @@ MotionCore::enqueueSequence(vector<BodyJointCommand*> &seq)
 {
   pthread_mutex_lock(&motion_mutex);
   for (vector<BodyJointCommand*>::iterator i = seq.begin(); i != seq.end(); i++)
-    enqueue(*i);
+	  enqueue(*i);
   pthread_mutex_unlock(&motion_mutex);
 }
 // Begin walking functions

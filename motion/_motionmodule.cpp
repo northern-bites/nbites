@@ -307,24 +307,24 @@ static PyObject*
 PyMotionInterface_postGotoCom (PyMotionInterface* self, PyObject* args)
 {
   float pX, pY, pZ, pTime;
-  int pType = static_cast<int>(ALMotionProxy::INTERPOLATION_LINEAR);
+  int pType = static_cast<int>(Kinematics::INTERPOLATION_LINEAR);
 
   if (!PyArg_ParseTuple(args, "ffff|i:postGotoCom", &pX, &pY, &pZ, &pTime,
         &pType))
     return NULL;
 
-  if (pType != ALMotionProxy::INTERPOLATION_LINEAR &&
-      pType != ALMotionProxy::INTERPOLATION_SMOOTH) {
+  if (pType != Kinematics::INTERPOLATION_LINEAR &&
+      pType != Kinematics::INTERPOLATION_SMOOTH) {
     PyErr_Format(PyExc_ValueError,
         "postGotoCom() expected and integer interpolation type argument of "
-        "%i or %i (%i given)", ALMotionProxy::INTERPOLATION_LINEAR,
-        ALMotionProxy::INTERPOLATION_SMOOTH, pType);
+        "%i or %i (%i given)", Kinematics::INTERPOLATION_LINEAR,
+        Kinematics::INTERPOLATION_SMOOTH, pType);
     return NULL;
   }
 
 #ifdef USE_PYMOTION_CXX_BACKEND
   return PyInt_FromLong(self->_interface->postGotoCom(
-      pX, pY, pZ, pTime, static_cast<ALMotionProxy::INTERPOLATION_TYPE>(pType)
+      pX, pY, pZ, pTime, static_cast<Kinematics::InterpolationType>(pType)
     ));
 #else
   return PyInt_FromLong(0);
@@ -336,24 +336,24 @@ PyMotionInterface_postGotoTorsoOrientation (PyMotionInterface* self,
                                             PyObject* args)
 {
   float pX, pY, pTime;
-  int pType = static_cast<int>(ALMotionProxy::INTERPOLATION_LINEAR);
+  int pType = static_cast<int>(Kinematics::INTERPOLATION_LINEAR);
 
   if (!PyArg_ParseTuple(args, "fff|i:postGotoTorsoOrientation", &pX, &pY, 
         &pTime, &pType))
     return NULL;
 
-  if (pType != ALMotionProxy::INTERPOLATION_LINEAR &&
-      pType != ALMotionProxy::INTERPOLATION_SMOOTH) {
+  if (pType != Kinematics::INTERPOLATION_LINEAR &&
+      pType != Kinematics::INTERPOLATION_SMOOTH) {
     PyErr_Format(PyExc_ValueError,
         "postGotoTorsoOrientation() expected and integer interpolation type "
-        "argument of %i or %i (%i given)", ALMotionProxy::INTERPOLATION_LINEAR,
-        ALMotionProxy::INTERPOLATION_SMOOTH, pType);
+        "argument of %i or %i (%i given)", Kinematics::INTERPOLATION_LINEAR,
+        Kinematics::INTERPOLATION_SMOOTH, pType);
     return NULL;
   }
 
 #ifdef USE_PYMOTION_CXX_BACKEND
   return PyInt_FromLong(self->_interface->postGotoTorsoOrientation(
-    pX, pY, pTime, static_cast<ALMotionProxy::INTERPOLATION_TYPE>(pType)
+    pX, pY, pTime, static_cast<Kinematics::InterpolationType>(pType)
     ));
 #else
   return PyInt_FromLong(0);
@@ -412,14 +412,14 @@ PyMotionInterface_setHead (PyMotionInterface *self, PyObject *args)
 
   if (type != 0 && type != 1) {
     PyErr_Format(PyExc_ValueError,
-        "setHead() expects an integer ALMotionProxy::INTERPOLATION_TYPE "
+        "setHead() expects an integer Kinematics::InterpolationType "
         "of 0 or 1 for the 'type' argument (%i given)", type);
     return NULL;
   }
 
 #ifdef USE_PYMOTION_CXX_BACKEND
   self->_interface->setHead(time, yaw*TO_RAD, pitch*TO_RAD,
-      static_cast<ALMotionProxy::INTERPOLATION_TYPE>(type));
+      static_cast<Kinematics::InterpolationType>(type));
 #endif
   Py_RETURN_NONE;
 }
@@ -712,7 +712,7 @@ PyBodyJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     ChainID chainID = LARM_CHAIN;
     vector<float> *joints, *larm, *lleg, *rleg, *rarm;
     joints = larm = lleg = rleg = rarm = NULL;
-    ALMotionProxy::INTERPOLATION_TYPE type;
+    Kinematics::InterpolationType type;
 
     // special case for copy constructor
     //
@@ -941,7 +941,7 @@ PyBodyJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (ptype == NULL || !PyInt_Check(ptype)) {
       PyErr_SetString(PyExc_TypeError,
           "__init__() expects an integer "
-          "AL::ALMotionProxy::INTERPOLATION_TYPE as the last argument, or in "
+          "AL::Kinematics::InterpolationType as the last argument, or in "
           "the keyword list as 'type', when not a copy constructor");
       if (joints != NULL) delete joints;
       if (larm != NULL) delete larm;
@@ -954,7 +954,7 @@ PyBodyJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     int _type = PyInt_AsLong(ptype);
     if (_type != 0 && _type != 1) {
       PyErr_Format(PyExc_ValueError,
-          "AL::ALMotionProxy::INTERPOLATION_TYPE argument to __init__() is "
+          "AL::Kinematics::InterpolationType argument to __init__() is "
           "not a valid interpolation type ('%i' given)", _type
           );
       if (joints != NULL) delete joints;
@@ -965,7 +965,7 @@ PyBodyJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
       PyBodyJointCommand_dealloc(self);
       return NULL;
     }else
-      type = (ALMotionProxy::INTERPOLATION_TYPE) _type;
+		type = (Kinematics::InterpolationType) _type;
     
 
     // Initialize the BodyJointCommand object
@@ -1055,7 +1055,7 @@ PyHeadJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     ptime = pjoints = ptype = NULL;
     float time;
     vector<float> *joints;
-    ALMotionProxy::INTERPOLATION_TYPE type;
+	Kinematics::InterpolationType type;
 
     // special case for copy constructor
     //
@@ -1130,7 +1130,7 @@ PyHeadJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (ptype == NULL || !PyInt_Check(ptype)) {
       PyErr_SetString(PyExc_TypeError,
           "__init__() expects an integer "
-          "AL::ALMotionProxy::INTERPOLATION_TYPE as the last argument, or in "
+          "AL::Kinematics::InterpolationType as the last argument, or in "
           "the keyword list as 'type', when not a copy constructor");
       if (joints != NULL) delete joints;
       PyHeadJointCommand_dealloc(self);
@@ -1139,14 +1139,14 @@ PyHeadJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     int _type = PyInt_AsLong(ptype);
     if (_type != 0 && _type != 1) {
       PyErr_SetString(PyExc_ValueError,
-          "AL::ALMotionProxy::INTERPOLATION_TYPE argument to __init__() is "
+          "AL::Kinematics::InterpolationType argument to __init__() is "
           "not a valid interpolation type"
           );
       if (joints != NULL) delete joints;
       PyHeadJointCommand_dealloc(self);
       return NULL;
     }else
-      type = (ALMotionProxy::INTERPOLATION_TYPE) _type;
+      type = (Kinematics::InterpolationType) _type;
 
 
     // Initialize the HeadJointCommand object

@@ -2,7 +2,7 @@
 
 HeadJointCommand::HeadJointCommand(const float time,
 				   const std::vector<float> *joints,
-				   const AL::ALMotionProxy::INTERPOLATION_TYPE _type)
+				   const Kinematics::InterpolationType _type)
   : duration(time), headJoints(joints), type(_type) {
 
 }

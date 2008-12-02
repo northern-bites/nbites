@@ -13,6 +13,7 @@
  * NOTE: All of the lengths are in millimeters.
  */
 
+#include <string.h>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/triangular.hpp>

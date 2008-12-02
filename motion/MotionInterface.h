@@ -47,7 +47,7 @@ class MotionInterface
       core->setBodyStiffness(percentStiffness,time);
     }
     void setHead(float time, float yaw, float pitch,
-                 AL::ALMotionProxy::INTERPOLATION_TYPE type) { }
+                 Kinematics::InterpolationType type) { }
     void setWalkConfig ( float pMaxStepLength, float pMaxStepHeight,
 			 float pMaxStepSide, float pMaxStepTurn,
 			 float pZmpOffsetX, float pZmpOffsetY);

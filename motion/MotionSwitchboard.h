@@ -17,6 +17,7 @@ using namespace std;
 
 #include "Kinematics.h"
 #include "WalkProvider.h"
+#include "ScriptedProvider.h"
 #include "Sensors.h"
 
 class MotionSwitchboard {
@@ -35,6 +36,7 @@ public:
 private:
     Sensors * sensors;
     WalkProvider walkProvider;
+	ScriptedProvider scriptedProvider;
     vector <float> nextJoints;
 
     bool running;

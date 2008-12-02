@@ -13,11 +13,11 @@ public:
 	ChopShop(Sensors *s, float motionFrameLength);
 	virtual ~ChopShop();
 
-	vector<vector<vector<float> > > chopCommand(BodyJointCommand *command);
+	vector<vector<vector<float> > > chopCommand(const BodyJointCommand *command);
 
 private:
-	vector<vector<vector<float> > > chopSmooth(BodyJointCommand *command);
-	vector<vector<vector<float> > > chopLinear(BodyJointCommand *command);
+	vector<vector<vector<float> > > chopSmooth(const BodyJointCommand *command);
+	vector<vector<vector<float> > > chopLinear(const BodyJointCommand *command);
 
 	// Class objects
 	vector<float> finalJoints;

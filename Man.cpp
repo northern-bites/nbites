@@ -450,6 +450,7 @@ Man::closeMan() {
 void
 Man::run ()
 {
+
 #ifdef DEBUG_MAN_THREADING
     cout << "Man::running" << endl;
 #endif

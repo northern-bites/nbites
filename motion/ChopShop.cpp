@@ -12,7 +12,7 @@ ChopShop::ChopShop (Sensors *s, float motionFrameLength)
 
 // Breaks command into FRAME_LENGTH_S size pieces,
 // adds it to the queue
-vector<vector<vector<float> > > ChopShop::chopCommand(BodyJointCommand *command){
+vector<vector<vector<float> > > ChopShop::chopCommand(const BodyJointCommand *command){
   // Checks type of body command and sends to
   // appropriate function
 //  if (command->getType() == INTERPOLATION_LINEAR){
@@ -27,14 +27,14 @@ vector<vector<vector<float> > > ChopShop::chopCommand(BodyJointCommand *command)
 }
 
 // Smooth interpolation motion
-vector<vector<vector<float> > > ChopShop::chopSmooth(BodyJointCommand *command){
+vector<vector<vector<float> > > ChopShop::chopSmooth(const BodyJointCommand *command){
 	vector<vector<vector<float> > > a;
 	a = vector<vector<vector<float> > >(0);
 	return a;
 }
 
 // Linear interpolation motion
-vector<vector<vector<float> > > ChopShop::chopLinear(BodyJointCommand *command){
+vector<vector<vector<float> > > ChopShop::chopLinear(const BodyJointCommand *command){
   // Get number of chops according to duration
   float numChops = command->getDuration()/FRAME_LENGTH_S;
 

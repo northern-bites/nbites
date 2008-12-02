@@ -2,6 +2,7 @@
 MotionSwitchboard::MotionSwitchboard(Sensors *s)
     : sensors(s),
       walkProvider(),
+	  scriptedProvider(1/50.,s), // HOW SHOULD WE PASS FRAME_LENGTH??? FILE?
       nextJoints(Kinematics::NUM_JOINTS, 0.0),
       running(false)
 {
@@ -50,10 +51,12 @@ void MotionSwitchboard::stop() {
 void MotionSwitchboard::run() {
     static int fcount = 0;
     while(running) {
+
         if(fcount == 1){
             //hack to help keep from falling over in the simulator
             usleep(2*1000*1000);
         }
+
         // Calculate the next joints and get them
         walkProvider.calculateNextJoints();
 
