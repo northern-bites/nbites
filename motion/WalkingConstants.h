@@ -48,7 +48,11 @@ struct LegConstants{
     }
 };
 
+//NOTE You must never set these variables except with a constructor
+//or you must update single,doubleSupportFrames  manually with
+// updateFrameLengths()
 struct WalkingParameters{
+public:
     float motion_frame_length_s;
     float bodyHeight;
     float hipOffsetX;
@@ -61,7 +65,7 @@ struct WalkingParameters{
 
     // There are no defaults for walking parameters. All of them need to be
     // inputted.
-
+public:
     WalkingParameters(const float _motion_frame_length_s, const float _bh,
                       const float _hox, const float _dur,
                       const float _dblSupFrac, const float _stepHeight)
@@ -69,6 +73,11 @@ struct WalkingParameters{
            bodyHeight(_bh), hipOffsetX(_hox), stepDuration(_dur),
            doubleSupportFraction(_dblSupFrac),
            stepHeight(_stepHeight) {
+
+        updateFrameLengths();
+    }
+
+    void updateFrameLengths(){
 
         //need to calculate how many frames to spend in double, single
         stepDurationFrames = static_cast<int>(stepDuration /
@@ -78,8 +87,8 @@ struct WalkingParameters{
                                                doubleSupportFraction/
                                                motion_frame_length_s);
         singleSupportFrames = stepDurationFrames - doubleSupportFrames;
-
     }
+
 };
 
 #endif
