@@ -536,7 +536,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
     public void saveWindowPrefs(Preferences prefs, Window w) {
         prefs.putInt(DEFAULT_WIDTH_STRING, w.getWidth());
-        prefs.putInt(DEFAULT_HEIGHT_STRING, w.getWidth());
+        prefs.putInt(DEFAULT_HEIGHT_STRING, w.getHeight());
         prefs.putInt(DEFAULT_X_STRING, w.getX());
         prefs.putInt(DEFAULT_Y_STRING, w.getY());
     }
