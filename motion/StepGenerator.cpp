@@ -6,6 +6,7 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
       currentZMPDSteps(),
       lastZMPDStep(new Step(0,0,0,0,LEFT_FOOT)), coordOffsetLastZMPDStep(0,0),
+      if_Transform(CoordFrame3D::translation3D(0.0f,0.0f)),
       walkParams(params), nextStepIsLeft(true),
       leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
       controller_x(new PreviewController()),
@@ -33,7 +34,8 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     static float lastZMP_y = 0;
 
     while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES) {
-        if (futureSteps.size() < 1)
+        if (futureSteps.size() < 1  || futureSteps.size() +
+            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS)
             generateStep(x, y, theta); // with the current walk vector
         else {
             boost::shared_ptr<Step> nextStep = futureSteps.front();
@@ -42,8 +44,8 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
             //transfer the nextStep element from future to current list
             futureSteps.pop_front();
-            //NOT YET currentZMPDSteps.push_back(nextStep);
-
+            currentZMPDSteps.push_back(nextStep);
+          
         }
     }
 
@@ -76,14 +78,52 @@ void StepGenerator::tick_controller(){
 
 
 WalkLegsTuple StepGenerator::tick_legs(){
-    //Decide if this is the first frame in a new support mode.
-    bool switchedSupport = false;
-
-    if(switchedSupport){
+    //Decide if this is the first frame into any double support phase
+    //which is the critical point when we must swap coord frames, etc
+    if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
         //pop from the front of the current steps
 
-        //update the translation matrix between i and f coord. frames
+        int numCurrentSteps = static_cast<int>(currentZMPDSteps.size());
+        int numFutureSteps  = static_cast<int>(futureSteps.size());
+        if (numCurrentSteps  + numFutureSteps < MIN_NUM_ENQUEUED_STEPS)
+            throw "Insufficient steps";
+ 
+        //We may eventually be able to do withouth this switch
+        switch(max(numCurrentSteps,3)){
+        case 3:
+            //there are three elements in the list, pop the obsolete one
+            //and the first step is the support one now, the second the swing
+            currentZMPDSteps.pop_front();
+            swingingStep  = *(++currentZMPDSteps.begin());
+            supportStep   =    *currentZMPDSteps.begin();
+            break;
+        case 2:
+            //there are only two elements in the list of active steps
+            //this means we need to look at one step in the future steps
+            currentZMPDSteps.pop_front();
+            swingingStep  =  *futureSteps.begin();
+            supportStep   =  *currentZMPDSteps.begin();
+            break;
+        case 1:
+            //there is only one elements in the list of active steps
+            //this means we need to look at two step in the future steps list
+            currentZMPDSteps.pop_front();
+            //note the absence of break!
+        case 0:
+            //there is nothing to pop, so just look at future steps.
+            swingingStep  =  *(++futureSteps.begin()) ;
+            supportStep   =  *futureSteps.begin();
+            break;
+        default:
+            throw "Something odd is happening in a StepGen switch statement";
 
+        }
+        
+        //update the translation matrix between i and f coord. frames
+        ublas::matrix<float> stepTransform = getStepTransMatrix(supportStep);
+        //cout <<"Step transform" << stepTransform <<endl;
+        if_Transform = prod(stepTransform,if_Transform); 
+        //TODO: -> start work here. Need to verify how coord frames work!!
         //express the supporting foot and swinging foots locations in f coord.
 
     }
@@ -166,6 +206,8 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     //setup memory to cooberate dummy step
     lastZMPDStep = boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
                                                     walkParams->stepDuration, LEFT_FOOT));
+    //need to indicate what the current support foot is:
+    currentZMPDSteps.push_back(lastZMPDStep);
     coordOffsetLastZMPDStep = point<float>(0,0);
     nextStepIsLeft = false;
 }
@@ -185,3 +227,24 @@ void StepGenerator::generateStep(const float _x,
     //switch feet after each step is generated
     nextStepIsLeft = !nextStepIsLeft;
 }
+
+/**
+ * Method returns the transformation matrix that we apply to update f frame
+ */
+ublas::matrix<float>
+StepGenerator::getStepTransMatrix(boost::shared_ptr<Step> step){
+    float lastHipOffset = - (step->foot == LEFT_FOOT ?
+                             HIP_OFFSET_Y : -HIP_OFFSET_Y);
+
+    ublas::matrix<float> translation = CoordFrame3D::
+        translation3D(step->x,
+                      step->y -
+                      lastHipOffset);
+    ublas::matrix<float> rotation = CoordFrame3D::
+        rotation3D(CoordFrame3D::Z_AXIS,
+                   step->theta);
+
+    ublas::matrix<float> transform = prod(rotation,translation);
+    return transform;
+}
+

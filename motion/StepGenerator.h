@@ -35,7 +35,9 @@
 
 #include <cmath>
 #include <list>
+#include <algorithm> //for max
 using std::list;
+using std::max;
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
@@ -46,7 +48,7 @@ using std::list;
 #include "WalkingConstants.h"
 #include "WalkingLeg.h"
 #include "Kinematics.h"
-
+#include "CoordFrame.h"
 using namespace boost::numeric;
 using namespace Kinematics;
 
@@ -63,6 +65,9 @@ struct Step:point<float> {
          const float _time, const Foot _foot)
         : point<float>(_x,_y), theta(_theta), time(_time), foot(_foot) {}
 };
+
+static int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
+                                     //steps stored in future, current lists
 
 class StepGenerator {
 public:
@@ -83,6 +88,7 @@ private: // Helper methods
                       const float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
 
+    ublas::matrix<float> getStepTransMatrix(boost::shared_ptr<Step> step);
 private:
     // Walk vector:
     //  * x - forward
@@ -103,6 +109,9 @@ private:
     //enters into double support (perisistant)
     list<boost::shared_ptr<Step> > currentZMPDSteps;
 
+
+    boost::shared_ptr<Step> supportStep;
+    boost::shared_ptr<Step> swingingStep;
     boost::shared_ptr<Step> lastZMPDStep; //Last step turned into ZMP values
     point<float> coordOffsetLastZMPDStep;
     //Translation matrix to transfer points in the non-changing 'i'

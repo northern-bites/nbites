@@ -56,6 +56,10 @@ public:
     //True if the next call to tick() will be in a different support mode
     bool isSwitchingSupportMode(){return firstFrame();}
 
+    bool stateIsDoubleSupport(){
+        return state == DOUBLE_SUPPORT ||
+            state == PERSISTENT_DOUBLE_SUPPORT;
+    };
 private:
     //Execution methods, get called depending on which state the leg is in
     vector <float> supporting(float dest_x, float dest_y);
