@@ -37,23 +37,30 @@ void ScriptedProvider::requestStop() {
 }
 
 void ScriptedProvider::calculateNextJoints() {
+	cout << "Calculating next joints!" << endl;
 	// Sets the next joints for all the joints
-	setNextChainJoints( LARM_CHAIN, lArmQueue.front() );
-	setNextChainJoints( LLEG_CHAIN, lLegQueue.front() );
-	setNextChainJoints( RLEG_CHAIN, rLegQueue.front() );
-	setNextChainJoints( RARM_CHAIN, rArmQueue.front() );
-
-	lArmQueue.pop();
-	lLegQueue.pop();
-	rLegQueue.pop();
-	rArmQueue.pop();
-
+	if (!lArmQueue.empty() ||
+		!rArmQueue.empty() ||
+		!lLegQueue.empty() ||
+		!rLegQueue.empty() ){
+		cout << "adding new joints" << endl;
+		setNextChainJoints( LARM_CHAIN, lArmQueue.front() );
+		setNextChainJoints( LLEG_CHAIN, lLegQueue.front() );
+		setNextChainJoints( RLEG_CHAIN, rLegQueue.front() );
+		setNextChainJoints( RARM_CHAIN, rArmQueue.front() );
+		cout << "added new joints" << endl;
+		lArmQueue.pop();
+		lLegQueue.pop();
+		rLegQueue.pop();
+		rArmQueue.pop();
+	}
+	cout << "calculated next joints" << endl;
 }
 
 void ScriptedProvider::enqueue(const BodyJointCommand *command) {
 	// Chop command
 	choppedCommand = chopper.chopCommand(command);
-
+	cout << "ENQUEING COMMAND" << endl;
 	//Split command by chops
 	vector<vector<vector<float> > >::iterator choppedIter;
 	choppedIter = choppedCommand.begin();

@@ -4,7 +4,10 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
       walkProvider(),
 	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? FILE?
       nextJoints(Kinematics::NUM_JOINTS, 0.0),
-      running(false)
+	  running(false),
+	  command(100.0, //time
+			  new vector<float>(22,90.0), //joints, all zeros
+			  Kinematics::INTERPOLATION_LINEAR)
 {
 
     //Allow safe access to the next joints
@@ -23,12 +26,22 @@ void MotionSwitchboard::start() {
     cout << "  creating threads" << endl;
 #endif
     fflush(stdout);
-
+	scriptedProvider.enqueue(&command);
     running = true;
+
+    // set thread attributes
+    pthread_attr_t attr;
+    pthread_attr_init (&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    // create & start thread.
+    pthread_create(&switchboard_thread, &attr, runThread, (void *)this);
+    // destroy the used attributes
+    pthread_attr_destroy(&attr);
 }
 
 
 void MotionSwitchboard::stop() {
+	cout << "STOPPING SWITCHBOARD" << endl;
     running = false;
     //signal to end waiting in the run method,
     pthread_mutex_lock(&next_joints_mutex);
@@ -58,28 +71,43 @@ void MotionSwitchboard::run() {
         }
 
         // Calculate the next joints and get them
+
         scriptedProvider.calculateNextJoints();
 
         vector <float > llegJoints = scriptedProvider.getChainJoints(LLEG_CHAIN);
         vector <float > rlegJoints = scriptedProvider.getChainJoints(RLEG_CHAIN);
+<<<<<<< HEAD:motion/MotionSwitchboard.cpp
 
+=======
+		
+>>>>>>> Probably not a commit with value. Just want to be able to push this to my github. There is a memory leak in ChopShop that I am unsure of its location.:motion/MotionSwitchboard.cpp
 		vector <float > rarmJoints = scriptedProvider.getChainJoints(RARM_CHAIN);
 		vector <float > larmJoints= scriptedProvider.getChainJoints(LARM_CHAIN);
 
 
         //Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);
+
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
             nextJoints[L_HIP_YAW_PITCH + i] = llegJoints[i];
         }
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
             nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints[i];
         }
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+            nextJoints[L_SHOULDER_PITCH + i] = larmJoints[i];
+        }
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+            nextJoints[R_SHOULDER_PITCH + i] = rarmJoints[i];
+       }
+
+
         sensors->setBodyAngles(nextJoints);
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
         pthread_mutex_unlock(&next_joints_mutex);
         fcount++;
     }
+
 }
 
 
