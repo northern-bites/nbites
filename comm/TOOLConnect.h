@@ -10,7 +10,7 @@ class TOOLConnect; // forward reference
 #  include "OVision.h"
 #elif ROBOT(NAO)
 #  include <boost/shared_ptr.hpp>
-#  include "corpus/synchro.h"
+#  include "synchro.h"
 #  include "Sensors.h"
 #  include "Vision.h"
 #else

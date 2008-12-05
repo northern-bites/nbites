@@ -40,7 +40,7 @@
 #include "Noggin.h"
 #include "Motion.h"
 #include "NaoPose.h"
-#include "corpus/synchro.h"
+#include "synchro.h"
 
 /**
  * Preferences class to alter Python settings for our robot system.

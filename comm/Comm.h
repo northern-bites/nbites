@@ -13,7 +13,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Common.h"
-#include "corpus/synchro.h"
+#include "synchro.h"
 #include "Sensors.h"
 #include "CommDef.h"
 #include "RoboCupGameControlData.h"
