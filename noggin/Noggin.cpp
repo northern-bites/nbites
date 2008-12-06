@@ -9,6 +9,7 @@
 
 using namespace std;
 
+const char * BRAIN_MODULE = "man.noggin.Brain";
 
 Noggin::Noggin (Sensors *s, Profiler *p, Vision *v)
   : sensors(s), profiler(p), vision(NULL),
@@ -69,29 +70,14 @@ bool
 Noggin::import_modules ()
 {
 #ifdef  DEBUG_NOGGIN_INITIALIZATION
-  printf("  Importing util.module_helper and noggin.Brain\n");
+  printf("  Importing noggin.Brain\n");
 #endif
 
-  // Ensure module_helper is loaded
-  //
-  if (module_helper == NULL)
-    module_helper = PyImport_ImportModule("util.module_helper");
-
-  if (module_helper == NULL) {
-    // error, couldn't import util.module_helper
-    fprintf(stderr, "Error importing util.module_helper\n");
-    if (PyErr_Occurred())
-      PyErr_Print();
-    else
-      fprintf(stderr, "  No Python exception information available\n");
-    return false;
-  }
-
-  // Load/Reload Brain module
+  // Load Brain module
   //
   if (brain_module == NULL)
     // Import brain module
-    brain_module = PyImport_ImportModule("noggin.Brain");
+    brain_module = PyImport_ImportModule(BRAIN_MODULE);
 
   if (brain_module == NULL) {
     // error, couldn't import noggin.Brain
@@ -109,25 +95,9 @@ Noggin::import_modules ()
 void
 Noggin::reload ()
 {
-  if (module_helper == NULL || brain_module == NULL)
+  if (brain_module == NULL)
     if (!import_modules())
       return;
-
-  PyObject *result;
-
-  // Reload all modules via module_helper
-  PyObject *dict = PyModule_GetDict(module_helper);
-  PyObject *reloadAll = PyDict_GetItemString(dict, "reloadAll");
-  if (reloadAll == NULL || 
-      (result = PyObject_CallObject(reloadAll, NULL)) == NULL) {
-    fprintf(stderr, "Error reloading modules via module_helper.reloadAll()\n");
-    if (PyErr_Occurred())
-      PyErr_Print();
-    else
-      fprintf(stderr, "  No python exception information available\n");
-    return;
-  }
-  Py_DECREF(result);
 
   // reload Brain module
   PyImport_ReloadModule(brain_module);
@@ -138,34 +108,11 @@ Noggin::reload ()
 void
 Noggin::reload(std::string modules)
 {
-  if (module_helper == NULL || brain_module == NULL)
+  if (brain_module == NULL)
     if (!import_modules())
       return;
 
-  // Reload all modules via module_helper
-  //
-  // retrieve function from module
-  PyObject *dict = PyModule_GetDict(module_helper);
-  PyObject *_reload = PyDict_GetItemString(dict, "reload");
-  // build arguments
-  PyObject *args = PyTuple_New(0);
-  PyObject *kwds = PyDict_New();
-  PyObject *mod_arg = PyString_FromString(modules.c_str());
-  PyDict_SetItemString(kwds, "modules", mod_arg);
-  // call function
-  PyObject *result = PyObject_Call(_reload, args, kwds);
-  if (result == NULL) {
-    fprintf(stderr, "Error reloading modules via module_helper.reload()\n");
-    if (PyErr_Occurred())
-      PyErr_Print();
-    else
-      fprintf(stderr, "  No python exception information available\n");
-  }else
-    Py_DECREF(result);
-  // decrease references to release temporary objects
-  Py_DECREF(args);
-  Py_DECREF(kwds);
-  Py_DECREF(mod_arg);
+  /* Not currently implemented */
 
   // reload Brain module
   PyImport_ReloadModule(brain_module);
