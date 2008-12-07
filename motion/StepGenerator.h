@@ -23,7 +23,9 @@
  *   A normal step would have just one DBL and one SINGLE in a row
  *   A starting stopping step could have other types instead.
  *   WalkingLeg could then ask the current Step object what should happen next
- *
+ * - The s coordinate frame could be dispensed with -  we could just
+ *   express steps in the f coordinate frame, also this might allow
+ *   the step constructor to be called  without knowing about HIP_OFF, etc
  *  COORDINATE FRAME NOTE:
  *  There are four important coordinate frames:
  *     - initial (i) is the coordinate frame centered where we begin walking
@@ -87,8 +89,7 @@ private: // Helper methods
                       const float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
     void fillZMPRegular(const boost::shared_ptr<Step> newStep );
-    void fillZMPStart(const boost::shared_ptr<Step> newStep );
-    void fillZMPEnd(const boost::shared_ptr<Step> newStep );
+    void fillZMPNull(const boost::shared_ptr<Step> newStep );
 
     void startRight();
     void startLeft();
@@ -116,7 +117,7 @@ private:
     //A step is consider completed (obsolete/irrelevant) as soon as the foot
     //enters into double support (perisistant)
     list<boost::shared_ptr<Step> > currentZMPDSteps;
-
+    boost::shared_ptr<Step> lastQueuedStep;
 
     //Reference Frames for ZMPing steps
     //These are updated when we ZMP a step - they are the 'future', if you will

@@ -42,7 +42,7 @@ StepGenerator::~StepGenerator(){
  *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
-    static int fc = 4;
+    static int fc = 0;
     static float lastZMP_x = 0;
     static float lastZMP_y = 0;
 
@@ -51,11 +51,15 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
 
-            fc--;
-            if (fc == 0){
+            fc++;
+            if (fc == 6){
                 cout << "MOVE FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =30;
+            }else if(fc == 18){
+                cout << "STOP MOVING FORWARD!!"<<endl;
+                //Change the x vector to be moving forward
+                x =0;
             }
         }
         else {
@@ -218,19 +222,20 @@ WalkLegsTuple StepGenerator::tick_legs(){
 }
 
 void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
+
     switch(newSupportStep->type){
+    case START_STEP:
     case REGULAR_STEP:
         fillZMPRegular(newSupportStep);
-        return;
-    case START_STEP:
-        fillZMPStart(newSupportStep);
-        return;
-    case END_STEP:
-        fillZMPEnd(newSupportStep);
-        return;
+        break;
+    case END_STEP: //END and NULL might be the same thing....?
+        //case NULL_STEP:
+        fillZMPNull(newSupportStep);
+        break;
     default:
         throw "Unsupported Step type";
     }
+    newSupportStep->zmpd = true;
 }
 
 void
@@ -306,21 +311,20 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
 }
 
 void
-StepGenerator::fillZMPStart(const boost::shared_ptr<Step> newSupportStep ){
-
+StepGenerator::fillZMPNull(const boost::shared_ptr<Step> newSupportStep ){
+    const ublas::vector<float> end_s =
+        CoordFrame3D::vector3D(0.0f ,
+                               0.0f);
+    const ublas::vector<float> end_i = prod(si_Transform,end_s);
     //Queue a starting step, where we step, but do nothing with the ZMP
     //so push tons of zero ZMP values
     for (int i = 0; i < walkParams->stepDurationFrames; i++){
-        zmp_ref_y.push_back(0.0f);
-        zmp_ref_x.push_back(0.0f);
+        zmp_ref_x.push_back(end_i(0));
+        zmp_ref_y.push_back(end_i(1));
     }
 
     //A start step should never move the si_Transform!
     //si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
-}
-void
-StepGenerator::fillZMPEnd(const boost::shared_ptr<Step> newSupportStep ){
-
 }
 
 void StepGenerator::setWalkVector(const float _x, const float _y,
@@ -346,19 +350,25 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     rightLeg.startRight();//setSupportMode(DOUBLE_SUPPORT);
     if_Transform.assign(initStartLeft);//HACK to deal with dummy being RIGHT
 
-    //setup memory to corroborate dummy step
+
+    // boost::shared_ptr<Step> firstSwingingStep = //should be startStep type
+//         boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
+//                                          walkParams->stepDuration,
+//                                          RIGHT_FOOT,START_STEP));
     boost::shared_ptr<Step> firstSupportStep = //should be startStep type
         boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
                                          walkParams->stepDuration,
-                                         LEFT_FOOT,START_STEP));
+                                         LEFT_FOOT,END_STEP));
     boost::shared_ptr<Step> dummyStep =
         boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
                                          walkParams->stepDuration, RIGHT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     //currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
-    futureSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
-
+    fillZMP(firstSupportStep);
+    currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
+    //futureSteps.push_back(firstSwingingStep);//right will be 'swing'. during 0.0 zmp
+    lastQueuedStep = firstSupportStep;
     nextStepIsLeft = false;
 }
 
@@ -390,17 +400,43 @@ void StepGenerator::startRight(){
 }
 
 //currently only does two sets of steps side by side
-void StepGenerator::generateStep(const float _x,
+void StepGenerator::generateStep( float _x,
                                  const float _y,
                                  const float _theta) {
+    StepType type;
+    if (_x ==0){//stopping, or stopped
+        type = END_STEP;
+    }else{
+        //we are moving somewhere, and we must ensure that the last step
+        //we enqued was not an END STEP
+        cout << "Trying to move forward,";
+        if(lastQueuedStep->type == END_STEP){
+            if (lastQueuedStep->zmpd){//too late to change it! make this a start
+                cout <<"already ZMPD last step, so modifying this  one"<<endl;
+                type = START_STEP;
+                _x = 0.0f;
+            }else{
+                cout <<"Not zmpd yet, so making this a regular step"<<endl;
+                type = REGULAR_STEP;
+                lastQueuedStep->type = START_STEP;
+            }
+        }else{
+            cout << "everything is fine" <<endl;
+            //the last step was either start or reg, so we're fine
+            type = REGULAR_STEP;
+        }
+    }
+
     boost::shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
                                               HIP_OFFSET_Y : -HIP_OFFSET_Y),
                                           0, walkParams->stepDuration,
                                           (nextStepIsLeft ?
-                                           LEFT_FOOT : RIGHT_FOOT)));
+                                           LEFT_FOOT : RIGHT_FOOT),
+                                          type));
     //cout << "NEW STEP with x="<<_x<<endl;
 
     futureSteps.push_back(step);
+    lastQueuedStep = step;
     //switch feet after each step is generated
     nextStepIsLeft = !nextStepIsLeft;
 }

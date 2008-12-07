@@ -51,19 +51,24 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
     vector<float> result(6);
     switch(state){
     case SUPPORTING:
-        result  = supporting(fc_Transform);//dest_x, dest_y);
+        result  = supporting(fc_Transform);
         break;
     case SWINGING:
-        result  =  swinging(fc_Transform);//dest_x, dest_y);
+        if(step->type == REGULAR_STEP)
+            result  =  swinging(fc_Transform);
+        else{
+            //cout << "It's an Irregular step, so we are not swinging:" <<endl;
+            result = supporting(fc_Transform);
+        }
         break;
     case DOUBLE_SUPPORT:
         //In dbl sup, we have already got the final target after swinging in
         //mind, so we actually want to keep the target as the "source"
         cur_dest = swing_src;
-        result  = supporting(fc_Transform);//dest_x, dest_y);
+        result  = supporting(fc_Transform);
         break;
     case PERSISTENT_DOUBLE_SUPPORT:
-        result  = supporting(fc_Transform);//dest_x, dest_y);
+        result  = supporting(fc_Transform);
         break;
     default:
         throw "Invalid SupportMode passed to WalkingLeg::tick";
