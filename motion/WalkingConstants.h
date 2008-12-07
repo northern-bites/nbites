@@ -17,6 +17,12 @@ enum Foot {
     RIGHT_FOOT
 };
 
+enum StepType {
+    REGULAR_STEP=0,
+    START_STEP,
+    END_STEP
+};
+
 /**
  * Simple container to hold information about future steps.
  */
@@ -26,13 +32,23 @@ struct Step{
     float theta;
     float duration;
     Foot foot;
+    StepType type;
     Step(const float _x, const float _y, const float _theta,
-         const float _duration, const Foot _foot)
-        : x(_x),y(_y), theta(_theta), duration(_duration), foot(_foot){}
+         const float _duration, const Foot _foot,
+         const StepType _type = REGULAR_STEP)
+        : x(_x),y(_y), theta(_theta), duration(_duration),
+          foot(_foot),type(_type){}
+    // Copy constructor to allow changing reference frames:
+    Step(const float new_x, const float new_y, const float new_theta,
+         const boost::shared_ptr<Step> other)
+        : x(new_x),y(new_y), theta(new_theta), duration(other->duration),
+          foot(other->foot),type(other->type){}
 
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
-            return o << "Step(" << s.x << "," << s.y << "," << s.theta << ") in " << s.duration<<"secs with foot"<<s.foot;
+            return o << "Step(" << s.x << "," << s.y << "," << s.theta
+                     << ") in " << s.duration <<"secs with foot "
+                     << s.foot << "and type " << s.type;
         }
 };
 

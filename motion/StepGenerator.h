@@ -86,7 +86,9 @@ private: // Helper methods
     void generateStep(const float _x, const float _y,
                       const float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
-    void fillZMP2(const boost::shared_ptr<Step> newStep );
+    void fillZMPRegular(const boost::shared_ptr<Step> newStep );
+    void fillZMPStart(const boost::shared_ptr<Step> newStep );
+    void fillZMPEnd(const boost::shared_ptr<Step> newStep );
 
     void startRight();
     void startLeft();
@@ -119,7 +121,7 @@ private:
     //Reference Frames for ZMPing steps
     //These are updated when we ZMP a step - they are the 'future', if you will
     ublas::matrix<float> si_Transform;
- 
+
     //Steps for the Walking Leg
     boost::shared_ptr<Step> supportStep_s;
     boost::shared_ptr<Step> swingingStep_s;

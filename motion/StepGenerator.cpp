@@ -50,10 +50,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
         if (futureSteps.size() < 1  || futureSteps.size() +
             currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
-            //cout << "Adding a step" <<endl;
-/*
- * Start here: The issue is that we aren't doing a good job of keeping track of the correct target in walking leg, so actually moving forward is impossible right now
- */
+
             fc--;
             if (fc == 0){
                 cout << "MOVE FORWARD!!"<<endl;
@@ -179,19 +176,13 @@ WalkLegsTuple StepGenerator::tick_legs(){
         // the three footholds from above
         supportStep_f =
             boost::shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
-                                             hyp_angle,
-                                             supportStep_s->duration,
-                                             supportStep_s->foot));
+                                             hyp_angle,supportStep_s));
         swingingStep_f =
             boost::shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
-                                             hyp_angle,
-                                             swingingStep_s->duration,
-                                             swingingStep_s->foot));
+                                             hyp_angle,swingingStep_s));
         swingingStepSource_f  =
             boost::shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
-                                             last_hyp_angle,
-                                             supportStep_s->duration,
-                                             supportStep_s->foot));
+                                             last_hyp_angle,supportStep_s));
     }
 
     //Each frame, we must recalculate the location of the center of mass
@@ -227,6 +218,23 @@ WalkLegsTuple StepGenerator::tick_legs(){
 }
 
 void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
+    switch(newSupportStep->type){
+    case REGULAR_STEP:
+        fillZMPRegular(newSupportStep);
+        return;
+    case START_STEP:
+        fillZMPStart(newSupportStep);
+        return;
+    case END_STEP:
+        fillZMPEnd(newSupportStep);
+        return;
+    default:
+        throw "Unsupported Step type";
+    }
+}
+
+void
+StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     //look at the newStep, and make ZMP values:
     const float stepTime = newSupportStep->duration;
     //update the lastZMPD Step
@@ -257,9 +265,9 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
         CoordFrame3D::vector3D(newSupportStep->x - X_ZMP_FOOT_LENGTH,
                                newSupportStep->y);
 
-     std::cout << "start_s_x: " << start_s(0)
-               << " mid_s_x: "  << mid_s(0)
-               << " end_s_x: "  << end_s(0) << std::endl;
+//      std::cout << "start_s_x: " << start_s(0)
+//                << " mid_s_x: "  << mid_s(0)
+//                << " end_s_x: "  << end_s(0) << std::endl;
 
     const ublas::vector<float> start_i = prod(si_Transform,start_s);
     const ublas::vector<float> mid_i = prod(si_Transform,mid_s);
@@ -297,6 +305,24 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
 }
 
+void
+StepGenerator::fillZMPStart(const boost::shared_ptr<Step> newSupportStep ){
+
+    //Queue a starting step, where we step, but do nothing with the ZMP
+    //so push tons of zero ZMP values
+    for (int i = 0; i < walkParams->stepDurationFrames; i++){
+        zmp_ref_y.push_back(0.0f);
+        zmp_ref_x.push_back(0.0f);
+    }
+
+    //A start step should never move the si_Transform!
+    //si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
+}
+void
+StepGenerator::fillZMPEnd(const boost::shared_ptr<Step> newSupportStep ){
+
+}
+
 void StepGenerator::setWalkVector(const float _x, const float _y,
                                   const float _theta)  {
     // WARNING: This method still assumes that we start with (0,0,0) as the
@@ -308,12 +334,11 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
 
-    //Queue a starting step, where we step, but do nothing with the ZMP
-    //so push tons of zero ZMP values
-    for (int i = 0; i < walkParams->stepDurationFrames; i++){
-        zmp_ref_y.push_back(0.0f);
-        zmp_ref_x.push_back(0.0f);
-    }
+    //we also need to forget about any zmp values from before.
+    //WE should do this on ending, not on starting - what if we switch gaits?
+    //zmp_ref_x.clear();
+    //zmp_ref_y.clear();
+
     //cout << "Initial ZMPd Steps: " << zmp_ref_x.size()<<endl;
 
     //start off in a double support phase where the right leg swings first
@@ -325,14 +350,14 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     boost::shared_ptr<Step> firstSupportStep = //should be startStep type
         boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
                                          walkParams->stepDuration,
-                                         LEFT_FOOT));
+                                         LEFT_FOOT,START_STEP));
     boost::shared_ptr<Step> dummyStep =
         boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
                                          walkParams->stepDuration, RIGHT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
-    currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
-
+    //currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
+    futureSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
 
     nextStepIsLeft = false;
 }
@@ -373,7 +398,7 @@ void StepGenerator::generateStep(const float _x,
                                           0, walkParams->stepDuration,
                                           (nextStepIsLeft ?
                                            LEFT_FOOT : RIGHT_FOOT)));
-    cout << "NEW STEP with x="<<_x<<endl;
+    //cout << "NEW STEP with x="<<_x<<endl;
 
     futureSteps.push_back(step);
     //switch feet after each step is generated
