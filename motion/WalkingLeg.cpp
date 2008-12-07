@@ -302,14 +302,14 @@ void WalkingLeg::debugProcessing(){
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     static float ttime= 0.0f;
     fprintf(locus_log,"%f\t%f\t%f\t%f\t%d\n",ttime,goal(0),goal(1),goal(2),state);
-    ttime += 0.05f;
+    ttime += 0.02f;
 #endif
 #ifdef DEBUG_WALKING_DEST_LOGGING
     static float stime= 0.0f;
     fprintf(dest_log,"%f\t%f\t%f\t%f\t%f\t%d\n",stime,
             cur_dest->x,cur_dest->y,
             swing_src->x,swing_src->y,state);
-    stime += 0.05f;
+    stime += 0.02f;
 #endif
 
 }

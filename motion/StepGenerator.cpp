@@ -18,7 +18,7 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
-    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\n");
+    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\n");
 #endif
 
     setWalkVector(0,0,0); // for testing purposes. The function doesn't even
@@ -97,10 +97,13 @@ void StepGenerator::tick_controller(){
 #ifdef DEBUG_CONTROLLER_COM
     float pre_x = zmp_ref.get<0>()->front();
     float pre_y = zmp_ref.get<1>()->front();
+    float zmp_x = controller_x->getZMP();
+    float zmp_y = controller_y->getZMP();
 
     static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\n",ttime,com_x,com_y,pre_x,pre_y);
-    ttime += 0.05f;
+    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\n",
+            ttime,com_x,com_y,pre_x,pre_y,zmp_x,zmp_y);
+    ttime += 0.02f;
 #endif
 }
 
