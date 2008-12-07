@@ -226,6 +226,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
 
 //Step length always must be a multiple of the motion frame length
+/*
 void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     //look at the last ZMPD Step and the newStep, and make ZMP values
     float stepTime = newSupportStep->duration;
@@ -269,8 +270,90 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     coordOffsetLastZMPDStep.x += newSupportStep->x;
     //shift to 0 ('s' coord frame):
     coordOffsetLastZMPDStep.y += newSupportStep->y - sign*HIP_OFFSET_Y;
-}
+}*/
 
+
+
+void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
+
+    //for some as of yet not entirely clear reason, this constant should
+    // be negative 20 or so for better stability.
+    // my intuition is that it is more stable because a negative value
+    //gets the ZMP over the supporting foot much longer.
+    //(otherwise the ZMP just 'passes through'
+    //Another way to fix this might be to change the R value for the controller
+    float X_ZMP_FOOT_LENGTH =  -20.0f; //in mm, the dist we want ZMP to cover on foot
+
+    //small hack - if we aren't moving forward, then don't move along the foot
+    if(newSupportStep->x == 0)
+        X_ZMP_FOOT_LENGTH =  0.0f;
+
+    //look at the last ZMPD Step and the newStep, and make ZMP values
+    const float stepTime = newSupportStep->duration;
+    //update the lastZMPD Step
+    const int sign = (newSupportStep->foot == LEFT_FOOT ? 1 : -1);
+    const int last_sign = -sign;
+//  std::cout << "coordOffx: " << coordOffsetLastZMPDStep.x <<" lastZMPDStepx: "
+//               << lastZMPDStep->x << " new supportStepx: " <<newSupportStep->x
+//               << endl;
+
+
+    //lets define the key points in the s frame. See diagram in paper
+    //to use bezier curves, we would need also directions for each point
+    const ublas::vector<float> start_s =
+        CoordFrame3D::vector2D(X_ZMP_FOOT_LENGTH,last_sign*HIP_OFFSET_Y);
+    const ublas::vector<float> mid_s = start_s +
+        CoordFrame3D::vector2D(newSupportStep->x,newSupportStep->y);
+    const ublas::vector<float> end_s = mid_s +
+        CoordFrame3D::vector2D(X_ZMP_FOOT_LENGTH,0.0f);
+
+    //old stuff
+    const ublas::vector<float> start_i =
+        CoordFrame3D::vector3D(coordOffsetLastZMPDStep.x,
+                               coordOffsetLastZMPDStep.y);
+    const ublas::vector<float> mid_i =
+        CoordFrame3D::vector3D(newSupportStep->x + coordOffsetLastZMPDStep.x
+                               -X_ZMP_FOOT_LENGTH,
+                               newSupportStep->y + coordOffsetLastZMPDStep.y);
+    const ublas::vector<float> end_i = mid_i +
+        CoordFrame3D::vector3D(X_ZMP_FOOT_LENGTH,0.0f);
+
+//     std::cout << "start_x: " << start_i(0)
+//               << " mid_x: " << mid_i(0)
+//               <<" end_x: " << end_i(0) << std::endl;
+
+    //double support - we want to switch feet
+    const int numDChops = walkParams->doubleSupportFrames;
+    for(int i = 0; i< walkParams->doubleSupportFrames; i++){
+        ublas::vector<float> new_i = start_i +
+            (static_cast<float>(i)/numDChops)*(mid_i-start_i);
+
+        zmp_ref_x.push_back(new_i(0));
+        zmp_ref_y.push_back(new_i(1));
+        //zmp_ref_x.push_back(new_x);
+        //zmp_ref_y.push_back(new_y);
+
+    }
+
+    const int numSChops = walkParams->singleSupportFrames;
+    //single support -  we want to stay over the new step
+    for(int i = 0; i< walkParams->singleSupportFrames; i++){
+        ublas::vector<float> new_i = mid_i +
+            (static_cast<float>(i)/numSChops)*(end_i-mid_i);
+
+        zmp_ref_x.push_back(new_i(0));
+        zmp_ref_y.push_back(new_i(1));
+        //zmp_ref_x.push_back(new_x);
+        //zmp_ref_y.push_back(new_y);
+    }
+    lastZMPDStep = newSupportStep;
+
+//     cout << "Step length x: " <<newSupportStep->x << " act. length"
+//          << end_i(0) - start_i(0) <<endl;
+    coordOffsetLastZMPDStep.x += end_i(0) - start_i(0);//newSupportStep->x;
+    //shift to 0 ('s' coord frame):
+    coordOffsetLastZMPDStep.y += newSupportStep->y - sign*HIP_OFFSET_Y;
+}
 
 void StepGenerator::setWalkVector(const float _x, const float _y,
                                   const float _theta)  {

@@ -16,7 +16,12 @@
  *  - Figure out how to calculate number of required pre-planned steps,
  *    so that we always have enough previewable zmp_ref values.
  *
- *
+ * MUSINGS ON BETTER DESIGN of Steps:
+ * - Each Step could have a list of sub states which it must undergo
+ *   A normal step would have just one DBL and one SINGLE in a row
+ *   A starting stopping step could have other types instead.
+ *   WalkingLeg could then ask the current Step object what should happen next
+ * 
  *  COORDINATE FRAME NOTE:
  *  There are four important coordinate frames:
  *     - initial (i) is the coordinate frame centered where we begin walking
@@ -79,6 +84,7 @@ private: // Helper methods
     void generateStep(const float _x, const float _y,
                       const float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
+    void fillZMP2(const boost::shared_ptr<Step> newStep );
 
     void startRight();
     void startLeft();
