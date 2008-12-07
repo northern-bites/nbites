@@ -20,7 +20,6 @@ namespace CoordFrame3D{
     };
 
     // -------------------- Helper matrix methods --------------------
-
     static const ublas::matrix <float> rotation3D(const Axis axis,
                                                   const float angle) {
         ublas::matrix <float> rot = ublas::identity_matrix <float>(3);
@@ -51,13 +50,6 @@ namespace CoordFrame3D{
         return trans;
     }
 
-    static const ublas::vector <float> vector2D(const float x, const float y) {
-        ublas::vector <float> p = ublas::zero_vector <float> (2);
-        p(0) = x;
-        p(1) = y;
-        return p;
-    }
-
     static const ublas::vector <float> vector3D(const float x, const float y,
                                                 const float z = 1.0f) {
         ublas::vector <float> p = ublas::zero_vector <float> (3);
@@ -67,6 +59,9 @@ namespace CoordFrame3D{
         return p;
     }
 
+    static const ublas::matrix<float> identity3D(){
+        return translation3D(0.0f,0.0f);
+    }
 
 }
 #endif
