@@ -8,20 +8,22 @@
  *
  * Subtasks:
  *  - Manage the moving coordinate frame while the robot is walking
+ *   - There are in fact two moving coordinate frames:
+ *     * one of type s which moves with the last ZMPDstep,
+ *     * and one of the f type which moves according to which support step is
+ *       currently actually active
  *  - Decide when to throw away dated footsteps
  *  - Decide how to add new footsteps (when, etc)
  *
  *  TODO:
- *  - Figure out what the units are for the walk vector.
- *  - Figure out how to calculate number of required pre-planned steps,
- *    so that we always have enough previewable zmp_ref values.
+  *  - Translate all the matrix<float> into bounded arrays (ufmatrix3)
  *
  * MUSINGS ON BETTER DESIGN of Steps:
  * - Each Step could have a list of sub states which it must undergo
  *   A normal step would have just one DBL and one SINGLE in a row
  *   A starting stopping step could have other types instead.
  *   WalkingLeg could then ask the current Step object what should happen next
- * 
+ *
  *  COORDINATE FRAME NOTE:
  *  There are four important coordinate frames:
  *     - initial (i) is the coordinate frame centered where we begin walking
@@ -91,6 +93,7 @@ private: // Helper methods
 
     ublas::matrix<float> get_f_fprime(boost::shared_ptr<Step> step);
     ublas::matrix<float> get_fprime_f(boost::shared_ptr<Step> step);
+    ublas::matrix<float> get_s_sprime(boost::shared_ptr<Step> step);
 private:
     // Walk vector:
     //  * x - forward
@@ -113,13 +116,20 @@ private:
     list<boost::shared_ptr<Step> > currentZMPDSteps;
 
 
+    //Reference Frames for ZMPing steps
+    //These are updated when we ZMP a step - they are the 'future', if you will
+    ublas::matrix<float> si_Transform;
+ 
+    //Steps for the Walking Leg
     boost::shared_ptr<Step> supportStep_s;
     boost::shared_ptr<Step> swingingStep_s;
     boost::shared_ptr<Step> supportStep_f;
     boost::shared_ptr<Step> swingingStep_f;
     boost::shared_ptr<Step> swingingStepSource_f;
-    boost::shared_ptr<Step> lastZMPDStep; //Last step turned into ZMP values
-    point<float> coordOffsetLastZMPDStep;
+
+    //Reference frames for the Walking Leg
+    //These are updated in real time, as we are processing steps
+    //that are being sent to the WalkingLegs
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
     ublas::matrix<float> if_Transform;
