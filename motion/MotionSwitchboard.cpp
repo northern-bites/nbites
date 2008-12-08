@@ -4,15 +4,18 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
       walkProvider(),
 	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? FILE?
       nextJoints(Kinematics::NUM_JOINTS, 0.0),
-	  running(false),
-	  command(100.0, //time
-			  new vector<float>(22,90.0), //joints, all zeros
-			  Kinematics::INTERPOLATION_LINEAR)
+	  running(false)
 {
 
     //Allow safe access to the next joints
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
+
+	bodyJoints = new vector<float>(20,90.0f);
+
+	command = new BodyJointCommand(100.0f,
+								   bodyJoints,
+							   Kinematics::INTERPOLATION_LINEAR);
 }
 
 MotionSwitchboard::~MotionSwitchboard() {
@@ -21,12 +24,17 @@ MotionSwitchboard::~MotionSwitchboard() {
 
 
 void MotionSwitchboard::start() {
+
 #ifdef DEBUG_INITIALIZATION
     cout << "Switchboard::initializing" << endl;
     cout << "  creating threads" << endl;
 #endif
     fflush(stdout);
-	scriptedProvider.enqueue(&command);
+	cout << "larmsize" << command->getJoints(Kinematics::LARM_CHAIN)->size() << endl;
+	scriptedProvider.enqueue(command);
+	delete bodyJoints;
+	delete command;
+
     running = true;
 
     // set thread attributes

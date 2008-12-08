@@ -33,20 +33,24 @@ public:
 
     const vector <float> getNextJoints();
 
-	
+
 
 private:
-    Sensors * sensors;
+    Sensors *sensors;
     WalkProvider walkProvider;
 	ScriptedProvider scriptedProvider;
     vector <float> nextJoints;
 
     bool running;
+
+	vector<float> *bodyJoints;
+	BodyJointCommand *command;
+
+
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
     pthread_mutex_t next_joints_mutex;
 
-	BodyJointCommand command;
 };
 
 #endif

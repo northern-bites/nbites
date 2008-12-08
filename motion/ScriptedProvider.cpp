@@ -13,7 +13,7 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),
 	  nextJoints(),
-	  choppedCommand(0),
+	  choppedCommand(),
 	  headQueue(HEAD_CHAIN),
 	  lArmQueue(LARM_CHAIN),
 	  lLegQueue(LLEG_CHAIN),
@@ -54,6 +54,7 @@ void ScriptedProvider::calculateNextJoints() {
 		rLegQueue.pop();
 		rArmQueue.pop();
 	}
+
 	cout << "calculated next joints" << endl;
 }
 
@@ -63,15 +64,16 @@ void ScriptedProvider::enqueue(const BodyJointCommand *command) {
 	cout << "ENQUEING COMMAND" << endl;
 	//Split command by chops
 	vector<vector<vector<float> > >::iterator choppedIter;
-	choppedIter = choppedCommand.begin();
-	for (int numPushed=0 ; numPushed < choppedCommand.size(); numPushed++){
-		
+
+
+	while (!choppedCommand.empty()){
 		// Pass each chain to its chainqueue
-		headQueue.push(choppedCommand.at(numPushed).at(HEAD_CHAIN));
-		lArmQueue.push(choppedCommand.at(numPushed).at(LARM_CHAIN));
-		lLegQueue.push(choppedCommand.at(numPushed).at(LLEG_CHAIN));
-		rLegQueue.push(choppedCommand.at(numPushed).at(RLEG_CHAIN));
-		rArmQueue.push(choppedCommand.at(numPushed).at(RARM_CHAIN));
+		headQueue.push(choppedCommand.front().at(HEAD_CHAIN));
+		lArmQueue.push(choppedCommand.front().at(LARM_CHAIN));
+		lLegQueue.push(choppedCommand.front().at(LLEG_CHAIN));
+		rLegQueue.push(choppedCommand.front().at(RLEG_CHAIN));
+		rArmQueue.push(choppedCommand.front().at(RARM_CHAIN));
+		choppedCommand.pop();
 	}
 
 }
