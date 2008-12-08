@@ -1,4 +1,4 @@
-
+PLATFORM := $(shell uname)
 META_DIR := ../..
 DIR := TOOL/Vision
 TEST_CLASS := None
@@ -21,7 +21,6 @@ JAR = $(JCP)/jar
 TOOL_CLASS_PATH := edu.bowdoin.robocup.TOOL
 
 #For compiling JNI vision library
-PLATFORM := $(shell uname)
 MAN_HOME := $(META_DIR)/../man
 
 NATIVE_VISION_SRCS := TOOLVisionLink.cpp
