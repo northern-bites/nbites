@@ -3,40 +3,54 @@
  * configured. It must handle the following tasks:
  *  - Provide future ZMP_REF values for both x and y dimensions
  *  - Decide where to place footsteps depending on input x,y,h
+ *  - Oversee the behavior of the WalkingLegs which actually do the leg work
  *  - Handle stopping, both as a motion vector, and when requested
  *    to stop by the underlying switchboard/provider.
  *
  * Subtasks:
  *  - Manage the moving coordinate frame while the robot is walking
- *   - There are in fact two moving coordinate frames:
- *     * one of type s which moves with the last ZMPDstep,
- *     * and one of the f type which moves according to which support step is
- *       currently actually active
+ *    - There are in fact two moving coordinate frames:
+ *      * one of type s which moves with the last ZMPDstep,
+ *      * and one of the f type which moves according to which support step is
+ *        currently actually active
  *  - Decide when to throw away dated footsteps
  *  - Decide how to add new footsteps (when, etc)
  *
- *  TODO:
-  *  - Translate all the matrix<float> into bounded arrays (ufmatrix3)
+ * TODO:
+ *  - Translate all the matrix<float> into bounded arrays (ufmatrix3)
+ *  - Build access to work from the Switchboard or Interface. Need
+ *    to be able to change gaits, start and stop, etc
+ *  - Enable turning - prob. involves some work with Kinematics as well?
+ *  - Read through tick_legs, fillZMP, etc with a beginners mind and write
+ *    lots of awesomely descriptive and informative comments.
+ *  - Decide if the 'hack-ish' stuff in generate step is really a hack or not
+ *  - Move some of the parameters in WalkingParameters into Steps. This includes
+ *    stuff like step duration, frames in double support, step height, etc
  *
- * MUSINGS ON BETTER DESIGN of Steps:
- * - Each Step could have a list of sub states which it must undergo
- *   A normal step would have just one DBL and one SINGLE in a row
- *   A starting stopping step could have other types instead.
- *   WalkingLeg could then ask the current Step object what should happen next
- * - The s coordinate frame could be dispensed with -  we could just
- *   express steps in the f coordinate frame, also this might allow
- *   the step constructor to be called  without knowing about HIP_OFF, etc
- *  COORDINATE FRAME NOTE:
+ * MUSINGS ON BETTER DESIGN:
+ *  - Each Step could have a list of sub states which it must undergo
+ *    A normal step would have just one DBL and one SINGLE in a row
+ *    A starting stopping step could have other types instead.
+ *    WalkingLeg could then ask the current Step object what should happen next
+ *  - The s coordinate frame could be dispensed with -  we could just
+ *    express steps in the f coordinate frame, also this might allow
+ *    the step constructor to be called  without knowing about HIP_OFF, etc
+ *
+ * COORDINATE FRAME NOTE:
  *  There are four important coordinate frames:
  *     - initial (i) is the coordinate frame centered where we begin walking
-           Since we expect not to walk a net distance of more than .5-1.0km in
-           one go, we don't need to worry about float overflow.
-       - foot (f) is the coord. frame centered on the supporting leg.
-           During walking, this frame changes frequently. It is switched
-           the instant when the swinging leg enters DOUBLE_PERSISTANT
-       - center of mass (c) is the coordinate frame centered at the robot's com
-       - step (s) is the coordinate frame relative to which we define a step
-           Typically this would be HIP_OFFSET to the inside of the step.
+ *         Since we expect not to walk a net distance of more than .5-1.0km in
+ *         one go, we don't need to worry about float overflow.
+ *     - foot (f) is the coord. frame centered on the supporting leg.
+ *         During walking, this frame changes frequently. It is switched
+ *         the instant when the swinging leg enters DOUBLE_PERSISTANT
+ *     - center of mass (c) is the coordinate frame centered at the robot's com
+ *     - step (s) is the coordinate frame relative to which we define a step
+ *         Typically this would be HIP_OFFSET to the inside of the step.
+ *
+ * @author Johannes Strom
+ * @author George Slavov
+ * @date Jan 7 2009
  */
 
 #ifndef _StepGenerator_h_DEFINED

@@ -246,18 +246,20 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     const int sign = (newSupportStep->foot == LEFT_FOOT ? 1 : -1);
     const int last_sign = -sign;
 
-    //method level WALK PARAMETERS - eventually this should be changable
-    //for some as of yet not entirely clear reason, this constant should
-    // be negative 20 or so for better stability.
-    // my intuition is that it is more stable because a negative value
-    //gets the ZMP over the supporting foot much longer.
-    //(otherwise the ZMP just 'passes through'
-    //Another way to fix this might be to change the R value for the controller
-    //in mm, the dist we want ZMP to cover on foot:
+    //The intent of this constant is to be approximately the length of the foot
+    //and corresponds to the distance we would like the ZMP to move along the
+    //single-support-foot (say 80mm or so?). Might not want it to be linearly
+    //interpolated either - maybe stay at a point a bit and then  move in a line
+    //HACK/ HOWEVER - the best value for this constant is about -20 right now
+    //This could have two+ reasons:
+    //1) The controller is inaccurate in getting ref and actual zmp to line up
+    //   (In fact, we know this is the case, from the debug graphs. but, what we
+    //    dont know is if this is the definite cause of instability)
+    //2) The approximations made in the simple PreviewController are finally
+    //   hurting us. This could be fixed with an observer
+    // in anycase, we'll leave this at -20 for now. (The effect is that
+    // the com path 'pauses' over the support foot, which is quite nice)
     float X_ZMP_FOOT_LENGTH = -20.0f;
-    //small hack - if we aren't moving forward, then don't move along the foot
-    if(newSupportStep->x == 0)
-        X_ZMP_FOOT_LENGTH =  0.0f;
 
     //lets define the key points in the s frame. See diagram in paper
     //to use bezier curves, we would need also directions for each point
