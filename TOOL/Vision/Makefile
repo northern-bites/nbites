@@ -2,9 +2,15 @@
 META_DIR := ../..
 DIR := TOOL/Vision
 TEST_CLASS := None
-JAVA := /usr/bin/java
-JAVAC := javac
-JAVAH = javah
+
+JP = /System/Library/Frameworks/JavaVM.framework/Versions/1.5
+JCP = $(JP)/Commands
+JHP = $(JP)/Headers
+JAVA = $(JCP)/java
+JAVAC = $(JCP)/javac
+JAVAH = $(JCP)/javah
+
+JAR = $(JCP)/jar 
 
 TOOL_CLASS_PATH := edu.bowdoin.robocup.TOOL
 
@@ -24,7 +30,7 @@ NATIVE_VISION_JAVA_CLASS_NAME :=  $(TOOL_CLASS_PATH).Vision.TOOLVisionLink
 COMPILE_TIME_DEFS := -DNO_ZLIB -DROBOT_TYPE=NAO_RL
 
 ifeq  "$(PLATFORM)" "Darwin"
-JAVA_INCLUDE:=-I/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Headers
+JAVA_INCLUDE:=-I$(JHP)
 FINK_INCLUDE := -I/sw/include
 NATIVE_VISION_TARGET := $(META_DIR)/lib$(NATIVE_VISION_CLASS_FILE).jnilib
 VISION_SHARED_OPTS := -dynamiclib

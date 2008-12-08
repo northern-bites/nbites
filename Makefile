@@ -112,9 +112,11 @@ SED_FIX_BACKSLASH := sed -e "s/..\\\\\([^ ]*\)/..\/\1/g"
 else
 SED_FIX_BACKSLASH := cat
 endif
-JAVA = java
-JAVAC = javac
-JAR = jar
+
+JP = /System/Library/Frameworks/JavaVM.framework/Versions/1.5/Commands
+JAVA = $(JP)/java
+JAVAC = $(JP)/javac
+JAR = $(JP)/jar
 CP = cp
 ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
 PYTHON = 'C:/Program Files/Python25/python.exe'
