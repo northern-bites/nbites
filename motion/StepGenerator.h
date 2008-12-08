@@ -89,13 +89,14 @@ private: // Helper methods
                       const float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
     void fillZMPRegular(const boost::shared_ptr<Step> newStep );
-    void fillZMPNull(const boost::shared_ptr<Step> newStep );
+    void fillZMPEnd(const boost::shared_ptr<Step> newStep );
 
     void startRight();
     void startLeft();
 
     ublas::matrix<float> get_f_fprime(boost::shared_ptr<Step> step);
     ublas::matrix<float> get_fprime_f(boost::shared_ptr<Step> step);
+    ublas::matrix<float> get_sprime_s(boost::shared_ptr<Step> step);
     ublas::matrix<float> get_s_sprime(boost::shared_ptr<Step> step);
 private:
     // Walk vector:
@@ -122,6 +123,7 @@ private:
     //Reference Frames for ZMPing steps
     //These are updated when we ZMP a step - they are the 'future', if you will
     ublas::matrix<float> si_Transform;
+    ublas::vector<float> last_zmp_end_s;
 
     //Steps for the Walking Leg
     boost::shared_ptr<Step> supportStep_s;

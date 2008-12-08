@@ -7,6 +7,7 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
       currentZMPDSteps(),
       si_Transform(CoordFrame3D::identity3D()),
+      last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
       if_Transform(CoordFrame3D::identity3D()),
       initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
       initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
@@ -229,8 +230,7 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
         fillZMPRegular(newSupportStep);
         break;
     case END_STEP: //END and NULL might be the same thing....?
-        //case NULL_STEP:
-        fillZMPNull(newSupportStep);
+        fillZMPEnd(newSupportStep);
         break;
     default:
         throw "Unsupported Step type";
@@ -261,8 +261,7 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
 
     //lets define the key points in the s frame. See diagram in paper
     //to use bezier curves, we would need also directions for each point
-    const ublas::vector<float> start_s =
-        CoordFrame3D::vector3D(0.0f,last_sign*HIP_OFFSET_Y);
+    const ublas::vector<float> start_s = last_zmp_end_s;
     const ublas::vector<float> end_s =
         CoordFrame3D::vector3D(newSupportStep->x ,//+X_ZMP_FOOT_LENGTH,
                                newSupportStep->y);
@@ -308,10 +307,12 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
 
     //update our reference frame for the next time this method is called
     si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
+    //store the end of the zmp in the next s frame:
+    last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
 }
 
 void
-StepGenerator::fillZMPNull(const boost::shared_ptr<Step> newSupportStep ){
+StepGenerator::fillZMPEnd(const boost::shared_ptr<Step> newSupportStep ){
     const ublas::vector<float> end_s =
         CoordFrame3D::vector3D(0.0f ,
                                0.0f);
@@ -323,8 +324,10 @@ StepGenerator::fillZMPNull(const boost::shared_ptr<Step> newSupportStep ){
         zmp_ref_y.push_back(end_i(1));
     }
 
-    //A start step should never move the si_Transform!
+    //An End step should never move the si_Transform!
     //si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
+    //store the end of the zmp in the next s frame:
+    last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
 }
 
 void StepGenerator::setWalkVector(const float _x, const float _y,
@@ -409,19 +412,15 @@ void StepGenerator::generateStep( float _x,
     }else{
         //we are moving somewhere, and we must ensure that the last step
         //we enqued was not an END STEP
-        cout << "Trying to move forward,";
         if(lastQueuedStep->type == END_STEP){
             if (lastQueuedStep->zmpd){//too late to change it! make this a start
-                cout <<"already ZMPD last step, so modifying this  one"<<endl;
                 type = START_STEP;
                 _x = 0.0f;
             }else{
-                cout <<"Not zmpd yet, so making this a regular step"<<endl;
                 type = REGULAR_STEP;
                 lastQueuedStep->type = START_STEP;
             }
         }else{
-            cout << "everything is fine" <<endl;
             //the last step was either start or reg, so we're fine
             type = REGULAR_STEP;
         }
@@ -484,6 +483,23 @@ StepGenerator::get_f_fprime(boost::shared_ptr<Step> step){
     return prod(trans_s_f,trans_fprime_s);
 }
 
+/**
+ * Translates points in the sprime frame into the s frame, where
+ * the difference between sprime and s is based on 'step'
+ */
+ublas::matrix<float>
+StepGenerator::get_sprime_s(boost::shared_ptr<Step> step){
+    const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
+
+    const float x = step->x;
+    const float y = step->y - leg_sign*HIP_OFFSET_Y;
+    const float theta = step->theta;
+
+    const ublas::matrix<float> trans_s_sprime =
+        prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-theta),
+             CoordFrame3D::translation3D(-x,-y));
+    return trans_s_sprime;
+}
 
 /**
  * Yet another DIFFERENT Method, returning the matrix that translates points
@@ -499,7 +515,8 @@ StepGenerator::get_s_sprime(boost::shared_ptr<Step> step){
     const float theta = step->theta;
 
     const ublas::matrix<float> trans_s_sprime =
-        prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-theta),
+        prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta),
              CoordFrame3D::translation3D(x,y));
     return trans_s_sprime;
 }
+
