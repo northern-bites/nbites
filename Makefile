@@ -113,10 +113,18 @@ else
 SED_FIX_BACKSLASH := cat
 endif
 
+
+#On a mac, we may need to explicitly choose a version
+ifeq  "$(PLATFORM)" "Darwin"
 JP = /System/Library/Frameworks/JavaVM.framework/Versions/1.5/Commands
 JAVA = $(JP)/java
 JAVAC = $(JP)/javac
 JAR = $(JP)/jar
+else
+JAVA = java
+JAVAC = javac
+JAR = jar
+endif
 CP = cp
 ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
 PYTHON = 'C:/Program Files/Python25/python.exe'

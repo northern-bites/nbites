@@ -4,12 +4,18 @@ DIR := TOOL/Vision
 TEST_CLASS := None
 
 JP = /System/Library/Frameworks/JavaVM.framework/Versions/1.5
+
+ifeq  "$(PLATFORM)" "Darwin"
 JCP = $(JP)/Commands
 JHP = $(JP)/Headers
 JAVA = $(JCP)/java
 JAVAC = $(JCP)/javac
 JAVAH = $(JCP)/javah
-
+else
+JAVA = java
+JAVAC = javac
+JAVAH = javah
+endif
 JAR = $(JCP)/jar 
 
 TOOL_CLASS_PATH := edu.bowdoin.robocup.TOOL
