@@ -22,7 +22,7 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\n");
 #endif
 
-    setWalkVector(0,0,0); // for testing purposes. The function doesn't even
+    setWalkVector(30,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -53,14 +53,14 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if (fc == 6){
-                cout << "MOVE FORWARD!!"<<endl;
-                //Change the x vector to be moving forward
-                x =30;
-            }else if(fc == 18){
+            if(fc%10 == 0){
                 cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
+            }else if (fc%5 == 0){
+                cout << "MOVE FORWARD!!"<<endl;
+                //Change the x vector to be moving forward
+                x =30;
             }
         }
         else {
@@ -129,8 +129,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //which is the critical point when we must swap coord frames, etc
     if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
 
-        int numCurrentSteps = static_cast<int>(currentZMPDSteps.size());
-        int numFutureSteps  = static_cast<int>(futureSteps.size());
+        unsigned int numCurrentSteps = currentZMPDSteps.size();
+        unsigned int numFutureSteps  = futureSteps.size();
 
         if (numCurrentSteps  + numFutureSteps < MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
@@ -408,7 +408,11 @@ void StepGenerator::generateStep( float _x,
                                  const float _theta) {
     StepType type;
     if (_x ==0){//stopping, or stopped
-        type = END_STEP;
+        if(lastQueuedStep->x != 0)
+            type = REGULAR_STEP;
+        else
+            type = END_STEP;
+
     }else{
         //we are moving somewhere, and we must ensure that the last step
         //we enqued was not an END STEP

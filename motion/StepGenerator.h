@@ -68,7 +68,7 @@ using namespace Kinematics;
 typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 
-static int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
+static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
                                      //steps stored in future, current lists
 
 class StepGenerator {
