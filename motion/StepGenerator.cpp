@@ -408,6 +408,31 @@ void StepGenerator::startRight(){
 void StepGenerator::generateStep( float _x,
                                  const float _y,
                                  const float _theta) {
+    //We have this problem that we can't simply start and stop the robot:
+    //depending on the step type, we generate different types of ZMP
+    //which means after any given step, only certain other steps types are
+    //possible. For example, an END_STEP places the ZMP at 0,0, so it is a bad
+    //idea to try to have a REGUALR_STEP follow it.  Also, the START_STEP
+    //generates the same ZMP pattern as the REGULAR_STEP, but walking leg
+    //wont lift up the leg.
+    //PROBLEM:
+    // In order to follow these guidlines, we introduce some hackish, error
+    //prone code (see below) which must be repeated for all three 'directions'.
+
+    //MUSINGS on better design:
+    //1)We should probably have two different StepTypes
+    //  one that determines what kind of ZMP we want, and another that
+    //  determines if we should lift the foot as we approach the destination
+    //  determined by that step.
+    //2)We would ideally be able to call Generate step no matter what - i.e.
+    //  also to create the starting steps, etc. This probably means we need to
+    //  figure out how we are externally starting and stopping this module
+    //  and also means we need to store class level state information (another
+    //  FSA?)
+    //3)All this is contingent on building in the idea that with motion vector=
+    //  (0,0,0) we imply that the robot stops.  We could encode this as two
+    //  different overall behaviors: check if we want to start, else if we
+    //  want to start moving, else if are already moving.
     StepType type;
     if (_x ==0){//stopping, or stopped
         if(lastQueuedStep->x != 0)
