@@ -1717,6 +1717,21 @@ void Threshold::initTable(std::string filename) {
   fclose(fp);
 }
 
+
+void Threshold::initTableFromBuffer(byte * tbfr)
+{
+
+    byte* source = tbfr;
+    for(int i=0; i< YMAX; i++)
+        for(int j=0; j<UMAX; j++){
+            //pointer to beginning of row:
+            byte* dest = bigTable[i][j];
+            //copy over a whole row into big table from the buffer
+            memcpy(dest,source,YMAX);
+            source+=YMAX;//advance the source bugger
+            }
+}
+
 /* This function loads a table file with the given file name 
  * into memory(the big Table array)
  * for example, filename can be "/MS/merged.mtb". 

@@ -118,6 +118,7 @@ class Threshold
   void initObjects(void);
   void initColors();
   void initTable(std::string filename);
+  void initTableFromBuffer(byte* tbfr);
   void initChromeTable(std::string filename);
   void initCompressedTable(std::string filename);
 
