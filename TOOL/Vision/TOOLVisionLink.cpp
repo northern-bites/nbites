@@ -14,6 +14,7 @@
 #include <sys/time.h>
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink.h"
 #include "Vision.h"
@@ -89,10 +90,32 @@ JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppPr
     Profiler profiler =  Profiler(&micro_time);
     Vision vision = Vision(&pose,&profiler);
 
-    //Load the color table
-    const char *tablePath = env->GetStringUTFChars(jtablePath, 0);
-    vision.thresh->initTable(tablePath);
-    env->ReleaseStringUTFChars(jtablePath, tablePath);
+    //Testing stuff 
+
+    const char  *filename = env->GetStringUTFChars(jtablePath, 0);
+    env->ReleaseStringUTFChars(jtablePath, filename);
+    int size = YMAX*UMAX*VMAX;
+    unsigned char * test = (unsigned char*) std::malloc(sizeof(unsigned char)*size);
+
+    FILE* fp;
+    cout <<"Filename:" <<filename << endl;
+    fp = fopen(filename, "r");   //open table for reading
+    if (fp == NULL) {
+        printf("initTable() FAILED to open filename: %s \n", filename);
+        return;
+    }
+    fread(test, sizeof(unsigned char), VMAX*UMAX*YMAX, fp);
+
+    fclose(fp);
+    
+    
+    //end testing
+
+
+    //load the table
+    vision.thresh->initTableFromBuffer(test);
+    std::free(test);
+
 
     //Set the Senors data - Note: set visionBodyAngles not bodyAngles
     float * joints = env->GetFloatArrayElements(jjoints,0);
@@ -125,6 +148,7 @@ JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppPr
         env->ReleaseByteArrayElements(row_target, row, 0);
     }
 
-
+    
     return;
+
 }
