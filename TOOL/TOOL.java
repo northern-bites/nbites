@@ -105,7 +105,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private DataManager dataManager;
     private SourceManager sourceManager;
     private ColorTable colorTable;
-
+    private VisionModule vision;
 
     private List<TOOLModule> modules;
     private HashMap<String, Component> moduleMap;
@@ -185,11 +185,13 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // 3d rasterizer for fun and for viewing colortable/image distributions
         //addModule(new ZModule(this));
         //Offline Vision debugger
-        addModule(new VisionModule(this));
+        vision = new VisionModule(this);
+        addModule(vision);
         // Add color table listeners to the two modules that must be notified
         // whenever the color table changes
         dataManager.addColorTableListener(calibrate);
         dataManager.addColorTableListener(colorEdit);
+        dataManager.addColorTableListener(vision);
 
         setupPane();
 

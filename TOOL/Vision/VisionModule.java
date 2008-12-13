@@ -60,14 +60,18 @@ import edu.bowdoin.robocup.TOOL.TOOLModule;
 import edu.bowdoin.robocup.TOOL.Image.ImagePanel;
 import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
 import edu.bowdoin.robocup.TOOL.Image.ThresholdedImage;
+import edu.bowdoin.robocup.TOOL.Image.ColorTable;
 import edu.bowdoin.robocup.TOOL.Data.Frame;
 import edu.bowdoin.robocup.TOOL.Data.DataSet;
+import edu.bowdoin.robocup.TOOL.Data.ColorTableListener;
+import edu.bowdoin.robocup.TOOL.Calibrate.ColorTableUpdate;
 import edu.bowdoin.robocup.TOOL.Vision.TOOLVisionLink;
 
-public class VisionModule extends TOOLModule  {
+public class VisionModule extends TOOLModule implements ColorTableListener {
 
     private ImagePanel imgPanel;
     private TOOLVisionLink visionLink;
+    private ColorTable currentTable;
 
     //Controllers if we run vision processing on images or not
     private boolean active;
@@ -95,14 +99,10 @@ public class VisionModule extends TOOLModule  {
         return active;
     }
 
-    /**
-     *  Called evertime we change frames in the data set.
-     *  Currently attempts to run cpp vision on the new frame each time
-     */
-    public void notifyFrame(Frame d) {
-        currentFrame = d;
-        if(!d.hasImage()) return; //Don't even bother if there's no image
-        TOOLImage img = d.image();
+
+    public void processFrame(){
+        if(!currentFrame.hasImage()) return; //Don't even bother if there's no image
+        TOOLImage img = currentFrame.image();
 
         //Double check to see if the link is actually active (ie lib was found)
         if(!visionLink.isLinkActive()){
@@ -114,8 +114,8 @@ public class VisionModule extends TOOLModule  {
         }
         //Get the joints from the frame if it exists
         float[] joints  =new float[22]; //default length for Nao
-        if(d.hasJoints()){
-            List<Float> list_joints = d.joints();
+        if(currentFrame.hasJoints()){
+            List<Float> list_joints = currentFrame.joints();
             joints  =new float[list_joints.size()];
             int i = 0;
             for(Iterator itr = list_joints.iterator(); itr.hasNext(); ){
@@ -151,4 +151,20 @@ public class VisionModule extends TOOLModule  {
         imgPanel.updateImage(tImg);
 
     }
+
+    /**
+     *  Called evertime we change frames in the data set.
+     *  Currently attempts to run cpp vision on the new frame each time
+     */
+    public void notifyFrame(Frame d) {
+        currentFrame = d;
+        processFrame();
+    }
+
+    public void colorTableChanged(ColorTable source, ColorTableUpdate update,
+                                  ColorTableListener originator) {
+        currentTable = source;
+        processFrame();
+    }
+
 }
