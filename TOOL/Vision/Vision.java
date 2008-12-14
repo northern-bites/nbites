@@ -83,7 +83,7 @@ public interface Vision {
     public static final Color BLACK_COLOR = new Color(0,0,0); // BLACK 12
     public static final Color PINK_COLOR = new Color(255,0,200); // BALL_PINK 13
     //public static final Color BOTHWHITE_COLOR = new Color(200,200,200); // BOTHWHITE 14
-    public static final Color SHADOW_COLOR = Color.DARK_GRAY // SHADOW 14
+    public static final Color SHADOW_COLOR = Color.DARK_GRAY; // SHADOW 14
     public static final Color CYAN_COLOR = new Color(0,0,255); // CYAN 15
   // Generated from http://www.enetplace.com/color-picker.html
     public static final Color DARK_TURQUOISE_COLOR = new Color(0,206,209); // DARK TURQUOISE 16
