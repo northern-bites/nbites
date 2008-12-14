@@ -26,7 +26,7 @@ import edu.bowdoin.robocup.TOOL.Data.RobotDef;
 
 public interface Vision {
 
-    public static Vision[] VISION_BINARIES = 
+    public static Vision[] VISION_BINARIES =
             new Vision[RobotDef.ROBOT_DEFS.length];
 
     //current color encodings.
@@ -44,13 +44,28 @@ public interface Vision {
     public static final byte NAVY = 11;
     public static final byte BLACK = 12;
     public static final byte PINK = 13;
+    public static final byte SHADOW = 14;
+    public static final byte CYAN = 15;
+    public static final byte DARK_TURQUOISE = 16;
+    public static final byte LAWN_GREEN = 17;
+    public static final byte PALE_GREEN = 18;
+    public static final byte BROWN = 19;
+    public static final byte SEA_GREEN = 20;
+    public static final byte ROYAL_BLUE = 21;
+    public static final byte POWDER_BLUE = 22;
+    public static final byte MEDIUM_PURPLE = 23;
+    public static final byte MAROON = 24;
+    public static final byte LIGHT_SKY_BLUE = 25;
+    public static final byte MAGENTA = 26;
+    public static final byte PURPLE = 27;
 
     public static final String[] COLOR_STRINGS = {
 	"Undefined", "White", "Green", "Blue",
 	"Yellow", "Orange", "Yellow/White", "Blue/Green",
 	"Orange/Red", "Orange/Yellow", "Red", "Navy",
-	"Black", "Pink" 
-    };
+	"Black", "Pink","Shadow","Cyan","DarkTurquoise","LawnGreen","PaleGreen",
+    "Brown","SeaGreen","RoyalBlue","PowderBlue","MediumPurple","Maroon",
+    "LightSkyBlue","Magenta","Purple"};
 
     // Copied from CortexVision.h
     public static final Color GRAY_COLOR = new Color(100,100,100);
@@ -67,7 +82,8 @@ public interface Vision {
     public static final Color NAVY_COLOR = Color.BLUE.darker(); // NAVY 11
     public static final Color BLACK_COLOR = new Color(0,0,0); // BLACK 12
     public static final Color PINK_COLOR = new Color(255,0,200); // BALL_PINK 13
-    public static final Color BOTHWHITE_COLOR = new Color(200,200,200); // BOTHWHITE 14
+    //public static final Color BOTHWHITE_COLOR = new Color(200,200,200); // BOTHWHITE 14
+    public static final Color SHADOW_COLOR = Color.DARK_GRAY // SHADOW 14
     public static final Color CYAN_COLOR = new Color(0,0,255); // CYAN 15
   // Generated from http://www.enetplace.com/color-picker.html
     public static final Color DARK_TURQUOISE_COLOR = new Color(0,206,209); // DARK TURQUOISE 16
@@ -94,35 +110,49 @@ public interface Vision {
     */
 
     public static final Color[] COLORS = {GRAY_COLOR,
-					  WHITE_COLOR,
-					  GREEN_COLOR,
-					  BLUE_COLOR,
+                                          WHITE_COLOR,
+                                          GREEN_COLOR,
+                                          BLUE_COLOR,
                                           YELLOW_COLOR,
-					  ORANGE_COLOR,
-					  YELLOW_WHITE_COLOR,
-					  BLUE_GREEN_COLOR,
-					  ORANGE_RED_COLOR,
-					  ORANGE_YELLOW_COLOR,
-					  RED_COLOR,
-					  NAVY_COLOR,
-					  BLACK_COLOR,
-					  PINK_COLOR};
-    
+                                          ORANGE_COLOR,
+                                          YELLOW_WHITE_COLOR,
+                                          BLUE_GREEN_COLOR,
+                                          ORANGE_RED_COLOR,
+                                          ORANGE_YELLOW_COLOR,
+                                          RED_COLOR,
+                                          NAVY_COLOR,
+                                          BLACK_COLOR,
+                                          PINK_COLOR,
+                                          SHADOW_COLOR,
+                                          CYAN_COLOR,
+                                          DARK_TURQUOISE_COLOR,
+                                          LAWN_GREEN_COLOR,
+                                          PALE_GREEN_COLOR,
+                                          BROWN_COLOR,
+                                          SEA_GREEN_COLOR,
+                                          ROYAL_BLUE_COLOR,
+                                          POWDER_BLUE_COLOR,
+                                          MEDIUM_PURPLE_COLOR,
+                                          MAROON_COLOR,
+                                          LIGHT_SKY_BLUE_COLOR,
+                                          MAGENTA_COLOR,
+                                          PURPLE_COLOR};
+
 
     //current table sizes
     public static int YSHIFT = 1;
     public static int USHIFT = 1;
     public static int VSHIFT = 1;
-    
+
     public static int YMAX = (int)(256>>YSHIFT);
     public static int UMAX = (int)(256>>USHIFT);
     public static int VMAX = (int)(256>>VSHIFT);
-    
+
 
     //
     // Vision frame processing contract
     //
-    
+
     public void processFrame(Frame f);
     public void processSequence(DataSet s);
 
