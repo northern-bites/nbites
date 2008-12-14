@@ -20,32 +20,78 @@ using namespace std;
 #include "FieldConstants.h"
 
 // Structs
-// Pose Estimate
-class PoseEst
-{
-public:
-    float x;
-    float y;
-    float h;
-};
-
 // Odometery change
 class MotionModel
 {
 public:
+    MotionModel(float f, float l, float r);
+    MotionModel(const MotionModel& other);
+    MotionModel();
     float deltaF;
     float deltaL;
     float deltaR;
+};
+
+// Pose Estimate
+class PoseEst
+{
+public:
+    // Constructors
+    PoseEst(float _x, float _y, float _h);
+    PoseEst();
+    PoseEst(const PoseEst& other);
+    float x;
+    float y;
+    float h;
+
+    PoseEst operator+ (const PoseEst o)
+    {
+        return PoseEst(o.x + x,
+                       o.y + y,
+                       o.h + h);
+    }
+    void operator+= (const PoseEst o)
+    {
+        x += o.x;
+        y += o.y;
+        h += o.h;
+    }
+    void operator+= (const MotionModel u_t)
+    {
+        // Translate the relative change into the global coordinate system
+        // And add that to the current estimate
+        float calcFromAngle = h + M_PI / 2.0f;
+        x += u_t.deltaF * cos(calcFromAngle) - u_t.deltaL * sin(calcFromAngle);
+        y += u_t.deltaF * sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
+        h += u_t.deltaR;
+    }
+
+  friend std::ostream& operator<< (std::ostream &o, const PoseEst &c)
+  {
+      return o << "(" << c.x << ", " << c.y << ", " << c.h << ")";
+  }
+
+
 };
 
 // Particle
 class Particle
 {
 public:
+    Particle(PoseEst _pose, float _weight);
+    Particle(const Particle& other);
+    Particle();
     PoseEst pose;
     float weight;
     //BallEKF ball;
     //vector<EKF> opponents;
+
+  friend std::ostream& operator<< (std::ostream &o, const Particle &c)
+  {
+      return o << c.pose.x << " " << c.pose.y << " " << c.pose.h << " "
+               << c.weight;
+  }
+
 };
 
 // Math Macros

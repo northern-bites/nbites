@@ -62,6 +62,8 @@ public:
 
     virtual const string toString() const;
 
+    bool isAbstract(ConcreteFieldObject fo);
+
 // Static member variables
 public:
     static const ConcreteFieldObject blue_goal_left_post,

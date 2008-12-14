@@ -77,4 +77,10 @@ const string ConcreteFieldObject::toString() const {
     default:
         return "Invalid Field Object ID";
     }
+
+}
+
+bool ConcreteFieldObject::isAbstract(ConcreteFieldObject fo)
+{
+    return (fo.getID() == BLUE_GOAL_POST || fo.getID() == YELLOW_GOAL_POST);
 }

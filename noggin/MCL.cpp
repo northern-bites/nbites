@@ -16,16 +16,16 @@ MCL::MCL()
     // Initialize particles to be randomly spread about the field...
     srand(time(NULL));
     for (int m = 0; m < M; ++m) {
-        Particle p_m;
-        PoseEst x_m;
+        //Particle p_m;
         // X bounded by width of the field
-        x_m.x = float(rand() % int(FIELD_WIDTH));
         // Y bounded by height of the field
-        x_m.y = float(rand() % int(FIELD_HEIGHT));
         // H between +-pi
-        x_m.h = float(((rand() % FULL_CIRC) - HALF_CIRC)*DEG_TO_RAD);
-        p_m.pose = x_m;
-        p_m.weight = 1;
+        PoseEst x_m(float(rand() % int(FIELD_WIDTH)),
+                    float(rand() % int(FIELD_HEIGHT)),
+                    float(((rand() % FULL_CIRC) - HALF_CIRC)*DEG_TO_RAD));
+        Particle p_m(x_m, 1.0f);
+        // p_m.pose = x_m;
+        // p_m.weight = 1;
         X_t.push_back(p_m);
     }
 
@@ -96,17 +96,18 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 PoseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
 {
     // Translate the relative change into the global coordinate system
-    float deltaX, deltaY, deltaH;
-    float calcFromAngle = x_t.h + M_PI / 2.0f;
-    deltaX = u_t.deltaF * cos(calcFromAngle) - u_t.deltaL * sin(calcFromAngle);
-    deltaY = u_t.deltaF * sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
-    deltaH = u_t.deltaR; // Rotational change is the same as heading change
+    // float deltaX, deltaY, deltaH;
+    // float calcFromAngle = x_t.h + M_PI / 2.0f;
+    // deltaX = u_t.deltaF * cos(calcFromAngle) - u_t.deltaL * sin(calcFromAngle);
+    // deltaY = u_t.deltaF * sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
+    // deltaH = u_t.deltaR; // Rotational change is the same as heading change
 
-    // Add the change to the current pose estimate
-    x_t.x += deltaX;
-    x_t.y += deltaY;
-    x_t.h += deltaH;
+    // // Add the change to the current pose estimate
+    // x_t.x += deltaX;
+    // x_t.y += deltaY;
+    // x_t.h += deltaH;
 
+    x_t += u_t;
     return x_t;
 }
 
@@ -163,9 +164,9 @@ float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
  */
 void MCL::updateEstimates()
 {
-    PoseEst wMeans = {0.,0.,0.};
+    PoseEst wMeans(0.,0.,0.);
     float weightSum = 0.;
-    PoseEst bSDs = {0., 0., 0.};
+    PoseEst bSDs(0., 0., 0.);
 
     // Calculate the weighted mean
     for (unsigned int i = 0; i < X_t.size(); ++i) {
@@ -328,3 +329,43 @@ Particle MCL::randomWalkParticle(Particle p)
     p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
     return p;
 }
+
+// Other class simple constructors
+// PoseEst
+PoseEst::PoseEst(float _x, float _y, float _h) :
+    x(_x), y(_y), h(_h)
+{
+}
+
+PoseEst::PoseEst(const PoseEst& other) :
+    x(other.x), y(other.y), h(other.h)
+{
+}
+
+PoseEst::PoseEst() {}
+
+// MotionModel
+MotionModel::MotionModel(float f, float l, float r) :
+    deltaF(f), deltaL(l), deltaR(r)
+{
+}
+
+MotionModel::MotionModel(const MotionModel& other) :
+    deltaF(other.deltaF), deltaL(other.deltaL), deltaR(other.deltaR)
+{
+}
+
+MotionModel::MotionModel(){}
+
+// Particle
+Particle::Particle(PoseEst _pose, float _weight) :
+    pose(_pose), weight(_weight)
+{
+}
+
+Particle::Particle(const Particle& other) :
+    pose(other.pose), weight(other.weight)
+{
+}
+
+Particle::Particle(){}
