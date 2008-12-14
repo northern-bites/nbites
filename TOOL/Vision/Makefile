@@ -29,7 +29,8 @@ NATIVE_VISION_LIBS := $(MAN_HOME)/build/cmake.vision/libvision.a \
 
 
 NATIVE_VISION_CLASS_FILE := TOOLVisionLink
-NATIVE_VISION_JAVA_CLASS_NAME :=  $(TOOL_CLASS_PATH).Vision.TOOLVisionLink
+NATIVE_VISION_JAVA_CLASS_NAME :=  $(TOOL_CLASS_PATH).Vision.$(NATIVE_VISION_CLASS_FILE)
+NATIVE_VISION_HEADER_FILE := $(subst .,_,$(TOOL_CLASS_PATH))_Vision_$(NATIVE_VISION_CLASS_FILE)
 
 
 COMPILE_TIME_DEFS := -DNO_ZLIB -DROBOT_TYPE=NAO_RL
@@ -54,9 +55,9 @@ VISION_INCLUDE := $(JAVA_INCLUDE) $(NBITES_INCLUDE) $(PYTHON_INCLUDE)  $(FINK_IN
 .PHONY: all clean run
 
 all:
-	$(MAKE) -C $(META_DIR) $(DIR)
+	$(MAKE) -C $(META_DIR) vision
 
-clean:clean_vision
+clean: clean_vision
 	$(RM) *.class
 
 
@@ -70,7 +71,7 @@ test:	all
 	$(MAKE) -C $(META_DIR) $(DIR)/$@
 
 clean_vision:
-	$(RM) $(NATIVE_VISION_TARGET) 	$(NATIVE_VISION_CLASS).h
+	$(RM) $(NATIVE_VISION_TARGET) 	$(NATIVE_VISION_HEADER_FILE).h
 
 vision: $(NATIVE_VISION_TARGET)
 
