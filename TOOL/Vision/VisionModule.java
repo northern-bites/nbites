@@ -21,13 +21,11 @@
  * and each time a new frame is available, it sends it through cpp to be
  * analyzed.
  *
- * Current State:  You must have a "table.mtb" in the tool/ dir.
- *   If you also did 'make vision' then the link to cpp will be active
- *   and if you load a frame in the data manager, it's thresholded
- *   representation will be made visible under the Vision tab.
+ * Current State:  Vision processing is contingent on having built the jnilib
+ *                 which contains the cpp vision code. You can compile it
+ *                 by using 'make vision' in the tool/ base directory.
  *
- *  If the link is inactive, or there is no color table, the regular image
- *  is displayed.
+ *  If the link is inactive, the regular image is displayed.
  *
  *  IMPORTANT: Joint angles are currently not being sent to vision!!!
  *
@@ -101,6 +99,7 @@ public class VisionModule extends TOOLModule implements ColorTableListener {
 
 
     protected void processFrame(){
+        if(!active) return;
         if(!currentFrame.hasImage()) return; //Don't even bother if there's no image
         TOOLImage img = currentFrame.image();
 
@@ -129,32 +128,16 @@ public class VisionModule extends TOOLModule implements ColorTableListener {
         byte[] rawImage = new byte[img.getWidth()*img.getHeight()*2];
         img.writeByteArray(rawImage);
 
-        //current hack to load a cpp color table
-        //Eventually, need to pass an instance of the table to cpp
-        String colorTable = "table2.mtb";
-        File ct = new File(colorTable);
-        if(!ct.exists()){
-            t.CONSOLE.error("Color table path \"" + colorTable +
-                            "\" not found. Displaying reg. image instead");
-            imgPanel.updateImage(img);
-            return;
-        }
-
-        //If our local instance has not been set, try to get one from the tool
-        if (currentTable == null)
-            currentTable = t.getColorTable();
-        if (currentTable == null){ //if there's none in the tool, fail
-            t.CONSOLE.error("No color table loaded. Cannot process frame!");
-            return;
-        }
-
-        int ct_size =  currentTable.getYDimension()*currentTable.getUDimension()*currentTable.getVDimension();
+        //create the byte buffer for the 2MB color table
+        int ct_size =  currentTable.getYDimension()*
+            currentTable.getUDimension()*currentTable.getVDimension();
         byte[] rawTable = new byte[ct_size];
         currentTable.writeByteArray(rawTable);
+
         //If we've made it this far, everything is A OK, so process the image,
         // yields a thresh image
         byte[][] thresh = visionLink.processImage(rawImage,joints,
-                                                  rawTable,colorTable);
+                                                  rawTable);
         //Init a new Thresholded image to display
         ThresholdedImage tImg = new ThresholdedImage(thresh,
                                                      img.getWidth(),

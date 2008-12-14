@@ -38,7 +38,8 @@ micro_time (void)
  *
  * This is the central cpp method called by the Java TOOL to run vision
  * results. It takes in the raw image data, as well as the joint angles
- * and possibly later it will also need to take other sensor values.
+ * and single byte array representation of the color table.
+ * (possibly later it will also need to take other sensor values.)
  *
  * Due to the difficulty of JNI, we currently also require that the thresholded
  * array which Java wants filled be passed in as well. This removes the need
@@ -50,32 +51,26 @@ micro_time (void)
  * we should make a method to translate a cpp field object into a
  * Data/FieldObject.java compatible field object.
  *
- * KNOWN INEFFICIENCIES: Currently, we instantiate vision and load the color
- * table each time we process a frame. In the future, we'd like to be able
+ * KNOWN INEFFICIENCIES:In the future, we'd like to be able
  * to store a static file-level pointer to the vision class. A method which
  * instantiates vision  be called in the TOOLVisionLink.java  contructor.
  * This instance of vision will also need to be destroyed somehow when
  * we are done with this VisionLink
  *
- * To fix the color table inefficency requires some extra work - we need
- * need a vision level method which loads the color table from a byte array
- * rather than from a file.
  */
 
 JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppProcessImage
 (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
- jbyteArray jtable, jstring jtablePath, jobjectArray thresh_target){
+ jbyteArray jtable, jobjectArray thresh_target){
     //Size checking -- we expect the sizes of the arrays to match
     //Base these on the size cpp expects for the image
-    int width = IMAGE_WIDTH;
-    int height = IMAGE_HEIGHT;
-
     unsigned int tlenw =
         env->GetArrayLength((jbyteArray)
                             env->GetObjectArrayElement(thresh_target,0));
     //If one of the dimensions is wrong, we exit
     if(env->GetArrayLength(jimg) != IMAGE_BYTE_SIZE ||
        env->GetArrayLength(jjoints) != 22 ||
+       env->GetArrayLength(jtable) != YMAX*UMAX*VMAX ||
        env->GetArrayLength(thresh_target) != IMAGE_HEIGHT ||
         tlenw != IMAGE_WIDTH){
         cout << "Error: One of the dimensions passed to " <<endl
@@ -90,36 +85,11 @@ JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppPr
     Profiler profiler =  Profiler(&micro_time);
     Vision vision = Vision(&pose,&profiler);
 
-    //Testing stuff
-
-    const char  *filename = env->GetStringUTFChars(jtablePath, 0);
-    env->ReleaseStringUTFChars(jtablePath, filename);
-    int size = YMAX*UMAX*VMAX;
-    unsigned char * test = (unsigned char*) std::malloc(sizeof(unsigned char)*size);
-
-    FILE* fp;
-    cout <<"Filename:" <<filename << endl;
-    fp = fopen(filename, "r");   //open table for reading
-    if (fp == NULL) {
-        printf("initTable() FAILED to open filename: %s \n", filename);
-        return;
-    }
-    fread(test, sizeof(unsigned char), VMAX*UMAX*YMAX, fp);
-
-    fclose(fp);
-
-    //end testing
-
-
-
     //load the table
     jbyte *buf_table = env->GetByteArrayElements( jtable, 0);
     byte * table = (byte *)buf_table; //convert it to a reg. byte array
-    //vision.thresh->initTableFromBuffer(test);
     vision.thresh->initTableFromBuffer(table);
     env->ReleaseByteArrayElements( jtable, buf_table, 0);
-    std::free(test);
-
 
     //Set the Senors data - Note: set visionBodyAngles not bodyAngles
     float * joints = env->GetFloatArrayElements(jjoints,0);

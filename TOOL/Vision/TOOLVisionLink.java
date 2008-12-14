@@ -22,15 +22,12 @@
  * from cpp, you can call visionLink.processImage(), which returns a
  * thresholded image.
  *
- *
  * Future Work:
- * IMPORTANT: When the cpp sublayer throws an error, we cannot catch it.
- *            The TOOL will simply crash. For exaple, if cpp tries to load
- *            A table from a path, and fails, the TOOL crashes.
+ * IMPORTANT: When the cpp sublayer has an error (i.e. segfault), Java cannot
+ *            catch it.
  *
  * It is not clear what the right format for the img_data is.
  * Vision expects to get a pointer to a continuous 1D array of length w*h*2
- * Java
  *
  * In the future, we'd like to get back much more information --
  * like field objects, etc
@@ -38,7 +35,7 @@
  * This class purposefully doesnt rely directly on the TOOL class,
  * so that it is easier to generate the native headers. If desirable
  * some work on the make file would allow you to pass in an instance of the
- * tool, allowing you to write to the too.CONSOLE
+ * tool, allowing you to write to the tool.CONSOLE
  */
 
 package edu.bowdoin.robocup.TOOL.Vision;
@@ -76,14 +73,13 @@ public class TOOLVisionLink {
         return visionLinkSuccessful;
     }
     public byte[][] processImage(byte[] img_data, float[] joint_data,
-                                 byte[] ct_data,
-                                 String colorTablePath )
+                                 byte[] ct_data)
     {
         byte[][] threshResult = new byte[height][width];
         if( visionLinkSuccessful){
             try{
                 cppProcessImage(img_data,joint_data,ct_data,
-                                colorTablePath,threshResult);
+                                threshResult);
             }catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n"+
                                    "   Processing failed.");
@@ -98,7 +94,7 @@ public class TOOLVisionLink {
 
     //Native methods:
     native private void cppProcessImage(byte[] img_data, float[] joint_data,
-                                        byte[] table_data,String colorTablePath,
+                                        byte[] table_data,
                                         byte[][] threshResult);
 
     //Load the cpp library that implements the native methods
