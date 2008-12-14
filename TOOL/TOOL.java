@@ -74,6 +74,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     public static final String DEFAULT_IMAGE_DIRECTORY = "./";//"../frame_depot/closeYg/";
     public static final String DEFAULT_TABLE_PATH = "../../trunk/dog/tables/JohoLabFLHighFast/table.mtb";
 
+
     public static final int DATA_MANAGER_HEIGHT  = 24;
     public static final int DEFAULT_PANES = 1;
 
@@ -169,7 +170,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         ColorEditModule colorEditModule = new ColorEditModule(this);
         colorEdit = (ColorEdit) colorEditModule.getDisplayComponent();
         addModule(colorEditModule);
-//        addModule(new DatabaseModule(this));
+        //        addModule(new DatabaseModule(this));
         // network - discover and connect to robots
         NetworkModule net_mod = new NetworkModule(this);
         addModule(net_mod);
@@ -218,12 +219,13 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
         final String fileSeparator = System.getProperty("file.separator");
         sourceManager.addSource(".." + fileSeparator + "branches" + fileSeparator
-                            +"frame_depot" + fileSeparator);
+                                +"frame_depot" + fileSeparator);
 
-	//temporary color table mod - make a null table
+        //temporary color table mod - make a null table
         try {
             colorTable = new ColorTable(ColorTable.EMPTY,
                                         ColorTable.Dimension.LARGE);
+            vision.newColorTable(colorTable);
             dataManager.notifyDependants();
             colorEdit.setTable(colorTable);
         }
@@ -276,13 +278,13 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //and finally,  set size of the window
         mainWindow.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         //mainWindow.setExtendedState(JFrame.MAXIMIZED_VERT);
-    
+
     }
 
     private void initMenu(){
         //make a global menu bar
         menuBar = new JMenuBar();
-    
+
         //make the file menu
         fileMenu = new JMenu("File");
 
@@ -294,35 +296,35 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         fileMenu.add(quit);
 
         menuBar.add(fileMenu);
-    
 
-	//Temporary menu so we can load and save color tables
-	actions = new JMenu("Actions");
-	newColorTable = new JMenuItem("New Color Table");
-	loadColorTable = new JMenuItem("Load Color Table ");
-	saveColorTable = new JMenuItem("Save Color Table");
-	saveColorTableAs = new JMenuItem("Save Color Table As");
+
+        //Temporary menu so we can load and save color tables
+        actions = new JMenu("Actions");
+        newColorTable = new JMenuItem("New Color Table");
+        loadColorTable = new JMenuItem("Load Color Table ");
+        saveColorTable = new JMenuItem("Save Color Table");
+        saveColorTableAs = new JMenuItem("Save Color Table As");
         toggleAutoSave = new JCheckBoxMenuItem("Autosave enabled");
         toggleSoftColors = new JCheckBoxMenuItem("Softcolors enabled");
         toggleSoftColors.setSelected(true);
-        
+
         addPane = new JMenuItem("Add Pane");
         removePane = new JMenuItem("Remove Pane");
 
-	newColorTable.addActionListener(this);
-	loadColorTable.addActionListener(this);
-	saveColorTable.addActionListener(this);
-	saveColorTableAs.addActionListener(this);
+        newColorTable.addActionListener(this);
+        loadColorTable.addActionListener(this);
+        saveColorTable.addActionListener(this);
+        saveColorTableAs.addActionListener(this);
         toggleAutoSave.addActionListener(this);
         toggleSoftColors.addActionListener(this);
-        
+
         addPane.addActionListener(this);
         removePane.addActionListener(this);
 
-	actions.add(newColorTable);
-	actions.add(loadColorTable);
-	actions.add(saveColorTable);
-	actions.add(saveColorTableAs);
+        actions.add(newColorTable);
+        actions.add(loadColorTable);
+        actions.add(saveColorTable);
+        actions.add(saveColorTableAs);
 
         actions.addSeparator();
         actions.add(toggleAutoSave);
@@ -332,22 +334,22 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         actions.add(addPane);
         actions.add(removePane);
 
-	menuBar.add(actions);
+        menuBar.add(actions);
 
         help = new JMenu("Help");
         about = new JMenuItem("About");
         controls = new JMenuItem("Controls");
         about.addActionListener(this);
         controls.addActionListener(this);
-        
+
         help.add(about);
         help.add(controls);
-    
+
         menuBar.add(help);
 
         //finish up
         mainWindow.setJMenuBar(menuBar);
-    
+
     }
 
     //
@@ -374,7 +376,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     //
     // Public access to managers and modules
     //
-    
+
     public DataManager getDataManager() {
         return dataManager;
     }
@@ -414,7 +416,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             displayControls();
         }
         else if (e.getSource() == about) {
-            
+
         }
 	//added temporary way to load color tables
 	else if(e.getSource() == loadColorTable){
@@ -431,6 +433,22 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             removePane.setEnabled(true);
         mainWindow.validate();
     }else if (e.getSource() == removePane) {
+        }
+        //added temporary way to load color tables
+        else if(e.getSource() == loadColorTable){
+            loadColorTable();
+        }else if(e.getSource() == saveColorTable){
+            saveColorTable();
+        }else if(e.getSource() == saveColorTableAs){
+            saveColorTableAs();
+        }else if(e.getSource() == newColorTable){
+            newColorTable();
+        }else if (e.getSource() == addPane) {
+            multiPane.addPane();
+            if (multiPane.numPanes() > 1)
+                removePane.setEnabled(true);
+            mainWindow.validate();
+        }else if (e.getSource() == removePane) {
             multiPane.removePane();
             if (multiPane.numPanes() == 1)
                 removePane.setEnabled(false);
@@ -438,28 +456,28 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         }
         else if (e.getSource() == toggleAutoSave) {
             colorTable.setAutoSave(toggleAutoSave.isSelected());
-            CONSOLE.println("Auto save enabled: " + 
+            CONSOLE.println("Auto save enabled: " +
                             toggleAutoSave.isSelected());
         }
         else if (e.getSource() == toggleSoftColors) {
             colorTable.setSoftColors(toggleSoftColors.isSelected());
-            CONSOLE.println("Soft colors enabled: " + 
+            CONSOLE.println("Soft colors enabled: " +
                             toggleSoftColors.isSelected());
         }
-	
+
     }
 
     // PropertyChangeListener method
     public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)
-                && !split_changing) {
+            && !split_changing) {
             split_changing = true;
             split_pane.setDividerLocation(DATA_MANAGER_HEIGHT);
             split_changing = false;
         }
     }
 
-    
+
 
 
 
@@ -477,11 +495,11 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         System.out.println(controls);
 
     }
-    
+
 
     //temp color table thing
     public void newColorTable(){
-	try{
+        try{
             // Determine the size of the color table based on the way the user
             // chose.
             ColorTable.Dimension d = ColorTable.getSize();
@@ -493,14 +511,15 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             else {
                 colorTable = new ColorTable(ColorTable.EMPTY, d);
             }
-            
-	    colorTable.setSoftColors(toggleSoftColors.isSelected());
+
+            colorTable.setSoftColors(toggleSoftColors.isSelected());
             // If they had been editing a table earlier, clear out their undos
             calibrate.clearHistory();
+            vision.newColorTable(colorTable);
         }
-	catch(IOException  e){
-	    return;
-	}
+        catch(IOException  e){
+            return;
+        }
         dataManager.notifyDependants();
         colorEdit.setTable(colorTable);
 
@@ -509,12 +528,12 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         colorTable.saveColorTable();
     }
     public void saveColorTableAs(){
-	colorTable.saveColorTableAs();
+        colorTable.saveColorTableAs();
     }
     public void loadColorTable() {
         String path = CONSOLE.promptFileOpen(
-            "Existing Color Table Location and Name",
-            ColorTable.LOAD_TABLE_PATH);
+                                             "Existing Color Table Location and Name",
+                                             ColorTable.LOAD_TABLE_PATH);
 
         if (path != null) {
             ColorTable temp = new ColorTable(path);
@@ -526,6 +545,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             // If they had been editing a table earlier, clear out their
             // undos
             calibrate.clearHistory();
+            vision.newColorTable(colorTable);
             dataManager.notifyDependants();
         }
 

@@ -64,7 +64,7 @@ micro_time (void)
 
 JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppProcessImage
 (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
- jstring jtablePath, jobjectArray thresh_target){
+ jbyteArray jtable, jstring jtablePath, jobjectArray thresh_target){
     //Size checking -- we expect the sizes of the arrays to match
     //Base these on the size cpp expects for the image
     int width = IMAGE_WIDTH;
@@ -90,7 +90,7 @@ JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppPr
     Profiler profiler =  Profiler(&micro_time);
     Vision vision = Vision(&pose,&profiler);
 
-    //Testing stuff 
+    //Testing stuff
 
     const char  *filename = env->GetStringUTFChars(jtablePath, 0);
     env->ReleaseStringUTFChars(jtablePath, filename);
@@ -107,13 +107,17 @@ JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppPr
     fread(test, sizeof(unsigned char), VMAX*UMAX*YMAX, fp);
 
     fclose(fp);
-    
-    
+
     //end testing
 
 
+
     //load the table
-    vision.thresh->initTableFromBuffer(test);
+    jbyte *buf_table = env->GetByteArrayElements( jtable, 0);
+    byte * table = (byte *)buf_table; //convert it to a reg. byte array
+    //vision.thresh->initTableFromBuffer(test);
+    vision.thresh->initTableFromBuffer(table);
+    env->ReleaseByteArrayElements( jtable, buf_table, 0);
     std::free(test);
 
 
@@ -148,7 +152,7 @@ JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppPr
         env->ReleaseByteArrayElements(row_target, row, 0);
     }
 
-    
+
     return;
 
 }

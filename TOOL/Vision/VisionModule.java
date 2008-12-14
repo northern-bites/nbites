@@ -100,7 +100,7 @@ public class VisionModule extends TOOLModule implements ColorTableListener {
     }
 
 
-    public void processFrame(){
+    protected void processFrame(){
         if(!currentFrame.hasImage()) return; //Don't even bother if there's no image
         TOOLImage img = currentFrame.image();
 
@@ -131,7 +131,7 @@ public class VisionModule extends TOOLModule implements ColorTableListener {
 
         //current hack to load a cpp color table
         //Eventually, need to pass an instance of the table to cpp
-        String colorTable = "table.mtb";
+        String colorTable = "table2.mtb";
         File ct = new File(colorTable);
         if(!ct.exists()){
             t.CONSOLE.error("Color table path \"" + colorTable +
@@ -140,10 +140,21 @@ public class VisionModule extends TOOLModule implements ColorTableListener {
             return;
         }
 
+        //If our local instance has not been set, try to get one from the tool
+        if (currentTable == null)
+            currentTable = t.getColorTable();
+        if (currentTable == null){ //if there's none in the tool, fail
+            t.CONSOLE.error("No color table loaded. Cannot process frame!");
+            return;
+        }
+
+        int ct_size =  currentTable.getYDimension()*currentTable.getUDimension()*currentTable.getVDimension();
+        byte[] rawTable = new byte[ct_size];
+        currentTable.writeByteArray(rawTable);
         //If we've made it this far, everything is A OK, so process the image,
         // yields a thresh image
-        byte[][] thresh = visionLink.processImage(rawImage,
-                                                  joints,colorTable);
+        byte[][] thresh = visionLink.processImage(rawImage,joints,
+                                                  rawTable,colorTable);
         //Init a new Thresholded image to display
         ThresholdedImage tImg = new ThresholdedImage(thresh,
                                                      img.getWidth(),
@@ -165,6 +176,16 @@ public class VisionModule extends TOOLModule implements ColorTableListener {
                                   ColorTableListener originator) {
         currentTable = source;
         processFrame();
+    }
+
+    public void newColorTable(ColorTable newTable){
+        setColorTable(newTable);
+        //not needed since notifyFrame is called in this instance,
+        //processFrame();
+    }
+
+    public void setColorTable(ColorTable newTable){
+        currentTable = newTable;
     }
 
 }
