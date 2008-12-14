@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.GridLayout;
 import java.util.HashMap;
+import java.text.DecimalFormat;
 
 public class DebugViewer extends JFrame {
 
@@ -98,6 +99,10 @@ public class DebugViewer extends JFrame {
     // takes a Point and maps it to a string
     public HashMap <Point2D.Double,String> cornerMap;
 
+    // Takes a numeric ID and returns an X,Y pair
+    public HashMap <Integer, Point2D.Double> objectIDMap;
+    public HashMap <Integer, String> objectIDStringMap;
+
     // frame labels
     private JLabel frameLabel1, frameLabel2;
     public JLabel frameNumber, frameTotal;
@@ -173,6 +178,9 @@ public class DebugViewer extends JFrame {
     private Component landmark_components[];
     private int num_landmarks;
 
+    // Format output for better display readability
+    private DecimalFormat niceOutput;
+
     public DebugViewer(WorldController _wc, int x, int y) {
         super("Debug Viewer");
 
@@ -188,6 +196,8 @@ public class DebugViewer extends JFrame {
         landmark_components = new Component[10];
 
         cornerMap = new HashMap<Point2D.Double,String>();
+        objectIDMap = new HashMap<Integer, Point2D.Double>();
+        objectIDStringMap = new HashMap<Integer, String>();
 
         // frame number
 
@@ -364,6 +374,7 @@ public class DebugViewer extends JFrame {
         setVisible(false);
 
         populateCornerMap();
+        populateObjectIDMap();
         LANDMARK_X = new int[18];
         LANDMARK_X[0] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_X;
         LANDMARK_X[1] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_X;
@@ -407,6 +418,8 @@ public class DebugViewer extends JFrame {
                                 wc.the_field.GOAL_BOX_HEIGHT);
         LANDMARK_Y[17] = (int) (wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
                                 wc.the_field.GOAL_BOX_HEIGHT);
+
+        niceOutput = new DecimalFormat("####.##");
     }
 
     private void populateCornerMap() {
@@ -415,6 +428,31 @@ public class DebugViewer extends JFrame {
             new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
                                wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
         cornerMap.put(blueCornerLeftL, "Blue Corner Left L");
+    }
+
+    private void populateObjectIDMap()
+    {
+        Point2D.Double bglpPT =
+            new Point2D.Double(wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
+                               wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_Y);
+        objectIDMap.put(new Integer(30), bglpPT);
+        objectIDStringMap.put(new Integer(30), "Blue goal left post");
+        Point2D.Double bgrpPT =
+            new Point2D.Double(wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
+                               wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y);
+        objectIDMap.put(new Integer(31), bgrpPT);
+        objectIDStringMap.put(new Integer(31), "Blue goal right post");
+        Point2D.Double yglpPT =
+            new Point2D.Double(wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_X,
+                               wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_Y);
+        objectIDMap.put(new Integer(32), yglpPT);
+        objectIDStringMap.put(new Integer(32), "Yellow goal left post");
+        Point2D.Double ygrpPT =
+            new Point2D.Double(wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_X,
+                               wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_Y);
+        objectIDMap.put(new Integer(33), ygrpPT);
+        objectIDStringMap.put(new Integer(33), "Yellow goal right post");
+
     }
 
     public Dimension getMinimumSize()
@@ -428,7 +466,8 @@ public class DebugViewer extends JFrame {
     }
 
     public void addLandmark(int id, double dist, double bearing) {
-        if (id < 0 || id >= wc.NUM_LANDMARKS) {
+        if (id < 0 || id >= wc.NUM_LANDMARKS &&
+            !(objectIDMap.containsKey(new Integer(id)))) {
             System.out.println("DebugViewer.java sawLandmark(): " +
                                "Saw Non-Existant Landmark: " + id +
                                " at line " + frameNumber.getText());
@@ -443,11 +482,17 @@ public class DebugViewer extends JFrame {
         JLabel colon_label, slash_label;
         JPanel panel;
 
-        // get id string from LANDMARKS array
-        id_label = new JLabel(LANDMARKS[id], JLabel.CENTER);
+        if (objectIDMap.containsKey(new Integer(id))) {
+            id_label = new JLabel(objectIDStringMap.get(new Integer(id)),
+                                  JLabel.CENTER);
+        } else {
+            // get id string from LANDMARKS array
+            id_label = new JLabel(LANDMARKS[id], JLabel.CENTER);
+        }
+
         // convert dist/bearing to strings, add to labels
-        dist_label = new JLabel("" + dist, JLabel.CENTER);
-        bearing_label = new JLabel("" + bearing, JLabel.CENTER);
+        dist_label = new JLabel(niceOutput.format(dist), JLabel.CENTER);
+        bearing_label = new JLabel(niceOutput.format(bearing), JLabel.CENTER);
         // make a colon and slash as JLabels
         colon_label = new JLabel(":", JLabel.CENTER);
         slash_label = new JLabel("/", JLabel.CENTER);
@@ -538,4 +583,9 @@ public class DebugViewer extends JFrame {
 
 	lbl.setText("" + value);
 	}*/
+
+    public boolean isDistinctLandmarkID(int ID)
+    {
+        return ( ID >= 30 && ID <= 33);
+    }
 }

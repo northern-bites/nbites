@@ -706,10 +706,18 @@ public class LogHandler
         // Pull off the data 4 items at a time for each particle
         // The items are (x,y,h,weight)
         for(int i = 0; i < lineValues.length; i += 4) {
-            particles.add(new MCLParticle(Float.parseFloat(lineValues[i]),
+            try{
+                particles.add(new
+                              MCLParticle(Float.parseFloat(lineValues[i]),
                                           Float.parseFloat(lineValues[i+1]),
                                           Float.parseFloat(lineValues[i+2]),
                                           Float.parseFloat(lineValues[i+3])));
+            } catch (NumberFormatException nfe) {
+                //System.out.println(nfe.getMessage());
+                System.out.println("Attempted to add nan particle at index " +
+                                   i + " in line " + log_marker);
+                return particles;
+            }
         }
         return particles;
     }
@@ -740,7 +748,7 @@ public class LogHandler
             if (log_strings != null && log_marker < log_strings.size()) {
 
                 // Split the log at the :
-                t = new StringTokenizer(log_strings.get(log_marker),":");
+                t = new StringTokenizer(log_strings.get(log_marker-1),":");
 
                 // Paint the particles on the screen
                 particleInfo = t.nextToken();
@@ -749,6 +757,20 @@ public class LogHandler
                 // Update the debug viewer
                 debugInfo = t.nextToken();
                 processDebugInfo(debugInfo);
+
+                // Draw the uncertainty ellipses on the screen
+                painter.updateUncertainytInfo(Double.parseDouble
+                                              (debugViewer.myX.getText()),
+                                              Double.parseDouble
+                                              (debugViewer.myY.getText()),
+                                              Double.parseDouble
+                                              (debugViewer.myH.getText()),
+                                              Double.parseDouble
+                                              (debugViewer.myUncertX.getText()),
+                                              Double.parseDouble
+                                              (debugViewer.myUncertY.getText()),
+                                              Double.parseDouble
+                                              (debugViewer.myUncertH.getText()));
 
                 // Update the observed landarmks information
                 // Check if any landmarks were sighted this frame
@@ -820,8 +842,8 @@ public class LogHandler
         // Iterate through the landmark IDs getting the correct ones
         for(int i = 0; i < infos.length; i++) {
             int ID = Integer.parseInt(infos[i]);
-            float dist = Float.parseFloat(infos[i++]);
-            float bearing = Float.parseFloat(infos[i++]);
+            float dist = Float.parseFloat(infos[++i]);
+            float bearing = Float.parseFloat(infos[++i]);
 
             // Write sighted landmarks to the debug viewer
             debugViewer.addLandmark(ID,dist,bearing);
@@ -843,11 +865,12 @@ public class LogHandler
     private void decodeAndDisplayLandmark(int ID)
     {
         // Determine the type of landmark and draw it
-        if (ID < debugViewer.BALL_ID) { // We have a distinct landmark
-            painter.sawLandmark(debugViewer.LANDMARK_X[ID],
-                                debugViewer.LANDMARK_Y[ID],
+        // We have a distinct landmark
+        if (debugViewer.isDistinctLandmarkID(ID)) {
+            painter.sawLandmark((int)debugViewer.objectIDMap.get(ID).x,
+                                (int)debugViewer.objectIDMap.get(ID).y,
                                 0);
-        } else if (ID > debugViewer.BALL_ID) { // We have an ambigious landmark
+        } else if (ID != debugViewer.BALL_ID) { // We have an ambigious landmark
             // get the list of possible landmarks
             for (int pos_id : getPossibleIDs(ID)) {
                 painter.sawLandmark(debugViewer.LANDMARK_X[pos_id],

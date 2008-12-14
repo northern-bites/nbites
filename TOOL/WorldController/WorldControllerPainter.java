@@ -127,6 +127,8 @@ public class WorldControllerPainter implements DogListener
     private int mclTeamColor;
     private int mclPlayerNum;
 
+    private double[] positionEstimates;
+    private double[] uncertaintyEstimates;
     /**
      * Constructs the painter to draw all possible localization information
      * @param toView Field on which the painter will paint.
@@ -153,6 +155,9 @@ public class WorldControllerPainter implements DogListener
         currentParticles = new Vector<MCLParticle>();
         mclTeamColor = 0;
         mclPlayerNum = 1;
+
+        positionEstimates = new double[3];
+        uncertaintyEstimates = new double[3];
     }
 
     /**
@@ -168,6 +173,7 @@ public class WorldControllerPainter implements DogListener
             paintLandmarks(g2);
             paintDogInformation(g2);
             paintParticleSet(g2);
+            paintEstimateMeanAndVariance(g2);
         } catch (ConcurrentModificationException e) {
             // Ignore.  The painting and simulation threads are trying
             // to concurrently access elements in the same list
@@ -794,6 +800,29 @@ public class WorldControllerPainter implements DogListener
     }
 
     /**
+     * Updates the current position estimates and uncertainty measures
+     *
+     * @param _x
+     * @param _y
+     * @param _h
+     * @param _uncertX
+     * @param _uncertY
+     * @param _uncertH
+     */
+    public void updateUncertainytInfo(double _x, double _y, double _h,
+                                      double _uncertX, double _uncertY,
+                                      double _uncertH)
+    {
+        positionEstimates[0] = field.fieldToScreenX((int)_x);
+        positionEstimates[1] = field.fieldToScreenY((int)_y);
+        positionEstimates[2] = _h;
+        uncertaintyEstimates[0] = _uncertX;
+        uncertaintyEstimates[1] = _uncertY;
+        uncertaintyEstimates[2] = _uncertH;
+
+    }
+
+    /**
      * Paints the current set of particles on the field.  Called by
      * updateInfomration when the WorldControllerViewer is updated.
      *
@@ -808,9 +837,21 @@ public class WorldControllerPainter implements DogListener
                 partColor = DOG_COLOR_BLUE_TEAM;
             }
             drawParticle(g2, partColor, field.fieldToScreenX(p.getX()),
-                         field.fieldToScreenY(p.getY()), p.getH() - 90.0f,
+                         field.fieldToScreenY(p.getY()), p.getH() + 90.0f,
                          p.getWeight());
         }
+    }
+
+    /**
+     * Paints the uncertainty ellipses and estimate center for the
+     * reported information
+     *
+     * @param g2 The graphics context to be drawn on.
+     */
+    public void paintEstimateMeanAndVariance(Graphics2D g2) {
+        drawDogsUncertainty(g2, positionEstimates[0], positionEstimates[1],
+                            positionEstimates[2], uncertaintyEstimates[0],
+                            uncertaintyEstimates[1], uncertaintyEstimates[2]);
     }
 
     /**
@@ -833,17 +874,5 @@ public class WorldControllerPainter implements DogListener
         field.drawLine(drawing_on, in_color, field.DRAW_STROKE, x, y,
                        x + PARTICLE_HEADING_DIST*Math.cos(h),
                        y + PARTICLE_HEADING_DIST*Math.sin(h));
-    }
-
-    /**
-     * Method draws an elipse of the associated position error centered at the
-     * weighted mean of the particle set.
-     *
-     * @param meanX The weighted mean of the x estimate of the particles
-     * @param meanY The weighted mean of the y estimate of the particles
-     * @param meanH The weighted mean of the heading estimate of the particles
-     */
-    public void drawMCLMeanAndVariance(float meanX, float meanY, float meanH)
-    {
     }
 }
