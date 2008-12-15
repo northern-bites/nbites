@@ -45,7 +45,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             //transfer the nextStep element from future to current list
             futureSteps.pop_front();
             currentZMPDSteps.push_back(nextStep);
-          
+
         }
     }
 
@@ -87,7 +87,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
         int numFutureSteps  = static_cast<int>(futureSteps.size());
         if (numCurrentSteps  + numFutureSteps < MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
- 
+
         //We may eventually be able to do withouth this switch
         switch(max(numCurrentSteps,3)){
         case 3:
@@ -118,11 +118,11 @@ WalkLegsTuple StepGenerator::tick_legs(){
             throw "Something odd is happening in a StepGen switch statement";
 
         }
-        
+
         //update the translation matrix between i and f coord. frames
         ublas::matrix<float> stepTransform = getStepTransMatrix(supportStep);
         //cout <<"Step transform" << stepTransform <<endl;
-        if_Transform = prod(stepTransform,if_Transform); 
+        if_Transform = prod(stepTransform,if_Transform);
         //TODO: -> start work here. Need to verify how coord frames work!!
         //express the supporting foot and swinging foots locations in f coord.
 

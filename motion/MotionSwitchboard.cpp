@@ -5,7 +5,7 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
       nextJoints(Kinematics::NUM_JOINTS, 0.0),
       running(false)
 {
-    
+
     //Allow safe access to the next joints
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
@@ -59,7 +59,12 @@ void* MotionSwitchboard::runThread(void *switchboard) {
  * takes too long, the enactor will send old joints.
  */
 void MotionSwitchboard::run() {
+    static int fcount = 0;
     while(running) {
+        if(fcount == 1){
+            //hack to help keep from falling over in the simulator
+            usleep(2*1000*1000);
+        }
         // Calculate the next joints and get them
         walkProvider.calculateNextJoints();
 
@@ -77,7 +82,7 @@ void MotionSwitchboard::run() {
         sensors->setBodyAngles(nextJoints);
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
         pthread_mutex_unlock(&next_joints_mutex);
-
+        fcount++;
     }
 }
 

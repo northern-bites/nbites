@@ -7,6 +7,9 @@ void SimulatorEnactor::run() {
     AL::ALMotionProxy *motionProxy = AL::ALMotionProxy::getInstance();
     motionProxy->setBodyStiffness(0.85f, 0.1f);
 
+    //hack to keep from falling over in the simulator
+    usleep(2*1000*1000);
+
     while (running) {
 
         vector <float> result = switchboard->getNextJoints();
