@@ -6,8 +6,6 @@ HeadProvider::HeadProvider(float motionFrameLength,
 	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),
-	  nextJoints(),
-	  choppedHeadCommand(),
 	  headCommandQueue(),
 	  headQueue(HEAD_CHAIN)
 {
@@ -57,18 +55,16 @@ void HeadProvider::setNextHeadCommand() {
 
 	if ( !headCommandQueue.empty() ) {
 		const HeadJointCommand *command = headCommandQueue.front();
-		choppedHeadCommand = chopper.chopCommand(command);
+		queue<vector<vector<float> > >*	choppedHeadCommand = chopper.chopCommand(command);
 		headCommandQueue.pop();
 		delete command;
 
-		while (!choppedHeadCommand.empty()) {
+		while (!choppedHeadCommand->empty()) {
 			// Push commands onto head queue
-			headQueue.push(choppedHeadCommand.front().at(HEAD_CHAIN));
-			choppedHeadCommand.pop();
-			cout << "headq size is " << headQueue.size() << endl;
-			cout << "headq front 0 is " << headQueue.front().at(0) << endl;
-			cout << "headq front 1 is " << headQueue.front().at(1) << endl;
+			headQueue.push(choppedHeadCommand->front().at(HEAD_CHAIN));
+			choppedHeadCommand->pop();
 		}
+		delete choppedHeadCommand;
 	}
 }
 

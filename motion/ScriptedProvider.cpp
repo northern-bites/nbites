@@ -6,8 +6,6 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
 	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),
-	  nextJoints(),
-	  choppedBodyCommand(),
 	  bodyCommandQueue()
 {
 	// No head chain, only body chains
@@ -98,11 +96,11 @@ void ScriptedProvider::setNextBodyCommand() {
 
 		const BodyJointCommand *command = bodyCommandQueue.front();
 		bodyCommandQueue.pop();
-		choppedBodyCommand = chopper.chopCommand(command);
+		queue<vector<vector<float> > >* choppedBodyCommand = chopper.chopCommand(command);
 		delete command;
 
 		vector<ChainQueue>::iterator i;
-		while (!choppedBodyCommand.empty()) {
+		while (!choppedBodyCommand->empty()) {
 			// Pass each chain to its chainqueue
 
 			// Skips the HEAD_CHAIN and enqueues all body chains
@@ -110,11 +108,12 @@ void ScriptedProvider::setNextBodyCommand() {
 			while ( i != chainQueues.end() ) {
 				// Subtract 1 because there is no head chain in the
 				// choppedBodyCommand (it's only body joints)
-				i->push( choppedBodyCommand.front().at( i->getChainID() ) );
+				i->push( choppedBodyCommand->front().at( i->getChainID() ) );
 				i++;
 			}
-			choppedBodyCommand.pop();
+			choppedBodyCommand->pop();
 		}
+		delete choppedBodyCommand;
 	}
 }
 

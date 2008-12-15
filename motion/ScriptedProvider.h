@@ -31,7 +31,6 @@ private:
 	float FRAME_LENGTH_S;
 	ChopShop chopper;
 	vector<vector<float> > nextJoints;
-	queue<vector<vector<float> > > choppedBodyCommand;
 
 	// ChainQueues
 	vector<ChainQueue> chainQueues;

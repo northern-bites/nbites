@@ -2,16 +2,14 @@
 
 ChopShop::ChopShop (Sensors *s, float motionFrameLength)
 	: sensors(s),
-	  FRAME_LENGTH_S(motionFrameLength),
-	  choppedJoints(),
-	  nextChain()
+	  FRAME_LENGTH_S(motionFrameLength)
 {
 
 }
 
 // Breaks command into FRAME_LENGTH_S size pieces,
 // adds it to the queue
-queue<vector<vector<float> > > ChopShop::chopCommand(const JointCommand *command) {
+queue<vector<vector<float> > >* ChopShop::chopCommand(const JointCommand *command) {
 	// It's a BJC so it deals with 4 chains
 
 	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
@@ -26,11 +24,11 @@ queue<vector<vector<float> > > ChopShop::chopCommand(const JointCommand *command
 }
 
 // Smooth interpolation motion
-queue<vector<vector<float> > >
+queue<vector<vector<float> > >*
 ChopShop::chopSmooth(const JointCommand *command) {
 
 	// PLACE HOLDER
-	queue<vector<vector<float> > > a;
+	queue<vector<vector<float> > >* a;
 	return a;
 }
 
@@ -42,15 +40,10 @@ ChopShop::chopSmooth(const JointCommand *command) {
  *
  *
  */
-queue<vector<vector<float> > >
+queue<vector<vector<float> > >*
 ChopShop::chopLinear(const JointCommand *command) {
-
-	// Clear previous queue and vectors
- 	while (!choppedJoints.empty())
- 		choppedJoints.pop();
-
 	// Get number of chops according to duration
-	float numChops = command->getDuration()/FRAME_LENGTH_S;
+	int numChops = (int)(command->getDuration()/FRAME_LENGTH_S);
 
 	vector<float> currentJoints = getCurrentJoints();
 	// Add final joints for all chains
@@ -62,8 +55,8 @@ ChopShop::chopLinear(const JointCommand *command) {
 											   &currentJoints,
 											   &finalJoints);
 
-	buildChops(numChops, &currentJoints, &diffPerChop, command);
-	return choppedJoints;
+
+	return buildChops(numChops, &currentJoints, &diffPerChop, command);
 }
 
 vector<float> ChopShop::getCurrentJoints() {
@@ -73,7 +66,7 @@ vector<float> ChopShop::getCurrentJoints() {
 	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
 
 	// Adjust to real currentJoints, not Sensors'
-	for (int i=0; i<NUM_JOINTS ; i++)
+	for (unsigned int i=0; i<NUM_JOINTS ; i++)
 		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
 
 	return currentJoints;
@@ -87,9 +80,9 @@ vector<float> ChopShop::getFinalJoints(const JointCommand *command,
 	vector<float>::iterator currentStart = currentJoints->begin();
 	vector<float>::iterator currentEnd = currentJoints->begin();
 
-	for (int chain=0; chain < NUM_CHAINS;chain++) {
+	for (unsigned int chain=0; chain < NUM_CHAINS;chain++) {
 		// First, get chain joints from command
-		nextChain = command->getJoints((ChainID)chain);
+		const vector<float> *nextChain = command->getJoints((ChainID)chain);
 
 		// Set the end iterator
 		currentEnd += chain_lengths[chain];
@@ -119,7 +112,7 @@ vector<float> ChopShop::getDiffPerChop(int numChops,
 									   vector<float> *final) {
 	vector<float> diffPerChop;
 
-	for ( int joint_id=0; joint_id < NUM_JOINTS ;++joint_id) {
+	for (unsigned int joint_id=0; joint_id < NUM_JOINTS ;++joint_id) {
 		diffPerChop.push_back( (final->at(joint_id) -
 								current->at(joint_id)) / numChops);
 	}
@@ -128,10 +121,11 @@ vector<float> ChopShop::getDiffPerChop(int numChops,
 }
 
 // Takes final joint values and
-void ChopShop::buildChops(float numChops,
+queue<vector<vector<float> > >* ChopShop::buildChops(int numChops,
 						  vector<float> *currentJoints,
 						  vector<float> *diffPerChop,
 						  const JointCommand *command) {
+	queue<vector<vector<float> > >* choppedJoints = new queue<vector<vector<float> > >();
 	float nextVal;
 
 	for (int num_chopped=1; num_chopped<=numChops; num_chopped++ ) {
@@ -155,9 +149,9 @@ void ChopShop::buildChops(float numChops,
 //					cout << "nextVal is" << nextVal << " for chain " << *chain << endl;
 			}
 		}
-		choppedJoints.push(nextChopped);
+		choppedJoints->push(nextChopped);
 	}
-
+	return choppedJoints;
 
 } // END CHOP THAT
 
