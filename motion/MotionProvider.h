@@ -29,7 +29,6 @@ public:
 protected:
     void setNextChainJoints(const ChainID id,
                             const vector <float> &chainJoints) {
-		std::cout << "chain " << id << " at(0) is " << chainJoints.at(0) << endl;
         nextJoints[id] = chainJoints;
     }
 

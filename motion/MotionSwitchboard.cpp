@@ -17,6 +17,17 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
 							   headJoints2,
 							   Kinematics::INTERPOLATION_LINEAR);
 
+	vector<float>* headJoints2 = new vector<float>(2,0.0f);
+	hjc2 = new HeadJointCommand(3.0f,
+								headJoints2,
+								Kinematics::INTERPOLATION_LINEAR);
+	vector<float>* headJoints3 = new vector<float>(2,-90.0f);
+	hjc3 = new HeadJointCommand(10.0f,
+								headJoints3,
+								Kinematics::INTERPOLATION_LINEAR);
+
+
+
 	vector<float>* bodyJoints3 = new vector<float>(4,45.0f);
 	command3 = new BodyJointCommand(5.0f, LARM_CHAIN,
 									bodyJoints3,
@@ -49,8 +60,10 @@ void MotionSwitchboard::start() {
 
 	headProvider.enqueue(hjc);
 	scriptedProvider.enqueue(command);
-//	scriptedProvider.enqueue(command2);
-//	scriptedProvider.enqueue(command3);
+	scriptedProvider.enqueue(command2);
+	scriptedProvider.enqueue(command3);
+	headProvider.enqueue(hjc2);
+	headProvider.enqueue(hjc3);
 
     running = true;
 
@@ -127,7 +140,6 @@ void MotionSwitchboard::run() {
         fcount++;
 
     }
-
 }
 
 

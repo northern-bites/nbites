@@ -44,6 +44,8 @@ private:
 
     bool running;
 	const HeadJointCommand *hjc;
+	const HeadJointCommand *hjc2;
+	const HeadJointCommand *hjc3;
 	vector<float> *bodyJoints;
 	vector<float> *bodyJoints2;
 

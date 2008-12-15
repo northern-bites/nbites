@@ -30,14 +30,20 @@ void ScriptedProvider::requestStop() {
 
 void ScriptedProvider::calculateNextJoints() {
 
-	vector <vector <float> > currentChains = getCurrentChains();
+
 	// If all queues are empty, then the next command must
 	// be chopped and used.
 	bool allEmpty = true;
 
+<<<<<<< HEAD:motion/ScriptedProvider.cpp
 	for ( int i=0 ; i<chainQueues.size() ; i++ ) {
 		if ( !chainQueues.at(i).empty() ) {
 			cout << "not empty!" << endl;
+=======
+
+	for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
+		if ( !chainQueues.at(i).empty() ) {
+>>>>>>> Fixed errors in Scripted and Head Providers. It is now possible to enqueue multiple head and body joint commands without error. Although, head moves seem to move too quickly.:motion/ScriptedProvider.cpp
 			allEmpty=false;
 		}
 	}
@@ -50,15 +56,13 @@ void ScriptedProvider::calculateNextJoints() {
 	// joints as the next Chain joints
 	vector<ChainQueue>::iterator i;
 	i = chainQueues.begin();
+	vector <vector <float> > currentChains = getCurrentChains();
 
 	while ( i != chainQueues.end() ) {
 		ChainID chainID = i->getChainID();
 		if ( i->empty() ) {
-			cout << "chain " << chainID << " is empty" << endl;
-			cout << "current has size " << currentChains.at(chainID).size() << endl;
 			setNextChainJoints( chainID, currentChains.at(chainID) );
 		} else {
-			cout << "chain " << chainID << " has size " << i->front().size() << endl;
 			setNextChainJoints( chainID, i->front() );
 			i->pop();
 		}
@@ -89,8 +93,6 @@ void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq
 }
 
 void ScriptedProvider::setNextBodyCommand() {
-	cout << "bodyCommandQueue.size() = " << bodyCommandQueue.size() << endl;
-
 	// If there are no more commands, don't try to enqueue one
 	if ( !bodyCommandQueue.empty() ) {
 
@@ -99,13 +101,16 @@ void ScriptedProvider::setNextBodyCommand() {
 		choppedBodyCommand = chopper.chopCommand(command);
 		delete command;
 
+		vector<ChainQueue>::iterator i;
 		while (!choppedBodyCommand.empty()) {
 			// Pass each chain to its chainqueue
-			vector<ChainQueue>::iterator i;
+
 			// Skips the HEAD_CHAIN and enqueues all body chains
 			i = chainQueues.begin();
 			while ( i != chainQueues.end() ) {
-				i->push(choppedBodyCommand.front().at( i->getChainID() ));
+				// Subtract 1 because there is no head chain in the
+				// choppedBodyCommand (it's only body joints)
+				i->push( choppedBodyCommand.front().at( i->getChainID() ) );
 				i++;
 			}
 			choppedBodyCommand.pop();
@@ -114,22 +119,27 @@ void ScriptedProvider::setNextBodyCommand() {
 }
 
 vector<vector<float> > ScriptedProvider::getCurrentChains() {
-	vector<vector<float> > currentChains(NUM_BODY_CHAINS);
+	vector<vector<float> > currentChains(NUM_CHAINS,vector<float>(0));
 
 	vector<float> currentJoints = sensors->getBodyAngles();
 	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
 
+<<<<<<< HEAD:motion/ScriptedProvider.cpp
 	for (unsigned int i=0; i<NUM_JOINTS ; i++){
+=======
+	for (unsigned int i=0; i<NUM_JOINTS ; i++) {
+>>>>>>> Fixed errors in Scripted and Head Providers. It is now possible to enqueue multiple head and body joint commands without error. Although, head moves seem to move too quickly.:motion/ScriptedProvider.cpp
 		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
 	}
 
-	unsigned int lastChainJoint = HEAD_JOINTS;
-	unsigned int joint=HEAD_JOINTS;
-	for (unsigned int chain=LARM_CHAIN/* skip head*/;chain<NUM_CHAINS; chain++) {
+	unsigned int lastChainJoint = 0;
+	unsigned int joint = 0;
+
+	for (unsigned int chain=HEAD_CHAIN;chain<NUM_CHAINS; chain++) {
 		lastChainJoint += chain_lengths[chain];
 
 		for ( ; joint < lastChainJoint ; joint++) {
-			currentChains.at(chain-1/*No head in currentChains*/).push_back(currentJoints[joint]);
+			currentChains.at(chain).push_back(currentJoints.at(joint));
 		}
 
 	}
