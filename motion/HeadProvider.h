@@ -1,7 +1,8 @@
-#ifndef _ScriptedProvider_h_DEFINED
-#define _ScriptedProvider_h_DEFINED
+#ifndef _HeadProvider_h_DEFINED
+#define _HeadProvider_h_DEFINED
 
 #include <vector>
+#include <queue>
 
 #include "MotionProvider.h"
 #include "ChainQueue.h"
@@ -23,7 +24,7 @@ public:
 	void calculateNextJoints();
 
 	void enqueue(const HeadJointCommand *command);
-	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
+	void enqueueSequence(vector<const HeadJointCommand*> &seq);
 
 private:
 	Sensors *sensors;
@@ -32,15 +33,14 @@ private:
 	vector<vector<float> > nextJoints;
 	queue<vector<vector<float> > > choppedHeadCommand;
 
-
 	ChainQueue headQueue;
 	// Queue of all future commands
 	queue<const HeadJointCommand*> headCommandQueue;
 
-	void setNextHeadCommand();
-	vector<float> getCurrentHeads();
-
 	pthread_mutex_t head_mutex;
-}
+
+	vector<float> getCurrentHeads();
+	void setNextHeadCommand();
+};
 
 #endif

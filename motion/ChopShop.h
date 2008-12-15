@@ -34,7 +34,6 @@ private:
 	queue<vector<vector<float> > > choppedJoints;
 	const vector<float> *nextChain;
 
-	list<int> *chainList;
 	queue<vector<vector<float> > > chopSmooth(const JointCommand *command);
 	queue<vector<vector<float> > > chopLinear(const JointCommand *command);
 
@@ -48,7 +47,8 @@ private:
 
 	void buildChops(float numChops,
 					vector<float> *currentJoints,
-					vector<float> *diffPerChop);
+					vector<float> *diffPerChop,
+					const JointCommand *command);
 };
 
 #endif

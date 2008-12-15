@@ -2,6 +2,7 @@
 #define _ScriptedProvider_h_DEFINED
 
 #include <vector>
+#include <queue>
 
 #include "MotionProvider.h"
 #include "ChainQueue.h"
@@ -9,7 +10,6 @@
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"
-#include "BodyJointCommand.h"
 
 using namespace std;
 using namespace Kinematics;
@@ -23,9 +23,8 @@ public:
     void requestStop();
     void calculateNextJoints();
 
-
 	void enqueue(const BodyJointCommand *command);
-	void enqueueSequence(std::vector<BodyJointCommand*> &seq);
+	void enqueueSequence(std::vector<const BodyJointCommand*> &seq);
 
 private:
 	Sensors *sensors;

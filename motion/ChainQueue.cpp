@@ -1,8 +1,8 @@
 #include "ChainQueue.h"
 
-ChainQueue::ChainQueue (ChainID newChainID)
+ChainQueue::ChainQueue (ChainID id)
 	: queue<vector<float> >(),
-	  chainID(newChainID)
+	  chainID(id)
 {
 
 }

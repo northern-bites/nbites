@@ -31,7 +31,7 @@ class BodyJointCommand : public JointCommand {
     BodyJointCommand(const BodyJointCommand &other);
     ~BodyJointCommand(void);
 
-    virtual const std::vector<float>* getJoints(ChainID chainID) const;
+    virtual const  std::vector<float>* getJoints(ChainID chainID) const;
     const std::vector<float>* getLArmJoints(void) const { return larm_joints; }
     const std::vector<float>* getLLegJoints(void) const { return lleg_joints; }
     const std::vector<float>* getRLegJoints(void) const { return rleg_joints; }

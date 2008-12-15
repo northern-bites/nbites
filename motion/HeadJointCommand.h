@@ -28,12 +28,17 @@ public:
 
 	// TODO @JGM NEED A CHECK ON THE CHAINID REQUEST
 	virtual const std::vector<float>* getJoints(ChainID chain) const {
-		return headJoints;
+		if (chain == HEAD_CHAIN) {
+			return headJoints;
+		} else {
+			return &noJoints;
+		}
 	}
 private:
 	//const skew_function skew_func;
 	const std::vector<float> *headJoints;
 	virtual void setChainList();
+	const std::vector<float> noJoints;
 };
 
 #endif

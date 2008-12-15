@@ -16,7 +16,6 @@ public:
 	ChainID getChainID() {return chainID;};
 	void clear();
 
-
 private:
 	ChainID chainID;
 

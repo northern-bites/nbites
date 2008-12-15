@@ -14,7 +14,7 @@
 
 class JointCommand : public MotionCommand {
 public:
-	JointCommand(MotionConstants::MotionType motionType,
+	JointCommand(const MotionConstants::MotionType motionType,
 				 const float _duration,
 				 const Kinematics::InterpolationType _type)
 		: MotionCommand(motionType), duration(_duration), type(_type) { }

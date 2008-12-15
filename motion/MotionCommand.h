@@ -16,14 +16,14 @@ public:
 	MotionCommand(MotionConstants::MotionType type)
 		: chainList(), motionType(type) { }
 
-	MotionConstants::MotionType getType() { return motionType; }
-	std::list<int> getChainList() { return chainList; }
+	const MotionConstants::MotionType getType() const { return motionType; }
+	const std::list<int>* getChainList() const { return &chainList; }
 
 protected:
 	std::list<int> chainList;
 private:
 	virtual void setChainList() = 0;
-	MotionConstants::MotionType motionType;
+	const MotionConstants::MotionType motionType;
 };
 
 #endif

@@ -18,9 +18,11 @@ using namespace std;
 #include "Kinematics.h"
 #include "WalkProvider.h"
 #include "ScriptedProvider.h"
+#include "HeadProvider.h"
 #include "Sensors.h"
 
 #include "BodyJointCommand.h"
+#include "HeadJointCommand.h"
 
 class MotionSwitchboard {
 public:
@@ -33,27 +35,25 @@ public:
 
     const vector <float> getNextJoints();
 
-
-
 private:
     Sensors *sensors;
     WalkProvider walkProvider;
 	ScriptedProvider scriptedProvider;
+	HeadProvider headProvider;
     vector <float> nextJoints;
 
     bool running;
-
+	const HeadJointCommand *hjc;
 	vector<float> *bodyJoints;
 	vector<float> *bodyJoints2;
-	BodyJointCommand *command;
-	BodyJointCommand *command2;
-	BodyJointCommand *command3;
 
+	const BodyJointCommand *command;
+	const BodyJointCommand *command2;
+	const BodyJointCommand *command3;
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
     pthread_mutex_t next_joints_mutex;
-
 };
 
 #endif

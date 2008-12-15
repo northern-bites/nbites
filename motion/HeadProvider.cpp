@@ -8,12 +8,14 @@ HeadProvider::HeadProvider(float motionFrameLength,
 	  chopper(sensors, FRAME_LENGTH_S),
 	  nextJoints(),
 	  choppedHeadCommand(),
-	  headCommandQueue()
-
+	  headCommandQueue(),
+	  headQueue(HEAD_CHAIN)
 {
 	pthread_mutex_init (&head_mutex, NULL);
 }
 
+
+// Motion Provider Methods
 HeadProvider::~HeadProvider() {
 	// remove all remaining values from chain queues
 }
@@ -23,40 +25,51 @@ void HeadProvider::requestStop() {
 }
 
 void HeadProvider::calculateNextJoints() {
+	vector<float> currentHeads = getCurrentHeads();
+	cout << "headqueue size is " << headQueue.size() << endl;
+	if ( headQueue.empty() )
+		setNextHeadCommand();
 
+	if (!headQueue.empty() ) {
+		setNextChainJoints( HEAD_CHAIN, headQueue.front() );
+		cout << "headqueuefront 0 is " << headQueue.front().at(0) << endl;
+		cout << "headqueuefront 1 is " << headQueue.front().at(1) << endl;
+		headQueue.pop();
+	}
+	else {
+		setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
+	}
 }
+
 void HeadProvider::enqueue(const HeadJointCommand *command) {
 	headCommandQueue.push(command);
 }
 
-void HeadProvider::enqueueSequence(std::vector<HeadJointCommand*> &seq) {
+void HeadProvider::enqueueSequence(std::vector<const HeadJointCommand*> &seq) {
 	// Take in vec of commands and enqueue them all
 	pthread_mutex_lock(&head_mutex);
-	for (vector<HeadJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
+	for (vector<const HeadJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
 		enqueue(*i);
 	pthread_mutex_unlock(&head_mutex);
 }
-
 
 void HeadProvider::setNextHeadCommand() {
 
 	if ( !headCommandQueue.empty() ) {
 		const HeadJointCommand *command = headCommandQueue.front();
-		headCommandQueue.pop();
 		choppedHeadCommand = chopper.chopCommand(command);
+		headCommandQueue.pop();
 		delete command;
 
-		while (!choppedHeadCommand.empty()){
-			// Pass each chain to its chainqueue
-			chainQueues.at(HEAD_CHAIN).push(choppedHeadCommand.front().at(HEAD_CHAIN));
+		while (!choppedHeadCommand.empty()) {
+			// Push commands onto head queue
+			headQueue.push(choppedHeadCommand.front().at(HEAD_CHAIN));
 			choppedHeadCommand.pop();
-
+			cout << "headq size is " << headQueue.size() << endl;
+			cout << "headq front 0 is " << headQueue.front().at(0) << endl;
+			cout << "headq front 1 is " << headQueue.front().at(1) << endl;
 		}
-
-
-
 	}
-
 }
 
 vector<float> HeadProvider::getCurrentHeads() {

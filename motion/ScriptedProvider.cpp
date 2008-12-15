@@ -10,8 +10,10 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
 	  choppedBodyCommand(),
 	  bodyCommandQueue()
 {
-	for (unsigned int chainID=0; chainID<NUM_CHAINS; chainID++) {
-		chainQueues.push_back( ChainQueue((ChainID)chainID) );
+	// No head chain, only body chains
+	for (unsigned int chainID=0; chainID<NUM_BODY_CHAINS; chainID++) {
+		chainQueues.push_back( ChainQueue( (ChainID)(chainID+1) ) );
+
 	}
 	// Create mutexes
 	// (?) Need one mutex per queue (?)
@@ -33,8 +35,8 @@ void ScriptedProvider::calculateNextJoints() {
 	// be chopped and used.
 	bool allEmpty = true;
 
-	for (unsigned int i=LARM_CHAIN ; i<chainQueues.size() ; i++ ) {
-		if ( !chainQueues.at(i).empty() ){
+	for ( int i=0 ; i<chainQueues.size() ; i++ ) {
+		if ( !chainQueues.at(i).empty() ) {
 			cout << "not empty!" << endl;
 			allEmpty=false;
 		}
@@ -46,14 +48,21 @@ void ScriptedProvider::calculateNextJoints() {
 	// If they're empty, then add the current joints to be the
 	// next joints. If they're not empty, then add the queued
 	// joints as the next Chain joints
-	for (unsigned int chainID=1 ; chainID < chainQueues.size() ; chainID++) {
-		cout << "chain " << chainID << " size = " << chainQueues.at(chainID).size() << endl;
-		if ( chainQueues.at(chainID).empty() ) {
-			setNextChainJoints( (ChainID)chainID, currentChains.at(chainID) );
+	vector<ChainQueue>::iterator i;
+	i = chainQueues.begin();
+
+	while ( i != chainQueues.end() ) {
+		ChainID chainID = i->getChainID();
+		if ( i->empty() ) {
+			cout << "chain " << chainID << " is empty" << endl;
+			cout << "current has size " << currentChains.at(chainID).size() << endl;
+			setNextChainJoints( chainID, currentChains.at(chainID) );
 		} else {
-			setNextChainJoints( (ChainID)chainID, chainQueues.at(chainID).front() );
-			chainQueues.at(chainID).pop();
+			cout << "chain " << chainID << " has size " << i->front().size() << endl;
+			setNextChainJoints( chainID, i->front() );
+			i->pop();
 		}
+		i++;
 	}
 
 }
@@ -70,7 +79,16 @@ void ScriptedProvider::enqueue(const BodyJointCommand *command) {
 	bodyCommandQueue.push(command);
 }
 
-void ScriptedProvider::setNextBodyCommand(){
+
+void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq) {
+	// Take in vec of commands and enqueue them all
+	pthread_mutex_lock(&scripted_mutex);
+	for (vector<const BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
+		enqueue(*i);
+	pthread_mutex_unlock(&scripted_mutex);
+}
+
+void ScriptedProvider::setNextBodyCommand() {
 	cout << "bodyCommandQueue.size() = " << bodyCommandQueue.size() << endl;
 
 	// If there are no more commands, don't try to enqueue one
@@ -81,24 +99,18 @@ void ScriptedProvider::setNextBodyCommand(){
 		choppedBodyCommand = chopper.chopCommand(command);
 		delete command;
 
-		while (!choppedBodyCommand.empty()){
+		while (!choppedBodyCommand.empty()) {
 			// Pass each chain to its chainqueue
-
+			vector<ChainQueue>::iterator i;
 			// Skips the HEAD_CHAIN and enqueues all body chains
-			for (unsigned int chainID=1; chainID<chainQueues.size(); chainID++) {
-				chainQueues.at(chainID).push(choppedBodyCommand.front().at(chainID));
+			i = chainQueues.begin();
+			while ( i != chainQueues.end() ) {
+				i->push(choppedBodyCommand.front().at( i->getChainID() ));
+				i++;
 			}
 			choppedBodyCommand.pop();
 		}
 	}
-}
-
-void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand*> &seq) {
-	// Take in vec of commands and enqueue them all
-	pthread_mutex_lock(&scripted_mutex);
-	for (vector<BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
-		enqueue(*i);
-	pthread_mutex_unlock(&scripted_mutex);
 }
 
 vector<vector<float> > ScriptedProvider::getCurrentChains() {
@@ -116,7 +128,7 @@ vector<vector<float> > ScriptedProvider::getCurrentChains() {
 	for (unsigned int chain=LARM_CHAIN/* skip head*/;chain<NUM_CHAINS; chain++) {
 		lastChainJoint += chain_lengths[chain];
 
-		for ( ; joint < lastChainJoint ; joint++){
+		for ( ; joint < lastChainJoint ; joint++) {
 			currentChains.at(chain-1/*No head in currentChains*/).push_back(currentJoints[joint]);
 		}
 

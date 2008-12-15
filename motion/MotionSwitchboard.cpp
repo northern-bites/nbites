@@ -2,8 +2,9 @@
 MotionSwitchboard::MotionSwitchboard(Sensors *s)
     : sensors(s),
       walkProvider(),
-	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? FILE?
-      nextJoints(Kinematics::NUM_JOINTS, 0.0),
+	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
+	  headProvider(1/50.0f,sensors),
+      nextJoints(Kinematics::NUM_JOINTS, 0.0f),
 	  running(false)
 {
 
@@ -11,8 +12,10 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
-
-
+	vector<float>* headJoints2 = new vector<float>(2,90.0f);
+	hjc = new HeadJointCommand(2.0f,
+							   headJoints2,
+							   Kinematics::INTERPOLATION_LINEAR);
 
 	vector<float>* bodyJoints3 = new vector<float>(4,45.0f);
 	command3 = new BodyJointCommand(5.0f, LARM_CHAIN,
@@ -44,10 +47,10 @@ void MotionSwitchboard::start() {
 #endif
     fflush(stdout);
 
-
+	headProvider.enqueue(hjc);
 	scriptedProvider.enqueue(command);
-	scriptedProvider.enqueue(command2);
-	scriptedProvider.enqueue(command3);
+//	scriptedProvider.enqueue(command2);
+//	scriptedProvider.enqueue(command3);
 
     running = true;
 
@@ -84,6 +87,9 @@ void MotionSwitchboard::run() {
         }
 
         // Calculate the next joints and get them
+
+		// get headJoints from headProvider
+		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
         //Just switch this line to decide which provider we should use
         MotionProvider * curProvider =
             reinterpret_cast<MotionProvider *>( &walkProvider);
@@ -92,13 +98,16 @@ void MotionSwitchboard::run() {
 
         vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
         vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
-
 		vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
 		vector <float > larmJoints= curProvider->getChainJoints(LARM_CHAIN);
 
         //Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);
 
+		for(unsigned int i = 0; i < HEAD_JOINTS;i++){
+			nextJoints[HEAD_YAW + i] = headJoints.at(i);
+			cout << "headjoint is " << nextJoints[HEAD_YAW + i] << endl;
+		}
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
             nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
         }
