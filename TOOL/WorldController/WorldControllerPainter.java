@@ -447,6 +447,26 @@ public class WorldControllerPainter implements DogListener
                        at_x + x_line_pan_disp_minus,
                        at_y + y_line_pan_disp_minus);
 
+        // Draw dashed lines as axis of the oval
+        field.drawLine(drawing_on,
+                       ESTIMATED_DOG_XY_UNCERT_COLOR,
+                       new BasicStroke(1.0F, BasicStroke.CAP_BUTT,
+                                       BasicStroke.JOIN_MITER, 10,
+                                       new float[] {2}, 0),
+                       at_x,
+                       at_y - y_uncert,
+                       at_x,
+                       at_y + y_uncert);
+        field.drawLine(drawing_on,
+                       ESTIMATED_DOG_XY_UNCERT_COLOR,
+                       new BasicStroke(1.0F, BasicStroke.CAP_BUTT,
+                                       BasicStroke.JOIN_MITER, 10,
+                                       new float[] {2}, 0),
+                       at_x - x_uncert,
+                       at_y,
+                       at_x + x_uncert,
+                       at_y);
+
     }
 
     // draw the ball's position from dog ekf

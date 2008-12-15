@@ -483,6 +483,29 @@ public abstract class Field
                             fixXCoord(x_1), fixYCoord(y_1));
     }
 
+    /**
+     * Draws a line between (x_1, y_1) and (x_2, y_2) in field coordinates.
+     *
+     * @param drawing_on the graphics context on which this method draws
+     * @param in_color the color of the line
+     * @param strok A strok object of the type to be painted on the field
+     * @param x_1 the x coordinate of one endpoint of the line, in field
+     *        coordinates
+     * @param y_1 the corresponding y coordinate of x_1, in field coordinates
+     * @param x_2 the x coordinate of the second endpoint of the line, in
+     *        field coordinates
+     * @param y_2 the corresponding y coordinate of x_2, in field coordinates
+     */
+    public void drawLine(Graphics2D drawing_on, Color in_color,
+                         BasicStroke stroke,
+                         double x_1, double y_1,
+                         double x_2, double y_2) {
+        drawing_on.setColor(in_color);
+        drawing_on.setStroke(stroke);
+        drawing_on.drawLine(fixXCoord(x_2), fixYCoord(y_2),
+                            fixXCoord(x_1), fixYCoord(y_1));
+    }
+
 
     public int yCor(int len, double dir) {return (int)(len * Math.cos(dir));}
     public int xCor(int len, double dir) {return (int)(len * Math.sin(dir));}
