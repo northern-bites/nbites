@@ -14,9 +14,9 @@ using namespace std;
 // Local headers
 #include "FieldConstants.h"
 #include "ConcreteLandmark.h"
-
+#define CONCRETE_FIELD_OBJECT_START_ID 30
 enum fieldObjectID {
-    BLUE_GOAL_LEFT_POST = 30,
+    BLUE_GOAL_LEFT_POST = CONCRETE_FIELD_OBJECT_START_ID,
     BLUE_GOAL_RIGHT_POST,
     YELLOW_GOAL_LEFT_POST,
     YELLOW_GOAL_RIGHT_POST,

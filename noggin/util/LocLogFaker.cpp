@@ -5,13 +5,21 @@ int main()
     // TODO: Make this read a text file
     // Make navPath
     NavPath letsGo;
-    letsGo.startPos = PoseEst(100.1f,100.2f,-0.03f);
-    letsGo.myMoves.push_back(NavMove(MotionModel(2.0f,2.0f,-0.3f),
-                                     20));
-    letsGo.myMoves.push_back(NavMove(MotionModel(2.0f,2.0f,0.5f),
-                                     10));
-    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.25f),
-                                     10));
+    letsGo.startPos = PoseEst(200.0f,300.2f,0.0f);
+    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
+                                     200));
+    // letsGo.myMoves.push_back(NavMove(MotionModel(2.0f,0.0f,0.0f),
+    //                                  100));
+    // letsGo.myMoves.push_back(NavMove(MotionModel(-2.0f,0.0f,0.0f),
+    //                                  200));
+    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,3.0f,0.0f),
+                                     100));
+    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,-3.0f,0.0f),
+                                     125));
+    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,-0.314f),
+                                     25));
+    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
+                                     200));
 
     // Information needed for the main method
     PoseEst currentPose = letsGo.startPos;
@@ -22,8 +30,10 @@ int main()
 
     // Setup output file
     fstream outputFile;
-    string outfileName = "LOGx.mcl";
+    string outfileName = "FAKELOG.mcl";
     outputFile.open(outfileName.c_str(), ios::out);
+    MotionModel noMove(0.0,0.0,0.0);
+    printOutLogLine(&outputFile, myLoc, Z_t, noMove);
 
     // Iterate through the moves
     for(unsigned int i = 0; i < letsGo.myMoves.size(); ++i) {
@@ -47,7 +57,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
     // Check concrete field objects
     // required measurements for the added observation
-    float visDist, visBearing;
+    float visDist, visBearing, sigmaD, sigmaB;
     for(int i = 0; i < ConcreteFieldObject::NUM_FIELD_OBJECTS; ++i) {
        const ConcreteFieldObject* toView = ConcreteFieldObject::
            concreteFieldObjectList[i];
@@ -56,15 +66,59 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         visDist = hypot(deltaX, deltaY);
         visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
                                 - (M_PI / 2.0f));
-        // cout << "Looking at landmark " << toView->getID() << " at angle of "
-        //          << (visBearing * 180.0f / M_PI) << endl;
 
+        // Check if the object is viewable
         if (visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) {
-            cout << "Observed landmark: " << toView->getID() << endl;
+
+            // cout << "Observed landmark: " << toView->getID() << endl;
+
+            // Get measurement variance and add noise to reading
+            sigmaD = getDistSD(visDist);
+            visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
+            sigmaB = getBearingSD(visBearing);
+            visBearing += (M_PI / 2.0f);
+            visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
+
+            // Build the (visual) field object
+            FieldObjects fo(toView->getID());
+            Observation seen(fo);
+            seen.setVisDist(visDist);
+            seen.setVisBearing(visBearing);
+            seen.setDistSD(sigmaD);
+            seen.setBearingSD(sigmaB);
+            Z_t.push_back(seen);
         }
     }
 
     // Check concrete corners
+    for(int i = 0; i < ConcreteCorner::NUM_CORNERS; ++i) {
+       const ConcreteCorner* toView = ConcreteCorner::concreteCornerList[i];
+        float deltaX = toView->getFieldX() - myPos.x;
+        float deltaY = toView->getFieldY() - myPos.y;
+        visDist = hypot(deltaX, deltaY);
+        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
+                                - (M_PI / 2.0f));
+
+        // Check if the object is viewable
+        if ((visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) &&
+            visDist < CORNER_MAX_VIEW_RANGE) {
+            // cout << "Observed landmark: " << toView->getID() << endl;
+
+            // Get measurement variance and add noise to reading
+            sigmaD = getDistSD(visDist);
+            visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
+            sigmaB = getBearingSD(visBearing);
+            visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
+
+            // Build the visual corner
+            // VisualCorner * seen = new VisualCorner(toView.getID());
+            // seen->setDist(visDist);
+            // seen->setBearing(visBearing);
+            // seen->setDistanceSD(sigmaD);
+            // seen->setBearingSD(sigmaB);
+
+        }
+    }
 
     // Check concrete lines
 
@@ -133,4 +187,20 @@ float subPIAngle(float theta)
         theta += 2.0f*M_PI;
     }
     return theta;
+}
+
+/**
+ * Get standard deviation for the associated distance reading
+ */
+float getDistSD(float distance)
+{
+    return distance * 0.15;
+}
+
+/**
+ * Get standard deviation for the associated bearing reading
+ */
+float getBearingSD(float bearing)
+{
+    return bearing*0.12;
 }

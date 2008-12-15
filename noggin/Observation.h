@@ -116,6 +116,11 @@ public:
     vector<PointLandmark> getPointPossibilities() { return pointPossibilities; }
 
     // Setters
+    void setVisDist(float _d) { visDist = _d; }
+    void setVisBearing(float _b) { visBearing = _b; }
+    void setDistSD(float _sdD) { sigma_d = _sdD; }
+    void setBearingSD(float _sdB) { sigma_b = _sdB; }
+
 
 private:
     // Vision information

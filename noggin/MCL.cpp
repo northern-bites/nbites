@@ -22,7 +22,7 @@ MCL::MCL()
         // H between +-pi
         PoseEst x_m(float(rand() % int(FIELD_WIDTH)),
                     float(rand() % int(FIELD_HEIGHT)),
-                    float(((rand() % FULL_CIRC) - HALF_CIRC)*DEG_TO_RAD));
+                    float(((rand() % FULL_CIRC) - HALF_CIRC))*DEG_TO_RAD);
         Particle p_m(x_m, 1.0f);
         // p_m.pose = x_m;
         // p_m.weight = 1;

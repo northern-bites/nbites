@@ -13,7 +13,7 @@ using namespace std;
 // Observation parameters
 // Ranges at which objects are viewable
 // Field objects
-#define FO_MAX_VIEW_RANGE 450.0f
+#define FO_MAX_VIEW_RANGE 575.0f
 #define CORNER_MAX_VIEW_RANGE 200.0f
 #define LINE_MAX_VIEW_RANGE 250.0f
 
@@ -41,6 +41,8 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
 string team_color, player_number;
 // Helper functions
 float subPIAngle(float theta);
+float getDistSD(float dist);
+float getBearingSD(float bearing);
 
 #endif // LOCLOGFAKER_h_DEFINED
 
