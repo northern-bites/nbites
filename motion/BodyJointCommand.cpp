@@ -27,7 +27,7 @@ BodyJointCommand::BodyJointCommand
 
 	// Build joint vectors for each chain
 	// from the bodyJoint vector
-	for (int chainID=1; chainID<NUM_CHAINS; chainID++ ) {
+	for (unsigned int chainID=1; chainID<NUM_CHAINS; chainID++ ) {
 		joints = new vector<float>(chain_lengths[chainID]);
 
 		// Position the end iterator and assign the new vector

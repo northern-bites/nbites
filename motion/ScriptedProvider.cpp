@@ -10,7 +10,7 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
 	  choppedBodyCommand(),
 	  bodyCommandQueue()
 {
-	for (int chainID=0; chainID<NUM_CHAINS; chainID++) {
+	for (unsigned int chainID=0; chainID<NUM_CHAINS; chainID++) {
 		chainQueues.push_back( ChainQueue((ChainID)chainID) );
 	}
 	// Create mutexes
@@ -34,7 +34,7 @@ void ScriptedProvider::calculateNextJoints() {
 	// be chopped and used.
 	bool allEmpty = true;
 
-	for ( int i=LARM_CHAIN ; i<chainQueues.size() ; i++ ) {
+	for (unsigned int i=LARM_CHAIN ; i<chainQueues.size() ; i++ ) {
 		if ( !chainQueues.at(i).empty() ){
 			cout << "not empty!" << endl;
 			allEmpty=false;
@@ -47,7 +47,7 @@ void ScriptedProvider::calculateNextJoints() {
 	// If they're empty, then add the current joints to be the
 	// next joints. If they're not empty, then add the queued
 	// joints as the next Chain joints
-	for (int chainID=1 ; chainID < chainQueues.size() ; chainID++) {
+	for (unsigned int chainID=1 ; chainID < chainQueues.size() ; chainID++) {
 		cout << "chain " << chainID << " size = " << chainQueues.at(chainID).size() << endl;
 		if ( chainQueues.at(chainID).empty() ) {
 			setNextChainJoints( (ChainID)chainID, currentChains.at(chainID) );
@@ -86,7 +86,7 @@ void ScriptedProvider::setNextBodyCommand(){
 			// Pass each chain to its chainqueue
 
 			// Skips the HEAD_CHAIN and enqueues all body chains
-			for (int chainID=1; chainID<chainQueues.size(); chainID++) {
+			for (unsigned int chainID=1; chainID<chainQueues.size(); chainID++) {
 				chainQueues.at(chainID).push(choppedBodyCommand.front().at(chainID));
 			}
 			choppedBodyCommand.pop();
@@ -109,12 +109,12 @@ vector<vector<float> > ScriptedProvider::getCurrentChains() {
 	vector<float> currentJoints = sensors->getBodyAngles();
 	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
 
-	for (int i=0; i<NUM_JOINTS ; i++){
+	for (unsigned int i=0; i<NUM_JOINTS ; i++){
 		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
 	}
 
-	int lastChainJoint = 0;
-	for (int chain=0,joint=0; chain<NUM_CHAINS; chain++) {
+	unsigned int lastChainJoint = 0;
+	for (unsigned int chain=0,joint=0; chain<NUM_CHAINS; chain++) {
 		lastChainJoint += chain_lengths[chain];
 
 		for ( ; joint < lastChainJoint ; joint++){
