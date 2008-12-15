@@ -770,7 +770,8 @@ public class LogHandler
                                               Double.parseDouble
                                               (debugViewer.myUncertY.getText()),
                                               Double.parseDouble
-                                              (debugViewer.myUncertH.getText()));
+                                              (debugViewer.myUncertH.
+                                               getText()));
 
                 // Update the observed landarmks information
                 // Check if any landmarks were sighted this frame
@@ -902,5 +903,6 @@ public class LogHandler
         painter.updateParticleSet(new Vector<MCLParticle>(), team_color,
                                   player_number);
         painter.reportEndFrame();
+        painter.updateUncertainytInfo(0,0,0,0,0,0);
     }
 }

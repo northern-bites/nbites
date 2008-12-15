@@ -857,7 +857,7 @@ public class WorldControllerPainter implements DogListener
                 partColor = DOG_COLOR_BLUE_TEAM;
             }
             drawParticle(g2, partColor, field.fieldToScreenX(p.getX()),
-                         field.fieldToScreenY(p.getY()), p.getH() + 90.0f,
+                         field.fieldToScreenY(p.getY()), p.getH(),
                          p.getWeight());
         }
     }
@@ -892,7 +892,7 @@ public class WorldControllerPainter implements DogListener
 
         // Draw a line pointing in the direction of the heading
         field.drawLine(drawing_on, in_color, field.DRAW_STROKE, x, y,
-                       x + PARTICLE_HEADING_DIST*Math.cos(h),
-                       y + PARTICLE_HEADING_DIST*Math.sin(h));
+                       x + PARTICLE_HEADING_DIST*Math.cos(h+3.14159/2.0),
+                       y + PARTICLE_HEADING_DIST*Math.sin(h+3.14159/2.0));
     }
 }
