@@ -442,17 +442,16 @@ public class DebugViewer extends JFrame {
                                wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y);
         objectIDMap.put(new Integer(31), bgrpPT);
         objectIDStringMap.put(new Integer(31), "Blue goal right post");
-        Point2D.Double yglpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_X,
-                               wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_Y);
-        objectIDMap.put(new Integer(32), yglpPT);
-        objectIDStringMap.put(new Integer(32), "Yellow goal left post");
         Point2D.Double ygrpPT =
             new Point2D.Double(wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_X,
                                wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_Y);
-        objectIDMap.put(new Integer(33), ygrpPT);
-        objectIDStringMap.put(new Integer(33), "Yellow goal right post");
-
+        objectIDMap.put(new Integer(32), ygrpPT);
+        objectIDStringMap.put(new Integer(32), "Yellow goal right post");
+        Point2D.Double yglpPT =
+            new Point2D.Double(wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_X,
+                               wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_Y);
+        objectIDMap.put(new Integer(33), yglpPT);
+        objectIDStringMap.put(new Integer(33), "Yellow goal left post");
     }
 
     public Dimension getMinimumSize()

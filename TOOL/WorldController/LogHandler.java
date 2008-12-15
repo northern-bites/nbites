@@ -902,7 +902,8 @@ public class LogHandler
         logBox.slide.setMaximum(log_num_frames);
         painter.updateParticleSet(new Vector<MCLParticle>(), team_color,
                                   player_number);
-        painter.reportEndFrame();
+        // Clear the uncertainty ellipses
         painter.updateUncertainytInfo(0,0,0,0,0,0);
+        painter.reportEndFrame();
     }
 }

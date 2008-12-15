@@ -470,15 +470,15 @@ public class WorldController extends JPanel implements KeyListener,
                 painter.setDrawEst(true);
                 //draw_est_button.setText("Stop Draw Est");
             }
+        } else if (cmd.equals(RELOAD_MCL_LOG_ACTION)) {
+            startMCLLog();
+            System.out.println("RELOADED MCL LOG");
         } else if (cmd.equals(RELOAD_LOG_ACTION)) {
             startDogLog();
             System.out.println("RELOADED DOG LOG");
         } else if (cmd.equals(RELOAD_EKF_LOG_ACTION)) {
             startEKFLog();
             System.out.println("RELOADED EKF LOG");
-        } else if (cmd.equals(RELOAD_MCL_LOG_ACTION)) {
-            startMCLLog();
-            System.out.println("RELOADED MCL LOG");
         } else if (cmd.equals(VIEW_DOG_EKF_ACTION)) {
             startDogEKF();
         } else if (cmd.equals(VIEW_DOG_LOG_ACTION)) {
@@ -682,13 +682,13 @@ public class WorldController extends JPanel implements KeyListener,
         button_view_dog_log = new JButton(VIEW_DOG_LOG_STRING);
         button_view_dog_log.setActionCommand(VIEW_DOG_LOG_ACTION);
         button_view_dog_log.addActionListener(this);
-        button_area.add(button_view_dog_log);
+        // button_area.add(button_view_dog_log);
 
         // setup ekf log button
         button_view_ekf_log = new JButton(VIEW_EKF_LOG_STRING);
         button_view_ekf_log.setActionCommand(VIEW_EKF_LOG_ACTION);
         button_view_ekf_log.addActionListener(this);
-        button_area.add(button_view_ekf_log);
+        // button_area.add(button_view_ekf_log);
 
         // setup MCL log button
         button_view_mcl_log = new JButton(VIEW_MCL_LOG_STRING);
