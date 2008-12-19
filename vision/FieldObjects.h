@@ -1,5 +1,7 @@
 #ifndef FieldObjects_h_DEFINED
 #define FieldObjects_h_DEFINED
+
+#include <string>
 using namespace std;
 
 #include "Common.h"

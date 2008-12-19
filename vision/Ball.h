@@ -1,6 +1,5 @@
 #ifndef Ball_h_DEFINED
 #define Ball_h_DEFINED
-using namespace std;
 
 #include "Common.h"
 #include "ifdefs.h"

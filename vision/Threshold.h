@@ -1,6 +1,5 @@
 #ifndef Threshold_h_DEFINED
 #define Threshold_h_DEFINED
-using namespace std;
 
 typedef unsigned char uchar;
 

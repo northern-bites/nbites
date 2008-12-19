@@ -1,6 +1,5 @@
 #ifndef PoseMatrix_h_DEFINED
 #define PoseMatrix_h_DEFINED
-using namespace std;
 
 #include <math.h>
 #include "Structs.h"

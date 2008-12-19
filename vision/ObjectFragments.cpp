@@ -4354,9 +4354,9 @@ void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right
 
 void ObjectFragments::openDirection(int horizon, Pose *pose) {
 #if ROBOT(AIBO)
-  int divider = 5;
+  const int divider = 5;
 #elif ROBOT(NAO)
-  int divider = 10;
+  const int divider = 10;
 #endif
   int pix, bad, white, grey, run, greyrun;
   int intersections[5];
