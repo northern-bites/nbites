@@ -117,6 +117,10 @@ private:
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
     ublas::matrix<float> if_Transform;
+    // These hold the initial position of the left/right foot when they are
+    // in support mode. It is relative to the 'i' coord frame.
+    ublas::matrix<float> initStartLeft;
+    ublas::matrix<float> initStartRight;
 
     const WalkingParameters *walkParams;
     bool nextStepIsLeft;
