@@ -1,5 +1,5 @@
 #include "ChopShop.h"
-#include <algorithm>
+
 
 ChopShop::ChopShop (Sensors *s, float motionFrameLength)
 	: finalJoints(),
@@ -61,17 +61,15 @@ queue<vector<vector<float> > > ChopShop::chopLinear(const BodyJointCommand *comm
 	}
 
 	// Add final joints for all chains
-	addFinalJoints(command, HEAD_CHAIN, &currentJoints);
-	addFinalJoints(command, LARM_CHAIN, &currentJoints);
-	addFinalJoints(command, LLEG_CHAIN, &currentJoints);
-	addFinalJoints(command, RLEG_CHAIN, &currentJoints);
-	addFinalJoints(command, RARM_CHAIN, &currentJoints);
+	addFinalJoints(command, &currentJoints);
+
 
 	//Get diff per chop from current to final
 	for ( int joint_id=0; joint_id < NUM_JOINTS ;++joint_id){
 		diffPerChop.push_back( (finalJoints.at(joint_id) -
 								currentJoints.at(joint_id)) /
 							   numChops);
+		
 	}
 	finalJoints.clear();
 	// @JGM need to add vector for each chain!
@@ -93,10 +91,8 @@ void ChopShop::chopThat(float numChops, vector<float> *currentJoints) {
 		int lastChainJoint = 0;
 		for (int chain=0,joint=0; chain<NUM_CHAINS; chain++) {
 			lastChainJoint += chain_lengths[chain];
-
 			for ( ; joint < lastChainJoint ; joint++){
 				nextVal = currentJoints->at(joint)+ diffPerChop.at(joint)*num_chopped;
-//				cout << "nextVal for joint " << joint << " is " << nextVal << endl;
 				nextChopped.at(chain).push_back(nextVal);
 			}
 		}
@@ -108,103 +104,31 @@ void ChopShop::chopThat(float numChops, vector<float> *currentJoints) {
 
 
 void ChopShop::addFinalJoints(const BodyJointCommand *command,
-							  ChainID id,
-							  vector<float>* currentJoints) {
-
-
-	// First, get chain joints from command
-	nextChain = command->getJoints(id);
-
-
+								  vector<float>* currentJoints) {
 	vector<float>::const_iterator currentStart = currentJoints->begin();
 	vector<float>::const_iterator currentEnd = currentJoints->begin();
 
-	// Then, copy into end of new vector
+	for (int chain=0; chain < NUM_CHAINS;chain++) {
+		// First, get chain joints from command
+		nextChain = command->getJoints((ChainID)chain);
 
+		// Set the end iterator
+		currentEnd += chain_lengths[chain];
 
 		// If the next chain is not queued (empty), add current joints
-	if ( nextChain == 0 ||
-		 nextChain->empty()){
-		cout << "nextChain is empty" << endl;
-		switch (id) {
-
-		case HEAD_CHAIN:
-			// Set the iterators to encompass the head chain
-			currentEnd += chain_lengths[HEAD_CHAIN];
-
-			// Add the head to the final joints
-
+		if ( nextChain == 0 ||
+			 nextChain->empty()) {
 			finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
-
-			break;
-
-		case LARM_CHAIN:
-			// Set the iterators around the larm chain
-			currentStart += chain_lengths[HEAD_CHAIN];
-			currentEnd += (chain_lengths[HEAD_CHAIN] +
-						   chain_lengths[LARM_CHAIN]);
-
-			// Add the larm chain to the final joints
-			finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
-			break;
-
-		case LLEG_CHAIN:
-			// Set the iterators around the lleg
-			currentStart += (chain_lengths[HEAD_CHAIN] +
-							 chain_lengths[LARM_CHAIN]);
-
-			currentEnd += (chain_lengths[HEAD_CHAIN] +
-						   chain_lengths[LARM_CHAIN] +
-						   chain_lengths[LLEG_CHAIN]);
-
-			// Add lleg to final joints
-			finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
-			break;
-
-		case RLEG_CHAIN:
-			// Set the iterators around the rleg
-			currentStart += (chain_lengths[HEAD_CHAIN] +
-							 chain_lengths[LARM_CHAIN] +
-							 chain_lengths[LLEG_CHAIN] );
-
-			currentEnd += (chain_lengths[HEAD_CHAIN] +
-						   chain_lengths[LARM_CHAIN] +
-						   chain_lengths[LLEG_CHAIN] +
-						   chain_lengths[RLEG_CHAIN]);
-
-			// FinalJoints. rleg to final joints
-			finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
-			break;
-
-		case RARM_CHAIN:
-			// Set the iterators from rarm beginning to end of currentJoints
-			currentStart += (chain_lengths[HEAD_CHAIN] +
-							 chain_lengths[LARM_CHAIN] +
-							 chain_lengths[LLEG_CHAIN] +
-							 chain_lengths[RLEG_CHAIN] );
-			currentEnd = currentJoints->end();
-
-			// Copy rarm to final joints
-			finalJoints.insert(finalJoints.end(), currentStart, currentEnd ) ;
-			break;
+		}else {
+			// Add each chain of joints to the final joints
+			finalJoints.insert( finalJoints.end(),
+								nextChain->begin(),
+								nextChain->end() );
 		}
-
-
-	}
-
-	else{
-		cout << "nextChain is NOT empty" << endl;
-
-// Add each chain of joints to the final joints
-
-
-		finalJoints.insert( finalJoints.end(),
-							nextChain->begin(),
-							nextChain->end() );
-
+		// Set the start iterator into the right position for the
+		// next chain
+		currentStart += chain_lengths[chain];
 
 	}
-
-
 
 }

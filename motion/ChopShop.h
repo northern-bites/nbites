@@ -37,7 +37,7 @@ private:
 	queue<vector<vector<float> > > chopSmooth(const BodyJointCommand *command);
 	queue<vector<vector<float> > > chopLinear(const BodyJointCommand *command);
 	void chopThat(float numChops, vector<float>* currentJoints);
-	void addFinalJoints(const BodyJointCommand *command,ChainID id, vector<float>* currentJoints);
+	void addFinalJoints(const BodyJointCommand *command, vector<float>* currentJoints);
 
 
 
