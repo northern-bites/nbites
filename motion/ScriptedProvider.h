@@ -38,6 +38,8 @@ private:
 	ChainQueue rArmQueue;
 
 	pthread_mutex_t scripted_mutex;
+
+	vector <vector <float> > getCurrentChains();
 };
 
 #endif

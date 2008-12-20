@@ -11,30 +11,57 @@ BodyJointCommand::BodyJointCommand
  const Kinematics::InterpolationType _type)
  : duration(time), type(_type)
 {
-  unsigned int i = 0, j;
-  vector<float> *joints;
 
-  joints = new vector<float>(chain_lengths[LARM_CHAIN]);
-  for (j = 0; j < joints->size(); j++, i++)
-    joints->assign(j, bodyJoints->at(j));
-  larm_joints = joints;
+	unsigned int i = 0, j;
+	vector<float> *joints;
+	vector<float>::const_iterator ite;
+	vector<float>::const_iterator iteEnd;
+	cout <<"here" << endl;
 
-  joints = new vector<float>(chain_lengths[LLEG_CHAIN]);
-  for (j = 0; j < joints->size(); j++, i++)
-    joints->assign(j, bodyJoints->at(j));
-  lleg_joints = joints;
+	joints = new vector<float>(chain_lengths[LARM_CHAIN]);
 
-  joints = new vector<float>(chain_lengths[RLEG_CHAIN]);
-  for (j = 0; j < joints->size(); j++, i++)
-    joints->assign(j, bodyJoints->at(j));
-  rleg_joints = joints;
+	// Both iterators start at the beginning
+	ite = bodyJoints->begin();
+	iteEnd = bodyJoints->begin();
 
-  joints = new vector<float>(chain_lengths[RARM_CHAIN]);
-  for (j = 0; j < joints->size(); j++, i++)
-    joints->assign(j, bodyJoints->at(j));
-  rarm_joints = joints;
-  
-  delete bodyJoints;
+	cout << "jointsize "<< joints->size() << endl;
+
+	// Put the beginning limit at the end of the start of
+	// the LARM_CHAIN joints
+	ite += chain_lengths[HEAD_CHAIN];
+
+	// Put the end limit at the end of the LARM_CHAIN joints,
+	// aka at the beginning plus its length
+	iteEnd = ite;
+	iteEnd += chain_lengths[LARM_CHAIN];
+
+	// Copy the values out of the bodyJoints
+	// into joints for the LARM_CHAIN
+	joints->assign(ite,iteEnd);
+	larm_joints = joints;
+
+	// Move the limiters to LLEG_CHAIN
+	// asign lleg_joints
+	joints = new vector<float>(chain_lengths[LLEG_CHAIN]);
+	ite += chain_lengths[LARM_CHAIN];
+	iteEnd += chain_lengths[LLEG_CHAIN];
+	joints->assign(ite,iteEnd);
+	lleg_joints = joints;
+
+	// Repeat above for RLEG_CHAIN and RARM_CHAIN
+	joints = new vector<float>(chain_lengths[RLEG_CHAIN]);
+	ite += chain_lengths[LLEG_CHAIN];
+	iteEnd += chain_lengths[RLEG_CHAIN];
+	joints->assign(ite,iteEnd);
+	rleg_joints = joints;
+
+	joints = new vector<float>(chain_lengths[RARM_CHAIN]);
+	ite += chain_lengths[RLEG_CHAIN];
+	iteEnd += chain_lengths[RARM_CHAIN];
+	joints->assign(ite,iteEnd);
+	rarm_joints = joints;
+
+	delete bodyJoints;
 }
 
 BodyJointCommand::BodyJointCommand(const float time, ChainID chainID,

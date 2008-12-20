@@ -12,10 +12,15 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
 	bodyJoints = new vector<float>(20,90.0f);
-
+	bodyJoints2 = new vector<float>(20,-90.0f);
 	command = new BodyJointCommand(100.0f,
 								   bodyJoints,
 							   Kinematics::INTERPOLATION_LINEAR);
+
+	command2 = new BodyJointCommand(100.0f,
+								   bodyJoints2,
+							   Kinematics::INTERPOLATION_LINEAR);
+
 }
 
 MotionSwitchboard::~MotionSwitchboard() {
@@ -30,10 +35,16 @@ void MotionSwitchboard::start() {
     cout << "  creating threads" << endl;
 #endif
     fflush(stdout);
-	cout << "larmsize" << command->getJoints(Kinematics::LARM_CHAIN)->size() << endl;
+
 	scriptedProvider.enqueue(command);
+	cout << "enqueued 1" << endl;
+	scriptedProvider.enqueue(command2);
+	cout << "enqueued 2" << endl;
 	delete bodyJoints;
 	delete command;
+//	delete bodyJoints2;
+//	delete command2;
+
 
     running = true;
 
@@ -49,7 +60,6 @@ void MotionSwitchboard::start() {
 
 
 void MotionSwitchboard::stop() {
-	cout << "STOPPING SWITCHBOARD" << endl;
     running = false;
     //signal to end waiting in the run method,
     pthread_mutex_lock(&next_joints_mutex);
@@ -79,16 +89,11 @@ void MotionSwitchboard::run() {
         }
 
         // Calculate the next joints and get them
-
         scriptedProvider.calculateNextJoints();
 
         vector <float > llegJoints = scriptedProvider.getChainJoints(LLEG_CHAIN);
         vector <float > rlegJoints = scriptedProvider.getChainJoints(RLEG_CHAIN);
-<<<<<<< HEAD:motion/MotionSwitchboard.cpp
 
-=======
-		
->>>>>>> Probably not a commit with value. Just want to be able to push this to my github. There is a memory leak in ChopShop that I am unsure of its location.:motion/MotionSwitchboard.cpp
 		vector <float > rarmJoints = scriptedProvider.getChainJoints(RARM_CHAIN);
 		vector <float > larmJoints= scriptedProvider.getChainJoints(LARM_CHAIN);
 
@@ -97,16 +102,16 @@ void MotionSwitchboard::run() {
         pthread_mutex_lock(&next_joints_mutex);
 
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextJoints[L_HIP_YAW_PITCH + i] = llegJoints[i];
+            nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
         }
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints[i];
+            nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints.at(i);
         }
         for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextJoints[L_SHOULDER_PITCH + i] = larmJoints[i];
+            nextJoints[L_SHOULDER_PITCH + i] = larmJoints.at(i);
         }
         for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextJoints[R_SHOULDER_PITCH + i] = rarmJoints[i];
+            nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
        }
 
 
@@ -114,6 +119,7 @@ void MotionSwitchboard::run() {
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
         pthread_mutex_unlock(&next_joints_mutex);
         fcount++;
+
     }
 
 }
@@ -122,8 +128,11 @@ void MotionSwitchboard::run() {
 const vector <float> MotionSwitchboard::getNextJoints() {
     //grab the latest values, and signal
     pthread_mutex_lock(&next_joints_mutex);
+
     const vector <float> vec(nextJoints);
+
     pthread_cond_signal(&calc_new_joints_cond);
+
     pthread_mutex_unlock(&next_joints_mutex);
 
 

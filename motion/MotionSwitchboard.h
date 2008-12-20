@@ -44,7 +44,9 @@ private:
     bool running;
 
 	vector<float> *bodyJoints;
+	vector<float> *bodyJoints2;
 	BodyJointCommand *command;
+	BodyJointCommand *command2;
 
 
     pthread_t       switchboard_thread;

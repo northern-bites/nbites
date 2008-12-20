@@ -37,25 +37,41 @@ void ScriptedProvider::requestStop() {
 }
 
 void ScriptedProvider::calculateNextJoints() {
-	cout << "Calculating next joints!" << endl;
-	// Sets the next joints for all the joints
-	if (!lArmQueue.empty() ||
-		!rArmQueue.empty() ||
-		!lLegQueue.empty() ||
-		!rLegQueue.empty() ){
-		cout << "adding new joints" << endl;
+
+	vector <vector <float> > currentChains = getCurrentChains();
+
+	// Make sure first that the queues are not empty
+	// If they're empty, then add the current joints to be the
+	// next joints. If they're not empty, then add the queued
+	// joints as the next Chain joints
+  	if (lArmQueue.empty() ) {
+ 		setNextChainJoints( LARM_CHAIN,currentChains.at(LARM_CHAIN) );
+  	}else {
 		setNextChainJoints( LARM_CHAIN, lArmQueue.front() );
-		setNextChainJoints( LLEG_CHAIN, lLegQueue.front() );
-		setNextChainJoints( RLEG_CHAIN, rLegQueue.front() );
-		setNextChainJoints( RARM_CHAIN, rArmQueue.front() );
-		cout << "added new joints" << endl;
 		lArmQueue.pop();
+	}
+
+  	if (lLegQueue.empty() ) {
+ 		setNextChainJoints( LLEG_CHAIN, currentChains.at(LLEG_CHAIN) );
+  	}else {
+		setNextChainJoints( LLEG_CHAIN, lLegQueue.front() );
 		lLegQueue.pop();
+	}
+
+  	if (rLegQueue.empty() ){
+ 		setNextChainJoints( RLEG_CHAIN, currentChains.at(RLEG_CHAIN) );
+  	}else {
+		setNextChainJoints( RLEG_CHAIN, rLegQueue.front() );
 		rLegQueue.pop();
+	}
+
+  	if (rArmQueue.empty() ) {
+ 		setNextChainJoints( RARM_CHAIN, currentChains.at(RARM_CHAIN) );
+	}else {
+		setNextChainJoints( RARM_CHAIN, rArmQueue.front() );
 		rArmQueue.pop();
 	}
 
-	cout << "calculated next joints" << endl;
 }
 
 void ScriptedProvider::enqueue(const BodyJointCommand *command) {
@@ -65,9 +81,14 @@ void ScriptedProvider::enqueue(const BodyJointCommand *command) {
 	//Split command by chops
 	vector<vector<vector<float> > >::iterator choppedIter;
 
+	cout << "choppedCommandFront.larm.empty" <<
+		choppedCommand.front().at(LARM_CHAIN).empty() << endl;
 
+//	cout << "choppedFrontSize = " <<choppedCommand.front().size() << endl;
 	while (!choppedCommand.empty()){
 		// Pass each chain to its chainqueue
+
+
 		headQueue.push(choppedCommand.front().at(HEAD_CHAIN));
 		lArmQueue.push(choppedCommand.front().at(LARM_CHAIN));
 		lLegQueue.push(choppedCommand.front().at(LLEG_CHAIN));
@@ -87,4 +108,26 @@ void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand*> &seq) {
 		enqueue(*i);
 	pthread_mutex_unlock(&scripted_mutex);
 
+}
+
+vector<vector<float> > ScriptedProvider::getCurrentChains() {
+	vector<vector<float> > currentChains(5);
+
+	vector<float> currentJoints = sensors->getBodyAngles();
+	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
+
+	for (int i=0; i<NUM_JOINTS ; i++){
+		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
+	}
+
+	int lastChainJoint = 0;
+	for (int chain=0,joint=0; chain<NUM_CHAINS; chain++) {
+		lastChainJoint += chain_lengths[chain];
+
+		for ( ; joint < lastChainJoint ; joint++){
+			currentChains.at(chain).push_back(currentJoints[joint]);
+		}
+
+	}
+	return currentChains;
 }
