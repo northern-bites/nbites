@@ -59,11 +59,11 @@ typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
  */
 struct Step:point<float> {
     float theta;
-    float time;
+    float duration;
     Foot foot;
     Step(const float _x, const float _y, const float _theta,
-         const float _time, const Foot _foot)
-        : point<float>(_x,_y), theta(_theta), time(_time), foot(_foot) {}
+         const float _duration, const Foot _foot)
+        : point<float>(_x,_y), theta(_theta), duration(_duration), foot(_foot){}
 };
 
 static int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
@@ -100,8 +100,9 @@ private:
     float y;
     float theta;
 
-    float com_x, com_y; //x,y targets for the com from the controller
 
+    ublas::vector<float> com_i;
+    //ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     list<float> zmp_ref_x, zmp_ref_y;
     list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
@@ -111,13 +112,16 @@ private:
     list<boost::shared_ptr<Step> > currentZMPDSteps;
 
 
-    boost::shared_ptr<Step> supportStep;
-    boost::shared_ptr<Step> swingingStep;
+    boost::shared_ptr<Step> supportStep_s;
+    boost::shared_ptr<Step> swingingStep_s;
+    boost::shared_ptr<Step> supportStep_f;
+    boost::shared_ptr<Step> swingingStep_f;
     boost::shared_ptr<Step> lastZMPDStep; //Last step turned into ZMP values
     point<float> coordOffsetLastZMPDStep;
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
     ublas::matrix<float> if_Transform;
+    ublas::matrix<float> fc_Transform;
     // These hold the initial position of the left/right foot when they are
     // in support mode. It is relative to the 'i' coord frame.
     ublas::matrix<float> initStartLeft;
