@@ -54,17 +54,6 @@ using namespace Kinematics;
 
 typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
-/**
- * Simple container to hold information about future steps.
- */
-struct Step:point<float> {
-    float theta;
-    float duration;
-    Foot foot;
-    Step(const float _x, const float _y, const float _theta,
-         const float _duration, const Foot _foot)
-        : point<float>(_x,_y), theta(_theta), duration(_duration), foot(_foot){}
-};
 
 static int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
                                      //steps stored in future, current lists
@@ -73,7 +62,6 @@ class StepGenerator {
 public:
     StepGenerator(const WalkingParameters *params);
     ~StepGenerator();
-
 
     zmp_xy_tuple generate_zmp_ref();
 

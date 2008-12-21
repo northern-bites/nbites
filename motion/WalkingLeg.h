@@ -31,8 +31,14 @@
 #include <vector>
 using namespace std;
 
+#include <boost/shared_ptr.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+using namespace boost::numeric;
+
 #include "WalkingConstants.h"
+#include "CoordFrame.h"
 #include "Kinematics.h"
+
 using namespace Kinematics;
 
 class WalkingLeg  {
@@ -40,7 +46,7 @@ public:
     WalkingLeg(ChainID id, const WalkingParameters * walkP);
     //~WalkingLeg() { };
 
-    vector <float> tick(float dest_x, float dest_y);
+    vector <float> tick(boost::shared_ptr<Step> step,ublas::matrix<float> fc_Transform);//float dest_x, float dest_y);
 
     //Hopefully these never need to get called (architecturally).
     //Instead, use methods like startLeft, right etc

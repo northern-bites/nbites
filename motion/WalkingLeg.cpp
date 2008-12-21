@@ -14,9 +14,17 @@ WalkingLeg::WalkingLeg(ChainID id,
 }
 
 
-vector <float> WalkingLeg::tick(float dest_x, float dest_y) {
-    //cout << "In leg" << chainID << " got target (" 
+vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
+                                ublas::matrix<float> fc_Transform){
+    //cout << "In leg" << chainID << " got target (" x
     //     << dest_x << "," <<dest_y << ")" <<endl;
+
+    ublas::vector<float> dest_f = CoordFrame3D::vector3D(step->x,step->y);
+    ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
+    float dest_x = dest_c(0);
+    float dest_y = dest_c(1);
+    //cout << "FC Transform" << fc_Transform <<endl;
+    //cout <<"Dest_c: " << dest_f<<endl;
     vector<float> result(6);
     switch(state){
     case SUPPORTING:

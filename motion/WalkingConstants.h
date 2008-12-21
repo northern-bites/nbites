@@ -16,7 +16,19 @@ enum Foot {
     RIGHT_FOOT
 };
 
-
+/**
+ * Simple container to hold information about future steps.
+ */
+struct Step{
+    float x;
+    float y;
+    float theta;
+    float duration;
+    Foot foot;
+    Step(const float _x, const float _y, const float _theta,
+         const float _duration, const Foot _foot)
+        : x(_x),y(_y), theta(_theta), duration(_duration), foot(_foot){}
+};
 
 /*
 struct WalkLegsResult{

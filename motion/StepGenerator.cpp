@@ -173,17 +173,20 @@ WalkLegsTuple StepGenerator::tick_legs(){
     }
 
     //calculate the f to c translation matrix
+    //cout <<"IF-TRANS " <<if_Transform<<endl;
+    //cout <<"COM_I " <<com_i<<endl;
+
     ublas::vector<float> com_f = prod(if_Transform,com_i);
     fc_Transform = CoordFrame3D::translation3D(-com_f(0),-com_f(1));
     //translate the targets for support and swinging foot into c frame
-
+    //cout <<"COM_F " <<com_f<<endl;
     //update leftLeg, rightLeg with targets in c frame
 
     //Temporary conversion to c frame for controller target
 
     boost::shared_ptr<Step> leftStep_f,rightStep_f;
     //First, the support leg.
-    if (supportStep_f->foot == LEFT_LEG){
+    if (supportStep_f->foot == LEFT_FOOT){
         leftStep_f = supportStep_f;
         rightStep_f = swingingStep_f;
     }
@@ -200,8 +203,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
     float dest_R_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
     float dest_R_y = -com_i(1) - HIP_OFFSET_Y;  //targetY
 
-    vector<float> left  = leftLeg.tick(dest_L_x,dest_L_y);
-    vector<float> right = rightLeg.tick(dest_R_x,dest_R_y);
+    vector<float> left  = leftLeg.tick(leftStep_f,fc_Transform);//dest_L_x,dest_L_y);
+    vector<float> right = rightLeg.tick(rightStep_f,fc_Transform);//dest_R_x,dest_R_y);
 
     return WalkLegsTuple(left,right);
 }
@@ -261,17 +264,19 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     //start off in a double support phase where the right leg swings first
     leftLeg.startRight();//setSupportMode(PERSISTENT_DOUBLE_SUPPORT);
     rightLeg.startRight();//setSupportMode(DOUBLE_SUPPORT);
-    if_Transform.assign(initStartRight);
+    if_Transform.assign(initStartLeft);//HACK to deal with dummy being RIGHT
 
     //setup memory to corroborate dummy step
     lastZMPDStep = boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
                                                     walkParams->stepDuration, LEFT_FOOT));
     boost::shared_ptr<Step> dummyStep =
-        boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                         walkParams->stepDuration, LEFT_FOOT));
+        boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
+                                         walkParams->stepDuration, RIGHT_FOOT));
     //need to indicate what the current support foot is:
-    currentZMPDSteps.push_back(lastZMPDStep);
     currentZMPDSteps.push_back(dummyStep);
+    currentZMPDSteps.push_back(lastZMPDStep);
+
+
     coordOffsetLastZMPDStep = point<float>(0,0);
     nextStepIsLeft = false;
 }
