@@ -88,7 +88,8 @@ private: // Helper methods
                       const float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
 
-    ublas::matrix<float> getStepTransMatrix(boost::shared_ptr<Step> step);
+    ublas::matrix<float> get_f_fprime(boost::shared_ptr<Step> step);
+    ublas::matrix<float> get_fprime_f(boost::shared_ptr<Step> step);
 private:
     // Walk vector:
     //  * x - forward

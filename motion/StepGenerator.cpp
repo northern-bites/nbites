@@ -129,7 +129,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
         }
 
         //update the translation matrix between i and f coord. frames
-        ublas::matrix<float> stepTransform = getStepTransMatrix(supportStep);
+        ublas::matrix<float> stepTransform = get_fprime_f(supportStep);
         //cout <<"Step transform" << stepTransform <<endl;
         if_Transform = prod(stepTransform,if_Transform);
         cout <<"I to F transform: " <<if_Transform <<endl;
@@ -137,7 +137,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
         cout << "Left leg says it is : " << leftLeg.getSupportMode() << endl;
         //TODO: -> start work here. Need to verify how coord frames work!!
         //express the supporting foot and swinging foots locations in f coord.
-
+	
+	cout<< "Should be identity" << prod(get_fprime_f(supportStep),get_f_fprime(supportStep))<<endl;
     }
 
     //calculate the f to c translation matrix
@@ -247,23 +248,44 @@ void StepGenerator::generateStep(const float _x,
 }
 
 /**
- * Method returns the transformation matrix that we apply to update f frame
+ * Method returns the transformation matrix that goes between the previous
+ * foot ('f') coordinate frame and the next f coordinate frame rooted at 'step'
  */
 ublas::matrix<float>
-StepGenerator::getStepTransMatrix(boost::shared_ptr<Step> step){
-    const int leg_sign = (step->foot == LEFT_FOOT ?
-                             1 : -1);
+StepGenerator::get_fprime_f(boost::shared_ptr<Step> step){
+    const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
-    const  float y = step->y;
+    const float y = step->y;
     const float theta = step->theta;
-    ublas::matrix<float> trans_fprime_s = CoordFrame3D::translation3D(0,-leg_sign*HIP_OFFSET_Y);
+
+    ublas::matrix<float> trans_fprime_s = 
+      CoordFrame3D::translation3D(0,-leg_sign*HIP_OFFSET_Y);
 
     ublas::matrix<float> trans_s_f =
         prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-theta),
              CoordFrame3D::translation3D(-x,-y));
     return prod(trans_s_f,trans_fprime_s);
-
-
 }
 
+/**
+ * DIFFERENT Method, returns the transformation matrix that goes between the f
+ * coordinate frame rooted at 'step' and the previous foot ('f') coordinate 
+ * frame rooted at the last step.  Really just the inverse of the matrix 
+ * returned by the 'get_fprime_f'
+ */
+ublas::matrix<float>
+StepGenerator::get_f_fprime(boost::shared_ptr<Step> step){
+    const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
+
+    const float x = step->x;
+    const float y = step->y;
+    const float theta = step->theta;
+
+    ublas::matrix<float> trans_fprime_s = 
+      CoordFrame3D::translation3D(0,leg_sign*HIP_OFFSET_Y);
+
+    ublas::matrix<float> trans_s_f =
+        prod(CoordFrame3D::translation3D(x,y),CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta));
+    return prod(trans_s_f,trans_fprime_s);
+}
