@@ -68,8 +68,8 @@ public:
     };
 private:
     //Execution methods, get called depending on which state the leg is in
-    vector <float> supporting(float dest_x, float dest_y);
-    vector <float> swinging(float dest_x, float dest_y);
+    vector <float> supporting(ublas::matrix<float> fc_Transform);//float dest_x, float dest_y);
+    vector <float> swinging(ublas::matrix<float> fc_Transform);//float dest_x, float dest_y);
 
     //FSA methods
     void setState(SupportMode newState);
@@ -82,6 +82,9 @@ private:
     SupportMode state, lastState,lastDiffState;
     SupportMode supportMode; //soon to be deprecated
     int frameCounter;
+
+    //destination attributes
+    boost::shared_ptr<Step> cur_dest, last_dest;
 
     //Leg Attributes
     ChainID chainID; //keep track of which leg this is

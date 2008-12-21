@@ -18,26 +18,26 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 ublas::matrix<float> fc_Transform){
     //cout << "In leg" << chainID << " got target (" x
     //     << dest_x << "," <<dest_y << ")" <<endl;
-
-    ublas::vector<float> dest_f = CoordFrame3D::vector3D(step->x,step->y);
-    ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
-    float dest_x = dest_c(0);
-    float dest_y = dest_c(1);
+    cur_dest = step;
+    //ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
+    //ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
+    //float dest_x = dest_c(0);
+    //float dest_y = dest_c(1);
     //cout << "FC Transform" << fc_Transform <<endl;
     //cout <<"Dest_c: " << dest_f<<endl;
     vector<float> result(6);
     switch(state){
     case SUPPORTING:
-        result  = supporting(dest_x, dest_y);
+        result  = supporting(fc_Transform);//dest_x, dest_y);
         break;
     case SWINGING:
-        result  =  swinging(dest_x, dest_y);
+        result  =  swinging(fc_Transform);//dest_x, dest_y);
         break;
     case DOUBLE_SUPPORT:
-        result  = supporting(dest_x, dest_y);
+        result  = supporting(fc_Transform);//dest_x, dest_y);
         break;
     case PERSISTENT_DOUBLE_SUPPORT:
-        result  = supporting(dest_x, dest_y);
+        result  = supporting(fc_Transform);//dest_x, dest_y);
         break;
     default:
         throw "Invalid SupportMode passed to WalkingLeg::tick";
@@ -53,7 +53,13 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
 }
 
 
-vector <float> WalkingLeg::swinging(float dest_x, float dest_y) {
+vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float dest_x, float dest_y) {
+    ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
+    ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
+    float dest_x = dest_c(0);
+    float dest_y = dest_c(1);
+
+
     // the swinging leg will follow a trapezoid in 3-d. The trapezoid has
     // three stages: going up, a level stretch, going back down to the ground
     static int stage;
@@ -93,7 +99,7 @@ vector <float> WalkingLeg::swinging(float dest_x, float dest_y) {
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
 
-vector <float> WalkingLeg::supporting(float dest_x, float dest_y) {
+vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float dest_x, float dest_y) {
     /**
        this method calculates the angles for this leg when it is on the ground
        (i.e. the leg on the ground in single support, or either leg in double
@@ -101,6 +107,11 @@ vector <float> WalkingLeg::supporting(float dest_x, float dest_y) {
        We calculate the goal based on the comx,comy from the controller,
        and the given parameters using inverse kinematics.
      */
+    ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
+    ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
+    float dest_x = dest_c(0);
+    float dest_y = dest_c(1);
+
     float physicalHipOffY = 0;
     goal(0) = dest_x; //targetX for this leg
     goal(1) = dest_y;  //targetY
@@ -177,5 +188,6 @@ void WalkingLeg::switchToNextState(){
 void WalkingLeg::setState(SupportMode newState){
     state = newState;
     lastDiffState = state;
+    last_dest = cur_dest;
     frameCounter = 0;
 }

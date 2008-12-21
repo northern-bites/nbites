@@ -197,11 +197,11 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
 
 
-    float dest_L_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
-    float dest_L_y = -com_i(1) + HIP_OFFSET_Y;  //targetY
+    // float dest_L_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
+//     float dest_L_y = -com_i(1) + HIP_OFFSET_Y;  //targetY
 
-    float dest_R_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
-    float dest_R_y = -com_i(1) - HIP_OFFSET_Y;  //targetY
+//     float dest_R_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
+//     float dest_R_y = -com_i(1) - HIP_OFFSET_Y;  //targetY
 
     vector<float> left  = leftLeg.tick(leftStep_f,fc_Transform);//dest_L_x,dest_L_y);
     vector<float> right = rightLeg.tick(rightStep_f,fc_Transform);//dest_R_x,dest_R_y);
