@@ -26,6 +26,20 @@ void ScriptedProvider::requestStop() {
 	// Finish motion or stop immediately?
 }
 
+bool ScriptedProvider::isDone() {
+	bool isEmpty = true;
+	for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
+		if ( !chainQueues.at(i).empty() ) {
+			isEmpty=false;
+		}
+	}
+
+	if (!bodyCommandQueue.empty()) {
+		isEmpty = false;
+	}
+	return isEmpty;
+}
+
 void ScriptedProvider::calculateNextJoints() {
 
 
