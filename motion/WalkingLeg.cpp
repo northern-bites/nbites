@@ -4,8 +4,9 @@
 WalkingLeg::WalkingLeg(ChainID id,
                        const WalkingParameters *walkP)
     :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
+     frameCounter(0),
      cur_dest(EMPTY_STEP),last_dest(EMPTY_STEP),
-     frameCounter(0), chainID(id), walkParams(walkP),
+     chainID(id), walkParams(walkP),
       goal(ufvector3(3)){
     if (chainID == LLEG_CHAIN)
         leg_sign = 1;

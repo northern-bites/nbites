@@ -41,20 +41,20 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
         if (futureSteps.size() < 1  || futureSteps.size() +
             currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
-
+            cout << "Adding a step" <<endl;
 /*
  * Start here: The issue is that we aren't doing a good job of keeping track of the correct target in walking leg, so actually moving forward is impossible right now
  */
-//             fc--;
-//             if (fc == 0){
-//                 cout << "MOVE FORWARD!!"<<endl;
-            //Change the x vector to be moving forward
-//                 x =10;
-//             }
+            fc--;
+            if (fc == 0){
+                cout << "MOVE FORWARD!!"<<endl;
+                //Change the x vector to be moving forward
+                x =10;
+            }
         }
         else {
             boost::shared_ptr<Step> nextStep = futureSteps.front();
-
+            cout << "Moving a step from future to current foot: "<<nextStep->foot<<endl;
             fillZMP(nextStep);
 
             //transfer the nextStep element from future to current list
@@ -108,6 +108,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
         int numCurrentSteps = static_cast<int>(currentZMPDSteps.size());
         int numFutureSteps  = static_cast<int>(futureSteps.size());
+        cout << "Current Steps: " << numCurrentSteps <<endl;
+        cout << "Future Steps: " << numFutureSteps <<endl;
         if (numCurrentSteps  + numFutureSteps < MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
 
@@ -224,18 +226,30 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
 
 //Step length always must be a multiple of the motion frame length
-void StepGenerator::fillZMP(const boost::shared_ptr<Step> newStep ){
+void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     //look at the last ZMPD Step and the newStep, and make ZMP values
-    float stepTime = newStep->duration;
-    int numChops = walkParams->stepDurationFrames;
-    float start_x = lastZMPDStep->x + coordOffsetLastZMPDStep.x;
-    float start_y = lastZMPDStep->y + coordOffsetLastZMPDStep.y;
-    float end_x = newStep->x + coordOffsetLastZMPDStep.x;
-    float end_y = newStep->y + coordOffsetLastZMPDStep.y;
+    float stepTime = newSupportStep->duration;
+
+    const float start_x = lastZMPDStep->x + coordOffsetLastZMPDStep.x;
+    const float start_y = lastZMPDStep->y + coordOffsetLastZMPDStep.y;
+    const float end_x = newSupportStep->x + coordOffsetLastZMPDStep.x;
+    const float end_y = newSupportStep->y + coordOffsetLastZMPDStep.y;
 
     //std::cout << "start_x: " << start_x << "end_x: " << end_x << std::endl;
 
-    for(int i = 0; i< numChops; i++){
+    //double support - we want to switch feet
+    const int numChops = walkParams->doubleSupportFrames;
+    for(int i = 0; i< walkParams->doubleSupportFrames; i++){
+        float new_x =
+            start_x + (static_cast<float>(i)/numChops)*(end_x-start_x);
+        float new_y =
+            start_y + (static_cast<float>(i)/numChops)*(end_y-start_y);
+
+        zmp_ref_x.push_back(new_x);
+        zmp_ref_y.push_back(new_y);
+    }
+    //single support -  we want to stay over the new step
+    for(int i = 0; i< walkParams->singleSupportFrames; i++){
         float new_x =
             end_x;
         //start_x + (static_cast<float>(i)/numChops)*(end_x-start_x);
@@ -247,10 +261,12 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newStep ){
         zmp_ref_y.push_back(new_y);
     }
     //update the lastZMPD Step
-    int sign = (newStep->foot == LEFT_FOOT ? 1 : -1);
-    lastZMPDStep = newStep;
-    coordOffsetLastZMPDStep.x += newStep->x;
-    coordOffsetLastZMPDStep.y += newStep->y - sign*HIP_OFFSET_Y; //shift to 0
+    int sign = (newSupportStep->foot == LEFT_FOOT ? 1 : -1);
+    lastZMPDStep = newSupportStep;
+
+    coordOffsetLastZMPDStep.x += newSupportStep->x;
+    //shift to 0 ('s' coord frame):
+    coordOffsetLastZMPDStep.y += newSupportStep->y - sign*HIP_OFFSET_Y;
 }
 
 
@@ -272,6 +288,7 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
         zmp_ref_y.push_back(0.0f);
         zmp_ref_x.push_back(0.0f);
     }
+    coordOffsetLastZMPDStep = point<float>(0,0); //similar to s coord. frame
 
     //start off in a double support phase where the right leg swings first
     leftLeg.startRight();//setSupportMode(PERSISTENT_DOUBLE_SUPPORT);
@@ -280,19 +297,46 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
 
     //setup memory to corroborate dummy step
     lastZMPDStep = boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                                    walkParams->stepDuration, LEFT_FOOT));
+                                                    walkParams->stepDuration,
+                                                    LEFT_FOOT));
     boost::shared_ptr<Step> dummyStep =
         boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
                                          walkParams->stepDuration, RIGHT_FOOT));
     //need to indicate what the current support foot is:
-    currentZMPDSteps.push_back(dummyStep);
-    currentZMPDSteps.push_back(lastZMPDStep);
+    currentZMPDSteps.push_back(dummyStep);//right gets popped right away
+    currentZMPDSteps.push_back(lastZMPDStep);//left will be sup. during 0.0 zmp
 
 
-    coordOffsetLastZMPDStep = point<float>(0,0);
     nextStepIsLeft = false;
 }
 
+
+void StepGenerator::startLeft(){
+
+}
+void StepGenerator::startRight(){
+//The next leg to take a step is the right - the left is supporting
+//This means, on the first frame, we will pop a step which should be the
+//the current position of the right leg. Then, the left leg will
+//become the support leg, and a step not shown here will become the next target.
+//except the ZMP is being held at zero, so that step will do nothing
+
+    boost::shared_ptr<Step> cur_right_leg =
+        boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
+                                         walkParams->stepDuration, RIGHT_FOOT));
+
+    boost::shared_ptr<Step> sup_left_leg =
+        boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
+                                         walkParams->stepDuration, LEFT_FOOT));
+
+    leftLeg.startRight();
+    rightLeg.startRight();
+
+    coordOffsetLastZMPDStep = point<float>(0,0);
+    //once we actually want to walk, we need to know which leg to use
+    nextStepIsLeft = false;
+
+}
 
 //currently only does two sets of steps side by side
 void StepGenerator::generateStep(const float _x,
