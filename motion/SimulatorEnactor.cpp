@@ -12,7 +12,7 @@ void SimulatorEnactor::run() {
 
     while (running) {
 
-        vector <float> result = switchboard->getNextJoints();
+        //vector <float> result = switchboard->getNextJoints();
 
         /*
         cout<<"Joints are : [";
