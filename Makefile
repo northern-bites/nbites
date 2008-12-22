@@ -48,9 +48,9 @@ straight: $(STRAIGHT_FILE)
 
 $(CMAKE_DEPEND): 
 	@if [ ! -e $(STRAIGHT_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) cross all; \
+		$(MAKE) $(MAKE_OPTIONS) cross; \
 	else \
-		$(MAKE) $(MAKE_OPTIONS) straight all; \
+		$(MAKE) $(MAKE_OPTIONS) straight; \
 	fi
 
 $(STRAIGHT_FILE):
