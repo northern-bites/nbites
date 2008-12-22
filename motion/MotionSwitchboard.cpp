@@ -100,13 +100,13 @@ void MotionSwitchboard::run() {
         }
 
         // Calculate the next joints and get them
-
+		headProvider.calculateNextJoints();
 		// get headJoints from headProvider
 		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
         //Just switch this line to decide which provider we should use
         MotionProvider * curProvider =
-            reinterpret_cast<MotionProvider *>( &walkProvider);
-        //dynamic_cast <MotionProvider *>( &scriptedProvider);
+//            reinterpret_cast<MotionProvider *>( &walkProvider);
+			reinterpret_cast <MotionProvider *>( &scriptedProvider);
         curProvider->calculateNextJoints();
 
         vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
@@ -117,6 +117,11 @@ void MotionSwitchboard::run() {
         //Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);
 
+		cout << "rleg " << rlegJoints.size() << endl;
+		cout << "rarm " << rarmJoints.size() << endl;
+		cout << "larm " << larmJoints.size() << endl;
+		cout << "lleg " << llegJoints.size() << endl;
+		cout << "head " << headJoints.size() << endl;
 		for(unsigned int i = 0; i < HEAD_JOINTS;i++){
 			nextJoints[HEAD_YAW + i] = headJoints.at(i);
 		}

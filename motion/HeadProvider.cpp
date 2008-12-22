@@ -72,8 +72,7 @@ vector<float> HeadProvider::getCurrentHeads() {
 	vector<float> currentHeads(HEAD_JOINTS);
 
 	for (int i=0; i<HEAD_JOINTS ; i++) {
-		currentHeads[i] = sensors->getBodyAngle(i) -
-			sensors->getBodyAngleError(i);
+		currentHeads[i] = sensors->getBodyAngle(i) - sensors->getBodyAngleError(i);
 	}
 
 	return currentHeads;
