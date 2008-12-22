@@ -33,13 +33,25 @@ StepGenerator::~StepGenerator(){
  *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
+    static int fc = 4;
     static float lastZMP_x = 0;
     static float lastZMP_y = 0;
 
     while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES) {
         if (futureSteps.size() < 1  || futureSteps.size() +
-            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS)
+            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
+
+/*
+ * Start here: The issue is that we aren't doing a good job of keeping track of the correct target in walking leg, so actually moving forward is impossible right now
+ */
+//             fc--;
+//             if (fc == 0){
+//                 cout << "MOVE FORWARD!!"<<endl;
+            //Change the x vector to be moving forward
+//                 x =10;
+//             }
+        }
         else {
             boost::shared_ptr<Step> nextStep = futureSteps.front();
 
@@ -291,6 +303,7 @@ void StepGenerator::generateStep(const float _x,
                                           0, walkParams->stepDuration,
                                           (nextStepIsLeft ?
                                            LEFT_FOOT : RIGHT_FOOT)));
+    cout << "NEW STEP with x="<<_x<<endl;
 
     futureSteps.push_back(step);
     //switch feet after each step is generated

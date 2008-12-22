@@ -1,6 +1,7 @@
 #ifndef _WalkingConstants_h_DEFINED
 #define _WalkingConstants_h_DEFINED
 
+#include <boost/shared_ptr.hpp>
 #include "Kinematics.h"
 using namespace Kinematics;
 
@@ -29,6 +30,11 @@ struct Step{
          const float _duration, const Foot _foot)
         : x(_x),y(_y), theta(_theta), duration(_duration), foot(_foot){}
 };
+
+static const boost::shared_ptr<Step> EMPTY_STEP =
+    boost::shared_ptr<Step>(new Step(0.0f,0.0f,
+                                     0.0f,0.0f,
+                                     LEFT_FOOT));
 
 /*
 struct WalkLegsResult{

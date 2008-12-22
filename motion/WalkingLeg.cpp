@@ -4,6 +4,7 @@
 WalkingLeg::WalkingLeg(ChainID id,
                        const WalkingParameters *walkP)
     :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
+     cur_dest(EMPTY_STEP),last_dest(EMPTY_STEP),
      frameCounter(0), chainID(id), walkParams(walkP),
       goal(ufvector3(3)){
     if (chainID == LLEG_CHAIN)
@@ -18,7 +19,12 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 ublas::matrix<float> fc_Transform){
     //cout << "In leg" << chainID << " got target (" x
     //     << dest_x << "," <<dest_y << ")" <<endl;
+    if(step != cur_dest){
+        cout << "There's a different destination, updating"<<endl;
+        last_dest = cur_dest;
+    }
     cur_dest = step;
+
     //ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     //ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
     //float dest_x = dest_c(0);
@@ -56,10 +62,39 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
 vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float dest_x, float dest_y) {
     ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
-    float dest_x = dest_c(0);
-    float dest_y = dest_c(1);
+    //float dest_x = dest_c(0);
+    //float dest_y = dest_c(1);
+
+    static float dist_to_cover_x = 0;
+    static float dist_to_cover_y = 0;
+
+    if(firstFrame()){
+        cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
+        cout << "Last destination" << last_dest->x<< ","<<last_dest->y << endl;
+        dist_to_cover_x = cur_dest->x - last_dest->x;
+        dist_to_cover_y = cur_dest->y - last_dest->y;
+
+        cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
+        cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
+    }
 
 
+    //There are two attirbutes to control - the height off the ground, and
+    //the progress towards the goal.
+
+    //HORIZONTAL PROGRESS:
+    float percent_incomplete =1 -
+        frameCounter/static_cast<float>(walkParams->singleSupportFrames);
+
+    //cout <<"Percent incomplete" << percent_incomplete <<endl;
+
+    //Then we can express the destination as the proportionate distance to cover
+    float dest_x = dest_c(0) - percent_incomplete*dist_to_cover_x;
+    float dest_y = dest_c(1) - percent_incomplete*dist_to_cover_y;
+
+    //cout << "New Dest (x,y) "<<dest_x <<","<<dest_y <<endl;
+
+    //ELEVATION PROGRESS:
     // the swinging leg will follow a trapezoid in 3-d. The trapezoid has
     // three stages: going up, a level stretch, going back down to the ground
     static int stage;
