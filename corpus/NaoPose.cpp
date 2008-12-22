@@ -263,8 +263,8 @@ intersectLineWithXYPlane(const std::vector<ublas::vector <float> > &aLine) {
 const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
 				    const float objectHeight) {
 
-  if ( pixelX >= IMAGE_WIDTH or pixelX < 0  or 
-       pixelY >= IMAGE_HEIGHT or pixelY < 0  ){
+  if ( pixelX >= IMAGE_WIDTH || pixelX < 0  ||
+       pixelY >= IMAGE_HEIGHT || pixelY < 0  ){
     return NULL_ESTIMATE;
   }
   // declare x,y,z coordinate of pixel in relation to focal point
