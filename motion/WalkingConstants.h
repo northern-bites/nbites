@@ -29,6 +29,11 @@ struct Step{
     Step(const float _x, const float _y, const float _theta,
          const float _duration, const Foot _foot)
         : x(_x),y(_y), theta(_theta), duration(_duration), foot(_foot){}
+
+    friend std::ostream& operator<< (std::ostream &o, const Step &s)
+        {
+            return o << "Step(" << s.x << "," << s.y << "," << s.theta << ") in " << s.duration<<"secs with foot"<<s.foot;
+        }
 };
 
 static const boost::shared_ptr<Step> EMPTY_STEP =
