@@ -107,6 +107,7 @@ private:
     boost::shared_ptr<Step> swingingStep_s;
     boost::shared_ptr<Step> supportStep_f;
     boost::shared_ptr<Step> swingingStep_f;
+    boost::shared_ptr<Step> swingingStepSource_f;
     boost::shared_ptr<Step> lastZMPDStep; //Last step turned into ZMP values
     point<float> coordOffsetLastZMPDStep;
     //Translation matrix to transfer points in the non-changing 'i'

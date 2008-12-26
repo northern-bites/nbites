@@ -46,7 +46,9 @@ public:
     WalkingLeg(ChainID id, const WalkingParameters * walkP);
     //~WalkingLeg() { };
 
-    vector <float> tick(boost::shared_ptr<Step> step,ublas::matrix<float> fc_Transform);//float dest_x, float dest_y);
+    vector <float> tick(boost::shared_ptr<Step> step,
+                        boost::shared_ptr<Step> swing_src,
+                        ublas::matrix<float> fc_Transform);
 
     //Hopefully these never need to get called (architecturally).
     //Instead, use methods like startLeft, right etc
@@ -84,7 +86,7 @@ private:
     int frameCounter;
 
     //destination attributes
-    boost::shared_ptr<Step> cur_dest, last_dest;
+    boost::shared_ptr<Step> cur_dest, swing_src;
 
     //Leg Attributes
     ChainID chainID; //keep track of which leg this is

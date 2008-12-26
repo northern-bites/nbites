@@ -157,6 +157,12 @@ WalkLegsTuple StepGenerator::tick_legs(){
         const ublas::vector<float> origin = CoordFrame3D::vector3D(0,0);
         const ublas::vector<float> supp_pos_f = origin;
 
+
+        //Using the stepTransform, we can also find where the last f coord frame
+        //is, relative to this one
+        ublas::vector<float> swing_src_f = CoordFrame3D::vector3D(0,0);//prod(stepTransform,origin);
+        cout << stepTransform <<endl;
+
         //Second, do the swinging leg, which is more complicated
         //We get the translation matrix that takes points in next f-type
         //coordinate frame, namely the one that will be centered at the swinging
@@ -172,6 +178,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //this only works because its a 3D homog. coord matr - 4D would break
         float hyp_angle = acos(swing_reverse_trans(0,0))/2;
 
+        //we use the swinging source to calc. a path for the swinging foot
+        //it is not clear now if we will need to angle offset or what
+        float last_hyp_angle = 0; //HACK - may need to actually do this
 
         //in the F coordinate frames, we express Steps for each leg
         supportStep_f =
@@ -184,7 +193,19 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                              hyp_angle,
                                              swingingStep_s->duration,
                                              swingingStep_s->foot));
+        swingingStepSource_f  =
+            boost::shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
+                                             last_hyp_angle,
+                                             supportStep_s->duration,
+                                             supportStep_s->foot));
+        cout <<"The swinging source is " << swingingStepSource_f->x << ","
+             <<swingingStepSource_f->y<< "Generated from the support: "<<
+            *supportStep_s.get()<<endl;
     }
+    //In order to make the swinging foot behave properly, I also need
+    //to give the location of the last step (the one I just discarded)
+    //in the current f frame
+    //This is really just the
 
     //calculate the f to c translation matrix
     //cout <<"IF-TRANS " <<if_Transform<<endl;
@@ -217,8 +238,10 @@ WalkLegsTuple StepGenerator::tick_legs(){
 //     float dest_R_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
 //     float dest_R_y = -com_i(1) - HIP_OFFSET_Y;  //targetY
 
-    vector<float> left  = leftLeg.tick(leftStep_f,fc_Transform);//dest_L_x,dest_L_y);
-    vector<float> right = rightLeg.tick(rightStep_f,fc_Transform);//dest_R_x,dest_R_y);
+    vector<float> left  = leftLeg.tick(leftStep_f,swingingStepSource_f,
+                                       fc_Transform);
+    vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
+                                        fc_Transform);
 
     return WalkLegsTuple(left,right);
 }

@@ -5,7 +5,7 @@ WalkingLeg::WalkingLeg(ChainID id,
                        const WalkingParameters *walkP)
     :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
      frameCounter(0),
-     cur_dest(EMPTY_STEP),last_dest(EMPTY_STEP),
+     cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),
      chainID(id), walkParams(walkP),
       goal(ufvector3(3)){
     if (chainID == LLEG_CHAIN)
@@ -17,14 +17,12 @@ WalkingLeg::WalkingLeg(ChainID id,
 
 
 vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
+                                boost::shared_ptr<Step> _swing_src,
                                 ublas::matrix<float> fc_Transform){
     //cout << "In leg" << chainID << " got target (" x
     //     << dest_x << "," <<dest_y << ")" <<endl;
-    if(step != cur_dest){
-        cout << "There's a different destination, updating"<<endl;
-        last_dest = cur_dest;
-    }
     cur_dest = step;
+    swing_src = _swing_src;
 
     //ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     //ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
@@ -69,15 +67,15 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     static float dist_to_cover_x = 0;
     static float dist_to_cover_y = 0;
 
-    if(firstFrame()){
-        cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
-        cout << "Last destination" << last_dest->x<< ","<<last_dest->y << endl;
-        dist_to_cover_x = cur_dest->x - last_dest->x;
-        dist_to_cover_y = cur_dest->y - last_dest->y;
+//     if(firstFrame()){
+//         cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
+//         cout << "Last destination" << swing_src->x<< ","<<swing_src->y << endl;
+//         dist_to_cover_x = cur_dest->x - swing_src->x;
+//         dist_to_cover_y = cur_dest->y - swing_src->y;
 
-        cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
-        cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
-    }
+//         cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
+//         cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
+//     }
 
 
     //There are two attirbutes to control - the height off the ground, and
@@ -224,6 +222,5 @@ void WalkingLeg::switchToNextState(){
 void WalkingLeg::setState(SupportMode newState){
     state = newState;
     lastDiffState = state;
-    last_dest = cur_dest;
     frameCounter = 0;
 }
