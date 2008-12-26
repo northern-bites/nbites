@@ -48,6 +48,8 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
         throw "Invalid SupportMode passed to WalkingLeg::tick";
     }
 
+    if(chainID == 2)
+        cout << "Goal for walking leg for left leg is :" <<goal<<endl;
     frameCounter++;
     //Decide if it's time to switch states
     if ( shouldSwitchStates())
@@ -60,38 +62,51 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
 
 vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float dest_x, float dest_y) {
     ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
+
+
+    ublas::vector<float> src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
+
+
     ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
+    ublas::vector<float> src_c = prod(fc_Transform,src_f);
+
     //float dest_x = dest_c(0);
     //float dest_y = dest_c(1);
 
     static float dist_to_cover_x = 0;
     static float dist_to_cover_y = 0;
 
-//     if(firstFrame()){
-//         cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
-//         cout << "Last destination" << swing_src->x<< ","<<swing_src->y << endl;
-//         dist_to_cover_x = cur_dest->x - swing_src->x;
-//         dist_to_cover_y = cur_dest->y - swing_src->y;
+    if(firstFrame()){
+        cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
+        cout << "Last destination" << swing_src->x<< ","<<swing_src->y << endl;
+        dist_to_cover_x = cur_dest->x - swing_src->x;
+        dist_to_cover_y = cur_dest->y - swing_src->y;
 
-//         cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
-//         cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
-//     }
+        cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
+        cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
+    }
 
 
     //There are two attirbutes to control - the height off the ground, and
     //the progress towards the goal.
 
     //HORIZONTAL PROGRESS:
-    float percent_incomplete =1 -
+    float percent_complete =
         frameCounter/static_cast<float>(walkParams->singleSupportFrames);
 
     //cout <<"Percent incomplete" << percent_incomplete <<endl;
-
+    //cout << "percent complete" << percent_complete<<endl;
     //Then we can express the destination as the proportionate distance to cover
-    float dest_x = dest_c(0) - percent_incomplete*dist_to_cover_x;
-    float dest_y = dest_c(1) - percent_incomplete*dist_to_cover_y;
+    float dest_x = src_f(0) + percent_complete*dist_to_cover_x;
+    float dest_y = src_f(1) + percent_complete*dist_to_cover_y;
 
+
+    ublas::vector<float> target_f = CoordFrame3D::vector3D(dest_x,dest_y);
     //cout << "New Dest (x,y) "<<dest_x <<","<<dest_y <<endl;
+    ublas::vector<float> target_c = prod(fc_Transform, target_f);
+
+    float target_c_x = target_c(0);
+    float target_c_y = target_c(1);
 
     //ELEVATION PROGRESS:
     // the swinging leg will follow a trapezoid in 3-d. The trapezoid has
@@ -124,8 +139,8 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
                               (walkParams->singleSupportFrames/3));
     }
 
-    goal(0) = dest_x;
-    goal(1) = dest_y;
+    goal(0) = target_c_x;
+    goal(1) = target_c_y;
     goal(2) = -walkParams->bodyHeight + heightOffGround;
 
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints);

@@ -49,7 +49,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             if (fc == 0){
                 cout << "MOVE FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
-                x =10;
+                x =20;
             }
         }
         else {
@@ -160,8 +160,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
         //Using the stepTransform, we can also find where the last f coord frame
         //is, relative to this one
-        ublas::vector<float> swing_src_f = CoordFrame3D::vector3D(0,0);//prod(stepTransform,origin);
-        cout << stepTransform <<endl;
+        ublas::vector<float> swing_src_f = prod(stepTransform,origin);
+        //cout << stepTransform <<endl;
 
         //Second, do the swinging leg, which is more complicated
         //We get the translation matrix that takes points in next f-type
@@ -199,7 +199,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                              supportStep_s->duration,
                                              supportStep_s->foot));
         cout <<"The swinging source is " << swingingStepSource_f->x << ","
-             <<swingingStepSource_f->y<< "Generated from the support: "<<
+             <<swingingStepSource_f->y<< " Generated from the support: "<<
             *supportStep_s.get()<<endl;
     }
     //In order to make the swinging foot behave properly, I also need
