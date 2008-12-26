@@ -39,7 +39,7 @@ private:
 	void chopThat(float numChops, vector<float>* currentJoints);
 	void addFinalJoints(const BodyJointCommand *command, vector<float>* currentJoints);
 
-
+	void finalJointsToRad();
 
 };
 

@@ -24,12 +24,11 @@ BodyJointCommand::BodyJointCommand
 	ite = bodyJoints->begin();
 	iteEnd = bodyJoints->begin();
 
-	cout << "jointsize "<< joints->size() << endl;
-
 	// Put the beginning limit at the end of the start of
 	// the LARM_CHAIN joints
 	ite += chain_lengths[HEAD_CHAIN];
 
+	
 	// Put the end limit at the end of the LARM_CHAIN joints,
 	// aka at the beginning plus its length
 	iteEnd = ite;

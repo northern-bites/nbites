@@ -2,7 +2,7 @@
 
 
 ChopShop::ChopShop (Sensors *s, float motionFrameLength)
-	: finalJoints(),
+	: finalJoints(0),
 	  diffPerChop(22),
 	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
@@ -20,7 +20,6 @@ queue<vector<vector<float> > > ChopShop::chopCommand(const BodyJointCommand *com
 	// Checks type of body command and sends to
 	// appropriate function
 //  if (command->getType() == INTERPOLATION_LINEAR){
-	cout << "Chopping command!!!" << endl;
 	return chopLinear(command);
 //  }
 
@@ -69,7 +68,7 @@ queue<vector<vector<float> > > ChopShop::chopLinear(const BodyJointCommand *comm
 		diffPerChop.push_back( (finalJoints.at(joint_id) -
 								currentJoints.at(joint_id)) /
 							   numChops);
-		
+
 	}
 	finalJoints.clear();
 	// @JGM need to add vector for each chain!
@@ -82,7 +81,6 @@ queue<vector<vector<float> > > ChopShop::chopLinear(const BodyJointCommand *comm
 }
 
 void ChopShop::chopThat(float numChops, vector<float> *currentJoints) {
-	cout << "chopthatshit" << endl;
 	float nextVal(0);
 
 	for (int num_chopped=1; num_chopped<=numChops; num_chopped++ ) {
@@ -105,8 +103,8 @@ void ChopShop::chopThat(float numChops, vector<float> *currentJoints) {
 
 void ChopShop::addFinalJoints(const BodyJointCommand *command,
 								  vector<float>* currentJoints) {
-	vector<float>::const_iterator currentStart = currentJoints->begin();
-	vector<float>::const_iterator currentEnd = currentJoints->begin();
+	vector<float>::iterator currentStart = currentJoints->begin();
+	vector<float>::iterator currentEnd = currentJoints->begin();
 
 	for (int chain=0; chain < NUM_CHAINS;chain++) {
 		// First, get chain joints from command
@@ -130,5 +128,16 @@ void ChopShop::addFinalJoints(const BodyJointCommand *command,
 		currentStart += chain_lengths[chain];
 
 	}
+	finalJointsToRad();
+}
 
+void ChopShop::finalJointsToRad() {
+	vector<float>::iterator i;
+	i = finalJoints.begin();
+	i++;
+	while ( i != finalJoints.end() ) {
+		// Convert joints to radians from degrees
+		*i = *i / 57.29577;
+		i++;
+	}
 }

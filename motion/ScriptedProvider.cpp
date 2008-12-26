@@ -18,7 +18,8 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
 	  lArmQueue(LARM_CHAIN),
 	  lLegQueue(LLEG_CHAIN),
 	  rLegQueue(RLEG_CHAIN),
-	  rArmQueue(RARM_CHAIN)
+	  rArmQueue(RARM_CHAIN),
+	  commandQueue()
 {
 
 
@@ -39,6 +40,13 @@ void ScriptedProvider::requestStop() {
 void ScriptedProvider::calculateNextJoints() {
 
 	vector <vector <float> > currentChains = getCurrentChains();
+	// If all queues are empty, then the next command must
+	// be chopped and used.
+	if (lArmQueue.empty() && lLegQueue.empty() &&
+		rLegQueue.empty() && rArmQueue.empty() ) {
+		cout << "They're empty!" << endl;
+		setNextCommand();
+	}
 
 	// Make sure first that the queues are not empty
 	// If they're empty, then add the current joints to be the
@@ -74,17 +82,24 @@ void ScriptedProvider::calculateNextJoints() {
 
 }
 
+// Adds new command to queue of commands.
+// when the chainQueues are all empty,
+// a command is popped, locked, and chopped.
 void ScriptedProvider::enqueue(const BodyJointCommand *command) {
-	// Chop command
+	commandQueue.push(command);
+}
+
+void ScriptedProvider::setNextCommand(){
+
+	const BodyJointCommand *command = commandQueue.front();
+	commandQueue.pop();
 	choppedCommand = chopper.chopCommand(command);
-	cout << "ENQUEING COMMAND" << endl;
+
+
+
 	//Split command by chops
 	vector<vector<vector<float> > >::iterator choppedIter;
 
-	cout << "choppedCommandFront.larm.empty" <<
-		choppedCommand.front().at(LARM_CHAIN).empty() << endl;
-
-//	cout << "choppedFrontSize = " <<choppedCommand.front().size() << endl;
 	while (!choppedCommand.empty()){
 		// Pass each chain to its chainqueue
 

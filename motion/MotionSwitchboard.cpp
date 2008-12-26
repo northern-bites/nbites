@@ -11,13 +11,13 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
-	bodyJoints = new vector<float>(20,90.0f);
-	bodyJoints2 = new vector<float>(20,-90.0f);
-	command = new BodyJointCommand(100.0f,
+	bodyJoints = new vector<float>(20,30.0f);
+	bodyJoints2 = new vector<float>(20,-30.0f);
+	command = new BodyJointCommand(10.0f,
 								   bodyJoints,
 							   Kinematics::INTERPOLATION_LINEAR);
 
-	command2 = new BodyJointCommand(100.0f,
+	command2 = new BodyJointCommand(10.0f,
 								   bodyJoints2,
 							   Kinematics::INTERPOLATION_LINEAR);
 
@@ -36,15 +36,9 @@ void MotionSwitchboard::start() {
 #endif
     fflush(stdout);
 
-	scriptedProvider.enqueue(command);
-	cout << "enqueued 1" << endl;
-	scriptedProvider.enqueue(command2);
-	cout << "enqueued 2" << endl;
-	delete bodyJoints;
-	delete command;
-//	delete bodyJoints2;
-//	delete command2;
 
+	scriptedProvider.enqueue(command);
+	scriptedProvider.enqueue(command2);
 
     running = true;
 
@@ -96,7 +90,6 @@ void MotionSwitchboard::run() {
 
 		vector <float > rarmJoints = scriptedProvider.getChainJoints(RARM_CHAIN);
 		vector <float > larmJoints= scriptedProvider.getChainJoints(LARM_CHAIN);
-
 
         //Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);

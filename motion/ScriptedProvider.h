@@ -36,10 +36,13 @@ private:
 	ChainQueue lLegQueue;
 	ChainQueue rLegQueue;
 	ChainQueue rArmQueue;
+	queue<const BodyJointCommand*> commandQueue;
 
 	pthread_mutex_t scripted_mutex;
 
 	vector <vector <float> > getCurrentChains();
+	void setNextCommand();
+
 };
 
 #endif
