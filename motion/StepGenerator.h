@@ -54,7 +54,7 @@ using namespace boost::numeric;
 using namespace Kinematics;
 
 //Debugging flags:
-//#define DEBUG_CONTROLLER_COM
+#define DEBUG_CONTROLLER_COM
 
 typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;

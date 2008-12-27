@@ -46,7 +46,8 @@ using namespace Kinematics;
 //DEBUG Switches:
 //#define DEBUG_WALKING_STATE_TRANSITIONS
 //#define DEBUG_WALKING_GOAL_CONTINUITY
-//#define DEBUG_WALKING_LOCUS_LOGGING
+#define DEBUG_WALKING_LOCUS_LOGGING
+#define DEBUG_WALKING_DEST_LOGGING
 
 class WalkingLeg  {
 public:
@@ -86,7 +87,9 @@ private:
     SupportMode nextState();
     bool shouldSwitchStates();
     bool firstFrame(){return frameCounter == 0;}
+    void debugProcessing();
 
+private:
     //FSA Attributes
     SupportMode state, lastState,lastDiffState;
     SupportMode supportMode; //soon to be deprecated
@@ -105,6 +108,9 @@ private:
     string leg_name;
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     FILE * locus_log;
+#endif
+#ifdef DEBUG_WALKING_DEST_LOGGING
+    FILE * dest_log;
 #endif
 };
 
