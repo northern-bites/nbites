@@ -15,10 +15,19 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
       controller_x(new PreviewController()),
       controller_y(new PreviewController()){
 
+    //COM logging
+#ifdef DEBUG_CONTROLLER_COM
+    com_log = fopen("/tmp/com_log.xls","w");
+    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\n");
+#endif
+
     setWalkVector(0,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
+#ifdef DEBUG_CONTROLLER_COM
+    fclose(com_log);
+#endif
     delete controller_x; delete controller_y;
 
 }
@@ -41,7 +50,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
         if (futureSteps.size() < 1  || futureSteps.size() +
             currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
-            cout << "Adding a step" <<endl;
+            //cout << "Adding a step" <<endl;
 /*
  * Start here: The issue is that we aren't doing a good job of keeping track of the correct target in walking leg, so actually moving forward is impossible right now
  */
@@ -54,7 +63,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
         }
         else {
             boost::shared_ptr<Step> nextStep = futureSteps.front();
-            cout << "Moving a step from future to current foot: "<<nextStep->foot<<endl;
+            //cout << "Moving a step from future to current foot: "<<nextStep->foot<<endl;
             fillZMP(nextStep);
 
             //transfer the nextStep element from future to current list
@@ -83,6 +92,16 @@ void StepGenerator::tick_controller(){
     const float com_x = controller_x->tick(zmp_ref.get<0>());
     const float com_y = controller_y->tick(zmp_ref.get<1>());
     com_i = CoordFrame3D::vector3D(com_x,com_y);
+
+
+#ifdef DEBUG_CONTROLLER_COM
+    float pre_x = zmp_ref.get<0>()->front();
+    float pre_y = zmp_ref.get<1>()->front();
+
+    static float ttime = 0;
+    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\n",ttime,com_x,com_y,pre_x,pre_y);
+    ttime += 0.05f;
+#endif
     //cout << "Com x: " << com_x << endl;
 }
 
@@ -108,8 +127,10 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
         int numCurrentSteps = static_cast<int>(currentZMPDSteps.size());
         int numFutureSteps  = static_cast<int>(futureSteps.size());
-        cout << "Current Steps: " << numCurrentSteps <<endl;
-        cout << "Future Steps: " << numFutureSteps <<endl;
+        //cout << "Current Steps: " << numCurrentSteps <<endl;
+        //cout << "Future Steps: " << numFutureSteps <<endl;
+        //cout << "ZMPd Frames: " << zmp_ref_x.size() <<endl;
+
         if (numCurrentSteps  + numFutureSteps < MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
 
@@ -198,9 +219,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                              last_hyp_angle,
                                              supportStep_s->duration,
                                              supportStep_s->foot));
-        cout <<"The swinging source is " << swingingStepSource_f->x << ","
-             <<swingingStepSource_f->y<< " Generated from the support: "<<
-            *supportStep_s.get()<<endl;
+        //cout <<"The swinging source is " << swingingStepSource_f->x << ","
+        //     <<swingingStepSource_f->y<< " Generated from the support: "<<
+        //       *supportStep_s.get()<<endl;
     }
     //In order to make the swinging foot behave properly, I also need
     //to give the location of the last step (the one I just discarded)
@@ -290,6 +311,7 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     coordOffsetLastZMPDStep.x += newSupportStep->x;
     //shift to 0 ('s' coord frame):
     coordOffsetLastZMPDStep.y += newSupportStep->y - sign*HIP_OFFSET_Y;
+    //cout << "ZMPd Frames: " <<zmp_ref_x.size()<<endl;
 }
 
 
@@ -311,6 +333,7 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
         zmp_ref_y.push_back(0.0f);
         zmp_ref_x.push_back(0.0f);
     }
+    //cout << "Initial ZMPd Steps: " << zmp_ref_x.size()<<endl;
     coordOffsetLastZMPDStep = point<float>(0,0); //similar to s coord. frame
 
     //start off in a double support phase where the right leg swings first

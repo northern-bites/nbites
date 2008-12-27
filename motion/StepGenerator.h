@@ -33,6 +33,7 @@
 #ifndef _StepGenerator_h_DEFINED
 #define _StepGenerator_h_DEFINED
 
+#include <cstdio>
 #include <cmath>
 #include <list>
 #include <algorithm> //for max
@@ -51,6 +52,9 @@ using std::max;
 #include "CoordFrame.h"
 using namespace boost::numeric;
 using namespace Kinematics;
+
+//Debugging flags:
+//#define DEBUG_CONTROLLER_COM
 
 typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
@@ -125,6 +129,9 @@ private:
     WalkingLeg leftLeg, rightLeg;
 
     WalkController *controller_x, *controller_y;
+#ifdef DEBUG_CONTROLLER_COM
+    FILE* com_log;
+#endif
 };
 
 #endif

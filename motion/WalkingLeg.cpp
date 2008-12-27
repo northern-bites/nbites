@@ -7,14 +7,23 @@ WalkingLeg::WalkingLeg(ChainID id,
      frameCounter(0),
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),
      chainID(id), walkParams(walkP),
-      goal(ufvector3(3)){
-    if (chainID == LLEG_CHAIN)
-        leg_sign = 1;
-    else
-        leg_sign = -1;
+     goal(ufvector3(3)),last_goal(ufvector3(3)),
+     leg_sign(id == LLEG_CHAIN ? 1 : -1),
+     leg_name(id == LLEG_CHAIN ? "left" : "right") {
+#ifdef DEBUG_WALKING_LOCUS_LOGGING
+    char filepath[100];
+    sprintf(filepath,"/tmp/%s_locus_log.xls",leg_name.c_str());
+    locus_log  = fopen(filepath,"w");
+    fprintf(locus_log,"time\tgoal_x\tgoal_y\tgoal_z\tstate\n");
+#endif
     for ( unsigned int i = 0 ; i< LEG_JOINTS; i++) lastJoints[i]=0.0f;
 }
 
+WalkingLeg::~WalkingLeg(){
+#ifdef DEBUG_WALKING_LOCUS_LOGGING
+    fclose(locus_log);
+#endif
+}
 
 vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
@@ -48,8 +57,48 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
         throw "Invalid SupportMode passed to WalkingLeg::tick";
     }
 
-    if(chainID == 2)
-        cout << "Goal for walking leg for left leg is :" <<goal<<endl;
+
+
+#ifdef DEBUG_WALKING_STATE_TRANSITIONS
+    if (firstFrame()){
+        if(chainID == LLEG_CHAIN){
+            cout<<"Left leg "
+        }else{
+            cout<<"Right leg "
+        }
+      if(state == SUPPORTING)
+          cout <<"switched into single support"<<endl;
+      else if(state== DOUBLE_SUPPORT || state == PERSISTENT_DOUBLE_SUPPORT)
+          cout <<"switched into double support"<<endl;
+      else if(state == SWINGING)
+          cout << "switched into swinging."<<endl;
+    }
+#endif
+
+#ifdef DEBUG_WALKING_GOAL_CONTINUITY
+    ufvector3 diff = goal - last_goal;
+    #define GTHRSH 5
+
+
+
+    if(diff(0) > GTHRSH || diff(1) > GTHRSH ||diff(2) > GTHRSH ){
+        if(chainID == LLEG_CHAIN){
+            cout << "Left leg ";
+        }else
+            cout << "Right leg ";
+        cout << "noticed a big jump from last frame"<< diff<<endl;
+        cout << "  from: "<< last_goal<<endl;
+        cout << "  to: "<< goal<<endl;
+
+    }
+#endif
+
+#ifdef DEBUG_WALKING_LOCUS_LOGGING
+    static float ttime= 0.0f;
+    fprintf(locus_log,"%f\t%f\t%f\t%f\t%d\n",ttime,goal(0),goal(1),goal(2),state);
+    ttime += 0.05f;
+#endif
+    last_goal = goal;
     frameCounter++;
     //Decide if it's time to switch states
     if ( shouldSwitchStates())
@@ -76,15 +125,15 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     static float dist_to_cover_x = 0;
     static float dist_to_cover_y = 0;
 
-    if(firstFrame()){
-        cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
-        cout << "Last destination" << swing_src->x<< ","<<swing_src->y << endl;
-        dist_to_cover_x = cur_dest->x - swing_src->x;
-        dist_to_cover_y = cur_dest->y - swing_src->y;
+     if(firstFrame()){
+         //cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
+         //cout << "Last destination" << swing_src->x<< ","<<swing_src->y << endl;
+         dist_to_cover_x = cur_dest->x - swing_src->x;
+         dist_to_cover_y = cur_dest->y - swing_src->y;
 
-        cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
-        cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
-    }
+         //cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
+         //cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
+     }
 
 
     //There are two attirbutes to control - the height off the ground, and

@@ -28,6 +28,8 @@
  *
  */
 
+#include <cstdio>
+#include <string>
 #include <vector>
 using namespace std;
 
@@ -41,10 +43,15 @@ using namespace boost::numeric;
 
 using namespace Kinematics;
 
+//DEBUG Switches:
+//#define DEBUG_WALKING_STATE_TRANSITIONS
+//#define DEBUG_WALKING_GOAL_CONTINUITY
+//#define DEBUG_WALKING_LOCUS_LOGGING
+
 class WalkingLeg  {
 public:
     WalkingLeg(ChainID id, const WalkingParameters * walkP);
-    //~WalkingLeg() { };
+    ~WalkingLeg();
 
     vector <float> tick(boost::shared_ptr<Step> step,
                         boost::shared_ptr<Step> swing_src,
@@ -93,8 +100,12 @@ private:
     const WalkingParameters *walkParams;
     float lastJoints[LEG_JOINTS];
     ufvector3 goal;
+    ufvector3 last_goal;
     int leg_sign; //-1 for right leg, 1 for left leg
-
+    string leg_name;
+#ifdef DEBUG_WALKING_LOCUS_LOGGING
+    FILE * locus_log;
+#endif
 };
 
 #endif
