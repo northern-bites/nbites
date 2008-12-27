@@ -57,6 +57,9 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
         result  =  swinging(fc_Transform);//dest_x, dest_y);
         break;
     case DOUBLE_SUPPORT:
+        //In dbl sup, we have already got the final target after swinging in
+        //mind, so we actually want to keep the target as the "source"
+        cur_dest = swing_src;
         result  = supporting(fc_Transform);//dest_x, dest_y);
         break;
     case PERSISTENT_DOUBLE_SUPPORT:
