@@ -26,7 +26,6 @@ public:
 
     void start();
     void stop();
-    static void* runThread(void *switchboard);
     void run();
 
     const vector <float> getNextJoints();

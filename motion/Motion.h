@@ -11,8 +11,9 @@
  *  - Instantiate a MotionInterface for PyMotion to use to communicate with
  *    Cpp motion module.
  *
- * The switchboard and enactor will both exist in their own thread in order to
- * ensure that commands get sent to the low level on time.
+ * The 'Motion' thread is really the switchboard thread (see MotionSwitchboard
+ * for details). The enactor will also create its own thread, which is dependant
+ * on the platform (i.e. simulator or real robot)
  */
 #ifndef _Motion_h_DEFINED
 #define _Motion_h_DEFINED
@@ -25,8 +26,7 @@
 #include "MotionInterface.h"
 #include "Sensors.h"
 
-class Motion
-//  : public MotionCore
+class Motion : public Thread
 {
   public:
 #ifdef NAOQI1
@@ -38,7 +38,7 @@ class Motion
 
     int start();
     void stop();
-
+    void run();
 private:
     MotionSwitchboard switchboard;
     SimulatorEnactor *enactor;

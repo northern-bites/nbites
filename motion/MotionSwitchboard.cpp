@@ -24,26 +24,15 @@ void MotionSwitchboard::start() {
     fflush(stdout);
 
     running = true;
-
-    // set thread attributes
-    pthread_attr_t attr;
-    pthread_attr_init (&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    // create & start thread.
-    pthread_create(&switchboard_thread, &attr, runThread, (void *)this);
-    // destroy the used attributes
-    pthread_attr_destroy(&attr);
 }
 
 
 void MotionSwitchboard::stop() {
     running = false;
-}
-
-
-void* MotionSwitchboard::runThread(void *switchboard) {
-    ((MotionSwitchboard*)switchboard)->run();
-    pthread_exit(NULL);
+    //signal to end waiting in the run method,
+    pthread_mutex_lock(&next_joints_mutex);
+    pthread_cond_signal(&calc_new_joints_cond);
+    pthread_mutex_unlock(&next_joints_mutex);
 }
 
 

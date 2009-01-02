@@ -5,7 +5,6 @@
 #include "synchro.h"
 #include "Motion.h"
 #include "_motionmodule.h"
-
 #include "SimulatorEnactor.h"
 
 #ifdef NAOQI1
@@ -13,7 +12,8 @@ Motion::Motion (ALPtr<ALMotionProxy> _proxy,shared_ptr<Synchro> _synchro, Sensor
 #else
 Motion::Motion (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
 #endif
-    : switchboard(s),
+    : Thread(_synchro, "MotionCore"),
+      switchboard(s),
       enactor(new SimulatorEnactor(&switchboard)),
       interface(&switchboard)
 {
@@ -30,9 +30,16 @@ int Motion::start() {
     enactor->start();
     switchboard.start();
 
-    return 0;
+    return Thread::start();
 }
 
 void Motion::stop() {
+    switchboard.stop();
     enactor->stop();
+    Thread::stop();
+}
+
+void Motion::run(){
+    cout <<"Motion::run"<<endl;
+    switchboard.run();
 }
