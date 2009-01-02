@@ -58,7 +58,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             if (fc == 0){
                 cout << "MOVE FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
-                x =20;
+                x =30;
             }
         }
         else {
@@ -113,13 +113,7 @@ void StepGenerator::tick_controller(){
 
 
 WalkLegsTuple StepGenerator::tick_legs(){
-    static bool test = true;
-    if  (test){
-        test = false;
-        for(list<boost::shared_ptr<Step> >::iterator itr = currentZMPDSteps.begin(); itr !=currentZMPDSteps.end();itr++ ){
-            cout << "Step in currentZMPDSteps is type "<<(*itr)->foot<<endl;
-        }
-    }
+    
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
     if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
