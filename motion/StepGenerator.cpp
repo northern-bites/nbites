@@ -267,13 +267,17 @@ WalkLegsTuple StepGenerator::tick_legs(){
 void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     //look at the last ZMPD Step and the newStep, and make ZMP values
     float stepTime = newSupportStep->duration;
-
-    const float start_x = lastZMPDStep->x + coordOffsetLastZMPDStep.x;
-    const float start_y = lastZMPDStep->y + coordOffsetLastZMPDStep.y;
+    std::cout << "coordOffx: " << coordOffsetLastZMPDStep.x <<" lastZMPDStepx: "
+              << lastZMPDStep->x << " new supportStepx: " <<newSupportStep->x
+              << endl;
+//     const float start_x = lastZMPDStep->x + coordOffsetLastZMPDStep.x;
+//     const float start_y = lastZMPDStep->y + coordOffsetLastZMPDStep.y;
+    const float start_x =  coordOffsetLastZMPDStep.x;
+    const float start_y = coordOffsetLastZMPDStep.y;
     const float end_x = newSupportStep->x + coordOffsetLastZMPDStep.x;
     const float end_y = newSupportStep->y + coordOffsetLastZMPDStep.y;
 
-    //std::cout << "start_x: " << start_x << "end_x: " << end_x << std::endl;
+    std::cout << "start_x: " << start_x << "end_x: " << end_x << std::endl;
 
     //double support - we want to switch feet
     const int numChops = walkParams->doubleSupportFrames;
