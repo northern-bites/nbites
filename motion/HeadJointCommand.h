@@ -11,13 +11,12 @@
 #include <vector>
 #include <string>
 
-#include "almotionproxy.h"         // for INTERPOLATION_TYPE
-
 #include "WalkCommand.h"
 #include "Kinematics.h"
 using namespace Kinematics;
 
-class HeadJointCommand {
+class HeadJointCommand
+{
  public:
   HeadJointCommand(const float time, const std::vector<float> *joints,
 		   const Kinematics::InterpolationType _type);

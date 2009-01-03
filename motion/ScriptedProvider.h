@@ -7,8 +7,11 @@
 #include "ChainQueue.h"
 #include "Sensors.h"
 #include "ChopShop.h"
+#include "Kinematics.h"
+
 
 using namespace std;
+using namespace Kinematics;
 
 class ScriptedProvider : public MotionProvider {
 public:
@@ -21,27 +24,27 @@ public:
 
 
 	void enqueue(const BodyJointCommand *command);
+	void enqueue(const HeadJointCommand *command);
 	void enqueueSequence(std::vector<BodyJointCommand*> &seq);
+	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
 
 private:
 	Sensors *sensors;
 	float FRAME_LENGTH_S;
 	ChopShop chopper;
 	vector<vector<float> > nextJoints;
-	queue<vector<vector<float> > > choppedCommand;
+	queue<vector<vector<float> > > choppedBodyCommand,choppedHeadCommand;
 
 	// ChainQueues
-	ChainQueue headQueue;
-	ChainQueue lArmQueue;
-	ChainQueue lLegQueue;
-	ChainQueue rLegQueue;
-	ChainQueue rArmQueue;
-	queue<const BodyJointCommand*> commandQueue;
+	vector<ChainQueue> chainQueues;
+	queue<const BodyJointCommand*> bodyCommandQueue;
+	queue<const HeadJointCommand*> headCommandQueue;
 
 	pthread_mutex_t scripted_mutex;
 
 	vector <vector <float> > getCurrentChains();
-	void setNextCommand();
+	void setNextBodyCommand();
+	void setNextHeadCommand();
 
 };
 

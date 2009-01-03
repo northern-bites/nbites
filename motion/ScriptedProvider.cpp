@@ -1,10 +1,4 @@
 #include "ScriptedProvider.h"
-#include "Kinematics.h"
-
-
-
-using namespace Kinematics;
-
 
 ScriptedProvider::ScriptedProvider(float motionFrameLength,
 								   Sensors *s)
@@ -13,16 +7,13 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),
 	  nextJoints(),
-	  choppedCommand(),
-	  headQueue(HEAD_CHAIN),
-	  lArmQueue(LARM_CHAIN),
-	  lLegQueue(LLEG_CHAIN),
-	  rLegQueue(RLEG_CHAIN),
-	  rArmQueue(RARM_CHAIN),
-	  commandQueue()
+	  choppedBodyCommand(),
+	  choppedHeadCommand(),
+	  bodyCommandQueue()
 {
-
-
+	for (int chainID=0; chainID<NUM_CHAINS; chainID++) {
+		chainQueues.push_back( ChainQueue((ChainID)chainID) );
+	}
 	// Create mutexes
 	// (?) Need one mutex per queue (?)
 	pthread_mutex_init (&scripted_mutex, NULL);
@@ -42,78 +33,94 @@ void ScriptedProvider::calculateNextJoints() {
 	vector <vector <float> > currentChains = getCurrentChains();
 	// If all queues are empty, then the next command must
 	// be chopped and used.
-	if (lArmQueue.empty() && lLegQueue.empty() &&
-		rLegQueue.empty() && rArmQueue.empty() ) {
-		cout << "They're empty!" << endl;
-		setNextCommand();
+	bool allEmpty = true;
+
+	if ( !chainQueues.at(HEAD_CHAIN).empty() )
+		setNextHeadCommand();
+
+	for ( int i=LARM_CHAIN ; i<chainQueues.size() ; i++ ) {
+		if ( !chainQueues.at(i).empty() ){
+			cout << "not empty!" << endl;
+			allEmpty=false;
+		}
 	}
+
+	if (allEmpty) setNextBodyCommand();
 
 	// Make sure first that the queues are not empty
 	// If they're empty, then add the current joints to be the
 	// next joints. If they're not empty, then add the queued
 	// joints as the next Chain joints
-  	if (lArmQueue.empty() ) {
- 		setNextChainJoints( LARM_CHAIN,currentChains.at(LARM_CHAIN) );
-  	}else {
-		setNextChainJoints( LARM_CHAIN, lArmQueue.front() );
-		lArmQueue.pop();
-	}
-
-  	if (lLegQueue.empty() ) {
- 		setNextChainJoints( LLEG_CHAIN, currentChains.at(LLEG_CHAIN) );
-  	}else {
-		setNextChainJoints( LLEG_CHAIN, lLegQueue.front() );
-		lLegQueue.pop();
-	}
-
-  	if (rLegQueue.empty() ){
- 		setNextChainJoints( RLEG_CHAIN, currentChains.at(RLEG_CHAIN) );
-  	}else {
-		setNextChainJoints( RLEG_CHAIN, rLegQueue.front() );
-		rLegQueue.pop();
-	}
-
-  	if (rArmQueue.empty() ) {
- 		setNextChainJoints( RARM_CHAIN, currentChains.at(RARM_CHAIN) );
-	}else {
-		setNextChainJoints( RARM_CHAIN, rArmQueue.front() );
-		rArmQueue.pop();
+	for (int chainID=1 ; chainID < chainQueues.size() ; chainID++) {
+		cout << "chain " << chainID << " size = " << chainQueues.at(chainID).size() << endl;
+		if ( chainQueues.at(chainID).empty() ) {
+			setNextChainJoints( (ChainID)chainID, currentChains.at(chainID) );
+		} else {
+			setNextChainJoints( (ChainID)chainID, chainQueues.at(chainID).front() );
+			chainQueues.at(chainID).pop();
+		}
 	}
 
 }
-
-// Adds new command to queue of commands.
-// when the chainQueues are all empty,
-// a command is popped, locked, and chopped.
+/*
+ * Adds new command to queue of commands.
+ * when the chainQueues are all empty,
+ * a command is popped, locked, and chopped.
+ * CAUTION: Will DELETE the enqueued command,
+ * so do not resend commands. One use per command.
+ * Only one BodyJointCommand can be enqueued at
+ * a time, even if they deal with different joints or chains.
+ */
 void ScriptedProvider::enqueue(const BodyJointCommand *command) {
-	commandQueue.push(command);
+	bodyCommandQueue.push(command);
+}
+void ScriptedProvider::enqueue(const HeadJointCommand *command) {
+	headCommandQueue.push(command);
 }
 
-void ScriptedProvider::setNextCommand(){
+void ScriptedProvider::setNextBodyCommand(){
+	cout << "bodyCommandQueue.size() = " << bodyCommandQueue.size() << endl;
 
-	const BodyJointCommand *command = commandQueue.front();
-	commandQueue.pop();
-	choppedCommand = chopper.chopCommand(command);
+	// If there are no more commands, don't try to enqueue one
+	if ( !bodyCommandQueue.empty() ) {
+		
+		const BodyJointCommand *command = bodyCommandQueue.front();
+		bodyCommandQueue.pop();
+		choppedBodyCommand = chopper.chopCommand(command);
+		delete command;
+
+		while (!choppedBodyCommand.empty()){
+			// Pass each chain to its chainqueue
+
+			// Skips the HEAD_CHAIN and enqueues all body chains
+			for (int chainID=1; chainID<chainQueues.size(); chainID++) {
+				chainQueues.at(chainID).push(choppedBodyCommand.front().at(chainID));
+			}
+			choppedBodyCommand.pop();
+		}
+	}
+}
+
+void ScriptedProvider::setNextHeadCommand() {
+
+	if ( !headCommandQueue.empty() ) {
+		const HeadJointCommand *command = headCommandQueue.front();
+		headCommandQueue.pop();
+		choppedHeadCommand = chopper.chopCommand(command);
+		delete command;
+
+		while (!choppedHeadCommand.empty()){
+			// Pass each chain to its chainqueue
+			chainQueues.at(HEAD_CHAIN).push(choppedHeadCommand.front().at(HEAD_CHAIN));
+			choppedHeadCommand.pop();
+
+		}
 
 
 
-	//Split command by chops
-	vector<vector<vector<float> > >::iterator choppedIter;
-
-	while (!choppedCommand.empty()){
-		// Pass each chain to its chainqueue
-
-
-		headQueue.push(choppedCommand.front().at(HEAD_CHAIN));
-		lArmQueue.push(choppedCommand.front().at(LARM_CHAIN));
-		lLegQueue.push(choppedCommand.front().at(LLEG_CHAIN));
-		rLegQueue.push(choppedCommand.front().at(RLEG_CHAIN));
-		rArmQueue.push(choppedCommand.front().at(RARM_CHAIN));
-		choppedCommand.pop();
 	}
 
 }
-
 
 
 void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand*> &seq) {

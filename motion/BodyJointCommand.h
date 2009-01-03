@@ -9,7 +9,6 @@
  */
 
 #include <vector>
-#include "almotionproxy.h"
 #include "Kinematics.h"
 using namespace Kinematics;
 

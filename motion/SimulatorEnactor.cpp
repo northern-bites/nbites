@@ -20,16 +20,13 @@ void SimulatorEnactor::run() {
         cout<<"]"<<endl;
         */
         // Get the angles we want to go to this frame from the switchboard
-
-		// Why is this getting joints again? @jstrom
 		vector<float> result = switchboard->getNextJoints();
-// 		for (int i=0; i<result.size();i++) {
-// 			cout << "result of joint " << i << " is " << result.at(i) << endl;
-// 		}
+ 		for (int i=0; i<result.size();i++) {
+ 			cout << "result of joint " << i << " is " << result.at(i) << endl;
+ 		}
 		motionProxy->postGotoBodyAngles(result,
                                         MOTION_FRAME_LENGTH_S,
                                         AL::ALMotionProxy::INTERPOLATION_LINEAR);
-
         // TODO: This is probably wrong!!!!1!ONE
         // We probably want to sleep webots time and this sleeps real time.
         usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS));

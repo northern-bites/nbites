@@ -2,10 +2,11 @@
 #define _ChopShop_h_DEFINED
 
 #include <vector>
-
+#include <queue>
 
 #include "Sensors.h"
 #include "BodyJointCommand.h"
+#include "HeadJointCommand.h"
 #include "Kinematics.h"
 
 using namespace std;
@@ -14,10 +15,10 @@ using namespace Kinematics;
 class ChopShop
 {
 public:
-	ChopShop(Sensors *s, float motionFrameLength);
+ 	ChopShop(Sensors *s, float motionFrameLength);
 
 	queue<vector<vector<float> > > chopCommand(const BodyJointCommand *command);
-
+	queue<vector<vector<float> > > chopCommand(const HeadJointCommand *command);
 private:
 	// Class objects
 	vector<float> finalJoints;
@@ -34,8 +35,13 @@ private:
 	queue<vector<vector<float> > > choppedJoints;
 	const vector<float> *nextChain;
 
+
 	queue<vector<vector<float> > > chopSmooth(const BodyJointCommand *command);
+	queue<vector<vector<float> > > chopSmooth(const HeadJointCommand *command);
+
 	queue<vector<vector<float> > > chopLinear(const BodyJointCommand *command);
+	queue<vector<vector<float> > > chopLinear(const HeadJointCommand *command);
+
 	void chopThat(float numChops, vector<float>* currentJoints);
 	void addFinalJoints(const BodyJointCommand *command, vector<float>* currentJoints);
 

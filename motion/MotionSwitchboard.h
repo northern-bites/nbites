@@ -47,6 +47,7 @@ private:
 	vector<float> *bodyJoints2;
 	BodyJointCommand *command;
 	BodyJointCommand *command2;
+	BodyJointCommand *command3;
 
 
     pthread_t       switchboard_thread;

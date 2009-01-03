@@ -11,15 +11,23 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
+
+
+
+	vector<float>* bodyJoints3 = new vector<float>(4,45.0f);
+	command3 = new BodyJointCommand(5.0f, LARM_CHAIN,
+									bodyJoints3,
+									Kinematics::INTERPOLATION_LINEAR);
+
 	bodyJoints = new vector<float>(20,30.0f);
-	bodyJoints2 = new vector<float>(20,-30.0f);
 	command = new BodyJointCommand(10.0f,
 								   bodyJoints,
 							   Kinematics::INTERPOLATION_LINEAR);
 
+	bodyJoints2 = new vector<float>(20,-30.0f);
 	command2 = new BodyJointCommand(10.0f,
-								   bodyJoints2,
-							   Kinematics::INTERPOLATION_LINEAR);
+									bodyJoints2,
+									Kinematics::INTERPOLATION_LINEAR);
 
 }
 
@@ -39,6 +47,7 @@ void MotionSwitchboard::start() {
 
 	scriptedProvider.enqueue(command);
 	scriptedProvider.enqueue(command2);
+	scriptedProvider.enqueue(command3);
 
     running = true;
 
@@ -119,7 +128,6 @@ void MotionSwitchboard::run() {
 
 
 const vector <float> MotionSwitchboard::getNextJoints() {
-    //grab the latest values, and signal
     pthread_mutex_lock(&next_joints_mutex);
 
     const vector <float> vec(nextJoints);
