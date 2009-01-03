@@ -422,6 +422,18 @@ Sensors::getBodyAngleErrors ()
   return vec;
 }
 
+const float
+Sensors::getBodyAngleError (int index)
+{
+	pthread_mutex_lock (&errors_mutex);
+
+	const float angleError = bodyAnglesError[index];
+
+	pthread_mutex_unlock (&errors_mutex);
+
+	return angleError;
+}
+
 void
 Sensors::setBodyAngles (vector<float>& v)
 {

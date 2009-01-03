@@ -5,6 +5,7 @@
 
 #include "MotionProvider.h"
 #include "ChainQueue.h"
+#include "BodyJointCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"

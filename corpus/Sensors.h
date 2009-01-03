@@ -50,6 +50,7 @@ class Sensors {
     std::vector<float> getVisionBodyAngles();
     const float getBodyAngle(const int index); // NOT wrapped for python use
     std::vector<float> getBodyAngleErrors();
+	const float getBodyAngleError(int index); // Also NOT wrapped for python
 #if ROBOT(NAO)
     std::vector<float> getFSR();
     std::vector<float> getInertial();

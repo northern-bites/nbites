@@ -24,7 +24,6 @@ ScriptedProvider::~ScriptedProvider() {
 
 void ScriptedProvider::requestStop() {
 	// Finish motion or stop immediately?
-
 }
 
 void ScriptedProvider::calculateNextJoints() {
@@ -100,11 +99,10 @@ void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand*> &seq) {
 	for (vector<BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
 		enqueue(*i);
 	pthread_mutex_unlock(&scripted_mutex);
-
 }
 
 vector<vector<float> > ScriptedProvider::getCurrentChains() {
-	vector<vector<float> > currentChains(5);
+	vector<vector<float> > currentChains(NUM_BODY_CHAINS);
 
 	vector<float> currentJoints = sensors->getBodyAngles();
 	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
@@ -113,8 +111,9 @@ vector<vector<float> > ScriptedProvider::getCurrentChains() {
 		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
 	}
 
-	unsigned int lastChainJoint = 0;
-	for (unsigned int chain=0,joint=0; chain<NUM_CHAINS; chain++) {
+	unsigned int lastChainJoint = HEAD_JOINTS;
+	unsigned int joint=HEAD_JOINTS;
+	for (unsigned int chain=LARM_CHAIN/* skip head*/;chain<NUM_BODY_CHAINS; chain++) {
 		lastChainJoint += chain_lengths[chain];
 
 		for ( ; joint < lastChainJoint ; joint++){
