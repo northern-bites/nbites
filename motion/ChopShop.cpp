@@ -52,6 +52,13 @@ queue<vector<vector<float> > > ChopShop::chopSmooth(const HeadJointCommand *comm
  *
  *
  */
+queue<vector<vector<float> > > ChopShop::chopLinear(const HeadJointCommand *command) {
+	// PLACE HOLDER
+	queue<vector<vector<float> > > a;
+	return a;
+}
+
+
 queue<vector<vector<float> > > ChopShop::chopLinear(const BodyJointCommand *command) {
 
 	// Clear previous queue and vectors
