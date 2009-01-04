@@ -24,7 +24,6 @@ BodyJointCommand::BodyJointCommand
 	// then bump them to the end of the head_chain,
 	// since BJC do not deal with the head
 	firstMark = endMark = bodyJoints->begin();
-	firstMark = endMark += chain_lengths[HEAD_CHAIN];
 
 	// Build joint vectors for each chain
 	// from the bodyJoint vector
