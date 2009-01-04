@@ -113,11 +113,11 @@ vector<vector<float> > ScriptedProvider::getCurrentChains() {
 
 	unsigned int lastChainJoint = HEAD_JOINTS;
 	unsigned int joint=HEAD_JOINTS;
-	for (unsigned int chain=LARM_CHAIN/* skip head*/;chain<NUM_BODY_CHAINS; chain++) {
+	for (unsigned int chain=LARM_CHAIN/* skip head*/;chain<NUM_CHAINS; chain++) {
 		lastChainJoint += chain_lengths[chain];
 
 		for ( ; joint < lastChainJoint ; joint++){
-			currentChains.at(chain).push_back(currentJoints[joint]);
+			currentChains.at(chain-1/*No head in currentChains*/).push_back(currentJoints[joint]);
 		}
 
 	}
