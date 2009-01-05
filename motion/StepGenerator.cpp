@@ -102,92 +102,67 @@ void StepGenerator::tick_controller(){
     fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\n",ttime,com_x,com_y,pre_x,pre_y);
     ttime += 0.05f;
 #endif
-    //cout << "Com x: " << com_x << endl;
 }
 
 /** Central method for moving the walking legs. It handles important stuff like:
  *
  *  * Switching support feet
+ *  * Updating the coordinate transformations from i to f and f to c
+ *  * Keep running track of the f locations of the following 'footholds':
+ *    - the support foot (supp_pos_f), which depends on the first step in the
+ *      ZMPDSteps queue, but is always at the origin in f frame, by definition
+ *    - the source of the swinging foot (swing_src_f), which is the location
+ *      where the now swinging foot was once the supporting foot
+ *    - the destination of the swinging foot (swing_pos_f), which depends on
+ *      the second step in the ZMPDSteps queue
  *  * Handles poping from the ZMPDStep list when we switch support feet
  */
 
 
 WalkLegsTuple StepGenerator::tick_legs(){
-    
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
     if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
-        //pop from the front of the current steps
 
         int numCurrentSteps = static_cast<int>(currentZMPDSteps.size());
         int numFutureSteps  = static_cast<int>(futureSteps.size());
-        //cout << "Current Steps: " << numCurrentSteps <<endl;
-        //cout << "Future Steps: " << numFutureSteps <<endl;
-        //cout << "ZMPd Frames: " << zmp_ref_x.size() <<endl;
 
         if (numCurrentSteps  + numFutureSteps < MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
 
-        //We may eventually be able to do withouth this switch
-        switch(min(numCurrentSteps,3)){
-        case 3:
-            //there are three elements in the list, pop the obsolete one
-            //and the first step is the support one now, the second the swing
-            currentZMPDSteps.pop_front();
-            swingingStep_s  = *(++currentZMPDSteps.begin());
-            supportStep_s   =  *currentZMPDSteps.begin();
-            break;
-        case 2:
-            //there are only two elements in the list of active steps
-            //this means we need to look at one step in the future steps
-            currentZMPDSteps.pop_front();
-            swingingStep_s  =  *futureSteps.begin();
-            supportStep_s   =  *currentZMPDSteps.begin();
-            break;
-        case 1:
-            //there is only one elements in the list of active steps
-            //this means we need to look at two step in the future steps list
-            currentZMPDSteps.pop_front();
-            //note the absence of break!
-        case 0:
-            //there is nothing to pop, so just look at future steps.
-            swingingStep_s  =  *(++futureSteps.begin());
-            supportStep_s   =  *futureSteps.begin();
-            break;
-        default:
-            throw "Something odd is happening in a StepGen switch statement";
-
-        }
+        //there are three elements in the list, pop the obsolete one
+        //and the first step is the support one now, the second the swing
+        currentZMPDSteps.pop_front();
+        swingingStep_s  = *(++currentZMPDSteps.begin());
+        supportStep_s   =  *currentZMPDSteps.begin();
 
         //update the translation matrix between i and f coord. frames
         ublas::matrix<float> stepTransform = get_fprime_f(supportStep_s);
-        //cout <<"Step transform" << stepTransform <<endl;
         if_Transform = prod(stepTransform,if_Transform);
-        //cout <<"I to F transform: " <<if_Transform <<endl;
-        //cout << "support step says it is : " << supportStep->foot << endl;
-        //cout << "Left leg says it is : " << leftLeg.getSupportMode() << endl;
 
-        //express the supporting foot and swinging foots locations in f coord.
+        //Express the  destination  and source for the supporting foot and
+        //swinging foots locations in f coord. Since the supporting foot doesn't
+        //move, we ignore its source.
+
         //First, do the support foot, which is always at the origin
         const ublas::vector<float> origin = CoordFrame3D::vector3D(0,0);
         const ublas::vector<float> supp_pos_f = origin;
 
-
-        //Using the stepTransform, we can also find where the last f coord frame
-        //is, relative to this one
+        //Second, do the source of the swinging leg, which can be calculated
+        //using the stepTransform matrix from above
         ublas::vector<float> swing_src_f = prod(stepTransform,origin);
-        //cout << stepTransform <<endl;
 
-        //Second, do the swinging leg, which is more complicated
+        //Third, do the dest. of the swinging leg, which is more complicated
         //We get the translation matrix that takes points in next f-type
         //coordinate frame, namely the one that will be centered at the swinging
         //foot's destination, and puts them into the current f coord. frame
         const ublas::matrix<float> swing_reverse_trans =
             get_f_fprime(swingingStep_s);
-        //This gives us the position of the swingin foot in the current f frame
+        //This gives us the position of the swinging foot's destination
+        //in the current f frame
         const ublas::vector<float> swing_pos_f = prod(swing_reverse_trans,
                                                       origin);
-        //finally, we need to know how much turning there will be
+        //finally, we need to know how much turning there will be. Turns out,
         //we can simply read this out of the aforementioned translation matr.
         //but, it will be twice the max. angle we send to HYP joint
         //this only works because its a 3D homog. coord matr - 4D would break
@@ -197,7 +172,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //it is not clear now if we will need to angle offset or what
         float last_hyp_angle = 0; //HACK - may need to actually do this
 
-        //in the F coordinate frames, we express Steps for each leg
+        //in the F coordinate frames, we express Steps representing
+        // the three footholds from above
         supportStep_f =
             boost::shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
                                              hyp_angle,
@@ -213,27 +189,19 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                              last_hyp_angle,
                                              supportStep_s->duration,
                                              supportStep_s->foot));
-        //cout <<"The swinging source is " << swingingStepSource_f->x << ","
-        //     <<swingingStepSource_f->y<< " Generated from the support: "<<
-        //       *supportStep_s.get()<<endl;
     }
-    //In order to make the swinging foot behave properly, I also need
-    //to give the location of the last step (the one I just discarded)
-    //in the current f frame
-    //This is really just the
 
-    //calculate the f to c translation matrix
-    //cout <<"IF-TRANS " <<if_Transform<<endl;
-    //cout <<"COM_I " <<com_i<<endl;
-
+    //Each frame, we must recalculate the location of the center of mass
+    //relative to the support leg (f coord frame), based on the output
+    //of the controller (in tick_controller() )
     ublas::vector<float> com_f = prod(if_Transform,com_i);
+
+    //Using the location of the com in the f coord frame, we can calculate
+    //a transformation matrix to go from f to c
     fc_Transform = CoordFrame3D::translation3D(-com_f(0),-com_f(1));
-    //translate the targets for support and swinging foot into c frame
-    //cout <<"COM_F " <<com_f<<endl;
-    //update leftLeg, rightLeg with targets in c frame
 
-    //Temporary conversion to c frame for controller target
 
+    //Now we need to determine which leg to send the coorect footholds/Steps to
     boost::shared_ptr<Step> leftStep_f,rightStep_f;
     //First, the support leg.
     if (supportStep_f->foot == LEFT_FOOT){
@@ -245,14 +213,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
         leftStep_f = swingingStep_f;
     }
 
-
-
-    // float dest_L_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
-//     float dest_L_y = -com_i(1) + HIP_OFFSET_Y;  //targetY
-
-//     float dest_R_x = -com_i(0) + walkParams->hipOffsetX; //targetX for this leg
-//     float dest_R_y = -com_i(1) - HIP_OFFSET_Y;  //targetY
-
+    //Since we'd like to ignore the state information of the WalkinLeg as much
+    //as possible, we send in the source of the swinging leg to both, regardless
     vector<float> left  = leftLeg.tick(leftStep_f,swingingStepSource_f,
                                        fc_Transform);
     vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
@@ -267,17 +229,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
 void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     //look at the last ZMPD Step and the newStep, and make ZMP values
     float stepTime = newSupportStep->duration;
-    std::cout << "coordOffx: " << coordOffsetLastZMPDStep.x <<" lastZMPDStepx: "
-              << lastZMPDStep->x << " new supportStepx: " <<newSupportStep->x
-              << endl;
-//     const float start_x = lastZMPDStep->x + coordOffsetLastZMPDStep.x;
-//     const float start_y = lastZMPDStep->y + coordOffsetLastZMPDStep.y;
+//  std::cout << "coordOffx: " << coordOffsetLastZMPDStep.x <<" lastZMPDStepx: "
+//               << lastZMPDStep->x << " new supportStepx: " <<newSupportStep->x
+//               << endl;
     const float start_x =  coordOffsetLastZMPDStep.x;
     const float start_y = coordOffsetLastZMPDStep.y;
     const float end_x = newSupportStep->x + coordOffsetLastZMPDStep.x;
     const float end_y = newSupportStep->y + coordOffsetLastZMPDStep.y;
 
-    std::cout << "start_x: " << start_x << "end_x: " << end_x << std::endl;
+//    std::cout << "start_x: " << start_x << "end_x: " << end_x << std::endl;
 
     //double support - we want to switch feet
     const int numChops = walkParams->doubleSupportFrames;
@@ -309,7 +269,6 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
     coordOffsetLastZMPDStep.x += newSupportStep->x;
     //shift to 0 ('s' coord frame):
     coordOffsetLastZMPDStep.y += newSupportStep->y - sign*HIP_OFFSET_Y;
-    //cout << "ZMPd Frames: " <<zmp_ref_x.size()<<endl;
 }
 
 
