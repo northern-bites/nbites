@@ -43,3 +43,13 @@ private:
     virtual void incorporateCorrectionMeasurement() = 0;
 };
 #endif EKF_h_DEFINED
+
+/**
+Invert a two by two matrix easily
+given:
+ [a b
+  c d]
+return:
+(1/(ad - bc)) [ d -b
+               -c  a]
+ */

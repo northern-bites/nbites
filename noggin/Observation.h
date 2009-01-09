@@ -26,6 +26,8 @@ using namespace std;
 class PointLandmark
 {
 public:
+    PointLandmark(float _x, float _y);
+    PointLandmark();
     float x;
     float y;
 };
@@ -36,6 +38,8 @@ public:
 class LineLandmark
 {
 public:
+    LineLandmark(float _x1, float _y1, float _x2, float _y2);
+    LineLandmark();
     float x1;
     float y1;
     float x2;
@@ -56,6 +60,7 @@ public:
     Observation(FieldObjects &_object);
     Observation(VisualCorner &_corner);
     Observation(VisualLine &_line);
+    Observation(const ConcreteCorner &_corner);
     virtual ~Observation();
 
     // Core Functions

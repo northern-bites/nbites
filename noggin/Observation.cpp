@@ -69,9 +69,8 @@ Observation::Observation(FieldObjects &_object)
     //list <const ConcreteFieldObject *> objList = _object.getPossibleFieldObjects();
     for( theIterator = objList.begin(); theIterator != objList.end();
          ++theIterator) {
-        PointLandmark objectLandmark;
-        objectLandmark.x = (**theIterator).getFieldX();
-        objectLandmark.y = (**theIterator).getFieldY();
+        PointLandmark objectLandmark((**theIterator).getFieldX(),
+                                     (**theIterator).getFieldY());
         pointPossibilities.push_back(objectLandmark);
         ++numPossibilities;
     }
@@ -101,9 +100,8 @@ Observation::Observation(VisualCorner &_corner)
     list <const ConcreteCorner *> cornerList = _corner.getPossibleCorners();
     for( theIterator = cornerList.begin(); theIterator != cornerList.end();
          ++theIterator) {
-        PointLandmark cornerLandmark;
-        cornerLandmark.x = (**theIterator).getFieldX();
-        cornerLandmark.y = (**theIterator).getFieldY();
+        PointLandmark cornerLandmark((**theIterator).getFieldX(),
+                                     (**theIterator).getFieldY());
         pointPossibilities.push_back(cornerLandmark);
         ++numPossibilities;
     }
@@ -135,19 +133,36 @@ Observation::Observation(VisualLine &_line)
     list <const ConcreteLine *> lineList = _line.getPossibleLines();
     for( theIterator = lineList.begin(); theIterator != lineList.end();
          ++theIterator) {
-        LineLandmark addLine;
-        addLine.x1 = (**theIterator).getFieldX1();
-        addLine.y1 = (**theIterator).getFieldY1();
-        addLine.x2 = (**theIterator).getFieldX1();
-        addLine.y2 = (**theIterator).getFieldY1();
+        LineLandmark addLine((**theIterator).getFieldX1(),
+                             (**theIterator).getFieldY1(),
+                             (**theIterator).getFieldX1(),
+                             (**theIterator).getFieldY1());
         linePossibilities.push_back(addLine);
         ++Observation::numPossibilities;
     }
 
 }
 
+Observation::Observation(const ConcreteCorner &_corner)
+{
+    numPossibilities = 1;
+    PointLandmark cornerLandmark(_corner.getFieldX(),_corner.getFieldY());
+    pointPossibilities.push_back(cornerLandmark);
+}
 
 /**
  * Deconstructor for our observation
  */
 Observation::~Observation() {}
+
+// Simple class constructors
+
+PointLandmark::PointLandmark(float _x, float _y): x(_x), y(_y){}
+
+PointLandmark::PointLandmark(){}
+
+LineLandmark::LineLandmark(float _x1, float _y1, float _x2, float _y2):
+    x1(_x1), y1(_y2), x2(_x2), y2(_y2){}
+
+LineLandmark::LineLandmark(){}
+

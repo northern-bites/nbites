@@ -1,5 +1,4 @@
-// Internal constants
-
+#include "BallEKF.h"
 
 BallEKF::BallEKF() : EKF(BALL_EKF_DIMENSION)
 {

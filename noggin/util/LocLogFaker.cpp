@@ -74,10 +74,10 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
-            visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
+            //visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
             sigmaB = getBearingSD(visBearing);
             visBearing += (M_PI / 2.0f);
-            visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
+            //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Build the (visual) field object
             FieldObjects fo(toView->getID());
@@ -108,15 +108,18 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
             sigmaB = getBearingSD(visBearing);
-            visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
+            visBearing += (M_PI / 2.0f);
+            //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Build the visual corner
-            // VisualCorner * seen = new VisualCorner(toView.getID());
-            // seen->setDist(visDist);
-            // seen->setBearing(visBearing);
-            // seen->setDistanceSD(sigmaD);
-            // seen->setBearingSD(sigmaB);
-
+            // VisualCorner vc(toView->getID());
+            // Build the observation
+            Observation seen(*toView);
+            seen.setVisDist(visDist);
+            seen.setVisBearing(visBearing);
+            seen.setDistSD(sigmaD);
+            seen.setBearingSD(sigmaB);
+            Z_t.push_back(seen);
         }
     }
 

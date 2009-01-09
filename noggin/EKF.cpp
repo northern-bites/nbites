@@ -1,3 +1,5 @@
+#include "EKF.h"
+
 EKF::EKF(int dimension)
 {
     // Declare 4 dimensional state thing
@@ -18,4 +20,8 @@ void EKF::correctionStep(std::vector<Measurement> z_k)
     for(unsigned int i = 0; i < z_k.size(); ++i) {
         incorporateCorrection(z_k[i]);
     }
+}
+
+void EKF::noCorrectionStep()
+{
 }
