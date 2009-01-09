@@ -3,17 +3,23 @@
 
 ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
                                const cornerID _id)
-  : ConcreteLandmark(_fieldX, _fieldY) {
-  id = _id;
+    : ConcreteLandmark(_fieldX, _fieldY), id(_id) {
+
+  cornerType = inferCornerType(_id);
+}
+ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
+                               const ConcreteLine _l1, const ConcreteLine _l2,
+                               const cornerID _id)
+    : ConcreteLandmark(_fieldX, _fieldY), id(_id) , line1(&_l1), line2(&_l2) {
 
   cornerType = inferCornerType(_id);
 }
 
 // Copy constructor - just pairwise copy the elements
 ConcreteCorner::ConcreteCorner(const ConcreteCorner& other)
-  : ConcreteLandmark(other) {
-  id = other.id;
-  cornerType = other.cornerType;
+    : ConcreteLandmark(other), id(other.id), cornerType(other.cornerType) {
+    // id = other.id;
+    // cornerType = other.cornerType;
 }
 
 // No memory to free
@@ -27,61 +33,85 @@ ConcreteCorner::~ConcreteCorner() {}
 const ConcreteCorner ConcreteCorner::
 blue_corner_left_l(FIELD_WHITE_LEFT_SIDELINE_X,
                    FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                   // ConcreteLine::blue_yellow_sideline,
+                   // ConcreteLine::blue_goal_endline,
                    BLUE_CORNER_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
 blue_corner_right_l(FIELD_WHITE_RIGHT_SIDELINE_X,
                     FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                    // ConcreteLine::yellow_blue_sideline,
+                    // ConcreteLine::blue_goal_endline,
                     BLUE_CORNER_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_left_t(GOALBOX_LEFT_X,
                  FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                 // ConcreteLine::blue_goal_endline,
+                 // ConcreteLine::blue_goalbox_left_line,
                  BLUE_GOAL_LEFT_T);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_right_t(GOALBOX_RIGHT_X,
                   FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                  // ConcreteLine::blue_goal_endline,
+                  // ConcreteLine::blue_goalbox_right_line,
                   BLUE_GOAL_RIGHT_T);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_left_l(GOALBOX_LEFT_X,
                  GOALBOX_HEIGHT + FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                 // ConcreteLine::blue_goalbox_left_line,
+                 // ConcreteLine::blue_goalbox_top_line,
                  BLUE_GOAL_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_right_l(GOALBOX_RIGHT_X,
                   GOALBOX_HEIGHT+FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                  // ConcreteLine::blue_goalbox_right_line,
+                  // ConcreteLine::blue_goalbox_top_line,
                   BLUE_GOAL_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_corner_left_l(FIELD_WHITE_RIGHT_SIDELINE_X,
                      FIELD_WHITE_TOP_SIDELINE_Y,
+                     // ConcreteLine::blue_yellow_sideline,
+                     // ConcreteLine::yellow_goal_endline,
                      YELLOW_CORNER_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_corner_right_l(FIELD_WHITE_LEFT_SIDELINE_X,
                       FIELD_WHITE_TOP_SIDELINE_Y,
+                      // ConcreteLine::yellow_blue_sideline,
+                      // ConcreteLine::yellow_goal_endline,
                       YELLOW_CORNER_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_left_t(GOALBOX_RIGHT_X,
                    FIELD_WHITE_TOP_SIDELINE_Y,
+                   // ConcreteLine::yellow_goalbox_left_line,
+                   // ConcreteLine::yellow_goal_endline,
                    YELLOW_GOAL_LEFT_T);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_right_t(GOALBOX_LEFT_X,
                     FIELD_WHITE_TOP_SIDELINE_Y,
+                    // ConcreteLine::yellow_goalbox_right_line,
+                    // ConcreteLine::yellow_goal_endline,
                     YELLOW_GOAL_RIGHT_T);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_left_l(GOALBOX_RIGHT_X,
                    FIELD_WHITE_TOP_SIDELINE_Y - GOALBOX_HEIGHT,
+                   // ConcreteLine::yellow_goalbox_left_line,
+                   // ConcreteLine::yellow_goalbox_top_line,
                    YELLOW_GOAL_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_right_l(GOALBOX_LEFT_X,
                     FIELD_WHITE_TOP_SIDELINE_Y - GOALBOX_HEIGHT,
+                    // ConcreteLine::yellow_goalbox_right_line,
+                    // ConcreteLine::yellow_goalbox_top_line,
                     YELLOW_GOAL_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
@@ -92,11 +122,15 @@ center_circle(MIDFIELD_X,
 const ConcreteCorner ConcreteCorner::
 center_by_t(FIELD_WHITE_RIGHT_SIDELINE_X,
             MIDFIELD_Y,
+            // ConcreteLine::blue_yellow_sideline,
+            // ConcreteLine::center_field_line,
             CENTER_BY_T);
 
 const ConcreteCorner ConcreteCorner::
 center_yb_t(FIELD_WHITE_LEFT_SIDELINE_X,
             MIDFIELD_Y,
+            // ConcreteLine::yellow_blue_sideline,
+            // ConcreteLine::center_field_line,
             CENTER_YB_T);
 
 const ConcreteCorner* ConcreteCorner::concreteCornerList[NUM_CORNERS] =
