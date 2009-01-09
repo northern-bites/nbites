@@ -8,62 +8,6 @@ using namespace std;
 #include "FieldConstants.h"
 #include "ConcreteFieldObject.h"
 
-////////////////////////////////////////////////////////////
-// Constants for absolute coordinates on the field of the six
-// most meaningful field objects (in terms of stationary things
-// we extract distance information from).  Since we do not use
-// backstops for any distance/bearing information, I am not including
-// it here.
-// (0,0) is the lower left corner of the field when BLUE goal is at the
-// bottom
-// NICK
-//
-////////////////////////////////////////////////////////////
-
-static const point <float> BLUE_GOAL_LEFT_POST_LOC =
-    point<float>(LANDMARK_MY_GOAL_LEFT_POST_X,
-                  LANDMARK_MY_GOAL_LEFT_POST_Y);
-
-static const point <float> BLUE_GOAL_RIGHT_POST_LOC =
-    point<float>(LANDMARK_MY_GOAL_RIGHT_POST_X,
-                  LANDMARK_MY_GOAL_RIGHT_POST_Y);
-
-static const point <float> YELLOW_GOAL_LEFT_POST_LOC =
-    point<float>(LANDMARK_OPP_GOAL_RIGHT_POST_X,
-                  LANDMARK_OPP_GOAL_RIGHT_POST_Y);
-
-static const point <float> YELLOW_GOAL_RIGHT_POST_LOC =
-    point<float>(LANDMARK_OPP_GOAL_LEFT_POST_X,
-                  LANDMARK_OPP_GOAL_LEFT_POST_Y);
-
-static const point <float> YELLOW_BLUE_BEACON_LOC =
-    point<float>(LANDMARK_LEFT_BEACON_X, LANDMARK_LEFT_BEACON_Y);
-
-static const point <float> BLUE_YELLOW_BEACON_LOC =
-    point<float>(LANDMARK_RIGHT_BEACON_X, LANDMARK_RIGHT_BEACON_Y);
-
-// Arc locations are defined to be the center of the quarter circle spanned
-// by the arc
-static const point <float> BLUE_GOAL_YELLOW_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_LEFT_SIDELINE_X, FIELD_WHITE_BOTTOM_SIDELINE_Y);
-
-static const point <float> BLUE_GOAL_BLUE_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_RIGHT_SIDELINE_X, FIELD_WHITE_BOTTOM_SIDELINE_Y);
-
-static const point <float> YELLOW_GOAL_YELLOW_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_RIGHT_SIDELINE_X, FIELD_WHITE_TOP_SIDELINE_Y);
-
-static const point <float> YELLOW_GOAL_BLUE_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_LEFT_SIDELINE_X, FIELD_WHITE_TOP_SIDELINE_Y);
-
-
-
-
-
-
-static const point <float> UNKNOWN_LOC =
-    point<float>(-1, -1);
-
 class FieldObjects;
 #include "Vision.h"
 
@@ -155,9 +99,9 @@ public:
     const fieldObjectID getID() const { return id; }
 
     static const float getHeightFromGround(const fieldObjectID id);
-    static const bool isBeacon(const FieldObjects * obj);
-    static const bool isGoal(const FieldObjects * obj);
-    static const bool isArc(const FieldObjects * obj);
+    // static const bool isBeacon(const FieldObjects * obj);
+    // static const bool isGoal(const FieldObjects * obj);
+    // static const bool isArc(const FieldObjects * obj);
 
 
 
