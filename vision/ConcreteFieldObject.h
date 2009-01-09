@@ -14,6 +14,7 @@ using namespace std;
 // Local headers
 #include "FieldConstants.h"
 #include "ConcreteLandmark.h"
+
 #define CONCRETE_FIELD_OBJECT_START_ID 30
 enum fieldObjectID {
     BLUE_GOAL_LEFT_POST = CONCRETE_FIELD_OBJECT_START_ID,
@@ -62,7 +63,7 @@ public:
 
     virtual const string toString() const;
 
-    bool isAbstract(ConcreteFieldObject fo);
+    bool isAbstract(fieldObjectID testID);
 
 // Static member variables
 public:

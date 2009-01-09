@@ -4,16 +4,13 @@
 ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,
                                          const float _fieldY,
                                          const fieldObjectID _id)
-    : ConcreteLandmark(_fieldX, _fieldY) {
-    id = _id;
+    : ConcreteLandmark(_fieldX, _fieldY), id(_id) {
 }
 
 // Copy constructor - just pairwise copy the elements
 ConcreteFieldObject::ConcreteFieldObject(const ConcreteFieldObject& other)
-    : ConcreteLandmark(other) {
-    id = other.id;
+    : ConcreteLandmark(other), id(other.id) {
 }
-
 // No memory to free
 ConcreteFieldObject::~ConcreteFieldObject() {}
 
@@ -80,7 +77,7 @@ const string ConcreteFieldObject::toString() const {
 
 }
 
-bool ConcreteFieldObject::isAbstract(ConcreteFieldObject fo)
+bool ConcreteFieldObject::isAbstract(fieldObjectID testID)
 {
-    return (fo.getID() == BLUE_GOAL_POST || fo.getID() == YELLOW_GOAL_POST);
+    return (testID == BLUE_GOAL_POST || testID == YELLOW_GOAL_POST);
 }
