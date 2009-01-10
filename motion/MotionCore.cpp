@@ -40,14 +40,19 @@ SIT_DOWN(GET_UP_TIME, new vector<float>(SIT_DOWN_BODY_JOINTS,
 
 const vector<float> MotionCore::NOT_MOVING = vector<float>(3,0.0f); //zero motion walk vector
 
-MotionCore::MotionCore (shared_ptr<Synchro> _synchro, Sensors *s)
+#ifdef NAOQI1
+MotionCore::MotionCore (ALPtr<ALMotionProxy> _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
+#else
+MotionCore::MotionCore (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
+#endif
   : Thread(_synchro, "MotionCore"), sensors(s),
     bodyQueue(), headQueue(), headScanQueue(), nextWalkCommand(0),
-#ifndef NO_ACTUAL_MOTION
-    motionProxy(AL::ALMotionProxy::getInstance()),
-#else
-    motionProxy(NULL),
-#endif
+//#ifndef NO_ACTUAL_MOTION
+    motionProxy(_proxy),
+//AL::ALMotionProxy::getInstance()),
+//#else
+//    motionProxy(NULL),
+//#endif
     walkIsStopping(false), running(false),
     latestOdometry(vector<float>(3,0.0f)), currentWalkVector(NOT_MOVING),
     odometryRead(false), lastHeadYaw(0.0f), lastHeadPitch(0.0f), headSpeed(0.0f)
@@ -177,26 +182,26 @@ void
 MotionCore::stopHeadMoves() {
   if (chainTaskIDs[HEAD_CHAIN] != NO_TASK){
 #ifndef NO_ACTUAL_MOTION
-    const bool success = motionProxy->killTask(chainTaskIDs[HEAD_CHAIN]);
-    chainTaskIDs[HEAD_CHAIN] = NO_TASK;
-
-#ifdef DEBUG_TASK_KILLS
-    if (success)  cout << "Successfully killed head task" << endl;
-    else          cout << "Could not kill head task" << endl;
+#ifdef NAOQI1
+    motionProxy->stop(chainTaskIDs[HEAD_CHAIN]);
+#else
+    motionProxy->killTask(chainTaskIDs[HEAD_CHAIN]);
 #endif
+    chainTaskIDs[HEAD_CHAIN] = NO_TASK;
 
 #endif
   }
   if (preemptiveChainTaskIDs[HEAD_CHAIN] != NO_TASK) {
 #ifndef NO_ACTUAL_MOTION
-    const bool success = motionProxy->killTask(preemptiveChainTaskIDs[HEAD_CHAIN]);
+#ifdef NAOQI1
+    motionProxy->stop(preemptiveChainTaskIDs[HEAD_CHAIN]);
+#else
+    motionProxy->killTask(preemptiveChainTaskIDs[HEAD_CHAIN]);
+#endif
+
 #endif
     preemptiveChainTaskIDs[HEAD_CHAIN] = NO_TASK;
 
-#ifdef DEBUG_TASK_KILLS
-    if (success)  cout << "Successfully killed premptive head task" << endl;
-    else          cout << "Could not kill head premptive task" << endl;
-#endif
   }
 
   pthread_mutex_lock(&motion_mutex);
@@ -225,12 +230,13 @@ MotionCore::stopBodyMoves() {
   for (unsigned int i = 1; i < NUM_CHAINS; i++) {
     if (chainTaskIDs[i] !=  NO_TASK){
 #ifndef NO_ACTUAL_MOTION
-      const bool success = motionProxy->killTask(chainTaskIDs[i]);
-#ifdef DEBUG_TASK_KILLS
-      if (success)  cout << "Successfully killed task" << endl;
-      else          cout << "Could not kill task" << endl;
+#ifdef NAOQI1
+        motionProxy->stop(chainTaskIDs[i]);
+      motionProxy->stop(preemptiveChainTaskIDs[i]);
+#else
+        motionProxy->killTask(chainTaskIDs[i]);
+      motionProxy->killTask(preemptiveChainTaskIDs[i]);
 #endif
-      bool success2 = motionProxy->killTask(preemptiveChainTaskIDs[i]);
 #endif
     }
     chainTaskIDs[i] = NO_TASK;
@@ -256,7 +262,11 @@ MotionCore::stopBodyMoves() {
   if (isWalkActive()) {
     cout << "Stopping the walk command" << endl;
 #ifndef NO_ACTUAL_MOTION
+#ifdef NAOQI1
+    motionProxy->clearFootsteps();
+#else
     motionProxy->endWalk();
+#endif
 #endif
     walkIsStopping = true;
   }
@@ -419,11 +429,19 @@ MotionCore::processCommands (void)
       int taskID = -1;
 #ifndef NO_ACTUAL_MOTION
       //try {
+#ifdef NAOQI1
       taskID = motionProxy->
-	postGotoChainAngles(CHAIN_STRINGS[HEAD_CHAIN],
+      post.gotoChainAngles(CHAIN_STRINGS[HEAD_CHAIN],
 			    *command->getJoints(),
 			    command->getDuration(),
 			    command->getType());
+#else
+taskID = motionProxy->
+      postGotoChainAngles(CHAIN_STRINGS[HEAD_CHAIN],
+			    *command->getJoints(),
+			    command->getDuration(),
+			    command->getType());
+#endif
       /*
       }catch( AL::ALError &e){
 	cout <<"Failed to post head angles: \n   " << e.toString() << endl;
@@ -463,10 +481,17 @@ MotionCore::processCommands (void)
 #ifndef NO_ACTUAL_MOTION
 	    // We should have try, catch here.
 	    //try{
+#ifdef NAOQI1
+	      taskID = motionProxy->post.gotoChainAngles(CHAIN_STRINGS[id],
+							*chainJoints,
+							command->getDuration(),
+							command->getType());
+#else
 	      taskID = motionProxy->postGotoChainAngles(CHAIN_STRINGS[id],
 							*chainJoints,
 							command->getDuration(),
 							command->getType());
+#endif
 	      /*
 	    }catch( AL::ALError &e){
 	      cout <<"Failed to post body angles: \n   " << e.toString() << endl;

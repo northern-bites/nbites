@@ -26,6 +26,7 @@
 
 // Aldebaran library includes
 #include "almotionproxy.h"
+#include "alptr.h"
 
 // NBites header includes
 #include "Sensors.h"
@@ -34,6 +35,7 @@
 #include "HeadScanCommand.h"
 #include "WalkCommand.h"
 #include "Kinematics.h"
+
 using namespace Kinematics;
 
 class MotionCore
@@ -48,7 +50,11 @@ class MotionCore
     SMOOTH_INTERPOLATION;
 
   public:
-    MotionCore(boost::shared_ptr<Synchro> synchro, Sensors *s);
+#ifdef NAOQI1
+    MotionCore(ALPtr<ALMotionProxy> _proxy,boost::shared_ptr<Synchro> synchro, Sensors *s);
+#else
+    MotionCore(ALMotionProxy * _proxy,boost::shared_ptr<Synchro> synchro, Sensors *s);
+#endif
     virtual ~MotionCore(void);
 
     void setNextWalkCommand (const WalkCommand *command) {
@@ -108,10 +114,18 @@ class MotionCore
     void stopBodyMoves();
 
     int postGotoCom(float pX, float pY, float pZ, float pTime, int pType) {
-      motionProxy->postGotoCom(pX, pY, pZ, pTime, pType);
+#ifdef NAOQI1
+        motionProxy->post.gotoCom(pX, pY, pZ, pTime, pType);
+#else
+        motionProxy->postGotoCom(pX, pY, pZ, pTime, pType);
+#endif
     }
     int postGotoTorsoOrientation(float pX, float pY, float pTime, int pType) {
-      motionProxy->postGotoTorsoOrientation(pX, pY, pTime, pType);
+#ifdef NAOQI1
+        motionProxy->post.gotoTorsoOrientation(pX, pY, pTime, pType);
+#else
+        motionProxy->postGotoTorsoOrientation(pX, pY, pTime, pType);
+#endif
     }
 
 #ifdef USE_MOTION
@@ -168,7 +182,14 @@ class MotionCore
     WalkCommand const *nextWalkCommand;
 
     // Pointer to the Aldebaran motion proxy
-    AL::ALMotionProxy *motionProxy;
+
+#ifdef NAOQI1
+    ALPtr<ALMotionProxy> motionProxy;
+#else
+    ALMotionProxy * motionProxy;
+#endif
+
+private:
     bool walkIsStopping;
 
     bool running;  // is the motion thread running

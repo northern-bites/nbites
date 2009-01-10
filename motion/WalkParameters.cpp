@@ -19,8 +19,11 @@ const vector<float> WalkParameters::
 const WalkParameters WalkParameters::DEFAULT_PARAMS =
   WalkParameters();
 
-
-void WalkParameters::apply(ALMotionProxy *proxy) const {
+#ifdef NAOQI1
+void WalkParameters::apply(ALPtr<ALMotionProxy> proxy) const {
+#else
+void WalkParameters::apply(ALMotionProxy * proxy) const {
+#endif
   proxy->setWalkConfig(walkConfig[pMaxStepLength], walkConfig[pMaxStepHeight],
 		       walkConfig[pMaxStepSide], walkConfig[pMaxStepTurn],
 		       walkConfig[pZmpOffsetX], walkConfig[pZmpOffsetY]);

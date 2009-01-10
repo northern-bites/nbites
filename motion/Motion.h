@@ -14,8 +14,14 @@ class Motion
   : public MotionCore
 {
   public:
-    Motion(boost::shared_ptr<Synchro> synchro, Sensors *s);
+#ifdef NAOQI1
+    Motion(ALPtr<ALMotionProxy> _proxy,boost::shared_ptr<Synchro> synchro, Sensors *s);
+#else
+    Motion(ALMotionProxy * _proxy,boost::shared_ptr<Synchro> synchro, Sensors *s);
+#endif
+
     virtual ~Motion() {}
+
 };
 
 #endif

@@ -66,7 +66,11 @@ Man::Man ()
     Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
     python_prefs(),
     profiler(&micro_time), sensors(),
-    motion(synchro, &sensors),
+#ifdef NAOQI1
+    motion(getParentBroker()->getMotionProxy(),synchro, &sensors),
+#else
+    motion(AL::ALMotionProxy::getInstance(),synchro, &sensors),
+#endif
     vision(new NaoPose(&sensors), &profiler),
     comm(synchro, &sensors, &vision),
     noggin(&sensors, &profiler, &vision),

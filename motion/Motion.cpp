@@ -8,8 +8,12 @@
 
 using namespace boost;
 
-Motion::Motion (shared_ptr<Synchro> _synchro, Sensors *s)
-  : MotionCore(_synchro, s)
+#ifdef NAOQI1
+Motion::Motion (ALPtr<ALMotionProxy> _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
+#else
+Motion::Motion (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
+#endif
+    : MotionCore(_proxy,_synchro, s)
 {
   set_motion_interface(this);
   c_init_motion();

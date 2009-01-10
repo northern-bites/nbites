@@ -29,8 +29,11 @@ class WalkCommand
   WalkCommand(const WalkCommand &other)
     : numSamplesPerStep(other.numSamplesPerStep), params(other.params) { }
   virtual ~WalkCommand() {}
-
-  virtual const float execute(ALMotionProxy *proxy) const = 0;
+#ifdef NAOQI1
+    virtual const float execute(ALPtr<ALMotionProxy> proxy) const {}
+#else
+    virtual const float execute(ALMotionProxy *proxy) const {}
+#endif
 
   const vector<float> odometry() const {
     const float temp[3] = {lastX,lastY,lastH};
@@ -52,12 +55,16 @@ class WalkStraight : public WalkCommand {
   WalkStraight(const WalkStraight &other)
     : WalkCommand(other), distance(other.distance) { }
   virtual ~WalkStraight() { }
-
+#ifdef NAOQI1
+  virtual const float execute(ALPtr<ALMotionProxy> proxy) const {
+#else
   virtual const float execute(ALMotionProxy *proxy) const {
+#endif
     proxy->walkStraight(distance*CM_TO_M, numSamplesPerStep);
     lastX = params.getMaxStepLength()*M_TO_CM / numSamplesPerStep;
     lastY = 0.0f;
     lastH = 0.0f;
+    return 0.0f; //Hack to fix warning
   }
 
  private:
@@ -73,13 +80,17 @@ class WalkSideways : public WalkCommand {
   WalkSideways(const WalkSideways &other)
     : WalkCommand(other), distance(other.distance) { }
   virtual ~WalkSideways() { }
-
+#ifdef NAOQI1
+  virtual const float execute(ALPtr<ALMotionProxy> proxy) const {
+#else
   virtual const float execute(ALMotionProxy *proxy) const {
+#endif
     proxy->walkSideways(distance*CM_TO_M, numSamplesPerStep);
     lastX = 0.0f;
     // It takes us two steps to complete a full step of size MaxStepSize
     lastY = params.getMaxStepSide()*M_TO_CM / (2.0f * numSamplesPerStep);
     lastH = 0.0f;
+    return 0.0f; //Hack to fix warning
   }
 
  private:
@@ -95,13 +106,17 @@ class WalkTurn : public WalkCommand {
   WalkTurn(const WalkTurn &other)
     : WalkCommand(other), angle(other.angle) { }
   virtual ~WalkTurn() { }
-
+#ifdef NAOQI1
+  virtual const float execute(ALPtr<ALMotionProxy> proxy) const {
+#else
   virtual const float execute(ALMotionProxy *proxy) const {
+#endif
     proxy->turn(angle, numSamplesPerStep);
     lastX = 0.0f;
     lastY = 0.0f;
     // It takes us two steps to complete a full step of size MaxStepSize
     lastH = (params.getMaxStepTurn()*TO_DEG) / (2.0f * numSamplesPerStep);
+    return 0.0f; //Hack to fix warning
   }
 
  private:
@@ -117,8 +132,11 @@ class WalkArc : public WalkCommand {
   WalkArc(const WalkArc &other)
     : WalkCommand(other), angle(other.angle), radius(other.radius) { }
   virtual ~WalkArc() { }
-
+#ifdef NAOQI1
+  virtual const float execute(ALPtr<ALMotionProxy> proxy) const {
+#else
   virtual const float execute(ALMotionProxy *proxy) const {
+#endif
     proxy->walkArc(angle, radius*CM_TO_M, numSamplesPerStep);
     const float arcLength = radius * angle;
     const int numSteps = ceil(arcLength / (params.getMaxStepLength()*M_TO_CM));
@@ -127,6 +145,7 @@ class WalkArc : public WalkCommand {
     lastY = (sin(angle) * radius) / (numTotalSamples);
     // It takes us two steps to complete a full step of size MaxStepSize
     lastH = (angle / numTotalSamples)*TO_DEG;
+    return 0.0f; //Hack to fix warning
   }
 
  private:
