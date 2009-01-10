@@ -1577,6 +1577,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
   }
   else {
     objPtr->setFocDist(0.0);
+
     objPtr->setDistanceWithSD(0.0);
     objPtr->setBearingWithSD(0.0);
     objPtr->setElevation(0.0);

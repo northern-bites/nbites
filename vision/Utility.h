@@ -67,7 +67,6 @@ class Utility {
   static const point<int> getCloserEndpoint(const VisualLine& l, const point<int>& p);
 
   //static const float hypot(const float a, const float b);
-  
 
   // get slope given x1,y1 and x2,y2
   static float getSlope(int x1, int y1, int x2, int y2);
@@ -189,8 +188,7 @@ class Utility {
                                            const point<int> line1End,
                                            const point<int> line2Start,
                                            const point<int> line2End);
-  
-  
+
   static float findLinePointDistanceFromStart(const point <int> &p,
                                                const VisualLine &aLine);
 

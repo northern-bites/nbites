@@ -509,6 +509,7 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
   // Determine the y value of line at x value of plumbline
   float y = slope * plumbTop.x + intercept;
  
+Landmark.:vision/Utility.cpp
   if (y >= plumbTop.y && y <= plumbBottom.y) {
     intersection.first = plumbTop.x;
     intersection.second = (int) y;
