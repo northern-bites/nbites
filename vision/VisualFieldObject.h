@@ -13,44 +13,18 @@ class VisualFieldObject;
 
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
-class VisualFieldObject {// : public VisualLandmark {
+class VisualFieldObject : public VisualLandmark {
 
-// VisualLandmark stuff to work in...
-//  public:
-//   VisualFieldObject(const int _x, const int _y, const float _distance,
-//                     const float _bearing);
-//   // destructor
-//   virtual ~VisualFieldObject();
-//   // copy constructor
-//   VisualFieldObject(const VisualFieldObject&);
-
-//   friend std::ostream& operator<< (std::ostream &o, const VisualFieldObject &c)
-//   {
-//     return o << setprecision(2)
-//              << "(" << c.getX() << "," << c.getY() << ") \tDistance: "
-//              << c.getDistance() << "\tBearing: " << c.getBearing();
-//   }
-
-//   ////////////////////////////////////////////////////////////
-//   // GETTERS
-//   ////////////////////////////////////////////////////////////
-//   const list <const ConcreteFieldObject *> getPossibleFieldObjects() const {
-//     return possibleFieldObjects; }
-
-//   ////////////////////////////////////////////////////////////
-//   // SETTERS
-//   ////////////////////////////////////////////////////////////
-//   void setPossibleFieldObjects(list <const ConcreteFieldObject *>
-//                                _possibleFieldObjects) {
-//       possibleFieldObjects = _possibleFieldObjects; }
-
-// private:
-//   // This list will hold all the possibilities for this corner's specific ID
-//   // It will get set from within FieldLines.cc.
-//   list <const ConcreteFieldObject *> possibleFieldObjects;
 public:
+    // Construcotrs
+    VisualFieldObject(const int _x, const int _y, const float _distance,
+                      const float _bearing);
     VisualFieldObject(const fieldObjectID);
     VisualFieldObject();
+    // copy constructor
+    VisualFieldObject(const VisualFieldObject&);
+
+    // Destructor
     virtual ~VisualFieldObject() {}
 
     friend std::ostream& operator<< (std::ostream &o,
@@ -70,8 +44,8 @@ public:
     // SETTERS
     void setWidth(float w) { width = w; }
     void setHeight(float h) { height = h; }
-    void setX(int x1) { x = x1; }
-    void setY(int y1) { y = y1; }
+    //void setX(int x1) { x = x1; }
+    //void setY(int y1) { y = y1; }
     void setLeftTopX(int _x){  leftTop.x = _x; }
     void setLeftTopY(int _y){  leftTop.y = _y; }
     void setRightTopX(int _x){ rightTop.x = _x; }
@@ -84,24 +58,30 @@ public:
     void setCenterY(int cY) { centerY = cY; }
     void setAngleX(float aX) { angleX = aX; }
     void setAngleY(float aY) { angleY = aY; }
-    void setBearing(float b) { bearing = b; }
+    //void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
     void setFocDist(float fd) { focDist = fd; }
-    void setDist(float d) { dist = d; }
-    void setCertainty(int c) {certainty = c; }
-    void setDistCertainty(int c) {distCertainty = c;}
+    //void setDist(float d) { dist = d; }
+    //void setCertainty(int c) {certainty = c; }
+    //void setDistCertainty(int c) {distCertainty = c;}
+    //void setDistanceSD(float sd) {distSD = sd;}
+    //void setBearingSD(float sd) {bearingSD = sd;}
     void setShoot(bool s1) {shoot = s1;}
     void setBackLeft(int x1) {backLeft = x1;}
     void setBackRight(int y1) {backRight = y1;}
     void setBackDir(int x1) {backDir = x1;}
     void setLeftOpening(int op) { leftOpening = op; }
     void setRightOpening(int op) { rightOpening = op; }
+    void setPossibleFieldObjects(list <const ConcreteFieldObject *>
+                                 _possibleFieldObjects) {
+        possibleFieldObjects = _possibleFieldObjects;
+    }
 
     // GETTERS
     float getWidth() const { return width; }
     float getHeight() const { return height; }
-    int getX() const{ return x; }
-    int getY() const{ return y; }
+    //int getX() const{ return x; }
+    //int getY() const{ return y; }
     int getLeftTopX() const{ return leftTop.x; }
     int getLeftTopY() const{ return leftTop.y; }
     int getRightTopX() const{ return rightTop.x; }
@@ -112,14 +92,16 @@ public:
     int getRightBottomY() const{ return rightBottom.y; }
     int getCenterX() const { return centerX; }
     int getCenterY() const { return centerY; }
-    int getCertainty() const { return certainty; }
-    int getDistCertainty() const { return distCertainty; }
+    //int getCertainty() const { return certainty; }
+    //int getDistCertainty() const { return distCertainty; }
     float getAngleX() const { return angleX; }
     float getAngleY() const { return angleY; }
     float getFocDist() const { return focDist; }
-    float getDist() const{ return dist; }
-    float getBearing() const { return bearing; }
+    //float getDist() const{ return dist; }
+    //float getBearing() const { return bearing; }
     float getElevation() const { return elevation; }
+    //float getDistanceSD() const { return distSD; }
+    //float getBearingSD() const { return bearingSD; }
     int getShootLeft() const { return backLeft; }
     int getShootRight() const { return backRight; }
     int getBackDir() const { return backDir; }
@@ -131,6 +113,10 @@ public:
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
     const fieldObjectID getID() const { return id; }
+    const list <const ConcreteFieldObject *> getPossibleFieldObjects() const {
+        return possibleFieldObjects;
+    }
+
 
 private: // Class Variables
 
@@ -141,12 +127,12 @@ private: // Class Variables
 
     float width;
     float height;
-    int x;
-    int y;
+    // int x;
+    // int y;
     int centerX;
     int centerY;
-    int certainty;
-    int distCertainty;
+    // int certainty;
+    // int distCertainty;
     int backLeft;
     int backRight;
     int backDir;
@@ -156,11 +142,16 @@ private: // Class Variables
     float angleX;
     float angleY;
     float focDist;
-    float dist;
-    float bearing;
+    // float dist;
+    // float bearing;
     float elevation;
+    // float distSD;
+    // flost bearingSD;
     point <float> fieldLocation;
     fieldObjectID id;
+    // This list will hold all the possibilities for this objects's specific ID
+    list <const ConcreteFieldObject *> possibleFieldObjects;
+
 };
 
 #endif

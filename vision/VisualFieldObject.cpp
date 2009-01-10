@@ -11,6 +11,14 @@ VisualFieldObject::VisualFieldObject() : id(UNKNOWN_FIELD_OBJECT) {
     init();
 }
 
+VisualFieldObject::VisualFieldObject(const int _x, const int _y,
+                                     const float _distance,
+                                     const float _bearing)
+    : VisualLandmark(_x, _y, _distance, _bearing) {
+}
+VisualFieldObject::VisualFieldObject(const VisualFieldObject&) {
+}
+
 // Initialization, happens every frame.
 void VisualFieldObject::init(){
     width = 0;
@@ -22,7 +30,7 @@ void VisualFieldObject::init(){
     angleX = 0;
     angleY = 0;
     focDist = 0;
-    dist = 0;
+    distance = 0;
     bearing = 0;
     elevation = 0;
     certainty = 0;
@@ -63,6 +71,6 @@ void VisualFieldObject::init(){
 }
 
 void VisualFieldObject::printDebugInfo(FILE * out) {
-    fprintf(out, "(%d, %d)\tdist: %f\tcertainty %d\n",
-            x, y, dist, certainty);
+    fprintf(out, "(%d, %d)\tdist: %f\tIDcertainty %d\n",
+            x, y, distance, IDcertainty);
 }
