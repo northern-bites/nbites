@@ -5,6 +5,7 @@
 class ConcreteLine;
 #include <ostream>
 #include <list>
+#include <string>
 
 using namespace std;
 
