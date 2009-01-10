@@ -32,7 +32,7 @@ public:
         {
             return o << l.toString() << "\tWidth: " << l.width
                      << "\tHeight: " << l.height
-                     << "\tDistance: " << l.dist
+                     << "\tDistance: " << l.getDistance()
                      << "\tAngle X: " << l.angleX << "\tAngle Y: " << l.angleY;
         }
 

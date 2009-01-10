@@ -10,11 +10,21 @@ class VisualLandmark;
 #include "ConcreteLandmark.h"
 #include "Structs.h"
 
+// What is the certainty associated with the identification of the object
 enum certainty {
     NOT_SURE,
     MILDLY_SURE,
     _SURE
 };
+
+// Are the heights and widths from Vision to be trusted? Used in localization
+enum distanceCertainty {
+    BOTH_UNSURE,
+    WIDTH_UNSURE,
+    HEIGHT_UNSURE,
+    BOTH_SURE
+};
+
 
 
 class VisualLandmark {
@@ -25,7 +35,7 @@ public:
     VisualLandmark(int _x = 0, int _y = 0, float _distance = 0.0,
                    float _bearing = 0.0,
                    certainty _idCertainty = NOT_SURE,
-                   certainty _distanceCertainty = NOT_SURE,
+                   distanceCertainty _distanceCertainty = BOTH_UNSURE,
                    ConcreteLandmark * _concreteLandmark = 0);
 
     // Copy constructor
@@ -45,7 +55,7 @@ private:
     // How sure are we that we identified the correct object
     // (for example, blue goal left post versus blue goal right post)
     certainty idCertainty;
-    certainty distanceCertainty;
+    distanceCertainty distanceCert;
     ConcreteLandmark * concreteLandmark;
 
 public:
@@ -58,7 +68,9 @@ public:
     const float getDistanceSD() const { return distanceSD; }
     const float getBearingSD() const { return bearingSD; }
     const certainty getIDCertainty() const { return idCertainty; }
-    const certainty getDistanceCertainty() const { return distanceCertainty; }
+    const distanceCertainty getDistanceCertainty() const {
+        return distanceCert;
+    }
     const ConcreteLandmark * getConcreteLandmark() const {
         return concreteLandmark;
     }
@@ -74,7 +86,7 @@ public:
     //virtual void setDistanceWithSD(float _distance);
     //virtual void setBearingWithSD(float _bearing);
     void setIDCertainty(certainty c) { idCertainty = c; }
-    void setDistanceCertainty(certainty c) { distanceCertainty = c; }
+    void setDistanceCertainty(distanceCertainty c) { distanceCert = c; }
     void setConcreteLandmark(ConcreteLandmark * c) { concreteLandmark = c; }
 };
 

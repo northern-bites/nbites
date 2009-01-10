@@ -1,5 +1,5 @@
 #ifndef Utility_hpp_DEFINED
-#define Utility_hpp_DEFINED 
+#define Utility_hpp_DEFINED
 
 
 
@@ -14,6 +14,7 @@ class Utility;
 #include "Structs.h"
 #include "VisualLine.h"
 #include "VisionDef.h"
+#include "VisualLandmark.h"
 
 // This class contains static utility functions which are used in many different
 // parts of our code.
@@ -34,7 +35,7 @@ class Utility {
   static const int area2(const point<int> &a, const point <int> &b,
                          const point <int> &c);
   // Returns true if point c is to the left of the line directed from a to b
-  static const bool left(const point<int> &a, const point <int> &b, 
+  static const bool left(const point<int> &a, const point <int> &b,
                          const point <int> &c);
   // Returns true if point c is to the left of the line or colinear with the
   // line directed from a to b
@@ -43,21 +44,21 @@ class Utility {
   // Returns true if point c is collinear with the line directed form a to b
   static const bool collinear(const point<int> &a, const point <int> &b,
                               const point <int> &c);
-  
+
   // Returns true if the point is in the rectangle formed from the VisualLine's
   // endpoints
   static const bool between(const VisualLine& line,
                             const point <int>& p);
-  
+
 
   static const bool between(const VisualLine& line,
                             const linePoint& p);
 
   // Returns true if the line segments (a,b) and (c,d) intersect "at a point
-  // interior to both" 
+  // interior to both"
   // p.30.
   static const bool intersectProp(const point<int> &a, const point<int> &b,
-                                  const point<int> &c, const point<int> &d); 
+                                  const point<int> &c, const point<int> &d);
 
   static const point<int> getPointFartherFromCorner(const VisualLine &l, int cornerX, int cornerY);
 
@@ -67,6 +68,7 @@ class Utility {
 
   //static const float hypot(const float a, const float b);
   
+
   // get slope given x1,y1 and x2,y2
   static float getSlope(int x1, int y1, int x2, int y2);
   static float getSlope(const VisualLine& line);
@@ -75,16 +77,17 @@ class Utility {
   static float getPerpenSlope(float slope);
 
   // get length of line segment specified by (x1, y1), (x2, y2)
+<<<<<<< HEAD:vision/Utility.h
   static const float getLength(const float x1, const float y1,
                                 const float x2, const float y2);
   static const float getLength(const point <const float> &p1, 
                                 const point <const float> &p2);
   static const float getLength(const point <const int> &p1, 
                                 const point <const int> &p2);
-                                                          
 
-  
-  // get angle between two lines 
+
+
+  // get angle between two lines
   // http://www.tpub.com/math2/5.htm
   static float getAngle(const VisualLine& line1, const VisualLine& line2);
   
@@ -104,7 +107,7 @@ class Utility {
   static int getLineX(int y, float y_intercept, float slope);
   // get x-coord with given y-coord and a line
   static int getLineX(int y, const VisualLine &aLine);
-  
+
 
   // get y-intercept given line slope plus a point the line goes through
   static float getInterceptY(int x1, int y1, float slope);
@@ -114,9 +117,9 @@ class Utility {
                                const int numElems);
   static bool isElementInArray(const int elem, const int list[],
                                const int numElems);
- 
 
-  // Return the four corners of the bounding box surrounding a line 
+
+  // Return the four corners of the bounding box surrounding a line
   // Uses trig to determine how to shift things orthogonally and parallel
   // to the line to determine the endpoints
   // Future: Rewrite using parameterizations of the line?
@@ -142,16 +145,16 @@ class Utility {
   //                  This allows the drawing to be easily done using a for
   //                  loop and modular arithmetic, e.g.
   //                  for (int i = 0; i < 4; i ++) {
-  //                           vision -> drawLine(thePoints[i].x, thePoints[i].y 
+  //                           vision -> drawLine(thePoints[i].x, thePoints[i].y
   //                           thePoints[(i + 1) % 4].x, thePoints[(i + 1) % 4].y
   //                           COLOR)
   //                  }
-  
-  static BoundingBox getBoundingBox(int x1, int y1, int x2, int y2, 
-                                    int orthoBuff, 
+
+  static BoundingBox getBoundingBox(int x1, int y1, int x2, int y2,
+                                    int orthoBuff,
                                     int paraBuff);
-  
-  
+
+
   static BoundingBox getBoundingBox(const VisualLine& l, int orthogonalRadius,
                                     int parallelRadius);
 
@@ -160,29 +163,29 @@ class Utility {
   // Determine whether a vertical line segment intersects a line segment
   // Keyword parameters:
   // plumbTop           the (x,y) coordinate of the top of the plumb line
-  // plumbBottom        the (x,y) coordinate of the bottom of the plumb line; 
+  // plumbBottom        the (x,y) coordinate of the bottom of the plumb line;
   //                    for our purposes this will always be IMAGE_HEIGHT
   // line1start         the (x,y) coordinate of one of the endpoints of the line
-  // line1end           the (x,y) coordinate of the second of the endpoints of 
+  // line1end           the (x,y) coordinate of the second of the endpoints of
   //                    the line.
-  // Returns (NO_INTERSECTION, NO_INTERSECTION) 
+  // Returns (NO_INTERSECTION, NO_INTERSECTION)
   // if no intersection, else (x, y) where x is x coord of
   // intersection point, y is y coord.
-  static pair<int, int> plumbIntersection(point <int> plumbTop, 
-                                          point <int> plumbBottom, 
-                                          point <int> line1start, 
+  static pair<int, int> plumbIntersection(point <int> plumbTop,
+                                          point <int> plumbBottom,
+                                          point <int> line1start,
                                           point <int> line1end);
 
-  
 
-  // Returns the (x, y) coordinate where the two lines intersect, or 
+
+  // Returns the (x, y) coordinate where the two lines intersect, or
   // (NO_INTERSECTION, NO_INTERSECTION) otherwise.
-  // if they do not intersect.  (since we are only concerned  about 
+  // if they do not intersect.  (since we are only concerned  about
   // intersections that appear on the screen, this will not be a problem)
-  static const point<int> getIntersection(const VisualLine& line1, 
+  static const point<int> getIntersection(const VisualLine& line1,
                                           const VisualLine& line2);
 
-  
+
   static const point <int> getIntersection(const point<int> line1Start,
                                            const point<int> line1End,
                                            const point<int> line2Start,
@@ -200,7 +203,7 @@ class Utility {
   static const bool tValueInMiddleOfLine(const float t1, const float length,
 					 const float minExtendDistance);
 
-  // Calculate how well the point fits to the line.  
+  // Calculate how well the point fits to the line.
   // Return distance between point and line evaluated at same x or y (depending
   // on orientation of the line)
   static float getPointDeviation(const VisualLine &aLine, const linePoint &point);
@@ -208,14 +211,14 @@ class Utility {
 
 
   // A closed polygon contains a point if and only if a plumb line (vertical line)
-  // dropped down from the point passes through (intersects) an odd number of 
+  // dropped down from the point passes through (intersects) an odd number of
   // sides.  See http://www.fandm.edu/x7736.xml
   // We check for intersection at all 4 sides of the box; if an odd number is
   // hit, then we return true, else false
   static bool boxContainsPoint(BoundingBox box, int x, int y);
 
   static bool isLegitIntersection(int x, int y);
-  
+
   static bool isPointOnScreen(int x, int y);
 
   static bool isPointOnScreen(point<int> p);

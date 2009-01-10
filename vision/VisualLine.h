@@ -22,6 +22,8 @@ struct linePoint {
     int y; // y coordinate on the image screen
     float lineWidth; // the width of the line where the point was found
     float distance; // The distance pose estimates the point to be from robot's
+    float bearing;
+
     // center
     ScanDirection foundWithScan;
 

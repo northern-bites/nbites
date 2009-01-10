@@ -25,9 +25,9 @@ const int Utility::area2(const point<int> &a, const point <int> &b,
 }
 
 /* From Joseph O'Rourke's Computational Geometry in C book, published 1998, p.29
- * "A directed line is determined by two points given in a particular order 
- * (a,b).  If a point c is to the left of the line determined by (a,b), 
- * then the triple (a,b,c) forms a counterclockwise circuit... c is to the 
+ * "A directed line is determined by two points given in a particular order
+ * (a,b).  If a point c is to the left of the line determined by (a,b),
+ * then the triple (a,b,c) forms a counterclockwise circuit... c is to the
  * left of (a,b) iff the area of the counterclockwise triangle A(a,b,c) is
  * positive"
  */
@@ -39,7 +39,7 @@ const bool Utility::left(const point<int> &a, const point <int> &b,
 // p.29
 // Returns true if point c is to the left of the line or colinear with the
 // line directed from a to b
-const bool Utility::leftOn(const point<int> &a, const point <int> &b, 
+const bool Utility::leftOn(const point<int> &a, const point <int> &b,
                            const point <int> &c) {
   return area2(a, b, c) >= 0;
 }
@@ -54,7 +54,7 @@ const bool Utility::collinear(const point<int> &a, const point <int> &b,
 // endpoints
 const bool Utility::between(const VisualLine& line,
                             const point <int>& p) {
-  return 
+  return
     // Point is between the endpoints in x direction
     (p.x >= line.left && p.x <= line.right) &&
     // Point is between the endpoints in y direction (note that the the higher
@@ -100,7 +100,7 @@ const point<int> Utility::getCloserEndpoint(const VisualLine& l, const point<int
 
 
 // Returns true if the line segments (a,b) and (c,d) intersect "at a point
-// interior to both" 
+// interior to both"
 // p.30
 const bool Utility::intersectProp(const point<int> &a, const point<int> &b,
                                   const point<int> &c, const point<int> &d) {
@@ -111,12 +111,12 @@ const bool Utility::intersectProp(const point<int> &a, const point<int> &b,
       collinear(c,d,b)) {
     return false;
   }
-  
+
   // ^ = exclusive or.  returns 1 if both operands are different.
   // If you draw a diagram, it's obvious that if c and d are on opposite sides
-  // of (a,b) and a and b are on opposite sides of (c,d), the lines must 
+  // of (a,b) and a and b are on opposite sides of (c,d), the lines must
   // intersect
-  return (left(a,b,c) ^ left(a,b,d)) 
+  return (left(a,b,c) ^ left(a,b,d))
     && (left(c,d,a) ^ left(c,d,b));
 }
 
@@ -161,7 +161,7 @@ float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int
   }
 }
 
-// Calculate how well the point fits to the line.  
+// Calculate how well the point fits to the line.
 // Return distance between point and line evaluated at same x or y (depending
 // on orientation of the line)
 float Utility::getPointDeviation(const VisualLine &aLine, const linePoint &point) {
@@ -175,6 +175,7 @@ const float Utility::getLength(const float x1, const float y1,
 }
 
 // get length of line segment specified by (x1, y1), (x2, y2)
+<<<<<<< HEAD:vision/Utility.cpp
 const float Utility::getLength(const point <const float> &p1, 
                                 const point <const float> &p2) {
   return getLength(p1.x, p1.y, p2.x, p2.y);
@@ -188,7 +189,7 @@ const float Utility::getLength(const point <const int> &p1,
 
 
 
-// get angle between two lines 
+// get angle between two lines
 // http://www.tpub.com/math2/5.htm
 float Utility::getAngle(const VisualLine& line1, const VisualLine& line2) {
   return DEG_OVER_RAD * atan((line2.a - line1.a) / (1 + line1.a * line2.a));
@@ -213,7 +214,7 @@ int Utility::getLineY(int x, const VisualLine &aLine) {
   return getLineY(x, aLine.b, aLine.a);
 }
 
-// VERY IMPORTANT: Ensure that the slope is not infinity! 
+// VERY IMPORTANT: Ensure that the slope is not infinity!
 // get x-coord with given y-coord, slope, and y-intercept
 int Utility::getLineX(int y, float y_intercept, float slope) {
   if (slope != 0) {
@@ -233,7 +234,7 @@ float Utility::getInterceptY(int x1, int y1, float slope){
 }
 
 // Returns the (x, y) coordinate where the two lines intersect, or (NO_INTERSECTION, NO_INTERSECTION)
-// if they do not intersect.  (since we are only concerned  about 
+// if they do not intersect.  (since we are only concerned  about
 // intersections that appear on the screen, this will not be a problem)
 const point<int> Utility::getIntersection(const VisualLine& line1,
 					  const VisualLine& line2) {
@@ -248,21 +249,21 @@ const point <int> Utility::getIntersection(const point<int> line1Start,
   int I_A1 = line1End.y-line1Start.y;
   int I_B1 = line1Start.x-line1End.x;
   int I_C1 = I_A1*line1Start.x+I_B1*line1Start.y;
-  
+
   int I_A2 = line2End.y-line2Start.y;
   int I_B2 = line2Start.x-line2End.x;
   int I_C2 = I_A2*line2Start.x+I_B2*line2Start.y;
-  
+
 
   int I_det = I_A1*I_B2 - I_A2*I_B1;/*
   cout << line1Start << "\t" <<  line1End << endl;
   cout << line2Start << "\t" << line2End << endl;
 
   cout << "I_A1 I_B1 I_C1 I_A2 I_B2 I_C2 I_DET" << endl;
-  cout << I_A1 << " " <<  I_B1 << " " << I_C1 << " " << I_A2 
+  cout << I_A1 << " " <<  I_B1 << " " << I_C1 << " " << I_A2
        << " " << I_B2 << " " << I_C2 << " " << I_det << endl;
                                     */
-  
+
   point <int> intersection;
   if (I_det != 0) {
     intersection.x = static_cast<int>((I_B2*I_C1 - I_B1*I_C2)/I_det);
@@ -272,11 +273,11 @@ const point <int> Utility::getIntersection(const point<int> line1Start,
     intersection.x = NO_INTERSECTION;
     intersection.y = NO_INTERSECTION;
   }
-  
+
   return intersection;
 
 }
-                                           
+
 
 
 
@@ -302,7 +303,7 @@ bool Utility::isElementInArray(const int elem, const int list[], const int numEl
 
 
 
-// Return the four corners of the bounding box surrounding a line 
+// Return the four corners of the bounding box surrounding a line
 // Uses trig to determine how to shift things orthogonally and parallel
 // to the line to determine the endpoints
 // Future: Rewrite using parameterizations of the line?
@@ -322,23 +323,23 @@ bool Utility::isElementInArray(const int elem, const int list[], const int numEl
 // Return:
 // thePoints        4 point <int> structs (having x and y values) representing
 //                  the location of the corners of the bounding box.
-//                  NOTE:  The method is set up in such a way that 
+//                  NOTE:  The method is set up in such a way that
 //                  connecting thePoints[0] to [1], [1] to [2], [2] to [3],
 //                  and [3] to [0] draws the correct shape on the screen.
 //                  This allows the drawing to be easily done using a for
 //                  loop and modular arithmetic, e.g.
 //                  for (int i = 0; i < 4; i ++) {
-//                           vision -> drawLine(thePoints[i].x, thePoints[i].y 
+//                           vision -> drawLine(thePoints[i].x, thePoints[i].y
 //                           thePoints[(i + 1) % 4].x, thePoints[(i + 1) % 4].y
 //                           COLOR)
 //                  }
 
-BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2, 
-                                             int orthoBuff, 
+BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
+                                             int orthoBuff,
                                              int paraBuff) {
 
   BoundingBox box;
-  
+
   // Check legitimacy of arguments
   if (orthoBuff < 0 || paraBuff < 0) {
     cout << "Error: invalid arguments; both orthoBuff and paraBuff must be "
@@ -372,13 +373,13 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
     // top, you *subtract*, whereas to extend on the bottom you *add*
     box.corners[0].x = x1 - orthoBuff;
     box.corners[0].y = top - paraBuff;
-   
+
     box.corners[1].x = x1 + orthoBuff;
     box.corners[1].y = top - paraBuff;
-    
+
     box.corners[2].x = x2 + orthoBuff;
     box.corners[2].y = bottom + paraBuff;
-    
+
     box.corners[3].x = x2 - orthoBuff;
     box.corners[3].y = bottom + paraBuff;
 
@@ -403,7 +404,7 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
 
     box.corners[2].x = x2 + paraBuff;
     box.corners[2].y = y2 - orthoBuff;
-    
+
     box.corners[3].x = x2 + paraBuff;
     box.corners[3].y = y2 + orthoBuff;
 
@@ -430,16 +431,16 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
 
   box.corners[0].x = (int)(x1 + deltaX - betaX);
   box.corners[0].y = (int)(y1 + deltaY - betaY);
-  
+
   box.corners[1].x = (int)(x1 - deltaX - betaX);
   box.corners[1].y = (int)(y1 - deltaY - betaY);
-  
+
   box.corners[2].x = (int)(x2 - deltaX + betaX);
   box.corners[2].y = (int)(y2 - deltaY + betaY);
-  
+
   box.corners[3].x = (int)(x2 + deltaX + betaX);
   box.corners[3].y = (int)(y2 + deltaY + betaY);
-  
+
   return box;
 
 }
@@ -448,7 +449,7 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
 // See explanation above as to what the bounding box method does in general.
 // This fits a bounding box to the least squares equation of the line passed
 // in.
-BoundingBox Utility::getBoundingBox(const VisualLine& aLine, 
+BoundingBox Utility::getBoundingBox(const VisualLine& aLine,
                                     int orthogonalRadius,
                                     int parallelRadius) {
   return getBoundingBox(aLine.start.x, aLine.start.y, aLine.end.x, aLine.end.y,
@@ -459,16 +460,16 @@ BoundingBox Utility::getBoundingBox(const VisualLine& aLine,
 // Determine whether a vertical line segment intersects a line segment
 // Keyword parameters:
 // plumbTop           the (x,y) coordinate of the top of the plumb line
-// plumbBottom        the (x,y) coordinate of the bottom of the plumb line; 
+// plumbBottom        the (x,y) coordinate of the bottom of the plumb line;
 //                    for our purposes this will always be IMAGE_HEIGHT
 // line1start         the (x,y) coordinate of one of the endpoints of the line
-// line1end           the (x,y) coordinate of the second of the endpoints of 
+// line1end           the (x,y) coordinate of the second of the endpoints of
 //                    the line.
 // Returns (NO_INTERSECTION, NO_INTERSECTION) if no intersection, else (x, y) where x is x coord of
 // intersection point, y is y coord.
-pair<int, int> Utility::plumbIntersection(point <int> plumbTop, 
-                                          point <int> plumbBottom, 
-                                          point <int> line1start, 
+pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
+                                          point <int> plumbBottom,
+                                          point <int> line1start,
                                           point <int> line1end) {
 
   // Use ternary operation to determine the left, right, and bottom value
@@ -478,7 +479,7 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
 
   pair <int, int> intersection;
   intersection.first = intersection.second = NO_INTERSECTION;
-  
+
   // plumbline lies to right or left of endpoints of line; no intersection
   if (plumbTop.x > line1Right || plumbTop.x < line1Left) {
     return intersection;
@@ -490,7 +491,7 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
 
   // vertical line
   if (line1start.x - line1end.x == 0) {
-    // We'll count it as an intersection only if they have the same x value 
+    // We'll count it as an intersection only if they have the same x value
     // (i.e. they run into each other going down the screen)
     if (plumbTop.x == line1start.x) {
       intersection.first = plumbTop.x;
@@ -499,7 +500,7 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
     return intersection;
   }
 
-  // easy cases out of way, have to calculate the y value of where the 
+  // easy cases out of way, have to calculate the y value of where the
   // intersection point would be
   // Will not divide by 0 here since we checked for vertical line already.
   float slope = (float) (line1end.y - line1start.y) / 
@@ -517,7 +518,7 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
   return intersection;
 }
 
-  
+
 
 
 
@@ -531,7 +532,7 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
 // from horizontal and y otherwise.
 float Utility::findLinePointDistanceFromStart(const point <int> &p,
                                                const VisualLine &aLine) {
-  
+
   return findLinePointDistanceFromStart(p, aLine.start, aLine.end,
                                         aLine.length);
 }
@@ -551,16 +552,16 @@ float Utility::findLinePointDistanceFromStart(const point <int> &p,
 
 /*
  * Any point on a line can be represented by a single value, t1, when the
- * line has been parameterized in such a way that x and y depend on a new 
+ * line has been parameterized in such a way that x and y depend on a new
  * variable t.  Given such a t1 we can calculate where along the line segment
  * the point lies.  We parameterize our line such that when t = 0, x = x1 and
  * y = y1, and when t = length of line, x = x2 and y = y2.  Thus if t < 0 the
  * point lies "before" the first end point and if t > length of line, the
- * point lies "after" the second end point.  
+ * point lies "after" the second end point.
  *
  * This method determines whether a given t value lies in the "middle" of the
  * line (not too close to either end point)
- * 
+ *
  * @param t1 the value for which the line reaches the point in question
  * @param length the length of the line
  */
@@ -579,9 +580,9 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
    1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
    2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided with the distribution.
-   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission. 
+   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 */
 int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
@@ -672,18 +673,18 @@ const string Utility::getCertaintyString(int _cert) {
   case MILDLYSURE: return "MILDLYSURE";
   case NOTSURE: return "NOTSURE";
   default: return "Don't know what certainty you're talking about, mate";
-  }  
+  }
 }
 
 const string Utility::getDistCertaintyString(int _cert) {
   switch (_cert) {
   case BOTH_SURE: return "BOTH_SURE";
   case HEIGHT_UNSURE: return "HEIGHT_UNSURE";
-  case WIDTH_UNSURE: return "WIDTH_UNSURE";  
+  case WIDTH_UNSURE: return "WIDTH_UNSURE";
   case BOTH_UNSURE: return "BOTH_UNSURE";
   default: return "Don't know what certainty you're talking about, mate";
   }
-}  
+}
 
 
 

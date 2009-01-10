@@ -23,17 +23,17 @@ VisualFieldObject::VisualFieldObject(const VisualFieldObject&) {
 void VisualFieldObject::init(){
     width = 0;
     height = 0;
-    x = 0;
-    y = 0;
+    setX(0);
+    setY(0);
     centerX = 0;
     centerY = 0;
     angleX = 0;
     angleY = 0;
     focDist = 0;
-    distance = 0;
-    bearing = 0;
+    setDistance(0);
+    setBearing(0);
     elevation = 0;
-    certainty = 0;
+    setIDCertainty(NOT_SURE);
 
     switch (id) {
     case BLUE_GOAL_LEFT_POST:
@@ -72,5 +72,5 @@ void VisualFieldObject::init(){
 
 void VisualFieldObject::printDebugInfo(FILE * out) {
     fprintf(out, "(%d, %d)\tdist: %f\tIDcertainty %d\n",
-            x, y, distance, IDcertainty);
+            getX(), getY(), getDistance(), getIDCertainty());
 }

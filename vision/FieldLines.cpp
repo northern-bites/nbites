@@ -2600,7 +2600,7 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
 
 
   for (int i = 0; i < NUM_BEACONS; ++i) {
-    if (beacons[i]->getDist() > 0 && beacons[i]->getDist() < CLOSE_DIST) {
+    if (beacons[i]->getDistance() > 0 && beacons[i]->getDistance() < CLOSE_DIST) {
       if (!LWorksWithBeacon(L, beacons[i])) {
         if (debugIdentifyCorners) {
           cout << "\tCorner should be classified as a T due to its proximity "
@@ -2618,7 +2618,7 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
 
 
   for (int i = 0; i < NUM_POSTS; ++i) {
-    if (posts[i]->getDist() > 0 && posts[i]->getDist() < CLOSE_DIST &&
+    if (posts[i]->getDistance() > 0 && posts[i]->getDistance() < CLOSE_DIST &&
         // Make sure the corner is approximately where a T should be
         nearGoalTCornerLocation(L, posts[i])) {
 
@@ -2870,8 +2870,8 @@ eliminateImpossibleIDs(VisualCorner &c,
 const bool FieldLines::unsureYellowPostOnScreen() const{
   VisualFieldObject * leftPost = vision->yglp;
   VisualFieldObject * rightPost = vision->ygrp;
-  return (leftPost->getDist() > 0 && leftPost->getCertainty() != SURE) ||
-    (rightPost->getDist() > 0 && rightPost->getCertainty() != SURE);
+  return (leftPost->getDistance() > 0 && leftPost->getIDCertainty() != _SURE) ||
+    (rightPost->getDistance() > 0 && rightPost->getIDCertainty() != _SURE);
 }
 
 // Returns true if there is a blue post on the screen whose certainty is
@@ -2879,17 +2879,19 @@ const bool FieldLines::unsureYellowPostOnScreen() const{
 const bool FieldLines::unsureBluePostOnScreen() const{
   VisualFieldObject * leftPost = vision->bglp;
   VisualFieldObject * rightPost = vision->bgrp;
-  return (leftPost->getDist() > 0 && leftPost->getCertainty() != SURE) ||
-    (rightPost->getDist() > 0 && rightPost->getCertainty() != SURE);
+  return (leftPost->getDistance() > 0 && leftPost->getIDCertainty() != _SURE) ||
+    (rightPost->getDistance() > 0 && rightPost->getIDCertainty() != _SURE);
 }
 
 // Returns whether there is a yellow post close to this corner
 const bool FieldLines::yellowPostCloseToCorner(VisualCorner& c) {
   static const int CLOSE = 75;
-  if (vision->yglp->getDist() > 0 && vision->yglp->getCertainty() == SURE) {
+  if (vision->yglp->getDistance() > 0 &&
+      vision->yglp->getIDCertainty() == _SURE) {
     return getEstimatedDistance(&c, vision->yglp) < CLOSE;
   }
-  if (vision->ygrp->getDist() > 0 && vision->ygrp->getCertainty() == SURE) {
+  if (vision->ygrp->getDistance() > 0 &&
+      vision->ygrp->getIDCertainty() == _SURE) {
     return getEstimatedDistance(&c, vision->ygrp) < CLOSE;
   }
   return false;
@@ -2897,10 +2899,12 @@ const bool FieldLines::yellowPostCloseToCorner(VisualCorner& c) {
 // Returns whether there is a blue post close to this corner
 const bool FieldLines::bluePostCloseToCorner(VisualCorner& c) {
   static const int CLOSE = 75;
-  if (vision->bglp->getDist() > 0 && vision->bglp->getCertainty() == SURE) {
+  if (vision->bglp->getDistance() > 0 &&
+      vision->bglp->getIDCertainty() == _SURE) {
     return getEstimatedDistance(&c, vision->bglp) < CLOSE;
   }
-  if (vision->bgrp->getDist() > 0 && vision->bgrp->getCertainty() == SURE) {
+  if (vision->bgrp->getDistance() > 0 &&
+      vision->bgrp->getIDCertainty() == _SURE) {
     return getEstimatedDistance(&c, vision->bgrp) < CLOSE;
   }
   return false;
@@ -2909,32 +2913,32 @@ const bool FieldLines::bluePostCloseToCorner(VisualCorner& c) {
 // Returns true if there is a yellow arc on the screen whose certainty is
 // sure
 const bool FieldLines::yellowArcOnScreen() const {
-  return vision->yellowArc->getDist() > 0 &&
-    vision->yellowArc->getCertainty() == SURE;
+  return vision->yellowArc->getDistance() > 0 &&
+    vision->yellowArc->getIDCertainty() == _SURE;
 }
 // Returns true if there is a blue arc on the screen whose certainty is
 // sure
 const bool FieldLines::blueArcOnScreen() const {
-  return vision->blueArc->getDist() > 0 &&
-    vision->blueArc->getCertainty() == SURE;
+  return vision->blueArc->getDistance() > 0 &&
+    vision->blueArc->getIDCertainty() == _SURE;
 }
 
 // Returns true if there is a goal post visible on the screen whose
 // certainty is sure
 const bool FieldLines::postOnScreen() const {
   return
-    (vision->bglp->getDist() > 0 && vision->bglp->getCertainty() == SURE) ||
-    (vision->bgrp->getDist() > 0 && vision->bgrp->getCertainty() == SURE) ||
-    (vision->yglp->getDist() > 0 && vision->yglp->getCertainty() == SURE) ||
-    (vision->ygrp->getDist() > 0 && vision->ygrp->getCertainty() == SURE);
+    (vision->bglp->getDistance() > 0 && vision->bglp->getIDCertainty() == _SURE) ||
+    (vision->bgrp->getDistance() > 0 && vision->bgrp->getIDCertainty() == _SURE) ||
+    (vision->yglp->getDistance() > 0 && vision->yglp->getIDCertainty() == _SURE) ||
+    (vision->ygrp->getDistance() > 0 && vision->ygrp->getIDCertainty() == _SURE);
 }
 
 // Returns true if there is a beacon visible on the screen whose certainty
 // is sure
 const bool FieldLines::beaconOnScreen() const {
   return
-    (vision->by->getDist() > 0 && vision->by->getCertainty() == SURE) ||
-    (vision->yb->getDist() > 0 && vision->yb->getCertainty() == SURE);
+    (vision->by->getDistance() > 0 && vision->by->getIDCertainty() == _SURE) ||
+    (vision->yb->getDistance() > 0 && vision->yb->getIDCertainty() == _SURE);
 }
 
 
@@ -3456,10 +3460,10 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
   // If there's a close goal in the frame, we couldn't be near the center
   // circle.
   static const int CLOSE_DIST = 150;
-  if ((vision->yglp->getDist() > 0 && vision->yglp->getDist() < CLOSE_DIST) ||
-      (vision->ygrp->getDist() > 0 && vision->ygrp->getDist() < CLOSE_DIST) ||
-      (vision->bglp->getDist() > 0 && vision->bglp->getDist() < CLOSE_DIST) ||
-      (vision->bgrp->getDist() > 0 && vision->bgrp->getDist() < CLOSE_DIST)) {
+  if ((vision->yglp->getDistance() > 0 && vision->yglp->getDistance() < CLOSE_DIST) ||
+      (vision->ygrp->getDistance() > 0 && vision->ygrp->getDistance() < CLOSE_DIST) ||
+      (vision->bglp->getDistance() > 0 && vision->bglp->getDistance() < CLOSE_DIST) ||
+      (vision->bgrp->getDistance() > 0 && vision->bgrp->getDistance() < CLOSE_DIST)) {
     if (debugCcScan) {
       cout << "Found a goal that was close in the image; could not be near "
            << "the center circle." << endl;
@@ -3468,8 +3472,8 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
   }
 
   static const int CLOSE_BEACON_DIST = 60;
-  if ((vision->yb->getDist() > 0 && vision->yb->getDist() < CLOSE_BEACON_DIST) ||
-      (vision->by->getDist() > 0 && vision->by->getDist() < CLOSE_BEACON_DIST)){
+  if ((vision->yb->getDistance() > 0 && vision->yb->getDistance() < CLOSE_BEACON_DIST) ||
+      (vision->by->getDistance() > 0 && vision->by->getDistance() < CLOSE_BEACON_DIST)){
     if (debugCcScan) {
       cout << "Found a beacon that was close in the image; could not be near "
            << "the center circle." << endl;
@@ -3697,10 +3701,10 @@ void FieldLines::printThresholdedImage() {
 vector <const VisualFieldObject*> FieldLines::getVisibleFieldObjects() const {
   vector <const VisualFieldObject*> visibleObjects;
   for (int i = 0; i < 6; ++i) {
-    if (allFieldObjects[i]->getDist() > 0 &&
+    if (allFieldObjects[i]->getDistance() > 0 &&
         // We don't want to identify corners based on posts that aren't sure,
         // for instance
-        allFieldObjects[i]->getCertainty() == SURE) {
+        allFieldObjects[i]->getIDCertainty() == _SURE) {
 #if ROBOT(AIBO)
       visibleObjects.push_back(allFieldObjects[i]);
 #elif ROBOT(NAO)
@@ -3869,7 +3873,7 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
 
   // With new regression, cannot trust pix estimates that are not right on
   // the ground
-  if (isGoal && (obj->getDist() < MAXIMUM_DIST_TO_USE_PIX_ESTIMATE ||
+  if (isGoal && (obj->getDistance() < MAXIMUM_DIST_TO_USE_PIX_ESTIMATE ||
       // The corner is extremely close in the picture to the object, use
       // pix estimate
       // TODO: named constant
@@ -3890,7 +3894,7 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
 
   else {
     typeOfEstimate = "FieldObjects getDistance()";
-    objDist = obj->getDist();
+    objDist = obj->getDistance();
      // NOTE: since our corner and object coordinate systems are reversed, take
     // the negative of the corner bearing
     objBearing = -obj->getBearing() * RAD_OVER_DEG;

@@ -260,10 +260,11 @@ class ObjectFragments {
   int checkIntersection(blob b);
   int checkCorners(blob b);
   int getBigRun(int left, int right, int hor);
-  bool updateObject(VisualFieldObject* a, blob b, int certainty, int dc);
+  bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
+                    distanceCertainty _distCertainty);
   void updateRobot(VisualFieldObject* a, blob b);
   bool updateArc(VisualFieldObject* a, blob b, int sawGoal);
-  int checkDist(int left, int right, int top, int bottom);
+  distanceCertainty checkDist(int left, int right, int top, int bottom);
   void updateBackstop(VisualFieldObject* a, blob b);
 
   // post recognition routines
@@ -307,7 +308,8 @@ class ObjectFragments {
   void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
   void transferToChecker(blob b);
   void transferToPole();
-  void transferTopBlob(VisualFieldObject * one, int cert, int dc);
+  void transferTopBlob(VisualFieldObject * one, certainty cert,
+                       distanceCertainty dc);
   void transferBlob(blob from, blob & to);
 
   // ball stuff
