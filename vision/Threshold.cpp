@@ -1571,14 +1571,24 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
     estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
 					  objPtr->getCenterY(),
 					  objPtr->getDistance());
+<<<<<<< HEAD:vision/Threshold.cpp
     objPtr->setDistanceWithSD(obj_est.dist);
     objPtr->setBearingWithSD(obj_est.bearing);
+=======
+    objPtr->setDistance(obj_est.dist);
+    objPtr->setBearing(obj_est.bearing);
+>>>>>>> Lots of changes to make VisualFieldObject work as a subclass of VisualLandmark.:vision/Threshold.cpp
     objPtr->setElevation(obj_est.elevation);
   }
   else {
     objPtr->setFocDist(0.0);
+<<<<<<< HEAD:vision/Threshold.cpp
     objPtr->setDistanceWithSD(0.0);
     objPtr->setBearingWithSD(0.0);
+=======
+    objPtr->setDistance(0.0);
+    objPtr->setBearing(0.0);
+>>>>>>> Lots of changes to make VisualFieldObject work as a subclass of VisualLandmark.:vision/Threshold.cpp
     objPtr->setElevation(0.0);
   }
 }
