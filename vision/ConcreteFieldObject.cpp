@@ -1,4 +1,5 @@
 #include "ConcreteFieldObject.h"
+const float ConcreteFieldObject::WHITE_HEIGHT_ON_BEACON = 18.6;
 
 // Constructors
 ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,
@@ -77,7 +78,8 @@ const string ConcreteFieldObject::toString() const {
 
 }
 
-const string ConcreteFieldObject::getStringFromID(const fieldObjectID testID) {
+const string ConcreteFieldObject::getStringFromID(const fieldObjectID
+                                                         testID) {
     switch (testID) {
     case BLUE_GOAL_LEFT_POST:
         return "Blue goal left post";
@@ -138,7 +140,8 @@ const bool ConcreteFieldObject::isArc(const fieldObjectID testID) {
     }
 }
 
-const float ConcreteFieldObject::getHeightFromGround(const fieldObjectID _id) {
+const float ConcreteFieldObject::getHeightFromGround(const
+                                                            fieldObjectID _id) {
     switch (_id) {
     case BLUE_GOAL_LEFT_POST:
     case BLUE_GOAL_RIGHT_POST:

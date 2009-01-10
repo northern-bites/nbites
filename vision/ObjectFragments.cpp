@@ -100,7 +100,7 @@ void ObjectFragments::init(double s){
 }
 
 /*  Set the primary color.  Depending on the color, we have different space needs.
- * @param c        the color 
+ * @param c        the color
  */
 
 void ObjectFragments::setColor(int c) {
@@ -122,7 +122,7 @@ void ObjectFragments::setColor(int c) {
   case ORANGE:
 #ifdef USE_PINK_BALL
   case PINK:
-#endif 
+#endif
     runsize = BALL_RUNS_MALLOC_SIZE; //max number of runs
     run_num = runsize * 3;
     break;
@@ -135,7 +135,7 @@ void ObjectFragments::setColor(int c) {
 
 
 /*
-  Pseudo-blobbing used for goal recognition.  Since the goals are rectangles we should be able to 
+  Pseudo-blobbing used for goal recognition.  Since the goals are rectangles we should be able to
   just paste the new runs in to a main blob directly.
 
   This uses the huge hack that our objects (except the ball) are square - so we can just keep a bounding box
@@ -175,14 +175,14 @@ void ObjectFragments::blobIt(int x, int y, int h) {
 
   // is this run contiguous with any previous blob?
   for (int i = 0; i < numBlobs; i++) {
-      
+
     // first check: if currentBlob x is greater than blob left and less than a little bit more than the blob right.
     // AND
     // second check: currentBlob y is within fits within current blob
     // OR
     // currentBlob's bottom is within blob and height makes it higher
-    if ((x > blobs[i].leftTop.x  && x < blobs[i].rightTop.x + contig) && 
-	((y >= blobs[i].leftTop.y - contig && y < blobs[i].leftBottom.y + contig) || 
+    if ((x > blobs[i].leftTop.x  && x < blobs[i].rightTop.x + contig) &&
+	((y >= blobs[i].leftTop.y - contig && y < blobs[i].leftBottom.y + contig) ||
 	 (y < blobs[i].leftTop.y && y+h+contig > blobs[i].leftTop.y))) {
 
       /* BOUNDING BOX CHECKS -- if current x or y increases the size of the box, do so and keep track of the corresponding x or y value */
@@ -197,7 +197,7 @@ void ObjectFragments::blobIt(int x, int y, int h) {
       if (blobs[i].leftTop.y > y) {
 	blobs[i].leftTop.y = y;
 	blobs[i].rightTop.y = y;
-      } 
+      }
 
       // assign the top, if it is better
       if (y+h > blobs[i].leftBottom.y) {
@@ -214,8 +214,8 @@ void ObjectFragments::blobIt(int x, int y, int h) {
 	}*/
 
       //add the run length to the number of real pixels in the blob
-      int s = (blobs[i].rightTop.x - blobs[i].leftTop.x + 1) * 
-	(blobs[i].leftBottom.y - blobs[i].leftTop.y + 1); //calculate the area of this blob under consideration 
+      int s = (blobs[i].rightTop.x - blobs[i].leftTop.x + 1) *
+	(blobs[i].leftBottom.y - blobs[i].leftTop.y + 1); //calculate the area of this blob under consideration
       blobs[i].area = s; //store the area for later.
       blobs[i].pixels += h;
 
@@ -243,7 +243,7 @@ void ObjectFragments::blobIt(int x, int y, int h) {
   }
 }
 
-/* Find the biggest blob.  Ideally this will end up also merging blobs when they are occluded (e.g. by a dog).  
+/* Find the biggest blob.  Ideally this will end up also merging blobs when they are occluded (e.g. by a dog).
    It may not be necessary though.  After this call the data structure "topBlob" will have the top blob.
    Additionally, the blob "secondBlob" will have the second biggest blob.
    @param maxY     max value (ignored)
@@ -332,8 +332,8 @@ void ObjectFragments::mergeBlobs(int first, int second) {
 }
 
 /* Adds a new run to the basic data structure.
-   
-   runs structure contains: 
+
+   runs structure contains:
    -x of start column
    -y of start column
    -height of run
@@ -347,17 +347,17 @@ void ObjectFragments::newRun(int x, int y, int h) {
     int last = numberOfRuns - 1;
     // skip over noise --- jumps over two pixel noise currently.
     //HW--added CONSTANT for noise jumps.
-    if (last > 0 && runs[last].x == x && 
+    if (last > 0 && runs[last].x == x &&
 	(runs[last].y - (y + h) <= NOISE_SKIP)) {
       runs[last].h += runs[last].y - y; // merge run lengths
       runs[last].y = y; // reset the new y val
-      h = runs[last].h; 
+      h = runs[last].h;
       numberOfRuns--; // don't count this merge as a new run
     } else {
       runs[numberOfRuns].x = x;
       runs[numberOfRuns].y = y;
       runs[numberOfRuns].h = h;
-    }                        
+    }
 
     if (h > biggestRun) { // tracking largest run
       biggestRun = h;
@@ -446,7 +446,7 @@ void ObjectFragments::robot(int bigGreen) {
 		   topBlob.leftBottom.y - topBlob.leftTop.y + 3, ORANGE);
 	}
       }
-    } 
+    }
   }
 }
 
@@ -460,7 +460,7 @@ void ObjectFragments::expandRobotBlob() {
   for (x = bestr; good && x < IMAGE_WIDTH - 1; x++) {
     good = false;
     for (y = topBlob.rightTop.y; y < topBlob.rightBottom.y && !good; y = y + 2) {
-      if (thresh->thresholded[y][x] == color) 
+      if (thresh->thresholded[y][x] == color)
 	good = true;
     }
   }
@@ -470,7 +470,7 @@ void ObjectFragments::expandRobotBlob() {
   for (x = topBlob.leftTop.x; good && x >  -1; x--) {
     good = false;
     for (y = topBlob.rightTop.y; y < topBlob.rightBottom.y && !good; y = y + 2) {
-      if (thresh->thresholded[y][x] == color) 
+      if (thresh->thresholded[y][x] == color)
 	good = true;
     }
   }
@@ -508,7 +508,7 @@ void ObjectFragments::expandRobotBlob() {
     for (x = topBlob.rightTop.x; good && x < IMAGE_WIDTH - 1; x++) {
       good = false;
       for (y = topBlob.rightBottom.y - gain; y < topBlob.rightBottom.y && !good; y++) {
-	if (thresh->thresholded[y][x] == color) 
+	if (thresh->thresholded[y][x] == color)
 	  good = true;
       }
     }
@@ -518,13 +518,13 @@ void ObjectFragments::expandRobotBlob() {
     for (x = topBlob.leftTop.x; good && x >  -1; x--) {
       good = false;
       for (y = topBlob.rightBottom.y - gain; y < topBlob.rightBottom.y && !good; y++) {
-	if (thresh->thresholded[y][x] == color) 
+	if (thresh->thresholded[y][x] == color)
 	  good = true;
       }
     }
     topBlob.leftTop.x = x + 1;
     topBlob.leftBottom.x = x + 1;
-    
+
   }
 }
 
@@ -603,7 +603,7 @@ bool ObjectFragments::viableRobot(blob a) {
   return false;
 }
 
-/* Find robot blobs.  
+/* Find robot blobs.
    @param maxY     max value - will be used to pick heads out
 */
 
@@ -762,7 +762,7 @@ void ObjectFragments::splitBlob(int which) {
     if (lastY - top > 50 && left - lastRight < 10) {
       mergeBlobs(which, which - 1);
     }
-    if (another) {  
+    if (another) {
       lastY = blobs[which - 2].leftTop.y;
       lastRight = blobs[which - 2].rightTop.x;
       if (lastY - top > 50 && left - lastRight < 10) {
@@ -915,7 +915,7 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c, 
   int height = IMAGE_HEIGHT;
   // go until we hit enough bad pixels
   for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH && y < height && bad < stopper; ) {
-    if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {         
+    if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
       // if it is either of the colors we're looking for - good
       good++;
       run++;
@@ -948,7 +948,7 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c, 
 bool ObjectFragments::checkEdge(int x, int y, int x2, int y2) {
   int ydiff = abs(thresh->getY(x, y) - thresh->getY(x2, y2));
   if (ydiff > 30) {
-    return true; 
+    return true;
   }
   return false;
 }
@@ -1033,11 +1033,11 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top, point <int>& 
     //cout << "Actual y is " << actualY << endl;
     if (actualY < 1) atTop = true;
     //cout << "Actual y is " << actualY << endl;
-    for (i = actualY; count < minCount  && 
-	   i <= actualY + spanY && (run < minRun || goodRun > spanY / 2) && (top.y > 1 || initRun < minRun); 
+    for (i = actualY; count < minCount  &&
+	   i <= actualY + spanY && (run < minRun || goodRun > spanY / 2) && (top.y > 1 || initRun < minRun);
 	 i+= increment) {
       theSpot = xProject(top.x + dir * j, actualY, i);
-      if (theSpot < 0 || theSpot > IMAGE_WIDTH - 1 || theSpot - dir < 0 || 
+      if (theSpot < 0 || theSpot > IMAGE_WIDTH - 1 || theSpot - dir < 0 ||
           theSpot - dir > IMAGE_WIDTH - 1 || i < 0 || i > IMAGE_HEIGHT - 1) {
 	fake++;
       } else {
@@ -1081,7 +1081,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top, point <int>& 
   //cout << "Checking " << top.x << " " << top.y << endl;
   if (top.x < 2 || top.x > IMAGE_WIDTH - 3) {
     //cout << "In upward scan" << endl;
-    for (j = 1; count < minCount && bottom.x + dir * j >= 0 && bottom.x + dir * j < IMAGE_WIDTH 
+    for (j = 1; count < minCount && bottom.x + dir * j >= 0 && bottom.x + dir * j < IMAGE_WIDTH
 	   && good > minGood && run < minRun; j+=increment) {
       //count = 0;
       good = 0;
@@ -1138,7 +1138,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left, point <int
   int dir = 1;
   int theSpot = 0;
   int run = 0;
-  int badLines = 0; 
+  int badLines = 0;
   int maxgreen = 3;
 #if ROBOT(NAO)
   maxgreen = 200;
@@ -1150,7 +1150,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left, point <int
   int minGood = max(1,spanX / 3);
   int greens = 0;
   int fakegood = 0;
-  
+
   for (j = 1; count < minCount && left.y + dir * j >= 0 && left.y + dir * j < IMAGE_HEIGHT && badLines < 2 && greens < max(minRun, maxgreen); j++) {
     //count = 0;
     good = 0;
@@ -1168,7 +1168,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left, point <int
       } else {
 	if (checkEdge(i, theSpot, i, theSpot - dir)) {
 	  //count++;
-	} 
+	}
 	int curcol = thresh->thresholded[theSpot][i];
 	if (curcol == c || curcol == c2) {
 	  good++;
@@ -1197,7 +1197,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left, point <int
   right.y = left.y + spanY;
 #if ROBOT(NAO)
   if (!up && thresh->getVisionHorizon() > left.y) {
-    // for the heck of it let's scan down 
+    // for the heck of it let's scan down
     int found = left.y;
     for (int d = left.y; d < thresh->getVisionHorizon(); d+=2) {
       good = 0;
@@ -1247,7 +1247,7 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
       int theSpot = left.y + dir * j;
        if (checkEdge(i, theSpot, i, theSpot - dir)) {
 	count++;
-       } 
+       }
       int curcol = thresh->thresholded[theSpot][i];
       if (curcol == c || curcol == c2) {
 	good++;
@@ -1276,7 +1276,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	//cout << "Vert scan " << x << " " << y << endl;
 	if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) { // if it is the color we're looking for - good
 	  break;
-	} 
+	}
 	y = y + 1;
 	x = xProject(startX, startY, y);
       }
@@ -1288,7 +1288,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
       for (x = startX, y = startY; x < IMAGE_WIDTH; ) {
 	if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) { // if it is the color we're looking for - good
 	  break;
-	} 
+	}
 	x++; // we just do on a pure horizontal so we don't need to worry about going offscreen
 	count++;
       }
@@ -1315,7 +1315,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	    int pix = thresh->thresholded[y][x];
 	    if (pix == c || pix == c2) {
 	      break;
-	    } 
+	    }
 	    x--; // we just do on a pure horizontal so we don't need to worry about going offscreen
 	    count++;
 	  }
@@ -1326,7 +1326,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	    int pix = thresh->thresholded[y][x];
 	    if (pix == c || pix == c2) {
 	      break;
-	    } 
+	    }
 	    x--; // we just do on a pure horizontal so we don't need to worry about going offscreen
 	    count2++;
 	  }
@@ -1348,7 +1348,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	  //cout << "Vert scan " << x << " " << y << endl;
 	  if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) { // if it is the color we're looking for - good
 	    break;
-	  } 
+	  }
 	  y = y + 1;
 	  x = xProject(startX, startY, y);
 	}
@@ -1360,7 +1360,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	for (x = startX, y = startY; x < IMAGE_WIDTH; ) {
 	  if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) { // if it is the color we're looking for - good
 	    break;
-	  } 
+	  }
 	  x--; // we just do on a pure horizontal so we don't need to worry about going offscreen
 	  count++;
 	}
@@ -1388,7 +1388,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	      int pix = thresh->thresholded[y][x];
 	      if (pix == c || pix == c2) {
 		break;
-	      } 
+	      }
 	      x++; // we just do on a pure horizontal so we don't need to worry about going offscreen
 	      count++;
 	    }
@@ -1399,7 +1399,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	      int pix = thresh->thresholded[y][x];
 	      if (pix == c || pix == c2) {
 		break;
-	      } 
+	      }
 	      x++; // we just do on a pure horizontal so we don't need to worry about going offscreen
 	      count2++;
 	    }
@@ -1411,7 +1411,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	    }
 	  }
 	}
-      } 
+      }
     }
   }
 
@@ -1525,7 +1525,7 @@ void ObjectFragments::constrainedSquare(int x, int y, int c, int c2, int left, i
 }
 
 /*  Routine to find a general square goal.  The Aibo version is more general than the Nao version
- * and should end up being the final version soon.  We start with a point.  We scan up from the 
+ * and should end up being the final version soon.  We start with a point.  We scan up from the
  * point and down from the point looking for a strip of the right color.  That serves as our
  * starting point.  Then we try expanding the sides outward.  The we try expanding the top and
  * bottom in a similar fashion.
@@ -1712,7 +1712,7 @@ void ObjectFragments::blue(int bigGreen) {
       }
     }
   }
-  
+
   if (rightPost > BADVALUE)
     goalScan(vision->bglp, vision->bgrp, vision->bgBackstop, BLUE, BLUEGREEN, true, bigGreen);
   else
@@ -1734,9 +1734,9 @@ void ObjectFragments::blue(int bigGreen) {
 
 
 /*  Look for a beacon of the given color.
- * Starts with the info from the RLE system, which consists of x-locations 
+ * Starts with the info from the RLE system, which consists of x-locations
  *  where there is a transition between blue,yellow or vice versa
- *  Then finds about how wide the beacon is, and uses this information to pick a 
+ *  Then finds about how wide the beacon is, and uses this information to pick a
  *  point inside the color blob. (the midpoint). This point is then expanded to find the rest of the beacon.
  * @param pFirst         x value of the first place we saw a yellow-blue transition
  * @param pFirstY        y value at that point
@@ -1745,7 +1745,7 @@ void ObjectFragments::blue(int bigGreen) {
  * @return               true when we found a beacon, false otherwise
  */
 
-bool ObjectFragments::beaconCheck(int pFirst, int pFirstY, int pSecond, int pSecondY) { 
+bool ObjectFragments::beaconCheck(int pFirst, int pFirstY, int pSecond, int pSecondY) {
   // we have two sets of beacon variables - one for yellow on top, the other for blue on top
   int pFirst1 = pFirst;     // we'll let the original parameters scan for the width //-yellowBlue
   int pSecond1 = pSecond;   //blueYellow
@@ -1844,7 +1844,7 @@ bool ObjectFragments::beaconCheck(int pFirst, int pFirstY, int pSecond, int pSec
  *  The main idea is to try and grab to square color swatches one above the other.  From there
  *  we fiddle around a bit to get the best boundaries we can.
  * @param leftBound      the leftmost we could accept this beacon as being
- * @param rightBound     the rightmost 
+ * @param rightBound     the rightmost
  * @param startx         x value where we have a stripe of both colors
  * @param starty         y value of that strip (transition between the colors)
  * @param yellowOnTop    should yellow be above blue or vice versa
@@ -1964,7 +1964,7 @@ bool ObjectFragments::processBeacon(int leftBound, int rightBound, int startx, i
       } else {
 	findSpot(x1, y1, x2, y2, 1, c1, c2, c3, c4, 0);
       }
-      FieldObjects* beacon = vision->by;
+      VisualFieldObject* beacon = vision->by;
       if (yellowOnTop)
 	beacon = vision->yb;
       return setCorners(scan.x, scan.y, scan.good, scan.bad, c1, c2, c3, c4, beacon);
@@ -1973,14 +1973,14 @@ bool ObjectFragments::processBeacon(int leftBound, int rightBound, int startx, i
   return false;
 }
 
-/*  As a convenience we use our blob data structure instead of an actual beacon data structure.  So once we've 
+/*  As a convenience we use our blob data structure instead of an actual beacon data structure.  So once we've
  * found the beacon we need to convert the blob accordingly.
  * @param b      the blob
  * @param beacon the real beacon object
  * @return       always true
  */
 
-bool ObjectFragments::inferBeaconFromBlob(blob b, FieldObjects* beacon) {
+bool ObjectFragments::inferBeaconFromBlob(blob b, VisualFieldObject* beacon) {
   int leftx = b.leftTop.x;
   int lefty = b.leftTop.y;
   int rightx = b.rightTop.x;
@@ -2020,7 +2020,7 @@ bool ObjectFragments::inferBeaconFromBlob(blob b, FieldObjects* beacon) {
   beacon->setDistCertainty(true);
   beacon->setDist(1);
   return true;
-  
+
 }
 
 /* Takes a beacon and the two points that define the borderline between the beacon's colors.  Extracts the defining
@@ -2037,7 +2037,7 @@ bool ObjectFragments::inferBeaconFromBlob(blob b, FieldObjects* beacon) {
  * @param beacon    the beacon that we're looking at
  */
 
-bool ObjectFragments::setCorners(int leftx, int lefty, int rightx, int righty, int c, int c2, int c3, int c4, FieldObjects* beacon) {
+bool ObjectFragments::setCorners(int leftx, int lefty, int rightx, int righty, int c, int c2, int c3, int c4, VisualFieldObject* beacon) {
   // sometimes we don't have perfect alignment - let's fix that
   int spanX = rightx - leftx;
   int spanY = righty - lefty;
@@ -2154,7 +2154,7 @@ bool ObjectFragments::setCorners(int leftx, int lefty, int rightx, int righty, i
 	bx = xCheck;
 	by = bottomY + i;
       }
-  
+
     }
     if (bx != 0 || by != 0) {
       bottomX = bx;
@@ -2260,31 +2260,31 @@ void ObjectFragments::expandSpot(int x1, int y1, int dir, int c, int c2,
       nx2 = xProject(newX, newY, ny2);
       if (nx < 0 || ny < 0 || nx >= width || ny >= height)
 	break;
-      if (thresh->thresholded[ny][nx] == c3 || thresh->thresholded[ny][nx] == c4) {  
+      if (thresh->thresholded[ny][nx] == c3 || thresh->thresholded[ny][nx] == c4) {
 	if (good == 0) {
 	  // track when we see the color
 	  firstx = nx;
 	  firsty = ny;
 	}
 	good++;
-      } 
+      }
       if (nx2 < 0 || ny2 < 0 || nx2 >= width || ny2 >= height)
 	break;
-      if (thresh->thresholded[ny2][nx2] == c || thresh->thresholded[ny2][nx2] == c2) {  
+      if (thresh->thresholded[ny2][nx2] == c || thresh->thresholded[ny2][nx2] == c2) {
 	if (good2 == 0) {
 	  // track when we see the color
 	  firstx2 = nx2;
 	  firsty2 = ny2;
 	}
 	good2++;
-      } 
+      }
     }
     if (good > 1 && good2 > 1) {
       spot.x = midPoint(firstx, firstx2);
       spot.y = midPoint(firsty, firsty2);
     }
   } while (good > 1 && good2 > 1);
-  
+
 }
 
 /* The "spot" we're trying to find are the two points at the end of the line segment dividing blue
@@ -2365,10 +2365,10 @@ void ObjectFragments::findSpot(int x1, int y1, int x2, int y2, int dir, int c, i
 
 /* Start at one of the edges - and then scan in towards the middle. As soon as a scan line is found which is more than "check" percent of "myHeight", stop, and report how many lines we moved over - since these can then ultimately be discarded - read shaved off.
    Results are stored in scan1.x,scan1.y for the top corner, and scan1.bad,scan1.good for the bottom corner.
- * 
- * @param oneX         a pointX - We want to left or right scan this direction from this x value 
+ *
+ * @param oneX         a pointX - We want to left or right scan this direction from this x value
  * @param oneY         a pointY - Serves to kepp track of where to scan
- * @param dir          the direction to scan in 
+ * @param dir          the direction to scan in
  * @param myHeight     the current height of our object
  * @param check        a double which represents what percent of the height we need to find a run to match
  * @param x            center of where we are looking
@@ -2440,7 +2440,7 @@ int ObjectFragments::getBigRun(int left, int right, int hor) {
     if (nextH > maxRun && (nextX < left || nextX > right)) { // hack for pictures with tape measure && nextY < hor) {
       maxRun = nextH;
       index = i;
-    } 
+    }
   }
   return index;
 }
@@ -2453,9 +2453,9 @@ int ObjectFragments::getBigRun(int left, int right, int hor) {
  * @param one             the field object we'd like to update
  * @param two             the blob that contains the information we need
  * @param certainty       how certain are we of its ID?
- * @param distCertainty   how certain are we of how big we think it is? 
+ * @param distCertainty   how certain are we of how big we think it is?
  */
-bool ObjectFragments::updateObject(FieldObjects* one, blob two, int certainty, int distCertainty) {
+bool ObjectFragments::updateObject(VisualFieldObject* one, blob two, int certainty, int distCertainty) {
   //cout << "Got an object" << endl;
   // before we do this let's make sure that the object is really our color
   if (rightBlobColor(two, NORMALPOST)) {
@@ -2483,7 +2483,7 @@ bool ObjectFragments::updateObject(FieldObjects* one, blob two, int certainty, i
   }
 }
 
-void ObjectFragments::updateRobot(FieldObjects* one, blob two) {
+void ObjectFragments::updateRobot(VisualFieldObject* one, blob two) {
   one->setLeftTopX(two.leftTop.x);
   one->setLeftTopY(two.leftTop.y);
   one->setLeftBottomX(two.leftBottom.x);
@@ -2505,7 +2505,7 @@ void ObjectFragments::updateRobot(FieldObjects* one, blob two) {
  * @param one             the field object we'd like to update
  * @param two             the blob that contains the information we need
  */
-bool ObjectFragments::updateArc(FieldObjects* one, blob two, int goalHeight) {
+bool ObjectFragments::updateArc(VisualFieldObject* one, blob two, int goalHeight) {
   one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x, two.leftTop.y));
   if (one->getWidth() > 10) {
 
@@ -2676,7 +2676,7 @@ int ObjectFragments::checkDist(int left, int right, int top, int bottom) {
  * @param one    the field object we'd like to update
  * @param two    the blob that contains the information we need
  */
-void ObjectFragments::updateBackstop(FieldObjects* one, blob two) {
+void ObjectFragments::updateBackstop(VisualFieldObject* one, blob two) {
   one->setLeftTopX(two.leftTop.x);
   one->setLeftTopY(two.leftTop.y);
   one->setLeftBottomX(two.leftBottom.x);
@@ -2745,7 +2745,7 @@ int ObjectFragments::crossCheck(blob b) {
       if (scan.good > biggest) {
 	biggest = scan.good;
       }
-    }    
+    }
     if (biggest < 10)
       return RIGHT;
   }
@@ -2925,7 +2925,7 @@ int ObjectFragments::checkIntersection(blob post) {
       }
     } else {
       //cout << "Got a corner " << (k->getX()) << " " << (k->getY()) << " " << post.leftBottom.x << " " << post.rightBottom.x << " " << post.leftBottom.y << endl;
-      if (k->getX() > post.leftBottom.x - spanx && k->getX() < post.rightBottom.x + spanx && 
+      if (k->getX() > post.leftBottom.x - spanx && k->getX() < post.rightBottom.x + spanx &&
 	  post.leftBottom.y < k->getY()) {
 	if (k->getX() > post.leftBottom.x - 5 && k->getX() < post.rightBottom.x + 5) {
 	  //cout << "Corner underneath" << endl;
@@ -2940,7 +2940,7 @@ int ObjectFragments::checkIntersection(blob post) {
 	      cout << "Viable corner underneath post" << endl;
 	    }
 	    point<int> midTop(midPoint(post.leftBottom.x, 0), post.leftBottom.y);
-	    point<int> midBottom(midPoint(post.leftBottom.x, 0), 
+	    point<int> midBottom(midPoint(post.leftBottom.x, 0),
 				 midPoint(midPoint(post.leftBottom.y, IMAGE_HEIGHT - 1), post.leftBottom.y));
 	    //drawLine(midTop.x, midTop.y, midBottom.x, midBottom.y, RED);
 	    bool intersects = vision->fieldLines->intersectsFieldLines(midTop,midBottom);
@@ -2970,7 +2970,7 @@ int ObjectFragments::checkIntersection(blob post) {
 	} else {
 	  //cout << "Offset corner " << endl;
 	  // if the corner is near enough we can use it to id the post
-	  
+
 	  point<int> midTop(post.leftBottom.x - 10, k->getY() + 10);
 	  point<int> midBottom(post.rightBottom.x + 10, k->getY() + 10);
 	  bool intersects = vision->fieldLines->intersectsFieldLines(midTop,midBottom);
@@ -2987,7 +2987,7 @@ int ObjectFragments::checkIntersection(blob post) {
 	    }
 	  }
 	}
-      } else if (k->getX() > post.leftBottom.x - spanx && k->getX() < post.rightBottom.x + spanx && 
+      } else if (k->getX() > post.leftBottom.x - spanx && k->getX() < post.rightBottom.x + spanx &&
 		 post.leftBottom.y > k->getY() && k->getY() > post.leftTop.y + (post.leftBottom.y - post.leftTop.y) / 2) {
 	if (POSTLOGIC) {
 	  cout << "Found a corner near and above the bottom of the post" << endl;
@@ -3012,7 +3012,7 @@ int ObjectFragments::checkCorners(blob post) {
        k != corners->end(); k++) {
     // we've already checked the Ts so ignore them
     if (k->getShape() != T) {
-      if (k->getX() > post.leftBottom.x - spanx && k->getX() < post.rightBottom.x + spanx && 
+      if (k->getX() > post.leftBottom.x - spanx && k->getX() < post.rightBottom.x + spanx &&
 	  post.leftBottom.y < k->getY()) {
 	if (k->getX() > post.leftBottom.x - 5 && k->getX() < post.rightBottom.x + 5) {
 	  // we checked these when we checked for Ts so ignore them
@@ -3050,7 +3050,7 @@ int ObjectFragments::checkPostBlob(blob big, blob small) {
   int spanY2 = blobHeight(big);
   int spanX1 = blobWidth(small);
   int spanX2 = blobWidth(big);
-  
+
   // when the big one and the small one are relatively similar in size it could indicate the two posts
   if (spanX1 > spanX2 / 4) {
     // if we have widely disparate blobs,  they are basically the same height, and they are fairly squat
@@ -3073,7 +3073,7 @@ int ObjectFragments::checkPostBlob(blob big, blob small) {
     return NOPOST;
   } else {
     // if the blob matches up with the post then we can use it if the big post is big enough relative to the small one
-    if ((leftGap > -2 || small.leftTop.x < 0) && rightGap > -2 && 
+    if ((leftGap > -2 || small.leftTop.x < 0) && rightGap > -2 &&
 	(big.leftTop.y <= small.leftTop.y || small.leftTop.y < 0) && big.leftBottom.y >= small.leftBottom.y) {
       // ok we have it, now let's classify what the relationship is
       if (POSTLOGIC) {
@@ -3104,7 +3104,7 @@ int ObjectFragments::checkPostBlob(blob big, blob small) {
  * @return            whether or not we concluded we had a viable post
  */
 // Check if one blob is inside the other, if so, then we may have a post and a backstop
-bool ObjectFragments::contains(blob big, blob small, int c, int c2, FieldObjects* left, FieldObjects* right, FieldObjects* mid) {
+bool ObjectFragments::contains(blob big, blob small, int c, int c2, VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* mid) {
   // first just check if its reasonable
   int leftGap = small.leftTop.x - big.leftTop.x;
   int rightGap = big.rightTop.x - small.rightTop.x;
@@ -3195,7 +3195,7 @@ bool ObjectFragments::contains(blob big, blob small, int c, int c2, FieldObjects
  */
 
 bool ObjectFragments::inBlob(blob b, int x, int y, int h) {
-  if (!((b.leftTop.x < x && x < b.rightTop.x) || (b.leftBottom.x < x && x < b.rightBottom.x)))    
+  if (!((b.leftTop.x < x && x < b.rightTop.x) || (b.leftBottom.x < x && x < b.rightBottom.x)))
     return false;
   if (!(((b.leftTop.y < y || b.leftTop.y < y + h) && y < b.leftBottom.y) || ((b.rightTop.y < y || b.rightTop.y < y+h) && y < b.rightBottom.y)))
     return false;
@@ -3429,7 +3429,7 @@ int ObjectFragments::projectBoxes(int spanX, int spanY, int howbig, int fakeBott
       } else {
 	if (POSTLOGIC) cout << "Right scan found " << scan.good << endl;
 	return LEFT;
-      } 
+      }
     } else {
       if (POSTLOGIC) cout << "here " << rSum << " " << rights << " " << lSum << " " << lefts << endl;
       return LEFT;
@@ -3566,7 +3566,7 @@ bool ObjectFragments::coloredArc(blob b, int c) {
   int area = blobArea(b);
   if (ARCDEBUG) {
     drawBlob(b, BROWN);
-    cout << "Good " <<  good << " " << green << " " << 
+    cout << "Good " <<  good << " " << green << " " <<
       (area / 3) << endl;
   }
   if (green < area / 3)
@@ -3649,8 +3649,8 @@ bool ObjectFragments::checkSize(blob b, int c) {
  * @return            whether or not we concluded we had a viable post
  */
 #if ROBOT(AIBO)
- 
-bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int c2, int horizon, FieldObjects* left, FieldObjects* mid, FieldObjects* right, blob post, blob big) {
+
+bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int c2, int horizon, VisualFieldObject* left, VisualFieldObject* mid, VisualFieldObject* right, blob post, blob big) {
   // check for a T nearby
   const list <VisualCorner>* corners = vision->fieldLines->getCorners();
   for (list <VisualCorner>::const_iterator k = corners->begin();
@@ -3702,12 +3702,12 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
       int rb = max(post.rightTop.x, post.rightBottom.x);
       int greens = 0;
       if (c == YELLOW) {
-	beaconFound = processBeacon(lb, rb, midPoint(lb, rb), midPoint(post.leftTop.y, post.leftBottom.y), true, false); 
+	beaconFound = processBeacon(lb, rb, midPoint(lb, rb), midPoint(post.leftTop.y, post.leftBottom.y), true, false);
 	if (!beaconFound) {
 	  beaconFound = processBeacon(lb, rb, midPoint(lb, rb), midPoint(post.leftTop.y, post.leftBottom.y), false, false);
 	}
       } else {
-	beaconFound = processBeacon(lb, rb, midPoint(lb, rb), post.leftTop.y, true, false); 
+	beaconFound = processBeacon(lb, rb, midPoint(lb, rb), post.leftTop.y, true, false);
 	if (!beaconFound) {
 	  beaconFound = processBeacon(lb, rb, midPoint(lb, rb), post.leftBottom.y, false, false);
 	}
@@ -3778,7 +3778,7 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
 	updateBackstop(mid, big);
 	return true;
       }
-      lastLast = big.leftBottom.y; lastFirst = -1; 
+      lastLast = big.leftBottom.y; lastFirst = -1;
       int stopper = min(IMAGE_WIDTH - 1, max(midPoint(big.leftTop.x, big.rightTop.x), post.rightTop.x + 10));
       //cout << stopper << endl;
       for (int i = big.leftTop.x + 10; !stop && i < stopper; i++) {
@@ -3868,8 +3868,8 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
 	updateBackstop(mid, big);
 	return true;
       }
-      lastLast = big.leftBottom.y; lastFirst = -1; 
-      
+      lastLast = big.leftBottom.y; lastFirst = -1;
+
       for (int i = big.rightTop.x - 10; !stop && i > big.leftTop.x + blobWidth(big) / 3; i--) {
 	first = -1;
 	greeng = 0;
@@ -3997,7 +3997,7 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
 	big.rightBottom.x = index - 1;
 	updateBackstop(mid, big);
 	return true;
-      } else if (lastindex != BADVALUE && lastindex < post.leftTop.x + blobWidth(post) / 2 || 
+      } else if (lastindex != BADVALUE && lastindex < post.leftTop.x + blobWidth(post) / 2 ||
 		 (index < post.leftTop.x + 3 && big.rightTop.x - post.rightTop.x > 5)) {
 	// post on left side?
 	if (POSTDEBUG) {
@@ -4014,7 +4014,7 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
       }
     }
     // let's not give up yet
-    
+
     if (locationOk(big, horizon)) {
       if (POSTDEBUG) {
 	cout << "Setting backstop" << endl;
@@ -4093,7 +4093,7 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
       updateBackstop(mid, big);
       return true;
     }
-  } 
+  }
   if (POSTDEBUG)
     cout << "Returning false from post/blob" << endl;
   return false;
@@ -4108,7 +4108,7 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
  * @param one     the backstop
  */
 
-void ObjectFragments::setShot(FieldObjects* one) {
+void ObjectFragments::setShot(VisualFieldObject* one) {
   int pix, bad, white, grey, run, greyrun;
   int ySpan = IMAGE_HEIGHT - one->getLeftBottomY();
   bool colorSeen = false;
@@ -4137,7 +4137,7 @@ void ObjectFragments::setShot(FieldObjects* one) {
         if (crossings == 3) {
           shoot[i] = false;
           break;
-        } 
+        }
       }
     }
 
@@ -4252,7 +4252,7 @@ void ObjectFragments::setShot(FieldObjects* one) {
   }
 }
 
-void ObjectFragments::bestShot(FieldObjects* left, FieldObjects* right, FieldObjects* middle) {
+void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* middle) {
   // start by setting boundaries
   int leftb = 0, rightb = IMAGE_WIDTH - 1, bottom = 0;
   int rl = 0, rr = 0;
@@ -4371,7 +4371,7 @@ void ObjectFragments::openDirection(int horizon, Pose *pose) {
   int lastd = 0;
   int sixty = IMAGE_HEIGHT - 1;
   for (int i = IMAGE_HEIGHT - 1; i > horizon; i--) {
-    estimate d = pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0); 
+    estimate d = pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0);
     //cout << "Distances " << i << " " << d.dist << endl;
     if (d.dist > 60 && lastd < 60) {
       if (OPENFIELD) {
@@ -4383,7 +4383,7 @@ void ObjectFragments::openDirection(int horizon, Pose *pose) {
   }
   const vector <VisualLine>* lines = vision->fieldLines->getLines();
   for (int x = divider; x < IMAGE_WIDTH - 1; x += divider) {
-    bad = 0; white = 0; grey = 0; run = 0; greyrun = 0; 
+    bad = 0; white = 0; grey = 0; run = 0; greyrun = 0;
     open[(int)(x / divider)] = horizon;
     open2[(int)(x / divider)] = horizon;
     // first - determine if any lines intersection this plumbline and where
@@ -4401,7 +4401,7 @@ void ObjectFragments::openDirection(int horizon, Pose *pose) {
         crossings++;
         if (crossings == 5) {
           break;
-        } 
+        }
       }
     }
     int maxH = max(0, horizonAt(x));
@@ -4718,7 +4718,7 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon) {
  * @return               classification
  */
 
-int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFound, FieldObjects* left, FieldObjects* right, FieldObjects* mid) {
+int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFound, VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* mid) {
   // ok now we're going to try and figure out which post it is and where the other one might be
   int trueLeft = min(pole.leftTop.x, pole.leftBottom.x);          // leftmost value in the blob
   int trueRight = max(pole.rightTop.x, pole.rightBottom.x);    // rightmost value in the blob
@@ -4854,7 +4854,7 @@ int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFo
   if (rightBlobColor(pole, QUESTIONABLEPOST) && spanX < 100) {
     if (trueLeft < min(spanX, 15))
       post = RIGHT;
-    else if (trueRight > IMAGE_WIDTH - min(spanX,  15)) 
+    else if (trueRight > IMAGE_WIDTH - min(spanX,  15))
       post = LEFT;
     if (POSTLOGIC)
       cout << "Side of the image" << endl;
@@ -4877,11 +4877,11 @@ int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFo
  * @param horizon     the green field horizon
  */
 // Look for posts and goals given the runs we've collected
-void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObjects* mid, int c, int c2, bool beaconFound, int horizon) {
+void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* mid, int c, int c2, bool beaconFound, int horizon) {
   //cout << horizon << " " << slope << endl;
   // if we don't have any runs there is nothing to do
   if (numberOfRuns <= 1) return;
-   int nextX = 0, nextY = 0, nextH = 0, dc = BOTH_UNSURE;         
+   int nextX = 0, nextY = 0, nextH = 0, dc = BOTH_UNSURE;
 #if ROBOT(AIBO)
   // start by blobbing - we often want to do it anyway
   for (int i = 0; i < numberOfRuns; i++) {
@@ -5021,7 +5021,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
 	return;
       }
     }
-  } 
+  }
 #endif
   dc = checkDist(trueLeft, trueRight, trueTop, trueBottom);
   // first characterize the size of the possible pole
@@ -5123,7 +5123,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
       fudge = spanX / 2;
     }
     if (locationOk(pole, horizon) && ratOk && goodSecondPost &&
-        secondPostFarEnough(leftP, rightP, pole.leftTop, pole.rightTop, post) && 
+        secondPostFarEnough(leftP, rightP, pole.leftTop, pole.rightTop, post) &&
 	relativeSizesOk(spanX, pspanY, spanX2, spanY2, trueTop, trueTop2, fudge)) {
       if (post == LEFT) {
 	second = 1;
@@ -5155,7 +5155,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
 	}
       } else if (!locationOk(pole, horizon) && secondPostFarEnough(leftP, rightP, pole.leftTop, pole.rightTop, post)) {
 #if ROBOT(AIBO)
-	if (coloredArc(topBlob, c) && topBlob.leftTop.y > horizonAt(topBlob.leftTop.x) && 
+	if (coloredArc(topBlob, c) && topBlob.leftTop.y > horizonAt(topBlob.leftTop.x) &&
 	    secondPostFarEnough(leftP, rightP, topBlob.leftTop, topBlob.rightTop, post)) {
 	  //!horizonTopOk(pole.leftTop.y, horizon)) {
       // FIXME - need to add this stuff to Nao Vision, or unify Vision
@@ -5204,7 +5204,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
   }
   point <int> backRange  = thresh->backStopCheck(c == BLUE, leftRange, rightRange);
   if (backRange.x != BADVALUE && backRange.y - backRange.x > spanX) {
-    // we have the backstop, so let's just get the particulars 
+    // we have the backstop, so let's just get the particulars
     int lastX = -1;
     numBlobs = 0;
     int tryy = -1;
@@ -5220,7 +5220,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
 	  tryy = nextY;
       }
       lastX = nextX;
-    } 
+    }
     transferToChecker(topBlob);
     getTopAndMerge(trueTop);
     constrainedSquare(backRange.x, tryy, c, c2, leftRange, rightRange);
@@ -5276,7 +5276,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
       //cout << nextX << endl;
       blobIt(nextX, nextY, nextH);
     }
-  } 
+  }
   // screen out blobs that are above other blobs
   screenCrossbar();
   transferToChecker(topBlob);
@@ -5310,7 +5310,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
 	left->setCertainty(SURE);
       certain = true;
       under = true;
-    } 
+    }
     // if it is a small goal then punt
     if (post == LEFT)
       right->init();
@@ -5362,7 +5362,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
 	    }
 	    return;
 	  }
-	}    
+	}
       }
     }
     } */
@@ -5467,7 +5467,7 @@ void ObjectFragments::goalScan(FieldObjects* left, FieldObjects* right, FieldObj
  * @param p2    the wrong one
  */
 
- void ObjectFragments::postSwap(FieldObjects * p1, FieldObjects * p2) {
+ void ObjectFragments::postSwap(VisualFieldObject * p1, VisualFieldObject * p2) {
    p1->setLeftTopX(p2->getLeftTopX());
    p1->setLeftTopY(p2->getLeftTopY());
    p1->setLeftBottomX(p2->getLeftBottomX());
@@ -5527,7 +5527,7 @@ void ObjectFragments::transferToPole() {
  * @param cert        how sure we are we IDd it correctly
  * @param distCert    how sure we are about distance certainty information
  */
-void ObjectFragments::transferTopBlob(FieldObjects * one, int cert, int distCert) {
+void ObjectFragments::transferTopBlob(VisualFieldObject * one, int cert, int distCert) {
   one->setLeftTopX(topBlob.leftTop.x);
   one->setLeftTopY(topBlob.leftTop.y);
   one->setLeftBottomX(topBlob.leftBottom.x);
@@ -5570,7 +5570,7 @@ double ObjectFragments::rightHalfColor(blob tempobj) {
   for (int i = spanY / 2; i < spanY; i++) {
     for (int j = 0; j < spanX; j++) {
       pix = thresh->thresholded[y + i][x + j];
-      if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT && 
+      if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 	  x + j < IMAGE_WIDTH &&  (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW)) {
 	good++;
       }
@@ -5579,7 +5579,7 @@ double ObjectFragments::rightHalfColor(blob tempobj) {
   for (int i = 0; i < spanY; i++) {
     for (int j = 0; j < spanX / 2; j++) {
       pix = thresh->thresholded[y + i][x + j];
-      if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT && 
+      if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 	  x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW)) {
 	good1++;
       }
@@ -5588,7 +5588,7 @@ double ObjectFragments::rightHalfColor(blob tempobj) {
   for (int i = 0; i < spanY; i++) {
     for (int j = spanX / 2; j < spanX; j++) {
       pix = thresh->thresholded[y + i][x + j];
-      if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT && 
+      if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 	  x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW)) {
 	good2++;
       }
@@ -5714,7 +5714,7 @@ int ObjectFragments::scanOut(int start_x, int start_y, double slopel, int dir){
 	   start_x,start_y,slopel,dir);
   }
   //thresh->drawPoint(start_x,start_y,PINK);
-  
+
   bool yOrX = true; //which axis do we scan on?
 
   int SNOISE_SKIP = 4;
@@ -5735,7 +5735,7 @@ int ObjectFragments::scanOut(int start_x, int start_y, double slopel, int dir){
 
   //scan for orange, or other ball colors
   while(x < IMAGE_WIDTH && x >= 0
-	&&y < IMAGE_HEIGHT && y >= 0  
+	&&y < IMAGE_HEIGHT && y >= 0
 	&& bad <= SNOISE_SKIP && goodEdge <= EDGE_DEPTH){
     int thisPix = thresh->thresholded[y][x];
     //printf("new pix:%d good:%d bad:%d\n",thisPix,good,bad);
@@ -5768,7 +5768,7 @@ int ObjectFragments::scanOut(int start_x, int start_y, double slopel, int dir){
 	thresh->debugImage[y][x] = BLACK;
 #endif
     }
-  
+
   //update position for both y, x
   if(yOrX){
     x = x + dir;
@@ -5785,12 +5785,12 @@ int ObjectFragments::scanOut(int start_x, int start_y, double slopel, int dir){
     return 1;
   }else{ //good point
     //printf("Got a good point at (%d,%d) bad:%d, goodEdge %d \n",lastGoodX,lastGoodY,bad,goodEdge);
-    if(DEBUGBALLPOINTS) 
+    if(DEBUGBALLPOINTS)
       drawPoint(lastGoodX,lastGoodY,BLUE);
     addPoint(lastGoodX,lastGoodY);
     return 0;
   }
- 
+
 }
 
 /*  It probably goes without saying that the ideal ball is round.  So let's see how round our
@@ -5927,7 +5927,7 @@ int ObjectFragments::ballNearGreen(blob b) {
       }
     }
   }
-  
+
   x = b.rightTop.x;
   y = b.rightTop.y;
   for (int i = 0; i < h && y + i < IMAGE_HEIGHT && where % GREENRIGHT != 0; i= i+2) {
@@ -6000,8 +6000,8 @@ bool ObjectFragments::badSurround(blob b) {
 bool ObjectFragments::atBoundary(blob b) {
   return b.leftTop.x == 0 || b.rightTop.x >= IMAGE_WIDTH -1 || b.leftTop.y == 0 || b.leftBottom.y >= IMAGE_HEIGHT - 1;
 }
-      
-	
+
+
 #if ROBOT(AIBO)
 /* See if there is a ball onscreen.  Basically we get all of the orange blobs and test them for
  * viability.  Once we've screened all of the obviously bad ones we then pick the biggest one
@@ -6039,7 +6039,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     int brad = max(hei, wid) * 2;
     // ball should never be more than about their radius below the horizon unless they are on the screen edge
     if (brad + brad/2 + horizonOffset < -5) {
-      // check if we're occluded 
+      // check if we're occluded
       //print("Ball height %d width %d leftX %d rightX %d",);
       if ((bx == 0 ||  blobs[i].rightTop.x >= IMAGE_WIDTH - 1) && hei > wid) {
       } else if ((by == 0 || blobs[i].leftBottom.y >= IMAGE_WIDTH - 1) && hei < wid) {
@@ -6055,7 +6055,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 	blobs[i].area = 0;
 #endif
       }
-    } 
+    }
     if (blobs[i].area > 0) {
       //print("Ball area %d\n",blobs[i].area);
       if (BALLDEBUG) {
@@ -6117,7 +6117,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   if (topBlob.rightTop.x > IMAGE_WIDTH - 2) {
     occlusion *= RIGHTOCCLUSION;
   }
-  
+
   // for smallish blobs, make sure we're near some green
   int whereIsGreen = ballNearGreen(topBlob);
   int horb = horizonAt(topBlob.leftBottom.x);
@@ -6130,13 +6130,13 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   //int cenX = thisBall -> getCenterY();
   /*int numBadPoints = 0;
   int angle = PI;
-  scanOut(cenX,cenY,tan(angle), 1);*/  
-  
+  scanOut(cenX,cenY,tan(angle), 1);*/
+
   for(double angle = 0; angle < PI; angle +=PI/NUM_EDGE_POINTS){
     scanOut(cenX,cenY,tan(angle), 1);
     scanOut(cenX,cenY,tan(angle), -1);
   }
-  
+
   if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
     if (badSurround(topBlob)) {
       if (BALLDEBUG) {
@@ -6153,7 +6153,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 	}
 	return 0;
       } else confidence -= 2;
-	
+
       } */
   }
   if (whereIsGreen == NOGREEN) {
@@ -6177,11 +6177,11 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     //	cout << "Screening small ball because it doesn't have green below it" << endl;
     //return 0;
     //}
-    if (BALLDEBUG) 
+    if (BALLDEBUG)
       cout << "Small ball passed green and horizon tests" << endl;
   }
   double colPer = rightColor(topBlob, ORANGE);
-  
+
   if (w * h > 1) {
     confidence -= ROUND2((0.85 - colPer) * 10);
     //cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
@@ -6208,7 +6208,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     if (confidence > 10 && min(w, h) > 40 && min(w, h) < 65) {
       // check for poking situation
     }
-    
+
 
     // SORT OUT BALL INFORMATION
     // start out by figuring out whether we're using blobs or inferred information
@@ -6225,7 +6225,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
       // x, y, width, and height. Not up for debate.
       thisBall->setX(topBlob.leftTop.x);
       thisBall->setY(topBlob.leftTop.y);
-      
+
       thisBall->setWidth(w);
       thisBall->setHeight(h);
       thisBall->setRadius((double)max((double)w/2.0, (double)h/2.0));
@@ -6271,7 +6271,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 	// crap we must have gotten bad points
 	thisBall->setX(topBlob.leftTop.x);
 	thisBall->setY(topBlob.leftTop.y);
-	
+
 	thisBall->setWidth(w);
 	thisBall->setHeight(h);
 	thisBall->setRadius((double)max((double)w/2.0, (double)h/2.0));
@@ -6403,7 +6403,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   if (topBlob.rightTop.x > IMAGE_WIDTH - 2) {
     occlusion *= RIGHTOCCLUSION;
   }
-  
+
   // for smallish blobs, make sure we're near some green
   int whereIsGreen = ballNearGreen(topBlob);
   int horb = horizonAt(topBlob.leftBottom.x);
@@ -6412,12 +6412,12 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   int NUM_EDGE_POINTS = 20;
   int cenX = midPoint(topBlob.leftTop.x, topBlob.rightBottom.x);
   int cenY = midPoint(topBlob.leftTop.y, topBlob.leftBottom.y);
-  
+
   for(double angle = 0; angle < PI; angle +=PI/NUM_EDGE_POINTS){
     scanOut(cenX,cenY,tan(angle), 1);
     scanOut(cenX,cenY,tan(angle), -1);
   }
-  
+
   if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
     if (badSurround(topBlob)) {
       if (BALLDEBUG) {
@@ -6435,11 +6435,11 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 	cout << "Screening small ball for horizon" << endl;
       return 0;
     }
-    if (BALLDEBUG) 
+    if (BALLDEBUG)
       cout << "Small ball passed green and horizon tests" << endl;
   }
   double colPer = rightColor(topBlob, ORANGE);
-  
+
   confidence -= ROUND2((0.85 - colPer) * 10);
   //cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
   if (topBlob.area < 75) {
@@ -6454,14 +6454,14 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   if (BALLDEBUG) {
     printBall(topBlob, confidence, colPer, occlusion, whereIsGreen);
   }
-  
+
   // SORT OUT BALL INFORMATION
   // start out by figuring out whether we're using blobs or inferred information
   //double rat = (double) w / (double) h;
   // x, y, width, and height. Not up for debate.
   thisBall->setX(topBlob.leftTop.x);
   thisBall->setY(topBlob.leftTop.y);
-  
+
   thisBall->setWidth(w);
   thisBall->setHeight(h);
   thisBall->setRadius((double)max((double)w/2.0, (double)h/2.0));
@@ -6520,13 +6520,13 @@ int ObjectFragments::circleFit(Ball * thisBall){
     }
   //Init the matrices j,k and a (j^-1)
   double
-    j00 = 0.0,j01 = 0.0, j02 = 0.0,	
+    j00 = 0.0,j01 = 0.0, j02 = 0.0,
     j10 = 0.0,j11 = 0.0,j12 = 0.0,
     j20 = 0.0,j21 = 0.0,j22 = 0.0,
-	
+
     k0 = 0.0, k1 = 0.0, k2 = 0.0,
 
-    a00 = 0.0,a01 = 0.0,a02 = 0.0,	
+    a00 = 0.0,a01 = 0.0,a02 = 0.0,
     a10 = 0.0,a11 = 0.0,a12 = 0.0,
     a20 = 0.0,a21 = 0.0,a22 = 0.0;
 
@@ -6548,11 +6548,11 @@ int ObjectFragments::circleFit(Ball * thisBall){
     //skip (1,0) because it is similar to (0,2)
     j11+= x*x;
     j12+= x*y;
-    
+
     //third row
     //skip (2,0),(2,1) bc of smiilar reason above
     j22 +=y*y;
-    
+
     //get K
     k0 +=xySqrd;
     k1 +=x;
@@ -6573,7 +6573,7 @@ int ObjectFragments::circleFit(Ball * thisBall){
 
   double stdDevX =sqrt((j11/numPoints)-(meanX*meanX));
   double stdDevY =sqrt((j22/numPoints)-(meanY*meanY));
- 
+
   printf("Std dev xy (%f,%f)\n",stdDevX,stdDevY);*/
 
   //find the inverse
@@ -6582,7 +6582,7 @@ int ObjectFragments::circleFit(Ball * thisBall){
 		     j20,j21,j22);
   //printf("The determinant:%g\n",jDet);
   if(jDet == 0){
-    if (DEBUGCIRCLEFIT) 
+    if (DEBUGCIRCLEFIT)
       printf("ERR in Circle fit: the determinant was zero, no circle!");
     return 1;
 
@@ -6594,39 +6594,39 @@ int ObjectFragments::circleFit(Ball * thisBall){
 	      ,j20,j22)/jDet;
   a02 =  det2(j10,j11,
 	      j20,j21)/jDet;
-  
+
   a10 = -det2(j01,j02,
 	      j21,j22)/jDet;
   a11 =  det2(j00,j02,
 	      j20,j22)/jDet;
   a12 = -det2(j00,j01,
 	      j20,j21)/jDet;
-  
+
   a20 =  det2(j01,j02,
 	      j11,j12)/jDet;
   a21 = -det2(j00,j02,
 	      j10,j12)/jDet;
   a22 =  det2(j00,j01,
 	      j10,j11)/jDet;
-  
+
   //multiply the matrices to find the coefficients
   //which help to solve the circle
   double a = a00*k0+a01*k1+a02*k2;
   double b = a10*k0+a11*k1+a12*k2;
   double c = a20*k0+a21*k1+a22*k2;
   if(a == 0){
-    if (DEBUGCIRCLEFIT) 
+    if (DEBUGCIRCLEFIT)
       printf("ERR in circle fit: got a zero denominator, circle fit failed");
     return 1; //fail
 
   }
 
   if ((4*a + b*b + c*c) < 0) {
-    if (DEBUGCIRCLEFIT) 
+    if (DEBUGCIRCLEFIT)
       print("ERR is negative sqrt");
     return 1;
   }
-    
+
   //cout<<"a "<<a<<"b "<<b<<"c "<<c<<endl;
   //calc all the infered dimensions
   int inferedX = ROUND2(-b/(2*a));
@@ -6642,12 +6642,12 @@ int ObjectFragments::circleFit(Ball * thisBall){
 
   if(inferedX < (0 - IMAGE_WIDTH) || inferedX > 2*IMAGE_WIDTH ||
      inferedY < (0 - IMAGE_HEIGHT) || inferedY > 2*IMAGE_HEIGHT){
-    if (DEBUGCIRCLEFIT) 
+    if (DEBUGCIRCLEFIT)
       print("ERR in circle fit: got a bad center");
     return 1; //fail
   }
 
-  //write info to the ball class 
+  //write info to the ball class
   thisBall->setCenterX(inferedX);
   thisBall->setCenterY(inferedY);
   thisBall->setRadius(inferedR);
@@ -6655,10 +6655,10 @@ int ObjectFragments::circleFit(Ball * thisBall){
   thisBall->setHeight(thisBall->getRadius() * 2);
   thisBall->setX(ROUND2(inferedX - thisBall->getRadius()));
   thisBall->setY(ROUND2(inferedY - thisBall->getRadius()));
-  if (DEBUGCIRCLEFIT) 
+  if (DEBUGCIRCLEFIT)
     printf("Circle fit: xyr (%d,%d,%f)\n",inferedX,inferedY,inferedR);
 
-  if (DEBUGCIRCLEFIT) 
+  if (DEBUGCIRCLEFIT)
     drawPoint(inferedX,inferedY,YELLOW);
   double stDev = 0;
   double *distances = new double[numPoints];
@@ -6677,7 +6677,7 @@ int ObjectFragments::circleFit(Ball * thisBall){
 
   double distErr = 0;
   int badPoints = 0;
-  
+
   for (int i=0; i< numPoints; i++) {
     double error = fabs(distances[i] - inferedR);
     //cout<<"error: "<<error<<endl;
@@ -6689,15 +6689,15 @@ int ObjectFragments::circleFit(Ball * thisBall){
   }
 
   delete distances;
-  
+
 
   if(badPoints==numPoints){
-    if (DEBUGCIRCLEFIT) 
+    if (DEBUGCIRCLEFIT)
       printf("ERR in circle fit: no good points");
     return 1; //fail
   }
   if(inferedR==0){
-    if (DEBUGCIRCLEFIT) 
+    if (DEBUGCIRCLEFIT)
       printf("ERR in circle fit: resultant radius = 0");
     return 1; //fail
   }
@@ -6784,7 +6784,7 @@ void ObjectFragments::screenCrossbar() {
  * @return      true if its big enough, false otherwise
  */
  bool ObjectFragments::postBigEnough(blob b) {
-  if (b.leftTop.x == BADVALUE || (b.rightTop.x - b.leftTop.x + 1 < MIN_GOAL_WIDTH) || 
+  if (b.leftTop.x == BADVALUE || (b.rightTop.x - b.leftTop.x + 1 < MIN_GOAL_WIDTH) ||
       b.leftBottom.y - b.leftTop.y + 1 < MIN_GOAL_HEIGHT) {
     return false;
   }
@@ -6827,7 +6827,7 @@ bool ObjectFragments::locationOk(blob b, int hor) {
 	cout << "Screening blob for bottom reasons" << endl;
 	printBlob(b);
       }
-      return false; 
+      return false;
     } else {
     }
   }
@@ -6858,7 +6858,7 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight, int l
   if (spanY > 100) return true;
   if (bottom + 5 + min(spanX, 20) < minHeight) {
     if (SANITY) {
-      cout << "Bad height" << endl; 
+      cout << "Bad height" << endl;
     }
     return false;
   }
@@ -6968,8 +6968,8 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2, int span
     return false;
   }
   if (spanY2 > 70) return true;
-  if (spanX2 > 2 && (spanY2 > spanY / 2 || spanY2 > BIGPOST || 
-		     (spanY2 > spanY / 3 && spanX2 > 10) && 
+  if (spanX2 > 2 && (spanY2 > spanY / 2 || spanY2 > BIGPOST ||
+		     (spanY2 > spanY / 3 && spanX2 > 10) &&
 		     (spanX2 <= spanX / 2 || fudge != 0)) && (spanX2 > spanX / 4))  {
     return true;
   }
@@ -6986,14 +6986,14 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2, int span
  * @param y     y value
  */
 void ObjectFragments::addPoint(double x, double y){
-  if (DEBUGCIRCLEFIT) 
+  if (DEBUGCIRCLEFIT)
     printf("ADDING a point:#%d,(%f,%f)\n",numPoints,x,y);
   if(numPoints < MAX_POINTS){
     points[numPoints*2] = x;
     points[numPoints*2+1] = y;
     numPoints++;
   }else{
-    if (DEBUGCIRCLEFIT) 
+    if (DEBUGCIRCLEFIT)
       printf("Too many points!!!\n");
   }
 }
@@ -7018,7 +7018,7 @@ bool ObjectFragments::postRatiosOk(double ratio) {
  */
 
 int ObjectFragments::getPixels(int index){
-  return blobs[index].pixels; 
+  return blobs[index].pixels;
 }
 
 
@@ -7037,7 +7037,7 @@ int ObjectFragments::distance(int x1, int x2, int x3, int x4) {
   return 0;
 }
 
-/* Calculate the euclidian distance between two points.  
+/* Calculate the euclidian distance between two points.
  * @param x    x value of point 1
  * @param y    y value of point 1
  * @param x1   x value of point 2
@@ -7069,8 +7069,8 @@ int ObjectFragments::midPoint(int a, int b) {
  * @param objs     the object in question
  */
 
-void ObjectFragments::printObject(FieldObjects * objs) {
-#if defined OFFLINE 
+void ObjectFragments::printObject(VisualFieldObject * objs) {
+#if defined OFFLINE
   cout << objs->getLeftTopX() << " " << objs->getLeftTopY() << " " << objs->getRightTopX() << " " << objs->getRightTopY() << endl;
   cout << objs->getLeftBottomX() << " " << objs->getLeftBottomY() << " " << objs->getRightBottomX() << " " << objs->getRightBottomY() << endl;
   cout << "Height is " << objs->getHeight() << " Width is " << objs->getWidth() << endl;

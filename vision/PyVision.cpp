@@ -875,7 +875,7 @@ PyBall_update (PyObject *self, PyObject *arg)
 
 // C++ - accessible interface
 extern PyObject *
-PyFieldObject_new (FieldObjects *o)
+PyFieldObject_new (VisualFieldObject *o)
 {
   PyFieldObject *self;
 

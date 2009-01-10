@@ -1,7 +1,5 @@
 #include "VisualFieldObject.h"
 
-const float VisualFieldObject::WHITE_HEIGHT_ON_BEACON = 18.6;
-
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
     : id(_id)
 {

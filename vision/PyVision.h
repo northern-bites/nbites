@@ -791,7 +791,7 @@ static PyTypeObject PyBallType = {
 
 typedef struct PyFieldObject_t {
   PyObject_HEAD
-  FieldObjects *object;
+  VisualFieldObject *object;
   PyObject *centerX;
   PyObject *centerY;
   PyObject *width;
@@ -804,7 +804,7 @@ typedef struct PyFieldObject_t {
 } PyFieldObject;
 
 // C++ - accessible inteface
-extern PyObject *PyFieldObject_new    (FieldObjects *o);
+extern PyObject *PyFieldObject_new    (VisualFieldObject *o);
 extern void      PyFieldObject_update (PyFieldObject *o);
 // backend methods
 extern PyObject *PyFieldObject_new    (PyTypeObject *type, PyObject *args,

@@ -58,7 +58,7 @@ static const int MIN_RUN_SIZE = 2;
 static const int MIN_RUN_SIZE = 25;
 #endif
 // we're more demanding of Green because there is so much
-static const int MIN_GREEN_SIZE = 10;  
+static const int MIN_GREEN_SIZE = 10;
 
 /* The following two constants are used in the traversal of the image
    inside thresholdAndRuns. We start at the bottom left of the image which
@@ -96,7 +96,7 @@ static const int CHROME_FILTER_SCORE = 3;
 
 class Threshold
 {
-    friend class Vision;  
+    friend class Vision;
  public:
   Threshold(Vision *vis, Pose *posPtr);
   virtual ~Threshold() {}
@@ -123,7 +123,7 @@ class Threshold
   void initCompressedTable(std::string filename);
 
   void storeFieldObjects();
-  void setFieldObjectInfo(FieldObjects *objPtr);
+  void setFieldObjectInfo(VisualFieldObject *objPtr);
   double getGoalPostDistFromHeight(double height);
   double getGoalPostDistFromWidth(double width);
   double getBeaconDistFromHeight(double height);
@@ -133,14 +133,14 @@ class Threshold
   point <int> findIntersection(int col, int dir, int c);
   int postCheck(bool which, int left, int right);
   point <int> backStopCheck(bool which, int left, int right);
-  void chromeFilter(FieldObjects *obj);
+  void chromeFilter(VisualFieldObject *obj);
   void setYUV(const uchar* newyuv);
   const uchar* getYUV();
   static const char * getShortColor(int _id);
 
   void swapUV() { inverted = !inverted; setYUV(yuv); }
   void swapUV(bool _inverted) { inverted = _inverted; setYUV(yuv); }
- 
+
 
 #ifdef OFFLINE
   void setConstant(int c);
@@ -152,7 +152,7 @@ class Threshold
   void transposeDebugImage();
   void drawX(int x, int y, int c);
   void drawPoint(int x, int y, int c);
-  void drawLine(const point<int> start, const point<int> end, 
+  void drawLine(const point<int> start, const point<int> end,
                 const int color);
   void drawVisualHorizon();
   void drawLine(int x, int y, int x1, int y1, int c);
@@ -163,7 +163,7 @@ class Threshold
   inline unsigned char getCorrY(int x, int y) { return corrY[yplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
   inline unsigned char getCorrU(int x, int y) { return corrU[uplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
   inline unsigned char getCorrV(int x, int y) { return corrV[vplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
-  
+
   inline uchar getY(int x, int y) { return corrY[yplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
   inline uchar getU(int x, int y) { return corrU[uplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
   inline uchar getV(int x, int y) { return corrV[vplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
@@ -260,11 +260,11 @@ class Threshold
   int redTops[IMAGE_WIDTH];
   int navyBottoms[IMAGE_WIDTH];
   int redBottoms[IMAGE_WIDTH];
-  
+
 #ifdef USE_CHROMATIC_CORRECTION
   unsigned char corrY[NUM_YUV][YRAD],corrU[NUM_YUV][URAD],corrV[NUM_YUV][VRAD];
   unsigned char xLUT[IMAGE_WIDTH][IMAGE_HEIGHT];
-#endif  
+#endif
 
 #if defined(NEW_LOGGING) || defined(USE_JPEG)
 #if defined(USE_CHROMATIC_CORRECTION)

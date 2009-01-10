@@ -11,8 +11,9 @@ class VisualFieldObject;
 #include "Utility.h"
 #include "Structs.h"
 
-
-class VisualFieldObject : public VisualLandmark {
+// This class should eventually inheret from VisualLandmark, once it is
+// cleaned a bit
+class VisualFieldObject {// : public VisualLandmark {
 
 // VisualLandmark stuff to work in...
 //  public:
@@ -48,11 +49,12 @@ class VisualFieldObject : public VisualLandmark {
 //   // It will get set from within FieldLines.cc.
 //   list <const ConcreteFieldObject *> possibleFieldObjects;
 public:
-    FieldObjects(const fieldObjectID);
-    FieldObjects();
-    virtual ~FieldObjects() {}
+    VisualFieldObject(const fieldObjectID);
+    VisualFieldObject();
+    virtual ~VisualFieldObject() {}
 
-    friend std::ostream& operator<< (std::ostream &o, const FieldObjects &l)
+    friend std::ostream& operator<< (std::ostream &o,
+                                     const VisualFieldObject &l)
         {
             return o << l.toString() << "\tWidth: " << l.width
                      << "\tHeight: " << l.height
@@ -124,14 +126,11 @@ public:
     int getLeftOpening() const { return leftOpening; }
     int getRightOpening() const { return rightOpening; }
     bool shotAvailable() const { return shoot; }
-    string toString() const { return getStringFromID(id); }
+    string toString() const { return ConcreteFieldObject::getStringFromID(id); }
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
     const fieldObjectID getID() const { return id; }
-
-public: // Class constants
-    static const float WHITE_HEIGHT_ON_BEACON;
 
 private: // Class Variables
 

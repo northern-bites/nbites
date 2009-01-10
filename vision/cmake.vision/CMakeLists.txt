@@ -122,8 +122,10 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteCorner
                  ${VISION_INCLUDE_DIR}/ConcreteLandmark
+                 ${VISION_INCLUDE_DIR}/ConcreteFieldObject
+                 #${VISION_INCLUDE_DIR}/FieldObjects
+                 ${VISION_INCLUDE_DIR}/ConcreteLine
                  ${VISION_INCLUDE_DIR}/FieldLines
-                 ${VISION_INCLUDE_DIR}/FieldObjects
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Pose
                  ${VISION_INCLUDE_DIR}/PoseMatrix
@@ -136,6 +138,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/Vision
                  ${VISION_INCLUDE_DIR}/VisualCorner
                  ${VISION_INCLUDE_DIR}/VisualLandmark
+		 ${VISION_INCLUDE_DIR}/VisualFieldObject
                  ${VISION_INCLUDE_DIR}/VisualLine
                  #${VISION_INCLUDE_DIR}/Zlib
                  ${VISION_INCLUDE_DIR}/matrix

@@ -11,10 +11,10 @@
 #define isEdgeClose(edgeLoc, newLoc) (abs(edgeLoc - newLoc) < ADJACENT_SAME_EDGE_SEPARATION)
 #define isMoreSuitableTopEdge(topEdgeY,newY,imageColumn) (topEdgeY == NO_EDGE || isEdgeClose(topEdgeY, newY))
 #define isMoreSuitableRightEdge(rightEdgeX,newX,y) (rightEdgeX == NO_EDGE || isEdgeClose(rightEdgeX, newX))
-#define downhillEdgeWasTooFar(imageColumn,imageRow,dir) 
-#define secondDownhillButInvalid(imageColumn,imageRow,dir) 
-#define foundDownhillNoUphill(imageColumn,imageRow,dir) 
-#define couldNotFindCorrespondingBottom(imageColumn,imageRow) 
+#define downhillEdgeWasTooFar(imageColumn,imageRow,dir)
+#define secondDownhillButInvalid(imageColumn,imageRow,dir)
+#define foundDownhillNoUphill(imageColumn,imageRow,dir)
+#define couldNotFindCorrespondingBottom(imageColumn,imageRow)
 #define isUphillEdge(new_y_value,old_y_value,dir) (dir == VERTICAL ? new_y_value - old_y_value >= VERTICAL_TRANSITION_VALUE : new_y_value - old_y_value >= HORIZONTAL_TRANSITION_VALUE)
 #define isDownhillEdge(new_y_value,old_y_value,dir) (dir == VERTICAL ? old_y_value - new_y_value >= VERTICAL_TRANSITION_VALUE : old_y_value - new_y_value >= HORIZONTAL_TRANSITION_VALUE)
 
@@ -61,7 +61,7 @@ FieldLines::FieldLines(Vision *visPtr, Pose *posePtr) {
 
   numFrames = 0;
 
-  // Initialize the array of FieldObjects which we use for distance 
+  // Initialize the array of VisualFieldObject which we use for distance
   // based identification of corners
   allFieldObjects[0] = vision->by;
   allFieldObjects[1] = vision->yb;
@@ -91,7 +91,7 @@ FieldLines::FieldLines(Vision *visPtr, Pose *posePtr) {
   //otherwise is goalie is true if player number is 1
   isGoalie = ((vision->getPlayerNumber()) == 1);
 #endif
-  
+
   // Makes setprecision dictate number of decimal places
   cout.setf(ios::fixed);
 }
@@ -99,19 +99,19 @@ FieldLines::FieldLines(Vision *visPtr, Pose *posePtr) {
 // Main Line Loop. Calls all of the smaller line functions.  Order matters.
 void FieldLines::lineLoop() {
   //long startTime;
-  
+
   //startTime = vision->getMillisFromStartup();
   vector<linePoint> vertLinePoints;
   findVerticalLinePoints(vertLinePoints);
   //timeInFindVerticalLinePoints += (vision->getMillisFromStartup() - startTime);
 
-  
+
   //startTime = vision->getMillisFromStartup();
   vector<linePoint> horLinePoints;
   findHorizontalLinePoints(horLinePoints);
-  //timeInFindHorizontalLinePoints += 
+  //timeInFindHorizontalLinePoints +=
   //(vision->getMillisFromStartup() - startTime);
-  
+
 
   //startTime = vision->getMillisFromStartup();
   sort(horLinePoints.begin(), horLinePoints.end());
@@ -125,7 +125,7 @@ void FieldLines::lineLoop() {
         horLinePoints.begin(), horLinePoints.end(),
         linePoints.begin());
   //timeInMerge += (vision->getMillisFromStartup() - startTime);
-  
+
   //startTime = vision->getMillisFromStartup();
   // Creating a copy of the list, maybe not the best way but .. it'll work for now
   linesList = createLines(linePoints); // Lines is a global member of FieldLines
@@ -138,18 +138,18 @@ void FieldLines::lineLoop() {
   joinLines(linesList);
   //timeInJoinLines += (vision->getMillisFromStartup() - startTime);
 
-  
+
 #if ROBOT(AIBO)
   //startTime = vision->getMillisFromStartup();
   fitUnusedPoints(linesList, linePoints);
   //timeInFitUnusedPoints += (vision->getMillisFromStartup() - startTime);
 #endif
-  
+
   // unusedPoints is a global member of FieldLines; is used by vision to draw
   // points on the screen
   // TODO:  eliminate copying?
   unusedPointsList = linePoints;
-  
+
   //  startTime = vision->getMillisFromStartup();
   if (isGoalie) {
     extendLines(linesList);
@@ -159,14 +159,14 @@ void FieldLines::lineLoop() {
   //startTime = vision->getMillisFromStartup();
   cornersList = intersectLines(linesList);
   //timeInIntersectLines += (vision->getMillisFromStartup() - startTime);
-  
+
 
 #if ROBOT(AIBO)
   // Goalies will not be near the center circle so we can save ourselves a check
   if (!isGoalie && cornersList.size() > 0) {
     //startTime = vision->getMillisFromStartup();
     if (probablyAtCenterCircle(linesList, cornersList)) {
-      if (debugCcScan || debugIntersectLines || debugIdentifyCorners) 
+      if (debugCcScan || debugIntersectLines || debugIdentifyCorners)
         cout << "Probably at center circle.  Clearing all corners." << endl;
       if (standardView) {
         drawCorners(cornersList, UNUSED_INTERSECTION_POINT_COLOR);
@@ -187,44 +187,44 @@ void FieldLines::lineLoop() {
 #ifdef LINES_PROFILING
   if (numFrames % numFramesToProfile == 0) {
     cout << endl << endl;
-    cout << "Average time in Find vertical points: " 
-         << static_cast<double>(timeInFindVerticalLinePoints) 
+    cout << "Average time in Find vertical points: "
+         << static_cast<double>(timeInFindVerticalLinePoints)
       / numFramesToProfile << endl;
-    
-    cout << "Average time in Find Horizontal points: " 
-         << static_cast<double>(timeInFindHorizontalLinePoints) 
+
+    cout << "Average time in Find Horizontal points: "
+         << static_cast<double>(timeInFindHorizontalLinePoints)
       / numFramesToProfile << endl;
-    
+
     cout << "Average time in sort: "
-         << static_cast<double>(timeInSort) 
+         << static_cast<double>(timeInSort)
       / numFramesToProfile << endl;
-    
-    cout << "Average time in merge: " 
-         << static_cast<double>(timeInMerge) 
+
+    cout << "Average time in merge: "
+         << static_cast<double>(timeInMerge)
       / numFramesToProfile << endl;
-    
+
     cout << "Average time in create lines: "
-         << static_cast<double>(timeInCreateLines) 
+         << static_cast<double>(timeInCreateLines)
       / numFramesToProfile << endl;
 
     cout << "Average time in join lines: "
-         << static_cast<double>(timeInJoinLines) 
+         << static_cast<double>(timeInJoinLines)
       / numFramesToProfile << endl;
 
     cout << "Average time in fit unused points: "
-         << static_cast<double>(timeInFitUnusedPoints) 
+         << static_cast<double>(timeInFitUnusedPoints)
       / numFramesToProfile << endl;
-    
-    cout << "Average time in IntersectLines: " 
-         << static_cast<double>(timeInIntersectLines) 
+
+    cout << "Average time in IntersectLines: "
+         << static_cast<double>(timeInIntersectLines)
       / numFramesToProfile << endl;
-    
-    cout << "Average time in centerCircleScan: " 
-         << static_cast<double>(timeInCenterCircleScan) 
+
+    cout << "Average time in centerCircleScan: "
+         << static_cast<double>(timeInCenterCircleScan)
       / numFramesToProfile << endl;
-    
-    cout << "Average time in identifyCorners: " 
-         << static_cast<double>(timeInIdentifyCorners) 
+
+    cout << "Average time in identifyCorners: "
+         << static_cast<double>(timeInIdentifyCorners)
       / numFramesToProfile << endl;
 
 
@@ -247,7 +247,7 @@ void FieldLines::lineLoop() {
 
 // While lineLoop is called before object recognition so that ObjectFragments
 // can make use of VisualLines and VisualCorners, the methods called from
-// here use FieldObjects and as such must be performed after the ObjectFragments
+// here use VisualFieldObject and as such must be performed after the ObjectFragments
 // loop is completed.
 void FieldLines::afterObjectFragments() {
   // Remove those corners that lead to bad localization problems, like
@@ -262,7 +262,7 @@ void FieldLines::afterObjectFragments() {
   if (!isGoalie && cornersList.size() > 0) {
     //startTime = vision->getMillisFromStartup();
     if (probablyAtCenterCircle2(linesList, cornersList)) {
-      if (debugCcScan || debugIntersectLines || debugIdentifyCorners) 
+      if (debugCcScan || debugIntersectLines || debugIdentifyCorners)
         cout << "Probably at center circle.  Clearing all corners." << endl;
       if (standardView) {
         drawCorners(cornersList, UNUSED_INTERSECTION_POINT_COLOR);
@@ -282,7 +282,7 @@ void FieldLines::afterObjectFragments() {
 
 
 // This method populates the points vector with line points it finds in
-// the image.  A line point ideally occurs in the middle of a line on the 
+// the image.  A line point ideally occurs in the middle of a line on the
 // screen.  We detect lines via a simple edge detection scheme -
 // a transition from green to white involves a big positive jump in Y channel,
 // while a transition from white to green involves a big negative jump in Y
@@ -293,9 +293,9 @@ void FieldLines::afterObjectFragments() {
 //
 // Note:  Whenever we are referring to the Y channel in the YUV color space,
 // we will name the variable with underscores (e.g. last_y_value).  Any camel
-// case named Y constants (e.g. greenWhiteY) refers to a coordinate on the 
+// case named Y constants (e.g. greenWhiteY) refers to a coordinate on the
 // image
-// Because this method uses no continues or breaks, we update counters for 
+// Because this method uses no continues or breaks, we update counters for
 // sanity checks at one place only in the entire method.
 //
 // @param vertLinePoints - the vector to fill with all points found in
@@ -310,10 +310,10 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
   if (debugVertEdgeDetect) {
     printf("\nvertLineEdgeDetect():\n");
   }
-  
+
 
   // We ensure that we scan the last column of the image; often very valuable
-  // information there 
+  // information there
   for (int x = 0; x < IMAGE_WIDTH + COL_SKIP - 1; x += COL_SKIP) {
     if (x > IMAGE_WIDTH - 1) {
       x = IMAGE_WIDTH - 1;
@@ -326,8 +326,8 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
     int numUndefined = 0;
     int numNonWhite = 0;
 
-    if (debugVertEdgeDetect) 
-      printf("\tColumn #%d:\n", x); 
+    if (debugVertEdgeDetect)
+      printf("\tColumn #%d:\n", x);
 
 #if ROBOT(AIBO)
     int stopY = min(vision->thresh->getVisionHorizon(),
@@ -339,17 +339,17 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
     // We start at the second to last pixel because we will be examining
     // transitions between adjacent pixels, so the first step would be to
     // compare lastY = IMAGE_HEIGHT-1 with currentY = IMAGE_HEIGHT-2
-    for (int y = IMAGE_HEIGHT - 2, last_y_value = 
+    for (int y = IMAGE_HEIGHT - 2, last_y_value =
            vision->thresh->getY(x,IMAGE_HEIGHT-1);
          y >= 0 && y > stopY; --y) {
-     
+
 
       int current_y_value = vision->thresh->getY(x,y);
       int thresholdedColor = vision->thresh->thresholded[y][x];
-      
+
       bool isAtAnUphillEdge = isUphillEdge(current_y_value, last_y_value,
                                            VERTICAL);
-    
+
 
       // Do some checks before we actively search for edges
 
@@ -357,8 +357,8 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
         updateLineCounters(thresholdedColor, numWhite, numUndefined,
                            numNonWhite);
         if (haveFound(whiteGreenY)) {
-          
-          // We're beyond the point where we could possibly find another 
+
+          // We're beyond the point where we could possibly find another
           // legitimate top to the line, go ahead and add the line point
           if (isGreenColor(thresholdedColor) || isAtAnUphillEdge ||
               !isWaitingForAnotherTopEdge(whiteGreenY, y)
@@ -374,27 +374,27 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
               // assign x, y, lineWidth
               linePoint point(x, linePointY, width, distance, VERTICAL);
               if (debugVertEdgeDetect) {
-                cout << "\t\t\tPoint " << point << " passed all checks!" 
+                cout << "\t\t\tPoint " << point << " passed all checks!"
                      << endl;
               }
-              
+
               if (printLinePointInfo) {
                 fprintf(lp, "%f\t%d\t(%d,%d)\n",distance,width,x,linePointY);
               }
 
               points.push_back(point);
-              vision->thresh->drawPoint(point.x, point.y, 
+              vision->thresh->drawPoint(point.x, point.y,
                                         UNUSED_VERT_POINT_COLOR);
             }
-    
+
             resetLineCounters(numWhite, numUndefined, numNonWhite);
             greenWhiteY = NO_EDGE;
             whiteGreenY = NO_EDGE;
           }
         }
       } // end  if (haveFound(greenWhiteY))
-      
-      if (countersHitSanityChecks(numWhite, numUndefined, numNonWhite, 
+
+      if (countersHitSanityChecks(numWhite, numUndefined, numNonWhite,
                                   debugVertEdgeDetect)) {
         resetLineCounters(numWhite, numUndefined, numNonWhite);
         greenWhiteY = NO_EDGE;
@@ -411,8 +411,8 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
           else if (isSecondCloseUphillEdge(x, greenWhiteY, x, y, VERTICAL)) {
             // Do nothing. Keep going.
           }
-          
-          // It's the second uphill edge but far away from first. 
+
+          // It's the second uphill edge but far away from first.
           // We missed the last line. Start anew
           else if (isSecondFarUphillEdge(x, greenWhiteY, x, y, VERTICAL)) {
             if (debugVertEdgeDetect) {
@@ -422,7 +422,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
             greenWhiteY = y;
           }
           else {
-            cout << " Should not be reaching this statement at (" << x << ", " 
+            cout << " Should not be reaching this statement at (" << x << ", "
                  << y << ")" << endl;
           }
         } // end isGreenWhiteEdge
@@ -433,7 +433,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
           whiteGreenY = NO_EDGE;
 	}
       } // End isUphillEdge()
-      
+
       // Possible top edge to line
       else if (isDownhillEdge(current_y_value, last_y_value, VERTICAL)) {
 
@@ -456,7 +456,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
           else secondDownhillButInvalid(x, y, VERTICAL);
         } // end have found
 
-        // We haven't found a bottom edge.  
+        // We haven't found a bottom edge.
         // It is a conscious decision not to allow these line points; they will
         // only appear legitimately at the bottom of the screen and we cannot
         // verify their width.
@@ -476,7 +476,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
 
 
 // This method populates the points vector with line points it finds in
-// the image.  A line point ideally occurs in the middle of a line on the 
+// the image.  A line point ideally occurs in the middle of a line on the
 // screen.  We detect lines via a simple edge detection scheme -
 // a transition from green to white involves a big positive jump in Y channel,
 // while a transition from white to green involves a big negative jump in Y
@@ -487,9 +487,9 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
 //
 // Note:  Whenever we are referring to the Y channel in the YUV color space,
 // we will name the variable with underscores (e.g. last_y_value).  Any camel
-// case named Y constants (e.g. greenWhiteY) refers to a coordinate on the 
+// case named Y constants (e.g. greenWhiteY) refers to a coordinate on the
 // image
-// Because this method uses no continues or breaks, we update counters for 
+// Because this method uses no continues or breaks, we update counters for
 // sanity checks at one place only in the entire method.
 //
 // @param horLinePoints - the vector to fill with all points found in
@@ -512,26 +512,26 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
     startAtHorizon = true;
   }
   // scan bottom to top
-  int poseHorizon = min(pose->getHorizonY(0), 
+  int poseHorizon = min(pose->getHorizonY(0),
                         pose->getHorizonY(IMAGE_WIDTH - 1));
   int visualHorizon = vision->thresh->getVisionHorizon();
   int highestPoint = max(0, min(poseHorizon, visualHorizon));
   for (int y = IMAGE_HEIGHT - 1; y > highestPoint; y -= ROW_SKIP) {
-   
+
     int greenWhiteX = NO_EDGE;
     int whiteGreenX = NO_EDGE;
     int numWhite = 0;
     int numUndefined = 0;
     int numNonWhite = 0;
 
-    // Start by calculating the y value one pixel to left of where we're 
+    // Start by calculating the y value one pixel to left of where we're
     // starting
     int last_y_value = vision->thresh->getY(0, y);
-    
-    if (debugHorEdgeDetect) 
+
+    if (debugHorEdgeDetect)
         cout <<"\tRow #" << y << endl;
-    
-    // Start 1 pixel from left so we can test the pixel before to determine 
+
+    // Start 1 pixel from left so we can test the pixel before to determine
     // starting edge value
     for (int x = 1; x < IMAGE_WIDTH - 1; x++) {
       int current_y_value = vision->thresh->getY(x,y);
@@ -541,19 +541,19 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
                                            HORIZONTAL);
        // Do some checks before we actively search for edges
       if (haveFound(greenWhiteX)) {
-       
+
         // We have found a whiteGreen (right) edge, we might accept it right
         // now or we might wait a little longer to ensure we get the full width
         // of the line
         if (haveFound(whiteGreenX)) {
-                   
-          // We're beyond the point where we could possibly find another 
+
+          // We're beyond the point where we could possibly find another
           // legitimate right to the line, go ahead and add the line point
           if (isGreenColor(thresholdedColor) || isAtAnUphillEdge ||
               !isWaitingForAnotherRightEdge(whiteGreenX, x)
               // About to exit this iteration of loop due to x position
               || isAtRightOfImage(x, IMAGE_WIDTH - 1)) {
-            
+
             // SANITY CHECK: lines have a much bigger width when they are
             // up close
             int linePointX = (whiteGreenX + greenWhiteX) / 2;
@@ -566,17 +566,17 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
               if (debugHorEdgeDetect) {
                 cout << "\t\tPoint " << point << " accepted." << endl;
               }
-              
+
               if (printLinePointInfo) {
                 fprintf(lp, "%f\t%d\t(%d,%d)\n",distance,width,linePointX,y);
               }
 
-              vision->thresh->drawPoint(point.x, point.y, 
+              vision->thresh->drawPoint(point.x, point.y,
                                         UNUSED_HOR_POINT_COLOR);
               points.push_back(point);
 	    }
             else {
-              if (debugHorEdgeDetect) 
+              if (debugHorEdgeDetect)
                 cout << "Width was invalid, ignoring line point" << endl;
             }
             resetLineCounters(numWhite, numUndefined, numNonWhite);
@@ -592,7 +592,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
                              numNonWhite);
         }
       }
-      // end if (haveFound(whiteGreenX)) 
+      // end if (haveFound(whiteGreenX))
 
       if (countersHitSanityChecks(numWhite, numUndefined, numNonWhite,
                                   debugHorEdgeDetect)) {
@@ -604,7 +604,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
        // Possible left edge to line
       if (isAtAnUphillEdge) {
         if (isGreenWhiteEdge(x, y, HORIZONTAL)) {
-          
+
           if (isFirstUphillEdge(greenWhiteX, x, y, HORIZONTAL)) {
             // Mark this pixel as left
             greenWhiteX = x;
@@ -612,7 +612,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
           else if (isSecondCloseUphillEdge(greenWhiteX, y, x, y, HORIZONTAL)) {
             // Do nothing.  Keep going
           }
-          // It's the second uphill edge but far away from first. 
+          // It's the second uphill edge but far away from first.
           // We missed the last line. Start anew from this point
           else if (isSecondFarUphillEdge(greenWhiteX, y, x, y, HORIZONTAL)) {
             vision->thresh->drawPoint(x, y, YELLOW);
@@ -620,11 +620,11 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
             greenWhiteX = x;
           }
           else {
-            cout << " Should not be reaching this statement at (" << x << ", " 
+            cout << " Should not be reaching this statement at (" << x << ", "
                  << y << ")" << endl;
           }
         } // end isGreenWhiteEdge
-        
+
         else if (isSecondUphillButInvalid(greenWhiteX, y, x, y, HORIZONTAL)) {
           resetLineCounters(numWhite, numUndefined, numNonWhite);
           greenWhiteX = NO_EDGE;
@@ -639,10 +639,10 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
         }
 
       } // End isUphillEdge()
-      
+
       // Possible right edge to line
       else if (isDownhillEdge(current_y_value, last_y_value, HORIZONTAL)) {
-        
+
         if (haveFound(greenWhiteX)) {
           // point position would be midway between left and right edge
           int potentialMidpointX = (greenWhiteX + x) / 2;
@@ -658,7 +658,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
 
           else secondDownhillButInvalid(x, y, HORIZONTAL);
         } // end haveFound
-        
+
         // We haven't found a left edge.
         else {
           foundDownhillNoUphill(x,y, HORIZONTAL);
@@ -746,7 +746,7 @@ const bool FieldLines::isSecondCloseUphillEdge(const int oldEdgeX,
   int oldEdgeLocation, newEdgeLocation;
   bool print;
   if (direction == HORIZONTAL) {
-    oldEdgeLocation = oldEdgeX; 
+    oldEdgeLocation = oldEdgeX;
     newEdgeLocation = newEdgeX;
     print = debugHorEdgeDetect;
   }
@@ -771,7 +771,7 @@ const bool FieldLines::isSecondCloseUphillEdge(const int oldEdgeX,
 // Check to see if two "bottom" edges were found too far apart.
 // It used to be that we checked whether we had found a top edge, but that
 // is no longer necessary. Always returns true for now.
-const bool FieldLines::isSecondFarUphillEdge(const int oldEdgeX, 
+const bool FieldLines::isSecondFarUphillEdge(const int oldEdgeX,
                                              const int oldEdgeY,
                                              const int newX,
                                              const int newY,
@@ -808,8 +808,8 @@ const bool FieldLines::isSecondUphillButInvalid(const int oldEdgeX,
     newEdgeLoc = newEdgeY;
     print = debugVertEdgeDetect;
   }
-  
-  if (oldEdgeLoc != NO_EDGE && 
+
+  if (oldEdgeLoc != NO_EDGE &&
       !isEdgeClose(oldEdgeLoc, newEdgeLoc)) {
     if (print) {
       const point <const int> edgePoint(newEdgeX, newEdgeY);
@@ -821,16 +821,16 @@ const bool FieldLines::isSecondUphillButInvalid(const int oldEdgeX,
   }
   return false;
 }
- 
+
 
 #ifdef OFFLINE
 
 // Either we have not found a top edge yet, or the new edge is
 // very close to the old top edge.
-// We will replace the current top edge (whiteGreenY) with our 
+// We will replace the current top edge (whiteGreenY) with our
 // newly found white green edge; sometimes we get tops of lines that
 // have adjacent points which each count as edges and we want
-// to get the top most edge in order to get the true width of the 
+// to get the top most edge in order to get the true width of the
 // line.
 const bool FieldLines::isMoreSuitableTopEdge(const int topEdgeY,
 					     const int newY,
@@ -844,8 +844,8 @@ const bool FieldLines::isMoreSuitableTopEdge(const int topEdgeY,
              << newEdgePoint << endl;
       }
       else {
-	cout << "\t\tFound a new downhill edge at " 
-             << newEdgePoint << ". Replacing the old one at " 
+	cout << "\t\tFound a new downhill edge at "
+             << newEdgePoint << ". Replacing the old one at "
              << oldEdgePoint << endl;
       }
     }
@@ -856,10 +856,10 @@ const bool FieldLines::isMoreSuitableTopEdge(const int topEdgeY,
 
 // Either we have not found a right edge yet, or the new edge is
 // very close to the old right edge.
-// We will replace the current right edge (whiteGreenX) with our 
+// We will replace the current right edge (whiteGreenX) with our
 // newly found white green edge; sometimes we get right sides of lines that
 // have adjacent points which each count as edges and we want
-// to get the right most edge in order to get the true width of the 
+// to get the right most edge in order to get the true width of the
 // line.
 const bool FieldLines::isMoreSuitableRightEdge(const int rightEdgeX,
                                                const int newX,
@@ -873,8 +873,8 @@ const bool FieldLines::isMoreSuitableRightEdge(const int rightEdgeX,
              << newEdgePoint << endl;
       }
       else {
-	cout << "\t\tFound a new downhill edge at " 
-             << newEdgePoint << ". Replacing the old one at " 
+	cout << "\t\tFound a new downhill edge at "
+             << newEdgePoint << ". Replacing the old one at "
              << oldEdgePoint << endl;
       }
     }
@@ -960,22 +960,22 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
                                                  const double distance,
                                                  const int width) const {
   if (width < 0) {
-    if (debugVertEdgeDetect) { 
-      cout << "isReasonableVerticalWidth() failed: Negative width invalid." 
-           << endl; 
+    if (debugVertEdgeDetect) {
+      cout << "isReasonableVerticalWidth() failed: Negative width invalid."
+           << endl;
     }
     return false;
   }
   if (distance <= 0) {
     if (debugVertEdgeDetect) {
       point<int> badP(x,y);
-      cout << "isReasonableVerticalWidth() failed: Distance to point " 
+      cout << "isReasonableVerticalWidth() failed: Distance to point "
            << badP << " was invalid (" << distance
            << "cm)" << endl;
     }
     return false;
   }
-  
+
 #if ROBOT(AIBO)
   if (distance > 70) {
     if (debugVertEdgeDetect && width >= 20) {
@@ -995,7 +995,7 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
 
 #elif ROBOT(NAO)
   //return true;
-  
+
   // These are based on 640x480 images
   // See https://robocup.bowdoin.edu/files/nao/NaoLineWidthData.xls
   if (distance < 100)
@@ -1007,10 +1007,10 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
   else if (distance < 250)
     return width < 16;
   else if (distance < 300)
-    return width < 11; 
+    return width < 11;
   else if (distance < 400)
     return width < 7;
-  else 
+  else
   return width < 5;
 #endif
 }
@@ -1019,7 +1019,7 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
 const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
                                                    const double distance,
                                                    const int width) const {
-  
+
   if (width < 0) {
     return false;
   }
@@ -1032,7 +1032,7 @@ const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
     return false;
   }
 
-#if ROBOT(AIBO) 
+#if ROBOT(AIBO)
   // When it's far away (like a beacon) it has to be thinner
   if (distance > 75) {
     return width < 18;
@@ -1087,7 +1087,7 @@ const bool FieldLines::isDownhillEdge(const int new_y_value,
     return old_y_value - new_y_value >= VERTICAL_TRANSITION_VALUE;
   else
     return old_y_value - new_y_value >= HORIZONTAL_TRANSITION_VALUE;
-} 
+}
 #endif
 
 
@@ -1098,11 +1098,11 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
   vector <VisualLine> lines;
 
   long startTime;
-  
-  if (debugCreateLines) 
+
+  if (debugCreateLines)
     cout << "Grouping lines now with " << linePoints.size()
          << " line points" << endl << endl;
-  
+
   /////////////// MASTER LOOP   /////////////////////////////////
   // For each point, attempt to create a line starting from that point and
   // use as many points as possible until either running out or hitting
@@ -1118,7 +1118,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 
     // debug print
     if (debugCreateLines) {
-      cout << "MAIN LOOP: Scanning for potential line #" << lines.size() << 
+      cout << "MAIN LOOP: Scanning for potential line #" << lines.size() <<
         " with Point #" << counter << " (" << firstPoint->x
            << ", " << firstPoint->y << ")" << endl;
     }
@@ -1153,7 +1153,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       // debug print
       if (debugCreateLines)
 	cout << "\tSecond loop: " << " --- lineEndpointX: " << lineEndpointX
-             << " lineEndpointY: " << lineEndpointY << " NEW POINT: x: " 
+             << " lineEndpointY: " << lineEndpointY << " NEW POINT: x: "
              << pointX << " y: " << pointY << endl;
 
       ///// SECOND LOOP SANITY CHECKS //////
@@ -1167,7 +1167,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 	break;
       }
 
-      
+
       // SANITY CHECK: The points we're considering need to belong to a
       // line of similar width.
       // We compare the lineWidth of the last point the potentialLine has in
@@ -1175,7 +1175,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       // In addition, if the new point is closer to us than the last point,
       // the lineWidth should have increased or at most decrease by some small
       // number of pixels.
-      
+
 
 
       double lastLineWidth = back->lineWidth;
@@ -1183,10 +1183,10 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       if (true || back->foundWithScan == currentPoint->foundWithScan) {
         double lastPointDistance = pose->pixEstimate(back->x, back->y, 0).dist;
         double curPointDistance = pose->pixEstimate(pointX, pointY, 0).dist;
-        
+
         double distanceDifference = curPointDistance - lastPointDistance;
         double lineWidthDifference = currentPoint->lineWidth - lastLineWidth;
-        
+
         if (distanceDifference < 0 && // line is going toward us
             // TODO named constant
             (lineWidthDifference < -2 || // The line shouldn't shrink more than 2 pix
@@ -1197,8 +1197,8 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
              lineWidthDifference < -5)) {
           if (debugCreateLines)
             cout << "\tSecond loop: Sanity check 'Points of similar line widths "
-                 << "failed', line width 1: " << lastLineWidth 
-                 << ", line width 2:" << currentPoint->lineWidth << endl;        
+                 << "failed', line width 1: " << lastLineWidth
+                 << ", line width 2:" << currentPoint->lineWidth << endl;
           continue;
         }
 
@@ -1215,11 +1215,11 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       // two points.  Furthermore, only skip this check if it's horizontally
       // oriented
       double percentGreen;
-      if (currentPoint->lineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK && 
+      if (currentPoint->lineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
           lastLineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
           abs(pointX - lineEndpointX) > abs(pointY - lineEndpointY) &&
           Utility::getLength(lineEndpointX, lineEndpointY, pointX, pointY)
-          < MIN_SEPARATION_TO_NOT_CHECK) { 
+          < MIN_SEPARATION_TO_NOT_CHECK) {
         percentGreen = 0;
       }
       else {
@@ -1230,7 +1230,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       if (percentGreen > MAX_GREEN_PERCENT_ALLOWED_IN_LINE) {
         if (debugCreateLines)
           cout << "\tSecond loop: sanity check 'Found too much green between "
-               << "line points.'  Found " << percentGreen << "%, max of " 
+               << "line points.'  Found " << percentGreen << "%, max of "
                << MAX_GREEN_PERCENT_ALLOWED_IN_LINE << "% allowed." << endl;
         continue;
       }
@@ -1238,7 +1238,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 
 
       //startTime = vision->getMillisFromStartup();
-      // ANGLE CHECK:  Check to see if the horizontal angle of the line as 
+      // ANGLE CHECK:  Check to see if the horizontal angle of the line as
       // it stands now is significantly different from the horizontal angle
       // of the new segment we're adding.  See Utility::getAngle(x1,y1,x2,y2).
       // Note:  This check makes no sense for the first point we do not perform
@@ -1246,16 +1246,16 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       // Also, we only want to check the angle between the points if they are
       // not extremely close to each other - if they are, the angle error will
       // be too high.
-      if (legitimateLinePoints.size() != 1 && 
-          Utility::getLength(lineEndpointX, lineEndpointY, pointX, 
+      if (legitimateLinePoints.size() != 1 &&
+          Utility::getLength(lineEndpointX, lineEndpointY, pointX,
                              pointY) >  MIN_PIXEL_DIST_TO_CHECK_ANGLE) {
-        double curLineAngle = Utility::getAngle(lineStartpointX, 
-                                                lineStartpointY, 
-                                                lineEndpointX, 
+        double curLineAngle = Utility::getAngle(lineStartpointX,
+                                                lineStartpointY,
+                                                lineEndpointX,
                                                 lineEndpointY);
-        double segmentAngle = Utility::getAngle(lineEndpointX, 
+        double segmentAngle = Utility::getAngle(lineEndpointX,
                                                 lineEndpointY,
-                                                pointX, 
+                                                pointX,
                                                 pointY);
         double difference = min(fabs(curLineAngle - segmentAngle),
                                 180 - (fabs(curLineAngle - segmentAngle)));
@@ -1274,7 +1274,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       // POINT HAS PASSED ALL SANITY CHECKS, IS NOW PART OF A LINE!
       if (debugCreateLines) {
 	cout << "\tSecond loop: Point "<< counter<< " passed all sanity checks:"
-          "x2: " << pointX << " y2:" << pointY << " added to line " << 
+          "x2: " << pointX << " y2:" << pointY << " added to line " <<
           lines.size() << endl;
       }
 
@@ -1287,7 +1287,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
     // failed. If all goes well, the points we used in the line are removed
     // from further consideration.
     //startTime = vision->getMillisFromStartup();
-    
+
     // Too few points
     if (legitimateLinePoints.size() < VisualLine::NUM_POINTS_TO_BE_VALID_LINE)
       firstPoint++;
@@ -1297,7 +1297,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 	cout << "\tSecond loop: adding line " << lines.size()
 	     << " with " << legitimateLinePoints.size() << " line points.\n";
       }
-      
+
       drawLinePoints(legitimateLinePoints);
       aLine.setColor(static_cast<int>(lines.size()) + BLUEGREEN);
       aLine.setColorString(Utility::getColorString(aLine.color));
@@ -1316,7 +1316,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
         // Draw a bounding box around the line points we put into the line
         drawSurroundingBox(aLine, CYAN);
         drawFieldLine(aLine, aLine.color);
-      } 
+      }
     }
     //timeInVisualLineCreation += vision->getMillisFromStartup() - startTime;
   }
@@ -1330,7 +1330,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
     cout << endl;
     cout << "\ttime in percent color between: " << static_cast<double>(timeInPercentColorBetween)/numFrames << endl;
     cout << "\ttime in get angle: " << static_cast<double>(timeInGetAngle)/30 << endl;
-    cout << "\ttime in creating the visual lines: " 
+    cout << "\ttime in creating the visual lines: "
          << static_cast<double>(timeInVisualLineCreation)/30 << endl;
     timeInPercentColorBetween = timeInGetAngle = timeInVisualLineCreation = 0;
   }
@@ -1338,11 +1338,11 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 
   return lines;
 }
- 
+
 void FieldLines::drawLinePoints(const list<linePointNode> &toDraw) const {
   for (list<linePointNode>::const_iterator i = toDraw.begin();
        i != toDraw.end(); ++i) {
-    if ((*i)->foundWithScan == VERTICAL) 
+    if ((*i)->foundWithScan == VERTICAL)
       drawLinePoint(**i, BLACK);
     else
       drawLinePoint(**i, RED);
@@ -1352,7 +1352,7 @@ void FieldLines::drawLinePoints(const list<linePointNode> &toDraw) const {
 void FieldLines::drawLinePoints(const list<linePoint> &toDraw) const {
   for (list<linePoint>::const_iterator i = toDraw.begin();
        i != toDraw.end(); ++i) {
-    if (i->foundWithScan == VERTICAL) 
+    if (i->foundWithScan == VERTICAL)
       drawLinePoint(*i, BLACK);
     else
       drawLinePoint(*i, RED);
@@ -1360,18 +1360,18 @@ void FieldLines::drawLinePoints(const list<linePoint> &toDraw) const {
 }
 
 void FieldLines::drawCorners(const list<VisualCorner> &toDraw, int color) {
-  for (list<VisualCorner>::const_iterator i = toDraw.begin(); 
+  for (list<VisualCorner>::const_iterator i = toDraw.begin();
        i != toDraw.end(); ++i) {
     vision->thresh->drawPoint(i->getX(), i->getY(), color);
   }
 }
 
 
-// Attempts to fit the left over points that were not used within the 
+// Attempts to fit the left over points that were not used within the
 // createLines function to the lines that were output from said function
-void FieldLines::fitUnusedPoints(vector<VisualLine> &lines, 
+void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
                                  list<linePoint> &remainingPoints) {
-   
+
    // Sort lines by length because we figure that the shortest line can most
    // benefit from adding more points to it and we want the algorithm to be
    // greedy for speed and simplicity's sake
@@ -1380,23 +1380,23 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
    int numPointsRemainining = static_cast<int>(remainingPoints.size());
 
    if (debugFitUnusedPoints)
-     cout << "Beginning fitUnusedPoints with " << lines.size() << " lines and " 
+     cout << "Beginning fitUnusedPoints with " << lines.size() << " lines and "
           << numPointsRemainining << " unused points." << endl;
-   
+
    for (vector<VisualLine>::iterator i = lines.begin(); i != lines.end(); ++i) {
      bool foundAdditionalPoints = false;
      list <linePoint> additionalPoints;
      // We will manually increment the j counter so that we can delete points
      // from the list
-     for (linePointNode j = remainingPoints.begin(); 
+     for (linePointNode j = remainingPoints.begin();
 	  j != remainingPoints.end(); ) {
-       
+
        bool sanityChecksPass = true;
-       
+
        // Calculate how far away from the line the point is
        const double jDistFromI = Utility::getPointDeviation(*i, j->x, j->y);
        const double maxDist = 2.0;
-       
+
        if (jDistFromI > maxDist) {
 	 sanityChecksPass = false;
 	 if (debugFitUnusedPoints)
@@ -1408,7 +1408,7 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
 
 
        // We will not add any horizontal points to a line which is composed
-       // entirely of vertical points and vice versa 
+       // entirely of vertical points and vice versa
 
        // Ensure that the line width of the point vertically found is not too
        // different from that of the line
@@ -1419,8 +1419,8 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
              cout << "Point " << (*j) << " had a vertical width that differed "
                   << "too much from the line width of the " << i->colorStr
                   << " line; average width of line was " << i->avgVerticalWidth
-                  << ", line point width was " << j->lineWidth 
-                  << ". Max width difference is " 
+                  << ", line point width was " << j->lineWidth
+                  << ". Max width difference is "
                   << MAX_VERT_FIT_UNUSED_WIDTH_DIFFERENCE << endl;
            }
            sanityChecksPass = false;
@@ -1432,7 +1432,7 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
        // can differ in width so much more dramatically than vertically found
        // lines, doing a simple difference in width check is a bit dangerous.
        else if (j->foundWithScan == HORIZONTAL) {
-         
+
          double dist = j->distance;
          double thinnestDist = i->thinnestHorPoint.distance;
          double thickestDist = i->thickestHorPoint.distance;
@@ -1453,10 +1453,10 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
          else if (dist > thinnestDist) {
            if (width > thinnestWidth) {
              if (debugFitUnusedPoints) {
-               cout << setprecision(2) 
+               cout << setprecision(2)
                     << "Point " << (*j) << " had a horizontal width that "
                     << "was wider than that of the thinnest part of the line "
-                    << "despite being farther away.  Width: " 
+                    << "despite being farther away.  Width: "
                     << width << "; thinnest width: "
                     << thinnestWidth << endl;
              }
@@ -1467,10 +1467,10 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
          else if (dist < thickestDist) {
            if (width < thickestWidth) {
              if (debugFitUnusedPoints) {
-               cout << setprecision(2) 
+               cout << setprecision(2)
                     << "Point " << (*j) << " had a horizontal width that "
                     << "was thinner than that of the thickest part of the line "
-                    << "despite being closer.  Width: " 
+                    << "despite being closer.  Width: "
                     << width << "; thickest width: "
                     << thickestWidth << endl;
              }
@@ -1482,30 +1482,30 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
          else {
            if (width < thinnestWidth || width > thickestWidth) {
              if (debugFitUnusedPoints) {
-               cout << setprecision(2) 
+               cout << setprecision(2)
                     << "Point " << (*j) << " had a horizontal width that "
                     << "was not between the line widths of thickest and "
                     << "thinnest portions of the " << i->colorStr << " line; "
-                    << "width was " << width << "; expected to be between " 
+                    << "width was " << width << "; expected to be between "
                     << thinnestWidth << " and " << thickestWidth << endl;
              }
              sanityChecksPass = false;
            }
          }
        }
-       
+
        // Check that distance between the two points isn't insane
 
 
        // Check for green between the two points
-       
+
        // If the line point being added isn't between the endpoints of the
        // line, we need to check for green between the endpoint and this
        // point
        if (sanityChecksPass && !(Utility::between(*i, *j))) {
          const point<int> closerEndpoint =
            Utility::getCloserEndpoint(*i, j->x, j->y);
-         const double percentGreenBetween = 
+         const double percentGreenBetween =
            percentColorBetween(j->x, j->y,
                                closerEndpoint.x, closerEndpoint.y, GREEN);
          const double MAX_GREEN_BETWEEN = 5.0;
@@ -1513,7 +1513,7 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
            if (debugFitUnusedPoints) {
              cout << setprecision(2)
                   << "Point " << (*j) << " had too much green between it and "
-                  << "the endpoint " << closerEndpoint << " of the " 
+                  << "the endpoint " << closerEndpoint << " of the "
                   << i->colorStr << " line; found " << percentGreenBetween
                   << ", expected at most " << MAX_GREEN_BETWEEN << endl;
            }
@@ -1547,35 +1547,35 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
        else {
 	 ++j;
        }
-       
+
      }
      // Redo the least squares regression, find left/top/right/bottom over
      // again
      if (foundAdditionalPoints)
        i->addPoints(additionalPoints);
    }
-   
-   
+
+
    if (debugFitUnusedPoints) {
      for (vector<VisualLine>::iterator i = lines.begin();
 	  i != lines.end(); ++i) {
        drawSurroundingBox(*i, FIT_UNUSED_POINTS_BOX_COLOR);
        drawFieldLine(*i, i->color);
-       
+
      }
-     int numPointsAdded = numPointsRemainining - 
+     int numPointsAdded = numPointsRemainining -
        static_cast<int>(remainingPoints.size());
      cout << "Successfully added " << numPointsAdded << " points to the lines. "
 	  << remainingPoints.size() << " points remain unfit. " << endl;
    }
-   
+
 }
 
 // Attempts to join together line segments that are logically part of one
 // longer line but for some reason were not grouped within the groupPoints
 // method.  This can often happen when there is an obstruction that obscures
-// part of the line; due to x offset sanity checks, points that are too far 
-// apart are not allowed to be within the same line in createLines.  
+// part of the line; due to x offset sanity checks, points that are too far
+// apart are not allowed to be within the same line in createLines.
 void FieldLines::joinLines(vector <VisualLine> &lines) {
   int numberOfJoinedLines = 0;
 
@@ -1585,9 +1585,9 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
     for (vector <VisualLine>::iterator j = i + 1; j != lines.end(); ++j) {
       string iColor = Utility::getColorString(i->color);
       string jColor = Utility::getColorString(j->color);
-      
+
       if (debugJoinLines) {
-        cout <<"Attempting to join the " << iColor << " line " 
+        cout <<"Attempting to join the " << iColor << " line "
              << "and the " << jColor << " line." << endl;
       }
 
@@ -1598,9 +1598,9 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
                                       fabs(180-(fabs(i->angle-j->angle))));
       if (angleBetween > MAX_ANGLE_TO_JOIN_LINES) {
         if (debugJoinLines) {
-          cout << "\tAngle sanity check failed: lines had an angle of " 
+          cout << "\tAngle sanity check failed: lines had an angle of "
                << setprecision(2) << angleBetween << " between them; "
-               << "expected a maximum difference of " 
+               << "expected a maximum difference of "
                << MAX_ANGLE_TO_JOIN_LINES   << endl;
         }
         continue;
@@ -1610,23 +1610,23 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
       // between them, they might not be legitimately part of the same line;
       // it could be the case that we have two parallel lines that lie apart
       // on the screen
- 
+
       // Evaluate the value of the line i at j's start point to determine
       // how far away the line deviates
       const double jDistFromI = Utility::getPointDeviation(*i, j->start.x,
 							   j->start.y);
-      
+
       // Evaluate the value of the line j at i's start point to determine
       // how far away the line deviates
       double iDistFromJ = Utility::getPointDeviation(*j, i->start.x,
 						     i->start.y);;
-      
+
       double avg = (jDistFromI + iDistFromJ) / 2.0;
       if (avg > MAX_DIST_BETWEEN_TO_JOIN_LINES) {
         if (debugJoinLines) {
           cout << "\tDistance from line sanity check failed: lines "
-               << "had a difference of " << avg << " between them; " 
-               << "the max difference allowed is " 
+               << "had a difference of " << avg << " between them; "
+               << "the max difference allowed is "
                << MAX_DIST_BETWEEN_TO_JOIN_LINES << endl;
         }
         continue;
@@ -1634,7 +1634,7 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
 
       // Passed all sanity checks
       if (debugJoinLines) {
-        cout << "\tPASSED all sanity checks; joining " << iColor 
+        cout << "\tPASSED all sanity checks; joining " << iColor
              << " and " << jColor << " lines now." << endl;
       }
       // Replace the information in i with the union of i and j and recalculate
@@ -1644,10 +1644,10 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
       i->addPoints(j->points);
       i->setColor(oldColor);
       ++numberOfJoinedLines;
-      if (debugJoinLines) 
+      if (debugJoinLines)
         drawSurroundingBox(*i, JOIN_LINES_BOX_COLOR );
       // erase the redundant line and position our j pointer correctly
-      // tricky: do not change 
+      // tricky: do not change
       j = lines.erase(j) - 1;
     }
   }
@@ -1672,7 +1672,7 @@ const VisualLine FieldLines::mergeLines(const VisualLine &line1,
 
 // For each line we have identified on the screen, attempts to extend the
 // line farther to both the right and the left in the case of mostly
-// horizontal lines, or to the top and bottom in the case of mostly 
+// horizontal lines, or to the top and bottom in the case of mostly
 // vertical lines
 void FieldLines::extendLines(vector <VisualLine> &lines) {
   if (debugExtendLines) {
@@ -1692,7 +1692,7 @@ void FieldLines::extendLines(vector <VisualLine> &lines) {
 }
 
 
-// Given a VisualLine, attempts to find points along the equation of the line 
+// Given a VisualLine, attempts to find points along the equation of the line
 // above the topmost point and below the bottommost point that may have been
 // missed in the horizontal scans due to lack of green on one side of the line.
 // As long as we have a downhill edge from white to green on at least one side
@@ -1704,18 +1704,18 @@ void FieldLines::extendLineVertically(VisualLine &line) {
          << endl;
     cout << "Stats: " << line << endl;
   }
-  
+
   list <linePoint> foundLinePoints;
   double slope = line.a;
   double yIntercept = line.b;
-  
-  // Keep track of coords so that we can check between the last point and 
+
+  // Keep track of coords so that we can check between the last point and
   // current point for green
   int topX = 0;
   int topY = line.top;
   int bottomX = 0;
   int bottomY = line.bottom;
-  
+
   // start point matches the top point
   if (line.top == line.start.y) {
     topX = line.start.x;
@@ -1737,11 +1737,11 @@ void FieldLines::extendLineVertically(VisualLine &line) {
   // TODO: Figure a way to reduce this duplication of code
 
   if (debugExtendLines) { cout << "Extending to the top" << endl; }
-  // Extend towards the top of the image 
+  // Extend towards the top of the image
   for (int y = topY - ROW_SKIP; y > vision->thresh->getVisionHorizon();
        y -= ROW_SKIP) {
     // if VisualLine is perfectly vertical, do not attempt to use slope
-    int startX = (VisualLine::isPerfectlyVertical(line)) ? 
+    int startX = (VisualLine::isPerfectlyVertical(line)) ?
       line.left :
       Utility::getLineX(y, yIntercept, slope);
 
@@ -1753,10 +1753,10 @@ void FieldLines::extendLineVertically(VisualLine &line) {
       continue;
     }
     // Since we are scanning top to bottom, we are looking for HORIZONTAL
-    // points 
+    // points
     linePoint newPoint = findLinePointFromMiddleOfLine(startX, y, HORIZONTAL);
     if (newPoint != VisualLine::DUMMY_LINEPOINT) {
-      
+
       if (abs(line.avgHorizontalWidth - newPoint.lineWidth) >
           MAX_EXTEND_LINES_WIDTH_DIFFERENCE ) {
         if (debugExtendLines) {
@@ -1765,7 +1765,7 @@ void FieldLines::extendLineVertically(VisualLine &line) {
         }
         continue;
       }
-      
+
       if (debugExtendLines) {
         cout << "\tAdding point " << newPoint << endl;
       }
@@ -1775,19 +1775,19 @@ void FieldLines::extendLineVertically(VisualLine &line) {
       else {
         vision->drawPoint(newPoint.x, newPoint.y, YELLOW);
       }
-      
+
       foundLinePoints.push_back(newPoint);
     }
   }
-  
-  
+
+
   if (debugExtendLines) { cout << "Extending to the bottom" << endl; }
   // Extend to the bottom of screen
   for (int y = bottomY + ROW_SKIP; y < IMAGE_HEIGHT; y += ROW_SKIP) {
     // This is the supposed midpoint in the line, will do further checks
     // before saying that it's part of a valid line point
     // if VisualLine is perfectly vertical, do not attempt to use slope
-    int startX = (VisualLine::isPerfectlyVertical(line)) ? 
+    int startX = (VisualLine::isPerfectlyVertical(line)) ?
       line.left :
       Utility::getLineX(y, yIntercept, slope);
 
@@ -1800,10 +1800,10 @@ void FieldLines::extendLineVertically(VisualLine &line) {
       continue;
     }
     // Since we are scanning top to bottom, we are looking for HORIZONTAL
-    // points 
+    // points
     linePoint newPoint = findLinePointFromMiddleOfLine(startX, y, HORIZONTAL);
     if (newPoint != VisualLine::DUMMY_LINEPOINT) {
-      
+
       if (abs(line.avgHorizontalWidth - newPoint.lineWidth) >
           MAX_EXTEND_LINES_WIDTH_DIFFERENCE ) {
         if (debugExtendLines) {
@@ -1812,7 +1812,7 @@ void FieldLines::extendLineVertically(VisualLine &line) {
         }
         continue;
       }
-      
+
 
       if (debugExtendLines) {
         cout << "\tAdding point " << newPoint << endl;
@@ -1828,10 +1828,10 @@ void FieldLines::extendLineVertically(VisualLine &line) {
       foundLinePoints.push_back(newPoint);
     }
   }
-       
+
   if (!foundLinePoints.empty()) {
     line.addPoints(foundLinePoints);
-    
+
     if (debugExtendLines) {
       drawSurroundingBox(line, LAWN_GREEN);
       drawFieldLine(line, line.color);
@@ -1852,8 +1852,8 @@ void FieldLines::extendLineHorizontally(VisualLine &line) {
   list <linePoint> foundLinePoints;
   double slope = line.a;
   double yIntercept = line.b;
-  
-  // Keep track of coords so that we can check between the last point and 
+
+  // Keep track of coords so that we can check between the last point and
   // current point for green
   int leftX = line.left;
   int leftY = 0;
@@ -1870,7 +1870,7 @@ void FieldLines::extendLineHorizontally(VisualLine &line) {
     leftY = line.end.y;
     rightY = line.start.y;
   }
-  
+
   if (debugExtendLines) {
     point<int> leftP(leftX, leftY);
     point<int> rightP(rightX, rightY);
@@ -1891,7 +1891,7 @@ void FieldLines::extendLineHorizontally(VisualLine &line) {
       continue;
     }
 
-    // Since we are scanning left to right, we are looking for VERTICAL line 
+    // Since we are scanning left to right, we are looking for VERTICAL line
     // points (the lines are near horizontal in the screen)
     linePoint newPoint = findLinePointFromMiddleOfLine(x, startY, VERTICAL);
     if (newPoint != VisualLine::DUMMY_LINEPOINT) {
@@ -1935,8 +1935,8 @@ void FieldLines::extendLineHorizontally(VisualLine &line) {
       }
       continue;
     }
-    
-    // Since we are scanning left to right, we are looking for VERTICAL line 
+
+    // Since we are scanning left to right, we are looking for VERTICAL line
     // points (the lines are near horizontal in the screen)
     linePoint newPoint = findLinePointFromMiddleOfLine(x, startY, VERTICAL);
     if (newPoint != VisualLine::DUMMY_LINEPOINT) {
@@ -1956,7 +1956,7 @@ void FieldLines::extendLineHorizontally(VisualLine &line) {
   }
   if (!foundLinePoints.empty()) {
     line.addPoints(foundLinePoints);
-    
+
     if (debugExtendLines) {
       drawSurroundingBox(line, RED);
       drawFieldLine(line, line.color);
@@ -1968,7 +1968,7 @@ void FieldLines::extendLineHorizontally(VisualLine &line) {
 
 
 // Returns true if the new point trying to be added to the line is offscreen or
-// there is too much green in between the old and new point.  Any further 
+// there is too much green in between the old and new point.  Any further
 // searching in this direction would be foolish.
 const bool FieldLines::shouldStopExtendingLine(const int oldX, const int oldY,
                                                 const int newX, const int newY)
@@ -1980,23 +1980,23 @@ const bool FieldLines::shouldStopExtendingLine(const int oldX, const int oldY,
     if (debugExtendLines) {
       point<int> currentPoint(newX, newY);
       cout << currentPoint << " could not possibly be a point on "
-           << "the line because it is off screen." 
+           << "the line because it is off screen."
            << endl;
     }
     return true;
   }
-  
+
   // Too much green between the last and most recent point means we've hit the
   // logical end of the line; any further continuance is extremely dangerous
   const double MAX_GREEN_PERCENT_BETWEEN = 10.0;
-  const double percentGreenBetween = percentColorBetween(oldX, oldY, 
+  const double percentGreenBetween = percentColorBetween(oldX, oldY,
                                                          newX, newY, GREEN);
   if (percentGreenBetween > MAX_GREEN_PERCENT_BETWEEN) {
     if (debugExtendLines) {
       point<int> oldPoint(oldX, oldY);
       point<int> currentPoint(newX, newY);
-      cout << " Found too much green between " << oldPoint << " and " 
-           << currentPoint << "; found " << percentGreenBetween 
+      cout << " Found too much green between " << oldPoint << " and "
+           << currentPoint << "; found " << percentGreenBetween
            << "%, expected at most " << MAX_GREEN_PERCENT_BETWEEN
            << "%.  Breaking out of loop" << endl;
     }
@@ -2005,16 +2005,16 @@ const bool FieldLines::shouldStopExtendingLine(const int oldX, const int oldY,
   return false;
 }
 
-// Helper method that just returns whether the thresholded color is a 
+// Helper method that just returns whether the thresholded color is a
 // line color
 const bool FieldLines::isLineColor(const int color) {
   return Utility::isElementInArray(color, LINE_COLORS, NUM_LINE_COLORS);
 }
 
-// Helper method that just returns whether the thresholded color is a 
+// Helper method that just returns whether the thresholded color is a
 // green color
 const bool FieldLines::isGreenColor(int threshColor) {
-  return Utility::isElementInArray(threshColor, FIELD_COLORS, 
+  return Utility::isElementInArray(threshColor, FIELD_COLORS,
                                    NUM_GREEN_COLORS);
 }
 
@@ -2022,7 +2022,7 @@ const bool FieldLines::isGreenColor(int threshColor) {
 
 // Given an (x, y) location and a direction (horizontal or vertical) in which
 // to look, attempts to find edges on either side of the (x,y) location.  If
-// there are no edges, or if another sanity check fails, returns 
+// there are no edges, or if another sanity check fails, returns
 // VisualLine::DUMMY_LINEPOINT.  Otherwise it returns the linepoint with
 // the correct (x,y) location and width and scan.
 linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
@@ -2031,7 +2031,7 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
     // TODO: figure out a limit to search
     int leftX = findEdgeFromMiddleOfLine(x, y, 100, TEST_LEFT);
     int rightX = findEdgeFromMiddleOfLine(x, y, 100, TEST_RIGHT);
-    
+
     // We can't use this point
     if (leftX == NO_EDGE && rightX == NO_EDGE) {
       return VisualLine::DUMMY_LINEPOINT;
@@ -2059,7 +2059,7 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
     // TODO: Named constant
     int topY = findEdgeFromMiddleOfLine(x, y, 100, TEST_UP);
     int bottomY = findEdgeFromMiddleOfLine(x, y, 100, TEST_DOWN);
-    
+
     // We can't use this point
     if (topY == NO_EDGE && bottomY == NO_EDGE) {
       if (debugExtendLines) {
@@ -2102,7 +2102,7 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
                << endl;
         }
         return VisualLine::DUMMY_LINEPOINT;
-      }      
+      }
       if (debugExtendLines) {
         point<int>goodP(x,y);
         cout << "\t\tPoint " << goodP << " had an edge above and one "
@@ -2119,7 +2119,7 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
 // Unlike our normal method for finding line points, this searches from the
 // middle of a line outward for an edge, in a given direction, up to a max
 // of maxPixelsToSearch.  If no edge is found, returns NO_EDGE.
-const int FieldLines::findEdgeFromMiddleOfLine(int x, int y, 
+const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
                                                int maxPixelsToSearch,
                                                TestDirection dir) const {
   int oldYChannel = vision->thresh->getY(x,y);
@@ -2144,7 +2144,7 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
     for (int j = y; j != stopValue; j += sign) {
       int newYChannel = vision->thresh->getY(x, j);
       if (isDownhillEdge(newYChannel, oldYChannel, VERTICAL) &&
-          percentColor(x, j, dir, FIELD_COLORS, NUM_GREEN_COLORS, 
+          percentColor(x, j, dir, FIELD_COLORS, NUM_GREEN_COLORS,
                        NUM_TEST_PIXELS) >= GREEN_PERCENT_CLEARANCE) {
         // We found the edge we were looking for.
         return j;
@@ -2155,7 +2155,7 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
         return NO_EDGE;
       }
       oldYChannel = newYChannel;
-    } 
+    }
     return NO_EDGE;
   } // end dir == TEST_UP || dir == TEST_DOWN
 
@@ -2168,18 +2168,18 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
       sign = -1;
     }
     else {
-      // stop at right edge of screen or maxPixelsToSearch to the right, 
+      // stop at right edge of screen or maxPixelsToSearch to the right,
       // whichever is farther to the left (fewer pixels)
       stopValue = min(IMAGE_WIDTH - 1, x + maxPixelsToSearch);
       sign = 1;
     }
-    
+
     // Iterate over the x axis until we either find the edge or hit the
     // stopping point
     for (int i = x; i != stopValue; i += sign) {
       int newYChannel = vision->thresh->getY(i, y);
       if (isDownhillEdge(newYChannel, oldYChannel, HORIZONTAL) &&
-          percentColor(i, y, dir, FIELD_COLORS, NUM_GREEN_COLORS, 
+          percentColor(i, y, dir, FIELD_COLORS, NUM_GREEN_COLORS,
                        NUM_TEST_PIXELS) >= GREEN_PERCENT_CLEARANCE) {
         // We found the edge we were looking for.
         return i;
@@ -2189,7 +2189,7 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
         return NO_EDGE;
       }
       oldYChannel = newYChannel;
-    } 
+    }
     return NO_EDGE;
   } // end horizontal test
 } // end method
@@ -2201,25 +2201,25 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
 
 
 
-// Pairwise tests each line on the screen against each other, calculates 
+// Pairwise tests each line on the screen against each other, calculates
 // where the intersection occurs, and then subjects the intersection
 // to a battery of sanity checks before determining that the intersection
-// is a legitimate corner on the field.  
-// @param lines - the vector of visual lines that have been found after 
+// is a legitimate corner on the field.
+// @param lines - the vector of visual lines that have been found after
 // createLines, join lines, and fit unused points.
 // @return a vector of VisualCorners created from the intersection points that
 // successfully pass all sanity checks.
-// 
+//
 list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
   list <VisualCorner> corners;
 
   if (debugIntersectLines) {
-    cout <<"Beginning intersectLines() with " << lines.size() << " lines.." 
+    cout <<"Beginning intersectLines() with " << lines.size() << " lines.."
          << endl;
   }
   // Keep track of the number of duplicate intersections (where two intersection
   // points occur very close to each other on the screen).  In places not near
-  // the center circle, there should be very few duplicates, if any.  
+  // the center circle, there should be very few duplicates, if any.
   int numDupes = 0;
 
   if (standardView) {
@@ -2229,9 +2229,9 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
     }
   }
 
-  // Compare every pair of lines 
+  // Compare every pair of lines
   for (vector <VisualLine>::iterator i = lines.begin(); i != lines.end(); ++i) {
-    
+
     for (vector <VisualLine>::iterator j = i+1; j != lines.end(); ++j) {
       string iColor = i->colorStr;
       string jColor = j->colorStr;
@@ -2241,7 +2241,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       point<int> intersection = Utility::getIntersection(*i,*j);
       int intersectX = intersection.x;
       int intersectY = intersection.y;
-      
+
       if (debugIntersectLines) {
         cout << endl << "Trying to form an intersection between the "
              << iColor << " and "  << jColor << " lines.." << endl;
@@ -2258,10 +2258,10 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
           cout << "\tIntersection occurs at " << intersection << endl;
         }
       }
-      vision->thresh->drawPoint(intersectX, intersectY, 
+      vision->thresh->drawPoint(intersectX, intersectY,
                             TENTATIVE_INTERSECTION_POINT_COLOR);
-      
-      
+
+
       // Duplicate corner check:  ensure that corner is not too close to any
       // previously found corners
       if (dupeCorner(corners, intersectX, intersectY, numChecksPassed)) {
@@ -2269,13 +2269,13 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
         if (numDupes > MAX_NUM_DUPES) {
           if (debugIntersectLines || debugCcScan) {
             cout <<"\t" << numChecksPassed
-                 << "-'Num duplicates' sanity check failed; found " 
+                 << "-'Num duplicates' sanity check failed; found "
                  << numDupes << " duplicate intersections; max allowed is "
                  << MAX_NUM_DUPES << endl;
           }
-          vision->drawPoint(intersectX, intersectY, 
+          vision->drawPoint(intersectX, intersectY,
                             INVALIDATED_INTERSECTION_POINT_COLOR);
-          // at this point, we are by a center and so we discard all 
+          // at this point, we are by a center and so we discard all
           // corners after recoloring them so we can tell they are illegitimate
           drawCorners(corners, INVALIDATED_INTERSECTION_POINT_COLOR);
           corners.clear();
@@ -2293,10 +2293,10 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       double angleOnScreen = min(fabs(i->angle - j->angle),
                                  fabs(180-(fabs(i->angle-j->angle))));
 
-      /*cout << i->colorStr << " has angle of " << i->angle << " and " 
+      /*cout << i->colorStr << " has angle of " << i->angle << " and "
            << j->colorStr << " has angle of " << j->angle << endl;
       */
-      
+
       if (angleOnScreen < MIN_ANGLE_BETWEEN_INTERSECTING_LINES) {
         if (debugIntersectLines) {
           cout << "\t" << numChecksPassed
@@ -2308,12 +2308,12 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
         continue;
       }
       ++numChecksPassed;
-      
-    
-      // Off screen sanity check: only allow corners that are within image 
+
+
+      // Off screen sanity check: only allow corners that are within image
       // frame
       if (!Utility::isPointOnScreen(intersection)) {
-        if (debugIntersectLines) 
+        if (debugIntersectLines)
           cout << "\t" << numChecksPassed
                << "-Intersection point was off screen." << endl;
         continue;
@@ -2326,22 +2326,22 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       double angleOnField = getEstimatedAngle(*i, *j, intersectX, intersectY);
       //cout << "angle on field: " << angleOnField << endl;
       // BAD_ANGLE signifies the angle could not be computed
-      if (angleOnField != BAD_ANGLE && 
+      if (angleOnField != BAD_ANGLE &&
           (angleOnField < MIN_ANGLE_ON_FIELD ||
            angleOnField > MAX_ANGLE_ON_FIELD)) {
         if (debugIntersectLines) {
           cout << "\t" << numChecksPassed
                << "- Failed due to an angle on the field that is too "
-               << "far from 90 degrees. Found angle of " 
-               << setprecision(2) << angleOnField 
-               << ".  Expected angle to be between " << MIN_ANGLE_ON_FIELD 
+               << "far from 90 degrees. Found angle of "
+               << setprecision(2) << angleOnField
+               << ".  Expected angle to be between " << MIN_ANGLE_ON_FIELD
                << " and " << MAX_ANGLE_ON_FIELD << endl;
         }
         continue;
       }
       ++numChecksPassed;
 #endif
-   
+
       // Too much green check:  Discard potential corners where the intersection
       // point is actually in the field green rather than in a line
       double percentGreen = percentSurrounding(intersection,
@@ -2349,42 +2349,42 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
                                                NUM_GREEN_COLORS,
                                                CORNER_TEST_RADIUS);
       if (percentGreen > MAX_GREEN_PERCENT_ALLOWED_AT_CORNER) {
-        if (debugIntersectLines) 
+        if (debugIntersectLines)
           cout << "\t" << numChecksPassed
                << "-'Corner surrounded by green' sanity check failed: "
-               << "Found " << setprecision(2) << percentGreen 
-               << "% green around the point; max allowed is " 
+               << "Found " << setprecision(2) << percentGreen
+               << "% green around the point; max allowed is "
                << MAX_GREEN_PERCENT_ALLOWED_AT_CORNER << "%"
                << endl;
         continue;
       }
       ++numChecksPassed;
-                 
-      // Too small check: ensure that at least one of the line segments is 
-      // long enough (if both are small it indicates we might be at the 
+
+      // Too small check: ensure that at least one of the line segments is
+      // long enough (if both are small it indicates we might be at the
       // center circle)
       int MIN_LENGTH_LINE_TO_INTERSECT = 30; // cm
       if (i->length < TWO_CORNER_LINES_MIN_LENGTH &&
           j->length < TWO_CORNER_LINES_MIN_LENGTH &&
           getEstimatedLength(*i) < MIN_LENGTH_LINE_TO_INTERSECT &&
           getEstimatedLength(*j) < MIN_LENGTH_LINE_TO_INTERSECT) {
-        
-        if (debugIntersectLines) 
+
+        if (debugIntersectLines)
           cout << "\t" << numChecksPassed
                << "-'Lines too small' sanity check failed. "
-               << "The " << iColor << " line was " << setprecision(2) 
-               << i->length << " pixels long, the " << jColor << " line was " 
+               << "The " << iColor << " line was " << setprecision(2)
+               << i->length << " pixels long, the " << jColor << " line was "
                << j->length << " pixels long.  Require at least "
                << TWO_CORNER_LINES_MIN_LENGTH << endl;
         continue;
       }
       ++numChecksPassed;
 
-      
+
       // Cross corner check: ensure that the lines do not both continue through
       // the point of intersection to form a cross; this indicates we have
       // malformed lines at the center circle
-      
+
       // We parameterize the line such that x and y are functions of one
       // variable t. Then we figure out what t gives us the corner's
       // x coordinate. When t = 0, x = x1; when t = lineLength, x = x2;
@@ -2392,7 +2392,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
         findLinePointDistanceFromStart(intersection, *i);
       double t_J = Utility::
         findLinePointDistanceFromStart(intersection, *j);
-      
+
 
       if (Utility::tValueInMiddleOfLine(t_I, i->length,
 					static_cast<double>(MIN_CROSS_EXTEND)) &&
@@ -2411,26 +2411,26 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       }
       ++numChecksPassed;
 
-            
+
       // Distance sanity check:  We cannot trust any corners more than around
       // 100 cm away.  Due to deficiencies in pose, extremely far distances
       // actually show up as negative numbers (we have a polynomial function
-      // that maxes out at around 110 and then decreases towards negative 
+      // that maxes out at around 110 and then decreases towards negative
       // infinity)
-      estimate pixEstimate = pose->pixEstimate(intersectX, intersectY, 
+      estimate pixEstimate = pose->pixEstimate(intersectX, intersectY,
                                                LINE_HEIGHT);
       double distance = pixEstimate.dist;
       double bearing = pixEstimate.bearing;
       // Ridiculously far away points have -distance due to pose problems.
       if (distance > MAX_CORNER_DISTANCE || distance < MIN_CORNER_DISTANCE) {
-        if (debugIntersectLines) 
+        if (debugIntersectLines)
           cout <<"\t" << numChecksPassed
-               << "-'Distance' sanity check failed: estimated distance: " 
+               << "-'Distance' sanity check failed: estimated distance: "
                << distance << "cm, require distance between "
-               << MIN_CORNER_DISTANCE << "cm and " << MAX_CORNER_DISTANCE 
+               << MIN_CORNER_DISTANCE << "cm and " << MAX_CORNER_DISTANCE
                << "cm" << endl;
         continue;
-      }  
+      }
       ++numChecksPassed;
 
       // Lines on the screen are not perfect.  As a result, we allow our corners
@@ -2441,17 +2441,17 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       // both contain the intersection
       BoundingBox box1 = Utility::
         getBoundingBox(*j,
-                       INTERSECT_MAX_ORTHOGONAL_EXTENSION, 
+                       INTERSECT_MAX_ORTHOGONAL_EXTENSION,
                        INTERSECT_MAX_PARALLEL_EXTENSION);
       BoundingBox box2 = Utility::
         getBoundingBox(*i,
-                       INTERSECT_MAX_ORTHOGONAL_EXTENSION, 
+                       INTERSECT_MAX_ORTHOGONAL_EXTENSION,
                        INTERSECT_MAX_PARALLEL_EXTENSION);
       if (debugIntersectLines) {
         drawBox(box1, RED);
         drawBox(box2, BLUE);
       }
-      
+
       bool box1Contains = Utility::
         boxContainsPoint(box1, intersectX, intersectY);
       bool box2Contains = Utility::
@@ -2465,33 +2465,33 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
         continue;
       }
       ++numChecksPassed;
-      
+
       // Make sure the intersection point stands out, even against balls
       vision->thresh->drawPoint(intersectX - 1, intersectY, BLACK);
       vision->thresh->drawPoint(intersectX + 1, intersectY, BLACK);
       vision->thresh->drawPoint(intersectX, intersectY + 1, BLACK);
       vision->thresh->drawPoint(intersectX, intersectY - 1, BLACK);
-      vision->thresh->drawPoint(intersectX, intersectY, 
+      vision->thresh->drawPoint(intersectX, intersectY,
                                 LEGIT_INTERSECTION_POINT_COLOR);
       // assign x, y, dist, bearing, line i, line j, t value for line i,
       // t value for line 2
       VisualCorner c(intersectX, intersectY, distance, bearing,
                      *i, *j, t_I, t_J);
       corners.push_back(c);
-      
+
       // TODO:  Should I be adding the intersection point to both lines?
       //i->addPoint
 
-      if (debugIntersectLines) 
-        cout <<"\tPassed all " << numChecksPassed << " checks with corner " 
+      if (debugIntersectLines)
+        cout <<"\tPassed all " << numChecksPassed << " checks with corner "
              << c << endl;
     }
   }
-  
+
   if (debugIntersectLines) {
     cout << "Found " << corners.size() << " legitimate corners." << endl;
   }
-  
+
   return corners;
 
 }
@@ -2507,16 +2507,16 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 // in certain cases the shape of a corner might be switched too (if an L
 // corner is determined to be a T instead, its shape is changed accordingly).
 void FieldLines::identifyCorners(list <VisualCorner> &corners) {
-  
-  if (debugIdentifyCorners) 
+
+  if (debugIdentifyCorners)
     cout << "Beginning identifyCorners() with " << corners.size() << " corners"
          << endl;
 
-  vector <const FieldObjects*> visibleObjects = getVisibleFieldObjects();
-    
+  vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
+
   // No explicit movement of iterator; will do it manually
   for (list <VisualCorner>::iterator i = corners.begin(); i != corners.end();) {
-    
+
     if (debugIdentifyCorners) {
       cout << endl << "Before identification: Corner: " << *i << endl;
     }
@@ -2532,18 +2532,18 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
     // Get all the possible corners given the shape of the corner
     const list <const ConcreteCorner*> possibleCorners =
       ConcreteCorner::getPossibleCorners(i->getShape());
-     
-    list <const ConcreteCorner*> possibleClassifications = 
+
+    list <const ConcreteCorner*> possibleClassifications =
       getPossibleClassifications(*i, visibleObjects, possibleCorners);
-    
+
     // T's can sometimes be misclassified as L's, check them if nothing
     // matched (and the geometric tests failed)
-    
+
     if (!possibleClassifications.empty()) {
       // Do a final sanity check
       eliminateImpossibleIDs(*i, visibleObjects, possibleClassifications);
     }
-    
+
     // Keep it completely abstract
     if (possibleClassifications.empty()) {
       i->setPossibleCorners(ConcreteCorner::getPossibleCorners(i->getShape()));
@@ -2584,11 +2584,11 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
   }
 }
 
-// Determines if the given L corner does not geometrically make sense for its 
-// shape given the objects on the screen.  
+// Determines if the given L corner does not geometrically make sense for its
+// shape given the objects on the screen.
 const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
   const double CLOSE_DIST = FIELD_HEIGHT / 2;
-  
+
   if (debugIdentifyCorners) {
     cout << "Testing to see if corner should be classified as a T."
          << endl;
@@ -2597,7 +2597,7 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
   // Nao fields do not have beacons
 #if ROBOT(AIBO)
   const int NUM_BEACONS = 2;
-  const FieldObjects * beacons[NUM_BEACONS] = {vision->by, vision->yb};
+  const VisualFieldObject * beacons[NUM_BEACONS] = {vision->by, vision->yb};
 
 
   for (int i = 0; i < NUM_BEACONS; ++i) {
@@ -2614,7 +2614,7 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
 #endif
 
   const int NUM_POSTS = 4;
-  const FieldObjects * posts[NUM_POSTS] = {vision->bglp, vision->bgrp, 
+  const VisualFieldObject * posts[NUM_POSTS] = {vision->bglp, vision->bgrp,
                                    vision->yglp, vision->ygrp};
 
 
@@ -2622,7 +2622,7 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
     if (posts[i]->getDist() > 0 && posts[i]->getDist() < CLOSE_DIST &&
         // Make sure the corner is approximately where a T should be
         nearGoalTCornerLocation(L, posts[i])) {
-      
+
       if (!LWorksWithPost(L, posts[i])) {
         if (debugIdentifyCorners) {
           cout << "\tCorner should be classified as a T due to bad geometrical "
@@ -2632,7 +2632,7 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
       }
     }
   }
-  
+
   if (debugIdentifyCorners) {
     cout << "\tCorner does not seem to be a T" << endl;
   }
@@ -2643,22 +2643,22 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
 // be
 // Precondition: post is either vision->yglp, vision->ygrp, vision->bglp,
 // or vision->bgrp
-const bool FieldLines::nearGoalTCornerLocation(const VisualCorner& corner, 
-                               const FieldObjects * post) const {
+const bool FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
+                               const VisualFieldObject * post) const {
   const double ALLOWABLE_ERROR = getAllowedDistanceError(post);
   if (post == vision->bglp || post == vision->bgrp) {
-    for (list <const ConcreteCorner*>::const_iterator i = 
-           ConcreteCorner::blueGoalTCorners.begin(); 
+    for (list <const ConcreteCorner*>::const_iterator i =
+           ConcreteCorner::blueGoalTCorners.begin();
          i != ConcreteCorner::blueGoalTCorners.end(); ++i) {
-      if (fabs(getEstimatedDistance(&corner, post) - 
+      if (fabs(getEstimatedDistance(&corner, post) -
                getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
         return true;
       }
     }
   }
   else if (post == vision->yglp || post == vision->ygrp) {
-    for (list <const ConcreteCorner*>::const_iterator i = 
-           ConcreteCorner::yellowGoalTCorners.begin(); 
+    for (list <const ConcreteCorner*>::const_iterator i =
+           ConcreteCorner::yellowGoalTCorners.begin();
          i != ConcreteCorner::yellowGoalTCorners.end(); ++i) {
       if (fabs(getEstimatedDistance(&corner, post) -
                getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
@@ -2671,7 +2671,7 @@ const bool FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
 
 // In some Nao frames, robots obscure part of the goal and the bottom is not
 // visible.  We can only use pix estimates of goals whose bottoms are visible
-const bool FieldLines::goalSuitableForPixEstimate(const FieldObjects * goal) const {
+const bool FieldLines::goalSuitableForPixEstimate(const VisualFieldObject * goal) const {
   // When we're the goalie, we don't expect there to be any robots blocking the
   // goal.  Furthermore, we're seeing it from a much different angle where
   // the green will not be at the bottom of the post
@@ -2685,7 +2685,7 @@ const bool FieldLines::goalSuitableForPixEstimate(const FieldObjects * goal) con
 
 
 const bool FieldLines::LWorksWithBeacon(const VisualCorner& c,
-                                        const FieldObjects * beacon) const {
+                                        const VisualFieldObject * beacon) const {
   const double TOO_CLOSE_DISTANCE = FIELD_WHITE_HEIGHT / 3;
   return getEstimatedDistance(&c, beacon) >= TOO_CLOSE_DISTANCE;
 }
@@ -2693,7 +2693,7 @@ const bool FieldLines::LWorksWithBeacon(const VisualCorner& c,
 // If it's a legitimate L, the post should be INSIDE of the two lines
 // See the wiki for an illustration
 const bool FieldLines::LWorksWithPost(const VisualCorner& c,
-                                      const FieldObjects * post) const {
+                                      const VisualFieldObject * post) const {
   point<int> cornerLoc(c.getX(), c.getY());
 
   point <int> leftPostLoc(post->getLeftBottomX(), post->getLeftBottomY());
@@ -2701,9 +2701,9 @@ const bool FieldLines::LWorksWithPost(const VisualCorner& c,
 
   VisualLine line1 = c.getLine1();
   VisualLine line2 = c.getLine2();
-  point<int> fartherPoint1 = 
+  point<int> fartherPoint1 =
     Utility::getPointFartherFromCorner(line1, c.getX(), c.getY());
-  point<int> fartherPoint2 = 
+  point<int> fartherPoint2 =
     Utility::getPointFartherFromCorner(line2, c.getX(), c.getY());
 
   // Orient the line from the farther point to the corner.
@@ -2728,7 +2728,7 @@ void FieldLines::goalieSpecificCheck(list <VisualCorner>& corners) {
 void FieldLines::identifyGoalieCorners(list <VisualCorner> &corners) {
   // If we see an inner L and an outer L in the same frame, chances are
   // the outer L is a T
-  
+
 
 }
 
@@ -2741,8 +2741,8 @@ void FieldLines::printPossibilities(const list <const ConcreteCorner*> &_list) c
 }
 
 void FieldLines::printFieldObjectsInformation() {
-  vector<const FieldObjects*> objs = getVisibleFieldObjects();
-  for (vector<const FieldObjects*>::const_iterator i = objs.begin();
+  vector<const VisualFieldObject*> objs = getVisibleFieldObjects();
+  for (vector<const VisualFieldObject*>::const_iterator i = objs.begin();
        i != objs.end(); ++i) {
     cout << *i << endl;
   }
@@ -2752,8 +2752,8 @@ void FieldLines::printFieldObjectsInformation() {
 // about what is visible on the screen to throw out corners that could not
 // be visible.
 void FieldLines::
-eliminateImpossibleIDs(VisualCorner &c, 
-                       vector <const FieldObjects*> &visibleObjects,
+eliminateImpossibleIDs(VisualCorner &c,
+                       vector <const VisualFieldObject*> &visibleObjects,
                        list <const ConcreteCorner*> &possibleClassifications)
 {
   if (debugIdentifyCorners) {
@@ -2761,13 +2761,13 @@ eliminateImpossibleIDs(VisualCorner &c,
   }
 
   unsigned int originalSize = possibleClassifications.size();
-  
+
 
 #if ROBOT(AIBO)
   // Impossible to see any field objects (other than arcs)
   // from inner L's at corner of screen when using an AIBO
   if (c.getShape() == INNER_L && visibleObjects.size() > 0) {
-    list<const ConcreteCorner*>::iterator eliminatedIDs = 
+    list<const ConcreteCorner*>::iterator eliminatedIDs =
       remove_if(possibleClassifications.begin(), possibleClassifications.end(),
                 CornerOfField());
 
@@ -2778,22 +2778,22 @@ eliminateImpossibleIDs(VisualCorner &c,
     }
   }
 #endif
-  
+
   // Since aibo cameras are limited to such a small area of the field, if we
   // see a close post in the frame, none of the corners in the frame could be
   // anywhere excelt close to the goal (either the left T, right T, or left goal
   // L, right goal L
 #if ROBOT(AIBO)
-  // If we see an unsure yellow post we cannot be near the beacons or the 
-  // blue goal, because the Vision system only gives uncertain posts 
+  // If we see an unsure yellow post we cannot be near the beacons or the
+  // blue goal, because the Vision system only gives uncertain posts
   // when close to the post
   if (unsureYellowPostOnScreen() || yellowPostCloseToCorner(c)) {
     if (debugIdentifyCorners) {
       cout << "Yellow post close on screen, eliminating all "
            << "possibilities not near yellow goal" << endl;
     }
-    
-    list <const ConcreteCorner*>::iterator badIDs = 
+
+    list <const ConcreteCorner*>::iterator badIDs =
       remove_if(possibleClassifications.begin(),
                 possibleClassifications.end(),
                 not1(InList(ConcreteCorner::yellowGoalCorners)));
@@ -2802,16 +2802,16 @@ eliminateImpossibleIDs(VisualCorner &c,
       possibleClassifications.erase(badIDs, possibleClassifications.end());
     }
   }
-  
+
   // If we see an unsure blue post we cannot be near the beacons or the
-  // yellow goal, because the Vision system only gives uncertain posts 
+  // yellow goal, because the Vision system only gives uncertain posts
   // when close
   if (unsureBluePostOnScreen() || bluePostCloseToCorner(c)) {
     if (debugIdentifyCorners) {
       cout << "Blue post close on screen, eliminating all possibilities "
            << "not near blue goal" << endl;
     }
-    list <const ConcreteCorner*>::iterator badIDs = 
+    list <const ConcreteCorner*>::iterator badIDs =
       remove_if(possibleClassifications.begin(),
                 possibleClassifications.end(),
                 not1(InList(ConcreteCorner::blueGoalCorners)));
@@ -2822,7 +2822,7 @@ eliminateImpossibleIDs(VisualCorner &c,
   }
 #endif
 
-  
+
 
 
   // There are no arcs for Naos.
@@ -2834,7 +2834,7 @@ eliminateImpossibleIDs(VisualCorner &c,
       cout << "Sure yellow arc on screen, eliminating all possibilities not "
            << "near yellow arc" << endl;
     }
-    list <const ConcreteCorner*>::iterator badIDs = 
+    list <const ConcreteCorner*>::iterator badIDs =
       remove_if(possibleClassifications.begin(),
                 possibleClassifications.end(),
                 not1(InList(ConcreteCorner::yellowArcCorners)));
@@ -2849,7 +2849,7 @@ eliminateImpossibleIDs(VisualCorner &c,
       cout << "Sure blue arc on screen, eliminating all possibilities not "
            << "near blue arc" << endl;
     }
-    list <const ConcreteCorner*>::iterator badIDs = 
+    list <const ConcreteCorner*>::iterator badIDs =
       remove_if(possibleClassifications.begin(),
                 possibleClassifications.end(),
                 not1(InList(ConcreteCorner::blueArcCorners)));
@@ -2866,20 +2866,20 @@ eliminateImpossibleIDs(VisualCorner &c,
   }
 }
 
-// Returns true if there is a yellow post on the screen whose certainty is 
+// Returns true if there is a yellow post on the screen whose certainty is
 // not sure
 const bool FieldLines::unsureYellowPostOnScreen() const{
-  FieldObjects * leftPost = vision->yglp;
-  FieldObjects * rightPost = vision->ygrp;
+  VisualFieldObject * leftPost = vision->yglp;
+  VisualFieldObject * rightPost = vision->ygrp;
   return (leftPost->getDist() > 0 && leftPost->getCertainty() != SURE) ||
     (rightPost->getDist() > 0 && rightPost->getCertainty() != SURE);
 }
 
-// Returns true if there is a blue post on the screen whose certainty is 
+// Returns true if there is a blue post on the screen whose certainty is
 // not sure
 const bool FieldLines::unsureBluePostOnScreen() const{
-  FieldObjects * leftPost = vision->bglp;
-  FieldObjects * rightPost = vision->bgrp;
+  VisualFieldObject * leftPost = vision->bglp;
+  VisualFieldObject * rightPost = vision->bgrp;
   return (leftPost->getDist() > 0 && leftPost->getCertainty() != SURE) ||
     (rightPost->getDist() > 0 && rightPost->getCertainty() != SURE);
 }
@@ -2907,16 +2907,16 @@ const bool FieldLines::bluePostCloseToCorner(VisualCorner& c) {
   return false;
 }
 
-// Returns true if there is a yellow arc on the screen whose certainty is 
+// Returns true if there is a yellow arc on the screen whose certainty is
 // sure
 const bool FieldLines::yellowArcOnScreen() const {
-  return vision->yellowArc->getDist() > 0 && 
+  return vision->yellowArc->getDist() > 0 &&
     vision->yellowArc->getCertainty() == SURE;
 }
-// Returns true if there is a blue arc on the screen whose certainty is 
+// Returns true if there is a blue arc on the screen whose certainty is
 // sure
 const bool FieldLines::blueArcOnScreen() const {
-  return vision->blueArc->getDist() > 0 && 
+  return vision->blueArc->getDist() > 0 &&
     vision->blueArc->getCertainty() == SURE;
 }
 
@@ -2933,7 +2933,7 @@ const bool FieldLines::postOnScreen() const {
 // Returns true if there is a beacon visible on the screen whose certainty
 // is sure
 const bool FieldLines::beaconOnScreen() const {
-  return 
+  return
     (vision->by->getDist() > 0 && vision->by->getCertainty() == SURE) ||
     (vision->yb->getDist() > 0 && vision->yb->getCertainty() == SURE);
 }
@@ -2945,14 +2945,14 @@ const bool FieldLines::beaconOnScreen() const {
 // TODO: rename method.
 list <const ConcreteCorner*> FieldLines::
   getPossibleClassifications(const VisualCorner &corner,
-                             const vector <const FieldObjects*> &visibleObjects,
+                             const vector <const VisualFieldObject*> &visibleObjects,
                              const list <const ConcreteCorner*> &concreteCorners) const {
-  
+
   list <const ConcreteCorner*> possibleClassifications;
   if (debugIdentifyCorners) {
-    cout << endl 
-         << "Beginning to get possible classifications for corner given " 
-         << visibleObjects.size() << " visible objects and " 
+    cout << endl
+         << "Beginning to get possible classifications for corner given "
+         << visibleObjects.size() << " visible objects and "
          << concreteCorners.size() << " corner possibilities" << endl << endl;
   }
   // For each concrete corner that's possible, calculate its distance to the
@@ -2964,40 +2964,40 @@ list <const ConcreteCorner*> FieldLines::
     bool badPossibleCorner = false;
     int numCorroboratingObjects = 0;
 
-    for (vector <const FieldObjects*>::const_iterator k =
+    for (vector <const VisualFieldObject*>::const_iterator k =
            visibleObjects.begin(); k != visibleObjects.end(); ++k) {
       double realDistance = getRealDistance(*j, *k);
       // Todo:  We are recalculating this over and over.  How to remember?
       double estimatedDistance = getEstimatedDistance(&corner, *k);
       double absoluteError = fabs(realDistance - estimatedDistance);
       double relativeError = absoluteError / realDistance * 100.0;
-      
+
       // If we have already one good distance between this corner and a field
       // object, we only require that the next objects have a small relative
-      // error.  
+      // error.
       const double MAX_RELATIVE_ERROR = 15.0;
-      // For each corroborating object we find, we allow this much more 
+      // For each corroborating object we find, we allow this much more
       // percent error for subsequent objects
       const double ERROR_ALLOWANCE_INCREASE = 5.0;
-      double relErrorRelaxation = 
+      double relErrorRelaxation =
         ERROR_ALLOWANCE_INCREASE * numCorroboratingObjects;
 
       if (numCorroboratingObjects > 0 &&
           relativeError < MAX_RELATIVE_ERROR + relErrorRelaxation) {
         if (debugIdentifyCorners) {
           cout << "\tDistance between " << (*j)->toString() << " and "
-               << (*k)->toString() << " was fine! Relative error of " 
+               << (*k)->toString() << " was fine! Relative error of "
                << relativeError << endl;
         }
         numCorroboratingObjects++;
       }
-     
+
       else if (absoluteError > getAllowedDistanceError(*k)) {
         if (debugIdentifyCorners) {
           cout << "\tDistance between " << (*j)->toString() << " and "
                << (*k)->toString() << " was too different." << endl
-               << "\tReal: " << realDistance 
-               << "\tEstimated: " << estimatedDistance  
+               << "\tReal: " << realDistance
+               << "\tEstimated: " << estimatedDistance
                << "\tAbsolute error: " << absoluteError
                << "\tRelative error: " << relativeError << "%" << endl;
         }
@@ -3007,7 +3007,7 @@ list <const ConcreteCorner*> FieldLines::
       else {
         if (debugIdentifyCorners) {
           cout << "\tDistance between " << (*j)->toString() << " and "
-               << (*k)->toString() << " was fine! Absolute error of " 
+               << (*k)->toString() << " was fine! Absolute error of "
                << absoluteError << endl;
         }
         numCorroboratingObjects++;
@@ -3024,9 +3024,9 @@ list <const ConcreteCorner*> FieldLines::
 }
 
 
- double FieldLines::getAllowedDistanceError(FieldObjects const *obj) const {
+ double FieldLines::getAllowedDistanceError(VisualFieldObject const *obj) const {
    switch (obj->getID()) {
-   case BLUE_GOAL_LEFT_POST: 
+   case BLUE_GOAL_LEFT_POST:
    case BLUE_GOAL_RIGHT_POST:
    case YELLOW_GOAL_LEFT_POST:
    case YELLOW_GOAL_RIGHT_POST:
@@ -3048,7 +3048,7 @@ list <const ConcreteCorner*> FieldLines::
 **/
 const bool FieldLines::isGreenWhiteEdge(int x, int y, ScanDirection direction) const {
 
-  TestDirection searchDirection = 
+  TestDirection searchDirection =
     (direction == HORIZONTAL ? TEST_LEFT : TEST_DOWN);
   bool print =  (direction == VERTICAL && debugVertEdgeDetect) ||
     (direction == HORIZONTAL && debugHorEdgeDetect);
@@ -3063,7 +3063,7 @@ const bool FieldLines::isGreenWhiteEdge(int x, int y, ScanDirection direction) c
   return enoughGreen;
 }
 
-const bool FieldLines::isWhiteGreenEdge(int x, int y, 
+const bool FieldLines::isWhiteGreenEdge(int x, int y,
                                   int potentialMidPoint,
                                   ScanDirection direction) const {
   bool print = (direction == VERTICAL && debugVertEdgeDetect) ||
@@ -3077,18 +3077,18 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
   int MAX_GREEN_PIXELS_TO_TEST = NUM_TEST_PIXELS;
 #endif
 
-  // Idea:  For lines at the edge of the field that are far away there is 
+  // Idea:  For lines at the edge of the field that are far away there is
   // VERY little green above them.  Rather than test a constant number
-  // of pixels above for green, we start small and work up only if we 
-  // haven't already found enough green.  
+  // of pixels above for green, we start small and work up only if we
+  // haven't already found enough green.
   bool greenAbove = false;
   double greenPercent = 0.0;
-  TestDirection searchDirection = 
+  TestDirection searchDirection =
     (direction == HORIZONTAL) ? TEST_RIGHT : TEST_UP;
 
-  for (int numPixels = MIN_GREEN_PIXELS_TO_TEST; 
+  for (int numPixels = MIN_GREEN_PIXELS_TO_TEST;
        numPixels <= MAX_GREEN_PIXELS_TO_TEST; numPixels++) {
-    greenPercent = percentColor(x, y, searchDirection, 
+    greenPercent = percentColor(x, y, searchDirection,
                                 FIELD_COLORS, NUM_GREEN_COLORS,
                                 numPixels);
     /*
@@ -3096,7 +3096,7 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
       printf("\t\t\tisWhiteGreenVerticalEdge(): greenPercent at (%d, %d): %f%%\n",
              x, y, greenPercent);
     */
-    if (greenPercent >= GREEN_PERCENT_CLEARANCE) {   
+    if (greenPercent >= GREEN_PERCENT_CLEARANCE) {
       greenAbove = true;
       break;
     }
@@ -3111,10 +3111,10 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
     }
     return false;
   }
-  
+
 
   // we have a good amount of green above so continue to check the line for
-  // white 
+  // white
   double whitePercent, yellowPercent;
   if (searchDirection == TEST_UP || searchDirection == TEST_DOWN) {
     whitePercent = percentSurrounding(x, potentialMidPoint, WHITE, 1);
@@ -3137,10 +3137,10 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
 
 
   // A simple, unadulterated whiteGreen transition
-  if (greenAbove && whiteBelow && notMuchYellow) { 
-    return true; 
+  if (greenAbove && whiteBelow && notMuchYellow) {
+    return true;
   }
-  
+
   if (debugVertEdgeDetect) {
     if (!whiteBelow) {
       printf("\t\t\tisWhiteGreenVerticalEdge():: (3) White below failed at "
@@ -3159,7 +3159,7 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
 
 
 
- 
+
 // AIBOSPECIFIC:
 // Determines from the lines and corners found on the screen whether the
 // robot is probably at the center circle.  Uses the fact that limitations
@@ -3169,21 +3169,21 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
 const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
                                               list<VisualCorner> &corners) {
   if (debugCcScan)
-    cout << "Beginning center circle check with " << lines.size() 
+    cout << "Beginning center circle check with " << lines.size()
          << " lines and " << corners.size() << " corners" << endl;
 
   // Sort by increasing length
   sort(lines.begin(), lines.end());
-  
-  
+
+
   const unsigned int MAX_NUM_UNUSED_POINTS = 8;
 
-  
+
 
   if (unusedPointsList.size() > MAX_NUM_UNUSED_POINTS) {
     if (debugCcScan) {
       cout << "\t6. Too many unused points in the image.  Found "
-           << unusedPointsList.size() << " expected at most " 
+           << unusedPointsList.size() << " expected at most "
            << MAX_NUM_UNUSED_POINTS << endl;
     }
     return true;
@@ -3192,17 +3192,17 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
 
   // Number of lines sanity check
   if (lines.size() > MAX_NUM_LINES) {
-    if (debugCcScan) 
-      cout << "\t1.  Too many lines on screen.  Found " 
-           << lines.size() << " lines, expected a maximum of " 
+    if (debugCcScan)
+      cout << "\t1.  Too many lines on screen.  Found "
+           << lines.size() << " lines, expected a maximum of "
            << MAX_NUM_LINES << endl;
     return true;
   }
   // Number of corners sanity check
   if (corners.size() > MAX_NUM_CORNERS) {
-    if (debugCcScan) 
+    if (debugCcScan)
       cout << "\t2.  Too many corners on screen.  Found "
-           << corners.size() << " corners, expected a maximum of " 
+           << corners.size() << " corners, expected a maximum of "
            << MAX_NUM_CORNERS << endl;
     return true;
   }
@@ -3211,10 +3211,10 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
   unsigned int numSmallLines = 0;
   for (vector<VisualLine>::const_iterator i = lines.begin(); i != lines.end();
        ++i) {
-    if (i->length < TWO_CORNER_LINES_MIN_LENGTH) 
+    if (i->length < TWO_CORNER_LINES_MIN_LENGTH)
       numSmallLines++;
   }
-  
+
   // Number of small lines sanity check
   if (numSmallLines > MAX_NUM_SMALL_LINES) {
     if (debugCcScan)
@@ -3225,12 +3225,12 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
   }
 
   // Many lines on screen, one long one, the rest absolutely short
-  if ((lines.size() == MAX_NUM_LINES) && 
+  if ((lines.size() == MAX_NUM_LINES) &&
       // Longest one is very long
       (lines[lines.size() - 1].length > LONG_LINE_LENGTH) &&
       // next longest is not very long
       (lines[lines.size() - 2].length < MEDIUM_LINE_LENGTH)) {
-    
+
     if (debugCcScan)
       cout << "\t4.  One long line with many smaller ones." << endl;
     return true;
@@ -3238,13 +3238,13 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
 
   // Look for outer L's that have an extremely obtuse angle; these don't
   // happen at goal boxes
-  for (list<VisualCorner>::const_iterator i = corners.begin(); 
+  for (list<VisualCorner>::const_iterator i = corners.begin();
        i != corners.end(); ++i) {
-       if (i->getShape() == OUTER_L && 
+       if (i->getShape() == OUTER_L &&
         i->getAngleBetweenLines() > MAX_OUTER_L_ANGLE) {
-      if (debugCcScan) 
-        cout << "\t5.  Corner " << *i << " had an angle of " 
-             << i->getAngleBetweenLines() 
+      if (debugCcScan)
+        cout << "\t5.  Corner " << *i << " had an angle of "
+             << i->getAngleBetweenLines()
              << "; max angle allowed is " << MAX_OUTER_L_ANGLE
              << endl;
       return true;
@@ -3252,7 +3252,7 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
   }
 
 
-  
+
 
   // TODO: Use unused points and check if they're above the T? Desktop/CC/42.FRM
 
@@ -3266,18 +3266,18 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
                                                         corners.end(),
                                                         cornerShapeEquals(T));
     if (firstT != corners.end()) {
-      // TODO: store this information somewhere earlier 
+      // TODO: store this information somewhere earlier
       int TCornerXCoord = firstT->getX();
       int TCornerYCoord = firstT->getY();
-      
+
       // Figure out which point on the stem is farther away from the corner, the
       // start or end variable.  Allows us to determine which side of the bar
       // the stem is on
-      point<int> fartherPoint = 
+      point<int> fartherPoint =
         Utility::getPointFartherFromCorner(firstT->getTStem(), firstT->getX(),
                                            firstT->getY());
       // Is the stem to the left of the bar?
-      bool left = Utility::left(firstT->getTBar().start, 
+      bool left = Utility::left(firstT->getTBar().start,
                                 firstT->getTBar().end,
                                 fartherPoint);
       // After excluding the lines that make up the T, there will be exactly 2
@@ -3286,19 +3286,19 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
       // Copy only those lines into the remaining lines vector which are NOT
       // part of the corner; check them each to see if one lies on the wrong
       // side
-      remove_copy_if(lines.begin(), lines.end(), 
+      remove_copy_if(lines.begin(), lines.end(),
                      remainingLines.begin(), lineInCorner(*firstT));
-      
-      for(vector<VisualLine>::iterator k = remainingLines.begin(); 
+
+      for(vector<VisualLine>::iterator k = remainingLines.begin();
           k != remainingLines.end(); ++k) {
-        point<int> fartherPointOnRemainingLine = 
+        point<int> fartherPointOnRemainingLine =
           Utility::getPointFartherFromCorner(*k, TCornerXCoord, TCornerYCoord);
 
         // The line lies on the opposite side of the bar than the stem..
-        if (Utility::left(firstT->getTBar().start, 
+        if (Utility::left(firstT->getTBar().start,
                           firstT->getTBar().end,
                           fartherPointOnRemainingLine) != left) {
-          
+
           if (debugCcScan) {
             cout << "\t7 Found a line that lay on the wrong side of "
                  << "the TBar of a T corner." << endl
@@ -3310,14 +3310,14 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
       }
     }
   }
-  
+
   /*
-  // Midline with shallow inner L corner above 
+  // Midline with shallow inner L corner above
   // see CC/23.FRM, 32.FRM, 39.FRM, 42.FRM
   */
 
   // Check the number of unused points and how close they lie to each other?
-    
+
   if (debugCcScan)
     cout << "\t Passed non-field objects sanity checks." << endl;
 
@@ -3334,27 +3334,27 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
 
   // It's very risky for us to allow any L corners at the edges of the
   // screen if there are no field objects on the screen to corroborate
-  // what they are. 
+  // what they are.
   // In some cases, the L is actually a T that got cut off by the
   // edge of the screen.  When we identify corners, the L will be kept
   // completely abstract and localization will try to fit the L to
   // whatever it can, which will be very wrong if the L is in fact a T.
-  // If we do see field objects on the screen, we can use distance to 
+  // If we do see field objects on the screen, we can use distance to
   // determine that the L corner is actually a T.
 
   int oldNumCorners = corners.size();
 
-  
+
   const int NUM_PIXELS_CLOSE_TO_EDGE = 15;
   // No field objects on screen..
   if (getVisibleFieldObjects().empty()) {
-    int numLByEdge = 
+    int numLByEdge =
       count_if(corners.begin(), corners.end(),
                LCornerNearEdgeOfScreen(SCREEN, NUM_PIXELS_CLOSE_TO_EDGE));
-    list<VisualCorner>::iterator riskyCorners = 
+    list<VisualCorner>::iterator riskyCorners =
       remove_if(corners.begin(), corners.end(),
                 LCornerNearEdgeOfScreen(SCREEN, NUM_PIXELS_CLOSE_TO_EDGE));
-    
+
     // We found at least one risky corner
     if (riskyCorners != corners.end()) {
       if (debugRiskyCorners || debugIdentifyCorners) {
@@ -3367,7 +3367,7 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
 
 #if ROBOT(AIBO)
     int numInnerL = count_if(corners.begin(), corners.end(), cornerShapeEquals(INNER_L));
-    
+
     if (numInnerL >= 2) {
       if (debugRiskyCorners || debugIdentifyCorners) {
         cout << "Removing " << numInnerL << " inner L corners because "
@@ -3391,7 +3391,7 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
              << "there are no field objects on the screen and at least one of "
              << "the corners must be incorrect." << endl;
       }
-      riskyCorners = remove_if(corners.begin(), corners.end(), 
+      riskyCorners = remove_if(corners.begin(), corners.end(),
                                cornerShapeEquals(OUTER_L));
       corners.erase(riskyCorners, corners.end());
     }
@@ -3404,7 +3404,7 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
              << "no field objects on the screen at at least one of the corners must "
              << "be incorrect." << endl;
       }
-      riskyCorners = remove_if(corners.begin(), corners.end(), 
+      riskyCorners = remove_if(corners.begin(), corners.end(),
                                cornerShapeEquals(T));
       corners.erase(riskyCorners, corners.end());
     }
@@ -3412,9 +3412,9 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
 #endif
 
   }
-  
-  if (debugRiskyCorners || debugIdentifyCorners) { 
-    cout << "\tRemoved " << oldNumCorners - corners.size() 
+
+  if (debugRiskyCorners || debugIdentifyCorners) {
+    cout << "\tRemoved " << oldNumCorners - corners.size()
          << " risky corner(s). "  << endl;
   }
 }
@@ -3429,18 +3429,18 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
                                                list<VisualCorner> &corners) {
 
   if (debugCcScan) {
-    cout << "Beginning the second set of center circle checks after " 
-         << "object recognition with " << lines.size() << " lines " 
+    cout << "Beginning the second set of center circle checks after "
+         << "object recognition with " << lines.size() << " lines "
          << "and " << corners.size() << " corners." << endl;
   }
-    
+
 
   // Get the fictitious "corner" at the center circle (directly in the center)
   // and calculate its distances from various field objects that are
   // visible in field.  Attempt to determine if the visual corner we have
   // matches up with this prototypical center circle corner in terms of distance
   ConcreteCorner const * center_circle_corner = &ConcreteCorner::center_circle;
-  vector <const FieldObjects*> visibleObjects = getVisibleFieldObjects();
+  vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
 
   // The distance from the center circle to goal posts is almost exactly the
   // same as the distance from the goal posts to the T corners by beacons.
@@ -3455,7 +3455,7 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
   }
 
   // If there's a close goal in the frame, we couldn't be near the center
-  // circle. 
+  // circle.
   static const int CLOSE_DIST = 150;
   if ((vision->yglp->getDist() > 0 && vision->yglp->getDist() < CLOSE_DIST) ||
       (vision->ygrp->getDist() > 0 && vision->ygrp->getDist() < CLOSE_DIST) ||
@@ -3484,7 +3484,7 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
   // a shallow angle AND another line on the screen, it's probably the
   // center circle.  Although this check doesn't use the field objects
   // explicitly, we put it in this method rather than in probablyAtCenterCircle
-  // itself because we want to ensure we are not near any field objects 
+  // itself because we want to ensure we are not near any field objects
   // (in some frames, you can see two inner L's by the goal posts, because a
   // T corner is cut off and we only see an L)
   if (lines.size() > 2) {
@@ -3498,9 +3498,9 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
       if (i->getShape() == INNER_L && i->getAngleBetweenLines() > MAX_INNER_L_ANGLE) {
         if (debugCcScan) {
             cout << "\t8 Found an inner L corner with a very shallow angle "
-                 << "on the screen (" << i->getAngleBetweenLines()  
+                 << "on the screen (" << i->getAngleBetweenLines()
                  << ") when there were more than two lines on the "
-                 << "screen; shallowest angle allowed is " << MAX_INNER_L_ANGLE 
+                 << "screen; shallowest angle allowed is " << MAX_INNER_L_ANGLE
                  << endl;
           }
           return true;
@@ -3508,31 +3508,31 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
     }
   }
 
-  
+
   // Related to above, it might be the case that the we miss a beacon but
-  // still see those goal posts.  Check to see if there are just two lines 
-  // in the image and that both of them are longer than the diameter of the 
+  // still see those goal posts.  Check to see if there are just two lines
+  // in the image and that both of them are longer than the diameter of the
   // center circle
-  if (lines.size() == 2 && 
+  if (lines.size() == 2 &&
       getEstimatedLength(lines[0]) > 2 * CENTER_CIRCLE_RADIUS &&
       getEstimatedLength(lines[1]) > 2 * CENTER_CIRCLE_RADIUS) {
     if (debugCcScan) {
-      cout << setprecision(2) 
+      cout << setprecision(2)
            << "There were only two lines in the image and both were longer than"
-           << " is possible at the center circle.  The " << lines[0].colorStr 
-           << " line is " << getEstimatedLength(lines[0]) << "cm long, the " 
+           << " is possible at the center circle.  The " << lines[0].colorStr
+           << " line is " << getEstimatedLength(lines[0]) << "cm long, the "
            << lines[1].colorStr << " line is " << getEstimatedLength(lines[1])
            << endl;
     }
     return false;
   }
-  
+
 
   // Look for distances that corroborate being at center circle
-  for (list<VisualCorner>::const_iterator i = corners.begin(); 
+  for (list<VisualCorner>::const_iterator i = corners.begin();
        i != corners.end(); ++i) {
-    
-    for (vector<const FieldObjects*>::const_iterator j = visibleObjects.begin();
+
+    for (vector<const VisualFieldObject*>::const_iterator j = visibleObjects.begin();
          j != visibleObjects.end(); ++j) {
       double realDistance = getRealDistance(center_circle_corner, *j);
       // Dereference the iterator i to get the VisualCorner and then get
@@ -3540,12 +3540,12 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
       double estimatedDistance = getEstimatedDistance(&(*i), *j);
       double absoluteError = fabs(realDistance - estimatedDistance);
       //double relativeError = absoluteError / realDistance * 100.0;
-      
+
       if (absoluteError < MAX_DIST_ERROR_FOR_CENTER_CIRCLE_DETERMINATION) {
         if (debugCcScan) {
           cout << setprecision(2)
-               << "\t7.  Corner " << *i << " was estimated to be close to " 
-               << "the distance between the center circle and " 
+               << "\t7.  Corner " << *i << " was estimated to be close to "
+               << "the distance between the center circle and "
                << (*j)->toString() << endl
                << "\tReal distance: " << realDistance << "\tEstimate distance: "
                << estimatedDistance << endl;
@@ -3555,8 +3555,8 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
 
     }
   }
-  
- 
+
+
   if (debugCcScan)
     cout << "\t Passed field objects sanity checks." << endl;
 
@@ -3610,7 +3610,7 @@ int FieldLines::numPixelsToHitColor(const int x, const int y,
 
 }
 
-int FieldLines::numPixelsToHitColor(const int x, const int y, const int color, 
+int FieldLines::numPixelsToHitColor(const int x, const int y, const int color,
                                     const TestDirection testDir) const {
   const int colors[] = {color};
   return numPixelsToHitColor(x,y,colors,1,testDir);
@@ -3631,7 +3631,7 @@ void FieldLines::drawBox(BoundingBox box, int color) const {
 
 // Draws a small box around the line in the given color
 void FieldLines::drawSurroundingBox(const VisualLine &line, int color) const {
-  drawBox(Utility::getBoundingBox(line, 
+  drawBox(Utility::getBoundingBox(line,
                                   DEBUG_GROUP_LINES_BOX_WIDTH,
                                   DEBUG_GROUP_LINES_BOX_WIDTH),
           color);
@@ -3639,13 +3639,13 @@ void FieldLines::drawSurroundingBox(const VisualLine &line, int color) const {
 
 
 
-// This method should only be called with a FieldObjects object that has a 
+// This method should only be called with a VisualFieldObject object that has a
 // concrete location on the field (YGLP, YGRP, BGLP, BGRP, BY, and YB).
 // Calculates the length of the straight line between the two objects on the
 // field
 double FieldLines::getRealDistance(const ConcreteCorner *c,
-                                   const FieldObjects *obj) const {
-  return Utility::getLength(c->getFieldX(), c->getFieldY(), 
+                                   const VisualFieldObject *obj) const {
+  return Utility::getLength(c->getFieldX(), c->getFieldY(),
                             obj->getFieldX(), obj->getFieldY());
 }
 
@@ -3653,7 +3653,7 @@ double FieldLines::getRealDistance(const ConcreteCorner *c,
 /*
  * This method prints out every pixel in the image, the Y channel value at
  * each pixel, and the thresholded color for that pixel.
- * By importing the resulting file into excel and applying conditional 
+ * By importing the resulting file into excel and applying conditional
  * formatting, we can see exactly where edges are found and how we can use
  * the edge information to improve the algorithm.
  */
@@ -3664,20 +3664,20 @@ void FieldLines::printThresholdedImage() {
     fprintf(stderr, "Error: Could not open file to print thresholded image.\n");
     return;
   }
-  
+
   // Print the column headers
   fprintf(stream, "\t");
   for (int x = 0; x < IMAGE_WIDTH; x++) {
     fprintf(stream, "%d\t", x);
   }
   fprintf(stream, "\n");
-  
+
   for(int y = 0; y < IMAGE_HEIGHT; y++) {
 
     fprintf(stream, "%d\t", y);
 
     for(int x = 0; x < IMAGE_WIDTH; x++) {
-      fprintf(stream, "%03d%s\t", vision->thresh->getY(x,y), 
+      fprintf(stream, "%03d%s\t", vision->thresh->getY(x,y),
               Threshold::getShortColor(vision->thresh->thresholded[y][x]));
       // we're done this row, skip down
       if (x >= IMAGE_WIDTH - 1) { fprintf(stream, "\n"); }
@@ -3695,10 +3695,10 @@ void FieldLines::printThresholdedImage() {
 
 // Creates a vector of all those field objects that are visible in the frame
 // and have SURE certainty
-vector <const FieldObjects*> FieldLines::getVisibleFieldObjects() const {
-  vector <const FieldObjects*> visibleObjects;
+vector <const VisualFieldObject*> FieldLines::getVisibleFieldObjects() const {
+  vector <const VisualFieldObject*> visibleObjects;
   for (int i = 0; i < 6; ++i) {
-    if (allFieldObjects[i]->getDist() > 0 && 
+    if (allFieldObjects[i]->getDist() > 0 &&
         // We don't want to identify corners based on posts that aren't sure,
         // for instance
         allFieldObjects[i]->getCertainty() == SURE) {
@@ -3707,7 +3707,7 @@ vector <const FieldObjects*> FieldLines::getVisibleFieldObjects() const {
 #elif ROBOT(NAO)
       // With the Nao we need to make sure that the goal posts are near the
       // green of the field in order to use them for distance
-      if (FieldObjects::isGoal(allFieldObjects[i]) && 
+      if (ConcreteFieldObject::isGoal(allFieldObjects[i]->getID()) &&
           !(goalSuitableForPixEstimate(allFieldObjects[i]))) {
         // We can't use it.
       }
@@ -3723,10 +3723,10 @@ vector <const FieldObjects*> FieldLines::getVisibleFieldObjects() const {
 }
 
 
-// Calculates the angle (in degrees) on the field between line1 and line2, 
-// given that they meet at intersectX, intersectY.  
+// Calculates the angle (in degrees) on the field between line1 and line2,
+// given that they meet at intersectX, intersectY.
 // See the Wiki for more information
-double FieldLines::getEstimatedAngle(const VisualLine &line1, 
+double FieldLines::getEstimatedAngle(const VisualLine &line1,
                                      const VisualLine &line2,
                                      const int intersectX,
                                      const int intersectY) const {
@@ -3735,7 +3735,7 @@ double FieldLines::getEstimatedAngle(const VisualLine &line1,
   if (debugEstimatedAngle) {
     cout << "Attempting to find the angle between the " << line1.colorStr
          << "line and the " << line2.colorStr << " line on the field, which "
-         << "have an intersection at (" << intersectX << ", " << intersectY 
+         << "have an intersection at (" << intersectX << ", " << intersectY
          << ")" << endl;
   }
 
@@ -3765,7 +3765,7 @@ double FieldLines::getEstimatedAngle(const VisualLine &line1,
 
   // Convert to field coordinates
   estimate line1EndEst = vision->pose->pixEstimate(line1EndPoint.x,
-                                                   line1EndPoint.y, 
+                                                   line1EndPoint.y,
                                                    0);
 
   estimate line2EndEst = vision->pose->pixEstimate(line2EndPoint.x,
@@ -3784,7 +3784,7 @@ double FieldLines::getEstimatedAngle(const VisualLine &line1,
     }
     return BAD_ANGLE;
   }
-  
+
   // Create a vector directed from the corner to the point on line farther
   // from the corner
   pair <double, double> line1Vector(line1EndEst.x - cornerEst.x,
@@ -3795,20 +3795,20 @@ double FieldLines::getEstimatedAngle(const VisualLine &line1,
 
   // By this point, we now have the actual vector representations of the lines
   // and can calculate theta
-  double dotProduct = 
+  double dotProduct =
     line1Vector.first * line2Vector.first +
     line1Vector.second * line2Vector.second;
-    
+
   // sqrt of dot product with itself
-  double lengthOfVector1 = 
-    Utility::getLength(line1EndEst.x, line1EndEst.y, 
+  double lengthOfVector1 =
+    Utility::getLength(line1EndEst.x, line1EndEst.y,
                        cornerEst.x, cornerEst.y);
 
-  double lengthOfVector2 = 
-    Utility::getLength(line2EndEst.x, line2EndEst.y, 
+  double lengthOfVector2 =
+    Utility::getLength(line2EndEst.x, line2EndEst.y,
                        cornerEst.x, cornerEst.y);
-  
-  // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta 
+
+  // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
   // -> ...
   double theta = DEG_OVER_RAD * acos(dotProduct/
                                      (lengthOfVector1 * lengthOfVector2));
@@ -3820,10 +3820,10 @@ double FieldLines::getEstimatedAngle(const VisualLine &line1,
 // lines, then calculates the dot product between the two vectors.  Returns
 // the angle between the lines, in degrees
 double FieldLines::getEstimatedAngle(const VisualCorner &corner) const {
-  return getEstimatedAngle(corner.getLine1(), corner.getLine2(), 
+  return getEstimatedAngle(corner.getLine1(), corner.getLine2(),
                            corner.getX(), corner.getY());
 }
-  
+
 
 // Estimates how long the line is on the field
 double FieldLines::getEstimatedLength(const VisualLine &line) const {
@@ -3834,10 +3834,10 @@ double FieldLines::getEstimatedLength(const VisualLine &line) const {
 // between them, on the field
 double FieldLines::getEstimatedDistance(const point<int> &point1,
                                         const point<int> &point2) const{
-  
+
   estimate point1Est = pose->pixEstimate(point1.x, point1.y, 0);
   estimate point2Est = pose->pixEstimate(point2.x, point2.y, 0);
-  
+
   double point1Dist = point1Est.dist;
   double point2Dist = point2Est.dist;
   // We cannot accurately calculate the distance because the pix estimate
@@ -3852,20 +3852,20 @@ double FieldLines::getEstimatedDistance(const point<int> &point1,
 // field object.
 // If the field object is very close (<100 cm away) we can use pose to estimate
 // bearing and distance to the field object rather than the distance and bearing
-// provided by the FieldObjects obj itself.
-double FieldLines::getEstimatedDistance(const VisualCorner *c, 
-                                        const FieldObjects *obj) const {
+// provided by the VisualFieldObject obj itself.
+double FieldLines::getEstimatedDistance(const VisualCorner *c,
+                                        const VisualFieldObject *obj) const {
   double objDist, objBearing;
   string typeOfEstimate;
 
   estimate cornerEst = vision->pose->pixEstimate(c->getX(), c->getY(), 0);
 
-  fieldObjectID id = obj->getID();
+  //fieldObjectID id = obj->getID();
 
   int midX = (obj->getLeftBottomX() + obj->getRightBottomX()) / 2;
   int midBottomY = (obj->getLeftBottomY() + obj->getRightBottomY()) / 2;
-  
-  bool isGoal = FieldObjects::isGoal(obj);
+
+  bool isGoal = ConcreteFieldObject::isGoal(obj->getID());
   bool pixEstimate = false;
 
   // With new regression, cannot trust pix estimates that are not right on
@@ -3875,20 +3875,20 @@ double FieldLines::getEstimatedDistance(const VisualCorner *c,
       // pix estimate
       // TODO: named constant
                  Utility::getLength(midX, midBottomY, c->getX(), c->getY()) < 15)) {
-   
+
     typeOfEstimate = "Pose Pix Estimate";
     pixEstimate = true;
     // We pass in an x, y, and z (height from the ground) which we change
     // based on the type of object
-    estimate objBottomEst = 
+    estimate objBottomEst =
       pose->pixEstimate(midX, midBottomY,
-                        FieldObjects::getHeightFromGround(obj->getID()));
+                        ConcreteFieldObject::getHeightFromGround(obj->getID()));
     objDist = objBottomEst.dist;
     // Keep the bearing positive in this case as it matches the coordinate
     // system of the corner bearing
     objBearing = objBottomEst.bearing * RAD_OVER_DEG;
   }
-    
+
   else {
     typeOfEstimate = "FieldObjects getDistance()";
     objDist = obj->getDist();
@@ -3896,7 +3896,7 @@ double FieldLines::getEstimatedDistance(const VisualCorner *c,
     // the negative of the corner bearing
     objBearing = -obj->getBearing() * RAD_OVER_DEG;
   }
-  
+
   double cornerDist = c->getDistance();
   // Convert degrees to radians for the sin/cos formulas
   double cornerBearing = c->getBearing() * RAD_OVER_DEG;
@@ -3904,31 +3904,31 @@ double FieldLines::getEstimatedDistance(const VisualCorner *c,
   // We want the objY to always be Positive because it is away from your body
   double cornerX = cornerDist * sin(cornerBearing);
   double cornerY = cornerDist * cos(cornerBearing);
-  
+
   // We want the objY to always be Positive because it is away from your body
   double objX = objDist * sin(objBearing);
   double objY = objDist * cos(objBearing);
 
   double diffX = objX - cornerX;
   double diffY = objY - cornerY;
- 
+
   double dist = sqrt(diffX * diffX + diffY * diffY);
-   
+
   if (debugCornerAndObjectDistances) {
     cout << endl
-         << "////////////////////////////////////////////////////////////" 
+         << "////////////////////////////////////////////////////////////"
          << endl;
     cout << "Using " << typeOfEstimate << " for distance estimate." << endl;
     cout << "Corner: " << *c << endl;
     cout << "CornerX: " << cornerX << "\tCornerY: " << cornerY << endl;
-    cout << obj->toString() << " dist: " << objDist << "\tbearing: " 
+    cout << obj->toString() << " dist: " << objDist << "\tbearing: "
          << objBearing * DEG_OVER_RAD << endl;
     cout << obj->toString() << ".x = "<< objX << ", .y =" << objY << endl;
     cout << "DiffX: " << diffX << "\tDiffY" << diffY << endl;
     cout << "Distance: " << dist << endl;
 
     cout << endl
-         << "////////////////////////////////////////////////////////////" 
+         << "////////////////////////////////////////////////////////////"
          << endl;
   }
   // Temporary hack - see Goalie/Leo/103.FRM
@@ -3944,14 +3944,14 @@ double FieldLines::getEstimatedDistance(const VisualCorner *c,
 
 // Returns true if the line segment directed from first to second intersects
 // any VisualLines identified on the screen.
-const bool FieldLines::intersectsFieldLines(const point<int>& first, 
+const bool FieldLines::intersectsFieldLines(const point<int>& first,
                                             const point<int>& second) const {
-  
+
   const vector <VisualLine> * lines = getLines();
-  
-  for (vector <VisualLine>::const_iterator i = lines->begin(); 
+
+  for (vector <VisualLine>::const_iterator i = lines->begin();
        i != lines->end(); ++i) {
-    // Returns true if the line segments (first, second) (i->start, i->end) 
+    // Returns true if the line segments (first, second) (i->start, i->end)
     // intersect
     if (Utility::intersectProp(first, second, i->start, i->end)) {
       return true;
@@ -3962,17 +3962,17 @@ const bool FieldLines::intersectsFieldLines(const point<int>& first,
 
 
 
-/* 
-   FIELD LINE HELPER/SUB METHODS 
+/*
+   FIELD LINE HELPER/SUB METHODS
 */
 
-// filter out double corners found in the same spot 
+// filter out double corners found in the same spot
 // normally happens with overlapping vertically/hor found lines
 // returns true if corner already exists near spot, false otherwise
-const bool FieldLines::dupeCorner(const list<VisualCorner> &corners, 
+const bool FieldLines::dupeCorner(const list<VisualCorner> &corners,
                                   const int x, const int y,
                                   const int testNumber) const {
-  for (list<VisualCorner>::const_iterator i = corners.begin(); 
+  for (list<VisualCorner>::const_iterator i = corners.begin();
        i != corners.end(); ++i) {
     if (abs(x - i->getX()) < DUPE_MIN_X_SEPARATION &&
         abs(y - i->getY()) < DUPE_MIN_Y_SEPARATION) {
@@ -3992,22 +3992,22 @@ const bool FieldLines::dupeCorner(const list<VisualCorner> &corners,
 // and divides by the total number of pixels it was able to test in order to
 // determine the percent of the immediate area which match the colors array.
 // Note:  The percentage is converted from 0 <= x <= 1 into 0 <= x <= 100.
-// Additionally, the test area will not necessarily be a square if the test 
+// Additionally, the test area will not necessarily be a square if the test
 // pixel is at the edge of the screen and testing the entire square would
 // cause us to test outside of the image.
-const double FieldLines::percentSurrounding(const int x, const int y, 
+const double FieldLines::percentSurrounding(const int x, const int y,
                                             const int colors[],
                                             const int numColors,
                                             const int numPixels) const {
-  
-  if (!Utility::isPointOnScreen(x, y)) { 
+
+  if (!Utility::isPointOnScreen(x, y)) {
     cout << "("<< x << ", " << y << ")" << endl;
     cout << "Pixel passed to percentSurrounding was off the screen" << endl;
     return 0;
   }
   else if (numPixels <= 0) {
     cout << numPixels << endl;
-    cout << "numPixels argument in percentSurrounding must be positive, got " 
+    cout << "numPixels argument in percentSurrounding must be positive, got "
          << numPixels << endl;
   }
 
@@ -4022,7 +4022,7 @@ const double FieldLines::percentSurrounding(const int x, const int y,
   int numFound = 0;
   for (int i = startX; i <= endX; ++i) {
     for (int j = startY; j <= endY; ++j) {
-      // Search for the color at that pixel within the vector of acceptable 
+      // Search for the color at that pixel within the vector of acceptable
       // colors
       for (int k = 0; k < numColors; ++k) {
         if (colors[k] == vision->thresh->thresholded[j][i]) {
@@ -4033,12 +4033,12 @@ const double FieldLines::percentSurrounding(const int x, const int y,
     }
   }
   int totalPixels = (endX - startX + 1) * (endY - startY + 1);
-  return (static_cast<double> (numFound) / 
+  return (static_cast<double> (numFound) /
           static_cast<double> (totalPixels)) * 100.0;
 }
 
 // Alternative form of percent surrounding that uses points.
-const double FieldLines::percentSurrounding(const point<int> &p, 
+const double FieldLines::percentSurrounding(const point<int> &p,
                                             const int colors[],
                                             const int numColors,
                                             const int numPixels) const {
@@ -4051,10 +4051,10 @@ const double FieldLines::percentSurrounding(const point<int> &p,
 // and divides by the total number of pixels it was able to test in order to
 // determine the percent of the immediate area which match the colors array.
 // Note:  The percentage is converted from 0 <= x <= 1 into 0 <= x <= 100.
-// Additionally, the test area will not necessarily be a square if the test 
+// Additionally, the test area will not necessarily be a square if the test
 // pixel is at the edge of the screen and testing the entire square would
 // cause us to test outside of the image.
-const double FieldLines::percentSurrounding(const int x, const int y, 
+const double FieldLines::percentSurrounding(const int x, const int y,
                                             const int color,
                                             const int numPixels) const {
   const int colors[] = {color};
@@ -4063,7 +4063,7 @@ const double FieldLines::percentSurrounding(const int x, const int y,
 
 
 // Tests all pixels on the line between (x1, y1) and (x2, y2) for thresholded
-// values in the colors[] array.  
+// values in the colors[] array.
 // Returns the percent of the pixels along the line that are found within
 // the colors array; always returns a number between 0 and 100.0.
 // Preconditions:  (x1, y1) and (x2, y2) are valid coordinates in our image
@@ -4075,13 +4075,13 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
 }
 
 // Tests all pixels on the line between (x1, y1) and (x2, y2) for thresholded
-// values in the colors[] array.  
+// values in the colors[] array.
 // Returns the percent of the pixels along the line that are found within
 // the colors array; always returns a number between 0 and 100.0.
 // Preconditions:  (x1, y1) and (x2, y2) are valid coordinates in our image
 const double FieldLines::percentColorBetween(const int x1, const int y1,
                                              const int x2, const int y2,
-                                             const int colors[], 
+                                             const int colors[],
                                              const int numColors) const {
   int totalPixels = 0;
   int numFound = 0;
@@ -4089,7 +4089,7 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
   // Vertical line
   if (x2 == x1) {
     int sign = 1;
-    if (y2 < y1) 
+    if (y2 < y1)
       sign = -1;
     for (int j = y1; j != y2; j += sign, ++totalPixels) {
       if (Utility::isElementInArray(vision->thresh->thresholded[j][x2],
@@ -4099,11 +4099,11 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
     }
   }
   else {
-    
-    double slope = static_cast<double>(y2 - y1) / 
+
+    double slope = static_cast<double>(y2 - y1) /
       static_cast<double>(x2 - x1);
     int sign = 1;
-    
+
     if ((abs(y2 - y1)) > (abs(x2 - x1))) {
       slope = 1.0 / slope;
       if (y1 > y2) sign = -1;
@@ -4111,7 +4111,7 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
         ++totalPixels;
         int newx = x1 + (int)(slope * (i - y1));
         if (Utility::isElementInArray(vision->thresh->thresholded[i][newx],
-                                      colors, numColors)) 
+                                      colors, numColors))
           ++numFound;
       }
     }
@@ -4123,7 +4123,7 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
         ++totalPixels;
         int newy = y1 + (int)(slope * (i - x1));
         if (Utility::isElementInArray(vision->thresh->thresholded[newy][i],
-                                      colors, numColors)) 
+                                      colors, numColors))
           ++numFound;
       }
     }
@@ -4134,18 +4134,18 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
       for (int i = startX; i <= endX; ++i) {
         ++totalPixels;
         if (Utility::isElementInArray(vision->thresh->thresholded[y2][i],
-                                      colors, numColors)) 
+                                      colors, numColors))
           ++numFound;
       }
     }
   }
-  
-  return static_cast<double> (numFound) / 
+
+  return static_cast<double> (numFound) /
     static_cast<double> (totalPixels) * 100.0;
 }
 
 
-const double FieldLines::percentColor(const int x, const int y, 
+const double FieldLines::percentColor(const int x, const int y,
                                       const TestDirection dir,
                                       const int colors[], const int numColors,
                                       const int numPixels) const {
@@ -4196,7 +4196,7 @@ const double FieldLines::percentColor(const int x, const int y,
  */
 const double FieldLines::percentColor(const int x, const int y,
                                       const TestDirection dir,
-                                      const int color, 
+                                      const int color,
                                       const int numPixels) const {
   const int colors[] = {color};
   return percentColor(x, y, dir, colors, 1, numPixels);
@@ -4216,7 +4216,7 @@ void FieldLines::drawLinePoint(const linePoint &p, const int color) const {
   vision->thresh->drawPoint(p.x, p.y, color);
 }
 
-void FieldLines::updateLineCounters(const int threshColor, int &numWhite, 
+void FieldLines::updateLineCounters(const int threshColor, int &numWhite,
                                     int &numUndefined, int &numNonWhite) {
   if (isLineColor(threshColor)) {
     ++numWhite;
@@ -4243,14 +4243,14 @@ bool FieldLines::countersHitSanityChecks(const int numWhite,
                                          const int numNonWhite,
                                          const bool print) const {
   if (numNonWhite > NUM_NON_WHITE_SANITY_CHECK ||
-      numUndefined > NUM_UNDEFINED_SANITY_CHECK) { 
+      numUndefined > NUM_UNDEFINED_SANITY_CHECK) {
     if (print) {
       if (numNonWhite > NUM_NON_WHITE_SANITY_CHECK) {
         printf("\t\t\t -numNonWhite hit sanity check\n");
       }
       if (numUndefined > NUM_UNDEFINED_SANITY_CHECK) {
         printf("\t\t\t - numUndefined hit sanity check\n");
-      }      
+      }
     }
     return true;
   }

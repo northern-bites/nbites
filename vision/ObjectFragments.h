@@ -12,7 +12,9 @@ using namespace std;
 
 class ObjectFragments; // forward reference
 #include "Threshold.h"
-#include "FieldObjects.h"
+//#include "FieldObjects.h"
+#include "VisualFieldObject.h"
+#include "ConcreteFieldObject.h"
 #include "Ball.h"
 #include "Vision.h"
 
@@ -29,7 +31,7 @@ class ObjectFragments; // forward reference
 static const int NOPOST = 0;   // don't know which
 static const int RIGHT = 1;
 static const int LEFT = 2;
-static const int USEBIG = 3;   // 
+static const int USEBIG = 3;   //
 static const int BACKSTOP = 4;
 static const int MAX_NUM_BALL_RUNS = 500; //never use this!
 static const int BALL_RUNS_MALLOC_SIZE = 10000;
@@ -78,10 +80,10 @@ static const double QUESTIONABLEPOST = 0.85;
 #if ROBOT(NAO)
 static const int SMALLBALLDIM = 8;                 // below this size balls are considered small
 #else
-static const int SMALLBALLDIM = 10; 
+static const int SMALLBALLDIM = 10;
 #endif
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
-static const double BALLTOOFAT = 1.5;               // ratio of width/height worse than this is a very bad sign 
+static const double BALLTOOFAT = 1.5;               // ratio of width/height worse than this is a very bad sign
 static const double BALLTOOTHIN = 0.75;             // ditto
 static const double OCCLUDEDTHIN = 0.2;             // however, if the ball is occluded we can go thinner
 static const double OCCLUDEDFAT = 4.0;              // or fatter
@@ -131,8 +133,8 @@ static const bool CORRECT = false;
 static const bool OPENFIELD = false;
 #endif
 
-//a blob structure that holds information about its own location, and information
-//involving its larger blob structure
+// a blob structure that holds information about its own location, and
+// information involving its larger blob structure
 struct blob {
   // bounding coordinates of the blob
   point <int> leftTop;
@@ -174,7 +176,7 @@ class ObjectFragments {
 
   // SETTERS
   void setColor(int c);
- 
+
   // Making object
   void init(double s);
 
@@ -183,7 +185,7 @@ class ObjectFragments {
   void getWidest();
   void zeroTheBlob(int which);
   void mergeBlobs(int first, int second);
-  void blobIt(int x, int y, int h); 
+  void blobIt(int x, int y, int h);
   void newRun(int x, int endY, int height);
   int blobArea(blob a);
   int blobWidth(blob a);
@@ -209,11 +211,16 @@ class ObjectFragments {
   int xProject(int startx, int starty, int newx);
   int xProject(point <int> point, int newx);
   void vertScan(int x, int y, int dir, int stopper, int c, int c2);
-  void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l, int r);
-  int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2, bool left);
-  int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2, bool up);
-  void findTrueLineVerticalSloped(point <int>& top, point <int>& bottom, int c, int c2, bool left);
-  void findTrueLineHorizontalSloped(point <int>& left, point <int>& right, int c, int c2, bool up);
+  void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
+                      int r);
+  int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2,
+                           bool left);
+  int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2,
+                             bool up);
+  void findTrueLineVerticalSloped(point <int>& top, point <int>& bottom, int c,
+                                  int c2, bool left);
+  void findTrueLineHorizontalSloped(point <int>& left, point <int>& right,
+                                    int c, int c2, bool up);
   bool checkEdge(int x, int y, int x1, int y1);
   int horizonAt(int x);
 
@@ -236,10 +243,13 @@ class ObjectFragments {
   bool beaconCheck(int a, int c, int d, int e);
   bool processBeacon(int l, int r, int x, int y, bool yellowOnTop, bool normal);
   void expandSpot(int x1, int y1, int dir, int c, int c2, int c3, int c4);
-  void findSpot(int x, int y, int x2, int y2, int dir, int c, int c2, int c3, int c4, int cases);
-  bool setCorners(int leftx, int lefty, int rightx, int righty, int c, int c2, int c3, int c4, FieldObjects* post);
-  void findCorner(int oneX, int oneY, int dir, int myHeight, double check, int x, int y, int stopper, int c, int c2);
-  bool inferBeaconFromBlob(blob b, FieldObjects* post);
+  void findSpot(int x, int y, int x2, int y2, int dir, int c, int c2, int c3
+                int c4, int cases);
+  bool setCorners(int leftx, int lefty, int rightx, int righty, int c, int c2,
+                  int c3, int c4, VisualFieldObject* post);
+  void findCorner(int oneX, int oneY, int dir, int myHeight, double check,
+                  int x, int y, int stopper, int c, int c2);
+  bool inferBeaconFromBlob(blob b, VisualFieldObject* post);
 #endif
 
   // miscelaneous goal processing  methods
@@ -250,11 +260,11 @@ class ObjectFragments {
   int checkIntersection(blob b);
   int checkCorners(blob b);
   int getBigRun(int left, int right, int hor);
-  bool updateObject(FieldObjects* a, blob b, int certainty, int dc);
-  void updateRobot(FieldObjects* a, blob b);
-  bool updateArc(FieldObjects* a, blob b, int sawGoal);
+  bool updateObject(VisualFieldObject* a, blob b, int certainty, int dc);
+  void updateRobot(VisualFieldObject* a, blob b);
+  bool updateArc(VisualFieldObject* a, blob b, int sawGoal);
   int checkDist(int left, int right, int top, int bottom);
-  void updateBackstop(FieldObjects* a, blob b);
+  void updateBackstop(VisualFieldObject* a, blob b);
 
   // post recognition routines
 #if ROBOT(NAO)
@@ -263,13 +273,15 @@ class ObjectFragments {
   int triangle(blob b);
 #elif ROBOT(AIBO)
   int checkPostBlob(blob b, blob s);
-  bool contains(blob b, blob s, int c, int c2, FieldObjects* left, FieldObjects* right, FieldObjects* mid);
+  bool contains(blob b, blob s, int c, int c2, VisualFieldObject* left,
+                VisualFieldObject* right, VisualFieldObject* mid);
   bool inBlob(blob b, int x, int y, int h);
   void makeBoxes(int sx, int xy, int hb);
-  bool checkPostAndBlob(double rat, bool postFound, int c, int c2, 
-			int horizon, FieldObjects* left, FieldObjects* mid, 
-			FieldObjects* right, blob post, blob big);
-  int projectBoxes(int spanX, int spanY, int howbig, int fakeBottom, int trueRight, int trueLeft, int trueTop);
+  bool checkPostAndBlob(double rat, bool postFound, int c, int c2,
+			int horizon, VisualFieldObject* left, VisualFieldObject* mid,
+			VisualFieldObject* right, blob post, blob big);
+  int projectBoxes(int spanX, int spanY, int howbig, int fakeBottom,
+                   int trueRight, int trueLeft, int trueTop);
   int determineRelationship(blob b, blob s);
 #endif
   int scanOut(int stopp, int spanX, int c);
@@ -278,20 +290,24 @@ class ObjectFragments {
   int  scanLogic(int howbig);
 
   // shooting
-  void setShot(FieldObjects * one);
-  void bestShot(FieldObjects * one, FieldObjects * two, FieldObjects * three);
+  void setShot(VisualFieldObject * one);
+  void bestShot(VisualFieldObject * one, VisualFieldObject * two,
+                VisualFieldObject * three);
   void openDirection(int h, Pose *p);
 
-  int classifyFirstPost(int horizon, int c, int c2, bool postFound, 
-			FieldObjects* left, FieldObjects* right, FieldObjects* mid);
+  int classifyFirstPost(int horizon, int c, int c2, bool postFound,
+                        VisualFieldObject* left, VisualFieldObject* right,
+                        VisualFieldObject* mid);
 
   // the big kahuna
-  void goalScan(FieldObjects* left, FieldObjects* mid, FieldObjects* right, int c, int c2, bool post, int horizon);
+  void goalScan(VisualFieldObject* left, VisualFieldObject* mid,
+                VisualFieldObject* right, int c, int c2, bool post,
+                int horizon);
   int grabPost(int c, int c2, int horizon, int left, int right);
-  void postSwap(FieldObjects * p1, FieldObjects * p2);
+  void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
   void transferToChecker(blob b);
   void transferToPole();
-  void transferTopBlob(FieldObjects * one, int cert, int dc);
+  void transferTopBlob(VisualFieldObject * one, int cert, int dc);
   void transferBlob(blob from, blob & to);
 
   // ball stuff
@@ -311,7 +327,8 @@ class ObjectFragments {
   bool rightBlobColor(blob obj, double per);
   void screenCrossbar();
   bool postBigEnough(blob b);
-  bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right, int bottom, int top);
+  bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
+                       int bottom, int top);
   bool horizonTopOk(int top, int hor);
   bool postRatiosOk(double ratio);
   bool secondPostFarEnough(point <int> l1, point <int> r1,
@@ -337,7 +354,7 @@ class ObjectFragments {
   void drawBlob(blob b, int c);
   void drawLine(int x, int y, int x1, int y1, int c);
   void printBlob(blob b);
-  void printObject(FieldObjects * objs);
+  void printObject(VisualFieldObject * objs);
   void paintRun(int x,int y, int h, int c);
   void drawRun(const run& run, int c);
   void drawLess(int x, int y, int c);
@@ -424,7 +441,7 @@ class ObjectFragments {
   int numberOfRuns;
   int indexOfBiggestRun;
   run* runs;
- 
+
   blob topBlob, secondBlob, crossBlob;
   int numBlobs;
   blob checker, obj, pole, leftBox, rightBox;
@@ -462,7 +479,7 @@ class ObjectFragments {
  bool CORRECT;
  bool OPENFIELD;
 #endif
-  
+
 };
 
 #endif // ObjectFragments_h_DEFINED

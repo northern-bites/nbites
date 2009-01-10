@@ -21,7 +21,9 @@
 class Vision;   // forward reference
 
 // including Class header files
-#include "FieldObjects.h"
+// #include "FieldObjects.h"
+#include "VisualFieldObject.h"
+#include "ConcreteFieldObject.h"
 #include "Ball.h"
 #include "Threshold.h"
 #include "Pose.h"
@@ -34,7 +36,7 @@ using namespace std;
 // helper method for deflate() for shifting bits for bit-wise compression
 inline static void setBit(unsigned char &b, int pos, int value) {
   b = (int) b | (value << pos);
-} 
+}
 
 
 class Vision
@@ -44,7 +46,7 @@ class Vision
   public:
     Vision(Pose *_pose, Profiler *_prof);
     virtual ~Vision();
-    
+
     // Main Vision methods
     //   virtual, to allow overloading
     // copy the data from the given image into the static image pointer
@@ -59,7 +61,7 @@ class Vision
 
     // visualization methods
     virtual void drawBoxes(void);
-    virtual void drawFieldObject(FieldObjects* obj, int color);
+    virtual void drawFieldObject(VisualFieldObject* obj, int color);
     virtual void drawBox(int left, int right, int bottom, int top, int c);
     virtual void drawCenters(void);
     virtual void drawRect(int left, int top, int width, int height, int c);
@@ -73,22 +75,22 @@ class Vision
     virtual void drawDot(int x, int y, int c);
     virtual void drawCrossHairs(int x, int y, int c);
     virtual void drawFieldLines();
-    
-  
+
+
     //
     // SETTERS
     //
-  
+
     // profiling
     inline void setTimeThresholding(long _t) { timeThresholding = _t; }
     inline void setTimeObject(long _o) { timeObject = _o; }
     inline void setTimeLines(long _l) { timeLines = _l; }
-  
+
     inline void setColorTablePath(std::string path) { colorTable = path; }
     inline void setPlayerNumber(int n) { player = n; }
     inline void setDogID(int _id) { id = _id; }
     inline void setRobotName(std::string _name) { name = _name; }
-    
+
     //
     // GETTERS
     //
@@ -99,7 +101,7 @@ class Vision
     inline long getTimeObject() { return timeObject; }
     inline long getTimeLines() { return timeLines; }
 
-  
+
     // information
     inline int getDogID() { return id; }
     std::string getRobotName();
@@ -113,15 +115,15 @@ class Vision
     //
     // Public Variables
     //
-    
+
     // OBJECT RECOGNITION VARIABLES
     // Field Object pointers
-    FieldObjects *bgrp, *bglp, *bgBackstop;
-    FieldObjects *ygrp, *yglp, *ygBackstop;
-    FieldObjects *by, *yb;
-    FieldObjects *blueArc, *yellowArc;
-    FieldObjects *red1, *red2;
-    FieldObjects *navy1, *navy2;
+    VisualFieldObject *bgrp, *bglp, *bgBackstop;
+    VisualFieldObject *ygrp, *yglp, *ygBackstop;
+    VisualFieldObject *by, *yb;
+    VisualFieldObject *blueArc, *yellowArc;
+    VisualFieldObject *red1, *red2;
+    VisualFieldObject *navy1, *navy2;
     Ball *ball;
 #ifdef USE_PINK_BALL
     Ball *pinkBall; //added for pink ball recognition
@@ -140,7 +142,7 @@ class Vision
     //
     // Protected Variable
     //
-    
+
 
     // PROFILING VARIABLES
     // time counters

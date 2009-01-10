@@ -3,9 +3,9 @@
 
 // System includes
 #include <cmath>                       // use fabs, max, min
-#include <vector>                      //  
-#include <list>                        // 
-#include <sstream>                     // 
+#include <vector>                      //
+#include <list>                        //
+#include <sstream>                     //
 #include <iomanip> // setprecision for cout
 
 using namespace std;
@@ -61,14 +61,15 @@ enum TestDirection {TEST_UP, TEST_DOWN, TEST_LEFT, TEST_RIGHT};
 struct linePoint;
 
 
-#include "Common.h"                    // 
-#include "ifdefs.h"                    //
-#include "FieldObjects.h"              //
-#include "ConcreteCorner.h"            //
-#include "VisualCorner.h"              //
+#include "Common.h"                   //
+#include "ifdefs.h"                   //
+#include "VisualFieldObject.h"        //
+#include "ConcreteFieldObject.h"        //
+#include "ConcreteCorner.h"           //
+#include "VisualCorner.h"             //
 #include "VisualLine.h"
-#include "Utility.h"                   //
-#include "Pose.h"                      // Used to estimate distances in the image
+#include "Utility.h"                  //
+#include "Pose.h"                     // Used to estimate distances in the image
 
 #include "Vision.h"
 
@@ -78,7 +79,7 @@ class lineInCorner : public unary_function<VisualLine, bool> {
   VisualCorner c;
  public:
   explicit lineInCorner(const VisualCorner& _c) : c(_c) { }
-  bool operator() (const VisualLine& line) const { 
+  bool operator() (const VisualLine& line) const {
     return c.getLine1() == line || c.getLine2() == line;
   }
 };
@@ -114,7 +115,7 @@ static const Rectangle SCREEN = {0, IMAGE_WIDTH - 1,
 typedef list<linePoint>::iterator linePointNode;
 
 class FieldLines {
- private: 
+ private:
 
 
   // Miscellaneous
@@ -124,7 +125,7 @@ class FieldLines {
   ////////////////////////////////////////////////////////////
   // Constants
   // Used in vert and horizontal edge detect
-  
+
   // Change in Y channel value over one pixel necessary to constitute an edge
   static const int VERTICAL_TRANSITION_VALUE = 30;
   static const int HORIZONTAL_TRANSITION_VALUE = 30;
@@ -143,15 +144,15 @@ class FieldLines {
   static const int NUM_WHITE_COLORS = 2;
   static const int LINE_COLORS[NUM_WHITE_COLORS];
   static const int NUM_LINE_COLORS = NUM_WHITE_COLORS;
-  
+
   // Number of columns in which to search for line points
   static const int NUM_COLS_TO_TEST = 20;
   // Number of rows in which to search for line points
   static const int NUM_ROWS_TO_TEST = 20;
-  // Number of pixels to skip between columns in image when searching for 
+  // Number of pixels to skip between columns in image when searching for
   // linepoints vertically
   static const int COL_SKIP = IMAGE_WIDTH / NUM_COLS_TO_TEST;
-  // Number of pixels to skip between rows in image when searching for 
+  // Number of pixels to skip between rows in image when searching for
   // linepoints horizontally
   static const int ROW_SKIP = IMAGE_HEIGHT / NUM_ROWS_TO_TEST;
   // AIBOSPECIFIC
@@ -159,7 +160,7 @@ class FieldLines {
   // image and so we fudge a little and scan higher when searching for
   // line points
   static const int PIXELS_TO_USE_ABOVE_HORIZON = 10;
-  
+
   // percentage of pixels needed to be green on either side of the line
   static const int GREEN_PERCENT_CLEARANCE = 40;
 
@@ -171,7 +172,7 @@ class FieldLines {
   static const int NUM_NON_WHITE_SANITY_CHECK = 3;
   static const int NUM_UNDEFINED_SANITY_CHECK = 5;
 
-  
+
   ////////////////////////////////////////////////////////////
   // Create Lines Constants
   ////////////////////////////////////////////////////////////
@@ -181,7 +182,7 @@ class FieldLines {
    // AIBOSPECIFIC (distance in pixels)
   static const int MIN_SEPARATION_TO_NOT_CHECK = 20;
    // AIBOSPECIFIC
-  // Two line points must have at least this Euclidean distance between 
+  // Two line points must have at least this Euclidean distance between
   // them in order for us to check their angle
   static const int MIN_PIXEL_DIST_TO_CHECK_ANGLE = 2;
 
@@ -191,19 +192,19 @@ class FieldLines {
   static const int MAX_ANGLE_LINE_SEGMENT = 8;
 #elif ROBOT(NAO)
   static const int MAX_ANGLE_LINE_SEGMENT = 4;
-#endif  
+#endif
 
 
   static const int MAX_GREEN_PERCENT_ALLOWED_IN_LINE = 15;
 
   // AIBO_SPECIFIC
   static const int MAX_LINE_WIDTH_DIFFERENCE = 5; // FIXME chosen randomly
-  
+
   // max number of pixels offset to connect two points in createLines
   static const int GROUP_MAX_X_OFFSET = static_cast<int>(.30 * IMAGE_WIDTH);
   // max number of pixels offset to connect two y points
   static const int GROUP_MAX_Y_OFFSET = static_cast<int>(.20 * IMAGE_WIDTH);
- 
+
   ////////////////////////////////////////////////////////////
   // Join Lines Constants
   ////////////////////////////////////////////////////////////
@@ -217,7 +218,7 @@ class FieldLines {
   static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 15;
 #endif
 
-  
+
   ////////////////////////////////////////////////////////////
   // Fit Unused Points Constants
   ////////////////////////////////////////////////////////////
@@ -239,10 +240,10 @@ class FieldLines {
   static const int MAX_NUM_DUPES = 0;
 
   // The bounding box extends ~40 pixels on either side parallel to the line
-  static const int INTERSECT_MAX_PARALLEL_EXTENSION = 
+  static const int INTERSECT_MAX_PARALLEL_EXTENSION =
     static_cast<int>(.2 * IMAGE_WIDTH);
   // the bounding box extends 10 pixels on either side perpendicular to the line
-  static const int INTERSECT_MAX_ORTHOGONAL_EXTENSION = 
+  static const int INTERSECT_MAX_ORTHOGONAL_EXTENSION =
     static_cast<int>(.05 * IMAGE_WIDTH);
   // for dupeCorner() checks
   static const int DUPE_MIN_X_SEPARATION = 15;
@@ -268,7 +269,7 @@ class FieldLines {
   // AIBOSPECIFIC
   static const int MIN_CROSS_EXTEND = 10;
   // When estimating the angle between two lines on the field, anything less than
-  // MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect and 
+  // MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect and
   // disallowed; ideally our estimates would always be 90.0 degrees
 #if ROBOT(NAO)
   static const int MIN_ANGLE_ON_FIELD = 70;
@@ -279,13 +280,13 @@ class FieldLines {
   // AIBOSPECIFIC
   static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
 
-  
+
 
   ////////////////////////////////////////////////////////////
   // Center circle check constants
   ////////////////////////////////////////////////////////////
   // AIBOSPECIFIC
-  // Given limitations of Aibo cam, we do not see more than 4 lines or 
+  // Given limitations of Aibo cam, we do not see more than 4 lines or
   // corners legitimately - only if we're at the center circle.
   static const unsigned int MAX_NUM_LINES = 4;
   static const unsigned int MAX_NUM_CORNERS = 4;
@@ -310,11 +311,11 @@ class FieldLines {
   // AIBOSPECIFIC
   static const int MAX_DIST_ERROR_FOR_CENTER_CIRCLE_DETERMINATION = 50;
 
-  
+
   ////////////////////////////////////////////////////////////
   // Identify corners constants
   ////////////////////////////////////////////////////////////
-  // AIBOSPECIFIC  
+  // AIBOSPECIFIC
   // Distance in centimeters
 #if ROBOT(AIBO)
   static const int MAXIMUM_DIST_TO_USE_PIX_ESTIMATE = 0;
@@ -323,7 +324,7 @@ class FieldLines {
 #endif
   // AIBOSPECIFIC
   static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
-     
+
  public:
 
   FieldLines(Vision *visPtr, Pose *posePtr);
@@ -331,15 +332,15 @@ class FieldLines {
 
   // master loop
   void lineLoop();
-  
+
   // While lineLoop is called before object recognition so that ObjectFragments
   // can make use of VisualLines and VisualCorners, the methods called from
-  // here use FieldObjects and as such must be performed after the 
+  // here use FieldObjects and as such must be performed after the
   // ObjectFragments loop is completed.
   void afterObjectFragments();
 
   // This method populates the points vector with line points it finds in
-  // the image.  A line point ideally occurs in the middle of a line on the 
+  // the image.  A line point ideally occurs in the middle of a line on the
   // screen.  We detect lines via a simple edge detection scheme -
   // a transition from green to white involves a big positive jump in Y channel,
   // while a transition from white to green involves a big negative jump in Y
@@ -352,7 +353,7 @@ class FieldLines {
   void findVerticalLinePoints(vector<linePoint> &vertLinePoints);
 
   // This method populates the points vector with line points it finds in
-  // the image.  A line point ideally occurs in the middle of a line on the 
+  // the image.  A line point ideally occurs in the middle of a line on the
   // screen.  We detect lines via a simple edge detection scheme -
   // a transition from green to white involves a big positive jump in Y channel,
   // while a transition from white to green involves a big negative jump in Y
@@ -367,8 +368,8 @@ class FieldLines {
   // Attempts to create lines out of a list of linePoints.  In order for points
   // to be fit onto a line, they must pass a battery of sanity checks
   vector<VisualLine> createLines(list<linePoint> &linePoints);
-  
-  // Attempts to fit the left over points that were not used within the 
+
+  // Attempts to fit the left over points that were not used within the
   // createLines function to the lines that were output from said function
   void fitUnusedPoints(vector<VisualLine> &lines,
 		       list<linePoint> &remainingPoints);
@@ -376,7 +377,7 @@ class FieldLines {
   // Attempts to join together line segments that are logically part of one
   // longer line but for some reason were not grouped within the groupPoints
   // method.  This can often happen when there is an obstruction that obscures
-  // part of the line; due to x offset sanity checks, points that are too far 
+  // part of the line; due to x offset sanity checks, points that are too far
   // apart are not allowed to be within the same line in createLines.
   void joinLines(vector<VisualLine> &lines);
 
@@ -386,12 +387,12 @@ class FieldLines {
   // Given a vector of lines, attempts to extend the near vertical ones to the
   // top and bottom, and the more horizontal ones to the left and right
   void extendLines(vector<VisualLine> &lines);
-  
-  // Helper method that returns true if the color is one we consider to be 
+
+  // Helper method that returns true if the color is one we consider to be
   // a line color
   static const bool isLineColor(const int color);
 
-  // Helper method that retursn true if the color is one we consider to be a 
+  // Helper method that retursn true if the color is one we consider to be a
   // line color
   static const bool isGreenColor(int threshColor);
 
@@ -402,14 +403,14 @@ class FieldLines {
   void extendLineVertically(VisualLine &line);
 
   // Returns true if the new point trying to be added to the line is offscreen
-  // or  there is too much green in between the old and new point.  Any further 
+  // or  there is too much green in between the old and new point.  Any further
   // searching in this direction would be foolish.
   const bool shouldStopExtendingLine(const int oldX, const int oldY,
                                      const int newX, const int newY) const;
 
   // Given an (x, y) location and a direction (horizontal or vertical) in which
   // to look, attempts to find edges on either side of the (x,y) location.  If
-  // there are no edges, or if another sanity check fails, returns 
+  // there are no edges, or if another sanity check fails, returns
   // VisualLine::DUMMY_LINEPOINT.  Otherwise it returns the linepoint with
   // the correct (x,y) location and width and scan.
   linePoint findLinePointFromMiddleOfLine(int x, int y, ScanDirection dir);
@@ -418,17 +419,17 @@ class FieldLines {
   // middle of a line outward for an edge, in a given direction, up to a max
   // of maxPixelsToSearch.  If no edge is found, returns NO_EDGE.
   const int findEdgeFromMiddleOfLine(int x, int y, int maxPixelsToSearch,
-                                     TestDirection dir) const; 
+                                     TestDirection dir) const;
 
-  // Pairwise tests each line on the screen against each other, calculates 
+  // Pairwise tests each line on the screen against each other, calculates
   // where the intersection occurs, and then subjects the intersection
   // to a battery of sanity checks before determining that the intersection
-  // is a legitimate corner on the field.  
-  // @param lines - the vector of visual lines that have been found after 
+  // is a legitimate corner on the field.
+  // @param lines - the vector of visual lines that have been found after
   // createLines, join lines, and fit unused points.
   // @return a vector of VisualCorners created from the intersection points that
   // successfully pass all sanity checks.
-  // 
+  //
   list<VisualCorner> intersectLines(vector<VisualLine> &lines);
 
   // AIBOSPECIFIC:
@@ -461,24 +462,24 @@ class FieldLines {
   // corner is determined to be a T instead, its shape is changed accordingly).
   void identifyCorners(list<VisualCorner> &corners);
 
-  const bool nearGoalTCornerLocation(const VisualCorner& corner, 
-                                     const FieldObjects * post) const;
+  const bool nearGoalTCornerLocation(const VisualCorner& corner,
+                                     const VisualFieldObject * post) const;
 
-  // Determines if the given L corner does not geometrically make sense for its 
-  // shape given the objects on the screen.  
+  // Determines if the given L corner does not geometrically make sense for its
+  // shape given the objects on the screen.
   const bool LCornerShouldBeTCorner(const VisualCorner &L) const;
 
   // In some Nao frames, robots obscure part of the goal and the bottom is not
   // visible.  We can only use pix estimates of goals whose bottoms are visible
-  const bool goalSuitableForPixEstimate(const FieldObjects * goal) const;
+  const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
 
   // Determine if the L is too close to a beacon to be a real L
   const bool LWorksWithBeacon(const VisualCorner& c,
-                              const FieldObjects * beacon) const;
+                              const VisualFieldObject * beacon) const;
 
   // If it's a legitimate L, the post should be INSIDE of the two lines
   const bool LWorksWithPost(const VisualCorner& c,
-                            const FieldObjects * post) const;
+                            const VisualFieldObject * post) const;
 
   void identifyGoalieCorners(list<VisualCorner> &corners);
 
@@ -491,79 +492,79 @@ class FieldLines {
   // Last sanity checks before localization gets the IDs.  Uses the information
   // about what is visible on the screen to throw out corners that could not
   // be visible.
-  void eliminateImpossibleIDs(VisualCorner &c, 
-                              vector <const FieldObjects*>& visibleObjects,
+  void eliminateImpossibleIDs(VisualCorner &c,
+                              vector <const VisualFieldObject*>& visibleObjects,
                               list <const ConcreteCorner*>& possibleClassifications);
 
   int numPixelsToHitColor(const int x, const int y, const int colors[],
                           const int numColors, const TestDirection testDir) const;
-  int numPixelsToHitColor(const int x, const int y, const int color, 
+  int numPixelsToHitColor(const int x, const int y, const int color,
                           const TestDirection testDir) const;
 
   // Uses the actual objects' locations on the field to calculate straight
   // line distance
-  double getRealDistance(const ConcreteCorner *c, 
-                               const FieldObjects *obj) const;
+  double getRealDistance(const ConcreteCorner *c,
+                               const VisualFieldObject *obj) const;
 
   // Estimates how long the line is on the field
   double getEstimatedLength(const VisualLine &line) const;
-  
+
   // Given two points on the screen, estimates the straight line distance
   // between them, on the field
   double getEstimatedDistance(const point<int> &point1,
                               const point<int> &point2) const;
 
-  // Estimates the distance between the corner and the object based on 
+  // Estimates the distance between the corner and the object based on
   // vectors
-  double getEstimatedDistance(const VisualCorner *c, const FieldObjects *obj) const;
+  double getEstimatedDistance(const VisualCorner *c, const VisualFieldObject *obj) const;
 
   double getEstimatedAngle(const VisualCorner &corner) const;
 
-  double getEstimatedAngle(const VisualLine &line1, 
+  double getEstimatedAngle(const VisualLine &line1,
                            const VisualLine &line2,
                            const int intersectX,
-                           const int intersectY) const; 
-  
-  list <const ConcreteCorner*> 
+                           const int intersectY) const;
+
+  list <const ConcreteCorner*>
     getPossibleClassifications(const VisualCorner &corner,
-                               const vector <const FieldObjects*>
+                               const vector <const VisualFieldObject*>
                                &visibleObjects,
                                const list <const ConcreteCorner*>
                                &concreteCorners) const;
-                          
 
-  double getAllowedDistanceError(FieldObjects const *obj) const;
 
-  
+  double getAllowedDistanceError(VisualFieldObject const *obj) const;
 
- 
-  
+
+
+
+
 
 
   // Return true if it appears the T is out of bounds, false otherwise
   /*
   bool isOutOfBoundsT(corner &t, int i);
   */
-  
+
   const bool dupeCorner(const list<VisualCorner> &corners, const int x, const int y, const int testNumber) const;
   const double percentColor(const int x, const int y, const TestDirection dir,
                             const int color, const int numPixels) const;
   const double percentColor(const int x, const int y, const TestDirection dir,
                             const int colors[], const int numColors,
                             const int numPixels) const;
-  const double percentSurrounding(const int x, const int y, 
+  const double percentSurrounding(const int x, const int y,
                                   const int colors[], const int numColors,
                                   const int numPixels) const;
   const double percentSurrounding(const int x, const int y, const int color,
                                   const int numPixels) const;
   // Alternative form of percent surrounding that uses points.
-  const double percentSurrounding(const point<int> &p, 
+  const double percentSurrounding(const point<int> &p,
                                   const int colors[], const int numColors,
                                   const int numPixels) const;
 
   const double percentColorBetween(const int x1, const int y1,
                                    const int x2, const int y2,
-                                   const int colors[], 
+                                   const int colors[],
                                    const int numColors) const;
   const double percentColorBetween(const int x1, const int y1,
                                    const int x2, const int y2,
@@ -574,12 +575,12 @@ class FieldLines {
   void drawSurroundingBox(const VisualLine& aLine, int color) const;
 
   const bool isGreenWhiteEdge(int x, int y, ScanDirection direction) const;
-  const bool isWhiteGreenEdge(int x, int y, int potentialMidPoint, 
+  const bool isWhiteGreenEdge(int x, int y, int potentialMidPoint,
                         const ScanDirection direction) const;
 
 
 
-  // Implementation can be found at revision 4518 if we ever want to get it 
+  // Implementation can be found at revision 4518 if we ever want to get it
   // again.
   const int findCorrespondingBottom(const int x, const int y) const;
 
@@ -589,7 +590,7 @@ class FieldLines {
 #ifdef OFFLINE
   static void resetLineCounters(int &numWhite, int &numUndefined, int &numNonWhite);
 
-  bool countersHitSanityChecks(const int numWhite, const int numUndefined, 
+  bool countersHitSanityChecks(const int numWhite, const int numUndefined,
                                const int numNonWhite, const bool print) const;
 #endif
 
@@ -598,14 +599,14 @@ class FieldLines {
   void drawLinePoint(const linePoint &p, const int color) const;
   void drawLinePoints(const list<linePointNode> &toDraw) const;
   void drawLinePoints(const list<linePoint> &toDraw) const;
-  void drawCorners(const list<VisualCorner> &toDraw, int color); 
- 
+  void drawCorners(const list<VisualCorner> &toDraw, int color);
+
   bool isLegitVerticalLinePoint(int x, int y);
 #ifdef OFFLINE
   void setDebugVertEdgeDetect(bool _bool) { debugVertEdgeDetect = _bool; }
   void setDebugHorEdgeDetect(bool _bool) { debugHorEdgeDetect = _bool; }
   void setDebugSecondVertEdgeDetect(bool _bool) {
-    debugSecondVertEdgeDetect = _bool; 
+    debugSecondVertEdgeDetect = _bool;
   }
   void setDebugCreateLines(bool _bool) { debugCreateLines = _bool; }
   void setDebugFitUnusedPoints(bool _bool) { debugFitUnusedPoints = _bool; }
@@ -619,7 +620,7 @@ class FieldLines {
 
   void setDebugBallCheck(bool _bool) {debugBallCheck = _bool; }
   void setDebugCornerAndObjectDistances(bool _bool) {
-    debugCornerAndObjectDistances = _bool; 
+    debugCornerAndObjectDistances = _bool;
   }
   void setStandardView(bool _bool) {
     standardView = _bool;
@@ -627,8 +628,8 @@ class FieldLines {
 
   const bool getDebugVertEdgeDetect() const { return debugVertEdgeDetect; }
   const bool getDebugHorEdgeDetect() const { return debugHorEdgeDetect; }
-  const bool getDebugSecondVertEdgeDetect() const { 
-    return debugSecondVertEdgeDetect; 
+  const bool getDebugSecondVertEdgeDetect() const {
+    return debugSecondVertEdgeDetect;
   }
   const bool getDebugCreateLines() const { return debugCreateLines; }
 
@@ -638,14 +639,14 @@ class FieldLines {
   const bool getDebugIntersectLines() const { return debugIntersectLines; }
   const bool getDebugProcessCorners() const { return debugProcessCorners; }
   const bool getDebugIdentifyCorners() const { return debugIdentifyCorners; }
-  
+
   const bool getDebugCcScan() const { return debugCcScan; }
   const bool getDebugRiskyCorners() const { return debugRiskyCorners; }
 
   // TODO:Unused
   const bool getDebugBallCheck() const { return debugBallCheck; }
   const bool getDebugCornerAndObjectDistances() const {
-    return debugCornerAndObjectDistances; 
+    return debugCornerAndObjectDistances;
   }
   const bool getStandardView() { return standardView; }
 #endif
@@ -657,7 +658,7 @@ class FieldLines {
 
   // Returns true if the line segment drawn between first and second
   // intersects any field line on the screen; false otherwise
-  const bool intersectsFieldLines(const point<int>& first, 
+  const bool intersectsFieldLines(const point<int>& first,
                                   const point<int>& second) const;
 
 
@@ -676,12 +677,12 @@ class FieldLines {
    */
  private:
   static const int NUM_FIELD_OBJECTS_WITH_DIST_INFO = 6;
-  FieldObjects const * allFieldObjects[NUM_FIELD_OBJECTS_WITH_DIST_INFO];
-  
-  // Determines which field objects are visible on the screen and returns 
+  VisualFieldObject const * allFieldObjects[NUM_FIELD_OBJECTS_WITH_DIST_INFO];
+
+  // Determines which field objects are visible on the screen and returns
   // a vector of the pointers of the objects that are visible.
-  vector<const FieldObjects*> getVisibleFieldObjects() const;
-  
+  vector<const VisualFieldObject*> getVisibleFieldObjects() const;
+
 
   // Returns whether there is a yellow post on screen that vision has not
   // identified the side of
@@ -735,7 +736,7 @@ class FieldLines {
                                      const int newEdgeX,
                                      const int newEdgeY,
                                      const ScanDirection direction) const;
-  const bool isSecondFarUphillEdge(const int oldEdgeX, 
+  const bool isSecondFarUphillEdge(const int oldEdgeX,
                                    const int oldEdgeY,
                                    const int newX,
                                    const int newY,
@@ -770,7 +771,7 @@ class FieldLines {
 #endif
 
 
-  const bool isReasonableVerticalWidth(const int x, const int y, 
+  const bool isReasonableVerticalWidth(const int x, const int y,
                                        const double dist,
                                        const int width) const;
   const bool isReasonableHorizontalWidth(const int x, const int y,
@@ -796,9 +797,9 @@ class FieldLines {
 
   long timeInPercentColorBetween, timeInGetAngle, timeInVisualLineCreation;
   int numFrames;
-  
+
  private:
-  
+
   // debug variables
 #ifdef OFFLINE
   bool debugVertEdgeDetect;
@@ -819,7 +820,7 @@ class FieldLines {
   // I have been drawing; now there will be fewer colors etc to keep track of
   bool standardView;
 
-  
+
   static const bool printLinePointInfo = false;
   static const char *linePointInfoFile;
 
@@ -841,7 +842,7 @@ class FieldLines {
   static const bool debugBallCheck = false;
   static const bool debugCornerAndObjectDistances = false;
   static const bool debugFitUnusedPoints = false;
-  
+
   static const bool standardView = false;
 
   bool isGoalie;

@@ -1,29 +1,29 @@
-/* This file and a related file (ObjectFragments.cc) 
-   do the bulk of the Vision processing in a given frame.  
-   
-   The algorithm used is (relatively) straightforward - 
-   the visual signal comes in as a 2D array of YUV values.  
+/* This file and a related file (ObjectFragments.cc)
+   do the bulk of the Vision processing in a given frame.
+
+   The algorithm used is (relatively) straightforward -
+   the visual signal comes in as a 2D array of YUV values.
 
    In principle the algorithm would work like this:
    1) convert each YUV value to a color (this is called thresholding)
    2) find groups of connected pixels of similar colors (run length encoding)
    3) extract objects from the blobs found
 
-   We need to be faster and smarter than that so 2) kind of blends into 1) 
-   and 3).  
-   Our version of vision scans the image starting at the bottom left corner 
+   We need to be faster and smarter than that so 2) kind of blends into 1)
+   and 3).
+   Our version of vision scans the image starting at the bottom left corner
    and doing vertical slices up and across the image.  Each pixel is checked
-   against a color table to do a basic thresholding.  If there are multiple 
-   pixels in a row of the same color they are collected together into a "run" 
+   against a color table to do a basic thresholding.  If there are multiple
+   pixels in a row of the same color they are collected together into a "run"
    and sent to the object detection module.  There are variations of this basic
-   theme in accordance with the structure of the field and the importance of 
-   the potential object (i.e. balls are extra important).  
+   theme in accordance with the structure of the field and the importance of
+   the potential object (i.e. balls are extra important).
 
-   Once the scan is complete then run length encoding is done on each color 
-   object separately and potential field objects are extracted.  
-   
+   Once the scan is complete then run length encoding is done on each color
+   object separately and potential field objects are extracted.
+
    These are then sanity checked based on things like where the horizon
-   of the field is, the structure of the field 
+   of the field is, the structure of the field
    (i.e. posts can't be too close to goals), etc.
 */
 
@@ -45,7 +45,7 @@ Threshold::Threshold(Vision *vis, Pose *posPtr)
   : inverted(false)
 {
 
-  // storing locally 
+  // storing locally
   vision = vis;
   pose = posPtr;
 #ifdef OFFLINE
@@ -74,7 +74,7 @@ Threshold::Threshold(Vision *vis, Pose *posPtr)
   // loads the color table on the MS into memory
 #if ROBOT(AIBO)
 #  ifndef OFFLINE
-  initCompressedTable("/MS/table.mtb"); 
+  initCompressedTable("/MS/table.mtb");
 #  endif
 #elif ROBOT(NAO_RL)
 # ifndef OFFLINE
@@ -95,7 +95,7 @@ Threshold::Threshold(Vision *vis, Pose *posPtr)
   red = new ObjectFragments(vision,this);
   red->setColor(RED);
   orange = new ObjectFragments(vision,this);
-  orange->setColor(ORANGE); 
+  orange->setColor(ORANGE);
   green = new ObjectFragments(vision,this);
   green->setColor(GREEN);
 
@@ -135,7 +135,7 @@ void Threshold::visionLoop() {
   // do line recognition (in FieldLines.cc)
   // This will form all lines and all corners. After this call, fieldLines
   // will be able to supply information about them through getLines() and
-  // getCorners(). 
+  // getCorners().
   PROF_ENTER(vision->profiler, P_OBJECT);
   vision->fieldLines->lineLoop();
   // do recognition
@@ -154,14 +154,14 @@ void Threshold::visionLoop() {
   yellow->openDirection(horizon, pose);
   PROF_EXIT(vision->profiler, P_LINES);
 
-  
+
 
 #ifdef OFFLINE
   if (visualHorizonDebug) {
     drawVisualHorizon();
   }
   transposeDebugImage();
-#endif  
+#endif
 }
 
 #ifndef UNROLLED_LOOPS_THRESHOLD
@@ -199,10 +199,10 @@ void Threshold::thresholdAndRuns() {
 #ifdef USE_CHROMATIC_CORRECTION
   unsigned char radius;
 #endif
-  
+
 
   //printf("Horizon (l,r,pan):\t%d\t%d\t%g\n",pose->getLeftHorizonY(),pose->getRightHorizonY(),RAD2DEG(pose->getPan()));
-  
+
   for (register int i = 0; i < IMAGE_WIDTH; i++) {//scan across
     // the color of the last pixel before the current one
     greenBlue[i] = false;
@@ -211,13 +211,13 @@ void Threshold::thresholdAndRuns() {
     blueWhite[i] = BADVALUE;
     lastPixel = GREEN;
     // how big is the current run of like colored pixels?
-    currentRun = 0;            
+    currentRun = 0;
     // where in the column did it begin?
-    //currentRunStart = IMAGE_HEIGHT - 1; 
+    //currentRunStart = IMAGE_HEIGHT - 1;
     // the color of the last run of pixels - useful for object detection
     previousRun = GREEN;
     // potential yellow post location
-    sawYellowBlue = false;         
+    sawYellowBlue = false;
     sawBlueYellow = false;
     //int horizonJ = pose->getHorizonY(i);
     int firstRed = -1, lastRed = -1;
@@ -233,7 +233,7 @@ void Threshold::thresholdAndRuns() {
       pixel = bigTable[yplane[j*IMAGE_WIDTH*3 + 3*i + 0]>>YSHIFT]
                       [yplane[j*IMAGE_WIDTH*3 + 3*i + 1]>>USHIFT]
                       [yplane[j*IMAGE_WIDTH*3 + 3*i + 2]>>VSHIFT];
-      
+
 #else
       pixel = bigTable[yplane[address]>>YSHIFT]
                       [uplane[address]>>USHIFT]
@@ -249,10 +249,10 @@ void Threshold::thresholdAndRuns() {
 
       // check thresholded point with last thresholded point.
       // if the same, increment the current run
-      
+
       if (lastPixel == newPixel) {
 	currentRun++;
-      } 
+      }
       // otherwise, do stuff according to color
       if (lastPixel != newPixel || j == 0) { // j == 0 means end of column
 	// switch for last thresholded pixel
@@ -282,7 +282,7 @@ void Threshold::thresholdAndRuns() {
 	    if (i > 5 && i < IMAGE_WIDTH - 5) {
 	      blue->newRun(i, j, currentRun);
 	      // checks to see if this blue run was preceded by a yellow run
-	      // which was preceded by a white run --> potential pb post 
+	      // which was preceded by a white run --> potential pb post
 	      if (sawYellowBlue && previousRun == YELLOW) {
 		if (firstYellowBlue == 0) {
 		  firstYellowBlue = i;
@@ -322,7 +322,7 @@ void Threshold::thresholdAndRuns() {
 	  break;
 #ifdef USE_PINK_BALL
 	case PINK:
-	  
+
 	  if(currentRun > 1){
 	    ballPink->newRun(i,j,currentRun);
 	  }
@@ -337,7 +337,7 @@ void Threshold::thresholdAndRuns() {
 
 	    yellow->newRun(i, j, currentRun);
 	    // checks to see if this yellow run was preceded by a blue run
-	    // which was preceded by a white run --> potential by post	    
+	    // which was preceded by a white run --> potential by post
 	    if (sawBlueYellow && previousRun == BLUE) {
 	      if (firstBlueYellow == 0) {
 		firstBlueYellow = i;
@@ -359,7 +359,7 @@ void Threshold::thresholdAndRuns() {
 	// since this loop runs when a run ends, restart # pixels in run counter
 	currentRun = 1;
 	// store the position of the start of the run in the column (y-value)
-	//currentRunStart = j;	
+	//currentRunStart = j;
       }
       // every pixel.
       lastPixel = newPixel;
@@ -384,8 +384,8 @@ void Threshold::thresholdAndRuns() {
  */
 
 void Threshold::findGreenHorizon() {
-#ifdef JOHO_DEBUG 
-print("   Theshold::SweepLeft"); 
+#ifdef JOHO_DEBUG
+print("   Theshold::SweepLeft");
 #endif
   // a useful point is where we stop seeing green in the first few pixels
 
@@ -423,16 +423,16 @@ print("   Theshold::SweepLeft");
 	  [corrY[yplane[address]][radius]>>YSHIFT]
 	  [corrU[uplane[address]][radius]>>USHIFT]
 	  [corrV[vplane[address]][radius]>>VSHIFT];
-	
+
 #else
 	unsigned char pixel = bigTable
 	  [yplane[address]>>YSHIFT]
 	  [uplane[address]>>USHIFT]
 	  [vplane[address]>>VSHIFT];
 #endif
-	
+
 	newPixel = pixel;
-	
+
 	if (newPixel == GREEN) {
 	  run++;
 	  greenPixels++;
@@ -455,14 +455,14 @@ print("   Theshold::SweepLeft");
 		    [corrY[yplane[address]][radius]>>YSHIFT]
 		    [corrU[uplane[address]][radius]>>USHIFT]
 		    [corrV[vplane[address]][radius]>>VSHIFT];
-		  
+
 #else
 		  unsigned char pixel = bigTable
 		    [yplane[address]>>YSHIFT]
 		    [uplane[address]>>USHIFT]
 		    [vplane[address]>>VSHIFT];
 #endif
-		  
+
 		  newPixel = pixel;
 		  if (newPixel == GREEN) {
 		    run++;
@@ -518,7 +518,7 @@ print("   Theshold::SweepLeft");
       [corrY[yplane[address]][radius]>>YSHIFT]
       [corrU[uplane[address]][radius]>>USHIFT]
       [corrV[vplane[address]][radius]>>VSHIFT];
-    
+
 #else
     unsigned char pixel = bigTable
       [yplane[address]>>YSHIFT]
@@ -730,7 +730,7 @@ void Threshold::threshold() {
       yPtr+=2; uPtr+=4; vPtr+=4;
 #endif
     }
-    
+
     // here is the unrolled loop
     while (tPtr < tEnd) {
       // Eight unrolled table lookups
@@ -817,9 +817,9 @@ void Threshold::runs() {
     // the color of the last pixel before the current one
     lastPixel = GREEN;
     // how big is the current run of like colored pixels?
-    currentRun = 0;            
+    currentRun = 0;
     // where in the column did it begin?
-    //currentRunStart = IMAGE_HEIGHT - 1; 
+    //currentRunStart = IMAGE_HEIGHT - 1;
     // the color of the last run of pixels - useful for object detection
     previousRun = GREEN;
     int previousRunStop = IMAGE_HEIGHT;
@@ -830,17 +830,17 @@ void Threshold::runs() {
     // potential yellow post location
     int lastGoodPixel = 0;
     //int horizonJ = pose->getHorizonY(i);
-    
+
     for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
       if (j < horizon && lastGoodPixel - j > 10 && currentRun == 1) break;
       pixel = thresholded[j][i];
 
       // check thresholded point with last thresholded point.
       // if the same, increment the current run
-      
+
       if (lastPixel == pixel) {
 	currentRun++;
-      } 
+      }
       // otherwise, do stuff according to color
       if (lastPixel != pixel || j == 0) { // j == 0 means end of column
 	// switch for last thresholded pixel
@@ -852,8 +852,8 @@ void Threshold::runs() {
 	    //navyblue->newRun(i, j, currentRun);
 	    lastGoodPixel = j;
 	  }
-	  if (currentRun > 3 && 
-	      (previousRun == WHITE || previousRun == NAVY || 
+	  if (currentRun > 3 &&
+	      (previousRun == WHITE || previousRun == NAVY ||
 	       (previousRun == GREEN || currentRun > 20))) { //&& previousRunStop - j - currentRun < 10))) {
 	    navyTops[i] = j;
 	    //drawPoint(i, j, YELLOW);
@@ -906,7 +906,7 @@ void Threshold::runs() {
 	  break;
 #ifdef USE_PINK_BALL
 	case PINK:
-	  
+
 	  if(currentRun > 1){
 	    ballPink->newRun(i,j,currentRun);
 	  }
@@ -933,7 +933,7 @@ void Threshold::runs() {
 	// since this loop runs when a run ends, restart # pixels in run counter
 	currentRun = 1;
 	// store the position of the start of the run in the column (y-value)
-	//currentRunStart = j;	
+	//currentRunStart = j;
       }
       // every pixel.
       lastPixel = pixel;
@@ -1032,11 +1032,11 @@ void Threshold::thresholdAndRuns() {
  */
 
 void Threshold::findGreenHorizon() {
-#ifdef JOHO_DEBUG 
-print("   Theshold::SweepLeft"); 
+#ifdef JOHO_DEBUG
+print("   Theshold::SweepLeft");
 #endif
   // a useful point is where we stop seeing green in the first few pixels
-  
+
   //variable definitions
   int pH, run, greenPixels, scanY;
   register int i, j;
@@ -1104,7 +1104,7 @@ print("   Theshold::SweepLeft");
     if (run < MIN_GREEN_SIZE && greenPixels < 20) {
       // first make sure we didn't get fooled by firstpix
       run = 0;
-      scanY = firstpix; 
+      scanY = firstpix;
       for (j = firstpix - 1; j >= 0; j--) {
 	newPixel = thresholded[scanY][j];
 	//drawPoint(j, scanY, BLACK);
@@ -1158,7 +1158,7 @@ point <int> Threshold::backStopCheck(bool which, int leftRange, int rightRange) 
   for (int i = leftRange + 1; i < rightRange; i++) {
     if ((which && greenBlue[i]) || (!which && greenYellow[i])) {
       bads = 0;
-      if (total == 0) 
+      if (total == 0)
 	left = i;
       right = i;
       total++;
@@ -1208,8 +1208,8 @@ int Threshold::postCheck(bool which, int left, int right) {
  */
 
 void Threshold::objectRecognition() {
-#ifdef JOHO_DEBUG 
-print("   Theshold::objectRecognition"); 
+#ifdef JOHO_DEBUG
+print("   Theshold::objectRecognition");
 #endif
   // Chown-RLE
   initObjects();
@@ -1225,7 +1225,7 @@ print("   Theshold::objectRecognition");
   bool yrp = vision->ygrp->getWidth() > 0;
   bool blp = vision->bglp->getWidth() > 0;
   bool brp = vision->bgrp->getWidth() > 0;
-  
+
 #if ROBOT(AIBO)
   // check if we saw a post - if so, then screen goals that are too close
   if (vision->by->getDist() > 0 || vision->yb->getDist() > 0) {
@@ -1237,44 +1237,44 @@ print("   Theshold::objectRecognition");
 	vision->yb->init();
     }
     // nothing can be too close
-    int byX = vision->by->getX(); 
+    int byX = vision->by->getX();
     int byX2 = vision->by->getRightTopX();
     if (vision->yb->getDist() > 0) {
       byX = vision->yb->getX();
       byX2 = vision->yb->getRightTopX();
     }
-    if (ylp && distance(byX, byX2, 
-			vision->yglp->getX(), vision->yglp->getRightTopX()) < 
+    if (ylp && distance(byX, byX2,
+			vision->yglp->getX(), vision->yglp->getRightTopX()) <
 	MIN_SPLIT) {
       vision->yglp->init();
       ylp = false;
     }
-    if (yrp && distance(byX, byX2, 
-			vision->ygrp->getX(), vision->ygrp->getRightTopX()) < 
+    if (yrp && distance(byX, byX2,
+			vision->ygrp->getX(), vision->ygrp->getRightTopX()) <
 	MIN_SPLIT) {
       vision->ygrp->init();
       yrp = false;
     }
-    if (blp && distance(byX, byX2, 
-			vision->bglp->getX(), vision->bglp->getRightTopX()) < 
+    if (blp && distance(byX, byX2,
+			vision->bglp->getX(), vision->bglp->getRightTopX()) <
 	MIN_SPLIT) {
       vision->bglp->init();
       blp = false;
     }
-    if (brp && distance(byX, byX2, 
-			vision->bgrp->getX(), vision->bgrp->getRightTopX()) < 
+    if (brp && distance(byX, byX2,
+			vision->bgrp->getX(), vision->bgrp->getRightTopX()) <
 	MIN_SPLIT) {
       vision->bgrp->init();
       brp = false;
     }
-    if (vision->ygBackstop->getWidth() > 0 && 
-	distance(byX, byX2, 
+    if (vision->ygBackstop->getWidth() > 0 &&
+	distance(byX, byX2,
 		 vision->ygBackstop->getX(), vision->ygBackstop->getRightTopX())
 	< MIN_SPLIT) {
       vision->ygBackstop->init();
     }
-    if (vision->bgBackstop->getWidth() > 0 && 
-	distance(byX, byX2, 
+    if (vision->bgBackstop->getWidth() > 0 &&
+	distance(byX, byX2,
 		 vision->bgBackstop->getX(), vision->bgBackstop->getRightTopX())
 	< MIN_SPLIT) {
       vision->bgBackstop->init();
@@ -1351,10 +1351,10 @@ print("   Theshold::objectRecognition");
   }
 
   if (horizon < IMAGE_HEIGHT)
-    orange->createObject(horizon); 
+    orange->createObject(horizon);
   else
     orange->createObject(pose->getHorizonY(0));
-  
+
 #ifdef USE_PINK_BALL
     if (horizon < IMAGE_HEIGHT)
       ballPink->createObject(horizon);
@@ -1371,7 +1371,7 @@ print("   Theshold::objectRecognition");
     }
 #endif
 
-  // sanity check: if pose estimated horizon is completely above the image, 
+  // sanity check: if pose estimated horizon is completely above the image,
   // shouldn't find any posts or goals
   if (pose->getLeftHorizonY() < 0 && pose->getRightHorizonY() < 0) {
     vision->yglp->init();
@@ -1384,13 +1384,13 @@ print("   Theshold::objectRecognition");
     vision->by->init();
   }
 
-  storeFieldObjects();  
+  storeFieldObjects();
 
 }
 
 //right post
 
-/* 
+/*
    RLE Helper Methods
 */
 
@@ -1423,38 +1423,38 @@ void Threshold::storeFieldObjects() {
 
 }
 
-/* This filter checks to see if field object points are within the 
+/* This filter checks to see if field object points are within the
  * region of chromatic distortion -- and if they mostly are, we throw them out
  * @param obj       The field object to check
 */
-void Threshold::chromeFilter(FieldObjects *obj) {
+void Threshold::chromeFilter(VisualFieldObject *obj) {
 
   if (obj->getHeight() <= 0 && obj->getWidth() <= 0) {
     return;
   }
 
- 
+
   // chromatic distortion filter only for blue goal objects
   point <int> leftTop(obj->getLeftTopX(), obj->getLeftTopY());
   point <int> rightTop(obj->getRightTopX(), obj->getRightTopY());
   point <int> leftBottom(obj->getLeftBottomX(), obj->getLeftBottomY());
   point <int> rightBottom(obj->getRightBottomX(), obj->getRightBottomY());
-    
+
   int score = 0;
 
-  if (getEuclidianDist(CENTER_IMAGE_COORD,leftTop) > 
-      CHROME_FILTER_RADIAL_DIST) {
-    score++;
-  } 
-  if (getEuclidianDist(CENTER_IMAGE_COORD,rightTop) > 
+  if (getEuclidianDist(CENTER_IMAGE_COORD,leftTop) >
       CHROME_FILTER_RADIAL_DIST) {
     score++;
   }
-  if (getEuclidianDist(CENTER_IMAGE_COORD,leftBottom) > 
+  if (getEuclidianDist(CENTER_IMAGE_COORD,rightTop) >
       CHROME_FILTER_RADIAL_DIST) {
     score++;
   }
-  if (getEuclidianDist(CENTER_IMAGE_COORD,rightBottom) > 
+  if (getEuclidianDist(CENTER_IMAGE_COORD,leftBottom) >
+      CHROME_FILTER_RADIAL_DIST) {
+    score++;
+  }
+  if (getEuclidianDist(CENTER_IMAGE_COORD,rightBottom) >
       CHROME_FILTER_RADIAL_DIST) {
     score++;
   }
@@ -1468,24 +1468,24 @@ void Threshold::chromeFilter(FieldObjects *obj) {
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
  * @param objPtr    the field object to study
  */
-void Threshold::setFieldObjectInfo(FieldObjects *objPtr) {
+void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
   // if the object is on screen, basically
   if (objPtr->getHeight() > 0) {
-    // set center x,y 
+    // set center x,y
     objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
     objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
-    
+
     // find angle x/y (relative to camera)
     objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/MAX_BEARING);
     objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/MAX_ELEVATION);
-    
+
     // if object is a goal post
     if (objPtr == vision->yglp ||
 	objPtr == vision->ygrp ||
 	objPtr == vision->bglp ||
 	objPtr == vision->bgrp) {
       //print("we've got a post!");
-      double dist = 0.0; 
+      double dist = 0.0;
       double width = objPtr->getWidth(); double height = objPtr->getHeight();
       int cert = objPtr->getDistCertainty();
       double distw = getGoalPostDistFromWidth(width);
@@ -1514,7 +1514,7 @@ void Threshold::setFieldObjectInfo(FieldObjects *objPtr) {
 
       // sanity check: throw ridiculous distance estimates out
       // constants in Threshold.h
-      if (dist < POST_MIN_FOC_DIST || 
+      if (dist < POST_MIN_FOC_DIST ||
 	  dist > POST_MAX_FOC_DIST) {
 	dist = 0.0;
       }
@@ -1525,16 +1525,16 @@ void Threshold::setFieldObjectInfo(FieldObjects *objPtr) {
     else if (objPtr == vision->yb || objPtr == vision->by) {
       double dist = 0.0;
 
-      // get beacon distance always from height 
+      // get beacon distance always from height
       dist = getBeaconDistFromHeight(objPtr->getHeight());
 
       // sanity check: throw out ridiculous post estimates
       // constants in Threshold.h
-      if (dist < BEACON_MIN_FOC_DIST || 
+      if (dist < BEACON_MIN_FOC_DIST ||
 	  dist > BEACON_MAX_FOC_DIST) {
 	dist = 0.0;
       }
-      
+
       //ANDREW- temp fix, should track down why bad distances are occuring
       if ((vision->getPlayerNumber()) == 1){
 	if(dist < GOALIE_BEACON_MIN_FOC_DIST ||
@@ -1542,7 +1542,7 @@ void Threshold::setFieldObjectInfo(FieldObjects *objPtr) {
 	  dist = 0.0;
 	}
       }
-      
+
 
       objPtr->setDist(dist);
     }
@@ -1568,8 +1568,8 @@ void Threshold::setFieldObjectInfo(FieldObjects *objPtr) {
     // sets focal distance of the field object
     objPtr->setFocDist(objPtr->getDist());
     // convert dist + angle estimates to body center
-    estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(), 
-					  objPtr->getCenterY(), 
+    estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+					  objPtr->getCenterY(),
 					  objPtr->getDist());
     objPtr->setDist(obj_est.dist);
     objPtr->setBearing(obj_est.bearing);
@@ -1676,14 +1676,14 @@ void Threshold::initColors() {
 #endif
 }
 
-/* This function loads a table file with the given file name 
+/* This function loads a table file with the given file name
  * into memory(the big Table array)
- * for example, filename can be "/MS/merged.mtb". 
+ * for example, filename can be "/MS/merged.mtb".
  * it means the merged.mtb file in the root directory of the Memory stick
  * @param filename      the file to load
 */
 void Threshold::initTable(std::string filename) {
-  
+
   FILE* fp;
   //cout << filename << endl;
   fp = fopen(filename.c_str(), "r");   //open table for reading
@@ -1732,13 +1732,13 @@ void Threshold::initTableFromBuffer(byte * tbfr)
             }
 }
 
-/* This function loads a table file with the given file name 
+/* This function loads a table file with the given file name
  * into memory(the big Table array)
- * for example, filename can be "/MS/merged.mtb". 
+ * for example, filename can be "/MS/merged.mtb".
  * it means the merged.mtb file in the root directory of the Memory stick
  * @param filename      the file to load
 */
-void Threshold::initCompressedTable(std::string filename){  
+void Threshold::initCompressedTable(std::string filename){
 #ifndef NO_ZLIB
   FILE* fp;
   //cout << filename << endl;
@@ -1822,7 +1822,7 @@ void Threshold::initChromeTable(std::string filename){
 #endif
   }
 
-  
+
   //read Y channel
   for(int i =0; i < NUM_YUV; i++){
     fread(corrY[i], sizeof(unsigned char), YRAD, fp);
@@ -1836,7 +1836,7 @@ void Threshold::initChromeTable(std::string filename){
   //V
   for(int i =0; i < NUM_YUV; i++){
     fread(corrV[i], sizeof(unsigned char), VRAD, fp);
-  }  
+  }
   /*
   //XLUT
   for(int i =0; i < IMAGE_HEIGHT; i++){
@@ -1935,7 +1935,7 @@ double Threshold::getEuclidianDist(point <int> coord1, point <int> coord2) {
 //fill the corrected image
 unsigned char * Threshold::getCorrectedImage(){
   int index = 0;
-  for(int y = 0; y < IMAGE_HEIGHT; y++){ 
+  for(int y = 0; y < IMAGE_HEIGHT; y++){
     //Y
     for(int x = 0; x < IMAGE_WIDTH; x++){
       corrected[index++] = corrY[yuv[index]][xLUT[x][y]];
@@ -1948,7 +1948,7 @@ unsigned char * Threshold::getCorrectedImage(){
     for(int x = 0; x < IMAGE_WIDTH; x++){
       corrected[index++] = corrV[yuv[index]][xLUT[x][y]];
     }
-    index += 3*IMAGE_WIDTH; //skip over these for compatability with openrimage  
+    index += 3*IMAGE_WIDTH; //skip over these for compatability with openrimage
   }
   return corrected;
 }
@@ -1991,8 +1991,8 @@ void Threshold::transposeDebugImage(){
  * @param c        the color we'd like to draw
  */
 void Threshold::drawBox(int left, int right, int bottom, int top, int c) {
-  
-  
+
+
 #ifdef OFFLINE
   if (left < 0) {
     left = 0;
@@ -2004,33 +2004,33 @@ void Threshold::drawBox(int left, int right, int bottom, int top, int c) {
   int height = bottom-top;
 
   for (int i = left; i < left + width; i++) {
-    if (top >= 0 && 
-	top < IMAGE_HEIGHT && 
-	i >= 0 && 
+    if (top >= 0 &&
+	top < IMAGE_HEIGHT &&
+	i >= 0 &&
 	i < IMAGE_WIDTH) {
       debugImage[top][i] = c;
     }
-    if ((top + height) >= 0 && 
-	(top + height) < IMAGE_HEIGHT && 
-	i >= 0 && 
+    if ((top + height) >= 0 &&
+	(top + height) < IMAGE_HEIGHT &&
+	i >= 0 &&
 	i < IMAGE_WIDTH) {
       debugImage[top + height][i] = c;
     }
   }
   for (int i = top; i < top + height; i++) {
-    if (i >= 0 && 
-	i < IMAGE_HEIGHT && 
-	left >= 0 && 
+    if (i >= 0 &&
+	i < IMAGE_HEIGHT &&
+	left >= 0 &&
 	left < IMAGE_WIDTH) {
       debugImage[i][left] = c;
     }
-    if (i >= 0 && 
-	i < IMAGE_HEIGHT && 
-	(left+width) >= 0 && 
+    if (i >= 0 &&
+	i < IMAGE_HEIGHT &&
+	(left+width) >= 0 &&
 	(left+width) < IMAGE_WIDTH) {
       debugImage[i][left + width] = c;
     }
-  }  
+  }
 #endif
 } // drawBox
 
@@ -2057,31 +2057,31 @@ void Threshold::drawRect(int left, int top, int width, int height, int c) {
     if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
       debugImage[top][i] = c;
     }
-    if ((top + height) >= 0 && 
-	(top + height) < IMAGE_HEIGHT && 
-	i >= 0 && 
+    if ((top + height) >= 0 &&
+	(top + height) < IMAGE_HEIGHT &&
+	i >= 0 &&
 	i < IMAGE_WIDTH) {
       debugImage[top + height][i] = c;
     }
   }
   for (int i = top; i < top + height; i++) {
-    if (i >= 0 && 
-	i < IMAGE_HEIGHT && 
-	left >= 0 && 
+    if (i >= 0 &&
+	i < IMAGE_HEIGHT &&
+	left >= 0 &&
 	left < IMAGE_WIDTH) {
       debugImage[i][left] = c;
     }
-    if (i >= 0 && 
-	i < IMAGE_HEIGHT && 
-	(left+width) >= 0 && 
+    if (i >= 0 &&
+	i < IMAGE_HEIGHT &&
+	(left+width) >= 0 &&
 	(left+width) < IMAGE_WIDTH) {
       debugImage[i][left + width] = c;
     }
-  }  
+  }
 #endif
 } // drawRect
 
-void Threshold::drawLine(const point<int> start, const point<int> end, 
+void Threshold::drawLine(const point<int> start, const point<int> end,
                          const int color) {
   drawLine(start.x, start.y, end.x, end.y, color);
 }
@@ -2094,7 +2094,7 @@ void Threshold::drawLine(const point<int> start, const point<int> end,
  * @param c       color we'd like to draw
  */
 void Threshold::drawLine(int x, int y, int x1, int y1, int c) {
-  
+
 #ifdef OFFLINE
   double slope = (double)(y - y1) / (double)(x - x1);
   int sign = 1;
@@ -2141,23 +2141,23 @@ void Threshold::drawVisualHorizon() {
 void Threshold::drawPoint(int x, int y, int c) {
 
 #ifdef OFFLINE
-  if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {    
+  if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
     debugImage[y][x] = c;
-  }if (y+1 > 0 && x > 0 && y+1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {   
+  }if (y+1 > 0 && x > 0 && y+1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
     debugImage[y+1][x] = c;
-  }if (y+2 > 0 && x > 0 && y+2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {   
+  }if (y+2 > 0 && x > 0 && y+2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
     debugImage[y+2][x] = c;
-  }if (y-1 > 0 && x > 0 && y-1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {   
+  }if (y-1 > 0 && x > 0 && y-1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
     debugImage[y-1][x] = c;
-  }if (y-2 > 0 && x > 0 && y-2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {   
+  }if (y-2 > 0 && x > 0 && y-2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
     debugImage[y-2][x] = c;
-  }if (y > 0 && x+1 > 0 && y < (IMAGE_HEIGHT) && x+1 < (IMAGE_WIDTH)) {   
+  }if (y > 0 && x+1 > 0 && y < (IMAGE_HEIGHT) && x+1 < (IMAGE_WIDTH)) {
     debugImage[y][x+1] = c;
-  }if (y > 0 && x+2 > 0 && y < (IMAGE_HEIGHT) && x+2 < (IMAGE_WIDTH)) {   
+  }if (y > 0 && x+2 > 0 && y < (IMAGE_HEIGHT) && x+2 < (IMAGE_WIDTH)) {
     debugImage[y][x+2] = c;
-  }if (y > 0 && x-1 > 0 && y < (IMAGE_HEIGHT) && x-1 < (IMAGE_WIDTH)) {   
+  }if (y > 0 && x-1 > 0 && y < (IMAGE_HEIGHT) && x-1 < (IMAGE_WIDTH)) {
     debugImage[y][x-1] = c;
-  }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {   
+  }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
     debugImage[y][x-2] = c;
   }
 #endif
@@ -2172,13 +2172,13 @@ void Threshold::drawX(int x, int y, int c) {
   debugImage[y][x] = c;
   debugImage[y+1][x+1] = c;
   debugImage[y+2][x+2] = c;
-  
+
   debugImage[y-2][x+2] = c;
   debugImage[y-1][x+1] = c;
-  
+
   debugImage[y+1][x-1] = c;
   debugImage[y+2][x-2] = c;
-  
+
 #endif
 
 }

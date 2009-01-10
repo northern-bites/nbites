@@ -12,6 +12,7 @@ class ConcreteFieldObject;
 using namespace std;
 
 // Local headers
+#include "Structs.h"
 #include "FieldConstants.h"
 #include "ConcreteLandmark.h"
 
@@ -42,6 +43,7 @@ private:
     ConcreteFieldObject(const ConcreteFieldObject&);
 
 public: // Constants
+    static const float WHITE_HEIGHT_ON_BEACON;
     static const int NUM_BLUE_GOAL_POSTS = 2;
     static const int NUM_YELLOW_GOAL_POSTS = 2;
     static const int NUM_FIELD_OBJECTS = NUM_BLUE_GOAL_POSTS +
@@ -62,13 +64,13 @@ public:
     const fieldObjectID getID() const { return id; }
 
     virtual const string toString() const;
-    const getStringFromID(const fieldObjectID testID);
+    static const string getStringFromID(const fieldObjectID testID);
     static const float getHeightFromGround(const fieldObjectID id);
 
-    const bool isAbstract(const fieldObjectID testID);
-    const bool isBeacon(const fieldObjectID testID);
-    const bool isGoal(const fieldObjectID testID);
-    const bool isArc(const fieldObjectID testID);
+    static const bool isAbstract(const fieldObjectID testID);
+    static const bool isBeacon(const fieldObjectID testID);
+    static const bool isGoal(const fieldObjectID testID);
+    static const bool isArc(const fieldObjectID testID);
 
 // Static member variables
 public:
