@@ -8,7 +8,7 @@
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"
-
+#include "BodyJointCommand.h"
 
 using namespace std;
 using namespace Kinematics;
@@ -24,28 +24,23 @@ public:
 
 
 	void enqueue(const BodyJointCommand *command);
-	void enqueue(const HeadJointCommand *command);
 	void enqueueSequence(std::vector<BodyJointCommand*> &seq);
-	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
 
 private:
 	Sensors *sensors;
 	float FRAME_LENGTH_S;
 	ChopShop chopper;
 	vector<vector<float> > nextJoints;
-	queue<vector<vector<float> > > choppedBodyCommand,choppedHeadCommand;
+	queue<vector<vector<float> > > choppedBodyCommand;
 
 	// ChainQueues
 	vector<ChainQueue> chainQueues;
 	queue<const BodyJointCommand*> bodyCommandQueue;
-	queue<const HeadJointCommand*> headCommandQueue;
 
 	pthread_mutex_t scripted_mutex;
 
 	vector <vector <float> > getCurrentChains();
 	void setNextBodyCommand();
-	void setNextHeadCommand();
-
 };
 
 #endif
