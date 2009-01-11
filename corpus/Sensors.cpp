@@ -354,7 +354,10 @@ Sensors::Sensors ()
   pthread_mutex_init(&image_mutex, NULL);
 #endif
 
+  //BREAKS NAOQI1.0
+#ifndef NAOQI1
   add_to_module();
+#endif
 }
 
 Sensors::~Sensors ()
@@ -547,11 +550,14 @@ Sensors::releaseImage()
 
 void
 Sensors::updatePython() {
+  // BROKEN in NAOQI 1.0
+#ifndef NAOQI1
   if (pySensors != NULL) {
     PySensors_update(pySensors);
   }else{
     cout<< "py sensors none!!" << endl;
   }
+#endif
 }
 
 

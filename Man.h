@@ -150,8 +150,10 @@ class Man
     Motion motion;
     Vision vision;
     Comm comm;
+    //Breaks Naoqi1.0
+#ifndef NAOQI1
     Noggin noggin;
-
+#endif
 
   private:
     // Interfaces/Proxies to robot

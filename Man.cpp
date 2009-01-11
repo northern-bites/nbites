@@ -78,7 +78,10 @@ Man::Man ()
 #endif
     vision(new NaoPose(&sensors), &profiler),
     comm(synchro, &sensors, &vision),
+    //BREAKS NAOQI1.0
+#ifndef NAOQI1
     noggin(&sensors, &profiler, &vision),
+#endif
     frame_counter(0), saved_frames(0), hack_frames(0),
     camera_active(false)
 {
@@ -695,7 +698,10 @@ Man::processFrame ()
 #endif
 
   // run Python behaviors
+  //BREAKS NAOQI1.0
+#ifndef NAOQI1
   noggin.runStep();
+#endif
 
   PROF_EXIT(&profiler, P_FINAL);
   PROF_NFRAME(&profiler);
@@ -781,8 +787,10 @@ PythonPreferences::PythonPreferences ()
   // Initialize interpreter
   if (!Py_IsInitialized())
     Py_Initialize();
-
+  //Breaks NaoQi1.0
+#ifndef NAOQI1
   modifySysPath();
+#endif
 }
 
 void
