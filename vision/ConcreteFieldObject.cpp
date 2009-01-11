@@ -1,5 +1,5 @@
 #include "ConcreteFieldObject.h"
-const float ConcreteFieldObject::WHITE_HEIGHT_ON_BEACON = 18.6;
+const float ConcreteFieldObject::WHITE_HEIGHT_ON_BEACON = 18.6f;
 
 // Constructors
 ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,

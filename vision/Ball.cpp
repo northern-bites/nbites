@@ -31,7 +31,8 @@ void Ball::init() {
 void Ball::setDistance() {
   // translate distance estimates to body center
   estimate ball_est;
-  ball_est = vision->pose->bodyEstimate(getCenterX(),getCenterY(),focDist);
+  ball_est = vision->pose->bodyEstimate(getCenterX(),getCenterY(),
+                                        static_cast<float>(focDist));
   setBearing(ball_est.bearing);
   setElevation(ball_est.elevation);
   dist = ball_est.dist;

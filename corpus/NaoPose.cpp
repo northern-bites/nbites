@@ -2,8 +2,8 @@
 #include "NaoPose.h"
 
 // From camera docs:
-const float NaoPose::IMAGE_WIDTH_MM = 2.36;
-const float NaoPose::IMAGE_HEIGHT_MM = 1.76;
+const float NaoPose::IMAGE_WIDTH_MM = 2.36f;
+const float NaoPose::IMAGE_HEIGHT_MM = 1.76f;
 
 // Calculated from numbers in camera docs:
   const float NaoPose::FOCAL_LENGTH_MM = (IMAGE_WIDTH_MM/2) / tan(FOV_X/2);
@@ -184,7 +184,7 @@ void NaoPose::calcImageHorizonLine() {
   horizonRight.x = IMAGE_WIDTH - 1;
   horizonRight.y = ROUND(height_pix_right);
 
-  horizonSlope = (height_pix_right - height_pix_left) /(IMAGE_WIDTH -1.0);
+  horizonSlope = (height_pix_right - height_pix_left) /(IMAGE_WIDTH - 1.0f);
   if (horizonSlope != 0)
     perpenHorizonSlope = -1/horizonSlope;
   else
