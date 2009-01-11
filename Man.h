@@ -24,13 +24,14 @@
 #include <pthread.h>
 #include <signal.h>
 
-#include "config.h"
+#include "manconfig.h"
 
 #include "alxplatform.h"
 #include "altools.h"
 #include "albroker.h"
 #include "almodule.h"
 #include "alloggerproxy.h"
+#include "alptr.h"
 
 #include "Common.h"
 #include "Profiler.h"
@@ -69,7 +70,11 @@ class Man
   public:
 
     // contructors
+#ifdef NAOQI1
+    Man(ALPtr<ALBroker> pBroker, std::string pName);
+#else
     Man();
+#endif
     // destructor
     virtual ~Man();
 
@@ -112,14 +117,22 @@ class Man
     void visionHack();
     // Hack the current image
     void hackFrame();
+
+    //HelperBoundMethods:
+    void manStart(){Thread::start();} //should return 'int' or ALValue
+    void manStop(){Thread::stop();}
+    void manAwaitOn(){getTrigger()->await_on();}
+    void manAwaitOff(){getTrigger()->await_on();}
+
+    void helloWorld(){std::cout<<"HelloWorld, C++ Style"<<std::endl;};
   private:
     // run Vision and call Noggin's main loop function
     void processFrame(void);
     // wait for and retrieve the latest image
     void waitForImage(void);
 
-    void initModule (void);
-    void closeModule(void);
+    void initMan (void);
+    void closeMan(void);
 
   //
   // Variables
@@ -136,14 +149,20 @@ class Man
     Motion motion;
     Vision vision;
     Comm comm;
-    Noggin noggin;   
-   
+    Noggin noggin;
+
 
   private:
     // Interfaces/Proxies to robot
+#ifdef NAOQI1
+    ALPtr<AL::ALLoggerProxy> log;
+    ALPtr<AL::ALProxy> camera;
+    ALPtr<AL::ALProxy> lem;
+#else
     AL::ALLoggerProxy *log;
     AL::ALProxy *camera;
     AL::ALProxy *lem;
+#endif
     std::string lem_name;
 
     int frame_counter;

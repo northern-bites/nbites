@@ -60,8 +60,13 @@ micro_time (void)
   return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
 }
 
+#ifdef NAOQI1
+Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
+  : ALModule(pBroker,pName),
+#else
 Man::Man ()
   : ALModule("Man"),
+#endif
     // this is not good usage of shared_ptr...  oh well
     Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
     python_prefs(),
@@ -77,20 +82,20 @@ Man::Man ()
     frame_counter(0), saved_frames(0), hack_frames(0)
 {
   // open lems
-  initModule();
+  initMan();
 }
 
 Man::~Man ()
 {
   // stop vision processing, comm, and motion
-  stop();
+    Thread::stop();
 
   // unregister lem
-  closeModule();
+  closeMan();
 }
 
 void
-Man::initModule()
+Man::initMan()
 {
 #ifdef DEBUG_MAN_INITIALIZATION
   printf("Man::initializing\n");
@@ -101,11 +106,17 @@ Man::initModule()
   setModuleDescription("Nao robotic soccer player");
 
   // Define callable methods with there description
-  //functionName("start", "Man", "Begin environment processing");
-  //BIND_METHOD(Man::start);
+  functionName("start", "Man", "Begin environment processing");
+  BIND_METHOD(Man::manStart);
 
-  //functionName("stop", "Man", "Halt environment processing");
-  //BIND_METHOD(Man::stop);
+  functionName("stop", "Man", "Halt environment processing");
+  BIND_METHOD(Man::manStop);
+
+  functionName("trigger_await_on", "Man", "Wait for Man to start");
+  BIND_METHOD(Man::manAwaitOn);
+
+  functionName("trigger_await_off", "Man", "Wait for Man to stop");
+  BIND_METHOD(Man::manAwaitOff);
 
   functionName("startProfiling", "Man", "Start vision frame profiling, "
     "for given number of frames");
@@ -116,24 +127,36 @@ Man::initModule()
 
   functionName("visionHack", "Man", "H4ck v1SI0n 2 pI3ce5");
   BIND_METHOD(Man::visionHack);
-
+  //functionName("helloWorld", "Man", "Test");
+  //BIND_METHOD(Man::helloWorld);
 
 #ifdef DEBUG_MAN_INITIALIZATION
   printf("  Opening proxies\n");
 #endif
   try {
-    log = ALLoggerProxy::getInstance();
+#ifdef NAOQI1
+      log = getParentBroker()->getLoggerProxy();
+#else
+      log = ALLoggerProxy::getInstance();
+#endif
     log->setVerbosity("warning");
   }catch (ALError &e) {
     std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
   }
 
+  
+#ifndef NAOQI1
   camera = NULL;
   lem = NULL;
+#endif
 
 #ifdef USE_VISION
   try {
+#ifdef NAOQI1
+    camera = getParentBroker()->getProxy("NaoCam");
+#else
     camera = new ALProxy("NaoCam");
+#endif
   }catch (ALError &e) {
     log->error("Man", "Could not create a proxy to NaoCam module");
     return;
@@ -168,7 +191,11 @@ Man::initModule()
   
 
   try {
-    lem = new ALProxy(lem_name);
+#ifdef NAOQI1
+      lem =getParentBroker()->getProxy(lem_name);
+#else
+      lem= new ALProxy(lem_name);
+#endif
   }catch (ALError &e) {
     log->error("Man", "Could not create the proxy for the Layer Extracator "
         "Module, name " + lem_name);
@@ -264,24 +291,19 @@ Man::initModule()
 }
 
 void
-Man::closeModule() {
+Man::closeMan() {
 #ifdef USE_VISION
-  if (camera != NULL) {
+
     try {
       camera->callVoid("unregister", lem_name);
-      delete camera;
-      camera = NULL;
     }catch (ALError &e) {
       log->error("Man", "Could not call the inregister method of the NaoCam "
-                "module");
-      camera = NULL;
+                   "module");
     }
-  }
 
-  delete lem;
-  lem = NULL;
 #endif
 }
+
 
 void
 Man::run ()
@@ -465,156 +487,6 @@ Man::processFrame ()
   PROF_ENTER(&profiler, P_GETIMAGE);
 
 }
-
-
-////////////////////////////////////////////
-//                                        //
-//  Library or runtime entry definitions  //
-//                                        //
-////////////////////////////////////////////
-
-
-#ifndef MAN_IS_REMOTE
-// Non-remote module
-//   builds a shared library to be loaded at naoqi initialization
-
-#  ifdef _WIN32
-#    define ALCALL __declspec(dllexport)
-#  else
-#    define ALCALL
-#  endif
-
-#  ifdef __cplusplus
-extern "C" {
-#  endif
-
-ALCALL int
-_createModule (ALBroker *pBroker)
-{
-
-  // init broker with the main broker instance 
-  // from the parent executable
-  ALBroker::setInstance(pBroker);
-      
-  // create modules instance. This will register automatically to the broker
-  lMan = shared_ptr<Man>(new Man());
-  // start Man in a new thread, so as to run the libraries main functions
-  lMan->start();
-
-  return 0;
-}
-
-ALCALL int
-_closeModule ()
-{
-  // Delete module instance.  Will unregister automatically.
-  if (lMan != NULL)
-    lMan->stop();
-
-  return 0;
-}
-
-#  ifdef __cplusplus
-}
-#  endif
-
-
-
-#else
-// MAN_IS_REMOTE defined
-// module is a remote module, so built as an executable binary
-
-
-void
-_terminationHandler (int signum)
-{
-  if (signum == SIGINT) {
-    // no direct exit, main thread will exit when finished
-    cerr << "Exiting Man via thread stop." << endl;
-    lMan->stop();
-  }
-  else {
-    cerr << "Emergency stop -- exiting immediately" << endl;
-    // fault, exit immediately
-    ::exit(1);
-  }
-}
-
-int
-usage (const char *name)
-{
-  cout << "USAGE: " << name << endl
-       << "\t-h \t\t: Display this help" << endl
-       << "\t-b <ip> \t: Binding address of the server.  Default is 127.0.0.1" << endl
-       << "\t-p <port> \t: Binding port of the server.  Default is 9559" << endl
-       << "\t-pip <ip> \t: Address of the parent broker.  Default is 127.0.0.1" << endl
-       << "\t-pport <ip> \t: Port of the parent broker.  Default is 9559" << endl;
-
-  return 0;
-}
-
-int
-main (int argc, char **argv)
-{
-  int  i = 1;
-  std::string brokerName = "man";
-  std::string brokerIP = "";
-  int brokerPort = 0 ;
-  // Default parent broker IP
-  std::string parentBrokerIP = "127.0.0.1";
-  // Default parent broker port
-  int parentBrokerPort = kBrokerPort;
-  
-  // checking options
-  while( i < argc ) {
-    if ( argv[i][0] != '-' ) return usage( argv[0] );
-    else if ( std::string( argv[i] ) == "-b" )        brokerIP          = std::string( argv[++i] );
-    else if ( std::string( argv[i] ) == "-p" )        brokerPort        = atoi( argv[++i] );
-    else if ( std::string( argv[i] ) == "-pip" )      parentBrokerIP    = std::string( argv[++i] );
-    else if ( std::string( argv[i] ) == "-pport" )    parentBrokerPort  = atoi( argv[++i] );
-    else if ( std::string( argv[i] ) == "-h" )        return usage( argv[0] );
-    i++;
-  }
-
-  // If server port is not set
-  if ( !brokerPort )
-    brokerPort = FindFreePort( brokerIP );     
-
-  std::cout << "Try to connect to parent Broker at ip :" << parentBrokerIP
-            << " and port : " << parentBrokerPort << std::endl;
-  //std::cout << "Start the server bind on this ip :  " << brokerIP
-  //          << " and port : " << brokerPort << std::endl;
-
-  // Starting Broker
-  AL::ALBroker* broker = AL::ALBroker::getInstance(  );
-  // init the broker with its ip and port, and the ip and port of a parent broker, if exist
-  broker->init( brokerName, brokerIP, brokerPort, parentBrokerIP, parentBrokerPort );
-
-# ifndef _WIN32
-  struct sigaction new_action;
-  // Set up the structure to specify the new action.
-  new_action.sa_handler = _terminationHandler;
-  sigemptyset( &new_action.sa_mask );
-  new_action.sa_flags = 0;
-
-  sigaction( SIGINT, &new_action, NULL );
-#endif
-
-  // Init Man. Module is automatically registered to the broker.
-  lMan = shared_ptr<Man>(new Man());
-  // Start the separate head thread
-  lMan->start();
-  lMan->getTrigger()->await_on();
-  // Wait for the head thread to exit
-  lMan->getTrigger()->await_off();
-
-  cout << "Main method finished." << endl;
-
-  // successful exit
-  return 0;
-}
-
-#endif // MAN_IS_REMOTE
 
 void
 Man::saveFrame(){
