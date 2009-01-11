@@ -49,7 +49,9 @@ public:
 #elif ROBOT(NAO_RL)
     void setFocalDistance() { focDist = 5700 / (getRadius() * 2); }
 #else
-    void setFocalDistance() { focDist = 2067.6f*pow(getRadius()*2.0f,-1.0595f); }
+    void setFocalDistance() {
+        focDist = 2067.6f*pow(getRadius()*2.0f,-1.0595f);
+    }
 #endif
     void findPinkBlobDist(){focDist = PinkBallAt1M * 100 / (getRadius() * 2); }
 
@@ -100,7 +102,6 @@ private:
     inline float ballBearingToSD(float _bearing) {
         return M_PI / 8.0f;
     }
-
 };
 
 

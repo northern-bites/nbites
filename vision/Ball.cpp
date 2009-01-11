@@ -30,8 +30,6 @@ void Ball::init() {
     elevation = 0;
 }
 
-
-
 void Ball::setDistance()
 {
     // translate distance estimates to body center
