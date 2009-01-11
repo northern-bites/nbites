@@ -192,7 +192,7 @@ PyLEDs_dealloc (PyObject* self)
 }
 
 const string*
-get_led_or_group (PyLEDs *self, int id)
+get_led_or_group (PyLEDs *self,  int id)
 {
   if (id < 0)
     return NULL;
@@ -204,7 +204,7 @@ get_led_or_group (PyLEDs *self, int id)
     return &LED_GROUPS[id];
 
   id -= NUM_LED_GROUPS;
-  if (id < self->groups.size())
+  if (id < (signed int)self->groups.size())
     return &self->groups[id];
 
   return NULL;

@@ -183,8 +183,8 @@ void FieldLines::lineLoop() {
 
   ++numFrames;
 
-  int numFramesToProfile = 30;
 #ifdef LINES_PROFILING
+  int numFramesToProfile = 30;
   if (numFrames % numFramesToProfile == 0) {
     cout << endl << endl;
     cout << "Average time in Find vertical points: "
@@ -1050,7 +1050,7 @@ const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
 #elif ROBOT(NAO)
   // These are based on 640x480 images
   // See https://robocup.bowdoin.edu/files/nao/NaoLineWidthData.xls
-  const int ERROR_ALLOWED = 8;
+  //const int ERROR_ALLOWED = 8;
   //return true;
   return width < 6111.8 * pow(distance, -1.0701);
 #endif
@@ -1097,7 +1097,6 @@ const bool FieldLines::isDownhillEdge(const int new_y_value,
 vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
   vector <VisualLine> lines;
 
-  long startTime;
 
   if (debugCreateLines)
     cout << "Grouping lines now with " << linePoints.size()
@@ -1203,7 +1202,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
         }
 
       }
-
+      //long startTime;
       //startTime = vision->getMillisFromStartup();
       // TODO: move to bottom
       // SANITY CHECK: Check to see if the segment formed by the old line

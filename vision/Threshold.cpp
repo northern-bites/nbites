@@ -1040,7 +1040,7 @@ print("   Theshold::SweepLeft");
   //variable definitions
   int pH, run, greenPixels, scanY;
   register int i, j;
-  unsigned char pixel, lastPixel;
+  unsigned char pixel; //, lastPixel;
   initColors();
 
   // if the pose estimated horizon is less than 0, then just use it directly
@@ -1054,7 +1054,6 @@ print("   Theshold::SweepLeft");
   run = 0;                 // how many consecutive green pixels have I seen?
   greenPixels = 0;
   scanY = 0;
-  i, j;
   int firstpix = 0;
   // we're going to do this backwards of how we used to - we start at the pose horizon and scan down
   for (j = pH; j < IMAGE_HEIGHT && horizon == -1; j+=4) {
