@@ -11,6 +11,8 @@ class VisualFieldObject;
 #include "Utility.h"
 #include "Structs.h"
 
+// Values for the Standard Deviation calculations
+
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
 class VisualFieldObject : public VisualLandmark {
@@ -44,8 +46,6 @@ public:
     // SETTERS
     void setWidth(float w) { width = w; }
     void setHeight(float h) { height = h; }
-    //void setX(int x1) { x = x1; }
-    //void setY(int y1) { y = y1; }
     void setLeftTopX(int _x){  leftTop.x = _x; }
     void setLeftTopY(int _y){  leftTop.y = _y; }
     void setRightTopX(int _x){ rightTop.x = _x; }
@@ -58,14 +58,8 @@ public:
     void setCenterY(int cY) { centerY = cY; }
     void setAngleX(float aX) { angleX = aX; }
     void setAngleY(float aY) { angleY = aY; }
-    //void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
     void setFocDist(float fd) { focDist = fd; }
-    //void setDist(float d) { dist = d; }
-    //void setCertainty(int c) {certainty = c; }
-    //void setDistCertainty(int c) {distCertainty = c;}
-    //void setDistanceSD(float sd) {distSD = sd;}
-    //void setBearingSD(float sd) {bearingSD = sd;}
     void setShoot(bool s1) {shoot = s1;}
     void setBackLeft(int x1) {backLeft = x1;}
     void setBackRight(int y1) {backRight = y1;}
@@ -76,12 +70,12 @@ public:
                                  _possibleFieldObjects) {
         possibleFieldObjects = _possibleFieldObjects;
     }
+    void setDistanceWithSD(float _distance);
+    void setBearingWithSD(float _bearing);
 
     // GETTERS
     float getWidth() const { return width; }
     float getHeight() const { return height; }
-    //int getX() const{ return x; }
-    //int getY() const{ return y; }
     int getLeftTopX() const{ return leftTop.x; }
     int getLeftTopY() const{ return leftTop.y; }
     int getRightTopX() const{ return rightTop.x; }
@@ -92,16 +86,10 @@ public:
     int getRightBottomY() const{ return rightBottom.y; }
     int getCenterX() const { return centerX; }
     int getCenterY() const { return centerY; }
-    //int getCertainty() const { return certainty; }
-    //int getDistCertainty() const { return distCertainty; }
     float getAngleX() const { return angleX; }
     float getAngleY() const { return angleY; }
     float getFocDist() const { return focDist; }
-    //float getDist() const{ return dist; }
-    //float getBearing() const { return bearing; }
     float getElevation() const { return elevation; }
-    //float getDistanceSD() const { return distSD; }
-    //float getBearingSD() const { return bearingSD; }
     int getShootLeft() const { return backLeft; }
     int getShootRight() const { return backRight; }
     int getBackDir() const { return backDir; }
@@ -127,12 +115,8 @@ private: // Class Variables
 
     float width;
     float height;
-    // int x;
-    // int y;
     int centerX;
     int centerY;
-    // int certainty;
-    // int distCertainty;
     int backLeft;
     int backRight;
     int backDir;
@@ -142,16 +126,19 @@ private: // Class Variables
     float angleX;
     float angleY;
     float focDist;
-    // float dist;
-    // float bearing;
     float elevation;
-    // float distSD;
-    // flost bearingSD;
     point <float> fieldLocation;
     fieldObjectID id;
     // This list will hold all the possibilities for this objects's specific ID
     list <const ConcreteFieldObject *> possibleFieldObjects;
 
+    // Helper Methods
+    inline float postDistanceToSD(float _distance) {
+        return 0.0496f * exp(0.0271f * _distance);
+    }
+    inline float postBearingToSD(float _bearing) {
+        return M_PI / 8.0f;
+    }
 };
 
 #endif

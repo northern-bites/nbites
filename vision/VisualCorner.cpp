@@ -21,10 +21,11 @@ VisualCorner::VisualCorner(const int _x, const int _y,
 
     determineCornerShape();
 
+    // Calculate and set the standard deviation of the measurements
+    setDistanceSD(cornerDistanceToSD(_distance));
+    setBearingSD(cornerBearingToSD(_bearing));
     //  calculateAngle();
     // TODO: remove
-
-
 }
 
 VisualCorner::~VisualCorner() {}
@@ -208,4 +209,28 @@ const shape VisualCorner::getLClassification() {
     } else {
         return OUTER_L;
     }
+}
+
+/**
+ * Calculate and set the standard deviation for the distance measurement.
+ * Set the distance measurement.
+ *
+ * @param _distance the distance estimate to be set
+ */
+void VisualCorner::setDistanceWithSD(float _distance)
+{
+    setDistance(_distance);
+    setDistanceSD(cornerDistanceToSD(_distance));
+}
+
+/**
+ * Calculate and set the standard deviation for the bearing measurement.
+ * Set the bearing measurement.
+ *
+ * @param _bearing the bearing estimate to be set
+ */
+void VisualCorner::setBearingWithSD(float _bearing)
+{
+    setBearing(_bearing);
+    setBearingSD(cornerBearingToSD(_bearing));
 }

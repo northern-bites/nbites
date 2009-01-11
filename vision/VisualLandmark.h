@@ -83,11 +83,16 @@ public:
     void setBearing(float _bearing) { bearing = _bearing; }
     void setDistanceSD(float _distanceSD) { distanceSD = _distanceSD; }
     void setBearingSD(float _bearingSD) { bearingSD = _bearingSD; }
-    //virtual void setDistanceWithSD(float _distance);
-    //virtual void setBearingWithSD(float _bearing);
     void setIDCertainty(certainty c) { idCertainty = c; }
     void setDistanceCertainty(distanceCertainty c) { distanceCert = c; }
     void setConcreteLandmark(ConcreteLandmark * c) { concreteLandmark = c; }
+    // Calculate and set the standard deviation of the measurement while
+    // setting the distance; should be used whenever a legitimate distance
+    // measurement is set
+    // pure virtual; to be defined by implementing subclass
+    virtual void setDistanceWithSD(float _distance) = 0;
+    virtual void setBearingWithSD(float _bearing) = 0;
+
 };
 
 

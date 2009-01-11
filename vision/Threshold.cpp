@@ -1571,14 +1571,14 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
     estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
 					  objPtr->getCenterY(),
 					  objPtr->getDistance());
-    objPtr->setDistance(obj_est.dist);
-    objPtr->setBearing(obj_est.bearing);
+    objPtr->setDistanceWithSD(obj_est.dist);
+    objPtr->setBearingWithSD(obj_est.bearing);
     objPtr->setElevation(obj_est.elevation);
   }
   else {
     objPtr->setFocDist(0.0);
-    objPtr->setDistance(0.0);
-    objPtr->setBearing(0.0);
+    objPtr->setDistanceWithSD(0.0);
+    objPtr->setBearingWithSD(0.0);
     objPtr->setElevation(0.0);
   }
 }

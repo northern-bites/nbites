@@ -72,10 +72,20 @@ public:
     void setShape(const shape s) { cornerType = s; }
     void setLine1(const VisualLine l1) { line1 = l1; }
     void setLine2(const VisualLine l2) { line2 = l2; }
+    void setDistanceWithSD(float _distance);
+    void setBearingWithSD(float _bearing);
+
 
 private: // private methods
     void determineCornerShape(); // called on object instantiation
     const shape getLClassification();
+    inline float cornerDistanceToSD(float _distance) {
+        return (10 + (_distance * _distance)*0.0125);
+    }
+    inline float cornerBearingToSD(float _bearing) {
+        return M_PI / 8.0f;
+    }
+
 
 private:
     // This list will hold all the possibilities for this corner's specific ID
@@ -128,5 +138,6 @@ public:
              abs(edges.bottom - y) < minPixelSeparation);
     }
 };
+
 
 #endif

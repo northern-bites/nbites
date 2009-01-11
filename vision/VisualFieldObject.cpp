@@ -70,6 +70,52 @@ void VisualFieldObject::init(){
     }
 }
 
+/**
+ * Calculate and set the standard deviation for the distance measurement.
+ * Set the distance measurement.
+ *
+ * @param _distance the distance estimate to be set
+ */
+void VisualFieldObject::setDistanceWithSD(float _distance)
+{
+    setDistance(_distance);
+    // Calculate the SD based on the object type
+    switch (getID()) {
+    case BLUE_GOAL_LEFT_POST:
+    case BLUE_GOAL_RIGHT_POST:
+    case YELLOW_GOAL_LEFT_POST:
+    case YELLOW_GOAL_RIGHT_POST:
+        setDistanceSD(postDistanceToSD(_distance));
+        break;
+    default:
+        setDistanceSD(postDistanceToSD(_distance));
+        break;
+    }
+}
+
+/**
+ * Calculate and set the standard deviation for the bearing measurement.
+ * Set the bearing measurement.
+ *
+ * @param _bearing the distance estimate to be set
+ */
+void VisualFieldObject::setBearingWithSD(float _bearing)
+{
+    setBearing(_bearing);
+    // Calculate the SD based on the object type
+    switch (getID()) {
+    case BLUE_GOAL_LEFT_POST:
+    case BLUE_GOAL_RIGHT_POST:
+    case YELLOW_GOAL_LEFT_POST:
+    case YELLOW_GOAL_RIGHT_POST:
+        setBearingSD(postBearingToSD(_bearing));
+        break;
+    default:
+        setDistanceSD(postBearingToSD(_bearing));
+        break;
+    }
+}
+
 void VisualFieldObject::printDebugInfo(FILE * out) {
     fprintf(out, "(%d, %d)\tdist: %f\tIDcertainty %d\n",
             getX(), getY(), getDistance(), getIDCertainty());
