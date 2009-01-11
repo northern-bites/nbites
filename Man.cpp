@@ -79,7 +79,8 @@ Man::Man ()
     vision(new NaoPose(&sensors), &profiler),
     comm(synchro, &sensors, &vision),
     noggin(&sensors, &profiler, &vision),
-    frame_counter(0), saved_frames(0), hack_frames(0)
+    frame_counter(0), saved_frames(0), hack_frames(0),
+    camera_active(false)
 {
   // open lems
   initMan();
@@ -144,21 +145,24 @@ Man::initMan()
     std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
   }
 
-  
-#ifndef NAOQI1
-  camera = NULL;
-  lem = NULL;
+  initCamera();
+
+#ifdef DEBUG_MAN_INITIALIZATION
+  printf("  DONE!\n");
 #endif
+}
 
 #ifdef USE_VISION
-  try {
 #ifdef NAOQI1
+void
+Man::initCamera(){
+
+  try {
     camera = getParentBroker()->getProxy("NaoCam");
-#else
-    camera = new ALProxy("NaoCam");
-#endif
+      camera_active =true;
   }catch (ALError &e) {
     log->error("Man", "Could not create a proxy to NaoCam module");
+    camera_active =false;
     return;
   }
 
@@ -171,9 +175,9 @@ Man::initMan()
   printf("  Registering LEM with format=%i colorSpace=%i fps=%i\n", format,
          colorSpace, fps);
 #endif
-  
+
   try {
-    lem_name = camera->call<std::string>("register", lem_name, format, 
+    lem_name = camera->call<std::string>("register", lem_name, format,
         colorSpace, fps);
   } catch (ALError &e) {
     SleepMs(500);
@@ -188,14 +192,10 @@ Man::initMan()
         "module\n" + e2.toString());
       return;
     }
-  
+
 
   try {
-#ifdef NAOQI1
       lem =getParentBroker()->getProxy(lem_name);
-#else
-      lem= new ALProxy(lem_name);
-#endif
   }catch (ALError &e) {
     log->error("Man", "Could not create the proxy for the Layer Extracator "
         "Module, name " + lem_name);
@@ -233,9 +233,9 @@ Man::initMan()
 
     // Our settings -- currently all mid-way between extremes, or off
     // currently off, as if messes up the image
-    
+
     //cout << "Setting Brightness" << endl;
-    
+
   for (int i=0;i<CAM_PARAM_RETRIES;++i){
     try {
       camera->callVoid("setParam", kCameraBrightnessID, 128);
@@ -281,29 +281,154 @@ Man::initMan()
 	}
   }
 
-#endif // USE_VISION
+}
+
+#else//NAOQI1
+
+void
+Man::initCamera(){
+  camera = NULL;
+  lem = NULL;
 
 
+  try {
+    camera = new ALProxy("NaoCam");
+  }catch (ALError &e) {
+    log->error("Man", "Could not create a proxy to NaoCam module");
+    return;
+  }
+
+  lem_name = "Man_LEM";
+  int format = NAO_IMAGE_SIZE;
+  int colorSpace = NAO_COLOR_SPACE;
+  int fps = 15;
 
 #ifdef DEBUG_MAN_INITIALIZATION
-  printf("  DONE!\n");
+  printf("  Registering LEM with format=%i colorSpace=%i fps=%i\n", format,
+         colorSpace, fps);
 #endif
+
+  try {
+    lem_name = camera->call<std::string>("register", lem_name, format,
+        colorSpace, fps);
+  } catch (ALError &e) {
+    SleepMs(500);
+  }
+
+  try {
+      printf("LEM failed once, trying again\n");
+      lem_name = camera->call<std::string>("register", lem_name, format,
+          colorSpace, fps);
+    }catch (ALError &e2) {
+      log->error("Man", "Could not call the register method of the NaoCam "
+        "module\n" + e2.toString());
+      return;
+    }
+
+  try {
+      lem= new ALProxy(lem_name);
+  }catch (ALError &e) {
+    log->error("Man", "Could not create the proxy for the Layer Extracator "
+        "Module, name " + lem_name);
+  }
+
+  const int CAM_PARAM_RETRIES = 3;
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+      // Turn of auto settings
+      camera->callVoid("setParam", kCameraAutoExpositionID, 0);
+      break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set AutoExposition 0");
+	}
+  }
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+    camera->callVoid("setParam", kCameraAutoWhiteBalanceID, 0);
+    break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set AutoWhiteBalance 0");
+	}
+  }
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+    camera->callVoid("setParam", kCameraAutoGainID, 0);
+    break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set AutoGain 0");
+	}
+  }
+
+    // Our settings -- currently all mid-way between extremes, or off
+    // currently off, as if messes up the image
+
+    //cout << "Setting Brightness" << endl;
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+      camera->callVoid("setParam", kCameraBrightnessID, 128);
+      break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set Brightness 128");
+	}
+  }
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+    camera->callVoid("setParam", kCameraContrastID, 64);
+    break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set Contrast 64");
+    }
+  }
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+    camera->callVoid("setParam", kCameraRedChromaID, 72);
+    break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set RedChroma 72");
+	}
+  }
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+    camera->callVoid("setParam", kCameraBlueChromaID,131);
+    break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set BlueChroma 131");
+	}
+  }
+
+  for (int i=0;i<CAM_PARAM_RETRIES;++i){
+    try {
+    camera->callVoid("setParam",kCameraExposureID,0);
+    break;
+    }catch (ALError &e){
+      log->error("Man", "Couldn't set Exposure 0");
+	}
+  }
+
 }
+#endif//NAOQI1
+#endif // USE_VISION
 
 void
 Man::closeMan() {
 #ifdef USE_VISION
-
+  if(camera_active){
     try {
       camera->callVoid("unregister", lem_name);
     }catch (ALError &e) {
       log->error("Man", "Could not call the inregister method of the NaoCam "
                    "module");
     }
-
+  }
 #endif
 }
-
 
 void
 Man::run ()
@@ -344,7 +469,8 @@ Man::run ()
     // Wait for signal
     //image_sig->await();
     // wait for and retrieve the latest image
-    waitForImage();
+    if(camera_active)
+      waitForImage();
 #else
     // simulate vision frame rate
     SleepMs(500);
@@ -397,6 +523,7 @@ Man::run ()
   trigger->off();
 }
 
+#ifdef NAOQI1
 void
 Man::waitForImage ()
 {
@@ -411,7 +538,92 @@ Man::waitForImage ()
 
     SleepMs(100);
     data = NULL;
+#ifndef MAN_IS_REMOTE
+#ifdef DEBUG_IMAGE_REQUESTS
+    printf("Requesting local image of size %ix%i, color space %i\n",
+           IMAGE_WIDTH, IMAGE_HEIGHT, NAO_COLOR_SPACE);
+#endif
 
+    // Attempt to retrive the next image
+    try {
+        image = (ALVisionImage*) (camera->call<int>("getImageLocal",lem_name));
+    }catch (ALError &e) {
+      log->error("NaoMain", "Could not call the getImageLocal method of the "
+          "NaoCam module");
+    }
+    if (image != NULL)
+      data = image->getFrame();
+
+#ifdef DEBUG_IMAGE_REQUESTS
+    //You can get some informations of the image.
+    int width = image->fWidth;
+    int height = image->fHeight;
+    int nbLayers = image->fNbLayers;
+    int colorSpace = image->fColorSpace;
+    long long timeStamp = image->fTimeStamp;
+    int seconds = (int)(timeStamp/1000000LL);
+    printf("Retrieved an image of dimensions %ix%i, color space %i,"
+           "with %i layers and a time stamp of %is \n",
+           width, height, colorSpace,nbLayers,seconds);
+#endif
+
+#else//Frame is remote:
+#ifdef DEBUG_IMAGE_REQUESTS
+    printf("Requesting remote image of size %ix%i, color space %i\n",
+           IMAGE_WIDTH, IMAGE_HEIGHT, NAO_COLOR_SPACE);
+#endif
+
+    // Attempt to retrive the next image
+    try {
+      image = lem->call<ALValue>("getImageRemote");
+    }catch (ALError &e) {
+      log->error("NaoMain", "Could not call the getImageRemote method of the "
+          "NaoCam module");
+    }
+
+    data = static_cast<const unsigned char*>(image[6].GetBinary());
+#ifdef DEBUG_IMAGE_REQUESTS
+    //You can get some informations of the image.
+    int width = (int) image[0];
+    int height = (int) image[1];
+    int nbLayers = (int) image[2];
+    int colorSpace = (int) image[3];
+    long long timeStamp = ((long long)(int)image[4])*1000000LL +
+        ((long long)(int)image[5]);
+    int seconds = (int)(timeStamp/1000000LL);
+    printf("Retrieved an image of dimensions %ix%i, color space %i,"
+           "with %i layers and a time stamp of %is \n",
+           width, height, colorSpace,nbLayers,seconds);
+#endif
+
+#endif//IS_REMOTE
+    
+    if (data != NULL) {
+      // Update Sensors image pointer
+      sensors.lockImage();
+      sensors.setImage(data);
+      sensors.releaseImage();
+    }
+ 
+  }catch (ALError &e) {
+    log->error("NaoMain", "Caught an error in run():\n" + e.toString());
+  }
+}
+#else//NAOQI1
+void
+Man::waitForImage ()
+{
+  try {
+    const unsigned char *data;
+#ifndef MAN_IS_REMOTE
+    ALVisionImage *image = NULL;
+#else
+    ALValue image;
+    image.arraySetSize(6);
+#endif
+
+    SleepMs(100);
+    data = NULL;
 #ifndef MAN_IS_REMOTE
 #ifdef DEBUG_IMAGE_REQUESTS
     printf("Requesting local image of size %ix%i, color space %i\n",
@@ -456,19 +668,23 @@ Man::waitForImage ()
     log->error("NaoMain", "Caught an error in run():\n" + e.toString());
   }
 }
+#endif//NAOQI1
 
 void
 Man::processFrame ()
 {
+
 #ifdef USE_VISION
   //  This is called from Python right now
-  vision.copyImage(sensors.getImage());
+  if(camera_active)
+    vision.copyImage(sensors.getImage());
 #endif
   PROF_EXIT(&profiler, P_GETIMAGE);
 
   PROF_ENTER(&profiler, P_FINAL);
 #ifdef USE_VISION
-  vision.notifyImage();
+  if(camera_active)
+    vision.notifyImage();
 #endif
 
 #ifdef DEBUG_BALL_DETECTION

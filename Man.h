@@ -133,6 +133,7 @@ class Man
 
     void initMan (void);
     void closeMan(void);
+    void initCamera(void);
 
   //
   // Variables
@@ -169,6 +170,8 @@ class Man
     int saved_frames;
     int hack_frames;
     int balls_seen;
+
+    bool camera_active;
 };
 
 
