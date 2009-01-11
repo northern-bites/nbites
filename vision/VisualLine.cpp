@@ -49,7 +49,9 @@ VisualLine::VisualLine(const VisualLine& other)
     thinnestHorPoint(other.thinnestHorPoint),
     thickestHorPoint(other.thickestHorPoint),
     thinnestVertPoint(other.thinnestVertPoint),
-    thickestVertPoint(other.thickestVertPoint)
+    thickestVertPoint(other.thickestVertPoint),
+    distance(other.getDistance()), bearing(other.getBearing()),
+    distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD())
 {
 }
 
@@ -294,5 +296,29 @@ leastSquaresFit(const vector <linePoint> &thePoints) {
 
 pair <float, float> VisualLine::leastSquaresFit(const VisualLine& l) {
   return leastSquaresFit(l.points);
+}
+
+/**
+ * Calculate and set the standard deviation for the distance measurement.
+ * Set the distance measurement.
+ *
+ * @param _distance the distance estimate to be set
+ */
+void VisualLine::setDistanceWithSD(float _distance)
+{
+    setDistance(_distance);
+    setDistanceSD(lineDistanceToSD(_distance));
+}
+
+/**
+ * Calculate and set the standard deviation for the bearing measurement.
+ * Set the bearing measurement.
+ *
+ * @param _bearing the bearing estimate to be set
+ */
+void VisualLine::setBearingWithSD(float _bearing)
+{
+    setBearing(_bearing);
+    setBearingSD(lineBearingToSD(_bearing));
 }
 
