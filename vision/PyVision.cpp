@@ -888,10 +888,10 @@ PyFieldObject_new (VisualFieldObject *o)
     self->width = PyFloat_FromDouble(o->getWidth());
     self->height = PyFloat_FromDouble(o->getHeight());
     self->focDist = PyFloat_FromDouble(o->getFocDist());
-    self->dist = PyFloat_FromDouble(o->getDist());
+    self->dist = PyFloat_FromDouble(o->getDistance());
     self->bearing = PyFloat_FromDouble(o->getBearing());
-    self->certainty = PyInt_FromLong(o->getCertainty());
-    self->distCertainty = PyInt_FromLong(o->getDistCertainty());
+    self->certainty = PyInt_FromLong(o->getIDCertainty());
+    self->distCertainty = PyInt_FromLong(o->getDistanceCertainty());
 
     if (self->centerX == NULL || self->centerY == NULL ||
         self->width == NULL || self->height == NULL ||
@@ -926,16 +926,16 @@ PyFieldObject_update (PyFieldObject *self)
   self->focDist = PyFloat_FromDouble(self->object->getFocDist());
 
   Py_XDECREF(self->dist);
-  self->dist = PyFloat_FromDouble(self->object->getDist());
+  self->dist = PyFloat_FromDouble(self->object->getDistance());
 
   Py_XDECREF(self->bearing);
   self->bearing = PyFloat_FromDouble(self->object->getBearing());
 
   Py_XDECREF(self->certainty);
-  self->certainty = PyInt_FromLong(self->object->getCertainty());
+  self->certainty = PyInt_FromLong(self->object->getIDCertainty());
 
   Py_XDECREF(self->distCertainty);
-  self->distCertainty = PyInt_FromLong(self->object->getDistCertainty());
+  self->distCertainty = PyInt_FromLong(self->object->getDistanceCertainty());
 }
 
 // backend methods
