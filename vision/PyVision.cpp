@@ -29,7 +29,7 @@ PyRobotAccess_new (RobotAccess *r)
     self->motionState = PyTuple_New(NUM_MOTION_STATES);
     self->sensors = PyTuple_New(NUM_SENSORS);
 
-    if (self->joints == NULL || self->motionState == NULL || 
+    if (self->joints == NULL || self->motionState == NULL ||
         self->sensors == NULL) {
       PyRobotAccess_dealloc(self);
       return NULL;
@@ -224,7 +224,7 @@ PyPose_update (PyObject *self, PyObject *args)
 
 
 // C++ - accessible interface
-/*jf- 
+/*jf-
 extern PyObject *
 PyVisualCorner_new (PyFieldLines *fl, int i)
 {
@@ -243,7 +243,7 @@ PyVisualCorner_new (PyFieldLines *fl, int i, const VisualCorner &corner)
     self->i = i;
 
     list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
-    
+
     self->dist = PyFloat_FromDouble(corner.getDistance());
     self->bearing = PyFloat_FromDouble(corner.getBearing());
 
@@ -256,8 +256,8 @@ PyVisualCorner_new (PyFieldLines *fl, int i, const VisualCorner &corner)
         PyList_SetItem(self->possibilities, c_i, py_concrete_corners[*c]);
       }
     }
-    
-    if (self->dist == NULL || self->bearing == NULL || 
+
+    if (self->dist == NULL || self->bearing == NULL ||
         self->possibilities == NULL) {
       PyVisualCorner_dealloc(self);
       self = NULL;
@@ -315,7 +315,7 @@ PyVisualCorner_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 extern void
-PyVisualCorner_dealloc (PyVisualCorner *self) 
+PyVisualCorner_dealloc (PyVisualCorner *self)
 {
   Py_XDECREF(self->dist);
   Py_XDECREF(self->bearing);
@@ -360,9 +360,9 @@ PyConcreteCorner_new (const ConcreteCorner *corner)
   if (self != NULL) {
 
     self->id = PyInt_FromLong(corner->getID());
-    self->fieldX = PyInt_FromLong(corner->getFieldX());
-    self->fieldY = PyInt_FromLong(corner->getFieldY());
-    
+    self->fieldX = PyFloat_FromDouble(corner->getFieldX());
+    self->fieldY = PyFloat_FromDouble(corner->getFieldY());
+
     if (self->id == NULL || self->fieldX == NULL || self->fieldY == NULL) {
       PyConcreteCorner_dealloc(self);
       self = NULL;
@@ -382,7 +382,7 @@ PyConcreteCorner_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 extern void
-PyConcreteCorner_dealloc (PyConcreteCorner *self) 
+PyConcreteCorner_dealloc (PyConcreteCorner *self)
 {
   Py_XDECREF(self->id);
   Py_XDECREF(self->fieldX);
@@ -471,7 +471,7 @@ PyVisualLine_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 extern void
-PyVisualLine_dealloc (PyVisualLine *self) 
+PyVisualLine_dealloc (PyVisualLine *self)
 {
   Py_XDECREF(self->x1);
   Py_XDECREF(self->y1);
@@ -521,7 +521,7 @@ PyFieldLines_new (FieldLines *fl)
 
     // Corners
     self->numCorners = PyInt_FromLong(corners->size());
-    int i = 0;
+    unsigned int i = 0;
     for (list<VisualCorner>::const_iterator c = corners->begin();
           c != corners->end(); c++,i++) {
       PyObject *o = PyVisualCorner_new(self, i, *c);
@@ -542,7 +542,7 @@ PyFieldLines_new (FieldLines *fl)
 
     // Lines
     self->numLines = PyInt_FromLong(lines->size());
-    for (int i = 0; i < lines->size(); i++) {
+    for (unsigned int i = 0; i < lines->size(); i++) {
       PyObject *l = PyVisualLine_new(self, i, lines->at(i));
       if (l != NULL)
         self->raw_lines.push_back(l);
@@ -552,14 +552,14 @@ PyFieldLines_new (FieldLines *fl)
     if (self->raw_lines.size() == lines->size()) {
       self->lines = PyList_New(lines->size());
       if (self->lines != NULL) {
-        for (int i = 0; i < self->raw_lines.size(); i++) {
+        for (unsigned int i = 0; i < self->raw_lines.size(); i++) {
           Py_INCREF(self->raw_lines[i]);
           PyList_SET_ITEM(self->lines, i, self->raw_lines[i]);
         }
       }
     }
 
-    if (self->numCorners == NULL || self->numLines == NULL || 
+    if (self->numCorners == NULL || self->numLines == NULL ||
         self->corners == NULL || self->lines == NULL) {
       PyFieldLines_dealloc(self);
       self = NULL;
@@ -581,7 +581,7 @@ PyFieldLines_update (PyFieldLines *self)
   self->numLines = PyInt_FromLong(lines->size());
 
   // Update all the corners, adding new ones if necessary
-  int i = 0;
+  unsigned int i = 0;
   for (list<VisualCorner>::const_iterator c = corners->begin();
        c != corners->end(); i++, c++) {
     if (i >= self->raw_corners.size()) {
@@ -645,7 +645,7 @@ PyFieldLines_update (PyObject *self, PyObject *args)
 
 
 
-// 
+//
 // PyThreshold defiinitions
 //
 
@@ -785,7 +785,7 @@ PyBall_new (Ball *b)
     self->confidence = PyInt_FromLong(b->getConfidence());
 
     if (self->centerX == NULL || self->centerY == NULL ||
-        self->width == NULL || self->height == NULL || 
+        self->width == NULL || self->height == NULL ||
         self->focDist == NULL || self->dist == NULL ||
         self->bearing == NULL || self->elevation == NULL ||
         self->confidence == NULL) {
@@ -803,7 +803,7 @@ PyBall_update (PyBall *self)
 {
   Py_XDECREF(self->centerX);
   self->centerX = PyInt_FromLong(self->ball->getCenterX());
-      
+
   Py_XDECREF(self->centerY);
   self->centerY = PyInt_FromLong(self->ball->getCenterY());
 
@@ -823,7 +823,7 @@ PyBall_update (PyBall *self)
   self->bearing = PyFloat_FromDouble(self->ball->getBearing());
 
   Py_XDECREF(self->elevation);
-  self->elevation = PyInt_FromLong(self->ball->getElevation());
+  self->elevation = PyFloat_FromDouble(self->ball->getElevation());
 
   Py_XDECREF(self->confidence);
   self->confidence = PyInt_FromLong(self->ball->getConfidence());
@@ -894,9 +894,9 @@ PyFieldObject_new (VisualFieldObject *o)
     self->distCertainty = PyInt_FromLong(o->getDistCertainty());
 
     if (self->centerX == NULL || self->centerY == NULL ||
-        self->width == NULL || self->height == NULL || 
+        self->width == NULL || self->height == NULL ||
         self->focDist == NULL || self->dist == NULL ||
-        self->bearing == NULL || self->certainty == NULL || 
+        self->bearing == NULL || self->certainty == NULL ||
         self->distCertainty == NULL) {
 
       PyFieldObject_dealloc(self);
@@ -912,7 +912,7 @@ PyFieldObject_update (PyFieldObject *self)
 {
   Py_XDECREF(self->centerX);
   self->centerX = PyInt_FromLong(self->object->getCenterX());
-      
+
   Py_XDECREF(self->centerY);
   self->centerY = PyInt_FromLong(self->object->getCenterY());
 
@@ -1111,7 +1111,7 @@ PyVision_dealloc (PyVision* self)
 extern PyObject *
 PyVision_copyImage (PyObject *self, PyObject *args)
 {
-  PyObject *result = NULL;
+    //PyObject *result = NULL;
   char *s;
   int len;
 
@@ -1143,7 +1143,7 @@ PyVision_notifyImage (PyObject *self, PyObject *args)
 
   if (size == 0) {
     v->notifyImage();
-    
+
   }else if (size == 1) {
     PyObject *s = PyTuple_GetItem(args, 0);
 
@@ -1296,7 +1296,7 @@ MODULE_INIT(vision) (void)
 
   //
   // Initialize module
-  // 
+  //
 
   module = Py_InitModule3(MODULE_HEAD "vision", vision_methods,
       "Python-wrapped C++ robot vision library");
@@ -1334,7 +1334,7 @@ MODULE_INIT(vision) (void)
   //
   // Fill py_concrete_corners array
   //
-  
+
   bool success = true;
   for (int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
     const ConcreteCorner *corner = ConcreteCorner::concreteCornerList[i];

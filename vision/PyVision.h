@@ -465,7 +465,7 @@ typedef struct PyVisualLine_t {
   PyFieldLines *fl;
 
   // The index of this VisualLine in FieldLines.getLines()
-  int i;
+  unsigned int i;
   // X and Y coordinates
   PyObject *x1, *y1, *x2, *y2;
   // Line slope and length
