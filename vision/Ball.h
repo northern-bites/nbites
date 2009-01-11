@@ -53,7 +53,9 @@ public:
         focDist = 2067.6f*pow(getRadius()*2.0f,-1.0595f);
     }
 #endif
-    void findPinkBlobDist(){focDist = PinkBallAt1M * 100 / (getRadius() * 2); }
+    void findPinkBlobDist() {
+        focDist = PinkBallAt1M * 100 / (getRadius() * 2);
+    }
 
     /* GETTERS */
     int getX() const {return x;}
