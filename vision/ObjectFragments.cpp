@@ -451,8 +451,8 @@ void ObjectFragments::robot(int bigGreen) {
 }
 
 void ObjectFragments::expandRobotBlob() {
-  int spany = blobHeight(topBlob);
-  int spanx = blobWidth(topBlob);
+    //int spany = blobHeight(topBlob);
+    //int spanx = blobWidth(topBlob);
   // expand right side
   int x, y;
   int bestr = topBlob.rightTop.x;
@@ -1261,7 +1261,7 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
 void ObjectFragments::correct(blob & post, int c, int c2) {
   if (c2 != 10000) return;
   // scan along the bottom
-  int bad1 = -1, bad2 = -1, temp = 0, good = 0;
+  //int bad1 = -1, bad2 = -1, temp = 0, good = 0;
   int x = max(0, post.leftTop.x), y = max(0, post.leftTop.y);
   int startX = x, startY = y;
   // start with the upper left corner
@@ -2770,11 +2770,11 @@ int ObjectFragments::crossCheck(blob b) {
 
 int ObjectFragments::crossCheck2(blob b) {
   // try and find the cross bar - start at the upper left corner
-  int biggest = 0, biggest2 = 0;
+  //int biggest = 0, biggest2 = 0;
   int x = b.leftTop.x;
   int y = b.leftTop.y;
   int h = b.leftBottom.y - b.leftTop.y;
-  int w = b.rightTop.x - b.leftTop.x;
+  //int w = b.rightTop.x - b.leftTop.x;
   int lefties = 0, righties = 0;
   for (int i = x - 10; i > max(0, x - h); i-=2) {
     int yp = yProject(x, y, i);
@@ -2869,7 +2869,7 @@ int ObjectFragments::checkIntersection(blob post) {
       if (POSTLOGIC) {
 	cout << "Got a T" << endl;
       }
-      int mid = midPoint(post.leftBottom.x, post.rightBottom.x);
+      //int mid = midPoint(post.leftBottom.x, post.rightBottom.x);
       int x = k->getX();
       int y = k->getY();
       bool swap = false;
@@ -2888,7 +2888,7 @@ int ObjectFragments::checkIntersection(blob post) {
       //cout << "here" << endl;
       int testX1 = midPoint(post.rightBottom.x, IMAGE_WIDTH - 1);
       int testX2 = midPoint(0, post.leftBottom.x);
-      int cross1 = 0, cross2 = 0;
+      //int cross1 = 0, cross2 = 0;
       // get the tstem and see if it intersect a plumb-line right or left
       VisualLine tstem = k->getTStem();
       point <int> plumbLineTop, plumbLineBottom;
@@ -4724,14 +4724,14 @@ int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFo
   int trueRight = max(pole.rightTop.x, pole.rightBottom.x);    // rightmost value in the blob
   int trueTop = min(pole.leftTop.y, pole.rightTop.y);             // topmost value in the blob
   int trueBottom = max(pole.leftBottom.y, pole.rightBottom.y); // bottommost value in teh blob
-  int lx = pole.leftTop.x;                                       // save these values in case we need
+  //int lx = pole.leftTop.x;                                       // save these values in case we need
   int ly = pole.leftTop.y;                                       // to look for the crossbar
-  int rx = pole.rightTop.x;
+  //int rx = pole.rightTop.x;
   // These variables are used to figure out whether we are looking at a right or left post
   // before proclaiming this a post, let's make sure its boundaries are in reasonable places
   int horizonLeft = horizonAt(trueLeft);
   int fakeBottom = max(trueBottom, horizonLeft);
-  int spanX = rx - lx + 1;
+  //int spanX = rx - lx + 1;
   int spanY = pole.leftBottom.y - ly;
   // do some sanity checking - this one makes sure the blob is ok
   if (!locationOk(pole, horizon)) {
@@ -4881,7 +4881,9 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
   //cout << horizon << " " << slope << endl;
   // if we don't have any runs there is nothing to do
   if (numberOfRuns <= 1) return;
-   int nextX = 0, nextY = 0, nextH = 0, dc = BOTH_UNSURE;
+  int nextX = 0;
+  //int nextY = 0;
+  int nextH = 0, dc = BOTH_UNSURE;
 #if ROBOT(AIBO)
   // start by blobbing - we often want to do it anyway
   for (int i = 0; i < numberOfRuns; i++) {
@@ -4934,7 +4936,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
   int spanY = pole.leftBottom.y - ly;
   int pspanY = fakeBottom - trueTop;
   //cout << "Spans " << spanY << " " << pspanY << endl;
-  int ySpan = pole.leftBottom.y - pole.leftTop.y + 1;
+  //int ySpan = pole.leftBottom.y - pole.leftTop.y + 1;
   // do some sanity checking - this one makes sure the blob is ok
   if (!locationOk(pole, horizon)) {
 #if ROBOT(AIBO)
@@ -6333,9 +6335,9 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     double perc = rightColor(blobs[i], ORANGE);
     estimate es;
     es = vision->pose->pixEstimate(blobs[i].leftTop.x + blobWidth(blobs[i]) / 2, blobs[i].leftTop.y + 2 * blobHeight(blobs[i]) / 3, 0.0);
-    int dist = (int)es.dist;
     int diam = max(blobWidth(blobs[i]), blobHeight(blobs[i]));
-    /*if (diam < 15) {
+    /*int dist = (int)es.dist;
+    if (diam < 15) {
       if (dist < 300) {
 	blobs[i].area = 0;
       }
@@ -6851,9 +6853,9 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight, int l
   // add a width fudge factor in case the object is occluded - bigger objects will also be taller
   //cout << (bottom + 5) << " " << minHeight << " " << top << " " << spanY << " " << spanX << " " << left << " " << right << endl;
 #if ROBOT(AIBO)
-  int fudge = 5;
+    //int fudge = 5;
 #elif ROBOT(NAO)
-  int fudge = 20;
+  //int fudge = 20;
 #endif
   if (spanY > 100) return true;
   if (bottom + 5 + min(spanX, 20) < minHeight) {
