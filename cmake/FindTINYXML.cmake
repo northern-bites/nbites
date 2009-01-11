@@ -5,23 +5,49 @@ INCLUDE( "${CMAKE_MODULE_PATH}/base_definitions.cmake" )
 ##
 # Includes
 ##
+
+
+#FOR NAOQI 0.18 back compatability
+IF( NAOQI1.0 STREQUAL "ON")
+
+## from ${AL_DIR}/cmakemodules/FindTINYXML.cmake
+include("${AL_DIR}/cmakemodules/aldebaran.cmake")
+include("${AL_DIR}/cmakemodules/libfind.cmake")
+
+clean(TINYXML)
+
+set(TINYXML_INCLUDE_DIR ${AL_DIR}/extern/c/src/tinyxml)
+if(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
+  SET( TINYXML_LIBRARIES ${AL_DIR}/extern/c/${TARGET_ARCH}/lib/tinyxml.lib)
+else(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
+  SET( TINYXML_LIBRARIES ${AL_DIR}/extern/c/${TARGET_ARCH}/lib/libtinyxml.a)
+endif(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
+
+export(TINYXML)
+
+
+
+ELSE( NAOQI1.0 STREQUAL "ON")
+SET(TINYXML_REL_PATH /extern/c/tinyxml/lib)
 SET( TINYXML_INCLUDE_DIR ${AL_DIR}/extern/c/tinyxml )
 
+
+#MESSAGE(ERROR "${TINYXML_REL_PATH}")
 IF( OE_CROSS_BUILD )
     SET( TINYXML_LIBRARIES
-        ${AL_DIR}/extern/c/tinyxml/lib/linux/libtinyxml.a
+      ${AL_DIR}${TINYXML_REL_PATH}/${TARGET_ARCH}/libtinyxml.a
     )
 ELSE( OE_CROSS_BUILD )
     IF( WIN32 )
         SET( TINYXML_LIBRARIES
-        ${AL_DIR}/extern/c/tinyxml/lib/${TARGET_ARCH}/tinyxml.lib
+        ${AL_DIR}${TINYXML_REL_PATH}/${TARGET_ARCH}/tinyxml.lib
         )
     ELSE( WIN32 )
         IF( APPLE )
             MESSAGE( STATUS "Remote objects have not been setup for Mac's yet - jfishman@" )
         ELSE( APPLE )
             SET( TINYXML_LIBRARIES
-                ${AL_DIR}/extern/c/tinyxml/lib/${TARGET_ARCH}/libtinyxml.a
+              ${AL_DIR}${TINYXML_REL_PATH}/${TARGET_ARCH}//libtinyxml.a
             )
         ENDIF( APPLE )
     ENDIF( WIN32 )
@@ -57,3 +83,4 @@ MARK_AS_ADVANCED(
   TINYXML_INCLUDE_DIR
   TINYXML_LIBRARIES
 )
+ENDIF( NAOQI1.0 STREQUAL "ON")
