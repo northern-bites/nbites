@@ -125,6 +125,7 @@ Man::initMan()
     printf("  Opening proxies\n");
 #endif
     try {
+
 #ifdef NAOQI1
         log = getParentBroker()->getLoggerProxy();
 #else
@@ -142,6 +143,7 @@ Man::initMan()
     }catch(ALError &e){
         cout << "Failed to initialize proxy to ALMemory" <<endl;
     }
+
 #endif
 
 #ifdef USE_VISION
@@ -441,6 +443,7 @@ Man::closeMan() {
     }
 #endif
 }
+
 
 void
 Man::run ()
