@@ -14,6 +14,7 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
+    : possibleLines(ConcreteLine::concreteLines)
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
          i != nodes.end(); i++) {
@@ -23,14 +24,17 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     init();
 }
 
-VisualLine::VisualLine() {
+VisualLine::VisualLine() : possibleLines(ConcreteLine::concreteLines)
+{
 
 }
 
 
 
 
-VisualLine::VisualLine(list<linePoint> &linePoints) {
+VisualLine::VisualLine(list<linePoint> &linePoints)
+    : possibleLines(ConcreteLine::concreteLines)
+{
     for (list<linePoint>::iterator i = linePoints.begin();
          i != linePoints.end(); i++) {
         // We need to dereference twice to get to the actual linePoint object.
@@ -52,7 +56,8 @@ VisualLine::VisualLine(const VisualLine& other)
       thinnestVertPoint(other.thinnestVertPoint),
       thickestVertPoint(other.thickestVertPoint),
       distance(other.getDistance()), bearing(other.getBearing()),
-      distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD())
+      distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
+      possibleLines(ConcreteLine::concreteLines)
 {
 }
 

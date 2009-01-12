@@ -128,13 +128,6 @@ public:
               << " " << l.color << endl;
             */
         }
-    /**
-     * @return a List of all possible lines.  Currently returns all 11 lines
-     */
-    const list <const ConcreteLine *> getPossibleLines() {
-        //return possibleLines;
-        return ConcreteLine::concreteLines;
-    }
 
 private: // Member functions
     void init();
@@ -185,6 +178,7 @@ private: // Private member variables
     float bearing;
     float distanceSD;
     float bearingSD;
+    list <const ConcreteLine*> possibleLines;
 
 public:
     // Getters
@@ -192,6 +186,13 @@ public:
     const float getBearing() const { return bearing; }
     const float getDistanceSD() const { return distanceSD; }
     const float getBearingSD() const { return bearingSD; }
+    /**
+     * @return a List of all possible lines.  Currently returns all 11 lines
+     */
+    const list <const ConcreteLine *> getPossibleLines() {
+        return possibleLines;
+    }
+
 
     // Setters
     void setDistance(float _distance) { distance = _distance; }
@@ -200,6 +201,9 @@ public:
     void setBearingSD(float _bearingSD) { bearingSD = _bearingSD; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
+    void setPossibleLines(list <const ConcreteLine*> _possibles) {
+        possibleLines = _possibles;
+    }
 
 };
 #endif
