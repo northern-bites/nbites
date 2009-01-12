@@ -1,6 +1,7 @@
 
 
 #include <boost/shared_ptr.hpp>
+using namespace boost;
 
 #include "synchro.h"
 #include "Motion.h"

@@ -154,6 +154,8 @@ class Man
 #endif
     Vision vision;
     Comm comm;
+    Noggin noggin;
+
 
   private:
     // Interfaces/Proxies to robot
