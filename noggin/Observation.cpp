@@ -23,48 +23,12 @@ Observation::Observation(VisualFieldObject &_object)
 
     id = _object.getID();
 
-    // Figure out which possible landmarks we have...
-    // This should be cleaner like in corners, once field objects is in line...
-    if (_object.getCertainty() == SURE) {
-        PointLandmark objectLandmark;
-        if ( id == BLUE_GOAL_LEFT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                blue_goal_left_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                blue_goal_left_post.getFieldY();
-        } else if( id == BLUE_GOAL_RIGHT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                blue_goal_right_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                blue_goal_right_post.getFieldY();
-        } else if ( id == YELLOW_GOAL_LEFT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                yellow_goal_left_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                yellow_goal_left_post.getFieldY();
-        } else if( id == YELLOW_GOAL_RIGHT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                yellow_goal_right_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                yellow_goal_right_post.getFieldY();
-        }
-        pointPossibilities.push_back(objectLandmark);
-        Observation::numPossibilities = 1;
-        return;
-    }
-
-    list <const ConcreteFieldObject *> objList;
-    if ( id == BLUE_GOAL_LEFT_POST ||
-         id == BLUE_GOAL_RIGHT_POST) {
-            objList = ConcreteFieldObject::blueGoalPosts;
-    } else {
-            objList = ConcreteFieldObject::yellowGoalPosts;
-    }
     // Initialize to 0 possibilities
     numPossibilities = 0;
 
     list <const ConcreteFieldObject *>::iterator theIterator;
-    //list <const ConcreteFieldObject *> objList = _object.getPossibleFieldObjects();
+    list <const ConcreteFieldObject *> objList =
+        _object.getPossibleFieldObjects();
     for( theIterator = objList.begin(); theIterator != objList.end();
          ++theIterator) {
         PointLandmark objectLandmark((**theIterator).getFieldX(),
