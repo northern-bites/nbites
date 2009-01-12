@@ -32,6 +32,7 @@ public:
     void setAngleY(float aY) { angleY = aY; }
     void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
+    void setConfidence(int c) {confidence = c;}
     void setDistance();
     void setX(int x1) {x = x1;}
     void setY(int y1) {y = y1;}
