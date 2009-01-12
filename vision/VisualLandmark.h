@@ -83,7 +83,7 @@ public:
     void setBearing(float _bearing) { bearing = _bearing; }
     void setDistanceSD(float _distanceSD) { distanceSD = _distanceSD; }
     void setBearingSD(float _bearingSD) { bearingSD = _bearingSD; }
-    void setIDCertainty(certainty c) { idCertainty = c; }
+    virtual void setIDCertainty(certainty c) { idCertainty = c; }
     void setDistanceCertainty(distanceCertainty c) { distanceCert = c; }
     void setConcreteLandmark(ConcreteLandmark * c) { concreteLandmark = c; }
     // Calculate and set the standard deviation of the measurement while

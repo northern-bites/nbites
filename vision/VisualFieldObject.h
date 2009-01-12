@@ -72,6 +72,7 @@ public:
     }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
+    virtual void setIDCertainty(certainty c);
 
     // GETTERS
     float getWidth() const { return width; }
