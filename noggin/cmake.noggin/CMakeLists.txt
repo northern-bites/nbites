@@ -1,21 +1,21 @@
 ##############################
 #
-# WELCOME 
+# WELCOME
 #
-# This is the main cmake configuration file 
+# This is the main cmake configuration file
 # associate to your projects
 # You can define here specific compilation options
-# 
+#
 # More about cmake : www.cmake.org
 #
-# Using cmake command line : 
+# Using cmake command line :
 # 1. Create a build directory : mkdir build
 # 2. Configure cmake project : cd build; cmake ..
-#   You can also generate project with your favorite IDE : 
+#   You can also generate project with your favorite IDE :
 #   Example : Under Mac osx use "cmake .. -G XCode"
 #   see cmake help for more information
 # 3. Edit project option : ccmake .
-# 4. Build it : make 
+# 4. Build it : make
 
 
 
@@ -40,7 +40,7 @@ SET( CMAKE_COLOR_MAKEFILE TRUE )
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ../../../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -106,10 +106,12 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      )
 
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 
 SET( NOGGIN_SRCS ${NOGGIN_INCLUDE_DIR}/Noggin.cpp
+                 ${NOGGIN_INCLUDE_DIR}/Observation.cpp
+                 ${NOGGIN_INCLUDE_DIR}/MCL.cpp
                  )
 
 
@@ -164,7 +166,7 @@ INSTALL(
 
 #IF( APPLE )
   SET_TARGET_PROPERTIES(
-    ${NOGGIN_TARGET} 
+    ${NOGGIN_TARGET}
     PROPERTIES LINKER_LANGUAGE CXX
     )
 #ENDIF( APPLE )
