@@ -64,6 +64,21 @@ public class FrameLoader implements FileFilter {
                 frm.setImage(new YUV422Image(input,
                                              RobotDef.NAO_DEF.imageWidth(),
                                              RobotDef.NAO_DEF.imageHeight()));
+                // read footer
+                footer = new byte[input.available()];
+                input.readFully(footer);
+
+                String fullFooter = new String(footer, "ASCII");
+                String[] values = fullFooter.split(" ");
+                Vector<Float> joints = new Vector<Float>();
+                for (int i = 0; i < values.length; i++) {
+                    try {
+                        joints.add(Float.parseFloat(values[i]));
+                    }catch (NumberFormatException e) {
+                        break;
+                    }
+                }
+                frm.setJoints(joints)
 
             }else if (upper.endsWith(AIBO_EXT)) {
                 // skip header
