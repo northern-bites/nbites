@@ -1,8 +1,7 @@
 #include "ChopShop.h"
 
 ChopShop::ChopShop (Sensors *s, float motionFrameLength)
-	: finalJoints(0),
-	  diffPerChop(22),
+	: diffPerChop(22),
 	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
 	  choppedJoints(),
@@ -52,31 +51,33 @@ queue<vector<vector<float> > > ChopShop::chopLinear(const BodyJointCommand *comm
 	// Get number of chops according to duration
 	float numChops = command->getDuration()/FRAME_LENGTH_S;
 
-	// Get current angles&errors from sensors
-	vector<float> currentJoints = sensors->getBodyAngles();
-	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
-
-	// Adjust to real currentJoints, not Sensors'
-	for (int i=0; i<NUM_JOINTS ; i++) {
-		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
-	}
-
+	vector<float> currentJoints = getCurrentJoints();
 	// Add final joints for all chains
-	addFinalJoints(command, &currentJoints);
+	vector<float> finalJoints = addFinalJoints(command, &currentJoints);
 
 	//Get diff per chop from current to final
-	for ( int joint_id=0; joint_id < NUM_JOINTS ;++joint_id) {
+	for ( int joint_id=0; joint_id < NUM_JOINTS ;++joint_id)
 		diffPerChop.push_back( (finalJoints.at(joint_id) -
-								currentJoints.at(joint_id)) /
-							   numChops);
-	}
+								currentJoints.at(joint_id)) / numChops);
+
 	finalJoints.clear();
 
 	chopThat(numChops, &currentJoints);
 	return choppedJoints;
 }
 
+vector<float> ChopShop::getCurrentJoints() {
 
+	// Get current angles&errors from sensors
+	vector<float> currentJoints = sensors->getBodyAngles();
+	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
+
+	// Adjust to real currentJoints, not Sensors'
+	for (int i=0; i<NUM_JOINTS ; i++)
+		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
+
+	return currentJoints;
+}
 
 // Takes final joint values and
 void ChopShop::chopThat(float numChops, vector<float> *currentJoints) {
@@ -100,8 +101,9 @@ void ChopShop::chopThat(float numChops, vector<float> *currentJoints) {
 } // END CHOP THAT
 
 
-void ChopShop::addFinalJoints(const BodyJointCommand *command,
+vector<float> ChopShop::addFinalJoints(const BodyJointCommand *command,
 								  vector<float>* currentJoints) {
+	vector<float> finalJoints;
 	vector<float>::iterator currentStart = currentJoints->begin();
 	vector<float>::iterator currentEnd = currentJoints->begin();
 
@@ -125,16 +127,16 @@ void ChopShop::addFinalJoints(const BodyJointCommand *command,
 		// Set the start iterator into the right position for the
 		// next chain
 		currentStart += chain_lengths[chain];
-
 	}
-	finalJointsToRad();
+	finalJointsToRad(&finalJoints);
+	return finalJoints;
 }
 
-void ChopShop::finalJointsToRad() {
+void ChopShop::finalJointsToRad(vector<float> *finalJoints) {
 	vector<float>::iterator i;
-	i = finalJoints.begin();
+	i = finalJoints->begin();
 	i++;
-	while ( i != finalJoints.end() ) {
+	while ( i != finalJoints->end() ) {
 		// Convert joints to radians from degrees
 		*i = *i / 57.29577;
 		i++;

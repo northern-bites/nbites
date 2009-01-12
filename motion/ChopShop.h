@@ -37,10 +37,11 @@ private:
 
 	queue<vector<vector<float> > > chopLinear(const BodyJointCommand *command);
 
+	vector<float> getCurrentJoints();
 	void chopThat(float numChops, vector<float>* currentJoints);
-	void addFinalJoints(const BodyJointCommand *command, vector<float>* currentJoints);
+	vector<float> addFinalJoints(const BodyJointCommand *command, vector<float>* currentJoints);
 
-	void finalJointsToRad();
+	void finalJointsToRad(vector<float> *finalJoints);
 
 };
 
