@@ -41,6 +41,10 @@ void Ball::setDistance()
     setBearing(ball_est.bearing);
     setElevation(ball_est.elevation);
     dist = ball_est.dist;
+
+    // Calcualate and set standard deviations
+    setDistanceSD(ballDistanceToSD(dist));
+    setBearingSD(ballBearingToSD(ball_est.bearing));
 }
 
 
