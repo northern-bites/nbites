@@ -18,21 +18,20 @@ public:
     Ball(Vision *vis);
     virtual ~Ball() {}
 
-
     // Ball VOID Functions
     void init();
 
     /* SETTERS */
     // Best Guesses
-    void setWidth(double w) { width = w; }
-    void setHeight(double h) { height = h; }
-    void setRadius(double r) { radius = r; }
+    void setWidth(float w) { width = w; }
+    void setHeight(float h) { height = h; }
+    void setRadius(float r) { radius = r; }
     void setCenterX(int cx) { centerX = cx; }
     void setCenterY(int cy) { centerY = cy; }
-    void setAngleX(double aX) { angleX = aX; }
-    void setAngleY(double aY) { angleY = aY; }
-    void setBearing(double b) { bearing = b; }
-    void setElevation(double e) { elevation = e; }
+    void setAngleX(float aX) { angleX = aX; }
+    void setAngleY(float aY) { angleY = aY; }
+    void setBearing(float b) { bearing = b; }
+    void setElevation(float e) { elevation = e; }
     void setConfidence(int c) {confidence = c;}
     void setDistance();
     void setX(int x1) {x = x1;}
@@ -53,40 +52,40 @@ public:
 #endif
     void findPinkBlobDist(){focDist = PinkBallAt1M * 100 / (getRadius() * 2); }
 
-  /* GETTERS */
-  int getX() {return x;}
-  int getY() {return y;}
-  float getWidth() { return width; }
-  float getHeight() { return height; }
-  float getRadius() { return radius; }
-  int getCenterX() { return centerX; }
-  int getCenterY() { return centerY; }
-  float getAngleX() { return angleX; }
-  float getAngleY() { return angleY; }
-  float getFocDist() { return focDist; }
-  float getDist() { return dist; }
-  float getBearing() { return bearing; }
-  float getElevation() { return elevation; }
-  int getConfidence() {return confidence;}
+    /* GETTERS */
+    int getX() {return x;}
+    int getY() {return y;}
+    float getWidth() { return width; }
+    float getHeight() { return height; }
+    float getRadius() { return radius; }
+    int getCenterX() { return centerX; }
+    int getCenterY() { return centerY; }
+    float getAngleX() { return angleX; }
+    float getAngleY() { return angleY; }
+    float getFocDist() { return focDist; }
+    float getDist() { return dist; }
+    float getBearing() { return bearing; }
+    float getElevation() { return elevation; }
+    int getConfidence() {return confidence;}
 
 private:
     // Vision class pointer
     Vision *vision;
 
-  /* Best guessed Ball Variables */
-  int x, y;
-  float width;
-  float height;
-  float radius;
-  int centerX;
-  int centerY;
-  float angleX;
-  float angleY;
-  float focDist;
-  float dist;
-  float bearing;
-  float elevation;
-  int confidence;
+    /* Best guessed Ball Variables */
+    int x, y;
+    float width;
+    float height;
+    float radius;
+    int centerX;
+    int centerY;
+    float angleX;
+    float angleY;
+    float focDist;
+    float dist;
+    float bearing;
+    float elevation;
+    int confidence;
 };
 
 
