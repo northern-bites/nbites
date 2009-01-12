@@ -12,16 +12,14 @@
 /**
  * @param fo FieldObject that was seen and reported.
  */
-Observation::Observation(FieldObjects &_object)
+Observation::Observation(VisualFieldObject &_object)
 {
     // We aren't a line
     line_truth = false;
-    visDist = _object.getDist();
+    visDist = _object.getDistance();
     visBearing = _object.getBearing();
-    // sigma_d = _object.getDistanceSD();
-    // sigma_b = _object.getBearingSD();
-    sigma_d = visDist * 4.0f;
-    sigma_b = visBearing * 4.0f;
+    sigma_d = _object.getDistanceSD();
+    sigma_b = _object.getBearingSD();
 
     id = _object.getID();
 
@@ -87,10 +85,8 @@ Observation::Observation(VisualCorner &_corner)
     // Get basic vision information
     visDist = _corner.getDistance();
     visBearing = _corner.getBearing();
-    //sigma_d = _corner.getDistanceSD();
-    //sigma_b = _corner.getBearingSD();
-    sigma_d = visDist * 4.0f;
-    sigma_b = visBearing * 4.0f;
+    sigma_d = _corner.getDistanceSD();
+    sigma_b = _corner.getBearingSD();
     //id = _corner.getID();
 
     // Build our possibilitiy list
@@ -116,14 +112,10 @@ Observation::Observation(VisualLine &_line)
     line_truth = true;
 
     // Get basic vision information
-    // visDist = _line.getDistance();
-    // visBearing = _line.getBearing();
-    // sigma_d = _line.getDistanceSD();
-    // sigma_b = _line.getBearingSD();
-    visDist = 100;
-    visBearing = 200;
-    sigma_d = visDist * 4.0f;
-    sigma_b = visBearing * 4.0f;
+    visDist = _line.getDistance();
+    visBearing = _line.getBearing();
+    sigma_d = _line.getDistanceSD();
+    sigma_b = _line.getBearingSD();
     //id = _line.getID();
 
     // Build our possibilitiy list

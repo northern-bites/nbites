@@ -15,7 +15,7 @@ using namespace std;
 #include "ConcreteFieldObject.h"
 #include "VisualLine.h"
 #include "VisualCorner.h"
-#include "FieldObjects.h"
+#include "VisualFieldObject.h"
 #include "Structs.h"
 
 // Structs
@@ -57,7 +57,7 @@ public:
     vector< pair<float, float> > posibilities;
 
     // Construcotrs & Destructors
-    Observation(FieldObjects &_object);
+    Observation(VisualFieldObject &_object);
     Observation(VisualCorner &_corner);
     Observation(VisualLine &_line);
     Observation(const ConcreteCorner &_corner);
