@@ -51,14 +51,6 @@ void MotionSwitchboard::start() {
 
     running = true;
 
-    // set thread attributes
-    pthread_attr_t attr;
-    pthread_attr_init (&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    // create & start thread.
-    pthread_create(&switchboard_thread, &attr, runThread, (void *)this);
-    // destroy the used attributes
-    pthread_attr_destroy(&attr);
 }
 
 

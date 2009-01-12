@@ -605,7 +605,7 @@ Kinematics::dls(const ChainID chainID,
 
 
 
-#ifdef NOTHING
+//#ifdef NOTHING
 //Usage example, code for offline testing:
 /*
 int main() {
