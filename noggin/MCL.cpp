@@ -71,7 +71,7 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
     for (int m = 0; m < M; ++m) {
         // Determine the number of copies of this particle to add
         X_bar_t[m].weight /= totalWeights;
-        int count = float(M) * X_bar_t[m].weight;
+        int count = int(round(float(M) * X_bar_t[m].weight));
 
         //cout<< endl << "Weight: " << X_bar_t[m].weight << endl;
         //cout << "Count: " << count << endl;
