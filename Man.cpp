@@ -148,7 +148,9 @@ Man::initMan()
     std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
   }
 
+#ifdef USE_VISION
   initCamera();
+#endif
 
 #ifdef DEBUG_MAN_INITIALIZATION
   printf("  DONE!\n");
