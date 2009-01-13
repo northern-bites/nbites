@@ -35,19 +35,23 @@ BallEKF::BallEKF(float initX, float initY,
  * @param Q the input covariance matrix
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
-ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
+ublas::matrix<float> BallEKF::associateTimeUpdate(MotionModel u)
 {
     // Calculate the assumed change in ball position
     // Assume no decrease in ball velocity
-    ublas::vector<float> deltaBall(BALL_EKF_DIMENSION);
-    deltaBall(0) = getXVelocityEst() * (1. / ASSUMED_FPS);
-    deltaBall(1) = getYVelocityEst() * (1. / ASSUMED_FPS);
-    deltaBall(2) = 0;
-    deltaBall(3) = 0;
+    ublas::matrix<float> deltaBall(BALL_EKF_DIMENSION,1);
+    deltaBall(0,0) = getXVelocityEst() * (1. / ASSUMED_FPS);
+    deltaBall(1,0) = getYVelocityEst() * (1. / ASSUMED_FPS);
+    deltaBall(2,0) = 0;
+    deltaBall(3,0) = 0;
 
     return deltaBall;
 }
 
-void BallEKF::incorporateCorrectionMeasurement(Observation z)
+ublas::matrix<float> BallEKF::incorporateCorrectionMeasurement(Observation z,
+                                               ublas::matrix<float> &H_k,
+                                               ublas::matrix<float> &R_k)
 {
+    ublas::matrix<float> v_k;
+    return v_k;
 }

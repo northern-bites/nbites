@@ -36,22 +36,22 @@ public:
     /**
      * @return The current estimate of the ball x position
      */
-    float getXEst() { return xhat_k[0]; }
+    float getXEst() { return xhat_k(0,0); }
 
     /**
      * @return The current estimate of the ball y position
      */
-    float getYEst() { return xhat_k[1]; }
+    float getYEst() { return xhat_k(1,0); }
 
     /**
      * @return The current estimate of the ball x velocity
      */
-    float getXVelocityEst() { return xhat_k[2]; }
+    float getXVelocityEst() { return xhat_k(2,0); }
 
     /**
      * @return The current estimate of the ball y velocity
      */
-    float getYVelocityEst() { return xhat_k[3]; }
+    float getYVelocityEst() { return xhat_k(3,0); }
 
     /**
      * @return The current uncertainty for ball x position
@@ -75,8 +75,10 @@ public:
 
 private:
     // Core Functions
-    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k);
-    virtual void incorporateCorrectionMeasurement(Observation z);
+    virtual ublas::matrix<float> associateTimeUpdate(MotionModel u_k);
+    virtual ublas::matrix<float> incorporateCorrectionMeasurement(Observation z,
+                                                  ublas::matrix<float> &H_k,
+                                                  ublas::matrix<float> &R_k);
 
 public:
     //const ublas::matrix<float> BALL_TIME_UPDATE_JACOBIAN;
