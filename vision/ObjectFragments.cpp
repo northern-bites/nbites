@@ -2794,7 +2794,7 @@ int ObjectFragments::crossCheck2(blob b) {
   }
   if (righties > 50 && righties > 10 * lefties)
     return LEFT;
-  if (lefties > 50 && lefties > 10 & righties)
+  if (lefties > 50 && lefties > 10 * righties)
     return RIGHT;
   return NOPOST;
 }
