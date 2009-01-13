@@ -1974,7 +1974,7 @@ void Threshold::initDebugImage(){
  * to the real image.
  */
 void Threshold::transposeDebugImage(){
-#ifdef OFFLINE
+#if defined OFFLINE && defined DEBUG_IMAGE
   for(int x = 0 ; x < IMAGE_WIDTH;x++)
     for(int y = 0; y < IMAGE_HEIGHT;y++)
       if(debugImage[y][x]!=GREY){
