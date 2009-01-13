@@ -75,12 +75,10 @@ public:
 
 private:
     // Core Functions
-    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k,
-                                                     ublas::matrix<float>,
-                                                     ublas::matrix<float>);
+    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k);
     virtual void incorporateCorrectionMeasurement(Observation z);
 
 public:
-    const ublas::vector<float> BALL_TIME_UPDATE_JACOBIAN;
+    //const ublas::matrix<float> BALL_TIME_UPDATE_JACOBIAN;
 };
 #endif // File

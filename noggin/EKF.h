@@ -30,6 +30,9 @@ protected:
     ublas::matrix<float> Q_k; // Input noise covariance matrix
     ublas::matrix<float> A_k; // Jacobian associated with update measurement
     ublas::matrix<float> P_k; // Uncertainty Matrix
+    float states; // number of states in the kalman filter
+    float beta; // constant uncertainty increase
+    float gamma; // scaled uncertainty increase
 
 public:
     // Constructors & Destructors
@@ -42,9 +45,7 @@ public:
     virtual void noCorrectionStep();
 private:
     // Pure virtual methods to be specified by implementing class
-    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k,
-                                                     ublas::matrix<float>,
-                                                     ublas::matrix<float>) = 0;
+    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k) = 0;
     virtual void incorporateCorrectionMeasurement(Observation z) = 0;
 };
 #endif EKF_h_DEFINED
