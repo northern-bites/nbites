@@ -1,6 +1,13 @@
 #include "BallEKF.h"
 
-BallEKF::BallEKF() : EKF(BALL_EKF_DIMENSION)
+BallEKF::BallEKF(float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
+                 float initVelX = INIT_BALL_X_VEL,
+                 float initVelY = INIT_BALL_Y_VEL,
+                 float initXUncert = INIT_X_UNCERT,
+                 float initYUncert = INIT_Y_UNCERT,
+                 float initVelXUncert = INIT_X_VEL_UNCERT,
+                 float initVelYUncert = INIT_Y_VEL_UNCERT)
+    : EKF(BALL_EKF_DIMENSION)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0f;
@@ -16,14 +23,6 @@ BallEKF::BallEKF() : EKF(BALL_EKF_DIMENSION)
     gamma = GAMMA_BALL;
 }
 
-BallEKF::BallEKF(float initX, float initY,
-                 float initVelX, float initVelY,
-                 float initXUncert,float initYUncert,
-                 float initVelXUncert, float initVelYUncert)
-    : EKF(BALL_EKF_DIMENSION)
-{
-}
-
 
 /**
  * Method incorporate the expected change in ball position from the last
@@ -35,23 +34,23 @@ BallEKF::BallEKF(float initX, float initY,
  * @param Q the input covariance matrix
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
-ublas::matrix<float> BallEKF::associateTimeUpdate(MotionModel u)
+ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
 {
     // Calculate the assumed change in ball position
     // Assume no decrease in ball velocity
-    ublas::matrix<float> deltaBall(BALL_EKF_DIMENSION,1);
-    deltaBall(0,0) = getXVelocityEst() * (1. / ASSUMED_FPS);
-    deltaBall(1,0) = getYVelocityEst() * (1. / ASSUMED_FPS);
-    deltaBall(2,0) = 0;
-    deltaBall(3,0) = 0;
+    ublas::vector<float> deltaBall(BALL_EKF_DIMENSION);
+    deltaBall(0) = getXVelocityEst() * (1. / ASSUMED_FPS);
+    deltaBall(1) = getYVelocityEst() * (1. / ASSUMED_FPS);
+    deltaBall(2) = 0;
+    deltaBall(3) = 0;
 
     return deltaBall;
 }
 
-ublas::matrix<float> BallEKF::incorporateCorrectionMeasurement(Observation z,
-                                               ublas::matrix<float> &H_k,
-                                               ublas::matrix<float> &R_k)
+ublas::vector<float> BallEKF::incorporateMeasurement(Observation z,
+                                                     ublas::matrix<float> &H_k,
+                                                     ublas::matrix<float> &R_k)
 {
-    ublas::matrix<float> v_k;
+    ublas::vector<float> v_k;
     return v_k;
 }

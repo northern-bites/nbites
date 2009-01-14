@@ -5,16 +5,16 @@
  *
  * @param dimension - the number of dimensions (states) for the EKF to track.
  */
-EKF::EKF(unsigned int dimension) : states(dimension)
+EKF::EKF(unsigned int dimension) : xhat_k(dimension), xhat_k_bar(dimension),
+                                   Q_k(dimension,dimension),
+                                   A_k(dimension,dimension),
+                                   P_k(dimension,dimension),
+                                   P_k_bar(dimension,dimension),
+                                   dimensionIdentity(dimension),
+                                   numStates(dimension)
+
 {
     // Declare 4 dimensional state thing
-    xhat_k.resize(dimension,1);
-    xhat_k_bar.resize(dimension,1);
-    Q_k.resize(dimension,dimension);
-    A_k.resize(dimension,dimension);
-    P_k.resize(dimension,dimension);
-    P_k_bar.resize(dimension,dimension);
-    dimensionIdentity.resize(dimension);
 }
 
 /**
@@ -29,12 +29,12 @@ void EKF::timeUpdate(MotionModel u_k)
 {
     // Have the time update prediction incorporated
     // i.e. odometery, natural roll, etc.
-    ublas::matrix<float> deltas = associateTimeUpdate(u_k);
+    ublas::vector<float> deltas = associateTimeUpdate(u_k);
     xhat_k_bar = xhat_k + deltas;
 
     // Calculate the uncertainty growth for the current update
-    for(unsigned int i = 0; i < states; ++i) {
-        Q_k(i,i) = beta + gamma * deltas(i,0) * deltas(i,0);
+    for(unsigned int i = 0; i < numStates; ++i) {
+        Q_k(i,i) = beta + gamma * deltas(i) * deltas(i);
     }
 
     // Update error covariance matrix
@@ -44,34 +44,31 @@ void EKF::timeUpdate(MotionModel u_k)
 
 /**
  * Function to perform the correction step of the EKF. Implementing classes must
- * implement the incorporateCorrectionMeasurement, to set...
+ * implement the incorporateMeasurement, to set H_k, R_k, and return v_k
  *
  * @param z_k - All measurements to be incoporated at the current update.
  */
 void EKF::correctionStep(std::vector<Measurement> z_k)
 {
     // Necessary computational matrices
-    ublas::matrix<float> K_k; // Kalman gain matrix
-    K_k.resize(states, 2);
-    ublas::matrix<float> H_k; //
-    H_k.resize(2, 2);
-    ublas::matrix<float> R_k; // Assumed error in measurment sensors
-    R_k.resize(2, 2);
-    ublas::matrix<float> v_k; // Measurement invariance
+    ublas::matrix<float> K_k(numStates, 2); // Kalman gain matrix
+    ublas::matrix<float> H_k(2, 2); //
+    ublas::matrix<float> R_k(2, 2); // Assumed error in measurment sensors
+    ublas::vector<float> v_k; // Measurement invariance
 
     // Incorporate all correction observations
     for(unsigned int i = 0; i < z_k.size(); ++i) {
-        v_k = incorporateCorrectionMeasurement(z_k[i], H_k, R_k);
+        v_k = incorporateMeasurement(z_k[i], H_k, R_k);
+        // Calculate the Kalman gain matrix
+        ublas::matrix<float> pTimesHTrans = prod(P_k_bar, trans(H_k));
+        K_k = prod(P_k_bar, prod(H_k, pTimesHTrans)+ R_k);
+        // Use the Kalman gain matrix to determine the next estimate
+        xhat_k_bar = xhat_k_bar + prod(K_k, v_k);
+        // Update associate uncertainty
+        P_k_bar = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);
     }
-
-    // Calculate the Kalman gain matrix
-    ublas::matrix<float> pTimesHTrans;
-    pTimesHTrans = prod(P_k_bar, trans(H_k));
-    K_k = prod(P_k_bar, prod(H_k, pTimesHTrans)+ R_k);
-    // Use the Kalman gain matrix to determine the next estimate
-    xhat_k = xhat_k_bar + prod(K_k, v_k);
-    // Update associate uncertainty
-    P_k = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);
+    xhat_k = xhat_k_bar;
+    P_k = P_k_bar;
 }
 
 /**

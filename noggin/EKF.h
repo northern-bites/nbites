@@ -34,14 +34,14 @@ class Measurement
 class EKF
 {
 protected:
-    ublas::matrix<float> xhat_k; // Estimate Vector
-    ublas::matrix<float> xhat_k_bar; // A priori Estimate Vector
+    ublas::vector<float> xhat_k; // Estimate Vector
+    ublas::vector<float> xhat_k_bar; // A priori Estimate Vector
     ublas::matrix<float> Q_k; // Input noise covariance matrix
     ublas::matrix<float> A_k; // Jacobian associated with update measurement
     ublas::matrix<float> P_k; // Uncertainty Matrix
     ublas::matrix<float> P_k_bar; // A priori uncertainty Matrix
     ublas::identity_matrix<float> dimensionIdentity;
-    unsigned int states; // number of states in the kalman filter
+    unsigned int numStates; // number of states in the kalman filter
     float beta; // constant uncertainty increase
     float gamma; // scaled uncertainty increase
 
@@ -56,10 +56,12 @@ public:
     virtual void noCorrectionStep();
 private:
     // Pure virtual methods to be specified by implementing class
-    virtual ublas::matrix<float> associateTimeUpdate(MotionModel u_k) = 0;
-    virtual ublas::matrix<float> incorporateCorrectionMeasurement(Measurement z,
-                                                  ublas::matrix<float> &H_k,
-                                                  ublas::matrix<float> &R_k)=0;
+    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k) = 0;
+    virtual ublas::vector<float> incorporateMeasurement(Measurement z,
+                                                        ublas::
+                                                        matrix<float> &H_k,
+                                                        ublas::
+                                                        matrix<float> &R_k) = 0;
 };
 #endif EKF_h_DEFINED
 
