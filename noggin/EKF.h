@@ -22,7 +22,7 @@ using namespace boost::numeric;
  */
 struct Measurement
 {
-    flaot distance;
+    float distance;
     float bearing;
     float distanceSD;
     float bearingSD;

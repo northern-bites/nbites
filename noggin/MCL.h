@@ -94,14 +94,15 @@ public:
 };
 
 // Math Macros
-#define DEG_TO_RAD (2.0f * M_PI) / 360.0f
-#define RAD_TO_DEG 360.0f / (2.0f * M_PI)
+#define DEG_TO_RAD M_PI / 180.0f
+#define RAD_TO_DEG 180.0f / M_PI
 #define FULL_CIRC 360
 #define HALF_CIRC 180
 #define MAX_CHANGE_X 10.0f
 #define MAX_CHANGE_Y 10.0f
 #define MAX_CHANGE_H M_PI / 6.0f
 #define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
+#define QUART_CIRC_RAD M_PI / 2.0f
 // Constants
 static const int M = 100; // Number of particles
 static const float MIN_SIMILARITY = 1.0e-15; // Minimum possible similarity

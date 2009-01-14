@@ -1,13 +1,14 @@
 #include "BallEKF.h"
 
-BallEKF::BallEKF(float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
+BallEKF::BallEKF(MCL _mcl,
+                 float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
                  float initVelX = INIT_BALL_X_VEL,
                  float initVelY = INIT_BALL_Y_VEL,
                  float initXUncert = INIT_X_UNCERT,
                  float initYUncert = INIT_Y_UNCERT,
                  float initVelXUncert = INIT_X_VEL_UNCERT,
                  float initVelYUncert = INIT_Y_VEL_UNCERT)
-    : EKF(BALL_EKF_DIMENSION)
+    : EKF(BALL_EKF_DIMENSION), robotLoc(_mcl)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0f;
@@ -52,9 +53,35 @@ ublas::vector<float> BallEKF::incorporateMeasurement(Measurement z,
                                                      ublas::matrix<float> &R_k)
 {
     ublas::vector<float> v_k(2);
+    // Convert our siting to cartesian coordinates
+    float x_b_r = z.distance * cos(z.bearing + QUART_CIRC_RAD);
+    float y_b_r = z.distance * sin(z.bearing + QUART_CIRC_RAD);
+    ublas::vector<float> z_x(2);
+    z_x(0) = x_b_r;
+    z_x(1) = y_b_r;
 
-    // Assign associated measurement error
+    // Get expected values of ball
+    float h = -robotLoc.getHEst();
+    float x = robotLoc.getXEst();
+    float y = robotLoc.getYEst();
+    float x_b = getXEst();
+    float y_b = getYEst();
+    ublas::vector<float> d_x(2);
+    d_x(0) = (x_b - x)*cos(h) - (y_b - y)*sin(h);
+    d_x(1) = (x_b - x)*sin(h) + (y_b - y)*cos(h);
+
+    // Calculate invariance
+    v_k = z_x - d_x;
+
+    // Calculate jacobians
+    H_k(0,0) = cos(h);
+    H_k(0,1) = -sin(h);
+    H_k(1,0) = sin(h);
+    H_k(1,1) = cos(h);
+
+    // Update the measurement covariance matrix
     R_k(0,0) = z.distanceSD;
     R_k(1,1) = z.bearingSD;
+
     return v_k;
 }

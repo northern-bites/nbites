@@ -8,6 +8,7 @@
 #define BallEKF_h_DEFINED
 
 #include "EKF.h"
+#include "MCL.h"
 
 // Parameters
 #define ASSUMED_FPS 30.0
@@ -31,7 +32,7 @@ class BallEKF : public EKF
 {
 public:
     // Constructors & Destructors
-    BallEKF(float initX, float initY,
+    BallEKF(MCL _mcl, float initX, float initY,
             float initVelX, float initVelY,
             float initXUncert,float initYUncert,
             float initVelXUncert, float initVelYUncert);
@@ -88,8 +89,7 @@ private:
                                                         matrix<float> &H_k,
                                                         ublas::
                                                         matrix<float> &R_k);
-
-public:
-    //const ublas::matrix<float> BALL_TIME_UPDATE_JACOBIAN;
+    // Members
+    MCL robotLoc;
 };
 #endif // File
