@@ -65,6 +65,7 @@ private:
 };
 #endif EKF_h_DEFINED
 
+ublas::matrix<float> invert2by2(ublas::matrix<float> toInvt);
 /**
 Invert a two by two matrix easily
 given:

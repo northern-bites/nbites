@@ -81,3 +81,15 @@ void EKF::noCorrectionStep()
     xhat_k = xhat_k_bar;
     P_k = P_k_bar;
 }
+
+ublas::matrix<float> invert2by2(ublas::matrix<float> m)
+{
+    float det = 1.0f / ( m(0,0) * m(1,1) - m(0,1) * m(1,0));
+    float tmp = m(0,0);
+    m(0,0) = m(1,1);
+    m(1,1) = tmp;
+    tmp = -m(0,1);
+    m(0,1) = -m(1,0);
+    m(1,0) = tmp;
+    return det * m;
+}
