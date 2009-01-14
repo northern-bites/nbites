@@ -20,8 +20,12 @@ using namespace boost::numeric;
  * Measurement - A generic class for holding the basic type information required
  *               for running the correctionStep in EKF.
  */
-class Measurement
+struct Measurement
 {
+    flaot distance;
+    float bearing;
+    float distanceSD;
+    float bearingSD;
 };
 
 /**
@@ -66,12 +70,3 @@ private:
 #endif EKF_h_DEFINED
 
 ublas::matrix<float> invert2by2(ublas::matrix<float> toInvt);
-/**
-Invert a two by two matrix easily
-given:
- [a b
-  c d]
-return:
-(1/(ad - bc)) [ d -b
-               -c  a]
- */

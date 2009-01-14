@@ -82,6 +82,17 @@ void EKF::noCorrectionStep()
     P_k = P_k_bar;
 }
 
+/**
+Invert a two by two matrix easily
+given:
+ [a b
+  c d]
+return:
+(1/(ad - bc)) [ d -b
+               -c  a]
+@param m the 2 by 2 matrix to invert.
+@return the inversion of m
+ */
 ublas::matrix<float> invert2by2(ublas::matrix<float> m)
 {
     float det = 1.0f / ( m(0,0) * m(1,1) - m(0,1) * m(1,0));

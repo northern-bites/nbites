@@ -47,10 +47,14 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
     return deltaBall;
 }
 
-ublas::vector<float> BallEKF::incorporateMeasurement(Observation z,
+ublas::vector<float> BallEKF::incorporateMeasurement(Measurement z,
                                                      ublas::matrix<float> &H_k,
                                                      ublas::matrix<float> &R_k)
 {
-    ublas::vector<float> v_k;
+    ublas::vector<float> v_k(2);
+
+    // Assign associated measurement error
+    R_k(0,0) = z.distanceSD;
+    R_k(1,1) = z.bearingSD;
     return v_k;
 }

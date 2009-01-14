@@ -83,7 +83,7 @@ public:
 private:
     // Core Functions
     virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k);
-    virtual ublas::vector<float> incorporateMeasurement(Observation z,
+    virtual ublas::vector<float> incorporateMeasurement(Measurement z,
                                                         ublas::
                                                         matrix<float> &H_k,
                                                         ublas::
