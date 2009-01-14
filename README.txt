@@ -25,6 +25,9 @@ Double check to make sure you have folders named 'cross' and 'stagging' in $AL_D
 
 COMPILING & INSTALLING
 
+*NAOQI1.0 NOTE*: For now, switiching between NaoQi1.0 and NaoQi0.18 is controlled by the CMake option NAOQI1.0 and the ifdef NAOQ1. Make sure the state of that switch matches the version of NaoQi you installed (presumably at /usr/local/nao). For easy switching between the two versions, I recommend making /usr/local/nao a sym link to the appropriate version:
+`$> ln -s NaoQi1.0 nao`
+
 We use CMake for compiling and installing our code.  It has most of GNU Make's
 features along with some other niceties.
 
