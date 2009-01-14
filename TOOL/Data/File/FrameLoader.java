@@ -78,7 +78,9 @@ public class FrameLoader implements FileFilter {
                         break;
                     }
                 }
-                frm.setJoints(joints);
+                if (!joints.isEmpty()) {
+                    frm.setJoints(joints);
+                }
 
             }else if (upper.endsWith(AIBO_EXT)) {
                 // skip header
