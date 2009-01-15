@@ -15,9 +15,6 @@ from .util.MyMath import (dist,
 
 # Try to import the c++ matrix library.  If this import fails,
 # it means we are testing offline, so then use the python library.
-<<<<<<< HEAD:noggin/EKF.py
-from ..vision import matrix
-=======
 try:
     from ..vision import matrix
     OFFLINE = False
@@ -26,8 +23,7 @@ except ImportError:
     OFFLINE = True
 #jf- whats the point of this?  can we just remove all OFFLINE stuff?
 #th- no!
->>>>>>> Small commenting changes to EKF.py:skull/noggin/EKF.py
-OFFLINE = False
+
 
 
 class EKF:

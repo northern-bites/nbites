@@ -33,15 +33,15 @@ class Brain(object):
         """
         Class constructor
         """
-	self.on = True
+        self.on = True
         # Setup nao modules inside brain for easy access
         #jf- self.nao = nao
         self.vision = vision.Vision()
-	self.sensors = sensors.Sensors()
-	self.comm = comm.inst
-        self.comm.gc.team = 1
+        self.sensors = sensors.Sensors()
+        self.comm = comm.inst
+        self.comm.gc.team = 101
         # Initialize motion interface and module references
-	self.motion = motion.MotionInterface()
+        self.motion = motion.MotionInterface()
         self.motionModule = motion
 
         # Retrieve our robot identification and set per-robot parameters
@@ -69,6 +69,8 @@ class Brain(object):
         self.snapshot = False
 
         # Functional Variables
+
+        self.my.teamNumber = 101
 
         #keyboard stuff
         #jf- nao.webots.enableKeyboard(NogginConstants.TIME_STEP)
