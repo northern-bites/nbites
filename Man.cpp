@@ -560,7 +560,7 @@ Man::waitForImage ()
 
         // Attempt to retrive the next image
         try {
-            image = (ALVisionImage*) (camera->call<int>("getImageLocal",lem_name));
+            image = (ALVisionImage*) (camera->call<int>("getDirectRawImageLocal",lem_name));
         }catch (ALError &e) {
             log->error("NaoMain", "Could not call the getImageLocal method of the "
                        "NaoCam module");
