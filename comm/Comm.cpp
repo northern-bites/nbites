@@ -444,10 +444,7 @@ Comm::Comm (shared_ptr<Synchro> _synchro, Sensors *s, Vision *v)
   broadcast_addr.sin_port = htons(UDP_PORT);
   broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 
-  //BREAKS NAOQI1.0
-#ifndef NAOQI1
   add_to_module();
-#endif
 }
 
 Comm::~Comm ()

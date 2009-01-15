@@ -15,9 +15,6 @@ Motion::Motion (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
 #endif
     : MotionCore(_proxy,_synchro, s)
 {
-  //Breaks NaoQi1.0
-#ifndef NAOQI1
   set_motion_interface(this);
   c_init_motion();
-#endif
 }

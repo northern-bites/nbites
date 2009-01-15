@@ -355,9 +355,9 @@ Sensors::Sensors ()
 #endif
 
   //BREAKS NAOQI1.0
-#ifndef NAOQI1
+//#ifndef NAOQI1
   add_to_module();
-#endif
+//#endif
 }
 
 Sensors::~Sensors ()
@@ -550,14 +550,11 @@ Sensors::releaseImage()
 
 void
 Sensors::updatePython() {
-  // BROKEN in NAOQI 1.0
-#ifndef NAOQI1
   if (pySensors != NULL) {
     PySensors_update(pySensors);
   }else{
     cout<< "py sensors none!!" << endl;
   }
-#endif
 }
 
 

@@ -69,3 +69,7 @@ Once you have built the binaries they can be installed on the robot with the
 following command:
 
     make install
+
+
+RUNNING THE CODE
+You must disable pythonbridge in AL_DIR/modules/lib/autoload.ini to run with Python

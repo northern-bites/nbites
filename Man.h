@@ -134,6 +134,7 @@ class Man
     void initMan (void);
     void closeMan(void);
     void initCamera(void);
+    void releaseImage(void);
 
   //
   // Variables
@@ -150,10 +151,7 @@ class Man
     Motion motion;
     Vision vision;
     Comm comm;
-    //Breaks Naoqi1.0
-#ifndef NAOQI1
     Noggin noggin;
-#endif
 
   private:
     // Interfaces/Proxies to robot

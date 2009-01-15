@@ -78,10 +78,7 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
 #endif
       vision(new NaoPose(&sensors), &profiler),
       comm(synchro, &sensors, &vision),
-      //BREAKS NAOQI1.0
-#ifndef NAOQI1
       noggin(&sensors, &profiler, &vision),
-#endif
       frame_counter(0), saved_frames(0), hack_frames(0),
       camera_active(false)
 {
@@ -176,6 +173,10 @@ Man::initCamera(){
     int colorSpace = NAO_COLOR_SPACE;
     int fps = 15;
 
+    int resolution = format;
+
+
+
 #ifdef DEBUG_MAN_INITIALIZATION
     printf("  Registering LEM with format=%i colorSpace=%i fps=%i\n", format,
            colorSpace, fps);
@@ -184,27 +185,30 @@ Man::initCamera(){
     try {
         lem_name = camera->call<std::string>("register", lem_name, format,
                                              colorSpace, fps);
+        cout << "Registered Camera: " << lem_name << " successfully"<<endl;
     } catch (ALError &e) {
+        cout << "Failed to register camera" << lem_name <<endl;
         SleepMs(500);
+
+        try {
+            printf("LEM failed once, trying again\n");
+            lem_name = camera->call<std::string>("register", lem_name, format,
+                                                 colorSpace, fps);
+        }catch (ALError &e2) {
+            log->error("Man", "Could not call the register method of the NaoCam "
+                       "module\n" + e2.toString());
+            return;
+        }
     }
 
-    try {
-        printf("LEM failed once, trying again\n");
-        lem_name = camera->call<std::string>("register", lem_name, format,
-                                             colorSpace, fps);
-    }catch (ALError &e2) {
-        log->error("Man", "Could not call the register method of the NaoCam "
-                   "module\n" + e2.toString());
-        return;
-    }
 
 
-    try {
-        lem =getParentBroker()->getProxy(lem_name);
-    }catch (ALError &e) {
-        log->error("Man", "Could not create the proxy for the Layer Extracator "
-                   "Module, name " + lem_name);
-    }
+//     try {
+//         lem =getParentBroker()->getProxy(lem_name);
+//     }catch (ALError &e) {
+//         log->error("Man", "Could not create the proxy for the Layer Extracator "
+//                    "Module, name " + lem_name);
+//     }
 
     const int CAM_PARAM_RETRIES = 3;
 
@@ -465,7 +469,7 @@ Man::run ()
 
     frame_counter = 0;
 #ifdef USE_VISION
-    visionHack();
+    //visionHack();
 #endif
 
     while (running) {
@@ -498,11 +502,16 @@ Man::run ()
 #ifdef USE_VISION
         // Perform hack to correct flipped image resulting from driver errors
         if (hack_frames > 0)
-            hackFrame();
+            //hackFrame();
 #endif
 
         // Process current frame
         processFrame();
+
+
+        //Release the camera image
+        if(camera_active)
+            releaseImage();
 
         // Make sure messages are printed
         fflush(stdout);
@@ -675,6 +684,19 @@ Man::waitForImage ()
 }
 #endif//NAOQI1
 
+#ifdef NAOQI1
+void Man::releaseImage(){
+  //Now you have finished with the image, you have to release it in the V.I.M.
+  try
+  {
+    camera->call<int>( "releaseImage", lem_name );
+  }catch( ALError& e)
+  {
+    log->error( "Man", "could not call the releaseImage method of the NaoCam module" );
+  }
+}
+#endif
+
 void
 Man::processFrame ()
 {
@@ -701,9 +723,9 @@ Man::processFrame ()
 
     // run Python behaviors
     //BREAKS NAOQI1.0
-#ifndef NAOQI1
+//#ifndef NAOQI1
     noggin.runStep();
-#endif
+//#endif
 
     PROF_EXIT(&profiler, P_FINAL);
     PROF_NFRAME(&profiler);
@@ -789,10 +811,9 @@ PythonPreferences::PythonPreferences ()
     // Initialize interpreter
     if (!Py_IsInitialized())
         Py_Initialize();
-    //Breaks NaoQi1.0
-#ifndef NAOQI1
+
     modifySysPath();
-#endif
+
 }
 
 void
@@ -801,7 +822,11 @@ PythonPreferences::modifySysPath ()
     // Enter the current working directory into the python module path
     //
 #if ROBOT(NAO)
+#ifndef OFFLINE
     char *cwd = "/opt/naoqi/modules/lib";
+#else
+    char *cwd = "/usr/local/nao/modules/lib";
+#endif
 #else
     const char *cwd = get_current_dir_name();
 #endif

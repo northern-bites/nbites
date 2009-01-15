@@ -73,7 +73,7 @@ MotionCore::MotionCore (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sen
   //motionProxy->setWalkConfig( 0.04, 0.015, 0.04, 0.3, 0.015, 0.025 );
 
 #ifndef NO_ACTUAL_MOTION
-  motionProxy->setBodyStiffness(0.85f, 1.0f);
+  motionProxy->setBodyStiffness(0.7f, 1.0f);
   SleepMs(1000.0f); // wait for the stiffness to kick in
   // cout << "Getting up. " << endl;
   //enqueue(new BodyJointCommand(GET_UP));
