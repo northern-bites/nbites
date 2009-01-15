@@ -81,11 +81,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Build the (visual) field object
             VisualFieldObject fo(toView->getID());
+            fo.setDistanceWithSD(visDist);
+            fo.setBearingWithSD(visBearing);
             Observation seen(fo);
-            seen.setVisDistance(visDist);
-            seen.setVisBearing(visBearing);
-            seen.setDistanceSD(sigmaD);
-            seen.setBearingSD(sigmaB);
             Z_t.push_back(seen);
         }
     }
@@ -112,13 +110,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Build the visual corner
-            // VisualCorner vc(toView->getID());
+
             // Build the observation
             Observation seen(*toView);
-            seen.setVisDistance(visDist);
-            seen.setVisBearing(visBearing);
-            seen.setDistanceSD(sigmaD);
-            seen.setBearingSD(sigmaB);
             Z_t.push_back(seen);
         }
     }
