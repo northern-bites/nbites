@@ -69,7 +69,7 @@ public:
     /**
      * @return The distance reported by the visual sighting
      */
-    float getVisDist() { return visDist; }
+    float getVisDistance() { return visDist; }
     /*
      * @return The bearing reported by the visual sighting
      */
@@ -77,7 +77,7 @@ public:
     /**
      * @return The standard deviation of the distance of the observation.
      */
-    float getDistSD() { return sigma_d; }
+    float getDistanceSD() { return sigma_d; }
     /*
      * @return The standard deviation of the bearing of the observation.
      */
@@ -121,9 +121,9 @@ public:
     vector<PointLandmark> getPointPossibilities() { return pointPossibilities; }
 
     // Setters
-    void setVisDist(float _d) { visDist = _d; }
+    void setVisDistance(float _d) { visDist = _d; }
     void setVisBearing(float _b) { visBearing = _b; }
-    void setDistSD(float _sdD) { sigma_d = _sdD; }
+    void setDistanceSD(float _sdD) { sigma_d = _sdD; }
     void setBearingSD(float _sdB) { sigma_b = _sdB; }
 
 
