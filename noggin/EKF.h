@@ -15,6 +15,9 @@ using namespace boost::numeric;
 // Local headers
 #include "MCL.h"
 
+// Default parameters
+#define DEFAULT_BETA 3.0f
+#define DEFAULT_GAMMA 2.0f
 
 /**
  * Measurement - A generic class for holding the basic type information required
@@ -51,7 +54,7 @@ protected:
 
 public:
     // Constructors & Destructors
-    EKF(unsigned int dimension);
+    EKF(unsigned int dimension, float _beta, float _gamma);
     virtual ~EKF();
 
     // Core functions

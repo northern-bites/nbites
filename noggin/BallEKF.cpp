@@ -8,7 +8,7 @@ BallEKF::BallEKF(MCL _mcl,
                  float initYUncert = INIT_Y_UNCERT,
                  float initVelXUncert = INIT_X_VEL_UNCERT,
                  float initVelYUncert = INIT_Y_VEL_UNCERT)
-    : EKF(BALL_EKF_DIMENSION), robotLoc(_mcl)
+    : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL), robotLoc(_mcl)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0f;
@@ -19,9 +19,37 @@ BallEKF::BallEKF(MCL _mcl,
     // Assummed change in position necessary for velocity to work correctly
     A_k(0,2) = 1. / ASSUMED_FPS;
     A_k(1,3) = 1. / ASSUMED_FPS;
+}
 
-    beta = BETA_BALL;
-    gamma = GAMMA_BALL;
+void BallEKF::updateModel(Ball ball)
+{
+    // Update expected ball movement
+    timeUpdate(MotionModel());
+
+    // We've seen a ball
+    if (ball.getDist() > 0) {
+        sawBall(ball);
+        // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
+    } else { // No ball seen
+        setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
+        setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
+        noCorrectionStep();
+    }
+}
+
+/**
+ *
+ */
+void BallEKF::sawBall(Ball ball)
+{
+    Measurement m;
+    m.distance = ball.getDist();
+    m.bearing = ball.getBearing();
+    m.distanceSD = ball.getDistanceSD();
+    m.bearingSD = ball.getBearingSD();
+    std::vector<Measurement> z;
+    z.push_back(m);
+    correctionStep(z);
 }
 
 
@@ -40,10 +68,10 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
     // Calculate the assumed change in ball position
     // Assume no decrease in ball velocity
     ublas::vector<float> deltaBall(BALL_EKF_DIMENSION);
-    deltaBall(0) = getXVelocityEst() * (1. / ASSUMED_FPS);
-    deltaBall(1) = getYVelocityEst() * (1. / ASSUMED_FPS);
-    deltaBall(2) = 0;
-    deltaBall(3) = 0;
+    deltaBall(0) = getXVelocityEst() * (1.0f / ASSUMED_FPS);
+    deltaBall(1) = getYVelocityEst() * (1.0f / ASSUMED_FPS);
+    deltaBall(2) = sign(getXVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
+    deltaBall(3) = sign(getYVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
 
     return deltaBall;
 }

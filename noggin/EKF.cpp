@@ -5,16 +5,13 @@
  *
  * @param dimension - the number of dimensions (states) for the EKF to track.
  */
-EKF::EKF(unsigned int dimension) : xhat_k(dimension), xhat_k_bar(dimension),
-                                   Q_k(dimension,dimension),
-                                   A_k(dimension,dimension),
-                                   P_k(dimension,dimension),
-                                   P_k_bar(dimension,dimension),
-                                   dimensionIdentity(dimension),
-                                   numStates(dimension)
-
+EKF::EKF(unsigned int dimension, float _beta = DEFAULT_BETA,
+         float _gamma = DEFAULT_GAMMA)
+  : xhat_k(dimension), xhat_k_bar(dimension), Q_k(dimension,dimension),
+    A_k(dimension,dimension), P_k(dimension,dimension),
+    P_k_bar(dimension,dimension), dimensionIdentity(dimension),
+    numStates(dimension), beta(_beta), gamma(_gamma)
 {
-    // Declare 4 dimensional state thing
 }
 
 /**

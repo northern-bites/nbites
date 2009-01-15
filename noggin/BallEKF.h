@@ -9,6 +9,7 @@
 
 #include "EKF.h"
 #include "MCL.h"
+#include "Ball.h"
 
 // Parameters
 #define ASSUMED_FPS 30.0
@@ -23,7 +24,8 @@
 #define INIT_Y_UNCERT 100.0f
 #define INIT_X_VEL_UNCERT 100.0f
 #define INIT_Y_VEL_UNCERT 100.0f
-
+#define BALL_DECAY_PERCENT 0.05
+#define CARPET_FRICTION -25 // 25 cm/s^2
 /**
  * Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
@@ -39,47 +41,92 @@ public:
 
     virtual ~BallEKF();
 
-    // Getters
+    // Update functions
+    void updateModel(Ball ball);
+    void sawTeammateBall(Measurement m);
+    void sawBall(Ball ball);
 
+    // Getters
     /**
      * @return The current estimate of the ball x position
      */
-    float getXEst() { return xhat_k(0); }
+    const float getXEst() const { return xhat_k(0); }
 
     /**
      * @return The current estimate of the ball y position
      */
-    float getYEst() { return xhat_k(1); }
+    const float getYEst() const { return xhat_k(1); }
 
     /**
      * @return The current estimate of the ball x velocity
      */
-    float getXVelocityEst() { return xhat_k(2); }
+    const float getXVelocityEst() const { return xhat_k(2); }
 
     /**
      * @return The current estimate of the ball y velocity
      */
-    float getYVelocityEst() { return xhat_k(3); }
+    const float getYVelocityEst() const { return xhat_k(3); }
 
     /**
      * @return The current uncertainty for ball x position
      */
-    float getXUncert() { return P_k(0,0); }
+    const float getXUncert() const { return P_k(0,0); }
 
     /**
      * @return The current uncertainty for ball y position
      */
-    float getYUncert() { return P_k(1,1); }
+    const float getYUncert() const { return P_k(1,1); }
 
     /**
      * @return The current uncertainty for ball x velocity
      */
-    float getXVelocityUncert() { return P_k(2,2); }
+    const float getXVelocityUncert() const { return P_k(2,2); }
 
     /**
      * @return The current uncertainty for ball y velocity
      */
-    float getYVelocityUncert() { return P_k(3,3); }
+    const float getYVelocityUncert() const { return P_k(3,3); }
+
+    // Setters
+    /**
+     * @return The current estimate of the ball x position
+     */
+    void setXEst(float val) { xhat_k(0) = val; }
+
+    /**
+     * @return The current estimate of the ball y position
+     */
+    void setYEst(float val) { xhat_k(1) = val; }
+
+    /**
+     * @return The current estimate of the ball x velocity
+     */
+    void setXVelocityEst(float val) { xhat_k(2) = val; }
+
+    /**
+     * @return The current estimate of the ball y velocity
+     */
+    void setYVelocityEst(float val) { xhat_k(3) = val; }
+
+    /**
+     * @return The current uncertainty for ball x position
+     */
+    void setXUncert(float val) { P_k(0,0) = val; }
+
+    /**
+     * @return The current uncertainty for ball y position
+     */
+    void setYUncert(float val) { P_k(1,1) = val; }
+
+    /**
+     * @return The current uncertainty for ball x velocity
+     */
+    void setXVelocityUncert(float val) { P_k(2,2) = val; }
+
+    /**
+     * @return The current uncertainty for ball y velocity
+     */
+    void setYVelocityUncert(float val) { P_k(3,3) = val; }
 
 private:
     // Core Functions
@@ -93,3 +140,12 @@ private:
     MCL robotLoc;
 };
 #endif // File
+
+float sign(float f)
+{
+    if (f < 0.0f) {
+        return -1.0f;
+    } else {
+        return 1.0f;
+    }
+}
