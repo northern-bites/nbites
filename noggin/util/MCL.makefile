@@ -15,7 +15,7 @@ CC_SRCS = ../../vision/ConcreteLandmark.cpp \
 
 UTILITY_SRCS = ../../vision/Utility.cpp
 
-FO_SRCS = ../../vision/FieldObjects.cpp
+FO_SRCS = ../../vision/VisualFieldObject.cpp
 
 CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp
 

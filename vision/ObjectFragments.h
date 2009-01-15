@@ -243,7 +243,7 @@ class ObjectFragments {
   bool beaconCheck(int a, int c, int d, int e);
   bool processBeacon(int l, int r, int x, int y, bool yellowOnTop, bool normal);
   void expandSpot(int x1, int y1, int dir, int c, int c2, int c3, int c4);
-  void findSpot(int x, int y, int x2, int y2, int dir, int c, int c2, int c3
+    void findSpot(int x, int y, int x2, int y2, int dir, int c, int c2, int c3,
                 int c4, int cases);
   bool setCorners(int leftx, int lefty, int rightx, int righty, int c, int c2,
                   int c3, int c4, VisualFieldObject* post);

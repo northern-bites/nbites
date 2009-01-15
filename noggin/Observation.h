@@ -90,7 +90,7 @@ public:
     /*
      * @return true if the observed landmark was not IDed to a specifc (x,y).
      */
-    bool isAmbgiuous() { return ambiguous; }
+    //bool isAmbgiuous() { return ambiguous; }
     /*
      * @return The x value of the landmark on the playing field.
      */
@@ -136,7 +136,6 @@ private:
 
     // Identity information
     int id;
-    bool ambiguous;
     float x;
     float y;
     float slope;

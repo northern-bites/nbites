@@ -16,8 +16,8 @@ VisualLandmark::VisualLandmark(int _x, int _y, float _distance,
 VisualLandmark::VisualLandmark(const VisualLandmark& other)
     : x(other.x), y(other.y), distance(other.distance), bearing(other.bearing),
       distanceSD(other.distanceSD), bearingSD(other.bearingSD),
-      concreteLandmark(other.concreteLandmark), idCertainty(other.idCertainty),
-      distanceCert(other.distanceCert) {
+      idCertainty(other.idCertainty), distanceCert(other.distanceCert),
+      concreteLandmark(other.concreteLandmark) {
 }
 
 // No memory needs to be freed

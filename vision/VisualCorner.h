@@ -52,7 +52,7 @@ public:
     const VisualLine getTBar() const { return tBar; }
     const VisualLine getTStem() const { return tStem; }
 
-
+    const cornerID getID() const { return id; }
     // See FieldLines.cc intersectLines to see how this is calculated and used
     const float getT1() const { return t1; }
     const float getT2() const { return t2; }
@@ -74,6 +74,7 @@ public:
     void setLine2(const VisualLine l2) { line2 = l2; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
+    void setID(cornerID _id) { id = _id; }
 
 
 private: // private methods
@@ -108,6 +109,9 @@ private:
     // In the case of a T corner, we report the smaller angle (the second
     // angle can be found by subtracting this angle from 180)
     float angleBetweenLines;
+
+    // Identifying id
+    cornerID id;
 };
 
 // functor that checks if the shape of one corner equals the given shape

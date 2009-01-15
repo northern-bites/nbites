@@ -8,16 +8,16 @@ int main()
     letsGo.startPos = PoseEst(200.0f,300.2f,0.0f);
     letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
                                      200));
-    // letsGo.myMoves.push_back(NavMove(MotionModel(2.0f,0.0f,0.0f),
-    //                                  100));
-    // letsGo.myMoves.push_back(NavMove(MotionModel(-2.0f,0.0f,0.0f),
-    //                                  200));
+    letsGo.myMoves.push_back(NavMove(MotionModel(2.0f,0.0f,0.0f),
+                                     100));
+    letsGo.myMoves.push_back(NavMove(MotionModel(-2.0f,0.0f,0.0f),
+                                     200));
     letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,3.0f,0.0f),
                                      100));
     letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,-3.0f,0.0f),
                                      125));
     letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,-0.314f),
-                                     25));
+                                     250));
     letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
                                      200));
 
@@ -61,7 +61,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
     for(int i = 0; i < ConcreteFieldObject::NUM_FIELD_OBJECTS; ++i) {
        const ConcreteFieldObject* toView = ConcreteFieldObject::
            concreteFieldObjectList[i];
-        float deltaX = toView->getFieldX() - myPos.x;
+       float deltaX = toView->getFieldX() - myPos.x;
         float deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
         visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
@@ -110,9 +110,14 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Build the visual corner
-
+            // VisualCorner vc(toView->getX(), toView->getY(),);
+            // vc.setPossibleCorners(
             // Build the observation
             Observation seen(*toView);
+            seen.setVisDistance(visDist);
+            seen.setDistanceSD(sigmaD);
+            seen.setVisBearing(visBearing);
+            seen.setBearingSD(sigmaB);
             Z_t.push_back(seen);
         }
     }
