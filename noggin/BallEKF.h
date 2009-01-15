@@ -16,16 +16,19 @@
 #define BETA_BALL 5. // How much uncertainty naturally grows per update
 #define GAMMA_BALL .1 // How much ball velocity should effect uncertainty
 #define BALL_EKF_DIMENSION 4 // Number of states in Ball EKF
+#define CARPET_FRICTION -25 // 25 cm/s^2
+#define BALL_DECAY_PERCENT 0.05
+
+// Default initialization values
 #define INIT_BALL_X 50.0f
 #define INIT_BALL_Y 50.0f
 #define INIT_BALL_X_VEL 0.0f
 #define INIT_BALL_Y_VEL 0.0f
 #define INIT_X_UNCERT 100.0f
 #define INIT_Y_UNCERT 100.0f
-#define INIT_X_VEL_UNCERT 100.0f
-#define INIT_Y_VEL_UNCERT 100.0f
-#define BALL_DECAY_PERCENT 0.05
-#define CARPET_FRICTION -25 // 25 cm/s^2
+#define INIT_X_VEL_UNCERT 10.0f
+#define INIT_Y_VEL_UNCERT 10.0f
+
 /**
  * Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
@@ -140,12 +143,3 @@ private:
     MCL robotLoc;
 };
 #endif // File
-
-float sign(float f)
-{
-    if (f < 0.0f) {
-        return -1.0f;
-    } else {
-        return 1.0f;
-    }
-}

@@ -1,5 +1,18 @@
 #include "BallEKF.h"
 
+/**
+ * Constructor for the BallEKF class
+ *
+ * @param _mcl The Monte Carlo localization sytem for the robot
+ * @param _initX An initial value for the x estimate
+ * @param _initY An initial value for the y estimate
+ * @param _initXUncert An initial value for the x uncertainty
+ * @param _initYUncert An initial value for the y uncertainty
+ * @param _initVelX An initial value for the x velocity estimate
+ * @param _initVelY An initial value for the y velocity estimate
+ * @param _initVelXUncert An initial value for the x velocity uncertainty
+ * @param _initVelYUncert An initial value for the y velocity uncertainty
+ */
 BallEKF::BallEKF(MCL _mcl,
                  float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
                  float initVelX = INIT_BALL_X_VEL,
@@ -21,6 +34,10 @@ BallEKF::BallEKF(MCL _mcl,
     A_k(1,3) = 1. / ASSUMED_FPS;
 }
 
+/**
+ * Method to deal with updating the entire ball model
+ * @param ball the ball seen this frame.
+ */
 void BallEKF::updateModel(Ball ball)
 {
     // Update expected ball movement
@@ -38,7 +55,8 @@ void BallEKF::updateModel(Ball ball)
 }
 
 /**
- *
+ * Method to deal with sighting of a ball by the robot
+ * @param ball a copy of the ball seen by the robot
  */
 void BallEKF::sawBall(Ball ball)
 {
@@ -59,8 +77,6 @@ void BallEKF::sawBall(Ball ball)
  * A_k.
  *
  * @param u The motion model of the last frame.  Ignored for the ball.
- * @param A the Jacobian associated with the update model
- * @param Q the input covariance matrix
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
 ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
@@ -76,6 +92,14 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
     return deltaBall;
 }
 
+/**
+ * Method to deal with incorporating a ball measurement into the EKF
+ *
+ * @param z the measurement to be incorporated
+ * @param H_k the jacobian associated with the measurement, to be filled out
+ * @param R_k the covariance matrix of the measurement, to be filled out
+ * @return the measurement invariance
+ */
 ublas::vector<float> BallEKF::incorporateMeasurement(Measurement z,
                                                      ublas::matrix<float> &H_k,
                                                      ublas::matrix<float> &R_k)

@@ -3,7 +3,9 @@
 /**
  * Simplest constructor for the EKF class
  *
- * @param dimension - the number of dimensions (states) for the EKF to track.
+ * @param dimension The number of dimensions (states) for the EKF to track.
+ * @param _beta The assumed absolute increase in uncertainty per frame
+ * @param _gamma The uncertainty scaling factor per frame
  */
 EKF::EKF(unsigned int dimension, float _beta = DEFAULT_BETA,
          float _gamma = DEFAULT_GAMMA)

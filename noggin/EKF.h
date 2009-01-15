@@ -72,4 +72,20 @@ private:
 };
 #endif EKF_h_DEFINED
 
+// Math helper functions
+// Should probably be housed elswhere
 ublas::matrix<float> invert2by2(ublas::matrix<float> toInvt);
+/**
+ * Given a float return its sign
+ *
+ * @param f the number to examine the sign of
+ * @return -1.0f if f is less than 0.0f, 1.0f otherwise
+ */
+inline float sign(float f)
+{
+    if (f < 0.0f) {
+        return -1.0f;
+    } else {
+        return 1.0f;
+    }
+}
