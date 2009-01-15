@@ -69,4 +69,4 @@ concreteFO.o : $(CCFO_SRCS)
 .Phony : clean
 
 clean :
-	$(RM) $(OBJS) mclLogger
+	$(RM) $(OBJS) mclLogger faker

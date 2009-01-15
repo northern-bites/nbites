@@ -80,11 +80,11 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Build the (visual) field object
-            FieldObjects fo(toView->getID());
+            VisualFieldObject fo(toView->getID());
             Observation seen(fo);
-            seen.setVisDist(visDist);
+            seen.setVisDistance(visDist);
             seen.setVisBearing(visBearing);
-            seen.setDistSD(sigmaD);
+            seen.setDistanceSD(sigmaD);
             seen.setBearingSD(sigmaB);
             Z_t.push_back(seen);
         }
@@ -115,9 +115,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             // VisualCorner vc(toView->getID());
             // Build the observation
             Observation seen(*toView);
-            seen.setVisDist(visDist);
+            seen.setVisDistance(visDist);
             seen.setVisBearing(visBearing);
-            seen.setDistSD(sigmaD);
+            seen.setDistanceSD(sigmaD);
             seen.setBearingSD(sigmaB);
             Z_t.push_back(seen);
         }
@@ -164,7 +164,7 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
     // Output landmark infos
     for(unsigned int k = 0; k < sightings.size(); ++k) {
         (*outputFile) << sightings[k].getID() << " "
-                      << sightings[k].getVisDist() << " "
+                      << sightings[k].getVisDistance() << " "
                       << sightings[k].getVisBearing() << " ";
     }
 
