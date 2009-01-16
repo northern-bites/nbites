@@ -92,7 +92,7 @@ class Man
     void dataChanged(const std::string& pDataName, const ALValue& pValue,
         const std::string& pMessage) {};
 
-    std::string version() { return TRUNK_REVISION; };
+    std::string version() { return "1.0.0-r"; /*TRUNK_REVISION;*/ };
 
     //
     // Our methods
@@ -133,7 +133,8 @@ class Man
 
     void initMan (void);
     void closeMan(void);
-    void initCamera(void);
+    void registerCamera();
+    void initCameraSettings(int whichCam);
     void releaseImage(void);
 
   //

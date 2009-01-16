@@ -146,7 +146,13 @@ Man::initMan()
     }
 
 #ifdef USE_VISION
+#ifdef NAOQI1
+    registerCamera();
+    initCameraSettings(0);
+    initCameraSettings(1);
+#else
     initCamera();
+#endif
 #endif
 
 #ifdef DEBUG_MAN_INITIALIZATION
@@ -156,8 +162,8 @@ Man::initMan()
 
 #ifdef USE_VISION
 #ifdef NAOQI1
-void
-Man::initCamera(){
+void 
+Man::registerCamera(){
 
     try {
         camera = getParentBroker()->getProxy("NaoCam");
@@ -188,27 +194,45 @@ Man::initCamera(){
         cout << "Registered Camera: " << lem_name << " successfully"<<endl;
     } catch (ALError &e) {
         cout << "Failed to register camera" << lem_name <<endl;
-        SleepMs(500);
+        camera_active = false;
+//         SleepMs(500);
 
-        try {
-            printf("LEM failed once, trying again\n");
-            lem_name = camera->call<std::string>("register", lem_name, format,
-                                                 colorSpace, fps);
-        }catch (ALError &e2) {
-            log->error("Man", "Could not call the register method of the NaoCam "
-                       "module\n" + e2.toString());
-            return;
-        }
+//         try {
+//             printf("LEM failed once, trying again\n");
+//             lem_name = camera->call<std::string>("register", lem_name, format,
+//                                                  colorSpace, fps);
+//         }catch (ALError &e2) {
+//             log->error("Man", "Could not call the register method of the NaoCam "
+//                        "module\n" + e2.toString());
+//             return;
+//         }
     }
 
 
 
-//     try {
-//         lem =getParentBroker()->getProxy(lem_name);
-//     }catch (ALError &e) {
-//         log->error("Man", "Could not create the proxy for the Layer Extracator "
-//                    "Module, name " + lem_name);
-//     }
+}
+
+void
+Man::initCameraSettings(int whichCam){
+
+    int currentCam =  camera->call<int>( "getParam", kCameraSelectID );
+    if (whichCam != currentCam){
+        camera->callVoid( "setParam", kCameraSelectID,whichCam);
+        SleepMs(100);
+        currentCam =  camera->call<int>( "getParam", kCameraSelectID );
+        if (whichCam != currentCam){
+            cout << "Failed to switch to camera "<<whichCam
+                 <<" in 100 ms" <<endl;
+            SleepMs(100);
+            currentCam =  camera->call<int>( "getParam", kCameraSelectID );
+            if (whichCam != currentCam){
+                cout << "Failed to switch to camera "<<whichCam
+                     <<" ... returning, no parameters initialized" <<endl;
+                return;
+            }
+        }
+        cout << "Switched to camera " <<whichCam<<" successfully"<<endl;
+    }
 
     const int CAM_PARAM_RETRIES = 3;
 
@@ -239,11 +263,6 @@ Man::initCamera(){
             log->error("Man", "Couldn't set AutoGain 0");
         }
     }
-
-    // Our settings -- currently all mid-way between extremes, or off
-    // currently off, as if messes up the image
-
-    //cout << "Setting Brightness" << endl;
 
     for (int i=0;i<CAM_PARAM_RETRIES;++i){
         try {
@@ -293,9 +312,7 @@ Man::initCamera(){
 }
 
 #else//NAOQI1
-
-void
-Man::initCamera(){
+void Man::initCamera(){
     camera = NULL;
     lem = NULL;
 
@@ -321,25 +338,10 @@ Man::initCamera(){
         lem_name = camera->call<std::string>("register", lem_name, format,
                                              colorSpace, fps);
     } catch (ALError &e) {
-        SleepMs(500);
+        cout << "Failed to initialize the camera"<<endl;
+        camera_active = false;
     }
 
-    try {
-        printf("LEM failed once, trying again\n");
-        lem_name = camera->call<std::string>("register", lem_name, format,
-                                             colorSpace, fps);
-    }catch (ALError &e2) {
-        log->error("Man", "Could not call the register method of the NaoCam "
-                   "module\n" + e2.toString());
-        return;
-    }
-
-    try {
-        lem= new ALProxy(lem_name);
-    }catch (ALError &e) {
-        log->error("Man", "Could not create the proxy for the Layer Extracator "
-                   "Module, name " + lem_name);
-    }
 
     const int CAM_PARAM_RETRIES = 3;
 
@@ -495,6 +497,12 @@ Man::run ()
         sensors.updateVisionAngles();
 
         // Image logging
+        ALPtr<ALProxy> fStm = getParentBroker()->getProxy("ALMemory");
+
+        double rf1 = fStm->call<ALValue>("getData",string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0);
+        double rf2 = fStm->call<ALValue>("getData",string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0);
+
+        //cout << "Bumper values "<<rf1 <<" and "<<rf2<<endl;
         //if (frame_counter % 6 == 0)
         //  saveFrame();
         //frame_counter++;
@@ -689,7 +697,7 @@ void Man::releaseImage(){
   //Now you have finished with the image, you have to release it in the V.I.M.
   try
   {
-    camera->call<int>( "releaseImage", lem_name );
+    camera->call<int>( "releaseDirectRawImage", lem_name );
   }catch( ALError& e)
   {
     log->error( "Man", "could not call the releaseImage method of the NaoCam module" );
