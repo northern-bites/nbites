@@ -3,6 +3,7 @@ import man.motion as motion
 
 from ..util import FSA
 from . import NoneStates
+from . import GameControllerStates
 
 class SoccerPlayer(FSA.FSA):
     def __init__(self, brain):
