@@ -1,5 +1,6 @@
 
-import socket
+#import socket
+#temp removed b/c not installed by default on V3 - js
 import os
 
 from . import BirthCertificate
@@ -51,12 +52,14 @@ unknown = BirthCertificate.BirthCertificate(
             doc='''\
 This robot is currently unknown.  That is, we could not identify it
 from its hostname (%s).  The recognized robots are %s.''' %
-    (socket.gethostname(), robot_map.keys()),
+            #(socket.gethostname(), robot_map.keys()),# temp removed -js
+            ("trillian", robot_map.keys()),
             )
 
 
 def get_certificate():
-    return robot_map.setdefault(socket.gethostname(), unknown)
+    return robot_map.setdefault("trillian", unknown) #temp removed -js
+    #return robot_map.setdefault(socket.gethostname(), unknown)
 
 
 
