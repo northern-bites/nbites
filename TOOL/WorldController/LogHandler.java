@@ -97,7 +97,6 @@ public class LogHandler
     public static final String NAO_LOG_TYPE = "NAO";
     public static final String AIBO_LOG_TYPE = "AIBO";
 
-
     //////////////////// VARIABLES /////////////
 
     // log file variables
@@ -112,6 +111,7 @@ public class LogHandler
     private Vector<String> log_camera;
     private boolean log_pause, log_played, log_last_frame, log_next_frame;
     private int log_marker, last_log_marker;
+    private int ambiguousLandmarkCount;
 
     // log variables
     int team_color, player_number;
@@ -841,6 +841,7 @@ public class LogHandler
         String[] infos = newInfos.split(" ");
 
         // Iterate through the landmark IDs getting the correct ones
+        ambiguousLandmarkCount = 0;
         for(int i = 0; i < infos.length; i++) {
             int ID = Integer.parseInt(infos[i]);
             float dist = Float.parseFloat(infos[++i]);
@@ -873,10 +874,11 @@ public class LogHandler
                                 0);
         } else if (ID != debugViewer.BALL_ID) { // We have an ambigious landmark
             // get the list of possible landmarks
+            ++ambiguousLandmarkCount;
             for (int pos_id : getPossibleIDs(ID)) {
-                painter.sawLandmark(debugViewer.LANDMARK_X[pos_id],
-                                    debugViewer.LANDMARK_Y[pos_id],
-                                    1);
+                painter.sawLandmark((int)debugViewer.objectIDMap.get(pos_id).x,
+                                    (int)debugViewer.objectIDMap.get(pos_id).y,
+                                    ambiguousLandmarkCount);
             }
         } else { // We Have a ball ignore...
         }
@@ -886,9 +888,79 @@ public class LogHandler
      * @return A list of possible distinct lanmdark IDs for the
      * ambigious landmark ID passed in
      */
-    private int[] getPossibleIDs(int ID)
+    private Vector<Integer> getPossibleIDs(int ID)
     {
-        return new int[0];
+        Vector<Integer> pos =  new Vector<Integer>();
+        switch(ID) {
+        case DebugViewer.L_INNER_CORNER:
+        case DebugViewer.L_OUTER_CORNER:
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_LEFT_L));
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_LEFT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_L));
+            break;
+        case DebugViewer.T_CORNER:
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_T));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_T));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_T));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_T));
+            pos.add(new Integer(DebugViewer.CENTER_BY_T));
+            pos.add(new Integer(DebugViewer.CENTER_YB_T));
+            break;
+        case DebugViewer.CENTER_CIRCLE:
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_T));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_T));
+            break;
+        case DebugViewer.BLUE_GOAL_T:
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_T));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_T));
+            break;
+        case DebugViewer.YELLOW_GOAL_T:
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_T));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_T));
+            break;
+        case DebugViewer.BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L:
+            break;
+        case DebugViewer.BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L:
+            break;
+        case DebugViewer.BLUE_CORNER_LEFT_L_OR_YELLOW_CORNER_LEFT_L:
+            break;
+        case DebugViewer.BLUE_CORNER_RIGHT_L_OR_YELLOW_CORNER_RIGHT_L:
+            break;
+        case DebugViewer.CORNER_INNER_L:
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_LEFT_L));
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_LEFT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_L));
+            break;
+        case DebugViewer.GOAL_BOX_INNER_L:
+            break;
+        case DebugViewer.BLUE_GOAL_OUTER_L:
+            break;
+        case DebugViewer.YELLOW_GOAL_OUTER_L:
+            break;
+        case DebugViewer.CENTER_T:
+            break;
+        case DebugViewer.BLUE_GOAL_POST:
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_POST));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_POST));
+            break;
+        case DebugViewer.YELLOW_GOAL_POST:
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_POST));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_POST));
+            break;
+        }
+        return pos;
     }
 
     /**

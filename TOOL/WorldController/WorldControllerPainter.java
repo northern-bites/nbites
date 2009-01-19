@@ -194,12 +194,33 @@ public class WorldControllerPainter implements DogListener
             int x = seenLandmarks[i][X_INDEX];
             int y = seenLandmarks[i][Y_INDEX];
 
-            // Determine if it is ambigious or not
-            if (0 == seenLandmarks[i][DISTINCT_INDEX]) {
+            // Determine if it is ambiguous or not
+            switch(seenLandmarks[i][DISTINCT_INDEX]) {
+            case 0:
                 // Pass off the work to another helper method
                 drawSeenLandmark(g2, x, y);
-            } else {
-                drawAmbigiousLandmark(g2, x, y);
+                break;
+            case 1:
+                drawAmbiguousLandmark(g2, x, y, Color.red);
+                break;
+            case 2:
+                drawAmbiguousLandmark(g2, x, y, Color.orange);
+                break;
+            case 3:
+                drawAmbiguousLandmark(g2, x, y, Color.cyan);
+                break;
+            case 4:
+                drawAmbiguousLandmark(g2, x, y, Color.pink);
+                break;
+            case 5:
+                drawAmbiguousLandmark(g2, x, y, Color.magenta);
+                break;
+            case 6:
+                drawAmbiguousLandmark(g2, x, y, Color.lightGray);
+                break;
+            default:
+                drawAmbiguousLandmark(g2, x, y, Color.white);
+                break;
             }
         }
         // Reset for the next frame
@@ -517,9 +538,14 @@ public class WorldControllerPainter implements DogListener
         field.drawOval(drawing_on, Color.black, 1, x, y, 10, 10);
     }
 
-    public void drawAmbigiousLandmark(Graphics2D drawing_on, int x, int y)
+    public void drawAmbiguousLandmark(Graphics2D drawing_on, int x, int y)
     {
-        field.drawOval(drawing_on, Color.red, 1, x, y, 10, 10);
+        drawAmbiguousLandmark(drawing_on, x, y, Color.red);
+    }
+    public void drawAmbiguousLandmark(Graphics2D drawing_on, int x, int y,
+                                      Color col)
+    {
+        field.drawOval(drawing_on, col, 1, x, y, 10, 10);
     }
 
     public void reportUpdatedActualLocation(LocalizationPacket
