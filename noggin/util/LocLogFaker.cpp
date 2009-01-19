@@ -16,8 +16,8 @@ int main()
                                      100));
     letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,-3.0f,0.0f),
                                      125));
-    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,-0.314f),
-                                     250));
+    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,-0.0314f),
+                                     300));
     letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
                                      200));
 
@@ -70,8 +70,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         // Check if the object is viewable
         if (visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) {
 
-            // cout << "Observed landmark: " << toView->getID() << endl;
-
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
             //visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
@@ -80,10 +78,27 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Build the (visual) field object
-            VisualFieldObject fo(toView->getID());
+            fieldObjectID foID = toView->getID();
+            VisualFieldObject fo(foID);
             fo.setDistanceWithSD(visDist);
             fo.setBearingWithSD(visBearing);
+
+            // set ambiguous data
+            // Randomly set them to abstract
+            if ((rand() / (float(RAND_MAX)+1)) < 0.12) {
+                fo.setIDCertainty(NOT_SURE);
+                if(foID == BLUE_GOAL_LEFT_POST ||
+                   foID == BLUE_GOAL_RIGHT_POST) {
+                    fo.setID(BLUE_GOAL_POST);
+                } else {
+                    fo.setID(YELLOW_GOAL_POST);
+                }
+            } else {
+                fo.setIDCertainty(_SURE);
+            }
             Observation seen(fo);
+            // cout << "ID: " << seen.getID() << "\tNumPos: " <<
+            //     seen.getNumPossibilities() << endl;
             Z_t.push_back(seen);
         }
     }
@@ -114,46 +129,79 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
                 continue;
             }
             const cornerID id = toView->getID();
-            shape s = ConcreteCorner::inferCornerType(id);
-            list <const ConcreteCorner*> toUse =
-                ConcreteCorner::getPossibleCorners(s);
-
-            // // Test membership in corner lists
-            // list<const ConcreteCorner*>::iterator i;
-            // // Test membership in L list
-            // for (i = ConcreteCorner::lCorners.begin(); i !=
-            //          ConcreteCorner::lCorners.end(); ++i) {
-            //     if((*i)->getID() == toView->getID()) {
-            //         toUse = ConcreteCorner::lCorners;
-            //         break;
-            //     }
-            // }
-            // // Test membership in T list, if not in L list
-            // //if (toUse == NULL) {
-            // for (i = ConcreteCorner::tCorners.begin(); i !=
-            //          ConcreteCorner::tCorners.end(); ++i) {
-            //     if((*i)->getID() == toView->getID()) {
-            //         toUse = ConcreteCorner::tCorners;
-            //         break;
-            //     }
-            // }
+            list <const ConcreteCorner*> toUse;
+            // Randomly set ambiguous data
+            if ((rand() / (float(RAND_MAX)+1)) < 0.65) {
+                shape s = ConcreteCorner::inferCornerType(id);
+                toUse = ConcreteCorner::getPossibleCorners(s);
+            } else {
+                const ConcreteCorner * corn;
+                switch(id) {
+                case BLUE_CORNER_LEFT_L:
+                    corn = &ConcreteCorner::blue_corner_left_l;
+                    break;
+                case BLUE_CORNER_RIGHT_L:
+                    corn = &ConcreteCorner::blue_corner_right_l;
+                    break;
+                case BLUE_GOAL_LEFT_T:
+                    corn = &ConcreteCorner::blue_goal_left_t;
+                    break;
+                case BLUE_GOAL_RIGHT_T:
+                    corn = &ConcreteCorner::blue_goal_right_t;
+                    break;
+                case BLUE_GOAL_LEFT_L:
+                    corn = &ConcreteCorner::blue_goal_left_l;
+                    break;
+                case BLUE_GOAL_RIGHT_L:
+                    corn = &ConcreteCorner::blue_goal_right_l;
+                    break;
+                case CENTER_BY_T:
+                    corn = &ConcreteCorner::center_by_t;
+                    break;
+                case CENTER_YB_T:
+                    corn = &ConcreteCorner::center_yb_t;
+                    break;
+                case YELLOW_CORNER_LEFT_L:
+                    corn = &ConcreteCorner::yellow_corner_left_l;
+                    break;
+                case YELLOW_CORNER_RIGHT_L:
+                    corn = &ConcreteCorner::yellow_corner_right_l;
+                    break;
+                case YELLOW_GOAL_LEFT_T:
+                    corn = &ConcreteCorner::yellow_goal_left_t;
+                    break;
+                case YELLOW_GOAL_RIGHT_T:
+                    corn = &ConcreteCorner::yellow_goal_right_t;
+                    break;
+                case YELLOW_GOAL_LEFT_L:
+                    corn = &ConcreteCorner::yellow_goal_left_l;
+                    break;
+                case YELLOW_GOAL_RIGHT_L:
+                    // Intentional fall through
+                default:
+                    corn = &ConcreteCorner::yellow_goal_right_l;
+                    break;
+                }
+                // Append to the list
+                toUse.assign(1,corn);
+            }
 
             // Build the visual corner
             VisualCorner vc(20, 20, visDist,visBearing,
                             VisualLine(), VisualLine(), 10.0f, 10.0f);
             vc.setPossibleCorners(toUse);
+
+            // Set ID
             if (toUse == ConcreteCorner::lCorners) {
-                cout << "L Corners!" << endl;
                 vc.setID(L_INNER_CORNER);
             } else if (toUse == ConcreteCorner::tCorners) {
-                cout << "T Corners!" << endl;
                 vc.setID(T_CORNER);
             } else {
-                cout << "Did not match corner list type..." << endl;
+                vc.setID(id);
             }
             // Build the observation
             Observation seen(vc);
-            cout << "Look at the corner id " << seen.getID() << endl;
+            //cout << "Look at the corner id " << seen.getID() << endl;
             Z_t.push_back(seen);
         }
     }

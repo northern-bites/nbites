@@ -18,8 +18,6 @@ ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
 // Copy constructor - just pairwise copy the elements
 ConcreteCorner::ConcreteCorner(const ConcreteCorner& other)
     : ConcreteLandmark(other), id(other.id), cornerType(other.cornerType) {
-    // id = other.id;
-    // cornerType = other.cornerType;
 }
 
 // No memory to free

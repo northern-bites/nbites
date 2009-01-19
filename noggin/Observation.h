@@ -60,7 +60,6 @@ public:
     Observation(VisualFieldObject &_object);
     Observation(VisualCorner &_corner);
     Observation(VisualLine &_line);
-    Observation(const ConcreteCorner &_corner);
     virtual ~Observation();
 
     // Core Functions

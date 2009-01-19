@@ -70,6 +70,7 @@ public:
                                  _possibleFieldObjects) {
         possibleFieldObjects = _possibleFieldObjects;
     }
+    void setID(fieldObjectID _id) { id = _id; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     virtual void setIDCertainty(certainty c);

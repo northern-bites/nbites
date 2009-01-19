@@ -58,18 +58,12 @@ Observation::Observation(VisualCorner &_corner) :
 /**
  * @param l Line that was seen and reported.
  */
-Observation::Observation(VisualLine &_line)
+Observation::Observation(VisualLine &_line) :
+    visDist(_line.getDistance()), visBearing(_line.getBearing()),
+    sigma_d(_line.getDistanceSD()), sigma_b(_line.getBearingSD()),
+    // id(_line.getID()),
+    line_truth(true)
 {
-    // We're a line
-    line_truth = true;
-
-    // Get basic vision information
-    visDist = _line.getDistance();
-    visBearing = _line.getBearing();
-    sigma_d = _line.getDistanceSD();
-    sigma_b = _line.getBearingSD();
-    //id = _line.getID();
-
     // Build our possibilitiy list
     Observation::numPossibilities = 0;
 
@@ -85,14 +79,6 @@ Observation::Observation(VisualLine &_line)
         ++Observation::numPossibilities;
     }
 
-}
-
-Observation::Observation(const ConcreteCorner &_corner) :
-    numPossibilities(1)
-{
-    PointLandmark cornerLandmark(_corner.getFieldX(),_corner.getFieldY());
-    pointPossibilities.push_back(cornerLandmark);
-    id = _corner.getID();
 }
 
 /**
