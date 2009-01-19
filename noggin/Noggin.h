@@ -33,6 +33,8 @@ private:
     bool import_modules();
     // Instantiate a Brain instance
     void getBrainInstance();
+    // Run the localization update; performed at every run step
+    void updateLocalization();
 
 private:
     Sensors *sensors;

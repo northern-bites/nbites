@@ -169,6 +169,34 @@ Noggin::runStep ()
     PROF_EXIT(profiler, P_PYUPDATE);
 
     // Update localization information
+    updateLocalization();
+
+    // Call main run() method of Brain
+    PROF_ENTER(profiler, P_PYRUN);
+    if (brain_instance != NULL) {
+        PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
+        if (result == NULL) {
+            // set Noggin in error state
+            error_state = true;
+            // report error
+            fprintf(stderr, "Error occurred in noggin.Brain.run() method\n");
+            if (PyErr_Occurred()) {
+                PyErr_Print();
+            } else {
+                fprintf(stderr,
+                        "  No Python exception information available\n");
+            }
+        } else {
+            Py_DECREF(result);
+        }
+    }
+    PROF_EXIT(profiler, P_PYRUN);
+
+    PROF_EXIT(profiler, P_PYTHON);
+}
+
+void Noggin::updateLocalization()
+{
     // Self Localization
     MotionModel odometery(0.0f, 0.0f, 0.0f);
 
@@ -191,24 +219,8 @@ Noggin::runStep ()
     // Process the information
     mcl.updateLocalization(odometery , observations);
 
-    // Call main run() method of Brain
-    PROF_ENTER(profiler, P_PYRUN);
-    if (brain_instance != NULL) {
-        PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
-        if (result == NULL) {
-            // set Noggin in error state
-            error_state = true;
-            // report error
-            fprintf(stderr, "Error occurred in noggin.Brain.run() method\n");
-            if (PyErr_Occurred())
-                PyErr_Print();
-            else
-                fprintf(stderr,
-                        "  No Python exception information available\n");
-        }else
-            Py_DECREF(result);
-    }
-    PROF_EXIT(profiler, P_PYRUN);
+    // Ball Tracking
 
-    PROF_EXIT(profiler, P_PYTHON);
+
+    // Opponent Tracking
 }
