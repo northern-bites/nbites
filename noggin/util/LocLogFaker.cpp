@@ -109,15 +109,51 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             visBearing += (M_PI / 2.0f);
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
+            // Ignore the center circle for right now
+            if (toView->getID() == CENTER_CIRCLE) {
+                continue;
+            }
+            const cornerID id = toView->getID();
+            shape s = ConcreteCorner::inferCornerType(id);
+            list <const ConcreteCorner*> toUse =
+                ConcreteCorner::getPossibleCorners(s);
+
+            // // Test membership in corner lists
+            // list<const ConcreteCorner*>::iterator i;
+            // // Test membership in L list
+            // for (i = ConcreteCorner::lCorners.begin(); i !=
+            //          ConcreteCorner::lCorners.end(); ++i) {
+            //     if((*i)->getID() == toView->getID()) {
+            //         toUse = ConcreteCorner::lCorners;
+            //         break;
+            //     }
+            // }
+            // // Test membership in T list, if not in L list
+            // //if (toUse == NULL) {
+            // for (i = ConcreteCorner::tCorners.begin(); i !=
+            //          ConcreteCorner::tCorners.end(); ++i) {
+            //     if((*i)->getID() == toView->getID()) {
+            //         toUse = ConcreteCorner::tCorners;
+            //         break;
+            //     }
+            // }
+
             // Build the visual corner
-            // VisualCorner vc(toView->getX(), toView->getY(),);
-            // vc.setPossibleCorners(
+            VisualCorner vc(20, 20, visDist,visBearing,
+                            VisualLine(), VisualLine(), 10.0f, 10.0f);
+            vc.setPossibleCorners(toUse);
+            if (toUse == ConcreteCorner::lCorners) {
+                cout << "L Corners!" << endl;
+                vc.setID(L_INNER_CORNER);
+            } else if (toUse == ConcreteCorner::tCorners) {
+                cout << "T Corners!" << endl;
+                vc.setID(T_CORNER);
+            } else {
+                cout << "Did not match corner list type..." << endl;
+            }
             // Build the observation
-            Observation seen(*toView);
-            seen.setVisDistance(visDist);
-            seen.setDistanceSD(sigmaD);
-            seen.setVisBearing(visBearing);
-            seen.setBearingSD(sigmaB);
+            Observation seen(vc);
+            cout << "Look at the corner id " << seen.getID() << endl;
             Z_t.push_back(seen);
         }
     }

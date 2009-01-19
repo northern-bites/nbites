@@ -69,63 +69,63 @@ public:
     /**
      * @return The distance reported by the visual sighting
      */
-    float getVisDistance() { return visDist; }
+    const float getVisDistance() const { return visDist; }
     /*
      * @return The bearing reported by the visual sighting
      */
-    float getVisBearing() { return visBearing; }
+    const float getVisBearing() const { return visBearing; }
     /**
      * @return The standard deviation of the distance of the observation.
      */
-    float getDistanceSD() { return sigma_d; }
+    const float getDistanceSD() const { return sigma_d; }
     /*
      * @return The standard deviation of the bearing of the observation.
      */
-    float getBearingSD() { return sigma_b; }
+    const float getBearingSD() const { return sigma_b; }
 
     /*
      * @return The ID of the landmark, element of ObservationID enumeration.
      */
-    int getID() { return id; }
-    /*
-     * @return true if the observed landmark was not IDed to a specifc (x,y).
-     */
-    //bool isAmbgiuous() { return ambiguous; }
+    const int getID() const { return id; }
     /*
      * @return The x value of the landmark on the playing field.
      */
-    float getX() { return x; }
+    const float getX() const { return x; }
     /*
      * @return The y value of the landmark on the playing field.
      */
-    float getY() { return y; }
+    const float getY() const { return y; }
 
     /*
      * @return true if the observed object is a line
      */
-    bool isLine() { return line_truth; }
+    const bool isLine() const { return line_truth; }
 
     /*
      * @return The number of possibilities for the landmark
      */
-    unsigned int getNumPossibilities() { return numPossibilities; }
+    const unsigned int getNumPossibilities() const { return numPossibilities; }
 
     /*
      * @return The list of possible line landmarks
      */
-    vector<LineLandmark> getLinePossibilities() { return linePossibilities; }
+    const vector<LineLandmark> getLinePossibilities() const {
+        return linePossibilities;
+    }
 
     /*
      * @return The list of possible point landmarks
      */
-    vector<PointLandmark> getPointPossibilities() { return pointPossibilities; }
+    const vector<PointLandmark> getPointPossibilities() const {
+        return pointPossibilities;
+    }
 
     // Setters
     void setVisDistance(float _d) { visDist = _d; }
     void setVisBearing(float _b) { visBearing = _b; }
     void setDistanceSD(float _sdD) { sigma_d = _sdD; }
     void setBearingSD(float _sdB) { sigma_b = _sdB; }
-
+    void setID(int _id) { id = _id; }
 
 private:
     // Vision information
