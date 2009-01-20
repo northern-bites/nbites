@@ -31,7 +31,7 @@
 //-----System Switches (uncomment the define to activate the system)----//
 // Turn on/off the entire Vision-processing system
 #ifndef USE_VISION
-#  define USE_VISION
+//#  define USE_VISION //js - should be set with cmake now
 #endif
 // it's baaack. due to battery life, here's an easy ifdef to enable/disable
 // Python

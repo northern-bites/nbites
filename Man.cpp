@@ -495,7 +495,7 @@ Man::run ()
         // thread's information
         sensors.updatePython();
         sensors.updateVisionAngles();
-
+#ifdef NAOQI1
         // Image logging
         ALPtr<ALProxy> fStm = getParentBroker()->getProxy("ALMemory");
 
@@ -503,6 +503,8 @@ Man::run ()
         double rf2 = fStm->call<ALValue>("getData",string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0);
 
         //cout << "Bumper values "<<rf1 <<" and "<<rf2<<endl;
+#endif
+
         //if (frame_counter % 6 == 0)
         //  saveFrame();
         //frame_counter++;

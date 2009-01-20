@@ -133,8 +133,12 @@ class Man
 
     void initMan (void);
     void closeMan(void);
+#ifdef NAOQI1
     void registerCamera();
     void initCameraSettings(int whichCam);
+#else
+    void initCamera();
+#endif
     void releaseImage(void);
 
   //
