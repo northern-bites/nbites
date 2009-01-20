@@ -84,13 +84,17 @@ void MotionSwitchboard::run() {
         }
 
         // Calculate the next joints and get them
-        scriptedProvider.calculateNextJoints();
+        //Just switch this line to decide which provider we should use
+        MotionProvider * curProvider =
+            reinterpret_cast<MotionProvider *>( &walkProvider);
+        //dynamic_cast <MotionProvider *>( &scriptedProvider);
+        curProvider->calculateNextJoints();
 
-        vector <float > llegJoints = scriptedProvider.getChainJoints(LLEG_CHAIN);
-        vector <float > rlegJoints = scriptedProvider.getChainJoints(RLEG_CHAIN);
+        vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
+        vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
 
-		vector <float > rarmJoints = scriptedProvider.getChainJoints(RARM_CHAIN);
-		vector <float > larmJoints= scriptedProvider.getChainJoints(LARM_CHAIN);
+		vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
+		vector <float > larmJoints= curProvider->getChainJoints(LARM_CHAIN);
 
         //Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);

@@ -33,9 +33,19 @@ void WalkProvider::calculateNextJoints() {
     //Get the joints for each Leg
     vector<float> lleg_results = legs_result.get<LEFT_FOOT>();
     vector<float> rleg_results = legs_result.get<RIGHT_FOOT>();
+
+    vector<float> rarm_results = vector<float>(ARM_JOINTS, 0.0f);
+    vector<float> larm_results = vector<float>(ARM_JOINTS, 0.0f);
+
+    cout << "2rarm size "<< rarm_results.size()
+         << "larm size "<< larm_results.size() <<endl;
+
+
     //Return the joints for the legs
+    setNextChainJoints(LARM_CHAIN,larm_results);
     setNextChainJoints(LLEG_CHAIN,lleg_results);
     setNextChainJoints(RLEG_CHAIN,rleg_results);
+    setNextChainJoints(RARM_CHAIN,rarm_results);
 
 }
 
