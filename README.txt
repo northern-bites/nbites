@@ -5,9 +5,16 @@ In order to compile the man binaries, you must first have the NaoQI libraries  a
 NOTE: The given commands should be executed from the directory where you downloaded the archives. Also, depending on your system setup, you may need root privilages to install to /usr/local/nao
 
 First, get the NaoQI libraries by saving the file
-<https://robocup.bowdoin.edu/files/software/nao/NaoQi/NaoQi-1.0.0-Linux.tar.gz> to your computer. You should then extract the contents to /usr/local/nao (i.e. there should be a file /usr/local/nao/Release-notes.txt)
+<https://robocup.bowdoin.edu/files/software/nao/NaoQi/NaoQiRobocup-1.0.0-Linux.tar.gz> to your computer. You should then extract the contents to /usr/local/nao (i.e. there should be a file /usr/local/nao/Release-notes.txt)
 
-	sudo tar -xvzf NaoQiRobocup-1.0.0-Linux -C /usr/local
+	sudo tar -xvzf NaoQiRobocup-1.0.0-Linux.tar.gz -C /usr/local
+
+If the directory /usr/local/nao already exists you should move it first
+
+        sudo mv /usr/local/nao /usr/local/nao-old
+
+Then you should move the NaoQi directory to /usr/local/nao
+
 	sudo mv /usr/local/NaoQiRobocup-1.0.0-Linux /usr/local/nao
 
 You will also need the cross compiler, so start by creating its directory:
@@ -15,9 +22,11 @@ You will also need the cross compiler, so start by creating its directory:
 	sudo mkdir /usr/local/nao/crosstoolchain
 
 Next,if you are on linux, the new (1.0) cross tool chain is available from <https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff/ctc-1.0.0b.tar.bz2>
-If you are on a mac, there is no precompiled cross compiler (yet). You might try using the stagging folder from the Linux file above, combined with the cross folder from the old cross compiler for mac at <https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff/cross-mac-intel.tar.bz2>
 
-When extracted, this should give you a cross folder that will replace the empty cross folder in /usr/local/crosstoolchain. Once you have downloaded the cross-mac-intel.tar.bz2, extract it to the crosstoolchain folder with the command:
+If you are on a mac, there is no precompiled cross compiler (yet). You should put the stagging folder from the Linux cross compiler archive above, combined with the cross folder from the old cross compiler for mac at <https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff/cross-mac-intel.tar.bz2>
+Place these folders in the directory /usr/local/nao/crosstoolchain described below.
+
+When extracted, this should give you a cross folder that will replace the empty cross folder in /usr/local/nao/crosstoolchain. Once you have downloaded the cross-mac-intel.tar.bz2, extract it to the crosstoolchain folder with the command:
 
      	sudo tar --strip 1 -C /usr/local/nao/crosstoolchain -xvjf ctc-1.0.0b.tar.bz2
 
@@ -45,7 +54,7 @@ your code compiles, than press c to begin configuration and then press g to
 generate the configuration files.
 
 If you are compiling for the robot you should make sure @MAN_IS_REMOTE@ is set
-to ON.  If it is set to OFF, you can change it by moving over the OFF text area
+to OFF.  If it is set to OFF, you can change it by moving over the OFF text area
 and hitting the enter key.  Here you should also set the appropriate player for
 the robot and the IP address. Help for the configuration tool is accesible by
 typing h while the tool is running.
@@ -73,10 +82,10 @@ following command:
 
 RUNNING THE CODE
 Set the IP address of the remote robot on the configuration screenas described above.
-Next, edit the file /opt/naoqi/modules/lib/autoload.ini using `nano autoload.ini`  This file lists all the modules that are loaded by NaoQi on bootime. If you are running as a dynamically linked library, you must ensure that the line
+Next, ssh into the robot as root and edit the file /opt/naoqi/modules/lib/autoload.ini using `nano autoload.ini`  This file lists all the modules that are loaded by NaoQi on bootime. If you are running as a dynamically linked library, you must ensure that the line
 man
 is present in that list. Additionally, you must disable pythonbridge for the Python to run correctly in our code (if you don't do this, you will get a segfault).
 
 
 TROUBLESHOOTING:
-Still having trouble?  Take a look at our wiki at http://robocup.bowdoin.edu/trac. Particularly, the page http://robocup.bowdoin.edu/trac/wiki/PracticalNao might give links to more detailed instructions that are shown here.
+Still having trouble?  Take a look at our wiki at http://robocup.bowdoin.edu/trac. Particularly, the page http://robocup.bowdoin.edu/trac/wiki/PracticalNao might give links to more detailed instructions then those shown here.
