@@ -38,7 +38,7 @@ ENDIF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
 # Which version of NaoQi 1.0 or 0.18 we want
 OPTION( NAOQI1.0
     "Use the new NAOQI1.0 (for V3, not for simulator)"
-    OFF
+    ON
     )
 IF( "${NAOQI1.0}" STREQUAL "ON" )
   ADD_DEFINITIONS(-DNAOQI1)
