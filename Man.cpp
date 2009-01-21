@@ -741,10 +741,7 @@ Man::processFrame ()
 #endif
 
     // run Python behaviors
-    //BREAKS NAOQI1.0
-//#ifndef NAOQI1
     noggin.runStep();
-//#endif
 
     PROF_EXIT(&profiler, P_FINAL);
     PROF_NFRAME(&profiler);

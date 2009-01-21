@@ -158,7 +158,7 @@ Noggin::runStep ()
   if (error_state)
     return;
 #endif
-  
+
   PROF_ENTER(profiler, P_PYTHON);
 
   // Update vision information for Python
