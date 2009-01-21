@@ -72,4 +72,11 @@ following command:
 
 
 RUNNING THE CODE
-You must disable pythonbridge in AL_DIR/modules/lib/autoload.ini to run with Python
+Set the IP address of the remote robot on the configuration screenas described above.
+Next, edit the file /opt/naoqi/modules/lib/autoload.ini using `nano autoload.ini`  This file lists all the modules that are loaded by NaoQi on bootime. If you are running as a dynamically linked library, you must ensure that the line
+man
+is present in that list. Additionally, you must disable pythonbridge for the Python to run correctly in our code (if you don't do this, you will get a segfault).
+
+
+TROUBLESHOOTING:
+Still having trouble?  Take a look at our wiki at http://robocup.bowdoin.edu/trac. Particularly, the page http://robocup.bowdoin.edu/trac/wiki/PracticalNao might give links to more detailed instructions that are shown here.
