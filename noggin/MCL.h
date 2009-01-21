@@ -116,7 +116,8 @@ public:
     virtual ~MCL();
 
     // Core Functions
-    void updateLocalization(MotionModel u_t, vector<Observation> z_t);
+    void updateLocalization(MotionModel u_t, vector<Observation> z_t,
+                            bool resample);
 
     // Getters
     /**

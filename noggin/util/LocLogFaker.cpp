@@ -1,3 +1,26 @@
+/* LocLogFaker.cpp */
+
+/**
+ * Format of the log file:
+ *
+ * PARTICLE INFO
+ * x y h weight (for M particles)
+ *
+ * Colon signifying end of section
+ *
+ * DEBUG INFO
+ * team_color player_number
+ * x-estimate y-estimate heading-estimate deg
+ * x-uncertinty y-uncert heading-uncert
+ * ball-x ball-y
+ * ball-uncert-x ball-uncert-y
+ * ball-vel-x ball-vel-y
+ * ball-vel-uncert-x ball-vel-uncert-y
+ * odometery-lateral odometery-forward odometery-rotational
+ *
+ * LANDMARK INFO
+ * ID dist bearing (for all landmarks observed in the frame)
+ */
 #include "LocLogFaker.h"
 
 int main()
@@ -34,14 +57,21 @@ int main()
     outputFile.open(outfileName.c_str(), ios::out);
     MotionModel noMove(0.0,0.0,0.0);
     printOutLogLine(&outputFile, myLoc, Z_t, noMove);
-
+    bool resample = true;
     // Iterate through the moves
     for(unsigned int i = 0; i < letsGo.myMoves.size(); ++i) {
         // Continue the move for as long as specified
         for (int j = 0; j < letsGo.myMoves[i].time; ++j) {
             currentPose += letsGo.myMoves[i].move;
+            if ( (i+j) % RESAMPLE_RATE == 0) {
+                resample = true;
+                // cout << "Resample set to true" << endl;
+            } else {
+                resample = false;
+                // cout << "Resample set to false" << endl;
+            }
             Z_t = determineObservedLandmarks(currentPose,0.0);
-            myLoc->updateLocalization(letsGo.myMoves[i].move,Z_t);
+            myLoc->updateLocalization(letsGo.myMoves[i].move,Z_t, resample);
             printOutLogLine(&outputFile, myLoc, Z_t, letsGo.myMoves[i].move);
         }
     }
@@ -232,14 +262,17 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
     (*outputFile) << ":";
 
     // Output standard infos
-    (*outputFile) << team_color<< " " << player_number << " " <<myLoc->getXEst()
-                  << " " << myLoc->getYEst() << " " << myLoc->getHEstDeg()
-                  << " " << myLoc->getXUncert() << " " << myLoc->getYUncert()
-                  << " " << myLoc->getHUncertDeg() << " " << "0.0"
-                  << " " << "0.0" << " " << "0.0" << " " << "0.0"
-                  << " " << "0.0" << " " << "0.0" << " " << "0.0"
-                  << " " << "0.0" << " " << lastOdo.deltaL
-                  << " " << lastOdo.deltaF << " " << lastOdo.deltaR;
+    (*outputFile) << team_color<< " " << player_number << " "
+                  << myLoc->getXEst() << " " << myLoc->getYEst() << " "
+                  << myLoc->getHEstDeg() << " "
+                  << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
+                  << myLoc->getHUncertDeg() << " "
+                  << "0.0" << " " << "0.0" << " " // Ball x,y
+                  << "0.0" << " " << "0.0" << " " // Ball Uncert
+                  << "0.0" << " " << "0.0" << " " // Ball Velocity
+                  << "0.0" << " " << "0.0" << " " // Ball Vel uncert
+                  << lastOdo.deltaL << " " << lastOdo.deltaF << " "
+                  << lastOdo.deltaR;
 
     // Divide the sections with a colon
     (*outputFile) << ":";

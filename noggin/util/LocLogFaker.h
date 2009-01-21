@@ -1,3 +1,5 @@
+/* LocLogFaker.h */
+
 #ifndef LOCLOGFAKER_h_DEFINED
 #define LOCLOGFAKER_h_DEFINED
 
@@ -16,7 +18,8 @@ using namespace std;
 #define FO_MAX_VIEW_RANGE 575.0f
 #define CORNER_MAX_VIEW_RANGE 200.0f
 #define LINE_MAX_VIEW_RANGE 250.0f
-
+// Number of frames to wait between resampling
+#define RESAMPLE_RATE 5
 class NavMove
 {
 public:
