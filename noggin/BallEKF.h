@@ -134,11 +134,10 @@ public:
 private:
     // Core Functions
     virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k);
-    virtual ublas::vector<float> incorporateMeasurement(Measurement z,
-                                                        ublas::
-                                                        matrix<float> &H_k,
-                                                        ublas::
-                                                        matrix<float> &R_k);
+    virtual void incorporateMeasurement(Measurement z,
+                                        ublas::matrix<float> &H_k,
+                                        ublas::matrix<float> &R_k,
+                                        ublas::vector<float> &V_k);
     // Members
     MCL robotLoc;
 };

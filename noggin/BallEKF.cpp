@@ -98,13 +98,15 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
  * @param z the measurement to be incorporated
  * @param H_k the jacobian associated with the measurement, to be filled out
  * @param R_k the covariance matrix of the measurement, to be filled out
+ * @param V_k the measurement invariance
+ *
  * @return the measurement invariance
  */
-ublas::vector<float> BallEKF::incorporateMeasurement(Measurement z,
-                                                     ublas::matrix<float> &H_k,
-                                                     ublas::matrix<float> &R_k)
+void BallEKF::incorporateMeasurement(Measurement z,
+                                     ublas::matrix<float> &H_k,
+                                     ublas::matrix<float> &R_k,
+                                     ublas::vector<float> &V_k)
 {
-    ublas::vector<float> v_k(2);
     // Convert our siting to cartesian coordinates
     float x_b_r = z.distance * cos(z.bearing + QUART_CIRC_RAD);
     float y_b_r = z.distance * sin(z.bearing + QUART_CIRC_RAD);
@@ -123,7 +125,7 @@ ublas::vector<float> BallEKF::incorporateMeasurement(Measurement z,
     d_x(1) = (x_b - x)*sin(h) + (y_b - y)*cos(h);
 
     // Calculate invariance
-    v_k = z_x - d_x;
+    V_k = z_x - d_x;
 
     // Calculate jacobians
     H_k(0,0) = cos(h);
@@ -134,6 +136,4 @@ ublas::vector<float> BallEKF::incorporateMeasurement(Measurement z,
     // Update the measurement covariance matrix
     R_k(0,0) = z.distanceSD;
     R_k(1,1) = z.bearingSD;
-
-    return v_k;
 }

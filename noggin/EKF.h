@@ -64,11 +64,10 @@ public:
 private:
     // Pure virtual methods to be specified by implementing class
     virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k) = 0;
-    virtual ublas::vector<float> incorporateMeasurement(Measurement z,
-                                                        ublas::
-                                                        matrix<float> &H_k,
-                                                        ublas::
-                                                        matrix<float> &R_k) = 0;
+    virtual void incorporateMeasurement(Measurement z,
+                                        ublas::matrix<float> &H_k,
+                                        ublas::matrix<float> &R_k,
+                                        ublas::vector<float> &V_k) = 0;
 };
 #endif EKF_h_DEFINED
 

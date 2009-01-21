@@ -53,11 +53,11 @@ void EKF::correctionStep(std::vector<Measurement> z_k)
     ublas::matrix<float> K_k(numStates, 2); // Kalman gain matrix
     ublas::matrix<float> H_k(2, numStates); //
     ublas::matrix<float> R_k(2, 2); // Assumed error in measurment sensors
-    ublas::vector<float> v_k; // Measurement invariance
+    ublas::vector<float> v_k(2); // Measurement invariance
 
     // Incorporate all correction observations
     for(unsigned int i = 0; i < z_k.size(); ++i) {
-        v_k = incorporateMeasurement(z_k[i], H_k, R_k);
+        incorporateMeasurement(z_k[i], H_k, R_k, v_k);
         // Calculate the Kalman gain matrix
         ublas::matrix<float> pTimesHTrans = prod(P_k_bar, trans(H_k));
         K_k = prod(P_k_bar, invert2by2(prod(H_k, pTimesHTrans)+ R_k));
