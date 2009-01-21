@@ -103,8 +103,8 @@ class EKF:
     ASSUMED_CORNER_SD_EXPONENT = 2.0
     CORNER_COEFFICIENT = 0.0125
     CORNER_DISTANCE_MEASUREMENT_SD = (lambda self, d:
-				      (d ** self.ASSUMED_CORNER_SD_EXPONENT)*
-				      self.CORNER_COEFFICIENT+10)
+                                      (d ** self.ASSUMED_CORNER_SD_EXPONENT)*
+                                      self.CORNER_COEFFICIENT+10)
     ASSUMED_ANGLE_SD = 4.
     NEAR_POST_VARIANCE_THRESH = 100.
     NEAR_POST_VARIANCE_FACTOR = 3.0
@@ -172,178 +172,178 @@ class EKF:
                  guess_ball_v_y_uncert = MAX_BALL_VELOCITY_UNCERT,
                  framesSinceReset = 0,
                  brain = None):
-	"""
-	Initialize the Filter, guess an initial location on the field, and
+        """
+        Initialize the Filter, guess an initial location on the field, and
         set the initial uncertainty about that location
-	"""
+        """
         ## Robot Position ##
-	self.P_kminus1 = matrix.withvalues(3, 3, [guess_uncert_x, 0., 0.,\
-						  0., guess_uncert_y, 0.,\
- 						  0., 0., guess_uncert_theta])
+        self.P_kminus1 = matrix.withvalues(3, 3, [guess_uncert_x, 0., 0.,\
+                                                  0., guess_uncert_y, 0.,\
+                                                   0., 0., guess_uncert_theta])
         self.xhat_kminus1 = matrix.withvalues(3, 1, [guess_x,\
-						     guess_y,\
-						     guess_theta])
-	self.by3_identity = matrix.identity(3)
-	self.P_k = matrix.Matrix(self.P_kminus1)
-	self.xhat_k = matrix.Matrix(self.xhat_kminus1)
+                                                     guess_y,\
+                                                     guess_theta])
+        self.by3_identity = matrix.identity(3)
+        self.P_k = matrix.Matrix(self.P_kminus1)
+        self.xhat_k = matrix.Matrix(self.xhat_kminus1)
 
-	# Initialize empty matrixes for use in updateOdometry()
-	self.A_k = matrix.identity(3)
-	self.delta_matrix = matrix.Matrix(3, 1, 0.)
-	self.xhat_k_priori = matrix.Matrix(3, 1, 0.)
-	self.Q_kminus1 = matrix.Matrix(3, 3, 0.)
-	self.P_k_priori = matrix.Matrix(3, 3, 0.)
+        # Initialize empty matrixes for use in updateOdometry()
+        self.A_k = matrix.identity(3)
+        self.delta_matrix = matrix.Matrix(3, 1, 0.)
+        self.xhat_k_priori = matrix.Matrix(3, 1, 0.)
+        self.Q_kminus1 = matrix.Matrix(3, 3, 0.)
+        self.P_k_priori = matrix.Matrix(3, 3, 0.)
 
-	# Initialize empty matrixes for use in sawSpecificLandmark()
-	self.z_x = matrix.Matrix(2, 1, 0.)
-	self.d_x = matrix.Matrix(2, 1, 0.)
-	self.v_k = matrix.Matrix(2, 1, 0.)
-	self.H_k = matrix.Matrix(2, 3, 0.)
-	self.R_k = matrix.Matrix(2, 2, 0.)
+        # Initialize empty matrixes for use in sawSpecificLandmark()
+        self.z_x = matrix.Matrix(2, 1, 0.)
+        self.d_x = matrix.Matrix(2, 1, 0.)
+        self.v_k = matrix.Matrix(2, 1, 0.)
+        self.H_k = matrix.Matrix(2, 3, 0.)
+        self.R_k = matrix.Matrix(2, 2, 0.)
 
         # Initialize the ball and ball velocity
-	self.init_ball(guess_ball_x, guess_ball_y,
+        self.init_ball(guess_ball_x, guess_ball_y,
                        guess_ball_velocity_x, guess_ball_velocity_y,
                        guess_ball_x_uncert, guess_ball_y_uncert,
                        guess_ball_v_x_uncert, guess_ball_v_y_uncert)
 
-	## Resetting ##
-	self.frames_since_reset = framesSinceReset
+        ## Resetting ##
+        self.frames_since_reset = framesSinceReset
 
-	# brain object
-	self.brain = brain
+        # brain object
+        self.brain = brain
 
     def init_ball(self, guess_ball_x = INITIAL_BALL_X,
                   guess_ball_y = INITIAL_BALL_Y,
                   guess_vel_x = INITIAL_BALL_X_VELOCITY,
-		  guess_vel_y = INITIAL_BALL_Y_VELOCITY,
-		  guess_b_x_uncert = INITIAL_UNCERT_X,
-		  guess_b_y_uncert = INITIAL_UNCERT_Y,
-		  guess_v_x_uncert = MAX_BALL_VELOCITY_UNCERT,
-		  guess_v_y_uncert = MAX_BALL_VELOCITY_UNCERT):
-	"""
-	Set up the ball tracking aspect of the filter, guessing the initial
+                  guess_vel_y = INITIAL_BALL_Y_VELOCITY,
+                  guess_b_x_uncert = INITIAL_UNCERT_X,
+                  guess_b_y_uncert = INITIAL_UNCERT_Y,
+                  guess_v_x_uncert = MAX_BALL_VELOCITY_UNCERT,
+                  guess_v_y_uncert = MAX_BALL_VELOCITY_UNCERT):
+        """
+        Set up the ball tracking aspect of the filter, guessing the initial
         location of the ball to the be values of the optional paramaters
-	"""
-	self.Pball_kminus1 = matrix.withvalues(4, 4,
-					       [guess_b_x_uncert, 0., 0., 0.,
-						0., guess_b_y_uncert, 0., 0.,
-						0., 0., guess_v_x_uncert, 0.,
-						0., 0., 0., guess_v_y_uncert])
+        """
+        self.Pball_kminus1 = matrix.withvalues(4, 4,
+                                               [guess_b_x_uncert, 0., 0., 0.,
+                                                0., guess_b_y_uncert, 0., 0.,
+                                                0., 0., guess_v_x_uncert, 0.,
+                                                0., 0., 0., guess_v_y_uncert])
 
-	self.xhatball_kminus1 = matrix.withvalues(4, 1, [guess_ball_x,
-							 guess_ball_y,
-							 guess_vel_x,
-							 guess_vel_y,])
-	self.by2_identity = matrix.identity(2)
-	self.by4_identity = matrix.identity(4)
+        self.xhatball_kminus1 = matrix.withvalues(4, 1, [guess_ball_x,
+                                                         guess_ball_y,
+                                                         guess_vel_x,
+                                                         guess_vel_y,])
+        self.by2_identity = matrix.identity(2)
+        self.by4_identity = matrix.identity(4)
 
         # Set this frame value to last frame values
-	self.Pball_k = matrix.Matrix(self.Pball_kminus1)
-	self.xhatball_k = matrix.Matrix(self.xhatball_kminus1)
+        self.Pball_k = matrix.Matrix(self.Pball_kminus1)
+        self.xhatball_k = matrix.Matrix(self.xhatball_kminus1)
 
-	# Matricies for ball time update
-	self.Aball_k = matrix.identity(4)
-	self.Aball_k.set(0, 2, 1. / self.ASSUMED_FPS)
-	self.Aball_k.set(1, 3, 1. / self.ASSUMED_FPS)
-	self.delta_ball_matrix = matrix.Matrix(4, 1, 0.)
-	self.xhatball_k_priori = matrix.Matrix(4, 1, 0.)
-	self.Qball_kminus1 = matrix.Matrix(4, 4, 0.)
-	self.Pball_k_priori = matrix.Matrix(4, 4, 0.)
+        # Matricies for ball time update
+        self.Aball_k = matrix.identity(4)
+        self.Aball_k.set(0, 2, 1. / self.ASSUMED_FPS)
+        self.Aball_k.set(1, 3, 1. / self.ASSUMED_FPS)
+        self.delta_ball_matrix = matrix.Matrix(4, 1, 0.)
+        self.xhatball_k_priori = matrix.Matrix(4, 1, 0.)
+        self.Qball_kminus1 = matrix.Matrix(4, 4, 0.)
+        self.Pball_k_priori = matrix.Matrix(4, 4, 0.)
 
-	# Matricies for ball correction phase
-	self.zball_x = matrix.Matrix(2, 1, 0.)
-	self.dball_x = matrix.Matrix(2, 1, 0.)
-	self.vball_k = matrix.Matrix(2, 1, 0.)
-	self.Hball_k = matrix.Matrix(2, 4, 0.)
-	self.Rball_k = matrix.Matrix(2, 2, 0.)
-	self.lastBallSeenFrame = 0
-	self.stopResetingFrame = 0
+        # Matricies for ball correction phase
+        self.zball_x = matrix.Matrix(2, 1, 0.)
+        self.dball_x = matrix.Matrix(2, 1, 0.)
+        self.vball_k = matrix.Matrix(2, 1, 0.)
+        self.Hball_k = matrix.Matrix(2, 4, 0.)
+        self.Rball_k = matrix.Matrix(2, 2, 0.)
+        self.lastBallSeenFrame = 0
+        self.stopResetingFrame = 0
 
     def updateOdometry(self, (delta_f, delta_l, delta_r)):
-	"""
-	Make a priori estimate to account for movement reported by odometry.
+        """
+        Make a priori estimate to account for movement reported by odometry.
         Takes a tuple of form (delta_f, delta_l, delta_r) with units of
         (cm, cm, deg)
-	"""
+        """
 
-	## Robot Position ##
-	# Since we expect exactly 1 updateOdometry() call each frame,
+        ## Robot Position ##
+        # Since we expect exactly 1 updateOdometry() call each frame,
         # increment the frames_since_reset count
-	self.frames_since_reset += 1
+        self.frames_since_reset += 1
 
-	# Sanity check the reported odometry deltas.
+        # Sanity check the reported odometry deltas.
         # If they are unreasonably large, trim the to reasonable values
-	if delta_f > self.MAX_DELTA_F:
-	    delta_f = self.MAX_DELTA_F
-	if delta_f < self.MIN_DELTA_F:
-	    delta_f = self.MIN_DELTA_F
-	if delta_l > self.MAX_DELTA_L:
-	    delta_l = self.MAX_DELTA_L
-	if delta_l < self.MIN_DELTA_L:
-	    delta_l = self.MIN_DELTA_L
-	if delta_r > self.MAX_DELTA_R:
-	    delta_r = self.MAX_DELTA_R
-	if delta_r < self.MIN_DELTA_R:
-	    delta_r = self.MIN_DELTA_R
+        if delta_f > self.MAX_DELTA_F:
+            delta_f = self.MAX_DELTA_F
+        if delta_f < self.MIN_DELTA_F:
+            delta_f = self.MIN_DELTA_F
+        if delta_l > self.MAX_DELTA_L:
+            delta_l = self.MAX_DELTA_L
+        if delta_l < self.MIN_DELTA_L:
+            delta_l = self.MIN_DELTA_L
+        if delta_r > self.MAX_DELTA_R:
+            delta_r = self.MAX_DELTA_R
+        if delta_r < self.MIN_DELTA_R:
+            delta_r = self.MIN_DELTA_R
 
-	# Determine the angle from which to how much we expect our position to
+        # Determine the angle from which to how much we expect our position to
         # have changed based on the odometry info.
         # I'm honestly not sure why we need to add 90 degrees instead of
         # subtract 90 degrees.  Convert to radians for use in trig functions
-	# A: We add 90 because lateral odometery is reported such that
-	# positive lateral moves the robot left not right
+        # A: We add 90 because lateral odometery is reported such that
+        # positive lateral moves the robot left not right
 
-       	calc_from_angle = (self.xhat_kminus1.get(2, 0) + 90) * self.DEG_TO_RAD
+               calc_from_angle = (self.xhat_kminus1.get(2, 0) + 90) * self.DEG_TO_RAD
         delta_x = (delta_f * cos(calc_from_angle)) - (delta_l *
                                                       sin(calc_from_angle))
         delta_y = (delta_f * sin(calc_from_angle)) + (delta_l *
                                                       cos(calc_from_angle))
         delta_theta = delta_r
 
-	# Update localization estimate by adding the changes computed from the
+        # Update localization estimate by adding the changes computed from the
         # odometry info to our previous localization info
         self.xhat_k_priori = self.xhat_kminus1.add(
             matrix.withvalues(3, 1, [delta_x,\
                                      delta_y,\
                                      delta_theta]))
 
-	# Correct heading estimate to assure that it is within 180 degrees of
+        # Correct heading estimate to assure that it is within 180 degrees of
         # zero: all possible headings can be expressed in this range
         self.xhat_k_priori.set(2,0, sub180Angle(self.xhat_k_priori.get(2,0)))
 
-	# Update the input noise covariance matrix based on the odemtry info.
+        # Update the input noise covariance matrix based on the odemtry info.
         # The larger the reported movement in any direction, the more
         # uncertain we are about that change
-	self.Q_kminus1.set(0, 0, self.ALPHA * (self.BETA + self.GAMMA
+        self.Q_kminus1.set(0, 0, self.ALPHA * (self.BETA + self.GAMMA
                                                *(delta_x ** 2.)))
-	self.Q_kminus1.set(1, 1, self.ALPHA * (self.BETA + self.GAMMA
+        self.Q_kminus1.set(1, 1, self.ALPHA * (self.BETA + self.GAMMA
                                                *(delta_y ** 2.)))
-	self.Q_kminus1.set(2, 2, self.ALPHA * (self.BETA_THETA + self.GAMMA
+        self.Q_kminus1.set(2, 2, self.ALPHA * (self.BETA_THETA + self.GAMMA
                                                *(delta_theta ** 2.)))
-	# Update the correction matrix
+        # Update the correction matrix
         # Add the noise described in Q to the uncertainty matrix:
         # the more noise we expect, the less certain we are about our new
         # estimates
-	self.P_k_priori = self.P_kminus1.add(self.Q_kminus1)
+        self.P_k_priori = self.P_kminus1.add(self.Q_kminus1)
 
-	# Copy the values of various matricies.
+        # Copy the values of various matricies.
         # These copies are only neccesary becuase we might not be strictely
         # alternating between updateOdometry() and sawSpecificLandmark()
-	self.xhat_kminus1 = matrix.Matrix(self.xhat_k_priori)
-	self.P_kminus1 = matrix.Matrix(self.P_k_priori)
-	self.xhat_k = matrix.Matrix(self.xhat_kminus1)
-	self.P_k = matrix.Matrix(self.P_kminus1)
-	# Check the reasonableness of the changes induced by the update
-	self.sanityCheck()
+        self.xhat_kminus1 = matrix.Matrix(self.xhat_k_priori)
+        self.P_kminus1 = matrix.Matrix(self.P_k_priori)
+        self.xhat_k = matrix.Matrix(self.xhat_kminus1)
+        self.P_k = matrix.Matrix(self.P_kminus1)
+        # Check the reasonableness of the changes induced by the update
+        self.sanityCheck()
 
-	#-----Ball Position and Velocity-----#
-	# Velocity should not effect position if we haven't seen the
-	# ball in a while
-	deltaball_x = self.getBallXVelocityEst() * (1. / self.ASSUMED_FPS)
-	deltaball_y = self.getBallYVelocityEst() * (1. / self.ASSUMED_FPS)
-	delta_v_x = 0.
-	delta_v_y = 0.
+        #-----Ball Position and Velocity-----#
+        # Velocity should not effect position if we haven't seen the
+        # ball in a while
+        deltaball_x = self.getBallXVelocityEst() * (1. / self.ASSUMED_FPS)
+        deltaball_y = self.getBallYVelocityEst() * (1. / self.ASSUMED_FPS)
+        delta_v_x = 0.
+        delta_v_y = 0.
 
         delta_v_x = (self.CARPET_FRICTION / self.ASSUMED_FPS *
                      sign(self.getBallXVelocityEst()))
@@ -351,249 +351,249 @@ class EKF:
                      sign(self.getBallYVelocityEst()))
 
         # Clip Ball Values
-	if deltaball_x > self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
-	    deltaball_x = self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
-	if deltaball_x < -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
-	    deltaball_x = -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
-	if deltaball_y > self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
-	    deltaball_y = self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
-	if deltaball_y < -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
-	    deltaball_y = -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
+        if deltaball_x > self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
+            deltaball_x = self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
+        if deltaball_x < -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
+            deltaball_x = -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
+        if deltaball_y > self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
+            deltaball_y = self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
+        if deltaball_y < -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS:
+            deltaball_y = -self.MAX_BALL_VELOCITY / self.ASSUMED_FPS
 
-	# Update ball position and velocity estimates
-	self.xhatball_k_priori = self.xhatball_kminus1.add(
+        # Update ball position and velocity estimates
+        self.xhatball_k_priori = self.xhatball_kminus1.add(
             matrix.withvalues(4, 1, [deltaball_x, deltaball_y,
-				     delta_v_x, delta_v_y]))
+                                     delta_v_x, delta_v_y]))
 
-	# Update uncertainty associated with ball
-	self.Qball_kminus1.set(0, 0, self.ALPHA_BALL *
+        # Update uncertainty associated with ball
+        self.Qball_kminus1.set(0, 0, self.ALPHA_BALL *
                                (self.BETA_BALL + self.GAMMA_BALL *
                                 (deltaball_x ** 2.)))
-	self.Qball_kminus1.set(1, 1, self.ALPHA_BALL *
+        self.Qball_kminus1.set(1, 1, self.ALPHA_BALL *
                                (self.BETA_BALL + self.GAMMA_BALL *
                                 (deltaball_y ** 2.)))
-	self.Qball_kminus1.set(2, 2, self.BETA_VEL)
-	self.Qball_kminus1.set(3, 3, self.BETA_VEL)
+        self.Qball_kminus1.set(2, 2, self.BETA_VEL)
+        self.Qball_kminus1.set(3, 3, self.BETA_VEL)
 
-	self.Pball_k_priori = self.Aball_k.multiply(
-	    self.Pball_kminus1.multiply(self.Aball_k.transpose())).add(
-	    self.Qball_kminus1)
+        self.Pball_k_priori = self.Aball_k.multiply(
+            self.Pball_kminus1.multiply(self.Aball_k.transpose())).add(
+            self.Qball_kminus1)
 
-	# Update matricies to reflect time change
-	self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k_priori)
-	self.Pball_kminus1 = matrix.Matrix(self.Pball_k_priori)
-	self.xhatball_k = matrix.Matrix(self.xhatball_kminus1)
-	self.Pball_k = matrix.Matrix(self.Pball_kminus1)
+        # Update matricies to reflect time change
+        self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k_priori)
+        self.Pball_kminus1 = matrix.Matrix(self.Pball_k_priori)
+        self.xhatball_k = matrix.Matrix(self.xhatball_kminus1)
+        self.Pball_k = matrix.Matrix(self.Pball_kminus1)
 
-	# Check the reasonableness of the changes induced by the
+        # Check the reasonableness of the changes induced by the
         # odometry update, including the calculated velocity
-	self.sanityCheckBall()
+        self.sanityCheckBall()
 
     def sawSpecificLandmark(self, landmark, is_corner = False):
-	"""
-	Update our a priori estimate to reflect new information from Vision.
+        """
+        Update our a priori estimate to reflect new information from Vision.
         We can preform multiple such updates between odemetry updates,
         if for example we see multiple beacons in one frame.
         See the Overview document - *update phase*
-	"""
-	# use simple vision certainties to screen things out
-	if not is_corner:
-	    # if landmark certainty is not sure (ie not sure which goal post)
-	    if landmark.certainty != Constants.SURE:
-		return
-	    # if dist uncertainty is high
-	    elif landmark.distCertainty == Constants.BOTH_UNSURE:
-		return
-	    # if we reasonably far away from object and height is unsure
-	    elif (landmark.distCertainty == Constants.HEIGHT_UNSURE and
-		  landmark.dist > Constants.MIDFIELD_Y):
-		return
+        """
+        # use simple vision certainties to screen things out
+        if not is_corner:
+            # if landmark certainty is not sure (ie not sure which goal post)
+            if landmark.certainty != Constants.SURE:
+                return
+            # if dist uncertainty is high
+            elif landmark.distCertainty == Constants.BOTH_UNSURE:
+                return
+            # if we reasonably far away from object and height is unsure
+            elif (landmark.distCertainty == Constants.HEIGHT_UNSURE and
+                  landmark.dist > Constants.MIDFIELD_Y):
+                return
 
-	b_x = landmark.x
-	b_y = landmark.y
-	z_d = landmark.dist
+        b_x = landmark.x
+        b_y = landmark.y
+        z_d = landmark.dist
         z_a = landmark.bearing
 
         #On the NAO, bearing is no longer flipped
-	#if not is_corner: # weird thing, bearing from Vision class if diff
-	#    z_a = -landmark.bearing
-	#else:
-	if is_corner:
+        #if not is_corner: # weird thing, bearing from Vision class if diff
+        #    z_a = -landmark.bearing
+        #else:
+        if is_corner:
             # if a corner is certain distance away, throw it out
-	    dist_to_corner_from_self = dist(self.getXEst(),self.getYEst(),
-					    landmark.x,landmark.y)
+            dist_to_corner_from_self = dist(self.getXEst(),self.getYEst(),
+                                            landmark.x,landmark.y)
 
-	    if (dist_to_corner_from_self >
-		self.CORNER_MAX_VISIBLE_DISTANCE or
-		dist_to_corner_from_self <
-		self.CORNER_MIN_VISIBLE_DISTANCE):
-		if self.DEBUG_CORNER_FITTING:
-		    print "Corner distance to far away", \
-			dist_to_corner_from_self
-		return
+            if (dist_to_corner_from_self >
+                self.CORNER_MAX_VISIBLE_DISTANCE or
+                dist_to_corner_from_self <
+                self.CORNER_MIN_VISIBLE_DISTANCE):
+                if self.DEBUG_CORNER_FITTING:
+                    print "Corner distance to far away", \
+                        dist_to_corner_from_self
+                return
 
-	    landmark.localId = cornerIDtoLandmarkID(landmark.localId)
+            landmark.localId = cornerIDtoLandmarkID(landmark.localId)
 
-	#debugPrint("sawSpecificLandmark(): %s" %
-	#	   (Constants.landmarkTuple[landmark.localId]))
+        #debugPrint("sawSpecificLandmark(): %s" %
+        #           (Constants.landmarkTuple[landmark.localId]))
 
-	if (self.brain is not None and Constants.DEBUG_LOC_INFO and
-	    not OFFLINE):
-	    self.brain.debugLoc.addUsedLandmark(landmark)
-	elif OFFLINE and self.brain is not None:
-	    self.brain.addUsedLandmark(landmark)
+        if (self.brain is not None and Constants.DEBUG_LOC_INFO and
+            not OFFLINE):
+            self.brain.debugLoc.addUsedLandmark(landmark)
+        elif OFFLINE and self.brain is not None:
+            self.brain.addUsedLandmark(landmark)
 
-	# Create a vector of the vision information
-	self.z_x = matrix.withvalues(2, 1, [z_d, z_a])
+        # Create a vector of the vision information
+        self.z_x = matrix.withvalues(2, 1, [z_d, z_a])
 
-	# Calculate the distance and heading angle that we would have expected
+        # Calculate the distance and heading angle that we would have expected
         # for this landmark given our previos localizaiton estimate,
         # then create a matrix with those values to use in calculations
-	d = ((self.xhat_k_priori.get(0,0) - b_x) ** 2. +
+        d = ((self.xhat_k_priori.get(0,0) - b_x) ** 2. +
                  (self.xhat_k_priori.get(1,0) - b_y) ** 2.) ** .5
 
-	# Assure that d is nonzero, becuase we will be dividing by it later
-	if d == 0:
-	    d = self.SMALL_NONZERO_NUMBER
+        # Assure that d is nonzero, becuase we will be dividing by it later
+        if d == 0:
+            d = self.SMALL_NONZERO_NUMBER
 
         a = sub180Angle(self.RAD_TO_DEG * safe_atan2(
-		b_y - self.xhat_k_priori.get(1,0), b_x -
-		self.xhat_k_priori.get(0,0)) - self.QUAT_CIRC_DEG -
+                b_y - self.xhat_k_priori.get(1,0), b_x -
+                self.xhat_k_priori.get(0,0)) - self.QUAT_CIRC_DEG -
                         self.xhat_k_priori.get(2,0))
 
         # Find an equivalant angle such that a has a Euclidian distance of no
         # more than 180 degrees from z_a: an angle is never really more than
         # 180 degrees different from any other angle.
-	a = sub180Diff(a, z_a)
-	self.d_x = matrix.withvalues(2, 1, [d, a])
-	v_k = self.z_x.subtract(self.d_x);
+        a = sub180Diff(a, z_a)
+        self.d_x = matrix.withvalues(2, 1, [d, a])
+        v_k = self.z_x.subtract(self.d_x);
 
-	# Calculate the values for the jacabian matrix.
+        # Calculate the values for the jacabian matrix.
         # See the Kalman Overview document for an explanation
         H_k_1_1 = (self.xhat_k_priori.get(0,0) - b_x) / d
         H_k_1_2 = (self.xhat_k_priori.get(1,0) - b_y) / d
         H_k_1_3 = 0.
 
         H_k_2_1 = -1. * self.RAD_TO_DEG * ((self.xhat_k_priori.get(1,0) - b_y)/
-					   d ** 2.)
+                                           d ** 2.)
 
         H_k_2_2 = self.RAD_TO_DEG * ((self.xhat_k_priori.get(0,0) - b_x)/
-				     d ** 2.)
+                                     d ** 2.)
 
         H_k_2_3 = -1.
 
         # Create the jacobian matrix
-	self.H_k = matrix.withvalues(2, 3, [H_k_1_1, H_k_1_2, H_k_1_3,
+        self.H_k = matrix.withvalues(2, 3, [H_k_1_1, H_k_1_2, H_k_1_3,
                                             H_k_2_1, H_k_2_2, H_k_2_3])
 
-	# Update the measurnment covariance matrix
+        # Update the measurnment covariance matrix
 
         # FIX_ME: Redo bearing variance to depend on HEAD_SPEED
         headSpeed = self.brain.motion.getHeadSpeed()
-	self.R_k.set(1, 1, self.HEAD_SPEED_TO_BEARING_VARIANCE(headSpeed))
+        self.R_k.set(1, 1, self.HEAD_SPEED_TO_BEARING_VARIANCE(headSpeed))
 
-	# Calculate distance variance dependent on landmark type
-	if is_corner:
-	    self.R_k.set(0, 0, self.CORNER_DISTANCE_MEASUREMENT_SD(z_d))
+        # Calculate distance variance dependent on landmark type
+        if is_corner:
+            self.R_k.set(0, 0, self.CORNER_DISTANCE_MEASUREMENT_SD(z_d))
 
-	elif (landmark.localId == Constants.LANDMARK_MY_GOAL_LEFT_POST_ID or
-	      landmark.localId == Constants.LANDMARK_MY_GOAL_RIGHT_POST_ID or
-	      landmark.localId == Constants.LANDMARK_OPP_GOAL_LEFT_POST_ID or
-	      landmark.localId == Constants.LANDMARK_OPP_GOAL_RIGHT_POST_ID):
+        elif (landmark.localId == Constants.LANDMARK_MY_GOAL_LEFT_POST_ID or
+              landmark.localId == Constants.LANDMARK_MY_GOAL_RIGHT_POST_ID or
+              landmark.localId == Constants.LANDMARK_OPP_GOAL_LEFT_POST_ID or
+              landmark.localId == Constants.LANDMARK_OPP_GOAL_RIGHT_POST_ID):
 
-	    self.R_k.set(0, 0, self.POST_DIST_TO_VARIANCE(z_d))
+            self.R_k.set(0, 0, self.POST_DIST_TO_VARIANCE(z_d))
 
-	    if z_d < self.NEAR_POST_VARIANCE_THRESH:
-		self.R_k.set(1, 1, self.R_k.get(1, 1)*
-			     self.NEAR_POST_VARIANCE_FACTOR)
+            if z_d < self.NEAR_POST_VARIANCE_THRESH:
+                self.R_k.set(1, 1, self.R_k.get(1, 1)*
+                             self.NEAR_POST_VARIANCE_FACTOR)
 
-	elif (landmark.localId == Constants.LANDMARK_LEFT_BEACON_ID or
-	      landmark.localId == Constants.LANDMARK_RIGHT_BEACON_ID):
-	    self.R_k.set(0,0, self.BEACON_DIST_TO_VARIANCE(z_d))
+        elif (landmark.localId == Constants.LANDMARK_LEFT_BEACON_ID or
+              landmark.localId == Constants.LANDMARK_RIGHT_BEACON_ID):
+            self.R_k.set(0,0, self.BEACON_DIST_TO_VARIANCE(z_d))
         else:
             print "wtf, mate?"
 
 
-	# Use the divergence between the recieved and expected localization
+        # Use the divergence between the recieved and expected localization
         # information to update our expection position and heading
-	# First, calculate the Kalman gain, which describes how realitevly
+        # First, calculate the Kalman gain, which describes how realitevly
         # heavily to weight the new information
-	K_k = self.P_k_priori.multiply(
+        K_k = self.P_k_priori.multiply(
             self.H_k.transpose().multiply(((self.H_k.multiply(
             self.P_k_priori.multiply(
             self.H_k.transpose()))).add(self.R_k)).invert()))
 
         # Then use the Kalman gain to compute the absolte amount by which we
         # should change our estimates, and apply those changes
-	self.xhat_k = self.xhat_k_priori.add(
+        self.xhat_k = self.xhat_k_priori.add(
             (K_k.multiply(v_k)).scale(self.EPSILON))
 
-	# Before going on, sanity check the updated values to see if they are
+        # Before going on, sanity check the updated values to see if they are
         # reasonable, by caping the total displacement to some specified amount
-	if not self.isRecoveringFromReset():
-	    if self.xhat_k.get(0,0) - self.xhat_k_priori.get(0,0) > \
+        if not self.isRecoveringFromReset():
+            if self.xhat_k.get(0,0) - self.xhat_k_priori.get(0,0) > \
                    self.MAX_LINEAR_DISPLACEMENT:
-		self.xhat_k.set(0,0,self.xhat_k_priori.get(0,0) +
+                self.xhat_k.set(0,0,self.xhat_k_priori.get(0,0) +
                                 self.MAX_LINEAR_DISPLACEMENT)
 
-	    if self.xhat_k.get(0,0) - self.xhat_k_priori.get(0,0) < \
+            if self.xhat_k.get(0,0) - self.xhat_k_priori.get(0,0) < \
                    -self.MAX_LINEAR_DISPLACEMENT:
-		self.xhat_k.set(0,0,self.xhat_k_priori.get(0,0) -
+                self.xhat_k.set(0,0,self.xhat_k_priori.get(0,0) -
                                 self.MAX_LINEAR_DISPLACEMENT)
 
-	    if self.xhat_k.get(1,0) - self.xhat_k_priori.get(1,0) > \
+            if self.xhat_k.get(1,0) - self.xhat_k_priori.get(1,0) > \
                    self.MAX_LINEAR_DISPLACEMENT:
-		self.xhat_k.set(1,0,self.xhat_k_priori.get(1,0) +
+                self.xhat_k.set(1,0,self.xhat_k_priori.get(1,0) +
                                 self.MAX_LINEAR_DISPLACEMENT)
 
-	    if self.xhat_k.get(1,0) - self.xhat_k_priori.get(1,0) < \
+            if self.xhat_k.get(1,0) - self.xhat_k_priori.get(1,0) < \
                    -self.MAX_LINEAR_DISPLACEMENT:
-		self.xhat_k.set(1,0,self.xhat_k_priori.get(1,0) -
+                self.xhat_k.set(1,0,self.xhat_k_priori.get(1,0) -
                                 self.MAX_LINEAR_DISPLACEMENT)
 
-	# Update our uncertainty to reflect the chagnes
-	self.P_k = (self.by3_identity.subtract(
+        # Update our uncertainty to reflect the chagnes
+        self.P_k = (self.by3_identity.subtract(
             K_k.multiply(self.H_k))).multiply(self.P_k_priori)
 
-	# Copy the values of various matricies.
+        # Copy the values of various matricies.
         # These copies are only neccesary becuase we might not be strictely
         # alternating between updateOdometry() and sawSpecificLandmark()
-	self.xhat_k_priori = matrix.Matrix(self.xhat_k)
-	self.P_k_priori = matrix.Matrix(self.P_k)
-	self.P_kminus1 = matrix.Matrix(self.P_k)
-	self.xhat_kminus1 = matrix.Matrix(self.xhat_k)
+        self.xhat_k_priori = matrix.Matrix(self.xhat_k)
+        self.P_k_priori = matrix.Matrix(self.P_k)
+        self.P_kminus1 = matrix.Matrix(self.P_k)
+        self.xhat_kminus1 = matrix.Matrix(self.xhat_k)
 
-	# Check the reasonableness of the changes induced by the
+        # Check the reasonableness of the changes induced by the
         # landmark sighting
-	self.sanityCheck()
+        self.sanityCheck()
 
     def sawBall(self, zball_d, zball_a, isTeammateReport=False,
-		teammateDist = 0):
-	"""
-	Update our a priori estimate of the ball's state to reflect new
+                teammateDist = 0):
+        """
+        Update our a priori estimate of the ball's state to reflect new
         information from Vision.  The procedure is similar to that of
         sawSpecificLandmark.  Note however the critical difference in the
         calculation of Hball_k_1_1 and Hball_k_1_2.
-	"""
-	if zball_d < self.NEAR_BALL_CALCULATION_DIST and self.NEAR_BALL_CALC:
-	    self.sawCloseBall(zball_d, zball_a, isTeammateReport, teammateDist)
-	    return
+        """
+        if zball_d < self.NEAR_BALL_CALCULATION_DIST and self.NEAR_BALL_CALC:
+            self.sawCloseBall(zball_d, zball_a, isTeammateReport, teammateDist)
+            return
 
-	# Create a vector of the vision information
-	self.zball_x = matrix.withvalues(2, 1, [zball_d, zball_a])
+        # Create a vector of the vision information
+        self.zball_x = matrix.withvalues(2, 1, [zball_d, zball_a])
 
-	# Calculate the distance and heading angle that we would have expected
+        # Calculate the distance and heading angle that we would have expected
         # for the ball given our previos localizaiton estimate, then create a
         # matrix with those values to use in calculations
-	dball = ((self.xhat_k_priori.get(0,0) - self.getBallXEst()) ** 2. +
+        dball = ((self.xhat_k_priori.get(0,0) - self.getBallXEst()) ** 2. +
                      (self.xhat_k_priori.get(1,0) - self.getBallYEst()) ** 2. )\
-		     ** .5
+                     ** .5
 
         # Assure that dball is not 0, becuase we will be dividing by it
-	if dball == 0:
-	    dball = self.SMALL_NONZERO_NUMBER
+        if dball == 0:
+            dball = self.SMALL_NONZERO_NUMBER
 
-	aball = sub180Angle(self.RAD_TO_DEG * safe_atan2(
+        aball = sub180Angle(self.RAD_TO_DEG * safe_atan2(
             self.getBallYEst() - self.xhat_k_priori.get(1,0),
             self.getBallXEst() - self.xhat_k_priori.get(0,0)) -
                             self.QUAT_CIRC_DEG - self.xhat_k_priori.get(2,0))
@@ -601,220 +601,220 @@ class EKF:
         # Find an equivalant angle such that a has a Euclidian distance of no
         # more than 180 degrees from zball_a: an angle is never really more
         # than 180 degrees different from any other angle.
-	aball = sub180Diff(aball, zball_a)
-	self.dball_x = matrix.withvalues(2, 1, [dball,\
-						aball])
+        aball = sub180Diff(aball, zball_a)
+        self.dball_x = matrix.withvalues(2, 1, [dball,\
+                                                aball])
 
-	vball_k = self.zball_x.subtract(self.dball_x);
+        vball_k = self.zball_x.subtract(self.dball_x);
 
-	# Calculate the values for the jacabian matrix.
-	Hball_k_1_1 = ( (self.getBallXEst() - self.xhat_k_priori.get(0,0)) /
-			dball)
-	Hball_k_1_2 = ((self.getBallYEst() - self.xhat_k_priori.get(1,0)) /
-		       dball)
+        # Calculate the values for the jacabian matrix.
+        Hball_k_1_1 = ( (self.getBallXEst() - self.xhat_k_priori.get(0,0)) /
+                        dball)
+        Hball_k_1_2 = ((self.getBallYEst() - self.xhat_k_priori.get(1,0)) /
+                       dball)
 
-	# Assure that the divsors are nonzero
-	Hball_k_2_1 = -1. * self.RAD_TO_DEG * ((self.getBallYEst() -
-						self.xhat_k_priori.get(1,0))
-					       / dball ** 2.)
+        # Assure that the divsors are nonzero
+        Hball_k_2_1 = -1. * self.RAD_TO_DEG * ((self.getBallYEst() -
+                                                self.xhat_k_priori.get(1,0))
+                                               / dball ** 2.)
 
-	Hball_k_2_2 = self.RAD_TO_DEG * ((self.getBallXEst() -
-					  self.xhat_k_priori.get(0,0)) /
-					 dball ** 2.)
+        Hball_k_2_2 = self.RAD_TO_DEG * ((self.getBallXEst() -
+                                          self.xhat_k_priori.get(0,0)) /
+                                         dball ** 2.)
 
-	# Create the jacobian matrix
-	self.Hball_k = matrix.withvalues(2, 4, [Hball_k_1_1, Hball_k_1_2,0.,0.,
-						Hball_k_2_1, Hball_k_2_2,0.,0.])
+        # Create the jacobian matrix
+        self.Hball_k = matrix.withvalues(2, 4, [Hball_k_1_1, Hball_k_1_2,0.,0.,
+                                                Hball_k_2_1, Hball_k_2_2,0.,0.])
 
-	# Update the measurnment covariance matrix
+        # Update the measurnment covariance matrix
 
-	if isTeammateReport:
-	    self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(teammateDist)*
-			     self.TEAMMATE_DIST_VARIANCE_FACTOR)
+        if isTeammateReport:
+            self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(teammateDist)*
+                             self.TEAMMATE_DIST_VARIANCE_FACTOR)
 
-	    # Limit the range of our function
-	    if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
-	    elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
+            # Limit the range of our function
+            if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
+            elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
 
-	    self.Rball_k.set(1, 1, self.ASSUMED_BALL_ANGLE_SD)
-	else:
-	    self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(zball_d))
+            self.Rball_k.set(1, 1, self.ASSUMED_BALL_ANGLE_SD)
+        else:
+            self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(zball_d))
 
-	    # Limit the range of our function
-	    if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
-	    elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
+            # Limit the range of our function
+            if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
+            elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
 
             # Calculate a value to determine variance
             # headSpeed = (self.brain.motion.getHeadYawSpeed() +
             #              self.brain.motion.getHeadPitchSpeed() + 1)
             headSpeed = self.brain.motion.getHeadSpeed()
 
-	    self.Rball_k.set(1, 1,
+            self.Rball_k.set(1, 1,
                              self.BALL_HEAD_SPEED_TO_BEARING_VARIANCE(headSpeed))
 
-	    if self.Rball_k.get(1,1) == 0.:
-		self.Rball_k.set(1, 1, self.SMALL_NONZERO_NUMBER)
-	    #self.Rball_k.set(1, 1, self.ASSUMED_BALL_ANGLE_SD)
+            if self.Rball_k.get(1,1) == 0.:
+                self.Rball_k.set(1, 1, self.SMALL_NONZERO_NUMBER)
+            #self.Rball_k.set(1, 1, self.ASSUMED_BALL_ANGLE_SD)
 
-	# Calculate Kalman gain matrix
-	Kball_k = self.Pball_k_priori.multiply(
+        # Calculate Kalman gain matrix
+        Kball_k = self.Pball_k_priori.multiply(
             self.Hball_k.transpose().multiply(((self.Hball_k.multiply(
-	    self.Pball_k_priori.multiply(self.Hball_k.transpose()))).add(
-			self.Rball_k)).invert()))
+            self.Pball_k_priori.multiply(self.Hball_k.transpose()))).add(
+                        self.Rball_k)).invert()))
 
-	# Use kalman gain matrix to determine next estimate
-	self.xhatball_k = self.xhatball_k_priori.add(
+        # Use kalman gain matrix to determine next estimate
+        self.xhatball_k = self.xhatball_k_priori.add(
             (Kball_k.multiply(vball_k)).scale(self.EPSILON_BALL))
 
-	# Before going on, sanity check the updated values to see if they are
+        # Before going on, sanity check the updated values to see if they are
         # reasonable, by caping the total displacement to some specified amount
-	# if not self.isRecoveringFromReset():
-	if self.xhatball_k.get(0,0) - self.xhatball_k_priori.get(0,0) > \
-		self.MAX_BALL_LINEAR_DISPLACEMENT:
-	    self.xhatball_k.set(0,0,self.xhatball_k_priori.get(0,0) +
-				self.MAX_BALL_LINEAR_DISPLACEMENT)
+        # if not self.isRecoveringFromReset():
+        if self.xhatball_k.get(0,0) - self.xhatball_k_priori.get(0,0) > \
+                self.MAX_BALL_LINEAR_DISPLACEMENT:
+            self.xhatball_k.set(0,0,self.xhatball_k_priori.get(0,0) +
+                                self.MAX_BALL_LINEAR_DISPLACEMENT)
 
-	if self.xhatball_k.get(0,0) - self.xhatball_k_priori.get(0,0) < \
-		-self.MAX_BALL_LINEAR_DISPLACEMENT:
-	    self.xhatball_k.set(0,0,self.xhatball_k_priori.get(0,0) -
-				self.MAX_BALL_LINEAR_DISPLACEMENT)
+        if self.xhatball_k.get(0,0) - self.xhatball_k_priori.get(0,0) < \
+                -self.MAX_BALL_LINEAR_DISPLACEMENT:
+            self.xhatball_k.set(0,0,self.xhatball_k_priori.get(0,0) -
+                                self.MAX_BALL_LINEAR_DISPLACEMENT)
 
-	if self.xhatball_k.get(1,0) - self.xhatball_k_priori.get(1,0) > \
-		self.MAX_BALL_LINEAR_DISPLACEMENT:
-	    self.xhatball_k.set(1,0,self.xhatball_k_priori.get(1,0) +
-				self.MAX_BALL_LINEAR_DISPLACEMENT)
+        if self.xhatball_k.get(1,0) - self.xhatball_k_priori.get(1,0) > \
+                self.MAX_BALL_LINEAR_DISPLACEMENT:
+            self.xhatball_k.set(1,0,self.xhatball_k_priori.get(1,0) +
+                                self.MAX_BALL_LINEAR_DISPLACEMENT)
 
-	if self.xhatball_k.get(1,0) - self.xhatball_k_priori.get(1,0) < \
-		-self.MAX_BALL_LINEAR_DISPLACEMENT:
-	    self.xhatball_k.set(1,0,self.xhatball_k_priori.get(1,0) -
-				self.MAX_BALL_LINEAR_DISPLACEMENT)
+        if self.xhatball_k.get(1,0) - self.xhatball_k_priori.get(1,0) < \
+                -self.MAX_BALL_LINEAR_DISPLACEMENT:
+            self.xhatball_k.set(1,0,self.xhatball_k_priori.get(1,0) -
+                                self.MAX_BALL_LINEAR_DISPLACEMENT)
 
-	# Update our uncertainty to reflect the chagnes
-	self.Pball_k = (self.by4_identity.subtract(
+        # Update our uncertainty to reflect the chagnes
+        self.Pball_k = (self.by4_identity.subtract(
             Kball_k.multiply(self.Hball_k))).multiply(self.Pball_k_priori)
 
-	# Copy the values of various matricies.  These copies are only
+        # Copy the values of various matricies.  These copies are only
         # neccesary becuase we might not be strictely alternating
         # between updateOdometry() and sawSpecificLandmark()
-	self.xhatball_k_priori = matrix.Matrix(self.xhatball_k)
-	self.Pball_k_priori = matrix.Matrix(self.Pball_k)
-	self.Pball_kminus1 = matrix.Matrix(self.Pball_k)
-	self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k)
+        self.xhatball_k_priori = matrix.Matrix(self.xhatball_k)
+        self.Pball_k_priori = matrix.Matrix(self.Pball_k)
+        self.Pball_kminus1 = matrix.Matrix(self.Pball_k)
+        self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k)
 
-	# Check the reasonableness of the changes induced by the ball sighting
-	self.sanityCheckBall(True)
-	self.lastBallSeenFrame = self.frames_since_reset
+        # Check the reasonableness of the changes induced by the ball sighting
+        self.sanityCheckBall(True)
+        self.lastBallSeenFrame = self.frames_since_reset
 
 
     def sawCloseBall(self, zball_d, zball_a, isTeammateReport = False,
-		     teammateDist = 0):
-	"""
-	Special sawball method to be used when balls are closer than 50 cm's
-	Uses relative cartesian coordinates as opposed to polar
-	"""
-	# Convert our siting to cartesian coordinates
-	x_b_r = zball_d * cos(self.DEG_TO_RAD*(zball_a + self.QUAT_CIRC_DEG))
-	y_b_r = zball_d * sin(self.DEG_TO_RAD*(zball_a + self.QUAT_CIRC_DEG))
-	zball_x = matrix.withvalues(2, 1, [x_b_r,
-					   y_b_r])
+                     teammateDist = 0):
+        """
+        Special sawball method to be used when balls are closer than 50 cm's
+        Uses relative cartesian coordinates as opposed to polar
+        """
+        # Convert our siting to cartesian coordinates
+        x_b_r = zball_d * cos(self.DEG_TO_RAD*(zball_a + self.QUAT_CIRC_DEG))
+        y_b_r = zball_d * sin(self.DEG_TO_RAD*(zball_a + self.QUAT_CIRC_DEG))
+        zball_x = matrix.withvalues(2, 1, [x_b_r,
+                                           y_b_r])
 
-	# Get expected values of ball
-	h = -self.DEG_TO_RAD*self.getHeadingEst()
-	x = self.getXEst()
-	y = self.getYEst()
-	x_b = self.getBallXEst()
-	y_b = self.getBallYEst()
-	dball_x = matrix.withvalues(2, 1,
-				    [(x_b - x)*cos(h) - (y_b - y)*sin(h),
-				     (x_b - x)*sin(h) + (y_b - y)*cos(h)])
+        # Get expected values of ball
+        h = -self.DEG_TO_RAD*self.getHeadingEst()
+        x = self.getXEst()
+        y = self.getYEst()
+        x_b = self.getBallXEst()
+        y_b = self.getBallYEst()
+        dball_x = matrix.withvalues(2, 1,
+                                    [(x_b - x)*cos(h) - (y_b - y)*sin(h),
+                                     (x_b - x)*sin(h) + (y_b - y)*cos(h)])
 
-	# Calculate invariance
-	vball_k = zball_x.subtract(dball_x)
+        # Calculate invariance
+        vball_k = zball_x.subtract(dball_x)
 
-	# Calculate jacobians
-	Hball_k = matrix.withvalues(2, 4, [cos(h), -sin(h), 0., 0.,
-					   sin(h), cos(h), 0., 0.])
+        # Calculate jacobians
+        Hball_k = matrix.withvalues(2, 4, [cos(h), -sin(h), 0., 0.,
+                                           sin(h), cos(h), 0., 0.])
 
-	# Update the measurnment covariance matrix
-	if isTeammateReport:
-	    self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(teammateDist)*
-			     self.TEAMMATE_DIST_VARIANCE_FACTOR)
-	    # Limit the range of our function
-	    if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
-	    elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
+        # Update the measurnment covariance matrix
+        if isTeammateReport:
+            self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(teammateDist)*
+                             self.TEAMMATE_DIST_VARIANCE_FACTOR)
+            # Limit the range of our function
+            if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
+            elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
 
-	    self.Rball_k.set(1, 1, self.BALL_DIST_TO_VARIANCE(teammateDist)*
-			     self.TEAMMATE_DIST_VARIANCE_FACTOR)
+            self.Rball_k.set(1, 1, self.BALL_DIST_TO_VARIANCE(teammateDist)*
+                             self.TEAMMATE_DIST_VARIANCE_FACTOR)
 
-	    # Limit the range of our function
-	    if self.Rball_k.get(1,1) < self.MIN_BALL_DIST_VARIANCE:
-		self.Rball_k.set(1, 1, self.MIN_BALL_DIST_VARIANCE)
-	    elif self.Rball_k.get(1, 1) > self.MAX_BALL_DIST_VARIANCE:
-		self.Rball_k.set(1, 1, self.MAX_BALL_DIST_VARIANCE)
-	else:
-	    self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(zball_d))
+            # Limit the range of our function
+            if self.Rball_k.get(1,1) < self.MIN_BALL_DIST_VARIANCE:
+                self.Rball_k.set(1, 1, self.MIN_BALL_DIST_VARIANCE)
+            elif self.Rball_k.get(1, 1) > self.MAX_BALL_DIST_VARIANCE:
+                self.Rball_k.set(1, 1, self.MAX_BALL_DIST_VARIANCE)
+        else:
+            self.Rball_k.set(0, 0, self.BALL_DIST_TO_VARIANCE(zball_d))
 
-	    # Limit the range of our function
-	    if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
-	    elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
-		self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
+            # Limit the range of our function
+            if self.Rball_k.get(0,0) < self.MIN_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MIN_BALL_DIST_VARIANCE)
+            elif self.Rball_k.get(0, 0) > self.MAX_BALL_DIST_VARIANCE:
+                self.Rball_k.set(0, 0, self.MAX_BALL_DIST_VARIANCE)
 
-	    self.Rball_k.set(1, 1, self.BALL_DIST_TO_VARIANCE(zball_d))
+            self.Rball_k.set(1, 1, self.BALL_DIST_TO_VARIANCE(zball_d))
 
-	    # Limit the range of our function
-	    if self.Rball_k.get(1,1) < self.MIN_BALL_DIST_VARIANCE:
-		self.Rball_k.set(1, 1, self.MIN_BALL_DIST_VARIANCE)
-	    elif self.Rball_k.get(1, 1) > self.MAX_BALL_DIST_VARIANCE:
-		self.Rball_k.set(1, 1, self.MAX_BALL_DIST_VARIANCE)
+            # Limit the range of our function
+            if self.Rball_k.get(1,1) < self.MIN_BALL_DIST_VARIANCE:
+                self.Rball_k.set(1, 1, self.MIN_BALL_DIST_VARIANCE)
+            elif self.Rball_k.get(1, 1) > self.MAX_BALL_DIST_VARIANCE:
+                self.Rball_k.set(1, 1, self.MAX_BALL_DIST_VARIANCE)
 
-	# Create our Kalman gain matrix
-	Kball_k = self.Pball_k_priori.multiply(
+        # Create our Kalman gain matrix
+        Kball_k = self.Pball_k_priori.multiply(
             Hball_k.transpose().multiply(((
-			Hball_k.multiply(self.Pball_k_priori.multiply(
-				Hball_k.transpose()))).add(
-			self.Rball_k)).invert()))
+                        Hball_k.multiply(self.Pball_k_priori.multiply(
+                                Hball_k.transpose()))).add(
+                        self.Rball_k)).invert()))
 
-	# Use kalman gain matrix to determine next estimate
-	self.xhatball_k = self.xhatball_k_priori.add(
+        # Use kalman gain matrix to determine next estimate
+        self.xhatball_k = self.xhatball_k_priori.add(
             (Kball_k.multiply(vball_k)).scale(self.EPSILON_CLOSE_BALL))
 
-	# Update our uncertainty to reflect the chagnes
-	self.Pball_k = (self.by4_identity.subtract(
+        # Update our uncertainty to reflect the chagnes
+        self.Pball_k = (self.by4_identity.subtract(
             Kball_k.multiply(Hball_k))).multiply(self.Pball_k_priori)
 
-	# Copy matrix values to update our world model
-	self.xhatball_k_priori = matrix.Matrix(self.xhatball_k)
-	self.Pball_k_priori = matrix.Matrix(self.Pball_k)
-	self.Pball_kminus1 = matrix.Matrix(self.Pball_k)
-	self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k)
+        # Copy matrix values to update our world model
+        self.xhatball_k_priori = matrix.Matrix(self.xhatball_k)
+        self.Pball_k_priori = matrix.Matrix(self.Pball_k)
+        self.Pball_kminus1 = matrix.Matrix(self.Pball_k)
+        self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k)
 
-	# Check the reasonableness of the changes induced by the ball sighting
-	self.sanityCheckBall(True)
-	self.lastBallSeenFrame = self.frames_since_reset
+        # Check the reasonableness of the changes induced by the ball sighting
+        self.sanityCheckBall(True)
+        self.lastBallSeenFrame = self.frames_since_reset
 
     def ballNotSeen(self):
-	"""
-	Method to decrease the velocity by BALL_DECAY_PERCENT for every frame
-	the ball is not seen.
-	"""
-	self.setBallXVelocityEst(self.getBallXVelocityEst() *
-				 (1. - self.BALL_DECAY_PERCENT))
-	self.setBallYVelocityEst(self.getBallYVelocityEst() *
-				 (1. - self.BALL_DECAY_PERCENT))
-	self.xhatball_k_priori = matrix.Matrix(self.xhatball_k)
-	self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k)
+        """
+        Method to decrease the velocity by BALL_DECAY_PERCENT for every frame
+        the ball is not seen.
+        """
+        self.setBallXVelocityEst(self.getBallXVelocityEst() *
+                                 (1. - self.BALL_DECAY_PERCENT))
+        self.setBallYVelocityEst(self.getBallYVelocityEst() *
+                                 (1. - self.BALL_DECAY_PERCENT))
+        self.xhatball_k_priori = matrix.Matrix(self.xhatball_k)
+        self.xhatball_kminus1 = matrix.Matrix(self.xhatball_k)
 
 
     def processTeammateBallReport(self, teammate_packet):
-	"""
-	Every teamate is constantly broadcasting their point estimates and
+        """
+        Every teamate is constantly broadcasting their point estimates and
         uncertainties for the location of the ball. If this robot does not
         itself have a good idea of where the ball is, perhpas becuase it
         cannot currently see it, it will use the ball location information
@@ -823,32 +823,32 @@ class EKF:
         for accurately localizing the ball realitive to this robot's own body,
         we only want to incorperate the other robot's estimates if this robot's
         estimates are too poor to be realiable.
-	"""
-	# Only listen to teammate if we haven't seen a ball for 3 frames
-	# And the teammate has reasonable self uncertainty
- 	if (teammate_packet.uncertX > self.TEAMMATE_SELF_UNCERT_THRESH or
+        """
+        # Only listen to teammate if we haven't seen a ball for 3 frames
+        # And the teammate has reasonable self uncertainty
+         if (teammate_packet.uncertX > self.TEAMMATE_SELF_UNCERT_THRESH or
             teammate_packet.uncertY > self.TEAMMATE_SELF_UNCERT_THRESH):# and
-	    # not (teammate_packet.ballDist ==
-# 		 Constants.BALL_TEAMMATE_DIST_GRABBING or
-# 		 teammate_packet.ballDist ==
-# 		 Constants.BALL_TEAMMATE_DIST_DRIBBLING or
-# 		 teammate_packet.ballDist ==
-# 		 Constants.BALL_TEAMMATE_DIST_KICKING)):
-	    return
-	else:
-	    self.brain.ball.reportBallSeen()
- 	    # Calculate the distance and angle at which this agent would see the
-	    # ball if this robot were at its estimated location and the ball
-	    # was at the teamate's estimate for its location
-	    dball = (((self.getXEst() - teammate_packet.ballX) ** 2. +
-		      (self.getYEst() - teammate_packet.ballY) ** 2.) ** .5)
+            # not (teammate_packet.ballDist ==
+#                  Constants.BALL_TEAMMATE_DIST_GRABBING or
+#                  teammate_packet.ballDist ==
+#                  Constants.BALL_TEAMMATE_DIST_DRIBBLING or
+#                  teammate_packet.ballDist ==
+#                  Constants.BALL_TEAMMATE_DIST_KICKING)):
+            return
+        else:
+            self.brain.ball.reportBallSeen()
+             # Calculate the distance and angle at which this agent would see the
+            # ball if this robot were at its estimated location and the ball
+            # was at the teamate's estimate for its location
+            dball = (((self.getXEst() - teammate_packet.ballX) ** 2. +
+                      (self.getYEst() - teammate_packet.ballY) ** 2.) ** .5)
 
-	    aball = sub180Angle(self.RAD_TO_DEG * safe_atan2(
+            aball = sub180Angle(self.RAD_TO_DEG * safe_atan2(
                 teammate_packet.ballY - self.getYEst(), teammate_packet.ballX -
                 self.getXEst()) - self.QUAT_CIRC_DEG - self.getHeadingEst())
 
-	    # Process this faked out ball sighting
-	    self.sawBall(dball, aball, True, teammate_packet.ballDist)
+            # Process this faked out ball sighting
+            self.sawBall(dball, aball, True, teammate_packet.ballDist)
 
     def sawCorners(self, cornerList):
         """
@@ -864,7 +864,7 @@ class EKF:
         """
         # There used to be several reasons that we might not want to process
         # any corners. We still keep this around for nostalgic reasons.
-	if (not self.PROCESS_CORNERS):
+        if (not self.PROCESS_CORNERS):
             return
 
         # Some terminology:
@@ -1028,406 +1028,406 @@ corner.")
         It returns how closely the abstract corner fits to this concrete corner
         on an arbitrary scale called forthwith called 'divergence'.
         """
-	#if self.DEBUG_CORNERS:
-	#    debugPrint("--- calculating divergence for " +
-	#	       cornerString(corner.visionID))
-	predicted_corner_x = (self.getXEst() +
-			      cos(((self.getHeadingEst() +
-				    abstractCorner.bearing + 90.0) *
-				   self.DEG_TO_RAD)) *
-			      abstractCorner.dist)
-	predicted_corner_y = (self.getYEst() +
-			      sin(((self.getHeadingEst() +
-				    abstractCorner.bearing + 90.0) *
-				   self.DEG_TO_RAD)) *
-			      abstractCorner.dist)
+        #if self.DEBUG_CORNERS:
+        #    debugPrint("--- calculating divergence for " +
+        #               cornerString(corner.visionID))
+        predicted_corner_x = (self.getXEst() +
+                              cos(((self.getHeadingEst() +
+                                    abstractCorner.bearing + 90.0) *
+                                   self.DEG_TO_RAD)) *
+                              abstractCorner.dist)
+        predicted_corner_y = (self.getYEst() +
+                              sin(((self.getHeadingEst() +
+                                    abstractCorner.bearing + 90.0) *
+                                   self.DEG_TO_RAD)) *
+                              abstractCorner.dist)
         x_divergence = predicted_corner_x - concreteCorner[0]
         y_divergence = predicted_corner_y - concreteCorner[1]
-	#x_divergence = predicted_corner_x - cornerX(corner.visionID)
-	#y_divergence = predicted_corner_y - cornerY(corner.visionID)
+        #x_divergence = predicted_corner_x - cornerX(corner.visionID)
+        #y_divergence = predicted_corner_y - cornerY(corner.visionID)
 
-	a = sub180Angle(-self.RAD_TO_DEG * safe_atan2(
+        a = sub180Angle(-self.RAD_TO_DEG * safe_atan2(
                 concreteCorner[0] - self.xhat_k_priori.get(0,0),
                 concreteCorner[1] - self.xhat_k_priori.get(1,0))
-		#cornerX(corner.visionID) - self.xhat_k_priori.get(0,0),
-		#cornerY(corner.visionID) - self.xhat_k_priori.get(1,0))
-			- self.xhat_k_priori.get(2,0))
+                #cornerX(corner.visionID) - self.xhat_k_priori.get(0,0),
+                #cornerY(corner.visionID) - self.xhat_k_priori.get(1,0))
+                        - self.xhat_k_priori.get(2,0))
         if self.DEBUG_CORNERS:
             debugPrint("------Min: %f\t Bearing: %f \tMax: %f------" %
                        (self.cornerMinVisibleBearing(), a,
                         self.cornerMaxVisibleBearing()))
- 	if not self.cornerBearingIsWithinVisibleRadius(a):
- 	    return self.SUPER_HIGH_CORNER_DIVERGENCE
+         if not self.cornerBearingIsWithinVisibleRadius(a):
+             return self.SUPER_HIGH_CORNER_DIVERGENCE
 
-	if self.DEBUG_CORNER_FITTING:
-	    debugPrint("------Corner in visual bearing range,\
+        if self.DEBUG_CORNER_FITTING:
+            debugPrint("------Corner in visual bearing range,\
 still candidate------")
 
-	total_divergence = hypot(x_divergence, y_divergence)
+        total_divergence = hypot(x_divergence, y_divergence)
 
-	if self.DEBUG_CORNERS:
-	    debugPrint("--- x_divergence:" + repr(x_divergence) +
-		       "   y_divergence:" + repr(y_divergence))
-	    debugPrint("--- total_divergence:" + repr(total_divergence))
-	return total_divergence
+        if self.DEBUG_CORNERS:
+            debugPrint("--- x_divergence:" + repr(x_divergence) +
+                       "   y_divergence:" + repr(y_divergence))
+            debugPrint("--- total_divergence:" + repr(total_divergence))
+        return total_divergence
 
     def sanityCheck(self):
-	"""
-	Checks the reasonableness of the filters estimates for position and
+        """
+        Checks the reasonableness of the filters estimates for position and
         uncertainty, modifying them if they are implausible or impossible.
-	"""
-	# Make sure that the robot thinks he is on the field.
+        """
+        # Make sure that the robot thinks he is on the field.
         # If he doesn't then bring him back on.
-	if self.getXEst() < self.LEFT_LOC_LIMIT:
-	    self.setXEst(self.LEFT_LOC_LIMIT)
-	if self.getXEst() > self.RIGHT_LOC_LIMIT:
-	    self.setXEst(self.RIGHT_LOC_LIMIT)
-	if self.getYEst() < self.BOTTOM_LOC_LIMIT:
-	    self.setYEst(self.BOTTOM_LOC_LIMIT)
-	if self.getYEst() > self.TOP_LOC_LIMIT:
-	    self.setYEst(self.TOP_LOC_LIMIT)
+        if self.getXEst() < self.LEFT_LOC_LIMIT:
+            self.setXEst(self.LEFT_LOC_LIMIT)
+        if self.getXEst() > self.RIGHT_LOC_LIMIT:
+            self.setXEst(self.RIGHT_LOC_LIMIT)
+        if self.getYEst() < self.BOTTOM_LOC_LIMIT:
+            self.setYEst(self.BOTTOM_LOC_LIMIT)
+        if self.getYEst() > self.TOP_LOC_LIMIT:
+            self.setYEst(self.TOP_LOC_LIMIT)
 
-	# Make sure that the robot's uncertainty estimates are reasonable.
+        # Make sure that the robot's uncertainty estimates are reasonable.
         # The uncertainty in any direction never needs to be more than, 1/2 of
         # the range of possible values for the 95% confidence interval to
         # include essentially the entire field.
-	if self.getXUncert() > Constants.FIELD_WIDTH * \
+        if self.getXUncert() > Constants.FIELD_WIDTH * \
                self.INSANITY_COEFFICIENT:
-	    self.setXUncert(Constants.FIELD_WIDTH * self.INSANITY_COEFFICIENT)
+            self.setXUncert(Constants.FIELD_WIDTH * self.INSANITY_COEFFICIENT)
 
-	if self.getYUncert() > Constants.FIELD_WIDTH * \
+        if self.getYUncert() > Constants.FIELD_WIDTH * \
                self.INSANITY_COEFFICIENT:
-	    self.setYUncert(Constants.FIELD_WIDTH * self.INSANITY_COEFFICIENT)
+            self.setYUncert(Constants.FIELD_WIDTH * self.INSANITY_COEFFICIENT)
 
-	# Similarly, the uncertainty of the heading need not be any more that
+        # Similarly, the uncertainty of the heading need not be any more that
         # 180 degrees, as an uncertainty of 180 represents having no idea what
         # your heading is.
-	if self.getHeadingUncert() > self.HALF_CIRC_DEG:
-	    self.setHeadingUncert(self.HALF_CIRC_DEG)
+        if self.getHeadingUncert() > self.HALF_CIRC_DEG:
+            self.setHeadingUncert(self.HALF_CIRC_DEG)
 
 
     def sanityCheckBall(self, sawBall = False):
-	"""
-	Checks the reasonableness of the filters estimates for position and
+        """
+        Checks the reasonableness of the filters estimates for position and
         uncertainty of the ball, modifying them if they are implausible or
         impossible.
-	"""
-	# Make sure that the robot thinks that the ball is on the field.
+        """
+        # Make sure that the robot thinks that the ball is on the field.
         # If he doesn't then bring the ball back on. TESTME
-	if self.getBallXEst() < self.LEFT_LOC_LIMIT:
- 	    self.setBallXEst(self.LEFT_LOC_LIMIT)
- 	if self.getBallXEst() > self.RIGHT_LOC_LIMIT:
- 	    self.setBallXEst(self.RIGHT_LOC_LIMIT)
- 	if self.getBallYEst() < self.BOTTOM_LOC_LIMIT:
- 	    self.setBallYEst(self.BOTTOM_LOC_LIMIT)
- 	if self.getBallYEst() > self.TOP_LOC_LIMIT:
- 	    self.setBallYEst(self.TOP_LOC_LIMIT)
+        if self.getBallXEst() < self.LEFT_LOC_LIMIT:
+             self.setBallXEst(self.LEFT_LOC_LIMIT)
+         if self.getBallXEst() > self.RIGHT_LOC_LIMIT:
+             self.setBallXEst(self.RIGHT_LOC_LIMIT)
+         if self.getBallYEst() < self.BOTTOM_LOC_LIMIT:
+             self.setBallYEst(self.BOTTOM_LOC_LIMIT)
+         if self.getBallYEst() > self.TOP_LOC_LIMIT:
+             self.setBallYEst(self.TOP_LOC_LIMIT)
 
-	# Make sure that the robot's uncertainty estimates about the
+        # Make sure that the robot's uncertainty estimates about the
         # location and velocity of the ball are reasonable
-	if self.getBallXUncert() > Constants.FIELD_WIDTH * \
+        if self.getBallXUncert() > Constants.FIELD_WIDTH * \
                self.INSANITY_COEFFICIENT:
-	    self.setBallXUncert(Constants.FIELD_WIDTH *
+            self.setBallXUncert(Constants.FIELD_WIDTH *
                                 self.INSANITY_COEFFICIENT)
 
-	if self.getBallYUncert() > Constants.FIELD_WIDTH * \
+        if self.getBallYUncert() > Constants.FIELD_WIDTH * \
                self.INSANITY_COEFFICIENT:
-	    self.setBallYUncert(Constants.FIELD_WIDTH *
+            self.setBallYUncert(Constants.FIELD_WIDTH *
                                 self.INSANITY_COEFFICIENT)
 
-	if self.getBallXVelocityUncert() > Constants.FIELD_WIDTH * \
-		self.INSANITY_COEFFICIENT:
-	    self.setBallXVelocityUncert(Constants.FIELD_WIDTH *
-					self.INSANITY_COEFFICIENT)
+        if self.getBallXVelocityUncert() > Constants.FIELD_WIDTH * \
+                self.INSANITY_COEFFICIENT:
+            self.setBallXVelocityUncert(Constants.FIELD_WIDTH *
+                                        self.INSANITY_COEFFICIENT)
 
-	if self.getBallYVelocityUncert() > Constants.FIELD_WIDTH * \
-		self.INSANITY_COEFFICIENT:
-	    self.setBallYVelocityUncert(Constants.FIELD_WIDTH *
-					self.INSANITY_COEFFICIENT)
+        if self.getBallYVelocityUncert() > Constants.FIELD_WIDTH * \
+                self.INSANITY_COEFFICIENT:
+            self.setBallYVelocityUncert(Constants.FIELD_WIDTH *
+                                        self.INSANITY_COEFFICIENT)
 
-	# If ball has only been recorded for a few frames, assume no velocity
-	# But don't reset on odometery.
-	if (self.frames_since_reset - self.lastBallSeenFrame > 3 and
-	    sawBall):
-	    self.stopResetingFrame = 20.
-	    #print "Reseting ball velocity"
-	    self.setBallXVelocityEst(0.)
-	    self.setBallYVelocityEst(0.)
+        # If ball has only been recorded for a few frames, assume no velocity
+        # But don't reset on odometery.
+        if (self.frames_since_reset - self.lastBallSeenFrame > 3 and
+            sawBall):
+            self.stopResetingFrame = 20.
+            #print "Reseting ball velocity"
+            self.setBallXVelocityEst(0.)
+            self.setBallYVelocityEst(0.)
 
-	if self.frames_since_reset - self.stopResetingFrame <= 0:
-	    #print "\tStill reseting ball velocity"
-	    self.setBallXVelocityEst(0.)
-	    self.setBallYVelocityEst(0.)
+        if self.frames_since_reset - self.stopResetingFrame <= 0:
+            #print "\tStill reseting ball velocity"
+            self.setBallXVelocityEst(0.)
+            self.setBallYVelocityEst(0.)
 
-	# Make sure that the robot has a reasonable estimate of ball velocity
- 	if self.getBallXVelocityEst() < -self.MAX_BALL_VELOCITY:
-	    self.setBallXVelocityEst(0.)
-	    self.setBallYVelocityEst(0.)
-	if self.getBallXVelocityEst() > self.MAX_BALL_VELOCITY:
-	    self.setBallXVelocityEst(0.)
-	    self.setBallYVelocityEst(0.)
-	if self.getBallYVelocityEst() < -self.MAX_BALL_VELOCITY:
-	    self.setBallXVelocityEst(0.)
-	    self.setBallYVelocityEst(0.)
-	if self.getBallYVelocityEst() > self.MAX_BALL_VELOCITY:
-	    self.setBallXVelocityEst(0.)
-	    self.setBallYVelocityEst(0.)
+        # Make sure that the robot has a reasonable estimate of ball velocity
+         if self.getBallXVelocityEst() < -self.MAX_BALL_VELOCITY:
+            self.setBallXVelocityEst(0.)
+            self.setBallYVelocityEst(0.)
+        if self.getBallXVelocityEst() > self.MAX_BALL_VELOCITY:
+            self.setBallXVelocityEst(0.)
+            self.setBallYVelocityEst(0.)
+        if self.getBallYVelocityEst() < -self.MAX_BALL_VELOCITY:
+            self.setBallXVelocityEst(0.)
+            self.setBallYVelocityEst(0.)
+        if self.getBallYVelocityEst() > self.MAX_BALL_VELOCITY:
+            self.setBallXVelocityEst(0.)
+            self.setBallYVelocityEst(0.)
 
     def reset(self, to_x = INITIAL_X, to_y = INITIAL_Y,
               to_heading = INITIAL_HEADING, brainObj=None):
-	"""
-	Reset the robot's assumed positions and uncertainties to reflect an
+        """
+        Reset the robot's assumed positions and uncertainties to reflect an
         expected new location of the robot on the field, for example after
         re-entering from a penalty.  If called without the optional arguments,
         resets the robot location to its default initial state.
         Always resets the ball location to its initial default.
-	"""
-	self.__init__(to_x, to_y, to_heading, brain=brainObj)
+        """
+        self.__init__(to_x, to_y, to_heading, brain=brainObj)
 
     def resetBall(self, to_ball_x = INITIAL_BALL_X,
                   to_ball_y = INITIAL_BALL_Y):
-	"""
-	Resets the ball filter's assumed positions and uncertainteis to
+        """
+        Resets the ball filter's assumed positions and uncertainteis to
         reflect an expected new locaiton of the ball on the field, for
         example moving the ball to the midfield line after it goes out of
         bounds.  If called without the optional arguments, resets the ball
         location to its initial default.  Does not affect the robot's estimated
         location or uncertainty.
-	"""
-	self.init_ball(to_ball_x, to_ball_y)
+        """
+        self.init_ball(to_ball_x, to_ball_y)
 
     def isRecoveringFromReset(self):
-	"""
-	Indicates weather the filter is recovering from reseting,
+        """
+        Indicates weather the filter is recovering from reseting,
         probably due to initialization or known kidnapping.
-	"""
-	return self.frames_since_reset < \
+        """
+        return self.frames_since_reset < \
                self.NUMBER_OF_FRAMES_TO_RECOVER_AFTER_RESET
 
     # Robot Position
     def getXEst(self):
-	"""
-	Returns the robot's estimate of its current X coordinate on the field
-	"""
-	return self.xhat_k.get(0,0)
+        """
+        Returns the robot's estimate of its current X coordinate on the field
+        """
+        return self.xhat_k.get(0,0)
 
     def getYEst(self):
-	"""
-	Returns the robot's estimate of its current Y coordinate on the field
-	"""
-	return self.xhat_k.get(1,0)
+        """
+        Returns the robot's estimate of its current Y coordinate on the field
+        """
+        return self.xhat_k.get(1,0)
 
     def getHeadingEst(self):
-	"""
-	Returns the robot's estimate of its current heading
-	"""
-	return self.xhat_k.get(2,0)
+        """
+        Returns the robot's estimate of its current heading
+        """
+        return self.xhat_k.get(2,0)
 
     def getXUncert(self):
-	"""
-	Returns the standard deviation of robot's estimate of its current X
+        """
+        Returns the standard deviation of robot's estimate of its current X
         coordinate
-	"""
-	return self.P_k.get(0,0)
+        """
+        return self.P_k.get(0,0)
 
     def getYUncert(self):
-	"""
-	Returns the standard deviation of robot's estimate of its current Y
+        """
+        Returns the standard deviation of robot's estimate of its current Y
         coordinate
-	"""
-	return self.P_k.get(1,1)
+        """
+        return self.P_k.get(1,1)
 
     def getHeadingUncert(self):
-	"""
-	Returns the standard deviation of robot's estimate of its current heading
-	"""
-	return self.P_k.get(2,2)
+        """
+        Returns the standard deviation of robot's estimate of its current heading
+        """
+        return self.P_k.get(2,2)
 
     def setXEst(self, to_x):
-	"""
-	Sets the robot's estimate of its current X coordinate on the field
-	"""
-	self.xhat_k.set(0, 0, to_x)
+        """
+        Sets the robot's estimate of its current X coordinate on the field
+        """
+        self.xhat_k.set(0, 0, to_x)
 
     def setYEst(self, to_y):
-	"""
-	Sets the robot's estimate of its current Y coordinate on the field
-	"""
-	self.xhat_k.set(1, 0, to_y)
+        """
+        Sets the robot's estimate of its current Y coordinate on the field
+        """
+        self.xhat_k.set(1, 0, to_y)
 
     def setHeadingEst(self, to_heading):
-	"""
-	Sets the robot's estimate of its current heading
-	"""
-	self.xhat_k.set(2, 0, to_heading)
+        """
+        Sets the robot's estimate of its current heading
+        """
+        self.xhat_k.set(2, 0, to_heading)
 
     def setXUncert(self, to_x_uncert):
-	"""
-	Sets the standard deviation of robot's estimate of its current X
+        """
+        Sets the standard deviation of robot's estimate of its current X
         coordinate
-	"""
-	self.P_k.set(0, 0, to_x_uncert)
+        """
+        self.P_k.set(0, 0, to_x_uncert)
 
     def setYUncert(self, to_y_uncert):
-	"""
-	Sets the standard deviation of robot's estimate of its current Y
+        """
+        Sets the standard deviation of robot's estimate of its current Y
         coordinate
-	"""
-	self.P_k.set(1, 1, to_y_uncert)
+        """
+        self.P_k.set(1, 1, to_y_uncert)
 
     def setHeadingUncert(self, to_heading_uncert):
-	"""
-	Sets the standard deviation of robot's estimate of its current heading
-	"""
-	self.P_k.set(2, 2, to_heading_uncert)
+        """
+        Sets the standard deviation of robot's estimate of its current heading
+        """
+        self.P_k.set(2, 2, to_heading_uncert)
 
     # Ball position
     def getBallXEst(self):
-	"""
-	Returns the robot's estimate of the ball's current X coordinate on the
+        """
+        Returns the robot's estimate of the ball's current X coordinate on the
         field
-	"""
-	return self.xhatball_k.get(0,0)
+        """
+        return self.xhatball_k.get(0,0)
 
     def getBallYEst(self):
-	"""
-	Returns the robot's estimate of the ball's current Y coordinate on the
+        """
+        Returns the robot's estimate of the ball's current Y coordinate on the
         field
-	"""
-	return self.xhatball_k.get(1,0)
+        """
+        return self.xhatball_k.get(1,0)
 
     def getBallXUncert(self):
-	"""
-	Returns the standard deviation of robot's estimate of the ball's current
+        """
+        Returns the standard deviation of robot's estimate of the ball's current
         X coordinate
-	"""
-	return self.Pball_k.get(0,0)
+        """
+        return self.Pball_k.get(0,0)
 
     def getBallYUncert(self):
-	"""
-	Returns the standard deviation of robot's estimate of the ball's current
+        """
+        Returns the standard deviation of robot's estimate of the ball's current
         Y coordinate
-	"""
-	return self.Pball_k.get(1,1)
+        """
+        return self.Pball_k.get(1,1)
 
     def getBallSD(self):
-	"""
-	Returns the combined standard deviation of the robots estimates of the
+        """
+        Returns the combined standard deviation of the robots estimates of the
         ball's current X and Y coordinates
-	"""
-	return hypot(self.getBallXUncert(), self.getBallYUncert())
+        """
+        return hypot(self.getBallXUncert(), self.getBallYUncert())
 
     def setBallXEst(self, to_x):
-	"""
-	Sets the robot's estimate of the ball's current X coordinate
-	"""
-	self.xhatball_k.set(0, 0, to_x)
+        """
+        Sets the robot's estimate of the ball's current X coordinate
+        """
+        self.xhatball_k.set(0, 0, to_x)
 
     def setBallYEst(self, to_y):
-	"""
-	Sets the robot's estimate of the ball's current Y coordinate
-	"""
-	self.xhatball_k.set(1, 0, to_y)
+        """
+        Sets the robot's estimate of the ball's current Y coordinate
+        """
+        self.xhatball_k.set(1, 0, to_y)
 
     def setBallXUncert(self, to_x_uncert):
-	"""
-	Sets the standard deviation of robot's estimate of the ball's current X
+        """
+        Sets the standard deviation of robot's estimate of the ball's current X
         coordinate
-	"""
-	self.Pball_k.set(0, 0, to_x_uncert)
+        """
+        self.Pball_k.set(0, 0, to_x_uncert)
 
     def setBallYUncert(self, to_y_uncert):
-	"""
-	Sets the standard deviation of robot's estimate of the ball's current Y
+        """
+        Sets the standard deviation of robot's estimate of the ball's current Y
         coordinate
-	"""
-	self.Pball_k.set(1, 1, to_y_uncert)
+        """
+        self.Pball_k.set(1, 1, to_y_uncert)
 
     # Ball Velocity
     def getBallXVelocityEst(self):
-	"""
-	Returns the robot's estimate of the x component of the ball's current
+        """
+        Returns the robot's estimate of the x component of the ball's current
         velocity
-	"""
-	return self.xhatball_k.get(2,0)
+        """
+        return self.xhatball_k.get(2,0)
 
     def getBallYVelocityEst(self):
-	"""
-	Returns the robot's estimate of the y component of the ball's current
+        """
+        Returns the robot's estimate of the y component of the ball's current
         velocity
-	"""
-	return self.xhatball_k.get(3,0)
+        """
+        return self.xhatball_k.get(3,0)
 
     def getBallXVelocityUncert(self):
-	"""
-	Returns the standard deviation of robot's estimate of the ball's current
+        """
+        Returns the standard deviation of robot's estimate of the ball's current
         X velocity
-	"""
-	return self.Pball_k.get(2,2)
+        """
+        return self.Pball_k.get(2,2)
 
     def getBallYVelocityUncert(self):
-	"""
-	Returns the standard deviation of robot's estimate of the ball's current
+        """
+        Returns the standard deviation of robot's estimate of the ball's current
         Y velocity
-	"""
-	return self.Pball_k.get(3,3)
+        """
+        return self.Pball_k.get(3,3)
 
     def getBallVelocitySD(self):
-	"""
-	Returns the combined standard deviation of the robots estimates of the
+        """
+        Returns the combined standard deviation of the robots estimates of the
         ball's current X and Y velocity
-	"""
-	return hypot(self.getBallXVelocityUncert(),
+        """
+        return hypot(self.getBallXVelocityUncert(),
                      self.getBallYVelocityUncert())
 
     def setBallXVelocityEst(self, to_x_vel):
-	"""
-	Sets the robot's estimate of the ball's current X velocity
-	"""
-	self.xhatball_k.set(2,0, to_x_vel)
+        """
+        Sets the robot's estimate of the ball's current X velocity
+        """
+        self.xhatball_k.set(2,0, to_x_vel)
 
     def setBallYVelocityEst(self, to_y_vel):
-	"""
-	Sets the robot's estimate of the ball's current Y velocity
-	"""
-	self.xhatball_k.set(3,0, to_y_vel)
+        """
+        Sets the robot's estimate of the ball's current Y velocity
+        """
+        self.xhatball_k.set(3,0, to_y_vel)
 
     def setBallXVelocityUncert(self, to_x_uncert):
-	"""
-	Sets the standard deviation of robot's estimate of the ball's current X
+        """
+        Sets the standard deviation of robot's estimate of the ball's current X
         velocity
-	"""
-	self.Pball_k.set(2, 2, to_x_uncert)
+        """
+        self.Pball_k.set(2, 2, to_x_uncert)
 
     def setBallYVelocityUncert(self, to_y_uncert):
-	"""
-	Sets the standard deviation of robot's estimate of the ball's current Y
+        """
+        Sets the standard deviation of robot's estimate of the ball's current Y
         velocity
-	"""
-	self.Pball_k.set(3, 3, to_y_uncert)
+        """
+        self.Pball_k.set(3, 3, to_y_uncert)
 
     def debugBall(self, header):
-	debugPrint(header)
-	debugPrint("ball x: " + repr(self.getBallXEst()))
-	debugPrint("ball y: " + repr(self.getBallYEst()))
-	debugPrint("ball x velocity: " + repr(self.getBallXVelocityEst()))
-	debugPrint("ball y velocity: " + repr(self.getBallYVelocityEst()))
-	debugPrint("")
+        debugPrint(header)
+        debugPrint("ball x: " + repr(self.getBallXEst()))
+        debugPrint("ball y: " + repr(self.getBallYEst()))
+        debugPrint("ball x velocity: " + repr(self.getBallXVelocityEst()))
+        debugPrint("ball y velocity: " + repr(self.getBallYVelocityEst()))
+        debugPrint("")
 
     def cornerBearingIsWithinVisibleRadius(self, bearing_to_corner):
-	'''checks to see if corner distance is within allowable range'''
-	return ( self.cornerMinVisibleBearing() < bearing_to_corner <
-		 self.cornerMaxVisibleBearing())
+        '''checks to see if corner distance is within allowable range'''
+        return ( self.cornerMinVisibleBearing() < bearing_to_corner <
+                 self.cornerMaxVisibleBearing())
 
     def cornerMinVisibleBearing(self):
-	''' Minimum posibble bearing that can be seen'''
+        ''' Minimum posibble bearing that can be seen'''
         return (self.brain.sensors.angles[MotionConstants.HeadYaw]-
-		self.OVEREST_FIELD_OF_VIEW / 2.)
+                self.OVEREST_FIELD_OF_VIEW / 2.)
 
     def cornerMaxVisibleBearing(self):
-	''' Maximum posibble bearing that can be seen'''
-	return (self.brain.sensors.angles[MotionConstants.HeadYaw]+
-		self.OVEREST_FIELD_OF_VIEW / 2.)
+        ''' Maximum posibble bearing that can be seen'''
+        return (self.brain.sensors.angles[MotionConstants.HeadYaw]+
+                self.OVEREST_FIELD_OF_VIEW / 2.)
 
 def debugPrint(string):
     print "debug: ", string
@@ -1510,39 +1510,39 @@ def cornerString(corner_id):
 def cornerDistanceIsWithinVisibleRadius(distance_to_corner):
     '''checks to see if corner distance is within allowable range'''
     return (distance_to_corner < EKF.CORNER_MAX_VISIBLE_DISTANCE and
-	    distance_to_corner > EKF.CORNER_MIN_VISIBLE_DISTANCE)
+            distance_to_corner > EKF.CORNER_MIN_VISIBLE_DISTANCE)
 
 def cornerIDtoLandmarkID(id):
     return_id = 0
     if id == Constants.MY_CORNER_LEFT_L:
-	return_id = Constants.LANDMARK_MY_CORNER_LEFT_L
+        return_id = Constants.LANDMARK_MY_CORNER_LEFT_L
     elif id == Constants.MY_CORNER_RIGHT_L:
-	return_id = Constants.LANDMARK_MY_CORNER_RIGHT_L
+        return_id = Constants.LANDMARK_MY_CORNER_RIGHT_L
     elif id == Constants.MY_GOAL_LEFT_L:
-	return_id = Constants.LANDMARK_MY_GOAL_LEFT_L
+        return_id = Constants.LANDMARK_MY_GOAL_LEFT_L
     elif id == Constants.MY_GOAL_RIGHT_L:
-	return_id = Constants.LANDMARK_MY_GOAL_RIGHT_L
+        return_id = Constants.LANDMARK_MY_GOAL_RIGHT_L
     elif id == Constants.MY_GOAL_LEFT_T:
-	return_id = Constants.LANDMARK_MY_GOAL_LEFT_T
+        return_id = Constants.LANDMARK_MY_GOAL_LEFT_T
     elif id == Constants.MY_GOAL_RIGHT_T:
-	return_id = Constants.LANDMARK_MY_GOAL_RIGHT_T
+        return_id = Constants.LANDMARK_MY_GOAL_RIGHT_T
     elif id == Constants.CENTER_BY_T:
-	return_id = Constants.LANDMARK_CENTER_LEFT_T
+        return_id = Constants.LANDMARK_CENTER_LEFT_T
     elif id == Constants.CENTER_YB_T:
-	return_id = Constants.LANDMARK_CENTER_RIGHT_T
+        return_id = Constants.LANDMARK_CENTER_RIGHT_T
     elif id == Constants.OPP_CORNER_LEFT_L:
-	return_id = Constants.LANDMARK_OPP_CORNER_LEFT_L
+        return_id = Constants.LANDMARK_OPP_CORNER_LEFT_L
     elif id == Constants.OPP_CORNER_RIGHT_L:
-	return_id = Constants.LANDMARK_OPP_CORNER_RIGHT_L
+        return_id = Constants.LANDMARK_OPP_CORNER_RIGHT_L
     elif id == Constants.OPP_GOAL_LEFT_L:
-	return_id = Constants.LANDMARK_OPP_GOAL_LEFT_L
+        return_id = Constants.LANDMARK_OPP_GOAL_LEFT_L
     elif id == Constants.OPP_GOAL_RIGHT_L:
-	return_id = Constants.LANDMARK_OPP_GOAL_RIGHT_L
+        return_id = Constants.LANDMARK_OPP_GOAL_RIGHT_L
     elif id == Constants.OPP_GOAL_LEFT_T:
-	return_id = Constants.LANDMARK_OPP_GOAL_LEFT_T
+        return_id = Constants.LANDMARK_OPP_GOAL_LEFT_T
     elif id == Constants.OPP_GOAL_RIGHT_T:
-	return_id = Constants.LANDMARK_OPP_GOAL_RIGHT_T
+        return_id = Constants.LANDMARK_OPP_GOAL_RIGHT_T
     else:
-	debugPrint("cornerIDtoLandmarkID can't find cornerID")
+        debugPrint("cornerIDtoLandmarkID can't find cornerID")
     #debugPrint("cornerID: %s to landmarkID: %s" % (Constants.visionCornerTuple[int(id)], Constants.landmarkTuple[return_id]))
     return return_id

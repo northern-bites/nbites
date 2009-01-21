@@ -7,10 +7,10 @@ for var in nao.deviceNames:
 class Player(object):
     def __init__(self,brain):
         self.brain = brain
-	self.on = True 
-	self.jointTime = .5
+        self.on = True 
+        self.jointTime = .5
         self.NUMBER_OF_FSR = 8
-	self.frameCount = 0
+        self.frameCount = 0
         self.joints = [0] * nao.NUMBER_OF_JOINTS
         self.fsrVals = [0] * self.NUMBER_OF_FSR
         self.leftFootForce = 0
@@ -27,7 +27,7 @@ class Player(object):
     def behave(self):
          
         self.initialize()
-	
+        
 
 
 

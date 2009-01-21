@@ -10,7 +10,7 @@ class SoccerPlayer(FSA.FSA):
         self.brain = brain
         #jf- self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(SecondGameStates)
-	self.currentState = 'nothing'
+        self.currentState = 'nothing'
         self.setName('Player pSecondGame')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)

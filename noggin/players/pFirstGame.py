@@ -9,7 +9,7 @@ class SoccerPlayer(FSA.FSA):
         self.brain = brain
         #jf- self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(FirstGameStates)
-	self.currentState = 'gameInitial'
+        self.currentState = 'gameInitial'
         self.setName('Player pFirstGame')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)

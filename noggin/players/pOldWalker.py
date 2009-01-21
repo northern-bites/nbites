@@ -32,7 +32,7 @@ IDLE_DELAY = 20 # how long IDLE state lasts in frames
 class Player(object):
     def __init__(self, brain):
         self.brain = brain
-	self.state = NOTHING
+        self.state = NOTHING
         self.lastFrameState = NOTHING
         self.lastDiffState = NOTHING
         self.counter = 0

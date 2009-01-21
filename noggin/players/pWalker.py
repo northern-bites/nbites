@@ -8,7 +8,7 @@ class SoccerPlayer(FSA.FSA):
         self.brain = brain
         self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(WalkLearning)
-	self.currentState = 'nothing'
+        self.currentState = 'nothing'
         self.setName('Player pWalker')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)

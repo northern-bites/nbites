@@ -168,7 +168,7 @@ class Brain(object):
             yield
 
     def run(self):
-	"""
+        """
         Main control loop called every TIME_STEP milliseconds
         """
 

@@ -54,189 +54,189 @@ class Matrix:
     #  rows  list of individual rows in matrix, which are in turn lists 
 
     def __init__(self, num_rows, num_columns = 1, initialize_value = 0.0):
-	"""Matrix.__init__(rows, columns): if called with 2 arguments, constructs a 0.0-valued matrix with the specified number of rows and columns.  If a 3rd argument is provided and that value is a scalar, constructs a matrix with all entries set to the constant value.  If the provided 3rd argument is a list, constructs a matrix with the entries drawn from that list, filling the entries in from left to right and then from top to bottom.  If the first argument is a matrix instance, creates a copy of that instance.  Usage: my_new_0_valued_matrix = Matrix(my_num_rows, my_num_columns)  OR  my_new_constant_valued_matrix = Matrix(my_num_rows, my_num_columns, my_constant_value)"""
-	# Assumes that initialize_value is either a list or a scalar, and that num_rows is a scalar or a matrix object
-	# The unfortunate overloading of num_rows is due to the need to conform to the API specified by the C++/python implementation
-	if isinstance(num_rows, Matrix):
-	    # num_rows is a Matrix instance
-	    self.m = num_rows.m
+        """Matrix.__init__(rows, columns): if called with 2 arguments, constructs a 0.0-valued matrix with the specified number of rows and columns.  If a 3rd argument is provided and that value is a scalar, constructs a matrix with all entries set to the constant value.  If the provided 3rd argument is a list, constructs a matrix with the entries drawn from that list, filling the entries in from left to right and then from top to bottom.  If the first argument is a matrix instance, creates a copy of that instance.  Usage: my_new_0_valued_matrix = Matrix(my_num_rows, my_num_columns)  OR  my_new_constant_valued_matrix = Matrix(my_num_rows, my_num_columns, my_constant_value)"""
+        # Assumes that initialize_value is either a list or a scalar, and that num_rows is a scalar or a matrix object
+        # The unfortunate overloading of num_rows is due to the need to conform to the API specified by the C++/python implementation
+        if isinstance(num_rows, Matrix):
+            # num_rows is a Matrix instance
+            self.m = num_rows.m
             self.n = num_rows.n
             self.rows = num_rows.getArrayCopy()
-	elif isinstance(initialize_value, list):
+        elif isinstance(initialize_value, list):
             self.m = num_rows
             self.n = num_columns
             self.rows = [ [initialize_value]*self.n for i in xrange(self.m)]
-	    for i in xrange(min(len(initialize_value), num_rows*num_columns)):
-		setting_at_column = i % num_columns
-		setting_at_row = i / num_columns
-		self.set(setting_at_row, setting_at_column, initialize_value[i])
-	else:
-	    self.m = num_rows
-	    self.n = num_columns
-	    self.rows = [ [initialize_value]*self.n for i in xrange(self.m)]
-	    
+            for i in xrange(min(len(initialize_value), num_rows*num_columns)):
+                setting_at_column = i % num_columns
+                setting_at_row = i / num_columns
+                self.set(setting_at_row, setting_at_column, initialize_value[i])
+        else:
+            self.m = num_rows
+            self.n = num_columns
+            self.rows = [ [initialize_value]*self.n for i in xrange(self.m)]
+            
     def copy(self):
-	"""copy(): returns a deep copy of self"""
+        """copy(): returns a deep copy of self"""
         return self.scale(1.0)
 
     def copyValues(self, from_matrix):
-	"""
-	copyValues(): copies the values from the argument matrix into self's rows
-	"""
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		self.rows[row_index][column_index] = from_matrix.rows[row_index][column_index]
-	
+        """
+        copyValues(): copies the values from the argument matrix into self's rows
+        """
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                self.rows[row_index][column_index] = from_matrix.rows[row_index][column_index]
+        
     
     def get(self, row_index, column_index):
-	"""get(row, column): returns the value at a specific location in the matrix"""
-	return self.rows[row_index][column_index]
+        """get(row, column): returns the value at a specific location in the matrix"""
+        return self.rows[row_index][column_index]
 
     def getArrayCopy(self):
-	return [self.rows[r][:] for r in xrange(self.m)]
+        return [self.rows[r][:] for r in xrange(self.m)]
 
     def getMatrix(self, r, j0, j1):
-	"""Get a copy of a submatrix of self, from the list or row indices r and the initial and final column indicies j0 and j1."""
-	X = Matrix(len(r), j1-j0+1)
-	for i in xrange(0, len(r)):
-	    for j in xrange(j0, j1 + 1):
-		X.set(i, j-j0, self.rows[r[i]][j])
-	return X
+        """Get a copy of a submatrix of self, from the list or row indices r and the initial and final column indicies j0 and j1."""
+        X = Matrix(len(r), j1-j0+1)
+        for i in xrange(0, len(r)):
+            for j in xrange(j0, j1 + 1):
+                X.set(i, j-j0, self.rows[r[i]][j])
+        return X
 
     def set(self, row_index, column_index, to_value):
-	"""set(row, column, value): sets the value at a specific location in the matrix"""
-	self.rows[row_index][column_index] = to_value
+        """set(row, column, value): sets the value at a specific location in the matrix"""
+        self.rows[row_index][column_index] = to_value
 
     def setValues(self, matrix_values):
-	"""set(values[][]): sets the matrix values to those contained in the 2D list argument"""
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		self.rows[row_index][column_index] = matrix_values[row_index][column_index]
+        """set(values[][]): sets the matrix values to those contained in the 2D list argument"""
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                self.rows[row_index][column_index] = matrix_values[row_index][column_index]
 
 
     def scale(self, scalar):
-	"""sclae(c): returns B such that B = c * self"""
-	scaled_matrix = Matrix(self.m, self.n)
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		scaled_matrix.rows[row_index][column_index] = self.rows[row_index][column_index] * scalar
-	return scaled_matrix
+        """sclae(c): returns B such that B = c * self"""
+        scaled_matrix = Matrix(self.m, self.n)
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                scaled_matrix.rows[row_index][column_index] = self.rows[row_index][column_index] * scalar
+        return scaled_matrix
 
     
     def scaleEquals(self, scalar):
-	"""
-	scaleEquals(c): scale in place, changing the values in self such that equal the previous values times the scalar
-	"""
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		self.rows[row_index][column_index] *= scalar
+        """
+        scaleEquals(c): scale in place, changing the values in self such that equal the previous values times the scalar
+        """
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                self.rows[row_index][column_index] *= scalar
 
-	
+        
     def plus(self, adding_matrix):
-	"""plus(A): returns B such that B = self - A"""
-	sum_matrix = Matrix(self.m, self.n)
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		sum_matrix.rows[row_index][column_index] = self.rows[row_index][column_index] + adding_matrix.rows[row_index][column_index]
-	return sum_matrix
+        """plus(A): returns B such that B = self - A"""
+        sum_matrix = Matrix(self.m, self.n)
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                sum_matrix.rows[row_index][column_index] = self.rows[row_index][column_index] + adding_matrix.rows[row_index][column_index]
+        return sum_matrix
 
 
     def plusArray(self, adding_array):
-	"""
-	plusArray(adding_array): adds the values in the 2D list adding_array to self.  Doesen't have the overhead of creating a new matrix like plus() does.
-	"""
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		self.rows[row_index][column_index] += adding_array[row_index][column_index]
+        """
+        plusArray(adding_array): adds the values in the 2D list adding_array to self.  Doesen't have the overhead of creating a new matrix like plus() does.
+        """
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                self.rows[row_index][column_index] += adding_array[row_index][column_index]
     
 
     def plusEquals(self, adding_matrix):
-	"""
-	plusEquals(adding_matrix): adds adding_matrix to self in place, overwriting the previous values of self.
-	"""
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		self.rows[row_index][column_index] += adding_matrix.rows[row_index][column_index]
+        """
+        plusEquals(adding_matrix): adds adding_matrix to self in place, overwriting the previous values of self.
+        """
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                self.rows[row_index][column_index] += adding_matrix.rows[row_index][column_index]
 
 
     def matrixSum(self, adding_matrix1, adding_matrix2):
-	"""
-	matrixSum(adding_matrix1, adding_matrix2): updates the values of self to be the the sum of the respective values in the two matrix addends.
-	"""
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		self.rows[row_index][column_index] = adding_matrix1.rows[row_index][column_index] + adding_matrix2.rows[row_index][column_index]
+        """
+        matrixSum(adding_matrix1, adding_matrix2): updates the values of self to be the the sum of the respective values in the two matrix addends.
+        """
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                self.rows[row_index][column_index] = adding_matrix1.rows[row_index][column_index] + adding_matrix2.rows[row_index][column_index]
 
 
     def minus(self, subtracting_matrix):
-	"""minus(A): returns B such that B = self - A"""
-	return (self.plus(subtracting_matrix.scale(-1.0)))
+        """minus(A): returns B such that B = self - A"""
+        return (self.plus(subtracting_matrix.scale(-1.0)))
 
     def matrixDifference(self, from_matrix, subtract_matrix):
-	"""matrixDifferenc(from_matrix, subtract_matrix): similarly to matrixSum(), updates the values of self to be the difference between the respective values of the two argument matricies.
-	"""
-	for row_index in xrange(self.m):
-	    for column_index in xrange(self.n):
-		self.rows[row_index][column_index] = from_matrix.rows[row_index][column_index] - subtract_matrix.rows[row_index][column_index]
+        """matrixDifferenc(from_matrix, subtract_matrix): similarly to matrixSum(), updates the values of self to be the difference between the respective values of the two argument matricies.
+        """
+        for row_index in xrange(self.m):
+            for column_index in xrange(self.n):
+                self.rows[row_index][column_index] = from_matrix.rows[row_index][column_index] - subtract_matrix.rows[row_index][column_index]
 
 
     def times(self, multiplying_matrix):
-	"""times(A): returns B such that B = self * A, in the matrix algebraic sense"""
-	B = [ [0.0]*multiplying_matrix.n for i in xrange(self.m)]
-	mult_matr_colj = [0.0] * self.n
-	for j in xrange(multiplying_matrix.n):
-	    for k in xrange(self.n):
-		mult_matr_colj[k] = multiplying_matrix.rows[k][j]
-	    for i in xrange(self.m):
-		selfrowi = self.rows[i]
-		s = 0
-		for k in xrange(self.n):
-		    s += selfrowi[k] * mult_matr_colj[k]
-		B[i][j] = s
-	return withValues(self.m, multiplying_matrix.n, B)
+        """times(A): returns B such that B = self * A, in the matrix algebraic sense"""
+        B = [ [0.0]*multiplying_matrix.n for i in xrange(self.m)]
+        mult_matr_colj = [0.0] * self.n
+        for j in xrange(multiplying_matrix.n):
+            for k in xrange(self.n):
+                mult_matr_colj[k] = multiplying_matrix.rows[k][j]
+            for i in xrange(self.m):
+                selfrowi = self.rows[i]
+                s = 0
+                for k in xrange(self.n):
+                    s += selfrowi[k] * mult_matr_colj[k]
+                B[i][j] = s
+        return withValues(self.m, multiplying_matrix.n, B)
 
     def transpose(self):
-	"""transpose(A): returns the matrix B that is the transpose of A"""
-	transposed_matrix = Matrix(self.n, self.m)
-	for orig_row_index in xrange(self.m):
-	    for orig_column_index in xrange(self.n):
-		transposed_matrix.rows[orig_column_index][orig_row_index] = self.rows[orig_row_index][orig_column_index]
-	return transposed_matrix
+        """transpose(A): returns the matrix B that is the transpose of A"""
+        transposed_matrix = Matrix(self.n, self.m)
+        for orig_row_index in xrange(self.m):
+            for orig_column_index in xrange(self.n):
+                transposed_matrix.rows[orig_column_index][orig_row_index] = self.rows[orig_row_index][orig_column_index]
+        return transposed_matrix
     
     def inverse(self):
-	"""self(A): returns B such that B = A^-1"""
-	# First make sure that all of the entries are in decimal, and not integer, form
-	# The algorithms below do not neccisarily work with integral entries
-	for i in xrange(self.m):
-	    for j in xrange(self.n):
-		self.rows[i][j] *= 1.0
-	# The calculation is simpler if the array is 2x2.  This is usefull becuase it simplifies linear regression calculations
-	# http://www.analyzemath.com/Calculators/InverseMatrixCalculator.html
-	if self.m == 2 and self.n == 2:
-	    temp = Matrix(2,2)
-	    temp.set(0,0, self.get(1,1))
-	    temp.set(0,1, self.get(0,1)*-1)
-	    temp.set(1,0, self.get(1,0)*-1)
-	    temp.set(1,1, self.get(0,0))
-	    return temp.scale(1.0/((self.get(0,0) * self.get(1,1)) - (self.get(0,1) * self.get(1,0))))
-	else:
-	    identity_matrix = identity(self.m)
-	    return self.solve(identity_matrix)
+        """self(A): returns B such that B = A^-1"""
+        # First make sure that all of the entries are in decimal, and not integer, form
+        # The algorithms below do not neccisarily work with integral entries
+        for i in xrange(self.m):
+            for j in xrange(self.n):
+                self.rows[i][j] *= 1.0
+        # The calculation is simpler if the array is 2x2.  This is usefull becuase it simplifies linear regression calculations
+        # http://www.analyzemath.com/Calculators/InverseMatrixCalculator.html
+        if self.m == 2 and self.n == 2:
+            temp = Matrix(2,2)
+            temp.set(0,0, self.get(1,1))
+            temp.set(0,1, self.get(0,1)*-1)
+            temp.set(1,0, self.get(1,0)*-1)
+            temp.set(1,1, self.get(0,0))
+            return temp.scale(1.0/((self.get(0,0) * self.get(1,1)) - (self.get(0,1) * self.get(1,0))))
+        else:
+            identity_matrix = identity(self.m)
+            return self.solve(identity_matrix)
 
     def solve(self, B):
-	"""solve(B) returns A such that A * self = B"""
-	decomposition = LUDecomposition(self)
-	return decomposition.solveLU(B)
+        """solve(B) returns A such that A * self = B"""
+        decomposition = LUDecomposition(self)
+        return decomposition.solveLU(B)
 
     # Wrapper methods to present identical API as C++/python implementation
     def add(self, adding_matrix):
-	return self.plus(adding_matrix)
+        return self.plus(adding_matrix)
     def subtract(self, subtracting_matrix):
-	return self.minus(subtracting_matrix)
+        return self.minus(subtracting_matrix)
     def multiply(self, multiplying_matrix):
-	return self.times(multiplying_matrix)
+        return self.times(multiplying_matrix)
     def invert(self):
-	return self.inverse()
+        return self.inverse()
     
 
 
@@ -253,54 +253,54 @@ class LUDecomposition:
     
 
     def __init__(self, A):
-	"""Preform an LU decomposition on the matrix argument, using Gaussian elimination.  Usage: my_LU_decomposition = LUDecomposition(matrix_to_decompose)"""
-	self.LU = A.getArrayCopy()
-	self.m = A.m
-	self.n = A.n
+        """Preform an LU decomposition on the matrix argument, using Gaussian elimination.  Usage: my_LU_decomposition = LUDecomposition(matrix_to_decompose)"""
+        self.LU = A.getArrayCopy()
+        self.m = A.m
+        self.n = A.n
         self.piv = []
-	self.piv = [i for i in xrange(self.m)]
-	pivsign = 1
+        self.piv = [i for i in xrange(self.m)]
+        pivsign = 1
 
-	for k in xrange(self.n):
-	    p = k
-	    for i in xrange(k+1, self.m):
-		if abs(self.LU[i][k]) > abs(self.LU[p][k]):
-		    p = i
-	    
-	    if p != k:
-		for j in xrange(self.n):
-		    t = self.LU[p][j]
-		    self.LU[p][j] = self.LU[k][j]
-		    self.LU[k][j] = t
-		t = self.piv[p]
-		self.piv[p] = self.piv[k]
-		self.piv[k] = t
-		pivsign = -pivsign
-	    if self.LU[k][k] != 0.0:
-		for i in xrange(k + 1, self.m):
-		    self.LU[i][k] /= self.LU[k][k]
-		    for j in xrange(k +1, self.n):
-			self.LU[i][j] -= self.LU[i][k]*self.LU[k][j]
+        for k in xrange(self.n):
+            p = k
+            for i in xrange(k+1, self.m):
+                if abs(self.LU[i][k]) > abs(self.LU[p][k]):
+                    p = i
+            
+            if p != k:
+                for j in xrange(self.n):
+                    t = self.LU[p][j]
+                    self.LU[p][j] = self.LU[k][j]
+                    self.LU[k][j] = t
+                t = self.piv[p]
+                self.piv[p] = self.piv[k]
+                self.piv[k] = t
+                pivsign = -pivsign
+            if self.LU[k][k] != 0.0:
+                for i in xrange(k + 1, self.m):
+                    self.LU[i][k] /= self.LU[k][k]
+                    for j in xrange(k +1, self.n):
+                        self.LU[i][j] -= self.LU[i][k]*self.LU[k][j]
 
     def solveLU(self, B):
-	"""solveLU(B) Use the LU decomposition to solve the system of linear equations"""
-	nx = B.n
-	Xmat = B.getMatrix(self.piv, 0, nx-1)
-	X = Xmat.getArrayCopy()
-	
-	for k in xrange(self.n):
-	    for i in xrange(k+1, self.n):
-		for j in xrange(0, nx):
-		    X[i][j] -= X[k][j]*self.LU[i][k]
+        """solveLU(B) Use the LU decomposition to solve the system of linear equations"""
+        nx = B.n
+        Xmat = B.getMatrix(self.piv, 0, nx-1)
+        X = Xmat.getArrayCopy()
+        
+        for k in xrange(self.n):
+            for i in xrange(k+1, self.n):
+                for j in xrange(0, nx):
+                    X[i][j] -= X[k][j]*self.LU[i][k]
 
-	for k in xrange(self.n - 1, -1, -1):
-	    for j in xrange(B.n):
-		X[k][j] /= self.LU[k][k]
-	    for i in xrange(0, k):
-		for j in xrange(B.n):
-		    X[i][j] -= X[k][j]*self.LU[i][k]
-	Xmat.setValues(X)
-	return Xmat
+        for k in xrange(self.n - 1, -1, -1):
+            for j in xrange(B.n):
+                X[k][j] /= self.LU[k][k]
+            for i in xrange(0, k):
+                for j in xrange(B.n):
+                    X[i][j] -= X[k][j]*self.LU[i][k]
+        Xmat.setValues(X)
+        return Xmat
 
 def withValues(num_rows, num_cols, values):
     """withValues(rows, columns, values): convenience method that constructs a matrix of the specified size and populates it with the entry values from the 3rd argument, which should be a list of lists which contain the values for each row."""
@@ -359,14 +359,14 @@ def leastSquaresCoefs(x_values, y_values, regression_dimension):
 
     # Extract the coefficients from the matrix into a list
     regression_coefs_list = \
-	[regression_coefs_vector.get(c,0) for c in range(0,regression_dimension + 1)]
+        [regression_coefs_vector.get(c,0) for c in range(0,regression_dimension + 1)]
     return regression_coefs_list
 
 def __applyRegressionCoefs(coefs, input_value):
     """applyRegressionCoefs(): Computes the value at input_value of a polynomial function characatersized be the coefficients in the first argument"""
     output_value = 0
     for power in xrange(0, len(coefs)):
-	output_value += coefs[power] * pow(input_value, power)
+        output_value += coefs[power] * pow(input_value, power)
     return output_value
 
 def leastSquares(x_values, y_values, regression_dimension):
@@ -383,10 +383,10 @@ def inverseLeastSquares(x_values, y_values, regression_dimension):
     min_y, min_y_index = y_values[0], 0
     max_y, min_y_index = y_values[0], 0
     for data_index in xrange(1, len(y_values)):
-	if y_values[data_index] < min_y:
-	    min_y, min_y_index = y_values[data_index], data_index
-	if y_values[data_index] > max_y:
-	    max_y, max_y_index = y_values[data_index], data_index
+        if y_values[data_index] < min_y:
+            min_y, min_y_index = y_values[data_index], data_index
+        if y_values[data_index] > max_y:
+            max_y, max_y_index = y_values[data_index], data_index
     # Slice the data lists to include only those points between the min and max y values
     # First, check if the min y value has a higher list index than the max y value
     min_list_index = min(min_y_index, max_y_index)
@@ -408,10 +408,10 @@ def inverseInterpolation(x_values, y_values):
     min_y, min_y_index = y_values[0], 0
     max_y, max_y_index = y_values[0], 0
     for data_index in xrange(1, len(y_values)):
-	if y_values[data_index] < min_y:
-	    min_y, min_y_index = y_values[data_index], data_index
-	if y_values[data_index] > max_y:
-	    max_y, max_y_index = y_values[data_index], data_index
+        if y_values[data_index] < min_y:
+            min_y, min_y_index = y_values[data_index], data_index
+        if y_values[data_index] > max_y:
+            max_y, max_y_index = y_values[data_index], data_index
     # Slice the data lists to include only those points between the min and max y values
     # First, check if the min y value has a higher list index than the max y value
     min_list_index = min(min_y_index, max_y_index)
@@ -428,7 +428,7 @@ def __interpolate(x_values, y_values, for_x_value):
     #Find a pair of data points to intepolate between
     left_index = 0
     while not __between(for_x_value, x_values[left_index], x_values[left_index + 1]):
-	left_index += 1	
+        left_index += 1        
     # Interpolate
     interpolated_slope = (y_values[left_index] - y_values[left_index + 1]) / (x_values[left_index] - x_values[left_index + 1])
     x_displacement = for_x_value - x_values[left_index]
@@ -437,13 +437,13 @@ def __interpolate(x_values, y_values, for_x_value):
 def __between(for_value, a, b):
     """ __between(for_value, a, b): Checks if for_value is between the values a and b.  Note that a is not neccisarily smaller than b.  If for_value = a or =b, then we consider it to be between."""
     if (for_value >= a) and (for_value <=b):
-	return True
+        return True
     elif (for_value <= a) and (for_value >=b):
-	return True
+        return True
     else:
-	return False
+        return False
     
-		    
+                    
 
 
 
@@ -515,24 +515,24 @@ def test(verbose=False):
     test12 = withValues(3, 3, [[1.,-1.,3.],[2.,1.,2.],[-2.,-2.,1.]])
     test13 = test12.inverse() 
     if verbose:
-	print test13.rows
+        print test13.rows
 
     test14 = withValues(3, 3, [[8., 36., 204.], [36., 204., 1296.], [204., 1296., 8772.]])
     test15 = test14.inverse() 
     if verbose:
-	print test15.rows
+        print test15.rows
 
     test16 = withValues(3, 3, [[8, 36, 204], [36, 204, 1296], [204, 1296, 8772]])
     test17 = test16.inverse() 
     if verbose:
-	print test17.rows
+        print test17.rows
     
     print '\n\n'
 
     """if verbose:
     print 'Speed test: Performing 10,000 3x3 matrix inversions'
     for i in xrange(0, 10000):
-	testi = test12.inverse()"""
+        testi = test12.inverse()"""
 
     if verbose:
         print '---Approximation Function Tests---\n'
@@ -559,14 +559,14 @@ def test(verbose=False):
     if verbose:
         print 'Testing effect of order on polynomial dimension'
     for dimension in xrange(1, 5):
-	regression_function, min_x, max_x = leastSquares(x_values, y_values, dimension)
-	sum_SE = 0.0
-	for residual_num in xrange(0, len(y_values)):
-	    estimate = regression_function(x_values[residual_num])
-	    square_error = pow(y_values[residual_num] - (estimate),2.0)
-	    sum_SE += square_error
-	RMSE = math.sqrt(sum_SE / len(x_values))
-	if verbose:
+        regression_function, min_x, max_x = leastSquares(x_values, y_values, dimension)
+        sum_SE = 0.0
+        for residual_num in xrange(0, len(y_values)):
+            estimate = regression_function(x_values[residual_num])
+            square_error = pow(y_values[residual_num] - (estimate),2.0)
+            sum_SE += square_error
+        RMSE = math.sqrt(sum_SE / len(x_values))
+        if verbose:
             print 'RMSE for order', dimension, 'is', RMSE
     if verbose:
         print ''
@@ -587,12 +587,12 @@ def test(verbose=False):
     if verbose:
         print 'For example, the inverse of 1290 is', inverse_interpolation_function(1290), '(should be about 1500)\n'
     if verbose:
-	x_values = [1,2,3,4,5]
-	#y_values = [0,20,60,80,100]
-	y_values = [100,100,100,100,100]
-	lin_func, min_x, max_x = leastSquares(x_values, y_values, 1)
-	for x in x_values:
-	    print lin_func(x)
+        x_values = [1,2,3,4,5]
+        #y_values = [0,20,60,80,100]
+        y_values = [100,100,100,100,100]
+        lin_func, min_x, max_x = leastSquares(x_values, y_values, 1)
+        for x in x_values:
+            print lin_func(x)
     if verbose:
         print '---No crashes - Yeah!---\n\n'
 

@@ -46,12 +46,12 @@ class NaoOutput:
         self.frameCounter+=1
 
     def printFSR(self):
-	fsr = self.brain.nao.fsr.gets()
-	fsrSum = 0.
-	for x in fsr:
-	    fsrSum +=x
-	    
-	print "Fsr",fsr," sum", fsrSum 
+        fsr = self.brain.nao.fsr.gets()
+        fsrSum = 0.
+        for x in fsr:
+            fsrSum +=x
+            
+        print "Fsr",fsr," sum", fsrSum 
 
     # Functionality for logging
     def updateLogs(self):

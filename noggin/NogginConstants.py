@@ -34,7 +34,7 @@ NUM_PLAYERS_PER_TEAM = 4
 # Setup colors
 NUM_GAME_TEAM_COLORS = 2
 teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
-		      ("TEAM_BLUE","TEAM_RED")))
+                      ("TEAM_BLUE","TEAM_RED")))
 (TEAM_BLUE,TEAM_RED) = range(NUM_GAME_TEAM_COLORS)
 
 ##

@@ -49,9 +49,9 @@ class MyInfo:
 
     def __str__(self):
         return ("name: %s #%d on team: %d color: %s @ (%g,%g,%g) uncert: (%g,%g,%g)" %
-		(self.name, self.playerNumber, self.teamNumber,
-		 Constants.teamColorDict[self.teamColor], self.x, self.y,
-		 self.h, self.uncertX, self.uncertY, self.uncertH))
+                (self.name, self.playerNumber, self.teamNumber,
+                 Constants.teamColorDict[self.teamColor], self.x, self.y,
+                 self.h, self.uncertX, self.uncertY, self.uncertH))
 
 class Ball:
     '''

@@ -30,7 +30,7 @@ class SoccerPlayer(FSA.FSA):
         self.addState('gamePlaying', self.gamePlaying)
         self.addState('gameFinished', self.gameFinished)
 
-	self.currentState = 'listen'
+        self.currentState = 'listen'
         self.setName('Player pRexec')
         self.setPrintStateChanges(False)
         self.setPrintFunction(self.brain.out.printf)

@@ -191,8 +191,8 @@ def reload_module(name, delete_pycs=False, ignore_case=False):
 
     module = name_map.get(name)
     if module is None:
-	# Load it now, I guess, since it hasn't been loaded already
-	module = register_module(name)
+        # Load it now, I guess, since it hasn't been loaded already
+        module = register_module(name)
 
     if hasattr(module, '__file__') and delete_pycs:
         fpath = module.__file__

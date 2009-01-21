@@ -37,8 +37,8 @@ MM_TO_CM = .10
 NUM_JOINT_CHAINS = 5
 #dictionary for joint chains
 JOINT_CHAIN_DICT = dict(zip(range(NUM_JOINT_CHAINS),\
-		      ("HEAD","LEFT_ARM","LEFT_LEG",\
-		       "RIGHT_LEG","RIGHT_ARM")))
+                      ("HEAD","LEFT_ARM","LEFT_LEG",\
+                       "RIGHT_LEG","RIGHT_ARM")))
 
 (HEAD_CHAIN,LEFT_ARM_CHAIN,LEFT_LEG_CHAIN,RIGHT_LEG_CHAIN,RIGHT_ARM_CHAIN) =\
     range(NUM_JOINT_CHAINS)

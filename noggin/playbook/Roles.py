@@ -21,12 +21,12 @@ def rChaser(team):
          team.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X) or 
         (team.brain.my.x > NogginConstants.MY_GOALBOX_RIGHT_X and
          team.brain.my.y < NogginConstants.MY_GOALBOX_TOP_Y and
-         team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X)):	    
+         team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X)):            
         team.moveMyCharge((team.brain.ball.x,team.brain.ball.y))
         team.position = team.getAttractorPosition()
         return [PBConstants.CHASER, PBConstants.CHASE_AROUND_BOX]
     # Almost always chase normal, i.e. without potential fields
-    else:	    
+    else:            
         team.position = (team.brain.my.x,team.brain.my.y,False,False)
         return [PBConstants.CHASER, PBConstants.CHASE_NORMAL]
 
@@ -139,7 +139,7 @@ def rDefender(team):
     if team.brain.ball.y < PBConstants.SWEEPER_Y:
         return [PBConstants.DEFENDER] + (SubRoles.pSweeper(team))
 
-    # Stand between the ball and the back of the goal if it is on our side	
+    # Stand between the ball and the back of the goal if it is on our side        
     elif PBConstants.USE_DEEP_STOPPER:
         return [PBConstants.DEFENDER] + SubRoles.pDeepStopper(team)
     else:
@@ -200,7 +200,7 @@ def rOffender(team):
         else:
             return [PBConstants.OFFENDER] + SubRoles.pLeftStriker(team)
 
-    # RIGHT STRIKER if the ball is in the right corner		
+    # RIGHT STRIKER if the ball is in the right corner                
     elif (team.brain.ball.y > PBConstants.OPP_CORNERS_Y and
           team.brain.ball.x > NogginConstants.OPP_GOALBOX_RIGHT_X):
         # Buffer moving from the wing and sideline

@@ -31,10 +31,10 @@ def sub180Diff(angle, from_angle):
     Euclidian distance from from_angle of less that 180 degrees.
     """ 
     while (fabs(angle - from_angle) > 180.):
-	if angle > 0.:
-	    angle -= 360
-	else:
-	    angle += 360
+        if angle > 0.:
+            angle -= 360
+        else:
+            angle += 360
     return angle
 
 def dist(x1,y1,x2,y2):
@@ -43,12 +43,12 @@ def dist(x1,y1,x2,y2):
 
 def safe_atan2(y, x):
     if x == 0.0:
-	if y > 0:
-	    return pi / 2.0
-	else:
-	    return -pi / 2.0
+        if y > 0:
+            return pi / 2.0
+        else:
+            return -pi / 2.0
     else:
-	return atan2(y, x)
+        return atan2(y, x)
 
 def sign(x):
     """

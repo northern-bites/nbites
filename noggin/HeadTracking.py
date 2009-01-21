@@ -19,7 +19,7 @@ class HeadTracking(FSA.FSA):
         self.addStates(TrackingStates)
         #self.addStates(PanningStates)
         
-	self.currentState = NOTHING
+        self.currentState = NOTHING
         self.setPrintFunction(self.brain.out.printf)
         self.setPrintStateChanges(True)
         self.setName('headTracking')

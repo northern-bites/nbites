@@ -22,19 +22,19 @@ class FSA:
 
     """
     def __init__(self, owner):
-	self.owner = owner
+        self.owner = owner
 
-	self.currentState = ""
-	self.lastFrameState = ""
-	self.lastDiffState = ""
+        self.currentState = ""
+        self.lastFrameState = ""
+        self.lastDiffState = ""
 
         self.name = "FSA"
         self.helperName = "Helper"
 
-	self.counter = 0
-	self.startTime = 0
-	self.stateTime = 0
-	self.states = dict()
+        self.counter = 0
+        self.startTime = 0
+        self.stateTime = 0
+        self.states = dict()
 
         self.getTime = time.time
 
@@ -42,13 +42,13 @@ class FSA:
         self.printStateChanges = False
 
     def addStates(self,module):
-	# gives a list of all methods and attributes of a module
+        # gives a list of all methods and attributes of a module
         if DEBUG: print "Listing states loaded:"
-	for candidate in dir(module):
-	    attribute = getattr(module,candidate)
-	    if callable(attribute):
-		if DEBUG: print candidate
-		self.states[candidate] = attribute
+        for candidate in dir(module):
+            attribute = getattr(module,candidate)
+            if callable(attribute):
+                if DEBUG: print candidate
+                self.states[candidate] = attribute
 
     def addState(self, name, method):
         if callable(method):
@@ -56,14 +56,14 @@ class FSA:
             self.states[name] = method
 
     def run(self):
-	""" Called once every frame by Brain.
-	Controls the flow of states for the current frame."""
+        """ Called once every frame by Brain.
+        Controls the flow of states for the current frame."""
 
-	stayInFrame = True
-	# Switches through states until one relinquishes control of the frame
-	# by returning NEXT_FRAME
-	while stayInFrame:
-	    # grab the method which describes what the current state does
+        stayInFrame = True
+        # Switches through states until one relinquishes control of the frame
+        # by returning NEXT_FRAME
+        while stayInFrame:
+            # grab the method which describes what the current state does
             methodCall = self.states[self.currentState]
             # execute the state
             if DEBUG:
