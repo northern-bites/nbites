@@ -294,7 +294,7 @@ class EKF:
         # A: We add 90 because lateral odometery is reported such that
         # positive lateral moves the robot left not right
 
-               calc_from_angle = (self.xhat_kminus1.get(2, 0) + 90) * self.DEG_TO_RAD
+        calc_from_angle = (self.xhat_kminus1.get(2, 0) + 90) * self.DEG_TO_RAD
         delta_x = (delta_f * cos(calc_from_angle)) - (delta_l *
                                                       sin(calc_from_angle))
         delta_y = (delta_f * sin(calc_from_angle)) + (delta_l *
@@ -826,7 +826,7 @@ class EKF:
         """
         # Only listen to teammate if we haven't seen a ball for 3 frames
         # And the teammate has reasonable self uncertainty
-         if (teammate_packet.uncertX > self.TEAMMATE_SELF_UNCERT_THRESH or
+        if (teammate_packet.uncertX > self.TEAMMATE_SELF_UNCERT_THRESH or
             teammate_packet.uncertY > self.TEAMMATE_SELF_UNCERT_THRESH):# and
             # not (teammate_packet.ballDist ==
 #                  Constants.BALL_TEAMMATE_DIST_GRABBING or
@@ -1056,8 +1056,8 @@ corner.")
             debugPrint("------Min: %f\t Bearing: %f \tMax: %f------" %
                        (self.cornerMinVisibleBearing(), a,
                         self.cornerMaxVisibleBearing()))
-         if not self.cornerBearingIsWithinVisibleRadius(a):
-             return self.SUPER_HIGH_CORNER_DIVERGENCE
+        if not self.cornerBearingIsWithinVisibleRadius(a):
+            return self.SUPER_HIGH_CORNER_DIVERGENCE
 
         if self.DEBUG_CORNER_FITTING:
             debugPrint("------Corner in visual bearing range,\
@@ -1116,12 +1116,12 @@ still candidate------")
         # If he doesn't then bring the ball back on. TESTME
         if self.getBallXEst() < self.LEFT_LOC_LIMIT:
              self.setBallXEst(self.LEFT_LOC_LIMIT)
-         if self.getBallXEst() > self.RIGHT_LOC_LIMIT:
-             self.setBallXEst(self.RIGHT_LOC_LIMIT)
-         if self.getBallYEst() < self.BOTTOM_LOC_LIMIT:
-             self.setBallYEst(self.BOTTOM_LOC_LIMIT)
-         if self.getBallYEst() > self.TOP_LOC_LIMIT:
-             self.setBallYEst(self.TOP_LOC_LIMIT)
+        if self.getBallXEst() > self.RIGHT_LOC_LIMIT:
+            self.setBallXEst(self.RIGHT_LOC_LIMIT)
+        if self.getBallYEst() < self.BOTTOM_LOC_LIMIT:
+            self.setBallYEst(self.BOTTOM_LOC_LIMIT)
+        if self.getBallYEst() > self.TOP_LOC_LIMIT:
+            self.setBallYEst(self.TOP_LOC_LIMIT)
 
         # Make sure that the robot's uncertainty estimates about the
         # location and velocity of the ball are reasonable
@@ -1160,7 +1160,7 @@ still candidate------")
             self.setBallYVelocityEst(0.)
 
         # Make sure that the robot has a reasonable estimate of ball velocity
-         if self.getBallXVelocityEst() < -self.MAX_BALL_VELOCITY:
+        if self.getBallXVelocityEst() < -self.MAX_BALL_VELOCITY:
             self.setBallXVelocityEst(0.)
             self.setBallYVelocityEst(0.)
         if self.getBallXVelocityEst() > self.MAX_BALL_VELOCITY:
