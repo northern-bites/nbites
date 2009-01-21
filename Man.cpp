@@ -37,10 +37,6 @@ using namespace AL;
 using namespace boost;
 
 
-static const int NUM_HACK_FRAMES = 20;
-static const int MIN_HACK_BALL_WIDTH = 20;
-#define DEBUG_VISION_HACK
-
 // reference to the running instance
 shared_ptr<Man> lMan;
 
@@ -79,7 +75,6 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
       vision(new NaoPose(&sensors), &profiler),
       comm(synchro, &sensors, &vision),
       noggin(&sensors, &profiler, &vision),
-      frame_counter(0), saved_frames(0), hack_frames(0),
       camera_active(false)
 {
     // open lems
@@ -126,11 +121,6 @@ Man::initMan()
     functionName("stopProfiling", "Man", "Stop vision frame profiling");
     BIND_METHOD(Man::stopProfiling);
 
-    functionName("visionHack", "Man", "H4ck v1SI0n 2 pI3ce5");
-    BIND_METHOD(Man::visionHack);
-    //functionName("helloWorld", "Man", "Test");
-    //BIND_METHOD(Man::helloWorld);
-
 #ifdef DEBUG_MAN_INITIALIZATION
     printf("  Opening proxies\n");
 #endif
@@ -144,6 +134,15 @@ Man::initMan()
     }catch (ALError &e) {
         std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
     }
+
+//initialize ALMemory for access to stuff like bumpers, etc
+#ifdef NAOQI1
+    try{
+        almemory = getParentBroker()->getProxy("ALMemory");
+    }catch(ALError &e){
+        cout << "Failed to initialize proxy to ALMemory" <<endl;
+    }
+#endif
 
 #ifdef USE_VISION
 #ifdef NAOQI1
@@ -471,11 +470,6 @@ Man::run ()
     running = true;
     trigger->on();
 
-    frame_counter = 0;
-#ifdef USE_VISION
-    //visionHack();
-#endif
-
     while (running) {
 
 #ifdef USE_VISION
@@ -501,33 +495,33 @@ Man::run ()
         sensors.updateVisionAngles();
 #ifdef NAOQI1
 #ifndef OFFLINE
-        // Image logging
-        try{
-            ALPtr<ALProxy> fStm = getParentBroker()->getProxy("ALMemory");
 
-            double rf1 = fStm->call<ALValue>(
+        // Image logging
+        double right_bumper1 = 0.0, right_bumper2 = 0.0;
+        double left_bumper1  = 0.0, left_bumper2  = 0.0;
+        try{
+            right_bumper1 = (double)almemory->call<ALValue>(
                 "getData",string(
                     "Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0);
-            double rf2 = fStm->call<ALValue>(
+            right_bumper2 = (double)almemory->call<ALValue>(
                 "getData",string(
                     "Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0);
-
-            //cout << "Bumper values "<<rf1 <<" and "<<rf2<<endl;
-
+            left_bumper1 = (double)almemory->call<ALValue>(
+                "getData",string(
+                    "Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"), 0);
+            left_bumper2 = almemory->call<ALValue>(
+                "getData",string(
+                    "Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"), 0);
         }catch(ALError &e){
             cout << "Failed to read bumper values" <<endl;
         }
-#endif
-#endif
 
-        //if (frame_counter % 6 == 0)
-        //  saveFrame();
-        //frame_counter++;
+        if( (right_bumper1 || right_bumper2) ||
+            (left_bumper1 || left_bumper2)  ){
+            saveFrame();
+        }
 
-#ifdef USE_VISION
-        // Perform hack to correct flipped image resulting from driver errors
-        if (hack_frames > 0)
-            //hackFrame();
+#endif
 #endif
 
         // Process current frame
@@ -761,6 +755,7 @@ Man::processFrame ()
 
 void
 Man::saveFrame(){
+    static int saved_frames = 0;
     int MAX_FRAMES = 150;
     if (saved_frames > MAX_FRAMES)
         return;
@@ -768,7 +763,7 @@ Man::saveFrame(){
     string EXT(".NFRM");
     string BASE("/");
     int NUMBER = saved_frames;
-    string FOLDER("/tmp/frames");
+    string FOLDER("/home/root/frames");
     stringstream FRAME_PATH;
 
     FRAME_PATH << FOLDER << BASE << NUMBER << EXT;
@@ -790,45 +785,6 @@ Man::saveFrame(){
     fout.close();
     saved_frames++;
     cout << "Saved frame #" << saved_frames << endl;
-}
-
-void
-Man::visionHack()
-{
-#ifdef DEBUG_VISION_HACK
-    cout << "Starting vision hack" << endl;
-#endif
-    hack_frames = NUM_HACK_FRAMES;
-    balls_seen = 0;
-}
-
-void
-Man::hackFrame()
-{
-    hack_frames--;
-
-    // perform image checks
-    if (vision.ball->getDist() > 0 &&
-        vision.ball->getWidth() > MIN_HACK_BALL_WIDTH)
-        balls_seen++;
-
-    // we're done hacking, make a decision
-    if (hack_frames == 0) {
-#ifdef DEBUG_VISION_HACK
-        cout << "Vison hack over" << endl;
-#endif
-        if (balls_seen < 3) {
-#ifdef DEBUG_VISION_HACK
-            cout << "Swapping image" << endl;
-#endif
-            vision.thresh->swapUV();
-
-        }else {
-#ifdef DEBUG_VISION_HACK
-            cout << "Not swapping" << endl;
-#endif
-        }
-    }
 }
 
 PythonPreferences::PythonPreferences ()

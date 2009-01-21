@@ -113,10 +113,6 @@ class Man
 
     // Store the current frame to file
     void saveFrame();
-    // Run the vision hacks for U/V switching detections over the next frames
-    void visionHack();
-    // Hack the current image
-    void hackFrame();
 
     //HelperBoundMethods:
     void manStart(){Thread::start();} //should return 'int' or ALValue
@@ -164,6 +160,7 @@ class Man
     ALPtr<AL::ALLoggerProxy> log;
     ALPtr<AL::ALProxy> camera;
     ALPtr<AL::ALProxy> lem;
+    ALPtr<AL::ALProxy> almemory;
 #else
     AL::ALLoggerProxy *log;
     AL::ALProxy *camera;
@@ -171,9 +168,6 @@ class Man
 #endif
     std::string lem_name;
 
-    int frame_counter;
-    int saved_frames;
-    int hack_frames;
     int balls_seen;
 
     bool camera_active;
