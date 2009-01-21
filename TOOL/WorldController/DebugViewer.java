@@ -622,6 +622,11 @@ public class DebugViewer extends JFrame {
                                wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_Y);
         objectIDMap.put(new Integer(33), yglpPT);
         objectIDStringMap.put(new Integer(33), "Yellow goal left post");
+        // Ambiguous field objects
+        objectIDMap.put(new Integer(34), emptyPoint);
+        objectIDStringMap.put(new Integer(34), "Blue Goal Post");
+        objectIDMap.put(new Integer(35), emptyPoint);
+        objectIDStringMap.put(new Integer(35), "Yellow Goal Post");
     }
 
     public Dimension getMinimumSize()
