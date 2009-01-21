@@ -148,8 +148,10 @@ Man::initMan()
 #ifdef USE_VISION
 #ifdef NAOQI1
     registerCamera();
-    initCameraSettings(0);
-    initCameraSettings(1);
+    if(camera_active){
+        initCameraSettings(0);
+        initCameraSettings(1);
+    }
 #else
     initCamera();
 #endif
@@ -162,7 +164,7 @@ Man::initMan()
 
 #ifdef USE_VISION
 #ifdef NAOQI1
-void 
+void
 Man::registerCamera(){
 
     try {
@@ -482,6 +484,8 @@ Man::run ()
         // wait for and retrieve the latest image
         if(camera_active)
             waitForImage();
+        else
+            SleepMs(500);
 #else
         // simulate vision frame rate
         SleepMs(500);
@@ -496,13 +500,24 @@ Man::run ()
         sensors.updatePython();
         sensors.updateVisionAngles();
 #ifdef NAOQI1
+#ifndef OFFLINE
         // Image logging
-        ALPtr<ALProxy> fStm = getParentBroker()->getProxy("ALMemory");
+        try{
+            ALPtr<ALProxy> fStm = getParentBroker()->getProxy("ALMemory");
 
-        double rf1 = fStm->call<ALValue>("getData",string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0);
-        double rf2 = fStm->call<ALValue>("getData",string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0);
+            double rf1 = fStm->call<ALValue>(
+                "getData",string(
+                    "Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0);
+            double rf2 = fStm->call<ALValue>(
+                "getData",string(
+                    "Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0);
 
-        //cout << "Bumper values "<<rf1 <<" and "<<rf2<<endl;
+            //cout << "Bumper values "<<rf1 <<" and "<<rf2<<endl;
+
+        }catch(ALError &e){
+            cout << "Failed to read bumper values" <<endl;
+        }
+#endif
 #endif
 
         //if (frame_counter % 6 == 0)
@@ -621,14 +636,14 @@ Man::waitForImage ()
 #endif
 
 #endif//IS_REMOTE
-    
+
         if (data != NULL) {
             // Update Sensors image pointer
             sensors.lockImage();
             sensors.setImage(data);
             sensors.releaseImage();
         }
- 
+
     }catch (ALError &e) {
         log->error("NaoMain", "Caught an error in run():\n" + e.toString());
     }
@@ -687,7 +702,7 @@ Man::waitForImage ()
             sensors.setImage(data);
             sensors.releaseImage();
         }
- 
+
     }catch (ALError &e) {
         log->error("NaoMain", "Caught an error in run():\n" + e.toString());
     }
@@ -758,7 +773,7 @@ Man::saveFrame(){
 
     FRAME_PATH << FOLDER << BASE << NUMBER << EXT;
     fstream fout(FRAME_PATH.str().c_str(), ios_base::out);
-  
+
     // Retrive joints
     vector<float> joints = sensors.getVisionBodyAngles();
 
@@ -771,7 +786,7 @@ Man::saveFrame(){
     // Write joints
     for (vector<float>::const_iterator i = joints.begin(); i < joints.end(); i++)
         fout << " " << *i;
-  
+
     fout.close();
     saved_frames++;
     cout << "Saved frame #" << saved_frames << endl;
