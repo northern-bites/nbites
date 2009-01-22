@@ -18,7 +18,7 @@ Motion::Motion (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
       enactor(new SimulatorEnactor(&switchboard)),
       interface(&switchboard)
 {
-  set_motion_interface(this);
+  set_motion_interface(&interface);
   c_init_motion();
 }
 

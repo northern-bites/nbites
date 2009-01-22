@@ -752,7 +752,6 @@ Man::processFrame ()
 #ifdef USE_NOGGIN
     noggin.runStep();
 #endif
-#endif
 
     PROF_EXIT(&profiler, P_FINAL);
     PROF_NFRAME(&profiler);
