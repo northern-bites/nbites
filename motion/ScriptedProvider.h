@@ -21,7 +21,7 @@ public:
     virtual ~ScriptedProvider();
 
     void requestStop();
-	void isDone();
+	bool isDone();
     void calculateNextJoints();
 
 	void enqueue(const BodyJointCommand *command);
