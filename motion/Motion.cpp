@@ -7,6 +7,7 @@ using namespace boost;
 #include "Motion.h"
 #include "_motionmodule.h"
 #include "SimulatorEnactor.h"
+#include "SimulatorEnactor.h"
 
 #ifdef NAOQI1
 Motion::Motion (ALPtr<ALMotionProxy> _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
@@ -15,7 +16,11 @@ Motion::Motion (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
 #endif
     : Thread(_synchro, "MotionCore"),
       switchboard(s),
+#ifdef NAOQI1
+      enactor(new ALEnactor(&switchboard,_proxy)),
+#else
       enactor(new SimulatorEnactor(&switchboard)),
+#endif
       interface(&switchboard)
 {
   set_motion_interface(&interface);

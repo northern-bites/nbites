@@ -29,7 +29,7 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
 
 
 	vector<float>* bodyJoints3 = new vector<float>(4,45.0f);
-	command3 = new BodyJointCommand(5.0f, LARM_CHAIN,
+	command3 = new BodyJointCommand(10.0f, LARM_CHAIN,
 									bodyJoints3,
 									Kinematics::INTERPOLATION_LINEAR);
 
@@ -58,12 +58,12 @@ void MotionSwitchboard::start() {
 #endif
     fflush(stdout);
 
-	headProvider.enqueue(hjc);
-	scriptedProvider.enqueue(command);
-	scriptedProvider.enqueue(command2);
-	scriptedProvider.enqueue(command3);
-	headProvider.enqueue(hjc2);
-	headProvider.enqueue(hjc3);
+// 	headProvider.enqueue(hjc);
+// 	scriptedProvider.enqueue(command);
+// 	scriptedProvider.enqueue(command2);
+  	scriptedProvider.enqueue(command3);
+// 	headProvider.enqueue(hjc2);
+// 	headProvider.enqueue(hjc3);
 
     running = true;
 
@@ -99,14 +99,16 @@ void MotionSwitchboard::run() {
             usleep(2*1000*1000);
         }
 
+        cout << "Switchboard stepping" <<endl;
+
         // Calculate the next joints and get them
 		headProvider.calculateNextJoints();
 		// get headJoints from headProvider
 		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
         //Just switch this line to decide which provider we should use
         MotionProvider * curProvider =
-//            reinterpret_cast<MotionProvider *>( &walkProvider);
-			reinterpret_cast <MotionProvider *>( &scriptedProvider);
+//            reinterpret_cast<MotionProvider *>( &
+            reinterpret_cast <MotionProvider *>( &scriptedProvider);
         curProvider->calculateNextJoints();
 
         vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);

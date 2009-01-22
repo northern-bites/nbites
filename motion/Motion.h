@@ -23,6 +23,7 @@
 #include "synchro.h"
 #include "MotionSwitchboard.h"
 #include "SimulatorEnactor.h"
+#include "ALEnactor.h"
 #include "MotionInterface.h"
 #include "Sensors.h"
 
@@ -41,7 +42,11 @@ class Motion : public Thread
     void run();
 private:
     MotionSwitchboard switchboard;
+#ifdef NAOQI1
+    ALEnactor *enactor;
+#else
     SimulatorEnactor *enactor;
+#endif
     MotionInterface interface;
 };
 
