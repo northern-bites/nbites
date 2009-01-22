@@ -5,6 +5,24 @@
 
 #include "Profiler.h"
 
+static const char *PCOMPONENT_NAMES[] = {
+  "GetImage",
+  "Transform",
+  "Threshold",
+  "FGHorizon",
+  "Runs",
+  "ThreshRuns",
+  "Object",
+  "Lines",
+  "Vision",
+  "Logging",
+  "AiboConnect",
+  "TOOLConnect",
+  "PyUpdate",
+  "PyRun",
+  "Python",
+  "Final"
+};
 
 // Map from subcomponent (index) to meta-component (value) for calculating
 // summary percentages.  Mapping to self means no parent.

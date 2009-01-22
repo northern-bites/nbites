@@ -36,27 +36,6 @@ enum ProfiledComponent {
 };
 static const int NUM_PCOMPONENTS = P_FINAL + 1;
 
-static const char *PCOMPONENT_NAMES[] = {
-  "GetImage",
-  "Transform",
-  "Threshold",
-  "FGHorizon",
-  "Runs",
-  "ThreshRuns",
-  "Object",
-  "Lines",
-  "Vision",
-  "Logging",
-  "AiboConnect",
-  "TOOLConnect",
-  "PyUpdate",
-  "PyRun",
-  "Python",
-  "Final"
-};
-
-
-
 class Profiler {
   public:
 
