@@ -5,6 +5,7 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
 	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
 	  headProvider(1/50.0f,sensors),
       nextJoints(Kinematics::NUM_JOINTS, 0.0f),
+      //nextJoints(sensors->getBodyAngles()),
 	  running(false)
 {
 
@@ -43,6 +44,10 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
 									bodyJoints2,
 									Kinematics::INTERPOLATION_LINEAR);
 
+    //We cannot read the sensor values until the run method
+    //so we must ensure that no one reads them until we get a chance
+    //to initialize them correctly
+    pthread_mutex_lock(&next_joints_mutex);
 }
 
 MotionSwitchboard::~MotionSwitchboard() {
@@ -92,6 +97,17 @@ void MotionSwitchboard::stop() {
  */
 void MotionSwitchboard::run() {
     static int fcount = 0;
+
+    //Initialize the next_joints to the sensors' angles:
+    //Note that the mutex remains locked since the constructor,
+    //until we set these angles here, since otherwise the
+    //enactor can steal bad values before we have a chance to
+    //correct them
+    //Kind of a hack-ish
+    nextJoints = sensors->getBodyAngles();
+    pthread_mutex_unlock(&next_joints_mutex);
+
+
     while(running) {
 
         if(fcount == 1){
@@ -100,6 +116,10 @@ void MotionSwitchboard::run() {
         }
 
         cout << "Switchboard stepping" <<endl;
+
+        //At the beginning of each frame, we need to update the sensor values
+        //that are tied to
+        //sensors->setBodyAngles(nextJoints); // WATCH THIS LINE!! IS IT RIGHT?
 
         // Calculate the next joints and get them
 		headProvider.calculateNextJoints();
@@ -116,31 +136,38 @@ void MotionSwitchboard::run() {
 		vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
 		vector <float > larmJoints= curProvider->getChainJoints(LARM_CHAIN);
 
-        //Copy the new values into place, and wait to be signaled.
-        pthread_mutex_lock(&next_joints_mutex);
 
 		cout << "rleg " << rlegJoints.size() << endl;
 		cout << "rarm " << rarmJoints.size() << endl;
 		cout << "larm " << larmJoints.size() << endl;
 		cout << "lleg " << llegJoints.size() << endl;
 		cout << "head " << headJoints.size() << endl;
-		for(unsigned int i = 0; i < HEAD_JOINTS;i++){
-			nextJoints[HEAD_YAW + i] = headJoints.at(i);
-		}
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
-        }
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints.at(i);
-        }
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextJoints[L_SHOULDER_PITCH + i] = larmJoints.at(i);
-        }
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
-       }
 
-        sensors->setBodyAngles(nextJoints); // WATCH THIS LINE!! IS IT RIGHT?
+		//Copy the new values into place, and wait to be signaled.
+        pthread_mutex_lock(&next_joints_mutex);
+        //by default, set the angles to what they are sensed to be
+        nextJoints = sensors->getBodyAngles();
+
+        //note: isActive has been implemented nowhere, will return false
+        if(!headProvider->isActive())
+            for(unsigned int i = 0; i < HEAD_JOINTS;i++){
+                nextJoints[HEAD_YAW + i] = headJoints.at(i);
+            }
+        if (!curProvider.isActive()){
+            for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+                nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
+            }
+            for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+                nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints.at(i);
+            }
+            for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+                nextJoints[L_SHOULDER_PITCH + i] = larmJoints.at(i);
+            }
+            for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+                nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
+            }
+        }
+
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
         pthread_mutex_unlock(&next_joints_mutex);
         fcount++;
@@ -153,9 +180,7 @@ const vector <float> MotionSwitchboard::getNextJoints() {
     pthread_mutex_lock(&next_joints_mutex);
 
     const vector <float> vec(nextJoints);
-
     pthread_cond_signal(&calc_new_joints_cond);
-
     pthread_mutex_unlock(&next_joints_mutex);
 
 
