@@ -41,6 +41,7 @@ private:
 
 	vector <vector <float> > getCurrentChains();
 	void setNextBodyCommand();
+    void setActive();
 };
 
 #endif

@@ -26,6 +26,15 @@ void ScriptedProvider::requestStop() {
 	// Finish motion or stop immediately?
 }
 
+//Checks if this chain is currently providing angles so that external
+//classes can check the status of this one
+void ScriptedProvider::setActive(){
+    if(isDone())
+        inactive();
+    else
+        active();
+}
+
 bool ScriptedProvider::isDone() {
 	bool isEmpty = true;
 	for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
@@ -75,6 +84,8 @@ void ScriptedProvider::calculateNextJoints() {
 		i++;
 	}
 
+
+    setActive();
 }
 /*
  * Adds new command to queue of commands.
