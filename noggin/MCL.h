@@ -86,11 +86,10 @@ public:
     //BallEKF ball;
     //vector<EKF> opponents;
 
-  friend std::ostream& operator<< (std::ostream &o, const Particle &c)
-  {
-      return o << c.pose.x << " " << c.pose.y << " " << c.pose.h << " "
-               << c.weight;
-  }
+    friend std::ostream& operator<< (std::ostream &o, const Particle &c) {
+        return o << c.pose.x << " " << c.pose.y << " " << c.pose.h << " "
+                 << c.weight;
+    }
 
 };
 
@@ -120,6 +119,8 @@ public:
                             bool resample);
 
     // Getters
+    PoseEst getCurrentEstimate() { return curEst; }
+    PoseEst getCurrentUncertainty() { return curUncert; }
     /**
      * @return The current x esitamte of the robot
      */
@@ -213,6 +214,12 @@ private:
     float determineLineWeight(Observation z, PoseEst x_t, LineLandmark _line);
     float getSimilarity(float r_d, float r_a, Observation &z);
     Particle randomWalkParticle(Particle p);
+
+public:
+    friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
+        return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
+    }
+
 };
 
 #endif // _MCL_H_DEFINED
