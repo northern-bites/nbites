@@ -12,9 +12,9 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
-	vector<float>* headJoints2 = new vector<float>(2,90.0f);
+	vector<float>* headJoints1 = new vector<float>(2,90.0f);
 	hjc = new HeadJointCommand(2.0f,
-							   headJoints2,
+							   headJoints1,
 							   Kinematics::INTERPOLATION_LINEAR);
 
 	vector<float>* headJoints2 = new vector<float>(2,0.0f);

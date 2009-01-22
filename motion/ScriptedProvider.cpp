@@ -33,15 +33,8 @@ void ScriptedProvider::calculateNextJoints() {
 	// be chopped and used.
 	bool allEmpty = true;
 
-<<<<<<< HEAD:motion/ScriptedProvider.cpp
-	for ( int i=0 ; i<chainQueues.size() ; i++ ) {
-		if ( !chainQueues.at(i).empty() ) {
-			cout << "not empty!" << endl;
-=======
-
 	for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
 		if ( !chainQueues.at(i).empty() ) {
->>>>>>> Fixed errors in Scripted and Head Providers. It is now possible to enqueue multiple head and body joint commands without error. Although, head moves seem to move too quickly.:motion/ScriptedProvider.cpp
 			allEmpty=false;
 		}
 	}
@@ -123,11 +116,7 @@ vector<vector<float> > ScriptedProvider::getCurrentChains() {
 	vector<float> currentJoints = sensors->getBodyAngles();
 	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
 
-<<<<<<< HEAD:motion/ScriptedProvider.cpp
-	for (unsigned int i=0; i<NUM_JOINTS ; i++){
-=======
 	for (unsigned int i=0; i<NUM_JOINTS ; i++) {
->>>>>>> Fixed errors in Scripted and Head Providers. It is now possible to enqueue multiple head and body joint commands without error. Although, head moves seem to move too quickly.:motion/ScriptedProvider.cpp
 		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
 	}
 
