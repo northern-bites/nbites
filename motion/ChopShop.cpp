@@ -49,8 +49,14 @@ ChopShop::chopLinear(const JointCommand *command) {
 	int numChops = (int)(command->getDuration()/FRAME_LENGTH_S);
 
 	vector<float> currentJoints = getCurrentJoints();
+    cout << "Current joints in CHOPCHOP" <<endl;
+    for (int i =0; i<22; i++)
+        cout <<"  [" <<i<<"] "<< currentJoints.at(i) <<endl;
 	// Add final joints for all chains
 	vector<float> finalJoints = getFinalJoints(command, &currentJoints);
+    cout << "Dest joints in CHOPCHOP" <<endl;
+    for (int i =0; i<22; i++)
+        cout <<"  [" <<i<<"] "<< currentJoints.at(i) <<endl;
 
 	//Get diff per chop from current to final
 
