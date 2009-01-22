@@ -24,7 +24,7 @@ void HeadProvider::requestStop() {
 
 void HeadProvider::calculateNextJoints() {
 	vector<float> currentHeads = getCurrentHeads();
-	cout << "headqueue size is " << headQueue.size() << endl;
+
 	if ( headQueue.empty() )
 		setNextHeadCommand();
 

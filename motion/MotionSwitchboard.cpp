@@ -40,7 +40,7 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
 							   Kinematics::INTERPOLATION_LINEAR);
 
 	bodyJoints2 = new vector<float>(20,-30.0f);
-	command2 = new BodyJointCommand(10.0f,
+	command2 = new BodyJointCommand(5.0f,
 									bodyJoints2,
 									Kinematics::INTERPOLATION_LINEAR);
 
@@ -136,24 +136,17 @@ void MotionSwitchboard::run() {
 		vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
 		vector <float > larmJoints= curProvider->getChainJoints(LARM_CHAIN);
 
-
-		cout << "rleg " << rlegJoints.size() << endl;
-		cout << "rarm " << rarmJoints.size() << endl;
-		cout << "larm " << larmJoints.size() << endl;
-		cout << "lleg " << llegJoints.size() << endl;
-		cout << "head " << headJoints.size() << endl;
-
 		//Copy the new values into place, and wait to be signaled.
         pthread_mutex_lock(&next_joints_mutex);
         //by default, set the angles to what they are sensed to be
-        nextJoints = sensors->getBodyAngles();
+        // nextJoints = sensors->getBodyAngles();
 
         //note: isActive has been implemented nowhere, will return false
-        if(!headProvider->isActive())
+        if (headProvider.isActive())
             for(unsigned int i = 0; i < HEAD_JOINTS;i++){
                 nextJoints[HEAD_YAW + i] = headJoints.at(i);
             }
-        if (!curProvider.isActive()){
+        if (curProvider->isActive()){
             for(unsigned int i = 0; i < LEG_JOINTS; i ++){
                 nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
             }
@@ -166,6 +159,8 @@ void MotionSwitchboard::run() {
             for(unsigned int i = 0; i < ARM_JOINTS; i ++){
                 nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
             }
+        }else{
+            cout << "Skipping bodyprovider" <<endl;
         }
 
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);

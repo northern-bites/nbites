@@ -49,6 +49,7 @@ void ScriptedProvider::calculateNextJoints() {
 
 	for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
 		if ( !chainQueues.at(i).empty() ) {
+            cout << "chain " << i << " has size " << chainQueues.at(i).size() << endl;
 			allEmpty=false;
 		}
 	}
@@ -128,11 +129,6 @@ vector<vector<float> > ScriptedProvider::getCurrentChains() {
 	vector<vector<float> > currentChains(NUM_CHAINS,vector<float>(0));
 
 	vector<float> currentJoints = sensors->getBodyAngles();
-	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
-
-	for (unsigned int i=0; i<NUM_JOINTS ; i++) {
-		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
-	}
 
 	unsigned int lastChainJoint = 0;
 	unsigned int joint = 0;
