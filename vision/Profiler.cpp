@@ -19,6 +19,8 @@ static const char *PCOMPONENT_NAMES[] = {
   "AiboConnect",
   "TOOLConnect",
   "PyUpdate",
+  "Localization",
+  "MCL",
   "PyRun",
   "Python",
   "Final"
@@ -40,6 +42,8 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
   /*P_AIBOCONNECT --> */ P_FINAL,
   /*P_TOOLCONNECT --> */ P_FINAL,
   /*P_PYUPDATE    --> */ P_PYTHON,
+  /*P_LOC         --> */ P_FINAL,
+  /*P_MCL         --> */ P_LOC,
   /*P_PYRUN       --> */ P_PYTHON,
   /*P_PYTHON      --> */ P_FINAL,
   /*P_FINAL       --> */ P_FINAL
@@ -69,7 +73,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  * current_frame is not incremented.  Thus when profiling is manually turned
  * off or when automatically over, current_frame represents THE LAST FRAME
  * profiled (indexing is zero-based).  If this weren't the case, it would be
- * much more difficult to accurately present the current and total frame count 
+ * much more difficult to accurately present the current and total frame count
  * in the printing methods.  printSummary() should be called after profiling is
  * false, whether manual or automatic, while current_frame has not been
  * incremented.  printCurrent() should be called before the call to nextFrame()
@@ -174,7 +178,7 @@ Profiler::printSummary ()
       depths[i]++;
       comp = PCOMPONENT_SUB_ORDER[comp];
     }
-    
+
     length = strlen(PCOMPONENT_NAMES[i]) + depths[i]*2;
     max_length = max_length > length ? max_length : length;
   }

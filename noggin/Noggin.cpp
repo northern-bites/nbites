@@ -17,7 +17,6 @@ Noggin::Noggin (Sensors *s, Profiler *p, Vision *v)
       brain_module(NULL), brain_instance(NULL),
       mcl()
 {
-
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
 #endif
@@ -47,8 +46,7 @@ Noggin::~Noggin ()
     Py_XDECREF(brain_module);
 }
 
-void
-Noggin::initializeVision(Vision *v)
+void Noggin::initializeVision(Vision *v)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing interpreter and extension modules\n");
@@ -68,8 +66,7 @@ Noggin::initializeVision(Vision *v)
     init_leds();
 }
 
-bool
-Noggin::import_modules ()
+bool Noggin::import_modules ()
 {
 #ifdef  DEBUG_NOGGIN_INITIALIZATION
     printf("  Importing noggin.Brain\n");
@@ -94,8 +91,7 @@ Noggin::import_modules ()
     return true;
 }
 
-void
-Noggin::reload ()
+void Noggin::reload ()
 {
     if (brain_module == NULL)
         if (!import_modules())
@@ -122,8 +118,7 @@ Noggin::reload(std::string modules)
     getBrainInstance();
 }
 
-void
-Noggin::getBrainInstance ()
+void Noggin::getBrainInstance ()
 {
     if (brain_module == NULL)
         if (!import_modules())
@@ -151,8 +146,7 @@ Noggin::getBrainInstance ()
     error_state = (brain_instance == NULL);
 }
 
-void
-Noggin::runStep ()
+void Noggin::runStep ()
 {
 #ifdef USE_NOGGIN_AUTO_HALT
     // don't bother doing anything if there's a Python error and we
@@ -169,7 +163,9 @@ Noggin::runStep ()
     PROF_EXIT(profiler, P_PYUPDATE);
 
     // Update localization information
+    PROF_ENTER(profiler, P_LOC);
     updateLocalization();
+    PROF_EXIT(profiler, P_LOC);
 
     // Call main run() method of Brain
     PROF_ENTER(profiler, P_PYRUN);
@@ -204,20 +200,38 @@ void Noggin::updateLocalization()
     vector<Observation> observations;
     // FieldObjects
     VisualFieldObject fo = *(vision->vision->bgrp);
-    if(fo.getDistance() > 0) observations.push_back(fo);
-    fo = *(vision->vision->bglp);
-    if(fo.getDistance() > 0) observations.push_back(fo);
-    fo = *(vision->vision->ygrp);
-    if(fo.getDistance() > 0) observations.push_back(fo);
-    fo = *(vision->vision->yglp);
-    if(fo.getDistance() > 0) observations.push_back(fo);
 
+    if(fo.getDistance() > 0) {
+        observations.push_back(fo);
+        cout << "Saw bgrp at distance" << fo.getDistance() << endl;
+    }
+
+    fo = *(vision->vision->bglp);
+    if(fo.getDistance() > 0) {
+        observations.push_back(fo);
+        cout << "Saw bglp at distance" << fo.getDistance() << endl;
+    }
+
+    fo = *(vision->vision->ygrp);
+    if(fo.getDistance() > 0) {
+        observations.push_back(fo);
+        cout << "Saw ygrp at distance" << fo.getDistance() << endl;
+    }
+
+    fo = *(vision->vision->yglp);
+    if(fo.getDistance() > 0) {
+        observations.push_back(fo);
+        cout << "Saw yglp at distance" << fo.getDistance() << endl;
+    }
     // Corners
 
     // Lines
 
     // Process the information
-    mcl.updateLocalization(odometery , observations);
+    PROF_ENTER(profiler, P_MCL);
+    mcl.updateLocalization(odometery, observations, true);
+    PROF_EXIT(profiler, P_MCL);
+    //cout << mcl << endl;
 
     // Ball Tracking
 
