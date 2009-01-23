@@ -19,6 +19,8 @@ public:
 				 const Kinematics::InterpolationType _type)
 		: MotionCommand(motionType), duration(_duration), type(_type) { }
 
+	virtual ~JointCommand() { };
+
 /* Attributes for JointCommand
  * Duration
  * InterpolationType

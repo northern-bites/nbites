@@ -24,7 +24,7 @@ public:
 	HeadJointCommand(const float time, const std::vector<float> *joints,
 					 const Kinematics::InterpolationType _type);
 	HeadJointCommand(const HeadJointCommand &other);
-	~HeadJointCommand();
+	virtual ~HeadJointCommand();
 
 	// TODO @JGM NEED A CHECK ON THE CHAINID REQUEST
 	virtual const std::vector<float>* getJoints(ChainID chain) const {

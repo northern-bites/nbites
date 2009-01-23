@@ -29,7 +29,7 @@ class BodyJointCommand : public JointCommand {
                                        const std::vector<float> *rarm,
 		     const Kinematics::InterpolationType _type);
     BodyJointCommand(const BodyJointCommand &other);
-    ~BodyJointCommand(void);
+    virtual ~BodyJointCommand(void);
 
     virtual const  std::vector<float>* getJoints(ChainID chainID) const;
     const std::vector<float>* getLArmJoints(void) const { return larm_joints; }

@@ -15,7 +15,7 @@ class MotionCommand
 public:
 	MotionCommand(MotionConstants::MotionType type)
 		: chainList(), motionType(type) { }
-
+	virtual ~MotionCommand() { }
 	const MotionConstants::MotionType getType() const { return motionType; }
 	const std::list<int>* getChainList() const { return &chainList; }
 
