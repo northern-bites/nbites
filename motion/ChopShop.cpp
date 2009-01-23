@@ -56,7 +56,7 @@ ChopShop::chopLinear(const JointCommand *command) {
 	vector<float> finalJoints = getFinalJoints(command, &currentJoints);
     cout << "Dest joints in CHOPCHOP" <<endl;
     for (int i =0; i<22; i++)
-        cout <<"  [" <<i<<"] "<< currentJoints.at(i) <<endl;
+        cout <<"  [" <<i<<"] "<< finalJoints.at(i) <<endl;
 
 	//Get diff per chop from current to final
 
@@ -112,7 +112,6 @@ vector<float> ChopShop::getFinalJoints(const JointCommand *command,
 		// next chain
 		currentStart += chain_lengths[chain];
 	}
-	vectorToRad(&finalJoints);
 	return finalJoints;
 
 }

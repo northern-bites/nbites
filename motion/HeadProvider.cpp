@@ -35,6 +35,7 @@ void HeadProvider::calculateNextJoints() {
 	else {
 		setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
 	}
+    //setActive();
 }
 
 void HeadProvider::enqueue(const HeadJointCommand *command) {

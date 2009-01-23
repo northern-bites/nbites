@@ -37,6 +37,8 @@ public:
     void requestStop();
     void calculateNextJoints();
     void setMotion(const float x, const float y, const float theta);
+    
+    vector<float> getWalkStance();
 
 private:
     WalkingParameters walkParameters;

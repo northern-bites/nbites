@@ -10,8 +10,13 @@ void ALEnactor::run() {
 
     static int x = 0;
 
-//    while (running && x++ <20) {
-    while (running) {
+    //vector<float> rarm(4,M_PI/4);
+    //mproxy->gotoChainAngles("RArm",rarm,2.0,INTERPOLATION_LINEAR);
+    //cout << "Done with AL motion stuff" << endl;
+
+    cout << "ALEnactor looping:" <<endl;
+    while (running && x++ <5) {
+//    while (running) {
         postSensors();
 
         // Get the angles we want to go to this frame from the switchboard
