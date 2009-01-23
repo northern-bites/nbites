@@ -167,8 +167,72 @@ Man::initMan()
 
 #ifdef USE_VISION
 #ifdef NAOQI1
-void Man::registerCamera()
-{
+void Man::syncWithALMemory() {
+    // FSR update
+    float frontLeft = 0.0f, frontRight = 0.0f,
+        rearLeft = 0.0f, rearRight = 0.0f;
+    try {
+        frontLeft = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"), 0));
+        frontRight = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"), 0));
+        rearLeft = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"), 0));
+        rearRight = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"), 0));
+    } catch(ALError &e) {
+        cout << "Failed to read left foot FSR values" << endl;
+    }
+    sensors.setLeftFootFSR(frontLeft, frontRight, rearLeft, rearRight);
+
+    try {
+        frontLeft = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"), 0));
+        frontRight = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"), 0));
+        rearLeft = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"), 0));
+        rearRight = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"), 0));
+    } catch(ALError &e) {
+        cout << "Failed to read right foot FSR values" << endl;
+    }
+    sensors.setRightFootFSR(frontLeft, frontRight, rearLeft, rearRight);
+
+    // Foot bumper update
+    float leftFootBumperLeft  = 0.0f, leftFootBumperRight  = 0.0f;
+    float rightFootBumperLeft = 0.0f, rightFootBumperRight = 0.0f;
+    try {
+        leftFootBumperLeft = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"), 0));
+        leftFootBumperRight = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"), 0));
+        rightFootBumperLeft = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0));
+        rightFootBumperRight = static_cast<float>(almemory->call<ALValue>(
+            "getData",string(
+                "Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0));
+    } catch(ALError &e) {
+        cout << "Failed to read bumper values" <<endl;
+    }
+    sensors.setLeftFootBumper(leftFootBumperLeft, leftFootBumperRight);
+    sensors.setRightFootBumper(rightFootBumperLeft, rightFootBumperRight);
+}
+
+
+void
+Man::registerCamera() {
     try {
         camera = getParentBroker()->getProxy("NaoCam");
         camera_active =true;
@@ -462,7 +526,7 @@ Man::closeMan() {
         try {
             camera->callVoid("unregister", lem_name);
         }catch (ALError &e) {
-            log->error("Man", "Could not call the inregister method of the NaoCam "
+            log->error("Man", "Could not call the unregister method of the NaoCam "
                        "module");
         }
     }
@@ -524,31 +588,43 @@ Man::run ()
         sensors.updateVisionAngles();
 #ifdef NAOQI1
 #ifndef OFFLINE
+        // This call syncs all sensors values: bumpers, fsr, inertial, etc.
+        syncWithALMemory();
 
-        // Image logging
-        double right_bumper1 = 0.0, right_bumper2 = 0.0;
-        double left_bumper1  = 0.0, left_bumper2  = 0.0;
-        try{
-            right_bumper1 = (double)almemory->call<ALValue>(
-                "getData",string(
-                    "Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0);
-            right_bumper2 = (double)almemory->call<ALValue>(
-                "getData",string(
-                    "Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0);
-            left_bumper1 = (double)almemory->call<ALValue>(
-                "getData",string(
-                    "Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"), 0);
-            left_bumper2 = almemory->call<ALValue>(
-                "getData",string(
-                    "Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"), 0);
-        }catch(ALError &e){
-            cout << "Failed to read bumper values" <<endl;
-        }
+        const FootBumper leftFootBumper(sensors.getLeftFootBumper());
+        const FootBumper rightFootBumper(sensors.getRightFootBumper());
 
-        if( (right_bumper1 || right_bumper2) ||
-            (left_bumper1 || left_bumper2)  ){
+        bool temp = leftFootBumper.left || leftFootBumper.right;
+
+        /*
+        cout << "leftFootBumper: "
+             << boolalpha << temp << endl;
+        */
+
+        /*
+        if (leftFootBumper.left || leftFootBumper.right ||
+            rightFootBumper.left || rightFootBumper.right) {
             saveFrame();
         }
+        */
+
+        // testing the fsr values we get from ALMemory
+        const FSR leftFoot(sensors.getLeftFootFSR());
+        const FSR rightFoot(sensors.getRightFootFSR());
+
+        cout << "Left foot:" << endl
+             << "    FL: " << leftFoot.frontLeft
+             << "    FR: " << leftFoot.frontRight
+             << "    RL: " << leftFoot.rearLeft
+             << "    RR: " << leftFoot.rearRight
+             << endl;
+
+        cout << "Right foot:" << endl
+             << "    FL: " << rightFoot.frontLeft
+             << "    FR: " << rightFoot.frontRight
+             << "    RL: " << rightFoot.rearLeft
+             << "    RR: " << rightFoot.rearRight
+             << endl;
 
 #endif
 #endif

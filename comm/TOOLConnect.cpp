@@ -5,6 +5,8 @@
 #if ROBOT(NAO)
 #include <sys/utsname.h> // uname()
 #include <boost/shared_ptr.hpp>
+#include <boost/assign/std/vector.hpp>
+using namespace boost::assign;
 #endif
 
 #include "TOOLConnect.h"
@@ -261,7 +263,13 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
         // Use OVision
 #elif ROBOT(NAO)
         // Use Sensors
-        v = sensors->getFSR();
+        const FSR leftFootFSR(sensors->getLeftFootFSR());
+        const FSR rightFootFSR(sensors->getRightFootFSR());
+        v.clear();
+        v += leftFootFSR.frontLeft, leftFootFSR.frontRight,
+            leftFootFSR.rearLeft, leftFootFSR.rearRight,
+            rightFootFSR.frontLeft, rightFootFSR.frontRight,
+            rightFootFSR.rearLeft, rightFootFSR.rearRight;
         serial.write_floats(v);
         v = sensors->getInertial();
         serial.write_floats(v);

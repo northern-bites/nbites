@@ -2,6 +2,8 @@
 #ifndef Sensors_H
 #define Sensors_H
 #include <vector>
+#include <boost/assign/std/vector.hpp>
+using namespace boost::assign;
 #include <list>
 #include <pthread.h>
 #include <Python.h>
@@ -37,6 +39,31 @@ typedef struct PySensors_t {
 } PySensors;
 
 
+struct FSR {
+    FSR(const float fl, const float fr,
+        const float rl, const float rr)
+        : frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
+
+    float frontLeft;
+    float frontRight;
+    float rearLeft;
+    float rearRight;
+};
+
+struct FootBumper {
+    // Since the foot bumpers only have pressed/unpressed states, but are stored
+    // as floats with values 0.0f and 1.0f, we just test whether the value is
+    // bigger than a half or not and assign a boolean based on that.
+    FootBumper(const float _left, const float _right) {
+        left = _left > 0.5f;
+        right = _right > 0.5f;
+    }
+
+    bool left;
+    bool right;
+};
+
+
 class Sensors {
   //friend class Man;
   public:
@@ -52,7 +79,10 @@ class Sensors {
     std::vector<float> getBodyAngleErrors();
 	const float getBodyAngleError(int index); // Also NOT wrapped for python
 #if ROBOT(NAO)
-    std::vector<float> getFSR();
+    const FSR getLeftFootFSR();
+    const FSR getRightFootFSR();
+    const FootBumper getLeftFootBumper();
+    const FootBumper getRightFootBumper();
     std::vector<float> getInertial();
     std::vector<float> getSonar();
 #endif
@@ -64,7 +94,15 @@ class Sensors {
     void setVisionBodyAngles(std::vector<float>& v);
     void setBodyAngleErrors(std::vector<float>& v);
 #if ROBOT(NAO)
-    void setFSR(std::vector<float>& v);
+    void setLeftFootFSR(const float frontLeft, const float frontRight,
+                        const float rearLeft, const float rearRight);
+    void setRightFootFSR(const float frontLeft, const float frontRight,
+                         const float rearLeft, const float rearRight);
+    void setFSR(const FSR &leftFootFSR, const FSR &rightFootFSR);
+    void setLeftFootBumper(const float left, const float right);
+    void setLeftFootBumper(const FootBumper& bumper);
+    void setRightFootBumper(const float left, const float right);
+    void setRightFootBumper(const FootBumper& bumper);
     void setInertial(std::vector<float>& v);
     void setSonar(float l, float r);
 #endif
@@ -104,6 +142,7 @@ class Sensors {
     pthread_mutex_t errors_mutex;
 #if ROBOT(NAO)
     pthread_mutex_t fsr_mutex;
+    pthread_mutex_t bumper_mutex;
     pthread_mutex_t inertial_mutex;
     pthread_mutex_t sonar_mutex;
 #endif
@@ -118,7 +157,11 @@ class Sensors {
     std::vector<float> bodyAnglesError;
 #if ROBOT(NAO)
     // FSR sensors
-    std::vector<float> fsr;
+    FSR leftFootFSR;
+    FSR rightFootFSR;
+    // Feet bumper sensors
+    FootBumper leftFootBumper;
+    FootBumper rightFootBumper;
     // Inertial sensors
     std::vector<float> inertial;
     // Sonar sensors

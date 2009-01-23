@@ -39,7 +39,16 @@ PySensors_update(PySensors *self)
   }
 
 #if ROBOT(NAO)
-  values = sensors->getFSR();
+  // HACK! FSRs are no longer stored in vectors. There are structs that hold
+  // the values. In order to not break functionality, I decided to convert them
+  // to the vector format for the python hookup.
+  values.clear();
+  const FSR leftFootFSR(sensors->getLeftFootFSR());
+  const FSR rightFootFSR(sensors->getRightFootFSR());
+  values += leftFootFSR.frontLeft, leftFootFSR.frontRight,
+      leftFootFSR.rearLeft, leftFootFSR.rearRight,
+      rightFootFSR.frontLeft, rightFootFSR.frontRight,
+      rightFootFSR.rearLeft, rightFootFSR.rearRight;
   for (i = 0; i < (int)values.size(); i++) {
     if (i < PyList_Size(self->fsr))
       PyList_SET_ITEM(self->fsr, i, PyFloat_FromDouble(values[i]));
@@ -338,7 +347,11 @@ Sensors::Sensors ()
   : bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
     bodyAnglesError(NUM_ACTUATORS),
 #if ROBOT(NAO)
-    fsr(AL_NUMBER_OF_FSR), inertial(NUM_INERTIAL_SENSORS),
+    leftFootFSR(0.0f, 0.0f, 0.0f, 0.0f),
+    rightFootFSR(leftFootFSR),
+    leftFootBumper(0.0f, 0.0f),
+    rightFootBumper(0.0f, 0.0f),
+    inertial(NUM_INERTIAL_SENSORS),
 #endif
     image(&global_image[0]), pySensors(NULL)
 {
@@ -347,6 +360,7 @@ Sensors::Sensors ()
   pthread_mutex_init(&errors_mutex, NULL);
 #if ROBOT(NAO)
   pthread_mutex_init(&fsr_mutex, NULL);
+  pthread_mutex_init(&bumper_mutex, NULL);
   pthread_mutex_init(&inertial_mutex, NULL);
   pthread_mutex_init(&sonar_mutex, NULL);
 #endif
@@ -367,6 +381,7 @@ Sensors::~Sensors ()
   pthread_mutex_destroy(&errors_mutex);
 #if ROBOT(NAO)
   pthread_mutex_destroy(&fsr_mutex);
+  pthread_mutex_destroy(&bumper_mutex);
   pthread_mutex_destroy(&inertial_mutex);
   pthread_mutex_destroy(&sonar_mutex);
 #endif
@@ -473,16 +488,52 @@ Sensors::setBodyAngleErrors (vector<float>& v)
 
 #if ROBOT(NAO)
 
-vector<float>
-Sensors::getFSR ()
+const FSR
+Sensors::getLeftFootFSR ()
 {
   pthread_mutex_lock (&fsr_mutex);
 
-  vector<float> vec(fsr);
+  const FSR left(leftFootFSR);
 
   pthread_mutex_unlock (&fsr_mutex);
 
-  return vec;
+  return left;
+}
+
+const FSR
+Sensors::getRightFootFSR ()
+{
+  pthread_mutex_lock (&fsr_mutex);
+
+  const FSR right(rightFootFSR);
+
+  pthread_mutex_unlock (&fsr_mutex);
+
+  return right;
+}
+
+const FootBumper
+Sensors::getLeftFootBumper()
+{
+    pthread_mutex_lock (&bumper_mutex);
+
+    const FootBumper bumper = leftFootBumper;
+
+    pthread_mutex_unlock (&bumper_mutex);
+
+    return bumper;
+}
+
+const FootBumper
+Sensors::getRightFootBumper()
+{
+    pthread_mutex_lock (&bumper_mutex);
+
+    const FootBumper bumper = rightFootBumper;
+
+    pthread_mutex_unlock (&bumper_mutex);
+
+    return bumper;
 }
 
 vector<float>
@@ -512,13 +563,76 @@ Sensors::getSonar ()
 }
 
 void
-Sensors::setFSR (vector<float>& v)
+Sensors::setLeftFootFSR(const float frontLeft, const float frontRight,
+                        const float rearLeft, const float rearRight)
+{
+    pthread_mutex_lock (&fsr_mutex);
+
+    leftFootFSR = FSR(frontLeft, frontRight, rearLeft, rearRight);
+
+    pthread_mutex_unlock (&fsr_mutex);
+}
+
+void
+Sensors::setRightFootFSR(const float frontLeft, const float frontRight,
+                         const float rearLeft, const float rearRight)
+{
+    pthread_mutex_lock (&fsr_mutex);
+
+    rightFootFSR = FSR(frontLeft, frontRight, rearLeft, rearRight);
+
+    pthread_mutex_unlock (&fsr_mutex);
+}
+
+void
+Sensors::setFSR(const FSR &_leftFootFSR, const FSR &_rightFootFSR)
 {
   pthread_mutex_lock (&fsr_mutex);
 
-  fsr = v;
+  leftFootFSR = _leftFootFSR;
+  rightFootFSR = _rightFootFSR;
 
   pthread_mutex_unlock (&fsr_mutex);
+}
+
+void
+Sensors::setLeftFootBumper(const float left, const float right)
+{
+    pthread_mutex_lock (&bumper_mutex);
+
+    leftFootBumper = FootBumper(left, right);
+
+    pthread_mutex_unlock (&bumper_mutex);
+}
+
+void
+Sensors::setLeftFootBumper(const FootBumper& bumper)
+{
+    pthread_mutex_lock (&bumper_mutex);
+
+    leftFootBumper = bumper;
+
+    pthread_mutex_unlock (&bumper_mutex);
+}
+
+void
+Sensors::setRightFootBumper(const float left, const float right)
+{
+    pthread_mutex_lock (&bumper_mutex);
+
+    rightFootBumper = FootBumper(left, right);
+
+    pthread_mutex_unlock (&bumper_mutex);
+}
+
+void
+Sensors::setRightFootBumper(const FootBumper& bumper)
+{
+    pthread_mutex_lock (&bumper_mutex);
+
+    rightFootBumper = bumper;
+
+    pthread_mutex_unlock (&bumper_mutex);
 }
 
 void
