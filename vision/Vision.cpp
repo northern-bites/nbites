@@ -193,9 +193,9 @@ void Vision::drawBoxes(void) {
 
 // self-explanatory
 void Vision::drawFieldObject(VisualFieldObject* obj, int color) {
-  drawLine(obj->getX(), obj->getY(),
+  drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
 	   obj->getRightTopX(), obj->getRightTopY(), color);
-  drawLine(obj->getX(), obj->getY(),
+  drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
 	   obj->getLeftBottomX(), obj->getLeftBottomY(), color);
   drawLine(obj->getRightBottomX(), obj->getRightBottomY(),
 	   obj->getRightTopX(), obj->getRightTopY(), color);
