@@ -32,6 +32,9 @@ protected:
         nextJoints[id] = chainJoints;
     }
 
+    //Method that must be implemented, and called at the end of each frame
+    //to set whether the provider is currently active or not
+    virtual void setActive() = 0;
     void active() { _active = true; }
     void inactive() { _active = false; }
 

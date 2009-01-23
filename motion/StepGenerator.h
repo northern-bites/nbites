@@ -95,6 +95,7 @@ public:
     void tick_controller();
     WalkLegsTuple tick_legs();
 
+    bool isDone(){return _done;}
 
     void setWalkVector(const float _x, const float _y, const float _theta);
 
@@ -122,6 +123,7 @@ private:
     float y;
     float theta;
 
+    bool _done;
 
     ublas::vector<float> com_i;
     //ublas::vector<float> com_f;

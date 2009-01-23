@@ -3,7 +3,7 @@
 
 StepGenerator::StepGenerator(const WalkingParameters *params)
     : x(0.0f), y(0.0f), theta(0.0f),
-      com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+      _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
       currentZMPDSteps(),
       si_Transform(CoordFrame3D::identity3D()),
@@ -219,6 +219,12 @@ WalkLegsTuple StepGenerator::tick_legs(){
     vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         fc_Transform);
 
+    //check to see if we are done
+    if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP){
+        cout << "DONE WALKING"<<endl;
+        _done = true;
+    }
+
     return WalkLegsTuple(left,right);
 }
 
@@ -375,6 +381,8 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     //futureSteps.push_back(firstSwingingStep);//right will be 'swing'. during 0.0 zmp
     lastQueuedStep = firstSupportStep;
     nextStepIsLeft = false;
+
+    _done = false;
 }
 
 
@@ -550,4 +558,3 @@ StepGenerator::get_s_sprime(boost::shared_ptr<Step> step){
              CoordFrame3D::translation3D(x,y));
     return trans_s_sprime;
 }
-

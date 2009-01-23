@@ -77,3 +77,12 @@ vector<float> HeadProvider::getCurrentHeads() {
 
 	return currentHeads;
 }
+
+void HeadProvider::setActive(){
+    isDone() ? inactive() : active();
+}
+
+
+bool HeadProvider::isDone(){
+    return  headQueue.empty()  && headCommandQueue.empty();
+}

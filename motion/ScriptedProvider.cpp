@@ -70,7 +70,7 @@ void ScriptedProvider::calculateNextJoints() {
 
 	for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
 		if ( !chainQueues.at(i).empty() ) {
-            cout << "chain " << i << " has size " << chainQueues.at(i).size() << endl;
+            //cout << "chain " << i << " has size " << chainQueues.at(i).size() << endl;
 			allEmpty=false;
 		}
 	}
@@ -110,6 +110,7 @@ void ScriptedProvider::calculateNextJoints() {
  */
 void ScriptedProvider::enqueue(const BodyJointCommand *command) {
 	bodyCommandQueue.push(command);
+    setActive();
 }
 
 

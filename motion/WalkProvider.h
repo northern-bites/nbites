@@ -37,12 +37,18 @@ public:
     void requestStop();
     void calculateNextJoints();
     void setMotion(const float x, const float y, const float theta);
-    
+
     vector<float> getWalkStance();
 
 private:
+    virtual void setActive();
+
     WalkingParameters walkParameters;
     StepGenerator stepGenerator;
+
+    //Temp solution to arms
+    vector<float> rarm_angles, larm_angles;
 };
 
 #endif
+

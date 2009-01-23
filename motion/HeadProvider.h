@@ -27,6 +27,9 @@ public:
 	void enqueueSequence(vector<const HeadJointCommand*> &seq);
 
 private:
+    void setActive();
+    bool isDone();
+
 	Sensors *sensors;
 	float FRAME_LENGTH_S;
 	ChopShop chopper;

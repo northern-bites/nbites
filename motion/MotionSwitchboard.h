@@ -36,6 +36,9 @@ public:
     const vector <float> getNextJoints();
 
 private:
+    void processProviders();
+
+private:
     Sensors *sensors;
     WalkProvider walkProvider;
 	ScriptedProvider scriptedProvider;
@@ -53,6 +56,8 @@ private:
 	const BodyJointCommand *command2;
 	const BodyJointCommand *command3;
     static const float sitDownAngles[NUM_BODY_JOINTS];
+	const BodyJointCommand *getUp;
+	const BodyJointCommand *sitDown;
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;

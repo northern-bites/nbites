@@ -21,7 +21,6 @@ public:
     virtual ~ScriptedProvider();
 
     void requestStop();
-	bool isDone();
     void calculateNextJoints();
 
 	void enqueue(const BodyJointCommand *command);
@@ -42,6 +41,7 @@ private:
 	vector <vector <float> > getCurrentChains();
 	void setNextBodyCommand();
     void setActive();
+	bool isDone();
 };
 
 #endif
