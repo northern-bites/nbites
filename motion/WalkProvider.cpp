@@ -56,6 +56,7 @@ void WalkProvider::setMotion(const float x, const float y, const float theta) {
 
 //Returns the 20 body joints
 vector<float> WalkProvider::getWalkStance(){
+    cout << "getWalkStance" <<endl;
     //calculate the walking stance of the robot
     const int z = walkParameters.bodyHeight;
     const int x = walkParameters.hipOffsetX;
@@ -69,20 +70,25 @@ vector<float> WalkProvider::getWalkStance(){
     vector<float> rarm_angles(rarm,rarm+ARM_JOINTS);
 
     //just assume we start at zero
-    float zeroJoints[LEG_JOINTS] = {0.0f,0.0f,0.0f,
-                                    0.0f,0.0f,0.0f};
-
+    float zeroJoints[LEG_JOINTS] = {0.1f,0.1f,0.1f,
+                                    0.1f,0.1f,0.1f};
+    cout << "Setting goals" <<endl;
     //Use inverse kinematics to find the left leg angles
-    ufvector3 lgoal; lgoal(0)=x; lgoal(1) = ly; lgoal(2) = z;
+    ufvector3 lgoal = ufvector3(3);
+    cout << "lgoal" << lgoal<<endl;
+    lgoal(0)=x; lgoal(1) = ly; lgoal(2) = -z;
+    cout << "lgoal" << lgoal<<endl;
     IKLegResult lresult = Kinematics::dls(LLEG_CHAIN,lgoal,zeroJoints);
     vector<float> lleg_angles(lresult.angles, lresult.angles + LEG_JOINTS);
 
     //Use inverse kinematics to find the right leg angles
-    ufvector3 rgoal; lgoal(0)=x; lgoal(1) = ly; lgoal(2) = z;
+    ufvector3 rgoal = ufvector3(3);
+    rgoal(0)=x; rgoal(1) = ry; rgoal(2) = -z;
+    cout << "rgoal" << rgoal<<endl;
     IKLegResult rresult = Kinematics::dls(RLEG_CHAIN,rgoal,zeroJoints);
     vector<float> rleg_angles(rresult.angles, rresult.angles + LEG_JOINTS);
 
-    vector<float> allJoints(NUM_BODY_JOINTS);
+    vector<float> allJoints;
 
     //now combine all the vectors together
     allJoints.insert(allJoints.end(),larm_angles.begin(),larm_angles.end());

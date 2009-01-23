@@ -7,6 +7,7 @@ void ALEnactor::run() {
     std::cout << "ALEnactor::run()" << std::endl;
 
     mproxy->setBodyStiffness(0.40f, 0.1f);
+    //mproxy->setBodyStiffness(0.0f, 0.1f);
 
     static int x = 0;
 
@@ -15,8 +16,8 @@ void ALEnactor::run() {
     //cout << "Done with AL motion stuff" << endl;
 
     cout << "ALEnactor looping:" <<endl;
-    while (running && x++ <5) {
-//    while (running) {
+//    while (running && x++ <1) {
+    while (running) {
         postSensors();
 
         // Get the angles we want to go to this frame from the switchboard
@@ -31,6 +32,8 @@ void ALEnactor::run() {
         // We probably want to sleep webots time and this sleeps real time.
         usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS));
     }
+
+    mproxy->setBodyStiffness(0.0f, 0.1f);
     cout << "ALENACTOR Done"<<endl;
 }
 
@@ -41,11 +44,11 @@ void ALEnactor::postSensors(){
     //actual joint post of the robot before any computation begins
     vector<float> alAngles = mproxy->getBodyAngles();
     //vector<float> alAngleErrors = mproxy->getBodyAngleErrors();
-    cout << "Sensor Angles" <<endl;
-    for(int i = 0; i < 22; i++){
-        //alAngles[i] -= alAngleErrors[i];
-        cout << alAngles[i]<<endl;
-    }
+//     cout << "Sensor Angles" <<endl;
+//     for(int i = 0; i < 22; i++){
+//         //alAngles[i] -= alAngleErrors[i];
+//         cout << alAngles[i]<<endl;
+//     }
 
     sensors->setBodyAngles(alAngles);
 }

@@ -52,6 +52,7 @@ private:
 	const BodyJointCommand *command;
 	const BodyJointCommand *command2;
 	const BodyJointCommand *command3;
+    static const float sitDownAngles[NUM_BODY_JOINTS];
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;

@@ -1,4 +1,13 @@
 #include "MotionSwitchboard.h"
+
+const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
+{1.57f,0.0f,-1.13f,-1.0f,
+ 0.0f,0.0f,-0.96f,2.18f,
+ -1.22f,0.0f,0.0f,0.0f,
+ -0.96f,2.18f,-1.22f,0.0f,
+ 1.57f,0.0f,1.13f,1.01f};
+
+
 MotionSwitchboard::MotionSwitchboard(Sensors *s)
     : sensors(s),
       walkProvider(),
@@ -110,11 +119,20 @@ void MotionSwitchboard::run() {
 
 
     //Build the get up routine
-    // vector<float> initPos = walkProvider.getWalkStance();
-//     cout <<"InitPos:"<< initPos.size() <<endl;
-//     for(int i = 0; i <20; i++)
-//         cout << "initPos["<<i<<"]: " << initPos[i];
+    vector<float> * initPos = new vector<float>(walkProvider.getWalkStance());
+	BodyJointCommand * getUp =
+        new BodyJointCommand(5.0f,
+                             initPos,
+                             Kinematics::INTERPOLATION_LINEAR);
+    scriptedProvider.enqueue(getUp);
 
+    //build the sit down routine
+    cout <<"Sitting Down"<<endl;
+    vector<float> * sitDown = new vector<float>(sitDownAngles,
+                                                sitDownAngles+NUM_JOINTS);
+    BodyJointCommand * sitDownCommand =
+        new BodyJointCommand(4.0f,sitDown,Kinematics::INTERPOLATION_LINEAR);
+    scriptedProvider.enqueue(sitDownCommand);
     while(running) {
 
         if(fcount == 1){
@@ -179,9 +197,7 @@ void MotionSwitchboard::run() {
 
 
 const vector <float> MotionSwitchboard::getNextJoints() {
-    cout << "GetNextJoints" <<endl;
     pthread_mutex_lock(&next_joints_mutex);
-    cout << "GetNextJoints locked" <<endl;
     const vector <float> vec(nextJoints);
     pthread_cond_signal(&calc_new_joints_cond);
     pthread_mutex_unlock(&next_joints_mutex);
