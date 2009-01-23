@@ -25,7 +25,7 @@ public class RGBImage extends TOOLImage {
     public static final int RAW_HEADER_SIZE = 0;
 
     public static final int BYTES_PER_TWO_PIXELS = 6;
-
+    public static final int COLOR_DEPTH = 3;
 
     public static final int Y1_OFFSET = 0;
     public static final int U_OFFSET = 1;

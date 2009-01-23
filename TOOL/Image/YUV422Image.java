@@ -23,7 +23,10 @@ public class YUV422Image extends TOOLImage {
     public static final int RAW_HEADER_SIZE = 0;
 
     public static final int BYTES_PER_TWO_PIXELS = 4;
-
+    // Note that we expand the YUV422 image such that every pixel has a Y,U,and
+    // V component when we load it from a file, even though the image packs
+    // 2 pixels into 4 bytes of data.
+    public static final int COLOR_DEPTH = 3;
 
     public static final int Y1_OFFSET = 0;
     public static final int U_OFFSET = 1;

@@ -49,9 +49,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.lang.Float;
 
-//hack -- remove this include later
-import java.io.File;
-
 //TOOL
 import edu.bowdoin.robocup.TOOL.TOOL;
 import edu.bowdoin.robocup.TOOL.TOOLModule;

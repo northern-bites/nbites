@@ -38,7 +38,6 @@ import edu.bowdoin.robocup.TOOL.Data.SourceManager;
 import edu.bowdoin.robocup.TOOL.Data.DataModule;
 import edu.bowdoin.robocup.TOOL.Calibrate.Calibrate;
 import edu.bowdoin.robocup.TOOL.Calibrate.CalibrateModule;
-import edu.bowdoin.robocup.TOOL.Vision.VisionModule;
 import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEditModule;
 import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEdit;
 import edu.bowdoin.robocup.TOOL.Classifier.ClassifierModule;
@@ -106,7 +105,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private DataManager dataManager;
     private SourceManager sourceManager;
     private ColorTable colorTable;
-    private VisionModule vision;
 
     private List<TOOLModule> modules;
     private HashMap<String, Component> moduleMap;
@@ -185,14 +183,11 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         addModule(new WorldControllerModule(this));
         // 3d rasterizer for fun and for viewing colortable/image distributions
         //addModule(new ZModule(this));
-        //Offline Vision debugger
-        vision = new VisionModule(this);
-        addModule(vision);
+
         // Add color table listeners to the two modules that must be notified
         // whenever the color table changes
         dataManager.addColorTableListener(calibrate);
         dataManager.addColorTableListener(colorEdit);
-        dataManager.addColorTableListener(vision);
 
         setupPane();
 
@@ -221,18 +216,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         sourceManager.addSource(".." + fileSeparator + "branches" + fileSeparator
                                 +"frame_depot" + fileSeparator);
 
-        //temporary color table mod - make a null table
-        try {
-            colorTable = new ColorTable(ColorTable.EMPTY,
-                                        ColorTable.Dimension.LARGE);
-            vision.newColorTable(colorTable);
-            dataManager.notifyDependants();
-            colorEdit.setTable(colorTable);
-        }
-        catch (IOException e) {
-            CONSOLE.error(e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     public void addModule(TOOLModule m) {
@@ -269,6 +252,12 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
         if (System.getProperty("os.name").contains("Mac")) {
             mainWindow.setDefaultLookAndFeelDecorated(true);
+        }
+        else if (System.getProperty("os.name").contains("Windows")) {
+            try {
+            UIManager.setLookAndFeel(
+                                 "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            } catch (Exception e) { }
         }
 
         //init menu needs to happen here, but before everything else, or the
@@ -515,7 +504,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             colorTable.setSoftColors(toggleSoftColors.isSelected());
             // If they had been editing a table earlier, clear out their undos
             calibrate.clearHistory();
-            vision.newColorTable(colorTable);
         }
         catch(IOException  e){
             return;
@@ -545,7 +533,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             // If they had been editing a table earlier, clear out their
             // undos
             calibrate.clearHistory();
-            vision.newColorTable(colorTable);
             dataManager.notifyDependants();
         }
 

@@ -4,14 +4,14 @@ import java.util.Vector;
 
 import edu.bowdoin.robocup.TOOL.TOOL;
 import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
-import edu.bowdoin.robocup.TOOL.Image.ThresholdedImage;
+import edu.bowdoin.robocup.TOOL.Image.ProcessedImage;
 import edu.bowdoin.robocup.TOOL.Image.ColorTable;
 import edu.bowdoin.robocup.TOOL.Data.*;
 
 public class VisionState {
     
     private TOOLImage rawImage;
-    private ThresholdedImage thresholdedImage;
+    private ProcessedImage thresholdedImage;
     private ColorTable  colorTable;
 
     private Vector<FieldObject> objects;
@@ -22,7 +22,7 @@ public class VisionState {
         colorTable = c;
 
         if (rawImage != null && colorTable != null)
-            thresholdedImage = new ThresholdedImage(rawImage, colorTable);
+            thresholdedImage = new ProcessedImage(rawImage, colorTable);
 
         objects = new Vector<FieldObject>();
         ball = null;
@@ -38,7 +38,7 @@ public class VisionState {
     }
 
     public VisionState(TOOLImage newRawImage, 
-		       ThresholdedImage newThreshImage, 
+		       ProcessedImage newThreshImage, 
 		       ColorTable newColorTable){
 	rawImage = newRawImage;
         thresholdedImage = newThreshImage;
@@ -52,7 +52,7 @@ public class VisionState {
         return rawImage;
     }
 
-    public ThresholdedImage getThreshImage() {
+    public ProcessedImage getThreshImage() {
         return thresholdedImage;
     }
 
@@ -65,7 +65,7 @@ public class VisionState {
         rawImage = i;
     }
 
-    public void setThreshImage(ThresholdedImage i) {
+    public void setThreshImage(ProcessedImage i) {
         thresholdedImage = i;
     }
 

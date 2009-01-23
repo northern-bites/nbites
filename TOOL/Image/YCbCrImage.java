@@ -23,37 +23,38 @@ public class YCbCrImage extends TOOLImage {
 
     public static final YCbCrColorSpace COLOR_SPACE = new YCbCrColorSpace();
     public static final int RAW_HEADER_SIZE = 100;
-		public static final int RAW_IMAGE_SIZE = 160*208*3;
-    
+    public static final int COLOR_DEPTH = 3;
+    public static final int RAW_IMAGE_SIZE = 160*208*COLOR_DEPTH;
+
     public YCbCrImage(byte[] rawImage, int w, int h) {
         super(w, h);
-                
+
         pixels = new byte[h][w][COLOR_DEPTH];
 
         readByteArray(rawImage);
     }
 
     public YCbCrImage(DataInputStream input, int width, int height)
-            throws IOException {
+        throws IOException {
         super(width, height);
-        
+
         pixels = new byte[height][width][COLOR_DEPTH];
 
         readInputStream(input);
     }
 
     public void readByteArray(byte[] rawImage) {
-        int i = 0; 
+        int i = 0;
         for (int r = 0; r < getHeight(); r++) {
             for (int c = 0; c < getWidth(); c++)
-		pixels[r][c][0] = rawImage[i++];
-		//pixels[r][c][0] = signedByteToUnsigned(rawImage[i++]);
+                pixels[r][c][0] = rawImage[i++];
+            //pixels[r][c][0] = signedByteToUnsigned(rawImage[i++]);
             for (int c = 0; c < getWidth(); c++)
                 pixels[r][c][2] = rawImage[i++];
-                //pixels[r][c][2] = signedByteToUnsigned(rawImage[i++]);
+            //pixels[r][c][2] = signedByteToUnsigned(rawImage[i++]);
             for (int c = 0; c < getWidth(); c++)
                 pixels[r][c][1] = rawImage[i++];
-                //pixels[r][c][1] = signedByteToUnsigned(rawImage[i++]);
+            //pixels[r][c][1] = signedByteToUnsigned(rawImage[i++]);
         }
     }
 
@@ -66,9 +67,9 @@ public class YCbCrImage extends TOOLImage {
             }
         }
     }
-       
+
     public void writeByteArray(byte[] rawImage) {
-        int i = 0; 
+        int i = 0;
         for (int r = 0; r < getHeight(); r++) {
             for (int c = 0; c < getWidth(); c++)
                 rawImage[i++] = pixels[r][c][0];
@@ -106,7 +107,7 @@ public class YCbCrImage extends TOOLImage {
                 img.setRGB(c, r, cm.getDataElement(rgb, 0));
             }
         }
-		
+
     }
 
 }

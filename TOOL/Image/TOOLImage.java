@@ -20,19 +20,17 @@ import edu.bowdoin.robocup.TOOL.TOOL;
  * All picture formats we rig up for the TOOL should extend this class.
  */
 public abstract class TOOLImage {
-    // Number of bytes per color (since we are in YUV or RGB, it'll be 3)
-    public static final int COLOR_DEPTH = 3;
     protected static final YCbCrColorSpace YCbCr_CS = new YCbCrColorSpace();
     protected byte[][][] pixels;
 
     protected int width;
     protected int height;
-    
+
     protected TOOLImage(int w, int h){
         width = w;
         height = h;
     }
-    
+
     public int getWidth() {
         return width;
     }
@@ -58,8 +56,8 @@ public abstract class TOOLImage {
      * (YCbCr row-by-row or interleaved, YUV422, RGB interleaved, etc.)
      */
     public abstract void writeByteArray(byte[] rawImage);
-    
-    
+
+
     /**
      * Allocates an array of bytes big enough to hold the file information, and
      * fills it with the raw data.  Then calls readByteArray to process the
@@ -70,7 +68,7 @@ public abstract class TOOLImage {
         input.readFully(buffer);
 	readByteArray(buffer);
     }
-    
+
     public byte[] getByteArray() {
         byte[] buffer = new byte[rawImageSize()];
         writeByteArray(buffer);
@@ -78,15 +76,15 @@ public abstract class TOOLImage {
     }
 
     public void writeOutputStream(DataOutputStream output) throws IOException {
-	
-        byte[] buffer = new byte[rawImageSize()];//getWidth()*getHeight()*COLOR_DEPTH];
+
+        byte[] buffer = new byte[rawImageSize()];
 
         writeByteArray(buffer);
         output.write(buffer);
     }
-    
+
     /**
-     * Initializes a BufferedImage based on the contents of the pixels array 
+     * Initializes a BufferedImage based on the contents of the pixels array
      * and the file format.  For instance, NaoSim frames are already in RGB
      * format whereas Aibo frames need to convert from YUV to RGB colorspace.
      */
@@ -104,9 +102,9 @@ public abstract class TOOLImage {
     */
     public byte[][][] getPixels() {
         return pixels;
-    } 
+    }
 
-    
+
     public int[] getYCbCr(int x, int y) {
         return getPixel(x,y);
     }
@@ -118,7 +116,7 @@ public abstract class TOOLImage {
         }
 
         int[] values = new int[3];
-        
+
         values[0] = getComponent(x, y, 0);
         values[1] = getComponent(x, y, 1);
         values[2] = getComponent(x, y, 2);
@@ -129,7 +127,7 @@ public abstract class TOOLImage {
     public int getComponent(int x, int y, int c) {
         return pixels[y][x][c] & 0xff;
     }
-    
+
     /**
      * In JAVA, a byte is always considered as signed when converted
      * to another type (-127 to 127).
