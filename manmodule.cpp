@@ -57,6 +57,12 @@ extern "C"
 
 ALCALL int _createModule( ALPtr<ALBroker> pBroker )
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
+
   // init broker with the main broker inctance
   // from the parent executable
   ALBrokerManager::setInstance(pBroker->fBrokerManager.lock());
@@ -127,6 +133,12 @@ int usage( char* progName )
 
 int main( int argc, char *argv[] )
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
+
   std::cout << "..::: starting MANMODULE revision " << MANMODULE_VERSION_REVISION << " :::.." << std::endl;
   std::cout << "Copyright (c) 2007, Aldebaran-robotics" << std::endl << std::endl;
 
@@ -244,6 +256,11 @@ static boost::shared_ptr<Man> lMan;
 ALCALL int
 _createModule (ALBroker *pBroker)
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
 
   // init broker with the main broker instance
   // from the parent executable
@@ -309,6 +326,12 @@ usage (const char *name)
 int
 main (int argc, char **argv)
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
+
   int i = 1;
   std::string brokerName = "man";
   std::string brokerIP = "";
