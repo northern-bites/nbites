@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

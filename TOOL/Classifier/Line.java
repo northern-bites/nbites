@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
@@ -7,8 +7,7 @@ import java.awt.geom.Line2D;
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
 
-import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.GUI.DefinableShape;
 
 /**
  * @author Nicholas Dunn1
@@ -132,9 +131,9 @@ public class Line extends ClassifierObject implements java.io.Serializable {
 
 
     public void getPointsFromShape(DefinableShape s, double scale) {
-        if (!(s instanceof edu.bowdoin.robocup.TOOL.GUI.Line)) {
+        if (!(s instanceof TOOL.GUI.Line)) {
             System.err.println("Error: in line");
-            TOOL.CONSOLE.error("Error: Tried to pass a non Line shape "+
+            TOOL.TOOL.CONSOLE.error("Error: Tried to pass a non Line shape "+
                                     "into the Line method..");
             return;
         }

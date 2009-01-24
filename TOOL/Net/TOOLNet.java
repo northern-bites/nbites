@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Net;
+package TOOL.Net;
 
 import java.io.IOException;
 
@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 public class TOOLNet implements ActionListener, Runnable {
 

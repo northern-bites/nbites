@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.GUI;
+package TOOL.GUI;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -32,10 +32,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.DataManager;
-import edu.bowdoin.robocup.TOOL.GUI.AutoTextField;
+import TOOL.TOOL;
+import TOOL.Data.DataSet;
+import TOOL.Data.DataManager;
+import TOOL.GUI.AutoTextField;
 
 public class DataSetOptionPanel extends JPanel implements ActionListener {
 

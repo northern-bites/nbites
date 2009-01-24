@@ -1,13 +1,13 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.Rectangle;
-import edu.bowdoin.robocup.TOOL.GUI.CrossPoint;
-import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.GUI.CrossPoint;
+import TOOL.GUI.DefinableShape;
+import TOOL.TOOL;
 
 
 /**

@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Data;
+package TOOL.Data;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

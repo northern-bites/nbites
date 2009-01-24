@@ -2,7 +2,7 @@
 CUR_DIR := .#$(shell pwd)
 PLATFORM := $(shell uname)
 
-TOOL_DIR := edu/bowdoin/robocup/TOOL
+TOOL_DIR := TOOL
 TOOL_SRCS := $(shell ls $(TOOL_DIR)/*.java)
 TOOL_OBJS := $(TOOL_SRCS:%.java=%.class)
 

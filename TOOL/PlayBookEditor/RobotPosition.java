@@ -1,6 +1,6 @@
-package edu.bowdoin.robocup.TOOL.PlayBookEditor;
+package TOOL.PlayBookEditor;
 
-import edu.bowdoin.robocup.TOOL.Data.Field;
+import TOOL.Data.Field;
 import java.awt.Point;
 
 /**

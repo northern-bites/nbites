@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Data;
+package TOOL.Data;
 
-import edu.bowdoin.robocup.TOOL.Calibrate.ColorTableUpdate;
-import edu.bowdoin.robocup.TOOL.Image.ColorTable;
+import TOOL.Calibrate.ColorTableUpdate;
+import TOOL.Image.ColorTable;
 
 public interface ColorTableListener {
     public void colorTableChanged(ColorTable source, ColorTableUpdate update,

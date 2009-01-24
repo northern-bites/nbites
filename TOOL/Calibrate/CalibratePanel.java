@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Calibrate;
+package TOOL.Calibrate;
 
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -23,9 +23,9 @@ import javax.swing.ActionMap;
 import java.awt.event.InputEvent;
 import javax.swing.KeyStroke;
 import javax.swing.AbstractAction;
-import edu.bowdoin.robocup.TOOL.Data.DataListener;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
+import TOOL.Data.DataListener;
+import TOOL.Data.Frame;
+import TOOL.Data.DataSet;
 import javax.swing.BoxLayout;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
@@ -35,10 +35,10 @@ import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.Cursor;
 
-import edu.bowdoin.robocup.TOOL.Image.ImageOverlay;
+import TOOL.Image.ImageOverlay;
 
-import edu.bowdoin.robocup.TOOL.Calibrate.ColorSwatchParent;
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.Calibrate.ColorSwatchParent;
+import TOOL.TOOL;
 
 
 public class CalibratePanel extends JPanel implements DataListener, KeyListener,

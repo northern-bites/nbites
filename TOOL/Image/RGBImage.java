@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 /**
  * Reads the Webots simulator's packed RGB format and converts into usable form

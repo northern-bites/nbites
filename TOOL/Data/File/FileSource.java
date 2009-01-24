@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Data.File;
+package TOOL.Data.File;
 
 import java.io.File;
 import java.util.Collections;
@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Vector;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.DataSource;
-import edu.bowdoin.robocup.TOOL.Data.SourceHandler;
+import TOOL.TOOL;
+import TOOL.Data.DataSet;
+import TOOL.Data.DataSource;
+import TOOL.Data.SourceHandler;
 
 /**
  * Implementation of the DataSource interface on folders of .FRM files.

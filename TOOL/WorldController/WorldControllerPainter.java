@@ -1,6 +1,6 @@
-package edu.bowdoin.robocup.TOOL.WorldController;
-import edu.bowdoin.robocup.TOOL.Data.Field;
-import edu.bowdoin.robocup.TOOL.Image.ImagePanel;
+package TOOL.WorldController;
+import TOOL.Data.Field;
+import TOOL.Image.ImagePanel;
 
 import javax.swing.*;
 import java.awt.*;

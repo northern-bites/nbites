@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.GUI;
+package TOOL.GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,11 +37,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JPanel;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Data.DataTypes;
-import edu.bowdoin.robocup.TOOL.Data.DataTypes.DataType;
-import edu.bowdoin.robocup.TOOL.Net.DataRequest;
-import edu.bowdoin.robocup.TOOL.Net.RemoteRobot;
+import TOOL.TOOL;
+import TOOL.Data.DataTypes;
+import TOOL.Data.DataTypes.DataType;
+import TOOL.Net.DataRequest;
+import TOOL.Net.RemoteRobot;
 
 public class RobotOptionPanel extends JPanel implements ActionListener {
 

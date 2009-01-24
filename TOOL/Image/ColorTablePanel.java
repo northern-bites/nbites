@@ -1,10 +1,10 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEdit;
+import TOOL.ColorEdit.ColorEdit;
 import java.awt.image.BufferedImage;
 import java.awt.event.*;
 

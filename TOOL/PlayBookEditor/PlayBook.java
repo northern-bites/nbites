@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.PlayBookEditor;
+package TOOL.PlayBookEditor;
 
 import java.util.Vector;
 import javax.swing.tree.*;

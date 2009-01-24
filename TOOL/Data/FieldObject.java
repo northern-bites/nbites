@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Data;
+package TOOL.Data;
 
 public interface FieldObject {
 

@@ -38,7 +38,7 @@
  * tool, allowing you to write to the tool.CONSOLE
  */
 
-package edu.bowdoin.robocup.TOOL.Vision;
+package TOOL.Vision;
 
 import java.io.FileInputStream;
 import java.io.IOException;

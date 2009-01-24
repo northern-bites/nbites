@@ -1,6 +1,6 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 import javax.swing.*;
 import java.awt.*;

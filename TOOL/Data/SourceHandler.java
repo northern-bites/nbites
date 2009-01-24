@@ -16,9 +16,9 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Data;
+package TOOL.Data;
 
-import edu.bowdoin.robocup.TOOL.Data.DataSource;
+import TOOL.Data.DataSource;
 
 /**
  * A SourceHandler checks and opens resources stored in a location specified

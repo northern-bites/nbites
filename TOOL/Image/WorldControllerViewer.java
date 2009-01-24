@@ -1,6 +1,6 @@
-package edu.bowdoin.robocup.TOOL.Image;
-import edu.bowdoin.robocup.TOOL.WorldController.WorldControllerPainter;
-import edu.bowdoin.robocup.TOOL.Data.Field;
+package TOOL.Image;
+import TOOL.WorldController.WorldControllerPainter;
+import TOOL.Data.Field;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 

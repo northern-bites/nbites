@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Data;
+package TOOL.Data;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -24,11 +24,11 @@ import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JPanel;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Data.File.FileHandler;
-import edu.bowdoin.robocup.TOOL.GUI.DataSourceObject;
-import edu.bowdoin.robocup.TOOL.GUI.DataSourceOptionPanel;
-import edu.bowdoin.robocup.TOOL.GUI.ListPanel;
+import TOOL.TOOL;
+import TOOL.Data.File.FileHandler;
+import TOOL.GUI.DataSourceObject;
+import TOOL.GUI.DataSourceOptionPanel;
+import TOOL.GUI.ListPanel;
 
 /**
  * Add, remove, and process selection of sources of incoming data (resources).

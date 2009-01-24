@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.ColorEdit;
+package TOOL.ColorEdit;
 
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -13,8 +13,8 @@ import javax.swing.JSlider;
 import javax.swing.JButton;
 import javax.swing.ButtonGroup;
 import javax.swing.BoxLayout;
-import edu.bowdoin.robocup.TOOL.Calibrate.ColorSwatchPanel;
-import edu.bowdoin.robocup.TOOL.GUI.IncrementalSlider;
+import TOOL.Calibrate.ColorSwatchPanel;
+import TOOL.GUI.IncrementalSlider;
 
 
 public class ColorEditPanel extends JPanel implements KeyListener {

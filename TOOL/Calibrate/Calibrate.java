@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Calibrate;
+package TOOL.Calibrate;
 
 import java.lang.Math;
 
@@ -26,11 +26,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 
-import edu.bowdoin.robocup.TOOL.Data.DataListener;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Data.ColorTableListener;
-//import edu.bowdoin.robocup.TOOL.Misc.Pair;
+import TOOL.Data.DataListener;
+import TOOL.Data.DataSet;
+import TOOL.Data.Frame;
+import TOOL.Data.ColorTableListener;
+//import TOOL.Misc.Pair;
 
 
 import java.util.ArrayList;
@@ -46,27 +46,27 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 // Image stuff
-import edu.bowdoin.robocup.TOOL.Image.ColorTable;
-import edu.bowdoin.robocup.TOOL.Image.ImageSwatch;
-import edu.bowdoin.robocup.TOOL.Image.ImagePanel;
-import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
-import edu.bowdoin.robocup.TOOL.Image.ThresholdedImage;
-import edu.bowdoin.robocup.TOOL.Image.PixelSelectionPanel;
-import edu.bowdoin.robocup.TOOL.Image.ImageMarkerPanel;
-import edu.bowdoin.robocup.TOOL.Image.CalibrationDrawingPanel;
-import edu.bowdoin.robocup.TOOL.Image.DrawingPanel;
+import TOOL.Image.ColorTable;
+import TOOL.Image.ImageSwatch;
+import TOOL.Image.ImagePanel;
+import TOOL.Image.TOOLImage;
+import TOOL.Image.ThresholdedImage;
+import TOOL.Image.PixelSelectionPanel;
+import TOOL.Image.ImageMarkerPanel;
+import TOOL.Image.CalibrationDrawingPanel;
+import TOOL.Image.DrawingPanel;
 
-import edu.bowdoin.robocup.TOOL.Image.ImageOverlay;
-import edu.bowdoin.robocup.TOOL.Image.ImageOverlayAction;
+import TOOL.Image.ImageOverlay;
+import TOOL.Image.ImageOverlayAction;
 
-import edu.bowdoin.robocup.TOOL.Vision.Vision;
+import TOOL.Vision.Vision;
 
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
-import edu.bowdoin.robocup.TOOL.GUI.IncrementalSliderParent;
+import TOOL.GUI.IncrementalSliderParent;
 
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 
 

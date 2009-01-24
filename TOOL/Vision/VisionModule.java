@@ -38,7 +38,7 @@
  */
 
 
-package edu.bowdoin.robocup.TOOL.Vision;
+package TOOL.Vision;
 
 //Graphics
 import java.awt.Component;
@@ -50,17 +50,17 @@ import java.util.List;
 import java.lang.Float;
 
 //TOOL
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.TOOLModule;
-import edu.bowdoin.robocup.TOOL.Image.ImagePanel;
-import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
-import edu.bowdoin.robocup.TOOL.Image.ThresholdedImage;
-import edu.bowdoin.robocup.TOOL.Image.ColorTable;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.ColorTableListener;
-import edu.bowdoin.robocup.TOOL.Calibrate.ColorTableUpdate;
-import edu.bowdoin.robocup.TOOL.Vision.TOOLVisionLink;
+import TOOL.TOOL;
+import TOOL.TOOLModule;
+import TOOL.Image.ImagePanel;
+import TOOL.Image.TOOLImage;
+import TOOL.Image.ThresholdedImage;
+import TOOL.Image.ColorTable;
+import TOOL.Data.Frame;
+import TOOL.Data.DataSet;
+import TOOL.Data.ColorTableListener;
+import TOOL.Calibrate.ColorTableUpdate;
+import TOOL.Vision.TOOLVisionLink;
 
 public class VisionModule extends TOOLModule implements ColorTableListener {
 

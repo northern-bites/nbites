@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;

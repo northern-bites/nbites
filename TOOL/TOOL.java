@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL;
+package TOOL;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -33,22 +33,22 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.*;
 
-import edu.bowdoin.robocup.TOOL.Data.DataManager;
-import edu.bowdoin.robocup.TOOL.Data.SourceManager;
-import edu.bowdoin.robocup.TOOL.Data.DataModule;
-import edu.bowdoin.robocup.TOOL.Calibrate.Calibrate;
-import edu.bowdoin.robocup.TOOL.Calibrate.CalibrateModule;
-import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEditModule;
-import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEdit;
-import edu.bowdoin.robocup.TOOL.Classifier.ClassifierModule;
-import edu.bowdoin.robocup.TOOL.Console.Console;
-import edu.bowdoin.robocup.TOOL.GUI.MultiTabbedPane;
-import edu.bowdoin.robocup.TOOL.Image.*;
-import edu.bowdoin.robocup.TOOL.Net.NetworkModule;
-import edu.bowdoin.robocup.TOOL.Net.RobotViewModule;
-import edu.bowdoin.robocup.TOOL.PlayBookEditor.PlayBookEditorModule;
-import edu.bowdoin.robocup.TOOL.SQL.SQLModule;
-import edu.bowdoin.robocup.TOOL.WorldController.WorldControllerModule;
+import TOOL.Data.DataManager;
+import TOOL.Data.SourceManager;
+import TOOL.Data.DataModule;
+import TOOL.Calibrate.Calibrate;
+import TOOL.Calibrate.CalibrateModule;
+import TOOL.ColorEdit.ColorEditModule;
+import TOOL.ColorEdit.ColorEdit;
+import TOOL.Classifier.ClassifierModule;
+import TOOL.Console.Console;
+import TOOL.GUI.MultiTabbedPane;
+import TOOL.Image.*;
+import TOOL.Net.NetworkModule;
+import TOOL.Net.RobotViewModule;
+import TOOL.PlayBookEditor.PlayBookEditorModule;
+import TOOL.SQL.SQLModule;
+import TOOL.WorldController.WorldControllerModule;
 
 import java.util.prefs.*;
 import java.awt.event.WindowListener;
@@ -56,7 +56,7 @@ import java.awt.event.WindowEvent;
 import java.awt.Window;
 
 
-//import edu.bowdoin.robocup.TOOL.ZSpace.ZModule;
+//import TOOL.ZSpace.ZModule;
 
 
 /**

@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.GUI;
+package TOOL.GUI;
 import java.awt.Cursor;
 import java.awt.Point;
 

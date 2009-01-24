@@ -1,4 +1,4 @@
-//package edu.bowdoin.robocup.TOOL.GUI;
+//package TOOL.GUI;
 
 import javax.swing.*;
 import javax.swing.event.*;

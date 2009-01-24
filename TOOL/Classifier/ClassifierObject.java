@@ -1,12 +1,12 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 
-import edu.bowdoin.robocup.TOOL.Misc.Pair;
-import edu.bowdoin.robocup.TOOL.GUI.Movable;
-import edu.bowdoin.robocup.TOOL.GUI.ID_Changeable;
-import edu.bowdoin.robocup.TOOL.GUI.Resizable;
-import edu.bowdoin.robocup.TOOL.GUI.Handle;
-import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
+import TOOL.Misc.Pair;
+import TOOL.GUI.Movable;
+import TOOL.GUI.ID_Changeable;
+import TOOL.GUI.Resizable;
+import TOOL.GUI.Handle;
+import TOOL.GUI.DefinableShape;
 
 import java.awt.Color;
 import java.awt.Point;

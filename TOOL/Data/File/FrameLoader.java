@@ -1,13 +1,13 @@
-package edu.bowdoin.robocup.TOOL.Data.File;
+package TOOL.Data.File;
 
 
-import edu.bowdoin.robocup.TOOL.TOOLException;
-import edu.bowdoin.robocup.TOOL.Image.*;
+import TOOL.TOOLException;
+import TOOL.Image.*;
 import java.io.*;
 import java.util.*;
-import edu.bowdoin.robocup.TOOL.Data.DataModule;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Data.RobotDef;
+import TOOL.Data.DataModule;
+import TOOL.Data.Frame;
+import TOOL.Data.RobotDef;
 
 /**
  * Parses the extensions of the files and determines how best to load them.

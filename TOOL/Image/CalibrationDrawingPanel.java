@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.awt.*;
 

@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Net;
+package TOOL.Net;
 
 import java.net.InetAddress;
 import java.net.Socket;
@@ -29,7 +29,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 public class DataSerializer {
 

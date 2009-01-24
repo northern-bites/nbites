@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -10,9 +10,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 
-import edu.bowdoin.robocup.TOOL.GUI.*;
+import TOOL.GUI.*;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 /**
  * A class that allows the user to draw on the screen using a few different 

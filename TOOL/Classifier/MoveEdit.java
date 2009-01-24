@@ -1,6 +1,6 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
-import edu.bowdoin.robocup.TOOL.GUI.Movable;
+import TOOL.GUI.Movable;
 
 import javax.swing.undo.*;
 import javax.swing.*;

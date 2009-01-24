@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL;
+package TOOL;
 
 // Necessary for listeners
 import java.awt.event.ActionEvent;
@@ -35,11 +35,11 @@ import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.bowdoin.robocup.TOOL.Data.DataListener;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.DataSource;
-import edu.bowdoin.robocup.TOOL.Data.SourceListener;
+import TOOL.Data.DataListener;
+import TOOL.Data.Frame;
+import TOOL.Data.DataSet;
+import TOOL.Data.DataSource;
+import TOOL.Data.SourceListener;
 
 /**
  * Any module for the tool should subclass this one

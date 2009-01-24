@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,16 +9,16 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.ArrayList;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Misc.Pair;
-import edu.bowdoin.robocup.TOOL.Calibrate.VisionState;
-import edu.bowdoin.robocup.TOOL.ColorEdit.*;
-import edu.bowdoin.robocup.TOOL.Data.DataListener;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Image.*;
+import TOOL.TOOL;
+import TOOL.Misc.Pair;
+import TOOL.Calibrate.VisionState;
+import TOOL.ColorEdit.*;
+import TOOL.Data.DataListener;
+import TOOL.Data.DataSet;
+import TOOL.Data.Frame;
+import TOOL.Image.*;
 
-import edu.bowdoin.robocup.TOOL.Image.ClassifierDrawingPanel;
+import TOOL.Image.ClassifierDrawingPanel;
 
 import java.util.LinkedList;
 

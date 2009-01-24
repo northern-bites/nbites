@@ -1,15 +1,15 @@
-package edu.bowdoin.robocup.TOOL.PlayBookEditor;
+package TOOL.PlayBookEditor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.awt.event.*;
 import java.io.*;
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Image.PlayBookEditorViewer;
-import edu.bowdoin.robocup.TOOL.Data.Field;
-import edu.bowdoin.robocup.TOOL.Data.AiboField2008;
-import edu.bowdoin.robocup.TOOL.Data.NaoField2008;
+import TOOL.TOOL;
+import TOOL.Image.PlayBookEditorViewer;
+import TOOL.Data.Field;
+import TOOL.Data.AiboField2008;
+import TOOL.Data.NaoField2008;
 import java.util.ListIterator;
 import java.util.LinkedList;
 

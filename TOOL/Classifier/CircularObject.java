@@ -1,10 +1,10 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Shape;
-import edu.bowdoin.robocup.TOOL.GUI.Ellipse;
-import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.GUI.Ellipse;
+import TOOL.GUI.DefinableShape;
+import TOOL.TOOL;
 
 public abstract class CircularObject extends RectangularFieldObject {
     protected int id, x, y, width, height, r;

@@ -1,12 +1,12 @@
-package edu.bowdoin.robocup.TOOL.Calibrate;
+package TOOL.Calibrate;
 
 import java.util.Vector;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
-import edu.bowdoin.robocup.TOOL.Image.ProcessedImage;
-import edu.bowdoin.robocup.TOOL.Image.ColorTable;
-import edu.bowdoin.robocup.TOOL.Data.*;
+import TOOL.TOOL;
+import TOOL.Image.TOOLImage;
+import TOOL.Image.ProcessedImage;
+import TOOL.Image.ColorTable;
+import TOOL.Data.*;
 
 public class VisionState {
     

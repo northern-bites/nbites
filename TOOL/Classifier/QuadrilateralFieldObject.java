@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import java.awt.Point;
 import java.awt.Color;
@@ -8,9 +8,9 @@ import java.awt.Rectangle;
 
 import java.util.Arrays;
 
-import edu.bowdoin.robocup.TOOL.GUI.DefinableShape;
-import edu.bowdoin.robocup.TOOL.GUI.Quadrilateral;
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.GUI.DefinableShape;
+import TOOL.GUI.Quadrilateral;
+import TOOL.TOOL;
 /**
  * Superclass to all field objects whose shape is generally rectangular;
  * this includes beacons and goals.  Specifically, this class is used to

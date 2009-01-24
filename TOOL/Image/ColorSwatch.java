@@ -1,5 +1,5 @@
 
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,7 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 
-import edu.bowdoin.robocup.TOOL.Vision.Vision;
+import TOOL.Vision.Vision;
 
 public class ColorSwatch extends JPanel implements PropertyChangeListener {
 

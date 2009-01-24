@@ -1,5 +1,5 @@
 
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,8 +12,8 @@ import java.awt.image.BufferedImageOp;
 import java.awt.geom.AffineTransform;
 import java.awt.Color;
 
-import edu.bowdoin.robocup.TOOL.Calibrate.Calibrate;
-import edu.bowdoin.robocup.TOOL.Vision.Vision;
+import TOOL.Calibrate.Calibrate;
+import TOOL.Vision.Vision;
 
 
 /**

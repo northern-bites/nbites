@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.SQL;
+package TOOL.SQL;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -27,12 +27,12 @@ import java.sql.ResultSet;
 import java.util.Vector;
 
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.TOOLException;
-import edu.bowdoin.robocup.TOOL.Data.AbstractDataSet;
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.DataSource;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
+import TOOL.TOOL;
+import TOOL.TOOLException;
+import TOOL.Data.AbstractDataSet;
+import TOOL.Data.DataSet;
+import TOOL.Data.DataSource;
+import TOOL.Data.Frame;
 
 public class SQLSet extends AbstractDataSet {
 

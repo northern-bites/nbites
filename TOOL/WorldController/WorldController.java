@@ -1,13 +1,13 @@
-package edu.bowdoin.robocup.TOOL.WorldController;
+package TOOL.WorldController;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Image.WorldControllerViewer;
-/*import edu.bowdoin.robocup.TOOL.WorldController.Field;
-import edu.bowdoin.robocup.TOOL.WorldController.UDPServer;
+import TOOL.TOOL;
+import TOOL.Image.WorldControllerViewer;
+/*import TOOL.WorldController.Field;
+import TOOL.WorldController.UDPServer;
 */
-import edu.bowdoin.robocup.TOOL.Data.Field;
-import edu.bowdoin.robocup.TOOL.Data.AiboField2008;
-import edu.bowdoin.robocup.TOOL.Data.NaoField2008;
+import TOOL.Data.Field;
+import TOOL.Data.AiboField2008;
+import TOOL.Data.NaoField2008;
 
 import javax.swing.*;
 import java.awt.*;

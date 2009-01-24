@@ -1,10 +1,10 @@
 
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.awt.Color;
 import java.awt.color.ColorSpace;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 /**
  * A ColorSpace representing the YCbCr color space.  Implements the standard

@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Vision;
+package TOOL.Vision;
 
 import java.awt.Color;
 
-import edu.bowdoin.robocup.TOOL.Data.DataSet;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Data.RobotDef;
+import TOOL.Data.DataSet;
+import TOOL.Data.Frame;
+import TOOL.Data.RobotDef;
 
 public interface Vision {
 

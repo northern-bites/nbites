@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -7,7 +7,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 /**
  * Reads the Nao's packed YUV422 format and converts into usable form for us.

@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Net;
+package TOOL.Net;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -37,14 +37,14 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Data.DataTypes;
-import edu.bowdoin.robocup.TOOL.Data.DataTypes.DataType;
-import edu.bowdoin.robocup.TOOL.Image.ImagePanel;
-import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
-import edu.bowdoin.robocup.TOOL.Net.DataRequest;
+import TOOL.TOOL;
+import TOOL.Data.DataTypes;
+import TOOL.Data.DataTypes.DataType;
+import TOOL.Image.ImagePanel;
+import TOOL.Image.TOOLImage;
+import TOOL.Net.DataRequest;
 
-import edu.bowdoin.robocup.TOOL.TOOLModule;
+import TOOL.TOOLModule;
 
 public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 

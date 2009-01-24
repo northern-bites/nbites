@@ -1,12 +1,12 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-import edu.bowdoin.robocup.TOOL.Image.DefaultDrawingPanel;
+import TOOL.Image.DefaultDrawingPanel;
 
 /**
  * @author Nicholas Dunn

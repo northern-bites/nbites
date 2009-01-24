@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Calibrate;
+package TOOL.Calibrate;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -17,8 +17,8 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import java.util.HashMap;
 
-import edu.bowdoin.robocup.TOOL.ColorEdit.ColorEditPanel;
-import edu.bowdoin.robocup.TOOL.Vision.Vision;
+import TOOL.ColorEdit.ColorEditPanel;
+import TOOL.Vision.Vision;
 
 /**
  * A simple class which holds individual ColorSwatches.  Each

@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.ColorEdit;
+package TOOL.ColorEdit;
 
 import java.awt.*;
 import java.awt.event.*;

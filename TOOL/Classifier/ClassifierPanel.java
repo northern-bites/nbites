@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Classifier;
+package TOOL.Classifier;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
-import edu.bowdoin.robocup.TOOL.Image.ClassifierDrawingPanel;
+import TOOL.Image.ClassifierDrawingPanel;
 
 
 

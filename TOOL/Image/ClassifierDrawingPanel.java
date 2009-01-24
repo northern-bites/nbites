@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 
 import javax.swing.*;
@@ -13,9 +13,9 @@ import java.util.Stack;
 
 import java.awt.image.BufferedImage;
 import java.awt.geom.*;
-import edu.bowdoin.robocup.TOOL.Classifier.*;
-import edu.bowdoin.robocup.TOOL.Misc.Pair;
-import edu.bowdoin.robocup.TOOL.Vision.Vision;
+import TOOL.Classifier.*;
+import TOOL.Misc.Pair;
+import TOOL.Vision.Vision;
 
 import java.io.*;
 

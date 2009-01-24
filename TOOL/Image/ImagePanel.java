@@ -1,5 +1,5 @@
 
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -19,7 +19,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 /**
  * The ImagePanel class is intended to be an easy-to-implement all around

@@ -1,9 +1,9 @@
-package edu.bowdoin.robocup.TOOL.Calibrate;
+package TOOL.Calibrate;
 
 import java.util.Vector;
 import java.util.Iterator;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 /**
  * Class is a data structure to hold changes to the color table. 

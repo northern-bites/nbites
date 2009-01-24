@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 
 import java.awt.Color;
@@ -9,7 +9,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
+import TOOL.TOOL;
 
 /**
  * @author Nicholas Dunn

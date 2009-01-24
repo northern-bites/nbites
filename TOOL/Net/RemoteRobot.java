@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TOOL.  If not, see <http://www.gnu.org/licenses/>.
 
-package edu.bowdoin.robocup.TOOL.Net;
+package TOOL.Net;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,14 +27,14 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.TOOLException;
-import edu.bowdoin.robocup.TOOL.Data.DataSource;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
-import edu.bowdoin.robocup.TOOL.Data.File.FileSet;
-import edu.bowdoin.robocup.TOOL.Data.File.FrameLoader;
-import edu.bowdoin.robocup.TOOL.Image.ThresholdedImage;
-import edu.bowdoin.robocup.TOOL.Image.TOOLImage;
+import TOOL.TOOL;
+import TOOL.TOOLException;
+import TOOL.Data.DataSource;
+import TOOL.Data.Frame;
+import TOOL.Data.File.FileSet;
+import TOOL.Data.File.FrameLoader;
+import TOOL.Image.ThresholdedImage;
+import TOOL.Image.TOOLImage;
 
 /**
  * A RemoteRobot object represents an advanced DataSet layered over a network

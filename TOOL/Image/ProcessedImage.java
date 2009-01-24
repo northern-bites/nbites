@@ -1,11 +1,11 @@
-package edu.bowdoin.robocup.TOOL.Image;
+package TOOL.Image;
 
 import java.util.List;
 import java.util.Iterator;
 
-import edu.bowdoin.robocup.TOOL.TOOL;
-import edu.bowdoin.robocup.TOOL.Vision.TOOLVisionLink;
-import edu.bowdoin.robocup.TOOL.Data.Frame;
+import TOOL.TOOL;
+import TOOL.Vision.TOOLVisionLink;
+import TOOL.Data.Frame;
 
 /**
  * @author George Slavov

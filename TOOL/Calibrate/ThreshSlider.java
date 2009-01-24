@@ -1,4 +1,4 @@
-package edu.bowdoin.robocup.TOOL.Calibrate;
+package TOOL.Calibrate;
 
 import java.awt.Component;
 import javax.swing.JLabel;
@@ -7,9 +7,9 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
-import edu.bowdoin.robocup.TOOL.Image.ImageOverlay;
+import TOOL.Image.ImageOverlay;
 
-import edu.bowdoin.robocup.TOOL.GUI.IncrementalSlider;
+import TOOL.GUI.IncrementalSlider;
 
 /**
  * Modifies a slider to work with our calibration module, mainly to change the
