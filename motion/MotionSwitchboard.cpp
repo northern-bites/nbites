@@ -153,7 +153,7 @@ void MotionSwitchboard::run() {
 }
 
 void MotionSwitchboard::processProviders(){
-    cout << "Switchboard stepping" <<endl;
+    //cout << "Switchboard stepping" <<endl;
     //At the beginning of each frame, we need to update the sensor values
     //that are tied to
     //sensors->setBodyAngles(nextJoints); // WATCH THIS LINE!! IS IT RIGHT?
@@ -215,7 +215,7 @@ void MotionSwitchboard::processProviders(){
             nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
         }
     }else{
-        cout << "Skipping bodyprovider" <<endl;
+        //cout << "Skipping bodyprovider" <<endl;
     }
     pthread_mutex_unlock(&next_joints_mutex);
 
