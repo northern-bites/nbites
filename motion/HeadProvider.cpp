@@ -30,8 +30,6 @@ void HeadProvider::calculateNextJoints() {
 
 	if (!headQueue.empty() ) {
 		setNextChainJoints( HEAD_CHAIN, headQueue.front() );
-		cout << "headqueuefront 0 is " << headQueue.front().at(0) << endl;
-		cout << "headqueuefront 1 is " << headQueue.front().at(1) << endl;
 		headQueue.pop();
 	}
 	else {
@@ -64,6 +62,7 @@ void HeadProvider::setNextHeadCommand() {
 			headQueue.push(choppedHeadCommand->front().at(HEAD_CHAIN));
 			choppedHeadCommand->pop();
 		}
+
 		delete choppedHeadCommand;
 	}
 }
