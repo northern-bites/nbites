@@ -271,8 +271,14 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
             rightFootFSR.frontLeft, rightFootFSR.frontRight,
             rightFootFSR.rearLeft, rightFootFSR.rearRight;
         serial.write_floats(v);
-        v = sensors->getInertial();
+        const Inertial inertial(sensors->getInertial());
+
+        v.clear();
+        v += inertial.accX, inertial.accY, inertial.accZ,
+            inertial.gyrX, inertial.gyrY,
+            inertial.angleX, inertial.angleY;
         serial.write_floats(v);
+
         v = sensors->getSonar();
         serial.write_floats(v);
 #endif

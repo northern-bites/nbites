@@ -8,8 +8,8 @@
 // Sensor locators for the sensor array returned from the robot. 
 const int NUM_ERS7_SENSORS = 16;
 const int NUM_ERS220_SENSORS = 16;
-const int NUM_NAO_SENSORS = 14; // 6 FSR, 5 Inertial, 2 Sonar
-const int NUM_IMPORTANT_SENSORS = 8;
+const int NUM_NAO_SENSORS = 17; // 8 FSR, 7 Inertial, 2 Sonar
+const int NUM_IMPORTANT_SENSORS = 8; // wtf?! this is unused
 const int NUM_LED_LIGHTS = 20;
 const int NUM_SENSOR_IDS = 34;
 
@@ -18,7 +18,7 @@ const int NUM_SENSORS = NUM_ERS7_SENSORS; // since both ers7 and ers220 have
                                           // the same number of sensors
 #elif ROBOT(NAO)
 const int NUM_SENSORS = NUM_NAO_SENSORS;
-const int NUM_INERTIAL_SENSORS = 5;
+const int NUM_INERTIAL_SENSORS = 7;
 #else
 #  error "Undefined robot type"
 #endif

@@ -228,6 +228,38 @@ void Man::syncWithALMemory() {
     }
     sensors.setLeftFootBumper(leftFootBumperLeft, leftFootBumperRight);
     sensors.setRightFootBumper(rightFootBumperLeft, rightFootBumperRight);
+
+    // Inertial values. This includes, accelerometers, gyros and the angleX,
+    // angleY filtered values which denote body tilt.
+    float accX = 0.0f, accY = 0.0f, accZ = 0.0f,
+        gyrX = 0.0f, gyrY = 0.0f,
+        angleX = 0.0f, angleY = 0.0f;
+    try {
+        accX = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"), 0));
+        accY = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"), 0));
+        accZ = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"), 0));
+        gyrX = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value"), 0));
+        gyrY = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value"), 0));
+        angleX = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value"), 0));
+        angleY = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value"), 0));
+    } catch(ALError &e) {
+        cout << "Failed to read inertial unit values" << endl;
+    }
+    sensors.setInertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
 }
 
 
@@ -591,12 +623,12 @@ Man::run ()
         // This call syncs all sensors values: bumpers, fsr, inertial, etc.
         syncWithALMemory();
 
+        /*
         const FootBumper leftFootBumper(sensors.getLeftFootBumper());
         const FootBumper rightFootBumper(sensors.getRightFootBumper());
 
         bool temp = leftFootBumper.left || leftFootBumper.right;
 
-        /*
         cout << "leftFootBumper: "
              << boolalpha << temp << endl;
         */
@@ -609,6 +641,7 @@ Man::run ()
         */
 
         // testing the fsr values we get from ALMemory
+        /*
         const FSR leftFoot(sensors.getLeftFootFSR());
         const FSR rightFoot(sensors.getRightFootFSR());
 
@@ -625,6 +658,22 @@ Man::run ()
              << "    RL: " << rightFoot.rearLeft
              << "    RR: " << rightFoot.rearRight
              << endl;
+        */
+
+        // testing the inertial values we get from ALMemory
+        /*
+        const Inertial inertial(sensors.getInertial());
+
+        cout << "Inertial values:" << endl
+             << "    accX: " << inertial.accX
+             << "    accY: " << inertial.accY
+             << "    accZ: " << inertial.accZ
+             << "    gyrX: " << inertial.gyrX
+             << "    gyrY: " << inertial.gyrY
+             << "    angleX: " << inertial.angleX
+             << "    angleY: " << inertial.angleY
+             << endl;
+        */
 
 #endif
 #endif

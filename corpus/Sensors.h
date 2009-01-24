@@ -63,6 +63,22 @@ struct FootBumper {
     bool right;
 };
 
+struct Inertial {
+    Inertial(const float _accX, const float _accY, const float _accZ,
+             const float _gyrX, const float _gyrY,
+             const float _angleX, const float _angleY)
+        : accX(_accX), accY(_accY), accZ(_accZ),
+          gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
+
+    float accX;
+    float accY;
+    float accZ;
+    float gyrX;
+    float gyrY;
+    float angleX;
+    float angleY;
+};
+
 
 class Sensors {
   //friend class Man;
@@ -73,18 +89,18 @@ class Sensors {
     // Locking data retrieval methods
     //   Each of these methods first locks the associated mutex, copies the
     //   requested values, then unlocks the mutex before returning
-    std::vector<float> getBodyAngles();
-    std::vector<float> getVisionBodyAngles();
-    const float getBodyAngle(const int index); // NOT wrapped for python use
-    std::vector<float> getBodyAngleErrors();
-	const float getBodyAngleError(int index); // Also NOT wrapped for python
+    const std::vector<float> getBodyAngles() const;
+    const std::vector<float> getVisionBodyAngles() const;
+    const float getBodyAngle(const int index) const;//NOT wrapped for python use
+    const std::vector<float> getBodyAngleErrors() const ;
+	const float getBodyAngleError(int index) const; //NOT wrapped for python use
 #if ROBOT(NAO)
-    const FSR getLeftFootFSR();
-    const FSR getRightFootFSR();
-    const FootBumper getLeftFootBumper();
-    const FootBumper getRightFootBumper();
-    std::vector<float> getInertial();
-    std::vector<float> getSonar();
+    const FSR getLeftFootFSR() const ;
+    const FSR getRightFootFSR() const ;
+    const FootBumper getLeftFootBumper() const;
+    const FootBumper getRightFootBumper() const;
+    const Inertial getInertial() const;
+    const std::vector<float> getSonar() const;
 #endif
 
     // Locking data storage methods
@@ -103,7 +119,10 @@ class Sensors {
     void setLeftFootBumper(const FootBumper& bumper);
     void setRightFootBumper(const float left, const float right);
     void setRightFootBumper(const FootBumper& bumper);
-    void setInertial(std::vector<float>& v);
+    void setInertial(const float accX, const float accY, const float accZ,
+                     const float gyrX, const float gyrY,
+                     const float angleX, const float angleY);
+    void setInertial(const Inertial &inertial);
     void setSonar(float l, float r);
 #endif
 
@@ -137,16 +156,16 @@ class Sensors {
     void add_to_module();
 
     // Locking mutexes
-    pthread_mutex_t angles_mutex;
-    pthread_mutex_t vision_angles_mutex;
-    pthread_mutex_t errors_mutex;
+    mutable pthread_mutex_t angles_mutex;
+    mutable pthread_mutex_t vision_angles_mutex;
+    mutable pthread_mutex_t errors_mutex;
 #if ROBOT(NAO)
-    pthread_mutex_t fsr_mutex;
-    pthread_mutex_t bumper_mutex;
-    pthread_mutex_t inertial_mutex;
-    pthread_mutex_t sonar_mutex;
+    mutable pthread_mutex_t fsr_mutex;
+    mutable pthread_mutex_t bumper_mutex;
+    mutable pthread_mutex_t inertial_mutex;
+    mutable pthread_mutex_t sonar_mutex;
 #endif
-    pthread_mutex_t image_mutex;
+    mutable pthread_mutex_t image_mutex;
 
     // Joint angles and sensors
     // Make the following distinction: bodyAngles is a vector of the most current
@@ -163,7 +182,7 @@ class Sensors {
     FootBumper leftFootBumper;
     FootBumper rightFootBumper;
     // Inertial sensors
-    std::vector<float> inertial;
+    Inertial inertial;
     // Sonar sensors
     float sonarLeft;
     float sonarRight;

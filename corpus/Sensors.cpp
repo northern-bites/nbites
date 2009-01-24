@@ -49,6 +49,7 @@ PySensors_update(PySensors *self)
       leftFootFSR.rearLeft, leftFootFSR.rearRight,
       rightFootFSR.frontLeft, rightFootFSR.frontRight,
       rightFootFSR.rearLeft, rightFootFSR.rearRight;
+
   for (i = 0; i < (int)values.size(); i++) {
     if (i < PyList_Size(self->fsr))
       PyList_SET_ITEM(self->fsr, i, PyFloat_FromDouble(values[i]));
@@ -56,7 +57,13 @@ PySensors_update(PySensors *self)
       PyList_Append(self->fsr, PyFloat_FromDouble(values[i]));
   }
 
-  values = sensors->getInertial(); //Gyros should eventually be converted to DEG
+  // Gyros should eventually by converted to DEG
+  values.clear();
+  const Inertial inertial(sensors->getInertial());
+  values += inertial.accX, inertial.accY, inertial.accZ,
+      inertial.gyrX, inertial.gyrY,
+      inertial.angleX, inertial.angleY;
+
   for (i = 0; i < (int)values.size(); i++) {
     if (i < PyList_Size(self->inertial))
       PyList_SET_ITEM(self->inertial, i, PyFloat_FromDouble(values[i]));
@@ -351,7 +358,7 @@ Sensors::Sensors ()
     rightFootFSR(leftFootFSR),
     leftFootBumper(0.0f, 0.0f),
     rightFootBumper(0.0f, 0.0f),
-    inertial(NUM_INERTIAL_SENSORS),
+    inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
 #endif
     image(&global_image[0]), pySensors(NULL)
 {
@@ -390,8 +397,8 @@ Sensors::~Sensors ()
 #endif
 }
 
-vector<float>
-Sensors::getBodyAngles ()
+const vector<float>
+Sensors::getBodyAngles () const
 {
   pthread_mutex_lock (&angles_mutex);
 
@@ -402,8 +409,8 @@ Sensors::getBodyAngles ()
   return vec;
 }
 
-vector<float>
-Sensors::getVisionBodyAngles()
+const vector<float>
+Sensors::getVisionBodyAngles() const
 {
   pthread_mutex_lock (&vision_angles_mutex);
 
@@ -415,7 +422,7 @@ Sensors::getVisionBodyAngles()
 }
 
 const float
-Sensors::getBodyAngle(const int index) {
+Sensors::getBodyAngle(const int index) const {
   pthread_mutex_lock (&angles_mutex);
 
   const float angle = bodyAngles[index];
@@ -425,8 +432,8 @@ Sensors::getBodyAngle(const int index) {
   return angle;
 }
 
-vector<float>
-Sensors::getBodyAngleErrors ()
+const vector<float>
+Sensors::getBodyAngleErrors () const
 {
   pthread_mutex_lock (&errors_mutex);
 
@@ -438,7 +445,7 @@ Sensors::getBodyAngleErrors ()
 }
 
 const float
-Sensors::getBodyAngleError (int index)
+Sensors::getBodyAngleError (int index) const
 {
 	pthread_mutex_lock (&errors_mutex);
 
@@ -489,7 +496,7 @@ Sensors::setBodyAngleErrors (vector<float>& v)
 #if ROBOT(NAO)
 
 const FSR
-Sensors::getLeftFootFSR ()
+Sensors::getLeftFootFSR () const
 {
   pthread_mutex_lock (&fsr_mutex);
 
@@ -501,7 +508,7 @@ Sensors::getLeftFootFSR ()
 }
 
 const FSR
-Sensors::getRightFootFSR ()
+Sensors::getRightFootFSR () const
 {
   pthread_mutex_lock (&fsr_mutex);
 
@@ -513,7 +520,7 @@ Sensors::getRightFootFSR ()
 }
 
 const FootBumper
-Sensors::getLeftFootBumper()
+Sensors::getLeftFootBumper() const
 {
     pthread_mutex_lock (&bumper_mutex);
 
@@ -525,7 +532,7 @@ Sensors::getLeftFootBumper()
 }
 
 const FootBumper
-Sensors::getRightFootBumper()
+Sensors::getRightFootBumper() const
 {
     pthread_mutex_lock (&bumper_mutex);
 
@@ -536,20 +543,20 @@ Sensors::getRightFootBumper()
     return bumper;
 }
 
-vector<float>
-Sensors::getInertial ()
+const Inertial
+Sensors::getInertial () const
 {
   pthread_mutex_lock (&inertial_mutex);
 
-  vector<float> vec(inertial);
+  const Inertial inert(inertial);
 
   pthread_mutex_unlock (&inertial_mutex);
 
-  return vec;
+  return inert;
 }
 
-vector<float>
-Sensors::getSonar ()
+const vector<float>
+Sensors::getSonar () const
 {
   pthread_mutex_lock (&sonar_mutex);
 
@@ -560,6 +567,43 @@ Sensors::getSonar ()
   pthread_mutex_unlock (&sonar_mutex);
 
   return vec;
+}
+
+void
+Sensors::setBodyAngles (vector<float>& v)
+{
+  pthread_mutex_lock (&angles_mutex);
+
+  bodyAngles = v;
+  /*
+  cout << "Body angles in sensors";
+  for (int i = 0 ; i < 22; i++){
+    cout <<  bodyAngles[i] << " ";
+
+  }
+  cout << endl;
+  */
+  pthread_mutex_unlock (&angles_mutex);
+}
+
+void
+Sensors::setVisionBodyAngles (vector<float>& v)
+{
+  pthread_mutex_lock (&vision_angles_mutex);
+
+  visionBodyAngles = v;
+
+  pthread_mutex_unlock (&vision_angles_mutex);
+}
+
+void
+Sensors::setBodyAngleErrors (vector<float>& v)
+{
+  pthread_mutex_lock (&errors_mutex);
+
+  bodyAnglesError = v;
+
+  pthread_mutex_unlock (&errors_mutex);
 }
 
 void
@@ -636,7 +680,19 @@ Sensors::setRightFootBumper(const FootBumper& bumper)
 }
 
 void
-Sensors::setInertial (vector<float>& v)
+Sensors::setInertial(const float accX, const float accY, const float accZ,
+                     const float gyrX, const float gyrY,
+                     const float angleX, const float angleY)
+{
+    pthread_mutex_lock (&inertial_mutex);
+
+    inertial = Inertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
+
+    pthread_mutex_unlock (&inertial_mutex);
+}
+
+void
+Sensors::setInertial (const Inertial &v)
 {
   pthread_mutex_lock (&inertial_mutex);
 
