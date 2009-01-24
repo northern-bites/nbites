@@ -1,4 +1,8 @@
 
+# Redirect standard error to standard out
+import sys
+_stderr = sys.stderr
+sys.stderr = sys.stdout
 import time
 
 # Packages and modules from super-directories
