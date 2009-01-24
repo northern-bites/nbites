@@ -48,6 +48,13 @@ public class VisionState {
         ball = null;
     }
 
+
+    //This updates the whole processed stuff - the thresholded image, the field objects and the ball
+    public void update(ProcessedImage thresholdedImage) {
+	if (thresholdedImage != null)
+	    thresholdedImage.thresholdImage();
+    }
+
     public TOOLImage getImage() {
         return rawImage;
     }

@@ -56,6 +56,7 @@ import TOOL.Image.ImageMarkerPanel;
 import TOOL.Image.CalibrationDrawingPanel;
 import TOOL.Image.DrawingPanel;
 
+
 import TOOL.Image.ImageOverlay;
 import TOOL.Image.ImageOverlayAction;
 
@@ -106,10 +107,11 @@ public class Calibrate implements DataListener, MouseListener,
     protected ImageOverlay overlay;
     protected TOOLImage rawImage;
     protected int imageID;
-    protected ThresholdedImage thresholdedImage;
+    protected ProcessedImage thresholdedImage;
     protected TOOL tool;
     protected ColorTable colorTable;
     protected CalibratePanel calibratePanel;
+    protected VisionState visionState;
 
     // Holds the changes made to overlay; the rest are taken care of
     // within ColorTable
@@ -422,8 +424,8 @@ public class Calibrate implements DataListener, MouseListener,
         pushUndo(currentMove);
         redoStack.clear();
 
-        //threshold the full image again
-        thresholdedImage.thresholdImage();
+        //update the visionState
+        visionState.update(thresholdedImage);
         //lastly, need to repaint
         // simply repaint the selector, as underlying image hasn't changed
         selector.repaint();
@@ -573,8 +575,8 @@ public class Calibrate implements DataListener, MouseListener,
         redoStack.clear();
 
 
-        //threshold the full image again
-        thresholdedImage.thresholdImage();
+        //update the vision state (which thresholds the whole image again, and updates the objects)
+        visionState.update(thresholdedImage);
         //lastly, need to repaint
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
@@ -704,7 +706,8 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.revert(overlayChanges);
         }
 
-        thresholdedImage.thresholdImage();
+	//update the thresholded image by calling visionstate.update
+        visionState.update(thresholdedImage);
         displayer.updateImage(thresholdedImage);
         selector.repaint();
 
@@ -756,7 +759,8 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.execute(overlayChanges);
         }
 
-        thresholdedImage.thresholdImage();
+	//update the thresholded image by calling update on visionstate
+        visionState.update(thresholdedImage);
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
         selector.repaint();
@@ -1019,11 +1023,11 @@ public class Calibrate implements DataListener, MouseListener,
         if (!f.hasImage())
             return;
 
-        VisionState v = new VisionState(f, tool.getColorTable());
-        rawImage = v.getImage();
+        visionState = new VisionState(f, tool.getColorTable());
+        rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
-        thresholdedImage = v.getThreshImage();
-        colorTable = v.getColorTable();
+        thresholdedImage = visionState.getThreshImage();
+        colorTable = visionState.getColorTable();
 
         // Since we now handle different sized frames, it's possible to
         // switch between modes, changing the image's size without updating
