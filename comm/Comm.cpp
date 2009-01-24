@@ -414,7 +414,8 @@ c_init_comm (void)
 #ifdef USE_PYCOMM_FAKE_BACKEND
   Sensors *s = new Sensors();
   Vision *v = new Vision(new NaoPose(s), new Profiler(&micro_time));
-  PyObject *pcomm = PyComm_new(new Comm(s, v));
+  shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
+  PyObject *pcomm = PyComm_new(new Comm(synchro, s, v));
   PyModule_AddObject(comm_module, "inst", pcomm);
 #endif
   
