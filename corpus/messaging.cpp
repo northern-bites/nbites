@@ -41,19 +41,30 @@ T MessagePost<T>::retrieve()
 }
 
 template <class T>
-void MessageList<T>::append(T &copy)
+void MessageQueue<T>::append(T &copy)
 {
     assert(lock());
-    data.push_back(copy);
+    data.push_back(new T(copy));
     assert(release());
 }
 
 template <class T>
-T MessageList<T>::retrieve()
+T* MessageQueue<T>::retrieve()
 {
-    T copy;
+    if (data.empty())
+        return NULL;
+
+    T* copy;
     assert(lock());
     copy = data.pop_front();
     assert(release());
     return copy;
+}
+
+template <class T>
+std::list<T*> MessageQueue<T>::retrieveAll()
+{
+    std::list<T*> list;
+    list.swap(data);
+    return list;
 }

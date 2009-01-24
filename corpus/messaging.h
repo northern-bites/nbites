@@ -40,17 +40,18 @@ class MessagePost
 };
 
 template <class T>
-class MessageList {
+class MessageQueue {
 
   public:
     std::list<T> data;
 
   public:
-    MessageList() : data() { };
+    MessageQueue() : data() { };
 
   public:
     void append(T &copy);
-    T    retrieve();
+    T*   retrieve();
+    std::list<T*> retrieveAll();
 };
 
 
