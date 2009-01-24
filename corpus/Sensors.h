@@ -95,8 +95,8 @@ class Sensors {
     const std::vector<float> getBodyAngleErrors() const ;
 	const float getBodyAngleError(int index) const; //NOT wrapped for python use
 #if ROBOT(NAO)
-    const FSR getLeftFootFSR() const ;
-    const FSR getRightFootFSR() const ;
+    const FSR getLeftFootFSR() const;
+    const FSR getRightFootFSR() const;
     const FootBumper getLeftFootBumper() const;
     const FootBumper getRightFootBumper() const;
     const Inertial getInertial() const;
@@ -104,7 +104,7 @@ class Sensors {
 #endif
 
     // Locking data storage methods
-    //   Each of these methods first lockes the associated mutex, stores
+    //   Each of these methods first locks the associated mutex, stores
     //   the specified values, then unlocks the mutex before returning
     void setBodyAngles(std::vector<float>& v);
     void setVisionBodyAngles(std::vector<float>& v);
