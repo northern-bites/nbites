@@ -31,7 +31,7 @@ typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 //know the length of a motion frame!!
 class WalkProvider : public MotionProvider {
 public:
-    WalkProvider();
+    WalkProvider(Sensors *s);
     virtual ~WalkProvider();
 
     void requestStop();
@@ -42,6 +42,8 @@ public:
 
 private:
     virtual void setActive();
+
+    Sensors *sensors;
 
     WalkingParameters walkParameters;
     StepGenerator stepGenerator;

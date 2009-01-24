@@ -73,6 +73,7 @@ using std::max;
 #include "WalkingLeg.h"
 #include "Kinematics.h"
 #include "CoordFrame.h"
+#include "Sensors.h"
 using namespace boost::numeric;
 using namespace Kinematics;
 
@@ -89,7 +90,7 @@ static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at 
 
 class StepGenerator {
 public:
-    StepGenerator(const WalkingParameters *params);
+    StepGenerator(Sensors * s, const WalkingParameters *params);
     ~StepGenerator();
 
     zmp_xy_tuple generate_zmp_ref();
@@ -162,6 +163,7 @@ private:
     ublas::matrix<float> initStartLeft;
     ublas::matrix<float> initStartRight;
 
+    Sensors * sensors;
     const WalkingParameters *walkParams;
     bool nextStepIsLeft;
 

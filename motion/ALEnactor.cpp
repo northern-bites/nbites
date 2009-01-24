@@ -7,7 +7,7 @@ const int ALEnactor::MOTION_FRAME_RATE = 50;
 const float ALEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f / ALEnactor::MOTION_FRAME_RATE;
 const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RATE;
 
-#define NO_ACTUAL_MOTION
+//#define NO_ACTUAL_MOTION
 
 #ifdef NAOQI1
 void ALEnactor::run() {
@@ -16,7 +16,7 @@ void ALEnactor::run() {
 #ifdef NO_ACTUAL_MOTION
     mproxy->setBodyStiffness(0.0f, 0.1f);
 #else
-    mproxy->setBodyStiffness(0.40f, 0.1f);
+    mproxy->setBodyStiffness(0.80f, 0.1f);
 #endif
 
     //vector<float> rarm(4,M_PI/4);

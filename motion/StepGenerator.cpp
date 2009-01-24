@@ -1,7 +1,7 @@
 #include "StepGenerator.h"
 #include <iostream>
 
-StepGenerator::StepGenerator(const WalkingParameters *params)
+StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     : x(0.0f), y(0.0f), theta(0.0f),
       _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
@@ -11,6 +11,7 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
       if_Transform(CoordFrame3D::identity3D()),
       initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
       initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
+      sensors(s),
       walkParams(params), nextStepIsLeft(true),
       leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
       controller_x(new PreviewController()),
@@ -19,10 +20,10 @@ StepGenerator::StepGenerator(const WalkingParameters *params)
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
-    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\n");
+    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\n");
 #endif
 
-    setWalkVector(30,0,0); // for testing purposes. The function doesn't even
+    setWalkVector(5,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -35,7 +36,7 @@ StepGenerator::~StepGenerator(){
 
 /**
  * Central method to get the previewed zmp_refernce values
- * In the process of getting these values, this method handles the following:
+ * In the process of getting these values, this method handles the following:    80
  *
  *  * Handles transfer from futureSteps list to the currentZMPDsteps list.
  *    When the Future ZMP values we want run out, we pop the next future step
@@ -47,21 +48,25 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     static float lastZMP_x = 0;
     static float lastZMP_y = 0;
 
-    while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES) {
+    //Generate enough ZMPs so a) the controller can run
+    //and                     b) there are enough steps
+    while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES ||
+           futureSteps.size() + currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS) {
         if (futureSteps.size() < 1  || futureSteps.size() +
             currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc%10 == 0){
+            if(fc == 4){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
-            }else if (fc%5 == 0){
-                //cout << "MOVE FORWARD!!"<<endl;
-                //Change the x vector to be moving forward
-                x =30;
             }
+//             else if (fc%5 == 0){
+//                 cout << "MOVE FORWARD!!"<<endl;
+//                 //Change the x vector to be moving forward
+//                 x =5;
+//             }
         }
         else {
             boost::shared_ptr<Step> nextStep = futureSteps.front();
@@ -102,9 +107,28 @@ void StepGenerator::tick_controller(){
     float zmp_x = controller_x->getZMP();
     float zmp_y = controller_y->getZMP();
 
+    vector<float> bodyAngles = sensors->getBodyAngles();
+    float lleg_angles[LEG_JOINTS],rleg_angles[LEG_JOINTS];
+    int bi = HEAD_JOINTS+ARM_JOINTS;
+    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
+        lleg_angles[i] = bodyAngles[bi];
+    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
+        rleg_angles[i] = bodyAngles[bi];
+
+    //pick the supporting leg to decide how to calc. actual com pos
+    //Currently hacked pretty heavily, and only the Y actually works
+    //need to apply some coord. translations for this to actually work
+    //also, beware of the time delay between sent commands and the robot
+    ufvector3 leg_dest = Kinematics::forwardKinematics(LLEG_CHAIN,
+                                                       lleg_angles);
+    (leftLeg.stateIsDoubleSupport()?
+     LLEG_CHAIN: RLEG_CHAIN);
+    float real_com_x = leg_dest(0);
+    float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
+    printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
     static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\n",
-            ttime,com_x,com_y,pre_x,pre_y,zmp_x,zmp_y);
+    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\t%f\t%f\n",
+            ttime,com_x,com_y,pre_x,pre_y,zmp_x,zmp_y,real_com_x,real_com_y);
     ttime += 0.02f;
 #endif
 }
@@ -265,7 +289,7 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     //   hurting us. This could be fixed with an observer
     // in anycase, we'll leave this at -20 for now. (The effect is that
     // the com path 'pauses' over the support foot, which is quite nice)
-    float X_ZMP_FOOT_LENGTH = -20.0f;
+    float X_ZMP_FOOT_LENGTH = 10.0f;
 
     //lets define the key points in the s frame. See diagram in paper
     //to use bezier curves, we would need also directions for each point

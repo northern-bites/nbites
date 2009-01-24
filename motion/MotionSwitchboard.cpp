@@ -10,7 +10,7 @@ const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 
 MotionSwitchboard::MotionSwitchboard(Sensors *s)
     : sensors(s),
-      walkProvider(),
+      walkProvider(sensors),
 	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
 	  headProvider(1/50.0f,sensors),
       nextJoints(Kinematics::NUM_JOINTS, 0.0f),
