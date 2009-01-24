@@ -20,11 +20,23 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
 
 ScriptedProvider::~ScriptedProvider() {
 	// remove all remaining values from chain queues
+	vector<ChainQueue>::iterator i;
+	i = chainQueues.begin();
+	while ( i != chainQueues.end() )
+		i->clear();
+
+	// Wait until not active anymore
+	while ( isActive() ) { /* wait until done */ }
+	// Don't have to delete commandQueue, since it will
+	// be empty once we're not active.
 }
 
-void ScriptedProvider::requestStop() {
-	// Finish motion or stop immediately?
-}
+// We're going to finish the whole command queue
+// and then stop doing anything.
+// So this method does nothing. At all.
+// We'll just naturally finish what we're doing and
+// hold steady at the last position.
+void ScriptedProvider::requestStop() { }
 
 //Checks if this chain is currently providing angles so that external
 //classes can check the status of this one
