@@ -4,6 +4,7 @@ In order to compile the man binaries, you must first have the NaoQI libraries  a
 
 NOTE: The given commands should be executed from the directory where you downloaded the archives. Also, depending on your system setup, you may need root privilages to install to /usr/local/nao
 
+LINUX:
 First, get the NaoQI libraries by saving the file
 <https://robocup.bowdoin.edu/files/software/nao/NaoQi/NaoQiRobocup-1.0.0-Linux.tar.gz> to your computer. You should then extract the contents to /usr/local/nao (i.e. there should be a file /usr/local/nao/Release-notes.txt)
 
@@ -21,16 +22,25 @@ You will also need the cross compiler, so start by creating its directory:
 
 	sudo mkdir /usr/local/nao/crosstoolchain
 
-Next,if you are on linux, the new (1.0) cross tool chain is available from <https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff/ctc-1.0.0b.tar.bz2>
-
-If you are on a mac, there is no precompiled cross compiler (yet). You should put the stagging folder from the Linux cross compiler archive above, combined with the cross folder from the old cross compiler for mac at <https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff/cross-mac-intel.tar.bz2>
-Place these folders in the directory /usr/local/nao/crosstoolchain described below.
-
-When extracted, this should give you a cross folder that will replace the empty cross folder in /usr/local/nao/crosstoolchain. Once you have downloaded the cross-mac-intel.tar.bz2, extract it to the crosstoolchain folder with the command:
-
-     	sudo tar --strip 1 -C /usr/local/nao/crosstoolchain -xvjf ctc-1.0.0b.tar.bz2
+Next, the new (1.0) cross tool chain is available from <https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff/ctc-1.0.0b.tar.bz2>
 
 Double check to make sure you have folders named 'cross' and 'stagging' in $AL_DIR/crosstoolchain
+
+DARWIN (MAC OS X):
+Download the Northern Bites nao tools from
+<https://robocup.bowdoin.edu/files/software/nao/NaoQi/nbites-nao-darwin.tar.bz2>
+
+Extract the archive using the following command:
+
+tar -xvvjf nao-darwin.tar.bz2
+
+NOTE: if you currently have /usr/local/nao you should move it with the following command if you do not want to lose the contents:
+
+sudo mv /usr/local/nao /usr/local/nao-old
+
+Now move the archive to /usr/local/nao:
+
+sudo mv ./nao-darwin /usr/local/nao
 
 COMPILING & INSTALLING
 
