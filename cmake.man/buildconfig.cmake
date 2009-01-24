@@ -92,5 +92,10 @@ OPTION(
   "Customize image locking configuration.  Man uses locking."
   ON
   )
+OPTION(
+  REDIRECT_C_STDERR
+  "Redirect the standard error to standard out in C++"
+  ON
+  )
   
 

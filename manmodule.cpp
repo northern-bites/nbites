@@ -57,21 +57,26 @@ extern "C"
 
 ALCALL int _createModule( ALPtr<ALBroker> pBroker )
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
+
   // init broker with the main broker inctance
   // from the parent executable
   ALBrokerManager::setInstance(pBroker->fBrokerManager.lock());
   ALBrokerManager::getInstance()->addBroker(pBroker);
 
-
   // create modules instance
-//<OGETINSTANCE> don't remove this comment
-ALModule::createModule<Man>(pBroker,"Man" );
+  //<OGETINSTANCE> don't remove this comment
+  ALModule::createModule<Man>(pBroker,"Man" );
 
-//</OGETINSTANCE> don't remove this comment
+  //</OGETINSTANCE> don't remove this comment
 
-//NBites code
-man  = pBroker->getProxy("Man");
-man->callVoid("start");
+  //NBites code
+  man  = pBroker->getProxy("Man");
+  man->callVoid("start");
 
   return 0;
 }
@@ -79,11 +84,11 @@ man->callVoid("start");
 ALCALL int _closeModule(  )
 {
   // Delete module instance
-//<OKILLINSTANCE> don't remove this comment
-//ALPtr<ALProxy>
-// man  = pBroker->getProxy("Man");
-man->callVoid("stop");
-//</OKILLINSTANCE> don't remove this comment
+  //<OKILLINSTANCE> don't remove this comment
+  //ALPtr<ALProxy>
+  // man  = pBroker->getProxy("Man");
+  man->callVoid("stop");
+  //</OKILLINSTANCE> don't remove this comment
 
   return 0;
 }
@@ -95,7 +100,7 @@ man->callVoid("stop");
 #else
 void _terminationHandler( int signum )
 {
-    //ALPtr<ALProxy> man  = pBroker->getProxy("Man");
+  //ALPtr<ALProxy> man  = pBroker->getProxy("Man");
 
   if (signum == SIGINT) {
     // no direct exit, main thread will exit when finished
@@ -128,6 +133,12 @@ int usage( char* progName )
 
 int main( int argc, char *argv[] )
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
+
   std::cout << "..::: starting MANMODULE revision " << MANMODULE_VERSION_REVISION << " :::.." << std::endl;
   std::cout << "Copyright (c) 2007, Aldebaran-robotics" << std::endl << std::endl;
 
@@ -165,10 +176,10 @@ int main( int argc, char *argv[] )
  pBroker->setBrokerManagerInstance(ALBrokerManager::getInstance());
 
 
-//<OGETINSTANCE> don't remove this comment
-ALModule::createModule<Man>(pBroker,"Man" );
+  //<OGETINSTANCE> don't remove this comment
+  ALModule::createModule<Man>(pBroker,"Man" );
 
-//</OGETINSTANCE> don't remove this comment
+  //</OGETINSTANCE> don't remove this comment
 
 #ifndef _WIN32
   struct sigaction new_action;
@@ -181,24 +192,24 @@ ALModule::createModule<Man>(pBroker,"Man" );
 #endif
 
   try{
-  //ALPtr<ALProxy>
-  man  = pBroker->getProxy("Man");
-  // Start the separate head thread
-  man->callVoid("start");
-  //(*(ALFunctor0<ALModule, boost::shared_ptr<TriggeredEvent> *)(man->getModule()->getFunction("getTrigger"));
-  man->callVoid("trigger_await_on");
-  // Wait for the head thread to exit
-  man->callVoid("trigger_await_off");
-  cout << "Main method finished." << endl;
+    //ALPtr<ALProxy>
+    man  = pBroker->getProxy("Man");
+    // Start the separate head thread
+    man->callVoid("start");
+    //(*(ALFunctor0<ALModule, boost::shared_ptr<TriggeredEvent> *)(man->getModule()->getFunction("getTrigger"));
+    man->callVoid("trigger_await_on");
+    // Wait for the head thread to exit
+    man->callVoid("trigger_await_off");
+    cout << "Main method finished." << endl;
   }catch(ALError &e){
-      cout <<e.toString() <<endl;
+    cout <<e.toString() <<endl;
   }
-//   Not sure what the purpose of this modulegenerator code is: //EDIT -JS
-   pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
-   while( 1 )
-   {
-     SleepMs( 100 );
-   }
+  //   Not sure what the purpose of this modulegenerator code is: //EDIT -JS
+  pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
+  while( 1 )
+  {
+    SleepMs( 100 );
+  }
 
 #ifdef _WIN32
   _terminationHandler( 0 );
@@ -245,6 +256,11 @@ static boost::shared_ptr<Man> lMan;
 ALCALL int
 _createModule (ALBroker *pBroker)
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
 
   // init broker with the main broker instance
   // from the parent executable
@@ -310,6 +326,12 @@ usage (const char *name)
 int
 main (int argc, char **argv)
 {
+#ifdef REDIRECT_C_STDERR
+  // Redirect stderr to stdout
+  FILE *_syderr = stderr;
+  stderr = stdout;
+#endif
+
   int i = 1;
   std::string brokerName = "man";
   std::string brokerIP = "";
