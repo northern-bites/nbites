@@ -104,6 +104,7 @@ SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
 SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )
 SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
                   ${CORPUS_INCLUDE_DIR}/_synchromodule
+                  ${CORPUS_INCLUDE_DIR}/messaging
                   )
 
 #IF( PYTHON_SHARED_CORPUS )

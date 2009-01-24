@@ -1,16 +1,22 @@
 
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
 //
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-//  You should have received a copy of the GNU General Public License
-//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
 
 #ifndef Synchro_h_DEFINED
 #define Synchro_h_DEFINED
@@ -21,9 +27,33 @@
 #include <boost/shared_ptr.hpp>
 
 
+#undef MUTEX_TYPE
+#ifdef NDEBUG
+#  define STATIC_MUTEX_TYPE PTHREAD_MUTEX_INITIALIZER
+#  define MUTEX_INIT fastmutex
+#else
+#  define STATIC_MUTEX_TYPE PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP
+#  define MUTEX_INIT errchkmutex
+#endif
+
 struct MutexDeleter
 {
     void operator() (pthread_mutex_t *mutex) { pthread_mutex_destroy(mutex); }
+};
+
+class Lock
+{
+  public:
+    Lock() { pthread_mutex_init(&mutex, NULL); }
+    ~Lock() { pthread_mutex_destroy(&mutex); }
+
+  public:
+    inline int lock()    { return pthread_mutex_lock(&mutex); }
+    inline int trylock() { return pthread_mutex_trylock(&mutex); }
+    inline int release() { return pthread_mutex_unlock(&mutex); }
+
+  private:
+    pthread_mutex_t mutex;
 };
 
 class Event
