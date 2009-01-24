@@ -189,7 +189,7 @@ public:
     static const int DEFAULT_CAMERA_BUFFERSIZE = 16;
     // Collor Settings
     static const int DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-    static const int DEFAULT_CAMERA_GAIN = 5;
+    static const int DEFAULT_CAMERA_GAIN = 4;
     static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
     static const int DEFAULT_CAMERA_BLUECHROMA = 158; //131;
     static const int DEFAULT_CAMERA_REDCHROMA = 68; //72;
@@ -202,7 +202,7 @@ public:
     static const int DEFAULT_CAMERA_LENSY = 0;
     // Exposure length
     static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE ON
-    static const int DEFAULT_CAMERA_EXPOSURE = 10;
+    static const int DEFAULT_CAMERA_EXPOSURE = 4.25;
     // Image orientation
     static const int DEFAULT_CAMERA_HFLIP = 0;
     static const int DEFAULT_CAMERA_VFLIP = 0;

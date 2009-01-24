@@ -152,7 +152,7 @@ Man::initMan()
 #ifdef NAOQI1
     registerCamera();
     if(camera_active){
-        initCameraSettings(TOP_CAMERA);
+        //initCameraSettings(TOP_CAMERA);
         initCameraSettings(BOTTOM_CAMERA);
     }
 #else
