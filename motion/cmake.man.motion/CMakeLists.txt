@@ -107,7 +107,6 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/WalkParameters
                      ${MOTION_INCLUDE_DIR}/MotionConstants
                      ${MOTION_INCLUDE_DIR}/Motion.cpp
-                     ${MOTION_INCLUDE_DIR}/MotionCore
                      ${MOTION_INCLUDE_DIR}/MotionInterface
 		     ${MOTION_INCLUDE_DIR}/MotionSwitchboard
 		     ${MOTION_INCLUDE_DIR}/ScriptedProvider

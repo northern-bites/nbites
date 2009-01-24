@@ -5,13 +5,10 @@
 #include <queue>
 
 #include "Kinematics.h"
+#include "MotionCore.h"
 #include "WalkCommand.h"
-#include "HeadScanCommand.h"
 #include "BodyJointCommand.h"
 #include "MotionSwitchboard.h"
-
-#define DUMMY_F 0.0f
-#define DUMMY_I 0
 
 /**
  * MotionInterface stores motion commands until
@@ -24,6 +21,7 @@ class MotionInterface
   public:
     MotionInterface(MotionSwitchboard *_switchboard)
         : switchboard(_switchboard) {}
+    MotionInterface(MotionCore *_core) : core(_core) {}
     virtual ~MotionInterface() {}
 
     //interface calls
@@ -31,21 +29,22 @@ class MotionInterface
     void enqueue(const BodyJointCommand *command);
     void enqueue(const HeadJointCommand *command);
     void enqueue(const HeadScanCommand *command);
-    inline bool isWalkActive() { return true; }
+    inline bool isWalkActive() { return core->isWalkActive(); }
 
     void stopBodyMoves();
     void stopHeadMoves();
 
     int postGotoCom(float pX, float pY, float pZ, float pTime, int pType) {
-        return DUMMY_I;
+      return core->postGotoCom(pX, pY, pZ, pTime, pType);
     }
     int postGotoTorsoOrientation(float pX, float pY, float pTime, int pType) {
-        return DUMMY_I;
+      return core->postGotoTorsoOrientation(pX, pY, pTime, pType);
     }
 
     float getHeadSpeed();
 
     void setBodyStiffness(float percentStiffness, float time) {
+      core->setBodyStiffness(percentStiffness,time);
     }
     void setHead(float time, float yaw, float pitch,
                  Kinematics::InterpolationType type) { }
@@ -64,8 +63,18 @@ class MotionInterface
     void setBalanceMode( int pBalanceMode );
     int getBalanceMode();
 
+    //void sendToMotion();
+    
   private:
+    MotionCore *core;
     MotionSwitchboard *switchboard;
+    /*
+    bool shouldStopHead;
+    bool shouldStopBody;
+
+    std::queue <const WalkCommand*> actionCommands;
+    std::queue <const BodyJointCommand*> jointCommands;
+    */
 };
 
 #endif
