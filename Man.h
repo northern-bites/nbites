@@ -50,7 +50,7 @@
  */
 class PythonPreferences
 {
-  public:
+public:
     PythonPreferences();
     virtual ~PythonPreferences() { }
 
@@ -63,11 +63,9 @@ class PythonPreferences
  * @author Jeremy R. Fishman
  * @author Bowdoin College Northern Bites
  */
-class Man
-  : public AL::ALModule,
-    public Thread
+class Man : public AL::ALModule, public Thread
 {
-  public:
+public:
 
     // contructors
 #ifdef NAOQI1
@@ -121,7 +119,7 @@ class Man
     void manAwaitOff(){getTrigger()->await_on();}
 
     void helloWorld(){std::cout<<"HelloWorld, C++ Style"<<std::endl;};
-  private:
+private:
     // run Vision and call Noggin's main loop function
     void processFrame(void);
     // wait for and retrieve the latest image
@@ -140,7 +138,7 @@ class Man
   //
   // Variables
   //
-  public:
+public:
     // Sub-module instances
     // ** ORDER MATTERS HERE **
     //   if the modules are not instantiated in this order, some dependedcies
@@ -156,8 +154,7 @@ class Man
     Comm comm;
     Noggin noggin;
 
-
-  private:
+private:
     // Interfaces/Proxies to robot
 #ifdef NAOQI1
     ALPtr<AL::ALLoggerProxy> log;
@@ -174,6 +171,41 @@ class Man
     int balls_seen;
 
     bool camera_active;
+
+// nBites Camera Constants
+public:
+    // Camera identification
+    static const int TOP_CAMERA = 0;
+    static const int BOTTOM_CAMERA = 1;
+
+    // Camera setup information
+    static const int CAMERA_SLEEP_TIME = 200;
+    static const int CAM_PARAM_RETRIES = 3;
+
+    // Default Camera Settings
+    // Basic Settings
+    static const int DEFAULT_CAMERA_RESOLUTION = 14;
+    static const int DEFAULT_CAMERA_FRAMERATE = 15;
+    static const int DEFAULT_CAMERA_BUFFERSIZE = 16;
+    // Collor Settings
+    static const int DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
+    static const int DEFAULT_CAMERA_GAIN = 5;
+    static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
+    static const int DEFAULT_CAMERA_BLUECHROMA = 158; //131;
+    static const int DEFAULT_CAMERA_REDCHROMA = 68; //72;
+    static const int DEFAULT_CAMERA_BRIGHTNESS = 128;
+    static const int DEFAULT_CAMERA_CONTRAST = 64;
+    static const int DEFAULT_CAMERA_SATURATION = 128;
+    static const int DEFAULT_CAMERA_HUE = 0;
+    // Lens correction
+    static const int DEFAULT_CAMERA_LENSX = 0;
+    static const int DEFAULT_CAMERA_LENSY = 0;
+    // Exposure length
+    static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE ON
+    static const int DEFAULT_CAMERA_EXPOSURE = 10;
+    // Image orientation
+    static const int DEFAULT_CAMERA_HFLIP = 0;
+    static const int DEFAULT_CAMERA_VFLIP = 0;
 };
 
 

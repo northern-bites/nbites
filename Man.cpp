@@ -152,8 +152,8 @@ Man::initMan()
 #ifdef NAOQI1
     registerCamera();
     if(camera_active){
-        initCameraSettings(0);
-        initCameraSettings(1);
+        initCameraSettings(TOP_CAMERA);
+        initCameraSettings(BOTTOM_CAMERA);
     }
 #else
     initCamera();
@@ -167,9 +167,8 @@ Man::initMan()
 
 #ifdef USE_VISION
 #ifdef NAOQI1
-void
-Man::registerCamera(){
-
+void Man::registerCamera()
+{
     try {
         camera = getParentBroker()->getProxy("NaoCam");
         camera_active =true;
@@ -198,7 +197,7 @@ Man::registerCamera(){
                                              colorSpace, fps);
         cout << "Registered Camera: " << lem_name << " successfully"<<endl;
     } catch (ALError &e) {
-        cout << "Failed to register camera" << lem_name <<endl;
+        cout << "Failed to register camera" << lem_name << endl;
         camera_active = false;
 //         SleepMs(500);
 
@@ -223,12 +222,12 @@ Man::initCameraSettings(int whichCam){
     int currentCam =  camera->call<int>( "getParam", kCameraSelectID );
     if (whichCam != currentCam){
         camera->callVoid( "setParam", kCameraSelectID,whichCam);
-        SleepMs(100);
+        SleepMs(CAMERA_SLEEP_TIME);
         currentCam =  camera->call<int>( "getParam", kCameraSelectID );
         if (whichCam != currentCam){
             cout << "Failed to switch to camera "<<whichCam
-                 <<" in 100 ms" <<endl;
-            SleepMs(100);
+                 <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<endl;
+            SleepMs(CAMERA_SLEEP_TIME);
             currentCam =  camera->call<int>( "getParam", kCameraSelectID );
             if (whichCam != currentCam){
                 cout << "Failed to switch to camera "<<whichCam
@@ -236,84 +235,103 @@ Man::initCameraSettings(int whichCam){
                 return;
             }
         }
-        cout << "Switched to camera " <<whichCam<<" successfully"<<endl;
+        cout << "Switched to camera " << whichCam <<" successfully"<<endl;
     }
 
-    const int CAM_PARAM_RETRIES = 3;
-
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            // Turn of auto settings
-            camera->callVoid("setParam", kCameraAutoExpositionID, 0);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set AutoExposition 0");
-        }
+    // Turn off auto settings
+    // Auto exposure
+    try {
+        camera->callVoid("setParam", kCameraAutoExpositionID,
+                         DEFAULT_CAMERA_AUTO_EXPOSITION);
+    } catch (ALError &e){
+        log->error("Man", "Couldn't set AutoExposition");
     }
+    // Auto white balance
+    try {
+        camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
+                         DEFAULT_CAMERA_AUTO_WHITEBALANCE);
 
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            camera->callVoid("setParam", kCameraAutoWhiteBalanceID, 0);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set AutoWhiteBalance 0");
-        }
+    } catch (ALError &e){
+        log->error("Man", "Couldn't set AutoWhiteBalance");
     }
-
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            camera->callVoid("setParam", kCameraAutoGainID, 0);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set AutoGain 0");
-        }
+    // Auto gain
+    try {
+        camera->callVoid("setParam", kCameraAutoGainID,
+                         DEFAULT_CAMERA_AUTO_GAIN);
+    } catch (ALError &e){
+        log->error("Man", "Couldn't set AutoGain");
     }
-
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            camera->callVoid("setParam", kCameraBrightnessID, 128);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set Brightness 128");
-        }
+    // Set camera defaults
+    // brightness
+    try {
+        camera->callVoid("setParam", kCameraBrightnessID,
+                         DEFAULT_CAMERA_BRIGHTNESS);
+    } catch (ALError &e){
+        log->error("Man", "Couldn't set Brightness ");
     }
-
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            camera->callVoid("setParam", kCameraContrastID, 64);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set Contrast 64");
-        }
+    // contrast
+    try {
+        camera->callVoid("setParam", kCameraContrastID,
+                         DEFAULT_CAMERA_CONTRAST);
+    } catch (ALError &e){
+        log->error("Man", "Couldn't set Contrast");
     }
-
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            camera->callVoid("setParam", kCameraRedChromaID, 72);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set RedChroma 72");
-        }
+    // Red chroma
+    try {
+        camera->callVoid("setParam", kCameraRedChromaID,
+                         DEFAULT_CAMERA_REDCHROMA);
+    } catch (ALError &e){
+        log->error("Man", "Couldn't set RedChroma");
     }
-
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            camera->callVoid("setParam", kCameraBlueChromaID,131);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set BlueChroma 131");
-        }
+    // Blue chroma
+    try {
+        camera->callVoid("setParam", kCameraBlueChromaID,
+                         DEFAULT_CAMERA_BLUECHROMA);
+    } catch (ALError &e){
+        log->error("Man", "Couldn't set BlueChroma");
     }
-
-    for (int i=0;i<CAM_PARAM_RETRIES;++i){
-        try {
-            camera->callVoid("setParam",kCameraExposureID,0);
-            break;
-        }catch (ALError &e){
-            log->error("Man", "Couldn't set Exposure 0");
-        }
+    // Exposure length
+    try {
+        camera->callVoid("setParam",kCameraExposureID,
+                         DEFAULT_CAMERA_EXPOSURE);
+    } catch (ALError &e) {
+        log->error("Man", "Couldn't set Exposure");
     }
-
+    // Gain
+    try {
+        camera->callVoid("setParam",kCameraGainID,
+                         DEFAULT_CAMERA_GAIN);
+    } catch (ALError &e) {
+        log->error("Man", "Couldn't set Gain");
+    }
+    // Saturation
+    try {
+        camera->callVoid("setParam",kCameraSaturationID,
+                         DEFAULT_CAMERA_SATURATION);
+    } catch (ALError &e) {
+        log->error("Man", "Couldn't set Saturation");
+    }
+    // Hue
+    try {
+        camera->callVoid("setParam",kCameraHueID,
+                         DEFAULT_CAMERA_HUE);
+    } catch (ALError &e) {
+        log->error("Man", "Couldn't set Hue");
+    }
+    // Lens correction X
+    try {
+        camera->callVoid("setParam",kCameraLensXID,
+                         DEFAULT_CAMERA_LENSX);
+    } catch (ALError &e) {
+        log->error("Man", "Couldn't set Lens Correction X");
+    }
+    // Lens correction Y
+    try {
+        camera->callVoid("setParam",kCameraLensXID,
+                         DEFAULT_CAMERA_LENSY);
+    } catch (ALError &e) {
+        log->error("Man", "Couldn't set Lens Correction Y");
+    }
 }
 
 #else//NAOQI1
@@ -353,19 +371,23 @@ void Man::initCamera(){
     for (int i=0;i<CAM_PARAM_RETRIES;++i){
         try {
             // Turn of auto settings
-            camera->callVoid("setParam", kCameraAutoExpositionID, 0);
+            camera->callVoid("setParam", kCameraAutoExpositionID,
+                             DEFAULT_CAMERA_AUTO_EXPOSURE);
             break;
         }catch (ALError &e){
-            log->error("Man", "Couldn't set AutoExposition 0");
+            log->error("Man", "Couldn't set AutoExposition %d",
+                       DEFAULT_CAMERA_AUTO_EXPOSURE);
         }
     }
 
     for (int i=0;i<CAM_PARAM_RETRIES;++i){
         try {
-            camera->callVoid("setParam", kCameraAutoWhiteBalanceID, 0);
+            camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
+                             DEFAULT_CAMERA_AUTO_WHITE);
             break;
         }catch (ALError &e){
-            log->error("Man", "Couldn't set AutoWhiteBalance 0");
+            log->error("Man", "Couldn't set AutoWhiteBalance %d",
+                       DEFAULT_CAMERA_AUTO_WHITE);
         }
     }
 
@@ -421,7 +443,7 @@ void Man::initCamera(){
 
     for (int i=0;i<CAM_PARAM_RETRIES;++i){
         try {
-            camera->callVoid("setParam",kCameraExposureID,0);
+            camera->callVoid("setParam",kCameraExposureID,1);
             break;
         }catch (ALError &e){
             log->error("Man", "Couldn't set Exposure 0");
@@ -436,6 +458,7 @@ void
 Man::closeMan() {
 #ifdef USE_VISION
     if(camera_active){
+        cout << "lem_name = " << lem_name << endl;
         try {
             camera->callVoid("unregister", lem_name);
         }catch (ALError &e) {
