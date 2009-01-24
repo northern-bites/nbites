@@ -485,7 +485,7 @@ taskID = motionProxy->
 	      taskID = motionProxy->post.gotoChainAngles(CHAIN_STRINGS[id],
 							*chainJoints,
 							command->getDuration(),
-							command->getType());
+							command->getInterpolation());
 #else
 	      taskID = motionProxy->postGotoChainAngles(CHAIN_STRINGS[id],
 							*chainJoints,
