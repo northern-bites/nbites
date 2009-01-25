@@ -90,6 +90,7 @@ private:
     bool firstFrame(){return frameCounter == 0;}
     void debugProcessing();
 
+    float getHipHack();
 private:
     //FSA Attributes
     SupportMode state, lastState,lastDiffState;

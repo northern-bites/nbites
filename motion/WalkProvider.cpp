@@ -7,9 +7,9 @@ WalkProvider::WalkProvider(Sensors *s)
       sensors(s),
       walkParameters(.02f, // motion frame length
                      310.0f, // COM height
-                     0.0f, // hipOffsetX
-                     2.00f, //stepDuration
-                     0.25f, //fraction in double support mode
+                     20.0f, // hipOffsetX
+                     1.00f, //stepDuration
+                     0.4f, //fraction in double support mode
                      17.0f), // steHeight
       stepGenerator(sensors,&walkParameters)
 {

@@ -148,14 +148,14 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
         heightOffGround = walkParams->stepHeight*
             static_cast<float>(frameCounter) /
             ((walkParams->singleSupportFrames/3));
-        if (frameCounter > walkParams->singleSupportFrames/3.)
+        if (frameCounter >= walkParams->singleSupportFrames/3.)
             stage++;
 
     }
     else if (stage == 1) { // keep it level
         heightOffGround = walkParams->stepHeight;
 
-        if (frameCounter > 2.* walkParams->singleSupportFrames/3)
+        if (frameCounter >= 2.* walkParams->singleSupportFrames/3)
             stage++;
     }
     else {// stage 2, set the foot back down on the ground
@@ -171,6 +171,10 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     goal(2) = -walkParams->bodyHeight + heightOffGround;
 
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints);
+    if(state == SWINGING){
+        //cout << frameCounter<<"\t"<<hr_offset <<endl;
+        result.angles[1] -= leg_sign*getHipHack();
+    }
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
@@ -193,12 +197,59 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
     goal(1) = dest_y;  //targetY
     goal(2) = -walkParams->bodyHeight;         //targetZ
 
+
     //calculate the new angles
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints);
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
+    if(state == SUPPORTING){
+        //cout << frameCounter<<"\t"<<hr_offset <<endl;
+        result.angles[1] += leg_sign*getHipHack();
+    }
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
 
+
+/**
+ * Function returns the angle to add to the hip roll joint depending on
+ * how far along we are in the process of a state (namely swinging,
+ * and supporting)
+ */
+float WalkingLeg::getHipHack(){
+    //Hack - calculate the compensation to the HIPROLL
+    float MAX_HIP_ANGLE_OFFSET = 1.5 * TO_RAD;
+
+    // the swinging leg will follow a trapezoid in 3-d. The trapezoid has
+    // three stages: going up, a level stretch, going back down to the ground
+    static int stage;
+    if (firstFrame()) stage = 0;
+
+    float hr_offset = 0.0f;
+
+    if (stage == 0) { // we are rising
+        // we want to raise the foot up for the first third of the step duration
+        hr_offset = MAX_HIP_ANGLE_OFFSET*
+            static_cast<float>(frameCounter) /
+            ((walkParams->singleSupportFrames/3));
+        if (frameCounter >= walkParams->singleSupportFrames/3.)
+            stage++;
+
+    }
+    else if (stage == 1) { // keep it level
+        hr_offset  = MAX_HIP_ANGLE_OFFSET;
+
+        if (frameCounter >= 2.* walkParams->singleSupportFrames/3)
+            stage++;
+    }
+    else {// stage 2, set the foot back down on the ground
+        hr_offset = max(0.0f,
+                        MAX_HIP_ANGLE_OFFSET*
+                        static_cast<float>(walkParams->singleSupportFrames
+                                           -frameCounter)/
+                        (walkParams->singleSupportFrames/3));
+    }
+
+    return hr_offset;
+}
 
 void WalkingLeg::startLeft(){
     if(chainID == LLEG_CHAIN){

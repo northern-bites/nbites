@@ -23,7 +23,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\n");
 #endif
 
-    setWalkVector(5,0,0); // for testing purposes. The function doesn't even
+    setWalkVector(0.5f,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -125,7 +125,7 @@ void StepGenerator::tick_controller(){
      LLEG_CHAIN: RLEG_CHAIN);
     float real_com_x = leg_dest(0);
     float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
-    printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
+    //printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
     static float ttime = 0;
     fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\t%f\t%f\n",
             ttime,com_x,com_y,pre_x,pre_y,zmp_x,zmp_y,real_com_x,real_com_y);
@@ -289,17 +289,21 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     //   hurting us. This could be fixed with an observer
     // in anycase, we'll leave this at -20 for now. (The effect is that
     // the com path 'pauses' over the support foot, which is quite nice)
-    float X_ZMP_FOOT_LENGTH = 10.0f;
+    float X_ZMP_FOOT_LENGTH = 0.0f;
+
+    //Another HACK (ie. zmp is not perfect)
+    //This moves the zmp reference to the outside of the foot
+    float Y_ZMP_OFFSET = 15.0f;
 
     //lets define the key points in the s frame. See diagram in paper
     //to use bezier curves, we would need also directions for each point
     const ublas::vector<float> start_s = last_zmp_end_s;
     const ublas::vector<float> end_s =
-        CoordFrame3D::vector3D(newSupportStep->x ,//+X_ZMP_FOOT_LENGTH,
-                               newSupportStep->y);
+        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX ,//+X_ZMP_FOOT_LENGTH,
+                               newSupportStep->y + sign*Y_ZMP_OFFSET);
     const ublas::vector<float> mid_s =
-        CoordFrame3D::vector3D(newSupportStep->x - X_ZMP_FOOT_LENGTH,
-                               newSupportStep->y);
+        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX - X_ZMP_FOOT_LENGTH,
+                               newSupportStep->y + sign*Y_ZMP_OFFSET);
 
 //      std::cout << "start_s_x: " << start_s(0)
 //                << " mid_s_x: "  << mid_s(0)
@@ -317,19 +321,22 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     //start and mid is double support, and the line between mid and end
     //is double support
 
-    //double support - we want to switch feet
-    const int numDChops = walkParams->doubleSupportFrames;
-    for(int i = 0; i< walkParams->doubleSupportFrames; i++){
-        ublas::vector<float> new_i = start_i +
-            (static_cast<float>(i)/numDChops)*(mid_i-start_i);
+//     //double support - we want to switch feet
+//     const int numDChops = walkParams->doubleSupportFrames;
+//     for(int i = 0; i< walkParams->doubleSupportFrames; i++){
+//         ublas::vector<float> new_i = start_i +
+//             (static_cast<float>(i)/numDChops)*(mid_i-start_i);
 
-        zmp_ref_x.push_back(new_i(0));
-        zmp_ref_y.push_back(new_i(1));
-    }
+//         zmp_ref_x.push_back(new_i(0));
+//         zmp_ref_y.push_back(new_i(1));
+//     }
 
     //single support -  we want to stay over the new step
-    const int numSChops = walkParams->singleSupportFrames;\
-    for(int i = 0; i< walkParams->singleSupportFrames; i++){
+//     const int numSChops = walkParams->singleSupportFrames;
+//     for(int i = 0; i< walkParams->singleSupportFrames; i++){
+    const int numSChops = walkParams->stepDurationFrames;
+    for(int i = 0; i< walkParams->stepDurationFrames; i++){
+
         ublas::vector<float> new_i = mid_i +
             (static_cast<float>(i)/numSChops)*(end_i-mid_i);
 
