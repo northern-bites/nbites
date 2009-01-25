@@ -56,17 +56,17 @@ class Ball {
   /* GETTERS */
   int getX() {return x;}
   int getY() {return y;}
-  double getWidth() { return width; }
-  double getHeight() { return height; }
-  double getRadius() { return radius; }
+  float getWidth() { return width; }
+  float getHeight() { return height; }
+  float getRadius() { return radius; }
   int getCenterX() { return centerX; }
   int getCenterY() { return centerY; }
-  double getAngleX() { return angleX; }
-  double getAngleY() { return angleY; }
-  double getFocDist() { return focDist; }
-  double getDist() { return dist; }
-  double getBearing() { return bearing; }
-  double getElevation() { return elevation; }
+  float getAngleX() { return angleX; }
+  float getAngleY() { return angleY; }
+  float getFocDist() { return focDist; }
+  float getDist() { return dist; }
+  float getBearing() { return bearing; }
+  float getElevation() { return elevation; }
   int getConfidence() {return confidence;}
 
  private:
@@ -75,17 +75,17 @@ class Ball {
 
   /* Best guessed Ball Variables */
   int x, y;
-  double width;
-  double height;
-  double radius;
+  float width;
+  float height;
+  float radius;
   int centerX;
   int centerY;
-  double angleX;
-  double angleY;
-  double focDist;
-  double dist;
-  double bearing;
-  double elevation;
+  float angleX;
+  float angleY;
+  float focDist;
+  float dist;
+  float bearing;
+  float elevation;
   int confidence;
 };
 
