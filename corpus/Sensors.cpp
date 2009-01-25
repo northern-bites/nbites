@@ -433,8 +433,7 @@ const vector<float> Sensors::getBodyAngleErrors () const
     return vec;
 }
 
-const float
-Sensors::getBodyAngleError (int index) const
+const float Sensors::getBodyAngleError (int index) const
 {
 	pthread_mutex_lock (&errors_mutex);
 
@@ -443,43 +442,6 @@ Sensors::getBodyAngleError (int index) const
 	pthread_mutex_unlock (&errors_mutex);
 
 	return angleError;
-}
-
-void
-Sensors::setBodyAngles (vector<float>& v)
-{
-  pthread_mutex_lock (&angles_mutex);
-
-  bodyAngles = v;
-  /*
-  cout << "Body angles in sensors";
-  for (int i = 0 ; i < 22; i++){
-    cout <<  bodyAngles[i] << " ";
-
-  }
-  cout << endl;
-  */
-  pthread_mutex_unlock (&angles_mutex);
-}
-
-void
-Sensors::setVisionBodyAngles (vector<float>& v)
-{
-  pthread_mutex_lock (&vision_angles_mutex);
-
-  visionBodyAngles = v;
-
-  pthread_mutex_unlock (&vision_angles_mutex);
-}
-
-void
-Sensors::setBodyAngleErrors (vector<float>& v)
-{
-  pthread_mutex_lock (&errors_mutex);
-
-  bodyAnglesError = v;
-
-  pthread_mutex_unlock (&errors_mutex);
 }
 
 #if ROBOT(NAO)
