@@ -121,11 +121,18 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     float percent_complete =
         frameCounter/static_cast<float>(walkParams->singleSupportFrames);
 
+    float theta = percent_complete*2.0f*M_PI;
+    float stepHeight = walkParams->stepHeight;
+    float percent_to_dest_horizontal = cycloidx(theta)/(2.0f*M_PI);
+    cout << "Frame counter " << frameCounter
+         << "Percent to dest " << percent_to_dest_horizontal
+         << " cycloidx " << cycloidx(theta) <<endl;
+
     //cout <<"Percent incomplete" << percent_incomplete <<endl;
     //cout << "percent complete" << percent_complete<<endl;
     //Then we can express the destination as the proportionate distance to cover
-    float dest_x = src_f(0) + percent_complete*dist_to_cover_x;
-    float dest_y = src_f(1) + percent_complete*dist_to_cover_y;
+    float dest_x = src_f(0) + percent_to_dest_horizontal*dist_to_cover_x;
+    float dest_y = src_f(1) + percent_to_dest_horizontal*dist_to_cover_y;
 
 
     ublas::vector<float> target_f = CoordFrame3D::vector3D(dest_x,dest_y);
@@ -141,30 +148,31 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     static int stage;
     if (firstFrame()) stage = 0;
     float x,y;
-    float heightOffGround = 0.0f;
 
-    if (stage == 0) { // we are rising
-        // we want to raise the foot up for the first third of the step duration
-        heightOffGround = walkParams->stepHeight*
-            static_cast<float>(frameCounter) /
-            ((walkParams->singleSupportFrames/3));
-        if (frameCounter >= walkParams->singleSupportFrames/3.)
-            stage++;
+    float heightOffGround = walkParams->stepHeight*cycloidy(theta);
 
-    }
-    else if (stage == 1) { // keep it level
-        heightOffGround = walkParams->stepHeight;
+//     if (stage == 0) { // we are rising
+//         // we want to raise the foot up for the first third of the step duration
+//         heightOffGround = walkParams->stepHeight*
+//             static_cast<float>(frameCounter) /
+//             ((walkParams->singleSupportFrames/3));
+//         if (frameCounter >= walkParams->singleSupportFrames/3.)
+//             stage++;
 
-        if (frameCounter >= 2.* walkParams->singleSupportFrames/3)
-            stage++;
-    }
-    else {// stage 2, set the foot back down on the ground
-        heightOffGround = max(0.0f,
-                              walkParams->stepHeight*
-                              static_cast<float>(walkParams->singleSupportFrames
-                                                 -frameCounter)/
-                              (walkParams->singleSupportFrames/3));
-    }
+//     }
+//     else if (stage == 1) { // keep it level
+//         heightOffGround = walkParams->stepHeight;
+
+//         if (frameCounter >= 2.* walkParams->singleSupportFrames/3)
+//             stage++;
+//     }
+//     else {// stage 2, set the foot back down on the ground
+//         heightOffGround = max(0.0f,
+//                               walkParams->stepHeight*
+//                               static_cast<float>(walkParams->singleSupportFrames
+//                                                  -frameCounter)/
+//                               (walkParams->singleSupportFrames/3));
+//     }
 
     goal(0) = target_c_x;
     goal(1) = target_c_y;
@@ -249,6 +257,14 @@ float WalkingLeg::getHipHack(){
     }
 
     return hr_offset;
+}
+
+float  WalkingLeg::cycloidx(float theta){
+    return theta - sin(theta);
+}
+
+float  WalkingLeg::cycloidy(float theta){
+    return 1 - cos(theta);
 }
 
 void WalkingLeg::startLeft(){

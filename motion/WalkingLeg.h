@@ -91,6 +91,9 @@ private:
     void debugProcessing();
 
     float getHipHack();
+    float cycloidy(float theta);
+    float cycloidx(float theta);
+
 private:
     //FSA Attributes
     SupportMode state, lastState,lastDiffState;
