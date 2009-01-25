@@ -38,7 +38,7 @@ const int FieldLines::LINE_COLORS[NUM_WHITE_COLORS] =
 
 const char * FieldLines::linePointInfoFile = "linepoints.xls";
 
-//const double FieldLines::MAX_PERCENT_ERROR_IN_JOIN_LINES = .024;
+//const float FieldLines::MAX_PERCENT_ERROR_IN_JOIN_LINES = .024f;
 
 
 FieldLines::FieldLines(Vision *visPtr, Pose *posePtr) {
@@ -188,43 +188,43 @@ void FieldLines::lineLoop() {
   if (numFrames % numFramesToProfile == 0) {
     cout << endl << endl;
     cout << "Average time in Find vertical points: "
-         << static_cast<double>(timeInFindVerticalLinePoints)
+         << static_cast<float>(timeInFindVerticalLinePoints)
       / numFramesToProfile << endl;
 
     cout << "Average time in Find Horizontal points: "
-         << static_cast<double>(timeInFindHorizontalLinePoints)
+         << static_cast<float>(timeInFindHorizontalLinePoints)
       / numFramesToProfile << endl;
 
     cout << "Average time in sort: "
-         << static_cast<double>(timeInSort)
+         << static_cast<float>(timeInSort)
       / numFramesToProfile << endl;
 
     cout << "Average time in merge: "
-         << static_cast<double>(timeInMerge)
+         << static_cast<float>(timeInMerge)
       / numFramesToProfile << endl;
 
     cout << "Average time in create lines: "
-         << static_cast<double>(timeInCreateLines)
+         << static_cast<float>(timeInCreateLines)
       / numFramesToProfile << endl;
 
     cout << "Average time in join lines: "
-         << static_cast<double>(timeInJoinLines)
+         << static_cast<float>(timeInJoinLines)
       / numFramesToProfile << endl;
 
     cout << "Average time in fit unused points: "
-         << static_cast<double>(timeInFitUnusedPoints)
+         << static_cast<float>(timeInFitUnusedPoints)
       / numFramesToProfile << endl;
 
     cout << "Average time in IntersectLines: "
-         << static_cast<double>(timeInIntersectLines)
+         << static_cast<float>(timeInIntersectLines)
       / numFramesToProfile << endl;
 
     cout << "Average time in centerCircleScan: "
-         << static_cast<double>(timeInCenterCircleScan)
+         << static_cast<float>(timeInCenterCircleScan)
       / numFramesToProfile << endl;
 
     cout << "Average time in identifyCorners: "
-         << static_cast<double>(timeInIdentifyCorners)
+         << static_cast<float>(timeInIdentifyCorners)
       / numFramesToProfile << endl;
 
 
@@ -368,7 +368,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
             int linePointY = (whiteGreenY + greenWhiteY) / 2;
             // greenWhiteY is at bottom, hence higher in our coordinate system
             int width = greenWhiteY - whiteGreenY;
-	    double distance = pose->pixEstimate(x, linePointY, 0).dist;
+	    float distance = pose->pixEstimate(x, linePointY, 0).dist;
 
             if (isReasonableVerticalWidth(x, linePointY, distance, width)) {
               // assign x, y, lineWidth
@@ -506,7 +506,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
   }
 
   // Slope is in image coordinates, meaning a negative slope rises to the right
-  double horizonSlope = pose->getHorizonSlope();
+  float horizonSlope = pose->getHorizonSlope();
   bool startAtHorizon = false;
   if (horizonSlope < 0) {
     startAtHorizon = true;
@@ -558,7 +558,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
             // up close
             int linePointX = (whiteGreenX + greenWhiteX) / 2;
             int width = whiteGreenX - greenWhiteX;
-            double distance = pose->pixEstimate(linePointX, y, 0).dist;
+            float distance = pose->pixEstimate(linePointX, y, 0).dist;
             if (isReasonableHorizontalWidth(linePointX, y, distance, width)) {
               // assign x, y, lineWidth
               linePoint point(linePointX, y,
@@ -957,7 +957,7 @@ const bool FieldLines::isEdgeClose(const int edgeLoc,
  // we just found appears in a line of reasonable width.
  ///
 const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
-                                                 const double distance,
+                                                 const float distance,
                                                  const int width) const {
   if (width < 0) {
     if (debugVertEdgeDetect) {
@@ -1017,7 +1017,7 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
 
 // TODO: Gross unnamed constants that are probably wrong
 const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
-                                                   const double distance,
+                                                   const float distance,
                                                    const int width) const {
 
   if (width < 0) {
@@ -1052,7 +1052,7 @@ const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
   // See https://robocup.bowdoin.edu/files/nao/NaoLineWidthData.xls
   //const int ERROR_ALLOWED = 8;
   //return true;
-  return width < 6111.8 * pow(distance, -1.0701);
+  return width < 6111.8 * pow((double)distance, -1.0701);
 #endif
 }
 
@@ -1177,14 +1177,14 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 
 
 
-      double lastLineWidth = back->lineWidth;
+      float lastLineWidth = back->lineWidth;
 
       if (true || back->foundWithScan == currentPoint->foundWithScan) {
-        double lastPointDistance = pose->pixEstimate(back->x, back->y, 0).dist;
-        double curPointDistance = pose->pixEstimate(pointX, pointY, 0).dist;
+        float lastPointDistance = pose->pixEstimate(back->x, back->y, 0).dist;
+        float curPointDistance = pose->pixEstimate(pointX, pointY, 0).dist;
 
-        double distanceDifference = curPointDistance - lastPointDistance;
-        double lineWidthDifference = currentPoint->lineWidth - lastLineWidth;
+        float distanceDifference = curPointDistance - lastPointDistance;
+        float lineWidthDifference = currentPoint->lineWidth - lastLineWidth;
 
         if (distanceDifference < 0 && // line is going toward us
             // TODO named constant
@@ -1213,7 +1213,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       // towards the bottom of the line, where there will be green between the
       // two points.  Furthermore, only skip this check if it's horizontally
       // oriented
-      double percentGreen;
+      float percentGreen;
       if (currentPoint->lineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
           lastLineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
           abs(pointX - lineEndpointX) > abs(pointY - lineEndpointY) &&
@@ -1248,15 +1248,15 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
       if (legitimateLinePoints.size() != 1 &&
           Utility::getLength(lineEndpointX, lineEndpointY, pointX,
                              pointY) >  MIN_PIXEL_DIST_TO_CHECK_ANGLE) {
-        double curLineAngle = Utility::getAngle(lineStartpointX,
+        float curLineAngle = Utility::getAngle(lineStartpointX,
                                                 lineStartpointY,
                                                 lineEndpointX,
                                                 lineEndpointY);
-        double segmentAngle = Utility::getAngle(lineEndpointX,
+        float segmentAngle = Utility::getAngle(lineEndpointX,
                                                 lineEndpointY,
                                                 pointX,
                                                 pointY);
-        double difference = min(fabs(curLineAngle - segmentAngle),
+        float difference = min(fabs(curLineAngle - segmentAngle),
                                 180 - (fabs(curLineAngle - segmentAngle)));
         if (difference > MAX_ANGLE_LINE_SEGMENT) {
           if (debugCreateLines)
@@ -1327,10 +1327,10 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 #ifdef LINES_PROFILING
   if (numFrames % 30 == 0) {
     cout << endl;
-    cout << "\ttime in percent color between: " << static_cast<double>(timeInPercentColorBetween)/numFrames << endl;
-    cout << "\ttime in get angle: " << static_cast<double>(timeInGetAngle)/30 << endl;
+    cout << "\ttime in percent color between: " << static_cast<float>(timeInPercentColorBetween)/numFrames << endl;
+    cout << "\ttime in get angle: " << static_cast<float>(timeInGetAngle)/30 << endl;
     cout << "\ttime in creating the visual lines: "
-         << static_cast<double>(timeInVisualLineCreation)/30 << endl;
+         << static_cast<float>(timeInVisualLineCreation)/30 << endl;
     timeInPercentColorBetween = timeInGetAngle = timeInVisualLineCreation = 0;
   }
 #endif
@@ -1393,8 +1393,8 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
        bool sanityChecksPass = true;
 
        // Calculate how far away from the line the point is
-       const double jDistFromI = Utility::getPointDeviation(*i, j->x, j->y);
-       const double maxDist = 2.0;
+       const float jDistFromI = Utility::getPointDeviation(*i, j->x, j->y);
+       const float maxDist = 2.0f;
 
        if (jDistFromI > maxDist) {
 	 sanityChecksPass = false;
@@ -1412,7 +1412,7 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
        // Ensure that the line width of the point vertically found is not too
        // different from that of the line
        else if (j->foundWithScan == VERTICAL) {
-         double widthDiff = fabs(j->lineWidth - i->avgVerticalWidth);
+         float widthDiff = fabs(j->lineWidth - i->avgVerticalWidth);
          if (widthDiff > MAX_VERT_FIT_UNUSED_WIDTH_DIFFERENCE) {
            if (debugFitUnusedPoints) {
              cout << "Point " << (*j) << " had a vertical width that differed "
@@ -1432,13 +1432,13 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
        // lines, doing a simple difference in width check is a bit dangerous.
        else if (j->foundWithScan == HORIZONTAL) {
 
-         double dist = j->distance;
-         double thinnestDist = i->thinnestHorPoint.distance;
-         double thickestDist = i->thickestHorPoint.distance;
+         float dist = j->distance;
+         float thinnestDist = i->thinnestHorPoint.distance;
+         float thickestDist = i->thickestHorPoint.distance;
 
-         double width = j->lineWidth;
-         double thickestWidth = i->thickestHorPoint.lineWidth;
-         double thinnestWidth = i->thinnestHorPoint.lineWidth;
+         float width = j->lineWidth;
+         float thickestWidth = i->thickestHorPoint.lineWidth;
+         float thinnestWidth = i->thinnestHorPoint.lineWidth;
 
          // There are no horizontal points in the line
          if (i->avgHorizontalWidth == 0) {
@@ -1504,10 +1504,10 @@ void FieldLines::fitUnusedPoints(vector<VisualLine> &lines,
        if (sanityChecksPass && !(Utility::between(*i, *j))) {
          const point<int> closerEndpoint =
            Utility::getCloserEndpoint(*i, j->x, j->y);
-         const double percentGreenBetween =
+         const float percentGreenBetween =
            percentColorBetween(j->x, j->y,
                                closerEndpoint.x, closerEndpoint.y, GREEN);
-         const double MAX_GREEN_BETWEEN = 5.0;
+         const float MAX_GREEN_BETWEEN = 5.0f;
          if (percentGreenBetween > MAX_GREEN_BETWEEN) {
            if (debugFitUnusedPoints) {
              cout << setprecision(2)
@@ -1593,7 +1593,7 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
       // ANGLE sanity check
       // Vertical lines get an angle of 90 but near vertical lines often have an
       // angle of maybe -88 or something.  This is a workaround
-      const double angleBetween = min(fabs(i->angle - j->angle),
+      const float angleBetween = min(fabs(i->angle - j->angle),
                                       fabs(180-(fabs(i->angle-j->angle))));
       if (angleBetween > MAX_ANGLE_TO_JOIN_LINES) {
         if (debugJoinLines) {
@@ -1612,12 +1612,12 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
 
       // Evaluate the value of the line i at j's start point to determine
       // how far away the line deviates
-      const double jDistFromI = Utility::getPointDeviation(*i, j->start.x,
+      const float jDistFromI = Utility::getPointDeviation(*i, j->start.x,
 							   j->start.y);
 
       // Evaluate the value of the line j at i's start point to determine
       // how far away the line deviates
-      double iDistFromJ = Utility::getPointDeviation(*j, i->start.x,
+      float iDistFromJ = Utility::getPointDeviation(*j, i->start.x,
 						     i->start.y);;
 
       double avg = (jDistFromI + iDistFromJ) / 2.0;
@@ -1987,8 +1987,8 @@ const bool FieldLines::shouldStopExtendingLine(const int oldX, const int oldY,
 
   // Too much green between the last and most recent point means we've hit the
   // logical end of the line; any further continuance is extremely dangerous
-  const double MAX_GREEN_PERCENT_BETWEEN = 10.0;
-  const double percentGreenBetween = percentColorBetween(oldX, oldY,
+  const float MAX_GREEN_PERCENT_BETWEEN = 10.0f;
+  const float percentGreenBetween = percentColorBetween(oldX, oldY,
                                                          newX, newY, GREEN);
   if (percentGreenBetween > MAX_GREEN_PERCENT_BETWEEN) {
     if (debugExtendLines) {
@@ -2289,7 +2289,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       // Angle check: only intersect those lines that have a minimum angle
       // between them.  This catches many bad intersections at the center circle
       // where the lines form very shallow angles
-      double angleOnScreen = min(fabs(i->angle - j->angle),
+      float angleOnScreen = min(fabs(i->angle - j->angle),
                                  fabs(180-(fabs(i->angle-j->angle))));
 
       /*cout << i->colorStr << " has angle of " << i->angle << " and "
@@ -2322,7 +2322,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       // Nao's pix estimates seem slightly better than the aibo, resulting in
       // better angles returned.
 #if ROBOT(NAO)
-      double angleOnField = getEstimatedAngle(*i, *j, intersectX, intersectY);
+      float angleOnField = getEstimatedAngle(*i, *j, intersectX, intersectY);
       //cout << "angle on field: " << angleOnField << endl;
       // BAD_ANGLE signifies the angle could not be computed
       if (angleOnField != BAD_ANGLE &&
@@ -2343,7 +2343,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 
       // Too much green check:  Discard potential corners where the intersection
       // point is actually in the field green rather than in a line
-      double percentGreen = percentSurrounding(intersection,
+      float percentGreen = percentSurrounding(intersection,
                                                FIELD_COLORS,
                                                NUM_GREEN_COLORS,
                                                CORNER_TEST_RADIUS);
@@ -2387,16 +2387,16 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       // We parameterize the line such that x and y are functions of one
       // variable t. Then we figure out what t gives us the corner's
       // x coordinate. When t = 0, x = x1; when t = lineLength, x = x2;
-      double t_I = Utility::
+      float t_I = Utility::
         findLinePointDistanceFromStart(intersection, *i);
-      double t_J = Utility::
+      float t_J = Utility::
         findLinePointDistanceFromStart(intersection, *j);
 
 
       if (Utility::tValueInMiddleOfLine(t_I, i->length,
-					static_cast<double>(MIN_CROSS_EXTEND)) &&
+					static_cast<float>(MIN_CROSS_EXTEND)) &&
           Utility::tValueInMiddleOfLine(t_J, j->length,
-					static_cast<double>(MIN_CROSS_EXTEND))) {
+					static_cast<float>(MIN_CROSS_EXTEND))) {
         if (debugIntersectLines || debugCcScan)
           cout <<"\t" << numChecksPassed
                << "-'Cross corner' sanity check failed, intersection "
@@ -2418,8 +2418,8 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
       // infinity)
       estimate pixEstimate = pose->pixEstimate(intersectX, intersectY,
                                                LINE_HEIGHT);
-      double distance = pixEstimate.dist;
-      double bearing = pixEstimate.bearing;
+      float distance = pixEstimate.dist;
+      float bearing = pixEstimate.bearing;
       // Ridiculously far away points have -distance due to pose problems.
       if (distance > MAX_CORNER_DISTANCE || distance < MIN_CORNER_DISTANCE) {
         if (debugIntersectLines)
@@ -2586,7 +2586,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 // Determines if the given L corner does not geometrically make sense for its
 // shape given the objects on the screen.
 const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
-  const double CLOSE_DIST = FIELD_HEIGHT / 2;
+  const float CLOSE_DIST = FIELD_HEIGHT / 2.0f;
 
   if (debugIdentifyCorners) {
     cout << "Testing to see if corner should be classified as a T."
@@ -2644,7 +2644,7 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
 // or vision->bgrp
 const bool FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
                                const VisualFieldObject * post) const {
-  const double ALLOWABLE_ERROR = getAllowedDistanceError(post);
+  const float ALLOWABLE_ERROR = getAllowedDistanceError(post);
   if (post == vision->bglp || post == vision->bgrp) {
     for (list <const ConcreteCorner*>::const_iterator i =
            ConcreteCorner::blueGoalTCorners.begin();
@@ -2685,7 +2685,7 @@ const bool FieldLines::goalSuitableForPixEstimate(const VisualFieldObject * goal
 
 const bool FieldLines::LWorksWithBeacon(const VisualCorner& c,
                                         const VisualFieldObject * beacon) const {
-  const double TOO_CLOSE_DISTANCE = FIELD_WHITE_HEIGHT / 3;
+  const float TOO_CLOSE_DISTANCE = FIELD_WHITE_HEIGHT / 3.0f;
   return getEstimatedDistance(&c, beacon) >= TOO_CLOSE_DISTANCE;
 }
 
@@ -2965,20 +2965,20 @@ list <const ConcreteCorner*> FieldLines::
 
     for (vector <const VisualFieldObject*>::const_iterator k =
            visibleObjects.begin(); k != visibleObjects.end(); ++k) {
-      double realDistance = getRealDistance(*j, *k);
+      float realDistance = getRealDistance(*j, *k);
       // Todo:  We are recalculating this over and over.  How to remember?
-      double estimatedDistance = getEstimatedDistance(&corner, *k);
-      double absoluteError = fabs(realDistance - estimatedDistance);
-      double relativeError = absoluteError / realDistance * 100.0;
+      float estimatedDistance = getEstimatedDistance(&corner, *k);
+      float absoluteError = fabs(realDistance - estimatedDistance);
+      float relativeError = absoluteError / realDistance * 100.0f;
 
       // If we have already one good distance between this corner and a field
       // object, we only require that the next objects have a small relative
       // error.
-      const double MAX_RELATIVE_ERROR = 15.0;
+      const float MAX_RELATIVE_ERROR = 15.0f;
       // For each corroborating object we find, we allow this much more
       // percent error for subsequent objects
-      const double ERROR_ALLOWANCE_INCREASE = 5.0;
-      double relErrorRelaxation =
+      const float ERROR_ALLOWANCE_INCREASE = 5.0f;
+      float relErrorRelaxation =
         ERROR_ALLOWANCE_INCREASE * numCorroboratingObjects;
 
       if (numCorroboratingObjects > 0 &&
@@ -3023,7 +3023,7 @@ list <const ConcreteCorner*> FieldLines::
 }
 
 
- double FieldLines::getAllowedDistanceError(VisualFieldObject const *obj) const {
+ float FieldLines::getAllowedDistanceError(VisualFieldObject const *obj) const {
    switch (obj->getID()) {
    case BLUE_GOAL_LEFT_POST:
    case BLUE_GOAL_RIGHT_POST:
@@ -3051,7 +3051,7 @@ const bool FieldLines::isGreenWhiteEdge(int x, int y, ScanDirection direction) c
     (direction == HORIZONTAL ? TEST_LEFT : TEST_DOWN);
   bool print =  (direction == VERTICAL && debugVertEdgeDetect) ||
     (direction == HORIZONTAL && debugHorEdgeDetect);
-  double greenPercent = percentColor(x, y, searchDirection, FIELD_COLORS,
+  float greenPercent = percentColor(x, y, searchDirection, FIELD_COLORS,
                                      NUM_GREEN_COLORS, NUM_TEST_PIXELS);
   bool enoughGreen = greenPercent >= GREEN_PERCENT_CLEARANCE;
 
@@ -3081,7 +3081,7 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
   // of pixels above for green, we start small and work up only if we
   // haven't already found enough green.
   bool greenAbove = false;
-  double greenPercent = 0.0;
+  float greenPercent = 0.0f;
   TestDirection searchDirection =
     (direction == HORIZONTAL) ? TEST_RIGHT : TEST_UP;
 
@@ -3114,7 +3114,7 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
 
   // we have a good amount of green above so continue to check the line for
   // white
-  double whitePercent, yellowPercent;
+  float whitePercent, yellowPercent;
   if (searchDirection == TEST_UP || searchDirection == TEST_DOWN) {
     whitePercent = percentSurrounding(x, potentialMidPoint, WHITE, 1);
     // Check that the line isn't yellow (within the yellow field arcs)
@@ -3131,7 +3131,7 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
 
   // Require at most 3 out of 9 pixels to be yellow
   // TODO: named constant
-  double MAX_YELLOW_IN_LINE = 300.0/9.0;
+  float MAX_YELLOW_IN_LINE = 300.0f/9.0f;
   bool notMuchYellow = yellowPercent <= MAX_YELLOW_IN_LINE;
 
 
@@ -3533,12 +3533,12 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
 
     for (vector<const VisualFieldObject*>::const_iterator j = visibleObjects.begin();
          j != visibleObjects.end(); ++j) {
-      double realDistance = getRealDistance(center_circle_corner, *j);
+      float realDistance = getRealDistance(center_circle_corner, *j);
       // Dereference the iterator i to get the VisualCorner and then get
       // the reference since getEstimatedDistance works with pointers.
-      double estimatedDistance = getEstimatedDistance(&(*i), *j);
-      double absoluteError = fabs(realDistance - estimatedDistance);
-      //double relativeError = absoluteError / realDistance * 100.0;
+      float estimatedDistance = getEstimatedDistance(&(*i), *j);
+      float absoluteError = fabs(realDistance - estimatedDistance);
+      //float relativeError = absoluteError / realDistance * 100.0f;
 
       if (absoluteError < MAX_DIST_ERROR_FOR_CENTER_CIRCLE_DETERMINATION) {
         if (debugCcScan) {
@@ -3642,7 +3642,7 @@ void FieldLines::drawSurroundingBox(const VisualLine &line, int color) const {
 // concrete location on the field (YGLP, YGRP, BGLP, BGRP, BY, and YB).
 // Calculates the length of the straight line between the two objects on the
 // field
-double FieldLines::getRealDistance(const ConcreteCorner *c,
+float FieldLines::getRealDistance(const ConcreteCorner *c,
                                    const VisualFieldObject *obj) const {
   return Utility::getLength(c->getFieldX(), c->getFieldY(),
                             obj->getFieldX(), obj->getFieldY());
@@ -3725,7 +3725,7 @@ vector <const VisualFieldObject*> FieldLines::getVisibleFieldObjects() const {
 // Calculates the angle (in degrees) on the field between line1 and line2,
 // given that they meet at intersectX, intersectY.
 // See the Wiki for more information
-double FieldLines::getEstimatedAngle(const VisualLine &line1,
+float FieldLines::getEstimatedAngle(const VisualLine &line1,
                                      const VisualLine &line2,
                                      const int intersectX,
                                      const int intersectY) const {
@@ -3786,30 +3786,30 @@ double FieldLines::getEstimatedAngle(const VisualLine &line1,
 
   // Create a vector directed from the corner to the point on line farther
   // from the corner
-  pair <double, double> line1Vector(line1EndEst.x - cornerEst.x,
+  pair <float, float> line1Vector(line1EndEst.x - cornerEst.x,
                                     line1EndEst.y - cornerEst.y);
 
-  pair <double, double> line2Vector(line2EndEst.x - cornerEst.x,
+  pair <float, float> line2Vector(line2EndEst.x - cornerEst.x,
                                     line2EndEst.y - cornerEst.y);
 
   // By this point, we now have the actual vector representations of the lines
   // and can calculate theta
-  double dotProduct =
+  float dotProduct =
     line1Vector.first * line2Vector.first +
     line1Vector.second * line2Vector.second;
 
   // sqrt of dot product with itself
-  double lengthOfVector1 =
+  float lengthOfVector1 =
     Utility::getLength(line1EndEst.x, line1EndEst.y,
                        cornerEst.x, cornerEst.y);
 
-  double lengthOfVector2 =
+  float lengthOfVector2 =
     Utility::getLength(line2EndEst.x, line2EndEst.y,
                        cornerEst.x, cornerEst.y);
 
   // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
   // -> ...
-  double theta = DEG_OVER_RAD * acos(dotProduct/
+  float theta = DEG_OVER_RAD * acos(dotProduct/
                                      (lengthOfVector1 * lengthOfVector2));
   return theta;
 }
@@ -3818,27 +3818,27 @@ double FieldLines::getEstimatedAngle(const VisualLine &line1,
 // Determines the vector emanating from the corner to the endpoint of both
 // lines, then calculates the dot product between the two vectors.  Returns
 // the angle between the lines, in degrees
-double FieldLines::getEstimatedAngle(const VisualCorner &corner) const {
+float FieldLines::getEstimatedAngle(const VisualCorner &corner) const {
   return getEstimatedAngle(corner.getLine1(), corner.getLine2(),
                            corner.getX(), corner.getY());
 }
 
 
 // Estimates how long the line is on the field
-double FieldLines::getEstimatedLength(const VisualLine &line) const {
+float FieldLines::getEstimatedLength(const VisualLine &line) const {
   return getEstimatedDistance(line.start, line.end);
 }
 
 // Given two points on the screen, estimates the straight line distance
 // between them, on the field
-double FieldLines::getEstimatedDistance(const point<int> &point1,
+float FieldLines::getEstimatedDistance(const point<int> &point1,
                                         const point<int> &point2) const{
 
   estimate point1Est = pose->pixEstimate(point1.x, point1.y, 0);
   estimate point2Est = pose->pixEstimate(point2.x, point2.y, 0);
 
-  double point1Dist = point1Est.dist;
-  double point2Dist = point2Est.dist;
+  float point1Dist = point1Est.dist;
+  float point2Dist = point2Est.dist;
   // We cannot accurately calculate the distance because the pix estimate
   // is too bad
   if (point1Dist <= 0 || point2Dist <= 0) { return BAD_DISTANCE; }
@@ -3852,9 +3852,9 @@ double FieldLines::getEstimatedDistance(const point<int> &point1,
 // If the field object is very close (<100 cm away) we can use pose to estimate
 // bearing and distance to the field object rather than the distance and bearing
 // provided by the VisualFieldObject obj itself.
-double FieldLines::getEstimatedDistance(const VisualCorner *c,
+float FieldLines::getEstimatedDistance(const VisualCorner *c,
                                         const VisualFieldObject *obj) const {
-  double objDist, objBearing;
+  float objDist, objBearing;
   string typeOfEstimate;
 
   estimate cornerEst = vision->pose->pixEstimate(c->getX(), c->getY(), 0);
@@ -3896,22 +3896,22 @@ double FieldLines::getEstimatedDistance(const VisualCorner *c,
     objBearing = -obj->getBearing() * RAD_OVER_DEG;
   }
 
-  double cornerDist = c->getDistance();
+  float cornerDist = c->getDistance();
   // Convert degrees to radians for the sin/cos formulas
-  double cornerBearing = c->getBearing() * RAD_OVER_DEG;
+  float cornerBearing = c->getBearing() * RAD_OVER_DEG;
 
   // We want the objY to always be Positive because it is away from your body
-  double cornerX = cornerDist * sin(cornerBearing);
-  double cornerY = cornerDist * cos(cornerBearing);
+  float cornerX = cornerDist * sin(cornerBearing);
+  float cornerY = cornerDist * cos(cornerBearing);
 
   // We want the objY to always be Positive because it is away from your body
-  double objX = objDist * sin(objBearing);
-  double objY = objDist * cos(objBearing);
+  float objX = objDist * sin(objBearing);
+  float objY = objDist * cos(objBearing);
 
-  double diffX = objX - cornerX;
-  double diffY = objY - cornerY;
+  float diffX = objX - cornerX;
+  float diffY = objY - cornerY;
 
-  double dist = sqrt(diffX * diffX + diffY * diffY);
+  float dist = sqrt(diffX * diffX + diffY * diffY);
 
   if (debugCornerAndObjectDistances) {
     cout << endl
@@ -3994,7 +3994,7 @@ const bool FieldLines::dupeCorner(const list<VisualCorner> &corners,
 // Additionally, the test area will not necessarily be a square if the test
 // pixel is at the edge of the screen and testing the entire square would
 // cause us to test outside of the image.
-const double FieldLines::percentSurrounding(const int x, const int y,
+const float FieldLines::percentSurrounding(const int x, const int y,
                                             const int colors[],
                                             const int numColors,
                                             const int numPixels) const {
@@ -4032,12 +4032,12 @@ const double FieldLines::percentSurrounding(const int x, const int y,
     }
   }
   int totalPixels = (endX - startX + 1) * (endY - startY + 1);
-  return (static_cast<double> (numFound) /
-          static_cast<double> (totalPixels)) * 100.0;
+  return (static_cast<float> (numFound) /
+          static_cast<float> (totalPixels)) * 100.0;
 }
 
 // Alternative form of percent surrounding that uses points.
-const double FieldLines::percentSurrounding(const point<int> &p,
+const float FieldLines::percentSurrounding(const point<int> &p,
                                             const int colors[],
                                             const int numColors,
                                             const int numPixels) const {
@@ -4053,7 +4053,7 @@ const double FieldLines::percentSurrounding(const point<int> &p,
 // Additionally, the test area will not necessarily be a square if the test
 // pixel is at the edge of the screen and testing the entire square would
 // cause us to test outside of the image.
-const double FieldLines::percentSurrounding(const int x, const int y,
+const float FieldLines::percentSurrounding(const int x, const int y,
                                             const int color,
                                             const int numPixels) const {
   const int colors[] = {color};
@@ -4066,7 +4066,7 @@ const double FieldLines::percentSurrounding(const int x, const int y,
 // Returns the percent of the pixels along the line that are found within
 // the colors array; always returns a number between 0 and 100.0.
 // Preconditions:  (x1, y1) and (x2, y2) are valid coordinates in our image
-const double FieldLines::percentColorBetween(const int x1, const int y1,
+const float FieldLines::percentColorBetween(const int x1, const int y1,
                                              const int x2, const int y2,
                                              const int color) const {
   const int colors[] = {color};
@@ -4078,7 +4078,7 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
 // Returns the percent of the pixels along the line that are found within
 // the colors array; always returns a number between 0 and 100.0.
 // Preconditions:  (x1, y1) and (x2, y2) are valid coordinates in our image
-const double FieldLines::percentColorBetween(const int x1, const int y1,
+const float FieldLines::percentColorBetween(const int x1, const int y1,
                                              const int x2, const int y2,
                                              const int colors[],
                                              const int numColors) const {
@@ -4099,8 +4099,8 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
   }
   else {
 
-    double slope = static_cast<double>(y2 - y1) /
-      static_cast<double>(x2 - x1);
+    float slope = static_cast<float>(y2 - y1) /
+      static_cast<float>(x2 - x1);
     int sign = 1;
 
     if ((abs(y2 - y1)) > (abs(x2 - x1))) {
@@ -4139,12 +4139,12 @@ const double FieldLines::percentColorBetween(const int x1, const int y1,
     }
   }
 
-  return static_cast<double> (numFound) /
-    static_cast<double> (totalPixels) * 100.0;
+  return static_cast<float> (numFound) /
+    static_cast<float> (totalPixels) * 100.0;
 }
 
 
-const double FieldLines::percentColor(const int x, const int y,
+const float FieldLines::percentColor(const int x, const int y,
                                       const TestDirection dir,
                                       const int colors[], const int numColors,
                                       const int numPixels) const {
@@ -4186,14 +4186,14 @@ const double FieldLines::percentColor(const int x, const int y,
       }
     }
   }
-  return static_cast<double>(numFound) / static_cast<double>(numTotal) * 100.0;
+  return static_cast<float>(numFound) / static_cast<float>(numTotal) * 100.0;
 }
 
 /* Since this is a specific case where we're just testing for the percent
  * of a single color, we can apply the more general algorithm above to do
  * this for us.
  */
-const double FieldLines::percentColor(const int x, const int y,
+const float FieldLines::percentColor(const int x, const int y,
                                       const TestDirection dir,
                                       const int color,
                                       const int numPixels) const {

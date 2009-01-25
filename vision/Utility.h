@@ -65,49 +65,49 @@ class Utility {
   static const point<int> getCloserEndpoint(const VisualLine& l, int x, int y);
   static const point<int> getCloserEndpoint(const VisualLine& l, const point<int>& p);
 
-  //static const double hypot(const double a, const double b);
+  //static const float hypot(const float a, const float b);
   
   // get slope given x1,y1 and x2,y2
-  static double getSlope(int x1, int y1, int x2, int y2);
-  static double getSlope(const VisualLine& line);
+  static float getSlope(int x1, int y1, int x2, int y2);
+  static float getSlope(const VisualLine& line);
 
 
-  static double getPerpenSlope(double slope);
+  static float getPerpenSlope(float slope);
 
   // get length of line segment specified by (x1, y1), (x2, y2)
-  static const double getLength(const double x1, const double y1,
-                                const double x2, const double y2);
-  static const double getLength(const point <const double> &p1, 
-                                const point <const double> &p2);
-  static const double getLength(const point <const int> &p1, 
+  static const float getLength(const float x1, const float y1,
+                                const float x2, const float y2);
+  static const float getLength(const point <const float> &p1, 
+                                const point <const float> &p2);
+  static const float getLength(const point <const int> &p1, 
                                 const point <const int> &p2);
                                                           
 
   
   // get angle between two lines 
   // http://www.tpub.com/math2/5.htm
-  static double getAngle(const VisualLine& line1, const VisualLine& line2);
+  static float getAngle(const VisualLine& line1, const VisualLine& line2);
   
   // Get the angle between the horizontal axis and the line specified by 
   // (x1,y1),(x2,y2)
-  static double getAngle(int x1, int y1, int x2, int y2); 
+  static float getAngle(int x1, int y1, int x2, int y2); 
 
-  static double getAngle(const VisualLine& line1);
+  static float getAngle(const VisualLine& line1);
 
 
   // get y-coord with given x-coord, slope, and y-intercept
-  static int getLineY(int x, double y_intercept, double slope);
+  static int getLineY(int x, float y_intercept, float slope);
   // get y-coord with given x-coord given a line
   static int getLineY(int x, const VisualLine &aLine);
 
   // get x-coord with given y-coord, slope, and y-intercept
-  static int getLineX(int y, double y_intercept, double slope);
+  static int getLineX(int y, float y_intercept, float slope);
   // get x-coord with given y-coord and a line
   static int getLineX(int y, const VisualLine &aLine);
   
 
   // get y-intercept given line slope plus a point the line goes through
-  static double getInterceptY(int x1, int y1, double slope);
+  static float getInterceptY(int x1, int y1, float slope);
 
   template <typename T>
   static bool isElementInArray(const T elem, const T list[],
@@ -189,22 +189,22 @@ class Utility {
                                            const point<int> line2End);
   
   
-  static double findLinePointDistanceFromStart(const point <int> &p,
+  static float findLinePointDistanceFromStart(const point <int> &p,
                                                const VisualLine &aLine);
 
-  static double findLinePointDistanceFromStart(const point <int> &p,
+  static float findLinePointDistanceFromStart(const point <int> &p,
                                                const point<int> &lineStart,
                                                const point<int> &lineEnd,
-                                               const double length);
+                                               const float length);
 
-  static const bool tValueInMiddleOfLine(const double t1, const double length,
-					 const double minExtendDistance);
+  static const bool tValueInMiddleOfLine(const float t1, const float length,
+					 const float minExtendDistance);
 
   // Calculate how well the point fits to the line.  
   // Return distance between point and line evaluated at same x or y (depending
   // on orientation of the line)
-  static double getPointDeviation(const VisualLine &aLine, const linePoint &point);
-  static double getPointDeviation(const VisualLine &aLine, const int x, const int y);
+  static float getPointDeviation(const VisualLine &aLine, const linePoint &point);
+  static float getPointDeviation(const VisualLine &aLine, const int x, const int y);
 
 
   // A closed polygon contains a point if and only if a plumb line (vertical line)

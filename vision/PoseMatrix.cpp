@@ -27,7 +27,7 @@ void PoseMatrix::clear() {
 // y axis on the aibo is a plane parallel to the ground
 // positive is from the center of the body towards the camera 
 // negative is from the center of the body towards the butt
-void PoseMatrix::rotateY(double angle) {
+void PoseMatrix::rotateY(float angle) {
     
   // stores locally as vector variables for easy calculation
   a1 = data_[0]; b1 = data_[1]; c1 = data_[2];  d1 = data_[3];
@@ -61,7 +61,7 @@ void PoseMatrix::rotateY(double angle) {
 // x axis on the aibo is a plane parallel to the ground
 // standing behind the robot, 
 // positive is to the right of the robot, negative to the left
-void PoseMatrix::rotateX(double angle) {
+void PoseMatrix::rotateX(float angle) {
     
   a1 = data_[0]; b1 = data_[1]; c1 = data_[2];  d1 = data_[3];
   a2 = data_[4]; b2 = data_[5]; c2 = data_[6];  d2 = data_[7];
@@ -92,7 +92,7 @@ void PoseMatrix::rotateX(double angle) {
 // z axis on the aibo is a plane parallel to the ground
 // positive is from the center of the body pointing up towards t3h sky
 // negative is from the center of the body heading down to the ground
-void PoseMatrix::rotateZ(double angle) {
+void PoseMatrix::rotateZ(float angle) {
     
   a1 = data_[0]; b1 = data_[1]; c1 = data_[2];  d1 = data_[3];
   a2 = data_[4]; b2 = data_[5]; c2 = data_[6];  d2 = data_[7];
@@ -122,7 +122,7 @@ void PoseMatrix::rotateZ(double angle) {
 // translates matrix by a x,y,z value
 // basically this means that it moves the x,y,z point that the matrix keeps 
 // track of by a constant value
-void PoseMatrix::translate(double x, double y, double z) {
+void PoseMatrix::translate(float x, float y, float z) {
     
   a1 = data_[0]; b1 = data_[1]; c1 = data_[2];  d1 = data_[3];
   a2 = data_[4]; b2 = data_[5]; c2 = data_[6];  d2 = data_[7];

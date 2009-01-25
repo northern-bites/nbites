@@ -45,7 +45,7 @@ ObjectFragments::ObjectFragments(Vision *vis, Threshold *thr) {
 /* Initialize the data structure.
  * @param s     the slope corresponding to the dog's head tilt
  */
-void ObjectFragments::init(double s){
+void ObjectFragments::init(float s){
   slope = s;
   biggestRun = 0;
   maxHeight = IMAGE_HEIGHT;
@@ -598,7 +598,7 @@ bool ObjectFragments::viableRobot(blob a) {
       }
     }
   }
-  if ((double)(whites + col) / (double)blobArea(a) > 0.10)
+  if ((float)(whites + col) / (float)blobArea(a) > 0.10f)
     return true;
   return false;
 }
@@ -809,8 +809,8 @@ void ObjectFragments::detectOrientation(int which) {
  * @return         the corresponding x point
  */
 int ObjectFragments::xProject(int startx, int starty, int newy) {
-  //slope is a double representing the slope of the horizon.
-  return startx - ROUND2(slope * (double)(newy - starty));
+  //slope is a float representing the slope of the horizon.
+  return startx - ROUND2(slope * (float)(newy - starty));
 }
 
 /* Project a line given a start coord and a new y value - note that this is dangerous depending on how you
@@ -820,8 +820,8 @@ int ObjectFragments::xProject(int startx, int starty, int newy) {
  * @return         the corresponding x point
  */
 int ObjectFragments::xProject(point <int> point, int newy) {
-  //slope is a double representing the slope of the horizon.
-  return point.x - ROUND2(slope * (double)(newy - point.y));
+  //slope is a float representing the slope of the horizon.
+  return point.x - ROUND2(slope * (float)(newy - point.y));
 }
 
 /* Project a line given a start coord and a new x value
@@ -831,7 +831,7 @@ int ObjectFragments::xProject(point <int> point, int newy) {
  * @return         the corresponding y point
  */
 int ObjectFragments::yProject(int startx, int starty, int newx) {
-  return starty + ROUND2(slope * (double)(newx - startx));
+  return starty + ROUND2(slope * (float)(newx - startx));
 }
 
 /* Project a line given a start coord and a new x value
@@ -840,7 +840,7 @@ int ObjectFragments::yProject(int startx, int starty, int newx) {
  * @return         the corresponding y point
  */
 int ObjectFragments::yProject(point <int> point, int newx) {
-  return point.y + ROUND2(slope * (double)(newx - point.x));
+  return point.y + ROUND2(slope * (float)(newx - point.x));
 }
 
 /* Scan from the point along the line until you have hit "stopper" points that aren't color "c"
@@ -1298,7 +1298,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
       int counter = count;
       // we do the inverse of the slope formula since we are calculating the perpindicular line
       if (y != newy) {
-	double newslope = (double)(newx - x) / (double)(y - newy) ;
+	float newslope = (float)(newx - x) / (float)(y - newy) ;
 	if (abs(newslope - slope) < 0.5 && abs(newslope - slope) > 0.05) {
 	  if (CORRECT) {
 	    drawBlob(post, PINK);
@@ -1371,7 +1371,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 	int counter = count;
 	// we do the inverse of the slope formula since we are calculating the perpindicular line
 	if (y != newy) {
-	  double newslope = (double)(newx - x) / (double)(y - newy) ;
+	  float newslope = (float)(newx - x) / (float)(y - newy) ;
 	  if (abs(newslope - slope) < 0.5 && abs(newslope - slope) > 0.05) {
 	    if (CORRECT) {
 	      drawBlob(post, PINK);
@@ -2161,13 +2161,13 @@ bool ObjectFragments::setCorners(int leftx, int lefty, int rightx, int righty, i
       bottomY = by;
     }
     // since our height has to be accurate, let's check heights of each blob
-    double bigd = 0;
+    float bigd = 0.0f;
     int toph = 0, both = 0;
     for (i = 0; i < spanX; i++) {
       bx = leftX + i;
       by = yProject(leftX, leftY, leftX + i);
       vertScan(bx, by, 1,  5, c, c2);
-      double d1 = dist(bx, by, scan.x, scan.y);
+      float d1 = dist(bx, by, scan.x, scan.y);
       if (d1 > bigd)
 	bigd = d1;
       if (scan.good > toph)
@@ -2175,7 +2175,7 @@ bool ObjectFragments::setCorners(int leftx, int lefty, int rightx, int righty, i
       bx = bottomX + i;
       by = yProject(bottomX, bottomY, bx);
       vertScan(bx, by, -1, 5, c3, c4);
-      double d2 = dist(bx, by, scan.x, scan.y);
+      float d2 = dist(bx, by, scan.x, scan.y);
       if (d2 > bigd)
 	bigd = d2;
       if (scan.good > both)
@@ -2370,14 +2370,14 @@ void ObjectFragments::findSpot(int x1, int y1, int x2, int y2, int dir, int c, i
  * @param oneY         a pointY - Serves to kepp track of where to scan
  * @param dir          the direction to scan in
  * @param myHeight     the current height of our object
- * @param check        a double which represents what percent of the height we need to find a run to match
+ * @param check        a float which represents what percent of the height we need to find a run to match
  * @param x            center of where we are looking
  * @param y            center of where we are looking
  * @param stopper      Noise tolerance on scans?
  * @param c            Object color
  *
  */
-void ObjectFragments::findCorner(int oneX, int oneY, int dir, int myHeight, double check, int x, int y, int stopper, int c, int c2) {
+void ObjectFragments::findCorner(int oneX, int oneY, int dir, int myHeight, float check, int x, int y, int stopper, int c, int c2) {
   int i = oneX;
   int j = oneY;
   int checkSpan = BADVALUE;
@@ -2390,7 +2390,7 @@ void ObjectFragments::findCorner(int oneX, int oneY, int dir, int myHeight, doub
   //cout << "In findcorner " << myHeight << endl;
   //myHeight times this magical .65 const basically means we are looking for a run that is at least that tall.
   //Also, make sure we are scanning in
-  for ( ; checkSpan < ROUND2((double)myHeight * check) && ((i < x && dir > 0) || (i > x && dir < 0)) ;  ) {
+  for ( ; checkSpan < ROUND2((float)myHeight * check) && ((i < x && dir > 0) || (i > x && dir < 0)) ;  ) {
     //cout << "Finding " << i << " " << j << " " << checkSpan << endl;
     vertScan(i, j, -1,  stopper, c, c2); //scan up
     check1 = scan.y;
@@ -3650,7 +3650,7 @@ bool ObjectFragments::checkSize(blob b, int c) {
  */
 #if ROBOT(AIBO)
 
-bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int c2, int horizon, VisualFieldObject* left, VisualFieldObject* mid, VisualFieldObject* right, blob post, blob big) {
+bool ObjectFragments::checkPostAndBlob(float rat, bool beaconFound, int c, int c2, int horizon, VisualFieldObject* left, VisualFieldObject* mid, VisualFieldObject* right, blob post, blob big) {
   // check for a T nearby
   const list <VisualCorner>* corners = vision->fieldLines->getCorners();
   for (list <VisualCorner>::const_iterator k = corners->begin();
@@ -3919,7 +3919,7 @@ bool ObjectFragments::checkPostAndBlob(double rat, bool beaconFound, int c, int 
 	  big.leftBottom.y = last;
 	  big.rightBottom.y = last;
 	  // one last check
-	  double newrat = (double)blobWidth(big) / (double)blobHeight(big);
+	  float newrat = (float)blobWidth(big) / (float)blobHeight(big);
 	  if (blobHeight(big) > spanY * 2 / 3 || newrat > SQUATRAT) {
 	    // whoops!
 	    left->init();
@@ -4985,7 +4985,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
     return;
   }
   if (spanY + 1 == 0) return;
-  double rat = (double)(spanX) / (double)(spanY);
+  float rat = (float)(spanX) / (float)(spanY);
   if (!postRatiosOk(rat) && spanY < IMAGE_HEIGHT / 2) {
 #if ROBOT(NAO)
     return;
@@ -5096,7 +5096,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
     spanX2 = pole.rightTop.x - pole.leftTop.x + 1;
     spanY2 = pole.leftBottom.y - pole.leftTop.y + 1;
     dc = checkDist(trueLeft2, trueRight2, trueTop2, trueBottom2);
-    rat = (double)spanX2 / (double)spanY2;
+    rat = (float)spanX2 / (float)spanY2;
     bool ratOk = postRatiosOk(rat) || (!greenCheck(pole) && rat < SQUATRAT);
     bool goodSecondPost = checkSize(pole, c);
     if (SANITY) {
@@ -5561,7 +5561,7 @@ void ObjectFragments::transferTopBlob(VisualFieldObject * one, int cert, int dis
  * @return             the best percentage we found
  */
 // only called on really big orange blobs
-double ObjectFragments::rightHalfColor(blob tempobj) {
+float ObjectFragments::rightHalfColor(blob tempobj) {
   int x = tempobj.leftTop.x;
   int y = tempobj.leftTop.y;
   int spanY = tempobj.leftBottom.y - y;
@@ -5599,7 +5599,7 @@ double ObjectFragments::rightHalfColor(blob tempobj) {
   if (BALLDEBUG) {
     cout << "Checking half color " << good << " " << good1 << " " << good2 << " " << (spanX * spanY / 2) << endl;
   }
-  double percent = (double)max(max(good, good1), good2) / (double) (spanX * spanY / 2);
+  float percent = (float)max(max(good, good1), good2) / (float) (spanX * spanY / 2);
   //cout << "Tossed because of low percentage " << percent << " " << color << endl;
   return percent;
 }
@@ -5610,7 +5610,7 @@ double ObjectFragments::rightHalfColor(blob tempobj) {
  * @return            the percentage (unless a special situation occurred)
  */
 
-double ObjectFragments::rightColor(blob tempobj, int col) {
+float ObjectFragments::rightColor(blob tempobj, int col) {
   int x = tempobj.leftTop.x;
   int y = tempobj.leftTop.y;
   int spanY = blobHeight(tempobj);
@@ -5640,14 +5640,14 @@ double ObjectFragments::rightColor(blob tempobj, int col) {
   if (BALLDEBUG) {
     cout << "ORange " << ogood << " " << orgood << " " << red << " " << blobArea(tempobj) << endl;
   }
-  if (blobArea(tempobj) > 1000) return (double) good / (double) blobArea(tempobj);
+  if (blobArea(tempobj) > 1000) return (float) good / (float) blobArea(tempobj);
   //if (ogood < 2 * orgood) return 0.1; // at least two thirds of the "orange" pixels should be orange
   if (red > spanX * spanY * 0.10) return 0.1;
   if (ogood < spanX * spanY * 0.20) return 0.1;
   if (tempobj.area > 1000 && ogood+oygood > (spanX * spanY * 0.4)  && good < (spanX * spanY * 0.65)) return 0.65;
-  double percent = (double)good / (double) (spanX * spanY);
+  float percent = (float)good / (float) (spanX * spanY);
   if (col == GREEN)
-    return (double)good;
+    return (float)good;
   //cout << "Tossed because of low percentage " << percent << " " << color << endl;
   return percent;
 }
@@ -5710,7 +5710,7 @@ double ObjectFragments::rightColor(blob tempobj, int col) {
  * @param dir         positive or negative direction
  * @return            whether the point is good (0) or bad (1) - Joho, a) why not boolean, b) why not the other way?
  */
-int ObjectFragments::scanOut(int start_x, int start_y, double slopel, int dir){
+int ObjectFragments::scanOut(int start_x, int start_y, float slopel, int dir){
   if(DEBUGBALLPOINTS) {
     printf("Passed start_x %d, start_y %d, slopel %g, dir %d \n",
 	   start_x,start_y,slopel,dir);
@@ -5774,10 +5774,10 @@ int ObjectFragments::scanOut(int start_x, int start_y, double slopel, int dir){
   //update position for both y, x
   if(yOrX){
     x = x + dir;
-    y = start_y  +ROUND2(slopel*(double)(x - (start_x)));
+    y = start_y  +ROUND2(slopel*(float)(x - (start_x)));
   }else{
     y = y + dir;
-    x = start_x  +ROUND2(slopel*(double)(y - (start_y)));
+    x = start_x  +ROUND2(slopel*(float)(y - (start_y)));
   }
   }
   if(goodEdge < EDGE_DEPTH){ // bad point
@@ -5807,7 +5807,7 @@ int  ObjectFragments::roundness(blob b) {
   int h = blobHeight(b);
   int x = b.leftTop.x;
   int y = b.leftTop.y;
-  double ratio = (double)w / (double)h;
+  float ratio = (float)w / (float)h;
   int r = 10;
   if ((h < SMALLBALLDIM && w < SMALLBALLDIM && ratio > BALLTOOTHIN && ratio < BALLTOOFAT)) {
   } else if (ratio > THINBALL && ratio < FATBALL) {
@@ -5849,7 +5849,7 @@ int  ObjectFragments::roundness(blob b) {
     if (y + h > IMAGE_HEIGHT - 3 || x == 0 || (x + w) > IMAGE_WIDTH - 2 || y == 0) {
     } else {
       // we're in the screen
-      int d = ROUND2((double)max(w, h) / 6.0);
+      int d = ROUND2((float)max(w, h) / 6.0);
       int d3 = min(w, h);
       for (int i = 0; i < d3; i++) {
 	pix = thresh->thresholded[y+i][x+i];
@@ -5890,7 +5890,7 @@ int  ObjectFragments::roundness(blob b) {
     }
     if (BALLDEBUG)
       cout << "Good " << goodPix << " " << badPix << endl;
-    if ((double)goodPix / (double)badPix < 2) {
+    if ((float)goodPix / (float)badPix < 2) {
       if (BALLDEBUG)
 	cout << "Screening for bad roundness" << endl;
       return BADVALUE;
@@ -6034,7 +6034,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     int bym = by - (by - blobs[i].leftTop.y) / 2;       // mid Y point of ball
     int bh = horizonAt(bx);
     int br = roundness(blobs[i]);
-    double colPer = rightColor(blobs[i], ORANGE);
+    float colPer = rightColor(blobs[i], ORANGE);
     int horizonOffset = bh - by;
     int hei = blobs[i].leftBottom.y - blobs[i].leftTop.y;
     int wid = blobs[i].rightTop.x - blobs[i].leftTop.x;
@@ -6134,7 +6134,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   int angle = PI;
   scanOut(cenX,cenY,tan(angle), 1);*/
 
-  for(double angle = 0; angle < PI; angle +=PI/NUM_EDGE_POINTS){
+  for(float angle = 0; angle < PI; angle +=PI/NUM_EDGE_POINTS){
     scanOut(cenX,cenY,tan(angle), 1);
     scanOut(cenX,cenY,tan(angle), -1);
   }
@@ -6182,7 +6182,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     if (BALLDEBUG)
       cout << "Small ball passed green and horizon tests" << endl;
   }
-  double colPer = rightColor(topBlob, ORANGE);
+  float colPer = rightColor(topBlob, ORANGE);
 
   if (w * h > 1) {
     confidence -= ROUND2((0.85 - colPer) * 10);
@@ -6214,7 +6214,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 
     // SORT OUT BALL INFORMATION
     // start out by figuring out whether we're using blobs or inferred information
-    //double rat = (double) w / (double) h;
+    //float rat = (float) w / (float) h;
     if (!atBoundary(topBlob)) {
 	//if (occlusion == NOOCCLUSION || (occlusion <= BOTTOMOCCLUSION && (rat > MINGOODBALL && rat < MAXGOODBALL))) {
       if (BALLDISTDEBUG) {
@@ -6230,7 +6230,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 
       thisBall->setWidth(w);
       thisBall->setHeight(h);
-      thisBall->setRadius((double)max((double)w/2.0, (double)h/2.0));
+      thisBall->setRadius((float)max((float)w/2.0, (float)h/2.0));
       int amount = h / 2;
       if (w > h)
 	amount = w / 2;
@@ -6255,7 +6255,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
        }
       if (BALLDISTDEBUG) {
 	cout << "Inferred Confidence " << inferredConfidence << endl;
-	thisBall->setRadius((double)max(w/2, h/2));
+	thisBall->setRadius((float)max(w/2, h/2));
 	thisBall->setFocalDistance();
 	thisBall->setDistance();
 	cout << "Blob dist would have been" << thisBall->getDist() << endl;
@@ -6276,7 +6276,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 
 	thisBall->setWidth(w);
 	thisBall->setHeight(h);
-	thisBall->setRadius((double)max((double)w/2.0, (double)h/2.0));
+	thisBall->setRadius((float)max((float)w/2.0, (float)h/2.0));
 	int amount = h / 2;
 	if (w > h)
 	  amount = w / 2;
@@ -6332,7 +6332,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   //cout << "horizon " << horizon << " " << slope << endl;
   for (int i = 0; i < numBlobs; i++) {
     int ar = blobArea(blobs[i]);
-    double perc = rightColor(blobs[i], ORANGE);
+    float perc = rightColor(blobs[i], ORANGE);
     estimate es;
     es = vision->pose->pixEstimate(blobs[i].leftTop.x + blobWidth(blobs[i]) / 2, blobs[i].leftTop.y + 2 * blobHeight(blobs[i]) / 3, 0.0);
     int diam = max(blobWidth(blobs[i]), blobHeight(blobs[i]));
@@ -6415,7 +6415,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   int cenX = midPoint(topBlob.leftTop.x, topBlob.rightBottom.x);
   int cenY = midPoint(topBlob.leftTop.y, topBlob.leftBottom.y);
 
-  for(double angle = 0; angle < PI; angle +=PI/NUM_EDGE_POINTS){
+  for(float angle = 0; angle < PI; angle +=PI/NUM_EDGE_POINTS){
     scanOut(cenX,cenY,tan(angle), 1);
     scanOut(cenX,cenY,tan(angle), -1);
   }
@@ -6440,7 +6440,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     if (BALLDEBUG)
       cout << "Small ball passed green and horizon tests" << endl;
   }
-  double colPer = rightColor(topBlob, ORANGE);
+  float colPer = rightColor(topBlob, ORANGE);
 
   confidence -= ROUND2((0.85 - colPer) * 10);
   //cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
@@ -6459,14 +6459,14 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 
   // SORT OUT BALL INFORMATION
   // start out by figuring out whether we're using blobs or inferred information
-  //double rat = (double) w / (double) h;
+  //float rat = (float) w / (float) h;
   // x, y, width, and height. Not up for debate.
   thisBall->setX(topBlob.leftTop.x);
   thisBall->setY(topBlob.leftTop.y);
 
   thisBall->setWidth(w);
   thisBall->setHeight(h);
-  thisBall->setRadius((double)max((double)w/2.0, (double)h/2.0));
+  thisBall->setRadius((float)max((float)w/2.0, (float)h/2.0));
   int amount = h / 2;
   if (w > h)
     amount = w / 2;
@@ -6521,7 +6521,7 @@ int ObjectFragments::circleFit(Ball * thisBall){
       return 1;
     }
   //Init the matrices j,k and a (j^-1)
-  double
+  float
     j00 = 0.0,j01 = 0.0, j02 = 0.0,
     j10 = 0.0,j11 = 0.0,j12 = 0.0,
     j20 = 0.0,j21 = 0.0,j22 = 0.0,
@@ -6535,9 +6535,9 @@ int ObjectFragments::circleFit(Ball * thisBall){
   //look through all the points, and do the analysis
   /*see http://www.orbitals.com/self/least/least.htm , 1st example*/
   for(int p = 0; p < 2*numPoints;){
-    double x = points[p++];
-    double y = points[p++];
-    double xySqrd = (x*x + y*y);
+    float x = points[p++];
+    float y = points[p++];
+    float xySqrd = (x*x + y*y);
     //cout<<x<<endl;
     //print "New point(",x,y,"),xySqrd = ",xySqrd
     //get Jt*J
@@ -6567,19 +6567,19 @@ int ObjectFragments::circleFit(Ball * thisBall){
   //printf("Num points %d \n",numPoints);
   /*http://en.wikipedia.org/wiki/Standard_deviation*/
   /*
-  double meanX = k1/numPoints;
-  double meanY = k2/numPoints;
+  float meanX = k1/numPoints;
+  float meanY = k2/numPoints;
 
   printf("Sum squared of X %f   mean X^2 %f \n",j11/numPoints,meanX*meanX);
   printf("Sum squared of X %f   mean X^2 %f \n",j22/numPoints,meanY*meanY);
 
-  double stdDevX =sqrt((j11/numPoints)-(meanX*meanX));
-  double stdDevY =sqrt((j22/numPoints)-(meanY*meanY));
+  float stdDevX =sqrt((j11/numPoints)-(meanX*meanX));
+  float stdDevY =sqrt((j22/numPoints)-(meanY*meanY));
 
   printf("Std dev xy (%f,%f)\n",stdDevX,stdDevY);*/
 
   //find the inverse
-  double jDet = det3(j00,j01,j02,
+  float jDet = det3(j00,j01,j02,
 		     j10,j11,j12,
 		     j20,j21,j22);
   //printf("The determinant:%g\n",jDet);
@@ -6613,9 +6613,9 @@ int ObjectFragments::circleFit(Ball * thisBall){
 
   //multiply the matrices to find the coefficients
   //which help to solve the circle
-  double a = a00*k0+a01*k1+a02*k2;
-  double b = a10*k0+a11*k1+a12*k2;
-  double c = a20*k0+a21*k1+a22*k2;
+  float a = a00*k0+a01*k1+a02*k2;
+  float b = a10*k0+a11*k1+a12*k2;
+  float c = a20*k0+a21*k1+a22*k2;
   if(a == 0){
     if (DEBUGCIRCLEFIT)
       printf("ERR in circle fit: got a zero denominator, circle fit failed");
@@ -6633,13 +6633,13 @@ int ObjectFragments::circleFit(Ball * thisBall){
   //calc all the infered dimensions
   int inferedX = ROUND2(-b/(2*a));
   int inferedY = ROUND2(-c/(2*a));
-  double determinantThing = 4*a + b*b + c*c;
+  float determinantThing = 4*a + b*b + c*c;
   if(determinantThing < 0){
     if (DEBUGCIRCLEFIT)
       printf("ERR in circle fit: PROCESSOR NOT ACCURATE ENOUGH\n");
     return 1;
   }
-  double inferedR = abs(sqrt(determinantThing)/(2*a));
+  float inferedR = abs(sqrt(determinantThing)/(2*a));
 
 
   if(inferedX < (0 - IMAGE_WIDTH) || inferedX > 2*IMAGE_WIDTH ||
@@ -6662,13 +6662,13 @@ int ObjectFragments::circleFit(Ball * thisBall){
 
   if (DEBUGCIRCLEFIT)
     drawPoint(inferedX,inferedY,YELLOW);
-  double stDev = 0;
-  double *distances = new double[numPoints];
-  double *pointer = distances;
+  float stDev = 0;
+  float *distances = new float[numPoints];
+  float *pointer = distances;
   for(int p = 0; p < 2*numPoints;){
-    double x = points[p++];
-    double y = points[p++];
-    double newRad = sqrt(pow(x-inferedX,2) + pow(y-inferedY,2));
+    float x = points[p++];
+    float y = points[p++];
+    float newRad = sqrt(pow(x-inferedX,2) + pow(y-inferedY,2));
     stDev +=pow(newRad-inferedR,2);
     *pointer = newRad;
     pointer++;
@@ -6677,11 +6677,11 @@ int ObjectFragments::circleFit(Ball * thisBall){
   stDev = sqrt(stDev);
   //cout<<"STDEV "<<stDev<<endl;
 
-  double distErr = 0;
+  float distErr = 0;
   int badPoints = 0;
 
   for (int i=0; i< numPoints; i++) {
-    double error = fabs(distances[i] - inferedR);
+    float error = fabs(distances[i] - inferedR);
     //cout<<"error: "<<error<<endl;
     if (error > stDev) {
       badPoints++;
@@ -6727,7 +6727,7 @@ int ObjectFragments::circleFit(Ball * thisBall){
  * @param minpercent  how good it needs to be
  * @return            was it good enough?
  */
-bool ObjectFragments::rightBlobColor(blob tempobj, double minpercent) {
+bool ObjectFragments::rightBlobColor(blob tempobj, float minpercent) {
   int x = tempobj.leftTop.x;
   int y = tempobj.leftTop.y;
   int spanX = tempobj.rightTop.x - tempobj.leftTop.x; //ROUND2(dist(x, y, tempobj.rightTop.x, tempobj.rightTop.y));
@@ -6749,7 +6749,7 @@ bool ObjectFragments::rightBlobColor(blob tempobj, double minpercent) {
       }
     }
   }
-  double percent = (double)good / (double) (total);
+  float percent = (float)good / (float) (total);
   if (percent > minpercent) {
     return true;
   }
@@ -6987,7 +6987,7 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2, int span
  * @param x     x value
  * @param y     y value
  */
-void ObjectFragments::addPoint(double x, double y){
+void ObjectFragments::addPoint(float x, float y){
   if (DEBUGCIRCLEFIT)
     printf("ADDING a point:#%d,(%f,%f)\n",numPoints,x,y);
   if(numPoints < MAX_POINTS){
@@ -7006,7 +7006,7 @@ void ObjectFragments::addPoint(double x, double y){
  * @param ratio     the height/width ratio
  * @return          is it a legal value?
  */
-bool ObjectFragments::postRatiosOk(double ratio) {
+bool ObjectFragments::postRatiosOk(float ratio) {
   return ratio < GOODRAT;
 }
 
@@ -7046,8 +7046,8 @@ int ObjectFragments::distance(int x1, int x2, int x3, int x4) {
  * @param y1   y value of point 2
  * @return      the distance between the objects
  */
- double ObjectFragments::dist(int x, int y, int x1, int y1) {
-   return sqrt((double)abs(x - x1) * abs(x - x1) + abs(y - y1) * abs(y - y1));
+ float ObjectFragments::dist(int x, int y, int x1, int y1) {
+   return sqrt((float)abs(x - x1) * abs(x - x1) + abs(y - y1) * abs(y - y1));
  }
 
 /* Finds and returns the midpoint of two numbers.
@@ -7161,7 +7161,7 @@ void ObjectFragments::printBlob(blob b) {
  * @param bg   where around the ball there is green
  */
 
-void ObjectFragments::printBall(blob b, int c, double p, int o, int bg) {
+void ObjectFragments::printBall(blob b, int c, float p, int o, int bg) {
 #ifdef OFFLINE
   if (BALLDEBUG) {
     cout << "Ball info: " << b.leftTop.x << " " << b.leftTop.y << " " << (b.rightTop.x - b.leftTop.x);

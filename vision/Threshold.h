@@ -74,14 +74,14 @@ static const int VISUAL_HORIZON_COLOR = BROWN;
 //
 // DISTANCE ESTIMATES CONSTANTS
 // based on Height and Width
-static const double POST_MIN_FOC_DIST = 10.0; // goal posts
-static const double POST_MAX_FOC_DIST = 800.0;
-static const double BEACON_MIN_FOC_DIST = 15.0;
-static const double BEACON_MAX_FOC_DIST = 650.0;
+static const float POST_MIN_FOC_DIST = 10.0f; // goal posts
+static const float POST_MAX_FOC_DIST = 800.0f;
+static const float BEACON_MIN_FOC_DIST = 15.0f;
+static const float BEACON_MAX_FOC_DIST = 650.0f;
 
 //Andrew: restrict acceptable beacon dist for goalie
-static const double GOALIE_BEACON_MIN_FOC_DIST = 10.0;
-static const double GOALIE_BEACON_MAX_FOC_DIST = 500.0;
+static const float GOALIE_BEACON_MIN_FOC_DIST = 10.0f;
+static const float GOALIE_BEACON_MAX_FOC_DIST = 500.0f;
 
 //
 // CHROMATIC DISTORTION CONSTANTS
@@ -123,11 +123,11 @@ class Threshold
 
   void storeFieldObjects();
   void setFieldObjectInfo(VisualFieldObject *objPtr);
-  double getGoalPostDistFromHeight(double height);
-  double getGoalPostDistFromWidth(double width);
-  double getBeaconDistFromHeight(double height);
+  float getGoalPostDistFromHeight(float height);
+  float getGoalPostDistFromWidth(float width);
+  float getBeaconDistFromHeight(float height);
   int distance(int x1, int x2, int x3, int x4);
-  double getEuclidianDist(point <int> coord1, point <int> coord2);
+  float getEuclidianDist(point <int> coord1, point <int> coord2);
   void findGreenHorizon();
   point <int> findIntersection(int col, int dir, int c);
   int postCheck(bool which, int left, int right);

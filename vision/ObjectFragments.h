@@ -67,14 +67,14 @@ static const int MAX_BLOBS = 400;
 #endif
 static const int NOISE_SKIP = 3;                    // actually just skips 2 pixel noise in runs
 static const int MIN_SPLIT = 40;                    // minimum distance between goal and post - changed from 50 to 40 JS
-static const double PERCENTMATCH = 0.65;            //  Amount of post that has to match (so backstop isn't counted in posts)
-static const double HALFISH = 0.49;                 // threshold for expanding sides back out
-static const double GOODRAT = 0.75;                 // highest ratio of width over height for posts
-static const double SQUATRAT = 1.2;                 // indicator that post may be salvagable
+static const float PERCENTMATCH = 0.65f;            //  Amount of post that has to match (so backstop isn't counted in posts)
+static const float HALFISH = 0.49f;                 // threshold for expanding sides back out
+static const float GOODRAT = 0.75f;                 // highest ratio of width over height for posts
+static const float SQUATRAT = 1.2f;                 // indicator that post may be salvagable
 static const int MIN_POST_SEPARATION = 12;          // goal posts of the same color have to be this far apart
 static const int BIGPOST = 50;                      // how big a post is to be declared a big post
-static const double NORMALPOST = 0.6;
-static const double QUESTIONABLEPOST = 0.85;
+static const float NORMALPOST = 0.6f;
+static const float QUESTIONABLEPOST = 0.85f;
 
 // Ball constants
 #if ROBOT(NAO)
@@ -83,19 +83,19 @@ static const int SMALLBALLDIM = 8;                 // below this size balls are 
 static const int SMALLBALLDIM = 10;
 #endif
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
-static const double BALLTOOFAT = 1.5;               // ratio of width/height worse than this is a very bad sign
-static const double BALLTOOTHIN = 0.75;             // ditto
-static const double OCCLUDEDTHIN = 0.2;             // however, if the ball is occluded we can go thinner
-static const double OCCLUDEDFAT = 4.0;              // or fatter
-static const double MIDFAT = 3.0;
-static const double MIDTHIN = 0.3;
-static const double MINORANGEPERCENT = 0.59;        // at least this much of the blob should be orange normally
-static const double MINGOODBALL = 0.5;
-static const double MAXGOODBALL = 3.0;
+static const float BALLTOOFAT = 1.5f;               // ratio of width/height worse than this is a very bad sign
+static const float BALLTOOTHIN = 0.75f;             // ditto
+static const float OCCLUDEDTHIN = 0.2f;             // however, if the ball is occluded we can go thinner
+static const float OCCLUDEDFAT = 4.0f;              // or fatter
+static const float MIDFAT = 3.0f;
+static const float MIDTHIN = 0.3f;
+static const float MINORANGEPERCENT = 0.59f;        // at least this much of the blob should be orange normally
+static const float MINGOODBALL = 0.5f;
+static const float MAXGOODBALL = 3.0f;
 static const int BIGAREA = 400;
 static const int BIGGERAREA = 600;
-static const double FATBALL = 2.0;
-static const double THINBALL = 0.5;
+static const float FATBALL = 2.0f;
+static const float THINBALL = 0.5f;
 
 static const int DIST_POINT_FUDGE = 5;
 
@@ -162,7 +162,7 @@ struct stop {
 //struct colorRect {
 //};
 
-inline int ROUND2(double x) {
+inline int ROUND2(float x) {
   if ((x-(int)x) >= 0.5) return ((int)x+1);
   if ((x-(int)x) <= -0.5) return ((int)x-1);
   return (int)x;
@@ -178,7 +178,7 @@ class ObjectFragments {
   void setColor(int c);
 
   // Making object
-  void init(double s);
+  void init(float s);
 
   // blobbing
   void getTopAndMerge(int maxY);
@@ -247,7 +247,7 @@ class ObjectFragments {
                 int c4, int cases);
   bool setCorners(int leftx, int lefty, int rightx, int righty, int c, int c2,
                   int c3, int c4, VisualFieldObject* post);
-  void findCorner(int oneX, int oneY, int dir, int myHeight, double check,
+  void findCorner(int oneX, int oneY, int dir, int myHeight, float check,
                   int x, int y, int stopper, int c, int c2);
   bool inferBeaconFromBlob(blob b, VisualFieldObject* post);
 #endif
@@ -277,7 +277,7 @@ class ObjectFragments {
                 VisualFieldObject* right, VisualFieldObject* mid);
   bool inBlob(blob b, int x, int y, int h);
   void makeBoxes(int sx, int xy, int hb);
-  bool checkPostAndBlob(double rat, bool postFound, int c, int c2,
+  bool checkPostAndBlob(float rat, bool postFound, int c, int c2,
 			int horizon, VisualFieldObject* left, VisualFieldObject* mid,
 			VisualFieldObject* right, blob post, blob big);
   int projectBoxes(int spanX, int spanY, int howbig, int fakeBottom,
@@ -311,11 +311,11 @@ class ObjectFragments {
   void transferBlob(blob from, blob & to);
 
   // ball stuff
-  double rightColor(blob obj, int c);
-  double rightHalfColor(blob obj);
+  float rightColor(blob obj, int c);
+  float rightHalfColor(blob obj);
   bool greenCheck(blob b);
   bool greenSide(blob b);
-  int scanOut(int start_x, int start_y, double slope,int dir);
+  int scanOut(int start_x, int start_y, float slope,int dir);
   int ballNearGreen(blob b);
   int roundness(blob b);
   bool badSurround(blob b);
@@ -324,31 +324,31 @@ class ObjectFragments {
   int circleFit(Ball * thisBall);
 
   // sanity checks
-  bool rightBlobColor(blob obj, double per);
+  bool rightBlobColor(blob obj, float per);
   void screenCrossbar();
   bool postBigEnough(blob b);
   bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
                        int bottom, int top);
   bool horizonTopOk(int top, int hor);
-  bool postRatiosOk(double ratio);
+  bool postRatiosOk(float ratio);
   bool secondPostFarEnough(point <int> l1, point <int> r1,
 			   point <int> l2, point <int> r2, int p);
   bool blobOk(blob b);
   bool locationOk(blob b, int hor);
   bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
-  void addPoint(double x, double y);
+  void addPoint(float x, float y);
 
   // misc.
-  double dist(int x, int y, int x1, int y1);
+  float dist(int x, int y, int x1, int y1);
   int distance(int x1, int x2, int x3, int x4);
   int getPixels(int index);
   int midPoint(int a, int b);
-  double getSlope() { return slope; }
+  float getSlope() { return slope; }
 
 
   // debugging methods
   void printObjs();
-  void printBall(blob b, int c, double p, int o, int bg);
+  void printBall(blob b, int c, float p, int o, int bg);
   void drawPoint(int x, int y, int c);
   void drawRect(int x, int y, int w, int h, int c);
   void drawBlob(blob b, int c);
@@ -414,12 +414,12 @@ class ObjectFragments {
 #endif
 
   //find the determinant of a 2by2
-  double det2(double a00,double a01,double a10,double a11){
+  float det2(float a00,float a01,float a10,float a11){
     return (a00*a11)-(a01*a10);}
   //find the determinant of a 3by3
-  double det3(double a00,double a01,double a02,
-	    double a10,double a11,double a12,
-	    double a20,double a21,double a22){
+  float det3(float a00,float a01,float a02,
+	    float a10,float a11,float a12,
+	    float a20,float a21,float a22){
     return ((a00*det2(a11,a12,
 		      a21,a22))
 	    -(a01*det2(a10,a12,
@@ -456,11 +456,11 @@ class ObjectFragments {
   int goodP;
   int inferredConfidence;
   blob zeroBlob;
-  double slope;
+  float slope;
   int occlusion;
   point <int> spot;
   int numPoints;
-  double points[MAX_POINTS*2];
+  float points[MAX_POINTS*2];
 
 #ifdef OFFLINE
  bool PRINTOBJS;
