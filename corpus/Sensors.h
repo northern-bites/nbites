@@ -79,6 +79,13 @@ struct Inertial {
     float angleY;
 };
 
+enum UltraSoundMode {
+    LL = 0,
+    LR,
+    RL,
+    RR
+};
+
 
 class Sensors {
   //friend class Man;
@@ -100,7 +107,7 @@ class Sensors {
     const FootBumper getLeftFootBumper() const;
     const FootBumper getRightFootBumper() const;
     const Inertial getInertial() const;
-    const std::vector<float> getSonar() const;
+    const float getUltraSound() const;
 #endif
 
     // Locking data storage methods
@@ -123,7 +130,7 @@ class Sensors {
                      const float gyrX, const float gyrY,
                      const float angleX, const float angleY);
     void setInertial(const Inertial &inertial);
-    void setSonar(float l, float r);
+    void setUltraSound(const float dist);
 #endif
 
     // special methods
@@ -163,7 +170,7 @@ class Sensors {
     mutable pthread_mutex_t fsr_mutex;
     mutable pthread_mutex_t bumper_mutex;
     mutable pthread_mutex_t inertial_mutex;
-    mutable pthread_mutex_t sonar_mutex;
+    mutable pthread_mutex_t ultra_sound_mutex;
 #endif
     mutable pthread_mutex_t image_mutex;
 
@@ -184,8 +191,8 @@ class Sensors {
     // Inertial sensors
     Inertial inertial;
     // Sonar sensors
-    float sonarLeft;
-    float sonarRight;
+    float ultraSoundDistance;
+    UltraSoundMode ultraSoundMode;
 #endif
 
     const unsigned char *image;

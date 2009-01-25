@@ -77,6 +77,14 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
       vision(new NaoPose(&sensors), &profiler),
       comm(synchro, &sensors, &vision),
       noggin(&sensors, &profiler, &vision),
+#ifdef NAOQI1
+      // call the default constructor of all the shared pointers
+      log(), camera(), lem(), almemory(), dcm(0),
+#else
+      // initialize all pointers to NULL or 0
+      log(0), camera(0), lem(0),
+#endif
+      lem_name(""),
       camera_active(false)
 {
     // open lems
@@ -138,12 +146,20 @@ Man::initMan()
         std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
     }
 
-//initialize ALMemory for access to stuff like bumpers, etc
+    // initialize ALMemory for access to stuff like bumpers, etc
 #ifdef NAOQI1
-    try{
-        almemory = getParentBroker()->getProxy("ALMemory");
-    }catch(ALError &e){
-        cout << "Failed to initialize proxy to ALMemory" <<endl;
+    try {
+        //almemory = getParentBroker()->getProxy("ALMemory");
+        almemory = getParentBroker()->getMemoryProxy();
+    } catch(ALError &e){
+        cout << "Failed to initialize proxy to ALMemory" << endl;
+    }
+
+    // initialize a dcm proxy so we can set values in almemory
+    try {
+        dcm = new DCMProxy(getParentBroker());
+    } catch(ALError &e) {
+        cout << "Failed to initialize proxy to DCM" << endl;
     }
 
 #endif
@@ -260,6 +276,46 @@ void Man::syncWithALMemory() {
         cout << "Failed to read inertial unit values" << endl;
     }
     sensors.setInertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
+
+    static int counter = 0;
+    float ultraSoundValue = 0.0f;
+    // Ultrasound values
+    try {
+        // This is testing code which sends a new value to the actuator every
+        // 20 frames. It also cycles the ultrasound mode between the four
+        // possibilities. See docs.
+        ALValue commands;
+
+        commands.arraySetSize(3);
+        commands[0] = string("US/Actuator/Value");
+        commands[1] = string("Merge");
+        commands[2].arraySetSize(1);
+        commands[2][0].arraySetSize(2);
+        // the current mode - changes every 5 frames
+        commands[2][0][0] = static_cast<float>(counter / 5);
+        commands[2][0][1] = dcm->getTime(250);
+
+        dcm->set(commands);
+
+        counter++;
+
+        if (counter > 20)
+            counter = 0;
+
+        ultraSoundValue = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/US/Sensor/Value"), 0));
+
+        float mode = static_cast<float>(almemory->call<ALValue>(
+            "getData", string(
+                "Device/SubDeviceList/US/Actuator/Value"), 0));
+
+        cout << "ultra sound mode: " << mode << endl;
+
+    } catch(ALError &e) {
+        cout << "Failed to read ultrasound distance values" << endl;
+    }
+    sensors.setUltraSound(ultraSoundValue);
 }
 
 
@@ -623,57 +679,13 @@ Man::run ()
         // This call syncs all sensors values: bumpers, fsr, inertial, etc.
         syncWithALMemory();
 
-        /*
         const FootBumper leftFootBumper(sensors.getLeftFootBumper());
         const FootBumper rightFootBumper(sensors.getRightFootBumper());
-
-        bool temp = leftFootBumper.left || leftFootBumper.right;
-
-        cout << "leftFootBumper: "
-             << boolalpha << temp << endl;
-        */
-
-        /*
-        if (leftFootBumper.left || leftFootBumper.right ||
-            rightFootBumper.left || rightFootBumper.right) {
+        // Save a frame when you press both foot bumpers
+        if ((leftFootBumper.left || leftFootBumper.right) &&
+            (rightFootBumper.left || rightFootBumper.right)) {
             saveFrame();
         }
-        */
-
-        // testing the fsr values we get from ALMemory
-        /*
-        const FSR leftFoot(sensors.getLeftFootFSR());
-        const FSR rightFoot(sensors.getRightFootFSR());
-
-        cout << "Left foot:" << endl
-             << "    FL: " << leftFoot.frontLeft
-             << "    FR: " << leftFoot.frontRight
-             << "    RL: " << leftFoot.rearLeft
-             << "    RR: " << leftFoot.rearRight
-             << endl;
-
-        cout << "Right foot:" << endl
-             << "    FL: " << rightFoot.frontLeft
-             << "    FR: " << rightFoot.frontRight
-             << "    RL: " << rightFoot.rearLeft
-             << "    RR: " << rightFoot.rearRight
-             << endl;
-        */
-
-        // testing the inertial values we get from ALMemory
-        /*
-        const Inertial inertial(sensors.getInertial());
-
-        cout << "Inertial values:" << endl
-             << "    accX: " << inertial.accX
-             << "    accY: " << inertial.accY
-             << "    accZ: " << inertial.accZ
-             << "    gyrX: " << inertial.gyrX
-             << "    gyrY: " << inertial.gyrY
-             << "    angleX: " << inertial.angleX
-             << "    angleY: " << inertial.angleY
-             << endl;
-        */
 
 #endif
 #endif

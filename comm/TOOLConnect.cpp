@@ -279,8 +279,7 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
             inertial.angleX, inertial.angleY;
         serial.write_floats(v);
 
-        v = sensors->getSonar();
-        serial.write_floats(v);
+        serial.write_float(sensors->getUltraSound());
 #endif
     }
 

@@ -31,6 +31,8 @@
 #include "albroker.h"
 #include "almodule.h"
 #include "alloggerproxy.h"
+#include "almemoryproxy.h"
+#include "dcmproxy.h"
 #include "alptr.h"
 
 #include "Common.h"
@@ -161,15 +163,14 @@ private:
     ALPtr<AL::ALLoggerProxy> log;
     ALPtr<AL::ALProxy> camera;
     ALPtr<AL::ALProxy> lem;
-    ALPtr<AL::ALProxy> almemory;
+    ALPtr<AL::ALMemoryProxy> almemory;
+    DCMProxy *dcm;
 #else
     AL::ALLoggerProxy *log;
     AL::ALProxy *camera;
     AL::ALProxy *lem;
 #endif
     std::string lem_name;
-
-    int balls_seen;
 
     bool camera_active;
 

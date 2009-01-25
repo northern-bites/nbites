@@ -70,11 +70,12 @@ static void PySensors_update(PySensors *self)
             PyList_Append(self->inertial, PyFloat_FromDouble(values[i]));
     }
 
-    values = sensors->getSonar();
+    const float dist = sensors->getUltraSound();
+
     Py_XDECREF(self->sonarLeft);
-    self->sonarLeft = PyFloat_FromDouble(values[0]);
+    self->sonarLeft = PyFloat_FromDouble(dist);
     Py_XDECREF(self->sonarRight);
-    self->sonarRight = PyFloat_FromDouble(values[1]);
+    self->sonarRight = PyFloat_FromDouble(dist);
 #endif
 }
 
@@ -350,6 +351,7 @@ Sensors::Sensors ()
       leftFootBumper(0.0f, 0.0f),
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+      ultraSoundDistance(0.0f), ultraSoundMode(LL),
 #endif
       image(&global_image[0]), pySensors(NULL)
 {
@@ -360,7 +362,7 @@ Sensors::Sensors ()
     pthread_mutex_init(&fsr_mutex, NULL);
     pthread_mutex_init(&bumper_mutex, NULL);
     pthread_mutex_init(&inertial_mutex, NULL);
-    pthread_mutex_init(&sonar_mutex, NULL);
+    pthread_mutex_init(&ultra_sound_mutex, NULL);
 #endif
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
@@ -381,7 +383,7 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&fsr_mutex);
     pthread_mutex_destroy(&bumper_mutex);
     pthread_mutex_destroy(&inertial_mutex);
-    pthread_mutex_destroy(&sonar_mutex);
+    pthread_mutex_destroy(&ultra_sound_mutex);
 #endif
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_destroy(&image_mutex);
@@ -537,17 +539,15 @@ const Inertial Sensors::getInertial () const
     return inert;
 }
 
-const vector<float> Sensors::getSonar () const
+const float Sensors::getUltraSound () const
 {
-    pthread_mutex_lock (&sonar_mutex);
+    pthread_mutex_lock (&ultra_sound_mutex);
 
-    vector<float> vec(2);
-    vec.push_back(sonarLeft);
-    vec.push_back(sonarRight);
+    float dist = ultraSoundDistance;
 
-    pthread_mutex_unlock (&sonar_mutex);
+    pthread_mutex_unlock (&ultra_sound_mutex);
 
-    return vec;
+    return dist;
 }
 
 void Sensors::setBodyAngles (vector<float>& v)
@@ -670,14 +670,13 @@ void Sensors::setInertial (const Inertial &v)
     pthread_mutex_unlock (&inertial_mutex);
 }
 
-void Sensors::setSonar (float l, float r)
+void Sensors::setUltraSound (const float dist)
 {
-    pthread_mutex_lock (&sonar_mutex);
+    pthread_mutex_lock (&ultra_sound_mutex);
 
-    sonarLeft = l;
-    sonarRight = r;
+    ultraSoundDistance = dist;
 
-    pthread_mutex_unlock (&sonar_mutex);
+    pthread_mutex_unlock (&ultra_sound_mutex);
 }
 
 #endif /* ROBOT(NAO) */
