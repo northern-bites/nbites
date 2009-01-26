@@ -40,6 +40,9 @@
 
 package TOOL.Vision;
 
+//the object classes
+import edu.bowdoin.robocup.TOOL.Data.Ball;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -49,14 +52,17 @@ public class TOOLVisionLink {
     //These are defined here for ease, but need to get read from somewhere else
     public static final  int DFLT_IMAGE_WIDTH = 640;
     public static final  int DFLT_IMAGE_HEIGHT = 480;
-
-    int width;
-    int height;
+    //image dimensions
+    private int width;
+    private int height;
+    //objects
+    private Ball ball;
 
     static private boolean visionLinkSuccessful;
 
     public TOOLVisionLink() {
         setImageDimensions(DFLT_IMAGE_WIDTH, DFLT_IMAGE_HEIGHT);
+	ball = new Ball();
     }
 
     /**
@@ -64,14 +70,18 @@ public class TOOLVisionLink {
      * Important: The cpp lower level will rejects images with the wrong
      * dimensions
      */
-    public void setImageDimensions(int w, int h)
-    {
-        width = w; height = h;
+    public void setImageDimensions(int w, int h) {
+        this.width = w; this.height = h;
     }
-    public boolean isLinkActive()
-    {
+
+    //returns true if link is active
+    public boolean isLinkActive() {
         return visionLinkSuccessful;
     }
+
+    //gets as params the raw image, the joint data and the color table
+    //returns a thresholded image
+    //it also gets all the objects (ball etc) when the cpp calls the java setballinfo
     public byte[][] processImage(byte[] img_data, float[] joint_data,
                                  byte[] ct_data)
     {
@@ -88,9 +98,13 @@ public class TOOLVisionLink {
         else
             System.out.println("VisionLink inactive,"+
                                " so image processing failed");
+
         return threshResult;
 
     }
+
+    //a simple getter for the ball 
+    public Ball getBall() { return ball;  }
 
     //Native methods:
     native private void cppProcessImage(byte[] img_data, float[] joint_data,
@@ -110,6 +124,12 @@ public class TOOLVisionLink {
         }
 
     }
-
-
+    //sets the ball variables
+    public void setBallInfo(double width, double height, int x, int y) {
+	ball.setWidth(width);
+	ball.setHeight(height);
+	ball.setX(x);
+	ball.setY(y);
+	System.out.println(width);
+    }
 }

@@ -1,7 +1,43 @@
 package TOOL.Data;
 
-public interface Ball {
+public class Ball {
 
+    //some constants
+    public final static int DEF_H = 0, DEF_W = 0, DEF_X = 0, DEF_Y = 0;
+    //variables
+    private int x, y;
+    private double h, w;
+
+    //default constructor, just sets everything to 0
+    public Ball() {
+	this.x = DEF_X;
+	this.y = DEF_Y;
+	this.w = DEF_W;
+	this.h = DEF_H;
+    }
+
+    //standard constructor
+    public Ball(int x, int y, double width, double height) {
+	this.x = x;
+	this.y = y;
+	this.w = width;
+	this.h = height;
+    }
+    
+    //setters
+    public void setWidth(double w) {this.w = w;}
+    public void setHeight(double h) {this.h = h;}
+    public void setX(int x) {this.x = x;}
+    public void setY(int y) {this.y = y;}
+
+    //getters
+    public double getWidth() {return w;}
+    public double getHeight() {return h;}
+    public int getX() {return x;}
+    public int getY() {return y;}
+
+    //Keeping this here as a reminder of stuff to implement
+    /*
     public void setWidth(double w);
     public void setHeight(double h);
     public void setRadius(double r);
@@ -33,4 +69,5 @@ public interface Ball {
     public double getBearing();
     public double getElevation();
     public int getConfidence();
+    */
 }

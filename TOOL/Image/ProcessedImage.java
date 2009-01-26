@@ -7,6 +7,7 @@ import TOOL.TOOL;
 import TOOL.Vision.TOOLVisionLink;
 import TOOL.Data.Frame;
 
+
 /**
  * @author George Slavov
  * @date December 22, 2008
@@ -21,12 +22,16 @@ import TOOL.Data.Frame;
  */
 
 public class ProcessedImage extends ThresholdedImage {
-    TOOLVisionLink visionLink;
+    
+    private TOOLVisionLink visionLink;//the link
+    private VisionState visionState;//the vision state the image is in
 
-    public ProcessedImage(TOOLImage image, ColorTable cTable) {
+    public ProcessedImage(TOOLImage image, ColorTable cTable, VisionState visionState) {
         super(image.getWidth(), image.getHeight());
-        visionLink = new TOOLVisionLink();
 
+	this.visionState = visionState;
+
+        visionLink = new TOOLVisionLink();
         this.thresholdImage(cTable, image);
     }
 
@@ -98,4 +103,7 @@ public class ProcessedImage extends ThresholdedImage {
         } else
             thresholdImage(colorTable, baseImage);
     }
+
+    //getLink - returns the visionLink
+    public TOOLVisionLink getVisionLink(){ return visionLink; }
 }

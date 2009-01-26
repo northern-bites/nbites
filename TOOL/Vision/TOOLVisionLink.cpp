@@ -119,12 +119,22 @@ extern "C" {
         env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
         //Debug output:
-        
+        /*
         cout <<"Ball Width: "<<  vision.ball->getWidth() <<endl;
         cout<<"Pose Left Hor Y" << pose.getLeftHorizonY() <<endl;
         cout<<"Pose Right Hor Y" << pose.getRightHorizonY() <<endl;
-        
-        //copy results from vision thresholded to the array passed in from java
+	*/
+
+	
+	//get the id for the java class, so we can get method IDs
+	jclass javaClass = env->GetObjectClass(jobj);
+    
+	//get the method ID for the ball setter
+	jmethodID setBallInfo = env->GetMethodID(javaClass, "setBallInfo", "(DDII)V");
+	env->CallVoidMethod(jobj, setBallInfo, vision.ball->getWidth(), vision.ball->getHeight(), 
+			    vision.ball->getX(), vision.ball->getY());
+	
+	//copy results from vision thresholded to the array passed in from java
         //we access to each row in the java array, and copy in from cpp thresholded
         //we may in the future want to experiment with malloc, for increased speed
         for(int i = 0; i < IMAGE_HEIGHT; i++){
@@ -141,6 +151,7 @@ extern "C" {
         return;
 
     }
+  
 
 #ifdef __cplusplus
 }
