@@ -153,7 +153,7 @@ Profiler::printCurrent ()
 {
   printf("Profiler Data: Frame %i:\n", (current_frame-1));
   for (int i = 0; i < NUM_PCOMPONENTS; i++) {
-    printf("%-13s: %.6luus last, %.10luus total\n", PCOMPONENT_NAMES[i],
+    printf("%-13s: %.6llu last, %.10llu total\n", PCOMPONENT_NAMES[i],
         lastTime[i], sumTime[i]);
   }
 }
@@ -190,11 +190,11 @@ Profiler::printSummary ()
       printf("  %-*s:      0%% (0000000000us total, 000000us avg.)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i]);
     else if (parent_sum == 0)
-      printf("  %-*s: 100.00%% (%.10luus total, %.6luus avg.)\n",
+      printf("  %-*s: 100.00%% (%.10llu total, %.6llu avg.)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
           (sumTime[i] / (current_frame+1)));
     else
-      printf("  %-*s: %6.2f%% (%.10luus total, %.6luus avg.)\n",
+      printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
           ((float)sumTime[i] / parent_sum * 100), sumTime[i],
           (sumTime[i] / (current_frame+1)));
