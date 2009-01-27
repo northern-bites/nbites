@@ -5,11 +5,11 @@
 
  // We often deal with an estimated value in comparison with a known value and
 // its necessity of being within a certain amount in order to be acceptable.
-bool CLOSE_ENOUGH(double arg1, double arg2, double errorAllowed) {
+bool CLOSE_ENOUGH(float arg1, float arg2, float errorAllowed) {
   return (fabs(arg2-arg1) < errorAllowed);
 }
 
-/*const double hypot(const double a, const double b) {
+/*const float hypot(const float a, const float b) {
   return sqrt((a * a) + (b * b));
   }*/
 
@@ -72,8 +72,8 @@ const bool Utility::between(const VisualLine& line,
 const point<int> Utility::getPointFartherFromCorner(const VisualLine &l,
                                                     int cornerX,
                                                     int cornerY) {
-  double startPointDistance = getLength(l.start.x, l.start.y, cornerX, cornerY);
-  double endPointDistance = getLength(l.end.x, l.end.y, cornerX, cornerY);
+  float startPointDistance = getLength(l.start.x, l.start.y, cornerX, cornerY);
+  float endPointDistance = getLength(l.end.x, l.end.y, cornerX, cornerY);
   if (startPointDistance < endPointDistance) {
     return l.end;
   }
@@ -83,8 +83,8 @@ const point<int> Utility::getPointFartherFromCorner(const VisualLine &l,
 }
 
 const point<int> Utility::getCloserEndpoint(const VisualLine& l, int x, int y) {
-  double startPointDistance = getLength(l.start.x, l.start.y, x, y);
-  double endPointDistance = getLength(l.end.x, l.end.y, x, y);
+  float startPointDistance = getLength(l.start.x, l.start.y, x, y);
+  float endPointDistance = getLength(l.end.x, l.end.y, x, y);
   if (startPointDistance < endPointDistance) {
     return l.start;
   }
@@ -123,18 +123,18 @@ const bool Utility::intersectProp(const point<int> &a, const point<int> &b,
 
 
 // get slope given x1,y1 and x2,y2
-double Utility::getSlope(int x1, int y1, int x2, int y2) {
-  return (double) ((double)(y2-y1)/(double)(x2-x1));
+float Utility::getSlope(int x1, int y1, int x2, int y2) {
+  return (float) ((float)(y2-y1)/(float)(x2-x1));
 }
 
-double Utility::getSlope(const VisualLine& line) {
+float Utility::getSlope(const VisualLine& line) {
   return getSlope(line.start.x,line.start.y,line.end.x,line.end.y);
 }
 
 
 // :TODO: This is broken.  -1/slope is perpendicular slope; plus it doesn't
 // deal with horizontal lines correctly.
-double Utility::getPerpenSlope(double slope) {
+float Utility::getPerpenSlope(float slope) {
   if (slope != 0)
     return 1/slope;
   return 0;
@@ -143,10 +143,10 @@ double Utility::getPerpenSlope(double slope) {
 // See http://mathworld.wolfram.com/LeastSquaresFitting.html for illustration;
 // we calculate vertical (or horizontal) offsets from the line rather than
 // perpendicular offsets
-double Utility::getPointDeviation(const VisualLine &aLine, const int x, const int y) {
+float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int y) {
   // Bigger change in x than in y, nearer to horizontal than vertical
   if ( abs(aLine.end.x - aLine.start.x) > abs(aLine.end.y - aLine.start.y) ) {
-    double lineY = getLineY(x, aLine);
+    float lineY = getLineY(x, aLine);
     return fabs(y - lineY);
   }
   // Perfectly vertical; no need to find where the point would hit.
@@ -156,7 +156,7 @@ double Utility::getPointDeviation(const VisualLine &aLine, const int x, const in
   }
   // A line that is not perfectly vertical but is more vertical than horizontal
   else {
-    double lineX = getLineX(y, aLine);
+    float lineX = getLineX(y, aLine);
     return fabs(x - lineX);
   }
 }
@@ -164,24 +164,24 @@ double Utility::getPointDeviation(const VisualLine &aLine, const int x, const in
 // Calculate how well the point fits to the line.  
 // Return distance between point and line evaluated at same x or y (depending
 // on orientation of the line)
-double Utility::getPointDeviation(const VisualLine &aLine, const linePoint &point) {
+float Utility::getPointDeviation(const VisualLine &aLine, const linePoint &point) {
   return getPointDeviation(aLine, point.x, point.y);  
 }
 
 // get length of line segment specified by (x1, y1), (x2, y2)
-const double Utility::getLength(const double x1, const double y1, 
-                                const double x2, const double y2) {
+const float Utility::getLength(const float x1, const float y1, 
+                                const float x2, const float y2) {
   return sqrt(pow(y2-y1,2)+pow(x2-x1,2));
 }
 
 // get length of line segment specified by (x1, y1), (x2, y2)
-const double Utility::getLength(const point <const double> &p1, 
-                                const point <const double> &p2) {
+const float Utility::getLength(const point <const float> &p1, 
+                                const point <const float> &p2) {
   return getLength(p1.x, p1.y, p2.x, p2.y);
 }
 
 
-const double Utility::getLength(const point <const int> &p1,
+const float Utility::getLength(const point <const int> &p1,
                                 const point <const int> &p2) {
   return getLength(p1.x, p1.y, p2.x, p2.y);
 }
@@ -190,22 +190,22 @@ const double Utility::getLength(const point <const int> &p1,
 
 // get angle between two lines 
 // http://www.tpub.com/math2/5.htm
-double Utility::getAngle(const VisualLine& line1, const VisualLine& line2) {
+float Utility::getAngle(const VisualLine& line1, const VisualLine& line2) {
   return DEG_OVER_RAD * atan((line2.a - line1.a) / (1 + line1.a * line2.a));
 }
 
-double Utility::getAngle(int x1, int y1, int x2, int y2) {
+float Utility::getAngle(int x1, int y1, int x2, int y2) {
   if (x2 == x1) {
     if (y2 > y1) return -90.0;
     else         return 90.0;
   }
   // y1-y2 due to flipped coordinate system
-  return DEG_OVER_RAD * atan( static_cast<double>(y1-y2) / static_cast<double>(x2-x1) );
+  return DEG_OVER_RAD * atan( static_cast<float>(y1-y2) / static_cast<float>(x2-x1) );
 }
 
 
 // get y-coord with given x-coord, slopoe, and y-intercept
-int Utility::getLineY(int x, double y_intercept, double slope) {
+int Utility::getLineY(int x, float y_intercept, float slope) {
   return ROUND(y_intercept+slope*x);
 }
 
@@ -215,9 +215,9 @@ int Utility::getLineY(int x, const VisualLine &aLine) {
 
 // VERY IMPORTANT: Ensure that the slope is not infinity! 
 // get x-coord with given y-coord, slope, and y-intercept
-int Utility::getLineX(int y, double y_intercept, double slope) {
+int Utility::getLineX(int y, float y_intercept, float slope) {
   if (slope != 0) {
-    return ROUND((double)(y - y_intercept)/(double)slope);
+    return ROUND((float)(y - y_intercept)/(float)slope);
   }
   return 0;
 }
@@ -228,7 +228,7 @@ int Utility::getLineX(int y, const VisualLine &aLine) {
 
 
 // get y-intercept given line slope plus a point the line goes through
-double Utility::getInterceptY(int x1, int y1, double slope){
+float Utility::getInterceptY(int x1, int y1, float slope){
   return (-slope*x1 + y1);
 }
 
@@ -387,7 +387,7 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
   }
 
   // Can divide with impunity now that we've removed chance of division by 0
-  double slope = (y2 - y1)/(double)(x2 - x1);
+  float slope = (y2 - y1)/(float)(x2 - x1);
 
   // Horizontal line
   if (slope == 0) {
@@ -418,15 +418,15 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
   // to extend in the orthogonal direction we need to use the orthogonal
   // slope.
       
-  double alpha = atan(slope);
-  double betaX = paraBuff * cos(alpha);
-  double betaY = paraBuff * sin(alpha);
+  float alpha = atan(slope);
+  float betaX = paraBuff * cos(alpha);
+  float betaY = paraBuff * sin(alpha);
 
-  double orthoSlope = -1.0 / slope;
+  float orthoSlope = -1.0 / slope;
 
-  double theta = atan(orthoSlope);
-  double deltaX = orthoBuff * cos(theta);
-  double deltaY = orthoBuff * sin(theta);
+  float theta = atan(orthoSlope);
+  float deltaX = orthoBuff * cos(theta);
+  float deltaY = orthoBuff * sin(theta);
 
   box.corners[0].x = (int)(x1 + deltaX - betaX);
   box.corners[0].y = (int)(y1 + deltaY - betaY);
@@ -502,12 +502,12 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
   // easy cases out of way, have to calculate the y value of where the 
   // intersection point would be
   // Will not divide by 0 here since we checked for vertical line already.
-  double slope = (double) (line1end.y - line1start.y) / 
-    (double) (line1end.x - line1start.x);
+  float slope = (float) (line1end.y - line1start.y) / 
+    (float) (line1end.x - line1start.x);
 
-  double intercept = line1end.y - slope * line1end.x;
+  float intercept = line1end.y - slope * line1end.x;
   // Determine the y value of line at x value of plumbline
-  double y = slope * plumbTop.x + intercept;
+  float y = slope * plumbTop.x + intercept;
  
   if (y >= plumbTop.y && y <= plumbBottom.y) {
     intersection.first = plumbTop.x;
@@ -529,7 +529,7 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
 // Since this relies on parametrization, we could end up with infinite slope.
 // For better accuracy, we use x to find t when the line is less than 45 degs
 // from horizontal and y otherwise.
-double Utility::findLinePointDistanceFromStart(const point <int> &p,
+float Utility::findLinePointDistanceFromStart(const point <int> &p,
                                                const VisualLine &aLine) {
   
   return findLinePointDistanceFromStart(p, aLine.start, aLine.end,
@@ -537,16 +537,16 @@ double Utility::findLinePointDistanceFromStart(const point <int> &p,
 }
 
 
-double Utility::findLinePointDistanceFromStart(const point <int> &p,
+float Utility::findLinePointDistanceFromStart(const point <int> &p,
                                                const point<int> &lineStart,
                                                const point<int> &lineEnd,
-                                               const double length) {
+                                               const float length) {
   if ( abs(lineEnd.x - lineStart.x) > abs(lineEnd.y - lineStart.y) )
-    return length * static_cast<double>(p.x - lineStart.x) /
-            static_cast<double>(lineEnd.x - lineStart.x);
+    return length * static_cast<float>(p.x - lineStart.x) /
+            static_cast<float>(lineEnd.x - lineStart.x);
   else
-    return length * static_cast<double>(p.y - lineStart.y) /
-            static_cast<double>(lineEnd.y - lineStart.y);
+    return length * static_cast<float>(p.y - lineStart.y) /
+            static_cast<float>(lineEnd.y - lineStart.y);
 }
 
 /*
@@ -565,8 +565,8 @@ double Utility::findLinePointDistanceFromStart(const point <int> &p,
  * @param length the length of the line
  */
 // TODO: think of a better name for this
-const bool Utility::tValueInMiddleOfLine(const double t1, const double length,
-				const double minExtendDistance) {
+const bool Utility::tValueInMiddleOfLine(const float t1, const float length,
+				const float minExtendDistance) {
   return t1 > minExtendDistance && t1 < length - minExtendDistance;
 }
 

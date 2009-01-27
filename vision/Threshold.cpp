@@ -192,7 +192,7 @@ void Threshold::thresholdAndRuns() {
 
   int hor = 0;        // check horizon
   int previousRunSize = 0;
-  double horizonSlope = pose->getHorizonSlope();
+  float horizonSlope = pose->getHorizonSlope();
   register unsigned int address = ADDRESS_START;
 
   unsigned char pixel;
@@ -331,7 +331,7 @@ void Threshold::thresholdAndRuns() {
 	case YELLOW:
 	  // add to Yellow data structure
 	  if (currentRun >= MIN_RUN_SIZE && (j < blue->horizonAt(i)  || currentRun > MIN_RUN_SIZE + 1)) {
-	    hor = horizon + (int)(horizonSlope * (double)(i));
+	    hor = horizon + (int)(horizonSlope * (float)(i));
 	    if (j > hor)
 	      yellowWhite[i] = BADVALUE;
 
@@ -797,7 +797,7 @@ void Threshold::threshold() {
 void Threshold::runs() {
   // variable declarations
   int hor;
-  double horizonSlope;
+  float horizonSlope;
   register int address, i, j;
   unsigned char pixel, lastPixel;
 #ifdef USE_CHROMATIC_CORRECTION
@@ -885,7 +885,7 @@ void Threshold::runs() {
 	  break;
 	case BLUE:
 	  // add to Blue data structure
-	  hor = horizon + (int)(horizonSlope * (double)(i));
+	  hor = horizon + (int)(horizonSlope * (float)(i));
 
 	  if (currentRun > MIN_RUN_SIZE) { // noise eliminator
 	    lastGoodPixel = j;
@@ -1298,10 +1298,10 @@ print("   Theshold::objectRecognition");
       yrp = false;
     } else {
       // we see one of each, so pick the biggest one
-      double ylpw = vision->yglp->getWidth();
-      double yrpw = vision->ygrp->getWidth();
-      double blpw = vision->bglp->getWidth();
-      double brpw = vision->bgrp->getWidth();
+      float ylpw = vision->yglp->getWidth();
+      float yrpw = vision->ygrp->getWidth();
+      float blpw = vision->bglp->getWidth();
+      float brpw = vision->bgrp->getWidth();
       if (ylpw > yrpw) {
 	if (blpw > brpw) {
 	  if (ylpw > blpw)
@@ -1484,11 +1484,11 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 	objPtr == vision->bglp ||
 	objPtr == vision->bgrp) {
       //print("we've got a post!");
-      double dist = 0.0;
-      double width = objPtr->getWidth(); double height = objPtr->getHeight();
+      float dist = 0.0;
+      float width = objPtr->getWidth(); float height = objPtr->getHeight();
       int cert = objPtr->getDistCertainty();
-      double distw = getGoalPostDistFromWidth(width);
-      double disth = getGoalPostDistFromHeight(height);
+      float distw = getGoalPostDistFromWidth(width);
+      float disth = getGoalPostDistFromHeight(height);
       switch (cert) {
       case HEIGHT_UNSURE:
 	// the height is too small - it can still be used as a ceiling though
@@ -1522,7 +1522,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 #if ROBOT(AIBO)
     // if object is a beacon
     else if (objPtr == vision->yb || objPtr == vision->by) {
-      double dist = 0.0;
+      float dist = 0.0;
 
       // get beacon distance always from height
       dist = getBeaconDistFromHeight(objPtr->getHeight());
@@ -1586,14 +1586,14 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
  * @param height     the height of the post
  * @return           the distance to the post
  */
-double Threshold::getGoalPostDistFromHeight(double height) {
+float Threshold::getGoalPostDistFromHeight(float height) {
 #if ROBOT(NAO_SIM)
-  return 17826*pow(height,-1.0254);
+  return 17826*pow((double) height,-1.0254);
   //OLD return 100.0*61.0/height;
 #elif ROBOT(NAO_RL)
-  return 39305*pow(height,-0.9245);
+  return 39305*pow((double) height,-0.9245);
 #else
-  return 6646*pow(height,-.9785);
+  return 6646*pow((double) height,-.9785);
 #endif
 }
 
@@ -1601,14 +1601,14 @@ double Threshold::getGoalPostDistFromHeight(double height) {
  * @param width     the width of the post
  * @return          the distance to the post
  */
-double Threshold::getGoalPostDistFromWidth(double width) {
+float Threshold::getGoalPostDistFromWidth(float width) {
 #if ROBOT(NAO_SIM)
   //floor distance, seems to be best for the width
-  return 2360.1*pow(width,-1.0516); //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
+  return 2360.1*pow((double) width,-1.0516); //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
 #elif ROBOT(NAO_RL)
-  return 10083*pow(width,-1.052);
+  return 10083*pow((double) width,-1.052);
 #else
-  return 1483.5*pow(width,-.934);
+  return 1483.5*pow((double) width,-.934);
 #endif
 }
 
@@ -1616,7 +1616,7 @@ double Threshold::getGoalPostDistFromWidth(double width) {
  * @param height     the height of the beacon
  * @return           the distance to the beacon
  */
-double Threshold::getBeaconDistFromHeight(double height) {
+float Threshold::getBeaconDistFromHeight(float height) {
 #if ROBOT(NAO_SIM)
   return 100.0*39.0/height; //there aren't nao beacons, but just in case
 #elif ROBOT(NAO_RL)
@@ -1801,7 +1801,7 @@ void Threshold::initChromeTable(std::string filename){
 #ifdef USE_CHROMATIC_CORRECTION
   for(int x = 0; x< IMAGE_WIDTH; x++){
     for(int y =0; y < IMAGE_HEIGHT; y++){
-      xLUT[x][y] = (unsigned char)sqrt(pow(104.0-(double)x,2)+pow(80.0-(double)y,2)); //calc each distance
+      xLUT[x][y] = (unsigned char)sqrt(pow(104.0-(float)x,2)+pow(80.0-(float)y,2)); //calc each distance
       //print("(%d,%d) = %d",x,y,xLUT[x][y]);
     }
   }
@@ -1925,8 +1925,8 @@ int Threshold::distance(int x1, int x2, int x3, int x4) {
  * @param coord2    the second point
  * @return          the distance between them
  */
-double Threshold::getEuclidianDist(point <int> coord1, point <int> coord2) {
-  return sqrt(pow((double)coord2.y-coord1.y,2)+pow((double)coord2.x-coord1.x,2));
+float Threshold::getEuclidianDist(point <int> coord1, point <int> coord2) {
+  return sqrt(pow((float)coord2.y-coord1.y,2)+pow((float)coord2.x-coord1.x,2));
 }
 
 #if defined(NEW_LOGGING) || defined(USE_JPEG)
@@ -2095,7 +2095,7 @@ void Threshold::drawLine(const point<int> start, const point<int> end,
 void Threshold::drawLine(int x, int y, int x1, int y1, int c) {
 
 #ifdef OFFLINE
-  double slope = (double)(y - y1) / (double)(x - x1);
+  float slope = (float)(y - y1) / (float)(x - x1);
   int sign = 1;
   if ((abs(y - y1)) > (abs(x - x1))) {
     slope = 1.0 / slope;

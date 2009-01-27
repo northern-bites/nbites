@@ -157,15 +157,15 @@ class Vision
     long totalLines;
     // results
     // avg percents
-    double transformPercent;
-    double thresholdPercent;
-    double objectPercent;
-    double linesPercent;
+    float transformPercent;
+    float thresholdPercent;
+    float objectPercent;
+    float linesPercent;
     // avg ms
-    double transformMs;
-    double thresholdMs;
-    double objectMs;
-    double linesMs;
+    float transformMs;
+    float thresholdMs;
+    float objectMs;
+    float linesMs;
     // booleans for stop/start profiling
     bool collectFrames;
     bool collectTimes;

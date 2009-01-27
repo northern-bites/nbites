@@ -358,7 +358,7 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
    --helper visualization method for drawing a line given two points and a color
 */
 void Vision::drawLine(int x, int y, int x1, int y1, int c) {
-  double slope = (double)(y - y1) / (double)(x - x1);
+  float slope = (float)(y - y1) / (float)(x - x1);
   int sign = 1;
   if ((abs(y - y1)) > (abs(x - x1))) {
     slope = 1.0 / slope;

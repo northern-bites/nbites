@@ -503,24 +503,24 @@ class FieldLines {
 
   // Uses the actual objects' locations on the field to calculate straight
   // line distance
-  double getRealDistance(const ConcreteCorner *c,
+  float getRealDistance(const ConcreteCorner *c,
                                const VisualFieldObject *obj) const;
 
   // Estimates how long the line is on the field
-  double getEstimatedLength(const VisualLine &line) const;
+  float getEstimatedLength(const VisualLine &line) const;
 
   // Given two points on the screen, estimates the straight line distance
   // between them, on the field
-  double getEstimatedDistance(const point<int> &point1,
+  float getEstimatedDistance(const point<int> &point1,
                               const point<int> &point2) const;
 
   // Estimates the distance between the corner and the object based on
   // vectors
-  double getEstimatedDistance(const VisualCorner *c, const VisualFieldObject *obj) const;
+  float getEstimatedDistance(const VisualCorner *c, const VisualFieldObject *obj) const;
 
-  double getEstimatedAngle(const VisualCorner &corner) const;
+  float getEstimatedAngle(const VisualCorner &corner) const;
 
-  double getEstimatedAngle(const VisualLine &line1,
+  float getEstimatedAngle(const VisualLine &line1,
                            const VisualLine &line2,
                            const int intersectX,
                            const int intersectY) const;
@@ -533,7 +533,7 @@ class FieldLines {
                                &concreteCorners) const;
 
 
-  double getAllowedDistanceError(VisualFieldObject const *obj) const;
+  float getAllowedDistanceError(VisualFieldObject const *obj) const;
 
 
 
@@ -547,26 +547,26 @@ class FieldLines {
   */
 
   const bool dupeCorner(const list<VisualCorner> &corners, const int x, const int y, const int testNumber) const;
-  const double percentColor(const int x, const int y, const TestDirection dir,
+  const float percentColor(const int x, const int y, const TestDirection dir,
                             const int color, const int numPixels) const;
-  const double percentColor(const int x, const int y, const TestDirection dir,
+  const float percentColor(const int x, const int y, const TestDirection dir,
                             const int colors[], const int numColors,
                             const int numPixels) const;
-  const double percentSurrounding(const int x, const int y,
+  const float percentSurrounding(const int x, const int y,
                                   const int colors[], const int numColors,
                                   const int numPixels) const;
-  const double percentSurrounding(const int x, const int y, const int color,
+  const float percentSurrounding(const int x, const int y, const int color,
                                   const int numPixels) const;
   // Alternative form of percent surrounding that uses points.
-  const double percentSurrounding(const point<int> &p,
+  const float percentSurrounding(const point<int> &p,
                                   const int colors[], const int numColors,
                                   const int numPixels) const;
 
-  const double percentColorBetween(const int x1, const int y1,
+  const float percentColorBetween(const int x1, const int y1,
                                    const int x2, const int y2,
                                    const int colors[],
                                    const int numColors) const;
-  const double percentColorBetween(const int x1, const int y1,
+  const float percentColorBetween(const int x1, const int y1,
                                    const int x2, const int y2,
                                    const int color) const;
 
@@ -772,10 +772,10 @@ class FieldLines {
 
 
   const bool isReasonableVerticalWidth(const int x, const int y,
-                                       const double dist,
+                                       const float dist,
                                        const int width) const;
   const bool isReasonableHorizontalWidth(const int x, const int y,
-                                         const double dist,
+                                         const float dist,
                                          const int width) const;
 
 
