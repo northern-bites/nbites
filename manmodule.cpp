@@ -177,7 +177,7 @@ int main( int argc, char *argv[] )
 
 
   //<OGETINSTANCE> don't remove this comment
-  ALModule::createModule<Man>(pBroker,"Man" );
+ ALPtr<Man> manptr = ALModule::createModule<Man>(pBroker,"Man" );
 
   //</OGETINSTANCE> don't remove this comment
 
@@ -191,19 +191,13 @@ int main( int argc, char *argv[] )
   sigaction( SIGINT, &new_action, NULL );
 #endif
 
-  try{
-    //ALPtr<ALProxy>
-    man  = pBroker->getProxy("Man");
-    // Start the separate head thread
-    man->callVoid("start");
-    //(*(ALFunctor0<ALModule, boost::shared_ptr<TriggeredEvent> *)(man->getModule()->getFunction("getTrigger"));
-    man->callVoid("trigger_await_on");
-    // Wait for the head thread to exit
-    man->callVoid("trigger_await_off");
-    cout << "Main method finished." << endl;
-  }catch(ALError &e){
-    cout <<e.toString() <<endl;
-  }
+
+  manptr->manStart();
+  cout << "Main method finished starting man" <<endl;
+  manptr->manAwaitOn();
+  manptr->manAwaitOff();
+  cout << "Main method finished" <<endl;
+
   //   Not sure what the purpose of this modulegenerator code is: //EDIT -JS
   pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
   while( 1 )
