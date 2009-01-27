@@ -188,36 +188,36 @@ void Man::syncWithALMemory() {
     float frontLeft = 0.0f, frontRight = 0.0f,
         rearLeft = 0.0f, rearRight = 0.0f;
     try {
-        frontLeft = static_cast<float>(almemory->call<ALValue>(
+        frontLeft = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"), 0));
-        frontRight = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"), 0);
+        frontRight = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"), 0));
-        rearLeft = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"), 0);
+        rearLeft = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"), 0));
-        rearRight = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"), 0);
+        rearRight = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"), 0));
+                "Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"), 0);
     } catch(ALError &e) {
         cout << "Failed to read left foot FSR values" << endl;
     }
     sensors.setLeftFootFSR(frontLeft, frontRight, rearLeft, rearRight);
 
     try {
-        frontLeft = static_cast<float>(almemory->call<ALValue>(
+        frontLeft = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"), 0));
-        frontRight = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"), 0);
+        frontRight = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"), 0));
-        rearLeft = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"), 0);
+        rearLeft = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"), 0));
-        rearRight = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"), 0);
+        rearRight = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"), 0));
+                "Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"), 0);
     } catch(ALError &e) {
         cout << "Failed to read right foot FSR values" << endl;
     }
@@ -227,18 +227,18 @@ void Man::syncWithALMemory() {
     float leftFootBumperLeft  = 0.0f, leftFootBumperRight  = 0.0f;
     float rightFootBumperLeft = 0.0f, rightFootBumperRight = 0.0f;
     try {
-        leftFootBumperLeft = static_cast<float>(almemory->call<ALValue>(
+        leftFootBumperLeft = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"), 0));
-        leftFootBumperRight = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"), 0);
+        leftFootBumperRight = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"), 0));
-        rightFootBumperLeft = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"), 0);
+        rightFootBumperLeft = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0));
-        rightFootBumperRight = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"), 0);
+        rightFootBumperRight = almemory->call<const ALValue>(
             "getData",string(
-                "Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0));
+                "Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"), 0);
     } catch(ALError &e) {
         cout << "Failed to read bumper values" <<endl;
     }
@@ -251,27 +251,27 @@ void Man::syncWithALMemory() {
         gyrX = 0.0f, gyrY = 0.0f,
         angleX = 0.0f, angleY = 0.0f;
     try {
-        accX = static_cast<float>(almemory->call<ALValue>(
+        accX = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"), 0));
-        accY = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"), 0);
+        accY = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"), 0));
-        accZ = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"), 0);
+        accZ = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"), 0));
-        gyrX = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"), 0);
+        gyrX = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value"), 0));
-        gyrY = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value"), 0);
+        gyrY = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value"), 0));
-        angleX = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value"), 0);
+        angleX = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value"), 0));
-        angleY = static_cast<float>(almemory->call<ALValue>(
+                "Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value"), 0);
+        angleY = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value"), 0));
+                "Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value"), 0);
     } catch(ALError &e) {
         cout << "Failed to read inertial unit values" << endl;
     }
@@ -302,13 +302,13 @@ void Man::syncWithALMemory() {
         if (counter > 20)
             counter = 0;
 
-        ultraSoundValue = static_cast<float>(almemory->call<ALValue>(
+        ultraSoundValue = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/US/Sensor/Value"), 0));
+                "Device/SubDeviceList/US/Sensor/Value"), 0);
 
-        float mode = static_cast<float>(almemory->call<ALValue>(
+        float mode = almemory->call<const ALValue>(
             "getData", string(
-                "Device/SubDeviceList/US/Actuator/Value"), 0));
+                "Device/SubDeviceList/US/Actuator/Value"), 0);
 
     } catch(ALError &e) {
         cout << "Failed to read ultrasound distance values" << endl;
