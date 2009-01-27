@@ -310,8 +310,6 @@ void Man::syncWithALMemory() {
             "getData", string(
                 "Device/SubDeviceList/US/Actuator/Value"), 0));
 
-        cout << "ultra sound mode: " << mode << endl;
-
     } catch(ALError &e) {
         cout << "Failed to read ultrasound distance values" << endl;
     }
