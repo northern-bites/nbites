@@ -54,11 +54,11 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
             fc++;
             if(fc%10 == 0){
-                cout << "STOP MOVING FORWARD!!"<<endl;
+                //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
             }else if (fc%5 == 0){
-                cout << "MOVE FORWARD!!"<<endl;
+                //cout << "MOVE FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =30;
             }
@@ -221,7 +221,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
     //check to see if we are done
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP){
-        cout << "DONE WALKING"<<endl;
+        //cout << "DONE WALKING"<<endl;
         _done = true;
     }
 
