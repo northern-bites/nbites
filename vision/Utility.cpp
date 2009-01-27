@@ -175,7 +175,6 @@ const float Utility::getLength(const float x1, const float y1,
 }
 
 // get length of line segment specified by (x1, y1), (x2, y2)
-<<<<<<< HEAD:vision/Utility.cpp
 const float Utility::getLength(const point <const float> &p1, 
                                 const point <const float> &p2) {
   return getLength(p1.x, p1.y, p2.x, p2.y);

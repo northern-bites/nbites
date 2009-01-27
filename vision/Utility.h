@@ -77,7 +77,6 @@ class Utility {
   static float getPerpenSlope(float slope);
 
   // get length of line segment specified by (x1, y1), (x2, y2)
-<<<<<<< HEAD:vision/Utility.h
   static const float getLength(const float x1, const float y1,
                                 const float x2, const float y2);
   static const float getLength(const point <const float> &p1, 
