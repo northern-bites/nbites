@@ -181,7 +181,6 @@ Man::initMan()
 #endif
 }
 
-#ifdef USE_VISION
 #ifdef NAOQI1
 void Man::syncWithALMemory() {
     // FSR update
@@ -315,7 +314,10 @@ void Man::syncWithALMemory() {
     }
     sensors.setUltraSound(ultraSoundValue);
 }
+#endif
 
+#ifdef USE_VISION
+#ifdef NAOQI1
 
 void
 Man::registerCamera() {
