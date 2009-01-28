@@ -62,14 +62,10 @@ const float PreviewController::tick(const list<float> *zmp_ref) {
     return getPosition();
 }
 
-/*
-const float PreviewController::tick(const list<float> *zmp_ref) {
-    static int frameNumber = -100;
-    frameNumber++;
+/**
+ * Initialize the position of the robot (vel and accel assumed to be 0)
+ */
+void PreviewController::initPos(float x){
+    stateVector(0) = x;
 
-    if (frameNumber > 0)
-        position = 50.0f*sin(frameNumber*180.0f/M_PI/2000); //std::min(20.0f, position + 1.0f);
-    return position;
 }
-
-*/

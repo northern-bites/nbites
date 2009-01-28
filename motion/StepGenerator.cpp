@@ -22,8 +22,8 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\n");
 #endif
-
-    setWalkVector(0.5f,0,0); // for testing purposes. The function doesn't even
+    //controller_x->initPos(walkParams->hipOffsetX);
+    setWalkVector(0.01f,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -289,11 +289,13 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     //   hurting us. This could be fixed with an observer
     // in anycase, we'll leave this at -20 for now. (The effect is that
     // the com path 'pauses' over the support foot, which is quite nice)
-    float X_ZMP_FOOT_LENGTH = 0.0f;
+    float X_ZMP_FOOT_LENGTH = walkParams->footLengthX;
 
     //Another HACK (ie. zmp is not perfect)
     //This moves the zmp reference to the outside of the foot
-    float Y_ZMP_OFFSET = 15.0f;
+    float Y_ZMP_OFFSET = (newSupportStep->foot == LEFT_FOOT ?
+                          walkParams->leftZMPSwingOffsetY :
+                          walkParams->rightZMPSwingOffsetY);
 
     //lets define the key points in the s frame. See diagram in paper
     //to use bezier curves, we would need also directions for each point
@@ -321,21 +323,52 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     //start and mid is double support, and the line between mid and end
     //is double support
 
-//     //double support - we want to switch feet
-//     const int numDChops = walkParams->doubleSupportFrames;
-//     for(int i = 0; i< walkParams->doubleSupportFrames; i++){
-//         ublas::vector<float> new_i = start_i +
-//             (static_cast<float>(i)/numDChops)*(mid_i-start_i);
+    //double support - consists of 3 phases:
+    //  1) a static portion at start_i
+    //  2) a moving (diagonal) portion between start_i and mid_i
+    //  3) a static portion at start_i
+    //The time is split between these phases according to
+    //the constant walkParams->dblSupInactivePercentage
 
-//         zmp_ref_x.push_back(new_i(0));
-//         zmp_ref_y.push_back(new_i(1));
-//     }
+    //First, split up the frames:
+    const int halfNumDSChops = //DS - DoubleStaticChops
+        int(walkParams->doubleSupportFrames*
+            walkParams->dblSupInactivePercentage/2.0f);
+    const int numDMChops = //DM - DoubleMovingChops
+        int(walkParams->doubleSupportFrames - halfNumDSChops*2.0f);
+
+     cout << "Double support split like: " << endl
+          << "  static: " << halfNumDSChops<< endl
+          << "  moving: " << numDMChops<< endl
+          << "  static: " << halfNumDSChops<< endl;
+
+    //Phase 1) - stay at start_i
+    for(int i = 0; i< halfNumDSChops; i++){
+        zmp_ref_x.push_back(start_i(0));
+        zmp_ref_y.push_back(start_i(1));
+    }
+
+    //phase 2) - move from start_i to
+    for(int i = 0; i< numDMChops; i++){
+        ublas::vector<float> new_i = start_i +
+            (static_cast<float>(i)/numDMChops)*(mid_i-start_i);
+
+        zmp_ref_x.push_back(new_i(0));
+        zmp_ref_y.push_back(new_i(1));
+    }
+
+    //phase 3) - stay at mid_i
+    for(int i = 0; i< halfNumDSChops; i++){
+        zmp_ref_x.push_back(mid_i(0));
+        zmp_ref_y.push_back(mid_i(1));
+    }
+
 
     //single support -  we want to stay over the new step
-//     const int numSChops = walkParams->singleSupportFrames;
-//     for(int i = 0; i< walkParams->singleSupportFrames; i++){
-    const int numSChops = walkParams->stepDurationFrames;
-    for(int i = 0; i< walkParams->stepDurationFrames; i++){
+    const int numSChops = walkParams->singleSupportFrames;
+    for(int i = 0; i< walkParams->singleSupportFrames; i++){
+//    const int numSChops = walkParams->stepDurationFrames;
+//    for(int i = 0; i< walkParams->stepDurationFrames; i++){
 
         ublas::vector<float> new_i = mid_i +
             (static_cast<float>(i)/numSChops)*(end_i-mid_i);
@@ -353,7 +386,7 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
 void
 StepGenerator::fillZMPEnd(const boost::shared_ptr<Step> newSupportStep ){
     const ublas::vector<float> end_s =
-        CoordFrame3D::vector3D(0.0f ,
+        CoordFrame3D::vector3D(0.0f,//walkParams->hipOffsetX,
                                0.0f);
     const ublas::vector<float> end_i = prod(si_Transform,end_s);
     //Queue a starting step, where we step, but do nothing with the ZMP

@@ -100,6 +100,7 @@ struct LegConstants{
 //or you must update single,doubleSupportFrames  manually with
 // updateFrameLengths()
 struct WalkingParameters{
+//parameters, passed into constructor in this order:
 public:
     float motion_frame_length_s;
     float bodyHeight;
@@ -107,6 +108,15 @@ public:
     float stepDuration; // seconds
     float doubleSupportFraction; //Fraction of time spent in double support
     float stepHeight; // in mm
+    float footLengthX;
+    float dblSupInactivePercentage; // time we aren't moving zmp in dbl support
+    float leftSwingHipRollAddition; //angle added to hip during single suppor
+    float rightSwingHipRollAddition; // in rad
+    float leftZMPSwingOffsetY; //in mm, distance to offset zmp from center of foot
+    float rightZMPSwingOffsetY;//in the Y direction (side to side)
+
+//calculated from parameters
+public:
     int stepDurationFrames; //one double + one single support
     int doubleSupportFrames; //num frames to spend in double support
     int singleSupportFrames; //num frames to spend in single support
@@ -116,14 +126,21 @@ public:
 public:
     WalkingParameters(const float _motion_frame_length_s, const float _bh,
                       const float _hox, const float _dur,
-                      const float _dblSupFrac, const float _stepHeight)
+                      const float _dblSupFrac, const float _stepHeight,
+                      const float _footLengthX, const float _dblInactivePerc,
+                      const float _lSwHRAdd,const float _rSwHRAdd,
+                      const float _lZMPSwOffY,const float _rZMPSwOffY)
         :  motion_frame_length_s( _motion_frame_length_s),
            bodyHeight(_bh), hipOffsetX(_hox), stepDuration(_dur),
            doubleSupportFraction(_dblSupFrac),
-           stepHeight(_stepHeight) {
-
-        updateFrameLengths();
-    }
+           stepHeight(_stepHeight),footLengthX(_footLengthX),
+           dblSupInactivePercentage(_dblInactivePerc),
+           leftSwingHipRollAddition(_lSwHRAdd),
+           rightSwingHipRollAddition(_rSwHRAdd),
+           leftZMPSwingOffsetY(_lZMPSwOffY),rightZMPSwingOffsetY(_rZMPSwOffY)
+        {
+            updateFrameLengths();
+        }
 
     void updateFrameLengths(){
 

@@ -124,9 +124,9 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     float theta = percent_complete*2.0f*M_PI;
     float stepHeight = walkParams->stepHeight;
     float percent_to_dest_horizontal = cycloidx(theta)/(2.0f*M_PI);
-    cout << "Frame counter " << frameCounter
-         << "Percent to dest " << percent_to_dest_horizontal
-         << " cycloidx " << cycloidx(theta) <<endl;
+//     cout << "Frame counter " << frameCounter
+//          << "Percent to dest " << percent_to_dest_horizontal
+//          << " cycloidx " << cycloidx(theta) <<endl;
 
     //cout <<"Percent incomplete" << percent_incomplete <<endl;
     //cout << "percent complete" << percent_complete<<endl;
@@ -224,7 +224,9 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
  */
 float WalkingLeg::getHipHack(){
     //Hack - calculate the compensation to the HIPROLL
-    float MAX_HIP_ANGLE_OFFSET = 1.5 * TO_RAD;
+    float MAX_HIP_ANGLE_OFFSET = (chainID == LLEG_CHAIN ?
+                                  walkParams->leftSwingHipRollAddition:
+                                  walkParams->rightSwingHipRollAddition);
 
     // the swinging leg will follow a trapezoid in 3-d. The trapezoid has
     // three stages: going up, a level stretch, going back down to the ground

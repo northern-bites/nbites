@@ -32,6 +32,7 @@ public:
     virtual const float getPosition() const { return stateVector(0); }
     virtual const float getZMP() const {return stateVector(2);}
 
+    virtual void initPos(float x);
 private:
     /*
      * This saves me some nasty typing...

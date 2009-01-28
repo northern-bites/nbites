@@ -16,6 +16,8 @@ public:
     virtual const float tick(const list<float> *zmp_ref) = 0;
     virtual const float getPosition() const = 0;
     virtual const float getZMP() const = 0;
+    virtual void initPos(float x) = 0;
+
 };
 
 #endif

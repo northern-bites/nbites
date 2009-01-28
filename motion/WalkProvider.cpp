@@ -5,12 +5,18 @@ using Kinematics::RLEG_CHAIN;
 WalkProvider::WalkProvider(Sensors *s)
     : MotionProvider(),
       sensors(s),
-      walkParameters(.02f, // motion frame length
-                     310.0f, // COM height
-                     20.0f, // hipOffsetX
-                     1.00f, //stepDuration
-                     0.4f, //fraction in double support mode
-                     17.0f), // steHeight
+      walkParameters(.02f,         // motion frame length - FIXME constant
+                     310.0f,       // COM height
+                     20.0f,        // hipOffsetX
+                     2.00f,        // stepDuration
+                     0.5f,         // fraction in double support mode
+                     17.0f,        // stepHeight
+                     0.0f,         // footLengthX
+                     0.25f,        // zmp static percentage in double support
+                     4.0f*TO_RAD,  // leftSwingHipRollAddition
+                     4.0f*TO_RAD,  // rightSwingHipRollAddition
+                     30.0f,        // leftZMPSwingOffestY,
+                     30.0f),       // rightZMPSwingOffestY
       stepGenerator(sensors,&walkParameters)
 {
 
