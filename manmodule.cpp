@@ -199,11 +199,12 @@ int main( int argc, char *argv[] )
   cout << "Main method finished" <<endl;
 
   //   Not sure what the purpose of this modulegenerator code is: //EDIT -JS
-  pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
+  /*pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
   while( 1 )
   {
     SleepMs( 100 );
   }
+  */
 
 #ifdef _WIN32
   _terminationHandler( 0 );
