@@ -66,7 +66,7 @@ public:
     void setBackDir(int x1) {backDir = x1;}
     void setLeftOpening(int op) { leftOpening = op; }
     void setRightOpening(int op) { rightOpening = op; }
-    void setPossibleFieldObjects(list <const ConcreteFieldObject *>
+    void setPossibleFieldObjects(const list <const ConcreteFieldObject *> *
                                  _possibleFieldObjects) {
         possibleFieldObjects = _possibleFieldObjects;
     }
@@ -103,7 +103,7 @@ public:
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
     const fieldObjectID getID() const { return id; }
-    const list <const ConcreteFieldObject *> getPossibleFieldObjects() const {
+    const list <const ConcreteFieldObject *> * getPossibleFieldObjects() const {
         return possibleFieldObjects;
     }
 
@@ -132,7 +132,7 @@ private: // Class Variables
     point <float> fieldLocation;
     fieldObjectID id;
     // This list will hold all the possibilities for this objects's specific ID
-    list <const ConcreteFieldObject *> possibleFieldObjects;
+    const list <const ConcreteFieldObject *> * possibleFieldObjects;
 
     // Helper Methods
     inline float postDistanceToSD(float _distance) {

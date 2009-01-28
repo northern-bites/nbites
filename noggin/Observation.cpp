@@ -21,10 +21,10 @@ Observation::Observation(VisualFieldObject &_object) :
     // Initialize to 0 possibilities
     numPossibilities = 0;
 
-    list <const ConcreteFieldObject *>::iterator theIterator;
-    list <const ConcreteFieldObject *> objList =
+    list <const ConcreteFieldObject *>::const_iterator theIterator;
+    const list <const ConcreteFieldObject *> * objList =
         _object.getPossibleFieldObjects();
-    for( theIterator = objList.begin(); theIterator != objList.end();
+    for( theIterator = objList->begin(); theIterator != objList->end();
          ++theIterator) {
         PointLandmark objectLandmark((**theIterator).getFieldX(),
                                      (**theIterator).getFieldY());
