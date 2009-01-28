@@ -45,7 +45,7 @@ public:
     virtual ~VisualLandmark();
 
 
-private:
+protected:
     // image coordinate system, not field
     int x, y;
     float distance;

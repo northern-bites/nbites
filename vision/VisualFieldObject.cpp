@@ -38,19 +38,19 @@ void VisualFieldObject::init(){
     switch (id) {
     case BLUE_GOAL_LEFT_POST:
         fieldLocation = BLUE_GOAL_LEFT_POST_LOC;
-        setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
+        //setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
         break;
     case BLUE_GOAL_RIGHT_POST:
         fieldLocation = BLUE_GOAL_RIGHT_POST_LOC;
-        setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
+        //setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
         break;
     case YELLOW_GOAL_LEFT_POST:
         fieldLocation = YELLOW_GOAL_LEFT_POST_LOC;
-        setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
+        //setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
         break;
     case YELLOW_GOAL_RIGHT_POST:
         fieldLocation = YELLOW_GOAL_RIGHT_POST_LOC;
-        setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
+        //setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
         break;
     case YELLOW_BLUE_BEACON:
         fieldLocation = YELLOW_BLUE_BEACON_LOC;
@@ -130,18 +130,18 @@ void VisualFieldObject::printDebugInfo(FILE * out) {
  */
 void VisualFieldObject::setIDCertainty(certainty _cert)
 {
-    VisualLandmark::setIDCertainty(_cert);
+    idCertainty = _cert;
     if (_cert == NOT_SURE) {
         switch(getID()) {
         case BLUE_GOAL_LEFT_POST:
         case BLUE_GOAL_RIGHT_POST:
         case BLUE_GOAL_POST:
-            setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
+            //setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
             break;
         case YELLOW_GOAL_LEFT_POST:
         case YELLOW_GOAL_RIGHT_POST:
         case YELLOW_GOAL_POST:
-            setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
+            //setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
             break;
         default:
             // We don't actually care about the possible field objects
@@ -150,24 +150,24 @@ void VisualFieldObject::setIDCertainty(certainty _cert)
     } else { // We know what the field object is
         switch(getID()) {
         case BLUE_GOAL_LEFT_POST:
-            setPossibleFieldObjects(ConcreteFieldObject::blueGoalLeftPostList);
+            //setPossibleFieldObjects(ConcreteFieldObject::blueGoalLeftPostList);
             break;
         case BLUE_GOAL_RIGHT_POST:
-            setPossibleFieldObjects(ConcreteFieldObject::blueGoalRightPostList);
+            //setPossibleFieldObjects(ConcreteFieldObject::blueGoalRightPostList);
             break;
         case BLUE_GOAL_POST: // This should probably never be reached
-            setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
+            //setPossibleFieldObjects(ConcreteFieldObject::blueGoalPosts);
             break;
         case YELLOW_GOAL_LEFT_POST:
-            setPossibleFieldObjects(
-                ConcreteFieldObject::yellowGoalLeftPostList);
+            //setPossibleFieldObjects(
+            //    ConcreteFieldObject::yellowGoalLeftPostList);
             break;
         case YELLOW_GOAL_RIGHT_POST:
-            setPossibleFieldObjects(
-                ConcreteFieldObject::yellowGoalRightPostList);
+            //setPossibleFieldObjects(
+            //    ConcreteFieldObject::yellowGoalRightPostList);
             break;
         case YELLOW_GOAL_POST: // This should probably never be reached
-            setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
+            //setPossibleFieldObjects(ConcreteFieldObject::yellowGoalPosts);
             break;
         default:
             // We don't actually care about the possible field objects
