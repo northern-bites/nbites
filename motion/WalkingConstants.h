@@ -5,6 +5,13 @@
 #include "Kinematics.h"
 using namespace Kinematics;
 
+#include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
+
+#ifdef DEBUG_MOTION
+#  define WALK_DEBUG
+#endif
+
+
 enum SupportMode{
     SUPPORTING=0,
     SWINGING,

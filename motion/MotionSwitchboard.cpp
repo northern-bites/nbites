@@ -22,7 +22,9 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
-
+#ifdef DEBUG_JOINTS_OUTPUT
+    initDebugLogs();
+#endif
 
     //build the sit down routine
     vector<float> * sitDownPos = new vector<float>(sitDownAngles,
@@ -75,6 +77,9 @@ MotionSwitchboard::MotionSwitchboard(Sensors *s)
 
 MotionSwitchboard::~MotionSwitchboard() {
     pthread_mutex_destroy(&next_joints_mutex);
+#ifdef DEBUG_JOINTS_OUTPUT
+    closeDebugLogs();
+#endif
 }
 
 
@@ -144,6 +149,9 @@ void MotionSwitchboard::run() {
 
         processProviders();
 
+#ifdef DEBUG_JOINTS_OUTPUT
+        updateDebugLogs();
+#endif
         pthread_mutex_lock(&next_joints_mutex);
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
         pthread_mutex_unlock(&next_joints_mutex);
@@ -230,4 +238,74 @@ const vector <float> MotionSwitchboard::getNextJoints() {
 
     return vec;
 }
+#ifdef DEBUG_JOINTS_OUTPUT
+void MotionSwitchboard::initDebugLogs(){
+    joints_log = fopen("/tmp/joints_log.xls","w");
+    fprintf(joints_log,"time\t"
+        "HEAD_YAW\t"
+        "HEAD_PITCH\t"
+        "L_SHOULDER_PITCH\t"
+        "L_SHOULDER_ROLL\t"
+        "L_ELBOW_YAW\t"
+        "L_ELBOW_ROLL\t"
+        "L_HIP_YAW_PITCH\t"
+        "L_HIP_ROLL\t"
+        "L_HIP_PITCH\t"
+        "L_KNEE_PITCH\t"
+        "L_ANKLE_PITCH\t"
+        "L_ANKLE_ROLL\t"
+        "R_HIP_YAW_PITCH\t"
+        "R_HIP_ROLL\t"
+        "R_HIP_PITCH\t"
+        "R_KNEE_PITCH\t"
+        "R_ANKLE_PITCH\t"
+        "R_ANKLE_ROLL\t"
+        "R_SHOULDER_PITCH\t"
+        "R_SHOULDER_ROLL\t"
+        "R_ELBOW_YAW\t"
+        "R_ELBOW_ROLL\t\n");
 
+    effector_log = fopen("/tmp/effector_log.xls","w");
+    fprintf(effector_log,"time\t"
+            "HEAD_CHAIN_X\t"
+            "HEAD_CHAIN_Y\t"
+            "HEAD_CHAIN_Z\t"
+            "LARM_CHAIN_X\t"
+            "LARM_CHAIN_Y\t"
+            "LARM_CHAIN_Z\t"
+            "LLEG_CHAIN_X\t"
+            "LLEG_CHAIN_Y\t"
+            "LLEG_CHAIN_Z\t"
+            "RLEG_CHAIN_X\t"
+            "RLEG_CHAIN_Y\t"
+            "RLEG_CHAIN_Z\t"
+            "RARM_CHAIN_X\t"
+            "RARM_CHAIN_Y\t"
+            "RARM_CHAIN_Z\t\n"
+        );
+}
+void MotionSwitchboard::closeDebugLogs(){
+    fclose(joints_log);
+}
+void MotionSwitchboard::updateDebugLogs(){
+
+    pthread_mutex_lock(&next_joints_mutex);
+    //print joints:
+    for(int i = 0; i < NUM_JOINTS; i++)
+        fprintf(joints_log, "%f\t",nextJoints[i]);
+    fprintf(joints_log, "\n");
+
+    int index  =0;
+    for(int chain = HEAD_CHAIN; chain <= RARM_CHAIN; chain++){
+
+
+        ufvector3 dest = Kinematics::forwardKinematics((ChainID)chain,
+                                                       &nextJoints[index]);
+        fprintf(effector_log,"%f\t%f\t%f\t",dest(0),dest(1),dest(2));
+        index += chain_lengths[chain];
+    }
+    fprintf(effector_log,"\n");
+    pthread_mutex_unlock(&next_joints_mutex);
+
+}
+#endif

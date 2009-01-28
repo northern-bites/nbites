@@ -35,3 +35,9 @@ OPTION(
   )
 
 
+OPTION(
+  DEBUG_MOTION
+  "Turn on/off a variety of motion-specific debugging. (Like logging trajectories to files)"
+  OFF
+)
+

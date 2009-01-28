@@ -44,11 +44,12 @@ using namespace boost::numeric;
 using namespace Kinematics;
 
 //DEBUG Switches:
+#ifdef WALK_DEBUG
 //#define DEBUG_WALKING_STATE_TRANSITIONS
 //#define DEBUG_WALKING_GOAL_CONTINUITY
 #define DEBUG_WALKING_LOCUS_LOGGING
 #define DEBUG_WALKING_DEST_LOGGING
-
+#endif
 class WalkingLeg  {
 public:
     WalkingLeg(ChainID id, const WalkingParameters * walkP);

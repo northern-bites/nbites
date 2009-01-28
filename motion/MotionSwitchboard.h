@@ -15,6 +15,8 @@
 #include <vector>
 using namespace std;
 
+#include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
+
 #include "Kinematics.h"
 #include "WalkProvider.h"
 #include "ScriptedProvider.h"
@@ -23,6 +25,10 @@ using namespace std;
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
+
+#ifdef DEBUG_MOTION
+#  define DEBUG_JOINTS_OUTPUT
+#endif
 
 class MotionSwitchboard {
 public:
@@ -37,6 +43,12 @@ public:
 
 private:
     void processProviders();
+
+#ifdef DEBUG_JOINTS_OUTPUT
+    void initDebugLogs();
+    void closeDebugLogs();
+    void updateDebugLogs();
+#endif
 
 private:
     Sensors *sensors;
@@ -62,6 +74,11 @@ private:
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
     pthread_mutex_t next_joints_mutex;
+
+#ifdef DEBUG_JOINTS_OUTPUT
+    FILE* joints_log;
+    FILE* effector_log;
+#endif
 };
 
 #endif

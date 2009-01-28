@@ -20,10 +20,10 @@ using namespace std;
 
 #include <boost/tuple/tuple.hpp>
 
+
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
 #include "StepGenerator.h"
-
 
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 

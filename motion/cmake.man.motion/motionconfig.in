@@ -27,6 +27,12 @@
 #  undef  USE_PYMOTION_CXX_BACKEND
 #endif
 
+#define DEBUG_MOTION_${DEBUG_MOTION}
+#ifdef DEBUG_MOTION_ON
+#  define DEBUG_MOTION
+#else
+# undef DEBUG_MOTION
+#endif
 
 #endif // !_motionconfig_h
 
