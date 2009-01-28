@@ -7,7 +7,6 @@
 
 #ifndef MCL_h_DEFINED
 #define MCL_h_DEFINED
-using namespace std;
 
 // Includes
 // STL
@@ -84,7 +83,7 @@ public:
     PoseEst pose;
     float weight;
     //BallEKF ball;
-    //vector<EKF> opponents;
+    //std::vector<EKF> opponents;
 
     friend std::ostream& operator<< (std::ostream &o, const Particle &c) {
         return o << c.pose.x << " " << c.pose.y << " " << c.pose.h << " "
@@ -116,7 +115,7 @@ public:
     virtual ~MCL();
 
     // Core Functions
-    void updateLocalization(MotionModel u_t, vector<Observation> z_t,
+    void updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
                             bool resample);
 
     // Getters
@@ -165,7 +164,7 @@ public:
     /**
      * @return The current set of particles in the filter
      */
-    vector<Particle> getParticles() { return X_t; }
+    std::vector<Particle> getParticles() { return X_t; }
 
     // Setters
     /**
@@ -202,11 +201,11 @@ private:
     // Class variables
     PoseEst curEst; // Current {x,y,h} esitamates
     PoseEst curUncert; // Associated {x,y,h} uncertainties (standard deviations)
-    vector<Particle> X_t; // Current set of particles
+    std::vector<Particle> X_t; // Current set of particles
 
     // Core Functions
     PoseEst updateOdometery(MotionModel u_t, PoseEst x_t);
-    float updateMeasurementModel(vector<Observation> z_t, PoseEst x_t);
+    float updateMeasurementModel(std::vector<Observation> z_t, PoseEst x_t);
     void updateEstimates();
 
     // Helpers

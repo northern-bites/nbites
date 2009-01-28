@@ -8,7 +8,6 @@
 #ifndef Observation_h_DEFINED
 #define Observation_h_DEFINED
 #include <vector>
-using namespace std;
 
 #include "ConcreteCorner.h"
 #include "ConcreteLine.h"
@@ -54,7 +53,7 @@ class Observation
 {
 public:
     // Fields
-    vector< pair<float, float> > posibilities;
+    std::vector< pair<float, float> > posibilities;
 
     // Construcotrs & Destructors
     Observation(VisualFieldObject &_object);
@@ -108,14 +107,14 @@ public:
     /*
      * @return The list of possible line landmarks
      */
-    const vector<LineLandmark> getLinePossibilities() const {
+    const std::vector<LineLandmark> getLinePossibilities() const {
         return linePossibilities;
     }
 
     /*
      * @return The list of possible point landmarks
      */
-    const vector<PointLandmark> getPointPossibilities() const {
+    const std::vector<PointLandmark> getPointPossibilities() const {
         return pointPossibilities;
     }
 
@@ -139,8 +138,8 @@ private:
     float y;
     float slope;
     bool line_truth;
-    vector<LineLandmark> linePossibilities;
-    vector<PointLandmark> pointPossibilities;
+    std::vector<LineLandmark> linePossibilities;
+    std::vector<PointLandmark> pointPossibilities;
     unsigned int numPossibilities;
 };
 #endif // _Observation_h_DEFINED

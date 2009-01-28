@@ -7,6 +7,7 @@
  */
 
 #include "MCL.h"
+using namespace std;
 
 /**
  * Initializes the sampel sets so that the first update works appropriately

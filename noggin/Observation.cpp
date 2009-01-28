@@ -8,6 +8,7 @@
  */
 
 #include "Observation.h"
+using namespace std;
 
 /**
  * @param fo FieldObject that was seen and reported.
