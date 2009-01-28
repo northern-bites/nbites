@@ -38,7 +38,7 @@ private:
 private:
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Vision> vision;
-    boost::shared_ptr<PyVision> pyvision;
+    PyVision* pyvision;
 
     bool error_state;
     PyObject *module_helper;

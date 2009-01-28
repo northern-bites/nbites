@@ -64,7 +64,8 @@ void Noggin::initializeVision(shared_ptr<Vision> v)
             endl;
         assert(false);
     }
-    vision_addToModule(reinterpret_cast<PyObject*>(pyvision.get()), MODULE_HEAD);
+    vision_addToModule(result, MODULE_HEAD);
+    pyvision = reinterpret_cast<PyVision*>(result);
 
     init_leds();
 }
@@ -162,7 +163,7 @@ void Noggin::runStep ()
 
     // Update vision information for Python
     PROF_ENTER(profiler, P_PYUPDATE);
-    PyVision_update(pyvision.get());
+    PyVision_update(pyvision);
     PROF_EXIT(profiler, P_PYUPDATE);
 
     // Update localization information
