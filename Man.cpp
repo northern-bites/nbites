@@ -944,8 +944,10 @@ Man::saveFrame(){
     sensors.releaseImage();
 
     // Write joints
-    for (vector<float>::const_iterator i = joints.begin(); i < joints.end(); i++)
-        fout << " " << *i;
+    for (vector<float>::const_iterator i = joints.begin(); i < joints.end();
+         i++) {
+        fout << *i << " ";
+    }
 
     fout.close();
     saved_frames++;
