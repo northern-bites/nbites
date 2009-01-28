@@ -442,7 +442,6 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
   : Thread(_synchro, "Comm"), tool(_synchro, s, v),
     data(14,0), latest(new list<vector<float> >),
-    latest(new list<vector<float> >), data(14,0),
     sensors(s), timer(&micro_time), gc()
 {
 

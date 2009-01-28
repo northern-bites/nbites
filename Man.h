@@ -155,7 +155,7 @@ public:
     PythonPreferences python_prefs;
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<Pose> pose;
+    boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
     MotionEnactor * enactor;
     boost::shared_ptr<Motion> motion;

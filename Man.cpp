@@ -189,8 +189,6 @@ Man::initMan()
 #endif
 }
 
-
-
 #ifdef USE_VISION
 #ifdef NAOQI1
 
@@ -511,8 +509,6 @@ Man::closeMan() {
 void
 Man::run ()
 {
-#if 0
-
 #ifdef DEBUG_MAN_THREADING
     cout << "Man::running" << endl;
 #endif
@@ -563,8 +559,8 @@ Man::run ()
         sensors->updateVisionAngles();
 #ifdef NAOQI1
 #ifndef OFFLINE
-        const FootBumper leftFootBumper(sensors.getLeftFootBumper());
-        const FootBumper rightFootBumper(sensors.getRightFootBumper());
+        const FootBumper leftFootBumper(sensors->getLeftFootBumper());
+        const FootBumper rightFootBumper(sensors->getRightFootBumper());
         // Save a frame when you press both foot bumpers
         if ((leftFootBumper.left || leftFootBumper.right) &&
             (rightFootBumper.left || rightFootBumper.right)) {
