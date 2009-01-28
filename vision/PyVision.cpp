@@ -139,7 +139,7 @@ PyRobotAccess_update (PyObject *self, PyObject *args)
 
 // C++ - accessible interface
 extern PyObject *
-PyPose_new (Pose *p)
+PyPose_new (NaoPose *p)
 {
   PyPose *self;
 
@@ -1269,10 +1269,15 @@ micro_time (void)
   return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
+// This method is only used if USE_PYVISION_FAKE_BACKEND is defined.
+// Its purpose is to allow you to test the PyVision link by instantiating a new
+// vision object. This will never happen on robots. Vision is instantiated
+// wherever we interface with the robot hardware API.
 static PyObject*
 vision_createNew (PyObject *self, PyObject *args)
 {
-  return PyVision_new(new Vision(new Pose(), new Profiler(&micro_time)));
+    return PyVision_new(new Vision(new NaoPose(new Sensors()),
+                                   new Profiler(&micro_time)));
 }
 
 

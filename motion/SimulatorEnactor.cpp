@@ -22,7 +22,7 @@ void SimulatorEnactor::run() {
         */
         // Get the angles we want to go to this frame from the switchboard
 		vector<float> result = switchboard->getNextJoints();
- 		for (int i=0; i<result.size();i++) {
+ 		for (unsigned int i=0; i<result.size();i++) {
  			cout << "result of joint " << i << " is " << result.at(i) << endl;
  		}
 #ifndef NAOQI1

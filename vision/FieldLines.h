@@ -69,7 +69,7 @@ struct linePoint;
 #include "VisualCorner.h"             //
 #include "VisualLine.h"
 #include "Utility.h"                  //
-#include "Pose.h"                     // Used to estimate distances in the image
+#include "NaoPose.h"                     // Used to estimate distances in the image
 
 #include "Vision.h"
 
@@ -327,7 +327,7 @@ class FieldLines {
 
  public:
 
-  FieldLines(Vision *visPtr, Pose *posePtr);
+  FieldLines(Vision *visPtr, NaoPose *posePtr);
   virtual ~FieldLines() {}
 
   // master loop
@@ -784,7 +784,7 @@ class FieldLines {
 
  private:
   Vision *vision;
-  Pose *pose;
+  NaoPose *pose;
 
   vector <VisualLine> linesList;
   list <VisualCorner> cornersList;

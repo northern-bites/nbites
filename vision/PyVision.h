@@ -42,7 +42,7 @@
 
 typedef struct PyPose_t {
   PyObject_HEAD
-  Pose *pose;
+  NaoPose *pose;
 
   // Horizon y coordinates
   PyObject *leftHorizonY, *rightHorizonY;
@@ -55,7 +55,7 @@ typedef struct PyPose_t {
 } PyPose;
 
 // C++ - accessible interface
-extern PyObject *PyPose_new    (Pose *p);
+extern PyObject *PyPose_new    (NaoPose *p);
 extern void      PyPose_update (PyPose *p);
 // backend methods
 extern PyObject *PyPose_new    (PyTypeObject *type, PyObject *args,

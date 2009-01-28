@@ -4352,7 +4352,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right
 /* Determines what is the most open part of the field.  Basically scans up and looks for occlusions.
  */
 
-void ObjectFragments::openDirection(int horizon, Pose *pose) {
+void ObjectFragments::openDirection(int horizon, NaoPose *pose) {
 #if ROBOT(AIBO)
   const int divider = 5;
 #elif ROBOT(NAO)

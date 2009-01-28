@@ -8,7 +8,7 @@ class Threshold;  // forward reference
 #include "Vision.h"
 
 #include "ObjectFragments.h"
-#include "Pose.h"
+#include "NaoPose.h"
 #ifndef NO_ZLIB
 #include "Zlib.h"
 #endif
@@ -97,7 +97,7 @@ class Threshold
 {
     friend class Vision;
  public:
-  Threshold(Vision *vis, Pose *posPtr);
+  Threshold(Vision *vis, NaoPose *posPtr);
   virtual ~Threshold() {}
 
   // main methods
@@ -237,7 +237,7 @@ class Threshold
 
   // class pointers
   Vision *vision;
-  Pose *pose;
+  NaoPose *pose;
 
   const uchar* yuv;
   const uchar* yplane, *uplane, *vplane;

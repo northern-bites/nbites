@@ -5,7 +5,7 @@ using namespace std;
 #include <stdlib.h>
 #include "Common.h"
 #include "ifdefs.h"
-#include "Pose.h"
+#include "NaoPose.h"
 
 #include <vector>
 
@@ -293,7 +293,7 @@ class ObjectFragments {
   void setShot(VisualFieldObject * one);
   void bestShot(VisualFieldObject * one, VisualFieldObject * two,
                 VisualFieldObject * three);
-  void openDirection(int h, Pose *p);
+  void openDirection(int h, NaoPose *p);
 
   int classifyFirstPost(int horizon, int c, int c2, bool postFound,
                         VisualFieldObject* left, VisualFieldObject* right,

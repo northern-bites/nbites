@@ -12,7 +12,7 @@ from man import vision
 from man.corpus import leds, sensors
 from man.motion import MotionConstants
 # Modules from this directory
-from . import EKF
+#from . import EKF
 from . import GameController
 from . import HeadTracking
 from . import Navigator
@@ -21,7 +21,7 @@ from . import NogginConstants as Constants
 from . import TypeDefs
 # Packages and modules from sub-directories
 from . import robots
-from .playbook import GoTeam
+#from .playbook import GoTeam
 from .players import Switch
 
 
@@ -57,7 +57,7 @@ class Brain(object):
         self.generator = self.temp_motion()
 
         # Initialize various components
-        self.ekf = EKF.EKF(brain=self) # Localization Initialization
+        #self.ekf = EKF.EKF(brain=self) # Localization Initialization
         self.my = TypeDefs.MyInfo()
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
@@ -66,7 +66,7 @@ class Brain(object):
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
-        self.playbook = GoTeam.GoTeam(self)
+        #self.playbook = GoTeam.GoTeam(self)
         self.gameController = GameController.GameController(self)
 
         #for taking pictures
@@ -190,7 +190,7 @@ class Brain(object):
         self.updateComm()
 
         # Localization Update
-        self.updateLocalization()
+        #self.updateLocalization()
 
         #taking a picture if the space bar is pressed
         """
@@ -344,5 +344,5 @@ class Brain(object):
                           self.ball.uncertX,
                           self.ball.uncertY,
                           self.ball.dist,
-                          self.playbook.currentSubRole,
+                          0, #self.playbook.currentSubRole,
                           -1) # Chase Time

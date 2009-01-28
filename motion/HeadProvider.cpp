@@ -6,8 +6,9 @@ HeadProvider::HeadProvider(float motionFrameLength,
 	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),
-	  headCommandQueue(),
-	  headQueue(HEAD_CHAIN)
+      nextJoints(),
+	  headQueue(HEAD_CHAIN),
+	  headCommandQueue()
 {
 	pthread_mutex_init (&head_mutex, NULL);
 }
@@ -71,7 +72,7 @@ void HeadProvider::setNextHeadCommand() {
 vector<float> HeadProvider::getCurrentHeads() {
 	vector<float> currentHeads(HEAD_JOINTS);
 
-	for (int i=0; i<HEAD_JOINTS ; i++) {
+	for (unsigned int i=0; i<HEAD_JOINTS ; i++) {
 		currentHeads[i] = sensors->getBodyAngle(i) - sensors->getBodyAngleError(i);
 	}
 

@@ -26,7 +26,7 @@ class Vision;   // forward reference
 #include "ConcreteFieldObject.h"
 #include "Ball.h"
 #include "Threshold.h"
-#include "Pose.h"
+#include "NaoPose.h"
 #include "FieldLines.h"
 #include "VisualCorner.h"
 
@@ -44,7 +44,7 @@ class Vision
     friend class Threshold;
 
   public:
-    Vision(Pose *_pose, Profiler *_prof);
+    Vision(NaoPose *_pose, Profiler *_prof);
     virtual ~Vision();
 
     // Main Vision methods
@@ -129,7 +129,7 @@ class Vision
     Ball *pinkBall; //added for pink ball recognition
 #endif
     Threshold *thresh;
-    Pose *pose;
+    NaoPose *pose;
     FieldLines *fieldLines;
 
 	fieldOpening fieldOpenings[3];

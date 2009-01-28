@@ -21,32 +21,32 @@ const void Kinematics::clipChainAngles(const ChainID chainID,
                                        float angles[]) {
     switch (chainID) {
     case LLEG_CHAIN:
-        for (int i=0; i<LEG_JOINTS; i++) {
+        for (unsigned int i=0; i<LEG_JOINTS; i++) {
             angles[i] = clip(angles[i],
                              LEFT_LEG_BOUNDS[i][0],LEFT_LEG_BOUNDS[i][1]);
         }
         break;
     case RLEG_CHAIN:
-        for (int i=0; i<LEG_JOINTS; i++) {
+        for (unsigned int i=0; i<LEG_JOINTS; i++) {
             angles[i] = clip(angles[i],
                              RIGHT_LEG_BOUNDS[i][0],RIGHT_LEG_BOUNDS[i][1]);
         }
         break;
     case LARM_CHAIN:
-        for (int i=0; i<ARM_JOINTS; i++) {
+        for (unsigned int i=0; i<ARM_JOINTS; i++) {
             angles[i] = clip(angles[i],
                              LEFT_ARM_BOUNDS[i][0],LEFT_ARM_BOUNDS[i][1]);
         }
         break;
     case RARM_CHAIN:
-        for (int i=0; i<ARM_JOINTS; i++) {
+        for (unsigned int i=0; i<ARM_JOINTS; i++) {
             angles[i] = clip(angles[i],
                              RIGHT_ARM_BOUNDS[i][0],RIGHT_ARM_BOUNDS[i][1]);
         }
         break;
     case HEAD_CHAIN:
     default:
-        for (int i=0; i<HEAD_JOINTS; i++) {
+        for (unsigned int i=0; i<HEAD_JOINTS; i++) {
             angles[i] = clip(angles[i],
                              HEAD_BOUNDS[i][0],HEAD_BOUNDS[i][1]);
         }

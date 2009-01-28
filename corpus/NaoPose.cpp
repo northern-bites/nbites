@@ -38,7 +38,7 @@ const ublas::vector <float> NaoPose::bottomRight = vector4D(FOCAL_LENGTH_MM,
 							    -IMAGE_HEIGHT_MM/2);
 
 NaoPose::NaoPose (Sensors *s)
-  : Pose(), sensors(s)
+  : sensors(s)
 {
 }
 

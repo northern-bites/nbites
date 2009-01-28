@@ -108,7 +108,7 @@ static const long long PENALIZED_TIMESTAMP = -2;
 static const long long SOS_TIMESTAMP = -666;
 static const long long USE_TEAMMATE_BALL_REPORT_FRAMES_OFF = 2;
 
-static const int MAX_MESSAGE_MEMORY = 20;
+static const unsigned int MAX_MESSAGE_MEMORY = 20;
 
 typedef struct CommPacketHeader_t
 {

@@ -1,21 +1,21 @@
 ##############################
 #
-# WELCOME 
+# WELCOME
 #
-# This is the main cmake configuration file 
+# This is the main cmake configuration file
 # associate to your projects
 # You can define here specific compilation options
-# 
+#
 # More about cmake : www.cmake.org
 #
-# Using cmake command line : 
+# Using cmake command line :
 # 1. Create a build directory : mkdir build
 # 2. Configure cmake project : cd build; cmake ..
-#   You can also generate project with your favorite IDE : 
+#   You can also generate project with your favorite IDE :
 #   Example : Under Mac osx use "cmake .. -G XCode"
 #   see cmake help for more information
 # 3. Edit project option : ccmake .
-# 4. Build it : make 
+# 4. Build it : make
 
 
 
@@ -40,7 +40,7 @@ SET( CMAKE_COLOR_MAKEFILE TRUE )
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ../../../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -85,7 +85,7 @@ FIND_PACKAGE( PYTHON   REQUIRED )
 #<ADD_TEST> don't remove this comment
 ### test example ADD_TEST(My_test python ${TEST_RUN} -p ${NAOQI} -s ${CMAKE_CURRENT_SOURCE_DIR}/test/myRubyTest.rb)
 
-#</ADD_TEST> don't remove this comment 
+#</ADD_TEST> don't remove this comment
 
 
 ############################ CONFIG.H GENERATION
@@ -117,7 +117,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      )
 
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteCorner
@@ -127,10 +127,6 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteLine
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/ObjectFragments
-                 ${VISION_INCLUDE_DIR}/Pose
-                 ${VISION_INCLUDE_DIR}/PoseMatrix
-                 ${VISION_INCLUDE_DIR}/PotentialField
-                 ${VISION_INCLUDE_DIR}/potentialfieldmodule
                  ${VISION_INCLUDE_DIR}/Profiler
                  ${VISION_INCLUDE_DIR}/PyVision
                  ${VISION_INCLUDE_DIR}/Threshold
@@ -141,16 +137,6 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
 		 ${VISION_INCLUDE_DIR}/VisualFieldObject
                  ${VISION_INCLUDE_DIR}/VisualLine
                  #${VISION_INCLUDE_DIR}/Zlib
-                 ${VISION_INCLUDE_DIR}/matrix
-                 ${VISION_INCLUDE_DIR}/_matrixmodule
-                 )
-
-SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py
-                        ${VISION_INCLUDE_DIR}/matrix.py
-                        )
-
-SET( MATRIX_SRCS ${VISION_INCLUDE_DIR}/matrix
-                 ${VISION_INCLUDE_DIR}/_matrixmodule
                  )
 
 
@@ -165,11 +151,7 @@ IF( PYTHON_SHARED_VISION )
     SHARED
     ${VISION_SRCS}
     )
-  ADD_LIBRARY(
-    ${MATRIX_TARGET}
-    SHARED
-    ${MATRIX_SRCS}
-    )
+
   # Install to XXXvisionmodule.so, instead of libvision.so
   GET_TARGET_PROPERTY( VISION_TARGET_LOCATION ${VISION_TARGET} LOCATION )
   INSTALL(
@@ -177,13 +159,6 @@ IF( PYTHON_SHARED_VISION )
     DESTINATION ${VISION_PYTHON_TARGET_DIR}
     CONFIGURATIONS "" Debug Release
     RENAME ${ROBOT_PREFIX}${VISION_TARGET}module.so
-    )
-  GET_TARGET_PROPERTY( MATRIX_TARGET_LOCATION ${MATRIX_TARGET} LOCATION )
-  INSTALL(
-    FILES ${MATRIX_TARGET_LOCATION}
-    DESTINATION ${VISION_PYTHON_TARGET_DIR}
-    CONFIGURATIONS "" Debug Release
-    RENAME ${MATRIX_TARGET}module.so
     )
 ELSE( PYTHON_SHARED_VISION )
   # Add static library target
@@ -193,12 +168,6 @@ ELSE( PYTHON_SHARED_VISION )
     ${VISION_SRCS}
     )
 ENDIF( PYTHON_SHARED_VISION )
-
-INSTALL(
-  FILES ${VISION_PYTHON_SRCS}
-  DESTINATION ${VISION_PYTHON_TARGET_DIR}
-  CONFIGURATIONS "" Debug Release
-  )
 
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} z )

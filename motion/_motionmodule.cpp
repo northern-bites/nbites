@@ -628,7 +628,7 @@ static vector<float>*
 PySequence_AsFloatVector (PyObject *seq, int size)
 {
   vector<float> *v = PySequence_AsFloatVector(seq);
-  if (v != NULL && v->size() != size) {
+  if (v != NULL && v->size() != static_cast<unsigned int>(size)) {
     PyErr_Format(PyExc_TypeError, "expected a sequence of %i float (%i given)",
         size, v->size());
     delete v;
@@ -1456,7 +1456,7 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
       break;
     default:
       PyErr_Format(PyExc_ValueError, "Unimplemented command type %i", type);
-      return NULL;
+      return -1; // could this value be a bug? I don't know. Keep an eye on it
   }
   // number of samples
   if (kwdc > 0)
@@ -1491,7 +1491,7 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
       break;
     default:
       PyErr_Format(PyExc_ValueError, "Unimplemented command type %i", type);
-      return NULL;
+      return -1;
   }
 
   return 0;

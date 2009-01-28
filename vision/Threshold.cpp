@@ -41,7 +41,7 @@
 
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
-Threshold::Threshold(Vision *vis, Pose *posPtr)
+Threshold::Threshold(Vision *vis, NaoPose *posPtr)
   : inverted(false)
 {
 

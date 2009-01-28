@@ -120,6 +120,7 @@ class MotionCore
 #else
         motionProxy->postGotoCom(pX, pY, pZ, pTime, pType);
 #endif
+        return 0; //hack
     }
     int postGotoTorsoOrientation(float pX, float pY, float pTime, int pType) {
 #ifdef NAOQI1
@@ -127,6 +128,7 @@ class MotionCore
 #else
         motionProxy->postGotoTorsoOrientation(pX, pY, pTime, pType);
 #endif
+        return 0; //hack
     }
 
 #ifdef USE_MOTION

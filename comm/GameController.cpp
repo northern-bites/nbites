@@ -437,7 +437,7 @@ PyGameController_dealloc (PyObject* self)
 PyObject*
 PyGameController_get (PyGameController* self, void* closure)
 {
-  PyObject *result;
+  PyObject *result = NULL;
 
   Py_BEGIN_ALLOW_THREADS;
   switch (reinterpret_cast<int>(closure)) {

@@ -37,9 +37,13 @@ class WalkCommand : public MotionCommand
 		params(other.params) { setChainList(); }
   virtual ~WalkCommand() {}
 #ifdef NAOQI1
-    virtual const float execute(ALPtr<ALMotionProxy> proxy) const {}
+    virtual const float execute(ALPtr<ALMotionProxy> proxy) const {
+        return 0.0f;
+    }
 #else
-    virtual const float execute(ALMotionProxy *proxy) const {}
+    virtual const float execute(ALMotionProxy *proxy) const {
+        return 0.0f;
+    }
 #endif
 
   const vector<float> odometry() const {
@@ -153,7 +157,8 @@ class WalkArc : public WalkCommand {
 #endif
     proxy->walkArc(angle, radius*CM_TO_M, numSamplesPerStep);
     const float arcLength = radius * angle;
-    const int numSteps = ceil(arcLength / (params.getMaxStepLength()*M_TO_CM));
+    const int numSteps = static_cast<int>(
+        ceil(arcLength / (params.getMaxStepLength()*M_TO_CM)) );
     const int numTotalSamples = numSamplesPerStep * numSteps;
     lastX = (radius - cos(angle) * radius) / (numTotalSamples);
     lastY = (sin(angle) * radius) / (numTotalSamples);

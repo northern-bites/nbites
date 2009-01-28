@@ -100,18 +100,17 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 # Add here source files needed to compile this project
 SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
                   ${CORPUS_INCLUDE_DIR}/NaoPose
-                  ${VISION_INCLUDE_DIR}/matrix
                   )
 SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )
 SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
                   ${CORPUS_INCLUDE_DIR}/_synchromodule
                   )
 
-IF( PYTHON_SHARED_CORPUS )
-  LIST( APPEND SENSORS_SRCS ${VISION_INCLUDE_DIR}/Pose
-                            ${VISION_INCLUDE_DIR}/PoseMatrix
-                            )
-ENDIF( PYTHON_SHARED_CORPUS )
+#IF( PYTHON_SHARED_CORPUS )
+#  LIST( APPEND SENSORS_SRCS ${VISION_INCLUDE_DIR}/Pose
+#                            ${VISION_INCLUDE_DIR}/PoseMatrix
+#                            )
+#ENDIF( PYTHON_SHARED_CORPUS )
 
 SET( CORPUS_PYTHON_SRCS ${CORPUS_INCLUDE_DIR}/__init__.py
                         ${CORPUS_INCLUDE_DIR}/leds.py

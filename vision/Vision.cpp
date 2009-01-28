@@ -12,7 +12,7 @@ static byte global_image[IMAGE_BYTE_SIZE];
 
 
 // Vision Class Constructor
-Vision::Vision(Pose *_pose, Profiler *_prof)
+Vision::Vision(NaoPose *_pose, Profiler *_prof)
   /* jf- commented out until we can remove pointers (change to references)
   : bgrp(this), bglp(this), bgBackstop(this), // blue goal
     ygrp(this), ygrp(this), ygBackstop(this), // yellow goal

@@ -109,7 +109,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
 
-SET( NOGGIN_SRCS ${NOGGIN_INCLUDE_DIR}/Noggin.cpp
+SET( NOGGIN_SRCS ${NOGGIN_INCLUDE_DIR}/Noggin
                  )
 
 

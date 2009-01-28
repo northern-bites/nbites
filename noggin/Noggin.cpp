@@ -1,8 +1,6 @@
 
 
 #include "Noggin.h"
-#include "potentialfieldmodule.h"
-#include "_matrixmodule.h"
 #include "_ledsmodule.h"
 
 #include "nogginconfig.h"
@@ -61,8 +59,6 @@ Noggin::initializeVision(Vision *v)
         endl;
   vision_addToModule(reinterpret_cast<PyObject*>(vision), MODULE_HEAD);
 
-  initpotentialfield();
-  init_matrix();
   init_leds();
 }
 

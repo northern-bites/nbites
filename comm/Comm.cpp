@@ -92,7 +92,7 @@ PyComm_latestComm (PyObject *self, PyObject *args)
       vector<float> &v = latest->front();
       inner = PyTuple_New(v.size());
       if (inner != NULL) {
-        for (int j = 0; j < v.size(); j++) {
+        for (unsigned int j = 0; j < v.size(); j++) {
           f = PyFloat_FromDouble(v[j]);
           if (f != NULL)
             PyTuple_SET_ITEM(inner, j, f);
@@ -436,7 +436,7 @@ init_comm (void)
 
 Comm::Comm (shared_ptr<Synchro> _synchro, Sensors *s, Vision *v)
   : Thread(_synchro, "Comm"), tool(_synchro, s,v),
-    latest(new list<vector<float> >), data(14,0),
+    data(14,0), latest(new list<vector<float> >),
     sensors(s), timer(&micro_time), gc()
 {
 
@@ -814,7 +814,7 @@ Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
   throw()
 {
   // check packet length
-  if (len < sizeof(CommPacketHeader))
+  if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader))
     return false;
 
   // cast packet data into CommPacketHeader struct

@@ -66,10 +66,10 @@ void WalkProvider::setMotion(const float x, const float y, const float theta) {
 vector<float> WalkProvider::getWalkStance(){
     cout << "getWalkStance" <<endl;
     //calculate the walking stance of the robot
-    const int z = walkParameters.bodyHeight;
-    const int x = walkParameters.hipOffsetX;
-    const int ly = HIP_OFFSET_Y;
-    const int ry = -HIP_OFFSET_Y;
+    const float z = walkParameters.bodyHeight;
+    const float x = walkParameters.hipOffsetX;
+    const float ly = HIP_OFFSET_Y;
+    const float ry = -HIP_OFFSET_Y;
 
 
     //just assume we start at zero

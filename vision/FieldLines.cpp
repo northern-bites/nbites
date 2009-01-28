@@ -41,7 +41,7 @@ const char * FieldLines::linePointInfoFile = "linepoints.xls";
 //const float FieldLines::MAX_PERCENT_ERROR_IN_JOIN_LINES = .024f;
 
 
-FieldLines::FieldLines(Vision *visPtr, Pose *posePtr) {
+FieldLines::FieldLines(Vision *visPtr, NaoPose *posePtr) {
   vision = visPtr;
   pose = posePtr;
 

@@ -82,8 +82,6 @@ using namespace boost::numeric;
 
 #include "Common.h"             // For ROUND
 #include "VisionDef.h"          // For camera parameters
-#include "Pose.h"               // Base class accepted by anyone with a particular
-                                // contract
 #include "Kinematics.h"         // For physical body parameters
 
 using namespace Kinematics;
@@ -91,7 +89,68 @@ using namespace Kinematics;
 #include "Sensors.h"
 #include "Structs.h"
 
-class NaoPose : public Pose {
+/**
+ *  *****************   Various constants follow   **********************
+ */
+
+using namespace std;
+
+// CONSTANTS
+
+struct mDHParam{
+  float xRot; //xRot
+  float xTrans; //xTrans
+  float zRot; //zRot
+  float zTrans; //zTrans
+
+};
+
+// Various Body Constants ALL IN MILLIMETERS
+
+static const float NECK_LENGTH = 80.0f;
+static const float CAMERA_YAW_Y_LENGTH = 81.06f;
+static const float CAMERA_YAW_Z_LENGTH = 14.6f;
+static const float NECK_BASE_TO_CENTER_Y = 67.5f;
+static const float NECK_BASE_TO_CENTER_Z = 19.5f;
+static const float SHOULDER_TO_ELBOW_LENGTH = 69.5f;
+static const float ELBOW_TO_ELBOW_X = 4.7f;
+static const float ELBOW_TO_ELBOW_Y = -9.0f;
+static const float REAR_LEG_LENGTH = 76.5f;// 79.4;--UTexas value
+static const float REAR_LEG_TO_CENTER_BODY_Y = 65.0f;
+static const float REAR_LEG_TO_CENTER_BODY_X = 62.5f;
+static const float NECK_TILT2_TO_CAMERA_Y = 81.0f;
+static const float NECK_TILT2_TO_CAMERA_Z = -14.6f;
+static const float NECK_TILT_TO_TILT2 = 80.0f;
+static const float SHOULDER_TO_NECK_TILT_Y = 2.5f;
+static const float SHOULDER_TO_NECK_TILT_Z = 19.5f;
+// Horizon-Related Constants
+static const float MM_TO_PIX_X_PLANE = 0.0171014f;
+static const float MM_TO_PIX_Y_PLANE = 0.0171195f;
+static const float HORIZON_LEFT_X_MM = -1.76999f;
+static const float HORIZON_RIGHT_X_MM = 1.76999f;
+static const float FOCAL_LENGTH_PIX = 192.0f;
+static const float FOCAL_LENGTH_MM = 3.27f;
+static const float IMAGE_CENTER_X = 103.5f;
+static const float IMAGE_CENTER_Y = 79.5f;
+static const float HALF_FOV_X_MM = 1.77f;
+static const float HALF_FOV_Y_MM = 1.361f;
+static const float IMAGE_MM_WIDTH = 2.0f*tan(FOV_X/2.0f)*FOCAL_LENGTH_MM;
+static const float IMAGE_MM_HEIGHT = 2.0f*tan(FOV_Y/2.0f)*FOCAL_LENGTH_MM;
+// e.g. 3 mm * mm_to_pix = 176 pixels
+static const float MM_TO_PIX_X = IMAGE_WIDTH/IMAGE_MM_WIDTH;
+static const float MM_TO_PIX_Y = IMAGE_HEIGHT/IMAGE_MM_HEIGHT;
+
+// 3d origin constant
+static const point3 <float> ZERO_COORD(0.0f,0.0f,0.0f);
+// a null estimate struct. zero dist,bearing,elevation (check dist always), x, y
+static const estimate NULL_ESTIMATE = {0.0f,0.0f,0.0f,0.0f,0.0f};
+// defines the left and right horizontal points in mm and in xyz space
+static const point3 <float> HORIZON_LEFT_3D ( HORIZON_LEFT_X_MM, FOCAL_LENGTH_MM, 0.0);
+static const point3 <float> HORIZON_RIGHT_3D (HORIZON_RIGHT_X_MM, FOCAL_LENGTH_MM, 0.0 );
+static const float LINE_HEIGHT = 0.0f;
+
+
+class NaoPose {
  protected: // Constants
   static const float IMAGE_WIDTH_MM;
   static const float IMAGE_HEIGHT_MM;
@@ -124,21 +183,21 @@ class NaoPose : public Pose {
   ~NaoPose() { }
 
   /********** Core Methods **********/
-  virtual void transform ();
+  void transform ();
 
-  virtual const estimate pixEstimate(const int pixelX, const int pixelY,
+  const estimate pixEstimate(const int pixelX, const int pixelY,
 				     const float objectHeight);
-  virtual const estimate bodyEstimate(const int x, const int y, const float dist);
+  const estimate bodyEstimate(const int x, const int y, const float dist);
 
   /********** Getters **********/
-  virtual const int getHorizonY(const int x) const;
-  virtual const int getHorizonX(const int y) const;
-  virtual const point <int> getLeftHorizon() const { return horizonLeft; }
-  virtual const point <int> getRightHorizon() const { return horizonRight; }
-  virtual const int getLeftHorizonY() const { return horizonLeft.y; }
-  virtual const int getRightHorizonY() const { return horizonRight.y; }
-  virtual const float getHorizonSlope() const { return horizonSlope; }
-  virtual const float getPerpenSlope() const { return perpenHorizonSlope; }
+  const int getHorizonY(const int x) const;
+  const int getHorizonX(const int y) const;
+  const point <int> getLeftHorizon() const { return horizonLeft; }
+  const point <int> getRightHorizon() const { return horizonRight; }
+  const int getLeftHorizonY() const { return horizonLeft.y; }
+  const int getRightHorizonY() const { return horizonRight.y; }
+  const float getHorizonSlope() const { return horizonSlope; }
+  const float getPerpenSlope() const { return perpenHorizonSlope; }
 
  protected: // helper methods
   static const ublas::matrix <float>

@@ -204,7 +204,7 @@ public:
     static const int DEFAULT_CAMERA_LENSY = 0;
     // Exposure length
     static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE ON
-    static const int DEFAULT_CAMERA_EXPOSURE = 4.25;
+    static const int DEFAULT_CAMERA_EXPOSURE = 5;
     // Image orientation
     static const int DEFAULT_CAMERA_HFLIP = 0;
     static const int DEFAULT_CAMERA_VFLIP = 0;
