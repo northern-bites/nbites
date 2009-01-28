@@ -69,7 +69,6 @@ private:
                                         ublas::matrix<float> &R_k,
                                         ublas::vector<float> &V_k) = 0;
 };
-#endif EKF_h_DEFINED
 
 // Math helper functions
 // Should probably be housed elswhere
@@ -88,3 +87,4 @@ inline float sign(float f)
         return 1.0f;
     }
 }
+#endif //EKF_h_DEFINED
