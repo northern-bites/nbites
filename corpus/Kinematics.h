@@ -38,6 +38,12 @@ namespace Kinematics {
     static const float CM_TO_MM = 10.0f;
     static const float MM_TO_CM = 0.1f;
 
+    //Accuracy constants for dls
+    //in mm, how close dls will get to the target
+    static const float UNBELIEVABLY_LOW_ERROR = 0.01f; //mm
+    static const float REALLY_LOW_ERROR = 0.1f; //mm
+    static const float ACCEPTABLE_ERROR = 0.5f; //mm
+    static const float COARSE_ERROR     = 1.0f; //mm
 
     enum Axis {
         X_AXIS = 0,
@@ -412,7 +418,7 @@ namespace Kinematics {
     const IKLegResult dls(const ChainID chainID,
                           const ufvector3 &goal,
                           const float startAngles[],
-                          const float maxError = 1.0f,
-                          const float maxHeelError = .1f);
+                          const float maxError = ACCEPTABLE_ERROR,
+                          const float maxHeelError = UNBELIEVABLY_LOW_ERROR);
 };
 #endif

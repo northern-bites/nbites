@@ -296,7 +296,7 @@ void MotionSwitchboard::updateDebugLogs(){
     pthread_mutex_lock(&next_joints_mutex);
     //print joints:
     fprintf(joints_log, "%f\t",time);
-    for(int i = 0; i < NUM_JOINTS; i++)
+    for(unsigned int i = 0; i < NUM_JOINTS; i++)
         fprintf(joints_log, "%f\t",nextJoints[i]);
     fprintf(joints_log, "\n");
 

@@ -178,7 +178,8 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     goal(1) = target_c_y;
     goal(2) = -walkParams->bodyHeight + heightOffGround;
 
-    IKLegResult result = Kinematics::dls(chainID,goal,lastJoints);
+    IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
+                                         REALLY_LOW_ERROR);
     if(state == SWINGING){
         //cout << frameCounter<<"\t"<<hr_offset <<endl;
         result.angles[1] -= leg_sign*getHipHack();
@@ -207,7 +208,8 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
 
 
     //calculate the new angles
-    IKLegResult result = Kinematics::dls(chainID,goal,lastJoints);
+    IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
+                                         REALLY_LOW_ERROR);
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     if(state == SUPPORTING){
         //cout << frameCounter<<"\t"<<hr_offset <<endl;

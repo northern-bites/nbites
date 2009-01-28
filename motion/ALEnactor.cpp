@@ -8,6 +8,7 @@ const float ALEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f / ALEna
 const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RATE;
 
 //#define NO_ACTUAL_MOTION
+#define SPEEDY_ENACTOR
 
 #ifdef NAOQI1
 void ALEnactor::run() {
@@ -37,7 +38,9 @@ void ALEnactor::run() {
 
         // TODO: This is probably wrong!!!!1!ONE
         // We probably want to sleep webots time and this sleeps real time.
+#if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
         usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS));
+#endif
     }
 }
 

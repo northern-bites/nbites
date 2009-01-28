@@ -110,6 +110,11 @@ forwardKinematics(const ChainID id,
     float SP, SR, EY, ER, sinSP, cosSP, sinSR, cosSR, sinEY, cosEY, sinER, cosER;
 
     switch(id) {
+    case HEAD_CHAIN:
+        x = 0.0f;
+        y = 0.0f;
+        z = NECK_OFFSET_Z;
+        break;
     case LARM_CHAIN:
         /* Extract the correct angles from the chainAngles tuple.
            Sines and cosines get reused a lot, so calculate them once.
@@ -579,7 +584,9 @@ Kinematics::dls(const ChainID chainID,
     // The optimization method hits a singularity if the leg is perfectly
     // straight, so we can virtually bend the knee .3 radians and go around
     // that.
-    currentAngles[3] = .3;
+
+    if( fabs(currentAngles[3]) < .2 )
+        currentAngles[3] = .2;
 
     bool ankleSuccess =
         adjustAnkle(chainID, ankleGoal, currentAngles, maxError);
