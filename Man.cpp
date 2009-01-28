@@ -37,9 +37,6 @@ using namespace AL;
 using namespace boost;
 
 
-// reference to the running instance
-shared_ptr<Man> lMan;
-
 /////////////////////////////////////////
 //                                     //
 //  Module class function definitions  //
