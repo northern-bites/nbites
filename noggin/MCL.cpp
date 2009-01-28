@@ -42,10 +42,11 @@ MCL::~MCL()
  *
  * @param u_t The motion (odometery) change since the last update.
  * @param z_t The set of landmark observations in the current frame.
- *
+ * @param resample Should we resample during this update
  * @return The set of particles representing the estimate of the current frame.
  */
-void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
+void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
+                             bool resample=true)
 {
     // Set the current particles to be of time minus one.
     vector<Particle> X_t_1 = X_t;
@@ -67,19 +68,25 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
         X_bar_t.push_back(x_t_m);
     }
 
-    // Resample the particles
+    // Process the particles after updating them all
     for (int m = 0; m < M; ++m) {
-        // Determine the number of copies of this particle to add
+
+        // Normalize the particle weights
         X_bar_t[m].weight /= totalWeights;
-        int count = float(M) * X_bar_t[m].weight;
 
-        //cout<< endl << "Weight: " << X_bar_t[m].weight << endl;
-        //cout << "Count: " << count << endl;
+        if(resample) { // Resample the particles
+            int count = int(round(float(M) * X_bar_t[m].weight));
+            // Add the particles to the resample posterior!
+            for (int i = 0; i < count; ++i) {
+                // Random walk the particles
+                X_t.push_back(randomWalkParticle(X_bar_t[m]));
+            }
 
-        // Add the particles to the resampled posterior!
-        for (int i = 0; i < count; ++i) {
-            X_t.push_back(randomWalkParticle(X_bar_t[m]));
+        } else { // Keep particle count the same
+            // Random walk the particles
+            //X_t.push_back(randomWalkParticle(X_bar_t[m]));
         }
+
     }
 
     // Update pose and uncertainty estimates
@@ -233,7 +240,7 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
     // Expected bearing
     a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
     // Calculate residuals
-    r_d = z.getVisDist() - d_hat;
+    r_d = z.getVisDistance() - d_hat;
     r_a = z.getVisBearing() - a_hat;
 
     return getSimilarity(r_d, r_a, z);
@@ -291,7 +298,7 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
     a_hat = atan2(pt_hat.y - x_t.y, pt_hat.x - x_t.x) - x_t.h;
 
     // Calculate residuals
-    r_d = fabs(z.getVisDist() - d_hat);
+    r_d = fabs(z.getVisDistance() - d_hat);
     r_a = fabs(z.getVisBearing() - a_hat);
 
     return getSimilarity(r_d, r_a, z);
@@ -310,7 +317,7 @@ float MCL::getSimilarity(float r_d, float r_a, Observation &z)
 {
     // Similarity of observation and expectation
     float s_d_a;
-    float sigma_d = z.getDistSD();
+    float sigma_d = z.getDistanceSD();
     float sigma_a = z.getBearingSD();
     // Calculate the similarity of the observation and expectation
     s_d_a = exp((-(r_d*r_d) / (sigma_d*sigma_d))

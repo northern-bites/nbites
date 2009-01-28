@@ -1227,7 +1227,7 @@ print("   Theshold::objectRecognition");
 
 #if ROBOT(AIBO)
   // check if we saw a post - if so, then screen goals that are too close
-  if (vision->by->getDist() > 0 || vision->yb->getDist() > 0) {
+  if (vision->by->getDistance() > 0 || vision->yb->getDistance() > 0) {
     // we can't see the yb and by posts at the same time, so pick the larger one
     if (vision->yb->getWidth() > 0 && vision->by->getWidth() > 0) {
       if (vision->yb->getWidth() > vision->by->getWidth())
@@ -1238,7 +1238,7 @@ print("   Theshold::objectRecognition");
     // nothing can be too close
     int byX = vision->by->getX();
     int byX2 = vision->by->getRightTopX();
-    if (vision->yb->getDist() > 0) {
+    if (vision->yb->getDistance() > 0) {
       byX = vision->yb->getX();
       byX2 = vision->yb->getRightTopX();
     }
@@ -1407,8 +1407,8 @@ void Threshold::storeFieldObjects() {
   setFieldObjectInfo(vision->bgrp);
   vision->ygBackstop->setFocDist(0.0); // sometimes set to 1.0 for some reason
   vision->bgBackstop->setFocDist(0.0); // sometimes set to 1.0 for some reason
-  vision->ygBackstop->setDist(0.0); // sometimes set to 1.0 for some reason
-  vision->bgBackstop->setDist(0.0); // sometimes set to 1.0 for some reason
+  vision->ygBackstop->setDistance(0.0); // sometimes set to 1.0 for some reason
+  vision->bgBackstop->setDistance(0.0); // sometimes set to 1.0 for some reason
 #if ROBOT(AIBO)
   // FIXME - need to add this stuff to Nao Vision, or unify Vision
   setFieldObjectInfo(vision->blueArc);
@@ -1486,9 +1486,10 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
       //print("we've got a post!");
       float dist = 0.0;
       float width = objPtr->getWidth(); float height = objPtr->getHeight();
-      int cert = objPtr->getDistCertainty();
+      distanceCertainty cert = objPtr->getDistanceCertainty();
       float distw = getGoalPostDistFromWidth(width);
       float disth = getGoalPostDistFromHeight(height);
+
       switch (cert) {
       case HEIGHT_UNSURE:
 	// the height is too small - it can still be used as a ceiling though
@@ -1517,7 +1518,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 	  dist > POST_MAX_FOC_DIST) {
 	dist = 0.0;
       }
-      objPtr->setDist(dist);
+      objPtr->setDistance(dist);
     }
 #if ROBOT(AIBO)
     // if object is a beacon
@@ -1543,19 +1544,19 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
       }
 
 
-      objPtr->setDist(dist);
+      objPtr->setDistance(dist);
     }
 #endif
     // if object is an arc
 #if ROBOT(AIBO)
     else if (objPtr == vision->blueArc || objPtr == vision->yellowArc) {
-      objPtr->setDist(10.0);
+      objPtr->setDistance(10.0);
     }
 #endif
 
 #if ROBOT(NAO)
     else if (objPtr == vision->red1 || objPtr == vision->red2 || objPtr == vision->navy1 || objPtr == vision->navy2) {
-      objPtr->setDist(10.0);
+      objPtr->setDistance(10.0);
     }
 #endif
     // don't know what object it is
@@ -1565,19 +1566,19 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
     }
 
     // sets focal distance of the field object
-    objPtr->setFocDist(objPtr->getDist());
+    objPtr->setFocDist(objPtr->getDistance());
     // convert dist + angle estimates to body center
     estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
 					  objPtr->getCenterY(),
-					  objPtr->getDist());
-    objPtr->setDist(obj_est.dist);
-    objPtr->setBearing(obj_est.bearing);
+					  objPtr->getDistance());
+    objPtr->setDistanceWithSD(obj_est.dist);
+    objPtr->setBearingWithSD(obj_est.bearing);
     objPtr->setElevation(obj_est.elevation);
   }
   else {
     objPtr->setFocDist(0.0);
-    objPtr->setDist(0.0);
-    objPtr->setBearing(0.0);
+    objPtr->setDistanceWithSD(0.0);
+    objPtr->setBearingWithSD(0.0);
     objPtr->setElevation(0.0);
   }
 }

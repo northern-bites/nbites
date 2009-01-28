@@ -12,62 +12,19 @@
 /**
  * @param fo FieldObject that was seen and reported.
  */
-Observation::Observation(FieldObjects &_object)
+Observation::Observation(VisualFieldObject &_object) :
+    visDist(_object.getDistance()), visBearing(_object.getBearing()),
+    sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
+    id(_object.getID()), line_truth(false)
 {
-    // We aren't a line
-    line_truth = false;
-    visDist = _object.getDist();
-    visBearing = _object.getBearing();
-    // sigma_d = _object.getDistanceSD();
-    // sigma_b = _object.getBearingSD();
-    sigma_d = visDist * 4.0f;
-    sigma_b = visBearing * 4.0f;
 
-    id = _object.getID();
-
-    // Figure out which possible landmarks we have...
-    // This should be cleaner like in corners, once field objects is in line...
-    if (_object.getCertainty() == SURE) {
-        PointLandmark objectLandmark;
-        if ( id == BLUE_GOAL_LEFT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                blue_goal_left_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                blue_goal_left_post.getFieldY();
-        } else if( id == BLUE_GOAL_RIGHT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                blue_goal_right_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                blue_goal_right_post.getFieldY();
-        } else if ( id == YELLOW_GOAL_LEFT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                yellow_goal_left_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                yellow_goal_left_post.getFieldY();
-        } else if( id == YELLOW_GOAL_RIGHT_POST) {
-            objectLandmark.x = ConcreteFieldObject::
-                yellow_goal_right_post.getFieldX();
-            objectLandmark.y = ConcreteFieldObject::
-                yellow_goal_right_post.getFieldY();
-        }
-        pointPossibilities.push_back(objectLandmark);
-        Observation::numPossibilities = 1;
-        return;
-    }
-
-    list <const ConcreteFieldObject *> objList;
-    if ( id == BLUE_GOAL_LEFT_POST ||
-         id == BLUE_GOAL_RIGHT_POST) {
-            objList = ConcreteFieldObject::blueGoalPosts;
-    } else {
-            objList = ConcreteFieldObject::yellowGoalPosts;
-    }
     // Initialize to 0 possibilities
     numPossibilities = 0;
 
-    list <const ConcreteFieldObject *>::iterator theIterator;
-    //list <const ConcreteFieldObject *> objList = _object.getPossibleFieldObjects();
-    for( theIterator = objList.begin(); theIterator != objList.end();
+    list <const ConcreteFieldObject *>::const_iterator theIterator;
+    const list <const ConcreteFieldObject *> * objList =
+        _object.getPossibleFieldObjects();
+    for( theIterator = objList->begin(); theIterator != objList->end();
          ++theIterator) {
         PointLandmark objectLandmark((**theIterator).getFieldX(),
                                      (**theIterator).getFieldY());
@@ -79,20 +36,11 @@ Observation::Observation(FieldObjects &_object)
 /**
  * @param c Corner that was seen and reported.
  */
-Observation::Observation(VisualCorner &_corner)
+Observation::Observation(VisualCorner &_corner) :
+    visDist(_corner.getDistance()), visBearing(_corner.getBearing()),
+    sigma_d(_corner.getDistanceSD()), sigma_b(_corner.getBearingSD()),
+    id(_corner.getID()), line_truth(false)
 {
-    // We aren't a line
-    line_truth = false;
-
-    // Get basic vision information
-    visDist = _corner.getDistance();
-    visBearing = _corner.getBearing();
-    //sigma_d = _corner.getDistanceSD();
-    //sigma_b = _corner.getBearingSD();
-    sigma_d = visDist * 4.0f;
-    sigma_b = visBearing * 4.0f;
-    //id = _corner.getID();
-
     // Build our possibilitiy list
     numPossibilities= 0;
 
@@ -110,22 +58,12 @@ Observation::Observation(VisualCorner &_corner)
 /**
  * @param l Line that was seen and reported.
  */
-Observation::Observation(VisualLine &_line)
+Observation::Observation(VisualLine &_line) :
+    visDist(_line.getDistance()), visBearing(_line.getBearing()),
+    sigma_d(_line.getDistanceSD()), sigma_b(_line.getBearingSD()),
+    // id(_line.getID()),
+    line_truth(true)
 {
-    // We're a line
-    line_truth = true;
-
-    // Get basic vision information
-    // visDist = _line.getDistance();
-    // visBearing = _line.getBearing();
-    // sigma_d = _line.getDistanceSD();
-    // sigma_b = _line.getBearingSD();
-    visDist = 100;
-    visBearing = 200;
-    sigma_d = visDist * 4.0f;
-    sigma_b = visBearing * 4.0f;
-    //id = _line.getID();
-
     // Build our possibilitiy list
     Observation::numPossibilities = 0;
 
@@ -141,13 +79,6 @@ Observation::Observation(VisualLine &_line)
         ++Observation::numPossibilities;
     }
 
-}
-
-Observation::Observation(const ConcreteCorner &_corner)
-{
-    numPossibilities = 1;
-    PointLandmark cornerLandmark(_corner.getFieldX(),_corner.getFieldY());
-    pointPossibilities.push_back(cornerLandmark);
 }
 
 /**

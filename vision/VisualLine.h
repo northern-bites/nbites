@@ -22,6 +22,8 @@ struct linePoint {
     int y; // y coordinate on the image screen
     float lineWidth; // the width of the line where the point was found
     float distance; // The distance pose estimates the point to be from robot's
+    float bearing;
+
     // center
     ScanDirection foundWithScan;
 
@@ -126,13 +128,6 @@ public:
               << " " << l.color << endl;
             */
         }
-    /**
-     * @return a List of all possible lines.  Currently returns all 11 lines
-     */
-    const list <const ConcreteLine *> getPossibleLines() {
-        //return possibleLines;
-        return ConcreteLine::concreteLines;
-    }
 
 private: // Member functions
     void init();
@@ -154,6 +149,13 @@ private: // Member functions
     static pair <float, float> leastSquaresFit(const VisualLine& l);
 
     //list <const ConcreteLine *> possibleLines;
+    inline float lineDistanceToSD(float _distance) {
+        return (10 + (_distance * _distance)*0.0125);
+    }
+    inline float lineBearingToSD(float _bearing) {
+        return M_PI / 8.0f;
+    }
+
 
 public: // Member variables (public just for now)
     point <int> start, end;
@@ -170,5 +172,38 @@ public: // Member variables (public just for now)
     float avgVerticalWidth, avgHorizontalWidth;
     linePoint thinnestHorPoint, thickestHorPoint;
     linePoint thinnestVertPoint, thickestVertPoint;
+
+private: // Private member variables
+    float distance;
+    float bearing;
+    float distanceSD;
+    float bearingSD;
+    list <const ConcreteLine*> possibleLines;
+
+public:
+    // Getters
+    const float getDistance() const { return distance; }
+    const float getBearing() const { return bearing; }
+    const float getDistanceSD() const { return distanceSD; }
+    const float getBearingSD() const { return bearingSD; }
+    /**
+     * @return a List of all possible lines.  Currently returns all 11 lines
+     */
+    const list <const ConcreteLine *> getPossibleLines() {
+        return possibleLines;
+    }
+
+
+    // Setters
+    void setDistance(float _distance) { distance = _distance; }
+    void setBearing(float _bearing) { bearing = _bearing; }
+    void setDistanceSD(float _distanceSD) { distanceSD = _distanceSD; }
+    void setBearingSD(float _bearingSD) { bearingSD = _bearingSD; }
+    void setDistanceWithSD(float _distance);
+    void setBearingWithSD(float _bearing);
+    void setPossibleLines(list <const ConcreteLine*> _possibles) {
+        possibleLines = _possibles;
+    }
+
 };
 #endif

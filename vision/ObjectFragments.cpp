@@ -1659,11 +1659,11 @@ void ObjectFragments::yellow(int bigGreen) {
   if (beacon) {
     int leftPost = 0;
     int rightPost = 0;
-    if (vision->by->getDist() > 0) {
+    if (vision->by->getDistance() > 0) {
       leftPost = min(vision->by->getLeftTopX(), vision->by->getLeftBottomX());
       rightPost = max(vision->by->getRightTopX(), vision->by->getRightBottomX());
     }
-    if (vision->yb->getDist() > 0) {
+    if (vision->yb->getDistance() > 0) {
       leftPost = min(vision->yb->getLeftTopX(), vision->yb->getLeftBottomX());
       rightPost = max(vision->yb->getRightTopX(), vision->yb->getRightBottomX());
     }
@@ -1695,11 +1695,11 @@ void ObjectFragments::blue(int bigGreen) {
   // take advantage of the fact that we've processed yellow
   int leftPost = 0;
   int rightPost = BADVALUE;
-  if (vision->by->getDist() > 0) {
+  if (vision->by->getDistance() > 0) {
     leftPost = min(vision->by->getLeftTopX(), vision->by->getLeftBottomX());
     rightPost = max(vision->by->getRightTopX(), vision->by->getRightBottomX());
   }
-  if (vision->yb->getDist() > 0) {
+  if (vision->yb->getDistance() > 0) {
     leftPost = min(vision->yb->getLeftTopX(), vision->yb->getLeftBottomX());
     rightPost = max(vision->yb->getRightTopX(), vision->yb->getRightBottomX());
   }
@@ -2016,9 +2016,9 @@ bool ObjectFragments::inferBeaconFromBlob(blob b, VisualFieldObject* beacon) {
   beacon->setHeight(dist(b.leftTop.x, b.leftTop.y, b.leftBottom.x, b.rightBottom.y));
   beacon->setCenterX(beacon->getLeftTopX() + ROUND2(beacon->getWidth()) / 2);
   beacon->setCenterY(beacon->getRightTopY() + ROUND2(beacon->getHeight()) / 2);
-  beacon->setCertainty(SURE);
+  beacon->setIDCertainty(_SURE);
   beacon->setDistCertainty(true);
-  beacon->setDist(1);
+  beacon->setDistance(1);
   return true;
 
 }
@@ -2212,9 +2212,9 @@ bool ObjectFragments::setCorners(int leftx, int lefty, int rightx, int righty, i
     beacon->setHeight(max(bigd,dist(leftX, leftY, bottomX, bottomY)));
     beacon->setCenterX(beacon->getLeftTopX() + ROUND2(beacon->getWidth()) / 2);
     beacon->setCenterY(beacon->getRightTopY() + ROUND2(beacon->getHeight()) / 2);
-    beacon->setCertainty(SURE);
-    beacon->setDistCertainty(true);
-    beacon->setDist(1);
+    beacon->setIDCertainty(_SURE);
+    beacon->setDistanceCertainty(true);
+    beacon->setDistance(1);
     return true;
   }
   return false;
@@ -2446,16 +2446,20 @@ int ObjectFragments::getBigRun(int left, int right, int hor) {
 }
 
 
-/*  As we saw with beacons, we tend to work with blobs for convenience.  So at some point
- * we need to transfer their contents over to the field object that we have identified.
- * In this case we have a goal.  Before we commit we make sure it has enough of the right
- * color.  We also collect up certainty information and pass that along.
+/*  As we saw with beacons, we tend to work with blobs for convenience.  So at
+ *  some point need to transfer their contents over to the field object that
+ * we have identified.
+ * In this case we have a goal.  Before we commit we make sure it has enough of
+ * the right color.  We also collect up certainty information and pass that
+ * along.
  * @param one             the field object we'd like to update
  * @param two             the blob that contains the information we need
  * @param certainty       how certain are we of its ID?
  * @param distCertainty   how certain are we of how big we think it is?
  */
-bool ObjectFragments::updateObject(VisualFieldObject* one, blob two, int certainty, int distCertainty) {
+bool ObjectFragments::updateObject(VisualFieldObject* one, blob two,
+                                   certainty _certainty,
+                                   distanceCertainty _distCertainty) {
   //cout << "Got an object" << endl;
   // before we do this let's make sure that the object is really our color
   if (rightBlobColor(two, NORMALPOST)) {
@@ -2469,13 +2473,15 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, blob two, int certain
       one->setRightBottomY(two.rightBottom.y);
       one->setX(two.leftTop.x);
       one->setY(two.leftTop.y);
-      one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x, two.leftTop.y));
-      one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x, two.leftBottom.y));
+      one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x,
+                         two.leftTop.y));
+      one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x,
+                          two.leftBottom.y));
       one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
       one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-      one->setCertainty(certainty);
-      one->setDistCertainty(distCertainty);
-      one->setDist(1);
+      one->setIDCertainty(_certainty);
+      one->setDistanceCertainty(_distCertainty);
+      one->setDistance(1);
       return true;
   } else {
     //cout << "Screening object for low percentage of real color" << endl;
@@ -2494,11 +2500,13 @@ void ObjectFragments::updateRobot(VisualFieldObject* one, blob two) {
   one->setRightBottomY(two.rightBottom.y);
   one->setX(two.leftTop.x);
   one->setY(two.leftTop.y);
-  one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x, two.leftTop.y));
-  one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x, two.leftBottom.y));
+  one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x,
+                     two.leftTop.y));
+  one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x,
+                      two.leftBottom.y));
   one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
   one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-  one->setDist(1);
+  one->setDistance(1);
 }
 
 /* Transfer a blob into a field arc.
@@ -2595,17 +2603,17 @@ bool ObjectFragments::updateArc(VisualFieldObject* one, blob two, int goalHeight
       one->init();
       return false;
     }
-    one->setCertainty(SURE);
+    one->setIDCertainty(_SURE);
     if (goalHeight > 12 || ((min(lt, rt) > max(lb, rb) && lt > 3) && (max(lb, rb) > max(lt, rt) + 2)))
-      one->setCertainty(NOTSURE);
+      one->setIDCertainty(NOT_SURE);
     else if (rt < 4 && lb < 4 && rb > lt + 3 && lt > 4)
-      one->setCertainty(NOTSURE);
+      one->setIDCertainty(NOT_SURE);
     else if (lt < 4 && rb < 4 && lb > rt + 3 && rt > 4)
-      one->setCertainty(NOTSURE);
+      one->setIDCertainty(NOT_SURE);
     /*if (min(lt, rt) > max(lb, rb) && lt > 3)
-      one->setCertainty(SURE);
+      one->setCertainty(_SURE);
     else if (min(lb, rb) > max(lt, rt))
-      one->setCertainty(NOTSURE);
+      one->setCertainty(NOT_SURE);
     else {
       lt = max(lt, rt);
       lb = max(lb, rb);
@@ -2628,8 +2636,8 @@ bool ObjectFragments::updateArc(VisualFieldObject* one, blob two, int goalHeight
     one->setY(two.leftTop.y);
     one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
     one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-    one->setDistCertainty(NOTSURE);
-    one->setDist(1);
+    one->setDistanceCertainty(BOTH_UNSURE);
+    one->setDistance(1);
   }
   return true;
 }
@@ -2644,8 +2652,9 @@ bool ObjectFragments::updateArc(VisualFieldObject* one, blob two, int goalHeight
  * @param bottom   the bottommost point of the object
  * @return         a constant indicating where the uncertainties (if any) lie
  */
-int ObjectFragments::checkDist(int left, int right, int top, int bottom) {
-  int dc = BOTH_SURE;
+distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
+                                             int bottom) {
+  distanceCertainty dc = BOTH_SURE;
   int nextX, nextY;
   if (left < DIST_POINT_FUDGE || right > IMAGE_WIDTH - DIST_POINT_FUDGE) {
     if (top < DIST_POINT_FUDGE || bottom > IMAGE_HEIGHT - DIST_POINT_FUDGE) {
@@ -2691,7 +2700,7 @@ void ObjectFragments::updateBackstop(VisualFieldObject* one, blob two) {
   one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x, two.leftBottom.y));
   one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
   one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-  one->setDist(1);
+  one->setDistance(1);
 }
 
 /* Post recognition for NAOs
@@ -4260,20 +4269,20 @@ void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right
   for (int i = 0; i < IMAGE_WIDTH; i++) {
     screen[i] = false;
   }
-  if (left->getDist() != 0) {
-    if (left->getCertainty() != SURE) return;
-    leftb = left->getRightBottomX();
-    bottom = left->getLeftBottomY();
-    rightb = min(rightb, left->getRightBottomX() + (int)left->getHeight());
+  if (left->getDistance() != 0) {
+      if (left->getIDCertainty() != _SURE) return;
+      leftb = left->getRightBottomX();
+      bottom = left->getLeftBottomY();
+      rightb = min(rightb, left->getRightBottomX() + (int)left->getHeight());
   }
-  if (right->getDist() != 0) {
+  if (right->getDistance() != 0) {
     rightb = right->getLeftBottomX();
     bottom = right->getRightBottomY();
     if (leftb == 0) {
       leftb = max(0, rightb - (int)right->getHeight());
     }
   }
-  if (vision->red1->getDist() > 0) {
+  if (vision->red1->getDistance() > 0) {
     rl = vision->red1->getLeftBottomX();
     rr = vision->red1->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
@@ -4282,7 +4291,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right
       }
     }
   }
-  if (vision->red2->getDist() > 0) {
+  if (vision->red2->getDistance() > 0) {
     rl = vision->red2->getLeftBottomX();
     rr = vision->red2->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
@@ -4291,7 +4300,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right
       }
     }
   }
-  if (vision->navy1->getDist() > 0) {
+  if (vision->navy1->getDistance() > 0) {
     rl = vision->navy1->getLeftBottomX();
     rr = vision->navy1->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
@@ -4300,7 +4309,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right
       }
     }
   }
-  if (vision->navy2->getDist() > 0) {
+  if (vision->navy2->getDistance() > 0) {
     rl = vision->navy2->getLeftBottomX();
     rr = vision->navy2->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
@@ -4344,7 +4353,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right
     middle->setHeight(20);
     middle->setCenterX(middle->getLeftTopX() + ROUND2(middle->getWidth() / 2));
     middle->setCenterY(middle->getRightTopY() + ROUND2(middle->getHeight() / 2));
-    middle->setDist(1);
+    middle->setDistance(1);
 
   }
 }
@@ -4881,9 +4890,12 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
   //cout << horizon << " " << slope << endl;
   // if we don't have any runs there is nothing to do
   if (numberOfRuns <= 1) return;
+
   int nextX = 0;
   //int nextY = 0;
-  int nextH = 0, dc = BOTH_UNSURE;
+  int nextH = 0;
+  distanceCertainty dc = BOTH_UNSURE;
+
 #if ROBOT(AIBO)
   // start by blobbing - we often want to do it anyway
   for (int i = 0; i < numberOfRuns; i++) {
@@ -5030,9 +5042,9 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
   int howbig = characterizeSize(pole);
   int post = classifyFirstPost(horizon, c, c2, beaconFound, left, right, mid);
   if (post == LEFT) {
-    updateObject(right, pole, SURE, dc);
+    updateObject(right, pole, _SURE, dc);
   } else if (post == RIGHT) {
-    updateObject(left, pole, SURE, dc);
+    updateObject(left, pole, _SURE, dc);
   } else if (post == BACKSTOP) {
 #if ROBOT(AIBO)
     updateBackstop(mid, topBlob);
@@ -5043,7 +5055,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
 #endif
   } else {
     if (howbig == LARGE)
-      updateObject(right, pole, NOTSURE, dc);
+        updateObject(right, pole, NOT_SURE, dc);
     if (POSTLOGIC)
       cout << "Post not classified" << endl;
     return;
@@ -5080,10 +5092,10 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
     // before returning make sure we don't need to screen the previous post
     if (questions) {
       if (post == LEFT) {
-	if (right->getCertainty() != SURE)
+	if (right->getIDCertainty() != _SURE)
 	  right->init();
       } else {
-	if (left->getCertainty() != SURE)
+	if (left->getIDCertainty() != _SURE)
 	  left->init();
       }
     }
@@ -5129,13 +5141,13 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
 	relativeSizesOk(spanX, pspanY, spanX2, spanY2, trueTop, trueTop2, fudge)) {
       if (post == LEFT) {
 	second = 1;
-	updateObject(left, pole, SURE, dc);
+	updateObject(left, pole, _SURE, dc);
 	// make sure the certainty was set on the other post
-	right->setCertainty(SURE);
+	right->setIDCertainty(_SURE);
       } else {
 	second = 1;
-	updateObject(right, pole, SURE, dc);
-	left->setCertainty(SURE);
+	updateObject(right, pole, _SURE, dc);
+	left->setIDCertainty(_SURE);
       }
     } else {
       if (SANITY) {
@@ -5146,13 +5158,13 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
 	if (abs(trueTop - trueTop2) < 10 && qualityPost(pole, c)) {
 	  if (post == LEFT) {
 	    second = 1;
-	    updateObject(left, pole, SURE, dc);
+	    updateObject(left, pole, _SURE, dc);
 	    // make sure the certainty was set on the other post
-	    right->setCertainty(SURE);
+	    right->setIDCertainty(_SURE);
 	  } else {
 	    second = 1;
-	    updateObject(right, pole, SURE, dc);
-            left->setCertainty(SURE);
+	    updateObject(right, pole, _SURE, dc);
+            left->setIDCertainty(_SURE);
 	  }
 	}
       } else if (!locationOk(pole, horizon) && secondPostFarEnough(leftP, rightP, pole.leftTop, pole.rightTop, post)) {
@@ -5484,9 +5496,9 @@ void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right
    p1->setHeight(p2->getHeight());
    p1->setCenterX(p2->getCenterX());
    p1->setCenterY(p2->getCenterY());
-   p1->setCertainty(SURE);
-   p1->setDistCertainty(p2->getDistCertainty());
-   p1->setDist(1);
+   p1->setIDCertainty(_SURE);
+   p1->setDistanceCertainty(p2->getDistanceCertainty());
+   p1->setDistance(1);
    p2->init();
  }
 
@@ -5529,7 +5541,8 @@ void ObjectFragments::transferToPole() {
  * @param cert        how sure we are we IDd it correctly
  * @param distCert    how sure we are about distance certainty information
  */
-void ObjectFragments::transferTopBlob(VisualFieldObject * one, int cert, int distCert) {
+void ObjectFragments::transferTopBlob(VisualFieldObject * one, certainty cert,
+                                      distanceCertainty distCert) {
   one->setLeftTopX(topBlob.leftTop.x);
   one->setLeftTopY(topBlob.leftTop.y);
   one->setLeftBottomX(topBlob.leftBottom.x);
@@ -5540,13 +5553,15 @@ void ObjectFragments::transferTopBlob(VisualFieldObject * one, int cert, int dis
   one->setRightBottomY(topBlob.rightBottom.y);
   one->setX(topBlob.leftTop.x);
   one->setY(topBlob.leftTop.y);
-  one->setWidth(dist(topBlob.leftTop.x, topBlob.leftTop.y, topBlob.rightTop.x, topBlob.rightTop.y));
-  one->setHeight(dist(topBlob.leftTop.x, topBlob.leftTop.y, topBlob.leftBottom.x, topBlob.rightBottom.y));
+  one->setWidth(dist(topBlob.leftTop.x, topBlob.leftTop.y, topBlob.rightTop.x,
+                     topBlob.rightTop.y));
+  one->setHeight(dist(topBlob.leftTop.x, topBlob.leftTop.y, topBlob.leftBottom.x
+                      , topBlob.rightBottom.y));
   one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
   one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-  one->setCertainty(cert);
-  one->setDistCertainty(distCert);
-  one->setDist(1);
+  one->setIDCertainty(cert);
+  one->setDistanceCertainty(distCert);
+  one->setDistance(1);
 }
 
 
@@ -6222,7 +6237,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 	circleFit(thisBall);
 	thisBall->setFocalDistance();
 	thisBall->setDistance();
-	cout << "Inferred dist would have been" << thisBall->getDist() << " conf: " << inferredConfidence << endl;
+	cout << "Inferred dist would have been" << thisBall->getDistance() << " conf: " << inferredConfidence << endl;
       }
       // x, y, width, and height. Not up for debate.
       thisBall->setX(topBlob.leftTop.x);
@@ -6258,11 +6273,11 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
 	thisBall->setRadius((float)max(w/2, h/2));
 	thisBall->setFocalDistance();
 	thisBall->setDistance();
-	cout << "Blob dist would have been" << thisBall->getDist() << endl;
+	cout << "Blob dist would have been" << thisBall->getDistance() << endl;
       }
       circleFit(thisBall);
       //cout<<"AFter circle fit radius"<<thisBall->getRadius()<<endl;
-      //cout<<"after circle fit, what is distance?"<<thisBall->getDist()<<endl;
+      //cout<<"after circle fit, what is distance?"<<thisBall->getDistance()<<endl;
       if (inferredConfidence > 4 && (occlusion <= BOTTOMOCCLUSION || topBlob.area > 400))
 	thisBall->setConfidence(SURE);
       else if (inferredConfidence > 3)
@@ -6301,7 +6316,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
     thisBall->setFocalDistance();
     thisBall->setDistance();
     if (BALLDISTDEBUG) {
-      cout << "Distance is " << thisBall->getDist() << " " << thisBall->getFocDist() << endl;
+      cout << "Distance is " << thisBall->getDistance() << " " << thisBall->getFocDist() << endl;
       cout<< "Radius"<<thisBall->getRadius()<<endl;
     }
   } else if (topBlob.area > 0){
@@ -7076,11 +7091,11 @@ void ObjectFragments::printObject(VisualFieldObject * objs) {
   cout << objs->getLeftTopX() << " " << objs->getLeftTopY() << " " << objs->getRightTopX() << " " << objs->getRightTopY() << endl;
   cout << objs->getLeftBottomX() << " " << objs->getLeftBottomY() << " " << objs->getRightBottomX() << " " << objs->getRightBottomY() << endl;
   cout << "Height is " << objs->getHeight() << " Width is " << objs->getWidth() << endl;
-  if (objs->getCertainty() == SURE)
+  if (objs->getIDCertainty() == _SURE)
     cout << "Very sure" << endl;
   else
     cout << "Not sure" << endl;
-  int dc = objs->getDistCertainty();
+  distanceCertainty dc = objs->getDistanceCertainty();
   switch (dc) {
   case BOTH_SURE:
     cout << "Distance should be good" << endl;

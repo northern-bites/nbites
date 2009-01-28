@@ -111,8 +111,9 @@ public:
     static const list <const ConcreteCorner*> getPossibleCorners(shape
                                                                  corner_type);
 
-    // Private methods
-private:
+//     // Private methods
+// private:
+public:
     static const shape inferCornerType(const cornerID id);
     // Static member variables
 

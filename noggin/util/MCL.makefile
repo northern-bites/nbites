@@ -15,7 +15,7 @@ CC_SRCS = ../../vision/ConcreteLandmark.cpp \
 
 UTILITY_SRCS = ../../vision/Utility.cpp
 
-FO_SRCS = ../../vision/FieldObjects.cpp
+FO_SRCS = ../../vision/VisualFieldObject.cpp
 
 CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp
 
@@ -69,4 +69,4 @@ concreteFO.o : $(CCFO_SRCS)
 .Phony : clean
 
 clean :
-	$(RM) $(OBJS) mclLogger
+	$(RM) $(OBJS) mclLogger faker

@@ -57,6 +57,19 @@ const list <const ConcreteFieldObject*> ConcreteFieldObject::yellowGoalPosts =
     list <const ConcreteFieldObject*>( ConcreteFieldObject::YELLOW_GOAL_POSTS,
                                         &ConcreteFieldObject::YELLOW_GOAL_POSTS[
                                             NUM_YELLOW_GOAL_POSTS]);
+// Lists of single posts, to make the functions easier to call...
+const list <const ConcreteFieldObject*>
+ConcreteFieldObject::blueGoalLeftPostList =
+    list <const ConcreteFieldObject*>( 1, &blue_goal_left_post);
+const list <const ConcreteFieldObject*>
+ConcreteFieldObject::blueGoalRightPostList =
+    list <const ConcreteFieldObject*>( 1, &blue_goal_right_post);
+const list <const ConcreteFieldObject*>
+ConcreteFieldObject::yellowGoalLeftPostList =
+    list <const ConcreteFieldObject*>( 1, &yellow_goal_left_post);
+const list <const ConcreteFieldObject*>
+ConcreteFieldObject::yellowGoalRightPostList =
+    list <const ConcreteFieldObject*>( 1, &yellow_goal_right_post);
 
 const string ConcreteFieldObject::toString() const {
     switch(id) {

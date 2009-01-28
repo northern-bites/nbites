@@ -16,7 +16,6 @@
 #endif
 
 enum ProfiledComponent {
-  
   P_GETIMAGE = 0,
   P_TRANSFORM,
   P_THRESHOLD,
@@ -30,6 +29,8 @@ enum ProfiledComponent {
   P_AIBOCONNECT,
   P_TOOLCONNECT,
   P_PYUPDATE,
+  P_LOC,
+  P_MCL,
   P_PYRUN,
   P_PYTHON,
   P_FINAL,

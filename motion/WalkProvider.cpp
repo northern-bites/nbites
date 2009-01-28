@@ -64,7 +64,7 @@ void WalkProvider::setMotion(const float x, const float y, const float theta) {
 
 //Returns the 20 body joints
 vector<float> WalkProvider::getWalkStance(){
-    cout << "getWalkStance" <<endl;
+    //cout << "getWalkStance" <<endl;
     //calculate the walking stance of the robot
     const float z = walkParameters.bodyHeight;
     const float x = walkParameters.hipOffsetX;

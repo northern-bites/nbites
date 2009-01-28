@@ -8,10 +8,11 @@
 #include "Sensors.h"
 #include "Profiler.h"
 #include "PyVision.h"
+#include "MCL.h"
 
 class Noggin
 {
-  public:
+public:
     Noggin(Sensors *s, Profiler *p, Vision *v);
     virtual ~Noggin();
 
@@ -25,15 +26,17 @@ class Noggin
     // current Noggin error status
     bool inErrorState() { return error_state; }
 
-  private:
+private:
     // Initialize the interpreter, the vision module, and PyVision instance
     void initializeVision(Vision *v);
     // Import the util.module_helper and noggin.Brain modules
     bool import_modules();
     // Instantiate a Brain instance
     void getBrainInstance();
+    // Run the localization update; performed at every run step
+    void updateLocalization();
 
-  private:
+private:
     Sensors *sensors;
     Profiler *profiler;
     PyVision *vision;
@@ -42,6 +45,10 @@ class Noggin
     PyObject *module_helper;
     PyObject *brain_module;
     PyObject *brain_instance;
+
+// Public members
+public:
+    MCL mcl;
 };
 
 

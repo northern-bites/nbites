@@ -91,6 +91,10 @@ private:
 public:
     static const list <const ConcreteFieldObject*> blueGoalPosts;
     static const list <const ConcreteFieldObject*> yellowGoalPosts;
+    static const list <const ConcreteFieldObject*> blueGoalLeftPostList;
+    static const list <const ConcreteFieldObject*> blueGoalRightPostList;
+    static const list <const ConcreteFieldObject*> yellowGoalLeftPostList;
+    static const list <const ConcreteFieldObject*> yellowGoalRightPostList;
 
 private: // Instance variables recording location on field and identifier
     fieldObjectID id;

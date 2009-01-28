@@ -153,15 +153,15 @@ std::string Vision::getRobotName() {
 void Vision::drawBoxes(void) {
 
   // draw field objects
-  if(bglp->getDist() > 0) drawFieldObject(bglp,RED);
-  if(bgrp->getDist() > 0) drawFieldObject(bgrp,BLACK);
-  if(yglp->getDist() > 0) drawFieldObject(yglp,RED);
-  if(ygrp->getDist() > 0) drawFieldObject(ygrp,BLACK);
+  if(bglp->getDistance() > 0) drawFieldObject(bglp,RED);
+  if(bgrp->getDistance() > 0) drawFieldObject(bgrp,BLACK);
+  if(yglp->getDistance() > 0) drawFieldObject(yglp,RED);
+  if(ygrp->getDistance() > 0) drawFieldObject(ygrp,BLACK);
   if(ygBackstop->getHeight() > 0) drawFieldObject(ygBackstop, BLUE);
   if(bgBackstop->getHeight() > 0) drawFieldObject(bgBackstop, YELLOW);
 #if ROBOT(AIBO)
-  if(by->getDist() > 0) drawFieldObject(by,GREEN);
-  if(yb->getDist() > 0) drawFieldObject(yb,ORANGE);
+  if(by->getDistance() > 0) drawFieldObject(by,GREEN);
+  if(yb->getDistance() > 0) drawFieldObject(yb,ORANGE);
 #endif
 
   // balls
