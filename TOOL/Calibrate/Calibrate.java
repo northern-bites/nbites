@@ -51,6 +51,7 @@ import TOOL.Image.ImageSwatch;
 import TOOL.Image.ImagePanel;
 import TOOL.Image.TOOLImage;
 import TOOL.Image.ThresholdedImage;
+import TOOL.Image.ProcessedImage;
 import TOOL.Image.PixelSelectionPanel;
 import TOOL.Image.ImageMarkerPanel;
 import TOOL.Image.CalibrationDrawingPanel;

@@ -41,7 +41,7 @@
 package TOOL.Vision;
 
 //the object classes
-import edu.bowdoin.robocup.TOOL.Data.Ball;
+import TOOL.Data.Ball;
 
 import java.io.FileInputStream;
 import java.io.IOException;
