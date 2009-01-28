@@ -7,6 +7,7 @@
 
 
 foot_locus = function(foot){
+
 name = paste(foot,"_locus_log",sep="")
 PDF = ".pdf"
 

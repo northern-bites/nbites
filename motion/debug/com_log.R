@@ -5,7 +5,6 @@
 # Date: Decemeber 2008
 
 
-
 name = "com_log"
 PDF = ".pdf"
 
