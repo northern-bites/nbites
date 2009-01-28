@@ -14,7 +14,7 @@
 #include <vector>
 #include <string>
 
-#include "edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink.h"
+#include "TOOL_Vision_TOOLVisionLink.h"
 #include "Vision.h"
 #include "NaoPose.h"
 #include "Sensors.h"
@@ -68,7 +68,7 @@ extern "C" {
     static Profiler profiler = Profiler(&micro_time);
     static Vision vision = Vision(&pose,&profiler);
 
-    JNIEXPORT void JNICALL Java_edu_bowdoin_robocup_TOOL_Vision_TOOLVisionLink_cppProcessImage
+    JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
      jbyteArray jtable, jobjectArray thresh_target){
         //Size checking -- we expect the sizes of the arrays to match

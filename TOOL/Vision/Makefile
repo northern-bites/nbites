@@ -18,7 +18,7 @@ JAVAH = javah
 endif
 JAR = $(JCP)/jar 
 
-TOOL_CLASS_PATH := edu.bowdoin.robocup.TOOL
+TOOL_CLASS_PATH := TOOL
 
 #For compiling JNI vision library
 MAN_HOME := $(META_DIR)/../man
