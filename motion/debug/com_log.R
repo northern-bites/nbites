@@ -5,10 +5,14 @@
 # Date: Decemeber 2008
 
 
-dat = read.table("/tmp/com_log.xls",header=T)
 
 name = "com_log"
 PDF = ".pdf"
+
+file = paste("/tmp/",name,".xls",sep="")
+if(!file.exists(file))
+	quit("no")
+dat = read.table(file,header=T,na.strings=c("-"))
 
 pdf(paste(name,"-x",PDF,sep=""))
 plot(dat$time,dat$pre_x,pch="",main="",xlab="s",ylab="mm")

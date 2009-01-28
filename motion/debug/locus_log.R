@@ -7,10 +7,13 @@
 
 
 foot_locus = function(foot){
-dat = read.table(paste("/tmp/",foot,"_locus_log.xls",sep=""),header=T)
-
 name = paste(foot,"_locus_log",sep="")
 PDF = ".pdf"
+
+file = paste("/tmp/",name,".xls",sep="")
+if(!file.exists(file))
+	quit("no")
+dat = read.table(file,header=T,na.strings=c("-"))
 
 pdf(paste(name,"-x",PDF,sep=""))
 plot(dat$time,dat$goal_x,pch="",main=paste(foot,"leg"),xlab="s",ylab="mm")

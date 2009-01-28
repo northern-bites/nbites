@@ -4,11 +4,13 @@
 # Author: Johannes Strom
 # Date: February 2008
 
-
-dat = read.table("/tmp/joints_log.xls",header=T,na.strings=c("-"))
-
 name = "joints_log"
 PDF = ".pdf"
+
+file = paste("/tmp/",name,".xls",sep="")
+if(!file.exists(file))
+	quit("no")
+dat = read.table(file,header=T,na.strings=c("-"))
 
 #labels = dat[0,]
 dummy = dat[,2] #for setting limits

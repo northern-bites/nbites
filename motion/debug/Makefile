@@ -1,11 +1,11 @@
 
 R=R
 R_FILES = $(wildcard *.R)
-R_OPTS = "--no-save"
+R_OPTS = --no-save
 CAT = cat
 
 graphs :
-	$(CAT) $(R_FILES) |$(R) $(R_OPTS)
+	for rf in $(R_FILES); do $(R) $(R_OPTS) < $$rf; done;
 
 clean:
 	$(RM) *.pdf
