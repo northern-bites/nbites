@@ -237,8 +237,6 @@ Man::registerCamera() {
 //         }
     }
 
-
-
 }
 
 void
@@ -509,6 +507,7 @@ Man::closeMan() {
 void
 Man::run ()
 {
+
 #ifdef DEBUG_MAN_THREADING
     cout << "Man::running" << endl;
 #endif
@@ -602,7 +601,6 @@ Man::run ()
     // Signal stop event
     running = false;
     trigger->off();
-#endif
 
 }
 
