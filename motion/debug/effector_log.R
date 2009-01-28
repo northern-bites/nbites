@@ -32,19 +32,22 @@ for(chn in c(1:5)){
       dim="_x"
       pdf(paste(c_names[chn],"_",name,dim,PDF,sep=""))
       plot(dat$time,dat[,indices[1]],type="l",
-           main=paste(c_names[chn],dim,sep=""),xlab="s",ylab="mm",col=5)
+           main=paste(c_names[chn],dim,sep=""),xlab="s",ylab="mm",col=3)
+      legend("top",lwd=2,legend=labels(dat)[[2]][indices[1]],col=3)
       dev.off()
 
-      dim="_z"
+      dim="_y"
       pdf(paste(c_names[chn],"_",name,dim,PDF,sep=""))
       plot(dat$time,dat[,indices[2]],type="l",
-           main=paste(c_names[chn],dim,sep=""),xlab="s",ylab="mm",col=5)
+           main=paste(c_names[chn],dim,sep=""),xlab="s",ylab="mm",col=4)
+      legend("top",lwd=2,legend=labels(dat)[[2]][indices[2]],col=4)
       dev.off()
 
       dim="_z"
       pdf(paste(c_names[chn],"_",name,dim,PDF,sep=""))
       plot(dat$time,dat[,indices[3]],type="l",
            main=paste(c_names[chn],dim,sep=""),xlab="s",ylab="mm",col=5)
+      legend("top",lwd=2,legend=labels(dat)[[2]][indices[3]],col=5)
       dev.off()
 
 }
