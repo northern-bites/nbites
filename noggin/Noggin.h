@@ -3,9 +3,8 @@
 #define _Noggin_h_DEFINED
 
 #include <Python.h>
-#include <exception>
+#include <boost/shared_ptr.hpp>
 
-#include "Sensors.h"
 #include "Profiler.h"
 #include "PyVision.h"
 #include "MCL.h"
@@ -13,7 +12,7 @@
 class Noggin
 {
 public:
-    Noggin(Sensors *s, Profiler *p, Vision *v);
+    Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v);
     virtual ~Noggin();
 
     // reload Brain module
@@ -28,7 +27,7 @@ public:
 
 private:
     // Initialize the interpreter, the vision module, and PyVision instance
-    void initializeVision(Vision *v);
+    void initializeVision(boost::shared_ptr<Vision> v);
     // Import the util.module_helper and noggin.Brain modules
     bool import_modules();
     // Instantiate a Brain instance
@@ -37,9 +36,9 @@ private:
     void updateLocalization();
 
 private:
-    Sensors *sensors;
-    Profiler *profiler;
-    PyVision *vision;
+    boost::shared_ptr<Profiler> profiler;
+    boost::shared_ptr<Vision> vision;
+    boost::shared_ptr<PyVision> pyvision;
 
     bool error_state;
     PyObject *module_helper;

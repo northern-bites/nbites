@@ -13,7 +13,7 @@
 
 #include <pthread.h>
 #include <vector>
-using namespace std;
+#include <boost/shared_ptr.hpp>
 
 #include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
 
@@ -32,14 +32,14 @@ using namespace std;
 
 class MotionSwitchboard {
 public:
-    MotionSwitchboard(Sensors *s);
+    MotionSwitchboard(boost::shared_ptr<Sensors> s);
     ~MotionSwitchboard();
 
     void start();
     void stop();
     void run();
 
-    const vector <float> getNextJoints();
+    const std::vector <float> getNextJoints();
 
 private:
     int processProviders();
@@ -51,25 +51,25 @@ private:
 #endif
 
 private:
-    Sensors *sensors;
+    boost::shared_ptr<Sensors> sensors;
     WalkProvider walkProvider;
-	ScriptedProvider scriptedProvider;
-	HeadProvider headProvider;
-    vector <float> nextJoints;
+    ScriptedProvider scriptedProvider;
+    HeadProvider headProvider;
+    std::vector <float> nextJoints;
 
     bool running;
-	const HeadJointCommand *hjc;
-	const HeadJointCommand *hjc2;
-	const HeadJointCommand *hjc3;
-	vector<float> *bodyJoints;
-	vector<float> *bodyJoints2;
+    const HeadJointCommand *hjc;
+    const HeadJointCommand *hjc2;
+    const HeadJointCommand *hjc3;
+    std::vector<float> *bodyJoints;
+    std::vector<float> *bodyJoints2;
 
-	const BodyJointCommand *command;
-	const BodyJointCommand *command2;
-	const BodyJointCommand *command3;
+    const BodyJointCommand *command;
+    const BodyJointCommand *command2;
+    const BodyJointCommand *command3;
     static const float sitDownAngles[NUM_BODY_JOINTS];
-	const BodyJointCommand *getUp;
-	const BodyJointCommand *sitDown;
+    const BodyJointCommand *getUp;
+    const BodyJointCommand *sitDown;
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;

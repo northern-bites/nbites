@@ -2,6 +2,8 @@
 #define _ALEnactor_h_DEFINED
 
 #ifdef NAOQI1
+
+#include <boost/shared_ptr.hpp>
 #include "alerror.h"
 #include "almotionproxy.h"
 #include "almemoryproxy.h"
@@ -16,8 +18,8 @@
 
 class ALEnactor : public MotionEnactor {
 public:
-    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, Sensors * s)
-        : MotionEnactor(),broker(_pbroker),sensors(s) {
+    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s)
+        : MotionEnactor(), broker(_pbroker), sensors(s) {
         try {
             almemory = broker->getMemoryProxy();
         } catch(AL::ALError &e){
@@ -50,7 +52,7 @@ private:
     AL::ALPtr<AL::ALMotionProxy>  almotion;
     AL::ALPtr<AL::ALMemoryProxy>  almemory;
     AL::ALPtr<AL::DCMProxy> dcm;
-    Sensors *sensors;
+    boost::shared_ptr<Sensors> sensors;
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
     static const float MOTION_FRAME_LENGTH_S; // in seconds

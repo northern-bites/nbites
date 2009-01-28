@@ -67,7 +67,9 @@ class TOOLConnect
 #if ROBOT(AIBO)
     TOOLConnect(OVision *s);
 #else
-    TOOLConnect(boost::shared_ptr<Synchro> _synchro, Sensors *s, Vision *v);
+    TOOLConnect(boost::shared_ptr<Synchro> _synchro,
+                boost::shared_ptr<Sensors> s,
+                boost::shared_ptr<Vision> v);
 #endif
     ~TOOLConnect();
 
@@ -95,8 +97,8 @@ class TOOLConnect
 #if ROBOT(AIBO)
     OVision *vision; // access to all robot information
 #elif ROBOT(NAO)
-    Sensors *sensors; // thread-safe access to sensor information
-    Vision *vision; // access to vision processing information
+    boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
+    boost::shared_ptr<Vision> vision; // access to vision processing
 #endif
 };
 

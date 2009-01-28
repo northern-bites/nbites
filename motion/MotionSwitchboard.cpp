@@ -1,4 +1,11 @@
+
+#include <vector>
+#include <boost/shared_ptr.hpp>
+
 #include "MotionSwitchboard.h"
+
+using namespace std;
+using namespace boost;
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
@@ -8,7 +15,7 @@ const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
  1.57f,0.0f,1.13f,1.01f};
 
 
-MotionSwitchboard::MotionSwitchboard(Sensors *s)
+MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     : sensors(s),
       walkProvider(sensors),
 	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!

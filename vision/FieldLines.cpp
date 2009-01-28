@@ -1,6 +1,28 @@
+
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
+//
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+
 /* Field Lines class */
 
 #include <algorithm>    // for sort() and merge()
+#include <boost/shared_ptr.hpp>
 
 #include "FieldLines.h"
 
@@ -31,6 +53,8 @@
 #define countersHitSanityChecks(numWhite,numUndefined,numNonWhite,print) (numNonWhite > NUM_NON_WHITE_SANITY_CHECK || numUndefined > NUM_UNDEFINED_SANITY_CHECK)
 #endif
 
+using boost::shared_ptr;
+
 const int FieldLines::FIELD_COLORS[NUM_GREEN_COLORS] =
   { GREEN, BLUEGREEN };
 const int FieldLines::LINE_COLORS[NUM_WHITE_COLORS] =
@@ -41,7 +65,7 @@ const char * FieldLines::linePointInfoFile = "linepoints.xls";
 //const float FieldLines::MAX_PERCENT_ERROR_IN_JOIN_LINES = .024f;
 
 
-FieldLines::FieldLines(Vision *visPtr, NaoPose *posePtr) {
+FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
   vision = visPtr;
   pose = posePtr;
 

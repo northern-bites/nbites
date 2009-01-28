@@ -29,12 +29,13 @@
 
 class Motion : public Thread
 {
-  public:
+public:
 #ifdef NAOQI1
-    Motion(boost::shared_ptr<Synchro> synchro,
-           MotionEnactor * _enactor, Sensors *s);
+    Motion(boost::shared_ptr<Synchro> synchro, MotionEnactor * _enactor,
+           boost::shared_ptr<Sensors> s);
 #else
-    Motion(ALMotionProxy * _proxy,boost::shared_ptr<Synchro> synchro, Sensors *s);
+    Motion(ALMotionProxy * _proxy, boost::shared_ptr<Synchro> synchro,
+            boost::shared_ptr<Sensors> s);
 #endif
     ~Motion();
 

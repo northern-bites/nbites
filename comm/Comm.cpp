@@ -412,10 +412,14 @@ c_init_comm (void)
       PyInt_FromLong(PENALTY_MANUAL));
 
 #ifdef USE_PYCOMM_FAKE_BACKEND
-  Sensors *s = new Sensors();
-  Vision *v = new Vision(new NaoPose(s), new Profiler(&micro_time));
   shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
-  PyObject *pcomm = PyComm_new(new Comm(synchro, s, v));
+  shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
+
+  shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
+  shared_ptr<Pose> pose = shared_ptr<Pose>(new Pose());
+  shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
+
+  PyObject *pcomm = PyComm_new(new Comm(synchro, sensors, vision));
   PyModule_AddObject(comm_module, "inst", pcomm);
 #endif
   
@@ -434,9 +438,11 @@ init_comm (void)
 // C++ Comm class methods
 //
 
-Comm::Comm (shared_ptr<Synchro> _synchro, Sensors *s, Vision *v)
-  : Thread(_synchro, "Comm"), tool(_synchro, s,v),
+Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
+            shared_ptr<Vision> v)
+  : Thread(_synchro, "Comm"), tool(_synchro, s, v),
     data(14,0), latest(new list<vector<float> >),
+    latest(new list<vector<float> >), data(14,0),
     sensors(s), timer(&micro_time), gc()
 {
 

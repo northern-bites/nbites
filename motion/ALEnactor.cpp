@@ -35,8 +35,8 @@ void ALEnactor::run() {
         vector<float> result = switchboard->getNextJoints();
 
 #ifdef DEBUG_ENACTOR_JOINTS
- 		for (int i=0; i<result.size();i++)
- 			cout << "result of joint " << i << " is " << result.at(i) << endl;
+        for (int i=0; i<result.size();i++)
+            cout << "result of joint " << i << " is " << result.at(i) << endl;
 #endif
 
 #ifndef NO_ACTUAL_MOTION
@@ -51,7 +51,7 @@ void ALEnactor::run() {
     }
 }
 
-void ALEnactor::postSensors(){
+void ALEnactor::postSensors() {
     //At the beginning of each cycle, we need to update the sensor values
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the

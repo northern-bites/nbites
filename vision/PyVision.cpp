@@ -2,11 +2,14 @@
 #include <time.h>
 #include <sys/time.h>
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 #include "PyVision.h"
 #if ROBOT(NAO)
 #include "visionconfig.h"
 #endif
+
+using boost::shared_ptr;
 
 static map<const ConcreteCorner*, PyObject*> py_concrete_corners;
 
@@ -1015,7 +1018,7 @@ PyVision_new (Vision *v)
 
     self->thresh = PyThreshold_new(v->thresh);
     self->fieldLines = PyFieldLines_new(v->fieldLines);
-    self->pose = PyPose_new(v->pose);
+    self->pose = PyPose_new(v->pose.get());
 
     if (self->width == NULL      || self->height == NULL ||
         self->by == NULL         || self->yb == NULL     ||
@@ -1276,8 +1279,11 @@ micro_time (void)
 static PyObject*
 vision_createNew (PyObject *self, PyObject *args)
 {
-    return PyVision_new(new Vision(new NaoPose(new Sensors()),
-                                   new Profiler(&micro_time)));
+    shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
+    shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
+    shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
+
+    return PyVision_new(new Vision(pose, prof));
 }
 
 

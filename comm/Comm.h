@@ -27,7 +27,8 @@ class Comm
   : public Thread
 {
   public:
-    Comm(boost::shared_ptr<Synchro> _synchro, Sensors *s, Vision* v);
+    Comm(boost::shared_ptr<Synchro> _synchro, boost::shared_ptr<Sensors> s,
+         boost::shared_ptr<Vision> v);
     ~Comm();
 
     int start();
@@ -85,7 +86,7 @@ class Comm
     std::list<std::vector<float> >* latest;
 
     // References to global data structures
-    Sensors *sensors; // thread-safe access to sensor information
+    boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     CommTimer timer;
     GameController gc;
 

@@ -1,6 +1,8 @@
 #ifndef Threshold_h_DEFINED
 #define Threshold_h_DEFINED
 
+#include <boost/shared_ptr.hpp>
+
 typedef unsigned char uchar;
 
 class Threshold;  // forward reference
@@ -97,7 +99,7 @@ class Threshold
 {
     friend class Vision;
  public:
-  Threshold(Vision *vis, NaoPose *posPtr);
+  Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr);
   virtual ~Threshold() {}
 
   // main methods
@@ -236,8 +238,8 @@ class Threshold
  private:
 
   // class pointers
-  Vision *vision;
-  NaoPose *pose;
+  Vision* vision;
+  boost::shared_ptr<NaoPose> pose;
 
   const uchar* yuv;
   const uchar* yplane, *uplane, *vplane;

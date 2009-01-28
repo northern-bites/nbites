@@ -1,31 +1,47 @@
-/* Vision.cc  -- The Main Vision Module Class file.
 
-   This file does the main initialization for the entire module, including: picking the camera settings, declaring all the class variables, starting AiboConnect TCP Server, amongst other things
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
+//
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
 
-   Then, this file contains the main processing loop for the module, called notifyImage(), which basically does all vision processing, localization, behavior control, and communication.
 
-*/
+/**
+ * Vision.cc  -- The Main Vision Module Class file.
+ *
+ * This file does the main initialization for the entire module, including:
+ *   - picking the camera settings
+ *   - declaring all the class variables
+ *   - starting AiboConnect TCP Server
+ *   - other important things
+ *
+ * Then, this file contains the main processing loop for the module, called
+ * notifyImage(), which performs all the vision processing.
+ */
 
+#include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
+
+using boost::shared_ptr;
 
 static byte global_image[IMAGE_BYTE_SIZE];
 
 
 // Vision Class Constructor
-Vision::Vision(NaoPose *_pose, Profiler *_prof)
-  /* jf- commented out until we can remove pointers (change to references)
-  : bgrp(this), bglp(this), bgBackstop(this), // blue goal
-    ygrp(this), ygrp(this), ygBackstop(this), // yellow goal
-    by(this), yb(this),                       // beacons
-    blueArc(this), yellowArc(this),           // arcs
-    ball(this),                               // orange ball
-#ifdef USE_PINK_BALL
-    pinkBall(this),                           // pink ball
-#endif
-    thresh(this),                             // threshold
-    pose(p),                                  // pose
-    fieldLines(this),                         // fieldLines
-    */
+Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
   : pose(_pose), profiler(_prof),
     frameNumber(0), id(-1), name(), player(1), colorTable("table.mtb")
 {

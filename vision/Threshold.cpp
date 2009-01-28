@@ -1,31 +1,51 @@
-/* This file and a related file (ObjectFragments.cc)
-   do the bulk of the Vision processing in a given frame.
 
-   The algorithm used is (relatively) straightforward -
-   the visual signal comes in as a 2D array of YUV values.
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
+//
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
 
-   In principle the algorithm would work like this:
-   1) convert each YUV value to a color (this is called thresholding)
-   2) find groups of connected pixels of similar colors (run length encoding)
-   3) extract objects from the blobs found
 
-   We need to be faster and smarter than that so 2) kind of blends into 1)
-   and 3).
-   Our version of vision scans the image starting at the bottom left corner
-   and doing vertical slices up and across the image.  Each pixel is checked
-   against a color table to do a basic thresholding.  If there are multiple
-   pixels in a row of the same color they are collected together into a "run"
-   and sent to the object detection module.  There are variations of this basic
-   theme in accordance with the structure of the field and the importance of
-   the potential object (i.e. balls are extra important).
-
-   Once the scan is complete then run length encoding is done on each color
-   object separately and potential field objects are extracted.
-
-   These are then sanity checked based on things like where the horizon
-   of the field is, the structure of the field
-   (i.e. posts can't be too close to goals), etc.
-*/
+/**
+ * This file and a related file (ObjectFragments.cc) do the bulk of the Vision
+ * processing in a given frame. The algorithm used is (relatively)
+ * straightforward - the visual signal comes in as a 2D array of YUV values.
+ *
+ * In principle the algorithm would work like this:
+ *   1) convert each YUV value to a color (this is called thresholding)
+ *   2) find groups of connected pixels of similar colors (run length encoding)
+ *   3) extract objects from the blobs found
+ *
+ * We need to be faster and smarter than that so 2) kind of blends into 1)
+ * and 3).
+ * Our version of vision scans the image starting at the bottom left corner
+ * and doing vertical slices up and across the image.  Each pixel is checked
+ * against a color table to do a basic thresholding.  If there are multiple
+ * pixels in a row of the same color they are collected together into a "run"
+ * and sent to the object detection module.  There are variations of this basic
+ * theme in accordance with the structure of the field and the importance of
+ * the potential object (i.e. balls are extra important).
+ *
+ * Once the scan is complete then run length encoding is done on each color
+ * object separately and potential field objects are extracted.
+ *
+ * These are then sanity checked based on things like where the horizon of the
+ * field is, the structure of the field (i.e. posts can't be too close to
+ * goals), etc.
+ */
 
 #include "ifdefs.h"
 #include "Common.h"
@@ -35,13 +55,16 @@
 #if ROBOT(NAO_SIM)
 #  include <aldefinitions.h>
 #endif
+#include <boost/shared_ptr.hpp>
 
 #include "Threshold.h"
 #include "debug.h"
 
+using boost::shared_ptr;
+
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
-Threshold::Threshold(Vision *vis, NaoPose *posPtr)
+Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
   : inverted(false)
 {
 
@@ -151,7 +174,7 @@ void Threshold::visionLoop() {
   if (vision->ygBackstop->getWidth() > 0) {
     yellow->setShot(vision->ygBackstop);
   }
-  yellow->openDirection(horizon, pose);
+  yellow->openDirection(horizon, pose.get());
   PROF_EXIT(vision->profiler, P_LINES);
 
 

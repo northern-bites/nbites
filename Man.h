@@ -24,6 +24,8 @@
 #include <pthread.h>
 #include <signal.h>
 
+#include <boost/shared_ptr.hpp>
+
 #include "manconfig.h"
 
 #include "alxplatform.h"
@@ -108,11 +110,11 @@ public:
 
     // Profiling methods
     void startProfiling(int nframes) {
-       profiler.reset();
-       profiler.profileFrames(nframes);
+       profiler->reset();
+       profiler->profileFrames(nframes);
     }
     void stopProfiling() {
-       profiler.profiling = false;
+       profiler->profiling = false;
     }
 
     // Store the current frame to file
@@ -151,15 +153,16 @@ public:
     //   (i.e. the Python modules exported) will not be available by the time
     //   other modules are imported
     PythonPreferences python_prefs;
-    Profiler profiler;
-    Sensors sensors;
+    boost::shared_ptr<Profiler> profiler;
+    boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Pose> pose;
 #ifdef USE_MOTION
     MotionEnactor * enactor;
-    Motion motion;
+    boost::shared_ptr<Motion> motion;
 #endif
-    Vision vision;
-    Comm comm;
-    Noggin noggin;
+    boost::shared_ptr<Vision> vision;
+    boost::shared_ptr<Comm> comm;
+    boost::shared_ptr<Noggin> noggin;
 
 private:
     // Interfaces/Proxies to robot

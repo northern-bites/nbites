@@ -1,3 +1,24 @@
+
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
+//
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+
 /* Object Fragment class - a ChownDawg production
    There is one of these for each color.  It holds "runs" of pixels that are of that color and vertically connected.
    The idea is to use the runs to recognize objects.  We use the mechanics of the field to help in this process
@@ -17,9 +38,9 @@
 
 using namespace std;
 
-ObjectFragments::ObjectFragments(Vision *vis, Threshold *thr) {
-  vision = vis;
-  thresh = thr;
+ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr)
+  : vision(vis), thresh(thr)
+{
 
   init(0.0);
 #ifdef OFFLINE

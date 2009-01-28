@@ -42,10 +42,11 @@ using namespace boost;
 TOOLConnect::TOOLConnect (OVision *v)
     : state(TOOL_REQUESTING), vision(v)
 #else
-      TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, Sensors *s, Vision *v)
-      : Thread(_synchro, "TOOLConnect"),
-      state(TOOL_REQUESTING),
-      sensors(s), vision(v)
+TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
+                          shared_ptr<Vision> v)
+  : Thread(_synchro, "TOOLConnect"),
+    state(TOOL_REQUESTING),
+    sensors(s), vision(v)
 #endif
 {
 #if ROBOT(AIBO)

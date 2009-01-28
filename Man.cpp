@@ -60,36 +60,43 @@ micro_time (void)
 Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
     : ALModule(pBroker,pName),
 #else
-      Man::Man ()
-      : ALModule("Man"),
+Man::Man ()
+    : ALModule("Man"),
 #endif
-      // this is not good usage of shared_ptr...  oh well
-      Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
-      python_prefs(),
-      profiler(&micro_time), sensors(),
-#ifdef USE_MOTION
+    // this is not good usage of shared_ptr...  oh well
+    Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
+    python_prefs(),
 #ifdef NAOQI1
-      enactor(new ALEnactor(pBroker,&sensors)),
+    // call the default constructor of all the shared pointers
+    log(), camera(), lem(), almemory(), dcm(0),
 #else
-      enactor(new SimulatorEnactor(&sensors)),
+    // initialize all pointers to NULL or 0
+    log(0), camera(0), lem(0),
 #endif
-      motion(synchro, enactor, &sensors),
-#endif
-      vision(new NaoPose(&sensors), &profiler),
-      comm(synchro, &sensors, &vision),
-      noggin(&sensors, &profiler, &vision),
-#ifdef NAOQI1
-      // call the default constructor of all the shared pointers
-      log(), camera(), lem(), almemory(), dcm(0),
-#else
-      // initialize all pointers to NULL or 0
-      log(0), camera(0), lem(0),
-#endif
-      lem_name(""),
-      camera_active(false)
+    lem_name(""),
+    camera_active(false)
 {
     // open lems
     initMan();
+
+    // initialize system helper modules
+    profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
+    //messaging = shared_ptr<Messenger>(new Messenger());
+    sensors = shared_ptr<Sensors>(new Sensors());
+    pose = shared_ptr<NaoPose>(new NaoPose(sensors));
+
+    // initialize core processing modules
+#ifdef USE_MOTION
+#ifdef NAOQI1
+    enactor(new ALEnactor(pBroker,sensors)),
+#else
+    enactor(new SimulatorEnactor(sensors)),
+#endif
+    motion(synchro, enactor, &sensors),
+#endif
+    vision = shared_ptr<Vision>(new Vision(pose, profiler));
+    comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
+    noggin = shared_ptr<Noggin>(new Noggin(profiler, vision));
 }
 
 Man::~Man ()
@@ -504,23 +511,24 @@ Man::closeMan() {
 void
 Man::run ()
 {
+#if 0
 
 #ifdef DEBUG_MAN_THREADING
     cout << "Man::running" << endl;
 #endif
 
     // Start Comm thread (it handles its own threading
-    if (comm.start() != 0)
+    if (comm->start() != 0)
         cerr << "Comm failed to start" << endl;
     else
-        comm.getTrigger()->await_on();
+        comm->getTrigger()->await_on();
 
 #ifdef USE_MOTION
 // Start Motion thread (it handles its own threading
-    if (motion.start() != 0)
+    if (motion->start() != 0)
         cerr << "Motion failed to start" << endl;
     //else
-    //  motion.getStart()->await();
+    //  motion->getStart()->await();
 #endif
 
 #ifdef DEBUG_MAN_THREADING
@@ -551,8 +559,8 @@ Man::run ()
 
         // Synchronize noggin's information about joint angles with the motion
         // thread's information
-        sensors.updatePython();
-        sensors.updateVisionAngles();
+        sensors->updatePython();
+        sensors->updateVisionAngles();
 #ifdef NAOQI1
 #ifndef OFFLINE
         const FootBumper leftFootBumper(sensors.getLeftFootBumper());
@@ -583,13 +591,13 @@ Man::run ()
 
 #ifdef USE_MOTION
     // Finished with run loop, stop sub-threads and exit
-    motion.stop();
-    motion.getTrigger()->await_off();
+    motion->stop();
+    motion->getTrigger()->await_off();
 #endif
-    comm.stop();
-    comm.getTrigger()->await_off();
+    comm->stop();
+    comm->getTrigger()->await_off();
     // @jfishman - tool will not exit, due to socket blocking
-    //comm.getTOOLTrigger()->await_off();
+    //comm->getTOOLTrigger()->await_off();
 
 #ifdef DEBUG_MAN_THREADING
     cout << "  run :: Signalling stop" << endl;
@@ -598,6 +606,8 @@ Man::run ()
     // Signal stop event
     running = false;
     trigger->off();
+#endif
+
 }
 
 #ifdef NAOQI1
@@ -677,9 +687,9 @@ Man::waitForImage ()
 
         if (data != NULL) {
             // Update Sensors image pointer
-            sensors.lockImage();
-            sensors.setImage(data);
-            sensors.releaseImage();
+            sensors->lockImage();
+            sensors->setImage(data);
+            sensors->releaseImage();
         }
 
     }catch (ALError &e) {
@@ -736,9 +746,9 @@ Man::waitForImage ()
 
         if (data != NULL) {
             // Update Sensors image pointer
-            sensors.lockImage();
-            sensors.setImage(data);
-            sensors.releaseImage();
+            sensors->lockImage();
+            sensors->setImage(data);
+            sensors->releaseImage();
         }
 
     }catch (ALError &e) {
@@ -767,18 +777,18 @@ Man::processFrame ()
 #ifdef USE_VISION
     //  This is called from Python right now
     if(camera_active)
-        vision.copyImage(sensors.getImage());
+        vision->copyImage(sensors->getImage());
 #endif
-    PROF_EXIT(&profiler, P_GETIMAGE);
+    PROF_EXIT(profiler.get(), P_GETIMAGE);
 
-    PROF_ENTER(&profiler, P_FINAL);
+    PROF_ENTER(profiler.get(), P_FINAL);
 #ifdef USE_VISION
     if(camera_active)
-        vision.notifyImage();
+        vision->notifyImage();
 #endif
 
 #ifdef DEBUG_BALL_DETECTION
-    if (vision.ball->getWidth() > 0)
+    if (vision->ball->getWidth() > 0)
         printf("We see the ball!\n");
     else
         printf("No ball in this frame\n");
@@ -786,13 +796,13 @@ Man::processFrame ()
 
     // run Python behaviors
 #ifdef USE_NOGGIN
-    noggin.runStep();
+    noggin->runStep();
 #endif
 
-    PROF_EXIT(&profiler, P_FINAL);
-    PROF_NFRAME(&profiler);
+    PROF_EXIT(profiler.get(), P_FINAL);
+    PROF_NFRAME(profiler.get());
 
-    PROF_ENTER(&profiler, P_GETIMAGE);
+    PROF_ENTER(profiler.get(), P_GETIMAGE);
 
 }
 
@@ -813,13 +823,13 @@ Man::saveFrame(){
     fstream fout(FRAME_PATH.str().c_str(), ios_base::out);
 
     // Retrive joints
-    vector<float> joints = sensors.getVisionBodyAngles();
+    vector<float> joints = sensors->getVisionBodyAngles();
 
     // Lock and write imag1e
-    sensors.lockImage();
-    fout.write(reinterpret_cast<const char*>(sensors.getImage()),
+    sensors->lockImage();
+    fout.write(reinterpret_cast<const char*>(sensors->getImage()),
                IMAGE_BYTE_SIZE);
-    sensors.releaseImage();
+    sensors->releaseImage();
 
     // Write joints
     for (vector<float>::const_iterator i = joints.begin(); i < joints.end();

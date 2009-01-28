@@ -25,14 +25,14 @@ void SimulatorEnactor::run() {
         cout<<"]"<<endl;
         */
         // Get the angles we want to go to this frame from the switchboard
-		vector<float> result = switchboard->getNextJoints();
-//  		for (unsigned int i=0; i<result.size();i++) {
-//  			cout << "result of joint " << i << " is " << result.at(i) << endl;
-//  		}
+        vector<float> result = switchboard->getNextJoints();
+        //for (unsigned int i=0; i<result.size();i++) {
+        //    cout << "result of joint " << i << " is " << result.at(i) << endl;
+        //}
 #ifndef NAOQI1
-		motionProxy->postGotoBodyAngles(result,
-                                        MOTION_FRAME_LENGTH_S,
-                                        AL::ALMotionProxy::INTERPOLATION_LINEAR);
+        motionProxy->postGotoBodyAngles(result,
+            MOTION_FRAME_LENGTH_S,
+            AL::ALMotionProxy::INTERPOLATION_LINEAR);
 #endif
         // TODO: This is probably wrong!!!!1!ONE
         // We probably want to sleep webots time and this sleeps real time.

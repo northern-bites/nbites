@@ -7,6 +7,7 @@
 #include <list>                        //
 #include <sstream>                     //
 #include <iomanip> // setprecision for cout
+#include <boost/shared_ptr.hpp>
 
 using namespace std;
 
@@ -327,7 +328,7 @@ class FieldLines {
 
  public:
 
-  FieldLines(Vision *visPtr, NaoPose *posePtr);
+  FieldLines(Vision *visPtr, boost::shared_ptr<NaoPose> posePtr);
   virtual ~FieldLines() {}
 
   // master loop
@@ -784,7 +785,7 @@ class FieldLines {
 
  private:
   Vision *vision;
-  NaoPose *pose;
+  boost::shared_ptr<NaoPose> pose;
 
   vector <VisualLine> linesList;
   list <VisualCorner> cornersList;

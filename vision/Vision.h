@@ -1,4 +1,22 @@
-/* Vision.h  */
+
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
+//
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
 
 #ifndef _Vision_h_DEFINED
 #define _Vision_h_DEFINED
@@ -7,6 +25,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 // including info header files
 #include "Common.h"
@@ -44,7 +63,7 @@ class Vision
     friend class Threshold;
 
   public:
-    Vision(NaoPose *_pose, Profiler *_prof);
+    Vision(boost::shared_ptr<NaoPose> _pose, boost::shared_ptr<Profiler> _prof);
     virtual ~Vision();
 
     // Main Vision methods
@@ -129,14 +148,14 @@ class Vision
     Ball *pinkBall; //added for pink ball recognition
 #endif
     Threshold *thresh;
-    NaoPose *pose;
+    boost::shared_ptr<NaoPose> pose;
     FieldLines *fieldLines;
 
-	fieldOpening fieldOpenings[3];
+    fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3
 
     // Profiling
-    Profiler *profiler;
+    boost::shared_ptr<Profiler> profiler;
 
   protected:
     //

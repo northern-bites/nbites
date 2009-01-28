@@ -1,19 +1,22 @@
 
 
+#include <Python.h>
+#include <exception>
+#include <boost/shared_ptr.hpp>
+
 #include "Noggin.h"
 #include "_ledsmodule.h"
 
 #include "nogginconfig.h"
 
 using namespace std;
+using namespace boost;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 
-Noggin::Noggin (Sensors *s, Profiler *p, Vision *v)
-    : sensors(s), profiler(p), vision(NULL),
-      error_state(false),
-      brain_module(NULL), brain_instance(NULL),
-      mcl()
+Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
+  : brain_module(NULL), brain_instance(NULL),
+    error_state(false), mcl()
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -44,20 +47,24 @@ Noggin::~Noggin ()
     Py_XDECREF(brain_module);
 }
 
-void Noggin::initializeVision(Vision *v)
+void Noggin::initializeVision(shared_ptr<Vision> v)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing interpreter and extension modules\n");
 #endif
 
     // Initialize PyVision module
+    vision = v;
     MODULE_INIT(vision) ();
+
     // Initialize and insert the vision wrapper into the module
-    vision = (PyVision*)PyVision_new(v);
-    if (vision == NULL)
+    PyObject *result = PyVision_new(v.get());
+    if (result == NULL) {
         cerr << "** Noggin extension could not initialize PyVision object **" <<
             endl;
-    vision_addToModule(reinterpret_cast<PyObject*>(vision), MODULE_HEAD);
+        assert(false);
+    }
+    vision_addToModule(reinterpret_cast<PyObject*>(pyvision.get()), MODULE_HEAD);
 
     init_leds();
 }
@@ -155,7 +162,7 @@ void Noggin::runStep ()
 
     // Update vision information for Python
     PROF_ENTER(profiler, P_PYUPDATE);
-    PyVision_update(vision);
+    PyVision_update(pyvision.get());
     PROF_EXIT(profiler, P_PYUPDATE);
 
     // Update localization information
@@ -195,26 +202,26 @@ void Noggin::updateLocalization()
     // Build the observations from vision data
     vector<Observation> observations;
     // FieldObjects
-    VisualFieldObject fo = *(vision->vision->bgrp);
+    VisualFieldObject fo = *(vision->bgrp);
 
     if(fo.getDistance() > 0) {
         observations.push_back(fo);
         cout << "Saw bgrp at distance" << fo.getDistance() << endl;
     }
 
-    fo = *(vision->vision->bglp);
+    fo = *(vision->bglp);
     if(fo.getDistance() > 0) {
         observations.push_back(fo);
         cout << "Saw bglp at distance" << fo.getDistance() << endl;
     }
 
-    fo = *(vision->vision->ygrp);
+    fo = *(vision->ygrp);
     if(fo.getDistance() > 0) {
         observations.push_back(fo);
         cout << "Saw ygrp at distance" << fo.getDistance() << endl;
     }
 
-    fo = *(vision->vision->yglp);
+    fo = *(vision->yglp);
     if(fo.getDistance() > 0) {
         observations.push_back(fo);
         cout << "Saw yglp at distance" << fo.getDistance() << endl;
