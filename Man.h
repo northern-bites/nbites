@@ -115,10 +115,10 @@ public:
     void saveFrame();
 
     //HelperBoundMethods:
-    void manStart(){Thread::start();} //should return 'int' or ALValue
-    void manStop(){Thread::stop();}
-    void manAwaitOn(){getTrigger()->await_on();}
-    void manAwaitOff(){getTrigger()->await_on();}
+    void manStart() { Thread::start(); } //should return 'int' or ALValue
+    void manStop() { Thread::stop(); }
+    void manAwaitOn() { getTrigger()->await_on(); }
+    void manAwaitOff() { getTrigger()->await_off(); }
 
     void helloWorld(){std::cout<<"HelloWorld, C++ Style"<<std::endl;};
 private:
