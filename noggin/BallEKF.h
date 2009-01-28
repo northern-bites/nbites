@@ -23,6 +23,7 @@ class BallEKF : public EKF
 {
 public:
     // Constructors & Destructors
+    BallEKF(void);
     BallEKF(float initX, float initY,
             float initVelX, float initVelY,
             float initXUncert,float initYUncert,
@@ -30,53 +31,56 @@ public:
 
     virtual ~BallEKF();
 
-    // Core functions
-    //virtual void timeUpdate(MotionModel u_t);
-
     // Getters
 
     /**
      * @return The current estimate of the ball x position
      */
-    getXEst() { return xhat_k[0]; }
+    float getXEst() { return xhat_k[0]; }
 
     /**
      * @return The current estimate of the ball y position
      */
-    getYEst() { return xhat_k[1]; }
+    float getYEst() { return xhat_k[1]; }
 
     /**
      * @return The current estimate of the ball x velocity
      */
-    getXVelocityEst() { return xhat_k[2]; }
+    float getXVelocityEst() { return xhat_k[2]; }
 
     /**
      * @return The current estimate of the ball y velocity
      */
-    getYVelocityEst() { return xhat_k[3]; }
+    float getYVelocityEst() { return xhat_k[3]; }
 
     /**
      * @return The current uncertainty for ball x position
      */
-    getXUncert() { return P_k[0][0]; }
+    float getXUncert() { return P_k(0,0); }
 
     /**
      * @return The current uncertainty for ball y position
      */
-    getYUncert() { return P_k[1][1]; }
+    float getYUncert() { return P_k(1,1); }
 
     /**
      * @return The current uncertainty for ball x velocity
      */
-    getXVelocityUncert() { return P_k[2][2]; }
+    float getXVelocityUncert() { return P_k(2,2); }
 
     /**
      * @return The current uncertainty for ball y velocity
      */
-    getYVelocityUncert() { return P_k[3][3]; }
+    float getYVelocityUncert() { return P_k(3,3); }
 
 private:
     // Core Functions
-    ublas::vector<double> associateTimeUpdate(MotionModel u_k);
-}
+    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k,
+                                                     ublas::matrix<float>,
+                                                     ublas::matrix<float>);
+    virtual void incorporateCorrectionMeasurement(Observation z);
+
+public:
+    const ublas::vector<float> BALL_TIME_UPDATE_JACOBIAN;
+};
 #endif // File
