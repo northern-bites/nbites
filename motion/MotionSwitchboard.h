@@ -42,7 +42,7 @@ public:
     const vector <float> getNextJoints();
 
 private:
-    void processProviders();
+    int processProviders();
 
 #ifdef DEBUG_JOINTS_OUTPUT
     void initDebugLogs();

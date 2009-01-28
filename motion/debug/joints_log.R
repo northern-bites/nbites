@@ -15,19 +15,46 @@ dummy = dat[,2] #for setting limits
 dummy[1] = pi
 dummy[2] = -pi
 
-chains = c(c(1:2),c(3:6),c(7:12),c(13:18),c(19:22))
-
-plot(dat$time,dummy,pch="",main="",xlab="s",ylab="rad")
-indices=c(1:22)
-color_list = c()
-for(i in indices){
-      #print(paste("Here is the number: ", i))
-      color = i %%7 + 1
-      color_list = append(color_list,c(color))
-      print("color list is")
-      print( color_list)
-      #print(color)
-      points(dat$time,dat[,i],type="l",col=color)
-
+#note, time occupies slot 1, so the indices are shifted by one
+chain_lengths = function(chainID){
+      if(chainID ==1){
+	return(c(2:3))
+      }
+      if(chainID ==2){
+	return(c(4:7))
+      }
+      if(chainID ==3){
+	return(c(8:13))
+      }
+      if(chainID ==4){
+	return(c(14:19))
+      }
+      if(chainID ==5){
+	return(c(20:23))
+      }
+      return(c())
 }
-legend("top",lwd=2,legend=labels(dat)[[2]],col=color_list)
+
+c_names = c("head","larm","lleg","rleg","rarm")
+for(chn in c(1:5)){
+      pdf(paste(c_names[chn],"_",name,PDF,sep=""))
+      indices=chain_lengths(chn)
+
+      #find the range of the graph
+      mind = min(dat[,indices])
+      maxd = max(dat[,indices])
+      dummy = dat[,2] #for setting limits
+      dummy[1] = mind
+      dummy[2] = maxd
+      plot(dat$time,dummy,pch="",main=c_names[chn],xlab="s",ylab="rad")
+
+      color_list = c()
+      color = 1
+      for(i in indices){
+      	    color = color +1
+      	    color_list = append(color_list,c(color))
+      	    points(dat$time,dat[,i],type="l",col=color)
+      }
+      legend("top",lwd=2,legend=labels(dat)[[2]][indices],col=color_list)
+      dev.off()
+}

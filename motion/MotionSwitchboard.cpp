@@ -147,10 +147,11 @@ void MotionSwitchboard::run() {
             usleep(2*1000*1000);
         }
 
-        processProviders();
+        bool active  = processProviders();
 
 #ifdef DEBUG_JOINTS_OUTPUT
-        updateDebugLogs();
+        if(active)
+            updateDebugLogs();
 #endif
         pthread_mutex_lock(&next_joints_mutex);
         pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
@@ -160,7 +161,7 @@ void MotionSwitchboard::run() {
     }
 }
 
-void MotionSwitchboard::processProviders(){
+int MotionSwitchboard::processProviders(){
     //cout << "Switchboard stepping" <<endl;
     //At the beginning of each frame, we need to update the sensor values
     //that are tied to
@@ -227,6 +228,8 @@ void MotionSwitchboard::processProviders(){
     }
     pthread_mutex_unlock(&next_joints_mutex);
 
+    return curProvider->isActive();
+
 }
 
 const vector <float> MotionSwitchboard::getNextJoints() {
@@ -288,17 +291,18 @@ void MotionSwitchboard::closeDebugLogs(){
     fclose(joints_log);
 }
 void MotionSwitchboard::updateDebugLogs(){
+    static float time = 0.0f;
 
     pthread_mutex_lock(&next_joints_mutex);
     //print joints:
+    fprintf(joints_log, "%f\t",time);
     for(int i = 0; i < NUM_JOINTS; i++)
         fprintf(joints_log, "%f\t",nextJoints[i]);
     fprintf(joints_log, "\n");
 
+    fprintf(effector_log, "%f\t",time);
     int index  =0;
     for(int chain = HEAD_CHAIN; chain <= RARM_CHAIN; chain++){
-
-
         ufvector3 dest = Kinematics::forwardKinematics((ChainID)chain,
                                                        &nextJoints[index]);
         fprintf(effector_log,"%f\t%f\t%f\t",dest(0),dest(1),dest(2));
@@ -307,5 +311,6 @@ void MotionSwitchboard::updateDebugLogs(){
     fprintf(effector_log,"\n");
     pthread_mutex_unlock(&next_joints_mutex);
 
+    time += 0.05f;
 }
 #endif
