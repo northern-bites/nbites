@@ -180,7 +180,7 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     goal(2) = -walkParams->bodyHeight + heightOffGround;
 
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
-                                         REALLY_LOW_ERROR);
+                                         COARSE_ERROR);
     if(state == SWINGING){
         //When we are swinging, use the OPPOSITE leg's offset
         result.angles[1] -= leg_sign*getHipHack(-leg_sign);
@@ -210,7 +210,7 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
 
     //calculate the new angles
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
-                                         REALLY_LOW_ERROR);
+                                         COARSE_ERROR);
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     if(state == SUPPORTING){
         //When we are supporting, use this leg's offset

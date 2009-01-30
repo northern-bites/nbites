@@ -23,7 +23,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(0.01f,0,0); // for testing purposes. The function doesn't even
+    setWalkVector(30.f,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -57,7 +57,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 6){
+            if(fc == 20){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
