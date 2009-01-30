@@ -20,9 +20,9 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
-    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\n");
+    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
-    //controller_x->initPos(walkParams->hipOffsetX);
+    controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
     setWalkVector(0.01f,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
@@ -127,8 +127,9 @@ void StepGenerator::tick_controller(){
     float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
     //printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
     static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\t%f\t%f\n",
-            ttime,com_x,com_y,pre_x,pre_y,zmp_x,zmp_y,real_com_x,real_com_y);
+    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\t%f\t%f\t%d\n",
+            ttime,com_x,com_y,pre_x,pre_y,zmp_x,zmp_y,
+            real_com_x,real_com_y,leftLeg.getSupportMode());
     ttime += 0.02f;
 #endif
 }
@@ -389,7 +390,7 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
 void
 StepGenerator::fillZMPEnd(const boost::shared_ptr<Step> newSupportStep ){
     const ublas::vector<float> end_s =
-        CoordFrame3D::vector3D(0.0f,//walkParams->hipOffsetX,
+        CoordFrame3D::vector3D(walkParams->hipOffsetX,
                                0.0f);
     const ublas::vector<float> end_i = prod(si_Transform,end_s);
     //Queue a starting step, where we step, but do nothing with the ZMP

@@ -1,5 +1,4 @@
 #include "PreviewController.h"
-
 //#include <iostream>
 //using namespace std;
 
@@ -65,7 +64,9 @@ const float PreviewController::tick(const list<float> *zmp_ref) {
 /**
  * Initialize the position of the robot (vel and accel assumed to be 0)
  */
-void PreviewController::initPos(float x){
+void PreviewController::initState(float x, float v, float p){
     stateVector(0) = x;
+    stateVector(1) = v;
+    stateVector(2) = p;
 
 }

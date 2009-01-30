@@ -8,15 +8,15 @@ WalkProvider::WalkProvider(Sensors *s)
       walkParameters(.02f,         // motion frame length - FIXME constant
                      310.0f,       // COM height
                      20.0f,        // hipOffsetX
-                     3.00f,        // stepDuration
-                     0.5f,         // fraction in double support mode
+                     .50f,        // stepDuration
+                     0.1f,         // fraction in double support mode
                      17.0f,        // stepHeight
                      0.0f,         // footLengthX
                      0.4f,        // zmp static percentage in double support
                      4.0f*TO_RAD,  // leftSwingHipRollAddition
                      4.0f*TO_RAD,  // rightSwingHipRollAddition
-                     30.0f,        // leftZMPSwingOffestY,
-                     30.0f),       // rightZMPSwingOffestY
+                     15.0f,        // leftZMPSwingOffestY,
+                     15.0f),       // rightZMPSwingOffestY
       stepGenerator(sensors,&walkParameters)
 {
 
@@ -84,13 +84,13 @@ vector<float> WalkProvider::getWalkStance(){
                                     0.1f,0.1f,0.1f};
     //Use inverse kinematics to find the left leg angles
     ufvector3 lgoal = ufvector3(3);
-    lgoal(0)=x; lgoal(1) = ly; lgoal(2) = -z;
+    lgoal(0)=-x; lgoal(1) = ly; lgoal(2) = -z;
     IKLegResult lresult = Kinematics::dls(LLEG_CHAIN,lgoal,zeroJoints);
     vector<float> lleg_angles(lresult.angles, lresult.angles + LEG_JOINTS);
 
     //Use inverse kinematics to find the right leg angles
     ufvector3 rgoal = ufvector3(3);
-    rgoal(0)=x; rgoal(1) = ry; rgoal(2) = -z;
+    rgoal(0)=-x; rgoal(1) = ry; rgoal(2) = -z;
     IKLegResult rresult = Kinematics::dls(RLEG_CHAIN,rgoal,zeroJoints);
     vector<float> rleg_angles(rresult.angles, rresult.angles + LEG_JOINTS);
 
