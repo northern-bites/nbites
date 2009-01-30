@@ -115,7 +115,7 @@ extern "C" {
         byte * img = (byte *)buf_img; //convert it to a reg. byte array
         //PROCESS VISION!!
         vision.notifyImage(img);
-	vision.drawBoxes();
+	//vision.drawBoxes();
         env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
         //Debug output:

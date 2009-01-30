@@ -130,6 +130,5 @@ public class TOOLVisionLink {
 	ball.setHeight(height);
 	ball.setX(x);
 	ball.setY(y);
-	System.out.println(width);
     }
 }

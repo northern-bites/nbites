@@ -432,6 +432,7 @@ public class Calibrate implements DataListener, MouseListener,
         selector.repaint();
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
 
         // Alert all color table listeners that the color table has changed
         tool.getDataManager().notifyColorTableDependants(colorTable,
@@ -581,6 +582,7 @@ public class Calibrate implements DataListener, MouseListener,
         //lastly, need to repaint
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
         selector.repaint();
 
         // Alert all color table listeners that the color table has changed
@@ -710,6 +712,7 @@ public class Calibrate implements DataListener, MouseListener,
 	//update the thresholded image by calling visionstate.update
         visionState.update(thresholdedImage);
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
         selector.repaint();
 
         // Update the undo button
@@ -764,6 +767,7 @@ public class Calibrate implements DataListener, MouseListener,
         visionState.update(thresholdedImage);
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
         selector.repaint();
 
         // Update the redo button
@@ -1027,7 +1031,8 @@ public class Calibrate implements DataListener, MouseListener,
         visionState = new VisionState(f, tool.getColorTable());
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
-        thresholdedImage = visionState.getThreshImage();
+	thresholdedImage =  visionState.getThreshImage();
+	visionState.update(thresholdedImage);
         colorTable = visionState.getColorTable();
 
         // Since we now handle different sized frames, it's possible to
@@ -1039,12 +1044,17 @@ public class Calibrate implements DataListener, MouseListener,
         imageHeight = rawImage.getHeight();
         imageWidth = rawImage.getWidth();
 
-
         overlay.generateNewEdgeImage(rawImage);
         selector.updateImage(rawImage);
         selector.setOverlayImage(overlay);
-        if(thresholdedImage != null)
+    
+        if(thresholdedImage != null) {
             displayer.updateImage(thresholdedImage);
+	    displayer.setOverlayImage(visionState.getThreshOverlay());
+	}
+
+	selector.repaint();
+	displayer.repaint();
 
         // They loaded something so make sure our buttons reflect the
         // active state; e.g. that our undo stack and redo stack are
@@ -1064,9 +1074,9 @@ public class Calibrate implements DataListener, MouseListener,
 
         //threshold the full image again
         if(thresholdedImage != null)//if no frame is loaded, don't want to update
-            thresholdedImage.thresholdImage();
-        //lastly, need to repaint
-        displayer.repaint();
+            visionState.update(thresholdedImage);
+        //lastly, need to repaint  
         selector.repaint();
+	displayer.repaint();
     }
 }

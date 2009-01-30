@@ -233,14 +233,21 @@ public class ImageOverlay extends BufferedImage{
 	return pixels[x][y] == color;
     }
 
-
-
-    public void setRectOverlay(int x, int y, int w, int h, byte color){
-	for(int i = x; i < x+w; i++)
-	    for(int j = y; y < y+h; y++){
-		setOverlay(i,j,color);
+    //draws a box
+    public void setRectOverlay(int x, int y, int w, int h, int thickness, byte color){
+	if ( w == 0 || h == 0) return;
+	//horizontal lines
+	for (int k = 1; k <= thickness; k++)
+	    for (int i = x; i <= x + w; i++) {
+		setOverlay(i, y-k, color);
+		setOverlay(i, y+h+k, color);
 	    }
-
+	//vertical lines
+	for (int k = 1; k <= thickness; k++)
+	    for (int i = y; i <= y+h; i++) {
+		setOverlay(x-k, i, color);
+		setOverlay(x+w+k, i, color);
+	}
     }
     
 
