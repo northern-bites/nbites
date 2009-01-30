@@ -41,7 +41,7 @@
 package TOOL.Vision;
 
 //the object classes
-import TOOL.Data.Ball;
+import TOOL.Vision.Ball;
 
 import java.io.FileInputStream;
 import java.io.IOException;

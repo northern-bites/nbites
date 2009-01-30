@@ -5,6 +5,7 @@ import java.util.Vector;
 import TOOL.TOOL;
 import TOOL.Vision.Vision;
 import TOOL.Vision.TOOLVisionLink;
+import TOOL.Vision.Ball;
 import TOOL.Image.TOOLImage;
 import TOOL.Image.ImageOverlay;
 import TOOL.Image.ProcessedImage;
