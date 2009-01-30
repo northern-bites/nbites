@@ -145,6 +145,7 @@ private:
     ublas::vector<float> last_zmp_end_s;
 
     //Steps for the Walking Leg
+    boost::shared_ptr<Step> lastStep_s;
     boost::shared_ptr<Step> supportStep_s;
     boost::shared_ptr<Step> swingingStep_s;
     boost::shared_ptr<Step> supportStep_f;

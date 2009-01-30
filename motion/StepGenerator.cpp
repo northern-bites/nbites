@@ -57,7 +57,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 4){
+            if(fc == 6){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
@@ -160,7 +160,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
             throw "Insufficient steps";
 
         //there are three elements in the list, pop the obsolete one
+        //(currently use last step to determine when to stop, hackish-ish)
         //and the first step is the support one now, the second the swing
+        lastStep_s = *currentZMPDSteps.begin();
         currentZMPDSteps.pop_front();
         swingingStep_s  = *(++currentZMPDSteps.begin());
         supportStep_s   =  *currentZMPDSteps.begin();
@@ -244,7 +246,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                         fc_Transform);
 
     //check to see if we are done
-    if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP){
+    if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
+       && lastStep_s->type == END_STEP){
         //cout << "DONE WALKING"<<endl;
         _done = true;
     }
@@ -335,7 +338,7 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
         int(walkParams->doubleSupportFrames*
             walkParams->dblSupInactivePercentage/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
-        int(walkParams->doubleSupportFrames - halfNumDSChops*2.0f);
+        walkParams->doubleSupportFrames - halfNumDSChops*2;
 
      cout << "Double support split like: " << endl
           << "  static: " << halfNumDSChops<< endl

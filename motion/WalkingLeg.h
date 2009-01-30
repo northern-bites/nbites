@@ -90,7 +90,7 @@ private:
     bool firstFrame(){return frameCounter == 0;}
     void debugProcessing();
 
-    float getHipHack();
+    float getHipHack(int sign);
     float cycloidy(float theta);
     float cycloidx(float theta);
 

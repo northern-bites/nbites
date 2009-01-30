@@ -149,7 +149,8 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     if (firstFrame()) stage = 0;
     float x,y;
 
-    float heightOffGround = walkParams->stepHeight*cycloidy(theta);
+    float radius =walkParams->stepHeight/2;
+    float heightOffGround = radius*cycloidy(theta);
 
 //     if (stage == 0) { // we are rising
 //         // we want to raise the foot up for the first third of the step duration
@@ -181,8 +182,8 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
                                          REALLY_LOW_ERROR);
     if(state == SWINGING){
-        //cout << frameCounter<<"\t"<<hr_offset <<endl;
-        result.angles[1] -= leg_sign*getHipHack();
+        //When we are swinging, use the OPPOSITE leg's offset
+        result.angles[1] -= leg_sign*getHipHack(-leg_sign);
     }
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
@@ -212,8 +213,8 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
                                          REALLY_LOW_ERROR);
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     if(state == SUPPORTING){
-        //cout << frameCounter<<"\t"<<hr_offset <<endl;
-        result.angles[1] += leg_sign*getHipHack();
+        //When we are supporting, use this leg's offset
+        result.angles[1] += leg_sign*getHipHack(leg_sign);
     }
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
@@ -223,10 +224,12 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
  * Function returns the angle to add to the hip roll joint depending on
  * how far along we are in the process of a state (namely swinging,
  * and supporting)
+ *
+ * Sign parameter allows to choose which leg's parameter to use
  */
-float WalkingLeg::getHipHack(){
+float WalkingLeg::getHipHack(int sign){
     //Hack - calculate the compensation to the HIPROLL
-    float MAX_HIP_ANGLE_OFFSET = (chainID == LLEG_CHAIN ?
+    float MAX_HIP_ANGLE_OFFSET = (sign == 1 ?
                                   walkParams->leftSwingHipRollAddition:
                                   walkParams->rightSwingHipRollAddition);
 
