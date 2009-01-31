@@ -10,7 +10,6 @@
 #include <string>
 #include "MCL.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
-using namespace std;
 
 // Observation parameters
 // Ranges at which objects are viewable
@@ -20,6 +19,15 @@ using namespace std;
 #define LINE_MAX_VIEW_RANGE 250.0f
 // Number of frames to wait between resampling
 #define RESAMPLE_RATE 5
+
+// Constants
+string team_color = "0";
+string player_number = "3";
+string DEFAULT_OUTFILE_NAME = "FAKELOG.mcl";
+
+/**
+   Class to hold a constant robot path vector over a given number of frames
+ */
 class NavMove
 {
 public:
@@ -32,16 +40,17 @@ class NavPath
 {
 public:
     PoseEst startPos; // Current real position of the robot
-    vector<NavMove> myMoves; // direction of movement per itteration
+    std::vector<NavMove> myMoves; // direction of movement per itteration
 };
 
-vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw);
-
+std::vector<Observation> determineObservedLandmarks(PoseEst myPos,
+                                                    float neckYaw);
+void iteratePath(fstream * outputFile, NavPath * letsGo);
 // IO Functions
-void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
+void readInputFile(fstream* name, NavPath * letsGo);
+void printOutLogLine(fstream* outputFile, MCL* myLoc, std::vector<Observation>
                      sightings, MotionModel lastOdo);
 
-string team_color, player_number;
 // Helper functions
 float subPIAngle(float theta);
 float getDistSD(float dist);
