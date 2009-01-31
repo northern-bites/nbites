@@ -32,8 +32,11 @@
 #include "almodule.h"
 #include "alloggerproxy.h"
 #include "almemoryproxy.h"
-#include "dcmproxy.h"
 #include "alptr.h"
+
+#ifdef NAOQI1
+#include "dcmproxy.h"
+#endif
 
 #include "Common.h"
 #include "Profiler.h"
