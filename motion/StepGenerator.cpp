@@ -23,7 +23,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(30.0f,0,0); // for testing purposes. The function doesn't even
+    setWalkVector(0.01f,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -408,8 +408,7 @@ StepGenerator::fillZMPEnd(const boost::shared_ptr<Step> newSupportStep ){
 
 void StepGenerator::setWalkVector(const float _x, const float _y,
                                   const float _theta)  {
-    // WARNING: This method still assumes that we start with (0,0,0) as the
-    // walk vector.
+    //assign walk vector l
     x = _x;
     y = _y;
     theta = _theta;
@@ -424,17 +423,58 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
 
     //cout << "Initial ZMPd Steps: " << zmp_ref_x.size()<<endl;
 
+    if(false)
+        startLeft();
+    else
+        startRight();
+
+    _done = false;
+}
+
+/*  Set up the walking engine for starting with a swinging step on the right */
+void StepGenerator::startRight(){
     //start off in a double support phase where the right leg swings first
-    leftLeg.startRight();//setSupportMode(PERSISTENT_DOUBLE_SUPPORT);
-    rightLeg.startRight();//setSupportMode(DOUBLE_SUPPORT);
-    if_Transform.assign(initStartLeft);//HACK to deal with dummy being RIGHT
+    //HOWEVER, since the first support step is END, there will be no
+    //actual swinging - the first actual swing will be 2 steps
+    //after the first support step, in this case, causing right to swing first
+    leftLeg.startLeft();
+    rightLeg.startLeft();
 
+    //Setup transform, such that the firstSupportStep is Right
+    if_Transform.assign(initStartRight);
 
-    // boost::shared_ptr<Step> firstSwingingStep = //should be startStep type
-//         boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
-//                                          walkParams->stepDuration,
-//                                          RIGHT_FOOT,START_STEP));
-    boost::shared_ptr<Step> firstSupportStep = //should be startStep type
+    //Support step is END Type, but the first swing step, generated
+    //in generateStep, is START type.
+    boost::shared_ptr<Step> firstSupportStep =
+        boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
+                                         walkParams->stepDuration,
+                                         RIGHT_FOOT,END_STEP));
+    boost::shared_ptr<Step> dummyStep =
+        boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
+                                         walkParams->stepDuration, LEFT_FOOT));
+    //need to indicate what the current support foot is:
+    currentZMPDSteps.push_back(dummyStep);//right gets popped right away
+    fillZMP(firstSupportStep);
+    currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
+    lastQueuedStep = firstSupportStep;
+    nextStepIsLeft = true;
+}
+
+/*  Set up the walking engine for starting with a swinging step on the left */
+void StepGenerator::startLeft(){
+    //start off in a double support phase where the right leg swings first
+    //HOWEVER, since the first support step is END, there will be no
+    //actual swinging - the first actual swing will be 2 steps
+    //after the first support step, in this case, causing left to swing first
+    leftLeg.startRight();
+    rightLeg.startRight();
+
+    //Setup transform, such that the firstSupportStep is Left
+    if_Transform.assign(initStartLeft);
+
+    //Support step is END Type, but the first swing step, generated
+    //in generateStep, is START type.
+    boost::shared_ptr<Step> firstSupportStep =
         boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
                                          walkParams->stepDuration,
                                          LEFT_FOOT,END_STEP));
@@ -443,41 +483,10 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
                                          walkParams->stepDuration, RIGHT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
-    //currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
     fillZMP(firstSupportStep);
     currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
-    //futureSteps.push_back(firstSwingingStep);//right will be 'swing'. during 0.0 zmp
     lastQueuedStep = firstSupportStep;
     nextStepIsLeft = false;
-
-    _done = false;
-}
-
-
-void StepGenerator::startLeft(){
-
-}
-void StepGenerator::startRight(){
-//The next leg to take a step is the right - the left is supporting
-//This means, on the first frame, we will pop a step which should be the
-//the current position of the right leg. Then, the left leg will
-//become the support leg, and a step not shown here will become the next target.
-//except the ZMP is being held at zero, so that step will do nothing
-
-    boost::shared_ptr<Step> cur_right_leg =
-        boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
-                                         walkParams->stepDuration, RIGHT_FOOT));
-
-    boost::shared_ptr<Step> sup_left_leg =
-        boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                         walkParams->stepDuration, LEFT_FOOT));
-
-    leftLeg.startRight();
-    rightLeg.startRight();
-
-    //once we actually want to walk, we need to know which leg to use
-    nextStepIsLeft = false;
-
 }
 
 //currently only does two sets of steps side by side
