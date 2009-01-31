@@ -13,6 +13,8 @@ public:
 
     virtual void run();
 
+    void postSensors();
+
 private:
     static const int MOTION_FRAME_RATE = 50;
     static const float MOTION_FRAME_LENGTH_uS = // in microseconds

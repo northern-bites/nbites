@@ -12,7 +12,7 @@ void SimulatorEnactor::run() {
     usleep(2*1000*1000);
 
     while (running) {
-
+        postSensors();
         /*
         cout<<"Joints are : [";
         for (unsigned int i=0; i <result.size(); i++){
@@ -36,3 +36,16 @@ void SimulatorEnactor::run() {
     }
 }
 
+
+void SimulatorEnactor::postSensors(){
+#ifndef NAOQI1
+    AL::ALMotionProxy *motionProxy = AL::ALMotionProxy::getInstance();
+
+    //At the beginning of each cycle, we need to update the sensor values
+    //We also call this from the Motion run method
+    //This is important to ensure that the providers have access to the
+    //actual joint post of the robot before any computation begins
+    vector<float> alAngles = motionProxy->getBodyAngles();
+    sensors->setBodyAngles(alAngles);
+#endif
+}
