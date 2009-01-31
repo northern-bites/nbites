@@ -23,7 +23,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(0.01f,0,0); // for testing purposes. The function doesn't even
+    setWalkVector(0.01f,30.0f,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -61,6 +61,8 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
+                y = 0;
+                theta = 0;
             }
 //             else if (fc%5 == 0){
 //                 cout << "MOVE FORWARD!!"<<endl;
@@ -423,7 +425,7 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
 
     //cout << "Initial ZMPd Steps: " << zmp_ref_x.size()<<endl;
 
-    if(false)
+    if(_y > 0)
         startLeft();
     else
         startRight();
@@ -491,8 +493,8 @@ void StepGenerator::startLeft(){
 
 //currently only does two sets of steps side by side
 void StepGenerator::generateStep( float _x,
-                                 const float _y,
-                                 const float _theta) {
+                                  float _y,
+                                  float _theta) {
     //We have this problem that we can't simply start and stop the robot:
     //depending on the step type, we generate different types of ZMP
     //which means after any given step, only certain other steps types are
@@ -519,7 +521,7 @@ void StepGenerator::generateStep( float _x,
     //  different overall behaviors: check if we want to start, else if we
     //  want to start moving, else if are already moving.
     StepType type;
-    if (_x ==0){//stopping, or stopped
+    if (_x ==0 && _y == 0){//stopping, or stopped
         if(lastQueuedStep->x != 0)
             type = REGULAR_STEP;
         else
@@ -532,6 +534,7 @@ void StepGenerator::generateStep( float _x,
             if (lastQueuedStep->zmpd){//too late to change it! make this a start
                 type = START_STEP;
                 _x = 0.0f;
+                _y = 0.0f;
             }else{
                 type = REGULAR_STEP;
                 lastQueuedStep->type = START_STEP;
@@ -542,8 +545,20 @@ void StepGenerator::generateStep( float _x,
         }
     }
 
+
+    //check  if we need to clip lateral movement of this leg
+    if(_y > 0){
+        if(!nextStepIsLeft){
+            _y = 0.0f;
+        }
+    }else if(_y < 0){
+        if(nextStepIsLeft){
+            _y = 0.0f;
+        }
+    }
+
     boost::shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
-                                              HIP_OFFSET_Y : -HIP_OFFSET_Y),
+                                              HIP_OFFSET_Y : -HIP_OFFSET_Y) + _y,
                                           0, walkParams->stepDuration,
                                           (nextStepIsLeft ?
                                            LEFT_FOOT : RIGHT_FOOT),
