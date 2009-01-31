@@ -23,7 +23,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(30.f,0,0); // for testing purposes. The function doesn't even
+    setWalkVector(30.0f,0,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -57,7 +57,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 20){
+            if(fc == 8){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
@@ -242,9 +242,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //Since we'd like to ignore the state information of the WalkinLeg as much
     //as possible, we send in the source of the swinging leg to both, regardless
     vector<float> left  = leftLeg.tick(leftStep_f,swingingStepSource_f,
-                                       fc_Transform);
+                                       swingingStep_f,fc_Transform);
     vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
-                                        fc_Transform);
+                                        swingingStep_f,fc_Transform);
 
     //check to see if we are done
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP

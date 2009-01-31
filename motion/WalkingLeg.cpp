@@ -5,11 +5,12 @@ WalkingLeg::WalkingLeg(ChainID id,
                        const WalkingParameters *walkP)
     :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
      frameCounter(0),
-     cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),
+     cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
      chainID(id), walkParams(walkP),
      goal(ufvector3(3)),last_goal(ufvector3(3)),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
-     leg_name(id == LLEG_CHAIN ? "left" : "right") {
+     leg_name(id == LLEG_CHAIN ? "left" : "right")
+{
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     char filepath[100];
     sprintf(filepath,"/tmp/%s_locus_log.xls",leg_name.c_str());
@@ -36,11 +37,13 @@ WalkingLeg::~WalkingLeg(){
 
 vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
+                                boost::shared_ptr<Step> _swing_dest,
                                 ublas::matrix<float> fc_Transform){
     //cout << "In leg" << chainID << " got target (" x
     //     << dest_x << "," <<dest_y << ")" <<endl;
     cur_dest = step;
     swing_src = _swing_src;
+    swing_dest = _swing_dest;
 
     //ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     //ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
@@ -180,11 +183,8 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     goal(2) = -walkParams->bodyHeight + heightOffGround;
 
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
-                                         COARSE_ERROR);
-    if(state == SWINGING){
-        //When we are swinging, use the OPPOSITE leg's offset
-        result.angles[1] -= leg_sign*getHipHack(-leg_sign);
-    }
+                                         REALLY_LOW_ERROR);
+    result.angles[1] -= getHipHack();
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
@@ -210,12 +210,9 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
 
     //calculate the new angles
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
-                                         COARSE_ERROR);
+                                         REALLY_LOW_ERROR);
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    if(state == SUPPORTING){
-        //When we are supporting, use this leg's offset
-        result.angles[1] += leg_sign*getHipHack(leg_sign);
-    }
+    result.angles[1] += getHipHack();
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
 
@@ -225,11 +222,30 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
  * how far along we are in the process of a state (namely swinging,
  * and supporting)
  *
- * Sign parameter allows to choose which leg's parameter to use
+ * In certain circumstances, this function returns 0.0f, since we don't
+ * want to be hacking the hio when we are starting and stopping.
  */
-float WalkingLeg::getHipHack(int sign){
-    //Hack - calculate the compensation to the HIPROLL
-    float MAX_HIP_ANGLE_OFFSET = (sign == 1 ?
+float WalkingLeg::getHipHack(){
+    //When we are starting and stopping we have no hip hack
+    //since the foot is never lifted in this instance
+    if(swing_dest->type != REGULAR_STEP){
+        //cout << "Supporting step is irregular, returning 0 hip hack" <<endl;
+        return 0.0f;
+    }
+
+    ChainID hack_chain;
+    if(state == SUPPORTING){
+        hack_chain = chainID;
+    }else if(state == SWINGING){
+        hack_chain = getOtherLegChainID();
+    }else{
+        //cout << "This step is double support, returning 0 hip hack"
+        //     << " leg: "<<chainID<<endl;
+        return 0.0f;
+    }
+
+    //Calculate the compensation to the HIPROLL
+    float MAX_HIP_ANGLE_OFFSET = (hack_chain == LLEG_CHAIN ?
                                   walkParams->leftSwingHipRollAddition:
                                   walkParams->rightSwingHipRollAddition);
 
@@ -263,7 +279,11 @@ float WalkingLeg::getHipHack(int sign){
                         (walkParams->singleSupportFrames/3));
     }
 
-    return hr_offset;
+    //we've calcuated the correct magnitude, but need to adjust for specific
+    //hip motor angle direction in this leg
+    //cout << "returning" <<leg_sign*hr_offset 
+    //     << " leg: "<< chainID <<endl;
+    return leg_sign*hr_offset;
 }
 
 float  WalkingLeg::cycloidx(float theta){
@@ -272,6 +292,11 @@ float  WalkingLeg::cycloidx(float theta){
 
 float  WalkingLeg::cycloidy(float theta){
     return 1 - cos(theta);
+}
+
+inline ChainID WalkingLeg::getOtherLegChainID(){
+    return (chainID==LLEG_CHAIN ?
+            RLEG_CHAIN : LLEG_CHAIN);
 }
 
 void WalkingLeg::startLeft(){

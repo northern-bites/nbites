@@ -57,6 +57,7 @@ public:
 
     vector <float> tick(boost::shared_ptr<Step> step,
                         boost::shared_ptr<Step> swing_src,
+                        boost::shared_ptr<Step> _suppoting,
                         ublas::matrix<float> fc_Transform);
 
     //Hopefully these never need to get called (architecturally).
@@ -90,9 +91,11 @@ private:
     bool firstFrame(){return frameCounter == 0;}
     void debugProcessing();
 
-    float getHipHack(int sign);
+    float getHipHack();
     float cycloidy(float theta);
     float cycloidx(float theta);
+
+    inline ChainID getOtherLegChainID();
 
 private:
     //FSA Attributes
@@ -101,7 +104,7 @@ private:
     int frameCounter;
 
     //destination attributes
-    boost::shared_ptr<Step> cur_dest, swing_src;
+    boost::shared_ptr<Step> cur_dest, swing_src, swing_dest;
 
     //Leg Attributes
     ChainID chainID; //keep track of which leg this is
