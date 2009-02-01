@@ -1,6 +1,8 @@
 #include "StepGenerator.h"
 #include <iostream>
 
+using boost::shared_ptr;
+
 StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     : x(0.0f), y(0.0f), theta(0.0f),
       _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
@@ -23,7 +25,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(0.01f,30.0f,0); // for testing purposes. The function doesn't even
+    setWalkVector(0.0f,30.0f,0); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -71,7 +73,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 //             }
         }
         else {
-            boost::shared_ptr<Step> nextStep = futureSteps.front();
+            shared_ptr<Step> nextStep = futureSteps.front();
             //cout << "Moving a step from future to current foot: "<<nextStep->foot<<endl;
             fillZMP(nextStep);
 
@@ -195,7 +197,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //This gives us the position of the swinging foot's destination
         //in the current f frame
         const ufvector3 swing_pos_f = prod(swing_reverse_trans,
-                                                      origin);
+                                           origin);
         //finally, we need to know how much turning there will be. Turns out,
         //we can simply read this out of the aforementioned translation matr.
         //but, it will be twice the max. angle we send to HYP joint
@@ -209,14 +211,14 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //in the F coordinate frames, we express Steps representing
         // the three footholds from above
         supportStep_f =
-            boost::shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
-                                             hyp_angle,supportStep_s));
+            shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
+                                      hyp_angle,supportStep_s));
         swingingStep_f =
-            boost::shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
-                                             hyp_angle,swingingStep_s));
+            shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
+                                      hyp_angle,swingingStep_s));
         swingingStepSource_f  =
-            boost::shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
-                                             last_hyp_angle,supportStep_s));
+            shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
+                                      last_hyp_angle,supportStep_s));
     }
 
     //Each frame, we must recalculate the location of the center of mass
@@ -230,7 +232,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
 
     //Now we need to determine which leg to send the coorect footholds/Steps to
-    boost::shared_ptr<Step> leftStep_f,rightStep_f;
+    shared_ptr<Step> leftStep_f,rightStep_f;
     //First, the support leg.
     if (supportStep_f->foot == LEFT_FOOT){
         leftStep_f = supportStep_f;
@@ -258,7 +260,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     return WalkLegsTuple(left,right);
 }
 
-void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
+void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 
     switch(newSupportStep->type){
     case START_STEP:
@@ -275,7 +277,7 @@ void StepGenerator::fillZMP(const boost::shared_ptr<Step> newSupportStep ){
 }
 
 void
-StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
+StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //look at the newStep, and make ZMP values:
     const float stepTime = newSupportStep->duration;
     //update the lastZMPD Step
@@ -343,10 +345,10 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
     const int numDMChops = //DM - DoubleMovingChops
         walkParams->doubleSupportFrames - halfNumDSChops*2;
 
-     cout << "Double support split like: " << endl
-          << "  static: " << halfNumDSChops<< endl
-          << "  moving: " << numDMChops<< endl
-          << "  static: " << halfNumDSChops<< endl;
+    cout << "Double support split like: " << endl
+         << "  static: " << halfNumDSChops<< endl
+         << "  moving: " << numDMChops<< endl
+         << "  static: " << halfNumDSChops<< endl;
 
     //Phase 1) - stay at start_i
     for(int i = 0; i< halfNumDSChops; i++){
@@ -390,7 +392,7 @@ StepGenerator::fillZMPRegular(const boost::shared_ptr<Step> newSupportStep ){
 }
 
 void
-StepGenerator::fillZMPEnd(const boost::shared_ptr<Step> newSupportStep ){
+StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
     const ufvector3 end_s =
         CoordFrame3D::vector3D(walkParams->hipOffsetX,
                                0.0f);
@@ -447,13 +449,13 @@ void StepGenerator::startRight(){
 
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is START type.
-    boost::shared_ptr<Step> firstSupportStep =
-        boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
-                                         walkParams->stepDuration,
-                                         RIGHT_FOOT,END_STEP));
-    boost::shared_ptr<Step> dummyStep =
-        boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                         walkParams->stepDuration, LEFT_FOOT));
+    shared_ptr<Step> firstSupportStep =
+        shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
+                                  walkParams->stepDuration,
+                                  RIGHT_FOOT,END_STEP));
+    shared_ptr<Step> dummyStep =
+        shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
+                                  walkParams->stepDuration, LEFT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
@@ -476,13 +478,13 @@ void StepGenerator::startLeft(){
 
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is START type.
-    boost::shared_ptr<Step> firstSupportStep =
-        boost::shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                         walkParams->stepDuration,
-                                         LEFT_FOOT,END_STEP));
-    boost::shared_ptr<Step> dummyStep =
-        boost::shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
-                                         walkParams->stepDuration, RIGHT_FOOT));
+    shared_ptr<Step> firstSupportStep =
+        shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
+                                  walkParams->stepDuration,
+                                  LEFT_FOOT,END_STEP));
+    shared_ptr<Step> dummyStep =
+        shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
+                                  walkParams->stepDuration, RIGHT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
@@ -521,8 +523,10 @@ void StepGenerator::generateStep( float _x,
     //  different overall behaviors: check if we want to start, else if we
     //  want to start moving, else if are already moving.
     StepType type;
-    if (_x ==0 && _y == 0){//stopping, or stopped
-        if(lastQueuedStep->x != 0)
+    if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
+        if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
+           (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
+                                 1:-1)*HIP_OFFSET_Y) != 0)
             type = REGULAR_STEP;
         else
             type = END_STEP;
@@ -558,12 +562,12 @@ void StepGenerator::generateStep( float _x,
         }
     }
 
-    boost::shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
-                                              HIP_OFFSET_Y : -HIP_OFFSET_Y) + _y,
-                                          0, walkParams->stepDuration,
-                                          (nextStepIsLeft ?
-                                           LEFT_FOOT : RIGHT_FOOT),
-                                          type));
+    shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
+                                       HIP_OFFSET_Y : -HIP_OFFSET_Y) + _y,
+                                   0, walkParams->stepDuration,
+                                   (nextStepIsLeft ?
+                                    LEFT_FOOT : RIGHT_FOOT),
+                                   type));
     //cout << "NEW STEP with x="<<_x<<endl;
 
     futureSteps.push_back(step);
@@ -576,7 +580,7 @@ void StepGenerator::generateStep( float _x,
  * Method returns the transformation matrix that goes between the previous
  * foot ('f') coordinate frame and the next f coordinate frame rooted at 'step'
  */
-ufmatrix3 StepGenerator::get_fprime_f(boost::shared_ptr<Step> step){
+ufmatrix3 StepGenerator::get_fprime_f(shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
@@ -598,7 +602,7 @@ ufmatrix3 StepGenerator::get_fprime_f(boost::shared_ptr<Step> step){
  * frame rooted at the last step.  Really just the inverse of the matrix
  * returned by the 'get_fprime_f'
  */
-ufmatrix3 StepGenerator::get_f_fprime(boost::shared_ptr<Step> step){
+ufmatrix3 StepGenerator::get_f_fprime(shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
@@ -617,7 +621,7 @@ ufmatrix3 StepGenerator::get_f_fprime(boost::shared_ptr<Step> step){
  * Translates points in the sprime frame into the s frame, where
  * the difference between sprime and s is based on 'step'
  */
-ufmatrix3 StepGenerator::get_sprime_s(boost::shared_ptr<Step> step){
+ufmatrix3 StepGenerator::get_sprime_s(shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
@@ -634,8 +638,8 @@ ufmatrix3 StepGenerator::get_sprime_s(boost::shared_ptr<Step> step){
  * Yet another DIFFERENT Method, returning the matrix that translates points
  * in the next s frame back to the previous one, based on the intervening
  * Step (s' being the last s frame).
-*/
-ufmatrix3 StepGenerator::get_s_sprime(boost::shared_ptr<Step> step){
+ */
+ufmatrix3 StepGenerator::get_s_sprime(shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
