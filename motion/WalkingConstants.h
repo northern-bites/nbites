@@ -56,8 +56,8 @@ struct Step{
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
             return o << "Step(" << s.x << "," << s.y << "," << s.theta
-                     << ") in " << s.duration <<"secs with foot "
-                     << s.foot << "and type " << s.type;
+                     << ") in " << s.duration <<" secs with foot "
+                     << s.foot << " and type " << s.type;
         }
 };
 

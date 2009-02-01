@@ -103,8 +103,8 @@ public:
     void setWalkVector(const float _x, const float _y, const float _theta);
 
 private: // Helper methods
-    void generateStep(const float _x, const float _y,
-                      const float _theta);
+    void generateStep(float _x,float _y,
+                      float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
     void fillZMPRegular(const boost::shared_ptr<Step> newStep );
     void fillZMPEnd(const boost::shared_ptr<Step> newStep );
@@ -112,10 +112,10 @@ private: // Helper methods
     void startRight();
     void startLeft();
 
-    ublas::matrix<float> get_f_fprime(boost::shared_ptr<Step> step);
-    ublas::matrix<float> get_fprime_f(boost::shared_ptr<Step> step);
-    ublas::matrix<float> get_sprime_s(boost::shared_ptr<Step> step);
-    ublas::matrix<float> get_s_sprime(boost::shared_ptr<Step> step);
+    ufmatrix3 get_f_fprime(boost::shared_ptr<Step> step);
+    ufmatrix3 get_fprime_f(boost::shared_ptr<Step> step);
+    ufmatrix3 get_sprime_s(boost::shared_ptr<Step> step);
+    ufmatrix3 get_s_sprime(boost::shared_ptr<Step> step);
 private:
     // Walk vector:
     //  * x - forward
@@ -128,7 +128,7 @@ private:
 
     bool _done;
 
-    ublas::vector<float> com_i;
+    ufvector3 com_i;
     //ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     list<float> zmp_ref_x, zmp_ref_y;
@@ -141,8 +141,8 @@ private:
 
     //Reference Frames for ZMPing steps
     //These are updated when we ZMP a step - they are the 'future', if you will
-    ublas::matrix<float> si_Transform;
-    ublas::vector<float> last_zmp_end_s;
+    ufmatrix3 si_Transform;
+    ufvector3 last_zmp_end_s;
 
     //Steps for the Walking Leg
     boost::shared_ptr<Step> lastStep_s;
@@ -157,12 +157,12 @@ private:
     //that are being sent to the WalkingLegs
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
-    ublas::matrix<float> if_Transform;
-    ublas::matrix<float> fc_Transform;
+    ufmatrix3 if_Transform;
+    ufmatrix3 fc_Transform;
     // These hold the initial position of the left/right foot when they are
     // in support mode. It is relative to the 'i' coord frame.
-    ublas::matrix<float> initStartLeft;
-    ublas::matrix<float> initStartRight;
+    ufmatrix3 initStartLeft;
+    ufmatrix3 initStartRight;
 
     Sensors * sensors;
     const WalkingParameters *walkParams;

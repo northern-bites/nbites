@@ -38,15 +38,15 @@ WalkingLeg::~WalkingLeg(){
 vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
                                 boost::shared_ptr<Step> _swing_dest,
-                                ublas::matrix<float> fc_Transform){
+                                ufmatrix3 fc_Transform){
     //cout << "In leg" << chainID << " got target (" x
     //     << dest_x << "," <<dest_y << ")" <<endl;
     cur_dest = step;
     swing_src = _swing_src;
     swing_dest = _swing_dest;
 
-    //ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
-    //ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
+    //ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
+    //ufvector3 dest_c = prod(fc_Transform,dest_f);
     //float dest_x = dest_c(0);
     //float dest_y = dest_c(1);
     //cout << "FC Transform" << fc_Transform <<endl;
@@ -90,15 +90,15 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
 }
 
 
-vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float dest_x, float dest_y) {
-    ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
+vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){//(float dest_x, float dest_y) {
+    ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
 
 
-    ublas::vector<float> src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
+    ufvector3 src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
 
 
-    ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
-    ublas::vector<float> src_c = prod(fc_Transform,src_f);
+    ufvector3 dest_c = prod(fc_Transform,dest_f);
+    ufvector3 src_c = prod(fc_Transform,src_f);
 
     //float dest_x = dest_c(0);
     //float dest_y = dest_c(1);
@@ -138,9 +138,9 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     float dest_y = src_f(1) + percent_to_dest_horizontal*dist_to_cover_y;
 
 
-    ublas::vector<float> target_f = CoordFrame3D::vector3D(dest_x,dest_y);
+    ufvector3 target_f = CoordFrame3D::vector3D(dest_x,dest_y);
     //cout << "New Dest (x,y) "<<dest_x <<","<<dest_y <<endl;
-    ublas::vector<float> target_c = prod(fc_Transform, target_f);
+    ufvector3 target_c = prod(fc_Transform, target_f);
 
     float target_c_x = target_c(0);
     float target_c_y = target_c(1);
@@ -189,7 +189,7 @@ vector <float> WalkingLeg::swinging(ublas::matrix<float> fc_Transform){//(float 
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
 
-vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float dest_x, float dest_y) {
+vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, float dest_y) {
     /**
        this method calculates the angles for this leg when it is on the ground
        (i.e. the leg on the ground in single support, or either leg in double
@@ -197,8 +197,8 @@ vector <float> WalkingLeg::supporting(ublas::matrix<float> fc_Transform){//float
        We calculate the goal based on the comx,comy from the controller,
        and the given parameters using inverse kinematics.
      */
-    ublas::vector<float> dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
-    ublas::vector<float> dest_c = prod(fc_Transform,dest_f);
+    ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
+    ufvector3 dest_c = prod(fc_Transform,dest_f);
     float dest_x = dest_c(0);
     float dest_y = dest_c(1);
 

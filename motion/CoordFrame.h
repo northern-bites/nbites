@@ -19,10 +19,15 @@ namespace CoordFrame3D{
         Z_AXIS
     };
 
+    typedef ublas::matrix<float,
+                          ublas::row_major,
+                          ublas::bounded_array<float,9> > ufmatrix3;
+    typedef ublas::vector<float, ublas::bounded_array<float,3> > ufvector3;
+
     // -------------------- Helper matrix methods --------------------
-    static const ublas::matrix <float> rotation3D(const Axis axis,
-                                                  const float angle) {
-        ublas::matrix <float> rot = ublas::identity_matrix <float>(3);
+    static const ufmatrix3 rotation3D(const Axis axis,
+                                      const float angle) {
+        ufmatrix3 rot = ublas::identity_matrix <float>(3);
 
         const float sinAngle = sin(angle);
         const float cosAngle = cos(angle);
@@ -42,24 +47,24 @@ namespace CoordFrame3D{
         return rot;
     }
 
-    static const ublas::matrix <float> translation3D(const float dx,
-                                                     const float dy) {
+    static const ufmatrix3 translation3D(const float dx,
+                                         const float dy) {
         ublas::matrix <float> trans = ublas::identity_matrix <float>(3);
         trans(X_AXIS, Z_AXIS) = dx;
         trans(Y_AXIS, Z_AXIS) = dy;
         return trans;
     }
 
-    static const ublas::vector <float> vector3D(const float x, const float y,
+    static const ufvector3 vector3D(const float x, const float y,
                                                 const float z = 1.0f) {
-        ublas::vector <float> p = ublas::zero_vector <float> (3);
+        ufvector3 p = ublas::zero_vector <float> (3);
         p(0) = x;
         p(1) = y;
         p(2) = z;
         return p;
     }
 
-    static const ublas::matrix<float> identity3D(){
+    static const ufmatrix3 identity3D(){
         return translation3D(0.0f,0.0f);
     }
 

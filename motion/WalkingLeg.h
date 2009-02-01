@@ -58,7 +58,7 @@ public:
     vector <float> tick(boost::shared_ptr<Step> step,
                         boost::shared_ptr<Step> swing_src,
                         boost::shared_ptr<Step> _suppoting,
-                        ublas::matrix<float> fc_Transform);
+                        ufmatrix3 fc_Transform);
 
     //Hopefully these never need to get called (architecturally).
     //Instead, use methods like startLeft, right etc
@@ -80,8 +80,8 @@ public:
     };
 private:
     //Execution methods, get called depending on which state the leg is in
-    vector <float> supporting(ublas::matrix<float> fc_Transform);//float dest_x, float dest_y);
-    vector <float> swinging(ublas::matrix<float> fc_Transform);//float dest_x, float dest_y);
+    vector <float> supporting(ufmatrix3 fc_Transform);//float dest_x, float dest_y);
+    vector <float> swinging(ufmatrix3 fc_Transform);//float dest_x, float dest_y);
 
     //FSA methods
     void setState(SupportMode newState);
