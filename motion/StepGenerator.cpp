@@ -580,7 +580,7 @@ void StepGenerator::generateStep( float _x,
  * Method returns the transformation matrix that goes between the previous
  * foot ('f') coordinate frame and the next f coordinate frame rooted at 'step'
  */
-ufmatrix3 StepGenerator::get_fprime_f(shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_fprime_f(const shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
@@ -602,7 +602,7 @@ ufmatrix3 StepGenerator::get_fprime_f(shared_ptr<Step> step){
  * frame rooted at the last step.  Really just the inverse of the matrix
  * returned by the 'get_fprime_f'
  */
-ufmatrix3 StepGenerator::get_f_fprime(shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_f_fprime(const shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
@@ -613,7 +613,8 @@ ufmatrix3 StepGenerator::get_f_fprime(shared_ptr<Step> step){
         CoordFrame3D::translation3D(0,leg_sign*HIP_OFFSET_Y);
 
     ufmatrix3 trans_s_f =
-        prod(CoordFrame3D::translation3D(x,y),CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta));
+        prod(CoordFrame3D::translation3D(x,y),
+             CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta));
     return prod(trans_s_f,trans_fprime_s);
 }
 
@@ -621,7 +622,7 @@ ufmatrix3 StepGenerator::get_f_fprime(shared_ptr<Step> step){
  * Translates points in the sprime frame into the s frame, where
  * the difference between sprime and s is based on 'step'
  */
-ufmatrix3 StepGenerator::get_sprime_s(shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_sprime_s(const shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
@@ -639,7 +640,7 @@ ufmatrix3 StepGenerator::get_sprime_s(shared_ptr<Step> step){
  * in the next s frame back to the previous one, based on the intervening
  * Step (s' being the last s frame).
  */
-ufmatrix3 StepGenerator::get_s_sprime(shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;

@@ -112,10 +112,10 @@ private: // Helper methods
     void startRight();
     void startLeft();
 
-    ufmatrix3 get_f_fprime(boost::shared_ptr<Step> step);
-    ufmatrix3 get_fprime_f(boost::shared_ptr<Step> step);
-    ufmatrix3 get_sprime_s(boost::shared_ptr<Step> step);
-    ufmatrix3 get_s_sprime(boost::shared_ptr<Step> step);
+    static const ufmatrix3 get_f_fprime(const boost::shared_ptr<Step> step);
+    static const ufmatrix3 get_fprime_f(const boost::shared_ptr<Step> step);
+    static const ufmatrix3 get_sprime_s(const boost::shared_ptr<Step> step);
+    static const ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
 private:
     // Walk vector:
     //  * x - forward
