@@ -47,7 +47,10 @@ ELSE( WIN32 )
         )
     ELSE( OE_CROSS_BUILD )
         IF( APPLE )
-            MESSAGE( STATUS "Remote objects have not been setup for Mac's yet - jfishman@" )
+            #MESSAGE( STATUS "Remote objects have not been setup for Mac's yet - jfishman@" )
+	    SET( ALCOMMON_LIBRARIES
+	        ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/libalcommon.a
+	    )
         ELSE( APPLE )
             SET( ALCOMMON_LIBRARIES 
                 ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/libalcommon.a

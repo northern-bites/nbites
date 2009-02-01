@@ -2,6 +2,11 @@
 
 #include <iostream>
 
+const int ALEnactor::MOTION_FRAME_RATE = 50;
+// 1 second * 1000 ms/s * 1000 us/ms
+const float ALEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f / ALEnactor::MOTION_FRAME_RATE;
+const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RATE;
+
 #define NO_ACTUAL_MOTION
 
 #ifdef NAOQI1
