@@ -1,7 +1,15 @@
 /* LocLogFaker.cpp */
 
 /**
- * Format of the log file:
+ * Format of the navigation input file (*.nav):
+ *
+ * START POSITION LINE
+ * x-value y-value heading-value
+ *
+ * NAVIGATION LINES
+ * deltaForward deltaLateral deltaRotation
+ *
+ * Format of the log output file (*.mcl):
  *
  * PARTICLE INFO
  * x y h weight (for M particles)
@@ -70,7 +78,14 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void iteratePath(fstream * outputFile, NavPath * letsGo) {
+/**
+ * Method to iterate through a robot path and write the localization info.
+ *
+ * @param outputFile The file to have everything printed to
+ * @param letsGo The robot path from which to localize
+ */
+void iteratePath(fstream * outputFile, NavPath * letsGo)
+{
     // Method variables
     vector<Observation> Z_t;
     MCL *myLoc = new MCL;
@@ -276,26 +291,30 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
  */
 void readInputFile(fstream* inputFile, NavPath * letsGo)
 {
-    letsGo->startPos = PoseEst(200.0f,300.2f,0.0f);
-    letsGo->myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
-                                     200));
-    letsGo->myMoves.push_back(NavMove(MotionModel(2.0f,0.0f,0.0f),
-                                     100));
-    letsGo->myMoves.push_back(NavMove(MotionModel(-2.0f,0.0f,0.0f),
-                                     200));
-    letsGo->myMoves.push_back(NavMove(MotionModel(0.0f,3.0f,0.0f),
-                                     100));
-    letsGo->myMoves.push_back(NavMove(MotionModel(0.0f,-3.0f,0.0f),
-                                     125));
-    letsGo->myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,-0.0314f),
-                                     300));
-    letsGo->myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
-                                     200));
+    // Method variables
+    PoseEst p;
+    int time;
+    MotionModel motion;
+
+    // Read the start info from the first line of the file
+    if (!inputFile->eof()) {
+        *inputFile >> p.x >> p.y >> p.h;
+    }
+    // Build NavMoves from the remaining lines
+    while (!inputFile->eof()) {
+        *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR >> time;
+        letsGo->myMoves.push_back(NavMove(motion, time));
+    }
 }
 
 
 /**
  * Prints the input to a log file to be read by the TOOL
+ *
+ * @param outputFile File to write the log line to
+ * @param myLoc Current localization module
+ * @param sightings Vector of landmark observations
+ * @param lastOdo Odometery since previous frame
  */
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                      sightings, MotionModel lastOdo)
@@ -345,6 +364,14 @@ NavMove::NavMove(MotionModel _p, int _t) : move(_p), time(_t)
 {
 };
 
+/**
+ * Returns an equivalent angle to the one passed in with value between positive
+ * and negative pi.
+ *
+ * @param theta The angle to be simplified
+ *
+ * @return The equivalent angle between -pi and pi.
+ */
 float subPIAngle(float theta)
 {
     while( theta > M_PI) {
