@@ -218,11 +218,11 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //we can simply read this out of the aforementioned translation matr.
         //but, it will be twice the max. angle we send to HYP joint
         //this only works because its a 3D homog. coord matr - 4D would break
-        float hyp_angle = -acos(swing_reverse_trans(0,0))*0.5f;
+        float hyp_angle = -acos(swing_reverse_trans(0,0));//*0.5f;
 
         //we use the swinging source to calc. a path for the swinging foot
         //it is not clear now if we will need to angle offset or what
-        float last_hyp_angle = -acos(stepTransform(0,0))*0.5f;
+        float last_hyp_angle = -acos(stepTransform(0,0));//*0.5f;
 
         //in the F coordinate frames, we express Steps representing
         // the three footholds from above
@@ -254,7 +254,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     ftime += 0.02f;
 #endif
 
-    cout << "com_f" << com_f<<endl;
+    cout << "com_f" << com_f<< " com_i "<<com_i<<endl;
 
     //Using the location of the com in the f coord frame, we can calculate
     //a transformation matrix to go from f to c

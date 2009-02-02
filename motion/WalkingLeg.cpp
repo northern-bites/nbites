@@ -201,7 +201,7 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
 
 const float WalkingLeg::getHipYawPitch(){
     if(state != SUPPORTING && state != SWINGING)
-        return swing_src->theta;
+        return swing_src->theta * 0.5f; //HYP should be half the target angle
 
     const float percent_complete =
         frameCounter/static_cast<float>(walkParams->singleSupportFrames);
@@ -209,8 +209,8 @@ const float WalkingLeg::getHipYawPitch(){
     const float theta = percent_complete*2.0f*M_PI;
     const float percent_to_dest = cycloidx(theta)/(2.0f*M_PI);
 
-    const float end = swing_dest->theta;
-    const float start = swing_src->theta;
+    const float end = swing_dest->theta*0.5f;
+    const float start = swing_src->theta*0.5f;
 
 
     if(end > 0)
