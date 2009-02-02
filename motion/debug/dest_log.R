@@ -27,7 +27,7 @@ points(dat$time,dat$dest_x,type="l",col=2)
 #points(dat$time,dat$src_x,type="l",col=3)
 legend("top",lwd=2,legend=names,col=cols)
 zeros = dat$time
-zeros[zeros > -100] =  mean(dat$dest_x) +10
+zeros[zeros > -100] =  mean(dat$dest_x,na.rm=T) +10
 points(dat$time,zeros,pch=1,col=dat$state+2)
 names = c("Supporting","Swinging","Dbl Sup", "P. Dbl Sup")
 legend("topleft",lwd=2,legend=names,col=c(2:5))
@@ -40,7 +40,7 @@ cols = c("2")
 points(dat$time,dat$dest_y,type="l",col=2)
 legend("top",lwd=2,legend=names,col=cols)
 zeros = dat$time
-zeros[zeros > -100] =  mean(dat$dest_y) +10
+zeros[zeros > -100] =  mean(dat$dest_y,na.rm=T) +10
 points(dat$time,zeros,pch=1,col=dat$state+2)
 names = c("Supporting","Swinging","Dbl Sup", "P. Dbl Sup")
 legend("topleft",lwd=2,legend=names,col=c(2:5))

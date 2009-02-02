@@ -20,7 +20,7 @@ cols = c("2","3","4","5")
 
 
 zeros = dat$time
-zeros[zeros > -100] = mean(dat$pre_x) +5
+zeros[zeros > -100] = mean(dat$pre_x,na.rm=T) +5
 points(dat$time,zeros,pch=1,col=dat$state+2)
 
 
@@ -39,7 +39,7 @@ names = c("com_y","pre_y","zmp_y","real_com_y")
 cols = c("2","3","4","5")
 
 zeros = dat$time
-zeros[zeros > -100] = mean(dat$pre_y) +5
+zeros[zeros > -100] = mean(dat$pre_y,na.rm=T) +5
 points(dat$time,zeros,pch=18,col=dat$state+2)
 
 points(dat$time,dat$com_y,type="l",col=2)

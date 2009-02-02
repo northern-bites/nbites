@@ -17,13 +17,13 @@ if(!file.exists(file))
 dat = read.table(file,header=T,na.strings=c("-"))
 
 pdf(paste(name,"-x",PDF,sep=""))
-plot(dat$time,dat$goal_x,pch="",main=paste(foot,"leg"),xlab="s",ylab="mm")
+plot(dat$time,dat$goal_x,pch="",main=paste(foot,"leg","x"),xlab="s",ylab="mm")
 names = c("goal_x")
 cols = c("2")
 points(dat$time,dat$goal_x,type="l",col=2)
 legend("top",lwd=2,legend=names,col=cols)
 zeros = dat$time
-zeros[zeros > -100] =  mean(dat$goal_x) +10
+zeros[zeros > -100] =  mean(dat$goal_x,na.rm=T) -1
 points(dat$time,zeros,pch=1,col=dat$state+2)
 names = c("Supporting","Swinging","Dbl Sup", "P. Dbl Sup")
 legend("topleft",lwd=2,legend=names,col=c(2:5))
@@ -36,7 +36,7 @@ cols = c("2")
 points(dat$time,dat$goal_y,type="l",col=2)
 legend("top",lwd=2,legend=names,col=cols)
 zeros = dat$time
-zeros[zeros > -100] =  mean(dat$goal_y) +10
+zeros[zeros > -100] =  mean(dat$goal_y,na.rm=T) +10
 points(dat$time,zeros,pch=1,col=dat$state+2)
 names = c("Supporting","Swinging","Dbl Sup", "P. Dbl Sup")
 legend("topleft",lwd=2,legend=names,col=c(2:5))
@@ -49,7 +49,7 @@ cols = c("2")
 points(dat$time,dat$goal_z,type="l",col=2)
 legend("top",lwd=2,legend=names,col=cols)
 zeros = dat$time
-zeros[zeros > -100] = mean(dat$goal_z) +5
+zeros[zeros > -100] = mean(dat$goal_z,na.rm=T) +5
 points(dat$time,zeros,pch=1,col=dat$state+2)
 points(dat$time,pch=1,col=dat$state+2)
 names = c("Supporting","Swinging","Dbl Sup", "P. Dbl Sup")

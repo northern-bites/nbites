@@ -24,6 +24,10 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
+#ifdef DEBUG_COM_F
+    com_f_log = fopen("/tmp/com_f_log.xls","w");
+    fprintf(com_f_log,"time\tcom_f_x\tcom_f_y\tstate\n");
+#endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
     setWalkVector(0.0f,0.0f,M_PI/18); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
@@ -31,6 +35,9 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
 StepGenerator::~StepGenerator(){
 #ifdef DEBUG_CONTROLLER_COM
     fclose(com_log);
+#endif
+#ifdef DEBUG_COM_F
+    fclose(com_f_log);
 #endif
     delete controller_x; delete controller_y;
 
@@ -59,7 +66,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 36){
+            if(fc == 2){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
@@ -239,6 +246,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //relative to the support leg (f coord frame), based on the output
     //of the controller (in tick_controller() )
     ufvector3 com_f = prod(if_Transform,com_i);
+
+#ifdef DEBUG_COM_F
+    static float ftime = 0;
+    fprintf(com_f_log,"%f\t%f\t%f\t%d\n",
+            ftime,com_f(0),com_f(1),leftLeg.getSupportMode());
+    ftime += 0.02f;
+#endif
+
+    cout << "com_f" << com_f<<endl;
 
     //Using the location of the com in the f coord frame, we can calculate
     //a transformation matrix to go from f to c

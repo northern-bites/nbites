@@ -79,7 +79,8 @@ using namespace Kinematics;
 
 //Debugging flags:
 #ifdef WALK_DEBUG
-#define DEBUG_CONTROLLER_COM
+#  define DEBUG_CONTROLLER_COM
+#  define DEBUG_COM_F
 #endif
 
 typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
@@ -173,6 +174,9 @@ private:
     WalkController *controller_x, *controller_y;
 #ifdef DEBUG_CONTROLLER_COM
     FILE* com_log;
+#endif
+#ifdef DEBUG_COM_F
+    FILE* com_f_log;
 #endif
 };
 
