@@ -25,7 +25,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(0.0f,30.0f,0); // for testing purposes. The function doesn't even
+    setWalkVector(20.0f,0.0f,0.f); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -59,7 +59,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 8){
+            if(fc == 20){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
@@ -175,6 +175,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
         if_Transform = prod(stepTransform,if_Transform);
+        static int ifcount = 0;
+        //cout << "IF("<<ifcount++<<"): " << if_Transform<<endl;
 
         //Express the  destination  and source for the supporting foot and
         //swinging foots locations in f coord. Since the supporting foot doesn't
@@ -389,6 +391,10 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
     //store the end of the zmp in the next s frame:
     last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
+
+    //Debugging
+    static int sicount = 0;
+    //cout << "SI ("<<sicount++<<"): "<<si_Transform<<endl;
 }
 
 void
@@ -427,7 +433,7 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
 
     //cout << "Initial ZMPd Steps: " << zmp_ref_x.size()<<endl;
 
-    if(_y > 0)
+    if(_y > 0 || _theta > 0)
         startLeft();
     else
         startRight();
@@ -625,7 +631,7 @@ const ufmatrix3 StepGenerator::get_f_fprime(const shared_ptr<Step> step){
     ufmatrix3 trans_s_f =
         prod(CoordFrame3D::translation3D(x,y),
              CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta));
-    return prod(trans_s_f,trans_fprime_s);
+    return prod(trans_fprime_s,trans_s_f);
 }
 
 /**
@@ -636,13 +642,16 @@ const ufmatrix3 StepGenerator::get_sprime_s(const shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
-    const float y = step->y - leg_sign*HIP_OFFSET_Y;
+    const float y = step->y;
     const float theta = step->theta;
 
-    const ufmatrix3 trans_s_sprime =
+    const ufmatrix3 trans_f_s =
+        CoordFrame3D::translation3D(0,leg_sign*HIP_OFFSET_Y);
+
+    const ufmatrix3 trans_sprime_f =
         prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-theta),
              CoordFrame3D::translation3D(-x,-y));
-    return trans_s_sprime;
+    return prod(trans_f_s,trans_sprime_f);
 }
 
 /**
@@ -654,11 +663,14 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
     const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
 
     const float x = step->x;
-    const float y = step->y - leg_sign*HIP_OFFSET_Y;
+    const float y = step->y;
     const float theta = step->theta;
 
-    const ufmatrix3 trans_s_sprime =
-        prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta),
-             CoordFrame3D::translation3D(x,y));
-    return trans_s_sprime;
+    const ufmatrix3 trans_f_s =
+        CoordFrame3D::translation3D(0,-leg_sign*HIP_OFFSET_Y);
+
+    const ufmatrix3 trans_sprime_f =
+        prod(CoordFrame3D::translation3D(x,y),
+             CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta));
+    return prod(trans_sprime_f,trans_f_s);
 }
