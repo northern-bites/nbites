@@ -40,7 +40,7 @@ public class WorldControllerPainter implements DogListener
     static final Color SAW_YELLOW_BEACON_COLOR = Color.YELLOW;
 
     // Dog drawing
-    static final Color REAL_DOG_POSITION_COLOR = Color.RED;
+    static final Color REAL_DOG_POSITION_COLOR = Color.BLACK;
     static final Color ESTIMATED_DOG_POSITION_COLOR = Color.BLUE;
     static final int   BLUE_TEAM = 0;
     static final int   RED_TEAM = 1;
@@ -71,6 +71,9 @@ public class WorldControllerPainter implements DogListener
     // Particle drawing
     static final int PARTICLE_RADIUS = 3;
     static final int PARTICLE_HEADING_DIST = 10;
+
+    // Known pose drawing
+    static final float NO_DATA_VALUE = -111.111f;
 
     // This instance draws a line from the current estimate of the ball's
     // location to the the estimte of its location in
@@ -107,6 +110,7 @@ public class WorldControllerPainter implements DogListener
 
     // A tautological geometric constant
     static final double QUART_CIRC_DEGS = 360. / 4.;
+    static final double QUART_CIRC_RADS =  3.14159 / 2.0;
 
     private boolean draw_real, draw_est;
 
@@ -129,6 +133,7 @@ public class WorldControllerPainter implements DogListener
 
     private double[] positionEstimates;
     private double[] uncertaintyEstimates;
+    private float[] realPose;
     /**
      * Constructs the painter to draw all possible localization information
      * @param toView Field on which the painter will paint.
@@ -158,6 +163,10 @@ public class WorldControllerPainter implements DogListener
 
         positionEstimates = new double[3];
         uncertaintyEstimates = new double[3];
+        realPose = new float[3];
+        realPose[0] = NO_DATA_VALUE;
+        realPose[1] = NO_DATA_VALUE;
+        realPose[2] = NO_DATA_VALUE;
     }
 
     /**
@@ -174,6 +183,7 @@ public class WorldControllerPainter implements DogListener
             paintDogInformation(g2);
             paintParticleSet(g2);
             paintEstimateMeanAndVariance(g2);
+            paintRealRobotPose(g2);
         } catch (ConcurrentModificationException e) {
             // Ignore.  The painting and simulation threads are trying
             // to concurrently access elements in the same list
@@ -354,24 +364,20 @@ public class WorldControllerPainter implements DogListener
         field.fillOval(drawing_on, REAL_DOG_POSITION_COLOR,
                        field.DRAW_STROKE, at_x, at_y, POSITION_DOT_RADIUS,
                        POSITION_DOT_RADIUS);
-        double heading_angle_from_right_horizon = at_heading + QUART_CIRC_DEGS;
+        double heading_angle_from_right_horizon = at_heading + QUART_CIRC_RADS;
         double x_line_body_disp = (POSITION_HEADING_RADIUS *
-                                   Math.cos(DEG_TO_RAD *
-                                            heading_angle_from_right_horizon));
+                                   Math.cos(heading_angle_from_right_horizon));
         double y_line_body_disp = (POSITION_HEADING_RADIUS *
-                                   Math.sin(DEG_TO_RAD *
-                                            heading_angle_from_right_horizon));
+                                   Math.sin(heading_angle_from_right_horizon));
         field.drawLine(drawing_on, REAL_DOG_POSITION_COLOR, field.DRAW_STROKE,
                        at_x - x_line_body_disp, at_y - y_line_body_disp,
                        at_x, at_y);
         double x_line_pan_disp = (PAN_HEADING_RADIUS *
-                                  Math.cos(DEG_TO_RAD *
-                                           (at_pan +
+                                  Math.cos((at_pan +
                                             heading_angle_from_right_horizon
                                             )));
         double y_line_pan_disp = (PAN_HEADING_RADIUS *
-                                  Math.sin(DEG_TO_RAD *
-                                           (at_pan +
+                                  Math.sin((at_pan +
                                             heading_angle_from_right_horizon
                                             )));
         field.drawLine(drawing_on, REAL_DOG_POSITION_COLOR, field.DRAW_STROKE,
@@ -859,13 +865,27 @@ public class WorldControllerPainter implements DogListener
                                       double _uncertX, double _uncertY,
                                       double _uncertH)
     {
-        positionEstimates[0] = field.fieldToScreenX((int)_x);
-        positionEstimates[1] = field.fieldToScreenY((int)_y);
+        positionEstimates[0] = _x;
+        positionEstimates[1] = _y;
         positionEstimates[2] = _h;
         uncertaintyEstimates[0] = _uncertX;
         uncertaintyEstimates[1] = _uncertY;
         uncertaintyEstimates[2] = _uncertH;
 
+    }
+
+    /**
+     * Update the current known pose of the robot
+     *
+     * @param _x The x position of the robot
+     * @param _y The y position of the robot
+     * @param _h The h position of the robot
+     */
+    public void updateRealPoseInfo(float _x, float _y, float _h)
+    {
+        realPose[0] = _x;
+        realPose[1] = _y;
+        realPose[2] = _h;
     }
 
     /**
@@ -882,8 +902,8 @@ public class WorldControllerPainter implements DogListener
             } else {
                 partColor = DOG_COLOR_BLUE_TEAM;
             }
-            drawParticle(g2, partColor, field.fieldToScreenX(p.getX()),
-                         field.fieldToScreenY(p.getY()), p.getH(),
+            drawParticle(g2, partColor, p.getX(),
+                         p.getY(), p.getH(),
                          p.getWeight());
         }
     }
@@ -894,11 +914,29 @@ public class WorldControllerPainter implements DogListener
      *
      * @param g2 The graphics context to be drawn on.
      */
-    public void paintEstimateMeanAndVariance(Graphics2D g2) {
+    public void paintEstimateMeanAndVariance(Graphics2D g2)
+    {
         drawDogsUncertainty(g2, positionEstimates[0], positionEstimates[1],
                             positionEstimates[2], uncertaintyEstimates[0],
                             uncertaintyEstimates[1], uncertaintyEstimates[2]);
     }
+
+    /**
+     * Function to draw the know position of the robot; mostly used for
+     * debugging of artificially created data. Draws nothing if the current pose
+     * is not known.
+     *
+     * @param g2 The graphics context to be drawn on.
+     */
+    public void paintRealRobotPose(Graphics2D g2)
+    {
+        if (realPose[0] == NO_DATA_VALUE) {// Test if data exists
+            return; // Draw nothing if we don't know the current real pose
+        }
+        drawDogsRealPosition(g2, /*Color.CYAN,*/ realPose[0], realPose[1],
+                             realPose[2], 0.0);
+    }
+
 
     /**
      * Draws a particle on the field
@@ -918,7 +956,7 @@ public class WorldControllerPainter implements DogListener
 
         // Draw a line pointing in the direction of the heading
         field.drawLine(drawing_on, in_color, field.DRAW_STROKE, x, y,
-                       x + PARTICLE_HEADING_DIST*Math.cos(h+3.14159/2.0),
-                       y + PARTICLE_HEADING_DIST*Math.sin(h+3.14159/2.0));
+                       x + PARTICLE_HEADING_DIST*Math.cos(h + QUART_CIRC_RADS),
+                       y + PARTICLE_HEADING_DIST*Math.sin(h + QUART_CIRC_RADS));
     }
 }

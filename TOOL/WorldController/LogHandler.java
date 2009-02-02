@@ -731,7 +731,7 @@ public class LogHandler
     {
         // Method variables
         Vector< MCLParticle> particles;
-        String particleInfo, debugInfo, landmarkInfo;
+        String particleInfo, debugInfo, landmarkInfo, realPoseInfo;
         StringTokenizer t;
 
         // Make sure the line is not blank
@@ -773,6 +773,10 @@ public class LogHandler
                                               (debugViewer.myUncertH.
                                                getText()));
 
+                // Parse the known robot position
+                realPoseInfo = t.nextToken();
+                processRobotPose(realPoseInfo);
+
                 // Update the observed landarmks information
                 // Check if any landmarks were sighted this frame
                 debugViewer.removeLandmarks();
@@ -782,7 +786,8 @@ public class LogHandler
                 }
 
                 // Update the screen view
-                painter.updateParticleSet(particles, team_color, player_number);
+                painter.updateParticleSet(particles, team_color,
+                                          player_number);
                 painter.reportEndFrame();
             }
         }
@@ -854,6 +859,20 @@ public class LogHandler
         }
     }
 
+    /**
+     * Process and draw a known pose of the robot on the field
+     *
+     * @param realPoseInfo A string of the form "x y h"
+     */
+    private void processRobotPose(String realPoseInfo)
+    {
+        float x, y, h;
+        String[] infos = realPoseInfo.split(" ");
+        x = Float.parseFloat(infos[0]);
+        y = Float.parseFloat(infos[1]);
+        h = Float.parseFloat(infos[2]);
+        painter.updateRealPoseInfo(x, y, h);
+    }
 
     /**
      * Method to decode a landmark ID to (x,y) coordinates and highlight
