@@ -107,8 +107,8 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){//(float dest_x, flo
     static float dist_to_cover_y = 0;
 
      if(firstFrame()){
-         //cout << "Current destination" << cur_dest->x<< ","<<cur_dest->y << endl;
-         //cout << "Last destination" << swing_src->x<< ","<<swing_src->y << endl;
+         //cout << "Current destination " << cur_dest->x<< ","<<cur_dest->y << endl;
+         //cout << "Last destination " << swing_src->x<< ","<<swing_src->y << endl;
          dist_to_cover_x = cur_dest->x - swing_src->x;
          dist_to_cover_y = cur_dest->y - swing_src->y;
 
@@ -155,32 +155,12 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){//(float dest_x, flo
     float radius =walkParams->stepHeight/2;
     float heightOffGround = radius*cycloidy(theta);
 
-//     if (stage == 0) { // we are rising
-//         // we want to raise the foot up for the first third of the step duration
-//         heightOffGround = walkParams->stepHeight*
-//             static_cast<float>(frameCounter) /
-//             ((walkParams->singleSupportFrames/3));
-//         if (frameCounter >= walkParams->singleSupportFrames/3.)
-//             stage++;
-
-//     }
-//     else if (stage == 1) { // keep it level
-//         heightOffGround = walkParams->stepHeight;
-
-//         if (frameCounter >= 2.* walkParams->singleSupportFrames/3)
-//             stage++;
-//     }
-//     else {// stage 2, set the foot back down on the ground
-//         heightOffGround = max(0.0f,
-//                               walkParams->stepHeight*
-//                               static_cast<float>(walkParams->singleSupportFrames
-//                                                  -frameCounter)/
-//                               (walkParams->singleSupportFrames/3));
-//     }
-
     goal(0) = target_c_x;
     goal(1) = target_c_y;
     goal(2) = -walkParams->bodyHeight + heightOffGround;
+
+    //Set the desired HYP in lastJoints, which will be read by dls
+    lastJoints[0] = getHipYawPitch();
 
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
                                          REALLY_LOW_ERROR);
@@ -207,6 +187,8 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
     goal(1) = dest_y;  //targetY
     goal(2) = -walkParams->bodyHeight;         //targetZ
 
+    //Set the desired HYP in lastJoints, which will be read by dls
+    lastJoints[0] = getHipYawPitch();
 
     //calculate the new angles
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
@@ -214,6 +196,28 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     result.angles[1] += getHipHack();
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+}
+
+
+const float WalkingLeg::getHipYawPitch(){
+    if(state != SUPPORTING && state != SWINGING)
+        return swing_src->theta;
+
+    const float percent_complete =
+        frameCounter/static_cast<float>(walkParams->singleSupportFrames);
+
+    const float theta = percent_complete*2.0f*M_PI;
+    const float percent_to_dest = cycloidx(theta)/(2.0f*M_PI);
+
+    const float end = swing_dest->theta;
+    const float start = swing_src->theta;
+
+
+    if(end > 0)
+        cout << "WARNING: end is greater than zero in hyp !!"<<endl;
+
+    const float value = start + (end-start)*percent_to_dest;
+    return value;
 }
 
 
@@ -225,7 +229,7 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
  * In certain circumstances, this function returns 0.0f, since we don't
  * want to be hacking the hio when we are starting and stopping.
  */
-float WalkingLeg::getHipHack(){
+const float WalkingLeg::getHipHack(){
     //When we are starting and stopping we have no hip hack
     //since the foot is never lifted in this instance
     if(swing_dest->type != REGULAR_STEP){
@@ -286,11 +290,11 @@ float WalkingLeg::getHipHack(){
     return leg_sign*hr_offset;
 }
 
-float  WalkingLeg::cycloidx(float theta){
+const float  WalkingLeg::cycloidx(float theta){
     return theta - sin(theta);
 }
 
-float  WalkingLeg::cycloidy(float theta){
+const float  WalkingLeg::cycloidy(float theta){
     return 1 - cos(theta);
 }
 

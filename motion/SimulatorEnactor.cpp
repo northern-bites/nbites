@@ -46,6 +46,6 @@ void SimulatorEnactor::postSensors(){
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
     vector<float> alAngles = motionProxy->getBodyAngles();
-    sensors->setBodyAngles(alAngles);
+    //sensors->setBodyAngles(alAngles);
 #endif
 }

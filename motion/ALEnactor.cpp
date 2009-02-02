@@ -34,7 +34,10 @@ void ALEnactor::run() {
  		for (int i=0; i<result.size();i++)
  			cout << "result of joint " << i << " is " << result.at(i) << endl;
 #endif
+
+#ifndef NO_ACTUAL_MOTION
         mproxy->setBodyAngles(result);
+#endif
 
         // TODO: This is probably wrong!!!!1!ONE
         // We probably want to sleep webots time and this sleeps real time.

@@ -91,9 +91,10 @@ private:
     bool firstFrame(){return frameCounter == 0;}
     void debugProcessing();
 
-    float getHipHack();
-    float cycloidy(float theta);
-    float cycloidx(float theta);
+    const float getHipYawPitch();
+    const float getHipHack();
+    const float cycloidy(float theta);
+    const float cycloidx(float theta);
 
     inline ChainID getOtherLegChainID();
 

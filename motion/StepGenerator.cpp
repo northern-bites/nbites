@@ -202,17 +202,17 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //we can simply read this out of the aforementioned translation matr.
         //but, it will be twice the max. angle we send to HYP joint
         //this only works because its a 3D homog. coord matr - 4D would break
-        float hyp_angle = acos(swing_reverse_trans(0,0))/2;
+        float hyp_angle = -acos(swing_reverse_trans(0,0))*0.5f;
 
         //we use the swinging source to calc. a path for the swinging foot
         //it is not clear now if we will need to angle offset or what
-        float last_hyp_angle = 0; //HACK - may need to actually do this
+        float last_hyp_angle = -acos(stepTransform(0,0))*0.5f;
 
         //in the F coordinate frames, we express Steps representing
         // the three footholds from above
         supportStep_f =
             shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
-                                      hyp_angle,supportStep_s));
+                                      0.0f,supportStep_s));
         swingingStep_f =
             shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
                                       hyp_angle,swingingStep_s));
@@ -345,10 +345,10 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     const int numDMChops = //DM - DoubleMovingChops
         walkParams->doubleSupportFrames - halfNumDSChops*2;
 
-    cout << "Double support split like: " << endl
-         << "  static: " << halfNumDSChops<< endl
-         << "  moving: " << numDMChops<< endl
-         << "  static: " << halfNumDSChops<< endl;
+//     cout << "Double support split like: " << endl
+//          << "  static: " << halfNumDSChops<< endl
+//          << "  moving: " << numDMChops<< endl
+//          << "  static: " << halfNumDSChops<< endl;
 
     //Phase 1) - stay at start_i
     for(int i = 0; i< halfNumDSChops; i++){
@@ -562,9 +562,19 @@ void StepGenerator::generateStep( float _x,
         }
     }
 
+    if(_theta > 0){
+        if(!nextStepIsLeft){
+            _theta = 0.0f;
+        }
+    }else if (_theta < 0){
+        if(nextStepIsLeft){
+            _theta = 0.0f;
+        }
+    }
+
     shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
                                        HIP_OFFSET_Y : -HIP_OFFSET_Y) + _y,
-                                   0, walkParams->stepDuration,
+                                   _theta, walkParams->stepDuration,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
