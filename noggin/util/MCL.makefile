@@ -29,9 +29,11 @@ OBJS = 	Utility.o \
 	concreteCorner.o \
 	Observation.o
 
-OBS_SRCS = ../Observation.cpp
+OBS_SRCS = ../Observation.cpp \
+	   ../Observation.h
 
-MCL_SRCS = ../MCL.cpp
+MCL_SRCS = ../MCL.cpp \
+	   ../MCL.h
 
 FAKER_SRCS = LocLogFaker.cpp \
 	LocLogFaker.h

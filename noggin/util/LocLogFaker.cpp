@@ -26,8 +26,12 @@
  * ball-vel-uncert-x ball-vel-uncert-y
  * odometery-lateral odometery-forward odometery-rotational
  *
+ * ROBOT REAL INFO
+ * x y h (as given by the system)
+ *
  * LANDMARK INFO
  * ID dist bearing (for all landmarks observed in the frame)
+ *
  */
 #include "LocLogFaker.h"
 
@@ -89,10 +93,15 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     MCL *myLoc = new MCL;
-    PoseEst currentPose = (*letsGo).startPos;
+    PoseEst currentPose;
     MotionModel *noMove = new MotionModel(0.0, 0.0, 0.0);
+
+    currentPose.x = letsGo->startPos.x;
+    currentPose.y = letsGo->startPos.y;
+    currentPose.h = letsGo->startPos.h;
+
     // Print out starting configuration
-    printOutLogLine(outputFile, myLoc, Z_t, *noMove);
+    printOutLogLine(outputFile, myLoc, Z_t, *noMove, &currentPose);
     delete noMove;
 
     // Iterate through the moves
@@ -101,11 +110,12 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
         // Continue the move for as long as specified
         for (int j = 0; j < (*letsGo).myMoves[i].time; ++j) {
             currentPose += (*letsGo).myMoves[i].move;
-            Z_t = determineObservedLandmarks(currentPose,0.0);
+            Z_t = determineObservedLandmarks(currentPose, 0.0);
             myLoc->updateLocalization((*letsGo).myMoves[i].move,Z_t);
 
             // Print the current frame to file
-            printOutLogLine(outputFile, myLoc, Z_t, (*letsGo).myMoves[i].move);
+            printOutLogLine(outputFile, myLoc, Z_t, (*letsGo).myMoves[i].move,
+                            &currentPose);
         }
     }
 }
@@ -129,9 +139,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
     // required measurements for the added observation
     float visDist, visBearing, sigmaD, sigmaB;
     for(int i = 0; i < ConcreteFieldObject::NUM_FIELD_OBJECTS; ++i) {
-       const ConcreteFieldObject* toView = ConcreteFieldObject::
-           concreteFieldObjectList[i];
-       float deltaX = toView->getFieldX() - myPos.x;
+        const ConcreteFieldObject* toView = ConcreteFieldObject::
+            concreteFieldObjectList[i];
+        float deltaX = toView->getFieldX() - myPos.x;
         float deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
         visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
@@ -144,7 +154,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             //visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
             sigmaB = getBearingSD(visBearing);
-            visBearing += (M_PI / 2.0f);
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Build the (visual) field object
@@ -189,7 +198,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
             sigmaB = getBearingSD(visBearing);
-            visBearing += (M_PI / 2.0f);
+            //visBearing += (M_PI / 2.0f);
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Ignore the center circle for right now
@@ -199,7 +208,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             const cornerID id = toView->getID();
             list <const ConcreteCorner*> toUse;
             // Randomly set ambiguous data
-            if ((rand() / (float(RAND_MAX)+1)) < 0.65) {
+            if ((rand() / (float(RAND_MAX)+1)) < 0.32) {
                 shape s = ConcreteCorner::inferCornerType(id);
                 toUse = ConcreteCorner::getPossibleCorners(s);
             } else {
@@ -287,19 +296,22 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
  *
  * @param inputFile The opened file containing the path information
  * @param letsGo Where the robot path is to be stored
- * @param currentPose Where the starting
  */
 void readInputFile(fstream* inputFile, NavPath * letsGo)
 {
     // Method variables
-    PoseEst p;
     int time;
     MotionModel motion;
 
     // Read the start info from the first line of the file
     if (!inputFile->eof()) {
-        *inputFile >> p.x >> p.y >> p.h;
+        *inputFile >> letsGo->startPos.x >> letsGo->startPos.y
+                   >> letsGo->startPos.h;
     }
+
+    // Convert input value to radians
+    letsGo->startPos.h *= DEG_TO_RAD;
+
     // Build NavMoves from the remaining lines
     while (!inputFile->eof()) {
         *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR >> time;
@@ -317,7 +329,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  * @param lastOdo Odometery since previous frame
  */
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
-                     sightings, MotionModel lastOdo)
+                     sightings, MotionModel lastOdo, PoseEst *currentPose)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
@@ -345,11 +357,19 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
     // Divide the sections with a colon
     (*outputFile) << ":";
 
+    // Print the actual robot position
+    (*outputFile) << (*currentPose).x << " "
+                  << (*currentPose).y << " "
+                  << (*currentPose).h << " ";
+
+    // Divide the sections with a colon
+    (*outputFile) << ":";
+
     // Output landmark infos
     for(unsigned int k = 0; k < sightings.size(); ++k) {
         (*outputFile) << sightings[k].getID() << " "
                       << sightings[k].getVisDistance() << " "
-                      << sightings[k].getVisBearing() << " ";
+                      << sightings[k].getVisBearingDeg() << " ";
     }
 
     // Close the line

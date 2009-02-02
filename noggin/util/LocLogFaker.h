@@ -49,7 +49,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo);
 // IO Functions
 void readInputFile(fstream* name, NavPath * letsGo);
 void printOutLogLine(fstream* outputFile, MCL* myLoc, std::vector<Observation>
-                     sightings, MotionModel lastOdo);
+                     sightings, MotionModel lastOdo, PoseEst * currentPose);
 
 // Helper functions
 float subPIAngle(float theta);
