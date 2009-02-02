@@ -25,7 +25,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(20.0f,0.0f,0.f); // for testing purposes. The function doesn't even
+    setWalkVector(0.0f,0.0f,M_PI/18); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -59,7 +59,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 20){
+            if(fc == 36){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
@@ -172,10 +172,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
         swingingStep_s  = *(++currentZMPDSteps.begin());
         supportStep_s   =  *currentZMPDSteps.begin();
 
+        cout << "New support step " <<*supportStep_s<<endl;
+
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
         if_Transform = prod(stepTransform,if_Transform);
         static int ifcount = 0;
+        cout << "stepTransform" <<stepTransform <<endl;
+
+        //cout << "should be identity" <<prod(get_fprime_f(supportStep_s),get_f_fprime(supportStep_s));
         //cout << "IF("<<ifcount++<<"): " << if_Transform<<endl;
 
         //Express the  destination  and source for the supporting foot and
@@ -185,6 +190,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //First, do the support foot, which is always at the origin
         const ufvector3 origin = CoordFrame3D::vector3D(0,0);
         const ufvector3 supp_pos_f = origin;
+
+        cout << "origin_i in _f"<< prod(if_Transform,origin);
 
         //Second, do the source of the swinging leg, which can be calculated
         //using the stepTransform matrix from above
@@ -221,6 +228,11 @@ WalkLegsTuple StepGenerator::tick_legs(){
         swingingStepSource_f  =
             shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
                                       last_hyp_angle,supportStep_s));
+
+        cout <<endl
+             << "Support_f        " << *supportStep_f <<endl
+             << "swinging_f       " << *swingingStep_f <<endl
+             << "swingingSource_f " << *swingingStepSource_f <<endl<<endl;
     }
 
     //Each frame, we must recalculate the location of the center of mass

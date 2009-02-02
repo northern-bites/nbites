@@ -48,3 +48,16 @@ points(dat$time,dat$zmp_y,type="l",col=4)
 points(dat$time,dat$real_com_y,type="l",col=5)
 legend("top",lwd=2,legend=names,col=cols)
 dev.off()
+
+
+
+pdf(paste(name,"-xy",PDF,sep=""))
+plot(dat$com_x,dat$com_y,pch="",main="",xlab="s",ylab="mm")
+names = c("com","pre","zmp")
+cols = c("2","3","4")
+
+points(dat$com_x,dat$com_y,type="l",col=2)
+points(dat$pre_x,dat$pre_y,type="l",col=3)
+points(dat$zmp_x,dat$zmp_y,type="l",col=4)
+legend("top",lwd=2,legend=names,col=cols)
+dev.off()

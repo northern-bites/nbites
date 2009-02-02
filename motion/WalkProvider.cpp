@@ -7,8 +7,8 @@ WalkProvider::WalkProvider(Sensors *s)
       sensors(s),
       walkParameters(.02f,         // motion frame length - FIXME constant
                      310.0f,       // COM height
-                     20.0f,        // hipOffsetX
-                     .50f,        // stepDuration
+                     0.0f,        // hipOffsetX
+                     6.50f,        // stepDuration
                      0.1f,         // fraction in double support mode
                      17.0f,        // stepHeight
                      0.0f,         // footLengthX
