@@ -6,11 +6,25 @@ import TOOL.TOOL;
 import TOOL.Vision.Vision;
 import TOOL.Vision.TOOLVisionLink;
 import TOOL.Vision.Ball;
+import TOOL.Vision.VisualFieldObject;
 import TOOL.Image.TOOLImage;
 import TOOL.Image.ImageOverlay;
 import TOOL.Image.ProcessedImage;
 import TOOL.Image.ColorTable;
-import TOOL.Data.*;
+
+/**
+ * Class VisionState
+ * 
+ * it holds all the vision detection stuff - the thresholded image, the ball etc
+ * it updates all the stuff when things are changed in calibrate (e.g. colorTable)
+ * by calling the processImage function, and then getting all the objects from the visionLink
+ * and drawing them
+ *
+ * @see Calibrate.java
+ * @see TOOLVisionLink.java
+ * 
+ * @author modified Octavian Neamtu 2009
+ */
 
 public class VisionState {
     
@@ -25,7 +39,7 @@ public class VisionState {
     private ColorTable  colorTable;
   
     //objects
-    private Vector<FieldObject> objects;
+    private Vector<VisualFieldObject> objects;
     private Ball ball;
 
     //gets the image from the data frame, inits colortable
@@ -35,8 +49,7 @@ public class VisionState {
         colorTable = c;
 	
 	//init the objects
-	objects = new Vector<FieldObject>();
-        ball = new Ball();
+	objects = new Vector<VisualFieldObject>();
 
         if (rawImage != null && colorTable != null)  {
 	    thresholdedImage = new ProcessedImage(rawImage, colorTable, this);
