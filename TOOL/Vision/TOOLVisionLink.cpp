@@ -6,7 +6,7 @@
  * @author Mark McGranagan
  *
  * @date November 2008
- */
+**/
 
 #include <jni.h>
 
@@ -131,8 +131,13 @@ extern "C" {
     
 	//get the method ID for the ball setter
 	jmethodID setBallInfo = env->GetMethodID(javaClass, "setBallInfo", "(DDII)V");
-	env->CallVoidMethod(jobj, setBallInfo, vision.ball->getWidth(), vision.ball->getHeight(), 
-			    vision.ball->getX(), vision.ball->getY());
+	env->CallVoidMethod(jobj, setBallInfo, 
+			    vision.ball->getWidth(), vision.ball->getHeight(), 
+			    vision.ball->getX(), vision.ball->getY(),
+			    vision.ball->getCenterX(), vision.ball->getCenterY(),
+			    vision.ball->getRadius());
+	
+ 
 	
 	//copy results from vision thresholded to the array passed in from java
         //we access to each row in the java array, and copy in from cpp thresholded

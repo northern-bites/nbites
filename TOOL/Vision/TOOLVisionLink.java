@@ -125,10 +125,14 @@ public class TOOLVisionLink {
 
     }
     //sets the ball variables
-    public void setBallInfo(double width, double height, int x, int y) {
+    public void setBallInfo(double width, double height, int x, int y,
+			    int centerX, int centerY, double radius) {
 	ball.setWidth(width);
 	ball.setHeight(height);
 	ball.setX(x);
 	ball.setY(y);
+	ball.setCenterX(centerX);
+	ball.setCenterY(centerY);
+	ball.setRadius(radius);
     }
 }
