@@ -103,6 +103,8 @@ public:
     void setWalkVector(const float _x, const float _y, const float _theta);
 
 private: // Helper methods
+    void swapSupportLegs();
+
     void generateStep(float _x,float _y,
                       float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );

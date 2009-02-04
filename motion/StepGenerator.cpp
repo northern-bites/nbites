@@ -123,69 +123,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
     if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
-
-        unsigned int numCurrentSteps = currentZMPDSteps.size();
-        unsigned int numFutureSteps  = futureSteps.size();
-
-        if (numCurrentSteps  + numFutureSteps < MIN_NUM_ENQUEUED_STEPS)
-            throw "Insufficient steps";
-
-        //there are three elements in the list, pop the obsolete one
-        //(currently use last step to determine when to stop, hackish-ish)
-        //and the first step is the support one now, the second the swing
-        lastStep_s = *currentZMPDSteps.begin();
-        currentZMPDSteps.pop_front();
-        swingingStep_s  = *(++currentZMPDSteps.begin());
-        supportStep_s   =  *currentZMPDSteps.begin();
-
-        //update the translation matrix between i and f coord. frames
-        ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
-        if_Transform = prod(stepTransform,if_Transform);
-        static int ifcount = 0;
-
-        //Express the  destination  and source for the supporting foot and
-        //swinging foots locations in f coord. Since the supporting foot doesn't
-        //move, we ignore its source.
-
-        //First, do the support foot, which is always at the origin
-        const ufvector3 origin = CoordFrame3D::vector3D(0,0);
-        const ufvector3 supp_pos_f = origin;
-
-        //Second, do the source of the swinging leg, which can be calculated
-        //using the stepTransform matrix from above
-        ufvector3 swing_src_f = prod(stepTransform,origin);
-
-        //Third, do the dest. of the swinging leg, which is more complicated
-        //We get the translation matrix that takes points in next f-type
-        //coordinate frame, namely the one that will be centered at the swinging
-        //foot's destination, and puts them into the current f coord. frame
-        const ufmatrix3 swing_reverse_trans =
-            get_f_fprime(swingingStep_s);
-        //This gives us the position of the swinging foot's destination
-        //in the current f frame
-        const ufvector3 swing_pos_f = prod(swing_reverse_trans,
-                                           origin);
-
-        //finally, we need to know how much turning there will be. Turns out,
-        //we can simply read this out of the aforementioned translation matr.
-        //this only works because its a 3D homog. coord matr - 4D would break
-        float swing_dest_angle = -asin(swing_reverse_trans(1,0));
-
-        //we use the swinging source to calc. a path for the swinging foot
-        //it is not clear now if we will need to angle offset or what
-        float swing_src_angle = -asin(stepTransform(1,0));
-
-        //in the F coordinate frames, we express Steps representing
-        // the three footholds from above
-        supportStep_f =
-            shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
-                                      0.0f,supportStep_s));
-        swingingStep_f =
-            shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
-                                      swing_dest_angle,swingingStep_s));
-        swingingStepSource_f  =
-            shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
-                                      swing_src_angle,lastStep_s));
+        swapSupportLegs();
     }
 
     //hack-ish for now to do hyp pitch crap
@@ -235,6 +173,71 @@ WalkLegsTuple StepGenerator::tick_legs(){
     debugLogging();
 
     return WalkLegsTuple(left,right);
+}
+
+
+void StepGenerator::swapSupportLegs(){
+
+        if (currentZMPDSteps.size() +  futureSteps.size() <
+            MIN_NUM_ENQUEUED_STEPS)
+            throw "Insufficient steps";
+
+        //there are three elements in the list, pop the obsolete one
+        //(currently use last step to determine when to stop, hackish-ish)
+        //and the first step is the support one now, the second the swing
+        lastStep_s = *currentZMPDSteps.begin();
+        currentZMPDSteps.pop_front();
+        swingingStep_s  = *(++currentZMPDSteps.begin());
+        supportStep_s   =  *currentZMPDSteps.begin();
+
+        //update the translation matrix between i and f coord. frames
+        ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
+        if_Transform = prod(stepTransform,if_Transform);
+
+        //Express the  destination  and source for the supporting foot and
+        //swinging foots locations in f coord. Since the supporting foot doesn't
+        //move, we ignore its source.
+
+        //First, do the support foot, which is always at the origin
+        const ufvector3 origin = CoordFrame3D::vector3D(0,0);
+        const ufvector3 supp_pos_f = origin;
+
+        //Second, do the source of the swinging leg, which can be calculated
+        //using the stepTransform matrix from above
+        ufvector3 swing_src_f = prod(stepTransform,origin);
+
+        //Third, do the dest. of the swinging leg, which is more complicated
+        //We get the translation matrix that takes points in next f-type
+        //coordinate frame, namely the one that will be centered at the swinging
+        //foot's destination, and puts them into the current f coord. frame
+        const ufmatrix3 swing_reverse_trans =
+            get_f_fprime(swingingStep_s);
+        //This gives us the position of the swinging foot's destination
+        //in the current f frame
+        const ufvector3 swing_pos_f = prod(swing_reverse_trans,
+                                           origin);
+
+        //finally, we need to know how much turning there will be. Turns out,
+        //we can simply read this out of the aforementioned translation matr.
+        //this only works because its a 3D homog. coord matr - 4D would break
+        float swing_dest_angle = -asin(swing_reverse_trans(1,0));
+
+        //we use the swinging source to calc. a path for the swinging foot
+        //it is not clear now if we will need to angle offset or what
+        float swing_src_angle = -asin(stepTransform(1,0));
+
+        //in the F coordinate frames, we express Steps representing
+        // the three footholds from above
+        supportStep_f =
+            shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
+                                      0.0f,supportStep_s));
+        swingingStep_f =
+            shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
+                                      swing_dest_angle,swingingStep_s));
+        swingingStepSource_f  =
+            shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
+                                      swing_src_angle,lastStep_s));
+
 }
 
 void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
