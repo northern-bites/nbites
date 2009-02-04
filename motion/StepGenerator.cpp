@@ -25,8 +25,9 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(20.0f,0.0f,0.0f); // for testing purposes. The function doesn't even
-    // honor the parameters passed to it yet
+
+    //hack
+    setWalkVector(0.0f,20.0f,0.0f);
 }
 StepGenerator::~StepGenerator(){
 #ifdef DEBUG_CONTROLLER_COM
@@ -58,12 +59,14 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
 
+            //HACK
             fc++;
             if(fc == 6){
                 //Change the x vector to be moving forward
                 x -=10;
                 y +=5 ;
                 theta += M_PI/12;
+                x =y=theta=0;
             }else if (fc == 12){
                 //Change the x vector to be moving forward
                 x =y=theta=0;
@@ -99,38 +102,6 @@ void StepGenerator::tick_controller(){
     const float com_y = controller_y->tick(zmp_ref.get<1>());
     com_i = CoordFrame3D::vector3D(com_x,com_y);
 
-
-#ifdef DEBUG_CONTROLLER_COM
-    float pre_x = zmp_ref.get<0>()->front();
-    float pre_y = zmp_ref.get<1>()->front();
-    float zmp_x = controller_x->getZMP();
-    float zmp_y = controller_y->getZMP();
-
-    vector<float> bodyAngles = sensors->getBodyAngles();
-    float lleg_angles[LEG_JOINTS],rleg_angles[LEG_JOINTS];
-    int bi = HEAD_JOINTS+ARM_JOINTS;
-    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
-        lleg_angles[i] = bodyAngles[bi];
-    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
-        rleg_angles[i] = bodyAngles[bi];
-
-    //pick the supporting leg to decide how to calc. actual com pos
-    //Currently hacked pretty heavily, and only the Y actually works
-    //need to apply some coord. translations for this to actually work
-    //also, beware of the time delay between sent commands and the robot
-    ufvector3 leg_dest = Kinematics::forwardKinematics(LLEG_CHAIN,
-                                                       lleg_angles);
-    (leftLeg.stateIsDoubleSupport()?
-     LLEG_CHAIN: RLEG_CHAIN);
-    float real_com_x = leg_dest(0);
-    float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
-    //printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
-    static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\t%f\t%f\t%d\n",
-            ttime,com_x,com_y,pre_x,pre_y,zmp_x,zmp_y,
-            real_com_x,real_com_y,leftLeg.getSupportMode());
-    ttime += 0.02f;
-#endif
 }
 
 /** Central method for moving the walking legs. It handles important stuff like:
@@ -260,6 +231,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
        && lastStep_s->type == END_STEP){
         _done = true;
     }
+
+    debugLogging();
 
     return WalkLegsTuple(left,right);
 }
@@ -654,4 +627,42 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
         prod(CoordFrame3D::translation3D(x,y),
              CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta));
     return prod(trans_sprime_f,trans_f_s);
+}
+
+
+void StepGenerator::debugLogging(){
+
+
+#ifdef DEBUG_CONTROLLER_COM
+    float pre_x = zmp_ref_x.front();
+    float pre_y = zmp_ref_y.front();
+    float zmp_x = controller_x->getZMP();
+    float zmp_y = controller_y->getZMP();
+
+    vector<float> bodyAngles = sensors->getBodyAngles();
+    float lleg_angles[LEG_JOINTS],rleg_angles[LEG_JOINTS];
+    int bi = HEAD_JOINTS+ARM_JOINTS;
+    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
+        lleg_angles[i] = bodyAngles[bi];
+    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
+        rleg_angles[i] = bodyAngles[bi];
+
+    //pick the supporting leg to decide how to calc. actual com pos
+    //Currently hacked pretty heavily, and only the Y actually works
+    //need to apply some coord. translations for this to actually work
+    //also, beware of the time delay between sent commands and the robot
+    ufvector3 leg_dest = Kinematics::forwardKinematics(LLEG_CHAIN,
+                                                       lleg_angles);
+    (leftLeg.stateIsDoubleSupport()?
+     LLEG_CHAIN: RLEG_CHAIN);
+    float real_com_x = leg_dest(0);
+    float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
+    //printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
+    static float ttime = 0;
+    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\t%f\t%f\t%d\n",
+            ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
+            real_com_x,real_com_y,leftLeg.getSupportMode());
+    ttime += 0.02f;
+#endif
+
 }
