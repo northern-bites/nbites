@@ -237,7 +237,7 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
     d_hat = sqrt( (pt.x - x_t.x)*(pt.x - x_t.x) +
                   (pt.y - x_t.y)*(pt.y - x_t.y));
     // Expected bearing
-    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) + x_t.h - QUART_CIRC_RAD;
+    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h - QUART_CIRC_RAD;
 
     // Calculate residuals
     r_d = z.getVisDistance() - d_hat;

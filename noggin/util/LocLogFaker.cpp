@@ -134,15 +134,17 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
     vector<Observation> Z_t;
     // Get half of the nao FOV converted to radians
     float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f;
-
-    // Check concrete field objects
+    // Measurements between robot position and seen object
+    float deltaX, deltaY;
     // required measurements for the added observation
     float visDist, visBearing, sigmaD, sigmaB;
+
+    // Check concrete field objects
     for(int i = 0; i < ConcreteFieldObject::NUM_FIELD_OBJECTS; ++i) {
         const ConcreteFieldObject* toView = ConcreteFieldObject::
             concreteFieldObjectList[i];
-        float deltaX = toView->getFieldX() - myPos.x;
-        float deltaY = toView->getFieldY() - myPos.y;
+        deltaX = toView->getFieldX() - myPos.x;
+        deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
         visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
                                 - (M_PI / 2.0f));
@@ -152,9 +154,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
-            //visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
+            visDist += sigmaD*UNIFORM_1_NEG_1;
             sigmaB = getBearingSD(visBearing);
-            //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
+            visBearing += sigmaB*UNIFORM_1_NEG_1;
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -192,7 +194,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         // Check if the object is viewable
         if ((visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) &&
             visDist < CORNER_MAX_VIEW_RANGE) {
-            // cout << "Observed landmark: " << toView->getID() << endl;
 
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
@@ -278,7 +279,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             }
             // Build the observation
             Observation seen(vc);
-            //cout << "Look at the corner id " << seen.getID() << endl;
             Z_t.push_back(seen);
         }
     }
@@ -315,6 +315,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
     // Build NavMoves from the remaining lines
     while (!inputFile->eof()) {
         *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR >> time;
+        motion.deltaR *= DEG_TO_RAD;
         letsGo->myMoves.push_back(NavMove(motion, time));
     }
 }
@@ -409,7 +410,7 @@ float subPIAngle(float theta)
  */
 float getDistSD(float distance)
 {
-    return distance * 0.15;
+    return distance * 0.175 + 2;
 }
 
 /**
@@ -417,5 +418,5 @@ float getDistSD(float distance)
  */
 float getBearingSD(float bearing)
 {
-    return bearing*0.12;
+    return bearing*0.20 + M_PI / 4.0;
 }
