@@ -110,7 +110,7 @@ void StepGenerator::tick_controller(){
     est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/G)*accel_i(0);
     est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/G)*accel_i(1);
 
-    cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
+    //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
