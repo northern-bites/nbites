@@ -24,20 +24,13 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
-#ifdef DEBUG_COM_F
-    com_f_log = fopen("/tmp/com_f_log.xls","w");
-    fprintf(com_f_log,"time\tcom_f_x\tcom_f_y\tstate\n");
-#endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(45.0f,0.0f,0.0f); // for testing purposes. The function doesn't even
+    setWalkVector(50.0f,0.0f,0.0f); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
 #ifdef DEBUG_CONTROLLER_COM
     fclose(com_log);
-#endif
-#ifdef DEBUG_COM_F
-    fclose(com_f_log);
 #endif
     delete controller_x; delete controller_y;
 
@@ -66,8 +59,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 15){
-                //cout << "STOP MOVING FORWARD!!"<<endl;
+            if(fc == 26){
                 //Change the x vector to be moving forward
                 x =0;
                 y = 0;
@@ -81,7 +73,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
         }
         else {
             shared_ptr<Step> nextStep = futureSteps.front();
-            //cout << "Moving a step from future to current foot: "<<nextStep->foot<<endl;
             fillZMP(nextStep);
 
             //transfer the nextStep element from future to current list
@@ -104,7 +95,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
 void StepGenerator::tick_controller(){
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
-    //std::cout<< "zmp y: " << zmp_ref->front() << endl;
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 
     const float com_x = controller_x->tick(zmp_ref.get<0>());
@@ -238,13 +228,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //of the controller (in tick_controller() )
     ufvector3 com_f = prod(if_Transform,com_i);
 
-#ifdef DEBUG_COM_F
-    static float ftime = 0;
-    fprintf(com_f_log,"%f\t%f\t%f\t%d\n",
-            ftime,com_f(0),com_f(1),leftLeg.getSupportMode());
-    ftime += 0.02f;
-#endif
-
     //We want to get the incremental rotation of the center of mass
     //we need to ask one of the walking legs to give it:
     const float body_rot_angle_fc = leftLeg.getFootRotation()/2; //relative to f
@@ -274,10 +257,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
     vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         swingingStep_f,fc_Transform);
 
-    //check to see if we are done
+    //HACK check to see if we are done
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
        && lastStep_s->type == END_STEP){
-        //cout << "DONE WALKING"<<endl;
         _done = true;
     }
 
@@ -339,17 +321,9 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
         CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX - X_ZMP_FOOT_LENGTH,
                                newSupportStep->y + sign*Y_ZMP_OFFSET);
 
-//      std::cout << "start_s_x: " << start_s(0)
-//                << " mid_s_x: "  << mid_s(0)
-//                << " end_s_x: "  << end_s(0) << std::endl;
-
     const ufvector3 start_i = prod(si_Transform,start_s);
     const ufvector3 mid_i = prod(si_Transform,mid_s);
     const ufvector3 end_i = prod(si_Transform,end_s);
-
-//     std::cout << "start_i_x: " << start_i(0)
-//               << " mid_i_x: "  << mid_i(0)
-//               << " end_i_x: "  << end_i(0) << std::endl;
 
     //Now, we interpolate between the three points. The line between
     //start and mid is double support, and the line between mid and end
@@ -368,11 +342,6 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
             walkParams->dblSupInactivePercentage/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
         walkParams->doubleSupportFrames - halfNumDSChops*2;
-
-//     cout << "Double support split like: " << endl
-//          << "  static: " << halfNumDSChops<< endl
-//          << "  moving: " << numDMChops<< endl
-//          << "  static: " << halfNumDSChops<< endl;
 
     //Phase 1) - stay at start_i
     for(int i = 0; i< halfNumDSChops; i++){
@@ -413,10 +382,6 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
     //store the end of the zmp in the next s frame:
     last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
-
-    //Debugging
-    static int sicount = 0;
-    //cout << "SI ("<<sicount++<<"): "<<si_Transform<<endl;
 }
 
 void
@@ -448,12 +413,10 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
 
-    //we also need to forget about any zmp values from before.
+    //TODO we also need to forget about any zmp values from before.
     //WE should do this on ending, not on starting - what if we switch gaits?
     //zmp_ref_x.clear();
     //zmp_ref_y.clear();
-
-    //cout << "Initial ZMPd Steps: " << zmp_ref_x.size()<<endl;
 
     if(_y > 0 || _theta > 0)
         startLeft();
@@ -606,7 +569,6 @@ void StepGenerator::generateStep( float _x,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
-    //cout << "NEW STEP with x="<<_x<<endl;
 
     futureSteps.push_back(step);
     lastQueuedStep = step;

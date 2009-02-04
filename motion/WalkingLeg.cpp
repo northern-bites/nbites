@@ -47,8 +47,6 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
                                 boost::shared_ptr<Step> _swing_dest,
                                 ufmatrix3 fc_Transform){
-    //cout << "In leg" << chainID << " got target (" x
-    //     << dest_x << "," <<dest_y << ")" <<endl;
     cur_dest = step;
     swing_src = _swing_src;
     swing_dest = _swing_dest;
@@ -57,8 +55,6 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
     //ufvector3 dest_c = prod(fc_Transform,dest_f);
     //float dest_x = dest_c(0);
     //float dest_y = dest_c(1);
-    //cout << "FC Transform" << fc_Transform <<endl;
-    //cout <<"Dest_c: " << dest_f<<endl;
     vector<float> result(6);
     switch(state){
     case SUPPORTING:
@@ -68,7 +64,7 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
         if(step->type == REGULAR_STEP)
             result  =  swinging(fc_Transform);
         else{
-            //cout << "It's an Irregular step, so we are not swinging:" <<endl;
+            // It's an Irregular step, so we are not swinging
             result = supporting(fc_Transform);
         }
         break;
@@ -98,10 +94,8 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
 }
 
 
-vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){//(float dest_x, float dest_y) {
+vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
-
-
     ufvector3 src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
 
 
@@ -115,13 +109,8 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){//(float dest_x, flo
     static float dist_to_cover_y = 0;
 
      if(firstFrame()){
-         //cout << "Current destination " << cur_dest->x<< ","<<cur_dest->y << endl;
-         //cout << "Last destination " << swing_src->x<< ","<<swing_src->y << endl;
          dist_to_cover_x = cur_dest->x - swing_src->x;
          dist_to_cover_y = cur_dest->y - swing_src->y;
-
-         //cout <<"Distance to cover x"<<dist_to_cover_x<<endl;
-         //cout <<"Distance to cover y"<<dist_to_cover_y<<endl;
      }
 
 
@@ -135,19 +124,13 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){//(float dest_x, flo
     float theta = percent_complete*2.0f*M_PI;
     float stepHeight = walkParams->stepHeight;
     float percent_to_dest_horizontal = cycloidx(theta)/(2.0f*M_PI);
-//     cout << "Frame counter " << frameCounter
-//          << "Percent to dest " << percent_to_dest_horizontal
-//          << " cycloidx " << cycloidx(theta) <<endl;
 
-    //cout <<"Percent incomplete" << percent_incomplete <<endl;
-    //cout << "percent complete" << percent_complete<<endl;
     //Then we can express the destination as the proportionate distance to cover
     float dest_x = src_f(0) + percent_to_dest_horizontal*dist_to_cover_x;
     float dest_y = src_f(1) + percent_to_dest_horizontal*dist_to_cover_y;
 
 
     ufvector3 target_f = CoordFrame3D::vector3D(dest_x,dest_y);
-    //cout << "New Dest (x,y) "<<dest_x <<","<<dest_y <<endl;
     ufvector3 target_c = prod(fc_Transform, target_f);
 
     float target_c_x = target_c(0);
@@ -246,7 +229,7 @@ const float WalkingLeg::getHipHack(){
     //When we are starting and stopping we have no hip hack
     //since the foot is never lifted in this instance
     if(swing_dest->type != REGULAR_STEP){
-        //cout << "Supporting step is irregular, returning 0 hip hack" <<endl;
+        // Supporting step is irregular, returning 0 hip hack
         return 0.0f;
     }
 
@@ -256,8 +239,7 @@ const float WalkingLeg::getHipHack(){
     }else if(state == SWINGING){
         hack_chain = getOtherLegChainID();
     }else{
-        //cout << "This step is double support, returning 0 hip hack"
-        //     << " leg: "<<chainID<<endl;
+        // This step is double support, returning 0 hip hack
         return 0.0f;
     }
 
@@ -298,8 +280,6 @@ const float WalkingLeg::getHipHack(){
 
     //we've calcuated the correct magnitude, but need to adjust for specific
     //hip motor angle direction in this leg
-    //cout << "returning" <<leg_sign*hr_offset 
-    //     << " leg: "<< chainID <<endl;
     return leg_sign*hr_offset;
 }
 
