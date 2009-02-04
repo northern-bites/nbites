@@ -6,6 +6,7 @@ using boost::shared_ptr;
 StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     : x(0.0f), y(0.0f), theta(0.0f),
       _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+      est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
       zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
       currentZMPDSteps(),
       si_Transform(CoordFrame3D::identity3D()),
@@ -22,7 +23,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
-    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
+    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
 
@@ -95,6 +96,22 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 }
 
 void StepGenerator::tick_controller(){
+    #define G 9.81
+    Inertial inertial = sensors->getInertial();
+
+    ufvector3 accel_c = CoordFrame3D::vector3D(inertial.accX,inertial.accY);
+    float angle_fc = asin(fc_Transform(1,0));
+    float angle_if = asin(if_Transform(1,0));
+    float tot_angle = -(angle_fc+angle_if);
+    ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+                                                      tot_angle),
+                            accel_c);
+
+    est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/G)*accel_i(0);
+    est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/G)*accel_i(1);
+
+    cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
+
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 
@@ -662,8 +679,9 @@ void StepGenerator::debugLogging(){
     float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
     //printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
     static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t\%f\t%f\t%f\t%f\t%f\t%d\n",
+    fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
             ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
+            est_zmp_i(0),est_zmp_i(1),
             real_com_x,real_com_y,leftLeg.getSupportMode());
     ttime += 0.02f;
 #endif

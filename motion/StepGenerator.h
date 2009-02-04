@@ -133,7 +133,7 @@ private:
 
     bool _done;
 
-    ufvector3 com_i;
+    ufvector3 com_i,est_zmp_i;
     //ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     list<float> zmp_ref_x, zmp_ref_y;
