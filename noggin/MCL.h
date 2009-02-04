@@ -116,7 +116,7 @@ public:
 
     // Core Functions
     void updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
-                            bool resample);
+                            bool resample=true);
 
     // Getters
     PoseEst getCurrentEstimate() { return curEst; }

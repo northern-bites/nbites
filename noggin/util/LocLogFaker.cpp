@@ -1,7 +1,15 @@
 /* LocLogFaker.cpp */
 
 /**
- * Format of the log file:
+ * Format of the navigation input file (*.nav):
+ *
+ * START POSITION LINE
+ * x-value y-value heading-value
+ *
+ * NAVIGATION LINES
+ * deltaForward deltaLateral deltaRotation
+ *
+ * Format of the log output file (*.mcl):
  *
  * PARTICLE INFO
  * x y h weight (for M particles)
@@ -23,62 +31,94 @@
  */
 #include "LocLogFaker.h"
 
-int main()
+using namespace std;
+
+int main(int argc, char** argv)
 {
-    // TODO: Make this read a text file
+    // Information needed for the main method
     // Make navPath
     NavPath letsGo;
-    letsGo.startPos = PoseEst(200.0f,300.2f,0.0f);
-    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
-                                     200));
-    letsGo.myMoves.push_back(NavMove(MotionModel(2.0f,0.0f,0.0f),
-                                     100));
-    letsGo.myMoves.push_back(NavMove(MotionModel(-2.0f,0.0f,0.0f),
-                                     200));
-    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,3.0f,0.0f),
-                                     100));
-    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,-3.0f,0.0f),
-                                     125));
-    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,-0.0314f),
-                                     300));
-    letsGo.myMoves.push_back(NavMove(MotionModel(0.0f,0.0f,0.0f),
-                                     200));
-
-    // Information needed for the main method
-    PoseEst currentPose = letsGo.startPos;
-    MCL *myLoc = new MCL;
-    vector<Observation> Z_t;
-    team_color = "0";
-    player_number = "3";
-
-    // Setup output file
+    // IO Variables
+    fstream inputFile;
     fstream outputFile;
-    string outfileName = "FAKELOG.mcl";
-    outputFile.open(outfileName.c_str(), ios::out);
-    MotionModel noMove(0.0,0.0,0.0);
-    printOutLogLine(&outputFile, myLoc, Z_t, noMove);
-    bool resample = true;
-    // Iterate through the moves
-    for(unsigned int i = 0; i < letsGo.myMoves.size(); ++i) {
-        // Continue the move for as long as specified
-        for (int j = 0; j < letsGo.myMoves[i].time; ++j) {
-            currentPose += letsGo.myMoves[i].move;
-            if ( (i+j) % RESAMPLE_RATE == 0) {
-                resample = true;
-                // cout << "Resample set to true" << endl;
-            } else {
-                resample = false;
-                // cout << "Resample set to false" << endl;
-            }
-            Z_t = determineObservedLandmarks(currentPose,0.0);
-            myLoc->updateLocalization(letsGo.myMoves[i].move,Z_t, resample);
-            printOutLogLine(&outputFile, myLoc, Z_t, letsGo.myMoves[i].move);
-        }
+
+    /* Test for the correct number of CLI arguments */
+    if(argc < 2 || argc > 3) {
+        fprintf(stderr, "usage: %s input-file [output-file]\n",
+                argv[0]);
+        return 1;
     }
+    try {
+        inputFile.open(argv[1], ios::in);
+
+    } catch (const exception& e) {
+        cout << "Failed to open input file" << argv[1] << endl;
+        return 1;
+    }
+
+    // Get the info from the file
+    readInputFile(&inputFile, &letsGo);
+
+    // Clost the file
+    inputFile.close();
+
+    // Open output file
+    if(argc > 2) { // If an output file is specified
+        outputFile.open(argv[2], ios::out);
+    } else { // Otherwise use the default
+        outputFile.open(DEFAULT_OUTFILE_NAME.c_str(), ios::out);
+    }
+
+    // Iterate through the path
+    iteratePath(&outputFile, &letsGo);
+
+    // Close the output file
+    outputFile.close();
 
     return 0;
 }
 
+/**
+ * Method to iterate through a robot path and write the localization info.
+ *
+ * @param outputFile The file to have everything printed to
+ * @param letsGo The robot path from which to localize
+ */
+void iteratePath(fstream * outputFile, NavPath * letsGo)
+{
+    // Method variables
+    vector<Observation> Z_t;
+    MCL *myLoc = new MCL;
+    PoseEst currentPose = (*letsGo).startPos;
+    MotionModel *noMove = new MotionModel(0.0, 0.0, 0.0);
+    // Print out starting configuration
+    printOutLogLine(outputFile, myLoc, Z_t, *noMove);
+    delete noMove;
+
+    // Iterate through the moves
+    for(unsigned int i = 0; i < (*letsGo).myMoves.size(); ++i) {
+
+        // Continue the move for as long as specified
+        for (int j = 0; j < (*letsGo).myMoves[i].time; ++j) {
+            currentPose += (*letsGo).myMoves[i].move;
+            Z_t = determineObservedLandmarks(currentPose,0.0);
+            myLoc->updateLocalization((*letsGo).myMoves[i].move,Z_t);
+
+            // Print the current frame to file
+            printOutLogLine(outputFile, myLoc, Z_t, (*letsGo).myMoves[i].move);
+        }
+    }
+}
+
+/**
+ * Method to determine which landmarks are viewable given a robot pose on the
+ * field
+ *
+ * @param myPos The current pose of the robot
+ * @param neckYaw The current head yaw of the robot
+ *
+ * @return A vector containing all of the observable landmarks at myPose
+ */
 vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 {
     vector<Observation> Z_t;
@@ -127,8 +167,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
                 fo.setIDCertainty(_SURE);
             }
             Observation seen(fo);
-            // cout << "ID: " << seen.getID() << "\tNumPos: " <<
-            //     seen.getNumPossibilities() << endl;
             Z_t.push_back(seen);
         }
     }
@@ -244,9 +282,39 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 ////////////////////////
 // File I/O           //
 ////////////////////////
+/**
+ * Method to read in a robot path from a formatted file
+ *
+ * @param inputFile The opened file containing the path information
+ * @param letsGo Where the robot path is to be stored
+ * @param currentPose Where the starting
+ */
+void readInputFile(fstream* inputFile, NavPath * letsGo)
+{
+    // Method variables
+    PoseEst p;
+    int time;
+    MotionModel motion;
+
+    // Read the start info from the first line of the file
+    if (!inputFile->eof()) {
+        *inputFile >> p.x >> p.y >> p.h;
+    }
+    // Build NavMoves from the remaining lines
+    while (!inputFile->eof()) {
+        *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR >> time;
+        letsGo->myMoves.push_back(NavMove(motion, time));
+    }
+}
+
 
 /**
  * Prints the input to a log file to be read by the TOOL
+ *
+ * @param outputFile File to write the log line to
+ * @param myLoc Current localization module
+ * @param sightings Vector of landmark observations
+ * @param lastOdo Odometery since previous frame
  */
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                      sightings, MotionModel lastOdo)
@@ -296,6 +364,14 @@ NavMove::NavMove(MotionModel _p, int _t) : move(_p), time(_t)
 {
 };
 
+/**
+ * Returns an equivalent angle to the one passed in with value between positive
+ * and negative pi.
+ *
+ * @param theta The angle to be simplified
+ *
+ * @return The equivalent angle between -pi and pi.
+ */
 float subPIAngle(float theta)
 {
     while( theta > M_PI) {

@@ -47,7 +47,7 @@ MCL::~MCL()
  * @return The set of particles representing the estimate of the current frame.
  */
 void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
-                             bool resample=true)
+                             bool resample)
 {
     // Set the current particles to be of time minus one.
     vector<Particle> X_t_1 = X_t;
