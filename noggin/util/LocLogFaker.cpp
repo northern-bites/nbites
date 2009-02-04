@@ -93,6 +93,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     MCL *myLoc = new MCL;
+    //BallEKF *ballEKF = new BallEKF;
     PoseEst currentPose;
     MotionModel *noMove = new MotionModel(0.0, 0.0, 0.0);
 

@@ -5,9 +5,9 @@
 #include "Ball.h"
 #include "math.h"
 
-Ball::Ball(Vision *vis)
+Ball::Ball()
 {
-    vision = vis; // stores vision class pointer
+    //vision = vis; // stores vision class pointer
     init();
 }
 
@@ -30,10 +30,8 @@ void Ball::init() {
     elevation = 0;
 }
 
-void Ball::setDistance()
+void Ball::setDistance(estimate ball_est)
 {
-    // translate distance estimates to body center
-    estimate ball_est;
     ball_est = vision->pose->bodyEstimate(getCenterX(),getCenterY(),
                                           static_cast<float>(focDist));
     setBearing(ball_est.bearing);

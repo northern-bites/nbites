@@ -6,7 +6,7 @@
 #include "Structs.h"
 
 class Ball; // forward reference
-#include "Vision.h"
+//#include "Vision.h"
 
 // BALL CONSTANTS
 #define BallAt1M         16 // pixel width of objects one meter away.
@@ -15,7 +15,8 @@ class Ball; // forward reference
 
 class Ball {
 public:
-    Ball(Vision *vis);
+    //Ball(Vision *vis);
+    Ball();
     virtual ~Ball() {}
 
     // Ball VOID Functions
@@ -33,7 +34,7 @@ public:
     void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
     void setConfidence(int c) {confidence = c;}
-    void setDistance();
+    void setDistance(estimate ball_est);
     void setX(int x1) {x = x1;}
     void setY(int y1) {y = y1;}
     void setDistanceSD(float _distSD) { distanceSD = _distSD;}
@@ -77,7 +78,7 @@ public:
 
 private:
     // Vision class pointer
-    Vision *vision;
+    //Vision *vision;
 
     /* Best guessed Ball Variables */
     int x, y;

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include "MCL.h"
+#include "BallEKF.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
 
 // Observation parameters
