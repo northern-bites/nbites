@@ -26,7 +26,7 @@ enum Foot {
 
 enum StepType {
     REGULAR_STEP=0,
-    START_STEP,
+    //START_STEP,
     END_STEP,
     //NULL_STEP
 };

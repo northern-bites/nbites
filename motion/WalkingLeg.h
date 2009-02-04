@@ -60,7 +60,8 @@ public:
                         boost::shared_ptr<Step> _suppoting,
                         ufmatrix3 fc_Transform);
 
-    void setSteps(boost::shared_ptr<Step> swing_src,
+    void setSteps(boost::shared_ptr<Step> _swing_src,
+                  boost::shared_ptr<Step> _swing_dest,
                   boost::shared_ptr<Step> _suppoting);
 
     //Hopefully these never need to get called (architecturally).
@@ -111,7 +112,7 @@ private:
     int frameCounter;
 
     //destination attributes
-    boost::shared_ptr<Step> cur_dest, swing_src, swing_dest;
+    boost::shared_ptr<Step> cur_dest, swing_src, swing_dest,support_step;
 
     //Leg Attributes
     ChainID chainID; //keep track of which leg this is

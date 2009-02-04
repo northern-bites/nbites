@@ -6,6 +6,7 @@ WalkingLeg::WalkingLeg(ChainID id,
     :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
      frameCounter(0),
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
+     support_step(EMPTY_STEP),
      chainID(id), walkParams(walkP),
      goal(ufvector3(3)),last_goal(ufvector3(3)),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
@@ -37,9 +38,11 @@ WalkingLeg::~WalkingLeg(){
 }
 
 void WalkingLeg::setSteps(boost::shared_ptr<Step> _swing_src,
-                          boost::shared_ptr<Step> _swing_dest){
+                          boost::shared_ptr<Step> _swing_dest,
+                          boost::shared_ptr<Step> _support_step){
     swing_src = _swing_src;
     swing_dest = _swing_dest;
+    support_step = _support_step;
 }
 
 
@@ -61,7 +64,7 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
         result  = supporting(fc_Transform);
         break;
     case SWINGING:
-        if(step->type == REGULAR_STEP)
+        if(support_step->type == REGULAR_STEP)
             result  =  swinging(fc_Transform);
         else{
             // It's an Irregular step, so we are not swinging
@@ -129,19 +132,11 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
     float dest_x = src_f(0) + percent_to_dest_horizontal*dist_to_cover_x;
     float dest_y = src_f(1) + percent_to_dest_horizontal*dist_to_cover_y;
 
-
     ufvector3 target_f = CoordFrame3D::vector3D(dest_x,dest_y);
     ufvector3 target_c = prod(fc_Transform, target_f);
 
     float target_c_x = target_c(0);
     float target_c_y = target_c(1);
-
-    //ELEVATION PROGRESS:
-    // the swinging leg will follow a trapezoid in 3-d. The trapezoid has
-    // three stages: going up, a level stretch, going back down to the ground
-    static int stage;
-    if (firstFrame()) stage = 0;
-    float x,y;
 
     float radius =walkParams->stepHeight/2;
     float heightOffGround = radius*cycloidy(theta);
@@ -228,7 +223,7 @@ const float WalkingLeg::getHipYawPitch(){
 const float WalkingLeg::getHipHack(){
     //When we are starting and stopping we have no hip hack
     //since the foot is never lifted in this instance
-    if(swing_dest->type != REGULAR_STEP){
+    if(support_step->type != REGULAR_STEP){
         // Supporting step is irregular, returning 0 hip hack
         return 0.0f;
     }

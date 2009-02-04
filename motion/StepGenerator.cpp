@@ -25,7 +25,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(50.0f,0.0f,0.0f); // for testing purposes. The function doesn't even
+    setWalkVector(20.0f,0.0f,0.0f); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -59,17 +59,15 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 26){
+            if(fc == 6){
                 //Change the x vector to be moving forward
-                x =0;
-                y = 0;
-                theta = 0;
+                x -=10;
+                y +=5 ;
+                theta += M_PI/12;
+            }else if (fc == 12){
+                //Change the x vector to be moving forward
+                x =y=theta=0;
             }
-//             else if (fc%5 == 0){
-//                 cout << "MOVE FORWARD!!"<<endl;
-//                 //Change the x vector to be moving forward
-//                 x =5;
-//             }
         }
         else {
             shared_ptr<Step> nextStep = futureSteps.front();
@@ -220,8 +218,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
     }
 
     //hack-ish for now to do hyp pitch crap
-    leftLeg.setSteps(swingingStepSource_f, swingingStep_f);
-    rightLeg.setSteps(swingingStepSource_f, swingingStep_f);
+    leftLeg.setSteps(swingingStepSource_f, swingingStep_f,supportStep_f);
+    rightLeg.setSteps(swingingStepSource_f, swingingStep_f,supportStep_f);
 
     //Each frame, we must recalculate the location of the center of mass
     //relative to the support leg (f coord frame), based on the output
@@ -269,7 +267,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
 void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 
     switch(newSupportStep->type){
-    case START_STEP:
     case REGULAR_STEP:
         fillZMPRegular(newSupportStep);
         break;
@@ -515,11 +512,11 @@ void StepGenerator::generateStep( float _x,
     //  want to start moving, else if are already moving.
     StepType type;
     if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
-        if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
-           (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
-                                 1:-1)*HIP_OFFSET_Y) != 0)
-            type = REGULAR_STEP;
-        else
+//         if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
+//            (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
+//                                  1:-1)*HIP_OFFSET_Y) != 0)
+//             type = REGULAR_STEP;
+//         else
             type = END_STEP;
 
     }else{
@@ -527,13 +524,13 @@ void StepGenerator::generateStep( float _x,
         //we enqued was not an END STEP
         if(lastQueuedStep->type == END_STEP){
             if (lastQueuedStep->zmpd){//too late to change it! make this a start
-                type = START_STEP;
+                type = REGULAR_STEP;
                 _x = 0.0f;
                 _y = 0.0f;
                 _theta = 0.0f;
             }else{
                 type = REGULAR_STEP;
-                lastQueuedStep->type = START_STEP;
+                lastQueuedStep->type = REGULAR_STEP;
             }
         }else{
             //the last step was either start or reg, so we're fine
@@ -570,6 +567,7 @@ void StepGenerator::generateStep( float _x,
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
 
+    cout << "Created new step "<<*step<<endl;
     futureSteps.push_back(step);
     lastQueuedStep = step;
     //switch feet after each step is generated
