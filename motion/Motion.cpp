@@ -9,26 +9,21 @@ using namespace boost;
 #include "SimulatorEnactor.h"
 #include "SimulatorEnactor.h"
 
-#ifdef NAOQI1
-Motion::Motion (ALPtr<ALMotionProxy> _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
-#else
-Motion::Motion (ALMotionProxy * _proxy,shared_ptr<Synchro> _synchro, Sensors *s)
-#endif
-    : Thread(_synchro, "MotionCore"),
-      switchboard(s),
-#ifdef NAOQI1
-    enactor(new ALEnactor(&switchboard,_proxy,s)),
-#else
-      enactor(new SimulatorEnactor(&switchboard)),
-#endif
-      interface(&switchboard)
+Motion::Motion (shared_ptr<Synchro> _synchro, MotionEnactor * _enactor, Sensors *s)
+  : Thread(_synchro, "MotionCore"),
+    switchboard(s),
+    enactor(_enactor),
+    interface(&switchboard)
 {
+  //Setup the callback  in the enactor so it knows to call the switchboard
+  enactor->setSwitchboard(&switchboard);
+
   set_motion_interface(&interface);
   c_init_motion();
 }
 
 Motion::~Motion() {
-    delete enactor;
+    enactor->setSwitchboard(NULL);
 }
 
 int Motion::start() {
@@ -40,16 +35,14 @@ int Motion::start() {
 }
 
 void Motion::stop() {
-    switchboard.stop();
     enactor->stop();
+    switchboard.stop();
     Thread::stop();
 }
 
 void Motion::run(){
     cout <<"Motion::run"<<endl;
-#ifdef NAOQI1
     //Ensure the lastest joint values are ready before we start the switchboard
     enactor->postSensors();
-#endif
     switchboard.run();
 }

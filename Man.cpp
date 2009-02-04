@@ -69,10 +69,11 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
       profiler(&micro_time), sensors(),
 #ifdef USE_MOTION
 #ifdef NAOQI1
-      motion(getParentBroker()->getMotionProxy(),synchro, &sensors),
+      enactor(new ALEnactor(pBroker,&sensors)),
 #else
-      motion(AL::ALMotionProxy::getInstance(),synchro, &sensors),
+      enactor(new SimulatorEnactor(&sensors)),
 #endif
+      motion(synchro, enactor, &sensors),
 #endif
       vision(new NaoPose(&sensors), &profiler),
       comm(synchro, &sensors, &vision),

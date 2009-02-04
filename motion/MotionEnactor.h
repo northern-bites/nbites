@@ -21,8 +21,8 @@
 
 class MotionEnactor {
 public:
-    MotionEnactor(MotionSwitchboard  * _switchboard)
-        : running(false), switchboard(_switchboard){};
+    MotionEnactor()
+        : running(false), switchboard(NULL){};
     virtual ~MotionEnactor() { }
 
     void start() {
@@ -56,6 +56,12 @@ public:
     }
 
     virtual void run() = 0;
+
+    virtual void postSensors() = 0;
+
+    void setSwitchboard(MotionSwitchboard * s){
+        switchboard = s;
+    }
 
 protected:
     bool running;

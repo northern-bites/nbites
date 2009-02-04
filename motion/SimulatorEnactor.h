@@ -7,15 +7,17 @@
 
 class SimulatorEnactor : public MotionEnactor {
 public:
-    SimulatorEnactor(MotionSwitchboard * _switchboard)
-        : MotionEnactor(_switchboard) {};
+    SimulatorEnactor(Sensors * s)
+        : MotionEnactor(),sensors(s) {};
     virtual ~SimulatorEnactor() { };
 
     virtual void run();
 
-    void postSensors();
+    virtual void postSensors();
 
 private:
+    Sensors * sensors;
+
     static const int MOTION_FRAME_RATE = 50;
     static const float MOTION_FRAME_LENGTH_uS = // in microseconds
       // 1 second * 1000 ms/s * 1000 us/ms

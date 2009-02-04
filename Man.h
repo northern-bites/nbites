@@ -45,6 +45,7 @@
 #include "Vision.h"
 #include "Noggin.h"
 #include "Motion.h"
+#include "ALEnactor.h"
 #include "NaoPose.h"
 #include "synchro.h"
 
@@ -154,6 +155,7 @@ public:
     Profiler profiler;
     Sensors sensors;
 #ifdef USE_MOTION
+    MotionEnactor * enactor;
     Motion motion;
 #endif
     Vision vision;

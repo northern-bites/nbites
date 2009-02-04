@@ -27,8 +27,12 @@ void ALEnactor::run() {
     while (running) {
         postSensors();
 
+        if(!switchboard){
+            cout<< "Caution!! Switchboard is null, exiting ALEnactor"<<endl;
+            break;
+        }
         // Get the angles we want to go to this frame from the switchboard
-		vector<float> result = switchboard->getNextJoints();
+        vector<float> result = switchboard->getNextJoints();
 
 #ifdef DEBUG_ENACTOR_JOINTS
  		for (int i=0; i<result.size();i++)

@@ -13,6 +13,10 @@ void SimulatorEnactor::run() {
 
     while (running) {
         postSensors();
+        if(!switchboard){
+            cout<< "Caution!! Switchboard has is null, exiting ALEnactor"<<endl;
+            break;
+        }
         /*
         cout<<"Joints are : [";
         for (unsigned int i=0; i <result.size(); i++){
@@ -46,6 +50,6 @@ void SimulatorEnactor::postSensors(){
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
     vector<float> alAngles = motionProxy->getBodyAngles();
-    //sensors->setBodyAngles(alAngles);
+    sensors->setBodyAngles(alAngles);
 #endif
 }
