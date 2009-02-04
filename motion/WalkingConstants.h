@@ -52,7 +52,6 @@ struct Step{
          const boost::shared_ptr<Step> other)
         : x(new_x),y(new_y), theta(new_theta), duration(other->duration),
           foot(other->foot),type(other->type),zmpd(other->zmpd){}
-
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
             return o << "Step(" << s.x << "," << s.y << "," << s.theta

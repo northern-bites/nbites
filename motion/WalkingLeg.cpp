@@ -26,6 +26,7 @@ WalkingLeg::WalkingLeg(ChainID id,
     for ( unsigned int i = 0 ; i< LEG_JOINTS; i++) lastJoints[i]=0.0f;
 }
 
+
 WalkingLeg::~WalkingLeg(){
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     fclose(locus_log);
@@ -34,6 +35,13 @@ WalkingLeg::~WalkingLeg(){
     fclose(dest_log);
 #endif
 }
+
+void WalkingLeg::setSteps(boost::shared_ptr<Step> _swing_src,
+                          boost::shared_ptr<Step> _swing_dest){
+    swing_src = _swing_src;
+    swing_dest = _swing_dest;
+}
+
 
 vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
@@ -198,10 +206,12 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
 
-
-const float WalkingLeg::getHipYawPitch(){
+/*  Returns the rotation for this motion frame which we expect
+ *  the swinging foot to have relative to the support foot (in the f frame)
+ */
+const float WalkingLeg::getFootRotation(){
     if(state != SUPPORTING && state != SWINGING)
-        return swing_src->theta * 0.5f; //HYP should be half the target angle
+        return swing_src->theta;
 
     const float percent_complete =
         frameCounter/static_cast<float>(walkParams->singleSupportFrames);
@@ -209,15 +219,18 @@ const float WalkingLeg::getHipYawPitch(){
     const float theta = percent_complete*2.0f*M_PI;
     const float percent_to_dest = cycloidx(theta)/(2.0f*M_PI);
 
-    const float end = swing_dest->theta*0.5f;
-    const float start = swing_src->theta*0.5f;
-
-
-    if(end > 0)
-        cout << "WARNING: end is greater than zero in hyp !!"<<endl;
+    const float end = swing_dest->theta;
+    const float start = swing_src->theta;
 
     const float value = start + (end-start)*percent_to_dest;
     return value;
+
+
+}
+
+/* We assume!!! that the rotation of the hip yaw pitch joint should be 1/2*/
+const float WalkingLeg::getHipYawPitch(){
+    return -fabs(getFootRotation()*0.5f);
 }
 
 

@@ -20,7 +20,7 @@ pdf(paste(name,"-x",PDF,sep=""))
 plot(dat$time,dat$goal_x,pch="",main=paste(foot,"leg","x"),xlab="s",ylab="mm")
 names = c("goal_x")
 cols = c("2")
-points(dat$time,dat$goal_x,type="l",col=2)
+points(dat$time,dat$goal_x,type="p",col=2)
 legend("top",lwd=2,legend=names,col=cols)
 zeros = dat$time
 zeros[zeros > -100] =  mean(dat$goal_x,na.rm=T) -1
@@ -33,7 +33,7 @@ pdf(paste(name,"-y",PDF,sep=""))
 plot(dat$time,dat$goal_y,pch="",main=paste(foot,"leg"),xlab="s",ylab="mm")
 names = c("goal_y")
 cols = c("2")
-points(dat$time,dat$goal_y,type="l",col=2)
+points(dat$time,dat$goal_y,type="p",col=2)
 legend("top",lwd=2,legend=names,col=cols)
 zeros = dat$time
 zeros[zeros > -100] =  mean(dat$goal_y,na.rm=T) +10

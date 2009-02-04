@@ -60,6 +60,9 @@ public:
                         boost::shared_ptr<Step> _suppoting,
                         ufmatrix3 fc_Transform);
 
+    void setSteps(boost::shared_ptr<Step> swing_src,
+                  boost::shared_ptr<Step> _suppoting);
+
     //Hopefully these never need to get called (architecturally).
     //Instead, use methods like startLeft, right etc
     //void setSupportMode(SupportMode newMode){setState(newMode);}
@@ -90,7 +93,10 @@ private:
     bool shouldSwitchStates();
     bool firstFrame(){return frameCounter == 0;}
     void debugProcessing();
-
+//hack
+public:
+    const float getFootRotation();
+private:
     const float getHipYawPitch();
     const float getHipHack();
     const float cycloidy(float theta);

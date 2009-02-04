@@ -7,8 +7,8 @@ WalkProvider::WalkProvider(Sensors *s)
       sensors(s),
       walkParameters(.02f,         // motion frame length - FIXME constant
                      310.0f,       // COM height
-                     0.0f,        // hipOffsetX
-                     6.50f,        // stepDuration
+                     20.0f,        // hipOffsetX
+                     0.50f,        // stepDuration
                      0.1f,         // fraction in double support mode
                      17.0f,        // stepHeight
                      0.0f,         // footLengthX
@@ -80,8 +80,8 @@ vector<float> WalkProvider::getWalkStance(){
 
 
     //just assume we start at zero
-    float zeroJoints[LEG_JOINTS] = {0.1f,0.1f,0.1f,
-                                    0.1f,0.1f,0.1f};
+    float zeroJoints[LEG_JOINTS] = {0.0f,0.0f,0.0f,
+                                    0.0f,0.0f,0.0f};
     //Use inverse kinematics to find the left leg angles
     ufvector3 lgoal = ufvector3(3);
     lgoal(0)=-x; lgoal(1) = ly; lgoal(2) = -z;

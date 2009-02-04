@@ -29,7 +29,7 @@ StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
     fprintf(com_f_log,"time\tcom_f_x\tcom_f_y\tstate\n");
 #endif
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-    setWalkVector(0.0f,0.0f,M_PI/18); // for testing purposes. The function doesn't even
+    setWalkVector(45.0f,0.0f,0.0f); // for testing purposes. The function doesn't even
     // honor the parameters passed to it yet
 }
 StepGenerator::~StepGenerator(){
@@ -66,7 +66,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // with the current walk vector
 
             fc++;
-            if(fc == 2){
+            if(fc == 15){
                 //cout << "STOP MOVING FORWARD!!"<<endl;
                 //Change the x vector to be moving forward
                 x =0;
@@ -179,16 +179,10 @@ WalkLegsTuple StepGenerator::tick_legs(){
         swingingStep_s  = *(++currentZMPDSteps.begin());
         supportStep_s   =  *currentZMPDSteps.begin();
 
-        cout << "New support step " <<*supportStep_s<<endl;
-
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
         if_Transform = prod(stepTransform,if_Transform);
         static int ifcount = 0;
-        cout << "stepTransform" <<stepTransform <<endl;
-
-        //cout << "should be identity" <<prod(get_fprime_f(supportStep_s),get_f_fprime(supportStep_s));
-        //cout << "IF("<<ifcount++<<"): " << if_Transform<<endl;
 
         //Express the  destination  and source for the supporting foot and
         //swinging foots locations in f coord. Since the supporting foot doesn't
@@ -197,8 +191,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //First, do the support foot, which is always at the origin
         const ufvector3 origin = CoordFrame3D::vector3D(0,0);
         const ufvector3 supp_pos_f = origin;
-
-        cout << "origin_i in _f"<< prod(if_Transform,origin);
 
         //Second, do the source of the swinging leg, which can be calculated
         //using the stepTransform matrix from above
@@ -214,15 +206,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
         //in the current f frame
         const ufvector3 swing_pos_f = prod(swing_reverse_trans,
                                            origin);
+
         //finally, we need to know how much turning there will be. Turns out,
         //we can simply read this out of the aforementioned translation matr.
-        //but, it will be twice the max. angle we send to HYP joint
         //this only works because its a 3D homog. coord matr - 4D would break
-        float hyp_angle = -acos(swing_reverse_trans(0,0));//*0.5f;
+        float swing_dest_angle = -asin(swing_reverse_trans(1,0));
 
         //we use the swinging source to calc. a path for the swinging foot
         //it is not clear now if we will need to angle offset or what
-        float last_hyp_angle = -acos(stepTransform(0,0));//*0.5f;
+        float swing_src_angle = -asin(stepTransform(1,0));
 
         //in the F coordinate frames, we express Steps representing
         // the three footholds from above
@@ -231,16 +223,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                       0.0f,supportStep_s));
         swingingStep_f =
             shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
-                                      hyp_angle,swingingStep_s));
+                                      swing_dest_angle,swingingStep_s));
         swingingStepSource_f  =
             shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
-                                      last_hyp_angle,supportStep_s));
-
-        cout <<endl
-             << "Support_f        " << *supportStep_f <<endl
-             << "swinging_f       " << *swingingStep_f <<endl
-             << "swingingSource_f " << *swingingStepSource_f <<endl<<endl;
+                                      swing_src_angle,lastStep_s));
     }
+
+    //hack-ish for now to do hyp pitch crap
+    leftLeg.setSteps(swingingStepSource_f, swingingStep_f);
+    rightLeg.setSteps(swingingStepSource_f, swingingStep_f);
 
     //Each frame, we must recalculate the location of the center of mass
     //relative to the support leg (f coord frame), based on the output
@@ -254,12 +245,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
     ftime += 0.02f;
 #endif
 
-    cout << "com_f" << com_f<< " com_i "<<com_i<<endl;
+    //We want to get the incremental rotation of the center of mass
+    //we need to ask one of the walking legs to give it:
+    const float body_rot_angle_fc = leftLeg.getFootRotation()/2; //relative to f
 
     //Using the location of the com in the f coord frame, we can calculate
     //a transformation matrix to go from f to c
-    fc_Transform = CoordFrame3D::translation3D(-com_f(0),-com_f(1));
-
+    fc_Transform = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+                                                 body_rot_angle_fc),
+                        CoordFrame3D::translation3D(-com_f(0),-com_f(1)));
 
     //Now we need to determine which leg to send the coorect footholds/Steps to
     shared_ptr<Step> leftStep_f,rightStep_f;
