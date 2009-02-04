@@ -97,7 +97,7 @@ static const int TOOL_ACCEPT_LEN = strlen(TOOL_ACCEPT_MSG);
 
 static const long PACKETS_PER_SECOND = 6;
 static const long SLEEP_MILLIS = 5000;
-static const long long MICROS_PER_SECOND = 1000000;
+//static const long long MICROS_PER_SECOND = 1000000; // defined in Common.h
 static const long long MICROS_PER_PACKET = MICROS_PER_SECOND /
                                               PACKETS_PER_SECOND;
 static const long long PACKET_GRACE_PERIOD = 3 * MICROS_PER_SECOND;

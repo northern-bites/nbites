@@ -661,6 +661,30 @@ void Sensors::setUltraSound (const float dist)
     pthread_mutex_unlock (&ultra_sound_mutex);
 }
 
+void Sensors::setSensorsEnMasse (const FSR &_leftFoot, const FSR &_rightFoot,
+                                 const FootBumper &_leftBumper,
+                                 const FootBumper &_rightBumper,
+                                 const Inertial &_inertial,
+                                 const float ultraSound)
+{
+    pthread_mutex_lock(&fsr_mutex);
+    pthread_mutex_lock(&bumper_mutex);
+    pthread_mutex_lock(&inertial_mutex);
+    pthread_mutex_lock(&ultra_sound_mutex);
+
+    leftFootFSR = _leftFoot;
+    rightFootFSR = _rightFoot;
+    leftFootBumper = _leftBumper;
+    rightFootBumper = _rightBumper;
+    inertial = _inertial;
+    ultraSoundDistance = ultraSound;
+
+    pthread_mutex_unlock(&fsr_mutex);
+    pthread_mutex_unlock(&bumper_mutex);
+    pthread_mutex_unlock(&inertial_mutex);
+    pthread_mutex_unlock(&ultra_sound_mutex);
+}
+
 #endif /* ROBOT(NAO) */
 
 void Sensors::lockImage()

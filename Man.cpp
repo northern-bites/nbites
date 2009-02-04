@@ -43,16 +43,6 @@ using boost::shared_ptr;
 //                                     //
 /////////////////////////////////////////
 
-static long long
-micro_time (void)
-{
-    // Needed for microseconds which we convert to milliseconds
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-
-    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
-}
-
 #ifdef NAOQI1
 Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
     : ALModule(pBroker,pName),

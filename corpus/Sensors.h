@@ -150,6 +150,15 @@ class Sensors {
                      const float angleX, const float angleY);
     void setInertial(const Inertial &inertial);
     void setUltraSound(const float dist);
+
+    // We had issues with the setters above because they seem to incur too much
+    // overhead when what we actually want to do is send them all in in bulk.
+    // In this spirit, I am creating a massive ALMemory setter. It includes
+    // a fair number of sensors.
+    void setSensorsEnMasse(const FSR &_leftFoot, const FSR &_rightFoot,
+                           const FootBumper &_leftBumper,
+                           const FootBumper &_rightBumper,
+                           const Inertial &_inertial, const float ultraSound);
 #endif
 
     // special methods

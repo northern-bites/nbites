@@ -24,7 +24,9 @@ void ALEnactor::run() {
     //almotion->gotoChainAngles("RArm",rarm,2.0,INTERPOLATION_LINEAR);
     //cout << "Done with AL motion stuff" << endl;
 
+    //long long currentTime;
     while (running) {
+        //currentTime = micro_time();
         postSensors();
 
         if(!switchboard){
@@ -42,6 +44,8 @@ void ALEnactor::run() {
 #ifndef NO_ACTUAL_MOTION
         almotion->setBodyAngles(result);
 #endif
+
+        //cout << "Time spent in ALEnactor: " << micro_time() - currentTime << endl;
 
         // TODO: This is probably wrong!!!!1!ONE
         // We probably want to sleep webots time and this sleeps real time.
@@ -64,45 +68,52 @@ void ALEnactor::postSensors() {
 
 }
 
+// from George: Forgive me for the variable names, but there are just too
+// many of them to figure out decent names for all. Feel free to change them...
+// they are only used internally in this method.
 void ALEnactor::syncWithALMemory() {
     // FSR update
-    float frontLeft = 0.0f, frontRight = 0.0f,
-        rearLeft = 0.0f, rearRight = 0.0f;
+    // a cap L means for the left foot. a cap R - for the right foot
+    float LfrontLeft = 0.0f, LfrontRight = 0.0f,
+        LrearLeft = 0.0f, LrearRight = 0.0f,
+        RfrontLeft = 0.0f, RfrontRight = 0.0f,
+        RrearLeft = 0.0f, RrearRight = 0.0f;
+
     try {
-        frontLeft = almemory->call<const ALValue>(
+        LfrontLeft = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"), 0);
-        frontRight = almemory->call<const ALValue>(
+        LfrontRight = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"), 0);
-        rearLeft = almemory->call<const ALValue>(
+        LrearLeft = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"), 0);
-        rearRight = almemory->call<const ALValue>(
+        LrearRight = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"), 0);
     } catch(ALError &e) {
         cout << "Failed to read left foot FSR values" << endl;
     }
-    sensors->setLeftFootFSR(frontLeft, frontRight, rearLeft, rearRight);
+    //sensors->setLeftFootFSR(frontLeft, frontRight, rearLeft, rearRight);
 
     try {
-        frontLeft = almemory->call<const ALValue>(
+        RfrontLeft = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"), 0);
-        frontRight = almemory->call<const ALValue>(
+        RfrontRight = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"), 0);
-        rearLeft = almemory->call<const ALValue>(
+        RrearLeft = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"), 0);
-        rearRight = almemory->call<const ALValue>(
+        RrearRight = almemory->call<const ALValue>(
             "getData",string(
                 "Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"), 0);
     } catch(ALError &e) {
         cout << "Failed to read right foot FSR values" << endl;
     }
-    sensors->setRightFootFSR(frontLeft, frontRight, rearLeft, rearRight);
+    //sensors->setRightFootFSR(frontLeft, frontRight, rearLeft, rearRight);
 
     // Foot bumper update
     float leftFootBumperLeft  = 0.0f, leftFootBumperRight  = 0.0f;
@@ -123,8 +134,8 @@ void ALEnactor::syncWithALMemory() {
     } catch(ALError &e) {
         cout << "Failed to read bumper values" <<endl;
     }
-    sensors->setLeftFootBumper(leftFootBumperLeft, leftFootBumperRight);
-    sensors->setRightFootBumper(rightFootBumperLeft, rightFootBumperRight);
+    //sensors->setLeftFootBumper(leftFootBumperLeft, leftFootBumperRight);
+    //sensors->setRightFootBumper(rightFootBumperLeft, rightFootBumperRight);
 
     // Inertial values. This includes, accelerometers, gyros and the angleX,
     // angleY filtered values which denote body tilt.
@@ -156,10 +167,10 @@ void ALEnactor::syncWithALMemory() {
     } catch(ALError &e) {
         cout << "Failed to read inertial unit values" << endl;
     }
-    sensors->setInertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
+    //sensors->setInertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
 
     static int counter = 0;
-    float ultraSoundValue = 0.0f;
+    float ultraSoundDistance = 0.0f;
     // Ultrasound values
     try {
         // This is testing code which sends a new value to the actuator every
@@ -183,7 +194,7 @@ void ALEnactor::syncWithALMemory() {
         if (counter > 20)
             counter = 0;
 
-        ultraSoundValue = almemory->call<const ALValue>(
+        ultraSoundDistance = almemory->call<const ALValue>(
             "getData", string(
                 "Device/SubDeviceList/US/Sensor/Value"), 0);
 
@@ -194,7 +205,15 @@ void ALEnactor::syncWithALMemory() {
     } catch(ALError &e) {
         cout << "Failed to read ultrasound distance values" << endl;
     }
-    sensors->setUltraSound(ultraSoundValue);
+
+    //sensors->setUltraSound(ultraSoundDistance);
+    sensors->
+        setSensorsEnMasse(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
+                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
+                          FootBumper(leftFootBumperLeft, leftFootBumperRight),
+                          FootBumper(rightFootBumperLeft, rightFootBumperRight),
+                          Inertial(accX,accY,accZ,gyrX,gyrY,angleX,angleY),
+                          ultraSoundDistance);
 }
 
 #endif//NAOQI1

@@ -36,7 +36,6 @@ public:
             cout << "Failed to initialize proxy to DCM" << endl;
         }
 
-
     };
     virtual ~ALEnactor() { };
 

@@ -12,8 +12,8 @@
 #include <netdb.h>       // gethostbyname()
 #include <unistd.h>      // close(), usleep()
 #include <fcntl.h>       // fcntl()
-#include <time.h>        // localtime()
-#include <sys/time.h>    // gettimeofday()
+//#include <time.h>        // localtime()
+//#include <sys/time.h>    // gettimeofday()
 #include <sys/utsname.h> // uname()
 #include <cstdio>        // printf(), fread(), popen()
 
@@ -30,17 +30,6 @@
 #define USE_GAMECONTROLLER
 
 using namespace boost;
-
-static long long
-micro_time (void)
-{
-  // Needed for microseconds
-  struct timeval tv;
-
-  gettimeofday(&tv, NULL);
-  return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
-}
-
 
 // Static reference to Python comm module
 
