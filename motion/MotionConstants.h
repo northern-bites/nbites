@@ -1,6 +1,8 @@
 
 #ifndef _MotionConstants_h_DEFINED
 #define _MotionConstants_h_DEFINED
+#include "Kinematics.h"
+
 using namespace Kinematics;
 
 namespace MotionConstants {

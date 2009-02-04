@@ -102,14 +102,10 @@ void MotionSwitchboard::start() {
     fflush(stdout);
 
 // 	headProvider.enqueue(hjc);
-// 	scriptedProvider.enqueue(command);
+
 	nextProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
-
-
-
-// 	scriptedProvider.enqueue(command2);
-//	scriptedProvider.enqueue(command3);
-// 	headProvider.enqueue(hjc2);
+	sendMotionCommand(command3);
+	sendMotionCommand(hjc3);
 // 	headProvider.enqueue(hjc3);
 
     running = true;
@@ -196,7 +192,6 @@ int MotionSwitchboard::processProviders(){
 
 	if (!curProvider->isActive()) {
 		curProvider = nextProvider;
-		setStartGait(curProvider);
 	}
 	//** Alternately, you may choose here:
 	//curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
@@ -321,3 +316,30 @@ void MotionSwitchboard::updateDebugLogs(){
     time += 0.05f;
 }
 #endif
+
+void MotionSwitchboard::sendMotionCommand(MotionCommand *command) {
+	MotionType type = command->getType();
+
+	switch (type) {
+	case WALK:
+		walkProvider.setCommand(command);
+		break;
+	case BODY_JOINT:
+		scriptedProvider.setCommand(command);
+		break;
+	case HEAD_JOINT:
+		headProvider.setCommand(command);
+		break;
+
+	}
+}
+
+void MotionSwitchboard::sendMotionCommands(vector<MotionCommand *> *commands) {
+	vector<MotionCommand*>::iterator i;
+	i = commands->begin();
+	while (i != commands->end() ) {
+		sendMotionCommand(*i);
+	}
+	delete commands;
+}
+

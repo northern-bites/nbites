@@ -1,4 +1,4 @@
-
+ 
 #ifndef _WalkProvider_h_DEFINED
 #define _WalkProvider_h_DEFINED
 
@@ -24,6 +24,7 @@ using namespace std;
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
 #include "StepGenerator.h"
+#include "WalkCommand.h"
 
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 
@@ -39,6 +40,8 @@ public:
     void setMotion(const float x, const float y, const float theta);
 
     vector<float> getWalkStance();
+	void setCommand(MotionCommand* command) { setCommand(reinterpret_cast<WalkCommand*>(command)); }
+	void setCommand(WalkCommand * command) { }
 
 private:
     virtual void setActive();

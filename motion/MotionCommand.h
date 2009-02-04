@@ -7,8 +7,11 @@
  *
  * It's only ability is to keep track of what kind of motion
  * it implements.
+ *
+ * Must be DELETED when passed to a provider!!!
  */
 #include <list>
+#include "MotionConstants.h"
 
 class MotionCommand
 {

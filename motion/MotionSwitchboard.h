@@ -22,6 +22,7 @@
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
 #include "Sensors.h"
+#include "MotionConstants.h"
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
@@ -39,7 +40,9 @@ public:
     void stop();
     void run();
 
-    const std::vector <float> getNextJoints();
+	const std::vector <float> getNextJoints();
+	void sendMotionCommand(MotionCommand* command);
+	void sendMotionCommands(vector<MotionCommand*> *command);
 
 private:
     int processProviders();
@@ -61,18 +64,21 @@ private:
 
     bool running;
 	bool newJoints; //Way to track if we ever use the same joints twice
-    const HeadJointCommand *hjc;
-    const HeadJointCommand *hjc2;
-    const HeadJointCommand *hjc3;
-    std::vector<float> *bodyJoints;
-    std::vector<float> *bodyJoints2;
 
-	const BodyJointCommand *command;
-	const BodyJointCommand *command2;
-	const BodyJointCommand *command3;
+	HeadJointCommand *hjc;
+	HeadJointCommand *hjc2;
+	HeadJointCommand *hjc3;
+	std::vector<float> *bodyJoints;
+	std::vector<float> *bodyJoints2;
+
+	BodyJointCommand *command;
+	BodyJointCommand *command2;
+	BodyJointCommand *command3;
     static const float sitDownAngles[NUM_BODY_JOINTS];
-    const BodyJointCommand *getUp;
-    const BodyJointCommand *sitDown;
+
+	BodyJointCommand *getUp;
+	BodyJointCommand *sitDown;
+
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;

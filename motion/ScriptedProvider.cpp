@@ -94,31 +94,31 @@ void ScriptedProvider::calculateNextJoints() {
     for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
         if ( !chainQueues.at(i).empty() ) {
             //cout << "chain " << i << " has size " << chainQueues.at(i).size() << endl;
-            allEmpty=false;
-        }
-    }
+			allEmpty=false;
+		}
+	}
 
-    if (allEmpty)
-        setNextBodyCommand();
+	if (allEmpty)
+		setNextBodyCommand();
 
-    // Make sure first that the queues are not empty
-    // If they're empty, then add the current joints to be the
-    // next joints. If they're not empty, then add the queued
-    // joints as the next Chain joints
-    vector<ChainQueue>::iterator i;
-    i = chainQueues.begin();
-    vector <vector <float> > currentChains = getCurrentChains();
+	// Make sure first that the queues are not empty
+	// If they're empty, then add the current joints to be the
+	// next joints. If they're not empty, then add the queued
+	// joints as the next Chain joints
+	vector<ChainQueue>::iterator i;
+	i = chainQueues.begin();
+	vector <vector <float> > currentChains = getCurrentChains();
 
-    while ( i != chainQueues.end() ) {
-        ChainID chainID = i->getChainID();
-        if ( i->empty() ) {
-            setNextChainJoints( chainID, currentChains.at(chainID) );
-        } else {
-            setNextChainJoints( chainID, i->front() );
-            i->pop();
-        }
-        i++;
-    }
+	while ( i != chainQueues.end() ) {
+		ChainID chainID = i->getChainID();
+		if ( i->empty() ) {
+			setNextChainJoints( chainID, currentChains.at(chainID) );
+		} else {
+			setNextChainJoints( chainID, i->front() );
+			i->pop();
+		}
+		i++;
+	}
 
     setActive();
 }
@@ -132,46 +132,50 @@ void ScriptedProvider::calculateNextJoints() {
  * Only one BodyJointCommand can be enqueued at
  * a time, even if they deal with different joints or chains.
  */
-void ScriptedProvider::enqueue(const BodyJointCommand *command) {
-    bodyCommandQueue.push(command);
-    setActive();
+void ScriptedProvider::setCommand(BodyJointCommand *command) {
+	if (command->getType() == MotionConstants::BODY_JOINT){
+		bodyCommandQueue.push(command);
+		setActive();
+	}
+	else {
+		cout << "WRONG MOTION COMMAND IN SWITCHBOARD!!!" << endl;
+	}
 }
 
 
-void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq) {
-    // Take in vec of commands and enqueue them all
-    pthread_mutex_lock(&scripted_mutex);
-    for (vector<const BodyJointCommand*>::iterator i= seq.begin();
-            i != seq.end(); i++)
-        enqueue(*i);
-    pthread_mutex_unlock(&scripted_mutex);
+void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand*> &seq) {
+	// Take in vec of commands and enqueue them all
+	pthread_mutex_lock(&scripted_mutex);
+	for (vector<BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
+		setCommand(*i);
+	pthread_mutex_unlock(&scripted_mutex);
 }
 
 void ScriptedProvider::setNextBodyCommand() {
-    // If there are no more commands, don't try to enqueue one
-    if ( !bodyCommandQueue.empty() ) {
+	// If there are no more commands, don't try to enqueue one
+	if ( !bodyCommandQueue.empty() ) {
 
-        const BodyJointCommand *command = bodyCommandQueue.front();
-        bodyCommandQueue.pop();
-        queue<vector<vector<float> > >* choppedBodyCommand = chopper.chopCommand(command);
-        delete command;
+		BodyJointCommand *command = bodyCommandQueue.front();
+		bodyCommandQueue.pop();
+		queue<vector<vector<float> > >* choppedBodyCommand = chopper.chopCommand(command);
+		delete command;
 
-        vector<ChainQueue>::iterator i;
-        while (!choppedBodyCommand->empty()) {
-            // Pass each chain to its chainqueue
+		vector<ChainQueue>::iterator i;
+		while (!choppedBodyCommand->empty()) {
+			// Pass each chain to its chainqueue
 
-            // Skips the HEAD_CHAIN and enqueues all body chains
-            i = chainQueues.begin();
-            while ( i != chainQueues.end() ) {
-                // Subtract 1 because there is no head chain in the
-                // choppedBodyCommand (it's only body joints)
-                i->push( choppedBodyCommand->front().at( i->getChainID() ) );
-                i++;
-            }
-            choppedBodyCommand->pop();
-        }
-        delete choppedBodyCommand;
-    }
+			// Skips the HEAD_CHAIN and enqueues all body chains
+			i = chainQueues.begin();
+			while ( i != chainQueues.end() ) {
+				// Subtract 1 because there is no head chain in the
+				// choppedBodyCommand (it's only body joints)
+				i->push( choppedBodyCommand->front().at( i->getChainID() ) );
+				i++;
+			}
+			choppedBodyCommand->pop();
+		}
+		delete choppedBodyCommand;
+	}
 }
 
 vector<vector<float> > ScriptedProvider::getCurrentChains() {

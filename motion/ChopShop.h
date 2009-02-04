@@ -39,8 +39,8 @@ class ChopShop
 public:
         ChopShop(shared_ptr<Sensors> s, float motionFrameLength);
 
-        queue< vector <vector<float> > >* chopCommand(
-                const JointCommand *command);
+	queue<vector<vector<float> > >* chopCommand(JointCommand *command);
+
 private:
 	// Inside most vector: joint values for a chain
 	// Next: vector for each choppped move (holding each chain,
@@ -49,14 +49,13 @@ private:
 	shared_ptr<Sensors> sensors;
 	float FRAME_LENGTH_S;
 
-	queue< vector< vector<float> > >* chopSmooth(
-                const JointCommand *command);
-	queue< vector< vector<float> > >* chopLinear(
-                const JointCommand *command);
+	queue<vector<vector<float> > >* chopSmooth(JointCommand *command);
+	queue<vector<vector<float> > >* chopLinear(JointCommand *command);
 
 	vector<float> getCurrentJoints();
-	vector<float> getFinalJoints(const JointCommand *command,
-                vector<float> *currentJoints);
+	vector<float> getFinalJoints(JointCommand *command,
+								 vector<float> *currentJoints);
+
 	vector<float> getDiffPerChop(int numChops,
                 vector<float> *current,
                 vector<float> *final);
@@ -65,7 +64,7 @@ private:
 	queue< vector< vector<float> > >* buildChops(int numChops,
 											   vector<float> *currentJoints,
 											   vector<float> *diffPerChop,
-											   const JointCommand *command);
+											   JointCommand *command);
 };
 
 #endif

@@ -61,36 +61,40 @@ void HeadProvider::calculateNextJoints() {
     //setActive();
 }
 
-void HeadProvider::enqueue(const HeadJointCommand *command) {
-    headCommandQueue.push(command);
+void HeadProvider::setCommand(HeadJointCommand *command) {
+	if (command->getType() == MotionConstants::HEAD_JOINT){
+		headCommandQueue.push(command);
+		setActive();
+	}
 }
 
-void HeadProvider::enqueueSequence(std::vector<const HeadJointCommand*> &seq) {
-    // Take in vec of commands and enqueue them all
-    pthread_mutex_lock(&head_mutex);
-    for (vector<const HeadJointCommand*>::iterator i= seq.begin();
-            i != seq.end(); i++)
-        enqueue(*i);
-    pthread_mutex_unlock(&head_mutex);
+void HeadProvider::enqueueSequence(std::vector<HeadJointCommand*> &seq) {
+	// Take in vec of commands and enqueue them all
+	pthread_mutex_lock(&head_mutex);
+	for (vector<HeadJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
+		setCommand(*i);
+	pthread_mutex_unlock(&head_mutex);
 }
 
 void HeadProvider::setNextHeadCommand() {
 
-    if ( !headCommandQueue.empty() ) {
-        const HeadJointCommand *command = headCommandQueue.front();
-        queue<vector<vector<float> > >*	choppedHeadCommand =
-            chopper.chopCommand(command);
-        headCommandQueue.pop();
-        delete command;
 
-        while (!choppedHeadCommand->empty()) {
-            // Push commands onto head queue
-            headQueue.push(choppedHeadCommand->front().at(HEAD_CHAIN));
-            choppedHeadCommand->pop();
-        }
+	if ( !headCommandQueue.empty() ) {
+		HeadJointCommand *command = headCommandQueue.front();
+		queue<vector<vector<float> > >*	choppedHeadCommand =
+			chopper.chopCommand(command);
+		headCommandQueue.pop();
+		delete command;
 
-        delete choppedHeadCommand;
-    }
+		while (!choppedHeadCommand->empty()) {
+			// Push commands onto head queue
+			headQueue.push(choppedHeadCommand->front().at(HEAD_CHAIN));
+			choppedHeadCommand->pop();
+		}
+
+		delete choppedHeadCommand;
+	}
+
 }
 
 vector<float> HeadProvider::getCurrentHeads() {

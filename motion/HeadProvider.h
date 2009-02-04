@@ -40,8 +40,11 @@ public:
     void requestStop();
     void calculateNextJoints();
 
-    void enqueue(const HeadJointCommand *command);
-    void enqueueSequence(vector<const HeadJointCommand*> &seq);
+	void enqueueSequence(vector<HeadJointCommand*> &seq);
+	void setCommand(MotionCommand* command) {
+		setCommand(reinterpret_cast<HeadJointCommand*>(command));
+	}
+	void setCommand(HeadJointCommand* command);
 
 private:
     void setActive();
@@ -52,9 +55,9 @@ private:
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 
-    ChainQueue headQueue;
-    // Queue of all future commands
-    std::queue<const HeadJointCommand*> headCommandQueue;
+	ChainQueue headQueue;
+	// Queue of all future commands
+	std::queue<HeadJointCommand*> headCommandQueue;
 
     pthread_mutex_t head_mutex;
 

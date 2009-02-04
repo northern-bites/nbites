@@ -3,14 +3,14 @@
 HeadJointCommand::HeadJointCommand(const float time,
 				   const std::vector<float> *joints,
 				   const Kinematics::InterpolationType _type)
-	: JointCommand(BODY_JOINT, time, _type), headJoints(joints),
+	: JointCommand(HEAD_JOINT, time, _type), headJoints(joints),
 	  noJoints(0)
 {
 	setChainList();
 }
 
 HeadJointCommand::HeadJointCommand(const HeadJointCommand &other)
-	: JointCommand(BODY_JOINT, other.getDuration(), other.getInterpolation()),
+	: JointCommand(HEAD_JOINT, other.getDuration(), other.getInterpolation()),
 	  noJoints(0)
 {
 	setChainList();

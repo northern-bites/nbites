@@ -44,8 +44,11 @@ public:
     void requestStop();
     void calculateNextJoints();
 
-	void enqueue(const BodyJointCommand *command);
-	void enqueueSequence(vector<const BodyJointCommand*> &seq);
+	void enqueueSequence(std::vector<BodyJointCommand*> &seq);
+	void setCommand(MotionCommand* command) {
+		setCommand(reinterpret_cast<BodyJointCommand*>(command));
+	}
+	void setCommand(BodyJointCommand * command);
 
 private:
 	shared_ptr<Sensors> sensors;
@@ -55,7 +58,7 @@ private:
 
 	// ChainQueues
 	vector<ChainQueue> chainQueues;
-	queue<const BodyJointCommand*> bodyCommandQueue;
+	queue<BodyJointCommand*> bodyCommandQueue;
 
 	pthread_mutex_t scripted_mutex;
 

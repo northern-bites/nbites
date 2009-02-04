@@ -10,6 +10,7 @@
 #define _MotionProvider_h_DEFINED
 
 #include <vector>
+#include "MotionCommand.h"
 using namespace std;
 
 #include "Kinematics.h"
@@ -25,6 +26,7 @@ public:
     const bool isActive() const { return _active; }
     virtual void calculateNextJoints() = 0;
     vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
+	virtual void  setCommand(MotionCommand *command) =0;
 
 protected:
     void setNextChainJoints(const ChainID id,
