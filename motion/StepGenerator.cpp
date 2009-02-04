@@ -567,7 +567,6 @@ void StepGenerator::generateStep( float _x,
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
 
-    cout << "Created new step "<<*step<<endl;
     futureSteps.push_back(step);
     lastQueuedStep = step;
     //switch feet after each step is generated
