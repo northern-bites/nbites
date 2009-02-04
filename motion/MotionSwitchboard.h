@@ -56,6 +56,8 @@ private:
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
     std::vector <float> nextJoints;
+	MotionProvider * curProvider;
+	MotionProvider * nextProvider;
 
     bool running;
 	bool newJoints; //Way to track if we ever use the same joints twice

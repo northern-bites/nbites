@@ -20,6 +20,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       walkProvider(sensors),
 	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
 	  headProvider(1/50.0f,sensors),
+	  curProvider(&scriptedProvider),
+	  nextProvider(&scriptedProvider),
       nextJoints(Kinematics::NUM_JOINTS, 0.0f),
       //nextJoints(sensors->getBodyAngles()),
 	  running(false),
@@ -101,6 +103,10 @@ void MotionSwitchboard::start() {
 
 // 	headProvider.enqueue(hjc);
 // 	scriptedProvider.enqueue(command);
+	nextProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
+
+
+
 // 	scriptedProvider.enqueue(command2);
 //	scriptedProvider.enqueue(command3);
 // 	headProvider.enqueue(hjc2);
@@ -145,9 +151,6 @@ void MotionSwitchboard::run() {
     pthread_mutex_unlock(&next_joints_mutex);
 
 
-
-    //scriptedProvider.enqueue(getUp);
-    //scriptedProvider.enqueue(sitDownCommand);
     while(running) {
 
 //         if(fcount == 1){
@@ -175,51 +178,41 @@ int MotionSwitchboard::processProviders(){
     //that are tied to
     //sensors->setBodyAngles(nextJoints); // WATCH THIS LINE!! IS IT RIGHT?
 
-    // Calculate the next joints and get them
-    headProvider.calculateNextJoints();
-    // get headJoints from headProvider
-    vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
+    if (headProvider.isActive()) {
+		// Calculate the next joints and get them
+		headProvider.calculateNextJoints();
+		// get headJoints from headProvider
+		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
 
-
-    //select the current body provider - either switch like this, or jut choose
-    //below **
-
-     MotionProvider * curProvider;
-    // static bool switched = false;
-//     if(!switched && scriptedProvider.isActive()) {
-//         //cout << "First part: standing up with the Scripted Provider"<<endl;
-//         curProvider=reinterpret_cast< MotionProvider*> ( &scriptedProvider);
-//     }else if( walkProvider.isActive()){
-//         switched = true;
-//         //cout << "Middle part: WALKING"<<endl;
-//         curProvider = reinterpret_cast<MotionProvider *>( &walkProvider);
-//     }else{
-//         //cout << "LAST part: sitting  down with the Scripted Provider"<<endl;
-//         static bool sitDownBool = true;
-//         if (sitDownBool){
-//             sitDownBool = false;
-//             scriptedProvider.enqueue(sitDown);
-//         }
-//         curProvider=reinterpret_cast <MotionProvider *>( &scriptedProvider);
-//     }
-    //** Alternately, you may choose here:
-    curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
-
-    //Request new joints
-    curProvider->calculateNextJoints();
-
-    const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
-    const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
-    const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
-    const vector <float > larmJoints = curProvider->getChainJoints(LARM_CHAIN);
-
-    //Copy the new values into place, and wait to be signaled.
-    pthread_mutex_lock(&next_joints_mutex);
-    if (headProvider.isActive())
         for(unsigned int i = 0; i < HEAD_JOINTS;i++){
             nextJoints[HEAD_YAW + i] = headJoints.at(i);
         }
+	}
+	// Switch Providers!
+
+
+	if (curProvider != nextProvider)
+		curProvider->requestStop();
+
+	if (!curProvider->isActive()) {
+		curProvider = nextProvider;
+		setStartGait(curProvider);
+	}
+	//** Alternately, you may choose here:
+	//curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
+
     if (curProvider->isActive()){
+		//Request new joints
+		curProvider->calculateNextJoints();
+		const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
+		const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
+		const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
+		const vector <float > larmJoints = curProvider->getChainJoints(LARM_CHAIN);
+
+		//Copy the new values into place, and wait to be signaled.
+		pthread_mutex_lock(&next_joints_mutex);
+
+
         for(unsigned int i = 0; i < LEG_JOINTS; i ++){
             nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
         }
@@ -252,7 +245,6 @@ const vector <float> MotionSwitchboard::getNextJoints() {
     newJoints =false;
     pthread_cond_signal(&calc_new_joints_cond);
     pthread_mutex_unlock(&next_joints_mutex);
-
 
     return vec;
 }
