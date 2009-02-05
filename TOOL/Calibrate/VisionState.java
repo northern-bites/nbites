@@ -11,6 +11,7 @@ import TOOL.Image.TOOLImage;
 import TOOL.Image.ImageOverlay;
 import TOOL.Image.ProcessedImage;
 import TOOL.Image.ColorTable;
+import TOOL.Data.Frame;
 
 /**
  * Class VisionState
@@ -31,6 +32,10 @@ public class VisionState {
     //constants
     public final static int BALL_BOX_THICKNESS = 2;
     public final static byte BALL_BOX_COLOR = Vision.RED;
+    public final static int GOAL_POST_BOX_THICKNESS = 2;
+    public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.ORANGEYELLOW;
+    public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.ORANGERED;
+    public final static byte GOAL_POST_BOX_COLOR = Vision.PINK;
 
     //images + colortable
     private TOOLImage rawImage;
@@ -39,8 +44,8 @@ public class VisionState {
     private ColorTable  colorTable;
   
     //objects
-    private Vector<VisualFieldObject> objects;
     private Ball ball;
+    private Vector<VisualFieldObject> visualFieldObjects;
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
@@ -49,8 +54,6 @@ public class VisionState {
         colorTable = c;
 	
 	//init the objects
-	objects = new Vector<VisualFieldObject>();
-
         if (rawImage != null && colorTable != null)  {
 	    thresholdedImage = new ProcessedImage(rawImage, colorTable, this);
 	    thresholdedOverlay = new ImageOverlay(thresholdedImage.getWidth(), 
@@ -58,37 +61,15 @@ public class VisionState {
 	}
     }
 
-    //this is useless
-    public VisionState() {
-        rawImage = null;
-        thresholdedImage = null;
-	colorTable = null;
-	
-        objects = new Vector<FieldObject>();
-        ball = null;
-    }
-
-
-    //this is also useless
-    public VisionState(TOOLImage newRawImage, 
-		       ProcessedImage newThreshImage, 
-		       ColorTable newColorTable){
-	rawImage = newRawImage;
-        thresholdedImage = newThreshImage;
-	colorTable = newColorTable;
-	
-        objects = new Vector<FieldObject>();
-        ball = null;
-    }
-
-
-    //This updates the whole processed stuff - the thresholded image, the field objects and the ball
+    //This updates the whole processed stuff 
+    //- the thresholded image, the field objects and the ball
     public void update(ProcessedImage thresholdedImage) {
 	if (thresholdedImage != null)  {
 	    //we process the image; the visionLink updates itself with the new data from the bot
 	    thresholdedImage.thresholdImage();
 	    //get the ball from the link
 	    ball = thresholdedImage.getVisionLink().getBall();
+	    visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
 	    //draw the stuff onto the overlay
 	    drawObjectBoxes();
 	}
@@ -101,6 +82,31 @@ public class VisionState {
 	thresholdedOverlay.setRectOverlay(ball.getX(), ball.getY(),
 					  (int) ball.getWidth(), (int) ball.getHeight(),
 					  BALL_BOX_THICKNESS, BALL_BOX_COLOR);
+	//set VisualFieldObjects
+	VisualFieldObject obj;
+	//loop through the objects
+	for (int i = 0; i < visualFieldObjects.size(); i++) {
+	    obj = visualFieldObjects.elementAt(i);
+	    //choose a color
+	    byte color;
+	    switch(obj.getID()) {
+	    case VisualFieldObject.BLUE_GOAL_LEFT_POST:
+	    case VisualFieldObject.YELLOW_GOAL_LEFT_POST: 
+		color = GOAL_LEFT_POST_BOX_COLOR; break;
+	    case VisualFieldObject.BLUE_GOAL_RIGHT_POST:
+	    case VisualFieldObject.YELLOW_GOAL_RIGHT_POST: 
+		color = GOAL_RIGHT_POST_BOX_COLOR; break;
+	    case VisualFieldObject.BLUE_GOAL_POST:
+	    case VisualFieldObject.YELLOW_GOAL_POST: 
+		color = GOAL_POST_BOX_COLOR; break;
+	    default: color = Vision.BLACK; break;
+	    }
+	    //draw the box
+	    thresholdedOverlay.setRectOverlay(obj.getLeftTopX(), obj.getLeftTopY(),
+					      (int) obj.getWidth(), (int) obj.getHeight(),
+					      GOAL_POST_BOX_THICKNESS, color);
+	}
+	    
     }
 
     //getters
@@ -115,7 +121,5 @@ public class VisionState {
     public void setThreshImage(ProcessedImage i) { thresholdedImage = i;  }
     public void setColorTable(ColorTable c) { colorTable = c; }
 
-    public void addObject(FieldObject obj) {  objects.add(obj);  }
-    public void removeObject(FieldObject obj) {   objects.remove(obj);  }
     public void setBall(Ball b) { ball = b;  }
 }

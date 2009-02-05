@@ -42,11 +42,13 @@ package TOOL.Vision;
 
 //the object classes
 import TOOL.Vision.Ball;
+import TOOL.Vision.VisualFieldObject;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.lang.UnsatisfiedLinkError;
+import java.util.Vector;
 
 public class TOOLVisionLink {
     //These are defined here for ease, but need to get read from somewhere else
@@ -57,12 +59,19 @@ public class TOOLVisionLink {
     private int height;
     //objects
     private Ball ball;
+    private VisualFieldObject bgrp, bglp, ygrp, yglp;
+    private Vector<VisualFieldObject> visualFieldObjects;
 
     static private boolean visionLinkSuccessful;
 
     public TOOLVisionLink() {
         setImageDimensions(DFLT_IMAGE_WIDTH, DFLT_IMAGE_HEIGHT);
 	ball = new Ball();
+	bgrp = new VisualFieldObject(VisualFieldObject.BLUE_GOAL_RIGHT_POST);
+	bglp = new VisualFieldObject(VisualFieldObject.BLUE_GOAL_LEFT_POST);
+	ygrp = new VisualFieldObject(VisualFieldObject.YELLOW_GOAL_RIGHT_POST);
+	yglp = new VisualFieldObject(VisualFieldObject.YELLOW_GOAL_LEFT_POST);
+	visualFieldObjects = new Vector<VisualFieldObject>();
     }
 
     /**
@@ -88,7 +97,7 @@ public class TOOLVisionLink {
         byte[][] threshResult = new byte[height][width];
         if( visionLinkSuccessful){
             try{
-                cppProcessImage(img_data,joint_data,ct_data,
+		cppProcessImage(img_data,joint_data,ct_data,
                                 threshResult);
             }catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n"+
@@ -103,8 +112,9 @@ public class TOOLVisionLink {
 
     }
 
-    //a simple getter for the ball 
-    public Ball getBall() { return ball;  }
+    //getters for the objects
+    public Ball getBall() { return ball; }
+    public Vector<VisualFieldObject> getVisualFieldObjects() { return visualFieldObjects;}
 
     //Native methods:
     native private void cppProcessImage(byte[] img_data, float[] joint_data,
@@ -135,4 +145,28 @@ public class TOOLVisionLink {
 	ball.setCenterY(centerY);
 	ball.setRadius(radius);
     }
+    //set field object variables
+    public void setFieldObjectInfo(int id, double width, double height, 
+				   int ltx, int lty, int rtx, int rty, 
+				   int lbx, int lby, int rbx, int rby) {
+	
+	VisualFieldObject fieldObject;
+	
+	switch (id) {
+	case VisualFieldObject.BLUE_GOAL_RIGHT_POST: fieldObject = bgrp; break;
+	case VisualFieldObject.BLUE_GOAL_LEFT_POST: fieldObject = bglp; break;
+	case VisualFieldObject.YELLOW_GOAL_RIGHT_POST: fieldObject = ygrp; break;
+	case VisualFieldObject.YELLOW_GOAL_LEFT_POST: fieldObject = yglp; break;
+	default: fieldObject = new VisualFieldObject(); break;
+	}
+	
+	//attach the data to the object
+	fieldObject.setID(id);
+	fieldObject.setWidth(width); fieldObject.setHeight(height);
+	fieldObject.setLeftTopX(ltx); fieldObject.setLeftTopY(lty);
+	fieldObject.setRightTopX(rtx); fieldObject.setRightTopY(rty);
+	fieldObject.setLeftBottomX(lbx); fieldObject.setLeftBottomY(lby);
+	fieldObject.setRightBottomX(rbx); fieldObject.setRightBottomY(rby);
+	visualFieldObjects.add(fieldObject);
+      }
 }
