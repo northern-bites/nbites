@@ -8,7 +8,7 @@ import TOOL.Vision.TOOLVisionLink;
 import TOOL.Vision.Ball;
 import TOOL.Vision.VisualFieldObject;
 import TOOL.Image.TOOLImage;
-import TOOL.Image.ImageOverlay;
+import TOOL.Image.ThresholdedImageOverlay;
 import TOOL.Image.ProcessedImage;
 import TOOL.Image.ColorTable;
 import TOOL.Data.Frame;
@@ -40,7 +40,7 @@ public class VisionState {
     //images + colortable
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
-    private ImageOverlay thresholdedOverlay;
+    private ThresholdedImageOverlay thresholdedOverlay;
     private ColorTable  colorTable;
   
     //objects
@@ -56,8 +56,8 @@ public class VisionState {
 	//init the objects
         if (rawImage != null && colorTable != null)  {
 	    thresholdedImage = new ProcessedImage(rawImage, colorTable, this);
-	    thresholdedOverlay = new ImageOverlay(thresholdedImage.getWidth(), 
-						  thresholdedImage.getHeight());
+	    thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(), 
+							     thresholdedImage.getHeight());
 	}
     }
 
@@ -112,7 +112,7 @@ public class VisionState {
     //getters
     public TOOLImage getImage() { return rawImage;  }
     public ProcessedImage getThreshImage() { return thresholdedImage;  }
-    public ImageOverlay getThreshOverlay() { return thresholdedOverlay; }
+    public ThresholdedImageOverlay getThreshOverlay() { return thresholdedOverlay; }
     public ColorTable getColorTable() { return colorTable;  }
 
     public Ball getBall() { return ball; }

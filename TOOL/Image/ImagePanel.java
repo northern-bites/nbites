@@ -76,7 +76,7 @@ public class ImagePanel extends JPanel implements ActionListener,
     protected BufferedImageOp imageOp;
     protected AffineTransform transform;
 
-    protected ImageOverlay overlay;
+    protected BufferedImage overlay;
 
     protected int xOffset;
     protected int yOffset;
@@ -190,9 +190,8 @@ public class ImagePanel extends JPanel implements ActionListener,
         repaint();
     }
     
-    public void setOverlayImage(ImageOverlay o){
+    public void setOverlayImage(BufferedImage o){
 	overlay = o;
-
     }
 
     public BufferedImageOp getImageOp() {

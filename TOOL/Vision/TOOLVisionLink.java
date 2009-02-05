@@ -97,6 +97,9 @@ public class TOOLVisionLink {
         byte[][] threshResult = new byte[height][width];
         if( visionLinkSuccessful){
             try{
+		//reset the field object vector so that it's ready for the
+		//new stuff coming in
+		visualFieldObjects.clear();
 		cppProcessImage(img_data,joint_data,ct_data,
                                 threshResult);
             }catch(Throwable e){
