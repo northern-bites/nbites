@@ -78,10 +78,22 @@ void ALEnactor::postSensors() {
 
 }
 
+void ALEnactor::initSyncWithALMemory(){
+    vector<string> varNames;
+    varNames.push_back(string("Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"));
+    alfastaccess->ConnectToVariables(broker,varNames);
+    
+    
+}
+
 // from George: Forgive me for the variable names, but there are just too
 // many of them to figure out decent names for all. Feel free to change them...
 // they are only used internally in this method.
 void ALEnactor::syncWithALMemory() {
+    vector<float> varValues(1,0.0);
+    alfastaccess->GetValues(varValues);
+    //cout << "FLBumper is "<<varValues[0] <<endl;
+
     // FSR update
     // a cap L means for the left foot. a cap R - for the right foot
     float LfrontLeft = 0.0f, LfrontRight = 0.0f,

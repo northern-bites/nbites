@@ -11,6 +11,7 @@
 #include "albroker.h"
 #include "alproxy.h"
 #include "dcmproxy.h"
+#include "almemoryfastaccess.h"
 
 #include "Sensors.h"
 #include "MotionEnactor.h"
@@ -20,6 +21,12 @@ class ALEnactor : public MotionEnactor {
 public:
     ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s)
         : MotionEnactor(), broker(_pbroker), sensors(s) {
+        try{
+            alfastaccess =
+                AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+        } catch(AL::ALError &e){
+            cout << "Failed to initialize proxy to ALFastAccess"<<endl;
+        }
         try {
             almemory = broker->getMemoryProxy();
         } catch(AL::ALError &e){
@@ -36,6 +43,7 @@ public:
             cout << "Failed to initialize proxy to DCM" << endl;
         }
 
+        initSyncWithALMemory();
     };
     virtual ~ALEnactor() { };
 
@@ -45,11 +53,12 @@ public:
 
 private:
     void syncWithALMemory();
-
+    void initSyncWithALMemory();
 private:
     AL::ALPtr<AL::ALBroker> broker;
     AL::ALPtr<AL::ALMotionProxy>  almotion;
     AL::ALPtr<AL::ALMemoryProxy>  almemory;
+    AL::ALPtr<ALMemoryFastAccess> alfastaccess;
     AL::ALPtr<AL::DCMProxy> dcm;
     boost::shared_ptr<Sensors> sensors;
     static const int MOTION_FRAME_RATE;
