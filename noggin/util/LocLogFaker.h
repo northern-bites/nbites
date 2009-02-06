@@ -35,8 +35,8 @@ public:
     float x;
     float y;
     float velX;
-    flaot velY;
-}
+    float velY;
+};
 
 /**
  * Class to hold a constant robot path vector over a given number of frames

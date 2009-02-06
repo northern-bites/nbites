@@ -14,13 +14,10 @@
  * @param _initVelYUncert An initial value for the y velocity uncertainty
  */
 BallEKF::BallEKF(MCL * _mcl,
-                 float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
-                 float initVelX = INIT_BALL_X_VEL,
-                 float initVelY = INIT_BALL_Y_VEL,
-                 float initXUncert = INIT_X_UNCERT,
-                 float initYUncert = INIT_Y_UNCERT,
-                 float initVelXUncert = INIT_X_VEL_UNCERT,
-                 float initVelYUncert = INIT_Y_VEL_UNCERT)
+                 float initX, float initY,
+                 float initVelX, float initVelY,
+                 float initXUncert,float initYUncert,
+                 float initVelXUncert, float initVelYUncert)
     : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL), robotLoc(_mcl)
 {
     // ones on the diagonal

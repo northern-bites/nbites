@@ -45,11 +45,10 @@ int main(int argc, char** argv)
     // IO Variables
     fstream inputFile;
     fstream outputFile;
-    fprintf(stderr, "what the fuck?");
+
     /* Test for the correct number of CLI arguments */
     if(argc < 2 || argc > 3) {
-        fprintf(stderr, "usage: %s input-file [output-file]\n",
-                argv[0]);
+        cerr << "usage: " << argv[0] << " input-file [output-file]" << endl;
         return 1;
     }
     try {
@@ -368,7 +367,7 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                   << (*currentBall).velX << " "
                   << (*currentBall).velY << " "
         //<< "0.0" << " " << "0.0" << " " // Ball Velocity
-        //<< "0.0" << " " << "0.0" << " " // Ball Vel uncert
+        << "0.0" << " " << "0.0" << " " // Ball Vel uncert
                   << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                   << lastOdo.deltaR;
 
@@ -403,7 +402,7 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
 
 // NavMove
 // Constructors
-NavMove::NavMove(MotionModel _p, BallPose _b, int _t) : move(_p), ballPose(_b),
+NavMove::NavMove(MotionModel _p, BallPose _b, int _t) : move(_p), ballVel(_b),
                                                         time(_t)
 {
 };
