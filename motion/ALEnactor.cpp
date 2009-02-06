@@ -24,10 +24,9 @@ void ALEnactor::run() {
     //almotion->gotoChainAngles("RArm",rarm,2.0,INTERPOLATION_LINEAR);
     //cout << "Done with AL motion stuff" << endl;
 
-    //long long currentTime;
+    long long currentTime;
     while (running) {
-        //currentTime = micro_time();
-        postSensors();
+        currentTime = micro_time();
 
         if(!switchboard){
             cout<< "Caution!! Switchboard is null, exiting ALEnactor"<<endl;
@@ -45,13 +44,24 @@ void ALEnactor::run() {
         almotion->setBodyAngles(result);
 #endif
 
-        //cout << "Time spent in ALEnactor: " << micro_time() - currentTime << endl;
+        //Once we've sent the most calculated joints
+        postSensors();
 
-        // TODO: This is probably wrong!!!!1!ONE
-        // We probably want to sleep webots time and this sleeps real time.
+        const long long zero = 0;
+        const long long processTime = micro_time() - currentTime;
+
 #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
-        usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS));
+        if (processTime > MOTION_FRAME_LENGTH_uS){
+            cout << "Time spent in ALEnactor longer than frame length: " 
+                 << processTime <<endl;
+            //Don't sleep at all
+        } else{
+            usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS
+                                           -processTime));
+        }
 #endif
+
+
     }
 }
 

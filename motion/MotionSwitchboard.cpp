@@ -22,7 +22,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	  headProvider(1/50.0f,sensors),
       nextJoints(Kinematics::NUM_JOINTS, 0.0f),
       //nextJoints(sensors->getBodyAngles()),
-	  running(false)
+	  running(false),
+      newJoints(false)
 {
 
     //Allow safe access to the next joints
@@ -149,10 +150,10 @@ void MotionSwitchboard::run() {
     //scriptedProvider.enqueue(sitDownCommand);
     while(running) {
 
-        if(fcount == 1){
-            //hack to help keep from falling over in the simulator
-            usleep(2*1000*1000);
-        }
+//         if(fcount == 1){
+//             hack to help keep from falling over in the simulator
+//             usleep(2*1000*1000);
+//         }
 
         bool active  = processProviders();
 
@@ -233,6 +234,7 @@ int MotionSwitchboard::processProviders(){
     }else{
         //cout << "Skipping bodyprovider" <<endl;
     }
+    newJoints = true;
     pthread_mutex_unlock(&next_joints_mutex);
 
     return curProvider->isActive();
@@ -241,7 +243,12 @@ int MotionSwitchboard::processProviders(){
 
 const vector <float> MotionSwitchboard::getNextJoints() {
     pthread_mutex_lock(&next_joints_mutex);
+    if(!newJoints){
+        cout << "An enactor is grabbing old joints from switchboard."
+             <<" Must have missed a frame!" <<endl;
+    }
     const vector <float> vec(nextJoints);
+    newJoints =false;
     pthread_cond_signal(&calc_new_joints_cond);
     pthread_mutex_unlock(&next_joints_mutex);
 

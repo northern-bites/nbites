@@ -20,8 +20,8 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
                      0.4f,        // zmp static percentage in double support
                      4.0f*TO_RAD,  // leftSwingHipRollAddition
                      4.0f*TO_RAD,  // rightSwingHipRollAddition
-                     15.0f,        // leftZMPSwingOffestY,
-                     15.0f),       // rightZMPSwingOffestY
+                     12.0f,        // leftZMPSwingOffestY,
+                     12.0f),       // rightZMPSwingOffestY
       stepGenerator(sensors,&walkParameters)
 {
 
