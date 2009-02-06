@@ -306,14 +306,13 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
     int time;
 
     // Read the start info from the first line of the file
-    if (!inputFile->eof()) {
-        *inputFile >> letsGo->startPos.x >> letsGo->startPos.y // start position
+    if (!inputFile->eof()) { // start position
+        *inputFile >> letsGo->startPos.x >> letsGo->startPos.y
                    >> letsGo->startPos.h // heaading start
                    >> letsGo->ballStart.x >> letsGo->ballStart.y; // Ball info
     }
-    cout << "(" << letsGo->startPos.x << ", " << letsGo->startPos.y << ", "
-         << letsGo->startPos.h << " )\t(" << letsGo->ballStart.x << ", "
-         << letsGo->ballStart.y << " )" << endl;
+    letsGo->ballStart.velX = 0.0;
+    letsGo->ballStart.velY = 0.0;
 
     // Convert input value to radians
     letsGo->startPos.h *= DEG_TO_RAD;
@@ -323,9 +322,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
         *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR
                    >> ballMove.velX >> ballMove.velY
                    >> time;
-        cout << "(" << motion.deltaF << ", " << motion.deltaL << ", "
-             << motion.deltaR << " )\t (" << ballMove.velX << ", "
-             << ballMove.velY << ")" << endl;
+
         motion.deltaR *= DEG_TO_RAD;
         letsGo->myMoves.push_back(NavMove(motion, ballMove, time));
     }

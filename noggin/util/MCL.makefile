@@ -1,114 +1,74 @@
 C++ = g++
 C++-FLAGS = -Wall -02 -g
 RM = rm -f
-INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/ \
-	-I ../../corpus/
+INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
 
 VL_SRCS = ../../vision/VisualLine.cpp
 
 VC_SRCS = ../../vision/VisualCorner.cpp \
 	../../vision/VisualLandmark.cpp
 
-CL_SRCS = ../../vision/ConcreteLine.cpp \
-	../../vision/ConcreteLine.h
+CL_SRCS = ../../vision/ConcreteLine.cpp
 
-CC_SRCS = ../../vision/ConcreteCorner.cpp \
-	../../vision/ConcreteCorner.h
+CC_SRCS = ../../vision/ConcreteLandmark.cpp \
+	../../vision/ConcreteCorner.cpp
 
 UTILITY_SRCS = ../../vision/Utility.cpp
 
 FO_SRCS = ../../vision/VisualFieldObject.cpp
 
-CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp \
-	../../vision/ConcreteFieldObject.h
+CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp
 
-VFO_SRCS = ../../vision/VisualFieldObject.cpp \
-	../../vision/VisualFieldObject.h
-
-VLANDMARK_SRCS = ../../vision/VisualLandmark.cpp \
-	../../vision/VisualLandmark.h
-
-CLANDMARK_SRCS = ../../vision/ConcreteLandmark.cpp \
-	../../vision/ConcreteLandmark.h
-
-EKF_SRCS = ../EKF.cpp \
-	../EKF.h
-
-BALLEKF_SRCS = ../BallEKF.cpp \
-	../BallEKF.h
+LOG_SRCS = MCLLogger.cpp \
+	MCLLogger.h
+EKF_SRCS = ../EKF.h \
+	../EKF.cpp
+BallEKF_SRCS = ../BallEKF.h \
+	../BallEKF.cpp
 
 OBJS = 	Utility.o \
-	VisualLine.o \
-	ConcreteLine.o \
-	VisualLandmark.o \
-	ConcreteLandmark.o \
-	VisualCorner.o \
-	ConcreteCorner.o \
-	Observation.o \
-	VisualFieldObject.o \
-	ConcreteFieldObject.o \
-	EKF.o \
-	BallEKF.o \
-	MCL.o
+	visualLine.o \
+	concreteLine.o \
+	visualCorner.o \
+	concreteCorner.o \
+	Observation.o
 
-OBS_SRCS = ../Observation.cpp \
-	   ../Observation.h
+OBS_SRCS = ../Observation.cpp
 
-MCL_SRCS = ../MCL.cpp \
-	   ../MCL.h
+MCL_SRCS = ../MCL.cpp
 
 FAKER_SRCS = LocLogFaker.cpp \
 	LocLogFaker.h
 
-LDLIBS = $(OBJS)
-LDFLAGS  = $(LDLIBS) -lm
-
 all : faker
 
-faker : $(FAKER_SRCS) $(OBJS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) -DNO_ZLIB faker.o -o $@
+faker : $(FAKER_SRCS) $(OBS_SRCS) $(CL_SRCS) $(CC_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS) $(EKF_SRCS) $(BallEFK_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o faker $(FAKER_SRCS) $(OBS_SRCS) $(CL_SRCS) $(CC_SRCS)  $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS) $(EKF_SRCS) $(BallEKF_SRCS)
 
-faker.o : $(FAKER_SRCS) $(OBJS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) -c $< -o $@
 
-MCL.o : $(MCL_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+mclLogger : $(LOG_SRCS) $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o mclLogger $(LOG_SRCS) $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
 
-Observation.o : $(OBS_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+mclTest : mclTest.cpp # $(OBJS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o mclTest mclTest.cpp $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
 
-ConcreteCorner.o : $(CC_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+Observation.o : visualLine.o visualCorner.o Observation.cpp Observation.h
+	$(C++) $(C++-FLAGS) $(INCLUDE) -o Observation.o $(OBS_SRCS)
 
-VisualCorner.o : $(VC_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+concreteCorner.o : $(CC_SRCS) # Utility.o #visualLine.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) -o concreteCorner.o $(CC_SRCS)
 
-ConcreteLine.o : $(CL_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
-VisualLine.o : $(VL_SRCS) Utility.o
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
+visualCorner.o : $(VC_SRCS) Utility.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $(VC_SRCS)
+concreteLine.o : $(CL_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -o conreteLine.o $(CL_SRCS)c
+visualLine.o : $(VL_SRCS) Utility.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) -o visualLine.o $(VL_SRCS)
 Utility.o : $(UTILITY_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $(UTILITY_SRCS)
 
-ConcreteFieldObject.o : $(CCFO_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
-VisualFieldObject.o : $(VFO_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
-VisualLandmark.o : $(VLANDMARK_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
-ConcreteLandmark.o : $(CLANDMARK_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
-EKF.o :$(EKF_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
-BallEKF.o :$(BALLEKF_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+concreteFO.o : $(CCFO_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $(CCFO_SRCS)
 
 .Phony : clean
 
