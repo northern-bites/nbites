@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     // IO Variables
     fstream inputFile;
     fstream outputFile;
-
+    fprintf(stderr, "what the fuck?");
     /* Test for the correct number of CLI arguments */
     if(argc < 2 || argc > 3) {
         fprintf(stderr, "usage: %s input-file [output-file]\n",
@@ -93,7 +93,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     MCL *myLoc = new MCL;
-    //BallEKF *ballEKF = new BallEKF;
+    BallEKF *ballEKF = new BallEKF(myLoc);
     PoseEst currentPose;
     MotionModel *noMove = new MotionModel(0.0, 0.0, 0.0);
 
@@ -102,7 +102,8 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     currentPose.h = letsGo->startPos.h;
 
     // Print out starting configuration
-    printOutLogLine(outputFile, myLoc, Z_t, *noMove, &currentPose);
+    printOutLogLine(outputFile, myLoc, Z_t, *noMove, &currentPose,
+                    &letsGo->ballStart);
     delete noMove;
 
     // Iterate through the moves
@@ -116,7 +117,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 
             // Print the current frame to file
             printOutLogLine(outputFile, myLoc, Z_t, (*letsGo).myMoves[i].move,
-                            &currentPose);
+                            &currentPose, &letsGo->ballStart);
         }
     }
 }
@@ -301,23 +302,33 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 void readInputFile(fstream* inputFile, NavPath * letsGo)
 {
     // Method variables
-    int time;
     MotionModel motion;
+    BallPose ballMove;
+    int time;
 
     // Read the start info from the first line of the file
     if (!inputFile->eof()) {
-        *inputFile >> letsGo->startPos.x >> letsGo->startPos.y
-                   >> letsGo->startPos.h;
+        *inputFile >> letsGo->startPos.x >> letsGo->startPos.y // start position
+                   >> letsGo->startPos.h // heaading start
+                   >> letsGo->ballStart.x >> letsGo->ballStart.y; // Ball info
     }
+    cout << "(" << letsGo->startPos.x << ", " << letsGo->startPos.y << ", "
+         << letsGo->startPos.h << " )\t(" << letsGo->ballStart.x << ", "
+         << letsGo->ballStart.y << " )" << endl;
 
     // Convert input value to radians
     letsGo->startPos.h *= DEG_TO_RAD;
 
     // Build NavMoves from the remaining lines
     while (!inputFile->eof()) {
-        *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR >> time;
+        *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR
+                   >> ballMove.velX >> ballMove.velY
+                   >> time;
+        cout << "(" << motion.deltaF << ", " << motion.deltaL << ", "
+             << motion.deltaR << " )\t (" << ballMove.velX << ", "
+             << ballMove.velY << ")" << endl;
         motion.deltaR *= DEG_TO_RAD;
-        letsGo->myMoves.push_back(NavMove(motion, time));
+        letsGo->myMoves.push_back(NavMove(motion, ballMove, time));
     }
 }
 
@@ -331,7 +342,8 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  * @param lastOdo Odometery since previous frame
  */
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
-                     sightings, MotionModel lastOdo, PoseEst *currentPose)
+                     sightings, MotionModel lastOdo, PoseEst *currentPose,
+                     BallPose * currentBall)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
@@ -349,10 +361,14 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                   << myLoc->getHEstDeg() << " "
                   << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                   << myLoc->getHUncertDeg() << " "
-                  << "0.0" << " " << "0.0" << " " // Ball x,y
+        //<< "0.0" << " " << "0.0" << " " // Ball x,y
+                  << (*currentBall).x << " "
+                  << (*currentBall).y << " "
                   << "0.0" << " " << "0.0" << " " // Ball Uncert
-                  << "0.0" << " " << "0.0" << " " // Ball Velocity
-                  << "0.0" << " " << "0.0" << " " // Ball Vel uncert
+                  << (*currentBall).velX << " "
+                  << (*currentBall).velY << " "
+        //<< "0.0" << " " << "0.0" << " " // Ball Velocity
+        //<< "0.0" << " " << "0.0" << " " // Ball Vel uncert
                   << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                   << lastOdo.deltaR;
 
@@ -362,7 +378,12 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
     // Print the actual robot position
     (*outputFile) << (*currentPose).x << " "
                   << (*currentPose).y << " "
-                  << (*currentPose).h << " ";
+                  << (*currentPose).h << " "
+    // print actual ball position
+                  << (*currentBall).x << " "
+                  << (*currentBall).y << " "
+                  << (*currentBall).velX << " "
+                  << (*currentBall).velY << " ";
 
     // Divide the sections with a colon
     (*outputFile) << ":";
@@ -382,7 +403,8 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
 
 // NavMove
 // Constructors
-NavMove::NavMove(MotionModel _p, int _t) : move(_p), time(_t)
+NavMove::NavMove(MotionModel _p, BallPose _b, int _t) : move(_p), ballPose(_b),
+                                                        time(_t)
 {
 };
 

@@ -31,8 +31,8 @@ VLANDMARK_SRCS = ../../vision/VisualLandmark.cpp \
 CLANDMARK_SRCS = ../../vision/ConcreteLandmark.cpp \
 	../../vision/ConcreteLandmark.h
 
-EKF_SRCS = ../EKF.h \
-	../BallEKF.h
+EKF_SRCS = ../EKF.cpp \
+	../EKF.h
 
 BALLEKF_SRCS = ../BallEKF.cpp \
 	../BallEKF.h
@@ -47,6 +47,7 @@ OBJS = 	Utility.o \
 	Observation.o \
 	VisualFieldObject.o \
 	ConcreteFieldObject.o \
+	EKF.o \
 	BallEKF.o \
 	MCL.o
 

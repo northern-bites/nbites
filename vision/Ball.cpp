@@ -7,7 +7,6 @@
 
 Ball::Ball()
 {
-    //vision = vis; // stores vision class pointer
     init();
 }
 
@@ -30,18 +29,22 @@ void Ball::init() {
     elevation = 0;
 }
 
-void Ball::setDistance(estimate ball_est)
+void Ball::setDistanceEst(estimate ball_est)
 {
-    ball_est = vision->pose->bodyEstimate(getCenterX(),getCenterY(),
-                                          static_cast<float>(focDist));
-    setBearing(ball_est.bearing);
+    setBearingWithSD(ball_est.bearing);
     setElevation(ball_est.elevation);
-    dist = ball_est.dist;
+    setDistanceWithSD(ball_est.dist);
+}
 
-    // Calcualate and set standard deviations
+void Ball::setDistanceWithSD(float _dist)
+{
+    dist = _dist;
     setDistanceSD(ballDistanceToSD(dist));
-    setBearingSD(ballBearingToSD(ball_est.bearing));
 }
 
 
-
+void Ball::setBearingWithSD(float _bearing)
+{
+    bearing = _bearing;
+    setBearingSD(ballBearingToSD(_bearing));
+}

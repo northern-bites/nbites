@@ -13,7 +13,7 @@
  * @param _initVelXUncert An initial value for the x velocity uncertainty
  * @param _initVelYUncert An initial value for the y velocity uncertainty
  */
-BallEKF::BallEKF(MCL _mcl,
+BallEKF::BallEKF(MCL * _mcl,
                  float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
                  float initVelX = INIT_BALL_X_VEL,
                  float initVelY = INIT_BALL_Y_VEL,
@@ -115,14 +115,14 @@ void BallEKF::incorporateMeasurement(Measurement z,
     z_x(1) = y_b_r;
 
     // Get expected values of ball
-    float h = -robotLoc.getHEst();
-    float x = robotLoc.getXEst();
-    float y = robotLoc.getYEst();
+    float h = robotLoc->getHEst();
+    float x = robotLoc->getXEst();
+    float y = robotLoc->getYEst();
     float x_b = getXEst();
     float y_b = getYEst();
     ublas::vector<float> d_x(2);
-    d_x(0) = (x_b - x)*cos(h) - (y_b - y)*sin(h);
-    d_x(1) = (x_b - x)*sin(h) + (y_b - y)*cos(h);
+    d_x(0) = (x_b - x)*cos(-h) - (y_b - y)*sin(-h);
+    d_x(1) = (x_b - x)*sin(-h) + (y_b - y)*cos(-h);
 
     // Calculate invariance
     V_k = z_x - d_x;

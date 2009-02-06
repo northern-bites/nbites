@@ -37,12 +37,12 @@ class BallEKF : public EKF
 {
 public:
     // Constructors & Destructors
-    BallEKF(MCL _mcl, float initX, float initY,
+    BallEKF(MCL * _mcl, float initX, float initY,
             float initVelX, float initVelY,
             float initXUncert,float initYUncert,
             float initVelXUncert, float initVelYUncert);
 
-    virtual ~BallEKF();
+    virtual ~BallEKF() {}
 
     // Update functions
     void updateModel(Ball ball);
@@ -139,6 +139,6 @@ private:
                                         ublas::matrix<float> &R_k,
                                         ublas::vector<float> &V_k);
     // Members
-    MCL robotLoc;
+    MCL * robotLoc;
 };
 #endif // File

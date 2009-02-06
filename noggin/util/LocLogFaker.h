@@ -27,20 +27,34 @@ string player_number = "3";
 string DEFAULT_OUTFILE_NAME = "FAKELOG.mcl";
 
 /**
-   Class to hold a constant robot path vector over a given number of frames
+ * Class to hold the ball positin and velocity in the x and y directions
+ */
+class BallPose
+{
+public:
+    float x;
+    float y;
+    float velX;
+    flaot velY;
+}
+
+/**
+ * Class to hold a constant robot path vector over a given number of frames
  */
 class NavMove
 {
 public:
     MotionModel move;
+    BallPose ballVel;
     int time; // Number of frames over which to continue on the move vector
-    NavMove(MotionModel _m, int _t);
+    NavMove(MotionModel _m, BallPose _b, int _t);
 };
 
 class NavPath
 {
 public:
-    PoseEst startPos; // Current real position of the robot
+    PoseEst startPos; // Real start position of the robot
+    BallPose ballStart; // Real start position of the ball
     std::vector<NavMove> myMoves; // direction of movement per itteration
 };
 
@@ -50,7 +64,8 @@ void iteratePath(fstream * outputFile, NavPath * letsGo);
 // IO Functions
 void readInputFile(fstream* name, NavPath * letsGo);
 void printOutLogLine(fstream* outputFile, MCL* myLoc, std::vector<Observation>
-                     sightings, MotionModel lastOdo, PoseEst * currentPose);
+                     sightings, MotionModel lastOdo, PoseEst * currentPose,
+                     BallPose * currentBall);
 
 // Helper functions
 float subPIAngle(float theta);

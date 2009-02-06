@@ -55,7 +55,7 @@ protected:
 public:
     // Constructors & Destructors
     EKF(unsigned int dimension, float _beta, float _gamma);
-    virtual ~EKF();
+    virtual ~EKF() {}
 
     // Core functions
     virtual void timeUpdate(MotionModel u_k);

@@ -4,9 +4,9 @@
 #include "Common.h"
 #include "ifdefs.h"
 #include "Structs.h"
+#include "VisionDef.h"
 
 class Ball; // forward reference
-//#include "Vision.h"
 
 // BALL CONSTANTS
 #define BallAt1M         16 // pixel width of objects one meter away.
@@ -15,7 +15,6 @@ class Ball; // forward reference
 
 class Ball {
 public:
-    //Ball(Vision *vis);
     Ball();
     virtual ~Ball() {}
 
@@ -32,9 +31,11 @@ public:
     void setAngleX(float aX) { angleX = aX; }
     void setAngleY(float aY) { angleY = aY; }
     void setBearing(float b) { bearing = b; }
+    void setBearingWithSD(float b);
     void setElevation(float e) { elevation = e; }
     void setConfidence(int c) {confidence = c;}
-    void setDistance(estimate ball_est);
+    void setDistanceEst(estimate ball_est);
+    void setDistanceWithSD(float _dist);
     void setX(int x1) {x = x1;}
     void setY(int y1) {y = y1;}
     void setDistanceSD(float _distSD) { distanceSD = _distSD;}
@@ -77,9 +78,6 @@ public:
     float getBearingSD() const { return bearingSD; }
 
 private:
-    // Vision class pointer
-    //Vision *vision;
-
     /* Best guessed Ball Variables */
     int x, y;
     float width;
