@@ -1,3 +1,4 @@
+
 /**
  * The StepGenerator (will) house a ton of logic relating to how the steps are
  * configured. It must handle the following tasks:
@@ -90,7 +91,8 @@ static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at 
 
 class StepGenerator {
 public:
-    StepGenerator(Sensors * s, const WalkingParameters *params);
+    StepGenerator(boost::shared_ptr<Sensors> s,
+                  const WalkingParameters *params);
     ~StepGenerator();
 
     zmp_xy_tuple generate_zmp_ref();
@@ -98,7 +100,7 @@ public:
     void tick_controller();
     WalkLegsTuple tick_legs();
 
-    bool isDone(){return _done;}
+    bool isDone() { return _done; }
 
     void setWalkVector(const float _x, const float _y, const float _theta);
 
@@ -169,7 +171,7 @@ private:
     ufmatrix3 initStartLeft;
     ufmatrix3 initStartRight;
 
-    Sensors * sensors;
+    boost::shared_ptr<Sensors> sensors;
     const WalkingParameters *walkParams;
     bool nextStepIsLeft;
 

@@ -1,24 +1,27 @@
-#include "StepGenerator.h"
-#include <iostream>
 
+#include <iostream>
+#include <boost/shared_ptr.hpp>
 using boost::shared_ptr;
 
-StepGenerator::StepGenerator(Sensors *s ,const WalkingParameters *params)
-    : x(0.0f), y(0.0f), theta(0.0f),
-      _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
-      est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
-      zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
-      currentZMPDSteps(),
-      si_Transform(CoordFrame3D::identity3D()),
-      last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
-      if_Transform(CoordFrame3D::identity3D()),
-      initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
-      initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
-      sensors(s),
-      walkParams(params), nextStepIsLeft(true),
-      leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
-      controller_x(new PreviewController()),
-      controller_y(new PreviewController()){
+#include "StepGenerator.h"
+
+StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
+                             const WalkingParameters *params)
+  : x(0.0f), y(0.0f), theta(0.0f),
+    _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+    est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+    zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
+    currentZMPDSteps(),
+    si_Transform(CoordFrame3D::identity3D()),
+    last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
+    if_Transform(CoordFrame3D::identity3D()),
+    initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
+    initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
+    sensors(s),
+    walkParams(params), nextStepIsLeft(true),
+    leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
+    controller_x(new PreviewController()),
+    controller_y(new PreviewController()){
 
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
