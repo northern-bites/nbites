@@ -34,7 +34,7 @@
 
 using namespace std;
 using namespace AL;
-using namespace boost;
+using boost::shared_ptr;
 
 
 /////////////////////////////////////////
@@ -85,11 +85,11 @@ Man::Man ()
     // initialize core processing modules
 #ifdef USE_MOTION
 #ifdef NAOQI1
-    enactor = shared_ptr<MotionEnactor<(new ALEnactor(pBroker,sensors)),
+    enactor = shared_ptr<MotionEnactor>(new ALEnactor(pBroker, sensors));
 #else
-    enactor = shared_ptr<MotionEnactor>(new SimulatorEnactor(sensors)),
+    enactor = shared_ptr<MotionEnactor>(new SimulatorEnactor(sensors));
 #endif
-    motion(synchro, enactor, &sensors),
+    motion(synchro, enactor, &sensors);
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
