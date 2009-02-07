@@ -94,31 +94,48 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     MCL *myLoc = new MCL;
     BallEKF *ballEKF = new BallEKF(myLoc);
     PoseEst currentPose;
+    BallPose currentBall;
     MotionModel *noMove = new MotionModel(0.0, 0.0, 0.0);
+    Ball * visBall = new Ball();
 
     currentPose.x = letsGo->startPos.x;
     currentPose.y = letsGo->startPos.y;
     currentPose.h = letsGo->startPos.h;
+    currentBall = letsGo->ballStart;
 
     // Print out starting configuration
     printOutLogLine(outputFile, myLoc, Z_t, *noMove, &currentPose,
-                    &letsGo->ballStart);
+                    &currentBall, ballEKF);
     delete noMove;
 
     // Iterate through the moves
     for(unsigned int i = 0; i < (*letsGo).myMoves.size(); ++i) {
 
         // Continue the move for as long as specified
-        for (int j = 0; j < (*letsGo).myMoves[i].time; ++j) {
-            currentPose += (*letsGo).myMoves[i].move;
+        for (int j = 0; j < letsGo->myMoves[i].time; ++j) {
+            currentPose += letsGo->myMoves[i].move;
+            currentBall += letsGo->myMoves[i].ballVel;
             Z_t = determineObservedLandmarks(currentPose, 0.0);
-            myLoc->updateLocalization((*letsGo).myMoves[i].move,Z_t);
+
+            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+
+            // Figure out the current ball distance and bearing
+            visBall->setDistanceEst(determineBallEstimate(&currentPose,
+                                                          &currentBall,
+                                                          0.0));
+
+            // Update the ball estimate model
+            ballEKF->updateModel(visBall);
 
             // Print the current frame to file
             printOutLogLine(outputFile, myLoc, Z_t, (*letsGo).myMoves[i].move,
-                            &currentPose, &letsGo->ballStart);
+                            &currentPose, &currentBall, ballEKF);
         }
     }
+
+    delete myLoc;
+    delete ballEKF;
+    delete visBall;
 }
 
 /**
@@ -289,6 +306,26 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
     return Z_t;
 }
 
+/**
+ * Function to return the current estimate towards the known ball position
+ *
+ * @param currentPose the current known pose of the robot
+ *
+ * @return The current distance and bearing of the ball with noise
+ */
+estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
+                               float neckYaw)
+{
+    estimate e;
+    e.dist = hypot(currentPose->x - currentBall->x,
+                   currentPose->y - currentBall->y);
+    e.bearing = atan2(currentPose->y - currentBall->y,
+                      currentPose->x - currentBall->x) - currentPose->h -
+        QUART_CIRC_RAD;
+    return e;
+}
+
+
 ////////////////////////
 // File I/O           //
 ////////////////////////
@@ -328,7 +365,6 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
     }
 }
 
-
 /**
  * Prints the input to a log file to be read by the TOOL
  *
@@ -339,7 +375,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  */
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                      sightings, MotionModel lastOdo, PoseEst *currentPose,
-                     BallPose * currentBall)
+                     BallPose * currentBall, BallEKF * ballEKF)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
@@ -357,14 +393,16 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                   << myLoc->getHEstDeg() << " "
                   << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                   << myLoc->getHUncertDeg() << " "
-        //<< "0.0" << " " << "0.0" << " " // Ball x,y
-                  << (*currentBall).x << " "
-                  << (*currentBall).y << " "
-                  << "0.0" << " " << "0.0" << " " // Ball Uncert
-                  << (*currentBall).velX << " "
-                  << (*currentBall).velY << " "
-        //<< "0.0" << " " << "0.0" << " " // Ball Velocity
-        << "0.0" << " " << "0.0" << " " // Ball Vel uncert
+                  // Ball estimates
+                  << ballEKF->getXEst() << " "
+                  << ballEKF->getYEst() << " "
+                  << ballEKF->getXUncert() << " "
+                  << ballEKF->getYUncert() << " "
+                  << ballEKF->getXVelocityEst() << " "
+                  << ballEKF->getYVelocityEst() << " "
+                  << ballEKF->getXVelocityUncert() << " "
+                  << ballEKF->getYVelocityUncert() << " "
+                  // Odometery
                   << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                   << lastOdo.deltaR;
 
@@ -372,14 +410,14 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
     (*outputFile) << ":";
 
     // Print the actual robot position
-    (*outputFile) << (*currentPose).x << " "
-                  << (*currentPose).y << " "
-                  << (*currentPose).h << " "
+    (*outputFile) << currentPose->x << " "
+                  << currentPose->y << " "
+                  << currentPose->h << " "
     // print actual ball position
-                  << (*currentBall).x << " "
-                  << (*currentBall).y << " "
-                  << (*currentBall).velX << " "
-                  << (*currentBall).velY << " ";
+                  << currentBall->x << " "
+                  << currentBall->y << " "
+                  << currentBall->velX << " "
+                  << currentBall->velY << " ";
 
     // Divide the sections with a colon
     (*outputFile) << ":";

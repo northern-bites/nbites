@@ -48,9 +48,9 @@ public:
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(Ball ball);
+    void updateModel(Ball * ball);
     void sawTeammateBall(Measurement m);
-    void sawBall(Ball ball);
+    void sawBall(Ball * ball);
 
     // Getters
     /**

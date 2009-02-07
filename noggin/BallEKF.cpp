@@ -35,13 +35,13 @@ BallEKF::BallEKF(MCL * _mcl,
  * Method to deal with updating the entire ball model
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(Ball ball)
+void BallEKF::updateModel(Ball * ball)
 {
     // Update expected ball movement
     timeUpdate(MotionModel());
 
     // We've seen a ball
-    if (ball.getDist() > 0) {
+    if (ball->getDist() > 0) {
         sawBall(ball);
         // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
     } else { // No ball seen
@@ -55,14 +55,16 @@ void BallEKF::updateModel(Ball ball)
  * Method to deal with sighting of a ball by the robot
  * @param ball a copy of the ball seen by the robot
  */
-void BallEKF::sawBall(Ball ball)
+void BallEKF::sawBall(Ball * ball)
 {
     Measurement m;
-    m.distance = ball.getDist();
-    m.bearing = ball.getBearing();
-    m.distanceSD = ball.getDistanceSD();
-    m.bearingSD = ball.getBearingSD();
     std::vector<Measurement> z;
+
+    m.distance = ball->getDist();
+    m.bearing = ball->getBearing();
+    m.distanceSD = ball->getDistanceSD();
+    m.bearingSD = ball->getBearingSD();
+
     z.push_back(m);
     correctionStep(z);
 }
@@ -108,6 +110,7 @@ void BallEKF::incorporateMeasurement(Measurement z,
     float x_b_r = z.distance * cos(z.bearing + QUART_CIRC_RAD);
     float y_b_r = z.distance * sin(z.bearing + QUART_CIRC_RAD);
     ublas::vector<float> z_x(2);
+
     z_x(0) = x_b_r;
     z_x(1) = y_b_r;
 
@@ -118,6 +121,7 @@ void BallEKF::incorporateMeasurement(Measurement z,
     float x_b = getXEst();
     float y_b = getYEst();
     ublas::vector<float> d_x(2);
+
     d_x(0) = (x_b - x)*cos(-h) - (y_b - y)*sin(-h);
     d_x(1) = (x_b - x)*sin(-h) + (y_b - y)*cos(-h);
 

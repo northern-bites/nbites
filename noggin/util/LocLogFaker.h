@@ -36,6 +36,25 @@ public:
     float y;
     float velX;
     float velY;
+
+    BallPose operator+ (const BallPose o){
+        return BallPose(x + o.velX,
+                        y + o.velY,
+                        o.velX,
+                        o.velY);
+    }
+
+    void operator+= (const BallPose o){
+        x += o.velX;
+        y += o.velY;
+        velX = o.velX;
+        velY = o.velY;
+    }
+
+    BallPose(float _x, float _y, float _vx, float _vy) : x(_x), y(_y), velX(_vx),
+                                                         velY(_vy) {}
+    BallPose() {}
+
 };
 
 /**
@@ -60,12 +79,14 @@ public:
 
 std::vector<Observation> determineObservedLandmarks(PoseEst myPos,
                                                     float neckYaw);
+estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
+                               float neckYaw);
 void iteratePath(fstream * outputFile, NavPath * letsGo);
 // IO Functions
 void readInputFile(fstream* name, NavPath * letsGo);
 void printOutLogLine(fstream* outputFile, MCL* myLoc, std::vector<Observation>
                      sightings, MotionModel lastOdo, PoseEst * currentPose,
-                     BallPose * currentBall);
+                     BallPose * currentBall, BallEKF * ballEKF);
 
 // Helper functions
 float subPIAngle(float theta);

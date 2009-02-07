@@ -58,11 +58,14 @@ void EKF::correctionStep(std::vector<Measurement> z_k)
     // Incorporate all correction observations
     for(unsigned int i = 0; i < z_k.size(); ++i) {
         incorporateMeasurement(z_k[i], H_k, R_k, v_k);
+
         // Calculate the Kalman gain matrix
         ublas::matrix<float> pTimesHTrans = prod(P_k_bar, trans(H_k));
-        K_k = prod(P_k_bar, invert2by2(prod(H_k, pTimesHTrans)+ R_k));
+        K_k = prod(pTimesHTrans, invert2by2(prod(H_k, pTimesHTrans) + R_k));
+
         // Use the Kalman gain matrix to determine the next estimate
         xhat_k_bar = xhat_k_bar + prod(K_k, v_k);
+
         // Update associate uncertainty
         P_k_bar = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);
     }
