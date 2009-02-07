@@ -31,7 +31,8 @@ class Motion : public Thread
 {
 public:
 #ifdef NAOQI1
-    Motion(boost::shared_ptr<Synchro> synchro, MotionEnactor * _enactor,
+    Motion(boost::shared_ptr<Synchro> synchro,
+           boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Sensors> s);
 #else
     Motion(ALMotionProxy * _proxy, boost::shared_ptr<Synchro> synchro,
@@ -45,9 +46,9 @@ public:
 private:
     MotionSwitchboard switchboard;
 #ifdef NAOQI1
-    MotionEnactor *enactor;
+    boost::shared_ptr<MotionEnactor> enactor;
 #else
-    SimulatorEnactor *enactor;
+    boost::shared_ptr<SimulatorEnactor> enactor;
 #endif
     MotionInterface interface;
 };

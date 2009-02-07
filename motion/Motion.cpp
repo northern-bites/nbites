@@ -7,9 +7,9 @@ using namespace boost;
 #include "Motion.h"
 #include "_motionmodule.h"
 #include "SimulatorEnactor.h"
-#include "SimulatorEnactor.h"
 
-Motion::Motion (shared_ptr<Synchro> _synchro, MotionEnactor * _enactor,
+Motion::Motion (shared_ptr<Synchro> _synchro,
+                shared_ptr<MotionEnactor> _enactor,
                 shared_ptr<Sensors> s)
   : Thread(_synchro, "MotionCore"),
     switchboard(s),

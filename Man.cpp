@@ -89,7 +89,7 @@ Man::Man ()
 #else
     enactor = shared_ptr<MotionEnactor>(new SimulatorEnactor(sensors));
 #endif
-    motion(synchro, enactor, &sensors);
+    motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors));
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
