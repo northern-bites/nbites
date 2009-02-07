@@ -134,7 +134,6 @@ private:
     void initMan (void);
     void closeMan(void);
 #ifdef NAOQI1
-    void syncWithALMemory();
     void registerCamera();
     void initCameraSettings(int whichCam);
 #else
