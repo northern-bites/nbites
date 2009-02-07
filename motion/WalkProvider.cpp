@@ -1,8 +1,13 @@
+
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+
+#include "Sensors.h"
 #include "WalkProvider.h"
 using Kinematics::LLEG_CHAIN;
 using Kinematics::RLEG_CHAIN;
 
-WalkProvider::WalkProvider(Sensors *s)
+WalkProvider::WalkProvider(shared_ptr<Sensors> s)
     : MotionProvider(),
       sensors(s),
       walkParameters(.02f,         // motion frame length - FIXME constant

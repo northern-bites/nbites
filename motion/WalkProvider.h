@@ -19,7 +19,7 @@
 using namespace std;
 
 #include <boost/tuple/tuple.hpp>
-
+#include <boost/shared_ptr.hpp>
 
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
@@ -31,7 +31,7 @@ typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 //know the length of a motion frame!!
 class WalkProvider : public MotionProvider {
 public:
-    WalkProvider(Sensors *s);
+    WalkProvider(boost::shared_ptr<Sensors> s);
     virtual ~WalkProvider();
 
     void requestStop();
@@ -43,7 +43,7 @@ public:
 private:
     virtual void setActive();
 
-    Sensors *sensors;
+    boost::shared_ptr<Sensors> sensors;
 
     WalkingParameters walkParameters;
     StepGenerator stepGenerator;
