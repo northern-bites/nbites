@@ -25,7 +25,7 @@
 template <class T>
 void MessagePost<T>::post(T &copy)
 {
-    assert(lock());
+    assert(dolock());
     data = copy;
     assert(release());
 }
@@ -34,7 +34,7 @@ template <class T>
 T MessagePost<T>::retrieve()
 {
     T copy;
-    assert(lock());
+    assert(dolock());
     copy = data;
     assert(release());
     return copy;
@@ -43,7 +43,7 @@ T MessagePost<T>::retrieve()
 template <class T>
 void MessageQueue<T>::append(T &copy)
 {
-    assert(lock());
+    assert(dolock());
     data.push_back(new T(copy));
     assert(release());
 }
@@ -55,7 +55,7 @@ T* MessageQueue<T>::retrieve()
         return NULL;
 
     T* copy;
-    assert(lock());
+    assert(dolock());
     copy = data.pop_front();
     assert(release());
     return copy;

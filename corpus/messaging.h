@@ -23,32 +23,30 @@
 
 
 template <class T>
-class MessagePost
-    : public Lock
+class MessagePost : public Lock
 {
-
-  public:
+public:
     T data;
 
-  public:
+public:
     MessagePost() : data() { }
     MessagePost(T &copy) : data(copy) { }
 
-  public:
+public:
     void post(T &copy);
     T    retrieve();
 };
 
 template <class T>
-class MessageQueue {
-
-  public:
+class MessageQueue : public Lock
+{
+public:
     std::list<T> data;
 
-  public:
+public:
     MessageQueue() : data() { };
 
-  public:
+public:
     void append(T &copy);
     T*   retrieve();
     std::list<T*> retrieveAll();

@@ -48,7 +48,7 @@ class Lock
     ~Lock() { pthread_mutex_destroy(&mutex); }
 
   public:
-    inline int lock()    { return pthread_mutex_lock(&mutex); }
+    inline int dolock()    { return pthread_mutex_lock(&mutex); }
     inline int trylock() { return pthread_mutex_trylock(&mutex); }
     inline int release() { return pthread_mutex_unlock(&mutex); }
 
