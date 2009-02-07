@@ -15,8 +15,7 @@ using namespace boost;
 const char * BRAIN_MODULE = "man.noggin.Brain";
 
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
-  : brain_module(NULL), brain_instance(NULL),
-    error_state(false), mcl()
+  : error_state(false), brain_module(NULL), brain_instance(NULL), mcl()
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
