@@ -149,7 +149,6 @@ extern "C" {
 	}
 	
 	if (obj != NULL) {
-	  cout<<obj->getID()<<endl;
 	  env->CallVoidMethod(jobj, setFieldObjectInfo,
 			      (int) obj->getID(),
 			      obj->getWidth(), obj->getHeight(),

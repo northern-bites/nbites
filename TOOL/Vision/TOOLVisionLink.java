@@ -170,6 +170,6 @@ public class TOOLVisionLink {
 	fieldObject.setRightTopX(rtx); fieldObject.setRightTopY(rty);
 	fieldObject.setLeftBottomX(lbx); fieldObject.setLeftBottomY(lby);
 	fieldObject.setRightBottomX(rbx); fieldObject.setRightBottomY(rby);
-	visualFieldObjects.add(fieldObject);
-      }
+	visualFieldObjects.add(fieldObject);//add the object to the vector
+    }
 }

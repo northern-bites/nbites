@@ -25,12 +25,9 @@ import TOOL.Calibrate.VisionState;
 public class ProcessedImage extends ThresholdedImage {
     
     private TOOLVisionLink visionLink;//the link
-    private VisionState visionState;//the vision state the image is in
 
-    public ProcessedImage(TOOLImage image, ColorTable cTable, VisionState visionState) {
+    public ProcessedImage(TOOLImage image, ColorTable cTable) {
         super(image.getWidth(), image.getHeight());
-
-	this.visionState = visionState;
 
         visionLink = new TOOLVisionLink();
         this.thresholdImage(cTable, image);
@@ -44,7 +41,7 @@ public class ProcessedImage extends ThresholdedImage {
     public void thresholdImage(ColorTable table, TOOLImage image) {
         // Grab a constant reference to the current instance of the TOOL
         final TOOL tool = TOOL.instance;
-
+	
         if(table == null)
             return;
         // Isn't it REALLY lame that these get initialized for the first time
@@ -82,7 +79,7 @@ public class ProcessedImage extends ThresholdedImage {
                 colorTable.getUDimension()*colorTable.getVDimension();
             byte[] rawTable = new byte[ct_size];
             colorTable.writeByteArray(rawTable);
-
+	    
             // This variable is declared in the superclass and used by its
             // getters.
             thresholded = visionLink.processImage(rawImage,joints,rawTable);

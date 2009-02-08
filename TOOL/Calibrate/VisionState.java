@@ -43,19 +43,17 @@ public class VisionState {
     private ThresholdedImageOverlay thresholdedOverlay;
     private ColorTable  colorTable;
   
-    //objects
+    //objects - these are just pointers to the objects in the visionLink
     private Ball ball;
     private Vector<VisualFieldObject> visualFieldObjects;
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
-  
 	rawImage = f.image();
         colorTable = c;
-	
 	//init the objects
         if (rawImage != null && colorTable != null)  {
-	    thresholdedImage = new ProcessedImage(rawImage, colorTable, this);
+	    thresholdedImage = new ProcessedImage(rawImage, colorTable);
 	    thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(), 
 							     thresholdedImage.getHeight());
 	}
@@ -63,7 +61,7 @@ public class VisionState {
 
     //This updates the whole processed stuff 
     //- the thresholded image, the field objects and the ball
-    public void update(ProcessedImage thresholdedImage) {
+    public void update() {
 	if (thresholdedImage != null)  {
 	    //we process the image; the visionLink updates itself with the new data from the bot
 	    thresholdedImage.thresholdImage();
@@ -79,13 +77,14 @@ public class VisionState {
     public void drawObjectBoxes(){
 	thresholdedOverlay.resetPixels();//reset the overlay
 	//set ball box
-	thresholdedOverlay.setRectOverlay(ball.getX(), ball.getY(),
-					  (int) ball.getWidth(), (int) ball.getHeight(),
+	if (ball.getRadius() > 0)
+	    thresholdedOverlay.drawCircle(ball.getCenterX(), ball.getCenterY(),
+					  (int) ball.getRadius(),
 					  BALL_BOX_THICKNESS, BALL_BOX_COLOR);
 	//set VisualFieldObjects
 	VisualFieldObject obj;
 	//loop through the objects
-	for (int i = 0; i < visualFieldObjects.size(); i++) {
+    	for (int i = 0; i < visualFieldObjects.size(); i++) {
 	    obj = visualFieldObjects.elementAt(i);
 	    //choose a color
 	    byte color;
@@ -102,24 +101,30 @@ public class VisionState {
 	    default: color = Vision.BLACK; break;
 	    }
 	    //draw the box
-	    thresholdedOverlay.setRectOverlay(obj.getLeftTopX(), obj.getLeftTopY(),
-					      (int) obj.getWidth(), (int) obj.getHeight(),
-					      GOAL_POST_BOX_THICKNESS, color);
+	    if (obj.getWidth() > 0)
+		thresholdedOverlay.drawPolygon(obj.getLeftTopX(), obj.getRightTopX(),
+					       obj.getRightBottomX(), obj.getLeftBottomX(),
+					       obj.getLeftTopY(), obj.getRightTopY(),
+					       obj.getRightBottomY(), obj.getLeftBottomY(),
+					       GOAL_POST_BOX_THICKNESS, color);
 	}
-	    
     }
-
+    
+    //load frame - loads data from a frame - we're interested in the raw image
+    public void loadFrame(Frame f) {
+	rawImage = f.image();
+    }
+	
     //getters
     public TOOLImage getImage() { return rawImage;  }
     public ProcessedImage getThreshImage() { return thresholdedImage;  }
     public ThresholdedImageOverlay getThreshOverlay() { return thresholdedOverlay; }
     public ColorTable getColorTable() { return colorTable;  }
-
     public Ball getBall() { return ball; }
+
     //setters
     public void setImage(TOOLImage i) { rawImage = i; }
     public void setThreshImage(ProcessedImage i) { thresholdedImage = i;  }
     public void setColorTable(ColorTable c) { colorTable = c; }
-
     public void setBall(Ball b) { ball = b;  }
 }

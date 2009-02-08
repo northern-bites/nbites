@@ -246,7 +246,6 @@ public class Calibrate implements DataListener, MouseListener,
         gridbag.setConstraints(images_panel, c);
         main_panel.add(images_panel);
 
-
         // within that panel, we have a split view of the two images
         split_pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         split_pane.setLeftComponent(selector);
@@ -256,9 +255,6 @@ public class Calibrate implements DataListener, MouseListener,
         split_changing = false;
         split_pane.addPropertyChangeListener(this);
         images_panel.add(split_pane);
-
-
-
 
         // set up mouse listeners
         selector.addMouseListener(this);
@@ -426,7 +422,7 @@ public class Calibrate implements DataListener, MouseListener,
         redoStack.clear();
 
         //update the visionState
-        visionState.update(thresholdedImage);
+        visionState.update();
         //lastly, need to repaint
         // simply repaint the selector, as underlying image hasn't changed
         selector.repaint();
@@ -578,7 +574,7 @@ public class Calibrate implements DataListener, MouseListener,
 
 
         //update the vision state (which thresholds the whole image again, and updates the objects)
-        visionState.update(thresholdedImage);
+        visionState.update();
         //lastly, need to repaint
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
@@ -710,7 +706,7 @@ public class Calibrate implements DataListener, MouseListener,
         }
 
 	//update the thresholded image by calling visionstate.update
-        visionState.update(thresholdedImage);
+        visionState.update();
         displayer.updateImage(thresholdedImage);
 	displayer.repaint();
         selector.repaint();
@@ -764,7 +760,7 @@ public class Calibrate implements DataListener, MouseListener,
         }
 
 	//update the thresholded image by calling update on visionstate
-        visionState.update(thresholdedImage);
+        visionState.update();
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
 	displayer.repaint();
@@ -1023,16 +1019,23 @@ public class Calibrate implements DataListener, MouseListener,
     public void notifyDataSet(DataSet s, Frame f) {
         notifyFrame(f);
     }
-
+    //to do: clean up this code - Octavian
     public void notifyFrame(Frame f) {
         if (!f.hasImage())
             return;
-
-        visionState = new VisionState(f, tool.getColorTable());
+	//if visionState is null, initialize, else just load the frame
+        //if (visionState == null) {
+	visionState = new VisionState(f, tool.getColorTable());
+	thresholdedImage = visionState.getThreshImage();//sync the thresholded images
+	/*}
+	  else {
+	  visionState.loadFrame(f);
+	  visionState.setColorTable(tool.getColorTable());
+	  }
+	*/
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
-	thresholdedImage =  visionState.getThreshImage();
-	visionState.update(thresholdedImage);
+	visionState.update();
         colorTable = visionState.getColorTable();
 
         // Since we now handle different sized frames, it's possible to
@@ -1051,6 +1054,7 @@ public class Calibrate implements DataListener, MouseListener,
         if(thresholdedImage != null) {
             displayer.updateImage(thresholdedImage);
 	    displayer.setOverlayImage(visionState.getThreshOverlay());
+	    visionState.update();
 	}
 
 	selector.repaint();
@@ -1074,7 +1078,7 @@ public class Calibrate implements DataListener, MouseListener,
 
         //threshold the full image again
         if(thresholdedImage != null)//if no frame is loaded, don't want to update
-            visionState.update(thresholdedImage);
+            visionState.update();
         //lastly, need to repaint  
         selector.repaint();
 	displayer.repaint();
