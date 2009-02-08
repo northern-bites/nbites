@@ -19,6 +19,9 @@ FO_SRCS = ../../vision/VisualFieldObject.cpp
 
 CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp
 
+BALL_SRCS = ../../vision/Ball.cpp \
+	../../vision/Ball.h
+
 LOG_SRCS = MCLLogger.cpp \
 	MCLLogger.h
 EKF_SRCS = ../EKF.h \
@@ -31,6 +34,7 @@ OBJS = 	Utility.o \
 	concreteLine.o \
 	visualCorner.o \
 	concreteCorner.o \
+	Ball.o \
 	Observation.o
 
 OBS_SRCS = ../Observation.cpp
@@ -42,8 +46,8 @@ FAKER_SRCS = LocLogFaker.cpp \
 
 all : faker
 
-faker : $(FAKER_SRCS) $(OBS_SRCS) $(CL_SRCS) $(CC_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS) $(EKF_SRCS) $(BallEFK_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o faker $(FAKER_SRCS) $(OBS_SRCS) $(CL_SRCS) $(CC_SRCS)  $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS) $(EKF_SRCS) $(BallEKF_SRCS)
+faker : $(FAKER_SRCS) $(OBS_SRCS) $(CL_SRCS) $(CC_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(BALL_SRCS) $(MCL_SRCS) $(EKF_SRCS) $(BallEFK_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -DNO_ZLIB -o faker $(FAKER_SRCS) $(OBS_SRCS) $(CL_SRCS) $(CC_SRCS)  $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(BALL_SRCS) $(MCL_SRCS) $(EKF_SRCS) $(BallEKF_SRCS)
 
 
 mclLogger : $(LOG_SRCS) $(OBS_SRCS) $(CC_SRCS) $(CL_SRCS) $(VL_SRCS) $(VC_SRCS) $(UTILITY_SRCS) $(CCFO_SRCS) $(FO_SRCS) $(MCL_SRCS)
@@ -69,6 +73,9 @@ Utility.o : $(UTILITY_SRCS)
 
 concreteFO.o : $(CCFO_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $(CCFO_SRCS)
+
+Ball : $(BALL_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $(BALL_SRCS)
 
 .Phony : clean
 

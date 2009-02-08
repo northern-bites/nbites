@@ -317,11 +317,14 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                                float neckYaw)
 {
     estimate e;
-    e.dist = hypot(currentPose->x - currentBall->x,
-                   currentPose->y - currentBall->y);
-    e.bearing = atan2(currentPose->y - currentBall->y,
-                      currentPose->x - currentBall->x) - currentPose->h -
-        QUART_CIRC_RAD;
+    // if ((rand() / (float(RAND_MAX)+1)) < 0.45) {
+    // e.dist = hypot(currentPose->x - currentBall->x,
+    //                currentPose->y - currentBall->y);
+    // e.bearing = atan2(currentPose->y - currentBall->y,
+    //                   currentPose->x - currentBall->x) - currentPose->h -
+    //     QUART_CIRC_RAD;
+    e.dist = 0;
+    e.bearing = 0;
     return e;
 }
 
