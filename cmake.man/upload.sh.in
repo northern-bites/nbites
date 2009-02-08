@@ -52,7 +52,7 @@ fi
 
 SRC=install/*
 
-#echo "rsync -rcLv $SRC $DEST/"
-#rsync -rcLv $SRC $DEST/
-echo "scp -rv $SRC $DEST/"
-scp -r $SRC $DEST/
+echo "rsync -rcLv $SRC $DEST/"
+rsync -rcLv $SRC $DEST/
+#echo "scp -rv $SRC $DEST/"
+#scp -r $SRC $DEST/
