@@ -40,7 +40,7 @@ public class WorldControllerPainter implements DogListener
     static final Color SAW_YELLOW_BEACON_COLOR = Color.YELLOW;
 
     // Dog drawing
-    static final Color REAL_DOG_POSITION_COLOR = Color.BLACK;
+    static final Color REAL_DOG_POSITION_COLOR = Color.CYAN;
     static final Color ESTIMATED_DOG_POSITION_COLOR = Color.BLUE;
     static final int   BLUE_TEAM = 0;
     static final int   RED_TEAM = 1;
@@ -63,7 +63,7 @@ public class WorldControllerPainter implements DogListener
     public static final double HEADING_UNCERT_RADIUS = 20.;
 
     // Ball drawing
-    static final Color REAL_BALL_COLOR = Color.RED;
+    static final Color REAL_BALL_COLOR = Color.pink;
     static final Color ESTIMATED_BALL_COLOR = Color.ORANGE;
     static final Color ESTIMATED_BALL_UNCERT_COLOR = Color.ORANGE;
     static final boolean DRAW_BALL_VELOCITY = true;
@@ -134,6 +134,8 @@ public class WorldControllerPainter implements DogListener
     private double[] positionEstimates;
     private double[] uncertaintyEstimates;
     private float[] realPose;
+    private float[] realBallPose;
+
     /**
      * Constructs the painter to draw all possible localization information
      * @param toView Field on which the painter will paint.
@@ -167,6 +169,12 @@ public class WorldControllerPainter implements DogListener
         realPose[0] = NO_DATA_VALUE;
         realPose[1] = NO_DATA_VALUE;
         realPose[2] = NO_DATA_VALUE;
+        realBallPose = new float[4];
+        realBallPose[0] = NO_DATA_VALUE;
+        realBallPose[1] = NO_DATA_VALUE;
+        realBallPose[2] = NO_DATA_VALUE;
+        realBallPose[3] = NO_DATA_VALUE;
+
     }
 
     /**
@@ -184,6 +192,7 @@ public class WorldControllerPainter implements DogListener
             paintParticleSet(g2);
             paintEstimateMeanAndVariance(g2);
             paintRealRobotPose(g2);
+            paintRealBallPose(g2);
         } catch (ConcurrentModificationException e) {
             // Ignore.  The painting and simulation threads are trying
             // to concurrently access elements in the same list
@@ -520,9 +529,6 @@ public class WorldControllerPainter implements DogListener
                                      double at_x,
                                      double at_y)
     {
-        System.out.println("drawing real position at (" + at_x + " , " + at_y
-                           + ")");
-
         field.fillOval(drawing_on, REAL_BALL_COLOR, field.DRAW_STROKE,
                        at_x, at_y, field.BALL_RADIUS, field.BALL_RADIUS);
     }
@@ -889,6 +895,23 @@ public class WorldControllerPainter implements DogListener
     }
 
     /**
+     * Update the current known pose of the ball
+     *
+     * @param _x The x position of the ball
+     * @param _y The y position of the ball
+     * @param _vx The x velocity of the ball
+     * @param _vy The y velocity of the ball
+     */
+    public void updateRealBallInfo(float _x, float _y,
+                                   float _vx, float _vy)
+    {
+        realBallPose[0] = _x;
+        realBallPose[1] = _y;
+        realBallPose[2] = _vx;
+        realBallPose[3] = _vy;
+    }
+
+    /**
      * Paints the current set of particles on the field.  Called by
      * updateInfomration when the WorldControllerViewer is updated.
      *
@@ -935,6 +958,20 @@ public class WorldControllerPainter implements DogListener
         }
         drawDogsRealPosition(g2, /*Color.CYAN,*/ realPose[0], realPose[1],
                              realPose[2], 0.0);
+    }
+
+    /**
+     * Function to draw the known position of the ball
+     *
+     * @param g2 The graphics context on which the ball should be drawn
+     */
+    public void paintRealBallPose(Graphics2D g2)
+    {
+        if (realBallPose[0] == NO_DATA_VALUE) {// Test if data exists
+            return; // Draw nothing if we don't know the current real pose
+        }
+        drawBallRealPosition(g2, realBallPose[0],
+                             realBallPose[1]);
     }
 
 
