@@ -44,6 +44,18 @@ PreviewController::PreviewController()
     for (int i=0; i < 3; i++)
         c(0,i) = c_values[i];
 
+#ifdef DEBUG_CONTROLLER_GAINS
+    FILE * gains_log;
+    gains_log = fopen("/tmp/gains_log.xls","w");
+    int j = 0;
+    fprintf(gains_log,"time\tgain\n");
+    //write the controller gains
+    for(int i  = 0; i < NUM_PREVIEW_FRAMES; i++){
+        fprintf(gains_log,"%d\t%f\n",j++,weights[j]);
+    }
+    fclose(gains_log);
+#endif
+
 }
 
 /**

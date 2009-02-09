@@ -24,6 +24,11 @@ using namespace boost::numeric;
 using std::list;
 
 #include "WalkController.h"
+#include "motionconfig.h"
+
+#ifdef DEBUG_MOTION
+#  define DEBUG_CONTROLLER_GAINS
+#endif
 
 class PreviewController : public WalkController {
 public:
@@ -65,7 +70,6 @@ private:
     ufmatrix3 A_c;
     ufvector3 b;
     ufrowVector3 c;
-
 
 };
 
