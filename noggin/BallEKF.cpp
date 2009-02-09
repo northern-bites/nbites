@@ -27,8 +27,8 @@ BallEKF::BallEKF(MCL * _mcl,
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1.0 / 30.0f;//ASSUMED_FPS;
-    A_k(1,3) = 1.0 / 30.0f;//ASSUMED_FPS;
+    A_k(0,2) = 1.0 / ASSUMED_FPS;
+    A_k(1,3) = 1.0 / ASSUMED_FPS;
 
     // Setup initial values
     setXEst(initX);
@@ -50,17 +50,20 @@ void BallEKF::updateModel(Ball * ball)
 {
     // Update expected ball movement
     timeUpdate(MotionModel());
-    limitUncertGrowth();
+    limitAPrioriUncert();
 
     // We've seen a ball
     if (ball->getDist() > 0.0) {
         sawBall(ball);
+
         // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
     } else { // No ball seen
         setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
         setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
         noCorrectionStep();
+
     }
+    limitPosteriorUncert();
 }
 
 /**
@@ -97,6 +100,8 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
     ublas::vector<float> deltaBall(BALL_EKF_DIMENSION);
     deltaBall(0) = getXVelocityEst() * (1.0f / ASSUMED_FPS);
     deltaBall(1) = getYVelocityEst() * (1.0f / ASSUMED_FPS);
+    // deltaBall(2) = 0.0f;
+    // deltaBall(3) = 0.0f;
     deltaBall(2) = sign(getXVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
     deltaBall(3) = sign(getYVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
 
@@ -154,22 +159,87 @@ void BallEKF::incorporateMeasurement(Measurement z,
 /**
  * Method to ensure that uncertainty does not grow without bound
  */
-void BallEKF::limitUncertGrowth()
+void BallEKF::limitAPrioriUncert()
 {
+
     // Check x uncertainty
-    if(P_k_bar(0,0) > X_UNCERT_LIMIT) {
-        P_k_bar(0,0) = X_UNCERT_LIMIT;
+    if(P_k_bar(0,0) > X_UNCERT_MAX) {
+        P_k_bar(0,0) = X_UNCERT_MAX;
     }
     // Check y uncertainty
-    if(P_k_bar(1,1) > Y_UNCERT_LIMIT) {
-        P_k_bar(1,1) = Y_UNCERT_LIMIT;
+    if(P_k_bar(1,1) > Y_UNCERT_MAX) {
+        P_k_bar(1,1) = Y_UNCERT_MAX;
     }
     // Check x veolcity uncertainty
-    if(P_k_bar(2,2) > VELOCITY_UNCERT_LIMIT) {
-        P_k_bar(2,2) = VELOCITY_UNCERT_LIMIT;
+    if(P_k_bar(2,2) > VELOCITY_UNCERT_MAX) {
+        P_k_bar(2,2) = VELOCITY_UNCERT_MAX;
     }
     // Check y veolcity uncertainty
-    if(P_k_bar(3,3) > VELOCITY_UNCERT_LIMIT) {
-        P_k_bar(3,3) = VELOCITY_UNCERT_LIMIT;
+    if(P_k_bar(3,3) > VELOCITY_UNCERT_MAX) {
+        P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
     }
+    // Check x uncertainty
+    if(P_k_bar(0,0) < X_UNCERT_MIN) {
+        P_k_bar(0,0) = X_UNCERT_MIN;
+    }
+    // Check y uncertainty
+    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
+        P_k_bar(1,1) = Y_UNCERT_MIN;
+    }
+    // Check x veolcity uncertainty
+    if(P_k_bar(2,2) < VELOCITY_UNCERT_MIN) {
+        P_k_bar(2,2) = VELOCITY_UNCERT_MIN;
+    }
+    // Check y veolcity uncertainty
+    if(P_k_bar(3,3) < VELOCITY_UNCERT_MIN) {
+        P_k_bar(3,3) = VELOCITY_UNCERT_MIN;
+    }
+}
+
+/**
+ * Method to ensure that uncertainty does not grow or shrink without bound
+ */
+void BallEKF::limitPosteriorUncert()
+{
+    // Check x uncertainty
+    if(P_k(0,0) < X_UNCERT_MIN) {
+        P_k(0,0) = X_UNCERT_MIN;
+        P_k_bar(0,0) = X_UNCERT_MIN;
+    }
+    // Check y uncertainty
+    if(P_k(1,1) < Y_UNCERT_MIN) {
+        P_k(1,1) = Y_UNCERT_MIN;
+        P_k_bar(1,1) = Y_UNCERT_MIN;
+    }
+    // Check x veolcity uncertainty
+    if(P_k(2,2) < VELOCITY_UNCERT_MIN) {
+        P_k(2,2) = VELOCITY_UNCERT_MIN;
+        P_k_bar(2,2) = VELOCITY_UNCERT_MIN;
+    }
+    // Check y veolcity uncertainty
+    if(P_k(3,3) < VELOCITY_UNCERT_MIN) {
+        P_k(3,3) = VELOCITY_UNCERT_MIN;
+        P_k_bar(3,3) = VELOCITY_UNCERT_MIN;
+    }
+    // Check x uncertainty
+    if(P_k(0,0) > X_UNCERT_MAX) {
+        P_k(0,0) = X_UNCERT_MAX;
+        P_k_bar(0,0) = X_UNCERT_MAX;
+    }
+    // Check y uncertainty
+    if(P_k(1,1) > Y_UNCERT_MAX) {
+        P_k(1,1) = Y_UNCERT_MAX;
+        P_k_bar(1,1) = Y_UNCERT_MAX;
+    }
+    // Check x veolcity uncertainty
+    if(P_k(2,2) > VELOCITY_UNCERT_MAX) {
+        P_k(2,2) = VELOCITY_UNCERT_MAX;
+        P_k_bar(2,2) = VELOCITY_UNCERT_MAX;
+    }
+    // Check y veolcity uncertainty
+    if(P_k(3,3) > VELOCITY_UNCERT_MAX) {
+        P_k(3,3) = VELOCITY_UNCERT_MAX;
+        P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
+    }
+
 }

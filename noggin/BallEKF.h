@@ -28,9 +28,12 @@
 #define INIT_Y_UNCERT 100.0f
 #define INIT_X_VEL_UNCERT 10.0f
 #define INIT_Y_VEL_UNCERT 10.0f
-#define X_UNCERT_LIMIT 440.0f
-#define Y_UNCERT_LIMIT 680.0f
-#define VELOCITY_UNCERT_LIMIT 300.0f
+#define X_UNCERT_MAX 440.0f
+#define Y_UNCERT_MAX 680.0f
+#define VELOCITY_UNCERT_MAX 300.0
+#define X_UNCERT_MIN 1.0e-6
+#define Y_UNCERT_MIN 1.0e-6
+#define VELOCITY_UNCERT_MIN 1.0e-6
 
 /**
  * Class for tracking of ball position and velocity.  Extends the abstract
@@ -39,6 +42,7 @@
 class BallEKF : public EKF
 {
 public:
+
     // Constructors & Destructors
     BallEKF(MCL * _mcl,
             float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
@@ -152,7 +156,8 @@ private:
                                         ublas::matrix<float> &H_k,
                                         ublas::matrix<float> &R_k,
                                         ublas::vector<float> &V_k);
-    void limitUncertGrowth(void);
+    void limitAPrioriUncert(void);
+    void limitPosteriorUncert(void);
     // Members
     MCL * robotLoc;
 };

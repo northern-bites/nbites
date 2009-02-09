@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "Ball.h"
 #include "MCL.h"
 #include "BallEKF.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
@@ -20,6 +21,7 @@
 #define LINE_MAX_VIEW_RANGE 250.0f
 // Number of frames to wait between resampling
 #define RESAMPLE_RATE 5
+#define BALL_ID 40
 
 // Constants
 string team_color = "0";
@@ -88,7 +90,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo);
 void readInputFile(fstream* name, NavPath * letsGo);
 void printOutLogLine(fstream* outputFile, MCL* myLoc, std::vector<Observation>
                      sightings, MotionModel lastOdo, PoseEst * currentPose,
-                     BallPose * currentBall, BallEKF * ballEKF);
+                     BallPose * currentBall, BallEKF * ballEKF, Ball _b);
 
 // Helper functions
 float subPIAngle(float theta);

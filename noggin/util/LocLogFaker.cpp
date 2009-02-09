@@ -92,7 +92,8 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     MCL *myLoc = new MCL;
-    BallEKF *ballEKF = new BallEKF(myLoc);
+    MCL *fakeLoc = new MCL;
+    BallEKF *ballEKF = new BallEKF(fakeLoc);
     PoseEst currentPose;
     BallPose currentBall;
     MotionModel noMove(0.0, 0.0, 0.0);
@@ -105,15 +106,27 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 
     // Print out starting configuration
     printOutLogLine(outputFile, myLoc, Z_t, noMove, &currentPose,
-                    &currentBall, ballEKF);
+                    &currentBall, ballEKF, *visBall);
 
+    // Use a fake loc system to test the EKF
+    fakeLoc->setXEst(currentPose.x);
+    fakeLoc->setYEst(currentPose.y);
+    fakeLoc->setHEst(currentPose.h);
+
+    unsigned frameCounter = 0;
     // Iterate through the moves
-    for(unsigned int i = 0; i < (*letsGo).myMoves.size(); ++i) {
+    for(unsigned int i = 0; i < letsGo->myMoves.size(); ++i) {
 
         // Continue the move for as long as specified
-        for (int j = 0; j < letsGo->myMoves[i].time; ++j) {
+        for (int j = 0; j < letsGo->myMoves[i].time; ++j, ++ frameCounter) {
+
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;
+
+            fakeLoc->setXEst(currentPose.x);
+            fakeLoc->setYEst(currentPose.y);
+            fakeLoc->setHEst(currentPose.h);
+
             Z_t = determineObservedLandmarks(currentPose, 0.0);
 
             myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
@@ -128,12 +141,13 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 
             // Print the current frame to file
             printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
-                            &currentPose, &currentBall, ballEKF);
+                            &currentPose, &currentBall, ballEKF, *visBall);
         }
     }
 
     delete myLoc;
     delete ballEKF;
+    delete fakeLoc;
     delete visBall;
 }
 
@@ -314,17 +328,21 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                                float neckYaw)
 {
     estimate e;
-    e.bearing = subPIAngle(atan2(currentPose->y - currentBall->y,
-                                 currentPose->x - currentBall->x) -
+    e.bearing = subPIAngle(atan2(currentBall->y - currentPose->y,
+                                 currentBall->x - currentPose->x) -
                            currentPose->h - QUART_CIRC_RAD);
 
+    // Calculate distance if object is within view
     if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
+        e.dist += e.dist*UNIFORM_1_NEG_1*0.12;
+        e.bearing += QUART_CIRC_RAD*UNIFORM_1_NEG_1*0.25;
+    } else {
+        e.dist = 0.0f;
+        e.bearing = 0.0f;
     }
-    e.dist = 0.0f;
-    e.bearing = 0.0f;
     return e;
 }
 
@@ -378,7 +396,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  */
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                      sightings, MotionModel lastOdo, PoseEst *currentPose,
-                     BallPose * currentBall, BallEKF * ballEKF)
+                     BallPose * currentBall, BallEKF * ballEKF, Ball _b)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
@@ -403,8 +421,8 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
                 << ballEKF->getYUncert() << " "
                 << ballEKF->getXVelocityEst() << " "
                 << ballEKF->getYVelocityEst() << " "
-                << ballEKF->getXVelocityUncert() << " "
-                << ballEKF->getYVelocityUncert() << " "
+                << ballEKF->getXUncert() << " "
+                << ballEKF->getYUncert() << " "
                 // Odometery
                 << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                 << lastOdo.deltaR;
@@ -430,6 +448,12 @@ void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
         *outputFile << sightings[k].getID() << " "
                     << sightings[k].getVisDistance() << " "
                     << sightings[k].getVisBearingDeg() << " ";
+    }
+    // Output ball as landmark
+    if (_b.getDist() > 0.0) {
+        *outputFile << BALL_ID << " "
+                    << _b.getDist() << " "
+                    << _b.getBearing() << " ";
     }
 
     // Close the line
