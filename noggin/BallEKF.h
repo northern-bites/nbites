@@ -14,10 +14,10 @@
 // Parameters
 #define ASSUMED_FPS 30.0
 #define BETA_BALL 5. // How much uncertainty naturally grows per update
-#define GAMMA_BALL .1 // How much ball velocity should effect uncertainty
+#define GAMMA_BALL 0.4 // How much ball velocity should effect uncertainty
 #define BALL_EKF_DIMENSION 4 // Number of states in Ball EKF
 #define CARPET_FRICTION -25 // 25 cm/s^2
-#define BALL_DECAY_PERCENT 0.05
+#define BALL_DECAY_PERCENT 0.25
 
 // Default initialization values
 #define INIT_BALL_X 220.0f
@@ -34,6 +34,12 @@
 #define X_UNCERT_MIN 1.0e-6
 #define Y_UNCERT_MIN 1.0e-6
 #define VELOCITY_UNCERT_MIN 1.0e-6
+#define X_EST_MIN 0
+#define Y_EST_MIN 0
+#define X_EST_MAX 440.0f
+#define Y_EST_MAX 680.0f
+#define VELOCITY_EST_MAX 300.0f
+#define VELOCITY_EST_MIN -300.0f
 
 /**
  * Class for tracking of ball position and velocity.  Extends the abstract
@@ -156,6 +162,8 @@ private:
                                         ublas::matrix<float> &H_k,
                                         ublas::matrix<float> &R_k,
                                         ublas::vector<float> &V_k);
+    void limitAPrioriEst(void);
+    void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
     void limitPosteriorUncert(void);
     // Members

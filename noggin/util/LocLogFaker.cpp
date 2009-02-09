@@ -92,8 +92,11 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     MCL *myLoc = new MCL;
-    MCL *fakeLoc = new MCL;
+#ifdef USE_PERFECT_LOC_FOR_BALL
     BallEKF *ballEKF = new BallEKF(fakeLoc);
+#else
+    BallEKF *ballEKF = new BallEKF(myLoc);
+#endif // PERFECT_LOC
     PoseEst currentPose;
     BallPose currentBall;
     MotionModel noMove(0.0, 0.0, 0.0);
@@ -108,10 +111,12 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     printOutLogLine(outputFile, myLoc, Z_t, noMove, &currentPose,
                     &currentBall, ballEKF, *visBall);
 
+#ifdef USE_PERFECT_LOC_FOR_BALL
     // Use a fake loc system to test the EKF
     fakeLoc->setXEst(currentPose.x);
     fakeLoc->setYEst(currentPose.y);
     fakeLoc->setHEst(currentPose.h);
+#endif
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -123,9 +128,11 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;
 
+#ifdef USE_PERFECT_LOC_FOR_BALL
             fakeLoc->setXEst(currentPose.x);
             fakeLoc->setYEst(currentPose.y);
             fakeLoc->setHEst(currentPose.h);
+#endif
 
             Z_t = determineObservedLandmarks(currentPose, 0.0);
 
@@ -147,7 +154,9 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 
     delete myLoc;
     delete ballEKF;
+#ifdef USE_PERFECT_LOC_FOR_BALL
     delete fakeLoc;
+#endif
     delete visBall;
 }
 
@@ -338,7 +347,7 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
         e.dist += e.dist*UNIFORM_1_NEG_1*0.12;
-        e.bearing += QUART_CIRC_RAD*UNIFORM_1_NEG_1*0.25;
+        e.bearing += QUART_CIRC_RAD*UNIFORM_1_NEG_1*0.125;
     } else {
         e.dist = 0.0f;
         e.bearing = 0.0f;

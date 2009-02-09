@@ -61,10 +61,14 @@ void EKF::timeUpdate(MotionModel u_k)
 void EKF::correctionStep(std::vector<Measurement> z_k)
 {
     // Necessary computational matrices
-    ublas::matrix<float> K_k(numStates, 2); // Kalman gain matrix
-    ublas::matrix<float> H_k(2, numStates); //
-    ublas::matrix<float> R_k(2, 2); // Assumed error in measurment sensors
-    ublas::vector<float> v_k(2); // Measurement invariance
+    // Kalman gain matrix
+    ublas::matrix<float> K_k = ublas::scalar_matrix<float>(numStates, 2, 0.0f);
+    // Observation jacobian
+    ublas::matrix<float> H_k = ublas::scalar_matrix<float>(2, numStates, 0.0f);
+    // Assumed error in measurment sensors
+    ublas::matrix<float> R_k = ublas::scalar_matrix<float>(2, 2, 0.0f);
+    // Measurement invariance
+    ublas::vector<float> v_k(2);
 
     // Incorporate all correction observations
     for(unsigned int i = 0; i < z_k.size(); ++i) {

@@ -50,6 +50,7 @@ void BallEKF::updateModel(Ball * ball)
 {
     // Update expected ball movement
     timeUpdate(MotionModel());
+    limitAPrioriEst();
     limitAPrioriUncert();
 
     // We've seen a ball
@@ -58,11 +59,13 @@ void BallEKF::updateModel(Ball * ball)
 
         // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
     } else { // No ball seen
+
         setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
         setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
-        noCorrectionStep();
 
+        noCorrectionStep();
     }
+    limitPosteriorEst();
     limitPosteriorUncert();
 }
 
@@ -157,6 +160,76 @@ void BallEKF::incorporateMeasurement(Measurement z,
 }
 
 /**
+ * Method to ensure that the ball estimate does have any unrealistic values
+ */
+void BallEKF::limitAPrioriEst()
+{
+    if(xhat_k_bar(0) > X_EST_MAX) {
+        xhat_k_bar(0) = X_EST_MAX;
+    }
+    if(xhat_k_bar(0) < X_EST_MIN) {
+        xhat_k_bar(0) = X_EST_MIN;
+    }
+    if(xhat_k_bar(1) > Y_EST_MAX) {
+        xhat_k_bar(1) = Y_EST_MAX;
+    }
+    if(xhat_k_bar(1) < Y_EST_MIN) {
+        xhat_k_bar(1) = Y_EST_MIN;
+    }
+    if(xhat_k_bar(2) > VELOCITY_EST_MAX) {
+        xhat_k_bar(2) = VELOCITY_EST_MAX;
+    }
+    if(xhat_k_bar(2) < VELOCITY_EST_MIN) {
+        xhat_k_bar(2) = VELOCITY_EST_MIN;
+    }
+    if(xhat_k_bar(3) > VELOCITY_EST_MAX) {
+        xhat_k_bar(3) = VELOCITY_EST_MAX;
+    }
+    if(xhat_k_bar(3) < VELOCITY_EST_MIN) {
+        xhat_k_bar(3) = VELOCITY_EST_MIN;
+    }
+}
+
+/**
+ * Method to ensure that the ball estimate does have any unrealistic values
+ */
+void BallEKF::limitPosteriorEst()
+{
+    if(xhat_k(0) > X_EST_MAX) {
+        xhat_k_bar(0) = X_EST_MAX;
+        xhat_k(0) = X_EST_MAX;
+    }
+    if(xhat_k(0) < X_EST_MIN) {
+        xhat_k_bar(0) = X_EST_MIN;
+        xhat_k(0) = X_EST_MIN;
+    }
+    if(xhat_k(1) > Y_EST_MAX) {
+        xhat_k_bar(1) = Y_EST_MAX;
+        xhat_k(1) = Y_EST_MAX;
+    }
+    if(xhat_k(1) < Y_EST_MIN) {
+        xhat_k_bar(1) = Y_EST_MIN;
+        xhat_k(1) = Y_EST_MIN;
+    }
+    if(xhat_k(2) > VELOCITY_EST_MAX) {
+        xhat_k_bar(2) = VELOCITY_EST_MAX;
+        xhat_k(2) = VELOCITY_EST_MAX;
+    }
+    if(xhat_k(2) < VELOCITY_EST_MIN) {
+        xhat_k_bar(2) = VELOCITY_EST_MIN;
+        xhat_k(2) = VELOCITY_EST_MIN;
+    }
+    if(xhat_k(3) > VELOCITY_EST_MAX) {
+        xhat_k_bar(3) = VELOCITY_EST_MAX;
+        xhat_k(3) = VELOCITY_EST_MAX;
+    }
+    if(xhat_k(3) < VELOCITY_EST_MIN) {
+        xhat_k_bar(3) = VELOCITY_EST_MIN;
+        xhat_k(3) = VELOCITY_EST_MIN;
+    }
+}
+
+/**
  * Method to ensure that uncertainty does not grow without bound
  */
 void BallEKF::limitAPrioriUncert()
@@ -241,5 +314,4 @@ void BallEKF::limitPosteriorUncert()
         P_k(3,3) = VELOCITY_UNCERT_MAX;
         P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
     }
-
 }
