@@ -32,11 +32,14 @@ public class VisionState {
     //constants
     public final static int BALL_BOX_THICKNESS = 2;
     public final static byte BALL_BOX_COLOR = Vision.RED;
-    public final static int GOAL_POST_BOX_THICKNESS = 2;
+    
+    public final static int VISUAL_OBJECT_THICKNESS = 2;
     public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.ORANGEYELLOW;
     public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.ORANGERED;
     public final static byte GOAL_POST_BOX_COLOR = Vision.PINK;
 
+    public final static byte BLUE_GOAL_BACKSTOP_COLOR = Vision.WHITE;
+    public final static byte YELLOW_GOAL_BACKSTOP_COLOR = Vision.WHITE;
     //images + colortable
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
@@ -98,6 +101,10 @@ public class VisionState {
 	    case VisualFieldObject.BLUE_GOAL_POST:
 	    case VisualFieldObject.YELLOW_GOAL_POST: 
 		color = GOAL_POST_BOX_COLOR; break;
+	    case VisualFieldObject.BLUE_GOAL_BACKSTOP: 
+		color = BLUE_GOAL_BACKSTOP_COLOR; break;
+	    case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
+		color = YELLOW_GOAL_BACKSTOP_COLOR; break;
 	    default: color = Vision.BLACK; break;
 	    }
 	    //draw the box
@@ -106,7 +113,7 @@ public class VisionState {
 					       obj.getRightBottomX(), obj.getLeftBottomX(),
 					       obj.getLeftTopY(), obj.getRightTopY(),
 					       obj.getRightBottomY(), obj.getLeftBottomY(),
-					       GOAL_POST_BOX_THICKNESS, color);
+					       VISUAL_OBJECT_THICKNESS, color);
 	}
     }
     

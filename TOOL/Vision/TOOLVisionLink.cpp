@@ -145,6 +145,8 @@ extern "C" {
 	case 1: obj = vision.bglp; k++; break;
 	case 2: obj = vision.ygrp; k++; break;
 	case 3: obj = vision.yglp; k++; break;
+	case 4: obj = vision.ygBackstop; k++; break;
+	case 5: obj = vision.bgBackstop; k++; break;
 	default: k = -1; obj = NULL; break;
 	}
 	

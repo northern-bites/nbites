@@ -59,7 +59,7 @@ public class TOOLVisionLink {
     private int height;
     //objects
     private Ball ball;
-    private VisualFieldObject bgrp, bglp, ygrp, yglp;
+    private VisualFieldObject bgrp, bglp, ygrp, yglp, bgBackstop, ygBackstop;
     private Vector<VisualFieldObject> visualFieldObjects;
 
     static private boolean visionLinkSuccessful;
@@ -67,10 +67,13 @@ public class TOOLVisionLink {
     public TOOLVisionLink() {
         setImageDimensions(DFLT_IMAGE_WIDTH, DFLT_IMAGE_HEIGHT);
 	ball = new Ball();
+	/*
 	bgrp = new VisualFieldObject(VisualFieldObject.BLUE_GOAL_RIGHT_POST);
 	bglp = new VisualFieldObject(VisualFieldObject.BLUE_GOAL_LEFT_POST);
 	ygrp = new VisualFieldObject(VisualFieldObject.YELLOW_GOAL_RIGHT_POST);
 	yglp = new VisualFieldObject(VisualFieldObject.YELLOW_GOAL_LEFT_POST);
+	//should add the backstops too if ever going to be used
+	*/
 	visualFieldObjects = new Vector<VisualFieldObject>();
     }
 
@@ -153,8 +156,8 @@ public class TOOLVisionLink {
 				   int ltx, int lty, int rtx, int rty, 
 				   int lbx, int lby, int rbx, int rby) {
 	
-	VisualFieldObject fieldObject;
-	
+	VisualFieldObject fieldObject = new VisualFieldObject();
+	/*useless unles someone uses each object in particular
 	switch (id) {
 	case VisualFieldObject.BLUE_GOAL_RIGHT_POST: fieldObject = bgrp; break;
 	case VisualFieldObject.BLUE_GOAL_LEFT_POST: fieldObject = bglp; break;
@@ -162,7 +165,7 @@ public class TOOLVisionLink {
 	case VisualFieldObject.YELLOW_GOAL_LEFT_POST: fieldObject = yglp; break;
 	default: fieldObject = new VisualFieldObject(); break;
 	}
-	
+	*/
 	//attach the data to the object
 	fieldObject.setID(id);
 	fieldObject.setWidth(width); fieldObject.setHeight(height);
