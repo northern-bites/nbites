@@ -134,22 +134,22 @@ public:
     /**
      * @return The uncertainty associated with the x estimate of the robot.
      */
-    float getXUncert() { return curUncert.x;}
+    float getXUncert() { return curUncert.x * 2;}
 
     /**
      * @return The uncertainty associated with the y estimate of the robot.
      */
-    float getYUncert() { return curUncert.y;}
+    float getYUncert() { return curUncert.y * 2;}
 
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncert() { return curUncert.h;}
+    float getHUncert() { return curUncert.h * 2;}
 
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncertDeg() { return curUncert.h * RAD_TO_DEG;}
+    float getHUncertDeg() { return curUncert.h * 2 * RAD_TO_DEG;}
 
     /**
      * @return The current set of particles in the filter

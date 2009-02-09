@@ -7,13 +7,24 @@
  * @param _beta The assumed absolute increase in uncertainty per frame
  * @param _gamma The uncertainty scaling factor per frame
  */
-EKF::EKF(unsigned int dimension, float _beta = DEFAULT_BETA,
-         float _gamma = DEFAULT_GAMMA)
-  : xhat_k(dimension), xhat_k_bar(dimension), Q_k(dimension,dimension),
-    A_k(dimension,dimension), P_k(dimension,dimension),
-    P_k_bar(dimension,dimension), dimensionIdentity(dimension),
-    numStates(dimension), beta(_beta), gamma(_gamma)
+EKF::EKF(unsigned int dimension, float _beta, float _gamma)
+    : xhat_k(dimension), xhat_k_bar(dimension),
+      Q_k(dimension,dimension), A_k(dimension,dimension),
+      P_k(dimension,dimension), P_k_bar(dimension,dimension),
+      dimensionIdentity(dimension), numStates(dimension),
+      beta(_beta), gamma(_gamma)
 {
+    // Initialize all matrix values to 0
+    for(unsigned i = 0; i < dimension; ++i) {
+        for(unsigned j = 0; j < dimension; ++j) {
+            Q_k(i,j) = 0.0f;
+            A_k(i,j) = 0.0f;
+            P_k(i,j) = 0.0f;
+            P_k_bar(i,j) = 0.0f;
+        }
+        xhat_k(i) = 0.0f;
+        xhat_k_bar(i) = 0.0f;
+    }
 }
 
 /**

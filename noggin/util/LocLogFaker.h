@@ -12,7 +12,7 @@
 #include "BallEKF.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
 
-// Observation parameters
+// Observation parameter
 // Ranges at which objects are viewable
 // Field objects
 #define FO_MAX_VIEW_RANGE 575.0f
@@ -25,6 +25,8 @@
 string team_color = "0";
 string player_number = "3";
 string DEFAULT_OUTFILE_NAME = "FAKELOG.mcl";
+// Get half of the nao FOV converted to radians
+float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f;
 
 /**
  * Class to hold the ball positin and velocity in the x and y directions

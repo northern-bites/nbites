@@ -20,14 +20,17 @@
 #define BALL_DECAY_PERCENT 0.05
 
 // Default initialization values
-#define INIT_BALL_X 50.0f
-#define INIT_BALL_Y 50.0f
+#define INIT_BALL_X 220.0f
+#define INIT_BALL_Y 340.0f
 #define INIT_BALL_X_VEL 0.0f
 #define INIT_BALL_Y_VEL 0.0f
 #define INIT_X_UNCERT 100.0f
 #define INIT_Y_UNCERT 100.0f
 #define INIT_X_VEL_UNCERT 10.0f
 #define INIT_Y_VEL_UNCERT 10.0f
+#define X_UNCERT_LIMIT 440.0f
+#define Y_UNCERT_LIMIT 680.0f
+#define VELOCITY_UNCERT_LIMIT 300.0f
 
 /**
  * Class for tracking of ball position and velocity.  Extends the abstract
@@ -38,12 +41,12 @@ class BallEKF : public EKF
 public:
     // Constructors & Destructors
     BallEKF(MCL * _mcl,
-                 float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
-                 float initVelX = INIT_BALL_X_VEL,
-                 float initVelY = INIT_BALL_Y_VEL,
-                 float initXUncert = INIT_X_UNCERT,
-                 float initYUncert = INIT_Y_UNCERT,
-                 float initVelXUncert = INIT_X_VEL_UNCERT,
+            float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
+            float initVelX = INIT_BALL_X_VEL,
+            float initVelY = INIT_BALL_Y_VEL,
+            float initXUncert = INIT_X_UNCERT,
+            float initYUncert = INIT_Y_UNCERT,
+            float initVelXUncert = INIT_X_VEL_UNCERT,
             float initVelYUncert = INIT_Y_VEL_UNCERT);
     virtual ~BallEKF() {}
 
@@ -95,45 +98,53 @@ public:
 
     // Setters
     /**
-     * @return The current estimate of the ball x position
+     * @param val The new estimate of the ball x position
      */
     void setXEst(float val) { xhat_k(0) = val; }
 
     /**
-     * @return The current estimate of the ball y position
+     * @param val The new estimate of the ball y position
      */
     void setYEst(float val) { xhat_k(1) = val; }
 
     /**
-     * @return The current estimate of the ball x velocity
+     * @param val The new estimate of the ball x velocity
      */
     void setXVelocityEst(float val) { xhat_k(2) = val; }
 
     /**
-     * @return The current estimate of the ball y velocity
+     * @param val The new estimate of the ball y velocity
      */
     void setYVelocityEst(float val) { xhat_k(3) = val; }
 
     /**
-     * @return The current uncertainty for ball x position
+     * @param val The new uncertainty for ball x position
      */
     void setXUncert(float val) { P_k(0,0) = val; }
 
     /**
-     * @return The current uncertainty for ball y position
+     * @param val The new uncertainty for ball y position
      */
     void setYUncert(float val) { P_k(1,1) = val; }
 
     /**
-     * @return The current uncertainty for ball x velocity
+     * @param val The new uncertainty for ball x velocity
      */
     void setXVelocityUncert(float val) { P_k(2,2) = val; }
 
     /**
-     * @return The current uncertainty for ball y velocity
+     * @param val The new uncertainty for ball y velocity
      */
     void setYVelocityUncert(float val) { P_k(3,3) = val; }
 
+    // Output methods
+    friend std::ostream& operator<< (std::ostream &o, const BallEKF &c) {
+        return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
+                 << c.getXVelocityEst() << ", " << c.getYVelocityEst() << ")\t"
+                 << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert() << ", "
+                 << c.getXVelocityUncert() << ", " << c.getYVelocityUncert()
+                 << ")";
+    }
 private:
     // Core Functions
     virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k);
@@ -141,6 +152,7 @@ private:
                                         ublas::matrix<float> &H_k,
                                         ublas::matrix<float> &R_k,
                                         ublas::vector<float> &V_k);
+    void limitUncertGrowth(void);
     // Members
     MCL * robotLoc;
 };

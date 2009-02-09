@@ -21,27 +21,39 @@ BallEKF::BallEKF(MCL * _mcl,
     : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL), robotLoc(_mcl)
 {
     // ones on the diagonal
-    A_k(0,0) = 1.0f;
-    A_k(1,1) = 1.0f;
-    A_k(2,2) = 1.0f;
-    A_k(3,3) = 1.0f;
+    A_k(0,0) = 1.0;
+    A_k(1,1) = 1.0;
+    A_k(2,2) = 1.0;
+    A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1. / ASSUMED_FPS;
-    A_k(1,3) = 1. / ASSUMED_FPS;
+    A_k(0,2) = 1.0 / 30.0f;//ASSUMED_FPS;
+    A_k(1,3) = 1.0 / 30.0f;//ASSUMED_FPS;
+
+    // Setup initial values
+    setXEst(initX);
+    setYEst(initY);
+    setXVelocityEst(initVelX);
+    setYVelocityEst(initVelY);
+    setXUncert(initXUncert);
+    setYUncert(initYUncert);
+    setXVelocityUncert(initVelXUncert);
+    setYVelocityUncert(initVelYUncert);
 }
 
 /**
  * Method to deal with updating the entire ball model
+ *
  * @param ball the ball seen this frame.
  */
 void BallEKF::updateModel(Ball * ball)
 {
     // Update expected ball movement
     timeUpdate(MotionModel());
+    limitUncertGrowth();
 
     // We've seen a ball
-    if (ball->getDist() > 0) {
+    if (ball->getDist() > 0.0) {
         sawBall(ball);
         // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
     } else { // No ball seen
@@ -137,4 +149,27 @@ void BallEKF::incorporateMeasurement(Measurement z,
     // Update the measurement covariance matrix
     R_k(0,0) = z.distanceSD;
     R_k(1,1) = z.bearingSD;
+}
+
+/**
+ * Method to ensure that uncertainty does not grow without bound
+ */
+void BallEKF::limitUncertGrowth()
+{
+    // Check x uncertainty
+    if(P_k_bar(0,0) > X_UNCERT_LIMIT) {
+        P_k_bar(0,0) = X_UNCERT_LIMIT;
+    }
+    // Check y uncertainty
+    if(P_k_bar(1,1) > Y_UNCERT_LIMIT) {
+        P_k_bar(1,1) = Y_UNCERT_LIMIT;
+    }
+    // Check x veolcity uncertainty
+    if(P_k_bar(2,2) > VELOCITY_UNCERT_LIMIT) {
+        P_k_bar(2,2) = VELOCITY_UNCERT_LIMIT;
+    }
+    // Check y veolcity uncertainty
+    if(P_k_bar(3,3) > VELOCITY_UNCERT_LIMIT) {
+        P_k_bar(3,3) = VELOCITY_UNCERT_LIMIT;
+    }
 }
