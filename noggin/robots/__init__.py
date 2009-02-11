@@ -1,4 +1,3 @@
-
 #import socket
 #temp removed b/c not installed by default on V3 - js
 import os
@@ -38,7 +37,7 @@ zaphod = BirthCertificate.BirthCertificate(
             player_number=4,
             )
 
-                                 
+
 robot_map = { marvin.name   : marvin,
               slarti.name   : slarti,
               trillian.name : trillian,
@@ -53,13 +52,19 @@ unknown = BirthCertificate.BirthCertificate(
 This robot is currently unknown.  That is, we could not identify it
 from its hostname (%s).  The recognized robots are %s.''' %
             #(socket.gethostname(), robot_map.keys()),# temp removed -js
-            ("trillian", robot_map.keys()),
+            ('\''+str(open("/etc/hostname",'r').readline()[:-1])+'\'', robot_map.keys()),
             )
 
 
 def get_certificate():
-    return robot_map.setdefault("trillian", unknown) #temp removed -js
+    return robot_map.setdefault(read_hostname(),
+                                unknown) # switched to use the file read method
     #return robot_map.setdefault(socket.gethostname(), unknown)
 
+def read_hostname():
+    """
+    Method reads the hostname from the hostname file
+    """
+    return open("/etc/hostname",'r').readline()[:-1]
 
 
