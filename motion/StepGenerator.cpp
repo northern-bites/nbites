@@ -69,7 +69,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
         }
     }
-
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
