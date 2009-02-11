@@ -34,6 +34,7 @@
 #include "almodule.h"
 #include "alloggerproxy.h"
 #include "almemoryproxy.h"
+#include "almemoryfastaccess.h"
 #include "alptr.h"
 
 #ifdef NAOQI1
@@ -138,6 +139,8 @@ private:
 #ifdef NAOQI1
     void registerCamera();
     void initCameraSettings(int whichCam);
+    void initSyncWithALMemory();
+    void syncWithALMemory();
 #else
     void initCamera();
 #endif
@@ -171,6 +174,7 @@ private:
     ALPtr<AL::ALProxy> camera;
     ALPtr<AL::ALProxy> lem;
     ALPtr<AL::ALMemoryProxy> almemory;
+    ALPtr<ALMemoryFastAccess> alfastaccess;
     DCMProxy *dcm;
 #else
     AL::ALLoggerProxy *log;
