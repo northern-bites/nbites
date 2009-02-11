@@ -14,6 +14,7 @@ using namespace boost::numeric;
 
 // Local headers
 #include "MCL.h"
+#include "Ball.h"
 
 // Default parameters
 #define DEFAULT_BETA 3.0f
@@ -55,7 +56,7 @@ protected:
 public:
     // Constructors & Destructors
     EKF(unsigned int dimension, float _beta, float _gamma);
-    virtual ~EKF();
+    virtual ~EKF() {}
 
     // Core functions
     virtual void timeUpdate(MotionModel u_k);

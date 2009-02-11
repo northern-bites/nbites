@@ -26,8 +26,12 @@
  * ball-vel-uncert-x ball-vel-uncert-y
  * odometery-lateral odometery-forward odometery-rotational
  *
+ * ROBOT REAL INFO
+ * x y h (as given by the system)
+ *
  * LANDMARK INFO
  * ID dist bearing (for all landmarks observed in the frame)
+ *
  */
 #include "LocLogFaker.h"
 
@@ -44,8 +48,7 @@ int main(int argc, char** argv)
 
     /* Test for the correct number of CLI arguments */
     if(argc < 2 || argc > 3) {
-        fprintf(stderr, "usage: %s input-file [output-file]\n",
-                argv[0]);
+        cerr << "usage: " << argv[0] << " input-file [output-file]" << endl;
         return 1;
     }
     try {
@@ -89,25 +92,72 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     MCL *myLoc = new MCL;
-    PoseEst currentPose = (*letsGo).startPos;
-    MotionModel *noMove = new MotionModel(0.0, 0.0, 0.0);
-    // Print out starting configuration
-    printOutLogLine(outputFile, myLoc, Z_t, *noMove);
-    delete noMove;
+#ifdef USE_PERFECT_LOC_FOR_BALL
+    BallEKF *ballEKF = new BallEKF(fakeLoc);
+#else
+    BallEKF *ballEKF = new BallEKF(myLoc);
+#endif // PERFECT_LOC
+    PoseEst currentPose;
+    BallPose currentBall;
+    MotionModel noMove(0.0, 0.0, 0.0);
+    Ball * visBall = new Ball();
 
+    currentPose.x = letsGo->startPos.x;
+    currentPose.y = letsGo->startPos.y;
+    currentPose.h = letsGo->startPos.h;
+    currentBall = letsGo->ballStart;
+
+    // Print out starting configuration
+    printOutLogLine(outputFile, myLoc, Z_t, noMove, &currentPose,
+                    &currentBall, ballEKF, *visBall);
+
+#ifdef USE_PERFECT_LOC_FOR_BALL
+    // Use a fake loc system to test the EKF
+    fakeLoc->setXEst(currentPose.x);
+    fakeLoc->setYEst(currentPose.y);
+    fakeLoc->setHEst(currentPose.h);
+#endif
+
+    unsigned frameCounter = 0;
     // Iterate through the moves
-    for(unsigned int i = 0; i < (*letsGo).myMoves.size(); ++i) {
+    for(unsigned int i = 0; i < letsGo->myMoves.size(); ++i) {
 
         // Continue the move for as long as specified
-        for (int j = 0; j < (*letsGo).myMoves[i].time; ++j) {
-            currentPose += (*letsGo).myMoves[i].move;
-            Z_t = determineObservedLandmarks(currentPose,0.0);
-            myLoc->updateLocalization((*letsGo).myMoves[i].move,Z_t);
+        for (int j = 0; j < letsGo->myMoves[i].time; ++j, ++ frameCounter) {
+
+            currentPose += letsGo->myMoves[i].move;
+            currentBall += letsGo->myMoves[i].ballVel;
+
+#ifdef USE_PERFECT_LOC_FOR_BALL
+            fakeLoc->setXEst(currentPose.x);
+            fakeLoc->setYEst(currentPose.y);
+            fakeLoc->setHEst(currentPose.h);
+#endif
+
+            Z_t = determineObservedLandmarks(currentPose, 0.0);
+
+            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+
+            // Figure out the current ball distance and bearing
+            visBall->setDistanceEst(determineBallEstimate(&currentPose,
+                                                          &currentBall,
+                                                          0.0));
+
+            // Update the ball estimate model
+            ballEKF->updateModel(visBall);
 
             // Print the current frame to file
-            printOutLogLine(outputFile, myLoc, Z_t, (*letsGo).myMoves[i].move);
+            printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
+                            &currentPose, &currentBall, ballEKF, *visBall);
         }
     }
+
+    delete myLoc;
+    delete ballEKF;
+#ifdef USE_PERFECT_LOC_FOR_BALL
+    delete fakeLoc;
+#endif
+    delete visBall;
 }
 
 /**
@@ -122,17 +172,17 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 {
     vector<Observation> Z_t;
-    // Get half of the nao FOV converted to radians
-    float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f;
-
-    // Check concrete field objects
+    // Measurements between robot position and seen object
+    float deltaX, deltaY;
     // required measurements for the added observation
     float visDist, visBearing, sigmaD, sigmaB;
+
+    // Check concrete field objects
     for(int i = 0; i < ConcreteFieldObject::NUM_FIELD_OBJECTS; ++i) {
-       const ConcreteFieldObject* toView = ConcreteFieldObject::
-           concreteFieldObjectList[i];
-       float deltaX = toView->getFieldX() - myPos.x;
-        float deltaY = toView->getFieldY() - myPos.y;
+        const ConcreteFieldObject* toView = ConcreteFieldObject::
+            concreteFieldObjectList[i];
+        deltaX = toView->getFieldX() - myPos.x;
+        deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
         visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
                                 - (M_PI / 2.0f));
@@ -142,10 +192,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
-            //visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
+            visDist += sigmaD*UNIFORM_1_NEG_1;
             sigmaB = getBearingSD(visBearing);
-            visBearing += (M_PI / 2.0f);
-            //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
+            visBearing += sigmaB*UNIFORM_1_NEG_1;
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -183,13 +232,12 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         // Check if the object is viewable
         if ((visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) &&
             visDist < CORNER_MAX_VIEW_RANGE) {
-            // cout << "Observed landmark: " << toView->getID() << endl;
 
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
             visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
             sigmaB = getBearingSD(visBearing);
-            visBearing += (M_PI / 2.0f);
+            //visBearing += (M_PI / 2.0f);
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Ignore the center circle for right now
@@ -199,7 +247,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             const cornerID id = toView->getID();
             list <const ConcreteCorner*> toUse;
             // Randomly set ambiguous data
-            if ((rand() / (float(RAND_MAX)+1)) < 0.65) {
+            if ((rand() / (float(RAND_MAX)+1)) < 0.32) {
                 shape s = ConcreteCorner::inferCornerType(id);
                 toUse = ConcreteCorner::getPossibleCorners(s);
             } else {
@@ -269,7 +317,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             }
             // Build the observation
             Observation seen(vc);
-            //cout << "Look at the corner id " << seen.getID() << endl;
             Z_t.push_back(seen);
         }
     }
@@ -279,6 +326,36 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
     return Z_t;
 }
 
+/**
+ * Function to return the current estimate towards the known ball position
+ *
+ * @param currentPose the current known pose of the robot
+ *
+ * @return The current distance and bearing of the ball with noise
+ */
+estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
+                               float neckYaw)
+{
+    estimate e;
+    e.bearing = subPIAngle(atan2(currentBall->y - currentPose->y,
+                                 currentBall->x - currentPose->x) -
+                           currentPose->h - QUART_CIRC_RAD);
+
+    // Calculate distance if object is within view
+    if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
+         (rand() / (float(RAND_MAX)+1)) < 0.85) {
+        e.dist = hypot(currentPose->x - currentBall->x,
+                       currentPose->y - currentBall->y);
+        e.dist += e.dist*UNIFORM_1_NEG_1*0.12;
+        e.bearing += QUART_CIRC_RAD*UNIFORM_1_NEG_1*0.125;
+    } else {
+        e.dist = 0.0f;
+        e.bearing = 0.0f;
+    }
+    return e;
+}
+
+
 ////////////////////////
 // File I/O           //
 ////////////////////////
@@ -287,26 +364,36 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
  *
  * @param inputFile The opened file containing the path information
  * @param letsGo Where the robot path is to be stored
- * @param currentPose Where the starting
  */
 void readInputFile(fstream* inputFile, NavPath * letsGo)
 {
     // Method variables
-    PoseEst p;
-    int time;
     MotionModel motion;
+    BallPose ballMove;
+    int time;
 
     // Read the start info from the first line of the file
-    if (!inputFile->eof()) {
-        *inputFile >> p.x >> p.y >> p.h;
+    if (!inputFile->eof()) { // start position
+        *inputFile >> letsGo->startPos.x >> letsGo->startPos.y
+                   >> letsGo->startPos.h // heaading start
+                   >> letsGo->ballStart.x >> letsGo->ballStart.y; // Ball info
     }
+    letsGo->ballStart.velX = 0.0;
+    letsGo->ballStart.velY = 0.0;
+
+    // Convert input value to radians
+    letsGo->startPos.h *= DEG_TO_RAD;
+
     // Build NavMoves from the remaining lines
     while (!inputFile->eof()) {
-        *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR >> time;
-        letsGo->myMoves.push_back(NavMove(motion, time));
+        *inputFile >> motion.deltaF >> motion.deltaL >> motion.deltaR
+                   >> ballMove.velX >> ballMove.velY
+                   >> time;
+
+        motion.deltaR *= DEG_TO_RAD;
+        letsGo->myMoves.push_back(NavMove(motion, ballMove, time));
     }
 }
-
 
 /**
  * Prints the input to a log file to be read by the TOOL
@@ -317,50 +404,77 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  * @param lastOdo Odometery since previous frame
  */
 void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
-                     sightings, MotionModel lastOdo)
+                     sightings, MotionModel lastOdo, PoseEst *currentPose,
+                     BallPose * currentBall, BallEKF * ballEKF, Ball _b)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
     for(unsigned int j = 0; j < particles.size(); ++j) {
         Particle p = particles[j];
-        (*outputFile) << p << " ";
+        *outputFile << p << " ";
     }
 
     // Divide the sections with a colon
-    (*outputFile) << ":";
+    *outputFile << ":";
 
     // Output standard infos
-    (*outputFile) << team_color<< " " << player_number << " "
-                  << myLoc->getXEst() << " " << myLoc->getYEst() << " "
-                  << myLoc->getHEstDeg() << " "
-                  << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
-                  << myLoc->getHUncertDeg() << " "
-                  << "0.0" << " " << "0.0" << " " // Ball x,y
-                  << "0.0" << " " << "0.0" << " " // Ball Uncert
-                  << "0.0" << " " << "0.0" << " " // Ball Velocity
-                  << "0.0" << " " << "0.0" << " " // Ball Vel uncert
-                  << lastOdo.deltaL << " " << lastOdo.deltaF << " "
-                  << lastOdo.deltaR;
+    *outputFile << team_color<< " " << player_number << " "
+                << myLoc->getXEst() << " " << myLoc->getYEst() << " "
+                << myLoc->getHEstDeg() << " "
+                << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
+                << myLoc->getHUncertDeg() << " "
+                // Ball estimates
+                << ballEKF->getXEst() << " "
+                << ballEKF->getYEst() << " "
+                << ballEKF->getXUncert() << " "
+                << ballEKF->getYUncert() << " "
+                << ballEKF->getXVelocityEst() << " "
+                << ballEKF->getYVelocityEst() << " "
+                << ballEKF->getXUncert() << " "
+                << ballEKF->getYUncert() << " "
+                // Odometery
+                << lastOdo.deltaL << " " << lastOdo.deltaF << " "
+                << lastOdo.deltaR;
 
     // Divide the sections with a colon
-    (*outputFile) << ":";
+    *outputFile << ":";
+
+    // Print the actual robot position
+    *outputFile << currentPose->x << " "
+                  << currentPose->y << " "
+                  << currentPose->h << " "
+    // print actual ball position
+                  << currentBall->x << " "
+                  << currentBall->y << " "
+                  << currentBall->velX << " "
+                  << currentBall->velY << " ";
+
+    // Divide the sections with a colon
+    *outputFile << ":";
 
     // Output landmark infos
     for(unsigned int k = 0; k < sightings.size(); ++k) {
-        (*outputFile) << sightings[k].getID() << " "
-                      << sightings[k].getVisDistance() << " "
-                      << sightings[k].getVisBearing() << " ";
+        *outputFile << sightings[k].getID() << " "
+                    << sightings[k].getVisDistance() << " "
+                    << sightings[k].getVisBearingDeg() << " ";
+    }
+    // Output ball as landmark
+    if (_b.getDist() > 0.0) {
+        *outputFile << BALL_ID << " "
+                    << _b.getDist() << " "
+                    << _b.getBearing() << " ";
     }
 
     // Close the line
-    (*outputFile) << endl;
+    *outputFile << endl;
 }
 
 
 
 // NavMove
 // Constructors
-NavMove::NavMove(MotionModel _p, int _t) : move(_p), time(_t)
+NavMove::NavMove(MotionModel _p, BallPose _b, int _t) : move(_p), ballVel(_b),
+                                                        time(_t)
 {
 };
 
@@ -389,7 +503,7 @@ float subPIAngle(float theta)
  */
 float getDistSD(float distance)
 {
-    return distance * 0.15;
+    return distance * 0.175 + 2;
 }
 
 /**
@@ -397,5 +511,5 @@ float getDistSD(float distance)
  */
 float getBearingSD(float bearing)
 {
-    return bearing*0.12;
+    return bearing*0.20 + M_PI / 4.0;
 }

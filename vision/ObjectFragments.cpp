@@ -6520,7 +6520,11 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   thisBall->setConfidence(SURE);
   thisBall->findAngles();
   thisBall->setFocalDistance();
-  thisBall->setDistance();
+  thisBall->setDistanceEst(vision->pose->
+                           bodyEstimate(thisBall->getCenterX(),
+                                        thisBall->getCenterY(),
+                                        static_cast<float>(thisBall->
+                                                           getFocDist())));
   if (atBoundary(topBlob)) {
     // INFERRED MEASUREMENTS
     //estimate es;

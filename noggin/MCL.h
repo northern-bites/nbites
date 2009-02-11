@@ -60,8 +60,8 @@ public:
         // Translate the relative change into the global coordinate system
         // And add that to the current estimate
         float calcFromAngle = h - M_PI / 2.0f;
-        x += u_t.deltaF * cos(calcFromAngle) - u_t.deltaL * sin(calcFromAngle);
-        y += u_t.deltaF * sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
+        x += u_t.deltaF * -cos(calcFromAngle) + u_t.deltaL * sin(calcFromAngle);
+        y += u_t.deltaF * -sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
         h += u_t.deltaR;
     }
 
@@ -92,16 +92,6 @@ public:
 
 };
 
-// Math Macros
-#define DEG_TO_RAD M_PI / 180.0f
-#define RAD_TO_DEG 180.0f / M_PI
-#define FULL_CIRC 360
-#define HALF_CIRC 180
-#define MAX_CHANGE_X 10.0f
-#define MAX_CHANGE_Y 10.0f
-#define MAX_CHANGE_H M_PI / 6.0f
-#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
-#define QUART_CIRC_RAD M_PI / 2.0f
 // Constants
 static const int M = 100; // Number of particles
 static const float MIN_SIMILARITY = 1.0e-15; // Minimum possible similarity
@@ -144,22 +134,22 @@ public:
     /**
      * @return The uncertainty associated with the x estimate of the robot.
      */
-    float getXUncert() { return curUncert.x;}
+    float getXUncert() { return curUncert.x * 2;}
 
     /**
      * @return The uncertainty associated with the y estimate of the robot.
      */
-    float getYUncert() { return curUncert.y;}
+    float getYUncert() { return curUncert.y * 2;}
 
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncert() { return curUncert.h;}
+    float getHUncert() { return curUncert.h * 2;}
 
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncertDeg() { return curUncert.h * RAD_TO_DEG;}
+    float getHUncertDeg() { return curUncert.h * 2 * RAD_TO_DEG;}
 
     /**
      * @return The current set of particles in the filter

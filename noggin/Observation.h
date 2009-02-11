@@ -17,6 +17,17 @@
 #include "VisualFieldObject.h"
 #include "Structs.h"
 
+// Math Definitions
+#define DEG_TO_RAD M_PI / 180.0f
+#define RAD_TO_DEG 180.0f / M_PI
+#define FULL_CIRC 360
+#define HALF_CIRC 180
+#define MAX_CHANGE_X 10.0f
+#define MAX_CHANGE_Y 10.0f
+#define MAX_CHANGE_H M_PI / 6.0f
+#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
+#define QUART_CIRC_RAD M_PI / 2.0f
+
 // Structs
 
 /**
@@ -72,6 +83,10 @@ public:
      * @return The bearing reported by the visual sighting
      */
     const float getVisBearing() const { return visBearing; }
+    /*
+     * @return The bearing reported by the visual sighting in degrees
+     */
+    const float getVisBearingDeg() const { return RAD_TO_DEG * visBearing; }
     /**
      * @return The standard deviation of the distance of the observation.
      */

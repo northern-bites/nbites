@@ -58,7 +58,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
   blueArc = new VisualFieldObject();
   yb = new VisualFieldObject(YELLOW_BLUE_BEACON);
   by = new VisualFieldObject(BLUE_YELLOW_BEACON);
-  ball = new Ball(this);
+  ball = new Ball();
   red1 = new VisualFieldObject();
   red2 = new VisualFieldObject();
   navy1 = new VisualFieldObject();

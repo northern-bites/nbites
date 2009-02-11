@@ -25,8 +25,6 @@ MCL::MCL()
                     float(rand() % int(FIELD_HEIGHT)),
                     float(((rand() % FULL_CIRC) - HALF_CIRC))*DEG_TO_RAD);
         Particle p_m(x_m, 1.0f);
-        // p_m.pose = x_m;
-        // p_m.weight = 1;
         X_t.push_back(p_m);
     }
 
@@ -85,7 +83,7 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
 
         } else { // Keep particle count the same
             // Random walk the particles
-            //X_t.push_back(randomWalkParticle(X_bar_t[m]));
+            X_t.push_back(randomWalkParticle(X_bar_t[m]));
         }
 
     }
@@ -239,7 +237,8 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
     d_hat = sqrt( (pt.x - x_t.x)*(pt.x - x_t.x) +
                   (pt.y - x_t.y)*(pt.y - x_t.y));
     // Expected bearing
-    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
+    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h - QUART_CIRC_RAD;
+
     // Calculate residuals
     r_d = z.getVisDistance() - d_hat;
     r_a = z.getVisBearing() - a_hat;
