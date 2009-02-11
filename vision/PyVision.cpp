@@ -1262,16 +1262,6 @@ vision_addToModule (PyObject *v, const char *name)
   }
 }
 
-static long long
-micro_time (void)
-{
-  // Needed for microseconds which we convert to milliseconds
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-
-  return tv.tv_sec * 1000000 + tv.tv_usec;
-}
-
 // This method is only used if USE_PYVISION_FAKE_BACKEND is defined.
 // Its purpose is to allow you to test the PyVision link by instantiating a new
 // vision object. This will never happen on robots. Vision is instantiated

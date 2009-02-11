@@ -58,15 +58,16 @@ private:
     std::vector <float> nextJoints;
 
     bool running;
+	bool newJoints; //Way to track if we ever use the same joints twice
     const HeadJointCommand *hjc;
     const HeadJointCommand *hjc2;
     const HeadJointCommand *hjc3;
     std::vector<float> *bodyJoints;
     std::vector<float> *bodyJoints2;
 
-    const BodyJointCommand *command;
-    const BodyJointCommand *command2;
-    const BodyJointCommand *command3;
+	const BodyJointCommand *command;
+	const BodyJointCommand *command2;
+	const BodyJointCommand *command3;
     static const float sitDownAngles[NUM_BODY_JOINTS];
     const BodyJointCommand *getUp;
     const BodyJointCommand *sitDown;

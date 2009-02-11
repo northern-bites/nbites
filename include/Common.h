@@ -103,5 +103,19 @@ inline static int ROUND(float x) {
   else return (int)x;
 }
 
+#include <time.h>
+#include <sys/time.h>
+
+static const long long MICROS_PER_SECOND = 1000000;
+static long long
+micro_time (void)
+{
+    // Needed for microseconds which we convert to milliseconds
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
+}
+
 #endif // Common_h_DEFINED
 

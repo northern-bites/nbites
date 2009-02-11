@@ -661,6 +661,45 @@ void Sensors::setUltraSound (const float dist)
     pthread_mutex_unlock (&ultra_sound_mutex);
 }
 
+
+/**
+ * Sets the sensors which are updated on the motion frequency (every 20ms)
+ */
+void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
+                                const Inertial &_inertial)
+{
+    pthread_mutex_lock(&fsr_mutex);
+    pthread_mutex_lock(&inertial_mutex);
+
+    leftFootFSR = _leftFoot;
+    rightFootFSR = _rightFoot;
+    inertial = _inertial;
+
+    pthread_mutex_unlock(&inertial_mutex);
+    pthread_mutex_unlock(&fsr_mutex);
+}
+
+/**
+ * Sets the sensors which are updated on the vision frequency (every ?? ms)
+ */
+void Sensors::setVisionSensors (const FootBumper &_leftBumper,
+                                const FootBumper &_rightBumper,
+                                const float ultraSound,
+                                const UltraSoundMode _mode)
+{
+    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock(&ultra_sound_mutex);
+
+    leftFootBumper = _leftBumper;
+    rightFootBumper = _rightBumper;
+    ultraSoundDistance = ultraSound;
+    ultraSoundMode = _mode;
+
+    pthread_mutex_unlock(&ultra_sound_mutex);
+    pthread_mutex_unlock (&bumper_mutex);
+}
+
+
 #endif /* ROBOT(NAO) */
 
 void Sensors::lockImage()

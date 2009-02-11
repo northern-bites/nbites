@@ -150,6 +150,15 @@ class Sensors {
                      const float angleX, const float angleY);
     void setInertial(const Inertial &inertial);
     void setUltraSound(const float dist);
+
+    void setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
+                          const Inertial &_inertial);
+
+    void setVisionSensors(const FootBumper &_leftBumper,
+                          const FootBumper &_rightBumper,
+                          const float ultraSound,
+                          const UltraSoundMode _mode);
+
 #endif
 
     // special methods
