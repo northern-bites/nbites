@@ -41,7 +41,7 @@ public:
 
     vector<float> getWalkStance();
 	void setCommand(MotionCommand* command) { setCommand(reinterpret_cast<WalkCommand*>(command)); }
-	void setCommand(WalkCommand * command) { }
+	void setCommand(WalkCommand * command);
 
 private:
     virtual void setActive();

@@ -23,47 +23,32 @@ using namespace MotionConstants;
 
 class WalkCommand : public MotionCommand
 {
- public: // Constants
-  static const int DEFAULT_SAMPLES_PER_STEP = 200;
  public:
-  WalkCommand(const int _numSamples,
-	      WalkParameters _params = WalkParameters::DEFAULT_PARAMS)
-	  : MotionCommand(MotionConstants::WALK),
-		numSamplesPerStep(_numSamples),
-		params(_params) { setChainList(); }
-  WalkCommand(const WalkCommand &other)
-	  : MotionCommand(MotionConstants::WALK),
-		numSamplesPerStep(other.numSamplesPerStep),
-		params(other.params) { setChainList(); }
+  WalkCommand()
+	  : MotionCommand(MotionConstants::WALK)
+        { setChainList(); }
+    WalkCommand(float x, float y, float theta)
+	  : MotionCommand(MotionConstants::WALK)
+        { setChainList(); }
+
   virtual ~WalkCommand() {}
-#ifdef NAOQI1
-    virtual const float execute(ALPtr<ALMotionProxy> proxy) const {
-        return 0.0f;
-    }
-#else
-    virtual const float execute(ALMotionProxy *proxy) const {
-        return 0.0f;
-    }
-#endif
 
-  const vector<float> odometry() const {
-    const float temp[3] = {lastX,lastY,lastH};
-    return vector<float>(temp,&temp[3]);
-  };
-
-
- protected:
-  const int numSamplesPerStep;
-  const WalkParameters params;
-  mutable float lastX, lastY, lastH;
-
+protected:
+    int numSamplesPerStep;
+    WalkParameters params;
+    float lastX, lastY, lastH;
+    float x;
+    float y;
+    float theta;
 private:
-	virtual void setChainList() { chainList.assign(WALK_CHAINS,
-												   WALK_CHAINS +
-												   WALK_NUM_CHAINS); }
+	virtual void setChainList() {
+        chainList.assign(MotionConstants::WALK_CHAINS,
+                         MotionConstants::WALK_CHAINS +
+                         MotionConstants::WALK_NUM_CHAINS);
+    }
 
 };
-
+/*
 class WalkStraight : public WalkCommand {
  public:
   WalkStraight(const float dist,
@@ -171,5 +156,5 @@ class WalkArc : public WalkCommand {
   const float angle;
   const float radius;
 };
-
+*/
 #endif

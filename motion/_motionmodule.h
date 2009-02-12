@@ -406,34 +406,12 @@ static PyTypeObject PyHeadScanCommandType = {
 
 
 
-//
-// PyWalkCommand type
-//
-
-enum WalkType {
-  WALK_STRAIGHT = 0,
-  WALK_SIDEWAYS,
-  WALK_TURN,
-  WALK_ARC,
-  WALK_PYTHON,
-};
-
-static const char* WalkType_Names[] = {
-  "WALK_STRAIGHT",
-  "WALK_SIDEWAYS",
-  "WALK_TURN",
-  "WALK_ARC",
-  "WALK_PYTHON",
-};
-
 // Declare the C structure
 typedef struct PyWalkCommand_t
 {
   PyObject_HEAD
   // Python reference to the core
   PyObject *pycore;
-  // indicator for actual WalkCommand sub-class type
-  WalkType type;
   // hard reference to C command class
   WalkCommand *_cmd;
 } PyWalkCommand;

@@ -9,7 +9,7 @@
 #include "HeadScanCommand.h"
 #include "BodyJointCommand.h"
 #include "MotionSwitchboard.h"
-
+#include "WalkParameters.h"
 #define DUMMY_F 0.0f
 #define DUMMY_I 0
 

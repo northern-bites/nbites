@@ -69,6 +69,10 @@ void WalkProvider::calculateNextJoints() {
     setActive();
 }
 
+void WalkProvider::setCommand(WalkCommand * command){
+    
+}
+
 void WalkProvider::setMotion(const float x, const float y, const float theta) {
 
 }

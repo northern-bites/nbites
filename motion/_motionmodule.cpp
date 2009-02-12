@@ -82,12 +82,6 @@ init_motion (void)
   Py_INCREF(&PyWalkParametersType);
   PyModule_AddObject(m, "WalkParameters",
       reinterpret_cast<PyObject*>(&PyWalkParametersType));
-
-  // constants
-  for (int i = WALK_STRAIGHT; i <= WALK_ARC; i++)
-    PyModule_AddObject(m, WalkType_Names[i], PyInt_FromLong(i));
-  PyModule_AddObject(m, "DEFAULT_SAMPLES_PER_STEP",
-      PyInt_FromLong(WalkCommand::DEFAULT_SAMPLES_PER_STEP));
 }
 
 // Module initialization method (Python interface, C extension)
@@ -165,11 +159,6 @@ c_init_motion (void)
   PyModule_AddObject(m, "WalkCommand",
       reinterpret_cast<PyObject*>(&PyWalkCommandType));
 
-  // constants
-  for (int i = WALK_STRAIGHT; i <= WALK_ARC; i++)
-    PyModule_AddObject(m, WalkType_Names[i], PyInt_FromLong(i));
-  PyModule_AddObject(m, "DEFAULT_SAMPLES_PER_STEP",
-      PyInt_FromLong(WalkCommand::DEFAULT_SAMPLES_PER_STEP));
 }
 
 // C++ backend insertion (must be set before import)
@@ -439,7 +428,7 @@ PyMotionInterface_setNextWalkCommand (PyMotionInterface *self, PyObject *args)
   PyObject *o = PyTuple_GET_ITEM(args, 0);
   if (PyObject_TypeCheck(o, &PyWalkCommandType)) {
     PyWalkCommand *cmd = reinterpret_cast<PyWalkCommand*>(o);
-
+/** HACK - breaking passing of WalkCommands!
     WalkCommand *_cmd;
     switch (cmd->type) {
       case WALK_STRAIGHT:
@@ -463,13 +452,12 @@ PyMotionInterface_setNextWalkCommand (PyMotionInterface *self, PyObject *args)
 #ifdef USE_PYMOTION_CXX_BACKEND
     self->_interface->setNextWalkCommand(_cmd);
 #endif
-
+*/
   }else {
     PyErr_Format(PyExc_TypeError, "a WalkCommand is required (%s given)",
         o->ob_type->tp_name);
     return NULL;
   }
-
   Py_RETURN_NONE;
 }
 
@@ -1335,11 +1323,18 @@ PyWalkCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 static int
 PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
 {
+  //old
   PyObject *ptype, *parg1, *parg2, *psamples;
   ptype = parg1 = parg2 = psamples = NULL;
-  int type, samples = WalkCommand::DEFAULT_SAMPLES_PER_STEP;
+
+  int type, samples = 100; //HACK
   float dist, angle, radius;
   dist = angle = radius = 0;
+
+
+  PyObject *x_vel_mms, *y_vel_mms, *theta_vel_mms;
+  //new
+  float x, y, theta;
 
   int argc = PyTuple_Size(args);
   int kwdc = kwds != NULL ? PyTuple_Size(kwds) : 0;
@@ -1365,18 +1360,11 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
           ptype->ob_type->tp_name);
     return -1;
   }
-  // Check type value
-  type = PyInt_AsLong(ptype);
-  if (type < WALK_STRAIGHT || type > WALK_ARC) {
-    PyErr_Format(PyExc_ValueError,
-        "type argument must be a valid WalkType, between %i and %i "
-        "(%i given)", WALK_STRAIGHT, WALK_ARC, type);
-    return -1;
-  }
-  self->type = static_cast<WalkType>(type);
+
 
   // Parse remaining arguments
   //
+/* HACK -- need to parse x,y,theta now
   switch (static_cast<WalkType>(type)) {
     case WALK_STRAIGHT:
     case WALK_SIDEWAYS:
@@ -1473,7 +1461,10 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
       return -1;
     }
   }
+*/
 
+  self->_cmd = new WalkCommand(x,y,theta);
+/*More hackery
   // Initialize WalkCommand Object
   //
   switch (static_cast<WalkType>(type)) {
@@ -1493,7 +1484,7 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
       PyErr_Format(PyExc_ValueError, "Unimplemented command type %i", type);
       return -1;
   }
-
+*/
   return 0;
 }
 
