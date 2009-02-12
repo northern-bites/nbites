@@ -385,9 +385,9 @@ public class WorldController extends JPanel implements KeyListener,
             if (mode == DO_NOTHING) {
 
             } else if (mode == VIEW_DOG_EKF) {
-                viewDogEKF();
+                //viewDogEKF();
             } else if (mode == VIEW_DOG_LOG) {
-                log.viewFromLog();
+                //log.viewFromLog();
             } else if (mode == VIEW_UDP_PACKETS) {
                 // server is on its own thread, should work on its own
                 // We just need to tell the field that a frame has passed
@@ -396,9 +396,9 @@ public class WorldController extends JPanel implements KeyListener,
                 //listens in to the udp packets
                 painter.reportEndFrame();
             } else if (mode == VIEW_EKF_LOG) {
-                log.viewFromLog();
+                //log.viewFromLog();
             } else if (mode == VIEW_MCL_LOG) {
-                log.viewFromLog();
+                //log.viewFromLog();
             }
         }
     }
