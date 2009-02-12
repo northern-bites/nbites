@@ -33,6 +33,7 @@ using std::list;
 class PreviewController : public WalkController {
 public:
     PreviewController();
+    virtual ~PreviewController(){};
     virtual const float tick(const list<float> *zmp_ref);
     virtual const float getPosition() const { return stateVector(0); }
     virtual const float getZMP() const {return stateVector(2);}
