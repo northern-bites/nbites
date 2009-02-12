@@ -14,25 +14,28 @@
 #include <vector>
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "TOOL_Vision_TOOLVisionLink.h"
 #include "Vision.h"
 #include "NaoPose.h"
 #include "Sensors.h"
 using namespace std;
+using namespace boost;
 
-static long long
-micro_time (void)
-{
-#ifdef __GNUC__
-    // Needed for microseconds which we convert to milliseconds
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
+// static long long
+// micro_time (void)
+// {
+// #ifdef __GNUC__
+//     // Needed for microseconds which we convert to milliseconds
+//     struct timeval tv;
+//     gettimeofday(&tv, NULL);
 
-    return tv.tv_sec * 1000000 + tv.tv_usec;
-#else
-    return 0L;
-#endif
-}
+//     return tv.tv_sec * 1000000 + tv.tv_usec;
+// #else
+//     return 0L;
+// #endif
+// }
 
 /**
  *
@@ -63,10 +66,11 @@ extern "C" {
 #endif
 
     //Instantiate the vision stuff
-    static Sensors sensors = Sensors();
-    static NaoPose pose = NaoPose(&sensors);
-    static Profiler profiler = Profiler(&micro_time);
-    static Vision vision = Vision(&pose,&profiler);
+    static shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
+    static shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
+    static shared_ptr<Profiler> profiler = shared_ptr<Profiler>(
+        new Profiler(micro_time));
+    static Vision vision = Vision(pose, profiler);
 
     JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
@@ -105,7 +109,7 @@ extern "C" {
         float * joints = env->GetFloatArrayElements(jjoints,0);
         vector<float> joints_vector = vector<float>(&joints[0],&joints[22]);
         env->ReleaseFloatArrayElements(jjoints,joints,0);
-        sensors.setVisionBodyAngles(joints_vector);
+        sensors->setVisionBodyAngles(joints_vector);
 
         // Clear the debug image on which the vision algorithm can draw
         vision.thresh->initDebugImage();
@@ -121,8 +125,8 @@ extern "C" {
         //Debug output:
         
         cout <<"Ball Width: "<<  vision.ball->getWidth() <<endl;
-        cout<<"Pose Left Hor Y" << pose.getLeftHorizonY() <<endl;
-        cout<<"Pose Right Hor Y" << pose.getRightHorizonY() <<endl;
+        cout<<"Pose Left Hor Y" << pose->getLeftHorizonY() <<endl;
+        cout<<"Pose Right Hor Y" << pose->getRightHorizonY() <<endl;
         
         //copy results from vision thresholded to the array passed in from java
         //we access to each row in the java array, and copy in from cpp thresholded
