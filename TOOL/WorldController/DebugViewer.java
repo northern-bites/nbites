@@ -140,7 +140,7 @@ public class DebugViewer extends JFrame {
     public int[] LANDMARK_X;
     public int[] LANDMARK_Y;
     // TODO: Change this ID value...
-    public final static int BALL_ID = 18;
+    public final static int BALL_ID = 40;
 
     // takes a Point and maps it to a string
     public HashMap <Point2D.Double,String> cornerMap;
@@ -641,7 +641,8 @@ public class DebugViewer extends JFrame {
 
     public void addLandmark(int id, double dist, double bearing) {
         if ( !objectIDMap.containsKey(new Integer(id)) &&
-             !cornerIDMap.containsKey(new Integer(id))) {
+             !cornerIDMap.containsKey(new Integer(id)) &&
+             id != BALL_ID) {
             System.out.println("DebugViewer.java sawLandmark(): " +
                                "Saw Non-Existant Landmark: " + id +
                                " at line " + frameNumber.getText());
@@ -656,7 +657,9 @@ public class DebugViewer extends JFrame {
         JLabel colon_label, slash_label;
         JPanel panel;
 
-        if (objectIDMap.containsKey(new Integer(id))) {
+        if (id == BALL_ID) {
+            id_label = new JLabel("Ball", JLabel.CENTER);
+        } else if (objectIDMap.containsKey(new Integer(id))) {
             id_label = new JLabel(objectIDStringMap.get(new Integer(id)),
                                   JLabel.CENTER);
         } else {

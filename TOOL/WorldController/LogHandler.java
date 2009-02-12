@@ -164,7 +164,7 @@ public class LogHandler
                     if (wc.getMode() == wc.VIEW_MCL_LOG) {
                         viewFromMCLLog();
                     } else {
-                        viewFromLog();
+                        //viewFromLog();
                     }
                     logBox.slide.setValue(log_marker);
                 }
@@ -238,82 +238,82 @@ public class LogHandler
         painter.clearSimulationHistory();
     }
 
-    public void viewFromLog()
-    {
-        if (log_strings.size() > 0 /*log_frame_strings != null*/) {
-            // set frame total in the log box
-            logBox.frameTotal.setText("" + (log_num_frames-1));
-            debugViewer.frameTotal.setText("" + (log_num_frames-1));
+    // public void viewFromLog()
+    // {
+    //     if (log_strings.size() > 0 /*log_frame_strings != null*/) {
+    //         // set frame total in the log box
+    //         logBox.frameTotal.setText("" + (log_num_frames-1));
+    //         debugViewer.frameTotal.setText("" + (log_num_frames-1));
 
-            // set frame number in log box & debug viewer
-            logBox.frameNumber.setText("" + log_marker);
-            debugViewer.frameNumber.setText("" + log_marker);
+    //         // set frame number in log box & debug viewer
+    //         logBox.frameNumber.setText("" + log_marker);
+    //         debugViewer.frameNumber.setText("" + log_marker);
 
-            // checks log_strings if current frame exists
-            if (log_strings != null && log_marker < log_strings.size()) {
+    //         // checks log_strings if current frame exists
+    //         if (log_strings != null && log_marker < log_strings.size()) {
 
-                // print debug strings if there are any
-                for (int i = 0; i < log_debugs.get(log_marker).size();
-                     i++) {
-                    System.out.println(log_debugs.get(log_marker).get(i));
-                }
-                // get camera data if any
-                if (log_camera.get(log_marker) != null) {
-                    parseCameraLine(log_camera.get(log_marker));
-                }
+    //             // print debug strings if there are any
+    //             for (int i = 0; i < log_debugs.get(log_marker).size();
+    //                  i++) {
+    //                 System.out.println(log_debugs.get(log_marker).get(i));
+    //             }
+    //             // get camera data if any
+    //             if (log_camera.get(log_marker) != null) {
+    //                 parseCameraLine(log_camera.get(log_marker));
+    //             }
 
-                parseLogLine(log_strings.get(log_marker));
+    //             parseLogLine(log_strings.get(log_marker));
 
-                if (DEBUG_LOG_DATA) {
-                    System.out.println("thinks_x: " + thinks_x +
-                                       " thinks_y: " + thinks_y +
-                                       " thinks_heading: " + thinks_h +
-                                       " uncertainty_x: " +
-                                       uncertainty_x +
-                                       " uncertainty_y: " +
-                                       uncertainty_y +
-                                       " uncertainty_h: " +
-                                       uncertainty_h);
-                }
-                // store ball estimates in a 'LocalizationPacket'
-                LocalizationPacket ball_loc_info =
-                    LocalizationPacket.
-                    makeBallEstimateAndUncertPacket(ball_thinks_x,
-                                                    ball_thinks_y,
-                                                    ball_uncert_x,
-                                                    ball_uncert_y,
-                                                    ball_velocity_x,
-                                                    ball_velocity_y);
-                painter.
-                    reportUpdatedBallLocalization(ball_loc_info,
-                                                  team_color,
-                                                  player_number);
+    //             if (DEBUG_LOG_DATA) {
+    //                 System.out.println("thinks_x: " + thinks_x +
+    //                                    " thinks_y: " + thinks_y +
+    //                                    " thinks_heading: " + thinks_h +
+    //                                    " uncertainty_x: " +
+    //                                    uncertainty_x +
+    //                                    " uncertainty_y: " +
+    //                                    uncertainty_y +
+    //                                    " uncertainty_h: " +
+    //                                    uncertainty_h);
+    //             }
+    //             // store ball estimates in a 'LocalizationPacket'
+    //             LocalizationPacket ball_loc_info =
+    //                 LocalizationPacket.
+    //                 makeBallEstimateAndUncertPacket(ball_thinks_x,
+    //                                                 ball_thinks_y,
+    //                                                 ball_uncert_x,
+    //                                                 ball_uncert_y,
+    //                                                 ball_velocity_x,
+    //                                                 ball_velocity_y);
+    //             painter.
+    //                 reportUpdatedBallLocalization(ball_loc_info,
+    //                                               team_color,
+    //                                               player_number);
 
-                // store my estimates in a 'LocalizationPacket'
-                LocalizationPacket current_localization_info =
-                    LocalizationPacket.
-                    makeEstimateAndUncertPacket(thinks_x,
-                                                thinks_y,
-                                                thinks_h,
-                                                0.0,
-                                                uncertainty_x,
-                                                uncertainty_y,
-                                                uncertainty_h);
-                painter.reportUpdatedLocalization(current_localization_info,
-                                                  team_color,
-                                                  player_number);
-                painter.reportEndFrame();
+    //             // store my estimates in a 'LocalizationPacket'
+    //             LocalizationPacket current_localization_info =
+    //                 LocalizationPacket.
+    //                 makeEstimateAndUncertPacket(thinks_x,
+    //                                             thinks_y,
+    //                                             thinks_h,
+    //                                             0.0,
+    //                                             uncertainty_x,
+    //                                             uncertainty_y,
+    //                                             uncertainty_h);
+    //             painter.reportUpdatedLocalization(current_localization_info,
+    //                                               team_color,
+    //                                               player_number);
+    //             painter.reportEndFrame();
 
-                //painter.sawBluePost(log_by_dist,log_by_bearing);
-                //painter.sawYellowPost(log_yb_dist,log_yb_bearing);
+    //             //painter.sawBluePost(log_by_dist,log_by_bearing);
+    //             //painter.sawYellowPost(log_yb_dist,log_yb_bearing);
 
-            }
-            //logBox.slide.setValue(log_marker);
+    //         }
+    //         //logBox.slide.setValue(log_marker);
 
-            logBox.play_pause.setText(logBox.PLAY_STRING);
+    //         logBox.play_pause.setText(logBox.PLAY_STRING);
 
-        }
-    }
+    //     }
+    // }
 
     public void logPlay()
     {
@@ -342,7 +342,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog();
+            //viewFromLog();
         }
         playTimer.stop();
     }
@@ -360,7 +360,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog();
+            //viewFromLog();
         }
 
         playTimer.stop();
@@ -375,7 +375,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog();
+            //viewFromLog();
         }
         playTimer.stop();
     }
@@ -391,7 +391,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog();
+            //viewFromLog();
         }
 
         playTimer.stop();
@@ -588,20 +588,20 @@ public class LogHandler
 
     }
 
-    public void parseCameraLine(String camera_line)
-    {
-        String[] current_frame = camera_line.split(" ");
-        Double camera_thinks_x = new Double(current_frame[MY_X_INDEX]);
-        Double camera_thinks_y = new Double(current_frame[MY_Y_INDEX]);
-        Double camera_thinks_h = new Double(current_frame[MY_H_INDEX]);
-        System.out.println("cam thinks x: " + camera_thinks_x +
-                           " y: "+ camera_thinks_y + " h: " + camera_thinks_h);
+    // public void parseCameraLine(String camera_line)
+    // {
+    //     String[] current_frame = camera_line.split(" ");
+    //     Double camera_thinks_x = new Double(current_frame[MY_X_INDEX]);
+    //     Double camera_thinks_y = new Double(current_frame[MY_Y_INDEX]);
+    //     Double camera_thinks_h = new Double(current_frame[MY_H_INDEX]);
+    //     System.out.println("cam thinks x: " + camera_thinks_x +
+    //                        " y: "+ camera_thinks_y + " h: " + camera_thinks_h);
 
-        //LocalizationPacket current_loc = LocalizationPacket.makeDogLocation(camera_thinks_x, camera_thinks_y, camera_thinks_h, 0.);
+    //     //LocalizationPacket current_loc = LocalizationPacket.makeDogLocation(camera_thinks_x, camera_thinks_y, camera_thinks_h, 0.);
 
-        //painter.reportUpdatedLocalization(current_loc);
-        //painter.reportEndFrame();
-    }
+    //     //painter.reportUpdatedLocalization(current_loc);
+    //     //painter.reportEndFrame();
+    // }
 
     public String formatDoubleForDisplay(Double debug_double) {
         return String.valueOf(debug_double.intValue());
@@ -731,7 +731,7 @@ public class LogHandler
     {
         // Method variables
         Vector< MCLParticle> particles;
-        String particleInfo, debugInfo, landmarkInfo;
+        String particleInfo, debugInfo, landmarkInfo, realPoseInfo;
         StringTokenizer t;
 
         // Make sure the line is not blank
@@ -773,6 +773,10 @@ public class LogHandler
                                               (debugViewer.myUncertH.
                                                getText()));
 
+                // Parse the known robot position
+                realPoseInfo = t.nextToken();
+                processRobotPose(realPoseInfo);
+
                 // Update the observed landarmks information
                 // Check if any landmarks were sighted this frame
                 debugViewer.removeLandmarks();
@@ -782,7 +786,8 @@ public class LogHandler
                 }
 
                 // Update the screen view
-                painter.updateParticleSet(particles, team_color, player_number);
+                painter.updateParticleSet(particles, team_color,
+                                          player_number);
                 painter.reportEndFrame();
             }
         }
@@ -796,10 +801,14 @@ public class LogHandler
     private void processDebugInfo(String newInfos)
     {
         String[] updateInfos = newInfos.split(" ");
-        Double ball_velocity_x, ball_velocity_y;
+        Double ball_velocity_x, ball_velocity_y, ball_thinks_x,
+            ball_thinks_y, ball_uncert_x, ball_uncert_y;
+        LocalizationPacket ball_loc_info;
+
         // Strip the team color and player number from the front of the line
         team_color = Integer.parseInt(updateInfos[MCL_TEAM_COLOR_INDEX]);
         player_number = Integer.parseInt(updateInfos[MCL_PLAYER_NUM_INDEX]);
+
         // Do boring converting from strings to appropriate types...
         // put all the loc values into debugViewer
         debugViewer.myX.setText(updateInfos[MCL_MY_X_INDEX]);
@@ -808,14 +817,22 @@ public class LogHandler
         debugViewer.myUncertX.setText(updateInfos[MCL_UNCERT_X_INDEX]);
         debugViewer.myUncertY.setText(updateInfos[MCL_UNCERT_Y_INDEX]);
         debugViewer.myUncertH.setText(updateInfos[MCL_UNCERT_H_INDEX]);
-        debugViewer.ballX.setText(updateInfos[MCL_BALL_X_INDEX]);
-        debugViewer.ballY.setText(updateInfos[MCL_BALL_Y_INDEX]);
-        debugViewer.ballUncertX.setText(updateInfos[MCL_BALL_UNCERT_X_INDEX]);
-        debugViewer.ballUncertY.setText(updateInfos[MCL_BALL_UNCERT_Y_INDEX]);
+
+        // Ball information
+        ball_thinks_x = new Double(updateInfos[MCL_BALL_X_INDEX]);
+        ball_thinks_y = new Double(updateInfos[MCL_BALL_Y_INDEX]);
+        ball_uncert_x = new Double(updateInfos[MCL_BALL_UNCERT_X_INDEX]);
+        ball_uncert_y = new Double(updateInfos[MCL_BALL_UNCERT_Y_INDEX]);
         ball_velocity_x = new Double(updateInfos[MCL_BALL_VELOCITY_X_INDEX]);
         ball_velocity_y = new Double(updateInfos[MCL_BALL_VELOCITY_Y_INDEX]);
+
+        debugViewer.ballX.setText(ball_thinks_x.toString());
+        debugViewer.ballY.setText(ball_thinks_y.toString());
+        debugViewer.ballUncertX.setText(ball_uncert_x.toString());
+        debugViewer.ballUncertY.setText(ball_uncert_y.toString());
         debugViewer.ballVelX.setText(ball_velocity_x.toString());
         debugViewer.ballVelY.setText(ball_velocity_y.toString());
+
         double absBallVelocity =
             Math.sqrt( Math.pow(ball_velocity_x.doubleValue(),2.0)
                        + Math.pow(ball_velocity_y.doubleValue(),2.0));
@@ -827,6 +844,17 @@ public class LogHandler
         debugViewer.odoX.setText(updateInfos[MCL_ODO_X_INDEX]);
         debugViewer.odoY.setText(updateInfos[MCL_ODO_Y_INDEX]);
         debugViewer.odoH.setText(updateInfos[MCL_ODO_H_INDEX]);
+
+        ball_loc_info = LocalizationPacket.
+            makeBallEstimateAndUncertPacket(ball_thinks_x.doubleValue(),
+                                            ball_thinks_y.doubleValue(),
+                                            ball_uncert_x.doubleValue(),
+                                            ball_uncert_y.doubleValue(),
+                                            ball_velocity_x.doubleValue(),
+                                            ball_velocity_y.doubleValue());
+        painter.reportUpdatedBallLocalization(ball_loc_info, team_color,
+                                              player_number);
+
     }
 
     /**
@@ -854,6 +882,25 @@ public class LogHandler
         }
     }
 
+    /**
+     * Process and draw a known pose of the robot on the field
+     *
+     * @param realPoseInfo A string of the form "x y h"
+     */
+    private void processRobotPose(String realPoseInfo)
+    {
+        float x, y, h, ballX, ballY, ballVelX, ballVelY;
+        String[] infos = realPoseInfo.split(" ");
+        x = Float.parseFloat(infos[0]);
+        y = Float.parseFloat(infos[1]);
+        h = Float.parseFloat(infos[2]);
+        ballX = Float.parseFloat(infos[3]);
+        ballY = Float.parseFloat(infos[4]);
+        ballVelX = Float.parseFloat(infos[5]);
+        ballVelY = Float.parseFloat(infos[6]);
+        painter.updateRealPoseInfo(x, y, h);
+        painter.updateRealBallInfo(ballX, ballY, ballVelX, ballVelY);
+    }
 
     /**
      * Method to decode a landmark ID to (x,y) coordinates and highlight
@@ -862,7 +909,6 @@ public class LogHandler
      * draws dashed circles arond all ambigious observation possibilities
      *
      * @param ID the ID of the landmark to be drawn
-
      */
     private void decodeAndDisplayLandmark(int ID)
     {
@@ -976,6 +1022,10 @@ public class LogHandler
                                   player_number);
         // Clear the uncertainty ellipses
         painter.updateUncertainytInfo(0,0,0,0,0,0);
+        painter.updateRealPoseInfo(painter.NO_DATA_VALUE, painter.NO_DATA_VALUE,
+                                   painter.NO_DATA_VALUE);
+        painter.updateRealBallInfo(painter.NO_DATA_VALUE,painter.NO_DATA_VALUE,
+                                   painter.NO_DATA_VALUE,painter.NO_DATA_VALUE);
         painter.reportEndFrame();
     }
 }
