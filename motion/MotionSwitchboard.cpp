@@ -193,6 +193,7 @@ int MotionSwitchboard::processProviders(){
 	if (!curProvider->isActive()) {
 		curProvider = nextProvider;
 	}
+
 	//** Alternately, you may choose here:
 	//curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
 
@@ -322,11 +323,15 @@ void MotionSwitchboard::sendMotionCommand(MotionCommand *command) {
 
 	switch (type) {
 	case WALK:
+		nextProvider = &walkProvider;
 		walkProvider.setCommand(command);
 		break;
 	case BODY_JOINT:
+		nextProvider = &scriptedProvider;
 		scriptedProvider.setCommand(command);
 		break;
+
+		// headProvider is NEVER the nextProvider. NEVER.
 	case HEAD_JOINT:
 		headProvider.setCommand(command);
 		break;
