@@ -33,7 +33,7 @@ ChopShop::ChopShop (shared_ptr<Sensors> s, float motionFrameLength)
 
 // Breaks command into FRAME_LENGTH_S size pieces,
 // adds it to the queue
-queue<vector<vector<float> > >* ChopShop::chopCommand(JointCommand *command) {
+queue<vector<vector<float> > >* ChopShop::chopCommand(const JointCommand *command) {
 	// It's a BJC so it deals with 4 chains
 
 	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
@@ -52,7 +52,7 @@ queue<vector<vector<float> > >* ChopShop::chopCommand(JointCommand *command) {
 
 // Smooth interpolation motion
 queue<vector<vector<float> > >*
-ChopShop::chopSmooth(JointCommand *command) {
+ChopShop::chopSmooth(const JointCommand *command) {
 
 	// PLACE HOLDER
 	queue<vector<vector<float> > >* a = new queue<vector<vector<float> > >();
@@ -68,7 +68,7 @@ ChopShop::chopSmooth(JointCommand *command) {
  *
  */
 queue<vector<vector<float> > >*
-ChopShop::chopLinear(JointCommand *command) {
+ChopShop::chopLinear(const JointCommand *command) {
 	// Get number of chops according to duration
 	int numChops = (int)(command->getDuration()/FRAME_LENGTH_S);
 
@@ -107,7 +107,7 @@ vector<float> ChopShop::getCurrentJoints() {
 
 
 
-vector<float> ChopShop::getFinalJoints(JointCommand *command,
+vector<float> ChopShop::getFinalJoints(const JointCommand *command,
 									   vector<float>* currentJoints) {
 	vector<float> finalJoints;
 	vector<float>::iterator currentStart = currentJoints->begin();
@@ -156,7 +156,7 @@ vector<float> ChopShop::getDiffPerChop(int numChops,
 queue<vector<vector<float> > >* ChopShop::buildChops(int numChops,
 													 vector<float> *currentJoints,
 													 vector<float> *diffPerChop,
-													 JointCommand *command) {
+													 const JointCommand *command) {
 	queue<vector<vector<float> > >* choppedJoints = new queue<vector<vector<float> > >();
 	float nextVal;
 

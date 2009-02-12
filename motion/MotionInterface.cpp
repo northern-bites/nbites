@@ -2,15 +2,19 @@
 #include "MotionInterface.h"
 
 void MotionInterface::setNextWalkCommand(const WalkCommand *command){
+    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
 }
 
 void MotionInterface::enqueue(const BodyJointCommand *command){
+    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
 }
 
 void MotionInterface::enqueue(const HeadJointCommand *command){
+    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
 }
 
 void MotionInterface::enqueue(const HeadScanCommand *command){
+    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
 }
 
 void MotionInterface::stopBodyMoves() {
@@ -29,7 +33,7 @@ void MotionInterface::setWalkConfig ( float pMaxStepLength, float pMaxStepHeight
 }
 
 void MotionInterface::setWalkArmsConfig ( float pShoulderMedian,
-					  float pShoulderAmplitude,
+					  float pShoulderApmlitude,
 					  float pElbowMedian,
 					  float pElbowAmplitude) {
 }

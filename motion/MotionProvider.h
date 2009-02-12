@@ -26,7 +26,7 @@ public:
     const bool isActive() const { return _active; }
     virtual void calculateNextJoints() = 0;
     vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
-	virtual void  setCommand(MotionCommand *command) =0;
+	virtual void  setCommand(const MotionCommand *command) =0;
 
 protected:
     void setNextChainJoints(const ChainID id,

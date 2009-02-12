@@ -61,7 +61,7 @@ void HeadProvider::calculateNextJoints() {
     //setActive();
 }
 
-void HeadProvider::setCommand(HeadJointCommand *command) {
+void HeadProvider::setCommand(const HeadJointCommand *command) {
 	if (command->getType() == MotionConstants::HEAD_JOINT){
 		headCommandQueue.push(command);
 		setActive();
@@ -80,7 +80,7 @@ void HeadProvider::setNextHeadCommand() {
 
 
 	if ( !headCommandQueue.empty() ) {
-		HeadJointCommand *command = headCommandQueue.front();
+		const HeadJointCommand *command = headCommandQueue.front();
 		queue<vector<vector<float> > >*	choppedHeadCommand =
 			chopper.chopCommand(command);
 		headCommandQueue.pop();

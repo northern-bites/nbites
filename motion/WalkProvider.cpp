@@ -76,7 +76,7 @@ void WalkProvider::calculateNextJoints() {
     setActive();
 }
 
-void WalkProvider::setCommand(WalkCommand * command){
+void WalkProvider::setCommand(const WalkCommand * command){
     //grab the velocities in mm/second rad/second from WalkCommand
 
     pthread_mutex_lock(&walk_command_mutex);

@@ -3,6 +3,7 @@
 #define _MotionInterface_h_DEFINED
 
 #include <queue>
+#include <vector>
 
 #include "Kinematics.h"
 #include "WalkCommand.h"
@@ -26,7 +27,7 @@ class MotionInterface
         : switchboard(_switchboard) {}
     virtual ~MotionInterface() {}
 
-    //interface calls
+    //depricated interface calls
     void setNextWalkCommand(const WalkCommand *command);
     void enqueue(const BodyJointCommand *command);
     void enqueue(const HeadJointCommand *command);

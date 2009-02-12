@@ -132,7 +132,7 @@ void ScriptedProvider::calculateNextJoints() {
  * Only one BodyJointCommand can be enqueued at
  * a time, even if they deal with different joints or chains.
  */
-void ScriptedProvider::setCommand(BodyJointCommand *command) {
+void ScriptedProvider::setCommand(const BodyJointCommand *command) {
 	if (command->getType() == MotionConstants::BODY_JOINT){
 		bodyCommandQueue.push(command);
 		setActive();
@@ -143,10 +143,10 @@ void ScriptedProvider::setCommand(BodyJointCommand *command) {
 }
 
 
-void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand*> &seq) {
+void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq) {
 	// Take in vec of commands and enqueue them all
 	pthread_mutex_lock(&scripted_mutex);
-	for (vector<BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
+	for (vector<const BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
 		setCommand(*i);
 	pthread_mutex_unlock(&scripted_mutex);
 }
@@ -155,7 +155,7 @@ void ScriptedProvider::setNextBodyCommand() {
 	// If there are no more commands, don't try to enqueue one
 	if ( !bodyCommandQueue.empty() ) {
 
-		BodyJointCommand *command = bodyCommandQueue.front();
+		const BodyJointCommand *command = bodyCommandQueue.front();
 		bodyCommandQueue.pop();
 		queue<vector<vector<float> > >* choppedBodyCommand = chopper.chopCommand(command);
 		delete command;

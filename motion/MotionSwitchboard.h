@@ -41,8 +41,8 @@ public:
     void run();
 
 	const std::vector <float> getNextJoints();
-	void sendMotionCommand(MotionCommand* command);
-	void sendMotionCommands(vector<MotionCommand*> *command);
+	void sendMotionCommand(const MotionCommand* command);
+	void sendMotionCommands(const vector<const MotionCommand*> *command);
 
 private:
     int processProviders();
@@ -58,9 +58,11 @@ private:
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
-    std::vector <float> nextJoints;
+
 	MotionProvider * curProvider;
 	MotionProvider * nextProvider;
+
+    std::vector <float> nextJoints;
 
     bool running;
 	bool newJoints; //Way to track if we ever use the same joints twice

@@ -50,7 +50,7 @@ PreviewController::PreviewController()
     int j = 0;
     fprintf(gains_log,"time\tgain\n");
     //write the controller gains
-    for(int i  = 0; i < NUM_PREVIEW_FRAMES; i++){
+    for(unsigned int i  = 0; i < NUM_PREVIEW_FRAMES; i++){
         fprintf(gains_log,"%d\t%f\n",j++,weights[j]);
     }
     fclose(gains_log);

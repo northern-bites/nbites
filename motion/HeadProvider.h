@@ -41,10 +41,10 @@ public:
     void calculateNextJoints();
 
 	void enqueueSequence(vector<HeadJointCommand*> &seq);
-	void setCommand(MotionCommand* command) {
-		setCommand(reinterpret_cast<HeadJointCommand*>(command));
+	void setCommand(const MotionCommand* command) {
+		setCommand(reinterpret_cast<const HeadJointCommand*>(command));
 	}
-	void setCommand(HeadJointCommand* command);
+	void setCommand(const HeadJointCommand* command);
 
 private:
     void setActive();
@@ -57,7 +57,7 @@ private:
 
 	ChainQueue headQueue;
 	// Queue of all future commands
-	std::queue<HeadJointCommand*> headCommandQueue;
+	std::queue<const HeadJointCommand*> headCommandQueue;
 
     pthread_mutex_t head_mutex;
 

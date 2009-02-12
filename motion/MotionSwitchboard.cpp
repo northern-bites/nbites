@@ -318,7 +318,7 @@ void MotionSwitchboard::updateDebugLogs(){
 }
 #endif
 
-void MotionSwitchboard::sendMotionCommand(MotionCommand *command) {
+void MotionSwitchboard::sendMotionCommand(const MotionCommand *command) {
 	MotionType type = command->getType();
 
 	switch (type) {
@@ -339,9 +339,8 @@ void MotionSwitchboard::sendMotionCommand(MotionCommand *command) {
 	}
 }
 
-void MotionSwitchboard::sendMotionCommands(vector<MotionCommand *> *commands) {
-	vector<MotionCommand*>::iterator i;
-	i = commands->begin();
+void MotionSwitchboard::sendMotionCommands(const vector<const MotionCommand *> *commands) {
+	vector<const MotionCommand *>::const_iterator i = commands->begin();
 	while (i != commands->end() ) {
 		sendMotionCommand(*i);
 	}
