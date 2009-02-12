@@ -9,7 +9,6 @@
 //
 #include "motionconfig.h"
 #include "Kinematics.h"
-#include "MotionCore.h"
 #include "MotionInterface.h"
 #include "_motionmodule.h"
 
@@ -1332,14 +1331,17 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
   dist = angle = radius = 0;
 
 
-  PyObject *x_vel_mms, *y_vel_mms, *theta_vel_mms;
+  PyObject *px_vel_cms, *py_vel_cms, *ptheta_vel_degs;
   //new
-  float x, y, theta;
+  float x_mms= 0.0f;
+  float y_mms = 0.0f;
+  float theta_rads = 0.0f;
 
   int argc = PyTuple_Size(args);
   int kwdc = kwds != NULL ? PyTuple_Size(kwds) : 0;
   int i = 0;
 
+/*
   // Parse type argument
   //
   if (kwdc > 0)
@@ -1360,7 +1362,23 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
           ptype->ob_type->tp_name);
     return -1;
   }
+*/
 
+//JS- my try to read x, y, z
+//First try getting it from keywords, then from the arguments
+
+  if (kwdc == 3){
+         px_vel_cms  = PyDict_GetItemString(kwds, "x");
+         py_vel_cms  = PyDict_GetItemString(kwds, "y");
+         ptheta_vel_degs  = PyDict_GetItemString(kwds, "theta");
+  }else if(argc ==3){
+      px_vel_cms  =  PyTuple_GET_ITEM(args, 0);
+      py_vel_cms  = PyTuple_GET_ITEM(args, 1);
+      ptheta_vel_degs = PyTuple_GET_ITEM(args, 2);
+  }else{
+      cout << "Wrong parameters passed to create  WalkCommand" <<endl;
+      cout << "  num args = " << argc << " num keywords = " << kwds <<endl; 
+  }
 
   // Parse remaining arguments
   //
@@ -1463,7 +1481,7 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
   }
 */
 
-  self->_cmd = new WalkCommand(x,y,theta);
+  self->_cmd = new WalkCommand(x_mms,y_mms,theta_rads);
 /*More hackery
   // Initialize WalkCommand Object
   //

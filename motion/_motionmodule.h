@@ -8,7 +8,6 @@
 #include <vector>
 // Project headers
 //
-#include "MotionCore.h"
 #include "MotionInterface.h"
 
 

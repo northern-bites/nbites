@@ -37,7 +37,6 @@ public:
 
     void requestStop();
     void calculateNextJoints();
-    void setMotion(const float x, const float y, const float theta);
 
     vector<float> getWalkStance();
 	void setCommand(MotionCommand* command) { setCommand(reinterpret_cast<WalkCommand*>(command)); }
@@ -50,6 +49,9 @@ private:
 
     WalkingParameters walkParameters;
     StepGenerator stepGenerator;
+
+    mutable pthread_mutex_t walk_command_mutex;
+    WalkCommand * nextCommand;
 
     //Temp solution to arms
     vector<float> rarm_angles, larm_angles;

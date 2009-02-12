@@ -155,4 +155,10 @@ public:
 
 };
 
+//Sensitivity to new walk vectors -- currently 0, giving maximum sensitivity
+//when a new vector differs by more than these constants, the internal
+//walk vector held in the StepGenerator changes
+const float NEW_VECTOR_THRESH_MMS = 0.0f; //difference in speed in mm/second
+const float NEW_VECTOR_THRESH_RADS = 0.0f; //difference in speed in radians/second
+
 #endif

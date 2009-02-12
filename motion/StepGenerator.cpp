@@ -372,12 +372,26 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
     last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
 }
 
-void StepGenerator::setWalkVector(const float _x, const float _y,
+/**
+ * Set the speed of the walk eninge in mm/s and rad/s
+ */
+void StepGenerator::setSpeed(const float _x, const float _y,
                                   const float _theta)  {
-    //assign walk vector l
-    x = _x;
-    y = _y;
-    theta = _theta;
+    //convert speeds in cm/s and rad/s into steps:
+    const float new_x = _x*walkParams->stepDuration;
+    const float new_y = _y*walkParams->stepDuration;
+    //we only turn every other step, so double the turning!
+    const float new_theta = _theta*walkParams->stepDuration*2.0;
+
+    //If the walk vector isn't changing, we don't need to do anything
+    if(abs(new_x - x) < NEW_VECTOR_THRESH_MMS &&
+       abs(new_y - y) < NEW_VECTOR_THRESH_MMS &&
+       abs(new_theta - theta) < NEW_VECTOR_THRESH_RADS){
+        return;
+    }
+
+    //if the new one is different, update the 
+    x = new_x; y = new_y; theta = new_theta;
 
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
@@ -387,7 +401,7 @@ void StepGenerator::setWalkVector(const float _x, const float _y,
     //zmp_ref_x.clear();
     //zmp_ref_y.clear();
 
-    if(_y > 0 || _theta > 0)
+    if(y > 0 || theta > 0)
         startLeft();
     else
         startRight();

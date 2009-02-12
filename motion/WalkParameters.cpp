@@ -19,22 +19,22 @@ const vector<float> WalkParameters::
 const WalkParameters WalkParameters::DEFAULT_PARAMS =
   WalkParameters();
 
-#ifdef NAOQI1
-void WalkParameters::apply(ALPtr<ALMotionProxy> proxy) const {
-#else
-void WalkParameters::apply(ALMotionProxy * proxy) const {
-#endif
-  proxy->setWalkConfig(walkConfig[pMaxStepLength], walkConfig[pMaxStepHeight],
-		       walkConfig[pMaxStepSide], walkConfig[pMaxStepTurn],
-		       walkConfig[pZmpOffsetX], walkConfig[pZmpOffsetY]);
+// #ifdef NAOQI1
+// void WalkParameters::apply(ALPtr<ALMotionProxy> proxy) const {
+// #else
+// void WalkParameters::apply(ALMotionProxy * proxy) const {
+// #endif
+//   proxy->setWalkConfig(walkConfig[pMaxStepLength], walkConfig[pMaxStepHeight],
+// 		       walkConfig[pMaxStepSide], walkConfig[pMaxStepTurn],
+// 		       walkConfig[pZmpOffsetX], walkConfig[pZmpOffsetY]);
 
-  proxy->setWalkExtraConfig(walkExtraConfig[pLHipRollBacklashCompensator],
-			    walkExtraConfig[pRHipRollBacklashCompensator],
-			    walkExtraConfig[pHipHeight],
-			    walkExtraConfig[pTorsoYOrientation]);
+//   proxy->setWalkExtraConfig(walkExtraConfig[pLHipRollBacklashCompensator],
+// 			    walkExtraConfig[pRHipRollBacklashCompensator],
+// 			    walkExtraConfig[pHipHeight],
+// 			    walkExtraConfig[pTorsoYOrientation]);
 
-  proxy->setWalkArmsConfig(walkArmsConfig[pShoulderMedian],
-			   walkArmsConfig[pShoulderAmplitude],
-			   walkArmsConfig[pElbowMedian],
-			   walkArmsConfig[pElbowAmplitude]);
-}
+//   proxy->setWalkArmsConfig(walkArmsConfig[pShoulderMedian],
+// 			   walkArmsConfig[pShoulderAmplitude],
+// 			   walkArmsConfig[pElbowMedian],
+// 			   walkArmsConfig[pElbowAmplitude]);
+// }

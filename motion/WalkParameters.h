@@ -46,11 +46,11 @@ class WalkParameters {
     : walkConfig(_walkConfig), walkExtraConfig(_walkExtraConfig),
       walkArmsConfig(_walkArmsConfig) { }
 
-#ifdef NAOQI1
-  void apply(ALPtr<ALMotionProxy> proxy) const;
-#else
-  void apply(ALMotionProxy * proxy) const;
-#endif
+// #ifdef NAOQI1
+//   void apply(ALPtr<ALMotionProxy> proxy) const;
+// #else
+//   void apply(ALMotionProxy * proxy) const;
+// #endif
  public: // Default parameters constants
 
   static const vector <float> DEFAULT_CONFIG;

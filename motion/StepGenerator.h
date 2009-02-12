@@ -102,7 +102,7 @@ public:
 
     bool isDone() { return _done; }
 
-    void setWalkVector(const float _x, const float _y, const float _theta);
+    void setSpeed(const float _x, const float _y, const float _theta);
 
 private: // Helper methods
     void swapSupportLegs();

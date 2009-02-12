@@ -24,6 +24,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
                      12.0f),       // rightZMPSwingOffestY
       stepGenerator(sensors,&walkParameters)
 {
+    pthread_mutex_init(&walk_command_mutex,NULL);
 
     //Make up something arbitrary for the arms
     const float larm[ARM_JOINTS] = {M_PI/2,M_PI/10,-M_PI/2,-M_PI/2};
@@ -35,7 +36,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
 }
 
 WalkProvider::~WalkProvider() {
-
+    pthread_mutex_destroy(&walk_command_mutex);
 }
 
 void WalkProvider::requestStop() {
@@ -43,6 +44,12 @@ void WalkProvider::requestStop() {
 }
 
 void WalkProvider::calculateNextJoints() {
+    pthread_mutex_lock(&walk_command_mutex);
+    stepGenerator.setSpeed(nextCommand->x_mms,
+                            nextCommand->y_mms,
+                            nextCommand->theta_rads);
+    pthread_mutex_lock(&walk_command_mutex);
+
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
 
@@ -70,13 +77,15 @@ void WalkProvider::calculateNextJoints() {
 }
 
 void WalkProvider::setCommand(WalkCommand * command){
-    
+    //grab the velocities in mm/second rad/second from WalkCommand
+
+    pthread_mutex_lock(&walk_command_mutex);
+    delete nextCommand;
+    nextCommand =command;
+    pthread_mutex_unlock(&walk_command_mutex);
+
+
 }
-
-void WalkProvider::setMotion(const float x, const float y, const float theta) {
-
-}
-
 
 //Returns the 20 body joints
 vector<float> WalkProvider::getWalkStance(){
