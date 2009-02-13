@@ -1,5 +1,7 @@
 #include "EKF.h"
 
+using namespace boost::numeric;
+
 /**
  * Simplest constructor for the EKF class
  *

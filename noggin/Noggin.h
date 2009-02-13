@@ -8,6 +8,7 @@
 #include "Profiler.h"
 #include "PyVision.h"
 #include "MCL.h"
+#include "BallEKF.h"
 
 class Noggin
 {
@@ -47,7 +48,8 @@ private:
 
 // Public members
 public:
-    MCL mcl;
+    boost::shared_ptr<MCL> mcl;
+    boost::shared_ptr<BallEKF> ballEKF;
 };
 
 

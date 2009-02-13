@@ -1,4 +1,6 @@
 #include "BallEKF.h"
+using namespace boost::numeric;
+using namespace boost;
 
 /**
  * Constructor for the BallEKF class
@@ -13,7 +15,7 @@
  * @param _initVelXUncert An initial value for the x velocity uncertainty
  * @param _initVelYUncert An initial value for the y velocity uncertainty
  */
-BallEKF::BallEKF(MCL * _mcl,
+BallEKF::BallEKF(shared_ptr<MCL> _mcl,
                  float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,

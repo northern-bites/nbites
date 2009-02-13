@@ -15,7 +15,7 @@ using namespace boost;
 const char * BRAIN_MODULE = "man.noggin.Brain";
 
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
-  : error_state(false), brain_module(NULL), brain_instance(NULL), mcl()
+    : error_state(false), brain_module(NULL), brain_instance(NULL)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -23,6 +23,11 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
 
     // Initialize the interpreter, the vision module, and PyVision instance
     initializeVision(v);
+
+    // Initialize localization stuff
+    mcl = shared_ptr<MCL>(new MCL());
+    ballEKF = shared_ptr<BallEKF>(new BallEKF(mcl));
+
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
@@ -37,7 +42,6 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  DONE!\n");
 #endif
-
 }
 
 Noggin::~Noggin ()
@@ -226,18 +230,19 @@ void Noggin::updateLocalization()
         observations.push_back(fo);
         cout << "Saw yglp at distance" << fo.getDistance() << endl;
     }
+
     // Corners
 
     // Lines
 
     // Process the information
     PROF_ENTER(profiler, P_MCL);
-    mcl.updateLocalization(odometery, observations, true);
+    mcl->updateLocalization(odometery, observations, true);
     PROF_EXIT(profiler, P_MCL);
     //cout << mcl << endl;
 
     // Ball Tracking
-
+    ballEKF->updateModel(vision->ball);
 
     // Opponent Tracking
 }

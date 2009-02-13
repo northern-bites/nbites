@@ -6,6 +6,7 @@
 
 #ifndef BallEKF_h_DEFINED
 #define BallEKF_h_DEFINED
+#include <boost/shared_ptr.hpp>
 
 #include "EKF.h"
 #include "MCL.h"
@@ -50,7 +51,7 @@ class BallEKF : public EKF
 public:
 
     // Constructors & Destructors
-    BallEKF(MCL * _mcl,
+    BallEKF(boost::shared_ptr<MCL> _mcl,
             float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
             float initVelX = INIT_BALL_X_VEL,
             float initVelY = INIT_BALL_Y_VEL,
@@ -157,16 +158,20 @@ public:
     }
 private:
     // Core Functions
-    virtual ublas::vector<float> associateTimeUpdate(MotionModel u_k);
+    virtual boost::numeric::ublas::vector<float> associateTimeUpdate(MotionModel
+                                                                     u_k);
     virtual void incorporateMeasurement(Measurement z,
-                                        ublas::matrix<float> &H_k,
-                                        ublas::matrix<float> &R_k,
-                                        ublas::vector<float> &V_k);
+                                        boost::numeric::ublas::matrix<float>
+                                        &H_k,
+                                        boost::numeric::ublas::matrix<float>
+                                        &R_k,
+                                        boost::numeric::ublas::vector<float>
+                                        &V_k);
     void limitAPrioriEst(void);
     void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
     void limitPosteriorUncert(void);
     // Members
-    MCL * robotLoc;
+    boost::shared_ptr<MCL> robotLoc;
 };
 #endif // File
