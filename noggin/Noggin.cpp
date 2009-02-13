@@ -211,28 +211,40 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0) {
         Observation seen(fo);
         observations.push_back(seen);
-        cout << "Saw bgrp at distance" << fo.getDistance() << endl;
+#ifdef DEBUG_OBSERVATIONS
+        cout << "Saw bgrp at distance " << fo.getDistance()
+             << " and bearing " << seen.getVisBearing() << endl;
+#endif
     }
 
     fo = *vision->bglp;
     if(fo.getDistance() > 0) {
         Observation seen(fo);
         observations.push_back(seen);
-        cout << "Saw bglp at distance" << fo.getDistance() << endl;
+#ifdef DEBUG_OBSERVATIONS
+        cout << "Saw bglp at distance " << fo.getDistance()
+             << " and bearing " << seen.getVisBearing() << endl;
+#endif
     }
 
     fo = *vision->ygrp;
     if(fo.getDistance() > 0) {
         Observation seen(fo);
         observations.push_back(seen);
-        cout << "Saw ygrp at distance" << fo.getDistance() << endl;
+#ifdef DEBUG_OBSERVATIONS
+        cout << "Saw ygrp at distance " << fo.getDistance()
+             << " and bearing " << seen.getVisBearing() << endl;
+#endif
     }
 
     fo = *vision->yglp;
     if(fo.getDistance() > 0) {
         Observation seen(fo);
         observations.push_back(seen);
-        cout << "Saw yglp at distance" << fo.getDistance() << endl;
+#ifdef DEBUG_OBSERVATIONS
+        cout << "Saw yglp at distance " << fo.getDistance()
+             << " and bearing " << seen.getVisBearing() << endl;
+#endif
     }
 
     // Corners
@@ -241,6 +253,11 @@ void Noggin::updateLocalization()
     for ( i = corners->begin(); i != corners->end(); ++i) {
         Observation seen(*i);
         observations.push_back(seen);
+#ifdef DEBUG_OBSERVATIONS
+        cout << "Saw corner " << seen.getID() << " at distance "
+             << seen.getVisDist() << " and bearing " << seen.getVisBearing()
+             << endl;
+#endif
     }
 
     // Lines
