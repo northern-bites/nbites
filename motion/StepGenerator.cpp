@@ -31,7 +31,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
 
     //hack
-    setWalkVector(0.0f,0.0f,0.0f);
+    setSpeed(0.0f,0.0f,0.0f);
 }
 StepGenerator::~StepGenerator(){
 #ifdef DEBUG_CONTROLLER_COM
