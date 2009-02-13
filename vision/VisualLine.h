@@ -188,7 +188,7 @@ public:
     /**
      * @return a List of all possible lines.  Currently returns all 11 lines
      */
-    const list <const ConcreteLine *> getPossibleLines() {
+    const list <const ConcreteLine *> getPossibleLines() const {
         return possibleLines;
     }
 

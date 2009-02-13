@@ -68,8 +68,8 @@ public:
 
     // Construcotrs & Destructors
     Observation(VisualFieldObject &_object);
-    Observation(VisualCorner &_corner);
-    Observation(VisualLine &_line);
+    Observation(const VisualCorner &_corner);
+    Observation(const VisualLine &_line);
     virtual ~Observation();
 
     // Core Functions

@@ -206,34 +206,50 @@ void Noggin::updateLocalization()
     // Build the observations from vision data
     vector<Observation> observations;
     // FieldObjects
-    VisualFieldObject fo = *(vision->bgrp);
+    VisualFieldObject fo = *vision->bgrp;
 
     if(fo.getDistance() > 0) {
-        observations.push_back(fo);
+        Observation seen(fo);
+        observations.push_back(seen);
         cout << "Saw bgrp at distance" << fo.getDistance() << endl;
     }
 
-    fo = *(vision->bglp);
+    fo = *vision->bglp;
     if(fo.getDistance() > 0) {
-        observations.push_back(fo);
+        Observation seen(fo);
+        observations.push_back(seen);
         cout << "Saw bglp at distance" << fo.getDistance() << endl;
     }
 
-    fo = *(vision->ygrp);
+    fo = *vision->ygrp;
     if(fo.getDistance() > 0) {
-        observations.push_back(fo);
+        Observation seen(fo);
+        observations.push_back(seen);
         cout << "Saw ygrp at distance" << fo.getDistance() << endl;
     }
 
-    fo = *(vision->yglp);
+    fo = *vision->yglp;
     if(fo.getDistance() > 0) {
-        observations.push_back(fo);
+        Observation seen(fo);
+        observations.push_back(seen);
         cout << "Saw yglp at distance" << fo.getDistance() << endl;
     }
 
     // Corners
+    const list<VisualCorner> * corners = vision->fieldLines->getCorners();
+    list <VisualCorner>::const_iterator i;
+    for ( i = corners->begin(); i != corners->end(); ++i) {
+        Observation seen(*i);
+        observations.push_back(seen);
+    }
 
     // Lines
+    // const vector<VisualLine> * lines = vision->fieldLines->getLines();
+    // vector <VisualLine>::const_iterator j;
+    // for ( j = lines->begin(); j != lines->end(); ++j) {
+    //     Observation seen(*j);
+    //     observations.push_back(seen);
+    // }
 
     // Process the information
     PROF_ENTER(profiler, P_MCL);

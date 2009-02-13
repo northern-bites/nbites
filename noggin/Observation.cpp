@@ -37,7 +37,7 @@ Observation::Observation(VisualFieldObject &_object) :
 /**
  * @param c Corner that was seen and reported.
  */
-Observation::Observation(VisualCorner &_corner) :
+Observation::Observation(const VisualCorner &_corner) :
     visDist(_corner.getDistance()), visBearing(_corner.getBearing()),
     sigma_d(_corner.getDistanceSD()), sigma_b(_corner.getBearingSD()),
     id(_corner.getID()), line_truth(false)
@@ -59,14 +59,14 @@ Observation::Observation(VisualCorner &_corner) :
 /**
  * @param l Line that was seen and reported.
  */
-Observation::Observation(VisualLine &_line) :
+Observation::Observation(const VisualLine &_line) :
     visDist(_line.getDistance()), visBearing(_line.getBearing()),
     sigma_d(_line.getDistanceSD()), sigma_b(_line.getBearingSD()),
     // id(_line.getID()),
     line_truth(true)
 {
     // Build our possibilitiy list
-    Observation::numPossibilities = 0;
+    numPossibilities = 0;
 
     list <const ConcreteLine *>::iterator theIterator;
     list <const ConcreteLine *> lineList = _line.getPossibleLines();
@@ -77,7 +77,7 @@ Observation::Observation(VisualLine &_line) :
                              (**theIterator).getFieldX1(),
                              (**theIterator).getFieldY1());
         linePossibilities.push_back(addLine);
-        ++Observation::numPossibilities;
+        ++numPossibilities;
     }
 
 }
