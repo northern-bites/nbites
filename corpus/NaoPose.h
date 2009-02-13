@@ -68,7 +68,7 @@
  *   - Need to fix the world frame, since it currently relies on the rotation of
  *     the foot also about the Z axis, which means when we are turning, for
  *     example, we will report distances and more imporantly bearings relative
- *     to the foot instead of the body. This has been hacked for now, in 
+ *     to the foot instead of the body. This has been hacked for now, in
  *     bodyEstimate.
  *
  *   - While testing this code on the robot, we saw a significant, though
@@ -167,8 +167,10 @@ static const point3 <float> ZERO_COORD(0.0f,0.0f,0.0f);
 // a null estimate struct. zero dist,bearing,elevation (check dist always), x, y
 static const estimate NULL_ESTIMATE = {0.0f,0.0f,0.0f,0.0f,0.0f};
 // defines the left and right horizontal points in mm and in xyz space
-static const point3 <float> HORIZON_LEFT_3D ( HORIZON_LEFT_X_MM, FOCAL_LENGTH_MM, 0.0);
-static const point3 <float> HORIZON_RIGHT_3D (HORIZON_RIGHT_X_MM, FOCAL_LENGTH_MM, 0.0 );
+static const point3 <float> HORIZON_LEFT_3D ( HORIZON_LEFT_X_MM,
+                                              FOCAL_LENGTH_MM, 0.0);
+static const point3 <float> HORIZON_RIGHT_3D (HORIZON_RIGHT_X_MM,
+                                              FOCAL_LENGTH_MM, 0.0 );
 static const float LINE_HEIGHT = 0.0f;
 
 
@@ -184,8 +186,8 @@ class NaoPose {
   static const float IMAGE_CENTER_X;
   static const float IMAGE_CENTER_Y;
 
-  static const float PIX_TO_DEG_X;
-  static const float PIX_TO_DEG_Y;
+  static const float PIX_TO_RAD_X;
+  static const float PIX_TO_RAD_Y;
 
   static const estimate NULL_ESTIMATE;
 
@@ -235,9 +237,9 @@ class NaoPose {
   // In homogeneous coordinates, get the length of a n-dimensional vector.
   static const float getHomLength(const ublas::vector <float> &vec);
   // takes in two sides of a triangle, returns hypotenuse
-  
+
   static const double getHypotenuse(const float x, const float y) {
-    return sqrt(pow(x,2)+pow(y,2));
+    return sqrt(x*x + y*y);
   }
 
   //returns an 'estimate' object for a homogeneous vector pointing to an

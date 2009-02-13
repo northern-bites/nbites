@@ -38,8 +38,8 @@ const float NaoPose::FOCAL_LENGTH_MM = (float)((IMAGE_WIDTH_MM/2) / tan(FOV_X/2)
   const float NaoPose::IMAGE_CENTER_X = (IMAGE_WIDTH-1)/2.0f;
   const float NaoPose::IMAGE_CENTER_Y = (IMAGE_HEIGHT-1)/2.0f;
 
-const float NaoPose::PIX_TO_DEG_X = (float)FOV_X_DEG/IMAGE_WIDTH;
-const float NaoPose::PIX_TO_DEG_Y = (float)FOV_Y_DEG/IMAGE_HEIGHT;
+const float NaoPose::PIX_TO_RAD_X = DEG2RAD((float)FOV_X_DEG/IMAGE_WIDTH);
+const float NaoPose::PIX_TO_RAD_Y = DEG2RAD((float)FOV_Y_DEG/IMAGE_HEIGHT);
 
 const estimate NaoPose::NULL_ESTIMATE = {0.0, 0.0, 0.0, 0.0, 0.0};
 
@@ -106,7 +106,7 @@ void NaoPose::transform () {
 
   const ublas::matrix <float> rLegToBodyTransform =
     calculateForwardTransform(RLEG_CHAIN, rLegAngles);
-  
+
   // For now we will use distance to figure out which foot is the support foot
   // This may need to be improved in the future.
   // The vectors below are in the body frame.
@@ -147,7 +147,7 @@ void NaoPose::transform () {
   comHeight = -torsoLocationInLegFrame[Z];
 
   cameraToWorldFrame = prod(bodyToWorldTransform, cameraToBodyTransform);
-  
+
   calcImageHorizonLine();
   focalPointInWorldFrame.x = cameraToWorldFrame(X,3);
   focalPointInWorldFrame.y = cameraToWorldFrame(Y,3);
@@ -174,7 +174,7 @@ void NaoPose::calcImageHorizonLine() {
   ublas::matrix <float> horizonToCameraFrame = trans(cameraToHorizonFrame);
 
   // We defined each edge of the CCD as a line, and solve
-  // for where that line intersects the horizon plane ( xy plane level with the 
+  // for where that line intersects the horizon plane ( xy plane level with the
   // ground, at the height of the focal point
   std::vector <ublas::vector <float> > leftEdge, rightEdge;
 
@@ -183,13 +183,13 @@ void NaoPose::calcImageHorizonLine() {
 
   rightEdge.push_back(prod(cameraToHorizonFrame, topRight));
   rightEdge.push_back(prod(cameraToHorizonFrame, bottomRight));
-  
+
   //intersection points in the horizon frame
   ublas::vector <float> intersectionLeft =
     intersectLineWithXYPlane(leftEdge);
   ublas::vector <float> intersectionRight =
     intersectLineWithXYPlane(rightEdge);
-  
+
   // Now they are in the camera frame. Result still stored in intersection 1,2
   intersectionLeft = prod(horizonToCameraFrame, intersectionLeft);
   intersectionRight = prod(horizonToCameraFrame, intersectionRight);
@@ -258,12 +258,12 @@ intersectLineWithXYPlane(const std::vector<ublas::vector <float> > &aLine) {
     // will be at the top of the screen in this case which works for us.
     return l1;
   }
-  
+
   ublas::vector <float> result(3);
   result.assign(target);
   lu_substitute(eqSystem, P, result);
   float t = result(0);
-  
+
   //the first variable in the linear equation was t, so it appears at the top of
   //the vector 'result'. The 't' is such that the point l1 + (l2 -l1)t is on
   //the horizon plane
@@ -319,7 +319,7 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
     t = ( object_z_in_world_frame - pixelInWorldFrame(Z) ) /
       ( focalPointInWorldFrame.z - pixelInWorldFrame(Z) );
   }
-  
+
   const float x = pixelInWorldFrame(X) +
     (focalPointInWorldFrame.x - pixelInWorldFrame(X))*t;
   const float y = pixelInWorldFrame(Y) +
@@ -327,7 +327,7 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
   const float z = pixelInWorldFrame(Z) +
     (focalPointInWorldFrame.z - pixelInWorldFrame(Z))*t;
   ublas::vector<float> objectInWorldFrame = vector4D(x,y,z);
-  
+
   // SANITY CHECKS
   //If the plane where the target object is, is below the camera height,
   //then we need to make sure that the pixel in world frame is lower than
@@ -340,7 +340,7 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
 
   return getEstimate(objectInWorldFrame);
 }
-  
+
 
   /**
    * Body estimate takes a pixel on the screen, and a vision calculated
@@ -352,12 +352,12 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
 				    const float dist) {
   if (dist <= 0.0)
     return NULL_ESTIMATE;
-  
+
   //all angle signs are according to right hand rule for the major axis
   // get bearing angle in image plane,left pos, right negative
-  double object_bearing = DEG2RAD((IMAGE_CENTER_X - (float)x)*PIX_TO_DEG_X);
+  double object_bearing = (IMAGE_CENTER_X - (float)x)*PIX_TO_RAD_X;
   // get elevation angle in image plane, up negative, down is postive
-  double object_elevation = DEG2RAD(((float)y - IMAGE_CENTER_Y)*PIX_TO_DEG_Y);
+  double object_elevation = ((float)y - IMAGE_CENTER_Y)*PIX_TO_RAD_Y;
   // convert dist estimate to mm
   double object_dist = dist*10;
 
@@ -387,7 +387,7 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
 /**
  * Method to populate an estimate with an vector4D in homogenous coordinates.
  *
- * Input units are MM, output in estimate is in CM, degreees
+ * Input units are MM, output in estimate is in CM, radians
  *
  */
 estimate NaoPose::getEstimate(ublas::vector <float> objInWorldFrame){
@@ -396,10 +396,10 @@ estimate NaoPose::getEstimate(ublas::vector <float> objInWorldFrame){
   //distance as projected onto XY plane - ie bird's eye view
 
   pix_est.dist =
-    getHypotenuse(objInWorldFrame(X), objInWorldFrame(Y)) * MM_TO_CM; 
+    getHypotenuse(objInWorldFrame(X), objInWorldFrame(Y)) * MM_TO_CM;
 
-  // calculate in degrees the bearing to the object from the center of the body
-  // since trig functions can't handle 360 degrees, we need to differentiate
+  // calculate in radians the bearing to the object from the center of the body
+  // since trig functions can't handle 2 Pi, we need to differentiate
   // by quadrant:
 
   const bool yPos = objInWorldFrame(Y) >= 0;
@@ -432,13 +432,13 @@ const ublas::matrix <float>
 NaoPose::calculateForwardTransform(const ChainID id,
 				   const std::vector <float> &angles) {
   ublas::matrix <float> fullTransform = ublas::identity_matrix <float> (4);
-  
+
   // Do base transforms
   const int numBaseTransforms = NUM_BASE_TRANSFORMS[id];
   for (int i = 0; i < numBaseTransforms; i++) {
     fullTransform = prod(fullTransform, BASE_TRANSFORMS[id][i]);
   }
-  
+
   // Do mDH transforms
   const int numTransforms = NUM_JOINTS_CHAIN[id];
   for (int i = 0; i < numTransforms; i++) {
@@ -477,13 +477,13 @@ NaoPose::calculateForwardTransform(const ChainID id,
       fullTransform = prod(fullTransform, transZ);
     }
   }
-  
+
   // Do the end transforms
   const int numEndTransforms = NUM_END_TRANSFORMS[id];
   for (int i = 0; i < numEndTransforms; i++) {
     fullTransform = prod(fullTransform, END_TRANSFORMS[id][i]);
   }
-  
+
   return fullTransform;
 }
 
