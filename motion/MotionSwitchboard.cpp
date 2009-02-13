@@ -146,7 +146,7 @@ void MotionSwitchboard::run() {
 
 
 
-    scriptedProvider.enqueue(getUp);
+    //scriptedProvider.enqueue(getUp);
     //scriptedProvider.enqueue(sitDownCommand);
     while(running) {
 
@@ -183,26 +183,27 @@ int MotionSwitchboard::processProviders(){
 
     //select the current body provider - either switch like this, or jut choose
     //below **
-    static bool switched = false;
-    MotionProvider * curProvider;
-    if(!switched && scriptedProvider.isActive()) {
-        //cout << "First part: standing up with the Scripted Provider"<<endl;
-        curProvider=reinterpret_cast< MotionProvider*> ( &scriptedProvider);
-    }else if( walkProvider.isActive()){
-        switched = true;
-        //cout << "Middle part: WALKING"<<endl;
-        curProvider = reinterpret_cast<MotionProvider *>( &walkProvider);
-    }else{
-        //cout << "LAST part: sitting  down with the Scripted Provider"<<endl;
-        static bool sitDownBool = true;
-        if (sitDownBool){
-            sitDownBool = false;
-            scriptedProvider.enqueue(sitDown);
-        }
-        curProvider=reinterpret_cast <MotionProvider *>( &scriptedProvider);
-    }
+
+     MotionProvider * curProvider;
+    // static bool switched = false;
+//     if(!switched && scriptedProvider.isActive()) {
+//         //cout << "First part: standing up with the Scripted Provider"<<endl;
+//         curProvider=reinterpret_cast< MotionProvider*> ( &scriptedProvider);
+//     }else if( walkProvider.isActive()){
+//         switched = true;
+//         //cout << "Middle part: WALKING"<<endl;
+//         curProvider = reinterpret_cast<MotionProvider *>( &walkProvider);
+//     }else{
+//         //cout << "LAST part: sitting  down with the Scripted Provider"<<endl;
+//         static bool sitDownBool = true;
+//         if (sitDownBool){
+//             sitDownBool = false;
+//             scriptedProvider.enqueue(sitDown);
+//         }
+//         curProvider=reinterpret_cast <MotionProvider *>( &scriptedProvider);
+//     }
     //** Alternately, you may choose here:
-    //curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
+    curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
 
     //Request new joints
     curProvider->calculateNextJoints();

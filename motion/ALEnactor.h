@@ -13,6 +13,7 @@
 #include "dcmproxy.h"
 #include "almemoryfastaccess.h"
 
+#include "motionconfig.h"
 #include "Sensors.h"
 #include "MotionEnactor.h"
 

@@ -31,7 +31,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
 
     //hack
-    setWalkVector(0.0f,20.0f,0.0f);
+    setWalkVector(0.0f,0.0f,0.0f);
 }
 StepGenerator::~StepGenerator(){
 #ifdef DEBUG_CONTROLLER_COM
@@ -51,10 +51,6 @@ StepGenerator::~StepGenerator(){
  *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
-    static int fc = 0;
-    static float lastZMP_x = 0;
-    static float lastZMP_y = 0;
-
     //Generate enough ZMPs so a) the controller can run
     //and                     b) there are enough steps
     while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES ||
@@ -62,19 +58,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
         if (futureSteps.size() < 1  || futureSteps.size() +
             currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
             generateStep(x, y, theta); // with the current walk vector
-
-            //HACK
-            fc++;
-            if(fc == 6){
-                //Change the x vector to be moving forward
-                x -=10;
-                y +=5 ;
-                theta += M_PI/12;
-                x =y=theta=0;
-            }else if (fc == 12){
-                //Change the x vector to be moving forward
-                x =y=theta=0;
-            }
         }
         else {
             shared_ptr<Step> nextStep = futureSteps.front();
@@ -87,12 +70,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
         }
     }
 
-    float newZMP_x = zmp_ref_x.front();
-    float newZMP_y = zmp_ref_y.front();
-
-
-    lastZMP_x = newZMP_x;
-    lastZMP_y = newZMP_y;
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);

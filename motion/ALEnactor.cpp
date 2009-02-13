@@ -10,7 +10,6 @@ const int ALEnactor::MOTION_FRAME_RATE = 50;
 const float ALEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f / ALEnactor::MOTION_FRAME_RATE;
 const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RATE;
 
-#define NO_ACTUAL_MOTION
 #define SPEEDY_ENACTOR
 
 #ifdef NAOQI1
