@@ -386,11 +386,16 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     //we only turn every other step, so double the turning!
     const float new_theta = _theta*walkParams->stepDuration*2.0;
 
-    //If the walk vector isn't changing, we don't need to do anything
+    //If the walk vector isn't changing, 
     if(abs(new_x - x) <= NEW_VECTOR_THRESH_MMS &&
        abs(new_y - y) <= NEW_VECTOR_THRESH_MMS &&
        abs(new_theta - theta) <= NEW_VECTOR_THRESH_RADS){
-        return;
+
+        //and there are plenty of steps,
+        if(futureSteps.size() + currentZMPDSteps.size() >= MIN_NUM_ENQUEUED_STEPS){
+            cout << "Walk vector not different enough, not updating anything" <<endl;
+            return;
+        }
     }
 
     //if the new one is different, update the 
@@ -410,6 +415,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
         startRight();
 
     _done = false;
+
 }
 
 /*  Set up the walking engine for starting with a swinging step on the right */

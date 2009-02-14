@@ -1308,8 +1308,6 @@ PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
   float y_cms = 0.0f;
   float theta_degs  = 0.0f;
 
-
-
   //first try to read as many arguments as there are, then look at keywords
   const int argc = PyTuple_Size(args);
 

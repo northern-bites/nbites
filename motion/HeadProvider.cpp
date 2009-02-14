@@ -41,7 +41,7 @@ HeadProvider::~HeadProvider() {
     // remove all remaining values from chain queues
 }
 
-void HeadProvider::requestStop() {
+void HeadProvider::requestStopFirstInstance() {
     // Finish motion or stop immediately?
 }
 

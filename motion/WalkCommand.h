@@ -30,6 +30,15 @@ private:
                          MotionConstants::WALK_CHAINS +
                          MotionConstants::WALK_NUM_CHAINS);
     }
+
+public:
+    friend std::ostream& operator<< (std::ostream &o, const WalkCommand &w)
+        {
+            return o << "WalkCommand("
+                     << w.x_mms << "," << w.y_mms << "," << w.theta_rads
+                     << ") ";
+        }
+
 };
 
 #endif

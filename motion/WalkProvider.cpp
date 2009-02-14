@@ -23,7 +23,8 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
                      12.0f,        // leftZMPSwingOffestY,
                      12.0f),       // rightZMPSwingOffestY
       stepGenerator(sensors,&walkParameters),
-      pendingCommands(false)
+      pendingCommands(false),
+      nextCommand(NULL)
 {
     pthread_mutex_init(&walk_command_mutex,NULL);
 
@@ -40,17 +41,23 @@ WalkProvider::~WalkProvider() {
     pthread_mutex_destroy(&walk_command_mutex);
 }
 
-void WalkProvider::requestStop() {
+void WalkProvider::requestStopFirstInstance() {
+    cout << "REQUEST STOP FIRST INSTANCE" <<endl;
     setCommand(new WalkCommand(0.0f, 0.0f, 0.0f));
 }
 
 void WalkProvider::calculateNextJoints() {
     pthread_mutex_lock(&walk_command_mutex);
-    stepGenerator.setSpeed(nextCommand->x_mms,
-                           nextCommand->y_mms,
-                           nextCommand->theta_rads);
+    if(nextCommand){
+        stepGenerator.setSpeed(nextCommand->x_mms,
+                               nextCommand->y_mms,
+                               nextCommand->theta_rads);
+    cout << "Finished sending the command to step generator" <<endl;
+    }
     pendingCommands = false;
+    nextCommand = NULL;
     pthread_mutex_unlock(&walk_command_mutex);
+
 
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
@@ -80,9 +87,10 @@ void WalkProvider::calculateNextJoints() {
 
 void WalkProvider::setCommand(const WalkCommand * command){
     //grab the velocities in mm/second rad/second from WalkCommand
-    cout << "Got walk command in walk Provider" <<endl;
+    cout << "Got walk command in walk Provider" << *command<<endl;
     pthread_mutex_lock(&walk_command_mutex);
-    delete nextCommand;
+    if(nextCommand)
+        delete nextCommand;
     nextCommand =command;
     pendingCommands = true;
     pthread_mutex_unlock(&walk_command_mutex);

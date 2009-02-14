@@ -151,7 +151,7 @@ void MotionSwitchboard::run() {
     while(running) {
         if(fcount == 100){
             cout << "enqueing a new walk command" <<endl;
-            sendMotionCommand(new WalkCommand(0.1f,0.0f,0.0f));
+            sendMotionCommand(new WalkCommand(0.0f,10.0f,0.0f));
         }else if( fcount == 450){
             cout << "enqueing a sit down" <<endl;
             sendMotionCommand(sitDown);
@@ -190,14 +190,15 @@ int MotionSwitchboard::processProviders(){
 	// Switch Providers!
 
 
-	if (curProvider != nextProvider){
-		cout << "Requesting stop on old provider" <<endl;
-        curProvider->requestStop();
-    }
 	if (curProvider != nextProvider && !curProvider->isActive()) {
         cout << "Switched to the new provider" << endl;
         curProvider = nextProvider;
 	}
+	if (curProvider != nextProvider && !curProvider->isStopping()){
+		cout << "Requesting stop on old provider" <<endl;
+        curProvider->requestStop();
+    }
+
 
     if (curProvider == &scriptedProvider) {
         cout << "Currently selected scripted provider" << endl;

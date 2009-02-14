@@ -35,7 +35,7 @@ public:
     WalkProvider(boost::shared_ptr<Sensors> s);
     virtual ~WalkProvider();
 
-    void requestStop();
+    void requestStopFirstInstance();
     void calculateNextJoints();
 
     vector<float> getWalkStance();

@@ -41,7 +41,7 @@ public:
     ScriptedProvider(float motionFrameLength, shared_ptr<Sensors> s);
     virtual ~ScriptedProvider();
 
-    void requestStop();
+    void requestStopFirstInstance();
     void calculateNextJoints();
 
 	void enqueueSequence(std::vector<const BodyJointCommand*> &seq);

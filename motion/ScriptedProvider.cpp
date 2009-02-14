@@ -60,7 +60,7 @@ ScriptedProvider::~ScriptedProvider() {
 // So this method does nothing. At all.
 // We'll just naturally finish what we're doing and
 // hold steady at the last position.
-void ScriptedProvider::requestStop() { }
+void ScriptedProvider::requestStopFirstInstance() { }
 
 //Checks if this chain is currently providing angles so that external
 //classes can check the status of this one

@@ -37,7 +37,7 @@ public:
     HeadProvider(float motionFrameLength, boost::shared_ptr<Sensors> s);
     virtual ~HeadProvider();
 
-    void requestStop();
+    void requestStopFirstInstance();
     void calculateNextJoints();
 
 	void enqueueSequence(vector<HeadJointCommand*> &seq);
