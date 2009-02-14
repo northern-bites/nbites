@@ -191,20 +191,12 @@ int MotionSwitchboard::processProviders(){
 
 
 	if (curProvider != nextProvider && !curProvider->isActive()) {
-        cout << "Switched to the new provider" << endl;
         curProvider = nextProvider;
+        cout << "Switched to the new provider" << *curProvider << endl;
 	}
 	if (curProvider != nextProvider && !curProvider->isStopping()){
 		cout << "Requesting stop on old provider" <<endl;
         curProvider->requestStop();
-    }
-
-
-    if (curProvider == &scriptedProvider) {
-        cout << "Currently selected scripted provider" << endl;
-    }
-    else if (curProvider == &walkProvider) {
-        cout << "Currently selected walk provider" << endl;
     }
 
 	//** Alternately, you may choose here:

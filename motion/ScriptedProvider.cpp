@@ -25,7 +25,7 @@ using boost::shared_ptr;
 
 ScriptedProvider::ScriptedProvider(float motionFrameLength,
         shared_ptr<Sensors> s)
-  : MotionProvider(),
+  : MotionProvider("ScriptedProvider"),
     sensors(s),
     FRAME_LENGTH_S(motionFrameLength),
     chopper(sensors, FRAME_LENGTH_S),

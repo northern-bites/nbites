@@ -24,7 +24,7 @@
 using boost::shared_ptr;
 
 HeadProvider::HeadProvider(float motionFrameLength, shared_ptr<Sensors> s)
-	: MotionProvider(),
+	: MotionProvider("HeadProvider"),
 	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),

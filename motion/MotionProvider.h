@@ -18,9 +18,10 @@ using Kinematics::ChainID;
 
 class MotionProvider {
 public:
-    MotionProvider()
+    MotionProvider(char * _provider_name)
         : _active(false), _stopping(false),
-          nextJoints(Kinematics::NUM_CHAINS,vector<float>()) { }
+          nextJoints(Kinematics::NUM_CHAINS,vector<float>()),
+          provider_name(_provider_name){ }
     virtual ~MotionProvider() { }
 
     //Only pass on the first request to the extending class
@@ -56,6 +57,13 @@ private:
     bool _active;
     bool _stopping;
     vector < vector <float> > nextJoints;
+    const char * provider_name;
+
+public:
+    friend std::ostream& operator<< (std::ostream &o, const MotionProvider &mp)
+        {
+            return o << mp.provider_name <<endl;
+        }
 };
 
 #endif

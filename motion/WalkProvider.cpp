@@ -8,7 +8,7 @@ using Kinematics::LLEG_CHAIN;
 using Kinematics::RLEG_CHAIN;
 
 WalkProvider::WalkProvider(shared_ptr<Sensors> s)
-    : MotionProvider(),
+    : MotionProvider("WalkProvider"),
       sensors(s),
       walkParameters(.02f,         // motion frame length - FIXME constant
                      310.0f,       // COM height
