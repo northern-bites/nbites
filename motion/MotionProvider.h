@@ -62,7 +62,7 @@ private:
 public:
     friend std::ostream& operator<< (std::ostream &o, const MotionProvider &mp)
         {
-            return o << mp.provider_name <<endl;
+            return o << mp.provider_name;
         }
 };
 

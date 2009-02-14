@@ -5,6 +5,8 @@ using boost::shared_ptr;
 
 #include "StepGenerator.h"
 
+#define DEBUG_STEPGENERATOR
+
 StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
                              const WalkingParameters *params)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -21,24 +23,22 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     walkParams(params), nextStepIsLeft(true),
     leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
     controller_x(new PreviewController()),
-    controller_y(new PreviewController()){
-
+    controller_y(new PreviewController())
+{
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
-    controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
-
-    //hack
-    //setSpeed(0.0f,0.0f,0.0f);
+    resetGait(params);
 }
-StepGenerator::~StepGenerator(){
+
+StepGenerator::~StepGenerator()
+{
 #ifdef DEBUG_CONTROLLER_COM
     fclose(com_log);
 #endif
     delete controller_x; delete controller_y;
-
 }
 
 /**
@@ -53,18 +53,16 @@ StepGenerator::~StepGenerator(){
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     //Generate enough ZMPs so a) the controller can run
     //and                     b) there are enough steps
-    while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES ||
-           futureSteps.size() + currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS) {
-        if (futureSteps.size() < 1  || futureSteps.size() +
-            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
-            generateStep(x, y, theta); // with the current walk vector
+    while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES) {
+        if (futureSteps.size() == 0){
+            generateStep(x, y, theta); // replenish with the current walk vector
         }
         else {
             shared_ptr<Step> nextStep = futureSteps.front();
-            fillZMP(nextStep);
-
-            //transfer the nextStep element from future to current list
             futureSteps.pop_front();
+
+            fillZMP(nextStep);
+            //transfer the nextStep element from future to current list
             currentZMPDSteps.push_back(nextStep);
 
         }
@@ -72,6 +70,12 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
+}
+
+void StepGenerator::generate_steps(){
+    while(futureSteps.size() + currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
+        generateStep(x,y,theta);
+    }
 }
 
 void StepGenerator::tick_controller(){
@@ -116,12 +120,17 @@ void StepGenerator::tick_controller(){
 
 
 WalkLegsTuple StepGenerator::tick_legs(){
+    //Ensure we have enough steps for planning purposes
+    generate_steps();
+
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
     if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
         swapSupportLegs();
+        cout <<"SWAPPING COORDINTE FRAMES!"<<endl;
     }
 
+    cout << "Support step is " << *supportStep_f <<endl;
     //hack-ish for now to do hyp pitch crap
     leftLeg.setSteps(swingingStepSource_f, swingingStep_f,supportStep_f);
     rightLeg.setSteps(swingingStepSource_f, swingingStep_f,supportStep_f);
@@ -393,28 +402,33 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
         //and there are plenty of steps,
         if(futureSteps.size() + currentZMPDSteps.size() >= MIN_NUM_ENQUEUED_STEPS){
-            cout << "Walk vector not different enough, not updating anything" <<endl;
+            cout << "Walk vector not different enough, nothing updated" <<endl;
             return;
         }
     }
 
+
     //if the new one is different, update the 
     x = new_x; y = new_y; theta = new_theta;
+    cout << "New Walk Vector is:" << endl
+         << "    x: " << x << " y: " << y << " theta: " << theta << endl;
+
+    if(_done){
+        //we are starting fresh from a stopped state, so we need to clear all remaining 
+        //steps and zmp values.
+        resetQueues();
+
+        //then we need to pick which foot to start with
+        if(y > 0 || theta > 0)
+            startLeft();
+        else
+            startRight();
+    }
+    _done = false;
+
 
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
-
-    //TODO we also need to forget about any zmp values from before.
-    //WE should do this on ending, not on starting - what if we switch gaits?
-    //zmp_ref_x.clear();
-    //zmp_ref_y.clear();
-
-    if(y > 0 || theta > 0)
-        startLeft();
-    else
-        startRight();
-
-    _done = false;
 
 }
 
@@ -475,6 +489,7 @@ void StepGenerator::startLeft(){
     lastQueuedStep = firstSupportStep;
     nextStepIsLeft = false;
 }
+
 
 //currently only does two sets of steps side by side
 void StepGenerator::generateStep( float _x,
@@ -562,6 +577,9 @@ void StepGenerator::generateStep( float _x,
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
 
+#ifdef DEBUG_STEPGENERATOR
+    cout << "Generated a new step: "<<*step<<endl;
+#endif
     futureSteps.push_back(step);
     lastQueuedStep = step;
     //switch feet after each step is generated
@@ -651,6 +669,20 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
     return prod(trans_sprime_f,trans_f_s);
 }
 
+
+void StepGenerator::resetGait(const WalkingParameters * _wp){
+    walkParams = _wp;
+    //When we switch gaits, we need to reinitialize the controller
+    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
+
+}
+
+void StepGenerator::resetQueues(){
+    futureSteps.clear();
+    currentZMPDSteps.clear();
+    zmp_ref_x.clear();
+    zmp_ref_y.clear();
+}
 
 void StepGenerator::debugLogging(){
 

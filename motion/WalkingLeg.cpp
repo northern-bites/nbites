@@ -67,6 +67,7 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
         if(support_step->type == REGULAR_STEP)
             result  =  swinging(fc_Transform);
         else{
+            cout << "Piping a swinging END STEP to not step" <<endl;
             // It's an Irregular step, so we are not swinging
             result = supporting(fc_Transform);
         }
@@ -360,7 +361,7 @@ void WalkingLeg::setState(SupportMode newState){
 
 
 void WalkingLeg::debugProcessing(){
-
+#define DEBUG_WALKING_GOAL_CONTINUITY
 #ifdef DEBUG_WALKING_STATE_TRANSITIONS
     if (firstFrame()){
         if(chainID == LLEG_CHAIN){

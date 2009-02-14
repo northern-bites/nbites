@@ -95,8 +95,6 @@ public:
                   const WalkingParameters *params);
     ~StepGenerator();
 
-    zmp_xy_tuple generate_zmp_ref();
-
     void tick_controller();
     WalkLegsTuple tick_legs();
 
@@ -104,7 +102,12 @@ public:
 
     void setSpeed(const float _x, const float _y, const float _theta);
 
+    void resetGait(const WalkingParameters * _wp);
+
 private: // Helper methods
+    zmp_xy_tuple generate_zmp_ref();
+    void generate_steps();
+
     void swapSupportLegs();
 
     void generateStep(float _x,float _y,
@@ -120,6 +123,8 @@ private: // Helper methods
     static const ufmatrix3 get_fprime_f(const boost::shared_ptr<Step> step);
     static const ufmatrix3 get_sprime_s(const boost::shared_ptr<Step> step);
     static const ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
+
+    void resetQueues();
 
     void debugLogging();
 

@@ -7,6 +7,8 @@
 using namespace std;
 using namespace boost;
 
+#define DEBUG_SWITCHBOARD
+
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
  0.0f,0.0f,-0.96f,2.18f,
@@ -151,8 +153,12 @@ void MotionSwitchboard::run() {
     while(running) {
         if(fcount == 100){
             cout << "enqueing a new walk command" <<endl;
-            sendMotionCommand(new WalkCommand(0.0f,10.0f,0.0f));
+            sendMotionCommand(new WalkCommand(0.0f,-20.0f,0.0f));
         }else if( fcount == 450){
+            sendMotionCommand(new WalkCommand(0.0f,0.0f,0.0f));
+        }else if( fcount == 1050){
+            sendMotionCommand(new WalkCommand(0.0f,20.0f,0.0f));
+        }else if( fcount == 1550){
             cout << "enqueing a sit down" <<endl;
             sendMotionCommand(sitDown);
         }
@@ -192,16 +198,19 @@ int MotionSwitchboard::processProviders(){
 
 	if (curProvider != nextProvider && !curProvider->isActive()) {
         curProvider = nextProvider;
-        cout << "Switched to the new provider" << *curProvider << endl;
+#ifdef DEBUG_SWITCHBOARD
+        cout << "Switched to " << *curProvider << endl;
+#endif
 	}
 	if (curProvider != nextProvider && !curProvider->isStopping()){
-		cout << "Requesting stop on old provider" <<endl;
+#ifdef DEBUG_SWITCHBOARD
+		cout << "Requesting stop on "<< *curProvider <<endl;
+#endif
         curProvider->requestStop();
     }
-
 	//** Alternately, you may choose here:
 	//curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
-
+    static bool switchedToInactive;
     if (curProvider->isActive()){
 		//Request new joints
 		curProvider->calculateNextJoints();
@@ -228,8 +237,13 @@ int MotionSwitchboard::processProviders(){
         }
         pthread_mutex_unlock(&next_joints_mutex);
 
+        switchedToInactive = false;
     }else{
-        cout << "curProvider is inactive" <<endl;
+#ifdef DEBUG_SWITCHBOARD
+        if (!switchedToInactive)
+            cout << *curProvider << " is inactive" <<endl;
+        switchedToInactive = true;
+#endif
     }
     newJoints = true;
 
@@ -301,7 +315,6 @@ void MotionSwitchboard::closeDebugLogs(){
     fclose(joints_log);
 }
 void MotionSwitchboard::updateDebugLogs(){
-    cout << "updating debug logs" << endl;
     static float time = 0.0f;
 
     pthread_mutex_lock(&next_joints_mutex);
