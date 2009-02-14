@@ -22,7 +22,9 @@ public:
         : _active(false), nextJoints(Kinematics::NUM_CHAINS,vector<float>()) { }
     virtual ~MotionProvider() { }
 
+    //Only pass on the first request
     virtual void requestStop() = 0;
+
     const bool isActive() const { return _active; }
     virtual void calculateNextJoints() = 0;
     vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
@@ -38,10 +40,11 @@ protected:
     //to set whether the provider is currently active or not
     virtual void setActive() = 0;
     void active() { _active = true; }
-    void inactive() { _active = false; }
+    void inactive() { _active = false; _stopping = false; }
 
 private:
     bool _active;
+    bool _stopping;
     vector < vector <float> > nextJoints;
 };
 

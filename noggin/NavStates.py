@@ -75,7 +75,7 @@ def turnLeftForever(nav):
     if nav.firstFrame() or not nav.brain.motion.isWalkActive():
         nav.brain.motion.setWalkConfig(*MotionConstants.WALK_TURN_BIG_CONFIGS[0])
         nav.brain.motion.setWalkExtraConfig(*MotionConstants.WALK_TURN_BIG_CONFIGS[1])
-        turn = motion.WalkCommand(0,0,-0.1)
+        turn = motion.WalkCommand(0,0,0.1)
         nav.brain.motion.setNextWalkCommand(turn)
 
     return nav.stay()

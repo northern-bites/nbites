@@ -22,7 +22,8 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
                      4.0f*TO_RAD,  // rightSwingHipRollAddition
                      12.0f,        // leftZMPSwingOffestY,
                      12.0f),       // rightZMPSwingOffestY
-      stepGenerator(sensors,&walkParameters)
+      stepGenerator(sensors,&walkParameters),
+      pendingCommands(false)
 {
     pthread_mutex_init(&walk_command_mutex,NULL);
 
@@ -40,15 +41,16 @@ WalkProvider::~WalkProvider() {
 }
 
 void WalkProvider::requestStop() {
-
+    setCommand(new WalkCommand(0.0f, 0.0f, 0.0f));
 }
 
 void WalkProvider::calculateNextJoints() {
     pthread_mutex_lock(&walk_command_mutex);
     stepGenerator.setSpeed(nextCommand->x_mms,
-                            nextCommand->y_mms,
-                            nextCommand->theta_rads);
-    pthread_mutex_lock(&walk_command_mutex);
+                           nextCommand->y_mms,
+                           nextCommand->theta_rads);
+    pendingCommands = false;
+    pthread_mutex_unlock(&walk_command_mutex);
 
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
@@ -78,13 +80,14 @@ void WalkProvider::calculateNextJoints() {
 
 void WalkProvider::setCommand(const WalkCommand * command){
     //grab the velocities in mm/second rad/second from WalkCommand
-
+    cout << "Got walk command in walk Provider" <<endl;
     pthread_mutex_lock(&walk_command_mutex);
     delete nextCommand;
     nextCommand =command;
+    pendingCommands = true;
     pthread_mutex_unlock(&walk_command_mutex);
 
-
+    setActive();
 }
 
 //Returns the 20 body joints
@@ -124,7 +127,7 @@ vector<float> WalkProvider::getWalkStance(){
 
 void WalkProvider::setActive(){
     //check to see if the walk engine is active
-    if(stepGenerator.isDone()){
+    if(stepGenerator.isDone() && !pendingCommands){
         inactive();
     }else{
         active();

@@ -10,8 +10,8 @@ class SoccerPlayer(FSA.FSA):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         #jf- self.setTimeFunction(self.brain.nao.getSimulatedTime)
-        self.addStates(NoneStates)
         self.addStates(GameControllerStates)
+        self.addStates(NoneStates)
         self.currentState = 'nothing'
         self.setName('Player pNone')
         self.setPrintStateChanges(True)

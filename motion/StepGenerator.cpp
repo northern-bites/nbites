@@ -31,7 +31,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     controller_x->initState(walkParams->hipOffsetX,0.1f,walkParams->hipOffsetX);
 
     //hack
-    setSpeed(0.0f,0.0f,0.0f);
+    //setSpeed(0.0f,0.0f,0.0f);
 }
 StepGenerator::~StepGenerator(){
 #ifdef DEBUG_CONTROLLER_COM
@@ -163,6 +163,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //HACK check to see if we are done
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
        && lastStep_s->type == END_STEP){
+        cout << "step generator done = true" << endl;
         _done = true;
     }
 
@@ -377,6 +378,8 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
                                   const float _theta)  {
+    cout << "Calling setSpeed with:" << endl
+         << "    x: " << _x << " y: " << _y << " theta: " << _theta << endl;
     //convert speeds in cm/s and rad/s into steps:
     const float new_x = _x*walkParams->stepDuration;
     const float new_y = _y*walkParams->stepDuration;
@@ -384,9 +387,9 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     const float new_theta = _theta*walkParams->stepDuration*2.0;
 
     //If the walk vector isn't changing, we don't need to do anything
-    if(abs(new_x - x) < NEW_VECTOR_THRESH_MMS &&
-       abs(new_y - y) < NEW_VECTOR_THRESH_MMS &&
-       abs(new_theta - theta) < NEW_VECTOR_THRESH_RADS){
+    if(abs(new_x - x) <= NEW_VECTOR_THRESH_MMS &&
+       abs(new_y - y) <= NEW_VECTOR_THRESH_MMS &&
+       abs(new_theta - theta) <= NEW_VECTOR_THRESH_RADS){
         return;
     }
 

@@ -57,8 +57,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	hjc2 = new HeadJointCommand(3.0f,
 								headJoints2,
 								Kinematics::INTERPOLATION_LINEAR);
-	vector<float>* headJoints3 = new vector<float>(2,-M_PI/2);
-	hjc3 = new HeadJointCommand(10.0f,
+	vector<float>* headJoints3 = new vector<float>(2,-M_PI/8);
+	hjc3 = new HeadJointCommand(2.0f,
 								headJoints3,
 								Kinematics::INTERPOLATION_LINEAR);
 
@@ -103,10 +103,11 @@ void MotionSwitchboard::start() {
 
 // 	headProvider.enqueue(hjc);
 
-	nextProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
-	sendMotionCommand(command3);
-	sendMotionCommand(hjc3);
+	//nextProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
+	//sendMotionCommand(command3);
+	//sendMotionCommand(hjc3);
 // 	headProvider.enqueue(hjc3);
+    sendMotionCommand(getUp);
 
     running = true;
 
@@ -148,11 +149,13 @@ void MotionSwitchboard::run() {
 
 
     while(running) {
-
-//         if(fcount == 1){
-//             hack to help keep from falling over in the simulator
-//             usleep(2*1000*1000);
-//         }
+        if(fcount == 100){
+            cout << "enqueing a new walk command" <<endl;
+            sendMotionCommand(new WalkCommand(0.1f,0.0f,0.0f));
+        }else if( fcount == 450){
+            cout << "enqueing a sit down" <<endl;
+            sendMotionCommand(sitDown);
+        }
 
         bool active  = processProviders();
 
@@ -187,12 +190,21 @@ int MotionSwitchboard::processProviders(){
 	// Switch Providers!
 
 
-	if (curProvider != nextProvider)
-		curProvider->requestStop();
-
-	if (!curProvider->isActive()) {
-		curProvider = nextProvider;
+	if (curProvider != nextProvider){
+		cout << "Requesting stop on old provider" <<endl;
+        curProvider->requestStop();
+    }
+	if (curProvider != nextProvider && !curProvider->isActive()) {
+        cout << "Switched to the new provider" << endl;
+        curProvider = nextProvider;
 	}
+
+    if (curProvider == &scriptedProvider) {
+        cout << "Currently selected scripted provider" << endl;
+    }
+    else if (curProvider == &walkProvider) {
+        cout << "Currently selected walk provider" << endl;
+    }
 
 	//** Alternately, you may choose here:
 	//curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
@@ -221,13 +233,15 @@ int MotionSwitchboard::processProviders(){
         for(unsigned int i = 0; i < ARM_JOINTS; i ++){
             nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
         }
+        pthread_mutex_unlock(&next_joints_mutex);
+
     }else{
-        //cout << "Skipping bodyprovider" <<endl;
+        cout << "curProvider is inactive" <<endl;
     }
     newJoints = true;
-    pthread_mutex_unlock(&next_joints_mutex);
 
-    return curProvider->isActive();
+    //return if one of the enactors 
+    return curProvider->isActive() ||  headProvider.isActive();
 
 }
 
@@ -294,6 +308,7 @@ void MotionSwitchboard::closeDebugLogs(){
     fclose(joints_log);
 }
 void MotionSwitchboard::updateDebugLogs(){
+    cout << "updating debug logs" << endl;
     static float time = 0.0f;
 
     pthread_mutex_lock(&next_joints_mutex);
@@ -323,6 +338,7 @@ void MotionSwitchboard::sendMotionCommand(const MotionCommand *command) {
 
 	switch (type) {
 	case WALK:
+        cout << "New motion command identified as walk command in switchboard"<<endl;
 		nextProvider = &walkProvider;
 		walkProvider.setCommand(command);
 		break;

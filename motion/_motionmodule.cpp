@@ -427,31 +427,11 @@ PyMotionInterface_setNextWalkCommand (PyMotionInterface *self, PyObject *args)
   PyObject *o = PyTuple_GET_ITEM(args, 0);
   if (PyObject_TypeCheck(o, &PyWalkCommandType)) {
     PyWalkCommand *cmd = reinterpret_cast<PyWalkCommand*>(o);
-/** HACK - breaking passing of WalkCommands!
-    WalkCommand *_cmd;
-    switch (cmd->type) {
-      case WALK_STRAIGHT:
-        _cmd = new WalkStraight(*static_cast<WalkStraight*>(cmd->_cmd));
-        break;
-      case WALK_SIDEWAYS:
-        _cmd = new WalkSideways(*static_cast<WalkSideways*>(cmd->_cmd));
-        break;
-      case WALK_TURN:
-        _cmd = new WalkTurn(*static_cast<WalkTurn*>(cmd->_cmd));
-        break;
-      case WALK_ARC:
-        _cmd = new WalkArc(*static_cast<WalkArc*>(cmd->_cmd));
-        break;
-      default:
-        PyErr_Format(PyExc_ValueError, "Unimplemented command type %i", 
-            cmd->type);
-        return NULL;
-    }
+    WalkCommand * _cmd = new WalkCommand(*cmd->_cmd);
     // set walk command in the motion interface
 #ifdef USE_PYMOTION_CXX_BACKEND
     self->_interface->setNextWalkCommand(_cmd);
 #endif
-*/
   }else {
     PyErr_Format(PyExc_TypeError, "a WalkCommand is required (%s given)",
         o->ob_type->tp_name);
@@ -1018,6 +998,7 @@ PyBodyJointCommand_dealloc (PyBodyJointCommand *self)
 static PyHeadJointCommand*
 PyHeadJointCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
+    cout << "New head command in _motionModule" <<endl;
   PyHeadJointCommand *self =
     reinterpret_cast<PyHeadJointCommand*>(type->tp_alloc(type, 0));
   self->_cmd = NULL;
@@ -1322,187 +1303,41 @@ PyWalkCommand_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 static int
 PyWalkCommand_init (PyWalkCommand *self, PyObject *args, PyObject *kwds)
 {
-  //old
-  PyObject *ptype, *parg1, *parg2, *psamples;
-  ptype = parg1 = parg2 = psamples = NULL;
-
-  int type, samples = 100; //HACK
-  float dist, angle, radius;
-  dist = angle = radius = 0;
+  //Python's units are Centimeters per second. Defaults are zeros
+  float x_cms  = 0.0f;
+  float y_cms = 0.0f;
+  float theta_degs  = 0.0f;
 
 
-  PyObject *px_vel_cms, *py_vel_cms, *ptheta_vel_degs;
-  //new
-  float x_mms= 0.0f;
-  float y_mms = 0.0f;
-  float theta_rads = 0.0f;
 
-  int argc = PyTuple_Size(args);
-  int kwdc = kwds != NULL ? PyTuple_Size(kwds) : 0;
-  int i = 0;
+  //first try to read as many arguments as there are, then look at keywords
+  const int argc = PyTuple_Size(args);
 
-/*
-  // Parse type argument
-  //
-  if (kwdc > 0)
-    // try to get out of keywords
-    ptype = PyDict_GetItemString(kwds, "type");
-  if (ptype == NULL && i < argc)
-    // try to get out of arguments
-    ptype = PyTuple_GET_ITEM(args, i++);
-  if (ptype == NULL || !PyInt_Check(ptype)) {
-    // error, no type given
-    if (ptype == NULL)
-      PyErr_Format(PyExc_TypeError,
-          "__init__() expects at least two arguments (%i given)",
-          argc);
-    else
-      PyErr_Format(PyExc_TypeError,
-          "__init__() expects an integer type argument (%s given)",
-          ptype->ob_type->tp_name);
-    return -1;
-  }
-*/
+  switch(argc){
+  case 3:
+      theta_degs = static_cast<float>(PyFloat_AsDouble(PyTuple_GET_ITEM(args, 2)));
+  case 2:
+      y_cms = static_cast<float>(PyFloat_AsDouble(PyTuple_GET_ITEM(args, 1)));
+  case 1:
+      x_cms = static_cast<float>(PyFloat_AsDouble(PyTuple_GET_ITEM(args, 0)));
 
-//JS- my try to read x, y, z
-//First try getting it from keywords, then from the arguments
-
-  if (kwdc == 3){
-         px_vel_cms  = PyDict_GetItemString(kwds, "x");
-         py_vel_cms  = PyDict_GetItemString(kwds, "y");
-         ptheta_vel_degs  = PyDict_GetItemString(kwds, "theta");
-  }else if(argc ==3){
-      px_vel_cms  =  PyTuple_GET_ITEM(args, 0);
-      py_vel_cms  = PyTuple_GET_ITEM(args, 1);
-      ptheta_vel_degs = PyTuple_GET_ITEM(args, 2);
-  }else{
-      cout << "Wrong parameters passed to create  WalkCommand" <<endl;
-      cout << "  num args = " << argc << " num keywords = " << kwds <<endl; 
   }
 
-  // Parse remaining arguments
-  //
-/* HACK -- need to parse x,y,theta now
-  switch (static_cast<WalkType>(type)) {
-    case WALK_STRAIGHT:
-    case WALK_SIDEWAYS:
-      if (kwdc > 0)
-        parg1 = PyDict_GetItemString(kwds, "dist");
-      if (parg1 == NULL && i < argc)
-        parg1 = PyTuple_GET_ITEM(args, i++);
-      if (parg1 == NULL) {
-        PyErr_Format(PyExc_TypeError,
-            "__init__(), when given a type of %i, expects a float 'dist' "
-            "argument", type);
-        return -1;
-      }else if (!PyNumber_Check(parg1)) {
-        PyErr_Format(PyExc_TypeError,
-            "'dist' argument to __init__() must be a float (%s given)",
-            parg1->ob_type->tp_name);
-        return -1;
-      }
+  //next, try to get them from keywords. If the keyword is missing,
+  //then the corresponding float is left alone
+  static char * kwlist[] = {"x","y","theta",NULL};
 
-      dist = static_cast<float>(PyFloat_AsDouble(parg1));
-      break;
-    case WALK_TURN:
-      if (kwdc > 0)
-        parg1 = PyDict_GetItemString(kwds, "angle");
-      if (parg1 == NULL && i < argc)
-        parg1 = PyTuple_GET_ITEM(args, i++);
-      if (parg1 == NULL) {
-        PyErr_Format(PyExc_TypeError,
-            "__init__(), when given a type of %i, expects a float 'angle' "
-            "argument", type);
-        return -1;
-      }else if (!PyNumber_Check(parg1)) {
-        PyErr_Format(PyExc_TypeError,
-            "'angle' argument to __init__() must be a float (%s given)",
-            parg1->ob_type->tp_name);
-        return -1;
-      }
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|fff", kwlist,
+                                   &x_cms, &y_cms, &theta_degs))
+      return 0;
 
-      angle = static_cast<float>(PyFloat_AsDouble(parg1));
-      break;
-    case WALK_ARC:
-      if (kwdc > 0) {
-        parg1 = PyDict_GetItemString(kwds, "angle");
-        parg2 = PyDict_GetItemString(kwds, "radius");
-      }
-      if (parg1 == NULL && i < argc)
-        parg1 = PyTuple_GET_ITEM(args, i++);
-      if (parg2 == NULL && i < argc)
-        parg2 = PyTuple_GET_ITEM(args, i++);
-
-      if (parg1 == NULL) {
-        PyErr_Format(PyExc_TypeError,
-            "__init__(), when given a type of %i, expects a float 'angle' "
-            "argument", type);
-        return -1;
-      }else if (!PyNumber_Check(parg1)) {
-        PyErr_Format(PyExc_TypeError,
-            "'angle' argument to __init__() must be a float (%s given)",
-            parg1->ob_type->tp_name);
-        return -1;
-      }
-
-      if (parg2 == NULL) {
-        PyErr_Format(PyExc_TypeError,
-            "__init__(), when given a type of %i, expects a float 'radius' "
-            "argument", type);
-        return -1;
-      }else if (!PyNumber_Check(parg2)) {
-        PyErr_Format(PyExc_TypeError,
-            "'radius' argument to __init__() must be a float (%s given)",
-            parg2->ob_type->tp_name);
-        return -1;
-      }
-
-      angle = static_cast<float>(PyFloat_AsDouble(parg1));
-      radius = static_cast<float>(PyFloat_AsDouble(parg2));
-      break;
-    default:
-      PyErr_Format(PyExc_ValueError, "Unimplemented command type %i", type);
-      return -1; // could this value be a bug? I don't know. Keep an eye on it
-  }
-  // number of samples
-  if (kwdc > 0)
-    psamples = PyDict_GetItemString(kwds, "samples");
-  if (psamples == NULL && i < argc)
-    psamples = PyTuple_GET_ITEM(args, i++);
-  if (psamples != NULL) {
-    if (PyInt_Check(psamples))
-      samples = PyInt_AsLong(psamples);
-    else {
-      PyErr_Format(PyExc_TypeError,
-          "__init__() 'samples' argument must be an int (%s given)",
-          psamples->ob_type->tp_name);
-      return -1;
-    }
-  }
-*/
+  //Motion's units are Millimeters per second, so we need to convert
+  const float x_mms= x_cms*CM_TO_MM;
+  const float y_mms = y_cms*CM_TO_MM;
+  const float theta_rads = theta_degs*TO_RAD;
 
   self->_cmd = new WalkCommand(x_mms,y_mms,theta_rads);
-/*More hackery
-  // Initialize WalkCommand Object
-  //
-  switch (static_cast<WalkType>(type)) {
-    case WALK_STRAIGHT:
-      self->_cmd = new WalkStraight(dist, samples);
-      break;
-    case WALK_SIDEWAYS:
-      self->_cmd = new WalkSideways(dist, samples);
-      break;
-    case WALK_TURN:
-      self->_cmd = new WalkTurn(angle*TO_RAD, samples);
-      break;
-    case WALK_ARC:
-      self->_cmd = new WalkArc(angle*TO_RAD, radius, samples);
-      break;
-    default:
-      PyErr_Format(PyExc_ValueError, "Unimplemented command type %i", type);
-      return -1;
-  }
-*/
+
   return 0;
 }
 

@@ -52,6 +52,7 @@ private:
 
     WalkingParameters walkParameters;
     StepGenerator stepGenerator;
+    bool pendingCommands;
 
     mutable pthread_mutex_t walk_command_mutex;
     const WalkCommand * nextCommand;
