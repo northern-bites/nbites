@@ -36,6 +36,7 @@
 #include "LocLogFaker.h"
 
 using namespace std;
+using namespace boost;
 
 int main(int argc, char** argv)
 {
@@ -91,11 +92,11 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 {
     // Method variables
     vector<Observation> Z_t;
-    MCL *myLoc = new MCL;
+    shared_ptr<MCL> myLoc = shared_ptr<MCL>(new MCL);
 #ifdef USE_PERFECT_LOC_FOR_BALL
-    BallEKF *ballEKF = new BallEKF(fakeLoc);
+    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF(fakeLoc));
 #else
-    BallEKF *ballEKF = new BallEKF(myLoc);
+    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF(myLoc));
 #endif // PERFECT_LOC
     PoseEst currentPose;
     BallPose currentBall;
@@ -152,11 +153,6 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
         }
     }
 
-    delete myLoc;
-    delete ballEKF;
-#ifdef USE_PERFECT_LOC_FOR_BALL
-    delete fakeLoc;
-#endif
     delete visBall;
 }
 
@@ -194,7 +190,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             visDist += sigmaD*UNIFORM_1_NEG_1;
             sigmaB = getBearingSD(visBearing);
-            visBearing += sigmaB*UNIFORM_1_NEG_1;
+            visBearing += .04*UNIFORM_1_NEG_1;
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -347,7 +343,7 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
         e.dist += e.dist*UNIFORM_1_NEG_1*0.12;
-        e.bearing += QUART_CIRC_RAD*UNIFORM_1_NEG_1*0.125;
+        e.bearing += UNIFORM_1_NEG_1*0.05;
     } else {
         e.dist = 0.0f;
         e.bearing = 0.0f;
@@ -403,9 +399,10 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  * @param sightings Vector of landmark observations
  * @param lastOdo Odometery since previous frame
  */
-void printOutLogLine(fstream* outputFile, MCL* myLoc, vector<Observation>
-                     sightings, MotionModel lastOdo, PoseEst *currentPose,
-                     BallPose * currentBall, BallEKF * ballEKF, Ball _b)
+void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
+                     vector<Observation> sightings, MotionModel lastOdo,
+                     PoseEst *currentPose, BallPose * currentBall,
+                     shared_ptr<BallEKF> ballEKF, Ball _b)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();

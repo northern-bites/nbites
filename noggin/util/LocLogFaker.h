@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include "Ball.h"
 #include "MCL.h"
 #include "BallEKF.h"
@@ -88,9 +89,11 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
 void iteratePath(fstream * outputFile, NavPath * letsGo);
 // IO Functions
 void readInputFile(fstream* name, NavPath * letsGo);
-void printOutLogLine(fstream* outputFile, MCL* myLoc, std::vector<Observation>
+void printOutLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
+                     std::vector<Observation>
                      sightings, MotionModel lastOdo, PoseEst * currentPose,
-                     BallPose * currentBall, BallEKF * ballEKF, Ball _b);
+                     BallPose * currentBall, boost::shared_ptr<BallEKF> ballEKF,
+                     Ball _b);
 
 // Helper functions
 float subPIAngle(float theta);
