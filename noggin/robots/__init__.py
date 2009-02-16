@@ -52,8 +52,7 @@ unknown = BirthCertificate.BirthCertificate(
 This robot is currently unknown.  That is, we could not identify it
 from its hostname (%s).  The recognized robots are %s.''' %
             #(socket.gethostname(), robot_map.keys()),# temp removed -js
-            ('\''+str(open("/etc/hostname",'r').readline()[:-1])+'\'', robot_map.keys()),
-            )
+            ('\''+open("/etc/hostname",'r').readline().rstrip()+'\'', robot_map.keys()), )
 
 
 def get_certificate():
@@ -65,6 +64,6 @@ def read_hostname():
     """
     Method reads the hostname from the hostname file
     """
-    return open("/etc/hostname",'r').readline()[:-1]
+    return open("/etc/hostname",'r').readline().rstrip()
 
 
