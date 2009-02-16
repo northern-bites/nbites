@@ -1,4 +1,4 @@
-
+//#define DEBUG_OBSERVATIONS 1
 
 #include <Python.h>
 #include <exception>
@@ -255,7 +255,7 @@ void Noggin::updateLocalization()
         observations.push_back(seen);
 #ifdef DEBUG_OBSERVATIONS
         cout << "Saw corner " << seen.getID() << " at distance "
-             << seen.getVisDist() << " and bearing " << seen.getVisBearing()
+             << seen.getVisDistance() << " and bearing " << seen.getVisBearing()
              << endl;
 #endif
     }
@@ -272,10 +272,20 @@ void Noggin::updateLocalization()
     PROF_ENTER(profiler, P_MCL);
     mcl->updateLocalization(odometery, observations, true);
     PROF_EXIT(profiler, P_MCL);
-    //cout << mcl << endl;
 
     // Ball Tracking
     ballEKF->updateModel(vision->ball);
 
+#ifdef DEBUG_OBSERVATIONS
+    if(vision->ball->getDist() > 0.0) {
+        cout << "Ball seen at distance " << vision->ball->getDist()
+             << " and bearing " << vision->ball->getBearing() << endl;
+    }
+#endif
+
     // Opponent Tracking
+
+#ifdef DEBUG_OBSERVATIONS
+    cout << mcl << endl;
+#endif
 }
