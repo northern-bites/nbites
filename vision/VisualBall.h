@@ -28,15 +28,19 @@ public:
     void setDistanceEst(estimate ball_est);
     void setDistanceWithSD(float _dist);
     void setBearingWithSD(float b);
+    void findAngles() {
+        setAngleX((IMAGE_WIDTH/2 - centerX) / MAX_BEARING);
+        setAngleY((IMAGE_HEIGHT/2 - centerY) / MAX_ELEVATION);
+    }
 
     // calibration pre-huge chown changes
     //void setFocalDistance() {focDist = 2250*pow((getRadius()*2),-1.0917);}
 #if ROBOT(NAO_SIM)
-    void setFocalDistance() { focDist = 100 * 24.5/(getRadius() *2); }
+    void setFocalDistanceFromRadius() { focDist = 100 * 24.5/(getRadius() *2); }
 #elif ROBOT(NAO_RL)
-    void setFocalDistance() { focDist = 5700 / (getRadius() * 2); }
+    void setFocalDistanceFromRadius() { focDist = 5700 / (getRadius() * 2); }
 #else
-    void setFocalDistance() {
+    void setFocalDistanceFromRadius() {
         focDist = 2067.6f*pow(getRadius()*2.0f,-1.0595f);
     }
 #endif
@@ -46,19 +50,17 @@ public:
 
     // Getters
     const float getRadius() const { return radius; }
-    const float getFocDist() const { return focDist; }
     const int getConfidence() const { return confidence;}
 
 private:
     float radius;
-    float focDist;
     int confidence;
 
     // Member functions
-    inline float ballDistanceToSD(float _distance) {
+    float ballDistanceToSD(float _distance) {
         return 0.00000004 * pow(_distance,4.079f);
     }
-    inline float ballBearingToSD(float _bearing) {
+    float ballBearingToSD(float _bearing) {
         return M_PI / 8.0f;
     }
 };

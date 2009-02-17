@@ -7,13 +7,19 @@
  * by the vision system
  *
  */
+
 #ifndef VisualDetection_h_defined
 #define VisualDetection_h_defined
 
 class VisualDetection {
 public:
-    VisualDetection() {}
-    virtual ~VisualDetection() {}
+    // Constructor
+    VisualDetection(int _x = 0, int _y = 0 , float _distance = 0.0,
+                    float _bearing = 0.0);
+    // Copy constructor
+    VisualDetection(const VisualDetection &);
+    // Destructor
+    virtual ~VisualDetection();
 
     /* SETTERS */
     // Best Guesses
@@ -23,6 +29,7 @@ public:
     void setCenterY(int cy) { centerY = cy; }
     void setAngleX(float aX) { angleX = aX; }
     void setAngleY(float aY) { angleY = aY; }
+    void setFocDist(float fd) { focDist = fd; }
     void setDistance(float d) { distance = d; }
     void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
@@ -30,20 +37,20 @@ public:
     void setY(int y1) {y = y1;}
     void setDistanceSD(float _distSD) { distanceSD = _distSD;}
     void setBearingSD(float _bearingSD) { bearingSD = _bearingSD;}
-    void findAngles() {
-        setAngleX((IMAGE_WIDTH/2 - centerX) / MAX_BEARING);
-        setAngleY((IMAGE_HEIGHT/2 - centerY) / MAX_ELEVATION);
-    }
+    virtual void setDistanceWithSD(float _distance) = 0;
+    virtual void setBearingWithSD(float _bearing) = 0;
 
     /* GETTERS */
     const int getX() const {return x;}
     const int getY() const {return y;}
+    const point<int> getLocation() const { return point<int>(x, y); }
     const float getWidth() const { return width; }
     const float getHeight() const { return height; }
     const int getCenterX() const { return centerX; }
     const int getCenterY() const { return centerY; }
     const float getAngleX() const { return angleX; }
     const float getAngleY() const { return angleY; }
+    const float getFocDist() const { return focDist; }
     const float getDistance() const { return distance; }
     const float getBearing() const { return bearing; }
     const float getElevation() const { return elevation; }
@@ -59,6 +66,7 @@ protected:
     int centerY;
     float angleX;
     float angleY;
+    float focDist;
     float distance;
     float bearing;
     float elevation;

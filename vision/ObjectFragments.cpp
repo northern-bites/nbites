@@ -6519,7 +6519,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
   }
   thisBall->setConfidence(SURE);
   thisBall->findAngles();
-  thisBall->setFocalDistance();
+  thisBall->setFocalDistanceFromRadius();
   thisBall->setDistanceEst(vision->pose->
                            bodyEstimate(thisBall->getCenterX(),
                                         thisBall->getCenterY(),

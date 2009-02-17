@@ -10,7 +10,8 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _bearing,
                            const VisualLine l1, const VisualLine l2,
                            const float _t1, const float _t2)
-    : VisualLandmark(_x, _y, _distance, _bearing), cornerType(UNKNOWN),
+    : VisualDetection(_x, _y, _distance, _bearing),
+      cornerType(UNKNOWN),
       line1(l1), line2(l2), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
       // which we apologize. It's a hack, but the true values of tBar and tStem
@@ -24,8 +25,6 @@ VisualCorner::VisualCorner(const int _x, const int _y,
     // Calculate and set the standard deviation of the measurements
     setDistanceSD(cornerDistanceToSD(_distance));
     setBearingSD(cornerBearingToSD(_bearing));
-    //  calculateAngle();
-    // TODO: remove
 }
 
 VisualCorner::~VisualCorner() {}
