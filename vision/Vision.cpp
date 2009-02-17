@@ -59,10 +59,10 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
   yb = new VisualFieldObject(YELLOW_BLUE_BEACON);
   by = new VisualFieldObject(BLUE_YELLOW_BEACON);
   ball = new VisualBall();
-  red1 = new VisualFieldObject();
-  red2 = new VisualFieldObject();
-  navy1 = new VisualFieldObject();
-  navy2 = new VisualFieldObject();
+  red1 = new VisualRobot();
+  red2 = new VisualRobot();
+  navy1 = new VisualRobot();
+  navy2 = new VisualRobot();
 #ifdef USE_PINK_BALL
   pinkBall = new Ball(this); //added for pink ball recognition
 #endif

@@ -1437,10 +1437,10 @@ void Threshold::storeFieldObjects() {
   setFieldObjectInfo(vision->blueArc);
   setFieldObjectInfo(vision->yellowArc);
 #elif ROBOT(NAO)
-  setFieldObjectInfo(vision->red1);
-  setFieldObjectInfo(vision->red2);
-  setFieldObjectInfo(vision->navy1);
-  setFieldObjectInfo(vision->navy2);
+  setVisualRobotInfo(vision->red1);
+  setVisualRobotInfo(vision->red2);
+  setVisualRobotInfo(vision->navy1);
+  setVisualRobotInfo(vision->navy2);
 #endif
 
 }
@@ -1577,11 +1577,6 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
     }
 #endif
 
-#if ROBOT(NAO)
-    else if (objPtr == vision->red1 || objPtr == vision->red2 || objPtr == vision->navy1 || objPtr == vision->navy2) {
-      objPtr->setDistance(10.0);
-    }
-#endif
     // don't know what object it is
     else {
       //print("setFieldObjectInfo: unrecognized FieldObject");
@@ -1601,6 +1596,37 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
   else {
     objPtr->setFocDist(0.0);
 
+    objPtr->setDistanceWithSD(0.0);
+    objPtr->setBearingWithSD(0.0);
+    objPtr->setElevation(0.0);
+  }
+}
+
+/* Figures out center x,y, angle x,y, and foc/body dists for field objects.
+ * @param objPtr    the field object to study
+ */
+void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
+  // if the object is on screen, basically
+  if (objPtr->getHeight() > 0) {
+    // set center x,y
+    objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
+    objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
+
+    // find angle x/y (relative to camera)
+    objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/MAX_BEARING);
+    objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/MAX_ELEVATION);
+
+    // sets focal distance of the field object
+    objPtr->setFocDist(objPtr->getDistance());
+    // convert dist + angle estimates to body center
+    estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+					  objPtr->getCenterY(),
+					  objPtr->getDistance());
+    objPtr->setDistanceWithSD(obj_est.dist);
+    objPtr->setBearingWithSD(obj_est.bearing);
+    objPtr->setElevation(obj_est.elevation);
+  } else {
+    objPtr->setFocDist(0.0);
     objPtr->setDistanceWithSD(0.0);
     objPtr->setBearingWithSD(0.0);
     objPtr->setElevation(0.0);

@@ -2512,7 +2512,7 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, blob two,
   }
 }
 
-void ObjectFragments::updateRobot(VisualFieldObject* one, blob two) {
+void ObjectFragments::updateRobot(VisualRobot* one, blob two) {
   one->setLeftTopX(two.leftTop.x);
   one->setLeftTopY(two.leftTop.y);
   one->setLeftBottomX(two.leftBottom.x);

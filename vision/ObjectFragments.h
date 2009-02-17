@@ -283,7 +283,7 @@ class ObjectFragments {
   int getBigRun(int left, int right, int hor);
   bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
                     distanceCertainty _distCertainty);
-  void updateRobot(VisualFieldObject* a, blob b);
+  void updateRobot(VisualRobot* a, blob b);
   bool updateArc(VisualFieldObject* a, blob b, int sawGoal);
   distanceCertainty checkDist(int left, int right, int top, int bottom);
   void updateBackstop(VisualFieldObject* a, blob b);

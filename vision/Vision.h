@@ -44,6 +44,7 @@ class Vision;   // forward reference
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
 #include "VisualBall.h"
+#include "VisualRobot.h"
 #include "Threshold.h"
 #include "NaoPose.h"
 #include "FieldLines.h"
@@ -143,8 +144,8 @@ class Vision
     VisualBackstop *ygBackstop, *bgBackstop;
     VisualFieldObject *by, *yb;
     VisualFieldObject *blueArc, *yellowArc;
-    VisualFieldObject *red1, *red2;
-    VisualFieldObject *navy1, *navy2;
+    VisualRobot *red1, *red2;
+    VisualRobot *navy1, *navy2;
     VisualBall *ball;
 #ifdef USE_PINK_BALL
     Ball *pinkBall; //added for pink ball recognition
