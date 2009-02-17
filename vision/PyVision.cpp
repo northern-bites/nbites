@@ -979,7 +979,7 @@ PyFieldObject_update (PyObject *self, PyObject *args)
 }
 
 //
-// PyFieldObject definitions
+// PyBackstop definitions
 //
 
 
@@ -1073,6 +1073,100 @@ PyBackstop_update (PyObject *self, PyObject *args)
   return Py_None;
 }
 
+//
+// PyVisualRobot definitions
+//
+
+
+// C++ - accessible interface
+extern PyObject * PyVisualRobot_new (VisualRobot *o)
+{
+  PyVisualRobot *self;
+
+  self = (PyVisualRobot *)PyVisualRobotType.tp_alloc(&PyVisualRobotType, 0);
+  if (self != NULL) {
+    self->object = o;
+
+    self->centerX = PyInt_FromLong(o->getCenterX());
+    self->centerY = PyInt_FromLong(o->getCenterY());
+    self->width = PyFloat_FromDouble(o->getWidth());
+    self->height = PyFloat_FromDouble(o->getHeight());
+    self->focDist = PyFloat_FromDouble(o->getFocDist());
+    self->dist = PyFloat_FromDouble(o->getDistance());
+    self->bearing = PyFloat_FromDouble(o->getBearing());
+
+    if (self->centerX == NULL || self->centerY == NULL ||
+        self->width == NULL || self->height == NULL ||
+        self->focDist == NULL || self->dist == NULL ||
+        self->bearing == NULL) {
+
+      PyVisualRobot_dealloc(self);
+      self = NULL;
+    }
+  }
+
+  return (PyObject *)self;
+}
+
+extern void
+PyVisualRobot_update (PyVisualRobot *self)
+{
+  Py_XDECREF(self->centerX);
+  self->centerX = PyInt_FromLong(self->object->getCenterX());
+
+  Py_XDECREF(self->centerY);
+  self->centerY = PyInt_FromLong(self->object->getCenterY());
+
+  Py_XDECREF(self->width);
+  self->width = PyFloat_FromDouble(self->object->getWidth());
+
+  Py_XDECREF(self->height);
+  self->height = PyFloat_FromDouble(self->object->getHeight());
+
+  Py_XDECREF(self->focDist);
+  self->focDist = PyFloat_FromDouble(self->object->getFocDist());
+
+  Py_XDECREF(self->dist);
+  self->dist = PyFloat_FromDouble(self->object->getDistance());
+
+  Py_XDECREF(self->bearing);
+  self->bearing = PyFloat_FromDouble(self->object->getBearing());
+}
+
+// backend methods
+extern PyObject *
+PyVisualRobot_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
+      "VisualRobot from Python.  Need a C++ FieldObject.");
+  return NULL;
+}
+
+extern void
+PyVisualRobot_dealloc (PyVisualRobot *self)
+{
+  if (self == NULL)
+    return;
+
+  Py_XDECREF(self->centerX);
+  Py_XDECREF(self->centerY);
+  Py_XDECREF(self->width);
+  Py_XDECREF(self->height);
+  Py_XDECREF(self->focDist);
+  Py_XDECREF(self->dist);
+  Py_XDECREF(self->bearing);
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+// Python - accessible interface
+extern PyObject *
+PyVisualRobot_update (PyObject *self, PyObject *args)
+{
+  PyVisualRobot_update((PyVisualRobot *)self);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
 
 //
 // PyVision definitions
@@ -1104,10 +1198,10 @@ PyVision_new (Vision *v)
     self->ygCrossbar = PyBackstop_new(v->ygBackstop);
 
 
-    self->red1 = PyFieldObject_new(v->red1);
-    self->red2 = PyFieldObject_new(v->red2);
-    self->navy1 = PyFieldObject_new(v->navy1);
-    self->navy2 = PyFieldObject_new(v->navy2);
+    self->red1 = PyVisualRobot_new(v->red1);
+    self->red2 = PyVisualRobot_new(v->red2);
+    self->navy1 = PyVisualRobot_new(v->navy1);
+    self->navy2 = PyVisualRobot_new(v->navy2);
 
     self->ball = PyBall_new(v->ball);
 
