@@ -1357,7 +1357,7 @@ print("   Theshold::objectRecognition");
   // throw blue goal objects through a filter to eliminate noise in corners
   //chromeFilter(vision->bglp);
   //chromeFilter(vision->bgrp);
-  chromeFilter(vision->bgBackstop);
+  //chromeFilter(vision->bgBackstop);
   //reset these bools, incase we changed them above
   ylp = vision->yglp->getWidth() > 0;
   yrp = vision->ygrp->getWidth() > 0;

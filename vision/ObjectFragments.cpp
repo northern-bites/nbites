@@ -1698,9 +1698,11 @@ void ObjectFragments::yellow(int bigGreen) {
       }
     }
   }
-  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW, beacon, bigGreen);
+  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW,
+           beacon, bigGreen);
 #elif ROBOT(NAO)
-  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW, false, bigGreen);
+  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW,
+           false, bigGreen);
   //naoScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW, bigGreen);
 #else
   #error "ROBOT not defined as AIBO or NAO"
@@ -4138,7 +4140,7 @@ bool ObjectFragments::checkPostAndBlob(float rat, bool beaconFound, int c, int c
  * @param one     the backstop
  */
 
-void ObjectFragments::setShot(VisualFieldObject* one) {
+void ObjectFragments::setShot(VisualBackstop* one) {
   int pix, bad, white, grey, run, greyrun;
   int ySpan = IMAGE_HEIGHT - one->getLeftBottomY();
   bool colorSeen = false;
@@ -4282,7 +4284,9 @@ void ObjectFragments::setShot(VisualFieldObject* one) {
   }
 }
 
-void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* middle) {
+void ObjectFragments::bestShot(VisualFieldObject* left,
+                               VisualFieldObject* right,
+                               VisualBackstop* middle) {
   // start by setting boundaries
   int leftb = 0, rightb = IMAGE_WIDTH - 1, bottom = 0;
   int rl = 0, rr = 0;
@@ -4748,7 +4752,11 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon) {
  * @return               classification
  */
 
-int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFound, VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* mid) {
+int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
+                                       bool beaconFound,
+                                       VisualFieldObject* left,
+                                       VisualFieldObject* right,
+                                       VisualBackstop* mid) {
   // ok now we're going to try and figure out which post it is and where the other one might be
   int trueLeft = min(pole.leftTop.x, pole.leftBottom.x);          // leftmost value in the blob
   int trueRight = max(pole.rightTop.x, pole.rightBottom.x);    // rightmost value in the blob
@@ -4907,7 +4915,10 @@ int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFo
  * @param horizon     the green field horizon
  */
 // Look for posts and goals given the runs we've collected
-void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* mid, int c, int c2, bool beaconFound, int horizon) {
+void ObjectFragments::goalScan(VisualFieldObject* left,
+                               VisualFieldObject* right,
+                               VisualBackstop* mid, int c, int c2,
+                               bool beaconFound, int horizon) {
   //cout << horizon << " " << slope << endl;
   // if we don't have any runs there is nothing to do
   if (numberOfRuns <= 1) return;

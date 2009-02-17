@@ -978,6 +978,101 @@ PyFieldObject_update (PyObject *self, PyObject *args)
   return Py_None;
 }
 
+//
+// PyFieldObject definitions
+//
+
+
+// C++ - accessible interface
+extern PyObject * PyBackstop_new (VisualBackstop *o)
+{
+  PyBackstop *self;
+
+  self = (PyBackstop *)PyBackstopType.tp_alloc(&PyBackstopType, 0);
+  if (self != NULL) {
+    self->object = o;
+
+    self->centerX = PyInt_FromLong(o->getCenterX());
+    self->centerY = PyInt_FromLong(o->getCenterY());
+    self->width = PyFloat_FromDouble(o->getWidth());
+    self->height = PyFloat_FromDouble(o->getHeight());
+    self->focDist = PyFloat_FromDouble(o->getFocDist());
+    self->dist = PyFloat_FromDouble(o->getDistance());
+    self->bearing = PyFloat_FromDouble(o->getBearing());
+
+    if (self->centerX == NULL || self->centerY == NULL ||
+        self->width == NULL || self->height == NULL ||
+        self->focDist == NULL || self->dist == NULL ||
+        self->bearing == NULL) {
+
+      PyBackstop_dealloc(self);
+      self = NULL;
+    }
+  }
+
+  return (PyObject *)self;
+}
+
+extern void
+PyBackstop_update (PyBackstop *self)
+{
+  Py_XDECREF(self->centerX);
+  self->centerX = PyInt_FromLong(self->object->getCenterX());
+
+  Py_XDECREF(self->centerY);
+  self->centerY = PyInt_FromLong(self->object->getCenterY());
+
+  Py_XDECREF(self->width);
+  self->width = PyFloat_FromDouble(self->object->getWidth());
+
+  Py_XDECREF(self->height);
+  self->height = PyFloat_FromDouble(self->object->getHeight());
+
+  Py_XDECREF(self->focDist);
+  self->focDist = PyFloat_FromDouble(self->object->getFocDist());
+
+  Py_XDECREF(self->dist);
+  self->dist = PyFloat_FromDouble(self->object->getDistance());
+
+  Py_XDECREF(self->bearing);
+  self->bearing = PyFloat_FromDouble(self->object->getBearing());
+}
+
+// backend methods
+extern PyObject *
+PyBackstop_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
+      "Backstop from Python.  Need a C++ FieldObject.");
+  return NULL;
+}
+
+extern void
+PyBackstop_dealloc (PyBackstop *self)
+{
+  if (self == NULL)
+    return;
+
+  Py_XDECREF(self->centerX);
+  Py_XDECREF(self->centerY);
+  Py_XDECREF(self->width);
+  Py_XDECREF(self->height);
+  Py_XDECREF(self->focDist);
+  Py_XDECREF(self->dist);
+  Py_XDECREF(self->bearing);
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+// Python - accessible interface
+extern PyObject *
+PyBackstop_update (PyObject *self, PyObject *args)
+{
+  PyBackstop_update((PyBackstop *)self);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 //
 // PyVision definitions
@@ -1005,8 +1100,8 @@ PyVision_new (Vision *v)
     self->ygrp = PyFieldObject_new(v->ygrp);
     self->yglp = PyFieldObject_new(v->yglp);
 
-    self->bgCrossbar = PyFieldObject_new(v->bgBackstop);
-    self->ygCrossbar = PyFieldObject_new(v->ygBackstop);
+    self->bgCrossbar = PyBackstop_new(v->bgBackstop);
+    self->ygCrossbar = PyBackstop_new(v->ygBackstop);
 
 
     self->red1 = PyFieldObject_new(v->red1);

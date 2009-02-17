@@ -52,8 +52,8 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
   yglp = new VisualFieldObject(YELLOW_GOAL_LEFT_POST);
   bgrp = new VisualFieldObject(BLUE_GOAL_RIGHT_POST);
   bglp = new VisualFieldObject(BLUE_GOAL_LEFT_POST);
-  ygBackstop = new VisualFieldObject();
-  bgBackstop = new VisualFieldObject();
+  ygBackstop = new VisualBackstop();
+  bgBackstop = new VisualBackstop();
   yellowArc = new VisualFieldObject();
   blueArc = new VisualFieldObject();
   yb = new VisualFieldObject(YELLOW_BLUE_BEACON);
@@ -173,8 +173,8 @@ void Vision::drawBoxes(void) {
   if(bgrp->getDistance() > 0) drawFieldObject(bgrp,BLACK);
   if(yglp->getDistance() > 0) drawFieldObject(yglp,RED);
   if(ygrp->getDistance() > 0) drawFieldObject(ygrp,BLACK);
-  if(ygBackstop->getHeight() > 0) drawFieldObject(ygBackstop, BLUE);
-  if(bgBackstop->getHeight() > 0) drawFieldObject(bgBackstop, YELLOW);
+  if(ygBackstop->getHeight() > 0) drawBackstop(ygBackstop, BLUE);
+  if(bgBackstop->getHeight() > 0) drawBackstop(bgBackstop, YELLOW);
 #if ROBOT(AIBO)
   if(by->getDistance() > 0) drawFieldObject(by,GREEN);
   if(yb->getDistance() > 0) drawFieldObject(yb,ORANGE);
@@ -209,6 +209,18 @@ void Vision::drawBoxes(void) {
 
 // self-explanatory
 void Vision::drawFieldObject(VisualFieldObject* obj, int color) {
+  drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
+	   obj->getRightTopX(), obj->getRightTopY(), color);
+  drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
+	   obj->getLeftBottomX(), obj->getLeftBottomY(), color);
+  drawLine(obj->getRightBottomX(), obj->getRightBottomY(),
+	   obj->getRightTopX(), obj->getRightTopY(), color);
+  drawLine(obj->getLeftBottomX(), obj->getLeftBottomY(),
+	   obj->getRightBottomX(), obj->getRightBottomY(), color);
+}
+
+// self-explanatory
+void Vision::drawBackstop(VisualBackstop* obj, int color) {
   drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
 	   obj->getRightTopX(), obj->getRightTopY(), color);
   drawLine(obj->getLeftTopX(), obj->getLeftTopY(),

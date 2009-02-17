@@ -312,18 +312,18 @@ class ObjectFragments {
   int  scanLogic(int howbig);
 
   // shooting
-  void setShot(VisualFieldObject * one);
-  void bestShot(VisualFieldObject * one, VisualFieldObject * two,
-                VisualFieldObject * three);
+  void setShot(VisualBackstop * one);
+  void bestShot(VisualFieldObject * left, VisualFieldObject * right,
+                VisualBackstop * mid);
   void openDirection(int h, NaoPose *p);
 
   int classifyFirstPost(int horizon, int c, int c2, bool postFound,
                         VisualFieldObject* left, VisualFieldObject* right,
-                        VisualFieldObject* mid);
+                        VisualBackstop* mid);
 
   // the big kahuna
-  void goalScan(VisualFieldObject* left, VisualFieldObject* mid,
-                VisualFieldObject* right, int c, int c2, bool post,
+  void goalScan(VisualFieldObject *left, VisualFieldObject *right,
+                VisualBackstop *mid, int c, int c2, bool post,
                 int horizon);
   int grabPost(int c, int c2, int horizon, int left, int right);
   void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
