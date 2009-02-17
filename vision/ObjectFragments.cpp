@@ -6535,7 +6535,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
   if (BALLDISTDEBUG) {
     estimate es;
     es = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, topBlob.leftTop.y + 2 * blobHeight(topBlob) / 3, 0.0);
-    cout << "Distance is " << thisBall->getDist() << " " << thisBall->getFocDist() << " " << es.dist << endl;
+    cout << "Distance is " << thisBall->getDistance() << " " << thisBall->getFocDist() << " " << es.dist << endl;
     cout<< "Radius"<<thisBall->getRadius()<<endl;
   }
   return 0;

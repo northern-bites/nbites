@@ -5,6 +5,7 @@
 #include "ifdefs.h"
 #include "Structs.h"
 #include "VisionDef.h"
+#include "VisualDetection.h"
 
 class VisualBall; // forward reference
 
@@ -13,7 +14,7 @@ class VisualBall; // forward reference
 #define PinkBallAt1M     12.46268657 // pixel width of PINK one meter away.
 #define MAXBALLDISTANCE  300
 
-class VisualBall {
+class VisualBall : public VisualDetection {
 public:
     VisualBall();
     virtual ~VisualBall() {}
@@ -21,29 +22,13 @@ public:
     // VisualBall VOID Functions
     void init();
 
-    /* SETTERS */
-    // Best Guesses
-    void setWidth(float w) { width = w; }
-    void setHeight(float h) { height = h; }
+    // Setters
     void setRadius(float r) { radius = r; }
-    void setCenterX(int cx) { centerX = cx; }
-    void setCenterY(int cy) { centerY = cy; }
-    void setAngleX(float aX) { angleX = aX; }
-    void setAngleY(float aY) { angleY = aY; }
-    void setBearing(float b) { bearing = b; }
-    void setBearingWithSD(float b);
-    void setElevation(float e) { elevation = e; }
     void setConfidence(int c) {confidence = c;}
     void setDistanceEst(estimate ball_est);
     void setDistanceWithSD(float _dist);
-    void setX(int x1) {x = x1;}
-    void setY(int y1) {y = y1;}
-    void setDistanceSD(float _distSD) { distanceSD = _distSD;}
-    void setBearingSD(float _bearingSD) { bearingSD = _bearingSD;}
-    void findAngles() {
-        setAngleX((IMAGE_WIDTH/2 - centerX) / MAX_BEARING);
-        setAngleY((IMAGE_HEIGHT/2 - centerY) / MAX_ELEVATION);
-    }
+    void setBearingWithSD(float b);
+
     // calibration pre-huge chown changes
     //void setFocalDistance() {focDist = 2250*pow((getRadius()*2),-1.0917);}
 #if ROBOT(NAO_SIM)
@@ -59,42 +44,15 @@ public:
         focDist = PinkBallAt1M * 100 / (getRadius() * 2);
     }
 
-    /* GETTERS */
-    int getX() const {return x;}
-    int getY() const {return y;}
-    float getWidth() const { return width; }
-    float getHeight() const { return height; }
-    float getRadius() const { return radius; }
-    int getCenterX() const { return centerX; }
-    int getCenterY() const { return centerY; }
-    float getAngleX() const { return angleX; }
-    float getAngleY() const { return angleY; }
-    float getFocDist() const { return focDist; }
-    float getDist() const { return dist; }
-    float getBearing() const { return bearing; }
-    float getElevation() const { return elevation; }
-    int getConfidence() const { return confidence;}
-    float getDistanceSD() const { return distanceSD; }
-    float getBearingSD() const { return bearingSD; }
+    // Getters
+    const float getRadius() const { return radius; }
+    const float getFocDist() const { return focDist; }
+    const int getConfidence() const { return confidence;}
 
 private:
-    /* Best guessed Ball Variables */
-    int x, y;
-    float width;
-    float height;
     float radius;
-    int centerX;
-    int centerY;
-    float angleX;
-    float angleY;
     float focDist;
-    float dist;
-    float bearing;
-    float elevation;
     int confidence;
-    // Standard deviation of measurements
-    float distanceSD;
-    float bearingSD;
 
     // Member functions
     inline float ballDistanceToSD(float _distance) {

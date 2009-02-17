@@ -24,7 +24,7 @@ void VisualBall::init() {
     angleX = 0;
     angleY = 0;
     focDist = 0;
-    dist = 0;
+    distance = 0;
     bearing = 0;
     elevation = 0;
 }
@@ -38,8 +38,8 @@ void VisualBall::setDistanceEst(estimate ball_est)
 
 void VisualBall::setDistanceWithSD(float _dist)
 {
-    dist = _dist;
-    setDistanceSD(ballDistanceToSD(dist));
+    distance = _dist;
+    setDistanceSD(ballDistanceToSD(distance));
 }
 
 

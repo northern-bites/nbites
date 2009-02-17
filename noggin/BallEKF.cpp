@@ -56,7 +56,7 @@ void BallEKF::updateModel(VisualBall * ball)
     limitAPrioriUncert();
 
     // We've seen a ball
-    if (ball->getDist() > 0.0) {
+    if (ball->getDistance() > 0.0) {
         sawBall(ball);
 
         // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
@@ -80,7 +80,7 @@ void BallEKF::sawBall(VisualBall * ball)
     Measurement m;
     std::vector<Measurement> z;
 
-    m.distance = ball->getDist();
+    m.distance = ball->getDistance();
     m.bearing = ball->getBearing();
     m.distanceSD = ball->getDistanceSD();
     m.bearingSD = ball->getBearingSD();

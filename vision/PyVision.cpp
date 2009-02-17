@@ -782,7 +782,7 @@ PyBall_new (VisualBall *b)
     self->width = PyFloat_FromDouble(b->getWidth());
     self->height = PyFloat_FromDouble(b->getHeight());
     self->focDist = PyFloat_FromDouble(b->getFocDist());
-    self->dist = PyFloat_FromDouble(b->getDist());
+    self->dist = PyFloat_FromDouble(b->getDistance());
     self->bearing = PyFloat_FromDouble(b->getBearing());
     self->elevation = PyFloat_FromDouble(b->getElevation());
     self->confidence = PyInt_FromLong(b->getConfidence());
@@ -820,7 +820,7 @@ PyBall_update (PyBall *self)
   self->focDist = PyFloat_FromDouble(self->ball->getFocDist());
 
   Py_XDECREF(self->dist);
-  self->dist = PyFloat_FromDouble(self->ball->getDist());
+  self->dist = PyFloat_FromDouble(self->ball->getDistance());
 
   Py_XDECREF(self->bearing);
   self->bearing = PyFloat_FromDouble(self->ball->getBearing());
