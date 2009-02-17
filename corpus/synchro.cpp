@@ -173,6 +173,9 @@ int Thread::start ()
     // Free attribute data
     pthread_attr_destroy(&attr);
 
+#ifdef DEBUG_THREAD_START
+    cout << name << "::start is DONE" << endl;
+#endif
     return result;
 }
 
