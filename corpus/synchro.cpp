@@ -166,6 +166,9 @@ int Thread::start ()
 
     // Create thread
     const int result = pthread_create(&thread, &attr, runThread, (void*)this);
+#ifdef DEBUG_THREAD_START
+    cout << "Created thread '" << name << "' with result " << result << endl;
+#endif
 
     // Free attribute data
     pthread_attr_destroy(&attr);
