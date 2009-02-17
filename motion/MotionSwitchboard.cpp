@@ -153,11 +153,11 @@ void MotionSwitchboard::run() {
     while(running) {
         if(fcount == 100){
             cout << "enqueing a new walk command" <<endl;
-            sendMotionCommand(new WalkCommand(0.0f,-20.0f,0.0f));
+            sendMotionCommand(new WalkCommand(0.0f,-30.0f,0.0f));
         }else if( fcount == 450){
             sendMotionCommand(new WalkCommand(0.0f,0.0f,0.0f));
         }else if( fcount == 1050){
-            sendMotionCommand(new WalkCommand(0.0f,20.0f,0.0f));
+            sendMotionCommand(new WalkCommand(0.0f,30.0f,0.0f));
         }else if( fcount == 1550){
             cout << "enqueing a sit down" <<endl;
             sendMotionCommand(sitDown);

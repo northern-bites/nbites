@@ -125,7 +125,7 @@ private: // Helper methods
     static const ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
 
     void resetQueues();
-
+    void resetCoordinateFrames();
     void debugLogging();
 
 private:
@@ -186,6 +186,8 @@ private:
 #ifdef DEBUG_CONTROLLER_COM
     FILE* com_log;
 #endif
+
+    bool temp_init;
 };
 
 #endif

@@ -8,7 +8,8 @@ WalkingLeg::WalkingLeg(ChainID id,
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
      support_step(EMPTY_STEP),
      chainID(id), walkParams(walkP),
-     goal(ufvector3(3)),last_goal(ufvector3(3)),
+     goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
+     last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
      leg_name(id == LLEG_CHAIN ? "left" : "right")
 {
@@ -67,7 +68,6 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
         if(support_step->type == REGULAR_STEP)
             result  =  swinging(fc_Transform);
         else{
-            cout << "Piping a swinging END STEP to not step" <<endl;
             // It's an Irregular step, so we are not swinging
             result = supporting(fc_Transform);
         }
@@ -380,7 +380,7 @@ void WalkingLeg::debugProcessing(){
 
 #ifdef DEBUG_WALKING_GOAL_CONTINUITY
     ufvector3 diff = goal - last_goal;
-    #define GTHRSH 5
+    #define GTHRSH 6
 
 
 

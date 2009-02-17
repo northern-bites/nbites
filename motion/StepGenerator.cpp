@@ -31,6 +31,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     resetGait(params);
+    resetCoordinateFrames();
+    temp_init= false;
 }
 
 StepGenerator::~StepGenerator()
@@ -130,7 +132,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
         cout <<"SWAPPING COORDINTE FRAMES!"<<endl;
     }
 
-    cout << "Support step is " << *supportStep_f <<endl;
+    //cout << "Support step is " << *supportStep_f <<endl;
     //hack-ish for now to do hyp pitch crap
     leftLeg.setSteps(swingingStepSource_f, swingingStep_f,supportStep_f);
     rightLeg.setSteps(swingingStepSource_f, swingingStep_f,supportStep_f);
@@ -169,6 +171,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         swingingStep_f,fc_Transform);
 
+
     //HACK check to see if we are done
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
        && lastStep_s->type == END_STEP){
@@ -176,8 +179,14 @@ WalkLegsTuple StepGenerator::tick_legs(){
         _done = true;
     }
 
-    debugLogging();
 
+    if(temp_init || _done){
+        cout <<" ** SWITCH DEBUG ** " <<endl;
+        cout <<" if_Trans: " <<if_Transform<<endl;
+        cout <<" fc_Trans: " <<fc_Transform<<endl;
+    }
+    debugLogging();
+    temp_init = false;
     return WalkLegsTuple(left,right);
 }
 
@@ -417,7 +426,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
         //we are starting fresh from a stopped state, so we need to clear all remaining 
         //steps and zmp values.
         resetQueues();
-
+        resetCoordinateFrames();
         //then we need to pick which foot to start with
         if(y > 0 || theta > 0)
             startLeft();
@@ -429,7 +438,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
-
+    temp_init = true;
 }
 
 /*  Set up the walking engine for starting with a swinging step on the right */
@@ -578,7 +587,7 @@ void StepGenerator::generateStep( float _x,
                                    type));
 
 #ifdef DEBUG_STEPGENERATOR
-    cout << "Generated a new step: "<<*step<<endl;
+    //cout << "Generated a new step: "<<*step<<endl;
 #endif
     futureSteps.push_back(step);
     lastQueuedStep = step;
@@ -672,9 +681,17 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
 
 void StepGenerator::resetGait(const WalkingParameters * _wp){
     walkParams = _wp;
-    //When we switch gaits, we need to reinitialize the controller
-    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
+    //HACK When we switch gaits, we probably need to do other things as well
+}
 
+void StepGenerator::resetCoordinateFrames(){
+    cout << "RESETTING CONTROLLER" <<endl;
+    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
+    controller_y->initState(0.0f,0.0f,0.0f);
+    cout << "RESETTING STEPS" <<endl;
+    si_Transform = CoordFrame3D::identity3D();
+    last_zmp_end_s = CoordFrame3D::vector3D(0.0f,0.0f);
+    //if_Trans is reset in startLeft/Right
 }
 
 void StepGenerator::resetQueues(){
