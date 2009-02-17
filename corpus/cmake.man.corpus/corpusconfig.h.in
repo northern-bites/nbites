@@ -36,6 +36,14 @@
 #  undef  USE_PYLEDS_CXX_BACKEND
 #endif
 
+//Turn on/off debugging information for the Thread class.
+#define DEBUG_THREAD_${USE_PYLEDS_CXX_BACKEND}
+#ifdef  DEBUG_THREAD_ON
+#  define DEBUG_THREAD
+#else
+#  undef  DEBUG_THREAD
+#endif
+
 
 #endif // !_corpusconfig_h
 

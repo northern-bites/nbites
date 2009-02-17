@@ -39,3 +39,8 @@ OPTION(
     ON
     )
 
+OPTION(
+    DEBUG_THREAD
+    "Turn on/off debugging information for the Thread class."
+    ON
+    )

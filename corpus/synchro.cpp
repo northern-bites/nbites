@@ -24,14 +24,15 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include "synchro.h"
-
+#include "corpusconfig.h"
 using namespace std;
 using namespace boost;
 
-
-//#define DEBUG_THREAD_CREATE
-//#define DEBUG_THREAD_START
-//#define DEBUG_THREAD_EXIT
+#ifdef DEBUG_THREAD
+#  define DEBUG_THREAD_CREATE
+#  define DEBUG_THREAD_START
+#  define DEBUG_THREAD_EXIT
+#endif
 
 Event::Event (string _name)
   : name(_name), signalled(false)
