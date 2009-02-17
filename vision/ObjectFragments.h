@@ -36,7 +36,7 @@ class ObjectFragments; // forward reference
 //#include "FieldObjects.h"
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
-#include "Ball.h"
+#include "VisualBall.h"
 #include "Vision.h"
 
 //here are defined the lower bounds on the sizes of goals, posts, and balls

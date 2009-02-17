@@ -2,7 +2,7 @@
  * Vision Ball class
  */
 
-#include "Ball.h"
+#include "VisualBall.h"
 #include "math.h"
 
 Ball::Ball()

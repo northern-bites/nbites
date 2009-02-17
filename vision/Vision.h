@@ -43,7 +43,7 @@ class Vision;   // forward reference
 // #include "FieldObjects.h"
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
-#include "Ball.h"
+#include "VisualBall.h"
 #include "Threshold.h"
 #include "NaoPose.h"
 #include "FieldLines.h"

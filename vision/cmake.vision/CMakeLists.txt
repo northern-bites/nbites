@@ -119,11 +119,9 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
-                 ${VISION_INCLUDE_DIR}/ConcreteCorner
+SET( VISION_SRCS ${VISION_INCLUDE_DIR}/ConcreteCorner
                  ${VISION_INCLUDE_DIR}/ConcreteLandmark
                  ${VISION_INCLUDE_DIR}/ConcreteFieldObject
-                 #${VISION_INCLUDE_DIR}/FieldObjects
                  ${VISION_INCLUDE_DIR}/ConcreteLine
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/ObjectFragments
@@ -132,6 +130,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/Threshold
                  ${VISION_INCLUDE_DIR}/Utility
                  ${VISION_INCLUDE_DIR}/Vision
+		 ${VISION_INCLUDE_DIR}/VisualBall
                  ${VISION_INCLUDE_DIR}/VisualCorner
                  ${VISION_INCLUDE_DIR}/VisualLandmark
 		 ${VISION_INCLUDE_DIR}/VisualFieldObject

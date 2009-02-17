@@ -13,7 +13,7 @@
 
 // Local headers
 #include "MCL.h"
-#include "Ball.h"
+#include "VisualBall.h"
 
 // Default parameters
 #define DEFAULT_BETA 3.0f
