@@ -1,24 +1,24 @@
-#ifndef Ball_h_DEFINED
-#define Ball_h_DEFINED
+#ifndef VisualBall_h_DEFINED
+#define VisualBall_h_DEFINED
 
 #include "Common.h"
 #include "ifdefs.h"
 #include "Structs.h"
 #include "VisionDef.h"
 
-class Ball; // forward reference
+class VisualBall; // forward reference
 
 // BALL CONSTANTS
 #define BallAt1M         16 // pixel width of objects one meter away.
 #define PinkBallAt1M     12.46268657 // pixel width of PINK one meter away.
 #define MAXBALLDISTANCE  300
 
-class Ball {
+class VisualBall {
 public:
-    Ball();
-    virtual ~Ball() {}
+    VisualBall();
+    virtual ~VisualBall() {}
 
-    // Ball VOID Functions
+    // VisualBall VOID Functions
     void init();
 
     /* SETTERS */
@@ -106,4 +106,4 @@ private:
 };
 
 
-#endif // Ball_h_DEFINED
+#endif // VisualBall_h_DEFINED

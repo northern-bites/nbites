@@ -681,7 +681,7 @@ static PyTypeObject PyThresholdType = {
 
 typedef struct PyBall_t {
   PyObject_HEAD
-  Ball *ball;
+  VisualBall *ball;
   PyObject *centerX;
   PyObject *centerY;
   PyObject *width;
@@ -694,7 +694,7 @@ typedef struct PyBall_t {
 } PyBall;
 
 // C++ - accessible interface
-extern PyObject *PyBall_new    (Ball *b);
+extern PyObject *PyBall_new    (VisualBall *b);
 extern void      PyBall_update (PyBall *b);
 // backend methods
 extern PyObject *PyBall_new    (PyTypeObject *type, PyObject *args,

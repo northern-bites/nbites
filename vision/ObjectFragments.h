@@ -343,8 +343,8 @@ class ObjectFragments {
   int roundness(blob b);
   bool badSurround(blob b);
   bool atBoundary(blob b);
-  int balls(int c, Ball *thisBall);
-  int circleFit(Ball * thisBall);
+  int balls(int c, VisualBall *thisBall);
+  int circleFit(VisualBall * thisBall);
 
   // sanity checks
   bool rightBlobColor(blob obj, float per);

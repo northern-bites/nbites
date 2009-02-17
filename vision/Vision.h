@@ -143,7 +143,7 @@ class Vision
     VisualFieldObject *blueArc, *yellowArc;
     VisualFieldObject *red1, *red2;
     VisualFieldObject *navy1, *navy2;
-    Ball *ball;
+    VisualBall *ball;
 #ifdef USE_PINK_BALL
     Ball *pinkBall; //added for pink ball recognition
 #endif

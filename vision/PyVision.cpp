@@ -769,7 +769,7 @@ PyThreshold_update (PyObject *self, PyObject *args)
 
 // C++ - accessible interface
 extern PyObject *
-PyBall_new (Ball *b)
+PyBall_new (VisualBall *b)
 {
   PyBall *self;
 

@@ -48,7 +48,7 @@ BallEKF::BallEKF(shared_ptr<MCL> _mcl,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(Ball * ball)
+void BallEKF::updateModel(VisualBall * ball)
 {
     // Update expected ball movement
     timeUpdate(MotionModel());
@@ -75,7 +75,7 @@ void BallEKF::updateModel(Ball * ball)
  * Method to deal with sighting of a ball by the robot
  * @param ball a copy of the ball seen by the robot
  */
-void BallEKF::sawBall(Ball * ball)
+void BallEKF::sawBall(VisualBall * ball)
 {
     Measurement m;
     std::vector<Measurement> z;

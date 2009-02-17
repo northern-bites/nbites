@@ -6352,7 +6352,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
  * @param  thisBall  the ball object
  * @return           we always return 0 - the return is an artifact of other methods
  */
-int ObjectFragments::balls(int horizon, Ball *thisBall) {
+int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
   int confidence = 10;
   occlusion = NOOCCLUSION;
   if (numberOfRuns > 1) {
@@ -6553,7 +6553,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
    @param thisBall    the ball object
    @return            0 for success, 1 for fail
  */
-int ObjectFragments::circleFit(Ball * thisBall){
+int ObjectFragments::circleFit(VisualBall * thisBall){
   //thisBall->init();
     inferredConfidence = 0;
     if(numPoints < 3){

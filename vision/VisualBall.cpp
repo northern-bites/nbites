@@ -5,7 +5,7 @@
 #include "VisualBall.h"
 #include "math.h"
 
-Ball::Ball()
+VisualBall::VisualBall()
 {
     init();
 }
@@ -14,7 +14,7 @@ Ball::Ball()
  * variables, to check to see if the ball is in frame by checking distance
  * first (if it's > 0)
  */
-void Ball::init() {
+void VisualBall::init() {
     // Main Variables
     width = 0;
     height = 0;
@@ -29,21 +29,21 @@ void Ball::init() {
     elevation = 0;
 }
 
-void Ball::setDistanceEst(estimate ball_est)
+void VisualBall::setDistanceEst(estimate ball_est)
 {
     setBearingWithSD(ball_est.bearing);
     setElevation(ball_est.elevation);
     setDistanceWithSD(ball_est.dist);
 }
 
-void Ball::setDistanceWithSD(float _dist)
+void VisualBall::setDistanceWithSD(float _dist)
 {
     dist = _dist;
     setDistanceSD(ballDistanceToSD(dist));
 }
 
 
-void Ball::setBearingWithSD(float _bearing)
+void VisualBall::setBearingWithSD(float _bearing)
 {
     bearing = _bearing;
     setBearingSD(ballBearingToSD(_bearing));
