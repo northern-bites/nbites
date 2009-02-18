@@ -1,13 +1,12 @@
 #include "WalkingLeg.h"
 
 
-WalkingLeg::WalkingLeg(ChainID id,
-                       const WalkingParameters *walkP)
+WalkingLeg::WalkingLeg(ChainID id)
     :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
      frameCounter(0),
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
      support_step(EMPTY_STEP),
-     chainID(id), walkParams(walkP),
+     chainID(id), walkParams(NULL),
      goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
@@ -46,6 +45,9 @@ void WalkingLeg::setSteps(boost::shared_ptr<Step> _swing_src,
     support_step = _support_step;
 }
 
+void WalkingLeg::resetGait(const WalkingParameters * _wp){
+    walkParams =_wp;
+}
 
 vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,

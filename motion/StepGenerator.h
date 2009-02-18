@@ -89,8 +89,7 @@ static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at 
 
 class StepGenerator {
 public:
-    StepGenerator(boost::shared_ptr<Sensors> s,
-                  const WalkingParameters *params);
+    StepGenerator(boost::shared_ptr<Sensors> s);
     ~StepGenerator();
 
     void tick_controller();

@@ -7,8 +7,7 @@ using boost::shared_ptr;
 
 //#define DEBUG_STEPGENERATOR
 
-StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
-                             const WalkingParameters *params)
+StepGenerator::StepGenerator(shared_ptr<Sensors> s)
   : x(0.0f), y(0.0f), theta(0.0f),
     _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
@@ -19,9 +18,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     if_Transform(CoordFrame3D::identity3D()),
     initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
-    sensors(s),
-    walkParams(params), nextStepIsLeft(true),
-    leftLeg(LLEG_CHAIN,params), rightLeg(RLEG_CHAIN,params),
+    sensors(s),walkParams(NULL),nextStepIsLeft(true),
+    leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
     controller_x(new PreviewController()),
     controller_y(new PreviewController())
 {
@@ -704,8 +702,11 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
 
 
 void StepGenerator::resetGait(const WalkingParameters * _wp){
-    if(_done)
+    if(_done){
         walkParams = _wp;
+        leftLeg.resetGait(_wp);
+        rightLeg.resetGait(_wp);
+    }
     else{
         cout << "Failed to change the gait since StepGenerator is active."
              << endl;

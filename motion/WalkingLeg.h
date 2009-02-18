@@ -52,7 +52,7 @@ using namespace Kinematics;
 #endif
 class WalkingLeg  {
 public:
-    WalkingLeg(ChainID id, const WalkingParameters * walkP);
+    WalkingLeg(ChainID id);
     ~WalkingLeg();
 
     vector <float> tick(boost::shared_ptr<Step> step,
@@ -82,6 +82,7 @@ public:
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT;
     };
+    void resetGait(const WalkingParameters * _wp);
 private:
     //Execution methods, get called depending on which state the leg is in
     vector <float> supporting(ufmatrix3 fc_Transform);//float dest_x, float dest_y);

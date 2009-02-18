@@ -22,7 +22,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
                      4.0f*TO_RAD,  // rightSwingHipRollAddition
                      12.0f,        // leftZMPSwingOffestY,
                      12.0f),       // rightZMPSwingOffestY
-      stepGenerator(sensors,&walkParameters),
+      stepGenerator(sensors),
       pendingCommands(false),
       nextCommand(NULL)
 {
@@ -91,6 +91,13 @@ void WalkProvider::setCommand(const WalkCommand * command){
     nextCommand =command;
     pendingCommands = true;
     pthread_mutex_unlock(&walk_command_mutex);
+
+    if(!isActive()){
+        //then we must just be starting out, so we can update the
+        //gait in StepGenerator if we want
+        stepGenerator.resetGait(&walkParameters);
+        cout << "Set the walking parameters in stepgen"<<endl;
+    }
 
     setActive();
 }
