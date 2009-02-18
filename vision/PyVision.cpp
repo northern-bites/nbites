@@ -1245,13 +1245,13 @@ PyVision_update (PyVision *self)
   PyFieldObject_update((PyFieldObject *)self->ygrp);
   PyFieldObject_update((PyFieldObject *)self->yglp);
 
-  PyFieldObject_update((PyFieldObject *)self->bgCrossbar);
-  PyFieldObject_update((PyFieldObject *)self->ygCrossbar);
+  PyBackstop_update((PyBackstop *)self->bgCrossbar);
+  PyBackstop_update((PyBackstop *)self->ygCrossbar);
 
-  PyFieldObject_update((PyFieldObject *)self->red1);
-  PyFieldObject_update((PyFieldObject *)self->red2);
-  PyFieldObject_update((PyFieldObject *)self->navy1);
-  PyFieldObject_update((PyFieldObject *)self->navy2);
+  PyVisualRobot_update((PyVisualRobot *)self->red1);
+  PyVisualRobot_update((PyVisualRobot *)self->red2);
+  PyVisualRobot_update((PyVisualRobot *)self->navy1);
+  PyVisualRobot_update((PyVisualRobot *)self->navy2);
   PyBall_update((PyBall *)self->ball);
 
   PyThreshold_update((PyThreshold *)self->thresh);
