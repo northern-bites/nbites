@@ -47,8 +47,8 @@ using namespace Kinematics;
 #ifdef WALK_DEBUG
 //#define DEBUG_WALKING_STATE_TRANSITIONS
 //#define DEBUG_WALKING_GOAL_CONTINUITY
-#define DEBUG_WALKING_LOCUS_LOGGING
-#define DEBUG_WALKING_DEST_LOGGING
+#  define DEBUG_WALKING_LOCUS_LOGGING
+#  define DEBUG_WALKING_DEST_LOGGING
 #endif
 class WalkingLeg  {
 public:

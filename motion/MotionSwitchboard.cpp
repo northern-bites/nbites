@@ -7,7 +7,7 @@
 using namespace std;
 using namespace boost;
 
-#define DEBUG_SWITCHBOARD
+//#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
@@ -151,17 +151,6 @@ void MotionSwitchboard::run() {
 
 
     while(running) {
-        if(fcount == 100){
-            cout << "enqueing a new walk command" <<endl;
-            sendMotionCommand(new WalkCommand(0.0f,-30.0f,0.0f));
-        }else if( fcount == 450){
-            sendMotionCommand(new WalkCommand(0.0f,0.0f,0.0f));
-        }else if( fcount == 1050){
-            sendMotionCommand(new WalkCommand(0.0f,30.0f,0.0f));
-        }else if( fcount == 1550){
-            cout << "enqueing a sit down" <<endl;
-            sendMotionCommand(sitDown);
-        }
 
         bool active  = processProviders();
 
@@ -210,7 +199,9 @@ int MotionSwitchboard::processProviders(){
     }
 	//** Alternately, you may choose here:
 	//curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
+#ifdef DEBUG_SWITCHBOARD
     static bool switchedToInactive;
+#endif
     if (curProvider->isActive()){
 		//Request new joints
 		curProvider->calculateNextJoints();
@@ -237,7 +228,10 @@ int MotionSwitchboard::processProviders(){
         }
         pthread_mutex_unlock(&next_joints_mutex);
 
+#ifdef DEBUG_SWITCHBOARD
         switchedToInactive = false;
+#endif
+
     }else{
 #ifdef DEBUG_SWITCHBOARD
         if (!switchedToInactive)
@@ -324,6 +318,8 @@ void MotionSwitchboard::updateDebugLogs(){
         fprintf(joints_log, "%f\t",nextJoints[i]);
     fprintf(joints_log, "\n");
 
+    //known bug TODO: joint order is still reverse in Kinematics!!
+
     fprintf(effector_log, "%f\t",time);
     int index  =0;
     for(int chain = HEAD_CHAIN; chain <= RARM_CHAIN; chain++){
@@ -344,7 +340,6 @@ void MotionSwitchboard::sendMotionCommand(const MotionCommand *command) {
 
 	switch (type) {
 	case WALK:
-        cout << "New motion command identified as walk command in switchboard"<<endl;
 		nextProvider = &walkProvider;
 		walkProvider.setCommand(command);
 		break;

@@ -42,7 +42,6 @@ WalkProvider::~WalkProvider() {
 }
 
 void WalkProvider::requestStopFirstInstance() {
-    cout << "REQUEST STOP FIRST INSTANCE" <<endl;
     setCommand(new WalkCommand(0.0f, 0.0f, 0.0f));
 }
 
@@ -52,7 +51,6 @@ void WalkProvider::calculateNextJoints() {
         stepGenerator.setSpeed(nextCommand->x_mms,
                                nextCommand->y_mms,
                                nextCommand->theta_rads);
-    cout << "Finished sending the command to step generator" <<endl;
     }
     pendingCommands = false;
     nextCommand = NULL;
@@ -87,7 +85,6 @@ void WalkProvider::calculateNextJoints() {
 
 void WalkProvider::setCommand(const WalkCommand * command){
     //grab the velocities in mm/second rad/second from WalkCommand
-    cout << "Got walk command in walk Provider" << *command<<endl;
     pthread_mutex_lock(&walk_command_mutex);
     if(nextCommand)
         delete nextCommand;

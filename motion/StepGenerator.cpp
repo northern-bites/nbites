@@ -5,7 +5,7 @@ using boost::shared_ptr;
 
 #include "StepGenerator.h"
 
-#define DEBUG_STEPGENERATOR
+//#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
                              const WalkingParameters *params)
@@ -31,8 +31,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
     resetGait(params);
-    resetCoordinateFrames();
-    temp_init= false;
+    resetStepCoordFrames();
 }
 
 StepGenerator::~StepGenerator()
@@ -129,7 +128,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //which is the critical point when we must swap coord frames, etc
     if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
         swapSupportLegs();
-        cout <<"SWAPPING COORDINTE FRAMES!"<<endl;
     }
 
     //cout << "Support step is " << *supportStep_f <<endl;
@@ -172,21 +170,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                         swingingStep_f,fc_Transform);
 
 
-    //HACK check to see if we are done
+    //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
        && lastStep_s->type == END_STEP){
-        cout << "step generator done = true" << endl;
+        //cout << "step generator done = true" << endl;
         _done = true;
     }
 
-
-    if(temp_init || _done){
-        cout <<" ** SWITCH DEBUG ** " <<endl;
-        cout <<" if_Trans: " <<if_Transform<<endl;
-        cout <<" fc_Trans: " <<fc_Transform<<endl;
-    }
     debugLogging();
-    temp_init = false;
+
     return WalkLegsTuple(left,right);
 }
 
@@ -396,8 +388,6 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
                                   const float _theta)  {
-    cout << "Calling setSpeed with:" << endl
-         << "    x: " << _x << " y: " << _y << " theta: " << _theta << endl;
     //convert speeds in cm/s and rad/s into steps:
     const float new_x = _x*walkParams->stepDuration;
     const float new_y = _y*walkParams->stepDuration;
@@ -417,16 +407,21 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     }
 
 
-    //if the new one is different, update the 
+    //if the new one is different, update the
+    //TODO need to do clipping
     x = new_x; y = new_y; theta = new_theta;
+
+
+#ifdef DEBUG_STEPGENERATOR
     cout << "New Walk Vector is:" << endl
          << "    x: " << x << " y: " << y << " theta: " << theta << endl;
+#endif
 
     if(_done){
         //we are starting fresh from a stopped state, so we need to clear all remaining 
         //steps and zmp values.
         resetQueues();
-        resetCoordinateFrames();
+        resetStepCoordFrames();
         //then we need to pick which foot to start with
         if(y > 0 || theta > 0)
             startLeft();
@@ -438,7 +433,6 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
-    temp_init = true;
 }
 
 /*  Set up the walking engine for starting with a swinging step on the right */
@@ -587,7 +581,7 @@ void StepGenerator::generateStep( float _x,
                                    type));
 
 #ifdef DEBUG_STEPGENERATOR
-    //cout << "Generated a new step: "<<*step<<endl;
+    cout << "Generated a new step: "<<*step<<endl;
 #endif
     futureSteps.push_back(step);
     lastQueuedStep = step;
@@ -684,11 +678,13 @@ void StepGenerator::resetGait(const WalkingParameters * _wp){
     //HACK When we switch gaits, we probably need to do other things as well
 }
 
-void StepGenerator::resetCoordinateFrames(){
-    cout << "RESETTING CONTROLLER" <<endl;
+/**
+ * Reset the coordiante frames for the controller and for our steps
+ */
+void StepGenerator::resetStepCoordFrames(){
     controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
     controller_y->initState(0.0f,0.0f,0.0f);
-    cout << "RESETTING STEPS" <<endl;
+
     si_Transform = CoordFrame3D::identity3D();
     last_zmp_end_s = CoordFrame3D::vector3D(0.0f,0.0f);
     //if_Trans is reset in startLeft/Right

@@ -2,17 +2,14 @@
 #include "MotionInterface.h"
 
 void MotionInterface::setNextWalkCommand(const WalkCommand *command){
-    cout << "Walk command in the interface" <<endl;
     switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
 }
 
 void MotionInterface::enqueue(const BodyJointCommand *command){
-    cout << "Interface got a BodyJointCommand" <<endl;
     switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
 }
 
 void MotionInterface::enqueue(const HeadJointCommand *command){
-    cout << "Interface got a HeadJointCommand" <<endl;
     switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
 }
 
