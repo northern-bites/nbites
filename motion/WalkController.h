@@ -13,6 +13,7 @@ using std::list;
 class WalkController {
 public:
     //WalkController(Sensors *s) : sensors(s) { }
+    virtual ~WalkController(){};
     virtual const float tick(const list<float> *zmp_ref) = 0;
     virtual const float getPosition() const = 0;
     virtual const float getZMP() const = 0;
