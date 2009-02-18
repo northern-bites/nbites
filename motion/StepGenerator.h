@@ -18,24 +18,22 @@
  *  - Decide how to add new footsteps (when, etc)
  *
  * TODO:
- *  - Translate all the matrix<float> into bounded arrays (ufmatrix3)
  *  - Build access to work from the Switchboard or Interface. Need
  *    to be able to change gaits, start and stop, etc
- *  - Enable turning - prob. involves some work with Kinematics as well?
  *  - Read through tick_legs, fillZMP, etc with a beginners mind and write
  *    lots of awesomely descriptive and informative comments.
- *  - Decide if the 'hack-ish' stuff in generate step is really a hack or not
  *  - Move some of the parameters in WalkingParameters into Steps. This includes
  *    stuff like step duration, frames in double support, step height, etc
- *
+ *  - Fix the ZMP leg length to be more intelligent. Must depend on if we are
+ *    moving left/right, and how much, etc. This depends on the next step in many
+ *    ways, so I'm not sure how to do this.
+ *  - We need to clip incoming x,y,theta because there is no protection currently
+ *  - We need an observer or we need to fix the preview controller's bugs
  * MUSINGS ON BETTER DESIGN:
  *  - Each Step could have a list of sub states which it must undergo
  *    A normal step would have just one DBL and one SINGLE in a row
  *    A starting stopping step could have other types instead.
  *    WalkingLeg could then ask the current Step object what should happen next
- *  - The s coordinate frame could be dispensed with -  we could just
- *    express steps in the f coordinate frame, also this might allow
- *    the step constructor to be called  without knowing about HIP_OFF, etc
  *
  * COORDINATE FRAME NOTE:
  *  There are four important coordinate frames:
