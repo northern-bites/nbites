@@ -289,9 +289,7 @@ class FieldLines {
   ////////////////////////////////////////////////////////////
   // AIBOSPECIFIC
   // Distance in centimeters
-#elif ROBOT(NAO)
   static const int MAXIMUM_DIST_TO_USE_PIX_ESTIMATE = 400;
-#endif
   // AIBOSPECIFIC
   static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
 
