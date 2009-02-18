@@ -364,6 +364,7 @@ int c_init_sensors (void)
 
 Sensors::Sensors ()
     : bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
+      motionBodyAngles(NUM_ACTUATORS),
       bodyAnglesError(NUM_ACTUATORS),
 #if ROBOT(NAO)
       leftFootFSR(0.0f, 0.0f, 0.0f, 0.0f),
@@ -377,6 +378,7 @@ Sensors::Sensors ()
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
+    pthread_mutex_init(&motion_angles_mutex, NULL);
     pthread_mutex_init(&errors_mutex, NULL);
 #if ROBOT(NAO)
     pthread_mutex_init(&fsr_mutex, NULL);
@@ -398,6 +400,7 @@ Sensors::~Sensors ()
 {
     pthread_mutex_destroy(&angles_mutex);
     pthread_mutex_destroy(&vision_angles_mutex);
+    pthread_mutex_destroy(&motion_angles_mutex);
     pthread_mutex_destroy(&errors_mutex);
 #if ROBOT(NAO)
     pthread_mutex_destroy(&fsr_mutex);
@@ -428,6 +431,18 @@ const vector<float> Sensors::getVisionBodyAngles() const
     vector<float> vec(visionBodyAngles);
 
     pthread_mutex_unlock (&vision_angles_mutex);
+
+    return vec;
+}
+
+
+const vector<float> Sensors::getMotionBodyAngles() const
+{
+    pthread_mutex_lock (&motion_angles_mutex);
+
+    vector<float> vec(motionBodyAngles);
+
+    pthread_mutex_unlock (&motion_angles_mutex);
 
     return vec;
 }
@@ -555,6 +570,15 @@ void Sensors::setVisionBodyAngles (vector<float>& v)
     visionBodyAngles = v;
 
     pthread_mutex_unlock (&vision_angles_mutex);
+}
+
+void Sensors::setMotionBodyAngles (vector<float>& v)
+{
+    pthread_mutex_lock (&motion_angles_mutex);
+
+    motionBodyAngles = v;
+
+    pthread_mutex_unlock (&motion_angles_mutex);
 }
 
 void Sensors::setBodyAngleErrors (vector<float>& v)
@@ -739,8 +763,8 @@ void Sensors::updateVisionAngles() {
 
     visionBodyAngles = bodyAngles;
 
-    pthread_mutex_unlock (&angles_mutex);
     pthread_mutex_unlock (&vision_angles_mutex);
+    pthread_mutex_unlock (&angles_mutex);
 }
 
 const unsigned char* Sensors::getImage ()

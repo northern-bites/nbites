@@ -35,15 +35,16 @@ void ALEnactor::run() {
             break;
         }
         // Get the angles we want to go to this frame from the switchboard
-        vector<float> result = switchboard->getNextJoints();
+        motionCommandAngles = switchboard->getNextJoints();
 
 #ifdef DEBUG_ENACTOR_JOINTS
-        for (int i=0; i<result.size();i++)
-            cout << "result of joint " << i << " is " << result.at(i) << endl;
+        for (unsigned int i=0; i<motionCommandAngles.size();i++)
+            cout << "result of joint " << i << " is "
+                 << motionCommandAngles.at(i) << endl;
 #endif
 
 #ifndef NO_ACTUAL_MOTION
-        almotion->setBodyAngles(result);
+        almotion->setBodyAngles(motionCommandAngles);
 #endif
 
         //Once we've sent the most calculated joints
@@ -54,7 +55,7 @@ void ALEnactor::run() {
 
 #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
         if (processTime > MOTION_FRAME_LENGTH_uS){
-            cout << "Time spent in ALEnactor longer than frame length: " 
+            cout << "Time spent in ALEnactor longer than frame length: "
                  << processTime <<endl;
             //Don't sleep at all
         } else{
@@ -74,9 +75,10 @@ void ALEnactor::postSensors() {
     //actual joint post of the robot before any computation begins
     vector<float> alAngles = almotion->getBodyAngles();
     sensors->setBodyAngles(alAngles);
+    sensors->setMotionBodyAngles(motionCommandAngles);
 
     // This call syncs all sensors values: bumpers, fsr, inertial, etc.
-    //syncWithALMemory();
+    syncWithALMemory();
 
 }
 

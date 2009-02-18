@@ -21,7 +21,7 @@
 class ALEnactor : public MotionEnactor {
 public:
     ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s)
-        : MotionEnactor(), broker(_pbroker), sensors(s) {
+        : MotionEnactor(), broker(_pbroker), sensors(s){
         try{
             alfastaccess =
                 AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
@@ -43,6 +43,12 @@ public:
         } catch(AL::ALError &e) {
             cout << "Failed to initialize proxy to DCM" << endl;
         }
+        //starting out we want to set our motion angles to the sensed
+        //position
+        motionCommandAngles = almotion->getBodyAngles();
+        for (unsigned int i=0; i<motionCommandAngles.size();i++)
+            cout << "initial motion angle at  " << i << " is "
+                 << motionCommandAngles.at(i) << endl;
 
         initSyncWithALMemory();
     };
@@ -62,6 +68,7 @@ private:
     AL::ALPtr<ALMemoryFastAccess> alfastaccess;
     AL::ALPtr<AL::DCMProxy> dcm;
     boost::shared_ptr<Sensors> sensors;
+    std::vector<float> motionCommandAngles;
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
     static const float MOTION_FRAME_LENGTH_S; // in seconds

@@ -93,16 +93,7 @@ ChopShop::chopLinear(const JointCommand *command) {
 }
 
 vector<float> ChopShop::getCurrentJoints() {
-
-	// Get current angles&errors from sensors
-	vector<float> currentJoints = sensors->getBodyAngles();
-	vector<float> currentJointErrors = sensors->getBodyAngleErrors();
-
-	// Adjust to real currentJoints, not Sensors'
-	for (unsigned int i=0; i<NUM_JOINTS ; i++)
-		currentJoints[i] = currentJoints[i]-currentJointErrors[i];
-
-	return currentJoints;
+    return sensors->getMotionBodyAngles();
 }
 
 

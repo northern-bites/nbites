@@ -117,6 +117,7 @@ class Sensors {
     //   requested values, then unlocks the mutex before returning
     const std::vector<float> getBodyAngles() const;
     const std::vector<float> getVisionBodyAngles() const;
+    const std::vector<float> getMotionBodyAngles() const;
     const float getBodyAngle(const int index) const;//NOT wrapped for python use
     const std::vector<float> getBodyAngleErrors() const ;
 	const float getBodyAngleError(int index) const; //NOT wrapped for python use
@@ -134,6 +135,7 @@ class Sensors {
     //   the specified values, then unlocks the mutex before returning
     void setBodyAngles(std::vector<float>& v);
     void setVisionBodyAngles(std::vector<float>& v);
+    void setMotionBodyAngles(std::vector<float>& v);
     void setBodyAngleErrors(std::vector<float>& v);
 #if ROBOT(NAO)
     void setLeftFootFSR(const float frontLeft, const float frontRight,
@@ -193,6 +195,7 @@ class Sensors {
     // Locking mutexes
     mutable pthread_mutex_t angles_mutex;
     mutable pthread_mutex_t vision_angles_mutex;
+    mutable pthread_mutex_t motion_angles_mutex;
     mutable pthread_mutex_t errors_mutex;
 #if ROBOT(NAO)
     mutable pthread_mutex_t fsr_mutex;
@@ -208,6 +211,7 @@ class Sensors {
     // were when the last vision frame started.
     std::vector<float> bodyAngles;
     std::vector<float> visionBodyAngles;
+    std::vector<float> motionBodyAngles;
     std::vector<float> bodyAnglesError;
 #if ROBOT(NAO)
     // FSR sensors

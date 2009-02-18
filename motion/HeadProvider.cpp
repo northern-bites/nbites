@@ -46,7 +46,6 @@ void HeadProvider::requestStopFirstInstance() {
 }
 
 void HeadProvider::calculateNextJoints() {
-    vector<float> currentHeads = getCurrentHeads();
 
     if ( headQueue.empty() )
         setNextHeadCommand();
@@ -99,12 +98,13 @@ void HeadProvider::setNextHeadCommand() {
 
 vector<float> HeadProvider::getCurrentHeads() {
     vector<float> currentHeads(HEAD_JOINTS);
+    const vector<float> currentJoints = sensors->getMotionBodyAngles();
 
     for (unsigned int i=0; i<HEAD_JOINTS ; i++) {
-        currentHeads[i] =
-            sensors->getBodyAngle(i) - sensors->getBodyAngleError(i);
+        currentHeads[i] = currentJoints[i];
     }
 
+    cout << "Cur Heads: " << currentHeads[0] <<"," <<currentHeads[1] <<endl;
     return currentHeads;
 }
 
