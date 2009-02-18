@@ -837,7 +837,7 @@ extern PyObject *
 PyBall_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
   PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
-      "Ball from Python.  Need a C++ Ball.");
+      "Ball from Python.  Need a C++ VisualBall.");
   return NULL;
 }
 
@@ -1043,7 +1043,7 @@ extern PyObject *
 PyBackstop_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
   PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
-      "Backstop from Python.  Need a C++ FieldObject.");
+      "Backstop from Python.  Need a C++ VisualBackstop.");
   return NULL;
 }
 
@@ -1138,7 +1138,7 @@ extern PyObject *
 PyVisualRobot_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
   PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
-      "VisualRobot from Python.  Need a C++ FieldObject.");
+      "VisualRobot from Python.  Need a C++ VisualRobot.");
   return NULL;
 }
 
