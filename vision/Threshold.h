@@ -60,12 +60,6 @@ static const int VISUAL_HORIZON_COLOR = BROWN;
 // based on Height and Width
 static const float POST_MIN_FOC_DIST = 10.0f; // goal posts
 static const float POST_MAX_FOC_DIST = 800.0f;
-static const float BEACON_MIN_FOC_DIST = 15.0f;
-static const float BEACON_MAX_FOC_DIST = 650.0f;
-
-//Andrew: restrict acceptable beacon dist for goalie
-static const float GOALIE_BEACON_MIN_FOC_DIST = 10.0f;
-static const float GOALIE_BEACON_MAX_FOC_DIST = 500.0f;
 
 class Threshold
 {
