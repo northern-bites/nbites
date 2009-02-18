@@ -58,7 +58,7 @@ void HeadProvider::calculateNextJoints() {
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
     }
-    //setActive();
+    setActive();
 }
 
 void HeadProvider::setCommand(const HeadJointCommand *command) {
