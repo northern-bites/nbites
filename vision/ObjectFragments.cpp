@@ -7114,8 +7114,9 @@ int ObjectFragments::midPoint(int a, int b) {
 
 
 
-/*  The next group of functions are for debugging only.  They are set up so that debugging information
- *  will only appear when processing is done off-line.
+/*
+ * The next group of functions are for debugging only.  They are set up so that
+ * debugging information will only appear when processing is done off-line.
  */
 
 /*  Print debugging information for a field object.
@@ -7124,27 +7125,30 @@ int ObjectFragments::midPoint(int a, int b) {
 
 void ObjectFragments::printObject(VisualFieldObject * objs) {
 #if defined OFFLINE
-  cout << objs->getLeftTopX() << " " << objs->getLeftTopY() << " " << objs->getRightTopX() << " " << objs->getRightTopY() << endl;
-  cout << objs->getLeftBottomX() << " " << objs->getLeftBottomY() << " " << objs->getRightBottomX() << " " << objs->getRightBottomY() << endl;
-  cout << "Height is " << objs->getHeight() << " Width is " << objs->getWidth() << endl;
-  if (objs->getIDCertainty() == _SURE)
-    cout << "Very sure" << endl;
-  else
-    cout << "Not sure" << endl;
-  distanceCertainty dc = objs->getDistanceCertainty();
-  switch (dc) {
-  case BOTH_SURE:
-    cout << "Distance should be good" << endl;
-    break;
-  case HEIGHT_UNSURE:
-    cout << "Heights are not to be trusted" << endl;
-    break;
-  case WIDTH_UNSURE:
-    cout << "Widths are not to be trusted" << endl;
-    break;
-  case BOTH_UNSURE:
-    cout << "Neither height nor width should be trusted" << endl;
-    break;
+    cout << objs->getLeftTopX() << " " << objs->getLeftTopY() << " "
+         << objs->getRightTopX() << " " << objs->getRightTopY() << endl;
+    cout << objs->getLeftBottomX() << " " << objs->getLeftBottomY() << " "
+         << objs->getRightBottomX() << " " << objs->getRightBottomY() << endl;
+    cout << "Height is " << objs->getHeight() << " Width is "
+         << objs->getWidth() << endl;
+    if (objs->getIDCertainty() == _SURE)
+        cout << "Very sure" << endl;
+    else
+        cout << "Not sure" << endl;
+    distanceCertainty dc = objs->getDistanceCertainty();
+    switch (dc) {
+    case BOTH_SURE:
+        cout << "Distance should be good" << endl;
+        break;
+    case HEIGHT_UNSURE:
+        cout << "Heights are not to be trusted" << endl;
+        break;
+    case WIDTH_UNSURE:
+        cout << "Widths are not to be trusted" << endl;
+        break;
+    case BOTH_UNSURE:
+        cout << "Neither height nor width should be trusted" << endl;
+        break;
   }
 #endif
 }
@@ -7172,11 +7176,11 @@ void ObjectFragments::printObjs() {
     }
     if (vision->bgBackstop->getWidth() >  0) {
       cout << "Vision found blue backstop " << endl;
-      printObject(vision->bgBackstop);
+      //printObject(vision->bgBackstop);
     }
     if (vision->ygBackstop->getWidth() >  0) {
       cout << "Vision found yellow backstop " << endl;
-      printObject(vision->ygBackstop);
+      //printObject(vision->ygBackstop);
     }
 #if ROBOT(AIBO)
     if (vision->yb->getWidth() >  0) {

@@ -1,13 +1,14 @@
 #include "VisualRobot.h"
-VisualRobot::VisualRobot() : {
+VisualRobot::VisualRobot()
+{
     init();
 }
 
-VisualRobot::VisualRobot(const VisualRobot&) {
-}
+VisualRobot::VisualRobot(const VisualRobot&) {}
 
 // Initialization, happens every frame.
-void VisualRobot::init(){
+void VisualRobot::init()
+{
     width = 0;
     height = 0;
     setX(0);
@@ -20,7 +21,6 @@ void VisualRobot::init(){
     setDistance(0);
     setBearing(0);
     elevation = 0;
-    idCertainty = NOT_SURE;
 }
 
 /**
@@ -32,8 +32,7 @@ void VisualRobot::init(){
 void VisualRobot::setDistanceWithSD(float _distance)
 {
     setDistance(_distance);
-    setDistanceSD(backstopDistanceToSD(_distance));
-    }
+    setDistanceSD(robotDistanceToSD(_distance));
 }
 
 /**
@@ -45,6 +44,5 @@ void VisualRobot::setDistanceWithSD(float _distance)
 void VisualRobot::setBearingWithSD(float _bearing)
 {
     setBearing(_bearing);
-    setBearingSD(backstopBearingToSD(_bearing));
-    }
+    setBearingSD(robotBearingToSD(_bearing));
 }

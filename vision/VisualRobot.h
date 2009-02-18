@@ -40,8 +40,6 @@ public:
     // INITIALIZATION (happens every frame)
     void init();
 
-    void printDebugInfo(FILE * out);
-
     // SETTERS
     void setLeftTopX(int _x){  leftTop.x = _x; }
     void setLeftTopY(int _y){  leftTop.y = _y; }
@@ -51,15 +49,8 @@ public:
     void setLeftBottomY(int _y){ leftBottom.y = _y; }
     void setRightBottomX(int _x){ rightBottom.x = _x; }
     void setRightBottomY(int _y){ rightBottom.y = _y; }
-    void setShoot(bool s1) {shoot = s1;}
-    void setBackLeft(int x1) {backLeft = x1;}
-    void setBackRight(int y1) {backRight = y1;}
-    void setBackDir(int x1) {backDir = x1;}
-    void setLeftOpening(int op) { leftOpening = op; }
-    void setRightOpening(int op) { rightOpening = op; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
-    //virtual void setIDCertainty(certainty c);
 
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
@@ -70,15 +61,6 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
-    const int getShootLeft() const { return backLeft; }
-    const int getShootRight() const { return backRight; }
-    const int getBackDir() const { return backDir; }
-    const int getLeftOpening() const { return leftOpening; }
-    const int getRightOpening() const { return rightOpening; }
-    const bool shotAvailable() const { return shoot; }
-    const point<float> getFieldLocation() const { return fieldLocation; }
-    const float getFieldX() const { return fieldLocation.x; }
-    const float getFieldY() const { return fieldLocation.y; }
 
 private: // Class Variables
 
@@ -94,6 +76,15 @@ private: // Class Variables
     int rightOpening;
     bool shoot;
     point <float> fieldLocation;
+
+    // Member functions
+    float robotDistanceToSD(float _distance) {
+        return 0.00000004 * pow(_distance,4.079f);
+    }
+    float robotBearingToSD(float _bearing) {
+        return M_PI / 8.0f;
+    }
+
 };
 
 #endif // VisualRobot_hpp_defined

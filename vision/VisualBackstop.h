@@ -40,8 +40,6 @@ public:
     // INITIALIZATION (happens every frame)
     void init();
 
-    void printDebugInfo(FILE * out);
-
     // SETTERS
     void setLeftTopX(int _x){  leftTop.x = _x; }
     void setLeftTopY(int _y){  leftTop.y = _y; }
@@ -59,7 +57,6 @@ public:
     void setRightOpening(int op) { rightOpening = op; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
-    //virtual void setIDCertainty(certainty c);
 
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
@@ -94,6 +91,9 @@ private: // Class Variables
     int rightOpening;
     bool shoot;
     point <float> fieldLocation;
+
+    float backstopDistanceToSD(float _distance) { return 1.0f; }
+    float backstopBearingToSD(float _bearing) { return 0.01f; }
 };
 
 #endif // VisualBackstop_hpp_defined

@@ -11,6 +11,7 @@
 #ifndef VisualDetection_h_defined
 #define VisualDetection_h_defined
 
+#include "Structs.h"
 class VisualDetection {
 public:
     // Constructor

@@ -1,13 +1,14 @@
 #include "VisualBackstop.h"
-VisualBackstop::VisualBackstop() : {
+VisualBackstop::VisualBackstop()
+{
     init();
 }
 
-VisualBackstop::VisualBackstop(const VisualBackstop&) {
-}
+VisualBackstop::VisualBackstop(const VisualBackstop&) {}
 
 // Initialization, happens every frame.
-void VisualBackstop::init(){
+void VisualBackstop::init()
+{
     width = 0;
     height = 0;
     setX(0);
@@ -20,7 +21,6 @@ void VisualBackstop::init(){
     setDistance(0);
     setBearing(0);
     elevation = 0;
-    idCertainty = NOT_SURE;
 }
 
 /**
@@ -33,7 +33,6 @@ void VisualBackstop::setDistanceWithSD(float _distance)
 {
     setDistance(_distance);
     setDistanceSD(backstopDistanceToSD(_distance));
-    }
 }
 
 /**
@@ -46,5 +45,4 @@ void VisualBackstop::setBearingWithSD(float _bearing)
 {
     setBearing(_bearing);
     setBearingSD(backstopBearingToSD(_bearing));
-    }
 }
