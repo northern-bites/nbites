@@ -30,10 +30,8 @@ using namespace std;
 #include "ifdefs.h"
 #include "NaoPose.h"
 
-
 class ObjectFragments; // forward reference
 #include "Threshold.h"
-//#include "FieldObjects.h"
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
 #include "VisualBall.h"
@@ -41,10 +39,7 @@ class ObjectFragments; // forward reference
 
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
-#if ROBOT(AIBO)
-#define MIN_GOAL_HEIGHT		8
-#define MIN_GOAL_WIDTH		2
-#elif ROBOT(NAO)
+#if ROBOT(NAO)
 #define MIN_GOAL_HEIGHT		50
 #define MIN_GOAL_WIDTH		10
 #endif
@@ -81,11 +76,7 @@ static const int POST = 1;
 // Universal bad value used to id whether or not we successfully did something
 static const int BADVALUE = -100;
 
-#if ROBOT(AIBO)
-static const int MAX_BLOBS = 100;                   // how many blobs can we handle
-#elif ROBOT(NAO)
 static const int MAX_BLOBS = 400;
-#endif
 static const int NOISE_SKIP = 3;                    // actually just skips 2 pixel noise in runs
 static const int MIN_SPLIT = 40;                    // minimum distance between goal and post - changed from 50 to 40 JS
 static const float PERCENTMATCH = 0.65f;            //  Amount of post that has to match (so backstop isn't counted in posts)
@@ -259,20 +250,6 @@ class ObjectFragments {
   void blue(int pink);
   void robot(int c);
 
-  // beacons
-#if ROBOT(AIBO)
-  bool beaconCheck(int a, int c, int d, int e);
-  bool processBeacon(int l, int r, int x, int y, bool yellowOnTop, bool normal);
-  void expandSpot(int x1, int y1, int dir, int c, int c2, int c3, int c4);
-    void findSpot(int x, int y, int x2, int y2, int dir, int c, int c2, int c3,
-                int c4, int cases);
-  bool setCorners(int leftx, int lefty, int rightx, int righty, int c, int c2,
-                  int c3, int c4, VisualFieldObject* post);
-  void findCorner(int oneX, int oneY, int dir, int myHeight, float check,
-                  int x, int y, int stopper, int c, int c2);
-  bool inferBeaconFromBlob(blob b, VisualFieldObject* post);
-#endif
-
   // miscelaneous goal processing  methods
   bool coloredArc(blob b, int c);
   bool goodPost(blob b, int c);
@@ -289,23 +266,9 @@ class ObjectFragments {
   void updateBackstop(VisualFieldObject* a, blob b);
 
   // post recognition routines
-#if ROBOT(NAO)
   int crossCheck(blob b);
   int crossCheck2(blob b);
   int triangle(blob b);
-#elif ROBOT(AIBO)
-  int checkPostBlob(blob b, blob s);
-  bool contains(blob b, blob s, int c, int c2, VisualFieldObject* left,
-                VisualFieldObject* right, VisualFieldObject* mid);
-  bool inBlob(blob b, int x, int y, int h);
-  void makeBoxes(int sx, int xy, int hb);
-  bool checkPostAndBlob(float rat, bool postFound, int c, int c2,
-			int horizon, VisualFieldObject* left, VisualFieldObject* mid,
-			VisualFieldObject* right, blob post, blob big);
-  int projectBoxes(int spanX, int spanY, int howbig, int fakeBottom,
-                   int trueRight, int trueLeft, int trueTop);
-  int determineRelationship(blob b, blob s);
-#endif
   int scanOut(int stopp, int spanX, int c);
   int checkOther(int left, int right, int height, int horizon);
   int characterizeSize(blob b);
