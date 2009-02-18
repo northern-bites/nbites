@@ -104,7 +104,6 @@ vector<float> HeadProvider::getCurrentHeads() {
         currentHeads[i] = currentJoints[i];
     }
 
-    cout << "Cur Heads: " << currentHeads[0] <<"," <<currentHeads[1] <<endl;
     return currentHeads;
 }
 

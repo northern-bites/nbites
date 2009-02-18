@@ -43,12 +43,8 @@ public:
         } catch(AL::ALError &e) {
             cout << "Failed to initialize proxy to DCM" << endl;
         }
-        //starting out we want to set our motion angles to the sensed
-        //position
+        //starting out we want to set our motion angles to the sensed position
         motionCommandAngles = almotion->getBodyAngles();
-        for (unsigned int i=0; i<motionCommandAngles.size();i++)
-            cout << "initial motion angle at  " << i << " is "
-                 << motionCommandAngles.at(i) << endl;
 
         initSyncWithALMemory();
     };
