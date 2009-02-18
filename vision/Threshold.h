@@ -70,10 +70,8 @@ class Threshold
 
   // main methods
   void visionLoop();
-#ifdef UNROLLED_LOOPS_THRESHOLD
   inline void threshold();
   inline void runs();
-#endif
   void thresholdAndRuns();
   void objectRecognition();
   // helper methods

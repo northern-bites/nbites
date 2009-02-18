@@ -14,14 +14,6 @@
 //#  define OFFLINE
 #endif
 
-// What should be defined when offline
-#if defined(OFFLINE)
- // Turn off chromatic correction
-#  undef  NO_CHROME
-#  define NO_CHROME 1
-#endif
-
-
 // Cortex 2.0 -- not used
 #if defined(OFFLINE) && !defined(CORTEX__2_0)
 //#  define CORTEX__2_0
@@ -38,10 +30,6 @@
 //#ifndef USE_PYTHON
 //#  define USE_PYTHON 
 //#endif
-// Use pink objects as balls
-#ifndef USE_PINK_BALL
-//#  define USE_PINK_BALL
-#endif
 // Use the old, small calibration tables
 #ifndef SMALL_TABLES
 //#  define SMALL_TABLES
@@ -72,11 +60,6 @@
 #endif
 
 // Other switches
-
-#if !defined(NO_CHROME)
-#  undef  USE_CHROMATIC_CORRECTION
-#  define USE_CHROMATIC_CORRECTION 1
-#endif
 
 #ifndef USE_FAST_WALK
 #  define USE_FAST_WALK
