@@ -53,9 +53,7 @@ static const int V = 2;
 //
 // THRESHOLDING CONSTANTS
 // Constants pertaining to object detection and horizon detection
-#if ROBOT(AIBO)
-static const int MIN_RUN_SIZE = 2;
-#elif ROBOT(NAO)
+#if ROBOT(NAO)
 static const int MIN_RUN_SIZE = 25;
 #endif
 // we're more demanding of Green because there is so much
@@ -177,15 +175,7 @@ class Threshold
 */
 #else
 
-#if ROBOT(AIBO)
-  inline uchar getCorrY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+x]; }
-  inline uchar getCorrU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+x]; }
-  inline uchar getCorrV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+x]; }
-
-  inline uchar getY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+x]; }
-  inline uchar getU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+x]; }
-  inline uchar getV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+x]; }
-#elif ROBOT(NAO_RL)
+#if ROBOT(NAO_RL)
   inline uchar getCorrY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
   inline uchar getCorrU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
   inline uchar getCorrV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
@@ -216,9 +206,6 @@ class Threshold
   ObjectFragments *green;
   ObjectFragments *navyblue;
   ObjectFragments *red;
-#ifdef USE_PINK_BALL
-  ObjectFragments *ballPink;
-#endif
 
   // can keep these arrays at hi-res size ...at any resolution
   //int sawYellowBlue[IMAGE_WIDTH];

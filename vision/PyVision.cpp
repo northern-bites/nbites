@@ -1085,10 +1085,6 @@ PyVision_dealloc (PyVision* self)
   Py_XDECREF(self->bglp);
   Py_XDECREF(self->ygrp);
   Py_XDECREF(self->yglp);
-#if ROBOT(AIBO)
-  Py_XDECREF(self->bgBackstop);
-  Py_XDECREF(self->ygBackstop);
-#endif
   Py_XDECREF(self->red1);
   Py_XDECREF(self->red2);
   Py_XDECREF(self->navy1);

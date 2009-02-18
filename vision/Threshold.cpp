@@ -76,14 +76,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #endif
 
 #ifdef USE_CHROMATIC_CORRECTION
-#  if ROBOT(AIBO)
-#    if defined(OFFLINE)
-  initChromeTable("../tables/chrome/chrome.all");
-#    else
-  initChromeTable("/MS/chrome.all");
-#    endif
-
-#  elif ROBOT(NAO)
+#  if ROBOT(NAO)
   // So far as we know there is no chromatic distortion
 #    error No chromatic correction for the Nao robots
 
@@ -95,11 +88,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 
 
   // loads the color table on the MS into memory
-#if ROBOT(AIBO)
-#  ifndef OFFLINE
-  initCompressedTable("/MS/table.mtb");
-#  endif
-#elif ROBOT(NAO_RL)
+#if ROBOT(NAO_RL)
 # ifndef OFFLINE
   initTable("/opt/naoqi/modules/etc/table.mtb");
 #endif
@@ -121,11 +110,6 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
   orange->setColor(ORANGE);
   green = new ObjectFragments(vision,this);
   green->setColor(GREEN);
-
-#ifdef USE_PINK_BALL
-  ballPink = new ObjectFragments(vision,this);
-  ballPink->setColor(PINK);
-#endif
 
   // initialize the thresholded array to BLACK
   /*for (int i = 0; i < IMAGE_WIDTH; i++) {
@@ -343,14 +327,6 @@ void Threshold::thresholdAndRuns() {
 	  if (currentRun > 1 && j + currentRun > blue->horizonAt(i) - 10)
 	    orange->newRun(i, j, currentRun);
 	  break;
-#ifdef USE_PINK_BALL
-	case PINK:
-
-	  if(currentRun > 1){
-	    ballPink->newRun(i,j,currentRun);
-	  }
-	  break;
-#endif
 	case YELLOW:
 	  // add to Yellow data structure
 	  if (currentRun >= MIN_RUN_SIZE && (j < blue->horizonAt(i)  || currentRun > MIN_RUN_SIZE + 1)) {
@@ -586,9 +562,6 @@ void Threshold::threshold() {
 #ifdef USE_CHROMATIC_CORRECTION
   const unsigned char *rPtr; // pointer into xLUT array
 #endif
-#if ROBOT(AIBO)
-  const unsigned char *uStart;
-#endif
 
   // My loop variable initializations
   yPtr = &yplane[0];
@@ -602,72 +575,7 @@ void Threshold::threshold() {
   rPtr = &xLUT[0][0];
 #endif
 
-#if ROBOT(AIBO)
-  m = IMAGE_WIDTH % 8;
-
-  while (tPtr < tEnd) {
-
-    // number of non-unrolled offset from beginning of row
-    tOff = tPtr + m;
-    // start of U data (end of row reached)
-    uStart = uPtr;
-
-    // here is non-unrolled loop
-    while (tPtr < tOff)
-#ifdef USE_CHROMATIC_CORRECTION
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-#else
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-#endif
-
-    // here is the unrolled loop
-    while (yPtr < uStart && tPtr < tEnd) {
-      // Eight unrolled table lookups
-#ifdef USE_CHROMATIC_CORRECTION
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr++][*rPtr++]>>VSHIFT];
-#else
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-      *tPtr++ = bigTable[*yPtr++>>YSHIFT][*uPtr++>>USHIFT][*vPtr++>>VSHIFT];
-#endif
-    }
-    // Jump over
-    yPtr += ROW_OFFSET - IMAGE_WIDTH;
-    uPtr += ROW_OFFSET - IMAGE_WIDTH;
-    vPtr += ROW_OFFSET - IMAGE_WIDTH;
-  }
-
-#elif ROBOT(NAO_SIM)
+#if ROBOT(NAO_SIM)
     m = (IMAGE_WIDTH * IMAGE_HEIGHT) % 8;
 
     // number of non-unrolled offset from beginning of row
@@ -927,14 +835,6 @@ void Threshold::runs() {
 	    lastGoodPixel = j;
 	  }
 	  break;
-#ifdef USE_PINK_BALL
-	case PINK:
-
-	  if(currentRun > 1){
-	    ballPink->newRun(i,j,currentRun);
-	  }
-	  break;
-#endif
 	case YELLOW:
 	  // add to Yellow data structure
 	  if (currentRun >= MIN_RUN_SIZE) {
@@ -1248,62 +1148,6 @@ print("   Theshold::objectRecognition");
   bool blp = vision->bglp->getWidth() > 0;
   bool brp = vision->bgrp->getWidth() > 0;
 
-#if ROBOT(AIBO)
-  // check if we saw a post - if so, then screen goals that are too close
-  if (vision->by->getDistance() > 0 || vision->yb->getDistance() > 0) {
-    // we can't see the yb and by posts at the same time, so pick the larger one
-    if (vision->yb->getWidth() > 0 && vision->by->getWidth() > 0) {
-      if (vision->yb->getWidth() > vision->by->getWidth())
-	vision->by->init();
-      else
-	vision->yb->init();
-    }
-    // nothing can be too close
-    int byX = vision->by->getX();
-    int byX2 = vision->by->getRightTopX();
-    if (vision->yb->getDistance() > 0) {
-      byX = vision->yb->getX();
-      byX2 = vision->yb->getRightTopX();
-    }
-    if (ylp && distance(byX, byX2,
-			vision->yglp->getX(), vision->yglp->getRightTopX()) <
-	MIN_SPLIT) {
-      vision->yglp->init();
-      ylp = false;
-    }
-    if (yrp && distance(byX, byX2,
-			vision->ygrp->getX(), vision->ygrp->getRightTopX()) <
-	MIN_SPLIT) {
-      vision->ygrp->init();
-      yrp = false;
-    }
-    if (blp && distance(byX, byX2,
-			vision->bglp->getX(), vision->bglp->getRightTopX()) <
-	MIN_SPLIT) {
-      vision->bglp->init();
-      blp = false;
-    }
-    if (brp && distance(byX, byX2,
-			vision->bgrp->getX(), vision->bgrp->getRightTopX()) <
-	MIN_SPLIT) {
-      vision->bgrp->init();
-      brp = false;
-    }
-    if (vision->ygBackstop->getWidth() > 0 &&
-	distance(byX, byX2,
-		 vision->ygBackstop->getX(), vision->ygBackstop->getRightTopX())
-	< MIN_SPLIT) {
-      vision->ygBackstop->init();
-    }
-    if (vision->bgBackstop->getWidth() > 0 &&
-	distance(byX, byX2,
-		 vision->bgBackstop->getX(), vision->bgBackstop->getRightTopX())
-	< MIN_SPLIT) {
-      vision->bgBackstop->init();
-    }
-  }
-#endif
-
   if ((ylp || yrp) && (blp || brp)) {
     // we see blue and yellow goal posts!
     // if we see two of either then use that color'
@@ -1377,13 +1221,6 @@ print("   Theshold::objectRecognition");
   else
     orange->createObject(pose->getHorizonY(0));
 
-#ifdef USE_PINK_BALL
-    if (horizon < IMAGE_HEIGHT)
-      ballPink->createObject(horizon);
-    else
-      ballPink->createObject(pose->getHorizonY(0));
-#endif
-
 #if ROBOT(NAO)
     if (ylp || yrp) {
       yellow->bestShot(vision->ygrp, vision->yglp, vision->ygBackstop);
@@ -1418,10 +1255,6 @@ print("   Theshold::objectRecognition");
  */
 void Threshold::storeFieldObjects() {
 
-#if ROBOT(AIBO)
-  setFieldObjectInfo(vision->yb);
-  setFieldObjectInfo(vision->by);
-#endif
   setFieldObjectInfo(vision->yglp);
   setFieldObjectInfo(vision->ygrp);
   setFieldObjectInfo(vision->bglp);
@@ -1430,11 +1263,8 @@ void Threshold::storeFieldObjects() {
   vision->bgBackstop->setFocDist(0.0); // sometimes set to 1.0 for some reason
   vision->ygBackstop->setDistance(0.0); // sometimes set to 1.0 for some reason
   vision->bgBackstop->setDistance(0.0); // sometimes set to 1.0 for some reason
-#if ROBOT(AIBO)
-  // FIXME - need to add this stuff to Nao Vision, or unify Vision
-  setFieldObjectInfo(vision->blueArc);
-  setFieldObjectInfo(vision->yellowArc);
-#elif ROBOT(NAO)
+
+#if ROBOT(NAO)
   setVisualRobotInfo(vision->red1);
   setVisualRobotInfo(vision->red2);
   setVisualRobotInfo(vision->navy1);
@@ -1536,47 +1366,11 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
       // sanity check: throw ridiculous distance estimates out
       // constants in Threshold.h
       if (dist < POST_MIN_FOC_DIST ||
-	  dist > POST_MAX_FOC_DIST) {
-	dist = 0.0;
+          dist > POST_MAX_FOC_DIST) {
+          dist = 0.0;
       }
       objPtr->setDistance(dist);
-    }
-#if ROBOT(AIBO)
-    // if object is a beacon
-    else if (objPtr == vision->yb || objPtr == vision->by) {
-      float dist = 0.0;
-
-      // get beacon distance always from height
-      dist = getBeaconDistFromHeight(objPtr->getHeight());
-
-      // sanity check: throw out ridiculous post estimates
-      // constants in Threshold.h
-      if (dist < BEACON_MIN_FOC_DIST ||
-	  dist > BEACON_MAX_FOC_DIST) {
-	dist = 0.0;
-      }
-
-      //ANDREW- temp fix, should track down why bad distances are occuring
-      if ((vision->getPlayerNumber()) == 1){
-	if(dist < GOALIE_BEACON_MIN_FOC_DIST ||
-	   dist > GOALIE_BEACON_MAX_FOC_DIST){
-	  dist = 0.0;
-	}
-      }
-
-
-      objPtr->setDistance(dist);
-    }
-#endif
-    // if object is an arc
-#if ROBOT(AIBO)
-    else if (objPtr == vision->blueArc || objPtr == vision->yellowArc) {
-      objPtr->setDistance(10.0);
-    }
-#endif
-
-    // don't know what object it is
-    else {
+    } else { // don't know what object it is
       //print("setFieldObjectInfo: unrecognized FieldObject");
       return;
     }
@@ -1699,9 +1493,6 @@ void Threshold::initObjects(void) {
   vision->navy2->init();
   // balls
   vision->ball->init();
-#ifdef USE_PINK_BALL
-  vision->pinkBall->init();
-#endif
 } // initObjects
 
 /* Initializes all the color data structures.
@@ -1713,9 +1504,6 @@ void Threshold::initColors() {
   yellow->init(pose->getHorizonSlope());
   red->init(pose->getHorizonSlope());
   navyblue->init(pose->getHorizonSlope());
-#ifdef USE_PINK_BALL
-  ballPink->init(pose->getHorizonSlope());
-#endif
 }
 
 /* This function loads a table file with the given file name
@@ -1733,14 +1521,6 @@ void Threshold::initTable(std::string filename) {
     print("initTable() FAILED to open filename: %s", filename.c_str());
 #ifdef OFFLINE
     exit(0);
-#elif ROBOT(AIBO)
-    print("Exiting..");
-    // crash
-    //OBootCondition bootCond;
-    //OPENR::GetBootCondition(&bootCond);
-    //OPENR::Shutdown(bootCond);
-    int x = 0;
-    x = 1/x;
 #else
     return;
 #endif
@@ -1917,10 +1697,7 @@ void Threshold::setYUV(const uchar* newyuv) {
   yplane = yuv;
 
   if (!inverted) {
-#if ROBOT(AIBO)
-    uplane = yplane + IMAGE_WIDTH;
-    vplane = yplane + IMAGE_WIDTH * 2;
-#elif ROBOT(NAO_RL)
+#if ROBOT(NAO_RL)
     // I've reversed the U and V planes, in addition to offsetting them, as the
     // color table format is still reversed
     uplane = yplane + 3; // normally, is 1, but with reversed tables, is 1
@@ -1932,10 +1709,7 @@ void Threshold::setYUV(const uchar* newyuv) {
 
   }else {
     // inverted
-#if ROBOT(AIBO)
-    uplane = yplane + IMAGE_WIDTH * 2;
-    vplane = yplane + IMAGE_WIDTH;
-#elif ROBOT(NAO)
+#if ROBOT(NAO)
     // this is actually the correct (non-inverted) settings, but again, with
     // our color tables, inverted=non-inverted and non-inverted=inverted
     uplane = yplane + 1;

@@ -59,9 +59,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
   red2 = new VisualRobot();
   navy1 = new VisualRobot();
   navy2 = new VisualRobot();
-#ifdef USE_PINK_BALL
-  pinkBall = new Ball(this); //added for pink ball recognition
-#endif
+
   thresh = new Threshold(this, pose);
   fieldLines = new FieldLines(this, pose);
   // pose handled in default contructor
@@ -130,7 +128,6 @@ std::string Vision::getThreshColor(int _id) {
   case BLUE: return "BLUE";
   case GREEN: return "GREEN";
   case YELLOW: return "YELLOW";
-  //case PINK: return "PINK";
   case BLACK: return "BLACK";
   case RED: return "RED";
   case NAVY: return "NAVY";
@@ -162,7 +159,8 @@ std::string Vision::getRobotName() {
    -Ball
    -Dogs
 */
-void Vision::drawBoxes(void) {
+void Vision::drawBoxes(void)
+{
 
   // draw field objects
   if(bglp->getDistance() > 0) drawFieldObject(bglp,RED);
@@ -171,22 +169,12 @@ void Vision::drawBoxes(void) {
   if(ygrp->getDistance() > 0) drawFieldObject(ygrp,BLACK);
   if(ygBackstop->getHeight() > 0) drawBackstop(ygBackstop, BLUE);
   if(bgBackstop->getHeight() > 0) drawBackstop(bgBackstop, YELLOW);
-#if ROBOT(AIBO)
-  if(by->getDistance() > 0) drawFieldObject(by,GREEN);
-  if(yb->getDistance() > 0) drawFieldObject(yb,ORANGE);
-#endif
 
   // balls
   // orange
   if(ball->getWidth() > 0)
     drawRect(ball->getX(), ball->getY(),
 	     ROUND(ball->getWidth()), ROUND(ball->getHeight()), PINK);
-  // pink
-#ifdef USE_PINK_BALL
-  if(pinkBall->getWidth() > 0)
-    drawRect(pinkBall->getX(), pinkBall->getY(),
-	     ROUND(pinkBall->getWidth()), ROUND(pinkBall->getHeight()), BLUE);
-#endif
 
   // lines
   drawFieldLines();

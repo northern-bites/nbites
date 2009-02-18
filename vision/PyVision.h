@@ -11,9 +11,6 @@
 #if ROBOT(NAO)
 #  define MODULE_HEAD "nao"
 #  define MODULE_INIT(tail) (initnao ## tail)
-#elif ROBOT(AIBO)
-#  define MODULE_HEAD "aibo"
-#  define MODULE_INIT(tail) (initaibo ## tail)
 #else
 #  error "Undefined robot type"
 #endif
