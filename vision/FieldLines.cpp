@@ -161,12 +161,6 @@ void FieldLines::lineLoop() {
   //timeInJoinLines += (vision->getMillisFromStartup() - startTime);
 
 
-#if ROBOT(AIBO)
-  //startTime = vision->getMillisFromStartup();
-  fitUnusedPoints(linesList, linePoints);
-  //timeInFitUnusedPoints += (vision->getMillisFromStartup() - startTime);
-#endif
-
   // unusedPoints is a global member of FieldLines; is used by vision to draw
   // points on the screen
   // TODO:  eliminate copying?
@@ -181,27 +175,6 @@ void FieldLines::lineLoop() {
   //startTime = vision->getMillisFromStartup();
   cornersList = intersectLines(linesList);
   //timeInIntersectLines += (vision->getMillisFromStartup() - startTime);
-
-
-#if ROBOT(AIBO)
-  // Goalies will not be near the center circle so we can save ourselves a check
-  if (!isGoalie && cornersList.size() > 0) {
-    //startTime = vision->getMillisFromStartup();
-    if (probablyAtCenterCircle(linesList, cornersList)) {
-      if (debugCcScan || debugIntersectLines || debugIdentifyCorners)
-        cout << "Probably at center circle.  Clearing all corners." << endl;
-      if (standardView) {
-        drawCorners(cornersList, UNUSED_INTERSECTION_POINT_COLOR);
-      }
-      else {
-        // recolor them so we can tell they are illegitimate
-        drawCorners(cornersList, INVALIDATED_INTERSECTION_POINT_COLOR);
-      }
-      cornersList.clear();
-    }
-    //timeInCenterCircleScan += (vision->getMillisFromStartup() - startTime);
-  }
-#endif
 
   ++numFrames;
 
@@ -278,27 +251,6 @@ void FieldLines::afterObjectFragments() {
     removeRiskyCorners(cornersList);
   }
 
-
-#if ROBOT(AIBO)
-  // Goalies will not be near the center circle so we can save ourselves a check
-  if (!isGoalie && cornersList.size() > 0) {
-    //startTime = vision->getMillisFromStartup();
-    if (probablyAtCenterCircle2(linesList, cornersList)) {
-      if (debugCcScan || debugIntersectLines || debugIdentifyCorners)
-        cout << "Probably at center circle.  Clearing all corners." << endl;
-      if (standardView) {
-        drawCorners(cornersList, UNUSED_INTERSECTION_POINT_COLOR);
-      }
-      else {
-        // recolor them so we can tell they are illegitimate
-        drawCorners(cornersList, INVALIDATED_INTERSECTION_POINT_COLOR);
-      }
-      cornersList.clear();
-    }
-    //timeInCenterCircleScan += (vision->getMillisFromStartup() - startTime);
-  }
-#endif
-
   identifyCorners(cornersList);
 }
 
@@ -351,12 +303,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
     if (debugVertEdgeDetect)
       printf("\tColumn #%d:\n", x);
 
-#if ROBOT(AIBO)
-    int stopY = min(vision->thresh->getVisionHorizon(),
-                    pose->getHorizonY(x) - PIXELS_TO_USE_ABOVE_HORIZON);
-#elif ROBOT(NAO)
     int stopY = vision->thresh->getVisionHorizon();
-#endif
 
     // We start at the second to last pixel because we will be examining
     // transitions between adjacent pixels, so the first step would be to
@@ -998,24 +945,6 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
     return false;
   }
 
-#if ROBOT(AIBO)
-  if (distance > 70) {
-    if (debugVertEdgeDetect && width >= 20) {
-      cout << "Line was too thick; found width of " << width << " expected max of 20" << endl;
-    }
-    return width < 20;
-  }
-  else if (distance > 40) {
-    if (debugVertEdgeDetect && width >= 30) {
-      cout << "Line was too thick; found width of " << width << " expected max of 30" << endl;
-    }
-    return width < 30;
-  }
-  else
-    return true;
-
-
-#elif ROBOT(NAO)
   //return true;
 
   // These are based on 640x480 images
@@ -1034,7 +963,6 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
     return width < 7;
   else
   return width < 5;
-#endif
 }
 
 // TODO: Gross unnamed constants that are probably wrong
@@ -1054,28 +982,11 @@ const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
     return false;
   }
 
-#if ROBOT(AIBO)
-  // When it's far away (like a beacon) it has to be thinner
-  if (distance > 75) {
-    return width < 18;
-  }
-  else if (distance > 55) {
-    return width < 30;
-  }
-  // Close ones can be really thick, say 40 pixels
-  else if (distance > 40) {
-    return width < 40;
-  }
-  else {
-    return true;
-  }
-#elif ROBOT(NAO)
   // These are based on 640x480 images
   // See https://robocup.bowdoin.edu/files/nao/NaoLineWidthData.xls
   //const int ERROR_ALLOWED = 8;
   //return true;
   return width < 6111.8 * pow((double)distance, -1.0701);
-#endif
 }
 
 
@@ -2542,14 +2453,6 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
       cout << endl << "Before identification: Corner: " << *i << endl;
     }
 
-#if ROBOT(AIBO)
-    // Determine if the L corner should really be a T
-    if ((i->getShape() == INNER_L || i->getShape() == OUTER_L) &&
-        LCornerShouldBeTCorner(*i)) {
-      i->setShape(T);
-    }
-#endif
-
     // Get all the possible corners given the shape of the corner
     const list <const ConcreteCorner*> possibleCorners =
       ConcreteCorner::getPossibleCorners(i->getShape());
@@ -2614,25 +2517,6 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
     cout << "Testing to see if corner should be classified as a T."
          << endl;
   }
-
-  // Nao fields do not have beacons
-#if ROBOT(AIBO)
-  const int NUM_BEACONS = 2;
-  const VisualFieldObject * beacons[NUM_BEACONS] = {vision->by, vision->yb};
-
-
-  for (int i = 0; i < NUM_BEACONS; ++i) {
-    if (beacons[i]->getDistance() > 0 && beacons[i]->getDistance() < CLOSE_DIST) {
-      if (!LWorksWithBeacon(L, beacons[i])) {
-        if (debugIdentifyCorners) {
-          cout << "\tCorner should be classified as a T due to its proximity "
-               << "to a beacon; real L corners are farther away." << endl;
-        }
-        return true;
-      }
-    }
-  }
-#endif
 
   const int NUM_POSTS = 4;
   const VisualFieldObject * posts[NUM_POSTS] = {vision->bglp, vision->bgrp,
@@ -2775,104 +2659,6 @@ eliminateImpossibleIDs(VisualCorner &c,
   }
 
   unsigned int originalSize = possibleClassifications.size();
-
-
-#if ROBOT(AIBO)
-  // Impossible to see any field objects (other than arcs)
-  // from inner L's at corner of screen when using an AIBO
-  if (c.getShape() == INNER_L && visibleObjects.size() > 0) {
-    list<const ConcreteCorner*>::iterator eliminatedIDs =
-      remove_if(possibleClassifications.begin(), possibleClassifications.end(),
-                CornerOfField());
-
-    // We found at least one to eliminate
-    if (eliminatedIDs != possibleClassifications.end()) {
-      possibleClassifications.erase(eliminatedIDs,
-                                    possibleClassifications.end());
-    }
-  }
-#endif
-
-  // Since aibo cameras are limited to such a small area of the field, if we
-  // see a close post in the frame, none of the corners in the frame could be
-  // anywhere excelt close to the goal (either the left T, right T, or left goal
-  // L, right goal L
-#if ROBOT(AIBO)
-  // If we see an unsure yellow post we cannot be near the beacons or the
-  // blue goal, because the Vision system only gives uncertain posts
-  // when close to the post
-  if (unsureYellowPostOnScreen() || yellowPostCloseToCorner(c)) {
-    if (debugIdentifyCorners) {
-      cout << "Yellow post close on screen, eliminating all "
-           << "possibilities not near yellow goal" << endl;
-    }
-
-    list <const ConcreteCorner*>::iterator badIDs =
-      remove_if(possibleClassifications.begin(),
-                possibleClassifications.end(),
-                not1(InList(ConcreteCorner::yellowGoalCorners)));
-    // We found at least one to be eliminated...
-    if (badIDs != possibleClassifications.end()) {
-      possibleClassifications.erase(badIDs, possibleClassifications.end());
-    }
-  }
-
-  // If we see an unsure blue post we cannot be near the beacons or the
-  // yellow goal, because the Vision system only gives uncertain posts
-  // when close
-  if (unsureBluePostOnScreen() || bluePostCloseToCorner(c)) {
-    if (debugIdentifyCorners) {
-      cout << "Blue post close on screen, eliminating all possibilities "
-           << "not near blue goal" << endl;
-    }
-    list <const ConcreteCorner*>::iterator badIDs =
-      remove_if(possibleClassifications.begin(),
-                possibleClassifications.end(),
-                not1(InList(ConcreteCorner::blueGoalCorners)));
-    // We found at least one to eliminate
-    if (badIDs != possibleClassifications.end()) {
-      possibleClassifications.erase(badIDs, possibleClassifications.end());
-    }
-  }
-#endif
-
-
-
-
-  // There are no arcs for Naos.
-#if ROBOT(AIBO)
-  // If there's a yellow arc on screen, eliminate all those corners not near
-  // yellow arc
-  if (yellowArcOnScreen()) {
-    if (debugIdentifyCorners) {
-      cout << "Sure yellow arc on screen, eliminating all possibilities not "
-           << "near yellow arc" << endl;
-    }
-    list <const ConcreteCorner*>::iterator badIDs =
-      remove_if(possibleClassifications.begin(),
-                possibleClassifications.end(),
-                not1(InList(ConcreteCorner::yellowArcCorners)));
-    // We found at least one to eliminate
-    if (badIDs != possibleClassifications.end()) {
-      possibleClassifications.erase(badIDs, possibleClassifications.end());
-    }
-  }
-  // Ditto for blue
-  if (blueArcOnScreen()) {
-    if (debugIdentifyCorners) {
-      cout << "Sure blue arc on screen, eliminating all possibilities not "
-           << "near blue arc" << endl;
-    }
-    list <const ConcreteCorner*>::iterator badIDs =
-      remove_if(possibleClassifications.begin(),
-                possibleClassifications.end(),
-                not1(InList(ConcreteCorner::blueArcCorners)));
-    // We found at least one to eliminate
-    if (badIDs != possibleClassifications.end()) {
-      possibleClassifications.erase(badIDs, possibleClassifications.end());
-    }
-  }
-#endif
 
   if (debugIdentifyCorners) {
     cout << "Removed " << (originalSize - possibleClassifications.size())
@@ -3065,13 +2851,8 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
   bool print = (direction == VERTICAL && debugVertEdgeDetect) ||
     (direction == HORIZONTAL && debugHorEdgeDetect);
 
-#if ROBOT(AIBO)
-  int MIN_GREEN_PIXELS_TO_TEST = 3;
-  int MAX_GREEN_PIXELS_TO_TEST = 5;
-#elif ROBOT(NAO)
   int MIN_GREEN_PIXELS_TO_TEST = 3;
   int MAX_GREEN_PIXELS_TO_TEST = NUM_TEST_PIXELS;
-#endif
 
   // Idea:  For lines at the edge of the field that are far away there is
   // VERY little green above them.  Rather than test a constant number
@@ -3360,53 +3141,6 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
       }
       corners.erase(riskyCorners, corners.end());
     }
-
-#if ROBOT(AIBO)
-    int numInnerL = count_if(corners.begin(), corners.end(), cornerShapeEquals(INNER_L));
-
-    if (numInnerL >= 2) {
-      if (debugRiskyCorners || debugIdentifyCorners) {
-        cout << "Removing " << numInnerL << " inner L corners because "
-             << "there are no field objects on the screen and at least one of "
-             << "the corners must be incorrect." << endl;
-      }
-      riskyCorners = remove_if(corners.begin(), corners.end(),
-                               cornerShapeEquals(INNER_L));
-      corners.erase(riskyCorners, corners.end());
-    }
-
-    int numOuterL = count_if(corners.begin(), corners.end(),
-                             cornerShapeEquals(OUTER_L));
-
-
-
-    // Due to aibo limitations, we never see more than 1 outer L legitimately
-    if (numOuterL >= 2) {
-      if (debugRiskyCorners || debugIdentifyCorners) {
-        cout << "Removing " << numOuterL << " outer L corners because "
-             << "there are no field objects on the screen and at least one of "
-             << "the corners must be incorrect." << endl;
-      }
-      riskyCorners = remove_if(corners.begin(), corners.end(),
-                               cornerShapeEquals(OUTER_L));
-      corners.erase(riskyCorners, corners.end());
-    }
-
-    int numT = count_if(corners.begin(), corners.end(),
-                             cornerShapeEquals(T));
-    if (numT >= 2) {
-      if (debugRiskyCorners || debugIdentifyCorners) {
-        cout << "Removing " << numT << " T corners because there are "
-             << "no field objects on the screen at at least one of the corners must "
-             << "be incorrect." << endl;
-      }
-      riskyCorners = remove_if(corners.begin(), corners.end(),
-                               cornerShapeEquals(T));
-      corners.erase(riskyCorners, corners.end());
-    }
-
-#endif
-
   }
 
   if (debugRiskyCorners || debugIdentifyCorners) {
@@ -3674,9 +3408,6 @@ vector <const VisualFieldObject*> FieldLines::getVisibleFieldObjects() const {
         // We don't want to identify corners based on posts that aren't sure,
         // for instance
         allFieldObjects[i]->getIDCertainty() == _SURE) {
-#if ROBOT(AIBO)
-      visibleObjects.push_back(allFieldObjects[i]);
-#elif ROBOT(NAO)
       // With the Nao we need to make sure that the goal posts are near the
       // green of the field in order to use them for distance
       if (ConcreteFieldObject::isGoal(allFieldObjects[i]->getID()) &&
@@ -3686,9 +3417,6 @@ vector <const VisualFieldObject*> FieldLines::getVisibleFieldObjects() const {
       else {
         visibleObjects.push_back(allFieldObjects[i]);
       }
-
-
-#endif
     }
   }
   return visibleObjects;

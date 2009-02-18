@@ -131,12 +131,7 @@ class FieldLines {
   static const int VERTICAL_TRANSITION_VALUE = 30;
   static const int HORIZONTAL_TRANSITION_VALUE = 30;
 
-#if ROBOT(AIBO)
-  // AIBOSPECIFIC
-  static const int NUM_TEST_PIXELS = 5;
-#elif ROBOT(NAO)
   static const int NUM_TEST_PIXELS = 15;
-#endif
 
   static const int NUM_GREEN_COLORS = 2;
   static const int FIELD_COLORS[NUM_GREEN_COLORS];
@@ -187,13 +182,7 @@ class FieldLines {
   // them in order for us to check their angle
   static const int MIN_PIXEL_DIST_TO_CHECK_ANGLE = 2;
 
-#if ROBOT(AIBO)
-  // This is the max allowed angle between a line and the new segment we are
-  // trying to add to a line; this replaces the need for slope sanity checks.
-  static const int MAX_ANGLE_LINE_SEGMENT = 8;
-#elif ROBOT(NAO)
   static const int MAX_ANGLE_LINE_SEGMENT = 4;
-#endif
 
 
   static const int MAX_GREEN_PERCENT_ALLOWED_IN_LINE = 15;
@@ -213,11 +202,7 @@ class FieldLines {
   static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
   static const int MAX_ANGLE_TO_JOIN_LINES = 5;
 
-#if ROBOT(AIBO)
-  static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 5;
-#elif ROBOT(NAO)
   static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 15;
-#endif
 
 
   ////////////////////////////////////////////////////////////
@@ -250,33 +235,19 @@ class FieldLines {
   static const int DUPE_MIN_X_SEPARATION = 15;
   static const int DUPE_MIN_Y_SEPARATION = 15;
 
-#if ROBOT(NAO)
   static const int MAX_CORNER_DISTANCE = 600;
   static const int MIN_CORNER_DISTANCE = 10;
-#elif ROBOT(AIBO)
-  static const int MAX_CORNER_DISTANCE = 160;
-  static const int MIN_CORNER_DISTANCE = 10;
-#endif
-
 
   static const int CORNER_TEST_RADIUS = 1;
 
-
-#if ROBOT(AIBO)
-  static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 12;
-#elif ROBOT(NAO)
   static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 10;
-#endif
+
   // AIBOSPECIFIC
   static const int MIN_CROSS_EXTEND = 10;
   // When estimating the angle between two lines on the field, anything less than
   // MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect and
   // disallowed; ideally our estimates would always be 90.0 degrees
-#if ROBOT(NAO)
   static const int MIN_ANGLE_ON_FIELD = 70;
-#elif ROBOT(AIBO)
-  static const int MIN_ANGLE_ON_FIELD = 60;
-#endif
   static const int MAX_ANGLE_ON_FIELD = 120;
   // AIBOSPECIFIC
   static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
@@ -318,8 +289,6 @@ class FieldLines {
   ////////////////////////////////////////////////////////////
   // AIBOSPECIFIC
   // Distance in centimeters
-#if ROBOT(AIBO)
-  static const int MAXIMUM_DIST_TO_USE_PIX_ESTIMATE = 0;
 #elif ROBOT(NAO)
   static const int MAXIMUM_DIST_TO_USE_PIX_ESTIMATE = 400;
 #endif
