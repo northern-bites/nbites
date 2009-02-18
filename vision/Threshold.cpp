@@ -75,18 +75,6 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
   visualHorizonDebug = false;
 #endif
 
-#ifdef USE_CHROMATIC_CORRECTION
-#  if ROBOT(NAO)
-  // So far as we know there is no chromatic distortion
-#    error No chromatic correction for the Nao robots
-
-#  else
-#    error Undefined robot type
-
-#  endif // ROBOT(...)
-#endif // USE_CHROMATIC_CORRECTION
-
-
   // loads the color table on the MS into memory
 #if ROBOT(NAO_RL)
 # ifndef OFFLINE
@@ -203,10 +191,6 @@ void Threshold::thresholdAndRuns() {
   register unsigned int address = ADDRESS_START;
 
   unsigned char pixel;
-#ifdef USE_CHROMATIC_CORRECTION
-  unsigned char radius;
-#endif
-
 
   //printf("Horizon (l,r,pan):\t%d\t%d\t%g\n",pose->getLeftHorizonY(),pose->getRightHorizonY(),RAD2DEG(pose->getPan()));
 
@@ -230,12 +214,6 @@ void Threshold::thresholdAndRuns() {
     int firstRed = -1, lastRed = -1;
 
     for (register int j = IMAGE_HEIGHT; j--; ) {//j > -1 ; j--) { //scan up
-#ifdef USE_CHROMATIC_CORRECTION
-      radius = xLUT[i][j];
-      pixel = bigTable[corrY[yplane[address]][radius]>>YSHIFT]
-                      [corrU[uplane[address]][radius]>>USHIFT]
-                      [corrV[vplane[address]][radius]>>VSHIFT];
-#else
 #if ROBOT(NAO_SIM)
       pixel = bigTable[yplane[j*IMAGE_WIDTH*3 + 3*i + 0]>>YSHIFT]
                       [yplane[j*IMAGE_WIDTH*3 + 3*i + 1]>>USHIFT]
@@ -245,7 +223,6 @@ void Threshold::thresholdAndRuns() {
       pixel = bigTable[yplane[address]>>YSHIFT]
                       [uplane[address]>>USHIFT]
                       [vplane[address]>>VSHIFT];
-#endif
 #endif
       newPixel = thresholded[j][i] = pixel;
 
@@ -416,19 +393,10 @@ print("   Theshold::SweepLeft");
     //lastYellow = yellowpix;
     for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1; i++) {
 	int address = scanY * IMAGE_ROW_OFFSET + i;
-#ifdef USE_CHROMATIC_CORRECTION
-	unsigned char radius = xLUT[i][j];
-	unsigned char pixel = bigTable
-	  [corrY[yplane[address]][radius]>>YSHIFT]
-	  [corrU[uplane[address]][radius]>>USHIFT]
-	  [corrV[vplane[address]][radius]>>VSHIFT];
-
-#else
 	unsigned char pixel = bigTable
 	  [yplane[address]>>YSHIFT]
 	  [uplane[address]>>USHIFT]
 	  [vplane[address]>>VSHIFT];
-#endif
 
 	newPixel = pixel;
 
@@ -448,19 +416,10 @@ print("   Theshold::SweepLeft");
 		for (l = 0; l < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE && greenPixels < 20; l++) {
 		  //drawPoint(l, scanY, BLACK);
 		  int address = scanY * IMAGE_ROW_OFFSET + l;
-#ifdef USE_CHROMATIC_CORRECTION
-		  unsigned char radius = xLUT[l][k];
-		  unsigned char pixel = bigTable
-		    [corrY[yplane[address]][radius]>>YSHIFT]
-		    [corrU[uplane[address]][radius]>>USHIFT]
-		    [corrV[vplane[address]][radius]>>VSHIFT];
-
-#else
 		  unsigned char pixel = bigTable
 		    [yplane[address]>>YSHIFT]
 		    [uplane[address]>>USHIFT]
 		    [vplane[address]>>VSHIFT];
-#endif
 
 		  newPixel = pixel;
 		  if (newPixel == GREEN) {
@@ -511,19 +470,10 @@ print("   Theshold::SweepLeft");
   run = 0;
   for (i = 0; i < IMAGE_WIDTH; i++) {
     int address = j * IMAGE_ROW_OFFSET + i;
-#ifdef USE_CHROMATIC_CORRECTION
-    unsigned char radius = xLUT[i][j];
-    unsigned char pixel = bigTable
-      [corrY[yplane[address]][radius]>>YSHIFT]
-      [corrU[uplane[address]][radius]>>USHIFT]
-      [corrV[vplane[address]][radius]>>VSHIFT];
-
-#else
     unsigned char pixel = bigTable
       [yplane[address]>>YSHIFT]
       [uplane[address]>>USHIFT]
       [vplane[address]>>VSHIFT];
-#endif
     newPixel = pixel;
     switch (newPixel) {
     case GREEN:
@@ -559,9 +509,6 @@ void Threshold::threshold() {
   int m;
   unsigned char *tPtr, *tEnd, *tOff; // pointers into thresholded array
   const unsigned char *yPtr, *uPtr, *vPtr; // pointers into image array
-#ifdef USE_CHROMATIC_CORRECTION
-  const unsigned char *rPtr; // pointer into xLUT array
-#endif
 
   // My loop variable initializations
   yPtr = &yplane[0];
@@ -571,10 +518,6 @@ void Threshold::threshold() {
   tPtr = &thresholded[0][0];
   tEnd = &thresholded[IMAGE_HEIGHT-1][IMAGE_WIDTH-1] + 1;
 
-#ifdef USE_CHROMATIC_CORRECTION
-  rPtr = &xLUT[0][0];
-#endif
-
 #if ROBOT(NAO_SIM)
     m = (IMAGE_WIDTH * IMAGE_HEIGHT) % 8;
 
@@ -583,43 +526,11 @@ void Threshold::threshold() {
 
     // here is non-unrolled loop
     while (tPtr < tOff)
-#ifdef USE_CHROMATIC_CORRECTION
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-#else
       *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-#endif
 
     // here is the unrolled loop
     while (tPtr < tEnd) {
       // Eight unrolled table lookups
-#ifdef USE_CHROMATIC_CORRECTION
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-      *tPtr++ = bigTable[corrY[*yPtr++][*rPtr  ]>>YSHIFT]
-                        [corrU[*yPtr++][*rPtr  ]>>USHIFT]
-                        [corrV[*yPtr++][*rPtr++]>>VSHIFT];
-#else
       *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
       *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
       *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
@@ -628,7 +539,6 @@ void Threshold::threshold() {
       *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
       *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
       *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-#endif
     }
 
 #elif ROBOT(NAO_RL)
@@ -645,60 +555,15 @@ void Threshold::threshold() {
     // here is non-unrolled loop (unrolled by 2, actually)
     while (tPtr < tOff) {
       // we increment Y by 2 every time, and U and V by 4 every two times
-#ifdef USE_CHROMATIC_CORRECTION
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2; uPtr+=4; vPtr+=4;
-#else
       *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
       yPtr+=2;
       *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
       yPtr+=2; uPtr+=4; vPtr+=4;
-#endif
     }
 
     // here is the unrolled loop
     while (tPtr < tEnd) {
       // Eight unrolled table lookups
-#ifdef USE_CHROMATIC_CORRECTION
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2; uPtr+=4; vPtr+=4;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2; uPtr+=4; vPtr+=4;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2; uPtr+=4; vPtr+=4;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2;
-      *tPtr++ = bigTable[corrY[*yPtr][*rPtr  ]>>YSHIFT]
-                        [corrU[*uPtr][*rPtr  ]>>USHIFT]
-                        [corrV[*vPtr][*rPtr++]>>VSHIFT];
-      yPtr+=2; uPtr+=4; vPtr+=4;
-#else
       *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
       yPtr+=2;
       *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
@@ -715,7 +580,6 @@ void Threshold::threshold() {
       yPtr+=2;
       *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
       yPtr+=2; uPtr+=4; vPtr+=4;
-#endif // USE_CHROMATIC_CORRECTION
     }
 
 #endif // ROBOT(...)
@@ -731,9 +595,6 @@ void Threshold::runs() {
   float horizonSlope;
   register int address, i, j;
   unsigned char pixel, lastPixel;
-#ifdef USE_CHROMATIC_CORRECTION
-  unsigned char radius;
-#endif
 
   // variable initializations
   hor = 0;
@@ -1199,9 +1060,6 @@ print("   Theshold::objectRecognition");
 
 
   // throw blue goal objects through a filter to eliminate noise in corners
-  //chromeFilter(vision->bglp);
-  //chromeFilter(vision->bgrp);
-  //chromeFilter(vision->bgBackstop);
   //reset these bools, incase we changed them above
   ylp = vision->yglp->getWidth() > 0;
   yrp = vision->ygrp->getWidth() > 0;
@@ -1271,48 +1129,6 @@ void Threshold::storeFieldObjects() {
   setVisualRobotInfo(vision->navy2);
 #endif
 
-}
-
-/* This filter checks to see if field object points are within the
- * region of chromatic distortion -- and if they mostly are, we throw them out
- * @param obj       The field object to check
-*/
-void Threshold::chromeFilter(VisualFieldObject *obj) {
-
-  if (obj->getHeight() <= 0 && obj->getWidth() <= 0) {
-    return;
-  }
-
-
-  // chromatic distortion filter only for blue goal objects
-  point <int> leftTop(obj->getLeftTopX(), obj->getLeftTopY());
-  point <int> rightTop(obj->getRightTopX(), obj->getRightTopY());
-  point <int> leftBottom(obj->getLeftBottomX(), obj->getLeftBottomY());
-  point <int> rightBottom(obj->getRightBottomX(), obj->getRightBottomY());
-
-  int score = 0;
-
-  if (getEuclidianDist(CENTER_IMAGE_COORD,leftTop) >
-      CHROME_FILTER_RADIAL_DIST) {
-    score++;
-  }
-  if (getEuclidianDist(CENTER_IMAGE_COORD,rightTop) >
-      CHROME_FILTER_RADIAL_DIST) {
-    score++;
-  }
-  if (getEuclidianDist(CENTER_IMAGE_COORD,leftBottom) >
-      CHROME_FILTER_RADIAL_DIST) {
-    score++;
-  }
-  if (getEuclidianDist(CENTER_IMAGE_COORD,rightBottom) >
-      CHROME_FILTER_RADIAL_DIST) {
-    score++;
-  }
-
-  if (score >= CHROME_FILTER_SCORE) {
-    //print("chromeFilter filters out object with score: %d", score);
-    obj->init();
-  }
 }
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
@@ -1616,74 +1432,6 @@ void Threshold::initCompressedTable(std::string filename){
 #endif /* NO_ZLIB */
 }
 
-/* Loads up the chromatic distortion table.
- * @param filename    the file where the data resides
- */
-void Threshold::initChromeTable(std::string filename){
-
-#ifdef USE_CHROMATIC_CORRECTION
-  for(int x = 0; x< IMAGE_WIDTH; x++){
-    for(int y =0; y < IMAGE_HEIGHT; y++){
-      xLUT[x][y] = (unsigned char)sqrt(pow(104.0-(float)x,2)+pow(80.0-(float)y,2)); //calc each distance
-      //print("(%d,%d) = %d",x,y,xLUT[x][y]);
-    }
-  }
-
-  FILE* fp;
-  printf("loading %s \n",filename.c_str());
-  fp = fopen(filename.c_str(), "r");   //open table for reading
-  if (fp == NULL) {
-    printf("initTable() FAILED to open filename: %s , exiting",
-           filename.c_str());
-#ifdef OFFLINE
-    exit(0);
-#else
-    // crash
-    int x = 0;
-    x = 1/x;
-#endif
-  }
-
-
-  //read Y channel
-  for(int i =0; i < NUM_YUV; i++){
-    fread(corrY[i], sizeof(unsigned char), YRAD, fp);
-  }
-
-  //U
-  for(int i =0; i < NUM_YUV; i++){
-    fread(corrU[i], sizeof(unsigned char), URAD, fp);
-  }
-
-  //V
-  for(int i =0; i < NUM_YUV; i++){
-    fread(corrV[i], sizeof(unsigned char), VRAD, fp);
-  }
-  /*
-  //XLUT
-  for(int i =0; i < IMAGE_HEIGHT; i++){
-    fread(xLUT[i], sizeof(unsigned char), XLUTX, fp);
-  }
-  */
-  fclose(fp);
-
-  #endif // USE_CHROMATIC_CORRECTION
-
-  /*
-  FILE *output = fopen("/MS/error.log", "w");
-  fprintf(output, "Threshold::initChromeTable('%s')\n", filename.c_str());
-  fflush(output);
-  fprintf(output, "Before fopen\n");
-  fflush(output);
-    fprintf(output, "fopen failed.  errno=%i, '%s'\n", errno, strerror(errno));
-    fclose(output);
-  fprintf(output, "After fopen\n");
-  fflush(output);
-  fprintf(output, "Done initChromeTable()\n");
-  fclose(output);
-  */
-}
-
 const uchar* Threshold::getYUV() {
   return yuv;
 }
@@ -1745,31 +1493,6 @@ int Threshold::distance(int x1, int x2, int x3, int x4) {
 float Threshold::getEuclidianDist(point <int> coord1, point <int> coord2) {
   return sqrt(pow((float)coord2.y-coord1.y,2)+pow((float)coord2.x-coord1.x,2));
 }
-
-#if defined(NEW_LOGGING) || defined(USE_JPEG)
-#if defined(USE_CHROMATIC_CORRECTION)
-//fill the corrected image
-unsigned char * Threshold::getCorrectedImage(){
-  int index = 0;
-  for(int y = 0; y < IMAGE_HEIGHT; y++){
-    //Y
-    for(int x = 0; x < IMAGE_WIDTH; x++){
-      corrected[index++] = corrY[yuv[index]][xLUT[x][y]];
-    }
-    //U
-    for(int x = 0; x < IMAGE_WIDTH; x++){
-      corrected[index++] = corrU[yuv[index]][xLUT[x][y]];
-    }
-    //V
-    for(int x = 0; x < IMAGE_WIDTH; x++){
-      corrected[index++] = corrV[yuv[index]][xLUT[x][y]];
-    }
-    index += 3*IMAGE_WIDTH; //skip over these for compatability with openrimage
-  }
-  return corrected;
-}
-#endif /* USE_CHROMATIC_CORRECTION */
-#endif /* NEW_LOGGING || USE_JPEG */
 
 /*  A bunch of methods for offline debugging.  Basically we create an extra image
  * array so that we can draw on it without disturbing the real image.  After we're

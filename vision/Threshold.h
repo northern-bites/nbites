@@ -36,26 +36,10 @@ class Threshold;  // forward reference
 #define VMAX  128
 #endif
 
-//radial chrome distortion
-#define YRAD  140
-#define URAD  140
-#define VRAD  140
-
-//Chromatic distorition constants
-static const int NUM_YUV = 256;
-
-// channel constants
-static const int Y = 0;
-static const int U = 1;
-static const int V = 2;
-
-
 //
 // THRESHOLDING CONSTANTS
 // Constants pertaining to object detection and horizon detection
-#if ROBOT(NAO)
 static const int MIN_RUN_SIZE = 25;
-#endif
 // we're more demanding of Green because there is so much
 static const int MIN_GREEN_SIZE = 10;
 
@@ -83,16 +67,6 @@ static const float BEACON_MAX_FOC_DIST = 650.0f;
 static const float GOALIE_BEACON_MIN_FOC_DIST = 10.0f;
 static const float GOALIE_BEACON_MAX_FOC_DIST = 500.0f;
 
-//
-// CHROMATIC DISTORTION CONSTANTS
-// center of image
-static const point <int> CENTER_IMAGE_COORD(IMAGE_WIDTH / 2,
-					    IMAGE_HEIGHT / 2);
-// radial dist for chromeFilter()
-static const int CHROME_FILTER_RADIAL_DIST = 110;
-// score at which you throw out values
-static const int CHROME_FILTER_SCORE = 3;
-
 class Threshold
 {
     friend class Vision;
@@ -108,17 +82,11 @@ class Threshold
 #endif
   void thresholdAndRuns();
   void objectRecognition();
-#if defined(NEW_LOGGING) || defined(USE_JPEG)
-#ifdef USE_CHROMATIC_CORRECTION
-  unsigned char * getCorrectedImage();
-#endif
-#endif
   // helper methods
   void initObjects(void);
   void initColors();
   void initTable(std::string filename);
   void initTableFromBuffer(byte* tbfr);
-  void initChromeTable(std::string filename);
   void initCompressedTable(std::string filename);
 
   void storeFieldObjects();
@@ -133,7 +101,6 @@ class Threshold
   point <int> findIntersection(int col, int dir, int c);
   int postCheck(bool which, int left, int right);
   point <int> backStopCheck(bool which, int left, int right);
-  void chromeFilter(VisualFieldObject *obj);
   void setYUV(const uchar* newyuv);
   const uchar* getYUV();
   static const char * getShortColor(int _id);
@@ -159,21 +126,6 @@ class Threshold
   void drawBox(int left, int right, int bottom, int top, int c);
   void drawRect(int left, int top, int width, int height, int c);
 
-#ifdef USE_CHROMATIC_CORRECTION
-  inline unsigned char getCorrY(int x, int y) { return corrY[yplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
-  inline unsigned char getCorrU(int x, int y) { return corrU[uplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
-  inline unsigned char getCorrV(int x, int y) { return corrV[vplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
-
-  inline uchar getY(int x, int y) { return corrY[yplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
-  inline uchar getU(int x, int y) { return corrU[uplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
-  inline uchar getV(int x, int y) { return corrV[vplane[y*IMAGE_ROW_OFFSET+x]][xLUT[x][y]]; }
-
-  /*
-  inline unsigned char getCorrY(int x, int y) { return corrY[yplane[y*IMAGE_ROW_OFFSET+x]>>YSHIFT][xLUT[x][y]]<<YSHIFT; }
-  inline unsigned char getCorrU(int x, int y) { return corrU[uplane[y*IMAGE_ROW_OFFSET+x]>>USHIFT][xLUT[x][y]]<<USHIFT; }
-  inline unsigned char getCorrV(int x, int y) { return corrV[vplane[y*IMAGE_ROW_OFFSET+x]>>VSHIFT][xLUT[x][y]]<<VSHIFT; }
-*/
-#else
 
 #if ROBOT(NAO_RL)
   inline uchar getCorrY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
@@ -187,8 +139,6 @@ class Threshold
 #  error NAO_SIM robot type not implemented
 #else
 #  error Undefined robot type
-#endif
-
 #endif
 
   int getVisionHorizon() { return horizon; }
@@ -250,16 +200,6 @@ class Threshold
   int navyBottoms[IMAGE_WIDTH];
   int redBottoms[IMAGE_WIDTH];
 
-#ifdef USE_CHROMATIC_CORRECTION
-  unsigned char corrY[NUM_YUV][YRAD],corrU[NUM_YUV][URAD],corrV[NUM_YUV][VRAD];
-  unsigned char xLUT[IMAGE_WIDTH][IMAGE_HEIGHT];
-#endif
-
-#if defined(NEW_LOGGING) || defined(USE_JPEG)
-#if defined(USE_CHROMATIC_CORRECTION)
-  unsigned char corrected[IMAGE_WIDTH*IMAGE_HEIGHT*6];
-#endif
-#endif
   // thresholding variables
   int horizon;
   int lastPixel;
