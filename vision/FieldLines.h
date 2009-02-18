@@ -474,10 +474,6 @@ class FieldLines {
   // visible.  We can only use pix estimates of goals whose bottoms are visible
   const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
 
-  // Determine if the L is too close to a beacon to be a real L
-  const bool LWorksWithBeacon(const VisualCorner& c,
-                              const VisualFieldObject * beacon) const;
-
   // If it's a legitimate L, the post should be INSIDE of the two lines
   const bool LWorksWithPost(const VisualCorner& c,
                             const VisualFieldObject * post) const;
@@ -677,13 +673,12 @@ class FieldLines {
    * of printing debugging info and as such have to accept diverse parameters.
    */
  private:
-  static const int NUM_FIELD_OBJECTS_WITH_DIST_INFO = 6;
+  static const int NUM_FIELD_OBJECTS_WITH_DIST_INFO = 4;
   VisualFieldObject const * allFieldObjects[NUM_FIELD_OBJECTS_WITH_DIST_INFO];
 
   // Determines which field objects are visible on the screen and returns
   // a vector of the pointers of the objects that are visible.
   vector<const VisualFieldObject*> getVisibleFieldObjects() const;
-
 
   // Returns whether there is a yellow post on screen that vision has not
   // identified the side of
@@ -698,14 +693,7 @@ class FieldLines {
   // Returns whether there is a blue post close to this corner
   const bool bluePostCloseToCorner(VisualCorner& c);
 
-  // Returns whether there is a sure yellow arc
-  const bool yellowArcOnScreen() const;
-  // Returns whether there is a sure blue arc
-  const bool blueArcOnScreen() const;
-
   const bool postOnScreen() const;
-
-  const bool beaconOnScreen() const;
 
 #ifdef OFFLINE
   static const bool isUphillEdge(const int, const int,

@@ -50,7 +50,7 @@ class Vision;   // forward reference
 #include "FieldLines.h"
 #include "VisualCorner.h"
 
-using namespace std;
+//using namespace std;
 
 
 // helper method for deflate() for shifting bits for bit-wise compression
@@ -63,7 +63,7 @@ class Vision
 {
     friend class Threshold;
 
-  public:
+public:
     Vision(boost::shared_ptr<NaoPose> _pose, boost::shared_ptr<Profiler> _prof);
     virtual ~Vision();
 
@@ -132,7 +132,7 @@ class Vision
     // misc
     std::string getThreshColor(int _id);
 
-  public:
+public:
     //
     // Public Variables
     //
@@ -142,14 +142,9 @@ class Vision
     VisualFieldObject *bgrp, *bglp;
     VisualFieldObject *ygrp, *yglp;
     VisualBackstop *ygBackstop, *bgBackstop;
-    VisualFieldObject *by, *yb;
-    VisualFieldObject *blueArc, *yellowArc;
     VisualRobot *red1, *red2;
     VisualRobot *navy1, *navy2;
     VisualBall *ball;
-#ifdef USE_PINK_BALL
-    Ball *pinkBall; //added for pink ball recognition
-#endif
     Threshold *thresh;
     boost::shared_ptr<NaoPose> pose;
     FieldLines *fieldLines;
@@ -160,7 +155,7 @@ class Vision
     // Profiling
     boost::shared_ptr<Profiler> profiler;
 
-  protected:
+protected:
     //
     // Protected Variable
     //
@@ -192,7 +187,7 @@ class Vision
     bool collectFrames;
     bool collectTimes;
 
- private:
+private:
     //
     // Private Variables
     //

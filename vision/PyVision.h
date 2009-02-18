@@ -912,8 +912,6 @@ typedef struct PyVision_t {
   // Threshold object
   PyObject *thresh;
 
-  // Blue-yellow and yellow-blue post
-  PyObject *by, *yb;
   // Blue goal left and right posts
   PyObject *bgrp, *bglp;
   // Yellow goal left and right posts
@@ -986,11 +984,6 @@ static PyMemberDef PyVision_members[] = {
     "Image height"},
 
   // Class reference attributes
-  {"by", T_OBJECT_EX, offsetof(PyVision, by), READONLY,
-    "Blue-yellow post"},
-  {"yb", T_OBJECT_EX, offsetof(PyVision, yb), READONLY,
-    "Yellow-blue post"},
-
   {"bgrp", T_OBJECT_EX, offsetof(PyVision, bgrp), READONLY,
     "Blue goal right post"},
   {"bglp", T_OBJECT_EX, offsetof(PyVision, bglp), READONLY,

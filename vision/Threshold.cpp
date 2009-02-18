@@ -1402,8 +1402,6 @@ print("   Theshold::objectRecognition");
     vision->bglp->init();
     vision->bgrp->init();
     //vision->bgBackstop->init();
-    vision->yb->init();
-    vision->by->init();
   }
 
   storeFieldObjects();
@@ -1694,13 +1692,7 @@ void Threshold::initObjects(void) {
   vision->bglp->init();
   vision->bgBackstop->init();
 
-  // beacons
-  vision->by->init();
-  vision->yb->init();
-  // arcs
-  vision->blueArc->init();
-  vision->yellowArc->init();
-
+  // robots
   vision->red1->init();
   vision->red2->init();
   vision->navy1->init();

@@ -87,12 +87,10 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
 
   // Initialize the array of VisualFieldObject which we use for distance
   // based identification of corners
-  allFieldObjects[0] = vision->by;
-  allFieldObjects[1] = vision->yb;
-  allFieldObjects[2] = vision->bgrp;
-  allFieldObjects[3] = vision->bglp;
-  allFieldObjects[4] = vision->ygrp;
-  allFieldObjects[5] = vision->yglp;
+  allFieldObjects[0] = vision->bgrp;
+  allFieldObjects[1] = vision->bglp;
+  allFieldObjects[2] = vision->ygrp;
+  allFieldObjects[3] = vision->yglp;
 
   // When online, these variables are always false and can never be changed,
   // but offline they can be toggled
@@ -2706,13 +2704,6 @@ const bool FieldLines::goalSuitableForPixEstimate(const VisualFieldObject * goal
   return greenHorizon - midBottomY < MAX_PIXEL_DIFF;
 }
 
-
-const bool FieldLines::LWorksWithBeacon(const VisualCorner& c,
-                                        const VisualFieldObject * beacon) const {
-  const float TOO_CLOSE_DISTANCE = FIELD_WHITE_HEIGHT / 3.0f;
-  return getEstimatedDistance(&c, beacon) >= TOO_CLOSE_DISTANCE;
-}
-
 // If it's a legitimate L, the post should be INSIDE of the two lines
 // See the wiki for an illustration
 const bool FieldLines::LWorksWithPost(const VisualCorner& c,
@@ -2934,19 +2925,6 @@ const bool FieldLines::bluePostCloseToCorner(VisualCorner& c) {
   return false;
 }
 
-// Returns true if there is a yellow arc on the screen whose certainty is
-// sure
-const bool FieldLines::yellowArcOnScreen() const {
-  return vision->yellowArc->getDistance() > 0 &&
-    vision->yellowArc->getIDCertainty() == _SURE;
-}
-// Returns true if there is a blue arc on the screen whose certainty is
-// sure
-const bool FieldLines::blueArcOnScreen() const {
-  return vision->blueArc->getDistance() > 0 &&
-    vision->blueArc->getIDCertainty() == _SURE;
-}
-
 // Returns true if there is a goal post visible on the screen whose
 // certainty is sure
 const bool FieldLines::postOnScreen() const {
@@ -2956,15 +2934,6 @@ const bool FieldLines::postOnScreen() const {
     (vision->yglp->getDistance() > 0 && vision->yglp->getIDCertainty() == _SURE) ||
     (vision->ygrp->getDistance() > 0 && vision->ygrp->getIDCertainty() == _SURE);
 }
-
-// Returns true if there is a beacon visible on the screen whose certainty
-// is sure
-const bool FieldLines::beaconOnScreen() const {
-  return
-    (vision->by->getDistance() > 0 && vision->by->getIDCertainty() == _SURE) ||
-    (vision->yb->getDistance() > 0 && vision->yb->getIDCertainty() == _SURE);
-}
-
 
 // Given a list of concrete corners that the visual corner could possibly be,
 // weeds out the bad ones based on distances to visible objects and returns
@@ -3469,18 +3438,6 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
   ConcreteCorner const * center_circle_corner = &ConcreteCorner::center_circle;
   vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
 
-  // The distance from the center circle to goal posts is almost exactly the
-  // same as the distance from the goal posts to the T corners by beacons.
-  // The CC check will fail in such cases and return a false positive.  As such
-  // we circumvent the check if a post is visible and a beacon is visible.
-  if (beaconOnScreen() && postOnScreen()) {
-    if (debugCcScan) {
-      cout << "Found a post and beacon visible in the same frame; "
-           << "could not be near center circle" << endl;
-    }
-    return false;
-  }
-
   // If there's a close goal in the frame, we couldn't be near the center
   // circle.
   static const int CLOSE_DIST = 150;
@@ -3494,18 +3451,6 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
     }
     return false;
   }
-
-  static const int CLOSE_BEACON_DIST = 60;
-  if ((vision->yb->getDistance() > 0 && vision->yb->getDistance() < CLOSE_BEACON_DIST) ||
-      (vision->by->getDistance() > 0 && vision->by->getDistance() < CLOSE_BEACON_DIST)){
-    if (debugCcScan) {
-      cout << "Found a beacon that was close in the image; could not be near "
-           << "the center circle." << endl;
-    }
-    return false;
-  }
-
-
 
   // Loop over all the inner L's in the frame; if we have an inner L with
   // a shallow angle AND another line on the screen, it's probably the

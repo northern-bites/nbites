@@ -54,10 +54,6 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
   bglp = new VisualFieldObject(BLUE_GOAL_LEFT_POST);
   ygBackstop = new VisualBackstop();
   bgBackstop = new VisualBackstop();
-  yellowArc = new VisualFieldObject();
-  blueArc = new VisualFieldObject();
-  yb = new VisualFieldObject(YELLOW_BLUE_BEACON);
-  by = new VisualFieldObject(BLUE_YELLOW_BEACON);
   ball = new VisualBall();
   red1 = new VisualRobot();
   red2 = new VisualRobot();

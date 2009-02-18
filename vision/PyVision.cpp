@@ -997,8 +997,6 @@ PyVision_new (Vision *v)
     self->width = PyInt_FromLong(IMAGE_WIDTH);
     self->height = PyInt_FromLong(IMAGE_HEIGHT);
 
-    self->by = PyFieldObject_new(v->by);
-    self->yb = PyFieldObject_new(v->yb);
     self->bgrp = PyFieldObject_new(v->bgrp);
     self->bglp = PyFieldObject_new(v->bglp);
     self->ygrp = PyFieldObject_new(v->ygrp);
@@ -1020,7 +1018,6 @@ PyVision_new (Vision *v)
     self->pose = PyPose_new(v->pose.get());
 
     if (self->width == NULL      || self->height == NULL ||
-        self->by == NULL         || self->yb == NULL     ||
         self->bgrp == NULL       || self->bglp == NULL   ||
         self->ygrp == NULL       || self->yglp == NULL   ||
 
@@ -1048,8 +1045,6 @@ PyVision_update (PyVision *self)
   //Py_XDECREF(self->height);
   //self->height = PyInt_FromLong(self->vision->getHeight());
 
-  PyFieldObject_update((PyFieldObject *)self->by);
-  PyFieldObject_update((PyFieldObject *)self->yb);
   PyFieldObject_update((PyFieldObject *)self->bgrp);
   PyFieldObject_update((PyFieldObject *)self->bglp);
   PyFieldObject_update((PyFieldObject *)self->ygrp);
@@ -1086,8 +1081,6 @@ PyVision_dealloc (PyVision* self)
 
   Py_XDECREF(self->width);
   Py_XDECREF(self->height);
-  Py_XDECREF(self->by);
-  Py_XDECREF(self->yb);
   Py_XDECREF(self->bgrp);
   Py_XDECREF(self->bglp);
   Py_XDECREF(self->ygrp);
