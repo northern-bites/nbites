@@ -125,7 +125,6 @@ private: // Helper methods
     static const ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
 
     void resetQueues();
-    void resetStepCoordFrames();
     void debugLogging();
 
 private:

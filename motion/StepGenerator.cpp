@@ -30,8 +30,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s ,
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
-    resetGait(params);
-    resetStepCoordFrames();
+    //resetGait(params);
+    //resetStepCoordFrames();
 }
 
 StepGenerator::~StepGenerator()
@@ -48,7 +48,7 @@ StepGenerator::~StepGenerator()
  *
  *  * Handles transfer from futureSteps list to the currentZMPDsteps list.
  *    When the Future ZMP values we want run out, we pop the next future step
- *    add generate ZMP from it, and put it into the ZMPDsteps List
+ *    add generated ZMP from it, and put it into the ZMPDsteps List
  *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
@@ -73,6 +73,10 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
 }
 
+/**
+ * Method called to ensure that there are sufficient steps for the walking legs
+ * to operate on.
+ */
 void StepGenerator::generate_steps(){
     while(futureSteps.size() + currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
         generateStep(x,y,theta);
@@ -189,7 +193,7 @@ void StepGenerator::swapSupportLegs(){
             MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
 
-        //there are three elements in the list, pop the obsolete one
+        //there are at least three elements in the list, pop the obsolete one
         //(currently use last step to determine when to stop, hackish-ish)
         //and the first step is the support one now, the second the swing
         lastStep_s = *currentZMPDSteps.begin();
@@ -421,7 +425,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
         //we are starting fresh from a stopped state, so we need to clear all remaining 
         //steps and zmp values.
         resetQueues();
-        resetStepCoordFrames();
+
         //then we need to pick which foot to start with
         if(y > 0 || theta > 0)
             startLeft();
@@ -444,8 +448,21 @@ void StepGenerator::startRight(){
     leftLeg.startLeft();
     rightLeg.startLeft();
 
-    //Setup transform, such that the firstSupportStep is Right
+    //This is the place where we reset the controller each time the walk starts
+    //over again.
+    //First we reset the controller back to the neutral position
+    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
+    controller_y->initState(0.0f,0.0f,0.0f);
+
+    //Second we setup the if_Transform such that the firstSupportStep is Right
+    //(When the firstSupportStep gets popped, it thinks we were over the other
+    //foot before, so we init the if_Transform to start under the opposite foot)
     if_Transform.assign(initStartRight);
+
+    //Third, we reset the memory of where to generate ZMP from steps back to
+    //the origin
+    si_Transform = CoordFrame3D::identity3D();
+    last_zmp_end_s = CoordFrame3D::vector3D(0.0f,0.0f);
 
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is START type.
@@ -473,8 +490,21 @@ void StepGenerator::startLeft(){
     leftLeg.startRight();
     rightLeg.startRight();
 
-    //Setup transform, such that the firstSupportStep is Left
+    //This is the place where we reset the controller each time the walk starts
+    //over again.
+    //First we reset the controller back to the neutral position
+    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
+    controller_y->initState(0.0f,0.0f,0.0f);
+
+    //Second we setup the if_Transform such that the firstSupportStep is Right
+    //(When the firstSupportStep gets popped, it thinks we were over the other
+    //foot before, so we init the if_Transform to start under the opposite foot)
     if_Transform.assign(initStartLeft);
+
+    //Third, we reset the memory of where to generate ZMP from steps back to
+    //the origin
+    si_Transform = CoordFrame3D::identity3D();
+    last_zmp_end_s = CoordFrame3D::vector3D(0.0f,0.0f);
 
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is START type.
@@ -674,20 +704,14 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
 
 
 void StepGenerator::resetGait(const WalkingParameters * _wp){
-    walkParams = _wp;
+    if(_done)
+        walkParams = _wp;
+    else{
+        cout << "Failed to change the gait since StepGenerator is active."
+             << endl;
+    }
     //HACK When we switch gaits, we probably need to do other things as well
-}
-
-/**
- * Reset the coordiante frames for the controller and for our steps
- */
-void StepGenerator::resetStepCoordFrames(){
-    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
-    controller_y->initState(0.0f,0.0f,0.0f);
-
-    si_Transform = CoordFrame3D::identity3D();
-    last_zmp_end_s = CoordFrame3D::vector3D(0.0f,0.0f);
-    //if_Trans is reset in startLeft/Right
+    //like restart the walk.
 }
 
 void StepGenerator::resetQueues(){
