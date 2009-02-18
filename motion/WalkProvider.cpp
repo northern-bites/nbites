@@ -10,18 +10,7 @@ using Kinematics::RLEG_CHAIN;
 WalkProvider::WalkProvider(shared_ptr<Sensors> s)
     : MotionProvider("WalkProvider"),
       sensors(s),
-      walkParameters(.02f,         // motion frame length - FIXME constant
-                     310.0f,       // COM height
-                     19.0f,        // hipOffsetX
-                     0.5f,        // stepDuration
-                     0.1f,         // fraction in double support mode
-                     16.5f,        // stepHeight
-                     10.0f,         // footLengthX
-                     0.4f,        // zmp static percentage in double support
-                     4.0f*TO_RAD,  // leftSwingHipRollAddition
-                     4.0f*TO_RAD,  // rightSwingHipRollAddition
-                     12.0f,        // leftZMPSwingOffestY,
-                     12.0f),       // rightZMPSwingOffestY
+      walkParameters(&WALK_PARAMS[DEFAULT_P]),
       stepGenerator(sensors),
       pendingCommands(false),
       nextCommand(NULL)
@@ -95,7 +84,7 @@ void WalkProvider::setCommand(const WalkCommand * command){
     if(!isActive()){
         //then we must just be starting out, so we can update the
         //gait in StepGenerator if we want
-        stepGenerator.resetGait(&walkParameters);
+        stepGenerator.resetGait(walkParameters);
         cout << "Set the walking parameters in stepgen"<<endl;
     }
 
@@ -106,8 +95,8 @@ void WalkProvider::setCommand(const WalkCommand * command){
 vector<float> WalkProvider::getWalkStance(){
     //cout << "getWalkStance" <<endl;
     //calculate the walking stance of the robot
-    const float z = walkParameters.bodyHeight;
-    const float x = walkParameters.hipOffsetX;
+    const float z = walkParameters->bodyHeight;
+    const float x = walkParameters->hipOffsetX;
     const float ly = HIP_OFFSET_Y;
     const float ry = -HIP_OFFSET_Y;
 

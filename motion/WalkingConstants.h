@@ -155,6 +155,29 @@ public:
 
 };
 
+
+enum GaitID {
+    DEFAULT_P = 0,
+    GOALIE_P
+};
+
+const WalkingParameters DEFAULT_PARAMETERS
+= WalkingParameters(0.02f,        // motion frame length - FIXME constant
+                    310.0f,       // COM height
+                    19.0f,        // hipOffsetX
+                    0.5f,         // stepDuration
+                    0.1f,         // fraction in double support mode
+                    16.5f,        // stepHeight
+                    10.0f,        // footLengthX
+                    0.4f,         // zmp static percentage in double support
+                    4.0f*TO_RAD,  // leftSwingHipRollAddition
+                    4.0f*TO_RAD,  // rightSwingHipRollAddition
+                    12.0f,        // leftZMPSwingOffestY,
+                    12.0f);       // rightZMPSwingOffestY
+const WalkingParameters GOALIE_PARAMETERS = DEFAULT_PARAMETERS;
+
+const WalkingParameters WALK_PARAMS[] = {DEFAULT_PARAMETERS,GOALIE_PARAMETERS};
+
 //Sensitivity to new walk vectors -- currently 0, giving maximum sensitivity
 //when a new vector differs by more than these constants, the internal
 //walk vector held in the StepGenerator changes

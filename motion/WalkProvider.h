@@ -50,7 +50,7 @@ private:
 
     boost::shared_ptr<Sensors> sensors;
 
-    WalkingParameters walkParameters;
+    const WalkingParameters * walkParameters;
     StepGenerator stepGenerator;
     bool pendingCommands;
 
