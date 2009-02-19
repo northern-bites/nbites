@@ -979,196 +979,6 @@ PyFieldObject_update (PyObject *self, PyObject *args)
 }
 
 //
-// PyBackstop definitions
-//
-
-
-// C++ - accessible interface
-extern PyObject * PyBackstop_new (VisualBackstop *o)
-{
-  PyBackstop *self;
-
-  self = (PyBackstop *)PyBackstopType.tp_alloc(&PyBackstopType, 0);
-  if (self != NULL) {
-    self->object = o;
-
-    self->centerX = PyInt_FromLong(o->getCenterX());
-    self->centerY = PyInt_FromLong(o->getCenterY());
-    self->width = PyFloat_FromDouble(o->getWidth());
-    self->height = PyFloat_FromDouble(o->getHeight());
-    self->focDist = PyFloat_FromDouble(o->getFocDist());
-    self->dist = PyFloat_FromDouble(o->getDistance());
-    self->bearing = PyFloat_FromDouble(o->getBearing());
-
-    if (self->centerX == NULL || self->centerY == NULL ||
-        self->width == NULL || self->height == NULL ||
-        self->focDist == NULL || self->dist == NULL ||
-        self->bearing == NULL) {
-
-      PyBackstop_dealloc(self);
-      self = NULL;
-    }
-  }
-
-  return (PyObject *)self;
-}
-
-extern void
-PyBackstop_update (PyBackstop *self)
-{
-  Py_XDECREF(self->centerX);
-  self->centerX = PyInt_FromLong(self->object->getCenterX());
-
-  Py_XDECREF(self->centerY);
-  self->centerY = PyInt_FromLong(self->object->getCenterY());
-
-  Py_XDECREF(self->width);
-  self->width = PyFloat_FromDouble(self->object->getWidth());
-
-  Py_XDECREF(self->height);
-  self->height = PyFloat_FromDouble(self->object->getHeight());
-
-  Py_XDECREF(self->focDist);
-  self->focDist = PyFloat_FromDouble(self->object->getFocDist());
-
-  Py_XDECREF(self->dist);
-  self->dist = PyFloat_FromDouble(self->object->getDistance());
-
-  Py_XDECREF(self->bearing);
-  self->bearing = PyFloat_FromDouble(self->object->getBearing());
-}
-
-// backend methods
-extern PyObject *
-PyBackstop_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-  PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
-      "Backstop from Python.  Need a C++ VisualBackstop.");
-  return NULL;
-}
-
-extern void
-PyBackstop_dealloc (PyBackstop *self)
-{
-  if (self == NULL)
-    return;
-
-  Py_XDECREF(self->centerX);
-  Py_XDECREF(self->centerY);
-  Py_XDECREF(self->width);
-  Py_XDECREF(self->height);
-  Py_XDECREF(self->focDist);
-  Py_XDECREF(self->dist);
-  Py_XDECREF(self->bearing);
-  self->ob_type->tp_free((PyObject*)self);
-}
-
-// Python - accessible interface
-extern PyObject *
-PyBackstop_update (PyObject *self, PyObject *args)
-{
-  PyBackstop_update((PyBackstop *)self);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-//
-// PyVisualRobot definitions
-//
-
-
-// C++ - accessible interface
-extern PyObject * PyVisualRobot_new (VisualRobot *o)
-{
-  PyVisualRobot *self;
-
-  self = (PyVisualRobot *)PyVisualRobotType.tp_alloc(&PyVisualRobotType, 0);
-  if (self != NULL) {
-    self->object = o;
-
-    self->centerX = PyInt_FromLong(o->getCenterX());
-    self->centerY = PyInt_FromLong(o->getCenterY());
-    self->width = PyFloat_FromDouble(o->getWidth());
-    self->height = PyFloat_FromDouble(o->getHeight());
-    self->focDist = PyFloat_FromDouble(o->getFocDist());
-    self->dist = PyFloat_FromDouble(o->getDistance());
-    self->bearing = PyFloat_FromDouble(o->getBearing());
-
-    if (self->centerX == NULL || self->centerY == NULL ||
-        self->width == NULL || self->height == NULL ||
-        self->focDist == NULL || self->dist == NULL ||
-        self->bearing == NULL) {
-
-      PyVisualRobot_dealloc(self);
-      self = NULL;
-    }
-  }
-
-  return (PyObject *)self;
-}
-
-extern void
-PyVisualRobot_update (PyVisualRobot *self)
-{
-  Py_XDECREF(self->centerX);
-  self->centerX = PyInt_FromLong(self->object->getCenterX());
-
-  Py_XDECREF(self->centerY);
-  self->centerY = PyInt_FromLong(self->object->getCenterY());
-
-  Py_XDECREF(self->width);
-  self->width = PyFloat_FromDouble(self->object->getWidth());
-
-  Py_XDECREF(self->height);
-  self->height = PyFloat_FromDouble(self->object->getHeight());
-
-  Py_XDECREF(self->focDist);
-  self->focDist = PyFloat_FromDouble(self->object->getFocDist());
-
-  Py_XDECREF(self->dist);
-  self->dist = PyFloat_FromDouble(self->object->getDistance());
-
-  Py_XDECREF(self->bearing);
-  self->bearing = PyFloat_FromDouble(self->object->getBearing());
-}
-
-// backend methods
-extern PyObject *
-PyVisualRobot_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-  PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
-      "VisualRobot from Python.  Need a C++ VisualRobot.");
-  return NULL;
-}
-
-extern void
-PyVisualRobot_dealloc (PyVisualRobot *self)
-{
-  if (self == NULL)
-    return;
-
-  Py_XDECREF(self->centerX);
-  Py_XDECREF(self->centerY);
-  Py_XDECREF(self->width);
-  Py_XDECREF(self->height);
-  Py_XDECREF(self->focDist);
-  Py_XDECREF(self->dist);
-  Py_XDECREF(self->bearing);
-  self->ob_type->tp_free((PyObject*)self);
-}
-
-// Python - accessible interface
-extern PyObject *
-PyVisualRobot_update (PyObject *self, PyObject *args)
-{
-  PyVisualRobot_update((PyVisualRobot *)self);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-//
 // PyVision definitions
 //
 
@@ -1481,7 +1291,9 @@ MODULE_INIT(vision) (void)
       PyType_Ready(&PyVisualCornerType) < 0 ||
       PyType_Ready(&PyConcreteCornerType) < 0 ||
       PyType_Ready(&PyVisualLineType) < 0 ||
-      PyType_Ready(&PyPoseType) < 0)
+      PyType_Ready(&PyPoseType) < 0 ||
+      PyType_Ready(&PyBackstopType) < 0 ||
+      PyType_Ready(&PyVisualRobotType) < 0)
     return;
 
   //
@@ -1492,6 +1304,12 @@ MODULE_INIT(vision) (void)
       "Python-wrapped C++ robot vision library");
   if (module == NULL)
     return;
+
+  Py_INCREF(&PyVisualRobotType);
+  PyModule_AddObject(module, "VisualRobot", (PyObject *)&PyVisualRobotType);
+
+  Py_INCREF(&PyVisualRobotType);
+  PyModule_AddObject(module, "VisualBackstop", (PyObject *)&PyBackstopType);
 
   Py_INCREF(&PyPoseType);
   PyModule_AddObject(module, "Pose", (PyObject *)&PyPoseType);
@@ -1554,3 +1372,228 @@ MODULE_INIT(vision) (void)
 #endif
 }
 
+
+//
+// PyBackstop definitions
+//
+
+
+// C++ - accessible interface
+extern PyObject * PyBackstop_new (VisualBackstop *b)
+{
+  PyBackstop *self;
+
+  self = (PyBackstop *)PyBackstopType.tp_alloc(&PyBackstopType, 0);
+  if (self != NULL) {
+    self->backstop = b;
+
+    self->x = PyInt_FromLong(b->getX());
+    self->y = PyInt_FromLong(b->getY());
+    self->centerX = PyInt_FromLong(b->getCenterX());
+    self->centerY = PyInt_FromLong(b->getCenterY());
+    self->angleX = PyFloat_FromDouble(b->getAngleX());
+    self->angleY = PyFloat_FromDouble(b->getAngleY());
+    self->width = PyFloat_FromDouble(b->getWidth());
+    self->height = PyFloat_FromDouble(b->getHeight());
+    self->focDist = PyFloat_FromDouble(b->getFocDist());
+    self->distance = PyFloat_FromDouble(b->getDistance());
+    self->bearing = PyFloat_FromDouble(b->getBearing());
+    self->elevation = PyFloat_FromDouble(b->getElevation());
+    self->leftOpening = PyFloat_FromDouble(b->getLeftOpening());
+    self->rightOpening = PyFloat_FromDouble(b->getRightOpening());
+    self->shoot = PyInt_FromLong(b->shotAvailable());
+
+    if (self->centerX == NULL || self->centerY == NULL ||
+        self->width == NULL || self->height == NULL ||
+        self->focDist == NULL || self->distance == NULL ||
+        self->bearing == NULL || self->elevation == NULL) {
+
+      PyBackstop_dealloc(self);
+      self = NULL;
+    }
+  }
+
+  return (PyObject *)self;
+}
+
+extern void PyBackstop_update (PyBackstop *self)
+{
+    Py_XDECREF(self->x);
+    self->x = PyInt_FromLong(self->backstop->getX());
+
+    Py_XDECREF(self->y);
+    self->y = PyInt_FromLong(self->backstop->getY());
+
+    Py_XDECREF(self->centerX);
+    self->centerX = PyInt_FromLong(self->backstop->getCenterX());
+
+    Py_XDECREF(self->centerY);
+    self->centerY = PyInt_FromLong(self->backstop->getCenterY());
+
+    Py_XDECREF(self->angleX);
+    self->angleX = PyFloat_FromDouble(self->backstop->getAngleX());
+
+    Py_XDECREF(self->angleX);
+    self->angleY = PyFloat_FromDouble(self->backstop->getAngleY());
+
+    Py_XDECREF(self->width);
+    self->width = PyFloat_FromDouble(self->backstop->getWidth());
+
+    Py_XDECREF(self->height);
+    self->height = PyFloat_FromDouble(self->backstop->getHeight());
+
+    Py_XDECREF(self->focDist);
+    self->focDist = PyFloat_FromDouble(self->backstop->getFocDist());
+
+    Py_XDECREF(self->distance);
+    self->distance = PyFloat_FromDouble(self->backstop->getDistance());
+
+    Py_XDECREF(self->bearing);
+    self->bearing = PyFloat_FromDouble(self->backstop->getBearing());
+
+    Py_XDECREF(self->elevation);
+    self->elevation = PyFloat_FromDouble(self->backstop->getElevation());
+
+    Py_XDECREF(self->leftOpening);
+    self->leftOpening = PyInt_FromLong(self->backstop->getLeftOpening());
+
+    Py_XDECREF(self->rightOpening);
+    self->rightOpening = PyInt_FromLong(self->backstop->getRightOpening());
+
+    Py_XDECREF(self->shoot);
+    self->shoot = PyInt_FromLong(self->backstop->shotAvailable());
+
+}
+
+// backend methods
+extern PyObject *
+PyBackstop_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
+      "Backstop from Python.  Need a C++ VisualBackstop.");
+  return NULL;
+}
+
+extern void
+PyBackstop_dealloc (PyBackstop *self)
+{
+  if (self == NULL)
+    return;
+
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+// Python - accessible methods
+extern PyObject *
+PyBackstop_update (PyObject *self, PyObject *arg)
+{
+    PyBackstop_update((PyBackstop *)self);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+//
+// PyVisualRobot definitions
+//
+
+
+// C++ - accessible interface
+extern PyObject * PyVisualRobot_new (VisualRobot *b)
+{
+  PyVisualRobot *self;
+
+  self = (PyVisualRobot *)PyVisualRobotType.tp_alloc(&PyVisualRobotType, 0);
+  if (self != NULL) {
+    self->robot = b;
+
+    self->x = PyInt_FromLong(b->getX());
+    self->y = PyInt_FromLong(b->getY());
+    self->centerX = PyInt_FromLong(b->getCenterX());
+    self->centerY = PyInt_FromLong(b->getCenterY());
+    self->angleX = PyFloat_FromDouble(b->getAngleX());
+    self->angleY = PyFloat_FromDouble(b->getAngleY());
+    self->width = PyFloat_FromDouble(b->getWidth());
+    self->height = PyFloat_FromDouble(b->getHeight());
+    self->focDist = PyFloat_FromDouble(b->getFocDist());
+    self->distance = PyFloat_FromDouble(b->getDistance());
+    self->bearing = PyFloat_FromDouble(b->getBearing());
+    self->elevation = PyFloat_FromDouble(b->getElevation());
+
+    if (self->centerX == NULL || self->centerY == NULL ||
+        self->width == NULL || self->height == NULL ||
+        self->focDist == NULL || self->distance == NULL ||
+        self->bearing == NULL || self->elevation == NULL) {
+
+      PyVisualRobot_dealloc(self);
+      self = NULL;
+    }
+  }
+
+  return (PyObject *)self;
+}
+
+extern void PyVisualRobot_update (PyVisualRobot *self)
+{
+    Py_XDECREF(self->x);
+    self->x = PyInt_FromLong(self->robot->getX());
+
+    Py_XDECREF(self->y);
+    self->y = PyInt_FromLong(self->robot->getY());
+
+    Py_XDECREF(self->centerX);
+    self->centerX = PyInt_FromLong(self->robot->getCenterX());
+
+    Py_XDECREF(self->centerY);
+    self->centerY = PyInt_FromLong(self->robot->getCenterY());
+
+    Py_XDECREF(self->angleX);
+    self->angleX = PyFloat_FromDouble(self->robot->getAngleX());
+
+    Py_XDECREF(self->angleX);
+    self->angleY = PyFloat_FromDouble(self->robot->getAngleY());
+
+    Py_XDECREF(self->width);
+    self->width = PyFloat_FromDouble(self->robot->getWidth());
+
+    Py_XDECREF(self->height);
+    self->height = PyFloat_FromDouble(self->robot->getHeight());
+
+    Py_XDECREF(self->focDist);
+    self->focDist = PyFloat_FromDouble(self->robot->getFocDist());
+
+    Py_XDECREF(self->distance);
+    self->distance = PyFloat_FromDouble(self->robot->getDistance());
+
+    Py_XDECREF(self->bearing);
+    self->bearing = PyFloat_FromDouble(self->robot->getBearing());
+
+    Py_XDECREF(self->elevation);
+    self->elevation = PyFloat_FromDouble(self->robot->getElevation());
+}
+
+// backend methods
+extern PyObject *
+PyVisualRobot_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
+      "VisualRobot from Python.  Need a C++ VisualVisualRobot.");
+  return NULL;
+}
+
+extern void
+PyVisualRobot_dealloc (PyVisualRobot *self)
+{
+  if (self == NULL)
+    return;
+
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+// Python - accessible methods
+extern PyObject *
+PyVisualRobot_update (PyObject *self, PyObject *arg)
+{
+    PyVisualRobot_update((PyVisualRobot *)self);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
