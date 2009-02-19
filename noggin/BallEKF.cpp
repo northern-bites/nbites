@@ -48,7 +48,7 @@ BallEKF::BallEKF(shared_ptr<MCL> _mcl,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(Ball * ball)
+void BallEKF::updateModel(VisualBall * ball)
 {
     // Update expected ball movement
     timeUpdate(MotionModel());
@@ -56,7 +56,7 @@ void BallEKF::updateModel(Ball * ball)
     limitAPrioriUncert();
 
     // We've seen a ball
-    if (ball->getDist() > 0.0) {
+    if (ball->getDistance() > 0.0) {
         sawBall(ball);
 
         // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
@@ -75,12 +75,12 @@ void BallEKF::updateModel(Ball * ball)
  * Method to deal with sighting of a ball by the robot
  * @param ball a copy of the ball seen by the robot
  */
-void BallEKF::sawBall(Ball * ball)
+void BallEKF::sawBall(VisualBall * ball)
 {
     Measurement m;
     std::vector<Measurement> z;
 
-    m.distance = ball->getDist();
+    m.distance = ball->getDistance();
     m.bearing = ball->getBearing();
     m.distanceSD = ball->getDistanceSD();
     m.bearingSD = ball->getBearingSD();

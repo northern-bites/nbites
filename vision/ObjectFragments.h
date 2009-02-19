@@ -36,7 +36,7 @@ class ObjectFragments; // forward reference
 //#include "FieldObjects.h"
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
-#include "Ball.h"
+#include "VisualBall.h"
 #include "Vision.h"
 
 //here are defined the lower bounds on the sizes of goals, posts, and balls
@@ -283,7 +283,7 @@ class ObjectFragments {
   int getBigRun(int left, int right, int hor);
   bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
                     distanceCertainty _distCertainty);
-  void updateRobot(VisualFieldObject* a, blob b);
+  void updateRobot(VisualRobot* a, blob b);
   bool updateArc(VisualFieldObject* a, blob b, int sawGoal);
   distanceCertainty checkDist(int left, int right, int top, int bottom);
   void updateBackstop(VisualFieldObject* a, blob b);
@@ -312,18 +312,18 @@ class ObjectFragments {
   int  scanLogic(int howbig);
 
   // shooting
-  void setShot(VisualFieldObject * one);
-  void bestShot(VisualFieldObject * one, VisualFieldObject * two,
-                VisualFieldObject * three);
+  void setShot(VisualBackstop * one);
+  void bestShot(VisualFieldObject * left, VisualFieldObject * right,
+                VisualBackstop * mid);
   void openDirection(int h, NaoPose *p);
 
   int classifyFirstPost(int horizon, int c, int c2, bool postFound,
                         VisualFieldObject* left, VisualFieldObject* right,
-                        VisualFieldObject* mid);
+                        VisualBackstop* mid);
 
   // the big kahuna
-  void goalScan(VisualFieldObject* left, VisualFieldObject* mid,
-                VisualFieldObject* right, int c, int c2, bool post,
+  void goalScan(VisualFieldObject *left, VisualFieldObject *right,
+                VisualBackstop *mid, int c, int c2, bool post,
                 int horizon);
   int grabPost(int c, int c2, int horizon, int left, int right);
   void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
@@ -343,8 +343,8 @@ class ObjectFragments {
   int roundness(blob b);
   bool badSurround(blob b);
   bool atBoundary(blob b);
-  int balls(int c, Ball *thisBall);
-  int circleFit(Ball * thisBall);
+  int balls(int c, VisualBall *thisBall);
+  int circleFit(VisualBall * thisBall);
 
   // sanity checks
   bool rightBlobColor(blob obj, float per);

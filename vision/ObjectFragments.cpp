@@ -1698,9 +1698,11 @@ void ObjectFragments::yellow(int bigGreen) {
       }
     }
   }
-  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW, beacon, bigGreen);
+  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW,
+           beacon, bigGreen);
 #elif ROBOT(NAO)
-  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW, false, bigGreen);
+  goalScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW,
+           false, bigGreen);
   //naoScan(vision->yglp, vision->ygrp, vision->ygBackstop, YELLOW, ORANGEYELLOW, bigGreen);
 #else
   #error "ROBOT not defined as AIBO or NAO"
@@ -2510,7 +2512,7 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, blob two,
   }
 }
 
-void ObjectFragments::updateRobot(VisualFieldObject* one, blob two) {
+void ObjectFragments::updateRobot(VisualRobot* one, blob two) {
   one->setLeftTopX(two.leftTop.x);
   one->setLeftTopY(two.leftTop.y);
   one->setLeftBottomX(two.leftBottom.x);
@@ -4138,7 +4140,7 @@ bool ObjectFragments::checkPostAndBlob(float rat, bool beaconFound, int c, int c
  * @param one     the backstop
  */
 
-void ObjectFragments::setShot(VisualFieldObject* one) {
+void ObjectFragments::setShot(VisualBackstop* one) {
   int pix, bad, white, grey, run, greyrun;
   int ySpan = IMAGE_HEIGHT - one->getLeftBottomY();
   bool colorSeen = false;
@@ -4282,7 +4284,9 @@ void ObjectFragments::setShot(VisualFieldObject* one) {
   }
 }
 
-void ObjectFragments::bestShot(VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* middle) {
+void ObjectFragments::bestShot(VisualFieldObject* left,
+                               VisualFieldObject* right,
+                               VisualBackstop* middle) {
   // start by setting boundaries
   int leftb = 0, rightb = IMAGE_WIDTH - 1, bottom = 0;
   int rl = 0, rr = 0;
@@ -4748,7 +4752,11 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon) {
  * @return               classification
  */
 
-int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFound, VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* mid) {
+int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
+                                       bool beaconFound,
+                                       VisualFieldObject* left,
+                                       VisualFieldObject* right,
+                                       VisualBackstop* mid) {
   // ok now we're going to try and figure out which post it is and where the other one might be
   int trueLeft = min(pole.leftTop.x, pole.leftBottom.x);          // leftmost value in the blob
   int trueRight = max(pole.rightTop.x, pole.rightBottom.x);    // rightmost value in the blob
@@ -4907,7 +4915,10 @@ int ObjectFragments::classifyFirstPost(int horizon, int c, int c2, bool beaconFo
  * @param horizon     the green field horizon
  */
 // Look for posts and goals given the runs we've collected
-void ObjectFragments::goalScan(VisualFieldObject* left, VisualFieldObject* right, VisualFieldObject* mid, int c, int c2, bool beaconFound, int horizon) {
+void ObjectFragments::goalScan(VisualFieldObject* left,
+                               VisualFieldObject* right,
+                               VisualBackstop* mid, int c, int c2,
+                               bool beaconFound, int horizon) {
   //cout << horizon << " " << slope << endl;
   // if we don't have any runs there is nothing to do
   if (numberOfRuns <= 1) return;
@@ -6352,7 +6363,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
  * @param  thisBall  the ball object
  * @return           we always return 0 - the return is an artifact of other methods
  */
-int ObjectFragments::balls(int horizon, Ball *thisBall) {
+int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
   int confidence = 10;
   occlusion = NOOCCLUSION;
   if (numberOfRuns > 1) {
@@ -6519,7 +6530,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   }
   thisBall->setConfidence(SURE);
   thisBall->findAngles();
-  thisBall->setFocalDistance();
+  thisBall->setFocalDistanceFromRadius();
   thisBall->setDistanceEst(vision->pose->
                            bodyEstimate(thisBall->getCenterX(),
                                         thisBall->getCenterY(),
@@ -6535,7 +6546,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
   if (BALLDISTDEBUG) {
     estimate es;
     es = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, topBlob.leftTop.y + 2 * blobHeight(topBlob) / 3, 0.0);
-    cout << "Distance is " << thisBall->getDist() << " " << thisBall->getFocDist() << " " << es.dist << endl;
+    cout << "Distance is " << thisBall->getDistance() << " " << thisBall->getFocDist() << " " << es.dist << endl;
     cout<< "Radius"<<thisBall->getRadius()<<endl;
   }
   return 0;
@@ -6553,7 +6564,7 @@ int ObjectFragments::balls(int horizon, Ball *thisBall) {
    @param thisBall    the ball object
    @return            0 for success, 1 for fail
  */
-int ObjectFragments::circleFit(Ball * thisBall){
+int ObjectFragments::circleFit(VisualBall * thisBall){
   //thisBall->init();
     inferredConfidence = 0;
     if(numPoints < 3){
@@ -7103,8 +7114,9 @@ int ObjectFragments::midPoint(int a, int b) {
 
 
 
-/*  The next group of functions are for debugging only.  They are set up so that debugging information
- *  will only appear when processing is done off-line.
+/*
+ * The next group of functions are for debugging only.  They are set up so that
+ * debugging information will only appear when processing is done off-line.
  */
 
 /*  Print debugging information for a field object.
@@ -7113,27 +7125,30 @@ int ObjectFragments::midPoint(int a, int b) {
 
 void ObjectFragments::printObject(VisualFieldObject * objs) {
 #if defined OFFLINE
-  cout << objs->getLeftTopX() << " " << objs->getLeftTopY() << " " << objs->getRightTopX() << " " << objs->getRightTopY() << endl;
-  cout << objs->getLeftBottomX() << " " << objs->getLeftBottomY() << " " << objs->getRightBottomX() << " " << objs->getRightBottomY() << endl;
-  cout << "Height is " << objs->getHeight() << " Width is " << objs->getWidth() << endl;
-  if (objs->getIDCertainty() == _SURE)
-    cout << "Very sure" << endl;
-  else
-    cout << "Not sure" << endl;
-  distanceCertainty dc = objs->getDistanceCertainty();
-  switch (dc) {
-  case BOTH_SURE:
-    cout << "Distance should be good" << endl;
-    break;
-  case HEIGHT_UNSURE:
-    cout << "Heights are not to be trusted" << endl;
-    break;
-  case WIDTH_UNSURE:
-    cout << "Widths are not to be trusted" << endl;
-    break;
-  case BOTH_UNSURE:
-    cout << "Neither height nor width should be trusted" << endl;
-    break;
+    cout << objs->getLeftTopX() << " " << objs->getLeftTopY() << " "
+         << objs->getRightTopX() << " " << objs->getRightTopY() << endl;
+    cout << objs->getLeftBottomX() << " " << objs->getLeftBottomY() << " "
+         << objs->getRightBottomX() << " " << objs->getRightBottomY() << endl;
+    cout << "Height is " << objs->getHeight() << " Width is "
+         << objs->getWidth() << endl;
+    if (objs->getIDCertainty() == _SURE)
+        cout << "Very sure" << endl;
+    else
+        cout << "Not sure" << endl;
+    distanceCertainty dc = objs->getDistanceCertainty();
+    switch (dc) {
+    case BOTH_SURE:
+        cout << "Distance should be good" << endl;
+        break;
+    case HEIGHT_UNSURE:
+        cout << "Heights are not to be trusted" << endl;
+        break;
+    case WIDTH_UNSURE:
+        cout << "Widths are not to be trusted" << endl;
+        break;
+    case BOTH_UNSURE:
+        cout << "Neither height nor width should be trusted" << endl;
+        break;
   }
 #endif
 }
@@ -7161,11 +7176,11 @@ void ObjectFragments::printObjs() {
     }
     if (vision->bgBackstop->getWidth() >  0) {
       cout << "Vision found blue backstop " << endl;
-      printObject(vision->bgBackstop);
+      //printObject(vision->bgBackstop);
     }
     if (vision->ygBackstop->getWidth() >  0) {
       cout << "Vision found yellow backstop " << endl;
-      printObject(vision->ygBackstop);
+      //printObject(vision->ygBackstop);
     }
 #if ROBOT(AIBO)
     if (vision->yb->getWidth() >  0) {

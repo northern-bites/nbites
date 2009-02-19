@@ -10,7 +10,7 @@
 
 #include "EKF.h"
 #include "MCL.h"
-#include "Ball.h"
+#include "VisualBall.h"
 
 // Parameters
 #define ASSUMED_FPS 30.0
@@ -62,9 +62,9 @@ public:
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(Ball * ball);
+    void updateModel(VisualBall * ball);
     void sawTeammateBall(Measurement m);
-    void sawBall(Ball * ball);
+    void sawBall(VisualBall * ball);
 
     // Getters
     /**

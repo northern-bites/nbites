@@ -40,10 +40,11 @@
 class Vision;   // forward reference
 
 // including Class header files
-// #include "FieldObjects.h"
+#include "VisualBackstop.h"
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
-#include "Ball.h"
+#include "VisualBall.h"
+#include "VisualRobot.h"
 #include "Threshold.h"
 #include "NaoPose.h"
 #include "FieldLines.h"
@@ -81,6 +82,7 @@ class Vision
     // visualization methods
     virtual void drawBoxes(void);
     virtual void drawFieldObject(VisualFieldObject* obj, int color);
+    virtual void drawBackstop(VisualBackstop* obj, int color);
     virtual void drawBox(int left, int right, int bottom, int top, int c);
     virtual void drawCenters(void);
     virtual void drawRect(int left, int top, int width, int height, int c);
@@ -137,13 +139,14 @@ class Vision
 
     // OBJECT RECOGNITION VARIABLES
     // Field Object pointers
-    VisualFieldObject *bgrp, *bglp, *bgBackstop;
-    VisualFieldObject *ygrp, *yglp, *ygBackstop;
+    VisualFieldObject *bgrp, *bglp;
+    VisualFieldObject *ygrp, *yglp;
+    VisualBackstop *ygBackstop, *bgBackstop;
     VisualFieldObject *by, *yb;
     VisualFieldObject *blueArc, *yellowArc;
-    VisualFieldObject *red1, *red2;
-    VisualFieldObject *navy1, *navy2;
-    Ball *ball;
+    VisualRobot *red1, *red2;
+    VisualRobot *navy1, *navy2;
+    VisualBall *ball;
 #ifdef USE_PINK_BALL
     Ball *pinkBall; //added for pink ball recognition
 #endif

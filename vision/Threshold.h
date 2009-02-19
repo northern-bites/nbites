@@ -125,6 +125,7 @@ class Threshold
 
   void storeFieldObjects();
   void setFieldObjectInfo(VisualFieldObject *objPtr);
+  void setVisualRobotInfo(VisualRobot *objPtr);
   float getGoalPostDistFromHeight(float height);
   float getGoalPostDistFromWidth(float width);
   float getBeaconDistFromHeight(float height);

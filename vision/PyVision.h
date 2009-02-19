@@ -681,7 +681,7 @@ static PyTypeObject PyThresholdType = {
 
 typedef struct PyBall_t {
   PyObject_HEAD
-  Ball *ball;
+  VisualBall *ball;
   PyObject *centerX;
   PyObject *centerY;
   PyObject *width;
@@ -694,7 +694,7 @@ typedef struct PyBall_t {
 } PyBall;
 
 // C++ - accessible interface
-extern PyObject *PyBall_new    (Ball *b);
+extern PyObject *PyBall_new    (VisualBall *b);
 extern void      PyBall_update (PyBall *b);
 // backend methods
 extern PyObject *PyBall_new    (PyTypeObject *type, PyObject *args,
@@ -893,8 +893,6 @@ static PyTypeObject PyFieldObjectType = {
     0,                         /* tp_alloc */
     PyFieldObject_new,         /* tp_new */
 };
-
-
 
 //
 // PyVision definitions
@@ -1099,4 +1097,248 @@ static PyMethodDef vision_methods[] = {
 PyMODINIT_FUNC MODULE_INIT(vision) (void);
 
 
+//
+// PyBackstop definitions
+//
+
+
+typedef struct PyBackstop_t {
+    PyObject_HEAD // Our stuff is below
+    VisualBackstop *backstop;
+    PyObject *x;
+    PyObject *y;
+    PyObject *centerX;
+    PyObject *centerY;
+    PyObject *angleX;
+    PyObject *angleY;
+    PyObject *width;
+    PyObject *height;
+    PyObject *focDist;
+    PyObject *distance;
+    PyObject *bearing;
+    PyObject *elevation;
+    PyObject *leftOpening;
+    PyObject *rightOpening;
+    PyObject *shoot;
+
+} PyBackstop;
+
+// C++ - accessible interface
+extern PyObject *PyBackstop_new    (VisualBackstop *b);
+extern void      PyBackstop_update (PyBackstop *b);
+// backend methods
+extern PyObject *PyBackstop_new    (PyTypeObject *type, PyObject *args,
+                                PyObject *kwds);
+extern void      PyBackstop_dealloc(PyBackstop *b);
+
+// Method list
+static PyMethodDef PyBackstop_methods[] = {
+
+  {"update", (PyCFunction)PyBackstop_update, METH_NOARGS,
+    "Update all the built Python objects to reflect the current state of the "
+    "backend C++ objects.  Recurses down the variable references to update "
+    "any attributes that are also wrapped C++ vision objects."},
+
+  /* Sentinal */
+  { NULL }
+};
+
+// Member list
+static PyMemberDef PyBackstop_members[] = {
+  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, x), READONLY,
+    "Backstop screen X coordinate"},
+  {"centerY", T_OBJECT_EX, offsetof(PyBackstop, y), READONLY,
+    "Backstop screen Y coordinate"},
+  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, centerX), READONLY,
+    "Backstop center X coordinate"},
+  {"centerY", T_OBJECT_EX, offsetof(PyBackstop, centerY), READONLY,
+    "Backstop center Y coordinate"},
+  {"width", T_OBJECT_EX, offsetof(PyBackstop, angleX), READONLY,
+    "Backstop angleX"},
+  {"height", T_OBJECT_EX, offsetof(PyBackstop, angleY), READONLY,
+    "Backstop angleY"},
+  {"width", T_OBJECT_EX, offsetof(PyBackstop, width), READONLY,
+    "Backstop width"},
+  {"height", T_OBJECT_EX, offsetof(PyBackstop, height), READONLY,
+    "Backstop height"},
+  {"focDist", T_OBJECT_EX, offsetof(PyBackstop, focDist), READONLY,
+    "Backstop focal distance"},
+  {"dist", T_OBJECT_EX, offsetof(PyBackstop, distance), READONLY,
+    "Backstop linear distance"},
+  {"bearing", T_OBJECT_EX, offsetof(PyBackstop, bearing), READONLY,
+    "Backstop bearing to body"},
+  {"elevation", T_OBJECT_EX, offsetof(PyBackstop, elevation), READONLY,
+    "Backstop elevation"},
+  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, leftOpening), READONLY,
+    "Backstop left opening"},
+  {"centerY", T_OBJECT_EX, offsetof(PyBackstop, rightOpening), READONLY,
+    "Backstop right opening"},
+  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, shoot), READONLY,
+    "Backstop shot available"},
+
+  /* Sentinal */
+  { NULL }
+};
+
+// PyBackstop type definition
+static PyTypeObject PyBackstopType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "vision.Backstop",             /*tp_name*/
+    sizeof(PyBackstop),            /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)PyBackstop_dealloc,/*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Backstop object",             /* tp_doc */
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    PyBackstop_methods,            /* tp_methods */
+    PyBackstop_members,            /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    0,                         /* tp_init */
+    0,                         /* tp_alloc */
+    PyBackstop_new,                /* tp_new */
+};
+
+//
+// PyVisualRobot definitions
+//
+
+
+typedef struct PyVisualRobot_t {
+    PyObject_HEAD // Our stuff is below
+    VisualRobot *robot;
+    PyObject *x;
+    PyObject *y;
+    PyObject *centerX;
+    PyObject *centerY;
+    PyObject *angleX;
+    PyObject *angleY;
+    PyObject *width;
+    PyObject *height;
+    PyObject *focDist;
+    PyObject *distance;
+    PyObject *bearing;
+    PyObject *elevation;
+
+} PyVisualRobot;
+
+// C++ - accessible interface
+extern PyObject *PyVisualRobot_new    (VisualRobot *b);
+extern void      PyVisualRobot_update (PyVisualRobot *b);
+// backend methods
+extern PyObject *PyVisualRobot_new    (PyTypeObject *type, PyObject *args,
+                                       PyObject *kwds);
+extern void      PyVisualRobot_dealloc(PyVisualRobot *b);
+
+// Method list
+static PyMethodDef PyVisualRobot_methods[] = {
+
+  {"update", (PyCFunction)PyVisualRobot_update, METH_NOARGS,
+    "Update all the built Python objects to reflect the current state of the "
+    "backend C++ objects.  Recurses down the variable references to update "
+    "any attributes that are also wrapped C++ vision objects."},
+
+  /* Sentinal */
+  { NULL }
+};
+
+// Member list
+static PyMemberDef PyVisualRobot_members[] = {
+  {"centerX", T_OBJECT_EX, offsetof(PyVisualRobot, x), READONLY,
+    "VisualRobot screen X coordinate"},
+  {"centerY", T_OBJECT_EX, offsetof(PyVisualRobot, y), READONLY,
+    "VisualRobot screen Y coordinate"},
+  {"centerX", T_OBJECT_EX, offsetof(PyVisualRobot, centerX), READONLY,
+    "VisualRobot center X coordinate"},
+  {"centerY", T_OBJECT_EX, offsetof(PyVisualRobot, centerY), READONLY,
+    "VisualRobot center Y coordinate"},
+  {"width", T_OBJECT_EX, offsetof(PyVisualRobot, angleX), READONLY,
+    "VisualRobot angleX"},
+  {"height", T_OBJECT_EX, offsetof(PyVisualRobot, angleY), READONLY,
+    "VisualRobot angleY"},
+  {"width", T_OBJECT_EX, offsetof(PyVisualRobot, width), READONLY,
+    "VisualRobot width"},
+  {"height", T_OBJECT_EX, offsetof(PyVisualRobot, height), READONLY,
+    "VisualRobot height"},
+  {"focDist", T_OBJECT_EX, offsetof(PyVisualRobot, focDist), READONLY,
+    "VisualRobot focal distance"},
+  {"dist", T_OBJECT_EX, offsetof(PyVisualRobot, distance), READONLY,
+    "VisualRobot linear distance"},
+  {"bearing", T_OBJECT_EX, offsetof(PyVisualRobot, bearing), READONLY,
+    "VisualRobot bearing to body"},
+  {"elevation", T_OBJECT_EX, offsetof(PyVisualRobot, elevation), READONLY,
+    "VisualRobot elevation"},
+  /* Sentinal */
+  { NULL }
+};
+
+// PyVisualRobot type definition
+static PyTypeObject PyVisualRobotType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "vision.VisualRobot",             /*tp_name*/
+    sizeof(PyVisualRobot),            /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)PyVisualRobot_dealloc,/*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "VisualRobot object",             /* tp_doc */
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    PyVisualRobot_methods,            /* tp_methods */
+    PyVisualRobot_members,            /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    0,                         /* tp_init */
+    0,                         /* tp_alloc */
+    PyVisualRobot_new,                /* tp_new */
+};
+
+
 #endif /* PyVision_h */
+

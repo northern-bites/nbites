@@ -14,7 +14,7 @@ VisualFieldObject::VisualFieldObject() : id(UNKNOWN_FIELD_OBJECT) {
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,
                                      const float _distance,
                                      const float _bearing)
-    : VisualLandmark(_x, _y, _distance, _bearing) {
+    : VisualDetection(_x, _y, _distance, _bearing) {
 }
 VisualFieldObject::VisualFieldObject(const VisualFieldObject&) {
 }
