@@ -98,12 +98,11 @@ class Brain(object):
         self.bgrp = TypeDefs.FieldObject(self.vision.bgrp,
                                          Constants.VISION_BGRP)
 
-        self.bgCrossbar = TypeDefs.FieldObject(self.vision.bgCrossbar,
-                                         Constants.VISION_BG_CROSSBAR)
-        self.ygCrossbar = TypeDefs.FieldObject(self.vision.ygCrossbar,
-                                         Constants.VISION_YG_CROSSBAR)
+        self.bgCrossbar = TypeDefs.Crossbar(self.vision.bgCrossbar,
+                                            Constants.VISION_BG_CROSSBAR)
+        self.ygCrossbar = TypeDefs.Crossbar(self.vision.ygCrossbar,
+                                            Constants.VISION_YG_CROSSBAR)
 
-        
         # Now we setup the corners
         self.corners = []
         self.lines = []
