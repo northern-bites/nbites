@@ -64,144 +64,144 @@ static const float POST_MAX_FOC_DIST = 800.0f;
 class Threshold
 {
     friend class Vision;
- public:
-  Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr);
-  virtual ~Threshold() {}
+public:
+    Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr);
+    virtual ~Threshold() {}
 
-  // main methods
-  void visionLoop();
-  inline void threshold();
-  inline void runs();
-  void thresholdAndRuns();
-  void objectRecognition();
-  // helper methods
-  void initObjects(void);
-  void initColors();
-  void initTable(std::string filename);
-  void initTableFromBuffer(byte* tbfr);
-  void initCompressedTable(std::string filename);
+    // main methods
+    void visionLoop();
+    inline void threshold();
+    inline void runs();
+    void thresholdAndRuns();
+    void objectRecognition();
+    // helper methods
+    void initObjects(void);
+    void initColors();
+    void initTable(std::string filename);
+    void initTableFromBuffer(byte* tbfr);
+    void initCompressedTable(std::string filename);
 
-  void storeFieldObjects();
-  void setFieldObjectInfo(VisualFieldObject *objPtr);
-  void setVisualRobotInfo(VisualRobot *objPtr);
-  float getGoalPostDistFromHeight(float height);
-  float getGoalPostDistFromWidth(float width);
-  float getBeaconDistFromHeight(float height);
-  int distance(int x1, int x2, int x3, int x4);
-  float getEuclidianDist(point <int> coord1, point <int> coord2);
-  void findGreenHorizon();
-  point <int> findIntersection(int col, int dir, int c);
-  int postCheck(bool which, int left, int right);
-  point <int> backStopCheck(bool which, int left, int right);
-  void setYUV(const uchar* newyuv);
-  const uchar* getYUV();
-  static const char * getShortColor(int _id);
+    void storeFieldObjects();
+    void setFieldObjectInfo(VisualFieldObject *objPtr);
+    void setVisualRobotInfo(VisualRobot *objPtr);
+    float getGoalPostDistFromHeight(float height);
+    float getGoalPostDistFromWidth(float width);
+    float getBeaconDistFromHeight(float height);
+    int distance(int x1, int x2, int x3, int x4);
+    float getEuclidianDist(point <int> coord1, point <int> coord2);
+    void findGreenHorizon();
+    point <int> findIntersection(int col, int dir, int c);
+    int postCheck(bool which, int left, int right);
+    point <int> backStopCheck(bool which, int left, int right);
+    void setYUV(const uchar* newyuv);
+    const uchar* getYUV();
+    static const char * getShortColor(int _id);
 
-  void swapUV() { inverted = !inverted; setYUV(yuv); }
-  void swapUV(bool _inverted) { inverted = _inverted; setYUV(yuv); }
+    void swapUV() { inverted = !inverted; setYUV(yuv); }
+    void swapUV(bool _inverted) { inverted = _inverted; setYUV(yuv); }
 
 
 #ifdef OFFLINE
-  void setConstant(int c);
-  void setHorizonDebug(bool _bool) { visualHorizonDebug = _bool; }
-  bool getHorizonDebug() { return visualHorizonDebug; }
+    void setConstant(int c);
+    void setHorizonDebug(bool _bool) { visualHorizonDebug = _bool; }
+    bool getHorizonDebug() { return visualHorizonDebug; }
 #endif
 
-  void initDebugImage();
-  void transposeDebugImage();
-  void drawX(int x, int y, int c);
-  void drawPoint(int x, int y, int c);
-  void drawLine(const point<int> start, const point<int> end,
-                const int color);
-  void drawVisualHorizon();
-  void drawLine(int x, int y, int x1, int y1, int c);
-  void drawBox(int left, int right, int bottom, int top, int c);
-  void drawRect(int left, int top, int width, int height, int c);
+    void initDebugImage();
+    void transposeDebugImage();
+    void drawX(int x, int y, int c);
+    void drawPoint(int x, int y, int c);
+    void drawLine(const point<int> start, const point<int> end,
+                  const int color);
+    void drawVisualHorizon();
+    void drawLine(int x, int y, int x1, int y1, int c);
+    void drawBox(int left, int right, int bottom, int top, int c);
+    void drawRect(int left, int top, int width, int height, int c);
 
 
 #if ROBOT(NAO_RL)
-  inline uchar getCorrY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
-  inline uchar getCorrU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
-  inline uchar getCorrV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
+    inline uchar getCorrY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
+    inline uchar getCorrU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
+    inline uchar getCorrV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
 
-  inline uchar getY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
-  inline uchar getU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
-  inline uchar getV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
+    inline uchar getY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
+    inline uchar getU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
+    inline uchar getV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
 #else
 #  error Undefined robot type
 #endif
 
-  int getVisionHorizon() { return horizon; }
+    int getVisionHorizon() { return horizon; }
 
-  inline static int ROUND(float x) {
-    if ((x-(int)x) >= 0.5) return ((int)x+1);
-    if ((x-(int)x) <= -0.5) return ((int)x-1);
-    else return (int)x;
-  }
+    inline static int ROUND(float x) {
+        if ((x-(int)x) >= 0.5) return ((int)x+1);
+        if ((x-(int)x) <= -0.5) return ((int)x-1);
+        else return (int)x;
+    }
 
 
-  ObjectFragments *blue;
-  ObjectFragments *yellow;
-  ObjectFragments *orange;
-  ObjectFragments *green;
-  ObjectFragments *navyblue;
-  ObjectFragments *red;
+    ObjectFragments *blue;
+    ObjectFragments *yellow;
+    ObjectFragments *orange;
+    ObjectFragments *green;
+    ObjectFragments *navyblue;
+    ObjectFragments *red;
 
-  // can keep these arrays at hi-res size ...at any resolution
-  //int sawYellowBlue[IMAGE_WIDTH];
-  //int sawBlueYellow[IMAGE_WIDTH];
-  bool sawYellowBlue, sawBlueYellow;
-  int firstYellowBlue, firstYellowBlueY;
-  int firstBlueYellow, firstBlueYellowY;
+    // can keep these arrays at hi-res size ...at any resolution
+    //int sawYellowBlue[IMAGE_WIDTH];
+    //int sawBlueYellow[IMAGE_WIDTH];
+    bool sawYellowBlue, sawBlueYellow;
+    int firstYellowBlue, firstYellowBlueY;
+    int firstBlueYellow, firstBlueYellowY;
 
-  // main array
-  unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
+    // main array
+    unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
 
 #ifdef OFFLINE//write lines, points, boxes to this array to avoid changing the real image
-  unsigned char debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
+    unsigned char debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
 
-  bool inverted;
+    bool inverted;
 
- private:
+private:
 
-  // class pointers
-  Vision* vision;
-  boost::shared_ptr<NaoPose> pose;
+    // class pointers
+    Vision* vision;
+    boost::shared_ptr<NaoPose> pose;
 
-  const uchar* yuv;
-  const uchar* yplane, *uplane, *vplane;
+    const uchar* yuv;
+    const uchar* yplane, *uplane, *vplane;
 
-  unsigned char bigTable[YMAX][UMAX][VMAX];
+    unsigned char bigTable[YMAX][UMAX][VMAX];
 
-  // open field variables
-  int openField[IMAGE_WIDTH];
-  int closePoint;
-  int closePoint1;
-  int closePoint2;
-  bool stillOpen;
+    // open field variables
+    int openField[IMAGE_WIDTH];
+    int closePoint;
+    int closePoint1;
+    int closePoint2;
+    bool stillOpen;
 
-  bool greenBlue[IMAGE_WIDTH];
-  bool greenYellow[IMAGE_WIDTH];
-  int yellowWhite[IMAGE_WIDTH];
-  int blueWhite[IMAGE_WIDTH];
-  int navyTops[IMAGE_WIDTH];
-  int redTops[IMAGE_WIDTH];
-  int navyBottoms[IMAGE_WIDTH];
-  int redBottoms[IMAGE_WIDTH];
+    bool greenBlue[IMAGE_WIDTH];
+    bool greenYellow[IMAGE_WIDTH];
+    int yellowWhite[IMAGE_WIDTH];
+    int blueWhite[IMAGE_WIDTH];
+    int navyTops[IMAGE_WIDTH];
+    int redTops[IMAGE_WIDTH];
+    int navyBottoms[IMAGE_WIDTH];
+    int redBottoms[IMAGE_WIDTH];
 
-  // thresholding variables
-  int horizon;
-  int lastPixel;
-  int currentRun;
-  int previousRun;
-  int newPixel;
+    // thresholding variables
+    int horizon;
+    int lastPixel;
+    int currentRun;
+    int previousRun;
+    int newPixel;
 
 #ifdef OFFLINE
-  // Visual horizon debugging
-  bool visualHorizonDebug;
+    // Visual horizon debugging
+    bool visualHorizonDebug;
 #endif
 };
 

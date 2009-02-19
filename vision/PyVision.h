@@ -27,8 +27,8 @@
   same offsets for the same members in many cases).
 */
 
-#define offsetof_in_object(OBJECT, MEMBER) \
-          ((size_t) ((char *)&(OBJECT.MEMBER) - (char*)&OBJECT))
+#define offsetof_in_object(OBJECT, MEMBER)                  \
+    ((size_t) ((char *)&(OBJECT.MEMBER) - (char*)&OBJECT))
 
 
 
@@ -38,17 +38,17 @@
 
 
 typedef struct PyPose_t {
-  PyObject_HEAD
-  NaoPose *pose;
+    PyObject_HEAD
+    NaoPose *pose;
 
-  // Horizon y coordinates
-  PyObject *leftHorizonY, *rightHorizonY;
-  // Slope of the horizon line
-  PyObject *horizonSlope;
-  // Height of body in space
-  //PyObject *bodyCenterHeight;
-  // Angle of head to body
-  //PyObject *panAngle;
+    // Horizon y coordinates
+    PyObject *leftHorizonY, *rightHorizonY;
+    // Slope of the horizon line
+    PyObject *horizonSlope;
+    // Height of body in space
+    //PyObject *bodyCenterHeight;
+    // Angle of head to body
+    //PyObject *panAngle;
 } PyPose;
 
 // C++ - accessible interface
@@ -64,31 +64,31 @@ extern PyObject *PyPose_update (PyObject *self, PyObject *args);
 // Method list
 static PyMethodDef PyPose_methods[] = {
 
-  {"update", (PyCFunction)PyPose_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"update", (PyCFunction)PyPose_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyPose_members[] = {
 
-  {"leftHorizonY", T_OBJECT_EX, offsetof(PyPose, leftHorizonY), READONLY,
-    "Left horizon y coordinate"},
-  {"rightHorizonY", T_OBJECT_EX, offsetof(PyPose, rightHorizonY), READONLY,
-    "Right horizon y coordinate"},
-  {"horizonSlope", T_OBJECT_EX, offsetof(PyPose, horizonSlope), READONLY,
-    "Slope of the horizon line"},
-  //{"bodyCenterHeight", T_OBJECT_EX, offsetof(PyPose, bodyCenterHeight),
-  //  READONLY, "Height of center of body in space"},
-  //{"panAngle", T_OBJECT_EX, offsetof(PyPose, panAngle), READONLY,
-  //   "Angle of the head to body"},
+    {"leftHorizonY", T_OBJECT_EX, offsetof(PyPose, leftHorizonY), READONLY,
+     "Left horizon y coordinate"},
+    {"rightHorizonY", T_OBJECT_EX, offsetof(PyPose, rightHorizonY), READONLY,
+     "Right horizon y coordinate"},
+    {"horizonSlope", T_OBJECT_EX, offsetof(PyPose, horizonSlope), READONLY,
+     "Slope of the horizon line"},
+    //{"bodyCenterHeight", T_OBJECT_EX, offsetof(PyPose, bodyCenterHeight),
+    //  READONLY, "Height of center of body in space"},
+    //{"panAngle", T_OBJECT_EX, offsetof(PyPose, panAngle), READONLY,
+    //   "Angle of the head to body"},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // PyPose type definition
@@ -142,16 +142,16 @@ static PyTypeObject PyPoseType = {
 
 
 typedef struct PyFieldLines_t {
-  PyObject_HEAD
-  FieldLines *fl;
+    PyObject_HEAD
+    FieldLines *fl;
 
-  PyObject *numLines;
-  PyObject *lines;
-  vector<PyObject*> raw_corners;
+    PyObject *numLines;
+    PyObject *lines;
+    vector<PyObject*> raw_corners;
 
-  PyObject *numCorners;
-  PyObject *corners;
-  vector<PyObject*> raw_lines;
+    PyObject *numCorners;
+    PyObject *corners;
+    vector<PyObject*> raw_lines;
 
 } PyFieldLines;
 
@@ -183,35 +183,35 @@ extern PyObject *PyFieldLines_update (PyObject *self, PyObject *args);
 // Method list
 static PyMethodDef PyFieldLines_methods[] = {
 
-  {"update", (PyCFunction)PyFieldLines_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"update", (PyCFunction)PyFieldLines_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyFieldLines_members[] = {
 
-  {"numLines", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, numLines),
-    READONLY,
-    "The number of lines detected in the current image"},
-  {"lines", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, lines),
-    READONLY,
-    "List of lines in the image.  Note, the list contains references to\n"
-    "MAX_FIELD_LINES Line objects.  Only the first `numLines' lines\n"
-    "reflect accurate updated values of lines currently seen."},
-  {"numCorners", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, numCorners),
-    READONLY,
-   "The Number of corners detected in the current image"},
-  {"corners", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, corners),
-    READONLY,
-   "List of corners in the image."},
+    {"numLines", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, numLines),
+     READONLY,
+     "The number of lines detected in the current image"},
+    {"lines", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, lines),
+     READONLY,
+     "List of lines in the image.  Note, the list contains references to\n"
+     "MAX_FIELD_LINES Line objects.  Only the first `numLines' lines\n"
+     "reflect accurate updated values of lines currently seen."},
+    {"numCorners", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, numCorners),
+     READONLY,
+     "The Number of corners detected in the current image"},
+    {"corners", T_OBJECT_EX, offsetof_in_object(dummy_fieldlines, corners),
+     READONLY,
+     "List of corners in the image."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // PyFieldLines type definition
@@ -265,19 +265,19 @@ static PyTypeObject PyFieldLinesType = {
 
 
 typedef struct PyVisualCorner_t {
-  PyObject_HEAD
-  PyFieldLines *fl;
+    PyObject_HEAD
+    PyFieldLines *fl;
 
-  // The index of this VisualCorner in FieldLines.getCorners()
-  int i;
-  // Visual x and y coordinates (not included for now)
-  // PyObject *x, *y;
-  // Distance and bearing objects
-  PyObject *dist, *bearing;
-  // Certainty objects (not included for now)
-  //PyObject *distCert, *idCert;
-  // List of possible ConcreteCorner's
-  PyObject *possibilities;
+    // The index of this VisualCorner in FieldLines.getCorners()
+    int i;
+    // Visual x and y coordinates (not included for now)
+    // PyObject *x, *y;
+    // Distance and bearing objects
+    PyObject *dist, *bearing;
+    // Certainty objects (not included for now)
+    //PyObject *distCert, *idCert;
+    // List of possible ConcreteCorner's
+    PyObject *possibilities;
 
 } PyVisualCorner;
 
@@ -298,31 +298,31 @@ extern void      PyVisualCorner_dealloc(PyVisualCorner *self);
 // Method list
 static PyMethodDef PyVisualCorner_methods[] = {
 
-  /*jf-
-  {"update", (PyCFunction)PyVisualCorner_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    /*jf-
+      {"update", (PyCFunction)PyVisualCorner_update, METH_NOARGS,
+      "Update all the built Python objects to reflect the current state of the "
+      "backend C++ objects.  Recurses down the variable references to update "
+      "any attributes that are also wrapped C++ vision objects."},
     */
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyVisualCorner_members[] = {
 
-  {"dist", T_OBJECT_EX, offsetof(PyVisualCorner, dist), READONLY,
-    "Distance to the center of the corner"},
-  {"bearing", T_OBJECT_EX, offsetof(PyVisualCorner, bearing), READONLY,
-    "Bearing to the center of the corner"},
-  {"possibilities", T_OBJECT_EX, offsetof(PyVisualCorner, possibilities),
-    READONLY,
-    "List of possible ConcreteCorner objects that this VisualCorner could "
-    "represent."},
+    {"dist", T_OBJECT_EX, offsetof(PyVisualCorner, dist), READONLY,
+     "Distance to the center of the corner"},
+    {"bearing", T_OBJECT_EX, offsetof(PyVisualCorner, bearing), READONLY,
+     "Bearing to the center of the corner"},
+    {"possibilities", T_OBJECT_EX, offsetof(PyVisualCorner, possibilities),
+     READONLY,
+     "List of possible ConcreteCorner objects that this VisualCorner could "
+     "represent."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // PyVisualCorner type definition
@@ -376,13 +376,13 @@ static PyTypeObject PyVisualCornerType = {
 
 
 typedef struct PyConcreteCorner_t {
-  PyObject_HEAD
-  PyFieldLines *fl;
+    PyObject_HEAD
+    PyFieldLines *fl;
 
-  // The id of this corner, out of all corners
-  PyObject *id;
-  // Concrete x and y coordinates (localization-wise)
-  PyObject *fieldX, *fieldY;
+    // The id of this corner, out of all corners
+    PyObject *id;
+    // Concrete x and y coordinates (localization-wise)
+    PyObject *fieldX, *fieldY;
 
 } PyConcreteCorner;
 
@@ -396,15 +396,15 @@ extern void      PyConcreteCorner_dealloc(PyConcreteCorner *self);
 // Member list
 static PyMemberDef PyConcreteCorner_members[] = {
 
-  {"id", T_OBJECT_EX, offsetof(PyConcreteCorner, id), READONLY,
-    "The unique ID of this ConcreteCorner."},
-  {"fieldX", T_OBJECT_EX, offsetof(PyConcreteCorner, fieldX), READONLY,
-    "Field x coordinate of the location of this ConcreteCorner."},
-  {"fieldY", T_OBJECT_EX, offsetof(PyConcreteCorner, fieldY), READONLY,
-    "Field y coordinate of the location of this ConcreteCorner."},
+    {"id", T_OBJECT_EX, offsetof(PyConcreteCorner, id), READONLY,
+     "The unique ID of this ConcreteCorner."},
+    {"fieldX", T_OBJECT_EX, offsetof(PyConcreteCorner, fieldX), READONLY,
+     "Field x coordinate of the location of this ConcreteCorner."},
+    {"fieldY", T_OBJECT_EX, offsetof(PyConcreteCorner, fieldY), READONLY,
+     "Field y coordinate of the location of this ConcreteCorner."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // PyConcreteCorner type definition
@@ -458,15 +458,15 @@ static PyTypeObject PyConcreteCornerType = {
 
 
 typedef struct PyVisualLine_t {
-  PyObject_HEAD
-  PyFieldLines *fl;
+    PyObject_HEAD
+    PyFieldLines *fl;
 
-  // The index of this VisualLine in FieldLines.getLines()
-  unsigned int i;
-  // X and Y coordinates
-  PyObject *x1, *y1, *x2, *y2;
-  // Line slope and length
-  PyObject *slope, *length;
+    // The index of this VisualLine in FieldLines.getLines()
+    unsigned int i;
+    // X and Y coordinates
+    PyObject *x1, *y1, *x2, *y2;
+    // Line slope and length
+    PyObject *slope, *length;
 
 } PyVisualLine;
 
@@ -483,41 +483,41 @@ extern PyObject *PyVisualLine_new    (PyTypeObject *type, PyObject *args,
 extern void      PyVisualLine_dealloc(PyVisualLine *self);
 // Python - accessible interface
 /*jf-
-extern PyObject *PyVisualLine_update (PyObject *self, PyObject *args);
+  extern PyObject *PyVisualLine_update (PyObject *self, PyObject *args);
 */
 
 // Method list
 static PyMethodDef PyVisualLine_methods[] = {
 
-  /*jf-
-  {"update", (PyCFunction)PyVisualLine_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    /*jf-
+      {"update", (PyCFunction)PyVisualLine_update, METH_NOARGS,
+      "Update all the built Python objects to reflect the current state of the "
+      "backend C++ objects.  Recurses down the variable references to update "
+      "any attributes that are also wrapped C++ vision objects."},
     */
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyVisualLine_members[] = {
 
-  {"x1", T_OBJECT_EX, offsetof(PyVisualLine, x1), READONLY,
-    "First x coordinate"},
-  {"y1", T_OBJECT_EX, offsetof(PyVisualLine, y1), READONLY,
-    "First y coordinate"},
-  {"x2", T_OBJECT_EX, offsetof(PyVisualLine, x2), READONLY,
-    "Second x coordinate"},
-  {"y2", T_OBJECT_EX, offsetof(PyVisualLine, y2), READONLY,
-    "Second x coordinate"},
-  {"slope", T_OBJECT_EX, offsetof(PyVisualLine, slope), READONLY,
-    "Line slope"},
-  {"length", T_OBJECT_EX, offsetof(PyVisualLine, length), READONLY,
-    "Line length"},
+    {"x1", T_OBJECT_EX, offsetof(PyVisualLine, x1), READONLY,
+     "First x coordinate"},
+    {"y1", T_OBJECT_EX, offsetof(PyVisualLine, y1), READONLY,
+     "First y coordinate"},
+    {"x2", T_OBJECT_EX, offsetof(PyVisualLine, x2), READONLY,
+     "Second x coordinate"},
+    {"y2", T_OBJECT_EX, offsetof(PyVisualLine, y2), READONLY,
+     "Second x coordinate"},
+    {"slope", T_OBJECT_EX, offsetof(PyVisualLine, slope), READONLY,
+     "Line slope"},
+    {"length", T_OBJECT_EX, offsetof(PyVisualLine, length), READONLY,
+     "Line length"},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // PyVisualLine type definition
@@ -571,12 +571,12 @@ static PyTypeObject PyVisualLineType = {
 
 
 typedef struct PyThreshold_t {
-  PyObject_HEAD
-  Threshold *thresh;
-  PyObject *width;
-  PyObject *height;
+    PyObject_HEAD
+    Threshold *thresh;
+    PyObject *width;
+    PyObject *height;
 #if ROBOT(NAO)
-  PyObject *thresholded;
+    PyObject *thresholded;
 #endif
 } PyThreshold;
 
@@ -595,35 +595,35 @@ extern PyObject *PyThreshold_objectRecognition(PyObject *self, PyObject *args);
 // Method list
 static PyMethodDef PyThreshold_methods[] = {
 
-  {"visionLoop", (PyCFunction)PyThreshold_visionLoop, METH_NOARGS,
-    "Run the entire thresholding loop"},
-  {"thresholdAndRuns", (PyCFunction)PyThreshold_thresholdAndRuns, METH_NOARGS,
-    "Threshold the image and do runs"},
-  {"objectRecognition", (PyCFunction)PyThreshold_objectRecognition, 
-    METH_NOARGS, "Perform object recognition"},
-  {"update", (PyCFunction)PyThreshold_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"visionLoop", (PyCFunction)PyThreshold_visionLoop, METH_NOARGS,
+     "Run the entire thresholding loop"},
+    {"thresholdAndRuns", (PyCFunction)PyThreshold_thresholdAndRuns, METH_NOARGS,
+     "Threshold the image and do runs"},
+    {"objectRecognition", (PyCFunction)PyThreshold_objectRecognition, 
+     METH_NOARGS, "Perform object recognition"},
+    {"update", (PyCFunction)PyThreshold_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyThreshold_members[] = {
 
-  {"width", T_OBJECT_EX, offsetof(PyThreshold, width), READONLY,
-    "Image width"},
-  {"height", T_OBJECT_EX, offsetof(PyThreshold, height), READONLY,
-    "Image height"},
+    {"width", T_OBJECT_EX, offsetof(PyThreshold, width), READONLY,
+     "Image width"},
+    {"height", T_OBJECT_EX, offsetof(PyThreshold, height), READONLY,
+     "Image height"},
 #if ROBOT(NAO)
-  {"thresholded", T_OBJECT_EX, offsetof(PyThreshold, thresholded), READONLY,
-    "Thresholded image"},
+    {"thresholded", T_OBJECT_EX, offsetof(PyThreshold, thresholded), READONLY,
+     "Thresholded image"},
 #endif
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // PyThreshold type definition
@@ -677,17 +677,17 @@ static PyTypeObject PyThresholdType = {
 
 
 typedef struct PyBall_t {
-  PyObject_HEAD
-  VisualBall *ball;
-  PyObject *centerX;
-  PyObject *centerY;
-  PyObject *width;
-  PyObject *height;
-  PyObject *focDist;
-  PyObject *dist;
-  PyObject *bearing;
-  PyObject *elevation;
-  PyObject *confidence;
+    PyObject_HEAD
+    VisualBall *ball;
+    PyObject *centerX;
+    PyObject *centerY;
+    PyObject *width;
+    PyObject *height;
+    PyObject *focDist;
+    PyObject *dist;
+    PyObject *bearing;
+    PyObject *elevation;
+    PyObject *confidence;
 } PyBall;
 
 // C++ - accessible interface
@@ -701,39 +701,39 @@ extern void      PyBall_dealloc(PyBall *b);
 // Method list
 static PyMethodDef PyBall_methods[] = {
 
-  {"update", (PyCFunction)PyBall_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"update", (PyCFunction)PyBall_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
   
-  /* Sentinal */
-  { NULL }
+    /* Sentinal */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyBall_members[] = {
 
-  {"centerX", T_OBJECT_EX, offsetof(PyBall, centerX), READONLY,
-    "Ball center X coordinate"},
-  {"centerY", T_OBJECT_EX, offsetof(PyBall, centerY), READONLY,
-    "Ball center Y coordinate"},
-  {"width", T_OBJECT_EX, offsetof(PyBall, width), READONLY,
-    "Ball width"},
-  {"height", T_OBJECT_EX, offsetof(PyBall, height), READONLY,
-    "Ball height"},
-  {"focDist", T_OBJECT_EX, offsetof(PyBall, focDist), READONLY,
-    "Ball focal distance"},
-  {"dist", T_OBJECT_EX, offsetof(PyBall, dist), READONLY,
-    "Ball linear distance"},
-  {"bearing", T_OBJECT_EX, offsetof(PyBall, bearing), READONLY,
-    "Ball bearing to body"},
-  {"elevation", T_OBJECT_EX, offsetof(PyBall, elevation), READONLY,
-    "Ball elevation"},
-  {"confidence", T_OBJECT_EX, offsetof(PyBall, confidence), READONLY,
-    "Ball confidence (that it exists)"},
+    {"centerX", T_OBJECT_EX, offsetof(PyBall, centerX), READONLY,
+     "Ball center X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyBall, centerY), READONLY,
+     "Ball center Y coordinate"},
+    {"width", T_OBJECT_EX, offsetof(PyBall, width), READONLY,
+     "Ball width"},
+    {"height", T_OBJECT_EX, offsetof(PyBall, height), READONLY,
+     "Ball height"},
+    {"focDist", T_OBJECT_EX, offsetof(PyBall, focDist), READONLY,
+     "Ball focal distance"},
+    {"dist", T_OBJECT_EX, offsetof(PyBall, dist), READONLY,
+     "Ball linear distance"},
+    {"bearing", T_OBJECT_EX, offsetof(PyBall, bearing), READONLY,
+     "Ball bearing to body"},
+    {"elevation", T_OBJECT_EX, offsetof(PyBall, elevation), READONLY,
+     "Ball elevation"},
+    {"confidence", T_OBJECT_EX, offsetof(PyBall, confidence), READONLY,
+     "Ball confidence (that it exists)"},
 
-  /* Sentinal */
-  { NULL }
+    /* Sentinal */
+    { NULL }
 };
 
 // PyBall type definition
@@ -787,17 +787,17 @@ static PyTypeObject PyBallType = {
 
 
 typedef struct PyFieldObject_t {
-  PyObject_HEAD
-  VisualFieldObject *object;
-  PyObject *centerX;
-  PyObject *centerY;
-  PyObject *width;
-  PyObject *height;
-  PyObject *focDist;
-  PyObject *dist;
-  PyObject *bearing;
-  PyObject *certainty;
-  PyObject *distCertainty;
+    PyObject_HEAD
+    VisualFieldObject *object;
+    PyObject *centerX;
+    PyObject *centerY;
+    PyObject *width;
+    PyObject *height;
+    PyObject *focDist;
+    PyObject *dist;
+    PyObject *bearing;
+    PyObject *certainty;
+    PyObject *distCertainty;
 } PyFieldObject;
 
 // C++ - accessible inteface
@@ -813,39 +813,39 @@ extern PyObject *PyFieldObject_update (PyObject *self, PyObject *args);
 // Method list
 static PyMethodDef PyFieldObject_methods[] = {
 
-  {"update", (PyCFunction)PyFieldObject_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"update", (PyCFunction)PyFieldObject_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // Attribute list
 static PyMemberDef PyFieldObject_members[] = {
 
-  {"centerX", T_OBJECT_EX, offsetof(PyFieldObject, centerX), READONLY,
-    "Object center X coordinate"},
-  {"centerY", T_OBJECT_EX, offsetof(PyFieldObject, centerY), READONLY,
-    "Object center Y coordinate"},
-  {"width", T_OBJECT_EX, offsetof(PyFieldObject, width), READONLY,
-    "Object width"},
-  {"height", T_OBJECT_EX, offsetof(PyFieldObject, height), READONLY,
-    "Object height"},
-  {"focDist", T_OBJECT_EX, offsetof(PyFieldObject, focDist), READONLY,
-    "Object focal distance"},
-  {"dist", T_OBJECT_EX, offsetof(PyFieldObject, dist), READONLY,
-    "Object linear distance"},
-  {"bearing", T_OBJECT_EX, offsetof(PyFieldObject, bearing), READONLY,
-    "Object bearing to body"},
-  {"certainty", T_OBJECT_EX, offsetof(PyFieldObject, certainty), READONLY,
-    "Object certainty (that it exists)"},
-  {"distCertainty", T_OBJECT_EX, offsetof(PyFieldObject, distCertainty),
-    READONLY, "Object distance certainty"},
+    {"centerX", T_OBJECT_EX, offsetof(PyFieldObject, centerX), READONLY,
+     "Object center X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyFieldObject, centerY), READONLY,
+     "Object center Y coordinate"},
+    {"width", T_OBJECT_EX, offsetof(PyFieldObject, width), READONLY,
+     "Object width"},
+    {"height", T_OBJECT_EX, offsetof(PyFieldObject, height), READONLY,
+     "Object height"},
+    {"focDist", T_OBJECT_EX, offsetof(PyFieldObject, focDist), READONLY,
+     "Object focal distance"},
+    {"dist", T_OBJECT_EX, offsetof(PyFieldObject, dist), READONLY,
+     "Object linear distance"},
+    {"bearing", T_OBJECT_EX, offsetof(PyFieldObject, bearing), READONLY,
+     "Object bearing to body"},
+    {"certainty", T_OBJECT_EX, offsetof(PyFieldObject, certainty), READONLY,
+     "Object certainty (that it exists)"},
+    {"distCertainty", T_OBJECT_EX, offsetof(PyFieldObject, distCertainty),
+     READONLY, "Object distance certainty"},
 
-  /* Sentinal */
-  { NULL }
+    /* Sentinal */
+    { NULL }
 };
 
 // PyFieldObject type definition
@@ -897,30 +897,30 @@ static PyTypeObject PyFieldObjectType = {
 
 
 typedef struct PyVision_t {
-  PyObject_HEAD
-  Vision *vision;
-  PyObject *width;
-  PyObject *height;
+    PyObject_HEAD
+    Vision *vision;
+    PyObject *width;
+    PyObject *height;
 
-  // Pose object
-  PyObject *pose;
-  // FieldLines object
-  PyObject *fieldLines;
-  // Threshold object
-  PyObject *thresh;
+    // Pose object
+    PyObject *pose;
+    // FieldLines object
+    PyObject *fieldLines;
+    // Threshold object
+    PyObject *thresh;
 
-  // Blue goal left and right posts
-  PyObject *bgrp, *bglp;
-  // Yellow goal left and right posts
-  PyObject *ygrp, *yglp;
+    // Blue goal left and right posts
+    PyObject *bgrp, *bglp;
+    // Yellow goal left and right posts
+    PyObject *ygrp, *yglp;
 
-  // Goal crossbars
-  PyObject *bgCrossbar, *ygCrossbar;
+    // Goal crossbars
+    PyObject *bgCrossbar, *ygCrossbar;
 
-  // Robot recognition
-  PyObject *red1, *red2, *navy1, *navy2;
-  // Orange ball
-  PyObject *ball;
+    // Robot recognition
+    PyObject *red1, *red2, *navy1, *navy2;
+    // Orange ball
+    PyObject *ball;
 
 } PyVision;
 
@@ -944,83 +944,83 @@ extern PyObject *PyVision_stopProfiling(PyObject *self, PyObject *args);
 // Method list
 static PyMethodDef PyVision_methods[] = {
 
-  {"copyImage", (PyCFunction)PyVision_copyImage, METH_VARARGS, 
-    "copyImage(s) --> None.  Copy the contents of s into the extern image "
-    "buffer"},
-  {"notifyImage", (PyCFunction)PyVision_notifyImage, METH_VARARGS,
-    "notifyImage([s]) --> None.  \n\n"
-    "If argument s is passed, run the vision processing methods using the "
-    "pointer to s's internal char array.  If s is not provided, uses the "
-    "extern buffer."},
-  {"getColorTablePath", (PyCFunction)PyVision_getColorTablePath, METH_NOARGS,
-    "Get the path to the color table that is used."},
-  {"setColorTablePath", (PyCFunction)PyVision_setColorTablePath, METH_VARARGS,
-    "Set the path to the color table that should be used."},
-  {"startProfiling", (PyCFunction)PyVision_startProfiling, METH_VARARGS,
-    "startProfiling(nframes) --> None.  Start profiling for the next nframes\n"
-    "frames."},
-  {"stopProfiling", (PyCFunction)PyVision_stopProfiling, METH_NOARGS,
-    "stopProfiling() --> None.  Stop profiling, if still running, and print\n"
-    "profiling results."},
-  {"update", (PyCFunction)PyVision_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"copyImage", (PyCFunction)PyVision_copyImage, METH_VARARGS, 
+     "copyImage(s) --> None.  Copy the contents of s into the extern image "
+     "buffer"},
+    {"notifyImage", (PyCFunction)PyVision_notifyImage, METH_VARARGS,
+     "notifyImage([s]) --> None.  \n\n"
+     "If argument s is passed, run the vision processing methods using the "
+     "pointer to s's internal char array.  If s is not provided, uses the "
+     "extern buffer."},
+    {"getColorTablePath", (PyCFunction)PyVision_getColorTablePath, METH_NOARGS,
+     "Get the path to the color table that is used."},
+    {"setColorTablePath", (PyCFunction)PyVision_setColorTablePath, METH_VARARGS,
+     "Set the path to the color table that should be used."},
+    {"startProfiling", (PyCFunction)PyVision_startProfiling, METH_VARARGS,
+     "startProfiling(nframes) --> None.  Start profiling for the next nframes\n"
+     "frames."},
+    {"stopProfiling", (PyCFunction)PyVision_stopProfiling, METH_NOARGS,
+     "stopProfiling() --> None.  Stop profiling, if still running, and print\n"
+     "profiling results."},
+    {"update", (PyCFunction)PyVision_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // Attribute list
 static PyMemberDef PyVision_members[] = {
 
-  // Direct attribute
-  {"width", T_OBJECT_EX, offsetof(PyVision, width), READONLY,
-    "Image width"},
-  {"height", T_OBJECT_EX, offsetof(PyVision, height), READONLY,
-    "Image height"},
+    // Direct attribute
+    {"width", T_OBJECT_EX, offsetof(PyVision, width), READONLY,
+     "Image width"},
+    {"height", T_OBJECT_EX, offsetof(PyVision, height), READONLY,
+     "Image height"},
 
-  // Class reference attributes
-  {"bgrp", T_OBJECT_EX, offsetof(PyVision, bgrp), READONLY,
-    "Blue goal right post"},
-  {"bglp", T_OBJECT_EX, offsetof(PyVision, bglp), READONLY,
-    "Blue goal left post"},
-  {"ygrp", T_OBJECT_EX, offsetof(PyVision, ygrp), READONLY,
-    "Yellow goal right post"},
-  {"yglp", T_OBJECT_EX, offsetof(PyVision, yglp), READONLY,
-    "Yellow goal left post"},
-  {"bgCrossbar", T_OBJECT_EX, offsetof(PyVision, bgCrossbar), READONLY,
-    "Blue goal crossbar"},
-  {"ygCrossbar", T_OBJECT_EX, offsetof(PyVision, ygCrossbar), READONLY,
-    "Yellow goal crossbar"},
+    // Class reference attributes
+    {"bgrp", T_OBJECT_EX, offsetof(PyVision, bgrp), READONLY,
+     "Blue goal right post"},
+    {"bglp", T_OBJECT_EX, offsetof(PyVision, bglp), READONLY,
+     "Blue goal left post"},
+    {"ygrp", T_OBJECT_EX, offsetof(PyVision, ygrp), READONLY,
+     "Yellow goal right post"},
+    {"yglp", T_OBJECT_EX, offsetof(PyVision, yglp), READONLY,
+     "Yellow goal left post"},
+    {"bgCrossbar", T_OBJECT_EX, offsetof(PyVision, bgCrossbar), READONLY,
+     "Blue goal crossbar"},
+    {"ygCrossbar", T_OBJECT_EX, offsetof(PyVision, ygCrossbar), READONLY,
+     "Yellow goal crossbar"},
 
 
-  // Robot recognition
-  {"red1", T_OBJECT_EX, offsetof(PyVision, red1), READONLY,
-    "First red robot"},
-  {"red2", T_OBJECT_EX, offsetof(PyVision, red2), READONLY,
-    "Second red robot"},
-  {"navy1", T_OBJECT_EX, offsetof(PyVision, navy1), READONLY,
-    "First navy robot"},
-  {"navy2", T_OBJECT_EX, offsetof(PyVision, navy2), READONLY,
-    "Second navy robot"},
+    // Robot recognition
+    {"red1", T_OBJECT_EX, offsetof(PyVision, red1), READONLY,
+     "First red robot"},
+    {"red2", T_OBJECT_EX, offsetof(PyVision, red2), READONLY,
+     "Second red robot"},
+    {"navy1", T_OBJECT_EX, offsetof(PyVision, navy1), READONLY,
+     "First navy robot"},
+    {"navy2", T_OBJECT_EX, offsetof(PyVision, navy2), READONLY,
+     "Second navy robot"},
 
-  // Orange ball
-  {"ball", T_OBJECT_EX, offsetof(PyVision, ball), READONLY,
-    "Orange ball"},
+    // Orange ball
+    {"ball", T_OBJECT_EX, offsetof(PyVision, ball), READONLY,
+     "Orange ball"},
 
-  {"thresh", T_OBJECT_EX, offsetof(PyVision, thresh), READONLY,
-    "Threshold class.  Access to thresholded image, and control method to "
-    "run thresholding processing."},
+    {"thresh", T_OBJECT_EX, offsetof(PyVision, thresh), READONLY,
+     "Threshold class.  Access to thresholded image, and control method to "
+     "run thresholding processing."},
 
-  {"fieldLines", T_OBJECT_EX, offsetof(PyVision, fieldLines), READONLY,
-    "FieldLines class.  Access to lines processed from image."},
+    {"fieldLines", T_OBJECT_EX, offsetof(PyVision, fieldLines), READONLY,
+     "FieldLines class.  Access to lines processed from image."},
 
-  {"pose", T_OBJECT_EX, offsetof(PyVision, pose), READONLY,
-    "Pose class.  Access to horizon line and body height calculations"},
+    {"pose", T_OBJECT_EX, offsetof(PyVision, pose), READONLY,
+     "Pose class.  Access to horizon line and body height calculations"},
 
-  /* Sentinel */
-  { NULL }
+    /* Sentinel */
+    { NULL }
 };
 
 // PyVision type definition
@@ -1077,11 +1077,11 @@ extern void vision_addToModule(PyObject *v, const char *name);
 static PyObject* vision_createNew(PyObject *self, PyObject *args);
 
 static PyMethodDef vision_methods[] = {
-  {"createNew", (PyCFunction)vision_createNew, METH_NOARGS,
-    "Create a new bare Vision object and wrap it.  Causes a memory leak, for "
-    "now, on Python object deallocation (C++ Vision isn't deallocated)"},
-  /* Sentinel */
-  { NULL }
+    {"createNew", (PyCFunction)vision_createNew, METH_NOARGS,
+     "Create a new bare Vision object and wrap it.  Causes a memory leak, for "
+     "now, on Python object deallocation (C++ Vision isn't deallocated)"},
+    /* Sentinel */
+    { NULL }
 };
 
 PyMODINIT_FUNC MODULE_INIT(vision) (void);
@@ -1118,56 +1118,56 @@ extern PyObject *PyBackstop_new    (VisualBackstop *b);
 extern void      PyBackstop_update (PyBackstop *b);
 // backend methods
 extern PyObject *PyBackstop_new    (PyTypeObject *type, PyObject *args,
-                                PyObject *kwds);
+                                    PyObject *kwds);
 extern void      PyBackstop_dealloc(PyBackstop *b);
 
 // Method list
 static PyMethodDef PyBackstop_methods[] = {
 
-  {"update", (PyCFunction)PyBackstop_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"update", (PyCFunction)PyBackstop_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
 
-  /* Sentinal */
-  { NULL }
+    /* Sentinal */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyBackstop_members[] = {
-  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, x), READONLY,
-    "Backstop screen X coordinate"},
-  {"centerY", T_OBJECT_EX, offsetof(PyBackstop, y), READONLY,
-    "Backstop screen Y coordinate"},
-  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, centerX), READONLY,
-    "Backstop center X coordinate"},
-  {"centerY", T_OBJECT_EX, offsetof(PyBackstop, centerY), READONLY,
-    "Backstop center Y coordinate"},
-  {"width", T_OBJECT_EX, offsetof(PyBackstop, angleX), READONLY,
-    "Backstop angleX"},
-  {"height", T_OBJECT_EX, offsetof(PyBackstop, angleY), READONLY,
-    "Backstop angleY"},
-  {"width", T_OBJECT_EX, offsetof(PyBackstop, width), READONLY,
-    "Backstop width"},
-  {"height", T_OBJECT_EX, offsetof(PyBackstop, height), READONLY,
-    "Backstop height"},
-  {"focDist", T_OBJECT_EX, offsetof(PyBackstop, focDist), READONLY,
-    "Backstop focal distance"},
-  {"dist", T_OBJECT_EX, offsetof(PyBackstop, distance), READONLY,
-    "Backstop linear distance"},
-  {"bearing", T_OBJECT_EX, offsetof(PyBackstop, bearing), READONLY,
-    "Backstop bearing to body"},
-  {"elevation", T_OBJECT_EX, offsetof(PyBackstop, elevation), READONLY,
-    "Backstop elevation"},
-  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, leftOpening), READONLY,
-    "Backstop left opening"},
-  {"centerY", T_OBJECT_EX, offsetof(PyBackstop, rightOpening), READONLY,
-    "Backstop right opening"},
-  {"centerX", T_OBJECT_EX, offsetof(PyBackstop, shoot), READONLY,
-    "Backstop shot available"},
+    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, x), READONLY,
+     "Backstop screen X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyBackstop, y), READONLY,
+     "Backstop screen Y coordinate"},
+    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, centerX), READONLY,
+     "Backstop center X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyBackstop, centerY), READONLY,
+     "Backstop center Y coordinate"},
+    {"width", T_OBJECT_EX, offsetof(PyBackstop, angleX), READONLY,
+     "Backstop angleX"},
+    {"height", T_OBJECT_EX, offsetof(PyBackstop, angleY), READONLY,
+     "Backstop angleY"},
+    {"width", T_OBJECT_EX, offsetof(PyBackstop, width), READONLY,
+     "Backstop width"},
+    {"height", T_OBJECT_EX, offsetof(PyBackstop, height), READONLY,
+     "Backstop height"},
+    {"focDist", T_OBJECT_EX, offsetof(PyBackstop, focDist), READONLY,
+     "Backstop focal distance"},
+    {"dist", T_OBJECT_EX, offsetof(PyBackstop, distance), READONLY,
+     "Backstop linear distance"},
+    {"bearing", T_OBJECT_EX, offsetof(PyBackstop, bearing), READONLY,
+     "Backstop bearing to body"},
+    {"elevation", T_OBJECT_EX, offsetof(PyBackstop, elevation), READONLY,
+     "Backstop elevation"},
+    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, leftOpening), READONLY,
+     "Backstop left opening"},
+    {"centerY", T_OBJECT_EX, offsetof(PyBackstop, rightOpening), READONLY,
+     "Backstop right opening"},
+    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, shoot), READONLY,
+     "Backstop shot available"},
 
-  /* Sentinal */
-  { NULL }
+    /* Sentinal */
+    { NULL }
 };
 
 // PyBackstop type definition
@@ -1247,43 +1247,43 @@ extern void      PyVisualRobot_dealloc(PyVisualRobot *b);
 // Method list
 static PyMethodDef PyVisualRobot_methods[] = {
 
-  {"update", (PyCFunction)PyVisualRobot_update, METH_NOARGS,
-    "Update all the built Python objects to reflect the current state of the "
-    "backend C++ objects.  Recurses down the variable references to update "
-    "any attributes that are also wrapped C++ vision objects."},
+    {"update", (PyCFunction)PyVisualRobot_update, METH_NOARGS,
+     "Update all the built Python objects to reflect the current state of the "
+     "backend C++ objects.  Recurses down the variable references to update "
+     "any attributes that are also wrapped C++ vision objects."},
 
-  /* Sentinal */
-  { NULL }
+    /* Sentinal */
+    { NULL }
 };
 
 // Member list
 static PyMemberDef PyVisualRobot_members[] = {
-  {"centerX", T_OBJECT_EX, offsetof(PyVisualRobot, x), READONLY,
-    "VisualRobot screen X coordinate"},
-  {"centerY", T_OBJECT_EX, offsetof(PyVisualRobot, y), READONLY,
-    "VisualRobot screen Y coordinate"},
-  {"centerX", T_OBJECT_EX, offsetof(PyVisualRobot, centerX), READONLY,
-    "VisualRobot center X coordinate"},
-  {"centerY", T_OBJECT_EX, offsetof(PyVisualRobot, centerY), READONLY,
-    "VisualRobot center Y coordinate"},
-  {"width", T_OBJECT_EX, offsetof(PyVisualRobot, angleX), READONLY,
-    "VisualRobot angleX"},
-  {"height", T_OBJECT_EX, offsetof(PyVisualRobot, angleY), READONLY,
-    "VisualRobot angleY"},
-  {"width", T_OBJECT_EX, offsetof(PyVisualRobot, width), READONLY,
-    "VisualRobot width"},
-  {"height", T_OBJECT_EX, offsetof(PyVisualRobot, height), READONLY,
-    "VisualRobot height"},
-  {"focDist", T_OBJECT_EX, offsetof(PyVisualRobot, focDist), READONLY,
-    "VisualRobot focal distance"},
-  {"dist", T_OBJECT_EX, offsetof(PyVisualRobot, distance), READONLY,
-    "VisualRobot linear distance"},
-  {"bearing", T_OBJECT_EX, offsetof(PyVisualRobot, bearing), READONLY,
-    "VisualRobot bearing to body"},
-  {"elevation", T_OBJECT_EX, offsetof(PyVisualRobot, elevation), READONLY,
-    "VisualRobot elevation"},
-  /* Sentinal */
-  { NULL }
+    {"centerX", T_OBJECT_EX, offsetof(PyVisualRobot, x), READONLY,
+     "VisualRobot screen X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyVisualRobot, y), READONLY,
+     "VisualRobot screen Y coordinate"},
+    {"centerX", T_OBJECT_EX, offsetof(PyVisualRobot, centerX), READONLY,
+     "VisualRobot center X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyVisualRobot, centerY), READONLY,
+     "VisualRobot center Y coordinate"},
+    {"width", T_OBJECT_EX, offsetof(PyVisualRobot, angleX), READONLY,
+     "VisualRobot angleX"},
+    {"height", T_OBJECT_EX, offsetof(PyVisualRobot, angleY), READONLY,
+     "VisualRobot angleY"},
+    {"width", T_OBJECT_EX, offsetof(PyVisualRobot, width), READONLY,
+     "VisualRobot width"},
+    {"height", T_OBJECT_EX, offsetof(PyVisualRobot, height), READONLY,
+     "VisualRobot height"},
+    {"focDist", T_OBJECT_EX, offsetof(PyVisualRobot, focDist), READONLY,
+     "VisualRobot focal distance"},
+    {"dist", T_OBJECT_EX, offsetof(PyVisualRobot, distance), READONLY,
+     "VisualRobot linear distance"},
+    {"bearing", T_OBJECT_EX, offsetof(PyVisualRobot, bearing), READONLY,
+     "VisualRobot bearing to body"},
+    {"elevation", T_OBJECT_EX, offsetof(PyVisualRobot, elevation), READONLY,
+     "VisualRobot elevation"},
+    /* Sentinal */
+    { NULL }
 };
 
 // PyVisualRobot type definition

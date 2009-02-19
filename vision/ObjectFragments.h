@@ -146,118 +146,118 @@ static const bool OPENFIELD = false;
 // a blob structure that holds information about its own location, and
 // information involving its larger blob structure
 struct blob {
-  // bounding coordinates of the blob
-  point <int> leftTop;
-  point <int> rightTop;
-  point <int> leftBottom;
-  point <int> rightBottom;
-  int pixels; // the total number of correctly colored pixels in our blob
-  int area;
+    // bounding coordinates of the blob
+    point <int> leftTop;
+    point <int> rightTop;
+    point <int> leftBottom;
+    point <int> rightBottom;
+    int pixels; // the total number of correctly colored pixels in our blob
+    int area;
 };
 
 struct run {
-  int x;
-  int y;
-  int h;
+    int x;
+    int y;
+    int h;
 };
 
 struct stop {
-  int x;
-  int y;
-  int bad;
-  int good;
-  int span;
+    int x;
+    int y;
+    int bad;
+    int good;
+    int span;
 };
 
 //struct colorRect {
 //};
 
 inline int ROUND2(float x) {
-  if ((x-(int)x) >= 0.5) return ((int)x+1);
-  if ((x-(int)x) <= -0.5) return ((int)x-1);
-  return (int)x;
+    if ((x-(int)x) >= 0.5) return ((int)x+1);
+    if ((x-(int)x) <= -0.5) return ((int)x-1);
+    return (int)x;
 }
 
 
 class ObjectFragments {
- public:
-  ObjectFragments(Vision* vis, Threshold* thr);
-  virtual ~ObjectFragments() {}
+public:
+    ObjectFragments(Vision* vis, Threshold* thr);
+    virtual ~ObjectFragments() {}
 
-  // SETTERS
-  void setColor(int c);
+    // SETTERS
+    void setColor(int c);
 
-  // Making object
-  void init(float s);
+    // Making object
+    void init(float s);
 
-  // blobbing
-  void getTopAndMerge(int maxY);
-  void getWidest();
-  void zeroTheBlob(int which);
-  void mergeBlobs(int first, int second);
-  void blobIt(int x, int y, int h);
-  void newRun(int x, int endY, int height);
-  int blobArea(blob a);
-  int blobWidth(blob a);
-  int blobHeight(blob a);
+    // blobbing
+    void getTopAndMerge(int maxY);
+    void getWidest();
+    void zeroTheBlob(int which);
+    void mergeBlobs(int first, int second);
+    void blobIt(int x, int y, int h);
+    void newRun(int x, int endY, int height);
+    int blobArea(blob a);
+    int blobWidth(blob a);
+    int blobHeight(blob a);
 
-  // robot recognition routines
-  void getRobots(int maxY);
-  void expandRobotBlob();
-  void mergeBigBlobs();
-  void updateRobots(int a, int b);
-  bool closeEnough(blob a, blob b);
-  int isRobotCentered(int mid, int left, int right);
-  bool bigEnough(blob a, blob b);
-  bool viableRobot(blob a);
+    // robot recognition routines
+    void getRobots(int maxY);
+    void expandRobotBlob();
+    void mergeBigBlobs();
+    void updateRobots(int a, int b);
+    bool closeEnough(blob a, blob b);
+    int isRobotCentered(int mid, int left, int right);
+    bool bigEnough(blob a, blob b);
+    bool viableRobot(blob a);
 
-  // scan operations
-  int yProject(int startx, int starty, int newy);
-  int yProject(point <int> point, int newy);
-  int xProject(int startx, int starty, int newx);
-  int xProject(point <int> point, int newx);
-  void vertScan(int x, int y, int dir, int stopper, int c, int c2);
-  void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
-                      int r);
-  int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2,
-                           bool left);
-  int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2,
-                             bool up);
-  void findTrueLineVerticalSloped(point <int>& top, point <int>& bottom, int c,
-                                  int c2, bool left);
-  void findTrueLineHorizontalSloped(point <int>& left, point <int>& right,
-                                    int c, int c2, bool up);
-  bool checkEdge(int x, int y, int x1, int y1);
-  int horizonAt(int x);
+    // scan operations
+    int yProject(int startx, int starty, int newy);
+    int yProject(point <int> point, int newy);
+    int xProject(int startx, int starty, int newx);
+    int xProject(point <int> point, int newx);
+    void vertScan(int x, int y, int dir, int stopper, int c, int c2);
+    void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
+                        int r);
+    int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2,
+                             bool left);
+    int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2,
+                               bool up);
+    void findTrueLineVerticalSloped(point <int>& top, point <int>& bottom, int c,
+                                    int c2, bool left);
+    void findTrueLineHorizontalSloped(point <int>& left, point <int>& right,
+                                      int c, int c2, bool up);
+    bool checkEdge(int x, int y, int x1, int y1);
+    int horizonAt(int x);
 
-  // finding square objects
-  void squareGoal(int x, int y, int c, int c2);
-  void correct(blob& b, int c, int c2);
+    // finding square objects
+    void squareGoal(int x, int y, int c, int c2);
+    void correct(blob& b, int c, int c2);
 
-  // main methods
-  void createObject(int c);
-  void yellow(int pink);
-  void blue(int pink);
-  void robot(int c);
+    // main methods
+    void createObject(int c);
+    void yellow(int pink);
+    void blue(int pink);
+    void robot(int c);
 
-  // miscelaneous goal processing  methods
-  bool qualityPost(blob b, int c);
-  bool checkSize(blob b, int c);
-  int checkIntersection(blob b);
-  int checkCorners(blob b);
-  int getBigRun(int left, int right, int hor);
-  bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
-                    distanceCertainty _distCertainty);
-  void updateRobot(VisualRobot* a, blob b);
-  distanceCertainty checkDist(int left, int right, int top, int bottom);
-  void updateBackstop(VisualFieldObject* a, blob b);
+    // miscelaneous goal processing  methods
+    bool qualityPost(blob b, int c);
+    bool checkSize(blob b, int c);
+    int checkIntersection(blob b);
+    int checkCorners(blob b);
+    int getBigRun(int left, int right, int hor);
+    bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
+                      distanceCertainty _distCertainty);
+    void updateRobot(VisualRobot* a, blob b);
+    distanceCertainty checkDist(int left, int right, int top, int bottom);
+    void updateBackstop(VisualFieldObject* a, blob b);
 
-  // post recognition routines
-  int crossCheck(blob b);
-  int crossCheck2(blob b);
-  int scanOut(int stopp, int spanX, int c);
-  int checkOther(int left, int right, int height, int horizon);
-  int characterizeSize(blob b);
+    // post recognition routines
+    int crossCheck(blob b);
+    int crossCheck2(blob b);
+    int scanOut(int stopp, int spanX, int c);
+    int checkOther(int left, int right, int height, int horizon);
+    int characterizeSize(blob b);
 
     // shooting
     void setShot(VisualBackstop * one);
@@ -268,173 +268,173 @@ class ObjectFragments {
                           VisualFieldObject* left, VisualFieldObject* right,
                           VisualBackstop* mid);
 
-  // the big kahuna
-  void goalScan(VisualFieldObject *left, VisualFieldObject *right,
-                VisualBackstop *mid, int c, int c2, bool post,
-                int horizon);
-  int grabPost(int c, int c2, int horizon, int left, int right);
-  void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
-  void transferToChecker(blob b);
-  void transferToPole();
-  void transferTopBlob(VisualFieldObject * one, certainty cert,
-                       distanceCertainty dc);
-  void transferBlob(blob from, blob & to);
+    // the big kahuna
+    void goalScan(VisualFieldObject *left, VisualFieldObject *right,
+                  VisualBackstop *mid, int c, int c2, bool post,
+                  int horizon);
+    int grabPost(int c, int c2, int horizon, int left, int right);
+    void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
+    void transferToChecker(blob b);
+    void transferToPole();
+    void transferTopBlob(VisualFieldObject * one, certainty cert,
+                         distanceCertainty dc);
+    void transferBlob(blob from, blob & to);
 
-  // ball stuff
-  float rightColor(blob obj, int c);
-  float rightHalfColor(blob obj);
-  bool greenCheck(blob b);
-  bool greenSide(blob b);
-  int scanOut(int start_x, int start_y, float slope,int dir);
-  int ballNearGreen(blob b);
-  int roundness(blob b);
-  bool badSurround(blob b);
-  bool atBoundary(blob b);
-  int balls(int c, VisualBall *thisBall);
+    // ball stuff
+    float rightColor(blob obj, int c);
+    float rightHalfColor(blob obj);
+    bool greenCheck(blob b);
+    bool greenSide(blob b);
+    int scanOut(int start_x, int start_y, float slope,int dir);
+    int ballNearGreen(blob b);
+    int roundness(blob b);
+    bool badSurround(blob b);
+    bool atBoundary(blob b);
+    int balls(int c, VisualBall *thisBall);
 
-  // sanity checks
-  bool rightBlobColor(blob obj, float per);
-  void screenCrossbar();
-  bool postBigEnough(blob b);
-  bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
-                       int bottom, int top);
-  bool horizonTopOk(int top, int hor);
-  bool postRatiosOk(float ratio);
-  bool secondPostFarEnough(point <int> l1, point <int> r1,
-			   point <int> l2, point <int> r2, int p);
-  bool blobOk(blob b);
-  bool locationOk(blob b, int hor);
-  bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
-  void addPoint(float x, float y);
+    // sanity checks
+    bool rightBlobColor(blob obj, float per);
+    void screenCrossbar();
+    bool postBigEnough(blob b);
+    bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
+                         int bottom, int top);
+    bool horizonTopOk(int top, int hor);
+    bool postRatiosOk(float ratio);
+    bool secondPostFarEnough(point <int> l1, point <int> r1,
+                             point <int> l2, point <int> r2, int p);
+    bool blobOk(blob b);
+    bool locationOk(blob b, int hor);
+    bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
+    void addPoint(float x, float y);
 
-  // misc.
-  float dist(int x, int y, int x1, int y1);
-  int distance(int x1, int x2, int x3, int x4);
-  int getPixels(int index);
-  int midPoint(int a, int b);
-  float getSlope() { return slope; }
+    // misc.
+    float dist(int x, int y, int x1, int y1);
+    int distance(int x1, int x2, int x3, int x4);
+    int getPixels(int index);
+    int midPoint(int a, int b);
+    float getSlope() { return slope; }
 
 
-  // debugging methods
-  void printObjs();
-  void printBall(blob b, int c, float p, int o, int bg);
-  void drawPoint(int x, int y, int c);
-  void drawRect(int x, int y, int w, int h, int c);
-  void drawBlob(blob b, int c);
-  void drawLine(int x, int y, int x1, int y1, int c);
-  void printBlob(blob b);
-  void printObject(VisualFieldObject * objs);
-  void paintRun(int x,int y, int h, int c);
-  void drawRun(const run& run, int c);
-  void drawLess(int x, int y, int c);
-  void drawMore(int x, int y, int c);
+    // debugging methods
+    void printObjs();
+    void printBall(blob b, int c, float p, int o, int bg);
+    void drawPoint(int x, int y, int c);
+    void drawRect(int x, int y, int w, int h, int c);
+    void drawBlob(blob b, int c);
+    void drawLine(int x, int y, int x1, int y1, int c);
+    void printBlob(blob b);
+    void printObject(VisualFieldObject * objs);
+    void paintRun(int x,int y, int h, int c);
+    void drawRun(const run& run, int c);
+    void drawLess(int x, int y, int c);
+    void drawMore(int x, int y, int c);
 
 #ifdef OFFLINE
-  void setConstant(int c) {
-    switch (c) {
-    case PRINTOBJSN:
-      PRINTOBJS = !PRINTOBJS;
-      break;
-    case POSTLOGICN:
-      POSTLOGIC = !POSTLOGIC;
-      break;
-    case  POSTDEBUGN:
-      POSTDEBUG = !POSTDEBUG;
-      break;
-    case BALLDEBUGN:
-      BALLDEBUG = !BALLDEBUG;
-      break;
-    case TOPFINDN:
-      TOPFIND = !TOPFIND;
-      break;
-    case CORNERDEBUGN:
-      CORNERDEBUG = !CORNERDEBUG;
-      break;
-    case  BACKDEBUGN:
-      BACKDEBUG = !BACKDEBUG;
-      break;
-    case SANITYN:
-      SANITY = !SANITY;
-      break;
-    case BALLDISTDEBUGN:
-      BALLDISTDEBUG = !BALLDISTDEBUG;
-      break;
-    case DEBUGBALLPOINTSN:
-      DEBUGBALLPOINTS = !DEBUGBALLPOINTS;
-      break;
-    case CORRECTN:
-      CORRECT = !CORRECT;
-      break;
-    case OPENFIELDN:
-      OPENFIELD = !OPENFIELD;
-      break;
+    void setConstant(int c) {
+        switch (c) {
+        case PRINTOBJSN:
+            PRINTOBJS = !PRINTOBJS;
+            break;
+        case POSTLOGICN:
+            POSTLOGIC = !POSTLOGIC;
+            break;
+        case  POSTDEBUGN:
+            POSTDEBUG = !POSTDEBUG;
+            break;
+        case BALLDEBUGN:
+            BALLDEBUG = !BALLDEBUG;
+            break;
+        case TOPFINDN:
+            TOPFIND = !TOPFIND;
+            break;
+        case CORNERDEBUGN:
+            CORNERDEBUG = !CORNERDEBUG;
+            break;
+        case  BACKDEBUGN:
+            BACKDEBUG = !BACKDEBUG;
+            break;
+        case SANITYN:
+            SANITY = !SANITY;
+            break;
+        case BALLDISTDEBUGN:
+            BALLDISTDEBUG = !BALLDISTDEBUG;
+            break;
+        case DEBUGBALLPOINTSN:
+            DEBUGBALLPOINTS = !DEBUGBALLPOINTS;
+            break;
+        case CORRECTN:
+            CORRECT = !CORRECT;
+            break;
+        case OPENFIELDN:
+            OPENFIELD = !OPENFIELD;
+            break;
+        }
     }
-  }
 
 #endif
 
-  //find the determinant of a 2by2
-  float det2(float a00,float a01,float a10,float a11){
-    return (a00*a11)-(a01*a10);}
-  //find the determinant of a 3by3
-  float det3(float a00,float a01,float a02,
-	    float a10,float a11,float a12,
-	    float a20,float a21,float a22){
-    return ((a00*det2(a11,a12,
-		      a21,a22))
-	    -(a01*det2(a10,a12,
-		       a20,a22))
-	    +(a02*det2(a10,a11,
-		       a20,a21)));}
+    //find the determinant of a 2by2
+    float det2(float a00,float a01,float a10,float a11){
+        return (a00*a11)-(a01*a10);}
+    //find the determinant of a 3by3
+    float det3(float a00,float a01,float a02,
+               float a10,float a11,float a12,
+               float a20,float a21,float a22){
+        return ((a00*det2(a11,a12,
+                          a21,a22))
+                -(a01*det2(a10,a12,
+                           a20,a22))
+                +(a02*det2(a10,a11,
+                           a20,a21)));}
 
- private:
-  // class pointers
-  Vision* vision;
-  Threshold* thresh;
+private:
+    // class pointers
+    Vision* vision;
+    Threshold* thresh;
 
-  int topSpot; //keeps track of best blob -> global var for debugging purposes
-  int color;
-  int runsize;
-  int biggestRun;
-  int maxHeight;
-  int maxOfBiggestRun;
-  int numberOfRuns;
-  int indexOfBiggestRun;
-  run* runs;
+    int topSpot; //keeps track of best blob -> global var for debugging purposes
+    int color;
+    int runsize;
+    int biggestRun;
+    int maxHeight;
+    int maxOfBiggestRun;
+    int numberOfRuns;
+    int indexOfBiggestRun;
+    run* runs;
 
-  blob topBlob, secondBlob, crossBlob;
-  int numBlobs;
-  blob checker, obj, pole, leftBox, rightBox;
-  stop scan, scan1, scan2;
-  blob blobs[MAX_BLOBS];
-  int projx[5], projy[5];
-  //int goodX[4];
-  //int goodY[4];
-  int candidateX[4];
-  int candidateY[4];
-  bool shoot[IMAGE_WIDTH];
-  int goodP;
-  int inferredConfidence;
-  blob zeroBlob;
-  float slope;
-  int occlusion;
-  point <int> spot;
-  int numPoints;
-  float points[MAX_POINTS*2];
+    blob topBlob, secondBlob, crossBlob;
+    int numBlobs;
+    blob checker, obj, pole, leftBox, rightBox;
+    stop scan, scan1, scan2;
+    blob blobs[MAX_BLOBS];
+    int projx[5], projy[5];
+    //int goodX[4];
+    //int goodY[4];
+    int candidateX[4];
+    int candidateY[4];
+    bool shoot[IMAGE_WIDTH];
+    int goodP;
+    int inferredConfidence;
+    blob zeroBlob;
+    float slope;
+    int occlusion;
+    point <int> spot;
+    int numPoints;
+    float points[MAX_POINTS*2];
 
 #ifdef OFFLINE
- bool PRINTOBJS;
- bool POSTLOGIC;
- bool POSTDEBUG;
- bool BALLDEBUG;
- bool TOPFIND;
- bool CORNERDEBUG;
- bool BACKDEBUG;
- bool SANITY;
- bool BALLDISTDEBUG;
- bool DEBUGBALLPOINTS;
- bool CORRECT;
- bool OPENFIELD;
+    bool PRINTOBJS;
+    bool POSTLOGIC;
+    bool POSTDEBUG;
+    bool BALLDEBUG;
+    bool TOPFIND;
+    bool CORNERDEBUG;
+    bool BACKDEBUG;
+    bool SANITY;
+    bool BALLDISTDEBUG;
+    bool DEBUGBALLPOINTS;
+    bool CORRECT;
+    bool OPENFIELD;
 #endif
 
 };
