@@ -8,7 +8,7 @@ using Kinematics::LLEG_CHAIN;
 using Kinematics::RLEG_CHAIN;
 
 WalkProvider::WalkProvider(shared_ptr<Sensors> s)
-    : MotionProvider("WalkProvider"),
+    : MotionProvider(WALK_PROVIDER),
       sensors(s),
       walkParameters(&WALK_PARAMS[DEFAULT_P]),
       stepGenerator(sensors),
@@ -91,40 +91,7 @@ void WalkProvider::setCommand(const WalkCommand * command){
     setActive();
 }
 
-//Returns the 20 body joints
-vector<float> WalkProvider::getWalkStance(){
-    //cout << "getWalkStance" <<endl;
-    //calculate the walking stance of the robot
-    const float z = walkParameters->bodyHeight;
-    const float x = walkParameters->hipOffsetX;
-    const float ly = HIP_OFFSET_Y;
-    const float ry = -HIP_OFFSET_Y;
 
-
-    //just assume we start at zero
-    float zeroJoints[LEG_JOINTS] = {0.0f,0.0f,0.0f,
-                                    0.0f,0.0f,0.0f};
-    //Use inverse kinematics to find the left leg angles
-    ufvector3 lgoal = ufvector3(3);
-    lgoal(0)=-x; lgoal(1) = ly; lgoal(2) = -z;
-    IKLegResult lresult = Kinematics::dls(LLEG_CHAIN,lgoal,zeroJoints);
-    vector<float> lleg_angles(lresult.angles, lresult.angles + LEG_JOINTS);
-
-    //Use inverse kinematics to find the right leg angles
-    ufvector3 rgoal = ufvector3(3);
-    rgoal(0)=-x; rgoal(1) = ry; rgoal(2) = -z;
-    IKLegResult rresult = Kinematics::dls(RLEG_CHAIN,rgoal,zeroJoints);
-    vector<float> rleg_angles(rresult.angles, rresult.angles + LEG_JOINTS);
-
-    vector<float> allJoints;
-
-    //now combine all the vectors together
-    allJoints.insert(allJoints.end(),larm_angles.begin(),larm_angles.end());
-    allJoints.insert(allJoints.end(),lleg_angles.begin(),lleg_angles.end());
-    allJoints.insert(allJoints.end(),rleg_angles.begin(),rleg_angles.end());
-    allJoints.insert(allJoints.end(),rarm_angles.begin(),rarm_angles.end());
-    return allJoints;
-}
 
 void WalkProvider::setActive(){
     //check to see if the walk engine is active

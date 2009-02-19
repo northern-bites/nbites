@@ -45,7 +45,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 
     //the getup routine waits for the walk engine to be inited
     //Build the get up routine
-    vector<float> * initPos = new vector<float>(walkProvider.getWalkStance());
+    vector<float> * initPos
+        = new vector<float>(DEFAULT_PARAMETERS.getWalkStance());
 	getUp = new BodyJointCommand(5.0f,
                                  initPos,
                                  Kinematics::INTERPOLATION_LINEAR);
@@ -167,26 +168,11 @@ void MotionSwitchboard::run() {
 }
 
 int MotionSwitchboard::processProviders(){
-    //cout << "Switchboard stepping" <<endl;
-    //At the beginning of each frame, we need to update the sensor values
-    //that are tied to
-    //sensors->setBodyAngles(nextJoints); // WATCH THIS LINE!! IS IT RIGHT?
-
-    if (headProvider.isActive()) {
-		// Calculate the next joints and get them
-		headProvider.calculateNextJoints();
-		// get headJoints from headProvider
-		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
-
-        for(unsigned int i = 0; i < HEAD_JOINTS;i++){
-            nextJoints[HEAD_YAW + i] = headJoints.at(i);
-        }
-	}
-	// Switch Providers!
-
-
+    //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
-        curProvider = nextProvider;
+
+        swapBodyProvider();
+
 #ifdef DEBUG_SWITCHBOARD
         cout << "Switched to " << *curProvider << endl;
 #endif
@@ -197,8 +183,17 @@ int MotionSwitchboard::processProviders(){
 #endif
         curProvider->requestStop();
     }
-	//** Alternately, you may choose here:
-	//curProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
+    if (headProvider.isActive()) {
+		// Calculate the next joints and get them
+		headProvider.calculateNextJoints();
+		// get headJoints from headProvider
+		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
+
+        for(unsigned int i = 0; i < HEAD_JOINTS;i++){
+            nextJoints[HEAD_YAW + i] = headJoints.at(i);
+        }
+	}
+
 #ifdef DEBUG_SWITCHBOARD
     static bool switchedToInactive;
 #endif
@@ -244,6 +239,41 @@ int MotionSwitchboard::processProviders(){
     //return if one of the enactors 
     return curProvider->isActive() ||  headProvider.isActive();
 
+}
+
+/**
+ * Method handles switching providers. Also handles any special action
+ * required when switching between providers
+ */
+void MotionSwitchboard::swapBodyProvider(){
+    BodyJointCommand * gaitSwitch = NULL;
+    switch(nextProvider->getType()){
+    case WALK_PROVIDER:
+        if(curGait != nextGait){
+            //We need to ensure we are in the correct gait before walking
+            gaitSwitch = getGaitTransitionCommand(nextGait);
+            if(gaitSwitch->getDuration() > 0.0f){
+                scriptedProvider.setCommand(gaitSwitch);
+                curProvider = static_cast<MotionProvider * >(&scriptedProvider);
+                break;
+            }
+        }
+    case SCRIPTED_PROVIDER:
+    case HEAD_PROVIDER:
+    default:
+        curProvider = nextProvider;
+    }
+
+
+
+}
+
+BodyJointCommand * MotionSwitchboard::getGaitTransitionCommand(const WalkingParameters * new_gait){
+    vector<float> curJoints;
+    vector<float> gaitJoints = new_gait->getWalkStance();
+
+    return new BodyJointCommand(0.0f,new vector<float>(NUM_JOINTS,0.0f),
+                                Kinematics::INTERPOLATION_LINEAR);
 }
 
 const vector <float> MotionSwitchboard::getNextJoints() {

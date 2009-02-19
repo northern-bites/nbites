@@ -10,18 +10,38 @@
 #define _MotionProvider_h_DEFINED
 
 #include <vector>
+#include <string>
 #include "MotionCommand.h"
 using namespace std;
 
 #include "Kinematics.h"
 using Kinematics::ChainID;
 
+enum ProviderType{
+    SCRIPTED_PROVIDER,
+    WALK_PROVIDER,
+    HEAD_PROVIDER
+};
+
 class MotionProvider {
 public:
-    MotionProvider(char * _provider_name)
+    MotionProvider(ProviderType _provider_type)
         : _active(false), _stopping(false),
-          nextJoints(Kinematics::NUM_CHAINS,vector<float>()),
-          provider_name(_provider_name){ }
+          nextJoints(Kinematics::NUM_CHAINS,std::vector<float>()),
+          provider_type(_provider_type)
+          {
+              switch(provider_type){
+              case SCRIPTED_PROVIDER:
+                  provider_name = "ScriptedProvider";
+                  break;
+              case WALK_PROVIDER:
+                  provider_name = "WalkingProvider";
+                  break;
+              case HEAD_PROVIDER:
+                  provider_name = "HeadProvider";
+                  break;
+              }
+          }
     virtual ~MotionProvider() { }
 
     //Only pass on the first request to the extending class
@@ -35,12 +55,13 @@ public:
     const bool isActive() const { return _active; }
     const bool isStopping() const {return _stopping;}
     virtual void calculateNextJoints() = 0;
-    vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
+    std::vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
 	virtual void  setCommand(const MotionCommand *command) =0;
-
+    const std::string getName(){return provider_name;}
+    const ProviderType getType(){return provider_type;}
 protected:
     void setNextChainJoints(const ChainID id,
-                            const vector <float> &chainJoints) {
+                            const std::vector <float> &chainJoints) {
         nextJoints[id] = chainJoints;
     }
 
@@ -56,8 +77,9 @@ protected:
 private:
     bool _active;
     bool _stopping;
-    vector < vector <float> > nextJoints;
-    const char * provider_name;
+    std::vector < std::vector <float> > nextJoints;
+    const ProviderType provider_type;
+    std::string provider_name;
 
 public:
     friend std::ostream& operator<< (std::ostream &o, const MotionProvider &mp)

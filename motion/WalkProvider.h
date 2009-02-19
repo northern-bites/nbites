@@ -38,7 +38,6 @@ public:
     void requestStopFirstInstance();
     void calculateNextJoints();
 
-    vector<float> getWalkStance();
 	void setCommand(const MotionCommand* command)
         {
             setCommand(reinterpret_cast<const WalkCommand*>(command));

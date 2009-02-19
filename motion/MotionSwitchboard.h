@@ -19,6 +19,7 @@
 
 #include "Kinematics.h"
 #include "WalkProvider.h"
+#include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
 #include "Sensors.h"
@@ -46,6 +47,8 @@ public:
 
 private:
     int processProviders();
+    void swapBodyProvider();
+    BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
 
 #ifdef DEBUG_JOINTS_OUTPUT
     void initDebugLogs();
@@ -61,6 +64,9 @@ private:
 
 	MotionProvider * curProvider;
 	MotionProvider * nextProvider;
+
+    WalkingParameters *curGait;
+    WalkingParameters *nextGait;
 
     std::vector <float> nextJoints;
 

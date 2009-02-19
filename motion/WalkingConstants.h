@@ -1,6 +1,7 @@
 #ifndef _WalkingConstants_h_DEFINED
 #define _WalkingConstants_h_DEFINED
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include "Kinematics.h"
 using namespace Kinematics;
@@ -153,6 +154,47 @@ public:
         singleSupportFrames = stepDurationFrames - doubleSupportFrames;
     }
 
+    //Returns the 20 body joints
+    std::vector<float> getWalkStance() const {
+        //cout << "getWalkStance" <<endl;
+        //calculate the walking stance of the robot
+        const float z = bodyHeight;
+        const float x = hipOffsetX;
+        const float ly = HIP_OFFSET_Y;
+        const float ry = -HIP_OFFSET_Y;
+
+
+        //just assume we start at zero
+        float zeroJoints[LEG_JOINTS] = {0.0f,0.0f,0.0f,
+                                        0.0f,0.0f,0.0f};
+        //Use inverse kinematics to find the left leg angles
+        ufvector3 lgoal = ufvector3(3);
+        lgoal(0)=-x; lgoal(1) = ly; lgoal(2) = -z;
+        IKLegResult lresult = Kinematics::dls(LLEG_CHAIN,lgoal,zeroJoints);
+        std::vector<float> lleg_angles(lresult.angles, lresult.angles + LEG_JOINTS);
+
+        //Use inverse kinematics to find the right leg angles
+        ufvector3 rgoal = ufvector3(3);
+        rgoal(0)=-x; rgoal(1) = ry; rgoal(2) = -z;
+        IKLegResult rresult = Kinematics::dls(RLEG_CHAIN,rgoal,zeroJoints);
+        std::vector<float> rleg_angles(rresult.angles, rresult.angles + LEG_JOINTS);
+
+        std::vector<float> allJoints;
+
+        //Make up something arbitrary for the arms
+        const float larm[ARM_JOINTS] = {M_PI/2,M_PI/10,-M_PI/2,-M_PI/2};
+        const float rarm[ARM_JOINTS] = {M_PI/2,-M_PI/10,M_PI/2,M_PI/2};
+        const std::vector<float>larm_angles(larm,larm+ARM_JOINTS);
+        const std::vector<float>rarm_angles(rarm,rarm+ARM_JOINTS);
+        //now combine all the vectors together
+        allJoints.insert(allJoints.end(),larm_angles.begin(),larm_angles.end());
+        allJoints.insert(allJoints.end(),lleg_angles.begin(),lleg_angles.end());
+        allJoints.insert(allJoints.end(),rleg_angles.begin(),rleg_angles.end());
+        allJoints.insert(allJoints.end(),rarm_angles.begin(),rarm_angles.end());
+        return allJoints;
+    }
+
+
 };
 
 
@@ -183,5 +225,10 @@ const WalkingParameters WALK_PARAMS[] = {DEFAULT_PARAMETERS,GOALIE_PARAMETERS};
 //walk vector held in the StepGenerator changes
 const float NEW_VECTOR_THRESH_MMS = 0.0f; //difference in speed in mm/second
 const float NEW_VECTOR_THRESH_RADS = 0.0f; //difference in speed in radians/second
+
+
+
+
+
 
 #endif
