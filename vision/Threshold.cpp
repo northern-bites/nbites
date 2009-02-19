@@ -266,6 +266,7 @@ void Threshold::runs() {
   horizonSlope = pose->getHorizonSlope();
 
   // split up the loops
+  // TODO: change row skips to 1
   for (i = 0; i < IMAGE_WIDTH; i = i + 2) {//scan across
     // the color of the last pixel before the current one
     lastPixel = GREEN;
@@ -343,9 +344,9 @@ void Threshold::runs() {
 	  if (currentRun > MIN_RUN_SIZE) { // noise eliminator
 	    lastGoodPixel = j;
 	    // add run: x of start, y of start, height of run
-	    if (i > 5 && i < IMAGE_WIDTH - 5) {
+        // if (i > 5 && i < IMAGE_WIDTH - 5) {
 	      blue->newRun(i, j, currentRun);
-	    }
+          //}
 	  }
 	  break;
 
@@ -390,12 +391,14 @@ void Threshold::runs() {
     //}
   }//end i loop
   int bigh = IMAGE_HEIGHT, firstn = -1, lastn = -1, bot = -1;
+  // TODO: change column skips to 1
   for (i = 0; i < IMAGE_WIDTH - 1; i+= 2) {
     if (navyTops[i] != -1) {
       firstn = i;
       lastn = 0;
       bigh = navyTops[i];
       bot = navyBottoms[i];
+      // TODO: change to i and i+1
       while ((navyTops[i] != -1 || navyTops[i+2] != -1) && i < IMAGE_WIDTH - 3) {
 	if (navyTops[i] < bigh && navyTops[i] != -1) {
 	  bigh = navyTops[i];
@@ -403,9 +406,11 @@ void Threshold::runs() {
 	if (navyBottoms[i] > bot) {
 	  bot = navyBottoms[i];
 	}
+    // TODO: chagne to +1
 	i+=2;
 	lastn+= 2;
       }
+      // TODO: change to +1
       for (int k = firstn; k < firstn + lastn; k+= 2) {
 	navyblue->newRun(k, bigh, bot - bigh);
 	//cout << "Runs " << k << " " << bigh << " " << (bot - bigh) << endl;
@@ -414,6 +419,7 @@ void Threshold::runs() {
       //drawRect(firstn, bigh, lastn, bot - bigh, RED);
     }
   }
+  // TODO: change +2 to +1
   for (i = 0; i < IMAGE_WIDTH - 1; i+= 2) {
     if (redTops[i] != -1) {
       firstn = i;
@@ -430,6 +436,7 @@ void Threshold::runs() {
 	i+=2;
 	lastn+= 2;
       }
+      // TODO: change +2 to +1
       for (int k = firstn; k < firstn + lastn; k+= 2) {
 	red->newRun(k, bigh, bot - bigh);
 	//cout << "Runs " << k << " " << bigh << " " << (bot - bigh) << endl;
@@ -572,77 +579,77 @@ print("   Theshold::SweepLeft");
   horizon = 0;
 }
 
-point <int> Threshold::findIntersection(int col, int dir, int c) {
-  point <int> ret;
-  ret.x = BADVALUE; ret.y = BADVALUE;
-  for (int i = col; i > -1 && i < IMAGE_WIDTH; i += dir) {
-    if (c == BLUE) {
-      if (blueWhite[i] != BADVALUE) {
-	ret.x = i;
-	ret.y = blueWhite[i];
-	return ret;
-      }
-    } else {
-      if (yellowWhite[i] != BADVALUE) {
-	ret.x = i;
-	ret.y = yellowWhite[i];
-	return ret;
-      }
-    }
-  }
-  return ret;
-}
+// point <int> Threshold::findIntersection(int col, int dir, int c) {
+//   point <int> ret;
+//   ret.x = BADVALUE; ret.y = BADVALUE;
+//   for (int i = col; i > -1 && i < IMAGE_WIDTH; i += dir) {
+//     if (c == BLUE) {
+//       if (blueWhite[i] != BADVALUE) {
+// 	ret.x = i;
+// 	ret.y = blueWhite[i];
+// 	return ret;
+//       }
+//     } else {
+//       if (yellowWhite[i] != BADVALUE) {
+// 	ret.x = i;
+// 	ret.y = yellowWhite[i];
+// 	return ret;
+//       }
+//     }
+//   }
+//   return ret;
+// }
 
-point <int> Threshold::backStopCheck(bool which, int leftRange, int rightRange) {
-  int left = -1, right = -1, total = 0;
-  int bestLeft = -1, bestRight = -1, bestTotal = 0;
-  int bads = 0;
-  for (int i = leftRange + 1; i < rightRange; i++) {
-    if ((which && greenBlue[i]) || (!which && greenYellow[i])) {
-      bads = 0;
-      if (total == 0)
-	left = i;
-      right = i;
-      total++;
-      if (total > bestTotal) {
-	bestTotal = total;
-	bestLeft = left;
-	bestRight = right;
-      }
-    } else {
-      bads++;
-      if (bads > 1)
-	total = 0;
-    }
-  }
-  point <int> result;
-  result.x = bestLeft; result.y = bestRight;
-  return result;
-}
+// point <int> Threshold::backStopCheck(bool which, int leftRange, int rightRange) {
+//   int left = -1, right = -1, total = 0;
+//   int bestLeft = -1, bestRight = -1, bestTotal = 0;
+//   int bads = 0;
+//   for (int i = leftRange + 1; i < rightRange; i++) {
+//     if ((which && greenBlue[i]) || (!which && greenYellow[i])) {
+//       bads = 0;
+//       if (total == 0)
+// 	left = i;
+//       right = i;
+//       total++;
+//       if (total > bestTotal) {
+// 	bestTotal = total;
+// 	bestLeft = left;
+// 	bestRight = right;
+//       }
+//     } else {
+//       bads++;
+//       if (bads > 1)
+// 	total = 0;
+//     }
+//   }
+//   point <int> result;
+//   result.x = bestLeft; result.y = bestRight;
+//   return result;
+// }
 
-int Threshold::postCheck(bool which, int left, int right) {
-  int rc = 0, lc = 0;
-  if (which) {
-    for (int i = 0; i < left; i++) {
-      if (greenBlue[i])
-	lc++;
-    }
-    for (int i = right; i < IMAGE_WIDTH; i++) {
-      if (greenBlue[i])
-	rc++;
-    }
-  } else {
-    for (int i = 0; i < left; i++) {
-      if (greenYellow[i])
-	lc++;
-    }
-    for (int i = right; i < IMAGE_WIDTH; i++) {
-      if (greenYellow[i])
-	rc++;
-    }
-  }
-  return lc - rc;
-}
+// int Threshold::postCheck(bool which, int left, int right) {
+//   int rc = 0, lc = 0;
+//   if (which) {
+//     for (int i = 0; i < left; i++) {
+//       if (greenBlue[i])
+// 	lc++;
+//     }
+//     for (int i = right; i < IMAGE_WIDTH; i++) {
+//       if (greenBlue[i])
+// 	rc++;
+//     }
+//   } else {
+//     for (int i = 0; i < left; i++) {
+//       if (greenYellow[i])
+// 	lc++;
+//     }
+//     for (int i = right; i < IMAGE_WIDTH; i++) {
+//       if (greenYellow[i])
+// 	rc++;
+//     }
+//   }
+//   return lc - rc;
+// }
 
 
 /*  Makes the calls to the vision system to recognize objects.  Then performs some extra
@@ -738,14 +745,12 @@ print("   Theshold::objectRecognition");
   else
     orange->createObject(pose->getHorizonY(0));
 
-#if ROBOT(NAO)
     if (ylp || yrp) {
       yellow->bestShot(vision->ygrp, vision->yglp, vision->ygBackstop);
     }
     if (blp || brp) {
       blue->bestShot(vision->bgrp, vision->bglp, vision->bgBackstop);
     }
-#endif
 
   // sanity check: if pose estimated horizon is completely above the image,
   // shouldn't find any posts or goals
@@ -930,19 +935,19 @@ float Threshold::getGoalPostDistFromWidth(float width) {
 #endif
 }
 
-/* Looks up beacon height in pixels to focal distance function.
- * @param height     the height of the beacon
- * @return           the distance to the beacon
- */
-float Threshold::getBeaconDistFromHeight(float height) {
-#if ROBOT(NAO_SIM)
-  return 100.0*39.0/height; //there aren't nao beacons, but just in case
-#elif ROBOT(NAO_RL)
-  return (239.102*235)/height;
-#else
-  return 3028.7*pow(height,-.9324);
-#endif
-}
+// /* Looks up beacon height in pixels to focal distance function.
+//  * @param height     the height of the beacon
+//  * @return           the distance to the beacon
+//  */
+// float Threshold::getBeaconDistFromHeight(float height) {
+// #if ROBOT(NAO_SIM)
+//   return 100.0*39.0/height; //there aren't nao beacons, but just in case
+// #elif ROBOT(NAO_RL)
+//   return (239.102*235)/height;
+// #else
+//   return 3028.7*pow(height,-.9324);
+// #endif
+// }
 
 //Beacons in the simmulator are 18pix wide at 1M
 

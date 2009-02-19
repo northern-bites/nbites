@@ -39,6 +39,7 @@ class ObjectFragments; // forward reference
 
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
+// TODO: Change from highres constants to low-res/ probably too large right now
 #if ROBOT(NAO)
 #define MIN_GOAL_HEIGHT		50
 #define MIN_GOAL_WIDTH		10
@@ -84,16 +85,13 @@ static const float HALFISH = 0.49f;                 // threshold for expanding s
 static const float GOODRAT = 0.75f;                 // highest ratio of width over height for posts
 static const float SQUATRAT = 1.2f;                 // indicator that post may be salvagable
 static const int MIN_POST_SEPARATION = 12;          // goal posts of the same color have to be this far apart
-static const int BIGPOST = 50;                      // how big a post is to be declared a big post
+static const int BIGPOST = 50;                      // how big a post is to be declared a big post // TODO: change this
 static const float NORMALPOST = 0.6f;
 static const float QUESTIONABLEPOST = 0.85f;
 
 // Ball constants
-#if ROBOT(NAO)
+// TODO: look at this switch
 static const int SMALLBALLDIM = 8;                 // below this size balls are considered small
-#else
-static const int SMALLBALLDIM = 10;
-#endif
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
 static const float BALLTOOFAT = 1.5f;               // ratio of width/height worse than this is a very bad sign
 static const float BALLTOOTHIN = 0.75f;             // ditto
@@ -203,19 +201,15 @@ class ObjectFragments {
   int blobWidth(blob a);
   int blobHeight(blob a);
 
-#if ROBOT(NAO)
   // robot recognition routines
   void getRobots(int maxY);
   void expandRobotBlob();
   void mergeBigBlobs();
   void updateRobots(int a, int b);
   bool closeEnough(blob a, blob b);
-  void splitBlob(int which);
   int isRobotCentered(int mid, int left, int right);
-  void detectOrientation(int which);
   bool bigEnough(blob a, blob b);
   bool viableRobot(blob a);
-#endif
 
   // scan operations
   int yProject(int startx, int starty, int newy);
@@ -237,12 +231,8 @@ class ObjectFragments {
   int horizonAt(int x);
 
   // finding square objects
-  void constrainedSquare(int x, int y, int c, int c2, int left, int right);
-  void aiboSquareGoal(int x, int y, int c, int c2);
-  void squareGoal(int x, int y, int c, int c2, int l, int r, int whichOne);
+  void squareGoal(int x, int y, int c, int c2);
   void correct(blob& b, int c, int c2);
-  //void expansion(point <int> start, int axis, int dir, int span, int check, int c, int c2);
-  //bool topFind(int c, int c2, int l, int r, int w);
 
   // main methods
   void createObject(int c);
@@ -251,8 +241,6 @@ class ObjectFragments {
   void robot(int c);
 
   // miscelaneous goal processing  methods
-  bool coloredArc(blob b, int c);
-  bool goodPost(blob b, int c);
   bool qualityPost(blob b, int c);
   bool checkSize(blob b, int c);
   int checkIntersection(blob b);
@@ -261,28 +249,24 @@ class ObjectFragments {
   bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
                     distanceCertainty _distCertainty);
   void updateRobot(VisualRobot* a, blob b);
-  bool updateArc(VisualFieldObject* a, blob b, int sawGoal);
   distanceCertainty checkDist(int left, int right, int top, int bottom);
   void updateBackstop(VisualFieldObject* a, blob b);
 
   // post recognition routines
   int crossCheck(blob b);
   int crossCheck2(blob b);
-  int triangle(blob b);
   int scanOut(int stopp, int spanX, int c);
   int checkOther(int left, int right, int height, int horizon);
   int characterizeSize(blob b);
-  int  scanLogic(int howbig);
 
-  // shooting
-  void setShot(VisualBackstop * one);
-  void bestShot(VisualFieldObject * left, VisualFieldObject * right,
-                VisualBackstop * mid);
-  void openDirection(int h, NaoPose *p);
-
-  int classifyFirstPost(int horizon, int c, int c2, bool postFound,
-                        VisualFieldObject* left, VisualFieldObject* right,
-                        VisualBackstop* mid);
+    // shooting
+    void setShot(VisualBackstop * one);
+    void bestShot(VisualFieldObject * left, VisualFieldObject * right,
+                  VisualBackstop * mid);
+    void openDirection(int h, NaoPose *p);
+    int classifyFirstPost(int horizon, int c, int c2, bool postFound,
+                          VisualFieldObject* left, VisualFieldObject* right,
+                          VisualBackstop* mid);
 
   // the big kahuna
   void goalScan(VisualFieldObject *left, VisualFieldObject *right,
@@ -307,7 +291,6 @@ class ObjectFragments {
   bool badSurround(blob b);
   bool atBoundary(blob b);
   int balls(int c, VisualBall *thisBall);
-  int circleFit(VisualBall * thisBall);
 
   // sanity checks
   bool rightBlobColor(blob obj, float per);
@@ -358,9 +341,6 @@ class ObjectFragments {
     case  POSTDEBUGN:
       POSTDEBUG = !POSTDEBUG;
       break;
-    case BEACONDEBUGN:
-      BEACONDEBUG = !BEACONDEBUG;
-      break;
     case BALLDEBUGN:
       BALLDEBUG = !BALLDEBUG;
       break;
@@ -379,14 +359,8 @@ class ObjectFragments {
     case BALLDISTDEBUGN:
       BALLDISTDEBUG = !BALLDISTDEBUG;
       break;
-    case DEBUGCIRCLEFITN:
-      DEBUGCIRCLEFIT = !DEBUGCIRCLEFIT;
-      break;
     case DEBUGBALLPOINTSN:
       DEBUGBALLPOINTS = !DEBUGBALLPOINTS;
-      break;
-    case ARCDEBUGN:
-      ARCDEBUG = !ARCDEBUG;
       break;
     case CORRECTN:
       CORRECT = !CORRECT;
@@ -452,16 +426,13 @@ class ObjectFragments {
  bool PRINTOBJS;
  bool POSTLOGIC;
  bool POSTDEBUG;
- bool BEACONDEBUG;
  bool BALLDEBUG;
  bool TOPFIND;
  bool CORNERDEBUG;
  bool BACKDEBUG;
  bool SANITY;
  bool BALLDISTDEBUG;
- bool DEBUGCIRCLEFIT;
  bool DEBUGBALLPOINTS;
- bool ARCDEBUG;
  bool CORRECT;
  bool OPENFIELD;
 #endif

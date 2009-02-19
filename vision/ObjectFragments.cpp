@@ -392,8 +392,6 @@ void ObjectFragments::newRun(int x, int y, int h) {
 /* Robot recognition methods
  */
 
-#if ROBOT(NAO)
-
 /* Try and recognize robots
  */
 void ObjectFragments::robot(int bigGreen) {
@@ -401,7 +399,7 @@ void ObjectFragments::robot(int bigGreen) {
   for (int i = 0; i < numberOfRuns; i++) {
     //drawPoint(runs[i].x, runs[i].y, BLACK);
     if (runs[i].x < lastrunx + 20) {
-      for (int k = lastrunx; k < runs[i].x; k+= 2) {
+        for (int k = lastrunx; k < runs[i].x; k+= 2) { // TODO: change from +2
 	//cout << "merging " << k << " " << runs[i].x << endl;
 	blobIt(k, lastruny, lastrunh);
       }
@@ -472,7 +470,7 @@ void ObjectFragments::expandRobotBlob() {
   int bestr = topBlob.rightTop.x;
   bool good = true;
   for (x = bestr; good && x < IMAGE_WIDTH - 1; x++) {
-    good = false;
+      good = false; // TODO: change from +2
     for (y = topBlob.rightTop.y; y < topBlob.rightBottom.y && !good; y = y + 2) {
       if (thresh->thresholded[y][x] == color)
 	good = true;
@@ -482,7 +480,7 @@ void ObjectFragments::expandRobotBlob() {
   topBlob.rightBottom.x = x - 1;
   good = true;
   for (x = topBlob.leftTop.x; good && x >  -1; x--) {
-    good = false;
+    good = false; // TODO: change from +2
     for (y = topBlob.rightTop.y; y < topBlob.rightBottom.y && !good; y = y + 2) {
       if (thresh->thresholded[y][x] == color)
 	good = true;
@@ -579,6 +577,7 @@ void ObjectFragments::mergeBigBlobs() {
 bool ObjectFragments::closeEnough(blob a, blob b) {
   int xd = distance(a.leftTop.x, a.rightTop.x, b.leftTop.x, b.rightTop.x);
   int yd = distance(a.leftTop.y, a.leftBottom.y, b.leftTop.y, b.rightBottom.y);
+// TODO: change constant to lower res stuff
   if (xd < 40) {
     if (yd < 40)
       return true;
@@ -588,6 +587,7 @@ bool ObjectFragments::closeEnough(blob a, blob b) {
 }
 
 bool ObjectFragments::bigEnough(blob a, blob b) {
+// TODO: change constant to lower res stuff
   if (blobArea(a) > 200 && blobArea(b) > 200)
     return true;
   if (a.leftBottom.y > horizonAt(a.leftBottom.x) + 100)
@@ -597,6 +597,7 @@ bool ObjectFragments::bigEnough(blob a, blob b) {
 
 bool ObjectFragments::viableRobot(blob a) {
   // get rid of obviously false ones
+// TODO: change constant to lower res stuff
   if (!(a.rightBottom.y > horizonAt(a.rightBottom.x) && blobWidth(a) > 10)) {
     return false;
   }
@@ -629,6 +630,7 @@ void ObjectFragments::getRobots(int maxY) {
   for (int i = 0; i < numBlobs; i++) {
     int spread = blobs[i].rightTop.x - blobs[i].leftTop.x;
     if (blobs[i].leftTop.x == BADVALUE) {
+// TODO: experiment with this constant; probably 3
     } else if (blobs[i].leftTop.y > maxY || spread < 4) {
       //drawBlob(blobs[i], BLACK);
     } else {
@@ -644,6 +646,7 @@ void ObjectFragments::getRobots(int maxY) {
   size = 0;
   for (int i = 0; i < numBlobs; i++) {
     int spread = blobWidth(blobs[i]);
+// TODO: experiment with this constant; probably 3
     if (blobs[i].leftTop.x != BADVALUE && blobs[i].leftTop.y < maxY && spread > 4) {
       //drawBlob(blobs[i], ORANGE);
     }
@@ -672,148 +675,9 @@ int ObjectFragments::isRobotCentered(int head, int left, int right) {
   return 0;
 }
 
-/* We have a potential robot blob.  Let's try and figure out if it is just one, or really more than one.
- @param which         the blob we're to examine
- */
-void ObjectFragments::splitBlob(int which) {
-  // eventually these must become real constants - when we can check them on the robot
-  int MINROBOTWIDTH = 5;
-
-  // the algorithm starts out pretty simply - scan for heads
-  int headX = 0, left = blobs[which].leftTop.x, right = blobs[which].rightTop.x, top = blobs[which].leftTop.y;
-  // scan until you hit the right color pixel
-#if ROBOT(NAO_SIM)
-  robot_console_printf("Examining %d %d %d %d\n", left, right, top, blobs[which].leftBottom.y);
-#endif
-  for (headX = left; headX <= right && headX < IMAGE_WIDTH && thresh->thresholded[top+1][headX] != color; headX++) {}
-  drawPoint(headX, top, BLACK);
-  for (int i = headX; i < IMAGE_WIDTH && i < right && thresh->thresholded[top+1][i] == color; i++) {
-    if (i % 2 == 0)
-      headX++;
-  }
-  drawPoint(headX, top, BLACK);
-  // now we have a candidate head - so where is it within the blob?
-  int width = right - left, xdist = headX - left;
-  if (isRobotCentered(headX, left, right) == LEFT && xdist > 3 && left > 3 && width - xdist > MINROBOTWIDTH) {
-    // probably have two robots - our heuristic is that since this robot is tall it will control the width
-    int splitpoint = headX + xdist;
-    drawBlob(blobs[which], BLUE);
-    drawPoint(splitpoint, 10, BLACK);
-    // now try and find the head of the second blob
-    int newY, newX = 0;
-    bool found = false;
-    for (newY = top; newY < IMAGE_HEIGHT && newY < blobs[which].leftBottom.y && !found; newY++) {
-      for (newX = splitpoint; newX < right && newX < IMAGE_WIDTH && !found; newX++) {
-	if (thresh->thresholded[newY][newX] == color) {
-	  found = true;
-	}
-      }
-    }
-    newY--;
-    // do we really want to split?  Split if: a) the drop isn't too large, b) the new "head" is centered
-    if ((newY - top) < xdist && isRobotCentered(newX, splitpoint, right) == 0) {
-      blobs[which].rightTop.x = splitpoint;
-      blobs[which].rightBottom.x = splitpoint;
-#if ROBOT(NAO_SIM)
-      robot_console_printf("Splitting %d %d %d\n", left, right, splitpoint);
-#endif
-      blobs[numBlobs].leftTop.x = splitpoint;
-      blobs[numBlobs].leftTop.y = newY;
-      blobs[numBlobs].rightTop.x = right;
-      blobs[numBlobs].rightTop.y = newY;
-      blobs[numBlobs].leftBottom.x = splitpoint;
-      blobs[numBlobs].leftBottom.y = blobs[which].leftBottom.y;
-      blobs[numBlobs].rightBottom.x = right;
-      blobs[numBlobs].rightBottom.y = blobs[which].rightBottom.y;
-      blobs[numBlobs].pixels = 0;
-      blobs[numBlobs].area = 0;
-      numBlobs++;
-    }
-  } else if (isRobotCentered(headX, left, right) == RIGHT && xdist < width - 3 && right < IMAGE_WIDTH - 3 && width - xdist > MINROBOTWIDTH) {
-    drawBlob(blobs[which], BLUE);
-    // probably have two
-    int splitter = right - headX;
-    int splitpoint = headX - splitter;
-    blobs[which].leftTop.x = splitpoint;
-    blobs[which].leftBottom.x = splitpoint;
-    // now try and find the head of the second blob
-    // and here is where I stopped last
-    int newY, newX = 0;
-    bool found = false;
-    for (newY = top; newY < IMAGE_HEIGHT && newY < blobs[which].leftBottom.y && !found; newY++) {
-      for (newX = left; newX < IMAGE_WIDTH && newX < splitpoint && !found; newX++) {
-	if (thresh->thresholded[newY][newX] == color) {
-	  found = true;
-	}
-      }
-    }
-    newY--;
-    if ((newY - top) < width - xdist && isRobotCentered(newX, left, splitpoint) == 0) {
-      blobs[numBlobs].rightTop.x = splitpoint;
-      blobs[numBlobs].rightTop.y = newY;
-      blobs[numBlobs].leftTop.x = left;
-      blobs[numBlobs].leftTop.y = newY;
-      blobs[numBlobs].rightBottom.x = splitpoint;
-      blobs[numBlobs].rightBottom.y = blobs[which].leftBottom.y;
-      blobs[numBlobs].leftBottom.x = left;
-      blobs[numBlobs].leftBottom.y = blobs[which].rightBottom.y;
-      blobs[numBlobs].pixels = 0;
-      blobs[numBlobs].area = 0;
-      numBlobs++;
-    }
-  } else {
-    // punt
-    //drawBlob(blobs[which], ORANGE);
-  }
-  // should we merge this with nearby blobs?
-  bool another = false;
-  if (which > 0) {
-    // check previous blob
-    int lastY = blobs[which - 1].leftTop.y;
-    int lastRight = blobs[which - 1].rightTop.x;
-    if (which > 1 && blobs[which-1].rightTop.x - blobs[which-1].leftTop.x < 20)
-      another = true;
-    if (lastY - top > 50 && left - lastRight < 10) {
-      mergeBlobs(which, which - 1);
-    }
-    if (another) {
-      lastY = blobs[which - 2].leftTop.y;
-      lastRight = blobs[which - 2].rightTop.x;
-      if (lastY - top > 50 && left - lastRight < 10) {
-	mergeBlobs(which, which - 2);
-      }
-    }
-  }
-  if (which < numBlobs - 1) {
-    another = false;
-    int lastY = blobs[which + 1].leftTop.y;
-    int lastLeft = blobs[which + 1].leftTop.x;
-    if (which < numBlobs - 2 && blobs[which+1].rightTop.x - blobs[which+1].leftTop.x < 20)
-      another = true;
-    if (lastY - top > 50 && lastLeft - left < 10) {
-      mergeBlobs(which, which + 1);
-    }
-    if (another) {
-      lastY = blobs[which + 2].leftTop.y;
-      lastLeft = blobs[which + 2].leftTop.x;
-      if (lastY - top > 50 && lastLeft - left < 10) {
-	mergeBlobs(which, which + 2);
-      }
-    }
-  }
-}
-
-void ObjectFragments::detectOrientation(int which) {
-}
-
-#endif
-
 /* The next group of methods has to do with scanning along axis parallel dimensions in order to
  * create objects without blobbing.
  */
-
-
-
 
 /* Project a line given a start coord and a new y value - note that this is dangerous depending on how you
  * do the projection.
@@ -1010,6 +874,7 @@ int ObjectFragments::findTrueLineVertical(point <int> top, point <int> bottom, i
  */
 
 void ObjectFragments::findTrueLineVerticalSloped(point <int>& top, point <int>& bottom, int c, int c2, bool left) {
+    // TODO: change increment to 1
   int increment = 2;
   int spanY = bottom.y - top.y + 1;
   int count = 0;
@@ -1150,7 +1015,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left, point <int
   int run = 0;
   int badLines = 0;
   int maxgreen = 3;
-#if ROBOT(NAO)
+#if ROBOT(NAO) // TODO: change to lower res
   maxgreen = 200;
 #endif
   if (up)
@@ -1208,6 +1073,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left, point <int
 #if ROBOT(NAO)
   if (!up && thresh->getVisionHorizon() > left.y) {
     // for the heck of it let's scan down
+      // TODO: change to increment by 1
     int found = left.y;
     for (int d = left.y; d < thresh->getVisionHorizon(); d+=2) {
       good = 0;
@@ -1447,92 +1313,92 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
 
 
 
-/*  This method finds squares of a certain color under size constraints.  It is primarily
- * used to find backstops within goals.
- * @param x         x value of our starter point
- * @param y         y value of our starter point
- * @param c         the primary color
- * @param c2        the secondary color
- * @param left      the leftmost X boundary possible
- * @param right     the rightmost X boundary possible
- */
+// /*  This method finds squares of a certain color under size constraints.  It is primarily
+//  * used to find backstops within goals.
+//  * @param x         x value of our starter point
+//  * @param y         y value of our starter point
+//  * @param c         the primary color
+//  * @param c2        the secondary color
+//  * @param left      the leftmost X boundary possible
+//  * @param right     the rightmost X boundary possible
+//  */
 
-void ObjectFragments::constrainedSquare(int x, int y, int c, int c2, int left, int right) {
-  obj.leftTop.x = BADVALUE; obj.leftTop.y = BADVALUE;       // so we can check for failure
-  int nextx = x, nexty = y;
-  int top = 0, topx = 0, bottom = 0, bottomx = 0;
-  int h = 6, previousH = 0;
-  obj.leftBottom.y = 0;
-  // first we try going up
-  vertScan(nextx, nexty, -1,  3, c, c2);
-  h = scan.good;
-  // at this point we have a very rough idea of how tall the square is
-  vertScan(nextx, nexty, 1,  3, c, c2);
-  h += scan.good;
-  int initialH = h;
-  // going left
-  for (int i = 0; i < 4 && nextx > left; i++) {
-    do {
-      previousH = h;
-      // first we try going up
-      vertScan(nextx, nexty, -1,  4, c, c2);
-      h = scan.good;
-      // at this point we have a very rough idea of how tall the square is
-      top = scan.y;
-      topx = scan.x;
-      vertScan(nextx, nexty, 1,  4, c, c2);
-      bottom = scan.y;
-      bottomx = scan.x;
-      h += scan.good;
-      nextx--;
-      nexty = top + (bottom - top) / 2;
-      if (h > 5) {
-	obj.leftTop.x = topx;
-	if (i == 0)
-	  obj.leftTop.y = top;
-	obj.leftBottom.x = bottomx;
-	if (bottom > obj.leftBottom.y && i == 0) {
-	  obj.leftBottom.y = bottom;
-	  //drawPoint(bottomx, bottom, BLACK);
-	}
-      }
-    } while (nextx > left && h > previousH / 2 && h > 5 ); // && h < initialH +6);
-    h = initialH;
-  }
-  // going right
-  nextx = x;
-  nexty = y;
-  h = 6;
-  obj.rightBottom.y = 0;
-  for (int i = 0; i < 4 && nextx < right; i++) {
-    do {
-      // first we try going up
-      previousH = h;
-      vertScan(nextx, nexty, -1,  4, c, c2);
-      h = scan.good;
-      // at this point we have a very rough idea of how tall the square is
-      top = scan.y;
-      topx = scan.x;
-      vertScan(nextx, nexty, 1,  4, c, c2);
-      bottom = scan.y;
-      bottomx = scan.x;
-      //drawPoint(bottomx, bottom, RED);
-      h += scan.good;
-      nextx++;
-      nexty = top + (bottom - top) / 2;
-      if (h > 5) {
-	obj.rightTop.x = topx;
-	if (i == 0)
-	  obj.rightTop.y = top;
-	obj.rightBottom.x = bottomx;
-	if (bottom > obj.rightBottom.y && i == 0) {
-	  obj.rightBottom.y = bottom;
-	  //drawPoint(bottomx, bottom, RED);
-	}
-      }
-    } while (nextx < right && h > previousH / 2 && h > 5 ); //&& h < initialH + 6);
-  }
-}
+// void ObjectFragments::constrainedSquare(int x, int y, int c, int c2, int left, int right) {
+//   obj.leftTop.x = BADVALUE; obj.leftTop.y = BADVALUE;       // so we can check for failure
+//   int nextx = x, nexty = y;
+//   int top = 0, topx = 0, bottom = 0, bottomx = 0;
+//   int h = 6, previousH = 0;
+//   obj.leftBottom.y = 0;
+//   // first we try going up
+//   vertScan(nextx, nexty, -1,  3, c, c2);
+//   h = scan.good;
+//   // at this point we have a very rough idea of how tall the square is
+//   vertScan(nextx, nexty, 1,  3, c, c2);
+//   h += scan.good;
+//   int initialH = h;
+//   // going left
+//   for (int i = 0; i < 4 && nextx > left; i++) {
+//     do {
+//       previousH = h;
+//       // first we try going up
+//       vertScan(nextx, nexty, -1,  4, c, c2);
+//       h = scan.good;
+//       // at this point we have a very rough idea of how tall the square is
+//       top = scan.y;
+//       topx = scan.x;
+//       vertScan(nextx, nexty, 1,  4, c, c2);
+//       bottom = scan.y;
+//       bottomx = scan.x;
+//       h += scan.good;
+//       nextx--;
+//       nexty = top + (bottom - top) / 2;
+//       if (h > 5) {
+// 	obj.leftTop.x = topx;
+// 	if (i == 0)
+// 	  obj.leftTop.y = top;
+// 	obj.leftBottom.x = bottomx;
+// 	if (bottom > obj.leftBottom.y && i == 0) {
+// 	  obj.leftBottom.y = bottom;
+// 	  //drawPoint(bottomx, bottom, BLACK);
+// 	}
+//       }
+//     } while (nextx > left && h > previousH / 2 && h > 5 ); // && h < initialH +6);
+//     h = initialH;
+//   }
+//   // going right
+//   nextx = x;
+//   nexty = y;
+//   h = 6;
+//   obj.rightBottom.y = 0;
+//   for (int i = 0; i < 4 && nextx < right; i++) {
+//     do {
+//       // first we try going up
+//       previousH = h;
+//       vertScan(nextx, nexty, -1,  4, c, c2);
+//       h = scan.good;
+//       // at this point we have a very rough idea of how tall the square is
+//       top = scan.y;
+//       topx = scan.x;
+//       vertScan(nextx, nexty, 1,  4, c, c2);
+//       bottom = scan.y;
+//       bottomx = scan.x;
+//       //drawPoint(bottomx, bottom, RED);
+//       h += scan.good;
+//       nextx++;
+//       nexty = top + (bottom - top) / 2;
+//       if (h > 5) {
+// 	obj.rightTop.x = topx;
+// 	if (i == 0)
+// 	  obj.rightTop.y = top;
+// 	obj.rightBottom.x = bottomx;
+// 	if (bottom > obj.rightBottom.y && i == 0) {
+// 	  obj.rightBottom.y = bottom;
+// 	  //drawPoint(bottomx, bottom, RED);
+// 	}
+//       }
+//     } while (nextx < right && h > previousH / 2 && h > 5 ); //&& h < initialH + 6);
+//   }
+// }
 
 /*  Routine to find a general square goal.  The Aibo version is more general than the Nao version
  * and should end up being the final version soon.  We start with a point.  We scan up from the
@@ -1545,7 +1411,7 @@ void ObjectFragments::constrainedSquare(int x, int y, int c, int c2, int left, i
  * @param c2        the secondary color
  */
 
-void ObjectFragments::aiboSquareGoal(int x, int y, int c, int c2) {
+void ObjectFragments::squareGoal(int x, int y, int c, int c2) {
   obj.leftTop.x = BADVALUE; obj.leftTop.y = BADVALUE;       // so we can check for failure
   // first we try going up
   vertScan(x, y, -1,  3, c, c2);
@@ -1577,22 +1443,6 @@ void ObjectFragments::aiboSquareGoal(int x, int y, int c, int c2) {
 
 /* The next group of functions has to do with the creation of square objects.
  */
-
-
-
-/* Starts with a point and a color.  Tries to figure out if the point exists within a larger
- * "square" of that color.  If it is big enough it returns the information on the square.
- * Virtually identical to squareIt, except that we're more worried about bands of color sticking
- * out of one or the other side.
- * @param x           starting x point to search for square
- * @param y           starting y point
- * @param c           the color we're looking for
- * @return void       places results in struct called "obj"
- */
-void ObjectFragments::squareGoal(int x, int y, int c, int c2, int leftBound, int rightBound, int whatFor) {
-  aiboSquareGoal(x, y, c, c2);
-}
-
 
 /*  Our "main" methods.  Entry points into just about everything else.
  */
@@ -1783,139 +1633,6 @@ void ObjectFragments::updateRobot(VisualRobot* one, blob two) {
   one->setDistance(1);
 }
 
-/* Transfer a blob into a field arc.
- * @param one             the field object we'd like to update
- * @param two             the blob that contains the information we need
- */
-bool ObjectFragments::updateArc(VisualFieldObject* one, blob two, int goalHeight) {
-  one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x, two.leftTop.y));
-  if (one->getWidth() > 10) {
-
-    int midx = two.leftTop.x + (two.rightTop.x - two.leftTop.x) / 2;
-    point <int> leftPoint = thresh->findIntersection(midx, -1, color);
-    point <int> rightPoint = thresh->findIntersection(midx, 1, color);
-    if (leftPoint.x != BADVALUE) {
-      if (ARCDEBUG) {
-        print("Found left point %i %i", leftPoint.x, leftPoint.y);
-        drawPoint(leftPoint.x, leftPoint.y, RED);
-      }
-    }
-    if (rightPoint.x != BADVALUE) {
-      if (ARCDEBUG) {
-        print("Found right point %i %i", rightPoint.x, rightPoint.y);
-        drawPoint(rightPoint.x, rightPoint.y, RED);
-      }
-    }
-
-    one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x, two.leftBottom.y));
-    int lt = -1, rt = -1, lb = -1, rb = -1, col = GREEN, ltt = 0, rtt = 0, lbt = 0, rbt = 0;
-    for (int i = 0; i < min(one->getWidth(), one->getHeight()); i++) {
-      if (lt < 0) {
-        col = thresh->thresholded[two.leftTop.y + i][two.leftTop.x + i];
-        if (col == color) {
-          ltt++;
-          if (ltt > 1) {
-            lt = i;
-            //drawPoint(two.leftTop.x + i, two.leftTop.y + i, RED);
-          }
-        } else ltt = 0;
-      }
-      if (lb < 0) {
-        col = thresh->thresholded[two.leftBottom.y - i][two.leftTop.x + i];
-        if (col == color) {
-          lbt++;
-          if (lbt > 1) {
-            lb = i;
-            //drawPoint(two.leftBottom.x + i, two.leftBottom.y - i, RED);
-          }
-        } else lbt = 0;
-      }
-      if (rt < 0) {
-        col = thresh->thresholded[two.leftTop.y + i][two.rightTop.x - i];
-        if (col == color) {
-          rtt++;
-          if (rtt > 1) {
-            rt = i;
-            //drawPoint(two.rightTop.x - i, two.rightTop.y + i, RED);
-          }
-        } else rtt = 0;
-      }
-      if (rb < 0) {
-        col = thresh->thresholded[two.leftBottom.y - i][two.rightBottom.x - i];
-        if (col == color) {
-          rbt++;
-          if (rbt > 1) {
-            rb = i;
-            //drawPoint(two.rightBottom.x - i, two.leftBottom.y - i, RED);
-          }
-        } else rbt = 0;
-      }
-    }
-    int half = (two.rightTop.x - two.leftTop.x) / 2;
-    int half2 = (two.rightBottom.y - two.rightTop.y) / 2;
-    int top = 0, bottom = 0;
-    for (int i = 0; i < half; i++) {
-      for (int j = 0; j < half2; j++) {
-        if (thresh->thresholded[two.leftTop.y + j][two.leftTop.x + half / 2 + i] == GREEN)
-          top++;
-        if (thresh->thresholded[two.leftTop.y + half2 + j][two.leftTop.x + half / 2 + i] == GREEN)
-          bottom++;
-      }
-    }
-    if (ARCDEBUG) {
-      print("Distances %i %i %i %i", lt, rt, lb, rb);
-      print("Top %i %i", top, bottom);
-      drawRect(two.leftTop.x + half / 2, two.leftTop.y, half, ((two.leftBottom.y - two.leftTop.y) / 2), RED);
-      drawRect(two.leftTop.x + half / 2, two.leftTop.y + (two.leftBottom.y - two.leftTop.y) / 2, half, ((two.leftBottom.y - two.leftTop.y) / 2), BLACK);
-    }
-    int check = 0;
-    if (lt < 0) check++;
-    if (rt < 0) check++;
-    if (rb < 0) check++;
-    if (lb < 0) check++;
-    if (check > 2) {
-      one->init();
-      return false;
-    }
-    one->setIDCertainty(_SURE);
-    if (goalHeight > 12 || ((min(lt, rt) > max(lb, rb) && lt > 3) && (max(lb, rb) > max(lt, rt) + 2)))
-      one->setIDCertainty(NOT_SURE);
-    else if (rt < 4 && lb < 4 && rb > lt + 3 && lt > 4)
-      one->setIDCertainty(NOT_SURE);
-    else if (lt < 4 && rb < 4 && lb > rt + 3 && rt > 4)
-      one->setIDCertainty(NOT_SURE);
-    /*if (min(lt, rt) > max(lb, rb) && lt > 3)
-      one->setCertainty(_SURE);
-    else if (min(lb, rb) > max(lt, rt))
-      one->setCertainty(NOT_SURE);
-    else {
-      lt = max(lt, rt);
-      lb = max(lb, rb);
-      if (lb > lt + 2) {
-        one->setCertainty(SURE);
-      } else {
-        one->setCertainty(NOTSURE);
-      }
-      }*/
-    // try and figure out concavity
-    one->setLeftTopX(two.leftTop.x);
-    one->setLeftTopY(two.leftTop.y);
-    one->setLeftBottomX(leftPoint.x);
-    one->setLeftBottomY(leftPoint.y);
-    one->setRightTopX(two.rightTop.x);
-    one->setRightTopY(two.rightTop.y);
-    one->setRightBottomX(rightPoint.x);
-    one->setRightBottomY(rightPoint.y);
-    one->setX(two.leftTop.x);
-    one->setY(two.leftTop.y);
-    one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
-    one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-    one->setDistanceCertainty(BOTH_UNSURE);
-    one->setDistance(1);
-  }
-  return true;
-}
-
 /* Here we are trying to figure out how confident we are about our values with
  * regard to how they might be used for distance calculations.  Basically if
  * an object is too near one of the screen edges, or if we have some evidence that
@@ -1979,7 +1696,7 @@ void ObjectFragments::updateBackstop(VisualFieldObject* one, blob two) {
 
 /* Post recognition for NAOs
  */
-#if ROBOT(NAO)
+
 /*  Look for a crossbar once we think we've found a goalpost.  The idea is pretty simple, if we
  *  have done a good job with the square post, then the crossbar should either shoot out of the
  *  left or right top corner.  So try scanning from those positions.  The tricky part, or course
@@ -1996,6 +1713,7 @@ int ObjectFragments::crossCheck(blob b) {
   int h = blobHeight(b);
   int w = blobWidth(b);
   int need = min(w / 2, 20);
+  // TODO: change +2 to +1
   for (int i = 0; i < h / 5 && biggest < need; i+=2) {
     int tx = xProject(x, y, y + i);
     horizontalScan(tx, y + i, -1, 6, color, color, max(0, x - 2 * w), IMAGE_WIDTH - 1);
@@ -2005,6 +1723,7 @@ int ObjectFragments::crossCheck(blob b) {
   }
   x = b.rightTop.x;
   y = b.rightTop.y;
+  // TODO: change +2 to +1
   for (int i = 0; i < h / 5 && biggest2 < need; i+=2) {
     int tx = xProject(x, y, y + i);
     horizontalScan(tx, y + i, 1, 6, color, color, x - 1, IMAGE_WIDTH - 1);
@@ -2022,6 +1741,7 @@ int ObjectFragments::crossCheck(blob b) {
     //drawPoint(x, y, WHITE);
     //drawRect(x, y, 20, 20, ORANGE);
     biggest = 0;
+  // TODO: change +2 to +1
     for (int i = 0; i < h / 5 && biggest < 5; i+=2) {
       int tx = xProject(x, y, y + i);
       horizontalScan(tx, y + i, -1, 3, color, color, x - 12, IMAGE_WIDTH - 1);
@@ -2038,6 +1758,7 @@ int ObjectFragments::crossCheck(blob b) {
     //drawPoint(x, y, WHITE);
     //drawRect(x, y, 20, 20, WHITE);
     biggest2 = 0;
+  // TODO: change +2 to +1
     for (int i = 0; i < h / 5 && biggest2 < 5; i+=2) {
       int tx = xProject(x, y, y + i);
       horizontalScan(tx, y + i, 1, 3, color, color, x - 1, x + 13);
@@ -2059,6 +1780,7 @@ int ObjectFragments::crossCheck2(blob b) {
   int h = b.leftBottom.y - b.leftTop.y;
   //int w = b.rightTop.x - b.leftTop.x;
   int lefties = 0, righties = 0;
+  // TODO: change +2 to +1
   for (int i = x - 10; i > max(0, x - h); i-=2) {
     int yp = yProject(x, y, i);
     for (int j = max(0,yp); j < yp+10; j++) {
@@ -2067,6 +1789,7 @@ int ObjectFragments::crossCheck2(blob b) {
       }
     }
   }
+  // TODO: change +2 to +1
   for (int i = b.rightTop.x + 10; i < min(IMAGE_WIDTH - 1, b.rightTop.x + h); i+=2) {
     int yp = yProject(b.rightTop.x, b.rightTop.y, i);
     for (int j = max(0,yp); j < yp+10; j++) {
@@ -2075,71 +1798,13 @@ int ObjectFragments::crossCheck2(blob b) {
       }
     }
   }
+  // TODO: look at constants 50 and 10
   if (righties > 50 && righties > 10 * lefties)
     return LEFT;
   if (lefties > 50 && lefties > 10 * righties)
     return RIGHT;
   return NOPOST;
 }
-
-int ObjectFragments::triangle(blob b) {
-  int x = b.leftBottom.x - 20;
-  int y = b.leftBottom.y - 20;
-  int h = blobHeight(b);
-  int w = blobWidth(b);
-  for (int i = 0; i < h / 5; i+=2) {
-    int tx = xProject(x, y, y - i);
-    horizontalScan(tx, y - i, -1, 6, WHITE, WHITE, 0, IMAGE_WIDTH - 1);
-    if (scan.good >= 3 * w / 4) {
-      //drawPoint(scan.x, scan.y, MAROON);
-      int x2 = x - w / 4;
-      int y2 = min(midPoint(y - i, scan.y), IMAGE_HEIGHT - 1);
-      //drawPoint(x2, y2, MAROON);
-      vertScan(x2, y2, -1, 6, WHITE, WHITE);
-      int tot = scan.good;
-      int cx = scan.x, cy = scan.y;
-      vertScan(x2, y2, 1, 6, WHITE, WHITE);
-      if (scan.good + tot > w / 2) {
-	int greens = 0;
-	//drawRect(cx, cy, x - cx, cy - scan.y, MAROON);
-	for (int j = cx; j < x + 20; j++)
-	  for (int k = cy; k < y2; k++)
-	    if (thresh->thresholded[k][j] == GREEN) {
-	      greens++;
-	    }
-	if (greens > 1) break;
-	return RIGHT;
-      }
-    }
-    //drawPoint(scan.x, scan.y, MAROON);
-  }
-  x = b.rightBottom.x + 20;
-  y = b.rightBottom.y - 20;
-  for (int i = 0; i < h / 5; i+=2) {
-    int tx = xProject(x, y, y - i);
-    horizontalScan(tx, y - i, 1, 6, WHITE, WHITE, x - 1, IMAGE_WIDTH - 1);
-    if (scan.good >= 3 * w / 4) {
-      int x2 = x + w / 4;
-      int y2 = min(midPoint(y - i, scan.y), IMAGE_HEIGHT - 1);
-      //drawPoint(x2, y2, MAROON);
-      vertScan(x2, y2, -1, 6, WHITE, WHITE);
-      int tot = scan.good, cx = scan.good, cy = scan.y, greens = 0;
-      vertScan(x2, y2, 1, 6, WHITE, WHITE);
-      if (scan.good + tot > w / 2) {
-	for (int j = cx; j > x - 20; j--)
-	  for (int k = cy; k < y2; k++)
-	    if (thresh->thresholded[k][j] == GREEN) {
-	      greens++;
-	    }
-	if (greens > 1) break;
-	return LEFT;
-      }
-    }
-    //drawPoint(scan.x, scan.y, MAROON);
-  }
-  return NOPOST;
-}
-#endif
 
 int ObjectFragments::checkIntersection(blob post) {
   if (post.rightBottom.y - post.rightTop.y < 30) return NOPOST;
@@ -2319,7 +1984,7 @@ int ObjectFragments::checkCorners(blob post) {
  * @param b   the post in question
  * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
  */
-
+// TODO: change these constants
 int ObjectFragments::characterizeSize(blob b) {
   int w = b.rightTop.x - b.leftTop.x + 1;
   int h = b.leftBottom.y - b.leftTop.y + 1;
@@ -2327,82 +1992,6 @@ int ObjectFragments::characterizeSize(blob b) {
   if (h < 20 || w < 10) return SMALL;
   if (h < 40 || w < 20) return MEDIUM;
   return LARGE;
-}
-
-/* Make sure this isn't the blue ring of death.
- * @param b the post in question
- * @param c the color of the post
- * @return do we think it is ok?
- */
-
-bool ObjectFragments::goodPost(blob b, int c) {
-  int good = 0, bad = 0;
-  int pix = GREEN;
-  for (int i = b.leftTop.x; i < b.rightTop.x; i++)
-    for (int j = b.leftTop.y; j < b.leftBottom.y; j++)
-      pix = thresh->thresholded[j][i];
-      if (pix == c)
-        good++;
-      else if (pix == GREEN)
-        bad++;
-  if (ARCDEBUG) {
-    print("Good %i %d", good,
-          ((b.rightTop.x - b.leftTop.x) * (b.leftBottom.y - b.leftTop.y) / 3));
-  }
-  if  (good < (b.rightTop.x - b.leftTop.x) * (b.leftBottom.y - b.leftTop.y) / 2)
-    return false;
-  if (bad > (b.rightTop.x - b.leftTop.x) * (b.leftBottom.y - b.leftTop.y) / 5)
-    return false;
-  return true;
-
-}
-
-/* Make sure that the "post" we are looking at isn't just a colored field arc.  Just make sure that
- * it isn't mostly another color (green probably).
- * @param b   the post in question
- * @param c   the color of the post
- * @return    do we think its ok?
- */
-
-bool ObjectFragments::coloredArc(blob b, int c) {
-  int good = 0, green = 0, pix = GREEN;
-  for (int i = b.leftTop.x; i < b.rightTop.x; i++) {
-    for (int j = b.leftTop.y; j < b.leftBottom.y; j++) {
-      pix = thresh->thresholded[j][i];
-      if (pix == c)
-        good++;
-      else if (pix == GREEN)
-        green++;
-    }
-  }
-  int area = blobArea(b);
-  if (ARCDEBUG) {
-    drawBlob(b, BROWN);
-    cout << "Good " <<  good << " " << green << " " <<
-      (area / 3) << endl;
-  }
-  if (green < area / 3)
-    return false;
-  if  (good < area / 3)
-    return true;
-  // could still be an arc
-  if (c == BLUE && b.leftBottom.y > IMAGE_HEIGHT - 4 && (b.leftTop.x < 15 || b.rightTop.x > IMAGE_WIDTH - 15) &&
-      blobWidth(b) < 40) {
-    return false;
-  }
-  if (ARCDEBUG) {
-    print("%i %i %i %i %i", b.leftBottom.y, b.leftTop.x, b.rightTop.x,
-          (b.rightTop.x - b.leftTop.x), IMAGE_HEIGHT);
-  }
-  good = 0;
-  for (int i = b.leftTop.x; i < b.rightTop.x; i++)
-    for (int j = b.leftTop.y; j < b.leftTop.y + 2; j++)
-      if (thresh->thresholded[j][i] == GREEN)
-        good++;
-  if (ARCDEBUG) {
-    print("Good 2 %i %i", good, (b.rightTop.x - b.leftTop.x));
-  }
-  return good > (b.rightTop.x - b.leftTop.x);
 }
 
 /* Sets a standard of proof for a post.  In this case that the blob comprising the post
@@ -2441,13 +2030,12 @@ bool ObjectFragments::checkSize(blob b, int c) {
   return true;
 }
 
-/* Shooting.
- */
+/* Shooting stuff */
 
-/* Determines shooting information.  Basically scans down from backstop and looks for occlusions.
- * Sets the information found within the backstop data structure.
- * @param one     the backstop
- */
+/* Determines shooting information. Basically scans down from backstop and looks for occlusions.
+* Sets the information found within the backstop data structure.
+* @param one the backstop
+*/
 
 void ObjectFragments::setShot(VisualBackstop* one) {
   int pix, bad, white, grey, run, greyrun;
@@ -2486,56 +2074,56 @@ void ObjectFragments::setShot(VisualBackstop* one) {
     for (int j = min(ly, ry); j < IMAGE_HEIGHT && shoot[i]; j++) {
       pix = thresh->thresholded[j][i];
       if (pix == color) {
-	strip++;
-	if (strip > 5)
-	  colorSeen = true;
+  strip++;
+  if (strip > 5)
+   colorSeen = true;
       }
       if (colorSeen && (pix == RED || pix == NAVY)) {
-	bad++;
-	run++;
-	lineFound = false;
+  bad++;
+  run++;
+  lineFound = false;
       } else if (colorSeen && pix == WHITE) {
-	if (!lineFound) {
-	  for (int k = 0; k < crossings; k++) {
-	    //cout << "Crassing at " << intersections[k] << endl;
-	    if (intersections[k] - j < 10 && intersections[k] - j > 0) {
-	      lineFound = true;
-	    }
-	  }
-	}
-	if (lineFound) {
-	  //cout << "Intersection at " << j << endl;
-	  run = 0;
-	  greyrun = 0;
-	} else {
-	  //cout << "No Intersection at " << j << endl;
-	  white++;
-	  run++;
-	}
+  if (!lineFound) {
+   for (int k = 0; k < crossings; k++) {
+   //cout << "Crassing at " << intersections[k] << endl;
+   if (intersections[k] - j < 10 && intersections[k] - j > 0) {
+   lineFound = true;
+   }
+   }
+  }
+  if (lineFound) {
+   //cout << "Intersection at " << j << endl;
+   run = 0;
+   greyrun = 0;
+  } else {
+   //cout << "No Intersection at " << j << endl;
+   white++;
+   run++;
+  }
       } else if (colorSeen && pix == GREY || pix == BLACK) {
-	grey++;
-	greyrun++;
+  grey++;
+  greyrun++;
       } else if (pix == GREEN || pix == BLUEGREEN) {
-	run = 0;
-	greyrun = 0;
-	lineFound = false;
+  run = 0;
+  greyrun = 0;
+  lineFound = false;
       }
       if (greyrun > 15) {
-	//shoot[i] = false;
-	if (BACKDEBUG) {
-	  //drawPoint(i, j, RED);
-	}
+  //shoot[i] = false;
+  if (BACKDEBUG) {
+   //drawPoint(i, j, RED);
+  }
       }
       if (run > 10 && (pix == NAVY || pix == RED)) {
-	shoot[i] = false;
-	if (BACKDEBUG)
-	  drawPoint(i, j, RED);
+  shoot[i] = false;
+  if (BACKDEBUG)
+   drawPoint(i, j, RED);
       }
       if (run > 10) {
-	shoot[i] = false;
-	if (BACKDEBUG) {
-	  drawPoint(i, j, RED);
-	}
+  shoot[i] = false;
+  if (BACKDEBUG) {
+   drawPoint(i, j, RED);
+  }
       }
     }
     if (bad > ySpan / 5) {
@@ -2546,7 +2134,7 @@ void ObjectFragments::setShot(VisualBackstop* one) {
   int r1 = IMAGE_WIDTH / 2;
   int r2 = IMAGE_WIDTH / 2;
   for ( ;r1 < brx && r1 >= bx && shoot[r1]; r1--) {}
-  for ( ;r2 > bx && r2 <= rx  && shoot[r2]; r2++) {}
+  for ( ;r2 > bx && r2 <= rx && shoot[r2]; r2++) {}
   if (r2 - r1 < MINSHOTWIDTH || abs(r1 - IMAGE_WIDTH / 2) < MINSHOTWIDTH / 2 || abs(r2 - IMAGE_WIDTH / 2) < MINSHOTWIDTH) {
     one->setShoot(false);
     one->setBackLeft(-1);
@@ -2592,7 +2180,6 @@ void ObjectFragments::setShot(VisualBackstop* one) {
       cout << " Don't shoot!" << endl;
   }
 }
-
 void ObjectFragments::bestShot(VisualFieldObject* left,
                                VisualFieldObject* right,
                                VisualBackstop* middle) {
@@ -2621,7 +2208,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
     rr = vision->red1->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
       for (int i = rl; i <= rr; i++) {
-	screen[i] = true;
+  screen[i] = true;
       }
     }
   }
@@ -2630,7 +2217,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
     rr = vision->red2->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
       for (int i = rl; i <= rr; i++) {
-	screen[i] = true;
+  screen[i] = true;
       }
     }
   }
@@ -2639,7 +2226,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
     rr = vision->navy1->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
       for (int i = rl; i <= rr; i++) {
-	screen[i] = true;
+  screen[i] = true;
       }
     }
   }
@@ -2648,7 +2235,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
     rr = vision->navy2->getRightBottomX();
     if (rr >= leftb && rl <= rightb) {
       for (int i = rl; i <= rr; i++) {
-	screen[i] = true;
+  screen[i] = true;
       }
     }
   }
@@ -2659,9 +2246,9 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
       run++;
     } else {
       if (run > big) {
-	indexr = i - 1;
-	index = indexr - run;
-	big = run;
+  indexr = i - 1;
+  index = indexr - run;
+  big = run;
       }
       run = 0;
     }
@@ -2694,7 +2281,6 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
 
 /* Determines what is the most open part of the field.  Basically scans up and looks for occlusions.
  */
-
 void ObjectFragments::openDirection(int horizon, NaoPose *pose) {
   const int divider = 10;
 
@@ -2980,7 +2566,7 @@ int ObjectFragments::grabPost(int c, int c2, int horizon, int left, int right) {
   // Try and figure out the true axis-parallel post dimensions - we're going to try and start right in the middle
   int startX = maxX;
   int startY = maxY + maxRun / 2;
-  squareGoal(startX, startY, c, c2, 0, IMAGE_WIDTH - 1, POST); //starts a scan in the middle of the tallest run.
+  squareGoal(startX, startY, c, c2); //starts a scan in the middle of the tallest run.
   // make sure we're looking at something big enough to be a post
   if (!postBigEnough(obj)) {
     return NOPOST;
@@ -3115,13 +2701,13 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
     return post;
   }
 
-  //post = triangle(pole);        // look for the triangle
-  if (post != NOPOST) {
-    if (POSTLOGIC) {
-      cout << "Found triangle " << post << endl;
-    }
-    return post;
-  }
+  // //post = triangle(pole);        // look for the triangle
+  // if (post != NOPOST) {
+  //   if (POSTLOGIC) {
+  //     cout << "Found triangle " << post << endl;
+  //   }
+  //   return post;
+  // }
   return post;
 }
 
@@ -3871,7 +3457,6 @@ bool ObjectFragments::atBoundary(blob b) {
       || b.leftBottom.y >= IMAGE_HEIGHT - 1;
 }
 
-#if ROBOT(NAO)
 /* See if there is a ball onscreen.  Basically we get all of the orange blobs
  * and test them for viability.  Once we've screened all of the obviously bad
  * ones we then pick the biggest one and check it some more.
@@ -4068,223 +3653,6 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
   }
   return 0;
 }
-
-#endif
-/**
-   This method calculates the best fit circle to a number of given points. Uses
-   least squares regression of some sort. (see url below). Works by filling two
-   matrices with various expressions, summing as we go for each point.
-   Then we invert matrix J (by hand), and multiply it with K to get the 3x1
-   matrix of coefficients which will help us find the circle parmeters.
-   Then we write the information into the ball object.
-   Returns 0 on succes, 1 on fail.
-   @param thisBall    the ball object
-   @return            0 for success, 1 for fail
- */
-int ObjectFragments::circleFit(VisualBall * thisBall){
-  //thisBall->init();
-    inferredConfidence = 0;
-    if(numPoints < 3){
-      if (DEBUGCIRCLEFIT) printf("ERR in Circle fit: insufficient points!");
-      return 1;
-    }
-  //Init the matrices j,k and a (j^-1)
-  float
-    j00 = 0.0,j01 = 0.0, j02 = 0.0,
-    j10 = 0.0,j11 = 0.0,j12 = 0.0,
-    j20 = 0.0,j21 = 0.0,j22 = 0.0,
-
-    k0 = 0.0, k1 = 0.0, k2 = 0.0,
-
-    a00 = 0.0,a01 = 0.0,a02 = 0.0,
-    a10 = 0.0,a11 = 0.0,a12 = 0.0,
-    a20 = 0.0,a21 = 0.0,a22 = 0.0;
-
-  //look through all the points, and do the analysis
-  /*see http://www.orbitals.com/self/least/least.htm , 1st example*/
-  for(int p = 0; p < 2*numPoints;){
-    float x = points[p++];
-    float y = points[p++];
-    float xySqrd = (x*x + y*y);
-    //cout<<x<<endl;
-    //print "New point(",x,y,"),xySqrd = ",xySqrd
-    //get Jt*J
-
-    // first row
-    j00 +=xySqrd*xySqrd;
-    j01 +=xySqrd*x;
-    j02 +=xySqrd*y;
-    //second row
-    //skip (1,0) because it is similar to (0,2)
-    j11+= x*x;
-    j12+= x*y;
-
-    //third row
-    //skip (2,0),(2,1) bc of smiilar reason above
-    j22 +=y*y;
-
-    //get K
-    k0 +=xySqrd;
-    k1 +=x;
-    k2 +=y;
-  }
-  j10=j01;
-  j20=j02;
-  j21=j12;
-
-  //printf("Num points %d \n",numPoints);
-  /*http://en.wikipedia.org/wiki/Standard_deviation*/
-  /*
-  float meanX = k1/numPoints;
-  float meanY = k2/numPoints;
-
-  printf("Sum squared of X %f   mean X^2 %f \n",j11/numPoints,meanX*meanX);
-  printf("Sum squared of X %f   mean X^2 %f \n",j22/numPoints,meanY*meanY);
-
-  float stdDevX =sqrt((j11/numPoints)-(meanX*meanX));
-  float stdDevY =sqrt((j22/numPoints)-(meanY*meanY));
-
-  printf("Std dev xy (%f,%f)\n",stdDevX,stdDevY);*/
-
-  //find the inverse
-  float jDet = det3(j00,j01,j02,
-		     j10,j11,j12,
-		     j20,j21,j22);
-  //printf("The determinant:%g\n",jDet);
-  if(jDet == 0){
-    if (DEBUGCIRCLEFIT)
-      printf("ERR in Circle fit: the determinant was zero, no circle!");
-    return 1;
-
-  }
-
-  a00 =  det2(j11,j12,
-	      j21,j22)/jDet;
-  a01 = -det2(j10,j12
-	      ,j20,j22)/jDet;
-  a02 =  det2(j10,j11,
-	      j20,j21)/jDet;
-
-  a10 = -det2(j01,j02,
-	      j21,j22)/jDet;
-  a11 =  det2(j00,j02,
-	      j20,j22)/jDet;
-  a12 = -det2(j00,j01,
-	      j20,j21)/jDet;
-
-  a20 =  det2(j01,j02,
-	      j11,j12)/jDet;
-  a21 = -det2(j00,j02,
-	      j10,j12)/jDet;
-  a22 =  det2(j00,j01,
-	      j10,j11)/jDet;
-
-  //multiply the matrices to find the coefficients
-  //which help to solve the circle
-  float a = a00*k0+a01*k1+a02*k2;
-  float b = a10*k0+a11*k1+a12*k2;
-  float c = a20*k0+a21*k1+a22*k2;
-  if(a == 0){
-    if (DEBUGCIRCLEFIT)
-      printf("ERR in circle fit: got a zero denominator, circle fit failed");
-    return 1; //fail
-
-  }
-
-  if ((4*a + b*b + c*c) < 0) {
-    if (DEBUGCIRCLEFIT)
-      print("ERR is negative sqrt");
-    return 1;
-  }
-
-  //cout<<"a "<<a<<"b "<<b<<"c "<<c<<endl;
-  //calc all the infered dimensions
-  int inferedX = ROUND2(-b/(2*a));
-  int inferedY = ROUND2(-c/(2*a));
-  float determinantThing = 4*a + b*b + c*c;
-  if(determinantThing < 0){
-    if (DEBUGCIRCLEFIT)
-      printf("ERR in circle fit: PROCESSOR NOT ACCURATE ENOUGH\n");
-    return 1;
-  }
-  float inferedR = abs(sqrt(determinantThing)/(2*a));
-
-
-  if(inferedX < (0 - IMAGE_WIDTH) || inferedX > 2*IMAGE_WIDTH ||
-     inferedY < (0 - IMAGE_HEIGHT) || inferedY > 2*IMAGE_HEIGHT){
-    if (DEBUGCIRCLEFIT)
-      print("ERR in circle fit: got a bad center");
-    return 1; //fail
-  }
-
-  //write info to the ball class
-  thisBall->setCenterX(inferedX);
-  thisBall->setCenterY(inferedY);
-  thisBall->setRadius(inferedR);
-  thisBall->setWidth(thisBall->getRadius() * 2);
-  thisBall->setHeight(thisBall->getRadius() * 2);
-  thisBall->setX(ROUND2(inferedX - thisBall->getRadius()));
-  thisBall->setY(ROUND2(inferedY - thisBall->getRadius()));
-  if (DEBUGCIRCLEFIT)
-    printf("Circle fit: xyr (%d,%d,%f)\n",inferedX,inferedY,inferedR);
-
-  if (DEBUGCIRCLEFIT)
-    drawPoint(inferedX,inferedY,YELLOW);
-  float stDev = 0;
-  float *distances = new float[numPoints];
-  float *pointer = distances;
-  for(int p = 0; p < 2*numPoints;){
-    float x = points[p++];
-    float y = points[p++];
-    float newRad = sqrt(pow(x-inferedX,2) + pow(y-inferedY,2));
-    stDev +=pow(newRad-inferedR,2);
-    *pointer = newRad;
-    pointer++;
-  }
-  stDev/=numPoints;
-  stDev = sqrt(stDev);
-  //cout<<"STDEV "<<stDev<<endl;
-
-  float distErr = 0;
-  int badPoints = 0;
-
-  for (int i=0; i< numPoints; i++) {
-    float error = fabs(distances[i] - inferedR);
-    //cout<<"error: "<<error<<endl;
-    if (error > stDev) {
-      badPoints++;
-      continue;
-    }
-    distErr += error;
-  }
-
-  delete distances;
-
-
-  if(badPoints==numPoints){
-    if (DEBUGCIRCLEFIT)
-      printf("ERR in circle fit: no good points");
-    return 1; //fail
-  }
-  if(inferedR==0){
-    if (DEBUGCIRCLEFIT)
-      printf("ERR in circle fit: resultant radius = 0");
-    return 1; //fail
-  }
-  distErr /= numPoints-badPoints;
-  distErr /= inferedR;
-  distErr *= 100;
-  //cout<<"Radius"<<inferedR<<endl;
-  //cout<<"sum of dist errors: "<<distErr<<endl;
-  //  float confidence = sqrt(pow(stdDevX,2.0) + pow(stdDevY,2.0))/inferedR;
-  //cout<<"Confidence"<<confidence<<endl;
-
-  //print("Ball err %f",distErr);
-  inferredConfidence = 5 - ROUND2(distErr);
-  return 0; //success
-}
-
-
 
 /* Sanity check routines for beacons and posts
  */
@@ -4552,15 +3920,11 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2, int span
  * @param y     y value
  */
 void ObjectFragments::addPoint(float x, float y){
-  if (DEBUGCIRCLEFIT)
-    printf("ADDING a point:#%d,(%f,%f)\n",numPoints,x,y);
   if(numPoints < MAX_POINTS){
     points[numPoints*2] = x;
     points[numPoints*2+1] = y;
     numPoints++;
   }else{
-    if (DEBUGCIRCLEFIT)
-      printf("Too many points!!!\n");
   }
 }
 

@@ -39,7 +39,7 @@ class Threshold;  // forward reference
 //
 // THRESHOLDING CONSTANTS
 // Constants pertaining to object detection and horizon detection
-static const int MIN_RUN_SIZE = 25;
+static const int MIN_RUN_SIZE = 25; // Decrease for lower resolution n/2
 // we're more demanding of Green because there is so much
 static const int MIN_GREEN_SIZE = 10;
 
