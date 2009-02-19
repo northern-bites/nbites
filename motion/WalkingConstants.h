@@ -155,7 +155,7 @@ public:
     }
 
     //Returns the 20 body joints
-    std::vector<float> getWalkStance() const {
+    std::vector<float> * getWalkStance() const {
         //cout << "getWalkStance" <<endl;
         //calculate the walking stance of the robot
         const float z = bodyHeight;
@@ -179,18 +179,18 @@ public:
         IKLegResult rresult = Kinematics::dls(RLEG_CHAIN,rgoal,zeroJoints);
         std::vector<float> rleg_angles(rresult.angles, rresult.angles + LEG_JOINTS);
 
-        std::vector<float> allJoints;
+        std::vector<float> * allJoints = new std::vector<float>();
 
         //Make up something arbitrary for the arms
-        const float larm[ARM_JOINTS] = {M_PI/2,M_PI/10,-M_PI/2,-M_PI/2};
+        const float larm[ARM_JOINTS] = {M_PI/2,M_PI/10, -M_PI/2,-M_PI/2};
         const float rarm[ARM_JOINTS] = {M_PI/2,-M_PI/10,M_PI/2,M_PI/2};
         const std::vector<float>larm_angles(larm,larm+ARM_JOINTS);
         const std::vector<float>rarm_angles(rarm,rarm+ARM_JOINTS);
         //now combine all the vectors together
-        allJoints.insert(allJoints.end(),larm_angles.begin(),larm_angles.end());
-        allJoints.insert(allJoints.end(),lleg_angles.begin(),lleg_angles.end());
-        allJoints.insert(allJoints.end(),rleg_angles.begin(),rleg_angles.end());
-        allJoints.insert(allJoints.end(),rarm_angles.begin(),rarm_angles.end());
+        allJoints->insert(allJoints->end(),larm_angles.begin(),larm_angles.end());
+        allJoints->insert(allJoints->end(),lleg_angles.begin(),lleg_angles.end());
+        allJoints->insert(allJoints->end(),rleg_angles.begin(),rleg_angles.end());
+        allJoints->insert(allJoints->end(),rarm_angles.begin(),rarm_angles.end());
         return allJoints;
     }
 

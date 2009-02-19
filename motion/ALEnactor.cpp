@@ -76,7 +76,8 @@ void ALEnactor::postSensors() {
     vector<float> alAngles = almotion->getBodyAngles();
     sensors->setBodyAngles(alAngles);
     sensors->setMotionBodyAngles(motionCommandAngles);
-
+    vector<float> temp = sensors->getMotionBodyAngles();
+    //for (int i = 2; i < 6; i++)cout << "arm angles are"<< temp[i] <<endl;
     // This call syncs all sensors values: bumpers, fsr, inertial, etc.
     syncWithALMemory();
 

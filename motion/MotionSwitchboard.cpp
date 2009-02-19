@@ -48,7 +48,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     //the getup routine waits for the walk engine to be inited
     //Build the get up routine
     vector<float> * initPos
-        = new vector<float>(DEFAULT_PARAMETERS.getWalkStance());
+        = DEFAULT_PARAMETERS.getWalkStance();
 	getUp = new BodyJointCommand(5.0f,
                                  initPos,
                                  Kinematics::INTERPOLATION_LINEAR);
@@ -112,7 +112,7 @@ void MotionSwitchboard::start() {
 	//sendMotionCommand(command3);
 	//sendMotionCommand(hjc3);
 // 	headProvider.enqueue(hjc3);
-    sendMotionCommand(getUp);
+    //sendMotionCommand(getUp);
 
     running = true;
 
@@ -251,7 +251,8 @@ void MotionSwitchboard::swapBodyProvider(){
     BodyJointCommand * gaitSwitch = NULL;
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
-        if(curGait != nextGait){
+        //if(curGait != nextGait){
+        //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOAR IS BROKEN!
             //We need to ensure we are in the correct gait before walking
             gaitSwitch = getGaitTransitionCommand(nextGait);
             if(gaitSwitch->getDuration() > 0.0f){
@@ -259,7 +260,7 @@ void MotionSwitchboard::swapBodyProvider(){
                 curProvider = static_cast<MotionProvider * >(&scriptedProvider);
                 break;
             }
-        }
+            //}
     case SCRIPTED_PROVIDER:
     case HEAD_PROVIDER:
     default:
@@ -271,10 +272,28 @@ void MotionSwitchboard::swapBodyProvider(){
 }
 
 BodyJointCommand * MotionSwitchboard::getGaitTransitionCommand(const WalkingParameters * new_gait){
-    vector<float> curJoints;
-    vector<float> gaitJoints = new_gait->getWalkStance();
+    vector<float> curJoints = sensors->getMotionBodyAngles();
+    vector<float> * gaitJoints = new_gait->getWalkStance();
 
-    return new BodyJointCommand(0.0f,new vector<float>(NUM_JOINTS,0.0f),
+    float max_change = -M_PI*10.0f;
+
+    for(unsigned int i = 0; i < gaitJoints->size(); i++){
+
+        max_change = fmax(max_change,
+                          fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)));
+        cout << "target - current: "<<gaitJoints->at(i)
+             <<" - " << curJoints.at(i+HEAD_JOINTS) << ", max = " <<max_change<<endl;
+    }
+
+    const float  MAX_RAD_PER_SEC =  M_PI*0.25; //Technically its 220 deg/s or so
+    float time = max_change/MAX_RAD_PER_SEC;
+    cout << "time" <<time << "MAX change" << MAX_RAD_PER_SEC <<endl;
+    //If the motion would take less than a frame, don't do a transition
+    if(time < 0.02 || max_change < M_PI/180.0f)
+        time = 0.0f;
+    cout << "New Transition command with time "<<time<< " and angle "
+         <<max_change<<endl;
+    return new BodyJointCommand(time,gaitJoints,
                                 Kinematics::INTERPOLATION_LINEAR);
 }
 
