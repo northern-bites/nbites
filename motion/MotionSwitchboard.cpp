@@ -24,6 +24,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	  headProvider(1/50.0f,sensors),
 	  curProvider(&scriptedProvider),
 	  nextProvider(&scriptedProvider),
+      curGait(&DEFAULT_PARAMETERS),
+      nextGait(&DEFAULT_PARAMETERS),
       nextJoints(Kinematics::NUM_JOINTS, 0.0f),
       //nextJoints(sensors->getBodyAngles()),
 	  running(false),

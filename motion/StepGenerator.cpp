@@ -16,6 +16,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     si_Transform(CoordFrame3D::identity3D()),
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
     if_Transform(CoordFrame3D::identity3D()),
+    fc_Transform(CoordFrame3D::identity3D()),
     initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),
@@ -82,6 +83,9 @@ void StepGenerator::generate_steps(){
 }
 
 void StepGenerator::tick_controller(){
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::tick_controller" << endl;
+#endif
     #define G 9.81
     Inertial inertial = sensors->getInertial();
 
@@ -123,6 +127,9 @@ void StepGenerator::tick_controller(){
 
 
 WalkLegsTuple StepGenerator::tick_legs(){
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::tick_legs" << endl;
+#endif
     //Ensure we have enough steps for planning purposes
     generate_steps();
 

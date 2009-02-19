@@ -1,5 +1,6 @@
 #include "WalkingLeg.h"
 
+//#define DEBUG_WALKINGLEG
 
 WalkingLeg::WalkingLeg(ChainID id)
     :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
@@ -53,6 +54,9 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
                                 boost::shared_ptr<Step> _swing_dest,
                                 ufmatrix3 fc_Transform){
+#ifdef DEBUG_WALKINGLEG
+    cout << "WalkingLeg::tick() "<<leg_name <<" leg, state is "<<state<<endl;
+#endif
     cur_dest = step;
     swing_src = _swing_src;
     swing_dest = _swing_dest;

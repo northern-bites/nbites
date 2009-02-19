@@ -65,8 +65,8 @@ private:
 	MotionProvider * curProvider;
 	MotionProvider * nextProvider;
 
-    WalkingParameters *curGait;
-    WalkingParameters *nextGait;
+    const WalkingParameters *curGait;
+    const WalkingParameters *nextGait;
 
     std::vector <float> nextJoints;
 
