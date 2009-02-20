@@ -11,8 +11,8 @@ class VisualBackstop;
 #include "ConcreteFieldObject.h"
 #include "Utility.h"
 #include "Structs.h"
-
-// Values for the Standard Deviation calculations
+#include "VisionStructs.h"
+#include "VisionHelpers.h"
 
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
@@ -39,7 +39,7 @@ public:
 
     // INITIALIZATION (happens every frame)
     void init();
-
+    void updateBackstop(blob *b);
     // SETTERS
     void setLeftTopX(int _x){  leftTop.x = _x; }
     void setLeftTopY(int _y){  leftTop.y = _y; }

@@ -29,6 +29,8 @@ using namespace std;
 #include "Common.h"
 #include "ifdefs.h"
 #include "NaoPose.h"
+#include "VisionStructs.h"
+#include "VisionHelpers.h"
 
 class ObjectFragments; // forward reference
 #include "Threshold.h"
@@ -40,10 +42,10 @@ class ObjectFragments; // forward reference
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
 // TODO: Change from highres constants to low-res/ probably too large right now
-#if ROBOT(NAO)
+
 #define MIN_GOAL_HEIGHT		50
 #define MIN_GOAL_WIDTH		10
-#endif
+
 // ID information on goal post constant
 static const int NOPOST = 0;   // don't know which
 static const int RIGHT = 1;
@@ -90,7 +92,7 @@ static const float NORMALPOST = 0.6f;
 static const float QUESTIONABLEPOST = 0.85f;
 
 // Ball constants
-// TODO: look at this switch
+// TODO: look at this switch - SMALLBALLDIM
 static const int SMALLBALLDIM = 8;                 // below this size balls are considered small
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
 static const float BALLTOOFAT = 1.5f;               // ratio of width/height worse than this is a very bad sign
@@ -142,42 +144,6 @@ static const bool ARCDEBUG = false;
 static const bool CORRECT = false;
 static const bool OPENFIELD = false;
 #endif
-
-// a blob structure that holds information about its own location, and
-// information involving its larger blob structure
-struct blob {
-    // bounding coordinates of the blob
-    point <int> leftTop;
-    point <int> rightTop;
-    point <int> leftBottom;
-    point <int> rightBottom;
-    int pixels; // the total number of correctly colored pixels in our blob
-    int area;
-};
-
-struct run {
-    int x;
-    int y;
-    int h;
-};
-
-struct stop {
-    int x;
-    int y;
-    int bad;
-    int good;
-    int span;
-};
-
-//struct colorRect {
-//};
-
-inline int ROUND2(float x) {
-    if ((x-(int)x) >= 0.5) return ((int)x+1);
-    if ((x-(int)x) <= -0.5) return ((int)x-1);
-    return (int)x;
-}
-
 
 class ObjectFragments {
 public:
@@ -248,9 +214,7 @@ public:
     int getBigRun(int left, int right, int hor);
     bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
-    void updateRobot(VisualRobot* a, blob b);
     distanceCertainty checkDist(int left, int right, int top, int bottom);
-    void updateBackstop(VisualFieldObject* a, blob b);
 
     // post recognition routines
     int crossCheck(blob b);
@@ -308,10 +272,8 @@ public:
     void addPoint(float x, float y);
 
     // misc.
-    float dist(int x, int y, int x1, int y1);
     int distance(int x1, int x2, int x3, int x4);
     int getPixels(int index);
-    int midPoint(int a, int b);
     float getSlope() { return slope; }
 
 
@@ -372,20 +334,6 @@ public:
     }
 
 #endif
-
-    //find the determinant of a 2by2
-    float det2(float a00,float a01,float a10,float a11){
-        return (a00*a11)-(a01*a10);}
-    //find the determinant of a 3by3
-    float det3(float a00,float a01,float a02,
-               float a10,float a11,float a12,
-               float a20,float a21,float a22){
-        return ((a00*det2(a11,a12,
-                          a21,a22))
-                -(a01*det2(a10,a12,
-                           a20,a22))
-                +(a02*det2(a10,a11,
-                           a20,a21)));}
 
 private:
     // class pointers

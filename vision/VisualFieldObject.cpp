@@ -175,3 +175,28 @@ void VisualFieldObject::setIDCertainty(certainty _cert)
         }
     }
 }
+
+void VisualFieldObject::updateObject(blob * b, certainty _certainty,
+                                     distanceCertainty _distCertainty)
+{
+    // before we do this let's make sure that the object is really our color
+    setLeftTopX(b->leftTop.x);
+    setLeftTopY(b->leftTop.y);
+    setLeftBottomX(b->leftBottom.x);
+    setLeftBottomY(b->leftBottom.y);
+    setRightTopX(b->rightTop.x);
+    setRightTopY(b->rightTop.y);
+    setRightBottomX(b->rightBottom.x);
+    setRightBottomY(b->rightBottom.y);
+    setX(b->leftTop.x);
+    setY(b->leftTop.y);
+    setWidth(dist(b->rightTop.x, b->rightTop.y, b->leftTop.x,
+                  b->leftTop.y));
+    setHeight(dist(b->leftTop.x, b->leftTop.y, b->leftBottom.x,
+                   b->leftBottom.y));
+    setCenterX(getLeftTopX() + ROUND2(getWidth() / 2));
+    setCenterY(getRightTopY() + ROUND2(getHeight() / 2));
+    setIDCertainty(_certainty);
+    setDistanceCertainty(_distCertainty);
+    setDistance(1);
+}

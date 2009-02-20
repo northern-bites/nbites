@@ -545,15 +545,15 @@ void ObjectFragments::updateRobots(int which, int index) {
     //printBlob(blobs[index]);
     if (color == RED) {
         if (which == 1) {
-            updateRobot(vision->red1, blobs[index]);
+            vision->red1->updateRobot(&blobs[index]);
         } else {
-            updateRobot(vision->red2, blobs[index]);
+            vision->red2->updateRobot(&blobs[index]);
         }
     } else {
         if (which == 1) {
-            updateRobot(vision->navy1, blobs[index]);
+            vision->navy1->updateRobot(&blobs[index]);
         } else {
-            updateRobot(vision->navy2, blobs[index]);
+            vision->navy2->updateRobot(&blobs[index]);
         }
     }
 }
@@ -1587,50 +1587,12 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, blob two,
     //cout << "Got an object" << endl;
     // before we do this let's make sure that the object is really our color
     if (rightBlobColor(two, NORMALPOST)) {
-        one->setLeftTopX(two.leftTop.x);
-        one->setLeftTopY(two.leftTop.y);
-        one->setLeftBottomX(two.leftBottom.x);
-        one->setLeftBottomY(two.leftBottom.y);
-        one->setRightTopX(two.rightTop.x);
-        one->setRightTopY(two.rightTop.y);
-        one->setRightBottomX(two.rightBottom.x);
-        one->setRightBottomY(two.rightBottom.y);
-        one->setX(two.leftTop.x);
-        one->setY(two.leftTop.y);
-        one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x,
-                           two.leftTop.y));
-        one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x,
-                            two.leftBottom.y));
-        one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
-        one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-        one->setIDCertainty(_certainty);
-        one->setDistanceCertainty(_distCertainty);
-        one->setDistance(1);
+        one->updateObject(&two, _certainty, _distCertainty);
         return true;
     } else {
         //cout << "Screening object for low percentage of real color" << endl;
         return false;
     }
-}
-
-void ObjectFragments::updateRobot(VisualRobot* one, blob two) {
-    one->setLeftTopX(two.leftTop.x);
-    one->setLeftTopY(two.leftTop.y);
-    one->setLeftBottomX(two.leftBottom.x);
-    one->setLeftBottomY(two.leftBottom.y);
-    one->setRightTopX(two.rightTop.x);
-    one->setRightTopY(two.rightTop.y);
-    one->setRightBottomX(two.rightBottom.x);
-    one->setRightBottomY(two.rightBottom.y);
-    one->setX(two.leftTop.x);
-    one->setY(two.leftTop.y);
-    one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x,
-                       two.leftTop.y));
-    one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x,
-                        two.leftBottom.y));
-    one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
-    one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-    one->setDistance(1);
 }
 
 /* Here we are trying to figure out how confident we are about our values with
@@ -1669,29 +1631,6 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
     else if (dc == WIDTH_UNSURE)
         return BOTH_UNSURE;
     return HEIGHT_UNSURE;
-}
-
-/*  As we saw with beacons, we tend to work with blobs for convenience.  So at some point
- * we need to transfer their contents over to the field object that we have identified.
- * @param one    the field object we'd like to update
- * @param two    the blob that contains the information we need
- */
-void ObjectFragments::updateBackstop(VisualFieldObject* one, blob two) {
-    one->setLeftTopX(two.leftTop.x);
-    one->setLeftTopY(two.leftTop.y);
-    one->setLeftBottomX(two.leftBottom.x);
-    one->setLeftBottomY(two.leftBottom.y);
-    one->setRightTopX(two.rightTop.x);
-    one->setRightTopY(two.rightTop.y);
-    one->setRightBottomX(two.rightBottom.x);
-    one->setRightBottomY(two.rightBottom.y);
-    one->setX(two.leftTop.x);
-    one->setY(two.leftTop.y);
-    one->setWidth(dist(two.rightTop.x, two.rightTop.y, two.leftTop.x, two.leftTop.y));
-    one->setHeight(dist(two.leftTop.x, two.leftTop.y, two.leftBottom.x, two.leftBottom.y));
-    one->setCenterX(one->getLeftTopX() + ROUND2(one->getWidth() / 2));
-    one->setCenterY(one->getRightTopY() + ROUND2(one->getHeight() / 2));
-    one->setDistance(1);
 }
 
 /* Post recognition for NAOs
@@ -3966,30 +3905,6 @@ int ObjectFragments::distance(int x1, int x2, int x3, int x4) {
         return x1 - x4;
     return 0;
 }
-
-/* Calculate the euclidian distance between two points.
- * @param x    x value of point 1
- * @param y    y value of point 1
- * @param x1   x value of point 2
- * @param y1   y value of point 2
- * @return      the distance between the objects
- */
-float ObjectFragments::dist(int x, int y, int x1, int y1) {
-    return sqrt((float)abs(x - x1) * abs(x - x1) + abs(y - y1) * abs(y - y1));
-}
-
-/* Finds and returns the midpoint of two numbers.
- * @param a   one number
- * @param b   the other
- * @return    the number halfway between (as int)
- */
-int ObjectFragments::midPoint(int a, int b) {
-    return a + (b - a) / 2;
-}
-
-
-
-
 
 /*
  * The next group of functions are for debugging only.  They are set up so that

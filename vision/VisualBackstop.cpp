@@ -46,3 +46,28 @@ void VisualBackstop::setBearingWithSD(float _bearing)
     setBearing(_bearing);
     setBearingSD(backstopBearingToSD(_bearing));
 }
+
+/*
+ * As we saw with beacons, we tend to work with blobs for convenience.  So at some point
+ * we need to transfer their contents over to the field object that we have identified.
+ * @param b    the blob that contains the information we need
+ */
+void VisualBackstop::updateBackstop(blob * b)
+{
+    setLeftTopX(b->leftTop.x);
+    setLeftTopY(b->leftTop.y);
+    setLeftBottomX(b->leftBottom.x);
+    setLeftBottomY(b->leftBottom.y);
+    setRightTopX(b->rightTop.x);
+    setRightTopY(b->rightTop.y);
+    setRightBottomX(b->rightBottom.x);
+    setRightBottomY(b->rightBottom.y);
+    setX(b->leftTop.x);
+    setY(b->leftTop.y);
+    setWidth(dist(b->rightTop.x, b->rightTop.y, b->leftTop.x, b->leftTop.y));
+    setHeight(dist(b->leftTop.x, b->leftTop.y,
+                   b->leftBottom.x, b->leftBottom.y));
+    setCenterX(getLeftTopX() + ROUND2(getWidth() / 2));
+    setCenterY(getRightTopY() + ROUND2(getHeight() / 2));
+    setDistance(1);
+}
