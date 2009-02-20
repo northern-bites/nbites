@@ -65,8 +65,9 @@ public:
         }
         //starting out we want to set our motion angles to the sensed position
         motionCommandAngles = almotion->getBodyAngles();
-
+#ifndef OFFLINE
         initSyncWithALMemory();
+#endif
     };
     virtual ~ALEnactor() { };
 

@@ -104,7 +104,7 @@ public:
     void dataChanged(const std::string& pDataName, const ALValue& pValue,
         const std::string& pMessage) {};
 
-    std::string version() { return "1.0.0-r"; /*TRUNK_REVISION;*/ };
+    std::string version() { return "1.2.0-r"; /*TRUNK_REVISION;*/ };
 
     //
     // Our methods
