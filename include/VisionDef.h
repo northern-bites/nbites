@@ -15,7 +15,7 @@ Vision Constants that span multiple classes and systems.
 #define QVGA  1  // equivalent to kQVGA
 #define VGA   2  // equivalent to kVGA
 #ifndef NAO_IMAGE_SIZE
-#  define NAO_IMAGE_SIZE VGA
+#  define NAO_IMAGE_SIZE QVGA
 #endif
 
 #define YUV422INTER_CS  9 // equivalent to kYUV422InterlaceColorSpace

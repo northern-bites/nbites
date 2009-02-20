@@ -40,10 +40,16 @@ teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
 ##
 ##--------------------VISION CONNECTION CONSTANTS------#
 ##
+IMAGE_SIZE = "QVGA"
 CAMERA_FPS = 10
 # image constants, used for angle x,y setters
-IMAGE_WIDTH = 640
-IMAGE_HEIGHT = 480
+if IMAGE_SIZE == "VGA":
+    IMAGE_WIDTH = 640
+    IMAGE_HEIGHT = 480
+else:
+    IMAGE_WIDTH = 320
+    IMAGE_HEIGHT = 240
+
 IMAGE_CENTER_X = IMAGE_WIDTH / 2.0
 FOV_X_DEG = 46.4
 FOV_Y_DEG = 34.8
