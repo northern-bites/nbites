@@ -49,12 +49,9 @@ class Vision;   // forward reference
 #include "FieldLines.h"
 #include "VisualCorner.h"
 
-//using namespace std;
-
-
 // helper method for deflate() for shifting bits for bit-wise compression
 inline static void setBit(unsigned char &b, int pos, int value) {
-  b = (int) b | (value << pos);
+    b = (int) b | (value << pos);
 }
 
 
