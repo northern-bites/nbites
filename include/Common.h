@@ -10,9 +10,9 @@
 #include "ifdefs.h"
 
 // ROBOT TYPES
-#define NAO_RL    1
-#define NAO_SIM   2
-#define NAO       3
+#define NAO_RL    3
+#define NAO_SIM   4
+#define NAO       5
 #ifndef ROBOT_TYPE
 #  define ROBOT_TYPE NAO_RL
 #endif
