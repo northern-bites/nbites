@@ -14,8 +14,6 @@ class VisualCrossbar;
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 
-// This class should eventually inheret from VisualLandmark, once it is
-// cleaned a bit
 class VisualCrossbar : public VisualDetection {
 
 public:
@@ -73,9 +71,6 @@ public:
     const int getLeftOpening() const { return leftOpening; }
     const int getRightOpening() const { return rightOpening; }
     const bool shotAvailable() const { return shoot; }
-    const point<float> getFieldLocation() const { return fieldLocation; }
-    const float getFieldX() const { return fieldLocation.x; }
-    const float getFieldY() const { return fieldLocation.y; }
 
 private: // Class Variables
 
@@ -84,13 +79,13 @@ private: // Class Variables
     point <int> leftBottom;
     point <int> rightBottom;
 
+    // Should be moved to different class
     int backLeft;
     int backRight;
     int backDir;
     int leftOpening;
     int rightOpening;
     bool shoot;
-    point <float> fieldLocation;
 
     float crossbarDistanceToSD(float _distance) { return 1.0f; }
     float crossbarBearingToSD(float _bearing) { return 0.01f; }

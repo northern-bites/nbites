@@ -55,12 +55,6 @@ public:
     void setLeftBottomY(int _y){ leftBottom.y = _y; }
     void setRightBottomX(int _x){ rightBottom.x = _x; }
     void setRightBottomY(int _y){ rightBottom.y = _y; }
-    void setShoot(bool s1) {shoot = s1;}
-    void setBackLeft(int x1) {backLeft = x1;}
-    void setBackRight(int y1) {backRight = y1;}
-    void setBackDir(int x1) {backDir = x1;}
-    void setLeftOpening(int op) { leftOpening = op; }
-    void setRightOpening(int op) { rightOpening = op; }
     void setPossibleFieldObjects(const list <const ConcreteFieldObject *> *
                                  _possibleFieldObjects) {
         possibleFieldObjects = _possibleFieldObjects;
@@ -79,12 +73,6 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
-    const int getShootLeft() const { return backLeft; }
-    const int getShootRight() const { return backRight; }
-    const int getBackDir() const { return backDir; }
-    const int getLeftOpening() const { return leftOpening; }
-    const int getRightOpening() const { return rightOpening; }
-    const bool shotAvailable() const { return shoot; }
     const string toString() const { return ConcreteFieldObject::
             getStringFromID(id); }
     const point<float> getFieldLocation() const { return fieldLocation; }
@@ -102,21 +90,6 @@ private: // Class Variables
     point <int> rightTop;
     point <int> leftBottom;
     point <int> rightBottom;
-
-    // float width;
-    // float height;
-    // int centerX;
-    // int centerY;
-    int backLeft;
-    int backRight;
-    int backDir;
-    int leftOpening;
-    int rightOpening;
-    bool shoot;
-    // float angleX;
-    // float angleY;
-    // float focDist;
-    // float elevation;
     point <float> fieldLocation;
     fieldObjectID id;
     // This list will hold all the possibilities for this objects's specific ID

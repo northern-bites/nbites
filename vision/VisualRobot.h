@@ -75,10 +75,6 @@ private: // Class Variables
     int backLeft;
     int backRight;
     int backDir;
-    int leftOpening;
-    int rightOpening;
-    bool shoot;
-    point <float> fieldLocation;
 
     // Member functions
     float robotDistanceToSD(float _distance) {
