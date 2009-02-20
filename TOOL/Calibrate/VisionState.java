@@ -3,10 +3,7 @@ package TOOL.Calibrate;
 import java.util.Vector;
 
 import TOOL.TOOL;
-import TOOL.Vision.Vision;
-import TOOL.Vision.TOOLVisionLink;
-import TOOL.Vision.Ball;
-import TOOL.Vision.VisualFieldObject;
+import TOOL.Vision.*;
 import TOOL.Image.TOOLImage;
 import TOOL.Image.ThresholdedImageOverlay;
 import TOOL.Image.ProcessedImage;
@@ -30,16 +27,34 @@ import TOOL.Data.Frame;
 public class VisionState {
     
     //constants
-    public final static int BALL_BOX_THICKNESS = 2;
+    public final static byte BALL_BOX_THICKNESS = 2;
     public final static byte BALL_BOX_COLOR = Vision.RED;
     
-    public final static int VISUAL_OBJECT_THICKNESS = 2;
+    public final static byte VISUAL_OBJECT_THICKNESS = 2;
     public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.ORANGEYELLOW;
     public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.ORANGERED;
     public final static byte GOAL_POST_BOX_COLOR = Vision.PINK;
 
     public final static byte BLUE_GOAL_BACKSTOP_COLOR = Vision.WHITE;
     public final static byte YELLOW_GOAL_BACKSTOP_COLOR = Vision.WHITE;
+
+    public final static byte VISUAL_LINE_THICKNESS = 2;
+    public final static byte VISUAL_LINE_COLOR = Vision.BLUE;
+
+    public final static byte POINT_CROSS_SIZE = 4;
+    public final static byte POINT_CROSS_THICKNESS = 2;
+    
+    public final static byte POINT_HORIZONTAL_COLOR = Vision.YELLOW;
+    public final static byte POINT_VERTICAL_COLOR = Vision.RED;
+    
+    public final static byte UNUSED_POINT_HORIZONTAL_COLOR = Vision.NAVY;
+    public final static byte UNUSED_POINT_VERTICAL_COLOR = Vision.PINK;
+    
+    public final static byte CORNER_POINT_COLOR = Vision.ORANGE;
+    
+    public final static byte POSE_HORIZON_THICKNESS = 2;
+    public final static byte POSE_HORIZON_COLOR = Vision.BLUE;
+    public final static byte VISION_HORIZON_COLOR = Vision.MAGENTA;
     //images + colortable
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
@@ -49,6 +64,11 @@ public class VisionState {
     //objects - these are just pointers to the objects in the visionLink
     private Ball ball;
     private Vector<VisualFieldObject> visualFieldObjects;
+    private Vector<VisualLine> visualLines;
+    private Vector<LinePoint> unusedPoints;
+    private Vector<VisualCorner> visualCorners;
+    private Horizon poseHorizon;
+    private int visionHorizon;
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
@@ -71,6 +91,11 @@ public class VisionState {
 	    //get the ball from the link
 	    ball = thresholdedImage.getVisionLink().getBall();
 	    visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
+	    visualLines = thresholdedImage.getVisionLink().getVisualLines();
+	    unusedPoints = thresholdedImage.getVisionLink().getUnusedPoints();
+	    visualCorners = thresholdedImage.getVisionLink().getVisualCorners();
+	    poseHorizon = thresholdedImage.getVisionLink().getPoseHorizon();
+	    visionHorizon = thresholdedImage.getVisionLink().getVisionHorizon();
 	    //draw the stuff onto the overlay
 	    drawObjectBoxes();
 	}
@@ -79,12 +104,12 @@ public class VisionState {
     //drawObjectBoxes - draws the object onto the overlay
     public void drawObjectBoxes(){
 	thresholdedOverlay.resetPixels();//reset the overlay
-	//set ball box
+	//set the ball circle
 	if (ball.getRadius() > 0)
 	    thresholdedOverlay.drawCircle(ball.getCenterX(), ball.getCenterY(),
 					  (int) ball.getRadius(),
 					  BALL_BOX_THICKNESS, BALL_BOX_COLOR);
-	//set VisualFieldObjects
+	//set visual field objects
 	VisualFieldObject obj;
 	//loop through the objects
     	for (int i = 0; i < visualFieldObjects.size(); i++) {
@@ -115,6 +140,59 @@ public class VisionState {
 					       obj.getRightBottomY(), obj.getLeftBottomY(),
 					       VISUAL_OBJECT_THICKNESS, color);
 	}
+	//set field lines
+	VisualLine line;
+	for (int i = 0; i < visualLines.size(); i++) {
+	    line = visualLines.elementAt(i);
+	    thresholdedOverlay.drawLine(line.getBeginX(), line.getBeginY(),
+					line.getEndX(), line.getEndY(),
+					VISUAL_LINE_THICKNESS, VISUAL_LINE_COLOR);
+	    
+	    Vector<LinePoint> points;
+	    points = line.getLinePoints();
+	    LinePoint pt;
+	    byte color;
+	    for (int j = 0; j < points.size(); j++) {
+		pt = points.elementAt(j);
+		switch (pt.foundWithScan()) {
+		case LinePoint.HORIZONTAL : color = POINT_HORIZONTAL_COLOR; break;
+		case LinePoint.VERTICAL : color = POINT_VERTICAL_COLOR; break;
+		default : color = Vision.PINK;//this should never be the case
+		} 
+		thresholdedOverlay.drawCross(pt.getX(), pt.getY(), 
+					     POINT_CROSS_SIZE, POINT_CROSS_THICKNESS, 
+					     color);
+	    }
+	}
+	//set unused points
+	LinePoint unusedPoint;
+	byte color;
+	for (int i = 0; i < unusedPoints.size(); i++){
+	    unusedPoint = unusedPoints.elementAt(i);
+	    switch(unusedPoint.foundWithScan()) {
+	    case LinePoint.HORIZONTAL : color = UNUSED_POINT_HORIZONTAL_COLOR; break;
+	    case LinePoint.VERTICAL : color = UNUSED_POINT_VERTICAL_COLOR; break;
+	    default : color = Vision.BLACK; //this should never happen
+	    }
+	    thresholdedOverlay.drawCross(unusedPoint.getX(), unusedPoint.getY(),
+					 POINT_CROSS_SIZE, POINT_CROSS_THICKNESS, 
+					 color);
+	}
+	//set corners
+	VisualCorner corner;
+	for (int i = 0; i < visualCorners.size(); i++) {
+	    corner = visualCorners.elementAt(i);
+	    thresholdedOverlay.drawCross(corner.getX(), corner.getY(),
+					 POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
+					 CORNER_POINT_COLOR);
+	}
+	//set pose&vision horizon
+	thresholdedOverlay.drawLine(poseHorizon.getLeftX(), poseHorizon.getLeftY(),
+				 poseHorizon.getRightX(), poseHorizon.getRightY(),
+				 POSE_HORIZON_THICKNESS, POSE_HORIZON_COLOR);
+	thresholdedOverlay.drawCross(thresholdedOverlay.getWidth()/2, visionHorizon,
+				     POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
+				     VISION_HORIZON_COLOR);
     }
     
     //load frame - loads data from a frame - we're interested in the raw image

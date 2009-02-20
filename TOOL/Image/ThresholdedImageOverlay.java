@@ -52,7 +52,7 @@ public class ThresholdedImageOverlay extends BufferedImage{
     }
     //draws a rectangle starting from x,y and of width w and height h
     public void drawRectangle(int x, int y, int w, int h, 
-			      int thickness, byte color){
+			      byte thickness, byte color){
 	Graphics2D g = createGraphics();
 	
 	g.setColor(new Color(COLORS[color].getRGB()));
@@ -62,7 +62,7 @@ public class ThresholdedImageOverlay extends BufferedImage{
     //draws a polygon between 4 points
     public void drawPolygon(int x1, int x2, int x3, int x4,
 			    int y1, int y2, int y3, int y4,
-			    int thickness, byte color){
+			    byte thickness, byte color){
 	Graphics2D g = createGraphics();
 	
 	g.setColor(new Color(COLORS[color].getRGB()));
@@ -74,7 +74,7 @@ public class ThresholdedImageOverlay extends BufferedImage{
     }
     //draws an oval like a rectangle starting from x,y (like MsPaint)
     public void drawOval(int x, int y, int w, int h,
-			   int thickness, int color) {
+			   byte thickness, byte color) {
 	Graphics2D g = createGraphics();
 	
 	g.setColor(new Color(COLORS[color].getRGB()));
@@ -83,11 +83,31 @@ public class ThresholdedImageOverlay extends BufferedImage{
     }
     //draws a circle centered in cx, cy of radius r
     public void drawCircle(int cx, int cy, int radius, 
-			   int thickness, int color) {
+			   byte thickness, byte color) {
 	Graphics2D g = createGraphics();
 
 	g.setColor(new Color(COLORS[color].getRGB()));
 	for (int k = 1; k <= thickness; k++)
 	    g.drawOval(cx-radius-k, cy-radius-k, (radius+1)*2, (radius+1)*2);
     }    
+    //draws a line
+    public void drawLine(int bx, int by, int ex, int ey,
+			 byte thickness, byte color) {
+	Graphics2D g = createGraphics();
+
+	g.setColor( new Color(COLORS[color].getRGB()));
+	for (int k = 0; k < thickness; k++)
+	    g.drawLine(bx-k, by-k, ex-k, ey-k);
+    }
+    //draws a cross
+    public void drawCross(int x, int y, byte size, 
+			  byte thickness, byte color){
+	Graphics2D g = createGraphics();
+
+	g.setColor(new Color(COLORS[color].getRGB()));
+	for (int k = 0; k < thickness; k++){
+	g.drawLine(x-size, y+k, x+size, y+k);
+	g.drawLine(x+k, y-size, x+k, y+size);
+	}
+    }
 }

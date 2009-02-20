@@ -43,6 +43,10 @@ package TOOL.Vision;
 //the object classes
 import TOOL.Vision.Ball;
 import TOOL.Vision.VisualFieldObject;
+import TOOL.Vision.VisualLine;
+import TOOL.Vision.LinePoint;
+import TOOL.Vision.VisualCorner;
+import TOOL.Vision.Horizon;					       
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -61,6 +65,15 @@ public class TOOLVisionLink {
     private Ball ball;
     private VisualFieldObject bgrp, bglp, ygrp, yglp, bgBackstop, ygBackstop;
     private Vector<VisualFieldObject> visualFieldObjects;
+    private Vector<VisualLine> visualLines;
+    private Vector<LinePoint> unusedPoints;
+    private Vector<VisualCorner> visualCorners;
+    private Horizon poseHorizon;
+    private int visionHorizon;
+    //point helper arrays - helps with loading the point
+    private int[] pointX, pointY, pointFWS;
+    private double[] pointLineWidth;
+    private int len, curEl;
 
     static private boolean visionLinkSuccessful;
 
@@ -75,6 +88,9 @@ public class TOOLVisionLink {
 	//should add the backstops too if ever going to be used
 	*/
 	visualFieldObjects = new Vector<VisualFieldObject>();
+	visualLines = new Vector<VisualLine>();
+	unusedPoints = new Vector<LinePoint>();
+	visualCorners = new Vector<VisualCorner>();
     }
 
     /**
@@ -103,11 +119,13 @@ public class TOOLVisionLink {
 		//reset the field object vector so that it's ready for the
 		//new stuff coming in
 		visualFieldObjects.clear();
+		visualLines.clear();
+		//call the jni function
 		cppProcessImage(img_data,joint_data,ct_data,
                                 threshResult);
             }catch(Throwable e){
-                System.err.println("Error in cpp sub system. \n"+
-                                   "   Processing failed.");
+                System.err.println("Error in c++ side of the vision link. \n");
+		e.printStackTrace();
             }
         }
         else
@@ -121,7 +139,11 @@ public class TOOLVisionLink {
     //getters for the objects
     public Ball getBall() { return ball; }
     public Vector<VisualFieldObject> getVisualFieldObjects() { return visualFieldObjects;}
-
+    public Vector<VisualLine> getVisualLines() { return visualLines;}
+    public Vector<LinePoint> getUnusedPoints() { return unusedPoints;}
+    public Vector<VisualCorner> getVisualCorners() { return visualCorners;}
+    public Horizon getPoseHorizon(){ return poseHorizon;}
+    public int getVisionHorizon(){ return visionHorizon;}
     //Native methods:
     native private void cppProcessImage(byte[] img_data, float[] joint_data,
                                         byte[] table_data,
@@ -174,5 +196,60 @@ public class TOOLVisionLink {
 	fieldObject.setLeftBottomX(lbx); fieldObject.setLeftBottomY(lby);
 	fieldObject.setRightBottomX(rbx); fieldObject.setRightBottomY(rby);
 	visualFieldObjects.add(fieldObject);//add the object to the vector
+    }
+    //prepare the visual line data for the tranfer of the points;
+    public void prepPointBuffers(int len){
+	this.len = len;
+	curEl = 0;
+	pointX = new int[len];
+	pointY = new int[len];
+	pointLineWidth = new double[len];
+	pointFWS = new int[len];
+    }
+    //the point loading function should be replaced with a direct transfer;
+    //too slow
+    //set the data in visual lines
+    public void setVisualLineInfo(int bx, int by, int ex, int ey){
+	Vector<LinePoint> linePoints = new Vector<LinePoint>(len);
+	for(int i = 0; i < len; i++)
+	    linePoints.add(new LinePoint(pointX[i], pointY[i], 
+					 pointLineWidth[i], pointFWS[i]));
+	//flush the buffers
+	pointX = null;
+	pointY = null;
+	pointLineWidth = null;
+	pointFWS = null;
+	visualLines.add(new VisualLine(bx, by, ex, ey, linePoints));
+    }
+    //set the points
+    public void setPointInfo(int x, int y, double lw, int fws){
+	pointX[curEl] = x;
+	pointY[curEl] = y;
+	pointLineWidth[curEl] = lw;
+	pointFWS[curEl] = fws;
+	curEl++;
+    }
+    //set the unused points
+    public void setUnusedPointsInfo(){
+	unusedPoints = new Vector<LinePoint>();
+	for(int i = 0; i < len; i++)
+	    unusedPoints.add(new LinePoint(pointX[i], pointY[i], 
+					 pointLineWidth[i], pointFWS[i]));
+   	//flush the buffers
+	pointX = null;
+	pointY = null;
+	pointLineWidth = null;
+	pointFWS = null;
+    }
+    //set the corners
+    public void setVisualCornersInfo(int x, int y){
+	visualCorners = new Vector<VisualCorner>();
+	visualCorners.add(new VisualCorner(x,y));
+    }
+    //set the pose + vision horizon 
+    public void setHorizonInfo(int lx, int ly, int rx, int ry, int visHor){
+	poseHorizon = new Horizon(lx, ly, rx, ry);
+	visionHorizon = visHor;
+	System.out.println(visHor);
     }
 }

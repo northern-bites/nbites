@@ -19,6 +19,7 @@
 #include "NaoPose.h"
 #include "Sensors.h"
 #include "VisualFieldObject.h"
+#include "VisualLine.h"
 using namespace std;
 
 static long long
@@ -119,6 +120,20 @@ extern "C" {
       vision.notifyImage(img);
       //vision.drawBoxes();
       env->ReleaseByteArrayElements( jimg, buf_img, 0);
+
+      //copy results from vision thresholded to the array passed in from java
+      //we access to each row in the java array, and copy in from cpp thresholded
+      //we may in the future want to experiment with malloc, for increased speed
+      for(int i = 0; i < IMAGE_HEIGHT; i++){
+	jbyteArray row_target=
+	  (jbyteArray) env->GetObjectArrayElement(thresh_target,i);
+	jbyte* row = env->GetByteArrayElements(row_target,0);
+	
+	for(int j = 0; j < IMAGE_WIDTH; j++){
+	  row[j]= vision.thresh->thresholded[i][j];
+	}
+	env->ReleaseByteArrayElements(row_target, row, 0);
+      }
       
       //get the id for the java class, so we can get method IDs
       jclass javaClass = env->GetObjectClass(jobj);
@@ -133,8 +148,8 @@ extern "C" {
       
       //get the method ID for the field object setter
       jmethodID setFieldObjectInfo = env->GetMethodID(javaClass, "setFieldObjectInfo", 
-     					      "(IDDIIIIIIII)V");
-
+						      "(IDDIIIIIIII)V");
+      
       //call the field object info passing function for each object we're interested in
       VisualFieldObject *obj;
       int k = 0;
@@ -160,22 +175,63 @@ extern "C" {
 			      obj->getRightBottomX(), obj->getRightBottomY());
 	}
       }
-      //copy results from vision thresholded to the array passed in from java
-      //we access to each row in the java array, and copy in from cpp thresholded
-      //we may in the future want to experiment with malloc, for increased speed
-      for(int i = 0; i < IMAGE_HEIGHT; i++){
-	jbyteArray row_target=
-	  (jbyteArray) env->GetObjectArrayElement(thresh_target,i);
-	jbyte* row = env->GetByteArrayElements(row_target,0);
-	
-	for(int j = 0; j < IMAGE_WIDTH; j++){
-	  row[j]= vision.thresh->thresholded[i][j];
+      //get the methodIDs for the visual line setter methods from java
+      jmethodID setVisualLineInfo = env->GetMethodID(javaClass, "setVisualLineInfo",
+						     "(IIII)V");
+      jmethodID prepPointBuffers = env->GetMethodID(javaClass, "prepPointBuffers", 
+							 "(I)V");
+      jmethodID setPointInfo = env->GetMethodID(javaClass, "setPointInfo", 
+						"(IIDI)V");
+      jmethodID setUnusedPointsInfo = env->GetMethodID(javaClass, "setUnusedPointsInfo",
+						   "()V");
+      jmethodID setVisualCornersInfo = env->GetMethodID(javaClass, "setVisualCornersInfo",
+						       "(II)V");
+      //push data from the lines object
+      const vector<VisualLine> *lines = vision.fieldLines->getLines();
+      for (vector<VisualLine>::const_iterator i = lines->begin();
+	   i!= lines->end(); i++) {
+	env->CallVoidMethod(jobj, prepPointBuffers,
+			    i->points.size());
+	for(vector<linePoint>::const_iterator j = i->points.begin();
+	    j != i->points.end(); j++) {
+	  env->CallVoidMethod(jobj, setPointInfo,
+			      j->x, j->y,
+			      j->lineWidth, j->foundWithScan);
 	}
-	env->ReleaseByteArrayElements(row_target, row, 0);
+	env->CallVoidMethod(jobj, setVisualLineInfo,
+			    i->start.x, i->start.y,
+			    i->end.x, i->end.y);
       }
+      //push data from unusedPoints
+      const list <linePoint> *unusedPoints = vision.fieldLines->getUnusedPoints();
+      env->CallVoidMethod(jobj, prepPointBuffers, unusedPoints->size());
+      for (list <linePoint>::const_iterator i = unusedPoints->begin(); 
+	   i != unusedPoints->end(); i++)
+	env->CallVoidMethod(jobj, setPointInfo,
+			    i->x, i->y,
+			    i->lineWidth, i->foundWithScan);
+      env->CallVoidMethod(jobj, setUnusedPointsInfo);
+      cout<<"sa-mi trag palme?";
+      //push data from visualCorners
+      const list <VisualCorner>* corners = vision.fieldLines->getCorners();
+      for (list <VisualCorner>::const_iterator i = corners->begin();
+	   i != corners->end(); i++)
+	env->CallVoidMethod(jobj, setVisualCornersInfo,
+			    i->getX(), i->getY());
+      cout<<"pula ba";
+      //horizon line
+      jmethodID setHorizonInfo = env->GetMethodID(javaClass, "setHorizonInfo", 
+						  "(IIIII)V");
+      cout<<vision.thresh->getVisionHorizon();
+      env->CallVoidMethod(jobj, setHorizonInfo, 
+			  vision.pose->getLeftHorizon().x,
+			  vision.pose->getLeftHorizon().y,
+			  vision.pose->getRightHorizon().x,
+			  vision.pose->getRightHorizon().y,
+			  vision.thresh->getVisionHorizon());
       return;
-    }	    
-  
+    }
+
   
 #ifdef __cplusplus
 }
