@@ -32,7 +32,6 @@
 #include "VisionDef.h"
 #include "CortexDef.h"
 #include "Profiler.h"
-
 #if defined(OFFLINE) || !ROBOT(NAO_RL)
 #  include "MotionDef.h"
 #endif
@@ -40,7 +39,7 @@
 class Vision;   // forward reference
 
 // including Class header files
-#include "VisualBackstop.h"
+#include "VisualCrossbar.h"
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
 #include "VisualBall.h"
@@ -82,7 +81,7 @@ public:
     // visualization methods
     virtual void drawBoxes(void);
     virtual void drawFieldObject(VisualFieldObject* obj, int color);
-    virtual void drawBackstop(VisualBackstop* obj, int color);
+    virtual void drawCrossbar(VisualCrossbar* obj, int color);
     virtual void drawBox(int left, int right, int bottom, int top, int c);
     virtual void drawCenters(void);
     virtual void drawRect(int left, int top, int width, int height, int c);
@@ -141,7 +140,7 @@ public:
     // Field Object pointers
     VisualFieldObject *bgrp, *bglp;
     VisualFieldObject *ygrp, *yglp;
-    VisualBackstop *ygBackstop, *bgBackstop;
+    VisualCrossbar *ygCrossbar, *bgCrossbar;
     VisualRobot *red1, *red2;
     VisualRobot *navy1, *navy2;
     VisualBall *ball;

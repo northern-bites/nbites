@@ -1,10 +1,10 @@
-#ifndef VisualBackstop_hpp_defined
-#define VisualBackstop_hpp_defined
+#ifndef VisualCrossbar_hpp_defined
+#define VisualCrossbar_hpp_defined
 
 #include <iomanip>
 #include <cstdlib>
 
-class VisualBackstop;
+class VisualCrossbar;
 
 #include "VisualLandmark.h"
 #include "VisualDetection.h"
@@ -16,19 +16,19 @@ class VisualBackstop;
 
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
-class VisualBackstop : public VisualDetection {
+class VisualCrossbar : public VisualDetection {
 
 public:
     // Construcotrs
-    VisualBackstop();
+    VisualCrossbar();
     // copy constructor
-    VisualBackstop(const VisualBackstop&);
+    VisualCrossbar(const VisualCrossbar&);
 
     // Destructor
-    virtual ~VisualBackstop() {}
+    virtual ~VisualCrossbar() {}
 
     friend std::ostream& operator<< (std::ostream &o,
-                                     const VisualBackstop &l)
+                                     const VisualCrossbar &l)
         {
             return o << "\tWidth: " << l.getWidth()
                      << "\tHeight: " << l.getHeight()
@@ -39,7 +39,7 @@ public:
 
     // INITIALIZATION (happens every frame)
     void init();
-    void updateBackstop(blob *b);
+    void updateCrossbar(blob *b);
     // SETTERS
     void setLeftTopX(int _x){  leftTop.x = _x; }
     void setLeftTopY(int _y){  leftTop.y = _y; }
@@ -92,8 +92,8 @@ private: // Class Variables
     bool shoot;
     point <float> fieldLocation;
 
-    float backstopDistanceToSD(float _distance) { return 1.0f; }
-    float backstopBearingToSD(float _bearing) { return 0.01f; }
+    float crossbarDistanceToSD(float _distance) { return 1.0f; }
+    float crossbarBearingToSD(float _bearing) { return 0.01f; }
 };
 
-#endif // VisualBackstop_hpp_defined
+#endif // VisualCrossbar_hpp_defined

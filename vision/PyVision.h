@@ -1092,9 +1092,9 @@ PyMODINIT_FUNC MODULE_INIT(vision) (void);
 //
 
 
-typedef struct PyBackstop_t {
+typedef struct PyCrossbar_t {
     PyObject_HEAD // Our stuff is below
-    VisualBackstop *backstop;
+    VisualCrossbar *crossbar;
     PyObject *x;
     PyObject *y;
     PyObject *centerX;
@@ -1111,20 +1111,20 @@ typedef struct PyBackstop_t {
     PyObject *rightOpening;
     PyObject *shoot;
 
-} PyBackstop;
+} PyCrossbar;
 
 // C++ - accessible interface
-extern PyObject *PyBackstop_new    (VisualBackstop *b);
-extern void      PyBackstop_update (PyBackstop *b);
+extern PyObject *PyCrossbar_new    (VisualCrossbar *b);
+extern void      PyCrossbar_update (PyCrossbar *b);
 // backend methods
-extern PyObject *PyBackstop_new    (PyTypeObject *type, PyObject *args,
+extern PyObject *PyCrossbar_new    (PyTypeObject *type, PyObject *args,
                                     PyObject *kwds);
-extern void      PyBackstop_dealloc(PyBackstop *b);
+extern void      PyCrossbar_dealloc(PyCrossbar *b);
 
 // Method list
-static PyMethodDef PyBackstop_methods[] = {
+static PyMethodDef PyCrossbar_methods[] = {
 
-    {"update", (PyCFunction)PyBackstop_update, METH_NOARGS,
+    {"update", (PyCFunction)PyCrossbar_update, METH_NOARGS,
      "Update all the built Python objects to reflect the current state of the "
      "backend C++ objects.  Recurses down the variable references to update "
      "any attributes that are also wrapped C++ vision objects."},
@@ -1134,50 +1134,50 @@ static PyMethodDef PyBackstop_methods[] = {
 };
 
 // Member list
-static PyMemberDef PyBackstop_members[] = {
-    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, x), READONLY,
-     "Backstop screen X coordinate"},
-    {"centerY", T_OBJECT_EX, offsetof(PyBackstop, y), READONLY,
-     "Backstop screen Y coordinate"},
-    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, centerX), READONLY,
-     "Backstop center X coordinate"},
-    {"centerY", T_OBJECT_EX, offsetof(PyBackstop, centerY), READONLY,
-     "Backstop center Y coordinate"},
-    {"width", T_OBJECT_EX, offsetof(PyBackstop, angleX), READONLY,
-     "Backstop angleX"},
-    {"height", T_OBJECT_EX, offsetof(PyBackstop, angleY), READONLY,
-     "Backstop angleY"},
-    {"width", T_OBJECT_EX, offsetof(PyBackstop, width), READONLY,
-     "Backstop width"},
-    {"height", T_OBJECT_EX, offsetof(PyBackstop, height), READONLY,
-     "Backstop height"},
-    {"focDist", T_OBJECT_EX, offsetof(PyBackstop, focDist), READONLY,
-     "Backstop focal distance"},
-    {"dist", T_OBJECT_EX, offsetof(PyBackstop, distance), READONLY,
-     "Backstop linear distance"},
-    {"bearing", T_OBJECT_EX, offsetof(PyBackstop, bearing), READONLY,
-     "Backstop bearing to body"},
-    {"elevation", T_OBJECT_EX, offsetof(PyBackstop, elevation), READONLY,
-     "Backstop elevation"},
-    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, leftOpening), READONLY,
-     "Backstop left opening"},
-    {"centerY", T_OBJECT_EX, offsetof(PyBackstop, rightOpening), READONLY,
-     "Backstop right opening"},
-    {"centerX", T_OBJECT_EX, offsetof(PyBackstop, shoot), READONLY,
-     "Backstop shot available"},
+static PyMemberDef PyCrossbar_members[] = {
+    {"centerX", T_OBJECT_EX, offsetof(PyCrossbar, x), READONLY,
+     "Crossbar screen X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyCrossbar, y), READONLY,
+     "Crossbar screen Y coordinate"},
+    {"centerX", T_OBJECT_EX, offsetof(PyCrossbar, centerX), READONLY,
+     "Crossbar center X coordinate"},
+    {"centerY", T_OBJECT_EX, offsetof(PyCrossbar, centerY), READONLY,
+     "Crossbar center Y coordinate"},
+    {"width", T_OBJECT_EX, offsetof(PyCrossbar, angleX), READONLY,
+     "Crossbar angleX"},
+    {"height", T_OBJECT_EX, offsetof(PyCrossbar, angleY), READONLY,
+     "Crossbar angleY"},
+    {"width", T_OBJECT_EX, offsetof(PyCrossbar, width), READONLY,
+     "Crossbar width"},
+    {"height", T_OBJECT_EX, offsetof(PyCrossbar, height), READONLY,
+     "Crossbar height"},
+    {"focDist", T_OBJECT_EX, offsetof(PyCrossbar, focDist), READONLY,
+     "Crossbar focal distance"},
+    {"dist", T_OBJECT_EX, offsetof(PyCrossbar, distance), READONLY,
+     "Crossbar linear distance"},
+    {"bearing", T_OBJECT_EX, offsetof(PyCrossbar, bearing), READONLY,
+     "Crossbar bearing to body"},
+    {"elevation", T_OBJECT_EX, offsetof(PyCrossbar, elevation), READONLY,
+     "Crossbar elevation"},
+    {"centerX", T_OBJECT_EX, offsetof(PyCrossbar, leftOpening), READONLY,
+     "Crossbar left opening"},
+    {"centerY", T_OBJECT_EX, offsetof(PyCrossbar, rightOpening), READONLY,
+     "Crossbar right opening"},
+    {"centerX", T_OBJECT_EX, offsetof(PyCrossbar, shoot), READONLY,
+     "Crossbar shot available"},
 
     /* Sentinal */
     { NULL }
 };
 
-// PyBackstop type definition
-static PyTypeObject PyBackstopType = {
+// PyCrossbar type definition
+static PyTypeObject PyCrossbarType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "vision.Backstop",             /*tp_name*/
-    sizeof(PyBackstop),            /*tp_basicsize*/
+    "vision.Crossbar",             /*tp_name*/
+    sizeof(PyCrossbar),            /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    (destructor)PyBackstop_dealloc,/*tp_dealloc*/
+    (destructor)PyCrossbar_dealloc,/*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -1193,15 +1193,15 @@ static PyTypeObject PyBackstopType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Backstop object",             /* tp_doc */
+    "Crossbar object",             /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
     0,                         /* tp_richcompare */
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
-    PyBackstop_methods,            /* tp_methods */
-    PyBackstop_members,            /* tp_members */
+    PyCrossbar_methods,            /* tp_methods */
+    PyCrossbar_members,            /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
@@ -1210,7 +1210,7 @@ static PyTypeObject PyBackstopType = {
     0,                         /* tp_dictoffset */
     0,                         /* tp_init */
     0,                         /* tp_alloc */
-    PyBackstop_new,                /* tp_new */
+    PyCrossbar_new,                /* tp_new */
 };
 
 //

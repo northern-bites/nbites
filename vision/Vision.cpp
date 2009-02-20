@@ -52,8 +52,8 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
   yglp = new VisualFieldObject(YELLOW_GOAL_LEFT_POST);
   bgrp = new VisualFieldObject(BLUE_GOAL_RIGHT_POST);
   bglp = new VisualFieldObject(BLUE_GOAL_LEFT_POST);
-  ygBackstop = new VisualBackstop();
-  bgBackstop = new VisualBackstop();
+  ygCrossbar = new VisualCrossbar();
+  bgCrossbar = new VisualCrossbar();
   ball = new VisualBall();
   red1 = new VisualRobot();
   red2 = new VisualRobot();
@@ -167,8 +167,8 @@ void Vision::drawBoxes(void)
   if(bgrp->getDistance() > 0) drawFieldObject(bgrp,BLACK);
   if(yglp->getDistance() > 0) drawFieldObject(yglp,RED);
   if(ygrp->getDistance() > 0) drawFieldObject(ygrp,BLACK);
-  if(ygBackstop->getHeight() > 0) drawBackstop(ygBackstop, BLUE);
-  if(bgBackstop->getHeight() > 0) drawBackstop(bgBackstop, YELLOW);
+  if(ygCrossbar->getHeight() > 0) drawCrossbar(ygCrossbar, BLUE);
+  if(bgCrossbar->getHeight() > 0) drawCrossbar(bgCrossbar, YELLOW);
 
   // balls
   // orange
@@ -204,7 +204,7 @@ void Vision::drawFieldObject(VisualFieldObject* obj, int color) {
 }
 
 // self-explanatory
-void Vision::drawBackstop(VisualBackstop* obj, int color) {
+void Vision::drawCrossbar(VisualCrossbar* obj, int color) {
   drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
 	   obj->getRightTopX(), obj->getRightTopY(), color);
   drawLine(obj->getLeftTopX(), obj->getLeftTopY(),

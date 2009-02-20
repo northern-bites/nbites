@@ -1,13 +1,13 @@
-#include "VisualBackstop.h"
-VisualBackstop::VisualBackstop()
+#include "VisualCrossbar.h"
+VisualCrossbar::VisualCrossbar()
 {
     init();
 }
 
-VisualBackstop::VisualBackstop(const VisualBackstop&) {}
+VisualCrossbar::VisualCrossbar(const VisualCrossbar&) {}
 
 // Initialization, happens every frame.
-void VisualBackstop::init()
+void VisualCrossbar::init()
 {
     width = 0;
     height = 0;
@@ -29,10 +29,10 @@ void VisualBackstop::init()
  *
  * @param _distance the distance estimate to be set
  */
-void VisualBackstop::setDistanceWithSD(float _distance)
+void VisualCrossbar::setDistanceWithSD(float _distance)
 {
     setDistance(_distance);
-    setDistanceSD(backstopDistanceToSD(_distance));
+    setDistanceSD(crossbarDistanceToSD(_distance));
 }
 
 /**
@@ -41,18 +41,20 @@ void VisualBackstop::setDistanceWithSD(float _distance)
  *
  * @param _bearing the distance estimate to be set
  */
-void VisualBackstop::setBearingWithSD(float _bearing)
+void VisualCrossbar::setBearingWithSD(float _bearing)
 {
     setBearing(_bearing);
-    setBearingSD(backstopBearingToSD(_bearing));
+    setBearingSD(crossbarBearingToSD(_bearing));
 }
 
 /*
- * As we saw with beacons, we tend to work with blobs for convenience.  So at some point
- * we need to transfer their contents over to the field object that we have identified.
+ * As we saw with beacons, we tend to work with blobs for convenience.  So at
+ * some point we need to transfer their contents over to the field object that
+ * we have identified.
+ *
  * @param b    the blob that contains the information we need
  */
-void VisualBackstop::updateBackstop(blob * b)
+void VisualCrossbar::updateCrossbar(blob * b)
 {
     setLeftTopX(b->leftTop.x);
     setLeftTopY(b->leftTop.y);

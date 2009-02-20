@@ -224,17 +224,17 @@ public:
     int characterizeSize(blob b);
 
     // shooting
-    void setShot(VisualBackstop * one);
+    void setShot(VisualCrossbar * one);
     void bestShot(VisualFieldObject * left, VisualFieldObject * right,
-                  VisualBackstop * mid);
+                  VisualCrossbar * mid);
     void openDirection(int h, NaoPose *p);
     int classifyFirstPost(int horizon, int c, int c2, bool postFound,
                           VisualFieldObject* left, VisualFieldObject* right,
-                          VisualBackstop* mid);
+                          VisualCrossbar* mid);
 
     // the big kahuna
     void goalScan(VisualFieldObject *left, VisualFieldObject *right,
-                  VisualBackstop *mid, int c, int c2, bool post,
+                  VisualCrossbar *mid, int c, int c2, bool post,
                   int horizon);
     int grabPost(int c, int c2, int horizon, int left, int right);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);

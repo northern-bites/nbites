@@ -1002,8 +1002,8 @@ PyVision_new (Vision *v)
         self->ygrp = PyFieldObject_new(v->ygrp);
         self->yglp = PyFieldObject_new(v->yglp);
 
-        self->bgCrossbar = PyBackstop_new(v->bgBackstop);
-        self->ygCrossbar = PyBackstop_new(v->ygBackstop);
+        self->bgCrossbar = PyCrossbar_new(v->bgCrossbar);
+        self->ygCrossbar = PyCrossbar_new(v->ygCrossbar);
 
 
         self->red1 = PyVisualRobot_new(v->red1);
@@ -1050,8 +1050,8 @@ PyVision_update (PyVision *self)
     PyFieldObject_update((PyFieldObject *)self->ygrp);
     PyFieldObject_update((PyFieldObject *)self->yglp);
 
-    PyBackstop_update((PyBackstop *)self->bgCrossbar);
-    PyBackstop_update((PyBackstop *)self->ygCrossbar);
+    PyCrossbar_update((PyCrossbar *)self->bgCrossbar);
+    PyCrossbar_update((PyCrossbar *)self->ygCrossbar);
 
     PyVisualRobot_update((PyVisualRobot *)self->red1);
     PyVisualRobot_update((PyVisualRobot *)self->red2);
@@ -1281,7 +1281,7 @@ MODULE_INIT(vision) (void)
         PyType_Ready(&PyConcreteCornerType) < 0 ||
         PyType_Ready(&PyVisualLineType) < 0 ||
         PyType_Ready(&PyPoseType) < 0 ||
-        PyType_Ready(&PyBackstopType) < 0 ||
+        PyType_Ready(&PyCrossbarType) < 0 ||
         PyType_Ready(&PyVisualRobotType) < 0)
         return;
 
@@ -1298,7 +1298,7 @@ MODULE_INIT(vision) (void)
     PyModule_AddObject(module, "VisualRobot", (PyObject *)&PyVisualRobotType);
 
     Py_INCREF(&PyVisualRobotType);
-    PyModule_AddObject(module, "VisualBackstop", (PyObject *)&PyBackstopType);
+    PyModule_AddObject(module, "VisualCrossbar", (PyObject *)&PyCrossbarType);
 
     Py_INCREF(&PyPoseType);
     PyModule_AddObject(module, "Pose", (PyObject *)&PyPoseType);
@@ -1363,18 +1363,18 @@ MODULE_INIT(vision) (void)
 
 
 //
-// PyBackstop definitions
+// PyCrossbar definitions
 //
 
 
 // C++ - accessible interface
-extern PyObject * PyBackstop_new (VisualBackstop *b)
+extern PyObject * PyCrossbar_new (VisualCrossbar *b)
 {
-    PyBackstop *self;
+    PyCrossbar *self;
 
-    self = (PyBackstop *)PyBackstopType.tp_alloc(&PyBackstopType, 0);
+    self = (PyCrossbar *)PyCrossbarType.tp_alloc(&PyCrossbarType, 0);
     if (self != NULL) {
-        self->backstop = b;
+        self->crossbar = b;
 
         self->x = PyInt_FromLong(b->getX());
         self->y = PyInt_FromLong(b->getY());
@@ -1397,7 +1397,7 @@ extern PyObject * PyBackstop_new (VisualBackstop *b)
             self->focDist == NULL || self->distance == NULL ||
             self->bearing == NULL || self->elevation == NULL) {
 
-            PyBackstop_dealloc(self);
+            PyCrossbar_dealloc(self);
             self = NULL;
         }
     }
@@ -1405,66 +1405,66 @@ extern PyObject * PyBackstop_new (VisualBackstop *b)
     return (PyObject *)self;
 }
 
-extern void PyBackstop_update (PyBackstop *self)
+extern void PyCrossbar_update (PyCrossbar *self)
 {
     Py_XDECREF(self->x);
-    self->x = PyInt_FromLong(self->backstop->getX());
+    self->x = PyInt_FromLong(self->crossbar->getX());
 
     Py_XDECREF(self->y);
-    self->y = PyInt_FromLong(self->backstop->getY());
+    self->y = PyInt_FromLong(self->crossbar->getY());
 
     Py_XDECREF(self->centerX);
-    self->centerX = PyInt_FromLong(self->backstop->getCenterX());
+    self->centerX = PyInt_FromLong(self->crossbar->getCenterX());
 
     Py_XDECREF(self->centerY);
-    self->centerY = PyInt_FromLong(self->backstop->getCenterY());
+    self->centerY = PyInt_FromLong(self->crossbar->getCenterY());
 
     Py_XDECREF(self->angleX);
-    self->angleX = PyFloat_FromDouble(self->backstop->getAngleX());
+    self->angleX = PyFloat_FromDouble(self->crossbar->getAngleX());
 
     Py_XDECREF(self->angleX);
-    self->angleY = PyFloat_FromDouble(self->backstop->getAngleY());
+    self->angleY = PyFloat_FromDouble(self->crossbar->getAngleY());
 
     Py_XDECREF(self->width);
-    self->width = PyFloat_FromDouble(self->backstop->getWidth());
+    self->width = PyFloat_FromDouble(self->crossbar->getWidth());
 
     Py_XDECREF(self->height);
-    self->height = PyFloat_FromDouble(self->backstop->getHeight());
+    self->height = PyFloat_FromDouble(self->crossbar->getHeight());
 
     Py_XDECREF(self->focDist);
-    self->focDist = PyFloat_FromDouble(self->backstop->getFocDist());
+    self->focDist = PyFloat_FromDouble(self->crossbar->getFocDist());
 
     Py_XDECREF(self->distance);
-    self->distance = PyFloat_FromDouble(self->backstop->getDistance());
+    self->distance = PyFloat_FromDouble(self->crossbar->getDistance());
 
     Py_XDECREF(self->bearing);
-    self->bearing = PyFloat_FromDouble(self->backstop->getBearing());
+    self->bearing = PyFloat_FromDouble(self->crossbar->getBearing());
 
     Py_XDECREF(self->elevation);
-    self->elevation = PyFloat_FromDouble(self->backstop->getElevation());
+    self->elevation = PyFloat_FromDouble(self->crossbar->getElevation());
 
     Py_XDECREF(self->leftOpening);
-    self->leftOpening = PyInt_FromLong(self->backstop->getLeftOpening());
+    self->leftOpening = PyInt_FromLong(self->crossbar->getLeftOpening());
 
     Py_XDECREF(self->rightOpening);
-    self->rightOpening = PyInt_FromLong(self->backstop->getRightOpening());
+    self->rightOpening = PyInt_FromLong(self->crossbar->getRightOpening());
 
     Py_XDECREF(self->shoot);
-    self->shoot = PyInt_FromLong(self->backstop->shotAvailable());
+    self->shoot = PyInt_FromLong(self->crossbar->shotAvailable());
 
 }
 
 // backend methods
 extern PyObject *
-PyBackstop_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+PyCrossbar_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python "
-                    "Backstop from Python.  Need a C++ VisualBackstop.");
+                    "Crossbar from Python.  Need a C++ VisualCrossbar.");
     return NULL;
 }
 
 extern void
-PyBackstop_dealloc (PyBackstop *self)
+PyCrossbar_dealloc (PyCrossbar *self)
 {
     if (self == NULL)
         return;
@@ -1474,9 +1474,9 @@ PyBackstop_dealloc (PyBackstop *self)
 
 // Python - accessible methods
 extern PyObject *
-PyBackstop_update (PyObject *self, PyObject *arg)
+PyCrossbar_update (PyObject *self, PyObject *arg)
 {
-    PyBackstop_update((PyBackstop *)self);
+    PyCrossbar_update((PyCrossbar *)self);
     Py_INCREF(Py_None);
     return Py_None;
 }

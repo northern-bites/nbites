@@ -131,7 +131,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/ConcreteCorner
                  ${VISION_INCLUDE_DIR}/Utility
                  ${VISION_INCLUDE_DIR}/Vision
 		 ${VISION_INCLUDE_DIR}/VisualBall
-		 ${VISION_INCLUDE_DIR}/VisualBackstop
+		 ${VISION_INCLUDE_DIR}/VisualCrossbar
                  ${VISION_INCLUDE_DIR}/VisualCorner
                  ${VISION_INCLUDE_DIR}/VisualDetection
                  ${VISION_INCLUDE_DIR}/VisualLandmark

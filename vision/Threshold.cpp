@@ -140,11 +140,11 @@ void Threshold::visionLoop() {
 
     PROF_ENTER(vision->profiler, P_LINES);
     vision->fieldLines->afterObjectFragments();
-    if (vision->bgBackstop->getWidth() > 0) {
-        blue->setShot(vision->bgBackstop);
+    if (vision->bgCrossbar->getWidth() > 0) {
+        blue->setShot(vision->bgCrossbar);
     }
-    if (vision->ygBackstop->getWidth() > 0) {
-        yellow->setShot(vision->ygBackstop);
+    if (vision->ygCrossbar->getWidth() > 0) {
+        yellow->setShot(vision->ygCrossbar);
     }
     yellow->openDirection(horizon, pose.get());
     PROF_EXIT(vision->profiler, P_LINES);
@@ -600,7 +600,7 @@ void Threshold::findGreenHorizon() {
 //   return ret;
 // }
 
-// point <int> Threshold::backStopCheck(bool which, int leftRange, int rightRange) {
+// point <int> Threshold::crossbarCheck(bool which, int leftRange, int rightRange) {
 //   int left = -1, right = -1, total = 0;
 //   int bestLeft = -1, bestRight = -1, bestTotal = 0;
 //   int bads = 0;
@@ -681,13 +681,13 @@ void Threshold::objectRecognition() {
         if (ylp && yrp) {
             vision->bglp->init();
             vision->bgrp->init();
-            vision->bgBackstop->init();
+            vision->bgCrossbar->init();
             blp = false;
             brp = false;
         } else if (blp && brp) {
             vision->yglp->init();
             vision->ygrp->init();
-            vision->ygBackstop->init();
+            vision->ygCrossbar->init();
             ylp = false;
             yrp = false;
         } else {
@@ -732,12 +732,12 @@ void Threshold::objectRecognition() {
     blp = vision->bglp->getWidth() > 0;
     brp = vision->bgrp->getWidth() > 0;
 
-    // make sure we don't see a false backstop when looking at the other goal
+    // make sure we don't see a false crossbar when looking at the other goal
     if (ylp || yrp) {
-        vision->bgBackstop->init();
+        vision->bgCrossbar->init();
     }
     if (blp || brp) {
-        vision->ygBackstop->init();
+        vision->ygCrossbar->init();
     }
 
     if (horizon < IMAGE_HEIGHT)
@@ -746,10 +746,10 @@ void Threshold::objectRecognition() {
         orange->createObject(pose->getHorizonY(0));
 
     if (ylp || yrp) {
-        yellow->bestShot(vision->ygrp, vision->yglp, vision->ygBackstop);
+        yellow->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar);
     }
     if (blp || brp) {
-        blue->bestShot(vision->bgrp, vision->bglp, vision->bgBackstop);
+        blue->bestShot(vision->bgrp, vision->bglp, vision->bgCrossbar);
     }
 
     // sanity check: if pose estimated horizon is completely above the image,
@@ -757,10 +757,10 @@ void Threshold::objectRecognition() {
     if (pose->getLeftHorizonY() < 0 && pose->getRightHorizonY() < 0) {
         vision->yglp->init();
         vision->ygrp->init();
-        //vision->ygBackstop->init();
+        //vision->ygCrossbar->init();
         vision->bglp->init();
         vision->bgrp->init();
-        //vision->bgBackstop->init();
+        //vision->bgCrossbar->init();
     }
 
     storeFieldObjects();
@@ -781,10 +781,10 @@ void Threshold::storeFieldObjects() {
     setFieldObjectInfo(vision->ygrp);
     setFieldObjectInfo(vision->bglp);
     setFieldObjectInfo(vision->bgrp);
-    vision->ygBackstop->setFocDist(0.0); // sometimes set to 1.0 for some reason
-    vision->bgBackstop->setFocDist(0.0); // sometimes set to 1.0 for some reason
-    vision->ygBackstop->setDistance(0.0); // sometimes set to 1.0 for some reason
-    vision->bgBackstop->setDistance(0.0); // sometimes set to 1.0 for some reason
+    vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
+    vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
+    vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
+    vision->bgCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
 
 #if ROBOT(NAO)
     setVisualRobotInfo(vision->red1);
@@ -959,12 +959,12 @@ void Threshold::initObjects(void) {
     // yellow goal objs
     vision->ygrp->init();
     vision->yglp->init();
-    vision->ygBackstop->init();
+    vision->ygCrossbar->init();
 
     // blue goal objs
     vision->bgrp->init();
     vision->bglp->init();
-    vision->bgBackstop->init();
+    vision->bgCrossbar->init();
 
     // robots
     vision->red1->init();
