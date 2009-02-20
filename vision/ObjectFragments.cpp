@@ -51,14 +51,11 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr)
     POSTDEBUG = false;
     POSTLOGIC = false;
     TOPFIND = false;
-    BEACONDEBUG = false;
     BALLDEBUG = false;
     CORNERDEBUG = false;
     BACKDEBUG = false;
     SANITY = false;
-    DEBUGCIRCLEFIT = false;
     DEBUGBALLPOINTS = false;
-    ARCDEBUG = false;
     CORRECT = false;
     OPENFIELD = false;
 #endif
@@ -462,32 +459,6 @@ void ObjectFragments::robot(int bigGreen)
         updateRobots(1, index1);
         if (index2 != -1)
             updateRobots(2, index2);
-    }
-    if (BEACONDEBUG) {
-        for (int i = 0; i < numBlobs; i++) {
-            if (viableRobot(blobs[i])) {
-                if (color == RED) {
-                    drawRect(topBlob.leftTop.x, topBlob.leftTop.y - 5,
-                             topBlob.rightTop.x - topBlob.leftTop.x + 1,
-                             topBlob.leftBottom.y - topBlob.leftTop.y + 1,
-                             BLACK);
-                    drawRect(topBlob.leftTop.x - 1, topBlob.leftTop.y - 1,
-                             topBlob.rightTop.x - topBlob.leftTop.x + 3,
-                             topBlob.leftBottom.y - topBlob.leftTop.y + 3,
-                             BLACK);
-                }
-                else {
-                    drawRect(topBlob.leftTop.x, topBlob.leftTop.y - 5,
-                             topBlob.rightTop.x - topBlob.leftTop.x + 1,
-                             topBlob.leftBottom.y - topBlob.leftTop.y + 1,
-                             ORANGE);
-                    drawRect(topBlob.leftTop.x - 1, topBlob.leftTop.y - 1,
-                             topBlob.rightTop.x - topBlob.leftTop.x + 3,
-                             topBlob.leftBottom.y - topBlob.leftTop.y + 3,
-                             ORANGE);
-                }
-            }
-        }
     }
 }
 

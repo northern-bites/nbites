@@ -25,11 +25,6 @@ Vision Constants that span multiple classes and systems.
 #  define NAO_COLOR_SPACE YUV422INTER_CS
 #endif
 
-#define AIBO_IMAGE_WIDTH       208
-#define AIBO_IMAGE_HEIGHT      160
-#define AIBO_IMAGE_BYTE_SIZE   (AIBO_IMAGE_WIDTH * AIBO_IMAGE_HEIGHT * 3)
-#define AIBO_FOV_X_DEG         56.9
-#define AIBO_FOV_Y_DEG         45.2
 #define NAO_FOV_X_DEG          46.4
 #define NAO_FOV_Y_DEG          34.8
 #define NAO_SIM_IMAGE_WIDTH    160
@@ -53,28 +48,11 @@ Vision Constants that span multiple classes and systems.
 
 #define NAO_IMAGE_BYTE_SIZE    (NAO_IMAGE_WIDTH * NAO_IMAGE_HEIGHT * 2)
 
-
-#define AIBO_ONLINE_IMAGE_ROW_OFFSET  (AIBO_IMAGE_WIDTH * 6)
-#define AIBO_OFFLINE_IMAGE_ROW_OFFSET (AIBO_IMAGE_WIDTH * 3)
 #define NAO_IMAGE_ROW_OFFSET          (NAO_IMAGE_WIDTH * 2)
 #define NAO_SIM_IMAGE_ROW_OFFSET      (NAO_SIM_IMAGE_WIDTH * 3)
 
 
-#if ROBOT(AIBO_ERS7) || ROBOT(AIBO_220) 
-#  define IMAGE_WIDTH AIBO_IMAGE_WIDTH
-#  define IMAGE_HEIGHT AIBO_IMAGE_HEIGHT
-#  define FOV_X_DEG AIBO_FOV_X_DEG
-#  define FOV_Y_DEG AIBO_FOV_Y_DEG
-#  define IMAGE_BYTE_SIZE AIBO_IMAGE_BYTE_SIZE
-#  define JPEG_ROW_SKIP (AIBO_IMAGE_WIDTH * 3)
-
-#  ifndef OFFLINE
-#    define IMAGE_ROW_OFFSET AIBO_ONLINE_IMAGE_ROW_OFFSET
-#  else
-#    define IMAGE_ROW_OFFSET AIBO_OFFLINE_IMAGE_ROW_OFFSET
-#  endif
-
-#elif ROBOT(NAO_SIM)
+#if ROBOT(NAO_SIM)
 
 #  define IMAGE_WIDTH NAO_SIM_IMAGE_WIDTH
 #  define IMAGE_HEIGHT NAO_SIM_IMAGE_HEIGHT
@@ -101,9 +79,6 @@ Vision Constants that span multiple classes and systems.
 #  error "Undefined robot type"
 
 #endif
-
-
-#define AIBO_STYLE_IMAGE_BYTE_SIZE (IMAGE_WIDTH * IMAGE_HEIGHT * 3)
 
 #define FOV_X RAD_OVER_DEG*FOV_X_DEG
 #define FOV_Y RAD_OVER_DEG*FOV_Y_DEG
@@ -144,21 +119,6 @@ static const double MAX_ELEVATION = IMAGE_HEIGHT / FOV_Y_DEG; // ''
 #define LIGHT_SKY_BLUE 25
 #define MAGENTA 26
 #define PURPLE 27
-
-
-// CAMERA SETTINGS (open-r has its own constants for implementation)
-// WHITE BALANCES
-#define INDOOR_MODE 1
-#define OUTDOOR_MODE 2
-#define FL_MODE 3
-// GAINS
-#define LOW_GAIN 4
-#define MID_GAIN 5
-#define HIGH_GAIN 6
-// SHUTTER SPEEDS
-#define SLOW_SHUTTER 7
-#define MID_SHUTTER 8
-#define FAST_SHUTTER 9
 
 // might be used for landmark recognition certainty - now used for ball certainty
 #define SURE       2
