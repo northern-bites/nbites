@@ -372,7 +372,6 @@ class Crossbar:
         self.framesOn = 0
         self.framesOff = 0
         self.on = False
-        self.dist = 0
 
         # Setup the data from vision
         self.visionId = visionName
@@ -380,40 +379,29 @@ class Crossbar:
 
     def updateVision(self, visionInfos):
         '''updates class variables with new vision information'''
-        pass
-#         self.x = visionInfos.x
-#         self.y = visionInfos.y
-#         self.angleX = visionInfos.angleX
-#         self.angleY = visionInfos.angleY
-#         self.centerX = visionInfos.centerX
-#         self.centerY = visionInfos.centerY
-#         self.width = visionInfos.width
-#         self.height = visionInfos.height
-#         self.focDist = visionInfos.focDist
-#         self.dist = visionInfos.dist
-#         self.bearing = visionInfos.bearing
-#         self.elevation = visionInfos.elevation
-#         self.leftOpening = visionInfos.leftOpening
-#         self.rightOpening = visionInos.rightOpening
-#         self.shoot = visionInfos.shoot
+        self.x = visionInfos.x
+        self.y = visionInfos.y
+        self.angleX = visionInfos.angleX
+        self.angleY = visionInfos.angleY
+        self.centerX = visionInfos.centerX
+        self.centerY = visionInfos.centerY
+        self.width = visionInfos.width
+        self.height = visionInfos.height
+        self.focDist = visionInfos.focDist
+        self.distance = visionInfos.distance
+        self.bearing = visionInfos.bearing
+        self.elevation = visionInfos.elevation
+        self.leftOpening = visionInfos.leftOpening
+        self.rightOpening = visionInfos.rightOpening
+        self.shoot = visionInfos.shoot
 
-        # set angleX, angleY so that we don't create c->python object overhead
-#         if self.dist > 0:
-#             self.angleX = (((Constants.IMAGE_WIDTH/2-1) - self.centerX)/
-#                            Constants.IMAGE_ANGLE_X)
-#             self.angleY = (((Constants.IMAGE_HEIGHT/2-1) - self.centerY)/
-#                            Constants.IMAGE_ANGLE_Y)
-#         else:
-#             self.angleX = 0
-#             self.angleY = 0
-
-#         # obj is in this frame
-#         if self.dist > 0:
-#             self.on = True
-#             self.framesOn += 1
-#             self.framesOff = 0
-#         # obj not in this frame
-#         else:
-#             self.on = False
-#             self.framesOff += 1
-#             self.framesOn = 0
+        # obj is in this frame
+        if self.distance > 0:
+            self.on = True
+            self.framesOn += 1
+            self.framesOff = 0
+        # obj not in this frame
+        else:
+            self.on = False
+            self.framesOff += 1
+            self.framesOn = 0
