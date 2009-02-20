@@ -125,14 +125,6 @@ static const double MAX_ELEVATION = IMAGE_HEIGHT / FOV_Y_DEG; // ''
 #define MILDLYSURE 1
 #define NOTSURE    0
 
-// // Are the heights and widths from Vision to be trusted? Used in localization
-// enum distanceCertainty {
-//     BOTH_UNSURE,
-//     WIDTH_UNSURE,
-//     HEIGHT_UNSURE,
-//     BOTH_SURE
-// };
-
 // Image Types for Saving Frames
 #define UNCORRECTED_IMAGE 0
 #define CORRECTED_IMAGE 1
