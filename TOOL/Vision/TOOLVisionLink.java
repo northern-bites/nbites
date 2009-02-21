@@ -87,10 +87,9 @@ public class TOOLVisionLink {
 	yglp = new VisualFieldObject(VisualFieldObject.YELLOW_GOAL_LEFT_POST);
 	//should add the backstops too if ever going to be used
 	*/
-	visualFieldObjects = new Vector<VisualFieldObject>();
-	visualLines = new Vector<VisualLine>();
-	unusedPoints = new Vector<LinePoint>();
-	visualCorners = new Vector<VisualCorner>();
+	visualFieldObjects = new Vector<VisualFieldObject>(6);
+	visualLines = new Vector<VisualLine>(5, 5);
+	visualCorners = new Vector<VisualCorner>(10);
     }
 
     /**
@@ -231,7 +230,7 @@ public class TOOLVisionLink {
     }
     //set the unused points
     public void setUnusedPointsInfo(){
-	unusedPoints = new Vector<LinePoint>();
+	unusedPoints = new Vector<LinePoint>(len);
 	for(int i = 0; i < len; i++)
 	    unusedPoints.add(new LinePoint(pointX[i], pointY[i], 
 					 pointLineWidth[i], pointFWS[i]));
@@ -243,13 +242,11 @@ public class TOOLVisionLink {
     }
     //set the corners
     public void setVisualCornersInfo(int x, int y){
-	visualCorners = new Vector<VisualCorner>();
 	visualCorners.add(new VisualCorner(x,y));
     }
     //set the pose + vision horizon 
     public void setHorizonInfo(int lx, int ly, int rx, int ry, int visHor){
 	poseHorizon = new Horizon(lx, ly, rx, ry);
 	visionHorizon = visHor;
-	System.out.println(visHor);
     }
 }

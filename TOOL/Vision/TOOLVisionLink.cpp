@@ -211,18 +211,15 @@ extern "C" {
 			    i->x, i->y,
 			    i->lineWidth, i->foundWithScan);
       env->CallVoidMethod(jobj, setUnusedPointsInfo);
-      cout<<"sa-mi trag palme?";
       //push data from visualCorners
       const list <VisualCorner>* corners = vision.fieldLines->getCorners();
       for (list <VisualCorner>::const_iterator i = corners->begin();
 	   i != corners->end(); i++)
 	env->CallVoidMethod(jobj, setVisualCornersInfo,
 			    i->getX(), i->getY());
-      cout<<"pula ba";
       //horizon line
       jmethodID setHorizonInfo = env->GetMethodID(javaClass, "setHorizonInfo", 
 						  "(IIIII)V");
-      cout<<vision.thresh->getVisionHorizon();
       env->CallVoidMethod(jobj, setHorizonInfo, 
 			  vision.pose->getLeftHorizon().x,
 			  vision.pose->getLeftHorizon().y,
