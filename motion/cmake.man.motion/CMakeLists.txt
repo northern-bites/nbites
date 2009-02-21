@@ -53,6 +53,7 @@ MESSAGE( STATUS "" )
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PTHREAD  REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
+FIND_PACKAGE( BOOST_PYTHON REQUIRED )
 
 IF( APPLE )
   MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
@@ -122,7 +123,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/PreviewController
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/Kinematics
-                     ${MOTION_INCLUDE_DIR}/_motionmodule
+                     ${MOTION_INCLUDE_DIR}/PyMotion
                      )
 
 IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )

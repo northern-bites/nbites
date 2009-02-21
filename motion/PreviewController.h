@@ -21,7 +21,6 @@
 using namespace boost::numeric;
 
 #include <list>
-using std::list;
 
 #include "WalkController.h"
 #include "motionconfig.h"
@@ -34,7 +33,7 @@ class PreviewController : public WalkController {
 public:
     PreviewController();
     virtual ~PreviewController(){};
-    virtual const float tick(const list<float> *zmp_ref);
+    virtual const float tick(const std::list<float> *zmp_ref);
     virtual const float getPosition() const { return stateVector(0); }
     virtual const float getZMP() const {return stateVector(2);}
 

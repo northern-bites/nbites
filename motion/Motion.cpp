@@ -5,7 +5,7 @@ using namespace boost;
 
 #include "synchro.h"
 #include "Motion.h"
-#include "_motionmodule.h"
+#include "PyMotion.h"
 #include "SimulatorEnactor.h"
 
 Motion::Motion (shared_ptr<Synchro> _synchro,
