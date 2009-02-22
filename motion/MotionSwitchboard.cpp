@@ -281,18 +281,14 @@ BodyJointCommand * MotionSwitchboard::getGaitTransitionCommand(const WalkingPara
 
         max_change = fmax(max_change,
                           fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)));
-        cout << "target - current: "<<gaitJoints->at(i)
-             <<" - " << curJoints.at(i+HEAD_JOINTS) << ", max = " <<max_change<<endl;
     }
 
-    const float  MAX_RAD_PER_SEC =  M_PI*0.25; //Technically its 220 deg/s or so
+    const float  MAX_RAD_PER_SEC =  M_PI*0.20; //Technically its 220 deg/s or so
     float time = max_change/MAX_RAD_PER_SEC;
-    cout << "time" <<time << "MAX change" << MAX_RAD_PER_SEC <<endl;
     //If the motion would take less than a frame, don't do a transition
     if(time < 0.02 || max_change < M_PI/180.0f)
         time = 0.0f;
-    cout << "New Transition command with time "<<time<< " and angle "
-         <<max_change<<endl;
+
     return new BodyJointCommand(time,gaitJoints,
                                 Kinematics::INTERPOLATION_LINEAR);
 }

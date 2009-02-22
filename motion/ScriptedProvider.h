@@ -66,6 +66,9 @@ private:
 	void setNextBodyCommand();
     void setActive();
 	bool isDone();
+    bool chainQueuesEmpty();
+    bool commandQueueEmpty();
+
 };
 
 #endif

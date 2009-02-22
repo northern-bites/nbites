@@ -72,34 +72,28 @@ void ScriptedProvider::setActive(){
 }
 
 bool ScriptedProvider::isDone() {
+    return chainQueuesEmpty() && commandQueueEmpty();
+}
+
+bool ScriptedProvider::chainQueuesEmpty(){
     bool isEmpty = true;
     for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
         if ( !chainQueues.at(i).empty() ) {
             isEmpty=false;
         }
     }
-
-    if (!bodyCommandQueue.empty())
-        isEmpty = false;
-
     return isEmpty;
+}
+
+bool ScriptedProvider::commandQueueEmpty(){
+    return bodyCommandQueue.empty();
 }
 
 void ScriptedProvider::calculateNextJoints() {
 
-    // If all queues are empty, then the next command must
-    // be chopped and used.
-    bool allEmpty = true;
-
-    for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
-        if ( !chainQueues.at(i).empty() ) {
-            //cout << "chain " << i << " has size " << chainQueues.at(i).size() << endl;
-			allEmpty=false;
-		}
-	}
-
-	if (allEmpty)
+	if (chainQueuesEmpty())
 		setNextBodyCommand();
+
 
 	// Make sure first that the queues are not empty
 	// If they're empty, then add the current joints to be the

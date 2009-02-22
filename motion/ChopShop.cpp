@@ -41,7 +41,9 @@ queue<vector<vector<float> > >* ChopShop::chopCommand(const JointCommand *comman
 	}
 
 	else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
-		return chopSmooth(command);
+        cout << "SMOOTH INTERPOLATION IS NOT IMPLEMENTED. USING LINEAR"<<endl;
+		//return chopSmooth(command);
+        return chopLinear(command);
 	}
 
 	else {
@@ -53,7 +55,7 @@ queue<vector<vector<float> > >* ChopShop::chopCommand(const JointCommand *comman
 // Smooth interpolation motion
 queue<vector<vector<float> > >*
 ChopShop::chopSmooth(const JointCommand *command) {
-
+    
 	// PLACE HOLDER
 	queue<vector<vector<float> > >* a = new queue<vector<vector<float> > >();
 	return a;
