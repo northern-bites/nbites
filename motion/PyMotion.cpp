@@ -1,14 +1,10 @@
 #include <Python.h>
-#include <boost/shared_ptr.hpp>
 #include <boost/python.hpp>
 #include <boost/python/object.hpp>
 #include <boost/python/module.hpp>
 #include <boost/python/args.hpp>
 using namespace std;
 using namespace boost::python;
-
-#include <boost/assign/std/vector.hpp>
-using namespace boost::assign;
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
