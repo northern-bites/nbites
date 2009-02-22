@@ -17,7 +17,7 @@ TO_RAD= math.pi/180.
 def gameInitial(player):
     print "In the players version of game controller state (overridden)"
     gait = motion.GaitCommand(310.0,
-                              40.0,
+                              19.0,
                               0.5,
                               0.1,
                               16.5,
@@ -25,8 +25,8 @@ def gameInitial(player):
                               0.4,
                               4.0*TO_RAD,
                               4.0*TO_RAD,
-                              20.0,
-                              20.0)
+                              15.0,
+                              15.0)
     player.brain.motion.setGait(gait)
     return player.goLater('walkleft')
 

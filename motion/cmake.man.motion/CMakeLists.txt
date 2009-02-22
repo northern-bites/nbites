@@ -105,7 +105,6 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/HeadJointCommand
 		     ${MOTION_INCLUDE_DIR}/JointCommand
 		     ${MOTION_INCLUDE_DIR}/MotionCommand
-		     ${MOTION_INCLUDE_DIR}/WalkParameters
                      ${MOTION_INCLUDE_DIR}/MotionConstants
                      ${MOTION_INCLUDE_DIR}/Motion.cpp
                      ${MOTION_INCLUDE_DIR}/MotionInterface
@@ -120,7 +119,6 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ALEnactor
 		     ${MOTION_INCLUDE_DIR}/WalkProvider
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
-                     ${MOTION_INCLUDE_DIR}/DummyController
 		     ${MOTION_INCLUDE_DIR}/PreviewController
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/Kinematics

@@ -8,7 +8,6 @@ using namespace boost::python;
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
-#include "HeadScanCommand.h"
 #include "WalkCommand.h"
 #include "MotionInterface.h"
 
@@ -33,35 +32,6 @@ public:
 
 private:
     HeadJointCommand *command;
-};
-
-
-class PyHeadScanCommand {
-public:
-    /**
-     * The constructor takes a list of headJointCommands and whether they
-     * should be executed forever in a sequence
-     */
-    PyHeadScanCommand(boost::python::list headJointCommands,
-                      bool forever = false) {
-        vector<const HeadJointCommand*> *commands =
-            new vector<const HeadJointCommand*>;
-
-        unsigned int listLength =
-            extract<unsigned int>(headJointCommands.attr("__len__")());
-        for (unsigned int i = 0; i < listLength; i++) {
-            PyHeadJointCommand cmd =
-                extract<PyHeadJointCommand>(headJointCommands.pop(0));
-            commands->push_back(cmd.getCommand());
-        }
-
-        command = new HeadScanCommand(commands, forever);
-    }
-
-    HeadScanCommand* getCommand() const { return command; }
-
-private:
-    HeadScanCommand *command;
 };
 
 class PyGaitCommand {
@@ -152,9 +122,6 @@ public:
     void enqueue(const PyHeadJointCommand *command) {
         motionInterface->enqueue(command->getCommand());
     }
-    void enqueue(const PyHeadScanCommand *command) {
-        motionInterface->enqueue(command->getCommand());
-    }
     void enqueue(const PyBodyJointCommand *command) {
         motionInterface->enqueue(command->getCommand());
     }
@@ -190,9 +157,7 @@ private:
  */
 void (PyMotionInterface::*enq1)(const PyHeadJointCommand*) =
     &PyMotionInterface::enqueue;
-void (PyMotionInterface::*enq2)(const PyHeadScanCommand*)  =
-    &PyMotionInterface::enqueue;
-void (PyMotionInterface::*enq3)(const PyBodyJointCommand*) =
+void (PyMotionInterface::*enq2)(const PyBodyJointCommand*) =
     &PyMotionInterface::enqueue;
 
 
@@ -201,13 +166,6 @@ BOOST_PYTHON_MODULE(_motion)
     class_<PyHeadJointCommand>("HeadJointCommand",
                                init<float, tuple, int>(
  "A container for a head joint command passed to the motion engine"))
-        ;
-    class_<PyHeadScanCommand>("HeadScanCommand",
-                              init<boost::python::list, optional<bool> >(
- "A container for a head scan command passed to the motion engine. It is"
- " composed of several head joint commands which are executed in succession."
- " An optional second parameter indicates whether the command should execute"
- " forever unless it is stopped manually"))
         ;
     class_<PyGaitCommand>("GaitCommand",
                           init<
@@ -232,7 +190,6 @@ BOOST_PYTHON_MODULE(_motion)
     class_<PyMotionInterface>("MotionInterface")
         .def("enqueue", enq1)
         .def("enqueue", enq2)
-        .def("enqueue", enq3)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)

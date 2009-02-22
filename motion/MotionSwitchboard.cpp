@@ -7,7 +7,7 @@
 using namespace std;
 using namespace boost;
 
-//#define DEBUG_SWITCHBOARD
+#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
@@ -41,6 +41,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 #endif
 
     //Very Important, ensure that we have selected a default walk parameter set
+    //This command also causes the robot to stand up...
     sendMotionCommand(new GaitCommand(DEFAULT_P));
 
 //     //build the sit down routine
@@ -360,7 +361,8 @@ void MotionSwitchboard::updateDebugLogs(){
 #endif
 
 void MotionSwitchboard::sendMotionCommand(const GaitCommand *command){
-    nextProvider = &walkProvider;
+    //Don't request to switch providers when we get a gait command
+    //nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){

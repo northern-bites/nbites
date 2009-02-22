@@ -13,10 +13,6 @@ void MotionInterface::enqueue(const HeadJointCommand *command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::enqueue(const HeadScanCommand *command){
-    //switchboard->sendMotionCommand(command);
-}
-
 void MotionInterface::stopBodyMoves() {
 }
 
@@ -44,8 +40,6 @@ void MotionInterface::setWalkExtraConfig( float pLHipRollBacklashCompensator,
 					  float pTorsoYOrientation) {
 }
 
-void MotionInterface::setWalkParameters( const WalkParameters& params) {
-}
 void MotionInterface::setGait(const GaitCommand * command){
     switchboard->sendMotionCommand(command);
 }

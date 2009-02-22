@@ -7,10 +7,9 @@
 
 #include "Kinematics.h"
 #include "WalkCommand.h"
-#include "HeadScanCommand.h"
 #include "BodyJointCommand.h"
 #include "MotionSwitchboard.h"
-#include "WalkParameters.h"
+#include "WalkingConstants.h"
 #define DUMMY_F 0.0f
 #define DUMMY_I 0
 
@@ -31,12 +30,12 @@ class MotionInterface
     void setNextWalkCommand(const WalkCommand *command);
     void enqueue(const BodyJointCommand *command);
     void enqueue(const HeadJointCommand *command);
-    void enqueue(const HeadScanCommand *command);
     inline bool isWalkActive() { return true; }
     void setGait(const GaitCommand *command);
 
     void stopBodyMoves();
     void stopHeadMoves();
+
 
     int postGotoCom(float pX, float pY, float pZ, float pTime, int pType) {
         return DUMMY_I;
@@ -59,7 +58,6 @@ class MotionInterface
     void setWalkExtraConfig( float pLHipRollBacklashCompensator,
 			     float pRHipRollBacklashCompensator,
 			     float pHipHeight , float pTorsoYOrientation);
-    void setWalkParameters( const WalkParameters& param);
 
     void setSupportMode( int pSupportMode );
     int getSupportMode();
