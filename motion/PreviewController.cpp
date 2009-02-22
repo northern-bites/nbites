@@ -1,4 +1,5 @@
 #include "PreviewController.h"
+using std::list;
 //#include <iostream>
 //using namespace std;
 

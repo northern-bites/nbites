@@ -78,7 +78,7 @@ public:
 
     // contructors
 #ifdef NAOQI1
-    Man(ALPtr<ALBroker> pBroker, std::string pName);
+    Man(AL::ALPtr<AL::ALBroker> pBroker, std::string pName);
 #else
     Man();
 #endif
@@ -170,12 +170,12 @@ public:
 private:
     // Interfaces/Proxies to robot
 #ifdef NAOQI1
-    ALPtr<AL::ALLoggerProxy> log;
-    ALPtr<AL::ALProxy> camera;
-    ALPtr<AL::ALProxy> lem;
-    ALPtr<AL::ALMemoryProxy> almemory;
-    ALPtr<ALMemoryFastAccess> alfastaccess;
-    DCMProxy *dcm;
+    AL::ALPtr<AL::ALLoggerProxy> log;
+    AL::ALPtr<AL::ALProxy> camera;
+    AL::ALPtr<AL::ALProxy> lem;
+    AL::ALPtr<AL::ALMemoryProxy> almemory;
+    AL::ALPtr<ALMemoryFastAccess> alfastaccess;
+    AL::DCMProxy *dcm;
 #else
     AL::ALLoggerProxy *log;
     AL::ALProxy *camera;

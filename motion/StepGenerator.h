@@ -59,7 +59,6 @@
 #include <cmath>
 #include <list>
 #include <algorithm> //for max
-using std::list;
 using std::max;
 
 #include <boost/tuple/tuple.hpp>
@@ -81,7 +80,8 @@ using namespace Kinematics;
 #  define DEBUG_CONTROLLER_COM
 #endif
 
-typedef boost::tuple<const list<float>*, const list<float>*> zmp_xy_tuple;
+typedef boost::tuple<const std::list<float>*,
+                     const std::list<float>*> zmp_xy_tuple;
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 
 static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
@@ -139,12 +139,12 @@ private:
     ufvector3 com_i,est_zmp_i;
     //ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
-    list<float> zmp_ref_x, zmp_ref_y;
-    list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
+    std::list<float> zmp_ref_x, zmp_ref_y;
+    std::list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
     //Stores currently relevant steps that are zmpd but not yet completed.
     //A step is consider completed (obsolete/irrelevant) as soon as the foot
     //enters into double support (perisistant)
-    list<boost::shared_ptr<Step> > currentZMPDSteps;
+    std::list<boost::shared_ptr<Step> > currentZMPDSteps;
     boost::shared_ptr<Step> lastQueuedStep;
 
     //Reference Frames for ZMPing steps

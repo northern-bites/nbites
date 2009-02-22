@@ -4,10 +4,6 @@
 #include <vector>
 using namespace std;
 
-// Aldebaran
-#include "almotionproxy.h"   // For the motion proxy
-using namespace AL;
-
 
 enum WalkConfigIndices {
   pMaxStepLength = 0,
