@@ -64,6 +64,33 @@ private:
     HeadScanCommand *command;
 };
 
+class PyGaitCommand {
+public:
+    /**
+     * The constructor takes a list of headJointCommands and whether they
+     * should be executed forever in a sequence
+     */
+    PyGaitCommand( const float _bh,
+                   const float _hox, const float _dur,
+                   const float _dblSupFrac, const float _stepHeight,
+                   const float _footLengthX, const float _dblInactivePerc,
+                   const float _lSwHRAdd,const float _rSwHRAdd,
+                   const float _lZMPSwOffY,const float _rZMPSwOffY){
+        command = new GaitCommand(0.02,_bh, //HACK
+                                  _hox, _dur,
+                                  _dblSupFrac, _stepHeight,
+                                  _footLengthX, _dblInactivePerc,
+                                  _lSwHRAdd,_rSwHRAdd,
+                                  _lZMPSwOffY,_rZMPSwOffY);
+    }
+
+    GaitCommand* getCommand() const { return command; }
+
+private:
+    GaitCommand *command;
+};
+
+
 class PyWalkCommand {
 public:
     PyWalkCommand(float x_mms, float m_mms, float theta_rads) {
@@ -173,6 +200,16 @@ BOOST_PYTHON_MODULE(_motion)
  " composed of several head joint commands which are executed in succession."
  " An optional second parameter indicates whether the command should execute"
  " forever unless it is stopped manually"))
+        ;
+    class_<PyGaitCommand>("GaitCommand",
+                          init<
+                          float, float, float, float,
+                          float, float, float, float,
+                          float, float, float>(
+"A container for setting the walking gait of the robot. "
+"(bodyHeight,hipOffsetX,stepDuration,doubleSupportFraction,stepHeight,"
+"footLengthX,dblSupInactivePercentage,leftSwingHipRollAddition,"
+"rightSwingHipRollAddition,leftZMPSwingOffsetY,rightZMPSwingOffsetY"))
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple, tuple, int>(
