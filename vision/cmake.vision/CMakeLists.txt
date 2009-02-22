@@ -141,6 +141,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/ConcreteCorner
                  #${VISION_INCLUDE_DIR}/Zlib
                  )
 
+SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -170,6 +171,12 @@ ELSE( PYTHON_SHARED_VISION )
     ${VISION_SRCS}
     )
 ENDIF( PYTHON_SHARED_VISION )
+
+INSTALL(
+  FILES ${VISION_PYTHON_SRCS}
+  DESTINATION ${VISION_PYTHON_TARGET_DIR}
+  CONFIGURATIONS "" Debug Release
+  )
 
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} z )
