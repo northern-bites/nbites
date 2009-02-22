@@ -28,6 +28,7 @@
 #include "MotionProvider.h"
 #include "ChainQueue.h"
 #include "HeadJointCommand.h"
+#include "SetHeadCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"
@@ -41,12 +42,21 @@ public:
     void calculateNextJoints();
 
 	void enqueueSequence(vector<HeadJointCommand*> &seq);
-	void setCommand(const MotionCommand* command) {
-		setCommand(reinterpret_cast<const HeadJointCommand*>(command));
-	}
+	void setCommand(const SetHeadCommand* command);
 	void setCommand(const HeadJointCommand* command);
 
 private:
+    enum HeadMode {
+        SCRIPTED,
+        SET
+    };
+
+    void transitionTo(HeadMode newMode);
+    void setMode();
+    void scriptedMode();
+    HeadMode curMode;
+    float yawDest,pitchDest,lastYawDest,lastPitchDest;
+
     void setActive();
     bool isDone();
 

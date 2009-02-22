@@ -8,6 +8,7 @@ using namespace boost::python;
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
+#include "SetHeadCommand.h"
 #include "WalkCommand.h"
 #include "MotionInterface.h"
 
@@ -113,6 +114,18 @@ private:
 };
 
 
+class PySetHeadCommand {
+public:
+    PySetHeadCommand(const float yaw, const float pitch) {
+        command = new SetHeadCommand(yaw * TO_RAD, pitch * TO_RAD);
+    }
+
+    SetHeadCommand* getCommand() const { return command; }
+private:
+    SetHeadCommand *command;
+};
+
+
 class PyMotionInterface {
 public:
     PyMotionInterface() {
@@ -132,6 +145,9 @@ public:
 
     void setGait(const PyGaitCommand *command) {
         motionInterface->setGait(command->getCommand());
+    }
+    void setHead(const PySetHeadCommand *command) {
+        motionInterface->setHead(command->getCommand());
     }
 
     bool isWalkActive() {
@@ -181,6 +197,10 @@ BOOST_PYTHON_MODULE(_motion)
                                init<float, tuple, tuple, tuple, tuple, int>(
  "A container for a body joint command passed to the motion engine"))
         ;
+    class_<PySetHeadCommand>("SetHeadCommand",
+                             init<float, float>(args("yaw", "pitch"),
+ "A container for a set head command. Holds yaw and pitch angles in degrees."))
+        ;
     class_<PyWalkCommand>("WalkCommand",
                           init<float, float, float>(args("x","y","theta"),
  "A container for a walk command. Holds an x, y and theta which represents a"
@@ -192,6 +212,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("setGait", &PyMotionInterface::setGait)
+        .def("setHead",&PyMotionInterface::setHead)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)

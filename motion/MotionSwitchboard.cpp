@@ -373,6 +373,10 @@ void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
     nextProvider = &scriptedProvider;
     scriptedProvider.setCommand(command);
 }
+void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
+    // headProvider is NEVER the nextProvider. NEVER.
+    headProvider.setCommand(command);
+}
 void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
     // headProvider is NEVER the nextProvider. NEVER.
     headProvider.setCommand(command);

@@ -13,6 +13,10 @@ void MotionInterface::enqueue(const HeadJointCommand *command){
     switchboard->sendMotionCommand(command);
 }
 
+void MotionInterface::setHead(const SetHeadCommand *command){
+    switchboard->sendMotionCommand(command);
+}
+
 void MotionInterface::stopBodyMoves() {
 }
 

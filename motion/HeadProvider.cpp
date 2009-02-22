@@ -45,8 +45,31 @@ void HeadProvider::requestStopFirstInstance() {
     // Finish motion or stop immediately?
 }
 
+//Method called during the 'SCRIPTED' mode
 void HeadProvider::calculateNextJoints() {
 
+    switch(curMode){
+    case SCRIPTED:
+        scriptedMode();
+        break;
+    case SET:
+        setMode();
+        break;
+    }
+
+    setActive();
+}
+
+//Method called during the 'SET' Mode
+void HeadProvider::setMode(){
+    float newHeads[Kinematics::HEAD_JOINTS] = {yawDest,pitchDest};
+    vector<float> newChainAngles = vector<float>(
+                                                 newHeads,newHeads +
+                                                 Kinematics::HEAD_JOINTS);
+    setNextChainJoints(HEAD_CHAIN,newChainAngles);
+}
+
+void HeadProvider::scriptedMode(){
     if ( headQueue.empty() )
         setNextHeadCommand();
 
@@ -57,14 +80,16 @@ void HeadProvider::calculateNextJoints() {
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
     }
-    setActive();
+}
+
+void HeadProvider::setCommand(const SetHeadCommand *command) {
+    transitionTo(SET);
 }
 
 void HeadProvider::setCommand(const HeadJointCommand *command) {
-	if (command->getType() == MotionConstants::HEAD_JOINT){
-		headCommandQueue.push(command);
-		setActive();
-	}
+    transitionTo(SCRIPTED);
+    headCommandQueue.push(command);
+    setActive();
 }
 
 void HeadProvider::enqueueSequence(std::vector<HeadJointCommand*> &seq) {
@@ -112,4 +137,26 @@ void HeadProvider::setActive(){
 
 bool HeadProvider::isDone(){
     return  headQueue.empty()  && headCommandQueue.empty();
+}
+
+void HeadProvider::transitionTo(HeadMode newMode){
+    if(newMode != curMode){
+        switch(newMode){
+        case SCRIPTED:
+            //clear anything in the queues
+            headQueue.clear();
+            while(!headCommandQueue.empty()){
+                const HeadJointCommand * cmd = headCommandQueue.front();
+                delete cmd;
+                headCommandQueue.pop();
+            }
+            break;
+        case SET:
+            //record the current head angles from sensors
+            vector<float> mAngles = sensors->getMotionBodyAngles();
+            yawDest = mAngles[0];
+            pitchDest = mAngles[1];
+        }
+        curMode = newMode;
+    }
 }

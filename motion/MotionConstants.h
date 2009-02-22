@@ -11,7 +11,8 @@ namespace MotionConstants {
 		WALK = 0,
 		BODY_JOINT,
 		HEAD_JOINT,
-        GAIT
+        GAIT,
+        SET_HEAD
 	};
 
 	const static unsigned int WALK_NUM_CHAINS = NUM_BODY_CHAINS;

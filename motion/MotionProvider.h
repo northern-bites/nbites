@@ -56,7 +56,6 @@ public:
     const bool isStopping() const {return _stopping;}
     virtual void calculateNextJoints() = 0;
     std::vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
-	virtual void  setCommand(const MotionCommand *command) =0;
     const std::string getName(){return provider_name;}
     const ProviderType getType(){return provider_type;}
 protected:

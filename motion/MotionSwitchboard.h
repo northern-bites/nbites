@@ -27,7 +27,9 @@
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
-
+#include "WalkCommand.h"
+#include "GaitCommand.h"
+#include "SetHeadCommand.h"
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
 #endif
@@ -46,6 +48,7 @@ public:
 	void sendMotionCommand(const HeadJointCommand* command);
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const GaitCommand* command);
+	void sendMotionCommand(const SetHeadCommand* command);
 
 private:
     int processProviders();

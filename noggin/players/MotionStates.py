@@ -28,7 +28,10 @@ def gameInitial(player):
                               15.0,
                               15.0)
     player.brain.motion.setGait(gait)
-    return player.goLater('walkleft')
+
+    headCommand = motion.SetHeadCommand(30,0)
+    player.brain.motion.setHead(headCommand)
+    return player.goLater('nothing')
 
 def switchGaits(player):
     pass
@@ -79,4 +82,7 @@ def sitdown(player):
                                        )
         player.brain.motion.enqueue(move)
 
+    return player.stay()
+
+def  nothing(player):
     return player.stay()
