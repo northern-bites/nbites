@@ -46,7 +46,9 @@ void MotionInterface::setWalkExtraConfig( float pLHipRollBacklashCompensator,
 
 void MotionInterface::setWalkParameters( const WalkParameters& params) {
 }
-
+void MotionInterface::setGait(const GaitCommand * command){
+    switchboard->sendMotionCommand(command);
+}
 
 void MotionInterface::setSupportMode(int pSupportMode) {
 }

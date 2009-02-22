@@ -93,8 +93,12 @@ private:
 
 class PyWalkCommand {
 public:
-    PyWalkCommand(float x_mms, float m_mms, float theta_rads) {
-        command = new WalkCommand(x_mms, m_mms, theta_rads);
+    PyWalkCommand(float x_cms, float m_cms, float theta_degs) {
+        //All python units should be in CM and DEG per second
+        //C++ is in mm and rads, so we need to convert
+        command = new WalkCommand(x_cms*CM_TO_MM,
+                                  m_cms*CM_TO_MM,
+                                  theta_degs*TO_RAD);
     }
 
     WalkCommand* getCommand() const { return command; }
@@ -157,6 +161,10 @@ public:
 
     void setNextWalkCommand(const PyWalkCommand *command) {
         motionInterface->setNextWalkCommand(command->getCommand());
+    }
+
+    void setGait(const PyGaitCommand *command) {
+        motionInterface->setGait(command->getCommand());
     }
 
     bool isWalkActive() {
@@ -226,6 +234,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq2)
         .def("enqueue", enq3)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
+        .def("setGait", &PyMotionInterface::setGait)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)

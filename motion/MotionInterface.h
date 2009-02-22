@@ -33,6 +33,7 @@ class MotionInterface
     void enqueue(const HeadJointCommand *command);
     void enqueue(const HeadScanCommand *command);
     inline bool isWalkActive() { return true; }
+    void setGait(const GaitCommand *command);
 
     void stopBodyMoves();
     void stopHeadMoves();

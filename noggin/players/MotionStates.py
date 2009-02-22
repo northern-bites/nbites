@@ -12,11 +12,26 @@ sitDownAngles = SweetMoves.SIT_POS[0]
 #           -1.22,0.0),(0.0,0.0,\
 #                           -0.96,2.18,-1.22,0.0),\
 #      (1.57,0.0,1.13,1.01), 3.0, 1)
-
+TO_RAD= math.pi/180.
 
 def gameInitial(player):
     print "In the players version of game controller state (overridden)"
+    gait = motion.GaitCommand(310.0,
+                              40.0,
+                              0.5,
+                              0.1,
+                              16.5,
+                              10.0,
+                              0.4,
+                              4.0*TO_RAD,
+                              4.0*TO_RAD,
+                              20.0,
+                              20.0)
+    player.brain.motion.setGait(gait)
     return player.goLater('walkleft')
+
+def switchGaits(player):
+    pass
 
 def walkleft(player):
     if player.firstFrame():
@@ -35,6 +50,8 @@ def walkstraight(player):
         return player.goLater('sitdown')
     return player.stay()
 
+def switchGait():
+    pass
 
 def walkturn(player):
     if player.firstFrame():
