@@ -708,15 +708,17 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
 }
 
 
-void StepGenerator::resetGait(const WalkingParameters * _wp){
+bool StepGenerator::resetGait(const WalkingParameters * _wp){
     if(_done){
         walkParams = _wp;
         leftLeg.resetGait(_wp);
         rightLeg.resetGait(_wp);
+        return true;
     }
     else{
         cout << "Failed to change the gait since StepGenerator is active."
              << endl;
+        return false;
     }
     //HACK When we switch gaits, we probably need to do other things as well
     //like restart the walk.

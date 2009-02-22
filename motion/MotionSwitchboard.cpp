@@ -24,7 +24,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	  headProvider(1/50.0f,sensors),
 	  curProvider(&scriptedProvider),
 	  nextProvider(&scriptedProvider),
-      curGait(&DEFAULT_PARAMETERS),
+      curGait(NULL),
       nextGait(&DEFAULT_PARAMETERS),
       nextJoints(Kinematics::NUM_JOINTS, 0.0f),
       //nextJoints(sensors->getBodyAngles()),
@@ -40,49 +40,52 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     initDebugLogs();
 #endif
 
-    //build the sit down routine
-    vector<float> * sitDownPos = new vector<float>(sitDownAngles,
-                                                   sitDownAngles+NUM_JOINTS);
-    sitDown = new BodyJointCommand(4.0f,sitDownPos,Kinematics::INTERPOLATION_LINEAR);
+    //Very Important, ensure that we have selected a default walk parameter set
+    sendMotionCommand(new GaitCommand(DEFAULT_P));
 
-    //the getup routine waits for the walk engine to be inited
-    //Build the get up routine
-    vector<float> * initPos
-        = DEFAULT_PARAMETERS.getWalkStance();
-	getUp = new BodyJointCommand(5.0f,
-                                 initPos,
-                                 Kinematics::INTERPOLATION_LINEAR);
+//     //build the sit down routine
+//     vector<float> * sitDownPos = new vector<float>(sitDownAngles,
+//                                                    sitDownAngles+NUM_JOINTS);
+//     sitDown = new BodyJointCommand(4.0f,sitDownPos,Kinematics::INTERPOLATION_LINEAR);
 
-	vector<float>* headJoints1 = new vector<float>(2,M_PI/2);
-	hjc = new HeadJointCommand(2.0f,
-							   headJoints1,
-							   Kinematics::INTERPOLATION_LINEAR);
+//     //the getup routine waits for the walk engine to be inited
+//     //Build the get up routine
+//     vector<float> * initPos
+//         = DEFAULT_PARAMETERS.getWalkStance();
+// 	getUp = new BodyJointCommand(5.0f,
+//                                  initPos,
+//                                  Kinematics::INTERPOLATION_LINEAR);
 
-	vector<float>* headJoints2 = new vector<float>(2,0.0f);
-	hjc2 = new HeadJointCommand(3.0f,
-								headJoints2,
-								Kinematics::INTERPOLATION_LINEAR);
-	vector<float>* headJoints3 = new vector<float>(2,-M_PI/8);
-	hjc3 = new HeadJointCommand(2.0f,
-								headJoints3,
-								Kinematics::INTERPOLATION_LINEAR);
+// 	vector<float>* headJoints1 = new vector<float>(2,M_PI/2);
+// 	hjc = new HeadJointCommand(2.0f,
+// 							   headJoints1,
+// 							   Kinematics::INTERPOLATION_LINEAR);
+
+// 	vector<float>* headJoints2 = new vector<float>(2,0.0f);
+// 	hjc2 = new HeadJointCommand(3.0f,
+// 								headJoints2,
+// 								Kinematics::INTERPOLATION_LINEAR);
+// 	vector<float>* headJoints3 = new vector<float>(2,-M_PI/8);
+// 	hjc3 = new HeadJointCommand(2.0f,
+// 								headJoints3,
+// 								Kinematics::INTERPOLATION_LINEAR);
 
 
 
-	vector<float>* bodyJoints3 = new vector<float>(4,0.0f);//M_PI/4);
-	command3 = new BodyJointCommand(2.0f, RARM_CHAIN,
-									bodyJoints3,
-									Kinematics::INTERPOLATION_LINEAR);
+// 	vector<float>* bodyJoints3 = new vector<float>(4,0.0f);//M_PI/4);
+// 	command3 = new BodyJointCommand(2.0f, RARM_CHAIN,
+// 									bodyJoints3,
+// 									Kinematics::INTERPOLATION_LINEAR);
 
-	bodyJoints = new vector<float>(20,0.0f);
-	command = new BodyJointCommand(5.0f,
-								   bodyJoints,
-                                   Kinematics::INTERPOLATION_LINEAR);
+// 	bodyJoints = new vector<float>(20,0.0f);
+// 	command = new BodyJointCommand(5.0f,
+// 								   bodyJoints,
+//                                    Kinematics::INTERPOLATION_LINEAR);
 
-	bodyJoints2 = new vector<float>(20,-M_PI/6);
-	command2 = new BodyJointCommand(5.0f,
-									bodyJoints2,
-									Kinematics::INTERPOLATION_LINEAR);
+// 	bodyJoints2 = new vector<float>(20,-M_PI/6);
+// 	command2 = new BodyJointCommand(5.0f,
+// 									bodyJoints2,
+// 									Kinematics::INTERPOLATION_LINEAR);
 
     //We cannot read the sensor values until the run method
     //so we must ensure that no one reads them until we get a chance
@@ -251,46 +254,20 @@ void MotionSwitchboard::swapBodyProvider(){
     BodyJointCommand * gaitSwitch = NULL;
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
-        //if(curGait != nextGait){
         //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOAR IS BROKEN!
-            //We need to ensure we are in the correct gait before walking
-            gaitSwitch = getGaitTransitionCommand(nextGait);
-            if(gaitSwitch->getDuration() > 0.0f){
-                scriptedProvider.setCommand(gaitSwitch);
-                curProvider = static_cast<MotionProvider * >(&scriptedProvider);
-                break;
-            }
-            //}
+        //We need to ensure we are in the correct gait before walking
+        gaitSwitch = walkProvider.getGaitTransitionCommand();
+        if(gaitSwitch->getDuration() >= 0.02f){
+            scriptedProvider.setCommand(gaitSwitch);
+            curProvider = static_cast<MotionProvider * >(&scriptedProvider);
+            break;
+        }
     case SCRIPTED_PROVIDER:
     case HEAD_PROVIDER:
     default:
         curProvider = nextProvider;
     }
 
-
-
-}
-
-BodyJointCommand * MotionSwitchboard::getGaitTransitionCommand(const WalkingParameters * new_gait){
-    vector<float> curJoints = sensors->getMotionBodyAngles();
-    vector<float> * gaitJoints = new_gait->getWalkStance();
-
-    float max_change = -M_PI*10.0f;
-
-    for(unsigned int i = 0; i < gaitJoints->size(); i++){
-
-        max_change = fmax(max_change,
-                          fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)));
-    }
-
-    const float  MAX_RAD_PER_SEC =  M_PI*0.20; //Technically its 220 deg/s or so
-    float time = max_change/MAX_RAD_PER_SEC;
-    //If the motion would take less than a frame, don't do a transition
-    if(time < 0.02 || max_change < M_PI/180.0f)
-        time = 0.0f;
-
-    return new BodyJointCommand(time,gaitJoints,
-                                Kinematics::INTERPOLATION_LINEAR);
 }
 
 const vector <float> MotionSwitchboard::getNextJoints() {
@@ -382,32 +359,19 @@ void MotionSwitchboard::updateDebugLogs(){
 }
 #endif
 
-void MotionSwitchboard::sendMotionCommand(const MotionCommand *command) {
-	MotionType type = command->getType();
-
-	switch (type) {
-	case WALK:
-		nextProvider = &walkProvider;
-		walkProvider.setCommand(command);
-		break;
-	case BODY_JOINT:
-		nextProvider = &scriptedProvider;
-		scriptedProvider.setCommand(command);
-		break;
-
-		// headProvider is NEVER the nextProvider. NEVER.
-	case HEAD_JOINT:
-		headProvider.setCommand(command);
-		break;
-
-	}
+void MotionSwitchboard::sendMotionCommand(const GaitCommand *command){
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
 }
-
-void MotionSwitchboard::sendMotionCommands(const vector<const MotionCommand *> *commands) {
-	vector<const MotionCommand *>::const_iterator i = commands->begin();
-	while (i != commands->end() ) {
-		sendMotionCommand(*i);
-	}
-	delete commands;
+void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
 }
-
+void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
+    nextProvider = &scriptedProvider;
+    scriptedProvider.setCommand(command);
+}
+void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
+    // headProvider is NEVER the nextProvider. NEVER.
+    headProvider.setCommand(command);
+}

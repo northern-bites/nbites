@@ -42,8 +42,10 @@ public:
     void run();
 
 	const std::vector <float> getNextJoints();
-	void sendMotionCommand(const MotionCommand* command);
-	void sendMotionCommands(const vector<const MotionCommand*> *command);
+	void sendMotionCommand(const BodyJointCommand* command);
+	void sendMotionCommand(const HeadJointCommand* command);
+	void sendMotionCommand(const WalkCommand* command);
+	void sendMotionCommand(const GaitCommand* command);
 
 private:
     int processProviders();

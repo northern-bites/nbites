@@ -10,7 +10,7 @@ using Kinematics::RLEG_CHAIN;
 WalkProvider::WalkProvider(shared_ptr<Sensors> s)
     : MotionProvider(WALK_PROVIDER),
       sensors(s),
-      walkParameters(&WALK_PARAMS[DEFAULT_P]),
+      curGait(NULL),nextGait(NULL),
       stepGenerator(sensors),
       pendingCommands(false),
       nextCommand(NULL)
@@ -35,6 +35,13 @@ void WalkProvider::requestStopFirstInstance() {
 }
 
 void WalkProvider::calculateNextJoints() {
+    if ( nextGait != curGait){
+        if( stepGenerator.resetGait(nextGait)){
+            curGait = nextGait;
+        }else{
+            cout << "Failed to set gait, trying again next time"<<endl;
+        }
+    }
     pthread_mutex_lock(&walk_command_mutex);
     if(nextCommand){
         stepGenerator.setSpeed(nextCommand->x_mms,
@@ -81,17 +88,13 @@ void WalkProvider::setCommand(const WalkCommand * command){
     pendingCommands = true;
     pthread_mutex_unlock(&walk_command_mutex);
 
-    if(!isActive()){
-        //then we must just be starting out, so we can update the
-        //gait in StepGenerator if we want
-        stepGenerator.resetGait(walkParameters);
-        cout << "Set the walking parameters in stepgen"<<endl;
-    }
-
     setActive();
 }
 
-
+void WalkProvider::setCommand(const GaitCommand * command){
+    nextGait = new WalkingParameters(command->getGait());
+    delete command;
+}
 
 void WalkProvider::setActive(){
     //check to see if the walk engine is active
@@ -100,4 +103,23 @@ void WalkProvider::setActive(){
     }else{
         active();
     }
+}
+
+BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
+    vector<float> curJoints = sensors->getMotionBodyAngles();
+    vector<float> * gaitJoints = nextGait->getWalkStance();
+
+    float max_change = -M_PI*10.0f;
+
+    for(unsigned int i = 0; i < gaitJoints->size(); i++){
+
+        max_change = fmax(max_change,
+                          fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)));
+    }
+
+    const float  MAX_RAD_PER_SEC =  M_PI*0.20; //Technically its 220 deg/s or so
+    float time = max_change/MAX_RAD_PER_SEC;
+
+    return new BodyJointCommand(time,gaitJoints,
+                                Kinematics::INTERPOLATION_LINEAR);
 }

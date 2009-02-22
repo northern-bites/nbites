@@ -2,19 +2,19 @@
 #include "MotionInterface.h"
 
 void MotionInterface::setNextWalkCommand(const WalkCommand *command){
-    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
+    switchboard->sendMotionCommand(command);
 }
 
 void MotionInterface::enqueue(const BodyJointCommand *command){
-    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
+    switchboard->sendMotionCommand(command);
 }
 
 void MotionInterface::enqueue(const HeadJointCommand *command){
-    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
+    switchboard->sendMotionCommand(command);
 }
 
 void MotionInterface::enqueue(const HeadScanCommand *command){
-    switchboard->sendMotionCommand(reinterpret_cast<const MotionCommand *> (command));
+    //switchboard->sendMotionCommand(command);
 }
 
 void MotionInterface::stopBodyMoves() {

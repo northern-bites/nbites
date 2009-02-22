@@ -99,7 +99,7 @@ public:
 
     void setSpeed(const float _x, const float _y, const float _theta);
 
-    void resetGait(const WalkingParameters * _wp);
+    bool resetGait(const WalkingParameters * _wp);
 
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();

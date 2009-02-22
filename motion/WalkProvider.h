@@ -25,6 +25,8 @@ using namespace std;
 #include "WalkingConstants.h"
 #include "StepGenerator.h"
 #include "WalkCommand.h"
+#include "GaitCommand.h"
+#include "BodyJointCommand.h"
 
 typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
 
@@ -43,13 +45,15 @@ public:
             setCommand(reinterpret_cast<const WalkCommand*>(command));
         }
 	void setCommand(const WalkCommand * command);
+	void setCommand(const GaitCommand * command);
+    BodyJointCommand * getGaitTransitionCommand();
 
 private:
     virtual void setActive();
 
     boost::shared_ptr<Sensors> sensors;
 
-    const WalkingParameters * walkParameters;
+    const WalkingParameters * curGait, *nextGait;
     StepGenerator stepGenerator;
     bool pendingCommands;
 

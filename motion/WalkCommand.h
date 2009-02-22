@@ -17,14 +17,13 @@ public:
           x_mms(_x_mms),y_mms(_y_mms),theta_rads(_theta_rads)
         { setChainList(); }
 
-  virtual ~WalkCommand() {}
-
+    virtual ~WalkCommand() {}
 public:
 //    WalkParameters params;
-    const float x_mms;    //cm/second
-    const float y_mms;    //cm/second
-    const float theta_rads; //deg/second
-private:
+    const float x_mms;    //mm/second
+    const float y_mms;    //mm/second
+    const float theta_rads; //rad/second
+protected:
 	virtual void setChainList() {
         chainList.assign(MotionConstants::WALK_CHAINS,
                          MotionConstants::WALK_CHAINS +
