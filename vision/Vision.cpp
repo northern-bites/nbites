@@ -82,19 +82,21 @@ void Vision::notifyImage(const byte* image) {
 }
 
 /* notifyImage() -- The Image Loop
-
-   This is the most important loop, ever, really.  This is what the operating system calls when there is a new image.  Here is--in order--what we do next:
-
-   -Do Chromatic Distortion filtering on the Y,Cr,Cb values
-   -this is done by the setYUV() method and in CorrectedImage.cc
-   -Vision Processing->thresholding and object recognition.
-   -this is done in ChownRLE.cc (thresholding) and in ObjectFragments (rle and recognition)
-   -Behavior processing
-   -processFrame() in PyEmbed.cc, and then in the PyCode brain
-   -Handle image arrays if AiboConnect is requesting them
-   -Calculate Frames Per Second.
-
-*/
+ *
+ * This is the most important loop, ever, really.  This is what the operating
+ * system calls when there is a new image.  Here is--in order--what we do next:
+ *
+ * -Do Chromatic Distortion filtering on the Y,Cr,Cb values
+ * -this is done by the setYUV() method and in CorrectedImage.cc
+ * -Vision Processing->thresholding and object recognition.
+ * -this is done in ChownRLE.cc (thresholding) and in ObjectFragments (rle and
+ *  recognition)
+ * -Behavior processing
+ * -processFrame() in PyEmbed.cc, and then in the PyCode brain
+ * -Handle image arrays if AiboConnect is requesting them
+ * -Calculate Frames Per Second.
+ *
+ */
 void Vision::notifyImage() {
 
     // NORMAL VISION LOOP
@@ -489,11 +491,9 @@ void Vision::drawHorizontalLine(int y, int c) {
     if (y >= 0 && y < IMAGE_HEIGHT) {
         for (int i = 0; i < IMAGE_WIDTH; i++) {
             thresh->thresholded[y][i] = c;
-#if ROBOT(NAO)
             if (y + 1 < IMAGE_HEIGHT - 1) {
                 thresh->thresholded[y+1][i] = c;
             }
-#endif
         }
     }
 }
