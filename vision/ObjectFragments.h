@@ -147,11 +147,12 @@ static const bool OPENFIELD = false;
 
 class ObjectFragments {
 public:
-    ObjectFragments(Vision* vis, Threshold* thr);
+    ObjectFragments(Vision* vis, Threshold* thr, int _color);
     virtual ~ObjectFragments() {}
 
     // SETTERS
     void setColor(int c);
+    void allocateColorRuns();
 
     // Making object
     void init(float s);

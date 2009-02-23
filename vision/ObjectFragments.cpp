@@ -40,11 +40,12 @@
 
 using namespace std;
 
-ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr)
-    : vision(vis), thresh(thr)
+ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
+    : vision(vis), thresh(thr), color(_color), runsize(1)
 {
 
     init(0.0);
+    allocateColorRuns();
 #ifdef OFFLINE
     BALLDISTDEBUG = false;
     PRINTOBJS = false;
@@ -129,6 +130,33 @@ void ObjectFragments::setColor(int c)
     runsize = 1;
     int run_num = 3;
     color = c;
+    // depending on the color we have more or fewer runs available
+    switch (color) {
+    case YELLOW:
+    case BLUE:
+        run_num = IMAGE_WIDTH * 15;
+        runsize = IMAGE_WIDTH * 5;
+        break;
+    case RED:
+    case NAVY:
+        run_num = IMAGE_WIDTH * 15;
+        runsize = IMAGE_WIDTH * 5;
+        break;
+    case ORANGE:
+        runsize = BALL_RUNS_MALLOC_SIZE; //max number of runs
+        run_num = runsize * 3;
+        break;
+    }
+    runs = (run*)malloc(sizeof(run) * run_num);
+}
+
+/*
+ * Allocate the required amount of memory dependent on the primary color
+ */
+
+void ObjectFragments::allocateColorRuns()
+{
+    int run_num = 3;
     // depending on the color we have more or fewer runs available
     switch (color) {
     case YELLOW:

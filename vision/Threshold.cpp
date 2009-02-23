@@ -65,12 +65,10 @@ using boost::shared_ptr;
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
-    : inverted(false)
+    : inverted(false), vision(vis), pose(posPtr)
 {
 
     // storing locally
-    vision = vis;
-    pose = posPtr;
 #ifdef OFFLINE
     visualHorizonDebug = false;
 #endif
@@ -86,18 +84,18 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #  error Undefined robot type
 #endif // OFFLINE
     // Set up object recognition object pointers
-    blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
-    blue->setColor(BLUE);
-    yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
-    yellow->setColor(YELLOW);
-    navyblue = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
-    navyblue->setColor(NAVY);
-    red = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
-    red->setColor(RED);
-    orange = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
-    orange->setColor(ORANGE);
-    green = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
-    green->setColor(GREEN);
+    blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+                                                           BLUE));
+    yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+                                                             YELLOW));
+    navyblue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+                                                               NAVY));
+    red = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+                                                          RED));
+    orange = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+                                                             ORANGE));
+    green = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+                                                            GREEN));
 }
 
 #ifdef OFFLINE
