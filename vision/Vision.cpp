@@ -61,9 +61,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     navy2 = new VisualRobot();
 
     thresh = new Threshold(this, pose);
-    fieldLines = new FieldLines(this, pose);
-    // pose handled in default contructor
-
+    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose));
     thresh->setYUV(&global_image[0]);
 }
 

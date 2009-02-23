@@ -143,7 +143,7 @@ static PyTypeObject PyPoseType = {
 
 typedef struct PyFieldLines_t {
     PyObject_HEAD
-    FieldLines *fl;
+    boost::shared_ptr<FieldLines> fl;
 
     PyObject *numLines;
     PyObject *lines;
@@ -171,7 +171,7 @@ typedef struct PyFieldLines_t {
 static PyFieldLines dummy_fieldlines;
 
 // C++ - accessible interface
-extern PyObject *PyFieldLines_new    (FieldLines *fl);
+extern PyObject *PyFieldLines_new    (boost::shared_ptr<FieldLines> fl);
 extern void      PyFieldLines_update (PyFieldLines *fl);
 // backend methods
 extern PyObject *PyFieldLines_new    (PyTypeObject *type, PyObject *args,

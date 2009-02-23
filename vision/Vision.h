@@ -151,7 +151,7 @@ public:
     VisualBall *ball;
     Threshold *thresh;
     boost::shared_ptr<NaoPose> pose;
-    FieldLines *fieldLines;
+    boost::shared_ptr<FieldLines> fieldLines;
 
     fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3

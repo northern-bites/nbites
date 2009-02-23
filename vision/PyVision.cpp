@@ -511,7 +511,7 @@ PyVisualLine_update (PyObject *self, PyObject *args)
 
 // C++ - accessible interface
 extern PyObject *
-PyFieldLines_new (FieldLines *fl)
+PyFieldLines_new (shared_ptr<FieldLines> fl)
 {
     PyFieldLines *self;
 
