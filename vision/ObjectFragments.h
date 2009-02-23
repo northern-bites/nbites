@@ -60,9 +60,12 @@ static const int MAX_POINTS = 100;
 // Comparison of spatial relationships of two blobs
 static const int OUTSIDE = 0;      // one is outside the other
 static const int TIGHT = 1;        // they are basically the same blob
-static const int CLOSELEFT = 2;    // the small one is way on the left side of the big one
-static const int CLOSERIGHT = 3;   // the small one is way on the right side of the big one
-static const int MURKY = 4;        // the small one is sort of in the middle of the big one
+// the small one is way on the left side of the big one
+static const int CLOSELEFT = 2;
+// the small one is way on the right side of the big one
+static const int CLOSERIGHT = 3;
+// the small one is sort of in the middle of the big one
+static const int MURKY = 4;
 
 static const int BIGGAP = 80;
 static const int SIMILARSIZE = 5;
@@ -80,28 +83,42 @@ static const int POST = 1;
 static const int BADVALUE = -100;
 
 static const int MAX_BLOBS = 400;
-static const int NOISE_SKIP = 3;                    // actually just skips 2 pixel noise in runs
-static const int MIN_SPLIT = 40;                    // minimum distance between goal and post - changed from 50 to 40 JS
-static const float PERCENTMATCH = 0.65f;            //  Amount of post that has to match (so backstop isn't counted in posts)
-static const float HALFISH = 0.49f;                 // threshold for expanding sides back out
-static const float GOODRAT = 0.75f;                 // highest ratio of width over height for posts
-static const float SQUATRAT = 1.2f;                 // indicator that post may be salvagable
-static const int MIN_POST_SEPARATION = 12;          // goal posts of the same color have to be this far apart
-static const int BIGPOST = 50;                      // how big a post is to be declared a big post // TODO: change this
+// actually just skips 2 pixel noise in runs
+static const int NOISE_SKIP = 3;
+// minimum distance between goal and post - changed from 50 to 40 JS
+static const int MIN_SPLIT = 40;
+// Amount of post that has to match (so backstop isn't counted in posts)
+static const float PERCENTMATCH = 0.65f;
+// threshold for expanding sides back out
+static const float HALFISH = 0.49f;
+// highest ratio of width over height for posts
+static const float GOODRAT = 0.75f;
+// indicator that post may be salvagable
+static const float SQUATRAT = 1.2f;
+// goal posts of the same color have to be this far apart
+static const int MIN_POST_SEPARATION = 12;
+// how big a post is to be declared a big post
+// TODO: change this
+static const int BIGPOST = 50;
 static const float NORMALPOST = 0.6f;
 static const float QUESTIONABLEPOST = 0.85f;
 
 // Ball constants
 // TODO: look at this switch - SMALLBALLDIM
-static const int SMALLBALLDIM = 8;                 // below this size balls are considered small
+static const int SMALLBALLDIM = 8; // below this size balls are considered small
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
-static const float BALLTOOFAT = 1.5f;               // ratio of width/height worse than this is a very bad sign
-static const float BALLTOOTHIN = 0.75f;             // ditto
-static const float OCCLUDEDTHIN = 0.2f;             // however, if the ball is occluded we can go thinner
-static const float OCCLUDEDFAT = 4.0f;              // or fatter
+// ratio of width/height worse than this is a very bad sign
+static const float BALLTOOFAT = 1.5f;
+// ditto
+static const float BALLTOOTHIN = 0.75f;
+// however, if the ball is occluded we can go thinner
+static const float OCCLUDEDTHIN = 0.2f;
+// or fatter
+static const float OCCLUDEDFAT = 4.0f;
 static const float MIDFAT = 3.0f;
 static const float MIDTHIN = 0.3f;
-static const float MINORANGEPERCENT = 0.59f;        // at least this much of the blob should be orange normally
+// at least this much of the blob should be orange normally
+static const float MINORANGEPERCENT = 0.59f;
 static const float MINGOODBALL = 0.5f;
 static const float MAXGOODBALL = 3.0f;
 static const int BIGAREA = 400;
@@ -357,8 +374,6 @@ private:
     stop scan, scan1, scan2;
     blob blobs[MAX_BLOBS];
     int projx[5], projy[5];
-    //int goodX[4];
-    //int goodY[4];
     int candidateX[4];
     int candidateY[4];
     bool shoot[IMAGE_WIDTH];
