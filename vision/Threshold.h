@@ -142,12 +142,12 @@ public:
     }
 
 
-    ObjectFragments *blue;
-    ObjectFragments *yellow;
-    ObjectFragments *orange;
-    ObjectFragments *green;
-    ObjectFragments *navyblue;
-    ObjectFragments *red;
+    boost::shared_ptr<ObjectFragments> blue;
+    boost::shared_ptr<ObjectFragments> yellow;
+    boost::shared_ptr<ObjectFragments> orange;
+    boost::shared_ptr<ObjectFragments> green;
+    boost::shared_ptr<ObjectFragments> navyblue;
+    boost::shared_ptr<ObjectFragments> red;
 
     // can keep these arrays at hi-res size ...at any resolution
     //int sawYellowBlue[IMAGE_WIDTH];

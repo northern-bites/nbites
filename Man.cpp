@@ -908,8 +908,7 @@ Man::saveFrame(){
     }
 
     fout.close();
-    saved_frames++;
-    cout << "Saved frame #" << saved_frames << endl;
+    cout << "Saved frame #" << saved_frames++ << endl;
 }
 
 PythonPreferences::PythonPreferences ()

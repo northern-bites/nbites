@@ -86,26 +86,18 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #  error Undefined robot type
 #endif // OFFLINE
     // Set up object recognition object pointers
-    blue = new ObjectFragments(vision,this);
+    blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
     blue->setColor(BLUE);
-    yellow = new ObjectFragments(vision,this);
+    yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
     yellow->setColor(YELLOW);
-    navyblue = new ObjectFragments(vision,this);
+    navyblue = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
     navyblue->setColor(NAVY);
-    red = new ObjectFragments(vision,this);
+    red = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
     red->setColor(RED);
-    orange = new ObjectFragments(vision,this);
+    orange = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
     orange->setColor(ORANGE);
-    green = new ObjectFragments(vision,this);
+    green = shared_ptr<ObjectFragments>(new ObjectFragments(vision,this));
     green->setColor(GREEN);
-
-    // initialize the thresholded array to BLACK
-    /*for (int i = 0; i < IMAGE_WIDTH; i++) {
-      for (int j = 0; j < IMAGE_HEIGHT; j++) {
-      thresholded[j][i] = BLACK;
-      }
-      }*/
-
 }
 
 #ifdef OFFLINE
