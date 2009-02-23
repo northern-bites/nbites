@@ -256,8 +256,7 @@ void Threshold::runs() {
     horizonSlope = pose->getHorizonSlope();
 
     // split up the loops
-    // TODO: change row skips to 1
-    for (i = 0; i < IMAGE_WIDTH; i = i + 2) {//scan across
+    for (i = 0; i < IMAGE_WIDTH; i += 1) {//scan across
         // the color of the last pixel before the current one
         lastPixel = GREEN;
         // how big is the current run of like colored pixels?
@@ -292,31 +291,44 @@ void Threshold::runs() {
                 switch (lastPixel) {
                     // possible horizon detection and for postID (not that impt)
                 case NAVY:
-                    if (currentRun > 8 && (previousRun == WHITE || previousRun == NAVY)) {
+                    if (currentRun > 8 && (previousRun == WHITE ||
+                                           previousRun == NAVY)) {
                         //navyblue->newRun(i, j, currentRun);
                         lastGoodPixel = j;
                     }
                     if (currentRun > 3 &&
                         (previousRun == WHITE || previousRun == NAVY ||
-                         (previousRun == GREEN || currentRun > 20))) { //&& previousRunStop - j - currentRun < 10))) {
+                         (previousRun == GREEN || currentRun > 20))) {
+                        //&& previousRunStop - j - currentRun < 10))) {
                         navyTops[i] = j;
                         //drawPoint(i, j, YELLOW);
                     }
-                    if (navyBottoms[i] == -1 && currentRun > 3 && (previousRun == WHITE || previousRun == GREEN || currentRun > 20)) {
+                    if (navyBottoms[i] == -1 && currentRun > 3 &&
+                        (previousRun == WHITE || previousRun == GREEN ||
+                         currentRun > 20)) {
                         navyBottoms[i] = j + currentRun;
                         //drawPoint(i, j + currentRun, ORANGE);
                     }
                     break;
                 case RED:
-                    if (currentRun > 8 && (previousRun == WHITE || previousRun == RED || previousRun == ORANGE ||
-                                           (previousRun == GREEN ) || currentRun > 20)) {//&& previousRunStop - j - currentRun < 10))) {
+                    if (currentRun > 8 && (previousRun == WHITE ||
+                                           previousRun == RED ||
+                                           previousRun == ORANGE ||
+                                           (previousRun == GREEN ) ||
+                                           currentRun > 20)) {
+                        //&& previousRunStop - j - currentRun < 10))) {
                         lastGoodPixel = j;
                     }
-                    if (currentRun > 3 && (previousRun == WHITE || previousRun == RED || previousRun == ORANGE ||
-                                           previousRun == GREEN || currentRun > 20)) {
+                    if (currentRun > 3 && (previousRun == WHITE ||
+                                           previousRun == RED ||
+                                           previousRun == ORANGE ||
+                                           previousRun == GREEN ||
+                                           currentRun > 20)) {
                         redTops[i] = j;
                     }
-                    if (redBottoms[i] == -1 && currentRun > 3 && (previousRun == WHITE || previousRun == GREEN || previousRun == ORANGE)) {
+                    if (redBottoms[i] == -1 && currentRun > 3 &&
+                        (previousRun == WHITE || previousRun == GREEN ||
+                         previousRun == ORANGE)) {
                         redBottoms[i] = j + currentRun;
                     }
                     break;
@@ -381,42 +393,40 @@ void Threshold::runs() {
         //}
     }//end i loop
     int bigh = IMAGE_HEIGHT, firstn = -1, lastn = -1, bot = -1;
-    // TODO: change column skips to 1
-    for (i = 0; i < IMAGE_WIDTH - 1; i+= 2) {
+    for (i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
         if (navyTops[i] != -1) {
             firstn = i;
             lastn = 0;
             bigh = navyTops[i];
             bot = navyBottoms[i];
-            // TODO: change to i and i+1
-            while ((navyTops[i] != -1 || navyTops[i+2] != -1) && i < IMAGE_WIDTH - 3) {
+            while ((navyTops[i] != -1 || navyTops[i+1] != -1) &&
+                   i < IMAGE_WIDTH - 3) {
                 if (navyTops[i] < bigh && navyTops[i] != -1) {
                     bigh = navyTops[i];
                 }
                 if (navyBottoms[i] > bot) {
                     bot = navyBottoms[i];
                 }
-                // TODO: chagne to +1
-                i+=2;
-                lastn+= 2;
+                i+=1;
+                lastn+=1;
             }
-            // TODO: change to +1
-            for (int k = firstn; k < firstn + lastn; k+= 2) {
+            for (int k = firstn; k < firstn + lastn; k+= 1) {
                 navyblue->newRun(k, bigh, bot - bigh);
-                //cout << "Runs " << k << " " << bigh << " " << (bot - bigh) << endl;
+                // cout << "Runs " << k << " " << bigh << " " << (bot - bigh)
+                //      << endl;
             }
             //cout << "Last " << lastn << " " << bigh << " " << bot << endl;
             //drawRect(firstn, bigh, lastn, bot - bigh, RED);
         }
     }
-    // TODO: change +2 to +1
-    for (i = 0; i < IMAGE_WIDTH - 1; i+= 2) {
+    for (i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
         if (redTops[i] != -1) {
             firstn = i;
             lastn = 0;
             bigh = redTops[i];
             bot = redBottoms[i];
-            while ((redTops[i] != -1 || redTops[i+2] != -1) && i < IMAGE_WIDTH - 3) {
+            while ((redTops[i] != -1 || redTops[i+1] != -1) &&
+                   i < IMAGE_WIDTH - 3) {
                 if (redTops[i] < bigh && redTops[i] != -1) {
                     bigh = redTops[i];
                 }
@@ -426,10 +436,10 @@ void Threshold::runs() {
                 i+=2;
                 lastn+= 2;
             }
-            // TODO: change +2 to +1
-            for (int k = firstn; k < firstn + lastn; k+= 2) {
+            for (int k = firstn; k < firstn + lastn; k+= 1) {
                 red->newRun(k, bigh, bot - bigh);
-                //cout << "Runs " << k << " " << bigh << " " << (bot - bigh) << endl;
+                // cout << "Runs " << k << " " << bigh << " " << (bot - bigh)
+                //      << endl;
             }
             //cout << "Last " << lastn << " " << bigh << " " << bot << endl;
             //drawRect(firstn, bigh, lastn, bot - bigh, RED);
@@ -439,11 +449,15 @@ void Threshold::runs() {
 }
 
 
-/* Threshold and runs.  The goal here is to scan the image and collect up "runs" of color.
- * The ones we're particularly interested in are blue, yellow, orange and green (also red and dark blue).
- * Then we send the runs off to the object recognition system.  We scan the image from bottom to top.
- * Along the way we keep track of things like: where we saw blue-yellow and yellow-blue transitions,
- * where the green horizon line is, etc.
+/*
+ * Threshold and runs.  The goal here is to scan the image and collect up "runs"
+ * of color.
+ * The ones we're particularly interested in are blue, yellow, orange and green
+ * (also red and dark blue).
+ * Then we send the runs off to the object recognition system.  We scan the
+ * image from bottom to top. Along the way we keep track of things like: where
+ * we saw blue-yellow and yellow-blue transitions, where the green horizon
+ * line is, etc.
  */
 void Threshold::thresholdAndRuns() {
     PROF_ENTER(vision->profiler, P_THRESHRUNS); // profiling
@@ -468,8 +482,9 @@ void Threshold::thresholdAndRuns() {
 
 
 /*
- * Check the left side of the image, looking to find an edge of the field.  Our goal is to determine the basic
- * shape of the field.  If we find the edge on the left side, then we can use it to find any landmarks - which
+ * Check the left side of the image, looking to find an edge of the field.
+ *  Our goal is to determine the basic shape of the field.  If we find the edge
+ * on the left side, then we can use it to find any landmarks - which
  * ought to be right on the edge.
  */
 
@@ -497,14 +512,16 @@ void Threshold::findGreenHorizon() {
     greenPixels = 0;
     scanY = 0;
     int firstpix = 0;
-    // we're going to do this backwards of how we used to - we start at the pose horizon and scan down
+    // we're going to do this backwards of how we used to - we start at the pose
+    // horizon and scan down
     for (j = pH; j < IMAGE_HEIGHT && horizon == -1; j+=4) {
         greenPixels = 0;
         run = 0;
         scanY = 0;
         //lastBlue = bluepix;
         //lastYellow = yellowpix;
-        for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1 && greenPixels < 3; i+= 10) {
+        for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
+                 && greenPixels < 3; i+= 10) {
             pixel = thresholded[scanY][i];
             if (pixel == GREEN) {
                 greenPixels++;
@@ -523,7 +540,9 @@ void Threshold::findGreenHorizon() {
         greenPixels = 0;
         run = 0;
         scanY = 0;
-        for (l = max(0, firstpix - 5), firstpix = -1; l < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE && greenPixels < 20; l+=3) {
+        for (l = max(0, firstpix - 5), firstpix = -1; l < IMAGE_WIDTH && scanY <
+                 IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
+                 greenPixels < 20; l+=3) {
             //drawPoint(l, scanY, BLACK);
             newPixel = thresholded[scanY][l];
             if (newPixel == GREEN) {
@@ -557,10 +576,12 @@ void Threshold::findGreenHorizon() {
                 scanY = blue->yProject(0, k, j);
             }
             if (run < MIN_GREEN_SIZE && greenPixels < 20) {
-                //cout << "Found horizon " << k << " " << run << " " << greenPixels << endl;
-                //drawPoint(100, k + 1, BLACK);
-                //drawLine(0, k+2, IMAGE_WIDTH - 1, green->yProject(0, k+2, IMAGE_WIDTH - 1), MAROON);
-                //drawLine(minpix, minpixrow, firstpix, k + 2, RED);
+                // cout << "Found horizon " << k << " " << run << " "
+                //      << greenPixels << endl;
+                // drawPoint(100, k + 1, BLACK);
+                // drawLine(0, k+2, IMAGE_WIDTH - 1,
+                //          green->yProject(0, k+2, IMAGE_WIDTH - 1), MAROON);
+                // drawLine(minpix, minpixrow, firstpix, k + 2, RED);
                 horizon = k + 2;
                 return;
             }
@@ -796,8 +817,10 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
 
         // find angle x/y (relative to camera)
-        objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/MAX_BEARING);
-        objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/MAX_ELEVATION);
+        objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/
+                          MAX_BEARING);
+        objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/
+                          MAX_ELEVATION);
 
         // if object is a goal post
         if (objPtr == vision->yglp ||
@@ -813,7 +836,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 
             switch (cert) {
             case HEIGHT_UNSURE:
-                // the height is too small - it can still be used as a ceiling though
+                // the height is too small - it can still be used as a ceiling
                 if (disth < distw)
                     dist = disth;
                 else
@@ -875,8 +898,10 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
 
         // find angle x/y (relative to camera)
-        objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/MAX_BEARING);
-        objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/MAX_ELEVATION);
+        objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/
+                          MAX_BEARING);
+        objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/
+                          MAX_ELEVATION);
 
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
@@ -917,7 +942,8 @@ float Threshold::getGoalPostDistFromHeight(float height) {
 float Threshold::getGoalPostDistFromWidth(float width) {
 #if ROBOT(NAO_SIM)
     //floor distance, seems to be best for the width
-    return 2360.1*pow((double) width,-1.0516); //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
+    //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
+    return 2360.1*pow((double) width,-1.0516);
 #elif ROBOT(NAO_RL)
     return 10083*pow((double) width,-1.052);
 #else
@@ -925,24 +951,8 @@ float Threshold::getGoalPostDistFromWidth(float width) {
 #endif
 }
 
-// /* Looks up beacon height in pixels to focal distance function.
-//  * @param height     the height of the beacon
-//  * @return           the distance to the beacon
-//  */
-// float Threshold::getBeaconDistFromHeight(float height) {
-// #if ROBOT(NAO_SIM)
-//   return 100.0*39.0/height; //there aren't nao beacons, but just in case
-// #elif ROBOT(NAO_RL)
-//   return (239.102*235)/height;
-// #else
-//   return 3028.7*pow(height,-.9324);
-// #endif
-// }
-
-//Beacons in the simmulator are 18pix wide at 1M
-
-
-/* Sets all the object information back to zero.
+/*
+ * Sets all the object information back to zero.
  */
 void Threshold::initObjects(void) {
 
@@ -965,7 +975,8 @@ void Threshold::initObjects(void) {
     vision->ball->init();
 } // initObjects
 
-/* Initializes all the color data structures.
+/*
+ * Initializes all the color data structures.
  */
 void Threshold::initColors() {
 
@@ -1071,7 +1082,8 @@ void Threshold::initCompressedTable(std::string filename){
     for(int i=0; i< YMAX; i++) {
         //printf("vtoro");
         for(int j=0; j<UMAX; j++){
-            //fread(bigTable[i][j], sizeof(unsigned char), vMax, fp);  //64 bytes per chunk
+            //64 bytes per chunk
+            //fread(bigTable[i][j], sizeof(unsigned char), vMax, fp);
             for(int k=0; k<VMAX; k++) {
                 bigTable[i][j][k] = *fileTraverse;
                 fileTraverse++;
@@ -1100,8 +1112,8 @@ void Threshold::setYUV(const uchar* newyuv) {
 
     if (!inverted) {
 #if ROBOT(NAO_RL)
-        // I've reversed the U and V planes, in addition to offsetting them, as the
-        // color table format is still reversed
+        // I've reversed the U and V planes, in addition to offsetting them, as
+        // the color table format is still reversed
         uplane = yplane + 3; // normally, is 1, but with reversed tables, is 1
         vplane = yplane + 1; // normally, is 3, but with reversed tables, is 1
 #elif ROBOT(NAO_SIM)
@@ -1326,7 +1338,8 @@ void Threshold::drawVisualHorizon() {
 }
 
 /* drawPoint()
- * Draws a crosshair or a 'point' on the fake image at some given x, y, and with a given color.
+ * Draws a crosshair or a 'point' on the fake image at some given x, y, and with
+ * a given color.
  * @param x       center of the point
  * @param y       center y value
  * @param c       color to draw

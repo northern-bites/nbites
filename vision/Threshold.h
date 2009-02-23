@@ -120,13 +120,15 @@ public:
 
 
 #if ROBOT(NAO_RL)
-    inline uchar getCorrY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
-    inline uchar getCorrU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
-    inline uchar getCorrV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
-
-    inline uchar getY(int x, int y) { return yplane[y*IMAGE_ROW_OFFSET+2*x]; }
-    inline uchar getU(int x, int y) { return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
-    inline uchar getV(int x, int y) { return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)]; }
+    inline uchar getY(int x, int y) {
+        return yplane[y*IMAGE_ROW_OFFSET+2*x];
+    }
+    inline uchar getU(int x, int y) {
+        return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
+    }
+    inline uchar getV(int x, int y) {
+        return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
+    }
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
 #else
@@ -149,17 +151,11 @@ public:
     boost::shared_ptr<ObjectFragments> navyblue;
     boost::shared_ptr<ObjectFragments> red;
 
-    // can keep these arrays at hi-res size ...at any resolution
-    //int sawYellowBlue[IMAGE_WIDTH];
-    //int sawBlueYellow[IMAGE_WIDTH];
-    bool sawYellowBlue, sawBlueYellow;
-    int firstYellowBlue, firstYellowBlueY;
-    int firstBlueYellow, firstBlueYellowY;
-
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
 
-#ifdef OFFLINE//write lines, points, boxes to this array to avoid changing the real image
+#ifdef OFFLINE
+    //write lines, points, boxes to this array to avoid changing the real image
     unsigned char debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
 
