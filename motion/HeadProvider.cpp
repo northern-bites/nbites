@@ -80,17 +80,15 @@ void HeadProvider::setNextHeadCommand() {
 
 	if ( !headCommandQueue.empty() ) {
 		const HeadJointCommand *command = headCommandQueue.front();
-		queue<vector<vector<float> > >*	choppedHeadCommand =
+		ChoppedCommand * choppedHeadCommand =
 			chopper.chopCommand(command);
 		headCommandQueue.pop();
 		delete command;
 
-		while (!choppedHeadCommand->empty()) {
+		while (!choppedHeadCommand->isDone()) {
 			// Push commands onto head queue
-			headQueue.push(choppedHeadCommand->front().at(HEAD_CHAIN));
-			choppedHeadCommand->pop();
+			headQueue.push(choppedHeadCommand->getNextJoints(HEAD_CHAIN));
 		}
-
 		delete choppedHeadCommand;
 	}
 

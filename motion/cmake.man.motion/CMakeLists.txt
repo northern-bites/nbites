@@ -111,6 +111,7 @@ SET( MOTION_SRCS
                      ${MOTION_INCLUDE_DIR}/MotionInterface
 		     ${MOTION_INCLUDE_DIR}/MotionSwitchboard
 		     ${MOTION_INCLUDE_DIR}/ScriptedProvider
+		     ${MOTION_INCLUDE_DIR}/ChoppedCommand
 		     ${MOTION_INCLUDE_DIR}/HeadProvider
                      ${MOTION_INCLUDE_DIR}/ChainQueue
 		     ${MOTION_INCLUDE_DIR}/ChopShop

@@ -151,22 +151,22 @@ void ScriptedProvider::setNextBodyCommand() {
 
 		const BodyJointCommand *command = bodyCommandQueue.front();
 		bodyCommandQueue.pop();
-		queue<vector<vector<float> > >* choppedBodyCommand = chopper.chopCommand(command);
-		delete command;
+		ChoppedCommand * choppedBodyCommand = chopper.chopCommand(command);
 
 		vector<ChainQueue>::iterator i;
-		while (!choppedBodyCommand->empty()) {
+		while (!choppedBodyCommand->isDone()) {
 			// Pass each chain to its chainqueue
 
 			// Skips the HEAD_CHAIN and enqueues all body chains
 			i = chainQueues.begin();
+			int chainID;
 			while ( i != chainQueues.end() ) {
 				// Subtract 1 because there is no head chain in the
 				// choppedBodyCommand (it's only body joints)
-				i->push( choppedBodyCommand->front().at( i->getChainID() ) );
+				chainID = i->getChainID();
+				i->push( choppedBodyCommand->getNextJoints(chainID) );
 				i++;
 			}
-			choppedBodyCommand->pop();
 		}
 		delete choppedBodyCommand;
 	}
