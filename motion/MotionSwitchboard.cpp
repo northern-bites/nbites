@@ -189,6 +189,9 @@ int MotionSwitchboard::processProviders(){
 #endif
         curProvider->requestStop();
     }
+#ifdef DEBUG_SWITCHBOARD
+    static bool switchedHeadToInactive = true;
+#endif
     if (headProvider.isActive()) {
 		// Calculate the next joints and get them
 		headProvider.calculateNextJoints();
@@ -198,7 +201,17 @@ int MotionSwitchboard::processProviders(){
         for(unsigned int i = 0; i < HEAD_JOINTS;i++){
             nextJoints[HEAD_YAW + i] = headJoints.at(i);
         }
-	}
+#ifdef DEBUG_SWITCHBOARD
+        switchedHeadToInactive = false;
+#endif
+
+    }else{
+#ifdef DEBUG_SWITCHBOARD
+        if (!switchedHeadToInactive)
+            cout << headProvider << " is inactive" <<endl;
+        switchedHeadToInactive = true;
+#endif
+    }
 
 #ifdef DEBUG_SWITCHBOARD
     static bool switchedToInactive;

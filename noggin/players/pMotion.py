@@ -13,6 +13,6 @@ class SoccerPlayer(FSA.FSA):
         self.addStates(GameControllerStates)
         self.addStates(MotionStates)
         self.currentState = 'nothing'
-        self.setName('Player pNone')
+        self.setName('pMotion')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)

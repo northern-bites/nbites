@@ -136,7 +136,7 @@ void HeadProvider::setActive(){
 
 
 bool HeadProvider::isDone(){
-    return  headQueue.empty()  && headCommandQueue.empty();
+    return  headQueue.empty()  && headCommandQueue.empty() && curMode !=SET;
 }
 
 void HeadProvider::transitionTo(HeadMode newMode){
