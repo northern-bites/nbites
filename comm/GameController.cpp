@@ -1,6 +1,6 @@
 
 
-#include <fstream>
+#include <iostream>
 #include <string.h>
 #include <math.h>
 
@@ -544,10 +544,10 @@ PyGameController_players (PyGameController* self, PyObject* args)
   }
 
   int i = PyInt_AsLong(args);
-  if (i < 1 || i > NUM_PLAYERS_PER_TEAM) {
+  if (i < 1 || i > DEF_NUM_PLAYERS) {
     PyErr_Format(PyExc_ValueError,
         "expected in integer from %i to %i (%i given)",
-        1, NUM_PLAYERS_PER_TEAM, i);
+        1, DEF_NUM_PLAYERS, i);
     return NULL;
   }
 

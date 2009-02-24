@@ -6,7 +6,6 @@
 #include <pthread.h>
 #include "GameControllerConfig.h"
 #include "RoboCupGameControlData.h"
-#include "Sensors.h"
 
 class GameController;
 
