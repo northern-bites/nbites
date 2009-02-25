@@ -66,11 +66,10 @@ extern "C" {
 #endif
 
     //Instantiate the vision stuff
-    static shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
-    static shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
-    static shared_ptr<Profiler> profiler = shared_ptr<Profiler>(
-        new Profiler(micro_time));
-    static Vision vision = Vision(pose, profiler);
+    static shared_ptr<Sensors> sensors(new Sensors());
+    static shared_ptr<NaoPose> pose(new NaoPose(sensors));
+    static shared_ptr<Profiler> profiler(new Profiler(micro_time));
+    static Vision vision(pose, profiler);
 
     JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
@@ -119,15 +118,15 @@ extern "C" {
         byte * img = (byte *)buf_img; //convert it to a reg. byte array
         //PROCESS VISION!!
         vision.notifyImage(img);
-	vision.drawBoxes();
+        vision.drawBoxes();
         env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
         //Debug output:
-        
+        /*
         cout <<"Ball Width: "<<  vision.ball->getWidth() <<endl;
         cout<<"Pose Left Hor Y" << pose->getLeftHorizonY() <<endl;
         cout<<"Pose Right Hor Y" << pose->getRightHorizonY() <<endl;
-        
+        */
         //copy results from vision thresholded to the array passed in from java
         //we access to each row in the java array, and copy in from cpp thresholded
         //we may in the future want to experiment with malloc, for increased speed
