@@ -134,7 +134,7 @@ endif
 
 TRUST_STORE := trustStore
 JAVA_OPTS := -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
-ifeq ($(PLATFORM),"CYGWIN_NT-5.1")
+ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
 JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar;."
 else
 JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar:."
