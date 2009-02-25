@@ -190,7 +190,7 @@ forwardKinematics(const ChainID id,
         cosAP = cos(AP);
         sinAR = sin(AR);
         cosAR = cos(AR);
-        root2 = sqrt(2);
+        root2 = sqrt(2.0f);
         sinAPplusKP = sin(AP + KP);
         cosAPplusKP = cos(AP + KP);
 
@@ -221,7 +221,7 @@ forwardKinematics(const ChainID id,
         cosAP = cos(AP);
         sinAR = sin(AR);
         cosAR = cos(AR);
-        root2 = sqrt(2);
+        root2 = sqrt(2.0f);
         sinAPplusKP = sin(AP + KP);
         cosAPplusKP = cos(AP + KP);
 
@@ -246,7 +246,7 @@ forwardKinematics(const ChainID id,
         cosHR = cos(HR);
         sinKP = sin(KP);
         cosKP = cos(KP);
-        root2 = sqrt(2);
+        root2 = sqrt(2.0f);
 
         x = ((THIGH_LENGTH + TIBIA_LENGTH*cosKP)*sinHR*sinHYP)/root2 - .5*cosHR*(THIGH_LENGTH + TIBIA_LENGTH*cosKP)*(2*cosHYP*sinHP + root2*cosHP*sinHYP) - TIBIA_LENGTH*cosHP*cosHYP*sinKP + (TIBIA_LENGTH*sinHP*sinHYP*sinKP)/root2;
 
@@ -270,7 +270,7 @@ forwardKinematics(const ChainID id,
         cosHR = cos(HR);
         sinKP = sin(KP);
         cosKP = cos(KP);
-        root2 = sqrt(2);
+        root2 = sqrt(2.0f);
 
         x = -(((THIGH_LENGTH + TIBIA_LENGTH*cosKP)*sinHR*sinHYP)/root2) - .5*cosHR*(THIGH_LENGTH + TIBIA_LENGTH*cosKP)*(2*cosHYP*sinHP + root2*cosHP*sinHYP) - TIBIA_LENGTH*cosHP*cosHYP*sinKP + (TIBIA_LENGTH*sinHP*sinHYP*sinKP)/root2;
 

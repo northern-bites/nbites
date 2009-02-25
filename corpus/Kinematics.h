@@ -26,8 +26,8 @@ using namespace boost::numeric;
 
 namespace Kinematics {
 
-//Conversion constants
-	static const float M_PI_FLOAT = (float)M_PI;
+    //Conversion constants
+	static const float M_PI_FLOAT = static_cast<float>(M_PI);
     static const float TO_DEG = 180.0f/M_PI_FLOAT;
 #ifndef TO_RAD //also defined in almotionproxy.h
     static const float TO_RAD = M_PI_FLOAT/180.0f;
@@ -174,12 +174,15 @@ namespace Kinematics {
         float angles[6];
     };
 
+    /**
+     * (Deprecated)
     enum Motion_IntFlag {
         UNINT_INTR_CMD, // Un-interruptable interrupter command
         INT_INTR_CMD,   // Interruptable interupter command
         UNINT_CMD,      // Un-interruptable command
         INT_CMD         // Interruptable command
     };
+    **/
 
 
     enum SupportLeg{
@@ -348,10 +351,15 @@ namespace Kinematics {
                       -FOOT_HEIGHT) };
 
     static const ublas::matrix <float> RIGHT_LEG_END_TRANSFORMS[3] =
-        LEFT_LEG_END_TRANSFORMS;
+        { rotation4D(Z_AXIS, M_PI_FLOAT),
+        rotation4D(Y_AXIS, -M_PI_FLOAT/2),
+        translation4D(0.0f,
+                      0.0f,
+                      -FOOT_HEIGHT) };
 
     static const ublas::matrix <float> RIGHT_ARM_END_TRANSFORMS[2] =
-        LEFT_ARM_END_TRANSFORMS;
+        { rotation4D(Z_AXIS, -M_PI_FLOAT/2),
+        translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
 
 
     static const ublas::matrix <float> * END_TRANSFORMS[NUM_CHAINS] =
