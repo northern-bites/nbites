@@ -1,21 +1,51 @@
+import math
 
+import man.motion as motion
+import man.motion.SweetMoves as SweetMoves
+import man.motion.MotionConstants as MotionConstants
+
+def gameInitial(player):
+    return player.goLater('trackBall')
 
 def nothing(player):
     """
     Do nothing
     """
-    if player.firstFrame():
-        player.brain.motion.setDefaultPosition()
-        
 
-    if player.counter > 10:
-        return player.goLater('rotFindBall')
+#    if player.counter > 10:
+#        return player.goLater('test')
 
     
     return player.stay()
 
+def test(player):
+    if player.firstFrame():
+        print "Would be sending a head command"
+        hc = motion.HeadJointCommand(5.0,(0.,0.),1)
+        player.brain.motion.enqueue(hc)
+    if player.counter == 2:
+        return player.goLater("stopHead")
+    return player.stay()
+
+def stopHead(player):
+    if player.firstFrame():
+        player.brain.motion.stopHeadMoves()
+
+    return player.goLater('nothing')
+
+def trackBall(player):
+    if player.brain.ball.on:
+        player.brain.tracker.trackBall()
+    else:
+        player.brain.tracker.switchTo('scan')
+    return player.stay()
+
 def printing(player):
-    player.printf(str(player.brain.ball.bearing))
+    TO_DEG = 180./math.pi
+    #player.printf("bearing:   "+str(player.brain.ball.bearing*TO_DEG))
+    #player.printf("elevation: "+str(player.brain.ball.elevation*TO_DEG))
+    player.printf("angleX:   "+str(player.brain.ball.angleX))
+    player.printf("angleY: "+str(player.brain.ball.angleY))
 
     return player.stay()
 

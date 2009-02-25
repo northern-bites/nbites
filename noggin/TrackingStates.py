@@ -1,10 +1,10 @@
 
 import math
 
-from man import motion as motionCore
+from man import motion 
 from man.motion import MotionConstants
 
-DEBUG = True
+DEBUG = False
 
 
 def nothing(tracker):
@@ -21,11 +21,11 @@ def tracking(tracker):
 
     If a sweet move is begun while we are tracking, the current setup is to let
     the sweet move conclude and then resume tracking afterward.'''
-    motion = tracker.brain.motion
+    tracker.brain.motion
 
     if tracker.firstFrame():
         #supersede anything in the motion queue:
-        motion.stopHeadMoves()
+        tracker.brain.motion.stopHeadMoves()
         print "stopping head moves, first frame"
 
     (changeX,changeY) = (0.,0.)
@@ -54,7 +54,7 @@ def tracking(tracker):
             return min(orig,maxVal)
         else:
             return max(orig,minVal)
-        
+
     def getGain(angleToCover):
         ''' choose our gain by default on how far we need to go'''
         #should this be based on distance?
@@ -78,9 +78,10 @@ def tracking(tracker):
             (curYaw,curPitch,xGain,yGain,changeX,changeY)
 
     maxChange = 13.0
-    
-    safeChangeX = xGain*changeX #clip(xGain*changeX,-maxChange,maxChange )
-    safeChangeY = yGain*changeY #clip(yGain*changeY,-maxChange,maxChange )
+
+    #Warning- no gain is applied currently!
+    safeChangeX = clip(changeX,-maxChange,maxChange )
+    safeChangeY = clip(changeY,-maxChange,maxChange )
 
     newYaw = curYaw + safeChangeX
     newPitch = curPitch - safeChangeY
@@ -93,10 +94,10 @@ def tracking(tracker):
     if DEBUG:
         print "target: x %g, y%g" % (newYaw,newPitch)
 
-    motion.stopHeadMoves()
-    headMove = motionCore.HeadJointCommand(.15,[newYaw,newPitch],0)
-    
-    motion.enqueue(headMove)
+    #motion.stopHeadMoves()
+    #headMove = motion.HeadJointCommand(.15,(newYaw,newPitch),1)
+    headMove = motion.SetHeadCommand(newYaw,newPitch)
+    tracker.brain.motion.setHead(headMove)
 
     return tracker.stay()
 
@@ -111,12 +112,17 @@ def activeTracking(tracker):
     return tracker.goNow('tracking')
 
 def scan(tracker):
-    scan1 = motionCore.HeadJointCommand(3., [ 65.0, 30.0], 0)
-    scan2 =  motionCore.HeadJointCommand(2., [65.,10.], 0)
-    scan3 = motionCore.HeadJointCommand(5.0, [-65.,10.],0)
-    scan4 = motionCore.HeadJointCommand(2., [-65.0, 30.0], 0)
-    scan5 = motionCore.HeadJointCommand(3., [ 0.0, 30.0], 0)
+    if tracker.firstFrame():
+        scan1 = motion.HeadJointCommand(3., ( 65.0, 20.0), 1)
+        scan2 =  motion.HeadJointCommand(2., (65.,-10.), 1)
+        scan3 = motion.HeadJointCommand(5.0, (-65.,-10.),1)
+        scan4 = motion.HeadJointCommand(2., (-65.0, 20.0), 1)
+        scan5 = motion.HeadJointCommand(3., ( 0.0, 20.0), 1)
 
-    headScan = motionCore.HeadScanCommand([scan5, scan1, scan2, scan3,scan4], True)
-    tracker.brain.motion.enqueue(headScan)
+        tracker.brain.motion.enqueue(scan1)
+        tracker.brain.motion.enqueue(scan2)
+        tracker.brain.motion.enqueue(scan3)
+        tracker.brain.motion.enqueue(scan4)
+        tracker.brain.motion.enqueue(scan5)
+
     return tracker.stay()
