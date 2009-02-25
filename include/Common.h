@@ -55,18 +55,23 @@ inline static int ROUND(float x) {
   else return (int)x;
 }
 
+#ifndef _WIN32
 #include <time.h>
 #include <sys/time.h>
-
+#endif
 static const long long MICROS_PER_SECOND = 1000000;
 static long long
 micro_time (void)
 {
+#ifndef _WIN32
     // Needed for microseconds which we convert to milliseconds
     struct timeval tv;
     gettimeofday(&tv, NULL);
 
     return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
+#else
+    return 0;
+#endif
 }
 
 #endif // Common_h_DEFINED
