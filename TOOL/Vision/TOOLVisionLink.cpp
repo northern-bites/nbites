@@ -82,6 +82,9 @@ extern "C" {
         //If one of the dimensions is wrong, we exit
         if(env->GetArrayLength(jimg) != IMAGE_BYTE_SIZE) {
             cout << "Error: the image had the wrong byte size" << endl;
+            cout << "Image byte size should be " << IMAGE_BYTE_SIZE << endl;
+            cout << "Detected byte size of " << env->GetArrayLength(jimg)
+                 << endl;
             return;
         }
         if (env->GetArrayLength(jjoints) != 22) {

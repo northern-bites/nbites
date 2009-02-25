@@ -79,7 +79,10 @@ public class ProcessedImage extends ThresholdedImage {
 
             // This variable is declared in the superclass and used by its
             // getters.
-            thresholded = visionLink.processImage(rawImage,joints,rawTable);
+            thresholded = visionLink.processImage(rawImage,
+                                                  image.getWidth(),
+                                                  image.getHeight(),
+                                                  joints,rawTable);
         }
     }
 

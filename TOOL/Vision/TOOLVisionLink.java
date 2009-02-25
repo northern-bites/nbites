@@ -46,36 +46,21 @@ import java.io.FileNotFoundException;
 import java.lang.UnsatisfiedLinkError;
 
 public class TOOLVisionLink {
-    //These are defined here for ease, but need to get read from somewhere else
-    public static final  int DFLT_IMAGE_WIDTH = 640;
-    public static final  int DFLT_IMAGE_HEIGHT = 480;
-
-    int width;
-    int height;
-
     static private boolean visionLinkSuccessful;
 
     public TOOLVisionLink() {
-        setImageDimensions(DFLT_IMAGE_WIDTH, DFLT_IMAGE_HEIGHT);
     }
 
-    /**
-     * Method sets the size of image, etc that we are sending to cpp
-     * Important: The cpp lower level will rejects images with the wrong
-     * dimensions
-     */
-    public void setImageDimensions(int w, int h)
-    {
-        width = w; height = h;
-    }
     public boolean isLinkActive()
     {
         return visionLinkSuccessful;
     }
-    public byte[][] processImage(byte[] img_data, float[] joint_data,
+    public byte[][] processImage(byte[] img_data, int imageWidth,
+                                 int imageHeight,
+                                 float[] joint_data,
                                  byte[] ct_data)
     {
-        byte[][] threshResult = new byte[height][width];
+        byte[][] threshResult = new byte[imageHeight][imageWidth];
         if( visionLinkSuccessful){
             try{
                 cppProcessImage(img_data,joint_data,ct_data,

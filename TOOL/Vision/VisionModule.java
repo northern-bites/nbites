@@ -133,13 +133,13 @@ public class VisionModule extends TOOLModule implements ColorTableListener {
 
         //If we've made it this far, everything is A OK, so process the image,
         // yields a thresh image
-        byte[][] thresh = visionLink.processImage(rawImage,joints,
-                                                  rawTable);
+        // byte[][] thresh = visionLink.processImage(rawImage,joints,
+        //                                           rawTable);
         //Init a new Thresholded image to display
-        ThresholdedImage tImg = new ThresholdedImage(thresh,
-                                                     img.getWidth(),
-                                                     img.getHeight());
-        imgPanel.updateImage(tImg);
+        // ThresholdedImage tImg = new ThresholdedImage(thresh,
+        //                                              img.getWidth(),
+        //                                              img.getHeight());
+        // imgPanel.updateImage(tImg);
 
     }
 
