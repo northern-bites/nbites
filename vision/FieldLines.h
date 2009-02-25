@@ -241,6 +241,7 @@ private:
     static const int CORNER_TEST_RADIUS = 1;
 
     static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 10;
+    static const int LINE_HEIGHT = 0; // this refers to height off the ground
 
     // AIBOSPECIFIC
     static const int MIN_CROSS_EXTEND = 10;

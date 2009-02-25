@@ -182,14 +182,13 @@ namespace Kinematics {
         UNINT_CMD,      // Un-interruptable command
         INT_CMD         // Interruptable command
     };
-    **/
-
 
     enum SupportLeg{
         BOTH_LEGS = 0,
         RIGHT_LEG,
         LEFT_LEG
     };
+    **/
 
     static const unsigned int HEAD_JOINTS = 2;
     static const unsigned int ARM_JOINTS = 4;
@@ -225,8 +224,9 @@ namespace Kinematics {
     static const float FOOT_HEIGHT = 46.0f;
 
     // Camera
-    static const float CAMERA_OFF_X = 59.25f; // in millimeters
-    static const float CAMERA_OFF_Z = 68.0f;  // in millimeters
+    static const float CAMERA_OFF_X = 48.80f; // in millimeters
+    static const float CAMERA_OFF_Z = 23.81f;  // in millimeters
+    static const float CAMERA_PITCH_ANGLE = 40.0f * TO_RAD; // 40 degrees
 
     /**********       Joint Bounds       ***********/
     static const float HEAD_BOUNDS[2][2] = {{-2.09f,2.09f},{-.785f,.785f}};
@@ -334,10 +334,12 @@ namespace Kinematics {
       &RIGHT_ARM_BASE_TRANSFORMS[0] };
 
     //Base transforms to get from body center to beg. of chain
-    static const ublas::matrix <float> HEAD_END_TRANSFORMS[3]
+    static const ublas::matrix <float> HEAD_END_TRANSFORMS[4]
     = { rotation4D(X_AXIS, M_PI_FLOAT/2),
         rotation4D(Y_AXIS,M_PI_FLOAT/2),
-        translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z) };
+        translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z),
+        rotation4D(Y_AXIS, CAMERA_PITCH_ANGLE) };
+
 
     static const ublas::matrix <float> LEFT_ARM_END_TRANSFORMS[2]
     = { rotation4D(Z_AXIS, -M_PI_FLOAT/2),
@@ -369,7 +371,7 @@ namespace Kinematics {
       &RIGHT_LEG_END_TRANSFORMS[0],
       &RIGHT_ARM_END_TRANSFORMS[0] };
     static const int NUM_BASE_TRANSFORMS[NUM_CHAINS] = {1,1,1,1,1};
-    static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {3,2,3,3,2};
+    static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {4,2,3,3,2};
     static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};
 
 
