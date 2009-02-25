@@ -63,6 +63,14 @@ public:
     Vision(boost::shared_ptr<NaoPose> _pose, boost::shared_ptr<Profiler> _prof);
     virtual ~Vision();
 
+private:
+    // DO NOT ever copy or assign vision objects. Copying causes problems
+    // because the pointers passed to threshold and fieldlines can become
+    // invalid.
+    Vision(const Vision& other);
+    Vision& operator=(const Vision& other);
+
+public:
     // Main Vision methods
     //   virtual, to allow overloading
     // copy the data from the given image into the static image pointer
