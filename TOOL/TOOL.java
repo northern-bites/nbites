@@ -163,7 +163,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         calibrate = calibrator.getCalibrate();
         addModule(calibrator);
         // classifier
-        addModule(new ClassifierModule(this));
+        //addModule(new ClassifierModule(this));
         // color edit
         ColorEditModule colorEditModule = new ColorEditModule(this);
         colorEdit = (ColorEdit) colorEditModule.getDisplayComponent();
@@ -173,12 +173,12 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         NetworkModule net_mod = new NetworkModule(this);
         addModule(net_mod);
         // playbook - edit plays on a field model
-        addModule(new PlayBookEditorModule(this));
+        //addModule(new PlayBookEditorModule(this));
         // robotview - view up-to-date information live from the robot
         //    depends on NetworkModule
         addModule(new RobotViewModule(this, net_mod));
         // sql - load datasets from the MySQL HiveMind database
-        addModule(new SQLModule(this));
+        //addModule(new SQLModule(this));
         // wordcontroller - view and control robot udp broadcasts in realtime
         addModule(new WorldControllerModule(this));
         // 3d rasterizer for fun and for viewing colortable/image distributions
