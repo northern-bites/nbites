@@ -50,6 +50,8 @@ public:
 	void sendMotionCommand(const GaitCommand* command);
 	void sendMotionCommand(const SetHeadCommand* command);
 
+    void stopHeadMoves(){headProvider.requestStop();}
+
 private:
     int processProviders();
     void swapBodyProvider();

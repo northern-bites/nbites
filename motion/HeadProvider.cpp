@@ -46,6 +46,17 @@ HeadProvider::~HeadProvider() {
 
 void HeadProvider::requestStopFirstInstance() {
     // Finish motion or stop immediately?
+    //For the head, we will stop immediately:
+    pthread_mutex_lock(&scripted_mode_mutex);
+    pthread_mutex_lock(&set_mode_mutex);
+
+    stopScripted();
+    stopSet();
+    setActive();
+
+    pthread_mutex_unlock(&set_mode_mutex);
+    pthread_mutex_unlock(&scripted_mode_mutex);
+
 }
 
 //Method called during the 'SCRIPTED' mode
@@ -187,19 +198,28 @@ bool HeadProvider::isDone(){
         return true;
     }
 }
+void HeadProvider::stopScripted(){
+    //clear anything in the queues
+    headQueue.clear();
+    while(!headCommandQueue.empty()){
+        const HeadJointCommand * cmd = headCommandQueue.front();
+        delete cmd;
+        headCommandQueue.pop();
+    }
+}
+
+void HeadProvider::stopSet(){
+    //set the target to our current location.
+    yawDest = lastYawDest;
+    pitchDest = lastPitchDest;
+}
 
 void HeadProvider::transitionTo(HeadMode newMode){
 //Method to handle special cases when the state changes
     if(newMode != curMode){
         switch(newMode){
         case SCRIPTED:
-            //clear anything in the queues
-            headQueue.clear();
-            while(!headCommandQueue.empty()){
-                const HeadJointCommand * cmd = headCommandQueue.front();
-                delete cmd;
-                headCommandQueue.pop();
-            }
+            stopScripted();
             break;
         case SET:
             //If we need to switch modes, then we may not know what the latest

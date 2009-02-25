@@ -54,6 +54,9 @@ private:
     void transitionTo(HeadMode newMode);
     void setMode();
     void scriptedMode();
+    void stopScripted();
+    void stopSet();
+
     HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;
 

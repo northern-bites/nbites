@@ -21,6 +21,7 @@ void MotionInterface::stopBodyMoves() {
 }
 
 void MotionInterface::stopHeadMoves() {
+    switchboard->stopHeadMoves();
 }
 
 float MotionInterface::getHeadSpeed() {
