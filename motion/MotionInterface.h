@@ -30,7 +30,9 @@ class MotionInterface
     void setNextWalkCommand(const WalkCommand *command);
     void enqueue(const BodyJointCommand *command);
     void enqueue(const HeadJointCommand *command);
-    inline bool isWalkActive() { return true; }
+    inline bool isWalkActive() {return switchboard->isWalkActive();}
+    inline bool isHeadActive(){return switchboard->isHeadActive();}
+    inline bool isBodyActive(){return switchboard->isBodyActive();}
     void setGait(const GaitCommand *command);
     void setHead(const SetHeadCommand * command);
 

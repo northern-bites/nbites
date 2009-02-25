@@ -49,8 +49,13 @@ public:
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const GaitCommand* command);
 	void sendMotionCommand(const SetHeadCommand* command);
-
+public:
     void stopHeadMoves(){headProvider.requestStop();}
+
+    bool isWalkActive(){return walkProvider.isActive();}
+    bool isHeadActive(){return headProvider.isActive();}
+    bool isBodyActive(){return curProvider->isActive();}
+
 
 private:
     int processProviders();
@@ -103,6 +108,7 @@ private:
     FILE* joints_log;
     FILE* effector_log;
 #endif
+
 };
 
 #endif

@@ -154,6 +154,10 @@ public:
         return motionInterface->isWalkActive();
     }
 
+    bool isHeadActive(){
+        return motionInterface->isHeadActive();
+    }
+
     void stopBodyMoves() {
         motionInterface->stopBodyMoves();
     }
@@ -214,6 +218,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead",&PyMotionInterface::setHead)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
+        .def("isHeadActive", &PyMotionInterface::isHeadActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
         ;
