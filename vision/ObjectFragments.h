@@ -41,10 +41,9 @@ class ObjectFragments; // forward reference
 
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
-// TODO: Change from highres constants to low-res/ probably too large right now
 
-#define MIN_GOAL_HEIGHT		50
-#define MIN_GOAL_WIDTH		10
+#define MIN_GOAL_HEIGHT	25
+#define MIN_GOAL_WIDTH  5
 
 // ID information on goal post constant
 static const int NOPOST = 0;   // don't know which
@@ -76,7 +75,7 @@ static const int MEDIUM = 1;
 static const int SMALL = 0;
 
 // Am I looking at a post or a beacon?
-static const int BEACON = 0;
+//static const int BEACON = 0;
 static const int POST = 1;
 
 // Universal bad value used to id whether or not we successfully did something
@@ -98,14 +97,14 @@ static const float SQUATRAT = 1.2f;
 // goal posts of the same color have to be this far apart
 static const int MIN_POST_SEPARATION = 12;
 // how big a post is to be declared a big post
-// TODO: change this
-static const int BIGPOST = 50;
+// EXAMINED: change this
+static const int BIGPOST = 25;
 static const float NORMALPOST = 0.6f;
 static const float QUESTIONABLEPOST = 0.85f;
 
 // Ball constants
-// TODO: look at this switch - SMALLBALLDIM
-static const int SMALLBALLDIM = 8; // below this size balls are considered small
+// EXAMINED: look at this switch - SMALLBALLDIM
+static const int SMALLBALLDIM = 4; // below this size balls are considered small
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
 // ratio of width/height worse than this is a very bad sign
 static const float BALLTOOFAT = 1.5f;

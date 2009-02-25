@@ -521,6 +521,9 @@ void ObjectFragments::expandRobotBlob()
         goods = 0;
         for (x = topBlob.leftBottom.x; x < topBlob.rightTop.x && whites < width;
              x++) {
+            if(topBlob.leftBottom.x < 0) {
+                cout << "Top blob left bottom is negative" << endl;
+            }
             pix = thresh->thresholded[y][x];
             if (pix == color) {
                 whites++;
@@ -609,13 +612,14 @@ void ObjectFragments::mergeBigBlobs()
 
 bool ObjectFragments::closeEnough(blob a, blob b)
 {
+    // EXAMINED: change constant to lower res stuff
+    const int closeDistMax = 40;
     int xd = distance(a.leftTop.x,a.rightTop.x,
                       b.leftTop.x,b.rightTop.x);
     int yd = distance(a.leftTop.y,a.leftBottom.y,
                       b.leftTop.y,b.rightBottom.y);
-// TODO: change constant to lower res stuff
-    if (xd < 40) {
-        if (yd < 40)
+    if (xd < closeDistMax) {
+        if (yd < closeDistMax)
             return true;
     }
     // if (xd < max(blobWidth(a), blobWidth(b)) &&
@@ -625,10 +629,12 @@ bool ObjectFragments::closeEnough(blob a, blob b)
 
 bool ObjectFragments::bigEnough(blob a, blob b)
 {
-// TODO: change constant to lower res stuff
-    if (blobArea(a) > 200 && blobArea(b) > 200)
+    // EXAMINED: change constant to lower res stuff // at half right now
+    const int minBlobArea = 100;
+    const int horizonOffset = 50;
+    if (blobArea(a) > minBlobArea && blobArea(b) > minBlobArea)
         return true;
-    if (a.leftBottom.y > horizonAt(a.leftBottom.x) + 100)
+    if (a.leftBottom.y > horizonAt(a.leftBottom.x) + horizonOffset)
         return true;
     return false;
 }
@@ -1096,9 +1102,8 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
     int run = 0;
     int badLines = 0;
     int maxgreen = 3;
-#if ROBOT(NAO) // TODO: change to lower res
-    maxgreen = 200;
-#endif
+// EXAMINED: change to lower res
+    maxgreen = 100;
     if (up)
         dir = -1;
     int minRun = min(spanX, max(5, spanX / 5));
@@ -1498,14 +1503,10 @@ void ObjectFragments::createObject(int c) {
         blue(c);
         break;
     case RED:
-#if ROBOT(NAO)
         robot(c);
-#endif
         break;
     case NAVY:
-#if ROBOT(NAO)
         robot(c);
-#endif
         break;
     case YELLOW:
         // either we should see a marker or a goal
@@ -1760,6 +1761,9 @@ int ObjectFragments::crossCheck2(blob b) {
     int y = b.leftTop.y;
     int h = b.leftBottom.y - b.leftTop.y;
     //int w = b.rightTop.x - b.leftTop.x;
+    // EXAMINED: look at constants 50 and 10
+    const int numLiesMin = 25;
+    const int numLiesFactorMin = 5;
     int lefties = 0, righties = 0;
     for (int i = x - 10; i > max(0, x - h); i-=1) {
         int yp = yProject(x, y, i);
@@ -1778,10 +1782,9 @@ int ObjectFragments::crossCheck2(blob b) {
             }
         }
     }
-    // TODO: look at constants 50 and 10
-    if (righties > 50 && righties > 10 * lefties)
+    if (righties > numLiesMin && righties > numLiesFactorMin * lefties)
         return LEFT;
-    if (lefties > 50 && lefties > 10 * righties)
+    if (lefties > numLiesMin && lefties > numLiesFactorMin * righties)
         return RIGHT;
     return NOPOST;
 }
@@ -1995,13 +1998,18 @@ int ObjectFragments::checkCorners(blob post) {
  * @param b   the post in question
  * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
  */
-// TODO: change these constants
+// EXAMINED: change these constants
 int ObjectFragments::characterizeSize(blob b) {
     int w = b.rightTop.x - b.leftTop.x + 1;
     int h = b.leftBottom.y - b.leftTop.y + 1;
-    if (h > 60) return LARGE;
-    if (h < 20 || w < 10) return SMALL;
-    if (h < 40 || w < 20) return MEDIUM;
+    const int largePostHeight = 15;
+    const int smallPostHeight = 10;
+    const int smallPostWidth = 5;
+    const int midPostHeight = 20;
+    const int midPostWidth = 5;
+    if (h > largePostHeight) return LARGE;
+    if (h < smallPostHeight || w < smallPostWidth) return SMALL;
+    if (h < midPostHeight || w < midPostWidth) return MEDIUM;
     return LARGE;
 }
 
