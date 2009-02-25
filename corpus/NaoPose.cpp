@@ -38,8 +38,8 @@ const float NaoPose::FOCAL_LENGTH_MM = (float)((IMAGE_WIDTH_MM/2) / tan(FOV_X/2)
   const float NaoPose::IMAGE_CENTER_X = (IMAGE_WIDTH-1)/2.0f;
   const float NaoPose::IMAGE_CENTER_Y = (IMAGE_HEIGHT-1)/2.0f;
 
-const float NaoPose::PIX_TO_RAD_X = DEG2RAD((float)FOV_X_DEG/IMAGE_WIDTH);
-const float NaoPose::PIX_TO_RAD_Y = DEG2RAD((float)FOV_Y_DEG/IMAGE_HEIGHT);
+const float NaoPose::PIX_TO_RAD_X = static_cast<float>(FOV_X_DEG/IMAGE_WIDTH)*TO_RAD;
+const float NaoPose::PIX_TO_RAD_Y = static_cast<float>(FOV_Y_DEG/IMAGE_HEIGHT)*TO_RAD;
 
 const estimate NaoPose::NULL_ESTIMATE = {0.0, 0.0, 0.0, 0.0, 0.0};
 
@@ -355,11 +355,11 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
 
   //all angle signs are according to right hand rule for the major axis
   // get bearing angle in image plane,left pos, right negative
-  double object_bearing = (IMAGE_CENTER_X - (float)x)*PIX_TO_RAD_X;
+  float object_bearing = (IMAGE_CENTER_X - (float)x)*PIX_TO_RAD_X;
   // get elevation angle in image plane, up negative, down is postive
-  double object_elevation = ((float)y - IMAGE_CENTER_Y)*PIX_TO_RAD_Y;
+  float object_elevation = ((float)y - IMAGE_CENTER_Y)*PIX_TO_RAD_Y;
   // convert dist estimate to mm
-  double object_dist = dist*10;
+  float object_dist = dist*10;
 
   // object in the camera frame
   ublas::vector<float> objectInCameraFrame =
