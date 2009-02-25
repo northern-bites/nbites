@@ -30,7 +30,7 @@ public class ProcessedImage extends ThresholdedImage {
         super(image.getWidth(), image.getHeight());
 
         visionLink = new TOOLVisionLink();
-        this.thresholdImage(cTable, image);
+//        this.thresholdImage(cTable, image);
     }
 
     /**
@@ -38,7 +38,7 @@ public class ProcessedImage extends ThresholdedImage {
      * It gets called on instantiation and habitually by other modules of the
      * TOOL.
      */
-    public void thresholdImage(ColorTable table, TOOLImage image) {
+    public void thresholdImage(TOOLImage image, ColorTable table) {
         // Grab a constant reference to the current instance of the TOOL
         final TOOL tool = TOOL.instance;
 	
@@ -82,6 +82,7 @@ public class ProcessedImage extends ThresholdedImage {
 	    
             // This variable is declared in the superclass and used by its
             // getters.
+	    System.out.println("Do you call vision.process 3 times?");
             thresholded = visionLink.processImage(rawImage,joints,rawTable);
         }
     }

@@ -87,7 +87,8 @@ public class VisionState {
     public void update() {
 	if (thresholdedImage != null)  {
 	    //we process the image; the visionLink updates itself with the new data from the bot
-	    thresholdedImage.thresholdImage();
+	    thresholdedImage.thresholdImage(rawImage, colorTable);
+	    System.out.println("do we call update 3 tines?");
 	    //get the ball from the link
 	    ball = thresholdedImage.getVisionLink().getBall();
 	    visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
@@ -114,31 +115,34 @@ public class VisionState {
 	//loop through the objects
     	for (int i = 0; i < visualFieldObjects.size(); i++) {
 	    obj = visualFieldObjects.elementAt(i);
-	    //choose a color
-	    byte color;
-	    switch(obj.getID()) {
-	    case VisualFieldObject.BLUE_GOAL_LEFT_POST:
-	    case VisualFieldObject.YELLOW_GOAL_LEFT_POST: 
-		color = GOAL_LEFT_POST_BOX_COLOR; break;
-	    case VisualFieldObject.BLUE_GOAL_RIGHT_POST:
-	    case VisualFieldObject.YELLOW_GOAL_RIGHT_POST: 
+	    System.out.println(obj.getWidth());
+	    if (obj.getWidth() > 0){
+		//choose a color
+		byte color;
+		switch(obj.getID()) {
+		case VisualFieldObject.BLUE_GOAL_LEFT_POST:
+		case VisualFieldObject.YELLOW_GOAL_LEFT_POST: 
+		    color = GOAL_LEFT_POST_BOX_COLOR; break;
+		case VisualFieldObject.BLUE_GOAL_RIGHT_POST:
+		case VisualFieldObject.YELLOW_GOAL_RIGHT_POST: 
 		color = GOAL_RIGHT_POST_BOX_COLOR; break;
-	    case VisualFieldObject.BLUE_GOAL_POST:
-	    case VisualFieldObject.YELLOW_GOAL_POST: 
-		color = GOAL_POST_BOX_COLOR; break;
-	    case VisualFieldObject.BLUE_GOAL_BACKSTOP: 
-		color = BLUE_GOAL_BACKSTOP_COLOR; break;
-	    case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
-		color = YELLOW_GOAL_BACKSTOP_COLOR; break;
-	    default: color = Vision.BLACK; break;
-	    }
+		case VisualFieldObject.BLUE_GOAL_POST:
+		case VisualFieldObject.YELLOW_GOAL_POST: 
+		    color = GOAL_POST_BOX_COLOR; break;
+		case VisualFieldObject.BLUE_GOAL_BACKSTOP: 
+		    color = BLUE_GOAL_BACKSTOP_COLOR; break;
+		case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
+		    color = YELLOW_GOAL_BACKSTOP_COLOR; break;
+		default: color = Vision.BLACK; break;
+		}
 	    //draw the box
-	    if (obj.getWidth() > 0)
-		thresholdedOverlay.drawPolygon(obj.getLeftTopX(), obj.getRightTopX(),
-					       obj.getRightBottomX(), obj.getLeftBottomX(),
-					       obj.getLeftTopY(), obj.getRightTopY(),
-					       obj.getRightBottomY(), obj.getLeftBottomY(),
-					       VISUAL_OBJECT_THICKNESS, color);
+	    System.out.println("drawBox");
+	    thresholdedOverlay.drawPolygon(obj.getLeftTopX(), obj.getRightTopX(),
+					   obj.getRightBottomX(), obj.getLeftBottomX(),
+					   obj.getLeftTopY(), obj.getRightTopY(),
+					   obj.getRightBottomY(), obj.getLeftBottomY(),
+					   VISUAL_OBJECT_THICKNESS, color);
+	    }
 	}
 	//set field lines
 	VisualLine line;

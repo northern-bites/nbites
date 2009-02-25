@@ -87,7 +87,7 @@ public class TOOLVisionLink {
 	yglp = new VisualFieldObject(VisualFieldObject.YELLOW_GOAL_LEFT_POST);
 	//should add the backstops too if ever going to be used
 	*/
-	visualFieldObjects = new Vector<VisualFieldObject>(6);
+	visualFieldObjects = new Vector<VisualFieldObject>();
 	visualLines = new Vector<VisualLine>(5, 5);
 	visualCorners = new Vector<VisualCorner>(10);
     }
@@ -120,6 +120,7 @@ public class TOOLVisionLink {
 		visualFieldObjects.clear();
 		visualLines.clear();
 		//call the jni function
+		System.out.println("Do you call this 3 times?");
 		cppProcessImage(img_data,joint_data,ct_data,
                                 threshResult);
             }catch(Throwable e){
@@ -188,6 +189,7 @@ public class TOOLVisionLink {
 	}
 	*/
 	//attach the data to the object
+	System.out.println(width);
 	fieldObject.setID(id);
 	fieldObject.setWidth(width); fieldObject.setHeight(height);
 	fieldObject.setLeftTopX(ltx); fieldObject.setLeftTopY(lty);

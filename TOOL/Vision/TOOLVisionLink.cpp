@@ -138,7 +138,7 @@ extern "C" {
       //get the id for the java class, so we can get method IDs
       jclass javaClass = env->GetObjectClass(jobj);
       
-      //get the method ID for the ball setter
+      //push the ball
       jmethodID setBallInfo = env->GetMethodID(javaClass, "setBallInfo", "(DDIIIID)V");
       env->CallVoidMethod(jobj, setBallInfo, 
 			  vision.ball->getWidth(), vision.ball->getHeight(), 
@@ -150,7 +150,7 @@ extern "C" {
       jmethodID setFieldObjectInfo = env->GetMethodID(javaClass, "setFieldObjectInfo", 
 						      "(IDDIIIIIIII)V");
       
-      //call the field object info passing function for each object we're interested in
+      //push each field object
       VisualFieldObject *obj;
       int k = 0;
       while(k != -1) {
@@ -164,7 +164,8 @@ extern "C" {
 	case 5: obj = vision.bgBackstop; k++; break;
 	default: k = -1; obj = NULL; break;
 	}
-	
+	if (obj!=NULL)
+	cout<<obj->getWidth();
 	if (obj != NULL) {
 	  env->CallVoidMethod(jobj, setFieldObjectInfo,
 			      (int) obj->getID(),
