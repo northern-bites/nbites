@@ -1493,7 +1493,11 @@ void ObjectFragments::createObject(int c) {
         break;
     case RED:
 #if ROBOT(NAO)
-        robot(c);
+        // George: I am disabling robot recognition for now because it
+        // causes crashes. The blobs formed for robots have negative
+        // and/or incorrect dimensions. Those dimensions are later used
+        // to access the thresholded array.
+        //robot(c);
 #endif
         break;
     case NAVY:
