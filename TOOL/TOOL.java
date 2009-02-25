@@ -181,8 +181,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //addModule(new SQLModule(this));
         // wordcontroller - view and control robot udp broadcasts in realtime
         addModule(new WorldControllerModule(this));
-        // 3d rasterizer for fun and for viewing colortable/image distributions
-        //addModule(new ZModule(this));
 
         // Add color table listeners to the two modules that must be notified
         // whenever the color table changes
