@@ -56,6 +56,7 @@ private:
     void scriptedMode();
     HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;
+    float yawVel, pitchVel;
 
     void setActive();
     bool isDone();
@@ -69,7 +70,7 @@ private:
 	// Queue of all future commands
 	std::queue<const HeadJointCommand*> headCommandQueue;
 
-    pthread_mutex_t head_mutex;
+    pthread_mutex_t scripted_mode_mutex,set_mode_mutex;
 
     std::vector<float> getCurrentHeads();
     void setNextHeadCommand();
