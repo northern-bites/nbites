@@ -56,7 +56,6 @@ private:
     void scriptedMode();
     HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;
-    float yawVel, pitchVel;
 
     void setActive();
     bool isDone();

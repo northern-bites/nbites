@@ -7,7 +7,7 @@
 using namespace std;
 using namespace boost;
 
-#define DEBUG_SWITCHBOARD
+//#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,

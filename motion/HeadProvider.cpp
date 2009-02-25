@@ -80,12 +80,17 @@ void HeadProvider::setMode(){
     const float pitchChangeTarget = clip(pitchDest - lastPitchDest,
                                          -MAX_HEAD_VEL,
                                          MAX_HEAD_VEL);
+#ifdef DEBUG_HEADPROVIDER
+     cout << "Last values "<<endl
+          <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
+          <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
+          <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
+#endif
 
     //update memory for next  run
-    yawVel = yawChangeTarget;
-    pitchVel = pitchChangeTarget;
     lastYawDest = lastYawDest+yawChangeTarget;
     lastPitchDest = lastPitchDest +pitchChangeTarget;
+
 
     //update the chain angles
     float newHeads[Kinematics::HEAD_JOINTS] = {lastYawDest,lastPitchDest};
@@ -110,8 +115,6 @@ void HeadProvider::scriptedMode(){
 void HeadProvider::setCommand(const SetHeadCommand *command) {
     pthread_mutex_lock(&set_mode_mutex);
     transitionTo(SET);
-    lastYawDest = yawDest;
-    lastPitchDest = pitchDest;
     yawDest = command->getYaw();
     pitchDest = command->getPitch();
     setActive();
@@ -199,16 +202,21 @@ void HeadProvider::transitionTo(HeadMode newMode){
             }
             break;
         case SET:
-            //record the current head angles from sensors
+            //If we need to switch modes, then we may not know what the latest
+            //angles are, so lets get them again from sensors
             vector<float> mAngles = sensors->getMotionBodyAngles();
-            yawDest = mAngles[0];
-            pitchDest = mAngles[1];
-            yawVel = pitchVel = 0.0f;
+            lastYawDest =mAngles[0];
+            lastPitchDest =mAngles[1];
             break;
         }
         curMode = newMode;
-    }
 #ifdef DEBUG_HEADPROVIDER
     cout << "Transitioned to mode :"<<curMode<<endl;
 #endif
+    }else{
+#ifdef DEBUG_HEADPROVIDER
+    cout << "No transition need to get to :"<<curMode<<endl;
+#endif
+    }
+
 }
