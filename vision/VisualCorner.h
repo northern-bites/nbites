@@ -82,10 +82,10 @@ private: // private methods
     void determineCornerShape(); // called on object instantiation
     const shape getLClassification();
     inline float cornerDistanceToSD(float _distance) {
-        return (10 + (_distance * _distance)*0.0125);
+        return (10 + (_distance * _distance)*0.0125f);
     }
     inline float cornerBearingToSD(float _bearing) {
-        return M_PI / 8.0f;
+        return static_cast<float>(M_PI) / 8.0f;
     }
 
 

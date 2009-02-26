@@ -58,10 +58,10 @@ private:
 
     // Member functions
     float ballDistanceToSD(float _distance) {
-        return 0.00000004 * pow(_distance,4.079f);
+        return 0.00000004f * pow(_distance,4.079f);
     }
     float ballBearingToSD(float _bearing) {
-        return M_PI / 8.0f;
+        return static_cast<float>(M_PI) / 8.0f;
     }
 };
 

@@ -373,7 +373,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
     float slope = (float)(y - y1) / (float)(x - x1);
     int sign = 1;
     if ((abs(y - y1)) > (abs(x - x1))) {
-        slope = 1.0 / slope;
+        slope = 1.0f / slope;
         if (y > y1) sign = -1;
         for (int i = y; i != y1; i += sign) {
             int newx = x + (int)(slope * (i - y));
@@ -398,6 +398,11 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
             }
         }
     }
+/*
+    // This code is supposed to, I guess, make the line thicker since the Nao's
+    // image was 640x480 at some point and you couldn't see the drawing
+    // but it's not done well. if you look closely it looks like two blue
+    // lines are drawn next to each other but it's clearly not one solid line
 #if ROBOT(NAO)
     y--;
     y1--;
@@ -430,6 +435,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
         }
     }
 #endif
+*/
 }
 
 // Convenience method to draw a VisualLine to the screen.

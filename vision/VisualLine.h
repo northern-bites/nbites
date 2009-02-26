@@ -148,10 +148,10 @@ private: // Member functions
 
     //list <const ConcreteLine *> possibleLines;
     inline float lineDistanceToSD(float _distance) {
-        return (10 + (_distance * _distance)*0.0125);
+        return (10.0f + (_distance * _distance)*0.0125f);
     }
     inline float lineBearingToSD(float _bearing) {
-        return M_PI / 8.0f;
+        return static_cast<float>(M_PI) / 8.0f;
     }
 
 

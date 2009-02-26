@@ -25,8 +25,8 @@ Vision Constants that span multiple classes and systems.
 #  define NAO_COLOR_SPACE YUV422INTER_CS
 #endif
 
-#define NAO_FOV_X_DEG          46.4
-#define NAO_FOV_Y_DEG          34.8
+#define NAO_FOV_X_DEG          46.4f
+#define NAO_FOV_Y_DEG          34.8f
 #define NAO_SIM_IMAGE_WIDTH    160
 #define NAO_SIM_IMAGE_HEIGHT   120
 #define NAO_SIM_IMAGE_BYTE_SIZE (NAO_SIM_IMAGE_WIDTH * NAO_SIM_IMAGE_HEIGHT * 3)
@@ -91,8 +91,8 @@ Vision Constants that span multiple classes and systems.
 #define HALF_IMAGE_HEIGHT (IMAGE_HEIGHT / 2)
 
 // Core Image Constants
-static const double MAX_BEARING = IMAGE_WIDTH / FOV_X_DEG; // relative to cam
-static const double MAX_ELEVATION = IMAGE_HEIGHT / FOV_Y_DEG; // ''
+static const float MAX_BEARING = IMAGE_WIDTH / FOV_X_DEG; // relative to cam
+static const float MAX_ELEVATION = IMAGE_HEIGHT / FOV_Y_DEG; // ''
 
 // THRESHOLD COLORS
 #define GREY 0

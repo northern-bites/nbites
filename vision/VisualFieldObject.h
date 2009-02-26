@@ -100,7 +100,7 @@ private: // Class Variables
         return 0.0496f * exp(0.0271f * _distance);
     }
     inline float postBearingToSD(float _bearing) {
-        return M_PI / 8.0f;
+        return static_cast<float>(M_PI) / 8.0f;
     }
 };
 

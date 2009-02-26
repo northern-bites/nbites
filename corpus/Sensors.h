@@ -21,8 +21,6 @@
 #ifndef Sensors_H
 #define Sensors_H
 #include <vector>
-#include <boost/assign/std/vector.hpp>
-using namespace boost::assign;
 #include <list>
 #include <pthread.h>
 #include <Python.h>

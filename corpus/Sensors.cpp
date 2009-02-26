@@ -18,6 +18,9 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <boost/assign/std/vector.hpp>
+using namespace boost::assign;
+
 #include "Sensors.h"
 #include <structmember.h>
 
