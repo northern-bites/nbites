@@ -115,8 +115,6 @@ SET( OFFLINE_NAOQI_PATH
   CACHE STRING
   "The local path of the naoqi distribution to use with Webots"
   )
-#SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
-
 
 ############################ REMOTE INSTALLATION
 # Define this to remotely install the binary or library on the robot.
@@ -133,6 +131,14 @@ SET( @REMOTE_ADDRESS@
   "The remote address of the robot"
   )
 SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
+
+############################ USING_LAB_FIELD
+# Options pertaining to running the code on the simulator  (OFFLINE)
+OPTION( @USING_LAB_FIELD@
+    "Set field constants to use the lab field constants"
+    ON
+    )
+SET( USING_LAB_FIELD ${@USIGN_LAB_FIELD@} )
 
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(

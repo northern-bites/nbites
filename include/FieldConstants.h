@@ -5,14 +5,20 @@
 #include "Common.h"
 
 // Nao field constants
-static const float LAB_SCALE = 0; // What is our lab scale?  Shrug
-static const float OFFICIAL_SCALE = 1.0f;
-static const float FIELD_SCALE = OFFICIAL_SCALE;
+#ifdef USING_LAB_FIELD
+static const float FIELD_WHITE_WIDTH = 330.f;
+static const float FIELD_WHITE_HEIGHT = 500.f;
+static const float GREEN_PAD_X = 15.f;
+static const float GREEN_PAD_Y = 20.f;
+#else
+static const float FIELD_WHITE_WIDTH = 400.f;
+static const float FIELD_WHITE_HEIGHT = 600.f;
+static const float GREEN_PAD_X = 20.f;
+static const float GREEN_PAD_Y = 40.f;
+#endif // USING_LAB_FIELD
 
-static const float FIELD_WHITE_WIDTH = 400.f * FIELD_SCALE;
-static const float FIELD_WHITE_HEIGHT = 600.f * FIELD_SCALE;
-static const float FIELD_GREEN_WIDTH = 440.f * FIELD_SCALE;
-static const float FIELD_GREEN_HEIGHT = 680.f * FIELD_SCALE;
+static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_X;
+static const float FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + 2.0f * GREEN_PAD_Y;
 static const float FIELD_WIDTH = FIELD_GREEN_WIDTH;
 static const float FIELD_HEIGHT = FIELD_GREEN_HEIGHT;
 
@@ -24,20 +30,12 @@ static const float FIELD_GREEN_RIGHT_SIDELINE_X = FIELD_GREEN_WIDTH;
 static const float FIELD_GREEN_BOTTOM_SIDELINE_Y = 0;
 static const float FIELD_GREEN_TOP_SIDELINE_Y = FIELD_GREEN_HEIGHT;
 
-static const float GREEN_PAD_Y = 40.f * FIELD_SCALE;
-static const float GREEN_PAD_X = 20.f * FIELD_SCALE;
-
 static const float FIELD_WHITE_BOTTOM_SIDELINE_Y = GREEN_PAD_Y;
 static const float FIELD_WHITE_TOP_SIDELINE_Y = (FIELD_WHITE_HEIGHT +
                                                   GREEN_PAD_Y);
 static const float FIELD_WHITE_LEFT_SIDELINE_X = GREEN_PAD_X;
 static const float FIELD_WHITE_RIGHT_SIDELINE_X = (FIELD_WHITE_WIDTH +
                                                     GREEN_PAD_X);
-
-static const float LANDMARK_RIGHT_BEACON_X = FIELD_GREEN_WIDTH - 5;
-static const float LANDMARK_RIGHT_BEACON_Y = FIELD_GREEN_HEIGHT * .5f;
-static const float LANDMARK_LEFT_BEACON_X = 5.;
-static const float LANDMARK_LEFT_BEACON_Y = FIELD_GREEN_HEIGHT * .5f;
 
 // GOAL CONSTANTS
 // my left post is left of goalie defending my goal facing the opponent

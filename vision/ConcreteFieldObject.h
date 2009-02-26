@@ -128,12 +128,6 @@ static const point <float> YELLOW_GOAL_RIGHT_POST_LOC =
     point<float>(LANDMARK_OPP_GOAL_LEFT_POST_X,
                   LANDMARK_OPP_GOAL_LEFT_POST_Y);
 
-static const point <float> YELLOW_BLUE_BEACON_LOC =
-    point<float>(LANDMARK_LEFT_BEACON_X, LANDMARK_LEFT_BEACON_Y);
-
-static const point <float> BLUE_YELLOW_BEACON_LOC =
-    point<float>(LANDMARK_RIGHT_BEACON_X, LANDMARK_RIGHT_BEACON_Y);
-
 // Arc locations are defined to be the center of the quarter circle spanned
 // by the arc
 static const point <float> BLUE_GOAL_YELLOW_ARC_CENTER_LOC =
