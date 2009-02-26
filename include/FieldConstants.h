@@ -85,4 +85,9 @@ static const float OPP_GOALBOX_BOTTOM_Y = (FIELD_GREEN_HEIGHT-
                                             GREEN_PAD_Y-GOALBOX_HEIGHT);
 static const float OPP_GOALBOX_TOP_Y = FIELD_GREEN_HEIGHT-GREEN_PAD_Y;
 
+// Other Field object dimensions
+static const float GOAL_POST_CM_HEIGHT = 80.0f;
+static const float GOAL_POST_CM_WIDTH = 10.0f;
+static const float CROSSBAR_CM_WIDTH = 140.f;
+static const float CROSSBAR_CM_HEIGHT = 5.0f;
 #endif // File
