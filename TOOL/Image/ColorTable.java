@@ -68,7 +68,6 @@ public class ColorTable {
     protected static int NUM_MOVES_TO_AUTOSAVE = 30;
     public static String AUTO_SAVE_PATH = SAVE_TABLE_PATH + "autosave/";
 
-
     //note that these are the YUV encodings on the aibo, not the way
     //they are represented in standard YCbCr land.
     private static final int Y = 0;
@@ -103,6 +102,8 @@ public class ColorTable {
     //store for saving functionality
     private boolean notYetSaved = true; //store if it's ever been saved
     private boolean modified = false; //store if it's been modified after save
+
+    private String fileName;
 
     // We need a LinkedList within the stack because a single action might
     // change multiple colors, necessitating multiple ColorTableUpdates
@@ -677,6 +678,9 @@ public class ColorTable {
                              elapsedTime+"Seconds");
 
         updateDimensions();
+
+        // save the file name and location of the color table
+        this.fileName = fileName;
     }
 
 
@@ -1120,6 +1124,10 @@ public class ColorTable {
 
     public boolean getSoftColors() {
         return softColors;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public void printTable(){

@@ -111,25 +111,26 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private MultiTabbedPane multiPane;
 
 
-    public static final int DEFAULT_WIDTH = 900;
-    public static final int DEFAULT_HEIGHT = 800;
+    private static final int DEFAULT_WIDTH = 900;
+    private static final int DEFAULT_HEIGHT = 800;
 
-    public static final String DEFAULT_WIDTH_STRING = "default_width";
-    public static final String DEFAULT_HEIGHT_STRING = "default_height";
+    private static final String DEFAULT_WIDTH_STRING = "default_width";
+    private static final String DEFAULT_HEIGHT_STRING = "default_height";
 
-    public static final int DEFAULT_X = 0;
-    public static final int DEFAULT_Y = 0;
+    private static final int DEFAULT_X = 0;
+    private static final int DEFAULT_Y = 0;
 
-    public static final String DEFAULT_X_STRING = "default_x";
-    public static final String DEFAULT_Y_STRING = "default_y";
+    private static final String DEFAULT_X_STRING = "default_x";
+    private static final String DEFAULT_Y_STRING = "default_y";
 
-    public static final String DEFAULT_1_TAB_STRING = "default_1_tab";
-    public static final String DEFAULT_1_TAB = "Data";
+    private static final String DEFAULT_1_TAB_STRING = "default_1_tab";
+    private static final String DEFAULT_1_TAB = "Data";
 
-    public static final String DEFAULT_2_TAB_STRING = "default_2_tab";
-    public static final String DEFAULT_2_TAB = "Calibrate";
+    private static final String DEFAULT_2_TAB_STRING = "default_2_tab";
+    private static final String DEFAULT_2_TAB = "Calibrate";
 
-
+    private static final String DEFAULT_COLOR_TABLE_STRING =
+        "default_color_table";
 
     //starts an instance of a tool, which ties together all the sub modules
     public TOOL(){
@@ -150,8 +151,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
         // Setup the GUI
         initMainWindow();
-
-       
 
         // Initialize and add each of the modules
         //
@@ -196,10 +195,16 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         int startX = prefs.getInt(DEFAULT_X_STRING, DEFAULT_X);
         int startY = prefs.getInt(DEFAULT_Y_STRING, DEFAULT_Y);
 
-
         // Determine size window should start at
         int startWidth = prefs.getInt(DEFAULT_WIDTH_STRING, DEFAULT_WIDTH);
         int startHeight = prefs.getInt(DEFAULT_HEIGHT_STRING, DEFAULT_HEIGHT);
+
+        // Try to load the color table we used last
+        // If the key does not exist, the method will return the second
+        // parameter passed to .get().
+        String fileName = prefs.get(DEFAULT_COLOR_TABLE_STRING,
+                                    null);
+        loadColorTable(fileName);
 
         mainWindow.setLocation(startX, startY);
         mainWindow.setSize(startWidth, startHeight);
@@ -213,6 +218,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         final String fileSeparator = System.getProperty("file.separator");
         sourceManager.addSource(".." + fileSeparator + "branches" + fileSeparator
                                 +"frame_depot" + fileSeparator);
+        // add the local robots folder to the source manager
+        sourceManager.addSource("robots");
 
     }
 
@@ -405,37 +412,26 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         else if (e.getSource() == about) {
 
         }
-	//added temporary way to load color tables
-	else if(e.getSource() == loadColorTable){
-	    loadColorTable();
-	}else if(e.getSource() == saveColorTable){
-	    saveColorTable();
-	}else if(e.getSource() == saveColorTableAs){
-	    saveColorTableAs();
-	}else if(e.getSource() == newColorTable){
-	    newColorTable();
-	}else if (e.getSource() == addPane) {
-        multiPane.addPane();
-        if (multiPane.numPanes() > 1)
-            removePane.setEnabled(true);
-        mainWindow.validate();
-    }else if (e.getSource() == removePane) {
-        }
         //added temporary way to load color tables
         else if(e.getSource() == loadColorTable){
             loadColorTable();
-        }else if(e.getSource() == saveColorTable){
+        }
+        else if(e.getSource() == saveColorTable){
             saveColorTable();
-        }else if(e.getSource() == saveColorTableAs){
+        }
+        else if(e.getSource() == saveColorTableAs){
             saveColorTableAs();
-        }else if(e.getSource() == newColorTable){
+        }
+        else if(e.getSource() == newColorTable){
             newColorTable();
-        }else if (e.getSource() == addPane) {
+        }
+        else if (e.getSource() == addPane) {
             multiPane.addPane();
             if (multiPane.numPanes() > 1)
                 removePane.setEnabled(true);
             mainWindow.validate();
-        }else if (e.getSource() == removePane) {
+        }
+        else if (e.getSource() == removePane) {
             multiPane.removePane();
             if (multiPane.numPanes() == 1)
                 removePane.setEnabled(false);
@@ -516,6 +512,12 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     public void saveColorTableAs(){
         colorTable.saveColorTableAs();
     }
+
+    /**
+     * This method uses the abstract way of prompting for a file. More often
+     * than not, this will be a GUI dialog allowing you to navigate to a
+     * file in some path.
+     **/
     public void loadColorTable() {
         String path = CONSOLE.promptFileOpen(
                                              "Existing Color Table Location and Name",
@@ -536,9 +538,25 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
     }
 
+    /**
+     * This method takes in a file name and tries to load a color table from it
+     **/
+    public void loadColorTable(String fileName) {
+        colorTable = new ColorTable(fileName);
+        colorEdit.setTable(colorTable);
+
+        colorTable.setSoftColors(toggleSoftColors.isSelected());
+        // If they had been editing a table earlier, clear out their
+        // undos
+        calibrate.clearHistory();
+        dataManager.notifyDependants();
+
+    }
+
     public void savePreferences() {
         saveWindowPrefs(prefs, mainWindow);
         saveTabPrefs(prefs, multiPane);
+        saveColorTablePrefs(prefs);
     }
 
     public void saveWindowPrefs(Preferences prefs, Window w) {
@@ -552,6 +570,15 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         prefs.put(DEFAULT_1_TAB_STRING, tabs.getSelectedTabName(0));
         if (tabs.getNumTabbedPanes() > 1) {
             prefs.put(DEFAULT_2_TAB_STRING, tabs.getSelectedTabName(1));
+        }
+    }
+
+    public void saveColorTablePrefs(Preferences prefs) {
+        if (colorTable != null) {
+            String fileName = colorTable.getFileName();
+            if (fileName != null)
+                prefs.put(DEFAULT_COLOR_TABLE_STRING,
+                          fileName);
         }
     }
 
