@@ -2885,14 +2885,17 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     // now get rid of all the ones on the wrong side of the post
     for (int i = 0; i < numberOfRuns; i++) {
         nextX = runs[i].x;
-        if ((nextX < trueLeft && post == LEFT) || (nextX > trueRight && post == RIGHT)) {
+        if ((nextX < trueLeft && post == LEFT) ||
+            (nextX > trueRight && post == RIGHT)) {
             runs[i].h = 0;
         }
-        if (nextX > trueLeft - 10 && post == RIGHT || nextX < trueRight + 10 && post == LEFT) {
+        if (nextX > trueLeft - 10 && post == RIGHT ||
+            nextX < trueRight + 10 && post == LEFT) {
             runs[i].h = 0;
         }
     }
-    // find the other post if possible - the process is basically identical to the first post
+    // find the other post if possible - the process is basically identical to
+    // the first post
     point <int> leftP = pole.leftTop;
     point <int> rightP = pole.rightTop;
     int trueLeft2 = 0;
@@ -2935,7 +2938,8 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
         if (POSTDEBUG) {
             if (ratOk && goodSecondPost) {
                 cout << "First two ok on 2d" << endl;
-                if (secondPostFarEnough(leftP, rightP, pole.leftTop, pole.rightTop, post)) {
+                if (secondPostFarEnough(leftP, rightP,
+                                        pole.leftTop, pole.rightTop, post)) {
                     cout << "separation is fine" << endl;
                 } else {
                     cout << "Not far enough apart" << endl;
@@ -3818,8 +3822,19 @@ bool ObjectFragments::postBigEnough(blob b) {
  */
 
 bool ObjectFragments::locationOk(blob b, int hor) {
-    if (!blobOk(b)) return false;
-    if (hor < -50) return false;
+    const int minPostSpanY = 25;
+    if (!blobOk(b)) {
+        if (POSTLOGIC) {
+            cout << "Blob not okay on location check" << endl;
+        }
+        return false;
+    }
+    if (hor < -50) {
+        if (POSTLOGIC) {
+            cout << "Horizon to high" << endl;
+        }
+        return false;
+    }
     int trueLeft = min(b.leftTop.x, b.leftBottom.x);       // leftmost value in the blob
     int trueRight = max(b.rightTop.x, b.rightBottom.x);    // rightmost value in the blob
     int trueTop = min(b.leftTop.y, b.rightTop.y);          // topmost value in the blob
@@ -3835,13 +3850,13 @@ bool ObjectFragments::locationOk(blob b, int hor) {
     int spanX = b.rightTop.x - b.leftTop.x + 1;
     int spanY = b.leftBottom.y - b.leftTop.y;
     int mh = min(horizonLeft, horizonRight);
-    if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom, trueTop)) {
-        if (!greenCheck(b) || mh - trueBottom > spanY || spanX < 5 || mh - trueBottom > 25) {
-#if ROBOT(NAO)
-            if (spanY > 50) {
+    if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom,
+                         trueTop)) {
+        if (!greenCheck(b) || mh - trueBottom > spanY || spanX < 5 ||
+            mh - trueBottom > 25) {
+            if (spanY > minPostSpanY) {
                 return true;
             }
-#endif
             if (SANITY) {
                 cout << "Screening blob for bottom reasons" << endl;
                 printBlob(b);
@@ -3851,7 +3866,8 @@ bool ObjectFragments::locationOk(blob b, int hor) {
         }
     }
     //if (trueRight - trueLeft > IMAGE_WIDTH - 10) return true;
-    return horizonTopOk(trueTop, max(horizonAt(trueLeft), horizonAt(trueRight)));
+    return horizonTopOk(trueTop, max(horizonAt(trueLeft),
+                                     horizonAt(trueRight)));
 }
 
 /* Objects need to be at or below the horizon.  We get the basic shape of the object and either the horizon
@@ -3923,27 +3939,35 @@ bool ObjectFragments::horizonTopOk(int top, int hor) {
     return true;
 }
 
-/*  Posts shouldn't show up too close to each other (yes, I realize they can be when you're
- * looking from the side).  Make sure there is some separation.
+/*  Posts shouldn't show up too close to each other (yes, I realize they can be
+ * when you're looking from the side).  Make sure there is some separation.
+ *
  * @param l1      left x of one post
  * @param r1      right x of the same post
  * @param l2      left x of the other post
  * @param r2      right x of the other post
  * @return        true when there is enough separation.
  */
-bool ObjectFragments::secondPostFarEnough(point <int> left1, point <int> right1, point <int> left2, point <int> right2, int post) {
+bool ObjectFragments::secondPostFarEnough(point <int> left1, point <int> right1,
+                                          point <int> left2, point <int> right2,
+                                          int post) {
     if (SANITY) {
-        cout << "Separations " << (dist(left1.x, left1.y, right2.x, right2.y)) << " " << (dist(left2.x, left2.y, right1.x, right1.y)) << endl;
+        cout << "Separations " << (dist(left1.x, left1.y, right2.x, right2.y))
+             << " " << (dist(left2.x, left2.y, right1.x, right1.y)) << endl;
     }
-    //cout << left1.x << " " << left2.x << " " << right1.x << " " << right2.x << endl;
-    if ((post == RIGHT && right2.x > left1.x) || (post == LEFT && left2.x < right1.x)) {
+    // cout << left1.x << " " << left2.x << " " << right1.x << " "
+    //      << right2.x << endl;
+    if ((post == RIGHT && right2.x > left1.x) ||
+        (post == LEFT && left2.x < right1.x)) {
         if (SANITY) {
             cout << "Second post is on the wrong side!" << endl;
         }
         return false;
     }
-    if (dist(left1.x, left1.y, right2.x, right2.y) > MIN_POST_SEPARATION && dist(left2.x, left2.y, right1.x, right1.y) > MIN_POST_SEPARATION) {
-        if (dist(left1.x, left1.y, left2.x, left2.y) > MIN_POST_SEPARATION && dist(right2.x, right2.y, right1.x, right1.y) > MIN_POST_SEPARATION) {
+    if (dist(left1.x, left1.y, right2.x, right2.y) > MIN_POST_SEPARATION &&
+        dist(left2.x, left2.y, right1.x, right1.y) > MIN_POST_SEPARATION) {
+        if (dist(left1.x, left1.y, left2.x, left2.y) > MIN_POST_SEPARATION &&
+            dist(right2.x, right2.y, right1.x, right1.y) > MIN_POST_SEPARATION){
             return true;
         }
     }
