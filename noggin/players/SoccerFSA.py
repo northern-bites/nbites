@@ -11,10 +11,14 @@ from . import GameControllerStates
 
 class SoccerFSA(FSA.FSA):
     def __init__(self,brain):
-        FSA.FSA.__init__(self,brain)
+        FSA.FSA.__init__(self, brain)
         #self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(GameControllerStates)
 
+
+        # Method to enqueue a SweetMove
+        # Can either take in a head move or a body command
+        # (see SweetMove files for descriptions of command tuples)
         def executeMove(self,sweetMove):
             for position in sweetMove:
                 if len(position) == 6:
