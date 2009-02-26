@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include "Ball.h"
+#include "VisualBall.h"
 #include "MCL.h"
 #include "BallEKF.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
@@ -93,7 +93,7 @@ void printOutLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
                      std::vector<Observation>
                      sightings, MotionModel lastOdo, PoseEst * currentPose,
                      BallPose * currentBall, boost::shared_ptr<BallEKF> ballEKF,
-                     Ball _b);
+                     VisualBall _b);
 
 // Helper functions
 float subPIAngle(float theta);

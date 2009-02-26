@@ -21,10 +21,12 @@ VFO_SRCS = ../../vision/VisualFieldObject.cpp \
 	 ../../vision/VisualFieldObject.h
 EKF_SRCS = ../EKF.cpp \
 	   ../EKF.h
-VISBALL_SRCS = ../../vision/Ball.cpp \
-	  ../../vision/Ball.h
+VISBALL_SRCS = ../../vision/VisualBall.cpp \
+	  ../../vision/VisualBall.h
 VLANDMARK_SRCS = ../../vision/VisualLandmark.cpp \
 	 ../../vision/VisualLandmark.h
+VISDETECTION_SRCS = ../../vision/VisualDetection.cpp \
+	 ../../vision/VisualDetection.h
 CLANDMARK_SRCS = ../../vision/ConcreteLandmark.cpp \
 	         ../../vision/ConcreteLandmark.h
 BALLEKF_SRCS = ../BallEKF.cpp \
@@ -42,6 +44,7 @@ OBJS = Utility.o \
        ConcreteFieldObject.o \
        ConcreteLine.o \
        VisualLandmark.o \
+       VisualDetection.o \
        VisualFieldObject.o \
        VisualCorner.o \
        VisualLine.o \
@@ -77,6 +80,8 @@ ConcreteFieldObject.o : $(CCFO_SRCS) ConcreteLandmark.o
 ConcreteLine.o : $(CL_SRCS)
 	 $(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 # Visual Vision Stuff
+VisualDetection.o : $(VISDETECTION_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 VisualLandmark.o : $(VLANDMARK_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 VisualCorner.o : $(VC_SRCS) VisualLandmark.o

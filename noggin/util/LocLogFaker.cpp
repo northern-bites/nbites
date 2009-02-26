@@ -101,7 +101,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     PoseEst currentPose;
     BallPose currentBall;
     MotionModel noMove(0.0, 0.0, 0.0);
-    Ball * visBall = new Ball();
+    VisualBall * visBall = new VisualBall();
 
     currentPose.x = letsGo->startPos.x;
     currentPose.y = letsGo->startPos.y;
@@ -402,7 +402,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
 void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                      vector<Observation> sightings, MotionModel lastOdo,
                      PoseEst *currentPose, BallPose * currentBall,
-                     shared_ptr<BallEKF> ballEKF, Ball _b)
+                     shared_ptr<BallEKF> ballEKF, VisualBall _b)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
@@ -456,9 +456,9 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                     << sightings[k].getVisBearingDeg() << " ";
     }
     // Output ball as landmark
-    if (_b.getDist() > 0.0) {
+    if (_b.getDistance() > 0.0) {
         *outputFile << BALL_ID << " "
-                    << _b.getDist() << " "
+                    << _b.getDistance() << " "
                     << _b.getBearing() << " ";
     }
 
