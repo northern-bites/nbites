@@ -45,9 +45,6 @@ public:
     void calculateNextJoints();
 
 	void enqueueSequence(std::vector<const BodyJointCommand*> &seq);
-	void setCommand(const MotionCommand* command) {
-		setCommand(reinterpret_cast<const BodyJointCommand*>(command));
-	}
 	void setCommand(const BodyJointCommand * command);
 
 private:

@@ -29,9 +29,7 @@ def gameInitial(player):
                               15.0)
     player.brain.motion.setGait(gait)
 
-    headCommand = motion.SetHeadCommand(30,0)
-    player.brain.motion.setHead(headCommand)
-    return player.goLater('nothing')
+    return player.goLater('walkleft')
 
 def switchGaits(player):
     pass

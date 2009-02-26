@@ -143,10 +143,8 @@ void HeadProvider::setCommand(const HeadJointCommand *command) {
 
 void HeadProvider::enqueueSequence(std::vector<HeadJointCommand*> &seq) {
 	// Take in vec of commands and enqueue them all
-	pthread_mutex_lock(&scripted_mode_mutex);
 	for (vector<HeadJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
 		setCommand(*i);
-	pthread_mutex_unlock(&scripted_mode_mutex);
 }
 
 void HeadProvider::setNextHeadCommand() {

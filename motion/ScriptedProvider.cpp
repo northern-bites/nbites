@@ -90,7 +90,7 @@ bool ScriptedProvider::commandQueueEmpty(){
 }
 
 void ScriptedProvider::calculateNextJoints() {
-
+	pthread_mutex_lock(&scripted_mutex);
 	if (chainQueuesEmpty())
 		setNextBodyCommand();
 
@@ -115,6 +115,7 @@ void ScriptedProvider::calculateNextJoints() {
 	}
 
     setActive();
+	pthread_mutex_unlock(&scripted_mutex);
 }
 
 /*
@@ -127,22 +128,17 @@ void ScriptedProvider::calculateNextJoints() {
  * a time, even if they deal with different joints or chains.
  */
 void ScriptedProvider::setCommand(const BodyJointCommand *command) {
-	if (command->getType() == MotionConstants::BODY_JOINT){
-		bodyCommandQueue.push(command);
-		setActive();
-	}
-	else {
-		cout << "WRONG MOTION COMMAND IN SWITCHBOARD!!!" << endl;
-	}
+	pthread_mutex_lock(&scripted_mutex);
+    bodyCommandQueue.push(command);
+    setActive();
+    pthread_mutex_unlock(&scripted_mutex);
 }
 
 
 void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq) {
 	// Take in vec of commands and enqueue them all
-	pthread_mutex_lock(&scripted_mutex);
 	for (vector<const BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
 		setCommand(*i);
-	pthread_mutex_unlock(&scripted_mutex);
 }
 
 void ScriptedProvider::setNextBodyCommand() {
