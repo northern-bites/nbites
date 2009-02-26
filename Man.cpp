@@ -25,6 +25,7 @@
 #include <Python.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
+using namespace boost::assign;
 
 #include "alvisionimage.h"
 #include "alvisiondefinitions.h"

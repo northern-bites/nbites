@@ -23,8 +23,10 @@
 #include <iostream>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
-
 using namespace AL;
+
+#include "Kinematics.h"
+
 const int ALEnactor::MOTION_FRAME_RATE = 50;
 // 1 second * 1000 ms/s * 1000 us/ms
 const float ALEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f / ALEnactor::MOTION_FRAME_RATE;
@@ -94,7 +96,16 @@ void ALEnactor::postSensors() {
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
     vector<float> alAngles = almotion->getBodyAngles();
-    sensors->setBodyAngles(alAngles);
+
+    // HACK!
+    // in order to accurately calculate the position of the red leg, it needs
+    // to have a correct HYP value, but that value is only stored once and that
+    // is in the left leg. This is done by NaoQi, not us.
+    //rLegAngles[0] = lLegAngles[0];
+    alAngles[Kinematics::R_HIP_YAW_PITCH] =
+        alAngles[Kinematics::L_HIP_YAW_PITCH];
+
+     sensors->setBodyAngles(alAngles);
     sensors->setMotionBodyAngles(motionCommandAngles);
     vector<float> temp = sensors->getMotionBodyAngles();
     //for (int i = 2; i < 6; i++)cout << "arm angles are"<< temp[i] <<endl;

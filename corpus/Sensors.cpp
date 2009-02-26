@@ -18,6 +18,7 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <boost/static_assert.hpp>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
 
@@ -550,6 +551,55 @@ const float Sensors::getUltraSound () const
     return dist;
 }
 
+const UltraSoundMode Sensors::getUltraSoundMode () const
+{
+    pthread_mutex_lock (&ultra_sound_mutex);
+
+    UltraSoundMode mode = ultraSoundMode;
+
+    pthread_mutex_unlock (&ultra_sound_mutex);
+
+    return mode;
+}
+
+const vector<float> Sensors::getAllSensors () const
+{
+    pthread_mutex_lock (&fsr_mutex);
+    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&inertial_mutex);
+    pthread_mutex_lock (&ultra_sound_mutex);
+
+    vector<float> allSensors;
+
+    // write the FSR values
+    allSensors += leftFootFSR.frontLeft, leftFootFSR.frontRight,
+        leftFootFSR.rearLeft, leftFootFSR.rearRight,
+        rightFootFSR.frontLeft, rightFootFSR.frontRight,
+        rightFootFSR.rearLeft, rightFootFSR.rearRight;
+
+    // write the foot bumper values
+    allSensors += static_cast<float>(leftFootBumper.left),
+        static_cast<float>(leftFootBumper.right),
+        static_cast<float>(rightFootBumper.left),
+        static_cast<float>(rightFootBumper.right);
+
+    // write the accelerometers + gyros + filtered angleX and angleY
+    allSensors += inertial.accX, inertial.accY, inertial.accZ,
+        inertial.gyrX, inertial.gyrY,
+        inertial.angleX, inertial.angleY;
+
+    // write the ultrasound values
+    allSensors += ultraSoundDistance;
+    allSensors += static_cast<float>(ultraSoundMode);
+
+    pthread_mutex_unlock (&fsr_mutex);
+    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&inertial_mutex);
+    pthread_mutex_unlock (&ultra_sound_mutex);
+
+    return allSensors;
+}
+
 void Sensors::setBodyAngles (vector<float>& v)
 {
     pthread_mutex_lock (&angles_mutex);
@@ -688,6 +738,15 @@ void Sensors::setUltraSound (const float dist)
     pthread_mutex_unlock (&ultra_sound_mutex);
 }
 
+void Sensors::setUltraSoundMode (const UltraSoundMode mode)
+{
+    pthread_mutex_lock (&ultra_sound_mutex);
+
+    ultraSoundMode = mode;
+
+    pthread_mutex_unlock (&ultra_sound_mutex);
+}
+
 
 /**
  * Sets the sensors which are updated on the motion frequency (every 20ms)
@@ -724,6 +783,36 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
 
     pthread_mutex_unlock(&ultra_sound_mutex);
     pthread_mutex_unlock (&bumper_mutex);
+}
+
+void Sensors::setAllSensors (vector<float> sensorValues) {
+    pthread_mutex_lock (&fsr_mutex);
+    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&inertial_mutex);
+    pthread_mutex_lock (&ultra_sound_mutex);
+
+    // we have to be EXTRA careful about this order. If someone can think of
+    // a better way to assign these so that it's checked at compile time
+    // please do!
+    leftFootFSR = FSR(sensorValues[0], sensorValues[1],
+                      sensorValues[2], sensorValues[3]);
+    rightFootFSR = FSR(sensorValues[4], sensorValues[5],
+                       sensorValues[6], sensorValues[7]);
+
+    leftFootBumper = FootBumper(sensorValues[8], sensorValues[9]);
+    rightFootBumper = FootBumper(sensorValues[10], sensorValues[11]);
+
+    inertial = Inertial(sensorValues[12], sensorValues[13], sensorValues[14],
+                        sensorValues[15], sensorValues[16], // gyros
+                        sensorValues[17], sensorValues[18]); // angleX/angleY
+
+    ultraSoundDistance = sensorValues[19];
+    ultraSoundMode = static_cast<UltraSoundMode>(sensorValues[20]);
+
+    pthread_mutex_unlock (&fsr_mutex);
+    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&inertial_mutex);
+    pthread_mutex_unlock (&ultra_sound_mutex);
 }
 
 

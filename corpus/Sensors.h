@@ -126,6 +126,8 @@ class Sensors {
     const FootBumper getRightFootBumper() const;
     const Inertial getInertial() const;
     const float getUltraSound() const;
+    const UltraSoundMode getUltraSoundMode() const;
+    const std::vector<float> getAllSensors() const;
 #endif
 
     // Locking data storage methods
@@ -150,6 +152,7 @@ class Sensors {
                      const float angleX, const float angleY);
     void setInertial(const Inertial &inertial);
     void setUltraSound(const float dist);
+    void setUltraSoundMode(const UltraSoundMode);
 
     void setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
                           const Inertial &_inertial);
@@ -158,6 +161,9 @@ class Sensors {
                           const FootBumper &_rightBumper,
                           const float ultraSound,
                           const UltraSoundMode _mode);
+
+    // this method is very useful for serialization and parsing sensors
+    void setAllSensors(const std::vector<float> sensorValues);
 
 #endif
 

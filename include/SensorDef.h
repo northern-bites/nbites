@@ -8,8 +8,7 @@
 // Sensor locators for the sensor array returned from the robot. 
 const int NUM_ERS7_SENSORS = 16;
 const int NUM_ERS220_SENSORS = 16;
-const int NUM_NAO_SENSORS = 17; // 8 FSR, 7 Inertial, 2 Sonar
-const int NUM_IMPORTANT_SENSORS = 8; // wtf?! this is unused
+const int NUM_NAO_SENSORS = 21; // 8 FSR, 4 foot bumpers, 7 Inertial, 2 Sonar
 const int NUM_LED_LIGHTS = 20;
 const int NUM_SENSOR_IDS = 34;
 

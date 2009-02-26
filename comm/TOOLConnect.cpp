@@ -158,24 +158,8 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 
     // Sensor data request
     if (r.sensors) {
-        // Use Sensors
-        const FSR leftFootFSR(sensors->getLeftFootFSR());
-        const FSR rightFootFSR(sensors->getRightFootFSR());
-        v.clear();
-        v += leftFootFSR.frontLeft, leftFootFSR.frontRight,
-            leftFootFSR.rearLeft, leftFootFSR.rearRight,
-            rightFootFSR.frontLeft, rightFootFSR.frontRight,
-            rightFootFSR.rearLeft, rightFootFSR.rearRight;
+        v = sensors->getAllSensors();
         serial.write_floats(v);
-        const Inertial inertial(sensors->getInertial());
-
-        v.clear();
-        v += inertial.accX, inertial.accY, inertial.accZ,
-            inertial.gyrX, inertial.gyrY,
-            inertial.angleX, inertial.angleY;
-        serial.write_floats(v);
-
-        serial.write_float(sensors->getUltraSound());
     }
 
     // Image data request
