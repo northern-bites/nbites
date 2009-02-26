@@ -27,11 +27,8 @@ import java.awt.image.BufferedImage;
 public abstract class Field
 {
     public double REAL_FIELD_SCALE = 1.0;
-    public double LAB_SCALE = getLabScale();
 
     public final double SCALE = REAL_FIELD_SCALE;
-    //public final double SCALE = LAB_SCALE;
-
     public final double GREEN_PAD_X = getGreenPadX() * SCALE;
     public final double GREEN_PAD_Y = getGreenPadY() * SCALE;
     public final double FIELD_WHITE_WIDTH = getFieldWhiteWidth() * SCALE;
@@ -132,7 +129,6 @@ public abstract class Field
      * from which all other variables can be computed)
      *
      **********************************************************************/
-    public abstract double getLabScale();
     public abstract double getGreenPadX();
     public abstract double getGreenPadY();
     public abstract double getFieldWhiteWidth();
