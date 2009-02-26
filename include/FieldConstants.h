@@ -11,10 +11,10 @@ static const float FIELD_WHITE_HEIGHT = 500.f;
 static const float GREEN_PAD_X = 15.f;
 static const float GREEN_PAD_Y = 20.f;
 #else
-static const float FIELD_WHITE_WIDTH = 400.f;
-static const float FIELD_WHITE_HEIGHT = 600.f;
-static const float GREEN_PAD_X = 20.f;
-static const float GREEN_PAD_Y = 40.f;
+static const float FIELD_WHITE_WIDTH = 405.f;
+static const float FIELD_WHITE_HEIGHT = 605.f;
+static const float GREEN_PAD_X = 67.5f;
+static const float GREEN_PAD_Y = 67.5f;
 #endif // USING_LAB_FIELD
 
 static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_X;
@@ -54,11 +54,16 @@ static const float LANDMARK_OPP_GOAL_LEFT_POST_Y =
 static const float LANDMARK_OPP_GOAL_RIGHT_POST_Y =
     FIELD_WHITE_TOP_SIDELINE_Y+5;
 
-static const float CENTER_CIRCLE_RADIUS = 65.; // not scaled
+static const float CENTER_CIRCLE_RADIUS = 62.5f; // Not scaled
 
-static const float GOALBOX_HEIGHT = 60.f; // not scaled
-static const float GOALBOX_WIDTH = 200.f; // not scaled
-
+#ifdef USING_LAB_FIELD
+static const float CENTER_CIRCLE_RADIUS = 62.5f;
+static const float GOALBOX_HEIGHT = 60.f;
+static const float GOALBOX_WIDTH = 200.f;
+#else
+static const float GOALBOX_HEIGHT = 65.f;
+static const float GOALBOX_WIDTH = 305.f;
+#endif // USING_LAB_FIELD
 static const float MIDFIELD_X = FIELD_GREEN_WIDTH * .5f;
 static const float MIDFIELD_Y = FIELD_GREEN_HEIGHT * .5f;
 
