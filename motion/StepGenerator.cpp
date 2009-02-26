@@ -20,6 +20,8 @@
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+#include <boost/assign/std/vector.hpp>
+using namespace boost::assign;
 using boost::shared_ptr;
 
 #include "StepGenerator.h"
@@ -48,8 +50,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
-    //resetGait(params);
-    //resetStepCoordFrames();
+    pthread_mutex_init(&transform_mutex,NULL);
 }
 
 StepGenerator::~StepGenerator()
@@ -167,7 +168,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //relative to the support leg (f coord frame), based on the output
     //of the controller (in tick_controller() )
     ufvector3 com_f = prod(if_Transform,com_i);
-
+ 
     //We want to get the incremental rotation of the center of mass
     //we need to ask one of the walking legs to give it:
     const float body_rot_angle_fc = leftLeg.getFootRotation()/2; //relative to f
@@ -482,6 +483,7 @@ void StepGenerator::startRight(){
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
     if_Transform.assign(initStartRight);
+    ic_Transform.assign(CoordFrame3D::translation3D(0.0,0.0));
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -748,6 +750,28 @@ void StepGenerator::resetQueues(){
     currentZMPDSteps.clear();
     zmp_ref_x.clear();
     zmp_ref_y.clear();
+}
+
+vector<float> StepGenerator::getOdometryUpdate(){
+    pthread_mutex_lock(&transform_mutex);
+    ufmatrix3 new_ic_Transform = prod(if_Transform,fc_Transform);
+    const float rot_new = asin(new_ic_Transform(1,0));
+    const float rot_old = asin(ic_Transform(1,0));
+    const float rot_diff = rot_new - rot_old; //angle from cold to cnew
+
+    const ufvector3 origin_i = CoordFrame3D::vector3D(0.0f,0.0f);
+    ufvector3 start_pos_c_new = prod(new_ic_Transform,origin_i);
+    ufvector3 start_pos_c_old = prod(ic_Transform,origin_i);
+    ufvector3 start_pos_c_new_in_old =
+        prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-rot_diff),
+            start_pos_c_new);
+    ufvector3 movement_c = start_pos_c_new_in_old - start_pos_c_old;
+
+    ic_Transform = new_ic_Transform;
+    pthread_mutex_unlock(&transform_mutex);
+    vector<float> odoUpdate= vector<float>();
+    odoUpdate+=movement_c(0);odoUpdate+=movement_c(1);odoUpdate+=rot_diff;
+    return odoUpdate;
 }
 
 void StepGenerator::debugLogging(){

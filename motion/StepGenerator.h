@@ -120,6 +120,8 @@ public:
 
     bool resetGait(const WalkingParameters * _wp);
 
+    vector <float> getOdometryUpdate();
+
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
     void generate_steps();
@@ -155,7 +157,7 @@ private:
 
     bool _done;
 
-    ufvector3 com_i,est_zmp_i;
+    ufvector3 com_i,last_com_c,est_zmp_i;
     //ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     std::list<float> zmp_ref_x, zmp_ref_y;
@@ -186,6 +188,7 @@ private:
     //coord. frame into points in the 'f' coord frame
     ufmatrix3 if_Transform;
     ufmatrix3 fc_Transform;
+    ufmatrix3 ic_Transform; //odometry
     // These hold the initial position of the left/right foot when they are
     // in support mode. It is relative to the 'i' coord frame.
     ufmatrix3 initStartLeft;
@@ -202,7 +205,7 @@ private:
     FILE* com_log;
 #endif
 
-    bool temp_init;
+    pthread_mutex_t transform_mutex;
 };
 
 #endif
