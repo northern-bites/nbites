@@ -58,12 +58,14 @@ public class TOOLVisionLink {
     public byte[][] processImage(byte[] img_data, int imageWidth,
                                  int imageHeight,
                                  float[] joint_data,
+                                 float[] sensor_data,
                                  byte[] ct_data)
     {
         byte[][] threshResult = new byte[imageHeight][imageWidth];
         if( visionLinkSuccessful){
             try{
-                cppProcessImage(img_data,joint_data,ct_data,
+                cppProcessImage(img_data,joint_data,
+                                sensor_data,ct_data,
                                 threshResult);
             }catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n"+
@@ -79,6 +81,7 @@ public class TOOLVisionLink {
 
     //Native methods:
     native private void cppProcessImage(byte[] img_data, float[] joint_data,
+                                        float[] sensors_data,
                                         byte[] table_data,
                                         byte[][] threshResult);
 

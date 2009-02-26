@@ -38,16 +38,19 @@ public class DataRequest {
     public static final DataRequest INFO_ONLY =
         new DataRequest(true, false, false, false, false, false, false, false,
                         false, false);
-    public static final DataRequest IMAGE_ONLY = 
+    public static final DataRequest IMAGE_ONLY =
         new DataRequest(false, false, false, true, false, false, false, false,
                         false, false);
-    public static final DataRequest IMAGE_JOINTS = 
+    public static final DataRequest IMAGE_JOINTS =
         new DataRequest(false, true, false, true, false, false, false, false,
                         false, false);
-    public static final DataRequest THRESH_ONLY = 
+    public static final DataRequest IMAGE_JOINTS_SENSORS =
+        new DataRequest(false, true, true, true, false, false, false, false,
+                        false, false);
+    public static final DataRequest THRESH_ONLY =
         new DataRequest(false, false, false, false, true, false, false, false,
                         false, false);
-    public static final DataRequest IMAGE_THRESH = 
+    public static final DataRequest IMAGE_THRESH =
         new DataRequest(false, false, false, true, true, false, false, false,
                         false, false);
 
@@ -56,7 +59,7 @@ public class DataRequest {
         switch (type) {
             case INFO:         return true;
             case JOINTS:       return true;
-            case SENSORS:      return false;
+            case SENSORS:      return true;
             case IMAGE:        return true;
             case THRESH:       return true;
             case JPEG:         return false;

@@ -20,6 +20,8 @@
 #include "Vision.h"
 #include "NaoPose.h"
 #include "Sensors.h"
+#include "SensorDef.h"       // for NUM_SENSORS
+#include "Kinematics.h"      // for NUM_JOINTS
 using namespace std;
 using namespace boost;
 
@@ -73,7 +75,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
-     jbyteArray jtable, jobjectArray thresh_target){
+     jfloatArray jsensors, jbyteArray jtable, jobjectArray thresh_target){
         //Size checking -- we expect the sizes of the arrays to match
         //Base these on the size cpp expects for the image
         unsigned int tlenw =
@@ -87,9 +89,13 @@ extern "C" {
                  << endl;
             return;
         }
-        if (env->GetArrayLength(jjoints) != 22) {
+        if (env->GetArrayLength(jjoints) != Kinematics::NUM_JOINTS) {
             cout << "Error: the joint array had incorrect dimensions" << endl;
-            return ;
+            return;
+        }
+        if (env->getArrayLength(jsensors) != NUM_SENSORS) {
+            cout << "Error: the sensors array had incorrect dimensions" << endl;
+            return;
         }
         if (env->GetArrayLength(jtable) != YMAX*UMAX*VMAX) {
             cout << "Error: the color table had incorrect dimensions" << endl;

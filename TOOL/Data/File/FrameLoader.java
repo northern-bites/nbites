@@ -18,7 +18,7 @@ import TOOL.Data.RobotDef;
 public class FrameLoader implements FileFilter {
 
     public static final FileFilter FILTER = new FrameLoader();
-    
+
     public static final String BMP_EXT = ".BMP";
     public static final String AIBO_EXT = ".FRM";
     public static final String NAO_EXT = ".NFRM";
@@ -26,7 +26,7 @@ public class FrameLoader implements FileFilter {
 
     public static final int AIBO_IMAGE_WIDTH = 208;
     public static final int AIBO_IMAGE_HEIGHT = 160;
-    
+
     public static final String EXTENSIONS[] = {
         AIBO_EXT,
         NAO_EXT,
@@ -59,7 +59,7 @@ public class FrameLoader implements FileFilter {
             byte[] header;
             byte[] image;
             byte[] footer;
-            
+
             if (upper.endsWith(NAO_EXT)) {
                 frm.setImage(new YUV422Image(input,
                                              RobotDef.NAO_DEF.imageWidth(),
@@ -85,10 +85,10 @@ public class FrameLoader implements FileFilter {
             }else if (upper.endsWith(AIBO_EXT)) {
                 // skip header
                 input.skip(AIBO_HEADER_SIZE);
-                // read image 
+                // read image
                 frm.setImage(new YCbCrImage(input,
-                                            RobotDef.ERS7_DEF.imageWidth(), 
-                                            RobotDef.ERS7_DEF.imageHeight())); 
+                                            RobotDef.ERS7_DEF.imageWidth(),
+                                            RobotDef.ERS7_DEF.imageHeight()));
                 // read footer
                 footer = new byte[input.available()];
                 input.readFully(footer);
@@ -111,7 +111,7 @@ public class FrameLoader implements FileFilter {
                                           RobotDef.NAO_SIM_DEF.imageHeight()));
                 footer = new byte[input.available()];
                 input.readFully(footer);
-            
+
                 String fullFooter = new String(footer, "ASCII");
                 String[] values = fullFooter.split(" ");
                 Vector<Float> joints = new Vector<Float>();
@@ -167,27 +167,30 @@ public class FrameLoader implements FileFilter {
         try {
             FileOutputStream fos = new FileOutputStream(f);
             DataOutputStream output = new DataOutputStream(fos);
-    
+
             switch (frm.type()) {
                 case RobotDef.AIBO:
                 case RobotDef.AIBO_220:
                 case RobotDef.AIBO_ERS7:
                     output.write(new byte[AIBO_HEADER_SIZE]);
-    
+
                     if (frm.hasImage())
                         frm.image().writeOutputStream(output);
-    
+
                     if (frm.hasJoints())
                         for (Float fl : frm.joints())
                             output.writeBytes(fl.toString() + " ");
                     break;
-    
+
                 case RobotDef.NAO:
                 case RobotDef.NAO_RL:
                     if (frm.hasImage())
                         frm.image().writeOutputStream(output);
                     if (frm.hasJoints())
                         for (Float fl : frm.joints())
+                            output.writeBytes(fl.toString() + " ");
+                    if (frm.hasSensors())
+                        for (Float fl : frm.sensors())
                             output.writeBytes(fl.toString() + " ");
                     break;
 
@@ -210,15 +213,15 @@ public class FrameLoader implements FileFilter {
         return f.isFile() && acceptableFormat(f.getPath());
     }
     public static boolean acceptableFormat(String imagePath) {
-      
+
         String upper = imagePath.toUpperCase();
-        
+
         for (int i = 0; i < EXTENSIONS.length; i++)
             if (upper.endsWith(EXTENSIONS[i]))
                 return true;
 
         return false;
-        
+
     }
 
     /**

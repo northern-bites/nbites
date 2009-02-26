@@ -6,6 +6,7 @@ import java.util.Iterator;
 import TOOL.TOOL;
 import TOOL.Vision.TOOLVisionLink;
 import TOOL.Data.Frame;
+import TOOL.Data.RobotDef;
 
 /**
  * @author George Slavov
@@ -34,6 +35,8 @@ public class ProcessedImage extends ThresholdedImage {
      * This method overrides the super class method.
      * It gets called on instantiation and habitually by other modules of the
      * TOOL.
+     * NOTE: This method assumes we are working with a NAO image. If someone
+     *       cares to fix it...be my guest. Sincerely, George.
      */
     public void thresholdImage(ColorTable table, TOOLImage image) {
         // Grab a constant reference to the current instance of the TOOL
@@ -51,8 +54,9 @@ public class ProcessedImage extends ThresholdedImage {
             super.thresholdImage(table, image);
         else {
             //Get the joints from the frame if it exists
-            float[] joints = new float[22]; //default length for Nao
             Frame currentFrame = tool.getDataManager().activeFrame();
+
+            float[] joints = new float[RobotDef.NAO_DEF.numJoints()];
             if(currentFrame.hasJoints()){
                 List<Float> list_joints = currentFrame.joints();
                 joints = new float[list_joints.size()];
@@ -63,6 +67,16 @@ public class ProcessedImage extends ThresholdedImage {
             }else{
                 tool.CONSOLE.message("Warning: Processing image w/o " +
                                      "joint info");
+            }
+
+            float[] sensors = new float[RobotDef.NAO_DEF.numSensors()];
+            if (currentFrame.hasSensors()) {
+                List<Float> list_sensors = currentFrame.sensors();
+                sensors = new float[list_sensors.size()];
+                int i = 0;
+                for (Float value : list_sensors) {
+                    joints[i++] = value;
+                }
             }
 
             // Convert the TOOLImage to the one-dimensional format that the C++
@@ -82,7 +96,8 @@ public class ProcessedImage extends ThresholdedImage {
             thresholded = visionLink.processImage(rawImage,
                                                   image.getWidth(),
                                                   image.getHeight(),
-                                                  joints,rawTable);
+                                                  joints, sensors,
+                                                  rawTable);
         }
     }
 

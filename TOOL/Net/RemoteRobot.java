@@ -68,7 +68,7 @@ public class RemoteRobot extends FileSet {
         super(src, i, storagePath);
 
         proto = new TOOLProtocol(addr);
-        requestDetails = DataRequest.IMAGE_JOINTS;
+        requestDetails = DataRequest.IMAGE_JOINTS_SENSORS;
 
         init(host, addr.getHostAddress(), 0);
     }
