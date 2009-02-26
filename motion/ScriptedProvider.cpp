@@ -50,7 +50,7 @@ ScriptedProvider::~ScriptedProvider() {
 
     // Wait until not active anymore
     while ( isActive() );
-
+    pthread_mutex_destroy(&scripted_mutex);
     // Don't have to delete commandQueue, since it will
     // be empty once we're not active.
 }

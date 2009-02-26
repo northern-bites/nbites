@@ -41,6 +41,8 @@ HeadProvider::HeadProvider(float motionFrameLength, shared_ptr<Sensors> s)
 
 // Motion Provider Methods
 HeadProvider::~HeadProvider() {
+    pthread_mutex_destroy(&scripted_mode_mutex);
+    pthread_mutex_destroy(&set_mode_mutex);
     // remove all remaining values from chain queues
 }
 
