@@ -143,6 +143,7 @@ private: // Helper methods
     static const ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
 
     void resetQueues();
+    void resetOdometry();
     void debugLogging();
 
 private:
@@ -205,6 +206,7 @@ private:
     FILE* com_log;
 #endif
 
+    //mutex locks if, ic Transforms to protect against odometry access
     pthread_mutex_t transform_mutex;
 };
 

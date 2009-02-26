@@ -38,6 +38,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
     if_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
+    ic_Transform(CoordFrame3D::identity3D()),
     initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),
@@ -106,6 +107,7 @@ void StepGenerator::tick_controller(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_controller" << endl;
 #endif
+/*
     #define G 9.81
     Inertial inertial = sensors->getInertial();
 
@@ -119,7 +121,7 @@ void StepGenerator::tick_controller(){
 
     est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/G)*accel_i(0);
     est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/G)*accel_i(1);
-
+*/
     //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
@@ -152,6 +154,8 @@ WalkLegsTuple StepGenerator::tick_legs(){
 #endif
     //Ensure we have enough steps for planning purposes
     generate_steps();
+    cout << "tick" <<endl;
+    pthread_mutex_lock(&transform_mutex);
 
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
@@ -198,6 +202,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         swingingStep_f,fc_Transform);
 
+    pthread_mutex_unlock(&transform_mutex);
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
@@ -473,6 +478,11 @@ void StepGenerator::startRight(){
     leftLeg.startLeft();
     rightLeg.startLeft();
 
+    //When we start out again, we need to let odometry know to store
+    //the distance covered so far. This needs to happen before
+    //we reset any coordinate frames
+    resetOdometry();
+
     //This is the place where we reset the controller each time the walk starts
     //over again.
     //First we reset the controller back to the neutral position
@@ -482,8 +492,9 @@ void StepGenerator::startRight(){
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
+    pthread_mutex_lock(&transform_mutex);
     if_Transform.assign(initStartRight);
-    ic_Transform.assign(CoordFrame3D::translation3D(0.0,0.0));
+    pthread_mutex_unlock(&transform_mutex);
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -516,6 +527,11 @@ void StepGenerator::startLeft(){
     leftLeg.startRight();
     rightLeg.startRight();
 
+    //When we start out again, we need to let odometry know to store
+    //the distance covered so far. This needs to happen before
+    //we reset any coordinate frames
+    resetOdometry();
+
     //This is the place where we reset the controller each time the walk starts
     //over again.
     //First we reset the controller back to the neutral position
@@ -525,7 +541,11 @@ void StepGenerator::startLeft(){
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
+    pthread_mutex_lock(&transform_mutex);
     if_Transform.assign(initStartLeft);
+    pthread_mutex_unlock(&transform_mutex);
+
+
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -752,26 +772,59 @@ void StepGenerator::resetQueues(){
     zmp_ref_y.clear();
 }
 
+/**
+ * Returns the cumulative odometry changes since the last call
+ */
 vector<float> StepGenerator::getOdometryUpdate(){
     pthread_mutex_lock(&transform_mutex);
     ufmatrix3 new_ic_Transform = prod(if_Transform,fc_Transform);
     const float rot_new = asin(new_ic_Transform(1,0));
     const float rot_old = asin(ic_Transform(1,0));
     const float rot_diff = rot_new - rot_old; //angle from cold to cnew
+    cout <<endl<< "********************************"<<_done<<endl;
+
+    cout << "com_i" <<com_i<<endl;
+    cout << "Rot diff is " <<rot_diff<<endl;
 
     const ufvector3 origin_i = CoordFrame3D::vector3D(0.0f,0.0f);
     ufvector3 start_pos_c_new = prod(new_ic_Transform,origin_i);
     ufvector3 start_pos_c_old = prod(ic_Transform,origin_i);
+    cout << "start pos_c_new: "<<start_pos_c_new<<endl
+         << "start_pos_c_old: "<<start_pos_c_old<<endl;
     ufvector3 start_pos_c_new_in_old =
         prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-rot_diff),
             start_pos_c_new);
-    ufvector3 movement_c = start_pos_c_new_in_old - start_pos_c_old;
+    cout << "start_pos_c_new_in_old"<<start_pos_c_new_in_old<<endl;
+    ufvector3 movement_c = start_pos_c_old - start_pos_c_new_in_old;
 
     ic_Transform = new_ic_Transform;
     pthread_mutex_unlock(&transform_mutex);
     vector<float> odoUpdate= vector<float>();
     odoUpdate+=movement_c(0);odoUpdate+=movement_c(1);odoUpdate+=rot_diff;
     return odoUpdate;
+}
+
+/**
+ * Ensures we don't loose odometry information if the walk is restarted.
+ */
+void StepGenerator::resetOdometry(){
+    cout << "Resetting Odometry" <<endl;
+    cout << "if_transform" << if_Transform <<endl;
+    cout << "fc_transform" << fc_Transform <<endl;
+
+    vector<float> curOdoUpdate = getOdometryUpdate();
+
+    //since we are starting over, we need to
+    //assign the ic transform to account for any currently
+    //built up odometry. This means we need to init the i to c matrix
+    //to store the location of the c frame last time odometry was called:
+    ufmatrix3 odoHistory = prod(CoordFrame3D::translation3D(-curOdoUpdate[0],
+                                                            -curOdoUpdate[1]),
+                                CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+                                                         -curOdoUpdate[2]));
+    pthread_mutex_lock(&transform_mutex);
+    ic_Transform.assign(odoHistory);
+    pthread_mutex_unlock(&transform_mutex);
 }
 
 void StepGenerator::debugLogging(){

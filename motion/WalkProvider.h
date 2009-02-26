@@ -66,7 +66,9 @@ public:
 	void setCommand(const WalkCommand * command);
 	void setCommand(const GaitCommand * command);
     BodyJointCommand * getGaitTransitionCommand();
-
+    std::vector<float> getOdometeryUpdate(){
+        return stepGenerator.getOdometryUpdate();
+    }
 private:
     virtual void setActive();
 

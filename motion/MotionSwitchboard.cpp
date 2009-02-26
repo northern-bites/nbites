@@ -264,6 +264,13 @@ int MotionSwitchboard::processProviders(){
 #ifdef DEBUG_SWITCHBOARD
         switchedToInactive = false;
 #endif
+        
+        static float f = 0.0f,l = 0.0f,t = 0.0f;
+        vector<float> odo =  walkProvider.getOdometeryUpdate();
+        cout << "Odo up date ("<<odo[0]<<","<<odo[1]<<","<<odo[2]<<")"<<endl;
+        f+=odo[0];l+=odo[1];t+=odo[2];
+        cout << "Total Odo update ("<<f<<","<<l<<","<<t<<")"<<endl;
+        
 
     }else{
 #ifdef DEBUG_SWITCHBOARD
@@ -272,9 +279,10 @@ int MotionSwitchboard::processProviders(){
         switchedToInactive = true;
 #endif
     }
+
     newJoints = true;
 
-    //return if one of the enactors 
+    //return if one of the enactors
     return curProvider->isActive() ||  headProvider.isActive();
 
 }
