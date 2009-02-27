@@ -12,7 +12,6 @@ RAW_HEADER_SIZE = 0
 LOG_DIR = "logs/"
 # Localization Logs
 LOC_LOG_TYPE = "localization"
-EKF_LOG_TYPE = "EKF"
 NAO_HEADER_ID = "NAO"
 
 class NaoOutput:
@@ -23,9 +22,7 @@ class NaoOutput:
         self.brain = brain
         self.frameCounter = 0 # Used by saveFrame
         self.locLogCount = 0
-        self.ekfLogCount = 0
         self.loggingLoc = False
-        self.loggingEKF = False
 
     def printf(self,str):
         """
@@ -50,8 +47,8 @@ class NaoOutput:
         fsrSum = 0.
         for x in fsr:
             fsrSum +=x
-            
-        print "Fsr",fsr," sum", fsrSum 
+
+        print "Fsr",fsr," sum", fsrSum
 
     # Functionality for logging
     def updateLogs(self):
@@ -60,9 +57,6 @@ class NaoOutput:
         """
         if self.loggingLoc:
             self.logLoc()
-        if self.loggingEKF:
-            self.logEKF()
-
 
     def newLog(self, logType, logCount):
         """
@@ -88,23 +82,22 @@ class NaoOutput:
         headerLine = str(self.brain.my.teamColor) + " " + \
             str(self.brain.my.playerNumber) + " " + NAO_HEADER_ID
 
-        # The second line holds the current EKF values needed for self init
-        initLine = ("%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g"
-                    % ( self.brain.ekf.getXEst(),
-                        self.brain.ekf.getYEst(),
-                        self.brain.ekf.getHeadingEst(),
-                        self.brain.ekf.getXUncert(),
-                        self.brain.ekf.getYUncert(),
-                        self.brain.ekf.getHeadingUncert(),
-                        self.brain.ekf.getBallXEst(),
-                        self.brain.ekf.getBallYEst(),
-                        self.brain.ekf.getBallXVelocityEst(),
-                        self.brain.ekf.getBallYVelocityEst(),
-                        self.brain.ekf.getBallXUncert(),
-                        self.brain.ekf.getBallYUncert(),
-                        self.brain.ekf.getBallXVelocityUncert(),
-                        self.brain.ekf.getBallYVelocityUncert(),
-                        self.brain.ekf.frames_since_reset))
+        # The second line holds the current loc values needed for self init
+        initLine = ("%g %g %g %g %g %g %g %g %g %g %g %g %g %g"
+                    % ( self.brain.loc.x,
+                        self.brain.loc.y,
+                        self.brain.loc.h,
+                        self.brain.loc.xUncert,
+                        self.brain.loc.yUncert,
+                        self.brain.loc.hUncert,
+                        self.brain.loc.ballX,
+                        self.brain.loc.ballY,
+                        self.brain.loc.ballVelX,
+                        self.brain.loc.ballVelY,
+                        self.brain.loc.ballXUncert,
+                        self.brain.loc.BallYUncert,
+                        self.brain.loc.ballVelXUncert,
+                        self.brain.loc.BallVelYUncert))
 
         # Write our first line
         self.locLog.writeLine(headerLine)
@@ -117,18 +110,14 @@ class NaoOutput:
         if not self.loggingLoc:
             return
 
-        odometry = self.brain.motion.getLastOdometry()
+        odometry = [0,0,0]#self.brain.motion.getLastOdometry()
         # Follow the line format
-        locLine = "%ld %ld %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g" % (#TIME
-            self.brain.nao.getSimulatedTime(),
+        locLine = "%ld %ld %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g" % (
+            self.brain.nao.getSimulatedTime(), #TIME
             #FRAME COUNT
             self.locLog.frame,
             #ODOMETRY dF, dL, dA
             odometry[0], odometry[1], odometry[2],
-            #BY DIST BEARING
-            0, 0,
-            #YB DIST BEARING
-            0, 0,
             #YGLP DIST BEARING
             self.brain.yglp.dist, self.brain.yglp.bearing,
             #YGRP DIST BEARING
@@ -138,11 +127,7 @@ class NaoOutput:
             #BGRP DIST BEARING
             self.brain.bgrp.dist, self.brain.bgrp.bearing,
             #BALL DIST BEARING
-            self.brain.ball.dist, self.brain.ball.bearing,
-            #PWM
-            1.5,
-            # Head Yaw
-            self.brain.motion.getHeadYaw())
+            self.brain.ball.dist, self.brain.ball.bearing)
 
         for corner in self.brain.corners:
             locLine += " %d %g %g" & (corner.visionId, corner.dist,
@@ -159,69 +144,6 @@ class NaoOutput:
         self.printf("Stopping Localization Logging")
         self.loggingLoc = False
         self.locLog.closeLog()
-
-    def startEKFLog(self):
-        """
-        This is to start logging of all EKF data for playback offline
-        """
-        if self.loggingEKF:
-            return
-        self.printf("Starting EKF Logging")
-        self.loggingEKF = True
-        self.ekfLog = self.newLog(EKF_LOG_TYPE, self.ekfLogCount)
-
-        # Write header line
-        self.ekfLog.writeLine(NAO_HEADER_ID)
-
-    def logEKF(self):
-        """
-        Method to write a ine of ekf information
-        """
-        if not self.loggingEKF:
-            return
-        odo = self.brain.motion.getLastOdometry()
-        infoLine = ("%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g" 
-                    % ( self.brain.nao.getSimulatedTime(),
-                        self.ekfLog.frame,
-                        self.brain.my.teamColor,
-                        self.brain.my.playerNumber,
-
-                        # Self
-                        self.brain.ekf.getXEst(),
-                        self.brain.ekf.getYEst(),
-                        self.brain.ekf.getHeadingEst(),
-                        self.brain.ekf.getXUncert(),
-                        self.brain.ekf.getYUncert(),
-                        self.brain.ekf.getHeadingUncert(),
-
-                        # Ball
-                        self.brain.ekf.getBallXEst(),
-                        self.brain.ekf.getBallYEst(),
-                        self.brain.ekf.getBallXVelocityEst(),
-                        self.brain.ekf.getBallYVelocityEst(),
-                        self.brain.ekf.getBallXUncert(),
-                        self.brain.ekf.getBallYUncert(),
-                        self.brain.ekf.getBallXVelocityUncert(),
-                        self.brain.ekf.getBallYVelocityUncert(),
-                        self.brain.ball.dist,
-                        self.brain.ball.bearing,
-
-                        # Odometry
-                        odo[1], # dF
-                        odo[0], # dL
-                        odo[2]))# dA
-
-        self.ekfLog.writeLine(infoLine)
-
-    def stopEKFLog(self):
-        """
-        Method to stop EKF logging
-        """
-        if not self.loggingEKF:
-            return
-        self.printf("Stopping EKF Logging")
-        self.loggingEKF = False
-        self.ekfLog.closeLog()
 
 class Log:
     """

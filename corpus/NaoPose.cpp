@@ -506,3 +506,17 @@ const int NaoPose::getHorizonY(const int x) const {
 const int NaoPose::getHorizonX(const int y) const {
 	return (int)(((float)y - (float)horizonLeft.y)/horizonSlope);
 }
+
+// Return the distance to the object based on the image magnification of its
+// height
+const float NaoPose::pixHeightToDistance(float pixHeight, float cmHeight) const
+{
+    return (FOCAL_LENGTH_MM / (pixHeight * PIX_Y_TO_MM)) * cmHeight;
+}
+
+// Return the distance to the object based on the image magnification of its
+// height
+const float NaoPose::pixWidthToDistance(float pixWidth, float cmWidth) const
+{
+    return (FOCAL_LENGTH_MM / (pixWidth * PIX_X_TO_MM)) * cmWidth;
+}

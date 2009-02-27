@@ -45,7 +45,7 @@ public:
     ////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////
-    const list <const ConcreteCorner *> getPossibleCorners() const {
+    const std::list <const ConcreteCorner *> getPossibleCorners() const {
         return possibleCorners; }
     const VisualLine getLine1() const { return line1; }
     const VisualLine getLine2() const { return line2; }
@@ -68,7 +68,7 @@ public:
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////
-    void setPossibleCorners(list <const ConcreteCorner *> _possibleCorners) {
+    void setPossibleCorners(std::list <const ConcreteCorner *> _possibleCorners) {
         possibleCorners = _possibleCorners; }
     void setShape(const shape s) { cornerType = s; }
     void setLine1(const VisualLine l1) { line1 = l1; }
@@ -92,7 +92,7 @@ private: // private methods
 private:
     // This list will hold all the possibilities for this corner's specific ID
     // It will get set from within FieldLines.cc.
-    list <const ConcreteCorner *> possibleCorners;
+    std::list <const ConcreteCorner *> possibleCorners;
     shape cornerType;
 
     VisualLine line1;

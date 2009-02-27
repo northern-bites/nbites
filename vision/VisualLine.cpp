@@ -3,7 +3,7 @@
 #include <cstdlib>      // git rid of overloaded abs() errors
 
 #include "VisualLine.h"
-
+using namespace std;
 
 // Return true if y is higher in the image (towards 0)
 const bool YOrder::operator() (const linePoint& first, const linePoint& second)

@@ -8,6 +8,9 @@
 #include "_ledsmodule.h"
 
 #include "nogginconfig.h"
+#include "PyLoc.h"
+
+//#define DEBUG_OBSERVATIONS
 
 using namespace std;
 using namespace boost;
@@ -25,9 +28,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
     initializeVision(v);
 
     // Initialize localization stuff
-    mcl = shared_ptr<MCL>(new MCL());
-    ballEKF = shared_ptr<BallEKF>(new BallEKF(mcl));
-
+    initializeLocalization();
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
@@ -73,6 +74,22 @@ void Noggin::initializeVision(shared_ptr<Vision> v)
     init_leds();
 }
 
+void Noggin::initializeLocalization()
+{
+#ifdef DEBUG_NOGGIN_INITIALIZATION
+    printf("Initializing localization modules\n");
+#endif
+
+    // Initialize the localization modules
+    mcl = shared_ptr<MCL>(new MCL());
+    ballEKF = shared_ptr<BallEKF>(new BallEKF(mcl));
+
+    // Setup the python localization wrappers
+    set_mcl_reference(mcl);
+    set_ballEKF_reference(ballEKF);
+    c_init_localization();
+}
+
 bool Noggin::import_modules ()
 {
 #ifdef  DEBUG_NOGGIN_INITIALIZATION
@@ -110,8 +127,7 @@ void Noggin::reload ()
     getBrainInstance();
 }
 
-void
-Noggin::reload(std::string modules)
+void Noggin::reload(std::string modules)
 {
     if (brain_module == NULL)
         if (!import_modules())
@@ -277,8 +293,8 @@ void Noggin::updateLocalization()
     ballEKF->updateModel(vision->ball);
 
 #ifdef DEBUG_OBSERVATIONS
-    if(vision->ball->getDist() > 0.0) {
-        cout << "Ball seen at distance " << vision->ball->getDist()
+    if(vision->ball->getDistance() > 0.0) {
+        cout << "Ball seen at distance " << vision->ball->getDistance()
              << " and bearing " << vision->ball->getBearing() << endl;
     }
 #endif
@@ -286,6 +302,6 @@ void Noggin::updateLocalization()
     // Opponent Tracking
 
 #ifdef DEBUG_OBSERVATIONS
-    cout << mcl << endl;
+    cout << *mcl << endl;
 #endif
 }

@@ -1,4 +1,5 @@
 #include "ConcreteLine.h"
+using namespace std;
 
 ConcreteLine::ConcreteLine(const float _fieldX1, const float _fieldY1,
                            const float _fieldX2, const float _fieldY2,

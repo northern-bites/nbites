@@ -1,4 +1,5 @@
 #include "VisualFieldObject.h"
+using namespace std;
 
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
     : id(_id)
@@ -52,20 +53,6 @@ void VisualFieldObject::init(){
         fieldLocation = YELLOW_GOAL_RIGHT_POST_LOC;
         setPossibleFieldObjects(&ConcreteFieldObject::yellowGoalPosts);
         break;
-    case YELLOW_BLUE_BEACON:
-        fieldLocation = YELLOW_BLUE_BEACON_LOC;
-        break;
-    case BLUE_YELLOW_BEACON:
-        fieldLocation = BLUE_YELLOW_BEACON_LOC;
-        break;
-
-        /*
-          case BLUE_YELLOW_ARC:
-          //    fieldLocation = BLUE_YELLOW_ARC
-          break;
-          case YELLOW_BLUE_ARC:
-          break;*/
-
     case UNKNOWN_FIELD_OBJECT:
         fieldLocation = UNKNOWN_LOC;
     default:

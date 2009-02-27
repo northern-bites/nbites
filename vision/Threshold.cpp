@@ -921,17 +921,15 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 }
 
 /* Looks up goal post height in pixels to focal distance function.
- * @param height     the height of the post
- * @return           the distance to the post
+ * @param height     the height of the post in pixels
+ * @return           the distance to the post in centimeters
  */
 float Threshold::getGoalPostDistFromHeight(float height) {
 #if ROBOT(NAO_SIM)
     return 17826*pow((double) height,-1.0254);
-    //OLD return 100.0*61.0/height;
-#elif ROBOT(NAO_RL)
-    return 39305*pow((double) height,-0.9245);
 #else
-    return 6646*pow((double) height,-.9785);
+    // return 39305*pow((double) height,-0.9245);
+    return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
 #endif
 }
 
@@ -944,10 +942,9 @@ float Threshold::getGoalPostDistFromWidth(float width) {
     //floor distance, seems to be best for the width
     //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
     return 2360.1*pow((double) width,-1.0516);
-#elif ROBOT(NAO_RL)
-    return 10083*pow((double) width,-1.052);
 #else
-    return 1483.5*pow((double) width,-.934);
+    //return 10083*pow((double) width,-1.052);
+    return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
 #endif
 }
 

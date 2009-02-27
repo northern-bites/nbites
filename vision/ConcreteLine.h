@@ -7,7 +7,7 @@ class ConcreteLine;
 #include <list>
 #include <string>
 
-using namespace std;
+//using namespace std;
 
 // Includes
 #include "FieldConstants.h"
@@ -70,7 +70,7 @@ public:
     ////////////////////////////////////////////////////////////
     const lineID getID() const { return id; }
 
-    virtual const string toString() const;
+    virtual const std::string toString() const;
 
     const float getFieldX1() const { return fieldX1; }
     const float getFieldY1() const { return fieldY1; }
@@ -93,7 +93,7 @@ public:
     static const ConcreteLine* concreteLineList[NUM_LINES];
 
 public:
-    static const list <const ConcreteLine*> concreteLines;
+    static const std::list <const ConcreteLine*> concreteLines;
 // We'll probably want to define some lists of sidelines vs goalbox lines, etc.
 // This will be implemented in accordance with analysis within fieldlines...
 

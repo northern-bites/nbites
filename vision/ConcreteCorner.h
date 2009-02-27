@@ -7,7 +7,6 @@ class ConcreteCorner;
 #include <string>
 #include <list>
 #include <algorithm>
-using namespace std;
 
 #include "FieldConstants.h"
 #include "ConcreteLine.h"
@@ -108,7 +107,7 @@ public:
 
     virtual const string toString() const;
 
-    static const list <const ConcreteCorner*> getPossibleCorners(shape
+    static const std::list <const ConcreteCorner*> getPossibleCorners(shape
                                                                  corner_type);
 
 //     // Private methods
@@ -155,18 +154,18 @@ private: // These are only used internally by the getPossibleCorners method
 
 
 public:
-    static const list <const ConcreteCorner*> lCorners;
-    static const list <const ConcreteCorner*> tCorners;
-    static const list <const ConcreteCorner*> ccCorners;
+    static const std::list <const ConcreteCorner*> lCorners;
+    static const std::list <const ConcreteCorner*> tCorners;
+    static const std::list <const ConcreteCorner*> ccCorners;
 
-    static const list <const ConcreteCorner*> yellowGoalCorners;
-    static const list <const ConcreteCorner*> blueGoalCorners;
+    static const std::list <const ConcreteCorner*> yellowGoalCorners;
+    static const std::list <const ConcreteCorner*> blueGoalCorners;
 
-    static const list <const ConcreteCorner*> yellowArcCorners;
-    static const list <const ConcreteCorner*> blueArcCorners;
+    static const std::list <const ConcreteCorner*> yellowArcCorners;
+    static const std::list <const ConcreteCorner*> blueArcCorners;
 
-    static const list <const ConcreteCorner*> yellowGoalTCorners;
-    static const list <const ConcreteCorner*> blueGoalTCorners;
+    static const std::list <const ConcreteCorner*> yellowGoalTCorners;
+    static const std::list <const ConcreteCorner*> blueGoalTCorners;
 
 private: // Instance variables recording location on field and identifier
     cornerID id;
@@ -192,10 +191,10 @@ public:
 };
 
 class InList : public unary_function<const ConcreteCorner*, bool> {
-    const list<const ConcreteCorner *> possibilities;
+    const std::list<const ConcreteCorner *> possibilities;
 
 public:
-    explicit InList(const list<const ConcreteCorner *> &_possibilities) :
+    explicit InList(const std::list<const ConcreteCorner *> &_possibilities) :
         possibilities(_possibilities) { }
 
     bool operator() (const ConcreteCorner *c) const {

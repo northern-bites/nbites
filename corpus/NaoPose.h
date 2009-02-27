@@ -175,7 +175,8 @@ class NaoPose {
   const int getRightHorizonY() const { return horizonRight.y; }
   const float getHorizonSlope() const { return horizonSlope; }
   const float getPerpenSlope() const { return perpenHorizonSlope; }
-
+    const float pixHeightToDistance(float pixHeight, float cmHeight) const;
+    const float pixWidthToDistance(float pixWidth, float cmWidth) const;
  protected: // helper methods
   static const ublas::matrix <float>
     calculateForwardTransform(const ChainID id,

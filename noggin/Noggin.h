@@ -33,6 +33,8 @@ private:
     bool import_modules();
     // Instantiate a Brain instance
     void getBrainInstance();
+    // Initialize the localization system
+    void initializeLocalization();
     // Run the localization update; performed at every run step
     void updateLocalization();
 
@@ -40,7 +42,6 @@ private:
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Vision> vision;
     PyVision* pyvision;
-
     bool error_state;
     PyObject *module_helper;
     PyObject *brain_module;

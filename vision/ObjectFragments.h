@@ -94,8 +94,9 @@ static const float HALFISH = 0.49f;
 static const float GOODRAT = 0.75f;
 // indicator that post may be salvagable
 static const float SQUATRAT = 1.2f;
+// EXAMINED: lowered
 // goal posts of the same color have to be this far apart
-static const int MIN_POST_SEPARATION = 12;
+static const int MIN_POST_SEPARATION = 7;
 // how big a post is to be declared a big post
 // EXAMINED: change this
 static const int BIGPOST = 25;
@@ -133,14 +134,12 @@ static const int PRINTOBJSN = 50;
 static const int POSTDEBUGN = 52;
 static const int POSTLOGICN = 51;
 static const int TOPFINDN = 55;
-static const int BEACONDEBUGN = 53;
 static const int BALLDEBUGN = 54;
 static const int CORNERDEBUGN = 56;
 static const int BACKDEBUGN = 57;
 static const int SANITYN = 58;
 static const int DEBUGCIRCLEFITN = 60;
 static const int DEBUGBALLPOINTSN = 61;
-static const int ARCDEBUGN = 62;
 static const int CORRECTN = 63;
 static const int OPENFIELDN = 64;
 #else
@@ -149,14 +148,12 @@ static const bool PRINTOBJS = false;
 static const bool POSTDEBUG = false;
 static const bool POSTLOGIC = false;
 static const bool TOPFIND = false;
-static const bool BEACONDEBUG = false;
 static const bool BALLDEBUG = false;
 static const bool CORNERDEBUG = false;
 static const bool BACKDEBUG = false;
 static const bool SANITY = false;
 static const bool DEBUGCIRCLEFIT = false;
 static const bool DEBUGBALLPOINTS = false;
-static const bool ARCDEBUG = false;
 static const bool CORRECT = false;
 static const bool OPENFIELD = false;
 #endif
