@@ -9,6 +9,8 @@
 
 #include "nogginconfig.h"
 
+//#define DEBUG_OBSERVATIONS
+
 using namespace std;
 using namespace boost;
 
@@ -277,8 +279,8 @@ void Noggin::updateLocalization()
     ballEKF->updateModel(vision->ball);
 
 #ifdef DEBUG_OBSERVATIONS
-    if(vision->ball->getDist() > 0.0) {
-        cout << "Ball seen at distance " << vision->ball->getDist()
+    if(vision->ball->getDistance() > 0.0) {
+        cout << "Ball seen at distance " << vision->ball->getDistance()
              << " and bearing " << vision->ball->getBearing() << endl;
     }
 #endif
@@ -286,6 +288,6 @@ void Noggin::updateLocalization()
     // Opponent Tracking
 
 #ifdef DEBUG_OBSERVATIONS
-    cout << mcl << endl;
+    cout << *mcl << endl;
 #endif
 }
