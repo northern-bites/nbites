@@ -62,17 +62,13 @@ void WalkProvider::calculateNextJoints() {
             cout << "Failed to set gait, trying again next time"<<endl;
         }
     }
-    //pthread_mutex_lock(&walk_provider_mutex);
-    cout << "About to set the next command "<<nextCommand<<endl;
     if(nextCommand){
-        cout << "Setting it"<<endl;
         stepGenerator.setSpeed(nextCommand->x_mms,
                                nextCommand->y_mms,
                                nextCommand->theta_rads);
     }
     pendingCommands = false;
     nextCommand = NULL;
-    //pthread_mutex_unlock(&walk_provider_mutex);
 
 
     //ask the step Generator to update ZMP values, com targets
@@ -105,14 +101,12 @@ void WalkProvider::calculateNextJoints() {
 void WalkProvider::setCommand(const WalkCommand * command){
     //grab the velocities in mm/second rad/second from WalkCommand
     pthread_mutex_lock(&walk_provider_mutex);
-    cout << "Got new command in WalkProvider" <<endl;
     if(nextCommand)
         delete nextCommand;
     nextCommand =command;
     pendingCommands = true;
 
     setActive();
-    cout << "Done setting the command in WP" <<endl;
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 

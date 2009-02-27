@@ -26,7 +26,7 @@ using boost::shared_ptr;
 
 #include "StepGenerator.h"
 
-#define DEBUG_STEPGENERATOR
+//#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -153,7 +153,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
 #endif
     //Ensure we have enough steps for planning purposes
     generate_steps();
-    cout << "tick" <<endl;
 
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
@@ -765,31 +764,38 @@ void StepGenerator::resetQueues(){
 
 /**
  * Returns the cumulative odometry changes since the last call
+ * 
+ * The basic idea is to keep track of where the start position is located
+ * in two c-type frames. The new c frame is the c frame of the robot at the time
+ * this method is called. The old c frame was the c frame of the robot when this
+ * method was last called (or alternately since instantiation).
+ *
+ * The odometry update is then calculated by looking at the difference 
+ * between the location of the global origin (origin_i) in each of those frames.
+ * This allows us to see how to translate, then rotate, from the old c frame
+ * to the new one.
+ *
+ * Note that since we reset the location of the controller when we restart walking
+ * it is vital to call 'resetOdometry()' in order to make sure any movement
+ * since the last call to getOdometryUpdate doesnt get lost
  */
 vector<float> StepGenerator::getOdometryUpdate(){
     ufmatrix3 new_ic_Transform = prod(fc_Transform,if_Transform);
     const float rot_new = -asin(new_ic_Transform(1,0));
     const float rot_old = -asin(ic_Transform(1,0));
     const float rot_diff = rot_new - rot_old; //angle from cold to cnew
-    cout <<endl<< "********************************"<<_done<<endl;
-    cout<< "if_Transform" <<if_Transform<<endl;
-    cout<< "fc_Transform" <<fc_Transform<<endl;
-    cout<< "new_ic_Transform" <<new_ic_Transform<<endl<<endl;
-    cout << "com_i" <<com_i<<endl;
-    cout << "Rot diff is " <<rot_diff<<" old:"<<rot_old << " new:"<<rot_new <<endl;
 
     const ufvector3 origin_i = CoordFrame3D::vector3D(0.0f,0.0f);
-    ufvector3 start_pos_c_new = prod(new_ic_Transform,origin_i);
-    ufvector3 start_pos_c_old = prod(ic_Transform,origin_i);
-    cout << "start pos_c_new: "<<start_pos_c_new<<endl
-         << "start_pos_c_old: "<<start_pos_c_old<<endl;
-    ufvector3 start_pos_c_new_in_old =
+    const ufvector3 start_pos_c_new = prod(new_ic_Transform,origin_i);
+    const ufvector3 start_pos_c_old = prod(ic_Transform,origin_i);
+    const ufvector3 start_pos_c_new_in_old =
         prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-rot_diff),
-            start_pos_c_new);
-    cout << "start_pos_c_new_in_old"<<start_pos_c_new_in_old<<endl;
-    ufvector3 movement_c = start_pos_c_old - start_pos_c_new_in_old;
+             start_pos_c_new);
+    const ufvector3 movement_c = start_pos_c_old - start_pos_c_new_in_old;
 
-    ic_Transform = new_ic_Transform;
+    ic_Transform = new_ic_Transform; //save the new coordinate frame for later
+
+    //populate the vector. Note the units are mm and rad
     vector<float> odoUpdate= vector<float>();
     odoUpdate+=movement_c(0);odoUpdate+=movement_c(1);odoUpdate+=rot_diff;
     return odoUpdate;
@@ -799,9 +805,6 @@ vector<float> StepGenerator::getOdometryUpdate(){
  * Ensures we don't loose odometry information if the walk is restarted.
  */
 void StepGenerator::resetOdometry(){
-    cout << "Resetting Odometry" <<endl;
-    cout << "if_transform" << if_Transform <<endl;
-    cout << "fc_transform" << fc_Transform <<endl;
 
     vector<float> curOdoUpdate = getOdometryUpdate();
 

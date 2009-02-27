@@ -1,32 +1,13 @@
 
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 #include "MotionSwitchboard.h"
-#include "CoordFrame.h"
+
 using namespace std;
 using namespace boost;
 
-#define DEBUG_SWITCHBOARD
+//#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
@@ -193,8 +174,6 @@ void MotionSwitchboard::run() {
 }
 
 int MotionSwitchboard::processProviders(){
-//     cout << "Switch Tick now in " <<*curProvider <<" --> "
-//          <<*nextProvider<<endl;
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
 
@@ -266,40 +245,17 @@ int MotionSwitchboard::processProviders(){
 #ifdef DEBUG_SWITCHBOARD
         switchedToInactive = false;
 #endif
-        if(curProvider->getType() == 1){
-            static float f = 0.0f,l = 0.0f,t = 0.0f;
-            static ufmatrix3 transform = CoordFrame3D::identity3D();
-            //static ufvector3 position = CoordFrame3D::vector3D(0.0f,0.0f);
-            vector<float> odo =  walkProvider.getOdometeryUpdate();
-            
-            f+=odo[0];l+=odo[1];t+=odo[2];
-            ufmatrix3 nt = prod(CoordFrame3D::translation3D(-odo[0],-odo[1]),
-                                CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-odo[2]));
-//             ufvector3 new_position = prod(nt,position);
-//             cout << "old position "<<position<<endl;
-//             cout << "new position" <<new_position<<endl<<endl;
-//             position = new_position;
 
-            transform = prod(transform,nt);
-            
-            cout << "Odo up date ("<<odo[0]<<","<<odo[1]<<","<<odo[2]<<")"<<endl;        
-            cout << "Total Odo update ("<<f<<","<<l<<","<<t<<")"<<endl;
-            cout << "Total matrix udpate" <<prod(transform,
-                                                 CoordFrame3D::vector3D(0.0f,0.0f))
-                 <<" with rot "<< asin(transform(1,0))<<endl;
-        }
     }else{
 #ifdef DEBUG_SWITCHBOARD
         if (!switchedToInactive)
             cout << *curProvider << " is inactive" <<endl;
         switchedToInactive = true;
 #endif
-
     }
-
     newJoints = true;
 
-    //return if one of the enactors
+    //return if one of the enactors 
     return curProvider->isActive() ||  headProvider.isActive();
 
 }
@@ -423,7 +379,6 @@ void MotionSwitchboard::sendMotionCommand(const GaitCommand *command){
     walkProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
-    cout << "Got walk command in MotionSwitchboard"<<endl;
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }
