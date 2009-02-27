@@ -2,9 +2,10 @@
 
 #include "NaoEnactor.h"
 #include <iostream>
+#define DEBUG_ENACTOR_JOINTS
 
-
-NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s)
+NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
+                        boost::shared_ptr<Sensors> s)
     : MotionEnactor(),broker(_pbroker),sensors(s) {
         try {
             dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
@@ -12,7 +13,8 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Senso
             cout << "Failed to initialize proxy to DCM" << endl;
         }
         try{
-            alfastaccess = AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+            alfastaccess =
+                    AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
         } catch(AL::ALError &e){
             cout << "Failed to initialize proxy to ALFastAccess"<<endl;
         }
@@ -24,15 +26,18 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Senso
     sensors = s;
     //TestSafety();
 }
-vector<float> NaoEnactor::jointValues(16,0.0);
+vector<float> NaoEnactor::jointValues(22,0.0); //current values of joints
+vector<float> NaoEnactor::motionValues(22,0.0); //commands sent to joints
 const string NaoEnactor::PositionPostFix("/Position/Actuator/Value");
 const string NaoEnactor::HardnessPostFix("/Hardness/Actuator/Value");
 const string NaoEnactor::ValuePostFix("/Position/Sensor/Value");
 const string NaoEnactor::ValuePreFix("Device/SubDeviceList/");
 const int NaoEnactor::MOTION_FRAME_RATE = 50;
 // 1 second * 1000 ms/s * 1000 us/ms
-const float NaoEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f / NaoEnactor::MOTION_FRAME_RATE;
-const float NaoEnactor::MOTION_FRAME_LENGTH_S = 1.0f / NaoEnactor::MOTION_FRAME_RATE;
+const float NaoEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
+                                                NaoEnactor::MOTION_FRAME_RATE;
+const float NaoEnactor::MOTION_FRAME_LENGTH_S = 1.0f /
+                                                NaoEnactor::MOTION_FRAME_RATE;
 
 const string NaoEnactor::jointsP[NaoEnactor::NUM_JOINTS] = {
 	"HeadYaw" + PositionPostFix,
@@ -52,7 +57,7 @@ const string NaoEnactor::jointsP[NaoEnactor::NUM_JOINTS] = {
 	"RHipPitch" + PositionPostFix,
 	"RKneePitch" + PositionPostFix,
 	"RAnklePitch" + PositionPostFix,
-        "RAnkleRoll" + PositionPostFix,
+    "RAnkleRoll" + PositionPostFix,
 	"RShoulderPitch" + PositionPostFix,
 	"RShoulderRoll" + PositionPostFix,
 	"RElbowYaw" + PositionPostFix,
@@ -76,15 +81,15 @@ const string NaoEnactor::jointsH[NaoEnactor::NUM_JOINTS] = {
 	"RHipPitch" + HardnessPostFix,
 	"RKneePitch" + HardnessPostFix,
 	"RAnklePitch" + HardnessPostFix,
-        "RAnkleRoll" + HardnessPostFix,
+    "RAnkleRoll" + HardnessPostFix,
 	"RShoulderPitch" + HardnessPostFix,
 	"RShoulderRoll" + HardnessPostFix,
 	"RElbowYaw" + HardnessPostFix,
 	"RElbowRoll" + HardnessPostFix
 };
 const string NaoEnactor::jointsV[NaoEnactor::NUM_JOINTS] = {
-        ValuePreFix + "HeadYaw" + ValuePostFix,
-        ValuePreFix + "HeadPitch" + ValuePostFix,
+    ValuePreFix + "HeadYaw" + ValuePostFix,
+    ValuePreFix + "HeadPitch" + ValuePostFix,
 	ValuePreFix + "LShoulderPitch" + ValuePostFix,
 	ValuePreFix + "LShoulderRoll" + ValuePostFix,
 	ValuePreFix + "LElbowYaw" + ValuePostFix,
@@ -100,7 +105,7 @@ const string NaoEnactor::jointsV[NaoEnactor::NUM_JOINTS] = {
 	ValuePreFix + "RHipPitch" + ValuePostFix,
 	ValuePreFix + "RKneePitch" + ValuePostFix,
 	ValuePreFix + "RAnklePitch" + ValuePostFix,
-        ValuePreFix + "RAnkleRoll" + ValuePostFix,
+    ValuePreFix + "RAnkleRoll" + ValuePostFix,
 	ValuePreFix + "RShoulderPitch" + ValuePostFix,
 	ValuePreFix + "RShoulderRoll" + ValuePostFix,
 	ValuePreFix + "RElbowYaw" + ValuePostFix,
@@ -123,95 +128,96 @@ const float NaoEnactor::jointsMax[NaoEnactor::NUM_JOINTS] = {
 
 void NaoEnactor::run() {
     std::cout << "NaoEnactor::run()" << std::endl;
-    
+	//basically postSensors() but need a different order for the first run
+    //makes sure we have current joint values in sensors and in motionValues
+    syncWithALMemory();
+	motionValues = jointValues;
+	sensors->setMotionBodyAngles(motionValues);
+
 	//set-up the array for sending commands to DCM
-	try{
-	ALValue commands;
-	commands.arraySetSize(3);
-	//kind of dcm update 
-         //"ClearAll" :  Delete all timed command before adding these one.
-        commands[1] = string("ClearAll");
-        commands[2].arraySetSize(1); //list of 1 timed-commands
-        commands[2][0].arraySetSize(3);
-	commands[2][0][2] = 0;
-        //sets the hardness for all the joints
+    ALValue commands;
+    commands.arraySetSize(3);
+    //kind of dcm update 
+     //"ClearAll" :  Delete all timed command before adding these one.
+    commands[1] = string("ClearAll");
+    commands[2].arraySetSize(1); //list of 1 timed-commands
+    commands[2][0].arraySetSize(3);
+    commands[2][0][2] = 0;
+    //sets the hardness for all the joints
+    for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
+        commands[0] = string(jointsH[i]); //has the actuator name
+        //sets the value for hardness
+        commands[2][0][0] = 0.85;
+        //tells the DCM how much time it has to get to the requested value
+        commands[2][0][1] = dcmProxy->getTime(100);
+        //sends the command to the DCM
+        #ifndef NO_ACTUAL_MOTION
+	    try {
+	        dcmProxy->set(commands);
+	    } catch(AL::ALError& a) {
+		    std::cout << "DCM Hardness set error" << a.toString() << "    " 
+		        << commands.toString() << std::endl;
+	    }
+        #endif
+    }
+    long long currentTime;
+    while (running) {
+        currentTime = micro_time();
+        if(!switchboard){
+            cout<< "Caution!! Switchboard is null, exiting NaoEnactor"<<endl;
+	        break;
+        }
+
+        // Get the angles we want to go to this frame from the switchboard
+        motionValues = switchboard->getNextJoints();
+        alfastaccess->GetValues(jointValues);
         for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
-            commands[0] = string(jointsH[i]); //has the actuator name
-            //sets the value for hardness
-            commands[2][0][0] = 0.85;
-            //tells the DCM how much time it has to get to the requested value
-            commands[2][0][1] = dcmProxy->getTime(100);
-            //sends the command to the DCM
+            #ifdef DEBUG_ENACTOR_JOINTS
+	        cout << "result of joint " << i << " is " << motionValues[i] << endl;
+	        #endif
+            //the name of the joint to send to be sent to the DCM
+            commands[0] = string(jointsP[i]);
+            
+            //Before assigning this value compare to current sensor value and make
+	        //sure that it doesn't exceed max speed (SafteyCheck does this)
+            float testVal = motionValues[i];
+            //may be better to use previous rounds motionValues[i] in case
+            //sensor lag occurs. we risk unsafe values if motion is impeded
+        	float currentVal = jointValues[i];
+	        motionValues[i] =  SafetyCheck(currentVal, testVal, i);
+            commands[2][0][0] = motionValues.at(i);
+            //tells the dcm to make this move as soon as possible
+            commands[2][0][1] = dcmProxy->getTime(0);
+	        //consider making this 200, as in RedDocs
+            /*"The better way to use timed command is to send them with at least a 
+	        20ms delay in the future. With this delay, the D.C.M. can compute an
+	        interpolation in its next cycle, whatever the next cycle time is."
+	        - From DCM Red Doc*/
+            
+            //send the array
             #ifndef NO_ACTUAL_MOTION
-		  try {
-		      dcmProxy->set(commands);
-		  } catch(AL::ALError& a) {
-			std::cout << "Set 1 " << a.toString() << "    " << commands.toString() << std::endl;
-		    }
+            try {
+	            dcmProxy->set(commands);
+	        } catch(AL::ALError& a) {
+		        std::cout << "dcm value set error " << a.toString() << std::endl;
+	        }
             #endif
         }
-        long long currentTime;
-        while (running) {
-	    currentTime = micro_time();
-	    
-	    if(!switchboard){
-	        cout<< "Caution!! Switchboard is null, exiting ALEnactor"<<endl;
-		break;
-	    }
-	    
-	    postSensors();
-            
-	    // Get the angles we want to go to this frame from the switchboard
-            vector<float> result = switchboard->getNextJoints();
-            
-	    for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
-                #ifdef DEBUG_ENACTOR_JOINTS
-		  cout << "result of joint " << i << " is " << result.at(i) << endl;
-		#endif
-                //the name of the joint to send to be sent to the DCM
-                commands[0] = string(jointsP[i]);
-                
-                //Before assigning this value compare to current sensor value and make
-		//sure that it doesn't exceed max speed (SafteyCheck does this)
-                float testVal = result.at(i);
-            	float currentVal = jointValues[i];
-		float newValue =  SafetyCheck(currentVal, testVal, i);
-                commands[2][0][0] = newValue;
-                //tells the dcm to make this move as soon as possible
-                commands[2][0][1] = dcmProxy->getTime(0);
-		//consider making this 200, as in RedDocs
-                /*"The better way to use timed command is to send them with at least a 
-		  20ms delay in the future. With this delay, the D.C.M. can compute an
-		  interpolation in its next cycle, whatever the next cycle time is."
-		  - From DCM Red Doc*/
-                
-                //send the array
-                #ifndef NO_ACTUAL_MOTION
-                    try {
-		      dcmProxy->set(commands);
-		    } catch(AL::ALError& a) {
-			std::cout << "Set 1 " << a.toString() << std::endl;
-		    }
-                #endif
-            }
-	    postSensors();
-	    const long long zero = 0;
-	    const long long processTime = micro_time() - currentTime;
+        postSensors();
+        const long long zero = 0;
+        const long long processTime = micro_time() - currentTime;
 
-#if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
-	    if (processTime > MOTION_FRAME_LENGTH_uS){
-	        cout << "Time spent in NaoEnactor longer than frame length: " 
-		     << processTime <<endl;
+        #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
+        if (processTime > MOTION_FRAME_LENGTH_uS){
+            cout << "Time spent in NaoEnactor longer than frame length: " 
+	            << processTime <<endl;
             //Don't sleep at all
-	    } else{
-	      usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS
-                                           -processTime));
-	    }
-#endif
+        } else{
+            usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS - processTime));
         }
-	}catch(AL::ALError& a) {
-	   std::cout << "Set 1 " << a.toString() <<  std::endl;
-	}
+        #endif
+    }
+
 }
 /*
 //runs unit tests when called.
@@ -260,7 +266,9 @@ void NaoEnactor::postSensors(){
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
+    sensors->setMotionBodyAngles(motionValues);
     syncWithALMemory();
+
 }
 /**
  * ALFastAccess allows us to pull out values from ALMemory a lot faster
@@ -311,15 +319,8 @@ void NaoEnactor::initSyncWithALMemory(){
 
 void NaoEnactor::syncWithALMemory() {
     alfastaccess->GetValues(jointValues);
-    
-    /*
-    cout << "****** Sensors values ******" << endl;
-    for (int i = 0; i < 20; i++) {
-        cout << varValues[i] <<endl;
-    }
-    cout << endl;
-    */
-     sensors->setBodyAngles(jointValues);
+    sensors->setBodyAngles(jointValues);
+     
 
     
 }

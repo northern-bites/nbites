@@ -45,6 +45,7 @@ private:
     static const float M2R1 = 0.1227;
     static const float M2R2 = 0.1066;
     static vector<float> jointValues;
+    static vector<float> motionValues;
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
     static const float MOTION_FRAME_LENGTH_S; // in seconds

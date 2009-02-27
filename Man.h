@@ -41,6 +41,12 @@
 #include "dcmproxy.h"
 #endif
 
+#ifdef USE_DCM
+#include "NaoEnactor.h"
+#else
+#include "ALEnactor.h"
+#endif
+
 #include "Common.h"
 #include "Profiler.h"
 #include "Sensors.h"
@@ -48,7 +54,6 @@
 #include "Vision.h"
 #include "Noggin.h"
 #include "Motion.h"
-#include "ALEnactor.h"
 #include "NaoPose.h"
 #include "synchro.h"
 
