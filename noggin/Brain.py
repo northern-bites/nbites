@@ -12,13 +12,13 @@ from man import vision
 from man.corpus import leds, sensors
 from man.motion import MotionConstants
 # Modules from this directory
-#from . import EKF
 from . import GameController
 from . import HeadTracking
 from . import Navigator
 from . import NaoOutput
 from . import NogginConstants as Constants
 from . import TypeDefs
+from . import Loc
 # Packages and modules from sub-directories
 from . import robots
 #from .playbook import GoTeam
@@ -47,6 +47,7 @@ class Brain(object):
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion
+        self.loc = Loc()
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()

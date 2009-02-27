@@ -42,7 +42,6 @@ private:
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Vision> vision;
     PyVision* pyvision;
-    // PyLoc* pyloc;
     bool error_state;
     PyObject *module_helper;
     PyObject *brain_module;

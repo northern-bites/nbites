@@ -8,6 +8,7 @@
 #include "_ledsmodule.h"
 
 #include "nogginconfig.h"
+#include "PyLoc.h"
 
 //#define DEBUG_OBSERVATIONS
 
@@ -83,16 +84,10 @@ void Noggin::initializeLocalization()
     mcl = shared_ptr<MCL>(new MCL());
     ballEKF = shared_ptr<BallEKF>(new BallEKF(mcl));
 
-    // // Initialize and insert the localization wrapper into the module
-    // PyObject *result = PyLoc_new();
-    // if (result == NULL) {
-    //     cerr << "** Noggin extension could not initialize PyLoc object **" <<
-    //         endl;
-    //     assert(false);
-    // }
-    // vision_addToModule(result, MODULE_HEAD);
-    // pyloc = reinterpret_cast<PyLoc*>(result);
-
+    // Setup the python localization wrappers
+    set_mcl_reference(mcl);
+    set_ballEKF_reference(ballEKF);
+    c_init_localization();
 }
 
 bool Noggin::import_modules ()
