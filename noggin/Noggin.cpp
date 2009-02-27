@@ -17,8 +17,10 @@ using namespace boost;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 
-Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
-    : error_state(false), brain_module(NULL), brain_instance(NULL)
+Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
+                MotionInterface * _minterface)
+    : error_state(false), brain_module(NULL), brain_instance(NULL),
+      motion_interface(_minterface)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -217,7 +219,8 @@ void Noggin::runStep ()
 void Noggin::updateLocalization()
 {
     // Self Localization
-    MotionModel odometery(0.0f, 0.0f, 0.0f);
+    //MotionModel odometery(0.0f, 0.0f, 0.0f);
+    MotionModel odometery = motion_interface->getOdometryUpdate();
 
     // Build the observations from vision data
     vector<Observation> observations;

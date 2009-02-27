@@ -5,6 +5,7 @@
 #include <Python.h>
 #include <boost/shared_ptr.hpp>
 
+#include "MotionInterface.h"
 #include "Profiler.h"
 #include "PyVision.h"
 #include "MCL.h"
@@ -13,7 +14,8 @@
 class Noggin
 {
 public:
-    Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v);
+    Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v,
+           MotionInterface * _minterface);
     virtual ~Noggin();
 
     // reload Brain module
@@ -46,7 +48,7 @@ private:
     PyObject *module_helper;
     PyObject *brain_module;
     PyObject *brain_instance;
-
+    MotionInterface * motion_interface;
 // Public members
 public:
     boost::shared_ptr<MCL> mcl;

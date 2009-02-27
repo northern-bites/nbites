@@ -37,6 +37,7 @@
 
 #include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
 
+#include "MCL.h"
 #include "Kinematics.h"
 #include "WalkProvider.h"
 #include "WalkingConstants.h"
@@ -76,6 +77,9 @@ public:
     bool isHeadActive(){return headProvider.isActive();}
     bool isBodyActive(){return curProvider->isActive();}
 
+    MotionModel getOdometryUpdate(){
+        return walkProvider.getOdometryUpdate();
+    }
 
 private:
     int processProviders();

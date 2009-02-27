@@ -24,6 +24,7 @@
 #include <queue>
 #include <vector>
 
+#include "MCL.h"
 #include "Kinematics.h"
 #include "WalkCommand.h"
 #include "BodyJointCommand.h"
@@ -58,6 +59,10 @@ class MotionInterface
     void stopBodyMoves();
     void stopHeadMoves();
 
+    //For noggin
+    MotionModel getOdometryUpdate(){
+        return switchboard->getOdometryUpdate();
+    }
 
     int postGotoCom(float pX, float pY, float pZ, float pTime, int pType) {
         return DUMMY_I;

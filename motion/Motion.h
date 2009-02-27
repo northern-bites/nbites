@@ -63,6 +63,7 @@ public:
     int start();
     void stop();
     void run();
+    MotionInterface * getInterface(){return &interface;}
 private:
     MotionSwitchboard switchboard;
 #ifdef NAOQI1

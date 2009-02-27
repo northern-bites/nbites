@@ -39,6 +39,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "MCL.h"
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
 #include "StepGenerator.h"
@@ -67,8 +68,9 @@ public:
 	void setCommand(const WalkCommand * command);
 	void setCommand(const GaitCommand * command);
     BodyJointCommand * getGaitTransitionCommand();
-    std::vector<float> getOdometeryUpdate(){
-        return stepGenerator.getOdometryUpdate();
+    MotionModel getOdometryUpdate(){
+        const std::vector<float> odo = stepGenerator.getOdometryUpdate();
+        return MotionModel(odo[0]*MM_TO_CM,odo[1]*MM_TO_CM,odo[2]);
     }
 private:
     virtual void setActive();

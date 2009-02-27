@@ -84,7 +84,8 @@ Man::Man ()
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
-    noggin = shared_ptr<Noggin>(new Noggin(profiler, vision));
+    noggin = shared_ptr<Noggin>(new Noggin(profiler, vision,
+                                           motion->getInterface()));
 
     initSyncWithALMemory();
 }
