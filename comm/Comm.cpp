@@ -433,7 +433,7 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
     data(14,0), latest(new list<vector<float> >),
     sensors(s), timer(&micro_time), gc()
 {
-
+  pthread_mutex_init(&comm_mutex,NULL);
   // initialize broadcast address structure
   broadcast_addr.sin_family = AF_INET;
   broadcast_addr.sin_port = htons(UDP_PORT);
@@ -444,6 +444,7 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
 
 Comm::~Comm ()
 {
+  pthread_mutex_destroy(&comm_mutex);
 }
 
 int
