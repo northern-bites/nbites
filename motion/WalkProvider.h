@@ -61,7 +61,9 @@ public:
 
 	void setCommand(const MotionCommand* command)
         {
+            pthread_mutex_lock(&walk_provider_mutex);
             setCommand(reinterpret_cast<const WalkCommand*>(command));
+            pthread_mutex_unlock(&walk_provider_mutex);
         }
 	void setCommand(const WalkCommand * command);
 	void setCommand(const GaitCommand * command);
@@ -78,7 +80,7 @@ private:
     StepGenerator stepGenerator;
     bool pendingCommands;
 
-    mutable pthread_mutex_t walk_command_mutex;
+    mutable pthread_mutex_t walk_provider_mutex;
     const WalkCommand * nextCommand;
 
     //Temp solution to arms

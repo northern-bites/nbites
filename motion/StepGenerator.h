@@ -206,8 +206,6 @@ private:
     FILE* com_log;
 #endif
 
-    //mutex locks if, ic Transforms to protect against odometry access
-    pthread_mutex_t transform_mutex;
 };
 
 #endif

@@ -22,11 +22,11 @@
 #include <boost/shared_ptr.hpp>
 
 #include "MotionSwitchboard.h"
-
+#include "CoordFrame.h"
 using namespace std;
 using namespace boost;
 
-//#define DEBUG_SWITCHBOARD
+#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
@@ -193,6 +193,8 @@ void MotionSwitchboard::run() {
 }
 
 int MotionSwitchboard::processProviders(){
+//     cout << "Switch Tick now in " <<*curProvider <<" --> "
+//          <<*nextProvider<<endl;
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
 
@@ -264,13 +266,21 @@ int MotionSwitchboard::processProviders(){
 #ifdef DEBUG_SWITCHBOARD
         switchedToInactive = false;
 #endif
-        
-        static float f = 0.0f,l = 0.0f,t = 0.0f;
-        vector<float> odo =  walkProvider.getOdometeryUpdate();
-        cout << "Odo up date ("<<odo[0]<<","<<odo[1]<<","<<odo[2]<<")"<<endl;
-        f+=odo[0];l+=odo[1];t+=odo[2];
-        cout << "Total Odo update ("<<f<<","<<l<<","<<t<<")"<<endl;
-        
+        if(curProvider->getType() == 1){
+            static float f = 0.0f,l = 0.0f,t = 0.0f;
+            static ufmatrix3 transform = CoordFrame3D::identity3D();
+            vector<float> odo =  walkProvider.getOdometeryUpdate();
+            
+            f+=odo[0];l+=odo[1];t+=odo[2];
+            ufmatrix3 nt = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-odo[2]),
+                                CoordFrame3D::translation3D(-odo[0],-odo[1]));
+            transform = prod(transform,nt);
+            
+            cout << "Odo up date ("<<odo[0]<<","<<odo[1]<<","<<odo[2]<<")"<<endl;        
+            cout << "Total Odo update ("<<f<<","<<l<<","<<t<<")"<<endl;
+            cout << "Total matrix udpate" <<prod(transform,
+                                                 CoordFrame3D::vector3D(0.0f,0.0f))<<endl;
+        }
 
     }else{
 #ifdef DEBUG_SWITCHBOARD
@@ -406,6 +416,7 @@ void MotionSwitchboard::sendMotionCommand(const GaitCommand *command){
     walkProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
+    cout << "Got walk command in MotionSwitchboard"<<endl;
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }

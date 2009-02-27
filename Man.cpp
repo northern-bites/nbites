@@ -866,7 +866,9 @@ Man::processFrame ()
 
     // run Python behaviors
 #ifdef USE_NOGGIN
+    cout <<"Noggin::stepping"<<endl;
     noggin->runStep();
+    cout <<"Noggin::done stepping"<<endl;
 #endif
 
     PROF_EXIT(profiler.get(), P_FINAL);

@@ -36,9 +36,12 @@ def switchGaits(player):
 
 def walkleft(player):
     if player.firstFrame():
-        walkcmd = motion.WalkCommand(x=0,y=1,theta=0)
+        print "sending walk command"
+        walkcmd = motion.WalkCommand(x=0,y=1,theta=1)
         player.brain.motion.setNextWalkCommand(walkcmd)
-    if player.counter == 30:
+        print "sent walk command"
+
+    if player.counter == 80:
         return player.goLater('sitdown')
     return player.stay()
 

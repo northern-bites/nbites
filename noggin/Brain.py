@@ -164,10 +164,10 @@ class Brain(object):
         self.player.run()
         self.tracker.run()
         self.nav.run()
-
+        print "Done with FSA"
         # Broadcast Report for Teammates
         self.setPacketData()
-
+        print "Done setting Packet Data"
         # Update any logs we have
         self.out.updateLogs()
 

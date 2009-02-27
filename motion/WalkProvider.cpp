@@ -34,7 +34,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
       pendingCommands(false),
       nextCommand(NULL)
 {
-    pthread_mutex_init(&walk_command_mutex,NULL);
+    pthread_mutex_init(&walk_provider_mutex,NULL);
 
     //Make up something arbitrary for the arms
     const float larm[ARM_JOINTS] = {M_PI/2,M_PI/10,-M_PI/2,-M_PI/2};
@@ -46,7 +46,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
 }
 
 WalkProvider::~WalkProvider() {
-    pthread_mutex_destroy(&walk_command_mutex);
+    pthread_mutex_destroy(&walk_provider_mutex);
 }
 
 void WalkProvider::requestStopFirstInstance() {
@@ -54,6 +54,7 @@ void WalkProvider::requestStopFirstInstance() {
 }
 
 void WalkProvider::calculateNextJoints() {
+    pthread_mutex_lock(&walk_provider_mutex);
     if ( nextGait != curGait){
         if( stepGenerator.resetGait(nextGait)){
             curGait = nextGait;
@@ -61,15 +62,17 @@ void WalkProvider::calculateNextJoints() {
             cout << "Failed to set gait, trying again next time"<<endl;
         }
     }
-    pthread_mutex_lock(&walk_command_mutex);
+    //pthread_mutex_lock(&walk_provider_mutex);
+    cout << "About to set the next command "<<nextCommand<<endl;
     if(nextCommand){
+        cout << "Setting it"<<endl;
         stepGenerator.setSpeed(nextCommand->x_mms,
                                nextCommand->y_mms,
                                nextCommand->theta_rads);
     }
     pendingCommands = false;
     nextCommand = NULL;
-    pthread_mutex_unlock(&walk_command_mutex);
+    //pthread_mutex_unlock(&walk_provider_mutex);
 
 
     //ask the step Generator to update ZMP values, com targets
@@ -96,19 +99,23 @@ void WalkProvider::calculateNextJoints() {
     setNextChainJoints(RARM_CHAIN,rarm_angles);
 
     setActive();
+    pthread_mutex_unlock(&walk_provider_mutex);
 }
 
 void WalkProvider::setCommand(const WalkCommand * command){
     //grab the velocities in mm/second rad/second from WalkCommand
-    pthread_mutex_lock(&walk_command_mutex);
+    pthread_mutex_lock(&walk_provider_mutex);
+    cout << "Got new command in WalkProvider" <<endl;
     if(nextCommand)
         delete nextCommand;
     nextCommand =command;
     pendingCommands = true;
-    pthread_mutex_unlock(&walk_command_mutex);
 
     setActive();
+    cout << "Done setting the command in WP" <<endl;
+    pthread_mutex_unlock(&walk_provider_mutex);
 }
+
 
 void WalkProvider::setCommand(const GaitCommand * command){
     nextGait = new WalkingParameters(command->getGait());
@@ -125,6 +132,7 @@ void WalkProvider::setActive(){
 }
 
 BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
+    //pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = nextGait->getWalkStance();
 
@@ -139,6 +147,7 @@ BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
     const float  MAX_RAD_PER_SEC =  M_PI*0.20; //Technically its 220 deg/s or so
     float time = max_change/MAX_RAD_PER_SEC;
 
+    //pthread_mutex_unlock(&walk_provider_mutex);
     return new BodyJointCommand(time,gaitJoints,
                                 Kinematics::INTERPOLATION_LINEAR);
 }

@@ -26,7 +26,7 @@ using boost::shared_ptr;
 
 #include "StepGenerator.h"
 
-//#define DEBUG_STEPGENERATOR
+#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -51,7 +51,6 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
 #endif
-    pthread_mutex_init(&transform_mutex,NULL);
 }
 
 StepGenerator::~StepGenerator()
@@ -155,7 +154,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //Ensure we have enough steps for planning purposes
     generate_steps();
     cout << "tick" <<endl;
-    pthread_mutex_lock(&transform_mutex);
 
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
@@ -201,8 +199,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                        swingingStep_f,fc_Transform);
     vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         swingingStep_f,fc_Transform);
-
-    pthread_mutex_unlock(&transform_mutex);
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
@@ -492,9 +488,7 @@ void StepGenerator::startRight(){
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
-    pthread_mutex_lock(&transform_mutex);
     if_Transform.assign(initStartRight);
-    pthread_mutex_unlock(&transform_mutex);
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -541,10 +535,7 @@ void StepGenerator::startLeft(){
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
-    pthread_mutex_lock(&transform_mutex);
     if_Transform.assign(initStartLeft);
-    pthread_mutex_unlock(&transform_mutex);
-
 
 
     //Third, we reset the memory of where to generate ZMP from steps back to
@@ -776,7 +767,6 @@ void StepGenerator::resetQueues(){
  * Returns the cumulative odometry changes since the last call
  */
 vector<float> StepGenerator::getOdometryUpdate(){
-    pthread_mutex_lock(&transform_mutex);
     ufmatrix3 new_ic_Transform = prod(if_Transform,fc_Transform);
     const float rot_new = asin(new_ic_Transform(1,0));
     const float rot_old = asin(ic_Transform(1,0));
@@ -798,7 +788,6 @@ vector<float> StepGenerator::getOdometryUpdate(){
     ufvector3 movement_c = start_pos_c_old - start_pos_c_new_in_old;
 
     ic_Transform = new_ic_Transform;
-    pthread_mutex_unlock(&transform_mutex);
     vector<float> odoUpdate= vector<float>();
     odoUpdate+=movement_c(0);odoUpdate+=movement_c(1);odoUpdate+=rot_diff;
     return odoUpdate;
@@ -822,9 +811,7 @@ void StepGenerator::resetOdometry(){
                                                             -curOdoUpdate[1]),
                                 CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                          -curOdoUpdate[2]));
-    pthread_mutex_lock(&transform_mutex);
     ic_Transform.assign(odoHistory);
-    pthread_mutex_unlock(&transform_mutex);
 }
 
 void StepGenerator::debugLogging(){
