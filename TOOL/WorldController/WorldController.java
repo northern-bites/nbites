@@ -379,6 +379,9 @@ public class WorldController extends JPanel implements KeyListener,
             startDogUDP();
         } else if (cmd.equals(VIEW_MCL_LOG_ACTION)) {
             startMCLLog();
+        } else if (cmd.equals(DISCONNECT_ACTION)) {
+            udp_server.setReceiving(false);
+            startDoNothing();
         }
 
         // keeps keyboard focus
