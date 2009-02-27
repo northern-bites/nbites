@@ -25,9 +25,6 @@ from . import robots
 from .players import Switch
 
 
-DEBUG_OBJS = False
-DEBUG_LOC = False
-
 class Brain(object):
     """
     Class brings all of our components together and runs the behaviors
@@ -39,7 +36,6 @@ class Brain(object):
         """
         self.on = True
         # Setup nao modules inside brain for easy access
-        #jf- self.nao = nao
         self.vision = vision.Vision()
         self.sensors = sensors.Sensors()
         self.comm = comm.inst
@@ -47,18 +43,16 @@ class Brain(object):
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion
+        # Get our reference to the C++ localization system
         self.loc = Loc()
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
-            # coa = Certificate of Authenticity (to keep things short)
+        # coa is Certificate of Authenticity (to keep things short)
         self.comm.gc.player = self.CoA.player_number
         print self.CoA
 
-        self.generator = self.temp_motion()
-
         # Initialize various components
-        #self.ekf = EKF.EKF(brain=self) # Localization Initialization
         self.my = TypeDefs.MyInfo()
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
@@ -70,17 +64,9 @@ class Brain(object):
         #self.playbook = GoTeam.GoTeam(self)
         self.gameController = GameController.GameController(self)
 
-        #for taking pictures
-        self.snapshot = False
-
         # Functional Variables
-
         self.my.teamNumber = 101
 
-        #keyboard stuff
-        #jf- nao.webots.enableKeyboard(NogginConstants.TIME_STEP)
-
-        self.skipThisFrame = False # on the simulator, we skip every other frame
 
     def initFieldObjects(self):
         """
@@ -158,30 +144,11 @@ class Brain(object):
 ##
 ##--------------CONTROL METHODS---------------##
 ##
-    def temp_motion(self):
-        for i in xrange(5):
-            print "Generator frame: ", i
-            yield
-
-        print "Enqueueing test motion"
-        self.motion.enqueue(motion.BodyJointCommand(3.0,
-                                                    1,
-                                                    [0., 0., 0., 0.],
-                                                    0))
-        while (True):
-            yield
 
     def run(self):
         """
         Main control loop called every TIME_STEP milliseconds
         """
-
-        #print "Brain.run()"
-
-        #print " IN Brain: ",self.sensors.angles
-
-        #uncomment this to try temp_motion behavior
-        #self.generator.next()
         # Update Environment
         self.ball.updateVision(self.vision.ball)
         self.updateFieldObjects()
@@ -190,16 +157,7 @@ class Brain(object):
         self.updateComm()
 
         # Localization Update
-        #self.updateLocalization()
-
-        #taking a picture if the space bar is pressed
-        """
-        js currently cant save frames on the nao
-        if Constants.USE_SNAPSHOT:
-            if self.snapshot:
-                self.out.saveFrame()
-                self.snapshot = False
-        """
+        self.updateLocalization()
 
         # Behavior stuff
         self.gameController.run()
@@ -211,28 +169,7 @@ class Brain(object):
         self.setPacketData()
 
         # Update any logs we have
-        #jf- self.out.updateLogs()
-
-        if DEBUG_OBJS:
-            #print "TeamColor: ",Constants.teamColorDict[self.my.teamColor]
-            self.printObj(self.bglp,"BGLP")
-            self.printObj(self.bgrp,"BGRP")
-            self.printObj(self.yglp,"YGLP")
-            self.printObj(self.ygrp,"YGRP")
-#            self.printObj(self.ball,"BALL")
-
-        if DEBUG_LOC:
-            print "X,Y,H (%g,%g,%g)"%(self.my.x,self.my.y,self.my.h)
-
-    def printObj(self,obj,name):
-        if obj.dist > 0:
-            print "Seen"+name+":"#, obj.visionId
-            print "  width: ", obj.width
-            print "  height: ", obj.height
-            print "  distance: ", obj.dist
-            print "  bearing: ", obj.bearing
-            print "  x", obj.x
-            print "  y", obj.y
+        self.out.updateLogs()
 
     def updateFieldObjects(self):
         """
@@ -286,46 +223,9 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        # UPDATE PHASE
-        # Every frame we run the update phase based on odometry
-        # Ball odometry is updated automatically
-        self.ekf.updateOdometry((0.0,0.0,0.0))
-
-        # CORRECTION PHASE
-        # We correct the idea of our position based on objects we have seen
-        # First we deal with standard field objects
-        for fieldObject in self.myFieldObjects:
-            if fieldObject.dist > 0:
-                if Constants.DEBUG_FIELD_OBJECTS:
-                    self.out.printf("Report object seen: %s\n" %
-                                    (fieldObject.__str__(), ))
-                    self.printLandmark(fieldObject)
-                #print "Reporting field object ", fieldObject.visionId
-                self.ekf.sawSpecificLandmark(fieldObject)
-            else:
-                if Constants.DEBUG_FIELD_OBJECTS:
-                    print "Skipping field object ", fieldObject.visionId
-        # We deal with corners last
-        self.ekf.sawCorners(self.corners)
-
-        # BALL CORRECTION PHASE
-        # If we have seen the ball we correct our estimate of its location
-        if self.ball.on:
-            self.ekf.sawBall(self.ball.dist, -self.ball.bearing)
-        # We report not seeing the ball to ensure that the velocity decays
-        else:
-            self.ekf.ballNotSeen()
-
         # Update global information to current estimates
-        self.my.updateLoc(self.ekf)
-        self.ball.updateLoc(self.ekf)
-
-    def printLandmark(self, fo):
-        print "Field Object ",fo.visionId," has:"
-        print "\t bearing ", fo.bearing
-        print "\t distance ", fo.dist
-        print "\t field x", fo.x
-        print "\t field y", fo.y
+        self.my.updateLoc(self.loc)
+        self.ball.updateLoc(self.loc, self.my.teamColor)
 
     # move to comm
     def setPacketData(self):
@@ -333,16 +233,16 @@ class Brain(object):
         # passed to comm, whereas all the rest are Python-controlled.
         # eventually, all game-controller set info should be handled by Comm
         # alone, and extra Python stuff put in here
-        self.comm.setData(self.my.x,
-                          self.my.y,
-                          self.my.h,
-                          self.my.uncertX,
-                          self.my.uncertY,
-                          self.my.uncertH,
-                          self.ball.x,
-                          self.ball.y,
-                          self.ball.uncertX,
-                          self.ball.uncertY,
+        self.comm.setData(self.loc.x,
+                          self.loc.y,
+                          self.loc.h,
+                          self.loc.xUncert,
+                          self.loc.yUncert,
+                          self.loc.hUncert,
+                          self.loc.ballX,
+                          self.loc.ballY,
+                          self.loc.ballXUncert,
+                          self.loc.ballYUncert,
                           self.ball.dist,
                           0, #self.playbook.currentSubRole,
                           -1) # Chase Time

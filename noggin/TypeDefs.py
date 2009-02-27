@@ -8,7 +8,8 @@ from .util.MyMath import (dist,
                           getRelativeVelocityX,
                           getRelativeVelocityY,
                           getRelativeX,
-                          getRelativeY)
+                          getRelativeY,
+                          sub180Angle)
 
 
 class MyInfo:
@@ -35,17 +36,22 @@ class MyInfo:
         self.name = 0
         self.playerNumber = 3
         self.teamNumber = 0
-        self.teamColor = Constants.TEAM_RED
+        self.teamColor = Constants.TEAM_BLUE
         self.penalized = False
         self.kicking = False
 
-    def updateLoc(self, ekf):
-        self.x = ekf.getXEst()
-        self.y = ekf.getYEst()
-        self.h = ekf.getHeadingEst()
-        self.uncertX = ekf.getXUncert()
-        self.uncertY = ekf.getYUncert()
-        self.uncertH = ekf.getHeadingUncert()
+    def updateLoc(self, loc):
+        if self.teamColor == Constants.TEAM_BLUE:
+            self.x = loc.x
+            self.y = loc.y
+            self.h = loc.h
+        else:
+            self.x = Constants.FIELD_GREEN_WIDTH - loc.x
+            self.y = Constants.FIELD_GREEN_HEIGHT - loc.y
+            self.h = sub180Angle(loc.h - 180)
+        self.uncertX = loc.xUncert
+        self.uncertY = loc.yUncert
+        self.uncertH = loc.hUncert
 
     def __str__(self):
         return ("name: %s #%d on team: %d color: %s @ (%g,%g,%g) uncert: (%g,%g,%g)" %
@@ -182,32 +188,36 @@ class Ball:
         """
         return time.time() - self.lastTimeSeen
 
-    def updateLoc(self, ekf):
+    def updateLoc(self, loc, teamColor):
         """
         Update all of our inforamtion pased on the newest localization info
         """
         # Get latest estimates
-        self.x = ekf.getBallXEst()
-        self.y = ekf.getBallYEst()
-        self.uncertX = ekf.getBallXUncert()
-        self.uncertY = ekf.getBallYUncert()
-        self.sd = ekf.getBallSD()
-        self.velX = ekf.getBallXVelocityEst()
-        self.velY = ekf.getBallYVelocityEst()
-        self.uncertVelX = ekf.getBallXVelocityUncert()
-        self.uncertVelY = ekf.getBallYVelocityUncert()
+        if teamColor == Constants.TEAM_BLUE:
+            self.x = loc.ballX
+            self.y = loc.ballY
+            self.velX = loc.ballVelX
+            self.velY = loc.ballVelY
+        else:
+            self.x = Constants.FIELD_GREEN_WIDTH - loc.ballX
+            self.y = Constnats.FIELD_GREEN_HEIGHT - loc.ballY
+            self.velX = -loc.ballVelX
+            self.velY = -loc.ballVelY
+
+        self.uncertX = loc.ballXUncert
+        self.uncertY = loc.ballYUncert
+        self.uncertVelX = loc.ballVelXUncert
+        self.uncertVelY = loc.ballVelYUncert
+        self.sd = self.uncertX * self.uncertY
 
         # Determine other values
-        self.locDist = dist(ekf.getXEst(), ekf.getYEst(), self.x, self.y)
-        self.locBearing = getRelativeBearing(ekf.getXEst(), ekf.getYEst(),
-                                             ekf.getHeadingEst(),
+        self.locDist = dist(loc.x, loc.y, self.x, self.y)
+        self.locBearing = getRelativeBearing(loc.x, loc.y, loc.h,
                                              self.x, self.y)
         self.locRelX = getRelativeX(self.locDist, self.locBearing)
         self.locRelY = getRelativeY(self.locDist, self.locBearing)
-        self.relVelX = getRelativeVelocityX(ekf.getHeadingEst(),
-                                            self.velX, self.velY)
-        self.relVelY = getRelativeVelocityY(ekf.getHeadingEst(),
-                                            self.velX, self.velY)
+        self.relVelX = getRelativeVelocityX(loc.h,self.velX, self.velY)
+        self.relVelY = getRelativeVelocityY(loc.h,self.velX, self.velY)
 
     def __str__(self):
         '''returns string with all class variables'''
