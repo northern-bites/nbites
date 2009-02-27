@@ -57,7 +57,6 @@ static const float LANDMARK_OPP_GOAL_RIGHT_POST_Y =
 static const float CENTER_CIRCLE_RADIUS = 62.5f; // Not scaled
 
 #ifdef USING_LAB_FIELD
-static const float CENTER_CIRCLE_RADIUS = 62.5f;
 static const float GOALBOX_HEIGHT = 60.f;
 static const float GOALBOX_WIDTH = 200.f;
 #else
