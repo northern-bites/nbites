@@ -35,7 +35,6 @@
  */
 
 #include <vector>
-using namespace std;
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
@@ -84,7 +83,7 @@ private:
     const WalkCommand * nextCommand;
 
     //Temp solution to arms
-    vector<float> rarm_angles, larm_angles;
+    std::vector<float> rarm_angles, larm_angles;
 };
 
 #endif
