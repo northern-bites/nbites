@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 #include <sstream>
-using namespace std;
 
 #include "ConcreteLine.h"
 class VisualLine;
@@ -81,16 +80,16 @@ public: // Constants
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;
 
 public:
-    VisualLine(list<list<linePoint>::iterator> &listOfIterators);
-    VisualLine(list<linePoint> &listOfPoints);
+    VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
+    VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
     VisualLine(const VisualLine& other);
     ~VisualLine();
 
     void setColor(const int c) { color = c; }
-    void setColorString(const string s) { colorStr = s; }
-    void addPoints(const list <linePoint> &additionalPoints);
-    void addPoints(const vector <linePoint> &additionalPoints);
+    void setColorString(const std::string s) { colorStr = s; }
+    void addPoints(const std::list <linePoint> &additionalPoints);
+    void addPoints(const std::vector <linePoint> &additionalPoints);
 
     static const linePoint DUMMY_LINEPOINT;
     const float getSlope() const;
@@ -105,7 +104,7 @@ public:
     // the unit vector parallel to the y axis).  Assumes that the line
     // is oriented left to right.
     // Our j axis will actually increase towards the bottom of the screen
-    static pair <int, int> getLineComponents(const VisualLine &aLine);
+    static std::pair <int, int> getLineComponents(const VisualLine &aLine);
 
     // By default, sort by lengths of lines.
     bool operator< (const VisualLine &secondLine) const  {
@@ -141,11 +140,11 @@ private: // Member functions
     // from http://www.efunda.com/math/leastsquares/lstsqr1dcurve.cfm
     // y = mx + b
     // returns a pair <m, b>
-    static pair <float, float> leastSquaresFit(const vector <linePoint>
+    static std::pair <float, float> leastSquaresFit(const std::vector <linePoint>
                                                &thePoints);
     // Using the points in the line, finds the line of best fit that corresponds
     // with those points.
-    static pair <float, float> leastSquaresFit(const VisualLine& l);
+    static std::pair <float, float> leastSquaresFit(const VisualLine& l);
 
     //list <const ConcreteLine *> possibleLines;
     inline float lineDistanceToSD(float _distance) {
@@ -159,14 +158,14 @@ private: // Member functions
 public: // Member variables (public just for now)
     point <int> start, end;
     int left,right,bottom,top; // left, right x values, bottom, top y values
-    vector <linePoint> points;
+    std::vector <linePoint> points;
 
     float angle; // Angle from horizontal in degrees
     // y = ax + b (a = slope, b = y-intercept)
     float a, b;
     float length;
     int color; // Holds the color the line is being drawn as on the screen
-    string colorStr;
+    std::string colorStr;
 
     float avgVerticalWidth, avgHorizontalWidth;
     linePoint thinnestHorPoint, thickestHorPoint;
@@ -177,7 +176,7 @@ private: // Private member variables
     float bearing;
     float distanceSD;
     float bearingSD;
-    list <const ConcreteLine*> possibleLines;
+    std::list <const ConcreteLine*> possibleLines;
 
 public:
     // Getters
@@ -188,7 +187,7 @@ public:
     /**
      * @return a List of all possible lines.  Currently returns all 11 lines
      */
-    const list <const ConcreteLine *> getPossibleLines() const {
+    const std::list <const ConcreteLine *> getPossibleLines() const {
         return possibleLines;
     }
 
@@ -200,7 +199,7 @@ public:
     void setBearingSD(float _bearingSD) { bearingSD = _bearingSD; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
-    void setPossibleLines(list <const ConcreteLine*> _possibles) {
+    void setPossibleLines(std::list <const ConcreteLine*> _possibles) {
         possibleLines = _possibles;
     }
 

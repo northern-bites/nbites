@@ -1,4 +1,5 @@
 #include "VisualCorner.h"
+using namespace std;
 
 //-------------------------------
 // Static VisualCorner variables:

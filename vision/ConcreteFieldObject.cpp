@@ -1,4 +1,6 @@
 #include "ConcreteFieldObject.h"
+using namespace std;
+
 const float ConcreteFieldObject::WHITE_HEIGHT_ON_BEACON = 18.6f;
 
 // Constructors

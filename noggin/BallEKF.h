@@ -152,7 +152,8 @@ public:
     friend std::ostream& operator<< (std::ostream &o, const BallEKF &c) {
         return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
                  << c.getXVelocityEst() << ", " << c.getYVelocityEst() << ")\t"
-                 << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert() << ", "
+                 << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
+                 << ", "
                  << c.getXVelocityUncert() << ", " << c.getYVelocityUncert()
                  << ")";
     }

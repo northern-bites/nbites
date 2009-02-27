@@ -1,4 +1,5 @@
 #include "VisualFieldObject.h"
+using namespace std;
 
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
     : id(_id)

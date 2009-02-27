@@ -55,7 +55,7 @@ public:
     void setLeftBottomY(int _y){ leftBottom.y = _y; }
     void setRightBottomX(int _x){ rightBottom.x = _x; }
     void setRightBottomY(int _y){ rightBottom.y = _y; }
-    void setPossibleFieldObjects(const list <const ConcreteFieldObject *> *
+    void setPossibleFieldObjects(const std::list <const ConcreteFieldObject *> *
                                  _possibleFieldObjects) {
         possibleFieldObjects = _possibleFieldObjects;
     }
@@ -79,7 +79,7 @@ public:
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
     const fieldObjectID getID() const { return id; }
-    const list <const ConcreteFieldObject *> * getPossibleFieldObjects() const {
+    const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects() const {
         return possibleFieldObjects;
     }
 
@@ -93,7 +93,7 @@ private: // Class Variables
     point <float> fieldLocation;
     fieldObjectID id;
     // This list will hold all the possibilities for this objects's specific ID
-    const list <const ConcreteFieldObject *> * possibleFieldObjects;
+    const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 
     // Helper Methods
     inline float postDistanceToSD(float _distance) {

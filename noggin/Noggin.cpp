@@ -27,9 +27,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v)
     initializeVision(v);
 
     // Initialize localization stuff
-    mcl = shared_ptr<MCL>(new MCL());
-    ballEKF = shared_ptr<BallEKF>(new BallEKF(mcl));
-
+    initializeLocalization();
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
@@ -75,6 +73,28 @@ void Noggin::initializeVision(shared_ptr<Vision> v)
     init_leds();
 }
 
+void Noggin::initializeLocalization()
+{
+#ifdef DEBUG_NOGGIN_INITIALIZATION
+    printf("Initializing localization modules\n");
+#endif
+
+    // Initialize the localization modules
+    mcl = shared_ptr<MCL>(new MCL());
+    ballEKF = shared_ptr<BallEKF>(new BallEKF(mcl));
+
+    // // Initialize and insert the localization wrapper into the module
+    // PyObject *result = PyLoc_new();
+    // if (result == NULL) {
+    //     cerr << "** Noggin extension could not initialize PyLoc object **" <<
+    //         endl;
+    //     assert(false);
+    // }
+    // vision_addToModule(result, MODULE_HEAD);
+    // pyloc = reinterpret_cast<PyLoc*>(result);
+
+}
+
 bool Noggin::import_modules ()
 {
 #ifdef  DEBUG_NOGGIN_INITIALIZATION
@@ -112,8 +132,7 @@ void Noggin::reload ()
     getBrainInstance();
 }
 
-void
-Noggin::reload(std::string modules)
+void Noggin::reload(std::string modules)
 {
     if (brain_module == NULL)
         if (!import_modules())

@@ -1,5 +1,5 @@
 #include "ConcreteCorner.h"
-
+using namespace std;
 
 ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
                                const cornerID _id)

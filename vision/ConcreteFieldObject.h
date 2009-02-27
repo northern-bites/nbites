@@ -9,7 +9,6 @@ class ConcreteFieldObject;
 #include <string>
 #include <list>
 #include <algorithm>
-using namespace std;
 
 // Local headers
 #include "Structs.h"
@@ -63,7 +62,7 @@ public:
     ////////////////////////////////////////////////////////////
     const fieldObjectID getID() const { return id; }
 
-    virtual const string toString() const;
+    virtual const std::string toString() const;
     static const string getStringFromID(const fieldObjectID testID);
     static const float getHeightFromGround(const fieldObjectID id);
 
@@ -89,12 +88,12 @@ private:
     static const ConcreteFieldObject* YELLOW_GOAL_POSTS[NUM_YELLOW_GOAL_POSTS];
 
 public:
-    static const list <const ConcreteFieldObject*> blueGoalPosts;
-    static const list <const ConcreteFieldObject*> yellowGoalPosts;
-    static const list <const ConcreteFieldObject*> blueGoalLeftPostList;
-    static const list <const ConcreteFieldObject*> blueGoalRightPostList;
-    static const list <const ConcreteFieldObject*> yellowGoalLeftPostList;
-    static const list <const ConcreteFieldObject*> yellowGoalRightPostList;
+    static const std::list <const ConcreteFieldObject*> blueGoalPosts;
+    static const std::list <const ConcreteFieldObject*> yellowGoalPosts;
+    static const std::list <const ConcreteFieldObject*> blueGoalLeftPostList;
+    static const std::list <const ConcreteFieldObject*> blueGoalRightPostList;
+    static const std::list <const ConcreteFieldObject*> yellowGoalLeftPostList;
+    static const std::list <const ConcreteFieldObject*> yellowGoalRightPostList;
 
 private: // Instance variables recording location on field and identifier
     fieldObjectID id;
