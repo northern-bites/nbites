@@ -106,6 +106,11 @@ OPTION(
   ON
   )
 OPTION(
+  USE_DCM
+  "Use direct interaction with the DCM through NaoEnactor instead of ALEnactor"
+  OFF
+  )
+OPTION(
   USE_SENSORS_IMAGE_LOCKING
   "Customize image locking configuration.  Man uses locking."
   ON
