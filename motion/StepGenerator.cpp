@@ -767,14 +767,16 @@ void StepGenerator::resetQueues(){
  * Returns the cumulative odometry changes since the last call
  */
 vector<float> StepGenerator::getOdometryUpdate(){
-    ufmatrix3 new_ic_Transform = prod(if_Transform,fc_Transform);
-    const float rot_new = asin(new_ic_Transform(1,0));
-    const float rot_old = asin(ic_Transform(1,0));
+    ufmatrix3 new_ic_Transform = prod(fc_Transform,if_Transform);
+    const float rot_new = -asin(new_ic_Transform(1,0));
+    const float rot_old = -asin(ic_Transform(1,0));
     const float rot_diff = rot_new - rot_old; //angle from cold to cnew
     cout <<endl<< "********************************"<<_done<<endl;
-
+    cout<< "if_Transform" <<if_Transform<<endl;
+    cout<< "fc_Transform" <<fc_Transform<<endl;
+    cout<< "new_ic_Transform" <<new_ic_Transform<<endl<<endl;
     cout << "com_i" <<com_i<<endl;
-    cout << "Rot diff is " <<rot_diff<<endl;
+    cout << "Rot diff is " <<rot_diff<<" old:"<<rot_old << " new:"<<rot_new <<endl;
 
     const ufvector3 origin_i = CoordFrame3D::vector3D(0.0f,0.0f);
     ufvector3 start_pos_c_new = prod(new_ic_Transform,origin_i);

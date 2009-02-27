@@ -54,7 +54,7 @@ dev.off()
 
 
 pdf(paste(name,"-xy",PDF,sep=""))
-plot(dat$com_x,dat$com_y,pch="",main="",xlab="s",ylab="mm")
+plot(dat$pre_x,dat$pre_y,pch="",main="",xlab="x",ylab="y")
 names = c("com","pre","zmp")
 cols = c("2","3","4")
 
