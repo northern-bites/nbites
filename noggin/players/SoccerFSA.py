@@ -5,6 +5,7 @@
 #
 
 import math
+import man.motion as motion
 
 from ..util import FSA
 from . import GameControllerStates
@@ -14,30 +15,36 @@ class SoccerFSA(FSA.FSA):
         FSA.FSA.__init__(self, brain)
         #self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(GameControllerStates)
+        self.brain = brain
+        self.motion = brain.motion
+        #self.currentState = '' #handled externally by GameControllerFSA
 
+        #set default behavior for soccer players - override it if you want
+        self.setPrintStateChanges(True)
+        self.setPrintFunction(self.brain.out.printf)
 
         # Method to enqueue a SweetMove
         # Can either take in a head move or a body command
         # (see SweetMove files for descriptions of command tuples)
-        def executeMove(self,sweetMove):
-            for position in sweetMove:
-                if len(position) == 6:
-                    move = motion.BodyJointCommand(position[4], #time
-                                                   position[0], #larm
-                                                   position[1], #lleg
-                                                   position[2], #rleg
-                                                   position[3], #rarm
-                                                   position[5], #interpolation type
-                                                   )
-                    self.brain.motion.enqueue(move)
+    def executeMove(self,sweetMove):
+        for position in sweetMove:
+            if len(position) == 6:
+                move = motion.BodyJointCommand(position[4], #time
+                                               position[0], #larm
+                                               position[1], #lleg
+                                               position[2], #rleg
+                                               position[3], #rarm
+                                               position[5], #interpolation type
+                                               )
+                self.brain.motion.enqueue(move)
 
-                elif len(position) == 3:
-                    move = motion.HeadJointCommand(position[1],#time
-                                                   position[0],#head pos
-                                                   position[2],#interpolation type
+            elif len(position) == 3:
+                move = motion.HeadJointCommand(position[1],#time
+                                               position[0],#head pos
+                                               position[2],#interpolation type
                                                    )
-                    self.brain.motion.enqueue(move)
+                self.brain.motion.enqueue(move)
 
-                else:
-                    print "What kind of sweet ass-Move is this?"
+            else:
+                print "What kind of sweet ass-Move is this?"
 

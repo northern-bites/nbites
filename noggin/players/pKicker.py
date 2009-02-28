@@ -1,22 +1,18 @@
+#
+# A behavior to test kicking. States are defined as methods in Kicking States
+# Note that it is crucial to implement the appropriate game controller states
+# that you wish to override. (By default they do  nothing.)
+# By inheriting from the SoccerFSA, we only need to set the name of the player
+# and add any additional gourps of states. (GameControlerStates are added in the
+# super class.)
+#
 
-class Player(object):
+from . import SoccerFSA
+from . import KickingStates
+
+class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
-        self.brain = brain
-        self.doOnce = True
-        self.doTwice = True
-        self.counter = 0
+        SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(KickingStates)
+        self.setName('pKicker')
 
-    def behave(self):
-        """ Called every TIME_STEP, ie 40 ms"""
-
-        if self.doOnce:
-
-            self.brain.motion.setDefaultPosition()
-            self.brain.motion.setMotion(27,-15,0,6)
-            
-            self.doOnce = not self.doOnce
-            
-        
-        elif self.doTwice and not self.brain.motion.isWalking():
-            self.brain.motion.queueLeftKick()
-            self.doTwice = not self.doTwice
