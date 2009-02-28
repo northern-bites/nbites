@@ -6,6 +6,7 @@ using namespace std;
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
 
+
 NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
                         boost::shared_ptr<Sensors> s)
     : MotionEnactor(), broker(_pbroker), sensors(s),
