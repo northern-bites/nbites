@@ -29,7 +29,7 @@ def gameInitial(player):
                               15.0)
     player.brain.motion.setGait(gait)
 
-    return player.goLater('walkleft')
+    return player.goLater('walkstraight')
 
 def switchGaits(player):
     pass
@@ -48,7 +48,7 @@ def walkstraight(player):
     if player.firstFrame():
         walkcmd = motion.WalkCommand(x=6,y=0,theta=0)
         player.brain.motion.setNextWalkCommand(walkcmd)
-    if player.counter == 80:
+    if player.counter == 160:
         return player.goLater('sitdown')
     return player.stay()
 
@@ -69,7 +69,10 @@ def stopwalking(player):
         walkcmd = motion.WalkCommand(x=0,y=0,theta=0)
         player.brain.motion.setNextWalkCommand(walkcmd)
     return player.goLater('sitdown')
-
+def standup(player):
+    if player.firstFrame():
+        player.executeMove(SweetMoves.ZERO_POS)
+    return player.stay()
 def sitdown(player):
     if player.firstFrame():
         move = motion.BodyJointCommand(sitDownAngles[4], #time
