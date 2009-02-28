@@ -926,6 +926,13 @@ Man::saveFrame(){
         fout << *i << " ";
     }
 
+    // Write sensors
+    vector<float> sensor_data = sensors->getAllSensors();
+    for (vector<float>::const_iterator i = sensor_data.begin();
+         i != sensor_data.end(); i++) {
+        fout << *i << " ";
+    }
+
     fout.close();
     cout << "Saved frame #" << saved_frames++ << endl;
 }

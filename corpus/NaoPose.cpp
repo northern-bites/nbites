@@ -76,18 +76,11 @@ void NaoPose::transform () {
 
   // Make up bogus values
   std::vector <float> headAngles(2, 0.0f);
-  headAngles[1] = 0.0;//M_PI/4;
   std::vector <float> lLegAngles(6, 0.0f);
-  lLegAngles[2] = 0.0;//-M_PI/2;
   std::vector <float> rLegAngles(6, 0.0f);
-  rLegAngles[2] = 0.0;//-M_PI/2;
 
   std::vector <float> bodyAngles = sensors->getVisionBodyAngles();
 
-  /*cout << "Body angles: \n \t";
-  for(int i = 0; i <22; i++)
-    cout << bodyAngles[i];
-    cout << endl << " ";*/
   //copy the values into a vector.
   copy(bodyAngles.begin(),bodyAngles.begin() + HEAD_JOINTS,headAngles.begin());
   copy(bodyAngles.begin() + HEAD_JOINTS + ARM_JOINTS,
@@ -138,9 +131,24 @@ void NaoPose::transform () {
   supportLegToBodyTransform(Y_AXIS, W_AXIS) = 0.0f;
   supportLegToBodyTransform(Z_AXIS, W_AXIS) = 0.0f;
 
+  // **************************
+  // The code below is old but is kept around just in case the new code does
+  // not work. We used to get the body rotation using the leg transform, but
+  // now we use the accelerometers. The question is whether we should first
+  // apply the x rotation or the y one.
+  // **************************
   // We need the inverse but we calculate the transpose because they are
   // equivalent for orthogonal matrices and transpose is faster.
-  ublas::matrix <float> bodyToWorldTransform = trans(supportLegToBodyTransform);
+  // ublas::matrix<float>bodyToWorldTransform=trans(supportLegToBodyTransform);
+  // **************************
+  // End old code
+  // **************************
+
+  const Inertial inertial = sensors->getInertial();
+  ublas::matrix <float> bodyToWorldTransform =
+      prod(Kinematics::rotation4D(Kinematics::X_AXIS, inertial.angleX),
+      Kinematics::rotation4D(Kinematics::Y_AXIS, inertial.angleY));
+
   ublas::vector <float> torsoLocationInLegFrame =
     prod(bodyToWorldTransform, supportLegLocation);
   // get the Z component of the location
