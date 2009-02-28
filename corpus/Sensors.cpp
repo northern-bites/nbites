@@ -807,7 +807,9 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
                         sensorValues[17], sensorValues[18]); // angleX/angleY
 
     ultraSoundDistance = sensorValues[19];
-    ultraSoundMode = static_cast<UltraSoundMode>(sensorValues[20]);
+    // ugh... can't cast float to an enum, so cast to int and then to the enum.
+    ultraSoundMode = static_cast<UltraSoundMode>(
+        static_cast<int>(sensorValues[20]));
 
     pthread_mutex_unlock (&fsr_mutex);
     pthread_mutex_unlock (&bumper_mutex);
