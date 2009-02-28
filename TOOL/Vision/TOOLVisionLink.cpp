@@ -93,7 +93,7 @@ extern "C" {
             cout << "Error: the joint array had incorrect dimensions" << endl;
             return;
         }
-        if (env->getArrayLength(jsensors) != NUM_SENSORS) {
+        if (env->GetArrayLength(jsensors) != NUM_SENSORS) {
             cout << "Error: the sensors array had incorrect dimensions" << endl;
             return;
         }
@@ -113,11 +113,17 @@ extern "C" {
         vision.thresh->initTableFromBuffer(table);
         env->ReleaseByteArrayElements( jtable, buf_table, 0);
 
-        //Set the Senors data - Note: set visionBodyAngles not bodyAngles
+        // Set the joints data - Note: set visionBodyAngles not bodyAngles
         float * joints = env->GetFloatArrayElements(jjoints,0);
-        vector<float> joints_vector = vector<float>(&joints[0],&joints[22]);
+        vector<float> joints_vector(&joints[0],&joints[22]);
         env->ReleaseFloatArrayElements(jjoints,joints,0);
         sensors->setVisionBodyAngles(joints_vector);
+
+        // Set the sensor data
+        float * sensors_array = env->GetFloatArrayElements(jsensors,0);
+        vector<float> sensors_vector(&sensors_array[0],&sensors_array[22]);
+        env->ReleaseFloatArrayElements(jsensors,sensors_array,0);
+        sensors->setAllSensors(sensors_vector);
 
         // Clear the debug image on which the vision algorithm can draw
         vision.thresh->initDebugImage();

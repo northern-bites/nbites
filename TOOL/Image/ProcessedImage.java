@@ -61,8 +61,9 @@ public class ProcessedImage extends ThresholdedImage {
                 List<Float> list_joints = currentFrame.joints();
                 joints = new float[list_joints.size()];
                 int i = 0;
-                for(Iterator itr = list_joints.iterator(); itr.hasNext(); ){
-                joints[i++] = ((Float)itr.next()).floatValue();
+                //for(Iterator itr = list_joints.iterator(); itr.hasNext(); ){
+                for (Float value : list_joints) {
+                    joints[i++] = value;
                 }
             }else{
                 tool.CONSOLE.message("Warning: Processing image w/o " +
@@ -75,8 +76,12 @@ public class ProcessedImage extends ThresholdedImage {
                 sensors = new float[list_sensors.size()];
                 int i = 0;
                 for (Float value : list_sensors) {
-                    joints[i++] = value;
+                    sensors[i++] = value;
                 }
+            }
+            else {
+                tool.CONSOLE.message("Warning: Processing image w/o " +
+                                     "sensor info");
             }
 
             // Convert the TOOLImage to the one-dimensional format that the C++

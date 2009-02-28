@@ -71,16 +71,38 @@ public class FrameLoader implements FileFilter {
                 String fullFooter = new String(footer, "ASCII");
                 String[] values = fullFooter.split(" ");
                 Vector<Float> joints = new Vector<Float>();
-                for (int i = 0; i < values.length; i++) {
+                Vector<Float> sensors = new Vector<Float>();
+
+                int currentValue = 0;
+                for (int i = 0;
+                     i < RobotDef.NAO_DEF.numJoints() &&
+                         currentValue < values.length; i++, currentValue++) {
                     try {
-                        joints.add(Float.parseFloat(values[i]));
+                        joints.add(Float.parseFloat(values[currentValue]));
                     }catch (NumberFormatException e) {
                         break;
                     }
                 }
-                if (!joints.isEmpty()) {
+                if (joints.size() == RobotDef.NAO_DEF.numJoints())
                     frm.setJoints(joints);
+                else
+                    System.out.println("Couldn't read joints from file " +
+                                       path);
+
+                for (int i = 0;
+                     i < RobotDef.NAO_DEF.numSensors() &&
+                         currentValue < values.length; i++, currentValue++) {
+                    try {
+                        sensors.add(Float.parseFloat(values[currentValue]));
+                    } catch (NumberFormatException e) {
+                        break;
+                    }
                 }
+                if (sensors.size() == RobotDef.NAO_DEF.numSensors())
+                    frm.setSensors(sensors);
+                else
+                    System.out.println("Couldn't read sensors from file " +
+                                       path);
 
             }else if (upper.endsWith(AIBO_EXT)) {
                 // skip header
