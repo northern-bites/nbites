@@ -32,6 +32,8 @@
 #include "Man.h"
 #include "manconfig.h"
 #include "corpus/synchro.h"
+#include "VisionDef.h"
+#include "Common.h"
 
 using namespace std;
 using namespace AL;
@@ -200,7 +202,7 @@ Man::registerCamera() {
     lem_name = "Man_LEM";
     int format = NAO_IMAGE_SIZE;
     int colorSpace = NAO_COLOR_SPACE;
-    int fps = 15;
+    int fps = VISION_FPS;
 
     int resolution = format;
 
@@ -613,7 +615,8 @@ Man::run ()
     trigger->on();
 
     while (running) {
-
+        //start timer
+        const long long startTime = micro_time();
 #ifdef USE_VISION
         // Wait for signal
         //image_sig->await();
@@ -663,6 +666,18 @@ Man::run ()
 
         // Broadcast a signal that we have finished processing this frame
         //vision_sig->signal();
+
+        //stop timer
+        const long long processTime = micro_time() - startTime;
+        //sleep until next frame
+        if (processTime > VISION_FRAME_LENGTH_uS){
+            cout << "Time spent in Man loop longer than frame length: "
+                 << processTime <<endl;
+            //Don't sleep at all
+        } else{
+            usleep(static_cast<useconds_t>(VISION_FRAME_LENGTH_uS
+                                           -processTime));
+        }
     }
 
 #ifdef USE_MOTION
@@ -698,7 +713,6 @@ Man::waitForImage ()
         image.arraySetSize(6);
 #endif
 
-        SleepMs(100);
         data = NULL;
 #ifndef MAN_IS_REMOTE
 #ifdef DEBUG_IMAGE_REQUESTS
