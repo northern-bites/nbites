@@ -51,7 +51,6 @@ private:
     static const float MOTION_FRAME_LENGTH_S; // in seconds
 
 private:
-	//void TestSafety(); 
     float SafetyCheck(float,float, int);
     void initSyncWithALMemory();
     void syncWithALMemory();
