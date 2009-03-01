@@ -14,7 +14,7 @@ class GameController(FSA.FSA):
         self.addStates(GameStates)
         self.currentState = 'gameInitial'
         self.setName('GameController')
-        self.setPrintStateChanges(True)
+        self.setPrintStateChanges(False)
         self.setPrintFunction(self.brain.out.printf)
 
     def run(self):

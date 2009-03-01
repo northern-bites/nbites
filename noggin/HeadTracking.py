@@ -22,7 +22,7 @@ class HeadTracking(FSA.FSA):
 
         self.currentState = NOTHING
         self.setPrintFunction(self.brain.out.printf)
-        self.setPrintStateChanges(True)
+        self.setPrintStateChanges(False)
         self.setName('headTracking')
 
 

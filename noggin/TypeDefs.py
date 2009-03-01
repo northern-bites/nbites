@@ -160,17 +160,17 @@ class Ball:
             self.reportBallSeen()
             if not self.on:
                 self.prevFramesOff = self.framesOff
-                self.on = True
-                self.framesOn += 1
-                self.framesOff = 0
+            self.on = True
+            self.framesOn += 1
+            self.framesOff = 0
         else:
             self.angleX = 0
             self.angleY = 0
             if self.on:
                 self.prevFramesOn = self.framesOn
-                self.on = False
-                self.framesOff += 1
-                self.framesOn = 0
+            self.on = False
+            self.framesOff += 1
+            self.framesOn = 0
 
             self.relX = getRelativeX(self.dist, self.bearing)
             self.relY = getRelativeY(self.dist, self.bearing)

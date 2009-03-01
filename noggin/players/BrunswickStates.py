@@ -7,7 +7,7 @@ import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 
 def gamePlaying(player):
-    return player.stay()
+    return player.goNow('scanFindBall')
 
 def gamePenalized(player):
     return player.stay()

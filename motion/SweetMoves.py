@@ -3,6 +3,15 @@
 import MotionConstants
 
 
+def getMoveTime(move):
+    totalTime = 0.0
+    for target in move:
+        if len(target) == 6:
+            totalTime += target[4]
+        elif len(target) == 3:
+            totalTime += target[1]
+    return totalTime
+
 OFF = None #OFF means the joint chain doesnt get enqueued during this motion
 
 
