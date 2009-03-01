@@ -2,6 +2,8 @@
 
 #include "NaoEnactor.h"
 #include <iostream>
+#include <boost/assign/std/vector.hpp>
+using namespace boost::assign;
 
 NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
                         boost::shared_ptr<Sensors> s)
