@@ -22,6 +22,7 @@
 #include "Sensors.h"
 #include "SensorDef.h"       // for NUM_SENSORS
 #include "Kinematics.h"      // for NUM_JOINTS
+#include "Structs.h"         // for estimate struct
 using namespace std;
 using namespace boost;
 
@@ -158,6 +159,37 @@ extern "C" {
 
         return;
 
+    }
+
+    JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppPixEstimate
+        (JNIEnv * env, jobject jobj, jint pixelX, jint pixelY,
+         jfloat objectHeight, jdoubleArray estimateResult) {
+            // make sure the array for the estimate is big enough. There
+            // should be room for five things in there. (subject to change)
+            if (env->GetArrayLength(estimateResult) !=
+                sizeof(estimate)/sizeof(double)) {
+                cout << "Error: the estimateResult array had incorrect "
+                    "dimensions" << endl;
+                return;
+            }
+
+            //load the table
+            jdouble * buf_estimate =
+                env->GetDoubleArrayElements( estimateResult, 0);
+            double * estimate_array =
+                (double *)buf_estimate;
+            //vision.thresh->initTableFromBuffer(table);
+            estimate est = pose->pixEstimate(static_cast<int>(pixelX),
+                                             static_cast<int>(pixelY),
+                                             static_cast<float>(objectHeight));
+
+            estimate_array[0] = est.dist;
+            estimate_array[1] = est.elevation;
+            estimate_array[2] = est.bearing;
+            estimate_array[3] = est.x;
+            estimate_array[4] = est.y;
+
+            env->ReleaseDoubleArrayElements( estimateResult, buf_estimate, 0);
     }
 
 #ifdef __cplusplus

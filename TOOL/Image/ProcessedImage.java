@@ -8,6 +8,8 @@ import TOOL.Vision.TOOLVisionLink;
 import TOOL.Data.Frame;
 import TOOL.Data.RobotDef;
 
+import TOOL.Misc.Estimate;
+
 /**
  * @author George Slavov
  * @date December 22, 2008
@@ -120,5 +122,20 @@ public class ProcessedImage extends ThresholdedImage {
                                " an image without associated base image");
         } else
             thresholdImage(colorTable, baseImage);
+    }
+
+    /**
+     * Overriding the ThresholdImage.pixEstimate() method, so that we use
+     * the vision link and ask C++ to give us a pix estimate.
+     **/
+    public Estimate pixEstimate(int pixelX, int pixelY,
+                                float objectHeight) throws RuntimeException {
+        if(visionLink == null || !visionLink.isLinkActive())
+            // Vision link is inactive. Pretend we are a thresholded image.
+            // Thresholded image throws an exception when asked to do pixEst.
+            super.pixEstimate(pixelX, pixelY, objectHeight);
+
+        return visionLink.pixEstimate(pixelX, pixelY,
+                                      objectHeight);
     }
 }

@@ -31,6 +31,7 @@ import TOOL.Data.DataSet;
 import TOOL.Data.Frame;
 import TOOL.Data.ColorTableListener;
 //import TOOL.Misc.Pair;
+import TOOL.Misc.Estimate;
 
 
 import java.util.ArrayList;
@@ -933,14 +934,24 @@ public class Calibrate implements DataListener, MouseListener,
             int x = ((ImagePanel)e.getSource()).getImageX(e.getX());
             int y = ((ImagePanel)e.getSource()).getImageY(e.getY());
 
-            if(inImage(x,y)){
-                // Undefine the color underneath the cursor if in that mode..
-                if (undefineColor) {
-                    undefineColor(x, y, currentColor);
+            if (inImage(x,y)) { // make sure we clicked inside the image
+                if (e.isShiftDown()) {
+                // get the pix est on this pixel assuming object height=0
+                Estimate est = thresholdedImage.pixEstimate(x,y,0);
+                // we want to print a pixEstimate on this pixel if shift is down
+                System.out.println("dist: " + est.dist + " bearing: " +
+                                   est.bearing);
                 }
-                // Otherwise, do the normal process of thresholding
-                // the area under the cursor to be the currentColor.
-                else {pixelSelected(x,y);}
+                else{
+                    // Undefine the color underneath the cursor if in that mode.
+                    if (undefineColor) {
+                        undefineColor(x, y, currentColor);
+                    }
+                    // Otherwise, do the normal process of thresholding
+                    // the area under the cursor to be the currentColor.
+                    else
+                        pixelSelected(x,y);
+                }
             }
         }
         // Update the buttons; undo function might be available now

@@ -45,6 +45,8 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.lang.UnsatisfiedLinkError;
 
+import TOOL.Misc.Estimate;
+
 public class TOOLVisionLink {
     static private boolean visionLinkSuccessful;
 
@@ -79,11 +81,34 @@ public class TOOLVisionLink {
 
     }
 
+    public Estimate pixEstimate(int pixelX, int pixelY, float objectHeight) {
+        double[] estimateResult = new double[5];
+        if (visionLinkSuccessful) {
+            try {
+                cppPixEstimate(pixelX, pixelY, objectHeight, estimateResult);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n"+
+                                   "   pixEstimate failed.");
+            }
+        }
+        else
+            System.out.println("VisionLink inactive," +
+                               " so pixEstimate does not work");
+
+        return new Estimate(estimateResult[0], estimateResult[1],
+                            estimateResult[2], estimateResult[3],
+                            estimateResult[4]);
+    }
+
     //Native methods:
     native private void cppProcessImage(byte[] img_data, float[] joint_data,
                                         float[] sensors_data,
                                         byte[] table_data,
                                         byte[][] threshResult);
+
+    native private void cppPixEstimate(int pixelX, int pixelY,
+                                       float objectHeight,
+                                       double[] estimateResult);
 
     //Load the cpp library that implements the native methods
     static

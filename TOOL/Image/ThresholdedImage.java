@@ -10,6 +10,8 @@ import TOOL.Calibrate.ColorTableUpdate;
 import TOOL.Calibrate.CalibratePanel;
 import TOOL.Vision.Vision;
 
+import TOOL.Misc.Estimate;
+
 public class ThresholdedImage extends TOOLImage {
 
     private static final Color[] COLORS = Vision.COLORS;
@@ -69,6 +71,11 @@ public class ThresholdedImage extends TOOLImage {
                                "an image without associated base image");
         }else
             thresholdImage(colorTable, baseImage);
+    }
+
+    public Estimate pixEstimate(int pixelX, int pixelY,
+                                float objectHeight) throws RuntimeException {
+        throw new RuntimeException("pixEstimate only works on processed images");
     }
 
     public void setBaseImage(TOOLImage image) {
