@@ -1,7 +1,8 @@
 
 from . import TrackingStates
-#from . import PanningStates
+from . import PanningStates
 from .util import FSA
+import man.motion as motion
 
 #constants need to go in another file.
 #maybe auto generated on boot?
@@ -17,8 +18,8 @@ class HeadTracking(FSA.FSA):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(TrackingStates)
-        #self.addStates(PanningStates)
-        
+        self.addStates(PanningStates)
+
         self.currentState = NOTHING
         self.setPrintFunction(self.brain.out.printf)
         self.setPrintStateChanges(True)
@@ -46,5 +47,31 @@ class HeadTracking(FSA.FSA):
     def stopHead(self):
         self.switchTo('nothing')
 
+    def stopHeadMoves(self):
+        self.stopHead()
+        self.brain.motion.stopHeadMoves()
+
     def trackBall(self):
         self.switchTo('tracking',self.brain.ball)
+
+    def execute(self,sweetMove):
+        for position in sweetMove:
+            if len(position) == 6:
+                move = motion.BodyJointCommand(position[4], #time
+                                               position[0], #larm
+                                               position[1], #lleg
+                                               position[2], #rleg
+                                               position[3], #rarm
+                                               position[5], #interpolation type
+                                               )
+                self.brain.motion.enqueue(move)
+
+            elif len(position) == 3:
+                move = motion.HeadJointCommand(position[1],#time
+                                               position[0],#head pos
+                                               position[2],#interpolation type
+                                                   )
+                self.brain.motion.enqueue(move)
+
+            else:
+                print "What kind of sweet ass-Move is this?"

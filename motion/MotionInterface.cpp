@@ -37,6 +37,7 @@ void MotionInterface::setHead(const SetHeadCommand *command){
 }
 
 void MotionInterface::stopBodyMoves() {
+    cout << "Stopping the body not yet implemented" <<endl;
 }
 
 void MotionInterface::stopHeadMoves() {

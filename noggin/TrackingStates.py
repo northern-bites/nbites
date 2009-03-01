@@ -111,20 +111,4 @@ def activeTracking(tracker):
     
     return tracker.goNow('tracking')
 
-def scan(tracker):
-    if tracker.firstFrame() \
-            or not tracker.brain.motion.isHeadActive():
-        print "Enqueing head motion"
-        scan1 = motion.HeadJointCommand(3., ( 65.0, 20.0), 1)
-        scan2 = motion.HeadJointCommand(2., (65.,-10.), 1)
-        scan3 = motion.HeadJointCommand(5.0, (-65.,-10.),1)
-        scan4 = motion.HeadJointCommand(2., (-65.0, 20.0), 1)
-        scan5 = motion.HeadJointCommand(3., ( 0.0, 20.0), 1)
 
-        tracker.brain.motion.enqueue(scan1)
-        tracker.brain.motion.enqueue(scan2)
-        tracker.brain.motion.enqueue(scan3)
-        tracker.brain.motion.enqueue(scan4)
-        tracker.brain.motion.enqueue(scan5)
-
-    return tracker.stay()

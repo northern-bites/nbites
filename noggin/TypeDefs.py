@@ -200,7 +200,7 @@ class Ball:
             self.velY = loc.ballVelY
         else:
             self.x = Constants.FIELD_GREEN_WIDTH - loc.ballX
-            self.y = Constnats.FIELD_GREEN_HEIGHT - loc.ballY
+            self.y = Constants.FIELD_GREEN_HEIGHT - loc.ballY
             self.velX = -loc.ballVelX
             self.velY = -loc.ballVelY
 

@@ -1,39 +1,40 @@
+import man.motion.SweetMoves as SweetMoves
 
-def locPans(player):
-    ''' pans to the left '''
-    
-    motion = player.brain.motion
+def scanBall(tracker):
+    if tracker.firstFrame() \
+            or not tracker.brain.motion.isHeadActive():
+        print "Enqueing head motion"
+        tracker.execute(SweetMoves.SCAN_BALL)
 
-    #player.printf("sup")
-    if motion.isHeadQueueEmpty():    
-        motion.queueBadHeadPan()
-    
-        
-        
-    return player.stay()
+    return tracker.stay()
 
-def panLeftOnce(player):
-    motion = player.brain.motion
-    if player.firstFrame():
-        motion.queuePanLeftOnce()
+def locPans(tracker):
+    if tracker.firstFrame() \
+            or not tracker.brain.motion.isHeadActive():
+        print "Enqueing head motion"
+        tracker.execute(SweetMoves.LOC_PANS)
+    return tracker.stay()
 
-    if motion.isHeadQueueEmpty():    
-        if player.lastDiffState == 'tracking':
-            return player.goNow('tracking')
+def panLeftOnce(tracker):
+    if tracker.firstFrame():
+        tracker.execute(SweetMoves.PAN_LEFT)
 
-        return player.goLater('nothing')
-    
-    return player.stay()
+    if not tracker.brain.motion.isHeadActive():
+        if tracker.lastDiffState == 'tracking':
+            return tracker.goNow('tracking')
 
-def panRightOnce(player):
-    motion = player.brain.motion
-    if player.firstFrame():
-        motion.queuePanRightOnce()
+        return tracker.goLater('nothing')
 
-    if motion.isHeadQueueEmpty():
-        if player.lastDiffState == 'tracking':
-            return player.goNow('tracking')
-        
-        return player.goLater('nothing')
-    
-    return player.stay()
+    return tracker.stay()
+
+def panRightOnce(tracker):
+    if tracker.firstFrame():
+        tracker.execute(SweetMoves.PAN_RIGHT)
+
+    if not tracker.brain.motion.isHeadActive():
+        if tracker.lastDiffState == 'tracking':
+            return tracker.goNow('tracking')
+
+        return tracker.goLater('nothing')
+
+    return tracker.stay()
