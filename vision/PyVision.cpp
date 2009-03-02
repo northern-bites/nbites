@@ -248,7 +248,7 @@ PyVisualCorner_new (PyFieldLines *fl, int i, const VisualCorner &corner)
         list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
 
         self->dist = PyFloat_FromDouble(corner.getDistance());
-        self->bearing = PyFloat_FromDouble(corner.getBearing());
+        self->bearing = PyFloat_FromDouble(corner.getBearingDeg());
 
         self->possibilities = PyList_New(possibilities.size());
         if (self->possibilities != NULL) {
@@ -286,7 +286,7 @@ PyVisualCorner_update (PyVisualCorner *self, const VisualCorner &corner)
     self->dist = PyFloat_FromDouble(corner.getDistance());
 
     Py_XDECREF(self->bearing);
-    self->bearing = PyFloat_FromDouble(corner.getBearing());
+    self->bearing = PyFloat_FromDouble(corner.getBearingDeg());
 
     list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
     if (self->possibilities == NULL)
@@ -783,8 +783,8 @@ PyBall_new (VisualBall *b)
         self->height = PyFloat_FromDouble(b->getHeight());
         self->focDist = PyFloat_FromDouble(b->getFocDist());
         self->dist = PyFloat_FromDouble(b->getDistance());
-        self->bearing = PyFloat_FromDouble(b->getBearing());
-        self->elevation = PyFloat_FromDouble(b->getElevation());
+        self->bearing = PyFloat_FromDouble(b->getBearingDeg());
+        self->elevation = PyFloat_FromDouble(b->getElevationDeg());
         self->confidence = PyInt_FromLong(b->getConfidence());
 
         if (self->centerX == NULL || self->centerY == NULL ||
@@ -823,10 +823,10 @@ PyBall_update (PyBall *self)
     self->dist = PyFloat_FromDouble(self->ball->getDistance());
 
     Py_XDECREF(self->bearing);
-    self->bearing = PyFloat_FromDouble(self->ball->getBearing());
+    self->bearing = PyFloat_FromDouble(self->ball->getBearingDeg());
 
     Py_XDECREF(self->elevation);
-    self->elevation = PyFloat_FromDouble(self->ball->getElevation());
+    self->elevation = PyFloat_FromDouble(self->ball->getElevationDeg());
 
     Py_XDECREF(self->confidence);
     self->confidence = PyInt_FromLong(self->ball->getConfidence());
@@ -892,7 +892,7 @@ PyFieldObject_new (VisualFieldObject *o)
         self->height = PyFloat_FromDouble(o->getHeight());
         self->focDist = PyFloat_FromDouble(o->getFocDist());
         self->dist = PyFloat_FromDouble(o->getDistance());
-        self->bearing = PyFloat_FromDouble(o->getBearing());
+        self->bearing = PyFloat_FromDouble(o->getBearingDeg());
         self->certainty = PyInt_FromLong(o->getIDCertainty());
         self->distCertainty = PyInt_FromLong(o->getDistanceCertainty());
 
@@ -932,7 +932,7 @@ PyFieldObject_update (PyFieldObject *self)
     self->dist = PyFloat_FromDouble(self->object->getDistance());
 
     Py_XDECREF(self->bearing);
-    self->bearing = PyFloat_FromDouble(self->object->getBearing());
+    self->bearing = PyFloat_FromDouble(self->object->getBearingDeg());
 
     Py_XDECREF(self->certainty);
     self->certainty = PyInt_FromLong(self->object->getIDCertainty());
@@ -1380,14 +1380,14 @@ extern PyObject * PyCrossbar_new (VisualCrossbar *b)
         self->y = PyInt_FromLong(b->getY());
         self->centerX = PyInt_FromLong(b->getCenterX());
         self->centerY = PyInt_FromLong(b->getCenterY());
-        self->angleX = PyFloat_FromDouble(b->getAngleX());
-        self->angleY = PyFloat_FromDouble(b->getAngleY());
+        self->angleX = PyFloat_FromDouble(b->getAngleXDeg());
+        self->angleY = PyFloat_FromDouble(b->getAngleYDeg());
         self->width = PyFloat_FromDouble(b->getWidth());
         self->height = PyFloat_FromDouble(b->getHeight());
         self->focDist = PyFloat_FromDouble(b->getFocDist());
         self->distance = PyFloat_FromDouble(b->getDistance());
-        self->bearing = PyFloat_FromDouble(b->getBearing());
-        self->elevation = PyFloat_FromDouble(b->getElevation());
+        self->bearing = PyFloat_FromDouble(b->getBearingDeg());
+        self->elevation = PyFloat_FromDouble(b->getElevationDeg());
         self->leftOpening = PyFloat_FromDouble(b->getLeftOpening());
         self->rightOpening = PyFloat_FromDouble(b->getRightOpening());
         self->shoot = PyInt_FromLong(b->shotAvailable());
@@ -1420,10 +1420,10 @@ extern void PyCrossbar_update (PyCrossbar *self)
     self->centerY = PyInt_FromLong(self->crossbar->getCenterY());
 
     Py_XDECREF(self->angleX);
-    self->angleX = PyFloat_FromDouble(self->crossbar->getAngleX());
+    self->angleX = PyFloat_FromDouble(self->crossbar->getAngleXDeg());
 
     Py_XDECREF(self->angleX);
-    self->angleY = PyFloat_FromDouble(self->crossbar->getAngleY());
+    self->angleY = PyFloat_FromDouble(self->crossbar->getAngleYDeg());
 
     Py_XDECREF(self->width);
     self->width = PyFloat_FromDouble(self->crossbar->getWidth());
@@ -1438,10 +1438,10 @@ extern void PyCrossbar_update (PyCrossbar *self)
     self->distance = PyFloat_FromDouble(self->crossbar->getDistance());
 
     Py_XDECREF(self->bearing);
-    self->bearing = PyFloat_FromDouble(self->crossbar->getBearing());
+    self->bearing = PyFloat_FromDouble(self->crossbar->getBearingDeg());
 
     Py_XDECREF(self->elevation);
-    self->elevation = PyFloat_FromDouble(self->crossbar->getElevation());
+    self->elevation = PyFloat_FromDouble(self->crossbar->getElevationDeg());
 
     Py_XDECREF(self->leftOpening);
     self->leftOpening = PyInt_FromLong(self->crossbar->getLeftOpening());
@@ -1499,14 +1499,14 @@ extern PyObject * PyVisualRobot_new (VisualRobot *b)
         self->y = PyInt_FromLong(b->getY());
         self->centerX = PyInt_FromLong(b->getCenterX());
         self->centerY = PyInt_FromLong(b->getCenterY());
-        self->angleX = PyFloat_FromDouble(b->getAngleX());
-        self->angleY = PyFloat_FromDouble(b->getAngleY());
+        self->angleX = PyFloat_FromDouble(b->getAngleXDeg());
+        self->angleY = PyFloat_FromDouble(b->getAngleYDeg());
         self->width = PyFloat_FromDouble(b->getWidth());
         self->height = PyFloat_FromDouble(b->getHeight());
         self->focDist = PyFloat_FromDouble(b->getFocDist());
         self->distance = PyFloat_FromDouble(b->getDistance());
-        self->bearing = PyFloat_FromDouble(b->getBearing());
-        self->elevation = PyFloat_FromDouble(b->getElevation());
+        self->bearing = PyFloat_FromDouble(b->getBearingDeg());
+        self->elevation = PyFloat_FromDouble(b->getElevationDeg());
 
         if (self->centerX == NULL || self->centerY == NULL ||
             self->width == NULL || self->height == NULL ||
@@ -1536,10 +1536,10 @@ extern void PyVisualRobot_update (PyVisualRobot *self)
     self->centerY = PyInt_FromLong(self->robot->getCenterY());
 
     Py_XDECREF(self->angleX);
-    self->angleX = PyFloat_FromDouble(self->robot->getAngleX());
+    self->angleX = PyFloat_FromDouble(self->robot->getAngleXDeg());
 
     Py_XDECREF(self->angleX);
-    self->angleY = PyFloat_FromDouble(self->robot->getAngleY());
+    self->angleY = PyFloat_FromDouble(self->robot->getAngleYDeg());
 
     Py_XDECREF(self->width);
     self->width = PyFloat_FromDouble(self->robot->getWidth());
@@ -1554,10 +1554,10 @@ extern void PyVisualRobot_update (PyVisualRobot *self)
     self->distance = PyFloat_FromDouble(self->robot->getDistance());
 
     Py_XDECREF(self->bearing);
-    self->bearing = PyFloat_FromDouble(self->robot->getBearing());
+    self->bearing = PyFloat_FromDouble(self->robot->getBearingDeg());
 
     Py_XDECREF(self->elevation);
-    self->elevation = PyFloat_FromDouble(self->robot->getElevation());
+    self->elevation = PyFloat_FromDouble(self->robot->getElevationDeg());
 }
 
 // backend methods
