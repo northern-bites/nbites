@@ -15,7 +15,7 @@ from man.motion import MotionConstants
 from . import GameController
 from . import HeadTracking
 from . import Navigator
-from . import NaoOutput
+from .util import NaoOutput
 from . import NogginConstants as Constants
 from . import TypeDefs
 from . import Loc
