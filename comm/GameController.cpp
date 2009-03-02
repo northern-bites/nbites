@@ -15,7 +15,7 @@ bool DEBUG = false;
 
 // print error messages when bad packets are received
 #undef  DEBUG_INVALID_PACKETS
-#define DEBUG_INVALID_PACKETS
+//#define DEBUG_INVALID_PACKETS
 
 static void
 printGCData(RoboCupGameControlData& packet)
