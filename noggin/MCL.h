@@ -55,6 +55,17 @@ public:
         y += o.y;
         h += o.h;
     }
+    PoseEst operator+ (const MotionModel u_t)
+    {
+        // Translate the relative change into the global coordinate system
+        // And add that to the current estimate
+        float calcFromAngle = h - M_PI / 2.0f;
+        return PoseEst(u_t.deltaF * -cos(calcFromAngle) +
+                       u_t.deltaL * sin(calcFromAngle),
+                       u_t.deltaF * -sin(calcFromAngle) -
+                       u_t.deltaL * cos(calcFromAngle),
+                       h += u_t.deltaR);
+    }
     void operator+= (const MotionModel u_t)
     {
         // Translate the relative change into the global coordinate system
@@ -194,7 +205,6 @@ private:
     std::vector<Particle> X_t; // Current set of particles
 
     // Core Functions
-    PoseEst updateOdometery(MotionModel u_t, PoseEst x_t);
     float updateMeasurementModel(std::vector<Observation> z_t, PoseEst x_t);
     void updateEstimates();
 

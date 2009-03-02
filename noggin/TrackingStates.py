@@ -26,7 +26,7 @@ def tracking(tracker):
     if tracker.firstFrame():
         #supersede anything in the motion queue:
         tracker.brain.motion.stopHeadMoves()
-        if DEBUG: print "stopping head moves, first frame"
+        if DEBUG: tracker.printf("stopping head moves, first frame",'cyan')
 
     (changeX,changeY) = (0.,0.)
     #Find the target's angular distance from the center of the screen
@@ -37,7 +37,7 @@ def tracking(tracker):
             changeX = tracker.target.angleX
             changeY = tracker.target.angleY #the pitch is pos = down
         else:
-            if DEBUG : print "Missing object this frame"
+            if DEBUG : tracker.printf("Missing object this frame",'cyan')
             return tracker.stay()
     #otherwise, if we have angles, track by those
     elif tracker.angleX != None and tracker.angleY !=None:

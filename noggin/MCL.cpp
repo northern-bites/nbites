@@ -57,8 +57,9 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
     // Run through the particles
     for (int m = 0; m < M; ++m) {
         Particle x_t_m;
+
         // Update motion model for the particle
-        x_t_m.pose = updateOdometery(u_t, X_t_1[m].pose);
+        x_t_m.pose = X_t_1[m].pose + u_t;
 
         // Update measurement model
         x_t_m.weight = updateMeasurementModel(z_t, x_t_m.pose);
@@ -90,31 +91,6 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
 
     // Update pose and uncertainty estimates
     updateEstimates();
-}
-
-/**
- * Method updates the robot pose based on motion changes since the last frame.
- *
- * @param u_t The motion change since the last update.
- * @param x_t The robot pose estimate to be updated.
- * @return The new estimated robot pose.
- */
-PoseEst MCL::updateOdometery(MotionModel u_t, PoseEst x_t)
-{
-    // Translate the relative change into the global coordinate system
-    // float deltaX, deltaY, deltaH;
-    // float calcFromAngle = x_t.h + M_PI / 2.0f;
-    // deltaX = u_t.deltaF * cos(calcFromAngle) - u_t.deltaL * sin(calcFromAngle);
-    // deltaY = u_t.deltaF * sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
-    // deltaH = u_t.deltaR; // Rotational change is the same as heading change
-
-    // // Add the change to the current pose estimate
-    // x_t.x += deltaX;
-    // x_t.y += deltaY;
-    // x_t.h += deltaH;
-
-    x_t += u_t;
-    return x_t;
 }
 
 /**
@@ -264,38 +240,55 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
     float r_d;
     float r_a;
 
-    // Determine nearest expected point on the line
-    // NOTE:  This is currently too naive, we need to extrapolate the entire
-    // line from the vision inforamtion and find the closest expected distance
-    PointLandmark pt_hat;
-    if (line.x1 == line.x2) { // Line is vertical
-        pt_hat.x = line.x1;
-        pt_hat.y = x_t.y;
+    // Nearest point on the line
+    PointLandmark pt;
+    // Slopes
+    float m;
 
-        // Make sure we aren't outside the line
-        if ( pt_hat.y < line.y1) {
-            pt_hat.y = line.y1;
-        } else if ( pt_hat.y > line.y2) {
-            pt_hat.y = line.y2;
-        }
-    } else { // Line is horizontal
-        pt_hat.x = x_t.x;
-        pt_hat.y = line.y1;
+    if (line.x2 - line.x1 != 0) { // Check if the line is vertical
+        m = (line.y2 - line.y1) / (line.x2 - line.x1);
 
-        // Make sure we aren't outside the line
-        if ( pt_hat.x < line.x1) {
-            pt_hat.x = line.x1;
-        } else if ( pt_hat.x > line.x2) {
-            pt_hat.x = line.x2;
+        if (m != 0) { // Line is on a slope
+            pt.x = (line.y1 - x_t.y + m*line.x1 + m*x_t.x) *
+                (m / (2*m + 1));
+            pt.y = m * (pt.x - line.x1) + line.y1;
+        } else { // Line is horizontal; ortho is vertical
+            pt.x = x_t.x;
+            pt.y = line.y1;
         }
+    } else { // Line is vertical
+        pt.x = line.x1;
+        pt.y = x_t.y;
     }
 
-    // Get dist and bearing to expected point
-    d_hat = sqrt( pow(pt_hat.x - x_t.x, 2.0f) +
-                  pow(pt_hat.y - x_t.y, 2.0f));
+    // Check if the intersecting point is on the line
+    if( ((line.x1 < line.x2) && (pt.x < line.x1 || pt.x > line.x2)) ||
+        ((line.x1 > line.x2) && (pt.x > line.x1 || pt.x < line.x2)) ||
+        ((line.y1 < line.y2) && (pt.y < line.y1 || pt.y > line.y2)) ||
+        ((line.y1 > line.y2) && (pt.y > line.y1 || pt.y < line.y2))) {
+        // Point is outside the bound of the bounds of the line segment
+        float d_1 = sqrt( (line.x1 - x_t.x)*(line.x1 - x_t.x) +
+                          (line.y1 - x_t.y)*(line.y1 - x_t.y));
+        float d_2 = sqrt( (line.x2 - x_t.x)*(line.x2 - x_t.x) +
+                          (line.y2 - x_t.y)*(line.y2 - x_t.y));
+        if (d_1 < d_2) {
+            d_hat = d_1;
+            a_hat = atan2(line.y1 - x_t.y, line.x1 - x_t.x) - x_t.h -
+                QUART_CIRC_RAD;
+        } else {
+            d_hat = d_2;
+            a_hat = atan2(line.y2 - x_t.y, line.x2 - x_t.x) - x_t.h -
+                QUART_CIRC_RAD;
+        }
 
-    // Expected bearing
-    a_hat = atan2(pt_hat.y - x_t.y, pt_hat.x - x_t.x) - x_t.h;
+    } else {
+
+        // Determine nearest expected point on the line
+        d_hat = sqrt( (pt.x - x_t.x)*(pt.x - x_t.x) +
+                      (pt.y - x_t.y)*(pt.y - x_t.y));
+        // Expected bearing
+        a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h - QUART_CIRC_RAD;
+    }
 
     // Calculate residuals
     r_d = fabs(z.getVisDistance() - d_hat);
@@ -329,6 +322,14 @@ float MCL::getSimilarity(float r_d, float r_a, Observation &z)
     return s_d_a;
 }
 
+/**
+ * Move a particle randomly in the x, y, and h directions proportional
+ * to its weight, within a certian bounds.
+ *
+ * @param p The particle to be random walked
+ *
+ * @return The walked particle
+ */
 Particle MCL::randomWalkParticle(Particle p)
 {
     p.pose.x += MAX_CHANGE_X * (1.0f - p.weight)*UNIFORM_1_NEG_1;

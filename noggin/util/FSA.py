@@ -4,7 +4,7 @@ This file contains an implementation of a finite state automaton.
 """
 
 import time
-
+from . import NaoOutput
 DEBUG =False
 
 #HELPER method syntax for external state changes requiring helpers
@@ -13,6 +13,16 @@ HELPER = "Helper"
 # Should I stay? Or should I go?
 THIS_FRAME = True
 NEXT_FRAME = False
+
+# ANSI terminal color codes
+# http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html
+RESET_COLORS_CODE = '\033[0m'
+RED_COLOR_CODE = '\033[31m'
+GREEN_COLOR_CODE = '\033[32m'
+YELLOW_COLOR_CODE = '\033[33m'
+BLUE_COLOR_CODE = '\033[34m'
+PURPLE_COLOR_CODE = '\033[35m'
+CYAN_COLOR_CODE = '\033[36m'
 
 class FSA:
     """ Finite State Automaton implementation.
@@ -39,6 +49,7 @@ class FSA:
         self.getTime = time.time
 
         #debug switches
+        self.stateChangeColor = ''
         self.printStateChanges = False
 
     def addStates(self,module):
@@ -113,7 +124,7 @@ class FSA:
         '''
         allows changing the printing to use new function like printf(string)
         '''
-        self.printf = newPrintFunction
+        self.outputFunction = newPrintFunction
 
     def setName(self,string):
         self.name = string
@@ -121,9 +132,24 @@ class FSA:
     def setHelperName(self,string):
         self.helperName = string
 
-    def printf(self,str):
+    def outputFunction(self, str):
         ''' default print method for the FSA '''
         print str
+
+    def printf(self,outputString, printingColor=''):
+        '''FSA print function that allows colors to be specified'''
+        if printingColor == 'red':
+            self.outputFunction(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'blue':
+            self.outputFunction(BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'yellow':
+            self.outputFunction(YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'cyan':
+            self.outputFunction(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'purple':
+            self.outputFunction(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        else:
+            self.outputFunction(str(outputString))
 
     def updateStateInfo(self):
         """
@@ -137,8 +163,7 @@ class FSA:
                 self.printf(self.name+": switched to '"+
                             self.currentState+"\' after " +
                             str(self.counter + 1) +
-                            " frames in state \'"+self.lastFrameState+"\'")
-
+                            " frames in state \'"+self.lastFrameState+"\'", self.stateChangeColor)
             self.lastDiffState = self.lastFrameState
             self.counter = 0
             self.startTime = self.getTime()

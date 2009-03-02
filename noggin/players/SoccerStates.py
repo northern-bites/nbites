@@ -26,7 +26,7 @@ def nothing(player):
 def track(player):
 
     player.brain.tracker.switchTo('tracking', player.brain.ball)
-    print "bearing",player.brain.bearing
+    player.printf("bearing " + player.brain.bearing)
     return player.goLater('done')
 
 def spinFindBall(player):
@@ -55,7 +55,7 @@ def sawBall(player):
     if not player.brain.motion.isWalkActive():
         return player.goNow('alignOnBall')
 
-    print "waiting for previous walk to stop"
+    player.printf("waiting for previous walk to stop")
     return player.stay()
 
 def alignOnBall(player):
@@ -66,7 +66,7 @@ def alignOnBall(player):
             return player.stay()
 
     if player.brain.ball.on:
-        print "ball bearing", player.brain.ball.bearing
+        player.printf("ball bearing" + player.brain.ball.bearing)
         player.brain.tracker.switchTo('tracking', player.brain.ball)
         #later, we want to align on ball here
 

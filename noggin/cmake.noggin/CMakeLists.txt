@@ -125,7 +125,6 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/GameStates.py
                         ${NOGGIN_INCLUDE_DIR}/HeadTracking.py
                         ${NOGGIN_INCLUDE_DIR}/PanningStates.py
-                        ${NOGGIN_INCLUDE_DIR}/NaoOutput.py
                         ${NOGGIN_INCLUDE_DIR}/NavConstants.py
                         ${NOGGIN_INCLUDE_DIR}/NavStates.py
                         ${NOGGIN_INCLUDE_DIR}/Navigator.py

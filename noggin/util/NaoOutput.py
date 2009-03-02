@@ -13,7 +13,8 @@ LOG_DIR = "logs/"
 # Localization Logs
 LOC_LOG_TYPE = "localization"
 NAO_HEADER_ID = "NAO"
-
+GREEN_COLOR_CODE = '\033[32m'
+RESET_COLORS_CODE = '\033[0m'
 class NaoOutput:
     def __init__(self, brain):
         """
@@ -24,11 +25,12 @@ class NaoOutput:
         self.locLogCount = 0
         self.loggingLoc = False
 
-    def printf(self,str):
+    def printf(self,outputString):
         """
         Prints string to robot_console
         """
-        print str
+        # Print everything in green
+        print GREEN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
 
     def saveFrame(self):
         """
