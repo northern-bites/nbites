@@ -29,8 +29,8 @@ public:
     void setDistanceWithSD(float _dist);
     void setBearingWithSD(float b);
     void findAngles() {
-        setAngleX((IMAGE_WIDTH/2 - centerX) / MAX_BEARING);
-        setAngleY((IMAGE_HEIGHT/2 - centerY) / MAX_ELEVATION);
+        setAngleX((IMAGE_WIDTH/2 - centerX) / MAX_BEARING_RAD);
+        setAngleY((IMAGE_HEIGHT/2 - centerY) / MAX_ELEVATION_RAD);
     }
 
     // calibration pre-huge chown changes

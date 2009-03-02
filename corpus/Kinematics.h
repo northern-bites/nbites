@@ -23,15 +23,9 @@
 using namespace boost::numeric;
 
 #include <cmath>
+#include "NBMath.h"
 
 namespace Kinematics {
-
-    //Conversion constants
-	static const float M_PI_FLOAT = static_cast<float>(M_PI);
-    static const float TO_DEG = 180.0f/M_PI_FLOAT;
-#ifndef TO_RAD //also defined in almotionproxy.h
-    static const float TO_RAD = M_PI_FLOAT/180.0f;
-#endif
 
     static const float M_TO_CM  = 100.0f;
     static const float CM_TO_M  = 0.01f;

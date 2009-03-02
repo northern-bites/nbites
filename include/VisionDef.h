@@ -91,8 +91,10 @@ Vision Constants that span multiple classes and systems.
 #define HALF_IMAGE_HEIGHT (IMAGE_HEIGHT / 2)
 
 // Core Image Constants
-static const float MAX_BEARING = IMAGE_WIDTH / FOV_X_DEG; // relative to cam
-static const float MAX_ELEVATION = IMAGE_HEIGHT / FOV_Y_DEG; // ''
+static const float MAX_BEARING_DEG = IMAGE_WIDTH / FOV_X_DEG; // relative to cam
+static const float MAX_ELEVATION_DEG = IMAGE_HEIGHT / FOV_Y_DEG; // ''
+static const float MAX_BEARING_RAD = MAX_BEARING_DEG*TO_RAD;
+static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 
 // THRESHOLD COLORS
 #define GREY 0

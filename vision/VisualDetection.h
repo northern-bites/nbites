@@ -12,6 +12,7 @@
 #define VisualDetection_h_defined
 
 #include "Structs.h"
+#include "NBMath.h"
 class VisualDetection {
 public:
     // Constructor
@@ -51,10 +52,14 @@ public:
     const int getCenterY() const { return centerY; }
     const float getAngleX() const { return angleX; }
     const float getAngleY() const { return angleY; }
+    const float getAngleXDeg() const { return angleX*TO_DEG; }
+    const float getAngleYDeg() const { return angleY*TO_DEG; }
     const float getFocDist() const { return focDist; }
     const float getDistance() const { return distance; }
     const float getBearing() const { return bearing; }
+    const float getBearingDeg() const { return bearing*TO_DEG; }
     const float getElevation() const { return elevation; }
+    const float getElevationDeg() const { return elevation*TO_DEG; }
     const float getDistanceSD() const { return distanceSD; }
     const float getBearingSD() const { return bearingSD; }
 

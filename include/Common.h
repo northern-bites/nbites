@@ -6,8 +6,8 @@
 #define Common_h_DEFINED
 
 #include <math.h> // for PI
-
 #include "ifdefs.h"
+#include "NBMath.h"
 
 // ROBOT TYPES
 #define NAO_RL    3
@@ -33,9 +33,6 @@
 #define GAME_CONTROLLER_TEAM_LIST_SIZE 4
 #define GAME_CONTROLLER_PLAYERS_LIST_SIZE NUM_PLAYERS_PER_TEAM
 
-static const double PI = M_PI;
-static const double DEG_OVER_RAD = 180.0 / M_PI;
-static const double RAD_OVER_DEG = M_PI / 180.0;
 
 //
 // Define oft-used short-hand or clarifying user-defined types
@@ -48,12 +45,6 @@ static const double RAD_OVER_DEG = M_PI / 180.0;
 #ifndef byte
 typedef unsigned char byte;
 #endif
-
-inline static int ROUND(float x) {
-  if ((x-static_cast<int>(x)) >= 0.5) return (static_cast<int>(x)+1);
-  if ((x-static_cast<int>(x)) <= -0.5) return (static_cast<int>(x)-1);
-  else return (int)x;
-}
 
 #ifndef _WIN32
 #include <time.h>
