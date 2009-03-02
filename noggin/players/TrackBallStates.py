@@ -20,7 +20,7 @@ def nothing(player):
 
 def test(player):
     if player.firstFrame():
-        print "Would be sending a head command"
+        player.printf("Would be sending a head command")
         hc = motion.HeadJointCommand(5.0,(0.,0.),1)
         player.brain.motion.enqueue(hc)
     if player.counter == 2:

@@ -21,6 +21,8 @@ class SoccerFSA(FSA.FSA):
 
         #set default behavior for soccer players - override it if you want
         self.setPrintStateChanges(True)
+        # set printing to be done with colors
+        self.stateChangeColor = 'red'
         self.setPrintFunction(self.brain.out.printf)
 
         # Method to enqueue a SweetMove
@@ -46,5 +48,5 @@ class SoccerFSA(FSA.FSA):
                 self.brain.motion.enqueue(move)
 
             else:
-                print "What kind of sweet ass-Move is this?"
+                self.printf("What kind of sweet ass-Move is this?")
 

@@ -3,7 +3,7 @@ import man.motion.SweetMoves as SweetMoves
 def scanBall(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
-        print "Enqueing head motion"
+        #print "Enqueing head motion"
         tracker.execute(SweetMoves.SCAN_BALL)
 
     return tracker.stay()
@@ -11,7 +11,7 @@ def scanBall(tracker):
 def locPans(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
-        print "Enqueing head motion"
+        #print "Enqueing head motion"
         tracker.execute(SweetMoves.LOC_PANS)
     return tracker.stay()
 

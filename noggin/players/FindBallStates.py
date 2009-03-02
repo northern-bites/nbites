@@ -2,13 +2,13 @@ import man.motion.SweetMoves as SweetMoves
 
 def scanFindBall(player):
     if player.firstFrame() or  player.brain.ball.framesOff >2:
-        print "First frame or havent seen the ball in abit"
+        player.printf("First frame or havent seen the ball in abit")
         player.brain.tracker.switchTo('scanBall')
 
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
 
-    print "ball.frames on",player.brain.ball.framesOn," dist:",player.brain.ball.dist
+    player.printf("ball.frames on" + player.brain.ball.framesOn + " dist:" + player.brain.ball.dist)
 
     if player.brain.ball.framesOn > 2:
         return player.goNow('rotAlignOnBall')
@@ -21,5 +21,5 @@ def spinFindBall(player):
     return player.stay()
 
 def rotAlignOnBall(player):
-    print "Ball bearing i " , player.brain.ball.bearing
+    player.printf("Ball bearing i " + player.brain.ball.bearing)
     return player.stay()

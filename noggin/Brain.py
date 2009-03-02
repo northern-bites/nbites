@@ -35,6 +35,8 @@ class Brain(object):
         Class constructor
         """
         self.on = True
+        # Output Class
+        self.out = NaoOutput.NaoOutput(self)
         # Setup nao modules inside brain for easy access
         self.vision = vision.Vision()
         self.sensors = sensors.Sensors()
@@ -50,13 +52,12 @@ class Brain(object):
         self.CoA = robots.get_certificate()
         # coa is Certificate of Authenticity (to keep things short)
         self.comm.gc.player = self.CoA.player_number
-        print self.CoA
+        self.out.printf(self.CoA)
 
         # Initialize various components
         self.my = TypeDefs.MyInfo()
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
-        self.out = NaoOutput.NaoOutput(self) # Output Class
 
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
@@ -65,7 +66,7 @@ class Brain(object):
         self.gameController = GameController.GameController(self)
 
         # Functional Variables
-        self.my.teamNumber = 101
+        self.my.teamNumber = self.comm.gc.team
 
 
     def initFieldObjects(self):
@@ -216,7 +217,7 @@ class Brain(object):
                                 (i+1, self.lines[i].__str__(),))
 
     def updateComm(self):
-        #print self.comm.latestComm()
+        #self.out.printf(self.comm.latestComm())
         pass
 
     def updateLocalization(self):
