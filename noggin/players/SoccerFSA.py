@@ -50,3 +50,9 @@ class SoccerFSA(FSA.FSA):
             else:
                 self.printf("What kind of sweet ass-Move is this?")
 
+    def setSpeed(self,x,y,theta):
+        walk = motion.WalkCommand(x=x,y=y,theta=theta)
+        self.brain.motion.setNextWalkCommand(walk)
+
+    def clip(self,val,minv,maxv):
+        return max(min(val,maxv),minv)
