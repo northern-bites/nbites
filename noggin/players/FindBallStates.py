@@ -1,15 +1,22 @@
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
+import math
+TO_RAD = math.pi/180.
 
 def scanFindBall(player):
+    '''
+    State to move the head to find the ball. If we find the ball, we
+    move to align on it. If we don't find it, we spin to keep looking
+    '''
     if player.firstFrame() or  player.brain.ball.framesOff >2:
         player.printf("First frame or havent seen the ball in abit")
         player.brain.tracker.switchTo('scanBall')
-
+        player.setSpeed(0,0,0)
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
 
-    player.printf("ball.frames on" + player.brain.ball.framesOn + " dist:" + player.brain.ball.dist)
+    player.printf("ball.frames on" +str(player.brain.ball.framesOn) +
+                  " dist:" + str(player.brain.ball.dist))
 
     if player.brain.ball.framesOn > 2:
         return player.goNow('rotAlignOnBall')
@@ -19,6 +26,10 @@ def scanFindBall(player):
     return player.stay()
 
 def spinFindBall(player):
+    '''
+    State to spin to find the ball. If we find the ball, we
+    move to align on it. If we don't find it, we go to a garbage state
+    '''
     if player.firstFrame():
         player.setSpeed(0,0,10)
 
@@ -31,12 +42,14 @@ def spinFindBall(player):
     return player.stay()
 
 def cantFindBall(player):
+    ''' Garbage state when we can't see the ball'''
     if player.firstFrame():
         player.printf('Cant find ball')
     return player.stay()
 
 def rotAlignOnBall(player):
-    turnRate = player.clip(player.brain.ball.bearing*0.5,-25.,25.)
+    '''Rotate to align with the ball. When we get close, we will approach it '''
+    turnRate = player.clip(player.brain.ball.bearing*0.5,-10.,10.)
     player.printf( "Ball bearing i "+ str(player.brain.ball.bearing)+
                    " turning at "+str(turnRate))
     player.setSpeed(x=0,y=0,theta=turnRate)
@@ -45,7 +58,25 @@ def rotAlignOnBall(player):
     return player.stay()
 
 def approachBall(player):
+    ''' Once we are alligned with the ball, approach it'''
     if player.firstFrame():
         player.setSpeed(0,0,0)
         player.printf("Approaching ball")
+    if player.brain.ball.on:
+        bearing = player.brain.ball.bearing
+        if bearing < 20:
+            targetX = math.cos(bearing*TO_RAD)*player.brain.ball.dist
+            targetY = math.sin(bearing*TO_RAD)*player.brain.ball.dist
+            player.printf("bearing is"+str(bearing)+" target X/Y  is "+str(targetX)+","+str(targetY),"blue")
+            maxTarget = max(abs(targetX),abs(targetY))
+
+
+            sX = targetX/maxTarget*6.
+            sY = targetY/maxTarget*3.
+            player.printf("Walk vector is "+str(sX)+","+str(sY))
+            #player.setSpeed(maxX*ratio,maxY*ratio,0)
+        else:
+            return player.goNow('rotAlignOnBall')
+    elif player.brain.ball.framesOff >2:
+        return player.goNow('scanFindBall')
     return player.stay()

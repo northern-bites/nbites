@@ -16,6 +16,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.motion.stopBodyMoves()
         player.brain.tracker.stopHeadMoves()
+        player.setHeads(0.,0.)
         player.executeMove(SweetMoves.SIT_POS)
     return player.stay()
 

@@ -53,6 +53,9 @@ class SoccerFSA(FSA.FSA):
     def setSpeed(self,x,y,theta):
         walk = motion.WalkCommand(x=x,y=y,theta=theta)
         self.brain.motion.setNextWalkCommand(walk)
+    def setHeads(self,yawv,pitchv):
+        heads = motion.SetHeadCommand(yaw=yawv,pitch=pitchv)
+        self.brain.motion.setHead(heads)
 
     def clip(self,val,minv,maxv):
         return max(min(val,maxv),minv)
