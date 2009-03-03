@@ -25,7 +25,7 @@ using namespace boost::assign;
 using boost::shared_ptr;
 
 #include "StepGenerator.h"
-
+#include "NBMath.h"
 //#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
@@ -436,9 +436,10 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     }
 
 
-    //if the new one is different, update the
-    //TODO need to do clipping
-    x = new_x; y = new_y; theta = new_theta;
+    //Clip the incoming values as dictated by the walkParameters
+    x     = clip(new_x,walkParams->maxXSpeed);
+    y     = clip(new_y,walkParams->maxXSpeed);
+    theta = clip(new_theta,walkParams->maxXSpeed);
 
 
 #ifdef DEBUG_STEPGENERATOR

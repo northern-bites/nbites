@@ -393,7 +393,6 @@ namespace Kinematics {
                           ublas::bounded_array<float,9> > ufmatrix3;
     typedef ublas::vector<float, ublas::bounded_array<float,3> > ufvector3;
 
-    const float clip(const float, const float, const float);
     const void clipChainAngles(const ChainID id,
                                float angles[]);
     const float getMinValue(const ChainID id, const int jointNumber);

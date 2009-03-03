@@ -134,7 +134,9 @@ public:
     float rightSwingHipRollAddition; // in rad
     float leftZMPSwingOffsetY; //in mm, distance to offset zmp from center of foot
     float rightZMPSwingOffsetY;//in the Y direction (side to side)
-
+    float maxXSpeed;
+    float maxYSpeed;
+    float maxThetaSpeed;
 //calculated from parameters
 public:
     int stepDurationFrames; //one double + one single support
@@ -149,7 +151,9 @@ public:
                       const float _dblSupFrac, const float _stepHeight,
                       const float _footLengthX, const float _dblInactivePerc,
                       const float _lSwHRAdd,const float _rSwHRAdd,
-                      const float _lZMPSwOffY,const float _rZMPSwOffY)
+                      const float _lZMPSwOffY,const float _rZMPSwOffY,
+                      const float maxx_mms, const float maxy_mms,
+                      const float maxtheta_rads)
         :  motion_frame_length_s( _motion_frame_length_s),
            bodyHeight(_bh), hipOffsetX(_hox), stepDuration(_dur),
            doubleSupportFraction(_dblSupFrac),
@@ -157,7 +161,8 @@ public:
            dblSupInactivePercentage(_dblInactivePerc),
            leftSwingHipRollAddition(_lSwHRAdd),
            rightSwingHipRollAddition(_rSwHRAdd),
-           leftZMPSwingOffsetY(_lZMPSwOffY),rightZMPSwingOffsetY(_rZMPSwOffY)
+           leftZMPSwingOffsetY(_lZMPSwOffY),rightZMPSwingOffsetY(_rZMPSwOffY),
+           maxXSpeed(maxx_mms),maxYSpeed(maxy_mms),maxThetaSpeed(maxtheta_rads)
         {
             updateFrameLengths();
         }
@@ -235,7 +240,11 @@ const WalkingParameters DEFAULT_PARAMETERS
                     4.0f*TO_RAD,  // leftSwingHipRollAddition
                     4.0f*TO_RAD,  // rightSwingHipRollAddition
                     12.0f,        // leftZMPSwingOffestY,
-                    12.0f);       // rightZMPSwingOffestY
+                    12.0f,        // rightZMPSwingOffestY
+                    100.0f,       // max speed x (mm/s)
+                    50.0f,        // max speed y (mm/s)
+                    0.50f);       // max speed theta (rad/s)
+
 const WalkingParameters GOALIE_PARAMETERS = DEFAULT_PARAMETERS;
 
 const WalkingParameters WALK_PARAMS[] = {DEFAULT_PARAMETERS,GOALIE_PARAMETERS};

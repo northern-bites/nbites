@@ -36,14 +36,17 @@ public:
                  const float _dblSupFrac, const float _stepHeight,
                  const float _footLengthX, const float _dblInactivePerc,
                  const float _lSwHRAdd,const float _rSwHRAdd,
-                 const float _lZMPSwOffY,const float _rZMPSwOffY)
+                 const float _lZMPSwOffY,const float _rZMPSwOffY,
+                 const float maxx_mms, const float maxy_mms,
+                 const float maxtheta_rads)
         :MotionCommand(MotionConstants::GAIT),
          gait(_motion_frame_length_s,_bh, //HACK
               _hox, _dur,
               _dblSupFrac, _stepHeight,
               _footLengthX, _dblInactivePerc,
               _lSwHRAdd,_rSwHRAdd,
-              _lZMPSwOffY,_rZMPSwOffY)
+              _lZMPSwOffY,_rZMPSwOffY,
+              maxx_mms,maxy_mms,maxtheta_rads)
         {
         }
     const WalkingParameters getGait() const {return gait;}

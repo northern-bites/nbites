@@ -22,4 +22,16 @@ inline static int ROUND(float x) {
   else return (int)x;
 }
 
+static const float clip(const float value,const float minValue, const float maxValue) {
+    if (value > maxValue)
+        return maxValue;
+    else if (value < minValue)
+        return minValue;
+    else
+        return value;
+}
+
+static const float clip(const float value, const float minMax){
+    return clip(value,-minMax,minMax);
+}
 #endif //NBMath_h

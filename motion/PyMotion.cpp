@@ -66,13 +66,15 @@ public:
                    const float _dblSupFrac, const float _stepHeight,
                    const float _footLengthX, const float _dblInactivePerc,
                    const float _lSwHRAdd,const float _rSwHRAdd,
-                   const float _lZMPSwOffY,const float _rZMPSwOffY){
-        command = new GaitCommand(0.02,_bh, //HACK
-                                  _hox, _dur,
-                                  _dblSupFrac, _stepHeight,
-                                  _footLengthX, _dblInactivePerc,
-                                  _lSwHRAdd,_rSwHRAdd,
-                                  _lZMPSwOffY,_rZMPSwOffY);
+                   const float _lZMPSwOffY,const float _rZMPSwOffY,
+                   const float maxx, const float maxy, const float maxtheta){
+        command = new GaitCommand(0.02,_bh*CM_TO_MM, //HACK
+                                  _hox*CM_TO_MM, _dur,
+                                  _dblSupFrac, _stepHeight*CM_TO_MM,
+                                  _footLengthX*CM_TO_MM, _dblInactivePerc,
+                                  _lSwHRAdd*TO_RAD,_rSwHRAdd*TO_RAD,
+                                  _lZMPSwOffY*CM_TO_MM,_rZMPSwOffY*CM_TO_MM,
+                                  maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD);
     }
 
     GaitCommand* getCommand() const { return command; }
@@ -211,6 +213,7 @@ BOOST_PYTHON_MODULE(_motion)
                           init<
                           float, float, float, float,
                           float, float, float, float,
+                          float, float, float,
                           float, float, float>(
 "A container for setting the walking gait of the robot. "
 "(bodyHeight,hipOffsetX,stepDuration,doubleSupportFraction,stepHeight,"

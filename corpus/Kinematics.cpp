@@ -1,15 +1,7 @@
 #include <iostream>
 #include "Kinematics.h"
 
-const float Kinematics::clip(const float value,
-                             const float minValue, const float maxValue) {
-    if (value > maxValue)
-        return maxValue;
-    else if (value < minValue)
-        return minValue;
-    else
-        return value;
-}
+
 
 
 /**
