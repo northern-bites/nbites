@@ -15,21 +15,49 @@ sitDownAngles = SweetMoves.SIT_POS[0]
 TO_RAD= math.pi/180.
 
 def gameInitial(player):
-    print "In the players version of game controller state (overridden)"
-    gait = motion.GaitCommand(310.0,
-                              19.0,
-                              0.5,
-                              0.1,
-                              16.5,
-                              10.0,
-                              0.4,
-                              4.0*TO_RAD,
-                              4.0*TO_RAD,
-                              15.0,
-                              15.0)
-    player.brain.motion.setGait(gait)
+    if player.firstFrame():
+        gait = motion.GaitCommand(31.00, # com height
+                                  1.40,  # hip offset x
+                                  0.50,   # step duration
+                                  0.1,   # fraction in double support
+                                  1.65,  # stepHeight
+                                  0.0,  # footLengthX
+                                  0.4,   # zmp static percentage
+                                  4.0,   # left swing hip roll addition
+                                  4.0,   # right swing hip roll addition
+                                  1.50,  # left zmp off
+                                  1.50,  # right zmp off
+                                  10.0,  # max x speed
+                                  5.0,   # max y speed
+                                  30.0)  # max theta speed
+        player.brain.motion.setGait(gait)
+    return player.stay()
 
-    return player.goLater('walkstraight')
+def gameReady(player):
+    if player.firstFrame():
+        walkcmd = motion.WalkCommand(x=0,y=0,theta=0)
+        player.brain.motion.setNextWalkCommand(walkcmd)
+
+    return player.stay()
+
+def gamePlaying(player):
+    print "In the players version of game controller state (overridden)"
+    # gait = motion.GaitCommand(31.00,
+#                               1.90,
+#                               0.5,
+#                               0.1,
+#                               1.65,
+#                               1.00,
+#                               0.4,
+#                               4.0,
+#                               4.0,
+#                               1.50,
+#                               1.50,
+#                               10.0,
+#                               5.0,
+#                               30.0)
+#    player.brain.motion.setGait(gait)
+    return player.goLater('walkturn')
 
 def switchGaits(player):
     pass
@@ -57,9 +85,9 @@ def switchGait():
 
 def walkturn(player):
     if player.firstFrame():
-        walkcmd = motion.WalkCommand(x=1,y=1,theta=10)
+        walkcmd = motion.WalkCommand(x=0,y=0,theta=10)
         player.brain.motion.setNextWalkCommand(walkcmd)
-    if player.counter == 30:
+    if player.counter == 80:
         return player.goLater('stopwalking')
     return player.stay()
 
