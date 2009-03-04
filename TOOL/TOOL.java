@@ -70,8 +70,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
     //temporary defaults, eventually wont want to auto load content
     public static final boolean LOAD_DEFAULTS = true;
-    public static final String DEFAULT_IMAGE_DIRECTORY = "./";//"../frame_depot/closeYg/";
-    public static final String DEFAULT_TABLE_PATH = "../../trunk/dog/tables/JohoLabFLHighFast/table.mtb";
+    public static final String DEFAULT_IMAGE_DIRECTORY = "./";
+    public static final String DEFAULT_TABLE_PATH = "./";
 
 
     public static final int DATA_MANAGER_HEIGHT  = 24;
@@ -136,18 +136,26 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     public TOOL(){
 
         instance = this;
+
+        // Initialize the preferences for the TOOL
+        prefs = Preferences.userNodeForPackage(this.getClass());
+
         CONSOLE = new Console(this);
+
+        // Try to load the color table we used last
+        // If the key does not exist, the method will return the second
+        // parameter passed to .get().
+        String fileName = prefs.get(DEFAULT_COLOR_TABLE_STRING,
+                                    null);
 
         // Initialize the back-end managers and module list
         sourceManager = new SourceManager();
+        loadStartColorTable(fileName);
         dataManager = new DataManager();
         sourceManager.addSourceListener(dataManager);
 
         modules = new Vector<TOOLModule>();
         moduleMap = new HashMap<String, Component>();
-
-        // Initialize the preferences for the TOOL
-        prefs = Preferences.userNodeForPackage(this.getClass());
 
         // Setup the GUI
         initMainWindow();
@@ -181,6 +189,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // wordcontroller - view and control robot udp broadcasts in realtime
         addModule(new WorldControllerModule(this));
 
+        // Tell the modules which colortable they should use.
+        updateColorTableReferences();
         // Add color table listeners to the two modules that must be notified
         // whenever the color table changes
         dataManager.addColorTableListener(calibrate);
@@ -198,13 +208,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // Determine size window should start at
         int startWidth = prefs.getInt(DEFAULT_WIDTH_STRING, DEFAULT_WIDTH);
         int startHeight = prefs.getInt(DEFAULT_HEIGHT_STRING, DEFAULT_HEIGHT);
-
-        // Try to load the color table we used last
-        // If the key does not exist, the method will return the second
-        // parameter passed to .get().
-        String fileName = prefs.get(DEFAULT_COLOR_TABLE_STRING,
-                                    null);
-        loadColorTable(fileName);
 
         mainWindow.setLocation(startX, startY);
         mainWindow.setSize(startWidth, startHeight);
@@ -538,6 +541,22 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
     }
 
+    /**
+     * This method takes in a file name and tries to load a color table from it at startup
+     **/
+    public void loadStartColorTable(String fileName) {
+
+        colorTable = new ColorTable(fileName);
+    }
+
+    public void updateColorTableReferences() {
+        colorEdit.setTable(colorTable);
+        colorTable.setSoftColors(toggleSoftColors.isSelected());
+        // If they had been editing a table earlier, clear out their
+        // undos
+        calibrate.clearHistory();
+        dataManager.notifyDependants();
+    }
     /**
      * This method takes in a file name and tries to load a color table from it
      **/

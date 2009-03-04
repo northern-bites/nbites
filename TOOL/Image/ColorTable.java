@@ -40,11 +40,8 @@ import TOOL.Vision.Vision;
 public class ColorTable {
     //default table locations,
     //which get statically updated each time we save a new table
-    public static String LOAD_TABLE_PATH = System.getProperty("user.dir")
-        + "/../../trunk/dog/tables/";
-    public static String SAVE_TABLE_PATH = System.getProperty("user.dir")
-        + "/../../trunk/dog/tables/";
-
+    public static String LOAD_TABLE_PATH = System.getProperty("user.dir");
+    public static String SAVE_TABLE_PATH = System.getProperty("user.dir");
 
     public static final byte GREEN = Vision.GREEN;
     public static final byte BLUE = Vision.BLUE;
@@ -143,8 +140,9 @@ public class ColorTable {
 
         if(type == LOAD){
 
-            String path = TOOL.CONSOLE.promptFileOpen(
-                                                      "Existing Color Table Location and Name", LOAD_TABLE_PATH);
+            String path = TOOL.CONSOLE.
+                promptFileOpen("Existing Color Table Location and Name",
+                               LOAD_TABLE_PATH);
 
             if(path != null){
                 loadDefFromFile(path, yMax,uMax,vMax);

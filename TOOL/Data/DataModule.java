@@ -91,7 +91,7 @@ public class DataModule extends TOOLModule {
 
         initDisplay();
 
-        t.setColorTable(new ColorTable(t.DEFAULT_TABLE_PATH));
+        t.setColorTable(tool.getColorTable());
         t.getFrame().addKeyListener(this);
     }
 
