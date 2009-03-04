@@ -133,6 +133,12 @@ static PyObject* PySensors_setImage (PyObject *self, PyObject *args)
     return result;
 }
 
+static PyObject* PySensors_saveFrame(PyObject *self, PyObject *)
+{
+    ((PySensors *)self)->_sensors->saveFrame();
+    return Py_None;
+}
+
 
 static PyMethodDef PySensors_methods[] = {
 
@@ -145,6 +151,9 @@ static PyMethodDef PySensors_methods[] = {
      "Set the image data for the robot.  Copies raw bytes data from the Python "
      "string into the static global_image array, then sets the image pointer "
      "in the Sensors object."},
+
+    {"saveFrame", (PyCFunction)PySensors_saveFrame, METH_NOARGS,
+     "Save an image frame with associated sensor data."},
 
     { NULL } /* Sentinel */
 };
