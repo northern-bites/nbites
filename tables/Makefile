@@ -1,0 +1,20 @@
+#Makefile to enable syncing the color table collection with the server.
+#Alternatively, you can sync manually.  In the future, once there are many tables
+#it would probably make sense to make targets for specific to competition, lab,etc
+
+#The default is to read your username from the shell.
+USERNAME = $(shell echo $$USER)
+#USERNAME = <enter your bowdoin id here>
+EXCLUDE = Makefile*
+SOURCE = robocup.bowdoin.edu:/home/robocup/tables
+DEST = .
+RSYNC = rsync
+RSYNC_OPTS = -rvzc  #recursive, verbose, compress, checksum (binary diff)
+
+pull:
+	$(RSYNC) $(RSYNC_OPTS) --exclude='$(EXCLUDE)'\
+	 $(USERNAME)@$(SOURCE)/* $(DEST)
+
+push:
+	$(RSYNC) $(RSYNC_OPTS) --exclude='$(EXCLUDE)'\
+	  $(DEST)/* $(USERNAME)@$(SOURCE)

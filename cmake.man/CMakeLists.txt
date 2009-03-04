@@ -132,6 +132,14 @@ SET( @REMOTE_ADDRESS@
   )
 SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 
+############################ COLOR TABLE SELECTION
+# Set the path to the color table you wish to be loaded into install/etc
+SET( COLOR_TABLE
+  "tables/lab120/zaphLowLight.mtb"
+  CACHE STRING
+  "Path relative to man directory for the desired color table"
+  )
+
 ############################ USING_LAB_FIELD
 # Options pertaining to running the code on the simulator  (OFFLINE)
 OPTION( @USING_LAB_FIELD@

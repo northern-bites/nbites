@@ -1,4 +1,5 @@
 # This script installs the man code to where it needs to go.
+# It also copies the color table to the correct location
 # There are two modes:
 #  1) REMOTE_INSTALLATION to a robot
 #  2) SIMULATOR_INSTALLATION to a local naoqi folder
@@ -13,7 +14,9 @@ REMOTE="${REMOTE_INSTALL}"
 LOCAL="${OFFLINE}"
 ROBOT=${REMOTE_ADDRESS}
 LOCAL_DEST=${OFFLINE_NAOQI_PATH}/modules
-
+COLOR_TABLE_PATH=${COLOR_TABLE}
+COLOR_TABLE_DIR=install/etc
+TABLE_STD_NAME=table.mtb
 if [ $REMOTE = "ON" ] && [ $LOCAL = "ON" ]; then
   echo "Install Error: Cannot instal both remotely and locally."
   echo "               Please check your CMake options."
@@ -49,6 +52,11 @@ fi
 #  exit 0
 #fi
 
+mkdir -p $COLOR_TABLE_DIR #ensure the color table directory exists
+echo "echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt"
+echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt
+echo "cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME"
+cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME
 
 SRC=install/*
 
