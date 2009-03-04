@@ -55,6 +55,8 @@ def rotAlignOnBall(player):
     player.setSpeed(x=0,y=0,theta=turnRate)
     if player.brain.ball.on and player.brain.ball.bearing < 15 :
         return player.goNow('approachBall')
+    if player.brain.ball.framesOff > 5:
+        return player.goNow('scanFindBall')
     return player.stay()
 
 def approachBall(player):
@@ -71,10 +73,10 @@ def approachBall(player):
             maxTarget = max(abs(targetX),abs(targetY))
 
 
-            sX = targetX/maxTarget*6.
-            sY = targetY/maxTarget*3.
+            sX = targetX/maxTarget*4.0
+            sY = targetY/maxTarget*1.5
             player.printf("Walk vector is "+str(sX)+","+str(sY))
-            #player.setSpeed(maxX*ratio,maxY*ratio,0)
+            player.setSpeed(sX,sY,0)
         else:
             return player.goNow('rotAlignOnBall')
     elif player.brain.ball.framesOff >2:

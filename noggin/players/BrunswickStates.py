@@ -23,7 +23,7 @@ def gameInitial(player):
 def gameSet(player):
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
-    else:
+    elif player.brain.ball.framesOff > 3:
         player.brain.tracker.switchTo('scanBall')
     return player.stay()
 
