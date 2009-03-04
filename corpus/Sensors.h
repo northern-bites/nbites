@@ -26,13 +26,7 @@
 #include <Python.h>
 
 #include "SensorDef.h"
-#if ROBOT(AIBO)
-#  include "MotionDef.h"
-#elif ROBOT(NAO_RL)
-#  include "NaoDef.h"
-#else
-#  error Undefined robot type
-#endif
+#include "NaoDef.h"
 #include "VisionDef.h"
 
 class Sensors;
@@ -46,12 +40,10 @@ typedef struct PySensors_t {
   Sensors *_sensors;
   PyObject *angles;
   PyObject *errors;
-#if ROBOT(NAO)
   PyObject *fsr;
   PyObject *inertial;
   PyObject *sonarLeft;
   PyObject *sonarRight;
-#endif
   PyObject *image;
 } PySensors;
 
@@ -119,7 +111,6 @@ class Sensors {
     const float getBodyAngle(const int index) const;//NOT wrapped for python use
     const std::vector<float> getBodyAngleErrors() const ;
 	const float getBodyAngleError(int index) const; //NOT wrapped for python use
-#if ROBOT(NAO)
     const FSR getLeftFootFSR() const;
     const FSR getRightFootFSR() const;
     const FootBumper getLeftFootBumper() const;
@@ -128,7 +119,6 @@ class Sensors {
     const float getUltraSound() const;
     const UltraSoundMode getUltraSoundMode() const;
     const std::vector<float> getAllSensors() const;
-#endif
 
     // Locking data storage methods
     //   Each of these methods first locks the associated mutex, stores
@@ -137,7 +127,6 @@ class Sensors {
     void setVisionBodyAngles(std::vector<float>& v);
     void setMotionBodyAngles(std::vector<float>& v);
     void setBodyAngleErrors(std::vector<float>& v);
-#if ROBOT(NAO)
     void setLeftFootFSR(const float frontLeft, const float frontRight,
                         const float rearLeft, const float rearRight);
     void setRightFootFSR(const float frontLeft, const float frontRight,
@@ -165,7 +154,6 @@ class Sensors {
     // this method is very useful for serialization and parsing sensors
     void setAllSensors(const std::vector<float> sensorValues);
 
-#endif
 
     // special methods
     //   the image retrieval and locking methods are a little different, as we
@@ -192,7 +180,10 @@ class Sensors {
     // most recent angles if some other module needs them.
     void updateVisionAngles();
 
-  private:
+    // Save a vision frame with associated sensor data
+    void saveFrame(void);
+
+private:
 
     void add_to_module();
 
@@ -201,12 +192,10 @@ class Sensors {
     mutable pthread_mutex_t vision_angles_mutex;
     mutable pthread_mutex_t motion_angles_mutex;
     mutable pthread_mutex_t errors_mutex;
-#if ROBOT(NAO)
     mutable pthread_mutex_t fsr_mutex;
     mutable pthread_mutex_t bumper_mutex;
     mutable pthread_mutex_t inertial_mutex;
     mutable pthread_mutex_t ultra_sound_mutex;
-#endif
     mutable pthread_mutex_t image_mutex;
 
     // Joint angles and sensors
@@ -217,7 +206,7 @@ class Sensors {
     std::vector<float> visionBodyAngles;
     std::vector<float> motionBodyAngles;
     std::vector<float> bodyAnglesError;
-#if ROBOT(NAO)
+
     // FSR sensors
     FSR leftFootFSR;
     FSR rightFootFSR;
@@ -229,7 +218,6 @@ class Sensors {
     // Sonar sensors
     float ultraSoundDistance;
     UltraSoundMode ultraSoundMode;
-#endif
 
     const unsigned char *image;
     PySensors *pySensors;

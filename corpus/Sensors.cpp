@@ -27,6 +27,8 @@ using namespace boost::assign;
 
 #include "Kinematics.h"
 #include "corpusconfig.h"
+#include <iostream>
+#include <fstream>
 
 using namespace Kinematics;
 using namespace std;
@@ -61,7 +63,6 @@ static void PySensors_update(PySensors *self)
             PyList_Append(self->errors, PyFloat_FromDouble(values[i]*TO_DEG));
     }
 
-#if ROBOT(NAO)
     // HACK! FSRs are no longer stored in vectors. There are structs that hold
     // the values. In order to not break functionality, I decided to convert them
     // to the vector format for the python hookup.
@@ -100,7 +101,6 @@ static void PySensors_update(PySensors *self)
     self->sonarLeft = PyFloat_FromDouble(dist);
     Py_XDECREF(self->sonarRight);
     self->sonarRight = PyFloat_FromDouble(dist);
-#endif
 }
 
 static PyObject* PySensors_update (PyObject *self, PyObject *)
@@ -155,7 +155,6 @@ static PyMemberDef PySensors_members[] = {
      "Body angles values."},
     {"errors", T_OBJECT_EX, offsetof(PySensors, errors), READONLY,
      "Body angles error values."},
-#if ROBOT(NAO)
     {"fsr", T_OBJECT_EX, offsetof(PySensors, fsr), READONLY,
      "Force sensitive resitor values."},
     {"inertial", T_OBJECT_EX, offsetof(PySensors, inertial), READONLY,
@@ -164,7 +163,6 @@ static PyMemberDef PySensors_members[] = {
      "Left sonar distance sensor value."},
     {"sonarRight", T_OBJECT_EX, offsetof(PySensors, sonarRight), READONLY,
      "Right sonar distance sensor value."},
-#endif
 
     { NULL } /* Sentinel */
 };
@@ -227,17 +225,11 @@ static PyObject* PySensors_new (Sensors *sensors)
 
         self->angles = PyList_New(NUM_ACTUATORS);
         self->errors = PyList_New(NUM_ACTUATORS);
-#if ROBOT(NAO)
         self->fsr = PyList_New(AL_NUMBER_OF_FSR);
         self->inertial = PyList_New(NUM_INERTIAL_SENSORS);
-#endif
 
         if (self->angles == NULL || self->errors == NULL
-#if ROBOT(NAO)
             || self->fsr == NULL || self->inertial == NULL) {
-#else
-            ) {
-#endif
             PySensors_dealloc(reinterpret_cast<PyObject*>(self));
             self = NULL;
         }else
@@ -266,17 +258,11 @@ static int PySensors_init (PySensors *self, PyObject *args, PyObject *kwds)
 
     self->angles = PyList_New(NUM_ACTUATORS);
     self->errors = PyList_New(NUM_ACTUATORS);
-#if ROBOT(NAO)
     self->fsr = PyList_New(AL_NUMBER_OF_FSR);
     self->inertial = PyList_New(NUM_INERTIAL_SENSORS);
-#endif
 
     if (self->angles == NULL || self->errors == NULL
-#if ROBOT(NAO)
         || self->fsr == NULL || self->inertial == NULL) {
-#else
-        ) {
-#endif
         return -1;
     }else
          PySensors_update(self);
@@ -370,26 +356,22 @@ Sensors::Sensors ()
     : bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
       motionBodyAngles(NUM_ACTUATORS),
       bodyAnglesError(NUM_ACTUATORS),
-#if ROBOT(NAO)
       leftFootFSR(0.0f, 0.0f, 0.0f, 0.0f),
       rightFootFSR(leftFootFSR),
       leftFootBumper(0.0f, 0.0f),
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistance(0.0f), ultraSoundMode(LL),
-#endif
       image(&global_image[0]), pySensors(NULL)
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
     pthread_mutex_init(&motion_angles_mutex, NULL);
     pthread_mutex_init(&errors_mutex, NULL);
-#if ROBOT(NAO)
     pthread_mutex_init(&fsr_mutex, NULL);
     pthread_mutex_init(&bumper_mutex, NULL);
     pthread_mutex_init(&inertial_mutex, NULL);
     pthread_mutex_init(&ultra_sound_mutex, NULL);
-#endif
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
@@ -406,12 +388,10 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&vision_angles_mutex);
     pthread_mutex_destroy(&motion_angles_mutex);
     pthread_mutex_destroy(&errors_mutex);
-#if ROBOT(NAO)
     pthread_mutex_destroy(&fsr_mutex);
     pthread_mutex_destroy(&bumper_mutex);
     pthread_mutex_destroy(&inertial_mutex);
     pthread_mutex_destroy(&ultra_sound_mutex);
-#endif
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_destroy(&image_mutex);
 #endif
@@ -482,8 +462,6 @@ const float Sensors::getBodyAngleError (int index) const
 
 	return angleError;
 }
-
-#if ROBOT(NAO)
 
 const FSR Sensors::getLeftFootFSR () const
 {
@@ -818,8 +796,6 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
 }
 
 
-#endif /* ROBOT(NAO) */
-
 void Sensors::lockImage()
 {
 #ifdef USE_SENSORS_IMAGE_LOCKING
@@ -891,3 +867,45 @@ void Sensors::add_to_module ()
     }
 }
 
+
+void Sensors::saveFrame()
+{
+    static int saved_frames = 0;
+    int MAX_FRAMES = 150;
+    if (saved_frames > MAX_FRAMES)
+        return;
+
+    string EXT(".NFRM");
+    string BASE("/");
+    int NUMBER = saved_frames;
+    string FOLDER("/home/root/frames");
+    stringstream FRAME_PATH;
+
+    FRAME_PATH << FOLDER << BASE << NUMBER << EXT;
+    fstream fout(FRAME_PATH.str().c_str(), fstream::out);
+
+    // Retrive joints
+    vector<float> joints = getVisionBodyAngles();
+
+    // Lock and write imag1e
+    lockImage();
+    fout.write(reinterpret_cast<const char*>(getImage()),
+               IMAGE_BYTE_SIZE);
+    releaseImage();
+
+    // Write joints
+    for (vector<float>::const_iterator i = joints.begin(); i < joints.end();
+         i++) {
+        fout << *i << " ";
+    }
+
+    // Write sensors
+    vector<float> sensor_data = getAllSensors();
+    for (vector<float>::const_iterator i = sensor_data.begin();
+         i != sensor_data.end(); i++) {
+        fout << *i << " ";
+    }
+
+    fout.close();
+    cout << "Saved frame #" << saved_frames++ << endl;
+}

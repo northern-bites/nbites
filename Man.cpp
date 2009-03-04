@@ -642,21 +642,11 @@ Man::run ()
 #ifdef NAOQI1
 #ifndef OFFLINE
         syncWithALMemory(); // update sensors with foot bumpers and ultrasound.
-
-        const FootBumper leftFootBumper(sensors->getLeftFootBumper());
-        const FootBumper rightFootBumper(sensors->getRightFootBumper());
-        // Save a frame when you press both foot bumpers
-        if ((leftFootBumper.left || leftFootBumper.right) &&
-            (rightFootBumper.left || rightFootBumper.right)) {
-            saveFrame();
-        }
-
 #endif
 #endif
 
         // Process current frame
         processFrame();
-
 
         //Release the camera image
         if(camera_active)
@@ -893,48 +883,6 @@ Man::processFrame ()
 
     PROF_ENTER(profiler.get(), P_GETIMAGE);
 
-}
-
-void
-Man::saveFrame(){
-    static int saved_frames = 0;
-    int MAX_FRAMES = 150;
-    if (saved_frames > MAX_FRAMES)
-        return;
-
-    string EXT(".NFRM");
-    string BASE("/");
-    int NUMBER = saved_frames;
-    string FOLDER("/home/root/frames");
-    stringstream FRAME_PATH;
-
-    FRAME_PATH << FOLDER << BASE << NUMBER << EXT;
-    fstream fout(FRAME_PATH.str().c_str(), ios_base::out);
-
-    // Retrive joints
-    vector<float> joints = sensors->getVisionBodyAngles();
-
-    // Lock and write imag1e
-    sensors->lockImage();
-    fout.write(reinterpret_cast<const char*>(sensors->getImage()),
-               IMAGE_BYTE_SIZE);
-    sensors->releaseImage();
-
-    // Write joints
-    for (vector<float>::const_iterator i = joints.begin(); i < joints.end();
-         i++) {
-        fout << *i << " ";
-    }
-
-    // Write sensors
-    vector<float> sensor_data = sensors->getAllSensors();
-    for (vector<float>::const_iterator i = sensor_data.begin();
-         i != sensor_data.end(); i++) {
-        fout << *i << " ";
-    }
-
-    fout.close();
-    cout << "Saved frame #" << saved_frames++ << endl;
 }
 
 PythonPreferences::PythonPreferences ()
