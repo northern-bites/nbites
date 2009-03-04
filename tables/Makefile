@@ -1,6 +1,8 @@
 #Makefile to enable syncing the color table collection with the server.
 #Alternatively, you can sync manually.  In the future, once there are many tables
 #it would probably make sense to make targets for specific to competition, lab,etc
+#More detailed documentation is available at
+# http://robocup.bowdoin.edu/trac/wiki/ColorTables
 
 #The default is to read your username from the shell.
 USERNAME = $(shell echo $$USER)
@@ -18,3 +20,7 @@ pull:
 push:
 	$(RSYNC) $(RSYNC_OPTS) --exclude='$(EXCLUDE)'\
 	  $(DEST)/* $(USERNAME)@$(SOURCE)
+
+diff:
+	$(RSYNC) $(RSYNC_OPTS) -n --exclude='$(EXCLUDE)'\
+		  $(DEST)/* $(USERNAME)@$(SOURCE)
