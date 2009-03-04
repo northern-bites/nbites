@@ -624,11 +624,6 @@ Man::run ()
         // wait for and retrieve the latest image
         if(camera_active)
             waitForImage();
-        else
-            SleepMs(500);
-#else
-        // simulate vision frame rate
-        SleepMs(500);
 #endif // USE_VISION
 
         // Break out of loop if thread should exit
