@@ -10,9 +10,9 @@ CALIBRATE_DIR := $(TOOL_DIR)/Calibrate
 CALIBRATE_SRCS := $(shell ls $(CALIBRATE_DIR)/*.java)
 CALIBRATE_OBJS := $(CALIBRATE_SRCS:%.java=%.class)
 
-CLASSIFIER_DIR := $(TOOL_DIR)/Classifier
-CLASSIFIER_SRCS := $(shell ls $(CLASSIFIER_DIR)/*.java)
-CLASSIFIER_OBJS := $(CLASSIFIER_SRCS:%.java=%.class)
+# CLASSIFIER_DIR := $(TOOL_DIR)/Classifier
+# CLASSIFIER_SRCS := $(shell ls $(CLASSIFIER_DIR)/*.java)
+# CLASSIFIER_OBJS := $(CLASSIFIER_SRCS:%.java=%.class)
 
 COLOREDIT_DIR := $(TOOL_DIR)/ColorEdit
 COLOREDIT_SRCS := $(shell ls $(COLOREDIT_DIR)/*.java)
@@ -30,9 +30,9 @@ DATA_DIR := $(TOOL_DIR)/Data
 DATA_SRCS := $(shell ls $(DATA_DIR)/*.java)
 DATA_OBJS := $(DATA_SRCS:%.java=%.class)
 
-PEDITOR_DIR := $(TOOL_DIR)/PlayBookEditor
-PEDITOR_SRCS := $(shell ls $(PEDITOR_DIR)/*.java)
-PEDITOR_OBJS := $(PEDITOR_SRCS:%.java=%.class)
+# PEDITOR_DIR := $(TOOL_DIR)/PlayBookEditor
+# PEDITOR_SRCS := $(shell ls $(PEDITOR_DIR)/*.java)
+# PEDITOR_OBJS := $(PEDITOR_SRCS:%.java=%.class)
 
 FILE_DIR := $(DATA_DIR)/File
 FILE_SRCS := $(shell ls $(FILE_DIR)/*.java)
@@ -50,9 +50,9 @@ NET_DIR := $(TOOL_DIR)/Net
 NET_SRCS := $(shell ls $(NET_DIR)/*.java)
 NET_OBJS := $(NET_SRCS:%.java=%.class)
 
-SQL_DIR := $(TOOL_DIR)/SQL
-SQL_SRCS := $(shell ls $(SQL_DIR)/*.java)
-SQL_OBJS := $(SQL_SRCS:%.java=%.class)
+# SQL_DIR := $(TOOL_DIR)/SQL
+# SQL_SRCS := $(shell ls $(SQL_DIR)/*.java)
+# SQL_OBJS := $(SQL_SRCS:%.java=%.class)
 
 VISION_DIR := $(TOOL_DIR)/Vision
 VISION_SRCS := $(shell ls $(VISION_DIR)/*.java)
@@ -66,7 +66,7 @@ VISION_OBJS := $(VISION_SRCS:%.java=%.class)
 SRCS = \
 	$(TOOL_SRCS) \
 	$(CALIBRATE_SRCS) \
-	$(CLASSIFIER_SRCS) \
+	#$(CLASSIFIER_SRCS) \
 	$(COLOREDIT_SRCS) \
 	$(CONSOLE_DIR) \
 	$(DATA_SRCS) \
@@ -74,8 +74,8 @@ SRCS = \
 	$(GUI_SRCS) \
 	$(IMAGE_SRCS) \
 	$(NET_SRCS) \
-	$(PEDITOR_SRCS) \
-	$(SQL_SRCS) \
+	#$(PEDITOR_SRCS) \
+	#$(SQL_SRCS) \
 	$(VISION_SRCS) \
 	$(WORLDCONTROLLER_SRCS)
 	#$(ZSPACE_SRCS) \
