@@ -123,9 +123,6 @@ public:
        profiler->profiling = false;
     }
 
-    // Store the current frame to file
-    void saveFrame();
-
     //HelperBoundMethods:
     void manStart() { Thread::start(); } //should return 'int' or ALValue
     void manStop() { Thread::stop(); }
