@@ -406,6 +406,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         String cmd = e.getActionCommand();
 
         if(cmd.equals("quit")) {
+            savePreferences();
             System.exit(0);
         }
 
