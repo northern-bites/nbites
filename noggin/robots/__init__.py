@@ -8,14 +8,12 @@ marvin = BirthCertificate.BirthCertificate(
             name='marvin',
             long_name='Marvin the Paranoid Android',
             tts_name='marvin',
-            player_number=1,
             )
 
 slarti = BirthCertificate.BirthCertificate(
             name="slarti",
             long_name="Slartibartfast",
             tts_name="slartibartfast",
-            player_number=2,
             doc='''\
 I am Slartibartfast of Magrathea.  I am best known for my award-winning
 fjords on the coastline of Norway.  Join me in CamTim, the Campaign for
@@ -27,14 +25,12 @@ trillian = BirthCertificate.BirthCertificate(
             name='trillian',
             long_name='Tricia MacMillan',
             tts_name='trillian',
-            player_number=3,
             )
 
 zaphod = BirthCertificate.BirthCertificate(
             name='zaphod',
             long_name='Zaphod Beeblebrox',
             tts_name='zafoed beebel brocks',
-            player_number=4,
             )
 
 

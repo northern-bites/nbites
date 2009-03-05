@@ -13,7 +13,7 @@ class BirthCertificate:
     # Class-static variable.  Increments with each new instance
     next_id = 0
 
-    def __init__(self, name, long_name, tts_name=None, player_number=None,
+    def __init__(self, name, long_name, tts_name=None,
                   doc='', walk_config=None, walk_arms_config=None,
                  walk_extra_config=None):
         self.id = BirthCertificate.next_id
@@ -24,7 +24,6 @@ class BirthCertificate:
         self.tts_name = name
         if tts_name is not None:
             self.tts_name = tts_name
-        self.player_number = player_number or 2
         self.__doc__ = doc
         self.walk_config = walk_config
         self.walk_arms_config = walk_arms_config
@@ -42,6 +41,5 @@ class BirthCertificate:
         s = "CoA: " + self.long_name
         if self.__doc__:
             s += '\nCoA:   ' + self.__doc__
-        s += "\nCoA: I am player " + str(self.player_number)
         return s
 

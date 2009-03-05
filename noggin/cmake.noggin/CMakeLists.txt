@@ -78,6 +78,17 @@ FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
 
 
+############################ TeamConfig.py variables
+SET(GC_TEAM_NUMBER
+  "101"
+  CACHE STRING
+  "The team number for the robot (GameController)"
+  )
+SET(GC_PLAYER_NUMBER
+  "2"
+  CACHE STRING
+  "The player number for the robot (GameController)"
+  )
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   "${NOGGIN_CMAKE_DIR}/nogginconfig.in"
@@ -88,7 +99,10 @@ CONFIGURE_FILE(
   "${NOGGIN_INCLUDE_DIR}/players/Switch.py.in"
   "${NOGGIN_INCLUDE_DIR}/players/Switch.py"
   )
-
+CONFIGURE_FILE(
+  "${NOGGIN_INCLUDE_DIR}/TeamConfig.py.in"
+  "${NOGGIN_INCLUDE_DIR}/TeamConfig.py"
+  )
 
 ############################ DEFINITION
 # Add here definition needed.
@@ -129,6 +143,7 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/NavStates.py
                         ${NOGGIN_INCLUDE_DIR}/Navigator.py
                         ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
+                        ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
                         ${NOGGIN_INCLUDE_DIR}/TrackingStates.py
                         ${NOGGIN_INCLUDE_DIR}/TypeDefs.py
                         )

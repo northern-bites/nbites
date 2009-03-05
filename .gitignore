@@ -4,3 +4,4 @@ install/*
 *.pyc
 upload.sh
 noggin/players/Switch.py
+noggin/TeamConfig.py

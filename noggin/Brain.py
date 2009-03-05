@@ -19,6 +19,7 @@ from .util import NaoOutput
 from . import NogginConstants as Constants
 from . import TypeDefs
 from . import Loc
+from . import TeamConfig
 # Packages and modules from sub-directories
 from . import robots
 #from .playbook import GoTeam
@@ -41,7 +42,8 @@ class Brain(object):
         self.vision = vision.Vision()
         self.sensors = sensors.Sensors()
         self.comm = comm.inst
-        self.comm.gc.team = 101
+        self.comm.gc.team = TeamConfig.TEAM_NUMBER
+
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion
@@ -51,8 +53,10 @@ class Brain(object):
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
         # coa is Certificate of Authenticity (to keep things short)
-        self.comm.gc.player = self.CoA.player_number
+        self.comm.gc.player = TeamConfig.PLAYER_NUMBER
         self.out.printf(self.CoA)
+        self.out.printf("GC:  I am on team "+str(TeamConfig.TEAM_NUMBER))
+        self.out.printf("GC:  I am player  "+str(TeamConfig.PLAYER_NUMBER))
 
         # Initialize various components
         self.my = TypeDefs.MyInfo()
@@ -67,7 +71,7 @@ class Brain(object):
 
         # Functional Variables
         self.my.teamNumber = self.comm.gc.team
-
+        self.my.playerNumber = self.comm.gc.player
 
     def initFieldObjects(self):
         """

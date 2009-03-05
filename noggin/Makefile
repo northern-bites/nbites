@@ -13,6 +13,7 @@ CMAKE_SRCS = \
 CMAKE_SRC := $(addprefix $(CMAKE_DIR),$(CMAKE_SRC))
 CONFIG_FILE = nogginconfig.h
 SWITCH_FILE = players/Switch.py
+TEAMCONFIG_FILE = TeamConfig.py
 VISION_DIR = $(abspath $(CUR_DIR)/../vision)
 
 TRUNK_REVISION = r0 #$(shell svn info | grep Revision | awk 'FS=" " {print $$2}')
@@ -46,7 +47,7 @@ visioninstall:
 	@$(MAKE) -C $(VISION_DIR) install
 
 clean: visionclean
-	$(RM) -r $(BUILD_DIR) $(CONFIG_FILE) $(SWITCH_FILE)
+	$(RM) -r $(BUILD_DIR) $(CONFIG_FILE) $(SWITCH_FILE) $(TEAMCONFIG_FILE)
 
 visionclean:
 	@$(MAKE) -C $(VISION_DIR) clean
