@@ -1,6 +1,7 @@
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import math
+from ..util import MyMath as MyMath
 TO_RAD = math.pi/180.
 
 def scanFindBall(player):
@@ -49,7 +50,7 @@ def cantFindBall(player):
 
 def rotAlignOnBall(player):
     '''Rotate to align with the ball. When we get close, we will approach it '''
-    turnRate = player.clip(player.brain.ball.bearing*0.5,-10.,10.)
+    turnRate = MyMath.clip(player.brain.ball.bearing*0.5,-10.,10.)
     player.printf( "Ball bearing i "+ str(player.brain.ball.bearing)+
                    " turning at "+str(turnRate))
     player.setSpeed(x=0,y=0,theta=turnRate)

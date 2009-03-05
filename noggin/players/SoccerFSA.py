@@ -8,13 +8,13 @@ import math
 import man.motion as motion
 
 from ..util import FSA
-from . import GameControllerStates
+from . import CoreSoccerStates
 
 class SoccerFSA(FSA.FSA):
     def __init__(self,brain):
         FSA.FSA.__init__(self, brain)
         #self.setTimeFunction(self.brain.nao.getSimulatedTime)
-        self.addStates(GameControllerStates)
+        self.addStates(CoreSoccerStates)
         self.brain = brain
         self.motion = brain.motion
         #self.currentState = '' #handled externally by GameControllerFSA
@@ -25,10 +25,12 @@ class SoccerFSA(FSA.FSA):
         self.stateChangeColor = 'red'
         self.setPrintFunction(self.brain.out.printf)
 
-        # Method to enqueue a SweetMove
-        # Can either take in a head move or a body command
-        # (see SweetMove files for descriptions of command tuples)
     def executeMove(self,sweetMove):
+        """
+        Method to enqueue a SweetMove
+        Can either take in a head move or a body command
+        (see SweetMove files for descriptions of command tuples)
+        """
         for position in sweetMove:
             if len(position) == 6:
                 move = motion.BodyJointCommand(position[4], #time
@@ -51,11 +53,15 @@ class SoccerFSA(FSA.FSA):
                 self.printf("What kind of sweet ass-Move is this?")
 
     def setSpeed(self,x,y,theta):
+        """
+        Wrapper method to easily change the walk vector of the robot
+        """
         walk = motion.WalkCommand(x=x,y=y,theta=theta)
         self.brain.motion.setNextWalkCommand(walk)
+
     def setHeads(self,yawv,pitchv):
+        """
+        Wrapper method to easily specify a head destination (in degrees, obvi)
+        """
         heads = motion.SetHeadCommand(yaw=yawv,pitch=pitchv)
         self.brain.motion.setHead(heads)
-
-    def clip(self,val,minv,maxv):
-        return max(min(val,maxv),minv)
