@@ -167,7 +167,9 @@ public:
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
+#ifdef USE_NOGGIN
     boost::shared_ptr<Noggin> noggin;
+#endif// USE_NOGGIN
 
 private:
     // Interfaces/Proxies to robot
