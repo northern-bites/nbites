@@ -12,7 +12,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 
 // Local headers
-#include "Observation.h"
+#include "NogginStructs.h"
 #include "VisualBall.h"
 
 // Default parameters

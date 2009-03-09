@@ -18,6 +18,7 @@
 #include "Observation.h"
 #include "FieldConstants.h"
 #include "NBMath.h"
+#include "NogginStructs.h"
 
 #ifdef USE_PER_PARTICLE_EKF
 #include "VisualBall.h"
@@ -36,7 +37,7 @@ public:
 #   ifdef USE_PER_PARTICLE_EKF
     BallEKF ball;
     //std::vector<EKF> opponents;
-#   endif
+#   endif // USE_PER_PARTICLE_EKF
 
     friend std::ostream& operator<< (std::ostream &o, const Particle &c) {
         return o << c.pose.x << " " << c.pose.y << " " << c.pose.h << " "
@@ -112,6 +113,8 @@ public:
      */
     const std::vector<Particle> getParticles() const { return X_t; }
 
+#   ifdef USE_PER_PARTICLE_EKF
+#   endif // USE_PER_PARTICLE_EKF
     // Setters
     /**
      * @param xEst The current x esitamte of the robot
@@ -148,6 +151,11 @@ private:
     PoseEst curEst; // Current {x,y,h} esitamates
     PoseEst curUncert; // Associated {x,y,h} uncertainties (standard deviations)
     std::vector<Particle> X_t; // Current set of particles
+#   ifdef USE_PER_PARTICLE_EKF
+    BallPose curBallEst;
+    BallPose curBallUncert;
+    VisualBall * ball;
+#   endif
 
     // Core Functions
     float updateMeasurementModel(std::vector<Observation> z_t, PoseEst x_t);
@@ -159,9 +167,6 @@ private:
     float determineLineWeight(Observation z, PoseEst x_t, LineLandmark _line);
     float getSimilarity(float r_d, float r_a, Observation &z);
     Particle randomWalkParticle(Particle p);
-#   ifdef USE_PER_PARTICLE_EKF
-    VisualBall * ball;
-#   endif
 
 public:
     friend std::ostream& operator<< (std::ostream &o, const MCL &c) {

@@ -11,6 +11,7 @@
 #include "EKF.h"
 #include "VisualBall.h"
 #include "NBMath.h"
+#include "NogginStructs.h"
 
 // Parameters
 #define ASSUMED_FPS 30.0

@@ -393,41 +393,20 @@ Particle MCL::randomWalkParticle(Particle p)
     return p;
 }
 
-// Other class simple constructors
-// PoseEst
-PoseEst::PoseEst(float _x, float _y, float _h) :
-    x(_x), y(_y), h(_h)
-{
-}
-
-PoseEst::PoseEst(const PoseEst& other) :
-    x(other.x), y(other.y), h(other.h)
-{
-}
-
-PoseEst::PoseEst() {}
-
-// MotionModel
-MotionModel::MotionModel(float f, float l, float r) :
-    deltaF(f), deltaL(l), deltaR(r)
-{
-}
-
-MotionModel::MotionModel(const MotionModel& other) :
-    deltaF(other.deltaF), deltaL(other.deltaL), deltaR(other.deltaR)
-{
-}
-
-MotionModel::MotionModel(){}
-
 // Particle
 Particle::Particle(PoseEst _pose, float _weight) :
     pose(_pose), weight(_weight)
+#ifdef USE_PER_PARTICLE_EKF
+    , ball()
+#endif
 {
 }
 
 Particle::Particle(const Particle& other) :
     pose(other.pose), weight(other.weight)
+#ifdef USE_PER_PARTICLE_EKF
+    , ball(other.ball)
+#endif
 {
 }
 
