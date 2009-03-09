@@ -15,12 +15,11 @@ using namespace boost;
  * @param _initVelXUncert An initial value for the x velocity uncertainty
  * @param _initVelYUncert An initial value for the y velocity uncertainty
  */
-BallEKF::BallEKF(shared_ptr<MCL> _mcl,
-                 float initX, float initY,
+BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL), robotLoc(_mcl)
+    : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -48,8 +47,9 @@ BallEKF::BallEKF(shared_ptr<MCL> _mcl,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(VisualBall * ball)
+void BallEKF::updateModel(VisualBall * ball, PoseEst p)
 {
+    robotPose = p;
     // Update expected ball movement
     timeUpdate(MotionModel());
     limitAPrioriEst();
@@ -137,24 +137,23 @@ void BallEKF::incorporateMeasurement(Measurement z,
     z_x(1) = y_b_r;
 
     // Get expected values of ball
-    float h = robotLoc->getHEst();
-    float x = robotLoc->getXEst();
-    float y = robotLoc->getYEst();
     float x_b = getXEst();
     float y_b = getYEst();
     ublas::vector<float> d_x(2);
 
-    d_x(0) = (x_b - x)*cos(-h) - (y_b - y)*sin(-h);
-    d_x(1) = (x_b - x)*sin(-h) + (y_b - y)*cos(-h);
+    d_x(0) = (x_b - robotPose.x)*cos(-robotPose.h) -
+        (y_b - robotPose.y)*sin(-robotPose.h);
+    d_x(1) = (x_b - robotPose.x)*sin(-robotPose.h) +
+        (y_b - robotPose.y)*cos(-robotPose.h);
 
     // Calculate invariance
     V_k = z_x - d_x;
 
     // Calculate jacobians
-    H_k(0,0) = cos(h);
-    H_k(0,1) = -sin(h);
-    H_k(1,0) = sin(h);
-    H_k(1,1) = cos(h);
+    H_k(0,0) = cos(robotPose.h);
+    H_k(0,1) = -sin(robotPose.h);
+    H_k(1,0) = sin(robotPose.h);
+    H_k(1,1) = cos(robotPose.h);
 
     // Update the measurement covariance matrix
     R_k(0,0) = z.distanceSD;

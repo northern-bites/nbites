@@ -52,8 +52,7 @@ class BallEKF : public EKF
 public:
 
     // Constructors & Destructors
-    BallEKF(boost::shared_ptr<MCL> _mcl,
-            float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
+    BallEKF(float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
             float initVelX = INIT_BALL_X_VEL,
             float initVelY = INIT_BALL_Y_VEL,
             float initXUncert = INIT_X_UNCERT,
@@ -63,7 +62,7 @@ public:
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(VisualBall * ball);
+    void updateModel(VisualBall * ball, PoseEst p);
     void sawTeammateBall(Measurement m);
     void sawBall(VisualBall * ball);
 
@@ -173,7 +172,6 @@ private:
     void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
     void limitPosteriorUncert(void);
-    // Members
-    boost::shared_ptr<MCL> robotLoc;
+    PoseEst robotPose;
 };
 #endif // File

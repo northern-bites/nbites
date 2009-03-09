@@ -93,8 +93,10 @@ public:
     Particle();
     PoseEst pose;
     float weight;
-    //BallEKF ball;
+#   ifdef USE_PER_PARTICLE_EKF
+    BallEKF ball;
     //std::vector<EKF> opponents;
+#   endif
 
     friend std::ostream& operator<< (std::ostream &o, const Particle &c) {
         return o << c.pose.x << " " << c.pose.y << " " << c.pose.h << " "
@@ -118,54 +120,57 @@ public:
     // Core Functions
     void updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
                             bool resample=true);
-
+#   ifdef USE_PER_PARTICLE_EKF
+    void updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
+                            VisualBall * ball, bool resample=true);
+#   endif
     // Getters
-    PoseEst getCurrentEstimate() { return curEst; }
-    PoseEst getCurrentUncertainty() { return curUncert; }
+    const PoseEst getCurrentEstimate() const { return curEst; }
+    const PoseEst getCurrentUncertainty() const { return curUncert; }
     /**
      * @return The current x esitamte of the robot
      */
-    float getXEst() { return curEst.x;}
+    const float getXEst() const { return curEst.x;}
 
     /**
      * @return The current y esitamte of the robot
      */
-    float getYEst() { return curEst.y;}
+    const float getYEst() const { return curEst.y;}
 
     /**
      * @return The current heading esitamte of the robot in radians
      */
-    float getHEst() { return curEst.h;}
+    const float getHEst() const { return curEst.h;}
 
     /**
      * @return The current heading esitamte of the robot in degrees
      */
-    float getHEstDeg() { return curEst.h * DEG_OVER_RAD;}
+    const float getHEstDeg() const { return curEst.h * DEG_OVER_RAD;}
 
     /**
      * @return The uncertainty associated with the x estimate of the robot.
      */
-    float getXUncert() { return curUncert.x * 2;}
+    const float getXUncert() const { return curUncert.x * 2;}
 
     /**
      * @return The uncertainty associated with the y estimate of the robot.
      */
-    float getYUncert() { return curUncert.y * 2;}
+    const float getYUncert() const { return curUncert.y * 2;}
 
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncert() { return curUncert.h * 2;}
+    const float getHUncert() const { return curUncert.h * 2;}
 
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncertDeg() { return curUncert.h * 2 * DEG_OVER_RAD;}
+    const float getHUncertDeg() const { return curUncert.h * 2 * DEG_OVER_RAD;}
 
     /**
      * @return The current set of particles in the filter
      */
-    std::vector<Particle> getParticles() { return X_t; }
+    const std::vector<Particle> getParticles() const { return X_t; }
 
     // Setters
     /**
@@ -214,6 +219,9 @@ private:
     float determineLineWeight(Observation z, PoseEst x_t, LineLandmark _line);
     float getSimilarity(float r_d, float r_a, Observation &z);
     Particle randomWalkParticle(Particle p);
+#   ifdef USE_PER_PARTICLE_EKF
+    VisualBall * ball;
+#   endif
 
 public:
     friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
