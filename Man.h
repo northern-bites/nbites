@@ -104,7 +104,7 @@ public:
     void dataChanged(const std::string& pDataName, const ALValue& pValue,
         const std::string& pMessage) {};
 
-    std::string version() { return "1.0.0-r"; /*TRUNK_REVISION;*/ };
+    std::string version() { return "1.2.0-r"; /*TRUNK_REVISION;*/ };
 
     //
     // Our methods
@@ -167,7 +167,9 @@ public:
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
+#ifdef USE_NOGGIN
     boost::shared_ptr<Noggin> noggin;
+#endif// USE_NOGGIN
 
 private:
     // Interfaces/Proxies to robot
@@ -217,7 +219,7 @@ public:
     static const int DEFAULT_CAMERA_LENSY = 0;
     // Exposure length
     static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE ON
-    static const int DEFAULT_CAMERA_EXPOSURE = 5;
+    static const int DEFAULT_CAMERA_EXPOSURE = 300;
     // Image orientation
     static const int DEFAULT_CAMERA_HFLIP = 0;
     static const int DEFAULT_CAMERA_VFLIP = 0;

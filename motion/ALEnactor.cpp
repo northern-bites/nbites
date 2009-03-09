@@ -39,9 +39,9 @@ void ALEnactor::run() {
     std::cout << "ALEnactor::run()" << std::endl;
 
 #ifdef NO_ACTUAL_MOTION
-    almotion->setBodyStiffness(0.0f, 0.1f);
+    almotion->setBodyStiffness(0.0f);
 #else
-    almotion->setBodyStiffness(0.80f, 0.1f);
+    almotion->setBodyStiffness(0.80f);
 #endif
 
     //vector<float> rarm(4,M_PI/4);
@@ -110,8 +110,9 @@ void ALEnactor::postSensors() {
     vector<float> temp = sensors->getMotionBodyAngles();
     //for (int i = 2; i < 6; i++)cout << "arm angles are"<< temp[i] <<endl;
     // This call syncs all sensors values: bumpers, fsr, inertial, etc.
+#ifndef OFFLINE
     syncWithALMemory();
-
+#endif
 }
 
 /**
