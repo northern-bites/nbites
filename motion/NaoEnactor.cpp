@@ -140,7 +140,7 @@ void NaoEnactor::run() {
     positionCommandsAlias.arraySetSize(3);
     positionCommandsAlias[0] = string("AllActuatorPosition");
     positionCommandsAlias[1].arraySetSize(NaoEnactor::NUM_JOINTS);
-    
+
     ALValue hardCommandsAlias;
     hardCommandsAlias.arraySetSize(3);
     hardCommandsAlias[0] = string("AllActuatorHardness");
@@ -153,7 +153,7 @@ void NaoEnactor::run() {
 
     dcmProxy->createAlias(positionCommandsAlias);
     dcmProxy->createAlias(hardCommandsAlias);
-    
+
     //set-up the array for sending commands to DCM
     ALValue commands;
     commands.arraySetSize(6);
@@ -162,7 +162,7 @@ void NaoEnactor::run() {
     commands[3] = 0; //importance level
     commands[4].arraySetSize(1); //list of time to send commands
     commands[5].arraySetSize(NaoEnactor::NUM_JOINTS);
-    
+
     //sets the hardness for all the joints
     commands[0] = string("AllActuatorHardness");
     for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
@@ -171,13 +171,13 @@ void NaoEnactor::run() {
         commands[5][i][0] = 0.85;
     }
     commands[4][0] = dcmProxy->getTime(100);
-    
+
     //sends the hardness command to the DCM
     #ifndef NO_ACTUAL_MOTION
     try {
         dcmProxy->setAlias(commands);
     } catch(AL::ALError& a) {
-        std::cout << "DCM Hardness set error" << a.toString() << "    " 
+        std::cout << "DCM Hardness set error" << a.toString() << "    "
             << commands.toString() << std::endl;
     }
     #endif
@@ -191,7 +191,7 @@ void NaoEnactor::run() {
     //for now we're leaving always leaving hardness the same, so we can
     //set the alias to be for actuator position in the while loop
     commands[0] = string("AllActuatorPosition");
-    while (running) {        
+    while (running) {
         currentTime = micro_time();
         if(!switchboard){
             cout<< "Caution!! Switchboard is null, exiting NaoEnactor"<<endl;
@@ -222,14 +222,14 @@ void NaoEnactor::run() {
             std::cout << "dcm value set error " << a.toString() << std::endl;
         }
         #endif
-        
+
         postSensors();
         const long long zero = 0;
         const long long processTime = micro_time() - currentTime;
 
         #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
         if (processTime > MOTION_FRAME_LENGTH_uS){
-            cout << "Time spent in NaoEnactor longer than frame length: " 
+            cout << "Time spent in NaoEnactor longer than frame length: "
                 << processTime <<endl;
             //Don't sleep at all
         } else{
@@ -243,7 +243,7 @@ void NaoEnactor::run() {
 //makes sure that we don't tell the motors to move faster than they can
 //the DCM takes care of trimming too large/ too small of values
 float NaoEnactor::SafetyCheck(float currentVal, float toCheck, int i){
-    
+
     float absDiffInRad = fabs(currentVal - toCheck);
     float allowedDiffInRad = jointsMax[i];
     if (absDiffInRad > allowedDiffInRad){
@@ -252,14 +252,14 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, int i){
             std::cout << jointsP[i] << "Current = " << currentVal << "  TRIM = "
                                 << (currentVal + allowedDiffInRad) << std::endl;
             #endif
-            return (currentVal + allowedDiffInRad); 
+            return (currentVal + allowedDiffInRad);
         }
         else {
             #ifdef DEBUG_ENACTOR_JOINTS
             std::cout << jointsP[i] << "Current = " << currentVal << "  TRIM = "
                                 << (currentVal - allowedDiffInRad) << std::endl;
             #endif
-            return (currentVal - allowedDiffInRad); 
+            return (currentVal - allowedDiffInRad);
         }
     }
     #ifdef DEBUG_ENACTOR_JOINTS
@@ -287,7 +287,7 @@ void NaoEnactor::postSensors(){
 void NaoEnactor::initSyncWithALMemory(){
 
     vector<string> jointNames;
-    jointNames += 
+    jointNames +=
         string(jointsV[0]), string(jointsV[1]), string(jointsV[2]),
         string(jointsV[3]), string(jointsV[4]), string(jointsV[5]),
         string(jointsV[6]), string(jointsV[7]), string(jointsV[8]),
@@ -324,10 +324,10 @@ void NaoEnactor::initSyncWithALMemory(){
         alfastaccess->ConnectToVariables(broker,jointNames);
     } catch(AL::ALError& a) {
       std::cout << "NaoEnactor " << a.toString() << std::endl;}
-  
+
 }
 
 void NaoEnactor::syncWithALMemory() {
     alfastaccess->GetValues(jointValues);
-    sensors->setBodyAngles(jointValues);  
+    sensors->setBodyAngles(jointValues);
 }

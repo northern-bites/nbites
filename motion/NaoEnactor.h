@@ -1,7 +1,7 @@
 #ifndef _NaoEnactor_h_DEFINED
 #define _NaoEnactor_h_DEFINED
 
-#include "alproxy.h" 
+#include "alproxy.h"
 #include "dcmproxy.h"
 #include "almemoryproxy.h"
 #include "MotionEnactor.h"
@@ -14,15 +14,15 @@
 
 
 using namespace std;
- 
+
 class NaoEnactor : public MotionEnactor {
-		
+
 public:
 	NaoEnactor(AL::ALPtr<AL::ALBroker> broker, boost::shared_ptr<Sensors> s);
     virtual ~NaoEnactor() { };
     virtual void run();
     void postSensors();
-	
+
 private:
     AL::ALPtr<AL::ALBroker> broker;
     AL::ALPtr<ALMemoryFastAccess> alfastaccess;
@@ -56,5 +56,5 @@ private:
     void syncWithALMemory();
 
 };
- 
+
 #endif
