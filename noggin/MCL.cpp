@@ -97,6 +97,57 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
     updateEstimates();
 }
 
+#ifdef USE_PER_PARTICLE_EKF
+void MCL::updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
+                             VisualBall * ball, bool resample)
+{
+    // Set the current particles to be of time minus one.
+    vector<Particle> X_t_1 = X_t;
+    // Clar the current set
+    X_t.clear();
+    vector<Particle> X_bar_t; // A priori estimates
+    float totalWeights = 0.; // Must sum all weights for future use
+
+    // Run through the particles
+    for (int m = 0; m < M; ++m) {
+        Particle x_t_m;
+
+        // Update motion model for the particle
+        x_t_m.pose = X_t_1[m].pose + u_t;
+
+        // Update measurement model
+        x_t_m.weight = updateMeasurementModel(z_t, x_t_m.pose);
+        totalWeights += x_t_m.weight;
+        // Add the particle to the current frame set
+        X_bar_t.push_back(x_t_m);
+    }
+
+    // Process the particles after updating them all
+    for (int m = 0; m < M; ++m) {
+
+        // Normalize the particle weights
+        X_bar_t[m].weight /= totalWeights;
+
+        if(resample) { // Resample the particles
+            int count = int(round(float(M) * X_bar_t[m].weight));
+            // Add the particles to the resample posterior!
+            for (int i = 0; i < count; ++i) {
+                // Random walk the particles
+                X_t.push_back(randomWalkParticle(X_bar_t[m]));
+            }
+
+        } else { // Keep particle count the same
+            // Random walk the particles
+            X_t.push_back(randomWalkParticle(X_bar_t[m]));
+        }
+
+    }
+
+    // Update pose and uncertainty estimates
+    updateEstimates();
+}
+#endif // USE_PER_PARTICLE_EKF
+
 /**
  * Method determines the weight of a particle based on the current landmark
  * observations.

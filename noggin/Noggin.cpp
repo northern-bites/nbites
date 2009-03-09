@@ -84,11 +84,16 @@ void Noggin::initializeLocalization()
 
     // Initialize the localization modules
     mcl = shared_ptr<MCL>(new MCL());
+
+#   ifndef USE_PER_PARTICLE_EKF
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
+#   endif
 
     // Setup the python localization wrappers
     set_mcl_reference(mcl);
+#   ifndef USE_PER_PARTICLE_EKF
     set_ballEKF_reference(ballEKF);
+#   endif
     c_init_localization();
 }
 
@@ -288,12 +293,18 @@ void Noggin::updateLocalization()
     // }
 
     // Process the information
+#   ifdef USE_PER_PARTICLE_EKF
+    PROF_ENTER(profiler, P_MCL);
+    mcl->updateLocalization(odometery, observations, vision->ball, true);
+    PROF_EXIT(profiler, P_MCL);
+#   else
     PROF_ENTER(profiler, P_MCL);
     mcl->updateLocalization(odometery, observations, true);
     PROF_EXIT(profiler, P_MCL);
 
     // Ball Tracking
     ballEKF->updateModel(vision->ball, mcl->getCurrentEstimate());
+#   endif // USE_PER_PARTICLE_EKF
 
 #ifdef DEBUG_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {

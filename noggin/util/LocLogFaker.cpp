@@ -93,11 +93,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     shared_ptr<MCL> myLoc = shared_ptr<MCL>(new MCL);
-#ifdef USE_PERFECT_LOC_FOR_BALL
-    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF(fakeLoc));
-#else
-    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF(myLoc));
-#endif // PERFECT_LOC
+    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF());
     PoseEst currentPose;
     BallPose currentBall;
     MotionModel noMove(0.0, 0.0, 0.0);
@@ -112,13 +108,6 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     printOutLogLine(outputFile, myLoc, Z_t, noMove, &currentPose,
                     &currentBall, ballEKF, *visBall);
 
-#ifdef USE_PERFECT_LOC_FOR_BALL
-    // Use a fake loc system to test the EKF
-    fakeLoc->setXEst(currentPose.x);
-    fakeLoc->setYEst(currentPose.y);
-    fakeLoc->setHEst(currentPose.h);
-#endif
-
     unsigned frameCounter = 0;
     // Iterate through the moves
     for(unsigned int i = 0; i < letsGo->myMoves.size(); ++i) {
@@ -128,12 +117,6 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;
-
-#ifdef USE_PERFECT_LOC_FOR_BALL
-            fakeLoc->setXEst(currentPose.x);
-            fakeLoc->setYEst(currentPose.y);
-            fakeLoc->setHEst(currentPose.h);
-#endif
 
             Z_t = determineObservedLandmarks(currentPose, 0.0);
 
@@ -145,8 +128,11 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
                                                           0.0));
 
             // Update the ball estimate model
-            ballEKF->updateModel(visBall);
-
+#ifdef USE_PERFECT_LOC_FOR_BALL
+            ballEKF->updateModel(visBall, currentPose);
+#else
+            ballEKF->updateModel(visBall, myLoc->getCurrentEstimate());
+#endif
             // Print the current frame to file
             printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
                             &currentPose, &currentBall, ballEKF, *visBall);
