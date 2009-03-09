@@ -14,6 +14,7 @@ static const float TO_DEG = 180.0f/M_PI_FLOAT;
 #ifndef TO_RAD
 static const float TO_RAD = M_PI_FLOAT/180.0f;
 #endif
+static const float QUART_CIRC_RAD = M_PI / 2.0f;
 
 
 inline static int ROUND(float x) {

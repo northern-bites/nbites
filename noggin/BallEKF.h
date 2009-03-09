@@ -11,6 +11,7 @@
 #include "EKF.h"
 #include "MCL.h"
 #include "VisualBall.h"
+#include "NBMath.h"
 
 // Parameters
 #define ASSUMED_FPS 30.0

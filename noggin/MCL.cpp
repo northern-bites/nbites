@@ -8,6 +8,10 @@
 
 #include "MCL.h"
 using namespace std;
+#define MAX_CHANGE_X 10.0f
+#define MAX_CHANGE_Y 10.0f
+#define MAX_CHANGE_H M_PI / 6.0f
+#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 
 /**
  * Initializes the sampel sets so that the first update works appropriately
@@ -23,7 +27,7 @@ MCL::MCL()
         // H between +-pi
         PoseEst x_m(float(rand() % int(FIELD_WIDTH)),
                     float(rand() % int(FIELD_HEIGHT)),
-                    float(((rand() % FULL_CIRC) - HALF_CIRC))*DEG_TO_RAD);
+                    UNIFORM_1_NEG_1 * (M_PI / 2.0f));
         Particle p_m(x_m, 1.0f);
         X_t.push_back(p_m);
     }

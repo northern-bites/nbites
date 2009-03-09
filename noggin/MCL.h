@@ -17,7 +17,7 @@
 // Local
 #include "Observation.h"
 #include "FieldConstants.h"
-
+#include "NBMath.h"
 // Structs
 // Odometery change
 class MotionModel
@@ -140,7 +140,7 @@ public:
     /**
      * @return The current heading esitamte of the robot in degrees
      */
-    float getHEstDeg() { return curEst.h * RAD_TO_DEG;}
+    float getHEstDeg() { return curEst.h * DEG_OVER_RAD;}
 
     /**
      * @return The uncertainty associated with the x estimate of the robot.
@@ -160,7 +160,7 @@ public:
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    float getHUncertDeg() { return curUncert.h * 2 * RAD_TO_DEG;}
+    float getHUncertDeg() { return curUncert.h * 2 * DEG_OVER_RAD;}
 
     /**
      * @return The current set of particles in the filter
