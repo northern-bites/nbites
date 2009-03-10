@@ -42,7 +42,8 @@ private: // Constants
 
 private: // Members
     AL::ALPtr<AL::ALBroker> broker;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccess;
+    AL::ALPtr<ALMemoryFastAccess> alfastaccessJoints;
+    AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     boost::shared_ptr<Sensors> sensors;
     vector<float> jointValues;

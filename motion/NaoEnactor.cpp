@@ -19,10 +19,17 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
     }
 
     try{
-        alfastaccess =
+        alfastaccessJoints =
             AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
     } catch(AL::ALError &e){
-        cout << "Failed to initialize proxy to ALFastAccess"<<endl;
+        cout << "Failed to initialize proxy to ALFastAccess for joints"<<endl;
+    }
+
+    try{
+        alfastaccessSensors =
+            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+    } catch(AL::ALError &e){
+        cout << "Failed to initialize proxy to ALFastAccess for sensors"<<endl;
     }
 
     try{
@@ -204,7 +211,7 @@ void NaoEnactor::run() {
         // Get the angles we want to go to this frame from the switchboard
         motionValues = switchboard->getNextJoints();
         // Get most current joint values possible for performing checks
-        alfastaccess->GetValues(jointValues);
+        alfastaccessJoints->GetValues(jointValues);
 
         for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
             #ifdef DEBUG_ENACTOR_JOINTS
@@ -304,13 +311,68 @@ void NaoEnactor::initSyncWithALMemory(){
         string(jointsV[21]);
 
     try{
-        alfastaccess->ConnectToVariables(broker,jointNames);
+        alfastaccessJoints->ConnectToVariables(broker,jointNames);
     } catch(AL::ALError& a) {
-      std::cout << "NaoEnactor " << a.toString() << std::endl;}
+        std::cout << "NaoEnactor " << a.toString() << std::endl;
+    }
 
+    // Now connect to all the sensor values we need to update on the motion
+    // frame rate: FSR and inertial sensors for now.
+    vector<string> sensorNames;
+    sensorNames +=
+        string("Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"),
+        string("Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"),
+        string("Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"),
+        string("Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"),
+        string("Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"),
+        string("Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"),
+        string("Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"),
+        string("Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"),
+        string("Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"),
+        string("Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"),
+        string("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"),
+        string("Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value"),
+        string("Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value"),
+        string("Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value"),
+        string("Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value");
+
+    try {
+        alfastaccessSensors->ConnectToVariables(broker, sensorNames);
+    } catch(AL::ALError& a) {
+        std::cout << "NaoEnactor " << a.toString() << std::endl;
+    }
 }
 
 void NaoEnactor::syncWithALMemory() {
-    alfastaccess->GetValues(jointValues);
+    alfastaccessJoints->GetValues(jointValues);
     sensors->setBodyAngles(jointValues);
+/*
+    cout << "jointValues: ";
+    for (unsigned int i = 0; i < jointValues.size(); i++) {
+        cout << jointValues[i] << " ";
+    }
+    cout << endl;
+*/
+    // There are 16 sensor values we want.
+    // The vector is static so that it is initialized only once for this
+    // method.
+    static vector<float> sensorValues(16, 0.0f);
+    alfastaccessSensors->GetValues(sensorValues);
+
+    // The indices here are determined by the order in which we requested
+    // the sensors values (see initSyncWithALMemory).
+    const float LfrontLeft = sensorValues[0], LfrontRight = sensorValues[1],
+        LrearLeft = sensorValues[2], LrearRight = sensorValues[3],
+        RfrontLeft = sensorValues[4], RfrontRight = sensorValues[5],
+        RrearLeft = sensorValues[6], RrearRight = sensorValues[7];
+
+    const float accX = sensorValues[8], accY = sensorValues[9],
+        accZ = sensorValues[10],
+        gyrX = sensorValues[11], gyrY = sensorValues[12],
+        angleX = sensorValues[13], angleY = sensorValues[14];
+
+    sensors->
+        setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
+                         FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
+                         Inertial(accX,accY,accZ,gyrX,gyrY,angleX,angleY));
 }

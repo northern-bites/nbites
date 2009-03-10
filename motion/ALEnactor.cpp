@@ -147,16 +147,8 @@ void ALEnactor::initSyncWithALMemory(){
 // many of them to figure out decent names for all. Feel free to change them...
 // they are only used internally in this method.
 void ALEnactor::syncWithALMemory() {
-    static vector<float> varValues(16,0.0);
+    static vector<float> varValues(16, 0.0f);
     alfastaccess->GetValues(varValues);
-
-    /*
-    cout << "****** Sensors values ******" << endl;
-    for (int i = 0; i < 20; i++) {
-        cout << varValues[i] <<endl;
-    }
-    cout << endl;
-    */
 
     // The indices here are determined by the order in which we requested
     // the sensors values (see initSyncWithALMemory).
