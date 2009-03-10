@@ -346,13 +346,7 @@ void NaoEnactor::initSyncWithALMemory(){
 void NaoEnactor::syncWithALMemory() {
     alfastaccessJoints->GetValues(jointValues);
     sensors->setBodyAngles(jointValues);
-/*
-    cout << "jointValues: ";
-    for (unsigned int i = 0; i < jointValues.size(); i++) {
-        cout << jointValues[i] << " ";
-    }
-    cout << endl;
-*/
+
     // There are 16 sensor values we want.
     // The vector is static so that it is initialized only once for this
     // method.
