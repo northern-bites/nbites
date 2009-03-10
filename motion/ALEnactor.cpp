@@ -86,7 +86,6 @@ void ALEnactor::run() {
         }
 #endif
 
-
     }
 }
 
@@ -101,7 +100,6 @@ void ALEnactor::postSensors() {
     // in order to accurately calculate the position of the red leg, it needs
     // to have a correct HYP value, but that value is only stored once and that
     // is in the left leg. This is done by NaoQi, not us.
-    //rLegAngles[0] = lLegAngles[0];
     alAngles[Kinematics::R_HIP_YAW_PITCH] =
         alAngles[Kinematics::L_HIP_YAW_PITCH];
 

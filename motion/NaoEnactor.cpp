@@ -2,33 +2,36 @@
 
 #include "NaoEnactor.h"
 #include <iostream>
+using namespace std;
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
 
 NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
                         boost::shared_ptr<Sensors> s)
-    : MotionEnactor(),broker(_pbroker),sensors(s) {
-        try {
-            dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
-        } catch(AL::ALError &e) {
-            cout << "Failed to initialize proxy to DCM" << endl;
-        }
-        try{
-            alfastaccess =
-                    AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
-        } catch(AL::ALError &e){
-            cout << "Failed to initialize proxy to ALFastAccess"<<endl;
-        }
+    : MotionEnactor(), broker(_pbroker), sensors(s),
+      jointValues(NUM_JOINTS,0.0f),  // current values of joints
+      motionValues(NUM_JOINTS,0.0f)  // commands sent to joints
+{
+    try {
+        dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
+    } catch(AL::ALError &e) {
+        cout << "Failed to initialize proxy to DCM" << endl;
+    }
+
+    try{
+        alfastaccess =
+            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+    } catch(AL::ALError &e){
+        cout << "Failed to initialize proxy to ALFastAccess"<<endl;
+    }
+
     try{
         NaoEnactor::initSyncWithALMemory();
     } catch(AL::ALError &e){
         cout << "Failed to initialize sync with al memory"<<endl;
     }
-    sensors = s;
 }
 
-vector<float> NaoEnactor::jointValues(22,0.0); //current values of joints
-vector<float> NaoEnactor::motionValues(22,0.0); //commands sent to joints
 const string NaoEnactor::PositionPostFix("/Position/Actuator/Value");
 const string NaoEnactor::HardnessPostFix("/Hardness/Actuator/Value");
 const string NaoEnactor::ValuePostFix("/Position/Sensor/Value");
@@ -168,7 +171,7 @@ void NaoEnactor::run() {
     for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
         //sets the value for hardness
         commands[5][i].arraySetSize(1);
-        commands[5][i][0] = 0.85;
+        commands[5][i][0] = 0.80;
     }
     commands[4][0] = dcmProxy->getTime(100);
 
@@ -213,8 +216,10 @@ void NaoEnactor::run() {
             //sensor lag occurs. we risk unsafe values if motion is impeded
         }
 
-        //send the array
-        commands[4][0] = dcmProxy->getTime(0);
+        // Send the array with a 25 ms delay. This delay removes the jitter.
+        // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
+        // a value in between that works though. Will look into it.
+        commands[4][0] = dcmProxy->getTime(25);
         #ifndef NO_ACTUAL_MOTION
         try {
             dcmProxy->setAlias(commands);
@@ -264,7 +269,7 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, int i){
     }
     #ifdef DEBUG_ENACTOR_JOINTS
     std::cout << jointsP[i] << "Current = " << currentVal << "  Sent = "
-                                                        << toCheck << std::endl;
+              << toCheck << std::endl;
     #endif
     return toCheck;
 }
@@ -277,6 +282,7 @@ void NaoEnactor::postSensors(){
     sensors->setMotionBodyAngles(motionValues);
     syncWithALMemory();
 }
+
 /**
  * ALFastAccess allows us to pull out values from ALMemory a lot faster
  * and in bulk. The order in which we declare the desired devices are also
@@ -296,29 +302,6 @@ void NaoEnactor::initSyncWithALMemory(){
         string(jointsV[15]), string(jointsV[16]), string(jointsV[17]),
         string(jointsV[18]), string(jointsV[19]), string(jointsV[20]),
         string(jointsV[21]);
-    /*jointNames +=
-      string("Device/SubDeviceList/HeadYaw/Position/Sensor/Value"),
-      string("Device/SubDeviceList/HeadPitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LShoulderPitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LShoulderRoll/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LElbowYaw/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LElbowRoll/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LHipYawPitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LHipRoll/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LHipPitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LKneePitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LAnklePitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LAnkleRoll/Position/Sensor/Value"),
-      string("Device/SubDeviceList/LHipYawPitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RHipRoll/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RHipPitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RKneePitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RAnklePitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RAnkleRoll/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RShoulderPitch/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RShoulderRoll/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RElbowYaw/Position/Sensor/Value"),
-      string("Device/SubDeviceList/RElbowRoll/Position/Sensor/Value");*/
 
     try{
         alfastaccess->ConnectToVariables(broker,jointNames);
