@@ -34,6 +34,8 @@
  *
  */
 #include "LocLogFaker.h"
+#include "NBMath.h"
+#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 
 using namespace std;
 using namespace boost;
@@ -120,19 +122,19 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 
             Z_t = determineObservedLandmarks(currentPose, 0.0);
 
-            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
-
             // Figure out the current ball distance and bearing
             visBall->setDistanceEst(determineBallEstimate(&currentPose,
                                                           &currentBall,
                                                           0.0));
 
             // Update the ball estimate model
-#ifdef USE_PERFECT_LOC_FOR_BALL
-            ballEKF->updateModel(visBall, currentPose);
-#else
+#           ifdef USE_PER_PARTICLE_EKF
+            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t, visBall);
+#           else // NOT PER_PARTICLE
+            cout << "Current loc: " << *myLoc << endl;
+            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
             ballEKF->updateModel(visBall, myLoc->getCurrentEstimate());
-#endif
+#           endif // PER_PARTICLE
             // Print the current frame to file
             printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
                             &currentPose, &currentBall, ballEKF, *visBall);
@@ -364,7 +366,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
     letsGo->ballStart.velY = 0.0;
 
     // Convert input value to radians
-    letsGo->startPos.h *= DEG_TO_RAD;
+    letsGo->startPos.h *= TO_RAD;
 
     // Build NavMoves from the remaining lines
     while (!inputFile->eof()) {
@@ -372,7 +374,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
                    >> ballMove.velX >> ballMove.velY
                    >> time;
 
-        motion.deltaR *= DEG_TO_RAD;
+        motion.deltaR *= TO_RAD;
         letsGo->myMoves.push_back(NavMove(motion, ballMove, time));
     }
 }
@@ -407,6 +409,16 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncertDeg() << " "
                 // Ball estimates
+#               ifdef USE_PER_PARTICLE_EKF
+                << myLoc->getBallXEst() << " "
+                << myLoc->getBallYEst() << " "
+                << myLoc->getBallXUncert() << " "
+                << myLoc->getBallYUncert() << " "
+                << myLoc->getBallXVelocityEst() << " "
+                << myLoc->getBallYVelocityEst() << " "
+                << myLoc->getBallXUncert() << " "
+                << myLoc->getBallYUncert() << " "
+#               else // USE_PER_PARTICLE_EKF
                 << ballEKF->getXEst() << " "
                 << ballEKF->getYEst() << " "
                 << ballEKF->getXUncert() << " "
@@ -415,6 +427,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 << ballEKF->getYVelocityEst() << " "
                 << ballEKF->getXUncert() << " "
                 << ballEKF->getYUncert() << " "
+#               endif // USE_PER_PARTICLE_EKF
                 // Odometery
                 << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                 << lastOdo.deltaR;
@@ -424,13 +437,13 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
 
     // Print the actual robot position
     *outputFile << currentPose->x << " "
-                  << currentPose->y << " "
-                  << currentPose->h << " "
+                << currentPose->y << " "
+                << currentPose->h << " "
     // print actual ball position
-                  << currentBall->x << " "
-                  << currentBall->y << " "
-                  << currentBall->velX << " "
-                  << currentBall->velY << " ";
+                << currentBall->x << " "
+                << currentBall->y << " "
+                << currentBall->velX << " "
+                << currentBall->velY << " ";
 
     // Divide the sections with a colon
     *outputFile << ":";

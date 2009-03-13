@@ -7,7 +7,7 @@
 
 #ifndef MCL_h_DEFINED
 #define MCL_h_DEFINED
-#define USE_PER_PARTICLE_EKF
+
 // Includes
 // STL
 #include <vector>
@@ -114,6 +114,47 @@ public:
     const std::vector<Particle> getParticles() const { return X_t; }
 
 #   ifdef USE_PER_PARTICLE_EKF
+
+    /**
+     * @return The current x esitamte of the ball
+     */
+    const float getBallXEst() const { return curBallEst.x; }
+
+    /**
+     * @return The current y esitamte of the ball
+     */
+    const float getBallYEst() const { return curBallEst.y; }
+
+    /**
+     * @return The current heading esitamte of the ball
+     */
+    const float getBallXVelocityEst() const { return curBallEst.velX; }
+
+    /**
+     * @return The current y velocity esitamte of the ball
+     */
+    const float getBallYVelocityEst() const { return curBallEst.velY; }
+
+    /**
+     * @return The uncertainty associated with the x estimate of the ball.
+     */
+    const float getBallXUncert() const { return curBallUncert.x * 2;}
+
+    /**
+     * @return The uncertainty associated with the y estimate of the ball.
+     */
+    const float getBallYUncert() const { return curBallUncert.y * 2;}
+
+    /**
+     * @return The uncertainty associated with the ball's heading estimate.
+     */
+    const float getBallXVelocityUncert() const { return curBallUncert.velX * 2;}
+
+    /**
+     * @return The uncertainty associated with the ball's heading estimate.
+     */
+    const float getBallYVelocityUncert() const { return curBallUncert.velY * 2;}
+
 #   endif // USE_PER_PARTICLE_EKF
     // Setters
     /**
@@ -154,7 +195,6 @@ private:
 #   ifdef USE_PER_PARTICLE_EKF
     BallPose curBallEst;
     BallPose curBallUncert;
-    VisualBall * ball;
 #   endif
 
     // Core Functions
