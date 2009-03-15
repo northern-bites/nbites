@@ -249,11 +249,6 @@ public class LogHandler
      */
     public boolean loadMCLLog(String logFile)
     {
-        // Make sure we have a Nao field and not an Aibo field
-        if (wc.the_field == wc.labField ) {
-            wc.switchFields();
-        }
-
         BufferedReader dataIn = null;
         System.out.println("Loading MCL log file: " + logFile + "... ");
         log_strings.clear();
