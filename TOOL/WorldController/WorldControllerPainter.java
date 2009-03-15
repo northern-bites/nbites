@@ -95,7 +95,7 @@ public class WorldControllerPainter implements DogListener
 
     // The number of most recent positions/uncertainties to appear on the
     // field at one time
-    private int NUMBER_PREVIOUS_POSITIONS_TO_DRAW = 5;
+    private int NUMBER_PREVIOUS_POSITIONS_TO_DRAW = 1;
 
     // To hold the history for one or more dogs
     private HashMap<Integer, DogHistory> dog_histories =

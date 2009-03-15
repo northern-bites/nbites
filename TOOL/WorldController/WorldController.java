@@ -73,9 +73,6 @@ public class WorldController extends JPanel implements KeyListener,
     public static final int FPS_SLIDE_MIN = 1;
     public static final int FPS_SLIDE_MAX = 60;
     public static final int FPS_SLIDE_INIT = 25;
-    public static final int NUM_DISPLAY_ESTIMATES_SLIDE_MIN = 1;
-    public static final int NUM_DISPLAY_ESTIMATES_SLIDE_MAX = 30;
-    public static final int NUM_DISPLAY_ESTIMATES_SLIDE_INIT = 5;
 
     // TCP Constants
     // data coming off dog via tcp.
@@ -146,8 +143,6 @@ public class WorldController extends JPanel implements KeyListener,
     public final static String UDP_LABEL_STRING = "UDP Viewer:";
     public final static String CONNECTION_LABEL_STRING = "Connection:";
     public final static String FPS_LABEL_STRING = "FPS Playback Speed:";
-    public final static String NUM_DISPLAY_ESTIMATES_LABEL_STRING =
-        "# Estimates Displayed";
     public final static String SWITCH_FIELDS_STRING = "Switch Fields";
     public final static String SWITCH_COLORS_STRING = "Switch Colors";
     public final static String SWITCH_TEAMS_STRING = "Switch Teams";
@@ -229,7 +224,6 @@ public class WorldController extends JPanel implements KeyListener,
     private JLabel program_specific_label;
     private JLabel connection_label;
     private JLabel fps_label;
-    private JLabel num_display_estimates_label;
     private JButton button_switch_fields;
     private JButton button_view_dog_ekf;
     private JButton button_view_robot_mcl;
@@ -244,7 +238,6 @@ public class WorldController extends JPanel implements KeyListener,
     private JButton draw_real_button;
     private JButton draw_est_button;
     private JSlider fps_slide;
-    private JSlider num_display_estimates_slide;
 
     // for key listener
     private boolean key_pressed;
@@ -451,21 +444,6 @@ public class WorldController extends JPanel implements KeyListener,
         button_area.add(fps_slide);
         fps_slide.setVisible(false);
 
-        // estimates slide
-        num_display_estimates_label = new JLabel
-            (NUM_DISPLAY_ESTIMATES_LABEL_STRING,
-             JLabel.CENTER);
-        num_display_estimates_label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        num_display_estimates_label.setVisible(false);
-        button_area.add(num_display_estimates_label);
-        num_display_estimates_slide = new JSlider
-            (JSlider.HORIZONTAL,
-             NUM_DISPLAY_ESTIMATES_SLIDE_MIN,
-             NUM_DISPLAY_ESTIMATES_SLIDE_MAX,
-             NUM_DISPLAY_ESTIMATES_SLIDE_INIT);
-        num_display_estimates_slide.addChangeListener(this);
-        button_area.add(num_display_estimates_slide);
-        num_display_estimates_slide.setVisible(false);
     }
 
     public void nothingButtons()
@@ -475,8 +453,6 @@ public class WorldController extends JPanel implements KeyListener,
         button_three.setVisible(false);
         fps_label.setVisible(false);
         fps_slide.setVisible(false);
-        num_display_estimates_label.setVisible(false);
-        num_display_estimates_slide.setVisible(false);
     }
 
     public void mclLogButtons()
@@ -492,8 +468,6 @@ public class WorldController extends JPanel implements KeyListener,
         button_three.setVisible(true);
         fps_label.setVisible(true);
         fps_slide.setVisible(true);
-        num_display_estimates_label.setVisible(true);
-        num_display_estimates_slide.setVisible(true);
     }
     public void udpButtons()
     {
@@ -575,12 +549,6 @@ public class WorldController extends JPanel implements KeyListener,
             int value = (int)source.getValue();
             System.out.println("fps set to: " + value);
             setPlaybackFps(value);
-        }
-        if (!source.getValueIsAdjusting() &&
-            source == num_display_estimates_slide) {
-            int value = (int)source.getValue();
-            System.out.println("num estimates set to: " + value);
-            painter.setPositionsToDraw(value);
         }
     }
 
