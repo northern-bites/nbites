@@ -35,4 +35,26 @@ static const float clip(const float value,const float minValue, const float maxV
 static const float clip(const float value, const float minMax){
     return clip(value,-minMax,minMax);
 }
+
+
+/**
+ * Returns an equivalent angle to the one passed in with value between positive
+ * and negative pi.
+ *
+ * @param theta The angle to be simplified
+ *
+ * @return The equivalent angle between -pi and pi.
+ */
+inline static float subPIAngle(float theta)
+{
+    while( theta > M_PI) {
+        theta -= 2.0f*M_PI;
+    }
+
+    while( theta < -M_PI) {
+        theta += 2.0f*M_PI;
+    }
+    return theta;
+}
+
 #endif //NBMath_h

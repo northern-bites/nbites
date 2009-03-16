@@ -24,20 +24,20 @@
 #define BALL_DECAY_PERCENT 0.25
 
 // Default initialization values
-#define INIT_BALL_X 100.0f
+#define INIT_BALL_X 0.0f
 #define INIT_BALL_Y 100.0f
 #define INIT_BALL_X_VEL 0.0f
 #define INIT_BALL_Y_VEL 0.0f
-#define INIT_X_UNCERT 100.0f
-#define INIT_Y_UNCERT 100.0f
-#define INIT_X_VEL_UNCERT 10.0f
-#define INIT_Y_VEL_UNCERT 10.0f
 #define X_UNCERT_MAX 440.0f
 #define Y_UNCERT_MAX 680.0f
 #define VELOCITY_UNCERT_MAX 300.0
 #define X_UNCERT_MIN 1.0e-6
 #define Y_UNCERT_MIN 1.0e-6
 #define VELOCITY_UNCERT_MIN 1.0e-6
+#define INIT_X_UNCERT X_UNCERT_MAX
+#define INIT_Y_UNCERT Y_UNCERT_MAX
+#define INIT_X_VEL_UNCERT VELOCITY_UNCERT_MAX
+#define INIT_Y_VEL_UNCERT VELOCITY_UNCERT_MAX
 #define X_EST_MIN -600.0f
 #define Y_EST_MIN -1000.0f
 #define X_EST_MAX 600.0f

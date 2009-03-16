@@ -65,7 +65,6 @@ void printOutLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
                      VisualBall _b);
 
 // Helper functions
-float subPIAngle(float theta);
 float getDistSD(float dist);
 float getBearingSD(float bearing);
 

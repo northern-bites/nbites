@@ -318,15 +318,17 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
     estimate e;
     e.bearing = subPIAngle(atan2(currentBall->y - currentPose->y,
                                  currentBall->x - currentPose->x) -
-                           currentPose->h - QUART_CIRC_RAD);
+                           M_PI / 2.0f);
 
     // Calculate distance if object is within view
-    if ( /*e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&*/
+    if ( true ||
+         e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        e.dist += e.dist*UNIFORM_1_NEG_1*0.12;
-        e.bearing += UNIFORM_1_NEG_1*0.05;
+        e.dist += e.dist*UNIFORM_1_NEG_1*0.03;
+        e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
+
     } else {
         e.dist = 0.0f;
         e.bearing = 0.0f;
@@ -412,21 +414,31 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 //     ballEKF->getYEst()*cos(myLoc->getHEst()) +
                 //     myLoc->getYEst()) << " "
                 // X Estimate
-                << (-ballEKF->getXEst()*cos(currentPose->h) +
+                << (ballEKF->getXEst()*cos(currentPose->h) +
                     ballEKF->getYEst()*sin(currentPose->h) +
                     currentPose->x) << " "
                 // Y Estimate
-                << (-ballEKF->getXEst()*sin(-currentPose->h) +
+                << (ballEKF->getXEst()*sin(currentPose->h) +
                     ballEKF->getYEst()*cos(currentPose->h) +
                     currentPose->y) << " "
+                // // X Estimate
+                // << (ballEKF->getXEst() +
+                //     currentPose->x) << " "
+                // // Y Estimate
+                // << (ballEKF->getYEst() +
+                //     currentPose->y) << " "
                 // X Uncert
-                << (fabs(ballEKF->getXUncert()*cos(myLoc->getHEst())) +
-                    fabs(ballEKF->getYUncert()*sin(myLoc->getHEst()))) << " "
+                << (ballEKF->getXUncert()) << " "
                 // Y Uncert
-                << (fabs(ballEKF->getXUncert()*sin(myLoc->getHEst())) +
-                    fabs(ballEKF->getYUncert()*cos(myLoc->getHEst()))) << " "
+                << (ballEKF->getYUncert()) << " "
+                // // X Uncert
+                // << (fabs(ballEKF->getXUncert()*cos(myLoc->getHEst())) +
+                //     fabs(ballEKF->getYUncert()*sin(myLoc->getHEst()))) << " "
+                // // Y Uncert
+                // << (fabs(ballEKF->getXUncert()*sin(myLoc->getHEst())) +
+                //     fabs(ballEKF->getYUncert()*cos(myLoc->getHEst()))) << " "
                 // X Velocity Estimate
-                << (ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) +
+                << (-ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) +
                     ballEKF->getYVelocityEst()*sin(myLoc->getHEst())) << " "
                 // Y Estimate
                 << (ballEKF->getXVelocityEst()*sin(myLoc->getHEst()) +
@@ -484,26 +496,6 @@ NavMove::NavMove(MotionModel _p, BallPose _b, int _t) : move(_p), ballVel(_b),
                                                         time(_t)
 {
 };
-
-/**
- * Returns an equivalent angle to the one passed in with value between positive
- * and negative pi.
- *
- * @param theta The angle to be simplified
- *
- * @return The equivalent angle between -pi and pi.
- */
-float subPIAngle(float theta)
-{
-    while( theta > M_PI) {
-        theta -= 2.0f*M_PI;
-    }
-
-    while( theta < -M_PI) {
-        theta += 2.0f*M_PI;
-    }
-    return theta;
-}
 
 /**
  * Get standard deviation for the associated distance reading

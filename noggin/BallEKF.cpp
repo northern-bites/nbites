@@ -28,8 +28,8 @@ BallEKF::BallEKF(float initX, float initY,
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    // A_k(0,2) = 1.0 / ASSUMED_FPS;
-    // A_k(1,3) = 1.0 / ASSUMED_FPS;
+    A_k(0,2) = 1.0 / ASSUMED_FPS;
+    A_k(1,3) = 1.0 / ASSUMED_FPS;
 
     // Setup initial values
     setXEst(initX);
@@ -105,8 +105,6 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
     ublas::vector<float> deltaBall(BALL_EKF_DIMENSION);
     deltaBall(0) = getXVelocityEst() * (1.0f / ASSUMED_FPS);
     deltaBall(1) = getYVelocityEst() * (1.0f / ASSUMED_FPS);
-    // deltaBall(2) = 0.0f;
-    // deltaBall(3) = 0.0f;
     deltaBall(2) = sign(getXVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
     deltaBall(3) = sign(getYVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
 
@@ -129,6 +127,7 @@ void BallEKF::incorporateMeasurement(Measurement z,
                                      ublas::vector<float> &V_k)
 {
     if (useCartesian) {
+        std::cout << "Using not polar" << std::endl;
         // Convert our siting to cartesian coordinates
         float x_b_r = -z.distance * sin(z.bearing);
         float y_b_r = z.distance * cos(z.bearing);
@@ -168,21 +167,37 @@ void BallEKF::incorporateMeasurement(Measurement z,
         ublas::vector<float> d_x(2);
         float x_b = getXEst();
         float y_b = getYEst();
+
+        float locDistSquared = (x_b * x_b + y_b * y_b);
+        float locDist = sqrt(locDistSquared);
         d_x(0) = sqrt(x_b * x_b + y_b * y_b);
-        d_x(1) = atan2(x_b, y_b);
+        d_x(1) = subPIAngle(atan2(y_b, x_b) - M_PI / 2.0f);
 
         // Calculate invariance
         V_k = z_x - d_x;
+        V_k(1) = subPIAngle(V_k(1));
 
         // Calculate jacobians
-        H_k(0,0) = (x_b / sqrt(x_b * x_b + y_b * y_b));
-        H_k(0,1) = (y_b / sqrt(x_b * x_b + y_b * y_b));
-        H_k(1,0) = x_b / (x_b * x_b + y_b * y_b);
-        H_k(1,1) = -y_b / (x_b * x_b + y_b * y_b);
+        H_k(0,0) =  x_b / locDist;
+        H_k(0,1) =  y_b / locDist;
+        H_k(1,0) = -y_b / locDistSquared;
+        H_k(1,1) =  x_b / locDistSquared;
 
         // Update the measurement covariance matrix
         R_k(0,0) = z.distanceSD;
         R_k(1,1) = z.bearingSD;
+
+        bool debugStuff = true;
+        if (debugStuff) {
+            std::cout << "Vis bearing is " << z_x(1) << std::endl;
+            std::cout << "Loc bearing is " << d_x(1) << std::endl;
+            float x_b_r = -z.distance * sin(z.bearing);
+            float y_b_r = z.distance * cos(z.bearing);
+            std::cout << "Vis (x,y) are (" << x_b_r << ", " << y_b_r << ")"
+                      << std::endl;
+            std::cout << "Loc (x,y) are (" << x_b << ", " << y_b << ")\n"
+                      << std::endl;
+        }
     }
 }
 

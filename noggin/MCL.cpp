@@ -10,7 +10,7 @@
 using namespace std;
 #define MAX_CHANGE_X 10.0f
 #define MAX_CHANGE_Y 10.0f
-#define MAX_CHANGE_H M_PI / 6.0f
+#define MAX_CHANGE_H M_PI / 8.0f
 #define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 
 /**
