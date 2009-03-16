@@ -418,10 +418,20 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 // Y Uncert
                 << fabs(ballEKF->getXUncert()*sin(myLoc->getHEst()) +
                         ballEKF->getYUncert()*cos(myLoc->getHEst())) << " "
-                << ballEKF->getXVelocityEst() << " "
-                << ballEKF->getYVelocityEst() << " "
-                << ballEKF->getXUncert() << " "
-                << ballEKF->getYUncert() << " "
+                // X Velocity Estimate
+                << (ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) -
+                    ballEKF->getYVelocityEst()*sin(myLoc->getHEst())) << " "
+                // Y Estimate
+                << (ballEKF->getXVelocityEst()*sin(myLoc->getHEst()) +
+                    ballEKF->getYVelocityEst()*cos(myLoc->getHEst())) << " "
+                // X Velocity Uncert
+                << fabs(ballEKF->getXVelocityUncert()*cos(myLoc->getHEst()) -
+                        ballEKF->getYVelocityUncert()*sin(myLoc->getHEst()))
+                << " "
+                // Y Velocity Uncert
+                << fabs(ballEKF->getXVelocityUncert()*sin(myLoc->getHEst()) +
+                        ballEKF->getYVelocityUncert()*cos(myLoc->getHEst()))
+                << " "
                 // Odometery
                 << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                 << lastOdo.deltaR;

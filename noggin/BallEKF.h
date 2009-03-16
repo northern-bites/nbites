@@ -1,5 +1,7 @@
 /**
  * BallEKF.h - Header file for the BallEKF class
+ * All coordinates in C++ are in the local coordinate frame
+ * We convert to the global frame when dealing with python
  *
  * @author Tucker Hermans
  */
