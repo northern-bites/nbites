@@ -1,5 +1,5 @@
 C++ = g++
-C++-FLAGS = -Wall -O2 -Wconversion -DNDEBUG -DUSING_LAB_FIELD
+C++-FLAGS = -Wall -O2 -Wconversion -DNDEBUG
 RM = rm -f
 INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
 

@@ -321,7 +321,7 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                            currentPose->h - QUART_CIRC_RAD);
 
     // Calculate distance if object is within view
-    if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
+    if ( /*e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&*/
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
@@ -404,33 +404,40 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncertDeg() << " "
                 // Ball estimates
+                // << (ballEKF->getXEst()*cos(myLoc->getHEst()) +
+                //     ballEKF->getYEst()*sin(myLoc->getHEst()) +
+                //     myLoc->getXEst()) << " "
+                // // Y Estimate
+                // << (ballEKF->getXEst()*sin(myLoc->getHEst()) +
+                //     ballEKF->getYEst()*cos(myLoc->getHEst()) +
+                //     myLoc->getYEst()) << " "
                 // X Estimate
-                << (ballEKF->getXEst()*cos(myLoc->getHEst()) -
-                    ballEKF->getYEst()*sin(myLoc->getHEst()) +
-                    myLoc->getXEst()) << " "
+                << (-ballEKF->getXEst()*cos(currentPose->h) +
+                    ballEKF->getYEst()*sin(currentPose->h) +
+                    currentPose->x) << " "
                 // Y Estimate
-                << (ballEKF->getXEst()*sin(myLoc->getHEst()) +
-                    ballEKF->getYEst()*cos(myLoc->getHEst()) +
-                    myLoc->getYEst()) << " "
+                << (-ballEKF->getXEst()*sin(-currentPose->h) +
+                    ballEKF->getYEst()*cos(currentPose->h) +
+                    currentPose->y) << " "
                 // X Uncert
-                << fabs(ballEKF->getXUncert()*cos(myLoc->getHEst()) -
-                        ballEKF->getYUncert()*sin(myLoc->getHEst())) << " "
+                << (fabs(ballEKF->getXUncert()*cos(myLoc->getHEst())) +
+                    fabs(ballEKF->getYUncert()*sin(myLoc->getHEst()))) << " "
                 // Y Uncert
-                << fabs(ballEKF->getXUncert()*sin(myLoc->getHEst()) +
-                        ballEKF->getYUncert()*cos(myLoc->getHEst())) << " "
+                << (fabs(ballEKF->getXUncert()*sin(myLoc->getHEst())) +
+                    fabs(ballEKF->getYUncert()*cos(myLoc->getHEst()))) << " "
                 // X Velocity Estimate
-                << (ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) -
+                << (ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) +
                     ballEKF->getYVelocityEst()*sin(myLoc->getHEst())) << " "
                 // Y Estimate
                 << (ballEKF->getXVelocityEst()*sin(myLoc->getHEst()) +
                     ballEKF->getYVelocityEst()*cos(myLoc->getHEst())) << " "
                 // X Velocity Uncert
-                << fabs(ballEKF->getXVelocityUncert()*cos(myLoc->getHEst()) -
-                        ballEKF->getYVelocityUncert()*sin(myLoc->getHEst()))
+                << (fabs(ballEKF->getXVelocityUncert()*cos(myLoc->getHEst())) +
+                    fabs(ballEKF->getYVelocityUncert()*sin(myLoc->getHEst())))
                 << " "
                 // Y Velocity Uncert
-                << fabs(ballEKF->getXVelocityUncert()*sin(myLoc->getHEst()) +
-                        ballEKF->getYVelocityUncert()*cos(myLoc->getHEst()))
+                << (fabs(ballEKF->getXVelocityUncert()*sin(myLoc->getHEst())) +
+                    fabs(ballEKF->getYVelocityUncert()*cos(myLoc->getHEst())))
                 << " "
                 // Odometery
                 << lastOdo.deltaL << " " << lastOdo.deltaF << " "
