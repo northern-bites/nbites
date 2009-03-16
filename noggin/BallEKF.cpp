@@ -19,7 +19,7 @@ BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL)
+    : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL), useCartesian(false)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -28,8 +28,8 @@ BallEKF::BallEKF(float initX, float initY,
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1.0 / ASSUMED_FPS;
-    A_k(1,3) = 1.0 / ASSUMED_FPS;
+    // A_k(0,2) = 1.0 / ASSUMED_FPS;
+    // A_k(1,3) = 1.0 / ASSUMED_FPS;
 
     // Setup initial values
     setXEst(initX);
@@ -47,9 +47,9 @@ BallEKF::BallEKF(float initX, float initY,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(VisualBall * ball, PoseEst p)
+void BallEKF::updateModel(VisualBall * ball, bool _useCartesian)
 {
-    robotPose = p;
+    useCartesian = _useCartesian;
     // Update expected ball movement
     timeUpdate(MotionModel());
     limitAPrioriEst();
@@ -128,36 +128,62 @@ void BallEKF::incorporateMeasurement(Measurement z,
                                      ublas::matrix<float> &R_k,
                                      ublas::vector<float> &V_k)
 {
-    // Convert our siting to cartesian coordinates
-    float x_b_r = z.distance * cos(z.bearing + QUART_CIRC_RAD);
-    float y_b_r = z.distance * sin(z.bearing + QUART_CIRC_RAD);
-    ublas::vector<float> z_x(2);
+    if (useCartesian) {
+        // Convert our siting to cartesian coordinates
+        float x_b_r = -z.distance * sin(z.bearing);
+        float y_b_r = z.distance * cos(z.bearing);
+        ublas::vector<float> z_x(2);
 
-    z_x(0) = x_b_r;
-    z_x(1) = y_b_r;
+        z_x(0) = x_b_r;
+        z_x(1) = y_b_r;
 
-    // Get expected values of ball
-    float x_b = getXEst();
-    float y_b = getYEst();
-    ublas::vector<float> d_x(2);
+        // Get expected values of ball
+        float x_b = getXEst();
+        float y_b = getYEst();
+        ublas::vector<float> d_x(2);
 
-    d_x(0) = (x_b - robotPose.x)*cos(-robotPose.h) -
-        (y_b - robotPose.y)*sin(-robotPose.h);
-    d_x(1) = (x_b - robotPose.x)*sin(-robotPose.h) +
-        (y_b - robotPose.y)*cos(-robotPose.h);
+        d_x(0) = x_b;
+        d_x(1) = y_b;
 
-    // Calculate invariance
-    V_k = z_x - d_x;
+        // Calculate invariance
+        V_k = z_x - d_x;
 
-    // Calculate jacobians
-    H_k(0,0) = cos(robotPose.h);
-    H_k(0,1) = -sin(robotPose.h);
-    H_k(1,0) = sin(robotPose.h);
-    H_k(1,1) = cos(robotPose.h);
+        // Calculate jacobians
+        H_k(0,0) = cos(z.bearing);
+        H_k(0,1) = -sin(z.bearing);
+        H_k(1,0) = sin(z.bearing);
+        H_k(1,1) = cos(z.bearing);
 
-    // Update the measurement covariance matrix
-    R_k(0,0) = z.distanceSD;
-    R_k(1,1) = z.bearingSD;
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.distanceSD;
+        R_k(1,1) = z.distanceSD;
+
+    } else { // Use polar coordinates
+        // Make qa vector of the observed range and bearing
+        ublas::vector<float> z_x(2);
+        z_x(0) = z.distance;
+        z_x(1) = z.bearing;
+
+        // Get the predicted range and bearing
+        ublas::vector<float> d_x(2);
+        float x_b = getXEst();
+        float y_b = getYEst();
+        d_x(0) = sqrt(x_b * x_b + y_b * y_b);
+        d_x(1) = atan2(x_b, y_b);
+
+        // Calculate invariance
+        V_k = z_x - d_x;
+
+        // Calculate jacobians
+        H_k(0,0) = (x_b / sqrt(x_b * x_b + y_b * y_b));
+        H_k(0,1) = (y_b / sqrt(x_b * x_b + y_b * y_b));
+        H_k(1,0) = x_b / (x_b * x_b + y_b * y_b);
+        H_k(1,1) = -y_b / (x_b * x_b + y_b * y_b);
+
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.distanceSD;
+        R_k(1,1) = z.bearingSD;
+    }
 }
 
 /**

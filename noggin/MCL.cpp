@@ -96,63 +96,6 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
     updateEstimates();
 }
 
-#ifdef USE_PER_PARTICLE_EKF
-void MCL::updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
-                             VisualBall * ball, bool resample)
-{
-    // Set the current particles to be of time minus one.
-    vector<Particle> X_t_1 = X_t;
-    // Clar the current set
-    X_t.clear();
-    vector<Particle> X_bar_t; // A priori estimates
-    float totalWeights = 0.; // Must sum all weights for future use
-
-    // Run through the particles
-    for (int m = 0; m < M; ++m) {
-        Particle x_t_m;
-
-        // Update motion model for the particle
-        x_t_m.pose = X_t_1[m].pose + u_t;
-
-        // Update measurement model
-        x_t_m.weight = updateMeasurementModel(z_t, x_t_m.pose);
-        totalWeights += x_t_m.weight;
-        // Add the particle to the current frame set
-        X_bar_t.push_back(x_t_m);
-    }
-
-    // Process the particles after updating them all
-    for (int m = 0; m < M; ++m) {
-
-        // Normalize the particle weights
-        X_bar_t[m].weight /= totalWeights;
-
-        if(resample) { // Resample the particles
-            int count = int(round(float(M) * X_bar_t[m].weight));
-            // Add the particles to the resample posterior!
-            for (int i = 0; i < count; ++i) {
-                // Random walk the particles
-                X_bar_t[m] = randomWalkParticle(X_bar_t[m]);
-                // Update the ball model for this particle
-                X_bar_t[m].ball.updateModel(ball, X_bar_t[m].pose);
-                X_t.push_back(X_bar_t[m]);
-            }
-
-        } else { // Keep particle count the same
-            // Random walk the particles
-            X_bar_t[m] = randomWalkParticle(X_bar_t[m]);
-            // Update the ball model for this particle
-            X_bar_t[m].ball.updateModel(ball, X_bar_t[m].pose);
-            X_t.push_back(X_bar_t[m]);
-        }
-
-    }
-
-    // Update pose and uncertainty estimates
-    updateEstimates();
-}
-#endif // USE_PER_PARTICLE_EKF
-
 /**
  * Method determines the weight of a particle based on the current landmark
  * observations.
@@ -209,22 +152,13 @@ void MCL::updateEstimates()
     float weightSum = 0.;
     PoseEst wMeans(0.,0.,0.);
     PoseEst bSDs(0., 0., 0.);
-#   ifdef USE_PER_PARTICLE_EKF
-    BallPose wBallMeans(0.0f,0.0f,0.0f,0.0f);
-    BallPose bBallSDs(0.0f,0.0f,0.0f,0.0f);
-#   endif // PER_PARTICLE
+
     // Calculate the weighted mean
     for (unsigned int i = 0; i < X_t.size(); ++i) {
         // Sum the values
         wMeans.x += X_t[i].pose.x*X_t[i].weight;
         wMeans.y += X_t[i].pose.y*X_t[i].weight;
         wMeans.h += X_t[i].pose.h*X_t[i].weight;
-#       ifdef USE_PER_PARTICLE_EKF
-        wBallMeans.x += X_t[i].ball.getXEst()*X_t[i].weight;
-        wBallMeans.y += X_t[i].ball.getYEst()*X_t[i].weight;
-        wBallMeans.velX += X_t[i].ball.getXVelocityEst()*X_t[i].weight;
-        wBallMeans.velY += X_t[i].ball.getYVelocityEst()*X_t[i].weight;
-#       endif // PER_PARTICLE
         // Sum the weights
         weightSum += X_t[i].weight;
     }
@@ -232,12 +166,6 @@ void MCL::updateEstimates()
     wMeans.x /= weightSum;
     wMeans.y /= weightSum;
     wMeans.h /= weightSum;
-#   ifdef USE_PER_PARTICLE_EKF
-    wBallMeans.x /= weightSum;
-    wBallMeans.y /= weightSum;
-    wBallMeans.velX /= weightSum;
-    wBallMeans.velY /= weightSum;
-#   endif // PER_PARTICLE
 
     // Calculate the biased variances
     for (unsigned int i=0; i < X_t.size(); ++i) {
@@ -250,20 +178,6 @@ void MCL::updateEstimates()
         bSDs.h += X_t[i].weight *
             (X_t[i].pose.h - wMeans.h)*
             (X_t[i].pose.h - wMeans.h);
-#       ifdef USE_PER_PARTICLE_EKF
-        bBallSDs.x += X_t[i].weight *
-            (X_t[i].ball.getXEst() - wBallMeans.x)*
-            (X_t[i].ball.getXEst() - wBallMeans.x);
-        bBallSDs.y += X_t[i].weight *
-            (X_t[i].ball.getYEst() - wBallMeans.y)*
-            (X_t[i].ball.getYEst() - wBallMeans.y);
-        bBallSDs.velX += X_t[i].weight *
-            (X_t[i].ball.getXVelocityEst() - wBallMeans.velX)*
-            (X_t[i].ball.getXVelocityEst() - wBallMeans.velX);
-        bBallSDs.velY += X_t[i].weight *
-            (X_t[i].ball.getYVelocityEst() - wBallMeans.velY)*
-            (X_t[i].ball.getYVelocityEst() - wBallMeans.velY);
-#       endif // PER_PARTICLE
     }
 
     bSDs.x /= weightSum;
@@ -275,27 +189,9 @@ void MCL::updateEstimates()
     bSDs.h /= weightSum;
     bSDs.h = sqrt(bSDs.h);
 
-#   ifdef USE_PER_PARTICLE_EKF
-    bBallSDs.x /= weightSum;
-    bBallSDs.x = sqrt(bBallSDs.x);
-
-    bBallSDs.y /= weightSum;
-    bBallSDs.y = sqrt(bBallSDs.y);
-
-    bBallSDs.velX /= weightSum;
-    bBallSDs.velX = sqrt(bBallSDs.velX);
-
-    bBallSDs.velY /= weightSum;
-    bBallSDs.velY = sqrt(bBallSDs.velY);
-#   endif // PER_PARTICLE
-
     // Set class variables to reflect newly calculated values
     curEst = wMeans;
     curUncert = bSDs;
-#   ifdef USE_PER_PARTICLE_EKF
-    curBallEst = wBallMeans;
-    curBallUncert = bBallSDs;
-#   endif // PER_PARTICLE
 }
 
 //Helpers
@@ -450,17 +346,11 @@ Particle MCL::randomWalkParticle(Particle p)
 // Particle
 Particle::Particle(PoseEst _pose, float _weight) :
     pose(_pose), weight(_weight)
-#ifdef USE_PER_PARTICLE_EKF
-    , ball()
-#endif
 {
 }
 
 Particle::Particle(const Particle& other) :
     pose(other.pose), weight(other.weight)
-#ifdef USE_PER_PARTICLE_EKF
-    , ball(other.ball)
-#endif
 {
 }
 
