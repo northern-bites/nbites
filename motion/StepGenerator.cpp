@@ -833,9 +833,9 @@ void StepGenerator::debugLogging(){
     vector<float> bodyAngles = sensors->getBodyAngles();
     float lleg_angles[LEG_JOINTS],rleg_angles[LEG_JOINTS];
     int bi = HEAD_JOINTS+ARM_JOINTS;
-    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
+    for(unsigned int i = 0; i < LEG_JOINTS; i++, bi++)
         lleg_angles[i] = bodyAngles[bi];
-    for(uint i = 0; i < LEG_JOINTS; i++, bi++)
+    for(unsigned int i = 0; i < LEG_JOINTS; i++, bi++)
         rleg_angles[i] = bodyAngles[bi];
 
     //pick the supporting leg to decide how to calc. actual com pos
