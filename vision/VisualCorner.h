@@ -14,7 +14,7 @@ class VisualCorner;
 #include "Structs.h"
 
 
-class VisualCorner : public VisualLandmark, public VisualDetection {
+class VisualCorner : public VisualDetection, public VisualLandmark {
 private: // Constants
     // Number of pixels that must extend beyond the intersection for a line to
     // be considered a T
