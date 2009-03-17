@@ -127,7 +127,6 @@ void BallEKF::incorporateMeasurement(Measurement z,
                                      ublas::vector<float> &V_k)
 {
     if (useCartesian) {
-        std::cout << "Using not polar" << std::endl;
         // Convert our siting to cartesian coordinates
         float x_b_r = -z.distance * sin(z.bearing);
         float y_b_r = z.distance * cos(z.bearing);
@@ -186,18 +185,6 @@ void BallEKF::incorporateMeasurement(Measurement z,
         // Update the measurement covariance matrix
         R_k(0,0) = z.distanceSD;
         R_k(1,1) = z.bearingSD;
-
-        bool debugStuff = true;
-        if (debugStuff) {
-            std::cout << "Vis bearing is " << z_x(1) << std::endl;
-            std::cout << "Loc bearing is " << d_x(1) << std::endl;
-            float x_b_r = -z.distance * sin(z.bearing);
-            float y_b_r = z.distance * cos(z.bearing);
-            std::cout << "Vis (x,y) are (" << x_b_r << ", " << y_b_r << ")"
-                      << std::endl;
-            std::cout << "Loc (x,y) are (" << x_b << ", " << y_b << ")\n"
-                      << std::endl;
-        }
     }
 }
 
