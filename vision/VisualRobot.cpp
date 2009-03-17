@@ -1,10 +1,10 @@
 #include "VisualRobot.h"
-VisualRobot::VisualRobot()
+VisualRobot::VisualRobot() : VisualDetection()
 {
     init();
 }
 
-VisualRobot::VisualRobot(const VisualRobot&) {}
+VisualRobot::VisualRobot(const VisualRobot& o) : VisualDetection(o) {}
 
 // Initialization, happens every frame.
 void VisualRobot::init()

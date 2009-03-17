@@ -2,7 +2,7 @@
 using namespace std;
 
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
-    : id(_id)
+    : VisualLandmark(), VisualDetection(), id(_id)
 {
     init();
 }
@@ -15,9 +15,12 @@ VisualFieldObject::VisualFieldObject() : id(UNKNOWN_FIELD_OBJECT) {
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,
                                      const float _distance,
                                      const float _bearing)
-    : VisualDetection(_x, _y, _distance, _bearing) {
+    : VisualLandmark(), VisualDetection(_x, _y, _distance, _bearing)
+{
 }
-VisualFieldObject::VisualFieldObject(const VisualFieldObject&) {
+VisualFieldObject::VisualFieldObject(const VisualFieldObject& other) :
+    VisualLandmark(other), VisualDetection(other)
+{
 }
 
 // Initialization, happens every frame.

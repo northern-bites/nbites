@@ -1,10 +1,10 @@
 #include "VisualCrossbar.h"
-VisualCrossbar::VisualCrossbar()
+VisualCrossbar::VisualCrossbar() : VisualDetection()
 {
     init();
 }
 
-VisualCrossbar::VisualCrossbar(const VisualCrossbar&) {}
+VisualCrossbar::VisualCrossbar(const VisualCrossbar& o) : VisualDetection(o) {}
 
 // Initialization, happens every frame.
 void VisualCrossbar::init()
