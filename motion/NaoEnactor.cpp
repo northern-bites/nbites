@@ -181,7 +181,7 @@ void NaoEnactor::run() {
         commands[5][i].arraySetSize(1);
         commands[5][i][0] = 0.80;
     }
-    commands[4][0] = dcmProxy->getTime(100);
+    commands[4][0] = dcmProxy->getTime(0);
 
     //sends the hardness command to the DCM
     #ifndef NO_ACTUAL_MOTION
@@ -237,7 +237,6 @@ void NaoEnactor::run() {
         #endif
 
         postSensors();
-        const long long zero = 0;
         const long long processTime = micro_time() - currentTime;
 
         #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
@@ -246,6 +245,9 @@ void NaoEnactor::run() {
                 << processTime <<endl;
             //Don't sleep at all
         } else{
+            //might be accumulating lag here since there is a processing time
+            //involved in reaching the setAlias command, and we want to be
+            //reaching *that* every 20ms
             usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS - processTime));
         }
         #endif
