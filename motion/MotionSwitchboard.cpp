@@ -26,8 +26,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	  nextProvider(&scriptedProvider),
       curGait(NULL),
       nextGait(&DEFAULT_PARAMETERS),
-      nextJoints(Kinematics::NUM_JOINTS, 0.0f),
-      //nextJoints(sensors->getBodyAngles()),
+      nextJoints(s->getBodyAngles()),
 	  running(false),
       newJoints(false)
 {
@@ -89,10 +88,6 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 // 									bodyJoints2,
 // 									Kinematics::INTERPOLATION_LINEAR);
 
-    //We cannot read the sensor values until the run method
-    //so we must ensure that no one reads them until we get a chance
-    //to initialize them correctly
-    pthread_mutex_lock(&next_joints_mutex);
 }
 
 MotionSwitchboard::~MotionSwitchboard() {
@@ -147,20 +142,6 @@ void MotionSwitchboard::stop() {
  */
 void MotionSwitchboard::run() {
     static int fcount = 0;
-    vector<float> motionCommandAngles =sensors->getMotionBodyAngles();
-    cout << " a leg value" << motionCommandAngles[9]<<endl;
-
-    //Initialize the next_joints to the sensors' angles:
-    //Note that the mutex remains locked since the constructor,
-    //until we set these angles here, since otherwise the
-    //enactor can steal values which were calculated from zero (defualt) angles
-    //when the robot is in fact in a different position.
-    //Relies on the enactor setting the sensors in its constructor
-    //and (redundantly) on the call to postSensors in Motion:run()
-    //Kind of a hack-ish
-    nextJoints = sensors->getBodyAngles();
-
-    pthread_mutex_unlock(&next_joints_mutex);
 
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);

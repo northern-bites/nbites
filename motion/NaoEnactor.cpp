@@ -7,6 +7,17 @@ using namespace std;
 using namespace boost::assign;
 #include "NBMath.h"
 
+#include <boost/bind.hpp>
+using namespace boost;
+
+
+void staticPostSensors(NaoEnactor * n) {
+    n->postSensors();
+}
+void staticSendJoints(NaoEnactor * n) {
+    n->sendJoints();
+}
+
 NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
                         boost::shared_ptr<Sensors> s)
     : MotionEnactor(), broker(_pbroker), sensors(s),
@@ -43,6 +54,12 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
     initDCMCommands();
     initSensorBodyJoints();
     setBodyHardness(0.80f);
+
+    // connect to dcm using the static methods declared above
+    broker->getProxy("DCM")->getModule()->onPostProcess()
+        .connect(bind(staticPostSensors,this));
+    broker->getProxy("DCM")->getModule()->onPreProcess()
+        .connect(bind(staticSendJoints,this));
 }
 
 const string NaoEnactor::PositionPostFix("/Position/Actuator/Value");
@@ -175,7 +192,7 @@ void NaoEnactor::sendJoints() {
     // Send the array with a 25 ms delay. This delay removes the jitter.
     // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
     // a value in between that works though. Will look into it.
-    joint_command[4][0] = dcmProxy->getTime(25);
+    joint_command[4][0] = dcmProxy->getTime(20);
 #ifndef NO_ACTUAL_MOTION
     try {
         dcmProxy->setAlias(joint_command);
@@ -242,7 +259,7 @@ void NaoEnactor::postSensors(){
     sensors->setMotionBodyAngles(motionValues);
     syncWithALMemory();
 
-    if(switchboard != NULL){
+    if(!switchboard){
         return;
     }
     //We only want the switchboard to start calculating new joints once we've

@@ -42,6 +42,11 @@
 #endif
 
 #ifdef USE_DCM
+
+#  ifdef MAN_IS_REMOTE
+#    error "DCM not compatible with remote!!!"
+#  endif
+
 #include "NaoEnactor.h"
 typedef NaoEnactor EnactorT;
 #else
