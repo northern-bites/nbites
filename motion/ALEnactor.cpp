@@ -116,6 +116,7 @@ void ALEnactor::postSensors() {
 #ifndef OFFLINE
     syncWithALMemory();
 #endif
+
     switchboard->signalNextFrame();
 }
 

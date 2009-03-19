@@ -7,7 +7,7 @@
 using namespace std;
 using namespace boost;
 
-#define DEBUG_SWITCHBOARD
+//#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
@@ -279,7 +279,6 @@ void MotionSwitchboard::swapBodyProvider(){
         //We need to ensure we are in the correct gait before walking
         gaitSwitch = walkProvider.getGaitTransitionCommand();
         if(gaitSwitch->getDuration() >= 0.02f){
-            cout << "Switching gaits with a new command" <<endl;
             scriptedProvider.setCommand(gaitSwitch);
             curProvider = static_cast<MotionProvider * >(&scriptedProvider);
             break;
@@ -303,6 +302,7 @@ const vector <float> MotionSwitchboard::getNextJoints() {
     }
     const vector <float> vec(nextJoints);
     newJoints =false;
+
     pthread_mutex_unlock(&next_joints_mutex);
 
     return vec;

@@ -130,13 +130,13 @@ bool ChoppedCommand::isDone() {
 	bool isDone = false;
 	if (motionType == MotionConstants::BODY_JOINT){
 		for (unsigned int i = LARM_CHAIN; i <Kinematics::NUM_CHAINS ; ++i){
-			if (numChopped.at(i) > numChops)
+			if (numChopped.at(i) >= numChops)
 				isDone = true;
 			else
 				return false;
 		}
 	} else if (motionType == MotionConstants::HEAD_JOINT) {
-		if (numChopped.at(HEAD_CHAIN) > numChops)
+		if (numChopped.at(HEAD_CHAIN) >= numChops)
 			isDone = true;
 		else
 			return false;

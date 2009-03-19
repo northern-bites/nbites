@@ -67,7 +67,6 @@ public:
         motionCommandAngles = almotion->getBodyAngles();
         sensors->setMotionBodyAngles(motionCommandAngles);
         sensors->setBodyAngles(motionCommandAngles);
-        cout << " a leg value" << motionCommandAngles[9]<<endl;
 #ifndef OFFLINE
         initSyncWithALMemory();
 #endif
