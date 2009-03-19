@@ -5,7 +5,7 @@
 using namespace std;
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
-
+#include "NBMath.h"
 
 NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
                         boost::shared_ptr<Sensors> s)
@@ -38,6 +38,11 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
     } catch(AL::ALError &e){
         cout << "Failed to initialize sync with al memory"<<endl;
     }
+
+    initDCMAliases();
+    initDCMCommands();
+    initSensorBodyJoints();
+    setBodyHardness(0.80f);
 }
 
 const string NaoEnactor::PositionPostFix("/Position/Actuator/Value");
@@ -141,118 +146,63 @@ const float NaoEnactor::jointsMax[NaoEnactor::NUM_JOINTS] = {
     NaoEnactor::M2R2, NaoEnactor::M2R1, NaoEnactor::M2R1, NaoEnactor::M2R2
 };
 
-void NaoEnactor::run() {
-    std::cout << "NaoEnactor::run()" << std::endl;
-    //basically postSensors() but need a different order for the first run
-    //makes sure we have current joint values in sensors and in motionValues
 
-    //set-up the aliases for sending commands to DCM
-    ALValue positionCommandsAlias;
-    positionCommandsAlias.arraySetSize(3);
-    positionCommandsAlias[0] = string("AllActuatorPosition");
-    positionCommandsAlias[1].arraySetSize(NaoEnactor::NUM_JOINTS);
 
-    ALValue hardCommandsAlias;
-    hardCommandsAlias.arraySetSize(3);
-    hardCommandsAlias[0] = string("AllActuatorHardness");
-    hardCommandsAlias[1].arraySetSize(NaoEnactor::NUM_JOINTS);
+void NaoEnactor::sendJoints() {
 
-    for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++){
-        positionCommandsAlias[1][i] = jointsP[i];
-        hardCommandsAlias[1][i] = jointsH[i];
+    if(!switchboard){
+        cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
+        return;
     }
 
-    dcmProxy->createAlias(positionCommandsAlias);
-    dcmProxy->createAlias(hardCommandsAlias);
+    // Get the angles we want to go to this frame from the switchboard
+    motionValues = switchboard->getNextJoints();
+    // Get most current joint values possible for performing checks
+    alfastaccessJoints->GetValues(jointValues);
 
-    //set-up the array for sending commands to DCM
-    ALValue commands;
-    commands.arraySetSize(6);
-    commands[1] = string("ClearAll");
-    commands[2] = string("time-separate");
-    commands[3] = 0; //importance level
-    commands[4].arraySetSize(1); //list of time to send commands
-    commands[5].arraySetSize(NaoEnactor::NUM_JOINTS);
+    for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
+#ifdef DEBUG_ENACTOR_JOINTS
+        cout << "result of joint " << i << " is " << motionValues[i] << endl;
+#endif
+        //returns the fastest safe value if requested movement is too fast
+        joint_command[5][i][0] = SafetyCheck(jointValues[i], motionValues[i], i);
+        //may be better to use previous rounds motionValues[i] in case
+        //sensor lag occurs. we risk unsafe values if motion is impeded
+    }
 
-    //sets the hardness for all the joints
-    commands[0] = string("AllActuatorHardness");
+    //TODO setBodyHardness() when necessary
+
+    // Send the array with a 25 ms delay. This delay removes the jitter.
+    // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
+    // a value in between that works though. Will look into it.
+    joint_command[4][0] = dcmProxy->getTime(25);
+#ifndef NO_ACTUAL_MOTION
+    try {
+        dcmProxy->setAlias(joint_command);
+    } catch(AL::ALError& a) {
+        std::cout << "dcm value set error " << a.toString() << std::endl;
+    }
+#endif
+}
+
+void NaoEnactor::setBodyHardness(float hardness){
+    hardness = clip(hardness,0,1.0f);
+
+    //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
         //sets the value for hardness
-        commands[5][i].arraySetSize(1);
-        commands[5][i][0] = 0.80;
+        hardness_command[5][i].arraySetSize(1);
+        hardness_command[5][i][0] = hardness;
     }
-    commands[4][0] = dcmProxy->getTime(0);
-
-    //sends the hardness command to the DCM
-    #ifndef NO_ACTUAL_MOTION
+    hardness_command[4][0] = dcmProxy->getTime(0);
+#ifndef NO_ACTUAL_MOTION
     try {
-        dcmProxy->setAlias(commands);
+        dcmProxy->setAlias(hardness_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM Hardness set error" << a.toString() << "    "
-            << commands.toString() << std::endl;
+                  << hardness_command.toString() << std::endl;
     }
-    #endif
-
-    long long currentTime;
-    //basically postSensors() but need a different order for the first run
-    //makes sure we have current joint values in sensors and in motionValues
-    syncWithALMemory();
-    motionValues = jointValues;
-    sensors->setMotionBodyAngles(motionValues);
-    //for now we're leaving always leaving hardness the same, so we can
-    //set the alias to be for actuator position in the while loop
-    commands[0] = string("AllActuatorPosition");
-    while (running) {
-        currentTime = micro_time();
-        if(!switchboard){
-            cout<< "Caution!! Switchboard is null, exiting NaoEnactor"<<endl;
-            break;
-        }
-
-        // Get the angles we want to go to this frame from the switchboard
-        motionValues = switchboard->getNextJoints();
-        // Get most current joint values possible for performing checks
-        alfastaccessJoints->GetValues(jointValues);
-
-        for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
-            #ifdef DEBUG_ENACTOR_JOINTS
-            cout << "result of joint " << i << " is " << motionValues[i] << endl;
-            #endif
-            //returns the fastest safe value if requested movement is too fast
-            commands[5][i][0] = SafetyCheck(jointValues[i], motionValues[i], i);
-            //may be better to use previous rounds motionValues[i] in case
-            //sensor lag occurs. we risk unsafe values if motion is impeded
-        }
-
-        // Send the array with a 25 ms delay. This delay removes the jitter.
-        // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
-        // a value in between that works though. Will look into it.
-        commands[4][0] = dcmProxy->getTime(25);
-        #ifndef NO_ACTUAL_MOTION
-        try {
-            dcmProxy->setAlias(commands);
-        } catch(AL::ALError& a) {
-            std::cout << "dcm value set error " << a.toString() << std::endl;
-        }
-        #endif
-
-        postSensors();
-        const long long processTime = micro_time() - currentTime;
-
-        #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
-        if (processTime > MOTION_FRAME_LENGTH_uS){
-            cout << "Time spent in NaoEnactor longer than frame length: "
-                << processTime <<endl;
-            //Don't sleep at all
-        } else{
-            //might be accumulating lag here since there is a processing time
-            //involved in reaching the setAlias command, and we want to be
-            //reaching *that* every 20ms
-            usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS - processTime));
-        }
-        #endif
-    }
-
+#endif
 }
 
 //makes sure that we don't tell the motors to move faster than they can
@@ -291,6 +241,78 @@ void NaoEnactor::postSensors(){
     //actual joint post of the robot before any computation begins
     sensors->setMotionBodyAngles(motionValues);
     syncWithALMemory();
+
+    if(switchboard != NULL){
+        return;
+    }
+    //We only want the switchboard to start calculating new joints once we've
+    //updated the latest sensor information into Sensors
+    switchboard->signalNextFrame();
+}
+
+/**
+ * Creates the appropriate aliases with the DCM
+ */
+void NaoEnactor::initDCMAliases(){
+    ALValue positionCommandsAlias;
+    positionCommandsAlias.arraySetSize(3);
+    positionCommandsAlias[0] = string("AllActuatorPosition");
+    positionCommandsAlias[1].arraySetSize(NaoEnactor::NUM_JOINTS);
+
+    ALValue hardCommandsAlias;
+    hardCommandsAlias.arraySetSize(3);
+    hardCommandsAlias[0] = string("AllActuatorHardness");
+    hardCommandsAlias[1].arraySetSize(NaoEnactor::NUM_JOINTS);
+
+    for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++){
+        positionCommandsAlias[1][i] = jointsP[i];
+        hardCommandsAlias[1][i] = jointsH[i];
+    }
+
+    dcmProxy->createAlias(positionCommandsAlias);
+    dcmProxy->createAlias(hardCommandsAlias);
+}
+
+
+void NaoEnactor::initSensorBodyJoints(){
+    //We need to correctly initialize the value in Sensors so that
+    //motion can run based on the actual pose of the robot.
+    //This is basically postSensors() but need a different order
+    syncWithALMemory();
+    motionValues = jointValues;
+    sensors->setBodyAngles(motionValues);
+}
+
+void NaoEnactor::initDCMCommands(){
+    //set-up the array for sending hardness commands to DCM
+    //ALValue hardness_command;
+    hardness_command.arraySetSize(6);
+    hardness_command[1] = string("ClearAll");
+    hardness_command[2] = string("time-separate");
+    hardness_command[3] = 0; //importance level
+    hardness_command[4].arraySetSize(1); //list of time to send commands
+    hardness_command[5].arraySetSize(NaoEnactor::NUM_JOINTS);
+
+    //sets the hardness for all the joints
+    hardness_command[0] = string("AllActuatorHardness");
+
+
+    //set-up the array for sending commands to DCM
+    joint_command.arraySetSize(6);
+    joint_command[1] = string("ClearAll");
+    joint_command[2] = string("time-separate");
+    joint_command[3] = 0; //importance level
+    joint_command[4].arraySetSize(1); //list of time to send commands
+    joint_command[5].arraySetSize(NaoEnactor::NUM_JOINTS);
+
+    //sets the hardness for all the joints
+    joint_command[0] = string("AllActuatorPosition");
+    for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
+        //sets the value for hardness
+        joint_command[5][i].arraySetSize(1);
+        joint_command[5][i][0] = 0.80;
+    }
+
 }
 
 /**

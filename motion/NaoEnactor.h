@@ -16,7 +16,7 @@ class NaoEnactor : public MotionEnactor {
 public:
 	NaoEnactor(AL::ALPtr<AL::ALBroker> broker, boost::shared_ptr<Sensors> s);
     virtual ~NaoEnactor() { };
-    virtual void run();
+    void sendJoints();
     void postSensors();
 
 private: // Constants
@@ -46,12 +46,18 @@ private: // Members
     AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     boost::shared_ptr<Sensors> sensors;
-    vector<float> jointValues;
-    vector<float> motionValues;
+    std::vector<float> jointValues;
+    std::vector<float> motionValues;
+    AL::ALValue hardness_command;
+    AL::ALValue joint_command;
 
 private: // Helper methods
+    void setBodyHardness(float bodyHardness);
     float SafetyCheck(float,float, int);
     void initSyncWithALMemory();
+    void initDCMAliases();
+    void initSensorBodyJoints();
+    void initDCMCommands();
     void syncWithALMemory();
 
 };

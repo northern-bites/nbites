@@ -78,16 +78,9 @@ Man::Man ()
 
     // initialize core processing modules
 #ifdef USE_MOTION
-#ifdef NAOQI1
-#ifdef USE_DCM
-    enactor = shared_ptr<MotionEnactor>(new NaoEnactor(pBroker, sensors));
-#else
-    enactor = shared_ptr<MotionEnactor>(new ALEnactor(pBroker, sensors));
-#endif
-#else
-    enactor = shared_ptr<MotionEnactor>(new SimulatorEnactor(sensors));
-#endif
-    motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors));
+    enactor = shared_ptr<EnactorT>(new EnactorT(pBroker, sensors));
+    motion = shared_ptr<Motion<EnactorT> >(
+        new Motion<EnactorT>(synchro, enactor, sensors));
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));

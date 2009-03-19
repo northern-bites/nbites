@@ -24,44 +24,71 @@ using namespace boost;
 #include "synchro.h"
 #include "Motion.h"
 #include "PyMotion.h"
-#include "SimulatorEnactor.h"
+#include "NaoEnactor.h"
 
-Motion::Motion (shared_ptr<Synchro> _synchro,
-                shared_ptr<MotionEnactor> _enactor,
-                shared_ptr<Sensors> s)
+template <class EnactorType>
+Motion<EnactorType>::Motion (shared_ptr<Synchro> _synchro,
+                   shared_ptr<EnactorType> _enactor,
+                   shared_ptr<Sensors> s)
   : Thread(_synchro, "Motion"),
     switchboard(s),
     enactor(_enactor),
     interface(&switchboard)
 {
-  //Setup the callback  in the enactor so it knows to call the switchboard
-  enactor->setSwitchboard(&switchboard);
+    //Setup the callback  in the enactor so it knows to call the switchboard
+    enactor->setSwitchboard(&switchboard);
 
-  set_motion_interface(&interface);
-  c_init_motion();
+    set_motion_interface(&interface);
+    c_init_motion();
 }
 
-Motion::~Motion() {
+template <class EnactorType>
+Motion<EnactorType>::~Motion() {
     enactor->setSwitchboard(NULL);
 }
 
-int Motion::start() {
-    // Start the enactor thread
+/********* Special definition of the start method for Nao Enactor *********/
+
+template <>
+int Motion<NaoEnactor>::start() {
+    // Note: no need to call enactor->start() !
+    switchboard.start();
+
+    return Thread::start();
+}
+
+template <>
+void Motion<NaoEnactor>::stop() {
+    switchboard.stop();
+    Thread::stop();
+}
+
+
+/********* General definition of the start method for other enactors *********/
+
+template <class EnactorType>
+int Motion<EnactorType>::start() {
     enactor->start();
     switchboard.start();
 
     return Thread::start();
 }
 
-void Motion::stop() {
+template <class EnactorType>
+void Motion<EnactorType>::stop() {
     enactor->stop();
     switchboard.stop();
     Thread::stop();
 }
 
-void Motion::run(){
+template <class EnactorType>
+void Motion<EnactorType>::run(){
     cout <<"Motion::run"<<endl;
     //Ensure the lastest joint values are ready before we start the switchboard
-    enactor->postSensors();
+    cout << "Done with post Sensors" <<endl;
     switchboard.run();
 }
+
+
+template class Motion<NaoEnactor>;
+template class Motion<ALEnactor>;

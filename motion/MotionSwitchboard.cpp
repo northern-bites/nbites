@@ -7,7 +7,7 @@
 using namespace std;
 using namespace boost;
 
-//#define DEBUG_SWITCHBOARD
+#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 {1.57f,0.0f,-1.13f,-1.0f,
@@ -34,6 +34,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 
     //Allow safe access to the next joints
     pthread_mutex_init(&next_joints_mutex, NULL);
+    pthread_mutex_init(&calc_new_joints_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
 #ifdef DEBUG_JOINTS_OUTPUT
@@ -96,6 +97,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 
 MotionSwitchboard::~MotionSwitchboard() {
     pthread_mutex_destroy(&next_joints_mutex);
+    pthread_mutex_destroy(&calc_new_joints_mutex);
 #ifdef DEBUG_JOINTS_OUTPUT
     closeDebugLogs();
 #endif
@@ -126,9 +128,9 @@ void MotionSwitchboard::start() {
 void MotionSwitchboard::stop() {
     running = false;
     //signal to end waiting in the run method,
-    pthread_mutex_lock(&next_joints_mutex);
+    pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_signal(&calc_new_joints_cond);
-    pthread_mutex_unlock(&next_joints_mutex);
+    pthread_mutex_unlock(&calc_new_joints_mutex);
 }
 
 
@@ -145,17 +147,24 @@ void MotionSwitchboard::stop() {
  */
 void MotionSwitchboard::run() {
     static int fcount = 0;
+    vector<float> motionCommandAngles =sensors->getMotionBodyAngles();
+    cout << " a leg value" << motionCommandAngles[9]<<endl;
 
     //Initialize the next_joints to the sensors' angles:
     //Note that the mutex remains locked since the constructor,
     //until we set these angles here, since otherwise the
-    //enactor can steal bad values before we have a chance to
-    //correct them
+    //enactor can steal values which were calculated from zero (defualt) angles
+    //when the robot is in fact in a different position.
+    //Relies on the enactor setting the sensors in its constructor
+    //and (redundantly) on the call to postSensors in Motion:run()
     //Kind of a hack-ish
     nextJoints = sensors->getBodyAngles();
-    pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
+
     pthread_mutex_unlock(&next_joints_mutex);
 
+    pthread_mutex_lock(&calc_new_joints_mutex);
+    pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
+    pthread_mutex_unlock(&calc_new_joints_mutex);
 
     while(running) {
 
@@ -165,9 +174,9 @@ void MotionSwitchboard::run() {
         if(active)
             updateDebugLogs();
 #endif
-        pthread_mutex_lock(&next_joints_mutex);
-        pthread_cond_wait(&calc_new_joints_cond, &next_joints_mutex);
-        pthread_mutex_unlock(&next_joints_mutex);
+        pthread_mutex_lock(&calc_new_joints_mutex);
+        pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
+        pthread_mutex_unlock(&calc_new_joints_mutex);
         fcount++;
 
     }
@@ -179,9 +188,7 @@ int MotionSwitchboard::processProviders(){
 
         swapBodyProvider();
 
-#ifdef DEBUG_SWITCHBOARD
-        cout << "Switched to " << *curProvider << endl;
-#endif
+
 	}
 	if (curProvider != nextProvider && !curProvider->isStopping()){
 #ifdef DEBUG_SWITCHBOARD
@@ -272,6 +279,7 @@ void MotionSwitchboard::swapBodyProvider(){
         //We need to ensure we are in the correct gait before walking
         gaitSwitch = walkProvider.getGaitTransitionCommand();
         if(gaitSwitch->getDuration() >= 0.02f){
+            cout << "Switching gaits with a new command" <<endl;
             scriptedProvider.setCommand(gaitSwitch);
             curProvider = static_cast<MotionProvider * >(&scriptedProvider);
             break;
@@ -280,6 +288,9 @@ void MotionSwitchboard::swapBodyProvider(){
     case HEAD_PROVIDER:
     default:
         curProvider = nextProvider;
+#ifdef DEBUG_SWITCHBOARD
+        cout << "Switched to " << *curProvider << endl;
+#endif
     }
 
 }
@@ -292,11 +303,18 @@ const vector <float> MotionSwitchboard::getNextJoints() {
     }
     const vector <float> vec(nextJoints);
     newJoints =false;
-    pthread_cond_signal(&calc_new_joints_cond);
     pthread_mutex_unlock(&next_joints_mutex);
 
     return vec;
 }
+
+void MotionSwitchboard::signalNextFrame(){
+    pthread_mutex_lock(&calc_new_joints_mutex);
+    pthread_cond_signal(&calc_new_joints_cond);
+    pthread_mutex_unlock(&calc_new_joints_mutex);
+
+}
+
 #ifdef DEBUG_JOINTS_OUTPUT
 void MotionSwitchboard::initDebugLogs(){
     joints_log = fopen("/tmp/joints_log.xls","w");

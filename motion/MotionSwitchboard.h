@@ -65,6 +65,7 @@ public:
     void run();
 
 	const std::vector <float> getNextJoints();
+    void signalNextFrame();
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
 	void sendMotionCommand(const WalkCommand* command);
@@ -126,6 +127,7 @@ private:
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
+    pthread_mutex_t calc_new_joints_mutex;
     pthread_mutex_t next_joints_mutex;
 
 #ifdef DEBUG_JOINTS_OUTPUT

@@ -57,7 +57,7 @@ def gamePlaying(player):
 #                               5.0,
 #                               30.0)
 #    player.brain.motion.setGait(gait)
-    return player.goLater('walkturn')
+    return player.goLater('walkstraight')
 
 def switchGaits(player):
     pass
@@ -76,7 +76,7 @@ def walkstraight(player):
     if player.firstFrame():
         walkcmd = motion.WalkCommand(x=6,y=0,theta=0)
         player.brain.motion.setNextWalkCommand(walkcmd)
-    if player.counter == 160:
+    if player.counter == 200:
         return player.goLater('sitdown')
     return player.stay()
 

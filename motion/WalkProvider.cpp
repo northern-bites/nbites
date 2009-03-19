@@ -131,16 +131,19 @@ BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
     vector<float> * gaitJoints = nextGait->getWalkStance();
 
     float max_change = -M_PI*10.0f;
-
+    int max_index = -1;
     for(unsigned int i = 0; i < gaitJoints->size(); i++){
 
+        if (max_change < fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)))
+            max_index = i;
         max_change = fmax(max_change,
                           fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)));
     }
 
-    const float  MAX_RAD_PER_SEC =  M_PI*0.10; //Technically its 220 deg/s or so
+    const float  MAX_RAD_PER_SEC =  M_PI*0.40; //Technically its 220 deg/s or so
     float time = max_change/MAX_RAD_PER_SEC;
-
+    cout << "max change is " << max_change << " in joint" << max_index 
+         << "time is "<<time<< endl;
     //pthread_mutex_unlock(&walk_provider_mutex);
     return new BodyJointCommand(time,gaitJoints,
                                 Kinematics::INTERPOLATION_LINEAR);

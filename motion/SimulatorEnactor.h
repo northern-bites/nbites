@@ -23,16 +23,17 @@
 
 #include "almotionproxy.h"
 
-#include "MotionEnactor.h"
+#include "ThreadedMotionEnactor.h"
 
-class SimulatorEnactor : public MotionEnactor {
+class SimulatorEnactor : public ThreadedMotionEnactor {
 public:
     SimulatorEnactor(Sensors * s)
-        : MotionEnactor(),sensors(s) {};
+        : ThreadedMotionEnactor(),sensors(s) {};
     virtual ~SimulatorEnactor() { };
 
     virtual void run();
 
+    virtual void sendJoints();
     virtual void postSensors();
 
 private:

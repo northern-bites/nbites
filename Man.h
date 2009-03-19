@@ -43,8 +43,10 @@
 
 #ifdef USE_DCM
 #include "NaoEnactor.h"
+typedef NaoEnactor EnactorT;
 #else
 #include "ALEnactor.h"
+typedef ALEnactor EnactorT;
 #endif
 
 #include "Common.h"
@@ -162,8 +164,8 @@ public:
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
-    boost::shared_ptr<MotionEnactor> enactor;
-    boost::shared_ptr<Motion> motion;
+    boost::shared_ptr<EnactorT> enactor;
+    boost::shared_ptr<Motion<EnactorT> > motion;
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;

@@ -35,13 +35,13 @@
 
 #include "motionconfig.h"
 #include "Sensors.h"
-#include "MotionEnactor.h"
+#include "ThreadedMotionEnactor.h"
 
 
-class ALEnactor : public MotionEnactor {
+class ALEnactor : public ThreadedMotionEnactor {
 public:
     ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s)
-        : MotionEnactor(), broker(_pbroker), sensors(s){
+        : ThreadedMotionEnactor(), broker(_pbroker), sensors(s){
         try{
             alfastaccess =
                 AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
@@ -65,6 +65,9 @@ public:
         }
         //starting out we want to set our motion angles to the sensed position
         motionCommandAngles = almotion->getBodyAngles();
+        sensors->setMotionBodyAngles(motionCommandAngles);
+        sensors->setBodyAngles(motionCommandAngles);
+        cout << " a leg value" << motionCommandAngles[9]<<endl;
 #ifndef OFFLINE
         initSyncWithALMemory();
 #endif
@@ -72,7 +75,7 @@ public:
     virtual ~ALEnactor() { };
 
     virtual void run();
-
+    virtual void sendJoints();
     virtual void postSensors();
 
 private:

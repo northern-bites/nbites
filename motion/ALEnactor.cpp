@@ -52,22 +52,7 @@ void ALEnactor::run() {
     while (running) {
         currentTime = micro_time();
 
-        if(!switchboard){
-            cout<< "Caution!! Switchboard is null, exiting ALEnactor"<<endl;
-            break;
-        }
-        // Get the angles we want to go to this frame from the switchboard
-        motionCommandAngles = switchboard->getNextJoints();
-
-#ifdef DEBUG_ENACTOR_JOINTS
-        for (unsigned int i=0; i<motionCommandAngles.size();i++)
-            cout << "result of joint " << i << " is "
-                 << motionCommandAngles.at(i) << endl;
-#endif
-
-#ifndef NO_ACTUAL_MOTION
-        almotion->setBodyAngles(motionCommandAngles);
-#endif
+        sendJoints();
 
         //Once we've sent the most calculated joints
         postSensors();
@@ -89,6 +74,26 @@ void ALEnactor::run() {
     }
 }
 
+void ALEnactor::sendJoints(){
+    if(!switchboard){
+        cout<< "Caution!! Switchboard is null, exiting ALEnactor"<<endl;
+        return;
+    }
+    // Get the angles we want to go to this frame from the switchboard
+    motionCommandAngles = switchboard->getNextJoints();
+
+#ifdef DEBUG_ENACTOR_JOINTS
+    for (unsigned int i=0; i<motionCommandAngles.size();i++)
+        cout << "result of joint " << i << " is "
+             << motionCommandAngles.at(i) << endl;
+#endif
+
+#ifndef NO_ACTUAL_MOTION
+    almotion->setBodyAngles(motionCommandAngles);
+#endif
+
+}
+
 void ALEnactor::postSensors() {
     //At the beginning of each cycle, we need to update the sensor values
     //We also call this from the Motion run method
@@ -103,14 +108,15 @@ void ALEnactor::postSensors() {
     alAngles[Kinematics::R_HIP_YAW_PITCH] =
         alAngles[Kinematics::L_HIP_YAW_PITCH];
 
-     sensors->setBodyAngles(alAngles);
+    sensors->setBodyAngles(alAngles);
     sensors->setMotionBodyAngles(motionCommandAngles);
-    vector<float> temp = sensors->getMotionBodyAngles();
+    //vector<float> temp = sensors->getMotionBodyAngles();
     //for (int i = 2; i < 6; i++)cout << "arm angles are"<< temp[i] <<endl;
     // This call syncs all sensors values: bumpers, fsr, inertial, etc.
 #ifndef OFFLINE
     syncWithALMemory();
 #endif
+    switchboard->signalNextFrame();
 }
 
 /**

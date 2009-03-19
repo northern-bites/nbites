@@ -32,10 +32,19 @@ void SimulatorEnactor::run() {
     usleep(2*1000*1000);
 
     while (running) {
+        sendJoints();
         postSensors();
+
+        // TODO: This is probably wrong!!!!1!ONE
+        // We probably want to sleep webots time and this sleeps real time.
+        usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS));
+    }
+}
+
+void SimulatorEnactor::sendJoints(){
         if(!switchboard){
             cout<< "Caution!! Switchboard has is null, exiting ALEnactor"<<endl;
-            break;
+            return;
         }
         /*
         cout<<"Joints are : [";
@@ -54,12 +63,8 @@ void SimulatorEnactor::run() {
             MOTION_FRAME_LENGTH_S,
             AL::ALMotionProxy::INTERPOLATION_LINEAR);
 #endif
-        // TODO: This is probably wrong!!!!1!ONE
-        // We probably want to sleep webots time and this sleeps real time.
-        usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS));
-    }
-}
 
+}
 
 void SimulatorEnactor::postSensors(){
 #ifndef NAOQI1
@@ -72,4 +77,5 @@ void SimulatorEnactor::postSensors(){
     vector<float> alAngles = motionProxy->getBodyAngles();
     sensors->setBodyAngles(alAngles);
 #endif
+    switchboard->signalNextFrame();
 }
