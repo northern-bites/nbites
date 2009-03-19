@@ -14,7 +14,7 @@ if(!file.exists(file))
 dat = read.table(file,header=T,na.strings=c("-"))
 
 pdf(paste(name,"-x",PDF,sep=""))
-plot(dat$time,dat$pre_x,pch="",main="",xlab="s",ylab="mm")
+plot(dat$time,dat$sensor_zmp_x,pch="",main="",xlab="s",ylab="mm")
 names = c("com_x","pre_x","zmp_x","real_com_x","sensor_zmp_x")
 cols = c("2","3","4","5","6")
 
@@ -35,7 +35,7 @@ dev.off()
 
 
 pdf(paste(name,"-y",PDF,sep=""))
-plot(dat$time,dat$pre_y,pch="",main="",xlab="s",ylab="mm")
+plot(dat$time,dat$sensor_zmp_y,pch="",main="",xlab="s",ylab="mm")
 names = c("com_y","pre_y","zmp_y","real_com_y","sensor_zmp_y")
 cols = c("2","3","4","5","6")
 

@@ -106,8 +106,8 @@ void StepGenerator::tick_controller(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_controller" << endl;
 #endif
-/*
-    #define G 9.81
+
+    static const float G = 9.8f;
     Inertial inertial = sensors->getInertial();
 
     ufvector3 accel_c = CoordFrame3D::vector3D(inertial.accX,inertial.accY);
@@ -120,7 +120,7 @@ void StepGenerator::tick_controller(){
 
     est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/G)*accel_i(0);
     est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/G)*accel_i(1);
-*/
+
     //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();

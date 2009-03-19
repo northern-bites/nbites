@@ -385,6 +385,23 @@ void NaoEnactor::initSyncWithALMemory(){
     }
 }
 
+// for marvin!
+static const float ACCEL_CONVERSION_X = -9.8f / 50.0f;
+static const float ACCEL_CONVERSION_Y = -9.8f / 54.0f;
+static const float ACCEL_CONVERSION_Z = -9.8f / 56.0f;
+
+const float NaoEnactor::calibrate_acc_x(const float x) {
+    return x * ACCEL_CONVERSION_X;
+}
+
+const float NaoEnactor::calibrate_acc_y(const float y) {
+    return y * ACCEL_CONVERSION_Y;
+}
+
+const float NaoEnactor::calibrate_acc_z(const float z) {
+    return z * ACCEL_CONVERSION_Z;
+}
+
 void NaoEnactor::syncWithALMemory() {
     alfastaccessJoints->GetValues(jointValues);
     sensors->setBodyAngles(jointValues);
@@ -402,13 +419,32 @@ void NaoEnactor::syncWithALMemory() {
         RfrontLeft = sensorValues[4], RfrontRight = sensorValues[5],
         RrearLeft = sensorValues[6], RrearRight = sensorValues[7];
 
-    const float accX = sensorValues[8], accY = sensorValues[9],
-        accZ = sensorValues[10],
+    const float accX = calibrate_acc_x(sensorValues[8]),
+        accY = calibrate_acc_y(sensorValues[9]),
+        accZ = calibrate_acc_z(sensorValues[10]),
         gyrX = sensorValues[11], gyrY = sensorValues[12],
         angleX = sensorValues[13], angleY = sensorValues[14];
+
+    //basic accel filtering
+    static float runningAvgX[5] = {0.0f,0.0f,0.0f,0.0f,0.0f};
+    static int index = 0;
+    static float runningAvgY[5] = {0.0f,0.0f,0.0f,0.0f,0.0f};
+    static float runningAvgZ[5] = {0.0f,0.0f,0.0f,0.0f,0.0f};
+
+    runningAvgX[index] = accX;
+    runningAvgY[index] = accY;
+    runningAvgZ[index] = accZ; index = (index+1)%5;
+
+    float xSum = 0.0f;float ySum = 0.0f;float zSum = 0.0f;
+    for(int i = 0; i < 5; i++){
+        xSum+=runningAvgX[i];ySum+=runningAvgY[i];zSum+=runningAvgZ[i];
+    }
+    const float avgX = xSum * 0.2f;
+    const float avgY = ySum * 0.2f;
+    const float avgZ = zSum * 0.2f;
 
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         Inertial(accX,accY,accZ,gyrX,gyrY,angleX,angleY));
+                         Inertial(avgX,avgY,avgZ,gyrX,gyrY,angleX,angleY));
 }
