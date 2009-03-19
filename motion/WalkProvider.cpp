@@ -138,7 +138,7 @@ BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
                           fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)));
     }
 
-    const float  MAX_RAD_PER_SEC =  M_PI*0.20; //Technically its 220 deg/s or so
+    const float  MAX_RAD_PER_SEC =  M_PI*0.10; //Technically its 220 deg/s or so
     float time = max_change/MAX_RAD_PER_SEC;
 
     //pthread_mutex_unlock(&walk_provider_mutex);
