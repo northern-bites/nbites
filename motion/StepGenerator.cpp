@@ -116,7 +116,7 @@ void StepGenerator::tick_controller(){
     float tot_angle = -(angle_fc+angle_if);
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
-                            accel_c);
+                             accel_c);
 
     est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/G)*accel_i(0);
     est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/G)*accel_i(1);

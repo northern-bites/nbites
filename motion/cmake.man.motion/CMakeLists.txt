@@ -121,6 +121,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/WalkProvider
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
 		     ${MOTION_INCLUDE_DIR}/PreviewController
+		     ${MOTION_INCLUDE_DIR}/Observer
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/Kinematics
                      ${MOTION_INCLUDE_DIR}/PyMotion
