@@ -34,8 +34,8 @@
  */
 
 
-#ifndef _PreviewController_h_DEFINED
-#define _PreviewController_h_DEFINED
+#ifndef _Observer_h_DEFINED
+#define _Observer_h_DEFINED
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -92,10 +92,14 @@ private:
     static const float A_values[9];
     static const float b_values[3];
     static const float c_values[3];
+    static const float L_values[3];
+    static const float Gi;
 
     ufmatrix3 A;
     ufvector3 b;
     ufrowVector3 c;
+    ufvector3 L;
+
     float trackingError;
 };
 

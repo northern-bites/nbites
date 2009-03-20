@@ -26,6 +26,7 @@ using boost::shared_ptr;
 
 #include "StepGenerator.h"
 #include "NBMath.h"
+#include "Observer.h"
 //#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
@@ -43,8 +44,10 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),
     leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
-    controller_x(new PreviewController()),
-    controller_y(new PreviewController())
+    //controller_x(new PreviewController()),
+    //controller_y(new PreviewController())
+    controller_x(new Observer()),
+    controller_y(new Observer())
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
@@ -77,7 +80,7 @@ StepGenerator::~StepGenerator()
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     //Generate enough ZMPs so a) the controller can run
     //and                     b) there are enough steps
-    while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES) {
+    while (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES) {
         if (futureSteps.size() == 0){
             generateStep(x, y, theta); // replenish with the current walk vector
         }

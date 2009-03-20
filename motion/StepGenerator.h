@@ -86,6 +86,7 @@ using std::max;
 
 #include "Structs.h"
 #include "PreviewController.h"
+#include "Observer.h"
 #include "WalkingConstants.h"
 #include "WalkingLeg.h"
 #include "Kinematics.h"

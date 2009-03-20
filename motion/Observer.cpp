@@ -44,8 +44,15 @@ const float Observer::b_values[3] =
   0.0f,
   0.02f };
 
+const float Observer::L_values[3] =
+{ 0.069177f,
+ -0.534042f,
+ -0.326940f};
+
 const float Observer::c_values[3] =
 { 0.0f, 0.0f, 1.0f };
+
+const float Observer::Gi = -28.972f;
 
 Observer::Observer()
     : WalkController(), stateVector(ufvector3(3)),
@@ -69,6 +76,9 @@ Observer::Observer()
     for (int i=0; i < 3; i++)
         c(0,i) = c_values[i];
 
+    for (int i=0; i < 3; i++)
+        L(i) = L_values[i];
+
 #ifdef DEBUG_CONTROLLER_GAINS
     FILE * gains_log;
     gains_log = fopen("/tmp/gains_log.xls","w");
@@ -90,21 +100,24 @@ Observer::Observer()
  */
 const float Observer::tick(const list<float> *zmp_ref,
                            const float cur_zmp_ref) {
-    float control = 0.0f; // This is 'u' in mathematical notation
+    float preview_control = 0.0f;
     unsigned int counter = 0;
 
     for (list<float>::const_iterator i = zmp_ref->begin();
-         counter < NUM_PREVIEW_FRAMES; counter++, i++) {
-        control += weights[counter]* (*i);
+         counter < NUM_PREVIEW_FRAMES; ++counter, ++i) {
+        preview_control += weights[counter]* (*i);
     }
 
-    /**********        TODO: PAY ATTENTION!      ***********/
-    // We want to look at what the zmp_ref should have been this frame
-    // and that is not contained within zmp_ref. That list only contains
-    // future values.
-    //trackingError += (c * stateVector - *zmp_ref->begin() );
+    trackingError += prod(c,stateVector)(0) - cur_zmp_ref;
 
-    stateVector.assign(prod(A, stateVector) + b*control);
+    const float control = -Gi * trackingError - preview_control;
+    const float psensor = cur_zmp_ref;//TODO: make this actually use sensors
+
+    ufvector3 temp(prod(A, stateVector)
+                   - L*(psensor - prod(c,stateVector)(0))
+                   + b*control);
+    stateVector.assign(temp);
+
     return getPosition();
 }
 
