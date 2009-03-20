@@ -88,7 +88,8 @@ Observer::Observer()
  * Tick calculates the next state vector for the robot, given the zmp_ref
  *
  */
-const float Observer::tick(const list<float> *zmp_ref) {
+const float Observer::tick(const list<float> *zmp_ref,
+                           const float cur_zmp_ref) {
     float control = 0.0f; // This is 'u' in mathematical notation
     unsigned int counter = 0;
 
@@ -101,7 +102,7 @@ const float Observer::tick(const list<float> *zmp_ref) {
     // We want to look at what the zmp_ref should have been this frame
     // and that is not contained within zmp_ref. That list only contains
     // future values.
-    trackingError += (c * stateVector - *zmp_ref->begin() )
+    //trackingError += (c * stateVector - *zmp_ref->begin() );
 
     stateVector.assign(prod(A, stateVector) + b*control);
     return getPosition();

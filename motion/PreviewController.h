@@ -53,7 +53,8 @@ class PreviewController : public WalkController {
 public:
     PreviewController();
     virtual ~PreviewController(){};
-    virtual const float tick(const std::list<float> *zmp_ref);
+    virtual const float tick(const std::list<float> *zmp_ref,
+                             const float cur_zmp_ref);
     virtual const float getPosition() const { return stateVector(0); }
     virtual const float getZMP() const {return stateVector(2);}
 

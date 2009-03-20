@@ -69,6 +69,10 @@ StepGenerator::~StepGenerator()
  *    When the Future ZMP values we want run out, we pop the next future step
  *    add generated ZMP from it, and put it into the ZMPDsteps List
  *
+ *  * Ensures that there are NUM_PREVIEW_FRAMES + 1 frames in the zmp lists.
+ *    the oldest value will be popped off before the list is sent to the
+ *    controller.
+ *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     //Generate enough ZMPs so a) the controller can run
@@ -87,8 +91,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
         }
     }
-    zmp_ref_x.pop_front();
-    zmp_ref_y.pop_front();
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
 }
 
@@ -124,10 +126,18 @@ void StepGenerator::tick_controller(){
     //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
+
+    //The observer needs to know the current reference zmp
+    const float cur_zmp_ref_x =  zmp_ref_x.front();
+    const float cur_zmp_ref_y = zmp_ref_y.front();
+    //clear the oldest (i.e. current) value from the preview list
+    zmp_ref_x.pop_front();
+    zmp_ref_y.pop_front();
+
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 
-    const float com_x = controller_x->tick(zmp_ref.get<0>());
-    const float com_y = controller_y->tick(zmp_ref.get<1>());
+    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x);
+    const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y);
     com_i = CoordFrame3D::vector3D(com_x,com_y);
 
 }

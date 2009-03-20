@@ -84,7 +84,8 @@ PreviewController::PreviewController()
  * Tick calculates the next state vector for the robot, given the zmp_ref
  *
  */
-const float PreviewController::tick(const list<float> *zmp_ref) {
+const float PreviewController::tick(const list<float> *zmp_ref,
+                                    const float cur_zmp_ref) {
     float control = 0.0f; // This is 'u' in mathematical notation
     unsigned int counter = 0;
     for (list<float>::const_iterator i = zmp_ref->begin();
