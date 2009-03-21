@@ -20,7 +20,10 @@ BallEKF::BallEKF(shared_ptr<MCL> _mcl,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF(BALL_EKF_DIMENSION, BETA_BALL, GAMMA_BALL), robotLoc(_mcl)
+    : EKF<BallMeasurement, MotionModel>(BALL_EKF_DIMENSION,
+                                        BALL_MEASUREMENT_DIMENSION,
+                                        BETA_BALL,GAMMA_BALL),
+      robotLoc(_mcl)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -77,8 +80,8 @@ void BallEKF::updateModel(VisualBall * ball)
  */
 void BallEKF::sawBall(VisualBall * ball)
 {
-    Measurement m;
-    std::vector<Measurement> z;
+    BallMeasurement m;
+    std::vector<BallMeasurement> z;
 
     m.distance = ball->getDistance();
     m.bearing = ball->getBearing();
@@ -123,7 +126,7 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
  *
  * @return the measurement invariance
  */
-void BallEKF::incorporateMeasurement(Measurement z,
+void BallEKF::incorporateMeasurement(BallMeasurement z,
                                      ublas::matrix<float> &H_k,
                                      ublas::matrix<float> &R_k,
                                      ublas::vector<float> &V_k)

@@ -77,16 +77,13 @@
 #include <cstdio>
 #include <cmath>
 #include <list>
-#include <algorithm> //for max
-using std::max;
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "Structs.h"
-#include "PreviewController.h"
-#include "Observer.h"
+#include "WalkController.h"
 #include "WalkingConstants.h"
 #include "WalkingLeg.h"
 #include "Kinematics.h"

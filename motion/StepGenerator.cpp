@@ -27,6 +27,7 @@ using boost::shared_ptr;
 #include "StepGenerator.h"
 #include "NBMath.h"
 #include "Observer.h"
+#include "BasicWorldConstants.h"
 //#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
@@ -112,7 +113,6 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
-    static const float G = 9.8f;
     Inertial inertial = sensors->getInertial();
 
     ufvector3 accel_c = CoordFrame3D::vector3D(inertial.accX,inertial.accY);
@@ -123,8 +123,8 @@ void StepGenerator::tick_controller(){
                                                       tot_angle),
                              accel_c);
 
-    est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/G)*accel_i(0);
-    est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/G)*accel_i(1);
+    est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(0);
+    est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(1);
 
     //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
 

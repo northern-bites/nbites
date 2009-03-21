@@ -9,6 +9,7 @@
 #include "almemoryfastaccess.h"
 #include "Sensors.h"
 #include "NaoDef.h"
+#include "AccEKF.h"
 #include <string>
 
 class NaoEnactor : public MotionEnactor {
@@ -50,6 +51,8 @@ private: // Members
     std::vector<float> motionValues;
     AL::ALValue hardness_command;
     AL::ALValue joint_command;
+
+    AccEKF accelerationFilter;
 
 private: // Helper methods
     void setBodyHardness(float bodyHardness);

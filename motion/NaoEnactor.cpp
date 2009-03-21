@@ -10,6 +10,7 @@ using namespace boost::assign;
 #include <boost/bind.hpp>
 using namespace boost;
 
+#include "BasicWorldConstants.h"
 
 void staticPostSensors(NaoEnactor * n) {
     n->postSensors();
@@ -22,7 +23,8 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
                         boost::shared_ptr<Sensors> s)
     : MotionEnactor(), broker(_pbroker), sensors(s),
       jointValues(NUM_JOINTS,0.0f),  // current values of joints
-      motionValues(NUM_JOINTS,0.0f)  // commands sent to joints
+      motionValues(NUM_JOINTS,0.0f),  // commands sent to joints
+      accelerationFilter()
 {
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
@@ -386,9 +388,9 @@ void NaoEnactor::initSyncWithALMemory(){
 }
 
 // for marvin!
-static const float ACCEL_CONVERSION_X = -9.8f / 50.0f;
-static const float ACCEL_CONVERSION_Y = -9.8f / 54.0f;
-static const float ACCEL_CONVERSION_Z = -9.8f / 56.0f;
+static const float ACCEL_CONVERSION_X = (-GRAVITY_mss) / 50.0f;
+static const float ACCEL_CONVERSION_Y = (-GRAVITY_mss) / 54.0f;
+static const float ACCEL_CONVERSION_Z = (-GRAVITY_mss) / 56.5f;
 
 const float NaoEnactor::calibrate_acc_x(const float x) {
     return x * ACCEL_CONVERSION_X;
@@ -425,26 +427,17 @@ void NaoEnactor::syncWithALMemory() {
         gyrX = sensorValues[11], gyrY = sensorValues[12],
         angleX = sensorValues[13], angleY = sensorValues[14];
 
-    //basic accel filtering
-    static float runningAvgX[5] = {0.0f,0.0f,0.0f,0.0f,0.0f};
-    static int index = 0;
-    static float runningAvgY[5] = {0.0f,0.0f,0.0f,0.0f,0.0f};
-    static float runningAvgZ[5] = {0.0f,0.0f,0.0f,0.0f,0.0f};
+    accelerationFilter.update(accX, accY, accZ);
+    const float filteredX = accelerationFilter.getX();
+    const float filteredY = accelerationFilter.getY();
+    const float filteredZ = accelerationFilter.getZ();
 
-    runningAvgX[index] = accX;
-    runningAvgY[index] = accY;
-    runningAvgZ[index] = accZ; index = (index+1)%5;
-
-    float xSum = 0.0f;float ySum = 0.0f;float zSum = 0.0f;
-    for(int i = 0; i < 5; i++){
-        xSum+=runningAvgX[i];ySum+=runningAvgY[i];zSum+=runningAvgZ[i];
-    }
-    const float avgX = xSum * 0.2f;
-    const float avgY = ySum * 0.2f;
-    const float avgZ = zSum * 0.2f;
+    //printf("%f\t%f\t%f\n",accX,accY,accZ);
 
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         Inertial(avgX,avgY,avgZ,gyrX,gyrY,angleX,angleY));
+                         Inertial(filteredX, filteredY, filteredZ,
+                                  //Inertial(accX, accY, accZ,
+                                  gyrX, gyrY, angleX, angleY));
 }

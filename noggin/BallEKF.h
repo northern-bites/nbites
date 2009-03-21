@@ -11,12 +11,14 @@
 #include "EKF.h"
 #include "MCL.h"
 #include "VisualBall.h"
+#include "EKFStructs.h"
 
 // Parameters
 #define ASSUMED_FPS 30.0
 #define BETA_BALL 5. // How much uncertainty naturally grows per update
 #define GAMMA_BALL 0.4 // How much ball velocity should effect uncertainty
 #define BALL_EKF_DIMENSION 4 // Number of states in Ball EKF
+#define BALL_MEASUREMENT_DIMENSION 2 // Number of dimensions in a measurement
 #define CARPET_FRICTION -25 // 25 cm/s^2
 #define BALL_DECAY_PERCENT 0.25
 
@@ -46,7 +48,7 @@
  * Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
-class BallEKF : public EKF
+class BallEKF : public EKF<BallMeasurement, MotionModel>
 {
 public:
 
@@ -63,7 +65,7 @@ public:
 
     // Update functions
     void updateModel(VisualBall * ball);
-    void sawTeammateBall(Measurement m);
+    void sawTeammateBall(BallMeasurement m);
     void sawBall(VisualBall * ball);
 
     // Getters
@@ -161,7 +163,7 @@ private:
     // Core Functions
     virtual boost::numeric::ublas::vector<float> associateTimeUpdate(MotionModel
                                                                      u_k);
-    virtual void incorporateMeasurement(Measurement z,
+    virtual void incorporateMeasurement(BallMeasurement z,
                                         boost::numeric::ublas::matrix<float>
                                         &H_k,
                                         boost::numeric::ublas::matrix<float>
