@@ -1,11 +1,6 @@
 To run,
 type 'make run'. This will compile the sources, run them, and then run R on their output and generate some nice pdf graphs.
 
-NOTE: Before running, you must disable the template reference for the BallEKF at the
-end of EKF.cpp:
-
-//template class EKF<BallMeasurement, MotionModel>;
-
 Assumes that there is a tab separated csv located at
 ../../../../Desktop/accels.csv
 

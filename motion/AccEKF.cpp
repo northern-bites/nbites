@@ -63,7 +63,12 @@ ublas::vector<float> AccEKF::getGain(const ublas::vector<float> &est_error){
 
 const float scale(const float x) {
     //return .4f * std::pow(3.46572f, x);
-    return 10.0f * std::pow(x, 2) + 1.4f;
+    //return 10.0f * std::pow(x, 3.0f) + 5.4f;
+    // A bezier curve
+    return 6.73684f * std::pow(x,3) +
+        37.8947f * std::pow(x,2) +
+        -54.6316f * x +
+        20.0f;
 }
 
 void AccEKF::incorporateMeasurement(AccelMeasurement z,
@@ -71,6 +76,8 @@ void AccEKF::incorporateMeasurement(AccelMeasurement z,
                                     ublas::matrix<float> &R_k,
                                     ublas::vector<float> &V_k)
 {
+    static ublas::vector<float> last_measurement(
+        ublas::scalar_vector<float>(num_dimensions, 0.0f));
     ublas::vector<float> z_x(num_dimensions);
     z_x(0) = z.x;
     z_x(1) = z.y;
@@ -78,14 +85,19 @@ void AccEKF::incorporateMeasurement(AccelMeasurement z,
 
     V_k = z_x - xhat_k;
 
-    //The Jacobian is the identity because we don't need an ExtendKF
-    //(i.e. we assume the system is linear)
+    // The Jacobian is the identity because the observation space is the same
+    // as the state space.
     H_k(0,0) = 1.0f;
     H_k(1,1) = 1.0f;
     H_k(2,2) = 1.0f;
 
+    ublas::vector<float> instantaneousChange =
+        z_x - last_measurement;
+
     // Update the measurement covariance matrix
-    R_k(0,0) = scale(std::abs(V_k(0)));
-    R_k(1,1) = scale(std::abs(V_k(1)));
-    R_k(2,2) = scale(std::abs(V_k(2)));
+    R_k(0,0) = scale(std::abs(instantaneousChange(0)));
+    R_k(1,1) = scale(std::abs(instantaneousChange(1)));
+    R_k(2,2) = scale(std::abs(instantaneousChange(2)));
+
+    last_measurement = z_x;
 }
