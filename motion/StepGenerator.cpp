@@ -139,8 +139,10 @@ void StepGenerator::tick_controller(){
 
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 
-    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x);
-    const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y);
+    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
+                                           est_zmp_i(0));
+    const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y,
+                                           est_zmp_i(1));
     com_i = CoordFrame3D::vector3D(com_x,com_y);
 
 }

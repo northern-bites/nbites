@@ -99,7 +99,8 @@ Observer::Observer()
  *
  */
 const float Observer::tick(const list<float> *zmp_ref,
-                           const float cur_zmp_ref) {
+                           const float cur_zmp_ref,
+                           const float sensor_zmp) {
     float preview_control = 0.0f;
     unsigned int counter = 0;
 
@@ -111,10 +112,10 @@ const float Observer::tick(const list<float> *zmp_ref,
     trackingError += prod(c,stateVector)(0) - cur_zmp_ref;
 
     const float control = -Gi * trackingError - preview_control;
-    const float psensor = cur_zmp_ref;//TODO: make this actually use sensors
+    const float psensor = cur_zmp_ref; //sensor_zmp;
 
     ufvector3 temp(prod(A, stateVector)
-                   - L*(psensor - prod(c,stateVector)(0))
+                   - L*(psensor - prod(c,stateVector)(0)) * .5f
                    + b*control);
     stateVector.assign(temp);
 

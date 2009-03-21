@@ -85,7 +85,8 @@ PreviewController::PreviewController()
  *
  */
 const float PreviewController::tick(const list<float> *zmp_ref,
-                                    const float cur_zmp_ref) {
+                                    const float cur_zmp_ref,
+                                    const float sensor_zmp) {
     float control = 0.0f; // This is 'u' in mathematical notation
     unsigned int counter = 0;
     for (list<float>::const_iterator i = zmp_ref->begin();
