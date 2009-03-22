@@ -5,7 +5,7 @@
 using namespace boost::numeric;
 
 const int AccEKF::num_dimensions = 3;
-const float AccEKF::beta = 1.0f;
+const float AccEKF::beta = 3.f;
 const float AccEKF::gamma = .2f;
 const float AccEKF::variance  = 0.22f;
 //const float AccEKF::variance  = 100.00f;
@@ -65,10 +65,44 @@ const float scale(const float x) {
     //return .4f * std::pow(3.46572f, x);
     //return 10.0f * std::pow(x, 3.0f) + 5.4f;
     // A bezier curve
+    //return 6.73684f * std::pow(x,3) +
+    //    37.8947f * std::pow(x,2) +
+    //    -54.6316f * x +
+    //    20.0f;
+
+/*
     return 6.73684f * std::pow(x,3) +
-        37.8947f * std::pow(x,2) +
-        -54.6316f * x +
-        20.0f;
+       37.8947f * std::pow(x,2) +
+       -54.6316f * x +
+       70.0f;
+*/
+    //return 80 - 79 * std::exp( - .36f * std::pow( - 2.5f + x , 2));
+
+    if (x > 9.0f)
+        return 400.0f;
+    else
+        return 80 - 79 * std::exp( - .25f * std::pow( - 2.7f + x , 2));
+
+}
+
+const float getVariance(float delta, float divergence) {
+    delta = std::abs(delta);
+    divergence = std::abs(divergence);
+
+    const float big = 3.5f;
+    const float small = 1.0f;
+    const float trust = .2f;
+    const float dont_trust = 1000.0f;
+
+    if (delta > big && divergence < small) {
+        return trust;
+    }
+
+    if (delta < small && divergence < small) {
+        return trust;
+    }
+
+    return dont_trust;
 }
 
 void AccEKF::incorporateMeasurement(AccelMeasurement z,
@@ -83,7 +117,7 @@ void AccEKF::incorporateMeasurement(AccelMeasurement z,
     z_x(1) = z.y;
     z_x(2) = z.z; // hahahha
 
-    V_k = z_x - xhat_k;
+    V_k = z_x - xhat_k; // divergence
 
     // The Jacobian is the identity because the observation space is the same
     // as the state space.
@@ -91,13 +125,20 @@ void AccEKF::incorporateMeasurement(AccelMeasurement z,
     H_k(1,1) = 1.0f;
     H_k(2,2) = 1.0f;
 
-    ublas::vector<float> instantaneousChange =
+    ublas::vector<float> deltaS =
         z_x - last_measurement;
 
+/*
+    R_k(0,0) = getVariance(deltaS(0), V_k(0));
+    R_k(1,1) = getVariance(deltaS(1), V_k(1));
+    R_k(2,2) = getVariance(deltaS(2), V_k(2));
+
+*/
+
     // Update the measurement covariance matrix
-    R_k(0,0) = scale(std::abs(instantaneousChange(0)));
-    R_k(1,1) = scale(std::abs(instantaneousChange(1)));
-    R_k(2,2) = scale(std::abs(instantaneousChange(2)));
+    R_k(0,0) = scale(std::abs(deltaS(0)));
+    R_k(1,1) = scale(std::abs(deltaS(1)));
+    R_k(2,2) = scale(std::abs(deltaS(2)));
 
     last_measurement = z_x;
 }
