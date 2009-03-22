@@ -22,7 +22,6 @@
 #define _ChopShop_h_DEFINED
 
 #include <vector>
-#include <queue>
 #include <boost/shared_ptr.hpp>
 
 #include "Sensors.h"
@@ -31,14 +30,10 @@
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
 
-using std::queue;
-using std::vector;
-using boost::shared_ptr;
-
 class ChopShop
 {
 public:
-	ChopShop(shared_ptr<Sensors> s, float motionFrameLength);
+	ChopShop(boost::shared_ptr<Sensors> s, float motionFrameLength);
 
 	ChoppedCommand * chopCommand(const JointCommand *command);
 
@@ -47,24 +42,24 @@ private:
 	// Next: vector for each choppped move (holding each chain,
 	// instead of just holding the joint values in a row)
 	// Outside: vector to hold all the chopped moves
-	shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Sensors> sensors;
 	float FRAME_LENGTH_S;
 
 // 	ChoppedCommand * chopSmooth(const JointCommand *command);
 	ChoppedCommand * chopLinear(const JointCommand *command);
 
-	vector<float> getCurrentJoints();
-	vector<float> getFinalJoints(const JointCommand *command,
-								 vector<float> *currentJoints);
+	std::vector<float> getCurrentJoints();
+	std::vector<float> getFinalJoints(const JointCommand *command,
+                                      std::vector<float> *currentJoints);
 
-	vector<float> getDiffPerChop(int numChops,
-								 vector<float> *current,
-								 vector<float> *final);
-	void vectorToRad(vector<float> *vect);
+	std::vector<float> getDiffPerChop(int numChops,
+                                      std::vector<float> *current,
+                                      std::vector<float> *final);
+	void vectorToRad(std::vector<float> *vect);
 
 	ChoppedCommand * buildChops(int numChops,
-								vector<float> *currentJoints,
-								vector<float> *diffPerChop,
+								std::vector<float> *currentJoints,
+								std::vector<float> *diffPerChop,
 								const JointCommand *command);
 };
 

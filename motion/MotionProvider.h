@@ -32,10 +32,8 @@
 #include <vector>
 #include <string>
 #include "MotionCommand.h"
-using namespace std;
 
 #include "Kinematics.h"
-using Kinematics::ChainID;
 
 enum ProviderType{
     SCRIPTED_PROVIDER,
@@ -75,11 +73,13 @@ public:
     const bool isActive() const { return _active; }
     const bool isStopping() const {return _stopping;}
     virtual void calculateNextJoints() = 0;
-    std::vector<float> getChainJoints(const ChainID id){return nextJoints[id];}
+    std::vector<float> getChainJoints(const Kinematics::ChainID id) {
+        return nextJoints[id];
+    }
     const std::string getName(){return provider_name;}
     const ProviderType getType(){return provider_type;}
 protected:
-    void setNextChainJoints(const ChainID id,
+    void setNextChainJoints(const Kinematics::ChainID id,
                             const std::vector <float> &chainJoints) {
         nextJoints[id] = chainJoints;
     }

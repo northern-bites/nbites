@@ -9,8 +9,6 @@
 #include <iomanip> // setprecision for cout
 #include <boost/shared_ptr.hpp>
 
-using namespace std;
-
 
 class FieldLines;
 
@@ -76,7 +74,7 @@ struct linePoint;
 
 // functor that returns true if the line passed in is used in the creation
 // of the corner, false otherwise
-class lineInCorner : public unary_function<VisualLine, bool> {
+class lineInCorner : public std::unary_function<VisualLine, bool> {
     VisualCorner c;
 public:
     explicit lineInCorner(const VisualCorner& _c) : c(_c) { }
@@ -113,7 +111,7 @@ static const int JOIN_LINES_BOX_COLOR = PINK;
 static const Rectangle SCREEN = {0, IMAGE_WIDTH - 1,
                                  0, IMAGE_HEIGHT - 1};
 // More succinct.
-typedef list<linePoint>::iterator linePointNode;
+typedef std::list<linePoint>::iterator linePointNode;
 
 class FieldLines {
 private:
@@ -319,7 +317,7 @@ public:
     // bottom of the image and scan up for points.
     // @param vertLinePoints - the vector to fill with all points found in
     // the scan
-    void findVerticalLinePoints(vector<linePoint> &vertLinePoints);
+    void findVerticalLinePoints(std::vector<linePoint> &vertLinePoints);
 
     // This method populates the points vector with line points it finds in
     // the image.  A line point ideally occurs in the middle of a line on the
@@ -332,30 +330,30 @@ public:
     // the image and scan to the right to find these points
     // @param horLinePoints - the vector to fill with all points found in
     // the scan
-    void findHorizontalLinePoints(vector<linePoint> &horLinePoints);
+    void findHorizontalLinePoints(std::vector<linePoint> &horLinePoints);
 
     // Attempts to create lines out of a list of linePoints.  In order for points
     // to be fit onto a line, they must pass a battery of sanity checks
-    vector<VisualLine> createLines(list<linePoint> &linePoints);
+    std::vector<VisualLine> createLines(std::list<linePoint> &linePoints);
 
     // Attempts to fit the left over points that were not used within the
     // createLines function to the lines that were output from said function
-    void fitUnusedPoints(vector<VisualLine> &lines,
-                         list<linePoint> &remainingPoints);
+    void fitUnusedPoints(std::vector<VisualLine> &lines,
+                         std::list<linePoint> &remainingPoints);
 
     // Attempts to join together line segments that are logically part of one
     // longer line but for some reason were not grouped within the groupPoints
     // method.  This can often happen when there is an obstruction that obscures
     // part of the line; due to x offset sanity checks, points that are too far
     // apart are not allowed to be within the same line in createLines.
-    void joinLines(vector<VisualLine> &lines);
+    void joinLines(std::vector<VisualLine> &lines);
 
     // Copies the data from line1 and 2 into a new single line.
     const VisualLine mergeLines(const VisualLine &line1, const VisualLine &line2);
 
     // Given a vector of lines, attempts to extend the near vertical ones to the
     // top and bottom, and the more horizontal ones to the left and right
-    void extendLines(vector<VisualLine> &lines);
+    void extendLines(std::vector<VisualLine> &lines);
 
     // Helper method that returns true if the color is one we consider to be
     // a line color
@@ -399,7 +397,7 @@ public:
     // @return a vector of VisualCorners created from the intersection points that
     // successfully pass all sanity checks.
     //
-    list<VisualCorner> intersectLines(vector<VisualLine> &lines);
+    std::list<VisualCorner> intersectLines(std::vector<VisualLine> &lines);
 
     // AIBOSPECIFIC:
     // Determines from the lines and corners found on the screen whether the
@@ -407,18 +405,18 @@ public:
     // in the robot's camera prevent us from seeing more than a certain number
     // of lines when legitimately seeing lines and intersections in order to
     // screen out cases where we see too many (like at the center circle).
-    const bool probablyAtCenterCircle(vector<VisualLine> &lines,
-                                      list<VisualCorner> &corners);
+    const bool probablyAtCenterCircle(std::vector<VisualLine> &lines,
+                                      std::list<VisualCorner> &corners);
 
     // Iterates over the corners and removes those that are too risky to
     // use for localization data
     void removeRiskyCorners(//vector<VisualLine> &lines,
-        list<VisualCorner> &corners);
+        std::list<VisualCorner> &corners);
 
     // This one is in addition to the first one but runs after
     // ObjectFragments because it needs field objects to be detected.
-    const bool probablyAtCenterCircle2(vector<VisualLine> &lines,
-                                       list<VisualCorner> &corners);
+    const bool probablyAtCenterCircle2(std::vector<VisualLine> &lines,
+                                       std::list<VisualCorner> &corners);
 
 
 
@@ -429,7 +427,7 @@ public:
     // Modifies the corners passed in by calling the setPossibleCorners method;
     // in certain cases the shape of a corner might be switched too (if an L
     // corner is determined to be a T instead, its shape is changed accordingly).
-    void identifyCorners(list<VisualCorner> &corners);
+    void identifyCorners(std::list<VisualCorner> &corners);
 
     const bool nearGoalTCornerLocation(const VisualCorner& corner,
                                        const VisualFieldObject * post) const;
@@ -446,20 +444,20 @@ public:
     const bool LWorksWithPost(const VisualCorner& c,
                               const VisualFieldObject * post) const;
 
-    void identifyGoalieCorners(list<VisualCorner> &corners);
+    void identifyGoalieCorners(std::list<VisualCorner> &corners);
 
     void printFieldObjectsInformation();
 
     // Helper method that iterates over a list of ConcreteCorner pointers and
     // prints their string representations
-    void printPossibilities(const list <const ConcreteCorner*> &list) const;
+    void printPossibilities(const std::list <const ConcreteCorner*> &list) const;
 
     // Last sanity checks before localization gets the IDs.  Uses the information
     // about what is visible on the screen to throw out corners that could not
     // be visible.
     void eliminateImpossibleIDs(VisualCorner &c,
-                                vector <const VisualFieldObject*>& visibleObjects,
-                                list <const ConcreteCorner*>& possibleClassifications);
+                                std::vector <const VisualFieldObject*>& visibleObjects,
+                                std::list <const ConcreteCorner*>& possibleClassifications);
 
     int numPixelsToHitColor(const int x, const int y, const int colors[],
                             const int numColors, const TestDirection testDir) const;
@@ -490,11 +488,11 @@ public:
                             const int intersectX,
                             const int intersectY) const;
 
-    list <const ConcreteCorner*>
+    std::list <const ConcreteCorner*>
     getPossibleClassifications(const VisualCorner &corner,
-                               const vector <const VisualFieldObject*>
+                               const std::vector <const VisualFieldObject*>
                                &visibleObjects,
-                               const list <const ConcreteCorner*>
+                               const std::list <const ConcreteCorner*>
                                &concreteCorners) const;
 
 
@@ -511,7 +509,7 @@ public:
       bool isOutOfBoundsT(corner &t, int i);
     */
 
-    const bool dupeCorner(const list<VisualCorner> &corners, const int x, const int y, const int testNumber) const;
+    const bool dupeCorner(const std::list<VisualCorner> &corners, const int x, const int y, const int testNumber) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
                              const int color, const int numPixels) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
@@ -562,9 +560,9 @@ public:
     void drawFieldLine(const VisualLine &_line, const int color) const;
 
     void drawLinePoint(const linePoint &p, const int color) const;
-    void drawLinePoints(const list<linePointNode> &toDraw) const;
-    void drawLinePoints(const list<linePoint> &toDraw) const;
-    void drawCorners(const list<VisualCorner> &toDraw, int color);
+    void drawLinePoints(const std::list<linePointNode> &toDraw) const;
+    void drawLinePoints(const std::list<linePoint> &toDraw) const;
+    void drawCorners(const std::list<VisualCorner> &toDraw, int color);
 
     bool isLegitVerticalLinePoint(int x, int y);
 #ifdef OFFLINE
@@ -616,10 +614,10 @@ public:
     const bool getStandardView() { return standardView; }
 #endif
 
-    const vector <VisualLine>* getLines() const { return &linesList; }
-    const list <VisualCorner>* getCorners() const {return &cornersList; }
+    const std::vector <VisualLine>* getLines() const { return &linesList; }
+    const std::list <VisualCorner>* getCorners() const {return &cornersList; }
     const int getNumCorners() { return cornersList.size(); }
-    const list<linePoint>* getUnusedPoints() const { return &unusedPointsList; }
+    const std::list<linePoint>* getUnusedPoints() const { return &unusedPointsList; }
 
     // Returns true if the line segment drawn between first and second
     // intersects any field line on the screen; false otherwise
@@ -646,7 +644,7 @@ private:
 
     // Determines which field objects are visible on the screen and returns
     // a vector of the pointers of the objects that are visible.
-    vector<const VisualFieldObject*> getVisibleFieldObjects() const;
+    std::vector<const VisualFieldObject*> getVisibleFieldObjects() const;
 
     // Returns whether there is a yellow post on screen that vision has not
     // identified the side of
@@ -743,9 +741,9 @@ private:
     Vision *vision;
     boost::shared_ptr<NaoPose> pose;
 
-    vector <VisualLine> linesList;
-    list <VisualCorner> cornersList;
-    list <linePoint> unusedPointsList;
+    std::vector <VisualLine> linesList;
+    std::list <VisualCorner> cornersList;
+    std::list <linePoint> unusedPointsList;
 
     long timeInFindVerticalLinePoints, timeInFindHorizontalLinePoints,
         timeInSort, timeInMerge, timeInCreateLines, timeInExtendLines,

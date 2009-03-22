@@ -41,7 +41,7 @@ public:
     void requestStopFirstInstance();
     void calculateNextJoints();
 
-	void enqueueSequence(vector<HeadJointCommand*> &seq);
+	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
 	void setCommand(const SetHeadCommand* command);
 	void setCommand(const HeadJointCommand* command);
 

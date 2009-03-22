@@ -21,10 +21,8 @@
 
 #ifndef ObjectFragments_h_DEFINED
 #define ObjectFragments_h_DEFINED
-using namespace std;
 
 #include <stdlib.h>
-#include <vector>
 
 #include "Common.h"
 #include "ifdefs.h"

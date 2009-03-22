@@ -24,7 +24,6 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "Kinematics.h"
-using namespace Kinematics;
 
 #include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
 
@@ -98,17 +97,17 @@ struct WalkLegsResult{
 struct LegConstants{
     float hipOffsetY;
     float hipOffsetZ;
-    ChainID leg;
-    LegConstants(const ChainID _leg){
+    Kinematics::ChainID leg;
+    LegConstants(const Kinematics::ChainID _leg){
         leg = _leg;
         switch(leg){
-        case LLEG_CHAIN:
-            hipOffsetY = HIP_OFFSET_Y;
-            hipOffsetZ = -HIP_OFFSET_Z;
+        case Kinematics::LLEG_CHAIN:
+            hipOffsetY = Kinematics::HIP_OFFSET_Y;
+            hipOffsetZ = -Kinematics::HIP_OFFSET_Z;
             break;
-        case RLEG_CHAIN:
-            hipOffsetY = -HIP_OFFSET_Y;
-            hipOffsetZ = -HIP_OFFSET_Z;
+        case Kinematics::RLEG_CHAIN:
+            hipOffsetY = -Kinematics::HIP_OFFSET_Y;
+            hipOffsetZ = -Kinematics::HIP_OFFSET_Z;
             break;
         default:
             throw "Invalid ChainID passed to LegConstants in WalkingConstants";
@@ -185,32 +184,42 @@ public:
         //calculate the walking stance of the robot
         const float z = bodyHeight;
         const float x = hipOffsetX;
-        const float ly = HIP_OFFSET_Y;
-        const float ry = -HIP_OFFSET_Y;
+        const float ly = Kinematics::HIP_OFFSET_Y;
+        const float ry = -Kinematics::HIP_OFFSET_Y;
 
 
         //just assume we start at zero
-        float zeroJoints[LEG_JOINTS] = {0.0f,0.0f,0.0f,
-                                        0.0f,0.0f,0.0f};
+        float zeroJoints[Kinematics::LEG_JOINTS] = {0.0f,0.0f,0.0f,
+                                                    0.0f,0.0f,0.0f};
         //Use inverse kinematics to find the left leg angles
-        ufvector3 lgoal = ufvector3(3);
+        NBMath::ufvector3 lgoal = NBMath::ufvector3(3);
         lgoal(0)=-x; lgoal(1) = ly; lgoal(2) = -z;
-        IKLegResult lresult = Kinematics::dls(LLEG_CHAIN,lgoal,zeroJoints);
-        std::vector<float> lleg_angles(lresult.angles, lresult.angles + LEG_JOINTS);
+        Kinematics::IKLegResult lresult =
+            Kinematics::dls(Kinematics::LLEG_CHAIN,
+                            lgoal, zeroJoints);
+        std::vector<float> lleg_angles(lresult.angles,
+                                       lresult.angles +
+                                       Kinematics::LEG_JOINTS);
 
         //Use inverse kinematics to find the right leg angles
-        ufvector3 rgoal = ufvector3(3);
+        NBMath::ufvector3 rgoal = NBMath::ufvector3(3);
         rgoal(0)=-x; rgoal(1) = ry; rgoal(2) = -z;
-        IKLegResult rresult = Kinematics::dls(RLEG_CHAIN,rgoal,zeroJoints);
-        std::vector<float> rleg_angles(rresult.angles, rresult.angles + LEG_JOINTS);
+        Kinematics::IKLegResult rresult =
+            Kinematics::dls(Kinematics::RLEG_CHAIN,
+                            rgoal, zeroJoints);
+        std::vector<float> rleg_angles(rresult.angles,
+                                       rresult.angles +
+                                       Kinematics::LEG_JOINTS);
 
         std::vector<float> * allJoints = new std::vector<float>();
 
         //Make up something arbitrary for the arms
-        const float larm[ARM_JOINTS] = {M_PI/2,M_PI/10, -M_PI/2,-M_PI/2};
-        const float rarm[ARM_JOINTS] = {M_PI/2,-M_PI/10,M_PI/2,M_PI/2};
-        const std::vector<float>larm_angles(larm,larm+ARM_JOINTS);
-        const std::vector<float>rarm_angles(rarm,rarm+ARM_JOINTS);
+        const float larm[Kinematics::ARM_JOINTS] =
+            {M_PI/2,M_PI/10, -M_PI/2,-M_PI/2};
+        const float rarm[Kinematics::ARM_JOINTS] =
+            {M_PI/2,-M_PI/10,M_PI/2,M_PI/2};
+        const std::vector<float>larm_angles(larm,larm+Kinematics::ARM_JOINTS);
+        const std::vector<float>rarm_angles(rarm,rarm+Kinematics::ARM_JOINTS);
         //now combine all the vectors together
         allJoints->insert(allJoints->end(),larm_angles.begin(),larm_angles.end());
         allJoints->insert(allJoints->end(),lleg_angles.begin(),lleg_angles.end());

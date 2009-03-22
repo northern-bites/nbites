@@ -119,7 +119,7 @@ private:
 	BodyJointCommand *command;
 	BodyJointCommand *command2;
 	BodyJointCommand *command3;
-    static const float sitDownAngles[NUM_BODY_JOINTS];
+    static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];
 
 	BodyJointCommand *getUp;
 	BodyJointCommand *sitDown;

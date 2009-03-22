@@ -19,9 +19,9 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "ChoppedCommand.h"
+using namespace std;
 
-
-using Kinematics::chain_lengths;
+using namespace Kinematics;
 
 ChoppedCommand::ChoppedCommand(vector<float> *first,
 							   vector<float> *diffs,

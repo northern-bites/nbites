@@ -100,13 +100,10 @@
 #include <boost/numeric/ublas/fwd.hpp>             // for matrix_column
 #include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
 #include <boost/numeric/ublas/io.hpp>              // for cout
-using namespace boost::numeric;
 
 #include "Common.h"             // For ROUND
 #include "VisionDef.h"          // For camera parameters
 #include "Kinematics.h"         // For physical body parameters
-
-using namespace Kinematics;
 
 #include "Sensors.h"
 #include "Structs.h"
@@ -115,105 +112,108 @@ using namespace Kinematics;
  *  *****************   Various constants follow   **********************
  */
 
-using namespace std;
 
 // CONSTANTS
 
 struct mDHParam{
-  float xRot; //xRot
-  float xTrans; //xTrans
-  float zRot; //zRot
-  float zTrans; //zTrans
+    float xRot; //xRot
+    float xTrans; //xTrans
+    float zRot; //zRot
+    float zTrans; //zTrans
 
 };
 
 class NaoPose {
- protected: // Constants
-  static const float IMAGE_WIDTH_MM;
-  static const float IMAGE_HEIGHT_MM;
-  static const float FOCAL_LENGTH_MM;
-  static const float MM_TO_PIX_X;
-  static const float MM_TO_PIX_Y;
-  static const float PIX_X_TO_MM;
-  static const float PIX_Y_TO_MM;
-  static const float IMAGE_CENTER_X;
-  static const float IMAGE_CENTER_Y;
+protected: // Constants
+    static const float IMAGE_WIDTH_MM;
+    static const float IMAGE_HEIGHT_MM;
+    static const float FOCAL_LENGTH_MM;
+    static const float MM_TO_PIX_X;
+    static const float MM_TO_PIX_Y;
+    static const float PIX_X_TO_MM;
+    static const float PIX_Y_TO_MM;
+    static const float IMAGE_CENTER_X;
+    static const float IMAGE_CENTER_Y;
 
-  static const float PIX_TO_RAD_X;
-  static const float PIX_TO_RAD_Y;
+    static const float PIX_TO_RAD_X;
+    static const float PIX_TO_RAD_Y;
 
-  static const estimate NULL_ESTIMATE;
+    static const estimate NULL_ESTIMATE;
 
-  static const float INFTY;
-  // Screen edge coordinates in the camera coordinate frame.
-  static const ublas::vector <float> topLeft, bottomLeft, topRight, bottomRight;
+    static const float INFTY;
+    // Screen edge coordinates in the camera coordinate frame.
+    static const boost::numeric::ublas::vector <float> topLeft, bottomLeft, topRight, bottomRight;
 
-  // We use this to access the x,y,z components of vectors
-  enum Cardinal {
-    X = 0,
-    Y = 1,
-    Z = 2
-  };
+    // We use this to access the x,y,z components of vectors
+    enum Cardinal {
+        X = 0,
+        Y = 1,
+        Z = 2
+    };
 
- public:
-  NaoPose(boost::shared_ptr<Sensors> s);
-  ~NaoPose() { }
+public:
+    NaoPose(boost::shared_ptr<Sensors> s);
+    ~NaoPose() { }
 
-  /********** Core Methods **********/
-  void transform ();
+    /********** Core Methods **********/
+    void transform ();
 
-  const estimate pixEstimate(const int pixelX, const int pixelY,
-				     const float objectHeight);
-  const estimate bodyEstimate(const int x, const int y, const float dist);
+    const estimate pixEstimate(const int pixelX, const int pixelY,
+                               const float objectHeight);
+    const estimate bodyEstimate(const int x, const int y, const float dist);
 
-  /********** Getters **********/
-  const int getHorizonY(const int x) const;
-  const int getHorizonX(const int y) const;
-  const point <int> getLeftHorizon() const { return horizonLeft; }
-  const point <int> getRightHorizon() const { return horizonRight; }
-  const int getLeftHorizonY() const { return horizonLeft.y; }
-  const int getRightHorizonY() const { return horizonRight.y; }
-  const float getHorizonSlope() const { return horizonSlope; }
-  const float getPerpenSlope() const { return perpenHorizonSlope; }
+    /********** Getters **********/
+    const int getHorizonY(const int x) const;
+    const int getHorizonX(const int y) const;
+    const point <int> getLeftHorizon() const { return horizonLeft; }
+    const point <int> getRightHorizon() const { return horizonRight; }
+    const int getLeftHorizonY() const { return horizonLeft.y; }
+    const int getRightHorizonY() const { return horizonRight.y; }
+    const float getHorizonSlope() const { return horizonSlope; }
+    const float getPerpenSlope() const { return perpenHorizonSlope; }
     const float pixHeightToDistance(float pixHeight, float cmHeight) const;
     const float pixWidthToDistance(float pixWidth, float cmWidth) const;
- protected: // helper methods
-  static const ublas::matrix <float>
-    calculateForwardTransform(const ChainID id,
-			      const std::vector <float> &angles);
-  static const ublas::vector <float> calcFocalPointInBodyFrame();
+protected: // helper methods
+    static const boost::numeric::ublas::matrix <float>
+      calculateForwardTransform(const Kinematics::ChainID id,
+                              const std::vector <float> &angles);
+    static const boost::numeric::ublas::vector <float>
+      calcFocalPointInBodyFrame();
 
-  void calcImageHorizonLine();
-  // This method solves a system of linear equations and return a 3-d vector
-  // in homogeneous coordinates representing the point of intersection
-  static ublas::vector <float>
-    intersectLineWithXYPlane(const std::vector<ublas::vector <float> > &aLine);
-  // In homogeneous coordinates, get the length of a n-dimensional vector.
-  static const float getHomLength(const ublas::vector <float> &vec);
-  // takes in two sides of a triangle, returns hypotenuse
+    void calcImageHorizonLine();
+    // This method solves a system of linear equations and return a 3-d vector
+    // in homogeneous coordinates representing the point of intersection
+    static boost::numeric::ublas::vector <float>
+      intersectLineWithXYPlane(const std::vector<
+                               boost::numeric::ublas::vector <float> > &aLine);
+    // In homogeneous coordinates, get the length of a n-dimensional vector.
+    static const float
+      getHomLength(const boost::numeric::ublas::vector <float> &vec);
 
-  static const double getHypotenuse(const float x, const float y) {
-    return sqrt(x*x + y*y);
-  }
+    // takes in two sides of a triangle, returns hypotenuse
+    static const double getHypotenuse(const float x, const float y) {
+        return sqrt(x*x + y*y);
+    }
 
-  //returns an 'estimate' object for a homogeneous vector pointing to an
-  //object in the world frame
-  static estimate getEstimate(ublas::vector <float> objInWorldFrame);
+    //returns an 'estimate' object for a homogeneous vector pointing to an
+    //object in the world frame
+    static estimate getEstimate(boost::numeric::ublas::vector <float> objInWorldFrame);
 
- protected: // members
-  boost::shared_ptr<Sensors> sensors;
-  point <int> horizonLeft, horizonRight;
-  float horizonSlope,perpenHorizonSlope;;
-  point3 <float> focalPointInWorldFrame;
-  float comHeight; // center of mass height in mm
-  // In this array we hold the matrix transformation which takes us from the
-  // originn to the end of each chain of the body.
-  ublas::matrix <float> forwardTransforms[NUM_CHAINS];
-  // World frame is defined as the coordinate frame centered at the center of
-  // mass and parallel to the ground plane.
-  ublas::matrix <float> cameraToWorldFrame;
-  // Current hack for better beraing est
-  ublas::matrix <float> cameraToBodyTransform;
+protected: // members
+    boost::shared_ptr<Sensors> sensors;
+    point <int> horizonLeft, horizonRight;
+    float horizonSlope,perpenHorizonSlope;;
+    point3 <float> focalPointInWorldFrame;
+    float comHeight; // center of mass height in mm
+    // In this array we hold the matrix transformation which takes us from the
+    // originn to the end of each chain of the body.
+    boost::numeric::ublas::matrix <float>
+      forwardTransforms[Kinematics::NUM_CHAINS];
+    // World frame is defined as the coordinate frame centered at the center of
+    // mass and parallel to the ground plane.
+    boost::numeric::ublas::matrix <float> cameraToWorldFrame;
+    // Current hack for better beraing est
+    boost::numeric::ublas::matrix <float> cameraToBodyTransform;
 };
 
 #endif

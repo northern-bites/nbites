@@ -23,8 +23,9 @@ using boost::shared_ptr;
 
 #include "Sensors.h"
 #include "WalkProvider.h"
-using Kinematics::LLEG_CHAIN;
-using Kinematics::RLEG_CHAIN;
+using namespace std;
+
+using namespace Kinematics;
 
 WalkProvider::WalkProvider(shared_ptr<Sensors> s)
     : MotionProvider(WALK_PROVIDER),
@@ -126,7 +127,6 @@ void WalkProvider::setActive(){
 }
 
 BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
-    //pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = nextGait->getWalkStance();
 
@@ -143,9 +143,7 @@ BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
     // this is the max we allow, not the max the hardware can do
     const float  MAX_RAD_PER_SEC =  M_PI*0.15;
     float time = max_change/MAX_RAD_PER_SEC;
-    cout << "max change is " << max_change << " in joint" << max_index 
-         << "time is "<<time<< endl;
-    //pthread_mutex_unlock(&walk_provider_mutex);
+
     return new BodyJointCommand(time,gaitJoints,
                                 Kinematics::INTERPOLATION_LINEAR);
 }

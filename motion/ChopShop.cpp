@@ -24,6 +24,10 @@
 
 using namespace std;
 
+using namespace boost;
+
+using namespace Kinematics;
+
 ChopShop::ChopShop (shared_ptr<Sensors> s, float motionFrameLength)
 	: sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength)

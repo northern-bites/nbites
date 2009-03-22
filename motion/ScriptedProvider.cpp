@@ -21,6 +21,8 @@
 #include <boost/shared_ptr.hpp>
 #include "ScriptedProvider.h"
 
+using namespace std;
+using namespace Kinematics;
 using boost::shared_ptr;
 
 ScriptedProvider::ScriptedProvider(float motionFrameLength,

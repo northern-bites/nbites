@@ -21,8 +21,11 @@
 #include <boost/shared_ptr.hpp>
 
 #include "NaoPose.h"
-
+using namespace std;
 using boost::shared_ptr;
+using namespace boost::numeric;
+using namespace Kinematics;
+using namespace NBMath;
 
 // From camera docs:
 const float NaoPose::IMAGE_WIDTH_MM = 2.36f;

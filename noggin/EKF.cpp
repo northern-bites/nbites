@@ -1,9 +1,9 @@
 #include "EKF.h"
+#include "NBMatrixMath.h"
+#include "NBMath.h"
 
-#include <boost/numeric/ublas/triangular.hpp>
-#include <boost/numeric/ublas/vector_proxy.hpp>
-#include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
 using namespace boost::numeric;
+using namespace NBMath;
 
 /**
  * Simplest constructor for the EKF class
@@ -124,56 +124,7 @@ void EKF<Measurement, UpdateModel>::noCorrectionStep()
     P_k = P_k_bar;
 }
 
-/**
-Invert a two by two matrix easily
-given:
- [a b
-  c d]
-return:
-(1/(ad - bc)) [ d -b
-               -c  a]
-@param m the 2 by 2 matrix to invert.
-@return the inversion of m
- */
-ublas::matrix<float> invert2by2(ublas::matrix<float> m)
-{
-    float det = 1.0f / ( m(0,0) * m(1,1) - m(0,1) * m(1,0));
-    float tmp = m(0,0);
-    m(0,0) = m(1,1);
-    m(1,1) = tmp;
-    tmp = -m(0,1);
-    m(0,1) = -m(1,0);
-    m(1,0) = tmp;
-    return det * m;
-}
 
-const ublas::vector<float> solve(ublas::matrix<float> &A,
-                                 const ublas::vector<float> &b) {
-    ublas::permutation_matrix<float> P(A.size1());
-    int singularRow = lu_factorize(A, P);
-    if (singularRow != 0) {
-        // TODO: This case needs to be dealt with
-        throw "the system had no solution";
-    }
-    ublas::vector<float> result(A.size2());
-    result.assign(b);
-    lu_substitute(A, P, result);
-    return result;
-}
-
-const ublas::matrix<float> solve(ublas::matrix<float> &A,
-                                 const ublas::matrix<float> &B) {
-    ublas::permutation_matrix<float> P(A.size1());
-    int singularRow = lu_factorize(A, P);
-    if (singularRow != 0) {
-        // TODO: This case needs to be dealt with
-        throw "the system had no solution";
-    }
-    ublas::matrix<float> result(A.size2(), B.size1());
-    result.assign(B);
-    lu_substitute(A, P, result);
-    return result;
-}
 
 #include "EKFStructs.h"
 

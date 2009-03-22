@@ -205,7 +205,7 @@ void NaoEnactor::sendJoints() {
 }
 
 void NaoEnactor::setBodyHardness(float hardness){
-    hardness = clip(hardness,0,1.0f);
+    hardness = NBMath::clip(hardness,0,1.0f);
 
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {

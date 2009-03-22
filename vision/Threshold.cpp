@@ -60,6 +60,7 @@
 #include "Threshold.h"
 #include "debug.h"
 
+using namespace std;
 using boost::shared_ptr;
 
 

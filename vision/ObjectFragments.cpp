@@ -33,11 +33,7 @@
 #include "ObjectFragments.h"
 #include "debug.h"
 
-// redefine abs for ints or doubles
-#undef abs
-#define abs(x) ((x) < 0 ? -(x) : (x))
-
-
+#include <vector>
 using namespace std;
 
 ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)

@@ -19,9 +19,10 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "BodyJointCommand.h"
+using namespace std;
 
 using namespace MotionConstants;
-using namespace std;
+using namespace Kinematics;
 
 BodyJointCommand::BodyJointCommand
 (const float time,

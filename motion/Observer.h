@@ -42,6 +42,7 @@
 
 #include <list>
 
+#include "NBMatrixMath.h"
 #include "WalkController.h"
 #include "motionconfig.h"
 
@@ -61,30 +62,7 @@ public:
 
     virtual void initState(float x, float v, float p);
 private:
-    /*
-     * This saves me some nasty typing...
-     * uBLAS by default uses std::vector as its underlying storage data
-     * structure. By overriding the matrix type to use ublas::bounded_array
-     * we're forcing uBLAS to use arrays as the storage type which allows all
-     * variables to stay off the heap and on the stack. This offers a dramatic
-     * increase in performance with the slight inconvenience that the static
-     * array needs to be big enough to fit a n by n matrix. The biggest one I
-     * handle is 3x3, so a bounded array of size 9 is sufficient.
-     */
-
-    typedef boost::numeric::ublas::
-        matrix<float,
-               boost::numeric::ublas::row_major,
-               boost::numeric::ublas::bounded_array<float,9> > ufmatrix3;
-    typedef boost::numeric::ublas::
-        vector<float,
-               boost::numeric::ublas::bounded_array<float,3> > ufvector3;
-    typedef boost::numeric::ublas::
-        matrix<float,
-               boost::numeric::ublas::row_major,
-               boost::numeric::ublas::bounded_array<float,3> > ufrowVector3;
-
-    ufvector3 stateVector;
+    NBMath::ufvector3 stateVector;
 
 public: //Constants
     static const unsigned int NUM_PREVIEW_FRAMES = 60;
@@ -96,10 +74,10 @@ private:
     static const float L_values[3];
     static const float Gi;
 
-    ufmatrix3 A;
-    ufvector3 b;
-    ufrowVector3 c;
-    ufvector3 L;
+    NBMath::ufmatrix3 A;
+    NBMath::ufvector3 b;
+    NBMath::ufrowVector3 c;
+    NBMath::ufvector3 L;
 
     float trackingError;
 };

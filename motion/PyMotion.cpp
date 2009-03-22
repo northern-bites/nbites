@@ -31,7 +31,8 @@ using namespace boost::python;
 #include "SetHeadCommand.h"
 #include "WalkCommand.h"
 #include "MotionInterface.h"
-
+#include "Kinematics.h"
+using namespace Kinematics;
 
 static MotionInterface* interface_reference = 0;
 

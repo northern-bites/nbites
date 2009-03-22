@@ -2,6 +2,8 @@
 using namespace boost::numeric;
 using namespace boost;
 
+using namespace NBMath;
+
 /**
  * Constructor for the BallEKF class
  *

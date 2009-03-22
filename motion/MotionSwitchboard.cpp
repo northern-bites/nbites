@@ -1,11 +1,14 @@
 
 #include <vector>
+using namespace std;
+
 #include <boost/shared_ptr.hpp>
+using namespace boost;
 
 #include "MotionSwitchboard.h"
-
-using namespace std;
-using namespace boost;
+#include "NBMatrixMath.h"
+using namespace Kinematics;
+using namespace NBMath;
 
 //#define DEBUG_SWITCHBOARD
 

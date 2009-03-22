@@ -50,17 +50,14 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-using namespace std;
 
 #include <boost/shared_ptr.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-using namespace boost::numeric;
 
 #include "WalkingConstants.h"
 #include "CoordFrame.h"
 #include "Kinematics.h"
+#include "NBMatrixMath.h"
 
-using namespace Kinematics;
 
 //DEBUG Switches:
 #ifdef WALK_DEBUG
@@ -71,13 +68,13 @@ using namespace Kinematics;
 #endif
 class WalkingLeg  {
 public:
-    WalkingLeg(ChainID id);
+    WalkingLeg(Kinematics::ChainID id);
     ~WalkingLeg();
 
-    vector <float> tick(boost::shared_ptr<Step> step,
-                        boost::shared_ptr<Step> swing_src,
-                        boost::shared_ptr<Step> _suppoting,
-                        ufmatrix3 fc_Transform);
+    std::vector <float> tick(boost::shared_ptr<Step> step,
+                             boost::shared_ptr<Step> swing_src,
+                             boost::shared_ptr<Step> _suppoting,
+                             NBMath::ufmatrix3 fc_Transform);
 
     void setSteps(boost::shared_ptr<Step> _swing_src,
                   boost::shared_ptr<Step> _swing_dest,
@@ -101,11 +98,15 @@ public:
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT;
     };
+    bool isSupporting(){
+        return state == DOUBLE_SUPPORT ||
+            state == PERSISTENT_DOUBLE_SUPPORT || state == SUPPORTING;
+    };
     void resetGait(const WalkingParameters * _wp);
 private:
     //Execution methods, get called depending on which state the leg is in
-    vector <float> supporting(ufmatrix3 fc_Transform);//float dest_x, float dest_y);
-    vector <float> swinging(ufmatrix3 fc_Transform);//float dest_x, float dest_y);
+    std::vector <float> supporting(NBMath::ufmatrix3 fc_Transform);
+    std::vector <float> swinging(NBMath::ufmatrix3 fc_Transform);
 
     //FSA methods
     void setState(SupportMode newState);
@@ -123,7 +124,7 @@ private:
     const float cycloidy(float theta);
     const float cycloidx(float theta);
 
-    inline ChainID getOtherLegChainID();
+    inline Kinematics::ChainID getOtherLegChainID();
 
 private:
     //FSA Attributes
@@ -135,13 +136,13 @@ private:
     boost::shared_ptr<Step> cur_dest, swing_src, swing_dest,support_step;
 
     //Leg Attributes
-    ChainID chainID; //keep track of which leg this is
+    Kinematics::ChainID chainID; //keep track of which leg this is
     const WalkingParameters *walkParams;
-    float lastJoints[LEG_JOINTS];
-    ufvector3 goal;
-    ufvector3 last_goal;
+    float lastJoints[Kinematics::LEG_JOINTS];
+    NBMath::ufvector3 goal;
+    NBMath::ufvector3 last_goal;
     int leg_sign; //-1 for right leg, 1 for left leg
-    string leg_name;
+    std::string leg_name;
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     FILE * locus_log;
 #endif

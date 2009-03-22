@@ -89,8 +89,6 @@ const int kOutOfBoundsVelocity = -60;
 
 typedef unsigned char uint8;
 
-//using namespace std;
-
 /**
  * Conversions between degrees and radians
  */

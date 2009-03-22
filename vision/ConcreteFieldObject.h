@@ -63,7 +63,7 @@ public:
     const fieldObjectID getID() const { return id; }
 
     virtual const std::string toString() const;
-    static const string getStringFromID(const fieldObjectID testID);
+    static const std::string getStringFromID(const fieldObjectID testID);
     static const float getHeightFromGround(const fieldObjectID id);
 
     static const bool isAbstract(const fieldObjectID testID);

@@ -26,18 +26,16 @@
 
 #include <queue>
 #include <vector>
-using namespace std;
-using namespace Kinematics;
 
-class ChainQueue : public queue<vector<float> > {
+class ChainQueue : public std::queue<std::vector<float> > {
 public:
-	ChainQueue(ChainID newChainID);
-	void add(vector<vector<float> > nextJoints);
-	ChainID getChainID() {return chainID;};
+	ChainQueue(Kinematics::ChainID newChainID);
+	void add(std::vector<std::vector<float> > nextJoints);
+    Kinematics::ChainID getChainID() {return chainID;};
 	void clear();
 
 private:
-	ChainID chainID;
+    Kinematics::ChainID chainID;
 
 };
 

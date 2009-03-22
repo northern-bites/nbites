@@ -19,6 +19,8 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+using namespace std;
+
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
@@ -28,6 +30,10 @@ using boost::shared_ptr;
 #include "NBMath.h"
 #include "Observer.h"
 #include "BasicWorldConstants.h"
+using namespace boost::numeric;
+using namespace Kinematics;
+using namespace NBMath;
+
 //#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
@@ -53,7 +59,9 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
-    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
+    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\t"
+            "sensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tangleX\t"
+            "angleY\tstate\n");
 #endif
 }
 
@@ -244,6 +252,7 @@ void StepGenerator::swapSupportLegs(){
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
         if_Transform = prod(stepTransform,if_Transform);
+        updateDebugMatrix();
 
         //Express the  destination  and source for the supporting foot and
         //swinging foots locations in f coord. Since the supporting foot doesn't
@@ -454,8 +463,8 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     //Clip the incoming values as dictated by the walkParameters
     x     = clip(new_x,walkParams->maxXSpeed);
-    y     = clip(new_y,walkParams->maxXSpeed);
-    theta = clip(new_theta,walkParams->maxXSpeed);
+    y     = clip(new_y,walkParams->maxYSpeed);
+    theta = clip(new_theta,walkParams->maxThetaSpeed);
 
 
 #ifdef DEBUG_STEPGENERATOR
@@ -505,6 +514,7 @@ void StepGenerator::startRight(){
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
     if_Transform.assign(initStartRight);
+    updateDebugMatrix();
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -552,7 +562,7 @@ void StepGenerator::startLeft(){
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
     if_Transform.assign(initStartLeft);
-
+    updateDebugMatrix();
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -836,6 +846,19 @@ void StepGenerator::resetOdometry(){
     ic_Transform.assign(odoHistory);
 }
 
+// void hackJointOrder(float angles[]) {
+//     float temp = angles[1];
+//     angles[1] = angles[2];
+//     angles[2] = temp;
+// }
+
+void StepGenerator::updateDebugMatrix(){
+#ifdef DEBUG_CONTROLLER_COM
+    static ublas::matrix<float> identity(ublas::identity_matrix<float>(3));
+    ublas::matrix<float> test (if_Transform);
+    fi_Transform = solve(test,identity);
+#endif
+}
 void StepGenerator::debugLogging(){
 
 
@@ -852,23 +875,33 @@ void StepGenerator::debugLogging(){
         lleg_angles[i] = bodyAngles[bi];
     for(unsigned int i = 0; i < LEG_JOINTS; i++, bi++)
         rleg_angles[i] = bodyAngles[bi];
+    Kinematics::hackJointOrder(lleg_angles);
+    Kinematics::hackJointOrder(rleg_angles);
 
     //pick the supporting leg to decide how to calc. actual com pos
     //Currently hacked pretty heavily, and only the Y actually works
     //need to apply some coord. translations for this to actually work
     //also, beware of the time delay between sent commands and the robot
-    ufvector3 leg_dest = Kinematics::forwardKinematics(LLEG_CHAIN,
-                                                       lleg_angles);
-    (leftLeg.stateIsDoubleSupport()?
-     LLEG_CHAIN: RLEG_CHAIN);
-    float real_com_x = leg_dest(0);
-    float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
-    //printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
+    ufvector3 leg_dest_c =
+        -Kinematics::forwardKinematics((leftLeg.isSupporting()?
+                                       LLEG_CHAIN: RLEG_CHAIN),//LLEG_CHAIN,
+                                      (leftLeg.isSupporting()?
+                                       lleg_angles: rleg_angles)); 
+    leg_dest_c(2) = 1.0f;
+
+    ufvector3 leg_dest_i = prod(fi_Transform,leg_dest_c);
+    float real_com_x = leg_dest_i(0);
+    float real_com_y = leg_dest_i(1);// + 2*HIP_OFFSET_Y;
+
+    Inertial inertial = sensors->getInertial();
+
     static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
+    fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
             ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
             est_zmp_i(0),est_zmp_i(1),
-            real_com_x,real_com_y,leftLeg.getSupportMode());
+            real_com_x,real_com_y,
+            inertial.angleX, inertial.angleY,
+            leftLeg.getSupportMode());
     ttime += 0.02f;
 #endif
 

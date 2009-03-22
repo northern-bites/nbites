@@ -9,6 +9,8 @@
 #include "visionconfig.h"
 #endif
 
+using namespace std;
+
 using boost::shared_ptr;
 
 static map<const ConcreteCorner*, PyObject*> py_concrete_corners;

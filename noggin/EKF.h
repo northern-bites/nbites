@@ -67,32 +67,4 @@ protected:
                                         vector<float> &V_k) = 0;
 };
 
-// Math helper functions
-// Should probably be housed elswhere
-boost::numeric::ublas::matrix<float> invert2by2(boost::numeric::ublas::
-                                                matrix<float> toInvt);
-
-const boost::numeric::ublas::vector<float>
-    solve(boost::numeric::ublas::matrix<float> &A,
-          const boost::numeric::ublas::vector<float> &b);
-const boost::numeric::ublas::matrix<float>
-    solve(boost::numeric::ublas::matrix<float> &A,
-          const boost::numeric::ublas::matrix<float> &b);
-
-/**
- * Given a float return its sign
- *
- * @param f the number to examine the sign of
- * @return -1.0f if f is less than 0.0f, 1.0f otherwise
- */
-inline float sign(float f)
-{
-    if (f < 0.0f) {
-        return -1.0f;
-    } else if (f > 0.0f) {
-        return 1.0f;
-    } else {
-        return 0.0f;
-    }
-}
 #endif //EKF_h_DEFINED

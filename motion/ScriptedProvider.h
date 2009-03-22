@@ -32,13 +32,9 @@
 #include "ChopShop.h"
 #include "Kinematics.h"
 
-using std::vector;
-using std::queue;
-using boost::shared_ptr;
-
 class ScriptedProvider : public MotionProvider {
 public:
-    ScriptedProvider(float motionFrameLength, shared_ptr<Sensors> s);
+    ScriptedProvider(float motionFrameLength, boost::shared_ptr<Sensors> s);
     virtual ~ScriptedProvider();
 
     void requestStopFirstInstance();
@@ -48,18 +44,18 @@ public:
 	void setCommand(const BodyJointCommand * command);
 
 private:
-	shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Sensors> sensors;
 	float FRAME_LENGTH_S;
 	ChopShop chopper;
-	vector<vector<float> > nextJoints;
+	std::vector<std::vector<float> > nextJoints;
 
 	// ChainQueues
-	vector<ChainQueue> chainQueues;
-	queue<const BodyJointCommand*> bodyCommandQueue;
+	std::vector<ChainQueue> chainQueues;
+    std::queue<const BodyJointCommand*> bodyCommandQueue;
 
 	pthread_mutex_t scripted_mutex;
 
-	vector <vector <float> > getCurrentChains();
+    std::vector <std::vector <float> > getCurrentChains();
 	void setNextBodyCommand();
     void setActive();
 	bool isDone();
