@@ -24,17 +24,18 @@
  * previewable ZMP_REF positions.
  * Important: This controller models only one dimension at once, so you need
  * two instances one for the x and one for the y direction.
- * The weights and the time invariant system matrix A_c (see constructor, etc)
- * are pre-calculated in Scilab (see preview-control.sci). The theory
- * is described in Czarnetzki and Kajita and Katayama.
+ * The weights and the time invariant system matrix A (see constructor, etc)
+ * are pre-calculated in Octave (see observer.m and setupobserver.m). The
+ * theory is described in Czarnetzki and Kajita and Katayama.
  *
  * @author George Slavov
  * @author Johannes Strom
- * @date November 2008
+ * @date March 2009
  */
 
-#ifndef _PreviewController_h_DEFINED
-#define _PreviewController_h_DEFINED
+
+#ifndef _Observer_h_DEFINED
+#define _Observer_h_DEFINED
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -49,10 +50,10 @@
 #  define DEBUG_CONTROLLER_GAINS
 #endif
 
-class PreviewController : public WalkController {
+class Observer : public WalkController {
 public:
-    PreviewController();
-    virtual ~PreviewController(){};
+    Observer();
+    virtual ~Observer(){};
     virtual const float tick(const std::list<float> *zmp_ref,
                              const float cur_zmp_ref,
                              const float sensor_zmp);
@@ -67,14 +68,18 @@ public: //Constants
     static const unsigned int NUM_PREVIEW_FRAMES = 60;
 private:
     static const float weights[NUM_PREVIEW_FRAMES];
-    static const float A_c_values[9];
+    static const float A_values[9];
     static const float b_values[3];
     static const float c_values[3];
+    static const float L_values[3];
+    static const float Gi;
 
-    NBMath::ufmatrix3 A_c;
+    NBMath::ufmatrix3 A;
     NBMath::ufvector3 b;
     NBMath::ufrowVector3 c;
+    NBMath::ufvector3 L;
 
+    float trackingError;
 };
 
 #endif

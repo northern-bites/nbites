@@ -17,19 +17,7 @@
 // Local
 #include "Observation.h"
 #include "FieldConstants.h"
-
-// Structs
-// Odometery change
-class MotionModel
-{
-public:
-    MotionModel(float f, float l, float r);
-    MotionModel(const MotionModel& other);
-    MotionModel();
-    float deltaF;
-    float deltaL;
-    float deltaR;
-};
+#include "EKFStructs.h"
 
 // Pose Estimate
 class PoseEst

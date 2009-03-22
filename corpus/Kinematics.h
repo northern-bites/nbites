@@ -20,17 +20,13 @@
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
 #include <boost/numeric/ublas/io.hpp>              // for cout
-using namespace boost::numeric;
 
 #include <cmath>
 #include "NBMath.h"
+#include "NBMatrixMath.h"
+
 
 namespace Kinematics {
-
-    static const float M_TO_CM  = 100.0f;
-    static const float CM_TO_M  = 0.01f;
-    static const float CM_TO_MM = 10.0f;
-    static const float MM_TO_CM = 0.1f;
 
     //Accuracy constants for dls
     //in mm, how close dls will get to the target
@@ -48,9 +44,10 @@ namespace Kinematics {
 
     // -------------------- Helper matrix methods --------------------
 
-    static const ublas::matrix <float> rotation4D(const Axis axis,
-                                                  const float angle) {
-        ublas::matrix <float> rot = ublas::identity_matrix <float>(4);
+    static const boost::numeric::ublas::matrix <float>
+        rotation4D(const Axis axis,
+                   const float angle) {
+        boost::numeric::ublas::matrix <float> rot = boost::numeric::ublas::identity_matrix <float>(4);
 
         const float sinAngle = (float)sin(angle);
         const float cosAngle = (float)cos(angle);
@@ -82,29 +79,29 @@ namespace Kinematics {
         return rot;
     }
 
-    static const ublas::matrix <float> translation4D(const float dx,
+    static const boost::numeric::ublas::matrix <float> translation4D(const float dx,
                                                      const float dy,
                                                      const float dz) {
-        ublas::matrix <float> trans = ublas::identity_matrix <float>(4);
+        boost::numeric::ublas::matrix <float> trans = boost::numeric::ublas::identity_matrix <float>(4);
         trans(X_AXIS, W_AXIS) = dx;
         trans(Y_AXIS, W_AXIS) = dy;
         trans(Z_AXIS, W_AXIS) = dz;
         return trans;
     }
 
-    static const ublas::vector <float> vector3D(const float x, const float y,
+    static const boost::numeric::ublas::vector <float> vector3D(const float x, const float y,
                                                 const float z) {
-        ublas::vector <float> p = ublas::zero_vector <float> (3);
+        boost::numeric::ublas::vector <float> p = boost::numeric::ublas::zero_vector <float> (3);
         p(0) = x;
         p(1) = y;
         p(2) = z;
         return p;
     }
 
-    static const ublas::vector <float> vector4D(const float x, const float y,
+    static const boost::numeric::ublas::vector <float> vector4D(const float x, const float y,
                                                 const float z,
                                                 const float w = 1.0f) {
-        ublas::vector <float> p = ublas::zero_vector <float> (4);
+        boost::numeric::ublas::vector <float> p = boost::numeric::ublas::zero_vector <float> (4);
         p(0) = x;
         p(1) = y;
         p(2) = z;
@@ -295,32 +292,32 @@ namespace Kinematics {
                                                   &RIGHT_ARM_MDH_PARAMS[0][0]};
 
     //Base transforms to get from body center to beg. of chain
-    static const ublas::matrix <float> HEAD_BASE_TRANSFORMS[1]
+    static const boost::numeric::ublas::matrix <float> HEAD_BASE_TRANSFORMS[1]
     = { translation4D( 0.0f,
                        0.0f,
                        NECK_OFFSET_Z ) };
 
-    static const ublas::matrix <float> LEFT_ARM_BASE_TRANSFORMS[1]
+    static const boost::numeric::ublas::matrix <float> LEFT_ARM_BASE_TRANSFORMS[1]
     = { translation4D( 0.0f,
                        SHOULDER_OFFSET_Y,
                        SHOULDER_OFFSET_Z ) };
 
-    static const ublas::matrix <float> LEFT_LEG_BASE_TRANSFORMS[1]
+    static const boost::numeric::ublas::matrix <float> LEFT_LEG_BASE_TRANSFORMS[1]
     ={ translation4D( 0.0f,
                       HIP_OFFSET_Y,
                       -HIP_OFFSET_Z ) };
 
-    static const ublas::matrix <float> RIGHT_LEG_BASE_TRANSFORMS[1]
+    static const boost::numeric::ublas::matrix <float> RIGHT_LEG_BASE_TRANSFORMS[1]
     ={ translation4D( 0.0f,
                       -HIP_OFFSET_Y,
                       -HIP_OFFSET_Z ) };
 
-    static const ublas::matrix <float> RIGHT_ARM_BASE_TRANSFORMS[1]
+    static const boost::numeric::ublas::matrix <float> RIGHT_ARM_BASE_TRANSFORMS[1]
     ={ translation4D( 0.0f,
                       -SHOULDER_OFFSET_Y,
                       SHOULDER_OFFSET_Z ) };
 
-    static const ublas::matrix <float> * BASE_TRANSFORMS[NUM_CHAINS] =
+    static const boost::numeric::ublas::matrix <float> * BASE_TRANSFORMS[NUM_CHAINS] =
     { &HEAD_BASE_TRANSFORMS[0],
       &LEFT_ARM_BASE_TRANSFORMS[0],
       &LEFT_LEG_BASE_TRANSFORMS[0],
@@ -328,37 +325,37 @@ namespace Kinematics {
       &RIGHT_ARM_BASE_TRANSFORMS[0] };
 
     //Base transforms to get from body center to beg. of chain
-    static const ublas::matrix <float> HEAD_END_TRANSFORMS[4]
+    static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS[4]
     = { rotation4D(X_AXIS, M_PI_FLOAT/2),
         rotation4D(Y_AXIS,M_PI_FLOAT/2),
         translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z),
         rotation4D(Y_AXIS, CAMERA_PITCH_ANGLE) };
 
 
-    static const ublas::matrix <float> LEFT_ARM_END_TRANSFORMS[2]
+    static const boost::numeric::ublas::matrix <float> LEFT_ARM_END_TRANSFORMS[2]
     = { rotation4D(Z_AXIS, -M_PI_FLOAT/2),
         translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
 
-    static const ublas::matrix <float> LEFT_LEG_END_TRANSFORMS[3]
+    static const boost::numeric::ublas::matrix <float> LEFT_LEG_END_TRANSFORMS[3]
     = { rotation4D(Z_AXIS, M_PI_FLOAT),
         rotation4D(Y_AXIS, -M_PI_FLOAT/2),
         translation4D(0.0f,
                       0.0f,
                       -FOOT_HEIGHT) };
 
-    static const ublas::matrix <float> RIGHT_LEG_END_TRANSFORMS[3] =
+    static const boost::numeric::ublas::matrix <float> RIGHT_LEG_END_TRANSFORMS[3] =
         { rotation4D(Z_AXIS, M_PI_FLOAT),
         rotation4D(Y_AXIS, -M_PI_FLOAT/2),
         translation4D(0.0f,
                       0.0f,
                       -FOOT_HEIGHT) };
 
-    static const ublas::matrix <float> RIGHT_ARM_END_TRANSFORMS[2] =
+    static const boost::numeric::ublas::matrix <float> RIGHT_ARM_END_TRANSFORMS[2] =
         { rotation4D(Z_AXIS, -M_PI_FLOAT/2),
         translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
 
 
-    static const ublas::matrix <float> * END_TRANSFORMS[NUM_CHAINS] =
+    static const boost::numeric::ublas::matrix <float> * END_TRANSFORMS[NUM_CHAINS] =
     { &HEAD_END_TRANSFORMS[0],
       &LEFT_ARM_END_TRANSFORMS[0],
       &LEFT_LEG_END_TRANSFORMS[0],
@@ -378,50 +375,37 @@ namespace Kinematics {
     static const int maxAnkleIterations = 60;
     static const int maxHeelIterations = 20;
 
-    /*
-     * This saves me some nasty typing...
-     * uBLAS by default uses std::vector as its underlying storage data
-     * structure. By overriding the matrix type to use ublas::bounded_array
-     * we're forcing uBLAS to use arrays as the storage type which allows all
-     * variables to stay off the heap and on the stack. This offers a dramatic
-     * increase in performance with the slight inconvenience that the static
-     * array needs to be big enough to fit a n by n matrix. The biggest one I
-     * handle is 3x3, so a bounded array of size 9 is sufficient.
-     */
-    typedef ublas::matrix<float,
-                          ublas::row_major,
-                          ublas::bounded_array<float,9> > ufmatrix3;
-    typedef ublas::vector<float, ublas::bounded_array<float,3> > ufvector3;
-
     const void clipChainAngles(const ChainID id,
                                float angles[]);
     const float getMinValue(const ChainID id, const int jointNumber);
     const float getMaxValue(const ChainID id, const int jointNumber);
-    const ufvector3 forwardKinematics(const ChainID id,
-                                      const float angles[]);
-    const ufmatrix3 buildHeelJacobian(const ChainID chainID,
-                                      const float angles[]);
-    const ufmatrix3 buildLegJacobian(const ChainID chainID,
-                                     const float angles[]);
-
-    const ufvector3 solve(ufmatrix3 &A,
-                          const ufvector3 &b);
+    const NBMath::ufvector3 forwardKinematics(const ChainID id,
+                                              const float angles[]);
+    const NBMath::ufmatrix3 buildHeelJacobian(const ChainID chainID,
+                                              const float angles[]);
+    const NBMath::ufmatrix3 buildLegJacobian(const ChainID chainID,
+                                             const float angles[]);
 
     // Both adjustment methods return whether the search was successful.
     // The correct angles required to fulfill the goal are returned through
     // startAngles by reference.
     const bool adjustAnkle(const ChainID chainID,
-                           const ufvector3 &goal,
+                           const NBMath::ufvector3 &goal,
                            float startAngles[],
                            const float maxError);
     const bool adjustHeel(const ChainID chainID,
-                          const ufvector3 &goal,
+                          const NBMath::ufvector3 &goal,
                           float startAngles[],
                           const float maxError);
     const IKLegResult dls(const ChainID chainID,
-                          const ufvector3 &goal,
+                          const NBMath::ufvector3 &goal,
                           const float startAngles[],
                           const float maxError = ACCEPTABLE_ERROR,
                           const float maxHeelError = UNBELIEVABLY_LOW_ERROR);
+
+
+    void hackJointOrder(float angles[]);
+
 };
+
 #endif

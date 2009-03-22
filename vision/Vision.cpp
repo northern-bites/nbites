@@ -35,6 +35,7 @@
 #include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
 
+using namespace std;
 using boost::shared_ptr;
 
 static byte global_image[IMAGE_BYTE_SIZE];
@@ -174,7 +175,8 @@ void Vision::drawBoxes(void)
     // orange
     if(ball->getWidth() > 0)
         drawRect(ball->getX(), ball->getY(),
-                 ROUND(ball->getWidth()), ROUND(ball->getHeight()), PINK);
+                 NBMath::ROUND(ball->getWidth()),
+                 NBMath::ROUND(ball->getHeight()), PINK);
 
     // lines
     drawFieldLines();

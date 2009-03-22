@@ -10,6 +10,7 @@ using namespace boost::assign;
 #include <boost/bind.hpp>
 using namespace boost;
 
+#include "BasicWorldConstants.h"
 
 void staticPostSensors(NaoEnactor * n) {
     n->postSensors();
@@ -22,7 +23,8 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
                         boost::shared_ptr<Sensors> s)
     : MotionEnactor(), broker(_pbroker), sensors(s),
       jointValues(NUM_JOINTS,0.0f),  // current values of joints
-      motionValues(NUM_JOINTS,0.0f)  // commands sent to joints
+      motionValues(NUM_JOINTS,0.0f),  // commands sent to joints
+      accelerationFilter()
 {
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
@@ -203,7 +205,7 @@ void NaoEnactor::sendJoints() {
 }
 
 void NaoEnactor::setBodyHardness(float hardness){
-    hardness = clip(hardness,0,1.0f);
+    hardness = NBMath::clip(hardness,0,1.0f);
 
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
@@ -385,6 +387,23 @@ void NaoEnactor::initSyncWithALMemory(){
     }
 }
 
+// for marvin!
+static const float ACCEL_CONVERSION_X = (-GRAVITY_mss) / 50.0f;
+static const float ACCEL_CONVERSION_Y = (-GRAVITY_mss) / 54.0f;
+static const float ACCEL_CONVERSION_Z = (-GRAVITY_mss) / 56.5f;
+
+const float NaoEnactor::calibrate_acc_x(const float x) {
+    return x * ACCEL_CONVERSION_X;
+}
+
+const float NaoEnactor::calibrate_acc_y(const float y) {
+    return y * ACCEL_CONVERSION_Y;
+}
+
+const float NaoEnactor::calibrate_acc_z(const float z) {
+    return z * ACCEL_CONVERSION_Z;
+}
+
 void NaoEnactor::syncWithALMemory() {
     alfastaccessJoints->GetValues(jointValues);
     sensors->setBodyAngles(jointValues);
@@ -402,13 +421,23 @@ void NaoEnactor::syncWithALMemory() {
         RfrontLeft = sensorValues[4], RfrontRight = sensorValues[5],
         RrearLeft = sensorValues[6], RrearRight = sensorValues[7];
 
-    const float accX = sensorValues[8], accY = sensorValues[9],
-        accZ = sensorValues[10],
+    const float accX = calibrate_acc_x(sensorValues[8]),
+        accY = calibrate_acc_y(sensorValues[9]),
+        accZ = calibrate_acc_z(sensorValues[10]),
         gyrX = sensorValues[11], gyrY = sensorValues[12],
         angleX = sensorValues[13], angleY = sensorValues[14];
+
+    accelerationFilter.update(accX, accY, accZ);
+    const float filteredX = accelerationFilter.getX();
+    const float filteredY = accelerationFilter.getY();
+    const float filteredZ = accelerationFilter.getZ();
+
+    //printf("%f\t%f\t%f\n",accX,accY,accZ);
 
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         Inertial(accX,accY,accZ,gyrX,gyrY,angleX,angleY));
+                         Inertial(filteredX, filteredY, filteredZ,
+                                  //Inertial(accX, accY, accZ,
+                                  gyrX, gyrY, angleX, angleY));
 }

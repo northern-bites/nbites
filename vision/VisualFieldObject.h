@@ -73,7 +73,7 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
-    const string toString() const { return ConcreteFieldObject::
+    const std::string toString() const { return ConcreteFieldObject::
             getStringFromID(id); }
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }

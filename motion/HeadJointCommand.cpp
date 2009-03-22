@@ -19,6 +19,8 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "HeadJointCommand.h"
+using namespace MotionConstants;
+using namespace Kinematics;
 
 HeadJointCommand::HeadJointCommand(const float time,
 				   const std::vector<float> *joints,

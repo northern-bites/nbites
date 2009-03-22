@@ -35,7 +35,7 @@ public:
 
     friend std::ostream& operator<< (std::ostream &o, const VisualCorner &c)
         {
-            return o << setprecision(2)
+            return o << std::setprecision(2)
                      << "(" << c.getX() << "," << c.getY() << ") \tDistance: "
                      << c.getDistance() << "\tBearing: " << c.getBearing()
                      << "\tShape: " << ConcreteCorner::getShapeString(
@@ -116,14 +116,15 @@ private:
 };
 
 // functor that checks if the shape of one corner equals the given shape
-class cornerShapeEquals : public unary_function<VisualCorner, bool> {
+class cornerShapeEquals : public std::unary_function<VisualCorner, bool> {
     shape s;
 public:
     explicit cornerShapeEquals(const shape& shape) : s(shape) { }
     bool operator() (const VisualCorner& c) const { return c.getShape() == s; }
 };
 
-class LCornerNearEdgeOfScreen : public unary_function<VisualCorner, bool> {
+class LCornerNearEdgeOfScreen : public std::unary_function<VisualCorner,bool>
+{
     Rectangle edges;
     int minPixelSeparation;
 public:

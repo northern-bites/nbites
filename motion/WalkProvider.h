@@ -47,8 +47,6 @@
 #include "GaitCommand.h"
 #include "BodyJointCommand.h"
 
-typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
-
 //NOTE: we need to get passed a reference to the switchboard so we can
 //know the length of a motion frame!!
 class WalkProvider : public MotionProvider {

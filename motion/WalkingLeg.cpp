@@ -19,6 +19,10 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "WalkingLeg.h"
+using namespace std;
+
+using namespace Kinematics;
+using namespace NBMath;
 
 //#define DEBUG_WALKINGLEG
 

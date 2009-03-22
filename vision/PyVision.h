@@ -147,11 +147,11 @@ typedef struct PyFieldLines_t {
 
     PyObject *numLines;
     PyObject *lines;
-    vector<PyObject*> raw_corners;
+    std::vector<PyObject*> raw_corners;
 
     PyObject *numCorners;
     PyObject *corners;
-    vector<PyObject*> raw_lines;
+    std::vector<PyObject*> raw_lines;
 
 } PyFieldLines;
 

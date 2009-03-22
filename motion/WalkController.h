@@ -33,7 +33,9 @@ class WalkController {
 public:
     //WalkController(Sensors *s) : sensors(s) { }
     virtual ~WalkController(){};
-    virtual const float tick(const std::list<float> *zmp_ref) = 0;
+    virtual const float tick(const std::list<float> *zmp_ref,
+                             const float cur_zmp_ref,
+                             const float sensor_zmp) = 0;
     virtual const float getPosition() const = 0;
     virtual const float getZMP() const = 0;
     virtual void initState(float x, float v, float p) = 0;

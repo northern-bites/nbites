@@ -23,8 +23,6 @@
 #define _MotionConstants_h_DEFINED
 #include "Kinematics.h"
 
-using namespace Kinematics;
-
 namespace MotionConstants {
 
 	enum MotionType {
@@ -35,27 +33,31 @@ namespace MotionConstants {
         SET_HEAD
 	};
 
-	const static unsigned int WALK_NUM_CHAINS = NUM_BODY_CHAINS;
-	const static unsigned int BODY_JOINT_NUM_CHAINS = NUM_BODY_CHAINS;
+	const static unsigned int WALK_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
+	const static unsigned int BODY_JOINT_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
 	const static unsigned int HEAD_JOINT_NUM_CHAINS = 1;
-    const static unsigned int GAIT_NUM_CHAINS = NUM_BODY_CHAINS;
+    const static unsigned int GAIT_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
 
-	const static int WALK_CHAINS[WALK_NUM_CHAINS] = {LARM_CHAIN,
-                                                     LLEG_CHAIN,
-                                                     RLEG_CHAIN,
-                                                     RARM_CHAIN };
+	const static int WALK_CHAINS[WALK_NUM_CHAINS] =
+      {Kinematics::LARM_CHAIN,
+       Kinematics::LLEG_CHAIN,
+       Kinematics::RLEG_CHAIN,
+       Kinematics::RARM_CHAIN };
 
-    const static int GAIT_CHAINS[GAIT_NUM_CHAINS] = {LARM_CHAIN,
-                                                     LLEG_CHAIN,
-                                                     RLEG_CHAIN,
-                                                     RARM_CHAIN };
+    const static int GAIT_CHAINS[GAIT_NUM_CHAINS] =
+      { Kinematics::LARM_CHAIN,
+        Kinematics::LLEG_CHAIN,
+        Kinematics::RLEG_CHAIN,
+        Kinematics::RARM_CHAIN };
 
-	const static int BODY_JOINT_CHAINS[BODY_JOINT_NUM_CHAINS] = {LARM_CHAIN,
-																 LLEG_CHAIN,
-																 RLEG_CHAIN,
-																 RARM_CHAIN };
+	const static int BODY_JOINT_CHAINS[BODY_JOINT_NUM_CHAINS] =
+    { Kinematics::LARM_CHAIN,
+      Kinematics::LLEG_CHAIN,
+      Kinematics::RLEG_CHAIN,
+      Kinematics::RARM_CHAIN };
 
-	const static int HEAD_JOINT_CHAINS[HEAD_JOINT_NUM_CHAINS] = {HEAD_CHAIN};
+	const static int HEAD_JOINT_CHAINS[HEAD_JOINT_NUM_CHAINS] =
+      { Kinematics::HEAD_CHAIN };
 
 };
 #endif

@@ -25,6 +25,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "FieldLines.h"
+using namespace std;
 
 
 #ifndef OFFLINE

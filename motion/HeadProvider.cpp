@@ -21,6 +21,9 @@
 #include <boost/shared_ptr.hpp>
 #include "HeadProvider.h"
 
+using namespace std;
+
+using namespace Kinematics;
 using boost::shared_ptr;
 
 //#define DEBUG_HEADPROVIDER
@@ -87,12 +90,12 @@ void HeadProvider::setMode(){
     const float MAX_HEAD_VEL = 6.0*TO_RAD;
 
     //Calculate how much we can move toward the goal
-    const float yawChangeTarget = clip(yawDest - lastYawDest,
-                                       -MAX_HEAD_VEL,
-                                       MAX_HEAD_VEL);
-    const float pitchChangeTarget = clip(pitchDest - lastPitchDest,
-                                         -MAX_HEAD_VEL,
-                                         MAX_HEAD_VEL);
+    const float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
+                                               -MAX_HEAD_VEL,
+                                               MAX_HEAD_VEL);
+    const float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
+                                                 -MAX_HEAD_VEL,
+                                                 MAX_HEAD_VEL);
 #ifdef DEBUG_HEADPROVIDER
      cout << "Last values "<<endl
           <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl

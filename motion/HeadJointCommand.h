@@ -36,9 +36,6 @@
 #include "JointCommand.h"
 #include "MotionConstants.h"
 
-using namespace MotionConstants;
-using namespace Kinematics;
-
 class HeadJointCommand : public JointCommand {
 public:
 	HeadJointCommand(const float time, const std::vector<float> *joints,
@@ -47,8 +44,8 @@ public:
 	virtual ~HeadJointCommand();
 
 	// TODO @JGM NEED A CHECK ON THE CHAINID REQUEST
-	virtual const std::vector<float>* getJoints(ChainID chain) const {
-		if (chain == HEAD_CHAIN) {
+	virtual const std::vector<float>* getJoints(Kinematics::ChainID chain) const {
+		if (chain == Kinematics::HEAD_CHAIN) {
 			return headJoints;
 		} else {
 			return &noJoints;

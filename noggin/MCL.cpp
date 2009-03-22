@@ -352,19 +352,6 @@ PoseEst::PoseEst(const PoseEst& other) :
 
 PoseEst::PoseEst() {}
 
-// MotionModel
-MotionModel::MotionModel(float f, float l, float r) :
-    deltaF(f), deltaL(l), deltaR(r)
-{
-}
-
-MotionModel::MotionModel(const MotionModel& other) :
-    deltaF(other.deltaF), deltaL(other.deltaL), deltaR(other.deltaR)
-{
-}
-
-MotionModel::MotionModel(){}
-
 // Particle
 Particle::Particle(PoseEst _pose, float _weight) :
     pose(_pose), weight(_weight)

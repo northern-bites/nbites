@@ -77,22 +77,19 @@
 #include <cstdio>
 #include <cmath>
 #include <list>
-#include <algorithm> //for max
-using std::max;
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "Structs.h"
-#include "PreviewController.h"
+#include "WalkController.h"
 #include "WalkingConstants.h"
 #include "WalkingLeg.h"
 #include "Kinematics.h"
 #include "CoordFrame.h"
 #include "Sensors.h"
-using namespace boost::numeric;
-using namespace Kinematics;
+#include "NBMatrixMath.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
@@ -101,7 +98,8 @@ using namespace Kinematics;
 
 typedef boost::tuple<const std::list<float>*,
                      const std::list<float>*> zmp_xy_tuple;
-typedef boost::tuple<const vector<float>,const vector<float> > WalkLegsTuple;
+typedef boost::tuple<const std::vector<float>,
+                     const std::vector<float> > WalkLegsTuple;
 
 static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
                                      //steps stored in future, current lists
@@ -120,7 +118,7 @@ public:
 
     bool resetGait(const WalkingParameters * _wp);
 
-    vector <float> getOdometryUpdate();
+    std::vector <float> getOdometryUpdate();
 
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
@@ -137,15 +135,15 @@ private: // Helper methods
     void startRight();
     void startLeft();
 
-    static const ufmatrix3 get_f_fprime(const boost::shared_ptr<Step> step);
-    static const ufmatrix3 get_fprime_f(const boost::shared_ptr<Step> step);
-    static const ufmatrix3 get_sprime_s(const boost::shared_ptr<Step> step);
-    static const ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
+    static const NBMath::ufmatrix3 get_f_fprime(const boost::shared_ptr<Step> step);
+    static const NBMath::ufmatrix3 get_fprime_f(const boost::shared_ptr<Step> step);
+    static const NBMath::ufmatrix3 get_sprime_s(const boost::shared_ptr<Step> step);
+    static const NBMath::ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
 
     void resetQueues();
     void resetOdometry();
     void debugLogging();
-
+    void updateDebugMatrix();
 private:
     // Walk vector:
     //  * x - forward
@@ -158,8 +156,8 @@ private:
 
     bool _done;
 
-    ufvector3 com_i,last_com_c,est_zmp_i;
-    //ublas::vector<float> com_f;
+    NBMath::ufvector3 com_i,last_com_c,est_zmp_i;
+    //boost::numeric::ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     std::list<float> zmp_ref_x, zmp_ref_y;
     std::list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
@@ -171,8 +169,8 @@ private:
 
     //Reference Frames for ZMPing steps
     //These are updated when we ZMP a step - they are the 'future', if you will
-    ufmatrix3 si_Transform;
-    ufvector3 last_zmp_end_s;
+    NBMath::ufmatrix3 si_Transform;
+    NBMath::ufvector3 last_zmp_end_s;
 
     //Steps for the Walking Leg
     boost::shared_ptr<Step> lastStep_s;
@@ -187,13 +185,13 @@ private:
     //that are being sent to the WalkingLegs
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
-    ufmatrix3 if_Transform;
-    ufmatrix3 fc_Transform;
-    ufmatrix3 ic_Transform; //odometry
+    NBMath::ufmatrix3 if_Transform;
+    NBMath::ufmatrix3 fc_Transform;
+    NBMath::ufmatrix3 ic_Transform; //odometry
     // These hold the initial position of the left/right foot when they are
     // in support mode. It is relative to the 'i' coord frame.
-    ufmatrix3 initStartLeft;
-    ufmatrix3 initStartRight;
+    NBMath::ufmatrix3 initStartLeft;
+    NBMath::ufmatrix3 initStartRight;
 
     boost::shared_ptr<Sensors> sensors;
     const WalkingParameters *walkParams;
@@ -204,6 +202,7 @@ private:
     WalkController *controller_x, *controller_y;
 #ifdef DEBUG_CONTROLLER_COM
     FILE* com_log;
+    NBMath::ufmatrix3 fi_Transform;
 #endif
 
 };

@@ -12,24 +12,13 @@
 #include <boost/numeric/ublas/vector.hpp>
 
 // Local headers
-#include "MCL.h"
+//#include "MCL.h"
 #include "VisualBall.h"
 
 // Default parameters
 #define DEFAULT_BETA 3.0f
 #define DEFAULT_GAMMA 2.0f
 
-/**
- * Measurement - A generic class for holding the basic type information required
- *               for running the correctionStep in EKF.
- */
-struct Measurement
-{
-    float distance;
-    float bearing;
-    float distanceSD;
-    float bearingSD;
-};
 
 /**
  * EKF - An abstract class which implements the computational components of
@@ -38,6 +27,7 @@ struct Measurement
  * @date August 2008
  * @author Tucker Hermans
  */
+template <class Measurement, class UpdateModel = void>
 class EKF
 {
 protected:
@@ -48,23 +38,26 @@ protected:
     boost::numeric::ublas::matrix<float> P_k; // Uncertainty Matrix
     boost::numeric::ublas::matrix<float> P_k_bar; // A priori uncertainty Matrix
     boost::numeric::ublas::identity_matrix<float> dimensionIdentity;
-    unsigned int numStates; // number of states in the kalman filter
+    const unsigned int numStates; // number of states in the kalman filter
+    const unsigned int measurementSize; // dimension of the observation (z_k)
+
     float beta; // constant uncertainty increase
     float gamma; // scaled uncertainty increase
 
 public:
     // Constructors & Destructors
-    EKF(unsigned int dimension, float _beta, float _gamma);
+    EKF(unsigned int dimension, unsigned int mSize, float _beta, float _gamma);
     virtual ~EKF() {}
 
     // Core functions
-    virtual void timeUpdate(MotionModel u_k);
+    virtual void timeUpdate(UpdateModel u_k);
+
     virtual void correctionStep(std::vector<Measurement> z_k);
     virtual void noCorrectionStep();
-private:
+protected:
     // Pure virtual methods to be specified by implementing class
-    virtual boost::numeric::ublas::vector<float> associateTimeUpdate(MotionModel
-                                                                     u_k) = 0;
+    virtual boost::numeric::ublas::vector<float>
+        associateTimeUpdate(UpdateModel u_k) = 0;
     virtual void incorporateMeasurement(Measurement z,
                                         boost::numeric::ublas::
                                         matrix<float> &H_k,
@@ -74,24 +67,4 @@ private:
                                         vector<float> &V_k) = 0;
 };
 
-// Math helper functions
-// Should probably be housed elswhere
-boost::numeric::ublas::matrix<float> invert2by2(boost::numeric::ublas::
-                                                matrix<float> toInvt);
-/**
- * Given a float return its sign
- *
- * @param f the number to examine the sign of
- * @return -1.0f if f is less than 0.0f, 1.0f otherwise
- */
-inline float sign(float f)
-{
-    if (f < 0.0f) {
-        return -1.0f;
-    } else if (f > 0.0f) {
-        return 1.0f;
-    } else {
-        return 0.0f;
-    }
-}
 #endif //EKF_h_DEFINED

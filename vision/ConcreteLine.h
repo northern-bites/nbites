@@ -7,8 +7,6 @@ class ConcreteLine;
 #include <list>
 #include <string>
 
-//using namespace std;
-
 // Includes
 #include "FieldConstants.h"
 

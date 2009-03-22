@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Kinematics.h"
-
-
+using namespace boost::numeric;
+using namespace NBMath;
 
 
 /**
@@ -87,7 +87,7 @@ const float Kinematics::getMaxValue(const ChainID id, const int jointNumber) {
    Returns an x,y,z point where the end of a limb would be with a given
    chainID and chain angles. The returned value is a 3 by 1 vector.
 */
-const Kinematics::ufvector3 Kinematics::
+const ufvector3 Kinematics::
 forwardKinematics(const ChainID id,
                   const float angles[]) {
     ufvector3 finalPoint(3);
@@ -280,7 +280,7 @@ forwardKinematics(const ChainID id,
 }
 
 
-const Kinematics::ufmatrix3 Kinematics::
+const ufmatrix3 Kinematics::
 buildHeelJacobian(const ChainID chainID,
                   const float angles[]) {
     const float HYP = angles[0];
@@ -349,7 +349,7 @@ buildHeelJacobian(const ChainID chainID,
     else
         throw "Wrong chain";
 }
-const Kinematics::ufmatrix3 Kinematics::buildLegJacobian(const ChainID chainID,
+const ufmatrix3 Kinematics::buildLegJacobian(const ChainID chainID,
                                                          const float angles[]) {
     const float HYP = angles[0];
     const float HP = angles[1];
@@ -421,24 +421,7 @@ const Kinematics::ufmatrix3 Kinematics::buildLegJacobian(const ChainID chainID,
         throw "Wrong chain";
 }
 
-// Solve the linear system Ax=b for the vector x.
-// NOTE: This method is hard coded to work for 3x3 matrices and 3-vectors.
-//       We can get superior performance this way.
-const Kinematics::ufvector3 Kinematics::solve(ufmatrix3 &A,
-                                              const ufvector3 &b) {
-    ublas::permutation_matrix
-        <float, ublas::bounded_array<float, 9> >
-        P(A.size1());
-    int singularRow = lu_factorize(A, P);
-    if (singularRow != 0) {
-        // TODO: This case needs to be dealt with
-        throw "the system had no solution";
-    }
-    ufvector3 result(A.size2());
-    result.assign(b);
-    lu_substitute(A, P, result);
-    return result;
-}
+
 
 const bool Kinematics::adjustAnkle(const ChainID chainID,
                                    const ufvector3 &goal,
@@ -542,7 +525,7 @@ const bool Kinematics::adjustHeel(const ChainID chainID,
     return false;
 }
 
-void hackJointOrder(float angles[]) {
+void Kinematics::hackJointOrder(float angles[]) {
     float temp = angles[1];
     angles[1] = angles[2];
     angles[2] = temp;

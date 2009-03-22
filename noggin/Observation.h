@@ -64,7 +64,7 @@ class Observation
 {
 public:
     // Fields
-    std::vector< pair<float, float> > posibilities;
+    std::vector< std::pair<float, float> > posibilities;
 
     // Construcotrs & Destructors
     Observation(VisualFieldObject &_object);

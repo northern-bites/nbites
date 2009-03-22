@@ -19,6 +19,9 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "ChainQueue.h"
+using namespace std;
+
+using namespace Kinematics;
 
 ChainQueue::ChainQueue (ChainID id)
 	: queue<vector<float> >(),

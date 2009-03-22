@@ -29,6 +29,8 @@
 #undef USE_GAMECONTROLLER
 #define USE_GAMECONTROLLER
 
+using namespace std;
+
 using namespace boost;
 
 // Static reference to Python comm module

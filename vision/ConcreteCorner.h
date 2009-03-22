@@ -105,10 +105,11 @@ public:
     ////////////////////////////////////////////////////////////
     const cornerID getID() const { return id; }
 
-    virtual const string toString() const;
+    virtual const std::string toString() const;
 
-    static const std::list <const ConcreteCorner*> getPossibleCorners(shape
-                                                                 corner_type);
+    static const std::list <const ConcreteCorner*>
+      getPossibleCorners(shape
+                         corner_type);
 
 //     // Private methods
 // private:
@@ -133,7 +134,7 @@ public:
                         yellow_goal_right_l,
                         center_circle;
 
-    static const string getShapeString(shape s);
+    static const std::string getShapeString(shape s);
 
     static const ConcreteCorner* concreteCornerList[NUM_CORNERS];
 
@@ -176,7 +177,7 @@ private: // Instance variables recording location on field and identifier
     const ConcreteLine * line2;
 };
 
-class CornerOfField : public unary_function<const ConcreteCorner*, bool> {
+class CornerOfField : public std::unary_function<const ConcreteCorner*, bool> {
 public:
 
     explicit CornerOfField() {}
@@ -190,7 +191,7 @@ public:
     }
 };
 
-class InList : public unary_function<const ConcreteCorner*, bool> {
+class InList : public std::unary_function<const ConcreteCorner*, bool> {
     const std::list<const ConcreteCorner *> possibilities;
 
 public:

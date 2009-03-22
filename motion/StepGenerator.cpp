@@ -19,6 +19,8 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+using namespace std;
+
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
@@ -26,6 +28,12 @@ using boost::shared_ptr;
 
 #include "StepGenerator.h"
 #include "NBMath.h"
+#include "Observer.h"
+#include "BasicWorldConstants.h"
+using namespace boost::numeric;
+using namespace Kinematics;
+using namespace NBMath;
+
 //#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
@@ -43,13 +51,17 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),
     leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
-    controller_x(new PreviewController()),
-    controller_y(new PreviewController())
+    //controller_x(new PreviewController()),
+    //controller_y(new PreviewController())
+    controller_x(new Observer()),
+    controller_y(new Observer())
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
-    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\tsensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tstate\n");
+    fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\t"
+            "sensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tangleX\t"
+            "angleY\tstate\n");
 #endif
 }
 
@@ -69,11 +81,15 @@ StepGenerator::~StepGenerator()
  *    When the Future ZMP values we want run out, we pop the next future step
  *    add generated ZMP from it, and put it into the ZMPDsteps List
  *
+ *  * Ensures that there are NUM_PREVIEW_FRAMES + 1 frames in the zmp lists.
+ *    the oldest value will be popped off before the list is sent to the
+ *    controller.
+ *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     //Generate enough ZMPs so a) the controller can run
     //and                     b) there are enough steps
-    while (zmp_ref_y.size() <= PreviewController::NUM_PREVIEW_FRAMES) {
+    while (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES) {
         if (futureSteps.size() == 0){
             generateStep(x, y, theta); // replenish with the current walk vector
         }
@@ -87,8 +103,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
         }
     }
-    zmp_ref_x.pop_front();
-    zmp_ref_y.pop_front();
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
 }
 
@@ -106,8 +120,7 @@ void StepGenerator::tick_controller(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_controller" << endl;
 #endif
-/*
-    #define G 9.81
+
     Inertial inertial = sensors->getInertial();
 
     ufvector3 accel_c = CoordFrame3D::vector3D(inertial.accX,inertial.accY);
@@ -116,18 +129,35 @@ void StepGenerator::tick_controller(){
     float tot_angle = -(angle_fc+angle_if);
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
-                            accel_c);
+                             accel_c);
 
-    est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/G)*accel_i(0);
-    est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/G)*accel_i(1);
-*/
+    est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(0);
+    est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(1);
+    //est_zmp_i(1) *= 1.35f;
+
     //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
+
+    //The observer needs to know the current reference zmp
+    const float cur_zmp_ref_x =  zmp_ref_x.front();
+    const float cur_zmp_ref_y = zmp_ref_y.front();
+    //clear the oldest (i.e. current) value from the preview list
+    zmp_ref_x.pop_front();
+    zmp_ref_y.pop_front();
+
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 
-    const float com_x = controller_x->tick(zmp_ref.get<0>());
-    const float com_y = controller_y->tick(zmp_ref.get<1>());
+    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
+                                           est_zmp_i(0));
+    /*
+    // TODO! for now we are disabling the observer for the x direction
+    // by reporting a sensor zmp equal to the planned/expected value
+    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
+                                           cur_zmp_ref_x); // NOTE!
+    */
+    const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y,
+                                           est_zmp_i(1));
     com_i = CoordFrame3D::vector3D(com_x,com_y);
 
 }
@@ -229,6 +259,7 @@ void StepGenerator::swapSupportLegs(){
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
         if_Transform = prod(stepTransform,if_Transform);
+        updateDebugMatrix();
 
         //Express the  destination  and source for the supporting foot and
         //swinging foots locations in f coord. Since the supporting foot doesn't
@@ -439,8 +470,8 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     //Clip the incoming values as dictated by the walkParameters
     x     = clip(new_x,walkParams->maxXSpeed);
-    y     = clip(new_y,walkParams->maxXSpeed);
-    theta = clip(new_theta,walkParams->maxXSpeed);
+    y     = clip(new_y,walkParams->maxYSpeed);
+    theta = clip(new_theta,walkParams->maxThetaSpeed);
 
 
 #ifdef DEBUG_STEPGENERATOR
@@ -490,6 +521,7 @@ void StepGenerator::startRight(){
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
     if_Transform.assign(initStartRight);
+    updateDebugMatrix();
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -537,7 +569,7 @@ void StepGenerator::startLeft(){
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
     if_Transform.assign(initStartLeft);
-
+    updateDebugMatrix();
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
@@ -821,6 +853,19 @@ void StepGenerator::resetOdometry(){
     ic_Transform.assign(odoHistory);
 }
 
+// void hackJointOrder(float angles[]) {
+//     float temp = angles[1];
+//     angles[1] = angles[2];
+//     angles[2] = temp;
+// }
+
+void StepGenerator::updateDebugMatrix(){
+#ifdef DEBUG_CONTROLLER_COM
+    static ublas::matrix<float> identity(ublas::identity_matrix<float>(3));
+    ublas::matrix<float> test (if_Transform);
+    fi_Transform = solve(test,identity);
+#endif
+}
 void StepGenerator::debugLogging(){
 
 
@@ -837,23 +882,33 @@ void StepGenerator::debugLogging(){
         lleg_angles[i] = bodyAngles[bi];
     for(unsigned int i = 0; i < LEG_JOINTS; i++, bi++)
         rleg_angles[i] = bodyAngles[bi];
+    Kinematics::hackJointOrder(lleg_angles);
+    Kinematics::hackJointOrder(rleg_angles);
 
     //pick the supporting leg to decide how to calc. actual com pos
     //Currently hacked pretty heavily, and only the Y actually works
     //need to apply some coord. translations for this to actually work
     //also, beware of the time delay between sent commands and the robot
-    ufvector3 leg_dest = Kinematics::forwardKinematics(LLEG_CHAIN,
-                                                       lleg_angles);
-    (leftLeg.stateIsDoubleSupport()?
-     LLEG_CHAIN: RLEG_CHAIN);
-    float real_com_x = leg_dest(0);
-    float real_com_y = leg_dest(1);// + 2*HIP_OFFSET_Y;
-    //printf("real com (x,y) : (%f,%f) \n", real_com_x,real_com_y);
+    ufvector3 leg_dest_c =
+        -Kinematics::forwardKinematics((leftLeg.isSupporting()?
+                                       LLEG_CHAIN: RLEG_CHAIN),//LLEG_CHAIN,
+                                      (leftLeg.isSupporting()?
+                                       lleg_angles: rleg_angles)); 
+    leg_dest_c(2) = 1.0f;
+
+    ufvector3 leg_dest_i = prod(fi_Transform,leg_dest_c);
+    float real_com_x = leg_dest_i(0);
+    float real_com_y = leg_dest_i(1);// + 2*HIP_OFFSET_Y;
+
+    Inertial inertial = sensors->getInertial();
+
     static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
+    fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
             ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
             est_zmp_i(0),est_zmp_i(1),
-            real_com_x,real_com_y,leftLeg.getSupportMode());
+            real_com_x,real_com_y,
+            inertial.angleX, inertial.angleY,
+            leftLeg.getSupportMode());
     ttime += 0.02f;
 #endif
 
