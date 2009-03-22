@@ -133,6 +133,7 @@ void StepGenerator::tick_controller(){
 
     est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(0);
     est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(1);
+    //est_zmp_i(1) *= 1.35f;
 
     //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
 
@@ -149,6 +150,12 @@ void StepGenerator::tick_controller(){
 
     const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
                                            est_zmp_i(0));
+    /*
+    // TODO! for now we are disabling the observer for the x direction
+    // by reporting a sensor zmp equal to the planned/expected value
+    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
+                                           cur_zmp_ref_x); // NOTE!
+    */
     const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y,
                                            est_zmp_i(1));
     com_i = CoordFrame3D::vector3D(com_x,com_y);

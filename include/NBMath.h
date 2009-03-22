@@ -47,7 +47,7 @@ namespace NBMath {
      * @param f the number to examine the sign of
      * @return -1.0f if f is less than 0.0f, 1.0f otherwise
      */
-    inline float sign(float f)
+    static float sign(const float f)
     {
         if (f < 0.0f) {
             return -1.0f;

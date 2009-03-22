@@ -5,7 +5,7 @@
 using namespace boost::numeric;
 
 const int AccEKF::num_dimensions = 3;
-const float AccEKF::beta = 3.f;
+const float AccEKF::beta = 0.2f;
 const float AccEKF::gamma = .2f;
 const float AccEKF::variance  = 0.22f;
 //const float AccEKF::variance  = 100.00f;
@@ -63,7 +63,7 @@ ublas::vector<float> AccEKF::getGain(const ublas::vector<float> &est_error){
 
 const float scale(const float x) {
     //return .4f * std::pow(3.46572f, x);
-    //return 10.0f * std::pow(x, 3.0f) + 5.4f;
+    return 100.0f * std::pow(x, 5.0f) + 580.4f;
     // A bezier curve
     //return 6.73684f * std::pow(x,3) +
     //    37.8947f * std::pow(x,2) +
@@ -77,12 +77,16 @@ const float scale(const float x) {
        70.0f;
 */
     //return 80 - 79 * std::exp( - .36f * std::pow( - 2.5f + x , 2));
-
+    /*
     if (x > 9.0f)
         return 400.0f;
     else
         return 80 - 79 * std::exp( - .25f * std::pow( - 2.7f + x , 2));
+    */
+}
 
+const float scaleDivergence(const float x){
+    return 100.0f * std::pow(x, 5.0f) + 580.4f;
 }
 
 const float getVariance(float delta, float divergence) {
@@ -136,9 +140,12 @@ void AccEKF::incorporateMeasurement(AccelMeasurement z,
 */
 
     // Update the measurement covariance matrix
-    R_k(0,0) = scale(std::abs(deltaS(0)));
-    R_k(1,1) = scale(std::abs(deltaS(1)));
-    R_k(2,2) = scale(std::abs(deltaS(2)));
+//     R_k(0,0) = scale(std::abs(deltaS(0)));
+//     R_k(1,1) = scale(std::abs(deltaS(1)));
+//     R_k(2,2) = scale(std::abs(deltaS(2)));
 
+    R_k(0,0) = scale(std::abs(V_k(0)));
+    R_k(1,1) = scale(std::abs(V_k(1)));
+    R_k(2,2) = scale(std::abs(V_k(2)));
     last_measurement = z_x;
 }

@@ -23,16 +23,16 @@ def gameInitial(player):
                                   1.65,  # stepHeight
                                   0.0,  # footLengthX
                                   0.4,   # zmp static percentage
-                                  4.0,   # left swing hip roll addition
-                                  4.0,   # right swing hip roll addition
+                                  5.0,   # left swing hip roll addition
+                                  5.0,   # right swing hip roll addition
                                   0.90,  # left zmp off
                                   0.90,  # right zmp off
                                   10.0,  # max x speed
                                   5.0,   # max y speed
                                   30.0)  # max theta speed
         player.brain.motion.setGait(gait)
-    #return player.stay()
-    return player.goLater('walkstraight')
+    return player.stay()
+    #return player.goLater('walkstraight')
 
 def gameReady(player):
     if player.firstFrame():
