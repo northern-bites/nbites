@@ -13,6 +13,7 @@
 #include "MCL.h"
 #include "BallEKF.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
+#include "EKFStructs.h"
 
 // Observation parameter
 // Ranges at which objects are viewable
@@ -23,6 +24,8 @@
 // Number of frames to wait between resampling
 #define RESAMPLE_RATE 5
 #define BALL_ID 40
+
+using namespace std;
 
 // Constants
 string team_color = "0";
