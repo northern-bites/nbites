@@ -24,12 +24,14 @@
 
 #include "EKF.h"
 #include "EKFStructs.h"
+#define ACC_NUM_DIMENSIONS 3
 
-class AccEKF : public EKF<AccelMeasurement, int>
+class AccEKF : public EKF<AccelMeasurement, int, ACC_NUM_DIMENSIONS,
+                          ACC_NUM_DIMENSIONS>
 {
 public:
     AccEKF();
-    ~AccEKF();
+    virtual ~AccEKF();
 
     // Update functions
     void update(const float accx,
@@ -55,7 +57,8 @@ private:
                                         &R_k,
                                         boost::numeric::ublas::vector<float>
                                         &V_k);
-    boost::numeric::ublas::vector<float> getGain(const boost::numeric::ublas::vector<float> &);
+    boost::numeric::ublas::vector<float> getGain(const boost::numeric::ublas::
+                                                 vector<float> &);
 private: // Constants
     static const int num_dimensions;
     static const float beta;

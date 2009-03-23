@@ -21,9 +21,7 @@ BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF<BallMeasurement, MotionModel>(BALL_EKF_DIMENSION,
-                                        BALL_MEASUREMENT_DIMENSION,
-                                        BETA_BALL,GAMMA_BALL),
+    : EKF<BallMeasurement, MotionModel, 4, 2>(BETA_BALL,GAMMA_BALL),
       useCartesian(false)
 {
     // ones on the diagonal

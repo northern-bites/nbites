@@ -51,7 +51,8 @@
  * Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
-class BallEKF : public EKF<BallMeasurement, MotionModel>
+class BallEKF : public EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION,
+                           BALL_MEASUREMENT_DIMENSION>
 {
 public:
 

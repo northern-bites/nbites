@@ -18,7 +18,6 @@
 #define DEFAULT_BETA 3.0f
 #define DEFAULT_GAMMA 2.0f
 
-
 /**
  * EKF - An abstract class which implements the computational components of
  *       an Extended Kalman Filter.
@@ -26,16 +25,33 @@
  * @date August 2008
  * @author Tucker Hermans
  */
-template <class Measurement, class UpdateModel = void>
+template <class Measurement, class UpdateModel,
+          unsigned int dimension, unsigned int mSize>
 class EKF
 {
 protected:
-    boost::numeric::ublas::vector<float> xhat_k; // Estimate Vector
-    boost::numeric::ublas::vector<float> xhat_k_bar; // A priori Estimate Vector
-    boost::numeric::ublas::matrix<float> Q_k; // Input noise covariance matrix
-    boost::numeric::ublas::matrix<float> A_k; // Update measurement Jacobian
-    boost::numeric::ublas::matrix<float> P_k; // Uncertainty Matrix
-    boost::numeric::ublas::matrix<float> P_k_bar; // A priori uncertainty Matrix
+    boost::numeric::ublas::vector<float, boost::numeric::ublas::
+                                  bounded_array<float, dimension>
+                                  > xhat_k; // Estimate Vector
+    boost::numeric::ublas::vector<float, boost::numeric::ublas::
+                                  bounded_array<float, dimension>
+                                  > xhat_k_bar; // A priori Estimate Vector
+    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
+                                  boost::numeric::ublas::
+                                  bounded_array<float, dimension*dimension>
+                                  > Q_k; // Input noise covariance matrix
+    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
+                                  boost::numeric::ublas::
+                                  bounded_array<float, dimension*dimension>
+                                  > A_k; // Update measurement Jacobian
+    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
+                                  boost::numeric::ublas::
+                                  bounded_array<float, dimension*dimension>
+                                  > P_k; // Uncertainty Matrix
+    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
+                                  boost::numeric::ublas::
+                                  bounded_array<float, dimension*dimension>
+                                  > P_k_bar; // A priori uncertainty Matrix
     boost::numeric::ublas::identity_matrix<float> dimensionIdentity;
     const unsigned int numStates; // number of states in the kalman filter
     const unsigned int measurementSize; // dimension of the observation (z_k)
@@ -45,7 +61,7 @@ protected:
 
 public:
     // Constructors & Destructors
-    EKF(unsigned int dimension, unsigned int mSize, float _beta, float _gamma);
+    EKF(float _beta, float _gamma);
     virtual ~EKF() {}
 
     // Core functions

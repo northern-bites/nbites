@@ -12,9 +12,10 @@ using namespace NBMath;
  * @param _beta The assumed absolute increase in uncertainty per frame
  * @param _gamma The uncertainty scaling factor per frame
  */
-template <class Measurement, class UpdateModel>
-EKF<Measurement, UpdateModel>
-::EKF(unsigned int dimension,unsigned int mSize, float _beta, float _gamma)
+template <class Measurement, class UpdateModel, unsigned int dimension,
+          unsigned int mSize>
+EKF<Measurement, UpdateModel, dimension, mSize>
+::EKF(float _beta, float _gamma)
     : xhat_k(dimension), xhat_k_bar(dimension),
       Q_k(dimension,dimension), A_k(dimension,dimension),
       P_k(dimension,dimension), P_k_bar(dimension,dimension),
@@ -42,8 +43,9 @@ EKF<Measurement, UpdateModel>
  * @param u_k - the UpdateModel showing the estimate change since the last time
  * update.
  */
-template <class Measurement, class UpdateModel>
-void EKF<Measurement, UpdateModel>::timeUpdate(UpdateModel u_k)
+template <class Measurement, class UpdateModel,unsigned int dimension,
+          unsigned int mSize>
+void EKF<Measurement, UpdateModel, dimension,mSize>::timeUpdate(UpdateModel u_k)
 {
     // Have the time update prediction incorporated
     // i.e. odometery, natural roll, etc.
@@ -66,8 +68,9 @@ void EKF<Measurement, UpdateModel>::timeUpdate(UpdateModel u_k)
  *
  * @param z_k - All measurements to be incoporated at the current update.
  */
-template <class Measurement, class UpdateModel>
-void EKF<Measurement, UpdateModel>
+template <class Measurement, class UpdateModel, unsigned int dimension,
+          unsigned int mSize>
+void EKF<Measurement, UpdateModel, dimension, mSize>
   ::correctionStep(std::vector<Measurement> z_k)
 {
     // Necessary computational matrices
@@ -116,8 +119,9 @@ void EKF<Measurement, UpdateModel>
  * Function to update necessary information when there is noCorrectionStep.
  * Should be called at every timeUpdate which has no correctionStep.
  */
-template <class Measurement, class UpdateModel>
-void EKF<Measurement, UpdateModel>::noCorrectionStep()
+template <class Measurement, class UpdateModel, unsigned int dimension,
+          unsigned int mSize>
+void EKF<Measurement, UpdateModel, dimension, mSize>::noCorrectionStep()
 {
     // Set current estimates to a priori estimates
     xhat_k = xhat_k_bar;
@@ -128,7 +132,7 @@ void EKF<Measurement, UpdateModel>::noCorrectionStep()
 
 #include "EKFStructs.h"
 
-template class EKF<BallMeasurement, MotionModel>;
+template class EKF<BallMeasurement, MotionModel, 4, 2>;
 // we do not need update model, so a hack is to just put in something small
 // like an int.
-template class EKF<AccelMeasurement, int>;
+template class EKF<AccelMeasurement, int, 3, 3>;

@@ -4,14 +4,14 @@
 #include "BasicWorldConstants.h"
 using namespace boost::numeric;
 
-const int AccEKF::num_dimensions = 3;
+const int AccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
 const float AccEKF::beta = 0.2f;
 const float AccEKF::gamma = .2f;
 const float AccEKF::variance  = 0.22f;
 //const float AccEKF::variance  = 100.00f;
 
 AccEKF::AccEKF()
-    : EKF<AccelMeasurement,int>(num_dimensions, num_dimensions, beta, gamma)
+    : EKF<AccelMeasurement,int, num_dimensions, num_dimensions>(beta, gamma)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
