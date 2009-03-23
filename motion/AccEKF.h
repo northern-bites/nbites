@@ -48,17 +48,12 @@ public:
 
 private:
     // Core functions
-    virtual boost::numeric::ublas::vector<float>
-        associateTimeUpdate(int u_k);
+    virtual StateVector associateTimeUpdate(int u_k);
     virtual void incorporateMeasurement(AccelMeasurement z,
-                                        boost::numeric::ublas::matrix<float>
-                                        &H_k,
-                                        boost::numeric::ublas::matrix<float>
-                                        &R_k,
-                                        boost::numeric::ublas::vector<float>
-                                        &V_k);
-    boost::numeric::ublas::vector<float> getGain(const boost::numeric::ublas::
-                                                 vector<float> &);
+                                        StateMeasurementMatrix &H_k,
+                                        MeasurementMatrix &R_k,
+                                        MeasurementVector &V_k);
+
 private: // Constants
     static const int num_dimensions;
     static const float beta;

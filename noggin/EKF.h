@@ -29,29 +29,50 @@ template <class Measurement, class UpdateModel,
           unsigned int dimension, unsigned int mSize>
 class EKF
 {
+public:
+    // Our template dimensions allow us to use bounded arrays for storage
+    // We define our own types for simpler use throughout the class
+
+    // A vector with the number of state dimensions
+    typedef boost::numeric::ublas::vector<float, boost::numeric::ublas::
+                                          bounded_array<float,dimension> >
+        StateVector;
+    // A vector with the length of the measurement dimensions
+    typedef boost::numeric::ublas::vector<float, boost::numeric::ublas::
+                                          bounded_array<float,mSize> >
+        MeasurementVector;
+
+    // A square matrix with state dimension number of rows and cols
+    typedef boost::numeric::ublas::matrix<float,
+                                          boost::numeric::ublas::row_major,
+                                          boost::numeric::ublas::
+                                          bounded_array<float, dimension*
+                                                        dimension> >
+    StateMatrix;
+
+    // A square matrix with measurement dimension number of rows and cols
+    typedef boost::numeric::ublas::matrix<float,
+                                          boost::numeric::ublas::row_major,
+                                          boost::numeric::ublas::
+                                          bounded_array<float, mSize*
+                                                        mSize> >
+    MeasurementMatrix;
+
+    // A matrix that is of size measurement * states
+    typedef boost::numeric::ublas::matrix<float,
+                                          boost::numeric::ublas::row_major,
+                                          boost::numeric::ublas::
+                                          bounded_array<float, mSize*
+                                                        dimension> >
+    StateMeasurementMatrix;
+
 protected:
-    boost::numeric::ublas::vector<float, boost::numeric::ublas::
-                                  bounded_array<float, dimension>
-                                  > xhat_k; // Estimate Vector
-    boost::numeric::ublas::vector<float, boost::numeric::ublas::
-                                  bounded_array<float, dimension>
-                                  > xhat_k_bar; // A priori Estimate Vector
-    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
-                                  boost::numeric::ublas::
-                                  bounded_array<float, dimension*dimension>
-                                  > Q_k; // Input noise covariance matrix
-    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
-                                  boost::numeric::ublas::
-                                  bounded_array<float, dimension*dimension>
-                                  > A_k; // Update measurement Jacobian
-    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
-                                  boost::numeric::ublas::
-                                  bounded_array<float, dimension*dimension>
-                                  > P_k; // Uncertainty Matrix
-    boost::numeric::ublas::matrix<float, boost::numeric::ublas::row_major,
-                                  boost::numeric::ublas::
-                                  bounded_array<float, dimension*dimension>
-                                  > P_k_bar; // A priori uncertainty Matrix
+    StateVector xhat_k; // Estimate Vector
+    StateVector xhat_k_bar; // A priori Estimate Vector
+    StateMatrix Q_k; // Input noise covariance matrix
+    StateMatrix A_k; // Update measurement Jacobian
+    StateMatrix P_k; // Uncertainty Matrix
+    StateMatrix P_k_bar; // A priori uncertainty Matrix
     boost::numeric::ublas::identity_matrix<float> dimensionIdentity;
     const unsigned int numStates; // number of states in the kalman filter
     const unsigned int measurementSize; // dimension of the observation (z_k)
@@ -71,15 +92,11 @@ public:
     virtual void noCorrectionStep();
 protected:
     // Pure virtual methods to be specified by implementing class
-    virtual boost::numeric::ublas::vector<float>
-        associateTimeUpdate(UpdateModel u_k) = 0;
+    virtual StateVector associateTimeUpdate(UpdateModel u_k) = 0;
     virtual void incorporateMeasurement(Measurement z,
-                                        boost::numeric::ublas::
-                                        matrix<float> &H_k,
-                                        boost::numeric::ublas::
-                                        matrix<float> &R_k,
-                                        boost::numeric::ublas::
-                                        vector<float> &V_k) = 0;
+                                        StateMeasurementMatrix &H_k,
+                                        MeasurementMatrix &R_k,
+                                        MeasurementVector &V_k) = 0;
 };
 
 #endif //EKF_h_DEFINED

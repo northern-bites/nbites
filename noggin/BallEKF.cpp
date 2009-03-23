@@ -21,7 +21,8 @@ BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF<BallMeasurement, MotionModel, 4, 2>(BETA_BALL,GAMMA_BALL),
+    : EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION,
+          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
       useCartesian(false)
 {
     // ones on the diagonal
@@ -101,11 +102,12 @@ void BallEKF::sawBall(VisualBall * ball)
  * @param u The motion model of the last frame.  Ignored for the ball.
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
-ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
+EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION
+    >::StateVector BallEKF::associateTimeUpdate(MotionModel u)
 {
     // Calculate the assumed change in ball position
     // Assume no decrease in ball velocity
-    ublas::vector<float> deltaBall(BALL_EKF_DIMENSION);
+    StateVector deltaBall(BALL_EKF_DIMENSION);
     deltaBall(0) = getXVelocityEst() * (1.0f / ASSUMED_FPS);
     deltaBall(1) = getYVelocityEst() * (1.0f / ASSUMED_FPS);
     deltaBall(2) = sign(getXVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
@@ -125,15 +127,15 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
  * @return the measurement invariance
  */
 void BallEKF::incorporateMeasurement(BallMeasurement z,
-                                     ublas::matrix<float> &H_k,
-                                     ublas::matrix<float> &R_k,
-                                     ublas::vector<float> &V_k)
+                                     StateMeasurementMatrix &H_k,
+                                     MeasurementMatrix &R_k,
+                                     MeasurementVector &V_k)
 {
     if (useCartesian) {
         // Convert our siting to cartesian coordinates
         float x_b_r = -z.distance * sin(z.bearing);
         float y_b_r = z.distance * cos(z.bearing);
-        ublas::vector<float> z_x(2);
+        MeasurementVector z_x(2);
 
         z_x(0) = x_b_r;
         z_x(1) = y_b_r;
@@ -141,7 +143,7 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
         // Get expected values of ball
         float x_b = getXEst();
         float y_b = getYEst();
-        ublas::vector<float> d_x(2);
+        MeasurementVector d_x(2);
 
         d_x(0) = x_b;
         d_x(1) = y_b;
@@ -161,12 +163,12 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
 
     } else { // Use polar coordinates
         // Make qa vector of the observed range and bearing
-        ublas::vector<float> z_x(2);
+        MeasurementVector z_x(2);
         z_x(0) = z.distance;
         z_x(1) = z.bearing;
 
         // Get the predicted range and bearing
-        ublas::vector<float> d_x(2);
+        MeasurementVector d_x(2);
         float x_b = getXEst();
         float y_b = getYEst();
 

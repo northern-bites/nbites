@@ -49,7 +49,7 @@ void EKF<Measurement, UpdateModel, dimension,mSize>::timeUpdate(UpdateModel u_k)
 {
     // Have the time update prediction incorporated
     // i.e. odometery, natural roll, etc.
-    ublas::vector<float> deltas = associateTimeUpdate(u_k);
+    StateVector deltas = associateTimeUpdate(u_k);
     xhat_k_bar = xhat_k + deltas;
 
     // Calculate the uncertainty growth for the current update
@@ -58,7 +58,7 @@ void EKF<Measurement, UpdateModel, dimension,mSize>::timeUpdate(UpdateModel u_k)
     }
 
     // Update error covariance matrix
-    ublas::matrix<float> newP = prod(P_k, trans(A_k));
+    StateMatrix newP = prod(P_k, trans(A_k));
     P_k_bar = prod(A_k, newP) + Q_k;
 }
 
@@ -75,38 +75,38 @@ void EKF<Measurement, UpdateModel, dimension, mSize>
 {
     // Necessary computational matrices
     // Kalman gain matrix
-    ublas::matrix<float> K_k = ublas::scalar_matrix<float>(numStates,
-                                                           measurementSize,
-                                                           0.0f);
+    StateMeasurementMatrix K_k = ublas::scalar_matrix<float>(numStates,
+                                                             measurementSize,
+                                                             0.0f);
     // Observation jacobian
-    ublas::matrix<float> H_k = ublas::scalar_matrix<float>(measurementSize,
-                                                           numStates, 0.0f);
+    StateMeasurementMatrix H_k = ublas::scalar_matrix<float>(measurementSize,
+                                                             numStates, 0.0f);
     // Assumed error in measurment sensors
-    ublas::matrix<float> R_k = ublas::scalar_matrix<float>(measurementSize,
-                                                           measurementSize,
-                                                           0.0f);
+    MeasurementMatrix R_k = ublas::scalar_matrix<float>(measurementSize,
+                                                        measurementSize,
+                                                        0.0f);
     // Measurement invariance
-    ublas::vector<float> v_k(measurementSize);
+    MeasurementVector v_k(measurementSize);
 
     // Incorporate all correction observations
     for(unsigned int i = 0; i < z_k.size(); ++i) {
         incorporateMeasurement(z_k[i], H_k, R_k, v_k);
 
         // Calculate the Kalman gain matrix
-        ublas::matrix<float> pTimesHTrans = prod(P_k_bar, trans(H_k));
+        StateMeasurementMatrix pTimesHTrans = prod(P_k_bar, trans(H_k));
+
         if(measurementSize == 2){
             K_k = prod(pTimesHTrans, invert2by2(prod(H_k, pTimesHTrans) + R_k));
-            // Use the Kalman gain matrix to determine the next estimate
-            xhat_k_bar = xhat_k_bar + prod(K_k, v_k);
         }else{
-            ublas::matrix<float> temp = prod(H_k, pTimesHTrans) + R_k;
-            ublas::matrix<float> inv =
-                solve(temp,
-                      ublas::identity_matrix<float>(measurementSize));
+            MeasurementMatrix temp = prod(H_k, pTimesHTrans) + R_k;
+            MeasurementMatrix inv = solve(temp,
+                                          ublas::identity_matrix<float>(
+                                              measurementSize));
             K_k = prod(pTimesHTrans, inv);
-            // Use the Kalman gain matrix to determine the next estimate
-            xhat_k_bar = xhat_k_bar + prod(K_k, v_k);
         }
+
+        // Use the Kalman gain matrix to determine the next estimate
+        xhat_k_bar = xhat_k_bar + prod(K_k, v_k);
 
         // Update associate uncertainty
         P_k_bar = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);

@@ -51,14 +51,10 @@ void AccEKF::update(const float accX,
     correctionStep(z);
 }
 
-ublas::vector<float>
+EKF<AccelMeasurement, int, 3, 3>::StateVector
 AccEKF::associateTimeUpdate(int u_k)
 {
     return ublas::zero_vector<float>(num_dimensions);
-}
-
-ublas::vector<float> AccEKF::getGain(const ublas::vector<float> &est_error){
-    return est_error * 17.0f;
 }
 
 const float scale(const float x) {
@@ -85,10 +81,6 @@ const float scale(const float x) {
     */
 }
 
-const float scaleDivergence(const float x){
-    return 100.0f * std::pow(x, 5.0f) + 580.4f;
-}
-
 const float getVariance(float delta, float divergence) {
     delta = std::abs(delta);
     divergence = std::abs(divergence);
@@ -110,13 +102,14 @@ const float getVariance(float delta, float divergence) {
 }
 
 void AccEKF::incorporateMeasurement(AccelMeasurement z,
-                                    ublas::matrix<float> &H_k,
-                                    ublas::matrix<float> &R_k,
-                                    ublas::vector<float> &V_k)
+                                    StateMeasurementMatrix &H_k,
+                                    MeasurementMatrix &R_k,
+                                    MeasurementVector &V_k)
 {
-    static ublas::vector<float> last_measurement(
+    static MeasurementVector last_measurement(
         ublas::scalar_vector<float>(num_dimensions, 0.0f));
-    ublas::vector<float> z_x(num_dimensions);
+
+    MeasurementVector z_x(num_dimensions);
     z_x(0) = z.x;
     z_x(1) = z.y;
     z_x(2) = z.z; // hahahha
@@ -129,8 +122,7 @@ void AccEKF::incorporateMeasurement(AccelMeasurement z,
     H_k(1,1) = 1.0f;
     H_k(2,2) = 1.0f;
 
-    ublas::vector<float> deltaS =
-        z_x - last_measurement;
+    MeasurementVector deltaS = z_x - last_measurement;
 
 /*
     R_k(0,0) = getVariance(deltaS(0), V_k(0));

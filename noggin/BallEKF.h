@@ -164,15 +164,11 @@ public:
     }
 private:
     // Core Functions
-    virtual boost::numeric::ublas::vector<float> associateTimeUpdate(MotionModel
-                                                                     u_k);
+    virtual StateVector associateTimeUpdate(MotionModel u_k);
     virtual void incorporateMeasurement(BallMeasurement z,
-                                        boost::numeric::ublas::matrix<float>
-                                        &H_k,
-                                        boost::numeric::ublas::matrix<float>
-                                        &R_k,
-                                        boost::numeric::ublas::vector<float>
-                                        &V_k);
+                                        StateMeasurementMatrix &H_k,
+                                        MeasurementMatrix &R_k,
+                                        MeasurementVector &V_k);
     void limitAPrioriEst(void);
     void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
