@@ -15,47 +15,8 @@
 #include "VisualLine.h"
 #include "VisualCorner.h"
 #include "VisualFieldObject.h"
-#include "Structs.h"
-
-// Math Definitions
-#define DEG_TO_RAD M_PI / 180.0f
-#define RAD_TO_DEG 180.0f / M_PI
-#define FULL_CIRC 360
-#define HALF_CIRC 180
-#define MAX_CHANGE_X 10.0f
-#define MAX_CHANGE_Y 10.0f
-#define MAX_CHANGE_H M_PI / 6.0f
-#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
-#define QUART_CIRC_RAD M_PI / 2.0f
-
-// Structs
-
-/**
- * Stores field location information about a concrete point landmark
- */
-class PointLandmark
-{
-public:
-    PointLandmark(float _x, float _y);
-    PointLandmark();
-    float x;
-    float y;
-};
-
-/**
- * Stores field location information about a concrete line landmark
- */
-class LineLandmark
-{
-public:
-    LineLandmark(float _x1, float _y1, float _x2, float _y2);
-    LineLandmark();
-    float x1;
-    float y1;
-    float x2;
-    float y2;
-};
-
+#include "NBMath.h"
+#include "NogginStructs.h"
 
 /**
  * Class to hold the informations associated with the observation of a landmark
@@ -86,7 +47,7 @@ public:
     /*
      * @return The bearing reported by the visual sighting in degrees
      */
-    const float getVisBearingDeg() const { return RAD_TO_DEG * visBearing; }
+    const float getVisBearingDeg() const { return DEG_OVER_RAD * visBearing; }
     /**
      * @return The standard deviation of the distance of the observation.
      */

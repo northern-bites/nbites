@@ -17,15 +17,14 @@ using namespace NBMath;
  * @param _initVelXUncert An initial value for the x velocity uncertainty
  * @param _initVelYUncert An initial value for the y velocity uncertainty
  */
-BallEKF::BallEKF(shared_ptr<MCL> _mcl,
-                 float initX, float initY,
+BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
     : EKF<BallMeasurement, MotionModel>(BALL_EKF_DIMENSION,
                                         BALL_MEASUREMENT_DIMENSION,
                                         BETA_BALL,GAMMA_BALL),
-      robotLoc(_mcl)
+      useCartesian(false)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -53,8 +52,9 @@ BallEKF::BallEKF(shared_ptr<MCL> _mcl,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(VisualBall * ball)
+void BallEKF::updateModel(VisualBall * ball, bool _useCartesian)
 {
+    useCartesian = _useCartesian;
     // Update expected ball movement
     timeUpdate(MotionModel());
     limitAPrioriEst();
@@ -110,8 +110,6 @@ ublas::vector<float> BallEKF::associateTimeUpdate(MotionModel u)
     ublas::vector<float> deltaBall(BALL_EKF_DIMENSION);
     deltaBall(0) = getXVelocityEst() * (1.0f / ASSUMED_FPS);
     deltaBall(1) = getYVelocityEst() * (1.0f / ASSUMED_FPS);
-    // deltaBall(2) = 0.0f;
-    // deltaBall(3) = 0.0f;
     deltaBall(2) = sign(getXVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
     deltaBall(3) = sign(getYVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
 
@@ -133,37 +131,66 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
                                      ublas::matrix<float> &R_k,
                                      ublas::vector<float> &V_k)
 {
-    // Convert our siting to cartesian coordinates
-    float x_b_r = z.distance * cos(z.bearing + QUART_CIRC_RAD);
-    float y_b_r = z.distance * sin(z.bearing + QUART_CIRC_RAD);
-    ublas::vector<float> z_x(2);
+    if (useCartesian) {
+        // Convert our siting to cartesian coordinates
+        float x_b_r = -z.distance * sin(z.bearing);
+        float y_b_r = z.distance * cos(z.bearing);
+        ublas::vector<float> z_x(2);
 
-    z_x(0) = x_b_r;
-    z_x(1) = y_b_r;
+        z_x(0) = x_b_r;
+        z_x(1) = y_b_r;
 
-    // Get expected values of ball
-    float h = robotLoc->getHEst();
-    float x = robotLoc->getXEst();
-    float y = robotLoc->getYEst();
-    float x_b = getXEst();
-    float y_b = getYEst();
-    ublas::vector<float> d_x(2);
+        // Get expected values of ball
+        float x_b = getXEst();
+        float y_b = getYEst();
+        ublas::vector<float> d_x(2);
 
-    d_x(0) = (x_b - x)*cos(-h) - (y_b - y)*sin(-h);
-    d_x(1) = (x_b - x)*sin(-h) + (y_b - y)*cos(-h);
+        d_x(0) = x_b;
+        d_x(1) = y_b;
 
-    // Calculate invariance
-    V_k = z_x - d_x;
+        // Calculate invariance
+        V_k = z_x - d_x;
 
-    // Calculate jacobians
-    H_k(0,0) = cos(h);
-    H_k(0,1) = -sin(h);
-    H_k(1,0) = sin(h);
-    H_k(1,1) = cos(h);
+        // Calculate jacobians
+        H_k(0,0) = cos(z.bearing);
+        H_k(0,1) = -sin(z.bearing);
+        H_k(1,0) = sin(z.bearing);
+        H_k(1,1) = cos(z.bearing);
 
-    // Update the measurement covariance matrix
-    R_k(0,0) = z.distanceSD;
-    R_k(1,1) = z.bearingSD;
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.distanceSD;
+        R_k(1,1) = z.distanceSD;
+
+    } else { // Use polar coordinates
+        // Make qa vector of the observed range and bearing
+        ublas::vector<float> z_x(2);
+        z_x(0) = z.distance;
+        z_x(1) = z.bearing;
+
+        // Get the predicted range and bearing
+        ublas::vector<float> d_x(2);
+        float x_b = getXEst();
+        float y_b = getYEst();
+
+        float locDistSquared = (x_b * x_b + y_b * y_b);
+        float locDist = sqrt(locDistSquared);
+        d_x(0) = sqrt(x_b * x_b + y_b * y_b);
+        d_x(1) = subPIAngle(atan2(y_b, x_b) - M_PI / 2.0f);
+
+        // Calculate invariance
+        V_k = z_x - d_x;
+        V_k(1) = subPIAngle(V_k(1));
+
+        // Calculate jacobians
+        H_k(0,0) =  x_b / locDist;
+        H_k(0,1) =  y_b / locDist;
+        H_k(1,0) = -y_b / locDistSquared;
+        H_k(1,1) =  x_b / locDistSquared;
+
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.distanceSD;
+        R_k(1,1) = z.bearingSD;
+    }
 }
 
 /**

@@ -12,7 +12,6 @@
 #include <boost/numeric/ublas/vector.hpp>
 
 // Local headers
-//#include "MCL.h"
 #include "VisualBall.h"
 
 // Default parameters

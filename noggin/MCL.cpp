@@ -8,6 +8,10 @@
 
 #include "MCL.h"
 using namespace std;
+#define MAX_CHANGE_X 10.0f
+#define MAX_CHANGE_Y 10.0f
+#define MAX_CHANGE_H M_PI / 8.0f
+#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 
 /**
  * Initializes the sampel sets so that the first update works appropriately
@@ -23,7 +27,7 @@ MCL::MCL()
         // H between +-pi
         PoseEst x_m(float(rand() % int(FIELD_WIDTH)),
                     float(rand() % int(FIELD_HEIGHT)),
-                    float(((rand() % FULL_CIRC) - HALF_CIRC))*DEG_TO_RAD);
+                    UNIFORM_1_NEG_1 * (M_PI / 2.0f));
         Particle p_m(x_m, 1.0f);
         X_t.push_back(p_m);
     }
@@ -60,7 +64,6 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
 
         // Update motion model for the particle
         x_t_m.pose = X_t_1[m].pose + u_t;
-
         // Update measurement model
         x_t_m.weight = updateMeasurementModel(z_t, x_t_m.pose);
         totalWeights += x_t_m.weight;
@@ -146,8 +149,8 @@ float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
  */
 void MCL::updateEstimates()
 {
-    PoseEst wMeans(0.,0.,0.);
     float weightSum = 0.;
+    PoseEst wMeans(0.,0.,0.);
     PoseEst bSDs(0., 0., 0.);
 
     // Calculate the weighted mean
@@ -156,7 +159,6 @@ void MCL::updateEstimates()
         wMeans.x += X_t[i].pose.x*X_t[i].weight;
         wMeans.y += X_t[i].pose.y*X_t[i].weight;
         wMeans.h += X_t[i].pose.h*X_t[i].weight;
-
         // Sum the weights
         weightSum += X_t[i].weight;
     }
@@ -167,11 +169,14 @@ void MCL::updateEstimates()
 
     // Calculate the biased variances
     for (unsigned int i=0; i < X_t.size(); ++i) {
-        bSDs.x += X_t[i].weight * (X_t[i].pose.x - wMeans.x)*
+        bSDs.x += X_t[i].weight *
+            (X_t[i].pose.x - wMeans.x)*
             (X_t[i].pose.x - wMeans.x);
-        bSDs.y += X_t[i].weight * (X_t[i].pose.y - wMeans.y)*
+        bSDs.y += X_t[i].weight *
+            (X_t[i].pose.y - wMeans.y)*
             (X_t[i].pose.y - wMeans.y);
-        bSDs.h += X_t[i].weight * (X_t[i].pose.h - wMeans.h)*
+        bSDs.h += X_t[i].weight *
+            (X_t[i].pose.h - wMeans.h)*
             (X_t[i].pose.h - wMeans.h);
     }
 
@@ -337,20 +342,6 @@ Particle MCL::randomWalkParticle(Particle p)
     p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
     return p;
 }
-
-// Other class simple constructors
-// PoseEst
-PoseEst::PoseEst(float _x, float _y, float _h) :
-    x(_x), y(_y), h(_h)
-{
-}
-
-PoseEst::PoseEst(const PoseEst& other) :
-    x(other.x), y(other.y), h(other.h)
-{
-}
-
-PoseEst::PoseEst() {}
 
 // Particle
 Particle::Particle(PoseEst _pose, float _weight) :

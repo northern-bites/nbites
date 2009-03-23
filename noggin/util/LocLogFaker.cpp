@@ -34,7 +34,9 @@
  *
  */
 #include "LocLogFaker.h"
-
+#include "NBMath.h"
+#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
+#define USE_PERFECT_LOC_FOR_BALL
 using namespace std;
 using namespace boost;
 
@@ -93,11 +95,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     // Method variables
     vector<Observation> Z_t;
     shared_ptr<MCL> myLoc = shared_ptr<MCL>(new MCL);
-#ifdef USE_PERFECT_LOC_FOR_BALL
-    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF(fakeLoc));
-#else
-    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF(myLoc));
-#endif // PERFECT_LOC
+    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF());
     PoseEst currentPose;
     BallPose currentBall;
     MotionModel noMove(0.0, 0.0, 0.0);
@@ -112,13 +110,6 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     printOutLogLine(outputFile, myLoc, Z_t, noMove, &currentPose,
                     &currentBall, ballEKF, *visBall);
 
-#ifdef USE_PERFECT_LOC_FOR_BALL
-    // Use a fake loc system to test the EKF
-    fakeLoc->setXEst(currentPose.x);
-    fakeLoc->setYEst(currentPose.y);
-    fakeLoc->setHEst(currentPose.h);
-#endif
-
     unsigned frameCounter = 0;
     // Iterate through the moves
     for(unsigned int i = 0; i < letsGo->myMoves.size(); ++i) {
@@ -129,15 +120,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;
 
-#ifdef USE_PERFECT_LOC_FOR_BALL
-            fakeLoc->setXEst(currentPose.x);
-            fakeLoc->setYEst(currentPose.y);
-            fakeLoc->setHEst(currentPose.h);
-#endif
-
             Z_t = determineObservedLandmarks(currentPose, 0.0);
-
-            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
 
             // Figure out the current ball distance and bearing
             visBall->setDistanceEst(determineBallEstimate(&currentPose,
@@ -145,8 +128,8 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
                                                           0.0));
 
             // Update the ball estimate model
-            ballEKF->updateModel(visBall);
-
+            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+            ballEKF->updateModel(visBall,false);
             // Print the current frame to file
             printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
                             &currentPose, &currentBall, ballEKF, *visBall);
@@ -335,15 +318,17 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
     estimate e;
     e.bearing = subPIAngle(atan2(currentBall->y - currentPose->y,
                                  currentBall->x - currentPose->x) -
-                           currentPose->h - QUART_CIRC_RAD);
+                           M_PI / 2.0f);
 
     // Calculate distance if object is within view
-    if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
+    if ( true ||
+         e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        e.dist += e.dist*UNIFORM_1_NEG_1*0.12;
-        e.bearing += UNIFORM_1_NEG_1*0.05;
+        e.dist += e.dist*UNIFORM_1_NEG_1*0.03;
+        e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
+
     } else {
         e.dist = 0.0f;
         e.bearing = 0.0f;
@@ -378,7 +363,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
     letsGo->ballStart.velY = 0.0;
 
     // Convert input value to radians
-    letsGo->startPos.h *= DEG_TO_RAD;
+    letsGo->startPos.h *= TO_RAD;
 
     // Build NavMoves from the remaining lines
     while (!inputFile->eof()) {
@@ -386,7 +371,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
                    >> ballMove.velX >> ballMove.velY
                    >> time;
 
-        motion.deltaR *= DEG_TO_RAD;
+        motion.deltaR *= TO_RAD;
         letsGo->myMoves.push_back(NavMove(motion, ballMove, time));
     }
 }
@@ -421,14 +406,51 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncertDeg() << " "
                 // Ball estimates
-                << ballEKF->getXEst() << " "
-                << ballEKF->getYEst() << " "
-                << ballEKF->getXUncert() << " "
-                << ballEKF->getYUncert() << " "
-                << ballEKF->getXVelocityEst() << " "
-                << ballEKF->getYVelocityEst() << " "
-                << ballEKF->getXUncert() << " "
-                << ballEKF->getYUncert() << " "
+                // << (ballEKF->getXEst()*cos(myLoc->getHEst()) +
+                //     ballEKF->getYEst()*sin(myLoc->getHEst()) +
+                //     myLoc->getXEst()) << " "
+                // // Y Estimate
+                // << (ballEKF->getXEst()*sin(myLoc->getHEst()) +
+                //     ballEKF->getYEst()*cos(myLoc->getHEst()) +
+                //     myLoc->getYEst()) << " "
+                // X Estimate
+                << (ballEKF->getXEst()*cos(currentPose->h) +
+                    ballEKF->getYEst()*sin(currentPose->h) +
+                    currentPose->x) << " "
+                // Y Estimate
+                << (ballEKF->getXEst()*sin(currentPose->h) +
+                    ballEKF->getYEst()*cos(currentPose->h) +
+                    currentPose->y) << " "
+                // // X Estimate
+                // << (ballEKF->getXEst() +
+                //     currentPose->x) << " "
+                // // Y Estimate
+                // << (ballEKF->getYEst() +
+                //     currentPose->y) << " "
+                // X Uncert
+                << (ballEKF->getXUncert()) << " "
+                // Y Uncert
+                << (ballEKF->getYUncert()) << " "
+                // // X Uncert
+                // << (fabs(ballEKF->getXUncert()*cos(myLoc->getHEst())) +
+                //     fabs(ballEKF->getYUncert()*sin(myLoc->getHEst()))) << " "
+                // // Y Uncert
+                // << (fabs(ballEKF->getXUncert()*sin(myLoc->getHEst())) +
+                //     fabs(ballEKF->getYUncert()*cos(myLoc->getHEst()))) << " "
+                // X Velocity Estimate
+                << (-ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) +
+                    ballEKF->getYVelocityEst()*sin(myLoc->getHEst())) << " "
+                // Y Estimate
+                << (ballEKF->getXVelocityEst()*sin(myLoc->getHEst()) +
+                    ballEKF->getYVelocityEst()*cos(myLoc->getHEst())) << " "
+                // X Velocity Uncert
+                << (fabs(ballEKF->getXVelocityUncert()*cos(myLoc->getHEst())) +
+                    fabs(ballEKF->getYVelocityUncert()*sin(myLoc->getHEst())))
+                << " "
+                // Y Velocity Uncert
+                << (fabs(ballEKF->getXVelocityUncert()*sin(myLoc->getHEst())) +
+                    fabs(ballEKF->getYVelocityUncert()*cos(myLoc->getHEst())))
+                << " "
                 // Odometery
                 << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                 << lastOdo.deltaR;
@@ -438,13 +460,13 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
 
     // Print the actual robot position
     *outputFile << currentPose->x << " "
-                  << currentPose->y << " "
-                  << currentPose->h << " "
+                << currentPose->y << " "
+                << currentPose->h << " "
     // print actual ball position
-                  << currentBall->x << " "
-                  << currentBall->y << " "
-                  << currentBall->velX << " "
-                  << currentBall->velY << " ";
+                << currentBall->x << " "
+                << currentBall->y << " "
+                << currentBall->velX << " "
+                << currentBall->velY << " ";
 
     // Divide the sections with a colon
     *outputFile << ":";
@@ -474,26 +496,6 @@ NavMove::NavMove(MotionModel _p, BallPose _b, int _t) : move(_p), ballVel(_b),
                                                         time(_t)
 {
 };
-
-/**
- * Returns an equivalent angle to the one passed in with value between positive
- * and negative pi.
- *
- * @param theta The angle to be simplified
- *
- * @return The equivalent angle between -pi and pi.
- */
-float subPIAngle(float theta)
-{
-    while( theta > M_PI) {
-        theta -= 2.0f*M_PI;
-    }
-
-    while( theta < -M_PI) {
-        theta += 2.0f*M_PI;
-    }
-    return theta;
-}
 
 /**
  * Get standard deviation for the associated distance reading

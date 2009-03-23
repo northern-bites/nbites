@@ -84,7 +84,7 @@ void Noggin::initializeLocalization()
 
     // Initialize the localization modules
     mcl = shared_ptr<MCL>(new MCL());
-    ballEKF = shared_ptr<BallEKF>(new BallEKF(mcl));
+    ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers
     set_mcl_reference(mcl);

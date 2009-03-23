@@ -32,37 +32,6 @@ string DEFAULT_OUTFILE_NAME = "FAKELOG.mcl";
 float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f;
 
 /**
- * Class to hold the ball positin and velocity in the x and y directions
- */
-class BallPose
-{
-public:
-    float x;
-    float y;
-    float velX;
-    float velY;
-
-    BallPose operator+ (const BallPose o){
-        return BallPose(x + o.velX,
-                        y + o.velY,
-                        o.velX,
-                        o.velY);
-    }
-
-    void operator+= (const BallPose o){
-        x += o.velX;
-        y += o.velY;
-        velX = o.velX;
-        velY = o.velY;
-    }
-
-    BallPose(float _x, float _y, float _vx, float _vy) : x(_x), y(_y), velX(_vx),
-                                                         velY(_vy) {}
-    BallPose() {}
-
-};
-
-/**
  * Class to hold a constant robot path vector over a given number of frames
  */
 class NavMove
@@ -96,7 +65,6 @@ void printOutLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
                      VisualBall _b);
 
 // Helper functions
-float subPIAngle(float theta);
 float getDistSD(float dist);
 float getBearingSD(float bearing);
 

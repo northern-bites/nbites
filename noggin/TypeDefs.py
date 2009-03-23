@@ -214,10 +214,10 @@ class Ball:
         self.locDist = dist(loc.x, loc.y, self.x, self.y)
         self.locBearing = getRelativeBearing(loc.x, loc.y, loc.h,
                                              self.x, self.y)
-        self.locRelX = getRelativeX(self.locDist, self.locBearing)
-        self.locRelY = getRelativeY(self.locDist, self.locBearing)
-        self.relVelX = getRelativeVelocityX(loc.h,self.velX, self.velY)
-        self.relVelY = getRelativeVelocityY(loc.h,self.velX, self.velY)
+        self.locRelX = loc.ballRelX
+        self.locRelY = loc.ballRelY
+        self.relVelX = loc.ballVelRelX
+        self.relVelY = loc.ballVelRelY
 
     def __str__(self):
         '''returns string with all class variables'''

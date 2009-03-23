@@ -1,5 +1,7 @@
 /**
  * BallEKF.h - Header file for the BallEKF class
+ * All coordinates in C++ are in the local coordinate frame
+ * We convert to the global frame when dealing with python
  *
  * @author Tucker Hermans
  */
@@ -9,9 +11,10 @@
 #include <boost/shared_ptr.hpp>
 
 #include "EKF.h"
-#include "MCL.h"
 #include "VisualBall.h"
 #include "EKFStructs.h"
+#include "NBMath.h"
+#include "NogginStructs.h"
 
 // Parameters
 #define ASSUMED_FPS 30.0
@@ -23,24 +26,24 @@
 #define BALL_DECAY_PERCENT 0.25
 
 // Default initialization values
-#define INIT_BALL_X 220.0f
-#define INIT_BALL_Y 340.0f
+#define INIT_BALL_X 0.0f
+#define INIT_BALL_Y 100.0f
 #define INIT_BALL_X_VEL 0.0f
 #define INIT_BALL_Y_VEL 0.0f
-#define INIT_X_UNCERT 100.0f
-#define INIT_Y_UNCERT 100.0f
-#define INIT_X_VEL_UNCERT 10.0f
-#define INIT_Y_VEL_UNCERT 10.0f
 #define X_UNCERT_MAX 440.0f
 #define Y_UNCERT_MAX 680.0f
 #define VELOCITY_UNCERT_MAX 300.0
 #define X_UNCERT_MIN 1.0e-6
 #define Y_UNCERT_MIN 1.0e-6
 #define VELOCITY_UNCERT_MIN 1.0e-6
-#define X_EST_MIN 0
-#define Y_EST_MIN 0
-#define X_EST_MAX 440.0f
-#define Y_EST_MAX 680.0f
+#define INIT_X_UNCERT X_UNCERT_MAX
+#define INIT_Y_UNCERT Y_UNCERT_MAX
+#define INIT_X_VEL_UNCERT VELOCITY_UNCERT_MAX
+#define INIT_Y_VEL_UNCERT VELOCITY_UNCERT_MAX
+#define X_EST_MIN -600.0f
+#define Y_EST_MIN -1000.0f
+#define X_EST_MAX 600.0f
+#define Y_EST_MAX 1000.0f
 #define VELOCITY_EST_MAX 300.0f
 #define VELOCITY_EST_MIN -300.0f
 
@@ -53,8 +56,7 @@ class BallEKF : public EKF<BallMeasurement, MotionModel>
 public:
 
     // Constructors & Destructors
-    BallEKF(boost::shared_ptr<MCL> _mcl,
-            float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
+    BallEKF(float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
             float initVelX = INIT_BALL_X_VEL,
             float initVelY = INIT_BALL_Y_VEL,
             float initXUncert = INIT_X_UNCERT,
@@ -64,7 +66,7 @@ public:
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(VisualBall * ball);
+    void updateModel(VisualBall * ball, bool _useCartesian=false);
     void sawTeammateBall(BallMeasurement m);
     void sawBall(VisualBall * ball);
 
@@ -174,7 +176,6 @@ private:
     void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
     void limitPosteriorUncert(void);
-    // Members
-    boost::shared_ptr<MCL> robotLoc;
+    bool useCartesian;
 };
 #endif // File

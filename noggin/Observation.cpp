@@ -86,15 +86,3 @@ Observation::Observation(const VisualLine &_line) :
  * Deconstructor for our observation
  */
 Observation::~Observation() {}
-
-// Simple class constructors
-
-PointLandmark::PointLandmark(float _x, float _y): x(_x), y(_y){}
-
-PointLandmark::PointLandmark(){}
-
-LineLandmark::LineLandmark(float _x1, float _y1, float _x2, float _y2):
-    x1(_x1), y1(_y2), x2(_x2), y2(_y2){}
-
-LineLandmark::LineLandmark(){}
-
