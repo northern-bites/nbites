@@ -293,7 +293,7 @@ void Noggin::updateLocalization()
     PROF_EXIT(profiler, P_MCL);
 
     // Ball Tracking
-    ballEKF->updateModel(vision->ball);
+    ballEKF->updateModel(vision->ball, mcl->getCurrentEstimate());
 
 #ifdef DEBUG_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {

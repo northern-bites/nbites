@@ -51,8 +51,9 @@ BallEKF::BallEKF(float initX, float initY,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(VisualBall * ball, bool _useCartesian)
+void BallEKF::updateModel(VisualBall * ball, PoseEst p, bool _useCartesian)
 {
+    robotPose = p;
     useCartesian = _useCartesian;
     // Update expected ball movement
     timeUpdate(MotionModel());
@@ -132,9 +133,9 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
                                      MeasurementVector &V_k)
 {
     if (useCartesian) {
-        // Convert our siting to cartesian coordinates
-        float x_b_r = -z.distance * sin(z.bearing);
-        float y_b_r = z.distance * cos(z.bearing);
+        // Convert our sighting to cartesian coordinates
+        float x_b_r = z.distance * cos(z.bearing + QUART_CIRC_RAD);
+        float y_b_r = z.distance * sin(z.bearing + QUART_CIRC_RAD);
         MeasurementVector z_x(2);
 
         z_x(0) = x_b_r;
@@ -145,17 +146,19 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
         float y_b = getYEst();
         MeasurementVector d_x(2);
 
-        d_x(0) = x_b;
-        d_x(1) = y_b;
+        d_x(0) = (x_b - robotPose.x)*cos(-robotPose.h) -
+            (y_b - robotPose.y)*sin(-robotPose.h);
+        d_x(1) = (x_b - robotPose.x)*sin(-robotPose.h) +
+            (y_b - robotPose.y)*cos(-robotPose.h);
 
         // Calculate invariance
         V_k = z_x - d_x;
 
         // Calculate jacobians
-        H_k(0,0) = cos(z.bearing);
-        H_k(0,1) = -sin(z.bearing);
-        H_k(1,0) = sin(z.bearing);
-        H_k(1,1) = cos(z.bearing);
+        H_k(0,0) = cos(robotPose.h);
+        H_k(0,1) = -sin(robotPose.h);
+        H_k(1,0) = sin(robotPose.h);
+        H_k(1,1) = cos(robotPose.h);
 
         // Update the measurement covariance matrix
         R_k(0,0) = z.distanceSD;

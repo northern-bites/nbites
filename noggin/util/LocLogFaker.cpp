@@ -40,6 +40,8 @@
 using namespace std;
 using namespace boost;
 
+static const bool usePerfectLocForBall = false;
+
 int main(int argc, char** argv)
 {
     // Information needed for the main method
@@ -129,7 +131,11 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
 
             // Update the ball estimate model
             myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
-            ballEKF->updateModel(visBall,false);
+            if (usePerfectLocForBall) {
+                ballEKF->updateModel(visBall,currentPose, true);
+            } else {
+                ballEKF->updateModel(visBall,myLoc->getCurrentEstimate(), true);
+            }
             // Print the current frame to file
             printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
                             &currentPose, &currentBall, ballEKF, *visBall);
@@ -405,52 +411,30 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 << myLoc->getHEstDeg() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncertDeg() << " "
-                // Ball estimates
-                // << (ballEKF->getXEst()*cos(myLoc->getHEst()) +
-                //     ballEKF->getYEst()*sin(myLoc->getHEst()) +
-                //     myLoc->getXEst()) << " "
-                // // Y Estimate
-                // << (ballEKF->getXEst()*sin(myLoc->getHEst()) +
-                //     ballEKF->getYEst()*cos(myLoc->getHEst()) +
-                //     myLoc->getYEst()) << " "
-                // X Estimate
-                << (ballEKF->getXEst()*cos(currentPose->h) +
-                    ballEKF->getYEst()*sin(currentPose->h) +
-                    currentPose->x) << " "
-                // Y Estimate
-                << (ballEKF->getXEst()*sin(currentPose->h) +
-                    ballEKF->getYEst()*cos(currentPose->h) +
-                    currentPose->y) << " "
                 // // X Estimate
-                // << (ballEKF->getXEst() +
+                // << (ballEKF->getXEst()*cos(currentPose->h) +
+                //     ballEKF->getYEst()*sin(currentPose->h) +
                 //     currentPose->x) << " "
                 // // Y Estimate
-                // << (ballEKF->getYEst() +
+                // << (ballEKF->getXEst()*sin(currentPose->h) +
+                //     ballEKF->getYEst()*cos(currentPose->h) +
                 //     currentPose->y) << " "
+                // X Estimate
+                << (ballEKF->getXEst()) << " "
+                // Y Estimate
+                << (ballEKF->getYEst()) << " "
                 // X Uncert
                 << (ballEKF->getXUncert()) << " "
                 // Y Uncert
                 << (ballEKF->getYUncert()) << " "
-                // // X Uncert
-                // << (fabs(ballEKF->getXUncert()*cos(myLoc->getHEst())) +
-                //     fabs(ballEKF->getYUncert()*sin(myLoc->getHEst()))) << " "
-                // // Y Uncert
-                // << (fabs(ballEKF->getXUncert()*sin(myLoc->getHEst())) +
-                //     fabs(ballEKF->getYUncert()*cos(myLoc->getHEst()))) << " "
                 // X Velocity Estimate
-                << (-ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) +
-                    ballEKF->getYVelocityEst()*sin(myLoc->getHEst())) << " "
-                // Y Estimate
-                << (ballEKF->getXVelocityEst()*sin(myLoc->getHEst()) +
-                    ballEKF->getYVelocityEst()*cos(myLoc->getHEst())) << " "
+                << ballEKF->getXVelocityEst() << " "
+                // Y Velocity Estimate
+                << ballEKF->getYVelocityEst() << " "
                 // X Velocity Uncert
-                << (fabs(ballEKF->getXVelocityUncert()*cos(myLoc->getHEst())) +
-                    fabs(ballEKF->getYVelocityUncert()*sin(myLoc->getHEst())))
-                << " "
+                << ballEKF->getXVelocityUncert() << " "
                 // Y Velocity Uncert
-                << (fabs(ballEKF->getXVelocityUncert()*sin(myLoc->getHEst())) +
-                    fabs(ballEKF->getYVelocityUncert()*cos(myLoc->getHEst())))
-                << " "
+                << ballEKF->getYVelocityUncert() << " "
                 // Odometery
                 << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                 << lastOdo.deltaR;

@@ -57,7 +57,8 @@ class BallEKF : public EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION,
 public:
 
     // Constructors & Destructors
-    BallEKF(float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
+    BallEKF(float initX = INIT_BALL_X,
+            float initY = INIT_BALL_Y,
             float initVelX = INIT_BALL_X_VEL,
             float initVelY = INIT_BALL_Y_VEL,
             float initXUncert = INIT_X_UNCERT,
@@ -67,7 +68,7 @@ public:
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(VisualBall * ball, bool _useCartesian=false);
+    void updateModel(VisualBall * ball, PoseEst p, bool _useCartesian=true);
     void sawTeammateBall(BallMeasurement m);
     void sawBall(VisualBall * ball);
 
@@ -174,5 +175,6 @@ private:
     void limitAPrioriUncert(void);
     void limitPosteriorUncert(void);
     bool useCartesian;
+    PoseEst robotPose;
 };
 #endif // File
