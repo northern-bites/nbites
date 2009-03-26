@@ -453,9 +453,9 @@ public class DebugViewer extends JFrame {
         LANDMARK_Y[6] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[7] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[8] = (int) (wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-                               wc.the_field.GOAL_BOX_HEIGHT);
+                               wc.the_field.GOAL_BOX_DEPTH);
         LANDMARK_Y[9] = (int) (wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-                               wc.the_field.GOAL_BOX_HEIGHT);
+                               wc.the_field.GOAL_BOX_DEPTH);
         LANDMARK_Y[10] = (int) wc.the_field.MIDFIELD_Y;
         LANDMARK_Y[11] = (int) wc.the_field.MIDFIELD_Y;
         LANDMARK_Y[12] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;
@@ -463,9 +463,9 @@ public class DebugViewer extends JFrame {
         LANDMARK_Y[14] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;
         LANDMARK_Y[15] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;
         LANDMARK_Y[16] = (int) (wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
-                                wc.the_field.GOAL_BOX_HEIGHT);
+                                wc.the_field.GOAL_BOX_DEPTH);
         LANDMARK_Y[17] = (int) (wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
-                                wc.the_field.GOAL_BOX_HEIGHT);
+                                wc.the_field.GOAL_BOX_DEPTH);
 
         niceOutput = new DecimalFormat("####.##");
     }
@@ -544,14 +544,14 @@ public class DebugViewer extends JFrame {
             new Point2D.Double(wc.the_field.CENTER_FIELD_X -
                                wc.the_field.GOAL_BOX_WIDTH / 2.0,
                                wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-                               wc.the_field.GOAL_BOX_HEIGHT);
+                               wc.the_field.GOAL_BOX_DEPTH);
         objectIDMap.put(new Integer(19), blueGoalLeftL);
         objectIDStringMap.put(new Integer(19), "Blue Goal Left L");
         Point2D.Double blueGoalRightL =
             new Point2D.Double(wc.the_field.CENTER_FIELD_X +
                                wc.the_field.GOAL_BOX_WIDTH / 2.0,
                                wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-                               wc.the_field.GOAL_BOX_HEIGHT);
+                               wc.the_field.GOAL_BOX_DEPTH);
         objectIDMap.put(new Integer(20), blueGoalRightL);
         objectIDStringMap.put(new Integer(20), "Blue Goal Right L");
         Point2D.Double centerBYT =
@@ -590,14 +590,14 @@ public class DebugViewer extends JFrame {
             new Point2D.Double(wc.the_field.CENTER_FIELD_X +
                                wc.the_field.GOAL_BOX_WIDTH / 2.0,
                                wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
-                               wc.the_field.GOAL_BOX_HEIGHT);
+                               wc.the_field.GOAL_BOX_DEPTH);
         objectIDMap.put(new Integer(27), yellowGoalLeftL);
         objectIDStringMap.put(new Integer(27), "Yellow Goal Left L");
         Point2D.Double yellowGoalRightL =
             new Point2D.Double(wc.the_field.CENTER_FIELD_X -
                                wc.the_field.GOAL_BOX_WIDTH / 2.0,
                                wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
-                               wc.the_field.GOAL_BOX_HEIGHT);
+                               wc.the_field.GOAL_BOX_DEPTH);
         objectIDMap.put(new Integer(28), yellowGoalRightL);
         objectIDStringMap.put(new Integer(28), "Yellow Goal Right L");
 

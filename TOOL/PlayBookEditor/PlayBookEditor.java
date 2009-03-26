@@ -8,8 +8,7 @@ import java.io.*;
 import TOOL.TOOL;
 import TOOL.Image.PlayBookEditorViewer;
 import TOOL.Data.Field;
-import TOOL.Data.AiboField2008;
-import TOOL.Data.NaoField2008;
+import TOOL.Data.NaoField2009;
 import java.util.ListIterator;
 import java.util.LinkedList;
 
@@ -53,8 +52,7 @@ public class PlayBookEditor extends JPanel implements MouseListener,
 
     // Important things for the handling of playbook data
     protected Field field;
-    protected AiboField2008 aiboField;
-    protected NaoField2008 naoField;
+    protected NaoField2009 naoField;
     protected Ball ball;
     protected PlayBook playBook;
     protected ComponentLibrary playBookComponents;
@@ -86,13 +84,12 @@ public class PlayBookEditor extends JPanel implements MouseListener,
 					   JLabel.CENTER);
 
 	// Setup the main field area
-        aiboField = new AiboField2008();
-        naoField = new NaoField2008();
-        field = aiboField;
-	fieldPanel = new PlayBookEditorViewer(tool, field, this);
+    naoField = new NaoField2009();
+    field = naoField;
+    fieldPanel = new PlayBookEditorViewer(tool, field, this);
 
 	// Setup the bottom field drawing components
-        buttonPanel = new PlayBookEditorPanel(this, fieldPanel);
+    buttonPanel = new PlayBookEditorPanel(this, fieldPanel);
 
 	// Setup the left hand display panel
 	treePanel = new BehaviorTree();
@@ -179,13 +176,7 @@ public class PlayBookEditor extends JPanel implements MouseListener,
      * Method to switch between Aibo and Nao fields
      */
     public void switchFields() {
-        if (field == aiboField) {
             field = naoField;
-        }
-        else if (field == naoField) {
-            field = aiboField;
-        }
-        fieldPanel.setField(field);
     }
 
     public PlayBookEditorViewer getViewer() { return fieldPanel; }

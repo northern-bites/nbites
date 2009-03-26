@@ -14,8 +14,8 @@ public class NaoField2009 extends Field {
 
     public final double getGreenPadX() { return 67.5; }
     public final double getGreenPadY() { return 67.5; }
-    public final double getFieldWhiteWidth() { return 405.0; }
-    public final double getFieldWhiteHeight() { return 605.0; }
+    public final double getFieldWhiteWidth() { return 605.0; }
+    public final double getFieldWhiteHeight() { return 405.0; }
     // Side length = 40, goal post width = 10
     public final double getGoalDepth() { return 50.0; }
     public final double getGoalSideLength() { return 40.0; }
@@ -28,7 +28,7 @@ public class NaoField2009 extends Field {
     // The width between the two posts
     public final double getGoalWidth() { return 140.0; }
     public final double getGoalBoxWidth() { return 305.0; }
-    public final double getGoalBoxHeight() { return 65.0; }
+    public final double getGoalBoxDepth() { return 65.0; }
     public final double getCCRadius() { return 62.5; }
     // There are no beacons
     public final double getBeaconRadius() { return 0.0; }

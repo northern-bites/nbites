@@ -36,7 +36,7 @@ public class LabField2009 extends Field {
     // The width between the two posts
     public final double getGoalWidth() { return 140.0; }
     public final double getGoalBoxWidth() { return 200.0; }
-    public final double getGoalBoxHeight() { return 60.0; }
+    public final double getGoalBoxDepth() { return 60.0; }
     public final double getCCRadius() { return 62.5; }
     // There are no beacons
     public final double getBeaconRadius() { return 0.0; }

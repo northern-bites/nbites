@@ -52,7 +52,7 @@ public abstract class Field
     public final double GOAL_SIDE_LENGTH = getGoalSideLength();
     public final double GOAL_WIDTH = getGoalWidth();
     public final double GOAL_BOX_WIDTH = getGoalBoxWidth();
-    public final double GOAL_BOX_HEIGHT = getGoalBoxHeight();
+    public final double GOAL_BOX_DEPTH = getGoalBoxDepth();
     public final double CENTER_CIRCLE_RADIUS = getCCRadius();
     public final double BEACON_RADIUS = getBeaconRadius();
     public final double GOAL_POST_RADIUS = getGoalPostRadius();
@@ -137,7 +137,7 @@ public abstract class Field
     public abstract double getGoalSideLength();
     public abstract double getGoalWidth();
     public abstract double getGoalBoxWidth();
-    public abstract double getGoalBoxHeight();
+    public abstract double getGoalBoxDepth();
     public abstract double getCCRadius();
     public abstract double getBeaconRadius();
     public abstract double getGoalPostRadius();
@@ -239,12 +239,12 @@ public abstract class Field
 
         // Top goal box
         drawRect(g2, LINES_COLOR, LINE_THICKNESS, GOAL_BOX_X_LEFT,
-                 TOP_GOAL_Y - GOAL_BOX_HEIGHT, GOAL_BOX_WIDTH,
-                 GOAL_BOX_HEIGHT);
+                 TOP_GOAL_Y - GOAL_BOX_DEPTH, GOAL_BOX_WIDTH,
+                 GOAL_BOX_DEPTH);
 
         // draw bottom goal box
         drawRect(g2, LINES_COLOR, LINE_THICKNESS, GOAL_BOX_X_LEFT,
-                 BOTTOM_GOAL_Y, GOAL_BOX_WIDTH, GOAL_BOX_HEIGHT);
+                 BOTTOM_GOAL_Y, GOAL_BOX_WIDTH, GOAL_BOX_DEPTH);
 
     }
 
