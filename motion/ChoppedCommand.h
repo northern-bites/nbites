@@ -14,6 +14,12 @@ using std::vector;
 class ChoppedCommand
 {
 public:
+
+	// Empty constructor. Will initialize a finished
+	// body joint command with no values. Don't use!
+	// ***SHOULD NOT BE USED***
+	ChoppedCommand() : finished(true) { }
+	
 	ChoppedCommand (vector<float> *first,
 					vector<float> *diffs,
 					int chops,int motionType);
@@ -37,9 +43,12 @@ private:
 	int numChops;
 	vector<int> numChopped;
 	int motionType;
+	bool finished;
 
 	vector<float>* getCurrentChain(int id);
 	vector<float>* getDiffChain(int id);
+	void incrCurrChain(int id);
+	void checkDone();
 };
 
 #endif

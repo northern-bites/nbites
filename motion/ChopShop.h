@@ -22,7 +22,6 @@
 #define _ChopShop_h_DEFINED
 
 #include <vector>
-#include <queue>
 #include <boost/shared_ptr.hpp>
 
 #include "Sensors.h"
@@ -31,7 +30,6 @@
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
 
-using std::queue;
 using std::vector;
 using boost::shared_ptr;
 
@@ -40,7 +38,7 @@ class ChopShop
 public:
 	ChopShop(shared_ptr<Sensors> s, float motionFrameLength);
 
-	ChoppedCommand * chopCommand(const JointCommand *command);
+	shared_ptr<ChoppedCommand> chopCommand(const JointCommand *command);
 
 private:
 	// Inside most vector: joint values for a chain
@@ -50,8 +48,8 @@ private:
 	shared_ptr<Sensors> sensors;
 	float FRAME_LENGTH_S;
 
-// 	ChoppedCommand * chopSmooth(const JointCommand *command);
-	ChoppedCommand * chopLinear(const JointCommand *command);
+// 	shared_ptr<ChoppedCommand> chopSmooth(const JointCommand *command);
+	shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command);
 
 	vector<float> getCurrentJoints();
 	vector<float> getFinalJoints(const JointCommand *command,
@@ -62,10 +60,6 @@ private:
 								 vector<float> *final);
 	void vectorToRad(vector<float> *vect);
 
-	ChoppedCommand * buildChops(int numChops,
-								vector<float> *currentJoints,
-								vector<float> *diffPerChop,
-								const JointCommand *command);
 };
 
 #endif

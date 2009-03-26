@@ -53,17 +53,19 @@ private:
 	ChopShop chopper;
 	vector<vector<float> > nextJoints;
 
-	// ChainQueues
-	vector<ChainQueue> chainQueues;
+	// The current chopped command which is being enacted
+	shared_ptr<ChoppedCommand> currCommand;
+
+	// Queue to hold the next body commands
 	queue<const BodyJointCommand*> bodyCommandQueue;
 
 	pthread_mutex_t scripted_mutex;
 
-	vector <vector <float> > getCurrentChains();
+	shared_ptr<vector <vector <float> > > getCurrentChains();
 	void setNextBodyCommand();
     void setActive();
 	bool isDone();
-    bool chainQueuesEmpty();
+	bool currCommandEmpty();
     bool commandQueueEmpty();
 
 };

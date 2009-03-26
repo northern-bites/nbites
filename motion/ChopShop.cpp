@@ -36,12 +36,11 @@ ChopShop::ChopShop (shared_ptr<Sensors> s, float motionFrameLength)
 /*************************************************************************/
 /*******  THIS WILL DELETE THE JOINT COMMAND PASSED TO IT!   *************/
 /*************************************************************************/
-ChoppedCommand* ChopShop::chopCommand(const JointCommand *command) {
-	ChoppedCommand * chopped;
+shared_ptr<ChoppedCommand> ChopShop::chopCommand(const JointCommand *command) {
+	shared_ptr<ChoppedCommand> chopped;
 	// It's a BJC so it deals with 4 chains
 	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
 		chopped = chopLinear(command);
-
 	}
 
 // 	else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
@@ -50,7 +49,7 @@ ChoppedCommand* ChopShop::chopCommand(const JointCommand *command) {
 
 	else {
 		cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING LINEARLY" << endl;
-		chopped =  chopLinear(command);
+		chopped = chopLinear(command) ;
 	}
 	// Deleting command!
 	delete command;
@@ -74,7 +73,7 @@ ChoppedCommand* ChopShop::chopCommand(const JointCommand *command) {
  *
  *
  */
-ChoppedCommand *
+shared_ptr<ChoppedCommand>
 ChopShop::chopLinear(const JointCommand *command) {
 	// Get number of chops according to duration
 	int numChops = (int)(command->getDuration()/FRAME_LENGTH_S);
@@ -92,8 +91,8 @@ ChopShop::chopLinear(const JointCommand *command) {
 	ChoppedCommand * chopped = new ChoppedCommand(&currentJoints,
 												  &diffPerChop,
 												  numChops,command->getType());
-
-	return chopped;
+	shared_ptr<ChoppedCommand> pChopped(chopped);
+	return pChopped;
 }
 
 vector<float> ChopShop::getCurrentJoints() {
@@ -154,4 +153,5 @@ void ChopShop::vectorToRad(vector<float> *vect) {
 		*i = *i * TO_RAD;
 		i++;
 	}
+
 }
