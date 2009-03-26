@@ -26,7 +26,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "MotionProvider.h"
-#include "ChainQueue.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
 #include "Sensors.h"
