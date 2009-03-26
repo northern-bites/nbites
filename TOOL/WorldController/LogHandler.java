@@ -590,12 +590,12 @@ public class LogHandler
         case DebugViewer.CENTER_T:
             break;
         case DebugViewer.BLUE_GOAL_POST:
-            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_POST));
-            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_POST));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_TOP_POST));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_BOTTOM_POST));
             break;
         case DebugViewer.YELLOW_GOAL_POST:
-            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_POST));
-            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_POST));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_TOP_POST));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_BOTTOM_POST));
             break;
         }
         return pos;

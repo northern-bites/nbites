@@ -130,10 +130,10 @@ public class DebugViewer extends JFrame {
     public static final int YELLOW_GOAL_RIGHT_L = 28;
 
     // Field Objects
-    public static final int BLUE_GOAL_LEFT_POST = 30;
-    public static final int BLUE_GOAL_RIGHT_POST = 31;
-    public static final int YELLOW_GOAL_LEFT_POST = 32;
-    public static final int YELLOW_GOAL_RIGHT_POST = 33;
+    public static final int BLUE_GOAL_TOP_POST = 30;
+    public static final int BLUE_GOAL_BOTTOM_POST = 31;
+    public static final int YELLOW_GOAL_TOP_POST = 32;
+    public static final int YELLOW_GOAL_BOTTOM_POST = 33;
     public static final int BLUE_GOAL_POST = 34;
     public static final int YELLOW_GOAL_POST = 35;
 
@@ -424,10 +424,10 @@ public class DebugViewer extends JFrame {
         populateCornerMap();
         populateObjectIDMap();
         LANDMARK_X = new int[18];
-        LANDMARK_X[0] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_X;
-        LANDMARK_X[1] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_X;
-        LANDMARK_X[2] = (int) wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_X;
-        LANDMARK_X[3] = (int) wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_X;
+        LANDMARK_X[0] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X;
+        LANDMARK_X[1] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X;
+        LANDMARK_X[2] = (int) wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X;
+        LANDMARK_X[3] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X;
         LANDMARK_X[4] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
         LANDMARK_X[5] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
         // LANDMARK_X[6] = (int) wc.the_field.GOAL_BOX_X_LEFT;
@@ -444,10 +444,10 @@ public class DebugViewer extends JFrame {
         // LANDMARK_X[17] = (int) wc.the_field.GOAL_BOX_X_LEFT;
 
         LANDMARK_Y = new int[18];
-        LANDMARK_Y[0] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_Y;
-        LANDMARK_Y[1] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y;
-        LANDMARK_Y[2] = (int) wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_Y;
-        LANDMARK_Y[3] = (int) wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_Y;
+        LANDMARK_Y[0] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y;
+        LANDMARK_Y[1] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y;
+        LANDMARK_Y[2] = (int) wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_Y;
+        LANDMARK_Y[3] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y;
         LANDMARK_Y[4] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[5] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[6] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
@@ -603,23 +603,23 @@ public class DebugViewer extends JFrame {
 
         // Field objects
         Point2D.Double bglpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
-                               wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X,
+                               wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y);
         objectIDMap.put(new Integer(30), bglpPT);
         objectIDStringMap.put(new Integer(30), "Blue goal left post");
         Point2D.Double bgrpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
-                               wc.the_field.LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
+                               wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
         objectIDMap.put(new Integer(31), bgrpPT);
         objectIDStringMap.put(new Integer(31), "Blue goal right post");
         Point2D.Double ygrpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_X,
-                               wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
+                               wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y);
         objectIDMap.put(new Integer(32), ygrpPT);
         objectIDStringMap.put(new Integer(32), "Yellow goal right post");
         Point2D.Double yglpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_X,
-                               wc.the_field.LANDMARK_TOP_GOAL_LEFT_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X,
+                               wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_Y);
         objectIDMap.put(new Integer(33), yglpPT);
         objectIDStringMap.put(new Integer(33), "Yellow goal left post");
         // Ambiguous field objects

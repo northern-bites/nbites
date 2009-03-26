@@ -54,15 +54,12 @@ public abstract class Field
     public final double GOAL_BOX_WIDTH = getGoalBoxWidth();
     public final double GOAL_BOX_DEPTH = getGoalBoxDepth();
     public final double CENTER_CIRCLE_RADIUS = getCCRadius();
-    public final double BEACON_RADIUS = getBeaconRadius();
     public final double GOAL_POST_RADIUS = getGoalPostRadius();
     public final double BALL_RADIUS = getBallRadius();
     public final double LINE_THICKNESS = getLineThickness();
     public final double DEFAULT_THICKNESS = 1.0;
     public final double GOAL_CROSSBAR_THICKNESS =
         getGoalCrossbarThickness();
-    // Distance from beacons to field
-    public final double POST_TO_FIELD_OFFSET = getPostToFieldOffset();
 
     // computed field dimensions used by internal procedures and the RoboCup
     // Rules. There is no need to set or to modify these values
@@ -76,47 +73,46 @@ public abstract class Field
     public final double MIDFIELD_Y = FIELD_HEIGHT / 2.;
 
     // my left post is left of goalie defending my goal facing the opponent
-    public final double LANDMARK_BOTTOM_GOAL_LEFT_POST_X =
-        CENTER_FIELD_X - GOAL_WIDTH/2;
-    public final double LANDMARK_BOTTOM_GOAL_RIGHT_POST_X =
-        CENTER_FIELD_X + GOAL_WIDTH/2;
-    public final double LANDMARK_TOP_GOAL_LEFT_POST_X =
-        CENTER_FIELD_X + GOAL_WIDTH/2;
-    public final double LANDMARK_TOP_GOAL_RIGHT_POST_X =
-        CENTER_FIELD_X - GOAL_WIDTH/2;
+    public final double LANDMARK_RIGHT_GOAL_TOP_POST_X =
+        RIGHT_SIDELINE_X + GOAL_POST_RADIUS;
+    public final double LANDMARK_RIGHT_GOAL_BOTTOM_POST_X =
+        RIGHT_SIDELINE_X + GOAL_POST_RADIUS;
+    public final double LANDMARK_LEFT_GOAL_TOP_POST_X =
+        LEFT_SIDELINE_X - GOAL_POST_RADIUS;
+    public final double LANDMARK_LEFT_GOAL_BOTTOM_POST_X =
+        LEFT_SIDELINE_X - GOAL_POST_RADIUS;
 
     // measure to the center of the posts, 5 cm off the line
-    public final double LANDMARK_BOTTOM_GOAL_LEFT_POST_Y =
-        FIELD_WHITE_BOTTOM_SIDELINE_Y - GOAL_POST_RADIUS;
-    public final double LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y =
-        FIELD_WHITE_BOTTOM_SIDELINE_Y - GOAL_POST_RADIUS;
-    public final double LANDMARK_TOP_GOAL_LEFT_POST_Y =
-        FIELD_WHITE_TOP_SIDELINE_Y + GOAL_POST_RADIUS;
-    public final double LANDMARK_TOP_GOAL_RIGHT_POST_Y =
-        FIELD_WHITE_TOP_SIDELINE_Y + GOAL_POST_RADIUS;
+    public final double LANDMARK_RIGHT_GOAL_TOP_POST_Y =
+        MIDFIELD_Y + GOAL_WIDTH / 2.0;
+    public final double LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y =
+        MIDFIELD_Y - GOAL_WIDTH / 2.0;
+    public final double LANDMARK_LEFT_GOAL_TOP_POST_Y =
+        MIDFIELD_Y + GOAL_WIDTH / 2.0;
+    public final double LANDMARK_LEFT_GOAL_BOTTOM_POST_Y =
+        MIDFIELD_Y - GOAL_WIDTH / 2.0;
 
     public final double GOAL_X_LEFT = MIDFIELD_X - (GOAL_WIDTH / 2.);
     public final double GOAL_X_CENTER = MIDFIELD_X;
     public final double GOAL_BOX_TOP_Y = MIDFIELD_Y + (GOAL_BOX_WIDTH / 2.);
     public final double GOAL_BOX_BOTTOM_Y = MIDFIELD_Y - (GOAL_BOX_WIDTH / 2.);
-    public final double BOTTOM_GOAL_Y = BOTTOM_SIDELINE_Y;
-    public final double TOP_GOAL_Y = TOP_SIDELINE_Y;
-    public final double LEFT_BEACON_CENTER_X =
-        LEFT_SIDELINE_X - POST_TO_FIELD_OFFSET - BEACON_RADIUS;
-    public final double LEFT_BEACON_CENTER_Y = MIDFIELD_Y;
-    public final double RIGHT_BEACON_CENTER_X =
-        RIGHT_SIDELINE_X + POST_TO_FIELD_OFFSET + BEACON_RADIUS;
-    public final double RIGHT_BEACON_CENTER_Y = MIDFIELD_Y;
+    public final double RIGHT_GOAL_Y = BOTTOM_SIDELINE_Y;
+    public final double LEFT_GOAL_Y = TOP_SIDELINE_Y;
 
     public final double DRAW_STROKE = 1.;
     public final Color FIELD_COLOR = new Color(0,200,0);//Color.GREEN;
     public final Color LINES_COLOR = Color.WHITE;
-    public final Color TOP_GOAL_COLOR = getTopGoalColor();
-    public final Color BOTTOM_GOAL_COLOR = getBottomGoalColor();
-    public final Color LEFT_BEACON_COLOR = getLeftBeaconColor();
-    public final Color RIGHT_BEACON_COLOR = getRightBeaconColor();
+    public final Color LEFT_GOAL_COLOR = getLeftGoalColor();
+    public final Color RIGHT_GOAL_COLOR = getRightGoalColor();
 
     public final Color REAL_DOG_POSITION_COLOR = Color.RED;
+
+    protected static final Color GOAL_SIDE_COLOR = Color.WHITE;
+    protected static final Color NET_COLOR = Color.WHITE;
+
+    protected static final double NET_DRAW_WIDTH = 1.0;
+    // Size of the holes of the net, in cm (I think we have 2 inch netting)
+    protected static final double MESH_SIZE = 2 * 2.54;
 
     // Particle Junk
     public final int PARTICLE_LENGTH = 10;
@@ -139,18 +135,14 @@ public abstract class Field
     public abstract double getGoalBoxWidth();
     public abstract double getGoalBoxDepth();
     public abstract double getCCRadius();
-    public abstract double getBeaconRadius();
     public abstract double getGoalPostRadius();
     public abstract double getLineThickness();
     public abstract double getGoalCrossbarThickness();
-    public abstract double getPostToFieldOffset();
 
     // Things that should not change between Nao and Aibo fields
     public double getBallRadius() { return 4.0; }
-    public Color getTopGoalColor() { return Color.YELLOW; }
-    public Color getBottomGoalColor() { return Color.BLUE; }
-    public Color getLeftBeaconColor() { return Color.YELLOW; }
-    public Color getRightBeaconColor() { return Color.BLUE; }
+    public Color getLeftGoalColor() { return Color.BLUE; }
+    public Color getRightGoalColor() { return Color.YELLOW; }
 
     /**
      * Creates a BufferedImage representation of the field through the use
@@ -166,7 +158,6 @@ public abstract class Field
         drawField(g2);
         drawFieldLines(g2);
         drawGoals(g2);
-        drawLandmarks(g2);
         return field;
     }
 
@@ -223,7 +214,7 @@ public abstract class Field
      * @param g2 the graphics context on which to draw
      */
     protected void drawFieldLines(Graphics2D g2) {
-        // Outer box
+        // Sidelines
         drawRect(g2, LINES_COLOR, LINE_THICKNESS,
                  LEFT_SIDELINE_X, GREEN_PAD_Y,
                  FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT);
@@ -237,12 +228,12 @@ public abstract class Field
                  MIDFIELD_Y, CENTER_CIRCLE_RADIUS, CENTER_CIRCLE_RADIUS);
 
 
-        // Top goal box
+        // Left goal box
         drawRect(g2, LINES_COLOR, LINE_THICKNESS,
                  LEFT_SIDELINE_X, GOAL_BOX_BOTTOM_Y,
                  GOAL_BOX_DEPTH, GOAL_BOX_WIDTH);
 
-        // draw bottom goal box
+        // Right goal box
         drawRect(g2, LINES_COLOR, LINE_THICKNESS,
                  RIGHT_SIDELINE_X - GOAL_BOX_DEPTH, GOAL_BOX_BOTTOM_Y,
                  GOAL_BOX_DEPTH, GOAL_BOX_WIDTH);
@@ -255,113 +246,116 @@ public abstract class Field
      * @param g2 the graphics context on which to draw
      */
     protected void drawGoals(Graphics2D g2) {
-        drawTopGoal(g2);
-        drawBottomGoal(g2);
+        drawLeftGoal(g2);
+        drawRightGoal(g2);
     }
-
 
     /**
      * Draws the top goal on the given graphics context.
      * @param g2 the graphics context on which to draw
      */
-    protected void drawTopGoal(Graphics2D g2) {
+    protected void drawLeftGoal(Graphics2D g2) {
+        drawNet(g2, NET_COLOR, NET_DRAW_WIDTH,
+                LANDMARK_LEFT_GOAL_TOP_POST_X - GOAL_SIDE_LENGTH,
+                LANDMARK_LEFT_GOAL_TOP_POST_Y,
+                LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
+                LANDMARK_LEFT_GOAL_BOTTOM_POST_Y);
 
-        // draw top goal left post
-        fillOval(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_TOP_GOAL_LEFT_POST_X,
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y,
-                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
-        // draw top goal right post
-        fillOval(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_Y,
-                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
-        // draw left side of goal
-        drawLine(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_TOP_GOAL_LEFT_POST_X,
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y,
-                 LANDMARK_TOP_GOAL_LEFT_POST_X,
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y+GOAL_SIDE_LENGTH);
-        // draw right side of goal
-        drawLine(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_Y,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y+GOAL_SIDE_LENGTH);
+        // draw top side of goal
+        drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_LEFT_GOAL_TOP_POST_X,
+                 LANDMARK_LEFT_GOAL_TOP_POST_Y,
+                 LANDMARK_LEFT_GOAL_TOP_POST_X - GOAL_SIDE_LENGTH,
+                 LANDMARK_LEFT_GOAL_TOP_POST_Y);
         // draw bottom side of goal
-        drawLine(g2, TOP_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_TOP_GOAL_LEFT_POST_X,
-                 FIELD_GREEN_HEIGHT,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
-                 FIELD_GREEN_HEIGHT);
+        drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_Y,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_X - GOAL_SIDE_LENGTH,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_Y);
+        // draw left goal top post
+        fillOval(g2, LEFT_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_LEFT_GOAL_TOP_POST_X,
+                 LANDMARK_LEFT_GOAL_TOP_POST_Y,
+                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
+        // draw left goal bottom post
+        fillOval(g2, LEFT_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_Y,
+                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
+
         // draw crossbar
-        drawLine(g2, TOP_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS,
-                 LANDMARK_TOP_GOAL_LEFT_POST_X,
-                 LANDMARK_TOP_GOAL_LEFT_POST_Y,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_X,
-                 LANDMARK_TOP_GOAL_RIGHT_POST_Y);
+        drawLine(g2, LEFT_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS,
+                 LANDMARK_LEFT_GOAL_TOP_POST_X,
+                 LANDMARK_LEFT_GOAL_TOP_POST_Y,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
+                 LANDMARK_LEFT_GOAL_BOTTOM_POST_Y);
     }
 
-    /**
+     /**
      * Draws the bottom goal on the given graphics context.
      * @param g2 the graphics context on which to draw
      */
-    protected void drawBottomGoal(Graphics2D g2) {
-        // draw bottom goal left post
-        fillOval(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y,
-                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
-        // draw bottom goal right post
-        fillOval(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y,
-                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
-        // draw left side of goal
-        drawLine(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y-GOAL_SIDE_LENGTH);
-        // draw right side of goal
-        drawLine(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y-GOAL_SIDE_LENGTH);
+    protected void drawRightGoal(Graphics2D g2) {
+        // Draw the net
+        drawNet(g2, NET_COLOR, NET_DRAW_WIDTH,
+                LANDMARK_RIGHT_GOAL_TOP_POST_X,
+                LANDMARK_RIGHT_GOAL_TOP_POST_Y,
+                LANDMARK_RIGHT_GOAL_BOTTOM_POST_X + GOAL_SIDE_LENGTH,
+                LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
+
+        // draw top side of goal
+        drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_X,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_Y,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_X + GOAL_SIDE_LENGTH,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_Y);
         // draw bottom side of goal
-        drawLine(g2, BOTTOM_GOAL_COLOR, DEFAULT_THICKNESS,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
-                 1,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
-                 1);
+        drawLine(g2, GOAL_SIDE_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_X + GOAL_SIDE_LENGTH,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
+
+        // draw left goal top post
+        fillOval(g2, RIGHT_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_X,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_Y,
+                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
+        // draw right goal bottom post
+        fillOval(g2, RIGHT_GOAL_COLOR, DEFAULT_THICKNESS,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y,
+                 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
+
         // draw crossbar
-        drawLine(g2, BOTTOM_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_LEFT_POST_Y,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_X,
-                 LANDMARK_BOTTOM_GOAL_RIGHT_POST_Y);
+        drawLine(g2, RIGHT_GOAL_COLOR, GOAL_CROSSBAR_THICKNESS,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_X,
+                 LANDMARK_RIGHT_GOAL_TOP_POST_Y,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
+                 LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
     }
 
-    /**
-     * Draws the landmarks of the field on the given graphics context.
-     * Subclasses should override this method if they have more/fewer landmarks
-     * to draw.  For instance, the AiboField2008 subclass will additionally draw
-     * arcs in the four corners of the field, whereas it is possible the
-     * NaoField will have no beacons.
-     * @param g2 the graphics context on which to draw.
-     */
-    protected void drawLandmarks(Graphics2D g2) {
-        // draw left beacon
-        fillOval(g2, LEFT_BEACON_COLOR, DEFAULT_THICKNESS,
-                 LEFT_BEACON_CENTER_X, MIDFIELD_Y,
-                 BEACON_RADIUS, BEACON_RADIUS);
 
-        // draw right beacon
-        fillOval(g2, RIGHT_BEACON_COLOR, DEFAULT_THICKNESS,
-                 RIGHT_BEACON_CENTER_X, MIDFIELD_Y,
-                 BEACON_RADIUS, BEACON_RADIUS);
+
+
+    protected void drawNet(Graphics2D g2, Color col,double strokeWidth,
+                           double x1, double y1, double x2, double y2) {
+        g2.setColor(col);
+        g2.setStroke(new BasicStroke((float) strokeWidth));
+
+        int numHorRects = (int) ((x2 - x1) / MESH_SIZE);
+        int numVertRects = (int) ((y1 - y2) / MESH_SIZE);
+
+        for (int i = 0; i <= numHorRects; i++) {
+            for (int j = 0; j <= numVertRects; j++) {
+                g2.drawRect((int) (x1 + (i * MESH_SIZE)),
+                            (int) (fixYCoord(y1) + (j * MESH_SIZE)),
+                            (int) MESH_SIZE, (int) MESH_SIZE);
+            }
+        }
     }
+
 
     /**
      * Draws a rectangle whose lower left corner is located at field
