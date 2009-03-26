@@ -230,7 +230,7 @@ public abstract class Field
 
         // Midline
         drawLine(g2, LINES_COLOR, LINE_THICKNESS,
-                 LEFT_SIDELINE_X, MIDFIELD_Y, RIGHT_SIDELINE_X, MIDFIELD_Y);
+                 MIDFIELD_X,TOP_SIDELINE_Y, MIDFIELD_X, BOTTOM_SIDELINE_Y);
 
         // Center circle
         drawOval(g2, LINES_COLOR, LINE_THICKNESS, MIDFIELD_X,
