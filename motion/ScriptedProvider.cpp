@@ -31,25 +31,16 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
     sensors(s),
     FRAME_LENGTH_S(motionFrameLength),
     chopper(sensors, FRAME_LENGTH_S),
+	currCommand(new ChoppedCommand()), // INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
     bodyCommandQueue()
-{
-    // No head chain, only body chains
-    for (unsigned int chainID=0; chainID<NUM_BODY_CHAINS; chainID++) {
-            chainQueues.push_back( ChainQueue( (ChainID)(chainID+1) ) );
 
-    }
+{
     // Create mutexes
     // (?) Need one mutex per queue (?)
     pthread_mutex_init (&scripted_mutex, NULL);
 }
 
 ScriptedProvider::~ScriptedProvider() {
-    // remove all remaining values from chain queues
-    vector<ChainQueue>::iterator i;
-    i = chainQueues.begin();
-    while ( i != chainQueues.end() )
-        i->clear();
-
     // Wait until not active anymore
     while ( isActive() );
     pthread_mutex_destroy(&scripted_mutex);
@@ -73,47 +64,40 @@ void ScriptedProvider::setActive(){
         active();
 }
 
+// Are we done moving totally?
 bool ScriptedProvider::isDone() {
-    return chainQueuesEmpty() && commandQueueEmpty();
+    return currCommandEmpty() && commandQueueEmpty();
 }
 
-bool ScriptedProvider::chainQueuesEmpty(){
-    bool isEmpty = true;
-    for (unsigned int i=0 ; i<chainQueues.size() ; i++ ) {
-        if ( !chainQueues.at(i).empty() ) {
-            isEmpty=false;
-        }
-    }
-    return isEmpty;
+// Are we finished with our current motion command?
+bool ScriptedProvider::currCommandEmpty() {
+	return currCommand->isDone();
 }
 
+// Do we have any BodyCommands left to run through?
 bool ScriptedProvider::commandQueueEmpty(){
     return bodyCommandQueue.empty();
 }
 
 void ScriptedProvider::calculateNextJoints() {
 	pthread_mutex_lock(&scripted_mutex);
-	if (chainQueuesEmpty())
+	if (currCommandEmpty())
 		setNextBodyCommand();
 
 
-	// Make sure first that the queues are not empty
-	// If they're empty, then add the current joints to be the
-	// next joints. If they're not empty, then add the queued
-	// joints as the next Chain joints
-	vector<ChainQueue>::iterator i;
-	i = chainQueues.begin();
-	vector <vector <float> > currentChains = getCurrentChains();
+	// Go through the chains and enqueue the next
+	// joints from the ChoppedCommand.
+	shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
 
-	while ( i != chainQueues.end() ) {
-		ChainID chainID = i->getChainID();
-		if ( i->empty() ) {
-			setNextChainJoints( chainID, currentChains.at(chainID) );
+	for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
+		Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
+		if ( currCommand->isDone() ) {
+			setNextChainJoints( cid,
+								currentChains->at(cid) );
 		} else {
-			setNextChainJoints( chainID, i->front() );
-			i->pop();
+			setNextChainJoints( cid,
+								currCommand->getNextJoints(cid) );
 		}
-		i++;
 	}
 
     setActive();
@@ -144,47 +128,45 @@ void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq
 }
 
 void ScriptedProvider::setNextBodyCommand() {
+
 	// If there are no more commands, don't try to enqueue one
 	if ( !bodyCommandQueue.empty() ) {
 
-		const BodyJointCommand *command = bodyCommandQueue.front();
+		const BodyJointCommand *nextCommand = bodyCommandQueue.front();
 		bodyCommandQueue.pop();
-		ChoppedCommand * choppedBodyCommand = chopper.chopCommand(command);
 
-		vector<ChainQueue>::iterator i;
-		while (!choppedBodyCommand->isDone()) {
-			// Pass each chain to its chainqueue
+		// Replace the current command and delete the
+		// next command object
+		currCommand = chopper.chopCommand(nextCommand);
 
-			// Skips the HEAD_CHAIN and enqueues all body chains
-			i = chainQueues.begin();
-			int chainID;
-			while ( i != chainQueues.end() ) {
-				// Subtract 1 because there is no head chain in the
-				// choppedBodyCommand (it's only body joints)
-				chainID = i->getChainID();
-				i->push( choppedBodyCommand->getNextJoints(chainID) );
-				i++;
-			}
-		}
-		delete choppedBodyCommand;
 	}
 }
 
-vector<vector<float> > ScriptedProvider::getCurrentChains() {
-    vector<vector<float> > currentChains(NUM_CHAINS,vector<float>(0));
+// Get the chain's current positions. Gives a shared pointer to
+// a vector containing a vector for each chain. Makes accessing
+// each chain very simple.
+shared_ptr<vector<vector<float> > > ScriptedProvider::getCurrentChains() {
+    shared_ptr<vector<vector<float> > >currentChains(
+		new vector<vector<float> >(Kinematics::NUM_CHAINS) );
 
     vector<float> currentJoints = sensors->getBodyAngles();
 
-    unsigned int lastChainJoint = 0;
-    unsigned int joint = 0;
+    unsigned int lastChainJoint,joint,chain;
+	lastChainJoint= 0;
+	joint = 0;
+	chain = 0;
 
-    for (unsigned int chain=HEAD_CHAIN;chain<NUM_CHAINS; chain++) {
+	vector<vector<float> >::iterator i = currentChains->begin();
+
+	while (i != currentChains->end() ) {
         lastChainJoint += chain_lengths[chain];
 
         for ( ; joint < lastChainJoint ; joint++) {
-            currentChains.at(chain).push_back(currentJoints.at(joint));
+            i->push_back(currentJoints.at(joint));
         }
 
+		++i;
+		++chain;
     }
     return currentChains;
 }

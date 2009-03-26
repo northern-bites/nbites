@@ -30,12 +30,13 @@
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
 
+
 class ChopShop
 {
 public:
 	ChopShop(boost::shared_ptr<Sensors> s, float motionFrameLength);
 
-	ChoppedCommand * chopCommand(const JointCommand *command);
+	shared_ptr<ChoppedCommand> chopCommand(const JointCommand *command);
 
 private:
 	// Inside most vector: joint values for a chain
@@ -45,8 +46,8 @@ private:
     boost::shared_ptr<Sensors> sensors;
 	float FRAME_LENGTH_S;
 
-// 	ChoppedCommand * chopSmooth(const JointCommand *command);
-	ChoppedCommand * chopLinear(const JointCommand *command);
+// 	shared_ptr<ChoppedCommand> chopSmooth(const JointCommand *command);
+	shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command);
 
 	std::vector<float> getCurrentJoints();
 	std::vector<float> getFinalJoints(const JointCommand *command,
@@ -57,10 +58,6 @@ private:
                                       std::vector<float> *final);
 	void vectorToRad(std::vector<float> *vect);
 
-	ChoppedCommand * buildChops(int numChops,
-								std::vector<float> *currentJoints,
-								std::vector<float> *diffPerChop,
-								const JointCommand *command);
 };
 
 #endif
