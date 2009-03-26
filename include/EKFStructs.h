@@ -41,4 +41,27 @@ struct AccelMeasurement {
     float z;
 };
 
+
+/**
+ * ZmpTimeUpdate - For ZmpEKF, the apriori input comes as the zmp from the
+ *                 third entry in the controller's state vector.
+ *
+ */
+
+struct ZmpTimeUpdate{
+    float cur_zmp_x;
+    float cur_zmp_y;
+};
+
+/**
+ * AccelMeasurement - A non-generic class for holding accelerometer values
+ *                    required (by motion) for filtering accel sensor values.
+ */
+struct ZmpMeasurement {
+    float comX;
+    float comY;
+    float accX;
+    float accY;
+};
+
 #endif

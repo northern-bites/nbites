@@ -54,14 +54,17 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     //controller_x(new PreviewController()),
     //controller_y(new PreviewController())
     controller_x(new Observer()),
-    controller_y(new Observer())
+    controller_y(new Observer()),
+    zmp_filter()
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\t"
             "sensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tangleX\t"
-            "angleY\tstate\n");
+            "angleY\taccX\taccY\taccZ\t"
+            "lfl\tlfr\tlrl\tlrr\trfl\trfr\trrl\trrr\t"
+            "state\n");
 #endif
 }
 
@@ -130,9 +133,15 @@ void StepGenerator::tick_controller(){
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
                              accel_c);
+    ZmpTimeUpdate tUp = {controller_x->getZMP(),controller_y->getZMP()};
+    ZmpMeasurement pMeasure =
+        {controller_x->getPosition(),controller_y->getPosition(),
+         accel_i(0),accel_i(1)};
 
-    est_zmp_i(0) = com_i(0) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(0);
-    est_zmp_i(1) = com_i(1) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(1);
+    zmp_filter.update(tUp,pMeasure);
+
+    est_zmp_i(0) = zmp_filter.get_zmp_x();//com_i(0) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(0);
+    est_zmp_i(1) = zmp_filter.get_zmp_y();//com_i(1) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(1);
     //est_zmp_i(1) *= 1.35f;
 
     //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
@@ -901,13 +910,23 @@ void StepGenerator::debugLogging(){
     float real_com_y = leg_dest_i(1);// + 2*HIP_OFFSET_Y;
 
     Inertial inertial = sensors->getInertial();
+    FSR leftFoot = sensors->getLeftFootFSR();
+    FSR rightFoot = sensors->getRightFootFSR();
+
+    printf(" %f\t%f\t%f\n",inertial.accX,inertial.accY,inertial.accZ);
 
     static float ttime = 0;
-    fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
+    fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t"
+            "%f\t%f\t%f\t"
+            "%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
             ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
             est_zmp_i(0),est_zmp_i(1),
             real_com_x,real_com_y,
             inertial.angleX, inertial.angleY,
+            inertial.accX,inertial.accY,inertial.accZ,
+            // FSRs
+            leftFoot.frontLeft,leftFoot.frontRight,leftFoot.rearLeft,leftFoot.rearRight,
+            rightFoot.frontLeft,rightFoot.frontRight,rightFoot.rearLeft,rightFoot.rearRight,
             leftLeg.getSupportMode());
     ttime += 0.02f;
 #endif

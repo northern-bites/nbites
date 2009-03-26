@@ -5,12 +5,13 @@ LDFLAGS  = $(LDLIBS) $(GLDLIBS) -lm
 MAN_DIR = ../../..
 INCLUDE = -I$(MAN_DIR)/include -I$(MAN_DIR)/motion -I$(MAN_DIR)/noggin -I$(MAN_DIR)/corpus -I$(MAN_DIR)/vision
 
-CC = g++ -g -Wall
+CC = g++ -g -Wall -Wno-unused
 
 PROGS = simple1
-OBJS = test.o AccEKF.o EKF.o
+OBJS = test.o AccEKF.o EKF.o ZmpEKF.o
 
-LOG_FILE = ../../../../Desktop/accels.csv
+#LOG_FILE = ../../../../Desktop/accels.csv
+LOG_FILE = /tmp/com_log.xls
 
 default: accel
 
@@ -18,7 +19,7 @@ accel: $(OBJS)
 	$(CC) -o $@ $(OBJS)   $(LDFLAGS)
 
 run: accel
-	./accel $(LOG_FILE) && R --no-save < accel.R
+	./accel $(LOG_FILE) && R --no-save < zmp_log.R
 
 clean::
 	rm -f $(OBJS)

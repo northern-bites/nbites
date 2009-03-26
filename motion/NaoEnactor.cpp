@@ -432,12 +432,11 @@ void NaoEnactor::syncWithALMemory() {
     const float filteredY = accelerationFilter.getY();
     const float filteredZ = accelerationFilter.getZ();
 
-    //printf("%f\t%f\t%f\n",accX,accY,accZ);
 
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         Inertial(filteredX, filteredY, filteredZ,
-                                  //Inertial(accX, accY, accZ,
+                         //Inertial(filteredX, filteredY, filteredZ,
+                         Inertial(accX, accY, accZ,
                                   gyrX, gyrY, angleX, angleY));
 }

@@ -90,6 +90,7 @@
 #include "CoordFrame.h"
 #include "Sensors.h"
 #include "NBMatrixMath.h"
+#include "ZmpEKF.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
@@ -200,6 +201,8 @@ private:
     WalkingLeg leftLeg, rightLeg;
 
     WalkController *controller_x, *controller_y;
+
+    ZmpEKF zmp_filter;
 #ifdef DEBUG_CONTROLLER_COM
     FILE* com_log;
     NBMath::ufmatrix3 fi_Transform;

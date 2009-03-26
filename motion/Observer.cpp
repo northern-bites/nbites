@@ -114,7 +114,7 @@ const float Observer::tick(const list<float> *zmp_ref,
     trackingError += prod(c,stateVector)(0) - cur_zmp_ref;
 
     const float control = -Gi * trackingError - preview_control;
-    const float psensor = cur_zmp_ref; //sensor_zmp;
+    const float psensor = sensor_zmp;
 
     ufvector3 temp(prod(A, stateVector)
                    - L*(psensor - prod(c,stateVector)(0)) * 1.0f
