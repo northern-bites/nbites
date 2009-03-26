@@ -140,6 +140,7 @@ private:
     std::vector<Particle> X_t; // Current set of particles
 
     // Core Functions
+    PoseEst updateMotionModel(PoseEst x_t, MotionModel u_t);
     float updateMeasurementModel(std::vector<Observation> z_t, PoseEst x_t);
     void updateEstimates();
 
@@ -149,6 +150,8 @@ private:
     float determineLineWeight(Observation z, PoseEst x_t, LineLandmark _line);
     float getSimilarity(float r_d, float r_a, Observation &z);
     Particle randomWalkParticle(Particle p);
+    float sampleNormalDistribution(float sd);
+    float sampleTriangularDistribution(float sd);
 
 public:
     friend std::ostream& operator<< (std::ostream &o, const MCL &c) {

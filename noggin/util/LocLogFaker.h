@@ -32,7 +32,7 @@ string team_color = "0";
 string player_number = "3";
 string DEFAULT_OUTFILE_NAME = "FAKELOG.mcl";
 // Get half of the nao FOV converted to radians
-float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f;
+float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f + M_PI / 4.0f;
 
 /**
  * Class to hold a constant robot path vector over a given number of frames

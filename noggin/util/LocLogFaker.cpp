@@ -74,7 +74,10 @@ int main(int argc, char** argv)
     if(argc > 2) { // If an output file is specified
         outputFile.open(argv[2], ios::out);
     } else { // Otherwise use the default
-        outputFile.open(DEFAULT_OUTFILE_NAME.c_str(), ios::out);
+        string outFileName(argv[1]);
+        outFileName.replace(outFileName.end()-3, outFileName.end(), "mcl");
+
+        outputFile.open(outFileName.c_str(), ios::out);
     }
 
     // Iterate through the path
@@ -327,12 +330,11 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                            M_PI / 2.0f);
 
     // Calculate distance if object is within view
-    if ( true ||
-         e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
+    if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        e.dist += e.dist*UNIFORM_1_NEG_1*0.03;
+        e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
         e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
 
     } else {

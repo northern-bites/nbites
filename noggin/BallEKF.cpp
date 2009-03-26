@@ -177,7 +177,7 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
 
         float locDistSquared = (x_b * x_b + y_b * y_b);
         float locDist = sqrt(locDistSquared);
-        d_x(0) = sqrt(x_b * x_b + y_b * y_b);
+        d_x(0) = hypot(x_b, y_b);
         d_x(1) = subPIAngle(atan2(y_b, x_b) - M_PI / 2.0f);
 
         // Calculate invariance
