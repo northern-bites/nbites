@@ -430,18 +430,18 @@ public class DebugViewer extends JFrame {
         LANDMARK_X[3] = (int) wc.the_field.LANDMARK_TOP_GOAL_RIGHT_POST_X;
         LANDMARK_X[4] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
         LANDMARK_X[5] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
-        LANDMARK_X[6] = (int) wc.the_field.GOAL_BOX_X_LEFT;
-        LANDMARK_X[7] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
-        LANDMARK_X[8] = (int) wc.the_field.GOAL_BOX_X_LEFT;
-        LANDMARK_X[9] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        // LANDMARK_X[6] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+        // LANDMARK_X[7] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        // LANDMARK_X[8] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+        // LANDMARK_X[9] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
         LANDMARK_X[10] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
         LANDMARK_X[11] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
         LANDMARK_X[12] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
         LANDMARK_X[13] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
-        LANDMARK_X[14] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
-        LANDMARK_X[15] = (int) wc.the_field.GOAL_BOX_X_LEFT;
-        LANDMARK_X[16] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
-        LANDMARK_X[17] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+        // LANDMARK_X[14] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        // LANDMARK_X[15] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+        // LANDMARK_X[16] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+        // LANDMARK_X[17] = (int) wc.the_field.GOAL_BOX_X_LEFT;
 
         LANDMARK_Y = new int[18];
         LANDMARK_Y[0] = (int) wc.the_field.LANDMARK_BOTTOM_GOAL_LEFT_POST_Y;

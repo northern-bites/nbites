@@ -97,8 +97,8 @@ public abstract class Field
 
     public final double GOAL_X_LEFT = MIDFIELD_X - (GOAL_WIDTH / 2.);
     public final double GOAL_X_CENTER = MIDFIELD_X;
-    public final double GOAL_BOX_X_LEFT = MIDFIELD_X - (GOAL_BOX_WIDTH / 2.);
-    public final double GOAL_BOX_X_RIGHT = MIDFIELD_X + (GOAL_BOX_WIDTH / 2.);
+    public final double GOAL_BOX_TOP_Y = MIDFIELD_Y + (GOAL_BOX_WIDTH / 2.);
+    public final double GOAL_BOX_BOTTOM_Y = MIDFIELD_Y - (GOAL_BOX_WIDTH / 2.);
     public final double BOTTOM_GOAL_Y = BOTTOM_SIDELINE_Y;
     public final double TOP_GOAL_Y = TOP_SIDELINE_Y;
     public final double LEFT_BEACON_CENTER_X =
@@ -238,13 +238,14 @@ public abstract class Field
 
 
         // Top goal box
-        drawRect(g2, LINES_COLOR, LINE_THICKNESS, GOAL_BOX_X_LEFT,
-                 TOP_GOAL_Y - GOAL_BOX_DEPTH, GOAL_BOX_WIDTH,
-                 GOAL_BOX_DEPTH);
+        drawRect(g2, LINES_COLOR, LINE_THICKNESS,
+                 LEFT_SIDELINE_X, GOAL_BOX_BOTTOM_Y,
+                 GOAL_BOX_DEPTH, GOAL_BOX_WIDTH);
 
         // draw bottom goal box
-        drawRect(g2, LINES_COLOR, LINE_THICKNESS, GOAL_BOX_X_LEFT,
-                 BOTTOM_GOAL_Y, GOAL_BOX_WIDTH, GOAL_BOX_DEPTH);
+        drawRect(g2, LINES_COLOR, LINE_THICKNESS,
+                 RIGHT_SIDELINE_X - GOAL_BOX_DEPTH, GOAL_BOX_BOTTOM_Y,
+                 GOAL_BOX_DEPTH, GOAL_BOX_WIDTH);
 
     }
 
