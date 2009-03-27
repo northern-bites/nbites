@@ -140,11 +140,8 @@ void StepGenerator::tick_controller(){
 
     zmp_filter.update(tUp,pMeasure);
 
-    est_zmp_i(0) = zmp_filter.get_zmp_x();//com_i(0) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(0);
-    est_zmp_i(1) = zmp_filter.get_zmp_y();//com_i(1) - (walkParams->bodyHeight/(GRAVITY_mss))*accel_i(1);
-    //est_zmp_i(1) *= 1.35f;
-
-    //cout << "zmp: "<< est_zmp_i(0) << ", " <<est_zmp_i(1)<<endl;
+    est_zmp_i(0) = zmp_filter.get_zmp_x();
+    est_zmp_i(1) = zmp_filter.get_zmp_y();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 
@@ -912,8 +909,6 @@ void StepGenerator::debugLogging(){
     Inertial inertial = sensors->getInertial();
     FSR leftFoot = sensors->getLeftFootFSR();
     FSR rightFoot = sensors->getRightFootFSR();
-
-    printf(" %f\t%f\t%f\n",inertial.accX,inertial.accY,inertial.accZ);
 
     static float ttime = 0;
     fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t"

@@ -51,7 +51,6 @@ void ZmpFilter(FILE *f){
         float time;
         float bogus;
         int bogi;
-        //cout <<
         fscanf(f,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t"
                "%f\t%f\t%f\t"
                "%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
@@ -59,19 +58,12 @@ void ZmpFilter(FILE *f){
                &estZMPX,&estZMPY,&bogus,&bogus, &angleX,&angleY,
                &accX,&accY,&accZ,
                &bogus,&bogus,&bogus,&bogus,&bogus,&bogus,&bogus,&bogus,&bogi);
-            //<<endl;
 
+        //Note the unit conversion from m to mm we are doing implicitly
         estZMPX = comX + 310/GRAVITY_mss * accX;
         estZMPY = comY + 310/GRAVITY_mss * accY;
 
         ZmpTimeUpdate tUp = {zmpX,zmpY};
-        //float accX = (estZMPX - comX)*GRAVITY_mss/0.31f;
-        //float accY = (estZMPY - comY)*GRAVITY_mss/0.31f;
-        //cout << "real_zmp* = "<<estZMPX <<","<<estZMPY<<endl;
-        cout << "real_zmp - com* = "<<estZMPX-comX <<","<<estZMPY-comY<<endl;
-        //cout << "com* = "<<comX <<","<<comY<<endl;
-        cout << "accZ" << accZ<<endl;
-        cout << "acc* = "<<accX <<","<<accY<<endl;
         ZmpMeasurement pMeasure = {comX,comY,accX,accY};
         a.update(tUp,pMeasure);
 
@@ -87,16 +79,6 @@ void ZmpFilter(FILE *f){
                 estZMPX, estZMPY);
                 //filtered_zmp_unc_x, filtered_zmp_unc_y,
 
-
-        //float fAccX = a.getX();  float fAccY = a.getY();float fAccZ = a.getZ();
-        //float fAccXUnc = a.getXUnc();
-        //float fAccYUnc = a.getYUnc();
-        //float fAccZUnc = a.getZUnc();
-//         static float time = 0.0;
-//         fprintf(output,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
-//                 time,accX,accY,accZ,fAccX,fAccY,fAccZ,
-//                 fAccXUnc, fAccYUnc, fAccZUnc);
-//         time +=.02;
     }
 
 }
