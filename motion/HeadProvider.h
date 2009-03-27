@@ -67,7 +67,7 @@ private:
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 
-	shared_ptr<ChoppedCommand> currCommand;
+    boost::shared_ptr<ChoppedCommand> currCommand;
 	// Queue of all future commands
 	std::queue<const HeadJointCommand*> headCommandQueue;
 

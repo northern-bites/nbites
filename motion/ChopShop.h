@@ -36,7 +36,7 @@ class ChopShop
 public:
 	ChopShop(boost::shared_ptr<Sensors> s, float motionFrameLength);
 
-	shared_ptr<ChoppedCommand> chopCommand(const JointCommand *command);
+    boost::shared_ptr<ChoppedCommand> chopCommand(const JointCommand *command);
 
 private:
 	// Inside most vector: joint values for a chain
@@ -47,7 +47,7 @@ private:
 	float FRAME_LENGTH_S;
 
 // 	shared_ptr<ChoppedCommand> chopSmooth(const JointCommand *command);
-	shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command);
+    boost::shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command);
 
 	std::vector<float> getCurrentJoints();
 	std::vector<float> getFinalJoints(const JointCommand *command,
