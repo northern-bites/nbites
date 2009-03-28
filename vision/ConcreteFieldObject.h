@@ -111,21 +111,21 @@ private: // Instance variables recording location on field and identifier
 //
 ////////////////////////////////////////////////////////////
 
-static const point <float> BLUE_GOAL_LEFT_POST_LOC =
-    point<float>(LANDMARK_MY_GOAL_LEFT_POST_X,
-                  LANDMARK_MY_GOAL_LEFT_POST_Y);
+static const point <float> BLUE_GOAL_BOTTOM_POST_LOC =
+    point<float>(LANDMARK_BLUE_GOAL_BOTTOM_POST_X,
+                  LANDMARK_BLUE_GOAL_BOTTOM_POST_Y);
 
-static const point <float> BLUE_GOAL_RIGHT_POST_LOC =
-    point<float>(LANDMARK_MY_GOAL_RIGHT_POST_X,
-                  LANDMARK_MY_GOAL_RIGHT_POST_Y);
+static const point <float> BLUE_GOAL_TOP_POST_LOC =
+    point<float>(LANDMARK_BLUE_GOAL_TOP_POST_X,
+                  LANDMARK_BLUE_GOAL_TOP_POST_Y);
 
-static const point <float> YELLOW_GOAL_LEFT_POST_LOC =
-    point<float>(LANDMARK_OPP_GOAL_RIGHT_POST_X,
-                  LANDMARK_OPP_GOAL_RIGHT_POST_Y);
+static const point <float> YELLOW_GOAL_TOP_POST_LOC =
+    point<float>(LANDMARK_YELLOW_GOAL_TOP_POST_X,
+                  LANDMARK_YELLOW_GOAL_TOP_POST_Y);
 
-static const point <float> YELLOW_GOAL_RIGHT_POST_LOC =
-    point<float>(LANDMARK_OPP_GOAL_LEFT_POST_X,
-                  LANDMARK_OPP_GOAL_LEFT_POST_Y);
+static const point <float> YELLOW_GOAL_BOTTOM_POST_LOC =
+    point<float>(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X,
+                  LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y);
 
 // Arc locations are defined to be the center of the quarter circle spanned
 // by the arc

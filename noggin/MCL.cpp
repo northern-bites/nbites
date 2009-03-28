@@ -242,7 +242,7 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
     // Determine expected distance to the landmark
     d_hat = hypot(pt.x - x_t.x, pt.y - x_t.y);
     // Expected bearing
-    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h - QUART_CIRC_RAD;
+    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
 
     // Calculate residuals
     r_d = z.getVisDistance() - d_hat;
@@ -300,12 +300,10 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
         float d_2 = hypot(line.x2 - x_t.x, line.y2 - x_t.y);
         if (d_1 < d_2) {
             d_hat = d_1;
-            a_hat = atan2(line.y1 - x_t.y, line.x1 - x_t.x) - x_t.h -
-                QUART_CIRC_RAD;
+            a_hat = atan2(line.y1 - x_t.y, line.x1 - x_t.x) - x_t.h;
         } else {
             d_hat = d_2;
-            a_hat = atan2(line.y2 - x_t.y, line.x2 - x_t.x) - x_t.h -
-                QUART_CIRC_RAD;
+            a_hat = atan2(line.y2 - x_t.y, line.x2 - x_t.x) - x_t.h;
         }
 
     } else {
@@ -313,7 +311,7 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
         // Determine nearest expected point on the line
         d_hat = hypot(pt.x - x_t.x, pt.y - x_t.y);
         // Expected bearing
-        a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h - QUART_CIRC_RAD;
+        a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
     }
 
     // Calculate residuals
@@ -367,7 +365,7 @@ Particle MCL::randomWalkParticle(Particle p)
 
 float MCL::sampleNormalDistribution(float sd)
 {
-    float samp;
+    float samp = 0;
     for(int i = 0; i < 12; i++) {
         samp += (2*(rand() / (float(RAND_MAX) + sd)) - sd);
     }

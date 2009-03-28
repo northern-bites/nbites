@@ -172,8 +172,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         deltaX = toView->getFieldX() - myPos.x;
         deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
-        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
-                                - (M_PI / 2.0f));
+        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h);
 
         // Check if the object is viewable
         if (visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) {
@@ -214,8 +213,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         float deltaX = toView->getFieldX() - myPos.x;
         float deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
-        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
-                                - (M_PI / 2.0f));
+        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h);
 
         // Check if the object is viewable
         if ((visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) &&
@@ -326,8 +324,7 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
 {
     estimate e;
     e.bearing = subPIAngle(atan2(currentBall->y - currentPose->y,
-                                 currentBall->x - currentPose->x) -
-                           M_PI / 2.0f);
+                                 currentBall->x - currentPose->x));
 
     // Calculate distance if object is within view
     if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&

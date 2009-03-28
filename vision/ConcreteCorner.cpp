@@ -43,29 +43,29 @@ blue_corner_right_l(FIELD_WHITE_RIGHT_SIDELINE_X,
                     BLUE_CORNER_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
-blue_goal_left_t(GOALBOX_LEFT_X,
+blue_goal_left_t(BLUE_GOALBOX_LEFT_X,
                  FIELD_WHITE_BOTTOM_SIDELINE_Y,
                  // ConcreteLine::blue_goal_endline,
                  // ConcreteLine::blue_goalbox_left_line,
                  BLUE_GOAL_LEFT_T);
 
 const ConcreteCorner ConcreteCorner::
-blue_goal_right_t(GOALBOX_RIGHT_X,
+blue_goal_right_t(BLUE_GOALBOX_RIGHT_X,
                   FIELD_WHITE_BOTTOM_SIDELINE_Y,
                   // ConcreteLine::blue_goal_endline,
                   // ConcreteLine::blue_goalbox_right_line,
                   BLUE_GOAL_RIGHT_T);
 
 const ConcreteCorner ConcreteCorner::
-blue_goal_left_l(GOALBOX_LEFT_X,
-                 GOALBOX_HEIGHT + FIELD_WHITE_BOTTOM_SIDELINE_Y,
+blue_goal_left_l(BLUE_GOALBOX_LEFT_X,
+                 GOALBOX_DEPTH + FIELD_WHITE_BOTTOM_SIDELINE_Y,
                  // ConcreteLine::blue_goalbox_left_line,
                  // ConcreteLine::blue_goalbox_top_line,
                  BLUE_GOAL_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
-blue_goal_right_l(GOALBOX_RIGHT_X,
-                  GOALBOX_HEIGHT+FIELD_WHITE_BOTTOM_SIDELINE_Y,
+blue_goal_right_l(BLUE_GOALBOX_RIGHT_X,
+                  GOALBOX_DEPTH+FIELD_WHITE_BOTTOM_SIDELINE_Y,
                   // ConcreteLine::blue_goalbox_right_line,
                   // ConcreteLine::blue_goalbox_top_line,
                   BLUE_GOAL_RIGHT_L);
@@ -85,29 +85,29 @@ yellow_corner_right_l(FIELD_WHITE_LEFT_SIDELINE_X,
                       YELLOW_CORNER_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
-yellow_goal_left_t(GOALBOX_RIGHT_X,
+yellow_goal_left_t(YELLOW_GOALBOX_RIGHT_X,
                    FIELD_WHITE_TOP_SIDELINE_Y,
                    // ConcreteLine::yellow_goalbox_left_line,
                    // ConcreteLine::yellow_goal_endline,
                    YELLOW_GOAL_LEFT_T);
 
 const ConcreteCorner ConcreteCorner::
-yellow_goal_right_t(GOALBOX_LEFT_X,
+yellow_goal_right_t(YELLOW_GOALBOX_LEFT_X,
                     FIELD_WHITE_TOP_SIDELINE_Y,
                     // ConcreteLine::yellow_goalbox_right_line,
                     // ConcreteLine::yellow_goal_endline,
                     YELLOW_GOAL_RIGHT_T);
 
 const ConcreteCorner ConcreteCorner::
-yellow_goal_left_l(GOALBOX_RIGHT_X,
-                   FIELD_WHITE_TOP_SIDELINE_Y - GOALBOX_HEIGHT,
+yellow_goal_left_l(YELLOW_GOALBOX_RIGHT_X,
+                   FIELD_WHITE_TOP_SIDELINE_Y - GOALBOX_DEPTH,
                    // ConcreteLine::yellow_goalbox_left_line,
                    // ConcreteLine::yellow_goalbox_top_line,
                    YELLOW_GOAL_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
-yellow_goal_right_l(GOALBOX_LEFT_X,
-                    FIELD_WHITE_TOP_SIDELINE_Y - GOALBOX_HEIGHT,
+yellow_goal_right_l(YELLOW_GOALBOX_LEFT_X,
+                    FIELD_WHITE_TOP_SIDELINE_Y - GOALBOX_DEPTH,
                     // ConcreteLine::yellow_goalbox_right_line,
                     // ConcreteLine::yellow_goalbox_top_line,
                     YELLOW_GOAL_RIGHT_L);

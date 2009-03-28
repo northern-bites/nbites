@@ -24,19 +24,19 @@ ConcreteFieldObject::~ConcreteFieldObject() {}
 ///////////////////////////////////////////////////////////////////////////////
 
 const ConcreteFieldObject ConcreteFieldObject::blue_goal_left_post(
-    LANDMARK_MY_GOAL_LEFT_POST_X, LANDMARK_MY_GOAL_LEFT_POST_Y,
+    LANDMARK_BLUE_GOAL_TOP_POST_X, LANDMARK_BLUE_GOAL_TOP_POST_Y,
     BLUE_GOAL_LEFT_POST);
 
 const ConcreteFieldObject ConcreteFieldObject::blue_goal_right_post(
-    LANDMARK_MY_GOAL_RIGHT_POST_X, LANDMARK_MY_GOAL_RIGHT_POST_Y,
+    LANDMARK_BLUE_GOAL_BOTTOM_POST_X, LANDMARK_BLUE_GOAL_BOTTOM_POST_Y,
     BLUE_GOAL_RIGHT_POST);
 
 const ConcreteFieldObject ConcreteFieldObject::yellow_goal_left_post(
-    LANDMARK_OPP_GOAL_LEFT_POST_X, LANDMARK_OPP_GOAL_LEFT_POST_Y,
+    LANDMARK_YELLOW_GOAL_BOTTOM_POST_X, LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y,
     YELLOW_GOAL_LEFT_POST);
 
 const ConcreteFieldObject ConcreteFieldObject::yellow_goal_right_post(
-    LANDMARK_OPP_GOAL_RIGHT_POST_X, LANDMARK_OPP_GOAL_RIGHT_POST_Y,
+    LANDMARK_YELLOW_GOAL_TOP_POST_X, LANDMARK_YELLOW_GOAL_TOP_POST_Y,
     YELLOW_GOAL_RIGHT_POST);
 
 const ConcreteFieldObject* ConcreteFieldObject::concreteFieldObjectList[
