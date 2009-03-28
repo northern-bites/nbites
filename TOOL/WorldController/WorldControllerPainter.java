@@ -19,7 +19,7 @@ import java.util.ConcurrentModificationException;
  * @date  3/18/08
  */
 
-public class WorldControllerPainter implements DogListener
+public class WorldControllerPainter implements RobotListener
 {
     // Holds a field instance, from which we obtain constants necessary
     // to render the world controller information
@@ -31,29 +31,29 @@ public class WorldControllerPainter implements DogListener
     // DEBUG SWITCHES
     static final boolean DEBUG_SEEN_LANDMARKS = false;
 
-    // The maximum number of dogs allowable on the field, and therefore
+    // The maximum number of robots allowable on the field, and therefore
     // the maximum that we will acount for in the data strucutures
-    static final int MAX_DOGS_ON_FIELD = 10;
+    static final int MAX_ROBOTS_ON_FIELD = 10;
 
     // Debug drawing stuff
     static final Color SAW_BLUE_BEACON_COLOR = Color.CYAN;
     static final Color SAW_YELLOW_BEACON_COLOR = Color.YELLOW;
 
-    // Dog drawing
-    static final Color REAL_DOG_POSITION_COLOR = Color.CYAN;
-    static final Color ESTIMATED_DOG_POSITION_COLOR = Color.BLUE;
+    // Robot drawing
+    static final Color REAL_ROBOT_POSITION_COLOR = Color.CYAN;
+    static final Color ESTIMATED_ROBOT_POSITION_COLOR = Color.BLUE;
     static final int   BLUE_TEAM = 0;
     static final int   RED_TEAM = 1;
     static final int   DEFAULT_TEAM = BLUE_TEAM;
-    static final Color DOG_COLOR_RED_TEAM = Color.RED;
-    static final Color DOG_COLOR_BLUE_TEAM = Color.BLUE;
-    static final Color ESTIMATED_DOG_XY_UNCERT_COLOR = Color.YELLOW;
-    static final Color ESTIMATED_DOG_HEADING_UNCERT_COLOR = Color.PINK;
+    static final Color ROBOT_COLOR_RED_TEAM = Color.RED;
+    static final Color ROBOT_COLOR_BLUE_TEAM = Color.BLUE;
+    static final Color ESTIMATED_ROBOT_XY_UNCERT_COLOR = Color.YELLOW;
+    static final Color ESTIMATED_ROBOT_HEADING_UNCERT_COLOR = Color.PINK;
     static final Color VISIBLE_LANDMARK_COLOR = Color.PINK;
 
 
     // Drawing paramaters
-    // Adjust to change how the dogs position, uncertainty, etc are represented
+    // Adjust to change how the robots position, uncertainty, etc are represented
     // on the drawing
     public static final double DRAW_NUM_SD_RADI = 2.;
     public static final double POSITION_DOT_RADIUS = 2.;
@@ -87,9 +87,9 @@ public class WorldControllerPainter implements DogListener
     static final double RAD_TO_DEG = 360. / (2. * Math.PI);
     static final double DEG_TO_RAD = (2. * Math.PI) / 360.;
 
-    // Used when we are only tracking one dog.  Chosen to be a weird number
-    // so that it doesen't collide with a dog's udp key
-    static final Integer SINGLE_DOG_KEY = new Integer(-1273);
+    // Used when we are only tracking one robot.  Chosen to be a weird number
+    // so that it doesen't collide with a robot's udp key
+    static final Integer SINGLE_ROBOT_KEY = new Integer(-1273);
 
     private int num_positions_to_draw;
 
@@ -97,12 +97,12 @@ public class WorldControllerPainter implements DogListener
     // field at one time
     private int NUMBER_PREVIOUS_POSITIONS_TO_DRAW = 1;
 
-    // To hold the history for one or more dogs
-    private HashMap<Integer, DogHistory> dog_histories =
-        new HashMap<Integer, DogHistory>(MAX_DOGS_ON_FIELD);
-    // Add a DogHistory instance to handle the case that we are visualizing
-    // a single dog
-    DogHistory single_dog;
+    // To hold the history for one or more robots
+    private HashMap<Integer, RobotHistory> robot_histories =
+        new HashMap<Integer, RobotHistory>(MAX_ROBOTS_ON_FIELD);
+    // Add a RobotHistory instance to handle the case that we are visualizing
+    // a single robot
+    RobotHistory single_robot;
 
     // because UDP currently doesn't provide heading uncertainty estimates
     static final double ASSUMED_HEADING_UNCERT_FOR_UDP_COMMUNICATIONS = 0.0;
@@ -154,10 +154,10 @@ public class WorldControllerPainter implements DogListener
         yb_x = -1;
         yb_y = -1;
 
-        single_dog = new DogHistory();
-        single_dog.team = 1;
-        single_dog.color = BLUE_TEAM;
-        dog_histories.put(SINGLE_DOG_KEY, single_dog);
+        single_robot = new RobotHistory();
+        single_robot.team = 1;
+        single_robot.color = BLUE_TEAM;
+        robot_histories.put(SINGLE_ROBOT_KEY, single_robot);
         numSeenLandmarks = 0;
         currentParticles = new Vector<MCLParticle>();
         mclTeamColor = 0;
@@ -188,7 +188,7 @@ public class WorldControllerPainter implements DogListener
         if (g2 == null) { return; }
         try {
             paintLandmarks(g2);
-            paintDogInformation(g2);
+            paintRobotInformation(g2);
             paintParticleSet(g2);
             paintEstimateMeanAndVariance(g2);
             paintRealRobotPose(g2);
@@ -254,13 +254,13 @@ public class WorldControllerPainter implements DogListener
     }
 
 
-    protected void paintDogInformation(Graphics2D g2)
+    protected void paintRobotInformation(Graphics2D g2)
     {
         if (draw_real) {
-            paintDogRealInformation(g2);
+            paintRobotRealInformation(g2);
         }
         if (draw_est) {
-            paintDogEstInformation(g2);
+            paintRobotEstInformation(g2);
         }
     }
 
@@ -270,18 +270,18 @@ public class WorldControllerPainter implements DogListener
      *
      * NOTE:  Unlike in the paint landmarks method where we need to switch the
      * coordinate system to account for the red team, by the time we enter this
-     * method all the coordinate systems have been fixed for the dog
+     * method all the coordinate systems have been fixed for the robot
      * information.
-     * @see updateDog(Dog) update
+     * @see updateRobot(Robot) update
      */
-    protected void paintDogRealInformation(Graphics2D g2)
+    protected void paintRobotRealInformation(Graphics2D g2)
     {
-        // For each of the dogs that we are tracking
-        for (DogHistory dog_history : dog_histories.values()) {
-            // Draw the dog's most recent actual locations
+        // For each of the robots that we are tracking
+        for (RobotHistory robot_history : robot_histories.values()) {
+            // Draw the robot's most recent actual locations
             for (LocalizationPacket recent_position :
-                     dog_history.actual_position_history) {
-                drawDogsRealPosition(g2,
+                     robot_history.actual_position_history) {
+                drawRobotsRealPosition(g2,
                                      recent_position.getXActual(),
                                      recent_position.getYActual(),
                                      recent_position.
@@ -291,7 +291,7 @@ public class WorldControllerPainter implements DogListener
             }
             // Draw the ball's most recent actual locations
             for (LocalizationPacket recent_position :
-                     dog_history.actual_ball_position_history) {
+                     robot_history.actual_ball_position_history) {
                 drawBallRealPosition(g2,
                                      recent_position.getXActual(),
                                      recent_position.getYActual());
@@ -304,47 +304,47 @@ public class WorldControllerPainter implements DogListener
      * is and has been recently.  Again, please note that prior to entering this
      * method the red team's coordinate system has been suitably modified to
      * work with this method.
-     * @see updateDog(Dog) update
+     * @see updateRobot(Robot) update
      */
-    protected void paintDogEstInformation(Graphics2D g2)
+    protected void paintRobotEstInformation(Graphics2D g2)
     {
-        // For each of the dogs that we are tracking
-        for (DogHistory dog_history : dog_histories.values()) {
-            // Draw the most recent dog estimated locations and uncertainties
-            Color dogColor, numberColor;
-            if (dog_history.color == RED_TEAM) {
-                dogColor = DOG_COLOR_RED_TEAM;
-                numberColor = DOG_COLOR_RED_TEAM;
+        // For each of the robots that we are tracking
+        for (RobotHistory robot_history : robot_histories.values()) {
+            // Draw the most recent robot estimated locations and uncertainties
+            Color robotColor, numberColor;
+            if (robot_history.color == RED_TEAM) {
+                robotColor = ROBOT_COLOR_RED_TEAM;
+                numberColor = ROBOT_COLOR_RED_TEAM;
             } else {
-                dogColor = DOG_COLOR_BLUE_TEAM;
-                numberColor = DOG_COLOR_BLUE_TEAM;
+                robotColor = ROBOT_COLOR_BLUE_TEAM;
+                numberColor = ROBOT_COLOR_BLUE_TEAM;
             }
             for (LocalizationPacket recent_estimate :
-                     dog_history.estimated_position_history) {
+                     robot_history.estimated_position_history) {
                 // draw the location and heading estimate dot and line
-                drawDogsEstimatedPosition(g2,
-                                          dogColor,
+                drawRobotsEstimatedPosition(g2,
+                                          robotColor,
                                           recent_estimate.getXEst(),
                                           recent_estimate.getYEst(),
                                           recent_estimate.
                                           getHeadingEst(),
                                           recent_estimate.
                                           getHeadPanEst(),
-                                          dog_history.number);
+                                          robot_history.number);
                 // draw the position uncertanity oval, if applicable
-                drawDogsUncertainty(g2,
+                drawRobotsUncertainty(g2,
                                     recent_estimate.getXEst(),
                                     recent_estimate.getYEst(),
                                     recent_estimate.getHeadingEst(),
                                     recent_estimate.getXUncert(),
                                     recent_estimate.getYUncert(),
                                     recent_estimate.getHUncert());
-                dogColor = dogColor.darker();
+                robotColor = robotColor.darker();
             }
             // Draw the most recent ball estimated locations and uncertainties
             Color ballColor = Color.WHITE;
             for (LocalizationPacket recent_estimate :
-                     dog_history.estimated_ball_position_history) {
+                     robot_history.estimated_ball_position_history) {
                 drawBallEstimatedPosition(g2,
                                           recent_estimate.getXEst(),
                                           recent_estimate.getYEst(),
@@ -352,7 +352,7 @@ public class WorldControllerPainter implements DogListener
                                           getXVelocity(),
                                           recent_estimate.
                                           getYVelocity(),
-                                          dog_history.number,
+                                          robot_history.number,
                                           numberColor);
                 drawBallUncertainty(g2,
                                     recent_estimate.getXEst(),
@@ -365,74 +365,72 @@ public class WorldControllerPainter implements DogListener
     }
 
 
-    // draw dog's real positioni
-    public void drawDogsRealPosition(Graphics2D drawing_on,
+    // draw robot's real positioni
+    public void drawRobotsRealPosition(Graphics2D drawing_on,
                                      double at_x, double at_y,
                                      double at_heading, double at_pan)
     {
-        field.fillOval(drawing_on, REAL_DOG_POSITION_COLOR,
+        field.fillOval(drawing_on, REAL_ROBOT_POSITION_COLOR,
                        field.DRAW_STROKE, at_x, at_y, POSITION_DOT_RADIUS,
                        POSITION_DOT_RADIUS);
-        double heading_angle_from_right_horizon = at_heading + QUART_CIRC_RADS;
         double x_line_body_disp = (POSITION_HEADING_RADIUS *
-                                   Math.cos(heading_angle_from_right_horizon));
+                                   Math.cos(at_heading));
         double y_line_body_disp = (POSITION_HEADING_RADIUS *
-                                   Math.sin(heading_angle_from_right_horizon));
-        field.drawLine(drawing_on, REAL_DOG_POSITION_COLOR, field.DRAW_STROKE,
+                                   Math.sin(at_heading));
+        field.drawLine(drawing_on, REAL_ROBOT_POSITION_COLOR, field.DRAW_STROKE,
                        at_x - x_line_body_disp, at_y - y_line_body_disp,
                        at_x, at_y);
         double x_line_pan_disp = (PAN_HEADING_RADIUS *
                                   Math.cos((at_pan +
-                                            heading_angle_from_right_horizon
+                                            at_heading
                                             )));
         double y_line_pan_disp = (PAN_HEADING_RADIUS *
                                   Math.sin((at_pan +
-                                            heading_angle_from_right_horizon
+                                            at_heading
                                             )));
-        field.drawLine(drawing_on, REAL_DOG_POSITION_COLOR, field.DRAW_STROKE,
+        field.drawLine(drawing_on, REAL_ROBOT_POSITION_COLOR, field.DRAW_STROKE,
                        at_x, at_y, at_x + x_line_pan_disp,
                        at_y + y_line_pan_disp);
     }
 
-    // draw dog's estimated position
-    public void drawDogsEstimatedPosition(Graphics2D drawing_on,
-                                          Color dogColor, double at_x,
+    // draw robot's estimated position
+    public void drawRobotsEstimatedPosition(Graphics2D drawing_on,
+                                          Color robotColor, double at_x,
                                           double at_y, double at_heading,
                                           double at_pan, int player_number)
     {
-        field.fillOval(drawing_on, dogColor, field.DRAW_STROKE, at_x, at_y,
+        field.fillOval(drawing_on, robotColor, field.DRAW_STROKE, at_x, at_y,
                        POSITION_DOT_RADIUS, POSITION_DOT_RADIUS);
         // TAIL PART
-        double heading_angle_from_right_horizon = at_heading + QUART_CIRC_DEGS;
         double x_line_body_disp = (POSITION_HEADING_RADIUS *
                                    Math.cos(DEG_TO_RAD *
-                                            heading_angle_from_right_horizon));
+                                            at_heading));
         double y_line_body_disp = (POSITION_HEADING_RADIUS *
                                    Math.sin(DEG_TO_RAD *
-                                            heading_angle_from_right_horizon));
-        field.drawLine(drawing_on, dogColor, field.DRAW_STROKE,
+                                            at_heading));
+        field.drawLine(drawing_on, robotColor, field.DRAW_STROKE,
                        at_x - x_line_body_disp, at_y - y_line_body_disp,
                        at_x, at_y);
         double x_line_pan_disp = (PAN_HEADING_RADIUS *
                                   Math.cos(DEG_TO_RAD *
                                            (at_pan +
-                                            heading_angle_from_right_horizon
+                                            at_heading
                                             )));
         double y_line_pan_disp = (PAN_HEADING_RADIUS *
                                   Math.sin(DEG_TO_RAD *
                                            (at_pan +
-                                            heading_angle_from_right_horizon
+                                            at_heading
                                             )));
-        field.drawLine(drawing_on, dogColor, field.DRAW_STROKE, at_x, at_y,
+        field.drawLine(drawing_on, robotColor, field.DRAW_STROKE, at_x, at_y,
                        at_x + x_line_pan_disp, at_y + y_line_pan_disp);
 
-        // Here we add a number ontop of the dog
-        field.drawNumber(drawing_on, dogColor, at_x+5, at_y+5,
+        // Here we add a number ontop of the robot
+        field.drawNumber(drawing_on, robotColor, at_x+5, at_y+5,
                          player_number);
     }
 
-    // draw dog uncertainty (x,y,h)
-    public void drawDogsUncertainty(Graphics2D drawing_on,
+    // draw robot uncertainty (x,y,h)
+    public void drawRobotsUncertainty(Graphics2D drawing_on,
                                     double at_x,
                                     double at_y,
                                     double at_heading,
@@ -440,35 +438,33 @@ public class WorldControllerPainter implements DogListener
                                     double y_uncert,
                                     double h_uncert)
     {
-        // draw dog's uncert
+        // draw robot's uncert
         field.drawOval(drawing_on,
-                       ESTIMATED_DOG_XY_UNCERT_COLOR,
+                       ESTIMATED_ROBOT_XY_UNCERT_COLOR,
                        field.DRAW_STROKE,
                        at_x,
                        at_y,
                        x_uncert,
                        y_uncert);
 
-        double heading_angle_from_right_horizon = at_heading + QUART_CIRC_DEGS;
-
         double half_h_uncert = h_uncert/2.0;
 
         // HEAD PART
         double x_line_pan_disp_plus = HEADING_UNCERT_RADIUS *
             Math.cos(DEG_TO_RAD * (half_h_uncert +
-                                   heading_angle_from_right_horizon));
+                                   at_heading));
         double y_line_pan_disp_plus = HEADING_UNCERT_RADIUS *
             Math.sin(DEG_TO_RAD * (half_h_uncert +
-                                   heading_angle_from_right_horizon));
+                                   at_heading));
         double x_line_pan_disp_minus = HEADING_UNCERT_RADIUS *
             Math.cos(DEG_TO_RAD * (-half_h_uncert +
-                                   heading_angle_from_right_horizon));
+                                   at_heading));
         double y_line_pan_disp_minus = HEADING_UNCERT_RADIUS *
             Math.sin(DEG_TO_RAD * (-half_h_uncert +
-                                   heading_angle_from_right_horizon));
+                                   at_heading));
 
         field.drawLine(drawing_on,
-                       ESTIMATED_DOG_HEADING_UNCERT_COLOR,
+                       ESTIMATED_ROBOT_HEADING_UNCERT_COLOR,
                        field.DRAW_STROKE,
                        at_x,
                        at_y,
@@ -476,7 +472,7 @@ public class WorldControllerPainter implements DogListener
                        at_y + y_line_pan_disp_plus);
 
         field.drawLine(drawing_on,
-                       ESTIMATED_DOG_HEADING_UNCERT_COLOR,
+                       ESTIMATED_ROBOT_HEADING_UNCERT_COLOR,
                        field.DRAW_STROKE,
                        at_x,
                        at_y,
@@ -485,7 +481,7 @@ public class WorldControllerPainter implements DogListener
 
         // Draw dashed lines as axis of the oval
         field.drawLine(drawing_on,
-                       ESTIMATED_DOG_XY_UNCERT_COLOR,
+                       ESTIMATED_ROBOT_XY_UNCERT_COLOR,
                        new BasicStroke(1.0F, BasicStroke.CAP_BUTT,
                                        BasicStroke.JOIN_MITER, 10,
                                        new float[] {2}, 0),
@@ -494,7 +490,7 @@ public class WorldControllerPainter implements DogListener
                        at_x,
                        at_y + y_uncert);
         field.drawLine(drawing_on,
-                       ESTIMATED_DOG_XY_UNCERT_COLOR,
+                       ESTIMATED_ROBOT_XY_UNCERT_COLOR,
                        new BasicStroke(1.0F, BasicStroke.CAP_BUTT,
                                        BasicStroke.JOIN_MITER, 10,
                                        new float[] {2}, 0),
@@ -505,14 +501,14 @@ public class WorldControllerPainter implements DogListener
 
     }
 
-    // draw the ball's position from dog ekf
+    // draw the ball's position from robot ekf
     public void drawBallEstimatedPosition(Graphics2D drawing_on,
                                           double at_x,
                                           double at_y,
                                           double x_velocity,
                                           double y_velocity,
                                           int player_number,
-                                          Color dogColor)
+                                          Color robotColor)
     {
         field.fillOval(drawing_on, ESTIMATED_BALL_COLOR, field.DRAW_STROKE,
                        at_x, at_y, field.BALL_RADIUS, field.BALL_RADIUS);
@@ -521,7 +517,7 @@ public class WorldControllerPainter implements DogListener
                        at_x, at_y,
                        at_x + x_velocity * BALL_VELOCITY_DRAWING_MULTIPLIER,
                        at_y + y_velocity * BALL_VELOCITY_DRAWING_MULTIPLIER);
-        field.drawNumber(drawing_on, dogColor, at_x, at_y, player_number);
+        field.drawNumber(drawing_on, robotColor, at_x, at_y, player_number);
     }
 
     // draws ball's 'actual' position in simulation/camera
@@ -563,37 +559,37 @@ public class WorldControllerPainter implements DogListener
     public void reportUpdatedActualLocation(LocalizationPacket
                                             actual_location)
     {
-        reportUpdatedActualLocation(singleDogHistory(), actual_location);
+        reportUpdatedActualLocation(singleRobotHistory(), actual_location);
     }
 
-    public void reportUpdatedActualLocation(DogHistory dog_history,
+    public void reportUpdatedActualLocation(RobotHistory robot_history,
                                             LocalizationPacket
                                             actual_location)
     {
-        if (dog_history.actual_position_history.size() >=
+        if (robot_history.actual_position_history.size() >=
             num_positions_to_draw) {
-            dog_history.actual_position_history.removeLast();
+            robot_history.actual_position_history.removeLast();
         }
-        dog_history.actual_position_history.addFirst(actual_location);
+        robot_history.actual_position_history.addFirst(actual_location);
     }
 
     public void reportUpdatedActualBallLocation(LocalizationPacket
                                                 actual_ball_location)
     {
-        reportUpdatedActualBallLocation(singleDogHistory(),
+        reportUpdatedActualBallLocation(singleRobotHistory(),
                                         actual_ball_location);
     }
 
     public void
-        reportUpdatedActualBallLocation(DogHistory dog_history,
+        reportUpdatedActualBallLocation(RobotHistory robot_history,
                                         LocalizationPacket
                                         actual_ball_location)
     {
-        if (dog_history.actual_ball_position_history.size() >=
+        if (robot_history.actual_ball_position_history.size() >=
             num_positions_to_draw) {
-            dog_history.actual_ball_position_history.removeLast();
+            robot_history.actual_ball_position_history.removeLast();
         }
-        dog_history.actual_ball_position_history.addFirst(actual_ball_location);
+        robot_history.actual_ball_position_history.addFirst(actual_ball_location);
     }
 
     public void
@@ -603,24 +599,24 @@ public class WorldControllerPainter implements DogListener
         if (team_color == RED_TEAM) {
             transformFieldCoordinatesToRedTeamSide(new_localization_info);
         }
-        reportUpdatedLocalization(singleDogHistory(),
+        reportUpdatedLocalization(singleRobotHistory(),
                                   new_localization_info,
                                   team_color,
                                   player_number);
     }
 
     public void
-        reportUpdatedLocalization(DogHistory dog_history,
+        reportUpdatedLocalization(RobotHistory robot_history,
                                   LocalizationPacket new_localization_info,
                                   int team_color, int player_number)
     {
-        if (dog_history.estimated_position_history.size() >=
+        if (robot_history.estimated_position_history.size() >=
             num_positions_to_draw) {
-            dog_history.estimated_position_history.removeLast();
+            robot_history.estimated_position_history.removeLast();
         }
-        dog_history.estimated_position_history.addFirst(new_localization_info);
-        dog_history.color = team_color;
-        dog_history.number = player_number;
+        robot_history.estimated_position_history.addFirst(new_localization_info);
+        robot_history.color = team_color;
+        robot_history.number = player_number;
     }
 
     public void
@@ -631,37 +627,37 @@ public class WorldControllerPainter implements DogListener
         if (team_color == RED_TEAM) {
             transformFieldCoordinatesToRedTeamSide(new_ball_localization_info);
         }
-        reportUpdatedBallLocalization(singleDogHistory(),
+        reportUpdatedBallLocalization(singleRobotHistory(),
                                       new_ball_localization_info,
                                       team_color,
                                       player_number);
     }
 
-    public void reportUpdatedBallLocalization(DogHistory dog_history,
+    public void reportUpdatedBallLocalization(RobotHistory robot_history,
                                               LocalizationPacket
                                               new_ball_localization_info,
                                               int team_color,
                                               int player_number)
     {
-        if (dog_history.estimated_ball_position_history.size() >=
+        if (robot_history.estimated_ball_position_history.size() >=
             num_positions_to_draw) {
-            dog_history.estimated_ball_position_history.removeLast();
+            robot_history.estimated_ball_position_history.removeLast();
         }
-        dog_history.estimated_ball_position_history.
+        robot_history.estimated_ball_position_history.
             addFirst(new_ball_localization_info);
-        dog_history.color = team_color;
-        dog_history.number = player_number;
+        robot_history.color = team_color;
+        robot_history.number = player_number;
     }
 
     public void reportTrackedLandmark(LocalizationPacket landmark_location)
     {
-        reportTrackedLandmark(singleDogHistory(), landmark_location);
+        reportTrackedLandmark(singleRobotHistory(), landmark_location);
     }
 
-    public void reportTrackedLandmark(DogHistory dog_history, LocalizationPacket
+    public void reportTrackedLandmark(RobotHistory robot_history, LocalizationPacket
                                       landmark_location)
     {
-        dog_history.visible_landmarks.add(landmark_location);
+        robot_history.visible_landmarks.add(landmark_location);
     }
 
     // 0 true, 1 false
@@ -685,7 +681,7 @@ public class WorldControllerPainter implements DogListener
             return;
         }
 
-        LocalizationPacket est = singleDogHistory().estimated_position_history.
+        LocalizationPacket est = singleRobotHistory().estimated_position_history.
             getFirst();
         double new_angle = AngleUtilities.sub180Angle(-angle+est.
                                                       getHeadingEst());
@@ -703,7 +699,7 @@ public class WorldControllerPainter implements DogListener
             return;
         }
 
-        LocalizationPacket est = singleDogHistory().estimated_position_history.
+        LocalizationPacket est = singleRobotHistory().estimated_position_history.
             getFirst();
         double new_angle = AngleUtilities.sub180Angle(-angle+est.
                                                       getHeadingEst());
@@ -720,31 +716,31 @@ public class WorldControllerPainter implements DogListener
         clearVisibleLandmarks();
     }
 
-    public void updateDog(Dog dog)
+    public void updateRobot(Robot robot)
     {
-        // Use the dog's unique number to see if we allready have it in our
-        // hash of all dogs, adding it to the hash if we don't
-        // Update the dog's history with the uncoming UDP data
-        DogHistory this_dogs_history;
-        if (dog_histories.containsKey(dog.getHash())) {
-            this_dogs_history = dog_histories.get(dog.getHash());
+        // Use the robot's unique number to see if we allready have it in our
+        // hash of all robots, adding it to the hash if we don't
+        // Update the robot's history with the uncoming UDP data
+        RobotHistory this_robots_history;
+        if (robot_histories.containsKey(robot.getHash())) {
+            this_robots_history = robot_histories.get(robot.getHash());
         }
         else {
-            this_dogs_history = new DogHistory();
-            this_dogs_history.team = dog.getTeam();
-            this_dogs_history.color = dog.getColor();
-            this_dogs_history.number = dog.getNumber().intValue();
-            dog_histories.put(dog.getHash(), this_dogs_history);
+            this_robots_history = new RobotHistory();
+            this_robots_history.team = robot.getTeam();
+            this_robots_history.color = robot.getColor();
+            this_robots_history.number = robot.getNumber().intValue();
+            robot_histories.put(robot.getHash(), this_robots_history);
         }
-        DogData d = dog.getData();
-        LocalizationPacket dog_estimate = LocalizationPacket.
-            makeEstimateAndUncertPacket(d.getDogX(),
-                                        d.getDogY(),
-                                        d.getDogHeading(),
+        RobotData d = robot.getData();
+        LocalizationPacket robot_estimate = LocalizationPacket.
+            makeEstimateAndUncertPacket(d.getRobotX(),
+                                        d.getRobotY(),
+                                        d.getRobotHeading(),
                                         ASSUMED_HEAD_PAN_FOR_UDP_COMMUNICATIONS,
-                                        d.getDogUncertX(),
-                                        d.getDogUncertY(),
-                                        d.getDogUncertH());
+                                        d.getRobotUncertX(),
+                                        d.getRobotUncertY(),
+                                        d.getRobotUncertH());
         LocalizationPacket ball_estimate = LocalizationPacket.
             makeBallEstimateAndUncertPacket(d.getBallX().doubleValue(),
                                             d.getBallY().doubleValue(),
@@ -752,21 +748,21 @@ public class WorldControllerPainter implements DogListener
                                             d.getBallYUncert().doubleValue(),
                                             d.getBallXVel(),
                                             d.getBallYVel());
-        // If the dog is on the red team, then we need to transform its
-        // co-ordinates because it has a different (0,0) that the dogs on the
+        // If the robot is on the red team, then we need to transform its
+        // co-ordinates because it has a different (0,0) that the robots on the
         // blue team
-        if (dog.getColor() == RED_TEAM) {
-            transformFieldCoordinatesToRedTeamSide(dog_estimate);
+        if (robot.getColor() == RED_TEAM) {
+            transformFieldCoordinatesToRedTeamSide(robot_estimate);
             transformFieldCoordinatesToRedTeamSide(ball_estimate);
         }
-        reportUpdatedLocalization(this_dogs_history,
-                                  dog_estimate,
-                                  dog.getColor(),
-                                  dog.getNumber().intValue());
-        reportUpdatedBallLocalization(this_dogs_history,
+        reportUpdatedLocalization(this_robots_history,
+                                  robot_estimate,
+                                  robot.getColor(),
+                                  robot.getNumber().intValue());
+        reportUpdatedBallLocalization(this_robots_history,
                                       ball_estimate,
-                                      dog.getColor(),
-                                      dog.getNumber().intValue());
+                                      robot.getColor(),
+                                      robot.getNumber().intValue());
         reportEndFrame();
     }
 
@@ -783,40 +779,40 @@ public class WorldControllerPainter implements DogListener
         loc_pack.y_velocity = loc_pack.y_velocity * -1.0;
     }
 
-    public DogHistory singleDogHistory()
+    public RobotHistory singleRobotHistory()
     {
-        return dog_histories.get(SINGLE_DOG_KEY);
+        return robot_histories.get(SINGLE_ROBOT_KEY);
     }
 
     public void clearEstimatedPositionHistory()
     {
-        for (DogHistory dog_history : dog_histories.values()) {
-            dog_history.estimated_position_history.clear();
+        for (RobotHistory robot_history : robot_histories.values()) {
+            robot_history.estimated_position_history.clear();
         }
     }
     public void clearEstimatedBallPositionHistory()
     {
-        for (DogHistory dog_history : dog_histories.values()) {
-            dog_history.estimated_ball_position_history.clear();
+        for (RobotHistory robot_history : robot_histories.values()) {
+            robot_history.estimated_ball_position_history.clear();
         }
     }
     public void clearActualPositionHistory()
     {
-        for (DogHistory dog_history : dog_histories.values()) {
-            dog_history.actual_position_history.clear();
+        for (RobotHistory robot_history : robot_histories.values()) {
+            robot_history.actual_position_history.clear();
         }
     }
     public void clearActualBallPositionHistory()
     {
-        for (DogHistory dog_history : dog_histories.values()) {
-            dog_history.actual_ball_position_history.clear();
+        for (RobotHistory robot_history : robot_histories.values()) {
+            robot_history.actual_ball_position_history.clear();
         }
     }
 
     public void clearVisibleLandmarks()
     {
-        for (DogHistory dog_history : dog_histories.values()) {
-            dog_history.visible_landmarks.clear();
+        for (RobotHistory robot_history : robot_histories.values()) {
+            robot_history.visible_landmarks.clear();
         }
     }
 
@@ -921,9 +917,9 @@ public class WorldControllerPainter implements DogListener
         for(MCLParticle p : currentParticles) {
             Color partColor;
             if( mclTeamColor == RED_TEAM) {
-                partColor = DOG_COLOR_RED_TEAM;
+                partColor = ROBOT_COLOR_RED_TEAM;
             } else {
-                partColor = DOG_COLOR_BLUE_TEAM;
+                partColor = ROBOT_COLOR_BLUE_TEAM;
             }
             drawParticle(g2, partColor, p.getX(),
                          p.getY(), p.getH(),
@@ -939,7 +935,7 @@ public class WorldControllerPainter implements DogListener
      */
     public void paintEstimateMeanAndVariance(Graphics2D g2)
     {
-        drawDogsUncertainty(g2, positionEstimates[0], positionEstimates[1],
+        drawRobotsUncertainty(g2, positionEstimates[0], positionEstimates[1],
                             positionEstimates[2], uncertaintyEstimates[0],
                             uncertaintyEstimates[1], uncertaintyEstimates[2]);
     }
@@ -956,7 +952,7 @@ public class WorldControllerPainter implements DogListener
         if (realPose[0] == NO_DATA_VALUE) {// Test if data exists
             return; // Draw nothing if we don't know the current real pose
         }
-        drawDogsRealPosition(g2, /*Color.CYAN,*/ realPose[0], realPose[1],
+        drawRobotsRealPosition(g2, /*Color.CYAN,*/ realPose[0], realPose[1],
                              realPose[2], 0.0);
     }
 
@@ -993,7 +989,7 @@ public class WorldControllerPainter implements DogListener
 
         // Draw a line pointing in the direction of the heading
         field.drawLine(drawing_on, in_color, field.DRAW_STROKE, x, y,
-                       x + PARTICLE_HEADING_DIST*Math.cos(h + QUART_CIRC_RADS),
-                       y + PARTICLE_HEADING_DIST*Math.sin(h + QUART_CIRC_RADS));
+                       x + PARTICLE_HEADING_DIST*Math.cos(h),
+                       y + PARTICLE_HEADING_DIST*Math.sin(h));
     }
 }

@@ -1,10 +1,10 @@
 package TOOL.WorldController;
 
-public class Dog {
+public class Robot {
 
     final static int NUM_MSG_COMPONENTS = 17;
     final static String HEADER = "borat";
-  
+
     final static int PACKET_TEAM_HEADER = 0;
     final static int PACKET_TEAM_NUMBER = 1;
     final static int PACKET_TEAM_COLOR = 2;
@@ -26,13 +26,13 @@ public class Dog {
     private Integer team;
     private Integer color;
     private Integer number;
-    private DogData data;
-  
-    public Dog(int team, int color, int number) {
-	this(team,color,number,new DogData());
+    private RobotData data;
+
+    public Robot(int team, int color, int number) {
+	this(team,color,number,new RobotData());
     }
 
-    public Dog(int team, int color, int number, DogData data) {
+    public Robot(int team, int color, int number, RobotData data) {
 	this.team = new Integer(team);
 	this.color = new Integer(color);
 	this.number = new Integer(number);
@@ -55,11 +55,11 @@ public class Dog {
 	return (team * 10) + number;
     }
 
-    public DogData getData() {
+    public RobotData getData() {
 	return data;
     }
 
-    public static Dog parseData(byte[] rawData, int length) {
+    public static Robot parseData(byte[] rawData, int length) {
 	String data = (new String(rawData,0,200));
 	String[] words = data.split(" ");
 	//System.out.println("parseData: " + data + " length: " + length);
@@ -67,7 +67,7 @@ public class Dog {
 	    System.out.println("UDP PACKET REJECTED: packet: " + data + " length: " + words.length + " < NUM_MSG_COMPONENTS: " + NUM_MSG_COMPONENTS);
 	    return null;
 	}
- 
+
 	if (words[PACKET_TEAM_HEADER].equals(HEADER)) {
 	    //We don't need to worry about it while its only us in the lab
 	    //return null;
@@ -79,36 +79,36 @@ public class Dog {
 		Integer color = new Integer(words[PACKET_TEAM_COLOR]);
 		Integer number = new Integer(words[PACKET_PLAYER_NUMBER]);
 		Integer time = new Integer(words[PACKET_TIME_STAMP]);
-		Integer dogX = 
+		Integer robotX =
 		    new Integer((int)Double.parseDouble(words[PACKET_PLAYER_X]));
-		Integer dogY = 
+		Integer robotY =
 		    new Integer((int)Double.parseDouble(words[PACKET_PLAYER_Y]));
-		Integer dogHeading = 
+		Integer robotHeading =
 		    new Integer((int)Double.parseDouble(words[PACKET_PLAYER_H]));
-		Integer dogUncertX = 
+		Integer robotUncertX =
 		    new Integer((int)Double.parseDouble(words[PACKET_UNCERT_X]));
-		Integer dogUncertY = 
+		Integer robotUncertY =
 		    new Integer((int)Double.parseDouble(words[PACKET_UNCERT_Y]));
-		Integer dogUncertH = 
+		Integer robotUncertH =
 		    new Integer((int)Double.parseDouble(words[PACKET_UNCERT_H]));
-		Integer ballX = 
+		Integer ballX =
 		    new Integer((int)Double.parseDouble(words[PACKET_BALL_X]));
-		Integer ballY = 
+		Integer ballY =
 		    new Integer((int)Double.parseDouble(words[PACKET_BALL_Y]));
-		Integer ballXUncert = 
+		Integer ballXUncert =
 		    new Integer((int)Double.parseDouble(words[PACKET_BALL_UNCERT_X]));
-		Integer ballYUncert = 
+		Integer ballYUncert =
 		    new Integer((int)Double.parseDouble(words[PACKET_BALL_UNCERT_Y]));
 		Integer ballXVel = 0;
 		Integer ballYVel = 0;
 		Integer ballDist = 0;
 		Integer ballTrapped = 0;//new Integer(words[14]);
-		Integer calledSubRole = 
+		Integer calledSubRole =
 		    new Integer(Integer.parseInt(words[PACKET_ROLE]));
 
-		return new Dog(team,color,number,new DogData(time,dogX,dogY,dogHeading,
-							     dogUncertX, dogUncertY,
-							     dogUncertY,
+		return new Robot(team,color,number,new RobotData(time,robotX,robotY,robotHeading,
+							     robotUncertX, robotUncertY,
+							     robotUncertY,
 							     ballX,ballY,
 							     ballXUncert,ballYUncert,
 							     ballXVel,ballYVel,
@@ -125,13 +125,13 @@ public class Dog {
     }
 }
 
-class DogData {
-  
+class RobotData {
+
     private Integer time;
-    private Integer dogX;
-    private Integer dogY;
-    private Integer dogHeading;
-    private Integer dogUncertX, dogUncertY, dogUncertH;
+    private Integer robotX;
+    private Integer robotY;
+    private Integer robotHeading;
+    private Integer robotUncertX, robotUncertY, robotUncertH;
     private Integer ballX;
     private Integer ballY;
     private Integer ballXUncert;
@@ -141,38 +141,38 @@ class DogData {
     private Integer ballDist;
     private boolean ballTrapped;
     private Integer calledSubRole;
-  
-    public DogData() {
+
+    public RobotData() {
 	time = new Integer(0);
 	ballX = new Integer(0);
 	ballY = new Integer(0);
 	ballDist = new Integer(0);
 	ballTrapped = false;
-	dogX = new Integer(0);
-	dogY = new Integer(0);
-	dogHeading = new Integer(0);
-	dogUncertX = new Integer(0);
-	dogUncertY = new Integer(0);
-	dogUncertH = new Integer(0);
+	robotX = new Integer(0);
+	robotY = new Integer(0);
+	robotHeading = new Integer(0);
+	robotUncertX = new Integer(0);
+	robotUncertY = new Integer(0);
+	robotUncertH = new Integer(0);
 	ballXVel = new Integer(0);
 	ballYVel = new Integer(0);
 	calledSubRole = new Integer(0);
     }
-  
-    public DogData(Integer time, Integer dogX, Integer dogY, Integer dogHeading, 
-		   Integer dogUncertX, Integer dogUncertY, Integer dogUncertH,
-		   Integer ballX, Integer ballY, 
+
+    public RobotData(Integer time, Integer robotX, Integer robotY, Integer robotHeading,
+		   Integer robotUncertX, Integer robotUncertY, Integer robotUncertH,
+		   Integer ballX, Integer ballY,
 		   Integer ballXUncert, Integer ballYUncert,
-		   Integer ballXVel, Integer ballYVel, 
+		   Integer ballXVel, Integer ballYVel,
 		   Integer ballDist, Integer ballTrapped,
 		   Integer calledSubRole) {
 	this.time = time;
-	this.dogX = dogX;
-	this.dogY = dogY;
-	this.dogHeading = dogHeading;
-	this.dogUncertX = dogUncertX;
-	this.dogUncertY = dogUncertY;
-	this.dogUncertH = dogUncertH;
+	this.robotX = robotX;
+	this.robotY = robotY;
+	this.robotHeading = robotHeading;
+	this.robotUncertX = robotUncertX;
+	this.robotUncertY = robotUncertY;
+	this.robotUncertH = robotUncertH;
 	this.ballX = ballX;
 	this.ballY = ballY;
 	this.ballXUncert = ballXUncert;
@@ -183,38 +183,38 @@ class DogData {
 	this.ballTrapped = (ballTrapped.intValue()==1);
 	this.calledSubRole = calledSubRole;
     }
-  
+
     //public Integer getIDNumber() {
     //return number;
     //}
     public Integer getTime() {
 	return time;
     }
-  
-    public Integer getDogX() {
-	return dogX;
-    }
-  
-    public Integer getDogY() {
-	return dogY;
+
+    public Integer getRobotX() {
+	return robotX;
     }
 
-    public Integer getDogHeading() {
-	return dogHeading;
+    public Integer getRobotY() {
+	return robotY;
     }
 
-    public Integer getDogUncertX() {
-	return dogUncertX;
-    }
-  
-    public Integer getDogUncertY() {
-	return dogUncertY;
+    public Integer getRobotHeading() {
+	return robotHeading;
     }
 
-    public Integer getDogUncertH() {
-	return dogUncertH;
+    public Integer getRobotUncertX() {
+	return robotUncertX;
     }
-  
+
+    public Integer getRobotUncertY() {
+	return robotUncertY;
+    }
+
+    public Integer getRobotUncertH() {
+	return robotUncertH;
+    }
+
     public Integer getBallX() {
 	return ballX;
     }
@@ -226,11 +226,11 @@ class DogData {
     public Integer getBallXUncert() {
 	return ballXUncert;
     }
-    
+
     public Integer getBallYUncert() {
 	return ballYUncert;
     }
-  
+
     public Integer getBallXVel() {
 	return ballXVel;
     }
@@ -243,8 +243,8 @@ class DogData {
 	return ballDist;
     }
 
-    public double getDogHeadingRadians() {
-	return dogHeading.intValue()/180.0 * Math.PI;
+    public double getRobotHeadingRadians() {
+	return robotHeading.intValue()/180.0 * Math.PI;
     }
 
     public Integer getCalledSubRole() {

@@ -430,18 +430,21 @@ public class DebugViewer extends JFrame {
         LANDMARK_X[3] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X;
         LANDMARK_X[4] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
         LANDMARK_X[5] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
-        // LANDMARK_X[6] = (int) wc.the_field.GOAL_BOX_X_LEFT;
-        // LANDMARK_X[7] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
-        // LANDMARK_X[8] = (int) wc.the_field.GOAL_BOX_X_LEFT;
-        // LANDMARK_X[9] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
+
+        LANDMARK_X[6] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
+        LANDMARK_X[7] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
+        LANDMARK_X[8] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
+        LANDMARK_X[9] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
+
         LANDMARK_X[10] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
         LANDMARK_X[11] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
         LANDMARK_X[12] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
         LANDMARK_X[13] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
-        // LANDMARK_X[14] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
-        // LANDMARK_X[15] = (int) wc.the_field.GOAL_BOX_X_LEFT;
-        // LANDMARK_X[16] = (int) wc.the_field.GOAL_BOX_X_RIGHT;
-        // LANDMARK_X[17] = (int) wc.the_field.GOAL_BOX_X_LEFT;
+
+        LANDMARK_X[14] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
+        LANDMARK_X[15] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
+        LANDMARK_X[16] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
+        LANDMARK_X[17] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
 
         LANDMARK_Y = new int[18];
         LANDMARK_Y[0] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y;
@@ -450,12 +453,14 @@ public class DebugViewer extends JFrame {
         LANDMARK_Y[3] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y;
         LANDMARK_Y[4] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[5] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
+
         LANDMARK_Y[6] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[7] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[8] = (int) (wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
                                wc.the_field.GOAL_BOX_DEPTH);
         LANDMARK_Y[9] = (int) (wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
                                wc.the_field.GOAL_BOX_DEPTH);
+
         LANDMARK_Y[10] = (int) wc.the_field.MIDFIELD_Y;
         LANDMARK_Y[11] = (int) wc.the_field.MIDFIELD_Y;
         LANDMARK_Y[12] = (int) wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y;

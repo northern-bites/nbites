@@ -16,7 +16,7 @@ public class UDPServer extends Thread {
     private DatagramSocket socket;    // Socket on which server listens
     private boolean receiving;  // Whether this server is currently listening
     private DatagramPacket packet;    // UDP packet (buffer) used to recieve data
-    private Vector<DogListener> listens; // Objects that will be notfied of data
+    private Vector<RobotListener> listens; // Objects that will be notfied of data
 
     public UDPServer() {
 	this(DEF_PORT);
@@ -24,7 +24,7 @@ public class UDPServer extends Thread {
 
     /**
      * Creates a new UDPServer on the given port, which notifies the given UDPGui
-     * with new Dogs generated from packets recieved.
+     * with new Robots generated from packets recieved.
      *
      * @param port   The port on which the server should bind and listen for
      * packets
@@ -42,14 +42,14 @@ public class UDPServer extends Thread {
 	}
 
 	packet = new DatagramPacket(new byte[DEF_BUF],200);
-	listens = new Vector<DogListener>();
+	listens = new Vector<RobotListener>();
 	receiving = false;
 	start();
     }
 
     /**
      * The executing body of the server thread, listens on the port (while open)
-     * and notifies the listeners with new Dogs.  Exits upon socket 
+     * and notifies the listeners with new Robots.  Exits upon socket 
      * closure/unbinding or when server is no longer receiving.  Does not exit on
      * packet receival error.
      */
@@ -58,12 +58,12 @@ public class UDPServer extends Thread {
 	    try {
 		socket.receive(packet);
 		if (isReceiving()) {
-		    Dog dog = Dog.parseData(packet.getData(),packet.getLength());
-		    if (dog != null) {
-			notifyListeners(dog);
+		    Robot robot = Robot.parseData(packet.getData(),packet.getLength());
+		    if (robot != null) {
+			notifyListeners(robot);
 		    }
 		    else {
-			System.out.println("dog is null");
+			System.out.println("robot is null");
 		    }
 		}
 	    }catch (IOException e) {
@@ -73,18 +73,18 @@ public class UDPServer extends Thread {
 	}
     }
 
-    public void addDogListener(DogListener dl) {
+    public void addRobotListener(RobotListener dl) {
 	listens.add(dl);
     }
 
-    public void removeDogListener(DogListener dl) {
+    public void removeRobotListener(RobotListener dl) {
 	listens.remove(dl);
     }
 
-    private void notifyListeners(Dog dog) {
-	Iterator<DogListener> itr = listens.iterator();
+    private void notifyListeners(Robot robot) {
+	Iterator<RobotListener> itr = listens.iterator();
 	while (itr.hasNext()) {
-	    itr.next().updateDog(dog);
+	    itr.next().updateRobot(robot);
 	}
     }
 
@@ -99,7 +99,7 @@ public class UDPServer extends Thread {
     /**
      * Changes the recieving state of this server.  When argument is true and
      * server is currently not receiving, starts a thread that recieves UDP
-     * packets sent to the server and parses them for DogData content
+     * packets sent to the server and parses them for RobotData content
      *
      * @param toReceive   Whether or not the server should receive packets
      */

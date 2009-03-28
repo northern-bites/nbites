@@ -51,7 +51,7 @@ public class WorldController extends JPanel implements KeyListener,
     // To handle recorder log input, parsing, and passing to display
     LogHandler log;
 
-    // Listen to live UDP data, used to visualize multiple dogs' world states
+    // Listen to live UDP data, used to visualize multiple robots' world states
     // simultaneously
     UDPServer udp_server;
 
@@ -75,7 +75,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final int FPS_SLIDE_INIT = 25;
 
     // TCP Constants
-    // data coming off dog via tcp.
+    // data coming off robot via tcp.
     static final int TCP_NUM_LOC_DATA = 21;
 
     // Loc Debug Data Indexes
@@ -164,17 +164,17 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String CLEAR_FIELD_ACTION = "clearfield";
 
     // Menu Strings
-    public static final String VIEW_DOG_EKF_STRING = "View Robot EKF";
+    public static final String VIEW_ROBOT_EKF_STRING = "View Robot EKF";
     public static final String VIEW_ROBOT_MCL_STRING = "View Robot Particles";
-    public static final String VIEW_DOG_LOG_STRING = "View Robot Log";
+    public static final String VIEW_ROBOT_LOG_STRING = "View Robot Log";
     public static final String VIEW_EKF_LOG_STRING = "View EKF Log";
     public static final String VIEW_MCL_LOG_STRING = "View MCL Log";
     public static final String VIEW_UDP_PACKETS_STRING = "View UDP Packets";
 
     // Menu Action Commands
-    public static final String VIEW_DOG_EKF_ACTION = "view robot ekfs";
+    public static final String VIEW_ROBOT_EKF_ACTION = "view robot ekfs";
     public static final String VIEW_ROBOT_MCL_ACTION = "view robot mcl";
-    public static final String VIEW_DOG_LOG_ACTION = "viewrobotlog";
+    public static final String VIEW_ROBOT_LOG_ACTION = "viewrobotlog";
     public static final String VIEW_EKF_LOG_ACTION = "viewekflog";
     public static final String VIEW_MCL_LOG_ACTION = "viewmcllog";
     public static final String VIEW_UDP_PACKETS_ACTION = "viewudpaction";
@@ -193,8 +193,8 @@ public class WorldController extends JPanel implements KeyListener,
     private Thread connect_thread;
     private JDialog connect_dialog;
 
-    // Viewing dog EKF thread
-    private Thread viewDogEKFThread;
+    // Viewing robot EKF thread
+    private Thread viewRobotEKFThread;
 
     // simulation getters
     private double thinks_looking_at_x, thinks_looking_at_y;
@@ -214,7 +214,7 @@ public class WorldController extends JPanel implements KeyListener,
     private int playback_fps;
 
     // for the connection counter we need to remember how many ticks have passed
-    // since we started waiting for a successful dog connection
+    // since we started waiting for a successful robot connection
     private Timer waitToConnect;
     private int numWaitTimerTicks;
 
@@ -225,10 +225,10 @@ public class WorldController extends JPanel implements KeyListener,
     private JLabel connection_label;
     private JLabel fps_label;
     private JButton button_switch_fields;
-    private JButton button_view_dog_ekf;
+    private JButton button_view_robot_ekf;
     private JButton button_view_robot_mcl;
     private JButton button_view_udp_packets;
-    private JButton button_view_dog_log;
+    private JButton button_view_robot_log;
     private JButton button_view_ekf_log;
     private JButton button_view_mcl_log;
     private JButton button_one;
@@ -258,7 +258,7 @@ public class WorldController extends JPanel implements KeyListener,
                                                   BUTTON_AREA_WIDTH + 150), 0);
         log = new LogHandler(this, painter, debugViewer);
         udp_server = new UDPServer();
-        udp_server.addDogListener(painter);
+        udp_server.addRobotListener(painter);
 
         setSize((int) (the_field.getPreferredSize().getWidth() +
                        BUTTON_AREA_WIDTH),
@@ -369,7 +369,7 @@ public class WorldController extends JPanel implements KeyListener,
             startMCLLog();
             System.out.println("RELOADED MCL LOG");
         } else if (cmd.equals(VIEW_UDP_PACKETS_ACTION)) {
-            startDogUDP();
+            startRobotUDP();
         } else if (cmd.equals(VIEW_MCL_LOG_ACTION)) {
             startMCLLog();
         } else if (cmd.equals(DISCONNECT_ACTION)) {
@@ -480,8 +480,8 @@ public class WorldController extends JPanel implements KeyListener,
     }
 
 
-    // master method for getting dog udp working
-    public void startDogUDP()
+    // master method for getting robot udp working
+    public void startRobotUDP()
     {
         nothingButtons();
         udpButtons();
