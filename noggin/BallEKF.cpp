@@ -134,8 +134,8 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
 {
     if (useCartesian) {
         // Convert our sighting to cartesian coordinates
-        float x_b_r = z.distance * cos(z.bearing + QUART_CIRC_RAD);
-        float y_b_r = z.distance * sin(z.bearing + QUART_CIRC_RAD);
+        float x_b_r = z.distance * cos(z.bearing);
+        float y_b_r = z.distance * sin(z.bearing);
         MeasurementVector z_x(2);
 
         z_x(0) = x_b_r;
@@ -178,7 +178,7 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
         float locDistSquared = (x_b * x_b + y_b * y_b);
         float locDist = sqrt(locDistSquared);
         d_x(0) = hypot(x_b, y_b);
-        d_x(1) = subPIAngle(atan2(y_b, x_b) - M_PI / 2.0f);
+        d_x(1) = subPIAngle(atan2(y_b, x_b));
 
         // Calculate invariance
         V_k = z_x - d_x;

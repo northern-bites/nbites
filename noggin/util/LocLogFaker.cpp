@@ -410,14 +410,6 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                 << myLoc->getHEstDeg() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncertDeg() << " "
-                // // X Estimate
-                // << (ballEKF->getXEst()*cos(currentPose->h) +
-                //     ballEKF->getYEst()*sin(currentPose->h) +
-                //     currentPose->x) << " "
-                // // Y Estimate
-                // << (ballEKF->getXEst()*sin(currentPose->h) +
-                //     ballEKF->getYEst()*cos(currentPose->h) +
-                //     currentPose->y) << " "
                 // X Estimate
                 << (ballEKF->getXEst()) << " "
                 // Y Estimate

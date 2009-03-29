@@ -177,6 +177,8 @@ void MCL::updateEstimates()
     float weightSum = 0.;
     PoseEst wMeans(0.,0.,0.);
     PoseEst bSDs(0., 0., 0.);
+    PoseEst best(0.,0.,0.);
+    float maxWeight = 0;
 
     // Calculate the weighted mean
     for (unsigned int i = 0; i < X_t.size(); ++i) {
@@ -186,6 +188,11 @@ void MCL::updateEstimates()
         wMeans.h += X_t[i].pose.h*X_t[i].weight;
         // Sum the weights
         weightSum += X_t[i].weight;
+
+        // if (X_t[i].weight > maxWeight) {
+        //     maxWeight = X_t[i].weight;
+        //     best = X_t[i].pose;
+        // }
     }
 
     wMeans.x /= weightSum;
@@ -216,6 +223,7 @@ void MCL::updateEstimates()
 
     // Set class variables to reflect newly calculated values
     curEst = wMeans;
+    //curEst = best;
     curUncert = bSDs;
 }
 

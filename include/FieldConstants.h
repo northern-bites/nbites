@@ -8,8 +8,8 @@
 #ifdef USING_LAB_FIELD
 static const float FIELD_WHITE_WIDTH = 500.f;
 static const float FIELD_WHITE_HEIGHT = 330.f;
-static const float GREEN_PAD_X = 15.f;
-static const float GREEN_PAD_Y = 20.f;
+static const float GREEN_PAD_X = 20.f;
+static const float GREEN_PAD_Y = 15.f;
 #else
 static const float FIELD_WHITE_WIDTH = 605.f;
 static const float FIELD_WHITE_HEIGHT = 405.f;
@@ -76,10 +76,6 @@ static const float GOALBOX_DEPTH = 65.f;
 static const float GOALBOX_WIDTH = 305.f;
 #endif // USING_LAB_FIELD
 
-// static const float GOALBOX_TOP_X = GOALBOX_DEPTH + GREEN_PAD_X;
-// static const float GOALBOX_LEFT_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
-// static const float GOALBOX_RIGHT_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
-
 static const float YELLOW_GOAL_HEADING = 0;
 static const float BLUE_GOAL_HEADING = 180;
 
@@ -93,8 +89,8 @@ static const float BLUE_GOALBOX_RIGHT_X = GREEN_PAD_X + GOALBOX_DEPTH;
 // opp goal box constants relative to (0,0) on my team
 static const float YELLOW_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
 static const float YELLOW_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
-static const float YELLOW_GOALBOX_LEFT_X = (FIELD_GREEN_WIDTH -
-                                         GREEN_PAD_X - GOALBOX_DEPTH);
-static const float YELLOW_GOALBOX_RIGHT_X = FIELD_GREEN_WIDTH - GREEN_PAD_X;
+static const float YELLOW_GOALBOX_LEFT_X =
+    FIELD_WHITE_RIGHT_SIDELINE_X - GOALBOX_DEPTH;
+static const float YELLOW_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
 
 #endif // File
