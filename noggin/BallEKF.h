@@ -51,8 +51,8 @@
  * Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
-class BallEKF : public EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION,
-                           BALL_MEASUREMENT_DIMENSION>
+class BallEKF : public EKF<RangeBearingMeasurement, MotionModel,
+                           BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION>
 {
 public:
 
@@ -69,7 +69,7 @@ public:
 
     // Update functions
     void updateModel(VisualBall * ball, PoseEst p, bool _useCartesian=true);
-    void sawTeammateBall(BallMeasurement m);
+    void sawTeammateBall(RangeBearingMeasurement m);
     void sawBall(VisualBall * ball);
 
     // Getters
@@ -166,7 +166,7 @@ public:
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
-    virtual void incorporateMeasurement(BallMeasurement z,
+    virtual void incorporateMeasurement(RangeBearingMeasurement z,
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);

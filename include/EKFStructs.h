@@ -22,7 +22,7 @@ public:
  * BallMeasurement - A non-generic class for holding the basic type information
  *                   required (by Tucker) for running the correctionStep in EKF
  */
-struct BallMeasurement
+struct RangeBearingMeasurement
 {
     float distance;
     float bearing;

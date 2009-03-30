@@ -21,7 +21,7 @@ BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION,
+    : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
           BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
       useCartesian(false)
 {
@@ -82,8 +82,8 @@ void BallEKF::updateModel(VisualBall * ball, PoseEst p, bool _useCartesian)
  */
 void BallEKF::sawBall(VisualBall * ball)
 {
-    BallMeasurement m;
-    std::vector<BallMeasurement> z;
+    RangeBearingMeasurement m;
+    std::vector<RangeBearingMeasurement> z;
 
     m.distance = ball->getDistance();
     m.bearing = ball->getBearing();
@@ -103,8 +103,9 @@ void BallEKF::sawBall(VisualBall * ball)
  * @param u The motion model of the last frame.  Ignored for the ball.
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
-EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION
-    >::StateVector BallEKF::associateTimeUpdate(MotionModel u)
+EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
+    BALL_MEASUREMENT_DIMENSION>::StateVector BallEKF::associateTimeUpdate(
+        MotionModel u)
 {
     // Calculate the assumed change in ball position
     // Assume no decrease in ball velocity
@@ -127,7 +128,7 @@ EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION
  *
  * @return the measurement invariance
  */
-void BallEKF::incorporateMeasurement(BallMeasurement z,
+void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
                                      StateMeasurementMatrix &H_k,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)
