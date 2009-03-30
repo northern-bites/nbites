@@ -68,23 +68,22 @@ public class DebugViewer extends JFrame {
                                               "Opp Goal Left L",
                                               "Opp Goal Right L"};
 
-    // Here we assume top is yellow, bottom is blue
-    // Left is left with yellow at top
+    // Here we assume right is yellow, left is blue
     // Left of a goal is left side looking through the back of the goal
     public final static String[] LANDMARK_TAG = {"Blue Goal Left Post",
                                                  "Blue Goal Right Post",
                                                  "Yellow Goal Left Post",
                                                  "Yellow Goal Right Post",
-                                                 "Blue Corner Left L",
-                                                 "Blue Corner Right L",
+                                                 "Blue Corner Top L",
+                                                 "Blue Corner Bottom L",
                                                  "Blue Goal Left T",
                                                  "Blue Goal Right T",
                                                  "Blue Goal Left L",
                                                  "Blue Goal Right L",
-                                                 "Center Left T",
-                                                 "Center Right T",
-                                                 "Yellow Corner Left L",
-                                                 "Yellow Corner Right L",
+                                                 "Center Bottom T",
+                                                 "Center Top T",
+                                                 "Yellow Corner Bottom L",
+                                                 "Yellow Corner Top L",
                                                  "Yellow Goal Left T",
                                                  "Yellow Goal Right T",
                                                  "Yellow Goal Left L",
@@ -103,10 +102,10 @@ public class DebugViewer extends JFrame {
     public static final int YELLOW_GOAL_T = 5;
     public static final int BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L = 6;
     public static final int BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L = 7;
-    public static final int BLUE_CORNER_LEFT_L_OR_YELLOW_CORNER_LEFT_L = 8;
-    public static final int BLUE_CORNER_RIGHT_L_OR_YELLOW_CORNER_RIGHT_L = 9;
+    public static final int BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L = 8;
+    public static final int BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L = 9;
     public static final int CORNER_INNER_L = 10;
-    public static final int  GOAL_BOX_INNER_L = 11;
+    public static final int GOAL_BOX_INNER_L = 11;
 
     // FUZZY/CLEAR CORNER IDS start at = 12
     public static final int BLUE_GOAL_OUTER_L = 12;
@@ -114,16 +113,16 @@ public class DebugViewer extends JFrame {
     public static final int CENTER_T = 14;
 
     // SPECIFIC CORNER IDS start at = 15
-    public static final int BLUE_CORNER_LEFT_L = 15;
-    public static final int BLUE_CORNER_RIGHT_L = 16;
+    public static final int BLUE_CORNER_TOP_L = 15;
+    public static final int BLUE_CORNER_BOTTOM_L = 16;
     public static final int BLUE_GOAL_LEFT_T = 17;
     public static final int BLUE_GOAL_RIGHT_T = 18;
     public static final int BLUE_GOAL_LEFT_L = 19;
     public static final int BLUE_GOAL_RIGHT_L = 20;
-    public static final int CENTER_BY_T = 21;
-    public static final int CENTER_YB_T = 22;
-    public static final int YELLOW_CORNER_LEFT_L = 23;
-    public static final int YELLOW_CORNER_RIGHT_L = 24;
+    public static final int CENTER_BOTTOM_T = 21;
+    public static final int CENTER_TOP_T = 22;
+    public static final int YELLOW_CORNER_BOTTOM_L = 23;
+    public static final int YELLOW_CORNER_TOP_L = 24;
     public static final int YELLOW_GOAL_LEFT_T = 25;
     public static final int YELLOW_GOAL_RIGHT_T = 26;
     public static final int YELLOW_GOAL_LEFT_L = 27;
@@ -424,10 +423,10 @@ public class DebugViewer extends JFrame {
         populateCornerMap();
         populateObjectIDMap();
         LANDMARK_X = new int[18];
-        LANDMARK_X[0] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X;
-        LANDMARK_X[1] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X;
-        LANDMARK_X[2] = (int) wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X;
-        LANDMARK_X[3] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X;
+        LANDMARK_X[0] = (int) wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X;
+        LANDMARK_X[1] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X;
+        LANDMARK_X[2] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X;
+        LANDMARK_X[3] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X;
         LANDMARK_X[4] = (int) wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X;
         LANDMARK_X[5] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
 
@@ -447,10 +446,10 @@ public class DebugViewer extends JFrame {
         LANDMARK_X[17] = (int) wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X;
 
         LANDMARK_Y = new int[18];
-        LANDMARK_Y[0] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y;
-        LANDMARK_Y[1] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y;
-        LANDMARK_Y[2] = (int) wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_Y;
-        LANDMARK_Y[3] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y;
+        LANDMARK_Y[0] = (int) wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_Y;
+        LANDMARK_Y[1] = (int) wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y;
+        LANDMARK_Y[2] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y;
+        LANDMARK_Y[3] = (int) wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y;
         LANDMARK_Y[4] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
         LANDMARK_Y[5] = (int) wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y;
 
@@ -523,108 +522,108 @@ public class DebugViewer extends JFrame {
         objectIDMap.put(new Integer(14), emptyPoint);
         objectIDStringMap.put(new Integer(14), "CENTER T");
         // Specific Corners
-        Point2D.Double blueCornerLeftL =
+        Point2D.Double blueCornerTopL =
+            new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
+        objectIDMap.put(new Integer(15), blueCornerTopL);
+        objectIDStringMap.put(new Integer(15), "Blue Corner Top L");
+        Point2D.Double blueCornerBottomL =
             new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
                                wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
-        objectIDMap.put(new Integer(15), blueCornerLeftL);
-        objectIDStringMap.put(new Integer(15), "Blue Corner Left L");
-        Point2D.Double blueCornerRightL =
-            new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
-                               wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
-        objectIDMap.put(new Integer(16), blueCornerRightL);
-        objectIDStringMap.put(new Integer(16), "Blue Corner Right L");
+        objectIDMap.put(new Integer(16), blueCornerBottomL);
+        objectIDStringMap.put(new Integer(16), "Blue Corner Bottom L");
         Point2D.Double blueGoalLeftT =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X -
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+                               wc.the_field.CENTER_FIELD_Y +
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(17), blueGoalLeftT);
         objectIDStringMap.put(new Integer(17), "Blue Goal Left T");
         Point2D.Double blueGoalRightT =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X +
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+                               wc.the_field.CENTER_FIELD_Y -
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(18), blueGoalRightT);
         objectIDStringMap.put(new Integer(18), "Blue Goal Right T");
         Point2D.Double blueGoalLeftL =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X -
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-                               wc.the_field.GOAL_BOX_DEPTH);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X +
+                               wc.the_field.GOAL_BOX_DEPTH,
+                               wc.the_field.CENTER_FIELD_Y +
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(19), blueGoalLeftL);
         objectIDStringMap.put(new Integer(19), "Blue Goal Left L");
         Point2D.Double blueGoalRightL =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X +
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-                               wc.the_field.GOAL_BOX_DEPTH);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X +
+                               wc.the_field.GOAL_BOX_DEPTH,
+                               wc.the_field.CENTER_FIELD_Y -
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(20), blueGoalRightL);
         objectIDStringMap.put(new Integer(20), "Blue Goal Right L");
-        Point2D.Double centerBYT =
-            new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
-                               wc.the_field.CENTER_FIELD_Y);
-        objectIDMap.put(new Integer(21), centerBYT);
+        Point2D.Double centerBottomT =
+            new Point2D.Double(wc.the_field.CENTER_FIELD_X,
+                               wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+        objectIDMap.put(new Integer(21), centerBottomT);
         objectIDStringMap.put(new Integer(21), "Center BY T");
-        Point2D.Double centerYBT =
-            new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
-                               wc.the_field.CENTER_FIELD_Y);
-        objectIDMap.put(new Integer(22), centerYBT);
+        Point2D.Double centerTopT =
+            new Point2D.Double(wc.the_field.CENTER_FIELD_X,
+                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
+        objectIDMap.put(new Integer(22), centerTopT);
         objectIDStringMap.put(new Integer(22), "Center YB T");
-        Point2D.Double yellowCornerLeftL =
+        Point2D.Double yellowCornerBottomL =
              new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
-                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
-        objectIDMap.put(new Integer(23), yellowCornerLeftL);
-        objectIDStringMap.put(new Integer(23), "Yellow Corner Left L");
-        Point2D.Double yellowCornerRightL =
+                                wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+        objectIDMap.put(new Integer(23), yellowCornerBottomL);
+        objectIDStringMap.put(new Integer(23), "Yellow Corner Bottom L");
+        Point2D.Double yellowCornerTopL =
              new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
-                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
-        objectIDMap.put(new Integer(24), yellowCornerRightL);
-        objectIDStringMap.put(new Integer(24), "Yellow Corner Right L");
+                                wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
+        objectIDMap.put(new Integer(24), yellowCornerTopL);
+        objectIDStringMap.put(new Integer(24), "Yellow Corner Top L");
         Point2D.Double yellowGoalLeftT =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X +
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
+                               wc.the_field.CENTER_FIELD_Y -
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(25), yellowGoalLeftT);
         objectIDStringMap.put(new Integer(25), "Yellow Goal Left T");
         Point2D.Double yellowGoalRightT =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X -
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
+                               wc.the_field.CENTER_FIELD_Y +
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(26), yellowGoalRightT);
         objectIDStringMap.put(new Integer(26), "Yellow Goal Right T");
         Point2D.Double yellowGoalLeftL =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X +
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
-                               wc.the_field.GOAL_BOX_DEPTH);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X -
+                               wc.the_field.GOAL_BOX_DEPTH,
+                               wc.the_field.CENTER_FIELD_Y -
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(27), yellowGoalLeftL);
         objectIDStringMap.put(new Integer(27), "Yellow Goal Left L");
         Point2D.Double yellowGoalRightL =
-            new Point2D.Double(wc.the_field.CENTER_FIELD_X -
-                               wc.the_field.GOAL_BOX_WIDTH / 2.0,
-                               wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y -
-                               wc.the_field.GOAL_BOX_DEPTH);
+            new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X -
+                               wc.the_field.GOAL_BOX_DEPTH,
+                               wc.the_field.CENTER_FIELD_Y -
+                               wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(28), yellowGoalRightL);
         objectIDStringMap.put(new Integer(28), "Yellow Goal Right L");
 
         // Field objects
         Point2D.Double bglpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X,
-                               wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X,
+                               wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_Y);
         objectIDMap.put(new Integer(30), bglpPT);
         objectIDStringMap.put(new Integer(30), "Blue goal left post");
         Point2D.Double bgrpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
-                               wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
+                               wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y);
         objectIDMap.put(new Integer(31), bgrpPT);
         objectIDStringMap.put(new Integer(31), "Blue goal right post");
         Point2D.Double ygrpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
-                               wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
+                               wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
         objectIDMap.put(new Integer(32), ygrpPT);
         objectIDStringMap.put(new Integer(32), "Yellow goal right post");
         Point2D.Double yglpPT =
-            new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X,
-                               wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_Y);
+            new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X,
+                               wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y);
         objectIDMap.put(new Integer(33), yglpPT);
         objectIDStringMap.put(new Integer(33), "Yellow goal left post");
         // Ambiguous field objects
@@ -696,8 +695,6 @@ public class DebugViewer extends JFrame {
         num_landmarks++;
     }
 
-    //public void addSeenCorner(
-
     // removes all landmarks from debug viewer
     public void removeLandmarks() {
 
@@ -710,61 +707,6 @@ public class DebugViewer extends JFrame {
         //window.validate();
         num_landmarks = 0;
     }
-
-    /*
-    // input is: LANDMARK id index , and value
-    // this function maps the id to the proper label
-    public void displayLocData(int id, Double value) {
-	JLabel lbl = myX;
-	if (id == wc.TCP_LOC_MY_X) {
-    lbl = myX;
-	}
-	else if (id == wc.TCP_LOC_MY_Y) {
-    lbl = myY;
-	}
-	else if (id == wc.TCP_LOC_MY_H) {
-    lbl = myH;
-	}
-	else if (id == wc.TCP_LOC_MY_UNCERT_X) {
-    lbl = myUncertX;
-	}
-	else if (id == wc.TCP_LOC_MY_UNCERT_Y) {
-    lbl = myUncertY;
-	}
-	else if (id == wc.TCP_LOC_MY_UNCERT_H) {
-    lbl = myUncertH;
-	}
-	else if (id == wc.TCP_LOC_BALL_X) {
-    lbl = ballX;
-	}
-	else if (id == wc.TCP_LOC_BALL_Y) {
-    lbl = ballY;
-	}
-	else if (id == wc.TCP_LOC_BALL_UNCERT_X) {
-    lbl = ballUncertX;
-	}
-	else if (id == wc.TCP_LOC_BALL_UNCERT_Y) {
-    lbl = ballUncertY;
-	}
-	else if (id == wc.TCP_LOC_BALL_VEL_X) {
-    lbl = ballVelX;
-	}
-	else if (id == wc.TCP_LOC_BALL_VEL_Y) {
-    lbl = ballVelY;
-	}
-	else if (id == wc.TCP_LOC_ODO_X) {
-    lbl = odoX;
-	}
-	else if (id == wc.TCP_LOC_ODO_Y) {
-    lbl = odoY;
-	}
-	else if (id == wc.TCP_LOC_ODO_Y) {
-    lbl = odoY;
-	}
-
-
-	lbl.setText("" + value);
-	}*/
 
     public boolean isDistinctLandmarkID(int ID)
     {

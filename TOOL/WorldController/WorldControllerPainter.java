@@ -109,9 +109,6 @@ public class WorldControllerPainter implements RobotListener
     static final double ASSUMED_HEAD_PAN_FOR_UDP_COMMUNICATIONS = 0.0;
 
     // A tautological geometric constant
-    static final double QUART_CIRC_DEGS = 360. / 4.;
-    static final double QUART_CIRC_RADS =  3.14159 / 2.0;
-
     private boolean draw_real, draw_est;
 
     private double by_x,by_y;

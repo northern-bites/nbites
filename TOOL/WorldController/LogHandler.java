@@ -532,12 +532,12 @@ public class LogHandler
         switch(ID) {
         case DebugViewer.L_INNER_CORNER:
         case DebugViewer.L_OUTER_CORNER:
-            pos.add(new Integer(DebugViewer.BLUE_CORNER_LEFT_L));
-            pos.add(new Integer(DebugViewer.BLUE_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_BOTTOM_L));
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_TOP_L));
             pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_L));
             pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_L));
-            pos.add(new Integer(DebugViewer.YELLOW_CORNER_LEFT_L));
-            pos.add(new Integer(DebugViewer.YELLOW_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_BOTTOM_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_TOP_L));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_L));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_L));
             break;
@@ -546,8 +546,8 @@ public class LogHandler
             pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_T));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_T));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_T));
-            pos.add(new Integer(DebugViewer.CENTER_BY_T));
-            pos.add(new Integer(DebugViewer.CENTER_YB_T));
+            pos.add(new Integer(DebugViewer.CENTER_BOTTOM_T));
+            pos.add(new Integer(DebugViewer.CENTER_TOP_T));
             break;
         case DebugViewer.CENTER_CIRCLE:
             pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_L));
@@ -567,17 +567,17 @@ public class LogHandler
             break;
         case DebugViewer.BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L:
             break;
-        case DebugViewer.BLUE_CORNER_LEFT_L_OR_YELLOW_CORNER_LEFT_L:
+        case DebugViewer.BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L:
             break;
-        case DebugViewer.BLUE_CORNER_RIGHT_L_OR_YELLOW_CORNER_RIGHT_L:
+        case DebugViewer.BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L:
             break;
         case DebugViewer.CORNER_INNER_L:
-            pos.add(new Integer(DebugViewer.BLUE_CORNER_LEFT_L));
-            pos.add(new Integer(DebugViewer.BLUE_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_TOP_L));
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_BOTTOM_L));
             pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_L));
             pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_L));
-            pos.add(new Integer(DebugViewer.YELLOW_CORNER_LEFT_L));
-            pos.add(new Integer(DebugViewer.YELLOW_CORNER_RIGHT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_TOP_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_BOTTOM_L));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_L));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_L));
             break;
