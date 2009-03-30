@@ -23,7 +23,7 @@ BallEKF::BallEKF(float initX, float initY,
                  float initVelXUncert, float initVelYUncert)
     : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
           BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
-      useCartesian(false)
+      useCartesian(true)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;

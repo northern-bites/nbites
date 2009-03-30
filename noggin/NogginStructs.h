@@ -50,9 +50,8 @@ public:
     {
         // Translate the relative change into the global coordinate system
         // And add that to the current estimate
-        float calcFromAngle = h - M_PI / 2.0f;
-        x += u_t.deltaF * -cos(calcFromAngle) + u_t.deltaL * sin(calcFromAngle);
-        y += u_t.deltaF * -sin(calcFromAngle) - u_t.deltaL * cos(calcFromAngle);
+        x += u_t.deltaF * cos(h) + u_t.deltaL * sin(h);
+        y += u_t.deltaF * sin(h) + u_t.deltaL * cos(h);
         h += u_t.deltaR;
     }
 

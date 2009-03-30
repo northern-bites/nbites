@@ -191,7 +191,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // set ambiguous data
             // Randomly set them to abstract
-            if ((rand() / (float(RAND_MAX)+1)) < 0.12) {
+            if (false && (rand() / (float(RAND_MAX)+1)) < 0.12) {
                 fo.setIDCertainty(NOT_SURE);
                 if(foID == BLUE_GOAL_LEFT_POST ||
                    foID == BLUE_GOAL_RIGHT_POST) {
@@ -233,17 +233,17 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             const cornerID id = toView->getID();
             list <const ConcreteCorner*> toUse;
             // Randomly set ambiguous data
-            if ((rand() / (float(RAND_MAX)+1)) < 0.32) {
+            if (false && (rand() / (float(RAND_MAX)+1)) < 0.32) {
                 shape s = ConcreteCorner::inferCornerType(id);
                 toUse = ConcreteCorner::getPossibleCorners(s);
             } else {
                 const ConcreteCorner * corn;
                 switch(id) {
-                case BLUE_CORNER_LEFT_L:
-                    corn = &ConcreteCorner::blue_corner_left_l;
+                case BLUE_CORNER_TOP_L:
+                    corn = &ConcreteCorner::blue_corner_top_l;
                     break;
-                case BLUE_CORNER_RIGHT_L:
-                    corn = &ConcreteCorner::blue_corner_right_l;
+                case BLUE_CORNER_BOTTOM_L:
+                    corn = &ConcreteCorner::blue_corner_bottom_l;
                     break;
                 case BLUE_GOAL_LEFT_T:
                     corn = &ConcreteCorner::blue_goal_left_t;
@@ -257,17 +257,17 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
                 case BLUE_GOAL_RIGHT_L:
                     corn = &ConcreteCorner::blue_goal_right_l;
                     break;
-                case CENTER_BY_T:
-                    corn = &ConcreteCorner::center_by_t;
+                case CENTER_TOP_T:
+                    corn = &ConcreteCorner::center_top_t;
                     break;
-                case CENTER_YB_T:
-                    corn = &ConcreteCorner::center_yb_t;
+                case CENTER_BOTTOM_T:
+                    corn = &ConcreteCorner::center_bottom_t;
                     break;
-                case YELLOW_CORNER_LEFT_L:
-                    corn = &ConcreteCorner::yellow_corner_left_l;
+                case YELLOW_CORNER_TOP_L:
+                    corn = &ConcreteCorner::yellow_corner_top_l;
                     break;
-                case YELLOW_CORNER_RIGHT_L:
-                    corn = &ConcreteCorner::yellow_corner_right_l;
+                case YELLOW_CORNER_BOTTOM_L:
+                    corn = &ConcreteCorner::yellow_corner_bottom_l;
                     break;
                 case YELLOW_GOAL_LEFT_T:
                     corn = &ConcreteCorner::yellow_goal_left_t;

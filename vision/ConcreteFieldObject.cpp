@@ -5,13 +5,11 @@ using namespace std;
 ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,
                                          const float _fieldY,
                                          const fieldObjectID _id)
-    : ConcreteLandmark(_fieldX, _fieldY), id(_id) {
-}
+    : ConcreteLandmark(_fieldX, _fieldY), id(_id) {}
 
 // Copy constructor - just pairwise copy the elements
 ConcreteFieldObject::ConcreteFieldObject(const ConcreteFieldObject& other)
-    : ConcreteLandmark(other), id(other.id) {
-}
+    : ConcreteLandmark(other), id(other.id) {}
 // No memory to free
 ConcreteFieldObject::~ConcreteFieldObject() {}
 

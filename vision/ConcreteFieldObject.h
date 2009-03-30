@@ -63,7 +63,6 @@ public:
 
     static const bool isAbstract(const fieldObjectID testID);
     static const bool isGoal(const fieldObjectID testID);
-    static const bool isArc(const fieldObjectID testID);
 
 // Static member variables
 public:

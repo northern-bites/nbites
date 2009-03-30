@@ -17,7 +17,7 @@
 #include "NogginStructs.h"
 
 // Parameters
-#define ASSUMED_FPS 30.0
+#define ASSUMED_FPS 15.0
 #define BETA_BALL 5. // How much uncertainty naturally grows per update
 #define GAMMA_BALL 0.4 // How much ball velocity should effect uncertainty
 #define BALL_EKF_DIMENSION 4 // Number of states in Ball EKF

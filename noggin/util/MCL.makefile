@@ -36,7 +36,8 @@ OBS_SRCS = ../Observation.cpp \
 MCL_SRCS = ../MCL.cpp \
 	../MCL.h
 FAKER_SRCS = LocLogFaker.cpp \
-	  LocLogFaker.h
+	  LocLogFaker.h \
+	../NogginStructs.h
 
 OBJS = Utility.o \
        ConcreteLandmark.o \

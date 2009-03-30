@@ -85,8 +85,8 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
             // Add the particles to the resample posterior!
             for (int i = 0; i < count; ++i) {
                 // Random walk the particles
-                //X_t.push_back(randomWalkParticle(X_bar_t[m]));
-                X_t.push_back(X_bar_t[m]);
+                X_t.push_back(randomWalkParticle(X_bar_t[m]));
+                //X_t.push_back(X_bar_t[m]);
             }
 
         } else { // Keep particle count the same
