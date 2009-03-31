@@ -35,6 +35,9 @@ OBS_SRCS = ../Observation.cpp \
 	   ../Observation.h
 MCL_SRCS = ../MCL.cpp \
 	../MCL.h
+LOCEKF_SRCS = ../LocEKF.cpp \
+	../LocEKF.h
+
 FAKER_SRCS = LocLogFaker.cpp \
 	  LocLogFaker.h \
 	../NogginStructs.h
@@ -53,7 +56,8 @@ OBJS = Utility.o \
        Observation.o \
        MCL.o \
        EKF.o \
-       BallEKF.o
+       BallEKF.o \
+       LocEKF.o
 
 LDLIBS = $(OBJS)
 LDFLAGS = $(LDLIBS)
@@ -102,6 +106,8 @@ MCL.o : $(MCL_SRCS)
 EKF.o : $(EKF_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 BallEKF.o :$(BALLEKF_SRCS) EKF.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+LocEKF.o :$(LOCEKF_SRCS) EKF.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
 .Phony : clean

@@ -132,7 +132,14 @@ void EKF<Measurement, UpdateModel, dimension, mSize>::noCorrectionStep()
 
 #include "EKFStructs.h"
 
-template class EKF<RangeBearingMeasurement, MotionModel, 4, 2>;
+// BallEKF
+template class EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
+                   BALL_MEASUREMENT_DIMENSION>;
+// LocEKF
+template class EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
+                   LOC_MEASUREMENT_DIMENSION>;
+// AccEKF
 // we do not need update model, so a hack is to just put in something small
 // like an int.
-template class EKF<AccelMeasurement, int, 3, 3>;
+template class EKF<AccelMeasurement, int, ACC_NUM_DIMENSIONS,
+                   ACC_NUM_DIMENSIONS>;

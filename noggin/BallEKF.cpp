@@ -4,6 +4,46 @@ using namespace boost;
 
 using namespace NBMath;
 
+// Parameters
+const float BallEKF::ASSUMED_FPS = 15.0;
+// How much uncertainty naturally grows per update
+const float BallEKF::BETA_BALL = 5.0f;
+// How much ball velocity should effect uncertainty
+const float BallEKF::GAMMA_BALL = 0.4f;
+const float BallEKF::CARPET_FRICTION = -25.0f; // 25 cm/s^2
+const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
+
+// Default initialization values
+const float BallEKF::INIT_BALL_X = 370.0f;
+const float BallEKF::INIT_BALL_Y = 270.0f;
+const float BallEKF::INIT_BALL_X_VEL = 0.0f;
+const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
+const float BallEKF::X_UNCERT_MAX = 740.0f;
+const float BallEKF::Y_UNCERT_MAX = 270.0f;
+const float BallEKF::VELOCITY_UNCERT_MAX = 300.0;
+const float BallEKF::X_UNCERT_MIN = 1.0e-6;
+const float BallEKF::Y_UNCERT_MIN = 1.0e-6;
+const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6;
+const float BallEKF::INIT_X_UNCERT = 740.0f;
+const float BallEKF::INIT_Y_UNCERT = 270.0f;
+const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
+const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
+const float BallEKF::X_EST_MIN = -1000.0f;
+const float BallEKF::Y_EST_MIN = -600.0f;
+const float BallEKF::X_EST_MAX = 1000.0f;
+const float BallEKF::Y_EST_MAX = 600.0f;
+const float BallEKF::VELOCITY_EST_MAX = 300.0f;
+const float BallEKF::VELOCITY_EST_MIN = -300.0f;
+
+BallEKF::BallEKF()
+    : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
+          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
+      useCartesian(true)
+{
+
+}
+
+
 /**
  * Constructor for the BallEKF class
  *

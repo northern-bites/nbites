@@ -80,8 +80,8 @@ static const float YELLOW_GOAL_HEADING = 0;
 static const float BLUE_GOAL_HEADING = 180;
 
 // my goal box constants relative to (0,0) on my team
-static const float BLUE_GOALBOX_TOP_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
-static const float BLUE_GOALBOX_BOTTOM_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
+static const float BLUE_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
+static const float BLUE_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
  // bottom as in closest to (0,0)
 static const float BLUE_GOALBOX_LEFT_X = GREEN_PAD_X;
 static const float BLUE_GOALBOX_RIGHT_X = GREEN_PAD_X + GOALBOX_DEPTH;

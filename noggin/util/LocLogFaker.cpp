@@ -49,11 +49,12 @@ int main(int argc, char** argv)
     NavPath letsGo;
     // IO Variables
     fstream inputFile;
-    fstream outputFile;
+    fstream mclFile;
+    fstream ekfFile;
 
     /* Test for the correct number of CLI arguments */
-    if(argc < 2 || argc > 3) {
-        cerr << "usage: " << argv[0] << " input-file [output-file]" << endl;
+    if(argc != 2) {
+        cerr << "usage: " << argv[0] << " input-file" << endl;
         return 1;
     }
     try {
@@ -64,27 +65,27 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    // Get the info from the file
+    // Get the info from the input file
     readInputFile(&inputFile, &letsGo);
 
-    // Clost the file
+    // Clost the input file
     inputFile.close();
 
-    // Open output file
-    if(argc > 2) { // If an output file is specified
-        outputFile.open(argv[2], ios::out);
-    } else { // Otherwise use the default
-        string outFileName(argv[1]);
-        outFileName.replace(outFileName.end()-3, outFileName.end(), "mcl");
+    // Open output files
+    string mclFileName(argv[1]);
+    string ekfFileName(argv[1]);
+    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
+    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
 
-        outputFile.open(outFileName.c_str(), ios::out);
-    }
+    mclFile.open(mclFileName.c_str(), ios::out);
+    ekfFile.open(ekfFileName.c_str(), ios::out);
 
     // Iterate through the path
-    iteratePath(&outputFile, &letsGo);
+    iteratePath(&mclFile, &ekfFile, &letsGo);
 
-    // Close the output file
-    outputFile.close();
+    // Close the output files
+    mclFile.close();
+    ekfFile.close();
 
     return 0;
 }
@@ -95,12 +96,14 @@ int main(int argc, char** argv)
  * @param outputFile The file to have everything printed to
  * @param letsGo The robot path from which to localize
  */
-void iteratePath(fstream * outputFile, NavPath * letsGo)
+void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
 {
     // Method variables
     vector<Observation> Z_t;
-    shared_ptr<MCL> myLoc = shared_ptr<MCL>(new MCL);
-    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF());
+    shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL());
+    shared_ptr<BallEKF> MCLballEKF = shared_ptr<BallEKF>(new BallEKF());
+    shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
+    shared_ptr<BallEKF> EKFballEKF = shared_ptr<BallEKF>(new BallEKF());
     PoseEst currentPose;
     BallPose currentBall;
     MotionModel noMove(0.0, 0.0, 0.0);
@@ -112,8 +115,8 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     currentBall = letsGo->ballStart;
 
     // Print out starting configuration
-    printOutLogLine(outputFile, myLoc, Z_t, noMove, &currentPose,
-                    &currentBall, ballEKF, *visBall);
+    printOutMCLLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
+                       &currentBall, MCLballEKF, *visBall);
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -122,6 +125,8 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
         // Continue the move for as long as specified
         for (int j = 0; j < letsGo->myMoves[i].time; ++j, ++ frameCounter) {
 
+
+            // Determine the current frame info
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;
 
@@ -132,16 +137,29 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
                                                           &currentBall,
                                                           0.0));
 
-            // Update the ball estimate model
-            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+            // Update the MCL sytem
+            mclLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+            // Update the MCL ball
             if (usePerfectLocForBall) {
-                ballEKF->updateModel(visBall,currentPose, true);
+                MCLballEKF->updateModel(visBall,currentPose, true);
             } else {
-                ballEKF->updateModel(visBall,myLoc->getCurrentEstimate(), true);
+                MCLballEKF->updateModel(visBall,mclLoc->getCurrentEstimate(),
+                                        true);
             }
-            // Print the current frame to file
-            printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
-                            &currentPose, &currentBall, ballEKF, *visBall);
+
+            // Update the EKF sytem
+            ekfLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+            // Update the EKF ball
+            if (usePerfectLocForBall) {
+                EKFballEKF->updateModel(visBall,currentPose, true);
+            } else {
+                EKFballEKF->updateModel(visBall,ekfLoc->getCurrentEstimate(),
+                                        true);
+            }
+
+            // Print the current MCL frame to file
+            printOutMCLLogLine(mclFile, mclLoc, Z_t, letsGo->myMoves[i].move,
+                               &currentPose, &currentBall, MCLballEKF, *visBall);
         }
     }
 
@@ -389,7 +407,7 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  * @param sightings Vector of landmark observations
  * @param lastOdo Odometery since previous frame
  */
-void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
+void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
                      vector<Observation> sightings, MotionModel lastOdo,
                      PoseEst *currentPose, BallPose * currentBall,
                      shared_ptr<BallEKF> ballEKF, VisualBall _b)

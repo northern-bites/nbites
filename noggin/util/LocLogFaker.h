@@ -14,6 +14,7 @@
 #include "BallEKF.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
 #include "EKFStructs.h"
+#include "LocEKF.h"
 
 // Observation parameter
 // Ranges at which objects are viewable
@@ -58,14 +59,14 @@ std::vector<Observation> determineObservedLandmarks(PoseEst myPos,
                                                     float neckYaw);
 estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                                float neckYaw);
-void iteratePath(fstream * outputFile, NavPath * letsGo);
+void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo);
 // IO Functions
 void readInputFile(fstream* name, NavPath * letsGo);
-void printOutLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
-                     std::vector<Observation>
-                     sightings, MotionModel lastOdo, PoseEst * currentPose,
-                     BallPose * currentBall, boost::shared_ptr<BallEKF> ballEKF,
-                     VisualBall _b);
+void printOutMCLLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
+                        std::vector<Observation>
+                        sightings, MotionModel lastOdo, PoseEst * currentPose,
+                        BallPose * currentBall, boost::shared_ptr<BallEKF> ballEKF,
+                        VisualBall _b);
 
 // Helper functions
 float getDistSD(float dist);

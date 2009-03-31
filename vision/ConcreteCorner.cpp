@@ -32,7 +32,7 @@ blue_corner_top_l(FIELD_WHITE_LEFT_SIDELINE_X,
                   BLUE_CORNER_TOP_L);
 
 const ConcreteCorner ConcreteCorner::
-blue_corner_bottom_l(FIELD_WHITE_RIGHT_SIDELINE_X,
+blue_corner_bottom_l(FIELD_WHITE_LEFT_SIDELINE_X,
                      FIELD_WHITE_BOTTOM_SIDELINE_Y,
                      BLUE_CORNER_BOTTOM_L);
 

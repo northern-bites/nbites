@@ -40,9 +40,9 @@ public:
     {
         // Translate the relative change into the global coordinate system
         // And add that to the current estimate
-        return PoseEst(x + u_t.deltaF * -cos(h) +
+        return PoseEst(x + u_t.deltaF * cos(h) -
                        u_t.deltaL * sin(h),
-                       y + u_t.deltaF * -sin(h) -
+                       y + u_t.deltaF * sin(h) +
                        u_t.deltaL * cos(h),
                        h + u_t.deltaR);
     }
@@ -50,7 +50,7 @@ public:
     {
         // Translate the relative change into the global coordinate system
         // And add that to the current estimate
-        x += u_t.deltaF * cos(h) + u_t.deltaL * sin(h);
+        x += u_t.deltaF * cos(h) - u_t.deltaL * sin(h);
         y += u_t.deltaF * sin(h) + u_t.deltaL * cos(h);
         h += u_t.deltaR;
     }
