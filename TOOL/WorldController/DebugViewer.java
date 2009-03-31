@@ -239,7 +239,7 @@ public class DebugViewer extends JFrame {
 
         window = getContentPane();
         num_landmarks = 0;
-        landmark_components = new Component[10];
+        landmark_components = new Component[30];
 
         cornerIDMap = new HashMap<Integer, Point2D.Double>();
         cornerMap = new HashMap<Point2D.Double,String>();
@@ -600,7 +600,7 @@ public class DebugViewer extends JFrame {
         Point2D.Double yellowGoalRightL =
             new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X -
                                wc.the_field.GOAL_BOX_DEPTH,
-                               wc.the_field.CENTER_FIELD_Y -
+                               wc.the_field.CENTER_FIELD_Y +
                                wc.the_field.GOAL_BOX_WIDTH / 2.0);
         objectIDMap.put(new Integer(28), yellowGoalRightL);
         objectIDStringMap.put(new Integer(28), "Yellow Goal Right L");
