@@ -2,6 +2,8 @@ build*
 install/*
 *config.h
 *.pyc
+*.ekf
+*.mcl
 upload.sh
 noggin/players/Switch.py
 noggin/TeamConfig.py
