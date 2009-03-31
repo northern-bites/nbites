@@ -20,6 +20,7 @@
 #include "EKFStructs.h"
 #include "NBMath.h"
 #include "NogginStructs.h"
+#include "LocSystem.h"
 
 // Particle
 class Particle
@@ -43,7 +44,7 @@ static const int M = 100; // Number of particles
 static const float MIN_SIMILARITY = 1.0e-15; // Minimum possible similarity
 
 // The Monte Carlo Localization class
-class MCL
+class MCL : public LocSystem
 {
 public:
     // Constructors & Destructors
@@ -51,8 +52,8 @@ public:
     virtual ~MCL();
 
     // Core Functions
-    void updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
-                            bool resample=true);
+    virtual void updateLocalization(MotionModel u_t,
+                                    std::vector<Observation> z_t);
 
     // Getters
     const PoseEst getCurrentEstimate() const { return curEst; }

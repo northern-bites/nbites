@@ -39,7 +39,7 @@
 #define USE_PERFECT_LOC_FOR_BALL
 using namespace std;
 using namespace boost;
-
+using namespace NBMath;
 static const bool usePerfectLocForBall = false;
 
 int main(int argc, char** argv)
@@ -117,6 +117,8 @@ void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
     // Print out starting configuration
     printOutMCLLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
                        &currentBall, MCLballEKF, *visBall);
+    printOutLogLine(mclFile, ekfLoc, Z_t, noMove, &currentPose,
+                    &currentBall, EKFballEKF, *visBall);
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -159,7 +161,12 @@ void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
 
             // Print the current MCL frame to file
             printOutMCLLogLine(mclFile, mclLoc, Z_t, letsGo->myMoves[i].move,
-                               &currentPose, &currentBall, MCLballEKF, *visBall);
+                               &currentPose, &currentBall, MCLballEKF,
+                               *visBall);
+            // Print the current EKF frame to file
+            printOutLogLine(ekfFile, ekfLoc, Z_t, letsGo->myMoves[i].move,
+                               &currentPose, &currentBall, EKFballEKF,
+                               *visBall);
         }
     }
 
@@ -408,9 +415,9 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  * @param lastOdo Odometery since previous frame
  */
 void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
-                     vector<Observation> sightings, MotionModel lastOdo,
-                     PoseEst *currentPose, BallPose * currentBall,
-                     shared_ptr<BallEKF> ballEKF, VisualBall _b)
+                        vector<Observation> sightings, MotionModel lastOdo,
+                        PoseEst *currentPose, BallPose * currentBall,
+                        shared_ptr<BallEKF> ballEKF, VisualBall _b)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
@@ -422,6 +429,23 @@ void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
     // Divide the sections with a colon
     *outputFile << ":";
 
+    printOutLogLine(outputFile, myLoc, sightings, lastOdo, currentPose,
+                    currentBall, ballEKF, _b);
+}
+
+/**
+ * Prints the input to a log file to be read by the TOOL
+ *
+ * @param outputFile File to write the log line to
+ * @param myLoc Current localization module
+ * @param sightings Vector of landmark observations
+ * @param lastOdo Odometery since previous frame
+ */
+void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
+                     vector<Observation> sightings, MotionModel lastOdo,
+                     PoseEst *currentPose, BallPose * currentBall,
+                     shared_ptr<BallEKF> ballEKF, VisualBall _b)
+{
     // Output standard infos
     *outputFile << team_color<< " " << player_number << " "
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "

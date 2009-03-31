@@ -11,10 +11,6 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-// Local headers
-#include "VisualBall.h"
-#include "Observation.h"
-
 // Default parameters
 #define DEFAULT_BETA 3.0f
 #define DEFAULT_GAMMA 2.0f

@@ -82,7 +82,8 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
  * @param u The motion model of the last frame.  Ignored for the loc.
  * @return The expected change in loc position (x,y, xVelocity, yVelocity)
  */
-EKF<Observation, MotionModel, LOC_EKF_DIMENSION, LOC_MEASUREMENT_DIMENSION>::StateVector
+EKF<Observation, MotionModel,
+    LOC_EKF_DIMENSION, LOC_MEASUREMENT_DIMENSION>::StateVector
 LocEKF::associateTimeUpdate(MotionModel u)
 {
     // Calculate the assumed change in loc position

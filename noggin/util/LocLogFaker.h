@@ -67,6 +67,10 @@ void printOutMCLLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
                         sightings, MotionModel lastOdo, PoseEst * currentPose,
                         BallPose * currentBall, boost::shared_ptr<BallEKF> ballEKF,
                         VisualBall _b);
+void printOutLogLine(fstream* outputFile, boost::shared_ptr<LocSystem> myLoc,
+                     std::vector<Observation> sightings, MotionModel lastOdo,
+                     PoseEst *currentPose, BallPose * currentBall,
+                     boost::shared_ptr<BallEKF> ballEKF, VisualBall _b);
 
 // Helper functions
 float getDistSD(float dist);

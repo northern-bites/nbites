@@ -43,8 +43,8 @@ public:
     // Global Coordinates
     const float getBallXEst() const { return ballEKF->getXEst(); }
     const float getBallYEst() const { return ballEKF->getYEst(); }
-    const float getXVelocityEst() const { ballEKF->getXVelcoityEst(); }
-    const float getYVelocityEst() const { return ballEKF->getYVelcoityEst(); }
+    const float getXVelocityEst() const { return ballEKF->getXVelocityEst(); }
+    const float getYVelocityEst() const { return ballEKF->getYVelocityEst(); }
 
     // Ball Uncertainty
     // Global Coordinates

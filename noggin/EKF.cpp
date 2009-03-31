@@ -129,8 +129,10 @@ void EKF<Measurement, UpdateModel, dimension, mSize>::noCorrectionStep()
 }
 
 
-
+// Local headers
 #include "EKFStructs.h"
+#include "VisualBall.h"
+#include "Observation.h"
 
 // BallEKF
 template class EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,

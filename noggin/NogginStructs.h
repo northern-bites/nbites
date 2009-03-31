@@ -9,6 +9,8 @@
 #ifndef NogginStructs_h_DEFINED
 #define NogginStructs_h_DEFINED
 #include "EKFStructs.h"
+#include <math.h>
+#include <ostream>
 
 // Pose Estimate
 class PoseEst

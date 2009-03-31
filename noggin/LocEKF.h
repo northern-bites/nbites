@@ -15,6 +15,7 @@
 #include "NBMath.h"
 #include "NogginStructs.h"
 #include "Observation.h"
+#include "LocSystem.h"
 
 /**
  * Class for tracking of loc position and velocity.  Extends the abstract
@@ -22,7 +23,8 @@
  */
 class LocEKF : public EKF<Observation,
                           MotionModel, LOC_EKF_DIMENSION,
-                          LOC_MEASUREMENT_DIMENSION>
+                          LOC_MEASUREMENT_DIMENSION>,
+               public LocSystem
 {
 public:
 
@@ -36,63 +38,63 @@ public:
     virtual ~LocEKF() {}
 
     // Update functions
-    void updateLocalization(MotionModel u, std::vector<Observation> Z);
+    virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
 
     // Getters
     /**
      * @return The current estimate of the loc x position
      */
-    const float getXEst() const { return xhat_k(0); }
+    virtual const float getXEst() const { return xhat_k(0); }
 
     /**
      * @return The current estimate of the loc y position
      */
-    const float getYEst() const { return xhat_k(1); }
+    virtual const float getYEst() const { return xhat_k(1); }
 
     /**
      * @return The current estimate of the loc heading
      */
-    const float getHEst() const { return xhat_k(2); }
+    virtual const float getHEst() const { return xhat_k(2); }
 
     /**
      * @return The current estimate of the loc heading in degrees
      */
-    const float getHDegEst() const { return xhat_k(2) * TO_DEG; }
+    virtual const float getHEstDeg() const { return xhat_k(2) * TO_DEG; }
 
 
     /**
      * @return The current pose estimate of the robot
      */
-    const PoseEst getCurrentEstimate() const { return PoseEst(xhat_k(0),
+    virtual const PoseEst getCurrentEstimate() const { return PoseEst(xhat_k(0),
                                                               xhat_k(1),
                                                               xhat_k(2)); }
 
     /**
      * @return The current uncertainty for loc x position
      */
-    const float getXUncert() const { return P_k(0,0); }
+    virtual const float getXUncert() const { return P_k(0,0); }
 
     /**
      * @return The current uncertainty for loc y position
      */
-    const float getYUncert() const { return P_k(1,1); }
+    virtual const float getYUncert() const { return P_k(1,1); }
 
     /**
      * @return The current uncertainty for loc heading
      */
-    const float getHUncert() const { return P_k(2,2); }
+    virtual const float getHUncert() const { return P_k(2,2); }
 
     /**
      * @return The current uncertainty for loc heading in degrees
      */
-    const float getHUncertDeg() const { return P_k(2,2) * TO_DEG; }
+    virtual const float getHUncertDeg() const { return P_k(2,2) * TO_DEG; }
 
     /**
      * @return The current pose estimate of the robot
      */
-    const PoseEst getCurrentUncertainty() const { return PoseEst(P_k(0,0),
-                                                                 P_k(1,1),
-                                                                 P_k(2,2)); }
+    virtual const PoseEst getCurrentUncertainty() const {
+        return PoseEst(P_k(0,0), P_k(1,1), P_k(2,2));
+    }
     // Setters
     /**
      * @param val The new estimate of the loc x position

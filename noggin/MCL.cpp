@@ -51,8 +51,7 @@ MCL::~MCL()
  * @param resample Should we resample during this update
  * @return The set of particles representing the estimate of the current frame.
  */
-void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
-                             bool resample)
+void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 {
     // Set the current particles to be of time minus one.
     vector<Particle> X_t_1 = X_t;
@@ -80,20 +79,13 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
         // Normalize the particle weights
         X_bar_t[m].weight /= totalWeights;
 
-        if(resample) { // Resample the particles
-            int count = int(round(float(M) * X_bar_t[m].weight));
-            // Add the particles to the resample posterior!
-            for (int i = 0; i < count; ++i) {
-                // Random walk the particles
-                X_t.push_back(randomWalkParticle(X_bar_t[m]));
-                //X_t.push_back(X_bar_t[m]);
-            }
-
-        } else { // Keep particle count the same
+        int count = int(round(float(M) * X_bar_t[m].weight));
+        // Add the particles to the resample posterior!
+        for (int i = 0; i < count; ++i) {
             // Random walk the particles
             X_t.push_back(randomWalkParticle(X_bar_t[m]));
+            //X_t.push_back(X_bar_t[m]);
         }
-
     }
 
     // Update pose and uncertainty estimates
