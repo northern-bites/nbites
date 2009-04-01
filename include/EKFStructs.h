@@ -13,6 +13,12 @@ public:
     float deltaF;
     float deltaL;
     float deltaR;
+
+    friend std::ostream& operator<< (std::ostream &o, const MotionModel &u) {
+        return o << "(" << u.deltaF << ", " << u.deltaL << ", " << u.deltaR
+                 << ")";
+    }
+
 };
 
 

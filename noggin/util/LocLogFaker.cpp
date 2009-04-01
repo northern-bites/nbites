@@ -127,7 +127,6 @@ void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
         // Continue the move for as long as specified
         for (int j = 0; j < letsGo->myMoves[i].time; ++j, ++ frameCounter) {
 
-
             // Determine the current frame info
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;

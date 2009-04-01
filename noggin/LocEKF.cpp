@@ -22,8 +22,8 @@ const float LocEKF::H_UNCERT_MAX = M_PI;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6;
-const float LocEKF::INIT_X_UNCERT = 440.0f;
-const float LocEKF::INIT_Y_UNCERT = 680.0f;
+const float LocEKF::INIT_X_UNCERT = 220.0f;
+const float LocEKF::INIT_Y_UNCERT = 340.0f;
 const float LocEKF::INIT_H_UNCERT = M_PI;
 const float LocEKF::X_EST_MIN = -600.0f;
 const float LocEKF::Y_EST_MIN = -1000.0f;
@@ -68,10 +68,15 @@ LocEKF::LocEKF(float initX, float initY, float initH,
 void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
     // Update expected position based on odometry
-    timeUpdate(MotionModel());
+    timeUpdate(u);
 
     // Correct step based on the observed stuff
-    correctionStep(Z);
+    // if (Z.size() > 0) {
+    //     correctionStep(Z);
+    // } else {
+    //     noCorrectionStep();
+    // }
+    noCorrectionStep();
 }
 
 /**
