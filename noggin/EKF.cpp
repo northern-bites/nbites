@@ -49,9 +49,6 @@ void EKF<Measurement, UpdateModel, dimension,mSize>::timeUpdate(UpdateModel u_k)
 {
     // Have the time update prediction incorporated
     // i.e. odometery, natural roll, etc.
-    if(dimension == 3) {
-        std::cout << "Update model is " << u_k << std::endl;
-    }
     StateVector deltas = associateTimeUpdate(u_k);
     xhat_k_bar = xhat_k + deltas;
 

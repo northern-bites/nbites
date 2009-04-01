@@ -117,7 +117,7 @@ void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
     // Print out starting configuration
     printOutMCLLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
                        &currentBall, MCLballEKF, *visBall);
-    printOutLogLine(mclFile, ekfLoc, Z_t, noMove, &currentPose,
+    printOutLogLine(ekfFile, ekfLoc, Z_t, noMove, &currentPose,
                     &currentBall, EKFballEKF, *visBall);
 
     unsigned frameCounter = 0;
@@ -424,7 +424,6 @@ void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
         Particle p = particles[j];
         *outputFile << p << " ";
     }
-
     // Divide the sections with a colon
     *outputFile << ":";
 
