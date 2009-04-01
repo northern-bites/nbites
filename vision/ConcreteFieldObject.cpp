@@ -1,19 +1,15 @@
 #include "ConcreteFieldObject.h"
 using namespace std;
 
-const float ConcreteFieldObject::WHITE_HEIGHT_ON_BEACON = 18.6f;
-
 // Constructors
 ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,
                                          const float _fieldY,
                                          const fieldObjectID _id)
-    : ConcreteLandmark(_fieldX, _fieldY), id(_id) {
-}
+    : ConcreteLandmark(_fieldX, _fieldY), id(_id) {}
 
 // Copy constructor - just pairwise copy the elements
 ConcreteFieldObject::ConcreteFieldObject(const ConcreteFieldObject& other)
-    : ConcreteLandmark(other), id(other.id) {
-}
+    : ConcreteLandmark(other), id(other.id) {}
 // No memory to free
 ConcreteFieldObject::~ConcreteFieldObject() {}
 
@@ -24,19 +20,19 @@ ConcreteFieldObject::~ConcreteFieldObject() {}
 ///////////////////////////////////////////////////////////////////////////////
 
 const ConcreteFieldObject ConcreteFieldObject::blue_goal_left_post(
-    LANDMARK_MY_GOAL_LEFT_POST_X, LANDMARK_MY_GOAL_LEFT_POST_Y,
+    LANDMARK_BLUE_GOAL_TOP_POST_X, LANDMARK_BLUE_GOAL_TOP_POST_Y,
     BLUE_GOAL_LEFT_POST);
 
 const ConcreteFieldObject ConcreteFieldObject::blue_goal_right_post(
-    LANDMARK_MY_GOAL_RIGHT_POST_X, LANDMARK_MY_GOAL_RIGHT_POST_Y,
+    LANDMARK_BLUE_GOAL_BOTTOM_POST_X, LANDMARK_BLUE_GOAL_BOTTOM_POST_Y,
     BLUE_GOAL_RIGHT_POST);
 
 const ConcreteFieldObject ConcreteFieldObject::yellow_goal_left_post(
-    LANDMARK_OPP_GOAL_LEFT_POST_X, LANDMARK_OPP_GOAL_LEFT_POST_Y,
+    LANDMARK_YELLOW_GOAL_BOTTOM_POST_X, LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y,
     YELLOW_GOAL_LEFT_POST);
 
 const ConcreteFieldObject ConcreteFieldObject::yellow_goal_right_post(
-    LANDMARK_OPP_GOAL_RIGHT_POST_X, LANDMARK_OPP_GOAL_RIGHT_POST_Y,
+    LANDMARK_YELLOW_GOAL_TOP_POST_X, LANDMARK_YELLOW_GOAL_TOP_POST_Y,
     YELLOW_GOAL_RIGHT_POST);
 
 const ConcreteFieldObject* ConcreteFieldObject::concreteFieldObjectList[
@@ -104,14 +100,6 @@ const string ConcreteFieldObject::getStringFromID(const fieldObjectID
         return "Yellow goal left post";
     case YELLOW_GOAL_RIGHT_POST:
         return "Yellow goal right post";
-    case YELLOW_BLUE_BEACON:
-        return "Yellow blue beacon";
-    case BLUE_YELLOW_BEACON:
-        return "Blue yellow beacon";
-    case BLUE_ARC:
-        return "Blue arc";
-    case YELLOW_ARC:
-        return "Yellow arc";
     default:
         return "Invalid ID";
     }
@@ -129,49 +117,16 @@ const bool ConcreteFieldObject::isGoal(const fieldObjectID testID) {
     case BLUE_GOAL_RIGHT_POST:
     case YELLOW_GOAL_LEFT_POST:
     case YELLOW_GOAL_RIGHT_POST:
+    case YELLOW_GOAL_POST:
+    case BLUE_GOAL_POST:
         return true;
     default:
         return false;
     }
 }
 
-const bool ConcreteFieldObject::isBeacon(const fieldObjectID testID) {
-    switch (testID) {
-    case YELLOW_BLUE_BEACON: // Intentional fall through
-    case BLUE_YELLOW_BEACON:
-        return true;
-    default:
-        return false;
-    }
-}
-
-const bool ConcreteFieldObject::isArc(const fieldObjectID testID) {
-    switch (testID) {
-    case BLUE_ARC: // Intentional fall through
-    case YELLOW_ARC:
-        return true;
-    default:
-        return false;
-    }
-}
-
-const float ConcreteFieldObject::getHeightFromGround(const
-                                                            fieldObjectID _id) {
-    switch (_id) {
-    case BLUE_GOAL_LEFT_POST:
-    case BLUE_GOAL_RIGHT_POST:
-    case YELLOW_GOAL_LEFT_POST:
-    case YELLOW_GOAL_RIGHT_POST:
-    case BLUE_ARC:
-    case YELLOW_ARC:
-        return 0;
-        // The beacons only consider the blue and yellow portion, which are
-        // elevated off the ground
-    case YELLOW_BLUE_BEACON:
-    case BLUE_YELLOW_BEACON:
-        return WHITE_HEIGHT_ON_BEACON;
-    default:
-        return 0;
-    }
+const float ConcreteFieldObject::getHeightFromGround(const fieldObjectID _id)
+{
+    return 0;
 }
 

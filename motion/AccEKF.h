@@ -24,7 +24,6 @@
 
 #include "EKF.h"
 #include "EKFStructs.h"
-#define ACC_NUM_DIMENSIONS 3
 
 class AccEKF : public EKF<AccelMeasurement, int, ACC_NUM_DIMENSIONS,
                           ACC_NUM_DIMENSIONS>

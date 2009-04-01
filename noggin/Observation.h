@@ -57,6 +57,11 @@ public:
      */
     const float getBearingSD() const { return sigma_b; }
 
+    const RangeBearingMeasurement getRangeBearingMeasurement() const {
+        return RangeBearingMeasurement(visDist, visBearing, sigma_d,
+                                             sigma_b);
+    }
+
     /*
      * @return The ID of the landmark, element of ObservationID enumeration.
      */

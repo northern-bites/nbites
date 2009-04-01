@@ -35,8 +35,12 @@ OBS_SRCS = ../Observation.cpp \
 	   ../Observation.h
 MCL_SRCS = ../MCL.cpp \
 	../MCL.h
+LOCEKF_SRCS = ../LocEKF.cpp \
+	../LocEKF.h
+LOCSYSTEM_SRCS = ../LocSystem.h
 FAKER_SRCS = LocLogFaker.cpp \
-	  LocLogFaker.h
+	  LocLogFaker.h \
+	../NogginStructs.h
 
 OBJS = Utility.o \
        ConcreteLandmark.o \
@@ -52,7 +56,9 @@ OBJS = Utility.o \
        Observation.o \
        MCL.o \
        EKF.o \
-       BallEKF.o
+       BallEKF.o \
+       LocEKF.o \
+       LocSystem.o
 
 LDLIBS = $(OBJS)
 LDFLAGS = $(LDLIBS)
@@ -96,11 +102,15 @@ VisBall.o : $(VISBALL_SRCS)
 # Localization stuff
 Observation.o : $(OBS_SRCS)
 	 $(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-MCL.o : $(MCL_SRCS)
+LocSystem.o : $(LOCSYSTEM_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+MCL.o : $(MCL_SRCS) LocSystem.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 EKF.o : $(EKF_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 BallEKF.o :$(BALLEKF_SRCS) EKF.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+LocEKF.o :$(LOCEKF_SRCS) EKF.o LocSystem.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
 .Phony : clean

@@ -8,9 +8,12 @@
 
 #include "MCL.h"
 using namespace std;
-#define MAX_CHANGE_X 10.0f
-#define MAX_CHANGE_Y 10.0f
+#define MAX_CHANGE_X 5.0f
+#define MAX_CHANGE_Y 5.0f
 #define MAX_CHANGE_H M_PI / 8.0f
+#define MAX_CHANGE_F 5.0f
+#define MAX_CHANGE_L 5.0f
+#define MAX_CHANGE_R M_PI / 16.0f
 #define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 
 /**
@@ -48,8 +51,7 @@ MCL::~MCL()
  * @param resample Should we resample during this update
  * @return The set of particles representing the estimate of the current frame.
  */
-void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
-                             bool resample)
+void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 {
     // Set the current particles to be of time minus one.
     vector<Particle> X_t_1 = X_t;
@@ -63,7 +65,7 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
         Particle x_t_m;
 
         // Update motion model for the particle
-        x_t_m.pose = X_t_1[m].pose + u_t;
+        x_t_m.pose = updateMotionModel(X_t_1[m].pose, u_t);
         // Update measurement model
         x_t_m.weight = updateMeasurementModel(z_t, x_t_m.pose);
         totalWeights += x_t_m.weight;
@@ -77,23 +79,38 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t,
         // Normalize the particle weights
         X_bar_t[m].weight /= totalWeights;
 
-        if(resample) { // Resample the particles
-            int count = int(round(float(M) * X_bar_t[m].weight));
-            // Add the particles to the resample posterior!
-            for (int i = 0; i < count; ++i) {
-                // Random walk the particles
-                X_t.push_back(randomWalkParticle(X_bar_t[m]));
-            }
-
-        } else { // Keep particle count the same
+        int count = int(round(float(M) * X_bar_t[m].weight));
+        // Add the particles to the resample posterior!
+        for (int i = 0; i < count; ++i) {
             // Random walk the particles
             X_t.push_back(randomWalkParticle(X_bar_t[m]));
+            //X_t.push_back(X_bar_t[m]);
         }
-
     }
 
     // Update pose and uncertainty estimates
     updateEstimates();
+}
+
+/**
+ * Update a particle's pose based on the last motion model.
+ * We sample the pose with noise proportional to the odometery update.
+ *
+ * @param x_t_1 The robot pose from the pervious position distribution
+ * @param u_t The odometry update from the last frame
+ *
+ * @return A new robot pose sampled on the odometry update
+ */
+PoseEst MCL::updateMotionModel(PoseEst x_t, MotionModel u_t)
+{
+    u_t.deltaF += MAX_CHANGE_F * UNIFORM_1_NEG_1;
+    u_t.deltaL += MAX_CHANGE_L * UNIFORM_1_NEG_1;
+    u_t.deltaR += MAX_CHANGE_R * UNIFORM_1_NEG_1;
+
+    x_t += u_t;
+
+    return x_t;
+
 }
 
 /**
@@ -152,6 +169,8 @@ void MCL::updateEstimates()
     float weightSum = 0.;
     PoseEst wMeans(0.,0.,0.);
     PoseEst bSDs(0., 0., 0.);
+    PoseEst best(0.,0.,0.);
+    float maxWeight = 0;
 
     // Calculate the weighted mean
     for (unsigned int i = 0; i < X_t.size(); ++i) {
@@ -161,6 +180,11 @@ void MCL::updateEstimates()
         wMeans.h += X_t[i].pose.h*X_t[i].weight;
         // Sum the weights
         weightSum += X_t[i].weight;
+
+        // if (X_t[i].weight > maxWeight) {
+        //     maxWeight = X_t[i].weight;
+        //     best = X_t[i].pose;
+        // }
     }
 
     wMeans.x /= weightSum;
@@ -191,6 +215,7 @@ void MCL::updateEstimates()
 
     // Set class variables to reflect newly calculated values
     curEst = wMeans;
+    //curEst = best;
     curUncert = bSDs;
 }
 
@@ -215,10 +240,9 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
     float r_a;
 
     // Determine expected distance to the landmark
-    d_hat = sqrt( (pt.x - x_t.x)*(pt.x - x_t.x) +
-                  (pt.y - x_t.y)*(pt.y - x_t.y));
+    d_hat = hypot(pt.x - x_t.x, pt.y - x_t.y);
     // Expected bearing
-    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h - QUART_CIRC_RAD;
+    a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
 
     // Calculate residuals
     r_d = z.getVisDistance() - d_hat;
@@ -272,27 +296,22 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
         ((line.y1 < line.y2) && (pt.y < line.y1 || pt.y > line.y2)) ||
         ((line.y1 > line.y2) && (pt.y > line.y1 || pt.y < line.y2))) {
         // Point is outside the bound of the bounds of the line segment
-        float d_1 = sqrt( (line.x1 - x_t.x)*(line.x1 - x_t.x) +
-                          (line.y1 - x_t.y)*(line.y1 - x_t.y));
-        float d_2 = sqrt( (line.x2 - x_t.x)*(line.x2 - x_t.x) +
-                          (line.y2 - x_t.y)*(line.y2 - x_t.y));
+        float d_1 = hypot(line.x1 - x_t.x, line.y1 - x_t.y);
+        float d_2 = hypot(line.x2 - x_t.x, line.y2 - x_t.y);
         if (d_1 < d_2) {
             d_hat = d_1;
-            a_hat = atan2(line.y1 - x_t.y, line.x1 - x_t.x) - x_t.h -
-                QUART_CIRC_RAD;
+            a_hat = atan2(line.y1 - x_t.y, line.x1 - x_t.x) - x_t.h;
         } else {
             d_hat = d_2;
-            a_hat = atan2(line.y2 - x_t.y, line.x2 - x_t.x) - x_t.h -
-                QUART_CIRC_RAD;
+            a_hat = atan2(line.y2 - x_t.y, line.x2 - x_t.x) - x_t.h;
         }
 
     } else {
 
         // Determine nearest expected point on the line
-        d_hat = sqrt( (pt.x - x_t.x)*(pt.x - x_t.x) +
-                      (pt.y - x_t.y)*(pt.y - x_t.y));
+        d_hat = hypot(pt.x - x_t.x, pt.y - x_t.y);
         // Expected bearing
-        a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h - QUART_CIRC_RAD;
+        a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
     }
 
     // Calculate residuals
@@ -342,6 +361,23 @@ Particle MCL::randomWalkParticle(Particle p)
     p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
     return p;
 }
+
+
+float MCL::sampleNormalDistribution(float sd)
+{
+    float samp = 0;
+    for(int i = 0; i < 12; i++) {
+        samp += (2*(rand() / (float(RAND_MAX) + sd)) - sd);
+    }
+    return 0.5*samp;
+}
+
+float MCL::sampleTriangularDistribution(float sd)
+{
+    return sqrt(6.0)*0.5 * ((2*(rand() / (float(RAND_MAX) + sd)) - sd) +
+                            (2*(rand() / (float(RAND_MAX) + sd)) - sd));
+}
+
 
 // Particle
 Particle::Particle(PoseEst _pose, float _weight) :

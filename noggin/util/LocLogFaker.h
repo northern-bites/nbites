@@ -14,12 +14,13 @@
 #include "BallEKF.h"
 #include "VisionDef.h" // For NAO_FOV_X_DEG
 #include "EKFStructs.h"
+#include "LocEKF.h"
 
 // Observation parameter
 // Ranges at which objects are viewable
 // Field objects
 #define FO_MAX_VIEW_RANGE 575.0f
-#define CORNER_MAX_VIEW_RANGE 200.0f
+#define CORNER_MAX_VIEW_RANGE 600.0f
 #define LINE_MAX_VIEW_RANGE 250.0f
 // Number of frames to wait between resampling
 #define RESAMPLE_RATE 5
@@ -32,7 +33,7 @@ string team_color = "0";
 string player_number = "3";
 string DEFAULT_OUTFILE_NAME = "FAKELOG.mcl";
 // Get half of the nao FOV converted to radians
-float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f;
+float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f + M_PI / 4.0f;
 
 /**
  * Class to hold a constant robot path vector over a given number of frames
@@ -58,14 +59,18 @@ std::vector<Observation> determineObservedLandmarks(PoseEst myPos,
                                                     float neckYaw);
 estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                                float neckYaw);
-void iteratePath(fstream * outputFile, NavPath * letsGo);
+void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo);
 // IO Functions
 void readInputFile(fstream* name, NavPath * letsGo);
-void printOutLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
-                     std::vector<Observation>
-                     sightings, MotionModel lastOdo, PoseEst * currentPose,
-                     BallPose * currentBall, boost::shared_ptr<BallEKF> ballEKF,
-                     VisualBall _b);
+void printOutMCLLogLine(fstream* outputFile, boost::shared_ptr<MCL> myLoc,
+                        std::vector<Observation>
+                        sightings, MotionModel lastOdo, PoseEst * currentPose,
+                        BallPose * currentBall, boost::shared_ptr<BallEKF> ballEKF,
+                        VisualBall _b);
+void printOutLogLine(fstream* outputFile, boost::shared_ptr<LocSystem> myLoc,
+                     std::vector<Observation> sightings, MotionModel lastOdo,
+                     PoseEst *currentPose, BallPose * currentBall,
+                     boost::shared_ptr<BallEKF> ballEKF, VisualBall _b);
 
 // Helper functions
 float getDistSD(float dist);

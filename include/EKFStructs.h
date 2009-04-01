@@ -6,15 +6,19 @@
 class MotionModel
 {
 public:
-    MotionModel(float f, float l, float r)
+    MotionModel(float f = 0.0f, float l = 0.0f, float r = 0.0f)
         : deltaF(f), deltaL(l), deltaR(r) { }
     MotionModel(const MotionModel& other)
         : deltaF(other.deltaF), deltaL(other.deltaL), deltaR(other.deltaR) { }
-    MotionModel()
-        : deltaF(0.0f), deltaL(0.0f), deltaR(0.0f) { }
     float deltaF;
     float deltaL;
     float deltaR;
+
+    friend std::ostream& operator<< (std::ostream &o, const MotionModel &u) {
+        return o << "(" << u.deltaF << ", " << u.deltaL << ", " << u.deltaR
+                 << ")";
+    }
+
 };
 
 
@@ -22,8 +26,15 @@ public:
  * BallMeasurement - A non-generic class for holding the basic type information
  *                   required (by Tucker) for running the correctionStep in EKF
  */
-struct BallMeasurement
+struct RangeBearingMeasurement
 {
+    RangeBearingMeasurement(float _dist = 0.0f, float _bearing = 0.0f,
+                            float _distSD = 0.0f, float _bearingSD = 0.0f) :
+        distance(_dist), bearing(_bearing), distanceSD(_distSD),
+        bearingSD(_bearingSD) {}
+    RangeBearingMeasurement(const RangeBearingMeasurement& other) :
+        distance(other.distance), bearing(other.bearing),
+        distanceSD(other.distanceSD), bearingSD(other.bearingSD) {}
     float distance;
     float bearing;
     float distanceSD;

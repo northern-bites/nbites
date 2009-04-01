@@ -4,6 +4,46 @@ using namespace boost;
 
 using namespace NBMath;
 
+// Parameters
+const float BallEKF::ASSUMED_FPS = 15.0;
+// How much uncertainty naturally grows per update
+const float BallEKF::BETA_BALL = 5.0f;
+// How much ball velocity should effect uncertainty
+const float BallEKF::GAMMA_BALL = 0.4f;
+const float BallEKF::CARPET_FRICTION = -25.0f; // 25 cm/s^2
+const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
+
+// Default initialization values
+const float BallEKF::INIT_BALL_X = 370.0f;
+const float BallEKF::INIT_BALL_Y = 270.0f;
+const float BallEKF::INIT_BALL_X_VEL = 0.0f;
+const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
+const float BallEKF::X_UNCERT_MAX = 740.0f;
+const float BallEKF::Y_UNCERT_MAX = 270.0f;
+const float BallEKF::VELOCITY_UNCERT_MAX = 300.0;
+const float BallEKF::X_UNCERT_MIN = 1.0e-6;
+const float BallEKF::Y_UNCERT_MIN = 1.0e-6;
+const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6;
+const float BallEKF::INIT_X_UNCERT = 740.0f;
+const float BallEKF::INIT_Y_UNCERT = 270.0f;
+const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
+const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
+const float BallEKF::X_EST_MIN = -1000.0f;
+const float BallEKF::Y_EST_MIN = -600.0f;
+const float BallEKF::X_EST_MAX = 1000.0f;
+const float BallEKF::Y_EST_MAX = 600.0f;
+const float BallEKF::VELOCITY_EST_MAX = 300.0f;
+const float BallEKF::VELOCITY_EST_MIN = -300.0f;
+
+BallEKF::BallEKF()
+    : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
+          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
+      useCartesian(true)
+{
+
+}
+
+
 /**
  * Constructor for the BallEKF class
  *
@@ -21,9 +61,9 @@ BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION,
+    : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
           BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
-      useCartesian(false)
+      useCartesian(true)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -51,8 +91,9 @@ BallEKF::BallEKF(float initX, float initY,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(VisualBall * ball, bool _useCartesian)
+void BallEKF::updateModel(VisualBall * ball, PoseEst p, bool _useCartesian)
 {
+    robotPose = p;
     useCartesian = _useCartesian;
     // Update expected ball movement
     timeUpdate(MotionModel());
@@ -81,8 +122,8 @@ void BallEKF::updateModel(VisualBall * ball, bool _useCartesian)
  */
 void BallEKF::sawBall(VisualBall * ball)
 {
-    BallMeasurement m;
-    std::vector<BallMeasurement> z;
+    RangeBearingMeasurement m;
+    std::vector<RangeBearingMeasurement> z;
 
     m.distance = ball->getDistance();
     m.bearing = ball->getBearing();
@@ -102,8 +143,9 @@ void BallEKF::sawBall(VisualBall * ball)
  * @param u The motion model of the last frame.  Ignored for the ball.
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
-EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION
-    >::StateVector BallEKF::associateTimeUpdate(MotionModel u)
+EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
+    BALL_MEASUREMENT_DIMENSION>::StateVector BallEKF::associateTimeUpdate(
+        MotionModel u)
 {
     // Calculate the assumed change in ball position
     // Assume no decrease in ball velocity
@@ -126,15 +168,15 @@ EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION
  *
  * @return the measurement invariance
  */
-void BallEKF::incorporateMeasurement(BallMeasurement z,
+void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
                                      StateMeasurementMatrix &H_k,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)
 {
     if (useCartesian) {
-        // Convert our siting to cartesian coordinates
-        float x_b_r = -z.distance * sin(z.bearing);
-        float y_b_r = z.distance * cos(z.bearing);
+        // Convert our sighting to cartesian coordinates
+        float x_b_r = z.distance * cos(z.bearing);
+        float y_b_r = z.distance * sin(z.bearing);
         MeasurementVector z_x(2);
 
         z_x(0) = x_b_r;
@@ -145,17 +187,19 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
         float y_b = getYEst();
         MeasurementVector d_x(2);
 
-        d_x(0) = x_b;
-        d_x(1) = y_b;
+        d_x(0) = (x_b - robotPose.x)*cos(-robotPose.h) -
+            (y_b - robotPose.y)*sin(-robotPose.h);
+        d_x(1) = (x_b - robotPose.x)*sin(-robotPose.h) +
+            (y_b - robotPose.y)*cos(-robotPose.h);
 
         // Calculate invariance
         V_k = z_x - d_x;
 
         // Calculate jacobians
-        H_k(0,0) = cos(z.bearing);
-        H_k(0,1) = -sin(z.bearing);
-        H_k(1,0) = sin(z.bearing);
-        H_k(1,1) = cos(z.bearing);
+        H_k(0,0) = cos(robotPose.h);
+        H_k(0,1) = -sin(robotPose.h);
+        H_k(1,0) = sin(robotPose.h);
+        H_k(1,1) = cos(robotPose.h);
 
         // Update the measurement covariance matrix
         R_k(0,0) = z.distanceSD;
@@ -174,8 +218,8 @@ void BallEKF::incorporateMeasurement(BallMeasurement z,
 
         float locDistSquared = (x_b * x_b + y_b * y_b);
         float locDist = sqrt(locDistSquared);
-        d_x(0) = sqrt(x_b * x_b + y_b * y_b);
-        d_x(1) = subPIAngle(atan2(y_b, x_b) - M_PI / 2.0f);
+        d_x(0) = hypot(x_b, y_b);
+        d_x(1) = subPIAngle(atan2(y_b, x_b));
 
         // Calculate invariance
         V_k = z_x - d_x;
