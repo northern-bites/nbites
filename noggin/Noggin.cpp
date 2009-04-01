@@ -289,7 +289,7 @@ void Noggin::updateLocalization()
 
     // Process the information
     PROF_ENTER(profiler, P_MCL);
-    mcl->updateLocalization(odometery, observations, true);
+    mcl->updateLocalization(odometery, observations);
     PROF_EXIT(profiler, P_MCL);
 
     // Ball Tracking
