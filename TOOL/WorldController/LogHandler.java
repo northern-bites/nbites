@@ -145,7 +145,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog(false);
+            viewFromEKFLog();
         }
         playTimer.stop();
     }
@@ -163,7 +163,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog(false);
+            viewFromEKFLog();
         }
 
         playTimer.stop();
@@ -178,7 +178,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog(false);
+            viewFromEKFLog();
         }
         playTimer.stop();
     }
@@ -194,7 +194,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            viewFromLog(false);
+            viewFromEKFLog();
         }
 
         playTimer.stop();
@@ -230,7 +230,7 @@ public class LogHandler
             System.out.println("log file not chosen");
             wc.setMode(wc.DO_NOTHING);
             return false;
-        } else if (!loadMCLLog(logFile)) {
+        } else if (!loadLog(logFile)) {
             System.out.println("log file not unable to load");
             return false;
         }
@@ -247,10 +247,14 @@ public class LogHandler
      *
      * @return True if succesfully loads the log, otherwise false
      */
-    public boolean loadMCLLog(String logFile)
+    public boolean loadLog(String logFile)
     {
         BufferedReader dataIn = null;
-        System.out.println("Loading MCL log file: " + logFile + "... ");
+        if( wc.getMode() == wc.VIEW_MCL_LOG) {
+            System.out.println("Loading MCL log file: " + logFile + "... ");
+        } else {
+            System.out.println("Loading EKF log file: " + logFile + "... ");
+        }
         log_strings.clear();
 
         // Read in the passed in file
@@ -309,6 +313,11 @@ public class LogHandler
                 System.out.println("Attempted to add nan particle at index " +
                                    i + " in line " + log_marker);
                 return particles;
+            } catch (ArrayIndexOutOfBoundsException obe) {
+                System.out.println("Wrong number of elements for particle " +
+                                   " parse");
+                System.out.println("Have read in " + i / 4 + " particles");
+                return particles;
             }
         }
         return particles;
@@ -322,6 +331,12 @@ public class LogHandler
     public void viewFromMCLLog()
     {
         viewFromLog(true);
+    }
+
+
+    public void viewFromEKFLog()
+    {
+        viewFromLog(false);
     }
 
     public void viewFromLog(boolean hasParticles)
@@ -358,6 +373,17 @@ public class LogHandler
                 // Update the debug viewer
                 debugInfo = t.nextToken();
                 processDebugInfo(debugInfo);
+
+                if(!hasParticles) {
+                    // Draw the robot position if there aren'y any particles
+                    painter.updateEstPoseInfo(Float.parseFloat
+                                              (debugViewer.myX.getText()),
+                                              Float.parseFloat
+                                              (debugViewer.myY.getText()),
+                                              Float.parseFloat
+                                              (debugViewer.myH.getText()));
+                }
+
 
                 // Draw the uncertainty ellipses on the screen
                 painter.updateUncertainytInfo(Double.parseDouble
@@ -625,6 +651,8 @@ public class LogHandler
                                   player_number);
         // Clear the uncertainty ellipses
         painter.updateUncertainytInfo(0,0,0,0,0,0);
+        painter.updateEstPoseInfo(painter.NO_DATA_VALUE,painter.NO_DATA_VALUE,
+                                        painter.NO_DATA_VALUE);
         painter.updateRealPoseInfo(painter.NO_DATA_VALUE, painter.NO_DATA_VALUE,
                                    painter.NO_DATA_VALUE);
         painter.updateRealBallInfo(painter.NO_DATA_VALUE,painter.NO_DATA_VALUE,

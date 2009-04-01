@@ -130,6 +130,7 @@ public class WorldControllerPainter implements RobotListener
 
     private double[] positionEstimates;
     private double[] uncertaintyEstimates;
+    private float[] estimatedPose;
     private float[] realPose;
     private float[] realBallPose;
 
@@ -166,6 +167,10 @@ public class WorldControllerPainter implements RobotListener
         realPose[0] = NO_DATA_VALUE;
         realPose[1] = NO_DATA_VALUE;
         realPose[2] = NO_DATA_VALUE;
+        estimatedPose = new float[3];
+        estimatedPose[0] = NO_DATA_VALUE;
+        estimatedPose[1] = NO_DATA_VALUE;
+        estimatedPose[2] = NO_DATA_VALUE;
         realBallPose = new float[4];
         realBallPose[0] = NO_DATA_VALUE;
         realBallPose[1] = NO_DATA_VALUE;
@@ -187,6 +192,7 @@ public class WorldControllerPainter implements RobotListener
             paintLandmarks(g2);
             paintRobotInformation(g2);
             paintParticleSet(g2);
+            paintEstRobotPose(g2);
             paintEstimateMeanAndVariance(g2);
             paintRealRobotPose(g2);
             paintRealBallPose(g2);
@@ -400,22 +406,18 @@ public class WorldControllerPainter implements RobotListener
                        POSITION_DOT_RADIUS, POSITION_DOT_RADIUS);
         // TAIL PART
         double x_line_body_disp = (POSITION_HEADING_RADIUS *
-                                   Math.cos(DEG_TO_RAD *
-                                            at_heading));
+                                   Math.cos(at_heading));
         double y_line_body_disp = (POSITION_HEADING_RADIUS *
-                                   Math.sin(DEG_TO_RAD *
-                                            at_heading));
+                                   Math.sin(at_heading));
         field.drawLine(drawing_on, robotColor, field.DRAW_STROKE,
                        at_x - x_line_body_disp, at_y - y_line_body_disp,
                        at_x, at_y);
         double x_line_pan_disp = (PAN_HEADING_RADIUS *
-                                  Math.cos(DEG_TO_RAD *
-                                           (at_pan +
+                                  Math.cos((at_pan +
                                             at_heading
                                             )));
         double y_line_pan_disp = (PAN_HEADING_RADIUS *
-                                  Math.sin(DEG_TO_RAD *
-                                           (at_pan +
+                                  Math.sin((at_pan +
                                             at_heading
                                             )));
         field.drawLine(drawing_on, robotColor, field.DRAW_STROKE, at_x, at_y,
@@ -905,6 +907,20 @@ public class WorldControllerPainter implements RobotListener
     }
 
     /**
+     * Update the current known pose of the robot
+     *
+     * @param _x The x position of the robot
+     * @param _y The y position of the robot
+     * @param _h The h position of the robot
+     */
+    public void updateEstPoseInfo(float _x, float _y, float _h)
+    {
+        estimatedPose[0] = _x;
+        estimatedPose[1] = _y;
+        estimatedPose[2] = _h;
+    }
+
+    /**
      * Paints the current set of particles on the field.  Called by
      * updateInfomration when the WorldControllerViewer is updated.
      *
@@ -936,6 +952,31 @@ public class WorldControllerPainter implements RobotListener
                             positionEstimates[2], uncertaintyEstimates[0],
                             uncertaintyEstimates[1], uncertaintyEstimates[2]);
     }
+
+    /**
+     * Function to draw the know position of the robot; mostly used for
+     * debugging of artificially created data. Draws nothing if the current pose
+     * is not known.
+     *
+     * @param g2 The graphics context to be drawn on.
+     */
+    public void paintEstRobotPose(Graphics2D g2)
+    {
+        if (estimatedPose[0] == NO_DATA_VALUE) {// Test if data exists
+            return; // Draw nothing if we don't know the current real pose
+        }
+        Color partColor;
+        if( mclTeamColor == RED_TEAM) {
+            partColor = ROBOT_COLOR_RED_TEAM;
+        } else {
+            partColor = ROBOT_COLOR_BLUE_TEAM;
+        }
+
+        drawRobotsEstimatedPosition(g2, partColor, estimatedPose[0],
+                                    estimatedPose[1], estimatedPose[2], 0.0,
+                                    mclPlayerNum);
+    }
+
 
     /**
      * Function to draw the know position of the robot; mostly used for
