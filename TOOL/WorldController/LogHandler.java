@@ -110,7 +110,7 @@ public class LogHandler
                     if (wc.getMode() == wc.VIEW_MCL_LOG) {
                         viewFromMCLLog();
                     } else {
-                        //viewFromLog();
+                        viewFromLog(false);
                     }
                     logBox.slide.setValue(log_marker);
                 }
@@ -145,7 +145,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            //viewFromLog();
+            viewFromLog(false);
         }
         playTimer.stop();
     }
@@ -163,7 +163,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            //viewFromLog();
+            viewFromLog(false);
         }
 
         playTimer.stop();
@@ -178,7 +178,7 @@ public class LogHandler
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            //viewFromLog();
+            viewFromLog(false);
         }
         playTimer.stop();
     }
@@ -187,14 +187,14 @@ public class LogHandler
         if( wc.getMode() == wc.VIEW_MCL_LOG) {
             log_marker = log_num_frames;
         } else {
-            log_marker = log_num_frames-1;
+            log_marker = log_num_frames;
         }
         logBox.play_pause.setText(logBox.PLAY_STRING);
         logBox.slide.setValue(log_marker);
         if (wc.getMode() == wc.VIEW_MCL_LOG) {
             viewFromMCLLog();
         } else {
-            //viewFromLog();
+            viewFromLog(false);
         }
 
         playTimer.stop();
@@ -216,15 +216,15 @@ public class LogHandler
     // Begin Monte Carlo stuff, hopefully this will be nicer than the things
     // Which are above and kind of suck.
     /**
-     * Initializes  MCL log for super duper Nao fun!
+     * Initializes  MCL or EKF log for super duper Nao fun!
      *
      * @return true if the file succesfully loads, otherwise false.
      */
-    public boolean initMCLLog()
+    public boolean initLog()
     {
         logFile = wc.openDialog("Locate Log File to Load",
-                                (System.getProperty("user.dir") +
-                                 "/matrixlib/"),FileDialog.LOAD);
+                                System.getProperty("user.dir"),
+                                FileDialog.LOAD);
 
         if (logFile == null) {
             System.out.println("log file not chosen");
@@ -321,6 +321,11 @@ public class LogHandler
      */
     public void viewFromMCLLog()
     {
+        viewFromLog(true);
+    }
+
+    public void viewFromLog(boolean hasParticles)
+    {
         // Method variables
         Vector< MCLParticle> particles;
         String particleInfo, debugInfo, landmarkInfo, realPoseInfo;
@@ -343,8 +348,12 @@ public class LogHandler
                 t = new StringTokenizer(log_strings.get(log_marker-1),":");
 
                 // Paint the particles on the screen
-                particleInfo = t.nextToken();
-                particles = parseParticleLine(particleInfo);
+                if (hasParticles) {
+                    particleInfo = t.nextToken();
+                    particles = parseParticleLine(particleInfo);
+                } else {
+                    particles = new Vector<MCLParticle>();
+                }
 
                 // Update the debug viewer
                 debugInfo = t.nextToken();
@@ -378,8 +387,10 @@ public class LogHandler
                 }
 
                 // Update the screen view
-                painter.updateParticleSet(particles, team_color,
-                                          player_number);
+                if (hasParticles) {
+                    painter.updateParticleSet(particles, team_color,
+                                              player_number);
+                }
                 painter.reportEndFrame();
             }
         }

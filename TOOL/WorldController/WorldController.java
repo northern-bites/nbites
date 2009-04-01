@@ -60,6 +60,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final int SIMULATE_OFFLINE = 0;
     public static final int VIEW_UDP_PACKETS = 1;
     public static final int VIEW_MCL_LOG = 2;
+    public static final int VIEW_EKF_LOG = 3;
 
     // Speed paramaters
     public static final int ROBOT_FPS = 30;
@@ -158,7 +159,9 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String SWITCH_TEAMS_ACTION = "switchteams";
     public static final String DRAW_EST_ACTION = "drawest";
     public static final String RELOAD_MCL_LOG_ACTION = "reloadmcllog";
-    public static final String QUIT_MCL_LOG_ACTION = "quitmcllog";
+    public static final String QUIT_MCL_LOG_ACTION = "quitekflog";
+    public static final String RELOAD_EKF_LOG_ACTION = "reloadekflog";
+    public static final String QUIT_EKF_LOG_ACTION = "quitekflog";
     public static final String CONNECT_ACTION = "connectme";
     public static final String DISCONNECT_ACTION = "disconnectme";
     public static final String CLEAR_FIELD_ACTION = "clearfield";
@@ -368,10 +371,18 @@ public class WorldController extends JPanel implements KeyListener,
         } else if (cmd.equals(RELOAD_MCL_LOG_ACTION)) {
             startMCLLog();
             System.out.println("RELOADED MCL LOG");
-        } else if (cmd.equals(VIEW_UDP_PACKETS_ACTION)) {
-            startRobotUDP();
         } else if (cmd.equals(VIEW_MCL_LOG_ACTION)) {
             startMCLLog();
+        } else if (cmd.equals(QUIT_EKF_LOG_ACTION)) {
+            log.quitMCLLog();
+            startDoNothing();
+        } else if (cmd.equals(RELOAD_EKF_LOG_ACTION)) {
+            startEKFLog();
+            System.out.println("RELOADED EKF LOG");
+        } else if (cmd.equals(VIEW_EKF_LOG_ACTION)) {
+            startEKFLog();
+        } else if (cmd.equals(VIEW_UDP_PACKETS_ACTION)) {
+            startRobotUDP();
         } else if (cmd.equals(DISCONNECT_ACTION)) {
             udp_server.setReceiving(false);
             startDoNothing();
@@ -410,6 +421,12 @@ public class WorldController extends JPanel implements KeyListener,
         button_view_mcl_log.setActionCommand(VIEW_MCL_LOG_ACTION);
         button_view_mcl_log.addActionListener(this);
         button_area.add(button_view_mcl_log);
+
+        // setup EKF log button
+        button_view_ekf_log = new JButton(VIEW_EKF_LOG_STRING);
+        button_view_ekf_log.setActionCommand(VIEW_EKF_LOG_ACTION);
+        button_view_ekf_log.addActionListener(this);
+        button_area.add(button_view_ekf_log);
 
         // program specific label
         program_specific_label = new JLabel(PROGRAM_SPECIFIC_LABEL_STRING,
@@ -469,6 +486,22 @@ public class WorldController extends JPanel implements KeyListener,
         fps_label.setVisible(true);
         fps_slide.setVisible(true);
     }
+
+    public void ekfLogButtons()
+    {
+        button_one.setText(DRAW_EST_STRING);
+        button_one.setActionCommand(DRAW_EST_ACTION);
+        button_one.setVisible(true);
+        button_two.setText(RELOAD_LOG_STRING);
+        button_two.setActionCommand(RELOAD_MCL_LOG_ACTION);
+        button_two.setVisible(true);
+        button_three.setText(QUIT_LOG_STRING);
+        button_three.setActionCommand(QUIT_MCL_LOG_ACTION);
+        button_three.setVisible(true);
+        fps_label.setVisible(true);
+        fps_slide.setVisible(true);
+    }
+
     public void udpButtons()
     {
         button_one.setText(DISCONNECT_STRING);
@@ -575,7 +608,7 @@ public class WorldController extends JPanel implements KeyListener,
     public void startMCLLog()
     {
         mode = VIEW_MCL_LOG;
-        if(!log.initMCLLog()) {
+        if(!log.initLog()) {
             mode = DO_NOTHING;
             nothingButtons();
             return;
@@ -583,6 +616,21 @@ public class WorldController extends JPanel implements KeyListener,
         nothingButtons();
         mclLogButtons();
     }
+    /**
+     * Method to test the output system of the mcl...
+     */
+    public void startEKFLog()
+    {
+        mode = VIEW_EKF_LOG;
+        if(!log.initLog()) {
+            mode = DO_NOTHING;
+            nothingButtons();
+            return;
+        }
+        nothingButtons();
+        ekfLogButtons();
+    }
+
 }
 
 
