@@ -562,19 +562,19 @@ public class DebugViewer extends JFrame {
             new Point2D.Double(wc.the_field.CENTER_FIELD_X,
                                wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
         objectIDMap.put(new Integer(21), centerBottomT);
-        objectIDStringMap.put(new Integer(21), "Center BY T");
+        objectIDStringMap.put(new Integer(21), "Center Bottom T");
         Point2D.Double centerTopT =
             new Point2D.Double(wc.the_field.CENTER_FIELD_X,
                                wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
         objectIDMap.put(new Integer(22), centerTopT);
-        objectIDStringMap.put(new Integer(22), "Center YB T");
+        objectIDStringMap.put(new Integer(22), "Center Top T");
         Point2D.Double yellowCornerBottomL =
              new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
                                 wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
         objectIDMap.put(new Integer(23), yellowCornerBottomL);
         objectIDStringMap.put(new Integer(23), "Yellow Corner Bottom L");
         Point2D.Double yellowCornerTopL =
-             new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+             new Point2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
                                 wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
         objectIDMap.put(new Integer(24), yellowCornerTopL);
         objectIDStringMap.put(new Integer(24), "Yellow Corner Top L");
