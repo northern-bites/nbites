@@ -1,5 +1,6 @@
 #ifndef EKFStructs_h
 #define EKFStructs_h
+#include <ostream>
 
 // Structs
 // Odometery change
