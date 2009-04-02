@@ -493,10 +493,10 @@ public class WorldController extends JPanel implements KeyListener,
         button_one.setActionCommand(DRAW_EST_ACTION);
         button_one.setVisible(true);
         button_two.setText(RELOAD_LOG_STRING);
-        button_two.setActionCommand(RELOAD_MCL_LOG_ACTION);
+        button_two.setActionCommand(RELOAD_EKF_LOG_ACTION);
         button_two.setVisible(true);
         button_three.setText(QUIT_LOG_STRING);
-        button_three.setActionCommand(QUIT_MCL_LOG_ACTION);
+        button_three.setActionCommand(QUIT_EKF_LOG_ACTION);
         button_three.setVisible(true);
         fps_label.setVisible(true);
         fps_slide.setVisible(true);
