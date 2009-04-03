@@ -156,10 +156,11 @@ void LocEKF::incorporateMeasurement(Observation z,
     H_k(0,1) = -sin(h);
     H_k(0,2) = 0;//-(x_b - x) * sin(h) + (y_b - y) * cos(h);
 
-    H_k(1,0) = -sin(h);
+    H_k(1,0) = sin(h);
     H_k(1,1) = -cos(h);
     H_k(1,2) = 0; //-(x_b - x) * cos(h) - (y_b - y) * sin(h);
 
     // Update the measurement covariance matrix
     R_k(0,0) = 2.0f*z.getDistanceSD();
-    R_k(1,1) = 2.0f*z.getDistanceSD();}
+    R_k(1,1) = 2.0f*z.getDistanceSD();
+}
