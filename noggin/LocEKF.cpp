@@ -1,20 +1,21 @@
 #include "LocEKF.h"
+//#define DEBUG_LOC_EKF
 using namespace boost::numeric;
 using namespace boost;
 
 using namespace NBMath;
 
 // Parameters
-const float LocEKF::BETA_LOC = 5.0f;
+const float LocEKF::BETA_LOC = 15.0f;
 const float LocEKF::GAMMA_LOC = 0.4f;
-const float LocEKF::BETA_LAT = 5.0f;
+const float LocEKF::BETA_LAT = 15.0f;
 const float LocEKF::GAMMA_LAT = 0.4f;
 const float LocEKF::BETA_ROT = 5.0f;
 const float LocEKF::GAMMA_ROT = 0.4f;
 
 // Default initialization values
-const float LocEKF::INIT_LOC_X = 100.0f;
-const float LocEKF::INIT_LOC_Y = 100.0f;
+const float LocEKF::INIT_LOC_X = 370.0f;
+const float LocEKF::INIT_LOC_Y = 270.0f;
 const float LocEKF::INIT_LOC_H = 0.0f;
 const float LocEKF::X_UNCERT_MAX = 440.0f;
 const float LocEKF::Y_UNCERT_MAX = 680.0f;
@@ -43,7 +44,7 @@ const float LocEKF::Y_EST_MAX = 1000.0f;
 LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
-          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC)
+          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), frameNumber(1)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -70,13 +71,17 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     // Update expected position based on odometry
     timeUpdate(u);
 
+#ifdef DEBUG_LOC_EKF
+    std::cout << "Frame number " << frameNumber++ << std::endl;
+    std::cout << "Pose is (" << getXEst() << ", " << getYEst() << ", "
+              << getHEst() << ")" << std::endl;
+#endif
     // Correct step based on the observed stuff
-    // if (Z.size() > 0) {
-    //     correctionStep(Z);
-    // } else {
-    //     noCorrectionStep();
-    // }
-    noCorrectionStep();
+    if (Z.size() > 0) {
+        correctionStep(Z);
+    } else {
+        noCorrectionStep();
+    }
 }
 
 /**
@@ -117,4 +122,44 @@ void LocEKF::incorporateMeasurement(Observation z,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)
 {
-}
+    // Convert our sighting to cartesian coordinates
+    float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
+    float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
+    MeasurementVector z_x(2);
+
+    z_x(0) = x_b_r;
+    z_x(1) = y_b_r;
+
+
+    // Get expected values of ball
+    float x_b = z.getPointPossibilities()[0].x;
+    float y_b = z.getPointPossibilities()[0].y;
+    MeasurementVector d_x(2);
+
+    float x = getXEst();
+    float y = getYEst();
+    float h = getHEst();
+
+    d_x(0) = (x_b - x) * cos(h) + (y_b - y) * sin(h);
+    d_x(1) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
+
+    // Calculate invariance
+    V_k = z_x - d_x;
+
+#ifdef DEBUG_LOC_EKF
+    std::cout << "Landmark: " << z.getID() << std::endl;
+    std::cout << "Expected (" << d_x(0) << ", " << d_x(1) << ")\n";
+    std::cout << "Observed (" << z_x(0) << ", " << z_x(1) << ")\n\n";
+#endif
+    // Calculate jacobians
+    H_k(0,0) = -cos(h);
+    H_k(0,1) = -sin(h);
+    H_k(0,2) = 0;//-(x_b - x) * sin(h) + (y_b - y) * cos(h);
+
+    H_k(1,0) = -sin(h);
+    H_k(1,1) = -cos(h);
+    H_k(1,2) = 0; //-(x_b - x) * cos(h) - (y_b - y) * sin(h);
+
+    // Update the measurement covariance matrix
+    R_k(0,0) = 2.0f*z.getDistanceSD();
+    R_k(1,1) = 2.0f*z.getDistanceSD();}

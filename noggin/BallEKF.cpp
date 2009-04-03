@@ -40,7 +40,25 @@ BallEKF::BallEKF()
           BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
       useCartesian(true)
 {
+    // ones on the diagonal
+    A_k(0,0) = 1.0;
+    A_k(1,1) = 1.0;
+    A_k(2,2) = 1.0;
+    A_k(3,3) = 1.0;
 
+    // Assummed change in position necessary for velocity to work correctly
+    A_k(0,2) = 1.0 / ASSUMED_FPS;
+    A_k(1,3) = 1.0 / ASSUMED_FPS;
+
+    // Setup initial values
+    setXEst(INIT_BALL_X);
+    setYEst(INIT_BALL_Y);
+    setXVelocityEst(INIT_BALL_X_VEL);
+    setYVelocityEst(INIT_BALL_Y_VEL);
+    setXUncert(INIT_X_UNCERT);
+    setYUncert(INIT_Y_UNCERT);
+    setXVelocityUncert(INIT_X_VEL_UNCERT);
+    setYVelocityUncert(INIT_Y_VEL_UNCERT);
 }
 
 

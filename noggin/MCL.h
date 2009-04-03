@@ -158,7 +158,7 @@ public:
     friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
         return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
     }
-
+    int frameCounter;
 };
 
 #endif // _MCL_H_DEFINED

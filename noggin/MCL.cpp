@@ -7,6 +7,7 @@
  */
 
 #include "MCL.h"
+#include "NBMath.h"
 using namespace std;
 #define MAX_CHANGE_X 5.0f
 #define MAX_CHANGE_Y 5.0f
@@ -19,7 +20,7 @@ using namespace std;
 /**
  * Initializes the sampel sets so that the first update works appropriately
  */
-MCL::MCL()
+MCL::MCL() : frameCounter(0)
 {
     // Initialize particles to be randomly spread about the field...
     srand(time(NULL));
@@ -53,6 +54,7 @@ MCL::~MCL()
  */
 void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 {
+    frameCounter++;
     // Set the current particles to be of time minus one.
     vector<Particle> X_t_1 = X_t;
     // Clar the current set
@@ -108,6 +110,13 @@ PoseEst MCL::updateMotionModel(PoseEst x_t, MotionModel u_t)
     u_t.deltaR += MAX_CHANGE_R * UNIFORM_1_NEG_1;
 
     x_t += u_t;
+
+    x_t.h = NBMath::subPIAngle(x_t.h);
+
+    // if (x_t.x < 0 || x_t.y < 0 || x_t.h < -M_PI || x_t.h > M_PI) {
+    //     cout << "Errant particle " << x_t << endl;
+    //     cout << "\tOdometry was " << u_t << endl;
+    // }
 
     return x_t;
 
@@ -359,6 +368,11 @@ Particle MCL::randomWalkParticle(Particle p)
     p.pose.x += MAX_CHANGE_X * (1.0f - p.weight)*UNIFORM_1_NEG_1;
     p.pose.y += MAX_CHANGE_Y * (1.0f - p.weight)*UNIFORM_1_NEG_1;
     p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
+
+    p.pose.h = NBMath::subPIAngle(p.pose.h);
+
+    if (p.pose.x < 0) p.pose.x = 0;
+    if (p.pose.y < 0) p.pose.y = 0;
     return p;
 }
 

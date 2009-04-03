@@ -40,7 +40,7 @@
 using namespace std;
 using namespace boost;
 using namespace NBMath;
-static const bool usePerfectLocForBall = false;
+static const bool usePerfectLocForBall = true;
 
 int main(int argc, char** argv)
 {
@@ -348,7 +348,8 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
 {
     estimate e;
     e.bearing = subPIAngle(atan2(currentBall->y - currentPose->y,
-                                 currentBall->x - currentPose->x));
+                                 currentBall->x - currentPose->x) -
+                           currentPose->h);
 
     // Calculate distance if object is within view
     if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
@@ -447,7 +448,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
     // Output standard infos
     *outputFile << team_color<< " " << player_number << " "
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "
-                << myLoc->getHEstDeg() << " "
+                << myLoc->getHEst() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncertDeg() << " "
                 // X Estimate
