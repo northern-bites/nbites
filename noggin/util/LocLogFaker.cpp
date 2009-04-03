@@ -40,7 +40,7 @@
 using namespace std;
 using namespace boost;
 using namespace NBMath;
-static const bool usePerfectLocForBall = true;
+static const bool usePerfectLocForBall = false;
 
 int main(int argc, char** argv)
 {
@@ -205,7 +205,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             visDist += sigmaD*UNIFORM_1_NEG_1;
             sigmaB = getBearingSD(visBearing);
-            visBearing += .04*UNIFORM_1_NEG_1;
+            //visBearing += .04*UNIFORM_1_NEG_1;
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -357,7 +357,7 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
         e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
-        e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
+        //e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
 
     } else {
         e.dist = 0.0f;
