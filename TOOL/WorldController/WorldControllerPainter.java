@@ -84,8 +84,8 @@ public class WorldControllerPainter implements RobotListener
     static final double  BALL_VELOCITY_DRAWING_MULTIPLIER = 1.0;
     static final int     BALL_VELOCITY_STROKE = 1;
 
-    static final double RAD_TO_DEG = 360. / (2. * Math.PI);
-    static final double DEG_TO_RAD = (2. * Math.PI) / 360.;
+    // static final double RAD_TO_DEG = 360. / (2. * Math.PI);
+    // static final double DEG_TO_RAD = (2. * Math.PI) / 360.;
 
     // Used when we are only tracking one robot.  Chosen to be a weird number
     // so that it doesen't collide with a robot's udp key
@@ -446,21 +446,17 @@ public class WorldControllerPainter implements RobotListener
                        x_uncert,
                        y_uncert);
 
-        double half_h_uncert = h_uncert/2.0;
+        //double half_h_uncert = h_uncert/2.0;
 
         // HEAD PART
         double x_line_pan_disp_plus = HEADING_UNCERT_RADIUS *
-            Math.cos(DEG_TO_RAD * (half_h_uncert +
-                                   at_heading));
+            Math.cos(h_uncert + at_heading);
         double y_line_pan_disp_plus = HEADING_UNCERT_RADIUS *
-            Math.sin(DEG_TO_RAD * (half_h_uncert +
-                                   at_heading));
+            Math.sin(h_uncert + at_heading);
         double x_line_pan_disp_minus = HEADING_UNCERT_RADIUS *
-            Math.cos(DEG_TO_RAD * (-half_h_uncert +
-                                   at_heading));
+            Math.cos(-h_uncert + at_heading);
         double y_line_pan_disp_minus = HEADING_UNCERT_RADIUS *
-            Math.sin(DEG_TO_RAD * (-half_h_uncert +
-                                   at_heading));
+            Math.sin(-h_uncert + at_heading);
 
         field.drawLine(drawing_on,
                        ESTIMATED_ROBOT_HEADING_UNCERT_COLOR,
@@ -684,8 +680,8 @@ public class WorldControllerPainter implements RobotListener
             getFirst();
         double new_angle = AngleUtilities.sub180Angle(-angle+est.
                                                       getHeadingEst());
-        double adj = Math.cos(new_angle * DEG_TO_RAD)*dist;
-        double opp = Math.sin(new_angle * DEG_TO_RAD)*dist;
+        double adj = Math.cos(new_angle)*dist;
+        double opp = Math.sin(new_angle)*dist;
 
         by_x = opp+est.getXEst();
         by_y = adj+est.getYEst();
@@ -702,8 +698,8 @@ public class WorldControllerPainter implements RobotListener
             getFirst();
         double new_angle = AngleUtilities.sub180Angle(-angle+est.
                                                       getHeadingEst());
-        double adj = Math.cos(new_angle * DEG_TO_RAD)*dist;
-        double opp = Math.sin(new_angle * DEG_TO_RAD)*dist;
+        double adj = Math.cos(new_angle)*dist;
+        double opp = Math.sin(new_angle)*dist;
 
         yb_x = opp+est.getXEst();
         yb_y = adj+est.getYEst();
@@ -949,8 +945,8 @@ public class WorldControllerPainter implements RobotListener
     public void paintEstimateMeanAndVariance(Graphics2D g2)
     {
         drawRobotsUncertainty(g2, positionEstimates[0], positionEstimates[1],
-                            positionEstimates[2], uncertaintyEstimates[0],
-                            uncertaintyEstimates[1], uncertaintyEstimates[2]);
+                              positionEstimates[2], uncertaintyEstimates[0],
+                              uncertaintyEstimates[1], uncertaintyEstimates[2]);
     }
 
     /**

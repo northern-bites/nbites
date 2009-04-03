@@ -369,16 +369,14 @@ public class WorldController extends JPanel implements KeyListener,
             log.quitMCLLog();
             startDoNothing();
         } else if (cmd.equals(RELOAD_MCL_LOG_ACTION)) {
-            startMCLLog();
-            System.out.println("RELOADED MCL LOG");
+            reloadMCLLog();
         } else if (cmd.equals(VIEW_MCL_LOG_ACTION)) {
             startMCLLog();
         } else if (cmd.equals(QUIT_EKF_LOG_ACTION)) {
             log.quitMCLLog();
             startDoNothing();
         } else if (cmd.equals(RELOAD_EKF_LOG_ACTION)) {
-            startEKFLog();
-            System.out.println("RELOADED EKF LOG");
+            reloadEKFLog();
         } else if (cmd.equals(VIEW_EKF_LOG_ACTION)) {
             startEKFLog();
         } else if (cmd.equals(VIEW_UDP_PACKETS_ACTION)) {
@@ -629,6 +627,29 @@ public class WorldController extends JPanel implements KeyListener,
         }
         nothingButtons();
         ekfLogButtons();
+    }
+
+    /**
+     * Method to test the output system of the mcl...
+     */
+    public void reloadMCLLog()
+    {
+        if(!log.reloadLog()) {
+            mode = DO_NOTHING;
+            nothingButtons();
+            return;
+        }
+    }
+    /**
+     * Method to test the output system of the mcl...
+     */
+    public void reloadEKFLog()
+    {
+        if(!log.reloadLog()) {
+            mode = DO_NOTHING;
+            nothingButtons();
+            return;
+        }
     }
 
 }

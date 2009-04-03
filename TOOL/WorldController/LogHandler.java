@@ -213,6 +213,22 @@ public class LogHandler
     }
 
 
+    public boolean reloadLog()
+    {
+        System.out.println("Attempting to reload log file");
+        if(loadLog(logFile) ) {
+            logBox.slide.setMaximum(log_num_frames);
+            logBox.setVisible(true);
+            debugViewer.setVisible(true);
+            logStartFrame();
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
     // Begin Monte Carlo stuff, hopefully this will be nicer than the things
     // Which are above and kind of suck.
     /**
