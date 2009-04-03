@@ -36,7 +36,6 @@
 #include "LocLogFaker.h"
 #include "NBMath.h"
 #define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
-#define USE_PERFECT_LOC_FOR_BALL
 using namespace std;
 using namespace boost;
 using namespace NBMath;
@@ -245,9 +244,8 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
-            visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
+            visDist += UNIFORM_1_NEG_1*0.05*visDist;
             sigmaB = getBearingSD(visBearing);
-            //visBearing += (M_PI / 2.0f);
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Ignore the center circle for right now
@@ -356,7 +354,7 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
+        //e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
         //e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
 
     } else {

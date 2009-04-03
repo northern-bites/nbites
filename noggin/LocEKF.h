@@ -166,6 +166,6 @@ private:
     const static float Y_EST_MIN;
     const static float X_EST_MAX;
     const static float Y_EST_MAX;
-    int frameNumber;
+    bool useCartesian;
 };
 #endif // File
