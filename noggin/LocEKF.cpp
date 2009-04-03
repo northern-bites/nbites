@@ -44,7 +44,7 @@ const float LocEKF::Y_EST_MAX = 1000.0f;
 LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
-          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), useCartesian(true)
+          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -122,81 +122,41 @@ void LocEKF::incorporateMeasurement(Observation z,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)
 {
-    if (useCartesian) {
-        // Convert our sighting to cartesian coordinates
-        float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
-        float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
-        MeasurementVector z_x(2);
+    // Convert our sighting to cartesian coordinates
+    float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
+    float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
+    MeasurementVector z_x(2);
 
-        z_x(0) = x_b_r;
-        z_x(1) = y_b_r;
+    z_x(0) = x_b_r;
+    z_x(1) = y_b_r;
 
+    // Get expected values of the post
+    float x_b = z.getPointPossibilities()[0].x;
+    float y_b = z.getPointPossibilities()[0].y;
+    MeasurementVector d_x(2);
 
-        // Get expected values of ball
-        float x_b = z.getPointPossibilities()[0].x;
-        float y_b = z.getPointPossibilities()[0].y;
-        MeasurementVector d_x(2);
+    float x = getXEst();
+    float y = getYEst();
+    float h = getHEst();
 
-        float x = getXEst();
-        float y = getYEst();
-        float h = getHEst();
+    d_x(0) = (x_b - x) * cos(h) + (y_b - y) * sin(h);
+    d_x(1) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
 
-        d_x(0) = (x_b - x) * cos(h) + (y_b - y) * sin(h);
-        d_x(1) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
+    // Calculate invariance
+    V_k = z_x - d_x;
 
-        // Calculate invariance
-        V_k = z_x - d_x;
+    // Calculate jacobians
+    H_k(0,0) = -cos(h);
+    H_k(0,1) = -sin(h);
+    H_k(0,2) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
 
-        // Calculate jacobians
-        H_k(0,0) = -cos(h);
-        H_k(0,1) = -sin(h);
-        H_k(0,2) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
+    H_k(1,0) = sin(h);
+    H_k(1,1) = -cos(h);
+    H_k(1,2) = -(x_b - x) * cos(h) - (y_b - y) * sin(h);
 
-        H_k(1,0) = sin(h);
-        H_k(1,1) = -cos(h);
-        H_k(1,2) = -(x_b - x) * cos(h) - (y_b - y) * sin(h);
-
-        // Update the measurement covariance matrix
-        R_k(0,0) = 2.0f*z.getDistanceSD();
-        R_k(1,1) = 2.0f*z.getDistanceSD();
-    } else {
-        // Convert our sighting to cartesian coordinates
-        float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
-        float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
-        MeasurementVector z_x(2);
-
-        z_x(0) = x_b_r;
-        z_x(1) = y_b_r;
-
-
-        // Get expected values of ball
-        float x_b = z.getPointPossibilities()[0].x;
-        float y_b = z.getPointPossibilities()[0].y;
-        MeasurementVector d_x(2);
-
-        float x = getXEst();
-        float y = getYEst();
-        float h = getHEst();
-
-        d_x(0) = (x_b - x) * cos(h) + (y_b - y) * sin(h);
-        d_x(1) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
-
-        // Calculate invariance
-        V_k = z_x - d_x;
-
-        // Calculate jacobians
-        H_k(0,0) = -cos(h);
-        H_k(0,1) = -sin(h);
-        H_k(0,2) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
-
-        H_k(1,0) = sin(h);
-        H_k(1,1) = -cos(h);
-        H_k(1,2) = -(x_b - x) * cos(h) - (y_b - y) * sin(h);
-
-        // Update the measurement covariance matrix
-        R_k(0,0) = 2.0f*z.getDistanceSD();
-        R_k(1,1) = 2.0f*z.getDistanceSD();
-    }
+    // Update the measurement covariance matrix
+    R_k(0,0) = 2.0f*z.getDistanceSD();
+    R_k(1,1) = 2.0f*z.getDistanceSD();
 }
 
 /**
