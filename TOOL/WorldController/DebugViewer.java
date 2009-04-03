@@ -22,6 +22,8 @@ public class DebugViewer extends JFrame {
     public static final String FRAME_STRING = "Frame:";
     public static final String OUT_OF_STRING = "of";
     public static final String
+        KNOWN_POSITIONS_STRING = "-----KNOWN POSITIONS-----";
+    public static final String
         MY_ESTIMATES_STRING = "-----MY LOC ESTIMATES-----";
     public static final String
         BALL_ESTIMATES_STRING = "-----BALL ESTIMATES-----";
@@ -155,6 +157,8 @@ public class DebugViewer extends JFrame {
     private JPanel framePanel;
 
     // master label panel declarations
+    private JLabel knownPositionLabel;
+    private JPanel knownPositionPanel;
     private JLabel myEstimatesLabel;
     private JPanel myEstimatesPanel;
     private JLabel ballEstimatesLabel;
@@ -163,6 +167,18 @@ public class DebugViewer extends JFrame {
     private JPanel landmarksPanel;
     private JLabel landmarkStuffLabel;
     private JPanel landmarkStuffPanel;
+
+    // known values
+    private JLabel knownXYHLabel;
+    public JLabel knownX;
+    public JLabel knownY;
+    public JLabel knownH;
+    private JPanel knownXYHPanel;
+    public JLabel knownBallXLabel;
+    public JLabel knownBallYLabel;
+    public JLabel knownBallX;
+    public JLabel knownBallY;
+    private JPanel knownBallXYPanel;
 
     // my values
     private JLabel myXYHLabel;
@@ -258,6 +274,14 @@ public class DebugViewer extends JFrame {
         framePanel.add(frameLabel2);
         framePanel.add(frameTotal);
 
+        // known stuff
+        knownPositionLabel = new JLabel(KNOWN_POSITIONS_STRING, JLabel.CENTER);
+        knownPositionPanel = new JPanel();
+        knownPositionPanel.add(knownPositionLabel);
+        knownPositionPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
+
         // estimates label
         myEstimatesLabel = new JLabel(MY_ESTIMATES_STRING, JLabel.CENTER);
         myEstimatesPanel = new JPanel();
@@ -288,6 +312,7 @@ public class DebugViewer extends JFrame {
         landmarkStuffPanel.
             setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
                                            LOC_PANEL_ENTRY_HEIGHT));
+
 
         // my estimates
         myXYHLabel = new JLabel(MY_XYH_STRING, JLabel.CENTER);
@@ -393,11 +418,40 @@ public class DebugViewer extends JFrame {
                                            LOC_PANEL_ENTRY_HEIGHT));
 
 
+        // known positions
+        knownXYHLabel = new JLabel(MY_XYH_STRING, JLabel.CENTER);
+        knownX = new JLabel("0", JLabel.CENTER);
+        knownY = new JLabel("0", JLabel.CENTER);
+        knownH = new JLabel("0", JLabel.CENTER);
+        knownXYHPanel = new JPanel();
+        knownXYHPanel.add(knownXYHLabel);
+        knownXYHPanel.add(knownX);
+        knownXYHPanel.add(knownY);
+        knownXYHPanel.add(knownH);
+        knownXYHPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
+        knownBallX = new JLabel("0", JLabel.CENTER);
+        knownBallY = new JLabel("0", JLabel.CENTER);
+        knownBallXLabel = new JLabel(BALL_X_STRING, JLabel.CENTER);
+        knownBallYLabel = new JLabel(BALL_Y_STRING, JLabel.CENTER);
+        knownBallXYPanel = new JPanel();
+        knownBallXYPanel.add(knownBallXLabel);
+        knownBallXYPanel.add(knownBallX);
+        knownBallXYPanel.add(knownBallYLabel);
+        knownBallXYPanel.add(knownBallY);
+        knownBallXYPanel.
+            setPreferredSize(new Dimension(LOC_PANEL_ENTRY_WIDTH,
+                                           LOC_PANEL_ENTRY_HEIGHT));
+
         // CALIBRATE BUTTONS LAYOUT
 
         locPanel = new JPanel();
 
         locPanel.add(framePanel);
+        locPanel.add(knownPositionPanel);
+        locPanel.add(knownXYHPanel);
+        locPanel.add(knownBallXYPanel);
         locPanel.add(myEstimatesPanel);
         locPanel.add(myXYHPanel);
         locPanel.add(myUncertXYHPanel);
@@ -643,7 +697,7 @@ public class DebugViewer extends JFrame {
         return num_landmarks;
     }
 
-    public void addLandmark(int id, double dist, double bearing) {
+    public void addLandmark(int id, float dist, float bearing) {
         if ( !objectIDMap.containsKey(new Integer(id)) &&
              !cornerIDMap.containsKey(new Integer(id)) &&
              id != BALL_ID) {

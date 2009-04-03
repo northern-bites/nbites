@@ -114,7 +114,7 @@ public class WorldControllerPainter implements RobotListener
     private double by_x,by_y;
     private double yb_x,yb_y;
 
-    private int[][] seenLandmarks = new int[30][3];
+    private float[][] seenLandmarks = new float[30][3];
     private int numSeenLandmarks;
     private static final int X_INDEX = 0;
     private static final int Y_INDEX = 1;
@@ -213,11 +213,11 @@ public class WorldControllerPainter implements RobotListener
     protected void paintLandmarks(Graphics2D g2)
     {
         for (int i = 0; i < numSeenLandmarks; i++) {
-            int x = seenLandmarks[i][X_INDEX];
-            int y = seenLandmarks[i][Y_INDEX];
+            float x = seenLandmarks[i][X_INDEX];
+            float y = seenLandmarks[i][Y_INDEX];
 
             // Determine if it is ambiguous or not
-            switch(seenLandmarks[i][DISTINCT_INDEX]) {
+            switch((int)seenLandmarks[i][DISTINCT_INDEX]) {
             case 0:
                 // Pass off the work to another helper method
                 drawSeenLandmark(g2, x, y);
@@ -450,17 +450,13 @@ public class WorldControllerPainter implements RobotListener
 
         // HEAD PART
         double x_line_pan_disp_plus = HEADING_UNCERT_RADIUS *
-            Math.cos(DEG_TO_RAD * (half_h_uncert +
-                                   at_heading));
+            Math.cos((half_h_uncert + at_heading));
         double y_line_pan_disp_plus = HEADING_UNCERT_RADIUS *
-            Math.sin(DEG_TO_RAD * (half_h_uncert +
-                                   at_heading));
+            Math.sin((half_h_uncert + at_heading));
         double x_line_pan_disp_minus = HEADING_UNCERT_RADIUS *
-            Math.cos(DEG_TO_RAD * (-half_h_uncert +
-                                   at_heading));
+            Math.cos( (-half_h_uncert + at_heading));
         double y_line_pan_disp_minus = HEADING_UNCERT_RADIUS *
-            Math.sin(DEG_TO_RAD * (-half_h_uncert +
-                                   at_heading));
+            Math.sin( (-half_h_uncert + at_heading));
 
         field.drawLine(drawing_on,
                        ESTIMATED_ROBOT_HEADING_UNCERT_COLOR,
@@ -540,16 +536,16 @@ public class WorldControllerPainter implements RobotListener
                        at_x, at_y, x_uncert, y_uncert);
     }
 
-    public void drawSeenLandmark(Graphics2D drawing_on, int x, int y)
+    public void drawSeenLandmark(Graphics2D drawing_on, float x, float y)
     {
         field.drawOval(drawing_on, Color.black, 1, x, y, 10, 10);
     }
 
-    public void drawAmbiguousLandmark(Graphics2D drawing_on, int x, int y)
+    public void drawAmbiguousLandmark(Graphics2D drawing_on, float x, float y)
     {
         drawAmbiguousLandmark(drawing_on, x, y, Color.red);
     }
-    public void drawAmbiguousLandmark(Graphics2D drawing_on, int x, int y,
+    public void drawAmbiguousLandmark(Graphics2D drawing_on, float x, float y,
                                       Color col)
     {
         field.drawOval(drawing_on, col, 1, x, y, 10, 10);
@@ -660,11 +656,11 @@ public class WorldControllerPainter implements RobotListener
     }
 
     // 0 true, 1 false
-    public void sawLandmark(int x, int y, int distinct)
+    public void sawLandmark(float x, float y, int distinct)
     {
-        seenLandmarks[numSeenLandmarks][0] = x;
-        seenLandmarks[numSeenLandmarks][1] = y;
-        seenLandmarks[numSeenLandmarks][2] = distinct;
+        seenLandmarks[numSeenLandmarks][X_INDEX] = x;
+        seenLandmarks[numSeenLandmarks][Y_INDEX] = y;
+        seenLandmarks[numSeenLandmarks][DISTINCT_INDEX] = distinct;
         numSeenLandmarks++;
     }
 

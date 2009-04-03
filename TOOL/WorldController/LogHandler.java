@@ -521,10 +521,15 @@ public class LogHandler
         float x, y, h, ballX, ballY, ballVelX, ballVelY;
         String[] infos = realPoseInfo.split(" ");
         x = Float.parseFloat(infos[0]);
+        debugViewer.knownX.setText(infos[0]);
         y = Float.parseFloat(infos[1]);
+        debugViewer.knownY.setText(infos[1]);
         h = Float.parseFloat(infos[2]);
+        debugViewer.knownH.setText(infos[2]);
         ballX = Float.parseFloat(infos[3]);
+        debugViewer.knownBallX.setText(infos[3]);
         ballY = Float.parseFloat(infos[4]);
+        debugViewer.knownBallY.setText(infos[4]);
         ballVelX = Float.parseFloat(infos[5]);
         ballVelY = Float.parseFloat(infos[6]);
         painter.updateRealPoseInfo(x, y, h);
@@ -544,15 +549,15 @@ public class LogHandler
         // Determine the type of landmark and draw it
         // We have a distinct landmark
         if (debugViewer.isDistinctLandmarkID(ID)) {
-            painter.sawLandmark((int)debugViewer.objectIDMap.get(ID).x,
-                                (int)debugViewer.objectIDMap.get(ID).y,
+            painter.sawLandmark((float)debugViewer.objectIDMap.get(ID).x,
+                                (float)debugViewer.objectIDMap.get(ID).y,
                                 0);
         } else if (ID != debugViewer.BALL_ID) { // We have an ambigious landmark
             // get the list of possible landmarks
             ++ambiguousLandmarkCount;
             for (int pos_id : getPossibleIDs(ID)) {
-                painter.sawLandmark((int)debugViewer.objectIDMap.get(pos_id).x,
-                                    (int)debugViewer.objectIDMap.get(pos_id).y,
+                painter.sawLandmark((float)debugViewer.objectIDMap.get(pos_id).x,
+                                    (float)debugViewer.objectIDMap.get(pos_id).y,
                                     ambiguousLandmarkCount);
             }
         } else { // We Have a ball ignore...
