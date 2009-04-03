@@ -141,6 +141,9 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+    void limitAPrioriUncert();
+    void limitPosteriorUncert();
+
     // Parameters
     const static float BETA_LOC;
     const static float GAMMA_LOC;

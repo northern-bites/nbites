@@ -70,6 +70,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
     // Update expected position based on odometry
     timeUpdate(u);
+    limitAPrioriUncert();
 
     // Correct step based on the observed stuff
     if (Z.size() > 0) {
@@ -77,6 +78,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     } else {
         noCorrectionStep();
     }
+    limitPosteriorUncert();
 }
 
 /**
@@ -194,5 +196,73 @@ void LocEKF::incorporateMeasurement(Observation z,
         // Update the measurement covariance matrix
         R_k(0,0) = 2.0f*z.getDistanceSD();
         R_k(1,1) = 2.0f*z.getDistanceSD();
+    }
+}
+
+/**
+ * Method to ensure that uncertainty does not grow without bound
+ */
+void LocEKF::limitAPrioriUncert()
+{
+    // Check x uncertainty
+    if(P_k_bar(0,0) < X_UNCERT_MIN) {
+        P_k_bar(0,0) = X_UNCERT_MIN;
+    }
+    // Check y uncertainty
+    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
+        P_k_bar(1,1) = Y_UNCERT_MIN;
+    }
+    // Check h uncertainty
+    if(P_k_bar(2,2) < H_UNCERT_MIN) {
+        P_k_bar(2,2) = H_UNCERT_MIN;
+    }
+    // Check x uncertainty
+    if(P_k_bar(0,0) > X_UNCERT_MAX) {
+        P_k_bar(0,0) = X_UNCERT_MAX;
+    }
+    // Check y uncertainty
+    if(P_k_bar(1,1) > Y_UNCERT_MAX) {
+        P_k_bar(1,1) = Y_UNCERT_MAX;
+    }
+    // Check h uncertainty
+    if(P_k_bar(2,2) > H_UNCERT_MAX) {
+        P_k_bar(2,2) = H_UNCERT_MAX;
+    }
+}
+
+/**
+ * Method to ensure that uncertainty does not grow or shrink without bound
+ */
+void LocEKF::limitPosteriorUncert()
+{
+    // Check x uncertainty
+    if(P_k(0,0) < X_UNCERT_MIN) {
+        P_k(0,0) = X_UNCERT_MIN;
+        P_k_bar(0,0) = X_UNCERT_MIN;
+    }
+    // Check y uncertainty
+    if(P_k(1,1) < Y_UNCERT_MIN) {
+        P_k(1,1) = Y_UNCERT_MIN;
+        P_k_bar(1,1) = Y_UNCERT_MIN;
+    }
+    // Check h uncertainty
+    if(P_k(2,2) < H_UNCERT_MIN) {
+        P_k(2,2) = H_UNCERT_MIN;
+        P_k_bar(2,2) = H_UNCERT_MIN;
+    }
+    // Check x uncertainty
+    if(P_k(0,0) > X_UNCERT_MAX) {
+        P_k(0,0) = X_UNCERT_MAX;
+        P_k_bar(0,0) = X_UNCERT_MAX;
+    }
+    // Check y uncertainty
+    if(P_k(1,1) > Y_UNCERT_MAX) {
+        P_k(1,1) = Y_UNCERT_MAX;
+        P_k_bar(1,1) = Y_UNCERT_MAX;
+    }
+    // Check h uncertainty
+    if(P_k(2,2) > H_UNCERT_MAX) {
+        P_k(2,2) = H_UNCERT_MAX;
+        P_k_bar(2,2) = H_UNCERT_MAX;
     }
 }
