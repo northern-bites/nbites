@@ -265,6 +265,18 @@ public class LogHandler
      */
     public boolean loadLog(String logFile)
     {
+
+        painter.updateParticleSet(new Vector<MCLParticle>(), team_color,
+                                  player_number);
+        // Clear the uncertainty ellipses
+        painter.updateUncertainytInfo(0,0,0,0,0,0);
+        painter.updateEstPoseInfo(painter.NO_DATA_VALUE,painter.NO_DATA_VALUE,
+                                        painter.NO_DATA_VALUE);
+        painter.updateRealPoseInfo(painter.NO_DATA_VALUE, painter.NO_DATA_VALUE,
+                                   painter.NO_DATA_VALUE);
+        painter.updateRealBallInfo(painter.NO_DATA_VALUE,painter.NO_DATA_VALUE,
+                                   painter.NO_DATA_VALUE,painter.NO_DATA_VALUE);
+
         BufferedReader dataIn = null;
         if( wc.getMode() == wc.VIEW_MCL_LOG) {
             System.out.println("Loading MCL log file: " + logFile + "... ");
