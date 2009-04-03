@@ -205,18 +205,18 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
         float y_b = getYEst();
         MeasurementVector d_x(2);
 
-        d_x(0) = (x_b - robotPose.x)*cos(-robotPose.h) -
-            (y_b - robotPose.y)*sin(-robotPose.h);
-        d_x(1) = (x_b - robotPose.x)*sin(-robotPose.h) +
-            (y_b - robotPose.y)*cos(-robotPose.h);
+        d_x(0) = ((x_b - robotPose.x) * cos(robotPose.h) +
+                  (y_b - robotPose.y) * sin(robotPose.h));
+        d_x(1) = (-(x_b - robotPose.x) * sin(robotPose.h) +
+                  (y_b - robotPose.y) * cos(robotPose.h));
 
         // Calculate invariance
         V_k = z_x - d_x;
 
         // Calculate jacobians
         H_k(0,0) = cos(robotPose.h);
-        H_k(0,1) = -sin(robotPose.h);
-        H_k(1,0) = sin(robotPose.h);
+        H_k(0,1) = sin(robotPose.h);
+        H_k(1,0) = -sin(robotPose.h);
         H_k(1,1) = cos(robotPose.h);
 
         // Update the measurement covariance matrix

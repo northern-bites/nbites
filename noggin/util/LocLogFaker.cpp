@@ -448,7 +448,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "
                 << myLoc->getHEst() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
-                << myLoc->getHUncertDeg() << " "
+                << myLoc->getHUncert() << " "
                 // X Estimate
                 << (ballEKF->getXEst()) << " "
                 // Y Estimate

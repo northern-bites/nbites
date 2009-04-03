@@ -105,21 +105,19 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
  */
 PoseEst MCL::updateMotionModel(PoseEst x_t, MotionModel u_t)
 {
-    u_t.deltaF += MAX_CHANGE_F * UNIFORM_1_NEG_1;
-    u_t.deltaL += MAX_CHANGE_L * UNIFORM_1_NEG_1;
-    u_t.deltaR += MAX_CHANGE_R * UNIFORM_1_NEG_1;
+    float ALPHA_F = 0.5;
+    float ALPHA_L = 0.5;
+    float ALPHA_R = 0.2;
+
+    // u_t.deltaF += sampleNormalDistribution(fabs(u_t.deltaF));
+    // u_t.deltaL += sampleNormalDistribution(fabs(u_t.deltaL));
+    // u_t.deltaR += sampleNormalDistribution(fabs(u_t.deltaR));
 
     x_t += u_t;
 
-    //x_t.h = NBMath::subPIAngle(x_t.h);
-
-    // if (x_t.x < 0 || x_t.y < 0 || x_t.h < -M_PI || x_t.h > M_PI) {
-    //     cout << "Errant particle " << x_t << endl;
-    //     cout << "\tOdometry was " << u_t << endl;
-    // }
+    x_t.h = NBMath::subPIAngle(x_t.h);
 
     return x_t;
-
 }
 
 /**
@@ -199,6 +197,8 @@ void MCL::updateEstimates()
     wMeans.x /= weightSum;
     wMeans.y /= weightSum;
     wMeans.h /= weightSum;
+
+    wMeans.h = NBMath::subPIAngle(wMeans.h);
 
     // Calculate the biased variances
     for (unsigned int i=0; i < X_t.size(); ++i) {
@@ -369,7 +369,7 @@ Particle MCL::randomWalkParticle(Particle p)
     p.pose.y += MAX_CHANGE_Y * (1.0f - p.weight)*UNIFORM_1_NEG_1;
     p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
 
-    //p.pose.h = NBMath::subPIAngle(p.pose.h);
+    p.pose.h = NBMath::subPIAngle(p.pose.h);
 
     if (p.pose.x < 0) p.pose.x = 0;
     if (p.pose.y < 0) p.pose.y = 0;
