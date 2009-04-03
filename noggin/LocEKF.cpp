@@ -99,6 +99,9 @@ LocEKF::associateTimeUpdate(MotionModel u)
     deltaLoc(1) = u.deltaF * sin(h) + u.deltaL * cos(h);
     deltaLoc(2) = u.deltaR;
 
+    A_k(0,2) =  -u.deltaF * sin(h) - u.deltaL * cos(h);
+    A_k(1,2) =  u.deltaF * sin(h) - u.deltaL * cos(h);
+
     return deltaLoc;
 }
 
