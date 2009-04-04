@@ -833,6 +833,8 @@ vector<float> StepGenerator::getOdometryUpdate(){
              start_pos_c_new);
     const ufvector3 movement_c = start_pos_c_old - start_pos_c_new_in_old;
 
+    //NOT SURE THIS WORKS: TODO: TEST this out, since I think its broke
+
     ic_Transform = new_ic_Transform; //save the new coordinate frame for later
 
     //populate the vector. Note the units are mm and rad
