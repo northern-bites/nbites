@@ -1054,11 +1054,15 @@ public class Calibrate implements DataListener, MouseListener,
         thresholdedImage = visionState.getThreshImage();//sync the thresholded images
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
-        System.out.println("Calling update() from notify frame");
-        if (drawThreshColors) {
-            visionState.update();
-        }
+
         colorTable = visionState.getColorTable();
+
+        if (drawThreshColors) {
+            System.out.println("Calling threshImage() from notify frame");
+            //visionState.update();
+            thresholdedImage.thresholdImage(colorTable, rawImage);
+        }
+
 
         // Since we now handle different sized frames, it's possible to
         // switch between modes, changing the image's size without updating

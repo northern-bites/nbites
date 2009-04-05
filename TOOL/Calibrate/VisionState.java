@@ -116,7 +116,6 @@ public class VisionState {
         //loop through the objects
     	for (int i = 0; i < visualFieldObjects.size(); i++) {
             obj = visualFieldObjects.elementAt(i);
-            System.out.println(obj.getWidth());
             if (obj.getWidth() > 0){
                 //choose a color
                 byte color;
@@ -137,7 +136,7 @@ public class VisionState {
                 default: color = Vision.BLACK; break;
                 }
                 //draw the box
-                System.out.println("drawBox");
+                System.out.println("Drawing a bounding box");
                 thresholdedOverlay.drawPolygon(obj.getLeftTopX(), obj.getRightTopX(),
                                                obj.getRightBottomX(), obj.getLeftBottomX(),
                                                obj.getLeftTopY(), obj.getRightTopY(),
