@@ -82,6 +82,7 @@ class Brain(object):
         # Functional Variables
         self.my.teamNumber = self.comm.gc.team
         self.my.playerNumber = self.comm.gc.player
+        self.ownPlayers = [[0]*13]*4
 
     def initFieldObjects(self):
         """
@@ -232,8 +233,13 @@ class Brain(object):
                                 (i+1, self.lines[i].__str__(),))
 
     def updateComm(self):
-        #self.out.printf(self.comm.latestComm())
-        pass
+        temp = self.comm.latestComm()
+        self.out.printf(temp)
+        if len(temp) > 0:
+            p = temp[0][3:len(temp[0])]
+            n = int(temp[0][1])
+            self.ownPlayers[n] = p
+            self.out.printf(self.ownPlayers)        
 
     def updateLocalization(self):
         """
@@ -245,8 +251,8 @@ class Brain(object):
 
     # move to comm
     def setPacketData(self):
-        # currently, teamNumber and playerNumber MUST be the first two values
-        # passed to comm, whereas all the rest are Python-controlled.
+        # currently, teamNumber, playerNumber, team color MUST be the first two
+        # values passed to comm, whereas all the rest are Python-controlled.
         # eventually, all game-controller set info should be handled by Comm
         # alone, and extra Python stuff put in here
         self.comm.setData(self.loc.x,
