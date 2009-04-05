@@ -192,20 +192,18 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
                                      MeasurementVector &V_k)
 {
     // Convert our sighting to cartesian coordinates
-    float x_b_r = z.distance * cos(z.bearing);
-    float y_b_r = z.distance * sin(z.bearing);
+    const float x_b_r = z.distance * cos(z.bearing);
+    const float y_b_r = z.distance * sin(z.bearing);
     MeasurementVector z_x(2);
 
     z_x(0) = x_b_r;
     z_x(1) = y_b_r;
 
     // Get expected values of ball
-    float x_b = getXEst();
-    float y_b = getYEst();
-    float sinh, cosh;
-    //sincos(&cosh, &sinh, h);
-    sinh = sin(robotPose.h);
-    cosh = cos(robotPose.h);
+    const float x_b = getXEst();
+    const float y_b = getYEst();
+    const float sinh, cosh;
+    sincosf(robotPose.h, &sinh, &cosh);
 
     MeasurementVector d_x(2);
 

@@ -96,11 +96,10 @@ LocEKF::associateTimeUpdate(MotionModel u)
     // Calculate the assumed change in loc position
     // Assume no decrease in loc velocity
     StateVector deltaLoc(LOC_EKF_DIMENSION);
-    float h = getHEst();
-    float sinh, cosh;
-    //sincos(&cosh, &sinh, h);
-    sinh = sin(h);
-    cosh = cos(h);
+    const float h = getHEst();
+    const float sinh, cosh;
+    sincosf(h, &sinh, &cosh);
+
     deltaLoc(0) = u.deltaF * cosh - u.deltaL * sinh;
     deltaLoc(1) = u.deltaF * sinh + u.deltaL * cosh;
     deltaLoc(2) = u.deltaR;
@@ -135,17 +134,15 @@ void LocEKF::incorporateMeasurement(Observation z,
     z_x(1) = y_b_r;
 
     // Get expected values of the post
-    float x_b = z.getPointPossibilities()[0].x;
-    float y_b = z.getPointPossibilities()[0].y;
+    const float x_b = z.getPointPossibilities()[0].x;
+    const float y_b = z.getPointPossibilities()[0].y;
     MeasurementVector d_x(2);
 
-    float x = getXEst();
-    float y = getYEst();
-    float h = getHEst();
-    float sinh, cosh;
-    //sincos(&cosh, &sinh, h);
-    sinh = sin(h);
-    cosh = cos(h);
+    const float x = getXEst();
+    const float y = getYEst();
+    const float h = getHEst();
+    const float sinh, cosh;
+    sincosf(h, &sinh, &cosh);
 
     d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
     d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
