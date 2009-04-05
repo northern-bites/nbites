@@ -31,8 +31,8 @@ public class VisionState {
     public final static byte BALL_BOX_COLOR = Vision.RED;
 
     public final static byte VISUAL_OBJECT_THICKNESS = 2;
-    public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.ORANGEYELLOW;
-    public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.ORANGERED;
+    public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.BLUEGREEN;
+    public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.RED;
     public final static byte GOAL_POST_BOX_COLOR = Vision.PINK;
 
     public final static byte BLUE_GOAL_BACKSTOP_COLOR = Vision.WHITE;
