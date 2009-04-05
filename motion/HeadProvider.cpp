@@ -34,7 +34,7 @@ HeadProvider::HeadProvider(float motionFrameLength, shared_ptr<Sensors> s)
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),
       nextJoints(),
-	  headQueue(HEAD_CHAIN),
+	  currCommand(new ChoppedCommand() ),
 	  headCommandQueue()
 {
     pthread_mutex_init (&scripted_mode_mutex, NULL);
@@ -116,12 +116,11 @@ void HeadProvider::setMode(){
 }
 
 void HeadProvider::scriptedMode(){
-    if ( headQueue.empty() )
+    if ( currCommand->isDone() )
         setNextHeadCommand();
 
-    if (!headQueue.empty() ) {
-        setNextChainJoints( HEAD_CHAIN, headQueue.front() );
-        headQueue.pop();
+    if (!currCommand->isDone() ) {
+        setNextChainJoints( HEAD_CHAIN, currCommand->getNextJoints(HEAD_CHAIN) );
     }
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
@@ -157,16 +156,9 @@ void HeadProvider::setNextHeadCommand() {
 
 	if ( !headCommandQueue.empty() ) {
 		const HeadJointCommand *command = headCommandQueue.front();
-		ChoppedCommand * choppedHeadCommand =
-			chopper.chopCommand(command);
+		currCommand = chopper.chopCommand(command);
 		headCommandQueue.pop();
-        assert(command);
 
-		while (!choppedHeadCommand->isDone()) {
-			// Push commands onto head queue
-			headQueue.push(choppedHeadCommand->getNextJoints(HEAD_CHAIN));
-		}
-		delete choppedHeadCommand;
 	}
 
 }
@@ -189,7 +181,7 @@ void HeadProvider::setActive(){
 
 bool HeadProvider::isDone(){
     const bool setDone = (yawDest == lastYawDest) && (pitchDest == lastPitchDest);
-    const bool scriptedDone = headQueue.empty()  && headCommandQueue.empty();
+    const bool scriptedDone = currCommand->isDone()  && headCommandQueue.empty();
     switch(curMode){
     case SET:
         return setDone;
@@ -202,8 +194,8 @@ bool HeadProvider::isDone(){
     }
 }
 void HeadProvider::stopScripted(){
-    //clear anything in the queues
-    headQueue.clear();
+
+
     while(!headCommandQueue.empty()){
         const HeadJointCommand * cmd = headCommandQueue.front();
         delete cmd;

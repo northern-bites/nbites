@@ -25,9 +25,6 @@
 #include "EKF.h"
 #include "EKFStructs.h"
 
-static const int ZMP_NUM_DIMENSIONS = 2;
-static const int ZMP_NUM_MEASUREMENTS = 2;
-
 class ZmpEKF : public EKF<ZmpMeasurement, ZmpTimeUpdate, ZMP_NUM_DIMENSIONS,
                           ZMP_NUM_MEASUREMENTS>
 {

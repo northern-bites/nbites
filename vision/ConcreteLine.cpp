@@ -60,44 +60,44 @@ center_field_line(FIELD_WHITE_LEFT_SIDELINE_X,
                   CENTER_FIELD_LINE);
 
 const ConcreteLine ConcreteLine::
-blue_goalbox_top_line(GOALBOX_LEFT_X,
-                      MY_GOALBOX_TOP_Y,
-                      GOALBOX_RIGHT_X,
-                      MY_GOALBOX_TOP_Y,
+blue_goalbox_top_line(BLUE_GOALBOX_LEFT_X,
+                      BLUE_GOALBOX_TOP_Y,
+                      BLUE_GOALBOX_RIGHT_X,
+                      BLUE_GOALBOX_TOP_Y,
                       BLUE_GOALBOX_TOP_LINE);
 
 const ConcreteLine ConcreteLine::
-blue_goalbox_left_line(GOALBOX_LEFT_X,
+blue_goalbox_left_line(BLUE_GOALBOX_LEFT_X,
                        FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                       GOALBOX_LEFT_X,
-                       MY_GOALBOX_TOP_Y,
+                       BLUE_GOALBOX_LEFT_X,
+                       BLUE_GOALBOX_TOP_Y,
                        BLUE_GOALBOX_LEFT_LINE);
 
 const ConcreteLine ConcreteLine::
-blue_goalbox_right_line(GOALBOX_RIGHT_X,
+blue_goalbox_right_line(BLUE_GOALBOX_RIGHT_X,
                         FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                        GOALBOX_RIGHT_X,
-                        MY_GOALBOX_TOP_Y,
+                        BLUE_GOALBOX_RIGHT_X,
+                        BLUE_GOALBOX_TOP_Y,
                         BLUE_GOALBOX_RIGHT_LINE);
 
 const ConcreteLine ConcreteLine::
-yellow_goalbox_top_line(GOALBOX_LEFT_X,
-                        OPP_GOALBOX_BOTTOM_Y,
-                        GOALBOX_RIGHT_X,
-                        OPP_GOALBOX_BOTTOM_Y,
+yellow_goalbox_top_line(YELLOW_GOALBOX_LEFT_X,
+                        YELLOW_GOALBOX_BOTTOM_Y,
+                        YELLOW_GOALBOX_RIGHT_X,
+                        YELLOW_GOALBOX_BOTTOM_Y,
                         YELLOW_GOALBOX_TOP_LINE);
 
 const ConcreteLine ConcreteLine::
-yellow_goalbox_left_line(GOALBOX_LEFT_X,
-                         OPP_GOALBOX_BOTTOM_Y,
-                         GOALBOX_LEFT_X,
+yellow_goalbox_left_line(YELLOW_GOALBOX_LEFT_X,
+                         YELLOW_GOALBOX_BOTTOM_Y,
+                         YELLOW_GOALBOX_LEFT_X,
                          FIELD_WHITE_TOP_SIDELINE_Y,
                          YELLOW_GOALBOX_LEFT_LINE);
 
 const ConcreteLine ConcreteLine::
-yellow_goalbox_right_line(GOALBOX_RIGHT_X,
-                          OPP_GOALBOX_BOTTOM_Y,
-                          GOALBOX_RIGHT_X,
+yellow_goalbox_right_line(YELLOW_GOALBOX_RIGHT_X,
+                          YELLOW_GOALBOX_BOTTOM_Y,
+                          YELLOW_GOALBOX_RIGHT_X,
                           FIELD_WHITE_TOP_SIDELINE_Y,
                           YELLOW_GOALBOX_RIGHT_LINE);
 

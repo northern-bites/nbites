@@ -2809,15 +2809,13 @@ getPossibleClassifications(const VisualCorner &corner,
 
 float FieldLines::getAllowedDistanceError(VisualFieldObject const *obj) const {
     switch (obj->getID()) {
+    case BLUE_GOAL_POST:
     case BLUE_GOAL_LEFT_POST:
     case BLUE_GOAL_RIGHT_POST:
+    case YELLOW_GOAL_POST:
     case YELLOW_GOAL_LEFT_POST:
     case YELLOW_GOAL_RIGHT_POST:
         return 30;
-    case YELLOW_BLUE_BEACON:
-    case BLUE_YELLOW_BEACON:
-        return 50;
-        // Should not have any UNKNOWN_FIELD_OBJECTs
     default:
         return 0;
     }

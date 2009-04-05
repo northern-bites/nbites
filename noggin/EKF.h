@@ -11,12 +11,21 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-// Local headers
-#include "VisualBall.h"
-
 // Default parameters
 #define DEFAULT_BETA 3.0f
 #define DEFAULT_GAMMA 2.0f
+
+// Dimensions of implemented classes
+#define LOC_EKF_DIMENSION 3 // Number of states in Loc EKF
+#define LOC_MEASUREMENT_DIMENSION 2 // Number of dimensions in a measurement
+#define BALL_EKF_DIMENSION 4 // Number of states in Ball EKF
+#define BALL_MEASUREMENT_DIMENSION 2 // Number of dimensions in a measurement
+
+static const int ACC_NUM_DIMENSIONS = 3;
+static const int ACC_NUM_MEASUREMENTS = 3;
+
+static const int ZMP_NUM_DIMENSIONS = 2;
+static const int ZMP_NUM_MEASUREMENTS = 2;
 
 /**
  * EKF - An abstract class which implements the computational components of

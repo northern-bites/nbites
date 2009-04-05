@@ -23,8 +23,8 @@ enum cornerID {
     YELLOW_GOAL_T,
     BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L,
     BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L,
-    BLUE_CORNER_LEFT_L_OR_YELLOW_CORNER_LEFT_L,
-    BLUE_CORNER_RIGHT_L_OR_YELLOW_CORNER_RIGHT_L,
+    BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L,
+    BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L,
     CORNER_INNER_L,
     GOAL_BOX_INNER_L,
 
@@ -34,16 +34,16 @@ enum cornerID {
     CENTER_T,
 
     // SPECIFIC CORNER IDS start at = 15
-    BLUE_CORNER_LEFT_L,
-    BLUE_CORNER_RIGHT_L,
+    BLUE_CORNER_TOP_L,
+    BLUE_CORNER_BOTTOM_L,
     BLUE_GOAL_LEFT_T,
     BLUE_GOAL_RIGHT_T,
     BLUE_GOAL_LEFT_L,
     BLUE_GOAL_RIGHT_L,
-    CENTER_BY_T,
-    CENTER_YB_T,
-    YELLOW_CORNER_LEFT_L,
-    YELLOW_CORNER_RIGHT_L,
+    CENTER_BOTTOM_T,
+    CENTER_TOP_T,
+    YELLOW_CORNER_BOTTOM_L,
+    YELLOW_CORNER_TOP_L,
     YELLOW_GOAL_LEFT_T,
     YELLOW_GOAL_RIGHT_T,
     YELLOW_GOAL_LEFT_L,
@@ -73,9 +73,6 @@ private:
     // copy constructor
     ConcreteCorner(const ConcreteCorner&);
 
-
-
-
 public: // Constants
     static const int NUM_L_CORNERS = 8;
     static const int NUM_T_CORNERS = 6;
@@ -86,8 +83,6 @@ public: // Constants
     static const int NUM_BLUE_GOAL_CORNERS = 4;
     static const int NUM_GOAL_CORNERS = NUM_YELLOW_GOAL_CORNERS +
         NUM_BLUE_GOAL_CORNERS;
-    static const int NUM_YELLOW_ARC_CORNERS = 2;
-    static const int NUM_BLUE_ARC_CORNERS = 2;
     static const int NUM_BLUE_GOAL_T_CORNERS = 2;
     static const int NUM_YELLOW_GOAL_T_CORNERS = 2;
 
@@ -118,16 +113,16 @@ public:
     // Static member variables
 
 public:
-    static const ConcreteCorner blue_corner_left_l,
-                        blue_corner_right_l,
+    static const ConcreteCorner blue_corner_top_l,
+                        blue_corner_bottom_l,
                         blue_goal_left_t,
                         blue_goal_right_t,
                         blue_goal_left_l,
                         blue_goal_right_l,
-                        center_by_t,
-                        center_yb_t,
-                        yellow_corner_left_l,
-                        yellow_corner_right_l,
+                        center_top_t,
+                        center_bottom_t,
+                        yellow_corner_bottom_l,
+                        yellow_corner_top_l,
                         yellow_goal_left_t,
                         yellow_goal_right_t,
                         yellow_goal_left_l,
@@ -146,9 +141,6 @@ private: // These are only used internally by the getPossibleCorners method
 
     static const ConcreteCorner* YELLOW_GOAL_CORNERS[NUM_YELLOW_GOAL_CORNERS];
     static const ConcreteCorner* BLUE_GOAL_CORNERS[NUM_BLUE_GOAL_CORNERS];
-
-    static const ConcreteCorner* YELLOW_ARC_CORNERS[NUM_YELLOW_ARC_CORNERS];
-    static const ConcreteCorner* BLUE_ARC_CORNERS[NUM_BLUE_ARC_CORNERS];
 
     static const ConcreteCorner* YELLOW_GOAL_T_CORNERS[NUM_YELLOW_GOAL_T_CORNERS];
     static const ConcreteCorner* BLUE_GOAL_T_CORNERS[NUM_BLUE_GOAL_T_CORNERS];
@@ -183,10 +175,10 @@ public:
     explicit CornerOfField() {}
     bool operator() (const ConcreteCorner *c) const {
         return
-            (c == &ConcreteCorner::blue_corner_left_l ||
-             c == &ConcreteCorner::blue_corner_right_l ||
-             c == &ConcreteCorner::yellow_corner_left_l ||
-             c == &ConcreteCorner::yellow_corner_right_l);
+            (c == &ConcreteCorner::blue_corner_top_l ||
+             c == &ConcreteCorner::blue_corner_bottom_l ||
+             c == &ConcreteCorner::yellow_corner_bottom_l ||
+             c == &ConcreteCorner::yellow_corner_top_l);
 
     }
 };

@@ -26,7 +26,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "MotionProvider.h"
-#include "ChainQueue.h"
 #include "BodyJointCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
@@ -49,17 +48,20 @@ private:
 	ChopShop chopper;
 	std::vector<std::vector<float> > nextJoints;
 
-	// ChainQueues
-	std::vector<ChainQueue> chainQueues;
-    std::queue<const BodyJointCommand*> bodyCommandQueue;
+	// The current chopped command which is being enacted
+	boost::shared_ptr<ChoppedCommand> currCommand;
+
+	// Queue to hold the next body commands
+	std::queue<const BodyJointCommand*> bodyCommandQueue;
 
 	pthread_mutex_t scripted_mutex;
 
-    std::vector <std::vector <float> > getCurrentChains();
+	boost::shared_ptr<std::vector <std::vector <float> > > getCurrentChains();
+
 	void setNextBodyCommand();
     void setActive();
 	bool isDone();
-    bool chainQueuesEmpty();
+	bool currCommandEmpty();
     bool commandQueueEmpty();
 
 };

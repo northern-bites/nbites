@@ -36,9 +36,10 @@
 #include "LocLogFaker.h"
 #include "NBMath.h"
 #define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
-#define USE_PERFECT_LOC_FOR_BALL
 using namespace std;
 using namespace boost;
+using namespace NBMath;
+static const bool usePerfectLocForBall = false;
 
 int main(int argc, char** argv)
 {
@@ -47,11 +48,12 @@ int main(int argc, char** argv)
     NavPath letsGo;
     // IO Variables
     fstream inputFile;
-    fstream outputFile;
+    fstream mclFile;
+    fstream ekfFile;
 
     /* Test for the correct number of CLI arguments */
-    if(argc < 2 || argc > 3) {
-        cerr << "usage: " << argv[0] << " input-file [output-file]" << endl;
+    if(argc != 2) {
+        cerr << "usage: " << argv[0] << " input-file" << endl;
         return 1;
     }
     try {
@@ -62,24 +64,27 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    // Get the info from the file
+    // Get the info from the input file
     readInputFile(&inputFile, &letsGo);
 
-    // Clost the file
+    // Clost the input file
     inputFile.close();
 
-    // Open output file
-    if(argc > 2) { // If an output file is specified
-        outputFile.open(argv[2], ios::out);
-    } else { // Otherwise use the default
-        outputFile.open(DEFAULT_OUTFILE_NAME.c_str(), ios::out);
-    }
+    // Open output files
+    string mclFileName(argv[1]);
+    string ekfFileName(argv[1]);
+    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
+    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
+
+    mclFile.open(mclFileName.c_str(), ios::out);
+    ekfFile.open(ekfFileName.c_str(), ios::out);
 
     // Iterate through the path
-    iteratePath(&outputFile, &letsGo);
+    iteratePath(&mclFile, &ekfFile, &letsGo);
 
-    // Close the output file
-    outputFile.close();
+    // Close the output files
+    mclFile.close();
+    ekfFile.close();
 
     return 0;
 }
@@ -90,12 +95,14 @@ int main(int argc, char** argv)
  * @param outputFile The file to have everything printed to
  * @param letsGo The robot path from which to localize
  */
-void iteratePath(fstream * outputFile, NavPath * letsGo)
+void iteratePath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
 {
     // Method variables
     vector<Observation> Z_t;
-    shared_ptr<MCL> myLoc = shared_ptr<MCL>(new MCL);
-    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF());
+    shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL());
+    shared_ptr<BallEKF> MCLballEKF = shared_ptr<BallEKF>(new BallEKF());
+    shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
+    shared_ptr<BallEKF> EKFballEKF = shared_ptr<BallEKF>(new BallEKF());
     PoseEst currentPose;
     BallPose currentBall;
     MotionModel noMove(0.0, 0.0, 0.0);
@@ -107,8 +114,10 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
     currentBall = letsGo->ballStart;
 
     // Print out starting configuration
-    printOutLogLine(outputFile, myLoc, Z_t, noMove, &currentPose,
-                    &currentBall, ballEKF, *visBall);
+    printOutMCLLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
+                       &currentBall, MCLballEKF, *visBall);
+    printOutLogLine(ekfFile, ekfLoc, Z_t, noMove, &currentPose,
+                    &currentBall, EKFballEKF, *visBall);
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -117,6 +126,7 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
         // Continue the move for as long as specified
         for (int j = 0; j < letsGo->myMoves[i].time; ++j, ++ frameCounter) {
 
+            // Determine the current frame info
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;
 
@@ -127,12 +137,34 @@ void iteratePath(fstream * outputFile, NavPath * letsGo)
                                                           &currentBall,
                                                           0.0));
 
-            // Update the ball estimate model
-            myLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
-            ballEKF->updateModel(visBall,false);
-            // Print the current frame to file
-            printOutLogLine(outputFile, myLoc, Z_t, letsGo->myMoves[i].move,
-                            &currentPose, &currentBall, ballEKF, *visBall);
+            // Update the MCL sytem
+            mclLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+            // Update the MCL ball
+            if (usePerfectLocForBall) {
+                MCLballEKF->updateModel(visBall,currentPose, true);
+            } else {
+                MCLballEKF->updateModel(visBall,mclLoc->getCurrentEstimate(),
+                                        true);
+            }
+
+            // Update the EKF sytem
+            ekfLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+            // Update the EKF ball
+            if (usePerfectLocForBall) {
+                EKFballEKF->updateModel(visBall,currentPose, true);
+            } else {
+                EKFballEKF->updateModel(visBall,ekfLoc->getCurrentEstimate(),
+                                        true);
+            }
+
+            // Print the current MCL frame to file
+            printOutMCLLogLine(mclFile, mclLoc, Z_t, letsGo->myMoves[i].move,
+                               &currentPose, &currentBall, MCLballEKF,
+                               *visBall);
+            // Print the current EKF frame to file
+            printOutLogLine(ekfFile, ekfLoc, Z_t, letsGo->myMoves[i].move,
+                               &currentPose, &currentBall, EKFballEKF,
+                               *visBall);
         }
     }
 
@@ -163,8 +195,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         deltaX = toView->getFieldX() - myPos.x;
         deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
-        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
-                                - (M_PI / 2.0f));
+        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h);
 
         // Check if the object is viewable
         if (visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) {
@@ -173,7 +204,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             visDist += sigmaD*UNIFORM_1_NEG_1;
             sigmaB = getBearingSD(visBearing);
-            visBearing += .04*UNIFORM_1_NEG_1;
+            //visBearing += .04*UNIFORM_1_NEG_1;
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -183,7 +214,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // set ambiguous data
             // Randomly set them to abstract
-            if ((rand() / (float(RAND_MAX)+1)) < 0.12) {
+            if (false && (rand() / (float(RAND_MAX)+1)) < 0.12) {
                 fo.setIDCertainty(NOT_SURE);
                 if(foID == BLUE_GOAL_LEFT_POST ||
                    foID == BLUE_GOAL_RIGHT_POST) {
@@ -205,8 +236,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         float deltaX = toView->getFieldX() - myPos.x;
         float deltaY = toView->getFieldY() - myPos.y;
         visDist = hypot(deltaX, deltaY);
-        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h
-                                - (M_PI / 2.0f));
+        visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h);
 
         // Check if the object is viewable
         if ((visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) &&
@@ -214,9 +244,8 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Get measurement variance and add noise to reading
             sigmaD = getDistSD(visDist);
-            visDist += sigmaD*UNIFORM_1_NEG_1+.005*sigmaD;
+            visDist += UNIFORM_1_NEG_1*0.05*visDist;
             sigmaB = getBearingSD(visBearing);
-            //visBearing += (M_PI / 2.0f);
             //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Ignore the center circle for right now
@@ -226,17 +255,17 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             const cornerID id = toView->getID();
             list <const ConcreteCorner*> toUse;
             // Randomly set ambiguous data
-            if ((rand() / (float(RAND_MAX)+1)) < 0.32) {
+            if (false && (rand() / (float(RAND_MAX)+1)) < 0.32) {
                 shape s = ConcreteCorner::inferCornerType(id);
                 toUse = ConcreteCorner::getPossibleCorners(s);
             } else {
                 const ConcreteCorner * corn;
                 switch(id) {
-                case BLUE_CORNER_LEFT_L:
-                    corn = &ConcreteCorner::blue_corner_left_l;
+                case BLUE_CORNER_TOP_L:
+                    corn = &ConcreteCorner::blue_corner_top_l;
                     break;
-                case BLUE_CORNER_RIGHT_L:
-                    corn = &ConcreteCorner::blue_corner_right_l;
+                case BLUE_CORNER_BOTTOM_L:
+                    corn = &ConcreteCorner::blue_corner_bottom_l;
                     break;
                 case BLUE_GOAL_LEFT_T:
                     corn = &ConcreteCorner::blue_goal_left_t;
@@ -250,17 +279,17 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
                 case BLUE_GOAL_RIGHT_L:
                     corn = &ConcreteCorner::blue_goal_right_l;
                     break;
-                case CENTER_BY_T:
-                    corn = &ConcreteCorner::center_by_t;
+                case CENTER_TOP_T:
+                    corn = &ConcreteCorner::center_top_t;
                     break;
-                case CENTER_YB_T:
-                    corn = &ConcreteCorner::center_yb_t;
+                case CENTER_BOTTOM_T:
+                    corn = &ConcreteCorner::center_bottom_t;
                     break;
-                case YELLOW_CORNER_LEFT_L:
-                    corn = &ConcreteCorner::yellow_corner_left_l;
+                case YELLOW_CORNER_TOP_L:
+                    corn = &ConcreteCorner::yellow_corner_top_l;
                     break;
-                case YELLOW_CORNER_RIGHT_L:
-                    corn = &ConcreteCorner::yellow_corner_right_l;
+                case YELLOW_CORNER_BOTTOM_L:
+                    corn = &ConcreteCorner::yellow_corner_bottom_l;
                     break;
                 case YELLOW_GOAL_LEFT_T:
                     corn = &ConcreteCorner::yellow_goal_left_t;
@@ -318,16 +347,15 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
     estimate e;
     e.bearing = subPIAngle(atan2(currentBall->y - currentPose->y,
                                  currentBall->x - currentPose->x) -
-                           M_PI / 2.0f);
+                           currentPose->h);
 
     // Calculate distance if object is within view
-    if ( true ||
-         e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
+    if ( e.bearing > -FOV_OFFSET && e.bearing < FOV_OFFSET &&
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        e.dist += e.dist*UNIFORM_1_NEG_1*0.03;
-        e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
+        //e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
+        //e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
 
     } else {
         e.dist = 0.0f;
@@ -384,10 +412,10 @@ void readInputFile(fstream* inputFile, NavPath * letsGo)
  * @param sightings Vector of landmark observations
  * @param lastOdo Odometery since previous frame
  */
-void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
-                     vector<Observation> sightings, MotionModel lastOdo,
-                     PoseEst *currentPose, BallPose * currentBall,
-                     shared_ptr<BallEKF> ballEKF, VisualBall _b)
+void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
+                        vector<Observation> sightings, MotionModel lastOdo,
+                        PoseEst *currentPose, BallPose * currentBall,
+                        shared_ptr<BallEKF> ballEKF, VisualBall _b)
 {
     // Output particle infos
     vector<Particle> particles = myLoc->getParticles();
@@ -395,62 +423,48 @@ void printOutLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
         Particle p = particles[j];
         *outputFile << p << " ";
     }
-
     // Divide the sections with a colon
     *outputFile << ":";
 
+    printOutLogLine(outputFile, myLoc, sightings, lastOdo, currentPose,
+                    currentBall, ballEKF, _b);
+}
+
+/**
+ * Prints the input to a log file to be read by the TOOL
+ *
+ * @param outputFile File to write the log line to
+ * @param myLoc Current localization module
+ * @param sightings Vector of landmark observations
+ * @param lastOdo Odometery since previous frame
+ */
+void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
+                     vector<Observation> sightings, MotionModel lastOdo,
+                     PoseEst *currentPose, BallPose * currentBall,
+                     shared_ptr<BallEKF> ballEKF, VisualBall _b)
+{
     // Output standard infos
     *outputFile << team_color<< " " << player_number << " "
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "
-                << myLoc->getHEstDeg() << " "
+                << myLoc->getHEst() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncertDeg() << " "
-                // Ball estimates
-                // << (ballEKF->getXEst()*cos(myLoc->getHEst()) +
-                //     ballEKF->getYEst()*sin(myLoc->getHEst()) +
-                //     myLoc->getXEst()) << " "
-                // // Y Estimate
-                // << (ballEKF->getXEst()*sin(myLoc->getHEst()) +
-                //     ballEKF->getYEst()*cos(myLoc->getHEst()) +
-                //     myLoc->getYEst()) << " "
                 // X Estimate
-                << (ballEKF->getXEst()*cos(currentPose->h) +
-                    ballEKF->getYEst()*sin(currentPose->h) +
-                    currentPose->x) << " "
+                << (ballEKF->getXEst()) << " "
                 // Y Estimate
-                << (ballEKF->getXEst()*sin(currentPose->h) +
-                    ballEKF->getYEst()*cos(currentPose->h) +
-                    currentPose->y) << " "
-                // // X Estimate
-                // << (ballEKF->getXEst() +
-                //     currentPose->x) << " "
-                // // Y Estimate
-                // << (ballEKF->getYEst() +
-                //     currentPose->y) << " "
+                << (ballEKF->getYEst()) << " "
                 // X Uncert
                 << (ballEKF->getXUncert()) << " "
                 // Y Uncert
                 << (ballEKF->getYUncert()) << " "
-                // // X Uncert
-                // << (fabs(ballEKF->getXUncert()*cos(myLoc->getHEst())) +
-                //     fabs(ballEKF->getYUncert()*sin(myLoc->getHEst()))) << " "
-                // // Y Uncert
-                // << (fabs(ballEKF->getXUncert()*sin(myLoc->getHEst())) +
-                //     fabs(ballEKF->getYUncert()*cos(myLoc->getHEst()))) << " "
                 // X Velocity Estimate
-                << (-ballEKF->getXVelocityEst()*cos(myLoc->getHEst()) +
-                    ballEKF->getYVelocityEst()*sin(myLoc->getHEst())) << " "
-                // Y Estimate
-                << (ballEKF->getXVelocityEst()*sin(myLoc->getHEst()) +
-                    ballEKF->getYVelocityEst()*cos(myLoc->getHEst())) << " "
+                << ballEKF->getXVelocityEst() << " "
+                // Y Velocity Estimate
+                << ballEKF->getYVelocityEst() << " "
                 // X Velocity Uncert
-                << (fabs(ballEKF->getXVelocityUncert()*cos(myLoc->getHEst())) +
-                    fabs(ballEKF->getYVelocityUncert()*sin(myLoc->getHEst())))
-                << " "
+                << ballEKF->getXVelocityUncert() << " "
                 // Y Velocity Uncert
-                << (fabs(ballEKF->getXVelocityUncert()*sin(myLoc->getHEst())) +
-                    fabs(ballEKF->getYVelocityUncert()*cos(myLoc->getHEst())))
-                << " "
+                << ballEKF->getYVelocityUncert() << " "
                 // Odometery
                 << lastOdo.deltaL << " " << lastOdo.deltaF << " "
                 << lastOdo.deltaR;

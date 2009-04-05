@@ -16,59 +16,25 @@
 #include "NBMath.h"
 #include "NogginStructs.h"
 
-// Parameters
-#define ASSUMED_FPS 30.0
-#define BETA_BALL 5. // How much uncertainty naturally grows per update
-#define GAMMA_BALL 0.4 // How much ball velocity should effect uncertainty
-#define BALL_EKF_DIMENSION 4 // Number of states in Ball EKF
-#define BALL_MEASUREMENT_DIMENSION 2 // Number of dimensions in a measurement
-#define CARPET_FRICTION -25 // 25 cm/s^2
-#define BALL_DECAY_PERCENT 0.25
-
-// Default initialization values
-#define INIT_BALL_X 0.0f
-#define INIT_BALL_Y 100.0f
-#define INIT_BALL_X_VEL 0.0f
-#define INIT_BALL_Y_VEL 0.0f
-#define X_UNCERT_MAX 440.0f
-#define Y_UNCERT_MAX 680.0f
-#define VELOCITY_UNCERT_MAX 300.0
-#define X_UNCERT_MIN 1.0e-6
-#define Y_UNCERT_MIN 1.0e-6
-#define VELOCITY_UNCERT_MIN 1.0e-6
-#define INIT_X_UNCERT X_UNCERT_MAX
-#define INIT_Y_UNCERT Y_UNCERT_MAX
-#define INIT_X_VEL_UNCERT VELOCITY_UNCERT_MAX
-#define INIT_Y_VEL_UNCERT VELOCITY_UNCERT_MAX
-#define X_EST_MIN -600.0f
-#define Y_EST_MIN -1000.0f
-#define X_EST_MAX 600.0f
-#define Y_EST_MAX 1000.0f
-#define VELOCITY_EST_MAX 300.0f
-#define VELOCITY_EST_MIN -300.0f
-
 /**
  * Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
-class BallEKF : public EKF<BallMeasurement, MotionModel, BALL_EKF_DIMENSION,
-                           BALL_MEASUREMENT_DIMENSION>
+class BallEKF : public EKF<RangeBearingMeasurement, MotionModel,
+                           BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION>
 {
 public:
-
     // Constructors & Destructors
-    BallEKF(float initX = INIT_BALL_X, float initY = INIT_BALL_Y,
-            float initVelX = INIT_BALL_X_VEL,
-            float initVelY = INIT_BALL_Y_VEL,
-            float initXUncert = INIT_X_UNCERT,
-            float initYUncert = INIT_Y_UNCERT,
-            float initVelXUncert = INIT_X_VEL_UNCERT,
-            float initVelYUncert = INIT_Y_VEL_UNCERT);
+    BallEKF();
+    BallEKF(float initX, float initY,
+            float initVelX, float initVelY,
+            float initXUncert, float initYUncert,
+            float initVelXUncert, float initVelYUncert);
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(VisualBall * ball, bool _useCartesian=false);
-    void sawTeammateBall(BallMeasurement m);
+    void updateModel(VisualBall * ball, PoseEst p, bool _useCartesian=true);
+    void sawTeammateBall(RangeBearingMeasurement m);
     void sawBall(VisualBall * ball);
 
     // Getters
@@ -165,7 +131,7 @@ public:
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
-    virtual void incorporateMeasurement(BallMeasurement z,
+    virtual void incorporateMeasurement(RangeBearingMeasurement z,
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
@@ -174,5 +140,32 @@ private:
     void limitAPrioriUncert(void);
     void limitPosteriorUncert(void);
     bool useCartesian;
+    PoseEst robotPose;
+    const static float ASSUMED_FPS;
+    const static float BETA_BALL;
+    const static float GAMMA_BALL;
+    const static float CARPET_FRICTION;
+    const static float BALL_DECAY_PERCENT;
+    const static float INIT_BALL_X;
+    const static float INIT_BALL_Y;
+    const static float INIT_BALL_X_VEL;
+    const static float INIT_BALL_Y_VEL;
+    const static float X_UNCERT_MAX;
+    const static float Y_UNCERT_MAX;
+    const static float VELOCITY_UNCERT_MAX;
+    const static float X_UNCERT_MIN;
+    const static float Y_UNCERT_MIN;
+    const static float VELOCITY_UNCERT_MIN;
+    const static float INIT_X_UNCERT;
+    const static float INIT_Y_UNCERT;
+    const static float INIT_X_VEL_UNCERT;
+    const static float INIT_Y_VEL_UNCERT;
+    const static float X_EST_MIN;
+    const static float Y_EST_MIN;
+    const static float X_EST_MAX;
+    const static float Y_EST_MAX;
+    const static float VELOCITY_EST_MAX;
+    const static float VELOCITY_EST_MIN;
+
 };
 #endif // File

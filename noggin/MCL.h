@@ -20,6 +20,7 @@
 #include "EKFStructs.h"
 #include "NBMath.h"
 #include "NogginStructs.h"
+#include "LocSystem.h"
 
 // Particle
 class Particle
@@ -43,7 +44,7 @@ static const int M = 100; // Number of particles
 static const float MIN_SIMILARITY = 1.0e-15; // Minimum possible similarity
 
 // The Monte Carlo Localization class
-class MCL
+class MCL : public LocSystem
 {
 public:
     // Constructors & Destructors
@@ -51,8 +52,8 @@ public:
     virtual ~MCL();
 
     // Core Functions
-    void updateLocalization(MotionModel u_t, std::vector<Observation> z_t,
-                            bool resample=true);
+    virtual void updateLocalization(MotionModel u_t,
+                                    std::vector<Observation> z_t);
 
     // Getters
     const PoseEst getCurrentEstimate() const { return curEst; }
@@ -140,6 +141,7 @@ private:
     std::vector<Particle> X_t; // Current set of particles
 
     // Core Functions
+    PoseEst updateMotionModel(PoseEst x_t, MotionModel u_t);
     float updateMeasurementModel(std::vector<Observation> z_t, PoseEst x_t);
     void updateEstimates();
 
@@ -149,12 +151,14 @@ private:
     float determineLineWeight(Observation z, PoseEst x_t, LineLandmark _line);
     float getSimilarity(float r_d, float r_a, Observation &z);
     Particle randomWalkParticle(Particle p);
+    float sampleNormalDistribution(float sd);
+    float sampleTriangularDistribution(float sd);
 
 public:
     friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
         return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
     }
-
+    int frameCounter;
 };
 
 #endif // _MCL_H_DEFINED

@@ -112,7 +112,6 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ScriptedProvider
 		     ${MOTION_INCLUDE_DIR}/ChoppedCommand
 		     ${MOTION_INCLUDE_DIR}/HeadProvider
-                     ${MOTION_INCLUDE_DIR}/ChainQueue
 		     ${MOTION_INCLUDE_DIR}/ChopShop
 		     ${MOTION_INCLUDE_DIR}/MotionEnactor
 		     ${MOTION_INCLUDE_DIR}/SimulatorEnactor

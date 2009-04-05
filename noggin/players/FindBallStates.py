@@ -2,7 +2,6 @@ import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import math
 from ..util import MyMath as MyMath
-TO_RAD = math.pi/180.
 
 def scanFindBall(player):
     '''
@@ -68,8 +67,8 @@ def approachBall(player):
     if player.brain.ball.on:
         bearing = player.brain.ball.bearing
         if bearing < 20:
-            targetX = math.cos(bearing*TO_RAD)*player.brain.ball.dist
-            targetY = math.sin(bearing*TO_RAD)*player.brain.ball.dist
+            targetX = math.cos(radians(bearing))*player.brain.ball.dist
+            targetY = math.sin(radians(bearing))*player.brain.ball.dist
             player.printf("bearing is"+str(bearing)+" target X/Y  is "+str(targetX)+","+str(targetY),"blue")
             maxTarget = max(abs(targetX),abs(targetY))
 

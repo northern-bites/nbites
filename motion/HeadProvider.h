@@ -26,7 +26,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "MotionProvider.h"
-#include "ChainQueue.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
 #include "Sensors.h"
@@ -68,7 +67,7 @@ private:
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 
-	ChainQueue headQueue;
+    boost::shared_ptr<ChoppedCommand> currCommand;
 	// Queue of all future commands
 	std::queue<const HeadJointCommand*> headCommandQueue;
 
