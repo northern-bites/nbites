@@ -74,25 +74,25 @@ PyComm_latestComm (PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   // Build tuple of tuples of joint values
-  PyObject *outer = PyTuple_New(latest->size()), *inner, *f;
+  PyObject *outer = PyList_New(latest->size()), *inner, *f;
   bool success = true;
   int i, j;
   if (outer != NULL) {
     i = 0;
     while (!latest->empty()) {
       vector<float> &v = latest->front();
-      inner = PyTuple_New(v.size());
+      inner = PyList_New(v.size());
       if (inner != NULL) {
         for (unsigned int j = 0; j < v.size(); j++) {
           f = PyFloat_FromDouble(v[j]);
           if (f != NULL)
-            PyTuple_SET_ITEM(inner, j, f);
+            PyList_SET_ITEM(inner, j, f);
           else {
             success = false;
             break;
           }
         }
-        PyTuple_SET_ITEM(outer, i, inner);
+        PyList_SET_ITEM(outer, i, inner);
         if (!success)
           break;
         latest->pop_front();
