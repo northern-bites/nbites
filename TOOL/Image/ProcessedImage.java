@@ -9,6 +9,8 @@ import TOOL.Data.Frame;
 import TOOL.Data.RobotDef;
 
 import TOOL.Misc.Estimate;
+import TOOL.Calibrate.VisionState;
+
 
 /**
  * @author George Slavov
@@ -24,13 +26,12 @@ import TOOL.Misc.Estimate;
  */
 
 public class ProcessedImage extends ThresholdedImage {
-    TOOLVisionLink visionLink;
+    private TOOLVisionLink visionLink;//the link
 
     public ProcessedImage(TOOLImage image, ColorTable cTable) {
         super(image.getWidth(), image.getHeight());
-        visionLink = new TOOLVisionLink();
 
-        this.thresholdImage(cTable, image);
+        visionLink = new TOOLVisionLink();
     }
 
     /**
@@ -40,7 +41,7 @@ public class ProcessedImage extends ThresholdedImage {
      * NOTE: This method assumes we are working with a NAO image. If someone
      *       cares to fix it...be my guest. Sincerely, George.
      */
-    public void thresholdImage(ColorTable table, TOOLImage image) {
+    public void thresholdImage(TOOLImage image, ColorTable table) {
         // Grab a constant reference to the current instance of the TOOL
         final TOOL tool = TOOL.instance;
 
@@ -138,4 +139,6 @@ public class ProcessedImage extends ThresholdedImage {
         return visionLink.pixEstimate(pixelX, pixelY,
                                       objectHeight);
     }
+    //getLink - returns the visionLink
+    public TOOLVisionLink getVisionLink(){ return visionLink; }
 }

@@ -23,22 +23,11 @@
 #include "SensorDef.h"       // for NUM_SENSORS
 #include "Kinematics.h"      // for NUM_JOINTS
 #include "Structs.h"         // for estimate struct
+#include "VisualFieldObject.h"
+#include "VisualLine.h"
+
 using namespace std;
 using namespace boost;
-
-// static long long
-// micro_time (void)
-// {
-// #ifdef __GNUC__
-//     // Needed for microseconds which we convert to milliseconds
-//     struct timeval tv;
-//     gettimeofday(&tv, NULL);
-
-//     return tv.tv_sec * 1000000 + tv.tv_usec;
-// #else
-//     return 0L;
-// #endif
-// }
 
 /**
  *
@@ -134,14 +123,14 @@ extern "C" {
         byte * img = (byte *)buf_img; //convert it to a reg. byte array
         //PROCESS VISION!!
         vision.notifyImage(img);
-        vision.drawBoxes();
+        //vision.drawBoxes();
         env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
         //Debug output:
         /*
-        cout <<"Ball Width: "<<  vision.ball->getWidth() <<endl;
-        cout<<"Pose Left Hor Y" << pose->getLeftHorizonY() <<endl;
-        cout<<"Pose Right Hor Y" << pose->getRightHorizonY() <<endl;
+          cout <<"Ball Width: "<<  vision.ball->getWidth() <<endl;
+          cout<<"Pose Left Hor Y" << pose->getLeftHorizonY() <<endl;
+          cout<<"Pose Right Hor Y" << pose->getRightHorizonY() <<endl;
         */
         //copy results from vision thresholded to the array passed in from java
         //we access to each row in the java array, and copy in from cpp thresholded
@@ -156,43 +145,147 @@ extern "C" {
             }
             env->ReleaseByteArrayElements(row_target, row, 0);
         }
+        //get the id for the java class, so we can get method IDs
+        jclass javaClass = env->GetObjectClass(jobj);
+
+        //push the ball
+        jmethodID setBallInfo = env->GetMethodID(javaClass, "setBallInfo", "(DDIIIID)V");
+        env->CallVoidMethod(jobj, setBallInfo,
+                            vision.ball->getWidth(), vision.ball->getHeight(),
+                            vision.ball->getX(), vision.ball->getY(),
+                            vision.ball->getCenterX(), vision.ball->getCenterY(),
+                            vision.ball->getRadius());
+
+        //get the method ID for the field object setter
+        jmethodID setFieldObjectInfo = env->GetMethodID(javaClass, "setFieldObjectInfo",
+                                                        "(IDDIIIIIIII)V");
+
+        //push each field object
+        VisualFieldObject *obj;
+        VisualCrossbar * cb;
+        int k = 0;
+        while(k != -1) {
+            //loop through all the objects we want to pass
+            switch(k){
+            case 0: obj = vision.bgrp; k++; cb = NULL; break;
+            case 1: obj = vision.bglp; k++; cb = NULL; break;
+            case 2: obj = vision.ygrp; k++; cb = NULL; break;
+            case 3: obj = vision.yglp; k++; cb = NULL; break;
+            case 4: cb = vision.ygCrossbar; k++; obj = NULL; break;
+            case 5: cb = vision.bgCrossbar; k++; obj = NULL; break;
+            default: k = -1; obj = NULL; cb = NULL; break;
+            }
+            if (obj!=NULL) {
+                cout << obj->getWidth();
+            } else if (cb != NULL) {
+                cout << cb->getWidth();
+            }
+            if (obj != NULL) {
+                env->CallVoidMethod(jobj, setFieldObjectInfo,
+                                    (int) obj->getID(),
+                                    obj->getWidth(), obj->getHeight(),
+                                    obj->getLeftTopX(), obj->getLeftTopY(),
+                                    obj->getRightTopX(), obj->getRightTopY(),
+                                    obj->getLeftBottomX(), obj->getLeftBottomY(),
+                                    obj->getRightBottomX(), obj->getRightBottomY());
+            } else if (cb != NULL) {
+                env->CallVoidMethod(jobj, setFieldObjectInfo,
+                                    50,
+                                    cb->getWidth(), cb->getHeight(),
+                                    cb->getLeftTopX(), cb->getLeftTopY(),
+                                    cb->getRightTopX(), cb->getRightTopY(),
+                                    cb->getLeftBottomX(), cb->getLeftBottomY(),
+                                    cb->getRightBottomX(), cb->getRightBottomY());
+            }
+        }
+
+        //get the methodIDs for the visual line setter methods from java
+        jmethodID setVisualLineInfo = env->GetMethodID(javaClass, "setVisualLineInfo",
+                                                       "(IIII)V");
+        jmethodID prepPointBuffers = env->GetMethodID(javaClass, "prepPointBuffers",
+                                                      "(I)V");
+        jmethodID setPointInfo = env->GetMethodID(javaClass, "setPointInfo",
+                                                  "(IIDI)V");
+        jmethodID setUnusedPointsInfo = env->GetMethodID(javaClass, "setUnusedPointsInfo",
+                                                         "()V");
+        jmethodID setVisualCornersInfo = env->GetMethodID(javaClass, "setVisualCornersInfo",
+                                                          "(II)V");
+        //push data from the lines object
+        const vector<VisualLine> *lines = vision.fieldLines->getLines();
+        for (vector<VisualLine>::const_iterator i = lines->begin();
+             i!= lines->end(); i++) {
+            env->CallVoidMethod(jobj, prepPointBuffers,
+                                i->points.size());
+            for(vector<linePoint>::const_iterator j = i->points.begin();
+                j != i->points.end(); j++) {
+                env->CallVoidMethod(jobj, setPointInfo,
+                                    j->x, j->y,
+                                    j->lineWidth, j->foundWithScan);
+            }
+            env->CallVoidMethod(jobj, setVisualLineInfo,
+                                i->start.x, i->start.y,
+                                i->end.x, i->end.y);
+        }
+        //push data from unusedPoints
+        const list <linePoint> *unusedPoints = vision.fieldLines->getUnusedPoints();
+        env->CallVoidMethod(jobj, prepPointBuffers, unusedPoints->size());
+        for (list <linePoint>::const_iterator i = unusedPoints->begin();
+             i != unusedPoints->end(); i++)
+            env->CallVoidMethod(jobj, setPointInfo,
+                                i->x, i->y,
+                                i->lineWidth, i->foundWithScan);
+        env->CallVoidMethod(jobj, setUnusedPointsInfo);
+        //push data from visualCorners
+        const list <VisualCorner>* corners = vision.fieldLines->getCorners();
+        for (list <VisualCorner>::const_iterator i = corners->begin();
+             i != corners->end(); i++)
+            env->CallVoidMethod(jobj, setVisualCornersInfo,
+                                i->getX(), i->getY());
+        //horizon line
+        jmethodID setHorizonInfo = env->GetMethodID(javaClass, "setHorizonInfo",
+                                                    "(IIIII)V");
+        env->CallVoidMethod(jobj, setHorizonInfo,
+                            vision.pose->getLeftHorizon().x,
+                            vision.pose->getLeftHorizon().y,
+                            vision.pose->getRightHorizon().x,
+                            vision.pose->getRightHorizon().y,
+                            vision.thresh->getVisionHorizon());
 
         return;
 
     }
 
     JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppPixEstimate
-        (JNIEnv * env, jobject jobj, jint pixelX, jint pixelY,
-         jfloat objectHeight, jdoubleArray estimateResult) {
-            // make sure the array for the estimate is big enough. There
-            // should be room for five things in there. (subject to change)
-            if (env->GetArrayLength(estimateResult) !=
-                sizeof(estimate)/sizeof(double)) {
-                cout << "Error: the estimateResult array had incorrect "
-                    "dimensions" << endl;
-                return;
-            }
+    (JNIEnv * env, jobject jobj, jint pixelX, jint pixelY,
+     jfloat objectHeight, jdoubleArray estimateResult) {
+        // make sure the array for the estimate is big enough. There
+        // should be room for five things in there. (subject to change)
+        if (env->GetArrayLength(estimateResult) !=
+            sizeof(estimate)/sizeof(double)) {
+            cout << "Error: the estimateResult array had incorrect "
+                "dimensions" << endl;
+            return;
+        }
 
-            //load the table
-            jdouble * buf_estimate =
-                env->GetDoubleArrayElements( estimateResult, 0);
-            double * estimate_array =
-                (double *)buf_estimate;
-            //vision.thresh->initTableFromBuffer(table);
-            estimate est = pose->pixEstimate(static_cast<int>(pixelX),
-                                             static_cast<int>(pixelY),
-                                             static_cast<float>(objectHeight));
+        //load the table
+        jdouble * buf_estimate =
+            env->GetDoubleArrayElements( estimateResult, 0);
+        double * estimate_array =
+            (double *)buf_estimate;
+        //vision.thresh->initTableFromBuffer(table);
+        estimate est = pose->pixEstimate(static_cast<int>(pixelX),
+                                         static_cast<int>(pixelY),
+                                         static_cast<float>(objectHeight));
 
-            estimate_array[0] = est.dist;
-            estimate_array[1] = est.elevation;
-            estimate_array[2] = est.bearing;
-            estimate_array[3] = est.x;
-            estimate_array[4] = est.y;
+        estimate_array[0] = est.dist;
+        estimate_array[1] = est.elevation;
+        estimate_array[2] = est.bearing;
+        estimate_array[3] = est.x;
+        estimate_array[4] = est.y;
 
-            env->ReleaseDoubleArrayElements( estimateResult, buf_estimate, 0);
+        env->ReleaseDoubleArrayElements( estimateResult, buf_estimate, 0);
     }
 
 #ifdef __cplusplus
 }
 #endif
-

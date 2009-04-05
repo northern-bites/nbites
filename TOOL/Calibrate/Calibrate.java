@@ -52,10 +52,12 @@ import TOOL.Image.ImageSwatch;
 import TOOL.Image.ImagePanel;
 import TOOL.Image.TOOLImage;
 import TOOL.Image.ThresholdedImage;
+import TOOL.Image.ProcessedImage;
 import TOOL.Image.PixelSelectionPanel;
 import TOOL.Image.ImageMarkerPanel;
 import TOOL.Image.CalibrationDrawingPanel;
 import TOOL.Image.DrawingPanel;
+
 
 import TOOL.Image.ImageOverlay;
 import TOOL.Image.ImageOverlayAction;
@@ -107,10 +109,11 @@ public class Calibrate implements DataListener, MouseListener,
     protected ImageOverlay overlay;
     protected TOOLImage rawImage;
     protected int imageID;
-    protected ThresholdedImage thresholdedImage;
+    protected ProcessedImage thresholdedImage;
     protected TOOL tool;
     protected ColorTable colorTable;
     protected CalibratePanel calibratePanel;
+    protected VisionState visionState;
 
     // Holds the changes made to overlay; the rest are taken care of
     // within ColorTable
@@ -244,7 +247,6 @@ public class Calibrate implements DataListener, MouseListener,
         gridbag.setConstraints(images_panel, c);
         main_panel.add(images_panel);
 
-
         // within that panel, we have a split view of the two images
         split_pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         split_pane.setLeftComponent(selector);
@@ -254,9 +256,6 @@ public class Calibrate implements DataListener, MouseListener,
         split_changing = false;
         split_pane.addPropertyChangeListener(this);
         images_panel.add(split_pane);
-
-
-
 
         // set up mouse listeners
         selector.addMouseListener(this);
@@ -423,13 +422,14 @@ public class Calibrate implements DataListener, MouseListener,
         pushUndo(currentMove);
         redoStack.clear();
 
-        //threshold the full image again
-        thresholdedImage.thresholdImage();
+        //update the visionState
+        visionState.update();
         //lastly, need to repaint
         // simply repaint the selector, as underlying image hasn't changed
         selector.repaint();
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
 
         // Alert all color table listeners that the color table has changed
         tool.getDataManager().notifyColorTableDependants(colorTable,
@@ -574,11 +574,12 @@ public class Calibrate implements DataListener, MouseListener,
         redoStack.clear();
 
 
-        //threshold the full image again
-        thresholdedImage.thresholdImage();
+        //update the vision state (which thresholds the whole image again, and updates the objects)
+        visionState.update();
         //lastly, need to repaint
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
         selector.repaint();
 
         // Alert all color table listeners that the color table has changed
@@ -705,8 +706,10 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.revert(overlayChanges);
         }
 
-        thresholdedImage.thresholdImage();
+	//update the thresholded image by calling visionstate.update
+        visionState.update();
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
         selector.repaint();
 
         // Update the undo button
@@ -757,9 +760,11 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.execute(overlayChanges);
         }
 
-        thresholdedImage.thresholdImage();
+	//update the thresholded image by calling update on visionstate
+        visionState.update();
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
+	displayer.repaint();
         selector.repaint();
 
         // Update the redo button
@@ -1025,16 +1030,24 @@ public class Calibrate implements DataListener, MouseListener,
     public void notifyDataSet(DataSet s, Frame f) {
         notifyFrame(f);
     }
-
+    //to do: clean up this code - Octavian
     public void notifyFrame(Frame f) {
         if (!f.hasImage())
             return;
-
-        VisionState v = new VisionState(f, tool.getColorTable());
-        rawImage = v.getImage();
+	//if visionState is null, initialize, else just load the frame
+        //if (visionState == null) {
+	visionState = new VisionState(f, tool.getColorTable());
+	thresholdedImage = visionState.getThreshImage();//sync the thresholded images
+	/*}
+	  else {
+	  visionState.loadFrame(f);
+	  visionState.setColorTable(tool.getColorTable());
+	  }
+	*/
+        rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
-        thresholdedImage = v.getThreshImage();
-        colorTable = v.getColorTable();
+	visionState.update();
+        colorTable = visionState.getColorTable();
 
         // Since we now handle different sized frames, it's possible to
         // switch between modes, changing the image's size without updating
@@ -1045,12 +1058,18 @@ public class Calibrate implements DataListener, MouseListener,
         imageHeight = rawImage.getHeight();
         imageWidth = rawImage.getWidth();
 
-
         overlay.generateNewEdgeImage(rawImage);
         selector.updateImage(rawImage);
         selector.setOverlayImage(overlay);
-        if(thresholdedImage != null)
+    
+        if(thresholdedImage != null) {
             displayer.updateImage(thresholdedImage);
+	    displayer.setOverlayImage(visionState.getThreshOverlay());
+	    visionState.update();
+	}
+
+	selector.repaint();
+	displayer.repaint();
 
         // They loaded something so make sure our buttons reflect the
         // active state; e.g. that our undo stack and redo stack are
@@ -1070,9 +1089,9 @@ public class Calibrate implements DataListener, MouseListener,
 
         //threshold the full image again
         if(thresholdedImage != null)//if no frame is loaded, don't want to update
-            thresholdedImage.thresholdImage();
-        //lastly, need to repaint
-        displayer.repaint();
+            visionState.update();
+        //lastly, need to repaint  
         selector.repaint();
+	displayer.repaint();
     }
 }
