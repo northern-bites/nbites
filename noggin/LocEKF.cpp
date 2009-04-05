@@ -97,7 +97,7 @@ LocEKF::associateTimeUpdate(MotionModel u)
     // Assume no decrease in loc velocity
     StateVector deltaLoc(LOC_EKF_DIMENSION);
     const float h = getHEst();
-    const float sinh, cosh;
+    float sinh, cosh;
     sincosf(h, &sinh, &cosh);
 
     deltaLoc(0) = u.deltaF * cosh - u.deltaL * sinh;
@@ -141,7 +141,7 @@ void LocEKF::incorporateMeasurement(Observation z,
     const float x = getXEst();
     const float y = getYEst();
     const float h = getHEst();
-    const float sinh, cosh;
+    float sinh, cosh;
     sincosf(h, &sinh, &cosh);
 
     d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;

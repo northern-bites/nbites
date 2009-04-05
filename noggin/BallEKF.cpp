@@ -202,7 +202,7 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
     // Get expected values of ball
     const float x_b = getXEst();
     const float y_b = getYEst();
-    const float sinh, cosh;
+    float sinh, cosh;
     sincosf(robotPose.h, &sinh, &cosh);
 
     MeasurementVector d_x(2);

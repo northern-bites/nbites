@@ -11,6 +11,8 @@
 #include "EKFStructs.h"
 #include <math.h>
 #include <ostream>
+#include "NBMath.h"
+using namespace NBMath;
 
 // Pose Estimate
 class PoseEst
@@ -42,18 +44,23 @@ public:
     {
         // Translate the relative change into the global coordinate system
         // And add that to the current estimate
-        return PoseEst(x + u_t.deltaF * cos(h) -
-                       u_t.deltaL * sin(h),
-                       y + u_t.deltaF * sin(h) +
-                       u_t.deltaL * cos(h),
+        float sinh, cosh;
+        sincosf(h, &sinh, &cosh);
+        return PoseEst(x + u_t.deltaF * cosh -
+                       u_t.deltaL * sinh,
+                       y + u_t.deltaF * sinh +
+                       u_t.deltaL * cosh,
                        h + u_t.deltaR);
     }
     void operator+= (const MotionModel u_t)
     {
+        float sinh, cosh;
+        sincosf(h, &sinh, &cosh);
+
         // Translate the relative change into the global coordinate system
         // And add that to the current estimate
-        x += u_t.deltaF * cos(h) - u_t.deltaL * sin(h);
-        y += u_t.deltaF * sin(h) + u_t.deltaL * cos(h);
+        x += u_t.deltaF * cosh - u_t.deltaL * sinh;
+        y += u_t.deltaF * sinh + u_t.deltaL * cosh;
         h += u_t.deltaR;
     }
 
