@@ -423,13 +423,14 @@ public class Calibrate implements DataListener, MouseListener,
         redoStack.clear();
 
         //update the visionState
+        System.out.println("Calling update from pixelSelected");
         visionState.update();
         //lastly, need to repaint
         // simply repaint the selector, as underlying image hasn't changed
         selector.repaint();
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
-	displayer.repaint();
+        displayer.repaint();
 
         // Alert all color table listeners that the color table has changed
         tool.getDataManager().notifyColorTableDependants(colorTable,
@@ -575,11 +576,12 @@ public class Calibrate implements DataListener, MouseListener,
 
 
         //update the vision state (which thresholds the whole image again, and updates the objects)
+        System.out.println("Calling update from swapColor");
         visionState.update();
         //lastly, need to repaint
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
-	displayer.repaint();
+        displayer.repaint();
         selector.repaint();
 
         // Alert all color table listeners that the color table has changed
@@ -706,10 +708,11 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.revert(overlayChanges);
         }
 
-	//update the thresholded image by calling visionstate.update
+        //update the thresholded image by calling visionstate.update
+        System.out.println("Calling update() from undo");
         visionState.update();
         displayer.updateImage(thresholdedImage);
-	displayer.repaint();
+        displayer.repaint();
         selector.repaint();
 
         // Update the undo button
@@ -760,11 +763,12 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.execute(overlayChanges);
         }
 
-	//update the thresholded image by calling update on visionstate
+        //update the thresholded image by calling update on visionstate
+        System.out.println("Calling update() from redo");
         visionState.update();
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
-	displayer.repaint();
+        displayer.repaint();
         selector.repaint();
 
         // Update the redo button
@@ -941,11 +945,11 @@ public class Calibrate implements DataListener, MouseListener,
 
             if (inImage(x,y)) { // make sure we clicked inside the image
                 if (e.isShiftDown()) {
-                // get the pix est on this pixel assuming object height=0
-                Estimate est = thresholdedImage.pixEstimate(x,y,0);
-                // we want to print a pixEstimate on this pixel if shift is down
-                System.out.println("dist: " + est.dist + " bearing: " +
-                                   est.bearing);
+                    // get the pix est on this pixel assuming object height=0
+                    Estimate est = thresholdedImage.pixEstimate(x,y,0);
+                    // we want to print a pixEstimate on this pixel if shift is down
+                    System.out.println("dist: " + est.dist + " bearing: " +
+                                       est.bearing);
                 }
                 else{
                     // Undefine the color underneath the cursor if in that mode.
@@ -1034,19 +1038,20 @@ public class Calibrate implements DataListener, MouseListener,
     public void notifyFrame(Frame f) {
         if (!f.hasImage())
             return;
-	//if visionState is null, initialize, else just load the frame
+        //if visionState is null, initialize, else just load the frame
         //if (visionState == null) {
-	visionState = new VisionState(f, tool.getColorTable());
-	thresholdedImage = visionState.getThreshImage();//sync the thresholded images
-	/*}
-	  else {
-	  visionState.loadFrame(f);
-	  visionState.setColorTable(tool.getColorTable());
-	  }
-	*/
+        visionState = new VisionState(f, tool.getColorTable());
+        thresholdedImage = visionState.getThreshImage();//sync the thresholded images
+        /*}
+          else {
+          visionState.loadFrame(f);
+          visionState.setColorTable(tool.getColorTable());
+          }
+        */
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
-	visionState.update();
+        System.out.println("Calling update() from notify frame");
+        visionState.update();
         colorTable = visionState.getColorTable();
 
         // Since we now handle different sized frames, it's possible to
@@ -1061,15 +1066,16 @@ public class Calibrate implements DataListener, MouseListener,
         overlay.generateNewEdgeImage(rawImage);
         selector.updateImage(rawImage);
         selector.setOverlayImage(overlay);
-    
+
         if(thresholdedImage != null) {
             displayer.updateImage(thresholdedImage);
-	    displayer.setOverlayImage(visionState.getThreshOverlay());
-	    visionState.update();
-	}
+            displayer.setOverlayImage(visionState.getThreshOverlay());
+            System.out.println("Calling update() from notify frame");
+            visionState.update();
+        }
 
-	selector.repaint();
-	displayer.repaint();
+        selector.repaint();
+        displayer.repaint();
 
         // They loaded something so make sure our buttons reflect the
         // active state; e.g. that our undo stack and redo stack are
@@ -1089,9 +1095,10 @@ public class Calibrate implements DataListener, MouseListener,
 
         //threshold the full image again
         if(thresholdedImage != null)//if no frame is loaded, don't want to update
-            visionState.update();
-        //lastly, need to repaint  
+            System.out.println("Calling update() from color table changed.");
+        visionState.update();
+        //lastly, need to repaint
         selector.repaint();
-	displayer.repaint();
+        displayer.repaint();
     }
 }

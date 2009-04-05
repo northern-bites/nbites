@@ -12,7 +12,7 @@ import TOOL.Data.Frame;
 
 /**
  * Class VisionState
- * 
+ *
  * it holds all the vision detection stuff - the thresholded image, the ball etc
  * it updates all the stuff when things are changed in calibrate (e.g. colorTable)
  * by calling the processImage function, and then getting all the objects from the visionLink
@@ -20,16 +20,16 @@ import TOOL.Data.Frame;
  *
  * @see Calibrate.java
  * @see TOOLVisionLink.java
- * 
+ *
  * @author modified Octavian Neamtu 2009
  */
 
 public class VisionState {
-    
+
     //constants
     public final static byte BALL_BOX_THICKNESS = 2;
     public final static byte BALL_BOX_COLOR = Vision.RED;
-    
+
     public final static byte VISUAL_OBJECT_THICKNESS = 2;
     public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.ORANGEYELLOW;
     public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.ORANGERED;
@@ -43,15 +43,15 @@ public class VisionState {
 
     public final static byte POINT_CROSS_SIZE = 4;
     public final static byte POINT_CROSS_THICKNESS = 2;
-    
+
     public final static byte POINT_HORIZONTAL_COLOR = Vision.YELLOW;
     public final static byte POINT_VERTICAL_COLOR = Vision.RED;
-    
+
     public final static byte UNUSED_POINT_HORIZONTAL_COLOR = Vision.NAVY;
     public final static byte UNUSED_POINT_VERTICAL_COLOR = Vision.PINK;
-    
+
     public final static byte CORNER_POINT_COLOR = Vision.ORANGE;
-    
+
     public final static byte POSE_HORIZON_THICKNESS = 2;
     public final static byte POSE_HORIZON_COLOR = Vision.BLUE;
     public final static byte VISION_HORIZON_COLOR = Vision.MAGENTA;
@@ -60,7 +60,7 @@ public class VisionState {
     private ProcessedImage thresholdedImage;
     private ThresholdedImageOverlay thresholdedOverlay;
     private ColorTable  colorTable;
-  
+
     //objects - these are just pointers to the objects in the visionLink
     private Ball ball;
     private Vector<VisualFieldObject> visualFieldObjects;
@@ -77,18 +77,18 @@ public class VisionState {
 	//init the objects
         if (rawImage != null && colorTable != null)  {
 	    thresholdedImage = new ProcessedImage(rawImage, colorTable);
-	    thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(), 
+	    thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
 							     thresholdedImage.getHeight());
 	}
     }
 
-    //This updates the whole processed stuff 
+    //This updates the whole processed stuff
     //- the thresholded image, the field objects and the ball
     public void update() {
 	if (thresholdedImage != null)  {
 	    //we process the image; the visionLink updates itself with the new data from the bot
 	    thresholdedImage.thresholdImage(rawImage, colorTable);
-	    System.out.println("do we call update 3 tines?");
+	    System.out.println("do we call update 3 times?");
 	    //get the ball from the link
 	    ball = thresholdedImage.getVisionLink().getBall();
 	    visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
@@ -101,7 +101,7 @@ public class VisionState {
 	    drawObjectBoxes();
 	}
     }
-    
+
     //drawObjectBoxes - draws the object onto the overlay
     public void drawObjectBoxes(){
 	thresholdedOverlay.resetPixels();//reset the overlay
@@ -121,15 +121,15 @@ public class VisionState {
 		byte color;
 		switch(obj.getID()) {
 		case VisualFieldObject.BLUE_GOAL_LEFT_POST:
-		case VisualFieldObject.YELLOW_GOAL_LEFT_POST: 
+		case VisualFieldObject.YELLOW_GOAL_LEFT_POST:
 		    color = GOAL_LEFT_POST_BOX_COLOR; break;
 		case VisualFieldObject.BLUE_GOAL_RIGHT_POST:
-		case VisualFieldObject.YELLOW_GOAL_RIGHT_POST: 
+		case VisualFieldObject.YELLOW_GOAL_RIGHT_POST:
 		color = GOAL_RIGHT_POST_BOX_COLOR; break;
 		case VisualFieldObject.BLUE_GOAL_POST:
-		case VisualFieldObject.YELLOW_GOAL_POST: 
+		case VisualFieldObject.YELLOW_GOAL_POST:
 		    color = GOAL_POST_BOX_COLOR; break;
-		case VisualFieldObject.BLUE_GOAL_BACKSTOP: 
+		case VisualFieldObject.BLUE_GOAL_BACKSTOP:
 		    color = BLUE_GOAL_BACKSTOP_COLOR; break;
 		case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
 		    color = YELLOW_GOAL_BACKSTOP_COLOR; break;
@@ -151,7 +151,7 @@ public class VisionState {
 	    thresholdedOverlay.drawLine(line.getBeginX(), line.getBeginY(),
 					line.getEndX(), line.getEndY(),
 					VISUAL_LINE_THICKNESS, VISUAL_LINE_COLOR);
-	    
+
 	    Vector<LinePoint> points;
 	    points = line.getLinePoints();
 	    LinePoint pt;
@@ -162,9 +162,9 @@ public class VisionState {
 		case LinePoint.HORIZONTAL : color = POINT_HORIZONTAL_COLOR; break;
 		case LinePoint.VERTICAL : color = POINT_VERTICAL_COLOR; break;
 		default : color = Vision.PINK;//this should never be the case
-		} 
-		thresholdedOverlay.drawCross(pt.getX(), pt.getY(), 
-					     POINT_CROSS_SIZE, POINT_CROSS_THICKNESS, 
+		}
+		thresholdedOverlay.drawCross(pt.getX(), pt.getY(),
+					     POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
 					     color);
 	    }
 	}
@@ -179,7 +179,7 @@ public class VisionState {
 	    default : color = Vision.BLACK; //this should never happen
 	    }
 	    thresholdedOverlay.drawCross(unusedPoint.getX(), unusedPoint.getY(),
-					 POINT_CROSS_SIZE, POINT_CROSS_THICKNESS, 
+					 POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
 					 color);
 	}
 	//set corners
@@ -198,12 +198,12 @@ public class VisionState {
 				     POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
 				     VISION_HORIZON_COLOR);
     }
-    
+
     //load frame - loads data from a frame - we're interested in the raw image
     public void loadFrame(Frame f) {
 	rawImage = f.image();
     }
-	
+
     //getters
     public TOOLImage getImage() { return rawImage;  }
     public ProcessedImage getThreshImage() { return thresholdedImage;  }

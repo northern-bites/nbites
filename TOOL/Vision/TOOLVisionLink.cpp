@@ -175,11 +175,6 @@ extern "C" {
             case 5: cb = vision.bgCrossbar; k++; obj = NULL; break;
             default: k = -1; obj = NULL; cb = NULL; break;
             }
-            if (obj!=NULL) {
-                cout << obj->getWidth();
-            } else if (cb != NULL) {
-                cout << cb->getWidth();
-            }
             if (obj != NULL) {
                 env->CallVoidMethod(jobj, setFieldObjectInfo,
                                     (int) obj->getID(),
