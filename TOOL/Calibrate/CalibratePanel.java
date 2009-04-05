@@ -42,7 +42,7 @@ import TOOL.TOOL;
 
 
 public class CalibratePanel extends JPanel implements DataListener, KeyListener,
-MouseWheelListener{
+                                                      MouseWheelListener{
 
     private ColorSwatchPanel colorSwatches;
     private JCheckBox undefineSpecific, smallTableMode;
@@ -52,7 +52,7 @@ MouseWheelListener{
     private JTextPane feedback;
     private InputMap im;
     private ActionMap am;
-
+    protected JCheckBox drawColors;
 
     private Calibrate calibrate;
 
@@ -61,10 +61,10 @@ MouseWheelListener{
     private static final int DEFAULT_COLOR_SWATCH_WIDTH = 40;
 
     public CalibratePanel(Calibrate aCalibrate) {
-	super();
-	calibrate = aCalibrate;
+        super();
+        calibrate = aCalibrate;
         setupWindow();
-	setupListeners();
+        setupListeners();
     }
 
     public ColorSwatchPanel getSwatches() {
@@ -72,9 +72,9 @@ MouseWheelListener{
     }
 
     private void setupWindow() {
-        
-        colorSwatches = new ColorSwatchPanel(calibrate, 
-					     DEFAULT_COLOR_SWATCH_WIDTH);
+
+        colorSwatches = new ColorSwatchPanel(calibrate,
+                                             DEFAULT_COLOR_SWATCH_WIDTH);
 
         // centering text from http://forum.java.sun.com/thread.jspa?threadID=166685&messageID=504493
         feedback = new JTextPane();
@@ -84,44 +84,55 @@ MouseWheelListener{
         StyleConstants.setAlignment(set,StyleConstants.ALIGN_CENTER);
         feedback.setParagraphAttributes(set,true);
 
-	feedback.setEditable(false);
-	feedback.setText("Welcome to TOOL 1.0");
+        feedback.setEditable(false);
+        feedback.setText("Welcome to TOOL 1.0");
         // Make the background match in color
         feedback.setBackground(this.getBackground());
 
-	prevImage = new JButton("Previous (S)");
-	prevImage.setFocusable(false);
-	
-	nextImage = new JButton("Next (D)");
-	nextImage.setFocusable(false);
+        prevImage = new JButton("Previous (S)");
+        prevImage.setFocusable(false);
 
-	fillHoles = new JButton("Fill Holes (H)");
-	fillHoles.setFocusable(false);
+        nextImage = new JButton("Next (D)");
+        nextImage.setFocusable(false);
+
+        fillHoles = new JButton("Fill Holes (H)");
+        fillHoles.setFocusable(false);
 
         smallTableMode = new JCheckBox("Small Table Mode");
-	
 
-	undo = new JButton("Undo");
-	undo.setFocusable(false);
 
-	redo = new JButton("Redo");
-	redo.setFocusable(false);
-	
-	jumpToFrame = new JTextField("0", 4);
-	
-	jumpToButton = new JButton("Jump");
-	jumpToButton.setFocusable(false);
-       
-	undefineSpecific = new JCheckBox("Undefine color");
+        undo = new JButton("Undo");
+        undo.setFocusable(false);
+
+        redo = new JButton("Redo");
+        redo.setFocusable(false);
+
+        jumpToFrame = new JTextField("0", 4);
+
+        jumpToButton = new JButton("Jump");
+        jumpToButton.setFocusable(false);
+
+        undefineSpecific = new JCheckBox("Undefine color");
         undefineSpecific.setAlignmentX(Component.CENTER_ALIGNMENT);
-	undefineSpecific.setFocusable(false);
+        undefineSpecific.setFocusable(false);
 
-	thresh = new ThreshSlider(calibrate);
-	thresh.setFocusable(false);
-        
+        thresh = new ThreshSlider(calibrate);
+        thresh.setFocusable(false);
+
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-       
+
+        drawColors = new JCheckBox("Draw Thresholded Colors");
+        drawColors.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    calibrate.
+                        setDrawThreshColors(!calibrate.getDrawThreshColors());
+                }
+            });
+        drawColors.setFocusable(false);
+        drawColors.setSelected(true);
+
+
         JPanel navigation = new JPanel();
         navigation.setLayout(new GridLayout(4,2));
         navigation.add(prevImage);
@@ -132,41 +143,42 @@ MouseWheelListener{
         navigation.add(jumpToButton);
         navigation.add(fillHoles);
         navigation.add(smallTableMode);
-        
+
         // Size the navigation panel to only take up as much room as needed
         Dimension navigationSize = new Dimension(2 * (int) smallTableMode.getPreferredSize().getWidth(), 4 * (int) fillHoles.getPreferredSize().getHeight());
         navigation.setMinimumSize(navigationSize);
         navigation.setPreferredSize(navigationSize);
         navigation.setMaximumSize(navigationSize);
-        
-       
+
+
         JPanel textAndSwatches = new JPanel();
-        textAndSwatches.setLayout(new BoxLayout(textAndSwatches, 
+        textAndSwatches.setLayout(new BoxLayout(textAndSwatches,
                                                 BoxLayout.Y_AXIS));
         textAndSwatches.add(feedback);
         textAndSwatches.add(undefineSpecific);
         textAndSwatches.add(colorSwatches);
-        
+        textAndSwatches.add(drawColors);
+
         add(textAndSwatches);
         add(navigation);
         add(thresh);
-        
+
         // Since the main panel of the calibration panel has a different
         // cursor, we want java to switch back to the default upon entering
         // this panel.
         setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
         setupShortcuts();
-        
+
     }
-    
+
 
 
 
     private void setupShortcuts() {
         im = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         KeyStroke metaJ = KeyStroke.getKeyStroke(KeyEvent.VK_J,
-                InputEvent.META_MASK);
+                                                 InputEvent.META_MASK);
         im.put(metaJ, "jumpToField");
 
         int numColorSwatchShortcuts = 10;
@@ -178,26 +190,26 @@ MouseWheelListener{
             im.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD1 + i, 0),
                    "color" + (i+1));
         }
-       
+
 
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_MASK), "undo");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.META_MASK), "redo");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "undefineSpecific");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "edgeThresh");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "fillHoles");
-	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "nextImage");
-	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "lastImage");
-        
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "nextImage");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "lastImage");
+
 
         am = this.getActionMap();
         am.put("jumpToField", new AbstractAction("jumpToField") {
-            public void actionPerformed(ActionEvent e) {
-                 jumpToFrame.requestFocus();
-                 jumpToFrame.setSelectionStart(0);
-                 jumpToFrame.setSelectionEnd(jumpToFrame.getText().length());
-            }
-        });
-       
+                public void actionPerformed(ActionEvent e) {
+                    jumpToFrame.requestFocus();
+                    jumpToFrame.setSelectionStart(0);
+                    jumpToFrame.setSelectionEnd(jumpToFrame.getText().length());
+                }
+            });
+
         // Now register the action for the number pad stuff
         for (int i = 0; i <numColorSwatchShortcuts; i++) {
             am.put("color" + (i+1), new SetColorSwatchAction(i));
@@ -229,72 +241,72 @@ MouseWheelListener{
                     fillHoles.doClick();
                 }
             });
-	am.put("nextImage", new AbstractAction("nextImage") {
+        am.put("nextImage", new AbstractAction("nextImage") {
                 public void actionPerformed(ActionEvent e) {
                     calibrate.getTool().getDataManager().next();
                 }
             });
-	am.put("lastImage", new AbstractAction("lastImage") {
+        am.put("lastImage", new AbstractAction("lastImage") {
                 public void actionPerformed(ActionEvent e) {
                     calibrate.getTool().getDataManager().last();
                 }
             });
     }
-    
+
 
     private void setupListeners() {
-	// Let the slider listen to mouse wheel movements
+        // Let the slider listen to mouse wheel movements
         addMouseWheelListener(this);
 
-	calibrate.getTool().getDataManager().addDataListener(this);
+        calibrate.getTool().getDataManager().addDataListener(this);
 
 
         smallTableMode.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
-		    calibrate.setSmallTableMode(smallTableMode.isSelected());
-		}
-	    });
+                    calibrate.setSmallTableMode(smallTableMode.isSelected());
+                }
+            });
 
 
 
-	undefineSpecific.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
-		    calibrate.setUndefine(undefineSpecific.isSelected());
-		    colorSwatches.setCrossedOut(undefineSpecific.isSelected());
-		    colorSwatches.repaint();
-		}
-	    });
+        undefineSpecific.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    calibrate.setUndefine(undefineSpecific.isSelected());
+                    colorSwatches.setCrossedOut(undefineSpecific.isSelected());
+                    colorSwatches.repaint();
+                }
+            });
 
-	prevImage.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
+        prevImage.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
                     calibrate.getLastImage();
                 }
-	});
-	
-	nextImage.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
+            });
+
+        nextImage.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
                     calibrate.getNextImage();
                 }
-	});
-	
-	fillHoles.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
-		    calibrate.fillHoles();
-		}
-	    });	
-	
-	undo.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
-                    calibrate.undo();
-		}
-	    });
+            });
 
-	redo.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
-		    calibrate.redo();
-		}
-	    });
-	
+        fillHoles.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    calibrate.fillHoles();
+                }
+            });
+
+        undo.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    calibrate.undo();
+                }
+            });
+
+        redo.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    calibrate.redo();
+                }
+            });
+
         jumpToFrame.addKeyListener(new KeyListener(){
                 public void keyPressed(KeyEvent e){
                     if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -306,7 +318,7 @@ MouseWheelListener{
                 public void keyTyped(KeyEvent e) {}
                 public void keyReleased(KeyEvent e){}
             });
-	
+
         jumpToButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     try {
@@ -316,19 +328,19 @@ MouseWheelListener{
                     }
                     // If they didn't have a legit number in the field, this
                     // catches the problem to avoid a crash.
-                    catch (NumberFormatException f) { 
+                    catch (NumberFormatException f) {
                         jumpToFrame.setText("Invalid");
                         jumpToFrame.setSelectionStart(0);
                         jumpToFrame.setSelectionEnd("Invalid".length());
-                        return; 
+                        return;
                     }
                 }
             });
-	
+
 
     }
 
-    
+
     /**
      * Greys out buttons depending on whether we can actually use them at this
      * moment; e.g. undo button is initially grey because you cannot undo until
@@ -348,27 +360,27 @@ MouseWheelListener{
     }
 
     public void setText(String text) {
-	feedback.setText(text);
+        feedback.setText(text);
     }
 
-    
+
     public void setColorSelected(byte color) {
-	colorSwatches.setSelected(color);
+        colorSwatches.setSelected(color);
     }
-   
+
     public void notifyDataSet(DataSet s, Frame f) {
-		
+
     }
-	
+
     /** Set the text in the box to update the frame number. */
     public void notifyFrame(Frame f) {
         jumpToFrame.setText((new Integer(f.index())).toString());
     }
-    
+
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
     public void keyTyped(KeyEvent e) {}
-    
+
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() > 0) {
             thresh.pressPlus();
@@ -386,11 +398,11 @@ MouseWheelListener{
         }
         public void actionPerformed(ActionEvent e) {
             if (!jumpToFrame.hasFocus()) {
-                    colorSwatches.setColor(i);
+                colorSwatches.setColor(i);
             }
         }
 
     }
-    
+
 }
 

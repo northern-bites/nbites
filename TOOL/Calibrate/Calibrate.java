@@ -142,9 +142,12 @@ public class Calibrate implements DataListener, MouseListener,
 
     private Point start, end;
 
+    // boolean to decide if the thresholded image colors are drawn or not.
+    private boolean drawThreshColors;
+
     public Calibrate(TOOL t){
         tool = t;
-
+        drawThreshColors = true;
         colorTable = tool.getColorTable();
 
         mode = Mode.THRESHOLD;
@@ -190,6 +193,14 @@ public class Calibrate implements DataListener, MouseListener,
         setEdgeThresh(x);
     }
 
+
+    public void setDrawThreshColors(boolean x) {
+        drawThreshColors = x;
+    }
+
+    public boolean getDrawThreshColors() {
+        return drawThreshColors;
+    }
 
     /**
      * Changes the threshold value of the edge.  A higher value means that
@@ -1039,19 +1050,14 @@ public class Calibrate implements DataListener, MouseListener,
         if (!f.hasImage())
             return;
         //if visionState is null, initialize, else just load the frame
-        //if (visionState == null) {
         visionState = new VisionState(f, tool.getColorTable());
         thresholdedImage = visionState.getThreshImage();//sync the thresholded images
-        /*}
-          else {
-          visionState.loadFrame(f);
-          visionState.setColorTable(tool.getColorTable());
-          }
-        */
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
         System.out.println("Calling update() from notify frame");
-        visionState.update();
+        if (drawThreshColors) {
+            visionState.update();
+        }
         colorTable = visionState.getColorTable();
 
         // Since we now handle different sized frames, it's possible to

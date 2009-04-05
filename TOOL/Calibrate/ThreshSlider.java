@@ -24,7 +24,7 @@ import TOOL.GUI.IncrementalSlider;
 public class ThreshSlider extends IncrementalSlider {
     public static final int THRESH_MIN = ImageOverlay.MIN_THRESH;
     public static final int THRESH_MAX = ImageOverlay.MAX_THRESH;
-    public static final int THRESH_INIT = ImageOverlay.DEFAULT_THRESH; 
+    public static final int THRESH_INIT = ImageOverlay.DEFAULT_THRESH;
     public static final int MAJOR_TICK_SPACING = 10;
     public static final int MINOR_TICK_SPACING = 1;
 
@@ -35,10 +35,11 @@ public class ThreshSlider extends IncrementalSlider {
     public ThreshSlider(Calibrate _calibrate) {
         super(_calibrate, "Threshold", THRESH_MIN, THRESH_MAX);
         calibrate = _calibrate;
-        
+
         enabled = new JCheckBox("Edge Thresholding Enabled (E)");
+
         //enabled.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        
+
         super.add(enabled, BorderLayout.PAGE_END);
         enabled.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -46,6 +47,7 @@ public class ThreshSlider extends IncrementalSlider {
                     calibrate.setThresholded(enabled.isSelected());
                 }
             });
+
         // Don't allow the checkbox to consume focus, but start it selected
         // by default
         enabled.setFocusable(false);
@@ -62,5 +64,5 @@ public class ThreshSlider extends IncrementalSlider {
     public void clickEnabled() {
         enabled.doClick();
     }
-   
+
 }
