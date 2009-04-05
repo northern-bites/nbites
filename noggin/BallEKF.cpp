@@ -191,68 +191,40 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)
 {
-    if (useCartesian) {
-        // Convert our sighting to cartesian coordinates
-        float x_b_r = z.distance * cos(z.bearing);
-        float y_b_r = z.distance * sin(z.bearing);
-        MeasurementVector z_x(2);
+    // Convert our sighting to cartesian coordinates
+    float x_b_r = z.distance * cos(z.bearing);
+    float y_b_r = z.distance * sin(z.bearing);
+    MeasurementVector z_x(2);
 
-        z_x(0) = x_b_r;
-        z_x(1) = y_b_r;
+    z_x(0) = x_b_r;
+    z_x(1) = y_b_r;
 
-        // Get expected values of ball
-        float x_b = getXEst();
-        float y_b = getYEst();
-        MeasurementVector d_x(2);
+    // Get expected values of ball
+    float x_b = getXEst();
+    float y_b = getYEst();
+    float sinh, cosh;
+    //sincos(&cosh, &sinh, h);
+    sinh = sin(robotPose.h);
+    cosh = cos(robotPose.h);
 
-        d_x(0) = ((x_b - robotPose.x) * cos(robotPose.h) +
-                  (y_b - robotPose.y) * sin(robotPose.h));
-        d_x(1) = (-(x_b - robotPose.x) * sin(robotPose.h) +
-                  (y_b - robotPose.y) * cos(robotPose.h));
+    MeasurementVector d_x(2);
 
-        // Calculate invariance
-        V_k = z_x - d_x;
+    d_x(0) = (x_b - robotPose.x) * cosh + (y_b - robotPose.y) * sinh;
+    d_x(1) = -(x_b - robotPose.x) * sinh + (y_b - robotPose.y) * cosh;
 
-        // Calculate jacobians
-        H_k(0,0) = cos(robotPose.h);
-        H_k(0,1) = sin(robotPose.h);
-        H_k(1,0) = -sin(robotPose.h);
-        H_k(1,1) = cos(robotPose.h);
+    // Calculate invariance
+    V_k = z_x - d_x;
 
-        // Update the measurement covariance matrix
-        R_k(0,0) = z.distanceSD;
-        R_k(1,1) = z.distanceSD;
+    // Calculate jacobians
+    H_k(0,0) = cosh;
+    H_k(0,1) = sinh;
+    H_k(1,0) = -sinh;
+    H_k(1,1) = cosh;
 
-    } else { // Use polar coordinates
-        // Make qa vector of the observed range and bearing
-        MeasurementVector z_x(2);
-        z_x(0) = z.distance;
-        z_x(1) = z.bearing;
+    // Update the measurement covariance matrix
+    R_k(0,0) = z.distanceSD;
+    R_k(1,1) = z.distanceSD;
 
-        // Get the predicted range and bearing
-        MeasurementVector d_x(2);
-        float x_b = getXEst();
-        float y_b = getYEst();
-
-        float locDistSquared = (x_b * x_b + y_b * y_b);
-        float locDist = sqrt(locDistSquared);
-        d_x(0) = hypot(x_b, y_b);
-        d_x(1) = subPIAngle(atan2(y_b, x_b));
-
-        // Calculate invariance
-        V_k = z_x - d_x;
-        V_k(1) = subPIAngle(V_k(1));
-
-        // Calculate jacobians
-        H_k(0,0) =  x_b / locDist;
-        H_k(0,1) =  y_b / locDist;
-        H_k(1,0) = -y_b / locDistSquared;
-        H_k(1,1) =  x_b / locDistSquared;
-
-        // Update the measurement covariance matrix
-        R_k(0,0) = z.distanceSD;
-        R_k(1,1) = z.bearingSD;
-    }
 }
 
 /**

@@ -97,12 +97,16 @@ LocEKF::associateTimeUpdate(MotionModel u)
     // Assume no decrease in loc velocity
     StateVector deltaLoc(LOC_EKF_DIMENSION);
     float h = getHEst();
-    deltaLoc(0) = u.deltaF * cos(h) - u.deltaL * sin(h);
-    deltaLoc(1) = u.deltaF * sin(h) + u.deltaL * cos(h);
+    float sinh, cosh;
+    //sincos(&cosh, &sinh, h);
+    sinh = sin(h);
+    cosh = cos(h);
+    deltaLoc(0) = u.deltaF * cosh - u.deltaL * sinh;
+    deltaLoc(1) = u.deltaF * sinh + u.deltaL * cosh;
     deltaLoc(2) = u.deltaR;
 
-    A_k(0,2) =  -u.deltaF * sin(h) - u.deltaL * cos(h);
-    A_k(1,2) =  u.deltaF * sin(h) - u.deltaL * cos(h);
+    A_k(0,2) =  -u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) =  u.deltaF * sinh - u.deltaL * cosh;
 
     return deltaLoc;
 }
@@ -138,21 +142,25 @@ void LocEKF::incorporateMeasurement(Observation z,
     float x = getXEst();
     float y = getYEst();
     float h = getHEst();
+    float sinh, cosh;
+    //sincos(&cosh, &sinh, h);
+    sinh = sin(h);
+    cosh = cos(h);
 
-    d_x(0) = (x_b - x) * cos(h) + (y_b - y) * sin(h);
-    d_x(1) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
+    d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
+    d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
     // Calculate invariance
     V_k = z_x - d_x;
 
     // Calculate jacobians
-    H_k(0,0) = -cos(h);
-    H_k(0,1) = -sin(h);
-    H_k(0,2) = -(x_b - x) * sin(h) + (y_b - y) * cos(h);
+    H_k(0,0) = -cosh;
+    H_k(0,1) = -sinh;
+    H_k(0,2) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
-    H_k(1,0) = sin(h);
-    H_k(1,1) = -cos(h);
-    H_k(1,2) = -(x_b - x) * cos(h) - (y_b - y) * sin(h);
+    H_k(1,0) = sinh;
+    H_k(1,1) = -cosh;
+    H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
 
     // Update the measurement covariance matrix
     R_k(0,0) = 2.0f*z.getDistanceSD();
