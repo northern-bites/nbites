@@ -52,6 +52,8 @@ class Brain(object):
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
+        self.CoA.setRobotGait(self.motion)
+
         # coa is Certificate of Authenticity (to keep things short)
         self.comm.gc.player = TeamConfig.PLAYER_NUMBER
         self.out.printf(self.CoA)
