@@ -59,7 +59,8 @@ const float Observer::Gi = -28.972f;
 Observer::Observer()
     : WalkController(), stateVector(ufvector3(3)),
       A(ufmatrix3(3,3)), b(ufvector3(3)), c(ufrowVector3(1,3)),
-      trackingError(0.0f) {
+      L(ufvector3(3)),trackingError(0.0f)
+      {
     // instantiate the ublas matrices with their respective values
     // TODO: there might be a better way to do this.
     for (int i=0; i < 3; i++)

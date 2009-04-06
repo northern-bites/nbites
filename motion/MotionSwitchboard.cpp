@@ -9,7 +9,6 @@ using namespace boost;
 #include "NBMatrixMath.h"
 using namespace Kinematics;
 using namespace NBMath;
-
 //#define DEBUG_SWITCHBOARD
 
 const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
@@ -30,6 +29,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       curGait(NULL),
       nextGait(&DEFAULT_PARAMETERS),
       nextJoints(s->getBodyAngles()),
+      nextStiffness(vector<float>(NUM_JOINTS,0.0f)),
 	  running(false),
       newJoints(false)
 {
@@ -37,6 +37,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     //Allow safe access to the next joints
     pthread_mutex_init(&next_joints_mutex, NULL);
     pthread_mutex_init(&calc_new_joints_mutex, NULL);
+    pthread_mutex_init(&stiffness_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
 
 #ifdef DEBUG_JOINTS_OUTPUT
@@ -46,6 +47,9 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     //Very Important, ensure that we have selected a default walk parameter set
     //This command also causes the robot to stand up...
     sendMotionCommand(new GaitCommand(DEFAULT_P));
+
+
+
 
 //     //build the sit down routine
 //     vector<float> * sitDownPos = new vector<float>(sitDownAngles,
@@ -129,6 +133,11 @@ void MotionSwitchboard::stop() {
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_signal(&calc_new_joints_cond);
     pthread_mutex_unlock(&calc_new_joints_mutex);
+
+    pthread_mutex_destroy(&next_joints_mutex);
+    pthread_mutex_destroy(&calc_new_joints_mutex);
+    pthread_mutex_destroy(&stiffness_mutex);
+    pthread_cond_destroy(&calc_new_joints_cond);
 }
 
 
@@ -150,8 +159,13 @@ void MotionSwitchboard::run() {
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
-    while(running) {
+    StiffnessCommand * stiff   = new StiffnessCommand(1.0);
+    sendMotionCommand(stiff);
+    StiffnessCommand * stiff2   = new StiffnessCommand(LLEG_CHAIN,.5);
+    sendMotionCommand(stiff2);
 
+    while(running) {
+        newStiffness = processStiffness();
         bool active  = processProviders();
 
 #ifdef DEBUG_JOINTS_OUTPUT
@@ -292,6 +306,13 @@ const vector <float> MotionSwitchboard::getNextJoints() {
     return vec;
 }
 
+const StiffnessResult  MotionSwitchboard::getNextStiffness(){
+    pthread_mutex_lock(&stiffness_mutex);
+    StiffnessResult result = {newStiffness, vector<float>(nextStiffness)};
+    pthread_mutex_unlock(&stiffness_mutex);
+    return result;
+}
+
 void MotionSwitchboard::signalNextFrame(){
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_signal(&calc_new_joints_cond);
@@ -395,4 +416,60 @@ void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
 void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
     // headProvider is NEVER the nextProvider. NEVER.
     headProvider.setCommand(command);
+}
+
+void MotionSwitchboard::sendMotionCommand(const StiffnessCommand * command){
+    pthread_mutex_lock(&stiffness_mutex);
+    stiffnessRequests.push_back(command);
+    pthread_mutex_unlock(&stiffness_mutex);
+
+}
+
+/**
+ * Method to process remaining stiffness requests
+ * Technically this could be handled by another provider, but there isn't
+ * too much too it:
+ */
+int MotionSwitchboard::processStiffness(){
+    int changed  = 0;
+    pthread_mutex_lock(&stiffness_mutex);
+
+    //Get all the pending commands out of the queue
+    while(!stiffnessRequests.empty()){
+        const StiffnessCommand * next = stiffnessRequests.front();
+        stiffnessRequests.pop_front();
+
+        //For each command, we look at each chain and see if there is anything
+        //that needs to be done
+        for(unsigned int i = HEAD_CHAIN; i <=RARM_CHAIN; i++){
+            const vector <float> * stiffnesses =
+                next->getChainStiffness((ChainID) i);
+
+            //Skip empty chains
+            if(stiffnesses==NULL)
+                continue;
+
+            //Each chain has several joints we need to update
+            //Ignore unchanged values or when the value is explicitly
+            //set to NOT_SET
+            for(unsigned int j = 0; j < chain_lengths[i]; j ++){
+                cout << "Looking at chain "<<i << " of length "<<chain_lengths[i]
+                     << " and currently at joint "<<j<<endl;
+                if (nextStiffness[chain_first_joint[i] + j]
+                    != stiffnesses->at(j) &&
+                    stiffnesses->at(j) != StiffnessCommand::NOT_SET){
+                    nextStiffness[chain_first_joint[i] + j] =
+                        stiffnesses->at(j);
+                    cout << "  diff value!" << endl;
+                    changed = true; //flag when a value is changed
+                }
+            }
+
+            delete stiffnesses;
+        }
+        delete next;
+    }
+    pthread_mutex_unlock(&stiffness_mutex);
+
+    return changed;
 }

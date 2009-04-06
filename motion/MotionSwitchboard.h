@@ -51,9 +51,16 @@
 #include "WalkCommand.h"
 #include "GaitCommand.h"
 #include "SetHeadCommand.h"
+#include "StiffnessCommand.h"
+
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
 #endif
+
+struct StiffnessResult{
+    bool changed;
+    const std::vector<float> stiffness;
+};
 
 class MotionSwitchboard {
 public:
@@ -65,12 +72,15 @@ public:
     void run();
 
 	const std::vector <float> getNextJoints();
+	const StiffnessResult getNextStiffness();
     void signalNextFrame();
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const GaitCommand* command);
 	void sendMotionCommand(const SetHeadCommand* command);
+	void sendMotionCommand(const StiffnessCommand* command);
+
 public:
     void stopHeadMoves(){headProvider.requestStop();}
 
@@ -84,6 +94,7 @@ public:
 
 private:
     int processProviders();
+    int processStiffness();
     void swapBodyProvider();
     BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
 
@@ -106,9 +117,13 @@ private:
     const WalkingParameters *nextGait;
 
     std::vector <float> nextJoints;
+    std::vector <float> nextStiffness;
 
     bool running;
 	bool newJoints; //Way to track if we ever use the same joints twice
+    bool newStiffness;
+
+    std::list<const StiffnessCommand *> stiffnessRequests;
 
 	HeadJointCommand *hjc;
 	HeadJointCommand *hjc2;
@@ -129,6 +144,7 @@ private:
     pthread_cond_t  calc_new_joints_cond;
     pthread_mutex_t calc_new_joints_mutex;
     pthread_mutex_t next_joints_mutex;
+    pthread_mutex_t stiffness_mutex;
 
 #ifdef DEBUG_JOINTS_OUTPUT
     FILE* joints_log;
