@@ -141,6 +141,9 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+    void limitAPrioriUncert();
+    void limitPosteriorUncert();
+
     // Parameters
     const static float BETA_LOC;
     const static float GAMMA_LOC;
@@ -166,6 +169,5 @@ private:
     const static float Y_EST_MIN;
     const static float X_EST_MAX;
     const static float Y_EST_MAX;
-    bool useCartesian;
 };
 #endif // File

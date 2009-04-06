@@ -204,7 +204,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             visDist += sigmaD*UNIFORM_1_NEG_1;
             sigmaB = getBearingSD(visBearing);
-            //visBearing += .04*UNIFORM_1_NEG_1;
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -246,7 +245,6 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             sigmaD = getDistSD(visDist);
             visDist += UNIFORM_1_NEG_1*0.05*visDist;
             sigmaB = getBearingSD(visBearing);
-            //visBearing += sigmaB*UNIFORM_1_NEG_1+.005*sigmaB;
 
             // Ignore the center circle for right now
             if (toView->getID() == CENTER_CIRCLE) {
@@ -354,8 +352,7 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        //e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
-        //e.bearing += subPIAngle(UNIFORM_1_NEG_1*0.05);
+        e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
 
     } else {
         e.dist = 0.0f;
@@ -448,7 +445,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "
                 << myLoc->getHEst() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
-                << myLoc->getHUncertDeg() << " "
+                << myLoc->getHUncert() << " "
                 // X Estimate
                 << (ballEKF->getXEst()) << " "
                 // Y Estimate

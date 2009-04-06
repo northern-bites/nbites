@@ -23,6 +23,13 @@ static const float QUART_CIRC_RAD = M_PI / 2.0f;
 
 namespace NBMath {
 
+#ifdef __APPLE__
+    inline static void sincosf(float _x, float * _sinx, float * _cosx) {
+        *_sinx = sin(_x);
+        *_cosx = cos(_x);
+    }
+#endif
+
     inline static int ROUND(float x) {
         if ((x-static_cast<int>(x)) >= 0.5) return (static_cast<int>(x)+1);
         if ((x-static_cast<int>(x)) <= -0.5) return (static_cast<int>(x)-1);

@@ -8,6 +8,8 @@
 
 #include "MCL.h"
 #include "NBMath.h"
+#include <time.h> // for srand(time(NULL))
+#include <cstdlib> // for MAX_RAND
 using namespace std;
 #define MAX_CHANGE_X 5.0f
 #define MAX_CHANGE_Y 5.0f
@@ -83,10 +85,14 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
 
         int count = int(round(float(M) * X_bar_t[m].weight));
         // Add the particles to the resample posterior!
-        for (int i = 0; i < count; ++i) {
-            // Random walk the particles
-            X_t.push_back(randomWalkParticle(X_bar_t[m]));
-            //X_t.push_back(X_bar_t[m]);
+        if (frameCounter % 1 == 0) {
+            for (int i = 0; i < count; ++i) {
+                // Random walk the particles
+                X_t.push_back(randomWalkParticle(X_bar_t[m]));
+                //X_t.push_back(X_bar_t[m]);
+            }
+        } else {
+            X_t.push_back(X_bar_t[m]);
         }
     }
 
@@ -105,21 +111,19 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
  */
 PoseEst MCL::updateMotionModel(PoseEst x_t, MotionModel u_t)
 {
-    u_t.deltaF += MAX_CHANGE_F * UNIFORM_1_NEG_1;
-    u_t.deltaL += MAX_CHANGE_L * UNIFORM_1_NEG_1;
-    u_t.deltaR += MAX_CHANGE_R * UNIFORM_1_NEG_1;
+    u_t.deltaF -= sampleNormalDistribution(fabs(u_t.deltaF));
+    u_t.deltaL -= sampleNormalDistribution(fabs(u_t.deltaL));
+    u_t.deltaR -= sampleNormalDistribution(fabs(u_t.deltaR));
+
+    // u_t.deltaF -= sampleTriangularDistribution(fabs(u_t.deltaF));
+    // u_t.deltaL -= sampleTriangularDistribution(fabs(u_t.deltaL));
+    // u_t.deltaR -= sampleTriangularDistribution(fabs(u_t.deltaR));
 
     x_t += u_t;
 
-    //x_t.h = NBMath::subPIAngle(x_t.h);
-
-    // if (x_t.x < 0 || x_t.y < 0 || x_t.h < -M_PI || x_t.h > M_PI) {
-    //     cout << "Errant particle " << x_t << endl;
-    //     cout << "\tOdometry was " << u_t << endl;
-    // }
+    x_t.h = NBMath::subPIAngle(x_t.h);
 
     return x_t;
-
 }
 
 /**
@@ -190,15 +194,17 @@ void MCL::updateEstimates()
         // Sum the weights
         weightSum += X_t[i].weight;
 
-        // if (X_t[i].weight > maxWeight) {
-        //     maxWeight = X_t[i].weight;
-        //     best = X_t[i].pose;
-        // }
+        if (X_t[i].weight > maxWeight) {
+            maxWeight = X_t[i].weight;
+            best = X_t[i].pose;
+        }
     }
 
     wMeans.x /= weightSum;
     wMeans.y /= weightSum;
     wMeans.h /= weightSum;
+
+    wMeans.h = NBMath::subPIAngle(wMeans.h);
 
     // Calculate the biased variances
     for (unsigned int i=0; i < X_t.size(); ++i) {
@@ -224,7 +230,7 @@ void MCL::updateEstimates()
 
     // Set class variables to reflect newly calculated values
     curEst = wMeans;
-    //curEst = best;
+    curBest = best;
     curUncert = bSDs;
 }
 
@@ -369,29 +375,27 @@ Particle MCL::randomWalkParticle(Particle p)
     p.pose.y += MAX_CHANGE_Y * (1.0f - p.weight)*UNIFORM_1_NEG_1;
     p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
 
-    //p.pose.h = NBMath::subPIAngle(p.pose.h);
+    p.pose.h = NBMath::subPIAngle(p.pose.h);
 
-    if (p.pose.x < 0) p.pose.x = 0;
-    if (p.pose.y < 0) p.pose.y = 0;
+    // if (p.pose.x < 0) p.pose.x = 0;
+    // if (p.pose.y < 0) p.pose.y = 0;
     return p;
 }
-
 
 float MCL::sampleNormalDistribution(float sd)
 {
     float samp = 0;
     for(int i = 0; i < 12; i++) {
-        samp += (2*(rand() / (float(RAND_MAX) + sd)) - sd);
+        samp += (2*(rand() / float(RAND_MAX)) * sd) - sd;
     }
     return 0.5*samp;
 }
 
 float MCL::sampleTriangularDistribution(float sd)
 {
-    return sqrt(6.0)*0.5 * ((2*(rand() / (float(RAND_MAX) + sd)) - sd) +
-                            (2*(rand() / (float(RAND_MAX) + sd)) - sd));
+    return sqrt(6.0)*0.5 * ((2*sd*(rand() / float(RAND_MAX))) - sd +
+                            (2*sd*(rand() / float(RAND_MAX))) - sd);
 }
-
 
 // Particle
 Particle::Particle(PoseEst _pose, float _weight) :
