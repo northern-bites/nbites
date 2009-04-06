@@ -159,10 +159,8 @@ void MotionSwitchboard::run() {
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
-    StiffnessCommand * stiff   = new StiffnessCommand(1.0);
+    StiffnessCommand * stiff   = new StiffnessCommand(0.8);
     sendMotionCommand(stiff);
-    StiffnessCommand * stiff2   = new StiffnessCommand(LLEG_CHAIN,.5);
-    sendMotionCommand(stiff2);
 
     while(running) {
         newStiffness = processStiffness();
@@ -306,9 +304,9 @@ const vector <float> MotionSwitchboard::getNextJoints() {
     return vec;
 }
 
-const StiffnessResult  MotionSwitchboard::getNextStiffness(){
+const vector<float>  MotionSwitchboard::getNextStiffness(){
     pthread_mutex_lock(&stiffness_mutex);
-    StiffnessResult result = {newStiffness, vector<float>(nextStiffness)};
+    vector<float> result(nextStiffness);
     pthread_mutex_unlock(&stiffness_mutex);
     return result;
 }

@@ -57,10 +57,6 @@
 #  define DEBUG_JOINTS_OUTPUT
 #endif
 
-struct StiffnessResult{
-    bool changed;
-    const std::vector<float> stiffness;
-};
 
 class MotionSwitchboard {
 public:
@@ -72,7 +68,7 @@ public:
     void run();
 
 	const std::vector <float> getNextJoints();
-	const StiffnessResult getNextStiffness();
+	const std::vector<float> getNextStiffness();
     void signalNextFrame();
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);

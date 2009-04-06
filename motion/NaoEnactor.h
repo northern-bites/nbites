@@ -49,6 +49,7 @@ private: // Members
     boost::shared_ptr<Sensors> sensors;
     std::vector<float> jointValues;
     std::vector<float> motionValues;
+    std::vector<float> motionHardness;
     AL::ALValue hardness_command;
     AL::ALValue joint_command;
 
@@ -56,6 +57,7 @@ private: // Members
 
 private: // Helper methods
     void setBodyHardness(float bodyHardness);
+    void sendHardness();
     float SafetyCheck(float,float, int);
     void initSyncWithALMemory();
     void initDCMAliases();
