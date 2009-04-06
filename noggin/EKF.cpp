@@ -20,7 +20,7 @@ EKF<Measurement, UpdateModel, dimension, mSize>
       Q_k(dimension,dimension), A_k(dimension,dimension),
       P_k(dimension,dimension), P_k_bar(dimension,dimension),
       dimensionIdentity(dimension), numStates(dimension),
-      measurementSize(mSize), beta(_beta), gamma(_gamma)
+      measurementSize(mSize)
 {
     // Initialize all matrix values to 0
     for(unsigned i = 0; i < dimension; ++i) {
@@ -32,6 +32,8 @@ EKF<Measurement, UpdateModel, dimension, mSize>
         }
         xhat_k(i) = 0.0f;
         xhat_k_bar(i) = 0.0f;
+        betas(i) = _beta;
+        gammas(i) = _gamma;
     }
 }
 
@@ -54,7 +56,7 @@ void EKF<Measurement, UpdateModel, dimension,mSize>::timeUpdate(UpdateModel u_k)
 
     // Calculate the uncertainty growth for the current update
     for(unsigned int i = 0; i < numStates; ++i) {
-        Q_k(i,i) = beta + gamma * deltas(i) * deltas(i);
+        Q_k(i,i) = betas(i) + gammas(i) * deltas(i) * deltas(i);
     }
 
     // Update error covariance matrix

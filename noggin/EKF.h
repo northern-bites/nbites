@@ -81,8 +81,8 @@ protected:
     const unsigned int numStates; // number of states in the kalman filter
     const unsigned int measurementSize; // dimension of the observation (z_k)
 
-    float beta; // constant uncertainty increase
-    float gamma; // scaled uncertainty increase
+    StateVector betas; // constant uncertainty increase
+    StateVector gammas; // scaled uncertainty increase
 
 public:
     // Constructors & Destructors

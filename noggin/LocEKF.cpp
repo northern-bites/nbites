@@ -6,11 +6,11 @@ using namespace boost;
 using namespace NBMath;
 
 // Parameters
-const float LocEKF::BETA_LOC = 15.0f;
+const float LocEKF::BETA_LOC = 3.0f;
 const float LocEKF::GAMMA_LOC = 0.4f;
-const float LocEKF::BETA_LAT = 15.0f;
+const float LocEKF::BETA_LAT = 3.0f;
 const float LocEKF::GAMMA_LAT = 0.4f;
-const float LocEKF::BETA_ROT = 5.0f;
+const float LocEKF::BETA_ROT = 10.0f;
 const float LocEKF::GAMMA_ROT = 0.4f;
 
 // Default initialization values
@@ -19,7 +19,7 @@ const float LocEKF::INIT_LOC_Y = 270.0f;
 const float LocEKF::INIT_LOC_H = 0.0f;
 const float LocEKF::X_UNCERT_MAX = 440.0f;
 const float LocEKF::Y_UNCERT_MAX = 680.0f;
-const float LocEKF::H_UNCERT_MAX = M_PI;
+const float LocEKF::H_UNCERT_MAX = 4*M_PI;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6;
@@ -59,6 +59,9 @@ LocEKF::LocEKF(float initX, float initY, float initH,
     setXUncert(initXUncert);
     setYUncert(initYUncert);
     setHUncert(initHUncert);
+
+    betas(2) = BETA_ROT;
+    gammas(2) = GAMMA_ROT;
 }
 
 /**
@@ -160,8 +163,8 @@ void LocEKF::incorporateMeasurement(Observation z,
     H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
 
     // Update the measurement covariance matrix
-    R_k(0,0) = 2.0f*z.getDistanceSD();
-    R_k(1,1) = 2.0f*z.getDistanceSD();
+    R_k(0,0) = z.getDistanceSD();
+    R_k(1,1) = z.getDistanceSD();
 }
 
 /**

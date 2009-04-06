@@ -98,7 +98,7 @@ private: // Class Variables
     // Helper Methods
     inline float postDistanceToSD(float _distance) {
         //return 0.0496f * exp(0.0271f * _distance);
-        return std::max(10 + (_distance * _distance)*0.0125f, 100.0f);
+        return 2.0f*(10 + (_distance * _distance)*0.00125f);
     }
     inline float postBearingToSD(float _bearing) {
         return static_cast<float>(M_PI) / 8.0f;

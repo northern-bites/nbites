@@ -12,8 +12,6 @@
 // STL
 #include <vector>
 #include <math.h>
-#include <time.h> // for srand(time(NULL))
-#include <cstdlib> // for MAX_RAND
 // Local
 #include "Observation.h"
 #include "FieldConstants.h"
@@ -58,6 +56,7 @@ public:
     // Getters
     const PoseEst getCurrentEstimate() const { return curEst; }
     const PoseEst getCurrentUncertainty() const { return curUncert; }
+    const PoseEst getCurrentBest() const { return curBest; }
     /**
      * @return The current x esitamte of the robot
      */
@@ -137,6 +136,7 @@ public:
 private:
     // Class variables
     PoseEst curEst; // Current {x,y,h} esitamates
+    PoseEst curBest; // Current {x,y,h} esitamate of the highest weighted particle
     PoseEst curUncert; // Associated {x,y,h} uncertainties (standard deviations)
     std::vector<Particle> X_t; // Current set of particles
 
