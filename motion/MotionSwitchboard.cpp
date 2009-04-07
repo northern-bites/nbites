@@ -456,7 +456,7 @@ int MotionSwitchboard::processStiffness(){
                     stiffnesses->at(j) != StiffnessCommand::NOT_SET){
                     nextStiffness[chain_first_joint[i] + j] =
                         stiffnesses->at(j);
-                    changed = true; //flag when a value is changed
+                    changed += 1; //flag when a value is changed
                 }
             }
 
