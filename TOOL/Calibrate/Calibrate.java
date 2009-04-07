@@ -127,7 +127,7 @@ public class Calibrate implements DataListener, MouseListener,
     protected static enum Mode { THRESHOLD, DEFINING_EDGE, UNDEFINE };
     protected Mode mode;
 
-
+    private Frame currentFrame;
     // Used to keep track of which pixels have already been thresholded in
     // a single click
     private Set<Point> currentSelections;
@@ -196,6 +196,7 @@ public class Calibrate implements DataListener, MouseListener,
 
     public void setDrawThreshColors(boolean x) {
         drawThreshColors = x;
+        notifyFrame(currentFrame);
     }
 
     public boolean getDrawThreshColors() {
@@ -434,7 +435,6 @@ public class Calibrate implements DataListener, MouseListener,
         redoStack.clear();
 
         //update the visionState
-        System.out.println("Calling update from pixelSelected");
         visionState.update();
         //lastly, need to repaint
         // simply repaint the selector, as underlying image hasn't changed
@@ -587,7 +587,6 @@ public class Calibrate implements DataListener, MouseListener,
 
 
         //update the vision state (which thresholds the whole image again, and updates the objects)
-        System.out.println("Calling update from swapColor");
         visionState.update();
         //lastly, need to repaint
         // displayer needs to be updated to reflect the new thresholded changes
@@ -720,7 +719,6 @@ public class Calibrate implements DataListener, MouseListener,
         }
 
         //update the thresholded image by calling visionstate.update
-        System.out.println("Calling update() from undo");
         visionState.update();
         displayer.updateImage(thresholdedImage);
         displayer.repaint();
@@ -775,7 +773,6 @@ public class Calibrate implements DataListener, MouseListener,
         }
 
         //update the thresholded image by calling update on visionstate
-        System.out.println("Calling update() from redo");
         visionState.update();
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
@@ -1047,6 +1044,7 @@ public class Calibrate implements DataListener, MouseListener,
     }
     //to do: clean up this code - Octavian
     public void notifyFrame(Frame f) {
+        currentFrame = f;
         if (!f.hasImage())
             return;
         //if visionState is null, initialize, else just load the frame
@@ -1058,8 +1056,6 @@ public class Calibrate implements DataListener, MouseListener,
         colorTable = visionState.getColorTable();
 
         if (drawThreshColors) {
-            System.out.println("Calling threshImage() from notify frame");
-            //visionState.update();
             thresholdedImage.thresholdImage(colorTable, rawImage);
         }
 
@@ -1080,7 +1076,6 @@ public class Calibrate implements DataListener, MouseListener,
         if(thresholdedImage != null) {
             displayer.updateImage(thresholdedImage);
             displayer.setOverlayImage(visionState.getThreshOverlay());
-            System.out.println("Calling update() from notify frame");
             visionState.update();
         }
 
@@ -1105,8 +1100,7 @@ public class Calibrate implements DataListener, MouseListener,
 
         //threshold the full image again
         if(thresholdedImage != null)//if no frame is loaded, don't want to update
-            System.out.println("Calling update() from color table changed.");
-        visionState.update();
+            visionState.update();
         //lastly, need to repaint
         selector.repaint();
         displayer.repaint();
