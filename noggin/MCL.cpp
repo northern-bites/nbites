@@ -13,7 +13,7 @@
 using namespace std;
 #define MAX_CHANGE_X 5.0f
 #define MAX_CHANGE_Y 5.0f
-#define MAX_CHANGE_H M_PI / 8.0f
+#define MAX_CHANGE_H M_PI / 16.0f
 #define MAX_CHANGE_F 5.0f
 #define MAX_CHANGE_L 5.0f
 #define MAX_CHANGE_R M_PI / 16.0f
@@ -77,27 +77,16 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
         X_bar_t.push_back(x_t_m);
     }
 
-    // Process the particles after updating them all
-    for (int m = 0; m < M; ++m) {
-
-        // Normalize the particle weights
-        X_bar_t[m].weight /= totalWeights;
-
-        int count = int(round(float(M) * X_bar_t[m].weight));
-        // Add the particles to the resample posterior!
-        if (frameCounter % 1 == 0) {
-            for (int i = 0; i < count; ++i) {
-                // Random walk the particles
-                X_t.push_back(randomWalkParticle(X_bar_t[m]));
-                //X_t.push_back(X_bar_t[m]);
-            }
-        } else {
-            X_t.push_back(X_bar_t[m]);
-        }
+    // Resample the particles
+    if (frameCounter % 1 == 0) {
+        resample(&X_bar_t, totalWeights);
+    } else {
+        noResample(&X_bar_t);
     }
 
     // Update pose and uncertainty estimates
     updateEstimates();
+
 }
 
 /**
@@ -171,6 +160,56 @@ float MCL::updateMeasurementModel(vector<Observation> z_t, PoseEst x_t)
     }
 
     return w; // The combined weight of all observations
+}
+
+/**
+ * Method to resample the particles based on a straight proportion of their
+ * weights. Adds copies of the paritcle jittered proportional to the weight
+ * of the particle
+ *
+ * @param X_bar_t the set of particles before being resampled
+ * @param totalWeights the totalWeights of the particle set X_bar_t
+ */
+void MCL::resample(std::vector<Particle> * X_bar_t, float totalWeights) {
+    for (int m = 0; m < M; ++m) {
+        // Normalize the particle weights
+        (*X_bar_t)[m].weight /= totalWeights;
+
+        int count = int(round(float(M) * (*X_bar_t)[m].weight));
+        for (int i = 0; i < count; ++i) {
+            // Random walk the particles
+            X_t.push_back(randomWalkParticle((*X_bar_t)[m]));
+            //X_t.push_back(X_bar_t[m]);
+        }
+    }
+}
+
+void MCL::lowVarianceResample(std::vector<Particle> * X_bar_t,
+                              float totalWeights) {
+    float r = ((rand() / float(RAND_MAX)) * (1/M));
+    float c = (*X_bar_t)[0].weight / totalWeights;
+    int i = 0;
+    for (int m = 0; m < M; ++m) {
+
+        float U = r = m * (1/M);
+
+        // Normalize the particle weights
+        (*X_bar_t)[m].weight /= totalWeights;
+
+        while ( U > c) {
+            i++;
+            c += (*X_bar_t)[m].weight;
+        }
+        X_t.push_back(randomWalkParticle((*X_bar_t)[i]));
+    }
+}
+/**
+ * Prepare for the next update step without resampling the particles
+ *
+ * @param X_bar_t the set of updated particles
+ */
+void MCL::noResample(std::vector<Particle> * X_bar_t) {
+    X_t = *X_bar_t;
 }
 
 /**
@@ -371,14 +410,12 @@ float MCL::getSimilarity(float r_d, float r_a, Observation &z)
  */
 Particle MCL::randomWalkParticle(Particle p)
 {
-    p.pose.x += MAX_CHANGE_X * (1.0f - p.weight)*UNIFORM_1_NEG_1;
-    p.pose.y += MAX_CHANGE_Y * (1.0f - p.weight)*UNIFORM_1_NEG_1;
-    p.pose.h += MAX_CHANGE_H * (1.0f - p.weight)*UNIFORM_1_NEG_1;
+    p.pose.x += sampleNormalDistribution(MAX_CHANGE_X * (1.0f - p.weight));
+    p.pose.y += sampleNormalDistribution(MAX_CHANGE_Y * (1.0f - p.weight));
+    p.pose.h += sampleNormalDistribution(MAX_CHANGE_H * (1.0f - p.weight));
 
     p.pose.h = NBMath::subPIAngle(p.pose.h);
 
-    // if (p.pose.x < 0) p.pose.x = 0;
-    // if (p.pose.y < 0) p.pose.y = 0;
     return p;
 }
 
