@@ -84,8 +84,6 @@ void Motion<EnactorType>::stop() {
 template <class EnactorType>
 void Motion<EnactorType>::run(){
     cout <<"Motion::run"<<endl;
-    //Ensure the lastest joint values are ready before we start the switchboard
-    cout << "Done with post Sensors" <<endl;
     switchboard.run();
 }
 

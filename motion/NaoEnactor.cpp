@@ -55,7 +55,6 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
     initDCMAliases();
     initDCMCommands();
     initSensorBodyJoints();
-    //setBodyHardness(0.80f);
 
     // connect to dcm using the static methods declared above
     broker->getProxy("DCM")->getModule()->onPostProcess()
@@ -324,7 +323,7 @@ void NaoEnactor::initSensorBodyJoints(){
     //This is basically postSensors() but need a different order
     syncWithALMemory();
     motionValues = jointValues;
-    sensors->setBodyAngles(motionValues);
+    sensors->setMotionBodyAngles(motionValues);
 }
 
 void NaoEnactor::initDCMCommands(){

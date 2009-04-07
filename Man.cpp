@@ -141,7 +141,7 @@ Man::initMan()
 #else
         log = ALLoggerProxy::getInstance();
 #endif
-        log->setVerbosity("warning");
+        log->setVerbosity("info");
     }catch (ALError &e) {
         std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
     }

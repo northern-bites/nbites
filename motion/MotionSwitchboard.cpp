@@ -45,55 +45,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 #endif
 
     //Very Important, ensure that we have selected a default walk parameter set
-    //This command also causes the robot to stand up...
     sendMotionCommand(new GaitCommand(DEFAULT_P));
-
-
-
-
-//     //build the sit down routine
-//     vector<float> * sitDownPos = new vector<float>(sitDownAngles,
-//                                                    sitDownAngles+NUM_JOINTS);
-//     sitDown = new BodyJointCommand(4.0f,sitDownPos,Kinematics::INTERPOLATION_LINEAR);
-
-//     //the getup routine waits for the walk engine to be inited
-//     //Build the get up routine
-//     vector<float> * initPos
-//         = DEFAULT_PARAMETERS.getWalkStance();
-// 	getUp = new BodyJointCommand(5.0f,
-//                                  initPos,
-//                                  Kinematics::INTERPOLATION_LINEAR);
-
-// 	vector<float>* headJoints1 = new vector<float>(2,M_PI/2);
-// 	hjc = new HeadJointCommand(2.0f,
-// 							   headJoints1,
-// 							   Kinematics::INTERPOLATION_LINEAR);
-
-// 	vector<float>* headJoints2 = new vector<float>(2,0.0f);
-// 	hjc2 = new HeadJointCommand(3.0f,
-// 								headJoints2,
-// 								Kinematics::INTERPOLATION_LINEAR);
-// 	vector<float>* headJoints3 = new vector<float>(2,-M_PI/8);
-// 	hjc3 = new HeadJointCommand(2.0f,
-// 								headJoints3,
-// 								Kinematics::INTERPOLATION_LINEAR);
-
-
-
-// 	vector<float>* bodyJoints3 = new vector<float>(4,0.0f);//M_PI/4);
-// 	command3 = new BodyJointCommand(2.0f, RARM_CHAIN,
-// 									bodyJoints3,
-// 									Kinematics::INTERPOLATION_LINEAR);
-
-// 	bodyJoints = new vector<float>(20,0.0f);
-// 	command = new BodyJointCommand(5.0f,
-// 								   bodyJoints,
-//                                    Kinematics::INTERPOLATION_LINEAR);
-
-// 	bodyJoints2 = new vector<float>(20,-M_PI/6);
-// 	command2 = new BodyJointCommand(5.0f,
-// 									bodyJoints2,
-// 									Kinematics::INTERPOLATION_LINEAR);
 
 }
 
@@ -114,13 +66,6 @@ void MotionSwitchboard::start() {
 #endif
     fflush(stdout);
 
-// 	headProvider.enqueue(hjc);
-
-	//nextProvider = reinterpret_cast <MotionProvider *>( &scriptedProvider);
-	//sendMotionCommand(command3);
-	//sendMotionCommand(hjc3);
-// 	headProvider.enqueue(hjc3);
-    //sendMotionCommand(getUp);
 
     running = true;
 
@@ -160,6 +105,7 @@ void MotionSwitchboard::run() {
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
     while(running) {
+        realityCheckJoints();
         newStiffness = processStiffness();
         bool active  = processProviders();
 
@@ -269,6 +215,10 @@ void MotionSwitchboard::swapBodyProvider(){
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
         //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOAR IS BROKEN!
+        //TODO/HACK: Since we overwrite Joint angles in realityCheck
+        //we may want to ensure that a gaitTranstition command is only run
+        // ONCE (Maybe twice?), instead of doing this forever.
+        //The potential symptoms of such a bug would be jittering when standing
         //We need to ensure we are in the correct gait before walking
         gaitSwitch = walkProvider.getGaitTransitionCommand();
         if(gaitSwitch->getDuration() >= 0.02f){
@@ -313,6 +263,29 @@ void MotionSwitchboard::signalNextFrame(){
     pthread_cond_signal(&calc_new_joints_cond);
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
+}
+
+
+/**
+ * Checks to ensure that the current MotionBodyAngles are close enough to
+ * what the sensors are reporting. If they are very different,
+ * then the bad value is replaced
+ */
+int MotionSwitchboard::realityCheckJoints(){
+    static const float joint_override_thresh = 0.1;//radians
+    int changed = 0;
+    vector<float> sensorAngles = sensors->getBodyAngles();
+    vector<float> motionAngles = sensors->getMotionBodyAngles();
+    for(unsigned int i = 0; i < NUM_JOINTS; i++){
+        if (fabs(sensorAngles[i] - motionAngles[i]) > joint_override_thresh){
+            //cout << "Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+            nextJoints[i] = motionAngles[i] = sensorAngles[i];
+            changed += 1;
+        }
+    }
+    if(changed != 0)
+        sensors->setMotionBodyAngles(motionAngles);
+    return changed;
 }
 
 #ifdef DEBUG_JOINTS_OUTPUT

@@ -93,6 +93,7 @@ private:
     int processStiffness();
     void swapBodyProvider();
     BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
+    int realityCheckJoints();
 
 #ifdef DEBUG_JOINTS_OUTPUT
     void initDebugLogs();
@@ -121,20 +122,7 @@ private:
 
     std::list<const StiffnessCommand *> stiffnessRequests;
 
-	HeadJointCommand *hjc;
-	HeadJointCommand *hjc2;
-	HeadJointCommand *hjc3;
-	std::vector<float> *bodyJoints;
-	std::vector<float> *bodyJoints2;
-
-	BodyJointCommand *command;
-	BodyJointCommand *command2;
-	BodyJointCommand *command3;
     static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];
-
-	BodyJointCommand *getUp;
-	BodyJointCommand *sitDown;
-
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
