@@ -451,14 +451,11 @@ int MotionSwitchboard::processStiffness(){
             //Ignore unchanged values or when the value is explicitly
             //set to NOT_SET
             for(unsigned int j = 0; j < chain_lengths[i]; j ++){
-                cout << "Looking at chain "<<i << " of length "<<chain_lengths[i]
-                     << " and currently at joint "<<j<<endl;
                 if (nextStiffness[chain_first_joint[i] + j]
                     != stiffnesses->at(j) &&
                     stiffnesses->at(j) != StiffnessCommand::NOT_SET){
                     nextStiffness[chain_first_joint[i] + j] =
                         stiffnesses->at(j);
-                    cout << "  diff value!" << endl;
                     changed = true; //flag when a value is changed
                 }
             }
