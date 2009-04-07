@@ -159,9 +159,6 @@ void MotionSwitchboard::run() {
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
-    StiffnessCommand * stiff   = new StiffnessCommand(0.8);
-    sendMotionCommand(stiff);
-
     while(running) {
         newStiffness = processStiffness();
         bool active  = processProviders();

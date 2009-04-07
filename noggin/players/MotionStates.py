@@ -31,6 +31,9 @@ def gameInitial(player):
 #                                   5.0,   # max y speed
 #                                   30.0)  # max theta speed
 #         player.brain.motion.setGait(gait)
+    if player.firstFrame():
+        x = motion.StiffnessCommand(1.0)
+        player.brain.motion.sendStiffness(x)
     return player.stay()
     #return player.goLater('walkstraight')
 
@@ -115,5 +118,25 @@ def sitdown(player):
 
     return player.stay()
 
+def shutoffgains(player):
+    if player.firstFrame():
+        shutoff = motion.StiffnessCommand(0.0)
+        player.brain.motion.sendStiffness(shutoff)
+
+    return player.goLater('nothing')
+
 def  nothing(player):
+    return player.stay()
+
+def gameFinished(player):
+    if player.firstFrame():
+        player.motion.stopBodyMoves()
+        player.brain.tracker.stopHeadMoves()
+        player.setHeads(0.,0.)
+        player.executeMove(SweetMoves.SIT_POS)
+
+    #Need time for sitdown and for waiting for the walk to stop
+    #it would be better if we could see when the motion engine was inactive
+    if player.stateTime > 8.0:
+        return player.goNow('shutoffgains')
     return player.stay()

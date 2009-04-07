@@ -36,6 +36,10 @@ void MotionInterface::setHead(const SetHeadCommand *command){
     switchboard->sendMotionCommand(command);
 }
 
+void MotionInterface::sendStiffness(const StiffnessCommand * command){
+    switchboard->sendMotionCommand(command);
+}
+
 void MotionInterface::stopBodyMoves() {
     std::cout << "Stopping the body not yet implemented" << std::endl;
 }
