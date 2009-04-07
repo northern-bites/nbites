@@ -85,11 +85,7 @@ OPTION(
   "Turn on/off debug printing on requesting images"
   OFF
   )
-OPTION(
-  DEBUG_BALL_DETECTION
-  "Turn on/off debug for frames that have a ball"
-  OFF
-  )
+
 OPTION(
   USE_VISION
   "Turn on/off all vision processing"
@@ -107,8 +103,8 @@ OPTION(
   )
 OPTION(
   USE_DCM
-  "Use direct interaction with the DCM through NaoEnactor instead of ALEnactor"
-  OFF
+  "Send commands directly to the DCM. Turn this off in REMOTE mode"
+  ON
   )
 OPTION(
   USE_SENSORS_IMAGE_LOCKING

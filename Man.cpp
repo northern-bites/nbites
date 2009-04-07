@@ -856,13 +856,6 @@ Man::processFrame ()
         vision->notifyImage();
 #endif
 
-#ifdef DEBUG_BALL_DETECTION
-    if (vision->ball->getWidth() > 0)
-        printf("We see the ball!\n");
-    else
-        printf("No ball in this frame\n");
-#endif
-
     // run Python behaviors
 #ifdef USE_NOGGIN
     noggin->runStep();

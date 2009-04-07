@@ -59,9 +59,9 @@ INCLUDE( ${TRUNK_PATH}/cmake/base_definitions.cmake )
 
 ############################ DEFAULT BUILD TYPE
 # Set which build type will be used by default, if none is set
-IF( "x${CMAKE_BUILD_TYPE}x" STREQUAL "xx" )
-  SET( CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" )
-ENDIF( "x${CMAKE_BUILD_TYPE}x" STREQUAL "xx" )
+#IF( "x${CMAKE_BUILD_TYPE}x" STREQUAL "xx" )
+SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
+#ENDIF( "x${CMAKE_BUILD_TYPE}x" STREQUAL "xx" )
 
 
 ############################ DISPLAY
