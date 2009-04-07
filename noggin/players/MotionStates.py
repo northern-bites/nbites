@@ -15,24 +15,8 @@ sitDownAngles = SweetMoves.SIT_POS[0]
 TO_RAD= math.pi/180.
 
 def gameInitial(player):
-#     if player.firstFrame():
-#         gait = motion.GaitCommand(31.00, # com height
-#                                   1.40,  # hip offset x
-#                                   0.50,   # step duration
-#                                   0.1,   # fraction in double support
-#                                   1.65,  # stepHeight
-#                                   0.0,  # footLengthX
-#                                   0.4,   # zmp static percentage
-#                                   5.0,   # left swing hip roll addition
-#                                   5.0,   # right swing hip roll addition
-#                                   0.90,  # left zmp off
-#                                   0.90,  # right zmp off
-#                                   10.0,  # max x speed
-#                                   5.0,   # max y speed
-#                                   30.0)  # max theta speed
-#         player.brain.motion.setGait(gait)
     if player.firstFrame():
-        x = motion.StiffnessCommand(1.0)
+        x = motion.StiffnessCommand(.85)
         player.brain.motion.sendStiffness(x)
     return player.stay()
     #return player.goLater('walkstraight')
@@ -46,21 +30,7 @@ def gameReady(player):
 
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
-    # gait = motion.GaitCommand(31.00,
-#                               1.90,
-#                               0.5,
-#                               0.1,
-#                               1.65,
-#                               1.00,
-#                               0.4,
-#                               4.0,
-#                               4.0,
-#                               1.50,
-#                               1.50,
-#                               10.0,
-#                               5.0,
-#                               30.0)
-#    player.brain.motion.setGait(gait)
+
     return player.goLater('walkstraight')
 
 def switchGaits(player):
