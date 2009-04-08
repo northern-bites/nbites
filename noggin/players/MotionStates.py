@@ -71,7 +71,7 @@ def standup(player):
     return player.stay()
 def sitdown(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.SIT_DOWN)
+        player.executeMove(SweetMoves.SIT_POS)
 
     return player.stay()
 
