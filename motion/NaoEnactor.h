@@ -21,22 +21,19 @@ public:
     void postSensors();
 
 private: // Constants
-    static const int NUM_JOINTS = NUM_ACTUATORS;
-    static const string PositionPostFix;
-    static const string HardnessPostFix;
-    static const string ValuePostFix;
-    static const string ValuePreFix;
-    static const string jointsP[NUM_JOINTS];
-    static const string jointsH[NUM_JOINTS];
-    static const string jointsV[NUM_JOINTS];
-    static const float jointsMax[NUM_JOINTS];
+    //static const int NUM_JOINTS = NUM_ACTUATORS;
+//     static const string PositionPostFix;
+//     static const string HardnessPostFix;
+//     static const string ValuePostFix;
+//     static const string ValuePreFix;
+//     static const string jointsP[NUM_JOINTS];
+//     static const string jointsH[NUM_JOINTS];
+//     static const string jointsV[NUM_JOINTS];
+//     static const float jointsMax[NUM_JOINTS];
     //Set hardware values- nominal speed in rad/20ms
     //from http://robocup.aldebaran-robotics.com/docs/reddoc/hardware.php
     //M=motor r = reduction ratio
-    static const float M1R1 = 0.1012;
-    static const float M1R2 = 0.0658;
-    static const float M2R1 = 0.1227;
-    static const float M2R2 = 0.1066;
+
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
     static const float MOTION_FRAME_LENGTH_S; // in seconds
@@ -53,22 +50,14 @@ private: // Members
     AL::ALValue hardness_command;
     AL::ALValue joint_command;
 
-    AccEKF accelerationFilter;
 
 
 private: // Helper methods
     void setBodyHardness(float bodyHardness);
     void sendHardness();
     float SafetyCheck(float,float, int);
-    void initSyncWithALMemory();
     void initDCMAliases();
-    void initSensorBodyJoints();
     void initDCMCommands();
-    void syncWithALMemory();
-
-    static const float calibrate_acc_x(const float x);
-    static const float calibrate_acc_y(const float y);
-    static const float calibrate_acc_z(const float z);
 
 };
 
