@@ -88,11 +88,17 @@ StepGenerator::~StepGenerator()
  *    the oldest value will be popped off before the list is sent to the
  *    controller.
  *
+ *  * Another important point is that the size of the currentZMPDSteps should
+ *    always be exactly 3. They are the current support foot, the place where
+ *    we will step next, and the step after.
+ *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     //Generate enough ZMPs so a) the controller can run
     //and                     b) there are enough steps
-    while (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES) {
+    while (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES ||
+           // VERY IMPORTANT: make sure we have enough ZMPed steps
+           currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS) {
         if (futureSteps.size() == 0){
             generateStep(x, y, theta); // replenish with the current walk vector
         }
@@ -111,7 +117,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
 /**
  * Method called to ensure that there are sufficient steps for the walking legs
- * to operate on.
+ * to operate on. This isn't called annymore!
  */
 void StepGenerator::generate_steps(){
     while(futureSteps.size() + currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
@@ -188,7 +194,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     cout << "StepGenerator::tick_legs" << endl;
 #endif
     //Ensure we have enough steps for planning purposes
-    generate_steps();
+    //generate_steps();
 
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
