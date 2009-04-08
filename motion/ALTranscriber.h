@@ -47,7 +47,7 @@ class ALTranscriber : public Transcriber
 public:
     ALTranscriber(AL::ALPtr<AL::ALBroker> _broker,
                   boost::shared_ptr<Sensors> sensors);
-    virtual ~ALTranscriber();
+    virtual ~ALTranscriber(){};
 
     virtual void postMotionSensors(){ syncMotionWithALMemory(); }
     virtual void postVisionSensors(){}
