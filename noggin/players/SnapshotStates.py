@@ -8,7 +8,7 @@ def gameInitial(player):
 
 def saveFrames(player):
     if player.firstFrame():
-        player.brain.tracker.switchTo('scanBall')
+        player.brain.tracker.switchTo('locPans')
     if player.counter % 15 == 0:
         player.brain.sensors.saveFrame()
     if player.counter > 15 * 150:

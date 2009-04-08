@@ -211,13 +211,16 @@ public:
     static const int DEFAULT_CAMERA_RESOLUTION = 14;
     static const int DEFAULT_CAMERA_FRAMERATE = 15;
     static const int DEFAULT_CAMERA_BUFFERSIZE = 16;
-    // Collor Settings
+    // Color Settings
+    // Gain: 26 / Exp: 83
+    // Gain: 28 / Exp: 60
+    // Gain: 35 / Exp: 40
     static const int DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-    static const int DEFAULT_CAMERA_GAIN = 4;
+    static const int DEFAULT_CAMERA_GAIN = 175;
     static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-    static const int DEFAULT_CAMERA_BLUECHROMA = 158; //131;
-    static const int DEFAULT_CAMERA_REDCHROMA = 68; //72;
-    static const int DEFAULT_CAMERA_BRIGHTNESS = 128;
+    static const int DEFAULT_CAMERA_BLUECHROMA = 128;
+    static const int DEFAULT_CAMERA_REDCHROMA = 68;
+    static const int DEFAULT_CAMERA_BRIGHTNESS = 140;
     static const int DEFAULT_CAMERA_CONTRAST = 64;
     static const int DEFAULT_CAMERA_SATURATION = 128;
     static const int DEFAULT_CAMERA_HUE = 0;
@@ -225,8 +228,8 @@ public:
     static const int DEFAULT_CAMERA_LENSX = 0;
     static const int DEFAULT_CAMERA_LENSY = 0;
     // Exposure length
-    static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE ON
-    static const int DEFAULT_CAMERA_EXPOSURE = 300;
+    static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
+    static const int DEFAULT_CAMERA_EXPOSURE = 33;
     // Image orientation
     static const int DEFAULT_CAMERA_HFLIP = 0;
     static const int DEFAULT_CAMERA_VFLIP = 0;

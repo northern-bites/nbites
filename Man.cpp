@@ -141,7 +141,9 @@ Man::initMan()
 #else
         log = ALLoggerProxy::getInstance();
 #endif
-        log->setVerbosity("info");
+        // Possible values are
+        // lowDebug, debug, lowInfo, info, warning, error, fatal
+        log->setVerbosity("lowDebug");
     }catch (ALError &e) {
         std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
     }
@@ -198,7 +200,7 @@ Man::registerCamera() {
     lem_name = "Man_LEM";
     int format = NAO_IMAGE_SIZE;
     int colorSpace = NAO_COLOR_SPACE;
-    int fps = VISION_FPS;
+    int fps = DEFAULT_CAMERA_FRAMERATE;
 
     int resolution = format;
 
