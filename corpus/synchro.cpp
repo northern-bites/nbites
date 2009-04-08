@@ -142,7 +142,7 @@ Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
     trigger(new Trigger(_synchro, _name, false))
 {
 #ifdef DEBUG_THREAD_CREATE
-    cout << "Create thread '" << name << "'" << endl;
+    cout << "Creating Thread instance '" << name << "'" << endl;
 #endif
 }
 

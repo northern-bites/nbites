@@ -20,7 +20,7 @@ EKF<Measurement, UpdateModel, dimension, mSize>
       Q_k(dimension,dimension), A_k(dimension,dimension),
       P_k(dimension,dimension), P_k_bar(dimension,dimension),
       dimensionIdentity(dimension), numStates(dimension),
-      measurementSize(mSize)
+      measurementSize(mSize),betas(dimension),gammas(dimension)
 {
     // Initialize all matrix values to 0
     for(unsigned i = 0; i < dimension; ++i) {
