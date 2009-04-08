@@ -157,7 +157,7 @@ void ALTranscriber::syncMotionWithALMemory() {
     const float filteredY = accelerationFilter.getY();
     const float filteredZ = accelerationFilter.getZ();
 
-
+    //TODO: don't allocate these FSR, etc objects each time
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),

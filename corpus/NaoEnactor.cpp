@@ -69,13 +69,15 @@ void NaoEnactor::sendJoints() {
     motionValues = switchboard->getNextJoints();
     // Get most current joint values possible for performing checks
     //alfastaccessJoints->GetValues(jointValues);
+    transcriber->postMotionSensors();
+    jointValues = sensors->getBodyAngles();//Need these for velocity checks
 
     for (unsigned int i = 0; i<Kinematics::NUM_JOINTS; i++) {
 #ifdef DEBUG_ENACTOR_JOINTS
         cout << "result of joint " << i << " is " << motionValues[i] << endl;
 #endif
         //returns the fastest safe value if requested movement is too fast
-        joint_command[5][i][0] = SafetyCheck(jointValues[i], motionValues[i], i);
+        joint_command[5][i][0] = motionValues[i];//SafetyCheck(jointValues[i], motionValues[i], i);
         //may be better to use previous rounds motionValues[i] in case
         //sensor lag occurs. we risk unsafe values if motion is impeded
     }
@@ -146,19 +148,20 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, int i){
 
     float absDiffInRad = fabs(currentVal - toCheck);
     float allowedDiffInRad = jointsMax[i];
+    //const float 
     if (absDiffInRad > allowedDiffInRad){
         if (toCheck > currentVal){
-            #ifdef DEBUG_ENACTOR_JOINTS
-            std::cout << jointsP[i] << "Current = " << currentVal << "  TRIM = "
+//            #ifdef DEBUG_ENACTOR_JOINTS
+            std::cout << jointsP[i] << " Current = " << currentVal << "  TRIM = "
                                 << (currentVal + allowedDiffInRad) << std::endl;
-            #endif
+//            #endif
             return (currentVal + allowedDiffInRad);
         }
         else {
-            #ifdef DEBUG_ENACTOR_JOINTS
+//            #ifdef DEBUG_ENACTOR_JOINTS
             std::cout << jointsP[i] << "Current = " << currentVal << "  TRIM = "
                                 << (currentVal - allowedDiffInRad) << std::endl;
-            #endif
+//            #endif
             return (currentVal - allowedDiffInRad);
         }
     }
@@ -176,7 +179,6 @@ void NaoEnactor::postSensors(){
     //actual joint post of the robot before any computation begins
     sensors->setMotionBodyAngles(motionValues);
     transcriber->postMotionSensors();
-    jointValues = sensors->getBodyAngles();//Need these for velocity checks
 
     if(!switchboard){
         return;

@@ -8,10 +8,14 @@ namespace ALNames {
     //from http://robocup.aldebaran-robotics.com/docs/reddoc/hardware.php
     //M=motor r = reduction ratio
 
-    static const float M1R1 = 0.1012;
-    static const float M1R2 = 0.0658;
+//     static const float M1R1 = 0.1012;
+//     static const float M1R2 = 0.0658;
+//     static const float M2R1 = 0.1227;
+//     static const float M2R2 = 0.1066;
+    static const float M1R1 = 0.0658;
+    static const float M1R2 = 0.1012;
     static const float M2R1 = 0.1227;
-    static const float M2R2 = 0.1066;
+    static const float M2R2 = 0.1065;
 
     static const string PositionPostFix = "/Position/Actuator/Value";
     static const string HardnessPostFix = "/Hardness/Actuator/Value";
@@ -97,15 +101,15 @@ namespace ALNames {
         //head
         M2R2, M2R1,
         //left arm
-        M2R2, M2R1, M2R1, M2R2,
+        M2R1, M2R2, M2R1, M2R2,
         //left leg
-        M1R1, M1R2, M1R2,
-        M1R1, M1R2, M1R1,
+        M1R1, M1R1, M1R2,
+        M1R2, M1R2, M1R1,
         //right leg
-        M1R1, M1R2, M1R2,
-        M1R1, M1R2, M1R1,
+        M1R1, M1R1, M1R2,
+        M1R2, M1R2, M1R1,
         //right arm
-        M2R2, M2R1, M2R1, M2R2
+        M2R2, M2R2, M2R1, M2R2
     };
 }
 #endif

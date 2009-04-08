@@ -282,7 +282,8 @@ int MotionSwitchboard::realityCheckJoints(){
     vector<float> motionAngles = sensors->getMotionBodyAngles();
     for(unsigned int i = 0; i < NUM_JOINTS; i++){
         if (fabs(sensorAngles[i] - motionAngles[i]) > joint_override_thresh){
-            //cout << "Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+            cout << "RealityCheck discrepancy: "<<endl
+                 << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
             nextJoints[i] = motionAngles[i] = sensorAngles[i];
             changed += 1;
         }
