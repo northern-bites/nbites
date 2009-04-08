@@ -126,7 +126,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ZmpEKF
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/Kinematics
-                     ${CORPUS_INCLUDE_DIR}/ALTranscriber #needs to go elsewhere
+                     ${MOTION_INCLUDE_DIR}/ALTranscriber
                      ${MOTION_INCLUDE_DIR}/PyMotion
                      )
 

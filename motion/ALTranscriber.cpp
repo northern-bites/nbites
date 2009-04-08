@@ -12,7 +12,6 @@ using namespace NBMath;
 using namespace Kinematics;
 
 
-
 #include "BasicWorldConstants.h"
 #include "ALNames.h"
 using namespace ALNames;

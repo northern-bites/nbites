@@ -42,8 +42,6 @@
  *  code out of Man
  */
 
-static const int test_info  = 0;
-
 class ALTranscriber : public Transcriber
 {
 public:
@@ -51,8 +49,8 @@ public:
                   boost::shared_ptr<Sensors> sensors);
     virtual ~ALTranscriber();
 
-    virtual void postMotionSensors();
-    virtual void postVisionSensors();
+    virtual void postMotionSensors(){ syncMotionWithALMemory(); }
+    virtual void postVisionSensors(){}
 
 private: //Members
     AL::ALPtr<AL::ALBroker> broker;
@@ -65,6 +63,7 @@ private: //Members
 
 private: //Helper Methods
 
+    //For the motion thread (enactor)
     void initSyncMotionWithALMemory();
     void syncMotionWithALMemory();
     void initSensorBodyJoints();

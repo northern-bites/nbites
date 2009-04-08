@@ -37,11 +37,14 @@
 #include "Sensors.h"
 #include "ThreadedMotionEnactor.h"
 #include "MotionSwitchboard.h"
+#include "Transcriber.h"
 
 class ALEnactor : public ThreadedMotionEnactor {
 public:
-    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s)
-        : ThreadedMotionEnactor(), broker(_pbroker), sensors(s){
+    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s,
+              boost::shared_ptr<Transcriber> t)
+        : ThreadedMotionEnactor(), broker(_pbroker), sensors(s),
+          transcriber(t){
         try{
             alfastaccess =
                 AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
@@ -87,6 +90,7 @@ private:
     AL::ALPtr<ALMemoryFastAccess> alfastaccess;
     AL::ALPtr<AL::DCMProxy> dcm;
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Transcriber> transcriber;
     std::vector<float> motionCommandAngles;
     std::vector<float>  motionCommandStiffness;
     static const int MOTION_FRAME_RATE;

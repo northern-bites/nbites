@@ -25,8 +25,10 @@ void staticSendJoints(NaoEnactor * n) {
 }
 
 NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
-                        boost::shared_ptr<Sensors> s)
+                       boost::shared_ptr<Sensors> s,
+                       boost::shared_ptr<Transcriber> t)
     : MotionEnactor(), broker(_pbroker), sensors(s),
+      transcriber(t),
       jointValues(Kinematics::NUM_JOINTS,0.0f),  // current values of joints
       motionValues(Kinematics::NUM_JOINTS,0.0f)  // commands sent to joints
 
@@ -177,7 +179,7 @@ void NaoEnactor::postSensors(){
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
     sensors->setMotionBodyAngles(motionValues);
-    //syncWithALMemory();
+    transcriber->postMotionSensors();
     jointValues = sensors->getBodyAngles();//Need these for velocity checks
 
     if(!switchboard){

@@ -54,6 +54,7 @@ typedef NaoEnactor EnactorT;
 typedef ALEnactor EnactorT;
 #endif
 
+#include "ALTranscriber.h"
 #include "Common.h"
 #include "Profiler.h"
 #include "Sensors.h"
@@ -167,6 +168,7 @@ public:
     PythonPreferences python_prefs;
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Transcriber> transcriber;
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
     boost::shared_ptr<EnactorT> enactor;

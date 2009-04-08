@@ -9,13 +9,15 @@
 #include "almemoryfastaccess.h"
 #include "Sensors.h"
 #include "NaoDef.h"
-#include "AccEKF.h"
 #include <string>
+#include "Transcriber.h"
 
 class NaoEnactor : public MotionEnactor {
 
 public:
-	NaoEnactor(AL::ALPtr<AL::ALBroker> broker, boost::shared_ptr<Sensors> s);
+	NaoEnactor(AL::ALPtr<AL::ALBroker> broker,
+               boost::shared_ptr<Sensors> s,
+               boost::shared_ptr<Transcriber> transcriber);
     virtual ~NaoEnactor() { };
     void sendJoints();
     void postSensors();
@@ -44,6 +46,7 @@ private: // Members
     AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Transcriber> transcriber;
     std::vector<float> jointValues;
     std::vector<float> motionValues;
     std::vector<float> motionHardness;
