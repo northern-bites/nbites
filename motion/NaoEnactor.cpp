@@ -169,7 +169,8 @@ const float NaoEnactor::jointsMax[NaoEnactor::NUM_JOINTS] = {
 void NaoEnactor::sendJoints() {
 
     if(!switchboard){
-        cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
+        if(switchboardSet)
+            cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
         return;
     }
 

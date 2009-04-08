@@ -35,8 +35,6 @@ Motion<EnactorType>::Motion (shared_ptr<Synchro> _synchro,
     enactor(_enactor),
     interface(&switchboard)
 {
-    //Setup the callback  in the enactor so it knows to call the switchboard
-    enactor->setSwitchboard(&switchboard);
 
     set_motion_interface(&interface);
     c_init_motion();
@@ -53,6 +51,8 @@ template <>
 int Motion<NaoEnactor>::start() {
     // Note: no need to call enactor->start() !
     switchboard.start();
+    //Setup the callback  in the enactor so it knows to call the switchboard
+    enactor->setSwitchboard(&switchboard);
 
     return Thread::start();
 }
@@ -70,6 +70,8 @@ template <class EnactorType>
 int Motion<EnactorType>::start() {
     enactor->start();
     switchboard.start();
+    //Setup the callback  in the enactor so it knows to call the switchboard
+    enactor->setSwitchboard(&switchboard);
 
     return Thread::start();
 }

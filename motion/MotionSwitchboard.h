@@ -120,6 +120,8 @@ private:
 	bool newJoints; //Way to track if we ever use the same joints twice
     bool newStiffness;
 
+    bool readyToSend;
+
     std::list<const StiffnessCommand *> stiffnessRequests;
 
     static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];

@@ -5,21 +5,15 @@ import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import man.motion.MotionConstants as MotionConstants
 
-sitDownAngles = SweetMoves.SIT_POS[0]
 
-# ((1.57,0.0,-1.13,-1.0),\
-#      (0.0,0.0,-0.96,2.18,\
-#           -1.22,0.0),(0.0,0.0,\
-#                           -0.96,2.18,-1.22,0.0),\
-#      (1.57,0.0,1.13,1.01), 3.0, 1)
 TO_RAD= math.pi/180.
 
 def gameInitial(player):
     if player.firstFrame():
         x = motion.StiffnessCommand(.85)
         player.brain.motion.sendStiffness(x)
+
     return player.stay()
-    #return player.goLater('walkstraight')
 
 def gameReady(player):
     if player.firstFrame():
@@ -77,14 +71,7 @@ def standup(player):
     return player.stay()
 def sitdown(player):
     if player.firstFrame():
-        move = motion.BodyJointCommand(sitDownAngles[4], #time
-                                       sitDownAngles[0], #larm
-                                       sitDownAngles[1], #lleg
-                                       sitDownAngles[2], #rleg
-                                       sitDownAngles[3], #rarm
-                                       sitDownAngles[5], #interpolation time
-                                       )
-        player.brain.motion.enqueue(move)
+        player.executeMove(SweetMoves.SIT_DOWN)
 
     return player.stay()
 

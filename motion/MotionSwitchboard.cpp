@@ -31,7 +31,9 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       nextJoints(s->getBodyAngles()),
       nextStiffness(vector<float>(NUM_JOINTS,0.0f)),
 	  running(false),
-      newJoints(false)
+      newJoints(false),
+      newStiffness(false),
+      readyToSend(false)
 {
 
     //Allow safe access to the next joints
@@ -113,6 +115,8 @@ void MotionSwitchboard::run() {
         if(active)
             updateDebugLogs();
 #endif
+        if(active)
+            readyToSend = true;
         pthread_mutex_lock(&calc_new_joints_mutex);
         pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
         pthread_mutex_unlock(&calc_new_joints_mutex);
@@ -239,7 +243,7 @@ void MotionSwitchboard::swapBodyProvider(){
 
 const vector <float> MotionSwitchboard::getNextJoints() {
     pthread_mutex_lock(&next_joints_mutex);
-    if(!newJoints){
+    if(!newJoints && readyToSend){
         cout << "An enactor is grabbing old joints from switchboard."
              <<" Must have missed a frame!" <<endl;
     }

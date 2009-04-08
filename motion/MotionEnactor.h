@@ -19,7 +19,7 @@
 class MotionEnactor {
 public:
     MotionEnactor()
-        : switchboard(NULL){};
+        : switchboard(NULL),switchboardSet(false){};
     virtual ~MotionEnactor() { }
 
     virtual void sendJoints() = 0;
@@ -27,10 +27,14 @@ public:
 
     void setSwitchboard(MotionSwitchboard * s){
         switchboard = s;
+        switchboardSet = true;
     }
 
 protected:
     MotionSwitchboard *switchboard;
+    bool switchboardSet; //Only true once the switchboard is set.
+                         //Helps generate valid error messages when
+                         //switchboard is deconstructed
 
 };
 

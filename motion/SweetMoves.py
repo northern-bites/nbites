@@ -17,7 +17,12 @@ OFF = None #OFF means the joint chain doesnt get enqueued during this motion
 
 INITIAL_POS = (((80.,40.,-50.,-70.),(0.,0.,-50.,100.,-50.,0.),(0.,0.,-50.,100.,-50.,0.),(80.,-40.,50.,70.),4.0,1),)
 
-SIT_POS = (((90.,0.,-65.,-57.),(0.,0.,-55.,130.,-75.,0.),(0.,0.,-55.,130.,-75.,0.),(90.,0.,65.,57.),4.0,1),)
+#Angles measured pretty exactly from the robot w/gains off.
+#might want to make them even different if we suspect the motors are weakening
+SIT_POS = (((90.,0.,-65.,-57.),
+            (0.,0.,-50.,125.7,-75.7,0.),
+            (0.,0.,-50.,125.7,-75.7,0.),
+            (90.,0.,65.,57.),4.0,1),)
 
 ZERO_POS = (((0.,0.,0.,0.),(0.,0.,0.,0.,0.,0.),(0.,0.,0.,0.,0.,0.),(0.,0.,0.,0.),4.0,1),)
 PENALIZED_POS = INITIAL_POS

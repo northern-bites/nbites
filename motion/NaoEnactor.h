@@ -55,6 +55,7 @@ private: // Members
 
     AccEKF accelerationFilter;
 
+
 private: // Helper methods
     void setBodyHardness(float bodyHardness);
     void sendHardness();
@@ -68,6 +69,7 @@ private: // Helper methods
     static const float calibrate_acc_x(const float x);
     static const float calibrate_acc_y(const float y);
     static const float calibrate_acc_z(const float z);
+
 };
 
 #endif
