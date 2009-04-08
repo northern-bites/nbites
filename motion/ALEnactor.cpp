@@ -57,6 +57,8 @@ void ALEnactor::run() {
         //Once we've sent the most calculated joints
         postSensors();
 
+        switchboard->signalNextFrame();
+
         const long long zero = 0;
         const long long processTime = micro_time() - currentTime;
 
@@ -109,83 +111,11 @@ void ALEnactor::sendJoints(){
 }
 
 void ALEnactor::postSensors() {
-    //At the beginning of each cycle, we need to update the sensor values
-    //We also call this from the Motion run method
-    //This is important to ensure that the providers have access to the
-    //actual joint post of the robot before any computation begins
-    vector<float> alAngles = almotion->getBodyAngles();
-
-    // HACK!
-    // in order to accurately calculate the position of the red leg, it needs
-    // to have a correct HYP value, but that value is only stored once and that
-    // is in the left leg. This is done by NaoQi, not us.
-    alAngles[Kinematics::R_HIP_YAW_PITCH] =
-        alAngles[Kinematics::L_HIP_YAW_PITCH];
-
-    sensors->setBodyAngles(alAngles);
+    //Each frame, we need to store which commmands were sent,
+    //also, we need to ask the transcriber to copy
+    //the relevant information out of ALMemory into sensors
     sensors->setMotionBodyAngles(motionCommandAngles);
-    //vector<float> temp = sensors->getMotionBodyAngles();
-    //for (int i = 2; i < 6; i++)cout << "arm angles are"<< temp[i] <<endl;
-    // This call syncs all sensors values: bumpers, fsr, inertial, etc.
-#ifndef OFFLINE
-    syncWithALMemory();
-#endif
 
-    switchboard->signalNextFrame();
+    transcriber->postMotionSensors();
 }
-
-/**
- * ALFastAccess allows us to pull out values from ALMemory a lot faster
- * and in bulk. The order in which we declare the desired devices are also
- * the order in which we receive them (see syncWithALMemory).
- * In this class we only sync the sensors values we need for motion. The
- * rest are synced in Man.cpp (may change).
- */
-void ALEnactor::initSyncWithALMemory(){
-    vector<string> varNames;
-    varNames +=
-        string("Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value");
-
-    alfastaccess->ConnectToVariables(broker,varNames);
-
-}
-
-// from George: Forgive me for the variable names, but there are just too
-// many of them to figure out decent names for all. Feel free to change them...
-// they are only used internally in this method.
-void ALEnactor::syncWithALMemory() {
-    static vector<float> varValues(16, 0.0f);
-    alfastaccess->GetValues(varValues);
-
-    // The indices here are determined by the order in which we requested
-    // the sensors values (see initSyncWithALMemory).
-    const float LfrontLeft = varValues[0], LfrontRight = varValues[1],
-        LrearLeft = varValues[2], LrearRight = varValues[3],
-        RfrontLeft = varValues[4], RfrontRight = varValues[5],
-        RrearLeft = varValues[6], RrearRight = varValues[7];
-
-    const float accX = varValues[8], accY = varValues[9], accZ = varValues[10],
-        gyrX = varValues[11], gyrY = varValues[12],
-        angleX = varValues[13], angleY = varValues[14];
-
-    sensors->
-        setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
-                         FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         Inertial(accX,accY,accZ,gyrX,gyrY,angleX,angleY));
-}
-
 #endif//NAOQI1
