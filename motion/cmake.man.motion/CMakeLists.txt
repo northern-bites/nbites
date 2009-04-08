@@ -114,19 +114,13 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ChoppedCommand
 		     ${MOTION_INCLUDE_DIR}/HeadProvider
 		     ${MOTION_INCLUDE_DIR}/ChopShop
-		     ${MOTION_INCLUDE_DIR}/MotionEnactor
-		     ${MOTION_INCLUDE_DIR}/SimulatorEnactor
-		     ${MOTION_INCLUDE_DIR}/ALEnactor
-		     ${MOTION_INCLUDE_DIR}/NaoEnactor
 		     ${MOTION_INCLUDE_DIR}/WalkProvider
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
 		     ${MOTION_INCLUDE_DIR}/PreviewController
 		     ${MOTION_INCLUDE_DIR}/Observer
-		     ${MOTION_INCLUDE_DIR}/AccEKF
 		     ${MOTION_INCLUDE_DIR}/ZmpEKF
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/Kinematics
-                     ${MOTION_INCLUDE_DIR}/ALTranscriber
                      ${MOTION_INCLUDE_DIR}/PyMotion
                      )
 

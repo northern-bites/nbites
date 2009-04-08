@@ -39,16 +39,6 @@ const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RA
 void ALEnactor::run() {
     std::cout << "ALEnactor::run()" << std::endl;
 
-// #ifdef NO_ACTUAL_MOTION
-//     almotion->setBodyStiffness(0.0f);
-// #else
-//     almotion->setBodyStiffness(0.80f);
-// #endif
-
-    //vector<float> rarm(4,M_PI/4);
-    //almotion->gotoChainAngles("RArm",rarm,2.0,INTERPOLATION_LINEAR);
-    //cout << "Done with AL motion stuff" << endl;
-
     long long currentTime;
     while (running) {
         currentTime = micro_time();

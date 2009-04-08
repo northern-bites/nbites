@@ -57,10 +57,6 @@ const float NaoEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
 const float NaoEnactor::MOTION_FRAME_LENGTH_S = 1.0f /
                                                 NaoEnactor::MOTION_FRAME_RATE;
 
-
-
-
-
 void NaoEnactor::sendJoints() {
 
     if(!switchboard){

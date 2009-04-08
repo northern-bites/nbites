@@ -4,6 +4,10 @@
 #include "Kinematics.h"
 
 namespace ALNames {
+    //Set hardware values- nominal speed in rad/20ms
+    //from http://robocup.aldebaran-robotics.com/docs/reddoc/hardware.php
+    //M=motor r = reduction ratio
+
     static const float M1R1 = 0.1012;
     static const float M1R2 = 0.0658;
     static const float M2R1 = 0.1227;

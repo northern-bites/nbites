@@ -32,9 +32,6 @@ private: // Constants
 //     static const string jointsH[NUM_JOINTS];
 //     static const string jointsV[NUM_JOINTS];
 //     static const float jointsMax[NUM_JOINTS];
-    //Set hardware values- nominal speed in rad/20ms
-    //from http://robocup.aldebaran-robotics.com/docs/reddoc/hardware.php
-    //M=motor r = reduction ratio
 
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
