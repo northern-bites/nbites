@@ -39,7 +39,7 @@ public:
 
 // Constants
 static const int M = 100; // Number of particles
-static const float MIN_SIMILARITY = 1.0e-15; // Minimum possible similarity
+static const float MIN_SIMILARITY = 1.0e-20; // Minimum possible similarity
 
 // The Monte Carlo Localization class
 class MCL : public LocSystem
@@ -143,6 +143,10 @@ private:
     // Core Functions
     PoseEst updateMotionModel(PoseEst x_t, MotionModel u_t);
     float updateMeasurementModel(std::vector<Observation> z_t, PoseEst x_t);
+    void resample(std::vector<Particle> * X_bar_t, float totalWeights);
+    void lowVarianceResample(std::vector<Particle> * X_bar_t,
+                             float totalWeights);
+    void noResample(std::vector<Particle> * X_bar_t);
     void updateEstimates();
 
     // Helpers
