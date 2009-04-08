@@ -36,8 +36,8 @@ trillian = BirthCertificate.BirthCertificate(
             long_name='Tricia MacMillan',
             tts_name='trillian',
             doc='''\
-I am Tricia MacMillian. After saving the Universe from the Krikkit rebellion,
-I became a highly successful Sub Etha radio reporter.''',
+I am Tricia MacMillian. After saving the Universe from the Krikkit
+rebellion, I became a highly successful Sub Etha radio reporter.''',
             gait = gaits.TRILLIAN_GAIT,
             )
 

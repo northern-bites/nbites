@@ -55,7 +55,6 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
     initDCMAliases();
     initDCMCommands();
     initSensorBodyJoints();
-    setBodyHardness(0.80f);
 
     // connect to dcm using the static methods declared above
     broker->getProxy("DCM")->getModule()->onPostProcess()
@@ -170,7 +169,8 @@ const float NaoEnactor::jointsMax[NaoEnactor::NUM_JOINTS] = {
 void NaoEnactor::sendJoints() {
 
     if(!switchboard){
-        cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
+        if(switchboardSet)
+            cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
         return;
     }
 
@@ -190,6 +190,7 @@ void NaoEnactor::sendJoints() {
     }
 
     //TODO setBodyHardness() when necessary
+    sendHardness();
 
     // Send the array with a 25 ms delay. This delay removes the jitter.
     // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
@@ -200,6 +201,30 @@ void NaoEnactor::sendJoints() {
         dcmProxy->setAlias(joint_command);
     } catch(AL::ALError& a) {
         std::cout << "dcm value set error " << a.toString() << std::endl;
+    }
+#endif
+}
+
+
+void NaoEnactor::sendHardness(){
+    motionHardness = switchboard->getNextStiffness();
+
+    //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
+    for (int i = 0; i<NaoEnactor::NUM_JOINTS; i++) {
+        static float hardness =0.0f;
+        hardness = NBMath::clip(motionHardness[i],0.0f,1.0f);
+
+        //sets the value for hardness
+        hardness_command[5][i].arraySetSize(1);
+        hardness_command[5][i][0] = hardness;
+    }
+    hardness_command[4][0] = dcmProxy->getTime(0);
+#ifndef NO_ACTUAL_MOTION
+    try {
+        dcmProxy->setAlias(hardness_command);
+    } catch(AL::ALError& a) {
+        std::cout << "DCM Hardness set error" << a.toString() << "    "
+                  << hardness_command.toString() << std::endl;
     }
 #endif
 }
@@ -299,7 +324,7 @@ void NaoEnactor::initSensorBodyJoints(){
     //This is basically postSensors() but need a different order
     syncWithALMemory();
     motionValues = jointValues;
-    sensors->setBodyAngles(motionValues);
+    sensors->setMotionBodyAngles(motionValues);
 }
 
 void NaoEnactor::initDCMCommands(){

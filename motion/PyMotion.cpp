@@ -30,6 +30,7 @@ using namespace boost::python;
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
 #include "WalkCommand.h"
+#include "StiffnessCommand.h"
 #include "MotionInterface.h"
 #include "Kinematics.h"
 using namespace Kinematics;
@@ -102,6 +103,26 @@ private:
 };
 
 
+class PyStiffnessCommand {
+public:
+    PyStiffnessCommand(){
+        command =  new StiffnessCommand();
+    }
+    PyStiffnessCommand(const float bodyStiffness){
+        command =  new StiffnessCommand(bodyStiffness);
+    }
+    PyStiffnessCommand(const int chainID, const float chainStiffness){
+        command =  new StiffnessCommand((ChainID)chainID,chainStiffness);
+    }
+    void setChainStiffness(const int chainID, const float chainStiffness){
+        if(command)
+            command->setChainStiffness((ChainID) chainID, chainStiffness );
+    }
+    StiffnessCommand * getCommand() const {return command;}
+private:
+    StiffnessCommand * command;
+};
+
 class PyBodyJointCommand {
 public:
     PyBodyJointCommand(float time,
@@ -172,6 +193,9 @@ public:
     void setHead(const PySetHeadCommand *command) {
         motionInterface->setHead(command->getCommand());
     }
+    void sendStiffness(const PyStiffnessCommand *command){
+        motionInterface->sendStiffness(command->getCommand());
+    }
 
     bool isWalkActive() {
         return motionInterface->isWalkActive();
@@ -203,7 +227,6 @@ void (PyMotionInterface::*enq1)(const PyHeadJointCommand*) =
 void (PyMotionInterface::*enq2)(const PyBodyJointCommand*) =
     &PyMotionInterface::enqueue;
 
-
 BOOST_PYTHON_MODULE(_motion)
 {
     class_<PyHeadJointCommand>("HeadJointCommand",
@@ -234,13 +257,21 @@ BOOST_PYTHON_MODULE(_motion)
  "A container for a walk command. Holds an x, y and theta which represents a"
  " walk vector"))
         ;
-
+    class_<PyStiffnessCommand>("StiffnessCommand",
+                               init<float>(args("bodyStiffness"),
+"A container for a stiffness comamnd. Allows setting stiffness per chain or "
+"for the whole body"))
+        .def(init<int,float>(args("chainID","chainStiffness")))
+        .def(init<>())
+        .def("setChainStiffness", &PyStiffnessCommand::setChainStiffness)
+        ;
     class_<PyMotionInterface>("MotionInterface")
         .def("enqueue", enq1)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead",&PyMotionInterface::setHead)
+        .def("sendStiffness",&PyMotionInterface::sendStiffness)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("isHeadActive", &PyMotionInterface::isHeadActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)

@@ -44,5 +44,5 @@ OPTION(
 OPTION(
   USE_MOTION_ACTUATORS
   "Turn on/off commands being sent from motion to the actuators"
-  OFF
+  ON
 )

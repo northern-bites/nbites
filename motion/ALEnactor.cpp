@@ -26,6 +26,7 @@ using namespace boost::assign;
 using namespace AL;
 
 #include "Kinematics.h"
+using namespace Kinematics;
 
 const int ALEnactor::MOTION_FRAME_RATE = 50;
 // 1 second * 1000 ms/s * 1000 us/ms
@@ -38,11 +39,11 @@ const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RA
 void ALEnactor::run() {
     std::cout << "ALEnactor::run()" << std::endl;
 
-#ifdef NO_ACTUAL_MOTION
-    almotion->setBodyStiffness(0.0f);
-#else
-    almotion->setBodyStiffness(0.80f);
-#endif
+// #ifdef NO_ACTUAL_MOTION
+//     almotion->setBodyStiffness(0.0f);
+// #else
+//     almotion->setBodyStiffness(0.80f);
+// #endif
 
     //vector<float> rarm(4,M_PI/4);
     //almotion->gotoChainAngles("RArm",rarm,2.0,INTERPOLATION_LINEAR);
@@ -53,7 +54,6 @@ void ALEnactor::run() {
         currentTime = micro_time();
 
         sendJoints();
-
         //Once we've sent the most calculated joints
         postSensors();
 
@@ -81,12 +81,26 @@ void ALEnactor::sendJoints(){
     }
     // Get the angles we want to go to this frame from the switchboard
     motionCommandAngles = switchboard->getNextJoints();
+    motionCommandStiffness = switchboard->getNextStiffness();
 
 #ifdef DEBUG_ENACTOR_JOINTS
     for (unsigned int i=0; i<motionCommandAngles.size();i++)
         cout << "result of joint " << i << " is "
              << motionCommandAngles.at(i) << endl;
 #endif
+
+
+    //NOTE: in AL Enactor, we set each joint stiffness individually - this is
+    //      probably quite slow
+    for(unsigned int joint = 0; joint < NUM_JOINTS; joint ++){
+
+        const float chainStiffness
+            = motionCommandStiffness[joint];
+        const string name = JOINT_STRINGS[joint];
+#ifndef NO_ACTUAL_MOTION
+        almotion->setJointStiffness(name ,chainStiffness);
+#endif
+    }
 
 #ifndef NO_ACTUAL_MOTION
     almotion->setBodyAngles(motionCommandAngles);

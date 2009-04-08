@@ -61,14 +61,6 @@
 #  undef  DEBUG_IMAGE_REQUESTS
 #endif
 
-// print whether a ball is seen in each frame
-#define DEBUG_BALL_DETECTION_${DEBUG_BALL_DETECTION}
-#ifdef  DEBUG_BALL_DETECTION_ON
-#  define DEBUG_BALL_DETECTION
-#else
-#  undef  DEBUG_BALL_DETECTION
-#endif
-
 // turn on/off vision processing
 #define USE_NOGGIN_${USE_NOGGIN}
 #ifdef  USE_NOGGIN_ON

@@ -141,7 +141,7 @@ Man::initMan()
 #else
         log = ALLoggerProxy::getInstance();
 #endif
-        log->setVerbosity("warning");
+        log->setVerbosity("info");
     }catch (ALError &e) {
         std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
     }
@@ -854,13 +854,6 @@ Man::processFrame ()
 #ifdef USE_VISION
     if(camera_active)
         vision->notifyImage();
-#endif
-
-#ifdef DEBUG_BALL_DETECTION
-    if (vision->ball->getWidth() > 0)
-        printf("We see the ball!\n");
-    else
-        printf("No ball in this frame\n");
 #endif
 
     // run Python behaviors

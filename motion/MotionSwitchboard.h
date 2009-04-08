@@ -51,9 +51,12 @@
 #include "WalkCommand.h"
 #include "GaitCommand.h"
 #include "SetHeadCommand.h"
+#include "StiffnessCommand.h"
+
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
 #endif
+
 
 class MotionSwitchboard {
 public:
@@ -65,12 +68,15 @@ public:
     void run();
 
 	const std::vector <float> getNextJoints();
+	const std::vector<float> getNextStiffness();
     void signalNextFrame();
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const GaitCommand* command);
 	void sendMotionCommand(const SetHeadCommand* command);
+	void sendMotionCommand(const StiffnessCommand* command);
+
 public:
     void stopHeadMoves(){headProvider.requestStop();}
 
@@ -84,8 +90,10 @@ public:
 
 private:
     int processProviders();
+    int processStiffness();
     void swapBodyProvider();
     BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
+    int realityCheckJoints();
 
 #ifdef DEBUG_JOINTS_OUTPUT
     void initDebugLogs();
@@ -106,29 +114,23 @@ private:
     const WalkingParameters *nextGait;
 
     std::vector <float> nextJoints;
+    std::vector <float> nextStiffness;
 
     bool running;
 	bool newJoints; //Way to track if we ever use the same joints twice
+    bool newStiffness;
 
-	HeadJointCommand *hjc;
-	HeadJointCommand *hjc2;
-	HeadJointCommand *hjc3;
-	std::vector<float> *bodyJoints;
-	std::vector<float> *bodyJoints2;
+    bool readyToSend;
 
-	BodyJointCommand *command;
-	BodyJointCommand *command2;
-	BodyJointCommand *command3;
+    std::list<const StiffnessCommand *> stiffnessRequests;
+
     static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];
-
-	BodyJointCommand *getUp;
-	BodyJointCommand *sitDown;
-
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
     pthread_mutex_t calc_new_joints_mutex;
     pthread_mutex_t next_joints_mutex;
+    pthread_mutex_t stiffness_mutex;
 
 #ifdef DEBUG_JOINTS_OUTPUT
     FILE* joints_log;

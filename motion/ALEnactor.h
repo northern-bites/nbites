@@ -36,7 +36,7 @@
 #include "motionconfig.h"
 #include "Sensors.h"
 #include "ThreadedMotionEnactor.h"
-
+#include "MotionSwitchboard.h"
 
 class ALEnactor : public ThreadedMotionEnactor {
 public:
@@ -88,6 +88,7 @@ private:
     AL::ALPtr<AL::DCMProxy> dcm;
     boost::shared_ptr<Sensors> sensors;
     std::vector<float> motionCommandAngles;
+    std::vector<float>  motionCommandStiffness;
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
     static const float MOTION_FRAME_LENGTH_S; // in seconds

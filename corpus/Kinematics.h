@@ -201,6 +201,33 @@ namespace Kinematics {
       "RLeg",
       "RArm" };
 
+    //Note: this joint list constains RHipYawPitch, which is not compatible
+    //with the DCM convention on naming joints (this joint is technially
+    //nonexistant)
+    static const std::string JOINT_STRINGS[NUM_JOINTS] =
+    { "HeadYaw",
+      "HeadPitch",
+      "LShoulderPitch",
+      "LShoulderRoll",
+      "LElbowYaw",
+      "LElbowRoll",
+      "LHipYawPitch",
+      "LHipRoll",
+      "LHipPitch",
+      "LKneePitch",
+      "LAnklePitch",
+      "LAnkleRoll",
+      "RHipYawPitch",
+      "RHipRoll",
+      "RHipPitch",
+      "RKneePitch",
+      "RAnklePitch",
+      "RAnkleRoll",
+      "RShoulderPitch",
+      "RShoulderRoll",
+      "RElbowYaw",
+      "RElbowRoll"};
+
     /**********    Bodily dimensions     ***********/
 
     static const float SHOULDER_OFFSET_Y = 98.0f;
