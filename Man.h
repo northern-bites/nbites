@@ -216,7 +216,7 @@ public:
     // Gain: 28 / Exp: 60
     // Gain: 35 / Exp: 40
     static const int DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-    static const int DEFAULT_CAMERA_GAIN = 175;
+    static const int DEFAULT_CAMERA_GAIN = 26;
     static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
     static const int DEFAULT_CAMERA_BLUECHROMA = 128;
     static const int DEFAULT_CAMERA_REDCHROMA = 68;
@@ -229,7 +229,7 @@ public:
     static const int DEFAULT_CAMERA_LENSY = 0;
     // Exposure length
     static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-    static const int DEFAULT_CAMERA_EXPOSURE = 33;
+    static const int DEFAULT_CAMERA_EXPOSURE = 83;
     // Image orientation
     static const int DEFAULT_CAMERA_HFLIP = 0;
     static const int DEFAULT_CAMERA_VFLIP = 0;
