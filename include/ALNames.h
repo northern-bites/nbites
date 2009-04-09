@@ -8,14 +8,21 @@ namespace ALNames {
     //from http://robocup.aldebaran-robotics.com/docs/reddoc/hardware.php
     //M=motor r = reduction ratio
 
-//     static const float M1R1 = 0.1012;
-//     static const float M1R2 = 0.0658;
-//     static const float M2R1 = 0.1227;
-//     static const float M2R2 = 0.1066;
-    static const float M1R1 = 0.0658;
-    static const float M1R2 = 0.1012;
-    static const float M2R1 = 0.1227;
-    static const float M2R2 = 0.1065;
+    static const float M1R1_NOMINAL = 0.0658;
+    static const float M1R2_NOMINAL = 0.1012;
+    static const float M2R1_NOMINAL = 0.1227;
+    static const float M2R2_NOMINAL = 0.1065;
+
+    static const float M1R1_NO_LOAD = 0.08308;
+    static const float M1R2_NO_LOAD = 0.1279;
+    static const float M2R1_NO_LOAD = 0.16528;
+    static const float M2R2_NO_LOAD = 0.1438;
+
+    static const float M1R1_AVG = 0.07435;
+    static const float M1R2_AVG = 0.1146;
+    static const float M2R1_AVG = 0.14399;
+    static const float M2R2_AVG = 0.12514;
+
 
     static const string PositionPostFix = "/Position/Actuator/Value";
     static const string HardnessPostFix = "/Hardness/Actuator/Value";
@@ -97,19 +104,50 @@ namespace ALNames {
         ValuePreFix + "RElbowYaw" + ValuePostFix,
         ValuePreFix + "RElbowRoll" + ValuePostFix
     };
-    static const float jointsMax[Kinematics::NUM_JOINTS] = {
+    static const float jointsMaxNominal[Kinematics::NUM_JOINTS] = {
         //head
-        M2R2, M2R1,
+        M2R2_NOMINAL, M2R1_NOMINAL,
         //left arm
-        M2R1, M2R2, M2R1, M2R2,
+        M2R1_NOMINAL, M2R2_NOMINAL, M2R1_NOMINAL, M2R2_NOMINAL,
         //left leg
-        M1R1, M1R1, M1R2,
-        M1R2, M1R2, M1R1,
+        M1R1_NOMINAL, M1R1_NOMINAL, M1R2_NOMINAL,
+        M1R2_NOMINAL, M1R2_NOMINAL, M1R1_NOMINAL,
         //right leg
-        M1R1, M1R1, M1R2,
-        M1R2, M1R2, M1R1,
+        M1R1_NOMINAL, M1R1_NOMINAL, M1R2_NOMINAL,
+        M1R2_NOMINAL, M1R2_NOMINAL, M1R1_NOMINAL,
         //right arm
-        M2R2, M2R2, M2R1, M2R2
+        M2R2_NOMINAL, M2R2_NOMINAL, M2R1_NOMINAL, M2R2_NOMINAL
     };
+
+    static const float jointsMaxNoLoad[Kinematics::NUM_JOINTS] = {
+        //head
+        M2R2_NO_LOAD, M2R1_NO_LOAD,
+        //left arm
+        M2R1_NO_LOAD, M2R2_NO_LOAD, M2R1_NO_LOAD, M2R2_NO_LOAD,
+        //left leg
+        M1R1_NO_LOAD, M1R1_NO_LOAD, M1R2_NO_LOAD,
+        M1R2_NO_LOAD, M1R2_NO_LOAD, M1R1_NO_LOAD,
+        //right leg
+        M1R1_NO_LOAD, M1R1_NO_LOAD, M1R2_NO_LOAD,
+        M1R2_NO_LOAD, M1R2_NO_LOAD, M1R1_NO_LOAD,
+        //right arm
+        M2R2_NO_LOAD, M2R2_NO_LOAD, M2R1_NO_LOAD, M2R2_NO_LOAD
+    };
+
+    static const float jointsMaxAvg[Kinematics::NUM_JOINTS] = {
+        //head
+        M2R2_AVG, M2R1_AVG,
+        //left arm
+        M2R1_AVG, M2R2_AVG, M2R1_AVG, M2R2_AVG,
+        //left leg
+        M1R1_AVG, M1R1_AVG, M1R2_AVG,
+        M1R2_AVG, M1R2_AVG, M1R1_AVG,
+        //right leg
+        M1R1_AVG, M1R1_AVG, M1R2_AVG,
+        M1R2_AVG, M1R2_AVG, M1R1_AVG,
+        //right arm
+        M2R2_AVG, M2R2_AVG, M2R1_AVG, M2R2_AVG
+    };
+
 }
 #endif

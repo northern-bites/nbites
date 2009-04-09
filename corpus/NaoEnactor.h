@@ -23,15 +23,6 @@ public:
     void postSensors();
 
 private: // Constants
-    //static const int NUM_JOINTS = NUM_ACTUATORS;
-//     static const string PositionPostFix;
-//     static const string HardnessPostFix;
-//     static const string ValuePostFix;
-//     static const string ValuePreFix;
-//     static const string jointsP[NUM_JOINTS];
-//     static const string jointsH[NUM_JOINTS];
-//     static const string jointsV[NUM_JOINTS];
-//     static const float jointsMax[NUM_JOINTS];
 
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
@@ -46,6 +37,7 @@ private: // Members
     boost::shared_ptr<Transcriber> transcriber;
     std::vector<float> jointValues;
     std::vector<float> motionValues;
+    std::vector<float> lastMotionCommandAngles;
     std::vector<float> motionHardness;
     AL::ALValue hardness_command;
     AL::ALValue joint_command;
