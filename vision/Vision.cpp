@@ -69,6 +69,18 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
 // Vision Class Deconstructor
 Vision::~Vision()
 {
+    delete thresh;
+    delete navy2;
+    delete navy1;
+    delete red2;
+    delete red1;
+    delete ball;
+    delete bgCrossbar;
+    delete ygCrossbar;
+    delete bglp;
+    delete bgrp;
+    delete yglp;
+    delete ygrp;
 }
 
 void Vision::copyImage(const byte* image) {
