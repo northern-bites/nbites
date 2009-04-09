@@ -28,7 +28,7 @@ class StiffnessCommand : public MotionCommand
 {
 public:
     //Default constructor is private and just inits the vector* to NULL
-    ~StiffnessCommand();
+    virtual ~StiffnessCommand();
     StiffnessCommand();
     StiffnessCommand(const float stiffness);
     StiffnessCommand(const Kinematics::ChainID chainID,
