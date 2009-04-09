@@ -1,9 +1,7 @@
+import man.motion.SweetMoves as SweetMoves
 
-###
-# Reimplementation of Game Controller States for pBrunswick
-###
-FRAME_SAVE_RATE = 1
-NUM_FRAMES_TO_SAVE = 150
+FRAME_SAVE_RATE = 5
+NUM_FRAMES_TO_SAVE = 100
 
 def gamePlaying(player):
     return player.goNow('saveFrames')
