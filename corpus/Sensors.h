@@ -182,6 +182,7 @@ class Sensors {
 
     // Save a vision frame with associated sensor data
     void saveFrame(void);
+    void resetSaveFrame(void);
 
 private:
 
@@ -221,6 +222,7 @@ private:
 
     const unsigned char *image;
     PySensors *pySensors;
+    static int saved_frames;
 };
 
 

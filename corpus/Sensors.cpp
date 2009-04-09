@@ -139,6 +139,12 @@ static PyObject* PySensors_saveFrame(PyObject *self, PyObject *)
     return Py_None;
 }
 
+static PyObject* PySensors_resetSaveFrame(PyObject *self, PyObject *)
+{
+    ((PySensors *)self)->_sensors->resetSaveFrame();
+    return Py_None;
+}
+
 
 static PyMethodDef PySensors_methods[] = {
 
@@ -154,6 +160,9 @@ static PyMethodDef PySensors_methods[] = {
 
     {"saveFrame", (PyCFunction)PySensors_saveFrame, METH_NOARGS,
      "Save an image frame with associated sensor data."},
+
+    {"resetSaveFrame", (PyCFunction)PySensors_resetSaveFrame, METH_NOARGS,
+     "Reset the counter for saving frames."},
 
     { NULL } /* Sentinel */
 };
@@ -360,6 +369,7 @@ int c_init_sensors (void)
 //
 // C++ Sensors class methods
 //
+int Sensors::saved_frames = 0;
 
 Sensors::Sensors ()
     : bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
@@ -877,9 +887,13 @@ void Sensors::add_to_module ()
 }
 
 
+void Sensors::resetSaveFrame()
+{
+    saved_frames = 0;
+}
+
 void Sensors::saveFrame()
 {
-    static int saved_frames = 0;
     int MAX_FRAMES = 150;
     if (saved_frames > MAX_FRAMES)
         return;
