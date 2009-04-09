@@ -43,11 +43,16 @@ void ALEnactor::run() {
     while (running) {
         currentTime = micro_time();
 
+        if(switchboard != NULL){
         sendJoints();
         //Once we've sent the most calculated joints
         postSensors();
 
         switchboard->signalNextFrame();
+
+        }else{
+            cout<< "Caution!! Switchboard is null, nothing done in ALEnactor"<<endl;
+        }
 
         const long long zero = 0;
         const long long processTime = micro_time() - currentTime;
