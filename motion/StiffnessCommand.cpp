@@ -5,6 +5,11 @@
 using namespace Kinematics;
 using namespace std;
 
+
+const float StiffnessCommand::NOT_SET  = - 1794.0f;//arbitrary constant
+const float StiffnessCommand::DECOUPLED = -1; //not supported by AL yet?
+
+
 StiffnessCommand::StiffnessCommand()
     : MotionCommand(MotionConstants::STIFFNESS)
 {
