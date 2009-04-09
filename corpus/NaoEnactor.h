@@ -55,7 +55,7 @@ private: // Members
 private: // Helper methods
     void setBodyHardness(float bodyHardness);
     void sendHardness();
-    float SafetyCheck(float,float, int);
+    float SafetyCheck(float,float,float, int);
     void initDCMAliases();
     void initDCMCommands();
 

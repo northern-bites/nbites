@@ -69,15 +69,25 @@ void NaoEnactor::sendJoints() {
     motionValues = switchboard->getNextJoints();
     // Get most current joint values possible for performing checks
     //alfastaccessJoints->GetValues(jointValues);
-    transcriber->postMotionSensors();
+    //transcriber->postMotionSensors();
     jointValues = sensors->getBodyAngles();//Need these for velocity checks
+
+    //last commands sent to the DCM
+    static vector<float> lastMotionCommandAngles(Kinematics::NUM_JOINTS,0.0f);
+    lastMotionCommandAngles = sensors->getMotionBodyAngles();
 
     for (unsigned int i = 0; i<Kinematics::NUM_JOINTS; i++) {
 #ifdef DEBUG_ENACTOR_JOINTS
         cout << "result of joint " << i << " is " << motionValues[i] << endl;
 #endif
         //returns the fastest safe value if requested movement is too fast
-        joint_command[5][i][0] = SafetyCheck(jointValues[i], motionValues[i], i);
+        const float clipped_angle  = SafetyCheck(jointValues[i],
+                                                 motionValues[i],
+                                                 lastMotionCommandAngles[i],
+                                                 i);
+        //save the clipped value for next time
+        motionValues[i] =  clipped_angle;
+        joint_command[5][i][0] = clipped_angle;
         //joint_command[5][i][0] = motionValues[i];
         //may be better to use previous rounds motionValues[i] in case
         //sensor lag occurs. we risk unsafe values if motion is impeded
@@ -145,44 +155,48 @@ void NaoEnactor::setBodyHardness(float hardness){
 
 //makes sure that we don't tell the motors to move faster than they can
 //the DCM takes care of trimming too large/ too small of values
-float NaoEnactor::SafetyCheck(float currentVal, float toCheck, int i){
+float NaoEnactor::SafetyCheck(float currentVal, float toCheck, float motionAngle, int i){
 
-    float absDiffInRad = fabs(currentVal - toCheck);
-    float allowedDiffInRad = jointsMax[i];
-    const float clippedVal =
-        NBMath::clip(toCheck, currentVal - allowedDiffInRad,
-                              currentVal + allowedDiffInRad);
+    //We need to clip angles twice. Why? Because the sensor values are between
+    //20 and 40 ms old, so we can't strictly use the sensor reports to clip
+    // the velocity.
+    //We also can't just use the internaly held motion angles because these
+    // could be out of sync with reality, and thus allow us to send bad
+    // commands.
+    //As a balance, we clip both with respect to sensor readings which we
+    //ASSUME are 40 ms old (even if they are newer), AND we clip with respect
+    //to the internally held motion command angles, which ensures that we'
+    //arent sending commands which are in general to fast for the motors.
+    //For the sensor angles, we clip with TWICE the max speed.
 
-#ifdef DEBUG_ENACTOR_JOINTS
+    const float absDiffInRad = fabs(currentVal - toCheck);
+    const float allowedMotionDiffInRad = jointsMax[i];
+    const float allowedSensorDiffInRad = allowedMotionDiffInRad*2.0f;
+    const float clippedMotionVal = toCheck;
+    //Motion check currently disabled b/c it makes tons of jitter!!
+//         NBMath::clip(toCheck, motionAngle - allowedMotionDiffInRad,
+//                               motionAngle + allowedMotionDiffInRad);
+
+    const float clippedSensorVal =
+        NBMath::clip(clippedMotionVal, currentVal - allowedSensorDiffInRad,
+                     currentVal + allowedSensorDiffInRad);
+
+#define DEBUG_ENACTOR_CLIPPING
+#ifdef DEBUG_ENACTOR_CLIPPING
     const float difference = abs(currentVal - toCheck);
-    if (difference > allowedDiffInRad)
+    const float motionDiff = abs(currentVal - motionAngle);
+    if ( difference > allowedSensorDiffInRad )
         cout << "Clipped " << Kinematics::JOINT_STRINGS[i]
-             << ". Difference was " << difference << endl;
+             << ". Difference due to SENSORS was " << difference << endl
+             << "  Reduction limitation is "<<jointsMax[i]<<"/20ms"<<endl;
+//     if( motionDiff > allowedMotionDiffInRad ){
+//         cout << "Clipped " << Kinematics::JOINT_STRINGS[i]
+//              << "  Difference due to MOTION was " <<motionDiff <<endl
+//              << "  Reduction limitation is "<<jointsMax[i]<<"/20ms"<<endl;
+//     }
 #endif
-/*
-    if (absDiffInRad > allowedDiffInRad){
-        if (toCheck > currentVal){
-//            #ifdef DEBUG_ENACTOR_JOINTS
-            std::cout << jointsP[i] << " Current = " << currentVal << "  TRIM = "
-                                << (currentVal + allowedDiffInRad) << std::endl;
-//            #endif
-            return (currentVal + allowedDiffInRad);
-        }
-        else {
-//            #ifdef DEBUG_ENACTOR_JOINTS
-            std::cout << jointsP[i] << "Current = " << currentVal << "  TRIM = "
-                                << (currentVal - allowedDiffInRad) << std::endl;
-//            #endif
-            return (currentVal - allowedDiffInRad);
-        }
-    }
 
-    #ifdef DEBUG_ENACTOR_JOINTS
-    std::cout << jointsP[i] << "Current = " << currentVal << "  Sent = "
-              << toCheck << std::endl;
-    #endif
-*/
-    return clippedVal;
+    return clippedSensorVal;
 }
 
 void NaoEnactor::postSensors(){
