@@ -37,7 +37,7 @@ dev.off()
 pdf(paste(name,"-y",PDF,sep=""),width=80, height=20)
 plot(dat$time,dat$pre_y,pch="",main="",xlab="s",ylab="mm")
 names = c("com_y","pre_y","zmp_y","real_com_y","sensor_zmp_y")
-cols = c("2","3","4","5","6")
+cols = c("2","3","4","5","6","1")
 
 zeros = dat$time
 zeros[zeros > -100] = mean(dat$pre_y,na.rm=T) +5
@@ -48,6 +48,7 @@ points(dat$time,dat$pre_y,type="l",col=3)
 points(dat$time,dat$zmp_y,type="l",col=4)
 points(dat$time,dat$real_com_y,type="p",col=5)
 points(dat$time,dat$sensor_zmp_y,type="l",col=6)
+points(dat$time,dat$com_y +(310./9.8)*dat$accY,type="l",col=1)
 legend("top",lwd=2,legend=names,col=cols)
 dev.off()
 

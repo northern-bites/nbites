@@ -74,11 +74,13 @@ Man::Man ()
     profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
     //messaging = shared_ptr<Messenger>(new Messenger());
     sensors = shared_ptr<Sensors>(new Sensors());
+    transcriber = shared_ptr<Transcriber>(new ALTranscriber(pBroker, sensors));
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
 
     // initialize core processing modules
 #ifdef USE_MOTION
-    enactor = shared_ptr<EnactorT>(new EnactorT(pBroker, sensors));
+    enactor = shared_ptr<EnactorT>(new EnactorT(pBroker, sensors,
+                                       transcriber));
     motion = shared_ptr<Motion<EnactorT> >(
         new Motion<EnactorT>(synchro, enactor, sensors));
 #endif

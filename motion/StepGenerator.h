@@ -113,7 +113,7 @@ public:
     void tick_controller();
     WalkLegsTuple tick_legs();
 
-    bool isDone() { return _done; }
+    bool isDone() { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
 
@@ -155,7 +155,7 @@ private:
     float y;
     float theta;
 
-    bool _done;
+    bool done;
 
     NBMath::ufvector3 com_i,last_com_c,est_zmp_i;
     //boost::numeric::ublas::vector<float> com_f;

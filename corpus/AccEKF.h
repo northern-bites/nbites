@@ -16,6 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
+#ifndef _AccEKF_h_DEFINED
+#define _AccEKF_h_DEFINED
 
 /**
  * Class for filtering accelerometer values received from sensors. Extends the
@@ -59,3 +61,4 @@ private: // Constants
     static const float gamma;
     static const float variance;
 };
+#endif

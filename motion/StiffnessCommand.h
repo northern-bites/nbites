@@ -28,7 +28,7 @@ class StiffnessCommand : public MotionCommand
 {
 public:
     //Default constructor is private and just inits the vector* to NULL
-    ~StiffnessCommand();
+    virtual ~StiffnessCommand();
     StiffnessCommand();
     StiffnessCommand(const float stiffness);
     StiffnessCommand(const Kinematics::ChainID chainID,
@@ -53,8 +53,8 @@ public:
     getRArmStiffness(void) const { return stiffnesses[Kinematics::RARM_CHAIN]; }
 
 public:
-    static const float NOT_SET  = -1794.0f; //arbitrary constant
-    static const float DECOUPLED  = -1; //not supported by AL yet?
+    static const float NOT_SET;
+    static const float DECOUPLED;
 
 private:
     virtual void setChainList() {

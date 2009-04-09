@@ -38,7 +38,7 @@ using namespace NBMath;
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
   : x(0.0f), y(0.0f), theta(0.0f),
-    _done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+    done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
     currentZMPDSteps(),
@@ -243,9 +243,11 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
-       && lastStep_s->type == END_STEP){
+       && lastStep_s->type == END_STEP &&
+       // Check that the walk vector is currently all 0s
+       x == 0.0f && y == 0.0f && theta == 0.0f) {
         //cout << "step generator done = true" << endl;
-        _done = true;
+        done = true;
     }
 
     debugLogging();
@@ -489,9 +491,10 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 #ifdef DEBUG_STEPGENERATOR
     cout << "New Walk Vector is:" << endl
          << "    x: " << x << " y: " << y << " theta: " << theta << endl;
+    cout << "Are we done? " << (done ? "Yes" : "No") << endl;
 #endif
 
-    if(_done){
+    if(done){
         //we are starting fresh from a stopped state, so we need to clear all remaining 
         //steps and zmp values.
         resetQueues();
@@ -502,7 +505,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
         else
             startRight();
     }
-    _done = false;
+    done = false;
 
 
     // We have to reevalaute future steps, so we forget about any future plans
@@ -786,7 +789,7 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
 
 
 bool StepGenerator::resetGait(const WalkingParameters * _wp){
-    if(_done){
+    if(done){
         walkParams = _wp;
         leftLeg.resetGait(_wp);
         rightLeg.resetGait(_wp);
