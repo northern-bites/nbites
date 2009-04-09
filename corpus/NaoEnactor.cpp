@@ -77,7 +77,8 @@ void NaoEnactor::sendJoints() {
         cout << "result of joint " << i << " is " << motionValues[i] << endl;
 #endif
         //returns the fastest safe value if requested movement is too fast
-        joint_command[5][i][0] = motionValues[i];//SafetyCheck(jointValues[i], motionValues[i], i);
+        joint_command[5][i][0] = SafetyCheck(jointValues[i], motionValues[i], i);
+        //joint_command[5][i][0] = motionValues[i];
         //may be better to use previous rounds motionValues[i] in case
         //sensor lag occurs. we risk unsafe values if motion is impeded
     }
@@ -148,7 +149,17 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, int i){
 
     float absDiffInRad = fabs(currentVal - toCheck);
     float allowedDiffInRad = jointsMax[i];
-    //const float 
+    const float clippedVal =
+        NBMath::clip(toCheck, currentVal - allowedDiffInRad,
+                              currentVal + allowedDiffInRad);
+
+#ifdef DEBUG_ENACTOR_JOINTS
+    const float difference = abs(currentVal - toCheck);
+    if (difference > allowedDiffInRad)
+        cout << "Clipped " << Kinematics::JOINT_STRINGS[i]
+             << ". Difference was " << difference << endl;
+#endif
+/*
     if (absDiffInRad > allowedDiffInRad){
         if (toCheck > currentVal){
 //            #ifdef DEBUG_ENACTOR_JOINTS
@@ -165,11 +176,13 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, int i){
             return (currentVal - allowedDiffInRad);
         }
     }
+
     #ifdef DEBUG_ENACTOR_JOINTS
     std::cout << jointsP[i] << "Current = " << currentVal << "  Sent = "
               << toCheck << std::endl;
     #endif
-    return toCheck;
+*/
+    return clippedVal;
 }
 
 void NaoEnactor::postSensors(){
