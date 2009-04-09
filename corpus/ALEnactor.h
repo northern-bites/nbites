@@ -37,39 +37,21 @@
 #include "Sensors.h"
 #include "ThreadedMotionEnactor.h"
 #include "MotionSwitchboard.h"
+#include "Transcriber.h"
 
 class ALEnactor : public ThreadedMotionEnactor {
 public:
-    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s)
-        : ThreadedMotionEnactor(), broker(_pbroker), sensors(s){
-        try{
-            alfastaccess =
-                AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
-        } catch(AL::ALError &e){
-            cout << "Failed to initialize proxy to ALFastAccess"<<endl;
-        }
-        try {
-            almemory = broker->getMemoryProxy();
-        } catch(AL::ALError &e){
-            cout << "Failed to initialize proxy to ALMemory" << endl;
-        }
+    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s,
+              boost::shared_ptr<Transcriber> t)
+        : ThreadedMotionEnactor(), broker(_pbroker), sensors(s),
+          transcriber(t){
+
         try {
             almotion = broker->getMotionProxy();
         } catch(AL::ALError &e){
             cout << "Failed to initialize proxy to ALMotion" << endl;
         }
-        try {
-            dcm = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
-        } catch(AL::ALError &e) {
-            cout << "Failed to initialize proxy to DCM" << endl;
-        }
-        //starting out we want to set our motion angles to the sensed position
-        motionCommandAngles = almotion->getBodyAngles();
-        sensors->setMotionBodyAngles(motionCommandAngles);
-        sensors->setBodyAngles(motionCommandAngles);
-#ifndef OFFLINE
-        initSyncWithALMemory();
-#endif
+
     };
     virtual ~ALEnactor() { };
 
@@ -78,15 +60,10 @@ public:
     virtual void postSensors();
 
 private:
-    void syncWithALMemory();
-    void initSyncWithALMemory();
-private:
     AL::ALPtr<AL::ALBroker> broker;
     AL::ALPtr<AL::ALMotionProxy>  almotion;
-    AL::ALPtr<AL::ALMemoryProxy>  almemory;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccess;
-    AL::ALPtr<AL::DCMProxy> dcm;
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Transcriber> transcriber;
     std::vector<float> motionCommandAngles;
     std::vector<float>  motionCommandStiffness;
     static const int MOTION_FRAME_RATE;

@@ -106,6 +106,11 @@ SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
                   ${CORPUS_INCLUDE_DIR}/_synchromodule
                   ${CORPUS_INCLUDE_DIR}/messaging
                   )
+SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
+                        ${CORPUS_INCLUDE_DIR}/NaoEnactor
+                        ${CORPUS_INCLUDE_DIR}/ALTranscriber
+                        ${CORPUS_INCLUDE_DIR}/AccEKF
+			)
 
 #IF( PYTHON_SHARED_CORPUS )
 #  LIST( APPEND SENSORS_SRCS ${VISION_INCLUDE_DIR}/Pose
@@ -142,9 +147,16 @@ IF( PYTHON_SHARED_CORPUS )
     SHARED
     ${SYNCHRO_SRCS}
     )
+  ADD_LIBRARY(
+    ${ROBOT_CONNECT_TARGET}
+    SHARED
+    ${ROBOT_CONNECT_SRCS}
+    )
   GET_TARGET_PROPERTY( SENSORS_TARGET_LOCATION ${SENSORS_TARGET} LOCATION )
   GET_TARGET_PROPERTY( LEDS_TARGET_LOCATION   ${LEDS_TARGET}   LOCATION )
   GET_TARGET_PROPERTY( SYNCHRO_TARGET_LOCATION   ${SYNCHRO_TARGET}   LOCATION )
+  GET_TARGET_PROPERTY( ROBOT_CONNET_TARGET_LOCATION
+                       ${ROBOT_CONNET_TARGET}   LOCATION )
   # Install to TARGETmodule.so, instead of lib_TARGET.so
   INSTALL(
     FILES ${SENSORS_TARGET_LOCATION}
@@ -164,6 +176,13 @@ IF( PYTHON_SHARED_CORPUS )
     CONFIGURATIONS "" Debug Release
     RENAME ${SYNCHRO_TARGET}module.so
     )
+  INSTALL(
+    FILES ${ROBOT_CONNECT_TARGET_LOCATION}
+    DESTINATION ${CORPUS_PYTHON_TARGET_DIR}
+    CONFIGURATIONS "" Debug Release
+    RENAME ${ROBOT_CONNECT_TARGET}module.so
+    )
+
 ELSE( PYTHON_SHARED_CORPUS )
   ADD_LIBRARY(
     ${SENSORS_TARGET}
@@ -179,6 +198,11 @@ ELSE( PYTHON_SHARED_CORPUS )
     ${SYNCHRO_TARGET}
     STATIC
     ${SYNCHRO_SRCS}
+    )
+  ADD_LIBRARY(
+    ${ROBOT_CONNECT_TARGET}
+    STATIC
+    ${ROBOT_CONNECT_SRCS}
     )
   # No INSTALL target when static
 ENDIF( PYTHON_SHARED_CORPUS )
@@ -219,6 +243,12 @@ TARGET_LINK_LIBRARIES( ${SYNCHRO_TARGET} ${NBCOMMON_LIBRARIES}
                                          ${PTHREAD_LIBRARIES}
                                          ${PYTHON_LIBRARIES}
                                          )
+TARGET_LINK_LIBRARIES( ${ROBOT_CONNECT_TARGET} ${NBCOMMON_LIBRARIES}
+                                               ${ALCOMMON_LIBRARIES}
+                                               ${TINYXML_LIBRARIES}
+                                               ${PTHREAD_LIBRARIES}
+                                               ${PYTHON_LIBRARIES}
+                                               )
 
 
 ############################ (SUB)DIRECTORY COMPILATION

@@ -276,13 +276,16 @@ void MotionSwitchboard::signalNextFrame(){
  * then the bad value is replaced
  */
 int MotionSwitchboard::realityCheckJoints(){
-    static const float joint_override_thresh = 0.1;//radians
+    static const float joint_override_thresh = 0.12;//radians
     int changed = 0;
     vector<float> sensorAngles = sensors->getBodyAngles();
     vector<float> motionAngles = sensors->getMotionBodyAngles();
     for(unsigned int i = 0; i < NUM_JOINTS; i++){
         if (fabs(sensorAngles[i] - motionAngles[i]) > joint_override_thresh){
-            //cout << "Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+#ifdef DEBUG_SWITCHBOARD_DISCREPANCIES
+            cout << "RealityCheck discrepancy: "<<endl
+                 << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+#endif
             nextJoints[i] = motionAngles[i] = sensorAngles[i];
             changed += 1;
         }
