@@ -15,7 +15,7 @@ using namespace boost;
 using namespace ALNames;
 
 #include "Kinematics.h"
-//using Kinematics::NUM_JOINTS;
+using Kinematics::jointsMaxVelNoLoad;
 
 void staticPostSensors(NaoEnactor * n) {
     n->postSensors();
@@ -169,7 +169,7 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, float motionAngle
     //For the sensor angles, we clip with TWICE the max speed.
 
     const float absDiffInRad = fabs(currentVal - toCheck);
-    const float allowedMotionDiffInRad = jointsMaxNoLoad[i];
+    const float allowedMotionDiffInRad = jointsMaxVelNoLoad[i];
     const float allowedSensorDiffInRad = allowedMotionDiffInRad*2.0f;
     const float clippedMotionVal =
         NBMath::clip(toCheck, motionAngle - allowedMotionDiffInRad,
@@ -185,11 +185,11 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, float motionAngle
     if ( difference > allowedSensorDiffInRad )
         cout << "Clipped " << Kinematics::JOINT_STRINGS[i]
              << ". Difference due to SENSORS was " << difference << endl
-             << "  Reduction limitation is "<<jointsMaxNoLoad[i]<<"/20ms"<<endl;
+             << "  Reduction limitation is "<<jointsMaxVelNoLoad[i]<<"/20ms"<<endl;
     if( motionDiff > allowedMotionDiffInRad ){
         cout << "Clipped " << Kinematics::JOINT_STRINGS[i]
              << "  Difference due to MOTION was " <<motionDiff <<endl
-             << "  Reduction limitation is "<<jointsMaxNoLoad[i]<<"/20ms"<<endl;
+             << "  Reduction limitation is "<<jointsMaxVelNoLoad[i]<<"/20ms"<<endl;
     }
 #endif
 
