@@ -769,10 +769,10 @@ void Threshold::objectRecognition() {
     if (pose->getLeftHorizonY() < 0 && pose->getRightHorizonY() < 0) {
         vision->yglp->init();
         vision->ygrp->init();
-        //vision->ygCrossbar->init();
+        vision->ygCrossbar->init();
         vision->bglp->init();
         vision->bgrp->init();
-        //vision->bgCrossbar->init();
+        vision->bgCrossbar->init();
     }
 
     storeFieldObjects();
