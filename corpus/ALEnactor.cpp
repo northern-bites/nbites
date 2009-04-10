@@ -44,11 +44,12 @@ void ALEnactor::run() {
         currentTime = micro_time();
 
         if(switchboard != NULL){
-        sendJoints();
-        //Once we've sent the most calculated joints
-        postSensors();
+            sendJoints();
+            sendHardness();
+            //Once we've sent the most calculated joints
+            postSensors();
 
-        switchboard->signalNextFrame();
+            switchboard->signalNextFrame();
 
         }else{
             cout<< "Caution!! Switchboard is null, nothing done in ALEnactor"<<endl;
@@ -72,13 +73,8 @@ void ALEnactor::run() {
 }
 
 void ALEnactor::sendJoints(){
-    if(!switchboard){
-        cout<< "Caution!! Switchboard is null, exiting ALEnactor"<<endl;
-        return;
-    }
     // Get the angles we want to go to this frame from the switchboard
     motionCommandAngles = switchboard->getNextJoints();
-    motionCommandStiffness = switchboard->getNextStiffness();
 
 #ifdef DEBUG_ENACTOR_JOINTS
     for (unsigned int i=0; i<motionCommandAngles.size();i++)
@@ -86,6 +82,15 @@ void ALEnactor::sendJoints(){
              << motionCommandAngles.at(i) << endl;
 #endif
 
+#ifndef NO_ACTUAL_MOTION
+    almotion->setBodyAngles(motionCommandAngles);
+#endif
+
+}
+
+void ALEnactor::sendHardness(){
+    //Get the hardness we need to send on to lower level
+    motionCommandStiffness = switchboard->getNextStiffness();
 
     //NOTE: in AL Enactor, we set each joint stiffness individually - this is
     //      probably quite slow
@@ -98,11 +103,6 @@ void ALEnactor::sendJoints(){
         almotion->setJointStiffness(name ,chainStiffness);
 #endif
     }
-
-#ifndef NO_ACTUAL_MOTION
-    almotion->setBodyAngles(motionCommandAngles);
-#endif
-
 }
 
 void ALEnactor::postSensors() {

@@ -56,8 +56,12 @@ public:
     virtual ~ALEnactor() { };
 
     virtual void run();
-    virtual void sendJoints();
+    virtual void sendCommands();
     virtual void postSensors();
+
+private:
+    void sendJoints();
+    void sendHardness();
 
 private:
     AL::ALPtr<AL::ALBroker> broker;

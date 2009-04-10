@@ -22,7 +22,7 @@ public:
         : switchboard(NULL),switchboardSet(false){};
     virtual ~MotionEnactor() { }
 
-    virtual void sendJoints() = 0;
+    virtual void sendCommands() = 0;
     virtual void postSensors() = 0;
 
     void setSwitchboard(MotionSwitchboard * s){

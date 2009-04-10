@@ -20,8 +20,8 @@ using Kinematics::jointsMaxVelNoLoad;
 void staticPostSensors(NaoEnactor * n) {
     n->postSensors();
 }
-void staticSendJoints(NaoEnactor * n) {
-    n->sendJoints();
+void staticSendCommands(NaoEnactor * n) {
+    n->sendCommands();
 }
 
 NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
@@ -52,7 +52,7 @@ NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
     broker->getProxy("DCM")->getModule()->onPostProcess()
         .connect(bind(staticPostSensors,this));
     broker->getProxy("DCM")->getModule()->onPreProcess()
-        .connect(bind(staticSendJoints,this));
+        .connect(bind(staticSendCommands,this));
 }
 
 const int NaoEnactor::MOTION_FRAME_RATE = 50;
@@ -62,14 +62,19 @@ const float NaoEnactor::MOTION_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
 const float NaoEnactor::MOTION_FRAME_LENGTH_S = 1.0f /
                                                 NaoEnactor::MOTION_FRAME_RATE;
 
-void NaoEnactor::sendJoints() {
+void NaoEnactor::sendCommands(){
 
     if(!switchboard){
         if(switchboardSet)
             cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
         return;
     }
+    sendJoints();
+    sendHardness();
 
+}
+
+void NaoEnactor::sendJoints() {
     // Get the angles we want to go to this frame from the switchboard
     motionValues = switchboard->getNextJoints();
 

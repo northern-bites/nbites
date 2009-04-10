@@ -19,7 +19,7 @@ public:
                boost::shared_ptr<Sensors> s,
                boost::shared_ptr<Transcriber> transcriber);
     virtual ~NaoEnactor() { };
-    void sendJoints();
+    void sendCommands();
     void postSensors();
 
 private: // Constants
@@ -47,6 +47,7 @@ private: // Members
 private: // Helper methods
     void setBodyHardness(float bodyHardness);
     void sendHardness();
+    void sendJoints();
     float SafetyCheck(float,float,float, int);
     void initDCMAliases();
     void initDCMCommands();
