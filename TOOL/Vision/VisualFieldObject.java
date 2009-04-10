@@ -33,7 +33,7 @@ public class VisualFieldObject {
     }
 
     public VisualFieldObject(int id){
-	this.id = id;
+        this.id = id;
     }
 
     //setters

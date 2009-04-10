@@ -136,7 +136,6 @@ public class VisionState {
                 default: color = Vision.BLACK; break;
                 }
                 //draw the box
-                System.out.println("Drawing a bounding box");
                 thresholdedOverlay.drawPolygon(obj.getLeftTopX(), obj.getRightTopX(),
                                                obj.getRightBottomX(), obj.getLeftBottomX(),
                                                obj.getLeftTopY(), obj.getRightTopY(),

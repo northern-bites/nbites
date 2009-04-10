@@ -207,17 +207,7 @@ public class TOOLVisionLink {
                                    int lbx, int lby, int rbx, int rby) {
 
         VisualFieldObject fieldObject = new VisualFieldObject();
-        /*useless unles someone uses each object in particular
-          switch (id) {
-          case VisualFieldObject.BLUE_GOAL_RIGHT_POST: fieldObject = bgrp; break;
-          case VisualFieldObject.BLUE_GOAL_LEFT_POST: fieldObject = bglp; break;
-          case VisualFieldObject.YELLOW_GOAL_RIGHT_POST: fieldObject = ygrp; break;
-          case VisualFieldObject.YELLOW_GOAL_LEFT_POST: fieldObject = yglp; break;
-          default: fieldObject = new VisualFieldObject(); break;
-          }
-        */
         //attach the data to the object
-        System.out.println(width);
         fieldObject.setID(id);
         fieldObject.setWidth(width); fieldObject.setHeight(height);
         fieldObject.setLeftTopX(ltx); fieldObject.setLeftTopY(lty);
