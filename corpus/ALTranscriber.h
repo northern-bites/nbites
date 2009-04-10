@@ -56,8 +56,9 @@ private: //Members
     AL::ALPtr<AL::ALBroker> broker;
     AL::ALPtr<ALMemoryFastAccess> alfastaccessJoints;
     AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
+    AL::ALPtr<ALMemoryFastAccess> alfastaccessTemps;
 
-    std::vector<float> jointValues; 
+    std::vector<float> jointValues;
 
     AccEKF accelerationFilter;
 

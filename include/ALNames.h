@@ -10,6 +10,7 @@ namespace ALNames {
     static const string HardnessPostFix = "/Hardness/Actuator/Value";
     static const string ValuePostFix    = "/Position/Sensor/Value";
     static const string ValuePreFix     = "Device/SubDeviceList/";
+    static const string TempValuePostFix= "/Temperature/Sensor/Value";
 
     static const string jointsP[Kinematics::NUM_JOINTS] = {
         "HeadYaw" + PositionPostFix,
@@ -85,6 +86,31 @@ namespace ALNames {
         ValuePreFix + "RShoulderRoll" + ValuePostFix,
         ValuePreFix + "RElbowYaw" + ValuePostFix,
         ValuePreFix + "RElbowRoll" + ValuePostFix
+    };
+    static const string jointsT[Kinematics::NUM_JOINTS] = {
+        ValuePreFix + "HeadYaw" + TempValuePostFix,
+        ValuePreFix + "HeadPitch" + TempValuePostFix,
+        ValuePreFix + "LShoulderPitch" + TempValuePostFix,
+        ValuePreFix + "LShoulderRoll" + TempValuePostFix,
+        ValuePreFix + "LElbowYaw" + TempValuePostFix,
+        ValuePreFix + "LElbowRoll" + TempValuePostFix,
+        ValuePreFix + "LHipYawPitch" + TempValuePostFix,
+        ValuePreFix + "LHipRoll" + TempValuePostFix,
+        ValuePreFix + "LHipPitch" + TempValuePostFix,
+        ValuePreFix + "LKneePitch" + TempValuePostFix,
+        ValuePreFix + "LAnklePitch" + TempValuePostFix,
+        ValuePreFix + "LAnkleRoll" + TempValuePostFix,
+        //this double subscription is intentional
+        ValuePreFix + "LHipYawPitch" + TempValuePostFix,
+        ValuePreFix + "RHipRoll" + TempValuePostFix,
+        ValuePreFix + "RHipPitch" + TempValuePostFix,
+        ValuePreFix + "RKneePitch" + TempValuePostFix,
+        ValuePreFix + "RAnklePitch" + TempValuePostFix,
+        ValuePreFix + "RAnkleRoll" + TempValuePostFix,
+        ValuePreFix + "RShoulderPitch" + TempValuePostFix,
+        ValuePreFix + "RShoulderRoll" + TempValuePostFix,
+        ValuePreFix + "RElbowYaw" + TempValuePostFix,
+        ValuePreFix + "RElbowRoll" + TempValuePostFix
     };
 
 }

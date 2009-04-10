@@ -38,6 +38,12 @@ ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
         cout << "Failed to initialize proxy to ALFastAccess for sensors"<<endl;
     }
 
+    try{
+        alfastaccessTemps =
+            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+    } catch(AL::ALError &e){
+        cout << "Failed to initialize proxy to ALFastAccess for temps"<<endl;
+    }
 
     try{
         initSyncMotionWithALMemory();
@@ -109,6 +115,25 @@ void ALTranscriber::initSyncMotionWithALMemory(){
     } catch(AL::ALError& a) {
         std::cout << "ALTranscriber " << a.toString() << std::endl;
     }
+
+
+    vector<string> jointTemperatureNames;
+    jointTemperatureNames +=
+        string(jointsT[0]), string(jointsT[1]), string(jointsT[2]),
+        string(jointsT[3]), string(jointsT[4]), string(jointsT[5]),
+        string(jointsT[6]), string(jointsT[7]), string(jointsT[8]),
+        string(jointsT[9]), string(jointsT[10]), string(jointsT[11]),
+        string(jointsT[12]), string(jointsT[13]), string(jointsT[14]),
+        string(jointsT[15]), string(jointsT[16]), string(jointsT[17]),
+        string(jointsT[18]), string(jointsT[19]), string(jointsT[20]),
+        string(jointsT[21]);
+
+    try{
+        alfastaccessTemps->ConnectToVariables(broker,jointTemperatureNames);
+    }catch(AL::ALError& a) {
+        std::cout << "ALTranscriber " << a.toString() << std::endl;
+    }
+
 }
 
 
@@ -132,6 +157,9 @@ const float ALTranscriber::calibrate_acc_z(const float z) {
 void ALTranscriber::syncMotionWithALMemory() {
     alfastaccessJoints->GetValues(jointValues);
     sensors->setBodyAngles(jointValues);
+
+    static vector<float> jointTemps(NUM_JOINTS,0.0f);
+    alfastaccessTemps->GetValues(jointTemps);
 
     // There are 16 sensor values we want.
     // The vector is static so that it is initialized only once for this
