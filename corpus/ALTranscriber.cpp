@@ -160,6 +160,7 @@ void ALTranscriber::syncMotionWithALMemory() {
 
     static vector<float> jointTemps(NUM_JOINTS,0.0f);
     alfastaccessTemps->GetValues(jointTemps);
+    sensors->setBodyTemperatures(jointTemps);
 
     // There are 16 sensor values we want.
     // The vector is static so that it is initialized only once for this
@@ -189,7 +190,8 @@ void ALTranscriber::syncMotionWithALMemory() {
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         //Inertial(filteredX, filteredY, filteredZ,
                          Inertial(accX, accY, accZ,
+                                  gyrX, gyrY, angleX, angleY),
+                         Inertial(filteredX, filteredY, filteredZ,
                                   gyrX, gyrY, angleX, angleY));
 }

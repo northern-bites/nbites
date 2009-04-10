@@ -370,16 +370,19 @@ Sensors::Sensors ()
       leftFootBumper(0.0f, 0.0f),
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+      unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistance(0.0f), ultraSoundMode(LL),
       image(&global_image[0]), pySensors(NULL)
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
     pthread_mutex_init(&motion_angles_mutex, NULL);
+    pthread_mutex_init(&temperatures_mutex, NULL);
     pthread_mutex_init(&errors_mutex, NULL);
     pthread_mutex_init(&fsr_mutex, NULL);
     pthread_mutex_init(&bumper_mutex, NULL);
     pthread_mutex_init(&inertial_mutex, NULL);
+    pthread_mutex_init(&unfiltered_inertial_mutex, NULL);
     pthread_mutex_init(&ultra_sound_mutex, NULL);
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
@@ -396,10 +399,12 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&angles_mutex);
     pthread_mutex_destroy(&vision_angles_mutex);
     pthread_mutex_destroy(&motion_angles_mutex);
+    pthread_mutex_destroy(&temperatures_mutex);
     pthread_mutex_destroy(&errors_mutex);
     pthread_mutex_destroy(&fsr_mutex);
     pthread_mutex_destroy(&bumper_mutex);
     pthread_mutex_destroy(&inertial_mutex);
+    pthread_mutex_destroy(&unfiltered_inertial_mutex);
     pthread_mutex_destroy(&ultra_sound_mutex);
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_destroy(&image_mutex);
@@ -436,6 +441,17 @@ const vector<float> Sensors::getMotionBodyAngles() const
     vector<float> vec(motionBodyAngles);
 
     pthread_mutex_unlock (&motion_angles_mutex);
+
+    return vec;
+}
+
+const vector<float> Sensors::getBodyTemperatures() const
+{
+    pthread_mutex_lock (&temperatures_mutex);
+
+    vector<float> vec(bodyTemperatures);
+
+    pthread_mutex_unlock (&temperatures_mutex);
 
     return vec;
 }
@@ -527,6 +543,17 @@ const Inertial Sensors::getInertial () const
     return inert;
 }
 
+const Inertial Sensors::getUnfilteredInertial () const
+{
+    pthread_mutex_lock (&unfiltered_inertial_mutex);
+
+    const Inertial inert(unfilteredInertial);
+
+    pthread_mutex_unlock (&unfiltered_inertial_mutex);
+
+    return inert;
+}
+
 const float Sensors::getUltraSound () const
 {
     pthread_mutex_lock (&ultra_sound_mutex);
@@ -551,6 +578,7 @@ const UltraSoundMode Sensors::getUltraSoundMode () const
 
 const vector<float> Sensors::getAllSensors () const
 {
+    //All sensors sans unfiltered Inertials and Temperatures
     pthread_mutex_lock (&fsr_mutex);
     pthread_mutex_lock (&bumper_mutex);
     pthread_mutex_lock (&inertial_mutex);
@@ -628,6 +656,16 @@ void Sensors::setBodyAngleErrors (vector<float>& v)
     bodyAnglesError = v;
 
     pthread_mutex_unlock (&errors_mutex);
+}
+
+
+void Sensors::setBodyTemperatures (vector<float>& v)
+{
+    pthread_mutex_lock (&temperatures_mutex);
+
+    bodyTemperatures = v;
+
+    pthread_mutex_unlock (&temperatures_mutex);
 }
 
 void Sensors::setLeftFootFSR(const float frontLeft, const float frontRight,
@@ -716,6 +754,26 @@ void Sensors::setInertial (const Inertial &v)
     pthread_mutex_unlock (&inertial_mutex);
 }
 
+void Sensors::setUnfilteredInertial(const float accX, const float accY, const float accZ,
+                          const float gyrX, const float gyrY,
+                          const float angleX, const float angleY)
+{
+    pthread_mutex_lock (&unfiltered_inertial_mutex);
+
+    unfilteredInertial = Inertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
+
+    pthread_mutex_unlock (&unfiltered_inertial_mutex);
+}
+
+void Sensors::setUnfilteredInertial (const Inertial &v)
+{
+    pthread_mutex_lock (&unfiltered_inertial_mutex);
+
+    unfilteredInertial = v;
+
+    pthread_mutex_unlock (&unfiltered_inertial_mutex);
+}
+
 void Sensors::setUltraSound (const float dist)
 {
     pthread_mutex_lock (&ultra_sound_mutex);
@@ -739,15 +797,19 @@ void Sensors::setUltraSoundMode (const UltraSoundMode mode)
  * Sets the sensors which are updated on the motion frequency (every 20ms)
  */
 void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
-                                const Inertial &_inertial)
+                                const Inertial &_inertial,
+                                const Inertial & _unfilteredInertial)
 {
     pthread_mutex_lock(&fsr_mutex);
     pthread_mutex_lock(&inertial_mutex);
+    pthread_mutex_lock(&unfiltered_inertial_mutex);
 
     leftFootFSR = _leftFoot;
     rightFootFSR = _rightFoot;
     inertial = _inertial;
+    unfilteredInertial = _unfilteredInertial;
 
+    pthread_mutex_unlock(&unfiltered_inertial_mutex);
     pthread_mutex_unlock(&inertial_mutex);
     pthread_mutex_unlock(&fsr_mutex);
 }
