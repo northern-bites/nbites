@@ -197,9 +197,9 @@ void ALTranscriber::syncMotionWithALMemory() {
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         Inertial(accX, accY, accZ,
-                                  gyrX, gyrY, angleX, angleY),
                          Inertial(filteredX, filteredY, filteredZ,
+                                  gyrX, gyrY, angleX, angleY),
+                         Inertial(accX, accY, accZ,
                                   gyrX, gyrY, angleX, angleY));
 }
 
