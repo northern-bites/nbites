@@ -115,6 +115,7 @@ void MotionSwitchboard::run() {
         processStiffness();
         bool active  = processProviders();
 
+
 #ifdef DEBUG_JOINTS_OUTPUT
         if(active)
             updateDebugLogs();
@@ -269,6 +270,7 @@ const bool MotionSwitchboard::hasNewStiffness() const {
 const vector<float>  MotionSwitchboard::getNextStiffness() const{
     pthread_mutex_lock(&stiffness_mutex);
     vector<float> result(nextStiffness);
+    newStiffness = false;
     pthread_mutex_unlock(&stiffness_mutex);
     return result;
 }
@@ -452,9 +454,9 @@ int MotionSwitchboard::processStiffness(){
         }
         delete next;
     }
-
-    newStiffness = changed;
-
+    if(changed){
+        newStiffness = true;
+    }
     pthread_mutex_unlock(&stiffness_mutex);
 
     return changed;

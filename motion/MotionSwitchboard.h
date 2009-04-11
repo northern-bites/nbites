@@ -119,7 +119,7 @@ private:
 
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
-    bool newStiffness;
+    mutable bool newStiffness;
 
     bool readyToSend;
 
