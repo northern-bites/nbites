@@ -125,11 +125,11 @@ class Sensors {
     // Locking data storage methods
     //   Each of these methods first locks the associated mutex, stores
     //   the specified values, then unlocks the mutex before returning
-    void setBodyAngles(std::vector<float>& v);
-    void setVisionBodyAngles(std::vector<float>& v);
-    void setMotionBodyAngles(std::vector<float>& v);
-    void setBodyAngleErrors(std::vector<float>& v);
-    void setBodyTemperatures(std::vector<float>& v);
+    void setBodyAngles(const std::vector<float>& v);
+    void setVisionBodyAngles(const std::vector<float>& v);
+    void setMotionBodyAngles(const std::vector<float>& v);
+    void setBodyAngleErrors(const std::vector<float>& v);
+    void setBodyTemperatures(const std::vector<float>& v);
     void setLeftFootFSR(const float frontLeft, const float frontRight,
                         const float rearLeft, const float rearRight);
     void setRightFootFSR(const float frontLeft, const float frontRight,

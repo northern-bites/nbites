@@ -102,6 +102,10 @@ void MotionSwitchboard::stop() {
 void MotionSwitchboard::run() {
     static int fcount = 0;
 
+    //IMPORTANT Before anything else happens we need to put the correct
+    //angles into sensors->motionBodyAngles:
+    sensors->setMotionBodyAngles(sensors->getBodyAngles());
+
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
     pthread_mutex_unlock(&calc_new_joints_mutex);

@@ -69,8 +69,10 @@ void NaoEnactor::sendCommands(){
             cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
         return;
     }
+
     sendJoints();
     sendHardness();
+    sendUltraSound();
 
 }
 
@@ -123,7 +125,7 @@ void NaoEnactor::sendHardness(){
         hardness = NBMath::clip(motionHardness[i],0.0f,1.0f);
 
         //sets the value for hardness
-        hardness_command[5][i].arraySetSize(1);
+        //hardness_command[5][i].arraySetSize(1);
         hardness_command[5][i][0] = hardness;
     }
     hardness_command[4][0] = dcmProxy->getTime(0);
@@ -137,24 +139,42 @@ void NaoEnactor::sendHardness(){
 #endif
 }
 
-void NaoEnactor::setBodyHardness(float hardness){
-    hardness = NBMath::clip(hardness,0,1.0f);
+void NaoEnactor::sendUltraSound(){
+    //The US sensors only resond on a 250 ms cycle -- TODO/HACK is this right??
+    static const int US_FRAME_RATE = 4;
+    //We need to skip approximately 12.5 (13) motion frames before sending
+    //another command
+    static const int US_IDLE_SKIP = MOTION_FRAME_RATE /  US_FRAME_RATE + 1;
 
-    //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
-    for (unsigned int i = 0; i<Kinematics::NUM_JOINTS; i++) {
-        //sets the value for hardness
-        hardness_command[5][i].arraySetSize(1);
-        hardness_command[5][i][0] = hardness;
-    }
-    hardness_command[4][0] = dcmProxy->getTime(0);
-#ifndef NO_ACTUAL_MOTION
+    static int counter = 0;
+    static int mode = 0;
     try {
-        dcmProxy->setAlias(hardness_command);
-    } catch(AL::ALError& a) {
-        std::cout << "DCM Hardness set error" << a.toString() << "    "
-                  << hardness_command.toString() << std::endl;
+        if (counter == US_IDLE_SKIP){
+            // This is testing code which sends a new value to the actuator
+            // every 13 motion frames (250ms). It also cycles the
+            //ultrasound mode between the four possibilities. See docs.
+            mode = mode % 4;
+
+            // the current mode - changes every 5 frames
+            us_command[2][0][0] = static_cast<float>(mode);
+            us_command[2][0][1] = dcmProxy->getTime(250);
+
+            // set the mode only once every 4 frames because it responds slowly anyway
+            // but this rate needs to change if we don't run vision at 15 fps
+            dcmProxy->set(us_command);
+
+            //Reset the counter after each command is sent
+            counter = 0;
+            mode+=1;
+
+        }else
+            counter++;
+
+    } catch(AL::ALError &e) {
+        cout << "Failed to set ultrasound mode. Reason: "
+             << e.toString() << endl;
     }
-#endif
+
 }
 
 //makes sure that we don't tell the motors to move faster than they can
@@ -253,7 +273,11 @@ void NaoEnactor::initDCMCommands(){
 
     //sets the hardness for all the joints
     hardness_command[0] = string("AllActuatorHardness");
-
+    for (unsigned int i = 0; i<Kinematics::NUM_JOINTS; i++) {
+        //sets default hardness for each joint, which will never be sent
+        hardness_command[5][i].arraySetSize(1);
+        hardness_command[5][i][0] = 0.0;
+    }
 
     //set-up the array for sending commands to DCM
     joint_command.arraySetSize(6);
@@ -266,10 +290,20 @@ void NaoEnactor::initDCMCommands(){
     //sets the hardness for all the joints
     joint_command[0] = string("AllActuatorPosition");
     for (unsigned int i = 0; i<Kinematics::NUM_JOINTS; i++) {
-        //sets the value for hardness
+        //sets default value for each joint, which will never be sent
         joint_command[5][i].arraySetSize(1);
-        joint_command[5][i][0] = 0.80;
+        joint_command[5][i][0] = 0.0;
     }
+
+    us_command.arraySetSize(3);
+    us_command[0] = string("US/Actuator/Value");
+    us_command[1] = string("Merge");
+    us_command[2].arraySetSize(1);
+    us_command[2][0].arraySetSize(2);
+//      // the current mode - changes every 5 frames
+//     us_command[2][0][0] = 0.0f; //static_cast<float>(setMode);
+//     us_command[2][0][1] = 0.0f; //dcm->getTime(250);
+
 
 }
 

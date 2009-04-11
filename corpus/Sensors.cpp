@@ -615,7 +615,7 @@ const vector<float> Sensors::getAllSensors () const
     return allSensors;
 }
 
-void Sensors::setBodyAngles (vector<float>& v)
+void Sensors::setBodyAngles (const vector<float>& v)
 {
     pthread_mutex_lock (&angles_mutex);
 
@@ -631,7 +631,7 @@ void Sensors::setBodyAngles (vector<float>& v)
     pthread_mutex_unlock (&angles_mutex);
 }
 
-void Sensors::setVisionBodyAngles (vector<float>& v)
+void Sensors::setVisionBodyAngles (const vector<float>& v)
 {
     pthread_mutex_lock (&vision_angles_mutex);
 
@@ -640,7 +640,7 @@ void Sensors::setVisionBodyAngles (vector<float>& v)
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
-void Sensors::setMotionBodyAngles (vector<float>& v)
+void Sensors::setMotionBodyAngles (const vector<float>& v)
 {
     pthread_mutex_lock (&motion_angles_mutex);
 
@@ -649,7 +649,7 @@ void Sensors::setMotionBodyAngles (vector<float>& v)
     pthread_mutex_unlock (&motion_angles_mutex);
 }
 
-void Sensors::setBodyAngleErrors (vector<float>& v)
+void Sensors::setBodyAngleErrors (const vector<float>& v)
 {
     pthread_mutex_lock (&errors_mutex);
 
@@ -659,7 +659,7 @@ void Sensors::setBodyAngleErrors (vector<float>& v)
 }
 
 
-void Sensors::setBodyTemperatures (vector<float>& v)
+void Sensors::setBodyTemperatures (const vector<float>& v)
 {
     pthread_mutex_lock (&temperatures_mutex);
 

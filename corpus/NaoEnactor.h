@@ -41,17 +41,18 @@ private: // Members
     std::vector<float> motionHardness;
     AL::ALValue hardness_command;
     AL::ALValue joint_command;
+    AL::ALValue us_command;
 
 
 
 private: // Helper methods
-    void setBodyHardness(float bodyHardness);
     void sendHardness();
     void sendJoints();
+    void sendUltraSound();
+
     float SafetyCheck(float,float,float, int);
     void initDCMAliases();
     void initDCMCommands();
-
 };
 
 #endif

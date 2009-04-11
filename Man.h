@@ -149,8 +149,6 @@ private:
 #ifdef NAOQI1
     void registerCamera();
     void initCameraSettings(int whichCam);
-    void initSyncWithALMemory();
-    void syncWithALMemory();
 #else
     void initCamera();
 #endif
@@ -186,9 +184,6 @@ private:
     AL::ALPtr<AL::ALLoggerProxy> log;
     AL::ALPtr<AL::ALProxy> camera;
     AL::ALPtr<AL::ALProxy> lem;
-    AL::ALPtr<AL::ALMemoryProxy> almemory;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccess;
-    AL::DCMProxy *dcm;
 #else
     AL::ALLoggerProxy *log;
     AL::ALProxy *camera;
