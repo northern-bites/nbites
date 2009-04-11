@@ -100,7 +100,7 @@ void NaoEnactor::sendJoints() {
         lastMotionCommandAngles[i] = clipped_angle;
     }
 
-    sendHardness();
+    //sendHardness();
 
     // Send the array with a 25 ms delay. This delay removes the jitter.
     // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
