@@ -112,7 +112,7 @@ void MotionSwitchboard::run() {
 
     while(running) {
         realityCheckJoints();
-        newStiffness = processStiffness();
+        processStiffness();
         bool active  = processProviders();
 
 #ifdef DEBUG_JOINTS_OUTPUT
@@ -245,21 +245,28 @@ void MotionSwitchboard::swapBodyProvider(){
 
 }
 
-const vector <float> MotionSwitchboard::getNextJoints() {
+const vector <float> MotionSwitchboard::getNextJoints() const {
     pthread_mutex_lock(&next_joints_mutex);
     if(!newJoints && readyToSend){
         cout << "An enactor is grabbing old joints from switchboard."
              <<" Must have missed a frame!" <<endl;
     }
     const vector <float> vec(nextJoints);
-    newJoints =false;
+    newJoints = false;
 
     pthread_mutex_unlock(&next_joints_mutex);
 
     return vec;
 }
 
-const vector<float>  MotionSwitchboard::getNextStiffness(){
+const bool MotionSwitchboard::hasNewStiffness() const {
+    pthread_mutex_lock(&stiffness_mutex);
+    bool result(newStiffness);
+    pthread_mutex_unlock(&stiffness_mutex);
+    return result;
+}
+
+const vector<float>  MotionSwitchboard::getNextStiffness() const{
     pthread_mutex_lock(&stiffness_mutex);
     vector<float> result(nextStiffness);
     pthread_mutex_unlock(&stiffness_mutex);
@@ -445,6 +452,9 @@ int MotionSwitchboard::processStiffness(){
         }
         delete next;
     }
+
+    newStiffness = changed;
+
     pthread_mutex_unlock(&stiffness_mutex);
 
     return changed;

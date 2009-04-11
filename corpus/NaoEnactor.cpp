@@ -71,7 +71,8 @@ void NaoEnactor::sendCommands(){
     }
 
     sendJoints();
-    sendHardness();
+    if (switchboard->hasNewStiffness())
+        sendHardness();
     sendUltraSound();
 
 }

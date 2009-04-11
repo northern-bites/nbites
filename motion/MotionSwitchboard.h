@@ -67,8 +67,9 @@ public:
     void stop();
     void run();
 
-	const std::vector <float> getNextJoints();
-	const std::vector<float> getNextStiffness();
+	const std::vector <float> getNextJoints() const;
+	const std::vector<float> getNextStiffness() const;
+    const bool hasNewStiffness() const;
     void signalNextFrame();
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
@@ -117,7 +118,7 @@ private:
     std::vector <float> nextStiffness;
 
     bool running;
-	bool newJoints; //Way to track if we ever use the same joints twice
+	mutable bool newJoints; //Way to track if we ever use the same joints twice
     bool newStiffness;
 
     bool readyToSend;
@@ -128,9 +129,9 @@ private:
 
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
-    pthread_mutex_t calc_new_joints_mutex;
-    pthread_mutex_t next_joints_mutex;
-    pthread_mutex_t stiffness_mutex;
+    mutable pthread_mutex_t calc_new_joints_mutex;
+    mutable pthread_mutex_t next_joints_mutex;
+    mutable pthread_mutex_t stiffness_mutex;
 
 #ifdef DEBUG_JOINTS_OUTPUT
     FILE* joints_log;
