@@ -372,6 +372,7 @@ Sensors::Sensors ()
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistance(0.0f), ultraSoundMode(LL),
+      chestButton(0.0f),
       image(&global_image[0]), pySensors(NULL)
 {
     pthread_mutex_init(&angles_mutex, NULL);
@@ -380,7 +381,7 @@ Sensors::Sensors ()
     pthread_mutex_init(&temperatures_mutex, NULL);
     pthread_mutex_init(&errors_mutex, NULL);
     pthread_mutex_init(&fsr_mutex, NULL);
-    pthread_mutex_init(&bumper_mutex, NULL);
+    pthread_mutex_init(&button_mutex, NULL);
     pthread_mutex_init(&inertial_mutex, NULL);
     pthread_mutex_init(&unfiltered_inertial_mutex, NULL);
     pthread_mutex_init(&ultra_sound_mutex, NULL);
@@ -402,7 +403,7 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&temperatures_mutex);
     pthread_mutex_destroy(&errors_mutex);
     pthread_mutex_destroy(&fsr_mutex);
-    pthread_mutex_destroy(&bumper_mutex);
+    pthread_mutex_destroy(&button_mutex);
     pthread_mutex_destroy(&inertial_mutex);
     pthread_mutex_destroy(&unfiltered_inertial_mutex);
     pthread_mutex_destroy(&ultra_sound_mutex);
@@ -512,22 +513,22 @@ const FSR Sensors::getRightFootFSR () const
 
 const FootBumper Sensors::getLeftFootBumper() const
 {
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
 
     const FootBumper bumper = leftFootBumper;
 
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
 
     return bumper;
 }
 
 const FootBumper Sensors::getRightFootBumper() const
 {
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
 
     const FootBumper bumper = rightFootBumper;
 
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
 
     return bumper;
 }
@@ -576,11 +577,23 @@ const UltraSoundMode Sensors::getUltraSoundMode () const
     return mode;
 }
 
+const float Sensors::getChestButton () const
+{
+    pthread_mutex_lock (&button_mutex);
+
+    float dist = ultraSoundDistance;
+
+    pthread_mutex_unlock (&button_mutex);
+
+    return dist;
+}
+
 const vector<float> Sensors::getAllSensors () const
 {
     //All sensors sans unfiltered Inertials and Temperatures
+    //and the chest button preses
     pthread_mutex_lock (&fsr_mutex);
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
     pthread_mutex_lock (&inertial_mutex);
     pthread_mutex_lock (&ultra_sound_mutex);
 
@@ -608,7 +621,7 @@ const vector<float> Sensors::getAllSensors () const
     allSensors += static_cast<float>(ultraSoundMode);
 
     pthread_mutex_unlock (&fsr_mutex);
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
     pthread_mutex_unlock (&inertial_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
 
@@ -700,38 +713,38 @@ void Sensors::setFSR(const FSR &_leftFootFSR, const FSR &_rightFootFSR)
 
 void Sensors::setLeftFootBumper(const float left, const float right)
 {
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
 
     leftFootBumper = FootBumper(left, right);
 
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
 }
 
 void Sensors::setLeftFootBumper(const FootBumper& bumper)
 {
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
 
     leftFootBumper = bumper;
 
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
 }
 
 void Sensors::setRightFootBumper(const float left, const float right)
 {
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
 
     rightFootBumper = FootBumper(left, right);
 
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
 }
 
 void Sensors::setRightFootBumper(const FootBumper& bumper)
 {
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
 
     rightFootBumper = bumper;
 
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
 }
 
 void Sensors::setInertial(const float accX, const float accY, const float accZ,
@@ -819,24 +832,28 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
  */
 void Sensors::setVisionSensors (const FootBumper &_leftBumper,
                                 const FootBumper &_rightBumper,
+                                const float _chestButton,
                                 const float ultraSound,
                                 const UltraSoundMode _mode)
 {
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
     pthread_mutex_lock(&ultra_sound_mutex);
 
     leftFootBumper = _leftBumper;
     rightFootBumper = _rightBumper;
     ultraSoundDistance = ultraSound;
     ultraSoundMode = _mode;
+    chestButton = _chestButton;
 
     pthread_mutex_unlock(&ultra_sound_mutex);
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
 }
 
 void Sensors::setAllSensors (vector<float> sensorValues) {
+    //All sensors sans unfiltered Inertials and Temperatures
+    //and the chest button preses
     pthread_mutex_lock (&fsr_mutex);
-    pthread_mutex_lock (&bumper_mutex);
+    pthread_mutex_lock (&button_mutex);
     pthread_mutex_lock (&inertial_mutex);
     pthread_mutex_lock (&ultra_sound_mutex);
 
@@ -861,7 +878,7 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
         static_cast<int>(sensorValues[20]));
 
     pthread_mutex_unlock (&fsr_mutex);
-    pthread_mutex_unlock (&bumper_mutex);
+    pthread_mutex_unlock (&button_mutex);
     pthread_mutex_unlock (&inertial_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
 }

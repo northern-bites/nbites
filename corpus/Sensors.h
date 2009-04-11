@@ -120,6 +120,7 @@ class Sensors {
     const Inertial getUnfilteredInertial() const;
     const float getUltraSound() const;
     const UltraSoundMode getUltraSoundMode() const;
+    const float getChestButton() const;
     const std::vector<float> getAllSensors() const;
 
     // Locking data storage methods
@@ -157,6 +158,7 @@ class Sensors {
 
     void setVisionSensors(const FootBumper &_leftBumper,
                           const FootBumper &_rightBumper,
+                          const float chestButton,
                           const float ultraSound,
                           const UltraSoundMode _mode);
 
@@ -203,7 +205,7 @@ private:
     mutable pthread_mutex_t errors_mutex;
     mutable pthread_mutex_t temperatures_mutex;
     mutable pthread_mutex_t fsr_mutex;
-    mutable pthread_mutex_t bumper_mutex;
+    mutable pthread_mutex_t button_mutex;
     mutable pthread_mutex_t inertial_mutex;
     mutable pthread_mutex_t unfiltered_inertial_mutex;
     mutable pthread_mutex_t ultra_sound_mutex;
@@ -232,6 +234,8 @@ private:
     // Sonar sensors
     float ultraSoundDistance;
     UltraSoundMode ultraSoundMode;
+    //ChestButton
+    float chestButton;
 
     const unsigned char *image;
     PySensors *pySensors;

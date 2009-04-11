@@ -217,6 +217,7 @@ void ALTranscriber::initSyncVisionWithALMemory() {
         string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
+        string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value"),
         string("Device/SubDeviceList/US/Sensor/Value"),
         string("Device/SubDeviceList/US/Actuator/Value");
 
@@ -231,13 +232,14 @@ void ALTranscriber::syncVisionWithALMemory() {
         leftFootBumperRight  = varValues[1];
     const float rightFootBumperLeft = varValues[2],
         rightFootBumperRight = varValues[3];
-
-    const float ultraSoundDist = varValues[4];
-    const int ultraSoundMode = static_cast<int>(varValues[5]);
+    const float chestButton = varValues[4];
+    const float ultraSoundDist = varValues[5];
+    const int ultraSoundMode = static_cast<int>(varValues[6]);
 
     sensors->
         setVisionSensors(FootBumper(leftFootBumperLeft, leftFootBumperRight),
                          FootBumper(rightFootBumperLeft, rightFootBumperRight),
+                         chestButton,
                          ultraSoundDist,
                          // UltraSoundMode is just an enum
                          static_cast<UltraSoundMode> (ultraSoundMode));
