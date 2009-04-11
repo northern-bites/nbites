@@ -83,6 +83,8 @@ Man::Man ()
                                        transcriber));
     motion = shared_ptr<Motion<EnactorT> >(
         new Motion<EnactorT>(synchro, enactor, sensors));
+    guardian = shared_ptr<RoboGuardian>(
+        new RoboGuardian(synchro,sensors, pBroker, motion->getInterface()));
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
@@ -504,6 +506,8 @@ Man::run ()
         cerr << "Motion failed to start" << endl;
     //else
     //  motion->getStart()->await();
+    if(guardian->start() != 0)
+        cout << "RoboGuardian failed to start" << endl;
 #endif
 
 #ifdef DEBUG_MAN_THREADING
@@ -568,6 +572,8 @@ Man::run ()
     // Finished with run loop, stop sub-threads and exit
     motion->stop();
     motion->getTrigger()->await_off();
+    guardian->stop();
+    guardian->getTrigger()->await_off();
 #endif
     comm->stop();
     comm->getTrigger()->await_off();

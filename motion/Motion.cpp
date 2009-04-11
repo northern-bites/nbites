@@ -87,6 +87,7 @@ template <class EnactorType>
 void Motion<EnactorType>::run(){
     cout <<"Motion::run"<<endl;
     switchboard.run();
+    Thread::trigger->off();
 }
 
 

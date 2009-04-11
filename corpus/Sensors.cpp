@@ -581,11 +581,11 @@ const float Sensors::getChestButton () const
 {
     pthread_mutex_lock (&button_mutex);
 
-    float dist = ultraSoundDistance;
+    float button = chestButton;
 
     pthread_mutex_unlock (&button_mutex);
 
-    return dist;
+    return button;
 }
 
 const vector<float> Sensors::getAllSensors () const

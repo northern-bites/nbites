@@ -64,6 +64,7 @@ typedef ALEnactor EnactorT;
 #include "Motion.h"
 #include "NaoPose.h"
 #include "synchro.h"
+#include "RoboGuardian.h"
 
 /**
  * Preferences class to alter Python settings for our robot system.
@@ -171,6 +172,7 @@ public:
 #ifdef USE_MOTION
     boost::shared_ptr<EnactorT> enactor;
     boost::shared_ptr<Motion<EnactorT> > motion;
+    boost::shared_ptr<RoboGuardian> guardian;
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
