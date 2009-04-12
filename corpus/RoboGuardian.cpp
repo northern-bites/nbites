@@ -8,6 +8,7 @@ using namespace std;
 
 #include "StiffnessCommand.h"
 
+
 const int RoboGuardian::GUARDIAN_FRAME_RATE = 50;
 // 1 second * 1000 ms/s * 1000 us/ms
 const float RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
@@ -102,13 +103,17 @@ void RoboGuardian::checkButtonPushes(){
         buttonOffCounter <= SINGLE_CLICK_INACTIVE_MAX &&
         !registeredClickThisTime){
         buttonClicks += 1;
+#ifdef DEBUG_GUARDIAN_CLICKS
         cout << "Registered a click, waiting to see if there are more"<<endl;
+#endif
         registeredClickThisTime = true;
    }
 
     if( buttonOffCounter > SINGLE_CLICK_INACTIVE_MAX &&
          buttonClicks > 0){
+#ifdef DEBUG_GUARDIAN_CLICKS
         cout << "Processing " <<buttonClicks <<" clicks"<<endl;
+#endif
         executeClickAction(buttonClicks);
         buttonClicks = 0;
     }
@@ -121,11 +126,28 @@ void RoboGuardian::checkButtonPushes(){
 }
 
 
+static const string quiet = " -q ";
+static const string sout = "aplay"+quiet;
+static const string sdir = "/opt/naoqi/data/wav/";
+static const string nbsdir = "/opt/naoqi/modules/etc/audio/";
+static const string wav = ".wav";
+static const string shutdown_wav = sdir + "shutdown" + wav;
+static const string mynameis_wav = nbsdir + "mynameis" + wav;
+static const string my_address_is_wav = sdir + "my_internet_address_is" + wav;
+static const string dot = ".";
+
+
+void playFile(string str){
+    system((sout+str).c_str());
+}
+
+
 void RoboGuardian::executeClickAction(int numClicks){
     switch(numClicks){
 
     case 1:
         //Say IP Address
+        speakIPAddress();
         break;
     case 2:
         cout << "Registered two clicks, disabling the gains" <<endl;
@@ -133,6 +155,7 @@ void RoboGuardian::executeClickAction(int numClicks){
         break;
     case 6:
         //Easter EGG!
+        playFile(nbsdir+"easter_egg.wav");
         break;
     default:
         //nothing
@@ -142,7 +165,42 @@ void RoboGuardian::executeClickAction(int numClicks){
 }
 
 
+void RoboGuardian::executeStartupAction(){
+//Blank for now
+
+}
+
 void RoboGuardian::executeShutdownAction(){
     cout << "Shutting down the robot NOW!!!"<<endl;
+    playFile(shutdown_wav);
     system("shutdown -h now &");
+}
+
+string getHostName(){
+    char name[40];
+    name[0] ='\0';
+    gethostname(name,39);
+    return string(name);
+}
+
+void RoboGuardian::speakIPAddress(){
+    //Currently we poll the broker. If this breaks in the future
+    //you can try to call /opt/naoqi/bin/ip.sh or
+    //parse the output of if config yourself
+    const string IP = broker->getIP();
+    const string host = getHostName();
+
+    cout << "Hello, my name is " + host
+         <<". My internet address is "<< IP<<endl;
+    playFile(mynameis_wav);
+    playFile(nbsdir+host+wav);
+    playFile(my_address_is_wav);
+    for (unsigned int i = 0; i < IP.size(); i++){
+        char digit = IP[i];
+        if(digit == dot[0])
+            playFile(sdir+"point"+wav);
+        else
+            playFile(sdir+digit+wav);
+
+    }
 }

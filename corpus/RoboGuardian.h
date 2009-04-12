@@ -42,7 +42,8 @@ public:
     void run();
 
     void executeShutdownAction();
-
+    void executeStartupAction();
+    void speakIPAddress();
 private:
     void checkTemperatures();
     void checkButtonPushes();
