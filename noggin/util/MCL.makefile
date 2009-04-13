@@ -1,5 +1,5 @@
 C++ = g++
-C++-FLAGS = -Wall -O2 -Wconversion -DNDEBUG
+C++-FLAGS = -Wall -O3 -Wconversion -DNDEBUG -m64
 RM = rm -f
 INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
 
@@ -36,8 +36,19 @@ OBS_SRCS = ../Observation.cpp \
 MCL_SRCS = ../MCL.cpp \
 	../MCL.h
 LOCEKF_SRCS = ../LocEKF.cpp \
-	../LocEKF.h
+		../LocEKF.h
 LOCSYSTEM_SRCS = ../LocSystem.h
+
+FAKER_IO_SRCS = fakerIO.cpp \
+		fakerIO.h
+
+FAKER_ITERATORS_SRCS = fakerIterators.cpp \
+		fakerIterators.h
+
+NAV_TO_OBS_SRCS = navToObs.cpp
+
+OBS_TO_LOC_SRCS = obsToLoc.cpp
+
 FAKER_SRCS = LocLogFaker.cpp \
 	  LocLogFaker.h \
 	../NogginStructs.h
@@ -58,17 +69,40 @@ OBJS = Utility.o \
        EKF.o \
        BallEKF.o \
        LocEKF.o \
-       LocSystem.o
+       fakerIO.o \
+       fakerIterators.o
+
+EXECS = faker.o \
+	faker \
 
 LDLIBS = $(OBJS)
 LDFLAGS = $(LDLIBS)
 
-all : faker
+all : navToObs obsToLoc faker
 
 # The faker tool
 faker : $(FAKER_SRCS) $(OBJS) faker.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) faker.o -DNO_ZLIB -o $@
+
+obsToLoc : $(OBS_TO_LOC_SRCS) $(OBJS) obsToLoc.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) obsToLoc.o -DNO_ZLIB -o $@
+
+navToObs : $(NAV_TO_OBS_SRCS) $(OBJS) navToObs.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) navToObs.o -DNO_ZLIB -o $@
+
 faker.o : $(FAKER_SRCS) $(OBJS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+
+obsToLoc.o : $(OBS_TO_LOC_SRCS) $(OBJS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+
+navToObs.o : $(NAV_TO_OBS_SRCS) $(OBJS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+
+fakerIterators.o : $(FAKER_ITERATORS_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+
+fakerIO.o : $(FAKER_IO_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
 # Vision utilities
@@ -102,18 +136,16 @@ VisBall.o : $(VISBALL_SRCS)
 # Localization stuff
 Observation.o : $(OBS_SRCS)
 	 $(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-LocSystem.o : $(LOCSYSTEM_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-MCL.o : $(MCL_SRCS) LocSystem.o
+MCL.o : $(MCL_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 EKF.o : $(EKF_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 BallEKF.o :$(BALLEKF_SRCS) EKF.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-LocEKF.o :$(LOCEKF_SRCS) EKF.o LocSystem.o
+LocEKF.o :$(LOCEKF_SRCS) EKF.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
 .Phony : clean
 
 clean :
-	$(RM) $(OBJS) faker.o faker
+	$(RM) $(OBJS) $(EXECS)
