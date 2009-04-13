@@ -133,8 +133,8 @@ public class DebugViewer extends JFrame {
     // Field Objects
     public static final int BLUE_GOAL_TOP_POST = 30;
     public static final int BLUE_GOAL_BOTTOM_POST = 31;
-    public static final int YELLOW_GOAL_TOP_POST = 32;
-    public static final int YELLOW_GOAL_BOTTOM_POST = 33;
+    public static final int YELLOW_GOAL_BOTTOM_POST = 32;
+    public static final int YELLOW_GOAL_TOP_POST = 33;
     public static final int BLUE_GOAL_POST = 34;
     public static final int YELLOW_GOAL_POST = 35;
 
@@ -674,12 +674,12 @@ public class DebugViewer extends JFrame {
             new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
                                wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
         objectIDMap.put(new Integer(32), ygrpPT);
-        objectIDStringMap.put(new Integer(32), "Yellow goal right post");
+        objectIDStringMap.put(new Integer(32), "Yellow goal left post");
         Point2D.Double yglpPT =
             new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X,
                                wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y);
         objectIDMap.put(new Integer(33), yglpPT);
-        objectIDStringMap.put(new Integer(33), "Yellow goal left post");
+        objectIDStringMap.put(new Integer(33), "Yellow goal right post");
         // Ambiguous field objects
         objectIDMap.put(new Integer(34), emptyPoint);
         objectIDStringMap.put(new Integer(34), "Blue Goal Post");
