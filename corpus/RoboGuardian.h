@@ -22,6 +22,7 @@
 #define _RoboGuardian_h
 
 #include <vector>
+#include <string>
 #include <boost/shared_ptr.hpp>
 
 #include "albroker.h"
@@ -41,17 +42,22 @@ public:
 
     void run();
 
-    void executeShutdownAction();
-    void executeStartupAction();
-    void speakIPAddress();
+    void executeShutdownAction()const;
+    void executeStartupAction()const;
+    void speakIPAddress()const;
 
     //getters
-    bool isRobotFalling(){ return falling; }
-    bool isRobotFallen(){ return fallen; }
+    bool isRobotFalling()const { return falling; }
+    bool isRobotFallen()const { return fallen; }
+    int getNumChestClicks()const;
+
 private: // Since this feature is not really production ready
     //setters
-    void enableFallProtection(bool _useFallProtection)//off by default
+    void enableFallProtection(bool _useFallProtection)const //off by default
         { useFallProtection = _useFallProtection; };
+
+public:
+    static const int NO_CLICKS;
 
 private:
     void checkFallProtection();
@@ -60,6 +66,10 @@ private:
     void checkButtonPushes();
     void executeClickAction(int);
     void shutoffGains();
+
+    //helpers
+    std::string getHostName()const;
+    void playFile(std::string filePath)const; //non-blocking
 private:
 
     boost::shared_ptr<Sensors> sensors;
@@ -74,12 +84,14 @@ private:
     int buttonClicks; //Stores how many clicks we think we may have gotten
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter;
+    mutable int numClicks;
 
-    bool registeredClickThisTime;
+    bool registeredClickThisTime,registeredShutdown;
 
     bool falling, fallen;
-    bool useFallProtection;
+    mutable bool useFallProtection;
 
+    mutable pthread_mutex_t click_mutex;
     static const int GUARDIAN_FRAME_RATE;
     static const float GUARDIAN_FRAME_LENGTH_uS;
 

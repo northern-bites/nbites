@@ -536,11 +536,8 @@ Man::run ()
         // thread's information
         sensors->updatePython();
         sensors->updateVisionAngles();
-#ifdef NAOQI1
-#ifndef OFFLINE
-        transcriber->postVisionSensors(); // update sensors with foot bumpers and ultrasound.
-#endif
-#endif
+
+        transcriber->postVisionSensors();
 
         // Process current frame
         processFrame();

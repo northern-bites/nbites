@@ -109,6 +109,7 @@ void ALTranscriber::initSyncMotionWithALMemory(){
         string("Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"),
+        string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value"),
         string("Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"),
         string("Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"),
         string("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"),
@@ -182,12 +183,14 @@ void ALTranscriber::syncMotionWithALMemory() {
         RfrontLeft = sensorValues[4], RfrontRight = sensorValues[5],
         RrearLeft = sensorValues[6], RrearRight = sensorValues[7];
 
-    const float accX = calibrate_acc_x(sensorValues[8]),
-        accY = calibrate_acc_y(sensorValues[9]),
-        accZ = calibrate_acc_z(sensorValues[10]),
-        gyrX = sensorValues[11], gyrY = sensorValues[12],
-        angleX = clip(sensorValues[13],-M_PI_FLOAT,M_PI_FLOAT),
-        angleY = clip(sensorValues[14],-M_PI_FLOAT,M_PI_FLOAT);
+    const float chestButton = sensorValues[8];
+
+    const float accX = calibrate_acc_x(sensorValues[9]),
+        accY = calibrate_acc_y(sensorValues[10]),
+        accZ = calibrate_acc_z(sensorValues[11]),
+        gyrX = sensorValues[12], gyrY = sensorValues[13],
+        angleX = clip(sensorValues[14],-M_PI_FLOAT,M_PI_FLOAT),
+        angleY = clip(sensorValues[15],-M_PI_FLOAT,M_PI_FLOAT);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();
@@ -198,6 +201,7 @@ void ALTranscriber::syncMotionWithALMemory() {
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
+                         chestButton,
                          Inertial(filteredX, filteredY, filteredZ,
                                   gyrX, gyrY, angleX, angleY),
                          Inertial(accX, accY, accZ,
@@ -218,7 +222,6 @@ void ALTranscriber::initSyncVisionWithALMemory() {
         string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
-        string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value"),
         string("Device/SubDeviceList/US/Sensor/Value"),
         string("Device/SubDeviceList/US/Actuator/Value"),
         string("Device/SubDeviceList/Battery/Charge/Sensor/Value"),
@@ -235,16 +238,14 @@ void ALTranscriber::syncVisionWithALMemory() {
         leftFootBumperRight  = varValues[1];
     const float rightFootBumperLeft = varValues[2],
         rightFootBumperRight = varValues[3];
-    const float chestButton = varValues[4];
-    const float ultraSoundDist = varValues[5];
-    const int ultraSoundMode = static_cast<int>(varValues[6]);
-    const float batteryCharge = varValues[7];
-    const float batteryCurrent = varValues[8];
+    const float ultraSoundDist = varValues[4];
+    const int ultraSoundMode = static_cast<int>(varValues[5]);
+    const float batteryCharge = varValues[6];
+    const float batteryCurrent = varValues[7];
 
     sensors->
         setVisionSensors(FootBumper(leftFootBumperLeft, leftFootBumperRight),
                          FootBumper(rightFootBumperLeft, rightFootBumperRight),
-                         chestButton,
                          ultraSoundDist,
                          // UltraSoundMode is just an enum
                          static_cast<UltraSoundMode> (ultraSoundMode),

@@ -833,21 +833,25 @@ void Sensors::setUltraSoundMode (const UltraSoundMode mode)
  * Sets the sensors which are updated on the motion frequency (every 20ms)
  */
 void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
+                                const float _chestButton,
                                 const Inertial &_inertial,
                                 const Inertial & _unfilteredInertial)
 {
+    pthread_mutex_lock(&button_mutex);
     pthread_mutex_lock(&fsr_mutex);
     pthread_mutex_lock(&inertial_mutex);
     pthread_mutex_lock(&unfiltered_inertial_mutex);
 
     leftFootFSR = _leftFoot;
     rightFootFSR = _rightFoot;
+    chestButton = _chestButton;
     inertial = _inertial;
     unfilteredInertial = _unfilteredInertial;
 
     pthread_mutex_unlock(&unfiltered_inertial_mutex);
     pthread_mutex_unlock(&inertial_mutex);
     pthread_mutex_unlock(&fsr_mutex);
+    pthread_mutex_unlock(&button_mutex);
 }
 
 /**
@@ -855,7 +859,6 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
  */
 void Sensors::setVisionSensors (const FootBumper &_leftBumper,
                                 const FootBumper &_rightBumper,
-                                const float _chestButton,
                                 const float ultraSound,
                                 const UltraSoundMode _mode,
                                 const float bCharge, const float bCurrent)
@@ -868,7 +871,6 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
     rightFootBumper = _rightBumper;
     ultraSoundDistance = ultraSound;
     ultraSoundMode = _mode;
-    chestButton = _chestButton;
     batteryCharge = bCharge;
     batteryCurrent = bCurrent;
 

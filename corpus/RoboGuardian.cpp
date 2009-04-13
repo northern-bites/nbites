@@ -18,6 +18,8 @@ const int RoboGuardian::GUARDIAN_FRAME_RATE = 50;
 const float RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
     RoboGuardian::GUARDIAN_FRAME_RATE;
 
+const int RoboGuardian::NO_CLICKS = -1;
+
 static const string quiet = " -q ";
 static const string sout = "aplay"+quiet;
 static const string sdir = "/opt/naoqi/data/wav/";
@@ -31,11 +33,12 @@ static const string my_address_is_wav = sdir + "my_internet_address_is" + wav;
 static const string stiffness_removed_wav = sdir + "emergency_stiffness"+wav;
 static const string stiffness_enabled_wav = nbsdir + "stiffness_enabled"+wav;
 static const string warning_wav = sdir + "warning"+wav;
+static const string falling_wav = nbsdir +"falling"+wav;
 static const string dot = ".";
 
 
 //Non blocking!!
-void playFile(string str){
+void RoboGuardian::playFile(string str)const{
     system((sout+str+" &").c_str());
 }
 
@@ -53,10 +56,12 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       lastButtonOnCounter(0),lastButtonOffCounter(0),
       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
-      notFallingFrames(0),fallenCounter(0),
-      registeredClickThisTime(true), falling(false),fallen(false),
+      notFallingFrames(0),fallenCounter(0),numClicks(NO_CLICKS),
+      registeredClickThisTime(true),registeredShutdown(false),
+      falling(false),fallen(false),
       useFallProtection(false)
 {
+    pthread_mutex_init(&click_mutex,NULL);
     try{
         ALSentinelProxy sentinel(broker);
         sentinel.enableDefaultActionSimpleClick(false);
@@ -67,7 +72,9 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
     }
     executeStartupAction();
 }
-RoboGuardian::~RoboGuardian(){}
+RoboGuardian::~RoboGuardian(){
+    pthread_mutex_destroy(&click_mutex);
+}
 
 
 
@@ -193,6 +200,7 @@ void RoboGuardian::checkFallProtection(){
 #define DEBUG_GUARDIAN_FALLING
 #ifdef DEBUG_GUARDIAN_FALLING
         cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
+        playFile(falling_wav);
 #endif
     }
 
@@ -216,10 +224,11 @@ void RoboGuardian::checkBatteryLevels(){
         //covert to a 0 - 10 scale
         const float newLevel = floor(newBatteryCharge*10.0f);
         const float oldLevel = floor(lastBatteryCharge*10.0f);
-        if(oldLevel != newLevel && oldLevel > newLevel && 
-            newLevel - oldLevel <= 1.0f){
+        if(oldLevel != newLevel && oldLevel > newLevel &&
+            newLevel - oldLevel <= 2.0f){
             cout << Thread::name << ": Battery charge is now at "
-                 << 10.0f * newBatteryCharge <<endl;
+                 << 10.0f * newBatteryCharge
+                 << " (was "<<oldLevel<<")"<<endl;
 
             if (newLevel <= LOW_BATTERY_VALUE){
                 playFile(energy_wav);
@@ -288,6 +297,7 @@ void RoboGuardian::checkButtonPushes(){
             buttonOnCounter = 0;
         }
         buttonOffCounter  +=1;
+        registeredShutdown=false;
     }
 
     //detect if a click occured sometime in the past
@@ -312,18 +322,18 @@ void RoboGuardian::checkButtonPushes(){
         buttonClicks = 0;
     }
 
-    if(buttonOnCounter > SHUTDOWN_THRESH && !registeredClickThisTime){
-        registeredClickThisTime = true;
+    if(buttonOnCounter > SHUTDOWN_THRESH && !registeredShutdown){
+        registeredShutdown = true;
         executeShutdownAction();
     }
 
 }
 
-void RoboGuardian::executeClickAction(int numClicks){
+void RoboGuardian::executeClickAction(int nClicks){
 #ifdef DEBUG_GUARDIAN_CLICKS
     cout << "Processing "<<numClicks<< " clicks"<<endl;
 #endif
-    switch(numClicks){
+    switch(nClicks){
 
     case 1:
         //Say IP Address
@@ -343,31 +353,35 @@ void RoboGuardian::executeClickAction(int numClicks){
         break;
     default:
         //nothing
+        cout << "Leaving a click of "<<nClicks<<" for someone else"<<endl;
+        pthread_mutex_lock(&click_mutex);
+        numClicks = nClicks;
+        pthread_mutex_unlock(&click_mutex);
         break;
     }
 
 }
 
 
-void RoboGuardian::executeStartupAction(){
+void RoboGuardian::executeStartupAction() const{
 //Blank for now
 
 }
 
-void RoboGuardian::executeShutdownAction(){
+void RoboGuardian::executeShutdownAction()const {
     cout << Thread::name<<" is shutting down the robot NOW!!!"<<endl;
     playFile(shutdown_wav);
     system("shutdown -h now &");
 }
 
-string getHostName(){
+string RoboGuardian::getHostName()const {
     char name[40];
     name[0] ='\0';
     gethostname(name,39);
     return string(name);
 }
 
-void RoboGuardian::speakIPAddress(){
+void RoboGuardian::speakIPAddress()const {
     //Currently we poll the broker. If this breaks in the future
     //you can try to call /opt/naoqi/bin/ip.sh or
     //parse the output of if config yourself
@@ -390,8 +404,18 @@ void RoboGuardian::speakIPAddress(){
 
     }
     speech_command += " &";
-    cout <<Thread::name<<" is speaking: My name is "<<host<< " my internet address is"
+    cout <<Thread::name<<" is speaking: My name is "<<host
+         << " my internet address is "
          <<IP<<endl;
 
     system(speech_command.c_str());
+}
+
+
+int RoboGuardian::getNumChestClicks() const{
+    pthread_mutex_lock(&click_mutex);
+    const int nClicks = numClicks;
+    numClicks = NO_CLICKS;
+    pthread_mutex_unlock(&click_mutex);
+    return nClicks;
 }

@@ -155,12 +155,12 @@ class Sensors {
     void setUltraSoundMode(const UltraSoundMode);
 
     void setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
+                          const float chestButton,
                           const Inertial &_inertial,
                           const Inertial &_unfiltered_inertial);
 
     void setVisionSensors(const FootBumper &_leftBumper,
                           const FootBumper &_rightBumper,
-                          const float chestButton,
                           const float ultraSound,
                           const UltraSoundMode _mode,
                           const float batteryCharge,
