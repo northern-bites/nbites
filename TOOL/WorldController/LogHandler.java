@@ -441,10 +441,8 @@ public class LogHandler
                 }
 
                 // Update the screen view
-                if (hasParticles) {
-                    painter.updateParticleSet(particles, team_color,
-                                              player_number);
-                }
+                painter.updateParticleSet(particles, team_color,
+                                          player_number);
                 painter.reportEndFrame();
             }
         }
