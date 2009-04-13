@@ -121,6 +121,8 @@ class Sensors {
     const float getUltraSound() const;
     const UltraSoundMode getUltraSoundMode() const;
     const float getChestButton() const;
+    const float getBatteryCharge() const;
+    const float getBatteryCurrent() const;
     const std::vector<float> getAllSensors() const;
 
     // Locking data storage methods
@@ -160,7 +162,9 @@ class Sensors {
                           const FootBumper &_rightBumper,
                           const float chestButton,
                           const float ultraSound,
-                          const UltraSoundMode _mode);
+                          const UltraSoundMode _mode,
+                          const float batteryCharge,
+                          const float batteryCurrent);
 
     // this method is very useful for serialization and parsing sensors
     void setAllSensors(const std::vector<float> sensorValues);
@@ -209,6 +213,7 @@ private:
     mutable pthread_mutex_t inertial_mutex;
     mutable pthread_mutex_t unfiltered_inertial_mutex;
     mutable pthread_mutex_t ultra_sound_mutex;
+    mutable pthread_mutex_t battery_mutex;
     mutable pthread_mutex_t image_mutex;
 
     // Joint angles and sensors
@@ -236,6 +241,9 @@ private:
     UltraSoundMode ultraSoundMode;
     //ChestButton
     float chestButton;
+    //Battery
+    float batteryCharge;
+    float batteryCurrent;
 
     const unsigned char *image;
     PySensors *pySensors;

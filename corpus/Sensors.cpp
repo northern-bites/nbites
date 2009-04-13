@@ -385,6 +385,7 @@ Sensors::Sensors ()
     pthread_mutex_init(&inertial_mutex, NULL);
     pthread_mutex_init(&unfiltered_inertial_mutex, NULL);
     pthread_mutex_init(&ultra_sound_mutex, NULL);
+    pthread_mutex_init(&battery_mutex, NULL);
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
@@ -407,6 +408,7 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&inertial_mutex);
     pthread_mutex_destroy(&unfiltered_inertial_mutex);
     pthread_mutex_destroy(&ultra_sound_mutex);
+    pthread_mutex_destroy(&battery_mutex);
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_destroy(&image_mutex);
 #endif
@@ -586,6 +588,27 @@ const float Sensors::getChestButton () const
     pthread_mutex_unlock (&button_mutex);
 
     return button;
+}
+
+const float Sensors::getBatteryCharge () const
+{
+    pthread_mutex_lock (&battery_mutex);
+
+    const float charge = batteryCharge;
+
+    pthread_mutex_unlock (&battery_mutex);
+
+    return charge;
+}
+const float Sensors::getBatteryCurrent () const
+{
+    pthread_mutex_lock (&battery_mutex);
+
+    const float current = batteryCurrent;
+
+    pthread_mutex_unlock (&battery_mutex);
+
+    return current;
 }
 
 const vector<float> Sensors::getAllSensors () const
@@ -834,8 +857,10 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
                                 const FootBumper &_rightBumper,
                                 const float _chestButton,
                                 const float ultraSound,
-                                const UltraSoundMode _mode)
+                                const UltraSoundMode _mode,
+                                const float bCharge, const float bCurrent)
 {
+    pthread_mutex_lock (&battery_mutex);
     pthread_mutex_lock (&button_mutex);
     pthread_mutex_lock(&ultra_sound_mutex);
 
@@ -844,9 +869,13 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
     ultraSoundDistance = ultraSound;
     ultraSoundMode = _mode;
     chestButton = _chestButton;
+    batteryCharge = bCharge;
+    batteryCurrent = bCurrent;
 
     pthread_mutex_unlock(&ultra_sound_mutex);
     pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock (&battery_mutex);
+
 }
 
 void Sensors::setAllSensors (vector<float> sensorValues) {

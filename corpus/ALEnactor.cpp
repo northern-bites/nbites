@@ -42,18 +42,9 @@ void ALEnactor::run() {
     long long currentTime;
     while (running) {
         currentTime = micro_time();
-
-        if(switchboard != NULL){
-            sendJoints();
-            sendHardness();
+            sendCommands();
             //Once we've sent the most calculated joints
             postSensors();
-
-            switchboard->signalNextFrame();
-
-        }else{
-            cout<< "Caution!! Switchboard is null, nothing done in ALEnactor"<<endl;
-        }
 
         const long long zero = 0;
         const long long processTime = micro_time() - currentTime;
@@ -70,6 +61,12 @@ void ALEnactor::run() {
 #endif
 
     }
+}
+void ALEnactor::sendCommands(){
+    if(!switchboard)
+        return;
+    sendJoints();
+    sendHardness();
 }
 
 void ALEnactor::sendJoints(){
@@ -106,11 +103,14 @@ void ALEnactor::sendHardness(){
 }
 
 void ALEnactor::postSensors() {
+    if(!switchboard)
+        return;
     //Each frame, we need to store which commmands were sent,
     //also, we need to ask the transcriber to copy
     //the relevant information out of ALMemory into sensors
     sensors->setMotionBodyAngles(motionCommandAngles);
 
     transcriber->postMotionSensors();
+    switchboard->signalNextFrame();
 }
 #endif//NAOQI1

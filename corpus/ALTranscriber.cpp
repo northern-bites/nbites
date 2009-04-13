@@ -186,7 +186,8 @@ void ALTranscriber::syncMotionWithALMemory() {
         accY = calibrate_acc_y(sensorValues[9]),
         accZ = calibrate_acc_z(sensorValues[10]),
         gyrX = sensorValues[11], gyrY = sensorValues[12],
-        angleX = sensorValues[13], angleY = sensorValues[14];
+        angleX = clip(sensorValues[13],-M_PI_FLOAT,M_PI_FLOAT),
+        angleY = clip(sensorValues[14],-M_PI_FLOAT,M_PI_FLOAT);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();
@@ -219,7 +220,9 @@ void ALTranscriber::initSyncVisionWithALMemory() {
         string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
         string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value"),
         string("Device/SubDeviceList/US/Sensor/Value"),
-        string("Device/SubDeviceList/US/Actuator/Value");
+        string("Device/SubDeviceList/US/Actuator/Value"),
+        string("Device/SubDeviceList/Battery/Charge/Sensor/Value"),
+        string("Device/SubDeviceList/Battery/Current/Sensor/Value");
 
     alfastaccessVision->ConnectToVariables(broker,varNames);
 }
@@ -235,6 +238,8 @@ void ALTranscriber::syncVisionWithALMemory() {
     const float chestButton = varValues[4];
     const float ultraSoundDist = varValues[5];
     const int ultraSoundMode = static_cast<int>(varValues[6]);
+    const float batteryCharge = varValues[7];
+    const float batteryCurrent = varValues[8];
 
     sensors->
         setVisionSensors(FootBumper(leftFootBumperLeft, leftFootBumperRight),
@@ -242,5 +247,7 @@ void ALTranscriber::syncVisionWithALMemory() {
                          chestButton,
                          ultraSoundDist,
                          // UltraSoundMode is just an enum
-                         static_cast<UltraSoundMode> (ultraSoundMode));
+                         static_cast<UltraSoundMode> (ultraSoundMode),
+                         batteryCharge,
+                         batteryCurrent);
 }

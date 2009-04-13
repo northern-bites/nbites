@@ -7,7 +7,9 @@ using namespace std;
 
 
 const float StiffnessCommand::NOT_SET  = - 1794.0f;//arbitrary constant
-const float StiffnessCommand::DECOUPLED = -1; //not supported by AL yet?
+const float StiffnessCommand::DECOUPLED = -1.0f; //not supported by AL yet?
+const float StiffnessCommand::NO_STIFFNESS = 0.0f;
+const float StiffnessCommand::FULL_STIFFNESS = 1.0f;
 
 
 StiffnessCommand::StiffnessCommand()

@@ -44,23 +44,41 @@ public:
     void executeShutdownAction();
     void executeStartupAction();
     void speakIPAddress();
+
+    //getters
+    bool isRobotFalling(){ return falling; }
+    bool isRobotFallen(){ return fallen; }
+private: // Since this feature is not really production ready
+    //setters
+    void enableFallProtection(bool _useFallProtection)//off by default
+        { useFallProtection = _useFallProtection; };
+
 private:
+    void checkFallProtection();
+    void checkBatteryLevels();
     void checkTemperatures();
     void checkButtonPushes();
     void executeClickAction(int);
+    void shutoffGains();
 private:
 
     boost::shared_ptr<Sensors> sensors;
     AL::ALPtr<AL::ALBroker> broker;
     MotionInterface * motion_interface;
     std::vector<float> lastTemps;
+    float lastBatteryCharge;
     int buttonOnCounter;
     int buttonOffCounter;
     int lastButtonOnCounter;
     int lastButtonOffCounter;
     int buttonClicks; //Stores how many clicks we think we may have gotten
+    Inertial lastInertial;
+    int fallingFrames,notFallingFrames,fallenCounter;
 
     bool registeredClickThisTime;
+
+    bool falling, fallen;
+    bool useFallProtection;
 
     static const int GUARDIAN_FRAME_RATE;
     static const float GUARDIAN_FRAME_LENGTH_uS;

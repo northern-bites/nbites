@@ -123,7 +123,8 @@ void NaoEnactor::sendHardness(){
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (unsigned int i = 0; i<Kinematics::NUM_JOINTS; i++) {
         static float hardness =0.0f;
-        hardness = NBMath::clip(motionHardness[i],0.0f,1.0f);
+        if (hardness != -1.0f) //-1: yet to be implemented by AL decoupled mode
+            hardness = NBMath::clip(motionHardness[i],0.0f,1.0f);
 
         //sets the value for hardness
         //hardness_command[5][i].arraySetSize(1);
