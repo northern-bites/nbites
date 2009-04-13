@@ -47,7 +47,7 @@ void readObsInputFile(fstream * inputFile,
                       vector<float> * ballBearings, int ball_id)
 {
     char line[256];
-    int j = 0;
+    //int j = 0;
     while(!inputFile->eof()) {
         PoseEst pose;
         BallPose ball;
@@ -67,7 +67,7 @@ void readObsInputFile(fstream * inputFile,
 
         realPoses->push_back(pose);
         ballPoses->push_back(ball);
-        odos->push_back(odo);q
+        odos->push_back(odo);
         // Assume we don't see a ball
         ballDists->push_back(0.0);
         ballBearings->push_back(0.0);
@@ -274,9 +274,10 @@ void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
     // Divide the sections with a colon
     *outputFile << ":";
 
-    printOutLogLine(outputFile, myLoc, sightings, lastOdo, currentPose,
-                    currentBall, ballEKF, _b, team_color, player_number,
-                    ball_id);
+    printOutLogLine(outputFile, myLoc, sightings, lastOdo,
+                    currentPose, currentBall,
+                    ballEKF, _b,
+                    team_color, player_number, ball_id);
 }
 
 /**

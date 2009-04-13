@@ -35,6 +35,7 @@ int main(int argc, char** argv)
     vector<float> ballDists;
     vector<float> ballBearings;
     MotionModel noMove(0.0, 0.0, 0.0);
+    cout << "Reading in file" << endl;
     readObsInputFile(&obsFile, &realPoses, &ballPoses,
                      &odos, &sightings, &ballDists,
                      &ballBearings, BALL_ID);
@@ -58,11 +59,13 @@ int main(int argc, char** argv)
     shared_ptr<MCL> mcl2 = shared_ptr<MCL>(new MCL());
 
     // Iterate through the path
+    cout << "Running EKF loc" << endl;
     iterateObsPath(&obsFile, &ekfFile, ekfLoc, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
     ekfFile.close();
 
     // Iterate through the path
+    cout << "Running MCL loc" << endl;
     iterateObsPath(&obsFile, &mclFile, mcl, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
     mclFile.close();

@@ -108,7 +108,7 @@ public:
 
     friend std::ostream& operator<< (std::ostream &o, const Observation &c) {
         return o << "Obs " << c.id << ": (" << c.visDist << ", " << c.visBearing
-                 << ")";
+                 << ", " << c.sigma_d << ", " << c.sigma_b << ")";
     }
 
 

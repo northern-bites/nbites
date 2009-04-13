@@ -64,6 +64,7 @@ int main(int argc, char** argv)
     }
 
     // Get the info from the input file
+    cout << "Reading in nav file" << endl;
     readNavInputFile(&inputFile, &letsGo);
 
     // Clost the input file
@@ -80,6 +81,7 @@ int main(int argc, char** argv)
     ekfFile.open(ekfFileName.c_str(), ios::out);
 
     // Iterate through the path
+    cout << "Running loc systems" << endl;
     iterateFakerPath(&mclFile, &ekfFile, &letsGo);
 
     // Close the output files

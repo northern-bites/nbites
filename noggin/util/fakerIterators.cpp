@@ -155,18 +155,14 @@ void iterateObsPath(fstream * obsFile, fstream * locFile,
     VisualBall * visBall = new VisualBall();
     visBall->setDistanceWithSD(0.0f);
     visBall->setBearingWithSD(0.0f);
+    vector<Observation> sx;
 
-    printOutLogLine(locFile, loc, (*sightings)[0], noMove,
+    printOutLogLine(locFile, loc, sx, noMove,
                     &(*realPoses)[0], &(*ballPoses)[0],
                     ballEKF, *visBall,
                     TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
 
     for(unsigned int i = 0; i < realPoses->size(); ++i) {
-
-        // cout << "Updated localization for frame # " << i << " with odometery "
-        //      << (*odos)[i] << " and sightings of "
-        //      << (*sightings)[i].size() << endl;
-
         // Update the localization sytem
         loc->updateLocalization((*odos)[i], (*sightings)[i]);
         visBall->setDistanceWithSD((*ballDists)[i]);

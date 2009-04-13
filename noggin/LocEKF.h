@@ -145,6 +145,7 @@ private:
     void limitPosteriorUncert();
 
     // Parameters
+    const static float USE_CARTESIAN_DIST;
     const static float BETA_LOC;
     const static float GAMMA_LOC;
     const static float BETA_LAT;

@@ -6,6 +6,7 @@ using namespace boost;
 using namespace NBMath;
 
 // Parameters
+const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
 const float LocEKF::BETA_LOC = 3.0f;
 const float LocEKF::GAMMA_LOC = 0.4f;
 const float LocEKF::BETA_LAT = 3.0f;
@@ -25,7 +26,7 @@ const float LocEKF::Y_UNCERT_MIN = 1.0e-6;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6;
 const float LocEKF::INIT_X_UNCERT = 220.0f;
 const float LocEKF::INIT_Y_UNCERT = 340.0f;
-const float LocEKF::INIT_H_UNCERT = M_PI;
+const float LocEKF::INIT_H_UNCERT = M_PI*4;
 const float LocEKF::X_EST_MIN = -600.0f;
 const float LocEKF::Y_EST_MIN = -1000.0f;
 const float LocEKF::X_EST_MAX = 600.0f;
@@ -70,10 +71,15 @@ LocEKF::LocEKF(float initX, float initY, float initH,
  */
 void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
+    // std::cout << "Loc update: " << std::endl;
+    // std::cout << "\tOdometery is " << u <<std::endl;
+    // std::cout << "\tObservations are: " << std::endl;
+    // for(unsigned int i = 0; i < Z.size(); ++i) {
+    //     std::cout << "\t\t" << Z[i] <<std::endl;
+    // }
     // Update expected position based on odometry
     timeUpdate(u);
     limitAPrioriUncert();
-
 
     // Correct step based on the observed stuff
     if (Z.size() > 0) {
@@ -128,43 +134,80 @@ void LocEKF::incorporateMeasurement(Observation z,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)
 {
-    // Convert our sighting to cartesian coordinates
-    float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
-    float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
-    MeasurementVector z_x(2);
+    if (z.getVisDistance() < USE_CARTESIAN_DIST) {
+        // Convert our sighting to cartesian coordinates
+        float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
+        float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
+        MeasurementVector z_x(2);
 
-    z_x(0) = x_b_r;
-    z_x(1) = y_b_r;
+        z_x(0) = x_b_r;
+        z_x(1) = y_b_r;
 
-    // Get expected values of the post
-    const float x_b = z.getPointPossibilities()[0].x;
-    const float y_b = z.getPointPossibilities()[0].y;
-    MeasurementVector d_x(2);
+        // Get expected values of the post
+        const float x_b = z.getPointPossibilities()[0].x;
+        const float y_b = z.getPointPossibilities()[0].y;
+        MeasurementVector d_x(2);
 
-    const float x = getXEst();
-    const float y = getYEst();
-    const float h = getHEst();
-    float sinh, cosh;
-    sincosf(h, &sinh, &cosh);
+        const float x = getXEst();
+        const float y = getYEst();
+        const float h = getHEst();
+        float sinh, cosh;
+        sincosf(h, &sinh, &cosh);
 
-    d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
-    d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
+        d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
+        d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
-    // Calculate invariance
-    V_k = z_x - d_x;
+        // Calculate invariance
+        V_k = z_x - d_x;
 
-    // Calculate jacobians
-    H_k(0,0) = -cosh;
-    H_k(0,1) = -sinh;
-    H_k(0,2) = -(x_b - x) * sinh + (y_b - y) * cosh;
+        // Calculate jacobians
+        H_k(0,0) = -cosh;
+        H_k(0,1) = -sinh;
+        H_k(0,2) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
-    H_k(1,0) = sinh;
-    H_k(1,1) = -cosh;
-    H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
+        H_k(1,0) = sinh;
+        H_k(1,1) = -cosh;
+        H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
 
-    // Update the measurement covariance matrix
-    R_k(0,0) = z.getDistanceSD();
-    R_k(1,1) = z.getDistanceSD();
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.getDistanceSD();
+        R_k(1,1) = z.getDistanceSD();
+    } else {
+        // Convert our sighting to cartesian coordinates
+        MeasurementVector z_x(2);
+        z_x(0) = z.getVisDistance();
+        z_x(1) = z.getVisBearing();
+
+        // Get expected values of the post
+        const float x_b = z.getPointPossibilities()[0].x;
+        const float y_b = z.getPointPossibilities()[0].y;
+        MeasurementVector d_x(2);
+
+        const float x = getXEst();
+        const float y = getYEst();
+        const float h = getHEst();
+
+        d_x(0) = hypot(x - x_b, y - y_b);
+        d_x(1) = atan2(y_b - y, x_b - x) - h;
+        d_x(1) = NBMath::subPIAngle(d_x(1));
+
+        // Calculate invariance
+        V_k = z_x - d_x;
+        V_k(1) = NBMath::subPIAngle(V_k(1));
+
+        // Calculate jacobians
+        H_k(0,0) = (x - x_b) / d_x(0);
+        H_k(0,1) = (y - y_b) / d_x(0);
+        H_k(0,2) = 0;
+
+        H_k(1,0) = (y_b - y) / (d_x(0)*d_x(0));
+        H_k(1,1) = (x - x_b) / (d_x(0)*d_x(0));
+        H_k(1,2) = -1;
+
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.getDistanceSD();
+        R_k(1,1) = z.getBearingSD();
+    }
 }
 
 /**
