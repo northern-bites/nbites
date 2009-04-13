@@ -47,7 +47,7 @@ void readObsInputFile(fstream * inputFile,
                       vector<float> * ballBearings, int ball_id)
 {
     char line[256];
-
+    int j = 0;
     while(!inputFile->eof()) {
         PoseEst pose;
         BallPose ball;
@@ -61,12 +61,13 @@ void readObsInputFile(fstream * inputFile,
         // Read in the next line
         inputFile->getline(line, 256);
         inputLine << line;
+        //cout << "Read input line " << j++ <<":" << endl;
         readObsInputLine(&inputLine, &pose, &ball, &odo,
                          &ids, &dists, &bearings);
 
         realPoses->push_back(pose);
         ballPoses->push_back(ball);
-        odos->push_back(odo);
+        odos->push_back(odo);q
         // Assume we don't see a ball
         ballDists->push_back(0.0);
         ballBearings->push_back(0.0);
@@ -177,9 +178,13 @@ void readObsInputLine(stringstream * inputLine, PoseEst *currentPose,
                >> currentBall->y
                >> currentBall->velX
                >> currentBall->velY
-               >> currentOdo->deltaL
                >> currentOdo->deltaF
+               >> currentOdo->deltaL
                >> currentOdo->deltaR;
+
+    // cout << "\tCurrent pose: " << *currentPose << endl;
+    // cout << "\tCurrent ball: " << *currentBall << endl;
+    // cout << "\tCurrent odo: " << *currentOdo << endl;
 
     // Read up all of the sightings...
     while( !inputLine->eof() ) {
@@ -191,10 +196,18 @@ void readObsInputLine(stringstream * inputLine, PoseEst *currentPose,
         bearings->push_back(newBearing);
     }
 
-    cout << "Read input line :" << endl;
-    cout << "\tCurrent pose: " << *currentPose << endl;
-    cout << "\tCurrent ball: " << *currentBall << endl;
-    cout << "\tCurrent odo: " << *currentOdo << endl;
+    // For some range we always push an extra copy, so, let's get rid of them
+    if (ids->size() > 0) {
+        ids->pop_back();
+        dists->pop_back();
+        bearings->pop_back();
+    }
+
+    // for(unsigned int i = 0; i < ids->size(); ++i) {
+    //     cout << "\tObservation: (" << (*ids)[i] << ", " << (*dists)[i] << ", "
+    //          << (*bearings)[i] << ")" << endl;
+    // }
+
 }
 
 /**
@@ -219,13 +232,13 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
                 << currentBall->velX << " "
                 << currentBall->velY << " ";
     // Odometery
-    *outputFile << lastOdo.deltaL << " " << lastOdo.deltaF << " "
+    *outputFile << lastOdo.deltaF << " " << lastOdo.deltaL << " "
                 << lastOdo.deltaR << " ";
     // Output landmark infos
     for(unsigned int k = 0; k < sightings.size(); ++k) {
         *outputFile << sightings[k].getID() << " "
                     << sightings[k].getVisDistance() << " "
-                    << sightings[k].getVisBearingDeg() << " ";
+                    << sightings[k].getVisBearing() << " ";
     }
     // Output ball as landmark
     if (_b.getDistance() > 0.0) {
@@ -303,7 +316,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
                 // Y Velocity Uncert
                 << ballEKF->getYVelocityUncert() << " "
                 // Odometery
-                << lastOdo.deltaL << " " << lastOdo.deltaF << " "
+                << lastOdo.deltaF << " " << lastOdo.deltaL << " "
                 << lastOdo.deltaR;
 
     // Divide the sections with a colon
@@ -326,7 +339,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
     for(unsigned int k = 0; k < sightings.size(); ++k) {
         *outputFile << sightings[k].getID() << " "
                     << sightings[k].getVisDistance() << " "
-                    << sightings[k].getVisBearingDeg() << " ";
+                    << sightings[k].getVisBearing() << " ";
     }
     // Output ball as landmark
     if (_b.getDistance() > 0.0) {

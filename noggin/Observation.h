@@ -106,6 +106,12 @@ public:
     void setBearingSD(float _sdB) { sigma_b = _sdB; }
     void setID(int _id) { id = _id; }
 
+    friend std::ostream& operator<< (std::ostream &o, const Observation &c) {
+        return o << "Obs " << c.id << ": (" << c.visDist << ", " << c.visBearing
+                 << ")";
+    }
+
+
 private:
     // Vision information
     float visDist;

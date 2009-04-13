@@ -73,8 +73,8 @@ int main(int argc, char** argv)
     string mclFileName(argv[1]);
     string ekfFileName(argv[1]);
 
-    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
-    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
+    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl.faker");
+    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf.faker");
 
     mclFile.open(mclFileName.c_str(), ios::out);
     ekfFile.open(ekfFileName.c_str(), ios::out);

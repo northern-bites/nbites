@@ -25,8 +25,8 @@ void iterateNavPath(fstream * obsFile, NavPath * letsGo)
     currentBall = letsGo->ballStart;
 
     // Print out starting configuration
-    printOutObsLine(obsFile, Z_t, noMove, &currentPose,
-                    &currentBall, *visBall, BALL_ID);
+    // printOutObsLine(obsFile, Z_t, noMove, &currentPose,
+    //                 &currentBall, *visBall, BALL_ID);
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -156,17 +156,18 @@ void iterateObsPath(fstream * obsFile, fstream * locFile,
     visBall->setDistanceWithSD(0.0f);
     visBall->setBearingWithSD(0.0f);
 
-    printOutLogLine(locFile, loc, (*sightings)[0], noMove, &(*realPoses)[0],
-                    &(*ballPoses)[0], ballEKF, *visBall, TEAM_COLOR,
-                    PLAYER_NUMBER, BALL_ID);
+    printOutLogLine(locFile, loc, (*sightings)[0], noMove,
+                    &(*realPoses)[0], &(*ballPoses)[0],
+                    ballEKF, *visBall,
+                    TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
 
     for(unsigned int i = 0; i < realPoses->size(); ++i) {
 
-        // Update the EKF sytem
-        cout << "Updated localization for frame # " << i << " with odometery "
-             << (*odos)[i] << " and sightings of "
-             << (*sightings)[i].size() << endl;
+        // cout << "Updated localization for frame # " << i << " with odometery "
+        //      << (*odos)[i] << " and sightings of "
+        //      << (*sightings)[i].size() << endl;
 
+        // Update the localization sytem
         loc->updateLocalization((*odos)[i], (*sightings)[i]);
         visBall->setDistanceWithSD((*ballDists)[i]);
         visBall->setBearingWithSD((*ballBearings)[i]);
@@ -176,9 +177,9 @@ void iterateObsPath(fstream * obsFile, fstream * locFile,
                              true);
 
         printOutLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
-                        &(*realPoses)[i],
-                        &(*ballPoses)[i], ballEKF, *visBall, TEAM_COLOR,
-                        PLAYER_NUMBER, BALL_ID);
+                        &(*realPoses)[i], &(*ballPoses)[i],
+                        ballEKF, *visBall,
+                        TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
     }
     delete visBall;
 }
@@ -213,7 +214,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         if (visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) {
 
             // Get measurement variance and add noise to reading
-            visDist += sampleNormalDistribution(visDist * 0.05);
+            if (!use_perfect_dists) {
+                visDist += sampleNormalDistribution(visDist * 0.05);
+            }
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -252,7 +255,9 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             visDist < CORNER_MAX_VIEW_RANGE) {
 
             // Get measurement variance and add noise to reading
-            visDist += sampleNormalDistribution(0.05*visDist);
+            if(!use_perfect_dists) {
+                visDist += sampleNormalDistribution(0.05*visDist);
+            }
 
             // Ignore the center circle for right now
             if (toView->getID() == CENTER_CIRCLE) {
@@ -360,7 +365,9 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        e.dist += sampleNormalDistribution(e.dist*0.05);
+        if (!use_perfect_dists) {
+            e.dist += sampleNormalDistribution(e.dist*0.05);
+        }
 
     } else {
         e.dist = 0.0f;

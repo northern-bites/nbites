@@ -1,5 +1,5 @@
 C++ = g++
-C++-FLAGS = -Wall -g #-O3 -Wconversion -DNDEBUG -m64
+C++-FLAGS = -Wall -O3 -DNDEBUG
 RM = rm -f
 INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
 

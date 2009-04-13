@@ -74,6 +74,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     timeUpdate(u);
     limitAPrioriUncert();
 
+
     // Correct step based on the observed stuff
     if (Z.size() > 0) {
         correctionStep(Z);
