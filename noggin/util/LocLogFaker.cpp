@@ -33,7 +33,8 @@
  * ID dist bearing (for all landmarks observed in the frame)
  *
  */
-#include "LocLogFaker.h"
+#include "fakerIO.h"
+#include "fakerIterators.h"
 #include "NBMath.h"
 
 using namespace std;

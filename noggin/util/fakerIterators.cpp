@@ -2,7 +2,6 @@
 using namespace std;
 using namespace boost;
 using namespace NBMath;
-#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 
 /**
  * Method to iterate through a robot path and write the localization info.
