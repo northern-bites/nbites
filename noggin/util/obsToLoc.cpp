@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     // Use weighted means
     shared_ptr<MCL> mcl = shared_ptr<MCL>(new MCL());
     // Use best particle
-    shared_ptr<MCL> mcl2 = shared_ptr<MCL>(new MCL());
+    //shared_ptr<MCL> mcl2 = shared_ptr<MCL>(new MCL());
 
     // Iterate through the path
     cout << "Running EKF loc" << endl;

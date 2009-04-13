@@ -62,21 +62,30 @@ LocEKF::LocEKF(float initX, float initY, float initH,
 
     betas(2) = BETA_ROT;
     gammas(2) = GAMMA_ROT;
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "Initializing LocEKF with: " << *this << std::endl;
+#endif
 }
 
 /**
  * Method to deal with updating the entire loc model
  *
- * @param loc the loc seen this frame.
+ * @param u The odometry since the last frame
+ * @param Z The observations from the current frame
  */
 void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
-    // std::cout << "Loc update: " << std::endl;
-    // std::cout << "\tOdometery is " << u <<std::endl;
-    // std::cout << "\tObservations are: " << std::endl;
-    // for(unsigned int i = 0; i < Z.size(); ++i) {
-    //     std::cout << "\t\t" << Z[i] <<std::endl;
-    // }
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "Loc update: " << std::endl;
+    std::cout << "Before updates: " << *this << std::endl;
+    std::cout << "\tOdometery is " << u <<std::endl;
+    std::cout << "\tObservations are: " << std::endl;
+    for(unsigned int i = 0; i < Z.size(); ++i) {
+        std::cout << "\t\t" << Z[i] <<std::endl;
+    }
+#endif
+
     // Update expected position based on odometry
     timeUpdate(u);
     limitAPrioriUncert();
@@ -88,6 +97,11 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
         noCorrectionStep();
     }
     limitPosteriorUncert();
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "After updates: " << *this << std::endl;
+    std::cout << std::endl;
+#endif
 }
 
 /**
@@ -102,6 +116,10 @@ EKF<Observation, MotionModel,
     LOC_EKF_DIMENSION, LOC_MEASUREMENT_DIMENSION>::StateVector
 LocEKF::associateTimeUpdate(MotionModel u)
 {
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "\t\t\tUpdating Odometry of " << u << std::endl;
+#endif
+
     // Calculate the assumed change in loc position
     // Assume no decrease in loc velocity
     StateVector deltaLoc(LOC_EKF_DIMENSION);
@@ -134,7 +152,15 @@ void LocEKF::incorporateMeasurement(Observation z,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)
 {
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "\t\t\tIncorporating measurement " << z << std::endl;
+#endif
     if (z.getVisDistance() < USE_CARTESIAN_DIST) {
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+        std::cout << "\t\t\tUsing cartesian " << std::endl;
+#endif
+
         // Convert our sighting to cartesian coordinates
         float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
         float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
@@ -173,6 +199,11 @@ void LocEKF::incorporateMeasurement(Observation z,
         R_k(0,0) = z.getDistanceSD();
         R_k(1,1) = z.getDistanceSD();
     } else {
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+        std::cout << "\t\t\tUsing polar " << std::endl;
+#endif
+
         // Convert our sighting to cartesian coordinates
         MeasurementVector z_x(2);
         z_x(0) = z.getVisDistance();

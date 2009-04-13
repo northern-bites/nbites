@@ -25,8 +25,8 @@ void iterateNavPath(fstream * obsFile, NavPath * letsGo)
     currentBall = letsGo->ballStart;
 
     // Print out starting configuration
-    // printOutObsLine(obsFile, Z_t, noMove, &currentPose,
-    //                 &currentBall, *visBall, BALL_ID);
+    printOutObsLine(obsFile, Z_t, noMove, &currentPose,
+                    &currentBall, *visBall, BALL_ID);
 
     unsigned frameCounter = 0;
     // Iterate through the moves

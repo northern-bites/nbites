@@ -47,7 +47,7 @@ void readObsInputFile(fstream * inputFile,
                       vector<float> * ballBearings, int ball_id)
 {
     char line[256];
-    //int j = 0;
+
     while(!inputFile->eof()) {
         PoseEst pose;
         BallPose ball;
@@ -61,7 +61,7 @@ void readObsInputFile(fstream * inputFile,
         // Read in the next line
         inputFile->getline(line, 256);
         inputLine << line;
-        //cout << "Read input line " << j++ <<":" << endl;
+
         readObsInputLine(&inputLine, &pose, &ball, &odo,
                          &ids, &dists, &bearings);
 
@@ -77,7 +77,14 @@ void readObsInputFile(fstream * inputFile,
             if( ids[k] == ball_id ) {
                 (*ballDists)[ballDists->size() - 1] = dists[k];
                 (*ballBearings)[ballDists->size() - 1] = bearings[k];
-            } else if (ids[k] < CONCRETE_FIELD_OBJECT_START_ID) {
+            } else if (ids[k] >= CONCRETE_FIELD_OBJECT_START_ID) {
+                // it's a field object
+                VisualFieldObject fo((fieldObjectID)ids[k]);
+                fo.setDistanceWithSD(dists[k]);
+                fo.setBearingWithSD(bearings[k]);
+                Observation seen(fo);
+                z_t.push_back(seen);
+            } else {
                 // if it's a corner
                 list <const ConcreteCorner*> toUse;
                 const ConcreteCorner * corn;
@@ -143,13 +150,6 @@ void readObsInputFile(fstream * inputFile,
                     vc.setID((cornerID)ids[k]);
                 }
                 Observation seen(vc);
-                z_t.push_back(seen);
-            } else {
-                // it's a field object
-                VisualFieldObject fo((fieldObjectID)ids[k]);
-                fo.setDistanceWithSD(dists[k]);
-                fo.setBearingWithSD(bearings[k]);
-                Observation seen(fo);
                 z_t.push_back(seen);
             }
         }
