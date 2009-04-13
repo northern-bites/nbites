@@ -138,37 +138,49 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
     delete visBall;
 }
 
-void iterateObsPath(fstream * obsFile, fstream * locFile)
+void iterateObsPath(fstream * obsFile, fstream * locFile,
+                    shared_ptr<LocSystem> loc,
+                    vector<PoseEst> * realPoses,
+                    vector<BallPose> * ballPoses,
+                    vector<MotionModel> * odos,
+                    vector<vector<Observation> > * sightings,
+                    vector<float> * ballDists, vector<float> * ballBearings,
+                    int ball_id)
+
 {
 
-    // shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
-    // shared_ptr<BallEKF> EKFballEKF = shared_ptr<BallEKF>(new BallEKF());
+    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF());
+    MotionModel noMove(0.0, 0.0, 0.0);
 
+    VisualBall * visBall = new VisualBall();
+    visBall->setDistanceWithSD(0.0f);
+    visBall->setBearingWithSD(0.0f);
 
-    // VisualBall * visBall = new VisualBall();
-    // visBall->setDistanceWithSD(0.0f);
-    // visBall->setBearingWithSD(0.0f);
+    printOutLogLine(locFile, loc, (*sightings)[0], noMove, &(*realPoses)[0],
+                    &(*ballPoses)[0], ballEKF, *visBall, TEAM_COLOR,
+                    PLAYER_NUMBER, BALL_ID);
 
-    // printOutLogLine(locFile, ekfLoc, sightings[0], noMove, &realPoses[0],
-    //                 &ballPoses[0], EKFballEKF, *visBall, TEAM_COLOR,
-    //                 PLAYER_NUMBER, BALL_ID);
+    for(unsigned int i = 0; i < realPoses->size(); ++i) {
 
-    // for(unsigned int i = 0; i < realPoses.size(); ++i) {
+        // Update the EKF sytem
+        cout << "Updated localization for frame # " << i << " with odometery "
+             << (*odos)[i] << " and sightings of "
+             << (*sightings)[i].size() << endl;
 
-    //     // Update the EKF sytem
-    //     ekfLoc->updateLocalization(odos[i], sightings[i]);
+        loc->updateLocalization((*odos)[i], (*sightings)[i]);
+        visBall->setDistanceWithSD((*ballDists)[i]);
+        visBall->setBearingWithSD((*ballBearings)[i]);
 
-    //     visBall->setDistanceWithSD(ballDists[i]);
-    //     visBall->setBearingWithSD(ballBearings[i]);
+        // Update the EKF ball
+        ballEKF->updateModel(visBall,loc->getCurrentEstimate(),
+                             true);
 
-    //     // Update the EKF ball
-    //     EKFballEKF->updateModel(visBall,ekfLoc->getCurrentEstimate(),
-    //                             true);
-
-    //     printOutLogLine(locFile, ekfLoc, sightings[i], odos[i], &realPoses[i],
-    //                     &ballPoses[i], EKFballEKF, *visBall, TEAM_COLOR,
-    //                     PLAYER_NUMBER, BALL_ID);
-    // }
+        printOutLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
+                        &(*realPoses)[i],
+                        &(*ballPoses)[i], ballEKF, *visBall, TEAM_COLOR,
+                        PLAYER_NUMBER, BALL_ID);
+    }
+    delete visBall;
 }
 
 /**
@@ -201,7 +213,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
         if (visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) {
 
             // Get measurement variance and add noise to reading
-            visDist += (visDist * 0.175 + 2)*UNIFORM_1_NEG_1;
+            visDist += sampleNormalDistribution(visDist * 0.05);
 
             // Build the (visual) field object
             fieldObjectID foID = toView->getID();
@@ -240,7 +252,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             visDist < CORNER_MAX_VIEW_RANGE) {
 
             // Get measurement variance and add noise to reading
-            visDist += UNIFORM_1_NEG_1*0.05*visDist;
+            visDist += sampleNormalDistribution(0.05*visDist);
 
             // Ignore the center circle for right now
             if (toView->getID() == CENTER_CIRCLE) {
@@ -348,11 +360,26 @@ estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
          (rand() / (float(RAND_MAX)+1)) < 0.85) {
         e.dist = hypot(currentPose->x - currentBall->x,
                        currentPose->y - currentBall->y);
-        e.dist += e.dist*UNIFORM_1_NEG_1*0.13;
+        e.dist += sampleNormalDistribution(e.dist*0.05);
 
     } else {
         e.dist = 0.0f;
         e.bearing = 0.0f;
     }
     return e;
+}
+
+float sampleNormalDistribution(float sd)
+{
+    float samp = 0;
+    for(int i = 0; i < 12; i++) {
+        samp += (2*(rand() / float(RAND_MAX)) * sd) - sd;
+    }
+    return 0.5*samp;
+}
+
+float sampleTriangularDistribution(float sd)
+{
+    return sqrt(6.0)*0.5 * ((2*sd*(rand() / float(RAND_MAX))) - sd +
+                            (2*sd*(rand() / float(RAND_MAX))) - sd);
 }

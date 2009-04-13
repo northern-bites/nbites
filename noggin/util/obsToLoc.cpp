@@ -44,20 +44,28 @@ int main(int argc, char** argv)
     string ekfFileName(argv[1]);
 
     mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
-    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf.1");
+    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
 
     mclFile.open(mclFileName.c_str(), ios::out);
     ekfFile.open(ekfFileName.c_str(), ios::out);
 
-    // Iterate through the path
-    iterateObsPath(&obsFile, &ekfFile);
-
     // Close the input file
     obsFile.close();
+    shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
+    // Use weighted means
+    shared_ptr<MCL> mcl = shared_ptr<MCL>(new MCL());
+    // Use best particle
+    shared_ptr<MCL> mcl2 = shared_ptr<MCL>(new MCL());
 
-    // Close the output files
-    mclFile.close();
+    // Iterate through the path
+    iterateObsPath(&obsFile, &ekfFile, ekfLoc, &realPoses, &ballPoses, &odos,
+                   &sightings, &ballDists, &ballBearings, BALL_ID);
     ekfFile.close();
+
+    // Iterate through the path
+    iterateObsPath(&obsFile, &mclFile, mcl, &realPoses, &ballPoses, &odos,
+                   &sightings, &ballDists, &ballBearings, BALL_ID);
+    mclFile.close();
 
     return 0;
 }

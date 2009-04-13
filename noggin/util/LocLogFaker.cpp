@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     string ekfFileName(argv[1]);
 
     mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
-    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf.1");
+    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
 
     mclFile.open(mclFileName.c_str(), ios::out);
     ekfFile.open(ekfFileName.c_str(), ios::out);

@@ -50,7 +50,6 @@ LocEKF::LocEKF(float initX, float initY, float initH,
     A_k(0,0) = 1.0;
     A_k(1,1) = 1.0;
     A_k(2,2) = 1.0;
-    A_k(3,3) = 1.0;
 
     // Setup initial values
     setXEst(initX);

@@ -32,14 +32,24 @@ static const bool usePerfectLocForBall = false;
 // Get half of the nao FOV converted to radians
 static float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f + M_PI / 4.0f;
 
-void iterateObsPath(std::fstream * obsFile, std::fstream * locFile);
+void iterateNavPath(std::fstream * obsFile, NavPath * letsGo);
+void iterateObsPath(std::fstream * obsFile, std::fstream * locFile,
+                    boost::shared_ptr<LocSystem> loc,
+                    std::vector<PoseEst> * realPoses,
+                    std::vector<BallPose> * ballPoses,
+                    std::vector<MotionModel> * odos,
+                    std::vector<std::vector<Observation> > * sightings,
+                    std::vector<float> * ballDists,
+                    std::vector<float> * ballBearings,
+                    int ball_id);
 void iterateFakerPath(std::fstream * mclFile, std::fstream * ekfFile,
                       NavPath * letsGo);
 std::vector<Observation> determineObservedLandmarks(PoseEst myPos,
                                                     float neckYaw);
 estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                                float neckYaw);
-void iterateNavPath(std::fstream * obsFile, NavPath * letsGo);
+float sampleNormalDistribution(float sd);
+float sampleTriangularDistribution(float sd);
 
 #endif // obsToLoc_h_DEFINED
 

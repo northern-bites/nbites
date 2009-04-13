@@ -97,6 +97,11 @@ public:
         velY = o.velY;
     }
 
+    friend std::ostream& operator<< (std::ostream &o, const BallPose &c) {
+        return o << "(" << c.x << ", " << c.y << ", " << c.velX
+                 << ", " << c.velY << ")";
+    }
+
     BallPose(float _x, float _y, float _vx, float _vy) :
         x(_x), y(_y), velX(_vx), velY(_vy) {}
     BallPose() {}

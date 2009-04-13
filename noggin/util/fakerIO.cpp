@@ -47,22 +47,26 @@ void readObsInputFile(fstream * inputFile,
                       vector<float> * ballBearings, int ball_id)
 {
     char line[256];
-    stringstream inputLine(stringstream::in | stringstream::out);
-    PoseEst pose;
-    BallPose ball;
-    MotionModel odo;
-    vector<int> ids;
-    vector<float> dists;
-    vector<float> bearings;
-    vector<Observation> z_t;
 
     while(!inputFile->eof()) {
+        PoseEst pose;
+        BallPose ball;
+        MotionModel odo;
+        vector<int> ids;
+        vector<float> dists;
+        vector<float> bearings;
+        vector<Observation> z_t;
+        stringstream inputLine(stringstream::in | stringstream::out);
+
         // Read in the next line
         inputFile->getline(line, 256);
         inputLine << line;
         readObsInputLine(&inputLine, &pose, &ball, &odo,
                          &ids, &dists, &bearings);
 
+        realPoses->push_back(pose);
+        ballPoses->push_back(ball);
+        odos->push_back(odo);
         // Assume we don't see a ball
         ballDists->push_back(0.0);
         ballBearings->push_back(0.0);
@@ -163,7 +167,6 @@ void readObsInputLine(stringstream * inputLine, PoseEst *currentPose,
                       vector<int> * ids, vector<float> * dists,
                       vector<float> * bearings)
 {
-    string s;
 
     // Print the actual robot position
     *inputLine >> currentPose->x
@@ -178,11 +181,8 @@ void readObsInputLine(stringstream * inputLine, PoseEst *currentPose,
                >> currentOdo->deltaF
                >> currentOdo->deltaR;
 
-    // Divide the sections with a colon
-    *inputLine >> s;
-
     // Read up all of the sightings...
-    while( inputLine ) {
+    while( !inputLine->eof() ) {
         int newId;
         float newDist, newBearing;
         *inputLine >> newId >> newDist >> newBearing;
@@ -190,6 +190,11 @@ void readObsInputLine(stringstream * inputLine, PoseEst *currentPose,
         dists->push_back(newDist);
         bearings->push_back(newBearing);
     }
+
+    cout << "Read input line :" << endl;
+    cout << "\tCurrent pose: " << *currentPose << endl;
+    cout << "\tCurrent ball: " << *currentBall << endl;
+    cout << "\tCurrent odo: " << *currentOdo << endl;
 }
 
 /**
@@ -212,14 +217,10 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
                 << currentBall->x << " "
                 << currentBall->y << " "
                 << currentBall->velX << " "
-                << currentBall->velY << " "
-                // Odometery
-                << lastOdo.deltaL << " " << lastOdo.deltaF << " "
-                << lastOdo.deltaR;
-
-    // Divide the sections with a colon
-    *outputFile << ":";
-
+                << currentBall->velY << " ";
+    // Odometery
+    *outputFile << lastOdo.deltaL << " " << lastOdo.deltaF << " "
+                << lastOdo.deltaR << " ";
     // Output landmark infos
     for(unsigned int k = 0; k < sightings.size(); ++k) {
         *outputFile << sightings[k].getID() << " "
