@@ -82,6 +82,12 @@ void readObsInputFile(fstream * inputFile,
                 VisualFieldObject fo((fieldObjectID)ids[k]);
                 fo.setDistanceWithSD(dists[k]);
                 fo.setBearingWithSD(bearings[k]);
+
+                if (fo.getID() != BLUE_GOAL_POST ||
+                    fo.getID() != YELLOW_GOAL_POST) {
+                    fo.setIDCertainty(_SURE);
+                }
+
                 Observation seen(fo);
                 z_t.push_back(seen);
             } else {

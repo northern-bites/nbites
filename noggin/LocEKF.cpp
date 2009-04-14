@@ -1,5 +1,7 @@
 #include "LocEKF.h"
+#include <boost/numeric/ublas/io.hpp> // for cout
 #define DEBUG_LOC_EKF
+//#define DEBUG_LOC_EKF_INPUTS
 using namespace boost::numeric;
 using namespace boost;
 
@@ -11,21 +13,21 @@ const float LocEKF::BETA_LOC = 3.0f;
 const float LocEKF::GAMMA_LOC = 0.4f;
 const float LocEKF::BETA_LAT = 3.0f;
 const float LocEKF::GAMMA_LAT = 0.4f;
-const float LocEKF::BETA_ROT = 10.0f;
+const float LocEKF::BETA_ROT = M_PI/8.0f;
 const float LocEKF::GAMMA_ROT = 0.4f;
 
 // Default initialization values
 const float LocEKF::INIT_LOC_X = 370.0f;
 const float LocEKF::INIT_LOC_Y = 270.0f;
 const float LocEKF::INIT_LOC_H = 0.0f;
-const float LocEKF::X_UNCERT_MAX = 440.0f;
-const float LocEKF::Y_UNCERT_MAX = 680.0f;
+const float LocEKF::X_UNCERT_MAX = 680.0f;
+const float LocEKF::Y_UNCERT_MAX = 440.0f;
 const float LocEKF::H_UNCERT_MAX = 4*M_PI;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6;
-const float LocEKF::INIT_X_UNCERT = 220.0f;
-const float LocEKF::INIT_Y_UNCERT = 340.0f;
+const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
+const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_H_UNCERT = M_PI*4;
 const float LocEKF::X_EST_MIN = -600.0f;
 const float LocEKF::Y_EST_MIN = -1000.0f;
@@ -114,6 +116,8 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "After updates: " << *this << std::endl;
     std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
 #endif
 }
 
@@ -187,9 +191,11 @@ void LocEKF::incorporateMeasurement(Observation z,
         const float y_b = z.getPointPossibilities()[0].y;
         MeasurementVector d_x(2);
 
-        const float x = getXEst();
-        const float y = getYEst();
-        const float h = getHEst();
+
+        const float x = xhat_k_bar(0);
+        const float y = xhat_k_bar(1);
+        const float h = xhat_k_bar(2);
+
         float sinh, cosh;
         sincosf(h, &sinh, &cosh);
 
@@ -227,9 +233,9 @@ void LocEKF::incorporateMeasurement(Observation z,
         const float y_b = z.getPointPossibilities()[0].y;
         MeasurementVector d_x(2);
 
-        const float x = getXEst();
-        const float y = getYEst();
-        const float h = getHEst();
+        const float x = xhat_k_bar(0);
+        const float y = xhat_k_bar(1);
+        const float h = xhat_k_bar(2);
 
         d_x(0) = hypot(x - x_b, y - y_b);
         d_x(1) = atan2(y_b - y, x_b - x) - h;
@@ -251,6 +257,18 @@ void LocEKF::incorporateMeasurement(Observation z,
         // Update the measurement covariance matrix
         R_k(0,0) = z.getDistanceSD();
         R_k(1,1) = z.getBearingSD();
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+        std::cout << "\t\t\tR vector is" << R_k << std::endl;
+        std::cout << "\t\t\tH vector is" << H_k << std::endl;
+        std::cout << "\t\t\tV vector is" << V_k << std::endl;
+        std::cout << "\t\t\t\td vector is" << d_x << std::endl;
+        std::cout << "\t\t\t\t\tx est is " << x << std::endl;
+        std::cout << "\t\t\t\t\ty est is " << y << std::endl;
+        std::cout << "\t\t\t\t\th est is " << h << std::endl;
+        std::cout << "\t\t\t\t\tx_b est is " << x_b << std::endl;
+        std::cout << "\t\t\t\t\ty_b est is " << y_b << std::endl;
+#endif
     }
 }
 

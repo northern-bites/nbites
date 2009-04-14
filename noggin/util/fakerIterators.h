@@ -28,7 +28,7 @@
 #define PLAYER_NUMBER 3
 
 static const bool usePerfectLocForBall = false;
-static const bool use_perfect_dists = true;
+static const bool use_perfect_dists = false;
 
 // Get half of the nao FOV converted to radians
 static float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f + M_PI / 4.0f;
