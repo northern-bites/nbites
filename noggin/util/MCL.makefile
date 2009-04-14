@@ -45,12 +45,13 @@ FAKER_IO_SRCS = fakerIO.cpp \
 FAKER_ITERATORS_SRCS = fakerIterators.cpp \
 		fakerIterators.h
 
-NAV_TO_OBS_SRCS = navToObs.cpp
+NAV_TO_OBS_SRCS = navToObs.cpp \
+	../NogginStructs.h
 
-OBS_TO_LOC_SRCS = obsToLoc.cpp
+OBS_TO_LOC_SRCS = obsToLoc.cpp \
+	../NogginStructs.h
 
 FAKER_SRCS = LocLogFaker.cpp \
-	  LocLogFaker.h \
 	../NogginStructs.h
 
 OBJS = Utility.o \

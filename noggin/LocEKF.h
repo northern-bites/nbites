@@ -39,6 +39,7 @@ public:
 
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
+    virtual void reset();
 
     // Getters
     /**

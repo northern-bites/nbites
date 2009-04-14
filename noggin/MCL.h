@@ -52,6 +52,7 @@ public:
     // Core Functions
     virtual void updateLocalization(MotionModel u_t,
                                     std::vector<Observation> z_t);
+    virtual void reset();
 
     // Getters
     const PoseEst getCurrentEstimate() const { return curEst; }

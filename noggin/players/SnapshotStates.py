@@ -4,6 +4,7 @@ FRAME_SAVE_RATE = 5
 NUM_FRAMES_TO_SAVE = 150
 
 def gamePlaying(player):
+    player.brain.loc.reset()
     return player.goNow('saveFrames')
 
 def saveFrames(player):

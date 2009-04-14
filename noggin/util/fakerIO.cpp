@@ -223,7 +223,7 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
                      BallPose * currentBall, VisualBall _b, int ball_id)
 {
     // Print the actual robot position
-    *outputFile << currentPose->x << " "
+    *outputFile << setprecision(6) << currentPose->x << " "
                 << currentPose->y << " "
                 << currentPose->h << " "
     // print actual ball position
@@ -236,13 +236,13 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
                 << lastOdo.deltaR << " ";
     // Output landmark infos
     for(unsigned int k = 0; k < sightings.size(); ++k) {
-        *outputFile << sightings[k].getID() << " "
+        *outputFile << setprecision(12) << sightings[k].getID() << " "
                     << sightings[k].getVisDistance() << " "
                     << sightings[k].getVisBearing() << " ";
     }
     // Output ball as landmark
     if (_b.getDistance() > 0.0) {
-        *outputFile << ball_id << " "
+        *outputFile << setprecision(12) << ball_id << " "
                     << _b.getDistance() << " "
                     << _b.getBearing() << " ";
     }
@@ -295,7 +295,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
                      int team_color, int player_number, int ball_id)
 {
     // Output standard infos
-    *outputFile << team_color<< " " << player_number << " "
+    *outputFile << setprecision(6) << team_color<< " " << player_number << " "
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "
                 << myLoc->getHEst() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
@@ -338,13 +338,13 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
 
     // Output landmark infos
     for(unsigned int k = 0; k < sightings.size(); ++k) {
-        *outputFile << sightings[k].getID() << " "
+        *outputFile << setprecision(12) << sightings[k].getID() << " "
                     << sightings[k].getVisDistance() << " "
                     << sightings[k].getVisBearing() << " ";
     }
     // Output ball as landmark
     if (_b.getDistance() > 0.0) {
-        *outputFile << ball_id << " "
+        *outputFile << setprecision(12) << ball_id << " "
                     << _b.getDistance() << " "
                     << _b.getBearing() << " ";
     }

@@ -69,6 +69,19 @@ LocEKF::LocEKF(float initX, float initY, float initH,
 }
 
 /**
+ * Reset the EKF to a starting configuration
+ */
+void LocEKF::reset()
+{
+    setXEst(INIT_LOC_X);
+    setYEst(INIT_LOC_Y);
+    setHEst(INIT_LOC_H);
+    setXUncert(INIT_X_UNCERT);
+    setYUncert(INIT_Y_UNCERT);
+    setHUncert(INIT_H_UNCERT);
+}
+
+/**
  * Method to deal with updating the entire loc model
  *
  * @param u The odometry since the last frame
