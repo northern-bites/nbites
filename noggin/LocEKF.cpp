@@ -105,6 +105,17 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     timeUpdate(u);
     limitAPrioriUncert();
 
+    // Remove ambiguous observations
+    std::vector<Observation>::iterator iter = Z.begin();
+    while( iter != Z.end() )
+    {
+        if (iter->getNumPossibilities() > 1 ) {
+            iter = Z.erase( iter );
+        } else {
+            ++iter;
+        }
+    }
+
     // Correct step based on the observed stuff
     if (Z.size() > 0) {
         correctionStep(Z);

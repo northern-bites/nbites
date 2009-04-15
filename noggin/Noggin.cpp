@@ -1,5 +1,3 @@
-//#define DEBUG_OBSERVATIONS 1
-
 #include <Python.h>
 #include <exception>
 #include <boost/shared_ptr.hpp>
