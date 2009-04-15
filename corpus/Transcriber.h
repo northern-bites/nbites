@@ -26,15 +26,15 @@
 #include "Sensors.h"
 
 /**
- *  This abstract class serves to connect our Sensors class with the underlying
- *  robot platform (i.e. Nao/Webots, etc)
- *  It has different mechanisims which can be called
+ *  This abstract class serves to copy (transcribe) information from the 
+ *  underlying robot platform to our codebase (e.g. copy into the Sensors class)
+ *  It has different methods which can be called
  *  from different threads in order to update sensors at different
- *  frequencies.
+ *  frequencies, depending on their need.
  *
- *  The advantage of this model is that similar code does not need to be
- *  duplicated accross Enactors, and we can pull more robot/platform specific
- *  code out of Man
+ *  The advantage of having the transcriber is that similar code does not need
+ *  to be duplicated accross Enactors, and we can pull more robot/platform
+ *  specific code out of Man
  */
 
 

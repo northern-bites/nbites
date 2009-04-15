@@ -22,8 +22,43 @@ ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
      broker(_broker),
      accelerationFilter()
 {
+    try{
+        initSyncMotionWithALMemory();
+    } catch(AL::ALError &e){
+        cout << "Failed to initialize motion sync with al memory"
+             << e.toString() <<endl;
+    }
+
+    try{
+        initSyncVisionWithALMemory();
+    } catch(AL::ALError &e){
+        cout << "Failed to initialize vision sync with al memory:"
+             << e.toString() <<endl;
+    }
+
+    //Ensure that the current sensor values are copied correctly sensors
+    initSensorBodyJoints();
+}
 
 
+void ALTranscriber::initSensorBodyJoints(){
+    //We need to correctly initialize the value in Sensors so that
+    //motion can run based on the actual pose of the robot.
+    //This is basically postSensors() but need a different order
+    syncMotionWithALMemory();
+
+    //HACK: this should be moved to MotionSwitchboard
+    sensors->setMotionBodyAngles(jointValues);
+}
+
+/**
+ * ALFastAccess allows us to pull out values from ALMemory a lot faster
+ * and in bulk. The order in which we declare the desired devices are also
+ * the order in which we receive them (see syncWithALMemory).
+ * In this class we only sync the sensors values we need for motion. The
+ * rest are synced in Man.cpp (may change).
+ */
+void ALTranscriber::initSyncMotionWithALMemory(){
     try{
         alfastaccessJoints =
             AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
@@ -38,34 +73,12 @@ ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
         cout << "Failed to initialize proxy to ALFastAccess for sensors"<<endl;
     }
 
-
     try{
-        initSyncMotionWithALMemory();
+        alfastaccessTemps =
+            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
     } catch(AL::ALError &e){
-        cout << "Failed to initialize sync with al memory"<<endl;
+        cout << "Failed to initialize proxy to ALFastAccess for temps"<<endl;
     }
-
-    initSensorBodyJoints();
-}
-
-
-void ALTranscriber::initSensorBodyJoints(){
-    //We need to correctly initialize the value in Sensors so that
-    //motion can run based on the actual pose of the robot.
-    //This is basically postSensors() but need a different order
-    syncMotionWithALMemory();
-
-    sensors->setMotionBodyAngles(jointValues);
-}
-
-/**
- * ALFastAccess allows us to pull out values from ALMemory a lot faster
- * and in bulk. The order in which we declare the desired devices are also
- * the order in which we receive them (see syncWithALMemory).
- * In this class we only sync the sensors values we need for motion. The
- * rest are synced in Man.cpp (may change).
- */
-void ALTranscriber::initSyncMotionWithALMemory(){
 
     vector<string> jointNames;
     jointNames +=
@@ -96,6 +109,7 @@ void ALTranscriber::initSyncMotionWithALMemory(){
         string("Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"),
+        string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value"),
         string("Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"),
         string("Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"),
         string("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"),
@@ -109,6 +123,25 @@ void ALTranscriber::initSyncMotionWithALMemory(){
     } catch(AL::ALError& a) {
         std::cout << "ALTranscriber " << a.toString() << std::endl;
     }
+
+
+    vector<string> jointTemperatureNames;
+    jointTemperatureNames +=
+        string(jointsT[0]), string(jointsT[1]), string(jointsT[2]),
+        string(jointsT[3]), string(jointsT[4]), string(jointsT[5]),
+        string(jointsT[6]), string(jointsT[7]), string(jointsT[8]),
+        string(jointsT[9]), string(jointsT[10]), string(jointsT[11]),
+        string(jointsT[12]), string(jointsT[13]), string(jointsT[14]),
+        string(jointsT[15]), string(jointsT[16]), string(jointsT[17]),
+        string(jointsT[18]), string(jointsT[19]), string(jointsT[20]),
+        string(jointsT[21]);
+
+    try{
+        alfastaccessTemps->ConnectToVariables(broker,jointTemperatureNames);
+    }catch(AL::ALError& a) {
+        std::cout << "ALTranscriber " << a.toString() << std::endl;
+    }
+
 }
 
 
@@ -133,6 +166,10 @@ void ALTranscriber::syncMotionWithALMemory() {
     alfastaccessJoints->GetValues(jointValues);
     sensors->setBodyAngles(jointValues);
 
+    static vector<float> jointTemps(NUM_JOINTS,0.0f);
+    alfastaccessTemps->GetValues(jointTemps);
+    sensors->setBodyTemperatures(jointTemps);
+
     // There are 16 sensor values we want.
     // The vector is static so that it is initialized only once for this
     // method.
@@ -146,11 +183,14 @@ void ALTranscriber::syncMotionWithALMemory() {
         RfrontLeft = sensorValues[4], RfrontRight = sensorValues[5],
         RrearLeft = sensorValues[6], RrearRight = sensorValues[7];
 
-    const float accX = calibrate_acc_x(sensorValues[8]),
-        accY = calibrate_acc_y(sensorValues[9]),
-        accZ = calibrate_acc_z(sensorValues[10]),
-        gyrX = sensorValues[11], gyrY = sensorValues[12],
-        angleX = sensorValues[13], angleY = sensorValues[14];
+    const float chestButton = sensorValues[8];
+
+    const float accX = calibrate_acc_x(sensorValues[9]),
+        accY = calibrate_acc_y(sensorValues[10]),
+        accZ = calibrate_acc_z(sensorValues[11]),
+        gyrX = sensorValues[12], gyrY = sensorValues[13],
+        angleX = clip(sensorValues[14],-M_PI_FLOAT,M_PI_FLOAT),
+        angleY = clip(sensorValues[15],-M_PI_FLOAT,M_PI_FLOAT);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();
@@ -161,7 +201,54 @@ void ALTranscriber::syncMotionWithALMemory() {
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
-                         //Inertial(filteredX, filteredY, filteredZ,
+                         chestButton,
+                         Inertial(filteredX, filteredY, filteredZ,
+                                  gyrX, gyrY, angleX, angleY),
                          Inertial(accX, accY, accZ,
                                   gyrX, gyrY, angleX, angleY));
+}
+
+
+void ALTranscriber::initSyncVisionWithALMemory() {
+    try{
+        alfastaccessVision =
+            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+    } catch(AL::ALError &e){
+        cout << "Failed to initialize proxy to ALFastAccess"<<endl;
+    }
+
+    vector<string> varNames;
+    varNames += string("Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"),
+        string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"),
+        string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"),
+        string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
+        string("Device/SubDeviceList/US/Sensor/Value"),
+        string("Device/SubDeviceList/US/Actuator/Value"),
+        string("Device/SubDeviceList/Battery/Charge/Sensor/Value"),
+        string("Device/SubDeviceList/Battery/Current/Sensor/Value");
+
+    alfastaccessVision->ConnectToVariables(broker,varNames);
+}
+
+void ALTranscriber::syncVisionWithALMemory() {
+    static vector<float> varValues(6, 0.0f);
+    alfastaccessVision->GetValues(varValues);
+
+    const float leftFootBumperLeft  = varValues[0],
+        leftFootBumperRight  = varValues[1];
+    const float rightFootBumperLeft = varValues[2],
+        rightFootBumperRight = varValues[3];
+    const float ultraSoundDist = varValues[4];
+    const int ultraSoundMode = static_cast<int>(varValues[5]);
+    const float batteryCharge = varValues[6];
+    const float batteryCurrent = varValues[7];
+
+    sensors->
+        setVisionSensors(FootBumper(leftFootBumperLeft, leftFootBumperRight),
+                         FootBumper(rightFootBumperLeft, rightFootBumperRight),
+                         ultraSoundDist,
+                         // UltraSoundMode is just an enum
+                         static_cast<UltraSoundMode> (ultraSoundMode),
+                         batteryCharge,
+                         batteryCurrent);
 }

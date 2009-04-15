@@ -102,14 +102,19 @@ void MotionSwitchboard::stop() {
 void MotionSwitchboard::run() {
     static int fcount = 0;
 
+    //IMPORTANT Before anything else happens we need to put the correct
+    //angles into sensors->motionBodyAngles:
+    sensors->setMotionBodyAngles(sensors->getBodyAngles());
+
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
     while(running) {
         realityCheckJoints();
-        newStiffness = processStiffness();
+        processStiffness();
         bool active  = processProviders();
+
 
 #ifdef DEBUG_JOINTS_OUTPUT
         if(active)
@@ -241,23 +246,31 @@ void MotionSwitchboard::swapBodyProvider(){
 
 }
 
-const vector <float> MotionSwitchboard::getNextJoints() {
+const vector <float> MotionSwitchboard::getNextJoints() const {
     pthread_mutex_lock(&next_joints_mutex);
     if(!newJoints && readyToSend){
         cout << "An enactor is grabbing old joints from switchboard."
              <<" Must have missed a frame!" <<endl;
     }
     const vector <float> vec(nextJoints);
-    newJoints =false;
+    newJoints = false;
 
     pthread_mutex_unlock(&next_joints_mutex);
 
     return vec;
 }
 
-const vector<float>  MotionSwitchboard::getNextStiffness(){
+const bool MotionSwitchboard::hasNewStiffness() const {
+    pthread_mutex_lock(&stiffness_mutex);
+    bool result(newStiffness);
+    pthread_mutex_unlock(&stiffness_mutex);
+    return result;
+}
+
+const vector<float>  MotionSwitchboard::getNextStiffness() const{
     pthread_mutex_lock(&stiffness_mutex);
     vector<float> result(nextStiffness);
+    newStiffness = false;
     pthread_mutex_unlock(&stiffness_mutex);
     return result;
 }
@@ -440,6 +453,9 @@ int MotionSwitchboard::processStiffness(){
             delete stiffnesses;
         }
         delete next;
+    }
+    if(changed){
+        newStiffness = true;
     }
     pthread_mutex_unlock(&stiffness_mutex);
 

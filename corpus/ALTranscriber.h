@@ -50,14 +50,16 @@ public:
     virtual ~ALTranscriber(){};
 
     virtual void postMotionSensors(){ syncMotionWithALMemory(); }
-    virtual void postVisionSensors(){}
+    virtual void postVisionSensors(){ syncVisionWithALMemory(); }
 
 private: //Members
     AL::ALPtr<AL::ALBroker> broker;
     AL::ALPtr<ALMemoryFastAccess> alfastaccessJoints;
     AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
+    AL::ALPtr<ALMemoryFastAccess> alfastaccessTemps;
+    AL::ALPtr<ALMemoryFastAccess> alfastaccessVision;
 
-    std::vector<float> jointValues; 
+    std::vector<float> jointValues;
 
     AccEKF accelerationFilter;
 
@@ -67,6 +69,10 @@ private: //Helper Methods
     void initSyncMotionWithALMemory();
     void syncMotionWithALMemory();
     void initSensorBodyJoints();
+
+    //For the vision thread (man)
+    void initSyncVisionWithALMemory();
+    void syncVisionWithALMemory();
 
     static const float calibrate_acc_x(const float x);
     static const float calibrate_acc_y(const float y);

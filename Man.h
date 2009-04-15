@@ -64,6 +64,7 @@ typedef ALEnactor EnactorT;
 #include "Motion.h"
 #include "NaoPose.h"
 #include "synchro.h"
+#include "RoboGuardian.h"
 
 /**
  * Preferences class to alter Python settings for our robot system.
@@ -149,8 +150,6 @@ private:
 #ifdef NAOQI1
     void registerCamera();
     void initCameraSettings(int whichCam);
-    void initSyncWithALMemory();
-    void syncWithALMemory();
 #else
     void initCamera();
 #endif
@@ -173,6 +172,7 @@ public:
 #ifdef USE_MOTION
     boost::shared_ptr<EnactorT> enactor;
     boost::shared_ptr<Motion<EnactorT> > motion;
+    boost::shared_ptr<RoboGuardian> guardian;
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
@@ -186,9 +186,6 @@ private:
     AL::ALPtr<AL::ALLoggerProxy> log;
     AL::ALPtr<AL::ALProxy> camera;
     AL::ALPtr<AL::ALProxy> lem;
-    AL::ALPtr<AL::ALMemoryProxy> almemory;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccess;
-    AL::DCMProxy *dcm;
 #else
     AL::ALLoggerProxy *log;
     AL::ALProxy *camera;

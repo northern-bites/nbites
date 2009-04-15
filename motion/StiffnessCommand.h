@@ -55,6 +55,8 @@ public:
 public:
     static const float NOT_SET;
     static const float DECOUPLED;
+    static const float NO_STIFFNESS;
+    static const float FULL_STIFFNESS;
 
 private:
     virtual void setChainList() {

@@ -108,6 +108,7 @@ class Sensors {
     const std::vector<float> getBodyAngles() const;
     const std::vector<float> getVisionBodyAngles() const;
     const std::vector<float> getMotionBodyAngles() const;
+    const std::vector<float> getBodyTemperatures() const;
     const float getBodyAngle(const int index) const;//NOT wrapped for python use
     const std::vector<float> getBodyAngleErrors() const ;
 	const float getBodyAngleError(int index) const; //NOT wrapped for python use
@@ -116,17 +117,22 @@ class Sensors {
     const FootBumper getLeftFootBumper() const;
     const FootBumper getRightFootBumper() const;
     const Inertial getInertial() const;
+    const Inertial getUnfilteredInertial() const;
     const float getUltraSound() const;
     const UltraSoundMode getUltraSoundMode() const;
+    const float getChestButton() const;
+    const float getBatteryCharge() const;
+    const float getBatteryCurrent() const;
     const std::vector<float> getAllSensors() const;
 
     // Locking data storage methods
     //   Each of these methods first locks the associated mutex, stores
     //   the specified values, then unlocks the mutex before returning
-    void setBodyAngles(std::vector<float>& v);
-    void setVisionBodyAngles(std::vector<float>& v);
-    void setMotionBodyAngles(std::vector<float>& v);
-    void setBodyAngleErrors(std::vector<float>& v);
+    void setBodyAngles(const std::vector<float>& v);
+    void setVisionBodyAngles(const std::vector<float>& v);
+    void setMotionBodyAngles(const std::vector<float>& v);
+    void setBodyAngleErrors(const std::vector<float>& v);
+    void setBodyTemperatures(const std::vector<float>& v);
     void setLeftFootFSR(const float frontLeft, const float frontRight,
                         const float rearLeft, const float rearRight);
     void setRightFootFSR(const float frontLeft, const float frontRight,
@@ -140,16 +146,25 @@ class Sensors {
                      const float gyrX, const float gyrY,
                      const float angleX, const float angleY);
     void setInertial(const Inertial &inertial);
+    void setUnfilteredInertial(const float accX, const float accY,
+                               const float accZ,
+                               const float gyrX, const float gyrY,
+                               const float angleX, const float angleY);
+    void setUnfilteredInertial(const Inertial &inertial);
     void setUltraSound(const float dist);
     void setUltraSoundMode(const UltraSoundMode);
 
     void setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
-                          const Inertial &_inertial);
+                          const float chestButton,
+                          const Inertial &_inertial,
+                          const Inertial &_unfiltered_inertial);
 
     void setVisionSensors(const FootBumper &_leftBumper,
                           const FootBumper &_rightBumper,
                           const float ultraSound,
-                          const UltraSoundMode _mode);
+                          const UltraSoundMode _mode,
+                          const float batteryCharge,
+                          const float batteryCurrent);
 
     // this method is very useful for serialization and parsing sensors
     void setAllSensors(const std::vector<float> sensorValues);
@@ -193,10 +208,13 @@ private:
     mutable pthread_mutex_t vision_angles_mutex;
     mutable pthread_mutex_t motion_angles_mutex;
     mutable pthread_mutex_t errors_mutex;
+    mutable pthread_mutex_t temperatures_mutex;
     mutable pthread_mutex_t fsr_mutex;
-    mutable pthread_mutex_t bumper_mutex;
+    mutable pthread_mutex_t button_mutex;
     mutable pthread_mutex_t inertial_mutex;
+    mutable pthread_mutex_t unfiltered_inertial_mutex;
     mutable pthread_mutex_t ultra_sound_mutex;
+    mutable pthread_mutex_t battery_mutex;
     mutable pthread_mutex_t image_mutex;
 
     // Joint angles and sensors
@@ -208,6 +226,8 @@ private:
     std::vector<float> motionBodyAngles;
     std::vector<float> bodyAnglesError;
 
+    std::vector<float> bodyTemperatures;
+
     // FSR sensors
     FSR leftFootFSR;
     FSR rightFootFSR;
@@ -216,9 +236,15 @@ private:
     FootBumper rightFootBumper;
     // Inertial sensors
     Inertial inertial;
+    Inertial unfilteredInertial;
     // Sonar sensors
     float ultraSoundDistance;
     UltraSoundMode ultraSoundMode;
+    //ChestButton
+    float chestButton;
+    //Battery
+    float batteryCharge;
+    float batteryCurrent;
 
     const unsigned char *image;
     PySensors *pySensors;

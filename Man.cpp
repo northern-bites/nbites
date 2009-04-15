@@ -59,7 +59,7 @@ Man::Man ()
     python_prefs(),
 #ifdef NAOQI1
     // call the default constructor of all the shared pointers
-    log(), camera(), lem(), almemory(), dcm(0),
+    log(), camera(), lem(), 
 #else
     // initialize all pointers to NULL or 0
     log(0), camera(0), lem(0),
@@ -83,6 +83,8 @@ Man::Man ()
                                        transcriber));
     motion = shared_ptr<Motion<EnactorT> >(
         new Motion<EnactorT>(synchro, enactor, sensors));
+    guardian = shared_ptr<RoboGuardian>(
+        new RoboGuardian(synchro,sensors, pBroker, motion->getInterface()));
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
@@ -90,7 +92,6 @@ Man::Man ()
     noggin = shared_ptr<Noggin>(new Noggin(profiler, vision,
                                            motion->getInterface()));
 #endif// USE_NOGGIN
-    initSyncWithALMemory();
 }
 
 Man::~Man ()
@@ -151,22 +152,6 @@ Man::initMan()
     }
 
     // initialize ALMemory for access to stuff like bumpers, etc
-#ifdef NAOQI1
-    try {
-        //almemory = getParentBroker()->getProxy("ALMemory");
-        almemory = getParentBroker()->getMemoryProxy();
-    } catch(ALError &e){
-        cout << "Failed to initialize proxy to ALMemory" << endl;
-    }
-
-    // initialize a dcm proxy so we can set values in almemory
-    try {
-        dcm = new DCMProxy(getParentBroker());
-    } catch(ALError &e) {
-        cout << "Failed to initialize proxy to DCM" << endl;
-    }
-
-#endif
 
 #ifdef USE_VISION
 #ifdef NAOQI1
@@ -484,90 +469,6 @@ void Man::initCamera(){
 #endif//NAOQI1
 #endif // USE_VISION
 
-#ifdef NAOQI1
-void Man::initSyncWithALMemory() {
-    try{
-        alfastaccess =
-            ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
-    } catch(AL::ALError &e){
-        cout << "Failed to initialize proxy to ALFastAccess"<<endl;
-    }
-
-    vector<string> varNames;
-    varNames += string("Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
-        string("Device/SubDeviceList/US/Sensor/Value"),
-        string("Device/SubDeviceList/US/Actuator/Value");
-
-    alfastaccess->ConnectToVariables(getParentBroker(),varNames);
-}
-
-void Man::syncWithALMemory() {
-
-    static vector<float> varValues(6, 0.0f);
-    alfastaccess->GetValues(varValues);
-
-    /*
-    cout << "****** Sensors values ******" << endl;
-    for (int i = 0; i < 6; i++) {
-        cout << varValues[i] <<endl;
-    }
-    cout << endl;
-    */
-
-    // cycle the ultra sound mode (MAYBE THIS DOESN'T WORK)
-    static int counter = 0;
-    try {
-        // This is testing code which sends a new value to the actuator every
-        // 20 frames. It also cycles the ultrasound mode between the four
-        // possibilities. See docs.
-        ALValue commands;
-        int setMode = counter / 5;
-
-        commands.arraySetSize(3);
-        commands[0] = string("US/Actuator/Value");
-        commands[1] = string("Merge");
-        commands[2].arraySetSize(1);
-        commands[2][0].arraySetSize(2);
-        // the current mode - changes every 5 frames
-        commands[2][0][0] = static_cast<float>(setMode);
-        commands[2][0][1] = dcm->getTime(250);
-
-        // set the mode only once every 4 frames because it responds slowly anyway
-        // but this rate needs to change if we don't run vision at 15 fps
-        if (counter % 4 == 0)
-            dcm->set(commands);
-
-        counter++;
-
-        if (counter > 20)
-            counter = 0;
-
-    } catch(ALError &e) {
-        cout << "Failed to set ultrasound mode. Reason: "
-             << e.toString() << endl;
-    }
-
-    const float leftFootBumperLeft  = varValues[0],
-        leftFootBumperRight  = varValues[1];
-    const float rightFootBumperLeft = varValues[2],
-        rightFootBumperRight = varValues[3];
-
-    const float ultraSoundDist = varValues[4];
-    const int ultraSoundMode = static_cast<int>(varValues[5]);
-
-    sensors->
-        setVisionSensors(FootBumper(leftFootBumperLeft, leftFootBumperRight),
-                         FootBumper(rightFootBumperLeft, rightFootBumperRight),
-                         ultraSoundDist,
-                         // UltraSoundMode is just an enum
-                         static_cast<UltraSoundMode> (ultraSoundMode));
-
-}
-
-#endif //NAOQI1
 
 void
 Man::closeMan() {
@@ -605,6 +506,8 @@ Man::run ()
         cerr << "Motion failed to start" << endl;
     //else
     //  motion->getStart()->await();
+    if(guardian->start() != 0)
+        cout << "RoboGuardian failed to start" << endl;
 #endif
 
 #ifdef DEBUG_MAN_THREADING
@@ -633,11 +536,8 @@ Man::run ()
         // thread's information
         sensors->updatePython();
         sensors->updateVisionAngles();
-#ifdef NAOQI1
-#ifndef OFFLINE
-        syncWithALMemory(); // update sensors with foot bumpers and ultrasound.
-#endif
-#endif
+
+        transcriber->postVisionSensors();
 
         // Process current frame
         processFrame();
@@ -669,6 +569,8 @@ Man::run ()
     // Finished with run loop, stop sub-threads and exit
     motion->stop();
     motion->getTrigger()->await_off();
+    guardian->stop();
+    guardian->getTrigger()->await_off();
 #endif
     comm->stop();
     comm->getTrigger()->await_off();

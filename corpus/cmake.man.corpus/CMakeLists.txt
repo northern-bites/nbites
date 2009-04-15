@@ -110,6 +110,7 @@ SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
                         ${CORPUS_INCLUDE_DIR}/NaoEnactor
                         ${CORPUS_INCLUDE_DIR}/ALTranscriber
                         ${CORPUS_INCLUDE_DIR}/AccEKF
+			${CORPUS_INCLUDE_DIR}/RoboGuardian
 			)
 
 #IF( PYTHON_SHARED_CORPUS )
