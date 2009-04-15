@@ -19,24 +19,27 @@ static const float TO_DEG = 180.0f/M_PI_FLOAT;
 #ifndef TO_RAD
 static const float TO_RAD = M_PI_FLOAT/180.0f;
 #endif
-static const float QUART_CIRC_RAD = M_PI / 2.0f;
+static const float QUART_CIRC_RAD = M_PI_FLOAT / 2.0f;
 
 namespace NBMath {
 
 #ifdef __APPLE__
     inline static void sincosf(float _x, float * _sinx, float * _cosx) {
-        *_sinx = sin(_x);
-        *_cosx = cos(_x);
+        *_sinx = static_cast<float>(sin(_x));
+        *_cosx = static_cast<float>(cos(_x));
     }
 #endif
 
     inline static int ROUND(float x) {
-        if ((x-static_cast<int>(x)) >= 0.5) return (static_cast<int>(x)+1);
-        if ((x-static_cast<int>(x)) <= -0.5) return (static_cast<int>(x)-1);
+        if ((x-static_cast<float>(
+                 static_cast<int>(x))) >= 0.5) return (static_cast<int>(x)+1);
+        if ((x-static_cast<float>(
+                 static_cast<int>(x))) <= -0.5) return (static_cast<int>(x)-1);
         else return (int)x;
     }
 
-    static const float clip(const float value,const float minValue, const float maxValue) {
+    static const float clip(const float value, const float minValue,
+                            const float maxValue) {
         if (value > maxValue)
             return maxValue;
         else if (value < minValue)
@@ -77,11 +80,11 @@ namespace NBMath {
     inline static float subPIAngle(float theta)
     {
         while( theta > M_PI) {
-            theta -= 2.0f*M_PI;
+            theta -= 2.0f*M_PI_FLOAT;
         }
 
         while( theta < -M_PI) {
-            theta += 2.0f*M_PI;
+            theta += 2.0f*M_PI_FLOAT;
         }
         return theta;
     }

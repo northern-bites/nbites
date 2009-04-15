@@ -22,7 +22,7 @@ using namespace std;
 /**
  * Initializes the sampel sets so that the first update works appropriately
  */
-MCL::MCL() : frameCounter(0)
+MCL::MCL() : useBest(false), frameCounter(0)
 {
     // Initialize particles to be randomly spread about the field...
     srand(time(NULL));
@@ -43,6 +43,28 @@ MCL::MCL() : frameCounter(0)
 
 MCL::~MCL()
 {
+}
+
+/**
+ * Method to reset the particle filter to an initial state.
+ */
+void MCL::reset()
+{
+    frameCounter = 0;
+
+    for (int m = 0; m < M; ++m) {
+        //Particle p_m;
+        // X bounded by width of the field
+        // Y bounded by height of the field
+        // H between +-pi
+        PoseEst x_m(float(rand() % int(FIELD_WIDTH)),
+                    float(rand() % int(FIELD_HEIGHT)),
+                    UNIFORM_1_NEG_1 * (M_PI / 2.0f));
+        Particle p_m(x_m, 1.0f);
+        X_t.push_back(p_m);
+    }
+
+    updateEstimates();
 }
 
 /**

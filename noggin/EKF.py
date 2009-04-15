@@ -414,10 +414,6 @@ class EKF:
         z_d = landmark.dist
         z_a = landmark.bearing
 
-        #On the NAO, bearing is no longer flipped
-        #if not is_corner: # weird thing, bearing from Vision class if diff
-        #    z_a = -landmark.bearing
-        #else:
         if is_corner:
             # if a corner is certain distance away, throw it out
             dist_to_corner_from_self = dist(self.getXEst(),self.getYEst(),

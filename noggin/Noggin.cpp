@@ -83,11 +83,12 @@ void Noggin::initializeLocalization()
 #endif
 
     // Initialize the localization modules
-    mcl = shared_ptr<MCL>(new MCL());
+    //loc = shared_ptr<MCL>(new MCL());
+    loc = shared_ptr<LocEKF>(new LocEKF());
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers
-    set_mcl_reference(mcl);
+    set_loc_reference(loc);
     set_ballEKF_reference(ballEKF);
     c_init_localization();
 }
@@ -289,11 +290,11 @@ void Noggin::updateLocalization()
 
     // Process the information
     PROF_ENTER(profiler, P_MCL);
-    mcl->updateLocalization(odometery, observations);
+    loc->updateLocalization(odometery, observations);
     PROF_EXIT(profiler, P_MCL);
 
     // Ball Tracking
-    ballEKF->updateModel(vision->ball, mcl->getCurrentEstimate());
+    ballEKF->updateModel(vision->ball, loc->getCurrentEstimate());
 
 #ifdef DEBUG_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {
@@ -305,6 +306,6 @@ void Noggin::updateLocalization()
     // Opponent Tracking
 
 #ifdef DEBUG_OBSERVATIONS
-    cout << *mcl << endl;
+    cout << *loc << endl;
 #endif
 }

@@ -8,10 +8,12 @@ using namespace std;
 using namespace boost::python;
 using namespace boost;
 
-#include "MCL.h"
+// #include "MCL.h"
+// #include "LocEKF.h"
+#include "LocSystem.h"
 #include "BallEKF.h"
 
-static shared_ptr<MCL> mcl_reference;
+static shared_ptr<LocSystem> loc_reference;
 static shared_ptr<BallEKF> ballEKF_reference;
 
 /**
@@ -20,24 +22,26 @@ static shared_ptr<BallEKF> ballEKF_reference;
  */
 class PyLoc {
 private:
-    shared_ptr<MCL> mcl;
+    shared_ptr<LocSystem> loc;
     shared_ptr<BallEKF> ballEKF;
 public:
     PyLoc() {
-        mcl = mcl_reference;
+        loc = loc_reference;
         ballEKF = ballEKF_reference;
     }
+
+    void reset() { loc->reset(); }
 
     /* Getters */
     // We use degreees in python, and radians in C++
     // Self localization
-    const float getXEst() const { return mcl->getXEst(); }
-    const float getYEst() const { return mcl->getYEst(); }
-    const float getHEst() const { return mcl->getHEstDeg(); }
+    const float getXEst() const { return loc->getXEst(); }
+    const float getYEst() const { return loc->getYEst(); }
+    const float getHEst() const { return loc->getHEstDeg(); }
     // Self Uncertainty
-    const float getXUncert() const { return mcl->getXUncert(); }
-    const float getYUncert() const { return mcl->getYUncert(); }
-    const float getHUncert() const { return mcl->getHUncertDeg(); }
+    const float getXUncert() const { return loc->getXUncert(); }
+    const float getYUncert() const { return loc->getYUncert(); }
+    const float getHUncert() const { return loc->getHUncertDeg(); }
 
     // Ball localization
     // Global Coordinates
@@ -76,6 +80,8 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("ballYUncert", &PyLoc::getBallYUncert)
         .add_property("ballVelXUncert", &PyLoc::getXVelocityUncert)
         .add_property("ballVelYUncert", &PyLoc::getYVelocityUncert)
+        // functional
+        .def("reset", &PyLoc::reset, "reset the localization system")
         ;
 }
 
@@ -89,9 +95,9 @@ void c_init_localization() {
     }
 }
 
-void set_mcl_reference(shared_ptr<MCL> _mcl)
+void set_loc_reference(shared_ptr<LocSystem> _loc)
 {
-    mcl_reference = _mcl;
+    loc_reference = _loc;
 }
 
 void set_ballEKF_reference(shared_ptr<BallEKF> _ballEKF)

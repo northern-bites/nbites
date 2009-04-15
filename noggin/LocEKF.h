@@ -39,6 +39,7 @@ public:
 
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
+    virtual void reset();
 
     // Getters
     /**
@@ -145,6 +146,7 @@ private:
     void limitPosteriorUncert();
 
     // Parameters
+    const static float USE_CARTESIAN_DIST;
     const static float BETA_LOC;
     const static float GAMMA_LOC;
     const static float BETA_LAT;

@@ -1,31 +1,34 @@
 #include "LocEKF.h"
+#include <boost/numeric/ublas/io.hpp> // for cout
 #define DEBUG_LOC_EKF
+//#define DEBUG_LOC_EKF_INPUTS
 using namespace boost::numeric;
 using namespace boost;
 
 using namespace NBMath;
 
 // Parameters
+const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
 const float LocEKF::BETA_LOC = 3.0f;
 const float LocEKF::GAMMA_LOC = 0.4f;
 const float LocEKF::BETA_LAT = 3.0f;
 const float LocEKF::GAMMA_LAT = 0.4f;
-const float LocEKF::BETA_ROT = 10.0f;
+const float LocEKF::BETA_ROT = M_PI/8.0f;
 const float LocEKF::GAMMA_ROT = 0.4f;
 
 // Default initialization values
 const float LocEKF::INIT_LOC_X = 370.0f;
 const float LocEKF::INIT_LOC_Y = 270.0f;
 const float LocEKF::INIT_LOC_H = 0.0f;
-const float LocEKF::X_UNCERT_MAX = 440.0f;
-const float LocEKF::Y_UNCERT_MAX = 680.0f;
+const float LocEKF::X_UNCERT_MAX = 680.0f;
+const float LocEKF::Y_UNCERT_MAX = 440.0f;
 const float LocEKF::H_UNCERT_MAX = 4*M_PI;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6;
-const float LocEKF::INIT_X_UNCERT = 220.0f;
-const float LocEKF::INIT_Y_UNCERT = 340.0f;
-const float LocEKF::INIT_H_UNCERT = M_PI;
+const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
+const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
+const float LocEKF::INIT_H_UNCERT = M_PI*4;
 const float LocEKF::X_EST_MIN = -600.0f;
 const float LocEKF::Y_EST_MIN = -1000.0f;
 const float LocEKF::X_EST_MAX = 600.0f;
@@ -50,7 +53,6 @@ LocEKF::LocEKF(float initX, float initY, float initH,
     A_k(0,0) = 1.0;
     A_k(1,1) = 1.0;
     A_k(2,2) = 1.0;
-    A_k(3,3) = 1.0;
 
     // Setup initial values
     setXEst(initX);
@@ -62,15 +64,43 @@ LocEKF::LocEKF(float initX, float initY, float initH,
 
     betas(2) = BETA_ROT;
     gammas(2) = GAMMA_ROT;
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "Initializing LocEKF with: " << *this << std::endl;
+#endif
+}
+
+/**
+ * Reset the EKF to a starting configuration
+ */
+void LocEKF::reset()
+{
+    setXEst(INIT_LOC_X);
+    setYEst(INIT_LOC_Y);
+    setHEst(INIT_LOC_H);
+    setXUncert(INIT_X_UNCERT);
+    setYUncert(INIT_Y_UNCERT);
+    setHUncert(INIT_H_UNCERT);
 }
 
 /**
  * Method to deal with updating the entire loc model
  *
- * @param loc the loc seen this frame.
+ * @param u The odometry since the last frame
+ * @param Z The observations from the current frame
  */
 void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "Loc update: " << std::endl;
+    std::cout << "Before updates: " << *this << std::endl;
+    std::cout << "\tOdometery is " << u <<std::endl;
+    std::cout << "\tObservations are: " << std::endl;
+    for(unsigned int i = 0; i < Z.size(); ++i) {
+        std::cout << "\t\t" << Z[i] <<std::endl;
+    }
+#endif
+
     // Update expected position based on odometry
     timeUpdate(u);
     limitAPrioriUncert();
@@ -82,6 +112,13 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
         noCorrectionStep();
     }
     limitPosteriorUncert();
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "After updates: " << *this << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+#endif
 }
 
 /**
@@ -96,6 +133,10 @@ EKF<Observation, MotionModel,
     LOC_EKF_DIMENSION, LOC_MEASUREMENT_DIMENSION>::StateVector
 LocEKF::associateTimeUpdate(MotionModel u)
 {
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "\t\t\tUpdating Odometry of " << u << std::endl;
+#endif
+
     // Calculate the assumed change in loc position
     // Assume no decrease in loc velocity
     StateVector deltaLoc(LOC_EKF_DIMENSION);
@@ -128,43 +169,107 @@ void LocEKF::incorporateMeasurement(Observation z,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)
 {
-    // Convert our sighting to cartesian coordinates
-    float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
-    float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
-    MeasurementVector z_x(2);
+#ifdef DEBUG_LOC_EKF_INPUTS
+    std::cout << "\t\t\tIncorporating measurement " << z << std::endl;
+#endif
+    if (z.getVisDistance() < USE_CARTESIAN_DIST) {
 
-    z_x(0) = x_b_r;
-    z_x(1) = y_b_r;
+#ifdef DEBUG_LOC_EKF_INPUTS
+        std::cout << "\t\t\tUsing cartesian " << std::endl;
+#endif
 
-    // Get expected values of the post
-    const float x_b = z.getPointPossibilities()[0].x;
-    const float y_b = z.getPointPossibilities()[0].y;
-    MeasurementVector d_x(2);
+        // Convert our sighting to cartesian coordinates
+        float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
+        float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
+        MeasurementVector z_x(2);
 
-    const float x = getXEst();
-    const float y = getYEst();
-    const float h = getHEst();
-    float sinh, cosh;
-    sincosf(h, &sinh, &cosh);
+        z_x(0) = x_b_r;
+        z_x(1) = y_b_r;
 
-    d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
-    d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
+        // Get expected values of the post
+        const float x_b = z.getPointPossibilities()[0].x;
+        const float y_b = z.getPointPossibilities()[0].y;
+        MeasurementVector d_x(2);
 
-    // Calculate invariance
-    V_k = z_x - d_x;
 
-    // Calculate jacobians
-    H_k(0,0) = -cosh;
-    H_k(0,1) = -sinh;
-    H_k(0,2) = -(x_b - x) * sinh + (y_b - y) * cosh;
+        const float x = xhat_k_bar(0);
+        const float y = xhat_k_bar(1);
+        const float h = xhat_k_bar(2);
 
-    H_k(1,0) = sinh;
-    H_k(1,1) = -cosh;
-    H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
+        float sinh, cosh;
+        sincosf(h, &sinh, &cosh);
 
-    // Update the measurement covariance matrix
-    R_k(0,0) = z.getDistanceSD();
-    R_k(1,1) = z.getDistanceSD();
+        d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
+        d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
+
+        // Calculate invariance
+        V_k = z_x - d_x;
+
+        // Calculate jacobians
+        H_k(0,0) = -cosh;
+        H_k(0,1) = -sinh;
+        H_k(0,2) = -(x_b - x) * sinh + (y_b - y) * cosh;
+
+        H_k(1,0) = sinh;
+        H_k(1,1) = -cosh;
+        H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
+
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.getDistanceSD();
+        R_k(1,1) = z.getDistanceSD();
+    } else {
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+        std::cout << "\t\t\tUsing polar " << std::endl;
+#endif
+
+        // Convert our sighting to cartesian coordinates
+        MeasurementVector z_x(2);
+        z_x(0) = z.getVisDistance();
+        z_x(1) = z.getVisBearing();
+
+        // Get expected values of the post
+        const float x_b = z.getPointPossibilities()[0].x;
+        const float y_b = z.getPointPossibilities()[0].y;
+        MeasurementVector d_x(2);
+
+        const float x = xhat_k_bar(0);
+        const float y = xhat_k_bar(1);
+        const float h = xhat_k_bar(2);
+
+        d_x(0) = hypot(x - x_b, y - y_b);
+        d_x(1) = atan2(y_b - y, x_b - x) - h;
+        d_x(1) = NBMath::subPIAngle(d_x(1));
+
+        // Calculate invariance
+        V_k = z_x - d_x;
+        V_k(1) = NBMath::subPIAngle(V_k(1));
+
+        // Calculate jacobians
+        H_k(0,0) = (x - x_b) / d_x(0);
+        H_k(0,1) = (y - y_b) / d_x(0);
+        H_k(0,2) = 0;
+
+        H_k(1,0) = (y_b - y) / (d_x(0)*d_x(0));
+        H_k(1,1) = (x - x_b) / (d_x(0)*d_x(0));
+        H_k(1,2) = -1;
+
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.getDistanceSD();
+        R_k(1,1) = z.getBearingSD();
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+        std::cout << "\t\t\tR vector is" << R_k << std::endl;
+        std::cout << "\t\t\tH vector is" << H_k << std::endl;
+        std::cout << "\t\t\tV vector is" << V_k << std::endl;
+        std::cout << "\t\t\t\td vector is" << d_x << std::endl;
+        std::cout << "\t\t\t\t\tx est is " << x << std::endl;
+        std::cout << "\t\t\t\t\ty est is " << y << std::endl;
+        std::cout << "\t\t\t\t\th est is " << h << std::endl;
+        std::cout << "\t\t\t\t\tx_b est is " << x_b << std::endl;
+        std::cout << "\t\t\t\t\ty_b est is " << y_b << std::endl;
+#endif
+    }
 }
 
 /**

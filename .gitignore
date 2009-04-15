@@ -4,6 +4,10 @@ install/*
 *.pyc
 *.ekf
 *.mcl
+*.obs
 upload.sh
 noggin/players/Switch.py
 noggin/TeamConfig.py
+noggin/util/fakeData/*
+/noggin/util/navToObs
+/noggin/util/obsToLoc

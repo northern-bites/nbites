@@ -51,8 +51,8 @@ typedef unsigned char byte;
 #include <sys/time.h>
 #endif
 static const long long MICROS_PER_SECOND = 1000000;
-static long long
-micro_time (void)
+
+static long long micro_time (void)
 {
 #ifndef _WIN32
     // Needed for microseconds which we convert to milliseconds

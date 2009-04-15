@@ -73,8 +73,14 @@ const bool Utility::between(const VisualLine& line,
 const point<int> Utility::getPointFartherFromCorner(const VisualLine &l,
                                                     int cornerX,
                                                     int cornerY) {
-    float startPointDistance = getLength(l.start.x, l.start.y, cornerX, cornerY);
-    float endPointDistance = getLength(l.end.x, l.end.y, cornerX, cornerY);
+    float startPointDistance = getLength(static_cast<float>(l.start.x),
+                                         static_cast<float>(l.start.y),
+                                         static_cast<float>(cornerX),
+                                         static_cast<float>(cornerY));
+    float endPointDistance = getLength(static_cast<float>(l.end.x),
+                                       static_cast<float>(l.end.y),
+                                       static_cast<float>(cornerX),
+                                       static_cast<float>(cornerY));
     if (startPointDistance < endPointDistance) {
         return l.end;
     }
@@ -84,8 +90,15 @@ const point<int> Utility::getPointFartherFromCorner(const VisualLine &l,
 }
 
 const point<int> Utility::getCloserEndpoint(const VisualLine& l, int x, int y) {
-    float startPointDistance = getLength(l.start.x, l.start.y, x, y);
-    float endPointDistance = getLength(l.end.x, l.end.y, x, y);
+    float startPointDistance = getLength(static_cast<float>(l.start.x),
+                                         static_cast<float>(l.start.y),
+                                         static_cast<float>(x),
+                                         static_cast<float>(y));
+    float endPointDistance = getLength(static_cast<float>(l.end.x),
+                                       static_cast<float>(l.end.y),
+                                       static_cast<float>(x),
+                                       static_cast<float>(y));
+
     if (startPointDistance < endPointDistance) {
         return l.start;
     }
@@ -147,8 +160,8 @@ float Utility::getPerpenSlope(float slope) {
 float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int y) {
     // Bigger change in x than in y, nearer to horizontal than vertical
     if ( abs(aLine.end.x - aLine.start.x) > abs(aLine.end.y - aLine.start.y) ) {
-        float lineY = getLineY(x, aLine);
-        return fabs(y - lineY);
+        float lineY = static_cast<float>(getLineY(x, aLine));
+        return fabs(static_cast<float>(y) - lineY);
     }
     // Perfectly vertical; no need to find where the point would hit.
     // Hack.
@@ -157,8 +170,8 @@ float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int
     }
     // A line that is not perfectly vertical but is more vertical than horizontal
     else {
-        float lineX = getLineX(y, aLine);
-        return fabs(x - lineX);
+        float lineX = static_cast<float>(getLineX(y, aLine));
+        return fabs(static_cast<float>(x) - lineX);
     }
 }
 
@@ -166,17 +179,17 @@ float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int
 // Return distance between point and line evaluated at same x or y (depending
 // on orientation of the line)
 float Utility::getPointDeviation(const VisualLine &aLine, const linePoint &point) {
-    return getPointDeviation(aLine, point.x, point.y);  
+    return getPointDeviation(aLine, point.x, point.y);
 }
 
 // get length of line segment specified by (x1, y1), (x2, y2)
-const float Utility::getLength(const float x1, const float y1, 
+const float Utility::getLength(const float x1, const float y1,
                                const float x2, const float y2) {
     return sqrt(pow(y2-y1,2)+pow(x2-x1,2));
 }
 
 // get length of line segment specified by (x1, y1), (x2, y2)
-const float Utility::getLength(const point <const float> &p1, 
+const float Utility::getLength(const point <const float> &p1,
                                const point <const float> &p2) {
     return getLength(p1.x, p1.y, p2.x, p2.y);
 }
@@ -418,7 +431,7 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
     // with just paraBuff (i.e., to extend a line into space), but in order
     // to extend in the orthogonal direction we need to use the orthogonal
     // slope.
-      
+
     float alpha = atan(slope);
     float betaX = paraBuff * cos(alpha);
     float betaY = paraBuff * sin(alpha);
@@ -503,13 +516,13 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
     // easy cases out of way, have to calculate the y value of where the
     // intersection point would be
     // Will not divide by 0 here since we checked for vertical line already.
-    float slope = (float) (line1end.y - line1start.y) / 
+    float slope = (float) (line1end.y - line1start.y) /
         (float) (line1end.x - line1start.x);
 
     float intercept = line1end.y - slope * line1end.x;
     // Determine the y value of line at x value of plumbline
     float y = slope * plumbTop.x + intercept;
- 
+
     if (y >= plumbTop.y && y <= plumbBottom.y) {
         intersection.first = plumbTop.x;
         intersection.second = (int) y;

@@ -52,7 +52,7 @@ private:
     MotionInterface * motion_interface;
 // Public members
 public:
-    boost::shared_ptr<MCL> mcl;
+    boost::shared_ptr<LocSystem> loc;
     boost::shared_ptr<BallEKF> ballEKF;
     boost::shared_ptr<LocEKF> locEKF;
 };
