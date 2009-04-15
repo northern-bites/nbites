@@ -137,7 +137,7 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
     delete visBall;
 }
 
-void iterateObsPath(fstream * obsFile, fstream * locFile,
+void iterateObsPath(fstream * obsFile, fstream * locFile, fstream * coreFile,
                     shared_ptr<LocSystem> loc,
                     vector<PoseEst> * realPoses,
                     vector<BallPose> * ballPoses,
@@ -161,6 +161,10 @@ void iterateObsPath(fstream * obsFile, fstream * locFile,
                     ballEKF, *visBall,
                     TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
 
+    printCoreLogLine(coreFile, loc, sx, noMove,
+                     &(*realPoses)[0], &(*ballPoses)[0],
+                     ballEKF);
+
     for(unsigned int i = 0; i < realPoses->size(); ++i) {
         // Update the localization sytem
         loc->updateLocalization((*odos)[i], (*sightings)[i]);
@@ -175,6 +179,9 @@ void iterateObsPath(fstream * obsFile, fstream * locFile,
                         &(*realPoses)[i], &(*ballPoses)[i],
                         ballEKF, *visBall,
                         TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+        printCoreLogLine(coreFile, loc, (*sightings)[i], (*odos)[i],
+                         &(*realPoses)[i], &(*ballPoses)[i],
+                         ballEKF);
     }
     delete visBall;
 }

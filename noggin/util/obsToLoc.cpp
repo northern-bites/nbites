@@ -14,6 +14,8 @@ int main(int argc, char** argv)
     fstream obsFile;
     fstream mclFile;
     fstream ekfFile;
+    fstream mclCoreFile;
+    fstream ekfCoreFile;
 
     /* Test for the correct number of CLI arguments */
     if(argc != 2) {
@@ -43,12 +45,20 @@ int main(int argc, char** argv)
     // Open output files
     string mclFileName(argv[1]);
     string ekfFileName(argv[1]);
+    string mclCoreFileName(argv[1]);
+    string ekfCoreFileName(argv[1]);
 
     mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
     ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
+    mclCoreFileName.replace(mclCoreFileName.end()-3,
+                            mclCoreFileName.end(), "mcl.core");
+    ekfCoreFileName.replace(ekfCoreFileName.end()-3,
+                            ekfCoreFileName.end(), "ekf.core");
 
     mclFile.open(mclFileName.c_str(), ios::out);
     ekfFile.open(ekfFileName.c_str(), ios::out);
+    mclCoreFile.open(mclCoreFileName.c_str(), ios::out);
+    ekfCoreFile.open(ekfCoreFileName.c_str(), ios::out);
 
     // Close the input file
     obsFile.close();
@@ -60,13 +70,15 @@ int main(int argc, char** argv)
 
     // Iterate through the path
     cout << "Running EKF loc" << endl;
-    iterateObsPath(&obsFile, &ekfFile, ekfLoc, &realPoses, &ballPoses, &odos,
+    iterateObsPath(&obsFile, &ekfFile, &ekfCoreFile,
+                   ekfLoc, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
     ekfFile.close();
 
     // Iterate through the path
     cout << "Running MCL loc" << endl;
-    iterateObsPath(&obsFile, &mclFile, mcl, &realPoses, &ballPoses, &odos,
+    iterateObsPath(&obsFile, &mclFile, &mclCoreFile,
+                   mcl, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
     mclFile.close();
 

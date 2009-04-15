@@ -77,5 +77,10 @@ void printOutLogLine(std::fstream* outputFile,
                      PoseEst *currentPose, BallPose * currentBall,
                      boost::shared_ptr<BallEKF> ballEKF, VisualBall _b,
                      int team_color, int player_number, int ball_id);
+void printCoreLogLine(std::fstream* outputFile,
+                      boost::shared_ptr<LocSystem> myLoc,
+                      std::vector<Observation> sightings, MotionModel lastOdo,
+                      PoseEst *currentPose, BallPose * currentBall,
+                      boost::shared_ptr<BallEKF> ballEKF);
 
 #endif // fakerIO_h_DEFINED

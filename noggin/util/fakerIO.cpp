@@ -358,3 +358,51 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
     // Close the line
     *outputFile << endl;
 }
+
+/**
+ * Prints the input to a log file to be read by the TOOL
+ *
+ * @param outputFile File to write the log line to
+ * @param myLoc Current localization module
+ * @param sightings Vector of landmark observations
+ * @param lastOdo Odometery since previous frame
+ */
+void printCoreLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
+                     vector<Observation> sightings, MotionModel lastOdo,
+                     PoseEst *currentPose, BallPose * currentBall,
+                     shared_ptr<BallEKF> ballEKF)
+{
+    // Output standard infos
+    *outputFile << setprecision(6)
+        // Robot estimate
+                << myLoc->getXEst() << " "
+                << myLoc->getYEst() << " "
+                << myLoc->getHEst() << " "
+        // estimate uncertainty
+                << myLoc->getXUncert() << " "
+                << myLoc->getYUncert() << " "
+                << myLoc->getHUncert() << " "
+        // ball estimates
+                << (ballEKF->getXEst()) << " "
+                << (ballEKF->getYEst()) << " "
+                << (ballEKF->getXUncert()) << " "
+                << (ballEKF->getYUncert()) << " "
+        // ball uncertainty
+                << ballEKF->getXVelocityEst() << " "
+                << ballEKF->getYVelocityEst() << " "
+                << ballEKF->getXVelocityUncert() << " "
+                << ballEKF->getYVelocityUncert() << " "
+        // odometry data
+                << lastOdo.deltaF << " "
+                << lastOdo.deltaL << " "
+                << lastOdo.deltaR << " "
+        // Print the actual robot position
+                << currentPose->x << " "
+                << currentPose->y << " "
+                << currentPose->h << " "
+        // print actual ball position
+                << currentBall->x << " "
+                << currentBall->y << " "
+                << currentBall->velX << " "
+                << currentBall->velY << endl;
+}

@@ -35,6 +35,7 @@ static float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f + M_PI / 4.0f;
 
 void iterateNavPath(std::fstream * obsFile, NavPath * letsGo);
 void iterateObsPath(std::fstream * obsFile, std::fstream * locFile,
+                    std::fstream * coreFile,
                     boost::shared_ptr<LocSystem> loc,
                     std::vector<PoseEst> * realPoses,
                     std::vector<BallPose> * ballPoses,
