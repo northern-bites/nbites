@@ -38,6 +38,16 @@ public:
     virtual void setXUncert(float uncertX) = 0;
     virtual void setYUncert(float uncertY) = 0;
     virtual void setHUncert(float uncertH) = 0;
+
+    friend std::ostream& operator<< (std::ostream &o,
+                                             const LocSystem &c) {
+        return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
+                 << c.getHEst() << ")\t"
+                 << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
+                 << ", "
+                 << c.getHUncert() << ")";
+
+    }
 };
 
 #endif // LocSystem_h_DEFINED

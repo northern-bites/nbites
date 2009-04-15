@@ -127,14 +127,14 @@ public:
      */
     void setHUncert(float val) { P_k(2,2) = val; }
 
-    // Output methods
-    friend std::ostream& operator<< (std::ostream &o, const LocEKF &c) {
-        return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
-                 << c.getHEst() << ")\t"
-                 << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
-                 << ", "
-                 << c.getHUncert() << ")";
-    }
+    // // Output methods
+    // friend std::ostream& operator<< (std::ostream &o, const LocEKF &c) {
+    //     return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
+    //              << c.getHEst() << ")\t"
+    //              << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
+    //              << ", "
+    //              << c.getHUncert() << ")";
+    // }
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);

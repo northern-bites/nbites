@@ -172,9 +172,9 @@ private:
 
     bool useBest;
 public:
-    friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
-        return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
-    }
+    // friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
+    //     return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
+    // }
     int frameCounter;
 };
 
