@@ -208,8 +208,14 @@ void RoboGuardian::checkBatteryLevels(){
     static const float EMPTY_BATTERY_VALUE = 0.7f; //start nagging below 7%
 
     //sometimes we get weird values from the battery (like -9.8...)
-    const float newBatteryCharge =  NBMath::clip(sensors->getBatteryCharge(),
-                                                 0.0f,1.0f);
+    const float newBatteryCharge =  sensors->getBatteryCharge();
+    if(newBatteryCharge < 0 || newBatteryCharge > 1.0){
+#ifdef GUARDIAN_DEBUG_BATTERY
+        cout<< Thread::name<<": Got bad battery charge of "<< newBatteryCharge
+        <<endl;
+#endif
+        return;
+    }
 
     if(newBatteryCharge != lastBatteryCharge){
 
