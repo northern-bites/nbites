@@ -66,7 +66,7 @@ private:
     void checkButtonPushes();
     void executeClickAction(int);
     void shutoffGains();
-
+    void resetWifiConnection();
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking

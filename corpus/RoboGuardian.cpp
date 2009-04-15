@@ -34,6 +34,7 @@ static const string stiffness_removed_wav = sdir + "emergency_stiffness"+wav;
 static const string stiffness_enabled_wav = nbsdir + "stiffness_enabled"+wav;
 static const string warning_wav = sdir + "warning"+wav;
 static const string falling_wav = nbsdir +"falling"+wav;
+static const string wifi_restart_wav = nbsdir +"wifi_restart"+wav;
 static const string dot = ".";
 
 
@@ -137,31 +138,24 @@ bool isFalling(float angle_pos, float angle_vel){
 void RoboGuardian::checkFallProtection(){
     const Inertial inertial  = sensors->getInertial();
 
-
-    //Track the instantaneous velocities of angleX and angleY
-    const float angleXVel = inertial.angleX - lastInertial.angleX;
-    const float angleYVel = inertial.angleY - lastInertial.angleY;
-
-
     /***** Determine if the robot is in the process of FALLING ****/
+    //Using just the magnitude:
+    const float angleMag = std::sqrt(std::pow(inertial.angleX,2) +
+                                     std::pow(inertial.angleY,2));
+    const float lastAngleMag = std::sqrt(std::pow(lastInertial.angleX,2) +
+                                         std::pow(lastInertial.angleY,2));
 
-    //first check if the robot is beyond a certain angle
-    const bool falling_critical_angle =
-        std::abs(inertial.angleX) > FALLING_ANGLE_THRESH ||
-        std::abs(inertial.angleY) > FALLING_ANGLE_THRESH;
+    const float angleSpeed = angleMag - lastAngleMag;
+    const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
 
-
-    //next, track how many frames in a row the robot has velocity
-    //greater than the thresholds
-    if(isFalling(inertial.angleX,angleXVel) ||
-       isFalling(inertial.angleY,angleYVel)){
+    if(isFalling(angleMag,angleSpeed)){
         fallingFrames += 1;
         notFallingFrames = 0;
-    }else if( std::abs(angleXVel) < NOFALL_SPEED_THRESH &&
-              std::abs(angleYVel) < NOFALL_SPEED_THRESH){
+    }else if( angleSpeed < NOFALL_SPEED_THRESH){
         fallingFrames = 0;
         notFallingFrames +=1;
     }
+
 
     //If the robot has been falling for a while, and the robot is inclined
     //already at a 45 degree angle, than we know we are falling
@@ -190,8 +184,6 @@ void RoboGuardian::checkFallProtection(){
 #endif
     }
 
-
-    //testing code
     if(fallingFrames == FALLING_FRAMES_THRESH){
         if(useFallProtection){
             shutoffGains();
@@ -333,6 +325,7 @@ void RoboGuardian::executeClickAction(int nClicks){
 #ifdef DEBUG_GUARDIAN_CLICKS
     cout << "Processing "<<numClicks<< " clicks"<<endl;
 #endif
+    //NOTE: Please upade wiki/NaoChestButtonInterface when this is changed!!!
     switch(nClicks){
 
     case 1:
@@ -347,13 +340,16 @@ void RoboGuardian::executeClickAction(int nClicks){
         motion_interface->sendStiffness( new StiffnessCommand(
                                              StiffnessCommand::FULL_STIFFNESS));
         break;
-    case 6:
+    case 7:
+        resetWifiConnection();
+        break;
+    case 9:
         //Easter EGG!
         playFile(nbsdir+"easter_egg.wav");
         break;
     default:
         //nothing
-        cout << "Leaving a click of "<<nClicks<<" for someone else"<<endl;
+        cout << Thread::name <<" is leaving "<<nClicks<<" clicks for someone else"<<endl;
         pthread_mutex_lock(&click_mutex);
         numClicks = nClicks;
         pthread_mutex_unlock(&click_mutex);
@@ -418,4 +414,10 @@ int RoboGuardian::getNumChestClicks() const{
     numClicks = NO_CLICKS;
     pthread_mutex_unlock(&click_mutex);
     return nClicks;
+}
+
+
+void RoboGuardian::resetWifiConnection(){
+    playFile(wifi_restart_wav);
+    system("/etc/init.d/wireless restart &");
 }
