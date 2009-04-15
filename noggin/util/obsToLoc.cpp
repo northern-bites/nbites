@@ -12,11 +12,13 @@ int main(int argc, char** argv)
     // Information needed for the main method
     // IO Variables
     fstream obsFile;
-    fstream mclFile;
     fstream ekfFile;
-    fstream mclCoreFile;
-    fstream ekfCoreFile;
+    fstream mclFile;
+    fstream mclFile2;
 
+    fstream ekfCoreFile;
+    fstream mclCoreFile;
+    fstream mclCoreFile2;
     /* Test for the correct number of CLI arguments */
     if(argc != 2) {
         cerr << "usage: " << argv[0] << " input-file" << endl;
@@ -43,22 +45,31 @@ int main(int argc, char** argv)
                      &ballBearings, BALL_ID);
 
     // Open output files
-    string mclFileName(argv[1]);
     string ekfFileName(argv[1]);
-    string mclCoreFileName(argv[1]);
+    string mclFileName(argv[1]);
+    string mclFileName2(argv[1]);
     string ekfCoreFileName(argv[1]);
+    string mclCoreFileName(argv[1]);
+    string mclCoreFileName2(argv[1]);
 
-    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
     ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
-    mclCoreFileName.replace(mclCoreFileName.end()-3,
-                            mclCoreFileName.end(), "mcl.core");
+    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
+    mclFileName2.replace(mclFileName2.end()-3, mclFileName2.end(), "mcl.2");
     ekfCoreFileName.replace(ekfCoreFileName.end()-3,
                             ekfCoreFileName.end(), "ekf.core");
+    mclCoreFileName.replace(mclCoreFileName.end()-3,
+                            mclCoreFileName.end(), "mcl.core");
+    mclCoreFileName2.replace(mclCoreFileName2.end()-3,
+                             mclCoreFileName2.end(), "mcl.core.2");
 
-    mclFile.open(mclFileName.c_str(), ios::out);
+
     ekfFile.open(ekfFileName.c_str(), ios::out);
-    mclCoreFile.open(mclCoreFileName.c_str(), ios::out);
+    mclFile.open(mclFileName.c_str(), ios::out);
+    mclFile2.open(mclFileName2.c_str(), ios::out);
+
     ekfCoreFile.open(ekfCoreFileName.c_str(), ios::out);
+    mclCoreFile.open(mclCoreFileName.c_str(), ios::out);
+    mclCoreFile2.open(mclCoreFileName2.c_str(), ios::out);
 
     // Close the input file
     obsFile.close();
@@ -66,7 +77,8 @@ int main(int argc, char** argv)
     // Use weighted means
     shared_ptr<MCL> mcl = shared_ptr<MCL>(new MCL());
     // Use best particle
-    //shared_ptr<MCL> mcl2 = shared_ptr<MCL>(new MCL());
+    shared_ptr<MCL> mcl2 = shared_ptr<MCL>(new MCL());
+    mcl2->setUseBest(true);
 
     // Iterate through the path
     cout << "Running EKF loc" << endl;
@@ -81,6 +93,13 @@ int main(int argc, char** argv)
                    mcl, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
     mclFile.close();
+
+    // Iterate through the path
+    cout << "Running MCL 2 loc" << endl;
+    iterateObsPath(&obsFile, &mclFile2, &mclCoreFile2,
+                   mcl2, &realPoses, &ballPoses, &odos,
+                   &sightings, &ballDists, &ballBearings, BALL_ID);
+    mclFile2.close();
 
     return 0;
 }

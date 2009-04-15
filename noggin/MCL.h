@@ -61,17 +61,26 @@ public:
     /**
      * @return The current x esitamte of the robot
      */
-    const float getXEst() const { return curEst.x;}
+    const float getXEst() const {
+        if (useBest) return curBest.x;
+        else return curEst.x;
+    }
 
     /**
      * @return The current y esitamte of the robot
      */
-    const float getYEst() const { return curEst.y;}
+    const float getYEst() const {
+        if (useBest) return curBest.y;
+        else return curEst.y;
+    }
 
     /**
      * @return The current heading esitamte of the robot in radians
      */
-    const float getHEst() const { return curEst.h;}
+    const float getHEst() const {
+        if (useBest) return curBest.h;
+        else return curEst.h;
+    }
 
     /**
      * @return The current heading esitamte of the robot in degrees
@@ -134,6 +143,8 @@ public:
      */
     void setHUncert(float uncertH) { curUncert.h = uncertH;}
 
+    void setUseBest(bool _new) { useBest = _new; }
+
 private:
     // Class variables
     PoseEst curEst; // Current {x,y,h} esitamates
@@ -159,6 +170,7 @@ private:
     float sampleNormalDistribution(float sd);
     float sampleTriangularDistribution(float sd);
 
+    bool useBest;
 public:
     friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
         return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
