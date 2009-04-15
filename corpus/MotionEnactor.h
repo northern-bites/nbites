@@ -1,14 +1,45 @@
+
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
+//
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
+
 /**
- * This class is an abstraction of the connection between the Switchboard and
- * the lower level access to robot hardware. Since this connection may change
- * often, and is different for the simulator and the robot, this class provides
- * a contract to fulfill to provide that connection.
+ * This class is an abstraction to send commands from our robot code to the
+ * underlying robot code, depending on the platform. The idea is to try
+ * to remove as much platfrom dependant code from our code base and conncentrate
+ * it in files which are 'hot swappable' so if we change from simmulation to
+ * the robot, we can easily do this by creating a new Enactor/Transcriber pair.
  *
- * Each MotionEnactor is in charge of passing joint commands to the low-level.
- * Typically, this will be done by starting a high-priority thread which recurs
- * close to the timestep (20 ms) as possible.
- * Each enactor must call getNextJoints on the switchboard, and relay that
- * information correctly.
+ * Note that this file was originally created only to send joint information
+ * from the switchboard to ALMotion/Webots, so this transformation is not
+ * complete yet. Also, there is still no enactor for Webots.
+ *
+ * See also Transcriber, ThreadedEnactor, NaoEnactor (DCM)
+ * and ALEnactor(ALMotion).
+ *
+ * Future improvements. The interface could be more generalize by making
+ * the switchboard private, and require lower classes to call methods in this
+ * class to access information from the switchboard. One could also abstract
+ * the switchboard to make it easier to swap components. At this point,
+ * there is no need for that extra effort however. Also this class should be
+ * named "Enactor" not MotionEnactor
+ *
+ * Johannes Strom April 2009
  */
 
 #ifndef _MotionEnactor_h_DEFINED
