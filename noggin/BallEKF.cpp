@@ -5,7 +5,9 @@ using namespace boost;
 using namespace NBMath;
 
 // Parameters
-const float BallEKF::ASSUMED_FPS = 15.0;
+const float BallEKF::ASSUMED_FPS = 15.0f;
+const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
+
 // How much uncertainty naturally grows per update
 const float BallEKF::BETA_BALL = 5.0f;
 // How much ball velocity should effect uncertainty
@@ -191,38 +193,72 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)
 {
-    // Convert our sighting to cartesian coordinates
-    const float x_b_r = z.distance * cos(z.bearing);
-    const float y_b_r = z.distance * sin(z.bearing);
-    MeasurementVector z_x(2);
+    if (z.distance < USE_CARTESIAN_BALL_DIST) {
+        std::cout << "Using the cartesian ball stuff" << std::endl;
+        std::cout << "Ball dist is " << z.distance << std::endl;
+        std::cout << "Cartesian ball dist is " << USE_CARTESIAN_BALL_DIST << std::endl;
+        // Convert our sighting to cartesian coordinates
+        const float x_b_r = z.distance * cos(z.bearing);
+        const float y_b_r = z.distance * sin(z.bearing);
+        MeasurementVector z_x(2);
 
-    z_x(0) = x_b_r;
-    z_x(1) = y_b_r;
+        z_x(0) = x_b_r;
+        z_x(1) = y_b_r;
 
-    // Get expected values of ball
-    const float x_b = getXEst();
-    const float y_b = getYEst();
-    float sinh, cosh;
-    sincosf(robotPose.h, &sinh, &cosh);
+        // Get expected values of ball
+        const float x_b = getXEst();
+        const float y_b = getYEst();
+        float sinh, cosh;
+        sincosf(robotPose.h, &sinh, &cosh);
 
-    MeasurementVector d_x(2);
+        MeasurementVector d_x(2);
 
-    d_x(0) = (x_b - robotPose.x) * cosh + (y_b - robotPose.y) * sinh;
-    d_x(1) = -(x_b - robotPose.x) * sinh + (y_b - robotPose.y) * cosh;
+        d_x(0) = (x_b - robotPose.x) * cosh + (y_b - robotPose.y) * sinh;
+        d_x(1) = -(x_b - robotPose.x) * sinh + (y_b - robotPose.y) * cosh;
 
-    // Calculate invariance
-    V_k = z_x - d_x;
+        // Calculate invariance
+        V_k = z_x - d_x;
 
-    // Calculate jacobians
-    H_k(0,0) = cosh;
-    H_k(0,1) = sinh;
-    H_k(1,0) = -sinh;
-    H_k(1,1) = cosh;
+        // Calculate jacobians
+        H_k(0,0) = cosh;
+        H_k(0,1) = sinh;
+        H_k(1,0) = -sinh;
+        H_k(1,1) = cosh;
 
-    // Update the measurement covariance matrix
-    R_k(0,0) = z.distanceSD;
-    R_k(1,1) = z.distanceSD;
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.distanceSD;
+        R_k(1,1) = z.distanceSD;
+    } else {
+        std::cout << "Using the polar ball stuff" << std::endl;
+        std::cout << "Ball dist is " << z.distance << std::endl;
+        std::cout << "Cartesian ball dist is " << USE_CARTESIAN_BALL_DIST << std::endl;
+        // Convert our sighting to cartesian coordinates
+        MeasurementVector z_x(2);
+        z_x(0) = z.distance;
+        z_x(1) = z.bearing;
 
+        // Get expected values of ball
+        const float x_b = getXEst();
+        const float y_b = getYEst();
+
+        MeasurementVector d_x(2);
+
+        d_x(0) = hypot(x_b - robotPose.x, y_b - robotPose.y);
+        d_x(1) = atan2(y_b - robotPose.y, x_b - robotPose.x) - robotPose.h;
+
+        // Calculate invariance
+        V_k = z_x - d_x;
+
+        // Calculate jacobians
+        H_k(0,0) = (x_b - robotPose.x) / d_x(0);
+        H_k(0,1) = (y_b - robotPose.y) / d_x(0);
+        H_k(1,0) = (robotPose.y - y_b) / (d_x(0)*d_x(0));
+        H_k(1,1) = (x_b - robotPose.x) / (d_x(0)*d_x(0));
+
+        // Update the measurement covariance matrix
+        R_k(0,0) = z.distanceSD;
+        R_k(1,1) = z.bearingSD;
+    }
 }
 
 /**
