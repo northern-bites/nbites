@@ -65,6 +65,9 @@ void ALEnactor::run() {
 void ALEnactor::sendCommands(){
     if(!switchboard)
         return;
+    if(!almotion_link){
+        return;
+    }
     sendJoints();
     sendHardness();
 }

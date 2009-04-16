@@ -44,12 +44,16 @@ public:
     ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s,
               boost::shared_ptr<Transcriber> t)
         : ThreadedMotionEnactor(), broker(_pbroker), sensors(s),
-          transcriber(t){
+          transcriber(t), almotion_link(false){
 
         try {
             almotion = broker->getMotionProxy();
+            almotion_link = true;
         } catch(AL::ALError &e){
-            cout << "Failed to initialize proxy to ALMotion" << endl;
+            cout << "Failed to initialize proxy to ALMotion!!!" << endl;
+            cout << "Please turn on 'motion' in autoload.ini and restart naoqi"
+                 << endl;
+            almotion_link = false;
         }
 
     };
@@ -73,6 +77,8 @@ private:
     static const int MOTION_FRAME_RATE;
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
     static const float MOTION_FRAME_LENGTH_S; // in seconds
+
+    bool almotion_link;
 };
 
 #endif //NAOQI1
