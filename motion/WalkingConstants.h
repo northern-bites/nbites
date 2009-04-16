@@ -115,6 +115,12 @@ struct LegConstants{
     }
 };
 
+
+static const float LARM_WALK_ANGLES[Kinematics::ARM_JOINTS] =
+{M_PI/2,M_PI/3,0.0f,-M_PI/3};
+static const float RARM_WALK_ANGLES[Kinematics::ARM_JOINTS] =
+{M_PI/2,-M_PI/3,0.0f,M_PI/3};
+
 //NOTE You must never set these variables except with a constructor
 //or you must update single,doubleSupportFrames  manually with
 // updateFrameLengths()
@@ -213,13 +219,10 @@ public:
 
         std::vector<float> * allJoints = new std::vector<float>();
 
-        //Make up something arbitrary for the arms
-        const float larm[Kinematics::ARM_JOINTS] =
-            {M_PI/2,M_PI/10, -M_PI/2,-M_PI/2};
-        const float rarm[Kinematics::ARM_JOINTS] =
-            {M_PI/2,-M_PI/10,M_PI/2,M_PI/2};
-        const std::vector<float>larm_angles(larm,larm+Kinematics::ARM_JOINTS);
-        const std::vector<float>rarm_angles(rarm,rarm+Kinematics::ARM_JOINTS);
+        const std::vector<float>larm_angles(LARM_WALK_ANGLES,
+                                            LARM_WALK_ANGLES + Kinematics::ARM_JOINTS);
+        const std::vector<float>rarm_angles(RARM_WALK_ANGLES,
+                                            RARM_WALK_ANGLES +Kinematics::ARM_JOINTS);
         //now combine all the vectors together
         allJoints->insert(allJoints->end(),larm_angles.begin(),larm_angles.end());
         allJoints->insert(allJoints->end(),lleg_angles.begin(),lleg_angles.end());

@@ -37,12 +37,11 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
 {
     pthread_mutex_init(&walk_provider_mutex,NULL);
 
-    //Make up something arbitrary for the arms
-    const float larm[ARM_JOINTS] = {M_PI/2,M_PI/10,-M_PI/2,-M_PI/2};
-    const float rarm[ARM_JOINTS] = {M_PI/2,-M_PI/10,M_PI/2,M_PI/2};
-    larm_angles = vector<float>(larm,larm+ARM_JOINTS);
-    rarm_angles = vector<float>(rarm,rarm+ARM_JOINTS);
-
+    //Currently, the arm angles are static, and never change
+    larm_angles = vector<float>(LARM_WALK_ANGLES,
+                                LARM_WALK_ANGLES + ARM_JOINTS);
+    rarm_angles = vector<float>(RARM_WALK_ANGLES,
+                                RARM_WALK_ANGLES + ARM_JOINTS);
     setActive();
 }
 
