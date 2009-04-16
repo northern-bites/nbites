@@ -1,18 +1,12 @@
 
 import man.motion as motion
 
-from ..util import FSA
+from . import SoccerFSA
 from . import NoneStates
-from . import GameControllerStates
 
-class SoccerPlayer(FSA.FSA):
+class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
-        FSA.FSA.__init__(self,brain)
-        self.brain = brain
+        SoccerFSA.SoccerFSA.__init__(self,brain)
         #jf- self.setTimeFunction(self.brain.nao.getSimulatedTime)
-        self.addStates(GameControllerStates)
         self.addStates(NoneStates)
-        self.currentState = 'nothing'
         self.setName('Player pNone')
-        self.setPrintStateChanges(True)
-        self.setPrintFunction(self.brain.out.printf)

@@ -327,6 +327,16 @@ def scan (player):
 
     return player.stay()
 ###
+# Standup states
+###
+def fallen(player):
+    """
+    Stops the player when the robot has fallen
+    """
+    return player.stay()
+
+
+###
 # Game Controller States
 ###
 
