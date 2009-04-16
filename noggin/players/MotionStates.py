@@ -91,7 +91,7 @@ def gameFinished(player):
     if player.firstFrame():
         player.motion.stopBodyMoves()
         player.brain.tracker.stopHeadMoves()
-        #player.setHeads(0.,0.)
+        player.setHeads(0.,0.)
         player.executeMove(SweetMoves.SIT_POS)
 
     #Need time for sitdown and for waiting for the walk to stop

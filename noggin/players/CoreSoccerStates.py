@@ -24,6 +24,7 @@ def gameInitial(player):
         x = motion.StiffnessCommand(.85)
         player.brain.motion.sendStiffness(x)
         player.motion.stopBodyMoves()
+        player.setHeads(0.,0.)
         player.brain.tracker.stopHeadMoves()
         player.executeMove(SweetMoves.SIT_POS)
     return player.stay()

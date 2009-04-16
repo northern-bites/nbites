@@ -290,10 +290,27 @@ void MotionSwitchboard::signalNextFrame(){
  */
 int MotionSwitchboard::realityCheckJoints(){
     static const float joint_override_thresh = 0.12;//radians
+    static const float head_joint_override_thresh = 0.3;//need diff for head
+
     int changed = 0;
     vector<float> sensorAngles = sensors->getBodyAngles();
     vector<float> motionAngles = sensors->getMotionBodyAngles();
-    for(unsigned int i = 0; i < NUM_JOINTS; i++){
+
+    //HEAD ANGLES - handled separately to avoid trouble in HeadProvider
+    for(unsigned int i = 0; i < HEAD_JOINTS; i++){
+        if (fabs(sensorAngles[i] - motionAngles[i]) >
+            head_joint_override_thresh){
+#ifdef DEBUG_SWITCHBOARD_DISCREPANCIES
+            cout << "RealityCheck discrepancy: "<<endl
+                 << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+#endif
+            nextJoints[i] = motionAngles[i] = sensorAngles[i];
+            changed += 1;
+        }
+    }
+
+    //BODY ANGLES
+    for(unsigned int i = HEAD_JOINTS -1; i < NUM_JOINTS; i++){
         if (fabs(sensorAngles[i] - motionAngles[i]) > joint_override_thresh){
 #ifdef DEBUG_SWITCHBOARD_DISCREPANCIES
             cout << "RealityCheck discrepancy: "<<endl
