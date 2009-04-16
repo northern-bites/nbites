@@ -9,6 +9,7 @@
 #include "PyLoc.h"
 
 //#define DEBUG_OBSERVATIONS
+#define RUN_LOCALIZATION
 
 using namespace std;
 using namespace boost;
@@ -186,10 +187,12 @@ void Noggin::runStep ()
     PyVision_update(pyvision);
     PROF_EXIT(profiler, P_PYUPDATE);
 
+#ifdef RUN_LOCALIZATION
     // Update localization information
     PROF_ENTER(profiler, P_LOC);
     updateLocalization();
     PROF_EXIT(profiler, P_LOC);
+#endif //RUN_LOCALIZATION
 
     // Call main run() method of Brain
     PROF_ENTER(profiler, P_PYRUN);
