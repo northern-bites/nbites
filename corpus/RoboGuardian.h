@@ -77,6 +77,9 @@ private:
     MotionInterface * motion_interface;
     std::vector<float> lastTemps;
     float lastBatteryCharge;
+
+    ClickableButton chestButton;
+
     int buttonOnCounter;
     int buttonOffCounter;
     int lastButtonOnCounter;
@@ -94,6 +97,7 @@ private:
     mutable pthread_mutex_t click_mutex;
     static const int GUARDIAN_FRAME_RATE;
     static const float GUARDIAN_FRAME_LENGTH_uS;
+
 
 };
 

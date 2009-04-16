@@ -111,6 +111,7 @@ SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
                         ${CORPUS_INCLUDE_DIR}/ALTranscriber
                         ${CORPUS_INCLUDE_DIR}/AccEKF
 			${CORPUS_INCLUDE_DIR}/RoboGuardian
+			${CORPUS_INCLUDE_DIR}/ClickableButton
 			)
 
 #IF( PYTHON_SHARED_CORPUS )
