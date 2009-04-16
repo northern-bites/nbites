@@ -194,9 +194,9 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
                                      MeasurementVector &V_k)
 {
     if (z.distance < USE_CARTESIAN_BALL_DIST) {
-        std::cout << "Using the cartesian ball stuff" << std::endl;
-        std::cout << "Ball dist is " << z.distance << std::endl;
-        std::cout << "Cartesian ball dist is " << USE_CARTESIAN_BALL_DIST << std::endl;
+        // std::cout << "Using the cartesian ball stuff" << std::endl;
+        // std::cout << "Ball dist is " << z.distance << std::endl;
+        // std::cout << "Cartesian ball dist is " << USE_CARTESIAN_BALL_DIST << std::endl;
         // Convert our sighting to cartesian coordinates
         const float x_b_r = z.distance * cos(z.bearing);
         const float y_b_r = z.distance * sin(z.bearing);
@@ -229,9 +229,9 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
         R_k(0,0) = z.distanceSD;
         R_k(1,1) = z.distanceSD;
     } else {
-        std::cout << "Using the polar ball stuff" << std::endl;
-        std::cout << "Ball dist is " << z.distance << std::endl;
-        std::cout << "Cartesian ball dist is " << USE_CARTESIAN_BALL_DIST << std::endl;
+        // std::cout << "Using the polar ball stuff" << std::endl;
+        // std::cout << "Ball dist is " << z.distance << std::endl;
+        // std::cout << "Cartesian ball dist is " << USE_CARTESIAN_BALL_DIST << std::endl;
         // Convert our sighting to cartesian coordinates
         MeasurementVector z_x(2);
         z_x(0) = z.distance;

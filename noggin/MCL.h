@@ -38,7 +38,6 @@ public:
 };
 
 // Constants
-static const int M = 100; // Number of particles
 static const float MIN_SIMILARITY = 1.0e-20; // Minimum possible similarity
 
 // The Monte Carlo Localization class
@@ -46,7 +45,7 @@ class MCL : public LocSystem
 {
 public:
     // Constructors & Destructors
-    MCL();
+    MCL(int M=100);
     virtual ~MCL();
 
     // Core Functions
@@ -176,6 +175,7 @@ public:
     //     return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
     // }
     int frameCounter;
+    const int M; // Number of particles
 };
 
 #endif // _MCL_H_DEFINED
