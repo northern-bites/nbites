@@ -237,9 +237,9 @@ class Brain(object):
         self.out.printf(temp)
         if len(temp) > 0:
             p = temp[0][3:len(temp[0])]
-            n = int(temp[0][1])
-            self.ownPlayers[n] = p
-            self.out.printf(self.ownPlayers)        
+            if p != self.my.playerNumber:
+                n = int(temp[0][1])
+                self.ownPlayers[n] = p
 
     def updateLocalization(self):
         """
