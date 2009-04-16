@@ -3,6 +3,7 @@ import math
 
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
+import man.motion.RobotGaits as RobotGaits
 import man.motion.MotionConstants as MotionConstants
 
 
@@ -12,6 +13,7 @@ def gameInitial(player):
     if player.firstFrame():
         x = motion.StiffnessCommand(.85)
         player.brain.motion.sendStiffness(x)
+
 
     return player.stay()
 
@@ -32,17 +34,17 @@ def switchGaits(player):
 
 def walkleft(player):
     if player.firstFrame():
-        walkcmd = motion.WalkCommand(x=0,y=10,theta=10)
+        walkcmd = motion.WalkCommand(x=0,y=4,theta=0)
         player.brain.motion.setNextWalkCommand(walkcmd)
 
-    if player.counter == 20:
+    if player.counter == 100:
         return player.goLater('sitdown')
     return player.stay()
 
 
 def walkstraight(player):
     if player.firstFrame():
-        walkcmd = motion.WalkCommand(x=6,y=0,theta=0)
+        walkcmd = motion.WalkCommand(x=4,y=0,theta=0)
         player.brain.motion.setNextWalkCommand(walkcmd)
     if player.counter == 200:
         return player.goLater('sitdown')
@@ -53,9 +55,9 @@ def switchGait():
 
 def walkturn(player):
     if player.firstFrame():
-        walkcmd = motion.WalkCommand(x=0,y=0,theta=10)
+        walkcmd = motion.WalkCommand(x=0,y=0,theta=20)
         player.brain.motion.setNextWalkCommand(walkcmd)
-    if player.counter == 80:
+    if player.counter == 180:
         return player.goLater('stopwalking')
     return player.stay()
 
@@ -89,7 +91,7 @@ def gameFinished(player):
     if player.firstFrame():
         player.motion.stopBodyMoves()
         player.brain.tracker.stopHeadMoves()
-        player.setHeads(0.,0.)
+        #player.setHeads(0.,0.)
         player.executeMove(SweetMoves.SIT_POS)
 
     #Need time for sitdown and for waiting for the walk to stop
