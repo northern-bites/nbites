@@ -53,7 +53,7 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       broker(_broker),motion_interface(_interface),
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
-      chestButton(GUARDIAN_FRAME_RATE),
+      chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       buttonOnCounter(0),buttonOffCounter(0),
       lastButtonOnCounter(0),lastButtonOffCounter(0),
       buttonClicks(0),
@@ -267,12 +267,21 @@ void RoboGuardian::checkTemperatures(){
 }
 
 void RoboGuardian::checkButtonPushes(){
-    chestButton->updateFrame();
+    static const int SHUTDOWN_THRESH = GUARDIAN_FRAME_RATE * 3;
+
+    chestButton->updateFrame(sensors->getChestButton());
 
     if(chestButton->getClickLength() == 0.0f ){
         registeredShutdown  = false;
-    }else if()
+    }else if(chestButton->getClickLength() > SHUTDOWN_THRESH && 
+        !registeredShutdown){
+        registeredShutdown = true;
+        executeShutdownAction();
+    }
 
+    if(executeClickAction(chestButton->peekNumClicks())){
+        chestButton->getAndClearNumClicks();
+    }
 }
 
 // //HACK/NOTE: the sensors we rely on are only updated in the vision thread
@@ -337,13 +346,16 @@ void RoboGuardian::checkButtonPushes(){
 
 // }
 
-void RoboGuardian::executeClickAction(int nClicks){
+bool RoboGuardian::executeClickAction(int nClicks){
 #ifdef DEBUG_GUARDIAN_CLICKS
     cout << "Processing "<<numClicks<< " clicks"<<endl;
 #endif
+
     //NOTE: Please upade wiki/NaoChestButtonInterface when this is changed!!!
     switch(nClicks){
-
+    case NO_CLICKS:
+        return false;
+        break;
     case 1:
         //Say IP Address
         speakIPAddress();
@@ -371,7 +383,7 @@ void RoboGuardian::executeClickAction(int nClicks){
         pthread_mutex_unlock(&click_mutex);
         break;
     }
-
+    return true;
 }
 
 

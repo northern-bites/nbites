@@ -28,9 +28,10 @@
 #include "albroker.h"
 #include "alptr.h"
 
-#include  "synchro.h"
-#include  "Sensors.h"
-#include  "MotionInterface.h"
+#include "synchro.h"
+#include "Sensors.h"
+#include "MotionInterface.h"
+#include "ClickableButton.h"
 
 class RoboGuardian : public Thread {
 public:
@@ -64,7 +65,7 @@ private:
     void checkBatteryLevels();
     void checkTemperatures();
     void checkButtonPushes();
-    void executeClickAction(int);
+    bool executeClickAction(int);
     void shutoffGains();
     void resetWifiConnection();
     //helpers
@@ -78,7 +79,7 @@ private:
     std::vector<float> lastTemps;
     float lastBatteryCharge;
 
-    ClickableButton chestButton;
+    boost::shared_ptr<ClickableButton> chestButton;
 
     int buttonOnCounter;
     int buttonOffCounter;
