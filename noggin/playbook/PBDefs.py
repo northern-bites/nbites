@@ -1,8 +1,10 @@
 
-from math import hypot
+from math import (hypot, degrees)
 
 from .. import NogginConstants
 from . import PBConstants
+from ..util import MyMath
+import time
 
 class Teammate:
     '''class for keeping track of teammates' info'''
@@ -33,10 +35,7 @@ class Teammate:
         self.inactive = False # dead basically just means inactive
         self.grabbing = False # dog is grabbing
         self.dribbling = False # dog is dribbling
-        self.kicking = False # dog is kicking
-        self.charge = None # pf charge
-        self.charge_type = None
-        self.charge_pos = None
+        self.kicking = False # dog is kicking[
         self.chaseTime = 0 # estimated time to chase the ball
         self.bearingToGoal = 0 # bearing to goal
 
@@ -48,7 +47,7 @@ class Teammate:
         '''
         
         # stores packet information locally
-        self.timeStamp = packet.timeStamp
+        self.timeStamp = time.time()
         self.x = packet.playerX
         self.y = packet.playerY
         self.h = packet.playerH
@@ -60,6 +59,7 @@ class Teammate:
         self.ballUncertX = packet.ballUncertX
         self.ballUncertY = packet.ballUncertY
         self.ballDist = packet.ballDist
+        self.calledRole = packet.role
         self.calledSubRole = packet.calledSubRole
         if self.isChaser():
             self.calledRole = PBConstants.CHASER
@@ -73,29 +73,31 @@ class Teammate:
         self.bearingToGoal = self.getBearingToGoal()
 
         # if a penalized timestamp, throw that up
+        """
         if packet.timeStamp == NogginConstants.PENALIZED_TIMESTAMP:
             self.inactive = True
         elif packet.timeStamp == NogginConstants.SOS_TIMESTAMP:
             print "DOG #%d DIED" % (self.playerNumber)
             self.inactive = True
         else:
-            self.inactive = False
+        """
+        self.inactive = False
 
-        self.grabbing = (packet.ballDist == 
+        self.grabbing = (packet.ballDist <= 
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
-        self.dribbling = (packet.ballDist == 
+        self.dribbling = (packet.ballDist <= 
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.kicking = False
         #(packet.ballDist == 
         #                Constants.BALL_TEAMMATE_DIST_KICKING)
 
-        self.lastPacketTime = self.brain.getTime()
+        self.lastPacketTime = time.time()
 
     def updateMe(self):
         '''updates my information as a teammate (since we don't get our own 
         packets)'''
         #self.playerNumber = self.brain.my.playerNumber
-        self.timeStamp = self.brain.time.timestamp()
+        self.timeStamp = time.time()
         self.x = self.brain.my.x
         self.y = self.brain.my.y
         self.h = self.brain.my.h
@@ -119,11 +121,9 @@ class Teammate:
 
     def getBearingToGoal(self):
         '''returns bearing to goal'''
-        return self.brain.getOthersRelativeBearing(self.x,
-                                                   self.y,
-                                                   self.h,
-                                                   NogginConstants.LANDMARK_OPP_GOAL_X,
-                                                   NogginConstants.LANDMARK_OPP_GOAL_Y)
+        return self.getOthersRelativeBearing(self.x, self.y, self.h,
+                                           NogginConstants.OPP_GOALBOX_X,
+                                           NogginConstants.OPP_GOALBOX_BOTTOM_Y)
 
     def getDistToBall(self):
         '''
@@ -139,12 +139,15 @@ class Teammate:
         -based on its own localization but my own ball estimates
         -return values is between -180,180
         '''
-
-        return self.brain.getOthersRelativeBearing(self.x,
-                                                   self.y,
-                                                   self.h,
+        return self.getOthersRelativeBearing(self.x, self.y, self.h,
                                                    self.brain.ball.x,
                                                    self.brain.ball.y)
+    
+    def getOthersRelativeBearing(self,playerX,playerY,playerH,x,y):
+        '''get another player's bearing to a point (x,y)'''
+        return MyMath.sub180Angle(playerH - (degrees(MyMath.safe_atan2(y - playerY,
+            x - playerX)) - 90.0))
+           
     def reset(self):
         '''Reset all important Teammate variables'''
         #self.playerNumber = 0 # doesn't reset player number

@@ -250,8 +250,7 @@ def fDubD(team):
                     break
 
     # position setting
-    team.moveMyCharge(pos)
-    return ['fDubD', team.me.role, team.me.subRole]
+    return ['fDubD', team.me.role, team.me.subRole, pos]
 
 def fFinder(team):
     '''no one knows where the ball is'''

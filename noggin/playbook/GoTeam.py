@@ -4,16 +4,8 @@ from math import fabs
 from . import PBDefs
 from . import PBConstants
 from . import Strategies
-
-try:
-    import potentialfield
-except ImportError:
-    import sys
-    print >>sys.stderr, '****************************************************'
-    print >>sys.stderr, '**** WARNING - no potentialfield module located ****'
-    print >>sys.stderr, '****    GoTeam module will FAIL upon running!   ****'
-    print >>sys.stderr, '****************************************************'
-
+from .. import NogginConstants
+import time
 
 class GoTeam:
     """
@@ -22,7 +14,6 @@ class GoTeam:
     """
     def __init__(self, brain):
         self.brain = brain
-        self.useAttractor = False
         self.printStateChanges = True
 
         # Info about all of our states
@@ -81,13 +72,6 @@ class GoTeam:
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
 
-        # potential field setup
-        self.pf = potentialfield.PotentialField()
-        self.pf.addFieldCharges()
-        self.my_charge = None
-        self.my_charge_type = None
-        self.my_charge_pos = None
-
 
     def run(self):
         """
@@ -97,7 +81,7 @@ class GoTeam:
 
         # We will always return a strategy
         self.currentStrategy, self.currentFormation, self.currentRole, \
-            self.currentSubRole = self.strategize()
+            self.currentSubRole, self.position = self.strategize()
 
         # Update all of our new infos
         self.updateStateInfo()
@@ -108,13 +92,13 @@ class GoTeam:
         Picks the strategy to run and returns all sorts of infos
         """
         # First we check for testing stuff
-        if TEST_DEFENDER:
+        if PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
-        elif TEST_OFFENDER:
+        elif PBConstants.TEST_OFFENDER:
             return Strategies.sTestOffender(self)
-        elif TEST_MIDDIE:
+        elif PBConstants.TEST_MIDDIE:
             return Strategies.sTestMiddie(self)
-        elif TEST_CHASER:
+        elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
 
         # Now we look at shorthanded strategies
@@ -220,7 +204,7 @@ class GoTeam:
         self.subRole = self.currentSubRole
 
     def getTime(self):
-        return self.brain.getTime()
+        return time.time()
 
     def printf(self, string):
         print string
@@ -245,38 +229,16 @@ class GoTeam:
 
         chaser_mate = self.teammates[self.me.playerNumber-1]
 
-        # center field capture hack for defender
-        if (self.currentSubRole == DEFENSIVE_MIDFIELD and
-            self.brain.getPosDist(self.position) < 125.0 and
-            0.0 < self.brain.ball.dist < 125.0 and
-            Constants.CENTER_FIELD_Y - 100.0 < self.brain.my.y < 
-            Constants.CENTER_FIELD_Y + 10.0 and
-            -90 < self.brain.my.h < 90):
-            self.timeSinceCaptureChase = self.brain.getTime()
-
-        # center field capture hack for offender
-        if (self.currentSubRole == CENTER_O_MIDFIELD and
-            self.brain.getPosDist(self.position) < 100.0 and
-            0.0 < self.brain.ball.dist < 125.0 and
-            Constants.CENTER_FIELD_Y - 10.0 < self.brain.my.y < 
-            Constants.CENTER_FIELD_Y + 100.0 and
-            (self.brain.my.h < -90 or self.brain.my.h > 90)):
-            self.timeSinceCaptureChase = self.brain.getTime()
-
-        # keep chasing for center field hack
-        if (self.brain.getTime() - self.timeSinceCaptureChase) < 2000.0:
-            return self.me
-
-        if DEBUG_DET_CHASER:
+        if PBConstants.DEBUG_DET_CHASER:
             print "chaser det: me == #", self.me.playerNumber
         # scroll through the teammates
-        for i,mate in enumerate(self.teammates):
-            if DEBUG_DET_CHASER:
+        for i, mate in enumerate(self.teammates):
+            if PBConstants.DEBUG_DET_CHASER:
                 print "\t mate #", i+1,
             # TEAMMATE SANITY CHECKS
             # don't check goalie out
             # don't check out penalized or turned-off dogs
-            if (mate.playerNumber == GOALIE_NUMBER or  
+            if (mate.playerNumber == PBConstants.GOALIE_NUMBER or  
                 mate.inactive or 
                 mate.playerNumber == self.brain.my.playerNumber or 
                 fabs(mate.ballY - self.brain.ball.y) > 150.0):
@@ -284,7 +246,7 @@ class GoTeam:
 #                  fabs(self.brain.ball.dist - 
 #                       self.brain.getPosDist([mate.ballX, mate.ballY]) > 
 #                       125.0))): 
-                if DEBUG_DET_CHASER:
+                if PBConstants.DEBUG_DET_CHASER:
                     print "\t inactive or goalie or me"
                 continue
 
@@ -298,7 +260,7 @@ class GoTeam:
 
             # Calculate chase time locally
             mate.chaseTime = self.getChaseTime(mate)
-
+            """
             # Tie break stuff
             if self.me.chaseTime < mate.chaseTime:
                 chaseTimeScale = self.me.chaseTime
@@ -328,17 +290,17 @@ class GoTeam:
                 chaser_mate = mate
 
             # else pick the lowest chaseTime
-            else:
-                if mate.chaseTime < chaser_mate.chaseTime:
-                    chaser_mate = mate
+            else:"""
+            if mate.chaseTime < chaser_mate.chaseTime:
+                chaser_mate = mate
 
-            if DEBUG_DET_CHASER:
+            if PBConstants.DEBUG_DET_CHASER:
                 print ("\t #%d @ %g >= #%d @ %g" % 
                        (mate.playerNumber, mate.chaseTime, 
                         chaser_mate.playerNumber, 
                         chaser_mate.chaseTime))
 
-        if DEBUG_DET_CHASER:
+        if PBConstants.DEBUG_DET_CHASER:
             print "\t ---- MATE %g WINS" % (chaser_mate.playerNumber)
         # returns teammate instance (could be mine)
         return chaser_mate
@@ -350,27 +312,20 @@ class GoTeam:
         
         time = 0.0
         # add chase forward time
-        time += ((mate.ballLocDist / CHASE_SPEED) * 
-                 SEC_TO_MILLIS)
+        time += ((mate.ballLocDist / PBConstants.CHASE_SPEED) *
+                 PBConstants.SEC_TO_MILLIS)
         # add bearing correction time
-        time += ((fabs(mate.ballLocBearing) / CHASE_SPIN) * 
-                 SEC_TO_MILLIS)
-
-        # special KICKOFF_PLAY bonus
-        if (self.currentFormation == KICKOFF_PLAY and 
-            self.brain.game.getTimeSincePlay() > 
-            KICKOFF_PLAY_SWITCH_TIME and
-            self.me.playerNumber == 4):
-            time -= KICKOFF_PLAY_BONUS
+        time += ((fabs(mate.ballLocBearing) / PBConstants.CHASE_SPIN) *
+                 PBConstants.SEC_TO_MILLIS)
 
         # velocity bonus
-        if (VB_MIN_REL_VEL_Y < self.brain.ball.relVelY < 
-            VB_MAX_REL_VEL_Y and
+        if (PBConstants.VB_MIN_REL_VEL_Y < self.brain.ball.relVelY <
+            PBConstants.VB_MAX_REL_VEL_Y and
             0 < self.brain.ball.relY < VB_MAX_REL_Y and
             fabs(self.brain.ball.relX + self.brain.ball.relVelX*
-                 (self.brain.ball.relY / self.brain.ball.relVelY)) < 
-            VB_X_THRESH):
-            time -= VELOCITY_BONUS
+                 (self.brain.ball.relY / self.brain.ball.relVelY)) <
+            PBConstants.VB_X_THRESH):
+            time -= PBConstants.VELOCITY_BONUS
 
         # ball bearing line to goal bonus
         if mate.y - self.brain.ball.y != 0:
@@ -381,29 +336,29 @@ class GoTeam:
         else:
             xDiff = 0
 
-        if ( 0. < xDiff < BEARING_SMOOTHNESS and 
+        if ( 0. < xDiff < PBConstants.BEARING_SMOOTHNESS and
              mate.y < self.brain.ball.y):
-            time -= (-BEARING_BONUS/
-                      BEARING_SMOOTHNESS * 
-                      xDiff + BEARING_BONUS)
-        elif 0. < xDiff < BEARING_SMOOTHNESS:
-            time += (-BEARING_BONUS/
-                      BEARING_SMOOTHNESS * 
-                      xDiff + BEARING_BONUS)
+            time -= (-PBConstants.BEARING_BONUS/
+                      PBConstants.BEARING_SMOOTHNESS * 
+                      xDiff + PBConstants.BEARING_BONUS)
+        elif 0. < xDiff < PBConstants.BEARING_SMOOTHNESS:
+            time += (-PBConstants.BEARING_BONUS/
+                      PBConstants.BEARING_SMOOTHNESS * 
+                      xDiff + PBConstants.BEARING_BONUS)
 
         # frames off bonus
         if self.brain.ball.framesOff < 3:
-            time -= BALL_NOT_SUPER_OFF_BONUS
+            time -= PBConstants.BALL_NOT_SUPER_OFF_BONUS
                 
         return time
 
     def determineSupporter(self, otherMates, roleInfo):
         '''
-        return a player object of the closest teammate in otherMates to 
+        return a player object of the closest teammate in otherMates to
         supportingPos
         '''
         supportRole = roleInfo[0]
-        supportingPos = self.getMyChargePos()
+        supportingPos = self.position[:]
         supporterMate = self.me
         self.me.supportTime = self.getSupportTime(self.me, supportingPos)
 
@@ -414,26 +369,26 @@ class GoTeam:
             # Tie break stuff
             supportTimeScale = min(self.me.supportTime, mate.supportTime)
 
-            if ((self.me.supportTime - mate.supportTime < 
-                 CALL_OFF_THRESH + 
+            if ((self.me.supportTime - mate.supportTime <
+                 PBConstants.CALL_OFF_THRESH +
                  .15 *supportTimeScale or
-                (self.me.supportTime - mate.supportTime < 
-                 STOP_CALLING_THRESH +
+                (self.me.supportTime - mate.supportTime <
+                 PBConstants.STOP_CALLING_THRESH +
                  .35 * supportTimeScale and
                  self.lastRole == supportRole)) and
                 mate.playerNumber < self.me.playerNumber):
-                if DEBUG_DET_SUPPORTER:
+                if PBConstants.DEBUG_DET_SUPPORTER:
                     print ("\t #%d @ %g >= #%d @ %g" % 
-                           (mate.playerNumber, mate.supportTime, 
-                            supporterMate.playerNumber, 
+                           (mate.playerNumber, mate.supportTime,
+                            supporterMate.playerNumber,
                             supporterMate.supportTime))
 
                 continue
             elif (mate.playerNumber > self.me.playerNumber and
-                  mate.supportTime - self.me.supportTime < 
-                  LISTEN_THRESH + 
+                  mate.supportTime - self.me.supportTime <
+                  PBConstants.LISTEN_THRESH +
                   .45 * supportTimeScale and
-                  mate.calledRole == CHASER):
+                  mate.calledRole == PBConstants.CHASER):
                 supporterMate = mate
 
             # else pick the lowest supportTime
@@ -441,10 +396,10 @@ class GoTeam:
                 if mate.supportTime < supporterMate.supportTime:
                     supporterMate = mate
 
-            if DEBUG_DET_SUPPORTER:
-                print ("\t #%d @ %g >= #%d @ %g" % 
-                       (mate.playerNumber, mate.supportTime, 
-                        supporterMate.playerNumber, 
+            if PBConstants.DEBUG_DET_SUPPORTER:
+                print ("\t #%d @ %g >= #%d @ %g" %
+                       (mate.playerNumber, mate.supportTime,
+                        supporterMate.playerNumber,
                         supporterMate.supportTime))
 
         # returns teammate instance (could be mine)
@@ -462,12 +417,12 @@ class GoTeam:
 
         # Not totally correct, since we move ortho...
         # add forward time
-        time += ((positionDist / SUPPORT_SPEED) * 
-                 SEC_TO_MILLIS)
+        time += ((positionDist / PBConstants.SUPPORT_SPEED) *
+                 PBConstants.SEC_TO_MILLIS)
 
         # add bearing correction time
-        time += ((positionBearing / SUPPORT_SPIN) * 
-                 SEC_TO_MILLIS)
+        time += ((positionBearing / PBConstants.SUPPORT_SPIN) *
+                 PBConstants.SEC_TO_MILLIS)
 
         return time
 
@@ -533,7 +488,7 @@ class GoTeam:
                            dog2[0][1],  dog3[2][1],  dog4[1][1])]
 
             # We must find the least weight choice from the 6 possibilities
-            min_dist = Constants.FIELD_HEIGHT*3
+            min_dist = NogginConstants.FIELD_HEIGHT*3
             chosenPositions = None
             for i,d in enumerate(distances):
                 if d[0] < min_dist:
@@ -615,7 +570,7 @@ class GoTeam:
                           dog2[3][1],  dog3[2][1],  dog4[1][1],  dog5[0][1])]
 
             # We must find the least weight choice from the 24 possibilities
-            min_dist = Constants.FIELD_HEIGHT*3
+            min_dist = NogginConstants.FIELD_HEIGHT*3
             chosenPositions = None
             for i,d in enumerate(distances):
                 if d[0] < min_dist:
@@ -633,7 +588,7 @@ class GoTeam:
         Here we update information about teammates before running a new frame
         '''
         # Change which wing is forward based on the opponents score
-        self.kickoffFormation = (self.brain.game.theirTeam.teamScore) % 2
+        # self.kickoffFormation = (self.brain.gameController.theirTeam.teamScore) % 2
 
         # update my own information for role switching
         self.me.updateMe()
@@ -641,55 +596,18 @@ class GoTeam:
 
         # loop through teammates    
         for mate in self.teammates:
-            if (self.isTeammateDead(mate) or 
-                self.isTeammatePenalized(mate)):
+            if (self.isTeammateDead(mate)):# or self.isTeammatePenalized(mate)):
                 mate.inactive = True
 
         self.inactiveMates = self.getInactiveFieldPlayers()
         self.numInactiveMates = len(self.inactiveMates)
-        self.useAttractor = False
-
-    def updateTeammateCharges(self):
-        '''updates teammate field charges. bigger repulsor for chaser.'''
-
-        for i,mate in enumerate(self.teammates):
-            # don't update self
-            if self.me.playerNumber == mate.playerNumber:
-                continue
-
-            ## update potential field repulsor at teammate (x,y) ##
-            # if teammate is inactive but charge is still there
-            # (ie he just became inactive), remove repulsor
-            if (mate.inactive or 
-                self.currentFormation == KICKOFF or
-                (self.currentRole == DEFENDER and 
-                 self.brain.my.y < Constants.FIELD_HEIGHT * 1./4.)):
-                if mate.charge:
-                    #print "removing mate %d repulsor" % (i)
-                    self.removeTeammateRepulsor(mate)            
-            elif mate.role == CHASER and mate.y < self.brain.my.y:
-                #if ((mate.grabbing or mate.dribbling or mate.kicking) and
-                #    ):
-                #self.updateTeammateCharge(mate,self.CHASER_TO_GOAL_CHARGE)
-                #else:
-                self.updateTeammateCharge(mate,
-                                          CHASER_CHARGE)            
-            elif self.brain.game.state == Constants.GAME_READY:
-                self.updateTeammateCharge(mate, READY_CHARGE)
-            else:
-                self.updateTeammateCharge(mate, NORMAL_CHARGE)
-
+  
     def  aPosterioriTeammateUpdate(self):
         """
         Here are updates to teammates which occur after running before 
         exiting the frame
         """
-        # update teammate pfield charges based on strategy
-        self.updateTeammateCharges()
-
-        # Set our position via potentialFields if required
-        if self.useAttractor:
-            self.position = self.getAttractorPosition()
+        pass
 
     def isTeammatePenalized(self,teammate):
         '''
@@ -698,7 +616,11 @@ class GoTeam:
         sending packets when they are penalized, so they will most likely
         fall under the isTeammateDead() check anyways.
         '''
-        return (self.brain.game.myTeam.players[teammate.playerNumber-1].penalty)
+        return (
+            self.brain.gameController.gc.team.players[
+                teammate.playerNumber-1
+                ].penalty
+            )
 
     def isTeammateDead(self,teammate):
         '''
@@ -707,17 +629,22 @@ class GoTeam:
         '''
         return (teammate.playerNumber != self.brain.my.playerNumber and
                 teammate.lastPacketTime == 0 or 
-                teammate.lastPacketTime < (self.brain.getTime() -
-                                           PACKET_DEAD_PERIOD))
+                teammate.lastPacketTime < (time.time() -
+                                           PBConstants.PACKET_DEAD_PERIOD))
 
     def getInactiveFieldPlayers(self):
         '''cycles through teammate objects and returns number of teammates
         that are 'dead'. ignores myself'''
         inactive_teammates = []
         for i,mate in enumerate(self.teammates):
-            if (mate.inactive and mate.playerNumber != 
+            """"if (mate.inactive and mate.playerNumber != 
                 self.brain.my.playerNumber and 
-                mate.playerNumber != GOALIE_NUMBER):
+                mate.playerNumber != PBConstants.GOALIE_NUMBER):
+                inactive_teammates.append(mate)"""
+            if ((time.time() - mate.timeStamp > PBConstants.INACTIVE_THRESH) and
+                self.brain.my.playerNumber != mate.playerNumber and
+                mate.playerNumber != PBConstants.GOALIE_NUMBER):
+                mate.inactive = True
                 inactive_teammates.append(mate)
         return inactive_teammates
 
@@ -734,7 +661,7 @@ class GoTeam:
 
     def getNumPenalizedOpponents(self):
         '''returns number of penalized robots on opponents team'''
-        return self.brain.game.theirTeam.numPenalized
+        return self.brain.gameController.theirTeam.numPenalized
 
     def teammateHasBall(self):
         '''returns True if any mate has the ball'''
@@ -753,7 +680,7 @@ class GoTeam:
         Determines if the goalie is dead or penalized
         '''
         return (self.isTeammateDead(self.teammates[0]) or
-                self.isTeammatePenalized(self.teammates[0]) or 
+                #self.isTeammatePenalized(self.teammates[0]) or 
                 self.teammates[0].inactive)
 
     def isGoalie(self):
@@ -762,13 +689,13 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
     def shouldUseDubD(self):
-        return ((self.brain.ball.x > Constants.MY_GOALBOX_LEFT_X + 5. and
-                 self.brain.ball.x < Constants.MY_GOALBOX_RIGHT_X -5.  and
-                 self.brain.ball.y < Constants.MY_GOALBOX_TOP_Y - 5.) or
-                (self.brain.ball.x > Constants.MY_GOALBOX_LEFT_X -5. and
-                 self.brain.ball.x < Constants.MY_GOALBOX_RIGHT_X + 5. and
-                 self.brain.ball.y < Constants.MY_GOALBOX_TOP_Y + 5. and
-                 self.teammates[0].calledRole == CHASER))
+        return ((self.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X + 5. and
+                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X -5.  and
+                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5.) or
+                (self.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X -5. and
+                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y + 5. and
+                 self.teammates[0].calledRole == PBConstants.CHASER))
 
     def ballInMyGoalBox(self):
         '''
@@ -776,9 +703,9 @@ class GoTeam:
         -includes all y values below top of goalbox 
         (so inside the goal is included)
         '''
-        return (self.brain.ball.x > Constants.MY_GOALBOX_LEFT_X and
-                self.brain.ball.x < Constants.MY_GOALBOX_RIGHT_X and
-                self.brain.ball.y < Constants.MY_GOALBOX_TOP_Y)
+        return (self.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X and
+                self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
+                self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
     
     def ballNearSideline(self):
         '''
@@ -786,45 +713,45 @@ class GoTeam:
         avoids either goal box
         '''
         return (
-            # if ball is nearing left sideline
-            (self.brain.ball.x < Constants.FIELD_WHITE_LEFT_SIDELINE_X + 
-             NEAR_LINE_THRESH) or 
+            # if BALL is nearing left sideline
+            (self.brain.ball.x < NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X + 
+             PBConstants.NEAR_LINE_THRESH) or 
             # if ball is nearing right sideline
-            (self.brain.ball.x > Constants.FIELD_WHITE_RIGHT_SIDELINE_X -
-             NEAR_LINE_THRESH) or
+            (self.brain.ball.x > NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X -
+             PBConstants.NEAR_LINE_THRESH) or
             # if ball is left of goalbox AND
-            (self.brain.ball.x < Constants.GOALBOX_LEFT_X and 
+            (self.brain.ball.x < NogginConstants.GOALBOX_LEFT_X and 
              # ball is nearing top sideline OR
-             ((self.brain.ball.y > Constants.FIELD_WHITE_TOP_SIDELINE_Y - 
-               NEAR_LINE_THRESH) or 
+             ((self.brain.ball.y > NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - 
+               PBConstants.NEAR_LINE_THRESH) or 
               # ball is nearing bottom sideline
-              (self.brain.ball.y < Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-               NEAR_LINE_THRESH))) or
+              (self.brain.ball.y < NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
+               PBConstants.NEAR_LINE_THRESH))) or
             # if ball is right of goalbox AND
-            (self.brain.ball.x > Constants.GOALBOX_RIGHT_X and 
+            (self.brain.ball.x > NogginConstants.GOALBOX_RIGHT_X and 
              # ball is nearing top sideline OR
-             ((self.brain.ball.y > Constants.FIELD_WHITE_TOP_SIDELINE_Y - 
-               NEAR_LINE_THRESH) or 
+             ((self.brain.ball.y > NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - 
+               PBConstants.NEAR_LINE_THRESH) or 
               # ball is nearing bottom sideline
-              (self.brain.ball.y < Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-               NEAR_LINE_THRESH)))
+              (self.brain.ball.y < NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
+               PBConstants.NEAR_LINE_THRESH)))
             )
 
     def getPointBetweenBallAndGoal(self,dist_from_ball):
         '''returns defensive position between ball (x,y) and goal (x,y)
         at <dist_from_ball> centimeters away from ball'''
-        delta_x = self.brain.ball.x - Constants.LANDMARK_MY_GOAL_X
-        delta_y = self.brain.ball.y - Constants.LANDMARK_MY_GOAL_Y
+        delta_x = self.brain.ball.x - NogginConstants.LANDMARK_MY_GOAL_X
+        delta_y = self.brain.ball.y - NogginConstants.LANDMARK_MY_GOAL_BOTTOM_Y
         
         pos_x = self.brain.ball.x - (dist_from_ball/
                                      hypot(delta_x,delta_y))*delta_x
         pos_y = self.brain.ball.y - (dist_from_ball/
                                      hypot(delta_x,delta_y))*delta_y
-        if pos_y > DEFENSIVE_MIDFIELD_Y:
-            pos_y = DEFENSIVE_MIDFIELD_Y
-            pos_x = (Constants.LANDMARK_MY_GOAL_X + delta_x / delta_y *
-                     (DEFENSIVE_MIDFIELD_Y - 
-                      Constants.LANDMARK_MY_GOAL_Y))
+        if pos_y > PBConstants.DEFENSIVE_MIDFIELD_Y:
+            pos_y = PBConstants.DEFENSIVE_MIDFIELD_Y
+            pos_x = (NogginConstants.LANDMARK_MY_GOAL_X + delta_x / delta_y *
+                     (PBConstants.DEFENSIVE_MIDFIELD_Y - 
+                      NogginConstants.LANDMARK_MY_GOAL_BOTTOM_Y))
 
         return pos_x,pos_y
 
@@ -833,7 +760,7 @@ class GoTeam:
         nonChasers = []
 
         for elem in self.teammates:
-            if ( elem.playerNumber != GOALIE_NUMBER and 
+            if ( elem.playerNumber != PBConstants.GOALIE_NUMBER and 
                  elem != chaser_mate and 
                  elem.playerNumber != self.me.playerNumber):
                 nonChasers.append(elem)
@@ -847,7 +774,7 @@ class GoTeam:
         mates = []
         for mate in self.teammates:
             if (not mate.inactive and mate.playerNumber != 
-                GOALIE_NUMBER 
+                PBConstants.GOALIE_NUMBER 
                 and mate != chaser_mate):
                 mates.append(mate)
         return mates
@@ -857,7 +784,7 @@ class GoTeam:
         you. THIS ASSUMES THAT THERE IS ALREADY ONE FIELD PLAYER DEAD'''
         # Figure out who isn't penalized with you
         others = [mate for mate in self.teammates if
-                  mate.playerNumber != GOALIE_NUMBER  and
+                  mate.playerNumber != PBConstants.GOALIE_NUMBER  and
                   mate.playerNumber != self.me.playerNumber and
                   not mate.inactive]
         if others:
@@ -872,7 +799,7 @@ class GoTeam:
         mates = []
         for mate in self.teammates:
             if (not mate.inactive and mate.playerNumber != 
-                GOALIE_NUMBER
+                PBConstants.GOALIE_NUMBER
                 and mate.playerNumber != self.me.playerNumber):
                 mates.append(mate)
         return mates
@@ -883,188 +810,37 @@ class GoTeam:
         """
         # If everyone else is out, let's not go for the ball
         if len(self.getInactiveFieldPlayers()) == \
-                NUM_TEAM_PLAYERS - 1.:
+                NogginConstants.NUM_TEAM_PLAYERS - 1.:
             return False
 
         for mate in self.teammates:
-            if (not mate.inactive and (mate.calledRole == CHASER
+            if (not mate.inactive and (mate.calledRole == PBConstants.CHASER
                                        or mate.calledRole == 
-                                       SEARCHER)):
+                                       PBConstants.SEARCHER)):
                 return False
         return True        
 
     def getGoalDifferential(self):
         '''
         Returns the current goal differential
-            '''
-        return (self.brain.game.myTeam.teamScore - 
-                self.brain.game.theirTeam.teamScore)
-
-    ######################################################
-    ############   Potential Fields Stuff     ############
-    ######################################################
-
-    def getAttractorPosition(self):
-        '''returns position to move to (via pf) + x_eq, y_eq'''
-        x_move, y_move, x_eq, y_eq = \
-            self.pf.movementVectorAt(self.brain.my.x,self.brain.my.y)        
-        return (self.brain.my.x+x_move,self.brain.my.y+y_move,x_eq,y_eq)
-
-    def updateMyCharge(self,position):
-        '''updates my charge (adds if we don't have any, moves otherwise)'''
-        if self.my_charge:
-            self.moveMyCharge(position)
-        else:
-            self.addMyCharge(position)
-
-    def addMyCharge(self,pos):
-        '''adds an attractor point at (x,y) for me to move to'''
-        self.my_charge = self.pf.addPointCharge(Constants.VERY_STRONG * 
-                                                Constants.ATTRACTION,
-                                                Constants.HALF_FIELD,
-                                                pos[0],pos[1])
-        self.my_charge_pos = pos
-
-    def moveMyCharge(self,pos):
-        '''moves my attractor point to (x,y) position'''
-        self.useAttractor = True
-        if not self.my_charge:
-            self.addMyCharge(pos)
-        elif self.my_charge == pos:
-            return
-        else:
-            self.pf.movePointCharge(self.my_charge,pos[0],pos[1])
-            self.my_charge_pos = pos  
-
-    def removeMyCharge(self):
-        '''removes own attractor point'''
-        if self.my_charge:
-            self.pf.removeCharge(self.my_charge)
-            self.my_charge = None
-            self.my_charge_pos = None
-
-    def updateTeammateCharge(self,mate,charge_type):
-        '''updates teammate's charge with proper charge type handling'''
-        # mate has no charge, add charge
-        if not mate.charge:
-            self.addTeammateRepulsor(mate,charge_type)
-        # mate has charge but not the desired type, remove and add
-        elif mate.charge_type != charge_type:
-            self.removeTeammateRepulsor(mate)
-            self.addTeammateRepulsor(mate,charge_type)
-        # mate has a charge, is right type, so just move charge
-        else:
-            self.moveTeammateRepulsor(mate)
-            
-    def addTeammateRepulsor(self,mate,type):
-        '''adds teammate (x,y) as repulsor point according to type of charge'''
-        if type == NORMAL_CHARGE or type == READY_CHARGE:            
-            mate.charge = self.pf.addPointCharge(Constants.VERY_WEAK * 
-                                                 Constants.REPULSION, 
-                                                 Constants.VERY_SMALL_REGION, 
-                                                 mate.x, 
-                                                 mate.y)
-            mate.charge_type = type
-        elif type == CHASER_CHARGE:
-            mate.charge = self.pf.addPointCharge(Constants.STRONG * 
-                                                 Constants.REPULSION, 
-                                                 Constants.SMALL_REGION, 
-                                                 mate.x, 
-                                                 mate.y)
-            mate.charge_type = type
-        elif type == CHASER_TO_GOAL_CHARGE:
-            mate.charge = \
-                self.pf.addSegmentCharge(Constants.VERY_STRONG * 
-                                         Constants.REPULSION,
-                                         Constants.LINE_SPREAD,
-                                         mate.x, mate.y,
-                                         Constants.LANDMARK_OPP_GOAL_X,
-                                         Constants.LANDMARK_OPP_GOAL_Y)
-            mate.charge_type = type
-        elif type == READY_CHARGE and self.closeToReadySpot(mate):
-            mate.charge = self.pf.addPointCharge(Constants.VERY_WEAK *
-                                                 Constants.REPULSION,
-                                                 Constants.UTTERLY_SMALL_REGION,
-                                                 mate.x,
-                                                 mate.y)
-            mate.charge_type = type
-        else:
-            mate.charge = None
-            mate.charge_type = None
-            print "addTeammateRepuslor: unknown charge type"
-                        
-
-    def moveTeammateRepulsor(self,mate):
-        '''moves teammate's repulsor to his new (x,y)'''
-        if (mate.charge_type == NORMAL_CHARGE or
-            mate.charge_type == CHASER_CHARGE or
-            mate.charge_type == READY_CHARGE or
-            mate.charge_type == GOALIE_CHARGE):
-            self.pf.movePointCharge(mate.charge,
-                                    mate.x, 
-                                    mate.y)
-        elif mate.charge_type == CHASER_TO_GOAL_CHARGE:
-            self.pf.moveSegmentCharge(mate.charge,
-                                      mate.x, mate.y,
-                                      Constants.LANDMARK_OPP_GOAL_X,
-                                      Constants.LANDMARK_OPP_GOAL_Y)
-    
-    def removeTeammateRepulsor(self,mate):
-        '''removes teammate repulsor (if he gets penalized/dies)'''
-        if mate.charge:
-            self.pf.removeCharge(mate.charge)
-            mate.charge = None
-            mate.charge_type = None
-
-    def addBallRepulsor(self):
+        '''
         """
-        Adds a charge to avoid the ball 
+        return (self.brain.gameController.myTeam.teamScore - 
+                self.brain.gameController.theirTeam.teamScore)
         """
-        if not self.brain.ball.charge:
-            self.brain.ball.charge = self.pf.addPointCharge(Constants.WEAK*
-                                   Constants.REPULSION,
-                                   Constants.VERY_SMALL_REGION,
-                                   self.brain.ball.x,
-                                   self.brain.ball.y)
-                                           
-    def moveBallRepulsor(self):
-        """
-        Move the charge of the ball to a new location
-        """
-        if self.brain.ball.charge:
-            self.pf.movePointCharge(self.brain.ball.charge,
-                                    self.brain.ball.x,
-                                    self.brain.ball.y)
-        else:
-            self.addBallRepulsor()
+        return 0
 
-    def removeBallRepulsor(self):
-        """
-        Removes the repulsor for the ball
-        """
-        if self.brain.ball.charge:
-            self.pf.removeCharge(self.brain.ball.charge)
-            self.brain.ball.charge = None
 
     def closeToReadySpot(self, mate):
         """
         Determine if a mate is close to the correct ready spot
         """
         return False
-
-    def getMyChargePos(self):
-        '''returns attraction position of the pf'''
-        if self.my_charge_pos:
-            return self.my_charge_pos
-        else:
-            return [self.brain.my.x, self.brain.my.y]
-
     def reset(self):
         '''resets all information stored from teammates'''
-        #print "playbook:: reset!"
-        self.removeMyCharge()
         for i,mate in enumerate(self.teammates):
             mate.reset()
+
 
     def update(self,packet):
         '''public method called by Brain.py to update a teammates' info

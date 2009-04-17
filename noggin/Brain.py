@@ -234,12 +234,11 @@ class Brain(object):
 
     def updateComm(self):
         temp = self.comm.latestComm()
-        self.out.printf(temp)
-        if len(temp) > 0:
-            p = temp[0][3:len(temp[0])]
-            if p != self.my.playerNumber:
-                n = int(temp[0][1])
-                self.ownPlayers[n] = p
+        if len(temp) > 0 and len(temp[0])==17:
+            self.out.printf(temp[0])
+            self.packet = TypeDefs.Packet(temp[0])
+            if self.packet.playerNumber != self.my.playerNumber:
+                self.playbook.me.update(self.packet)
 
     def updateLocalization(self):
         """
@@ -251,7 +250,7 @@ class Brain(object):
 
     # move to comm
     def setPacketData(self):
-        # currently, teamNumber, playerNumber, team color MUST be the first two
+        # currently, teamNumber, playerNumber, team color MUST be the first
         # values passed to comm, whereas all the rest are Python-controlled.
         # eventually, all game-controller set info should be handled by Comm
         # alone, and extra Python stuff put in here
@@ -266,5 +265,6 @@ class Brain(object):
                           self.loc.ballXUncert,
                           self.loc.ballYUncert,
                           self.ball.dist,
-                          0, #self.playbook.currentSubRole,
-                          -1) # Chase Time
+                          self.playbook.role,
+                          self.playbook.currentSubRole,
+                          self.playbook.me.chaseTime) # Chase Time
