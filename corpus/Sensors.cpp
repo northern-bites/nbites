@@ -86,7 +86,9 @@ static void PySensors_update(PySensors *self)
     const Inertial inertial(sensors->getInertial());
     values += inertial.accX, inertial.accY, inertial.accZ,
         inertial.gyrX, inertial.gyrY,
-        inertial.angleX, inertial.angleY;
+        (inertial.angleX*180.0f/M_PI_FLOAT),
+		(inertial.angleY*180.0f/M_PI_FLOAT);
+
 
     for (i = 0; i < (int)values.size(); i++) {
         if (i < PyList_Size(self->inertial))
