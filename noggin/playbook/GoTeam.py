@@ -1,5 +1,5 @@
 
-from math import fabs
+from math import (fabs, hypot)
 
 from . import PBDefs
 from . import PBConstants
@@ -315,6 +315,7 @@ class GoTeam:
         time += ((mate.ballLocDist / PBConstants.CHASE_SPEED) *
                  PBConstants.SEC_TO_MILLIS)
         # add bearing correction time
+        """
         time += ((fabs(mate.ballLocBearing) / PBConstants.CHASE_SPIN) *
                  PBConstants.SEC_TO_MILLIS)
 
@@ -349,7 +350,7 @@ class GoTeam:
         # frames off bonus
         if self.brain.ball.framesOff < 3:
             time -= PBConstants.BALL_NOT_SUPER_OFF_BONUS
-                
+        """
         return time
 
     def determineSupporter(self, otherMates, roleInfo):
