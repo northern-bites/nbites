@@ -69,6 +69,7 @@ typedef ALEnactor EnactorT;
 #include "NaoPose.h"
 #include "synchro.h"
 #include "RoboGuardian.h"
+#include "PyRoboGuardian.h"
 
 /**
  * Preferences class to alter Python settings for our robot system.

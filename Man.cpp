@@ -85,6 +85,11 @@ Man::Man ()
         new Motion<EnactorT>(synchro, enactor, sensors));
     guardian = shared_ptr<RoboGuardian>(
         new RoboGuardian(synchro,sensors, pBroker, motion->getInterface()));
+
+    // give python a pointer to the guardian. Method defined in PyRoboguardian.h
+    set_guardian_pointer(guardian);
+    // initialize python roboguardian module.
+    c_init_roboguardian();
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));

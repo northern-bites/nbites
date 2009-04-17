@@ -25,6 +25,8 @@ from . import robots
 #from .playbook import GoTeam
 from .players import Switch
 
+import _roboguardian
+
 
 class Brain(object):
     """
@@ -47,6 +49,8 @@ class Brain(object):
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion
+        # Get the pointer to the C++ RoboGuardian object for use with Python
+        self.roboguardian = _roboguardian.roboguardian
         # Get our reference to the C++ localization system
         self.loc = Loc()
 
