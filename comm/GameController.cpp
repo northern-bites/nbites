@@ -159,6 +159,15 @@ GameController::team()
   return team;
 }
 
+const TeamInfo
+GameController::teams(uint16 team)
+{
+  pthread_mutex_lock(&mutex);
+  const TeamInfo info = controlData.teams[team];
+  pthread_mutex_unlock(&mutex);
+  return info;
+}
+
 const uint8
 GameController::color()
 {
@@ -302,6 +311,8 @@ extern int PyGameController_set(PyGameController* self, PyObject* val,
     void* closure);
 extern PyObject* PyGameController_players(PyGameController* self,
     PyObject* args);
+extern PyObject* PyGameController_teams(PyGameController* self,
+    PyObject* args);
 
 enum PyGameController_attr {
   GC_TEAM = 0,
@@ -352,6 +363,11 @@ static PyMethodDef PyGameController_methods[] = {
     METH_O,
     "Retrieve a tuple containing the penalty state and remaining seconds for "
     "the given robot"},
+
+  {"teams", reinterpret_cast<PyCFunction>(PyGameController_teams),
+    METH_O,
+    "Retrieve a tuple containing the team color and team score for the given"
+    "team."},
 
   // Sentinel
   {NULL}
@@ -570,4 +586,34 @@ PyGameController_players (PyGameController* self, PyObject* args)
   return t;
 }
 
+PyObject*
+PyGameController_teams (PyGameController* self, PyObject* args)
+{
+  if (!PyInt_Check(args)) {
+    PyErr_Format(PyExc_TypeError,
+        "expected an integer argument (%s given)", args->ob_type->tp_name);
+    return NULL;
+  }
+
+  int i = PyInt_AsLong(args);
+  if (i < 0 || i > 1) {
+    PyErr_Format(PyExc_ValueError, "expected in integer 0 or 1 (%i given)",
+                 i);
+    return NULL;
+  }
+
+  TeamInfo info;
+
+  Py_BEGIN_ALLOW_THREADS;
+  info = self->_gc->teams(i);
+  Py_END_ALLOW_THREADS;
+
+  PyObject *t = PyTuple_New(2);
+  if (t != NULL) {
+    PyTuple_SET_ITEM(t, 0, PyInt_FromLong(info.teamColor));
+    PyTuple_SET_ITEM(t, 1, PyInt_FromLong(info.score));
+  }
+
+  return t;
+}
 #endif
