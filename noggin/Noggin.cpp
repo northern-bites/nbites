@@ -224,7 +224,8 @@ void Noggin::updateLocalization()
     // Build the observations from vision data
     vector<Observation> observations;
     // FieldObjects
-    VisualFieldObject fo = *vision->bgrp;
+    VisualFieldObject fo;
+    fo = *vision->bgrp;
 
     if(fo.getDistance() > 0) {
         Observation seen(fo);
