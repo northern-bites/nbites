@@ -28,6 +28,7 @@ FINDER_TIME_THRESH = 5000
 KICKOFF_PLAY_SWITCH_TIME = 2000. # Time around which we want player 4 to chase
 NUM_TEAM_PLAYERS = 4
 PACKET_DEAD_PERIOD = 5000
+INACTIVE_THRESH = 5000
 
 ####
 #### Role Switching / Tie Breaking ####
@@ -69,24 +70,6 @@ NEAR_LINE_THRESH = 15.
 
 # Special cases for waiting for the ball at half field
 CENTER_FIELD_DIST_THRESH = 125.
-
-####
-#### Potential Fields NogginConstants ####
-####
-
-NUM_TEAMMATE_CHARGE_TYPES = 5
-TEAMMATE_CHARGE_TYPES = dict(zip(range(NUM_TEAMMATE_CHARGE_TYPES), 
-                                 ("NORMAL_CHARGE",
-                                  "READY_CHARGE",
-                                  "CHASER_CHARGE",
-                                  "GOALIE_CHARGE",
-                                  "CHASER_TO_GOAL_CHARGE")))
-# tuple of charge types
-(NORMAL_CHARGE,
- READY_CHARGE,
- CHASER_CHARGE,
- GOALIE_CHARGE,
- CHASER_TO_GOAL_CHARGE) = range(NUM_TEAMMATE_CHARGE_TYPES)
 
 OFFENSIVE_ZONE_Y_LIMIT = NogginConstants.MIDFIELD_Y + 20.
 
