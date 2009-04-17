@@ -28,6 +28,6 @@
 void c_init_roboguardian();
 // C++ backend insertion (must be set before import)
 //    steals a reference to the supplied RoboGuardian
-void set_guardian_pointer (boost::shared_ptr<RoboGuardian> _interface);
+void set_guardian_pointer (boost::shared_ptr<RoboGuardian> guardian_ptr);
 
 #endif

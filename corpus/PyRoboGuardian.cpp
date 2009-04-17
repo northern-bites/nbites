@@ -71,6 +71,6 @@ void c_init_roboguardian () {
 
 }
 
-void set_guardian_pointer (shared_ptr<RoboGuardian> _interface) {
-    roboguardian_pointer = _interface;
+void set_guardian_pointer (shared_ptr<RoboGuardian> guardian_ptr) {
+    roboguardian_pointer = guardian_ptr;
 }
