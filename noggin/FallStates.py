@@ -7,7 +7,7 @@ Fall Protection and Recovery States
 """
 def fallen(guard):
     if guard.firstFrame():
-        x = motion.StiffnessCommand(.85)
+        x = motion.StiffnessCommand(.98)
         guard.brain.motion.sendStiffness(x)
 
     """
@@ -33,7 +33,8 @@ def standup(guard):
         return guard.goNow('standFromBack')
 
     # If on stomach, perform stand up from front
-    elif ( guard.brain.sensors.inertial[6] > guard.FALLEN_THRESH ):asdf
+    elif ( guard.brain.sensors.inertial[6] > guard.FALLEN_THRESH ):
+        return guard.goNow('standFromFront')
     return guard.stay()
 
 def standFromBack(guard):

@@ -29,7 +29,6 @@ class FallController(FSA.FSA):
 #         elif self.brain.guardian.falling:
 #             self.switchTo('falling')
 
-asg
         FSA.FSA.run(self)
 
     def isFallen(self):
