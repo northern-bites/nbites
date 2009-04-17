@@ -407,7 +407,7 @@ c_init_comm (void)
   shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
 
   shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
-  shared_ptr<Pose> pose = shared_ptr<Pose>(new Pose());
+  shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
   shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
 
   PyObject *pcomm = PyComm_new(new Comm(synchro, sensors, vision));
