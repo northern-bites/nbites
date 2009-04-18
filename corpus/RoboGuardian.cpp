@@ -56,6 +56,8 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
       chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
+      leftFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
+      rightFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       // buttonOnCounter(0),buttonOffCounter(0),
 //       lastButtonOnCounter(0),lastButtonOffCounter(0),
 //       buttonClicks(0),
@@ -91,7 +93,7 @@ void RoboGuardian::run(){
         checkFallProtection();
         checkBatteryLevels();
         checkTemperatures();
-        //processChestButtonPushes();
+        processChestButtonPushes();
          usleep(static_cast<useconds_t>(GUARDIAN_FRAME_LENGTH_uS));
     }
 

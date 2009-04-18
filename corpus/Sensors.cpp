@@ -56,7 +56,7 @@ Sensors::Sensors ()
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistance(0.0f), ultraSoundMode(LL),
-      chestButton(0.0f),
+      chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       image(&global_image[0])
 {
     pthread_mutex_init(&angles_mutex, NULL);

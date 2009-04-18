@@ -16,6 +16,7 @@ ClickableButton::ClickableButton(int _fps)
     : fps(_fps),
       buttonOnCounter(0), buttonOffCounter(0),
       lastButtonOnCounter(0),lastButtonOffCounter(0),
+      buttonClicks(0), numClicks(0),
       registeredClickThisTime(false)
 {
     pthread_mutex_init(&button_mutex, NULL);

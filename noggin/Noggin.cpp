@@ -187,7 +187,7 @@ void Noggin::runStep ()
 
 
     //Check button pushes for game controller signals
-    //processGCButtonClicks();
+    processGCButtonClicks();
 
     PROF_ENTER(profiler, P_PYTHON);
 
@@ -322,17 +322,17 @@ void Noggin::updateLocalization()
 }
 
 
+#define DEBUG_NOGGIN_GC
 void Noggin::processGCButtonClicks(){
     static const int ADVANCE_STATES_CLICKS  = 1;
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
 
-    cout << "Debugging click processing" <<endl;
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
         gc->advanceOneState();
         chestButton->getAndClearNumClicks();
 #ifdef DEBUG_NOGGIN_GC
-        cout << "Button pushing advanced GC to state : " << gc->state() <<endl;
+        cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
 #endif
     }
 
