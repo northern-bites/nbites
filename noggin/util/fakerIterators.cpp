@@ -137,7 +137,7 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
     delete visBall;
 }
 
-void iterateObsPath(fstream * obsFile, fstream * locFile, fstream * coreFile,
+void iterateObsPath(fstream * locFile, fstream * coreFile,
                     shared_ptr<LocSystem> loc,
                     vector<PoseEst> * realPoses,
                     vector<BallPose> * ballPoses,
@@ -179,6 +179,55 @@ void iterateObsPath(fstream * obsFile, fstream * locFile, fstream * coreFile,
                         &(*realPoses)[i], &(*ballPoses)[i],
                         ballEKF, *visBall,
                         TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+        printCoreLogLine(coreFile, loc, (*sightings)[i], (*odos)[i],
+                         &(*realPoses)[i], &(*ballPoses)[i],
+                         ballEKF);
+    }
+    delete visBall;
+}
+
+void iterateMCLObsPath(fstream * locFile, fstream * coreFile,
+                       shared_ptr<MCL> loc,
+                       vector<PoseEst> * realPoses,
+                       vector<BallPose> * ballPoses,
+                       vector<MotionModel> * odos,
+                       vector<vector<Observation> > * sightings,
+                       vector<float> * ballDists, vector<float> * ballBearings,
+                       int ball_id)
+
+{
+
+    shared_ptr<BallEKF> ballEKF = shared_ptr<BallEKF>(new BallEKF());
+    MotionModel noMove(0.0, 0.0, 0.0);
+
+    VisualBall * visBall = new VisualBall();
+    visBall->setDistanceWithSD(0.0f);
+    visBall->setBearingWithSD(0.0f);
+    vector<Observation> sx;
+
+    printOutMCLLogLine(locFile, loc, sx, noMove,
+                       &(*realPoses)[0], &(*ballPoses)[0],
+                       ballEKF, *visBall,
+                       TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+
+    printCoreLogLine(coreFile, loc, sx, noMove,
+                     &(*realPoses)[0], &(*ballPoses)[0],
+                     ballEKF);
+
+    for(unsigned int i = 0; i < realPoses->size(); ++i) {
+        // Update the localization sytem
+        loc->updateLocalization((*odos)[i], (*sightings)[i]);
+        visBall->setDistanceWithSD((*ballDists)[i]);
+        visBall->setBearingWithSD((*ballBearings)[i]);
+
+        // Update the EKF ball
+        ballEKF->updateModel(visBall,loc->getCurrentEstimate(),
+                             true);
+
+        printOutMCLLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
+                           &(*realPoses)[i], &(*ballPoses)[i],
+                           ballEKF, *visBall,
+                           TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
         printCoreLogLine(coreFile, loc, (*sightings)[i], (*odos)[i],
                          &(*realPoses)[i], &(*ballPoses)[i],
                          ballEKF);

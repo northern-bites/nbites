@@ -59,7 +59,8 @@ public:
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
-private: // Since this feature is not really production ready
+//private: // Since this feature is not really production ready
+// from George: I removed the private tag, so that Python can call this method
     //setters
     void enableFallProtection(bool _useFallProtection)const //off by default
         { useFallProtection = _useFallProtection; };

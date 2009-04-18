@@ -1,4 +1,5 @@
 import man.motion.SweetMoves as SweetMoves
+import man.motion as motion
 
 FRAME_SAVE_RATE = 5
 NUM_FRAMES_TO_SAVE = 150
@@ -10,7 +11,7 @@ def gamePlaying(player):
 def saveFrames(player):
     if player.firstFrame():
         player.brain.tracker.switchTo('locPans')
-        player.setSpeed(6,0,0)
+        player.setSpeed(4,0,0)
     if player.counter % FRAME_SAVE_RATE == 0:
         player.brain.sensors.saveFrame()
     if player.counter == 800:
