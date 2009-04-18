@@ -731,7 +731,7 @@ public class WorldControllerPainter implements RobotListener
         LocalizationPacket robot_estimate = LocalizationPacket.
             makeEstimateAndUncertPacket(d.getRobotX(),
                                         d.getRobotY(),
-                                        d.getRobotHeading(),
+                                        d.getRobotHeadingRadians(),
                                         ASSUMED_HEAD_PAN_FOR_UDP_COMMUNICATIONS,
                                         d.getRobotUncertX(),
                                         d.getRobotUncertY(),
