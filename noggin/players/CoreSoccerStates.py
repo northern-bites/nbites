@@ -12,6 +12,11 @@ import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 
 def gamePenalized(player):
+    if player.firstFrame():
+        player.setSpeed(0.,0.,0.)
+        player.setHeads(0.,0.)
+        player.motion.stopBodyMoves()
+        player.brain.tracker.stopHeadMoves()
     return player.stay()
 
 def gameInitial(player):

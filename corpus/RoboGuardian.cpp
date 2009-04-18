@@ -331,9 +331,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
     default:
         //nothing
         cout << Thread::name <<" is leaving "<<nClicks<<" clicks for someone else"<<endl;
-        pthread_mutex_lock(&click_mutex);
-        numClicks = nClicks;
-        pthread_mutex_unlock(&click_mutex);
+        return false;
         break;
     }
     return true;

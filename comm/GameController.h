@@ -64,7 +64,7 @@ public:
 
     //Button 
     void advanceOneState();
-    void toggleTeams();
+    void toggleTeamColor();
     void toggleKickoff();
 
     

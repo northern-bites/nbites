@@ -324,9 +324,9 @@ void GameController::advanceOneState(){
         //do nothing
     }
 }
-void GameController::toggleTeams(){
+void GameController::toggleTeamColor(){
     //switch to the next team
-    setTeam(team() +1 % NUM_TEAMS);
+    setColor(color() +1 % NUM_TEAMS);
 
 }
 
@@ -340,10 +340,10 @@ void GameController::toggleKickoff(){
     }else if(kickOffTeam() == team2){
         setKickOffTeam(team1);
     }else{
-        cout << "GameController:: kickOffTeam is not consistent with TeamInfo"
-             << " Setting kickoff team to " << team1
-             << endl;
-        setKickOffTeam(team1);
+//         cout << "GameController:: kickOffTeam is not consistent with TeamInfo"
+//              << " Setting kickoff team to " << team()
+//              << endl;
+        setKickOffTeam(team());
     }
 }
 //
