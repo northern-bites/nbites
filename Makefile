@@ -66,7 +66,6 @@ VISION_OBJS := $(VISION_SRCS:%.java=%.class)
 SRCS = \
 	$(TOOL_SRCS) \
 	$(CALIBRATE_SRCS) \
-	#$(CLASSIFIER_SRCS) \
 	$(COLOREDIT_SRCS) \
 	$(CONSOLE_DIR) \
 	$(DATA_SRCS) \
@@ -74,11 +73,12 @@ SRCS = \
 	$(GUI_SRCS) \
 	$(IMAGE_SRCS) \
 	$(NET_SRCS) \
-	#$(PEDITOR_SRCS) \
-	#$(SQL_SRCS) \
 	$(VISION_SRCS) \
 	$(WORLDCONTROLLER_SRCS)
-	#$(ZSPACE_SRCS) \
+	#$(CLASSIFIER_SRCS) \
+	#$(PEDITOR_SRCS) \
+	#$(SQL_SRCS) \
+	#$(ZSPACE_SRCS)
 
 OBJS = $(SRCS:.java=.class)
 
