@@ -306,11 +306,15 @@ class RobotData {
     }
 
     public static void swapb_array(byte[] bytes, int offset, int length) {
+      assert length >= 4;
       byte tmp;
-      for (int i = offset; i < length; i++) {
+      for (int i = offset; i < length; i+=4) {
         tmp = bytes[i];
-        bytes[i] = bytes[length - i - 1];
-        bytes[length - i - 1] = tmp;
+        bytes[i    ] = bytes[i + 3];
+        bytes[i + 3] = tmp;
+        tmp = bytes[i + 1];
+        bytes[i + 1] = bytes[i + 2];
+        bytes[i + 2] = tmp;
       }
     }
 
