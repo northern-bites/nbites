@@ -80,8 +80,10 @@ class GoTeam:
         self.aPrioriTeammateUpdate()
 
         # We will always return a strategy
+        temp = self.strategize()
+        self.brain.out.printf(temp)
         self.currentStrategy, self.currentFormation, self.currentRole, \
-            self.currentSubRole, self.position = self.strategize()
+            self.currentSubRole, self.position = temp
 
         # Update all of our new infos
         self.updateStateInfo()
@@ -104,8 +106,6 @@ class GoTeam:
         # Now we look at shorthanded strategies
         elif self.numInactiveMates == 1:
             return Strategies.sOneDown(self)
-        elif self.numInactiveMates == 2:
-            return Strategies.sTwoDown(self)
 
         # Here we have the strategy stuff
         return Strategies.sSpread(self)
@@ -169,7 +169,7 @@ class GoTeam:
 
             # if we are sure that we want to switch into this sub role
             if (self.subRoleOnDeckCounter > 
-                SUB_ROLE_SWITCH_BUFFER):
+                PbConstants.SUB_ROLE_SWITCH_BUFFER):
                 #self.currentSubRole = self.subRoleOnDeck
                 self.subRoleOnDeckCounter = 0
 
@@ -453,7 +453,7 @@ class GoTeam:
                 return positions[1]
 
         # We have three positions, 6 possibilities
-        elif len(positions) == 3:
+        else:
             # Pseudo 2d array to hold the 3 dogs dists to the 3 positions
             dog2, dog3, dog4 = [], [], []
             dog_distances = [dog2,dog3,dog4]
@@ -498,87 +498,6 @@ class GoTeam:
 
             return chosenPositions
 
-        # This is going to work for four positions now
-        else:
-            dog2, dog3, dog4, dog5 = [], [], [], []
-            dog_distances = [dog2,dog3,dog4,dog5]
-
-            # Determine all distances to all places
-            for i,dog in enumerate(dog_distances):
-                dog_number = i+2
-                x, y = 0.0, 0.0
-                # use either my estimate or teammates'
-                if dog_number == self.me.playerNumber:
-                    x = self.brain.my.x
-                    y = self.brain.my.y
-                else:
-                    x = self.teammates[dog_number-1].x
-                    y = self.teammates[dog_number-1].y
-                for p in positions:
-                    dog.append([hypot(p[0] - x, p[1] - y), p])
-
-            # Here are the 24 possible combinations of distances
-            distances = [(dog2[0][0] + dog3[1][0] + dog4[2][0] + dog5[3][0],
-                          dog2[0][1],  dog3[1][1],  dog4[2][1],  dog5[3][1]),
-                         (dog2[0][0] + dog3[1][0] + dog4[3][0] + dog5[2][0],
-                          dog2[0][1],  dog3[1][1],  dog4[3][1],  dog5[2][1]),
-                         (dog2[0][0] + dog3[2][0] + dog4[1][0] + dog5[3][0],
-                          dog2[0][1],  dog3[2][1],  dog4[1][1],  dog5[3][1]),
-                         (dog2[0][0] + dog3[2][0] + dog4[3][0] + dog5[1][0],
-                          dog2[0][1],  dog3[2][1],  dog4[3][1],  dog5[1][1]),
-                         (dog2[0][0] + dog3[3][0] + dog4[1][0] + dog5[2][0],
-                          dog2[0][1],  dog3[3][1],  dog4[1][1],  dog5[2][1]),
-                         (dog2[0][0] + dog3[3][0] + dog4[2][0] + dog5[1][0],
-                          dog2[0][1],  dog3[3][1],  dog4[2][1],  dog5[1][1]),
-
-                         (dog2[1][0] + dog3[0][0] + dog4[2][0] + dog5[3][0],
-                          dog2[1][1],  dog3[0][1],  dog4[2][1],  dog5[3][1]),
-                         (dog2[1][0] + dog3[0][0] + dog4[3][0] + dog5[2][0],
-                          dog2[1][1],  dog3[0][1],  dog4[3][1],  dog5[2][1]),
-                         (dog2[1][0] + dog3[2][0] + dog4[0][0] + dog5[3][0],
-                          dog2[1][1],  dog3[2][1],  dog4[0][1],  dog5[3][1]),
-                         (dog2[1][0] + dog3[2][0] + dog4[3][0] + dog5[0][0],
-                          dog2[1][1],  dog3[2][1],  dog4[3][1],  dog5[0][1]),
-                         (dog2[1][0] + dog3[3][0] + dog4[0][0] + dog5[2][0],
-                          dog2[1][1],  dog3[3][1],  dog4[0][1],  dog5[2][1]),
-                         (dog2[1][0] + dog3[3][0] + dog4[2][0] + dog5[0][0],
-                          dog2[1][1],  dog3[3][1],  dog4[2][1],  dog5[0][1]),
-
-                         (dog2[2][0] + dog3[0][0] + dog4[1][0] + dog5[3][0],
-                          dog2[2][1],  dog3[0][1],  dog4[1][1],  dog5[3][1]),
-                         (dog2[2][0] + dog3[0][0] + dog4[3][0] + dog5[1][0],
-                          dog2[2][1],  dog3[0][1],  dog4[3][1],  dog5[1][1]),
-                         (dog2[2][0] + dog3[1][0] + dog4[0][0] + dog5[3][0],
-                          dog2[2][1],  dog3[1][1],  dog4[0][1],  dog5[3][1]),
-                         (dog2[2][0] + dog3[1][0] + dog4[3][0] + dog5[0][0],
-                          dog2[2][1],  dog3[1][1],  dog4[3][1],  dog5[0][1]),
-                         (dog2[2][0] + dog3[3][0] + dog4[0][0] + dog5[1][0],
-                          dog2[2][1],  dog3[3][1],  dog4[0][1],  dog5[1][1]),
-                         (dog2[2][0] + dog3[3][0] + dog4[1][0] + dog5[0][0],
-                          dog2[2][1],  dog3[3][1],  dog4[1][1],  dog5[0][1]),
-
-                         (dog2[3][0] + dog3[0][0] + dog4[1][0] + dog5[2][0],
-                          dog2[3][1],  dog3[0][1],  dog4[1][1],  dog5[2][1]),
-                         (dog2[3][0] + dog3[0][0] + dog4[2][0] + dog5[1][0],
-                          dog2[3][1],  dog3[0][1],  dog4[2][1],  dog5[1][1]),
-                         (dog2[3][0] + dog3[1][0] + dog4[0][0] + dog5[2][0],
-                          dog2[3][1],  dog3[1][1],  dog4[0][1],  dog5[2][1]),
-                         (dog2[3][0] + dog3[1][0] + dog4[2][0] + dog5[0][0],
-                          dog2[3][1],  dog3[1][1],  dog4[2][1],  dog5[0][1]),
-                         (dog2[3][0] + dog3[2][0] + dog4[0][0] + dog5[1][0],
-                          dog2[3][1],  dog3[2][1],  dog4[0][1],  dog5[1][1]),
-                         (dog2[3][0] + dog3[2][0] + dog4[1][0] + dog5[0][0],
-                          dog2[3][1],  dog3[2][1],  dog4[1][1],  dog5[0][1])]
-
-            # We must find the least weight choice from the 24 possibilities
-            min_dist = NogginConstants.FIELD_HEIGHT*3
-            chosenPositions = None
-            for i,d in enumerate(distances):
-                if d[0] < min_dist:
-                    min_dist = d[0]
-                    chosenPositions = d
-
-            return chosenPositions
 
     ######################################################
     ############       Teammate Stuff     ################
@@ -599,6 +518,8 @@ class GoTeam:
         for mate in self.teammates:
             if (self.isTeammateDead(mate)):# or self.isTeammatePenalized(mate)):
                 mate.inactive = True
+            if (mate.ballDist > 0):
+                self.brain.ball.reportBallSeen()
 
         self.inactiveMates = self.getInactiveFieldPlayers()
         self.numInactiveMates = len(self.inactiveMates)
@@ -826,12 +747,11 @@ class GoTeam:
         Returns the current goal differential
         '''
         """
-        return (self.brain.gameController.myTeam.teamScore - 
-                self.brain.gameController.theirTeam.teamScore)
+        return (self.brain.gameController.gc.teams(0)[0] - 
+                self.brain.gameController.gc.teams(1)[1][1])
         """
         return 0
-
-
+        
     def closeToReadySpot(self, mate):
         """
         Determine if a mate is close to the correct ready spot

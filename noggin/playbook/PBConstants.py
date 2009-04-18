@@ -101,7 +101,7 @@ SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
 NUM_SUB_ROLES = 36
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
-                                            #OFFENDER SUB ROLES
+                                            #OFFENDER SUB ROLES 1-9
                                             "LEFT_WING",
                                             "RIGHT_WING",
                                             "LEFT_STRIKER",
@@ -112,7 +112,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "RIGHT_SIDELINE_O",
                                             "LEFT_SIDELINE_O",
 
-                                            # MIDDIE SUB ROLES
+                                            # MIDDIE SUB ROLES 10-15
                                             "LEFT_O_MIDDIE",
                                             "RIGHT_O_MIDDIE",
                                             "CENTER_O_MIDDIE",
@@ -120,7 +120,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "RIGHT_D_MIDDIE",
                                             "CENTER_D_MIDDIE",
 
-                                            # DEFENDER SUB ROLES
+                                            # DEFENDER SUB ROLES 16-21
                                             "STOPPER",
                                             "DEEP_STOPPER",
                                             "SWEEPER",
@@ -128,25 +128,25 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "LEFT_DEEP_BACK",
                                             "RIGHT_DEEP_BACK",
 
-                                            # CHASER SUB ROLES
+                                            # CHASER SUB ROLES 22-23
                                             "CHASE_NORMAL",
                                             "CHASE_AROUND_BOX",
 
-                                            # FINDER SUB ROLES
+                                            # FINDER SUB ROLES 24-27
                                             "FRONT_FINDER",
                                             "LEFT_FINDER",
                                             "RIGHT_FINDER",
                                             "OTHER_FINDER",
 
-                                            # GOALIE SUB ROLE
+                                            # GOALIE SUB ROLE 28
                                             "GOALIE_SUB_ROLE",
 
-                                            # KICKOFF SUB ROLES
+                                            # KICKOFF SUB ROLES 29-31
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
                                             "KICKOFF_MIDDIE",
 
-                                            # READY SUB ROLES
+                                            # READY SUB ROLES 32-35
                                             "READY_CHASER",
                                             "READY_DEFENDER",
                                             "READY_OFFENDER",
