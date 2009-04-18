@@ -288,4 +288,21 @@ class RobotData {
     public Integer getCalledSubRole() {
 	return calledSubRole;
     }
+
+    public static int swapb_int(int v) {
+        return (v >>> 24) | (v << 24) |
+              ((v << 8) & 0x00FF0000) | ((v >> 8) & 0x0000FF00);
+    }
+
+    public static long swapb_long(long x) {
+        return (x>>56) |
+                ((x<<40) & 0x00FF000000000000L) |
+                ((x<<24) & 0x0000FF0000000000L) |
+                ((x<<8)  & 0x000000FF00000000L) |
+                ((x>>8)  & 0x00000000FF000000L) |
+                ((x>>24) & 0x0000000000FF0000L) |
+                ((x>>40) & 0x000000000000FF00L) |
+                (x<<56);
+    }
+
 }
