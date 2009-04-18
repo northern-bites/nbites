@@ -1088,7 +1088,9 @@ public class Calibrate implements DataListener, MouseListener,
         calibratePanel.fixButtons();
         // 0 based indexing.
         calibratePanel.setText("Image " + (f.index()) + " of " +
-                               (f.dataSet().size() - 1));
+                               (f.dataSet().size() - 1) + 
+			       " -  processed in " + visionState.getProcessTime() + 
+			       " micro secs");
     }
 
 

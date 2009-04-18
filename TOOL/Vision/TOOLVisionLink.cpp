@@ -25,6 +25,8 @@
 #include "Structs.h"         // for estimate struct
 #include "VisualFieldObject.h"
 #include "VisualLine.h"
+#include "Common.h"
+
 
 using namespace std;
 using namespace boost;
@@ -66,6 +68,7 @@ extern "C" {
     JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
      jfloatArray jsensors, jbyteArray jtable, jobjectArray thresh_target){
+      
         //Size checking -- we expect the sizes of the arrays to match
         //Base these on the size cpp expects for the image
         unsigned int tlenw =
@@ -121,8 +124,11 @@ extern "C" {
         //get pointer access to the java image array
         jbyte *buf_img = env->GetByteArrayElements( jimg, 0);
         byte * img = (byte *)buf_img; //convert it to a reg. byte array
-        //PROCESS VISION!!
+	//timing the vision process
+	long startTime = micro_time();
+        //PROCESS VISION!! 
         vision.notifyImage(img);
+	long processTime = micro_time() - startTime;
         //vision.drawBoxes();
         env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
@@ -147,6 +153,10 @@ extern "C" {
         }
         //get the id for the java class, so we can get method IDs
         jclass javaClass = env->GetObjectClass(jobj);
+
+	//push the processTime
+	jmethodID setProcessTime = env->GetMethodID(javaClass, "setProcessTime", "(I)V");
+	env->CallVoidMethod(jobj, setProcessTime, (int) processTime);
 
         //push the ball
         jmethodID setBallInfo = env->GetMethodID(javaClass, "setBallInfo", "(DDIIIID)V");

@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.lang.UnsatisfiedLinkError;
 import java.util.Vector;
+import java.util.Date;
 
 import TOOL.Misc.Estimate;
 public class TOOLVisionLink {
@@ -76,6 +77,8 @@ public class TOOLVisionLink {
     private double[] pointLineWidth;
     private int len, curEl;
     static private boolean visionLinkSuccessful;
+    //processTime
+    private int processTime;
 
     public TOOLVisionLink() {
         setImageDimensions(DFLT_IMAGE_WIDTH, DFLT_IMAGE_HEIGHT);
@@ -167,6 +170,7 @@ public class TOOLVisionLink {
     public Vector<VisualCorner> getVisualCorners() { return visualCorners;}
     public Horizon getPoseHorizon(){ return poseHorizon;}
     public int getVisionHorizon(){ return visionHorizon;}
+    public int getProcessTime(){ return processTime;}
     //Native methods:
     native private void cppProcessImage(byte[] img_data, float[] joint_data,
                                         float[] sensors_data,
@@ -268,5 +272,9 @@ public class TOOLVisionLink {
     public void setHorizonInfo(int lx, int ly, int rx, int ry, int visHor){
         poseHorizon = new Horizon(lx, ly, rx, ry);
         visionHorizon = visHor;
+    }
+    //set the processTime
+    public void setProcessTime(int p) {
+	processTime = p;
     }
 }

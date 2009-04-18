@@ -209,6 +209,7 @@ public class VisionState {
     public ThresholdedImageOverlay getThreshOverlay() { return thresholdedOverlay; }
     public ColorTable getColorTable() { return colorTable;  }
     public Ball getBall() { return ball; }
+    public int getProcessTime() { return thresholdedImage.getVisionLink().getProcessTime();}
 
     //setters
     public void setImage(TOOLImage i) { rawImage = i; }

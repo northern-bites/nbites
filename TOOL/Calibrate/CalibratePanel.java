@@ -363,6 +363,10 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         feedback.setText(text);
     }
 
+    public String getText() {
+	return feedback.getText();
+    }
+
 
     public void setColorSelected(byte color) {
         colorSwatches.setSelected(color);
