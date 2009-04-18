@@ -62,6 +62,11 @@ public:
     void setGameState(GCGameState state);
     void setPenalty(GCPenalty penalized);
 
+    //Button 
+    void advanceOneState();
+    void toggleTeams();
+    void toggleKickoff();
+
     
   private:
     // check the validity of the given message and store the data
@@ -75,6 +80,8 @@ public:
     RoboCupGameControlData controlData;
     TeamInfo* myTeam;
     uint8 playerNumber;
+
+    static const uint8 NUM_TEAMS;//2
 
     // thread mutex to enable locking and thread-safe data access
     pthread_mutex_t mutex;

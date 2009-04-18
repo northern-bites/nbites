@@ -11,6 +11,8 @@
 
 using namespace std;
 
+const uint8 GameController::NUM_TEAMS = 2;
+
 bool DEBUG = false;
 
 // print error messages when bad packets are received
@@ -291,6 +293,59 @@ GameController::setPenalty(GCPenalty penalty)
 }
 
 
+
+void GameController::advanceOneState(){
+    const GCGameState currentState = gameState();
+    const GCPenalty currentPenalty  = penalty();
+
+    //From the Nao Rules, when the chest button is pushed
+    //We need to advance the states
+    //TODO: Enable LEDs for this
+    switch(currentState){
+    case STATE_INITIAL:
+        setGameState(STATE_READY);
+        break;
+    case STATE_READY:
+        setGameState(STATE_SET);
+        break;
+    case STATE_SET:
+        setGameState(STATE_PLAYING);
+        break;
+    case STATE_PLAYING:
+        if(currentPenalty == PENALTY_NONE){
+            setPenalty(PENALTY_MANUAL);
+        }else{
+            setPenalty(PENALTY_NONE);
+        }
+        break;
+    case STATE_FINISHED:
+    default:
+        break;
+        //do nothing
+    }
+}
+void GameController::toggleTeams(){
+    //switch to the next team
+    setTeam(team() +1 % NUM_TEAMS);
+
+}
+
+void GameController::toggleKickoff(){
+
+    const uint8 team1 = (controlData.teams[0]).teamNumber;
+    const uint8 team2 = (controlData.teams[1]).teamNumber;
+
+    if(kickOffTeam() == team1){
+        setKickOffTeam(team2);
+    }else if(kickOffTeam() == team2){
+        setKickOffTeam(team1);
+    }else{
+        cout << "GameController:: kickOffTeam is not consistent with TeamInfo"
+             << " Setting kickoff team to " << team1
+             << endl;
+        setKickOffTeam(team1);
+    }
+}
 //
 // Python GameController interface
 // 
