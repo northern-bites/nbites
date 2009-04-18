@@ -8,7 +8,7 @@
 #include "nogginconfig.h"
 #include "PyLoc.h"
 
-#define DEBUG_OBSERVATIONS
+//#define DEBUG_OBSERVATIONS
 #define RUN_LOCALIZATION
 
 using namespace std;
