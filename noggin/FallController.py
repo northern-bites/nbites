@@ -1,6 +1,4 @@
 
-import man.motion as motion
-import man.motion.SweetMoves as SweetMoves
 from . import FallStates
 from .util import FSA
 
@@ -36,7 +34,8 @@ class FallController(FSA.FSA):
         FSA.FSA.run(self)
 
     def isFallen(self):
-        if ( math.fabs(self.brain.sensors.inertial.angleY) > self.FALLEN_THRESH ):
+        inertial = self.brain.sensors.inertial
+        if ( math.fabs(inertial.angleY) > self.FALLEN_THRESH ):
             self.fallCount += 1
             if self.fallCount > self.FALL_COUNT_THRESH:
                 return True
