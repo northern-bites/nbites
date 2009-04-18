@@ -168,7 +168,7 @@ class GoTeam:
 
             # if we are sure that we want to switch into this sub role
             if (self.subRoleOnDeckCounter > 
-                PbConstants.SUB_ROLE_SWITCH_BUFFER):
+                PBConstants.SUB_ROLE_SWITCH_BUFFER):
                 #self.currentSubRole = self.subRoleOnDeck
                 self.subRoleOnDeckCounter = 0
 
@@ -253,7 +253,7 @@ class GoTeam:
             if (mate.grabbing or
                 mate.dribbling or
                 mate.kicking):
-                if DEBUG_DET_CHASER:
+                if PBConstants.DEBUG_DET_CHASER:
                     print "\t grabbing"
                 return mate
 
@@ -325,7 +325,7 @@ class GoTeam:
         # velocity bonus
         if (PBConstants.VB_MIN_REL_VEL_Y < self.brain.ball.relVelY <
             PBConstants.VB_MAX_REL_VEL_Y and
-            0 < self.brain.ball.relY < VB_MAX_REL_Y and
+            0 < self.brain.ball.relY < PBConstants.VB_MAX_REL_Y and
             fabs(self.brain.ball.relX + self.brain.ball.relVelX*
                  (self.brain.ball.relY / self.brain.ball.relVelY)) <
             PBConstants.VB_X_THRESH):
@@ -335,8 +335,8 @@ class GoTeam:
         if mate.y - self.brain.ball.y != 0:
             xDiff = fabs( (mate.x - self.brain.ball.x) /
                           (mate.y - self.brain.ball.y) *
-                          (GOAL_BACK_Y - mate.y) + mate.x -
-                          GOAL_BACK_X)
+                          (NogginConstants.GOAL_BACK_Y - mate.y) + mate.x -
+                          NogginConstants.GOAL_BACK_X)
         else:
             xDiff = 0
 
