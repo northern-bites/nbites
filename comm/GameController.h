@@ -6,7 +6,6 @@
 #include <pthread.h>
 #include "GameControllerConfig.h"
 #include "RoboCupGameControlData.h"
-#include "Sensors.h"
 
 class GameController;
 
@@ -44,6 +43,7 @@ public:
 
     // Public data access interface
     const uint8 team();
+    const TeamInfo teams(uint16 team);
     const uint8 color();
     const uint8 player();
     const uint8 kickOffTeam();

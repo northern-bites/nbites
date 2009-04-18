@@ -13,6 +13,7 @@ from man.corpus import leds, sensors
 from man.motion import MotionConstants
 # Modules from this directory
 from . import GameController
+from . import FallController
 from . import HeadTracking
 from . import Navigator
 from .util import NaoOutput
@@ -70,6 +71,7 @@ class Brain(object):
         self.nav = Navigator.Navigator(self)
         #self.playbook = GoTeam.GoTeam(self)
         self.gameController = GameController.GameController(self)
+        self.fallController = FallController.FallController(self)
 
         # Functional Variables
         self.my.teamNumber = self.comm.gc.team
@@ -168,6 +170,7 @@ class Brain(object):
 
         # Behavior stuff
         self.gameController.run()
+        #self.fallController.run() #not ready for prime time yet
         self.player.run()
         self.tracker.run()
         self.nav.run()
