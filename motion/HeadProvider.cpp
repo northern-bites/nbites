@@ -35,7 +35,11 @@ HeadProvider::HeadProvider(float motionFrameLength, shared_ptr<Sensors> s)
 	  chopper(sensors, FRAME_LENGTH_S),
       nextJoints(),
 	  currCommand(new ChoppedCommand() ),
-	  headCommandQueue()
+	  headCommandQueue(),
+	  curMode(SCRIPTED),
+	  yawDest(0.0f), pitchDest(0.0f),
+	  lastYawDest(0.0f), lastPitchDest(0.0f),
+	  pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f)
 {
     pthread_mutex_init (&scripted_mode_mutex, NULL);
     pthread_mutex_init (&set_mode_mutex, NULL);
@@ -91,11 +95,11 @@ void HeadProvider::setMode(){
 
     //Calculate how much we can move toward the goal
     const float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
-                                               -MAX_HEAD_VEL,
-                                               MAX_HEAD_VEL);
+                                               - yawMaxSpeed,
+                                               yawMaxSpeed);
     const float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
-                                                 -MAX_HEAD_VEL,
-                                                 MAX_HEAD_VEL);
+                                                 -pitchMaxSpeed,
+                                                 pitchMaxSpeed);
 #ifdef DEBUG_HEADPROVIDER
      cout << "Last values "<<endl
           <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
@@ -132,6 +136,8 @@ void HeadProvider::setCommand(const SetHeadCommand *command) {
     transitionTo(SET);
     yawDest = command->getYaw();
     pitchDest = command->getPitch();
+	yawMaxSpeed = command->getMaxSpeedYaw();
+	pitchMaxSpeed = command->getMaxSpeedPitch();
     setActive();
     pthread_mutex_unlock(&set_mode_mutex);
 }

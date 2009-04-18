@@ -130,6 +130,19 @@ const vector<float> Sensors::getVisionBodyAngles() const
     return vec;
 }
 
+const vector<float> Sensors::getMotionBodyAngles_degs () const
+{
+    pthread_mutex_lock (&motion_angles_mutex);
+
+    vector<float> vec(motionBodyAngles);
+
+    pthread_mutex_unlock (&motion_angles_mutex);
+
+    // Convert the angles from radians to degrees
+    std::for_each(vec.begin(), vec.end(), _1 = _1 * TO_DEG);
+
+    return vec;
+}
 
 const vector<float> Sensors::getMotionBodyAngles() const
 {

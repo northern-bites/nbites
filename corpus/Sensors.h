@@ -92,6 +92,7 @@ class Sensors {
     const std::vector<float> getBodyAngles_degs() const;
     const std::vector<float> getVisionBodyAngles() const;
     const std::vector<float> getMotionBodyAngles() const;
+	const std::vector<float> getMotionBodyAngles_degs() const;
     const std::vector<float> getBodyTemperatures() const;
     const float getBodyAngle(const int index) const;
     const std::vector<float> getBodyAngleErrors() const ;

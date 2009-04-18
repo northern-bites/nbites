@@ -1,7 +1,5 @@
 
-import math
-
-from man import motion 
+from man import motion
 from man.motion import MotionConstants
 
 DEBUG = False
@@ -60,18 +58,18 @@ def tracking(tracker):
         #should this be based on distance?
         angleToCover = abs(angleToCover)
         if angleToCover > 8:
-            return 0.5*tracker.gain
+            return 0.3*tracker.gain
         if angleToCover > 4:
-            return .5*tracker.gain
-        if angleToCover > .5:
             return .2*tracker.gain
+        if angleToCover > .5:
+            return .1*tracker.gain
         return 0.
 
     xGain = getGain(changeX)
     yGain = getGain(changeY)
 
-    curPitch = tracker.brain.sensors.angles[MotionConstants.HeadPitch]
-    curYaw = tracker.brain.sensors.angles[MotionConstants.HeadYaw]
+    curPitch = tracker.brain.sensors.motionAngles[MotionConstants.HeadPitch]
+    curYaw = tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw]
 
     if DEBUG:
         print "curHead (%g,%g), gain (%g,%g) change (%g,%g)" %\
@@ -83,8 +81,8 @@ def tracking(tracker):
     safeChangeX = clip(changeX,-maxChange,maxChange )
     safeChangeY = clip(changeY,-maxChange,maxChange )
 
-    newYaw = curYaw + safeChangeX
-    newPitch = curPitch - safeChangeY
+    newYaw = curYaw + safeChangeX/3
+    newPitch = curPitch - safeChangeY/3
 
     if newYaw < 0:
         newYaw = max(newYaw,-80.0)
@@ -94,9 +92,11 @@ def tracking(tracker):
     if DEBUG:
         print "target: x %g, y%g" % (newYaw,newPitch)
 
+    maxSpeed = 2.0
     #motion.stopHeadMoves()
     #headMove = motion.HeadJointCommand(.15,(newYaw,newPitch),1)
-    headMove = motion.SetHeadCommand(newYaw,newPitch)
+    headMove = motion.SetHeadCommand(newYaw,newPitch,
+                                     maxSpeed, maxSpeed)
     tracker.brain.motion.setHead(headMove)
 
     return tracker.stay()
@@ -108,7 +108,7 @@ def activeTracking(tracker):
     if ball.framesOn > 30 and tracker.framesSinceActiveLoc > 45: #ball vel?
         tracker.framesSinceActiveLoc = 0
         return tracker.goNow('panLeftOnce')
-    
+
     return tracker.goNow('tracking')
 
 
