@@ -30,12 +30,13 @@ def standup(guard):
     """
     Performs the appropriate standup routine
     """
+    inertial = guard.brain.sensors.inertial
     # If on back, perform back stand up
-    if ( guard.brain.sensors.inertial.angleY < -guard.FALLEN_THRESH ):
+    if ( inertial.angleY < -guard.FALLEN_THRESH ):
         return guard.goNow('standFromBack')
 
     # If on stomach, perform stand up from front
-    elif ( guard.brain.sensors.inertial.angleY > guard.FALLEN_THRESH ):
+    elif ( inertial.angleY > guard.FALLEN_THRESH ):
         return guard.goNow('standFromFront')
     return guard.stay()
 
