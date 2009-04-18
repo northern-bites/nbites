@@ -88,10 +88,10 @@ public class Robot {
                 return null;
             }
 
-            long timeStamp = input.readLong();
-            int team = input.readInt();
-            int player = input.readInt();
-            int color = input.readInt();
+            long timeStamp = RobotData.swapb_long(input.readLong());
+            int team = RobotData.swapb_int(input.readInt());
+            int player = RobotData.swapb_int(input.readInt());
+            int color = RobotData.swapb_int(input.readInt());
             System.out.println("packet = " + new String(rawData, "ASCII"));
             System.out.println("time = " + timeStamp + ", team = " + team +
                                ", player = " + player + ", color = " + color);
