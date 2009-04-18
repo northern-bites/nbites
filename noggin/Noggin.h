@@ -65,6 +65,10 @@ private:
     PyObject *brain_module;
     PyObject *brain_instance;
     MotionInterface * motion_interface;
+
+    //GC stuff
+    bool registeredGCReset;
+
 // Public members
 public:
     boost::shared_ptr<LocSystem> loc;

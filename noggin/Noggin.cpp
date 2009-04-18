@@ -24,7 +24,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
       error_state(false), brain_module(NULL), brain_instance(NULL),
-      motion_interface(_minterface)
+      motion_interface(_minterface),registeredGCREset(false)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -327,7 +327,7 @@ void Noggin::processGCButtonClicks(){
     static const int ADVANCE_STATES_CLICKS  = 1;
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
-
+    static const float REVERT_TO_INITIAL_TIME = 3.0f;
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
@@ -362,5 +362,16 @@ void Noggin::processGCButtonClicks(){
             cout << "OFF KICKOFF" <<endl;
 #endif
     }
+
+
+    if(rightFootButton->getClickLength() > REVERT_TO_INITIAL_TIME &&
+       leftFootButton->getClickLength() > REVERT_TO_INITIAL_TIME &&
+        !registeredGCReset){
+        registeredGCReset = true;
+        gc->setState(STATE_INTITIAL);
+    }else{
+        registeredGCReset = false;
+    }
+
 
 }
