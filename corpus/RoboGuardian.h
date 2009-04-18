@@ -69,13 +69,16 @@ public:
     static const int NO_CLICKS;
 
 private:
-    void checkFallProtection();
+    void checkFalling();
+    void checkFallen();
     void checkBatteryLevels();
     void checkTemperatures();
     void countButtonPushes();
+    void processFallingProtection();
     void processChestButtonPushes();
     void processGameControllerPushes();
     bool executeChestClickAction(int);
+    void executeFallProtection();
     void shutoffGains();
     void resetWifiConnection();
     //helpers
@@ -95,10 +98,9 @@ private:
 
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter;
-    mutable int numClicks;
+    bool registeredFalling;
 
-    bool registeredClickThisTime;
-        bool registeredShutdown;
+    bool registeredShutdown;
 
     bool falling, fallen;
     mutable bool useFallProtection;
