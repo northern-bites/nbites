@@ -238,7 +238,7 @@ class Brain(object):
             self.out.printf(temp[0])
             self.packet = TypeDefs.Packet(temp[0])
             if self.packet.playerNumber != self.my.playerNumber:
-                self.playbook.me.update(self.packet)
+                self.playbook.teammates[self.packet.playerNumber-1].update(self.packet)
 
     def updateLocalization(self):
         """

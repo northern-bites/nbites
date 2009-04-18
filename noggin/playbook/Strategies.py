@@ -31,7 +31,7 @@ def sSpread(team):
             return ['sSpread'] + Formations.fDubD(team)
 
         # ball hasn't been seen by me or teammates in a while
-        elif (team.brain.ball.lastTimeSeen > 
+        elif (team.brain.ball.timeSinceSeen() > 
               PBConstants.FINDER_TIME_THRESH): 
               #and team.brain.gameController.getTimeSinceUnpenalized() > 
               #PBConstants.FINDER_TIME_THRESH):
@@ -66,10 +66,10 @@ def sOneDown(team):
     elif team.shouldUseDubD():
         return ['sOneDown'] + Formations.fDubD(team)
 
-    elif (team.brain.ball.lastTimeSeen > 
-          PBConstants.FINDER_TIME_THRESH): 
+    elif (team.brain.ball.timeSinceSeen() >
+          PBConstants.FINDER_TIME_THRESH):
           #and team.brain.gameController.getTimeSinceUnpenalized() > 
           #PBConstants.FINDER_TIME_THRESH):
         return ['sOneDown'] + Formations.fFinder(team)
-
+    team.brain.out.printf(team.brain.ball.timeSinceSeen())
     return ['sOneDown'] + Formations.fOneDown(team)

@@ -5,7 +5,7 @@
 ##
 ##--------------------SWITCH BOARD ----------------#
 ##
-PACKET_HEADER = "borat"
+PACKET_HEADER = "borat_foobar"
 ##### MODULE SWITCHES ####
 USE_VISION = True # Disable if you want faster processing
 

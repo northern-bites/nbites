@@ -186,7 +186,7 @@ class Ball:
         """
         Update the time since we last saw a ball
         """
-        return time.time() - self.lastTimeSeen
+        return (time.time() - self.lastTimeSeen)
 
     def updateLoc(self, loc, teamColor):
         """
