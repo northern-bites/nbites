@@ -419,12 +419,12 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
     def shouldUseDubD(self):
-        return ((self.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X + 5. and
-                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X -5.  and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5.) or
-                (self.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X -5. and
+        return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y -5.  and
+                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y -5. and
+                 self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y + 5. and
                  self.teammates[0].calledRole == PBConstants.CHASER))
 
     def ballInMyGoalBox(self):
@@ -433,55 +433,25 @@ class GoTeam:
         -includes all y values below top of goalbox 
         (so inside the goal is included)
         '''
-        return (self.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X and
+        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_X and
                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
-    
-    def ballNearSideline(self):
-        '''
-        returns True if ball (x,y) is near any sideline. 
-        avoids either goal box
-        '''
-        return (
-            # if BALL is nearing left sideline
-            (self.brain.ball.x < NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X + 
-             PBConstants.NEAR_LINE_THRESH) or 
-            # if ball is nearing right sideline
-            (self.brain.ball.x > NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X -
-             PBConstants.NEAR_LINE_THRESH) or
-            # if ball is left of goalbox AND
-            (self.brain.ball.x < NogginConstants.GOALBOX_LEFT_X and 
-             # ball is nearing top sideline OR
-             ((self.brain.ball.y > NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - 
-               PBConstants.NEAR_LINE_THRESH) or 
-              # ball is nearing bottom sideline
-              (self.brain.ball.y < NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-               PBConstants.NEAR_LINE_THRESH))) or
-            # if ball is right of goalbox AND
-            (self.brain.ball.x > NogginConstants.GOALBOX_RIGHT_X and 
-             # ball is nearing top sideline OR
-             ((self.brain.ball.y > NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - 
-               PBConstants.NEAR_LINE_THRESH) or 
-              # ball is nearing bottom sideline
-              (self.brain.ball.y < NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-               PBConstants.NEAR_LINE_THRESH)))
-            )
 
     def getPointBetweenBallAndGoal(self,dist_from_ball):
         '''returns defensive position between ball (x,y) and goal (x,y)
         at <dist_from_ball> centimeters away from ball'''
-        delta_x = self.brain.ball.x - NogginConstants.MY_GOAL_X
-        delta_y = self.brain.ball.y - NogginConstants.MY_GOAL_BOTTOM_Y
+        delta_y = self.brain.ball.y - NogginConstants.MY_GOAL_MIDDLE_Y
+        delta_X = self.brain.ball.x - NogginConstants.MY_GOAL_LEFT_X
         
         pos_x = self.brain.ball.x - (dist_from_ball/
                                      hypot(delta_x,delta_y))*delta_x
         pos_y = self.brain.ball.y - (dist_from_ball/
                                      hypot(delta_x,delta_y))*delta_y
-        if pos_y > PBConstants.DEFENSIVE_MIDFIELD_Y:
-            pos_y = PBConstants.DEFENSIVE_MIDFIELD_Y
-            pos_x = (NogginConstants.MY_GOAL_X + delta_x / delta_y *
-                     (PBConstants.DEFENSIVE_MIDFIELD_Y - 
-                      NogginConstants.MY_GOAL_BOTTOM_Y))
+        if pos_x > PBConstants.STOPPER_MAX_X:
+            pos_x = PBConstants.STOPPER_MAX_X
+            pos_y = (NogginConstants.MY_GOAL_X + delta_x / delta_y *
+                     (PBConstants.STOPPER_MAX_X - 
+                      NogginConstants.MY_GOAL_LEFT_X))
 
         return pos_x,pos_y
 
@@ -526,16 +496,6 @@ class GoTeam:
                 return False
         return True        
 
-    def getGoalDifferential(self):
-        '''
-        Returns the current goal differential
-        '''
-        """
-        return (self.brain.gameController.gc.teams(0)[0] - 
-                self.brain.gameController.gc.teams(1)[1][1])
-        """
-        return 0
-        
     def reset(self):
         '''resets all information stored from teammates'''
         for i,mate in enumerate(self.teammates):

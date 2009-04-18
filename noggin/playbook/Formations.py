@@ -40,17 +40,9 @@ def fDubD(team):
 
         # Determine if we should have two defenders or a defender 
         # and a middie dependent on score differential
-        if team.getGoalDifferential() >= 2:
-            pos1 = (PBConstants.SWEEPER_X, PBConstants.SWEEPER_Y)
-            currentCenterMidX = team.brain.clip(team.brain.ball.x, 
-                                       PBConstants.CENTER_MID_LEFT_LIMIT, 
-                                       PBConstants.CENTER_MID_RIGHT_LIMIT)
-            pos2 = (currentCenterMidX, 
-                    PBConstants.OFFENSIVE_CENTER_MIDFIELD_Y)
-        else:
-            pos1 = PBConstants.LEFT_DEEP_BACK_POS
-            pos2 = PBConstants.RIGHT_DEEP_BACK_POS
-            team.me.role = PBConstants.DEFENDER
+        pos1 = PBConstants.LEFT_DEEP_BACK_POS
+        pos2 = PBConstants.RIGHT_DEEP_BACK_POS
+        team.me.role = PBConstants.DEFENDER
 
         # Figure out who should go to which position
         pos = team.getLeastWeightPosition((pos1,pos2), other_teammate)
