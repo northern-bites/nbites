@@ -36,7 +36,7 @@ class FallController(FSA.FSA):
         FSA.FSA.run(self)
 
     def isFallen(self):
-        if ( math.fabs(self.brain.sensors.inertial[6]) > self.FALLEN_THRESH ):
+        if ( math.fabs(self.brain.sensors.inertial.angleY) > self.FALLEN_THRESH ):
             self.fallCount += 1
             if self.fallCount > self.FALL_COUNT_THRESH:
                 return True

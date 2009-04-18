@@ -15,13 +15,15 @@ def fallen(guard):
     and puts standup in motion
     """
     # Put player into safe mode
-    guard.brain.player.switchTo('nothing')
+    guard.brain.tracker.stopHeadMoves()
+    guard.brain.player.switchTo('fallen')
     return guard.goNow('standup')
 
 def falling(guard):
     """
     Protect the robot when it is falling.
     """
+    guard.brain.tracker.stopHeadMoves()
     return guard.goNow('nothing')
 
 def standup(guard):
@@ -29,11 +31,11 @@ def standup(guard):
     Performs the appropriate standup routine
     """
     # If on back, perform back stand up
-    if ( guard.brain.sensors.inertial[6] < -guard.FALLEN_THRESH ):
+    if ( guard.brain.sensors.inertial.angleY < -guard.FALLEN_THRESH ):
         return guard.goNow('standFromBack')
 
     # If on stomach, perform stand up from front
-    elif ( guard.brain.sensors.inertial[6] > guard.FALLEN_THRESH ):
+    elif ( guard.brain.sensors.inertial.angleY > guard.FALLEN_THRESH ):
         return guard.goNow('standFromFront')
     return guard.stay()
 

@@ -28,7 +28,7 @@ def walkForward(player):
     if player.firstFrame():
         player.setSpeed(4,0,0)
     if player.counter > WALK_TIME:
-        return player.goLater(doneState)
+        return player.goLater('doneState')
     return player.stay()
 
 def doneState(player):
