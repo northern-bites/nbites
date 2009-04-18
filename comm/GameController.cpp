@@ -326,7 +326,7 @@ void GameController::advanceOneState(){
 }
 void GameController::toggleTeamColor(){
     //switch to the next team
-    setColor(color() +1 % NUM_TEAMS);
+    setColor((color()+1) % NUM_TEAMS);
 
 }
 
