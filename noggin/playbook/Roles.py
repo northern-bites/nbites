@@ -48,23 +48,6 @@ def rSearcher(team):
         else:
             subRole = PBConstants.OTHER_FINDER
 
-        
-        if PBConstants.DEBUG_SEARCHER:
-            print "playerPos: ", playerPos
-        
-        # Our playerNumber - 1 usually returns the correct player
-        offset = 1
-        # If an inactive mate has a lower playerNumber than us
-        # Then we need to take that into account when indexing the list
-        for mate in team.inactiveMates:
-            if mate.playerNumber < team.brain.my.playerNumber:
-                offset += 1
-        
-        pos = playerPos[team.me.playerNumber - offset]
-        
-        if PBConstants.DEBUG_SEARCHER:
-            print "three dogs pSearcher:",pos
-
     return [PBConstants.SEARCHER, subRole, pos[:2]]
 
 def rDefender(team):
