@@ -1,4 +1,5 @@
 
+
 from . import Roles
 from . import SubRoles
 from . import PBConstants
@@ -15,7 +16,7 @@ def fOneDown(team):
         return ['fOneDown'] + Roles.rChaser(team)
     else:
         team.me.role = PBConstants.DEFENDER
-        return ['fOneDown'] + Roles.rDefender(team)
+        return ['fOneddDown'] + Roles.rDefender(team)
 
 def fSpread(team):
     # gets teammate that is chaser (could be me)
@@ -108,8 +109,7 @@ def fReady(team):
     '''kickoff positions'''
 
     # ready state depends on number of players alive
-    team.inactive_teammates
-    num_inactive_teammates = len(inactive_teammates)
+    num_inactive_teammates = len(team.inactive_teammates)
 
     # if two dogs alive, position normally
     if num_inactive_teammates == 0:
@@ -133,5 +133,3 @@ def fTestOffender(team):
     return ['fTestOffender'] + Roles.rOffender(team)
 def fTestChaser(team):
     return ['fTestChaser'] + Roles.rChaser(team)
-
-

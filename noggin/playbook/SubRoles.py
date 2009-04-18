@@ -1,5 +1,6 @@
 
 from . import PBConstants
+from .. import NogginConstants
 # SubRoles for ready state
 
 def pReadyChaser(team):
