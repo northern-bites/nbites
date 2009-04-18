@@ -7,6 +7,16 @@ from . import Strategies
 from .. import NogginConstants
 import time
 
+# ANSI terminal color codes
+# http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html
+RESET_COLORS_CODE = '\033[0m'
+RED_COLOR_CODE = '\033[31m'
+GREEN_COLOR_CODE = '\033[32m'
+YELLOW_COLOR_CODE = '\033[33m'
+BLUE_COLOR_CODE = '\033[34m'
+PURPLE_COLOR_CODE = '\033[35m'
+CYAN_COLOR_CODE = '\033[36m'
+
 class GoTeam:
     """
     This is the class which controls all of our coordinated behavior system.  
@@ -73,6 +83,17 @@ class GoTeam:
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
 
+    def getAction(self):
+        '''called by player behaviors. returns a tuple [x,y] for position and
+        a all other coop info'''
+        if self.isGoalie():
+            self.aPrioriTeammateUpdate()
+            return self.noCalledChaser()
+
+        self.run()
+
+        return tuple(tuple(self.position), self.currentStrategy, self.currentFormation,\
+            self.currentRole, self.currentSubRole)
 
     def run(self):
         """
@@ -97,8 +118,6 @@ class GoTeam:
             return Strategies.sTestDefender(self)
         elif PBConstants.TEST_OFFENDER:
             return Strategies.sTestOffender(self)
-        elif PBConstants.TEST_MIDDIE:
-            return Strategies.sTestMiddie(self)
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
 
@@ -205,20 +224,20 @@ class GoTeam:
     def getTime(self):
         return time.time()
 
-    def printf(self, string):
-        print string
-
-    def getAction(self):
-        '''called by player behaviors. returns a list [x,y,h] for position and
-        a role to play'''
-        if self.isGoalie():
-            self.aPrioriTeammateUpdate()
-            return self.noCalledChaser()
-
-        self.run()
-
-        return list(self.position), self.currentStrategie, \
-            self.currentFormation, self.currentRole, self.currentSubRole
+    def printf(self,outputString, printingColor='purple'):
+        '''FSA print function that allows colors to be specified'''
+        if printingColor == 'red':
+            self.outputFunction(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'blue':
+            self.outputFunction(BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'yellow':
+            self.outputFunction(YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'cyan':
+            self.outputFunction(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'purple':
+            self.outputFunction(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        else:
+            self.outputFunction(str(outputString))
 
     ######################################################
     ############       Role Switching Stuff     ##########
@@ -241,10 +260,6 @@ class GoTeam:
                 mate.inactive or 
                 mate.playerNumber == self.brain.my.playerNumber or 
                 fabs(mate.ballY - self.brain.ball.y) > 150.0):
-#                 (0.0 < self.brain.ball.dist <= 125.0 and                 
-#                  fabs(self.brain.ball.dist - 
-#                       self.brain.getPosDist([mate.ballX, mate.ballY]) > 
-#                       125.0))): 
                 if PBConstants.DEBUG_DET_CHASER:
                     print "\t inactive or goalie or me"
                 continue
@@ -256,48 +271,14 @@ class GoTeam:
                 if PBConstants.DEBUG_DET_CHASER:
                     print "\t grabbing"
                 return mate
-
-            # Calculate chase time locally
-            #mate.chaseTime = self.getChaseTime(mate)
-            """
-            # Tie break stuff
-            if self.me.chaseTime < mate.chaseTime:
-                chaseTimeScale = self.me.chaseTime
-            else:
-                chaseTimeScale = mate.chaseTime
-
-            if ((self.me.chaseTime - mate.chaseTime < 
-                 CALL_OFF_THRESH + 
-                 .15 *chaseTimeScale or
-                (self.me.chaseTime - mate.chaseTime < 
-                 STOP_CALLING_THRESH +
-                 .35 * chaseTimeScale and
-                 self.lastRole == CHASER)) and
-                mate.playerNumber < self.me.playerNumber):
-                if DEBUG_DET_CHASER:
-                    print ("\t #%d @ %g >= #%d @ %g" % 
-                           (mate.playerNumber, mate.chaseTime, 
-                            chaser_mate.playerNumber, 
-                            chaser_mate.chaseTime))
-
-                continue
-            elif (mate.playerNumber > self.me.playerNumber and
-                  mate.chaseTime - self.me.chaseTime < 
-                  LISTEN_THRESH + 
-                  .45 * chaseTimeScale and
-                  mate.calledRole == CHASER):
-                chaser_mate = mate
-
-            # else pick the lowest chaseTime
-            else:
-            if mate.chaseTime < chaser_mate.chaseTime:
-                chaser_mate = mate
-            """
+            # if both robots see the ball use visual distances to ball
             if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
                 (mate.ballDist < chaser_mate.ballDist)):
                 chaser_mate = mate 
+            # use loc distances if both don't have a visual ball
             elif mate.ballLocDist < chaser_mate.ballLocDist:
                 chaser_mate = mate
+            
             if PBConstants.DEBUG_DET_CHASER:
                 print ("\t #%d @ %g >= #%d @ %g" % 
                        (mate.playerNumber, mate.ballDist, 
@@ -308,127 +289,6 @@ class GoTeam:
             print "\t ---- MATE %g WINS" % (chaser_mate.playerNumber)
         # returns teammate instance (could be mine)
         return chaser_mate
-    
-    def getChaseTime(self, mate):
-        '''
-        returns estimated time to get to the ball on a chase
-        '''
-        
-        time = 0.0
-        # add chase forward time
-        time += ((mate.ballLocDist / PBConstants.CHASE_SPEED) *
-                 PBConstants.SEC_TO_MILLIS)
-        # add bearing correction time
-        time += ((fabs(mate.ballLocBearing) / PBConstants.CHASE_SPIN) *
-                 PBConstants.SEC_TO_MILLIS)
-
-        # velocity bonus
-        if (PBConstants.VB_MIN_REL_VEL_Y < self.brain.ball.relVelY <
-            PBConstants.VB_MAX_REL_VEL_Y and
-            0 < self.brain.ball.relY < PBConstants.VB_MAX_REL_Y and
-            fabs(self.brain.ball.relX + self.brain.ball.relVelX*
-                 (self.brain.ball.relY / self.brain.ball.relVelY)) <
-            PBConstants.VB_X_THRESH):
-            time -= PBConstants.VELOCITY_BONUS
-
-        # ball bearing line to goal bonus
-        if mate.y - self.brain.ball.y != 0:
-            xDiff = fabs( (mate.x - self.brain.ball.x) /
-                          (mate.y - self.brain.ball.y) *
-                          (NogginConstants.GOAL_BACK_Y - mate.y) + mate.x -
-                          NogginConstants.GOAL_BACK_X)
-        else:
-            xDiff = 0
-
-        if ( 0. < xDiff < PBConstants.BEARING_SMOOTHNESS and
-             mate.y < self.brain.ball.y):
-            time -= (-PBConstants.BEARING_BONUS/
-                      PBConstants.BEARING_SMOOTHNESS * 
-                      xDiff + PBConstants.BEARING_BONUS)
-        elif 0. < xDiff < PBConstants.BEARING_SMOOTHNESS:
-            time += (-PBConstants.BEARING_BONUS/
-                      PBConstants.BEARING_SMOOTHNESS * 
-                      xDiff + PBConstants.BEARING_BONUS)
-
-        # frames off bonus
-        if self.brain.ball.framesOff < 3:
-            time -= PBConstants.BALL_NOT_SUPER_OFF_BONUS
-
-        return time
-
-    def determineSupporter(self, otherMates, roleInfo):
-        '''
-        return a player object of the closest teammate in otherMates to
-        supportingPos
-        '''
-        supportRole = roleInfo[0]
-        supportingPos = self.position[:]
-        supporterMate = self.me
-        self.me.supportTime = self.getSupportTime(self.me, supportingPos)
-
-        # scroll through the teammates
-        for i, mate in enumerate(otherMates):
-            mate.supportTime = self.getSupportTime(mate, supportingPos)
-
-            # Tie break stuff
-            supportTimeScale = min(self.me.supportTime, mate.supportTime)
-
-            if ((self.me.supportTime - mate.supportTime <
-                 PBConstants.CALL_OFF_THRESH +
-                 .15 *supportTimeScale or
-                (self.me.supportTime - mate.supportTime <
-                 PBConstants.STOP_CALLING_THRESH +
-                 .35 * supportTimeScale and
-                 self.lastRole == supportRole)) and
-                mate.playerNumber < self.me.playerNumber):
-                if PBConstants.DEBUG_DET_SUPPORTER:
-                    print ("\t #%d @ %g >= #%d @ %g" % 
-                           (mate.playerNumber, mate.supportTime,
-                            supporterMate.playerNumber,
-                            supporterMate.supportTime))
-
-                continue
-            elif (mate.playerNumber > self.me.playerNumber and
-                  mate.supportTime - self.me.supportTime <
-                  PBConstants.LISTEN_THRESH +
-                  .45 * supportTimeScale and
-                  mate.calledRole == PBConstants.CHASER):
-                supporterMate = mate
-
-            # else pick the lowest supportTime
-            else:
-                if mate.supportTime < supporterMate.supportTime:
-                    supporterMate = mate
-
-            if PBConstants.DEBUG_DET_SUPPORTER:
-                print ("\t #%d @ %g >= #%d @ %g" %
-                       (mate.playerNumber, mate.supportTime,
-                        supporterMate.playerNumber,
-                        supporterMate.supportTime))
-
-        # returns teammate instance (could be mine)
-        return supporterMate
-
-    def getSupportTime(self, mate, supporterSpot):
-        '''returns estimated time to get to the supporter spot'''
-        
-        time = 0.0
-        
-        positionDist = self.brain.getDist(mate.x, mate.y, supporterSpot[0],
-                                          supporterSpot[1])
-        positionBearing = fabs(self.brain.getOthersRelativeBearing(
-                mate.x, mate.y, mate.h, supporterSpot[0], supporterSpot[1]))
-
-        # Not totally correct, since we move ortho...
-        # add forward time
-        time += ((positionDist / PBConstants.SUPPORT_SPEED) *
-                 PBConstants.SEC_TO_MILLIS)
-
-        # add bearing correction time
-        time += ((positionBearing / PBConstants.SUPPORT_SPIN) *
-                 PBConstants.SEC_TO_MILLIS)
-
-        return time
 
     def getLeastWeightPosition(self,positions, mates = None):
         """
@@ -440,7 +300,7 @@ class GoTeam:
             return positions[0]
 
         # if we have two positions only two possibilites of positions
-        elif len(positions) == 2:
+        else: # len(positions) == 2
             myDist1 = hypot(positions[0][0] - self.brain.my.x,
                             positions[0][1] - self.brain.my.y)
             myDist2 = hypot(positions[1][0] - self.brain.my.x,
@@ -454,53 +314,6 @@ class GoTeam:
                 return positions[0]
             else:
                 return positions[1]
-
-        # We have three positions, 6 possibilities
-        else:
-            # Pseudo 2d array to hold the 3 dogs dists to the 3 positions
-            dog2, dog3, dog4 = [], [], []
-            dog_distances = [dog2,dog3,dog4]
-            mates.append(self.teammates[self.me.playerNumber - 1])
-
-            # get distances from every dog every possible position
-            for i,dog in enumerate(dog_distances):
-                dog_number = mates[i].playerNumber
-                x, y = 0.0, 0.0
-                # use either my estimate or teammates'
-                if dog_number == self.me.playerNumber:
-                    x = self.brain.my.x
-                    y = self.brain.my.y
-                else:
-                    x = self.teammates[dog_number-1].x
-                    y = self.teammates[dog_number-1].y
-
-                for p in positions:
-                    dog.append([hypot(p[0] - x, p[1] - y), p])
-
-            # 6 possible weights and positions
-            distances = [ (dog2[0][0] + dog3[1][0] + dog4[2][0],
-                           dog2[0][1],  dog3[1][1],  dog4[2][1]),
-                          (dog2[1][0] + dog3[2][0] + dog4[0][0],
-                           dog2[1][1],  dog3[2][1],  dog4[0][1]),
-                          (dog2[2][0] + dog3[0][0] + dog4[1][0],
-                           dog2[2][1],  dog3[0][1],  dog4[1][1]),
-                          (dog2[1][0] + dog3[0][0] + dog4[2][0],
-                           dog2[1][1],  dog3[0][1],  dog4[2][1]),
-                          (dog2[2][0] + dog3[1][0] + dog4[0][0],
-                           dog2[2][1],  dog3[1][1],  dog4[0][1]),
-                          (dog2[0][0] + dog3[2][0] + dog4[1][0],
-                           dog2[0][1],  dog3[2][1],  dog4[1][1])]
-
-            # We must find the least weight choice from the 6 possibilities
-            min_dist = NogginConstants.FIELD_HEIGHT*3
-            chosenPositions = None
-            for i,d in enumerate(distances):
-                if d[0] < min_dist:
-                    min_dist = d[0]
-                    chosenPositions = d
-
-            return chosenPositions
-
 
     ######################################################
     ############       Teammate Stuff     ################
@@ -575,18 +388,10 @@ class GoTeam:
 
     def highestActivePlayerNumber(self):
         '''returns true if the player is the highest active player number'''
-        activeMates = self.getOtherActiveTeammates()
-        
-        for mate in activeMates:
-            if mate.playerNumber > self.me.playerNumber:
-                return False
-
+        activeMate = self.getOtherActiveTeammate()
+        if activeMate.playerNumber > self.me.playerNumber:
+            return False
         return True
-
-
-    def getNumPenalizedOpponents(self):
-        '''returns number of penalized robots on opponents team'''
-        return self.brain.gameController.theirTeam.numPenalized
 
     def teammateHasBall(self):
         '''returns True if any mate has the ball'''
@@ -680,30 +485,6 @@ class GoTeam:
 
         return pos_x,pos_y
 
-    def getNonChaserTeammates(self,chaser_mate):
-        '''returns non-chaser teammate with you (assuming three dogs)'''
-        nonChasers = []
-
-        for elem in self.teammates:
-            if ( elem.playerNumber != PBConstants.GOALIE_NUMBER and 
-                 elem != chaser_mate and 
-                 elem.playerNumber != self.me.playerNumber):
-                nonChasers.append(elem)
-
-        return nonChasers
-
-    def getNonChaserPlayers(self, chaser_mate):
-        '''
-        figure out who the other active teammates are
-        '''
-        mates = []
-        for mate in self.teammates:
-            if (not mate.inactive and mate.playerNumber != 
-                PBConstants.GOALIE_NUMBER 
-                and mate != chaser_mate):
-                mates.append(mate)
-        return mates
-
     def getOtherActiveTeammate(self):
         '''this returns the teammate instance of an active teammate that isn't 
         you. THIS ASSUMES THAT THERE IS ALREADY ONE FIELD PLAYER DEAD'''
@@ -755,20 +536,13 @@ class GoTeam:
         """
         return 0
         
-    def closeToReadySpot(self, mate):
-        """
-        Determine if a mate is close to the correct ready spot
-        """
-        return False
     def reset(self):
         '''resets all information stored from teammates'''
         for i,mate in enumerate(self.teammates):
             mate.reset()
 
-
     def update(self,packet):
         '''public method called by Brain.py to update a teammates' info
         with a new packet'''
         self.teammates[packet.playerNumber-1].update(packet)
-
 

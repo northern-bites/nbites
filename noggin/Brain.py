@@ -235,10 +235,9 @@ class Brain(object):
     def updateComm(self):
         temp = self.comm.latestComm()
         if len(temp) > 0 and len(temp[0])==17:
-            self.out.printf(temp[0])
             self.packet = TypeDefs.Packet(temp[0])
             if self.packet.playerNumber != self.my.playerNumber:
-                self.playbook.teammates[self.packet.playerNumber-1].update(self.packet)
+                self.playbook.update(self.packet)
 
     def updateLocalization(self):
         """
