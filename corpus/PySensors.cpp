@@ -80,6 +80,7 @@ BOOST_PYTHON_MODULE(sensors)
         //All the properties lack a setter. The values should be read-only
         //NOTE: all sensor values in Python should be in degrees and centimeters
         .add_property("angles", &Sensors::getBodyAngles_degs)
+		.add_property("motionAngles",&Sensors::getMotionBodyAngles_degs)
         .add_property("leftFootFSR", &Sensors::getLeftFootFSR)
         .add_property("rightFootFSR", &Sensors::getRightFootFSR)
         .add_property("leftFootBumper", &Sensors::getLeftFootBumper)

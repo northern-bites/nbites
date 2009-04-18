@@ -56,8 +56,6 @@ private:
     void stopScripted();
     void stopSet();
 
-    HeadMode curMode;
-    float yawDest,pitchDest,lastYawDest,lastPitchDest;
 
     void setActive();
     bool isDone();
@@ -70,6 +68,11 @@ private:
     boost::shared_ptr<ChoppedCommand> currCommand;
 	// Queue of all future commands
 	std::queue<const HeadJointCommand*> headCommandQueue;
+
+	HeadMode curMode;
+    float yawDest,pitchDest,lastYawDest,lastPitchDest;
+	float pitchMaxSpeed, yawMaxSpeed;
+
 
     pthread_mutex_t scripted_mode_mutex,set_mode_mutex;
 

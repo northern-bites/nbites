@@ -164,6 +164,12 @@ public:
         command = new SetHeadCommand(yaw * TO_RAD, pitch * TO_RAD);
     }
 
+	PySetHeadCommand(const float yaw, const float pitch,
+					 const float maxYawSpeed, const float maxPitchSpeed) {
+        command = new SetHeadCommand(yaw * TO_RAD, pitch * TO_RAD,
+									 maxYawSpeed * TO_RAD, maxPitchSpeed * TO_RAD);
+    }
+
     SetHeadCommand* getCommand() const { return command; }
 private:
     SetHeadCommand *command;
@@ -255,6 +261,8 @@ BOOST_PYTHON_MODULE(_motion)
     class_<PySetHeadCommand>("SetHeadCommand",
                              init<float, float>(args("yaw", "pitch"),
  "A container for a set head command. Holds yaw and pitch angles in degrees."))
+		.def(init<float,float,float,float>(args("yaw","pitch",
+												"maxYawSpeed","maxPitchSpeed")))
         ;
     class_<PyWalkCommand>("WalkCommand",
                           init<float, float, float>(args("x","y","theta"),
