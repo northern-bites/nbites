@@ -66,11 +66,7 @@ def fOneDown(team):
         team.me.role = PBConstants.CHASER
         return ['fOneDown'] + Roles.rChaser(team)
     else:
-        other_teammates = team.getNonChaserTeammates(chaser_mate)
-        # If two robots are inactive, we become defender
         team.me.role = PBConstants.DEFENDER
-        other_teammates[0].role = PBConstants.OFFENDER
-        other_teammates[1].role = PBConstants.MIDDIE
         return ['fOneDown'] + Roles.rDefender(team)
 
 def fSpread(team):
@@ -81,15 +77,9 @@ def fSpread(team):
     # if i am chaser
     if chaser_mate.playerNumber == team.brain.my.playerNumber:
         return ['fSpread'] + Roles.rChaser(team)
-
-    # We now figure out the roles of non-chasers
-    posPlayers = team.getNonChaserTeammates(chaser_mate)
-
     # Get where the defender should be
-    defInfo = Roles.rDefender(team)
-    defPlayer = team.determineSupporter(posPlayers, defInfo)
-
-    if defPlayer.playerNumber == team.brain.my.playerNumber:
+    else:
+        defInfo = Roles.rDefender(team)
         return ['fSpread'] + defInfo
 
 def fDubD(team):

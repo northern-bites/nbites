@@ -67,6 +67,7 @@ class GoTeam:
        
         self.position = []
         self.me = self.teammates[self.brain.my.playerNumber - 1]
+        self.me.playerNumber = self.brain.my.playerNumber
         self.inactiveMates = []
         self.numInactiveMates = 0
         self.kickoffFormation = 0
@@ -80,10 +81,8 @@ class GoTeam:
         self.aPrioriTeammateUpdate()
 
         # We will always return a strategy
-        temp = self.strategize()
-        self.brain.out.printf(temp)
         self.currentStrategy, self.currentFormation, self.currentRole, \
-            self.currentSubRole, self.position = temp
+            self.currentSubRole, self.position = self.strategize()
 
         # Update all of our new infos
         self.updateStateInfo()
@@ -227,10 +226,10 @@ class GoTeam:
     def determineChaser(self):
         '''return the player number of the chaser'''
 
-        chaser_mate = self.teammates[self.me.playerNumber-1]
+        chaser_mate = self.teammates[self.brain.my.playerNumber-1]
 
         if PBConstants.DEBUG_DET_CHASER:
-            print "chaser det: me == #", self.me.playerNumber
+            print "chaser det: me == #", self.brain.my.playerNumber
         # scroll through the teammates
         for i, mate in enumerate(self.teammates):
             if PBConstants.DEBUG_DET_CHASER:
@@ -259,7 +258,7 @@ class GoTeam:
                 return mate
 
             # Calculate chase time locally
-            mate.chaseTime = self.getChaseTime(mate)
+            #mate.chaseTime = self.getChaseTime(mate)
             """
             # Tie break stuff
             if self.me.chaseTime < mate.chaseTime:
@@ -290,15 +289,20 @@ class GoTeam:
                 chaser_mate = mate
 
             # else pick the lowest chaseTime
-            else:"""
+            else:
             if mate.chaseTime < chaser_mate.chaseTime:
                 chaser_mate = mate
-
+            """
+            if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
+                (mate.ballDist < chaser_mate.ballDist)):
+                chaser_mate = mate 
+            elif mate.ballLocDist < chaser_mate.ballLocDist:
+                chaser_mate = mate
             if PBConstants.DEBUG_DET_CHASER:
                 print ("\t #%d @ %g >= #%d @ %g" % 
-                       (mate.playerNumber, mate.chaseTime, 
+                       (mate.playerNumber, mate.ballDist, 
                         chaser_mate.playerNumber, 
-                        chaser_mate.chaseTime))
+                        chaser_mate.ballDist))
 
         if PBConstants.DEBUG_DET_CHASER:
             print "\t ---- MATE %g WINS" % (chaser_mate.playerNumber)
@@ -315,7 +319,6 @@ class GoTeam:
         time += ((mate.ballLocDist / PBConstants.CHASE_SPEED) *
                  PBConstants.SEC_TO_MILLIS)
         # add bearing correction time
-        """
         time += ((fabs(mate.ballLocBearing) / PBConstants.CHASE_SPIN) *
                  PBConstants.SEC_TO_MILLIS)
 
@@ -350,7 +353,7 @@ class GoTeam:
         # frames off bonus
         if self.brain.ball.framesOff < 3:
             time -= PBConstants.BALL_NOT_SUPER_OFF_BONUS
-        """
+
         return time
 
     def determineSupporter(self, otherMates, roleInfo):
@@ -662,8 +665,8 @@ class GoTeam:
     def getPointBetweenBallAndGoal(self,dist_from_ball):
         '''returns defensive position between ball (x,y) and goal (x,y)
         at <dist_from_ball> centimeters away from ball'''
-        delta_x = self.brain.ball.x - NogginConstants.LANDMARK_MY_GOAL_X
-        delta_y = self.brain.ball.y - NogginConstants.LANDMARK_MY_GOAL_BOTTOM_Y
+        delta_x = self.brain.ball.x - NogginConstants.MY_GOAL_X
+        delta_y = self.brain.ball.y - NogginConstants.MY_GOAL_BOTTOM_Y
         
         pos_x = self.brain.ball.x - (dist_from_ball/
                                      hypot(delta_x,delta_y))*delta_x
@@ -671,9 +674,9 @@ class GoTeam:
                                      hypot(delta_x,delta_y))*delta_y
         if pos_y > PBConstants.DEFENSIVE_MIDFIELD_Y:
             pos_y = PBConstants.DEFENSIVE_MIDFIELD_Y
-            pos_x = (NogginConstants.LANDMARK_MY_GOAL_X + delta_x / delta_y *
+            pos_x = (NogginConstants.MY_GOAL_X + delta_x / delta_y *
                      (PBConstants.DEFENSIVE_MIDFIELD_Y - 
-                      NogginConstants.LANDMARK_MY_GOAL_BOTTOM_Y))
+                      NogginConstants.MY_GOAL_BOTTOM_Y))
 
         return pos_x,pos_y
 
