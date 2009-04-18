@@ -729,7 +729,7 @@ Man::waitForImage ()
         ALVisionImage *image = NULL;
 #else
         ALValue image;
-        image.arraySetSize(6);
+        image.arraySetSize(7);
 #endif
 
         data = NULL;
