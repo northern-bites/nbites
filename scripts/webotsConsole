@@ -1,0 +1,2 @@
+LOG_PATH=/var/log/system.log
+tail -f /var/log/system.log | sed -le "s/.*webots\[.*: \(.*\)/   webots:  \1/" | grep webots

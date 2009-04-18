@@ -11,7 +11,7 @@ public class UDPServer extends Thread {
 
     //Default values for the port and the buffer space used in packets
     final static int DEF_BUF = 1024;
-    final static int DEF_PORT = 14501;
+    final static int DEF_PORT = 4000;
 
     private DatagramSocket socket;    // Socket on which server listens
     private boolean receiving;  // Whether this server is currently listening

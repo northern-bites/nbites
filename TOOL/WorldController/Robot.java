@@ -1,9 +1,16 @@
 package TOOL.WorldController;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Vector;
+
 public class Robot {
 
     final static int NUM_MSG_COMPONENTS = 17;
-    final static String HEADER = "borat";
+    final static String HEADER = "borat_foobar";
+    final static int HEADER_DATA_SIZE = HEADER.length() + 1 + 5 * 8;
 
     final static int PACKET_TEAM_HEADER = 0;
     final static int PACKET_TEAM_NUMBER = 1;
@@ -60,73 +67,57 @@ public class Robot {
     }
 
     public static Robot parseData(byte[] rawData, int length) {
-	String data = (new String(rawData,0,200));
-	String[] words = data.split(" ");
-	//System.out.println("parseData: " + data + " length: " + length);
-	if (words.length < NUM_MSG_COMPONENTS) {
-	    System.out.println("UDP PACKET REJECTED: packet: " + data + " length: " + words.length + " < NUM_MSG_COMPONENTS: " + NUM_MSG_COMPONENTS);
-	    return null;
-	}
+        // ensure packet length
+        if (length < HEADER_DATA_SIZE) {
+	    System.out.println("UDP PACKET REJECTED: length: " + length +
+                               " < HEADER_DATA_SIZE: " + HEADER_DATA_SIZE);
+            return null;
+        }
+        // swap endianness of all float values
+        //RobotData.swapb_array(rawData, 32, (length - 32) / 4 * 4);
+        // open data input stream to read raw values
+        DataInputStream input = new DataInputStream(
+                new ByteArrayInputStream(rawData, 0, length));
+        // begin parsing
+        try {
+            // parse header string
+            byte[] rawHeader = new byte[HEADER.length()];
+            input.readFully(rawHeader);
+            String header = new String(rawHeader, "ASCII");
+            if (!header.equals(HEADER)) {
+                System.out.println("UDP PACKET REJECTED: header = " + header);
+                return null;
+            }
+            // parse header data
+            long timeStamp = RobotData.swapb_long(input.readLong());
+            input.readInt();
+            int team = RobotData.swapb_int(input.readInt());
+            int player = RobotData.swapb_int(input.readInt());
+            int color = RobotData.swapb_int(input.readInt());
+            // parse float values
+            Vector<Float> values = new Vector<Float>();
+            while (input.available() > 0)
+                values.add(Float.intBitsToFloat(
+                    RobotData.swapb_int(input.readInt())
+                    ));
 
-	if (words[PACKET_TEAM_HEADER].equals(HEADER)) {
-	    //We don't need to worry about it while its only us in the lab
-	    //return null;
-	    //System.out.println("UDP PACKET ACCEPTED: " + data);
+            return new Robot(team, color, player,
+                             new RobotData(timeStamp, values));
 
-	    try {
-		// See TypeDefs.py Packet: for info about our UDP API
-		Integer team = new Integer(words[PACKET_TEAM_NUMBER]);
-		Integer color = new Integer(words[PACKET_TEAM_COLOR]);
-		Integer number = new Integer(words[PACKET_PLAYER_NUMBER]);
-		Integer time = new Integer(words[PACKET_TIME_STAMP]);
-		Integer robotX =
-		    new Integer((int)Double.parseDouble(words[PACKET_PLAYER_X]));
-		Integer robotY =
-		    new Integer((int)Double.parseDouble(words[PACKET_PLAYER_Y]));
-		Integer robotHeading =
-		    new Integer((int)Double.parseDouble(words[PACKET_PLAYER_H]));
-		Integer robotUncertX =
-		    new Integer((int)Double.parseDouble(words[PACKET_UNCERT_X]));
-		Integer robotUncertY =
-		    new Integer((int)Double.parseDouble(words[PACKET_UNCERT_Y]));
-		Integer robotUncertH =
-		    new Integer((int)Double.parseDouble(words[PACKET_UNCERT_H]));
-		Integer ballX =
-		    new Integer((int)Double.parseDouble(words[PACKET_BALL_X]));
-		Integer ballY =
-		    new Integer((int)Double.parseDouble(words[PACKET_BALL_Y]));
-		Integer ballXUncert =
-		    new Integer((int)Double.parseDouble(words[PACKET_BALL_UNCERT_X]));
-		Integer ballYUncert =
-		    new Integer((int)Double.parseDouble(words[PACKET_BALL_UNCERT_Y]));
-		Integer ballXVel = 0;
-		Integer ballYVel = 0;
-		Integer ballDist = 0;
-		Integer ballTrapped = 0;//new Integer(words[14]);
-		Integer calledSubRole =
-		    new Integer(Integer.parseInt(words[PACKET_ROLE]));
+        }catch(UnsupportedEncodingException e) {
+            System.out.println("ASCII Encoding not supported!!!");
+            return null;
+        }catch(IOException e) {
+            System.out.println("UDP PACKET REJECTED: " + e);
+            return null;
+        }
 
-		return new Robot(team,color,number,new RobotData(time,robotX,robotY,robotHeading,
-							     robotUncertX, robotUncertY,
-							     robotUncertY,
-							     ballX,ballY,
-							     ballXUncert,ballYUncert,
-							     ballXVel,ballYVel,
-							     0,0,calledSubRole));
-	    }catch (Exception e) {
-		e.printStackTrace();
-		return null;
-	    }
-	}
-	else {
-	    System.out.println("UDP PACKET REJECTED B/C OF HEADER: " + words[0]);
-	}
-	return null;
     }
 }
 
 class RobotData {
 
+    // XXX - these need to be changed to Float objects
     private Integer time;
     private Integer robotX;
     private Integer robotY;
@@ -141,6 +132,7 @@ class RobotData {
     private Integer ballDist;
     private boolean ballTrapped;
     private Integer calledSubRole;
+    private Integer chaseTime;
 
     public RobotData() {
 	time = new Integer(0);
@@ -148,14 +140,14 @@ class RobotData {
 	ballY = new Integer(0);
 	ballDist = new Integer(0);
 	ballTrapped = false;
+	ballXVel = new Integer(0);
+	ballYVel = new Integer(0);
 	robotX = new Integer(0);
 	robotY = new Integer(0);
 	robotHeading = new Integer(0);
 	robotUncertX = new Integer(0);
 	robotUncertY = new Integer(0);
 	robotUncertH = new Integer(0);
-	ballXVel = new Integer(0);
-	ballYVel = new Integer(0);
 	calledSubRole = new Integer(0);
     }
 
@@ -182,6 +174,28 @@ class RobotData {
 	this.ballDist = ballDist;
 	this.ballTrapped = (ballTrapped.intValue()==1);
 	this.calledSubRole = calledSubRole;
+    }
+
+    public RobotData(long timeStamp, Vector<Float> values) {
+	time = (int)timeStamp;
+        // see order in man/noggin/Brain.py
+	robotX        = values.get(0).intValue();
+	robotY        = values.get(1).intValue();
+	robotHeading  = values.get(2).intValue();
+	robotUncertX  = values.get(3).intValue();
+	robotUncertY  = values.get(4).intValue();
+	robotUncertH  = values.get(5).intValue();
+	ballX         = values.get(6).intValue();
+	ballY         = values.get(7).intValue();
+        ballXUncert   = values.get(8).intValue();
+        ballYUncert   = values.get(9).intValue();
+        ballDist      = values.get(10).intValue();
+	calledSubRole = values.get(11).intValue();
+        chaseTime     = values.get(12).intValue();
+        // XXX - not currently sending these!
+	ballXVel = new Integer(0);
+	ballYVel = new Integer(0);
+	ballTrapped = false;
     }
 
     //public Integer getIDNumber() {
@@ -250,4 +264,34 @@ class RobotData {
     public Integer getCalledSubRole() {
 	return calledSubRole;
     }
+
+    public static int swapb_int(int v) {
+        return (v >>> 24) | (v << 24) |
+              ((v << 8) & 0x00FF0000) | ((v >> 8) & 0x0000FF00);
+    }
+
+    public static long swapb_long(long x) {
+        return (x>>56) |
+                ((x<<40) & 0x00FF000000000000L) |
+                ((x<<24) & 0x0000FF0000000000L) |
+                ((x<<8)  & 0x000000FF00000000L) |
+                ((x>>8)  & 0x00000000FF000000L) |
+                ((x>>24) & 0x0000000000FF0000L) |
+                ((x>>40) & 0x000000000000FF00L) |
+                (x<<56);
+    }
+
+    public static void swapb_array(byte[] bytes, int offset, int length) {
+      assert length >= 4;
+      byte tmp;
+      for (int i = offset; i < offset + length; i+=4) {
+        tmp = bytes[i];
+        bytes[i    ] = bytes[i + 3];
+        bytes[i + 3] = tmp;
+        tmp = bytes[i + 1];
+        bytes[i + 1] = bytes[i + 2];
+        bytes[i + 2] = tmp;
+      }
+    }
+
 }
