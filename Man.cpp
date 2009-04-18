@@ -770,7 +770,8 @@ Man::waitForImage ()
 
         // Attempt to retrive the next image
         try {
-            image = lem->call<ALValue>("getImageRemote");
+            image = camera->call<ALValue>("getDirectRawImageRemote",
+                                          lem_name);
         }catch (ALError &e) {
             log->error("NaoMain", "Could not call the getImageRemote method of the "
                        "NaoCam module");

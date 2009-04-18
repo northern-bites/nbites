@@ -43,7 +43,7 @@
 
 #ifdef USE_DCM
 
-#  ifdef MAN_IS_REMOTE
+#  if defined USE_DCM && defined MAN_IS_REMOTE
 #    error "DCM not compatible with remote!!!"
 #  endif
 
@@ -54,9 +54,6 @@ typedef NaoEnactor EnactorT;
 typedef ALEnactor EnactorT;
 #endif
 
-#if defined USE_VISION && defined  MAN_IS_REMOTE
-#  error "Vision is not currently compatible with remote"
-#endif
 
 #include "ALTranscriber.h"
 #include "Common.h"
