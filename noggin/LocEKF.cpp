@@ -105,16 +105,16 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     timeUpdate(u);
     limitAPrioriUncert();
 
-    // Remove ambiguous observations
-    std::vector<Observation>::iterator iter = Z.begin();
-    while( iter != Z.end() )
-    {
-        if (iter->getNumPossibilities() > 1 ) {
-            iter = Z.erase( iter );
-        } else {
-            ++iter;
-        }
-    }
+    // // Remove ambiguous observations
+    // std::vector<Observation>::iterator iter = Z.begin();
+    // while( iter != Z.end() )
+    // {
+    //     if (iter->getNumPossibilities() > 1 ) {
+    //         iter = Z.erase( iter );
+    //     } else {
+    //         ++iter;
+    //     }
+    // }
 
     // Correct step based on the observed stuff
     if (Z.size() > 0) {
@@ -183,6 +183,15 @@ void LocEKF::incorporateMeasurement(Observation z,
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "\t\t\tIncorporating measurement " << z << std::endl;
 #endif
+    unsigned int obsIndex;
+
+    // Get the best fit for ambigious data
+    if (z.getNumPossibilities() > 1) {
+        obsIndex = findBestLandmark(&z);
+    } else {
+        obsIndex = 0;
+    }
+
     if (z.getVisDistance() < USE_CARTESIAN_DIST) {
 
 #ifdef DEBUG_LOC_EKF_INPUTS
@@ -190,18 +199,14 @@ void LocEKF::incorporateMeasurement(Observation z,
 #endif
 
         // Convert our sighting to cartesian coordinates
-        float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
-        float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
         MeasurementVector z_x(2);
-
-        z_x(0) = x_b_r;
-        z_x(1) = y_b_r;
+        z_x(0) = z.getVisDistance() * cos(z.getVisBearing());
+        z_x(1) = z.getVisDistance() * sin(z.getVisBearing());
 
         // Get expected values of the post
-        const float x_b = z.getPointPossibilities()[0].x;
-        const float y_b = z.getPointPossibilities()[0].y;
+        const float x_b = z.getPointPossibilities()[obsIndex].x;
+        const float y_b = z.getPointPossibilities()[obsIndex].y;
         MeasurementVector d_x(2);
-
 
         const float x = xhat_k_bar(0);
         const float y = xhat_k_bar(1);
@@ -240,8 +245,8 @@ void LocEKF::incorporateMeasurement(Observation z,
         z_x(1) = z.getVisBearing();
 
         // Get expected values of the post
-        const float x_b = z.getPointPossibilities()[0].x;
-        const float y_b = z.getPointPossibilities()[0].y;
+        const float x_b = z.getPointPossibilities()[obsIndex].x;
+        const float y_b = z.getPointPossibilities()[obsIndex].y;
         MeasurementVector d_x(2);
 
         const float x = xhat_k_bar(0);
@@ -281,6 +286,53 @@ void LocEKF::incorporateMeasurement(Observation z,
         std::cout << "\t\t\t\t\ty_b est is " << y_b << std::endl;
 #endif
     }
+}
+
+/**
+ * Given an observation with multiple possibilities, we return the observation
+ * with the best possibility as the first element of the vector
+ *
+ * @param z The observation to be fixed
+ */
+unsigned int LocEKF::findBestLandmark(Observation *z)
+{
+    std::vector<PointLandmark> possiblePoints = z->getPointPossibilities();
+    float minDivergence = getDivergence(z, possiblePoints[0]);
+    unsigned int minIndex = 0;
+
+    for (unsigned int i = 1; i < possiblePoints.size(); ++i) {
+        float divergence = getDivergence(z, possiblePoints[i]);
+        if (divergence < minDivergence) {
+            minDivergence = divergence;
+            minIndex = i;
+        }
+    }
+    return minIndex;
+}
+
+/**
+ * Get the divergence between an observation and a possible point landmark
+ *
+ * @param z The observation measurement to be examined
+ * @param pt The possible point to check against
+ *
+ * @return The divergence value
+ */
+float LocEKF::getDivergence(Observation * z, PointLandmark pt)
+{
+    const float x = xhat_k_bar(0);
+    const float y = xhat_k_bar(1);
+    const float h = xhat_k_bar(2);
+    float x_b_r = z->getVisDistance() * cos(z->getVisBearing());
+    float y_b_r = z->getVisDistance() * sin(z->getVisBearing());
+
+    float sinh, cosh;
+    sincosf(h, &sinh, &cosh);
+
+    float x_b  = (pt.x - x) * cosh + (pt.y - y) * sinh;
+    float y_b = -(pt.x - x) * sinh + (pt.y - y) * cosh;
+
+    return hypot(x_b_r - x_b, y_b_r - y_b);
 }
 
 /**

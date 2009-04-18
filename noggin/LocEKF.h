@@ -142,6 +142,9 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+    unsigned int findBestLandmark(Observation * z);
+    float getDivergence(Observation * z, PointLandmark pt);
+
     void limitAPrioriUncert();
     void limitPosteriorUncert();
 
