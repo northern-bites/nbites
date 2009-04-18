@@ -5,8 +5,9 @@
 # http://robocup.bowdoin.edu/trac/wiki/ColorTables
 
 #The default is to read your username from the shell.
-USERNAME = $(shell echo $$USER)
+#USERNAME = $(shell echo $$USER)
 #USERNAME = <enter your bowdoin id here>
+USERNAME = robocup
 EXCLUDE = Makefile*
 SOURCE = robocup.bowdoin.edu:/home/robocup/tables
 DEST = .
