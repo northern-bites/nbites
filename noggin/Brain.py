@@ -9,7 +9,8 @@ import time
 from man import comm
 from man import motion
 from man import vision
-from man.corpus import leds, sensors
+from man.corpus import leds
+import sensors
 from man.motion import MotionConstants
 # Modules from this directory
 from . import GameController
@@ -26,6 +27,8 @@ from . import robots
 #from .playbook import GoTeam
 from .players import Switch
 
+import _roboguardian
+
 
 class Brain(object):
     """
@@ -41,13 +44,15 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
         # Setup nao modules inside brain for easy access
         self.vision = vision.Vision()
-        self.sensors = sensors.Sensors()
+        self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
 
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion
+        # Get the pointer to the C++ RoboGuardian object for use with Python
+        self.roboguardian = _roboguardian.roboguardian
         # Get our reference to the C++ localization system
         self.loc = Loc()
 

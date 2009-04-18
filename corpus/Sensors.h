@@ -23,29 +23,12 @@
 #include <vector>
 #include <list>
 #include <pthread.h>
-#include <Python.h>
 
 #include "SensorDef.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
 
 class Sensors;
-
-//
-// Python Sensors class definitions
-//
-
-typedef struct PySensors_t {
-  PyObject_HEAD
-  Sensors *_sensors;
-  PyObject *angles;
-  PyObject *errors;
-  PyObject *fsr;
-  PyObject *inertial;
-  PyObject *sonarLeft;
-  PyObject *sonarRight;
-  PyObject *image;
-} PySensors;
 
 
 struct FSR {
@@ -106,19 +89,22 @@ class Sensors {
     //   Each of these methods first locks the associated mutex, copies the
     //   requested values, then unlocks the mutex before returning
     const std::vector<float> getBodyAngles() const;
+    const std::vector<float> getBodyAngles_degs() const;
     const std::vector<float> getVisionBodyAngles() const;
     const std::vector<float> getMotionBodyAngles() const;
     const std::vector<float> getBodyTemperatures() const;
-    const float getBodyAngle(const int index) const;//NOT wrapped for python use
+    const float getBodyAngle(const int index) const;
     const std::vector<float> getBodyAngleErrors() const ;
-	const float getBodyAngleError(int index) const; //NOT wrapped for python use
+	const float getBodyAngleError(int index) const;
     const FSR getLeftFootFSR() const;
     const FSR getRightFootFSR() const;
     const FootBumper getLeftFootBumper() const;
     const FootBumper getRightFootBumper() const;
     const Inertial getInertial() const;
+    const Inertial getInertial_degs() const;
     const Inertial getUnfilteredInertial() const;
     const float getUltraSound() const;
+    const float getUltraSound_cm() const;
     const UltraSoundMode getUltraSoundMode() const;
     const float getChestButton() const;
     const float getBatteryCharge() const;
@@ -188,7 +174,6 @@ class Sensors {
     void lockImage();
     void releaseImage();
 
-    void updatePython();
     // The following method will internally save a snapshot of the current body
     // angles. This way we can save joints that are synchronized to the most
     // current image. At the same time, the bodyAngles vector will still have the
@@ -247,15 +232,8 @@ private:
     float batteryCurrent;
 
     const unsigned char *image;
-    PySensors *pySensors;
     static int saved_frames;
 };
-
-
-
-PyMODINIT_FUNC init_sensors(void);
-
-int c_init_sensors(void);
 
 
 #endif /* Sensors_H */
