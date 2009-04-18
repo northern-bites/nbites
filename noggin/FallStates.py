@@ -7,7 +7,7 @@ Fall Protection and Recovery States
 """
 def fallen(guard):
     if guard.firstFrame():
-        x = motion.StiffnessCommand(.98)
+        x = motion.StiffnessCommand(1.0)
         guard.brain.motion.sendStiffness(x)
 
     """
@@ -59,6 +59,9 @@ def doneStanding(guard):
     """
     Does clean up after standing up.
     """
+    x = motion.StiffnessCommand(.85)
+    guard.brain.motion.sendStiffness(x)
+
     guard.standingUp = False
     guard.brain.player.switchTo(guard.brain.gameController.currentState)
     return guard.goNow('nothing')
