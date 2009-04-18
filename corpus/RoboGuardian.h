@@ -71,7 +71,9 @@ private:
     void checkFallProtection();
     void checkBatteryLevels();
     void checkTemperatures();
-    void checkButtonPushes();
+    void countButtonPushes();
+    void processChestButtonPushes();
+    void processGameControllerPushes();
     bool executeChestClickAction(int);
     void shutoffGains();
     void resetWifiConnection();
@@ -90,11 +92,6 @@ private:
         leftFootButton,
         rightFootButton;
 
- //    int buttonOnCounter;
-//     int buttonOffCounter;
-//     int lastButtonOnCounter;
-//     int lastButtonOffCounter;
-//     int buttonClicks; //Stores how many clicks we think we may have gotten
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter;
     mutable int numClicks;

@@ -87,11 +87,11 @@ void RoboGuardian::run(){
 
     while(Thread::running){
 
+        countButtonPushes();
         checkFallProtection();
         checkBatteryLevels();
         checkTemperatures();
-        checkButtonPushes();
-
+        processChestButtonPushes();
          usleep(static_cast<useconds_t>(GUARDIAN_FRAME_LENGTH_uS));
     }
 
@@ -268,12 +268,8 @@ void RoboGuardian::checkTemperatures(){
     lastTemps = newTemps;
 }
 
-void RoboGuardian::checkButtonPushes(){
-    static const int SHUTDOWN_THRESH = 3;
-
+void RoboGuardian::countButtonPushes(){
     //First, update the buttons with their new values
-    chestButton->updateFrame(sensors->getChestButton());
-
     const FootBumper left = sensors->getLeftFootBumper();
     const FootBumper right = sensors->getRightFootBumper();
 
@@ -281,6 +277,10 @@ void RoboGuardian::checkButtonPushes(){
     leftFootButton->updateFrame(left.left || left.right);
     rightFootButton->updateFrame(right.left || right.right);
 
+}
+
+void RoboGuardian::processChestButtonPushes(){
+    static const int SHUTDOWN_THRESH = 3;
 
     //Then, process our actions locally
     if(chestButton->getClickLength() == 0.0f ){
@@ -296,67 +296,6 @@ void RoboGuardian::checkButtonPushes(){
     }
 }
 
-// //HACK/NOTE: the sensors we rely on are only updated in the vision thread
-// // so they will often times be old
-// void RoboGuardian::checkButtonPushes(){
-//     //These assume were running 50 fps
-//     static const int SINGLE_CLICK_ACTIVE_MIN = 5;
-//     static const int SINGLE_CLICK_ACTIVE_MAX = 50;
-//     static const int SINGLE_CLICK_INACTIVE_MIN = 4;
-//     static const int SINGLE_CLICK_INACTIVE_MAX = 18;
-//     static const float PUSHED = 1.0f;
-//     static const int SHUTDOWN_THRESH = GUARDIAN_FRAME_RATE * 3;
-
-//     float buttonPush = sensors->getChestButton();
-
-//     bool push_done =false;
-//     bool unpush_done = false;
-
-//     if(buttonPush == PUSHED){
-
-//         buttonOnCounter += 1;
-//         if(buttonOffCounter > 0){
-//             lastButtonOffCounter = buttonOffCounter;
-//             buttonOffCounter  = 0;
-//         }
-//         registeredClickThisTime = false;
-//     }else{
-//         if(buttonOnCounter >0){
-//             lastButtonOnCounter = buttonOnCounter;
-//             buttonOnCounter = 0;
-//         }
-//         buttonOffCounter  +=1;
-//         registeredShutdown=false;
-//     }
-
-//     //detect if a click occured sometime in the past
-//     if( lastButtonOnCounter >= SINGLE_CLICK_ACTIVE_MIN &&
-//         lastButtonOnCounter <= SINGLE_CLICK_ACTIVE_MAX &&
-//         buttonOffCounter >= SINGLE_CLICK_INACTIVE_MIN &&
-//         buttonOffCounter <= SINGLE_CLICK_INACTIVE_MAX &&
-//         !registeredClickThisTime){
-//         buttonClicks += 1;
-// #ifdef DEBUG_GUARDIAN_CLICKS
-//         cout << "Registered a click, waiting to see if there are more"<<endl;
-// #endif
-//         registeredClickThisTime = true;
-//    }
-
-//     if( buttonOffCounter > SINGLE_CLICK_INACTIVE_MAX &&
-//          buttonClicks > 0){
-// #ifdef DEBUG_GUARDIAN_CLICKS
-//         cout << "Processing " <<buttonClicks <<" clicks"<<endl;
-// #endif
-//         executeClickAction(buttonClicks);
-//         buttonClicks = 0;
-//     }
-
-//     if(buttonOnCounter > SHUTDOWN_THRESH && !registeredShutdown){
-//         registeredShutdown = true;
-//         executeShutdownAction();
-//     }
-
-// }
 
 bool RoboGuardian::executeChestClickAction(int nClicks){
 #ifdef DEBUG_GUARDIAN_CLICKS
