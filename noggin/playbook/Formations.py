@@ -2,58 +2,6 @@
 from . import Roles
 from . import SubRoles
 from . import PBConstants
-
-def fDefend(team):
-    """
-    Formation for one missing field player
-    """
-    # gets teammate that is chaser (could be me)
-    chaser_mate = team.determineChaser()
-    # if i am chaser
-    if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        team.me.role = PBConstants.CHASER
-        return ['fOneDown'] + Roles.rChaser(team)
-
-    other_teammates = team.getNonChaserTeammates(chaser_mate)
-    # get fellow teammate who isn't chaser
-    for mate in other_teammates:
-        if not mate.inactive:
-            otherMate = mate
-        else:
-            mate.role = PBConstants.OFFENDER
-
-    defInfo = Roles.rDefender(team)
-    defPlayer = team.determineSupporter([otherMate], defInfo)
-
-    if defPlayer.playerNumber == team.brain.my.playerNumber:
-        return ['fOneDownDefend'] + defInfo
-    return ['fOneDownDefend'] + Roles.rMiddie(team)
-
-def fAttack(team):
-    """
-    Formation for one missing field player
-    """
-    # gets teammate that is chaser (could be me)
-    chaser_mate = team.determineChaser()
-    # if i am chaser
-    if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        team.me.role = PBConstants.CHASER
-        return ['fOneDown'] + Roles.rChaser(team)
-
-    other_teammates = team.getNonChaserTeammates(chaser_mate)
-    # get fellow teammate who isn't chaser
-    for mate in other_teammates:
-        if not mate.inactive:
-            otherMate = mate
-        else:
-            mate.role = PBConstants.DEFENDER
-
-    midInfo = Roles.rMiddie(team)
-    midPlayer = team.determineSupporter([otherMate], midInfo)
-
-    if midPlayer.playerNumber == team.brain.my.playerNumber:
-        return ['fOneDownAttack'] + midInfo
-    return ['fOneDownAttack'] + Roles.rOffender(team)
     
 def fOneDown(team):
     """
@@ -115,7 +63,7 @@ def fDubD(team):
 
         else:
             team.me.role = PBConstants.OFFENDER
-            team.me.subRole = PBConstants.CENTER_O_MIDFIELD
+            team.me.subRole = PBConstants.DUBD_OFFENDER
 
     # If we are the only player, become the sweeper
     elif team.numInactiveMates == 1:
@@ -160,7 +108,7 @@ def fReady(team):
     '''kickoff positions'''
 
     # ready state depends on number of players alive
-    inactive_teammates = team.getInactiveFieldPlayers()
+    team.inactive_teammates
     num_inactive_teammates = len(inactive_teammates)
 
     # if two dogs alive, position normally
@@ -183,8 +131,6 @@ def fTestDefender(team):
     return ['fTestDefender'] + Roles.rDefender(team)
 def fTestOffender(team):
     return ['fTestOffender'] + Roles.rOffender(team)
-def fTestMiddie(team):
-    return ['fTestMiddie'] + Roles.rMiddie(team)
 def fTestChaser(team):
     return ['fTestChaser'] + Roles.rChaser(team)
 
