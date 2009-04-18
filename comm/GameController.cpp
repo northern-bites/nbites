@@ -425,7 +425,7 @@ PyGameController_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject*
-PyGameController_new (GameController *_gc)
+PyGameController_new (boost::shared_ptr<GameController> _gc)
 {
   PyObject *self;
 

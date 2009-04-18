@@ -11,11 +11,17 @@
 #include "MCL.h"
 #include "LocEKF.h"
 #include "BallEKF.h"
+#include "Comm.h"
+
+#include "RoboGuardian.h"
+#include "ClickableButton.h"
+
 
 class Noggin
 {
 public:
     Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v,
+           boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
            MotionInterface * _minterface);
     virtual ~Noggin();
 
@@ -40,10 +46,19 @@ private:
     void initializeLocalization();
     // Run the localization update; performed at every run step
     void updateLocalization();
+    //Process button  clicks that pertain to GameController manipulation
+    void processGCButtonClicks();
 
 private:
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Vision> vision;
+    boost::shared_ptr<Comm> comm;
+    boost::shared_ptr<GameController> gc;
+
+    boost::shared_ptr<ClickableButton> chestButton;
+    boost::shared_ptr<ClickableButton> leftFootButton;
+    boost::shared_ptr<ClickableButton> rightFootButton;
+
     PyVision* pyvision;
     bool error_state;
     PyObject *module_helper;

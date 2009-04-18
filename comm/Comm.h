@@ -44,7 +44,7 @@ class Comm
     void error(socket_error err) throw();
     void send(const char *msg, int len, sockaddr_in &addr) throw(socket_error);
 
-    GameController* getGC() { return &gc; }
+    boost::shared_ptr<GameController> getGC() { return gc; }
 
     int getTOOLState();
     std::string getRobotName();
@@ -88,7 +88,7 @@ class Comm
     // References to global data structures
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     CommTimer timer;
-    GameController gc;
+    boost::shared_ptr<GameController> gc;
 
     // Socket information
     int sockn;

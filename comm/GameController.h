@@ -4,6 +4,8 @@
 
 #include <vector>
 #include <pthread.h>
+#include <boost/shared_ptr.hpp>
+
 #include "GameControllerConfig.h"
 #include "RoboCupGameControlData.h"
 
@@ -14,10 +16,10 @@ class GameController;
 
 typedef struct PyGameController_t {
   PyObject_HEAD
-  GameController *_gc;
+  boost::shared_ptr<GameController> _gc;
 } PyGameController;
 
-extern PyObject* PyGameController_new(GameController *_gc);
+extern PyObject* PyGameController_new(boost::shared_ptr<GameController> _gc);
 
 extern PyTypeObject PyGameControllerType;
 

@@ -17,8 +17,13 @@ using namespace boost;
 const char * BRAIN_MODULE = "man.noggin.Brain";
 
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
+                shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
                 MotionInterface * _minterface)
-    : error_state(false), brain_module(NULL), brain_instance(NULL),
+    : comm(c),gc(c->getGC()),
+      chestButton(rbg->getButton(CHEST_BUTTON)),
+      leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
+      rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
+      error_state(false), brain_module(NULL), brain_instance(NULL),
       motion_interface(_minterface)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
@@ -180,6 +185,10 @@ void Noggin::runStep ()
         return;
 #endif
 
+
+    //Check button pushes for game controller signals
+    processGCButtonClicks();
+
     PROF_ENTER(profiler, P_PYTHON);
 
     // Update vision information for Python
@@ -310,4 +319,10 @@ void Noggin::updateLocalization()
 #ifdef DEBUG_OBSERVATIONS
     cout << *loc << endl;
 #endif
+}
+
+
+void Noggin::processGCButtonClicks(){
+
+
 }

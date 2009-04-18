@@ -433,7 +433,7 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
   : Thread(_synchro, "Comm"), tool(_synchro, s, v),
     data(14,0), latest(new list<vector<float> >),
-    sensors(s), timer(&micro_time), gc()
+    sensors(s), timer(&micro_time), gc(new GameController())
 {
   pthread_mutex_init(&comm_mutex,NULL);
   // initialize broadcast address structure
@@ -656,7 +656,7 @@ Comm::send () throw(socket_error)
 
   // C++ header data
   const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
-                                    gc.team(), gc.player(), gc.color()};
+                                    gc->team(), gc->player(), gc->color()};
   memcpy(&buf[0], &header, sizeof(header));
   // variable Python extra data 
   memcpy(&buf[sizeof(header)], &data[0], sizeof(float) * data.size());
@@ -803,7 +803,7 @@ Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 void
 Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw()
 {
-  gc.handle_packet(msg, len);
+  gc->handle_packet(msg, len);
 }
 
 bool
@@ -822,7 +822,7 @@ Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     return false;
 
   // check team number
-  if (packet.team != gc.team())
+  if (packet.team != gc->team())
     return false;
 
   // check player number
