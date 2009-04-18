@@ -59,8 +59,9 @@ def gamePlaying(player):
     """
     This method must be overriden by intersted SoccerPlayers
     """
-    player.motion.stopBodyMoves()
-    player.brain.tracker.stopHeadMoves()
+    if player.firstFrame():
+        player.motion.stopBodyMoves()
+        player.brain.tracker.stopHeadMoves()
     return player.stay()
 
 #Finished is the exact same as initial
