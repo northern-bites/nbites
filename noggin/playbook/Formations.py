@@ -73,12 +73,6 @@ def fOneDown(team):
         other_teammates[1].role = PBConstants.MIDDIE
         return ['fOneDown'] + Roles.rDefender(team)
 
-def fTwoDown(team):
-    """
-    Formation for missing two robots
-    """
-    return ['fTwoDown'] + Roles.rChaser(team)
-
 def fSpread(team):
     # gets teammate that is chaser (could be me)
     chaser_mate = team.determineChaser()
@@ -98,11 +92,9 @@ def fSpread(team):
     if defPlayer.playerNumber == team.brain.my.playerNumber:
         return ['fSpread'] + defInfo
 
-    return ['fSpread'] + Roles.rOffender(team)
-
 def fDubD(team):
     # If we're down a player, use different positions
-    if team.numInactiveMates == 2:
+    if team.numInactiveMates == 0:
 
         # Figure out who isn't penalized with you
         other_teammate = team.getOtherActiveTeammate()
@@ -136,118 +128,10 @@ def fDubD(team):
             team.me.subRole = PBConstants.CENTER_O_MIDFIELD
 
     # If we are the only player, become the sweeper
-    elif team.numInactiveMates == 3:
+    elif team.numInactiveMates == 1:
         pos = (PBConstants.SWEEPER_X, PBConstants.SWEEPER_Y)
         team.me.role = PBConstants.DEFENDER
         team.me.subRole = PBConstants.SWEEPER
-
-    # We have three dogs, we can have a middie and two deep backs
-    elif team.numInactiveMates == 1:
-
-        # Our playerNumber - 1 usually returns the correct player
-        offset = 1
-        # If an inactive mate has a lower playerNumber than us
-        # Then we need to take that into account when indexing the list
-        for mate in team.inactiveMates:
-            if mate.playerNumber < team.brain.my.playerNumber:
-                offset += 1
-
-        # Assign role based on closest position
-        currentCenterMidX = team.brain.clip(team.brain.ball.x, 
-                                        PBConstants.CENTER_MID_LEFT_LIMIT, 
-                                        PBConstants.CENTER_MID_RIGHT_LIMIT)
-        currentCenterMidPos = (currentCenterMidX, 
-                               PBConstants.OFFENSIVE_CENTER_MIDFIELD_Y)
-        playerPos = team.getLeastWeightPosition(
-            (PBConstants.LEFT_DEEP_BACK_POS,
-             PBConstants.RIGHT_DEEP_BACK_POS,
-             currentCenterMidPos), team.getOtherActiveTeammates())
-
-        pos = playerPos[team.me.playerNumber - offset]
-
-        if pos == PBConstants.LEFT_DEEP_BACK_POS:
-            team.me.role = PBConstants.DEFENDER
-            team.me.subRole = PBConstants.LEFT_DEEP_BACK
-
-        elif pos == PBConstants.RIGHT_DEEP_BACK_POS:
-            team.me.role = PBConstants.DEFENDER
-            team.me.subRole = PBConstants.RIGHT_DEEP_BACK
-
-        else:
-            team.me.role = PBConstants.OFFENDER
-            team.me.subRole = PBConstants.CENTER_O_MIDFIELD
-
-        # Tie breaking
-        if not team.highestActivePlayerNumber():
-            for i in xrange(team.brain.my.playerNumber+1, 4):
-                if (team.teammates[i-1].calledSubRole == team.me.subRole
-                    and not team.teammates[i-1].inactive):
-                    pos = playerPos[i - 1]
-                    if pos == PBConstants.LEFT_DEEP_BACK_POS:
-                        team.role = PBConstants.DEFENDER
-                        team.subRole = PBConstants.LEFT_DEEP_BACK
-
-                    elif pos == PBConstants.RIGHT_DEEP_BACK_POS:
-                        team.role = PBConstants.DEFENDER
-                        team.subRole = PBConstants.RIGHT_DEEP_BACK
-
-                    else:
-                        team.role = PBConstants.OFFENDER
-                        team.subRole = PBConstants.CENTER_O_MIDFIELD
-                    break
-
-    # We have four dogs, two defenders, two middies?
-    else:
-        # Assign role based on closest position
-        leftMiddiePos = (PBConstants.CENTER_MID_LEFT_LIMIT,
-                         PBConstants.DEFENSIVE_CENTER_MIDFIELD_Y)
-        rightMiddiePos = (PBConstants.CENTER_MID_RIGHT_LIMIT,
-                          PBConstants.OFFENSIVE_CENTER_MIDFIELD_Y)
-
-        playerPos = team.getLeastWeightPosition(
-            (PBConstants.LEFT_DEEP_BACK_POS,
-             PBConstants.RIGHT_DEEP_BACK_POS,leftMiddiePos, rightMiddiePos))
-
-        pos = playerPos[team.me.playerNumber - 1]
-
-        if pos == PBConstants.LEFT_DEEP_BACK_POS:
-            team.me.role = PBConstants.DEFENDER
-            team.me.subRole = PBConstants.LEFT_DEEP_BACK
-
-        elif pos == PBConstants.RIGHT_DEEP_BACK_POS:
-            team.me.role = PBConstants.DEFENDER
-            team.me.subRole = PBConstants.RIGHT_DEEP_BACK
-
-        elif pos == leftMiddiePos:
-            team.me.role = PBConstants.MIDDIE
-            team.me.subRole = PBConstants.RIGHT_O_MIDDIE
-
-        else:
-            team.me.role = PBConstants.OFFENDER
-            team.me.subRole = PBConstants.CENTER_O_MIDFIELD
-
-        # add some tiebreaking here
-        if not team.highestActivePlayerNumber():
-            for i in xrange(team.me.playerNumber + 1, 5):
-                if team.teammates[i-1].calledSubRole == team.me.subRole:
-                    pos = playerPos[i - 1]
-                    if pos == PBConstants.LEFT_DEEP_BACK_POS:
-                        team.me.role = PBConstants.DEFENDER
-                        team.me.subRole = PBConstants.LEFT_DEEP_BACK
-
-                    elif pos == PBConstants.RIGHT_DEEP_BACK_POS:
-                        team.me.role = PBConstants.DEFENDER
-                        team.me.subRole = PBConstants.RIGHT_DEEP_BACK
-
-                    elif pos == leftMiddiePos:
-                        team.me.role = PBConstants.MIDDIE
-                        team.me.subRole = PBConstants.RIGHT_O_MIDDIE
-
-                    else:
-                        team.me.role = PBConstants.OFFENDER
-                        team.me.subRole = PBConstants.CENTER_O_MIDFIELD
-
-                    break
 
     # position setting
     return ['fDubD', team.me.role, team.me.subRole, pos]
@@ -264,10 +148,6 @@ def fKickoffPlay(team):
             SubRoles.pKickoffPlaySweeper(team)
     elif team.brain.my.playerNumber == 3:
         return ['fKickoffPlay'] + Roles.rChaser(team)
-    #elif team.brain.my.playerNumber == 4:
-    else:
-        return ['fKickoffPlay', PBConstants.OFFENDER] + \
-            SubRoles.pKickoffPlayStriker(team)
 
 def fKickoff(team):
     '''time immediately after kickoff'''
@@ -278,23 +158,6 @@ def fKickoff(team):
     elif team.me.playerNumber == 3:
         team.me.role = PBConstants.CHASER
         return ['fKickoff'] + Roles.rChaser(team)
-    elif team.playerNumber == 4:
-        team.me.role = PBConstants.OFFENDER
-        return ['fKickoff', PBConstants.OFFENDER] + \
-            SubRoles.pKickoffStriker(team)
-
-def fTwoKickoff(team):
-    """
-    Kickoff for only two field players
-    """
-    other_teammate = team.getOtherActiveTeammate()
-    if team.me.playerNumber > other_teammate.playerNumber:
-        team.me.role = PBConstants.CHASER
-        return ['fTwoKickoff'] + (Roles.rChaser(team))
-    else:
-        team.me.role = PBConstants.DEFENDER
-        return ['fTwoKickoff',PBConstants.DEFENDER] + \
-            SubRoles.pKickoffSweeper(team)
 
 def fOneKickoff(team):
     """
@@ -310,7 +173,7 @@ def fReady(team):
     inactive_teammates = team.getInactiveFieldPlayers()
     num_inactive_teammates = len(inactive_teammates)
 
-    # if four dogs alive, position normally
+    # if two dogs alive, position normally
     if num_inactive_teammates == 0:
         if team.me.playerNumber == 2:
             return ['fReady', PBConstants.DEFENDER] + \
@@ -320,22 +183,8 @@ def fReady(team):
             return ['fReady', PBConstants.CHASER] + \
                 SubRoles.pReadyChaser(team)
 
-        #elif team.me.playerNumber == 4:
-        else:
-            return ['fReady', PBConstants.OFFENDER] + \
-                SubRoles.pReadyOffender(team)
-
-    # two dogs alive, alter positions a bit
+    # one dogs alive, alter positions a bit
     elif num_inactive_teammates == 1:
-        other_teammate = team.getOtherActiveTeammate()
-        if team.me.playerNumber > other_teammate.playerNumber:
-            return ['fReady', PBConstants.CHASER] + \
-                SubRoles.pReadyTwoChase(team)
-        else:
-            return ['fReady', PBConstants.DEFENDER] + \
-                SubRoles.pReadyStopper(team)
-    # just you
-    else:
         return ['fReady', PBConstants.CHASER] + \
             SubRoles.pReadyChaser(team)
 

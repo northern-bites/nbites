@@ -33,21 +33,21 @@ def rSearcher(team):
     '''
     Determines positioning for robots while using the finder formation
     '''
-    if team.numInactiveMates == 3:
-        pos = PBConstants.READY_NON_LEFT_POSITION
+    
+    team.me.role = PBConstants.SEARCHER
+    
+    if team.numInactiveMates == 1:
+        pos = PBConstants.READY_NON_KICKOFF_LEFT_POSITION
         subRole = PBConstants.OTHER_FINDER
-    elif team.numInactiveMates == 2:
+    else:
         pos = team.getLeastWeightPosition(
             PBConstants.TWO_DOG_FINDER_POSITIONS,
             team.getOtherActiveTeammate())
-        if pos == PBConstants.THREE_DOG_FINDER_POSITIONS[0]:
+        if pos == PBConstants.TWO_DOG_FINDER_POSITIONS[0]:
             subRole = PBConstants.FRONT_FINDER
         else:
             subRole = PBConstants.OTHER_FINDER
-    elif team.numInactiveMates == 1:
-        playerPos = team.getLeastWeightPosition(
-            PBConstants.THREE_DOG_FINDER_POSITIONS,
-            team.getOtherActiveTeammates())
+
         
         if PBConstants.DEBUG_SEARCHER:
             print "playerPos: ", playerPos
@@ -63,71 +63,9 @@ def rSearcher(team):
         pos = playerPos[team.me.playerNumber - offset]
         
         if PBConstants.DEBUG_SEARCHER:
-            print "initial pos: ", pos
-        
-        team.me.role = PBConstants.SEARCHER
-        if pos == PBConstants.THREE_DOG_FINDER_POSITIONS[0]:
-            subRole = PBConstants.LEFT_FINDER
-        
-        elif pos == PBConstants.THREE_DOG_FINDER_POSITIONS[1]:
-            subRole = PBConstants.RIGHT_FINDER
-        
-        else:
-            subRole = PBConstants.FRONT_FINDER
-        
-        if not team.highestActivePlayerNumber():
-            for i in xrange(team.me.playerNumber+1, 5):
-                if (team.teammates[i-1].calledSubRole == team.currentSubRole
-                    and not team.teammates[i-1].inactive):
-                    pos = playerPos[i - 1]
-                    if pos == PBConstants.THREE_DOG_FINDER_POSITIONS[0]:
-                        subRole = PBConstants.LEFT_FINDER
-                    
-                    elif pos == PBConstants.THREE_DOG_FINDER_POSITIONS[1]:
-                        subRole = PBConstants.RIGHT_FINDER
-                    
-                    else:
-                        subRole = PBConstants.FRONT_FINDER
-                    break
-        
-        if PBConstants.DEBUG_SEARCHER:
             print "three dogs pSearcher:",pos
-    
-    else:
-        playerPos = team.getLeastWeightPosition(
-            PBConstants.FOUR_DOG_FINDER_POSITIONS)
-        pos = playerPos[team.me.playerNumber - 1]
-        team.me.role = PBConstants.SEARCHER
-        if pos == PBConstants.FOUR_DOG_FINDER_POSITIONS[0]:
-            subRole = PBConstants.LEFT_FINDER
-        
-        elif pos == PBConstants.FOUR_DOG_FINDER_POSITIONS[1]:
-            subRole = PBConstants.RIGHT_FINDER
-        
-        elif pos == PBConstants.FOUR_DOG_FINDER_POSITIONS[2]:
-            subRole = PBConstants.FRONT_FINDER
-        
-        else:
-            subRole = PBConstants.OTHER_FINDER
-        
-        if not team.highestActivePlayerNumber():
-            for i in xrange(team.me.playerNumber+1, 5):
-                if team.teammates[i-1].calledSubRole == subRole:
-                    pos = playerPos[i - 1]
-                    if pos == PBConstants.FOUR_DOG_FINDER_POSITIONS[0]:
-                        subRole = PBConstants.LEFT_FINDER
-                    
-                    elif pos == PBConstants.FOUR_DOG_FINDER_POSITIONS[1]:
-                        subRole = PBConstants.RIGHT_FINDER
-                    
-                    elif pos == PBConstants.FOUR_DOG_FINDER_POSITIONS[2]:
-                        subRole = PBConstants.FRONT_FINDER
-                    
-                    else:
-                        subRole = PBConstants.OTHER_FINDER
-                    break
-    
-    return [PBConstants.SEARCHER, subRole]
+
+    return [PBConstants.SEARCHER, subRole, pos[:2]]
 
 def rDefender(team):
     '''gets positioning for defender'''

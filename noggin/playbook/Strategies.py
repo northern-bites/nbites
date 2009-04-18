@@ -9,12 +9,12 @@ def sSpread(team):
     the middie.
     '''
     # Game Ready Setup
-    if team.brain.gameController.currentState == NogginConstants.GAME_READY:
+    if team.brain.gameController.currentState == 'gameReady':
         # team is kicking off
         return ['sSpread'] + Formations.fReady(team)
 
     # Game Playing Formations
-    elif team.brain.gameController.currentState == NogginConstants.GAME_PLAYING:
+    elif team.brain.gameController.currentState == 'gamePlaying':
 
         # Kickoff Formations
         if (team.brain.gameController.getTimeSincePlay() < 
@@ -59,8 +59,8 @@ def sOneDown(team):
 
     # Kickoff Formations
     #if (team.brain.gameController.getTimeSincePlay() < 
-    #    PBConstants.KICKOFF_FORMATION_TIME):
-    #    return ['sTwoDown'] + Formations.fTwoKickoff(team)
+        #PBConstants.KICKOFF_FORMATION_TIME):
+        #return ['sOneDown'] + Formations.fOneKickoff(team)
 
     # Formation for ball in our goal box
     elif team.shouldUseDubD():
@@ -70,31 +70,6 @@ def sOneDown(team):
           PBConstants.FINDER_TIME_THRESH): 
           #and team.brain.gameController.getTimeSinceUnpenalized() > 
           #PBConstants.FINDER_TIME_THRESH):
-        return ['sSpread'] + Formations.fFinder(team)
+        return ['sOneDown'] + Formations.fFinder(team)
 
     return ['sOneDown'] + Formations.fOneDown(team)
-
-def sTwoDown(team):
-    # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady':
-        #NogginConstants.GAME_READY:
-        # team is kicking off
-        return ['sTwoDown'] + Formations.fReady(team)
-
-    # Kickoff Formations
-    #if (team.brain.gameController.getTimeSincePlay() < 
-    #    PBConstants.KICKOFF_FORMATION_TIME):
-    #    return ['sThreeDown'] + Formations.fOneKickoff(team)
-
-    # Formation for ball in our goal box
-    elif team.shouldUseDubD():
-        return ['sTwoDown'] + Formations.fDubD(team)
-
-    elif (team.brain.ball.lastTimeSeen > 
-          PBConstants.FINDER_TIME_THRESH):
-          #and team.brain.gameController.getTimeSinceUnpenalized() > 
-          #PBConstants.FINDER_TIME_THRESH):
-        return ['sSpread'] + Formations.fFinder(team)
-
-    return ['sThreeDown'] + Formations.fTwoDown(team)
-
