@@ -99,6 +99,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
 SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
+     		  ${CORPUS_INCLUDE_DIR}/PySensors
                   ${CORPUS_INCLUDE_DIR}/NaoPose
                   )
 SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )

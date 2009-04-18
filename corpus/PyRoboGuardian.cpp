@@ -27,10 +27,6 @@
 
 #include <Python.h>
 #include <boost/python.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/args.hpp>
-using namespace std;
 using namespace boost::python;
 
 #include <boost/shared_ptr.hpp>

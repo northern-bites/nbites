@@ -9,7 +9,8 @@ import time
 from man import comm
 from man import motion
 from man import vision
-from man.corpus import leds, sensors
+from man.corpus import leds
+import sensors
 from man.motion import MotionConstants
 # Modules from this directory
 from . import GameController
@@ -42,7 +43,7 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
         # Setup nao modules inside brain for easy access
         self.vision = vision.Vision()
-        self.sensors = sensors.Sensors()
+        self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
 
