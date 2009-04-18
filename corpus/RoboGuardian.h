@@ -33,6 +33,12 @@
 #include "MotionInterface.h"
 #include "ClickableButton.h"
 
+enum  ButtonID {
+    CHEST_BUTTON = 0,
+    LEFT_FOOT_BUTTON,
+    RIGHT_FOOT_BUTTON
+};
+
 class RoboGuardian : public Thread {
 public:
     RoboGuardian(boost::shared_ptr<Synchro>,
@@ -50,7 +56,8 @@ public:
     //getters
     bool isRobotFalling()const { return falling; }
     bool isRobotFallen()const { return fallen; }
-    int getNumChestClicks()const;
+
+    boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
 private: // Since this feature is not really production ready
     //setters
@@ -65,7 +72,7 @@ private:
     void checkBatteryLevels();
     void checkTemperatures();
     void checkButtonPushes();
-    bool executeClickAction(int);
+    bool executeChestClickAction(int);
     void shutoffGains();
     void resetWifiConnection();
     //helpers
@@ -79,18 +86,21 @@ private:
     std::vector<float> lastTemps;
     float lastBatteryCharge;
 
-    boost::shared_ptr<ClickableButton> chestButton;
+    boost::shared_ptr<ClickableButton> chestButton,
+        leftFootButton,
+        rightFootButton;
 
-    int buttonOnCounter;
-    int buttonOffCounter;
-    int lastButtonOnCounter;
-    int lastButtonOffCounter;
-    int buttonClicks; //Stores how many clicks we think we may have gotten
+ //    int buttonOnCounter;
+//     int buttonOffCounter;
+//     int lastButtonOnCounter;
+//     int lastButtonOffCounter;
+//     int buttonClicks; //Stores how many clicks we think we may have gotten
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter;
     mutable int numClicks;
 
-    bool registeredClickThisTime,registeredShutdown;
+    bool registeredClickThisTime;
+        bool registeredShutdown;
 
     bool falling, fallen;
     mutable bool useFallProtection;

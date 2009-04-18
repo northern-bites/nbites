@@ -13,6 +13,8 @@ using namespace AL;
 
 #include "StiffnessCommand.h"
 
+//#define DEBUG_GUARDIAN_CLICKS
+
 const int RoboGuardian::GUARDIAN_FRAME_RATE = 50;
 // 1 second * 1000 ms/s * 1000 us/ms
 const float RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
@@ -54,9 +56,9 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
       chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
-      buttonOnCounter(0),buttonOffCounter(0),
-      lastButtonOnCounter(0),lastButtonOffCounter(0),
-      buttonClicks(0),
+      // buttonOnCounter(0),buttonOffCounter(0),
+//       lastButtonOnCounter(0),lastButtonOffCounter(0),
+//       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
       notFallingFrames(0),fallenCounter(0),numClicks(NO_CLICKS),
       registeredClickThisTime(true),registeredShutdown(false),
@@ -267,19 +269,29 @@ void RoboGuardian::checkTemperatures(){
 }
 
 void RoboGuardian::checkButtonPushes(){
-    static const int SHUTDOWN_THRESH = GUARDIAN_FRAME_RATE * 3;
+    static const int SHUTDOWN_THRESH = 3;
 
+    //First, update the buttons with their new values
     chestButton->updateFrame(sensors->getChestButton());
 
+    const FootBumper left = sensors->getLeftFootBumper();
+    const FootBumper right = sensors->getRightFootBumper();
+
+    chestButton->updateFrame(sensors->getChestButton());
+    leftFootButton->updateFrame(left.left || left.right);
+    rightFootButton->updateFrame(right.left || right.right);
+
+
+    //Then, process our actions locally
     if(chestButton->getClickLength() == 0.0f ){
         registeredShutdown  = false;
-    }else if(chestButton->getClickLength() > SHUTDOWN_THRESH && 
+    }else if(chestButton->getClickLength() > SHUTDOWN_THRESH &&
         !registeredShutdown){
         registeredShutdown = true;
         executeShutdownAction();
     }
 
-    if(executeClickAction(chestButton->peekNumClicks())){
+    if(executeChestClickAction(chestButton->peekNumClicks())){
         chestButton->getAndClearNumClicks();
     }
 }
@@ -346,7 +358,7 @@ void RoboGuardian::checkButtonPushes(){
 
 // }
 
-bool RoboGuardian::executeClickAction(int nClicks){
+bool RoboGuardian::executeChestClickAction(int nClicks){
 #ifdef DEBUG_GUARDIAN_CLICKS
     cout << "Processing "<<numClicks<< " clicks"<<endl;
 #endif
@@ -356,12 +368,12 @@ bool RoboGuardian::executeClickAction(int nClicks){
     case NO_CLICKS:
         return false;
         break;
-    case 1:
-        //Say IP Address
-        speakIPAddress();
-        break;
     case 2:
         shutoffGains();
+        break;
+    case 3:
+        //Say IP Address
+        speakIPAddress();
         break;
     case 5:
         playFile(stiffness_enabled_wav);
@@ -436,12 +448,18 @@ void RoboGuardian::speakIPAddress()const {
 }
 
 
-int RoboGuardian::getNumChestClicks() const{
-    pthread_mutex_lock(&click_mutex);
-    const int nClicks = numClicks;
-    numClicks = NO_CLICKS;
-    pthread_mutex_unlock(&click_mutex);
-    return nClicks;
+boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) const{
+    switch(buttonID){
+    case CHEST_BUTTON:
+        return chestButton;
+    case LEFT_FOOT_BUTTON:
+        return leftFootButton;
+    case RIGHT_FOOT_BUTTON:
+        return rightFootButton;
+    default:
+        cout << "This button doesnt exist. Returning chest button" <<endl;
+        return chestButton;
+    }
 }
 
 
