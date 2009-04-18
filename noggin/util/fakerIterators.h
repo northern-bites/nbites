@@ -34,8 +34,7 @@ static const bool use_perfect_dists = false;
 static float FOV_OFFSET = NAO_FOV_X_DEG * M_PI / 360.0f + M_PI / 4.0f;
 
 void iterateNavPath(std::fstream * obsFile, NavPath * letsGo);
-void iterateObsPath(std::fstream * obsFile, std::fstream * locFile,
-                    std::fstream * coreFile,
+void iterateObsPath(std::fstream * locFile, std::fstream * coreFile,
                     boost::shared_ptr<LocSystem> loc,
                     std::vector<PoseEst> * realPoses,
                     std::vector<BallPose> * ballPoses,
@@ -44,6 +43,16 @@ void iterateObsPath(std::fstream * obsFile, std::fstream * locFile,
                     std::vector<float> * ballDists,
                     std::vector<float> * ballBearings,
                     int ball_id);
+void iterateMCLObsPath(std::fstream * locFile, std::fstream * coreFile,
+                       boost::shared_ptr<MCL> loc,
+                       std::vector<PoseEst> * realPoses,
+                       std::vector<BallPose> * ballPoses,
+                       std::vector<MotionModel> * odos,
+                       std::vector<std::vector<Observation> > * sightings,
+                       std::vector<float> * ballDists,
+                       std::vector<float> * ballBearings,
+                       int ball_id);
+
 void iterateFakerPath(std::fstream * mclFile, std::fstream * ekfFile,
                       NavPath * letsGo);
 std::vector<Observation> determineObservedLandmarks(PoseEst myPos,

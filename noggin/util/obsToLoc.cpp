@@ -7,18 +7,23 @@ using namespace std;
 using namespace boost;
 using namespace NBMath;
 
+static vector<PoseEst> realPoses;
+static vector<BallPose> ballPoses;
+static vector<MotionModel> odos;
+static vector<vector<Observation> > sightings;
+static vector<float> ballDists;
+static vector<float> ballBearings;
+
+void runMCL(char * base, string name, int numParticles, bool useBest);
+
 int main(int argc, char** argv)
 {
     // Information needed for the main method
     // IO Variables
     fstream obsFile;
     fstream ekfFile;
-    fstream mclFile;
-    fstream mclFile2;
-
     fstream ekfCoreFile;
-    fstream mclCoreFile;
-    fstream mclCoreFile2;
+
     /* Test for the correct number of CLI arguments */
     if(argc != 2) {
         cerr << "usage: " << argv[0] << " input-file" << endl;
@@ -32,74 +37,75 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    vector<PoseEst> realPoses;
-    vector<BallPose> ballPoses;
-    vector<MotionModel> odos;
-    vector<vector<Observation> > sightings;
-    vector<float> ballDists;
-    vector<float> ballBearings;
-    MotionModel noMove(0.0, 0.0, 0.0);
     cout << "Reading in file" << endl;
     readObsInputFile(&obsFile, &realPoses, &ballPoses,
                      &odos, &sightings, &ballDists,
                      &ballBearings, BALL_ID);
-
-    // Open output files
-    string ekfFileName(argv[1]);
-    string mclFileName(argv[1]);
-    string mclFileName2(argv[1]);
-    string ekfCoreFileName(argv[1]);
-    string mclCoreFileName(argv[1]);
-    string mclCoreFileName2(argv[1]);
-
-    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
-    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl");
-    mclFileName2.replace(mclFileName2.end()-3, mclFileName2.end(), "mcl.2");
-    ekfCoreFileName.replace(ekfCoreFileName.end()-3,
-                            ekfCoreFileName.end(), "ekf.core");
-    mclCoreFileName.replace(mclCoreFileName.end()-3,
-                            mclCoreFileName.end(), "mcl.core");
-    mclCoreFileName2.replace(mclCoreFileName2.end()-3,
-                             mclCoreFileName2.end(), "mcl.core.2");
-
-
-    ekfFile.open(ekfFileName.c_str(), ios::out);
-    mclFile.open(mclFileName.c_str(), ios::out);
-    mclFile2.open(mclFileName2.c_str(), ios::out);
-
-    ekfCoreFile.open(ekfCoreFileName.c_str(), ios::out);
-    mclCoreFile.open(mclCoreFileName.c_str(), ios::out);
-    mclCoreFile2.open(mclCoreFileName2.c_str(), ios::out);
-
     // Close the input file
     obsFile.close();
-    shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
-    // Use weighted means
-    shared_ptr<MCL> mcl = shared_ptr<MCL>(new MCL());
-    // Use best particle
-    shared_ptr<MCL> mcl2 = shared_ptr<MCL>(new MCL());
-    mcl2->setUseBest(true);
 
+    // EKF files
+    string ekfFileName(argv[1]);
+    string ekfCoreFileName(argv[1]);
+    ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
+    ekfFile.open(ekfFileName.c_str(), ios::out);
+    ekfCoreFileName.replace(ekfCoreFileName.end()-3,
+                            ekfCoreFileName.end(), "ekf.core");
+    ekfCoreFile.open(ekfCoreFileName.c_str(), ios::out);
+
+    // Create the EKF System
+    shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
     // Iterate through the path
     cout << "Running EKF loc" << endl;
-    iterateObsPath(&obsFile, &ekfFile, &ekfCoreFile,
+    iterateObsPath(&ekfFile, &ekfCoreFile,
                    ekfLoc, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
     ekfFile.close();
+    ekfCoreFile.close();
 
-    // Iterate through the path
-    cout << "Running MCL loc" << endl;
-    iterateObsPath(&obsFile, &mclFile, &mclCoreFile,
-                   mcl, &realPoses, &ballPoses, &odos,
-                   &sightings, &ballDists, &ballBearings, BALL_ID);
-    mclFile.close();
-
-    // Iterate through the path
-    cout << "Running MCL 2 loc" << endl;
-    iterateObsPath(&obsFile, &mclFile2, &mclCoreFile2,
-                   mcl2, &realPoses, &ballPoses, &odos,
-                   &sightings, &ballDists, &ballBearings, BALL_ID);
-    mclFile2.close();
+    runMCL(argv[1], "5", 5, false);
+    runMCL(argv[1], "5.best", 5, true);
+    runMCL(argv[1], "50", 50, false);
+    runMCL(argv[1], "50.best", 50, true);
+    runMCL(argv[1], "100", 100, false);
+    runMCL(argv[1], "100.best", 100, true);
+    runMCL(argv[1], "500", 500, false);
+    runMCL(argv[1], "500.best", 500, true);
+    runMCL(argv[1], "1000", 1000, false);
+    runMCL(argv[1], "1000.best", 1000, true);
 
     return 0;
+}
+
+void runMCL(char * base, string name, int numParticles, bool useBest)
+{
+    fstream mclFile;
+    fstream mclCoreFile;
+
+    // Setup the output files
+    string mclFileName(base);
+    string mclCoreFileName(base);
+    mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl.");
+    mclFileName += name;
+    mclFile.open(mclFileName.c_str(), ios::out);
+    mclCoreFileName.replace(mclCoreFileName.end()-3,
+                            mclCoreFileName.end(), "mcl.core.");
+    mclCoreFileName += name;
+    mclCoreFile.open(mclCoreFileName.c_str(), ios::out);
+
+    shared_ptr<MCL> mcl = shared_ptr<MCL>(new MCL(numParticles));
+    mcl->setUseBest(useBest);
+
+    // Iterate through the path
+    cout << "Running MCL loc with " << numParticles << " particles";
+    if (useBest) {
+        cout << " using best particle.";
+    }
+    cout << endl;
+
+    iterateMCLObsPath(&mclFile, &mclCoreFile,
+                      mcl, &realPoses, &ballPoses, &odos,
+                      &sightings, &ballDists, &ballBearings, BALL_ID);
+    mclFile.close();
+    mclCoreFile.close();
 }

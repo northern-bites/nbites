@@ -145,7 +145,7 @@ SET( COLOR_TABLE
 # Options pertaining to running the code on the simulator  (OFFLINE)
 OPTION( @USING_LAB_FIELD@
     "Set field constants to use the lab field constants"
-    ON
+    OFF
     )
 SET( USING_LAB_FIELD ${@USIGN_LAB_FIELD@} )
 
