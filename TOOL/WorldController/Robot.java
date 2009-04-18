@@ -1,9 +1,16 @@
 package TOOL.WorldController;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Vector;
+
 public class Robot {
 
     final static int NUM_MSG_COMPONENTS = 17;
-    final static String HEADER = "borat";
+    final static String HEADER = "borat_foobar";
+    final static int HEADER_DATA_SIZE = HEADER.length() + 1 + 5 * 8;
 
     final static int PACKET_TEAM_HEADER = 0;
     final static int PACKET_TEAM_NUMBER = 1;
@@ -60,18 +67,48 @@ public class Robot {
     }
 
     public static Robot parseData(byte[] rawData, int length) {
-	String data = (new String(rawData,0,200));
-	String[] words = data.split(" ");
-	//System.out.println("parseData: " + data + " length: " + length);
-	if (words.length < NUM_MSG_COMPONENTS) {
-	    System.out.println("UDP PACKET REJECTED: packet: " + data + " length: " + words.length + " < NUM_MSG_COMPONENTS: " + NUM_MSG_COMPONENTS);
-	    return null;
-	}
+        DataInputStream input = new DataInputStream(
+                new ByteArrayInputStream(rawData));
 
-	if (words[PACKET_TEAM_HEADER].equals(HEADER)) {
-	    //We don't need to worry about it while its only us in the lab
-	    //return null;
-	    //System.out.println("UDP PACKET ACCEPTED: " + data);
+        if (length < HEADER_DATA_SIZE) {
+	    System.out.println("UDP PACKET REJECTED: length: " + length +
+                               " < HEADER_DATA_SIZE: " + HEADER_DATA_SIZE);
+            return null;
+        }
+
+        byte[] rawHeader = new byte[HEADER.length()];
+
+        try {
+            input.readFully(rawHeader);
+            //input.readByte(); // skip NULL char
+
+            String header = new String(rawHeader, "ASCII");
+            if (!header.equals(HEADER)) {
+                System.out.println("UDP PACKET REJECTED: header = " + header);
+                return null;
+            }
+
+            long timeStamp = input.readLong();
+            int team = input.readInt();
+            int player = input.readInt();
+            int color = input.readInt();
+            System.out.println("packet = " + new String(rawData, "ASCII"));
+            System.out.println("time = " + timeStamp + ", team = " + team +
+                               ", player = " + player + ", color = " + color);
+
+            Vector<Float> vals = new Vector<Float>();
+            while (input.available() > 0)
+                vals.add(input.readFloat());
+
+        }catch(UnsupportedEncodingException e) {
+            System.out.println("ASCII Encoding not supported!!!");
+            return null;
+        }catch(IOException e) {
+            System.out.println("UDP PACKET REJECTED: " + e);
+            return null;
+        }
+
+/*
 
 	    try {
 		// See TypeDefs.py Packet: for info about our UDP API
@@ -121,6 +158,7 @@ public class Robot {
 	else {
 	    System.out.println("UDP PACKET REJECTED B/C OF HEADER: " + words[0]);
 	}
+        */
 	return null;
     }
 }
