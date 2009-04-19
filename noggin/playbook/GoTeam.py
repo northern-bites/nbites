@@ -356,9 +356,11 @@ class GoTeam:
         '''
         #penalty state is the first item the player tuple [0]
         #penalty state == 1 is penalized
+        print(self.brain.gameController.gc.players(
+            teammate.playerNumber-1)[0]!=0)
         return (
             self.brain.gameController.gc.players(
-                teammate.playerNumber-1)[0]==1
+                teammate.playerNumber-1)[0]!=0
             )
 
     def isTeammateDead(self,teammate):
