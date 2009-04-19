@@ -19,7 +19,6 @@ def tracking(tracker):
 
     If a sweet move is begun while we are tracking, the current setup is to let
     the sweet move conclude and then resume tracking afterward.'''
-    tracker.brain.motion
 
     if tracker.firstFrame():
         #supersede anything in the motion queue:
