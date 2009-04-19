@@ -227,17 +227,17 @@ class GoTeam:
     def printf(self,outputString, printingColor='purple'):
         '''FSA print function that allows colors to be specified'''
         if printingColor == 'red':
-            self.outputFunction(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         elif printingColor == 'blue':
-            self.outputFunction(BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         elif printingColor == 'yellow':
-            self.outputFunction(YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         elif printingColor == 'cyan':
-            self.outputFunction(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         elif printingColor == 'purple':
-            self.outputFunction(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         else:
-            self.outputFunction(str(outputString))
+            self.brain.out.printf(str(outputString))
 
     ######################################################
     ############       Role Switching Stuff     ##########
@@ -300,6 +300,7 @@ class GoTeam:
             return positions[0]
 
         # if we have two positions only two possibilites of positions
+        #TODO: tie-breaking?
         else: # len(positions) == 2
             myDist1 = hypot(positions[0][0] - self.brain.my.x,
                             positions[0][1] - self.brain.my.y)
@@ -328,11 +329,10 @@ class GoTeam:
 
         # update my own information for role switching
         self.me.updateMe()
-        self.me.chaseTime = self.getChaseTime(self.me)
 
         # loop through teammates    
         for mate in self.teammates:
-            if (self.isTeammateDead(mate)):# or self.isTeammatePenalized(mate)):
+            if (self.isTeammateDead(mate) or self.isTeammatePenalized(mate)):
                 mate.inactive = True
             if (mate.ballDist > 0):
                 self.brain.ball.reportBallSeen()
@@ -354,10 +354,13 @@ class GoTeam:
         sending packets when they are penalized, so they will most likely
         fall under the isTeammateDead() check anyways.
         '''
+        #penalty state is the first item the player tuple [0]
+        #penalty state == 1 is penalized
+        self.printf(self.brain.gameController.gc.players(teammate.playerNumber-1)[0])
+
         return (
-            self.brain.gameController.gc.team.players[
-                teammate.playerNumber-1
-                ].penalty
+            self.brain.gameController.gc.players(
+                teammate.playerNumber-1)[0]==1
             )
 
     def isTeammateDead(self,teammate):
@@ -366,23 +369,17 @@ class GoTeam:
         however, the dog could still be on but sending really laggy packets.
         '''
         return (teammate.playerNumber != self.brain.my.playerNumber and
-                teammate.lastPacketTime == 0 or 
-                teammate.lastPacketTime < (time.time() -
-                                           PBConstants.PACKET_DEAD_PERIOD))
+                 (PBConstants.PACKET_DEAD_PERIOD < time.time() - 
+                                                    teammate.lastPacketTime))
 
     def getInactiveFieldPlayers(self):
         '''cycles through teammate objects and returns number of teammates
         that are 'dead'. ignores myself'''
         inactive_teammates = []
         for i,mate in enumerate(self.teammates):
-            """"if (mate.inactive and mate.playerNumber != 
+            if (mate.inactive and mate.playerNumber != 
                 self.brain.my.playerNumber and 
                 mate.playerNumber != PBConstants.GOALIE_NUMBER):
-                inactive_teammates.append(mate)"""
-            if ((time.time() - mate.timeStamp > PBConstants.INACTIVE_THRESH) and
-                self.brain.my.playerNumber != mate.playerNumber and
-                mate.playerNumber != PBConstants.GOALIE_NUMBER):
-                mate.inactive = True
                 inactive_teammates.append(mate)
         return inactive_teammates
 
@@ -410,7 +407,7 @@ class GoTeam:
         Determines if the goalie is dead or penalized
         '''
         return (self.isTeammateDead(self.teammates[0]) or
-                #self.isTeammatePenalized(self.teammates[0]) or 
+                self.isTeammatePenalized(self.teammates[0]) or 
                 self.teammates[0].inactive)
 
     def isGoalie(self):
@@ -494,7 +491,7 @@ class GoTeam:
                                        or mate.calledRole == 
                                        PBConstants.SEARCHER)):
                 return False
-        return True        
+        return True
 
     def reset(self):
         '''resets all information stored from teammates'''
