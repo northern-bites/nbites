@@ -74,6 +74,7 @@ extern "C" {
         unsigned int tlenw =
             env->GetArrayLength((jbyteArray)
                                 env->GetObjectArrayElement(thresh_target,0));
+        unsigned int numSensorsInFrame = env->GetArrayLength(jsensors);
         //If one of the dimensions is wrong, we exit
         if(env->GetArrayLength(jimg) != IMAGE_BYTE_SIZE) {
             cout << "Error: the image had the wrong byte size" << endl;
@@ -86,9 +87,11 @@ extern "C" {
             cout << "Error: the joint array had incorrect dimensions" << endl;
             return;
         }
-        if (env->GetArrayLength(jsensors) != NUM_SENSORS) {
-            cout << "Error: the sensors array had incorrect dimensions" << endl;
-            return;
+        if (numSensorsInFrame != NUM_SENSORS) {
+            cout << "Warning: This frame must be old because the number of "
+                    "sensors stored in it is\n"
+                    "wrong. The missing values will be initialized to 0."
+                 << endl;
         }
         if (env->GetArrayLength(jtable) != YMAX*UMAX*VMAX) {
             cout << "Error: the color table had incorrect dimensions" << endl;
@@ -115,8 +118,14 @@ extern "C" {
         // Set the sensor data
         float * sensors_array = env->GetFloatArrayElements(jsensors,0);
         vector<float> sensors_vector(&sensors_array[0],
-                                     &sensors_array[NUM_SENSORS]);
+                                     &sensors_array[numSensorsInFrame]);
         env->ReleaseFloatArrayElements(jsensors,sensors_array,0);
+
+        // If there are missing sensors values in the frame, the vector will be
+        // shorter. We add 0s to it until it is of size NUM_SENSORS.
+        for (unsigned int i = 0; i < NUM_SENSORS - numSensorsInFrame; ++i)
+            sensors_vector.push_back(0.0f);
+
         sensors->setAllSensors(sensors_vector);
 
         // Clear the debug image on which the vision algorithm can draw
@@ -125,11 +134,11 @@ extern "C" {
         //get pointer access to the java image array
         jbyte *buf_img = env->GetByteArrayElements( jimg, 0);
         byte * img = (byte *)buf_img; //convert it to a reg. byte array
-	//timing the vision process
-	long startTime = micro_time();
-        //PROCESS VISION!! 
+        //timing the vision process
+        long startTime = micro_time();
+        //PROCESS VISION!!
         vision.notifyImage(img);
-	long processTime = micro_time() - startTime;
+        long processTime = micro_time() - startTime;
         //vision.drawBoxes();
         env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
