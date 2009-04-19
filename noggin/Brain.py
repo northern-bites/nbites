@@ -53,6 +53,7 @@ class Brain(object):
         self.motionModule = motion
         # Get the pointer to the C++ RoboGuardian object for use with Python
         self.roboguardian = _roboguardian.roboguardian
+        self.roboguardian.enableFallProtection(True)
         # Get our reference to the C++ localization system
         self.loc = Loc()
 

@@ -91,6 +91,9 @@ BOOST_PYTHON_MODULE(sensors)
         .add_property("chestButton", &Sensors::getChestButton)
         .add_property("batteryCharge", &Sensors::getBatteryCharge)
         .add_property("batteryCurrent", &Sensors::getBatteryCurrent)
+
+        .def("saveFrame", &Sensors::saveFrame)
+        .def("resetSaveFrame", &Sensors::resetSaveFrame)
         ;
 
     scope().attr("sensors") = sensors_pointer;
