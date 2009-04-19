@@ -364,8 +364,10 @@ void Noggin::processGCButtonClicks(){
     }
 
     if( chestButton->peekNumClicks() == REVERT_TO_INITIAL_CLICKS){
-           cout << "SENDING GC TO INITIAL DUE TO FOOT BUTTONS"
+#ifdef DEBUG_NOGGIN_CC
+           cout << "SENDING GC TO INITIAL DUE TO CHEST BUTTONS"
                 <<endl;
+#endif
            chestButton->getAndClearNumClicks();
            gc->setGameState(STATE_INITIAL);
     }

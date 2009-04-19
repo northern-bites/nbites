@@ -354,7 +354,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         break;
     default:
         //nothing
-        cout << Thread::name <<" is leaving "<<nClicks<<" clicks for someone else"<<endl;
+        //cout << Thread::name <<" is leaving "<<nClicks<<" clicks for someone else"<<endl;
         return false;
         break;
     }
@@ -364,10 +364,10 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
 
 void RoboGuardian::executeFallProtection(){
     if(useFallProtection){
+        cout << Thread::name <<": OH NO! I'm falling. Removing stiffness." <<endl;
         shutoffGains();
     }
 #ifdef DEBUG_GUARDIAN_FALLING
-    cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
     playFile(falling_wav);
 #endif
 }
