@@ -7,7 +7,7 @@ WALK_TIME = 200
 
 def gamePlaying(player):
     player.brain.loc.reset()
-    return player.goNow('spinLocalize')
+    return player.goLater('spinLocalize')
 
 def spinLocalize(player):
     if player.firstFrame():
@@ -43,7 +43,7 @@ def sitDown(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
 
-    if not motion.isBodyActive:
+    if not player.brain.motion.isBodyActive():
         player.gainsOff()
 
     return player.stay()

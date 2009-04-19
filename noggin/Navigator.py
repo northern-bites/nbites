@@ -14,7 +14,7 @@ class Navigator(FSA.FSA):
         self.setName('Navigator, bitch!')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
-        self.stateChangeColor = 'greenbg'
+        self.stateChangeColor = 'cyan'
 
         self.lastDestX = 0
         self.lastDestY = 0
