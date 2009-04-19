@@ -66,6 +66,11 @@ void ScriptedProvider::setActive(){
 
 // Are we done moving totally?
 bool ScriptedProvider::isDone() {
+	cout << "In Scripted Provider : done?? "
+		 << (currCommandEmpty() && commandQueueEmpty() ) 
+		 << "    The cur comand is empty?" << currCommandEmpty()
+		 << "    The command queue is empty?" << commandQueueEmpty()
+		 << endl;
     return currCommandEmpty() && commandQueueEmpty();
 }
 

@@ -17,12 +17,17 @@ class FallController(FSA.FSA):
         self.fallCount = 0
         self.FALLEN_THRESH = 72
         self.FALL_COUNT_THRESH = 15
+        self.doneStandingCount = 0
+        self.DONE_STANDING_THRESH = 30
 
     def run(self):
         # Only try to stand up when playing or localizing in ready
         if (self.brain.gameController.currentState == 'gamePlaying' or
             self.brain.gameController.currentState == 'gameReady' ):
             # Check to see if fallen over
+            inertial = self.brain.sensors.inertial
+            self.printf("run angleY is "+str(inertial.angleY))
+
             if (not self.standingUp and self.isFallen() ):
                 self.standingUp = True
                 self.fallCount = 0
@@ -33,6 +38,7 @@ class FallController(FSA.FSA):
 
     def isFallen(self):
         inertial = self.brain.sensors.inertial
+        self.printf("isFallen angleY is "+str(inertial.angleY))
         if ( abs(inertial.angleY) > self.FALLEN_THRESH ):
             self.fallCount += 1
             if self.fallCount > self.FALL_COUNT_THRESH:
