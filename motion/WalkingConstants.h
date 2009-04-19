@@ -130,6 +130,7 @@ public:
     float motion_frame_length_s;
     float bodyHeight;
     float hipOffsetX;
+    float XAngleOffset;
     float stepDuration; // seconds
     float doubleSupportFraction; //Fraction of time spent in double support
     float stepHeight; // in mm
@@ -152,7 +153,7 @@ public:
     // inputted.
 public:
     WalkingParameters(const float _motion_frame_length_s, const float _bh,
-                      const float _hox, const float _dur,
+                      const float _hox, const float _yao, const float _dur,
                       const float _dblSupFrac, const float _stepHeight,
                       const float _footLengthX, const float _dblInactivePerc,
                       const float _lSwHRAdd,const float _rSwHRAdd,
@@ -160,7 +161,8 @@ public:
                       const float maxx_mms, const float maxy_mms,
                       const float maxtheta_rads)
         :  motion_frame_length_s( _motion_frame_length_s),
-           bodyHeight(_bh), hipOffsetX(_hox), stepDuration(_dur),
+           bodyHeight(_bh), hipOffsetX(_hox), XAngleOffset(_yao),
+           stepDuration(_dur),
            doubleSupportFraction(_dblSupFrac),
            stepHeight(_stepHeight),footLengthX(_footLengthX),
            dblSupInactivePercentage(_dblInactivePerc),
@@ -217,6 +219,19 @@ public:
                                        rresult.angles +
                                        Kinematics::LEG_JOINTS);
 
+        //X AXIS angle offset:
+        const unsigned int leftHipPitchIndex
+            = Kinematics::L_HIP_PITCH -
+            Kinematics::chain_first_joint[Kinematics::LLEG_CHAIN];
+        const unsigned int rightHipPitchIndex
+            = Kinematics::R_HIP_PITCH -
+            Kinematics::chain_first_joint[Kinematics::RLEG_CHAIN];
+
+        lleg_angles[leftHipPitchIndex] = lleg_angles[leftHipPitchIndex]  +
+            XAngleOffset;
+        rleg_angles[rightHipPitchIndex] = rleg_angles[rightHipPitchIndex]  +
+            XAngleOffset;
+
         std::vector<float> * allJoints = new std::vector<float>();
 
         const std::vector<float>larm_angles(LARM_WALK_ANGLES,
@@ -244,6 +259,7 @@ const WalkingParameters DEFAULT_PARAMETERS
 = WalkingParameters(0.02f,        // motion frame length - FIXME constant
                     310.0f,       // COM height
                     19.0f,        // hipOffsetX
+                    0.0,          // XAngleOffset
                     0.5f,         // stepDuration
                     0.1f,         // fraction in double support mode
                     16.5f,        // stepHeight

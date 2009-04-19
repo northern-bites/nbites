@@ -24,6 +24,7 @@ TO_RAD= math.pi/180.
 
 #     return player.stay()
 
+
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
 

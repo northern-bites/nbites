@@ -32,7 +32,9 @@ public:
             setChainList();
         }
     GaitCommand( const float _motion_frame_length_s, const float _bh,
-                 const float _hox, const float _dur,
+                 const float _hox,
+                 const float _yao,
+                 const float _dur,
                  const float _dblSupFrac, const float _stepHeight,
                  const float _footLengthX, const float _dblInactivePerc,
                  const float _lSwHRAdd,const float _rSwHRAdd,
@@ -41,7 +43,7 @@ public:
                  const float maxtheta_rads)
         :MotionCommand(MotionConstants::GAIT),
          gait(_motion_frame_length_s,_bh, //HACK
-              _hox, _dur,
+              _hox, _yao, _dur,
               _dblSupFrac, _stepHeight,
               _footLengthX, _dblInactivePerc,
               _lSwHRAdd,_rSwHRAdd,
