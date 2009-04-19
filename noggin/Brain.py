@@ -168,14 +168,14 @@ class Brain(object):
         self.updateFieldObjects()
 
         # Communications update
-        self.updateComm()
+        #self.updateComm()
 
         # Localization Update
         self.updateLocalization()
 
         # Behavior stuff
         self.gameController.run()
-        self.fallController.run()
+        #self.playbook.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()
