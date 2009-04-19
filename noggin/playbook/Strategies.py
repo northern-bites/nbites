@@ -71,5 +71,4 @@ def sOneDown(team):
           #and team.brain.gameController.getTimeSinceUnpenalized() > 
           #PBConstants.FINDER_TIME_THRESH):
         return ['sOneDown'] + Formations.fFinder(team)
-    team.brain.out.printf(team.brain.ball.timeSinceSeen())
     return ['sOneDown'] + Formations.fOneDown(team)
