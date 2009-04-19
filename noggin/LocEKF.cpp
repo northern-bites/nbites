@@ -297,11 +297,11 @@ void LocEKF::incorporateMeasurement(Observation z,
 unsigned int LocEKF::findBestLandmark(Observation *z)
 {
     std::vector<PointLandmark> possiblePoints = z->getPointPossibilities();
-    float minDivergence = getDivergence(z, possiblePoints[0]);
-    unsigned int minIndex = 0;
-
-    for (unsigned int i = 1; i < possiblePoints.size(); ++i) {
+    float minDivergence = 10000.0f;
+    unsigned int minIndex = -1;
+    for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
         float divergence = getDivergence(z, possiblePoints[i]);
+
         if (divergence < minDivergence) {
             minDivergence = divergence;
             minIndex = i;
