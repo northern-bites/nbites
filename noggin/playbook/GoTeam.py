@@ -356,8 +356,6 @@ class GoTeam:
         '''
         #penalty state is the first item the player tuple [0]
         #penalty state == 1 is penalized
-        self.printf(self.brain.gameController.gc.players(teammate.playerNumber-1)[0])
-
         return (
             self.brain.gameController.gc.players(
                 teammate.playerNumber-1)[0]==1
