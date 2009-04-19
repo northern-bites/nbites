@@ -327,7 +327,7 @@ void Noggin::processGCButtonClicks(){
     static const int ADVANCE_STATES_CLICKS  = 1;
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
-    static const float REVERT_TO_INITIAL_TIME = 3.0f;
+    static const int REVERT_TO_INITIAL_CLICKS = 4;
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
@@ -363,19 +363,11 @@ void Noggin::processGCButtonClicks(){
 #endif
     }
 
-    cout << "Feet have been pushed for ("<<leftFootButton->getClickLength()
-         <<","<<rightFootButton->getClickLength()<< ")"<<endl;
-
-    if(rightFootButton->getClickLength() > REVERT_TO_INITIAL_TIME &&
-       leftFootButton->getClickLength() > REVERT_TO_INITIAL_TIME &&
-        !registeredGCReset){
-        registeredGCReset = true;
-        cout << "Both left and right feet have been pushed for 3 seconds"
-             <<endl;
-        gc->setGameState(STATE_INITIAL);
-    }else{
-        registeredGCReset = false;
+    if( chestButton->peekNumClicks() == REVERT_TO_INITIAL_CLICKS){
+           cout << "SENDING GC TO INITIAL DUE TO FOOT BUTTONS"
+                <<endl;
+           chestButton->getAndClearNumClicks();
+           gc->setGameState(STATE_INITIAL);
     }
-
 
 }

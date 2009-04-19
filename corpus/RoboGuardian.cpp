@@ -190,9 +190,9 @@ void RoboGuardian::checkFalling(){
         fallingFrames = 0;
         notFallingFrames +=1;
     }
-    cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
-         << "  fallingFrames is " << fallingFrames 
-         << " and critical angle is "<< falling_critical_angle<< endl;
+//     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
+//          << "  fallingFrames is " << fallingFrames 
+//          << " and critical angle is "<< falling_critical_angle<< endl;
 
     //If the robot has been falling for a while, and the robot is inclined
     //already at a 45 degree angle, than we know we are falling
