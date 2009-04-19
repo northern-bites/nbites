@@ -200,6 +200,8 @@ protected: // helper methods
     static estimate getEstimate(boost::numeric::ublas::vector <float> objInWorldFrame);
 
 protected: // members
+    float bodyInclinationX;
+    float bodyInclinationY;
     boost::shared_ptr<Sensors> sensors;
     point <int> horizonLeft, horizonRight;
     float horizonSlope,perpenHorizonSlope;;

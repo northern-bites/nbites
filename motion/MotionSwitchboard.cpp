@@ -218,6 +218,13 @@ int MotionSwitchboard::processProviders(){
         swapBodyProvider();
 	}
 
+    // Update sensors with the correct support foot because it may have
+    // changed this frame.
+    // TODO: This can be improved by keeping a local copy of the SupportFoot
+    //       so that we only update sensors when there has been a change.
+    //       The overhead of the mutex shouldn't be that high though.
+    sensors->setSupportFoot(curProvider->getSupportFoot());
+
     //return if one of the enactors 
     return curProvider->isActive() ||  headProvider.isActive();
 

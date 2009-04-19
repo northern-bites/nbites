@@ -72,6 +72,11 @@ public:
         const std::vector<float> odo = stepGenerator.getOdometryUpdate();
         return MotionModel(odo[0]*MM_TO_CM,odo[1]*MM_TO_CM,odo[2]);
     }
+
+    virtual const SupportFoot getSupportFoot() const {
+        return stepGenerator.getSupportFoot();
+    }
+
 private:
     virtual void setActive();
 
