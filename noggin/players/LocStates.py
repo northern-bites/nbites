@@ -36,7 +36,7 @@ def doneState(player):
         player.stopWalking()
         player.brain.tracker.stopHeadMoves()
     if player.brain.nav.currentState == 'stopped':
-        return player.goLater('sitDown')n
+        return player.goLater('sitDown')
     return player.stay()
 
 def sitDown(player):

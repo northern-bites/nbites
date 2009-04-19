@@ -90,5 +90,5 @@ class SoccerFSA(FSA.FSA):
         """
         Turn on the gains
         """
-        turnon = motion.StiffnessCommand(85.0)
+        turnon = motion.StiffnessCommand(0.85)
         self.brain.motion.sendStiffness(turnon)
