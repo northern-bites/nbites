@@ -176,7 +176,7 @@ class Brain(object):
 
         # Behavior stuff
         self.gameController.run()
-        #self.fallController.run() #not ready for prime time yet
+        self.fallController.run() #not ready for prime time yet
         self.player.run()
         self.tracker.run()
         self.nav.run()

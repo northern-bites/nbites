@@ -136,7 +136,7 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
-  "tables/lab120/zaphLowLight.mtb"
+  "tables/watson/tucker.mtb"
   CACHE STRING
   "Path relative to man directory for the desired color table"
   )
