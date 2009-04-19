@@ -67,8 +67,8 @@ def approachBall(player):
     if player.brain.ball.on:
         bearing = player.brain.ball.bearing
         if bearing < 20:
-            targetX = math.cos(radians(bearing))*player.brain.ball.dist
-            targetY = math.sin(radians(bearing))*player.brain.ball.dist
+            targetX = math.cos(math.radians(bearing))*player.brain.ball.dist
+            targetY = math.sin(math.radians(bearing))*player.brain.ball.dist
             player.printf("bearing is"+str(bearing)+" target X/Y  is "+str(targetX)+","+str(targetY),"blue")
             maxTarget = max(abs(targetX),abs(targetY))
 

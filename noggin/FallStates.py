@@ -7,7 +7,7 @@ Fall Protection and Recovery States
 """
 def fallen(guard):
     if guard.firstFrame():
-        x = motion.StiffnessCommand(.98)
+        x = motion.StiffnessCommand(1.0)
         guard.brain.motion.sendStiffness(x)
 
     """
@@ -15,25 +15,28 @@ def fallen(guard):
     and puts standup in motion
     """
     # Put player into safe mode
-    guard.brain.player.switchTo('nothing')
+    guard.brain.tracker.stopHeadMoves()
+    guard.brain.player.switchTo('fallen')
     return guard.goNow('standup')
 
 def falling(guard):
     """
     Protect the robot when it is falling.
     """
+    guard.brain.tracker.stopHeadMoves()
     return guard.goNow('nothing')
 
 def standup(guard):
     """
     Performs the appropriate standup routine
     """
+    inertial = guard.brain.sensors.inertial
     # If on back, perform back stand up
-    if ( guard.brain.sensors.inertial[6] < -guard.FALLEN_THRESH ):
+    if ( inertial.angleY < -guard.FALLEN_THRESH ):
         return guard.goNow('standFromBack')
 
     # If on stomach, perform stand up from front
-    elif ( guard.brain.sensors.inertial[6] > guard.FALLEN_THRESH ):
+    elif ( inertial.angleY > guard.FALLEN_THRESH ):
         return guard.goNow('standFromFront')
     return guard.stay()
 
@@ -59,6 +62,9 @@ def doneStanding(guard):
     """
     Does clean up after standing up.
     """
+    x = motion.StiffnessCommand(.85)
+    guard.brain.motion.sendStiffness(x)
+
     guard.standingUp = False
     guard.brain.player.switchTo(guard.brain.gameController.currentState)
     return guard.goNow('nothing')

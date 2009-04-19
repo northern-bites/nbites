@@ -8,7 +8,8 @@ VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
 }
 
 
-VisualFieldObject::VisualFieldObject() : id(UNKNOWN_FIELD_OBJECT) {
+VisualFieldObject::VisualFieldObject()
+    : VisualLandmark(), VisualDetection(), id(UNKNOWN_FIELD_OBJECT) {
     init();
 }
 

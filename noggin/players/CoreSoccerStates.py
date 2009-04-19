@@ -64,6 +64,16 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
     return player.stay()
 
+###
+# Standup states
+###
+def fallen(player):
+    """
+    Stops the player when the robot has fallen
+    """
+    return player.stay()
+
+
 #Finished is the exact same as initial
 #In the future, gameFinished should turn off the gains
 gameFinished = gameInitial

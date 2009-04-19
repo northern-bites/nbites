@@ -1,6 +1,4 @@
 
-import man.motion as motion
-import man.motion.SweetMoves as SweetMoves
 from . import FallStates
 from .util import FSA
 
@@ -20,22 +18,26 @@ class FallController(FSA.FSA):
         self.standingUp = False
         self.fallCount = 0
         self.FALLEN_THRESH = 72
+        self.FALL_COUNT_THRESH = 15
 
     def run(self):
-        # Check to see if fallen over is alerted by guardian
-        if (self.isFallen() and
-             not self.standingUp ):
-            self.switchTo('fallen')
-#         elif self.brain.guardian.falling:
-#             self.switchTo('falling')
+        # Only try to stand up when playing or localizing in ready
+        if (self.brain.gameController.currentState == 'gamePlaying' or
+            self.brain.gameController.currentState == 'gameReady' ):
+            # Check to see if fallen over
+            if (self.isFallen() and
+                not self.standingUp ):
+                self.switchTo('fallen')
+                #         elif self.brain.guardian.falling:
+                #             self.switchTo('falling')
 
         FSA.FSA.run(self)
 
     def isFallen(self):
-        print "y is ",self.brain.sensors.inertial[6]
-        if ( math.fabs(self.brain.sensors.inertial[6]) > self.FALLEN_THRESH ):
+        inertial = self.brain.sensors.inertial
+        if ( math.fabs(inertial.angleY) > self.FALLEN_THRESH ):
             self.fallCount += 1
-            if self.fallCount > 5:
+            if self.fallCount > self.FALL_COUNT_THRESH:
                 return True
         else:
             self.fallCount = 0
