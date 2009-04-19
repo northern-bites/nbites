@@ -76,7 +76,6 @@ private:
     void countButtonPushes();
     void processFallingProtection();
     void processChestButtonPushes();
-    void processGameControllerPushes();
     bool executeChestClickAction(int);
     void executeFallProtection();
     void shutoffGains();

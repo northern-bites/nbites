@@ -363,11 +363,15 @@ void Noggin::processGCButtonClicks(){
 #endif
     }
 
+    cout << "Feet have been pushed for ("<<leftFootButton->getClickLength()
+         <<","<<rightFootButton->getClickLength()<< ")"<<endl;
 
     if(rightFootButton->getClickLength() > REVERT_TO_INITIAL_TIME &&
        leftFootButton->getClickLength() > REVERT_TO_INITIAL_TIME &&
         !registeredGCReset){
         registeredGCReset = true;
+        cout << "Both left and right feet have been pushed for 3 seconds"
+             <<endl;
         gc->setGameState(STATE_INITIAL);
     }else{
         registeredGCReset = false;

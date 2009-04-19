@@ -94,6 +94,7 @@ void RoboGuardian::run(){
         checkFallen();
         checkBatteryLevels();
         checkTemperatures();
+        processFallingProtection();
         processChestButtonPushes();
          usleep(static_cast<useconds_t>(GUARDIAN_FRAME_LENGTH_uS));
     }
