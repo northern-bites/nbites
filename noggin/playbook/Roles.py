@@ -37,7 +37,7 @@ def rSearcher(team):
     team.me.role = PBConstants.SEARCHER
     
     if team.numInactiveMates == 1:
-        pos = PBConstants.READY_NON_KICKOFF_LEFT_POSITION
+        pos = PBConstants.READY_KICKOFF_STOPPER
         subRole = PBConstants.OTHER_FINDER
     else:
         pos = team.getLeastWeightPosition(
