@@ -501,7 +501,7 @@ class Packet:
 
     def __str__(self):
         '''returns string with all important values'''
-        return ("#%d @ %d role: %d subRole: %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %  
+        return ("#%d role: %d subRole: %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %  
             (self.playerNumber,
              self.role, self.calledSubRole, self.chaseTime,
              self.playerX, self.playerY, self.playerH, 

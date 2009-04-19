@@ -72,15 +72,6 @@ class Teammate:
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
 
-        # if a penalized timestamp, throw that up
-        """
-        if packet.timeStamp == NogginConstants.PENALIZED_TIMESTAMP:
-            self.inactive = True
-        elif packet.timeStamp == NogginConstants.SOS_TIMESTAMP:
-            print "DOG #%d DIED" % (self.playerNumber)
-            self.inactive = True
-        else:
-        """
         self.inactive = False
 
         self.grabbing = (packet.ballDist <= 
@@ -89,7 +80,7 @@ class Teammate:
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.kicking = False
         #(packet.ballDist == 
-        #                Constants.BALL_TEAMMATE_DIST_KICKING)
+        #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
 
         self.lastPacketTime = time.time()
 
@@ -117,13 +108,13 @@ class Teammate:
         self.dribbling = (self.ballDist == 
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         #self.kicking = (self.ballDist == 
-        #                Constants.BALL_TEAMMATE_DIST_KICKING)
+        #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
 
     def getBearingToGoal(self):
         '''returns bearing to goal'''
         return self.getOthersRelativeBearing(self.x, self.y, self.h,
-                                           NogginConstants.OPP_GOALBOX_X,
-                                           NogginConstants.OPP_GOALBOX_BOTTOM_Y)
+                                           NogginConstants.OPP_GOALBOX_LEFT_X,
+                                           NogginConstants.OPP_GOALBOX_MIDDLE_Y)
 
     def getDistToBall(self):
         '''
@@ -181,3 +172,31 @@ class Teammate:
                 self.calledSubRole == PBConstants.SWEEPER or
                 self.calledSubRole == PBConstants.LEFT_DEEP_BACK or
                 self.calledSubRole == PBConstants.RIGHT_DEEP_BACK)
+    
+    def isPenalized(self):
+        '''
+        this checks GameController to see if a player is penalized.
+        this check is more redundant than anything, because our players stop
+        sending packets when they are penalized, so they will most likely
+        fall under the isTeammateDead() check anyways.
+        '''
+        #penalty state is the first item the player tuple [0]
+        #penalty state == 1 is penalized
+        return (
+            self.brain.gameController.gc.players(
+                self.playerNumber)[0]!=0
+            )
+
+    def isDead(self):
+        '''
+        returns True if teammates' last timestamp is sufficiently behind ours.
+        however, the dog could still be on but sending really laggy packets.
+        '''
+        return (PBConstants.PACKET_DEAD_PERIOD <
+                    time.time() - self.lastPacketTime)
+
+    def hasBall(self):
+        '''
+        returns true if we have the ball
+        '''
+        return (self.grabbing or self.dribbling or self.kicking)

@@ -78,7 +78,7 @@ class GoTeam:
         self.position = []
         self.me = self.teammates[self.brain.my.playerNumber - 1]
         self.me.playerNumber = self.brain.my.playerNumber
-        self.inactiveMates = []
+        self.inactiveMates = [] # inactive field players only
         self.numInactiveMates = 0
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
@@ -113,6 +113,7 @@ class GoTeam:
         """
         Picks the strategy to run and returns all sorts of infos
         """
+        self.printf(self.numInactiveMates)
         # First we check for testing stuff
         if PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
@@ -221,24 +222,6 @@ class GoTeam:
         self.role = self.currentRole
         self.subRole = self.currentSubRole
 
-    def getTime(self):
-        return time.time()
-
-    def printf(self,outputString, printingColor='purple'):
-        '''FSA print function that allows colors to be specified'''
-        if printingColor == 'red':
-            self.brain.out.printf(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
-        elif printingColor == 'blue':
-            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
-        elif printingColor == 'yellow':
-            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
-        elif printingColor == 'cyan':
-            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
-        elif printingColor == 'purple':
-            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
-        else:
-            self.brain.out.printf(str(outputString))
-
     ######################################################
     ############       Role Switching Stuff     ##########
     ######################################################
@@ -332,7 +315,8 @@ class GoTeam:
 
         # loop through teammates    
         for mate in self.teammates:
-            if (self.isTeammateDead(mate) or self.isTeammatePenalized(mate)):
+            if (mate.isDead() or mate.isPenalized()):
+                #reset to true when we get a new packet from mate
                 mate.inactive = True
             if (mate.ballDist > 0):
                 self.brain.ball.reportBallSeen()
@@ -347,33 +331,8 @@ class GoTeam:
         """
         pass
 
-    def isTeammatePenalized(self,teammate):
-        '''
-        this checks GameController to see if a player is penalized.
-        this check is more redundant than anything, because our players stop
-        sending packets when they are penalized, so they will most likely
-        fall under the isTeammateDead() check anyways.
-        '''
-        #penalty state is the first item the player tuple [0]
-        #penalty state == 1 is penalized
-        print(self.brain.gameController.gc.players(
-            teammate.playerNumber-1)[0]!=0)
-        return (
-            self.brain.gameController.gc.players(
-                teammate.playerNumber-1)[0]!=0
-            )
-
-    def isTeammateDead(self,teammate):
-        '''
-        returns True if teammates' last timestamp is sufficiently behind ours.
-        however, the dog could still be on but sending really laggy packets.
-        '''
-        return (teammate.playerNumber != self.brain.my.playerNumber and
-                 (PBConstants.PACKET_DEAD_PERIOD < time.time() - 
-                                                    teammate.lastPacketTime))
-
     def getInactiveFieldPlayers(self):
-        '''cycles through teammate objects and returns number of teammates
+        '''cycles through teammate objects and returns teammates
         that are 'dead'. ignores myself'''
         inactive_teammates = []
         for i,mate in enumerate(self.teammates):
@@ -396,61 +355,9 @@ class GoTeam:
             if (mate.inactive or 
                 mate.playerNumber == self.me.playerNumber):
                 continue
-            elif (mate.grabbing or 
-                  mate.dribbling or 
-                  mate.kicking):
+            elif (mate.hasBall()):
                 return True
         return False
-
-    def isGoalieInactive(self):
-        '''
-        Determines if the goalie is dead or penalized
-        '''
-        return (self.isTeammateDead(self.teammates[0]) or
-                self.isTeammatePenalized(self.teammates[0]) or 
-                self.teammates[0].inactive)
-
-    def isGoalie(self):
-        return self.me.playernumber == 1
-    ######################################################
-    ############   Strategy Decision Stuff     ###########
-    ######################################################
-    def shouldUseDubD(self):
-        return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y -5.  and
-                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y -5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-                 self.teammates[0].calledRole == PBConstants.CHASER))
-
-    def ballInMyGoalBox(self):
-        '''
-        returns True if estimate of ball (x,y) lies in my goal box
-        -includes all y values below top of goalbox 
-        (so inside the goal is included)
-        '''
-        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_X and
-                self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
-                self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
-
-    def getPointBetweenBallAndGoal(self,dist_from_ball):
-        '''returns defensive position between ball (x,y) and goal (x,y)
-        at <dist_from_ball> centimeters away from ball'''
-        delta_y = self.brain.ball.y - NogginConstants.MY_GOAL_MIDDLE_Y
-        delta_X = self.brain.ball.x - NogginConstants.MY_GOAL_LEFT_X
-        
-        pos_x = self.brain.ball.x - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_x
-        pos_y = self.brain.ball.y - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_y
-        if pos_x > PBConstants.STOPPER_MAX_X:
-            pos_x = PBConstants.STOPPER_MAX_X
-            pos_y = (NogginConstants.MY_GOAL_X + delta_x / delta_y *
-                     (PBConstants.STOPPER_MAX_X - 
-                      NogginConstants.MY_GOAL_LEFT_X))
-
-        return pos_x,pos_y
 
     def getOtherActiveTeammate(self):
         '''this returns the teammate instance of an active teammate that isn't 
@@ -477,6 +384,65 @@ class GoTeam:
                 mates.append(mate)
         return mates
 
+    def isGoalieInactive(self):
+        '''
+        Determines if the goalie is inactive
+        '''
+        return (self.teammates[0].inactive)
+
+    def isGoalie(self):
+        return self.me.playernumber == 1
+
+    def reset(self):
+        '''resets all information stored from teammates'''
+        for i,mate in enumerate(self.teammates):
+            mate.reset()
+
+    def update(self,packet):
+        '''public method called by Brain.py to update a teammates' info
+        with a new packet'''
+        self.teammates[packet.playerNumber-1].update(packet)
+
+    ######################################################
+    ############   Strategy Decision Stuff     ###########
+    ######################################################
+    def shouldUseDubD(self):
+        return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y -5.  and
+                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y -5. and
+                 self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+                 self.teammates[0].calledRole == PBConstants.CHASER))
+
+    def ballInMyGoalBox(self):
+        '''
+        returns True if estimate of ball (x,y) lies in my goal box
+        -includes all y values below top of goalbox 
+        (so inside the goal is included)
+        '''
+        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_X and
+                self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
+                self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
+
+    def getPointBetweenBallAndGoal(self,dist_from_ball):
+        '''returns defensive position between ball (x,y) and goal (x,y)
+        at <dist_from_ball> centimeters away from ball'''
+        delta_y = self.brain.ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+        delta_x = self.brain.ball.x - NogginConstants.MY_GOALBOX_LEFT_X
+        
+        pos_x = self.brain.ball.x - (dist_from_ball/
+                                     hypot(delta_x,delta_y))*delta_x
+        pos_y = self.brain.ball.y - (dist_from_ball/
+                                     hypot(delta_x,delta_y))*delta_y
+        if pos_x > PBConstants.STOPPER_MAX_X:
+            pos_x = PBConstants.STOPPER_MAX_X
+            pos_y = (NogginConstants.MY_GOALBOX_LEFT_X + delta_x / delta_y *
+                     (PBConstants.STOPPER_MAX_X - 
+                      NogginConstants.MY_GOALBOX_LEFT_X))
+
+        return pos_x,pos_y
+
     def noCalledChaser(self):
         """
         Returns true if no one is chasing and they are not searching
@@ -493,13 +459,24 @@ class GoTeam:
                 return False
         return True
 
-    def reset(self):
-        '''resets all information stored from teammates'''
-        for i,mate in enumerate(self.teammates):
-            mate.reset()
+################################################################################
+#####################     Utility Functions      ###############################
+################################################################################
 
-    def update(self,packet):
-        '''public method called by Brain.py to update a teammates' info
-        with a new packet'''
-        self.teammates[packet.playerNumber-1].update(packet)
+    def getTime(self):
+        return time.time()
 
+    def printf(self,outputString, printingColor='purple'):
+        '''FSA print function that allows colors to be specified'''
+        if printingColor == 'red':
+            self.brain.out.printf(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'blue':
+            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'yellow':
+            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'cyan':
+            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'purple':
+            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        else:
+            self.brain.out.printf(str(outputString))
