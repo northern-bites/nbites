@@ -179,6 +179,5 @@ class Teammate:
         return (self.calledSubRole == PBConstants.STOPPER or
                 self.calledSubRole == PBConstants.DEEP_STOPPER or
                 self.calledSubRole == PBConstants.SWEEPER or
-                self.calledSubRole == PBConstants.DEFENSIVE_MIDFIELD or
                 self.calledSubRole == PBConstants.LEFT_DEEP_BACK or
                 self.calledSubRole == PBConstants.RIGHT_DEEP_BACK)
