@@ -1071,11 +1071,11 @@ public class Calibrate implements DataListener, MouseListener,
 
         overlay.generateNewEdgeImage(rawImage);
         selector.updateImage(rawImage);
-        selector.setOverlayImage(overlay);
+        calibratePanel.setSelectorOverlay();
 
         if(thresholdedImage != null) {
             displayer.updateImage(thresholdedImage);
-            displayer.setOverlayImage(visionState.getThreshOverlay());
+            calibratePanel.setDisplayerOverlay();
             visionState.update();
         }
 

@@ -144,19 +144,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 	selectorOverlayChoice.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    JComboBox sourceBox = (JComboBox) e.getSource();
-		    if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-			calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
-			calibrate.getSelector().repaint();
-		    }
-		    else if (((String) sourceBox.getSelectedItem()).equals("none")) {
-			calibrate.getSelector().setOverlayImage(null);
-			calibrate.getSelector().repaint();
-		    }
-		    else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
-			calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
-			calibrate.getSelector().repaint();
-		    }
-		}
+		    setSelectorOverlay(sourceBox);
+  		}
 	    });
 
 	displayerOverlayChoice = new JComboBox();
@@ -167,18 +156,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 	displayerOverlayChoice.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    JComboBox sourceBox = (JComboBox) e.getSource();
-		    if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-			calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
-			calibrate.getDisplayer().repaint();
-		    }
-		    else if (((String) sourceBox.getSelectedItem()).equals("none")) {
-			calibrate.getDisplayer().setOverlayImage(null);
-			calibrate.getDisplayer().repaint();
-		    }
-		    else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
-			calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
-			calibrate.getDisplayer().repaint();
-		    }
+		    setDisplayerOverlay(sourceBox);
 		}
 	    });
 
@@ -391,10 +369,79 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
                     }
                 }
             });
-
+	
 
     }
 
+    //
+    public void setSelectorOverlay(JComboBox sourceBox)
+    {
+	if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+	    calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
+	    calibrate.getSelector().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+	    calibrate.getSelector().setOverlayImage(null);
+	    calibrate.getSelector().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+	    calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+	    calibrate.getSelector().repaint();
+	}
+    }
+	
+    //
+    public void setSelectorOverlay()
+    {
+	JComboBox sourceBox = selectorOverlayChoice;
+	if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+	    calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
+	    calibrate.getSelector().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+	    calibrate.getSelector().setOverlayImage(null);
+	    calibrate.getSelector().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+	    calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+	    calibrate.getSelector().repaint();
+	}
+    }
+	
+
+    //
+    public void setDisplayerOverlay(JComboBox sourceBox) {
+	if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+	    calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
+	    calibrate.getDisplayer().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+	    calibrate.getDisplayer().setOverlayImage(null);
+	    calibrate.getDisplayer().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+	    calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+	    calibrate.getDisplayer().repaint();
+	}
+    }
+    
+    //
+    //
+    public void setDisplayerOverlay() {
+	JComboBox sourceBox = displayerOverlayChoice;
+	if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+	    calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
+	    calibrate.getDisplayer().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+	    calibrate.getDisplayer().setOverlayImage(null);
+	    calibrate.getDisplayer().repaint();
+	}
+	else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+	    calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+	    calibrate.getDisplayer().repaint();
+	}
+    }
 
     /**
      * Greys out buttons depending on whether we can actually use them at this
