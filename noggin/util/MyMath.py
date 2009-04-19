@@ -29,7 +29,7 @@ def sub180Diff(angle, from_angle):
     """
     Returns the angle indetical to the first angle such that it has a
     Euclidian distance from from_angle of less that 180 degrees.
-    """ 
+    """
     while (fabs(angle - from_angle) > 180.):
         if angle > 0.:
             angle -= 360
@@ -60,7 +60,7 @@ def sign(x):
         return x/abs(x)
 
 def clip(value,min,max):
-    '''takes a value, plus a min and a max, 
+    '''takes a value, plus a min and a max,
     then returns a value within the max/min'''
     if value < min:
         return min
@@ -89,3 +89,12 @@ def getRelativeBearing(robotX, robotY, robotH, x, y):
     '''return relative heading from self localization to abs x,y on field'''
     return sub180Angle(robotH - (degrees(safe_atan2(y - robotY,
                                                     x - robotX)) - 90.0))
+
+def getTargetHeading(my, targetX, targetY):
+    '''determine the heading facing a target x, y'''
+    targetH = sub180Angle(degrees(safe_atan2(
+                targetY - my.y, targetX - my.x)))
+    return targetH
+
+def getSpinDir(my, targetH):
+    return sign(targetH - my.h)

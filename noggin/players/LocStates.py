@@ -45,5 +45,9 @@ def sitDown(player):
 
     if not player.brain.motion.isBodyActive():
         player.gainsOff()
+        return player.goLater('doneDone')
 
+    return player.stay()
+
+def doneDone(player):
     return player.stay()

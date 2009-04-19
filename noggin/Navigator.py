@@ -1,17 +1,17 @@
 
 from . import NavStates
-from . import NavConstants
 from .util import FSA
-from .util import MyMath
 import man.motion as motion
+CLOSE_ENOUGH_XY = 15.0
+CLOSE_ENOUGH_H = 15.0
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
-        self.currentState = 'nothing'
-        self.setName('Navigator, bitch!')
+        self.currentState = 'stopped'
+        self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
@@ -51,3 +51,18 @@ class Navigator(FSA.FSA):
         """
         walk = motion.WalkCommand(x=x,y=y,theta=theta)
         self.brain.motion.setNextWalkCommand(walk)
+
+    def atDestination(self):
+        """
+        Returns true if we are at an (x, y) close enough to the one we want
+        """
+        return (abs(self.brain.my.x - self.destX) < CLOSE_ENOUGH_XY
+                and abs(self.brain.my.y - self.dextY) < CLOSE_ENOUGH_XY)
+
+    def atHeading(self, targetHeading = None):
+        """
+        Returns true if we are at a heading close enough to what we want
+        """
+        if targetHeading is None:
+            targetHeading = self.destH
+        return abs(self.brain.my.h - targetHeading) < CLOSE_ENOUGH_H

@@ -136,14 +136,12 @@ SET( NOGGIN_SRCS ${NOGGIN_INCLUDE_DIR}/Noggin
 
 SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/Brain.py
-                        ${NOGGIN_INCLUDE_DIR}/EKF.py
                         ${NOGGIN_INCLUDE_DIR}/GameController.py
                         ${NOGGIN_INCLUDE_DIR}/GameStates.py
 			${NOGGIN_INCLUDE_DIR}/FallController.py
                         ${NOGGIN_INCLUDE_DIR}/FallStates.py
                         ${NOGGIN_INCLUDE_DIR}/HeadTracking.py
                         ${NOGGIN_INCLUDE_DIR}/PanningStates.py
-                        ${NOGGIN_INCLUDE_DIR}/NavConstants.py
                         ${NOGGIN_INCLUDE_DIR}/NavStates.py
                         ${NOGGIN_INCLUDE_DIR}/Navigator.py
                         ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
