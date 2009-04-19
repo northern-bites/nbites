@@ -52,9 +52,9 @@ public class RobotDef {
     public static final RobotDef ERS220_DEF =
         new RobotDef(AIBO_220, 208, 160, 15, 16);
     public static final RobotDef NAO_DEF_HIGH =
-        new RobotDef(NAO_RL, 640, 480, 640*480*2, 22, 21);
+        new RobotDef(NAO_RL, 640, 480, 640*480*2, 22, 22);
     public static final RobotDef NAO_DEF =
-        new RobotDef(NAO_RL, 320, 240, 320*240*2, 22, 21);
+        new RobotDef(NAO_RL, 320, 240, 320*240*2, 22, 22);
     public static final RobotDef NAO_SIM_DEF =
         new RobotDef(NAO_SIM, 160, 120, 22, 15);
 

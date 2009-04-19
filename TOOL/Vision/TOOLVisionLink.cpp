@@ -108,13 +108,14 @@ extern "C" {
 
         // Set the joints data - Note: set visionBodyAngles not bodyAngles
         float * joints = env->GetFloatArrayElements(jjoints,0);
-        vector<float> joints_vector(&joints[0],&joints[22]);
+        vector<float> joints_vector(&joints[0],&joints[Kinematics::NUM_JOINTS]);
         env->ReleaseFloatArrayElements(jjoints,joints,0);
         sensors->setVisionBodyAngles(joints_vector);
 
         // Set the sensor data
         float * sensors_array = env->GetFloatArrayElements(jsensors,0);
-        vector<float> sensors_vector(&sensors_array[0],&sensors_array[22]);
+        vector<float> sensors_vector(&sensors_array[0],
+                                     &sensors_array[NUM_SENSORS]);
         env->ReleaseFloatArrayElements(jsensors,sensors_array,0);
         sensors->setAllSensors(sensors_vector);
 
@@ -132,12 +133,6 @@ extern "C" {
         //vision.drawBoxes();
         env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
-        //Debug output:
-        /*
-          cout <<"Ball Width: "<<  vision.ball->getWidth() <<endl;
-          cout<<"Pose Left Hor Y" << pose->getLeftHorizonY() <<endl;
-          cout<<"Pose Right Hor Y" << pose->getRightHorizonY() <<endl;
-        */
         //copy results from vision thresholded to the array passed in from java
         //we access to each row in the java array, and copy in from cpp thresholded
         //we may in the future want to experiment with malloc, for increased speed
