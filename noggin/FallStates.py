@@ -24,7 +24,7 @@ def falling(guard):
     Protect the robot when it is falling.
     """
     guard.brain.tracker.stopHeadMoves()
-    return guard.goNow('nothing')
+    return guard.goNow('notFallen')
 
 def standup(guard):
     """
@@ -42,7 +42,6 @@ def standup(guard):
 
 def standFromBack(guard):
     if guard.firstFrame():
-        guard.standingUp = True
         guard.brain.player.executeMove(SweetMoves.STAND_UP_BACK)
 
     if guard.brain.motion.isBodyActive():
@@ -51,7 +50,6 @@ def standFromBack(guard):
 
 def standFromFront(guard):
     if guard.firstFrame():
-        guard.standingUp = True
         guard.brain.player.executeMove(SweetMoves.STAND_UP_FRONT)
 
     if guard.brain.motion.isBodyActive():
@@ -67,9 +65,9 @@ def doneStanding(guard):
 
     guard.standingUp = False
     guard.brain.player.switchTo(guard.brain.gameController.currentState)
-    return guard.goNow('nothing')
+    return guard.goNow('notFallen')
 
-def nothing(guard):
+def notFallen(guard):
     """
     Does nothing
     """
