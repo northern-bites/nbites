@@ -380,17 +380,8 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
   // object in world frame
   ublas::vector<float> objectInWorldFrame =
      prod(cameraToWorldFrame,objectInCameraFrame);
-  ublas::vector<float> objectInBodyFrame =
-       prod(cameraToBodyTransform, objectInCameraFrame);
-  estimate badBearing = getEstimate(objectInWorldFrame);
-  estimate goodBearing = getEstimate(objectInBodyFrame);
-  //cout << goodBearing.bearing << "\t" << badBearing.bearing << endl;
-  const estimate goodEst = {badBearing.dist,
-			    goodBearing.elevation,
-			    goodBearing.bearing,
-			    badBearing.x,
-			    badBearing.y};
-  return goodEst;
+
+  return getEstimate(objectInWorldFrame);
 }
 
 /**
