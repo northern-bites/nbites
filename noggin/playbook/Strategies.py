@@ -17,7 +17,7 @@ def sSpread(team):
     elif team.brain.gameController.currentState == 'gamePlaying':
 
         # Kickoff Formations
-        if (team.brain.gameController.getTimeSincePlay() < 
+        if (team.brain.gameController.timeSincePlay() < 
             PBConstants.KICKOFF_FORMATION_TIME):
             # Kickoff play
             if PBConstants.KICKOFF_PLAY:
@@ -58,9 +58,9 @@ def sOneDown(team):
         return ['sOneDown'] + Formations.fReady(team)
 
     # Kickoff Formations
-    #if (team.brain.gameController.getTimeSincePlay() < 
-        #PBConstants.KICKOFF_FORMATION_TIME):
-        #return ['sOneDown'] + Formations.fOneKickoff(team)
+    if (team.brain.gameController.timeSincePlay() < 
+        PBConstants.KICKOFF_FORMATION_TIME):
+        return ['sOneDown'] + Formations.fOneKickoff(team)
 
     # Formation for ball in our goal box
     elif team.shouldUseDubD():

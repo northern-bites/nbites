@@ -29,8 +29,8 @@ TIME_PER_STEP = TIME_STEP/1000.
 ##
 ##--------------------TEAM STUFF-----------------------#
 ##
-NUM_PLAYERS_PER_TEAM = 4
-
+NUM_PLAYERS_PER_TEAM = 3
+LENGTH_OF_HALF = 10
 # Setup colors
 NUM_GAME_TEAM_COLORS = 2
 teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
