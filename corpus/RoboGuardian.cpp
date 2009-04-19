@@ -62,8 +62,8 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
 //       lastButtonOnCounter(0),lastButtonOffCounter(0),
 //       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
-      notFallingFrames(0),fallenCounter(0),numClicks(NO_CLICKS),
-      registeredClickThisTime(true),registeredShutdown(false),
+      notFallingFrames(0),fallenCounter(0),
+      registeredFalling(false),registeredShutdown(false),
       falling(false),fallen(false),
       useFallProtection(false)
 {
@@ -90,9 +90,11 @@ void RoboGuardian::run(){
     while(Thread::running){
 
         countButtonPushes();
-        checkFallProtection();
+        checkFalling();
+        checkFallen();
         checkBatteryLevels();
         checkTemperatures();
+        processFallingProtection();
         processChestButtonPushes();
          usleep(static_cast<useconds_t>(GUARDIAN_FRAME_LENGTH_uS));
     }
@@ -106,10 +108,11 @@ void RoboGuardian::shutoffGains(){
                                          StiffnessCommand::NO_STIFFNESS));
 }
 
-static const float FALL_SPEED_THRESH = 0.04f; //rads/20ms
+static const float FALL_SPEED_THRESH = 0.03f; //rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.01f; //rads/20ms
-static const int FALLING_FRAMES_THRESH = 5;
-static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/4.0f; //45 degrees
+static const int FALLING_FRAMES_THRESH = 3;
+static const int FALLING_RESET_FRAMES_THRESH = 10;
+static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/6.0f; //30 degrees
 static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/2.5f; //72 degrees
 
 
@@ -126,50 +129,10 @@ bool isFalling(float angle_pos, float angle_vel){
     return false;
 }
 
-/**
- * Method to watch the robots rotation and detect falls
- * publishes the result of this computation to other classes.
- *
- * Also builds in the ability to shutoff gains when a fall is detected,
- * but this still has some problems. Mainly, it sometimes triggers a fall
- * when the robot is rotated back up again, but only when the robot is 
- * 'over rotated' during the righting.  This feature can be enabled
- * by calling the currently private 'enableFallProtection'.
- * Also, currently the robot will print whenever it believes it is in
- * the process of falling. This will allow us to monitor how well this code
- * works.
- *
- */
-void RoboGuardian::checkFallProtection(){
+
+
+void RoboGuardian::checkFallen(){
     const Inertial inertial  = sensors->getInertial();
-
-    /***** Determine if the robot is in the process of FALLING ****/
-    //Using just the magnitude:
-    const float angleMag = std::sqrt(std::pow(inertial.angleX,2) +
-                                     std::pow(inertial.angleY,2));
-    const float lastAngleMag = std::sqrt(std::pow(lastInertial.angleX,2) +
-                                         std::pow(lastInertial.angleY,2));
-
-    const float angleSpeed = angleMag - lastAngleMag;
-    const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
-
-    if(isFalling(angleMag,angleSpeed)){
-        fallingFrames += 1;
-        notFallingFrames = 0;
-    }else if( angleSpeed < NOFALL_SPEED_THRESH){
-        fallingFrames = 0;
-        notFallingFrames +=1;
-    }
-
-
-    //If the robot has been falling for a while, and the robot is inclined
-    //already at a 45 degree angle, than we know we are falling
-    if (fallingFrames > FALLING_FRAMES_THRESH && falling_critical_angle){
-        //Execute protection? Just print for now and we'll see how this works
-        falling = true;
-    }else if(notFallingFrames > FALLING_FRAMES_THRESH){
-        falling = false;
-    }
 
     /***** Determine if the robot has FALLEN OVER *****/
     const bool fallen_now =
@@ -189,21 +152,82 @@ void RoboGuardian::checkFallProtection(){
 #endif
     }
 
-    if(fallingFrames == FALLING_FRAMES_THRESH){
-        if(useFallProtection){
-            shutoffGains();
-            cout << "Disabling Gains!!! due to falling" <<endl;
-        }
-#define DEBUG_GUARDIAN_FALLING
-#ifdef DEBUG_GUARDIAN_FALLING
-        cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
-        playFile(falling_wav);
-#endif
+
+}
+
+
+/**
+ * Method to watch the robots rotation and detect falls
+ * publishes the result of this computation to other classes.
+ *
+ * Also builds in the ability to shutoff gains when a fall is detected,
+ * but this still has some problems. Mainly, it sometimes triggers a fall
+ * when the robot is rotated back up again, but only when the robot is 
+ * 'over rotated' during the righting.  This feature can be enabled
+ * by calling the currently private 'enableFallProtection'.
+ * Also, currently the robot will print whenever it believes it is in
+ * the process of falling. This will allow us to monitor how well this code
+ * works.
+ *
+ */
+void RoboGuardian::checkFalling(){
+    const Inertial inertial  = sensors->getInertial();
+
+    /***** Determine if the robot is in the process of FALLING ****/
+    //Using just the magnitude:
+    const float angleMag = std::sqrt(std::pow(inertial.angleX,2) +
+                                     std::pow(inertial.angleY,2));
+    const float lastAngleMag = std::sqrt(std::pow(lastInertial.angleX,2) +
+                                         std::pow(lastInertial.angleY,2));
+
+    const float angleSpeed = angleMag - lastAngleMag;
+    const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
+
+    if(isFalling(angleMag,angleSpeed)){
+        fallingFrames += 1;
+        notFallingFrames = 0;
+    }else if( angleSpeed < NOFALL_SPEED_THRESH){
+        fallingFrames = 0;
+        notFallingFrames +=1;
     }
+//     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
+//          << "  fallingFrames is " << fallingFrames 
+//          << " and critical angle is "<< falling_critical_angle<< endl;
+
+    //If the robot has been falling for a while, and the robot is inclined
+    //already at a 45 degree angle, than we know we are falling
+    if (fallingFrames > FALLING_FRAMES_THRESH && falling_critical_angle){
+        //Execute protection? Just print for now and we'll see how this works
+        falling = true;
+    }else if(notFallingFrames > FALLING_FRAMES_THRESH){
+        falling = false;
+    }
+
 
     lastInertial  = inertial;
 }
 
+
+void RoboGuardian::processFallingProtection(){
+    if(falling && !registeredFalling){
+        registeredFalling = true;
+        executeFallProtection();
+    }else if(notFallingFrames > FALLING_RESET_FRAMES_THRESH){
+        registeredFalling = false;
+    }
+
+//     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle){
+//         if(useFallProtection){
+//             shutoffGains();
+//             cout << "Disabling Gains!!! due to falling" <<endl;
+//         }
+// #define DEBUG_GUARDIAN_FALLING
+// #ifdef DEBUG_GUARDIAN_FALLING
+//         cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
+//         playFile(falling_wav);
+// #endif
+//     }
+}
 
 // We print each time the battery looses ten percent of charge
 //once the charge gets to %30 percent of capacity, we start to say "energy"
@@ -228,7 +252,7 @@ void RoboGuardian::checkBatteryLevels(){
         const float newLevel = floor(newBatteryCharge*10.0f);
         const float oldLevel = floor(lastBatteryCharge*10.0f);
         if(oldLevel != newLevel && oldLevel > newLevel &&
-            newLevel - oldLevel <= 2.0f){
+            oldLevel - newLevel <= 1.0f){
             cout << Thread::name << ": Battery charge is now at "
                  << 10.0f * newBatteryCharge
                  << " (was "<<oldLevel<<")"<<endl;
@@ -301,7 +325,7 @@ void RoboGuardian::processChestButtonPushes(){
 
 bool RoboGuardian::executeChestClickAction(int nClicks){
 #ifdef DEBUG_GUARDIAN_CLICKS
-    cout << "Processing "<<numClicks<< " clicks"<<endl;
+    cout << "Processing "<<nClicks<< " clicks"<<endl;
 #endif
 
     //NOTE: Please upade wiki/NaoChestButtonInterface when this is changed!!!
@@ -336,6 +360,29 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
     }
     return true;
 }
+
+
+void RoboGuardian::executeFallProtection(){
+    if(useFallProtection){
+        shutoffGains();
+    }
+#ifdef DEBUG_GUARDIAN_FALLING
+    cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
+    playFile(falling_wav);
+#endif
+}
+
+    //     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle){
+//         if(useFallProtection){
+//             shutoffGains();
+//             cout << "Disabling Gains!!! due to falling" <<endl;
+//         }
+// #define DEBUG_GUARDIAN_FALLING
+// #ifdef DEBUG_GUARDIAN_FALLING
+//         cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
+//         playFile(falling_wav);
+// #endif
+//     }
 
 
 void RoboGuardian::executeStartupAction() const{

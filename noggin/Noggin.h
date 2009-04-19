@@ -12,6 +12,7 @@
 #include "LocEKF.h"
 #include "BallEKF.h"
 #include "Comm.h"
+#include "GameController.h"
 
 #include "RoboGuardian.h"
 #include "ClickableButton.h"
@@ -65,6 +66,10 @@ private:
     PyObject *brain_module;
     PyObject *brain_instance;
     MotionInterface * motion_interface;
+
+    //GC stuff
+    bool registeredGCReset;
+
 // Public members
 public:
     boost::shared_ptr<LocSystem> loc;

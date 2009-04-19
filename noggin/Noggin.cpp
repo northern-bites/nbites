@@ -24,7 +24,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
       error_state(false), brain_module(NULL), brain_instance(NULL),
-      motion_interface(_minterface)
+      motion_interface(_minterface),registeredGCReset(false)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -327,7 +327,7 @@ void Noggin::processGCButtonClicks(){
     static const int ADVANCE_STATES_CLICKS  = 1;
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
-
+    static const int REVERT_TO_INITIAL_CLICKS = 4;
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
@@ -361,6 +361,13 @@ void Noggin::processGCButtonClicks(){
         else
             cout << "OFF KICKOFF" <<endl;
 #endif
+    }
+
+    if( chestButton->peekNumClicks() == REVERT_TO_INITIAL_CLICKS){
+           cout << "SENDING GC TO INITIAL DUE TO FOOT BUTTONS"
+                <<endl;
+           chestButton->getAndClearNumClicks();
+           gc->setGameState(STATE_INITIAL);
     }
 
 }
