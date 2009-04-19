@@ -3,6 +3,7 @@ from . import NavStates
 from . import NavConstants
 from .util import FSA
 from .util import MyMath
+import man.motion as motion
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -13,100 +14,40 @@ class Navigator(FSA.FSA):
         self.setName('Navigator, bitch!')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
+        self.stateChangeColor = 'greenbg'
 
-        self.lastDestX=self.lastDestY=self.lastDestH = self.destX=self.destY=self.destH = 0
-
-
-    def run (self):
-        ''' 
-        Overload the FSA version of run, so we can exectue our own updates 
-        '''
-
-        #Each frame we need to update where we are going
-        #and calculate some facts about how far away we are
-
-        #unnecessary?
-        self.lastDestX,self.lastDestY,self.lastDestH = self.destX,self.destY,self.destH
-
-        self.bearingToDest = MyMath.getRelativeBearing(self.brain.my.x,
-                                                  self.brain.my.y,
-                                                  self.brain.my.h,
-                                                  self.destX,
-                                                  self.destY)
-        self.distToDest = MyMath.dist(self.brain.my.x,
-                                 self.brain.my.y,
-                                 self.destX,
-                                 self.destY)
-
-        self.bearingToDestHeading = self.destH - self.brain.my.h
-
-        FSA.FSA.run(self)
-
+        self.lastDestX = 0
+        self.lastDestY = 0
+        self.lastDestH = 0
+        self.destX= 0
+        self.destY= 0
+        self.destH = 0
+        self.walkX = 0
+        self.walkY = 0
+        self.walkTheta = 0
 
     def goTo(self,x,y,h=None):
-        self.forever = False
-        if h==None:
-            self.destH = self.brain.my.h
-        else:
-            self.destH = h
+        self.destH = h
         self.destX,self.destY = x,y
 
-        self.switchTo('walkStraight')
+    def setWalk(self, x, y, theta):
+        """
+        Sets a new walk command
+        Returns False if it is the same as the current walk
+        True otherwise
+        """
+        if (self.walkX == x and self.walkY == y and
+            self.walkTheta == theta):
+            return False
 
-    def spinLeft(self):
-        self.switchTo('turnLeftForever')
+        self.walkX = x
+        self.walkY = y
+        self.walkTheta = theta
+        return True
 
-    def spinRight(self):
-        self.switchTo('turnRightForever')
-
-    def walkStraight(self):
-        self.switchTo('walkStraightForever')
-
-    def stopWalking(self):
-        self.switchTo('stop')
-
-    def getErrors(self):
-        ''' Returns X,Y,H errors for how close we are to our destination positoning'''
-        return (self.destX - self.brain.my.x,
-                self.destY - self.brain.my.Y,
-                self.destH - self.brain.my.h)
-    
-
-    def arrived(self):
-        return self.distToDest < NavConstants.DIST_ARRIVED_THRESH
-
-    def shouldInitialTurnLeft(self):
-        return self.bearingToDest > NavConstants.INITIAL_BEARING_THRESH and not self.arrived()
-
-    def shouldInitialTurnRight(self):
-        return self.bearingToDest < NavConstants.INITIAL_BEARING_THRESH and not self.arrived()
-        
-    def shouldFinalTurnLeft(self):
-        return self.bearingToDestHeading > NavConstants.HEADING_ARRIVED_THRESH and self.arrived()
-    
-    def shouldFinalTurnRight(self):
-        return self.bearingToDestHeading < NavConstants.HEADING_ARRIVED_THRESH and self.arrived()
-    
-    def shouldWalkStraight(self):
-        return ( not self.arrived() and
-                 not self.shouldInitialTurnRight() and 
-                 not self.shouldInitialTurnLeft() )
-
-    def shouldStop(self):
-        return ( self.arrived and 
-                 not self.shouldFinalTurnRight() and 
-                 not self.shouldFinalTurnLeft() ) 
-    
-
-    def turnTo(self,degrees):
-        self.degreesToTurn = degrees
-        self.goNow('turn')
-
-    def walkStraightTo(self,cm):
-        self.distToDest = cm
-        self.switchTo('walkStraightTo')
-
-    def walkSidewaysTo(self,cm):
-        self.distToDest = cm
-        self.switchTo('walkSidewaysTo')
-
+    def setSpeed(self,x,y,theta):
+        """
+        Wrapper method to easily change the walk vector of the robot
+        """
+        walk = motion.WalkCommand(x=x,y=y,theta=theta)
+        self.brain.motion.setNextWalkCommand(walk)

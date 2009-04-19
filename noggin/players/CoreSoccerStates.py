@@ -26,8 +26,7 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
-        x = motion.StiffnessCommand(.85)
-        player.brain.motion.sendStiffness(x)
+        player.gainsOn()
         player.motion.stopBodyMoves()
         player.setHeads(0.,0.)
         player.brain.tracker.stopHeadMoves()

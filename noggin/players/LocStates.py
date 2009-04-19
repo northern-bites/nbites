@@ -2,8 +2,8 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion as motion
 
 SPIN_TIME = 180
-WAIT_TIME = 15
-WALK_TIME = 600
+WAIT_TIME = 45
+WALK_TIME = 200
 
 def gamePlaying(player):
     player.brain.loc.reset()
@@ -12,9 +12,9 @@ def gamePlaying(player):
 def spinLocalize(player):
     if player.firstFrame():
         player.brain.tracker.switchTo('locPans')
-        player.setSpeed(0,0,15)
+        player.setSpeed(0,2,15)
     if player.counter == SPIN_TIME:
-        player.setSpeed(0,0,0)
+        player.stopWalking()
         return player.goNow('waitToMove')
 
     return player.stay()
@@ -33,13 +33,17 @@ def walkForward(player):
 
 def doneState(player):
     if player.firstFrame():
-        player.setSpeed(0,0,0)
-        player.executeMove(SweetMoves.SIT_POS)
+        player.stopWalking()
         player.brain.tracker.stopHeadMoves()
-        #player.brain.sensors.resetSaveFrame()
+    if player.brain.nav.currentState == 'stopped':
+        return player.goLater('sitDown')n
+    return player.stay()
 
-    if player.stateTime > 8.0:
-        shutoff = motion.StiffnessCommand(0.0)
-        player.brain.motion.sendStiffness(shutoff)
+def sitDown(player):
+    if player.firstFrame():
+        player.executeMove(SweetMoves.SIT_POS)
+
+    if not motion.isBodyActive:
+        player.gainsOff()
 
     return player.stay()
