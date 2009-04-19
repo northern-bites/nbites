@@ -263,6 +263,6 @@ class Brain(object):
                           self.loc.ballXUncert,
                           self.loc.ballYUncert,
                           self.ball.dist,
-                          self.playbook.role,
-                          self.playbook.currentSubRole,
-                          self.playbook.me.chaseTime) # Chase Time
+                          0,#self.playbook.role,
+                          1,#self.playbook.currentSubRole,
+                          2)#self.playbook.me.chaseTime) # Chase Time

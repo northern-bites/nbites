@@ -113,7 +113,6 @@ class GoTeam:
         """
         Picks the strategy to run and returns all sorts of infos
         """
-        self.printf(self.numInactiveMates)
         # First we check for testing stuff
         if PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
@@ -469,14 +468,19 @@ class GoTeam:
     def printf(self,outputString, printingColor='purple'):
         '''FSA print function that allows colors to be specified'''
         if printingColor == 'red':
-            self.brain.out.printf(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\
+                RESET_COLORS_CODE)
         elif printingColor == 'blue':
-            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) +\
+                RESET_COLORS_CODE)
         elif printingColor == 'yellow':
-            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) +\
+                RESET_COLORS_CODE)
         elif printingColor == 'cyan':
-            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) +\
+                RESET_COLORS_CODE)
         elif printingColor == 'purple':
-            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) +\
+                RESET_COLORS_CODE)
         else:
             self.brain.out.printf(str(outputString))
