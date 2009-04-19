@@ -13,8 +13,8 @@ const float LocEKF::BETA_LOC = 3.0f;
 const float LocEKF::GAMMA_LOC = 0.4f;
 const float LocEKF::BETA_LAT = 3.0f;
 const float LocEKF::GAMMA_LAT = 0.4f;
-const float LocEKF::BETA_ROT = M_PI/8.0f;
-const float LocEKF::GAMMA_ROT = 0.4f;
+const float LocEKF::BETA_ROT = M_PI/16.0f;
+const float LocEKF::GAMMA_ROT = 0.04f;
 
 // Default initialization values
 const float LocEKF::INIT_LOC_X = 370.0f;

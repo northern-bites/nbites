@@ -1,8 +1,9 @@
 
 from . import NavStates
 from .util import FSA
+from .util import MyMath
 import man.motion as motion
-CLOSE_ENOUGH_XY = 15.0
+CLOSE_ENOUGH_XY = 25.0
 CLOSE_ENOUGH_H = 15.0
 
 class Navigator(FSA.FSA):
@@ -29,6 +30,7 @@ class Navigator(FSA.FSA):
     def goTo(self,x,y,h=None):
         self.destH = h
         self.destX,self.destY = x,y
+        self.switchTo('spinToWalkHeading')
 
     def setWalk(self, x, y, theta):
         """
@@ -56,8 +58,10 @@ class Navigator(FSA.FSA):
         """
         Returns true if we are at an (x, y) close enough to the one we want
         """
+        self.printf("X diff is " + str(self.brain.my.x - self.destX))
+        self.printf("Y diff is " + str(self.brain.my.y - self.destY))
         return (abs(self.brain.my.x - self.destX) < CLOSE_ENOUGH_XY
-                and abs(self.brain.my.y - self.dextY) < CLOSE_ENOUGH_XY)
+                and abs(self.brain.my.y - self.destY) < CLOSE_ENOUGH_XY)
 
     def atHeading(self, targetHeading = None):
         """
@@ -65,4 +69,9 @@ class Navigator(FSA.FSA):
         """
         if targetHeading is None:
             targetHeading = self.destH
-        return abs(self.brain.my.h - targetHeading) < CLOSE_ENOUGH_H
+        hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
+        self.printf("H diff is " + str(hDiff))
+        return abs(hDiff) < CLOSE_ENOUGH_H
+
+    def isStopped(self):
+        return self.currentState == 'stopped'

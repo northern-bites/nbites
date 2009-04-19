@@ -1,13 +1,15 @@
 import man.motion.SweetMoves as SweetMoves
-import man.motion as motion
+import man.noggin.NogginConstants as NogginConstants
 
-SPIN_TIME = 180
+SPIN_TIME = 360
 WAIT_TIME = 45
 WALK_TIME = 200
+TARGET_X = NogginConstants.MY_GOALBOX_RIGHT_X
+TARGET_Y = NogginConstants.CENTER_FIELD_Y
 
 def gamePlaying(player):
-    player.brain.loc.reset()
-    return player.goLater('spinLocalize')
+    #player.brain.loc.reset()
+    return player.goLater('goToPoint')
 
 def spinLocalize(player):
     if player.firstFrame():
@@ -21,7 +23,17 @@ def spinLocalize(player):
 
 def waitToMove(player):
     if player.counter > WAIT_TIME:
-        return player.goNow('walkForward')
+        return player.goNow('goToPoint')
+    return player.stay()
+
+def goToPoint(player):
+    if player.firstFrame():
+        player.brain.nav.goTo(TARGET_X, TARGET_Y)
+        return player.stay()
+
+    if player.brain.nav.isStopped():
+        return player.goLater('doneState')
+
     return player.stay()
 
 def walkForward(player):
@@ -35,13 +47,14 @@ def doneState(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.stopHeadMoves()
-    if player.brain.nav.currentState == 'stopped':
+    if player.brain.nav.isStopped():
         return player.goLater('sitDown')
     return player.stay()
 
 def sitDown(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
+        return player.stay()
 
     if not player.brain.motion.isBodyActive():
         player.gainsOff()

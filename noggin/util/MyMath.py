@@ -92,9 +92,7 @@ def getRelativeBearing(robotX, robotY, robotH, x, y):
 
 def getTargetHeading(my, targetX, targetY):
     '''determine the heading facing a target x, y'''
-    targetH = sub180Angle(degrees(safe_atan2(
-                targetY - my.y, targetX - my.x)))
-    return targetH
+    return sub180Angle(degrees(safe_atan2(targetY - my.y, targetX - my.x)))
 
 def getSpinDir(my, targetH):
-    return sign(targetH - my.h)
+    return sign(sub180Diff(targetH, my.h))

@@ -55,12 +55,13 @@ public:
     /**
      * @return The current estimate of the loc heading
      */
-    virtual const float getHEst() const { return xhat_k(2); }
+    virtual const float getHEst() const { return subPIAngle(xhat_k(2)); }
 
     /**
      * @return The current estimate of the loc heading in degrees
      */
-    virtual const float getHEstDeg() const { return xhat_k(2) * TO_DEG; }
+    virtual const float getHEstDeg() const {
+        return subPIAngle(xhat_k(2)) * TO_DEG; }
 
 
     /**

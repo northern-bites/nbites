@@ -16,9 +16,10 @@ def spinToWalkHeading(nav):
         nav.setSpeed(0,0,0)
 
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
-
+    nav.printf("Target heading is " + str(targetH))
+    nav.printf("Current heading is " + str(nav.brain.my.h))
     if nav.counter > WAIT_BETWEEN_MOVES:
-        spinDir = MyMath.getSpinDir(targetH)
+        spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
         nav.setSpeed(0, spinDir * GOTO_SPIN_STRAFE, spinDir * GOTO_SPIN_SPEED)
 
     if nav.atHeading(targetH):
@@ -58,8 +59,11 @@ def spinToFinalHeading(nav):
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
 
+    targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
+
     if nav.counter > WAIT_BETWEEN_MOVES:
-        nav.setSpeed(0, GOTO_SPIN_STRAFE, GOTO_SPIN_SPEED)
+        spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
+        nav.setSpeed(0, spinDir*GOTO_SPIN_STRAFE, spinDir*GOTO_SPIN_SPEED)
 
     if nav.atHeading():
         nav.goLater('stop')
