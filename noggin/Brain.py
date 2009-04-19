@@ -71,7 +71,6 @@ class Brain(object):
         self.my = TypeDefs.MyInfo()
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
-
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
@@ -82,7 +81,6 @@ class Brain(object):
         # Functional Variables
         self.my.teamNumber = self.comm.gc.team
         self.my.playerNumber = self.comm.gc.player
-        self.ownPlayers = [[0]*13]*4
 
     def initFieldObjects(self):
         """
@@ -234,10 +232,11 @@ class Brain(object):
 
     def updateComm(self):
         temp = self.comm.latestComm()
-        if len(temp) > 0 and len(temp[0])==17:
-            self.packet = TypeDefs.Packet(temp[0])
-            if self.packet.playerNumber != self.my.playerNumber:
-                self.playbook.update(self.packet)
+        for packet in temp:
+            if len(packet)==17:
+                packet = TypeDefs.Packet(packet)
+                if packet.playerNumber != self.my.playerNumber:
+                    self.playbook.update(packet)
 
     def updateLocalization(self):
         """
