@@ -727,13 +727,16 @@ void Sensors::resetSaveFrame()
     saved_frames = 0;
 }
 
+// The version for the frame format
+static const int VERSION = 0;
+
 void Sensors::saveFrame()
 {
     int MAX_FRAMES = 150;
     if (saved_frames > MAX_FRAMES)
         return;
 
-    string EXT(".NFRM");
+    string EXT(".NBFRM");
     string BASE("/");
     int NUMBER = saved_frames;
     string FOLDER("/home/root/frames");
@@ -750,6 +753,9 @@ void Sensors::saveFrame()
     fout.write(reinterpret_cast<const char*>(getImage()),
                IMAGE_BYTE_SIZE);
     releaseImage();
+
+    // write the version of the frame format at the end before joints/sensors
+    fout << VERSION << " ";
 
     // Write joints
     for (vector<float>::const_iterator i = joints.begin(); i < joints.end();
