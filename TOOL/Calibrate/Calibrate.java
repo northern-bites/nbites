@@ -174,7 +174,7 @@ public class Calibrate implements DataListener, MouseListener,
         setupWindowsAndListeners();
 
 
-        // Will take care of the cursor
+       // Will take care of the cursor
         updateSelectedColor(0);
         updateBrushSize(0);
 
@@ -1106,5 +1106,20 @@ public class Calibrate implements DataListener, MouseListener,
         //lastly, need to repaint
         selector.repaint();
         displayer.repaint();
+    }
+
+    public CalibrationDrawingPanel getDisplayer() {
+	return displayer;
+    }
+
+    public PixelSelectionPanel getSelector() {
+	return selector;
+    }
+    
+    public ImageOverlay getEdgeOverlay() {
+	return overlay;
+    }
+    public VisionState getVisionState() {
+	return visionState;
     }
 }

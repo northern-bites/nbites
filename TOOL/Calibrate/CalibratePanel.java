@@ -29,6 +29,7 @@ import TOOL.Data.DataSet;
 import javax.swing.BoxLayout;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
 import javax.swing.text.*;
 import java.awt.GridLayout;
 import java.awt.Font;
@@ -53,6 +54,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     private InputMap im;
     private ActionMap am;
     protected JCheckBox drawColors;
+    protected JComboBox displayerOverlayChoice;
+    protected JComboBox selectorOverlayChoice;
 
     private Calibrate calibrate;
 
@@ -121,7 +124,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-
+	
         drawColors = new JCheckBox("Draw Thresholded Colors");
         drawColors.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -131,6 +134,53 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
             });
         drawColors.setFocusable(false);
         drawColors.setSelected(true);
+	
+
+	selectorOverlayChoice = new JComboBox();
+	selectorOverlayChoice.addItem("Left Pane");
+       	selectorOverlayChoice.addItem("Thresholded Edges");
+	selectorOverlayChoice.addItem("Visual Objects");
+	selectorOverlayChoice.addItem("none");
+	selectorOverlayChoice.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    JComboBox sourceBox = (JComboBox) e.getSource();
+		    if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+			calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
+			calibrate.getSelector().repaint();
+		    }
+		    else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+			calibrate.getSelector().setOverlayImage(null);
+			calibrate.getSelector().repaint();
+		    }
+		    else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+			calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+			calibrate.getSelector().repaint();
+		    }
+		}
+	    });
+
+	displayerOverlayChoice = new JComboBox();
+	displayerOverlayChoice.addItem("Right Pane");
+       	displayerOverlayChoice.addItem("Thresholded Edges");
+	displayerOverlayChoice.addItem("Visual Objects");
+	displayerOverlayChoice.addItem("none");
+	displayerOverlayChoice.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    JComboBox sourceBox = (JComboBox) e.getSource();
+		    if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+			calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
+			calibrate.getDisplayer().repaint();
+		    }
+		    else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+			calibrate.getDisplayer().setOverlayImage(null);
+			calibrate.getDisplayer().repaint();
+		    }
+		    else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+			calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+			calibrate.getDisplayer().repaint();
+		    }
+		}
+	    });
 
 
         JPanel navigation = new JPanel();
@@ -157,7 +207,12 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         textAndSwatches.add(feedback);
         textAndSwatches.add(undefineSpecific);
         textAndSwatches.add(colorSwatches);
-        textAndSwatches.add(drawColors);
+	JPanel auxPanel = new JPanel();
+	auxPanel.add(drawColors);
+	auxPanel.add(selectorOverlayChoice);
+	auxPanel.add(displayerOverlayChoice);
+	textAndSwatches.add(auxPanel);
+
 
         add(textAndSwatches);
         add(navigation);
