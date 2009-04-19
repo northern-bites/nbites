@@ -101,7 +101,7 @@ def fReady(team):
     '''kickoff positions'''
 
     # ready state depends on number of players alive
-    num_inactive_teammates = len(team.inactive_teammates)
+    num_inactive_teammates = len(team.inactive_mates)
 
     # if two dogs alive, position normally
     if num_inactive_teammates == 0:
