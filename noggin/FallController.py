@@ -27,10 +27,10 @@ class FallController(FSA.FSA):
             # Check to see if fallen over
             if (self.isFallen() and
                 not self.standingUp ):
+                self.standingUp = True
                 self.switchTo('fallen')
                 #         elif self.brain.guardian.falling:
                 #             self.switchTo('falling')
-
         FSA.FSA.run(self)
 
     def isFallen(self):
@@ -38,6 +38,7 @@ class FallController(FSA.FSA):
         if ( math.fabs(inertial.angleY) > self.FALLEN_THRESH ):
             self.fallCount += 1
             if self.fallCount > self.FALL_COUNT_THRESH:
+                self.fallCount = 0
                 return True
         else:
             self.fallCount = 0

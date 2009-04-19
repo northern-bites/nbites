@@ -42,7 +42,6 @@ def standup(guard):
 
 def standFromBack(guard):
     if guard.firstFrame():
-        guard.standingUp = True
         guard.brain.player.executeMove(SweetMoves.STAND_UP_BACK)
 
     if guard.brain.motion.isBodyActive():
@@ -51,7 +50,6 @@ def standFromBack(guard):
 
 def standFromFront(guard):
     if guard.firstFrame():
-        guard.standingUp = True
         guard.brain.player.executeMove(SweetMoves.STAND_UP_FRONT)
 
     if guard.brain.motion.isBodyActive():
