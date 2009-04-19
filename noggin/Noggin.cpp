@@ -24,7 +24,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
       error_state(false), brain_module(NULL), brain_instance(NULL),
-      motion_interface(_minterface),registeredGCREset(false)
+      motion_interface(_minterface),registeredGCReset(false)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -368,7 +368,7 @@ void Noggin::processGCButtonClicks(){
        leftFootButton->getClickLength() > REVERT_TO_INITIAL_TIME &&
         !registeredGCReset){
         registeredGCReset = true;
-        gc->setState(STATE_INTITIAL);
+        gc->setGameState(STATE_INITIAL);
     }else{
         registeredGCReset = false;
     }

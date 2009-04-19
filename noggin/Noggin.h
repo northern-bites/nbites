@@ -12,6 +12,7 @@
 #include "LocEKF.h"
 #include "BallEKF.h"
 #include "Comm.h"
+#include "GameController.h"
 
 #include "RoboGuardian.h"
 #include "ClickableButton.h"
