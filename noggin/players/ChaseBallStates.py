@@ -1,7 +1,7 @@
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import math
-from ..util import MyMath as MyMath
+from noggin.util import MyMath as MyMath
 
 SPIN_SPEED = 15
 Y_SPEED = 2
@@ -11,6 +11,7 @@ FRAMES_ON_THRESH = 2
 BALL_BEARING_THRESH = 15
 GIVE_UP_THRESH = 36
 
+BALL_CLOSE_DIST_THRESH = 20
 
 def scanFindBall(player):
     '''
@@ -76,6 +77,9 @@ def approachBall(player):
     if player.brain.ball.on:
         bearing = player.brain.ball.bearing
         if bearing < BALL_BEARING_THRESH:
+            if player.brain.ball.dist < BALL_CLOSE_DIST_THRESH:
+                return player.goLater('alignOnBallClose')
+
             targetX = math.cos(math.radians(bearing))*player.brain.ball.dist
             targetY = math.sin(math.radians(bearing))*player.brain.ball.dist
             player.printf("bearing is"+str(bearing)+" target X/Y  is "+str(targetX)+","+str(targetY),"blue")
