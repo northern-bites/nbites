@@ -95,4 +95,4 @@ def getTargetHeading(my, targetX, targetY):
     return sub180Angle(degrees(safe_atan2(targetY - my.y, targetX - my.x)))
 
 def getSpinDir(my, targetH):
-    return sign(sub180Diff(targetH, my.h))
+    return sign(my.h - targetH)

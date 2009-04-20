@@ -6,6 +6,7 @@ GOTO_FORWARD_SPEED = 4
 WAIT_BETWEEN_MOVES = 10
 GOTO_SPIN_SPEED = 15
 GOTO_SPIN_STRAFE = 2
+GOTO_SURE_THRESH = 5
 
 # States for the standard spin - walk - spin go to
 def spinToWalkHeading(nav):
@@ -14,15 +15,20 @@ def spinToWalkHeading(nav):
     """
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
+        nav.stopSpinToWalkCount = 0
 
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
     nav.printf("Target heading is " + str(targetH))
     nav.printf("Current heading is " + str(nav.brain.my.h))
     if nav.counter > WAIT_BETWEEN_MOVES:
         spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
+        nav.printf("Spin Dir is " + str(spinDir))
         nav.setSpeed(0, spinDir * GOTO_SPIN_STRAFE, spinDir * GOTO_SPIN_SPEED)
 
     if nav.atHeading(targetH):
+        nav.stopSpinToWalkCount += 1
+
+    if nav.stopSpinToWalkCount > GOTO_SURE_THRESH:
         return nav.goLater('walkToPoint')
 
     return nav.stay()
@@ -35,11 +41,20 @@ def walkToPoint(nav):
     """
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
+        nav.walkToPointCount = 0
+        nav.walkToPointSpinCount = 0
+
     if nav.counter > WAIT_BETWEEN_MOVES:
         nav.setSpeed(GOTO_FORWARD_SPEED, 0, 0)
 
     if nav.atDestination():
+        nav.walkToPointCount += 1
+
+    if nav.walkToPointCount > GOTO_SURE_THRESH:
         if nav.destH is None:
+#             nav.printf("Stopping at position (" + str(nav.brain.my.x) +
+#                        ", " + str(nav.brain.my.y) + ") going to (" + str(nav.destX)
+#                        + ", " + str(nav.destY) + ")")
             return nav.goLater('stop')
         else:
             return nav.goLater('spinToFinalHeading')
@@ -47,6 +62,9 @@ def walkToPoint(nav):
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
 
     if not nav.atHeading(targetH):
+        nav.walkToPointSpinCount += 1
+
+    if nav.walkToPointSpinCount > GOTO_SURE_THRESH:
         return nav.goLater('spinToWalkHeading')
 
     return nav.stay()

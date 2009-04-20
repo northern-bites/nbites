@@ -4,7 +4,7 @@ import man.noggin.NogginConstants as NogginConstants
 SPIN_TIME = 360
 WAIT_TIME = 45
 WALK_TIME = 200
-TARGET_X = NogginConstants.MY_GOALBOX_RIGHT_X
+TARGET_X = NogginConstants.OPP_GOALBOX_LEFT_X
 TARGET_Y = NogginConstants.CENTER_FIELD_Y
 
 def gamePlaying(player):
