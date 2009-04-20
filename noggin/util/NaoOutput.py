@@ -109,8 +109,12 @@ class NaoOutput:
             self.brain.ball.dist, self.brain.ball.bearing)
 
         for corner in self.brain.corners:
-            locLine += " %d %g %g" & (corner.visionID, corner.dist,
-                                      corner.bearing)
+	            if len(corner.possibilities) == 1:
+	                locLine += " c %g %g" % (corner.dist, corner.bearing)
+	            else:
+	                locLine += " a %g %g" % (corner.dist, corner.bearing)
+	            for p in corner.possibilities:
+	                locLine += " %g %g" % (p[0], p[1])
 
         self.locLog.writeLine(locLine)
 

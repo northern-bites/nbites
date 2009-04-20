@@ -88,11 +88,11 @@ def getRelativeVelocityY(robotH, velX, velY):
 def getRelativeBearing(robotX, robotY, robotH, x, y):
     '''return relative heading from self localization to abs x,y on field'''
     return sub180Angle(robotH - (degrees(safe_atan2(y - robotY,
-                                                    x - robotX)) - 90.0))
+                                                    x - robotX))))
 
 def getTargetHeading(my, targetX, targetY):
     '''determine the heading facing a target x, y'''
     return sub180Angle(degrees(safe_atan2(targetY - my.y, targetX - my.x)))
 
 def getSpinDir(my, targetH):
-    return sign(my.h - targetH)
+    return sign(targetH - my.h)
