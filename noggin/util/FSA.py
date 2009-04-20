@@ -46,7 +46,7 @@ class FSA:
         self.owner = owner
 
         self.currentState = ""
-        self.lastFrameState = ""
+        self.lastState = ""
         self.lastDiffState = ""
 
         self.name = "FSA"
@@ -92,6 +92,7 @@ class FSA:
                 print self.name
                 print " DEBUG: current state = ",self.currentState
             (stayInFrame, nextState) = methodCall(self)
+            self.lastState = self.currentState
             self.currentState = nextState
             self.updateStateInfo()
 
@@ -116,7 +117,7 @@ class FSA:
 
         As a note: goLater(self.currentState) == stay()
         """
-        self.lastFrameState = self.currentState
+        self.lastState = self.currentState
         return (NEXT_FRAME, newState)
 
     def firstFrame(self):
@@ -174,14 +175,14 @@ class FSA:
         we store in this class is up to date.
         """
         # reseting the state counter + state timer when we switch states.
-        if self.currentState != self.lastFrameState:
+        if self.currentState != self.lastState:
             #debug prints
             if self.printStateChanges:
                 self.printf(self.name+": switched to '"+
                             self.currentState+"\' after " +
                             str(self.counter + 1) +
-                            " frames in state \'"+self.lastFrameState+"\'", self.stateChangeColor)
-            self.lastDiffState = self.lastFrameState
+                            " frames in state \'"+self.lastState+"\'", self.stateChangeColor)
+            self.lastDiffState = self.lastState
             self.counter = 0
             self.startTime = self.getTime()
             self.stateTime = 0

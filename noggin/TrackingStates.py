@@ -4,7 +4,7 @@ from man.motion import MotionConstants
 import util.MyMath as MyMath
 
 DEBUG = False
-
+TRACKER_FRAMES_OFF_REFIND_THRESH = 3 #num frms after which to switch to scanfindbl
 
 def nothing(tracker):
     '''default state where the tracker does nothing'''
@@ -12,6 +12,12 @@ def nothing(tracker):
         tracker.brain.motion.stopHeadMoves()
     return tracker.stay()
 
+
+def ballTracking(tracker): #Super state which handles following/refinding the ball
+    if tracker.target.framesOff <= TRACKER_FRAMES_OFF_REFIND_THRESH:
+        return tracker.goNow('tracking')
+    else:
+        return tracker.goNow('scanBall')
 
 def tracking(tracker):
     ''' state askes it's parent (the tracker) for an object or angles to track
@@ -36,6 +42,9 @@ def tracking(tracker):
             changeY = tracker.target.angleY #the pitch is pos = down
         else:
             if DEBUG : tracker.printf("Missing object this frame",'cyan')
+            if tracker.target == tracker.brain.ball and \
+                    tracker.target.framesOff > TRACKER_FRAMES_OFF_REFIND_THRESH:
+                return tracker.goLater(tracker.lastDiffState)
             return tracker.stay()
     #otherwise, if we have angles, track by those
     elif tracker.angleX != None and tracker.angleY !=None:

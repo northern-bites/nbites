@@ -48,10 +48,8 @@ def gameSet(player):
     """
     Fixate on the ball, or scan to look for it
     """
-    if player.brain.ball.on:
+    if player.firstFrame():
         player.brain.tracker.trackBall()
-    elif player.brain.ball.framesOff > 3:
-        player.brain.tracker.switchTo('scanBall')
     return player.stay()
 
 def gamePlaying(player):

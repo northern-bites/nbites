@@ -27,8 +27,8 @@ class HeadTracking(FSA.FSA):
         self.setName('headTracking')
 
 
-    def trackingHelper(self,args):
-        self.object = None
+    def ballTrackingHelper(self,args):
+        self.target = None
         self.gain = 1.0
         self.angleX = None
         self.angleY = None
@@ -53,7 +53,10 @@ class HeadTracking(FSA.FSA):
         self.brain.motion.stopHeadMoves()
 
     def trackBall(self):
-        self.switchTo('tracking',self.brain.ball)
+        self.target = self.brain.ball
+        self.gain = 1.0
+        if(self.currentState != 'tracking' or self.currentState != 'scanBall'):
+           self.switchTo('ballTracking')
 
     def execute(self,sweetMove):
         for position in sweetMove:
