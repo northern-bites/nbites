@@ -30,6 +30,7 @@ public:
     virtual const float getYUncert() const = 0;
     virtual const float getHUncert() const = 0;
     virtual const float getHUncertDeg() const = 0;
+    virtual const MotionModel getLastOdo() const = 0;
 
     // Setters
     virtual void setXEst(float xEst) = 0;

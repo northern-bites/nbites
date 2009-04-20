@@ -8,8 +8,9 @@ TARGET_X = NogginConstants.OPP_GOALBOX_LEFT_X
 TARGET_Y = NogginConstants.CENTER_FIELD_Y
 
 def gamePlaying(player):
-    #player.brain.loc.reset()
-    return player.goLater('goToPoint')
+    player.brain.loc.reset()
+    player.brain.out.startLocLog()
+    return player.goLater('spinLocalize')
 
 def spinLocalize(player):
     if player.firstFrame():
@@ -23,7 +24,7 @@ def spinLocalize(player):
 
 def waitToMove(player):
     if player.counter > WAIT_TIME:
-        return player.goNow('goToPoint')
+        return player.goNow('walkForward')
     return player.stay()
 
 def goToPoint(player):
@@ -55,6 +56,7 @@ def doneState(player):
 def sitDown(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
+        player.brain.out.stopLocLog()
         return player.stay()
 
     if not player.brain.motion.isBodyActive():

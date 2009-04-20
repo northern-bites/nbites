@@ -62,6 +62,12 @@ public:
     const float getYVelocityUncert() const {
         return ballEKF->getYVelocityUncert();
     }
+
+    // Odometry
+    const float getOdoF() const { return loc->getLastOdo().deltaF; }
+    const float getOdoL() const { return loc->getLastOdo().deltaL; }
+    const float getOdoR() const { return loc->getLastOdo().deltaR; }
+
 };
 
 BOOST_PYTHON_MODULE(_localization)
@@ -84,6 +90,10 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("ballYUncert", &PyLoc::getBallYUncert)
         .add_property("ballVelXUncert", &PyLoc::getXVelocityUncert)
         .add_property("ballVelYUncert", &PyLoc::getYVelocityUncert)
+        // Odometry
+        .add_property("lastOdoF", &PyLoc::getOdoF)
+        .add_property("lastOdoL", &PyLoc::getOdoL)
+        .add_property("lastOdoR", &PyLoc::getOdoR)
         // functional
         .def("reset", &PyLoc::reset, "reset the localization system")
         ;

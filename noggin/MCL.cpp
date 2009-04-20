@@ -22,7 +22,7 @@ using namespace std;
 /**
  * Initializes the sampel sets so that the first update works appropriately
  */
-MCL::MCL(int _M) : useBest(false), frameCounter(0), M(_M)
+MCL::MCL(int _M) : useBest(false), lastOdo(0,0,0), frameCounter(0), M(_M)
 {
     // Initialize particles to be randomly spread about the field...
     srand(time(NULL));

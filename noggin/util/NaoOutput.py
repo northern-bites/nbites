@@ -92,14 +92,11 @@ class NaoOutput:
         if not self.loggingLoc:
             return
 
-        odometry = [0,0,0]#self.brain.motion.getLastOdometry()
+
         # Follow the line format
-        locLine = "%ld %ld %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g" % (
-            self.brain.nao.getSimulatedTime(), #TIME
-            #FRAME COUNT
-            self.locLog.frame,
+        locLine = "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g" % (
             #ODOMETRY dF, dL, dA
-            odometry[0], odometry[1], odometry[2],
+            self.brain.loc.lastOdoF, self.brain.loc.lastOdoL, self.brain.loc.lastOdoR,
             #YGLP DIST BEARING
             self.brain.yglp.dist, self.brain.yglp.bearing,
             #YGRP DIST BEARING

@@ -1,6 +1,5 @@
 #include "LocEKF.h"
 #include <boost/numeric/ublas/io.hpp> // for cout
-#define DEBUG_LOC_EKF
 //#define DEBUG_LOC_EKF_INPUTS
 using namespace boost::numeric;
 using namespace boost;
@@ -47,7 +46,7 @@ const float LocEKF::Y_EST_MAX = 1000.0f;
 LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
-          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC)
+          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -104,6 +103,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     // Update expected position based on odometry
     timeUpdate(u);
     limitAPrioriUncert();
+    lastOdo = u;
 
     // // Remove ambiguous observations
     // std::vector<Observation>::iterator iter = Z.begin();

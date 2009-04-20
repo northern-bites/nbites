@@ -97,6 +97,10 @@ public:
     virtual const PoseEst getCurrentUncertainty() const {
         return PoseEst(P_k(0,0), P_k(1,1), P_k(2,2));
     }
+
+    virtual const MotionModel getLastOdo() const {
+        return lastOdo;
+    }
     // Setters
     /**
      * @param val The new estimate of the loc x position
@@ -148,6 +152,9 @@ private:
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();
+
+    // Last odometry update
+    MotionModel lastOdo;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

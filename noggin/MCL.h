@@ -106,6 +106,8 @@ public:
      */
     const float getHUncertDeg() const { return curUncert.h * 2 * DEG_OVER_RAD;}
 
+    const MotionModel getLastOdo() const { return lastOdo; }
+
     /**
      * @return The current set of particles in the filter
      */
@@ -150,6 +152,8 @@ private:
     PoseEst curBest; // Current {x,y,h} esitamate of the highest weighted particle
     PoseEst curUncert; // Associated {x,y,h} uncertainties (standard deviations)
     std::vector<Particle> X_t; // Current set of particles
+    bool useBest;
+    MotionModel lastOdo;
 
     // Core Functions
     PoseEst updateMotionModel(PoseEst x_t, MotionModel u_t);
@@ -169,7 +173,6 @@ private:
     float sampleNormalDistribution(float sd);
     float sampleTriangularDistribution(float sd);
 
-    bool useBest;
 public:
     // friend std::ostream& operator<< (std::ostream &o, const MCL &c) {
     //     return o << "Est: " << c.curEst << "\nUnct: " << c.curUncert;
