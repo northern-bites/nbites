@@ -56,8 +56,21 @@ class SoccerFSA(FSA.FSA):
         """
         Wrapper method to easily change the walk vector of the robot
         """
-        walk = motion.WalkCommand(x=x,y=y,theta=theta)
-        self.brain.motion.setNextWalkCommand(walk)
+        if x == 0 and y == 0 and theta == 0:
+            if (self.brain.nav.currentState == 'stopped' or
+                self.brain.nav.currentState == 'stop'):
+                return
+            else:
+                self.brain.nav.switchTo('stop')
+        else:
+            if self.brain.nav.setWalk(x,y,theta):
+                self.brain.nav.switchTo('walking')
+
+    def stopWalking(self):
+        """
+        Wrapper method to navigator to easily stop the robot from walking
+        """
+        self.brain.nav.switchTo('stop')
 
     def setHeads(self,yawv,pitchv):
         """
@@ -65,3 +78,17 @@ class SoccerFSA(FSA.FSA):
         """
         heads = motion.SetHeadCommand(yaw=yawv,pitch=pitchv)
         self.brain.motion.setHead(heads)
+
+    def gainsOff(self):
+        """
+        Turn off the gains
+        """
+        shutoff = motion.StiffnessCommand(0.0)
+        self.brain.motion.sendStiffness(shutoff)
+
+    def gainsOn(self):
+        """
+        Turn on the gains
+        """
+        turnon = motion.StiffnessCommand(0.85)
+        self.brain.motion.sendStiffness(turnon)

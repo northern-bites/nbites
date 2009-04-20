@@ -13,7 +13,7 @@ import man.motion.SweetMoves as SweetMoves
 
 def gamePenalized(player):
     if player.firstFrame():
-        player.setSpeed(0.,0.,0.)
+        player.stopWalking()
         player.setHeads(0.,0.)
         player.motion.stopBodyMoves()
         player.brain.tracker.stopHeadMoves()
@@ -26,8 +26,7 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
-        x = motion.StiffnessCommand(.85)
-        player.brain.motion.sendStiffness(x)
+        player.gainsOn()
         player.motion.stopBodyMoves()
         player.setHeads(0.,0.)
         player.brain.tracker.stopHeadMoves()
@@ -73,7 +72,25 @@ def fallen(player):
     """
     return player.stay()
 
+def gameFinished(player):
+    """
+    Ensure we are sitting down and head is snapped forward.
+    In the future, we may wish to make the head move a bit slower here
+    Also, in the future, gameInitial may be responsible for turning off the gains
+    """
+    if player.firstFrame():
+        player.stopWalking() # Ensure navigator stops correctly
+        player.setHeads(0.,0.)
+        player.brain.tracker.stopHeadMoves()
+        player.GAME_FINISHED_satDown = False
+        return player.stay()
 
-#Finished is the exact same as initial
-#In the future, gameFinished should turn off the gains
-gameFinished = gameInitial
+    # Sit down once we've finished walking
+    if player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown:
+        player.GAME_FINISHED_satDown = True
+        player.executeMove(SweetMoves.SIT_POS)
+        return player.stay()
+
+    if not player.motion.isBodyActive() and  player.GAME_FINISHED_satDown:
+        player.gainsOff()
+    return player.stay()

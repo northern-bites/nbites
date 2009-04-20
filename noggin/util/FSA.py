@@ -23,6 +23,17 @@ YELLOW_COLOR_CODE = '\033[33m'
 BLUE_COLOR_CODE = '\033[34m'
 PURPLE_COLOR_CODE = '\033[35m'
 CYAN_COLOR_CODE = '\033[36m'
+WHITE_COLOR_CODE = '\033[37m'
+DEFAULT_COLOR_CODE = '\033[39m'
+BLACK_BG_COLOR_CODE = '\033[40m'
+RED_BG_COLOR_CODE = '\033[41m'
+GREEN_BG_COLOR_CODE = '\033[42m\033[37m'
+YELLOW_BG_COLOR_CODE = '\033[43m'
+BLUE_BG_COLOR_CODE = '\033[44m'
+PURPLE_BG_COLOR_CODE = '\033[45m'
+CYAN_BG_COLOR_CODE = '\033[46m'
+WHITE_BG_COLOR_CODE = '\033[47m'
+BLACK_BG_COLOR_CODE = '\033[49m'
 
 class FSA:
     """ Finite State Automaton implementation.
@@ -148,6 +159,12 @@ class FSA:
             self.outputFunction(CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         elif printingColor == 'purple':
             self.outputFunction(PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'purplebg':
+            self.outputFunction(PURPLE_BG_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'whitebg':
+            self.outputFunction(WHITE_BG_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'greenbg':
+            self.outputFunction(GREEN_BG_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         else:
             self.outputFunction(str(outputString))
 

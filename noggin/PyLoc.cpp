@@ -38,10 +38,12 @@ public:
     const float getXEst() const { return loc->getXEst(); }
     const float getYEst() const { return loc->getYEst(); }
     const float getHEst() const { return loc->getHEstDeg(); }
+    const float getRadHEst() const { return loc->getHEst(); }
     // Self Uncertainty
     const float getXUncert() const { return loc->getXUncert(); }
     const float getYUncert() const { return loc->getYUncert(); }
     const float getHUncert() const { return loc->getHUncertDeg(); }
+    const float getRadHUncert() const { return loc->getHUncert(); }
 
     // Ball localization
     // Global Coordinates
@@ -68,6 +70,7 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("x", &PyLoc::getXEst)
         .add_property("y", &PyLoc::getYEst)
         .add_property("h", &PyLoc::getHEst)
+        .add_property("radH", &PyLoc::getRadHEst)
         .add_property("ballX", &PyLoc::getBallXEst)
         .add_property("ballY", &PyLoc::getBallYEst)
         .add_property("ballVelX", &PyLoc::getXVelocityEst)
@@ -76,6 +79,7 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("xUncert", &PyLoc::getXUncert)
         .add_property("yUncert", &PyLoc::getYUncert)
         .add_property("hUncert", &PyLoc::getHUncert)
+        .add_property("radHUncert", &PyLoc::getRadHUncert)
         .add_property("ballXUncert", &PyLoc::getBallXUncert)
         .add_property("ballYUncert", &PyLoc::getBallYUncert)
         .add_property("ballVelXUncert", &PyLoc::getXVelocityUncert)
