@@ -114,7 +114,7 @@ class NaoOutput:
 	            else:
 	                locLine += " a %g %g" % (corner.dist, corner.bearing)
 	            for p in corner.possibilities:
-	                locLine += " %g %g" % (p[0], p[1])
+	                locLine += " %g %g %g" % (p.id, p.fieldX, p.fieldY)
 
         self.locLog.writeLine(locLine)
 
