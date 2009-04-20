@@ -70,6 +70,7 @@ def fallen(player):
     """
     Stops the player when the robot has fallen
     """
+    player.brain.nav.switchTo('stopped')
     return player.stay()
 
 def gameFinished(player):

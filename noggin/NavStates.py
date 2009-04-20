@@ -18,11 +18,11 @@ def spinToWalkHeading(nav):
         nav.stopSpinToWalkCount = 0
 
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
-    nav.printf("Target heading is " + str(targetH))
-    nav.printf("Current heading is " + str(nav.brain.my.h))
+#     nav.printf("Target heading is " + str(targetH))
+#     nav.printf("Current heading is " + str(nav.brain.my.h))
     if nav.counter > WAIT_BETWEEN_MOVES:
         spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
-        nav.printf("Spin Dir is " + str(spinDir))
+        #nav.printf("Spin Dir is " + str(spinDir))
         nav.setSpeed(0, spinDir * GOTO_SPIN_STRAFE, spinDir * GOTO_SPIN_SPEED)
 
     if nav.atHeading(targetH):
@@ -105,7 +105,9 @@ def stop(nav):
     Wait until the walk is finished.
     '''
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
+        if nav.brain.motion.isWalkActive():
+            nav.setSpeed(0,0,0)
+
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
     return nav.stay()

@@ -28,6 +28,7 @@ def waitToMove(player):
 
 def goToPoint(player):
     if player.firstFrame():
+        player.brain.tracker.switchTo('locPans')
         player.brain.nav.goTo(TARGET_X, TARGET_Y)
         return player.stay()
 

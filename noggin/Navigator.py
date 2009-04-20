@@ -70,7 +70,7 @@ class Navigator(FSA.FSA):
         if targetHeading is None:
             targetHeading = self.destH
         hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
-        self.printf("H diff is " + str(hDiff))
+        #self.printf("H diff is " + str(hDiff))
         return abs(hDiff) < CLOSE_ENOUGH_H
 
     def isStopped(self):
