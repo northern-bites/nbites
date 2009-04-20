@@ -40,6 +40,8 @@ public:
     void requestStopFirstInstance();
     void calculateNextJoints();
 
+    void hardReset();
+
 	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
 	void setCommand(const SetHeadCommand* command);
 	void setCommand(const HeadJointCommand* command);
@@ -55,7 +57,6 @@ private:
     void scriptedMode();
     void stopScripted();
     void stopSet();
-
 
     void setActive();
     bool isDone();

@@ -48,6 +48,10 @@ void MotionInterface::stopHeadMoves() {
     switchboard->stopHeadMoves();
 }
 
+void MotionInterface::resetWalkProvider(){
+    switchboard->resetWalkProvider();
+}
+
 float MotionInterface::getHeadSpeed() {
     return DUMMY_F;
 }

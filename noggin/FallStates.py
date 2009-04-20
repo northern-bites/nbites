@@ -8,8 +8,10 @@ Fall Protection and Recovery States
 def fallen(guard):
     if guard.firstFrame():
         guard.brain.tracker.stopHeadMoves()
+        guard.brain.motion.resetWalk()
         x = motion.StiffnessCommand(1.0)
         guard.brain.motion.sendStiffness(x)
+
     """
     Activates when robot has fallen. Deactivates player
     and puts standup in motion

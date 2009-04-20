@@ -39,6 +39,8 @@ public:
     void requestStopFirstInstance();
     void calculateNextJoints();
 
+    void hardReset();
+
 	void enqueueSequence(std::vector<const BodyJointCommand*> &seq);
 	void setCommand(const BodyJointCommand * command);
 

@@ -57,6 +57,8 @@ public:
     void requestStopFirstInstance();
     void calculateNextJoints();
 
+    void hardReset();
+
 	void setCommand(const MotionCommand* command)
         {
             pthread_mutex_lock(&walk_provider_mutex);

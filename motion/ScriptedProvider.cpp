@@ -55,6 +55,18 @@ ScriptedProvider::~ScriptedProvider() {
 // hold steady at the last position.
 void ScriptedProvider::requestStopFirstInstance() { }
 
+void ScriptedProvider::hardReset(){
+    pthread_mutex_lock(&scripted_mutex);
+    while(!bodyCommandQueue.empty()){
+        const BodyJointCommand * cmd = bodyCommandQueue.front();
+        delete cmd;
+        bodyCommandQueue.pop();
+    }
+    currCommand = shared_ptr<ChoppedCommand>(new ChoppedCommand());
+    setActive();
+    pthread_mutex_unlock(&scripted_mutex);
+}
+
 //Checks if this chain is currently providing angles so that external
 //classes can check the status of this one
 void ScriptedProvider::setActive(){

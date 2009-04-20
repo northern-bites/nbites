@@ -53,6 +53,14 @@ void WalkProvider::requestStopFirstInstance() {
     setCommand(new WalkCommand(0.0f, 0.0f, 0.0f));
 }
 
+void WalkProvider::hardReset(){
+    pthread_mutex_lock(&walk_provider_mutex);
+    stepGenerator.resetHard();
+
+    setActive();
+    pthread_mutex_unlock(&walk_provider_mutex);
+}
+
 void WalkProvider::calculateNextJoints() {
     pthread_mutex_lock(&walk_provider_mutex);
     if ( nextGait != curGait){
@@ -70,6 +78,11 @@ void WalkProvider::calculateNextJoints() {
     pendingCommands = false;
     nextCommand = NULL;
 
+
+    if(!isActive()){
+        cout << "WARNING, I wouldn't be calling the Walkprovider while"
+            " it thinks its DONE if I were you!" <<endl;
+    }
 
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();

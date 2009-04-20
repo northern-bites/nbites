@@ -121,6 +121,8 @@ public:
 
     std::vector <float> getOdometryUpdate();
 
+    void resetHard();
+
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
     void generate_steps();
