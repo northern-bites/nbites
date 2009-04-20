@@ -9,25 +9,25 @@ import man.motion.MotionConstants as MotionConstants
 
 TO_RAD= math.pi/180.
 
-def gameInitial(player):
-    if player.firstFrame():
-        x = motion.StiffnessCommand(.85)
-        player.brain.motion.sendStiffness(x)
+# def gameInitial(player):
+#     if player.firstFrame():
+#         x = motion.StiffnessCommand(.85)
+#         player.brain.motion.sendStiffness(x)
 
 
-    return player.stay()
+#     return player.stay()
 
-def gameReady(player):
-    if player.firstFrame():
-        walkcmd = motion.WalkCommand(x=0,y=0,theta=0)
-        player.brain.motion.setNextWalkCommand(walkcmd)
+# def gameReady(player):
+#     if player.firstFrame():
+#         walkcmd = motion.WalkCommand(x=0,y=0,theta=0)
+#         player.brain.motion.setNextWalkCommand(walkcmd)
 
-    return player.stay()
+#     return player.stay()
 
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
 
-    return player.goLater('walkstraight')
+    return player.goLater('walktest')
 
 def switchGaits(player):
     pass
@@ -41,6 +41,22 @@ def walkleft(player):
         return player.goLater('sitdown')
     return player.stay()
 
+
+def walktest(player):
+    if player.firstFrame():
+        player.setSpeed(4,0,0)
+
+    if player.counter  == 100:
+        player.brain.motion.resetWalk()
+        #player.executeMove(SweetMoves.ZERO_POS)
+
+    if player.counter == 200:
+        player.setSpeed(4,0,0)
+
+    if player.counter == 300:
+        return player.goLater('stopwalking')
+
+    return player.stay()
 
 def walkstraight(player):
     if player.firstFrame():

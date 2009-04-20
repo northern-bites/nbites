@@ -26,7 +26,7 @@ class FallController(FSA.FSA):
             self.brain.gameController.currentState == 'gameReady' ):
             # Check to see if fallen over
             inertial = self.brain.sensors.inertial
-            self.printf("run angleY is "+str(inertial.angleY))
+            #self.printf("run angleY is "+str(inertial.angleY))
 
             if (not self.standingUp and self.isFallen() ):
                 self.standingUp = True
@@ -38,7 +38,7 @@ class FallController(FSA.FSA):
 
     def isFallen(self):
         inertial = self.brain.sensors.inertial
-        self.printf("isFallen angleY is "+str(inertial.angleY))
+        #self.printf("isFallen angleY is "+str(inertial.angleY))
         if ( abs(inertial.angleY) > self.FALLEN_THRESH ):
             self.fallCount += 1
             if self.fallCount > self.FALL_COUNT_THRESH:

@@ -354,7 +354,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         break;
     default:
         //nothing
-        cout << Thread::name <<" is leaving "<<nClicks<<" clicks for someone else"<<endl;
+        //cout << Thread::name <<" is leaving "<<nClicks<<" clicks for someone else"<<endl;
         return false;
         break;
     }
