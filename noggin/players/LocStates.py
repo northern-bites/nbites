@@ -6,11 +6,51 @@ WAIT_TIME = 45
 WALK_TIME = 200
 TARGET_X = NogginConstants.OPP_GOALBOX_LEFT_X
 TARGET_Y = NogginConstants.CENTER_FIELD_Y
+COUNT_TOTAL = 250
 
 def gamePlaying(player):
     player.brain.loc.reset()
     player.brain.out.startLocLog()
-    return player.goLater('spinLocalize')
+    player.DIST += 50
+    return player.goLater('collectDistData')
+
+def collectDistData(player):
+    if player.firstFrame():
+        player.distData = []
+        player.widthData = []
+        player.heightData = []
+        player.brain.tracker.switchTo('locPans')
+
+    if player.brain.ygrp.on:
+        player.distData.append(player.brain.ygrp.dist)
+        player.widthData.append(player.brain.ygrp.width)
+        player.heightData.append(player.brain.ygrp.height)
+        player.printf("YGGP is on")
+        player.printf("Count is " + str(len(player.distData)))
+
+    if player.brain.yglp.on:
+        player.printf("YGLP is on")
+
+    if len(player.distData) == COUNT_TOTAL:
+        return player.goLater('doneCollecting')
+
+    return player.stay()
+
+def doneCollecting(player):
+    if player.firstFrame():
+        distMean = sum(player.distData) / COUNT_TOTAL
+        heightMean = sum(player.heightData) / COUNT_TOTAL
+        widthMean = sum(player.widthData) / COUNT_TOTAL
+        player.brain.out.stopLocLog()
+        player.brain.tracker.stopHeadMoves()
+
+        player.printf("At dist " + str(player.DIST) + " over " +
+                      str(COUNT_TOTAL) + " frames YGRP:")
+        player.printf("\t average dist is " + str(distMean))
+        player.printf("\t average height is " + str(heightMean))
+        player.printf("\t average width is " + str(widthMean))
+
+    return player.stay()
 
 def spinLocalize(player):
     if player.firstFrame():

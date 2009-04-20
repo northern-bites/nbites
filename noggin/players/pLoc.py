@@ -6,3 +6,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(LocStates)
         self.setName('pLoc')
+        self.DIST = 50
