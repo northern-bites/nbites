@@ -1,6 +1,7 @@
 
 from man import motion
 from man.motion import MotionConstants
+from ..util import MyMath as MyMath
 
 DEBUG = False
 
@@ -45,13 +46,6 @@ def tracking(tracker):
         tracker.player.printf( "No object")
         return tracker.stay()
 
-
-    def clip(orig, minVal, maxVal):
-        if orig > 0:
-            return min(orig,maxVal)
-        else:
-            return max(orig,minVal)
-
     def getGain(angleToCover):
         ''' choose our gain by default on how far we need to go'''
         #should this be based on distance?
@@ -77,8 +71,8 @@ def tracking(tracker):
     maxChange = 13.0
 
     #Warning- no gain is applied currently!
-    safeChangeX = clip(changeX,-maxChange,maxChange )
-    safeChangeY = clip(changeY,-maxChange,maxChange )
+    safeChangeX = MyMath.clip(changeX,-maxChange,maxChange )
+    safeChangeY = MyMath.clip(changeY,-maxChange,maxChange )
 
     newYaw = curYaw + safeChangeX/3
     newPitch = curPitch - safeChangeY/3
