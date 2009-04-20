@@ -32,26 +32,6 @@ class NaoOutput:
         # Print everything in green
         print GREEN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
 
-    def saveFrame(self):
-        """
-        Save image frame for logging
-        """
-        fileString = FRAME_DIR+str(self.frameCounter)+".NSFRM"
-        self.printf("Saved frame to "+fileString)
-        f = file(fileString,'w')
-        f.write('\0'*RAW_HEADER_SIZE)
-        f.write(self.brain.nao.camera.get())
-        f.close()
-        self.frameCounter+=1
-
-    def printFSR(self):
-        fsr = self.brain.nao.fsr.gets()
-        fsrSum = 0.
-        for x in fsr:
-            fsrSum +=x
-
-        print "Fsr",fsr," sum", fsrSum
-
     # Functionality for logging
     def updateLogs(self):
         """
@@ -88,16 +68,16 @@ class NaoOutput:
         initLine = ("%g %g %g %g %g %g %g %g %g %g %g %g %g %g"
                     % ( self.brain.loc.x,
                         self.brain.loc.y,
-                        self.brain.loc.h,
+                        self.brain.loc.radH,
                         self.brain.loc.xUncert,
                         self.brain.loc.yUncert,
-                        self.brain.loc.hUncert,
+                        self.brain.loc.radHUncert,
                         self.brain.loc.ballX,
                         self.brain.loc.ballY,
-                        self.brain.loc.ballVelX,
-                        self.brain.loc.ballVelY,
                         self.brain.loc.ballXUncert,
                         self.brain.loc.BallYUncert,
+                        self.brain.loc.ballVelX,
+                        self.brain.loc.ballVelY,
                         self.brain.loc.ballVelXUncert,
                         self.brain.loc.BallVelYUncert))
 
