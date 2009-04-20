@@ -331,15 +331,12 @@ class Corner:
         self.x = self.INVALID_FIELD_POSITION
         self.y = self.INVALID_FIELD_POSITION
         self.updateVision(visionCorner)
-        self.locID = None
 
     # updates corner info from vision
     def updateVision(self,visionCorner):
-        self.visionId = visionCorner.id
         self.dist = visionCorner.dist
         self.bearing = visionCorner.bearing
         self.possibilities = visionCorner.possibilities
-        self.locID = None
 
     def getData(self):
         '''returns [possibilities, dist, bearing]'''
