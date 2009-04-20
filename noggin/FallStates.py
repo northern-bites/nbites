@@ -7,6 +7,7 @@ Fall Protection and Recovery States
 """
 def fallen(guard):
     if guard.firstFrame():
+        guard.brain.roboguardian.enableFallProtection(False)
         guard.brain.tracker.stopHeadMoves()
         guard.brain.motion.resetWalk()
         x = motion.StiffnessCommand(1.0)
@@ -33,7 +34,13 @@ def standup(guard):
     Performs the appropriate standup routine
     """
     inertial = guard.brain.sensors.inertial
-    guard.printf("standup angleY is "+str(inertial.angleY))
+    #guard.printf("standup angleY is "+str(inertial.angleY))
+
+    if guard.firstFrame():
+        guard.brain.tracker.stopHeadMoves()
+        headscmd = motion.HeadJointCommand(.5,(0.,0.),1)
+        guard.brain.motion.enqueue(headscmd)
+
     # If on back, perform back stand up
     if ( inertial.angleY < -guard.FALLEN_THRESH ):
         return guard.goLater('standFromBack')
@@ -60,7 +67,6 @@ def standing(guard):
     if guard.brain.motion.isBodyActive():
         return guard.stay()
     else :
-        guard.printf("Body is NOT active!");
         guard.doneStandingCount += 1
 
     if guard.doneStandingCount > guard.DONE_STANDING_THRESH:
@@ -80,7 +86,9 @@ def doneStanding(guard):
     return guard.goLater('notFallen')
 
 def notFallen(guard):
-    guard.standingUp = False
+    if guard.firstFrame():
+        guard.standingUp = False
+        guard.brain.roboguardian.enableFallProtection(True)
     """
     Does nothing
     """

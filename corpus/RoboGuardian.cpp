@@ -279,9 +279,9 @@ void RoboGuardian::checkTemperatures(){
     for(unsigned int joint = 0; joint < Kinematics::NUM_JOINTS; joint++){
         const float tempDiff = newTemps[joint] - lastTemps[joint];
         if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD){
-            cout << Thread::name << "::" << "TEMPERATURE-WARNING:"
-                 << "\t" << Kinematics::JOINT_STRINGS[joint]
-                 << " is at"
+            cout << Thread::name << "::" << "TEMP-WARNING: "
+                 << Kinematics::JOINT_STRINGS[joint]
+                 << " is at " << setprecision(1)
                  << newTemps[joint] <<" deg C"<<endl;
             if(newTemps[joint] >= REALLY_HIGH_TEMP){
                 sayWarning = true;
@@ -313,7 +313,7 @@ void RoboGuardian::processChestButtonPushes(){
         registeredShutdown  = false;
     }else if(chestButton->getClickLength() > SHUTDOWN_THRESH &&
         !registeredShutdown){
-        registeredShutdown = true;
+       registeredShutdown = true;
         executeShutdownAction();
     }
 
