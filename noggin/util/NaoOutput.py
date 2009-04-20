@@ -9,7 +9,7 @@ FRAME_DIR = "picSet/"
 RAW_HEADER_SIZE = 0
 
 # Logging
-LOG_DIR = "logs/"
+LOG_DIR = "/home/root/logs/"
 # Localization Logs
 LOC_LOG_TYPE = "localization"
 NAO_HEADER_ID = "NAO"
@@ -75,11 +75,11 @@ class NaoOutput:
                         self.brain.loc.ballX,
                         self.brain.loc.ballY,
                         self.brain.loc.ballXUncert,
-                        self.brain.loc.BallYUncert,
+                        self.brain.loc.ballYUncert,
                         self.brain.loc.ballVelX,
                         self.brain.loc.ballVelY,
                         self.brain.loc.ballVelXUncert,
-                        self.brain.loc.BallVelYUncert))
+                        self.brain.loc.ballVelYUncert))
 
         # Write our first line
         self.locLog.writeLine(headerLine)
@@ -94,7 +94,7 @@ class NaoOutput:
 
 
         # Follow the line format
-        locLine = "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g" % (
+        locLine = "%g %g %g %g %g %g %g %g %g %g %g %g %g" % (
             #ODOMETRY dF, dL, dA
             self.brain.loc.lastOdoF, self.brain.loc.lastOdoL, self.brain.loc.lastOdoR,
             #YGLP DIST BEARING
@@ -109,7 +109,7 @@ class NaoOutput:
             self.brain.ball.dist, self.brain.ball.bearing)
 
         for corner in self.brain.corners:
-            locLine += " %d %g %g" & (corner.visionId, corner.dist,
+            locLine += " %d %g %g" & (corner.visionID, corner.dist,
                                       corner.bearing)
 
         self.locLog.writeLine(locLine)

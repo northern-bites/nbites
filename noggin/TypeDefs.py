@@ -335,7 +335,7 @@ class Corner:
 
     # updates corner info from vision
     def updateVision(self,visionCorner):
-        #self.visionId = visionCorner.id
+        self.visionId = visionCorner.id
         self.dist = visionCorner.dist
         self.bearing = visionCorner.bearing
         self.possibilities = visionCorner.possibilities
