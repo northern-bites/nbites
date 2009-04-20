@@ -66,17 +66,25 @@ class SoccerFSA(FSA.FSA):
             if self.brain.nav.setWalk(x,y,theta):
                 self.brain.nav.switchTo('walking')
 
+    def standup(self):
+        if self.brain.motion.isWalkActive():
+            self.stopWalking()
+        else:
+            # TODO: this is not the best way to stand up
+            dummyWalk = motion.WalkCommand(x=0,y=0,theta=0)
+            self.brain.motion.setNextWalkCommand(dummyWalk)
+
     def stopWalking(self):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
         self.brain.nav.switchTo('stop')
 
-    def setHeads(self,yawv,pitchv):
+    def setHeads(self,yawv,pitchv,yawSpeed=GOOD_HEAD_SPEED,pitchSpeed = GOOD_HEAD_SPEED):
         """
         Wrapper method to easily specify a head destination (in degrees, obvi)
         """
-        heads = motion.SetHeadCommand(yaw=yawv,pitch=pitchv)
+        heads = motion.SetHeadCommand(yawv,pitchv,yawSpeed,pitchSpeed)
         self.brain.motion.setHead(heads)
 
     def gainsOff(self):
@@ -92,3 +100,20 @@ class SoccerFSA(FSA.FSA):
         """
         turnon = motion.StiffnessCommand(0.85)
         self.brain.motion.sendStiffness(turnon)
+
+    def standupGainsOn(self):
+        """
+        Turn on the gains
+        """
+        turnon = motion.StiffnessCommand(1.0)
+        self.brain.motion.sendStiffness(turnon)
+
+    def zeroHeads(self):
+        self.brain.tracker.switchTo('stopped')
+        self.setHeads(0,0)
+        return
+
+    def penalizedHeads(self):
+        self.brain.tracker.switchTo('stopped')
+        self.setHeads(0,20)
+        return

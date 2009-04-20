@@ -6,17 +6,16 @@ import man.motion as motion
 Fall Protection and Recovery States
 """
 def fallen(guard):
-    if guard.firstFrame():
-        guard.brain.roboguardian.enableFallProtection(False)
-        guard.brain.tracker.stopHeadMoves()
-        guard.brain.motion.resetWalk()
-        x = motion.StiffnessCommand(1.0)
-        guard.brain.motion.sendStiffness(x)
-
     """
     Activates when robot has fallen. Deactivates player
     and puts standup in motion
     """
+    if guard.firstFrame():
+        guard.brain.roboguardian.enableFallProtection(False)
+        guard.brain.tracker.stopHeadMoves()
+        guard.brain.motion.resetWalk()
+        guard.brain.player.standupGainsOn()
+
     # Put player into safe mode
 
     guard.brain.player.switchTo('fallen')
@@ -79,8 +78,7 @@ def doneStanding(guard):
     Does clean up after standing up.
     """
     if guard.firstFrame():
-        x = motion.StiffnessCommand(.85)
-        guard.brain.motion.sendStiffness(x)
+        guard.brain.player.gainsOn()
 
     guard.brain.player.switchTo(guard.brain.gameController.currentState)
     return guard.goLater('notFallen')

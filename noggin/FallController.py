@@ -18,7 +18,7 @@ class FallController(FSA.FSA):
         self.FALLEN_THRESH = 72
         self.FALL_COUNT_THRESH = 15
         self.doneStandingCount = 0
-        self.DONE_STANDING_THRESH = 30
+        self.DONE_STANDING_THRESH = 2
 
     def run(self):
         # Only try to stand up when playing or localizing in ready

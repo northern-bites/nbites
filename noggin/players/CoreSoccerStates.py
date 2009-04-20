@@ -3,19 +3,18 @@
 # in the SoccerFSA by default
 # When the robot is in initial, it sits down
 # When the robot is in ready, it stands up and locPans
-# When the robot is in set, it fixates on the ball
+# When the robot is in set, it fixates on the ball, stops walking if walking in ready
 # When the robot is in playing, it does the same as in set
 # When the robot is in finish, it does the same as in initial
 #
 
-import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 
 def gamePenalized(player):
     if player.firstFrame():
         player.stopWalking()
-        player.setHeads(0.,0.)
         player.motion.stopBodyMoves()
+        player.setHeads(0,20)
         player.brain.tracker.stopHeadMoves()
     return player.stay()
 
@@ -28,7 +27,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
         player.motion.stopBodyMoves()
-        player.setHeads(0.,0.)
+        player.setHeads(0,0)
         player.brain.tracker.stopHeadMoves()
         player.executeMove(SweetMoves.SIT_POS)
     return player.stay()
@@ -38,10 +37,8 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.firstFrame():
-        #TODO: this is not the best way to stand up
-        dummyWalk = motion.WalkCommand(x=0,y=0,theta=0)
-        player.motion.setNextWalkCommand(dummyWalk)
-    player.brain.tracker.switchTo('locPans')
+        player.standup()
+        player.brain.tracker.switchTo('locPans')
     return player.stay()
 
 def gameSet(player):
@@ -49,6 +46,7 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
+        player.stopWalking()
         player.brain.tracker.trackBall()
     return player.stay()
 
@@ -79,7 +77,7 @@ def gameFinished(player):
     """
     if player.firstFrame():
         player.stopWalking() # Ensure navigator stops correctly
-        player.setHeads(0.,0.)
+        player.setHeads(0,0)
         player.brain.tracker.stopHeadMoves()
         player.GAME_FINISHED_satDown = False
         return player.stay()
