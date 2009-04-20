@@ -85,6 +85,8 @@ public:
     bool isHeadActive(){return headProvider.isActive();}
     bool isBodyActive(){return curProvider->isActive();}
 
+    void resetWalkProvider(){ walkProvider.hardReset(); }
+
     MotionModel getOdometryUpdate(){
         return walkProvider.getOdometryUpdate();
     }

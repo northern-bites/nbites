@@ -76,6 +76,15 @@ StepGenerator::~StepGenerator()
     delete controller_x; delete controller_y;
 }
 
+void StepGenerator::resetHard(){
+    //When we fall, or other bad things happen, we just want to stop asap
+    //Clear all zmp, clear footsteps
+    resetQueues();
+    done  = true;
+    //I don't think there is much else we need to do....
+}
+
+
 /**
  * Central method to get the previewed zmp_refernce values
  * In the process of getting these values, this method handles the following:    80

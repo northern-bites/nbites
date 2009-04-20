@@ -24,7 +24,6 @@ TO_RAD= math.pi/180.
 
 #     return player.stay()
 
-
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
 
@@ -47,6 +46,22 @@ def walkright(player):
 
     if player.counter == 100:
         return player.goLater('walkleft')
+    return player.stay()
+
+def walktest(player):
+    if player.firstFrame():
+        player.setSpeed(4,0,0)
+
+    if player.counter  == 100:
+        player.brain.motion.resetWalk()
+        #player.executeMove(SweetMoves.ZERO_POS)
+
+    if player.counter == 200:
+        player.setSpeed(4,0,0)
+
+    if player.counter == 300:
+        return player.goLater('stopwalking')
+
     return player.stay()
 
 def walkstraight(player):

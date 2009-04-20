@@ -70,6 +70,9 @@ public:
         }
     }
 
+    //Dangerous, can cause loss of stability
+    virtual void hardReset() =0 ;
+
     const bool isActive() const { return _active; }
     const bool isStopping() const {return _stopping;}
     virtual void calculateNextJoints() = 0;

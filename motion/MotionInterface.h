@@ -59,6 +59,7 @@ class MotionInterface
     void sendStiffness(const StiffnessCommand *command);
     void stopBodyMoves();
     void stopHeadMoves();
+    void resetWalkProvider();
 
     //For noggin
     MotionModel getOdometryUpdate(){

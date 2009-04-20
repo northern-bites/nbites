@@ -68,6 +68,19 @@ void HeadProvider::requestStopFirstInstance() {
 
 }
 
+void HeadProvider::hardReset(){
+    pthread_mutex_lock(&scripted_mode_mutex);
+    pthread_mutex_lock(&set_mode_mutex);
+
+    stopScripted();
+    stopSet();
+    setActive();
+
+    pthread_mutex_unlock(&set_mode_mutex);
+    pthread_mutex_unlock(&scripted_mode_mutex);
+}
+
+
 //Method called during the 'SCRIPTED' mode
 void HeadProvider::calculateNextJoints() {
 
@@ -201,12 +214,13 @@ bool HeadProvider::isDone(){
 }
 void HeadProvider::stopScripted(){
 
-
     while(!headCommandQueue.empty()){
         const HeadJointCommand * cmd = headCommandQueue.front();
         delete cmd;
         headCommandQueue.pop();
     }
+    currCommand = shared_ptr<ChoppedCommand>(new ChoppedCommand());
+
 }
 
 void HeadProvider::stopSet(){
