@@ -4,11 +4,14 @@
 # @author Jack Morrison
 #
 
-import math
 import man.motion as motion
 
 from ..util import FSA
 from . import CoreSoccerStates
+
+STANDUP_GAINS_VALUE = 1.0
+GAINS_ON_VALUE = 0.85
+GAINS_OFF_VALUE = 0.0
 
 class SoccerFSA(FSA.FSA):
     def __init__(self,brain):
@@ -80,40 +83,30 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.nav.switchTo('stop')
 
-    def setHeads(self,yawv,pitchv,yawSpeed=GOOD_HEAD_SPEED,pitchSpeed = GOOD_HEAD_SPEED):
+    def setHeads(self,yawv,pitchv):
         """
         Wrapper method to easily specify a head destination (in degrees, obvi)
         """
-        heads = motion.SetHeadCommand(yawv,pitchv,yawSpeed,pitchSpeed)
+        heads = motion.SetHeadCommand(yawv,pitchv)
         self.brain.motion.setHead(heads)
 
     def gainsOff(self):
         """
         Turn off the gains
         """
-        shutoff = motion.StiffnessCommand(0.0)
+        shutoff = motion.StiffnessCommand(GAINS_OFF_VALUE)
         self.brain.motion.sendStiffness(shutoff)
 
     def gainsOn(self):
         """
         Turn on the gains
         """
-        turnon = motion.StiffnessCommand(0.85)
+        turnon = motion.StiffnessCommand(GAINS_ON_VALUE)
         self.brain.motion.sendStiffness(turnon)
 
     def standupGainsOn(self):
         """
         Turn on the gains
         """
-        turnon = motion.StiffnessCommand(1.0)
+        turnon = motion.StiffnessCommand(STANDUP_GAINS_VALUE)
         self.brain.motion.sendStiffness(turnon)
-
-    def zeroHeads(self):
-        self.brain.tracker.switchTo('stopped')
-        self.setHeads(0,0)
-        return
-
-    def penalizedHeads(self):
-        self.brain.tracker.switchTo('stopped')
-        self.setHeads(0,20)
-        return
