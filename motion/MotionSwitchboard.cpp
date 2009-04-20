@@ -210,6 +210,14 @@ int MotionSwitchboard::processProviders(){
     }
     newJoints = true;
 
+    //Make sure that if the current provider just became inactive,
+    //and we have the next provider ready, then we want to swap to ensure
+    //that we never have an inactive provider when an active one is potentially
+    //ready to take over:
+	if (curProvider != nextProvider && !curProvider->isActive()) {
+        swapBodyProvider();
+	}
+
     //return if one of the enactors 
     return curProvider->isActive() ||  headProvider.isActive();
 
