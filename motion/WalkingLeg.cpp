@@ -182,7 +182,7 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
                                          REALLY_LOW_ERROR);
     result.angles[1] -= getHipHack();
-    result.angles[2] += walkParams->XAngleOffset;
+    result.angles[2] -= walkParams->XAngleOffset;
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
@@ -213,7 +213,7 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
                                          REALLY_LOW_ERROR);
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     result.angles[1] += getHipHack();
-    result.angles[2] += walkParams->XAngleOffset;
+    result.angles[2] -= walkParams->XAngleOffset;
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
 

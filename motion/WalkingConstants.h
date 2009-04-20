@@ -227,10 +227,8 @@ public:
             = Kinematics::R_HIP_PITCH -
             Kinematics::chain_first_joint[Kinematics::RLEG_CHAIN];
 
-        lleg_angles[leftHipPitchIndex] = lleg_angles[leftHipPitchIndex]  +
-            XAngleOffset;
-        rleg_angles[rightHipPitchIndex] = rleg_angles[rightHipPitchIndex]  +
-            XAngleOffset;
+        lleg_angles[leftHipPitchIndex]  -= XAngleOffset;
+        rleg_angles[rightHipPitchIndex] -= XAngleOffset;
 
         std::vector<float> * allJoints = new std::vector<float>();
 

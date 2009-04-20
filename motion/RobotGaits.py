@@ -117,7 +117,7 @@ ZAPHOD_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
 
 SLARTI_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         1.40,  # hip offset x
-                                        10.0,  # x-axis angle offset
+                                        0.0,  # x-axis angle offset
                                         1.00,  # step duration
                                         0.5,   # fraction in double support
                                         0.0,  # stepHeight
