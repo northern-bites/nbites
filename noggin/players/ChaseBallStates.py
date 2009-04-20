@@ -1,7 +1,7 @@
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import math
-from noggin.util import MyMath as MyMath
+import man.noggin.util.MyMath as MyMath
 
 SPIN_SPEED = 15
 Y_SPEED = 2

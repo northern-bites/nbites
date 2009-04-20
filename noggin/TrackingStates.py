@@ -1,7 +1,7 @@
 
 from man import motion
 from man.motion import MotionConstants
-from ..util import MyMath as MyMath
+import util.MyMath as MyMath
 
 DEBUG = False
 
