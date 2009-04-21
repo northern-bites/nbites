@@ -128,7 +128,7 @@ ConcreteLine.o : $(CL_SRCS)
 VisualDetection.o : $(VISDETECTION_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 VisualLandmark.o : $(VLANDMARK_SRCS)
-g	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 VisualCorner.o : $(VC_SRCS) VisualLandmark.o
 	 $(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 VisualFieldObject.o : $(VFO_SRCS) VisualLandmark.o
