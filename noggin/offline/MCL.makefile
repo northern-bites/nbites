@@ -75,6 +75,10 @@ OBJS = Utility.o \
 
 EXECS = faker.o \
 	faker \
+	navToObs.o \
+	obsToLoc.o \
+	navToObs \
+	obsToLoc
 
 LDLIBS = $(OBJS)
 LDFLAGS = $(LDLIBS)
