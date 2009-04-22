@@ -69,7 +69,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     zmp_log = fopen("/tmp/zmp_log.xls","w");
-    fprintf(zmp_log,"pre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
+    fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
             "\taccX\taccY\taccZ\n");
 #endif
 
@@ -974,9 +974,9 @@ void StepGenerator::debugLogging(){
     const float accX = acc.accX;
     const float accY = acc.accY;
     const float accZ = acc.accZ;
-
-    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
-                preX,preY,comX,comY,comPX,comPY,accX,accY,accZ);
-
+    static float stime = 0;
+    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+            stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ);
+    stime+= .02;
 #endif
 }
