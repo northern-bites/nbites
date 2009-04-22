@@ -1,16 +1,16 @@
 
 
-#include "AccEKF.h"
+#include "ZmpAccEKF.h"
 #include "BasicWorldConstants.h"
 using namespace boost::numeric;
 
-const int AccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
-const float AccEKF::beta = 0.2f;
-const float AccEKF::gamma = .2f;
-const float AccEKF::variance  = 0.22f;
-//const float AccEKF::variance  = 100.00f;
+const int ZmpAccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
+const float ZmpAccEKF::beta = 0.2f;
+const float ZmpAccEKF::gamma = .2f;
+const float ZmpAccEKF::variance  = 0.22f;
+//const float ZmpAccEKF::variance  = 100.00f;
 
-AccEKF::AccEKF()
+ZmpAccEKF::ZmpAccEKF()
     : EKF<AccelMeasurement,int, num_dimensions, num_dimensions>(beta, gamma)
 {
     // ones on the diagonal
@@ -31,7 +31,7 @@ AccEKF::AccEKF()
 
 }
 
-AccEKF::~AccEKF()
+ZmpAccEKF::~ZmpAccEKF()
 {
 
 }
@@ -40,7 +40,7 @@ AccEKF::~AccEKF()
 /**
  * Method that gets called when we want to advance the filter to the next state
  */
-void AccEKF::update(const float accX,
+void ZmpAccEKF::update(const float accX,
                     const float accY,
                     const float accZ) {
     timeUpdate(0); // update model? we don't have one. it's an int. don't care.
@@ -52,12 +52,12 @@ void AccEKF::update(const float accX,
 }
 
 EKF<AccelMeasurement, int, 3, 3>::StateVector
-AccEKF::associateTimeUpdate(int u_k)
+ZmpAccEKF::associateTimeUpdate(int u_k)
 {
     return ublas::zero_vector<float>(num_dimensions);
 }
 
-const float AccEKF::scale(const float x) {
+const float ZmpAccEKF::scale(const float x) {
     //return .4f * std::pow(3.46572f, x);
     return 100.0f * std::pow(x, 5.0f) + 580.4f;
     // A bezier curve
@@ -81,7 +81,7 @@ const float AccEKF::scale(const float x) {
     */
 }
 
-const float AccEKF::getVariance(float delta, float divergence) {
+const float ZmpAccEKF::getVariance(float delta, float divergence) {
     delta = std::abs(delta);
     divergence = std::abs(divergence);
 
@@ -101,7 +101,7 @@ const float AccEKF::getVariance(float delta, float divergence) {
     return dont_trust;
 }
 
-void AccEKF::incorporateMeasurement(AccelMeasurement z,
+void ZmpAccEKF::incorporateMeasurement(AccelMeasurement z,
                                     StateMeasurementMatrix &H_k,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)

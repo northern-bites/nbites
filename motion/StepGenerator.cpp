@@ -55,7 +55,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     //controller_y(new PreviewController())
     controller_x(new Observer()),
     controller_y(new Observer()),
-    zmp_filter()
+    zmp_filter(),
+    acc_filter()
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
@@ -66,12 +67,21 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
             "lfl\tlfr\tlrl\tlrr\trfl\trfr\trrl\trrr\t"
             "state\n");
 #endif
+#ifdef DEBUG_SENSOR_ZMP
+    zmp_log = fopen("/tmp/zmp_log.xls","w");
+    fprintf(zmp_log,"pre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
+            "\taccX\taccY\taccZ\n");
+#endif
+
 }
 
 StepGenerator::~StepGenerator()
 {
 #ifdef DEBUG_CONTROLLER_COM
     fclose(com_log);
+#endif
+#ifdef DEBUG_SENSOR_ZMP
+    fclose(zmp_log);
 #endif
     delete controller_x; delete controller_y;
 }
@@ -152,6 +162,8 @@ void StepGenerator::tick_controller(){
     ZmpMeasurement pMeasure =
         {controller_x->getPosition(),controller_y->getPosition(),
          accel_i(0),accel_i(1)};
+
+    acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
 
     zmp_filter.update(tUp,pMeasure);
 
@@ -946,4 +958,25 @@ void StepGenerator::debugLogging(){
     ttime += 0.02f;
 #endif
 
+
+
+#ifdef DEBUG_SENSOR_ZMP
+    const float preX = zmp_ref_x.front();
+    const float preY = zmp_ref_y.front();
+
+    const float comX = com_i(0);
+    const float comY = com_i(1);
+
+    const float comPX = controller_x->getZMP();
+    const float comPY = controller_y->getZMP();
+
+    Inertial acc = sensors->getInertial();
+    const float accX = acc.accX;
+    const float accY = acc.accY;
+    const float accZ = acc.accZ;
+
+    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+                preX,preY,comX,comY,comPX,comPY,accX,accY,accZ);
+
+#endif
 }
