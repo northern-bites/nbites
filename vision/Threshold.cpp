@@ -929,8 +929,8 @@ float Threshold::getGoalPostDistFromHeight(float height) {
 #if ROBOT(NAO_SIM)
     return 17826*pow((double) height,-1.0254);
 #else
-    // return 39305*pow((double) height,-0.9245);
-    return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
+    // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
+    return 1139.1636f * pow(height, -0.9344f);
 #endif
 }
 
@@ -944,8 +944,8 @@ float Threshold::getGoalPostDistFromWidth(float width) {
     //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
     return 2360.1*pow((double) width,-1.0516);
 #else
-    //return 10083*pow((double) width,-1.052);
-    return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
+    // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
+    return 7630.7708f*pow(width, -1.2850f);
 #endif
 }
 
