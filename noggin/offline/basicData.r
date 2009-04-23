@@ -51,7 +51,7 @@ yMinMax = c(min(c(min(ekfY),min(knownY),min(mclY))),max(c(max(ekfY),max(knownY),
 hMinMax = c(min(c(min(ekfH),min(knownH),min(mclH))),max(c(max(ekfH),max(knownH),max(mclH))))
 
 # Plot the x data
-pdf(paste(name, ".xEsts.pdf", sep=""))
+pdf(paste(name, "-xEsts.pdf", sep=""))
 plot(frames, mclX, main="X Estimates", xlab="Frame #", ylab="x est (cm)", pch="",xlim=frameMinMax,ylim=xMinMax)
 points(frames, knownX, lty = 1, col = "green", type="l", lwd="2")
 points(frames, ekfX, lty = 2, col = "red", type="l", lwd="2")
@@ -61,7 +61,7 @@ legend("topleft",lty=c(1,2,5), c("Known", "EKF", "MCL"), fill=c("green", "red", 
 dev.off()
 
 # Plot the h data
-pdf(paste(name, ".yEsts.pdf", sep=""))
+pdf(paste(name, "-yEsts.pdf", sep=""))
 plot(frames, mclY, main="Y Estimates", xlab="Frame #", ylab="y est (cm)", pch="",xlim=frameMinMax,ylim=yMinMax)
 points(frames, knownY, lty = 1, col = "green", type="l", lwd="2")
 points(frames, ekfY, lty = 2, col = "red", type="l",lwd="2")
@@ -70,7 +70,7 @@ legend("topright",lty=c(1,2,5), c("Known", "EKF", "MCL"), fill=c("green", "red",
 dev.off()
 
 # Plot the h data
-pdf(paste(name, ".hEsts.pdf", sep=""))
+pdf(paste(name, "-hEsts.pdf", sep=""))
 plot(frames, mclH, main="H Estimates", xlab="Frame #", ylab="h est (cm)", pch="",xlim=frameMinMax,ylim=hMinMax)
 points(frames, knownH, lty = 1, col = "green", type="l", lwd="2")
 points(frames, ekfH, lty = 2, col = "red", type="l", lwd="2")

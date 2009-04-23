@@ -132,14 +132,10 @@ public:
      */
     void setHUncert(float val) { P_k(2,2) = val; }
 
-    // // Output methods
-    // friend std::ostream& operator<< (std::ostream &o, const LocEKF &c) {
-    //     return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
-    //              << c.getHEst() << ")\t"
-    //              << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
-    //              << ", "
-    //              << c.getHUncert() << ")";
-    // }
+    /**
+     * @param _use True if we are to use ambiguous landmark observations
+     */
+    void setUseAmbiguous(bool _use) { useAmbiguous = _use; }
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
@@ -155,6 +151,7 @@ private:
 
     // Last odometry update
     MotionModel lastOdo;
+    bool useAmbiguous;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

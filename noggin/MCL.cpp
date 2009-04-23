@@ -122,6 +122,7 @@ void MCL::updateLocalization(MotionModel u_t, vector<Observation> z_t)
  */
 PoseEst MCL::updateMotionModel(PoseEst x_t, MotionModel u_t)
 {
+    lastOdo = u_t;
     u_t.deltaF -= sampleNormalDistribution(fabs(u_t.deltaF));
     u_t.deltaL -= sampleNormalDistribution(fabs(u_t.deltaL));
     u_t.deltaR -= sampleNormalDistribution(fabs(u_t.deltaR));
