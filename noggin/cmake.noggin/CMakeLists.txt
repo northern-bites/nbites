@@ -79,16 +79,18 @@ FIND_PACKAGE( PYTHON   REQUIRED )
 
 
 ############################ TeamConfig.py variables
-SET(GC_TEAM_NUMBER
+SET(@GC_TEAM_NUMBER@
   "101"
   CACHE STRING
   "The team number for the robot (GameController)"
   )
-SET(GC_PLAYER_NUMBER
+SET( GC_TEAM_NUMBER ${@GC_TEAM_NUMBER@} )
+SET(@GC_PLAYER_NUMBER@
   "2"
   CACHE STRING
   "The player number for the robot (GameController)"
   )
+SET( GC_PLAYER_NUMBER ${@GC_PLAYER_NUMBER@} )
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   "${NOGGIN_CMAKE_DIR}/nogginconfig.in"

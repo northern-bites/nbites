@@ -60,7 +60,7 @@ SET( CMAKE_CXX_FLAGS_DEBUG
 
 # See documentation strings for descriptions
 OPTION(
-    @MAN_IS_REMOTE@
+    MAN_IS_REMOTE_
     "Compile as a remote binary, versus a dynamic library (ON/OFF)"
     OFF
     )
@@ -68,7 +68,7 @@ OPTION(
 #  It is included directly in source files and such things will come
 #  along with it
 SET(
-    MAN_IS_REMOTE ${@MAN_IS_REMOTE@}
+    MAN_IS_REMOTE ${MAN_IS_REMOTE_}
     )
 OPTION(
   DEBUG_MAN_INITIALIZATION
@@ -116,5 +116,9 @@ OPTION(
   "Redirect the standard error to standard out in C++"
   ON
   )
-  
+OPTION( USING_LAB_FIELD
+  "Set field constants to use the lab field constants"
+  ON
+  )
+
 
