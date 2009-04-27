@@ -6,12 +6,19 @@ import util.MyMath as MyMath
 DEBUG = False
 TRACKER_FRAMES_OFF_REFIND_THRESH = 3 #num frms after which to switch to scanfindbl
 
-def nothing(tracker):
+def stopped(tracker):
     '''default state where the tracker does nothing'''
-    if tracker.firstFrame():
-        tracker.brain.motion.stopHeadMoves()
     return tracker.stay()
 
+def stop(tracker):
+    ''' stop all head moves '''
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('stopped')
+
+    return tracker.stay()
 
 def ballTracking(tracker): #Super state which handles following/refinding the ball
     if tracker.target.framesOff <= TRACKER_FRAMES_OFF_REFIND_THRESH:
