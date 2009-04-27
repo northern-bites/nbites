@@ -45,6 +45,8 @@ class Navigator(FSA.FSA):
         self.walkX = x
         self.walkY = y
         self.walkTheta = theta
+
+        self.updatedTrajectory = True
         return True
 
     def setSpeed(self,x,y,theta):
