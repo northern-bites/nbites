@@ -3,7 +3,13 @@
 using namespace std;
 #include "AccEKF.h"
 #include "ZmpEKF.h"
+#include "ZmpAccEKF.h"
 #include "BasicWorldConstants.h"
+
+/**
+ * This is a test file to parse logs and test the various kalman filters we
+ * use for motion, etc
+ */
 
 void AccFilter(FILE *f){
 
@@ -83,13 +89,63 @@ void ZmpFilter(FILE *f){
 
 }
 
+void ZmpAccFilter(FILE * f){
+
+    //Read the header from the input log file
+    fscanf(f,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
+           "\taccX\taccY\taccZ\n");
+
+    //Write the header for the output log file
+    FILE * output = fopen("/tmp/zmpacc_log.xls","w");
+    fprintf(output,"time\taccX\taccY\taccZ\t"
+            "filteredAccX\tfilteredAccY\tfilteredAccZ\t"
+            "filteredAccXUnc\tfilteredAccYUnc\tfilteredAccZUnc\n");
+
+
+    ZmpAccEKF filter;
+
+    while (!feof(f)) {
+        //Read the input log file
+        float time,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ;
+        int nScan = fscanf(f,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+                           &time,&preX,&preY,&comX,&comY,&comPX,&comPY,
+                           &accX,&accY,&accZ);
+
+        //Process the accel values using EKF:
+        filter.update(accX,accY,accZ);
+        const float fAccX = filter.getX();
+        const float fAccY = filter.getY();
+        const float fAccZ = filter.getZ();
+        float fAccXUnc = filter.getXUnc();
+        float fAccYUnc = filter.getYUnc();
+        float fAccZUnc = filter.getZUnc();
+
+        //Write to a new log file
+        fprintf(output,
+                "%f\t"
+                "%f\t%f\t%f\t"
+                "%f\t%f\t%f\t"
+                "%f\t%f\t%f\n",
+                time,
+                accX,accY,accZ,
+                fAccX,fAccY,fAccZ,
+                fAccXUnc,fAccYUnc,fAccZUnc);
+    }
+
+
+    //Close the log file
+    fclose(output);
+}
+
+
 int main(int argc, char * argv[]) {
     if (argc < 2){
         cout << "Not enough arguments" <<endl;
         return 1;
     }
     FILE *f = fopen(argv[1],"r");
-    ZmpFilter(f);
+    //ZmpFilter(f);
+    ZmpAccFilter(f);
 
     return 0;
 }
