@@ -7,8 +7,8 @@ using namespace Kinematics;
 
 using namespace boost::numeric;
 
-const float ZmpEKF::beta = 0.01f;
-const float ZmpEKF::gamma = 0.1f;
+const float ZmpEKF::beta = 0.1f;
+const float ZmpEKF::gamma = 0.5f;
 //const float ZmpEKF::variance  = 100.00f;
 
 ZmpEKF::ZmpEKF()
@@ -39,7 +39,7 @@ ZmpEKF::~ZmpEKF()
  */
 void ZmpEKF::update(const ZmpTimeUpdate tUp,
                     const ZmpMeasurement zMeasure) {
-    timeUpdate(tUp); // update model? we don't have one. it's an int. don't care.
+    timeUpdate(tUp);
 
     std::vector<ZmpMeasurement> z(1,zMeasure);
     correctionStep(z);
@@ -67,6 +67,15 @@ const float getDontTrustVariance(const float divergence){
     return minVariance + std::abs(divergence) *varianceScale;
 }
 
+const float getVariance(const float divergence){
+    //For observations from mostly trustworthy sensors,
+    // can use a lower variance
+    static const float minVariance = .5f;
+    static const float varianceScale = .5f;
+    return minVariance + std::abs(divergence) *varianceScale;
+}
+
+
 void ZmpEKF::incorporateMeasurement(ZmpMeasurement z,
                                     StateMeasurementMatrix &H_k,
                                     MeasurementMatrix &R_k,
@@ -90,8 +99,8 @@ void ZmpEKF::incorporateMeasurement(ZmpMeasurement z,
 
     //MeasurementVector deltaS = z_x - last_measurement;
 
-    R_k(0,0) = getDontTrustVariance(V_k(0));//variance;
-    R_k(1,1) = getDontTrustVariance(V_k(1));//variance;
+    R_k(0,0) = getVariance(V_k(0));//variance;
+    R_k(1,1) = getVariance(V_k(1));//variance;
 
     last_measurement = z_x;
 }

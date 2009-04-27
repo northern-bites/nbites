@@ -8,7 +8,7 @@ INCLUDE = -I$(MAN_DIR)/include -I$(MAN_DIR)/motion -I$(MAN_DIR)/noggin -I$(MAN_D
 CC = g++ -g -Wall -Wno-unused
 
 PROGS = simple1
-OBJS = test.o AccEKF.o EKF.o ZmpEKF.o ZmpAccEKF.o
+OBJS = test.o AccEKF.o ZmpEKF.o ZmpAccEKF.o
 
 #LOG_FILE = ../../../../Desktop/accels.csv
 LOG_FILE = /tmp/com_log.xls

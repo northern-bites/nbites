@@ -95,14 +95,19 @@ void ZmpAccFilter(FILE * f){
     fscanf(f,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
            "\taccX\taccY\taccZ\n");
 
-    //Write the header for the output log file
-    FILE * output = fopen("/tmp/zmpacc_log.xls","w");
-    fprintf(output,"time\taccX\taccY\taccZ\t"
+    //Write the header for the accout log file
+    FILE * accout = fopen("/tmp/zmpacc_log.xls","w");
+    fprintf(accout,"time\taccX\taccY\taccZ\t"
             "filteredAccX\tfilteredAccY\tfilteredAccZ\t"
             "filteredAccXUnc\tfilteredAccYUnc\tfilteredAccZUnc\n");
 
+    FILE * zmpout = fopen("/tmp/zmpekf_log.xls","w");
+    fprintf(zmpout,"time\tcom_x\tcom_y\tcom_px\tcom_py\tpre_x\tpre_y\t"
+            "sensor_px\tsensor_py\tsensor_px_unf\tsensor_py_unf\t"
+            "sensor_px_unff\tsensor_py_unff\n");
 
-    ZmpAccEKF filter;
+    ZmpEKF zmpFilter;
+    ZmpAccEKF accFilter;
 
     while (!feof(f)) {
         //Read the input log file
@@ -112,16 +117,31 @@ void ZmpAccFilter(FILE * f){
                            &accX,&accY,&accZ);
 
         //Process the accel values using EKF:
-        filter.update(accX,accY,accZ);
-        const float fAccX = filter.getX();
-        const float fAccY = filter.getY();
-        const float fAccZ = filter.getZ();
-        float fAccXUnc = filter.getXUnc();
-        float fAccYUnc = filter.getYUnc();
-        float fAccZUnc = filter.getZUnc();
+        accFilter.update(accX,accY,accZ);
+        const float fAccX = accFilter.getX();
+        const float fAccY = accFilter.getY();
+        const float fAccZ = accFilter.getZ();
+        float fAccXUnc = accFilter.getXUnc();
+        float fAccYUnc = accFilter.getYUnc();
+        float fAccZUnc = accFilter.getZUnc();
 
-        //Write to a new log file
-        fprintf(output,
+        //Process the accel values into ZMP estimates using an EKF:
+        ZmpTimeUpdate tUp = {comPX,comPY};
+        ZmpMeasurement pMeasure = {comX,comY,fAccX,fAccY};
+        zmpFilter.update(tUp,pMeasure);
+        const float sensorPX = zmpFilter.get_zmp_x();
+        const float sensorPY = zmpFilter.get_zmp_y();
+
+        //slightly filtered ZMP est
+        const float sensorPXUnf = comX + (310.0f / GRAVITY_mss )*fAccX;
+        const float sensorPYUnf = comY + (310.0f / GRAVITY_mss )*fAccY;
+
+        //Completely unfiltered ZMP est
+        const float sensorPXUnff = comX + (310.0f / GRAVITY_mss )*accX;
+        const float sensorPYUnff = comY + (310.0f / GRAVITY_mss )*accY;
+
+        //Write accels to a new log file
+        fprintf(accout,
                 "%f\t"
                 "%f\t%f\t%f\t"
                 "%f\t%f\t%f\t"
@@ -130,11 +150,21 @@ void ZmpAccFilter(FILE * f){
                 accX,accY,accZ,
                 fAccX,fAccY,fAccZ,
                 fAccXUnc,fAccYUnc,fAccZUnc);
+
+        fprintf(zmpout, "%f\t"
+                "%f\t%f\t%f\t%f\t"
+                "%f\t%f\t%f\t%f\t"
+                "%f\t%f\t%f\t%f\n",
+                time,
+                comX,comY,comPX,comPY,
+                preX,preY,sensorPX,sensorPY,
+                sensorPXUnf,sensorPYUnf,
+                sensorPXUnff,sensorPYUnff);
     }
 
 
     //Close the log file
-    fclose(output);
+    fclose(accout);
 }
 
 
