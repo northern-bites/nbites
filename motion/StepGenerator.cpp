@@ -591,6 +591,9 @@ void StepGenerator::startRight(){
     controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
     controller_y->initState(0.0f,0.0f,0.0f);
 
+    //Each time we restart, we need to reset the estimated sensor ZMP:
+    zmp_filter = ZmpEKF();
+
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
@@ -638,6 +641,9 @@ void StepGenerator::startLeft(){
     //First we reset the controller back to the neutral position
     controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
     controller_y->initState(0.0f,0.0f,0.0f);
+
+    //Each time we restart, we need to reset the estimated sensor ZMP:
+    zmp_filter = ZmpEKF();
 
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
