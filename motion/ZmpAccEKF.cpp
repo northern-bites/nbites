@@ -59,26 +59,28 @@ ZmpAccEKF::associateTimeUpdate(int u_k)
 
 const float ZmpAccEKF::scale(const float x) {
     //return .4f * std::pow(3.46572f, x);
-    return 100.0f * std::pow(x, 5.0f) + 580.4f;
-    // A bezier curve
-    //return 6.73684f * std::pow(x,3) +
-    //    37.8947f * std::pow(x,2) +
-    //    -54.6316f * x +
-    //    20.0f;
+    // Highly filtered: return 100.0f * std::pow(x, 5.0f) + 580.4f;
+    // A bezier curve - pretty tight fit, still lags a bit
+//     return 6.73684f * std::pow(x,3) +
+//        37.8947f * std::pow(x,2) +
+//        -54.6316f * x +
+//        20.0f;
 
-/*
-    return 6.73684f * std::pow(x,3) +
-       37.8947f * std::pow(x,2) +
-       -54.6316f * x +
-       70.0f;
-*/
+    //very tight fit
+    return 2.0f* std::pow(3.0f,x);
+    
+    //Looser fit:
+//     return 6.73684f * std::pow(x,3) +
+//        37.8947f * std::pow(x,2) +
+//        -54.6316f * x +
+//        70.0f;
+
     //return 80 - 79 * std::exp( - .36f * std::pow( - 2.5f + x , 2));
-    /*
-    if (x > 9.0f)
-        return 400.0f;
-    else
-        return 80 - 79 * std::exp( - .25f * std::pow( - 2.7f + x , 2));
-    */
+    
+//     if (x > 9.0f)
+//         return 400.0f;
+//     else
+//         return 80 - 79 * std::exp( - .25f * std::pow( - 2.7f + x , 2));
 }
 
 const float ZmpAccEKF::getVariance(float delta, float divergence) {
@@ -122,6 +124,7 @@ void ZmpAccEKF::incorporateMeasurement(AccelMeasurement z,
     H_k(1,1) = 1.0f;
     H_k(2,2) = 1.0f;
 
+    //
     MeasurementVector deltaS = z_x - last_measurement;
 
 /*
@@ -132,12 +135,12 @@ void ZmpAccEKF::incorporateMeasurement(AccelMeasurement z,
 */
 
     // Update the measurement covariance matrix
-//     R_k(0,0) = scale(std::abs(deltaS(0)));
-//     R_k(1,1) = scale(std::abs(deltaS(1)));
-//     R_k(2,2) = scale(std::abs(deltaS(2)));
+    R_k(0,0) = scale(std::abs(deltaS(0)));
+    R_k(1,1) = scale(std::abs(deltaS(1)));
+    R_k(2,2) = scale(std::abs(deltaS(2)));
 
-    R_k(0,0) = scale(std::abs(V_k(0)));
-    R_k(1,1) = scale(std::abs(V_k(1)));
-    R_k(2,2) = scale(std::abs(V_k(2)));
+//     R_k(0,0) = scale(std::abs(V_k(0)));
+//     R_k(1,1) = scale(std::abs(V_k(1)));
+//     R_k(2,2) = scale(std::abs(V_k(2)));
     last_measurement = z_x;
 }
