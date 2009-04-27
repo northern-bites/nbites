@@ -56,7 +56,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     controller_x(new Observer()),
     controller_y(new Observer()),
     zmp_filter(),
-    acc_filter()
+    acc_filter(),
+    accInWorldFrame(Kinematics::vector4D(0.0f,0.0f,0.0f))
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
@@ -156,8 +157,22 @@ void StepGenerator::findSensorZMP(){
     //We will use angleX, and angleY:
 
     //TODO: Rotate with angleX,etc
+    const ufmatrix4 bodyToWorldTransform =
+        prod(Kinematics::rotation4D(Kinematics::X_AXIS, inertial.angleX),
+             Kinematics::rotation4D(Kinematics::Y_AXIS, inertial.angleY));
 
-    acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
+    const ufvector4 accInBodyFrame = Kinematics::vector4D(inertial.accX,
+                                                          inertial.accY,
+                                                          inertial.accZ);
+
+    //global
+    accInWorldFrame = prod(bodyToWorldTransform,
+                           accInBodyFrame);
+
+    //acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
+    acc_filter.update(accInWorldFrame(0),
+                      accInWorldFrame(1),
+                      accInWorldFrame(2));
 
     //Rotate from the local C to the global I frame
     ufvector3 accel_c = CoordFrame3D::vector3D(acc_filter.getX(),
@@ -988,10 +1003,13 @@ void StepGenerator::debugLogging(){
     const float comPX = controller_x->getZMP();
     const float comPY = controller_y->getZMP();
 
-    Inertial acc = sensors->getUnfilteredInertial();
-    const float accX = acc.accX;
-    const float accY = acc.accY;
-    const float accZ = acc.accZ;
+//     Inertial acc = sensors->getUnfilteredInertial();
+//     const float accX = acc.accX;
+//     const float accY = acc.accY;
+//     const float accZ = acc.accZ;
+    const float accX = accInWorldFrame(0);
+    const float accY = accInWorldFrame(1);
+    const float accZ = accInWorldFrame(2);
     static float stime = 0;
     fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
             stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ);

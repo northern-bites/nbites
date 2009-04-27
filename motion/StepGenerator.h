@@ -210,6 +210,9 @@ private:
 
     ZmpEKF zmp_filter;
     ZmpAccEKF acc_filter;
+
+    NBMath::ufvector4 accInWorldFrame;
+
 #ifdef DEBUG_CONTROLLER_COM
     FILE* com_log;
     NBMath::ufmatrix3 fi_Transform;

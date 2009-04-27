@@ -44,11 +44,14 @@ namespace Kinematics {
 
     // -------------------- Helper matrix methods --------------------
 
+    //TODO: Move all these rot4D, etc into a Coord4D namespace.
+    // also, make all these use bounded matrices (see NBMatrixMath)
     static const boost::numeric::ublas::matrix <float>
         rotation4D(const Axis axis,
                    const float angle) {
         boost::numeric::ublas::matrix <float> rot = boost::numeric::ublas::identity_matrix <float>(4);
 
+        //TODO: Make this one call:
         const float sinAngle = (float)sin(angle);
         const float cosAngle = (float)cos(angle);
         if (angle == 0.0) { //OPTIMIZAION POINT
