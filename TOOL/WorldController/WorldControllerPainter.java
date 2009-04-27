@@ -766,12 +766,12 @@ public class WorldControllerPainter implements RobotListener
     {
         // Currently transforms x_ and y_est, heading_est, x_velocity,
         // and y_velocity
-        loc_pack.x_est = field.FIELD_GREEN_WIDTH - loc_pack.x_est;
-        loc_pack.y_est = field.FIELD_GREEN_HEIGHT - loc_pack.y_est;
-        loc_pack.heading_est = AngleUtilities.sub180Angle(loc_pack.
-                                                          heading_est + 180);
-        loc_pack.x_velocity = loc_pack.x_velocity * -1.0;
-        loc_pack.y_velocity = loc_pack.y_velocity * -1.0;
+        // loc_pack.x_est = field.FIELD_GREEN_WIDTH - loc_pack.x_est;
+        // loc_pack.y_est = field.FIELD_GREEN_HEIGHT - loc_pack.y_est;
+        // loc_pack.heading_est = AngleUtilities.sub180Angle(loc_pack.
+        //                                                   heading_est + 180);
+        // loc_pack.x_velocity = loc_pack.x_velocity * -1.0;
+        // loc_pack.y_velocity = loc_pack.y_velocity * -1.0;
     }
 
     public RobotHistory singleRobotHistory()
