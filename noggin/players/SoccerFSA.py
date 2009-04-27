@@ -5,7 +5,7 @@
 #
 
 import man.motion as motion
-from motion import SweetMoves
+from man.motion import SweetMoves
 from ..util import FSA
 from . import CoreSoccerStates
 

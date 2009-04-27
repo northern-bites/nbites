@@ -14,8 +14,7 @@ def gamePenalized(player):
     if player.firstFrame():
         player.stopWalking()
         player.motion.stopBodyMoves()
-        player.setHeads(0,20)
-        player.brain.tracker.stopHeadMoves()
+        player.penalizeHeads()
     return player.stay()
 
 def gameInitial(player):
@@ -27,8 +26,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
         player.motion.stopBodyMoves()
-        player.setHeads(0,0)
-        player.brain.tracker.stopHeadMoves()
+        player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
     return player.stay()
 
@@ -77,8 +75,7 @@ def gameFinished(player):
     """
     if player.firstFrame():
         player.stopWalking() # Ensure navigator stops correctly
-        player.setHeads(0,0)
-        player.brain.tracker.stopHeadMoves()
+        player.zeroHeads()
         player.GAME_FINISHED_satDown = False
         return player.stay()
 
