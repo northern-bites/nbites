@@ -93,7 +93,7 @@ void ZmpAccFilter(FILE * f){
 
     //Read the header from the input log file
     fscanf(f,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
-           "\taccX\taccY\taccZ\n");
+           "\taccX\taccY\taccZ\tangleX\tangleY\n");
 
     //Write the header for the accout log file
     FILE * accout = fopen("/tmp/zmpacc_log.xls","w");
@@ -104,17 +104,17 @@ void ZmpAccFilter(FILE * f){
     FILE * zmpout = fopen("/tmp/zmpekf_log.xls","w");
     fprintf(zmpout,"time\tcom_x\tcom_y\tcom_px\tcom_py\tpre_x\tpre_y\t"
             "sensor_px\tsensor_py\tsensor_px_unf\tsensor_py_unf\t"
-            "sensor_px_unff\tsensor_py_unff\n");
+            "sensor_px_unff\tsensor_py_unff\tangleX\tangleY\n");
 
     ZmpEKF zmpFilter;
     ZmpAccEKF accFilter;
 
     while (!feof(f)) {
         //Read the input log file
-        float time,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ;
-        int nScan = fscanf(f,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+        float time,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ,angleX,angleY;
+        int nScan = fscanf(f,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
                            &time,&preX,&preY,&comX,&comY,&comPX,&comPY,
-                           &accX,&accY,&accZ);
+                           &accX,&accY,&accZ,&angleX,&angleY);
 
         //Process the accel values using EKF:
         accFilter.update(accX,accY,accZ);
@@ -154,12 +154,13 @@ void ZmpAccFilter(FILE * f){
         fprintf(zmpout, "%f\t"
                 "%f\t%f\t%f\t%f\t"
                 "%f\t%f\t%f\t%f\t"
-                "%f\t%f\t%f\t%f\n",
+                "%f\t%f\t%f\t%f\t%f\t%f\n",
                 time,
                 comX,comY,comPX,comPY,
                 preX,preY,sensorPX,sensorPY,
                 sensorPXUnf,sensorPYUnf,
-                sensorPXUnff,sensorPYUnff);
+                sensorPXUnff,sensorPYUnff,
+                angleX,angleY);
     }
 
 

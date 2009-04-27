@@ -71,7 +71,7 @@ const float getVariance(const float divergence){
     //For observations from mostly trustworthy sensors,
     // can use a lower variance
     static const float minVariance = .5f;
-    static const float varianceScale = .5f;
+    static const float varianceScale = 1.5f;
     return minVariance + std::abs(divergence) *varianceScale;
 }
 

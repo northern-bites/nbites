@@ -71,7 +71,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
 #ifdef DEBUG_SENSOR_ZMP
     zmp_log = fopen("/tmp/zmp_log.xls","w");
     fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
-            "\taccX\taccY\taccZ\n");
+            "\taccX\taccY\taccZ\tangleX\tangleY\n");
 #endif
 
 }
@@ -165,10 +165,15 @@ void StepGenerator::findSensorZMP(){
                                                           inertial.accY,
                                                           inertial.accZ);
 
+    accInWorldFrame = accInBodyFrame;
+    //TODO: Work out rotations
     //global
-    accInWorldFrame = prod(bodyToWorldTransform,
-                           accInBodyFrame);
-
+//     accInWorldFrame = prod(bodyToWorldTransform,
+//                            accInBodyFrame);
+//     cout << endl<< "########################"<<endl;
+//     cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
+//     cout << "Accel in world frame: "<< accInWorldFrame <<endl;
+//     cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
     //acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
     acc_filter.update(accInWorldFrame(0),
                       accInWorldFrame(1),
@@ -1003,7 +1008,7 @@ void StepGenerator::debugLogging(){
     const float comPX = controller_x->getZMP();
     const float comPY = controller_y->getZMP();
 
-//     Inertial acc = sensors->getUnfilteredInertial();
+     Inertial acc = sensors->getUnfilteredInertial();
 //     const float accX = acc.accX;
 //     const float accY = acc.accY;
 //     const float accZ = acc.accZ;
@@ -1011,8 +1016,9 @@ void StepGenerator::debugLogging(){
     const float accY = accInWorldFrame(1);
     const float accZ = accInWorldFrame(2);
     static float stime = 0;
-    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
-            stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ);
+    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+            stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ,
+            acc.angleX,acc.angleY);
     stime+= .02;
 #endif
 }
