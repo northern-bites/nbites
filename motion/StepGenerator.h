@@ -129,6 +129,8 @@ private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
     void generate_steps();
 
+    void findSensorZMP();
+
     void swapSupportLegs();
 
     void generateStep(float _x,float _y,

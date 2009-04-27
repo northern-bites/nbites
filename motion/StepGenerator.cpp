@@ -144,28 +144,46 @@ void StepGenerator::generate_steps(){
     }
 }
 
-void StepGenerator::tick_controller(){
-#ifdef DEBUG_STEPGENERATOR
-    cout << "StepGenerator::tick_controller" << endl;
-#endif
 
+void StepGenerator::findSensorZMP(){
+
+    //TODO: Figure out how to use unfiltered
     Inertial inertial = sensors->getInertial();
 
-    ufvector3 accel_c = CoordFrame3D::vector3D(inertial.accX,inertial.accY);
+    //The robot may or may not be tilted with respect to vertical,
+    //so, since walking is conducted from a bird's eye perspective
+    //we would like to rotate the sensor measurements appropriately.
+    //We will use angleX, and angleY:
+
+    //TODO: Rotate with angleX,etc
+
+    acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
+
+    //Rotate from the local C to the global I frame
+    ufvector3 accel_c = CoordFrame3D::vector3D(acc_filter.getX(),
+                                               acc_filter.getY());
     float angle_fc = asin(fc_Transform(1,0));
     float angle_if = asin(if_Transform(1,0));
     float tot_angle = -(angle_fc+angle_if);
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
                              accel_c);
+
     ZmpTimeUpdate tUp = {controller_x->getZMP(),controller_y->getZMP()};
     ZmpMeasurement pMeasure =
         {controller_x->getPosition(),controller_y->getPosition(),
          accel_i(0),accel_i(1)};
 
-    acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
-
     zmp_filter.update(tUp,pMeasure);
+
+}
+
+void StepGenerator::tick_controller(){
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::tick_controller" << endl;
+#endif
+
+    findSensorZMP();
 
     est_zmp_i(0) = zmp_filter.get_zmp_x();
     est_zmp_i(1) = zmp_filter.get_zmp_y();
@@ -970,7 +988,7 @@ void StepGenerator::debugLogging(){
     const float comPX = controller_x->getZMP();
     const float comPY = controller_y->getZMP();
 
-    Inertial acc = sensors->getInertial();
+    Inertial acc = sensors->getUnfilteredInertial();
     const float accX = acc.accX;
     const float accY = acc.accY;
     const float accZ = acc.accZ;

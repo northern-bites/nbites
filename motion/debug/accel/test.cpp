@@ -126,7 +126,7 @@ void ZmpAccFilter(FILE * f){
         float fAccZUnc = accFilter.getZUnc();
 
         //Process the accel values into ZMP estimates using an EKF:
-        ZmpTimeUpdate tUp = {comPX,comPY};
+        ZmpTimeUpdate tUp = {preX,preY};
         ZmpMeasurement pMeasure = {comX,comY,fAccX,fAccY};
         zmpFilter.update(tUp,pMeasure);
         const float sensorPX = zmpFilter.get_zmp_x();

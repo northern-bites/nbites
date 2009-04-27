@@ -118,7 +118,7 @@ const float Observer::tick(const list<float> *zmp_ref,
     const float psensor = sensor_zmp;
 
     ufvector3 temp(prod(A, stateVector)
-                   - L*(psensor - prod(c,stateVector)(0)) * 1.0f
+                   - L*(psensor - prod(c,stateVector)(0)) * 0.0f
                    + b*control);
     stateVector.assign(temp);
 
