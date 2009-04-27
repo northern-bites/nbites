@@ -317,7 +317,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
             const cornerID id = toView->getID();
             list <const ConcreteCorner*> toUse;
             // Randomly set ambiguous data
-            if ((rand() / (float(RAND_MAX)+1)) < 0.32) {
+            if ((rand() / (float(RAND_MAX)+1)) < 0.50) {
                 shape s = ConcreteCorner::inferCornerType(id);
                 toUse = ConcreteCorner::getPossibleCorners(s);
             } else {

@@ -163,7 +163,7 @@ LocEKF::associateTimeUpdate(MotionModel u)
     deltaLoc(2) = u.deltaR;
 
     A_k(0,2) =  -u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) =  u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) =  u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
@@ -243,7 +243,7 @@ void LocEKF::incorporateMeasurement(Observation z,
         std::cout << "\t\t\tUsing polar " << std::endl;
 #endif
 
-        // Convert our sighting to cartesian coordinates
+        // Get the observed range and bearing
         MeasurementVector z_x(2);
         z_x(0) = z.getVisDistance();
         z_x(1) = z.getVisBearing();
