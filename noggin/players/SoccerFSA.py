@@ -5,7 +5,7 @@
 #
 
 import man.motion as motion
-
+from motion import SweetMoves
 from ..util import FSA
 from . import CoreSoccerStates
 
@@ -110,3 +110,17 @@ class SoccerFSA(FSA.FSA):
         """
         turnon = motion.StiffnessCommand(STANDUP_GAINS_VALUE)
         self.brain.motion.sendStiffness(turnon)
+
+    def penalizeHeads(self):
+        """
+        Put head into penalized position, stop tracker
+        """
+        self.brain.tracker.switchTo('stopped')
+        self.executeMove(SweetMoves.PENALIZED_HEADS)
+
+    def zeroHeads(self):
+        """
+        Put heads into neutral position
+        """
+        self.brain.tracker.switchTo('stopped')
+        self.executeMove(SweetMoves.ZERO_HEADS)
