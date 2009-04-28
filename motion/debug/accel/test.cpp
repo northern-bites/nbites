@@ -3,7 +3,13 @@
 using namespace std;
 #include "AccEKF.h"
 #include "ZmpEKF.h"
+#include "ZmpAccEKF.h"
 #include "BasicWorldConstants.h"
+
+/**
+ * This is a test file to parse logs and test the various kalman filters we
+ * use for motion, etc
+ */
 
 void AccFilter(FILE *f){
 
@@ -83,13 +89,94 @@ void ZmpFilter(FILE *f){
 
 }
 
+void ZmpAccFilter(FILE * f){
+
+    //Read the header from the input log file
+    fscanf(f,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
+           "\taccX\taccY\taccZ\tangleX\tangleY\n");
+
+    //Write the header for the accout log file
+    FILE * accout = fopen("/tmp/zmpacc_log.xls","w");
+    fprintf(accout,"time\taccX\taccY\taccZ\t"
+            "filteredAccX\tfilteredAccY\tfilteredAccZ\t"
+            "filteredAccXUnc\tfilteredAccYUnc\tfilteredAccZUnc\n");
+
+    FILE * zmpout = fopen("/tmp/zmpekf_log.xls","w");
+    fprintf(zmpout,"time\tcom_x\tcom_y\tcom_px\tcom_py\tpre_x\tpre_y\t"
+            "sensor_px\tsensor_py\tsensor_px_unf\tsensor_py_unf\t"
+            "sensor_px_unff\tsensor_py_unff\tangleX\tangleY\n");
+
+    ZmpEKF zmpFilter;
+    ZmpAccEKF accFilter;
+
+    while (!feof(f)) {
+        //Read the input log file
+        float time,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ,angleX,angleY;
+        int nScan = fscanf(f,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+                           &time,&preX,&preY,&comX,&comY,&comPX,&comPY,
+                           &accX,&accY,&accZ,&angleX,&angleY);
+
+        //Process the accel values using EKF:
+        accFilter.update(accX,accY,accZ);
+        const float fAccX = accFilter.getX();
+        const float fAccY = accFilter.getY();
+        const float fAccZ = accFilter.getZ();
+        float fAccXUnc = accFilter.getXUnc();
+        float fAccYUnc = accFilter.getYUnc();
+        float fAccZUnc = accFilter.getZUnc();
+
+        //Process the accel values into ZMP estimates using an EKF:
+        ZmpTimeUpdate tUp = {preX,preY};
+        ZmpMeasurement pMeasure = {comX,comY,fAccX,fAccY};
+        zmpFilter.update(tUp,pMeasure);
+        const float sensorPX = zmpFilter.get_zmp_x();
+        const float sensorPY = zmpFilter.get_zmp_y();
+
+        //slightly filtered ZMP est
+        const float sensorPXUnf = comX + (310.0f / GRAVITY_mss )*fAccX;
+        const float sensorPYUnf = comY + (310.0f / GRAVITY_mss )*fAccY;
+
+        //Completely unfiltered ZMP est
+        const float sensorPXUnff = comX + (310.0f / GRAVITY_mss )*accX;
+        const float sensorPYUnff = comY + (310.0f / GRAVITY_mss )*accY;
+
+        //Write accels to a new log file
+        fprintf(accout,
+                "%f\t"
+                "%f\t%f\t%f\t"
+                "%f\t%f\t%f\t"
+                "%f\t%f\t%f\n",
+                time,
+                accX,accY,accZ,
+                fAccX,fAccY,fAccZ,
+                fAccXUnc,fAccYUnc,fAccZUnc);
+
+        fprintf(zmpout, "%f\t"
+                "%f\t%f\t%f\t%f\t"
+                "%f\t%f\t%f\t%f\t"
+                "%f\t%f\t%f\t%f\t%f\t%f\n",
+                time,
+                comX,comY,comPX,comPY,
+                preX,preY,sensorPX,sensorPY,
+                sensorPXUnf,sensorPYUnf,
+                sensorPXUnff,sensorPYUnff,
+                angleX,angleY);
+    }
+
+
+    //Close the log file
+    fclose(accout);
+}
+
+
 int main(int argc, char * argv[]) {
     if (argc < 2){
         cout << "Not enough arguments" <<endl;
         return 1;
     }
     FILE *f = fopen(argv[1],"r");
-    ZmpFilter(f);
+    //ZmpFilter(f);
+    ZmpAccFilter(f);
 
     return 0;
 }

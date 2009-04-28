@@ -55,7 +55,9 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     //controller_y(new PreviewController())
     controller_x(new Observer()),
     controller_y(new Observer()),
-    zmp_filter()
+    zmp_filter(),
+    acc_filter(),
+    accInWorldFrame(Kinematics::vector4D(0.0f,0.0f,0.0f))
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
@@ -66,12 +68,21 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
             "lfl\tlfr\tlrl\tlrr\trfl\trfr\trrl\trrr\t"
             "state\n");
 #endif
+#ifdef DEBUG_SENSOR_ZMP
+    zmp_log = fopen("/tmp/zmp_log.xls","w");
+    fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
+            "\taccX\taccY\taccZ\tangleX\tangleY\n");
+#endif
+
 }
 
 StepGenerator::~StepGenerator()
 {
 #ifdef DEBUG_CONTROLLER_COM
     fclose(com_log);
+#endif
+#ifdef DEBUG_SENSOR_ZMP
+    fclose(zmp_log);
 #endif
     delete controller_x; delete controller_y;
 }
@@ -134,26 +145,65 @@ void StepGenerator::generate_steps(){
     }
 }
 
-void StepGenerator::tick_controller(){
-#ifdef DEBUG_STEPGENERATOR
-    cout << "StepGenerator::tick_controller" << endl;
-#endif
 
+void StepGenerator::findSensorZMP(){
+
+    //TODO: Figure out how to use unfiltered
     Inertial inertial = sensors->getInertial();
 
-    ufvector3 accel_c = CoordFrame3D::vector3D(inertial.accX,inertial.accY);
+    //The robot may or may not be tilted with respect to vertical,
+    //so, since walking is conducted from a bird's eye perspective
+    //we would like to rotate the sensor measurements appropriately.
+    //We will use angleX, and angleY:
+
+    //TODO: Rotate with angleX,etc
+    const ufmatrix4 bodyToWorldTransform =
+        prod(Kinematics::rotation4D(Kinematics::X_AXIS, inertial.angleX),
+             Kinematics::rotation4D(Kinematics::Y_AXIS, inertial.angleY));
+
+    const ufvector4 accInBodyFrame = Kinematics::vector4D(inertial.accX,
+                                                          inertial.accY,
+                                                          inertial.accZ);
+
+    accInWorldFrame = accInBodyFrame;
+    //TODO: Work out rotations
+    //global
+//     accInWorldFrame = prod(bodyToWorldTransform,
+//                            accInBodyFrame);
+//     cout << endl<< "########################"<<endl;
+//     cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
+//     cout << "Accel in world frame: "<< accInWorldFrame <<endl;
+//     cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
+    //acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
+    acc_filter.update(accInWorldFrame(0),
+                      accInWorldFrame(1),
+                      accInWorldFrame(2));
+
+    //Rotate from the local C to the global I frame
+    ufvector3 accel_c = CoordFrame3D::vector3D(acc_filter.getX(),
+                                               acc_filter.getY());
     float angle_fc = asin(fc_Transform(1,0));
     float angle_if = asin(if_Transform(1,0));
     float tot_angle = -(angle_fc+angle_if);
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
                              accel_c);
+
     ZmpTimeUpdate tUp = {controller_x->getZMP(),controller_y->getZMP()};
     ZmpMeasurement pMeasure =
         {controller_x->getPosition(),controller_y->getPosition(),
          accel_i(0),accel_i(1)};
 
     zmp_filter.update(tUp,pMeasure);
+
+}
+
+void StepGenerator::tick_controller(){
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::tick_controller" << endl;
+#endif
+
+    findSensorZMP();
 
     est_zmp_i(0) = zmp_filter.get_zmp_x();
     est_zmp_i(1) = zmp_filter.get_zmp_y();
@@ -541,6 +591,9 @@ void StepGenerator::startRight(){
     controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
     controller_y->initState(0.0f,0.0f,0.0f);
 
+    //Each time we restart, we need to reset the estimated sensor ZMP:
+    zmp_filter = ZmpEKF();
+
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
     //foot before, so we init the if_Transform to start under the opposite foot)
@@ -588,6 +641,9 @@ void StepGenerator::startLeft(){
     //First we reset the controller back to the neutral position
     controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
     controller_y->initState(0.0f,0.0f,0.0f);
+
+    //Each time we restart, we need to reset the estimated sensor ZMP:
+    zmp_filter = ZmpEKF();
 
     //Second we setup the if_Transform such that the firstSupportStep is Right
     //(When the firstSupportStep gets popped, it thinks we were over the other
@@ -946,4 +1002,29 @@ void StepGenerator::debugLogging(){
     ttime += 0.02f;
 #endif
 
+
+
+#ifdef DEBUG_SENSOR_ZMP
+    const float preX = zmp_ref_x.front();
+    const float preY = zmp_ref_y.front();
+
+    const float comX = com_i(0);
+    const float comY = com_i(1);
+
+    const float comPX = controller_x->getZMP();
+    const float comPY = controller_y->getZMP();
+
+     Inertial acc = sensors->getUnfilteredInertial();
+//     const float accX = acc.accX;
+//     const float accY = acc.accY;
+//     const float accZ = acc.accZ;
+    const float accX = accInWorldFrame(0);
+    const float accY = accInWorldFrame(1);
+    const float accZ = accInWorldFrame(2);
+    static float stime = 0;
+    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+            stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ,
+            acc.angleX,acc.angleY);
+    stime+= .02;
+#endif
 }

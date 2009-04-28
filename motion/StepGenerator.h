@@ -91,10 +91,12 @@
 #include "Sensors.h"
 #include "NBMatrixMath.h"
 #include "ZmpEKF.h"
+#include "ZmpAccEKF.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
 #  define DEBUG_CONTROLLER_COM
+#  define DEBUG_SENSOR_ZMP
 #endif
 
 typedef boost::tuple<const std::list<float>*,
@@ -126,6 +128,8 @@ public:
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
     void generate_steps();
+
+    void findSensorZMP();
 
     void swapSupportLegs();
 
@@ -205,9 +209,16 @@ private:
     WalkController *controller_x, *controller_y;
 
     ZmpEKF zmp_filter;
+    ZmpAccEKF acc_filter;
+
+    NBMath::ufvector4 accInWorldFrame;
+
 #ifdef DEBUG_CONTROLLER_COM
     FILE* com_log;
     NBMath::ufmatrix3 fi_Transform;
+#endif
+#ifdef DEBUG_SENSOR_ZMP
+    FILE* zmp_log;
 #endif
 
 };
