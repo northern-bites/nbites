@@ -4,7 +4,7 @@ from man.motion import MotionConstants
 import util.MyMath as MyMath
 
 DEBUG = False
-TRACKER_FRAMES_OFF_REFIND_THRESH = 3 #num frms after which to switch to scanfindbl
+TRACKER_FRAMES_OFF_REFIND_THRESH = 7 #num frms after which to switch to scanfindbl
 
 def stopped(tracker):
     '''default state where the tracker does nothing'''
@@ -14,7 +14,7 @@ def stop(tracker):
     ''' stop all head moves '''
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        
+
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater('stopped')
 
