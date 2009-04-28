@@ -126,7 +126,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 SET( NOGGIN_SRCS ${NOGGIN_INCLUDE_DIR}/Noggin
                  ${NOGGIN_INCLUDE_DIR}/Observation
                  ${NOGGIN_INCLUDE_DIR}/MCL
-                 ${NOGGIN_INCLUDE_DIR}/EKF
+                 #${NOGGIN_INCLUDE_DIR}/EKF
                  ${NOGGIN_INCLUDE_DIR}/BallEKF
                  ${NOGGIN_INCLUDE_DIR}/PyLoc
                  ${NOGGIN_INCLUDE_DIR}/LocEKF

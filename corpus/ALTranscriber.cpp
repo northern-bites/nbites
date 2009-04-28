@@ -146,20 +146,24 @@ void ALTranscriber::initSyncMotionWithALMemory(){
 
 
 // for marvin!
-static const float ACCEL_CONVERSION_X = (-GRAVITY_mss) / 50.0f;
-static const float ACCEL_CONVERSION_Y = (-GRAVITY_mss) / 54.0f;
-static const float ACCEL_CONVERSION_Z = (-GRAVITY_mss) / 56.5f;
+static const float ACCEL_OFFSET_X = 3.5f;
+static const float ACCEL_OFFSET_Y = 0.5f;
+static const float ACCEL_OFFSET_Z = 4.0f;
+
+static const float ACCEL_CONVERSION_X = (-GRAVITY_mss) / 52.5f;
+static const float ACCEL_CONVERSION_Y = (-GRAVITY_mss) / 53.5f;
+static const float ACCEL_CONVERSION_Z = (-GRAVITY_mss) / 54.0f;
 
 const float ALTranscriber::calibrate_acc_x(const float x) {
-    return x * ACCEL_CONVERSION_X;
+    return (x + ACCEL_OFFSET_X) * ACCEL_CONVERSION_X;
 }
 
 const float ALTranscriber::calibrate_acc_y(const float y) {
-    return y * ACCEL_CONVERSION_Y;
+    return (y + ACCEL_OFFSET_Y) * ACCEL_CONVERSION_Y;
 }
 
 const float ALTranscriber::calibrate_acc_z(const float z) {
-    return z * ACCEL_CONVERSION_Z;
+    return (z + ACCEL_OFFSET_Z) * ACCEL_CONVERSION_Z;
 }
 
 void ALTranscriber::syncMotionWithALMemory() {
