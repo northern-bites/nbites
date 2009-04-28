@@ -64,6 +64,7 @@ class SoccerFSA(FSA.FSA):
                 self.brain.nav.currentState == 'stop'):
                 return
             else:
+                self.brain.nav.setWalk(x,y,theta)
                 self.brain.nav.switchTo('stop')
         else:
             if self.brain.nav.setWalk(x,y,theta):
