@@ -217,11 +217,11 @@ void StepGenerator::tick_controller(){
     zmp_ref_y.pop_front();
 
     //With sensor feedback
-//     est_zmp_i(0) = zmp_filter.get_zmp_x();
-//     est_zmp_i(1) = zmp_filter.get_zmp_y();
+    est_zmp_i(0) = zmp_filter.get_zmp_x();
+    est_zmp_i(1) = zmp_filter.get_zmp_y();
     //Without sensor feedback
-    est_zmp_i(0) = cur_zmp_ref_x;
-    est_zmp_i(1) = cur_zmp_ref_y;
+//     est_zmp_i(0) = cur_zmp_ref_x;
+//     est_zmp_i(1) = cur_zmp_ref_y;
 
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 
