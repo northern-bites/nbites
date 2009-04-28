@@ -83,30 +83,19 @@ class GoTeam:
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
 
-    def getAction(self):
-        '''called by player behaviors. returns a tuple [x,y] for position and
-        a all other coop info'''
-        if self.isGoalie():
-            self.aPrioriTeammateUpdate()
-            return self.noCalledChaser()
-
-        self.run()
-
-        return tuple(tuple(self.position), self.currentStrategy, self.currentFormation,\
-            self.currentRole, self.currentSubRole)
-
     def run(self):
         """
         We run this each frame to get the latest info
         """
         self.aPrioriTeammateUpdate()
-
-        # We will always return a strategy
-        self.currentStrategy, self.currentFormation, self.currentRole, \
-            self.currentSubRole, self.position = self.strategize()
-
-        # Update all of our new infos
-        self.updateStateInfo()
+        if self.isGoalie():
+            pass
+        else:
+            # We will always return a strategy
+            self.currentStrategy, self.currentFormation, self.currentRole, \
+                self.currentSubRole, self.position = self.strategize()
+            # Update all of our new infos
+            self.updateStateInfo()
         self.aPosterioriTeammateUpdate()
 
     def strategize(self):
@@ -390,7 +379,7 @@ class GoTeam:
         return (self.teammates[0].inactive)
 
     def isGoalie(self):
-        return self.me.playernumber == 1
+        return self.brain.my.playerNumber == 1
 
     def reset(self):
         '''resets all information stored from teammates'''
@@ -448,7 +437,7 @@ class GoTeam:
         """
         # If everyone else is out, let's not go for the ball
         if len(self.getInactiveFieldPlayers()) == \
-                NogginConstants.NUM_TEAM_PLAYERS - 1.:
+                PBConstants.NUM_TEAM_PLAYERS - 1.:
             return False
 
         for mate in self.teammates:

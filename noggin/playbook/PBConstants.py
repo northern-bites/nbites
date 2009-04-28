@@ -24,7 +24,7 @@ KICKOFF_FORMATION_TIME = 5
 # Time limit for moving into the finder routine
 FINDER_TIME_THRESH = 5
 KICKOFF_PLAY_SWITCH_TIME = 2. # Time around which we want player 4 to chase
-NUM_TEAM_PLAYERS = 3
+NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
 PACKET_DEAD_PERIOD = 5
 INACTIVE_THRESH = 5
 
