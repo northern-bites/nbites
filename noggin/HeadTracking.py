@@ -7,7 +7,6 @@ import man.motion as motion
 #constants need to go in another file.
 #maybe auto generated on boot?
 TRACKING = 'tracking'
-NOTHING = 'nothing'
 
 LOC_PANS = 'locPans'
 
@@ -20,7 +19,7 @@ class HeadTracking(FSA.FSA):
         self.addStates(TrackingStates)
         self.addStates(PanningStates)
 
-        self.currentState = NOTHING
+        self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
