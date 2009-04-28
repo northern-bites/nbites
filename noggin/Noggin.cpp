@@ -3,7 +3,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Noggin.h"
-#include "_ledsmodule.h"
 
 #include "nogginconfig.h"
 #include "PyLoc.h"
@@ -77,7 +76,6 @@ void Noggin::initializeVision(shared_ptr<Vision> v)
     vision_addToModule(result, MODULE_HEAD);
     pyvision = reinterpret_cast<PyVision*>(result);
 
-    init_leds();
 }
 
 void Noggin::initializeLocalization()

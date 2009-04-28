@@ -2,14 +2,18 @@
 #ifndef __ledsmodule_h_DEFINED
 #define __ledsmodule_h_DEFINED
 
-#include <alproxy.h>
+#include <albroker.h>
+#include <alledsproxy.h>
+#include <alptr.h>
+
 #include <Python.h>
 
 //
 // _leds module initialization
 //
+void setLedsProxy(AL::ALPtr<AL::ALLedsProxy> led_proxy);
 
-PyMODINIT_FUNC init_leds(void);
+PyMODINIT_FUNC init_leds();
 
 //
 // PyLEDS definitions
@@ -18,7 +22,7 @@ PyMODINIT_FUNC init_leds(void);
 typedef struct PyLEDs_t {
   PyObject_HEAD
   // Aldeberan proxy to the leds
-  AL::ALProxy *proxy;
+  AL::ALPtr<AL::ALLedsProxy> proxy;
   vector<string> groups;
 } PyLEDs;
 

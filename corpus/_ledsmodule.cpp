@@ -119,6 +119,14 @@ static const string LED_GROUPS[] = {
 };
 static const int NUM_LED_GROUPS = sizeof(LED_GROUPS) / sizeof(string);
 
+static AL::ALPtr<AL::ALLedsProxy> led_proxy;
+static bool ledSet = false;
+
+void setLedsProxy(AL::ALPtr<AL::ALLedsProxy> _led_proxy){
+    led_proxy = _led_proxy;
+    ledSet = true;
+}
+
 //
 // _leds module initialization
 //
@@ -129,7 +137,7 @@ static PyMethodDef _leds_methods[] = {
 };
 
 PyMODINIT_FUNC
-init_leds (void)
+init_leds ()
 {
   // Initialize LEDs type object
   if (PyType_Ready(&PyLEDsType) < 0)
@@ -166,8 +174,9 @@ PyLEDs_new (PyTypeObject* type, PyObject* args, PyObject* kwds)
   if (self != NULL) {
     PyLEDs* leds = reinterpret_cast<PyLEDs*>(self);
     try {
-#ifdef USE_PY_LEDS_CXX_BACKEND
-      leds->proxy = new ALProxy("ALLeds");
+#ifdef USE_PYLEDS_CXX_BACKEND
+        if (ledSet)
+            leds->proxy = led_proxy;
 #endif
 
     }catch (ALError &e) {
@@ -253,7 +262,7 @@ PyLEDs_createGroup (PyLEDs *self, PyObject *args)
 
   // call proxy method with group anem and array of leds names
   try {
-#ifdef USE_PY_LEDS_CXX_BACKEND
+#ifdef USE_PYLEDS_CXX_BACKEND
     self->proxy->callVoid("createGroup", string(name), ALValue(leds));
 #endif
   }catch (ALError &e) {
@@ -291,7 +300,7 @@ PyLEDs_off (PyLEDs *self, PyObject *args)
   }
 
   try {
-#ifdef USE_PY_LEDS_CXX_BACKEND
+#ifdef USE_PYLEDS_CXX_BACKEND
     self->proxy->callVoid("off", *name);
 #endif
   }catch (ALError &e) {
@@ -328,7 +337,7 @@ PyLEDs_on (PyLEDs *self, PyObject *args)
   }
 
   try {
-#ifdef USE_PY_LEDS_CXX_BACKEND
+#ifdef USE_PYLEDS_CXX_BACKEND
     self->proxy->callVoid("on", *name);
 #endif
   }catch (ALError &e) {
@@ -370,7 +379,7 @@ PyLEDs_set (PyLEDs *self, PyObject *args)
   }
 
   try {
-#ifdef USE_PY_LEDS_CXX_BACKEND
+#ifdef USE_PYLEDS_CXX_BACKEND
     self->proxy->callVoid("set", *name, intensity);
 #endif
   }catch (ALError &e) {

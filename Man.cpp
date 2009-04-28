@@ -35,6 +35,7 @@ using namespace boost::assign;
 #include "corpus/synchro.h"
 #include "VisionDef.h"
 #include "Common.h"
+#include "_ledsmodule.h"
 
 using namespace std;
 using namespace AL;
@@ -79,6 +80,9 @@ Man::Man ()
     set_sensors_pointer(sensors);
     // initialize python sensors module
     c_init_sensors();
+
+    setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(pBroker)));
+    init_leds();
 
     transcriber = shared_ptr<Transcriber>(new ALTranscriber(pBroker, sensors));
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
