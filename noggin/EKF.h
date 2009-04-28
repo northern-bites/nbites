@@ -86,7 +86,7 @@ protected:
     StateMatrix A_k; // Update measurement Jacobian
     StateMatrix P_k; // Uncertainty Matrix
     StateMatrix P_k_bar; // A priori uncertainty Matrix
-    boost::numeric::ublas::identity_matrix<float> dimensionIdentity;
+    const boost::numeric::ublas::identity_matrix<float> dimensionIdentity;
     const unsigned int numStates; // number of states in the kalman filter
     const unsigned int measurementSize; // dimension of the observation (z_k)
 
@@ -115,6 +115,23 @@ public:
             betas(i) = _beta;
             gammas(i) = _gamma;
         }
+    }
+
+    //Assignment operator
+    //The compiler should use template matching to ensure we never
+    //copy into an EKF of the wrong size;
+    EKF & operator=(const EKF & other){
+        if(this != &other){
+            xhat_k     = other.xhat_k;
+            xhat_k_bar = other.xhat_k_bar;
+            Q_k        = other.Q_k;
+            A_k        = other.A_k;
+            P_k        = other.P_k;
+            P_k_bar    = other.P_k_bar;
+            betas      = other.betas;
+            gammas     = other.gammas;
+        }
+        return *this;
     }
 
     virtual ~EKF() {}
