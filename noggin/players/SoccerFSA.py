@@ -119,6 +119,7 @@ class SoccerFSA(FSA.FSA):
         Put head into penalized position, stop tracker
         """
         self.brain.tracker.switchTo('stopped')
+        self.brain.motion.stopHeadMoves()
         self.executeMove(SweetMoves.PENALIZED_HEADS)
 
     def zeroHeads(self):
@@ -126,4 +127,5 @@ class SoccerFSA(FSA.FSA):
         Put heads into neutral position
         """
         self.brain.tracker.switchTo('stopped')
+        self.brain.motion.stopHeadMoves()
         self.executeMove(SweetMoves.ZERO_HEADS)
