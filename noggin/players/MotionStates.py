@@ -75,7 +75,7 @@ def walkstraight(player):
 
 def walkstraightstop(player):
     if player.firstFrame():
-        player.setSpeed(4,0,0)
+        player.setSpeed(4.0,0,0)
 
     if player.counter == 200:
         return player.goLater('stopwalking')
@@ -83,7 +83,7 @@ def walkstraightstop(player):
 
 def turnleft(player):
     if player.firstFrame():
-        player.setSpeed(0,2,15)
+        player.setSpeed(0,0,15)
 
     if player.counter == 180:
         return player.goLater('stopwalking')
@@ -91,7 +91,7 @@ def turnleft(player):
 
 def turnright(player):
     if player.firstFrame():
-        player.setSpeed(0,-2,-15)
+        player.setSpeed(0,0,-15)
     if player.counter == 180:
         return player.goLater('turnleft')
     return player.stay()

@@ -282,7 +282,7 @@ void RoboGuardian::checkTemperatures(){
             cout << Thread::name << "::" << "TEMP-WARNING: "
                  << Kinematics::JOINT_STRINGS[joint]
                  << " is at " << setprecision(1)
-                 << newTemps[joint] <<" deg C"<<endl;
+                 << newTemps[joint] <<" deg C"<< setprecision(6) << endl;
             if(newTemps[joint] >= REALLY_HIGH_TEMP){
                 sayWarning = true;
             }

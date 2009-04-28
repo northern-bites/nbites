@@ -148,6 +148,23 @@ MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         30.0)  # max theta speed()
 
 
+MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
+                                                1.40, # hip offset x
+                                                0.0,  # x-axis angle offset
+                                                1.00, # step duration
+                                                0.5,  # fraction in double support
+                                                0.5,  # stepHeight
+                                                0.0,  # footLengthX
+                                                0.3,  # zmp static percentage
+                                                10.0, # left swing hip roll addition
+                                                10.0, # right swing hip roll addition
+                                                0.6,  # left zmp off
+                                                0.6,  # right zmp off
+                                                7.0,  # max x speed
+                                                4.0,  # max y speed
+                                                30.0) # max theta speed()
+
+
 #DEFAULT GAIT ASSIGNMENTS
 
 TRILLIAN_GAIT = TRILLIAN_MEDIUM_GAIT
