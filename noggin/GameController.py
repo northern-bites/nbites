@@ -17,6 +17,7 @@ class GameController(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
         self.setPrintFunction(self.brain.out.printf)
+        print ("first timeRemaining call")
         self.timeRemaining = self.gc.timeRemaining()
 
     def run(self):
@@ -33,7 +34,6 @@ class GameController(FSA.FSA):
                 self.switchTo("gamePlaying")
         elif self.gc.state == comm.STATE_FINISHED:
             self.switchTo('gameFinished')
-
         self.timeRemaining = self.gc.timeRemaining()
         #Set team color
         if self.gc.color != self.brain.my.teamColor:

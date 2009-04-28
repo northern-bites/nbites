@@ -24,7 +24,7 @@ from . import Loc
 from . import TeamConfig
 # Packages and modules from sub-directories
 from . import robots
-#from .playbook import GoTeam
+from .playbook import GoTeam
 from .players import Switch
 
 import _roboguardian
@@ -74,7 +74,7 @@ class Brain(object):
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
-        #self.playbook = GoTeam.GoTeam(self)
+        self.playbook = GoTeam.GoTeam(self)
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
@@ -168,14 +168,15 @@ class Brain(object):
         self.updateFieldObjects()
 
         # Communications update
-        #self.updateComm()
+        self.updateComm()
 
         # Localization Update
         self.updateLocalization()
 
         # Behavior stuff
         self.gameController.run()
-        #self.playbook.run()
+        self.fallController.run()
+        self.playbook.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()
@@ -263,6 +264,6 @@ class Brain(object):
                           self.loc.ballXUncert,
                           self.loc.ballYUncert,
                           self.ball.dist,
-                          0,#self.playbook.role,
-                          1,#self.playbook.currentSubRole,
+                          self.playbook.role,
+                          self.playbook.currentSubRole,
                           2)#self.playbook.me.chaseTime) # Chase Time
