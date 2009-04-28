@@ -837,17 +837,22 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 
             switch (cert) {
             case HEIGHT_UNSURE:
-                // the height is too small - it can still be used as a ceiling
-                if (disth < distw)
-                    dist = disth;
-                else
-                    dist = distw;
+                // NOTE: turning this off, if the height is unsure, it probably
+                // means we have a bad blob off the height, and we shouldn't
+                // limit based on it
+
+                // // the height is too small - it can still be used as a ceiling
+                // if (disth < distw)
+                //     dist = disth;
+                // else
+                dist = distw;
                 break;
             case WIDTH_UNSURE:
                 dist = disth;
                 break;
             case BOTH_UNSURE:
-                dist = max(disth, distw);
+                // We choose the min distance here, since that means more pixels
+                dist = min(disth, distw);
                 break;
             case BOTH_SURE:
                 dist = disth;
@@ -930,7 +935,7 @@ float Threshold::getGoalPostDistFromHeight(float height) {
     return 17826*pow((double) height,-1.0254);
 #else
     // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
-    return 1139.1636f * pow(height, -0.9344f);
+    return 11139.1636f * pow(height, -0.9344f);
 #endif
 }
 
