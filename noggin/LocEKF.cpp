@@ -46,7 +46,8 @@ const float LocEKF::Y_EST_MAX = 1000.0f;
 LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
-          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0)
+          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0),
+      useAmbiguous(true)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -105,16 +106,18 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     limitAPrioriUncert();
     lastOdo = u;
 
-    // // Remove ambiguous observations
-    // std::vector<Observation>::iterator iter = Z.begin();
-    // while( iter != Z.end() )
-    // {
-    //     if (iter->getNumPossibilities() > 1 ) {
-    //         iter = Z.erase( iter );
-    //     } else {
-    //         ++iter;
-    //     }
-    // }
+    if (! useAmbiguous) {
+        // Remove ambiguous observations
+        std::vector<Observation>::iterator iter = Z.begin();
+        while( iter != Z.end() )
+        {
+            if (iter->getNumPossibilities() > 1 ) {
+                iter = Z.erase( iter );
+            } else {
+                ++iter;
+            }
+        }
+    }
 
     // Correct step based on the observed stuff
     if (Z.size() > 0) {
@@ -160,7 +163,7 @@ LocEKF::associateTimeUpdate(MotionModel u)
     deltaLoc(2) = u.deltaR;
 
     A_k(0,2) =  -u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) =  u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) =  u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
@@ -186,6 +189,7 @@ void LocEKF::incorporateMeasurement(Observation z,
     unsigned int obsIndex;
 
     // Get the best fit for ambigious data
+    // NOTE: this is only done, if useAmbiguous is turned to true
     if (z.getNumPossibilities() > 1) {
         obsIndex = findBestLandmark(&z);
     } else {
@@ -239,7 +243,7 @@ void LocEKF::incorporateMeasurement(Observation z,
         std::cout << "\t\t\tUsing polar " << std::endl;
 #endif
 
-        // Convert our sighting to cartesian coordinates
+        // Get the observed range and bearing
         MeasurementVector z_x(2);
         z_x(0) = z.getVisDistance();
         z_x(1) = z.getVisBearing();

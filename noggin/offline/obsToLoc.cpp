@@ -21,8 +21,6 @@ int main(int argc, char** argv)
     // Information needed for the main method
     // IO Variables
     fstream obsFile;
-    fstream ekfFile;
-    fstream ekfCoreFile;
 
     /* Test for the correct number of CLI arguments */
     if(argc != 2) {
@@ -45,6 +43,8 @@ int main(int argc, char** argv)
     obsFile.close();
 
     // EKF files
+    fstream ekfFile;
+    fstream ekfCoreFile;
     string ekfFileName(argv[1]);
     string ekfCoreFileName(argv[1]);
     ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf");
@@ -63,8 +63,35 @@ int main(int argc, char** argv)
     ekfFile.close();
     ekfCoreFile.close();
 
+    // EKF no ambiguous files
+    fstream ekfNoAmbigFile;
+    fstream ekfNoAmbigCoreFile;
+    string ekfNoAmbigFileName(argv[1]);
+    string ekfNoAmbigCoreFileName(argv[1]);
+    ekfNoAmbigFileName.replace(ekfNoAmbigFileName.end()-3,
+                               ekfNoAmbigFileName.end(),
+                               "ekf.na");
+    ekfNoAmbigFile.open(ekfNoAmbigFileName.c_str(), ios::out);
+    ekfNoAmbigCoreFileName.replace(ekfNoAmbigCoreFileName.end()-3,
+                                   ekfNoAmbigCoreFileName.end(),
+                                   "ekf.core.na");
+    ekfNoAmbigCoreFile.open(ekfNoAmbigCoreFileName.c_str(), ios::out);
+
+    // Create the EKF no ambiguous data system
+    shared_ptr<LocEKF> ekfNoAmbigLoc = shared_ptr<LocEKF>(new LocEKF());
+    ekfNoAmbigLoc->setUseAmbiguous(true);
+    // Iterate through the path
+    cout << "Running EKF loc ignoring ambiguous data" << endl;
+    iterateObsPath(&ekfNoAmbigFile, &ekfNoAmbigCoreFile,
+                   ekfLoc, &realPoses, &ballPoses, &odos,
+                   &sightings, &ballDists, &ballBearings, BALL_ID);
+    ekfNoAmbigFile.close();
+    ekfNoAmbigCoreFile.close();
+
     runMCL(argv[1], "5", 5, false);
     runMCL(argv[1], "5.best", 5, true);
+    runMCL(argv[1], "10", 10, false);
+    runMCL(argv[1], "10.best", 10, true);
     runMCL(argv[1], "50", 50, false);
     runMCL(argv[1], "50.best", 50, true);
     runMCL(argv[1], "100", 100, false);

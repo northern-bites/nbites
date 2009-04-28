@@ -105,11 +105,10 @@ CONFIGURE_FILE(
 
 ############################ OFFLINE
 # Options pertaining to running the code on the simulator  (OFFLINE)
-OPTION( @OFFLINE@
+OPTION( OFFLINE
     "Set the code to run with the simulator"
     OFF
     )
-SET( OFFLINE ${@OFFLINE@} )
 
 SET( OFFLINE_NAOQI_PATH
   $ENV{AL_DIR}
@@ -117,14 +116,21 @@ SET( OFFLINE_NAOQI_PATH
   "The local path of the naoqi distribution to use with Webots"
   )
 
+############################ USING_LAB_FIELD
+# Should are field constants be those of the lab or the standard field
+OPTION( USING_LAB_FIELD
+    "Set field constants to use the lab field constants"
+    ON
+    )
+SET( USING_LAB_FIELD ${USING_LAB_FIELD} )
+
 ############################ REMOTE INSTALLATION
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
-OPTION( @REMOTE_INSTALL@
+OPTION( REMOTE_INSTALL
     "Remotely install the libary or binary on the robot."
     ON
     )
-SET( REMOTE_INSTALL ${@REMOTE_INSTALL@} )
 
 SET( @REMOTE_ADDRESS@
   "192.168.0.5"
@@ -136,18 +142,11 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
-  "tables/watson/tucker.mtb"
+  #"tables/watson/tucker.mtb"
+  "tables/lab120/shutter83-2.mtb"
   CACHE STRING
   "Path relative to man directory for the desired color table"
   )
-
-############################ USING_LAB_FIELD
-# Options pertaining to running the code on the simulator  (OFFLINE)
-OPTION( @USING_LAB_FIELD@
-    "Set field constants to use the lab field constants"
-    OFF
-    )
-SET( USING_LAB_FIELD ${@USIGN_LAB_FIELD@} )
 
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(

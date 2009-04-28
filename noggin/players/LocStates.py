@@ -12,7 +12,7 @@ def gamePlaying(player):
     player.brain.loc.reset()
     player.brain.out.startLocLog()
     player.DIST += 50
-    return player.goLater('collectDistData')
+    return player.goLater('goToPoint')
 
 def collectDistData(player):
     if player.firstFrame():

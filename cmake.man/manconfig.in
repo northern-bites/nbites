@@ -109,6 +109,16 @@
 #  undef  REDIRECT_C_STDERR
 #endif
 
+// turn on/off motion actions
+#define USING_LAB_FIELD_${USING_LAB_FIELD}
+#ifdef  USING_LAB_FIELD_ON
+#  define USING_LAB_FIELD
+#else
+#  undef  USING_LAB_FIELD
+#endif
 
 #endif // !_manconfig_h
+
+
+
 

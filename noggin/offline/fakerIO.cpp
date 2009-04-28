@@ -231,7 +231,7 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
     // Print the actual robot position
     *outputFile << setprecision(6) << currentPose->x << " "
                 << currentPose->y << " "
-                << currentPose->h << " "
+                << NBMath::subPIAngle(currentPose->h) << " "
     // print actual ball position
                 << currentBall->x << " "
                 << currentBall->y << " "
