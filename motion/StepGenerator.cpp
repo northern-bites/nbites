@@ -158,15 +158,17 @@ void StepGenerator::findSensorZMP(){
 
     //TODO: Rotate with angleX,etc
     const ufmatrix4 bodyToWorldTransform =
-        prod(Kinematics::rotation4D(Kinematics::X_AXIS, inertial.angleX),
-             Kinematics::rotation4D(Kinematics::Y_AXIS, inertial.angleY));
+        prod(Kinematics::rotation4D(Kinematics::X_AXIS, -inertial.angleX),
+             Kinematics::rotation4D(Kinematics::Y_AXIS, -inertial.angleY));
 
     const ufvector4 accInBodyFrame = Kinematics::vector4D(inertial.accX,
                                                           inertial.accY,
                                                           inertial.accZ);
 
     accInWorldFrame = accInBodyFrame;
-    //TODO: Work out rotations
+    //TODO: Currently rotating the coordinate frames exacerbates the problem
+    //      but theoretically it should get the sensor zmp curve to more closely
+    //      mimic the reference zmp.
     //global
 //     accInWorldFrame = prod(bodyToWorldTransform,
 //                            accInBodyFrame);
@@ -205,9 +207,6 @@ void StepGenerator::tick_controller(){
 
     findSensorZMP();
 
-    est_zmp_i(0) = zmp_filter.get_zmp_x();
-    est_zmp_i(1) = zmp_filter.get_zmp_y();
-
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 
     //The observer needs to know the current reference zmp
@@ -216,6 +215,13 @@ void StepGenerator::tick_controller(){
     //clear the oldest (i.e. current) value from the preview list
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
+
+    //With sensor feedback
+//     est_zmp_i(0) = zmp_filter.get_zmp_x();
+//     est_zmp_i(1) = zmp_filter.get_zmp_y();
+    //Without sensor feedback
+    est_zmp_i(0) = cur_zmp_ref_x;
+    est_zmp_i(1) = cur_zmp_ref_y;
 
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 
@@ -753,12 +759,24 @@ void StepGenerator::generateStep( float _x,
         }
     }
 
-    shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
-                                       HIP_OFFSET_Y : -HIP_OFFSET_Y) + _y,
-                                   _theta, walkParams->stepDuration,
+
+    const float computed_x = _x - sin(abs(_theta)) * HIP_OFFSET_Y;
+    const float computed_y = _y + (nextStepIsLeft ?
+                                   HIP_OFFSET_Y : -HIP_OFFSET_Y)*cos(_theta);
+    const float computed_theta = _theta;
+
+    shared_ptr<Step> step(new Step(computed_x, computed_y, computed_theta,
+                                   walkParams->stepDuration,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
+
+//     shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
+//                                        HIP_OFFSET_Y : -HIP_OFFSET_Y) + _y,
+//                                    _theta, walkParams->stepDuration,
+//                                    (nextStepIsLeft ?
+//                                     LEFT_FOOT : RIGHT_FOOT),
+//                                    type));
 
 #ifdef DEBUG_STEPGENERATOR
     cout << "Generated a new step: "<<*step<<endl;
