@@ -219,8 +219,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         final String fileSeparator = System.getProperty("file.separator");
-        sourceManager.addSource(".." + fileSeparator + "branches" + fileSeparator
-                                +"frame_depot" + fileSeparator);
+        sourceManager.addSource(".." + fileSeparator + "man" + fileSeparator
+                                +"frames" + fileSeparator);
         // add the local robots folder to the source manager
         sourceManager.addSource("robots");
 

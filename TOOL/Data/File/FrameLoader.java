@@ -23,6 +23,7 @@ public class FrameLoader implements FileFilter {
     public static final String AIBO_EXT = ".FRM";
     public static final String NAO_EXT = ".NFRM";
     public static final String NAO_SIM_EXT = ".NSFRM";
+    public static final String NAO_VERSIONED = ".NBFRM";
 
     public static final int AIBO_IMAGE_WIDTH = 208;
     public static final int AIBO_IMAGE_HEIGHT = 160;
@@ -31,6 +32,7 @@ public class FrameLoader implements FileFilter {
         AIBO_EXT,
         NAO_EXT,
         NAO_SIM_EXT,
+        NAO_VERSIONED,
         BMP_EXT
     };
 
@@ -41,6 +43,7 @@ public class FrameLoader implements FileFilter {
         NAO_EXT,
         NAO_EXT,
         NAO_SIM_EXT,
+        NAO_VERSIONED,
     };
 
     public static final int AIBO_HEADER_SIZE = 100;
@@ -60,7 +63,59 @@ public class FrameLoader implements FileFilter {
             byte[] image;
             byte[] footer;
 
-            if (upper.endsWith(NAO_EXT)) {
+            // This is the latest frame format.
+            if (upper.endsWith(NAO_VERSIONED)) {
+                frm.setImage
+                    (new YUV422Image(input,
+                                     RobotDef.NAO_DEF_VERSIONED.imageWidth(),
+                                     RobotDef.NAO_DEF_VERSIONED.imageHeight()));
+                // read footer
+                footer = new byte[input.available()];
+                input.readFully(footer);
+
+                String fullFooter = new String(footer, "ASCII");
+                String[] values = fullFooter.split(" ");
+                Vector<Float> joints = new Vector<Float>();
+                Vector<Float> sensors = new Vector<Float>();
+
+                // get the frame version number
+                int version = Integer.parseInt(values[0]);
+                RobotDef.NAO_DEF_VERSIONED.setVersion(version);
+
+                // skip the first byte because that's the version number
+                int currentValue = 1;
+                for (int i = 0;
+                     i < RobotDef.NAO_DEF_VERSIONED.numJoints() &&
+                         currentValue < values.length; i++, currentValue++) {
+                    try {
+                        joints.add(Float.parseFloat(values[currentValue]));
+                    }catch (NumberFormatException e) {
+                        break;
+                    }
+                }
+                if (joints.size() == RobotDef.NAO_DEF_VERSIONED.numJoints())
+                    frm.setJoints(joints);
+                else
+                    System.out.println("Couldn't read joints from file " +
+                                       path);
+
+                for (int i = 0;
+                     i < RobotDef.NAO_DEF_VERSIONED.numSensors() &&
+                         currentValue < values.length; i++, currentValue++) {
+                    try {
+                        sensors.add(Float.parseFloat(values[currentValue]));
+                    } catch (NumberFormatException e) {
+                        break;
+                    }
+                }
+                if (sensors.size() == RobotDef.NAO_DEF_VERSIONED.numSensors())
+                    frm.setSensors(sensors);
+                else
+                    System.out.println("Couldn't read sensors from file " +
+                                       path);
+
+            }
+            else if (upper.endsWith(NAO_EXT)) {
                 frm.setImage(new YUV422Image(input,
                                              RobotDef.NAO_DEF.imageWidth(),
                                              RobotDef.NAO_DEF.imageHeight()));
