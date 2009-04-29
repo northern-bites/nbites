@@ -272,6 +272,8 @@ class GoTeam:
         to move is the least possible
         """
         # if there is only one position return the position
+        if len(positions) != len(mates)+1:
+            print("****wrong number of players for # of positions****")
         if len(positions) == 1:
             return positions[0]
 
@@ -354,16 +356,11 @@ class GoTeam:
 
     def getOtherActiveTeammate(self):
         '''this returns the teammate instance of an active teammate that isn't 
-        you. THIS ASSUMES THAT THERE IS ALREADY ONE FIELD PLAYER DEAD'''
-        # Figure out who isn't penalized with you
-        others = [mate for mate in self.teammates if
-                  mate.playerNumber != PBConstants.GOALIE_NUMBER  and
-                  mate.playerNumber != self.me.playerNumber and
-                  not mate.inactive]
-        if others:
-            return others[0]
+        you.'''
+        if self.me.playerNumber == 3:
+            return self.teammates[1] #returns player 2
         else:
-            return None
+            return self.teammates[2] #returns player 3
 
     def getOtherActiveTeammates(self):
         '''
