@@ -1054,11 +1054,11 @@ public class Calibrate implements DataListener, MouseListener,
         imageID = rawImage.hashCode();
 
         colorTable = visionState.getColorTable();
-
+	/*
         if (drawThreshColors) {
             thresholdedImage.thresholdImage(colorTable, rawImage);
         }
-
+	*/
 
         // Since we now handle different sized frames, it's possible to
         // switch between modes, changing the image's size without updating
@@ -1073,12 +1073,10 @@ public class Calibrate implements DataListener, MouseListener,
         selector.updateImage(rawImage);
         calibratePanel.setSelectorOverlay();
 
-        if(thresholdedImage != null) {
-            displayer.updateImage(thresholdedImage);
-            calibratePanel.setDisplayerOverlay();
-            visionState.update();
-        }
-
+	visionState.update();
+	calibratePanel.setDisplayerOverlay();
+	displayer.updateImage(thresholdedImage);
+	
         selector.repaint();
         displayer.repaint();
 

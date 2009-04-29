@@ -69,6 +69,8 @@ public class VisionState {
     private Vector<VisualCorner> visualCorners;
     private Horizon poseHorizon;
     private int visionHorizon;
+    //a boolean that says if we should draw the thresh colors
+    private boolean drawThreshColors = true;
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
@@ -85,10 +87,11 @@ public class VisionState {
     //This updates the whole processed stuff
     //- the thresholded image, the field objects and the ball
     public void update() {
+	//if the thresholdedImage is not null, process it again
         if (thresholdedImage != null)  {
             //we process the image; the visionLink updates itself with the new data from the bot
             thresholdedImage.thresholdImage(rawImage, colorTable);
-
+	    if (!drawThreshColors) thresholdedImage.clearColoring();
             //get the ball from the link
             ball = thresholdedImage.getVisionLink().getBall();
             visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
@@ -101,6 +104,11 @@ public class VisionState {
             //draw the stuff onto the overlay
             drawObjectBoxes();
         }
+	//else the thresholdedImage is null, so initialize it
+	else {
+	    thresholdedImage = new ProcessedImage(rawImage, colorTable);
+	    update();
+	}
     }
 
     //drawObjectBoxes - draws the object onto the overlay
@@ -210,10 +218,12 @@ public class VisionState {
     public ColorTable getColorTable() { return colorTable;  }
     public Ball getBall() { return ball; }
     public int getProcessTime() { return thresholdedImage.getVisionLink().getProcessTime();}
+    public boolean getDrawThreshColors(){ return drawThreshColors;}
 
     //setters
     public void setImage(TOOLImage i) { rawImage = i; }
     public void setThreshImage(ProcessedImage i) { thresholdedImage = i;  }
     public void setColorTable(ColorTable c) { colorTable = c; }
     public void setBall(Ball b) { ball = b;  }
+    public void setDrawThreshColors(boolean dr){ drawThreshColors = dr;}
 }
