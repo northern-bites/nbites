@@ -45,7 +45,7 @@ class HeadTracking(FSA.FSA):
         return self.currentState == TRACKING
 
     def stopHead(self):
-        self.switchTo('nothing')
+        self.switchTo('stop')
 
     def stopHeadMoves(self):
         self.stopHead()

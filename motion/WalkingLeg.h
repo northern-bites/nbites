@@ -52,12 +52,11 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
-
+#include <boost/tuple/tuple.hpp>
 #include "WalkingConstants.h"
 #include "CoordFrame.h"
 #include "Kinematics.h"
 #include "NBMatrixMath.h"
-
 
 //DEBUG Switches:
 #ifdef WALK_DEBUG
@@ -120,7 +119,7 @@ public:
     const float getFootRotation();
 private:
     const float getHipYawPitch();
-    const float getHipHack();
+    const boost::tuple<const float,const float>getHipHack(const float HYPAngle);
     const float cycloidy(float theta);
     const float cycloidx(float theta);
 

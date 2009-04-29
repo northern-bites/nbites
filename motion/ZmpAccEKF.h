@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
-#ifndef _AccEKF_h_DEFINED
-#define _AccEKF_h_DEFINED
+#ifndef _ZmpAccEKF_h_DEFINED
+#define _ZmpAccEKF_h_DEFINED
 
 /**
  * Class for filtering accelerometer values received from sensors. Extends the
@@ -27,12 +27,12 @@
 #include "EKF.h"
 #include "EKFStructs.h"
 
-class AccEKF : public EKF<AccelMeasurement, int, ACC_NUM_DIMENSIONS,
+class ZmpAccEKF : public EKF<AccelMeasurement, int, ACC_NUM_DIMENSIONS,
                           ACC_NUM_DIMENSIONS>
 {
 public:
-    AccEKF();
-    virtual ~AccEKF();
+    ZmpAccEKF();
+    virtual ~ZmpAccEKF();
 
     // Update functions
     void update(const float accx,
@@ -54,8 +54,9 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+
     const float scale(const float);
-    const float getVariance(float, float);
+    const float getVariance(float,float);
 
 private: // Constants
     static const int num_dimensions;
