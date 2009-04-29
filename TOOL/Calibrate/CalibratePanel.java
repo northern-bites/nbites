@@ -131,6 +131,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
                     calibrate.getVisionState().setDrawThreshColors(
 			      !calibrate.getVisionState().getDrawThreshColors());
 		    calibrate.getVisionState().update();
+		    calibrate.getDisplayer().updateImage(calibrate.getVisionState().getThreshImage());
+		    calibrate.getDisplayer().repaint();
                 }
             });
         drawColors.setFocusable(false);

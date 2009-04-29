@@ -1048,7 +1048,11 @@ public class Calibrate implements DataListener, MouseListener,
         if (!f.hasImage())
             return;
         //if visionState is null, initialize, else just load the frame
-        visionState = new VisionState(f, tool.getColorTable());
+	if (visionState == null)
+	    visionState = new VisionState(f, tool.getColorTable());
+	else 
+	    visionState.newFrame(f, tool.getColorTable());
+	
         thresholdedImage = visionState.getThreshImage();//sync the thresholded images
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();

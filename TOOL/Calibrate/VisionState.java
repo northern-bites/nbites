@@ -84,6 +84,17 @@ public class VisionState {
         }
     }
 
+    public void newFrame(Frame f, ColorTable c) {
+	rawImage = f.image();
+        colorTable = c;
+        //init the objects
+        if (rawImage != null && colorTable != null)  {
+            thresholdedImage = new ProcessedImage(rawImage, colorTable);
+            thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
+                                                             thresholdedImage.getHeight());
+	}        
+    }
+
     //This updates the whole processed stuff
     //- the thresholded image, the field objects and the ball
     public void update() {
