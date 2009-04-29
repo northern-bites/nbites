@@ -98,6 +98,14 @@ def pRightDeepBack(team):
     '''position deep right back'''
     return [PBConstants.RIGHT_DEEP_BACK,[PBConstants.RIGHT_DEEP_BACK_POS]]
 
+#Goalie sub roles
+def pGoalieNormal(team):
+    '''normal goalie position'''
+    return [PBConstants.GOALIE_NORMAL, [0,0]]
+
+def pGoalieChaser(team):
+    return [PBConstants.GOALIE_CHASER, [0,0]]
+    
 # Kickoff sub roles
 def pKickoffSweeper(team):
     '''position kickoff sweeper'''

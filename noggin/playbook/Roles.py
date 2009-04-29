@@ -34,7 +34,7 @@ def rSearcher(team):
     Determines positioning for robots while using the finder formation
     '''
     
-    team.me.role = PBConstants.SEARCHER
+    #team.me.role = PBConstants.SEARCHER
     
     if team.numInactiveMates == 1:
         pos = PBConstants.READY_KICKOFF_STOPPER
@@ -74,3 +74,12 @@ def rOffender(team):
     # LEFT_WING otherwise
     else:
         return [PBConstants.OFFENDER] + SubRoles.pLeftWing(team)
+
+def rGoalie(team):
+    """
+    The Goalie
+    """
+    if team.noCalledChaser():
+        return [PBConstants.GOALIE] + SubRoles.pGoalieChaser(team)
+    else:
+        return [PBConstants.GOALIE] + SubRoles.pGoalieNormal(team)

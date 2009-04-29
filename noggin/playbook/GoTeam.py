@@ -88,19 +88,11 @@ class GoTeam:
         We run this each frame to get the latest info
         """
         self.aPrioriTeammateUpdate()
-        if self.isGoalie():
-            if self.noCalledChaser():
-                self.currentRole = PBConstants.CHASER
-                self.currentSubRole = PBConstants.CHASE_NORMAL
-            else:
-                self.currentRole = PBConstants.GOALIE
-                self.currentSubRole = PBConstants.GOALIE_SUB_ROLE
-        else:
-            # We will always return a strategy
-            self.currentStrategy, self.currentFormation, self.currentRole, \
-                self.currentSubRole, self.position = self.strategize()
-            # Update all of our new infos
-            self.updateStateInfo()
+        # We will always return a strategy
+        self.currentStrategy, self.currentFormation, self.currentRole, \
+            self.currentSubRole, self.position = self.strategize()
+        # Update all of our new infos
+        self.updateStateInfo()
         self.aPosterioriTeammateUpdate()
 
     def strategize(self):
@@ -118,7 +110,8 @@ class GoTeam:
         # Now we look at shorthanded strategies
         elif self.numInactiveMates == 1:
             return Strategies.sOneDown(self)
-
+        #elif self.numInactiveMates == 2:
+            #return Strategies.sNoFieldPlayers(self)
         # Here we have the strategy stuff
         return Strategies.sSpread(self)
 
@@ -287,7 +280,12 @@ class GoTeam:
             mateDist2 = hypot(positions[1][0] - mates.x,
                               positions[1][1] - mates.y)
 
-            if myDist1 + mateDist2 < myDist2 + mateDist1:
+            if myDist1 + mateDist2 == myDist2 + mateDist1:
+                if self.me.playerNumber > mates.playerNumber:
+                    return positions[0]
+                else:
+                    return positions[1]
+            elif myDist1 + mateDist2 < myDist2 + mateDist1:
                 return positions[0]
             else:
                 return positions[1]
@@ -398,7 +396,7 @@ class GoTeam:
         return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
                  self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y -5.  and
                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y -5. and
+                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
                  self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
                  self.teammates[0].calledRole == PBConstants.CHASER))
@@ -409,7 +407,7 @@ class GoTeam:
         -includes all y values below top of goalbox 
         (so inside the goal is included)
         '''
-        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_X and
+        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
 
@@ -425,7 +423,7 @@ class GoTeam:
                                      hypot(delta_x,delta_y))*delta_y
         if pos_x > PBConstants.STOPPER_MAX_X:
             pos_x = PBConstants.STOPPER_MAX_X
-            pos_y = (NogginConstants.MY_GOALBOX_LEFT_X + delta_x / delta_y *
+            pos_y = (NogginConstants.MY_GOALBOX_MIDDLE_Y + delta_x / delta_y *
                      (PBConstants.STOPPER_MAX_X - 
                       NogginConstants.MY_GOALBOX_LEFT_X))
 
