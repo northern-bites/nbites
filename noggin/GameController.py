@@ -17,7 +17,6 @@ class GameController(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
         self.setPrintFunction(self.brain.out.printf)
-        print ("first timeRemaining call")
         self.timeRemaining = self.gc.timeRemaining()
 
     def run(self):

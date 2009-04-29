@@ -45,43 +45,43 @@ def pReadyStopper(team):
 # Game Playing SubRoles
 def pLeftWing(team):
     '''position left winger'''
-    x = MyMath.clip(team.brain.ball.x - PBConstants.WING_X_OFFSET,
-                        PBConstants.LEFT_WING_MIN_X, 
-                        PBConstants.LEFT_WING_MAX_X)
     y = MyMath.clip(team.brain.ball.y - PBConstants.WING_Y_OFFSET,
-                        PBConstants.WING_MIN_Y, PBConstants.WING_MAX_Y)
+                        PBConstants.LEFT_WING_MIN_Y,
+                        PBConstants.LEFT_WING_MAX_Y)
+    x = MyMath.clip(team.brain.ball.x - PBConstants.WING_X_OFFSET,
+                        PBConstants.WING_MIN_X, PBConstants.WING_MAX_X)
     return [PBConstants.LEFT_WING, [x,y]]
 
 def pRightWing(team):
     '''position right winger'''
-    x = MyMath.clip(team.brain.ball.x + PBConstants.WING_X_OFFSET,
-                        PBConstants.RIGHT_WING_MIN_X, 
-                        PBConstants.RIGHT_WING_MAX_X)
-    y = MyMath.clip(team.brain.ball.y - PBConstants.WING_Y_OFFSET,
-                        PBConstants.WING_MIN_Y, PBConstants.WING_MAX_Y)
+    y = MyMath.clip(team.brain.ball.y + PBConstants.WING_Y_OFFSET,
+                        PBConstants.RIGHT_WING_MIN_Y,
+                        PBConstants.RIGHT_WING_MAX_Y)
+    x = MyMath.clip(team.brain.ball.x - PBConstants.WING_X_OFFSET,
+                        PBConstants.WING_MIN_X, PBConstants.WING_MAX_X)
     return [PBConstants.RIGHT_WING, [x,y]]
 
 def pDubDOffender(team):
     '''offender for when in dubD'''
-    x = MyMath.clip(team.brain.ball.x,
-                        PBConstants.MIN_STANDARD_X,
-                        PBConstants.MAX_STANDARD_X)
-    y = MyMath.clip(team.brain.ball.y + 150, NogginConstants.GREEN_PAD_Y,
-                         NogginConstants.CENTER_FIELD_Y)
+    y = MyMath.clip(team.brain.ball.y,
+                        PBConstants.LEFT_WING_MIN_Y,
+                        PBConstants.RIGHT_WING_MAX_Y)
+    x = MyMath.clip(team.brain.ball.x + 150, NogginConstants.GREEN_PAD_X,
+                         NogginConstants.CENTER_FIELD_X)
     return [PBConstants.DUBD_OFFENDER, [x,y]]
 
 # Defender sub roles
 def pStopper(team):
     '''position stopper'''
     x,y = team.getPointBetweenBallAndGoal(PBConstants.DEFENDER_BALL_DIST)
-    y = MyMath.clip(y, PBConstants.SWEEPER_Y,
-                        PBConstants.STOPPER_MAX_Y)
+    x = MyMath.clip(x, PBConstants.SWEEPER_X,
+                        PBConstants.STOPPER_MAX_X)
     return [PBConstants.STOPPER, [x,y]]
 
 def pDeepStopper(team):
     '''position stopper'''
     x,y = team.getPointBetweenBallAndGoal(PBConstants.DEFENDER_BALL_DIST)
-    y = MyMath.clip(y, PBConstants.SWEEPER_Y,PBConstants.DEEP_STOPPER_Y)
+    x = MyMath.clip(x, PBConstants.SWEEPER_X,PBConstants.DEEP_STOPPER_X)
     return [PBConstants.DEEP_STOPPER, [x,y]]
 
 def pSweeper(team):
