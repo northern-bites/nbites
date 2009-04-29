@@ -59,12 +59,12 @@ public class FileSet extends AbstractDataSet {
         fpath = new File(path);
 
         frms = new Vector<File>();
-		
-        loadFrmPaths();
-        init(name, "FRM file set", frms.size());
+
+        String setType = loadFrmPaths();
+        init(name, setType + " file set", frms.size());
     }
 
-    private void loadFrmPaths() {
+    private String loadFrmPaths() {
         if (!fpath.exists())
             fpath.mkdir();
 
@@ -72,7 +72,17 @@ public class FileSet extends AbstractDataSet {
             frms.add(f);
 
         Collections.sort(frms, FileComparator.NumericalOrder_F);
-		
+
+        // Check what the extension of the first frame of the set is, and use
+        // that to determine the type of the set.
+        String fileName = fpath.listFiles(FrameLoader.FILTER)[0].getPath().toUpperCase();
+        if (fileName.endsWith(FrameLoader.NAO_VERSIONED))
+            return "Nao versioned";
+
+        if (fileName.endsWith(FrameLoader.NAO_EXT))
+            return "Nao";
+
+        return "FRM";
     }
 
     public Frame add(boolean l, boolean c) {
