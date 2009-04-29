@@ -3,9 +3,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Noggin.h"
-
 #include "nogginconfig.h"
 #include "PyLoc.h"
+#include "EKFStructs.h"
 
 //#define DEBUG_OBSERVATIONS
 #define RUN_LOCALIZATION
@@ -14,7 +14,7 @@ using namespace std;
 using namespace boost;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
-
+const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
                 MotionInterface * _minterface)
@@ -23,7 +23,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
       error_state(false), brain_module(NULL), brain_instance(NULL),
-      motion_interface(_minterface),registeredGCReset(false)
+      motion_interface(_minterface),registeredGCReset(false), ballFramesOff(0)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -303,7 +303,19 @@ void Noggin::updateLocalization()
     PROF_EXIT(profiler, P_MCL);
 
     // Ball Tracking
-    ballEKF->updateModel(vision->ball, loc->getCurrentEstimate());
+    if (vision->ball->getDistance() > 0.0) {
+        ballFramesOff = 0;
+    } else {
+        ++ballFramesOff;
+    }
+
+    if( ballFramesOff > TEAMMATE_FRAMES_OFF_THRESH) {
+        RangeBearingMeasurement m(vision->ball);
+        ballEKF->updateModel(m, loc->getCurrentEstimate());
+    } else {
+        RangeBearingMeasurement m(vision->ball);
+        ballEKF->updateModel(m, loc->getCurrentEstimate());
+    }
 
 #ifdef DEBUG_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {

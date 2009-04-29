@@ -69,6 +69,8 @@ private:
 
     //GC stuff
     bool registeredGCReset;
+    // Teammate ball stuff
+    int ballFramesOff;
 
 // Public members
 public:

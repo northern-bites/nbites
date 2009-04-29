@@ -19,8 +19,7 @@ CCFO_SRCS = ../../vision/ConcreteFieldObject.cpp \
 	    ../../vision/ConcreteFieldObject.h
 VFO_SRCS = ../../vision/VisualFieldObject.cpp \
 	 ../../vision/VisualFieldObject.h
-EKF_SRCS = ../EKF.cpp \
-	   ../EKF.h
+EKF_SRCS = ../EKF.h
 VISBALL_SRCS = ../../vision/VisualBall.cpp \
 	  ../../vision/VisualBall.h
 VLANDMARK_SRCS = ../../vision/VisualLandmark.cpp \
