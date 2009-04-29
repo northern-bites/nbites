@@ -94,7 +94,7 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     allFieldObjects[3] = vision->yglp;
 
     // When online, these variables are always false and can never be changed,
-    // but offline they can be toggled
+    // but offline they can be toggled		
 #ifdef OFFLINE
     debugVertEdgeDetect = false;
     debugHorEdgeDetect = false;
@@ -168,9 +168,11 @@ void FieldLines::lineLoop() {
     unusedPointsList = linePoints;
 
     //  startTime = vision->getMillisFromStartup();
-    if (isGoalie) {
-        extendLines(linesList);
+    
+     if (isGoalie) {
+     extendLines(linesList);
     }
+    
 
     // Corners is a global member of FieldLines
     //startTime = vision->getMillisFromStartup();

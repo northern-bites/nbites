@@ -200,7 +200,7 @@ private:
     static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
     static const int MAX_ANGLE_TO_JOIN_LINES = 5;
 
-    static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 15;
+    static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 6;
 
 
     ////////////////////////////////////////////////////////////
