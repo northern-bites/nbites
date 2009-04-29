@@ -89,7 +89,12 @@ class GoTeam:
         """
         self.aPrioriTeammateUpdate()
         if self.isGoalie():
-            pass
+            if self.noCalledChaser():
+                self.currentRole = PBConstants.CHASER
+                self.currentSubRole = PBConstants.CHASE_NORMAL
+            else:
+                self.currentRole = PBConstants.GOALIE
+                self.currentSubRole = PBConstants.GOALIE_SUB_ROLE
         else:
             # We will always return a strategy
             self.currentStrategy, self.currentFormation, self.currentRole, \

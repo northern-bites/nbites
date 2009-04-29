@@ -87,7 +87,7 @@ class Teammate:
     def updateMe(self):
         '''updates my information as a teammate (since we don't get our own 
         packets)'''
-        #self.playerNumber = self.brain.my.playerNumber
+        self.playerNumber = self.brain.my.playerNumber
         self.timeStamp = time.time()
         self.x = self.brain.my.x
         self.y = self.brain.my.y
