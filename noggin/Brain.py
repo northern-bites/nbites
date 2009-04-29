@@ -48,6 +48,10 @@ class Brain(object):
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
 
+        #initalize the leds
+        print leds
+        self.leds = leds._leds.LEDs()
+
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion

@@ -8,7 +8,14 @@ import man.motion.MotionConstants as MotionConstants
 
 def gameInitial(player):
     ''' Overwritting the gameInital State'''
-    return player.goLater('nothing')
+    if player.firstFrame():
+        player.brain.leds.off("FaceLeds")
+    return player.stay()
+
+def gameReady(player):
+    if player.firstFrame():
+        player.brain.leds.on("FaceLeds")
+    return player.stay()
 
 def nothing(player):
     """

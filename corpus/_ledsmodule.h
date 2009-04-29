@@ -2,14 +2,18 @@
 #ifndef __ledsmodule_h_DEFINED
 #define __ledsmodule_h_DEFINED
 
-#include <alproxy.h>
+#include <albroker.h>
+#include <alledsproxy.h>
+#include <alptr.h>
+
 #include <Python.h>
 
 //
 // _leds module initialization
 //
+void setLedsProxy(AL::ALPtr<AL::ALLedsProxy> led_proxy);
 
-PyMODINIT_FUNC init_leds(void);
+PyMODINIT_FUNC init_leds();
 
 //
 // PyLEDS definitions
@@ -18,7 +22,7 @@ PyMODINIT_FUNC init_leds(void);
 typedef struct PyLEDs_t {
   PyObject_HEAD
   // Aldeberan proxy to the leds
-  AL::ALProxy *proxy;
+  AL::ALPtr<AL::ALLedsProxy> proxy;
   vector<string> groups;
 } PyLEDs;
 
@@ -33,6 +37,8 @@ extern PyObject* PyLEDs_createGroup(PyLEDs* self, PyObject* args);
 extern PyObject* PyLEDs_off(PyLEDs* self, PyObject* args);
 extern PyObject* PyLEDs_on (PyLEDs* self, PyObject* args);
 extern PyObject* PyLEDs_set(PyLEDs* self, PyObject* args);
+extern PyObject* PyLEDs_fadeRGB(PyLEDs* self, PyObject* args);
+
 //extern PyObject* PyLEDs_spinGroup(PyLEDs* self, PyObject* args);
 // Method list
 static PyMethodDef PyLEDs_methods[] = {
@@ -61,7 +67,12 @@ static PyMethodDef PyLEDs_methods[] = {
     "\n\n"
     "Accepts either an integer ID or string name of and LED or group \n"
     "(group id must be a string name of a group created via createGroup())"},
-
+  {"fadeRGB", reinterpret_cast<PyCFunction>(PyLEDs_fadeRGB), METH_VARARGS,
+    "fadeRGB(id,0xRRGGBB,seconds) --> None. Set the given LED or group to the "
+    "given RGB Hex value over a certain number of seconds."
+    "\n\n"
+    "Accepts either an integer ID or string name of and LED or group \n"
+    "(group id must be a string name of a group created via createGroup())"},
   //{"spinGroup", reinterpret_cast<PyCFunction>(PyLEDs_spinGroup), METH_VARARGS,
   //  "spinGroup(name, start=0, forwards=True, onTime=1.0,\n"
   //  "          fadeTime=.5, totalTime=4.0) --> None.\n"
