@@ -309,11 +309,29 @@ void Noggin::updateLocalization()
         ++ballFramesOff;
     }
 
-    if( ballFramesOff > TEAMMATE_FRAMES_OFF_THRESH) {
+    if( ballFramesOff < TEAMMATE_FRAMES_OFF_THRESH) {
+        // If it's less than the threshold then we either see a ball or report
+        // no ball seen
         RangeBearingMeasurement m(vision->ball);
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     } else {
-        RangeBearingMeasurement m(vision->ball);
+        // If it's off for more then the threshold, then try and use mate data
+        RangeBearingMeasurement m;
+        // HUGE HACK!!!!
+        // This returns the ball x, y, which need to be converted to dist and
+        // bearing
+        m = comm->getTeammateBallReport();
+
+        float ballX = m.distance;
+        float ballY = m.bearing;
+        float ballXUncert = m.distanceSD;
+        float ballYUncert = m.bearingSD;
+
+        m.distance = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
+        m.bearing = atan2(ballY - loc->getYEst(), ballX - loc->getXEst());
+        m.distanceSD = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
+        m.bearingSD = atan2(ballY - loc->getYEst(), ballX - loc->getXEst());
+
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
 

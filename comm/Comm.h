@@ -21,7 +21,7 @@
 #include "TOOLConnect.h"
 #include "Vision.h"
 #include "CommTimer.h"
-
+#include "EKFStructs.h"
 
 class Comm
   : public Thread
@@ -49,6 +49,7 @@ class Comm
     int getTOOLState();
     std::string getRobotName();
     std::list<std::vector<float> >* latestComm();
+    RangeBearingMeasurement getTeammateBallReport();
     void setData(std::vector<float> &data);
 
   private:
