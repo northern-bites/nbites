@@ -5,7 +5,7 @@ from math import hypot
 SPIN_TIME = 360
 WAIT_TIME = 45
 WALK_TIME = 200
-TARGET_X = NogginConstants.MY_GOALBOX_LEFT_X
+TARGET_X = NogginConstants.MY_GOALBOX_RIGHT_X
 TARGET_Y = NogginConstants.CENTER_FIELD_Y
 TARGET_H = NogginConstants.OPP_GOAL_HEADING
 COUNT_TOTAL = 250
