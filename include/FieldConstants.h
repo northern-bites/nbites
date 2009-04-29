@@ -5,7 +5,7 @@
 #include "Common.h"
 
 // Nao field constants
-#define USING_LAB_FIELD
+
 #ifdef USING_LAB_FIELD
 static const float FIELD_WHITE_WIDTH = 500.f;
 static const float FIELD_WHITE_HEIGHT = 330.f;
