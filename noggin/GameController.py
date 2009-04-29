@@ -17,6 +17,7 @@ class GameController(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
         self.setPrintFunction(self.brain.out.printf)
+        self.kickOff = self.gc.kickOff
 
     def run(self):
         if self.gc.state == comm.STATE_INITIAL:
@@ -39,6 +40,16 @@ class GameController(FSA.FSA):
 
             self.brain.my.teamColor = self.gc.color
             self.brain.makeFieldObjectsRelative()
-            print "Switching team color to ",Constants.teamColorDict[self.brain.my.teamColor]
+            self.printf("Switching team color to " +
+                        Constants.teamColorDict[self.brain.my.teamColor])
+        if self.gc.kickOff != self.kickOff:
+            self.printf("Switching kickoff to team #%g"%self.gc.kickOff +
+                        " from team #%g"% self.kickOff)
+            self.kickOff = self.gc.kickOff
+
         FSA.FSA.run(self)
 
+
+
+    def setGCLEDS(self):
+        pass
