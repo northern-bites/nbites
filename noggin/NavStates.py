@@ -3,9 +3,9 @@
 from .util import MyMath
 
 GOTO_FORWARD_SPEED = 4
-WAIT_BETWEEN_MOVES = 10
-GOTO_SPIN_SPEED = 15
-GOTO_SPIN_STRAFE = 2
+WAIT_BETWEEN_MOVES = 0
+GOTO_SPIN_SPEED = 10
+GOTO_SPIN_STRAFE = 0
 GOTO_SURE_THRESH = 5
 
 # States for the standard spin - walk - spin go to
