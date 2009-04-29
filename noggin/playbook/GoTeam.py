@@ -272,8 +272,6 @@ class GoTeam:
         to move is the least possible
         """
         # if there is only one position return the position
-        if len(positions) != len(mates)+1:
-            print("****wrong number of players for # of positions****")
         if len(positions) == 1:
             return positions[0]
 
