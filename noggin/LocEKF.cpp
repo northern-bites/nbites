@@ -10,9 +10,9 @@ using namespace NBMath;
 const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
 const float LocEKF::BETA_LOC = 3.0f;
 const float LocEKF::GAMMA_LOC = 0.4f;
-const float LocEKF::BETA_LAT = 3.0f;
+const float LocEKF::BETA_LAT = 0.5f;
 const float LocEKF::GAMMA_LAT = 0.4f;
-const float LocEKF::BETA_ROT = M_PI/16.0f;
+const float LocEKF::BETA_ROT = M_PI/32.0f;
 const float LocEKF::GAMMA_ROT = 0.04f;
 
 // Default initialization values

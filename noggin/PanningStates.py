@@ -15,7 +15,6 @@ def scanBall(tracker):
         tracker.execute((((0.0,SweetMoves.SCAN_BALL[0][0][1]),moveTime,1),))
 
     if not tracker.brain.motion.isHeadActive():
-        #print "Enqueing head motion"
         tracker.execute(SweetMoves.SCAN_BALL)
 
     return tracker.stay()
@@ -23,7 +22,6 @@ def scanBall(tracker):
 def locPans(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
-        #print "Enqueing head motion"
         tracker.execute(SweetMoves.LOC_PANS)
     return tracker.stay()
 
@@ -49,4 +47,10 @@ def panRightOnce(tracker):
 
         return tracker.goLater('nothing')
 
+    return tracker.stay()
+
+def postScan(tracker):
+    if tracker.firstFrame() \
+            or not tracker.brain.motion.isHeadActive():
+        tracker.execute(SweetMoves.POST_SCAN)
     return tracker.stay()

@@ -4,7 +4,7 @@ from .util import FSA
 from .util import MyMath
 import man.motion as motion
 CLOSE_ENOUGH_XY = 25.0
-CLOSE_ENOUGH_H = 20.0
+CLOSE_ENOUGH_H = 30.0
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):

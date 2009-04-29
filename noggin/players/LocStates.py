@@ -1,21 +1,22 @@
 import man.motion.SweetMoves as SweetMoves
 import man.noggin.NogginConstants as NogginConstants
+from math import hypot
 
 SPIN_TIME = 360
 WAIT_TIME = 45
 WALK_TIME = 200
-TARGET_X = NogginConstants.OPP_GOALBOX_LEFT_X
+TARGET_X = NogginConstants.MY_GOALBOX_RIGHT_X
 TARGET_Y = NogginConstants.CENTER_FIELD_Y
+TARGET_H = NogginConstants.OPP_GOAL_HEADING
 COUNT_TOTAL = 250
 
 def gamePlaying(player):
     player.brain.loc.reset()
-    player.brain.out.startLocLog()
-    player.DIST += 50
     return player.goLater('goToPoint')
 
 def collectDistData(player):
     if player.firstFrame():
+        player.DIST += 50
         player.distData = []
         player.widthData = []
         player.heightData = []
@@ -69,9 +70,16 @@ def waitToMove(player):
 
 def goToPoint(player):
     if player.firstFrame():
-        player.brain.tracker.switchTo('locPans')
-        player.brain.nav.goTo(TARGET_X, TARGET_Y)
+        player.brain.tracker.switchTo('postScan')
+        player.brain.nav.goTo(TARGET_X, TARGET_Y, TARGET_H)
+        player.printf("Going to point (" +
+                      str(TARGET_X) + ", " +
+                      str(TARGET_Y) + ", " +
+                      str(TARGET_H) + ")")
         return player.stay()
+
+    if hypot(player.brain.loc.x - TARGET_X, player.brain.loc.y - TARGET_Y) < 300:
+        player.brain.tracker.switchTo('locPans')
 
     if player.brain.nav.isStopped():
         return player.goLater('doneState')
