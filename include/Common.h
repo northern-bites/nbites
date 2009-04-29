@@ -46,9 +46,11 @@
 typedef unsigned char byte;
 #endif
 
-#ifndef _WIN32
 #include <time.h>
+#ifndef _WIN32
 #include <sys/time.h>
+#else
+#include <sys/timeb.h>
 #endif
 static const long long MICROS_PER_SECOND = 1000000;
 
@@ -61,7 +63,14 @@ static long long micro_time (void)
 
     return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
 #else
-    return 0;
+    _timeb timebuffer;
+    time_t secondsSince1970;
+    unsigned short millis;
+
+    _ftime64_s( &timebuffer);
+    secondsSince1970 = timebuffer.time;
+    millis = timebuffer.millitm;
+    return (secondsSince1970 * 1000ul + millis) * 1000ul;
 #endif
 }
 

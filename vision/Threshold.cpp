@@ -868,6 +868,20 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 break;
             }
 #if defined OFFLINE && defined PRINT_VISION_INFO
+            const float bottomLeftX = objPtr->getLeftBottomX();
+            const float bottomRightX = objPtr->getRightBottomX();
+            const float bottomLeftY = objPtr->getLeftBottomY();
+            const float bottomRightY = objPtr->getRightBottomY();
+
+            const float bottomOfObjectX = (bottomLeftX + bottomRightX) * 0.5f;
+            const float bottomOfObjectY = (bottomLeftY + bottomRightY) * 0.5f;
+
+            const float poseDist = pose->pixEstimate(bottomOfObjectX,
+                                                     bottomOfObjectY,
+                                                     0).dist; // 0 elevation
+
+            print("{%g,%g},", poseDist, dist);
+
             print("goal post dist: %g %g %g", dist, distw, disth);
 #endif
 

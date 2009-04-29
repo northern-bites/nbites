@@ -54,10 +54,11 @@ Sensors::Sensors ()
       leftFootBumper(0.0f, 0.0f),
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-      unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistance(0.0f), ultraSoundMode(LL),
-      chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
-      image(&global_image[0])
+      image(&global_image[0]),
+      supportFoot(LEFT_SUPPORT),
+      unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+      chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f)
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
@@ -69,6 +70,7 @@ Sensors::Sensors ()
     pthread_mutex_init(&inertial_mutex, NULL);
     pthread_mutex_init(&unfiltered_inertial_mutex, NULL);
     pthread_mutex_init(&ultra_sound_mutex, NULL);
+    pthread_mutex_init(&support_foot_mutex, NULL);
     pthread_mutex_init(&battery_mutex, NULL);
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
@@ -88,6 +90,7 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&inertial_mutex);
     pthread_mutex_destroy(&unfiltered_inertial_mutex);
     pthread_mutex_destroy(&ultra_sound_mutex);
+    pthread_mutex_destroy(&support_foot_mutex);
     pthread_mutex_destroy(&battery_mutex);
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_destroy(&image_mutex);
@@ -311,6 +314,17 @@ const UltraSoundMode Sensors::getUltraSoundMode () const
     return mode;
 }
 
+const SupportFoot Sensors::getSupportFoot () const
+{
+    pthread_mutex_lock (&support_foot_mutex);
+
+    SupportFoot foot = supportFoot;
+
+    pthread_mutex_unlock (&support_foot_mutex);
+
+    return foot;
+}
+
 const float Sensors::getChestButton () const
 {
     pthread_mutex_lock (&button_mutex);
@@ -351,6 +365,7 @@ const vector<float> Sensors::getAllSensors () const
     pthread_mutex_lock (&button_mutex);
     pthread_mutex_lock (&inertial_mutex);
     pthread_mutex_lock (&ultra_sound_mutex);
+    pthread_mutex_lock (&support_foot_mutex);
 
     vector<float> allSensors;
 
@@ -375,6 +390,9 @@ const vector<float> Sensors::getAllSensors () const
     allSensors += ultraSoundDistance;
     allSensors += static_cast<float>(ultraSoundMode);
 
+    allSensors += supportFoot;
+
+    pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&fsr_mutex);
     pthread_mutex_unlock (&button_mutex);
     pthread_mutex_unlock (&inertial_mutex);
@@ -560,6 +578,15 @@ void Sensors::setUltraSoundMode (const UltraSoundMode mode)
     pthread_mutex_unlock (&ultra_sound_mutex);
 }
 
+void Sensors::setSupportFoot (const SupportFoot _supportFoot)
+{
+    pthread_mutex_lock (&support_foot_mutex);
+
+    supportFoot = _supportFoot;
+
+    pthread_mutex_unlock (&support_foot_mutex);
+}
+
 
 /**
  * Sets the sensors which are updated on the motion frequency (every 20ms)
@@ -619,6 +646,7 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
     pthread_mutex_lock (&button_mutex);
     pthread_mutex_lock (&inertial_mutex);
     pthread_mutex_lock (&ultra_sound_mutex);
+    pthread_mutex_lock (&support_foot_mutex);
 
     // we have to be EXTRA careful about this order. If someone can think of
     // a better way to assign these so that it's checked at compile time
@@ -640,10 +668,14 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
     ultraSoundMode = static_cast<UltraSoundMode>(
         static_cast<int>(sensorValues[20]));
 
-    pthread_mutex_unlock (&fsr_mutex);
-    pthread_mutex_unlock (&button_mutex);
-    pthread_mutex_unlock (&inertial_mutex);
+    supportFoot = static_cast<SupportFoot>(
+        static_cast<int>(sensorValues[21]));
+
+    pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
+    pthread_mutex_unlock (&inertial_mutex);
+    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock (&fsr_mutex);
 }
 
 
@@ -695,13 +727,16 @@ void Sensors::resetSaveFrame()
     saved_frames = 0;
 }
 
+// The version for the frame format
+static const int VERSION = 0;
+
 void Sensors::saveFrame()
 {
     int MAX_FRAMES = 150;
     if (saved_frames > MAX_FRAMES)
         return;
 
-    string EXT(".NFRM");
+    string EXT(".NBFRM");
     string BASE("/");
     int NUMBER = saved_frames;
     string FOLDER("/home/root/frames");
@@ -718,6 +753,9 @@ void Sensors::saveFrame()
     fout.write(reinterpret_cast<const char*>(getImage()),
                IMAGE_BYTE_SIZE);
     releaseImage();
+
+    // write the version of the frame format at the end before joints/sensors
+    fout << VERSION << " ";
 
     // Write joints
     for (vector<float>::const_iterator i = joints.begin(); i < joints.end();

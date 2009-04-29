@@ -28,6 +28,11 @@
 #include "NaoDef.h"
 #include "VisionDef.h"
 
+enum SupportFoot {
+    LEFT_SUPPORT = 0,
+    RIGHT_SUPPORT
+};
+
 class Sensors;
 
 
@@ -107,6 +112,7 @@ class Sensors {
     const float getUltraSound() const;
     const float getUltraSound_cm() const;
     const UltraSoundMode getUltraSoundMode() const;
+    const SupportFoot getSupportFoot() const;
     const float getChestButton() const;
     const float getBatteryCharge() const;
     const float getBatteryCurrent() const;
@@ -140,6 +146,7 @@ class Sensors {
     void setUnfilteredInertial(const Inertial &inertial);
     void setUltraSound(const float dist);
     void setUltraSoundMode(const UltraSoundMode);
+    void setSupportFoot(const SupportFoot _supportFoot);
 
     void setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
                           const float chestButton,
@@ -200,6 +207,7 @@ private:
     mutable pthread_mutex_t inertial_mutex;
     mutable pthread_mutex_t unfiltered_inertial_mutex;
     mutable pthread_mutex_t ultra_sound_mutex;
+    mutable pthread_mutex_t support_foot_mutex;
     mutable pthread_mutex_t battery_mutex;
     mutable pthread_mutex_t image_mutex;
 
@@ -222,17 +230,29 @@ private:
     FootBumper rightFootBumper;
     // Inertial sensors
     Inertial inertial;
-    Inertial unfilteredInertial;
     // Sonar sensors
     float ultraSoundDistance;
     UltraSoundMode ultraSoundMode;
+
+    const unsigned char *image;
+
+    // Pose needs to know which foot is on the ground during a vision frame
+    // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume
+    // left foot is on the ground.
+    SupportFoot supportFoot;
+
+    /**
+     * Stuff below is not logged to vision frames or sent over the network to
+     * TOOL.
+     */
+
+    Inertial unfilteredInertial;
     //ChestButton
     float chestButton;
     //Battery
     float batteryCharge;
     float batteryCurrent;
 
-    const unsigned char *image;
     static int saved_frames;
 };
 

@@ -64,7 +64,12 @@ const ublas::vector <float> NaoPose::bottomRight = vector4D(FOCAL_LENGTH_MM,
 							    -IMAGE_HEIGHT_MM/2);
 
 NaoPose::NaoPose (shared_ptr<Sensors> s)
-  : sensors(s)
+    : bodyInclinationX(0.0f), bodyInclinationY(0.0f),
+      sensors(s),
+      horizonLeft(0,0), horizonRight(0,0),
+      horizonSlope(0.0f), perpenHorizonSlope(0.0f),
+      focalPointInWorldFrame(0.0f, 0.0f, 0.0f),
+      comHeight(0.0f)
 {
 }
 
@@ -97,36 +102,24 @@ void NaoPose::transform () {
 
   cameraToBodyTransform = calculateForwardTransform(HEAD_CHAIN, headAngles);
 
-  const ublas::matrix <float> lLegToBodyTransform =
-    calculateForwardTransform(LLEG_CHAIN, lLegAngles);
-
-  const ublas::matrix <float> rLegToBodyTransform =
-    calculateForwardTransform(RLEG_CHAIN, rLegAngles);
-
-  // For now we will use distance to figure out which foot is the support foot
-  // This may need to be improved in the future.
-  // The vectors below are in the body frame.
-  const ublas::vector <float> lLegLocation = prod(lLegToBodyTransform, origin);
-  const ublas::vector <float> rLegLocation = prod(rLegToBodyTransform, origin);
-
-  const float lLegDistance = getHomLength(lLegLocation);
-  const float rLegDistance = getHomLength(rLegLocation);
-
   ublas::matrix <float> supportLegToBodyTransform;
-  ublas::vector <float> supportLegLocation;
 
   //support leg is determined by which leg is further from the body!
   //this should be changed in one or more of the following ways:
   //   * ask the walk engine for the support leg. (doesnt work in cortex)
   //   * ask the gyros/accelerometers for which way is down (doesnt work yet)
-  if (lLegDistance > rLegDistance) {
-    supportLegToBodyTransform = lLegToBodyTransform;
-    supportLegLocation = lLegLocation;
+  //if (lLegDistance > rLegDistance) {
+  if (sensors->getSupportFoot() == LEFT_SUPPORT) {
+    supportLegToBodyTransform =
+        calculateForwardTransform(LLEG_CHAIN, lLegAngles);
   }
   else {
-    supportLegToBodyTransform = rLegToBodyTransform;
-    supportLegLocation = rLegLocation;
+      supportLegToBodyTransform =
+        calculateForwardTransform(RLEG_CHAIN, rLegAngles);
   }
+
+  const ublas::vector <float> supportLegLocation(prod(supportLegToBodyTransform,
+                                                      origin));
 
   // Now support leg to body is actually world to body. World is explained in
   // the header.
@@ -147,10 +140,15 @@ void NaoPose::transform () {
   // End old code
   // **************************
 
+
+  // At this time we trust inertial
   const Inertial inertial = sensors->getInertial();
+  bodyInclinationX = inertial.angleX;
+  bodyInclinationY = inertial.angleY;
+
   ublas::matrix <float> bodyToWorldTransform =
-      prod(Kinematics::rotation4D(Kinematics::X_AXIS, inertial.angleX),
-      Kinematics::rotation4D(Kinematics::Y_AXIS, inertial.angleY));
+      prod(Kinematics::rotation4D(Kinematics::X_AXIS, bodyInclinationX),
+      Kinematics::rotation4D(Kinematics::Y_AXIS, bodyInclinationY));
 
   ublas::vector <float> torsoLocationInLegFrame =
     prod(bodyToWorldTransform, supportLegLocation);
@@ -349,7 +347,10 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
     return NULL_ESTIMATE;
   }
 
-  return getEstimate(objectInWorldFrame);
+  estimate est = getEstimate(objectInWorldFrame);
+  est.dist = correctDistance(est.dist);
+
+  return est;
 }
 
 
@@ -382,18 +383,16 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
   // object in world frame
   ublas::vector<float> objectInWorldFrame =
      prod(cameraToWorldFrame,objectInCameraFrame);
-  ublas::vector<float> objectInBodyFrame =
-       prod(cameraToBodyTransform, objectInCameraFrame);
-  estimate badBearing = getEstimate(objectInWorldFrame);
-  estimate goodBearing = getEstimate(objectInBodyFrame);
-  //cout << goodBearing.bearing << "\t" << badBearing.bearing << endl;
-  const estimate goodEst = {badBearing.dist,
-			    goodBearing.elevation,
-			    goodBearing.bearing,
-			    badBearing.x,
-			    badBearing.y};
-  return goodEst;
+
+  return getEstimate(objectInWorldFrame);
 }
+
+
+const float NaoPose::correctDistance(const float uncorrectedDist) {
+    return -0.000591972f * uncorrectedDist * uncorrectedDist +
+        0.858283f * uncorrectedDist + 2.18768f;
+}
+
 
 /**
  * Method to populate an estimate with an vector4D in homogenous coordinates.

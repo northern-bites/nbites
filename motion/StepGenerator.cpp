@@ -51,6 +51,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),
     leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
+    supportFoot(LEFT_SUPPORT),
     //controller_x(new PreviewController()),
     //controller_y(new PreviewController())
     controller_x(new Observer()),
@@ -334,6 +335,9 @@ void StepGenerator::swapSupportLegs(){
         currentZMPDSteps.pop_front();
         swingingStep_s  = *(++currentZMPDSteps.begin());
         supportStep_s   =  *currentZMPDSteps.begin();
+
+        supportFoot = (supportStep_s->foot == LEFT_FOOT ?
+                       LEFT_SUPPORT : RIGHT_SUPPORT);
 
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);

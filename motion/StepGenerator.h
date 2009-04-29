@@ -125,6 +125,10 @@ public:
 
     void resetHard();
 
+    const SupportFoot getSupportFoot() const {
+        return supportFoot;
+    }
+
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
     void generate_steps();
@@ -205,6 +209,7 @@ private:
     bool nextStepIsLeft;
 
     WalkingLeg leftLeg, rightLeg;
+    SupportFoot supportFoot;
 
     WalkController *controller_x, *controller_y;
 
