@@ -384,7 +384,7 @@ PyLEDs_set (PyLEDs *self, PyObject *args)
 #endif
   }catch (ALError &e) {
     PyErr_Format(PyExc_SystemError,
-        "createGroup() returned an ALError.\n  %s",
+        "set() returned an ALError.\n  %s",
         e.toString(VerbosityFull).c_str()
         );
     return NULL;
