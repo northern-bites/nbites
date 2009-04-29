@@ -151,7 +151,14 @@ GameController::rawSwapTeams (RoboCupGameControlData& data)
   data.teams[TEAM_RED] = tempTeam;
 }
 
-
+const uint32
+GameController::timeRemaining()
+{
+  pthread_mutex_lock(&mutex);
+  const uint32 time = controlData.secsRemaining;
+  pthread_mutex_unlock(&mutex);
+  return time;
+}
 const uint8
 GameController::team()
 {
@@ -364,6 +371,7 @@ extern PyObject* PyGameController_get(PyGameController* self, void* closure);
 // Generic setter method, used to set C++ values from Python
 extern int PyGameController_set(PyGameController* self, PyObject* val,
     void* closure);
+extern PyObject* PyGameController_timeRemaining(PyGameController* self);
 extern PyObject* PyGameController_players(PyGameController* self,
     PyObject* args);
 extern PyObject* PyGameController_teams(PyGameController* self,
@@ -423,6 +431,11 @@ static PyMethodDef PyGameController_methods[] = {
     METH_O,
     "Retrieve a tuple containing the team color and team score for the given"
     "team."},
+
+  {"timeRemaining", reinterpret_cast<PyCFunction>(PyGameController_timeRemaining),
+    METH_NOARGS,
+    "retrieve the time remaining in the half"
+  },
 
   // Sentinel
   {NULL}
@@ -603,6 +616,17 @@ PyGameController_set (PyGameController* self, PyObject* value, void* closure)
   Py_END_ALLOW_THREADS;
 
   return result;
+}
+
+PyObject*
+PyGameController_timeRemaining (PyGameController* self)
+{
+  PyObject* time;
+  Py_BEGIN_ALLOW_THREADS;
+  time = PyInt_FromLong(self->_gc->timeRemaining());
+  Py_END_ALLOW_THREADS;
+
+  return time;
 }
 
 PyObject*

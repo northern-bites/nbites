@@ -5,7 +5,7 @@
 ##
 ##--------------------SWITCH BOARD ----------------#
 ##
-PACKET_HEADER = "borat"
+PACKET_HEADER = "borat_foobar"
 ##### MODULE SWITCHES ####
 USE_VISION = True # Disable if you want faster processing
 
@@ -29,8 +29,8 @@ TIME_PER_STEP = TIME_STEP/1000.
 ##
 ##--------------------TEAM STUFF-----------------------#
 ##
-NUM_PLAYERS_PER_TEAM = 4
-
+NUM_PLAYERS_PER_TEAM = 3
+LENGTH_OF_HALF = 10
 # Setup colors
 NUM_GAME_TEAM_COLORS = 2
 teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
@@ -155,12 +155,14 @@ MY_GOALBOX_LEFT_X = GREEN_PAD_X
 MY_GOALBOX_RIGHT_X = GREEN_PAD_X + GOALBOX_DEPTH
 MY_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH / 2.
 MY_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH / 2.
+MY_GOALBOX_MIDDLE_Y = (MY_GOALBOX_BOTTOM_Y + MY_GOALBOX_TOP_Y) / 2.
 
 # opp goal box constants relative to (0,0) on my team
 OPP_GOALBOX_LEFT_X = FIELD_WHITE_LEFT_SIDELINE_X - GOALBOX_DEPTH
 OPP_GOALBOX_RIGHT_X = FIELD_WHITE_LEFT_SIDELINE_X
 OPP_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH / 2.
 OPP_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH / 2.
+OPP_GOALBOX_MIDDLE_Y = (OPP_GOALBOX_BOTTOM_Y + OPP_GOALBOX_TOP_Y) / 2.
 
 #LANDMARK TUPLE
 NUM_LANDMARKS = 19
@@ -234,3 +236,10 @@ visionObjectTuple = ("YGLP",
                      "YGRP",
                      "BGLP",
                      "BGRP")
+
+
+##
+##--------------------BEHAVIOR CONSTANTS -------------#
+##
+BALL_TEAMMATE_DIST_GRABBING = 50
+BALL_TEAMMATE_DIST_DRIBBLING = 20

@@ -44,6 +44,7 @@ public:
 
 
     // Public data access interface
+    const uint32 timeRemaining();
     const uint8 team();
     const TeamInfo teams(uint16 team);
     const uint8 color();

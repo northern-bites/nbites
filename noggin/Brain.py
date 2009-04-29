@@ -24,7 +24,7 @@ from . import Loc
 from . import TeamConfig
 # Packages and modules from sub-directories
 from . import robots
-#from .playbook import GoTeam
+from .playbook import GoTeam
 from .players import Switch
 
 import _roboguardian
@@ -71,11 +71,10 @@ class Brain(object):
         self.my = TypeDefs.MyInfo()
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
-
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
-        #self.playbook = GoTeam.GoTeam(self)
+        self.playbook = GoTeam.GoTeam(self)
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
@@ -177,6 +176,7 @@ class Brain(object):
         # Behavior stuff
         self.gameController.run()
         self.fallController.run()
+        self.playbook.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()
@@ -232,8 +232,12 @@ class Brain(object):
                                 (i+1, self.lines[i].__str__(),))
 
     def updateComm(self):
-        #self.out.printf(self.comm.latestComm())
-        pass
+        temp = self.comm.latestComm()
+        for packet in temp:
+            if len(packet)==17:
+                packet = TypeDefs.Packet(packet)
+                if packet.playerNumber != self.my.playerNumber:
+                    self.playbook.update(packet)
 
     def updateLocalization(self):
         """
@@ -245,8 +249,8 @@ class Brain(object):
 
     # move to comm
     def setPacketData(self):
-        # currently, teamNumber and playerNumber MUST be the first two values
-        # passed to comm, whereas all the rest are Python-controlled.
+        # currently, teamNumber, playerNumber, team color MUST be the first
+        # values passed to comm, whereas all the rest are Python-controlled.
         # eventually, all game-controller set info should be handled by Comm
         # alone, and extra Python stuff put in here
         self.comm.setData(self.loc.x,
@@ -260,5 +264,6 @@ class Brain(object):
                           self.loc.ballXUncert,
                           self.loc.ballYUncert,
                           self.ball.dist,
-                          0, #self.playbook.currentSubRole,
-                          -1) # Chase Time
+                          self.playbook.role,
+                          self.playbook.currentSubRole,
+                          2)#self.playbook.me.chaseTime) # Chase Time

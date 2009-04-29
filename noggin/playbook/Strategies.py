@@ -9,15 +9,15 @@ def sSpread(team):
     the middie.
     '''
     # Game Ready Setup
-    if team.brain.game.state == NogginConstants.GAME_READY:
+    if team.brain.gameController.currentState == 'gameReady':
         # team is kicking off
         return ['sSpread'] + Formations.fReady(team)
 
     # Game Playing Formations
-    elif team.brain.game.state == NogginConstants.GAME_PLAYING:
+    elif team.brain.gameController.currentState == 'gamePlaying':
 
         # Kickoff Formations
-        if (team.brain.game.getTimeSincePlay() < 
+        if (team.brain.gameController.timeSincePlay() < 
             PBConstants.KICKOFF_FORMATION_TIME):
             # Kickoff play
             if PBConstants.KICKOFF_PLAY:
@@ -31,10 +31,10 @@ def sSpread(team):
             return ['sSpread'] + Formations.fDubD(team)
 
         # ball hasn't been seen by me or teammates in a while
-        elif (team.brain.timeSinceBallSeen() > 
-              PBConstants.FINDER_TIME_THRESH and
-              team.brain.game.getTimeSinceUnpenalized() > 
-              PBConstants.FINDER_TIME_THRESH):
+        elif (team.brain.ball.timeSinceSeen() > 
+              PBConstants.FINDER_TIME_THRESH): 
+              #and team.brain.gameController.getTimeSinceUnpenalized() > 
+              #PBConstants.FINDER_TIME_THRESH):
             return ['sSpread'] + Formations.fFinder(team)
 
     # Standard spread formation
@@ -53,47 +53,22 @@ def sTestChaser(team):
 # Group of strategies for playing shorthanded
 def sOneDown(team):
     # Game Ready Setup
-    if team.brain.game.state == NogginConstants.GAME_READY:
+    if team.brain.gameController.currentState == 'gameReady':
         # team is kicking off
-        return ['sTwoDown'] + Formations.fReady(team)
+        return ['sOneDown'] + Formations.fReady(team)
 
     # Kickoff Formations
-    if (team.brain.game.getTimeSincePlay() < 
+    if (team.brain.gameController.timeSincePlay() < 
         PBConstants.KICKOFF_FORMATION_TIME):
-        return ['sTwoDown'] + Formations.fTwoKickoff(team)
+        return ['sOneDown'] + Formations.fOneKickoff(team)
 
     # Formation for ball in our goal box
     elif team.shouldUseDubD():
-        return ['sTwoDown'] + Formations.fDubD(team)
+        return ['sOneDown'] + Formations.fDubD(team)
 
-    elif (team.brain.timeSinceBallSeen() > 
-          PBConstants.FINDER_TIME_THRESH and
-          team.brain.game.getTimeSinceUnpenalized() > 
+    elif (team.brain.ball.timeSinceSeen() >
           PBConstants.FINDER_TIME_THRESH):
-        return ['sSpread'] + Formations.fFinder(team)
-
-    return ['sTwoDown'] + Formations.fTwoDown(team)
-
-def sTwoDown(team):
-    # Game Ready Setup
-    if team.brain.game.state == NogginConstants.GAME_READY:
-        # team is kicking off
-        return ['sThreeDown'] + Formations.fReady(team)
-
-    # Kickoff Formations
-    if (team.brain.game.getTimeSincePlay() < 
-        PBConstants.KICKOFF_FORMATION_TIME):
-        return ['sThreeDown'] + Formations.fOneKickoff(team)
-
-    # Formation for ball in our goal box
-    elif team.shouldUseDubD():
-        return ['sThreeDown'] + Formations.fDubD(team)
-
-    elif (team.brain.timeSinceBallSeen() > 
-          PBConstants.FINDER_TIME_THRESH and
-          team.brain.game.getTimeSinceUnpenalized() > 
-          PBConstants.FINDER_TIME_THRESH):
-        return ['sSpread'] + Formations.fFinder(team)
-
-    return ['sThreeDown'] + Formations.fThreeDown(team)
-
+          #and team.brain.gameController.getTimeSinceUnpenalized() > 
+          #PBConstants.FINDER_TIME_THRESH):
+        return ['sOneDown'] + Formations.fFinder(team)
+    return ['sOneDown'] + Formations.fOneDown(team)
