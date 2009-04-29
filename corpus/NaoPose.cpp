@@ -347,7 +347,10 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
     return NULL_ESTIMATE;
   }
 
-  return getEstimate(objectInWorldFrame);
+  estimate est = getEstimate(objectInWorldFrame);
+  est.dist = correctDistance(est.dist);
+
+  return est;
 }
 
 
@@ -383,6 +386,13 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
 
   return getEstimate(objectInWorldFrame);
 }
+
+
+const float NaoPose::correctDistance(const float uncorrectedDist) {
+    return -0.000591972f * uncorrectedDist * uncorrectedDist +
+        0.858283f * uncorrectedDist + 2.18768f;
+}
+
 
 /**
  * Method to populate an estimate with an vector4D in homogenous coordinates.

@@ -198,6 +198,10 @@ protected: // helper methods
     //returns an 'estimate' object for a homogeneous vector pointing to an
     //object in the world frame
     static estimate getEstimate(boost::numeric::ublas::vector <float> objInWorldFrame);
+    // Usually our pix estimate is an overestimate of the distance to the pixel,
+    // so we have a fitting function which tries to correct the noise. This is
+    // that function.
+    static const float correctDistance(const float uncorrectedDist);
 
 protected: // members
     float bodyInclinationX;
