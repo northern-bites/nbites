@@ -128,8 +128,11 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         drawColors = new JCheckBox("Draw Thresholded Colors");
         drawColors.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    calibrate.
-                        setDrawThreshColors(!calibrate.getDrawThreshColors());
+                    calibrate.getVisionState().setDrawThreshColors(
+			      !calibrate.getVisionState().getDrawThreshColors());
+		    calibrate.getVisionState().update();
+		    calibrate.getDisplayer().updateImage(calibrate.getVisionState().getThreshImage());
+		    calibrate.getDisplayer().repaint();
                 }
             });
         drawColors.setFocusable(false);
@@ -141,6 +144,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
        	selectorOverlayChoice.addItem("Thresholded Edges");
 	selectorOverlayChoice.addItem("Visual Objects");
 	selectorOverlayChoice.addItem("none");
+	selectorOverlayChoice.setSelectedItem("Thresholded Edges");
 	selectorOverlayChoice.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    JComboBox sourceBox = (JComboBox) e.getSource();
@@ -148,17 +152,20 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
   		}
 	    });
 
+
 	displayerOverlayChoice = new JComboBox();
 	displayerOverlayChoice.addItem("Right Pane");
        	displayerOverlayChoice.addItem("Thresholded Edges");
 	displayerOverlayChoice.addItem("Visual Objects");
 	displayerOverlayChoice.addItem("none");
+	displayerOverlayChoice.setSelectedItem("Visual Objects");
 	displayerOverlayChoice.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    JComboBox sourceBox = (JComboBox) e.getSource();
 		    setDisplayerOverlay(sourceBox);
 		}
 	    });
+	
 
 
         JPanel navigation = new JPanel();

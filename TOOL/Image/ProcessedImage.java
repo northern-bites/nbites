@@ -101,12 +101,12 @@ public class ProcessedImage extends ThresholdedImage {
 
             // This variable is declared in the superclass and used by its
             // getters.
-            thresholded = visionLink.processImage(rawImage,
-                                                  image.getWidth(),
-                                                  image.getHeight(),
-                                                  joints, sensors,
-                                                  rawTable);
-        }
+	    thresholded = visionLink.processImage(rawImage,
+						  image.getWidth(),
+						  image.getHeight(),
+						  joints, sensors,
+						  rawTable);
+	}
     }
 
     /**
@@ -135,10 +135,12 @@ public class ProcessedImage extends ThresholdedImage {
             // Vision link is inactive. Pretend we are a thresholded image.
             // Thresholded image throws an exception when asked to do pixEst.
             super.pixEstimate(pixelX, pixelY, objectHeight);
-
+	
         return visionLink.pixEstimate(pixelX, pixelY,
                                       objectHeight);
     }
     //getLink - returns the visionLink
     public TOOLVisionLink getVisionLink(){ return visionLink; }
+    public void clearColoring(){ thresholded = new byte[getHeight()][getWidth()];}
+    
 }
