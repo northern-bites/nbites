@@ -180,12 +180,13 @@ class Teammate:
         sending packets when they are penalized, so they will most likely
         fall under the isTeammateDead() check anyways.
         '''
+        return (self.brain.gameController.currentState =='gamePenalized')
         #penalty state is the first item the player tuple [0]
         #penalty state == 1 is penalized
-        return (
-            self.brain.gameController.gc.players(
-                self.playerNumber)[0]!=0
-            )
+        #return (
+        #    self.brain.gameController.gc.players(
+        #        self.playerNumber)[0]!=0
+        #   )
 
     def isDead(self):
         '''

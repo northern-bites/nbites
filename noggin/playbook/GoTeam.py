@@ -99,6 +99,10 @@ class GoTeam:
         """
         Picks the strategy to run and returns all sorts of infos
         """
+        if self.brain.gameController.currentState == 'gameInitial' or\
+            self.brain.gameController.currentState == 'gameFinished':
+            return ('sInit', PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
+                    PBConstants.INIT_SUB_ROLE, [0,0] )
         # First we check for testing stuff
         if PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
@@ -110,8 +114,8 @@ class GoTeam:
         # Now we look at shorthanded strategies
         elif self.numInactiveMates == 1:
             return Strategies.sOneDown(self)
-        #elif self.numInactiveMates == 2:
-            #return Strategies.sNoFieldPlayers(self)
+        elif self.numInactiveMates == 2:
+            return Strategies.sNoFieldPlayers(self)
         # Here we have the strategy stuff
         return Strategies.sSpread(self)
 

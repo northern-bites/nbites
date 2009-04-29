@@ -9,7 +9,8 @@ def sSpread(team):
     the middie.
     '''
     # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady':
+    if team.brain.gameController.currentState == 'gameReady' or\
+        team.brain.gameController.currentState =='gameSet':
         # team is kicking off
         return ['sSpread'] + Formations.fReady(team)
 
@@ -53,7 +54,8 @@ def sTestChaser(team):
 # Group of strategies for playing shorthanded
 def sOneDown(team):
     # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady':
+    if team.brain.gameController.currentState == 'gameReady' or\
+        team.brain.gameController.currentState =='gameSet':
         # team is kicking off
         return ['sOneDown'] + Formations.fReady(team)
 
@@ -75,7 +77,8 @@ def sOneDown(team):
 
 def sNoFieldPlayers(team):
     # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady':
+    if team.brain.gameController.currentState == 'gameReady' or\
+        team.brain.gameController.currentState =='gameSet':
         # team is kicking off
         return ['sNoFieldPlayers'] + Formations.fReady(team)
 

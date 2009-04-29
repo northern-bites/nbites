@@ -104,6 +104,8 @@ def pGoalieNormal(team):
     return [PBConstants.GOALIE_NORMAL, [0,0]]
 
 def pGoalieChaser(team):
+    '''goalie is being a chaser, presumably in/near goalbox not intended for
+        pulling the goalie situations'''
     return [PBConstants.GOALIE_CHASER, [0,0]]
     
 # Kickoff sub roles
