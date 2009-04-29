@@ -567,6 +567,15 @@ void Threshold::findGreenHorizon() {
             run = 0;
             scanY = firstpix;
             for (j = firstpix - 1; j >= 0; j--) {
+                if (scanY < 0) {
+                    //cout << "scanY < 0, value is: " << scanY << endl;
+                    scanY = 0;
+                }
+                if (scanY > IMAGE_HEIGHT) {
+                    //cout << "scanY > IMAGE_HEIGHT, value is: " << scanY << endl;
+                    scanY = IMAGE_HEIGHT;
+                }
+
                 newPixel = thresholded[scanY][j];
                 //drawPoint(j, scanY, BLACK);
                 if (newPixel == GREEN) {

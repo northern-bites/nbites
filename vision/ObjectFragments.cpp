@@ -1158,6 +1158,17 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
     right.x = left.x + spanX;
     right.y = left.y + spanY;
 
+    if( right.x > IMAGE_WIDTH) {
+        //cout << "right.x > IMAGE_WIDTH, value is: " << right.x << endl;
+        right.x = IMAGE_WIDTH;
+    }
+
+    if( left.x < 0) {
+        //cout << "left.x < 0, value is: " << left.x << endl;
+        left.x = 0;
+    }
+
+
     if (!up && thresh->getVisionHorizon() > left.y) {
         // for the heck of it let's scan down
         int found = left.y;
