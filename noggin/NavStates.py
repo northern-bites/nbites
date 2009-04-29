@@ -92,10 +92,11 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
-    if nav.firstFrame():
+    if nav.firstFrame() or nav.updatedTrajectory:
         nav.printf("New walk is (" + str(nav.walkX) + ", " +
                    str(nav.walkY) + ", " + str(nav.walkTheta) + ")")
         nav.setSpeed(nav.walkX, nav.walkY, nav.walkTheta)
+        nav.updatedTrajectory = False
 
     return nav.stay()
 

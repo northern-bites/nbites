@@ -64,10 +64,13 @@ class SoccerFSA(FSA.FSA):
                 self.brain.nav.currentState == 'stop'):
                 return
             else:
+                self.brain.nav.setWalk(x,y,theta)
                 self.brain.nav.switchTo('stop')
         else:
             if self.brain.nav.setWalk(x,y,theta):
                 self.brain.nav.switchTo('walking')
+            else:
+                self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) + "is ignored")
 
     def standup(self):
         if self.brain.motion.isWalkActive():

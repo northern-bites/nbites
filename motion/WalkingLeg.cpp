@@ -177,12 +177,16 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
     goal(2) = -walkParams->bodyHeight + heightOffGround;
 
     //Set the desired HYP in lastJoints, which will be read by dls
-    lastJoints[0] = getHipYawPitch();
+    const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
                                          REALLY_LOW_ERROR);
-    result.angles[1] -= getHipHack();
+
+    boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
+    result.angles[1] -= hipHacks.get<1>(); //HipRoll
     result.angles[2] -= walkParams->XAngleOffset;
+    result.angles[2] += hipHacks.get<0>(); //HipPitch
+
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
@@ -206,14 +210,18 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
     goal(2) = -walkParams->bodyHeight;         //targetZ
 
     //Set the desired HYP in lastJoints, which will be read by dls
-    lastJoints[0] = getHipYawPitch();
+    const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
     //calculate the new angles
     IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
                                          REALLY_LOW_ERROR);
-    memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    result.angles[1] += getHipHack();
+
+    boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
+    result.angles[1] += hipHacks.get<1>(); //HipRoll
     result.angles[2] -= walkParams->XAngleOffset;
+    result.angles[2] += hipHacks.get<0>(); //HipPitch
+
+    memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 }
 
@@ -253,7 +261,8 @@ const float WalkingLeg::getHipYawPitch(){
  * In certain circumstances, this function returns 0.0f, since we don't
  * want to be hacking the hio when we are starting and stopping.
  */
-const float WalkingLeg::getHipHack(){
+const boost::tuple<const float, const float>
+WalkingLeg::getHipHack(const float curHYPAngle){
     //When we are starting and stopping we have no hip hack
     //since the foot is never lifted in this instance
     if(support_step->type != REGULAR_STEP){
@@ -308,7 +317,15 @@ const float WalkingLeg::getHipHack(){
 
     //we've calcuated the correct magnitude, but need to adjust for specific
     //hip motor angle direction in this leg
-    return leg_sign*hr_offset;
+    //AND we also need to rotate some of the correction to the hip pitch motor
+    // (This is kind of a HACK until we move the step lifting to be taken
+    // directly into account when we determine x,y 3d targets for each leg)
+    const float hipPitchAdjustment = -hr_offset *sin(-curHYPAngle);
+    const float hipRollAdjustment = hr_offset *leg_sign* cos(-curHYPAngle);
+
+    return boost::tuple<const float, const float> (hipPitchAdjustment,
+                                                   hipRollAdjustment);
+    //return leg_sign*hr_offset;
 }
 
 const float  WalkingLeg::cycloidx(float theta){

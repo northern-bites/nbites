@@ -30,6 +30,14 @@ namespace NBMath {
         boost::numeric::ublas::row_major,
         boost::numeric::ublas::bounded_array<float,3> > ufrowVector3;
 
+    typedef boost::numeric::ublas::matrix<
+        float,
+        boost::numeric::ublas::row_major,
+        boost::numeric::ublas::bounded_array<float,16> > ufmatrix4;
+    typedef boost::numeric::ublas::vector<
+        float, boost::numeric::ublas::bounded_array<float,4> > ufvector4;
+
+
 /**
    Invert a two by two matrix easily
    given:
