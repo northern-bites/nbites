@@ -956,8 +956,9 @@ public class Calibrate implements DataListener, MouseListener,
                     // get the pix est on this pixel assuming object height=0
                     Estimate est = thresholdedImage.pixEstimate(x,y,0);
                     // we want to print a pixEstimate on this pixel if shift is down
-                    System.out.println("dist: " + est.dist + " bearing: " +
-                                       est.bearing);
+                    System.out.printf(
+                        "pixel (%d,%d) dist: %.2f bearing: %.2f\n",
+                        x, y, est.dist, est.bearing);
                 }
                 else{
                     // Undefine the color underneath the cursor if in that mode.
