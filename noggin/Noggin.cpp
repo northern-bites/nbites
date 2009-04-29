@@ -3,7 +3,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Noggin.h"
-#include "_ledsmodule.h"
 
 #include "nogginconfig.h"
 #include "PyLoc.h"
@@ -77,7 +76,6 @@ void Noggin::initializeVision(shared_ptr<Vision> v)
     vision_addToModule(result, MODULE_HEAD);
     pyvision = reinterpret_cast<PyVision*>(result);
 
-    init_leds();
 }
 
 void Noggin::initializeLocalization()
@@ -337,32 +335,33 @@ void Noggin::processGCButtonClicks(){
         cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
 #endif
     }
-
-    if(leftFootButton->peekNumClicks() ==  SWITCH_TEAM_CLICKS){
-        gc->toggleTeamColor();
-        leftFootButton->getAndClearNumClicks();
+    //Only toggle colors and kickoff when you are in initial
+    if(gc->gameState() == STATE_INITIAL){
+        if(leftFootButton->peekNumClicks() ==  SWITCH_TEAM_CLICKS){
+            gc->toggleTeamColor();
+            leftFootButton->getAndClearNumClicks();
 #ifdef DEBUG_NOGGIN_GC
-        cout << "Button pushing switched GC to color : ";
-        if(gc->color() == TEAM_BLUE)
-            cout << "BLUE" <<endl;
-        else
-            cout << "RED" <<endl;
+            cout << "Button pushing switched GC to color : ";
+            if(gc->color() == TEAM_BLUE)
+                cout << "BLUE" <<endl;
+            else
+                cout << "RED" <<endl;
 
 #endif
-    }
+        }
 
-    if(rightFootButton->peekNumClicks() ==  SWITCH_KICKOFF_CLICKS){
-        gc->toggleKickoff();
-        rightFootButton->getAndClearNumClicks();
+        if(rightFootButton->peekNumClicks() ==  SWITCH_KICKOFF_CLICKS){
+            gc->toggleKickoff();
+            rightFootButton->getAndClearNumClicks();
 #ifdef DEBUG_NOGGIN_GC
-        cout << " Button pushing switched GC to kickoff state : ";
-        if(gc->kickOffTeam() == gc->team())
-            cout << "ON KICKOFF" <<endl;
-        else
-            cout << "OFF KICKOFF" <<endl;
+            cout << " Button pushing switched GC to kickoff state : ";
+            if(gc->kickOffTeam() == gc->team())
+                cout << "ON KICKOFF" <<endl;
+            else
+                cout << "OFF KICKOFF" <<endl;
 #endif
+        }
     }
-
     if( chestButton->peekNumClicks() == REVERT_TO_INITIAL_CLICKS){
 #ifdef DEBUG_NOGGIN_CC
            cout << "SENDING GC TO INITIAL DUE TO CHEST BUTTONS"
