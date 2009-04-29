@@ -87,12 +87,17 @@ extern "C" {
             cout << "Error: the joint array had incorrect dimensions" << endl;
             return;
         }
+        // I (George) have disabled this check because we now have a variable
+        // number of sensors depending on which version of the frame format
+        // is loaded.
+        /*
         if (numSensorsInFrame != NUM_SENSORS) {
             cout << "Warning: This frame must be old because the number of "
                     "sensors stored in it is\n"
                     "wrong. The missing values will be initialized to 0."
                  << endl;
         }
+        */
         if (env->GetArrayLength(jtable) != YMAX*UMAX*VMAX) {
             cout << "Error: the color table had incorrect dimensions" << endl;
             return;

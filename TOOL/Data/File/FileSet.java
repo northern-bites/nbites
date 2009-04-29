@@ -80,7 +80,7 @@ public class FileSet extends AbstractDataSet {
             return "Nao versioned";
 
         if (fileName.endsWith(FrameLoader.NAO_EXT))
-            return "Nao";
+            return "Nao outdated";
 
         return "FRM";
     }
