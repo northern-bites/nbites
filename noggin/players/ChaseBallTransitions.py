@@ -71,8 +71,9 @@ def shouldTurnForKick(player):
 def shouldKick(player):
     ball = player.brain.ball
     if (ball.on and
-        ball.dist < constants.BALL_KICK_DIST_THRESH and
-        ball.bearing < constants.BALL_KICK_BEARING_THRESH_UPPER and
-        ball.bearing > constants.BALL_KICK_BEARING_THRESH_LOWER ):
+        ball.locRelX > constants.BALL_KICK_LEFT_X_R and
+        ball.locRelX < constants.BALL_KICK_LEFT_X_L and
+        ball.locRelY > constants.BALL_KICK_LEFT_Y_CLOSE and
+        ball.locRelY < constants.BALL_KICK_LEFT_Y_FAR ):
         return True
     return False

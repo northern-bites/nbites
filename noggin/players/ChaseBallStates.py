@@ -35,6 +35,10 @@ def spinFindBall(player):
         player.setSpeed(constants.X_SPEED_TO_BALL,
                         constants.Y_SPIN_SPEED,
                         constants.SPIN_SPEED)
+        player.brain.tracker.stopHeadMoves()
+    if not player.brain.motion.isHeadActive():    
+        player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
+        
 
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
@@ -56,6 +60,7 @@ def turnToBallFar(player):
     '''Rotate to align with the ball. When we get close, we will approach it '''
     if player.firstFrame():
         player.stopWalking()
+        player.brain.tracker.trackBall()
 
     turnRate = MyMath.clip(player.brain.ball.bearing*0.3,
                            -constants.BALL_SPIN_SPEED,
@@ -178,16 +183,14 @@ def turnForKick(player):
         desiredTurn = ball.bearing - \
             (constants.BALL_KICK_BEARING_THRESH_UPPER - \
                  constants.BALL_KICK_BEARING_THRESH_LOWER )
-        turnRate = MyMath.clip(desiredTurn*0.4,
+        turnRate = MyMath.clip(desiredTurn*0.6,
                                -constants.BALL_SPIN_SPEED,
                                constants.BALL_SPIN_SPEED)
 
         player.setSpeed(0,0,turnRate)
 
     if transitions.shouldKick(player):
-        return player.goNow('kickBall')
-    if transitions.shouldTurnForKick(player):
-        return player.goLater('turnForKick')
+        return player.goLater('kickBall')
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
 
@@ -197,10 +200,24 @@ def turnForKick(player):
 def kickBall(player):
     if player.firstFrame():
         player.stopWalking()
-        return player.stay()
-    player.executeMove(SweetMoves.KICK_STRAIGHT)
+    if player.counter == 2:
+        player.executeMove(SweetMoves.KICK_STRAIGHT_LEFT_FAR)
+        
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.KICK_STRAIGHT_LEFT_FAR):
+        if transitions.shouldScanFindBall(player):
+            return player.goLater('scanFindBall')
+        if transitions.shouldApproachBall(player):
+            return player.goLater('approachBall')
+        if transitions.shouldTurnToBallClose(player):
+            return player.goLater('turnToBallClose')
+        if transitions.shouldPositionForKick(player):
+            return player.goLater('positionForKick')
+        if transitions.shouldTurnForKick(player):
+            return player.goLater('turnForKick')
+        if transitions.shouldTurnToBall_ApproachBall(player):
+            return player.goLater('turnToBallFar')
 
-    return player.goLater('done')
+    return player.stay()
 
 def done(player):
     return player.stay()

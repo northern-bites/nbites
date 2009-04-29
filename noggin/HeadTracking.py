@@ -46,11 +46,10 @@ class HeadTracking(FSA.FSA):
         return self.currentState == TRACKING
 
     def stopHead(self):
-        self.switchTo('nothing')
+        self.switchTo('stopped')
 
     def stopHeadMoves(self):
         self.stopHead()
-        self.brain.motion.stopHeadMoves()
 
     def trackBall(self):
         self.target = self.brain.ball
