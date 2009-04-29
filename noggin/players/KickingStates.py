@@ -5,9 +5,8 @@
 
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
-import man.motion.MotionConstants as MotionConstants
 
-def gameInitial(player):
+def gameReady(player):
     return player.goLater('standup')
 
 def standup(player):
@@ -21,7 +20,8 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.KICK_STRAIGHT)
+
+        player.executeMove(SweetMoves.KICK_STRAIGHT_LEFT_FAR)
 
     if player.counter == 50:
         return player.goLater('done')

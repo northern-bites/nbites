@@ -49,7 +49,6 @@ class HeadTracking(FSA.FSA):
 
     def stopHeadMoves(self):
         self.stopHead()
-        self.brain.motion.stopHeadMoves()
 
     def trackBall(self):
         self.target = self.brain.ball

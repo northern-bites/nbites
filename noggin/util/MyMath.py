@@ -71,7 +71,7 @@ def clip(value,min,max):
 
 def getRelativeX(dist,bearing):
     '''returns relative x of dist,bearing. dist (cms), bearing in deg'''
-    return fabs(dist)*sin(radians(bearing))
+    return -fabs(dist)*sin(radians(bearing))
 
 def getRelativeY(dist,bearing):
     '''returns relative y of dist,bearing. dist (cms), bearing in deg'''
