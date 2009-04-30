@@ -1806,6 +1806,23 @@ int ObjectFragments::checkIntersection(blob post) {
     for (list <VisualCorner>::const_iterator k = corners->begin();
          k != corners->end(); k++) {
         if (k->getShape() == T) {
+            // George was here
+            // I couldn't understand Chown's code, so I am making my own since
+            // the one below seems to be very Aibo field specific.
+            // Basic idea:
+            //   1. Check whether the T is in the right or the left of the post
+            //   2. If on the right, assume the post is right. Else left.
+            //   3. Check whether the distance (as determined using some crazy
+            //      pix estimates and trig) between the corner and post is
+            //      reasonable.
+            /*
+            // check whether the T is on the right
+            if (k->getX() > post.rightBottom.x + ) {
+
+            }
+            */
+
+
             if (POSTLOGIC) {
                 cout << "Got a T" << endl;
             }
