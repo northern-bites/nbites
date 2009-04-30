@@ -6,7 +6,7 @@ def positionLocalize(player):
 def playbookPosition(player):
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.locPans()
+        player.brain.tracker.activeLoc()
 
     position = player.brain.playbook.position
     if player.brain.nav.destX != position[0] or \
