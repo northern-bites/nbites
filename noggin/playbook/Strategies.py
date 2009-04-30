@@ -5,7 +5,7 @@ from . import Formations
 
 def sSpread(team):
     '''
-    This is our standard strategy.  Based around the 2007 with changes for 
+    This is our standard strategy.  Based around the 2007 with changes for
     the middie.
     '''
     # Game Ready Setup
@@ -18,7 +18,7 @@ def sSpread(team):
     elif team.brain.gameController.currentState == 'gamePlaying':
 
         # Kickoff Formations
-        if (team.brain.gameController.timeSincePlay() < 
+        if (team.brain.gameController.timeSincePlay() <
             PBConstants.KICKOFF_FORMATION_TIME):
             # Kickoff play
             if PBConstants.KICKOFF_PLAY:
@@ -32,9 +32,10 @@ def sSpread(team):
             return ['sSpread'] + Formations.fDubD(team)
 
         # ball hasn't been seen by me or teammates in a while
-        elif (team.brain.ball.timeSinceSeen() > 
-              PBConstants.FINDER_TIME_THRESH): 
-              #and team.brain.gameController.getTimeSinceUnpenalized() > 
+        elif (PBConstants.USE_FINDER and
+              team.brain.ball.timeSinceSeen() >
+              PBConstants.FINDER_TIME_THRESH):
+              #and team.brain.gameController.getTimeSinceUnpenalized() >
               #PBConstants.FINDER_TIME_THRESH):
             return ['sSpread'] + Formations.fFinder(team)
     # Standard spread formation
@@ -59,7 +60,7 @@ def sOneDown(team):
         return ['sOneDown'] + Formations.fReady(team)
 
     # Kickoff Formations
-    if (team.brain.gameController.timeSincePlay() < 
+    if (team.brain.gameController.timeSincePlay() <
         PBConstants.KICKOFF_FORMATION_TIME):
         return ['sOneDown'] + Formations.fOneKickoff(team)
 
@@ -69,7 +70,7 @@ def sOneDown(team):
 
     elif (team.brain.ball.timeSinceSeen() >
           PBConstants.FINDER_TIME_THRESH):
-          #and team.brain.gameController.getTimeSinceUnpenalized() > 
+          #and team.brain.gameController.getTimeSinceUnpenalized() >
           #PBConstants.FINDER_TIME_THRESH):
         return ['sOneDown'] + Formations.fFinder(team)
     return ['sOneDown'] + Formations.fOneDown(team)
@@ -82,7 +83,7 @@ def sNoFieldPlayers(team):
         return ['sNoFieldPlayers'] + Formations.fReady(team)
 
     # Kickoff Formations
-    if (team.brain.gameController.timeSincePlay() < 
+    if (team.brain.gameController.timeSincePlay() <
         PBConstants.KICKOFF_FORMATION_TIME):
         return ['sNoFieldPlayers'] + Formations.fNoFieldKickoff(team)
 
@@ -92,8 +93,8 @@ def sNoFieldPlayers(team):
 
     elif (team.brain.ball.timeSinceSeen() >
           PBConstants.FINDER_TIME_THRESH):
-          #and team.brain.gameController.getTimeSinceUnpenalized() > 
+          #and team.brain.gameController.getTimeSinceUnpenalized() >
           #PBConstants.FINDER_TIME_THRESH):
         return ['sNoFieldPlayers'] + Formations.fNoFieldFinder(team)
     return ['sNoFieldPlayers'] + Formations.fNoFieldPlayers(team)
-    
+
