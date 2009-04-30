@@ -22,6 +22,7 @@ from . import NogginConstants as Constants
 from . import TypeDefs
 from . import Loc
 from . import TeamConfig
+from . import LedConstants
 # Packages and modules from sub-directories
 from . import robots
 from .playbook import GoTeam
@@ -176,6 +177,9 @@ class Brain(object):
         # Localization Update
         self.updateLocalization()
 
+        #Set LEDS
+        self.processLeds()
+
         # Behavior stuff
         self.gameController.run()
         self.fallController.run()
@@ -270,3 +274,23 @@ class Brain(object):
                           self.playbook.role,
                           self.playbook.currentSubRole,
                           2)#self.playbook.me.chaseTime) # Chase Time
+
+
+    def processLeds(self):
+        ### for the ball ###
+        if Constants.DEBUG_BALL_LEDS:
+            if self.ball.on:
+                self.executeLeds(LedConstants.BALL_ON_LEDS)
+            else:
+                self.executeLeds(LedConstants.BALL_OFF_LEDS)
+
+    def executeLeds(self,listOfLeds):
+
+        for ledTuple in listOfLeds:
+            if len(ledTuple) != 3:
+                self.printf("Invalid print command!! " + str(ledTuple))
+                continue
+            ledName     = ledTuple[0]
+            ledHexValue = ledTuple[1]
+            ledTime     = ledTuple[2]
+            self.leds.fadeRGB(ledName,ledHexValue,ledTime)
