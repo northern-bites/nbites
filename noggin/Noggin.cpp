@@ -322,15 +322,21 @@ void Noggin::updateLocalization()
         // bearing
         m = comm->getTeammateBallReport();
 
-        float ballX = m.distance;
-        float ballY = m.bearing;
-        float ballXUncert = m.distanceSD;
-        float ballYUncert = m.bearingSD;
-
-        m.distance = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
-        m.bearing = atan2(ballY - loc->getYEst(), ballX - loc->getXEst());
-        m.distanceSD = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
-        m.bearingSD = atan2(ballY - loc->getYEst(), ballX - loc->getXEst());
+        if (!(m.distance == 0.0 && m.bearing == 0.0) &&
+            !(gc->gameState() == STATE_INITIAL ||
+              gc->gameState() == STATE_FINISHED)) {
+            float ballX = m.distance;
+            float ballY = m.bearing;
+            float ballXUncert = m.distanceSD;
+            float ballYUncert = m.bearingSD;
+            m.distance = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
+            m.bearing = subPIAngle(atan2(ballY - loc->getYEst(), ballX -
+                                         loc->getXEst()) - loc->getHEst());
+            m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
+            m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
+            // cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
+            //      << m.bearing << ")" << endl;
+        }
 
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
