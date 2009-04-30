@@ -272,7 +272,7 @@ class GoTeam:
         to move is the least possible
         """
         # if there is only one position return the position
-        if len(positions) == 1:
+        if len(positions) == 1 or mates == None:
             return positions[0]
 
         # if we have two positions only two possibilites of positions

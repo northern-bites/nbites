@@ -71,11 +71,11 @@ def clip(value,min,max):
 
 def getRelativeX(dist,bearing):
     '''returns relative x of dist,bearing. dist (cms), bearing in deg'''
-    return fabs(dist)*sin(radians(bearing))
+    return fabs(dist)*cos(radians(bearing))
 
 def getRelativeY(dist,bearing):
     '''returns relative y of dist,bearing. dist (cms), bearing in deg'''
-    return fabs(dist)*cos(radians(bearing))
+    return fabs(dist)*sin(radians(bearing))
 
 def getRelativeVelocityX(robotH, velX, velY):
     '''Returns the x velocity of the ball relative to the self heading'''
@@ -87,8 +87,8 @@ def getRelativeVelocityY(robotH, velX, velY):
 
 def getRelativeBearing(robotX, robotY, robotH, x, y):
     '''return relative heading from self localization to abs x,y on field'''
-    return sub180Angle(robotH - (degrees(safe_atan2(y - robotY,
-                                                    x - robotX))))
+    return sub180Angle((degrees(safe_atan2(y - robotY,
+                                           x - robotX))) - robotH)
 
 def getTargetHeading(my, targetX, targetY):
     '''determine the heading facing a target x, y'''
@@ -96,3 +96,12 @@ def getTargetHeading(my, targetX, targetY):
 
 def getSpinDir(my, targetH):
     return sign(targetH - my.h)
+
+def getSign(x):
+    if x < 0:
+        return -1
+    elif x > 0:
+        return 1
+    else :
+        return 0
+    
