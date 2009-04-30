@@ -13,7 +13,6 @@ class Teammate:
 
         # things in the Packet()
         self.playerNumber = 0
-        self.timeStamp = 0
         self.x = 0
         self.y = 0
         self.h = 0
@@ -47,7 +46,6 @@ class Teammate:
         '''
         
         # stores packet information locally
-        self.timeStamp = time.time()
         self.x = packet.playerX
         self.y = packet.playerY
         self.h = packet.playerH
@@ -87,8 +85,6 @@ class Teammate:
     def updateMe(self):
         '''updates my information as a teammate (since we don't get our own 
         packets)'''
-        self.playerNumber = self.brain.my.playerNumber
-        self.timeStamp = time.time()
         self.x = self.brain.my.x
         self.y = self.brain.my.y
         self.h = self.brain.my.h
@@ -102,7 +98,8 @@ class Teammate:
         self.ballDist = self.brain.ball.dist
         self.ballLocDist = self.brain.ball.locDist
         self.ballLocBearing = self.brain.ball.locBearing
-        self.inactive = False
+        self.inactive = self.brain.gameController.currentState =='gamePenalized'
+        self.lastPacketTime = time.time()
         self.grabbing = (self.ballDist == 
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.dribbling = (self.ballDist == 
@@ -142,7 +139,6 @@ class Teammate:
     def reset(self):
         '''Reset all important Teammate variables'''
         #self.playerNumber = 0 # doesn't reset player number
-        self.timeStamp = 0
         self.x = 0
         self.y = 0
         self.h = 0
@@ -180,13 +176,12 @@ class Teammate:
         sending packets when they are penalized, so they will most likely
         fall under the isTeammateDead() check anyways.
         '''
-        return (self.brain.gameController.currentState =='gamePenalized')
         #penalty state is the first item the player tuple [0]
         #penalty state == 1 is penalized
-        #return (
-        #    self.brain.gameController.gc.players(
-        #        self.playerNumber)[0]!=0
-        #   )
+        return (
+            self.brain.gameController.gc.players(
+                self.playerNumber)[0]!=0
+           )
 
     def isDead(self):
         '''
@@ -201,3 +196,6 @@ class Teammate:
         returns true if we have the ball
         '''
         return (self.grabbing or self.dribbling or self.kicking)
+
+    def __str__(self):
+        return "I am player number " + self.playerNumber

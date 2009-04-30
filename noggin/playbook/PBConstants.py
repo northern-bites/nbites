@@ -71,9 +71,10 @@ CENTER_FIELD_DIST_THRESH = 125.
 ####
 
 # number of roles
-NUM_ROLES = 6
+NUM_ROLES = 7
 # dictionary of roles
 ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
+                                    "PENALTY_ROLE",
                                     "CHASER",
                                     "OFFENDER",
                                     "DEFENDER",
@@ -81,6 +82,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
                                     "GOALIE")))
 # tuple of roles
 (INIT_ROLE,
+ PENALTY_ROLE,
  CHASER,
  OFFENDER,
  DEFENDER,
@@ -90,8 +92,9 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 #### SUB_ROLE CONSTANTS ####
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 22
+NUM_SUB_ROLES = 23
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
+                                            "PENALTY_SUB_ROLE",
                                             #OFFENDER SUB ROLES 1-3
                                             "LEFT_WING",
                                             "RIGHT_WING",
@@ -128,6 +131,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "READY_OFFENDER")))
 # tuple of subRoles
 (INIT_SUB_ROLE,
+ PENALTY_SUB_ROLE,
 
  LEFT_WING,
  RIGHT_WING,
@@ -260,9 +264,10 @@ LEFT_DEEP_BACK_POS =  (DEEP_BACK_X, LEFT_DEEP_BACK_Y)
 RIGHT_DEEP_BACK_POS = (DEEP_BACK_X, RIGHT_DEEP_BACK_Y)
 
 # number of formations
-NUM_FORMATIONS = 13
+NUM_FORMATIONS = 14
 # dictionary of formations
 FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
+                                              "PENALTY_FORMATION",
                                               "NO_FIELD_PLAYERS",
                                               "ONE_DOWN",
                                               "SPREAD",
@@ -277,6 +282,7 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "TEST_CHASE")))
 # tuple of formations
 (INIT_FORMATION,
+ PENALTY_FORMATION,
  NO_FIELD_PLAYERS,
  ONE_DOWN,
  SPREAD,

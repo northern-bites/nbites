@@ -87,7 +87,8 @@ class GoTeam:
         """
         We run this each frame to get the latest info
         """
-        self.aPrioriTeammateUpdate()
+        if self.brain.gameController.currentState != 'gamePenalized':
+            self.aPrioriTeammateUpdate()
         # We will always return a strategy
         self.currentStrategy, self.currentFormation, self.currentRole, \
             self.currentSubRole, self.position = self.strategize()
@@ -103,6 +104,9 @@ class GoTeam:
             self.brain.gameController.currentState == 'gameFinished':
             return ('sInit', PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
                     PBConstants.INIT_SUB_ROLE, [0,0] )
+        elif self.brain.gameController.currentState == 'gamePenalized':
+            return ('sInit', PBConstants.PENALTY_FORMATION, PBConstants.PENALTY_ROLE,
+                    PBConstants.PENALTY_SUB_ROLE, [0,0] )
         # First we check for testing stuff
         elif PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
@@ -308,17 +312,16 @@ class GoTeam:
         # update my own information for role switching
         self.me.updateMe()
 
-        # loop through teammates    
+        # loop through teammates
         for mate in self.teammates:
-            if (mate.isDead() or mate.isPenalized()):
+            if (mate.isPenalized()): # or mate.isDead()
                 #reset to true when we get a new packet from mate
                 mate.inactive = True
             if (mate.ballDist > 0):
                 self.brain.ball.reportBallSeen()
-
         self.inactiveMates = self.getInactiveFieldPlayers()
         self.numInactiveMates = len(self.inactiveMates)
-  
+
     def aPosterioriTeammateUpdate(self):
         """
         Here are updates to teammates which occur after running before 
@@ -334,6 +337,7 @@ class GoTeam:
             if (mate.inactive and mate.playerNumber != 
                 self.brain.my.playerNumber and 
                 mate.playerNumber != PBConstants.GOALIE_NUMBER):
+                self.printf(mate.playerNumber)
                 inactive_teammates.append(mate)
         return inactive_teammates
 
