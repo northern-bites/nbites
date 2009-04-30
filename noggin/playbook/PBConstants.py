@@ -90,7 +90,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 #### SUB_ROLE CONSTANTS ####
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 21
+NUM_SUB_ROLES = 22
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             #OFFENDER SUB ROLES 1-3
                                             "LEFT_WING",
@@ -115,7 +115,8 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "OTHER_FINDER",
 
                                             # GOALIE SUB ROLE 14
-                                            "GOALIE_SUB_ROLE",
+                                            "GOALIE_NORMAL",
+                                            "GOALIE_CHASER",
 
                                             # KICKOFF SUB ROLES 15-16
                                             "KICKOFF_SWEEPER",
@@ -146,7 +147,8 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  RIGHT_FINDER,
  OTHER_FINDER,
  
- GOALIE_SUB_ROLE,
+ GOALIE_NORMAL,
+ GOALIE_CHASER,
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,
  
@@ -258,9 +260,10 @@ LEFT_DEEP_BACK_POS =  (DEEP_BACK_X, LEFT_DEEP_BACK_Y)
 RIGHT_DEEP_BACK_POS = (DEEP_BACK_X, RIGHT_DEEP_BACK_Y)
 
 # number of formations
-NUM_FORMATIONS = 9
+NUM_FORMATIONS = 13
 # dictionary of formations
 FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
+                                              "NO_FIELD_PLAYERS",
                                               "ONE_DOWN",
                                               "SPREAD",
                                               "DUB_D",
@@ -268,9 +271,13 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "KICKOFF_PLAY",
                                               "KICKOFF",
                                               "ONE_KICKOFF",
-                                              "READY")))
+                                              "READY",
+                                              "TEST_DEFEND",
+                                              "TEST_OFFEND",
+                                              "TEST_CHASE")))
 # tuple of formations
 (INIT_FORMATION,
+ NO_FIELD_PLAYERS,
  ONE_DOWN,
  SPREAD,
  DUB_D,
@@ -278,4 +285,7 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
  KICKOFF_PLAY,
  KICKOFF,
  ONE_KICKOFF,
- READY) = range(NUM_FORMATIONS)
+ READY,
+ TEST_DEFEND,
+ TEST_OFFEND,
+ TEST_CHASE) = range(NUM_FORMATIONS)

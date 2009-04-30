@@ -36,9 +36,9 @@ class GoTeam:
         self.strategyTime = 0
 
         # Formations
-        self.currentFormation = 'fInit'
-        self.lastFormation = 'fInit'
-        self.lastDiffFormation = 'fInit'
+        self.currentFormation = PBConstants.INIT_FORMATION
+        self.lastFormation = PBConstants.INIT_FORMATION
+        self.lastDiffFormation = PBConstants.INIT_FORMATION
         self.formationCounter = 0
         self.formationStartTime = 0
         self.formationTime = 0
@@ -88,27 +88,23 @@ class GoTeam:
         We run this each frame to get the latest info
         """
         self.aPrioriTeammateUpdate()
-        if self.isGoalie():
-            if self.noCalledChaser():
-                self.currentRole = PBConstants.CHASER
-                self.currentSubRole = PBConstants.CHASE_NORMAL
-            else:
-                self.currentRole = PBConstants.GOALIE
-                self.currentSubRole = PBConstants.GOALIE_SUB_ROLE
-        else:
-            # We will always return a strategy
-            self.currentStrategy, self.currentFormation, self.currentRole, \
-                self.currentSubRole, self.position = self.strategize()
-            # Update all of our new infos
-            self.updateStateInfo()
+        # We will always return a strategy
+        self.currentStrategy, self.currentFormation, self.currentRole, \
+            self.currentSubRole, self.position = self.strategize()
+        # Update all of our new infos
+        self.updateStateInfo()
         self.aPosterioriTeammateUpdate()
 
     def strategize(self):
         """
         Picks the strategy to run and returns all sorts of infos
         """
+        if self.brain.gameController.currentState == 'gameInitial' or\
+            self.brain.gameController.currentState == 'gameFinished':
+            return ('sInit', PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
+                    PBConstants.INIT_SUB_ROLE, [0,0] )
         # First we check for testing stuff
-        if PBConstants.TEST_DEFENDER:
+        elif PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
         elif PBConstants.TEST_OFFENDER:
             return Strategies.sTestOffender(self)
@@ -118,7 +114,8 @@ class GoTeam:
         # Now we look at shorthanded strategies
         elif self.numInactiveMates == 1:
             return Strategies.sOneDown(self)
-
+        elif self.numInactiveMates == 2:
+            return Strategies.sNoFieldPlayers(self)
         # Here we have the strategy stuff
         return Strategies.sSpread(self)
 
@@ -144,7 +141,7 @@ class GoTeam:
         if self.lastFormation != self.currentFormation:
             if self.printStateChanges:
                 self.printf("Formation switched to "+
-                            self.currentFormation)
+                            PBConstants.FORMATIONS[self.currentFormation])
             self.formationCounter = 0
             self.lastDiffFormation = self.lastFormation
             self.formationStartTime = self.getTime()
@@ -287,7 +284,12 @@ class GoTeam:
             mateDist2 = hypot(positions[1][0] - mates.x,
                               positions[1][1] - mates.y)
 
-            if myDist1 + mateDist2 < myDist2 + mateDist1:
+            if myDist1 + mateDist2 == myDist2 + mateDist1:
+                if self.me.playerNumber > mates.playerNumber:
+                    return positions[0]
+                else:
+                    return positions[1]
+            elif myDist1 + mateDist2 < myDist2 + mateDist1:
                 return positions[0]
             else:
                 return positions[1]
@@ -317,7 +319,7 @@ class GoTeam:
         self.inactiveMates = self.getInactiveFieldPlayers()
         self.numInactiveMates = len(self.inactiveMates)
   
-    def  aPosterioriTeammateUpdate(self):
+    def aPosterioriTeammateUpdate(self):
         """
         Here are updates to teammates which occur after running before 
         exiting the frame
@@ -398,7 +400,7 @@ class GoTeam:
         return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
                  self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y -5.  and
                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y -5. and
+                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
                  self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
                  self.teammates[0].calledRole == PBConstants.CHASER))
@@ -409,7 +411,7 @@ class GoTeam:
         -includes all y values below top of goalbox 
         (so inside the goal is included)
         '''
-        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_X and
+        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
 
@@ -432,7 +434,7 @@ class GoTeam:
                                      hypot(delta_x,delta_y))*delta_y
         if pos_x > PBConstants.STOPPER_MAX_X:
             pos_x = PBConstants.STOPPER_MAX_X
-            pos_y = (NogginConstants.MY_GOALBOX_LEFT_X + delta_x / delta_y *
+            pos_y = (NogginConstants.MY_GOALBOX_MIDDLE_Y + delta_x / delta_y *
                      (PBConstants.STOPPER_MAX_X - 
                       NogginConstants.MY_GOALBOX_LEFT_X))
 
@@ -445,6 +447,10 @@ class GoTeam:
         # If everyone else is out, let's not go for the ball
         if len(self.getInactiveFieldPlayers()) == \
                 PBConstants.NUM_TEAM_PLAYERS - 1.:
+            return False
+
+        if self.brain.gameController.currentState == 'gameReady' or\
+                self.brain.gameController.currentState =='gameSet':
             return False
 
         for mate in self.teammates:

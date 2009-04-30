@@ -9,7 +9,8 @@ def sSpread(team):
     the middie.
     '''
     # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady':
+    if team.brain.gameController.currentState == 'gameReady' or\
+        team.brain.gameController.currentState =='gameSet':
         # team is kicking off
         return ['sSpread'] + Formations.fReady(team)
 
@@ -36,7 +37,6 @@ def sSpread(team):
               #and team.brain.gameController.getTimeSinceUnpenalized() > 
               #PBConstants.FINDER_TIME_THRESH):
             return ['sSpread'] + Formations.fFinder(team)
-
     # Standard spread formation
     return ['sSpread'] + Formations.fSpread(team)
 
@@ -53,7 +53,8 @@ def sTestChaser(team):
 # Group of strategies for playing shorthanded
 def sOneDown(team):
     # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady':
+    if team.brain.gameController.currentState == 'gameReady' or\
+        team.brain.gameController.currentState =='gameSet':
         # team is kicking off
         return ['sOneDown'] + Formations.fReady(team)
 
@@ -72,3 +73,27 @@ def sOneDown(team):
           #PBConstants.FINDER_TIME_THRESH):
         return ['sOneDown'] + Formations.fFinder(team)
     return ['sOneDown'] + Formations.fOneDown(team)
+
+def sNoFieldPlayers(team):
+    # Game Ready Setup
+    if team.brain.gameController.currentState == 'gameReady' or\
+        team.brain.gameController.currentState =='gameSet':
+        # team is kicking off
+        return ['sNoFieldPlayers'] + Formations.fReady(team)
+
+    # Kickoff Formations
+    if (team.brain.gameController.timeSincePlay() < 
+        PBConstants.KICKOFF_FORMATION_TIME):
+        return ['sNoFieldPlayers'] + Formations.fNoFieldKickoff(team)
+
+    # Formation for ball in our goal box
+    elif team.shouldUseDubD():
+        return ['sNoFieldPlayers'] + Formations.fDubD(team)
+
+    elif (team.brain.ball.timeSinceSeen() >
+          PBConstants.FINDER_TIME_THRESH):
+          #and team.brain.gameController.getTimeSinceUnpenalized() > 
+          #PBConstants.FINDER_TIME_THRESH):
+        return ['sNoFieldPlayers'] + Formations.fNoFieldFinder(team)
+    return ['sNoFieldPlayers'] + Formations.fNoFieldPlayers(team)
+    
