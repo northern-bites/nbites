@@ -344,8 +344,9 @@ def gamePlaying(player):
     if player.firstFrame():
         player.brain.tracker.switchTo('nothing')
         player.brain.nav.stopWalking()
-    return player.goNow("spinFindBall")
-    
+    #return player.goNow("spinFindBall")
+    return player.stay()
+
 def gamePenalized(player):
 
     # GO TO PENALIZED POS

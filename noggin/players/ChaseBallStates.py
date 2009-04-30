@@ -5,6 +5,24 @@ import ChaseBallTransitions as transitions
 
 import man.motion.SweetMoves as SweetMoves
 
+def chase(player):
+    if player.brain.ball.on:
+        return player.goNow('positionOnBall')
+    if transitions.shouldScanFindBall(player):
+        return player.goNow('scanFindBall')
+    if transitions.shouldSpinFindBall(player):
+        return player.goNow('spinFindBall')
+    if transitions.shouldApproachBall(player):
+        return player.goNow('approachBall')
+    if transitions.shouldTurnToBall_ApproachBall(player):
+        return player.goNow('turnToBallFar')
+    if transitions.shouldSpinFindBall(player):
+        return player.goNow('spinFindBall')
+    if transitions.shouldTurnToBallClose(player):
+        return player.goNow('turnToBallClose')
+    else :
+        return player.goNow('scanFindBall')
+
 def scanFindBall(player):
     '''
     State to move the head to find the ball. If we find the ball, we
@@ -17,6 +35,7 @@ def scanFindBall(player):
         player.stopWalking()
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
+        return player.goNow('positionOnBall')
 
     if transitions.shouldTurnToBall_FoundBall(player):
         return player.goNow('turnToBallFar')
@@ -36,13 +55,14 @@ def spinFindBall(player):
                         constants.Y_SPIN_SPEED,
                         constants.SPIN_SPEED)
         player.brain.tracker.stopHeadMoves()
-    if not player.brain.motion.isHeadActive():    
+    if not player.brain.motion.isHeadActive():
         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
-        
+
 
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
-
+        return player.goNow('positionOnBall')
+    
     if transitions.shouldTurnToBall_FoundBall(player):
         return player.goNow('turnToBallFar')
     if transitions.shouldCantFindBall(player):
@@ -110,7 +130,7 @@ def turnToBallClose(player):
         turnRate = MyMath.clip(ball.bearing*0.8,
                                -constants.BALL_SPIN_SPEED,
                                constants.BALL_SPIN_SPEED)
-        
+
         player.setSpeed(0,
                         MyMath.getSign(turnRate)*constants.Y_SPIN_SPEED,
                         turnRate)
@@ -210,7 +230,7 @@ def kickBall(player):
         player.stopWalking()
     if player.counter == 2:
         player.executeMove(SweetMoves.KICK_STRAIGHT_LEFT_FAR)
-        
+
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.KICK_STRAIGHT_LEFT_FAR):
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')

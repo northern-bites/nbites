@@ -44,17 +44,18 @@ class HeadTracking(FSA.FSA):
     def isTracking(self):
         return self.currentState == TRACKING
 
-    def stopHead(self):
-        self.switchTo('stop')
-
     def stopHeadMoves(self):
-        self.stopHead()
+        self.switchTo('stop')
 
     def trackBall(self):
         self.target = self.brain.ball
         self.gain = 1.0
         if(self.currentState != 'tracking' or self.currentState != 'scanBall'):
            self.switchTo('ballTracking')
+
+    def locPans(self):
+        self.stopHeadMoves()
+        self.switchTo('locPans')
 
     def execute(self,sweetMove):
         for position in sweetMove:
