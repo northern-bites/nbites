@@ -75,6 +75,9 @@ public class FileSet extends AbstractDataSet {
 
         // Check what the extension of the first frame of the set is, and use
         // that to determine the type of the set.
+        if (fpath.listFiles(FrameLoader.FILTER).length == 0)
+            return "Empty";
+
         String fileName = fpath.listFiles(FrameLoader.FILTER)[0].getPath().toUpperCase();
         if (fileName.endsWith(FrameLoader.NAO_VERSIONED))
             return "Nao versioned";
