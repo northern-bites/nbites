@@ -30,10 +30,7 @@ def panLeftOnce(tracker):
         tracker.execute(SweetMoves.PAN_LEFT)
 
     if not tracker.brain.motion.isHeadActive():
-        if tracker.lastDiffState == 'tracking':
-            return tracker.goNow('tracking')
-
-        return tracker.goLater('nothing')
+        return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()
 
@@ -42,10 +39,7 @@ def panRightOnce(tracker):
         tracker.execute(SweetMoves.PAN_RIGHT)
 
     if not tracker.brain.motion.isHeadActive():
-        if tracker.lastDiffState == 'tracking':
-            return tracker.goNow('tracking')
-
-        return tracker.goLater('nothing')
+        return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()
 
@@ -53,4 +47,12 @@ def postScan(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
         tracker.execute(SweetMoves.POST_SCAN)
+    return tracker.stay()
+
+def activeLocScan(tracker):
+    if tracker.firstFrame() \
+            or not tracker.brain.motion.isHeadActive():
+        tracker.execute(SweetMoves.LOC_PANS)
+    if tracker.target.on:
+        return tracker.goLater('activeTracking')
     return tracker.stay()

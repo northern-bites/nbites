@@ -1,11 +1,11 @@
 #
 # This file maintains the core functionality of a soccer player, and is included
 # in the SoccerFSA by default
-# When the robot is in initial, it sits down
+# When the robot is in initial, it turns on its gains, and sits down, if standing
 # When the robot is in ready, it stands up and locPans
 # When the robot is in set, it fixates on the ball, stops walking if walking in ready
 # When the robot is in playing, it does the same as in set
-# When the robot is in finish, it does the same as in initial
+# When the robot is in finish, it stops, sits down, and turns off its gains
 #
 
 import man.motion.SweetMoves as SweetMoves
@@ -45,7 +45,8 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.trackBall()
+        #player.brain.tracker.trackBall()
+        player.brain.tracker.activeLoc()
     return player.stay()
 
 def gamePlaying(player):
