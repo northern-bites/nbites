@@ -73,6 +73,9 @@ class Brain(object):
 
         # Initialize various components
         self.my = TypeDefs.MyInfo()
+        # Functional Variables
+        self.my.teamNumber = self.comm.gc.team
+        self.my.playerNumber = self.comm.gc.player
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -81,10 +84,6 @@ class Brain(object):
         self.playbook = GoTeam.GoTeam(self)
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
-
-        # Functional Variables
-        self.my.teamNumber = self.comm.gc.team
-        self.my.playerNumber = self.comm.gc.player
 
     def initFieldObjects(self):
         """
