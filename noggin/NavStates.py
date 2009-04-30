@@ -108,6 +108,8 @@ def stop(nav):
     if nav.firstFrame():
         if nav.brain.motion.isWalkActive():
             nav.setSpeed(0,0,0)
+        nav.walkX = nav.walkY = nav.walkTheta = 0
+
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
