@@ -111,7 +111,8 @@ BallEKF::BallEKF(float initX, float initY,
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(VisualBall * ball, PoseEst p, bool _useCartesian)
+void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p,
+                          bool _useCartesian)
 {
     robotPose = p;
     useCartesian = _useCartesian;
@@ -121,10 +122,11 @@ void BallEKF::updateModel(VisualBall * ball, PoseEst p, bool _useCartesian)
     limitAPrioriUncert();
 
     // We've seen a ball
-    if (ball->getDistance() > 0.0) {
-        sawBall(ball);
+    if (ball.distance > 0.0) {
+        std::vector<RangeBearingMeasurement> z;
+        z.push_back(ball);
+        correctionStep(z);
 
-        // } else if (TEAMMATE BALL REPORT) { // A teammate has seen a ball
     } else { // No ball seen
 
         setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
@@ -135,25 +137,6 @@ void BallEKF::updateModel(VisualBall * ball, PoseEst p, bool _useCartesian)
     limitPosteriorEst();
     limitPosteriorUncert();
 }
-
-/**
- * Method to deal with sighting of a ball by the robot
- * @param ball a copy of the ball seen by the robot
- */
-void BallEKF::sawBall(VisualBall * ball)
-{
-    RangeBearingMeasurement m;
-    std::vector<RangeBearingMeasurement> z;
-
-    m.distance = ball->getDistance();
-    m.bearing = ball->getBearing();
-    m.distanceSD = ball->getDistanceSD();
-    m.bearingSD = ball->getBearingSD();
-
-    z.push_back(m);
-    correctionStep(z);
-}
-
 
 /**
  * Method incorporate the expected change in ball position from the last

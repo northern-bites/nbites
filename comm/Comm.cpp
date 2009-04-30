@@ -826,7 +826,8 @@ Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     return false;
 
   // check player number
-  if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM)
+  if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
+      packet.player == gc->player())
     return false;
 
   // passed all checks, packet is valid
@@ -872,6 +873,41 @@ Comm::latestComm()
   list<vector<float> >* old = latest;
   latest = new list<vector<float> >();
   return old;
+}
+
+RangeBearingMeasurement Comm::getTeammateBallReport()
+{
+    // Iterate through latest, checking if anyone has a ball report
+    // Choose the ball report from the robot with min uncertainty
+    list<vector<float> >::iterator i;
+    float minUncert = 10000.0f;
+    float ballX = 0.0f;
+    float ballY = 0.0f;
+    float ballXUncert = 0.0f;
+    float ballYUncert = 0.0f;
+    for (i = latest->begin(); i != latest->end(); ++i) {
+        // Get the combined uncert x and y
+        float curUncert = hypot((*i)[6],(*i)[7]);
+
+        // If the teammate sees the ball and its uncertainty is less than the
+        if ((*i)[13] > 0.0 && curUncert < minUncert) {
+            minUncert = curUncert;
+            ballX = (*i)[9];
+            ballY = (*i)[10];
+            ballXUncert = (*i)[6];
+            ballYUncert = (*i)[7];
+        }
+    }
+
+    RangeBearingMeasurement m;
+    if(ballX != 0.0f || ballY != 0.0f) {
+        m.distance = ballX;
+        m.bearing = ballY;
+        m.distanceSD = ballXUncert;
+        m.bearingSD = ballYUncert;
+    }
+
+    return m;
 }
 
 void

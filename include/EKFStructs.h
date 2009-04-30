@@ -1,6 +1,7 @@
 #ifndef EKFStructs_h
 #define EKFStructs_h
 #include <ostream>
+#include "VisualBall.h"
 
 // Structs
 // Odometery change
@@ -36,6 +37,9 @@ struct RangeBearingMeasurement
     RangeBearingMeasurement(const RangeBearingMeasurement& other) :
         distance(other.distance), bearing(other.bearing),
         distanceSD(other.distanceSD), bearingSD(other.bearingSD) {}
+    RangeBearingMeasurement(VisualBall * ball) :
+        distance(ball->getDistance()), bearing(ball->getBearing()),
+        distanceSD(ball->getDistanceSD()), bearingSD(ball->getBearingSD()) {}
     float distance;
     float bearing;
     float distanceSD;

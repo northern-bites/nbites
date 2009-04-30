@@ -106,10 +106,11 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
             // Update the MCL sytem
             mclLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
             // Update the MCL ball
+            RangeBearingMeasurement m(visBall);
             if (usePerfectLocForBall) {
-                MCLballEKF->updateModel(visBall,currentPose, true);
+                MCLballEKF->updateModel(m, currentPose, true);
             } else {
-                MCLballEKF->updateModel(visBall,mclLoc->getCurrentEstimate(),
+                MCLballEKF->updateModel(m, mclLoc->getCurrentEstimate(),
                                         true);
             }
 
@@ -117,9 +118,9 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
             ekfLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
             // Update the EKF ball
             if (usePerfectLocForBall) {
-                EKFballEKF->updateModel(visBall,currentPose, true);
+                EKFballEKF->updateModel(m, currentPose, true);
             } else {
-                EKFballEKF->updateModel(visBall,ekfLoc->getCurrentEstimate(),
+                EKFballEKF->updateModel(m, ekfLoc->getCurrentEstimate(),
                                         true);
             }
 
@@ -172,7 +173,8 @@ void iterateObsPath(fstream * locFile, fstream * coreFile,
         visBall->setBearingWithSD((*ballBearings)[i]);
 
         // Update the EKF ball
-        ballEKF->updateModel(visBall,loc->getCurrentEstimate(),
+        RangeBearingMeasurement m(visBall);
+        ballEKF->updateModel(m, loc->getCurrentEstimate(),
                              true);
 
         printOutLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
@@ -221,7 +223,8 @@ void iterateMCLObsPath(fstream * locFile, fstream * coreFile,
         visBall->setBearingWithSD((*ballBearings)[i]);
 
         // Update the EKF ball
-        ballEKF->updateModel(visBall,loc->getCurrentEstimate(),
+        RangeBearingMeasurement m(visBall);
+        ballEKF->updateModel(m, loc->getCurrentEstimate(),
                              true);
 
         printOutMCLLogLine(locFile, loc, (*sightings)[i], (*odos)[i],

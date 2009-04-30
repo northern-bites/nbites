@@ -3,9 +3,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Noggin.h"
-
 #include "nogginconfig.h"
 #include "PyLoc.h"
+#include "EKFStructs.h"
 
 //#define DEBUG_OBSERVATIONS
 #define RUN_LOCALIZATION
@@ -14,7 +14,7 @@ using namespace std;
 using namespace boost;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
-
+const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
                 MotionInterface * _minterface)
@@ -23,7 +23,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
       error_state(false), brain_module(NULL), brain_instance(NULL),
-      motion_interface(_minterface),registeredGCReset(false)
+      motion_interface(_minterface),registeredGCReset(false), ballFramesOff(0)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -303,7 +303,43 @@ void Noggin::updateLocalization()
     PROF_EXIT(profiler, P_MCL);
 
     // Ball Tracking
-    ballEKF->updateModel(vision->ball, loc->getCurrentEstimate());
+    if (vision->ball->getDistance() > 0.0) {
+        ballFramesOff = 0;
+    } else {
+        ++ballFramesOff;
+    }
+
+    if( ballFramesOff < TEAMMATE_FRAMES_OFF_THRESH) {
+        // If it's less than the threshold then we either see a ball or report
+        // no ball seen
+        RangeBearingMeasurement m(vision->ball);
+        ballEKF->updateModel(m, loc->getCurrentEstimate());
+    } else {
+        // If it's off for more then the threshold, then try and use mate data
+        RangeBearingMeasurement m;
+        // HUGE HACK!!!!
+        // This returns the ball x, y, which need to be converted to dist and
+        // bearing
+        m = comm->getTeammateBallReport();
+
+        if (!(m.distance == 0.0 && m.bearing == 0.0) &&
+            !(gc->gameState() == STATE_INITIAL ||
+              gc->gameState() == STATE_FINISHED)) {
+            float ballX = m.distance;
+            float ballY = m.bearing;
+            float ballXUncert = m.distanceSD;
+            float ballYUncert = m.bearingSD;
+            m.distance = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
+            m.bearing = subPIAngle(atan2(ballY - loc->getYEst(), ballX -
+                                         loc->getXEst()) - loc->getHEst());
+            m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
+            m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
+            // cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
+            //      << m.bearing << ")" << endl;
+        }
+
+        ballEKF->updateModel(m, loc->getCurrentEstimate());
+    }
 
 #ifdef DEBUG_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {

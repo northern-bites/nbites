@@ -417,8 +417,15 @@ class GoTeam:
         '''returns defensive position between ball (x,y) and goal (x,y)
         at <dist_from_ball> centimeters away from ball'''
         delta_y = self.brain.ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+
         delta_x = self.brain.ball.x - NogginConstants.MY_GOALBOX_LEFT_X
-        
+
+        # don't divide by 0
+        if delta_x == 0:
+            delta_x = 0.1
+        if delta_y == 0:
+            delta_y = 0.1
+
         pos_x = self.brain.ball.x - (dist_from_ball/
                                      hypot(delta_x,delta_y))*delta_x
         pos_y = self.brain.ball.y - (dist_from_ball/

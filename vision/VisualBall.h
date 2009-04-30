@@ -52,17 +52,18 @@ public:
     const float getRadius() const { return radius; }
     const int getConfidence() const { return confidence;}
 
+    // Member functions
+    const float ballDistanceToSD(float _distance) const {
+        return 10 + distance * 0.2;
+    }
+    const float ballBearingToSD(float _bearing) const {
+        return static_cast<float>(M_PI) / 8.0f;
+    }
+
 private:
     float radius;
     int confidence;
 
-    // Member functions
-    float ballDistanceToSD(float _distance) {
-        return 10 + distance * 0.2;
-    }
-    float ballBearingToSD(float _bearing) {
-        return static_cast<float>(M_PI) / 8.0f;
-    }
 };
 
 
