@@ -28,6 +28,9 @@ class SoccerFSA(FSA.FSA):
         self.stateChangeColor = 'red'
         self.setPrintFunction(self.brain.out.printf)
 
+    def run(self):
+        FSA.FSA.run(self)
+
     def executeMove(self,sweetMove):
         """
         Method to enqueue a SweetMove

@@ -19,7 +19,7 @@ CYAN_COLOR_CODE = '\033[36m'
 
 class GoTeam:
     """
-    This is the class which controls all of our coordinated behavior system.  
+    This is the class which controls all of our coordinated behavior system.
     Should act as a replacement to the old PlayBook monolith approach
     """
     def __init__(self, brain):
@@ -74,7 +74,7 @@ class GoTeam:
             mate = PBDefs.Teammate(brain)
             mate.playerNumber = i + 1
             self.teammates.append(mate)
-       
+
         self.position = []
         self.me = self.teammates[self.brain.my.playerNumber - 1]
         self.me.playerNumber = self.brain.my.playerNumber
@@ -169,9 +169,9 @@ class GoTeam:
             self.roleCounter += 1
             self.roleTime = self.getTime() - self.roleStartTime
 
-        # We buffer the subRole switching by making sure that a subrole is 
+        # We buffer the subRole switching by making sure that a subrole is
         # returned for multiple frames in a row
-        if (self.subRoleOnDeck and 
+        if (self.subRoleOnDeck and
             self.subRoleOnDeck != self.currentSubRole):
             # if the sub role on deck is the same as the last, increment
             if self.subRoleOnDeck == self.lastSubRoleOnDeck:
@@ -181,7 +181,7 @@ class GoTeam:
                 self.subRoleOnDeckCounter = 0
 
             # if we are sure that we want to switch into this sub role
-            if (self.subRoleOnDeckCounter > 
+            if (self.subRoleOnDeckCounter >
                 PBConstants.SUB_ROLE_SWITCH_BUFFER):
                 #self.currentSubRole = self.subRoleOnDeck
                 self.subRoleOnDeckCounter = 0
@@ -193,7 +193,7 @@ class GoTeam:
                     self.printf("SubRole switched to "+
                                 PBConstants.SUB_ROLES[self.currentSubRole])
                 except:
-                    raise ValueError("Incorrect currentSubRole:" + 
+                    raise ValueError("Incorrect currentSubRole:" +
                                      str(self.currentSubRole))
             self.roleCounter = 0
             self.lastDiffSubRole = self.lastSubRole
@@ -233,9 +233,9 @@ class GoTeam:
             # TEAMMATE SANITY CHECKS
             # don't check goalie out
             # don't check out penalized or turned-off dogs
-            if (mate.playerNumber == PBConstants.GOALIE_NUMBER or  
-                mate.inactive or 
-                mate.playerNumber == self.brain.my.playerNumber or 
+            if (mate.playerNumber == PBConstants.GOALIE_NUMBER or
+                mate.inactive or
+                mate.playerNumber == self.brain.my.playerNumber or
                 fabs(mate.ballY - self.brain.ball.y) > 150.0):
                 if PBConstants.DEBUG_DET_CHASER:
                     print "\t inactive or goalie or me"
@@ -251,15 +251,15 @@ class GoTeam:
             # if both robots see the ball use visual distances to ball
             if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
                 (mate.ballDist < chaser_mate.ballDist)):
-                chaser_mate = mate 
+                chaser_mate = mate
             # use loc distances if both don't have a visual ball
             elif mate.ballLocDist < chaser_mate.ballLocDist:
                 chaser_mate = mate
-            
+
             if PBConstants.DEBUG_DET_CHASER:
-                print ("\t #%d @ %g >= #%d @ %g" % 
-                       (mate.playerNumber, mate.ballDist, 
-                        chaser_mate.playerNumber, 
+                print ("\t #%d @ %g >= #%d @ %g" %
+                       (mate.playerNumber, mate.ballDist,
+                        chaser_mate.playerNumber,
                         chaser_mate.ballDist))
 
         if PBConstants.DEBUG_DET_CHASER:
@@ -301,7 +301,7 @@ class GoTeam:
     ######################################################
     ############       Teammate Stuff     ################
     ######################################################
-        
+
     def aPrioriTeammateUpdate(self):
         '''
         Here we update information about teammates before running a new frame
@@ -324,7 +324,7 @@ class GoTeam:
 
     def aPosterioriTeammateUpdate(self):
         """
-        Here are updates to teammates which occur after running before 
+        Here are updates to teammates which occur after running before
         exiting the frame
         """
         pass
@@ -334,8 +334,8 @@ class GoTeam:
         that are 'dead'. ignores myself'''
         inactive_teammates = []
         for i,mate in enumerate(self.teammates):
-            if (mate.inactive and mate.playerNumber != 
-                self.brain.my.playerNumber and 
+            if (mate.inactive and mate.playerNumber !=
+                self.brain.my.playerNumber and
                 mate.playerNumber != PBConstants.GOALIE_NUMBER):
                 self.printf(mate.playerNumber)
                 inactive_teammates.append(mate)
@@ -351,7 +351,7 @@ class GoTeam:
     def teammateHasBall(self):
         '''returns True if any mate has the ball'''
         for i,mate in enumerate(self.teammates):
-            if (mate.inactive or 
+            if (mate.inactive or
                 mate.playerNumber == self.me.playerNumber):
                 continue
             elif (mate.hasBall()):
@@ -359,7 +359,7 @@ class GoTeam:
         return False
 
     def getOtherActiveTeammate(self):
-        '''this returns the teammate instance of an active teammate that isn't 
+        '''this returns the teammate instance of an active teammate that isn't
         you.'''
         if self.me.playerNumber == 3:
             return self.teammates[1] #returns player 2
@@ -372,7 +372,7 @@ class GoTeam:
         '''
         mates = []
         for mate in self.teammates:
-            if (not mate.inactive and mate.playerNumber != 
+            if (not mate.inactive and mate.playerNumber !=
                 PBConstants.GOALIE_NUMBER
                 and mate.playerNumber != self.me.playerNumber):
                 mates.append(mate)
@@ -412,7 +412,7 @@ class GoTeam:
     def ballInMyGoalBox(self):
         '''
         returns True if estimate of ball (x,y) lies in my goal box
-        -includes all y values below top of goalbox 
+        -includes all y values below top of goalbox
         (so inside the goal is included)
         '''
         return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
@@ -438,8 +438,9 @@ class GoTeam:
                                      hypot(delta_x,delta_y))*delta_y
         if pos_x > PBConstants.STOPPER_MAX_X:
             pos_x = PBConstants.STOPPER_MAX_X
+
             pos_y = (NogginConstants.MY_GOALBOX_MIDDLE_Y + delta_x / delta_y *
-                     (PBConstants.STOPPER_MAX_X - 
+                     (PBConstants.STOPPER_MAX_X -
                       NogginConstants.MY_GOALBOX_LEFT_X))
 
         return pos_x,pos_y
@@ -459,7 +460,7 @@ class GoTeam:
 
         for mate in self.teammates:
             if (not mate.inactive and (mate.calledRole == PBConstants.CHASER
-                                       or mate.calledRole == 
+                                       or mate.calledRole ==
                                        PBConstants.SEARCHER)):
                 return False
         return True
