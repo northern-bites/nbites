@@ -1,12 +1,12 @@
 
 from . import SoccerFSA
-from . import BrunswickStates
 from . import ChaseBallStates
 from . import PositionStates
 from ..playbook import PBConstants
 from .. import NogginConstants
 from math import hypot
 from ..util.MyMath import safe_atan2
+from . import BrunswickStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
