@@ -107,12 +107,18 @@ def turnToBallClose(player):
 
     ball = player.brain.ball
     if ball.on:
-        turnRate = MyMath.clip(ball.bearing*0.3,
+        turnRate = MyMath.clip(ball.bearing*0.8,
                                -constants.BALL_SPIN_SPEED,
                                constants.BALL_SPIN_SPEED)
+        
+        player.setSpeed(0,
+                        MyMath.getSign(turnRate)*constants.Y_SPIN_SPEED,
+                        turnRate)
 
-        player.setSpeed(0,constants.Y_SPIN_SPEED,turnRate)
-
+    if transitions.shouldPositionForKick(player):
+        return player.goLater('positionForKick')
+    if transitions.shouldTurnForKick(player):
+        return player.goLater('turnForKick')
     if transitions.shouldApproachBallClose(player):
         return player.goLater('approachBallClose')
     if transitions.shouldScanFindBall(player):
@@ -144,6 +150,8 @@ def approachBallClose(player):
         return player.goLater('turnToBallClose')
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
+    if transitions.shouldTurnForKick(player):
+        return player.goLater('turnForKick')
 
     return player.stay()
 
@@ -162,7 +170,6 @@ def positionForKick(player):
 
          sX = (targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN
          sY = (targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN
-
          player.setSpeed(sX,sY,0)
 
     if transitions.shouldKick(player):
@@ -180,10 +187,9 @@ def turnForKick(player):
 
     ball = player.brain.ball
     if ball.on:
-        desiredTurn = ball.bearing - \
-            (constants.BALL_KICK_BEARING_THRESH_UPPER - \
-                 constants.BALL_KICK_BEARING_THRESH_LOWER )
-        turnRate = MyMath.clip(desiredTurn*0.6,
+        desiredTurn = ball.bearing*0.8
+
+        turnRate = MyMath.clip(desiredTurn,
                                -constants.BALL_SPIN_SPEED,
                                constants.BALL_SPIN_SPEED)
 
@@ -191,6 +197,8 @@ def turnForKick(player):
 
     if transitions.shouldKick(player):
         return player.goLater('kickBall')
+    if transitions.shouldPositionForKick(player):
+        return player.goLater('positionForKick')
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
 

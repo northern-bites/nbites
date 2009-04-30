@@ -39,7 +39,7 @@ def shouldApproachBall(player):
 def shouldApproachBallClose(player):
     ball = player.brain.ball
     if ball.dist < constants.BALL_CLOSE_DIST_THRESH and \
-            abs(ball.bearing) < constants.BALL_BEARING_THRESH and\
+            abs(ball.bearing) < constants.BALL_CLOSE_APPROACH_BEARING_THRESH and\
             ball.on :
         return True
     return False
@@ -47,14 +47,14 @@ def shouldApproachBallClose(player):
 def shouldTurnToBallClose(player):
     ball = player.brain.ball
     if ( ball.on and
-         abs(ball.bearing) > constants.BALL_CLOSE_BEARING_THRESH and
+         abs(ball.bearing) > constants.BALL_CLOSE_TURN_BEARING_THRESH and
          ball.dist < constants.BALL_CLOSE_DIST_THRESH):
         return True
 
 def shouldPositionForKick(player):
     ball = player.brain.ball
     if (ball.on and
-        abs(ball.bearing) < constants.BALL_CLOSE_BEARING_THRESH and
+        abs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH and
         ball.dist < constants.BALL_POS_KICK_DIST_THRESH ):
         return True
     return False
@@ -62,8 +62,7 @@ def shouldPositionForKick(player):
 def shouldTurnForKick(player):
     ball = player.brain.ball
     if ( ball.on and
-         (ball.bearing < constants.BALL_KICK_BEARING_THRESH_LOWER or
-          ball.bearing > constants.BALL_KICK_BEARING_THRESH_UPPER ) and
+          abs(ball.bearing) > constants.BALL_TURN_KICK_BEARING_THRESH and
          ball.dist < constants.BALL_POS_KICK_DIST_THRESH ):
         return True
     return False
@@ -71,9 +70,9 @@ def shouldTurnForKick(player):
 def shouldKick(player):
     ball = player.brain.ball
     if (ball.on and
-        ball.locRelX > constants.BALL_KICK_LEFT_X_R and
-        ball.locRelX < constants.BALL_KICK_LEFT_X_L and
-        ball.locRelY > constants.BALL_KICK_LEFT_Y_CLOSE and
-        ball.locRelY < constants.BALL_KICK_LEFT_Y_FAR ):
+        ball.locRelY > constants.BALL_KICK_LEFT_Y_R and
+        ball.locRelY < constants.BALL_KICK_LEFT_Y_L and
+        ball.locRelX > constants.BALL_KICK_LEFT_X_CLOSE and
+        ball.locRelX < constants.BALL_KICK_LEFT_X_FAR ):
         return True
     return False
