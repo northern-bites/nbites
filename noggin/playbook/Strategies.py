@@ -37,7 +37,6 @@ def sSpread(team):
               #and team.brain.gameController.getTimeSinceUnpenalized() > 
               #PBConstants.FINDER_TIME_THRESH):
             return ['sSpread'] + Formations.fFinder(team)
-
     # Standard spread formation
     return ['sSpread'] + Formations.fSpread(team)
 

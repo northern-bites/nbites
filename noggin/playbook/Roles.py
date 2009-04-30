@@ -27,7 +27,6 @@ def rChaser(team):
     else:
         pos = (team.brain.my.x,team.brain.my.y)
         return [PBConstants.CHASER, PBConstants.CHASE_NORMAL, pos]
-        #team.position = (team.brain.my.x,team.brain.my.y,False,False)
 
 def rSearcher(team):
     '''

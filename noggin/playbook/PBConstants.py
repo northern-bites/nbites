@@ -260,9 +260,10 @@ LEFT_DEEP_BACK_POS =  (DEEP_BACK_X, LEFT_DEEP_BACK_Y)
 RIGHT_DEEP_BACK_POS = (DEEP_BACK_X, RIGHT_DEEP_BACK_Y)
 
 # number of formations
-NUM_FORMATIONS = 9
+NUM_FORMATIONS = 13
 # dictionary of formations
 FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
+                                              "NO_FIELD_PLAYERS",
                                               "ONE_DOWN",
                                               "SPREAD",
                                               "DUB_D",
@@ -270,9 +271,13 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "KICKOFF_PLAY",
                                               "KICKOFF",
                                               "ONE_KICKOFF",
-                                              "READY")))
+                                              "READY",
+                                              "TEST_DEFEND",
+                                              "TEST_OFFEND",
+                                              "TEST_CHASE")))
 # tuple of formations
 (INIT_FORMATION,
+ NO_FIELD_PLAYERS,
  ONE_DOWN,
  SPREAD,
  DUB_D,
@@ -280,4 +285,7 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
  KICKOFF_PLAY,
  KICKOFF,
  ONE_KICKOFF,
- READY) = range(NUM_FORMATIONS)
+ READY,
+ TEST_DEFEND,
+ TEST_OFFEND,
+ TEST_CHASE) = range(NUM_FORMATIONS)

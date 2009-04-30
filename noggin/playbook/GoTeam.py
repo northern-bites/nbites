@@ -36,9 +36,9 @@ class GoTeam:
         self.strategyTime = 0
 
         # Formations
-        self.currentFormation = 'fInit'
-        self.lastFormation = 'fInit'
-        self.lastDiffFormation = 'fInit'
+        self.currentFormation = PBConstants.INIT_FORMATION
+        self.lastFormation = PBConstants.INIT_FORMATION
+        self.lastDiffFormation = PBConstants.INIT_FORMATION
         self.formationCounter = 0
         self.formationStartTime = 0
         self.formationTime = 0
@@ -104,7 +104,7 @@ class GoTeam:
             return ('sInit', PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
                     PBConstants.INIT_SUB_ROLE, [0,0] )
         # First we check for testing stuff
-        if PBConstants.TEST_DEFENDER:
+        elif PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
         elif PBConstants.TEST_OFFENDER:
             return Strategies.sTestOffender(self)
@@ -141,7 +141,7 @@ class GoTeam:
         if self.lastFormation != self.currentFormation:
             if self.printStateChanges:
                 self.printf("Formation switched to "+
-                            self.currentFormation)
+                            PBConstants.FORMATIONS[self.currentFormation])
             self.formationCounter = 0
             self.lastDiffFormation = self.lastFormation
             self.formationStartTime = self.getTime()
@@ -319,7 +319,7 @@ class GoTeam:
         self.inactiveMates = self.getInactiveFieldPlayers()
         self.numInactiveMates = len(self.inactiveMates)
   
-    def  aPosterioriTeammateUpdate(self):
+    def aPosterioriTeammateUpdate(self):
         """
         Here are updates to teammates which occur after running before 
         exiting the frame
@@ -420,7 +420,10 @@ class GoTeam:
         at <dist_from_ball> centimeters away from ball'''
         delta_y = self.brain.ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
         delta_x = self.brain.ball.x - NogginConstants.MY_GOALBOX_LEFT_X
-        
+        if delta_x == 0:
+            delta_x = 0.1
+        if delta_y == 0:
+            delta_y = 0.1
         pos_x = self.brain.ball.x - (dist_from_ball/
                                      hypot(delta_x,delta_y))*delta_x
         pos_y = self.brain.ball.y - (dist_from_ball/
@@ -440,6 +443,10 @@ class GoTeam:
         # If everyone else is out, let's not go for the ball
         if len(self.getInactiveFieldPlayers()) == \
                 PBConstants.NUM_TEAM_PLAYERS - 1.:
+            return False
+
+        if self.brain.gameController.currentState == 'gameReady' or\
+                self.brain.gameController.currentState =='gameSet':
             return False
 
         for mate in self.teammates:
