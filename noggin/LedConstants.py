@@ -9,6 +9,7 @@ CHEST_LED       = "ChestLeds"
 LEFT_EYE_LED    = "LeftFaceLeds"
 RIGHT_EYE_LED   = "RightFaceLeds"
 FACE_LED        = "FaceLeds"
+EAR_LED         = "EarLeds"
 
 #COLORS
 RED   = 0xFF0000
@@ -42,3 +43,8 @@ STATE_FINISHED_LEDS = ((CHEST_LED, OFF,    NOW),)
 #### Ball #######
 BALL_ON_LEDS = ((FACE_LED, RED,    NOW),)
 BALL_OFF_LEDS = ((FACE_LED, BLUE,    NOW),)
+
+
+#### GOAL ######
+GOAL_ON_LEDS = ((EAR_LED, BLUE,    NOW),)
+GOAL_OFF_LEDS = ((EAR_LED, OFF,    NOW),)

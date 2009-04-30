@@ -284,6 +284,13 @@ class Brain(object):
             else:
                 self.executeLeds(LedConstants.BALL_OFF_LEDS)
 
+        if Constants.DEBUG_GOAL_LEDS:
+            if self.oppGoalRightPost.on or self.oppGoalLeftPost.on or \
+                    self.myGoalRightPost.on or self.myGoalLeftPost.on:
+                self.executeLeds(LedConstants.GOAL_ON_LEDS)
+            else:
+                self.executeLeds(LedConstants.GOAL_OFF_LEDS)
+
     def executeLeds(self,listOfLeds):
 
         for ledTuple in listOfLeds:
