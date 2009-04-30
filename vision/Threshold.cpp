@@ -775,14 +775,14 @@ void Threshold::objectRecognition() {
 
     // sanity check: if pose estimated horizon is completely above the image,
     // shouldn't find any posts or goals
-    if (pose->getLeftHorizonY() < 0 && pose->getRightHorizonY() < 0) {
-        vision->yglp->init();
-        vision->ygrp->init();
-        vision->ygCrossbar->init();
-        vision->bglp->init();
-        vision->bgrp->init();
-        vision->bgCrossbar->init();
-    }
+    // if (pose->getLeftHorizonY() < 0 && pose->getRightHorizonY() < 0) {
+    //     vision->yglp->init();
+    //     vision->ygrp->init();
+    //     vision->ygCrossbar->init();
+    //     vision->bglp->init();
+    //     vision->bgrp->init();
+    //     vision->bgCrossbar->init();
+    // }
 
     storeFieldObjects();
 
