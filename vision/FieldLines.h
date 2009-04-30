@@ -225,7 +225,7 @@ private:
 
     // The bounding box extends ~40 pixels on either side parallel to the line
     static const int INTERSECT_MAX_PARALLEL_EXTENSION =
-        static_cast<int>(.2 * IMAGE_WIDTH);
+        static_cast<int>(.13 * IMAGE_WIDTH);
     // the bounding box extends 10 pixels on either side perpendicular to the line
     static const int INTERSECT_MAX_ORTHOGONAL_EXTENSION =
         static_cast<int>(.05 * IMAGE_WIDTH);
@@ -246,7 +246,7 @@ private:
     // When estimating the angle between two lines on the field, anything less than
     // MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect and
     // disallowed; ideally our estimates would always be 90.0 degrees
-    static const int MIN_ANGLE_ON_FIELD = 70;
+    static const int MIN_ANGLE_ON_FIELD = 65;
     static const int MAX_ANGLE_ON_FIELD = 120;
     // AIBOSPECIFIC
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;

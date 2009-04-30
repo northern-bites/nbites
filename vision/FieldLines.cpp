@@ -101,9 +101,10 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     debugSecondVertEdgeDetect = false;
     debugCreateLines = false;
     debugJoinLines = false;
-    debugIntersectLines = false;
+    debugIntersectLines = true;
     debugProcessCorners = false;
-    debugIdentifyCorners = false;
+    debugIdentifyCorners = true;
+    debugCornerAndObjectDistances = true;
     debugCcScan = false;
 
     debugBallCheck = false;
@@ -2772,7 +2773,11 @@ getPossibleClassifications(const VisualCorner &corner,
                 if (debugIdentifyCorners) {
                     cout << "\tDistance between " << (*j)->toString() << " and "
                          << (*k)->toString() << " was fine! Relative error of "
-                         << relativeError << endl;
+                         << relativeError
+                         << " corner pos: (" << (*j)->getFieldX() << ","
+                         << (*j)->getFieldY()
+                         << " goal pos: (" << (*k)->getFieldX() << ","
+                         << (*k)->getFieldY() << endl;
                 }
                 numCorroboratingObjects++;
             }
@@ -2793,7 +2798,11 @@ getPossibleClassifications(const VisualCorner &corner,
                 if (debugIdentifyCorners) {
                     cout << "\tDistance between " << (*j)->toString() << " and "
                          << (*k)->toString() << " was fine! Absolute error of "
-                         << absoluteError << endl;
+                         << absoluteError
+                         << " corner pos: (" << (*j)->getFieldX() << ","
+                         << (*j)->getFieldY()
+                         << " goal pos: (" << (*k)->getFieldX() << ","
+                         << (*k)->getFieldY() << endl;
                 }
                 numCorroboratingObjects++;
             }
@@ -3587,7 +3596,7 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
         objDist = objBottomEst.dist;
         // Keep the bearing positive in this case as it matches the coordinate
         // system of the corner bearing
-        objBearing = objBottomEst.bearing * RAD_OVER_DEG;
+        objBearing = objBottomEst.bearing;// * RAD_OVER_DEG;
     }
 
     else {
@@ -3595,12 +3604,12 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
         objDist = obj->getDistance();
         // NOTE: since our corner and object coordinate systems are reversed, take
         // the negative of the corner bearing
-        objBearing = -obj->getBearing() * RAD_OVER_DEG;
+        objBearing = -obj->getBearing();// * RAD_OVER_DEG;
     }
 
     float cornerDist = c->getDistance();
     // Convert degrees to radians for the sin/cos formulas
-    float cornerBearing = c->getBearing() * RAD_OVER_DEG;
+    float cornerBearing = c->getBearing();// * RAD_OVER_DEG;
 
     // We want the objY to always be Positive because it is away from your body
     float cornerX = cornerDist * sin(cornerBearing);
