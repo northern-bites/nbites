@@ -116,4 +116,5 @@ def stop(nav):
     return nav.stay()
 
 def stopped(nav):
+    nav.walkX = nav.walkY = nav.walkTheta = 0
     return nav.stay()
