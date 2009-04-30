@@ -62,7 +62,7 @@
 
 using namespace std;
 using boost::shared_ptr;
-
+#define PRINT_VISION_INFO
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
@@ -882,7 +882,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 
             print("{%g,%g},", poseDist, dist);
 
-            print("goal post dist: %g %g %g", dist, distw, disth);
+            print("goal post dist: %g %g %g\n", dist, distw, disth);
 #endif
 
             // sanity check: throw ridiculous distance estimates out

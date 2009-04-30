@@ -43,9 +43,9 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
     allocateColorRuns();
 #ifdef OFFLINE
     BALLDISTDEBUG = false;
-    PRINTOBJS = false;
-    POSTDEBUG = false;
-    POSTLOGIC = false;
+    PRINTOBJS = true;
+    POSTDEBUG = true;
+    POSTLOGIC = true;
     TOPFIND = false;
     BALLDEBUG = false;
     CORNERDEBUG = false;
@@ -1799,6 +1799,7 @@ int ObjectFragments::crossCheck2(blob b) {
 }
 
 int ObjectFragments::checkIntersection(blob post) {
+    // TODO: check if this should be the same standard minHeight for a post
     if (post.rightBottom.y - post.rightTop.y < 30) return NOPOST;
     const list <VisualCorner>* corners = vision->fieldLines->getCorners();
     int spanx = blobWidth(post);
