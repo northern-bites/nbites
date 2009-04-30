@@ -3,6 +3,8 @@ from . import TrackingStates
 from . import PanningStates
 from .util import FSA
 import man.motion as motion
+from man.motion import MotionConstants
+import util.MyMath as MyMath
 
 #constants need to go in another file.
 #maybe auto generated on boot?
@@ -24,7 +26,7 @@ class HeadTracking(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
-
+        self.activePanDir = False
 
     def ballTrackingHelper(self,args):
         self.target = None
@@ -77,3 +79,75 @@ class HeadTracking(FSA.FSA):
 
             else:
                 print "What kind of sweet ass-Move is this?"
+
+    def activeLoc(self):
+        self.target = self.brain.ball
+        self.gain = 1.0
+        if(self.currentState != 'tracking' or self.currentState != 'panLeftOnce' or
+           self.currentState != 'panRightOnce' or self.currentState != 'locPans' or
+           self.currentState != 'activeTracking'):
+           self.switchTo('activeTracking')
+
+    def trackObject(self):
+        """
+        Method to actually perform the tracking.  Should only be called explicitly from state
+        methods in TrackingStates.py
+        """
+        if self.firstFrame():
+            #supersede anything in the motion queue:
+            self.brain.motion.stopHeadMoves()
+
+        (changeX,changeY) = (0.,0.)
+        # Find the target's angular distance from the center of the screen
+        # if we have an object, track that
+        if self.target != None:
+
+            if self.target.on:
+                changeX = self.target.angleX
+                changeY = self.target.angleY #the pitch is pos = down
+
+        #otherwise, if we have angles, track by those
+        elif self.angleX != None and self.angleY !=None:
+            changeX = self.angleX
+            changeY = self.angleY #the pitch is pos = down
+        else:
+            # by default, the change is none
+            self.player.printf( "No object")
+            return
+
+        def getGain(angleToCover):
+            ''' choose our gain by default on how far we need to go'''
+            #should this be based on distance?
+            angleToCover = abs(angleToCover)
+            if angleToCover > 8:
+                return 0.3*self.gain
+            if angleToCover > 4:
+                return .2*self.gain
+            if angleToCover > .5:
+                return .1*self.gain
+            return 0.
+
+        xGain = getGain(changeX)
+        yGain = getGain(changeY)
+
+        curPitch = self.brain.sensors.motionAngles[MotionConstants.HeadPitch]
+        curYaw = self.brain.sensors.motionAngles[MotionConstants.HeadYaw]
+
+        maxChange = 13.0
+
+        #Warning- no gain is applied currently!
+        safeChangeX = MyMath.clip(changeX,-maxChange,maxChange )
+        safeChangeY = MyMath.clip(changeY,-maxChange,maxChange )
+
+        newYaw = curYaw + safeChangeX/3
+        newPitch = curPitch - safeChangeY/3
+
+        if newYaw < 0:
+            newYaw = max(newYaw,-80.0)
+        else:
+            newYaw = min(newYaw,80.0)
+
+        maxSpeed = 2.0
+        headMove = motion.SetHeadCommand(newYaw,newPitch,
+                                         maxSpeed, maxSpeed)
+        self.brain.motion.setHead(headMove)
