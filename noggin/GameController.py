@@ -5,43 +5,8 @@ from . import NogginConstants as Constants
 from . import GameStates
 from .util import FSA
 
+from . import LedConstants
 
-####### LED DEFINITIONS #############
-LED_OFF = 0
-LED_ON = 1
-
-#GROUPS
-LEFT_FOOT_LED   = "LeftFootLeds"
-RIGHT_FOOT_LED  = "RightFootLeds"
-CHEST_LED       = "ChestLeds"
-
-
-LED_GROUPS = (LEFT_FOOT_LED, RIGHT_FOOT_LED,CHEST_LED)
-
-#COLORS
-RED   = 0xFF0000
-GREEN = 0x00FF00
-BLUE  = 0x0000FF
-YELLOW= 0xFFFF00
-WHITE = 0xFFFFFF
-OFF   = 0x000000
-NOW = 0.0
-
-###### KICKOFF ##########
-HAVE_KICKOFF_LEDS  = ((RIGHT_FOOT_LED, WHITE, NOW),)
-NO_KICKOFF_LEDS    = ((RIGHT_FOOT_LED, OFF, NOW),)
-
-###### TEAM COLOR ##########
-TEAM_BLUE_LEDS = ((LEFT_FOOT_LED, BLUE, NOW),)
-TEAM_RED_LEDS = ((LEFT_FOOT_LED, RED, NOW),)
-
-###### STATES ###########
-STATE_INITIAL_LEDS =  ((CHEST_LED, OFF,    NOW),)
-STATE_READY_LEDS =    ((CHEST_LED, BLUE,   NOW),)
-STATE_SET_LEDS =      ((CHEST_LED, YELLOW, NOW),)
-STATE_PLAYING_LEDS =  ((CHEST_LED, GREEN,  NOW),)
-STATE_PENALIZED_LEDS =((CHEST_LED, RED,    NOW),)
-STATE_FINISHED_LEDS = ((CHEST_LED, OFF,    NOW),)
 
 TEAM_BLUE = 0
 TEAM_RED = 1
@@ -108,42 +73,31 @@ class GameController(FSA.FSA):
         #if self.gc.kickOff != self.kickOff:
         if self.gc.kickOff == self.gc.team:
             #self.printf("Setting LEDS to KICKOFF (WHITE)")
-            self.executeLeds(HAVE_KICKOFF_LEDS)
+            self.brain.executeLeds(LedConstants.HAVE_KICKOFF_LEDS)
         else:
             #self.printf("Setting LEDS to KICKOFF (OFF)")
-            self.executeLeds(NO_KICKOFF_LEDS)
+            self.brain.executeLeds(LedConstants.NO_KICKOFF_LEDS)
 
         ###### TEAM COLOR ######
         if self.gc.color == TEAM_BLUE:
-            self.executeLeds(TEAM_BLUE_LEDS)
+            self.brain.executeLeds(LedConstants.TEAM_BLUE_LEDS)
         else:
-            self.executeLeds(TEAM_RED_LEDS)
+            self.brain.executeLeds(LedConstants.TEAM_RED_LEDS)
 
         ###### GAME STATE ######
 
         if self.gc.state == comm.STATE_INITIAL:
-            self.executeLeds(STATE_INITIAL_LEDS)
+            self.brain.executeLeds(LedConstants.STATE_INITIAL_LEDS)
         elif self.gc.state == comm.STATE_SET:
-            self.executeLeds(STATE_SET_LEDS)
+            self.brain.executeLeds(LedConstants.STATE_SET_LEDS)
             self.switchTo('gameSet')
         elif self.gc.state == comm.STATE_READY:
-            self.executeLeds(STATE_READY_LEDS)
+            self.brain.executeLeds(LedConstants.STATE_READY_LEDS)
             self.switchTo('gameReady')
         elif self.gc.state == comm.STATE_PLAYING:
             if self.gc.penalty != comm.PENALTY_NONE:
-                self.executeLeds(STATE_PENALIZED_LEDS)
+                self.brain.executeLeds(LedConstants.STATE_PENALIZED_LEDS)
             else:
-                self.executeLeds(STATE_PLAYING_LEDS)
+                self.brain.executeLeds(LedConstants.STATE_PLAYING_LEDS)
         elif self.gc.state == comm.STATE_FINISHED:
-            self.executeLeds(STATE_FINISHED_LEDS)
-
-    def executeLeds(self,listOfLeds):
-
-        for ledTuple in listOfLeds:
-            if len(ledTuple) != 3:
-                self.printf("Invalid print command!! " + str(ledTuple))
-                continue
-            ledName     = ledTuple[0]
-            ledHexValue = ledTuple[1]
-            ledTime     = ledTuple[2]
-            self.brain.leds.fadeRGB(ledName,ledHexValue,ledTime)
+            self.brain.executeLeds(LedConstants.STATE_FINISHED_LEDS)

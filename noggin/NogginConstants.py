@@ -12,6 +12,8 @@ USE_VISION = True # Disable if you want faster processing
 #### DEBUG SWITCHES ####
 USE_SNAPSHOT = True # Enable if you want to take pictures with spacebar
 
+# LED Related #
+DEBUG_BALL_LEDS = True
 
 # Localization Related
 ODOMETRY_DEBUG = False

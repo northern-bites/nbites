@@ -147,6 +147,7 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/NavStates.py
                         ${NOGGIN_INCLUDE_DIR}/Navigator.py
                         ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
+                        ${NOGGIN_INCLUDE_DIR}/LedConstants.py
                         ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
                         ${NOGGIN_INCLUDE_DIR}/TrackingStates.py
                         ${NOGGIN_INCLUDE_DIR}/TypeDefs.py
