@@ -3,6 +3,7 @@
 #include "Common.h"
 
 #include <sys/utsname.h> // uname()
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
@@ -12,6 +13,7 @@ using namespace boost::assign;
 #include "Kinematics.h"
 #include "SensorDef.h"
 
+using std::vector;
 using namespace boost;
 
 //
@@ -198,9 +200,25 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 
     if (r.local) {
         // send localization data
-        float loc_values[19];
+        vector<float> loc_values;
+
         if (loc.get()) {
-        }
+          loc_values += loc->getXEst(), loc->getYEst(),
+                        loc->getHEstDeg(), loc->getHEst(),
+                        loc->getXUncert(), loc->getYUncert(),
+                        loc->getHUncertDeg(), loc->getHUncert();
+          loc_values += ballEKF->getXEst(), ballEKF->getYEst(),
+                        ballEKF->getXVelocityEst(), ballEKF->getYVelocityEst(),
+                        ballEKF->getXUncert(), ballEKF->getYUncert(),
+                        ballEKF->getXVelocityUncert(),
+                        ballEKF->getYVelocityUncert();
+          loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
+                        loc->getLastOdo().deltaR;
+        } else
+          for (int i = 0; i < 19; i++)
+            loc_values += 0;
+
+        serial.write_floats(loc_values);
     }
 
 }
