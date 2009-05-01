@@ -46,6 +46,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'playbookPosition'
         elif role == PBConstants.PENALTY_ROLE:
             return 'gamePenalized'
+        elif role == PBConstants.SEARCHER:
+            return 'scanFindBall'
         else:
             return 'scanFindBall'
 

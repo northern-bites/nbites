@@ -30,13 +30,11 @@ def scanFindBall(player):
     '''
     if player.firstFrame():
         player.stopWalking()
-
-    if player.brain.ball.framesOff > constants.FRAMES_OFF_THRESH:
         player.brain.tracker.trackBall()
 
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
-#        return player.goNow('positionOnBall')
+        return player.goNow('positionOnBall')
 
     if transitions.shouldTurnToBall_FoundBall(player):
         return player.goNow('turnToBallFar')
@@ -118,8 +116,12 @@ def approachBall(player):
         targetY = math.sin(math.radians(ball.bearing))*ball.dist
         maxTarget = max(abs(targetX),abs(targetY))
 
-        sX = (targetX/maxTarget)*constants.APPROACH_X_GAIN
-        sY = (targetY/maxTarget)*constants.APPROACH_Y_GAIN
+        sX = MyMath.clip((targetX/maxTarget)*constants.APPROACH_X_GAIN,
+                         constants.MIN_X_SPEED,
+                         constants.MAX_X_SPEED)
+        sY = MyMath.clip((targetY/maxTarget)*constants.APPROACH_Y_GAIN,
+                         constants.MIN_Y_SPEED,
+                         constants.MAX_Y_SPEED)
         player.setSpeed(sX,sY,0)
 
     if transitions.shouldTurnToBallClose(player):
@@ -178,8 +180,12 @@ def approachBallClose(player):
 
         maxTarget = max(abs(targetX),abs(targetY))
 
-        sX = (targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN
-        sY = (targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN
+        sX = MyMath.clip((targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN,
+                         constants.MIN_X_SPEED,
+                         constants.MAX_X_SPEED)
+        sY = MyMath.clip((targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN,
+                         constants.MIN_Y_SPEED,
+                         constants.MAX_Y_SPEED)
 
         player.setSpeed(sX,sY,0)
 
@@ -212,8 +218,12 @@ def positionForKick(player):
 
          maxTarget = max(abs(targetX),abs(targetY))
 
-         sX = (targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN
-         sY = (targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN
+         sX = MyMath.clip((targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN,
+                          constants.MIN_X_SPEED,
+                          constants.MAX_X_SPEED)
+         sY = MyMath.clip((targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN,
+                          constants.MIN_Y_SPEED,
+                          constants.MAX_Y_SPEED)
          player.setSpeed(sX,sY,0)
 
     if transitions.shouldKick(player):

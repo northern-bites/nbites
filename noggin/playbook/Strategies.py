@@ -68,7 +68,8 @@ def sOneDown(team):
     elif team.shouldUseDubD():
         return ['sOneDown'] + Formations.fDubD(team)
 
-    elif (team.brain.ball.timeSinceSeen() >
+    elif (PBConstants.USE_FINDER and
+          team.brain.ball.timeSinceSeen() >
           PBConstants.FINDER_TIME_THRESH):
           #and team.brain.gameController.getTimeSinceUnpenalized() >
           #PBConstants.FINDER_TIME_THRESH):
