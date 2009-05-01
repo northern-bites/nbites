@@ -3,7 +3,7 @@ from . import NavStates
 from .util import FSA
 from .util import MyMath
 import man.motion as motion
-import math
+from math import fabs
 
 LOC_IS_ACTIVE_H  = 400
 CLOSE_ENOUGH_XY = 25.0
@@ -16,6 +16,9 @@ HEADING_MEDIUM_THRESH = 30.
 HEADING_NEAR_SCALE = .3
 HEADING_MEDIUM_SCALE = .6
 HEADING_FAR_SCALE = 1.0
+SPIN_EPSILON = 0.2
+FORWARD_EPSILON = 0.5
+STRAFE_EPSILON = 0.3
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -49,8 +52,13 @@ class Navigator(FSA.FSA):
         Returns False if it is the same as the current walk
         True otherwise
         """
-        if (self.walkX == x and self.walkY == y and
-            self.walkTheta == theta):
+        # Make sure we stop
+        if (x == 0 and y == 0 and theta == 0):
+            if self.walkX == 0 and self.walkY == 0 and self.walkTheta == 0:
+                return False
+        # If the walk changes are really small, then ignore them
+        elif (fabs(self.walkX - x) < FORWARD_EPSILON and fabs(self.walkY - y) < STRAFE_EPSILON and
+            fabs(self.walkTheta - theta) < SPIN_EPSILON):
             return False
 
         self.walkX = x
