@@ -143,6 +143,7 @@ public:
     float maxXSpeed;
     float maxYSpeed;
     float maxThetaSpeed;
+    float sensorFeedback;
 //calculated from parameters
 public:
     int stepDurationFrames; //one double + one single support
@@ -159,7 +160,8 @@ public:
                       const float _lSwHRAdd,const float _rSwHRAdd,
                       const float _lZMPSwOffY,const float _rZMPSwOffY,
                       const float maxx_mms, const float maxy_mms,
-                      const float maxtheta_rads)
+                      const float maxtheta_rads,
+                      const float _sensorFeedback)
         :  motion_frame_length_s( _motion_frame_length_s),
            bodyHeight(_bh), hipOffsetX(_hox), XAngleOffset(_yao),
            stepDuration(_dur),
@@ -169,7 +171,8 @@ public:
            leftSwingHipRollAddition(_lSwHRAdd),
            rightSwingHipRollAddition(_rSwHRAdd),
            leftZMPSwingOffsetY(_lZMPSwOffY),rightZMPSwingOffsetY(_rZMPSwOffY),
-           maxXSpeed(maxx_mms),maxYSpeed(maxy_mms),maxThetaSpeed(maxtheta_rads)
+           maxXSpeed(maxx_mms),maxYSpeed(maxy_mms),maxThetaSpeed(maxtheta_rads),
+           sensorFeedback(_sensorFeedback)
         {
             updateFrameLengths();
         }
@@ -269,8 +272,8 @@ const WalkingParameters DEFAULT_PARAMETERS
                     12.0f,        // rightZMPSwingOffestY
                     100.0f,       // max speed x (mm/s)
                     50.0f,        // max speed y (mm/s)
-                    0.50f);       // max speed theta (rad/s)
-
+                    0.50f,        // max speed theta (rad/s)
+                    0.0f);        // sensor feedback
 const WalkingParameters GOALIE_PARAMETERS = DEFAULT_PARAMETERS;
 
 const WalkingParameters WALK_PARAMS[] = {DEFAULT_PARAMETERS,GOALIE_PARAMETERS};
