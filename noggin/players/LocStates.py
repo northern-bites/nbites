@@ -11,7 +11,7 @@ TARGET_H = NogginConstants.OPP_GOAL_HEADING
 COUNT_TOTAL = 250
 
 def gamePlaying(player):
-    player.brain.loc.reset()
+    #player.brain.loc.reset()
     return player.goLater('goToPoint')
 
 def collectDistData(player):

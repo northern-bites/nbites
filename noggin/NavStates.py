@@ -16,14 +16,23 @@ def spinToWalkHeading(nav):
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
         nav.stopSpinToWalkCount = 0
+        nav.noWalkSet = True
+
+    if nav.noWalkSet and nav.brain.motion.isWalkActive():
+        nav.printf("Waiting for walk to stop")
+        return nav.stay()
 
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
+    headingDiff = abs(nav.brain.my.h - targetH)
+
 #     nav.printf("Target heading is " + str(targetH))
 #     nav.printf("Current heading is " + str(nav.brain.my.h))
-    if nav.counter > WAIT_BETWEEN_MOVES:
-        spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
+
+    spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
         #nav.printf("Spin Dir is " + str(spinDir))
-        nav.setSpeed(0, spinDir * GOTO_SPIN_STRAFE, spinDir * GOTO_SPIN_SPEED)
+    nav.setSpeed(0, spinDir * GOTO_SPIN_STRAFE,
+                 spinDir * GOTO_SPIN_SPEED*nav.getRotScale(headingDiff))
+    nav.noWalkSet = False
 
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
@@ -43,9 +52,15 @@ def walkToPoint(nav):
         nav.setSpeed(0,0,0)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
+        nav.noWalkSet  = True
 
-    if nav.counter > WAIT_BETWEEN_MOVES:
-        nav.setSpeed(GOTO_FORWARD_SPEED, 0, 0)
+    if nav.noWalkSet and nav.brain.motion.isWalkActive():
+        nav.printf("Waiting for walk to stop")
+        return nav.stay()
+
+    nav.setSpeed(GOTO_FORWARD_SPEED, 0, 0)
+    nav.noWalkSet = False
+
 
     if nav.atDestination():
         nav.walkToPointCount += 1
@@ -61,7 +76,7 @@ def walkToPoint(nav):
 
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
 
-    if not nav.atHeading(targetH):
+    if nav.notAtHeading(targetH):
         nav.walkToPointSpinCount += 1
 
     if nav.walkToPointSpinCount > GOTO_SURE_THRESH:
@@ -76,15 +91,23 @@ def spinToFinalHeading(nav):
     """
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
+        nav.noWalkSet  = True
 
-    targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
+    if nav.noWalkSet and nav.brain.motion.isWalkActive():
+        nav.printf("Waiting for walk to stop")
+        return nav.stay()
 
-    if nav.counter > WAIT_BETWEEN_MOVES:
-        spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
-        nav.setSpeed(0, spinDir*GOTO_SPIN_STRAFE, spinDir*GOTO_SPIN_SPEED)
+    targetH = nav.destH#MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
+    headingDiff = abs(nav.brain.my.h - targetH)
+    nav.printf("Need to spin to %g, heading diff is %g, heading uncert is %g" %
+               (targetH, headingDiff, nav.brain.my.uncertH))
+    spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
+    nav.setSpeed(0, spinDir*GOTO_SPIN_STRAFE, 
+                 spinDir*GOTO_SPIN_SPEED*nav.getRotScale(headingDiff))
+    nav.noWalkSet = False
 
     if nav.atHeading():
-        nav.goLater('stop')
+        return nav.goLater('stop')
     return nav.stay()
 
 # State to be used with standard setSpeed movement

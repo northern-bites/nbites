@@ -8,7 +8,14 @@ import man.motion.MotionConstants as MotionConstants
 
 def gamePlaying(player):
     ''' Overwritting the gameInital State'''
-    if player.firstFrame():
-        player.brain.tracker.switchTo('locPans')
     return player.stay()
 
+def gameReady(player):
+    if player.firstFrame():
+        player.brain.tracker.switchTo('locPans')
+        player.standup()
+
+    if player.counter < 100:
+        player.brain.sensors.saveFrame()
+
+    return player.stay()

@@ -3,8 +3,19 @@ from . import NavStates
 from .util import FSA
 from .util import MyMath
 import man.motion as motion
+import math
+
+LOC_IS_ACTIVE_H  = 400
 CLOSE_ENOUGH_XY = 25.0
-CLOSE_ENOUGH_H = 30.0
+CLOSE_ENOUGH_H = 25.0
+ALMOST_CLOSE_ENOUGH_H = 45.0
+
+HEADING_NEAR_THRESH = 10.
+HEADING_MEDIUM_THRESH = 30.
+
+HEADING_NEAR_SCALE = .3
+HEADING_MEDIUM_SCALE = .6
+HEADING_FAR_SCALE = 1.0
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -72,8 +83,29 @@ class Navigator(FSA.FSA):
         if targetHeading is None:
             targetHeading = self.destH
         hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
+        self.printf("H diff is " + str(hDiff))
+        return abs(hDiff) < CLOSE_ENOUGH_H and \
+            self.brain.my.uncertH < LOC_IS_ACTIVE_H
+
+
+    def notAtHeading(self, targetHeading= None):
+        if targetHeading is None:
+            targetHeading = self.destH
+        hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
         #self.printf("H diff is " + str(hDiff))
-        return abs(hDiff) < CLOSE_ENOUGH_H
+        return abs(hDiff) > ALMOST_CLOSE_ENOUGH_H and \
+            self.brain.my.uncertH < LOC_IS_ACTIVE_H
+
+
+    def getRotScale(self, headingDiff):
+        absHDiff = abs(headingDiff)
+        if absHDiff < HEADING_NEAR_THRESH:
+            return HEADING_NEAR_SCALE
+        elif absHDiff < HEADING_MEDIUM_THRESH:
+            return HEADING_MEDIUM_SCALE
+        else:
+            return HEADING_FAR_SCALE
+
 
     def isStopped(self):
         return self.currentState == 'stopped'
