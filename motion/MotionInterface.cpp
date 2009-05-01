@@ -73,7 +73,7 @@ void MotionInterface::setWalkExtraConfig( float pLHipRollBacklashCompensator,
 					  float pTorsoYOrientation) {
 }
 
-void MotionInterface::setGait(const GaitCommand * command){
+void MotionInterface::setGait(const boost::shared_ptr<GaitCommand> command){
     switchboard->sendMotionCommand(command);
 }
 

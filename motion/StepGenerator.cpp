@@ -201,6 +201,11 @@ void StepGenerator::findSensorZMP(){
 
 }
 
+float StepGenerator::scaleSensors(const float sensorZMP, const float perfectZMP){
+    const float sensorWeight = walkParams->sensorFeedback;
+    return sensorZMP*sensorWeight + (1.0 - sensorWeight)*perfectZMP;
+}
+
 void StepGenerator::tick_controller(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_controller" << endl;
@@ -217,12 +222,9 @@ void StepGenerator::tick_controller(){
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
 
-    //With sensor feedback
-    est_zmp_i(0) = zmp_filter.get_zmp_x();
-    est_zmp_i(1) = zmp_filter.get_zmp_y();
-    //Without sensor feedback
-//     est_zmp_i(0) = cur_zmp_ref_x;
-//     est_zmp_i(1) = cur_zmp_ref_y;
+    //Scale the sensor feedback according to the gait parameters
+    est_zmp_i(0) = scaleSensors(zmp_filter.get_zmp_x(), cur_zmp_ref_x);
+    est_zmp_i(1) = scaleSensors(zmp_filter.get_zmp_y(), cur_zmp_ref_y);
 
     //Tick the controller (input: ZMPref, sensors -- out: CoM x, y)
 

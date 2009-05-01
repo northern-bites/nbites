@@ -134,6 +134,7 @@ private: // Helper methods
     void generate_steps();
 
     void findSensorZMP();
+    float scaleSensors(const float sensorZMP, const float perfectZMP);
 
     void swapSupportLegs();
 

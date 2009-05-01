@@ -124,9 +124,8 @@ void WalkProvider::setCommand(const WalkCommand * command){
 }
 
 
-void WalkProvider::setCommand(const GaitCommand * command){
+void WalkProvider::setCommand(const boost::shared_ptr<GaitCommand> command){
     nextGait = new WalkingParameters(command->getGait());
-    delete command;
 }
 
 void WalkProvider::setActive(){

@@ -74,7 +74,7 @@ public:
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
 	void sendMotionCommand(const WalkCommand* command);
-	void sendMotionCommand(const GaitCommand* command);
+	void sendMotionCommand(const boost::shared_ptr<GaitCommand> command);
 	void sendMotionCommand(const SetHeadCommand* command);
 	void sendMotionCommand(const StiffnessCommand* command);
 
