@@ -101,10 +101,10 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     debugSecondVertEdgeDetect = false;
     debugCreateLines = false;
     debugJoinLines = false;
-    debugIntersectLines = true;
+    debugIntersectLines = false;
     debugProcessCorners = false;
-    debugIdentifyCorners = true;
-    debugCornerAndObjectDistances = true;
+    debugIdentifyCorners = false;
+    debugCornerAndObjectDistances = false;
     debugCcScan = false;
 
     debugBallCheck = false;
@@ -2401,6 +2401,62 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
                 continue;
             }
             ++numChecksPassed;
+
+            // Find which end of each line is closer to the potential corner
+            point<int> line1Closer;
+            point<int> line2Closer;
+
+            if (Utility::getLength(intersectX, intersectY,
+                                   i->start.x, i->start.y) <
+                Utility::getLength(intersectX, intersectY,
+                                   i->end.x, i->end.y)) {
+                line1Closer = i->start;
+            }
+            else
+                line1Closer = i->end;
+
+            if (Utility::getLength(intersectX, intersectY,
+                                   j->start.x, j->start.y) <
+                Utility::getLength(intersectX, intersectY,
+                                   j->end.x, j->end.y)) {
+                line2Closer = j->start;
+            }
+            else
+                line2Closer = j->end;
+
+            if (debugIntersectLines)
+                cout << "Corner is close to line endpoint " << line1Closer
+                     << " and " << line2Closer << endl;
+
+            float percent1 = percentSurrounding((line1Closer.x + intersectX)/2,
+                                               (line1Closer.y + intersectY)/2,
+                                               FIELD_COLORS,
+                                               NUM_FIELD_COLORS,
+                                               1);
+            float percent2 = percentSurrounding((line2Closer.x + intersectX)/2,
+                                               (line2Closer.y + intersectY)/2,
+                                               FIELD_COLORS,
+                                               NUM_FIELD_COLORS,
+                                               1);
+            if (debugIntersectLines)
+                cout << "Percent green in between line 1 and corner: "
+                     << percent1 << ". between line 2 --- : " << percent2
+                     << endl;
+
+            const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 66.0f;
+            if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
+                percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
+                if (debugIntersectLines) {
+                    cout <<"\t" << numChecksPassed
+                         << "-There was too much green between the corner and"
+                        " the endpoints of the two lines." << endl;
+                    cout << "\t " << "b/w corner and line1: " << percent1
+                         << "\t " << " and line 2: " << percent2 << endl;
+                }
+                continue;
+            }
+            ++numChecksPassed;
+
 
             // Make sure the intersection point stands out, even against balls
             vision->thresh->drawPoint(intersectX - 1, intersectY, BLACK);

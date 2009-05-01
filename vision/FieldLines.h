@@ -225,13 +225,13 @@ private:
 
     // The bounding box extends ~40 pixels on either side parallel to the line
     static const int INTERSECT_MAX_PARALLEL_EXTENSION =
-        static_cast<int>(.13 * IMAGE_WIDTH);
+        static_cast<int>(.15 * IMAGE_WIDTH);
     // the bounding box extends 10 pixels on either side perpendicular to the line
     static const int INTERSECT_MAX_ORTHOGONAL_EXTENSION =
         static_cast<int>(.05 * IMAGE_WIDTH);
     // for dupeCorner() checks
-    static const int DUPE_MIN_X_SEPARATION = 15;
-    static const int DUPE_MIN_Y_SEPARATION = 15;
+    static const int DUPE_MIN_X_SEPARATION = 7;
+    static const int DUPE_MIN_Y_SEPARATION = 7;
 
     static const int MAX_CORNER_DISTANCE = 600;
     static const int MIN_CORNER_DISTANCE = 10;
