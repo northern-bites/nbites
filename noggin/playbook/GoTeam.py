@@ -337,7 +337,7 @@ class GoTeam:
             if (mate.inactive and mate.playerNumber !=
                 self.brain.my.playerNumber and
                 mate.playerNumber != PBConstants.GOALIE_NUMBER):
-                self.printf(mate.playerNumber)
+                #self.printf(mate.playerNumber)
                 inactive_teammates.append(mate)
         return inactive_teammates
 

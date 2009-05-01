@@ -7,7 +7,7 @@ def playbookPosition(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.activeLoc()
-
+        player.printf("I am going to " + str(player.brain.playbook.position))
     position = player.brain.playbook.position
     if player.brain.nav.destX != position[0] or \
             player.brain.nav.destY != position[1]:
