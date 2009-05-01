@@ -379,7 +379,6 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
 			 object_dist*sin(object_bearing),
 			 object_dist*cos(object_bearing)*sin(-object_elevation));
 
-  // Hack for getting better bearing estimate at the moment!!!
   // object in world frame
   ublas::vector<float> objectInWorldFrame =
      prod(cameraToWorldFrame,objectInCameraFrame);
