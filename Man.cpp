@@ -265,6 +265,16 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("Man", "Couldn't set AutoExposition");
     }
+	int param = camera->call<int>("getParam", kCameraAutoExpositionID);
+	// if that didn't work, then try again
+	if (param != DEFAULT_CAMERA_AUTO_EXPOSITION) {
+		try {
+			camera->callVoid("setParam", kCameraAutoExpositionID,
+							 DEFAULT_CAMERA_AUTO_EXPOSITION);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set AutoExposition AGAIN");
+		}
+	}
     // Auto white balance
     try {
         camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
@@ -273,6 +283,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("Man", "Couldn't set AutoWhiteBalance");
     }
+	param = camera->call<int>("getParam", kCameraAutoWhiteBalanceID);
+	if (param != DEFAULT_CAMERA_AUTO_WHITEBALANCE) {
+		try {
+			camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
+							 DEFAULT_CAMERA_AUTO_WHITEBALANCE);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set AutoWhiteBalance AGAIN");
+		}
+	}
     // Auto gain
     try {
         camera->callVoid("setParam", kCameraAutoGainID,
@@ -280,6 +299,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("Man", "Couldn't set AutoGain");
     }
+	param = camera->call<int>("getParam", kCameraAutoGainID);
+	if (param != DEFAULT_CAMERA_AUTO_GAIN) {
+		try {
+			camera->callVoid("setParam", kCameraAutoGainID,
+							 DEFAULT_CAMERA_AUTO_GAIN);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set AutoGain AGAIN");
+		}
+	}
     // Set camera defaults
     // brightness
     try {
@@ -288,6 +316,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("Man", "Couldn't set Brightness ");
     }
+	param = camera->call<int>("getParam", kCameraBrightnessID);
+	if (param != DEFAULT_CAMERA_BRIGHTNESS) {
+		try {
+			camera->callVoid("setParam", kCameraBrightnessID,
+							 DEFAULT_CAMERA_BRIGHTNESS);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set BRIGHTNESS AGAIN");
+		}
+	}
     // contrast
     try {
         camera->callVoid("setParam", kCameraContrastID,
@@ -295,6 +332,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("Man", "Couldn't set Contrast");
     }
+	param = camera->call<int>("getParam", kCameraContrastID);
+	if (param != DEFAULT_CAMERA_CONTRAST) {
+		try {
+			camera->callVoid("setParam", kCameraContrastID,
+							 DEFAULT_CAMERA_CONTRAST);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set Contrast AGAIN");
+		}
+	}
     // Red chroma
     try {
         camera->callVoid("setParam", kCameraRedChromaID,
@@ -302,6 +348,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("Man", "Couldn't set RedChroma");
     }
+	param = camera->call<int>("getParam", kCameraRedChromaID);
+	if (param != DEFAULT_CAMERA_REDCHROMA) {
+		try {
+			camera->callVoid("setParam", kCameraRedChromaID,
+							 DEFAULT_CAMERA_REDCHROMA);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set RedChroma AGAIN");
+		}
+	}
     // Blue chroma
     try {
         camera->callVoid("setParam", kCameraBlueChromaID,
@@ -309,6 +364,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("Man", "Couldn't set BlueChroma");
     }
+	param = camera->call<int>("getParam", kCameraBlueChromaID);
+	if (param != DEFAULT_CAMERA_BLUECHROMA) {
+		try {
+			camera->callVoid("setParam", kCameraBlueChromaID,
+							 DEFAULT_CAMERA_BLUECHROMA);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set BlueChroma AGAIN");
+		}
+	}
     // Exposure length
     try {
         camera->callVoid("setParam",kCameraExposureID,
@@ -316,6 +380,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("Man", "Couldn't set Exposure");
     }
+	param = camera->call<int>("getParam", kCameraExposureID);
+	if (param != DEFAULT_CAMERA_EXPOSURE) {
+		try {
+			camera->callVoid("setParam", kCameraExposureID,
+							 DEFAULT_CAMERA_EXPOSURE);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set Exposure AGAIN");
+		}
+	}
     // Gain
     try {
         camera->callVoid("setParam",kCameraGainID,
@@ -323,6 +396,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("Man", "Couldn't set Gain");
     }
+	param = camera->call<int>("getParam", kCameraGainID);
+	if (param != DEFAULT_CAMERA_GAIN) {
+		try {
+			camera->callVoid("setParam", kCameraGainID,
+							 DEFAULT_CAMERA_GAIN);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set Gain AGAIN");
+		}
+	}
     // Saturation
     try {
         camera->callVoid("setParam",kCameraSaturationID,
@@ -330,6 +412,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("Man", "Couldn't set Saturation");
     }
+	param = camera->call<int>("getParam", kCameraSaturationID);
+	if (param != DEFAULT_CAMERA_SATURATION) {
+		try {
+			camera->callVoid("setParam", kCameraSaturationID,
+							 DEFAULT_CAMERA_SATURATION);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set Saturation AGAIN");
+		}
+	}
     // Hue
     try {
         camera->callVoid("setParam",kCameraHueID,
@@ -337,6 +428,15 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("Man", "Couldn't set Hue");
     }
+	param = camera->call<int>("getParam", kCameraHueID);
+	if (param != DEFAULT_CAMERA_HUE) {
+		try {
+			camera->callVoid("setParam", kCameraHueID,
+							 DEFAULT_CAMERA_HUE);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set Hue AGAIN");
+		}
+	}
     // Lens correction X
     try {
         camera->callVoid("setParam",kCameraLensXID,
@@ -344,13 +444,31 @@ Man::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("Man", "Couldn't set Lens Correction X");
     }
+	param = camera->call<int>("getParam", kCameraLensXID);
+	if (param != DEFAULT_CAMERA_LENSX) {
+		try {
+			camera->callVoid("setParam", kCameraLensXID,
+							 DEFAULT_CAMERA_LENSX);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set Lens Correction X AGAIN");
+		}
+	}
     // Lens correction Y
     try {
-        camera->callVoid("setParam",kCameraLensXID,
+        camera->callVoid("setParam",kCameraLensYID,
                          DEFAULT_CAMERA_LENSY);
     } catch (ALError &e) {
         log->error("Man", "Couldn't set Lens Correction Y");
     }
+	param = camera->call<int>("getParam", kCameraLensYID);
+	if (param != DEFAULT_CAMERA_LENSY) {
+		try {
+			camera->callVoid("setParam", kCameraLensYID,
+							 DEFAULT_CAMERA_LENSY);
+		} catch (ALError &e){
+			log->error("Man", "Couldn't set Lens Correction Y AGAIN");
+		}
+	}
 }
 
 #else//NAOQI1
