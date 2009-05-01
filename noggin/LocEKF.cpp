@@ -8,12 +8,12 @@ using namespace NBMath;
 
 // Parameters
 const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
-const float LocEKF::BETA_LOC = 3.0f;
-const float LocEKF::GAMMA_LOC = 0.4f;
-const float LocEKF::BETA_LAT = 0.5f;
-const float LocEKF::GAMMA_LAT = 0.4f;
-const float LocEKF::BETA_ROT = M_PI/32.0f;
-const float LocEKF::GAMMA_ROT = 0.04f;
+const float LocEKF::BETA_LOC = 1.0f;
+const float LocEKF::GAMMA_LOC = 0.1f;
+const float LocEKF::BETA_LAT = 0.03f;
+const float LocEKF::GAMMA_LAT = 0.04f;
+const float LocEKF::BETA_ROT = M_PI/16.0f;
+const float LocEKF::GAMMA_ROT = 0.1f;
 
 // Default initialization values
 const float LocEKF::INIT_LOC_X = 370.0f;
@@ -25,9 +25,9 @@ const float LocEKF::H_UNCERT_MAX = 4*M_PI;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6;
-const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
-const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
-const float LocEKF::INIT_H_UNCERT = M_PI*4;
+const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 8.0f;
+const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 8.0f;
+const float LocEKF::INIT_H_UNCERT = M_PI / 2.0f;
 const float LocEKF::X_EST_MIN = -600.0f;
 const float LocEKF::Y_EST_MIN = -1000.0f;
 const float LocEKF::X_EST_MAX = 600.0f;
@@ -186,12 +186,17 @@ void LocEKF::incorporateMeasurement(Observation z,
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "\t\t\tIncorporating measurement " << z << std::endl;
 #endif
-    unsigned int obsIndex;
+    int obsIndex;
 
     // Get the best fit for ambigious data
     // NOTE: this is only done, if useAmbiguous is turned to true
     if (z.getNumPossibilities() > 1) {
         obsIndex = findBestLandmark(&z);
+        // No landmark is close enough, don't attempt to use one
+        if (obsIndex < 0) {
+            R_k(0,0) = DONT_PROCESS_KEY;
+            return;
+        }
     } else {
         obsIndex = 0;
     }
@@ -298,11 +303,11 @@ void LocEKF::incorporateMeasurement(Observation z,
  *
  * @param z The observation to be fixed
  */
-unsigned int LocEKF::findBestLandmark(Observation *z)
+int LocEKF::findBestLandmark(Observation *z)
 {
     std::vector<PointLandmark> possiblePoints = z->getPointPossibilities();
-    float minDivergence = 10000.0f;
-    unsigned int minIndex = 0;
+    float minDivergence = 250.0f;
+    int minIndex = -1;
     for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
         float divergence = getDivergence(z, possiblePoints[i]);
 

@@ -30,7 +30,7 @@ static const int ACC_NUM_MEASUREMENTS = 3;
 
 static const int ZMP_NUM_DIMENSIONS = 2;
 static const int ZMP_NUM_MEASUREMENTS = 2;
-
+static const float DONT_PROCESS_KEY = -1337.0f;
 /**
  * EKF - An abstract class which implements the computational components of
  *       an Extended Kalman Filter.
@@ -175,6 +175,9 @@ public:
         for(unsigned int i = 0; i < z_k.size(); ++i) {
             incorporateMeasurement(z_k[i], H_k, R_k, v_k);
 
+            if (R_k(0,0) == DONT_PROCESS_KEY) {
+                continue;
+            }
             // Calculate the Kalman gain matrix
             StateMeasurementMatrix pTimesHTrans = prod(P_k_bar, trans(H_k));
 

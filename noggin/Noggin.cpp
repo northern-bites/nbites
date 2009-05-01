@@ -8,8 +8,10 @@
 #include "EKFStructs.h"
 
 //#define DEBUG_OBSERVATIONS
+//#define DEBUG_BALL_OBSERVATIONS
 #define RUN_LOCALIZATION
-
+//#define USE_LOC_CORNERS
+static const float MAX_CORNER_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
 
@@ -277,17 +279,21 @@ void Noggin::updateLocalization()
     }
 
     // Corners
+#ifdef USE_LOC_CORNERS
     const list<VisualCorner> * corners = vision->fieldLines->getCorners();
     list <VisualCorner>::const_iterator i;
     for ( i = corners->begin(); i != corners->end(); ++i) {
-        Observation seen(*i);
-        observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
-        cout << "Saw corner " << seen.getID() << " at distance "
-             << seen.getVisDistance() << " and bearing " << seen.getVisBearing()
-             << endl;
-#endif
+        if (i->getDistance() < MAX_CORNER_DISTANCE) {
+            Observation seen(*i);
+            observations.push_back(seen);
+#           ifdef DEBUG_OBSERVATIONS
+            cout << "Saw corner " << i->getID() << " at distance "
+                 << seen.getVisDistance() << " and bearing " << seen.getVisBearing()
+                 << endl;
+#            endif
+        }
     }
+#endif
 
     // Lines
     // const vector<VisualLine> * lines = vision->fieldLines->getLines();
@@ -341,7 +347,7 @@ void Noggin::updateLocalization()
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
 
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_BALL_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {
         cout << "Ball seen at distance " << vision->ball->getDistance()
              << " and bearing " << vision->ball->getBearing() << endl;
@@ -351,7 +357,7 @@ void Noggin::updateLocalization()
     // Opponent Tracking
 
 #ifdef DEBUG_OBSERVATIONS
-    cout << *loc << endl;
+    //cout << *loc << endl;
 #endif
 }
 
