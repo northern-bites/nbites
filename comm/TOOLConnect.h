@@ -13,6 +13,9 @@ class TOOLConnect; // forward reference
 
 #include "CommDef.h"
 #include "DataSerializer.h"
+#include "LocSystem.h"
+#include "BallEKF.h"
+
 
 //
 // DataRequest struct definition
@@ -66,6 +69,9 @@ public:
     std::string getRobotName();
     int getState() { return state; }
 
+    void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
+                               boost::shared_ptr<BallEKF> _ballEKF);
+
 private:
     void reset();
     void receive       ()               throw(socket_error&);
@@ -80,6 +86,8 @@ private:
     //   on the Aibo's, we have neither threads nor Sensors class
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     boost::shared_ptr<Vision> vision; // access to vision processing
+    boost::shared_ptr<LocSystem> loc; // access to localization data
+    boost::shared_ptr<BallEKF> ballEKF; // access to localization data
 };
 
 #endif /* TOOLConnect_H */

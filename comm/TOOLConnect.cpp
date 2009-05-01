@@ -31,12 +31,20 @@ TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
                           shared_ptr<Vision> v)
     : Thread(_synchro, "TOOLConnect"),
       state(TOOL_REQUESTING),
-      sensors(s), vision(v)
+      sensors(s), vision(v),
+      loc(), ballEKF()
 {
 }
 
 TOOLConnect::~TOOLConnect ()
 {
+}
+
+void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
+                                         shared_ptr<BallEKF> _ballEKF)
+{
+  loc = _loc;
+  ballEKF = _ballEKF;
 }
 
 void
@@ -187,6 +195,14 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
         // send thresholded image
         serial.write_bytes(&vision->thresh->thresholded[0][0],
                            IMAGE_WIDTH * IMAGE_HEIGHT);
+
+    if (r.local) {
+        // send localization data
+        float loc_values[19];
+        if (loc.get()) {
+        }
+    }
+
 }
 
 void
