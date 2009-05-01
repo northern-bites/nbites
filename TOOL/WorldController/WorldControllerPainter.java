@@ -58,8 +58,8 @@ public class WorldControllerPainter implements RobotListener
     public static final double DRAW_NUM_SD_RADI = 2.;
     public static final double POSITION_DOT_RADIUS = 2.;
     public static final double LANDMARK_SEEN_RADIUS = 4.;
-    public static final double POSITION_HEADING_RADIUS = 20.;
-    public static final double PAN_HEADING_RADIUS = 15.;
+    public static final double POSITION_HEADING_RADIUS = 10.;
+    public static final double PAN_HEADING_RADIUS = 25.;
     public static final double HEADING_UNCERT_RADIUS = 20.;
 
     // Ball drawing
