@@ -6,19 +6,19 @@ import ChaseBallTransitions as transitions
 import man.motion.SweetMoves as SweetMoves
 
 def chase(player):
-    if player.brain.ball.on:
+    if player.brain.ball.on and constants.USE_LOC_CHASE:
         return player.goNow('positionOnBall')
-    if transitions.shouldScanFindBall(player):
+    elif transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
-    if transitions.shouldSpinFindBall(player):
+    elif transitions.shouldSpinFindBall(player):
         return player.goNow('spinFindBall')
-    if transitions.shouldApproachBall(player):
+    elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
-    if transitions.shouldTurnToBall_ApproachBall(player):
+    elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goNow('turnToBallFar')
-    if transitions.shouldSpinFindBall(player):
+    elif transitions.shouldSpinFindBall(player):
         return player.goNow('spinFindBall')
-    if transitions.shouldTurnToBallClose(player):
+    elif transitions.shouldTurnToBallClose(player):
         return player.goNow('turnToBallClose')
     else :
         return player.goNow('scanFindBall')

@@ -63,17 +63,12 @@ class SoccerFSA(FSA.FSA):
         Wrapper method to easily change the walk vector of the robot
         """
         if x == 0 and y == 0 and theta == 0:
-            if (self.brain.nav.currentState == 'stopped' or
-                self.brain.nav.currentState == 'stop'):
-                return
-            else:
-                self.brain.nav.setWalk(x,y,theta)
-                self.brain.nav.switchTo('stop')
+            self.stopWalking()
         else:
             if self.brain.nav.setWalk(x,y,theta):
                 self.brain.nav.switchTo('walking')
             else:
-                self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) + "is ignored")
+                if False: self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) + " is ignored")
 
     def standup(self):
         if self.brain.motion.isWalkActive():
@@ -87,7 +82,12 @@ class SoccerFSA(FSA.FSA):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
-        self.brain.nav.switchTo('stop')
+        if (self.brain.nav.currentState == 'stopped' or
+            self.brain.nav.currentState == 'stop'):
+            return
+        else:
+            self.brain.nav.setWalk(0,0,0)
+            self.brain.nav.switchTo('stop')
 
     def setHeads(self,yawv,pitchv):
         """

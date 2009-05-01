@@ -8,7 +8,7 @@ GIVE_UP_THRESH = 200
 
 
 BALL_BEARING_THRESH = 12
-
+USE_LOC_CHASE = False
 
 # close approach/turn thresholds
 BALL_CLOSE_DIST_THRESH = 42
