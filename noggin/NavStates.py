@@ -29,6 +29,7 @@ def spinToWalkHeading(nav):
         nav.changeSpinDirCounter = 0
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
+        nav.brain.CoA.setTurnGait(nav.brain.motion)
         if DEBUG: nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -80,6 +81,7 @@ def walkToPoint(nav):
         nav.noWalkSet  = True
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         if DEBUG: nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -119,6 +121,7 @@ def spinToFinalHeading(nav):
         nav.noWalkSet  = True
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
+        nav.brain.CoA.setTurnGait(nav.brain.motion)
         nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -141,6 +144,7 @@ def walking(nav):
     State to be used when setSpeed is called
     """
     if nav.firstFrame() or nav.updatedTrajectory:
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.printf("New walk is (" + str(nav.walkX) + ", " +
                    str(nav.walkY) + ", " + str(nav.walkTheta) + ")")
         nav.setSpeed(nav.walkX, nav.walkY, nav.walkTheta)
