@@ -10,7 +10,7 @@ GOTO_SURE_THRESH = 5
 
 CHANGE_SPIN_DIR_THRESH = 3
 
-DEBUG = True
+DEBUG = False
 # States for the standard spin - walk - spin go to
 def spinToWalkHeading(nav):
     """
@@ -47,6 +47,8 @@ def spinToWalkHeading(nav):
         spinDir = newSpinDir
         nav.curSpinDir = spinDir
         nav.changeSpinDirCounter = 0
+        if DEBUG: nav.printf("Switching spin directions my.h " + str(nav.brain.my.h)+
+                   " and my target h: " + str(targetH))
     else:
         spinDir = nav.curSpinDir
 

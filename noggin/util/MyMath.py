@@ -94,8 +94,34 @@ def getTargetHeading(my, targetX, targetY):
     '''determine the heading facing a target x, y'''
     return sub180Angle(degrees(safe_atan2(targetY - my.y, targetX - my.x)))
 
-def getSpinDir(my, targetH):
+def oldGetSpinDir(my, targetH):
     return sign(targetH - my.h)
+
+def getSpinDir(my, targetH):
+    """
+    Advanced function to get the spin direction for a given heading.
+    The complicated logic deals with the potential fluctuation of a targetH
+    around the discontinuity at -180.
+    We compute two distances, each one represents going around the circle
+    in either the left or the right directions (by adding 360 in some cases)
+    """
+    SPIN_LEFT = 1
+    SPIN_RIGHT = -1
+
+    myh = my.h
+    distLeft = 0
+    distRight = 0
+    if targetH < 0:
+        distLeft = abs( (targetH + 360) - myh )
+        distRight = abs(targetH - myh)
+    else:
+        distleft = abs(targetH - myh)
+        distRight = abs((targetH - 360) -myh)
+
+    if distRight < distLeft:
+        return SPIN_RIGHT
+    else:
+        return SPIN_LEFT
 
 def getSign(x):
     if x < 0:
