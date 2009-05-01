@@ -95,6 +95,9 @@ void Noggin::initializeLocalization()
     set_loc_reference(loc);
     set_ballEKF_reference(ballEKF);
     c_init_localization();
+
+    // Set the comm localization access pointers
+    comm->setLocalizationAccess(loc, ballEKF);
 }
 
 bool Noggin::import_modules ()

@@ -219,6 +219,12 @@ PyComm_stopTOOL (PyObject *self, PyObject *)
   return Py_None;
 }
 
+void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
+                                 shared_ptr<BallEKF> _ballEKF)
+{
+  tool.setLocalizationAccess(_loc, _ballEKF);
+}
+
 static PyObject *
 PyComm_getRobotName (PyObject *self, PyObject *)
 {

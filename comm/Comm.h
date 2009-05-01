@@ -34,11 +34,14 @@ class Comm
     int start();
     void stop();
     void run();
+
     int  startTOOL();
     void stopTOOL();
     const boost::shared_ptr<TriggeredEvent> getTOOLTrigger() {
         return tool.getTrigger();
     }
+    void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
+                               boost::shared_ptr<BallEKF> _ballEKF);
 
     void discover_broadcast();
     void error(socket_error err) throw();
