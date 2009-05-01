@@ -40,7 +40,8 @@ public:
                  const float _lSwHRAdd,const float _rSwHRAdd,
                  const float _lZMPSwOffY,const float _rZMPSwOffY,
                  const float maxx_mms, const float maxy_mms,
-                 const float maxtheta_rads)
+                 const float maxtheta_rads,
+                 const float _sensorFeedback)
         :MotionCommand(MotionConstants::GAIT),
          gait(_motion_frame_length_s,_bh, //HACK
               _hox, _yao, _dur,
@@ -48,7 +49,7 @@ public:
               _footLengthX, _dblInactivePerc,
               _lSwHRAdd,_rSwHRAdd,
               _lZMPSwOffY,_rZMPSwOffY,
-              maxx_mms,maxy_mms,maxtheta_rads)
+              maxx_mms,maxy_mms,maxtheta_rads, _sensorFeedback)
         {
         }
     const WalkingParameters getGait() const {return gait;}

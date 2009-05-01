@@ -14,7 +14,8 @@ MARVIN_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        0.90,  # right zmp off
                                        10.0,  # max x speed
                                        5.0,   # max y speed
-                                       30.0)  # max theta speed()
+                                       30.0,  # max theta speed()
+                                       0.0)   #sensorScale
 
 TRILLIAN_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                          1.40,  # hip offset x
@@ -30,8 +31,8 @@ TRILLIAN_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                          0.9,  # right zmp off
                                          10.0,  # max x speed
                                          5.0,   # max y speed
-                                         30.0)  # max theta speed()
-
+                                         30.0,  # max theta speed()
+                                         0.0)   #sensorScale
 SLARTI_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        1.40,  # hip offset x
                                        0.0,  # x-axis angle offset
@@ -46,7 +47,8 @@ SLARTI_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        0.60,  # right zmp off
                                        10.0,  # max x speed
                                        5.0,   # max y speed
-                                       30.0)  # max theta speed()
+                                       30.0,  # max theta speed()
+                                       0.0)   #sensorScale
 
 ZAPHOD_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        1.40,  # hip offset x
@@ -62,7 +64,8 @@ ZAPHOD_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        0.90,  # right zmp off
                                        10.0,  # max x speed
                                        5.0,   # max y speed
-                                       30.0)  # max theta speed()
+                                       30.0,   # max theta speed()
+                                       0.0)   #sensorScale
 
 
 #MISC EXPERIMENTAL GAITS
@@ -82,7 +85,9 @@ TRILLIAN_SLOW_GAIT = motion.GaitCommand(31.00, # com height
                                         0.85,  # right zmp off
                                         10.0,  # max x speed
                                         5.0,   # max y speed
-                                        30.0)  # max theta speed()
+                                        30.0,   # max theta speed()
+                                        1.0)   #sensorScale
+
 TRILLIAN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                           1.40,  # hip offset x
                                           0.0,  # x-axis angle offset
@@ -97,7 +102,8 @@ TRILLIAN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                           0.6,  # right zmp off
                                           7.0,  # max x speed
                                           4.0,   # max y speed
-                                          30.0)  # max theta speed()
+                                          30.0,   # max theta speed()
+                                          1.0)   #sensorScale
 
 ZAPHOD_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         1.40,  # hip offset x
@@ -113,7 +119,8 @@ ZAPHOD_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         0.6,  # right zmp off
                                         7.0,  # max x speed
                                         4.0,   # max y speed
-                                        30.0)  # max theta speed()
+                                        30.0,   # max theta speed()
+                                        1.0)   #sensorScale
 
 SLARTI_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         1.40,  # hip offset x
@@ -129,7 +136,9 @@ SLARTI_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         0.6,  # right zmp off
                                         7.0,  # max x speed
                                         4.0,   # max y speed
-                                        30.0)  # max theta speed()
+                                        30.0,   # max theta speed()
+                                        1.0)   #sensorScale
+
 
 MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         1.40,  # hip offset x
@@ -145,7 +154,8 @@ MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         0.6,  # right zmp off
                                         7.0,  # max x speed
                                         4.0,   # max y speed
-                                        30.0)  # max theta speed()
+                                        30.0,   # max theta speed()
+                                        1.0)   #sensorScale
 
 
 MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
@@ -162,9 +172,8 @@ MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
                                                 0.6,  # right zmp off
                                                 7.0,  # max x speed
                                                 4.0,  # max y speed
-                                                30.0) # max theta speed()
-
-
+                                                30.0,  # max theta speed()
+                                                1.0)   #sensorScale
 #DEFAULT GAIT ASSIGNMENTS
 
 TRILLIAN_GAIT = TRILLIAN_MEDIUM_GAIT

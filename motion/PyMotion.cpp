@@ -19,7 +19,7 @@
 // <http://www.gnu.org/licenses/>.
 //For gaitcommands
 
-#define BOOST_PYTHON_MAX_ARITY 16
+#define BOOST_PYTHON_MAX_ARITY 17
 
 #include <Python.h>
 #include <boost/python.hpp>
@@ -73,7 +73,8 @@ public:
                    const float _footLengthX, const float _dblInactivePerc,
                    const float _lSwHRAdd,const float _rSwHRAdd,
                    const float _lZMPSwOffY,const float _rZMPSwOffY,
-                   const float maxx, const float maxy, const float maxtheta)
+                   const float maxx, const float maxy, const float maxtheta,
+                   const float sensorFeedback)
 
         : command(new GaitCommand(0.02,_bh*CM_TO_MM, //HACK
                                   _hox*CM_TO_MM, _yao*TO_RAD, _dur,
@@ -81,7 +82,8 @@ public:
                                   _footLengthX*CM_TO_MM, _dblInactivePerc,
                                   _lSwHRAdd*TO_RAD,_rSwHRAdd*TO_RAD,
                                   _lZMPSwOffY*CM_TO_MM,_rZMPSwOffY*CM_TO_MM,
-                                  maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD))
+                                  maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD,
+                                  sensorFeedback))
         {
         }
 
@@ -258,12 +260,13 @@ BOOST_PYTHON_MODULE(_motion)
                           float, float, float, float,
                           float, float, float, float,
                           float, float, float, float,
-                          float, float, float>(
+                          float, float, float, float>(
 "A container for setting the walking gait of the robot. "
 "(bodyHeight,hipOffsetX,XAngleOffset,stepDuration,doubleSupportFraction,"
 "stepHeight,"
 "footLengthX,dblSupInactivePercentage,leftSwingHipRollAddition,"
-"rightSwingHipRollAddition,leftZMPSwingOffsetY,rightZMPSwingOffsetY"))
+"rightSwingHipRollAddition,leftZMPSwingOffsetY,rightZMPSwingOffsetY,"
+"sensorFeedback"))
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple, tuple, int>(
