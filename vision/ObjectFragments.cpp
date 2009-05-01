@@ -1704,7 +1704,7 @@ int ObjectFragments::crossCheck(blob b) {
     int h = blobHeight(b);
     int w = blobWidth(b);
     //int need = min(w / 2, 20);
-    int need = min(w, 20);
+    int need = max(w, 10);
 
     for (int i = 0; i < h / 5 && biggest < need; i+=1) {
         int tx = xProject(x, y, y + i);
