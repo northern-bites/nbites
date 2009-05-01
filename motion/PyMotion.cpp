@@ -26,6 +26,7 @@
 #include <boost/python/object.hpp>
 #include <boost/python/module.hpp>
 #include <boost/python/args.hpp>
+#include <boost/shared_ptr.hpp>
 using namespace std;
 using namespace boost::python;
 
@@ -72,22 +73,22 @@ public:
                    const float _footLengthX, const float _dblInactivePerc,
                    const float _lSwHRAdd,const float _rSwHRAdd,
                    const float _lZMPSwOffY,const float _rZMPSwOffY,
-                   const float maxx, const float maxy, const float maxtheta){
-//         const float _hox = 3.10f;
-//         const float _yao = 0.0f;
-        command = new GaitCommand(0.02,_bh*CM_TO_MM, //HACK
+                   const float maxx, const float maxy, const float maxtheta)
+
+        : command(new GaitCommand(0.02,_bh*CM_TO_MM, //HACK
                                   _hox*CM_TO_MM, _yao*TO_RAD, _dur,
                                   _dblSupFrac, _stepHeight*CM_TO_MM,
                                   _footLengthX*CM_TO_MM, _dblInactivePerc,
                                   _lSwHRAdd*TO_RAD,_rSwHRAdd*TO_RAD,
                                   _lZMPSwOffY*CM_TO_MM,_rZMPSwOffY*CM_TO_MM,
-                                  maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD);
-    }
+                                  maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD))
+        {
+        }
 
-    GaitCommand* getCommand() const { return command; }
+    boost::shared_ptr<GaitCommand> getCommand() const { return command; }
 
 private:
-    GaitCommand *command;
+    boost::shared_ptr<GaitCommand> command;
 };
 
 

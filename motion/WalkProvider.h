@@ -66,7 +66,7 @@ public:
             pthread_mutex_unlock(&walk_provider_mutex);
         }
 	void setCommand(const WalkCommand * command);
-	void setCommand(const GaitCommand * command);
+	void setCommand(const boost::shared_ptr<GaitCommand> command);
     BodyJointCommand * getGaitTransitionCommand();
     MotionModel getOdometryUpdate(){
         const std::vector<float> odo = stepGenerator.getOdometryUpdate();
