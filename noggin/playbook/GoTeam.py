@@ -314,8 +314,8 @@ class GoTeam:
 
         # loop through teammates
         for mate in self.teammates:
-            if (mate.isPenalized()): # or mate.isDead()
-                #reset to true when we get a new packet from mate
+            if (mate.isPenalized() or mate.isDead()): # 
+                #reset to false when we get a new packet from mate
                 mate.inactive = True
             if (mate.ballDist > 0):
                 self.brain.ball.reportBallSeen()

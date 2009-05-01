@@ -79,8 +79,8 @@ class Teammate:
         self.kicking = False
         #(packet.ballDist == 
         #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
-
         self.lastPacketTime = time.time()
+
 
     def updateMe(self):
         '''updates my information as a teammate (since we don't get our own 
