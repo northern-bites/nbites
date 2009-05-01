@@ -29,7 +29,7 @@ def spinToWalkHeading(nav):
         nav.changeSpinDirCounter = 0
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        nav.brain.CoA.setTurnGait(nav.brain.motion)
+        nav.brain.CoA.setRobotTurnGait(nav.brain.motion)
         if DEBUG: nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -121,7 +121,7 @@ def spinToFinalHeading(nav):
         nav.noWalkSet  = True
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        nav.brain.CoA.setTurnGait(nav.brain.motion)
+        nav.brain.CoA.setRobotTurnGait(nav.brain.motion)
         nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -165,6 +165,7 @@ def stop(nav):
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
+
     return nav.stay()
 
 def stopped(nav):
