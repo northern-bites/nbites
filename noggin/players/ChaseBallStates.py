@@ -28,14 +28,15 @@ def scanFindBall(player):
     State to move the head to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we spin to keep looking
     '''
-    if player.firstFrame() or  \
-            player.brain.ball.framesOff > constants.FRAMES_OFF_THRESH:
-
-        player.brain.tracker.switchTo('scanBall')
+    if player.firstFrame():
         player.stopWalking()
+
+    if player.brain.ball.framesOff > constants.FRAMES_OFF_THRESH:
+        player.brain.tracker.trackBall()
+
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
-        return player.goNow('positionOnBall')
+#        return player.goNow('positionOnBall')
 
     if transitions.shouldTurnToBall_FoundBall(player):
         return player.goNow('turnToBallFar')
@@ -50,18 +51,22 @@ def spinFindBall(player):
     State to spin to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we go to a garbage state
     '''
-    if player.firstFrame():
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+
+    if player.firstFrame() and player.stoppedWalk:
         player.setSpeed(constants.X_SPEED_TO_BALL,
                         constants.Y_SPIN_SPEED,
                         constants.SPIN_SPEED)
         player.brain.tracker.stopHeadMoves()
+
     if not player.brain.motion.isHeadActive():
         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
 
 
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
-        return player.goNow('positionOnBall')
+#        return player.goNow('positionOnBall')
     
     if transitions.shouldTurnToBall_FoundBall(player):
         return player.goNow('turnToBallFar')
@@ -82,10 +87,15 @@ def turnToBallFar(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    turnRate = MyMath.clip(player.brain.ball.bearing*0.3,
-                           -constants.BALL_SPIN_SPEED,
-                           constants.BALL_SPIN_SPEED)
-    player.setSpeed(x=0,y=0,theta=turnRate)
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+
+    ball = player.brain.ball
+    if player.stoppedWalk and ball.on:
+        turnRate = MyMath.clip(ball.bearing*0.3,
+                               -constants.BALL_SPIN_SPEED,
+                               constants.BALL_SPIN_SPEED)
+        player.setSpeed(x=0,y=0,theta=turnRate)
 
     if transitions.shouldApproachBall(player):
         return player.goLater('approachBall')
@@ -99,8 +109,11 @@ def approachBall(player):
     if player.firstFrame():
         player.stopWalking()
 
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+
     ball = player.brain.ball
-    if ball.on:
+    if ball.on and player.stoppedWalk:
         targetX = math.cos(math.radians(ball.bearing))*ball.dist
         targetY = math.sin(math.radians(ball.bearing))*ball.dist
         maxTarget = max(abs(targetX),abs(targetY))
@@ -124,9 +137,12 @@ def turnToBallClose(player):
     if player.firstFrame():
         player.stopWalking()
 
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
 
     ball = player.brain.ball
-    if ball.on:
+    if ball.on and player.stoppedWalk:
+
         turnRate = MyMath.clip(ball.bearing*0.8,
                                -constants.BALL_SPIN_SPEED,
                                constants.BALL_SPIN_SPEED)
@@ -150,9 +166,13 @@ def approachBallClose(player):
     if player.firstFrame():
         player.stopWalking()
 
-    if player.brain.ball.on:
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+
+    ball = player.brain.ball
+    if ball.on and player.stoppedWalk:
         bearing = player.brain.ball.bearing
-        ball = player.brain.ball
+
         targetX = math.cos(math.radians(ball.bearing))*ball.dist
         targetY = math.sin(math.radians(ball.bearing))*ball.dist
 
@@ -162,7 +182,6 @@ def approachBallClose(player):
         sY = (targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN
 
         player.setSpeed(sX,sY,0)
-
 
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
@@ -179,12 +198,17 @@ def positionForKick(player):
     if player.firstFrame():
         player.stopWalking()
 
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+
     ball = player.brain.ball
-    if ball.on:
+    if ball.on and player.stoppedWalk:
+
         # Put yourself with your left foot
         # in front of the ball
-         targetX = math.cos(math.radians(ball.bearing))*ball.dist
-         targetY = math.sin(math.radians(ball.bearing))*ball.dist
+         targetX = (math.cos(math.radians(ball.bearing))*ball.dist)*constants.POS_KICK_TARGET_X_GAIN
+         targetY = (math.sin(math.radians(ball.bearing))*ball.dist +
+                    constants.BALL_KICK_LEFT_Y_R )*constants.POS_KICK_TARGET_Y_GAIN
 
          maxTarget = max(abs(targetX),abs(targetY))
 
@@ -206,7 +230,11 @@ def turnForKick(player):
         player.stopWalking()
 
     ball = player.brain.ball
-    if ball.on:
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+
+    if ball.on and player.stoppedWalk:
+
         desiredTurn = ball.bearing*0.8
 
         turnRate = MyMath.clip(desiredTurn,
@@ -226,6 +254,7 @@ def turnForKick(player):
     return player.stay()
 
 def kickBall(player):
+    print "ball at (relx,rely) = (", player.brain.ball.locRelX, " , ", player.brain.ball.locRelY, ")"
     if player.firstFrame():
         player.stopWalking()
     if player.counter == 2:
