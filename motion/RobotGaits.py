@@ -16,21 +16,21 @@ MARVIN_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        5.0,   # max y speed
                                        30.0)  # max theta speed()
 
-TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00, # com height
-                                        1.40,  # hip offset x
-                                        0.0,  # x-axis angle offset
-                                        0.50,  # step duration
-                                        0.1,   # fraction in double support
-                                        1.65,  # stepHeight
-                                        0.0,   # footLengthX
-                                        0.4,   # zmp static percentage
-                                        5.0,   # left swing hip roll addition
-                                        5.0,   # right swing hip roll addition
-                                        0.60,  # left zmp off
-                                        0.60,  # right zmp off
-                                        10.0,  # max x speed
-                                        5.0,   # max y speed
-                                        30.0)  # max theta speed()
+TRILLIAN_FAST_GAIT =  motion.GaitCommand(31.00, # com height
+                                         1.40,  # hip offset x
+                                         0.0,  # x-axis angle offset
+                                         0.50,  # step duration
+                                         0.15,   # fraction in double support
+                                         1.55,  # stepHeight
+                                         0.0,   # footLengthX
+                                         0.4,   # zmp static percentage
+                                         6.0,   # left swing hip roll addition
+                                         6.0,   # right swing hip roll addition
+                                         0.9,  # left zmp off
+                                         0.9,  # right zmp off
+                                         10.0,  # max x speed
+                                         5.0,   # max y speed
+                                         30.0)  # max theta speed()
 
 SLARTI_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        1.40,  # hip offset x
@@ -167,7 +167,7 @@ MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
 
 #DEFAULT GAIT ASSIGNMENTS
 
-TRILLIAN_GAIT = TRILLIAN_MEDIUM_GAIT
+TRILLIAN_GAIT = TRILLIAN_FAST_GAIT
 ZAPHOD_GAIT   =   ZAPHOD_MEDIUM_GAIT
 SLARTI_GAIT   =   SLARTI_MEDIUM_GAIT
 MARVIN_GAIT   =   MARVIN_MEDIUM_GAIT
