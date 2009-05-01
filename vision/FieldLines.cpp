@@ -104,6 +104,7 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     debugIntersectLines = false;
     debugProcessCorners = false;
     debugIdentifyCorners = false;
+    debugCornerAndObjectDistances = false;
     debugCcScan = false;
 
     debugBallCheck = false;
@@ -2401,6 +2402,62 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             }
             ++numChecksPassed;
 
+            // Find which end of each line is closer to the potential corner
+            point<int> line1Closer;
+            point<int> line2Closer;
+
+            if (Utility::getLength(intersectX, intersectY,
+                                   i->start.x, i->start.y) <
+                Utility::getLength(intersectX, intersectY,
+                                   i->end.x, i->end.y)) {
+                line1Closer = i->start;
+            }
+            else
+                line1Closer = i->end;
+
+            if (Utility::getLength(intersectX, intersectY,
+                                   j->start.x, j->start.y) <
+                Utility::getLength(intersectX, intersectY,
+                                   j->end.x, j->end.y)) {
+                line2Closer = j->start;
+            }
+            else
+                line2Closer = j->end;
+
+            if (debugIntersectLines)
+                cout << "Corner is close to line endpoint " << line1Closer
+                     << " and " << line2Closer << endl;
+
+            float percent1 = percentSurrounding((line1Closer.x + intersectX)/2,
+                                               (line1Closer.y + intersectY)/2,
+                                               FIELD_COLORS,
+                                               NUM_FIELD_COLORS,
+                                               1);
+            float percent2 = percentSurrounding((line2Closer.x + intersectX)/2,
+                                               (line2Closer.y + intersectY)/2,
+                                               FIELD_COLORS,
+                                               NUM_FIELD_COLORS,
+                                               1);
+            if (debugIntersectLines)
+                cout << "Percent green in between line 1 and corner: "
+                     << percent1 << ". between line 2 --- : " << percent2
+                     << endl;
+
+            const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 66.0f;
+            if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
+                percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
+                if (debugIntersectLines) {
+                    cout <<"\t" << numChecksPassed
+                         << "-There was too much green between the corner and"
+                        " the endpoints of the two lines." << endl;
+                    cout << "\t " << "b/w corner and line1: " << percent1
+                         << "\t " << " and line 2: " << percent2 << endl;
+                }
+                continue;
+            }
+            ++numChecksPassed;
+
+
             // Make sure the intersection point stands out, even against balls
             vision->thresh->drawPoint(intersectX - 1, intersectY, BLACK);
             vision->thresh->drawPoint(intersectX + 1, intersectY, BLACK);
@@ -2772,7 +2829,11 @@ getPossibleClassifications(const VisualCorner &corner,
                 if (debugIdentifyCorners) {
                     cout << "\tDistance between " << (*j)->toString() << " and "
                          << (*k)->toString() << " was fine! Relative error of "
-                         << relativeError << endl;
+                         << relativeError
+                         << " corner pos: (" << (*j)->getFieldX() << ","
+                         << (*j)->getFieldY()
+                         << " goal pos: (" << (*k)->getFieldX() << ","
+                         << (*k)->getFieldY() << endl;
                 }
                 numCorroboratingObjects++;
             }
@@ -2793,7 +2854,11 @@ getPossibleClassifications(const VisualCorner &corner,
                 if (debugIdentifyCorners) {
                     cout << "\tDistance between " << (*j)->toString() << " and "
                          << (*k)->toString() << " was fine! Absolute error of "
-                         << absoluteError << endl;
+                         << absoluteError
+                         << " corner pos: (" << (*j)->getFieldX() << ","
+                         << (*j)->getFieldY()
+                         << " goal pos: (" << (*k)->getFieldX() << ","
+                         << (*k)->getFieldY() << endl;
                 }
                 numCorroboratingObjects++;
             }
@@ -3587,7 +3652,7 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
         objDist = objBottomEst.dist;
         // Keep the bearing positive in this case as it matches the coordinate
         // system of the corner bearing
-        objBearing = objBottomEst.bearing * RAD_OVER_DEG;
+        objBearing = objBottomEst.bearing;// * RAD_OVER_DEG;
     }
 
     else {
@@ -3595,12 +3660,12 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
         objDist = obj->getDistance();
         // NOTE: since our corner and object coordinate systems are reversed, take
         // the negative of the corner bearing
-        objBearing = -obj->getBearing() * RAD_OVER_DEG;
+        objBearing = -obj->getBearing();// * RAD_OVER_DEG;
     }
 
     float cornerDist = c->getDistance();
     // Convert degrees to radians for the sin/cos formulas
-    float cornerBearing = c->getBearing() * RAD_OVER_DEG;
+    float cornerBearing = c->getBearing();// * RAD_OVER_DEG;
 
     // We want the objY to always be Positive because it is away from your body
     float cornerX = cornerDist * sin(cornerBearing);
