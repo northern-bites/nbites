@@ -22,7 +22,7 @@ def scanBall(tracker):
 def locPans(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
-        tracker.execute(SweetMoves.LOC_PANS)
+        tracker.execute(SweetMoves.QUICK_PANS)
     return tracker.stay()
 
 def panLeftOnce(tracker):

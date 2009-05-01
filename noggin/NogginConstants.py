@@ -14,6 +14,7 @@ USE_SNAPSHOT = True # Enable if you want to take pictures with spacebar
 
 # LED Related #
 DEBUG_BALL_LEDS = True
+DEBUG_GOAL_LEDS = True
 
 # Localization Related
 ODOMETRY_DEBUG = False
