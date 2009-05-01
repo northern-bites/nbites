@@ -25,4 +25,5 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    return player.goNow('scanFindBall')
+    roleState = player.getRoleState(player.currentRole)
+    return player.goNow(roleState)
