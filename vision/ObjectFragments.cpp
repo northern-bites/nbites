@@ -1703,7 +1703,8 @@ int ObjectFragments::crossCheck(blob b) {
     int y = b.leftTop.y;
     int h = blobHeight(b);
     int w = blobWidth(b);
-    int need = min(w / 2, 20);
+    //int need = min(w / 2, 20);
+    int need = min(w, 20);
 
     for (int i = 0; i < h / 5 && biggest < need; i+=1) {
         int tx = xProject(x, y, y + i);
@@ -2778,13 +2779,13 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
         return post;
     }
 
-    post = crossCheck2(pole);        // look for the crossbar
-    if (post != NOPOST) {
-        if (POSTLOGIC) {
-            cout << "Found crossbar2 " << post << endl;
-        }
-        return post;
-    }
+    // post = crossCheck2(pole);        // look for the crossbar
+    // if (post != NOPOST) {
+    //     if (POSTLOGIC) {
+    //         cout << "Found crossbar2 " << post << endl;
+    //     }
+    //     return post;
+    // }
 
     // //post = triangle(pole);        // look for the triangle
     // if (post != NOPOST) {
