@@ -844,6 +844,17 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             float distw = getGoalPostDistFromWidth(width);
             float disth = getGoalPostDistFromHeight(height);
 
+            	    const float bottomLeftX = objPtr->getLeftBottomX();
+		  const float bottomRightX = objPtr->getRightBottomX();
+		  const float bottomLeftY = objPtr->getLeftBottomY();
+		  const float bottomRightY = objPtr->getRightBottomY();
+
+		  const float bottomOfObjectX = (bottomLeftX + bottomRightX) * 0.5f;
+		  const float bottomOfObjectY = (bottomLeftY + bottomRightY) * 0.5f;
+		  const float poseDist = pose->pixEstimate(bottomOfObjectX,
+					   bottomOfObjectY,
+					   0).dist;
+
             switch (cert) {
             case HEIGHT_UNSURE:
                 // NOTE: turning this off, if the height is unsure, it probably
@@ -855,35 +866,30 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 //     dist = disth;
                 // else
                 dist = distw;
+		if (distw < 200 && bottomOfObjectY < IMAGE_HEIGHT - 2) {
+		  dist = poseDist;
+		}
                 break;
             case WIDTH_UNSURE:
                 dist = disth;
                 break;
             case BOTH_UNSURE:
                 // We choose the min distance here, since that means more pixels
-                dist = min(disth, distw);
+	      if (bottomOfObjectY < IMAGE_HEIGHT - 4)
+		dist = min( poseDist, min(disth, distw));
+	      else
+		dist = min( disth, distw);
                 break;
             case BOTH_SURE:
                 dist = disth;
                 break;
             }
-#if defined OFFLINE && defined PRINT_VISION_INFO
-            const float bottomLeftX = objPtr->getLeftBottomX();
-            const float bottomRightX = objPtr->getRightBottomX();
-            const float bottomLeftY = objPtr->getLeftBottomY();
-            const float bottomRightY = objPtr->getRightBottomY();
-
-            const float bottomOfObjectX = (bottomLeftX + bottomRightX) * 0.5f;
-            const float bottomOfObjectY = (bottomLeftY + bottomRightY) * 0.5f;
-
-            const float poseDist = pose->pixEstimate(bottomOfObjectX,
-                                                     bottomOfObjectY,
-                                                     0).dist; // 0 elevation
-
+	    #if defined OFFLINE && defined PRINT_VISION_INFO
+            
             print("{%g,%g},", poseDist, dist);
 
             print("goal post dist: %g %g %g\n", dist, distw, disth);
-#endif
+	    #endif
 
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
@@ -958,7 +964,7 @@ float Threshold::getGoalPostDistFromHeight(float height) {
     return 17826*pow((double) height,-1.0254);
 #else
     // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
-    return 11139.1636f * pow(height, -0.9344f);
+    return 32880.0f/height - 11.8597f;
 #endif
 }
 
@@ -973,7 +979,7 @@ float Threshold::getGoalPostDistFromWidth(float width) {
     return 2360.1*pow((double) width,-1.0516);
 #else
     // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
-    return 7630.7708f*pow(width, -1.2850f);
+    return 3116.59f/width + 21.75;
 #endif
 }
 
