@@ -135,9 +135,9 @@ void NaoEnactor::sendHardness(){
     hardness_command[4][0] = dcmProxy->getTime(0);
 
 	// Turn off slarti shoulder!
-#ifdef ROBOT_NAME_zaphod
-    hardness_command[5][3][0] = -1.0f;
-#endif
+// #ifdef ROBOT_NAME_zaphod
+//     hardness_command[5][3][0] = -1.0f;
+// #endif
 
 #ifndef NO_ACTUAL_MOTION
     try {

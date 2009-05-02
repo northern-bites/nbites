@@ -75,7 +75,7 @@ def spinFindBall(player):
 #         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
 
 
-    if player.brain.ball.on:
+    if player.brain.ball.on and constants.USE_LOC_CHASE:
         player.brain.tracker.trackBall()
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
