@@ -66,6 +66,8 @@ void Noggin::initializePython(shared_ptr<Vision> v)
     printf("  Initializing interpreter and extension modules\n");
 #endif
 
+    brain_module = NULL;
+
     // Initialize low-level modules
     c_init_sensors();
     init_leds();
@@ -115,15 +117,15 @@ void Noggin::initializeLocalization()
 
 bool Noggin::import_modules ()
 {
-#ifdef  DEBUG_NOGGIN_INITIALIZATION
-    printf("  Importing noggin.Brain\n");
-#endif
-
     // Load Brain module
     //
-    if (brain_module == NULL)
+    if (brain_module == NULL) {
         // Import brain module
+#ifdef  DEBUG_NOGGIN_INITIALIZATION
+        printf("  Importing noggin.Brain\n");
+#endif
         brain_module = PyImport_ImportModule(BRAIN_MODULE);
+    }
 
     if (brain_module == NULL) {
         // error, couldn't import noggin.Brain
@@ -143,9 +145,12 @@ void Noggin::reload_hard ()
     // finalize and reinitialize the Python interpreter
     Py_Finalize();
     Py_Initialize();
-
     // load C extension modules
     initializePython(vision);
+    // import noggin.Brain and instantiate a Brain reference
+    import_modules();
+    // Instantiate a Brain instance
+    getBrainInstance();
 }
 
 void Noggin::reload_brain ()
@@ -211,6 +216,13 @@ void Noggin::runStep ()
         return;
 #endif
 
+    static int step_count = 0;
+
+    step_count ++;
+    if (step_count % 30 == 0) {
+      printf("performing hard Noggin reload\n");
+      reload_hard();
+    }
 
     //Check button pushes for game controller signals
     processGCButtonClicks();
