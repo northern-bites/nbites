@@ -156,6 +156,12 @@ CONFIGURE_FILE(
   )
 
 
+CONFIGURE_FILE(
+  ${MAN_CMAKE_DIR}/nameconfig.in
+  ${NBCOMMON_INCLUDE_DIR}/nameconfig.h
+  ESCAPE_QUOTES
+  )
+
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}

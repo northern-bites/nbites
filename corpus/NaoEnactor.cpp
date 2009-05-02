@@ -17,6 +17,8 @@ using namespace ALNames;
 #include "Kinematics.h"
 using Kinematics::jointsMaxVelNoLoad;
 
+#include "nameconfig.h"
+
 void staticPostSensors(NaoEnactor * n) {
     n->postSensors();
 }
@@ -131,8 +133,12 @@ void NaoEnactor::sendHardness(){
         hardness_command[5][i][0] = hardness;
     }
     hardness_command[4][0] = dcmProxy->getTime(0);
+
 	// Turn off slarti shoulder!
-	//hardness_command[5][3][0] = -1.0f;
+#ifdef ROBOT_NAME_zaphod
+    hardness_command[5][3][0] = -1.0f;
+#endif
+
 #ifndef NO_ACTUAL_MOTION
     try {
         dcmProxy->setAlias(hardness_command);
