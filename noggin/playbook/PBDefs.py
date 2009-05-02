@@ -31,7 +31,7 @@ class Teammate:
 
         self.brain = tbrain        # brain instance
         self.role = 0 # known role
-        self.inactive = False # dead basically just means inactive
+        self.active = True
         self.grabbing = False # dog is grabbing
         self.dribbling = False # dog is dribbling
         self.kicking = False # dog is kicking[
@@ -69,9 +69,8 @@ class Teammate:
         self.ballLocDist = self.getDistToBall()
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
-
-        self.inactive = False
-
+        self.active = True
+        
         self.grabbing = (packet.ballDist <= 
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.dribbling = (packet.ballDist <= 
@@ -98,7 +97,7 @@ class Teammate:
         self.ballDist = self.brain.ball.dist
         self.ballLocDist = self.brain.ball.locDist
         self.ballLocBearing = self.brain.ball.locBearing
-        self.inactive = self.brain.gameController.currentState =='gamePenalized'
+        self.active = not self.brain.gameController.currentState =='gamePenalized'
         self.lastPacketTime = time.time()
         self.grabbing = (self.ballDist == 
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)

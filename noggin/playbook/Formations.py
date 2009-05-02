@@ -55,8 +55,7 @@ def fThreeField(team):
 def fDubD(team):
     if team.me.isGoalie():
         return [PBConstants.DUB_D] + Roles.rGoalie(team)
-    # If we're down a player, use different positions
-    if team.numInactiveMates == 0:
+    if team.numActiveFieldPlayers == 2:
 
         # Figure out who isn't penalized with you
         other_teammate = team.getOtherActiveTeammate()
@@ -82,7 +81,7 @@ def fDubD(team):
             subRole = PBConstants.DUBD_OFFENDER
 
     # If we are the only player, become the sweeper
-    elif team.numInactiveMates == 1:
+    elif team.numActiveFieldPlayers == 1:
         pos = (PBConstants.SWEEPER_X, PBConstants.SWEEPER_Y)
         role = PBConstants.DEFENDER
         subRole = PBConstants.SWEEPER
@@ -132,11 +131,9 @@ def fReady(team):
     '''kickoff positions'''
     if team.me.isGoalie():
         return [PBConstants.READY] + Roles.rGoalie(team)
-    # ready state depends on number of players alive
-    num_inactive_teammates = len(team.inactiveMates)
 
     # if two dogs alive, position normally
-    if num_inactive_teammates == 0:
+    if team.numActiveFieldPlayers == 2:
         if team.me.playerNumber == 2:
             return [PBConstants.READY, PBConstants.DEFENDER] + \
                 SubRoles.pReadyDefender(team)
@@ -146,7 +143,7 @@ def fReady(team):
                 SubRoles.pReadyChaser(team)
 
     # one dogs alive, alter positions a bit
-    elif num_inactive_teammates == 1:
+    elif team.numActiveFieldPlayers == 1:
         return [PBConstants.READY, PBConstants.CHASER] + \
             SubRoles.pReadyChaser(team)
 

@@ -78,8 +78,8 @@ class GoTeam:
         self.position = []
         self.me = self.teammates[self.brain.my.playerNumber - 1]
         self.me.playerNumber = self.brain.my.playerNumber
-        self.inactiveMates = [] # inactive field players only
-        self.numInactiveMates = 0
+        self.activeFieldPlayers = []
+        self.numActiveFieldPlayers = 0
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
         self.pulledGoalie = False
@@ -116,14 +116,14 @@ class GoTeam:
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
         # Now we look at shorthanded strategies
-        elif self.numInactiveMates == 1:
-            return Strategies.sOneField(self)
-        elif self.numInactiveMates == 2:
+        elif self.activeMates == 0:
             return Strategies.sNoFieldPlayers(self)
-        elif self.pulledGoalie:
+        elif self.activeMates == 1:
+            return Strategies.sOneField(self)
+        elif self.activeMates == 2:
+            return Strategies.sTwoField(self)
+        elif self.activeMates == 3:
             return Strategies.sThreeField(self)
-        # Here we have the strategy stuff
-        return Strategies.sTwoField(self)
 
     def updateStateInfo(self):
         """
@@ -227,28 +227,22 @@ class GoTeam:
         chaser_mate = self.teammates[self.brain.my.playerNumber-1]
 
         if PBConstants.DEBUG_DET_CHASER:
-            print "chaser det: me == #", self.brain.my.playerNumber
+            self.printf(("chaser det: me == #", self.brain.my.playerNumber))
         # scroll through the teammates
-        for i, mate in enumerate(self.teammates):
+        for mate in self.activeFieldPlayers:
             if PBConstants.DEBUG_DET_CHASER:
-                print "\t mate #", i+1,
-            # TEAMMATE SANITY CHECKS
-            # don't check goalie out
-            # don't check out penalized or turned-off dogs
-            if (mate.playerNumber == PBConstants.GOALIE_NUMBER or
-                mate.inactive or
-                mate.playerNumber == self.brain.my.playerNumber or
-                fabs(mate.ballY - self.brain.ball.y) > 150.0):
+                self.printf(("\t mate #", mate.playerNumber))
+
+            if (mate.playerNumber == self.brain.my.playerNumber or
+                fabs(mate.ballY - self.brain.ball.y) > 200.0):
                 if PBConstants.DEBUG_DET_CHASER:
-                    print "\t inactive or goalie or me"
+                    self.printf ("\t active or goalie or me")
                 continue
 
             # if the player has got the ball, return his number
-            if (mate.grabbing or
-                mate.dribbling or
-                mate.kicking):
+            if mate.hasBall():
                 if PBConstants.DEBUG_DET_CHASER:
-                    print "\t grabbing"
+                    self.printf("\t grabbing")
                 return mate
             # if both robots see the ball use visual distances to ball
             if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
@@ -259,13 +253,13 @@ class GoTeam:
                 chaser_mate = mate
 
             if PBConstants.DEBUG_DET_CHASER:
-                print ("\t #%d @ %g >= #%d @ %g" %
+                self.printf (("\t #%d @ %g >= #%d @ %g" %
                        (mate.playerNumber, mate.ballDist,
                         chaser_mate.playerNumber,
-                        chaser_mate.ballDist))
+                        chaser_mate.ballDist)))
 
         if PBConstants.DEBUG_DET_CHASER:
-            print "\t ---- MATE %g WINS" % (chaser_mate.playerNumber)
+            self.printf ("\t ---- MATE %g WINS" % (chaser_mate.playerNumber))
         # returns teammate instance (could be mine)
         return chaser_mate
 
@@ -280,7 +274,7 @@ class GoTeam:
 
         # if we have two positions only two possibilites of positions
         #TODO: tie-breaking?
-        else: # len(positions) == 2
+        elif len(positions) == 2:
             myDist1 = hypot(positions[0][0] - self.brain.my.x,
                             positions[0][1] - self.brain.my.y)
             myDist2 = hypot(positions[1][0] - self.brain.my.x,
@@ -318,11 +312,12 @@ class GoTeam:
         for mate in self.teammates:
             if (mate.isPenalized() or mate.isDead()): # 
                 #reset to false when we get a new packet from mate
-                mate.inactive = True
+                mate.active = False
             if (mate.ballDist > 0):
                 self.brain.ball.reportBallSeen()
-        self.inactiveMates = self.getInactiveFieldPlayers()
-        self.numInactiveMates = len(self.inactiveMates)
+        self.activeMates = self.getActiveFieldPlayers()
+        self.numActiveFieldPlayers = len(self.activeMates)
+
 
     def aPosterioriTeammateUpdate(self):
         """
@@ -331,17 +326,15 @@ class GoTeam:
         """
         pass
 
-    def getInactiveFieldPlayers(self):
-        '''cycles through teammate objects and returns teammates
-        that are 'dead'. ignores myself'''
-        inactive_teammates = []
-        for i,mate in enumerate(self.teammates):
-            if (mate.inactive and mate.playerNumber !=
-                self.brain.my.playerNumber and
-                mate.playerNumber != PBConstants.GOALIE_NUMBER):
-                #self.printf(mate.playerNumber)
-                inactive_teammates.append(mate)
-        return inactive_teammates
+    def getActiveFieldPlayers(self):
+        '''cycles through teammate objects and returns active teammates
+           including me'''
+        active_teammates = []
+        for mate in self.teammates:
+            if (mate.active and (mate.playerNumber != PBConstants.GOALIE_NUMBER 
+                                 or (mate.isGoalie() and self.goaliePulled))):
+                active_teammates.append(mate)
+        return active_teammates
 
     def highestActivePlayerNumber(self):
         '''returns true if the player is the highest active player number'''
@@ -353,7 +346,7 @@ class GoTeam:
     def teammateHasBall(self):
         '''returns True if any mate has the ball'''
         for i,mate in enumerate(self.teammates):
-            if (mate.inactive or
+            if (not mate.active or
                 mate.playerNumber == self.me.playerNumber):
                 continue
             elif (mate.hasBall()):
@@ -363,27 +356,9 @@ class GoTeam:
     def getOtherActiveTeammate(self):
         '''this returns the teammate instance of an active teammate that isn't
         you.'''
-        if self.me.playerNumber == 3:
-            return self.teammates[1] #returns player 2
-        else:
-            return self.teammates[2] #returns player 3
-
-    def getOtherActiveTeammates(self):
-        '''
-        figure out who the other active teammates are
-        '''
-        mates = []
-        for mate in self.teammates:
-            if (not mate.inactive and not mate.isGoalie()
-                and mate.playerNumber != self.me.playerNumber):
-                mates.append(mate)
-        return mates
-
-    def isGoalieInactive(self):
-        '''
-        Determines if the goalie is inactive
-        '''
-        return (self.teammates[0].inactive)
+        for mate in self.activeFieldPlayers:
+            if self.me.playerNumber != mate.playerNumber:
+                return mate
 
     def reset(self):
         '''resets all information stored from teammates'''
@@ -448,8 +423,7 @@ class GoTeam:
         Returns true if no one is chasing and they are not searching
         """
         # If everyone else is out, let's not go for the ball
-        if len(self.getInactiveFieldPlayers()) == \
-                PBConstants.NUM_TEAM_PLAYERS - 1.:
+        if len(self.getActiveFieldPlayers()) == 0:
             return False
 
         if self.brain.gameController.currentState == 'gameReady' or\
@@ -457,7 +431,7 @@ class GoTeam:
             return False
 
         for mate in self.teammates:
-            if (not mate.inactive and (mate.calledRole == PBConstants.CHASER
+            if (mate.active and (mate.calledRole == PBConstants.CHASER
                                        or mate.calledRole ==
                                        PBConstants.SEARCHER)):
                 return False
