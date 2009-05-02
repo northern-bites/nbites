@@ -209,7 +209,8 @@ def positionForKick(player):
 #             sX = 0
 #         else:
 #             sY = 0
-
+        player.printf("positionForKick:idealVector is (%g,%g) "%
+                      (sX,sY))
         player.setSpeed(sX,sY,0)
 
     if transitions.shouldKick(player):
