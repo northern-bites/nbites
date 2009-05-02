@@ -134,10 +134,10 @@ TRILLIAN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                           10.0,   # right swing hip roll addition
                                           0.6,  # left zmp off
                                           0.6,  # right zmp off
-                                          6.6,   # turn zmp offset
+                                          7.5,   # turn zmp offset
                                           0.01,  # strafe zmp offset
-                                          7.0,  # max x speed
-                                          4.0,   # max y speed
+                                          6.0,  # max x speed
+                                          3.0,   # max y speed
                                           30.0,   # max theta speed()
                                           1.0)   #sensorScale
 
@@ -222,12 +222,12 @@ MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
 #DEFAULT GAIT ASSIGNMENTS
 
 # CAUTION!!!! REVERT THESE TO MEDIUM
-TRILLIAN_GAIT = TRILLIAN_FAST_GAIT
+TRILLIAN_GAIT = TRILLIAN_MEDIUM_GAIT
 ZAPHOD_GAIT   =   ZAPHOD_FAST_GAIT
 SLARTI_GAIT   =   SLARTI_FAST_GAIT
 MARVIN_GAIT   =   MARVIN_MEDIUM_GAIT
 
-TRILLIAN_TURN_GAIT = TRILLIAN_FAST_GAIT
+TRILLIAN_TURN_GAIT = TRILLIAN_MEDIUM_GAIT
 ZAPHOD_TURN_GAIT   =   ZAPHOD_FAST_GAIT
 SLARTI_TURN_GAIT   =   SLARTI_FAST_GAIT
 MARVIN_TURN_GAIT   =   MARVIN_MEDIUM_GAIT
