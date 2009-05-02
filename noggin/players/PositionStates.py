@@ -71,19 +71,26 @@ def spinToBall(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.activeLoc()
+        player.brain.tracker.trackBall()
     ball = player.brain.ball
-    if player.stoppedWalk and ball.on and player.brain.nav.isStopped():
+
+    turnRate = MyMath.clip(ball.locBearing*ChaseConstants.BALL_SPIN_GAIN,
+                           -ChaseConstants.BALL_SPIN_SPEED,
+                           ChaseConstants.BALL_SPIN_SPEED)
+
+    if chaseTransitions.shouldBeAtSpinDir(player):
+        return player.goLater('atSpinBallPosition')
+
+    elif chaseTransitions.shouldSpinFindBallPosition(player):
+        return player.goLater('spinFindBallPosition')
+
+    elif player.currentSpinDir != MyMath.sign(turnRate):
+        player.stopWalking()
+        player.currentSpinDir = MyMath.sign(turnRate)
+    elif player.stoppedWalk and ball.on and player.brain.nav.isStopped():
         player.brain.CoA.setRobotTurnGait(player.brain.motion)
-        turnRate = MyMath.clip(ball.locBearing*ChaseConstants.BALL_SPIN_GAIN,
-                               -ChaseConstants.BALL_SPIN_SPEED,
-                               ChaseConstants.BALL_SPIN_SPEED)
         player.setSpeed(x=0,y=0,theta=turnRate)
 
-    if chaseTransitions.shouldTurnToBall_ApproachBall(player):
-        return player.goLater('atSpinBallPosition')
-    elif chaseTransitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBallPosition')
     return player.stay()
 
 def atSpinBallPosition(player):
@@ -94,7 +101,7 @@ def atSpinBallPosition(player):
         player.stopWalking()
         player.brain.tracker.activeLoc()
 
-    if chaseTransitions.shouldTurnToBall_ApproachBall(player):
+    if chaseTransitions.shouldTurnToBall_fromAtBallPosition(player):
         return player.goNow('spinToBall')
     elif chaseTransitions.shouldSpinFindBallPosition(player):
         return player.goLater('spinFindBallPosition')
@@ -112,10 +119,10 @@ def spinFindBallPosition(player):
         player.setSpeed(0,
                         0,
                         ChaseConstants.SPIN_SPEED)
-        player.brain.tracker.activeLoc()
+        player.brain.tracker.trackBall()
 
 
-    if chaseTransitions.shouldTurnToBall_FoundBall(player):
+    if chaseTransitions.shouldTurnToBall_fromAtBallPosition(player):
         return player.goNow('spinToBall')
     if chaseTransitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('atSpinBallPosition')

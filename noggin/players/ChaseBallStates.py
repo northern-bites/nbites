@@ -109,23 +109,17 @@ def turnToBallFar(player):
                            -constants.BALL_SPIN_SPEED,
                            constants.BALL_SPIN_SPEED)
 
-    player.printf("Ball bearing and dist are (" + str(ball.locBearing)
-                  + ", " + str(ball.locDist) + ")")
+#     player.printf("Ball bearing and dist are (" + str(ball.locBearing)
+#                   + ", " + str(ball.locDist) + ")")
 
-    player.printf("Turn rate is " + str(turnRate))
+#     player.printf("Turn rate is " + str(turnRate))
 
 
     if transitions.shouldPositionForKick(player):
-        player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
-                      + ", " + str(player.brain.ball.locDist) + ")")
         return player.goNow('positionForKick')
     elif transitions.shouldApproachBall(player):
-        player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
-                      + ", " + str(player.brain.ball.locDist) + ")")
         return player.goNow('approachBall')
     elif transitions.shouldScanFindBall(player):
-        player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
-                      + ", " + str(player.brain.ball.locDist) + ")")
         return player.goNow('scanFindBall')
 
     elif player.currentSpinDir != MyMath.sign(turnRate):

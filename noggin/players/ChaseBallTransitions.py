@@ -25,7 +25,7 @@ def shouldSpinFindBall(player):
     return False
 
 def shouldSpinFindBallPosition(player):
-    if player.brain.ball.framesOff >= 40:
+    if player.brain.ball.framesOff >= 50:
         return True
     return False
 
@@ -87,5 +87,19 @@ def shouldKick(player):
         ball.locRelY < constants.BALL_KICK_LEFT_Y_L and
         ball.locRelX > constants.BALL_KICK_LEFT_X_CLOSE and
         ball.locRelX < constants.BALL_KICK_LEFT_X_FAR ):
+        return True
+    return False
+
+def shouldTurnToBall_fromAtBallPosition(player):
+    ball = player.brain.ball
+    if (ball.on and
+        abs(ball.locBearing) > constants.BALL_SPIN_POSITION_THRESH + 10):
+        return True
+    return False
+
+def shouldBeAtSpinDir(player):
+    ball = player.brain.ball
+    if ( ball.on and
+         abs(ball.locBearing) < constants.BALL_SPIN_POSITION_THRESH ):
         return True
     return False
