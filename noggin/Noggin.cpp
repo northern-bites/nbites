@@ -36,7 +36,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
 #endif
 
     // Initialize the interpreter and C python extensions
-    initializePython();
+    initializePython(v);
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
