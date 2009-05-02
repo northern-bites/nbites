@@ -10,7 +10,7 @@
 //#define DEBUG_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
 #define RUN_LOCALIZATION
-//#define USE_LOC_CORNERS
+#define USE_LOC_CORNERS
 static const float MAX_CORNER_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
@@ -326,23 +326,23 @@ void Noggin::updateLocalization()
         // HUGE HACK!!!!
         // This returns the ball x, y, which need to be converted to dist and
         // bearing
-        m = comm->getTeammateBallReport();
+        // m = comm->getTeammateBallReport();
 
-        if (!(m.distance == 0.0 && m.bearing == 0.0) &&
-            !(gc->gameState() == STATE_INITIAL ||
-              gc->gameState() == STATE_FINISHED)) {
-            float ballX = m.distance;
-            float ballY = m.bearing;
-            float ballXUncert = m.distanceSD;
-            float ballYUncert = m.bearingSD;
-            m.distance = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
-            m.bearing = subPIAngle(atan2(ballY - loc->getYEst(), ballX -
-                                         loc->getXEst()) - loc->getHEst());
-            m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
-            m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
-            // cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
-            //      << m.bearing << ")" << endl;
-        }
+        // if (!(m.distance == 0.0 && m.bearing == 0.0) &&
+        //     !(gc->gameState() == STATE_INITIAL ||
+        //       gc->gameState() == STATE_FINISHED)) {
+        //     float ballX = m.distance;
+        //     float ballY = m.bearing;
+        //     float ballXUncert = m.distanceSD;
+        //     float ballYUncert = m.bearingSD;
+        //     m.distance = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
+        //     m.bearing = subPIAngle(atan2(ballY - loc->getYEst(), ballX -
+        //                                  loc->getXEst()) - loc->getHEst());
+        //     m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
+        //     m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
+        //     // cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
+        //     //      << m.bearing << ")" << endl;
+        // }
 
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
