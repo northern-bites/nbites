@@ -239,7 +239,7 @@ void Noggin::updateLocalization()
     VisualFieldObject fo;
     fo = *vision->bgrp;
 
-    if(fo.getDistance() > 0) {
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
 #ifdef DEBUG_OBSERVATIONS
@@ -249,7 +249,7 @@ void Noggin::updateLocalization()
     }
 
     fo = *vision->bglp;
-    if(fo.getDistance() > 0) {
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
 #ifdef DEBUG_OBSERVATIONS
@@ -259,7 +259,7 @@ void Noggin::updateLocalization()
     }
 
     fo = *vision->ygrp;
-    if(fo.getDistance() > 0) {
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
 #ifdef DEBUG_OBSERVATIONS
@@ -269,7 +269,7 @@ void Noggin::updateLocalization()
     }
 
     fo = *vision->yglp;
-    if(fo.getDistance() > 0) {
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
 #ifdef DEBUG_OBSERVATIONS
