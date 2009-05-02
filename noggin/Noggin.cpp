@@ -25,7 +25,8 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
       error_state(false), brain_module(NULL), brain_instance(NULL),
-      motion_interface(_minterface),registeredGCReset(false), ballFramesOff(0)
+      motion_interface(_minterface),registeredGCReset(false), ballFramesOff(0),
+      do_reload(0)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
@@ -125,7 +126,7 @@ bool Noggin::import_modules ()
     return true;
 }
 
-void Noggin::reload ()
+void Noggin::reload_brain ()
 {
     if (brain_module == NULL)
         if (!import_modules())
@@ -137,7 +138,7 @@ void Noggin::reload ()
     getBrainInstance();
 }
 
-void Noggin::reload(std::string modules)
+void Noggin::reload_modules(std::string modules)
 {
     if (brain_module == NULL)
         if (!import_modules())

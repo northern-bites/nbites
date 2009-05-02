@@ -26,10 +26,12 @@ public:
            MotionInterface * _minterface);
     virtual ~Noggin();
 
+    // reinitialize and reload the Python interpreter
+    void reload_hard ();
     // reload Brain module
-    void reload ();
+    void reload_brain ();
     // reload specified modules
-    void reload (std::string modules);
+    void reload_modules (std::string modules);
     // run behavioral step
     void runStep();
 
@@ -67,10 +69,13 @@ private:
     PyObject *brain_instance;
     MotionInterface * motion_interface;
 
-    //GC stuff
+    // GC stuff
     bool registeredGCReset;
     // Teammate ball stuff
     int ballFramesOff;
+    // Reload specifiers
+    int do_reload;
+    std::vector<std::string> module_list;
 
 // Public members
 public:
