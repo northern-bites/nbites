@@ -17,7 +17,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.setName('pBrunswick')
         self.currentRole = PBConstants.INIT_ROLE
         self.stoppedWalk = True
-        self.currentSpindir = 0
+        self.currentSpinDir = 0
 
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':

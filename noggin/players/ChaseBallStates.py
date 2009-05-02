@@ -128,11 +128,11 @@ def turnToBallFar(player):
                       + ", " + str(player.brain.ball.locDist) + ")")
         return player.goNow('scanFindBall')
 
-    elif player.currentSpinDir != MyMath.spinDir(turnRate):
+    elif player.currentSpinDir != MyMath.sign(turnRate):
         player.stopWalking()
-        player.currentSpinDir = MyMath.spinDir(turnRate)
+        player.currentSpinDir = MyMath.sign(turnRate)
     elif player.stoppedWalk and ball.on and player.brain.nav.isStopped():
-        player.currentSpinDir = MyMath.spinDir(turnRate)
+        player.currentSpinDir = MyMath.sign(turnRate)
         player.brain.CoA.setRobotTurnGait(player.brain.motion)
 
         player.setSpeed(x=0,y=0,theta=turnRate)
