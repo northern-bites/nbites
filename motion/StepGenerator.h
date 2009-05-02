@@ -101,8 +101,8 @@
 
 typedef boost::tuple<const std::list<float>*,
                      const std::list<float>*> zmp_xy_tuple;
-typedef boost::tuple<const std::vector<float>,
-                     const std::vector<float> > WalkLegsTuple;
+typedef boost::tuple<std::vector<float>,
+                     std::vector<float> > WalkLegsTuple;
 
 static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
                                      //steps stored in future, current lists
@@ -143,6 +143,7 @@ private: // Helper methods
     void fillZMP(const boost::shared_ptr<Step> newStep );
     void fillZMPRegular(const boost::shared_ptr<Step> newStep );
     void fillZMPEnd(const boost::shared_ptr<Step> newStep );
+    void addStartZMP(const boost::shared_ptr<Step> newStep );
 
     void startRight();
     void startLeft();
@@ -208,6 +209,9 @@ private:
     boost::shared_ptr<Sensors> sensors;
     const WalkingParameters *walkParams;
     bool nextStepIsLeft;
+    // HACK: this variable holds the number of frames we have to wait before
+    //       we can start walking (NUM_PREVIEW_FRAMES).
+    int waitForController;
 
     WalkingLeg leftLeg, rightLeg;
     SupportFoot supportFoot;
