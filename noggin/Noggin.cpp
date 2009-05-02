@@ -32,11 +32,8 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
     printf("Noggin::initializing\n");
 #endif
 
-    // Initialize the interpreter, the vision module, and PyVision instance
-    initializeVision(v);
-
-    // Initialize localization stuff
-    initializeLocalization();
+    // Initialize the interpreter and C python extensions
+    initializePython();
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
@@ -59,11 +56,16 @@ Noggin::~Noggin ()
     Py_XDECREF(brain_module);
 }
 
-void Noggin::initializeVision(shared_ptr<Vision> v)
+void Noggin::initializePython(shared_ptr<Vision> v)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing interpreter and extension modules\n");
 #endif
+
+    // Initialize low-level modules
+    c_init_sensors();
+    init_leds();
+    c_init_roboguardian();
 
     // Initialize PyVision module
     vision = v;
@@ -78,6 +80,9 @@ void Noggin::initializeVision(shared_ptr<Vision> v)
     }
     vision_addToModule(result, MODULE_HEAD);
     pyvision = reinterpret_cast<PyVision*>(result);
+
+    // Initialize localization stuff
+    initializeLocalization();
 
 }
 
@@ -124,6 +129,16 @@ bool Noggin::import_modules ()
     }
 
     return true;
+}
+
+void Noggin::reload_hard ()
+{
+    // finalize and reinitialize the Python interpreter
+    Py_Finalize();
+    Py_Initialize();
+
+    // load C extension modules
+    initializePython();
 }
 
 void Noggin::reload_brain ()

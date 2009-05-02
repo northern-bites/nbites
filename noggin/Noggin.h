@@ -39,8 +39,8 @@ public:
     bool inErrorState() { return error_state; }
 
 private:
-    // Initialize the interpreter, the vision module, and PyVision instance
-    void initializeVision(boost::shared_ptr<Vision> v);
+    // Initialize the interpreter and C Python extensions
+    void initializePython(boost::shared_ptr<Vision> v);
     // Import the util.module_helper and noggin.Brain modules
     bool import_modules();
     // Instantiate a Brain instance

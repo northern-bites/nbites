@@ -78,11 +78,8 @@ Man::Man ()
     // give python a pointer to the sensors structure. Method defined in
     // Sensors.h
     set_sensors_pointer(sensors);
-    // initialize python sensors module
-    c_init_sensors();
 
     setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(pBroker)));
-    init_leds();
 
     transcriber = shared_ptr<Transcriber>(new ALTranscriber(pBroker, sensors));
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
@@ -99,7 +96,6 @@ Man::Man ()
     // give python a pointer to the guardian. Method defined in PyRoboguardian.h
     set_guardian_pointer(guardian);
     // initialize python roboguardian module.
-    c_init_roboguardian();
 #endif
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
