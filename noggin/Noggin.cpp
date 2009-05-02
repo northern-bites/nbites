@@ -6,6 +6,9 @@
 #include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
+#include "_ledsmodule.h"
+#include "Sensors.h"
+#include "PyRoboGuardian.h"
 
 //#define DEBUG_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
