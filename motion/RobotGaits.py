@@ -12,6 +12,8 @@ MARVIN_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       4.5,   # right swing hip roll addition
                                       0.40,  # left zmp off
                                       0.40,  # right zmp off
+                                      6.6,   # turn zmp offset
+                                      0.01,  # strafe zmp offset
                                       7.0,  # max x speed
                                       4.0,   # max y speed
                                       30.0,   # max theta speed()
@@ -30,6 +32,8 @@ TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                         4.5,   # right swing hip roll addition
                                         0.40,  # left zmp off
                                         0.40,  # right zmp off
+                                        7.5,   # turn zmp offset
+                                        0.01,  # strafe zmp offset
                                         7.0,  # max x speed
                                         4.0,   # max y speed
                                         30.0,   # max theta speed()
@@ -48,6 +52,8 @@ SLARTI_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       4.5,   # right swing hip roll addition
                                       0.40,  # left zmp off
                                       0.40,  # right zmp off
+                                      6.6,   # turn zmp offset
+                                      0.01,  # strafe zmp offset
                                       7.0,  # max x speed
                                       4.0,   # max y speed
                                       30.0,   # max theta speed()
@@ -66,6 +72,8 @@ ZAPHOD_FAST_GAIT =  motion.GaitCommand(31.00, # com height
                                        5.0,   # right swing hip roll addition
                                        0.90,  # left zmp off
                                        0.90,  # right zmp off
+                                       6.6,   # turn zmp offset
+                                       0.01,  # strafe zmp offset
                                        10.0,  # max x speed
                                        5.0,   # max y speed
                                        30.0,   # max theta speed()
@@ -87,6 +95,8 @@ TRILLIAN_SLOW_GAIT = motion.GaitCommand(31.00, # com height
                                         5.0,   # right swing hip roll addition
                                         0.85,  # left zmp off
                                         0.85,  # right zmp off
+                                        6.6,   # turn zmp offset
+                                        0.01,  # strafe zmp offset
                                         10.0,  # max x speed
                                         5.0,   # max y speed
                                         30.0,   # max theta speed()
@@ -104,6 +114,8 @@ TRILLIAN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                           10.0,   # right swing hip roll addition
                                           0.6,  # left zmp off
                                           0.6,  # right zmp off
+                                          6.6,   # turn zmp offset
+                                          0.01,  # strafe zmp offset
                                           7.0,  # max x speed
                                           4.0,   # max y speed
                                           30.0,   # max theta speed()
@@ -121,6 +133,8 @@ ZAPHOD_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         11.0,   # right swing hip roll addition
                                         1.0,  # left zmp off
                                         1.0,  # right zmp off
+                                        6.6,   # turn zmp offset
+                                        0.01,  # strafe zmp offset
                                         7.0,  # max x speed
                                         4.0,   # max y speed
                                         30.0,   # max theta speed()
@@ -139,6 +153,8 @@ SLARTI_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         10.0,   # right swing hip roll addition
                                         0.6,  # left zmp off
                                         0.6,  # right zmp off
+                                        6.6,   # turn zmp offset
+                                        0.01,  # strafe zmp offset
                                         7.0,  # max x speed
                                         4.0,   # max y speed
                                         30.0,   # max theta speed()
@@ -157,6 +173,8 @@ MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         10.0,   # right swing hip roll addition
                                         0.6,  # left zmp off
                                         0.6,  # right zmp off
+                                        6.6,   # turn zmp offset
+                                        0.01,  # strafe zmp offset
                                         7.0,  # max x speed
                                         4.0,   # max y speed
                                         30.0,   # max theta speed()
@@ -175,6 +193,8 @@ MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
                                                 10.0, # right swing hip roll addition
                                                 0.6,  # left zmp off
                                                 0.6,  # right zmp off
+                                                6.6,   # turn zmp offset
+                                                0.01,  # strafe zmp offset
                                                 7.0,  # max x speed
                                                 4.0,  # max y speed
                                                 30.0,  # max theta speed()

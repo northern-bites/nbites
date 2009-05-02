@@ -140,6 +140,8 @@ public:
     float rightSwingHipRollAddition; // in rad
     float leftZMPSwingOffsetY; //in mm, distance to offset zmp from center of foot
     float rightZMPSwingOffsetY;//in the Y direction (side to side)
+    float turnZMPOffsetY; // in mm per radians of turn
+    float strafeZMPOffsetY; // in mm per mm of step->y
     float maxXSpeed;
     float maxYSpeed;
     float maxThetaSpeed;
@@ -159,6 +161,7 @@ public:
                       const float _footLengthX, const float _dblInactivePerc,
                       const float _lSwHRAdd,const float _rSwHRAdd,
                       const float _lZMPSwOffY,const float _rZMPSwOffY,
+                      const float _tZMPOffY, const float _sZMPOffY,
                       const float maxx_mms, const float maxy_mms,
                       const float maxtheta_rads,
                       const float _sensorFeedback)
@@ -171,6 +174,7 @@ public:
            leftSwingHipRollAddition(_lSwHRAdd),
            rightSwingHipRollAddition(_rSwHRAdd),
            leftZMPSwingOffsetY(_lZMPSwOffY),rightZMPSwingOffsetY(_rZMPSwOffY),
+           turnZMPOffsetY(_tZMPOffY), strafeZMPOffsetY(_sZMPOffY),
            maxXSpeed(maxx_mms),maxYSpeed(maxy_mms),maxThetaSpeed(maxtheta_rads),
            sensorFeedback(_sensorFeedback)
         {
@@ -270,6 +274,8 @@ const WalkingParameters DEFAULT_PARAMETERS
                     4.0f*TO_RAD,  // rightSwingHipRollAddition
                     12.0f,        // leftZMPSwingOffestY,
                     12.0f,        // rightZMPSwingOffestY
+                    6.6f,         // turnZMPOffsetY
+                    0.010f,       // strafeZMPOffsetY
                     100.0f,       // max speed x (mm/s)
                     50.0f,        // max speed y (mm/s)
                     0.50f,        // max speed theta (rad/s)

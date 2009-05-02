@@ -435,14 +435,14 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     // we turn, the opening step is well balanced but the step which brings the
     // foot back is bad. We need to swing more toward the opening step in
     // order to not fall inward.
-    const float HACK_AMOUNT_PER_PI_OF_TURN = 6.6f;
-    const float HACK_AMOUNT_PER_1_OF_LATERAL = .010;
+    const float HACK_AMOUNT_PER_PI_OF_TURN = walkParams->turnZMPOffsetY;
+    const float HACK_AMOUNT_PER_1_OF_LATERAL = walkParams->strafeZMPOffsetY;
     float adjustment = ((newSupportStep->theta / M_PI_FLOAT)
                         * HACK_AMOUNT_PER_PI_OF_TURN);
     adjustment += (newSupportStep->y - (sign*HIP_OFFSET_Y))
         * HACK_AMOUNT_PER_1_OF_LATERAL;
 
-    cout << "\t adjustment to zmp because of lateral: " << adjustment << endl;
+    //cout << "\t adjustment to zmp because of lateral: " << adjustment << endl;
 
     //Another HACK (ie. zmp is not perfect)
     //This moves the zmp reference to the outside of the foot

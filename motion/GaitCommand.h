@@ -39,6 +39,7 @@ public:
                  const float _footLengthX, const float _dblInactivePerc,
                  const float _lSwHRAdd,const float _rSwHRAdd,
                  const float _lZMPSwOffY,const float _rZMPSwOffY,
+                 const float _tZMPOffY, const float _sZMPOffY,
                  const float maxx_mms, const float maxy_mms,
                  const float maxtheta_rads,
                  const float _sensorFeedback)
@@ -49,6 +50,7 @@ public:
               _footLengthX, _dblInactivePerc,
               _lSwHRAdd,_rSwHRAdd,
               _lZMPSwOffY,_rZMPSwOffY,
+              _tZMPOffY, _sZMPOffY,
               maxx_mms,maxy_mms,maxtheta_rads, _sensorFeedback)
         {
         }
