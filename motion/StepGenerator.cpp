@@ -436,15 +436,22 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
                           walkParams->leftZMPSwingOffsetY :
                           walkParams->rightZMPSwingOffsetY);
 
+    // When we turn, the ZMP offset needs to be corrected for the rotation of
+    // newSupportStep. A picture would be very useful here. Someday...
+    float y_zmp_offset_x = -sin(std::abs(newSupportStep->theta)) * Y_ZMP_OFFSET;
+    float y_zmp_offset_y = cos(newSupportStep->theta) * Y_ZMP_OFFSET;
+
     //lets define the key points in the s frame. See diagram in paper
     //to use bezier curves, we would need also directions for each point
     const ufvector3 start_s = last_zmp_end_s;
     const ufvector3 end_s =
-        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX ,//+X_ZMP_FOOT_LENGTH,
-                               newSupportStep->y + sign*Y_ZMP_OFFSET);
+        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX +
+                               y_zmp_offset_x,
+                               newSupportStep->y + sign*y_zmp_offset_y);
     const ufvector3 mid_s =
-        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX - X_ZMP_FOOT_LENGTH,
-                               newSupportStep->y + sign*Y_ZMP_OFFSET);
+        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX +
+                               y_zmp_offset_x - X_ZMP_FOOT_LENGTH,
+                               newSupportStep->y + sign*y_zmp_offset_y);
 
     const ufvector3 start_i = prod(si_Transform,start_s);
     const ufvector3 mid_i = prod(si_Transform,mid_s);
