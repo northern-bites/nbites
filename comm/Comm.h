@@ -55,6 +55,8 @@ class Comm
     RangeBearingMeasurement getTeammateBallReport();
     void setData(std::vector<float> &data);
 
+    void add_to_module();
+
   private:
     void bind()                 throw(socket_error);
     void bind_gc()              throw(socket_error);
@@ -74,8 +76,6 @@ class Comm
                       int size)  throw();
     bool validate_packet(const char* msg, int len, CommPacketHeader& packet)
       throw();
-
-    void add_to_module();
 
   private:
     // TOOLConnect sub-thread controller
@@ -102,6 +102,8 @@ class Comm
     char buf[UDP_BUF_SIZE];
 
 };
+
+PyMODINIT_FUNC(void) init_comm();
 
 #endif // ROBOT(NAO) - commenting out the entire file
 

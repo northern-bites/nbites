@@ -71,7 +71,7 @@ void Noggin::initializePython(shared_ptr<Vision> v)
     init_leds();
     c_init_roboguardian();
     c_init_motion();
-    c_init_comm();
+    init_comm();
     comm->add_to_module();
 
     // Initialize PyVision module
