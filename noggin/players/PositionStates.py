@@ -54,4 +54,6 @@ def atPosition(player):
     """
     State for when we're at the position
     """
+    if player.firstFrame():
+        player.brain.tracker.activeLoc()
     return player.stay()

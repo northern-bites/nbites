@@ -104,11 +104,9 @@ def turnToBallFar(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if player.brain.nav.isStopped():
-        player.stoppedWalk = True
-
     ball = player.brain.ball
-    if player.stoppedWalk and ball.on:
+    if player.stoppedWalk and ball.on and player.brain.nav.isStopped():
+        player.brain.CoA.setRobotTurnGait(player.brain.motion)
         turnRate = MyMath.clip(ball.locBearing*constants.BALL_SPIN_GAIN,
                                -constants.BALL_SPIN_SPEED,
                                constants.BALL_SPIN_SPEED)
@@ -138,6 +136,7 @@ def approachBall(player):
 
     ball = player.brain.ball
     if ball.on and player.brain.nav.isStopped():
+        player.brain.CoA.setRobotGait(player.brain.motion)
         targetX = math.cos(math.radians(ball.locBearing))*ball.locDist
         targetY = math.sin(math.radians(ball.locBearing))*ball.locDist
         maxTarget = max(abs(targetX),abs(targetY))
@@ -175,7 +174,7 @@ def positionForKick(player):
 
     ball = player.brain.ball
     if ball.on and player.brain.nav.isStopped():
-
+        player.brain.CoA.setRobotTurnGait(player.brain.motion)
         # Put yourself with your left foot
         # in front of the ball
         #targetX = (math.cos(math.radians(ball.locBearing))*ball.locDist)*constants.POS_KICK_TARGET_X_GAIN

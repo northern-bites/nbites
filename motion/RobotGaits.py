@@ -74,7 +74,7 @@ TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                         0.40,  # right zmp off
                                         7.5,   # turn zmp offset
                                         0.01,  # strafe zmp offset
-                                        7.0,  # max x speed
+                                        8.0,  # max x speed
                                         4.0,   # max y speed
                                         30.0,   # max theta speed()
                                         0.0)   #sensorScale
@@ -222,7 +222,7 @@ MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
 #DEFAULT GAIT ASSIGNMENTS
 
 # CAUTION!!!! REVERT THESE TO MEDIUM
-TRILLIAN_GAIT = TRILLIAN_MEDIUM_GAIT
+TRILLIAN_GAIT = TRILLIAN_FAST_GAIT
 ZAPHOD_GAIT   =   ZAPHOD_FAST_GAIT
 SLARTI_GAIT   =   SLARTI_FAST_GAIT
 MARVIN_GAIT   =   MARVIN_MEDIUM_GAIT
