@@ -187,10 +187,11 @@ def positionForKick(player):
 
         maxTarget = max(abs(targetX),abs(targetY))
 
-        sX = MyMath.clip((targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN,
-                         constants.MIN_X_SPEED,
-                         constants.MAX_X_SPEED)
-        sY = MyMath.clip((targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN,
+#         sX = MyMath.clip((targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN,
+#                          constants.MIN_X_SPEED,
+#                          constants.MAX_X_SPEED)
+        sX = 0
+        sY = MyMath.clip((targetY)*constants.APPROACH_CLOSE_Y_GAIN,
                          constants.MIN_Y_SPEED,
                          constants.MAX_Y_SPEED)
 #         if sX > sY:
