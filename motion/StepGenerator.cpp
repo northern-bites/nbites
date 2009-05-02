@@ -430,11 +430,24 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     // the com path 'pauses' over the support foot, which is quite nice)
     float X_ZMP_FOOT_LENGTH = walkParams->footLengthX;
 
+    // An additional HACK:
+    // When we are turning, we have this problem that the direction in which
+    // we turn, the opening step is well balanced but the step which brings the
+    // foot back is bad. We need to swing more toward the opening step in
+    // order to not fall inward.
+    const float HACK_AMOUNT_PER_PI_OF_TURN = 6.6f;
+    float adjustment = (newSupportStep->theta / M_PI_FLOAT)
+        * HACK_AMOUNT_PER_PI_OF_TURN;
+
+    cout << "\t adjustment to zmp because of lateral: " << adjustment << endl;
+
     //Another HACK (ie. zmp is not perfect)
     //This moves the zmp reference to the outside of the foot
     float Y_ZMP_OFFSET = (newSupportStep->foot == LEFT_FOOT ?
                           walkParams->leftZMPSwingOffsetY :
                           walkParams->rightZMPSwingOffsetY);
+
+    Y_ZMP_OFFSET += adjustment;
 
     // When we turn, the ZMP offset needs to be corrected for the rotation of
     // newSupportStep. A picture would be very useful here. Someday...
