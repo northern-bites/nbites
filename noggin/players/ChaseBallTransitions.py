@@ -10,7 +10,7 @@ def shouldTurnToBall_FoundBall(player):
 def shouldTurnToBall_ApproachBall(player):
     ball = player.brain.ball
     if (ball.on and
-        abs(ball.locBearing) > constants.BALL_BEARING_THRESH):
+        abs(ball.locBearing) > constants.BALL_BEARING_THRESH + 10):
         return True
     return False
 

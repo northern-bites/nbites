@@ -40,7 +40,7 @@ def scanFindBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if player.brain.ball.on:
+    if player.brain.ball.on and constants.USE_LOC_CHASE:
         player.brain.tracker.trackBall()
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
