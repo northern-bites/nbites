@@ -7,12 +7,12 @@ def positionLocalize(player):
     return player.stay()
 
 def playbookPosition(player):
+    position = player.brain.playbook.position
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.activeLoc()
         player.printf("I am going to " + str(player.brain.playbook.position))
-
-    position = player.brain.playbook.position
+        player.brain.nav.goTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
 
     if player.brain.nav.destX != position[0] or \
             player.brain.nav.destY != position[1]:
@@ -20,8 +20,9 @@ def playbookPosition(player):
         #player.printf("position = "+str(position[0])+" , "+str(position[1]) )
 
     # we're at the point, let's switch to another state
-#     if player.brain.nav.isStopped() and player.counter > 0:
-#         pass
+    if player.brain.nav.isStopped() and player.counter > 0:
+        return player.goNow('atPosition')
+
     return player.stay()
 
 def positionOnBall(player):
@@ -47,4 +48,10 @@ def positionOnBall(player):
     if player.brain.nav.isStopped():
         player.goLater('chase')
 
+    return player.stay()
+
+def atPosition(player):
+    """
+    State for when we're at the position
+    """
     return player.stay()
