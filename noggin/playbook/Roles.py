@@ -51,9 +51,11 @@ def rSearcher(team):
 
 def rDefender(team):
     '''gets positioning for defender'''
-    
+
+    return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
+
     # If the ball is deep in our side, we become a sweeper
-    if team.brain.ball.y < PBConstants.SWEEPER_Y:
+    if team.brain.ball.x < PBConstants.SWEEPER_X:
         return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
     
     # Stand between the ball and the back of the goal if it is on our side

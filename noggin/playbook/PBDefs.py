@@ -168,7 +168,10 @@ class Teammate:
                 self.calledSubRole == PBConstants.SWEEPER or
                 self.calledSubRole == PBConstants.LEFT_DEEP_BACK or
                 self.calledSubRole == PBConstants.RIGHT_DEEP_BACK)
-    
+
+    def isGoalie(self):
+        return self.playerNumber == 1
+
     def isPenalized(self):
         '''
         this checks GameController to see if a player is penalized.

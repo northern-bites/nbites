@@ -82,6 +82,7 @@ class GoTeam:
         self.numInactiveMates = 0
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
+        self.pulledGoalie = False
 
     def run(self):
         """
@@ -117,11 +118,13 @@ class GoTeam:
 
         # Now we look at shorthanded strategies
         elif self.numInactiveMates == 1:
-            return Strategies.sOneDown(self)
+            return Strategies.sOneField(self)
         elif self.numInactiveMates == 2:
             return Strategies.sNoFieldPlayers(self)
+        elif self.pulledGoalie:
+            return Strategies.sThreeField(self)
         # Here we have the strategy stuff
-        return Strategies.sSpread(self)
+        return Strategies.sTwoField(self)
 
     def updateStateInfo(self):
         """
@@ -311,7 +314,7 @@ class GoTeam:
 
         # update my own information for role switching
         self.me.updateMe()
-
+        self.pulledGoalie = self.pullTheGoalie()
         # loop through teammates
         for mate in self.teammates:
             if (mate.isPenalized() or mate.isDead()): # 
@@ -372,8 +375,7 @@ class GoTeam:
         '''
         mates = []
         for mate in self.teammates:
-            if (not mate.inactive and mate.playerNumber !=
-                PBConstants.GOALIE_NUMBER
+            if (not mate.inactive and not mate.isGoalie()
                 and mate.playerNumber != self.me.playerNumber):
                 mates.append(mate)
         return mates
@@ -383,9 +385,6 @@ class GoTeam:
         Determines if the goalie is inactive
         '''
         return (self.teammates[0].inactive)
-
-    def isGoalie(self):
-        return self.brain.my.playerNumber == 1
 
     def reset(self):
         '''resets all information stored from teammates'''
@@ -464,6 +463,12 @@ class GoTeam:
                                        PBConstants.SEARCHER)):
                 return False
         return True
+
+    def pullTheGoalie(self):
+        if PBConstants.PULL_THE_GOALIE:
+            if self.brain.gameController.getScoreDifferential() <= -3:
+                return True
+        return False
 
 ################################################################################
 #####################     Utility Functions      ###############################

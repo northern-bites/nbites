@@ -6,45 +6,60 @@ from . import PBConstants
 
 def fNoFieldPlayers(team):
     '''when only the goalie is active'''
-    if team.isGoalie():
+    if team.me.isGoalie():
         return [PBConstants.NO_FIELD_PLAYERS] + Roles.rGoalie(team)
     else:
         return [PBConstants.NO_FIELD_PLAYERS, PBConstants.INIT_ROLE,
             PBConstants.INIT_SUB_ROLE, [0,0] ]
 
-def fOneDown(team):
+def fOneField(team):
     """
     Formation for one missing field player
     """
-    if team.isGoalie():
-        return [PBConstants.ONE_DOWN] + Roles.rGoalie(team)
+    if team.me.isGoalie():
+        return [PBConstants.ONE_FIELD] + Roles.rGoalie(team)
     # gets teammate that is chaser (could be me)
     chaser_mate = team.determineChaser()
     # if i am chaser
     if chaser_mate.playerNumber == team.brain.my.playerNumber:
         #team.me.role = PBConstants.CHASER
-        return [PBConstants.ONE_DOWN] + Roles.rChaser(team)
+        return [PBConstants.ONE_FIELD] + Roles.rChaser(team)
     else:
         #team.me.role = PBConstants.DEFENDER
-        return [PBConstants.ONE_DOWN] + Roles.rDefender(team)
+        return [PBConstants.ONE_FIELD] + Roles.rDefender(team)
 
-def fSpread(team):
-    if team.isGoalie():
-        return [PBConstants.SPREAD] + Roles.rGoalie(team)
+def fTwoField(team):
+    if team.me.isGoalie():
+        return [PBConstants.TWO_FIELD] + Roles.rGoalie(team)
     # gets teammate that is chaser (could be me)
     chaser_mate = team.determineChaser()
     chaser_mate.role = PBConstants.CHASER
 
     # if i am chaser
     if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        return [PBConstants.SPREAD] + Roles.rChaser(team)
+        return [PBConstants.TWO_FIELD] + Roles.rChaser(team)
     # Get where the defender should be
     else:
         defInfo = Roles.rDefender(team)
-        return [PBConstants.SPREAD] + defInfo
+        return [PBConstants.TWO_FIELD] + defInfo
+
+def fThreeField(team):
+
+    # gets teammate that is chaser (could be me)
+    chaser_mate = team.determineChaser()
+    chaser_mate.role = PBConstants.CHASER
+
+    # if i am chaser
+    if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        return [PBConstants.THREE_FIELD] + Roles.rChaser(team)
+    # Get where the defender should be
+    if team.me.isGoalie():
+        return [PBConstants.THREE_FIELD] + Roles.rDefender(team)
+    else:
+        return [PBConstants.THREE_FIELD] + Roles.rOffender(team)
 
 def fDubD(team):
-    if team.isGoalie():
+    if team.me.isGoalie():
         return [PBConstants.DUB_D] + Roles.rGoalie(team)
     # If we're down a player, use different positions
     if team.numInactiveMates == 0:
@@ -83,14 +98,14 @@ def fDubD(team):
 
 def fFinder(team):
     '''no one knows where the ball is'''
-    if team.isGoalie():
+    if team.me.isGoalie():
         return [PBConstants.FINDER] + Roles.rGoalie(team)
     #team.me.role = PBConstants.SEARCHER
     return [PBConstants.FINDER] + Roles.rSearcher(team)
 
 def fKickoffPlay(team):
     '''time immediately after kickoff'''
-    if team.isGoalie():
+    if team.me.isGoalie():
         return [PBConstants.KICKOFF_PLAY] + Roles.rGoalie(team)
     if team.brain.my.playerNumber == 2:
         return [PBConstants.KICKOFF_PLAY, PBConstants.DEFENDER] + \
@@ -98,9 +113,9 @@ def fKickoffPlay(team):
     elif team.brain.my.playerNumber == 3:
         return [PBConstants.KICKOFF_PLAY] + Roles.rChaser(team)
 
-def fKickoff(team):
+def fTwoKickoff(team):
     '''time immediately after kickoff'''
-    if team.isGoalie():
+    if team.me.isGoalie():
         return [PBConstants.KICKOFF] + Roles.rGoalie(team)
     if team.me.playerNumber == 2:
         #team.me.role = PBConstants.DEFENDER
@@ -114,14 +129,14 @@ def fOneKickoff(team):
     """
     kickoff for only having one field player
     """
-    if team.isGoalie():
+    if team.me.isGoalie():
         return [PBConstants.ONE_KICKOFF] + Roles.rGoalie(team)
     #team.me.role = PBConstants.CHASER
     return [PBConstants.ONE_KICKOFF] + Roles.rChaser(team)
 
 def fReady(team):
     '''kickoff positions'''
-    if team.isGoalie():
+    if team.me.isGoalie():
         return [PBConstants.READY] + Roles.rGoalie(team)
     # ready state depends on number of players alive
     num_inactive_teammates = len(team.inactiveMates)
