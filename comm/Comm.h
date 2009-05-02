@@ -103,7 +103,7 @@ class Comm
 
 };
 
-void init_comm();
+bool c_init_comm(void);
 
 #endif // ROBOT(NAO) - commenting out the entire file
 
