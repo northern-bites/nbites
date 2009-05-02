@@ -49,6 +49,12 @@ def sTestOffender(team):
 def sTestMiddie(team):
     return ['sTestMiddie'] + Formations.fTestMiddie(team)
 def sTestChaser(team):
+    # Game Ready Setup
+    if team.brain.gameController.currentState == 'gameReady' or\
+        team.brain.gameController.currentState =='gameSet':
+        # team is kicking off
+        return ['sTestChaser'] + Formations.fReady(team)
+
     return ['sTestChaser'] + Formations.fTestChaser(team)
 
 # Group of strategies for playing shorthanded
