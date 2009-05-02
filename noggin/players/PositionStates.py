@@ -42,6 +42,10 @@ def positionOnBall(player):
             return player.goNow('scanFindBall')
 
     nextX, nextY,nextH = player.getBehindBallPosition()
+
+    if player.firstFrame():
+        player.brain.nav.goTo(nextX,nextY,nextH)
+
     #player.printf("position = "+str(nextX)+" , "+str(nextY) )
     if player.brain.nav.destX != nextX or \
             player.brain.nav.destY != nextY:
@@ -108,10 +112,8 @@ def spinFindBallPosition(player):
         player.setSpeed(0,
                         0,
                         ChaseConstants.SPIN_SPEED)
-        player.brain.tracker.stopHeadMoves()
+        player.brain.tracker.activeLoc()
 
-    if not player.brain.motion.isHeadActive():
-        player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
 
     if chaseTransitions.shouldTurnToBall_FoundBall(player):
         return player.goNow('spinToBall')

@@ -188,12 +188,12 @@ class Ball:
         """
         return (time.time() - self.lastTimeSeen)
 
-    def updateLoc(self, loc, teamColor):
+    def updateLoc(self, loc, my):
         """
         Update all of our inforamtion pased on the newest localization info
         """
         # Get latest estimates
-        if teamColor == Constants.TEAM_BLUE:
+        if my.teamColor == Constants.TEAM_BLUE:
             self.x = loc.ballX
             self.y = loc.ballY
             self.velX = loc.ballVelX
@@ -211,13 +211,13 @@ class Ball:
         self.sd = self.uncertX * self.uncertY
 
         # Determine other values
-        self.locDist = dist(loc.x, loc.y, self.x, self.y)
-        self.locBearing = getRelativeBearing(loc.x, loc.y, loc.h,
+        self.locDist = dist(my.x, my.y, self.x, self.y)
+        self.locBearing = getRelativeBearing(my.x, my.y, my.h,
                                              self.x, self.y)
         self.locRelX = getRelativeX(self.locDist, self.locBearing)
         self.locRelY = getRelativeY(self.locDist, self.locBearing)
-        self.relVelX = getRelativeVelocityX(loc.h, self.velX, self.velY)
-        self.relVelY = getRelativeVelocityY(loc.h, self.velX, self.velY)
+        self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
+        self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
 
     def __str__(self):
         '''returns string with all class variables'''

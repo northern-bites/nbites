@@ -69,10 +69,10 @@ def spinFindBall(player):
         player.setSpeed(0,
                         0,
                         constants.SPIN_SPEED)
-        player.brain.tracker.stopHeadMoves()
+        player.brain.tracker.trackBall()
 
-    if not player.brain.motion.isHeadActive():
-        player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
+#     if not player.brain.motion.isHeadActive():
+#         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
 
 
     if player.brain.ball.on:
@@ -85,10 +85,10 @@ def spinFindBall(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
         return player.goNow('turnToBallFar')
-    elif transitions.shouldCantFindBall(player):
-        player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
-                      + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goLater('cantFindBall')
+#     elif transitions.shouldCantFindBall(player):
+#         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
+#                       + ", " + str(player.brain.ball.locDist) + ")")
+#         return player.goLater('cantFindBall')
 
     return player.stay()
 
@@ -100,30 +100,42 @@ def cantFindBall(player):
 
 def turnToBallFar(player):
     ''' Rotate to align with the ball. When we get close, we will approach it '''
+    ball = player.brain.ball
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    ball = player.brain.ball
-    if player.stoppedWalk and ball.on and player.brain.nav.isStopped():
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
-        turnRate = MyMath.clip(ball.locBearing*constants.BALL_SPIN_GAIN,
-                               -constants.BALL_SPIN_SPEED,
-                               constants.BALL_SPIN_SPEED)
-        player.setSpeed(x=0,y=0,theta=turnRate)
+    turnRate = MyMath.clip(ball.locBearing*constants.BALL_SPIN_GAIN,
+                           -constants.BALL_SPIN_SPEED,
+                           constants.BALL_SPIN_SPEED)
+
+    player.printf("Ball bearing and dist are (" + str(ball.locBearing)
+                  + ", " + str(ball.locDist) + ")")
+
+    player.printf("Turn rate is " + str(turnRate))
+
 
     if transitions.shouldPositionForKick(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goLater('positionForKick')
-    if transitions.shouldApproachBall(player):
+        return player.goNow('positionForKick')
+    elif transitions.shouldApproachBall(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goLater('approachBall')
+        return player.goNow('approachBall')
     elif transitions.shouldScanFindBall(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goLater('scanFindBall')
+        return player.goNow('scanFindBall')
+
+    elif player.currentSpinDir != MyMath.spinDir(turnRate):
+        player.stopWalking()
+        player.currentSpinDir = MyMath.spinDir(turnRate)
+    elif player.stoppedWalk and ball.on and player.brain.nav.isStopped():
+        player.currentSpinDir = MyMath.spinDir(turnRate)
+        player.brain.CoA.setRobotTurnGait(player.brain.motion)
+
+        player.setSpeed(x=0,y=0,theta=turnRate)
 
     return player.stay()
 
@@ -266,9 +278,10 @@ def kickBall(player):
     if player.firstFrame():
         player.stopWalking()
     if player.counter == 2:
-        player.executeMove(SweetMoves.KICK_STRAIGHT_LEFT_FAR)
+        player.executeMove(SweetMoves.NEW_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.KICK_STRAIGHT_LEFT_FAR):
+        player.setSpeed(0,0,0)
         if transitions.shouldScanFindBall(player):
             player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                           + ", " + str(player.brain.ball.locDist) + ")")

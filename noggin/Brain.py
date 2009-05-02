@@ -252,7 +252,7 @@ class Brain(object):
         """
         # Update global information to current estimates
         self.my.updateLoc(self.loc)
-        self.ball.updateLoc(self.loc, self.my.teamColor)
+        self.ball.updateLoc(self.loc, self.my)
 
     # move to comm
     def setPacketData(self):
