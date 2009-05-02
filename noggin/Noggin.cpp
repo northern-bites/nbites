@@ -7,7 +7,7 @@
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include "_ledsmodule.h"
-#include "Sensors.h"
+#include "PySensors.h"
 #include "PyRoboGuardian.h"
 
 //#define DEBUG_OBSERVATIONS
@@ -141,7 +141,7 @@ void Noggin::reload_hard ()
     Py_Initialize();
 
     // load C extension modules
-    initializePython();
+    initializePython(vision);
 }
 
 void Noggin::reload_brain ()
