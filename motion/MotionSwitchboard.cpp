@@ -34,6 +34,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       newJoints(false),
       newStiffness(false),
       readyToSend(false),
+      stiffnessRequests(),
       noWalkTransitionCommand(true)
 
 {
@@ -448,7 +449,7 @@ void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
     headProvider.setCommand(command);
 }
 
-void MotionSwitchboard::sendMotionCommand(const StiffnessCommand * command){
+void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> command){
     pthread_mutex_lock(&stiffness_mutex);
     stiffnessRequests.push_back(command);
     pthread_mutex_unlock(&stiffness_mutex);
@@ -464,9 +465,12 @@ int MotionSwitchboard::processStiffness(){
     int changed  = 0;
     pthread_mutex_lock(&stiffness_mutex);
 
+
+
     //Get all the pending commands out of the queue
     while(!stiffnessRequests.empty()){
-        const StiffnessCommand * next = stiffnessRequests.front();
+        boost::shared_ptr<StiffnessCommand> next = stiffnessRequests.front();
+
         stiffnessRequests.pop_front();
 
         //For each command, we look at each chain and see if there is anything
@@ -492,13 +496,13 @@ int MotionSwitchboard::processStiffness(){
                 }
             }
 
-            delete stiffnesses;
         }
-        delete next;
     }
     if(changed){
         newStiffness = true;
     }
+
+
     pthread_mutex_unlock(&stiffness_mutex);
 
     return changed;

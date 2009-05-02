@@ -36,7 +36,7 @@ void MotionInterface::setHead(const SetHeadCommand *command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::sendStiffness(const StiffnessCommand * command){
+void MotionInterface::sendStiffness(const boost::shared_ptr<StiffnessCommand> command){
     switchboard->sendMotionCommand(command);
 }
 

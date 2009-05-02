@@ -76,7 +76,7 @@ public:
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const boost::shared_ptr<GaitCommand> command);
 	void sendMotionCommand(const SetHeadCommand* command);
-	void sendMotionCommand(const StiffnessCommand* command);
+	void sendMotionCommand(const boost::shared_ptr<StiffnessCommand> command);
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
@@ -125,7 +125,7 @@ private:
 
     bool readyToSend;
 
-    std::list<const StiffnessCommand *> stiffnessRequests;
+    std::list< boost::shared_ptr<StiffnessCommand> > stiffnessRequests;
 
     static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];
 

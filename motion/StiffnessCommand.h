@@ -59,6 +59,8 @@ public:
     static const float FULL_STIFFNESS;
 
 private:
+    void deleteChainAngles(Kinematics::ChainID chainID);
+
     virtual void setChainList() {
         chainList.insert(chainList.end(),
                          MotionConstants::STIFFNESS_CHAINS,

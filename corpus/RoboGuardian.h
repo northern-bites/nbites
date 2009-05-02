@@ -79,6 +79,7 @@ private:
     bool executeChestClickAction(int);
     void executeFallProtection();
     void shutoffGains();
+    void enableGains();
     void resetWifiConnection();
     //helpers
     std::string getHostName()const;
