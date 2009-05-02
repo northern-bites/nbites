@@ -82,7 +82,7 @@ TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00, # com height
 
 ZAPHOD_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       1.40,  # hip offset x
-                                      3.0,  # x-axis angle offset
+                                      1.5,  # x-axis angle offset
                                       0.5,  # step duration
                                       0.2,   # fraction in double support
                                       0.9,  # stepHeight
