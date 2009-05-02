@@ -135,6 +135,8 @@ private:
     mutable pthread_mutex_t next_joints_mutex;
     mutable pthread_mutex_t stiffness_mutex;
 
+    bool noWalkTransitionCommand;
+
 #ifdef DEBUG_JOINTS_OUTPUT
     FILE* joints_log;
     FILE* effector_log;

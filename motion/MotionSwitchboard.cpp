@@ -33,7 +33,9 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	  running(false),
       newJoints(false),
       newStiffness(false),
-      readyToSend(false)
+      readyToSend(false),
+      noWalkTransitionCommand(true)
+
 {
 
     //Allow safe access to the next joints
@@ -246,15 +248,21 @@ void MotionSwitchboard::swapBodyProvider(){
         // ONCE (Maybe twice?), instead of doing this forever.
         //The potential symptoms of such a bug would be jittering when standing
         //We need to ensure we are in the correct gait before walking
-        gaitSwitch = walkProvider.getGaitTransitionCommand();
-        if(gaitSwitch->getDuration() >= 0.02f){
-            scriptedProvider.setCommand(gaitSwitch);
-            curProvider = static_cast<MotionProvider * >(&scriptedProvider);
-            break;
+        if(noWalkTransitionCommand){//only enqueue one
+            noWalkTransitionCommand = false;
+            gaitSwitch = walkProvider.getGaitTransitionCommand();
+            if(gaitSwitch->getDuration() >= 0.02f){
+                scriptedProvider.setCommand(gaitSwitch);
+                curProvider = static_cast<MotionProvider * >(&scriptedProvider);
+                break;
+            }
         }
+        curProvider = nextProvider;
+        break;
     case SCRIPTED_PROVIDER:
     case HEAD_PROVIDER:
     default:
+        noWalkTransitionCommand = true;
         curProvider = nextProvider;
 #ifdef DEBUG_SWITCHBOARD
         cout << "Switched to " << *curProvider << endl;
