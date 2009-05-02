@@ -49,7 +49,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     ic_Transform(CoordFrame3D::identity3D()),
     initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
-    sensors(s),walkParams(NULL),nextStepIsLeft(true),
+    sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
     leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
     supportFoot(LEFT_SUPPORT),
     //controller_x(new PreviewController()),
@@ -261,8 +261,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_legs" << endl;
 #endif
-    //Ensure we have enough steps for planning purposes
-    //generate_steps();
+    static WalkLegsTuple noMovement;
+
+    bool firstFrame = waitForController ==
+        (int)Observer::NUM_PREVIEW_FRAMES - walkParams->stepDurationFrames;
+    if (waitForController > 0 &&
+        !firstFrame) {
+        --waitForController;
+        return noMovement;
+    }
 
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
@@ -319,6 +326,11 @@ WalkLegsTuple StepGenerator::tick_legs(){
     }
 
     debugLogging();
+
+    if (firstFrame) {
+        noMovement = WalkLegsTuple(left,right);
+        --waitForController;
+    }
 
     return WalkLegsTuple(left,right);
 }
@@ -442,8 +454,6 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     adjustment += (newSupportStep->y - (sign*HIP_OFFSET_Y))
         * HACK_AMOUNT_PER_1_OF_LATERAL;
 
-    //cout << "\t adjustment to zmp because of lateral: " << adjustment << endl;
-
     //Another HACK (ie. zmp is not perfect)
     //This moves the zmp reference to the outside of the foot
     float Y_ZMP_OFFSET = (newSupportStep->foot == LEFT_FOOT ?
@@ -530,6 +540,30 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
     //store the end of the zmp in the next s frame:
     last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
+}
+
+void
+StepGenerator::addStartZMP(const shared_ptr<Step> newSupportStep ){
+    const ufvector3 end_s =
+        CoordFrame3D::vector3D(walkParams->hipOffsetX,
+                               0.0f);
+    const ufvector3 end_i = prod(si_Transform,end_s);
+    //Queue a starting step, where we step, but do nothing with the ZMP
+    //so push tons of zero ZMP values
+    //for (int i = 0; i < walkParams->stepDurationFrames; i++){
+    for (unsigned int i = 0; i < Observer::NUM_PREVIEW_FRAMES -
+             walkParams->stepDurationFrames; ++i) {
+        zmp_ref_x.push_back(end_i(0));
+        zmp_ref_y.push_back(end_i(1));
+    }
+
+    //An End step should never move the si_Transform!
+    //si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
+    //store the end of the zmp in the next s frame:
+    last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
+
+    waitForController =
+        (int)Observer::NUM_PREVIEW_FRAMES - walkParams->stepDurationFrames;
 }
 
 void
@@ -652,6 +686,7 @@ void StepGenerator::startRight(){
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
+    addStartZMP(firstSupportStep);
     currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
     lastQueuedStep = firstSupportStep;
     nextStepIsLeft = true;
@@ -703,6 +738,7 @@ void StepGenerator::startLeft(){
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
+    addStartZMP(firstSupportStep);
     currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
     lastQueuedStep = firstSupportStep;
     nextStepIsLeft = false;
