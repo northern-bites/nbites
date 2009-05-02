@@ -64,8 +64,8 @@ def spinFindBall(player):
 
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
-#        return player.goNow('positionOnBall')
-    
+        return player.goNow('positionOnBall')
+
     if transitions.shouldTurnToBall_FoundBall(player):
         return player.goNow('turnToBallFar')
     if transitions.shouldCantFindBall(player):
@@ -103,7 +103,9 @@ def turnToBallFar(player):
     return player.stay()
 
 def approachBall(player):
-    ''' Once we are alligned with the ball, approach it'''
+    '''
+    Once we are alligned with the ball, approach it
+    '''
     if player.firstFrame():
         player.stopWalking()
 
@@ -148,10 +150,9 @@ def turnToBallClose(player):
         turnRate = MyMath.clip(ball.bearing*0.8,
                                -constants.BALL_SPIN_SPEED,
                                constants.BALL_SPIN_SPEED)
-
-        player.setSpeed(0,
-                        MyMath.getSign(turnRate)*constants.Y_SPIN_SPEED,
-                        turnRate)
+        if math.fabs(turnRate) < constants.MIN_BALL_SPIN_MAGNITUDE:
+            pass
+        player.setSpeed(0, 0, turnRate)
 
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
@@ -212,19 +213,22 @@ def positionForKick(player):
 
         # Put yourself with your left foot
         # in front of the ball
-         targetX = (math.cos(math.radians(ball.bearing))*ball.dist)*constants.POS_KICK_TARGET_X_GAIN
-         targetY = (math.sin(math.radians(ball.bearing))*ball.dist +
-                    constants.BALL_KICK_LEFT_Y_R )*constants.POS_KICK_TARGET_Y_GAIN
+        #targetX = (math.cos(math.radians(ball.bearing))*ball.dist)*constants.POS_KICK_TARGET_X_GAIN
+        targetX = player.brain.ball.locRelX*constants.POS_KICK_TARGET_X_GAIN
+#         targetY = (math.sin(math.radians(ball.bearing))*ball.dist +
+#                    constants.BALL_KICK_LEFT_Y_R )*constants.POS_KICK_TARGET_Y_GAIN
+        targetY = (player.brain.ball.locRelY +
+                   constants.BALL_KICK_LEFT_Y_R )*constants.POS_KICK_TARGET_Y_GAIN
 
-         maxTarget = max(abs(targetX),abs(targetY))
+        maxTarget = max(abs(targetX),abs(targetY))
 
-         sX = MyMath.clip((targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN,
-                          constants.MIN_X_SPEED,
-                          constants.MAX_X_SPEED)
-         sY = MyMath.clip((targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN,
-                          constants.MIN_Y_SPEED,
-                          constants.MAX_Y_SPEED)
-         player.setSpeed(sX,sY,0)
+        sX = MyMath.clip((targetX/maxTarget)*constants.APPROACH_CLOSE_X_GAIN,
+                         constants.MIN_X_SPEED,
+                         constants.MAX_X_SPEED)
+        sY = MyMath.clip((targetY/maxTarget)*constants.APPROACH_CLOSE_Y_GAIN,
+                         constants.MIN_Y_SPEED,
+                         constants.MAX_Y_SPEED)
+        player.setSpeed(sX,sY,0)
 
     if transitions.shouldKick(player):
         return player.goNow('kickBall')
@@ -268,9 +272,9 @@ def kickBall(player):
     if player.firstFrame():
         player.stopWalking()
     if player.counter == 2:
-        player.executeMove(SweetMoves.KICK_STRAIGHT_LEFT_FAR)
+        player.executeMove(SweetMoves.KICK_STRAIGHT_LEFT)
 
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.KICK_STRAIGHT_LEFT_FAR):
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.KICK_STRAIGHT_LEFT):
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
         if transitions.shouldApproachBall(player):
