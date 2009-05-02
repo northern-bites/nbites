@@ -146,6 +146,7 @@ bool Noggin::import_modules ()
 
 void Noggin::reload_hard ()
 {
+    printf("Reloading Noggin Python interpreter\n");
     // finalize and reinitialize the Python interpreter
     Py_Finalize();
     // load C extension modules
@@ -218,14 +219,6 @@ void Noggin::runStep ()
     if (error_state)
         return;
 #endif
-
-    static int step_count = 0;
-
-    step_count ++;
-    if (step_count % 30 == 0) {
-      printf("performing hard Noggin reload\n");
-      reload_hard();
-    }
 
     //Check button pushes for game controller signals
     processGCButtonClicks();
@@ -409,6 +402,7 @@ void Noggin::processGCButtonClicks(){
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
     static const int REVERT_TO_INITIAL_CLICKS = 4;
+    static const int RELOAD_PYTHON_HARD = 6;
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
@@ -417,6 +411,10 @@ void Noggin::processGCButtonClicks(){
 #ifdef DEBUG_NOGGIN_GC
         cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
 #endif
+    }
+    if (chestButton->peekNumClicks() == RELOAD_PYTHON_HARD) {
+        chestButton->getAndClearNumClicks();
+        reload_hard();
     }
     //Only toggle colors and kickoff when you are in initial
     if(gc->gameState() == STATE_INITIAL){
