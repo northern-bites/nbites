@@ -9,6 +9,7 @@
 #include "_ledsmodule.h"
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
+#include "PyMotion.h"
 
 //#define DEBUG_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
@@ -69,6 +70,9 @@ void Noggin::initializePython(shared_ptr<Vision> v)
     c_init_sensors();
     init_leds();
     c_init_roboguardian();
+    c_init_motion();
+    c_init_comm();
+    comm->add_to_module();
 
     // Initialize PyVision module
     vision = v;

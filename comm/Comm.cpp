@@ -446,8 +446,6 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
   broadcast_addr.sin_family = AF_INET;
   broadcast_addr.sin_port = htons(UDP_PORT);
   broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-
-  add_to_module();
 }
 
 Comm::~Comm ()

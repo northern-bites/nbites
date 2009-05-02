@@ -37,7 +37,6 @@ Motion<EnactorType>::Motion (shared_ptr<Synchro> _synchro,
 {
 
     set_motion_interface(&interface);
-    c_init_motion();
 }
 
 template <class EnactorType>
