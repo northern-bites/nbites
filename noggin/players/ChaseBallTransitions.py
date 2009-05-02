@@ -24,6 +24,11 @@ def shouldSpinFindBall(player):
         return True
     return False
 
+def shouldSpinFindBallPosition(player):
+    if player.brain.ball.framesOff >= 40:
+        return True
+    return False
+
 def shouldScanFindBall(player):
     if player.brain.ball.framesOff > constants.FRAMES_OFF_THRESH:
         return True

@@ -66,8 +66,8 @@ def spinFindBall(player):
         player.stoppedWalk = True
 
     if player.firstFrame() and player.stoppedWalk:
-        player.setSpeed(constants.X_SPEED_TO_BALL,
-                        constants.Y_SPIN_SPEED,
+        player.setSpeed(0,
+                        0,
                         constants.SPIN_SPEED)
         player.brain.tracker.stopHeadMoves()
 
@@ -203,7 +203,7 @@ def positionForKick(player):
     if transitions.shouldKick(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('kickBall')
+        return player.goNow('decideKick')
     if transitions.shouldApproachForKick(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
@@ -236,7 +236,7 @@ def turnForKick(player):
     if transitions.shouldKick(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goLater('kickBall')
+        return player.goLater('decideKick')
     if transitions.shouldPositionForKick(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
@@ -248,6 +248,18 @@ def turnForKick(player):
 
 
     return player.stay()
+
+def decideKick(player):
+    """
+    Decides if we should kick.
+    """
+    if player.firstFrame():
+        player.stopWalking()
+
+    if (player.brain.myGoalLeftPost.framesOff > 10 and
+        player.brain.myGoalRightPost.framesOff > 10):
+        return player.goLater('kickBall')
+    return player.goLater('positionForKick')
 
 def kickBall(player):
     print "ball at (relx,rely) = (", player.brain.ball.locRelX, " , ", player.brain.ball.locRelY, ")"
