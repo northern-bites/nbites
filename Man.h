@@ -69,19 +69,6 @@ typedef ALEnactor EnactorT;
 #include "PyRoboGuardian.h"
 #include "PySensors.h"
 
-/**
- * Preferences class to alter Python settings for our robot system.
- *
- * This is kind of a hack.
- */
-class PythonPreferences
-{
-public:
-    PythonPreferences();
-    virtual ~PythonPreferences() { }
-
-    void modifySysPath();
-};
 
 /**
  * The Naoqi module to run our main Nao robot system.
@@ -167,7 +154,6 @@ public:
     //   if the modules are not instantiated in this order, some dependedcies
     //   (i.e. the Python modules exported) will not be available by the time
     //   other modules are imported
-    PythonPreferences python_prefs;
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;

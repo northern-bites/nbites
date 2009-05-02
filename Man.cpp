@@ -57,7 +57,6 @@ Man::Man ()
 #endif
     // this is not good usage of shared_ptr...  oh well
     Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
-    python_prefs(),
 #ifdef NAOQI1
     // call the default constructor of all the shared pointers
     log(), camera(), lem(), 
@@ -902,54 +901,4 @@ Man::processFrame ()
     PROF_ENTER(profiler.get(), P_GETIMAGE);
 
 }
-
-PythonPreferences::PythonPreferences ()
-{
-    // Initialize interpreter
-    if (!Py_IsInitialized())
-        Py_Initialize();
-
-    modifySysPath();
-
-}
-
-void
-PythonPreferences::modifySysPath ()
-{
-    // Enter the current working directory into the python module path
-    //
-#if ROBOT(NAO)
-#ifndef OFFLINE
-    char *cwd = "/opt/naoqi/modules/lib";
-#else
-    char *cwd = "/usr/local/nao/modules/lib";
-#endif
-#else
-    const char *cwd = get_current_dir_name();
-#endif
-
-#ifdef DEBUG_NOGGIN_INITIALIZATION
-    printf("  Adding %s to sys.path\n", cwd);
-#endif
-
-    PyObject *sys_module = PyImport_ImportModule("sys");
-    if (sys_module == NULL) {
-        fprintf(stderr, "** Error importing sys module: **");
-        if (PyErr_Occurred())
-            PyErr_Print();
-        else
-            fprintf(stderr, "** No Python exception information available **");
-    }else {
-        PyObject *dict = PyModule_GetDict(sys_module);
-        PyObject *path = PyDict_GetItemString(dict, "path");
-        PyList_Append(path, PyString_FromString(cwd));
-        Py_DECREF(sys_module);
-    }
-
-#if !ROBOT(NAO)
-    free(cwd);
-#endif
-
-}
-
 

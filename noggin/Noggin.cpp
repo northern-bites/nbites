@@ -66,6 +66,10 @@ void Noggin::initializePython(shared_ptr<Vision> v)
     printf("  Initializing interpreter and extension modules\n");
 #endif
 
+    Py_Initialize();
+
+    modifySysPath();
+
     brain_module = NULL;
 
     // Initialize low-level modules
@@ -144,7 +148,6 @@ void Noggin::reload_hard ()
 {
     // finalize and reinitialize the Python interpreter
     Py_Finalize();
-    Py_Initialize();
     // load C extension modules
     initializePython(vision);
     // import noggin.Brain and instantiate a Brain reference
@@ -452,3 +455,43 @@ void Noggin::processGCButtonClicks(){
     }
 
 }
+
+void Noggin::modifySysPath ()
+{
+    // Enter the current working directory into the python module path
+    //
+#if ROBOT(NAO)
+#ifndef OFFLINE
+    char *cwd = "/opt/naoqi/modules/lib";
+#else
+    char *cwd = "/usr/local/nao/modules/lib";
+#endif
+#else
+    const char *cwd = get_current_dir_name();
+#endif
+
+#ifdef DEBUG_NOGGIN_INITIALIZATION
+    printf("  Adding %s to sys.path\n", cwd);
+#endif
+
+    PyObject *sys_module = PyImport_ImportModule("sys");
+    if (sys_module == NULL) {
+        fprintf(stderr, "** Error importing sys module: **");
+        if (PyErr_Occurred())
+            PyErr_Print();
+        else
+            fprintf(stderr, "** No Python exception information available **");
+    }else {
+        PyObject *dict = PyModule_GetDict(sys_module);
+        PyObject *path = PyDict_GetItemString(dict, "path");
+        PyList_Append(path, PyString_FromString(cwd));
+        Py_DECREF(sys_module);
+    }
+
+#if !ROBOT(NAO)
+    free(cwd);
+#endif
+
+}
+
+

@@ -41,6 +41,8 @@ public:
 private:
     // Initialize the interpreter and C Python extensions
     void initializePython(boost::shared_ptr<Vision> v);
+    // Insert the man directory in the system path
+    void modifySysPath();
     // Import the util.module_helper and noggin.Brain modules
     bool import_modules();
     // Instantiate a Brain instance
