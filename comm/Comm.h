@@ -103,7 +103,7 @@ class Comm
 
 };
 
-PyMODINIT_FUNC(void) init_comm();
+void init_comm();
 
 #endif // ROBOT(NAO) - commenting out the entire file
 
