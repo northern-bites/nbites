@@ -22,6 +22,9 @@ def rChaser(team):
         team.brain.my.y < NogginConstants.MY_GOALBOX_TOP_Y and
         team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X)):
         pos = (team.brain.ball.x,team.brain.ball.y)
+        if (team.me.isGoalie()):
+            pos = (team.brain.my.x,team.brain.my.y)
+            return [PBConstants.CHASER, PBConstants.CHASE_NORMAL, pos]
         return [PBConstants.CHASER, PBConstants.CHASE_AROUND_BOX, pos]
     # Almost always chase normal, i.e. without potential fields
     else:

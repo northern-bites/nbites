@@ -27,7 +27,8 @@ def sOneField(team):
     elif team.shouldUseDubD():
         return ['sOneField'] + Formations.fDubD(team)
 
-    elif (team.brain.ball.timeSinceSeen() >
+    elif (PBConstants.USE_FINDER and
+          team.brain.ball.timeSinceSeen() >
           PBConstants.FINDER_TIME_THRESH):
           #and team.brain.gameController.getTimeSinceUnpenalized() >
           #PBConstants.FINDER_TIME_THRESH):
@@ -69,7 +70,7 @@ def sTwoField(team):
               #PBConstants.FINDER_TIME_THRESH):
             return ['sTwoField'] + Formations.fFinder(team)
     # Standard spread formation
-    return ['sTwoField'] + Formations.fSpread(team)
+    return ['sTwoField'] + Formations.fTwoField(team)
 
 def sThreeField(team):
     '''

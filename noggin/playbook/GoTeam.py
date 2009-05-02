@@ -115,7 +115,6 @@ class GoTeam:
             return Strategies.sTestOffender(self)
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
-
         # Now we look at shorthanded strategies
         elif self.numInactiveMates == 1:
             return Strategies.sOneField(self)

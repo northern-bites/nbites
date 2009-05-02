@@ -14,19 +14,13 @@ def fNoFieldPlayers(team):
 
 def fOneField(team):
     """
-    Formation for one missing field player
+    Formation for one field player
     """
     if team.me.isGoalie():
         return [PBConstants.ONE_FIELD] + Roles.rGoalie(team)
-    # gets teammate that is chaser (could be me)
-    chaser_mate = team.determineChaser()
-    # if i am chaser
-    if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        #team.me.role = PBConstants.CHASER
-        return [PBConstants.ONE_FIELD] + Roles.rChaser(team)
-    else:
-        #team.me.role = PBConstants.DEFENDER
-        return [PBConstants.ONE_FIELD] + Roles.rDefender(team)
+
+    return [PBConstants.ONE_FIELD] + Roles.rChaser(team)
+
 
 def fTwoField(team):
     if team.me.isGoalie():

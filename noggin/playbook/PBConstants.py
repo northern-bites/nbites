@@ -16,8 +16,8 @@ DEBUG_SEARCHER = False
 
 USE_FINDER = False
 USE_DEEP_STOPPER = False # Fallback to a deep defensive position
-KICKOFF_PLAY = True # Forces the more intelligent and restrictive kickoff play
-PULL_THE_GOALIE = True
+KICKOFF_PLAY = False # Forces the more intelligent and restrictive kickoff play
+PULL_THE_GOALIE = False
 
 GOALIE_NUMBER = 1
 # Length of time to spend in the kickoff play
