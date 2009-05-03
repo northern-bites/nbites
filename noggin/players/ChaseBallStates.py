@@ -49,7 +49,9 @@ def spinFindBall(player):
     if player.brain.nav.isStopped():
         if player.currentGait != constants.FAST_GAIT:
             player.brain.CoA.setRobotGait(player.brain.motion)
-            player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
+            player.currentGait = constants.FAST_GAIT
+
+        player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
 
 #     if not player.brain.motion.isHeadActive():
 #         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
@@ -91,6 +93,7 @@ def turnToBallFar(player):
         player.currentChaseWalkTheta = turnRate
         if player.currentGait != constants.NORMAL_GAIT:
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
+            player.currentGait = constants.NORMAL_GAIT
         player.setSpeed(x=0,y=0,theta=turnRate)
 
     return player.stay()
@@ -113,6 +116,7 @@ def approachBall(player):
     if ball.on and player.brain.nav.isStopped():
         if player.currentGait != constants.FAST_GAIT:
             player.brain.CoA.setRobotGait(player.brain.motion)
+            player.currentGait = constants.FAST_GAIT
         player.currentChaseWalkX = sX
         player.setSpeed(sX,0,0)
 
@@ -149,6 +153,7 @@ def positionForKick(player):
         player.currentChaseWalkY = sY
         if player.currentGait != constants.NORMAL_GAIT:
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
+            player.currentGait = constants.NORMAL_GAIT
         player.setSpeed(0,sY,0)
     elif (MyMath.sign(player.currentChaseWalkY) != MyMath.sign(sY) or
           fabs(sY - player.currentChaseWalkY) > constants.CHASE_Y_EPSILON):
