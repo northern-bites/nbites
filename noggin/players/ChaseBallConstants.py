@@ -3,8 +3,9 @@
 
 # Frame thresholds
 FRAMES_ON_THRESH = 2
-FRAMES_OFF_THRESH = 8
+FRAMES_OFF_THRESH = 12
 GIVE_UP_THRESH = 200
+SUPER_SAFE_KICKS = False
 
 # Turning
 # Value to stop spinning to ball and approach

@@ -10,7 +10,7 @@ def shouldTurnToBall_FoundBall(player):
 def shouldTurnToBall_ApproachBall(player):
     ball = player.brain.ball
     if (ball.on and
-        abs(ball.locBearing) > constants.BALL_BEARING_OFF_THRESH):
+        abs(ball.bearing) > constants.BALL_BEARING_OFF_THRESH):
         return True
     return False
 
@@ -37,14 +37,14 @@ def shouldScanFindBall(player):
 def shouldApproachBall(player):
     ball = player.brain.ball
     if ( ball.on and
-         abs(ball.locBearing) < constants.BALL_BEARING_THRESH ):
+         abs(ball.bearing) < constants.BALL_BEARING_THRESH ):
         return True
     return False
 
 def shouldApproachBallClose(player):
     ball = player.brain.ball
     if ball.locDist < constants.BALL_CLOSE_DIST_THRESH and \
-            abs(ball.locBearing) < constants.BALL_CLOSE_APPROACH_BEARING_THRESH and\
+            abs(ball.bearing) < constants.BALL_CLOSE_APPROACH_BEARING_THRESH and\
             ball.on :
         return True
     return False
@@ -52,14 +52,14 @@ def shouldApproachBallClose(player):
 def shouldTurnToBallClose(player):
     ball = player.brain.ball
     if ( ball.on and
-         abs(ball.locBearing) > constants.BALL_CLOSE_TURN_BEARING_THRESH and
+         abs(ball.bearing) > constants.BALL_CLOSE_TURN_BEARING_THRESH and
          ball.locDist < constants.BALL_CLOSE_DIST_THRESH):
         return True
 
 def shouldPositionForKick(player):
     ball = player.brain.ball
     if (ball.on and
-        abs(ball.locBearing) < constants.BALL_POS_KICK_BEARING_THRESH and
+        abs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH and
         ball.locDist < constants.BALL_POS_KICK_DIST_THRESH ):
         return True
     return False
@@ -67,7 +67,7 @@ def shouldPositionForKick(player):
 def shouldApproachForKick(player):
     ball = player.brain.ball
     if (ball.on and ball.locRelX > constants.BALL_KICK_LEFT_X_FAR + 5 ):
-#         abs(ball.locBearing) < constants.BALL_POS_KICK_BEARING_THRESH and
+#         abs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH and
 #         ball.locDist > constants.BALL_POS_KICK_DIST_THRESH + 10 ):
         return True
     return False
@@ -75,7 +75,7 @@ def shouldApproachForKick(player):
 def shouldTurnForKick(player):
     ball = player.brain.ball
     if ( ball.on and
-          abs(ball.locBearing) > constants.BALL_TURN_KICK_BEARING_THRESH and
+          abs(ball.bearing) > constants.BALL_TURN_KICK_BEARING_THRESH and
          ball.locDist < constants.BALL_POS_KICK_DIST_THRESH ):
         return True
     return False
@@ -93,13 +93,13 @@ def shouldKick(player):
 def shouldTurnToBall_fromAtBallPosition(player):
     ball = player.brain.ball
     if (ball.on and
-        abs(ball.locBearing) > constants.BALL_SPIN_POSITION_THRESH + 10):
+        abs(ball.bearing) > constants.BALL_SPIN_POSITION_THRESH + 10):
         return True
     return False
 
 def shouldBeAtSpinDir(player):
     ball = player.brain.ball
     if ( ball.on and
-         abs(ball.locBearing) < constants.BALL_SPIN_POSITION_THRESH ):
+         abs(ball.bearing) < constants.BALL_SPIN_POSITION_THRESH ):
         return True
     return False

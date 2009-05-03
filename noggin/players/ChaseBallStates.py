@@ -75,7 +75,7 @@ def turnToBallFar(player):
         player.currentChaseWalkY = 0
         player.currentChaseWalkTheta = 0
 
-    turnRate = MyMath.clip(ball.locBearing*constants.BALL_SPIN_GAIN,
+    turnRate = MyMath.clip(ball.bearing*constants.BALL_SPIN_GAIN,
                            -constants.BALL_SPIN_SPEED,
                            constants.BALL_SPIN_SPEED)
 
@@ -109,7 +109,7 @@ def approachBall(player):
         player.currentChaseWalkTheta = 0
 
     ball = player.brain.ball
-    sX = MyMath.clip(ball.locDist*constants.APPROACH_X_GAIN,
+    sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
                      constants.MIN_X_SPEED,
                      constants.MAX_X_SPEED)
 
@@ -137,7 +137,7 @@ def positionForKick(player):
         player.currentChaseWalkTheta = 0
 
     ball = player.brain.ball
-    targetY = (ball.locRelY - constants.BALL_KICK_LEFT_Y_R )
+    targetY = (ball.relY - constants.BALL_KICK_LEFT_Y_R )
     sY = MyMath.clip((targetY),
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
@@ -219,6 +219,8 @@ def decideKick(player):
         return player.stay()
     elif player.sawOwnGoal:
         player.brain.tracker.trackBall()
+        if constants.SUPER_SAFE_KICKS:
+            return player.goLater('ignoreOwnGoal')
         myLeftPostBearing = None
         myRightPostBearing = None
         oppLeftPostBearing = None
@@ -368,12 +370,22 @@ def kickBallStraight(player):
 def kickBallLeft(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
+        player.setSpeed(0,1.5,0)
+    elif player.counter == 10:
+        player.stopWalking()
+    elif player.brain.nav.isStopped():
+        return player.goLater('kickBallLeftExecute')
+    return player.stay()
+
+def kickBallLeftExecute(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.executeStiffness(StiffnessModes.LEFT_SIDE_KICK_STIFFNESSES)
         player.printf("We should kick left!", 'cyan')
     if player.counter == 2:
-        player.executeMove(SweetMoves.LEFT_FAR_KICK)
+        player.executeMove(SweetMoves.LEFT_SIDE_KICK)
 
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_SIDE_KICK):
         # trick the robot into standing up instead of leaning to the side
         player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
         player.setSpeed(0,0,0)
@@ -391,12 +403,12 @@ def kickBallLeft(player):
 def kickBallRight(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
+        player.executeStiffness(StiffnessModes.RIGHT_SIDE_KICK_STIFFNESSES)
         player.printf("We should kick right!", 'cyan')
     if player.counter == 2:
-        player.executeMove(SweetMoves.LEFT_FAR_KICK)
+        player.executeMove(SweetMoves.RIGHT_SIDE_KICK)
 
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.RIGHT_SIDE_KICK):
         # trick the robot into standing up instead of leaning to the side
         player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
         player.setSpeed(0,0,0)
