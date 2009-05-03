@@ -120,7 +120,7 @@ SET( OFFLINE_NAOQI_PATH
 # Should are field constants be those of the lab or the standard field
 OPTION( USING_LAB_FIELD
     "Set field constants to use the lab field constants"
-    ON
+    OFF
     )
 SET( USING_LAB_FIELD ${USING_LAB_FIELD} )
 
@@ -142,7 +142,7 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
-  "tables/watson/tucker.mtb"
+  "tables/watson/chownmay1.mtb"
   #"tables/lab120/shutter83-2.mtb"
   CACHE STRING
   "Path relative to man directory for the desired color table"
