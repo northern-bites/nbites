@@ -35,7 +35,7 @@ public:
     // Update functions
     void updateModel(RangeBearingMeasurement  ball, PoseEst p,
                      bool _useCartesian=true);
-
+    void reset();
     // Getters
     /**
      * @return The current estimate of the ball x position

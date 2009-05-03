@@ -30,7 +30,10 @@ public:
         ballEKF = ballEKF_reference;
     }
 
-    void reset() { loc->reset(); }
+    void reset() {
+        loc->reset();
+        ballEKF->reset();
+    }
 
     /* Getters */
     // We use degreees in python, and radians in C++

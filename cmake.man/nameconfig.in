@@ -12,7 +12,7 @@
 
 
 //Get names into C++
-#define ROBOT_NAME_${REMOTE_ADDRESS}
+//#define ROBOT_NAME_${REMOTE_ADDRESS}
 
 
 #endif // !_nameconfig_h

@@ -106,6 +106,19 @@ BallEKF::BallEKF(float initX, float initY,
     setYVelocityUncert(initVelYUncert);
 }
 
+
+void BallEKF::reset()
+{
+    setXEst(INIT_BALL_X);
+    setYEst(INIT_BALL_Y);
+    setXVelocityEst(INIT_BALL_X_VEL);
+    setYVelocityEst(INIT_BALL_Y_VEL);
+    setXUncert(INIT_X_UNCERT);
+    setYUncert(INIT_Y_UNCERT);
+    setXVelocityUncert(INIT_X_VEL_UNCERT);
+    setYVelocityUncert(INIT_X_VEL_UNCERT);
+}
+
 /**
  * Method to deal with updating the entire ball model
  *

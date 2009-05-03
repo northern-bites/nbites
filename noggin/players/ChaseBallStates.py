@@ -107,20 +107,23 @@ def approachBall(player):
         player.currentChaseWalkX = 0
         player.currentChaseWalkY = 0
         player.currentChaseWalkTheta = 0
+        player.stoppedWalk = False
 
     ball = player.brain.ball
     sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
                      constants.MIN_X_SPEED,
                      constants.MAX_X_SPEED)
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
 
-    if ball.on and player.brain.nav.isStopped():
+    if ball.on and player.stoppedWalk:
         if player.currentGait != constants.FAST_GAIT:
             player.brain.CoA.setRobotGait(player.brain.motion)
             player.currentGait = constants.FAST_GAIT
         player.currentChaseWalkX = sX
         player.setSpeed(sX,0,0)
 
-    elif transitions.shouldPositionForKick(player):
+    if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBallFar')
@@ -249,53 +252,54 @@ def decideKick(player):
 
         # We see both posts
         if myLeftPostBearing is not None and myRightPostBearing is not None:
-            if player.brain.my.h > 0:
-                return player.goLater('kickBallRight')
-            else:
-                return player.goLater('kickBallLeft')
-#             # Goal in front
-#             if myRightPostBearing > myLeftPostBearing > 0:
-#                 # kick right
+#             if player.brain.my.h > 0:
 #                 return player.goLater('kickBallRight')
 #             else:
-#                 # kick left
 #                 return player.goLater('kickBallLeft')
-#         elif oppLeftPostBearing is not None and oppRightPostBearing is not None:
-#             if oppLeftPostBearing < 0 and oppRightPostBearing > 0:
-#                 # kick straight
-#                 return player.goLater('kickBallStraight')
-#             else:
-#                 if fabs(oppLeftPostBearing) > fabs(oppRightPostBearing):
-#                     # kick left
-#                     return player.goLater('kickBallLeft')
-#                 else:
-#                     # kick right
-#                     return player.goLater('kickBallRight')
+            # Goal in front
+            if myRightPostBearing > myLeftPostBearing > 0:
+                # kick right
+                return player.goLater('kickBallRight')
+            else:
+                # kick left
+                return player.goLater('kickBallLeft')
+        elif oppLeftPostBearing is not None and oppRightPostBearing is not None:
+            if oppLeftPostBearing < 0 and oppRightPostBearing > 0:
+                # kick straight
+                return player.goLater('kickBallStraight')
+            else:
+                if fabs(oppLeftPostBearing) > fabs(oppRightPostBearing):
+                    # kick left
+                    return player.goLater('kickBallLeft')
+                else:
+                    # kick right
+                    return player.goLater('kickBallRight')
 
         elif myLeftPostBearing is not None:
-            if player.brain.my.h > 0:
-                return player.goLater('kickBallRight')
-            else:
-                return player.goLater('kickBallLeft')
-
-#             if myLeftPostBearing > 0:
+#             if player.brain.my.h > 0:
 #                 return player.goLater('kickBallRight')
 #             else:
 #                 return player.goLater('kickBallLeft')
+
+            if myLeftPostBearing > 0:
+                return player.goLater('kickBallRight')
+            else:
+                return player.goLater('kickBallLeft')
         elif myRightPostBearing is not None:
             if player.brain.my.h > 0:
                 return player.goLater('kickBallRight')
             else:
                 return player.goLater('kickBallLeft')
 
-#             if myRightPostBearing > 0:
-#                 return player.goLater('kickBallLeft')
-#             else:
-#                 return player.goLater('kickBallRight')
+            if myRightPostBearing > 0:
+                return player.goLater('kickBallLeft')
+            else:
+                return player.goLater('kickBallRight')
 
         # don't do anything
         return player.goLater('ignoreOwnGoal')
     elif player.sawOppGoal:
+        return player.goLater('kickBallStraight')
         myLeftPostBearing = None
         myRightPostBearing = None
         oppLeftPostBearing = None
@@ -332,9 +336,9 @@ def decideKick(player):
                 else:
                     return player.goLater('kickBallLeft')
         else:
-            if player.brain.my.h < -35:
+            if player.brain.my.h < -65:
                 return player.goLater('kickBallLeft')
-            elif player.brain.my.h > 35:
+            elif player.brain.my.h > 65:
                 return player.goLater('kickBallRight')
             else:
                 return player.goLater('kickBallStraight')
