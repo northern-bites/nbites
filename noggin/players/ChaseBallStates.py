@@ -1,4 +1,3 @@
-import math
 import man.noggin.util.MyMath as MyMath
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
@@ -47,10 +46,9 @@ def spinFindBall(player):
         player.brain.tracker.trackBall()
 
     if player.brain.nav.isStopped():
-        player.brain.CoA.setRobotGait(player.brain.motion)
-        player.setSpeed(0,
-                        0,
-                        constants.SPIN_SPEED)
+        if player.currentGait != constants.FAST_GAIT:
+            player.brain.CoA.setRobotGait(player.brain.motion)
+            player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
 
 #     if not player.brain.motion.isHeadActive():
 #         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
@@ -90,7 +88,8 @@ def turnToBallFar(player):
         player.stopWalking()
     elif ball.on and player.brain.nav.isStopped():
         player.currentChaseWalkTheta = turnRate
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        if player.currentGait != constants.NORMAL_GAIT:
+            player.brain.CoA.setRobotTurnGait(player.brain.motion)
         player.setSpeed(x=0,y=0,theta=turnRate)
 
     return player.stay()
@@ -111,7 +110,8 @@ def approachBall(player):
                      constants.MAX_X_SPEED)
 
     if ball.on and player.brain.nav.isStopped():
-        player.brain.CoA.setRobotGait(player.brain.motion)
+        if player.currentGait != constants.FAST_GAIT:
+            player.brain.CoA.setRobotGait(player.brain.motion)
         player.currentChaseWalkX = sX
         player.setSpeed(sX,0,0)
 
@@ -151,7 +151,8 @@ def positionForKick(player):
         player.stopWalking()
     elif ball.on and player.brain.nav.isStopped():
         player.currentChaseWalkY = sY
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        if player.currentGait != constants.NORMAL_GAIT:
+            player.brain.CoA.setRobotTurnGait(player.brain.motion)
         player.setSpeed(0,sY,0)
 
     return player.stay()

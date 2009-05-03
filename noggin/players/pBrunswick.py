@@ -20,6 +20,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentChaseWalkTheta = None
         self.currentChaseWalkX = None
         self.currentChaseWalkY = None
+        self.currentGait = None
 
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':
