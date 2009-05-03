@@ -66,9 +66,9 @@ def shouldPositionForKick(player):
 
 def shouldApproachForKick(player):
     ball = player.brain.ball
-    if (ball.on and
-        abs(ball.locBearing) < constants.BALL_POS_KICK_BEARING_THRESH and
-        ball.locDist > constants.BALL_POS_KICK_DIST_THRESH + 10 ):
+    if (ball.on and ball.locRelX > constants.BALL_KICK_LEFT_X_FAR + 5 ):
+#         abs(ball.locBearing) < constants.BALL_POS_KICK_BEARING_THRESH and
+#         ball.locDist > constants.BALL_POS_KICK_DIST_THRESH + 10 ):
         return True
     return False
 

@@ -214,7 +214,10 @@ def decideKick(player):
         return player.stay()
     elif player.sawOwnGoal:
         player.brain.tracker.trackBall()
-        leftPostBearing = None
+        myLeftPostBearing = None
+        myRightPostBearing = None
+        oppLeftPostBearing = None
+        oppRightPostBearing = None
         if len(player.myGoalLeftPostBearings) > 0:
             myLeftPostBearing = (sum(player.myGoalLeftPostBearings) /
                                  len(player.myGoalLeftPostBearings))
@@ -228,11 +231,68 @@ def decideKick(player):
             oppRightPostBearing = (sum(player.oppGoalRightPostBearings) /
                                    len(player.oppGoalRightPostBearings))
 
-        #kick left
-        #kick right
+        if myLeftPostBearing is not None:
+            player.printf("My left post bearing is: " + str(myLeftPostBearing),'cyan')
+        if myRightPostBearing is not None:
+            player.printf("My right post bearing is: " + str(myRightPostBearing),'cyan')
+        if oppLeftPostBearing is not None:
+            player.printf("Opp left post bearing is: " + str(oppLeftPostBearing),'cyan')
+        if oppRightPostBearing is not None:
+            player.printf("Opp right post bearing is: " + str(oppRightPostBearing),'cyan')
+
+        # We see both posts
+        if myLeftPostBearing is not None and myRightPostBearing is not None:
+            if player.brain.my.h > 0:
+                return player.goLater('kickBallRight')
+            else:
+                return player.goLater('kickBallLeft')
+#             # Goal in front
+#             if myRightPostBearing > myLeftPostBearing > 0:
+#                 # kick right
+#                 return player.goLater('kickBallRight')
+#             else:
+#                 # kick left
+#                 return player.goLater('kickBallLeft')
+#         elif oppLeftPostBearing is not None and oppRightPostBearing is not None:
+#             if oppLeftPostBearing < 0 and oppRightPostBearing > 0:
+#                 # kick straight
+#                 return player.goLater('kickBallStraight')
+#             else:
+#                 if fabs(oppLeftPostBearing) > fabs(oppRightPostBearing):
+#                     # kick left
+#                     return player.goLater('kickBallLeft')
+#                 else:
+#                     # kick right
+#                     return player.goLater('kickBallRight')
+
+        elif myLeftPostBearing is not None:
+            if player.brain.my.h > 0:
+                return player.goLater('kickBallRight')
+            else:
+                return player.goLater('kickBallLeft')
+
+#             if myLeftPostBearing > 0:
+#                 return player.goLater('kickBallRight')
+#             else:
+#                 return player.goLater('kickBallLeft')
+        elif myRightPostBearing is not None:
+            if player.brain.my.h > 0:
+                return player.goLater('kickBallRight')
+            else:
+                return player.goLater('kickBallLeft')
+
+#             if myRightPostBearing > 0:
+#                 return player.goLater('kickBallLeft')
+#             else:
+#                 return player.goLater('kickBallRight')
+
         # don't do anything
         return player.goLater('ignoreOwnGoal')
-    else:
+    elif player.sawOppGoal:
+        myLeftPostBearing = None
+        myRightPostBearing = None
+        oppLeftPostBearing = None
+        oppRightPostBearing = None
         player.brain.tracker.trackBall()
         if len(player.myGoalLeftPostBearings) > 0:
             myLeftPostBearing = (sum(player.myGoalLeftPostBearings) /
@@ -246,16 +306,85 @@ def decideKick(player):
         if len(player.oppGoalRightPostBearings) > 0:
             oppRightPostBearing = (sum(player.oppGoalRightPostBearings) /
                                    len(player.oppGoalRightPostBearings))
+        if myLeftPostBearing is not None:
+            player.printf("My left post bearing is: " + str(myLeftPostBearing),'cyan')
+        if myRightPostBearing is not None:
+            player.printf("My right post bearing is: " + str(myRightPostBearing),'cyan')
+        if oppLeftPostBearing is not None:
+            player.printf("Opp left post bearing is: " + str(oppLeftPostBearing),'cyan')
+        if oppRightPostBearing is not None:
+            player.printf("Opp right post bearing is: " + str(oppRightPostBearing),'cyan')
 
+        if oppLeftPostBearing is not None and oppRightPostBearing is not None:
+            if oppLeftPostBearing < 0 and oppRightPostBearing > 0:
+                # kick straight
+                return player.goLater('kickBallStraight')
+            else:
+                if player.brain.my.h > 0:
+                    return player.goLater('kickBallRight')
+                else:
+                    return player.goLater('kickBallLeft')
+        else:
+            if player.brain.my.h < -35:
+                return player.goLater('kickBallLeft')
+            elif player.brain.my.h > 35:
+                return player.goLater('kickBallRight')
+            else:
+                return player.goLater('kickBallStraight')
         # kick straight
-        return player.goLater('kickBall')
-        #kick left
-        #kick right
+        return player.goLater('kickBallStraight')
+    else:
+        # use localization for kick
+        return player.goLater('kickBallStraight')
 
-
-def kickBall(player):
+def kickBallStraight(player):
     if player.firstFrame():
         player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
+        player.printf("We should kick straight!", 'cyan')
+    if player.counter == 2:
+        player.executeMove(SweetMoves.LEFT_FAR_KICK)
+
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
+        # trick the robot into standing up instead of leaning to the side
+        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
+        player.setSpeed(0,0,0)
+        if transitions.shouldScanFindBall(player):
+            return player.goLater('scanFindBall')
+        elif transitions.shouldApproachBall(player):
+            return player.goLater('approachBall')
+        elif transitions.shouldPositionForKick(player):
+            return player.goLater('positionForKick')
+        elif transitions.shouldTurnToBall_ApproachBall(player):
+            return player.goLater('turnToBallFar')
+
+    return player.stay()
+
+def kickBallLeft(player):
+    if player.firstFrame():
+        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
+        player.printf("We should kick left!", 'cyan')
+    if player.counter == 2:
+        player.executeMove(SweetMoves.LEFT_FAR_KICK)
+
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
+        # trick the robot into standing up instead of leaning to the side
+        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
+        player.setSpeed(0,0,0)
+        if transitions.shouldScanFindBall(player):
+            return player.goLater('scanFindBall')
+        elif transitions.shouldApproachBall(player):
+            return player.goLater('approachBall')
+        elif transitions.shouldPositionForKick(player):
+            return player.goLater('positionForKick')
+        elif transitions.shouldTurnToBall_ApproachBall(player):
+            return player.goLater('turnToBallFar')
+
+    return player.stay()
+
+def kickBallRight(player):
+    if player.firstFrame():
+        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
+        player.printf("We should kick right!", 'cyan')
     if player.counter == 2:
         player.executeMove(SweetMoves.LEFT_FAR_KICK)
 
