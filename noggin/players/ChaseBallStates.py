@@ -139,7 +139,7 @@ def positionForKick(player):
                      constants.MAX_Y_SPEED)
 
     if transitions.shouldKick(player):
-        return player.goLater('decideKick')
+        return player.goLater('waitBeforeKick')
     elif transitions.shouldApproachForKick(player):
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
@@ -158,6 +158,27 @@ def positionForKick(player):
 
     return player.stay()
 
+def waitBeforeKick(player):
+    if player.firstFrame():
+        player.stopWalking()
+        player.currentChaseWalkX = 0
+        player.currentChaseWalkY = 0
+        player.currentChaseWalkTheta = 0
+
+    if not player.brain.nav.isStopped():
+        return player.stay()
+    elif transitions.shouldApproachForKick(player):
+        player.brain.tracker.trackBall()
+        return player.goLater('approachBall')
+    elif transitions.shouldScanFindBall(player):
+        player.brain.tracker.trackBall()
+        return player.goLater('scanFindBall')
+#     elif transitions.shouldPositionForKick(player):
+#         player.brain.tracker.trackBall()
+#         return player.goLater('positionForKick')
+    else:
+        return player.goLater('decideKick')
+
 def decideKick(player):
     """
     Decides if we should kick.
@@ -172,21 +193,65 @@ def decideKick(player):
         player.brain.tracker.switchTo('stopped')
         player.brain.motion.stopHeadMoves()
         player.executeMove(SweetMoves.KICK_SCAN)
+        player.oppGoalLeftPostBearings = []
+        player.oppGoalRightPostBearings = []
+        player.myGoalLeftPostBearings = []
+        player.myGoalRightPostBearings = []
 
-    if player.stateTime < SweetMoves.getMoveTime(SweetMoves.KICK_SCAN):
-        if (player.brain.myGoalLeftPost.on or
-            player.brain.myGoalRightPost.on):
+    if (player.stateTime < SweetMoves.getMoveTime(SweetMoves.KICK_SCAN)):
+        if player.brain.myGoalLeftPost.on:
             player.sawOwnGoal = True
-        if (player.brain.oppGoalLeftPost.on or
-            player.brain.oppGoalRightPost.on):
+            player.myGoalLeftPostBearings.append(player.brain.myGoalLeftPost.bearing)
+        if player.brain.myGoalRightPost.on:
+            player.sawOwnGoal = True
+            player.myGoalRightPostBearings.append(player.brain.myGoalRightPost.bearing)
+        if player.brain.oppGoalLeftPost.on:
             player.sawOppGoal = True
+            player.oppGoalLeftPostBearings.append(player.brain.oppGoalRightPost.bearing)
+        if player.brain.oppGoalRightPost.on:
+            player.sawOppGoal = True
+            player.oppGoalRightPostBearings.append(player.brain.oppGoalRightPost.bearing)
         return player.stay()
     elif player.sawOwnGoal:
         player.brain.tracker.trackBall()
+        leftPostBearing = None
+        if len(player.myGoalLeftPostBearings) > 0:
+            myLeftPostBearing = (sum(player.myGoalLeftPostBearings) /
+                                 len(player.myGoalLeftPostBearings))
+        if len(player.myGoalRightPostBearings) > 0:
+            myRightPostBearing = (sum(player.myGoalRightPostBearings) /
+                                  len(player.myGoalRightPostBearings))
+        if len(player.oppGoalLeftPostBearings) > 0:
+            oppLeftPostBearing = (sum(player.oppGoalLeftPostBearings) /
+                                 len(player.oppGoalLeftPostBearings))
+        if len(player.oppGoalRightPostBearings) > 0:
+            oppRightPostBearing = (sum(player.oppGoalRightPostBearings) /
+                                   len(player.oppGoalRightPostBearings))
+
+        #kick left
+        #kick right
+        # don't do anything
         return player.goLater('ignoreOwnGoal')
     else:
         player.brain.tracker.trackBall()
+        if len(player.myGoalLeftPostBearings) > 0:
+            myLeftPostBearing = (sum(player.myGoalLeftPostBearings) /
+                                 len(player.myGoalLeftPostBearings))
+        if len(player.myGoalRightPostBearings) > 0:
+            myRightPostBearing = (sum(player.myGoalRightPostBearings) /
+                                  len(player.myGoalRightPostBearings))
+        if len(player.oppGoalLeftPostBearings) > 0:
+            oppLeftPostBearing = (sum(player.oppGoalLeftPostBearings) /
+                                 len(player.oppGoalLeftPostBearings))
+        if len(player.oppGoalRightPostBearings) > 0:
+            oppRightPostBearing = (sum(player.oppGoalRightPostBearings) /
+                                   len(player.oppGoalRightPostBearings))
+
+        # kick straight
         return player.goLater('kickBall')
+        #kick left
+        #kick right
+
 
 def kickBall(player):
     if player.firstFrame():

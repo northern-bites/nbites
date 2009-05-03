@@ -23,6 +23,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentGait = None
         self.sawOwnGoal = False
         self.sawOppGoal = False
+        self.oppGoalLeftPostBearings = []
+        self.oppGoalRightPostBearings = []
+        self.myGoalLeftPostBearings = []
+        self.myGoalRightPostBearings = []
 
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':
