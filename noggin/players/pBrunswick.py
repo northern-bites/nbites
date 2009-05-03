@@ -21,6 +21,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentChaseWalkX = None
         self.currentChaseWalkY = None
         self.currentGait = None
+        self.sawOwnGoal = False
+        self.sawOppGoal = False
 
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':

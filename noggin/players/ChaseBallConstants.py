@@ -51,7 +51,7 @@ APPROACH_CLOSE_X_GAIN = 2.5
 APPROACH_CLOSE_Y_GAIN = 0.2
 
 POS_KICK_X_GAIN = 0.8
-POS_KICK_Y_GAIN = 2.0
+POS_KICK_Y_GAIN = 0.8
 POS_KICK_TARGET_Y_GAIN = -3.0
 POS_KICK_TARGET_X_GAIN = 0.5
 
@@ -59,8 +59,10 @@ POS_KICK_TARGET_X_GAIN = 0.5
 MAX_X_SPEED = 7.5
 MIN_X_SPEED = -7.5
 
+# Values for controlling the strafing
 MAX_Y_SPEED = 3.0
 MIN_Y_SPEED = -MAX_Y_SPEED
+CHASE_Y_EPSILON = 0.75
 
 # Keep track of what gait we're using
 FAST_GAIT = "fastGait"

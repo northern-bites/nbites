@@ -1,8 +1,8 @@
 import man.noggin.util.MyMath as MyMath
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
-
 import man.motion.SweetMoves as SweetMoves
+from math import fabs
 
 def chase(player):
     if player.brain.ball.on and constants.USE_LOC_CHASE:
@@ -15,7 +15,7 @@ def chase(player):
         return player.goNow('turnToBallFar')
     elif transitions.shouldSpinFindBall(player):
         return player.goNow('spinFindBall')
-    else :
+    else:
         return player.goNow('scanFindBall')
 
 def scanFindBall(player):
@@ -137,8 +137,6 @@ def positionForKick(player):
     sY = MyMath.clip((targetY)*constants.APPROACH_CLOSE_Y_GAIN,
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
-    player.printf("My current sY is " + str(player.currentChaseWalkY), 'cyan')
-    player.printf("My new sY is " + str(sY), 'cyan')
 
     if transitions.shouldKick(player):
         return player.goLater('decideKick')
@@ -146,10 +144,19 @@ def positionForKick(player):
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif MyMath.sign(player.currentChaseWalkY) != MyMath.sign(sY):
+    elif (MyMath.sign(player.currentChaseWalkY) != MyMath.sign(sY) or
+          fabs(sY - player.currentChaseWalkY) > constants.CHASE_Y_EPSILON):
+        player.printf("Changing positionSpeed",'cyan')
+        player.printf("My current sY is " + str(player.currentChaseWalkY), 'cyan')
+        player.printf("My new sY is " + str(sY), 'cyan')
+
         player.currentChaseWalkY = sY
         player.stopWalking()
     elif ball.on and player.brain.nav.isStopped():
+        player.printf("Changing positionSpeed",'yellow')
+        player.printf("My current sY is " + str(player.currentChaseWalkY), 'yellow')
+        player.printf("My new sY is " + str(sY), 'yellow')
+
         player.currentChaseWalkY = sY
         if player.currentGait != constants.NORMAL_GAIT:
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
@@ -166,15 +173,28 @@ def decideKick(player):
         player.currentChaseWalkX = 0
         player.currentChaseWalkY = 0
         player.currentChaseWalkTheta = 0
+        player.sawOwnGoal = False
+        player.sawOppGoal = False
+        player.brain.tracker.switchTo('stopped')
+        player.brain.motion.stopHeadMoves()
+        player.executeMove(SweetMoves.KICK_SCAN)
 
-    if (player.brain.myGoalLeftPost.framesOff > 10 and
-        player.brain.myGoalRightPost.framesOff > 10):
+    if player.stateTime < SweetMoves.getMoveTime(SweetMoves.KICK_SCAN):
+        if (player.brain.myGoalLeftPost.on or
+            player.brain.myGoalRightPost.on):
+            player.sawOwnGoal = True
+        if (player.brain.oppGoalLeftPost.on or
+            player.brain.oppGoalRightPost.on):
+            player.sawOppGoal = True
+        return player.stay()
+    elif player.sawOwnGoal:
+        player.brain.tracker.trackBall()
+        return player.goLater('ignoreOwnGoal')
+    else:
+        player.brain.tracker.trackBall()
         return player.goLater('kickBall')
-    return player.goLater('positionForKick')
 
 def kickBall(player):
-    if player.firstFrame():
-        player.stopWalking()
     if player.counter == 2:
         player.executeMove(SweetMoves.NEW_KICK)
 

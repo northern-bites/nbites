@@ -60,6 +60,7 @@ class MotionInterface
     void stopBodyMoves();
     void stopHeadMoves();
     void resetWalkProvider();
+    void resetScriptedProvider();
 
     //For noggin
     MotionModel getOdometryUpdate(){

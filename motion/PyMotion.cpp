@@ -227,6 +227,10 @@ public:
         motionInterface->resetWalkProvider();
     }
 
+    void resetScriptedProvider(){
+        motionInterface->resetScriptedProvider();
+    }
+
     bool isHeadActive(){
         return motionInterface->isHeadActive();
     }
@@ -309,6 +313,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)
+        .def("resetScripted", &PyMotionInterface::resetScriptedProvider)
         ;
 }
 

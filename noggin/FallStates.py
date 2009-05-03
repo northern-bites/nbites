@@ -14,6 +14,7 @@ def fallen(guard):
         guard.brain.roboguardian.enableFallProtection(False)
         guard.brain.tracker.stopHeadMoves()
         guard.brain.motion.resetWalk()
+        guard.brain.motion.resetScripted()
         guard.brain.player.standupGainsOn()
 
     # Put player into safe mode
@@ -79,6 +80,7 @@ def doneStanding(guard):
     """
     if guard.firstFrame():
         guard.brain.player.gainsOn()
+        guard.brain.player.stopWalking()
 
     guard.brain.player.switchTo(guard.brain.gameController.currentState)
     return guard.goLater('notFallen')

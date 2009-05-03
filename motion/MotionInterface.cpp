@@ -52,6 +52,10 @@ void MotionInterface::resetWalkProvider(){
     switchboard->resetWalkProvider();
 }
 
+void MotionInterface::resetScriptedProvider(){
+    switchboard->resetScriptedProvider();
+}
+
 float MotionInterface::getHeadSpeed() {
     return DUMMY_F;
 }
