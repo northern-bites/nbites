@@ -3,6 +3,7 @@ from . import ChaseBallConstants as ChaseConstants
 import ChaseBallTransitions as chaseTransitions
 import man.noggin.util.MyMath as MyMath
 import man.motion.SweetMoves as SweetMoves
+import man.motion.StiffnessModes as StiffnessModes
 
 def positionLocalize(player):
 
@@ -52,7 +53,7 @@ def positionOnBall(player):
         player.brain.nav.goTo(nextX,nextY,nextH)
 
     if player.brain.nav.isStopped():
-        player.goLater('chase')
+        return player.goLater('chase')
 
     return player.stay()
 
@@ -62,7 +63,9 @@ def atPosition(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.activeLoc()
+        player.brain.tracker.trackBall()
+    if player.brain.ball.dist < 25:
+        return player.goLater('kickAtPosition')
     return player.stay()
 
 def spinToBall(player):
@@ -126,5 +129,21 @@ def spinFindBallPosition(player):
         return player.goLater('spinToBall')
     if chaseTransitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('atSpinBallPosition')
+
+    return player.stay()
+
+
+def kickAtPosition(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
+    if player.counter == 2:
+        player.executeMove(SweetMoves.LEFT_FAR_KICK)
+
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
+        # trick the robot into standing up instead of leaning to the side
+        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
+        player.setSpeed(0,0,0)
+        return player.goLater('atPosition')
 
     return player.stay()
