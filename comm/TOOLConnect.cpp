@@ -3,6 +3,7 @@
 #include "Common.h"
 
 #include <sys/utsname.h> // uname()
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
@@ -12,6 +13,7 @@ using namespace boost::assign;
 #include "Kinematics.h"
 #include "SensorDef.h"
 
+using std::vector;
 using namespace boost;
 
 //
@@ -31,12 +33,20 @@ TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
                           shared_ptr<Vision> v)
     : Thread(_synchro, "TOOLConnect"),
       state(TOOL_REQUESTING),
-      sensors(s), vision(v)
+      sensors(s), vision(v),
+      loc(), ballEKF()
 {
 }
 
 TOOLConnect::~TOOLConnect ()
 {
+}
+
+void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
+                                         shared_ptr<BallEKF> _ballEKF)
+{
+  loc = _loc;
+  ballEKF = _ballEKF;
 }
 
 void
@@ -187,6 +197,30 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
         // send thresholded image
         serial.write_bytes(&vision->thresh->thresholded[0][0],
                            IMAGE_WIDTH * IMAGE_HEIGHT);
+
+    if (r.local) {
+        // send localization data
+        vector<float> loc_values;
+
+        if (loc.get()) {
+          loc_values += loc->getXEst(), loc->getYEst(),
+                        loc->getHEstDeg(), loc->getHEst(),
+                        loc->getXUncert(), loc->getYUncert(),
+                        loc->getHUncertDeg(), loc->getHUncert();
+          loc_values += ballEKF->getXEst(), ballEKF->getYEst(),
+                        ballEKF->getXVelocityEst(), ballEKF->getYVelocityEst(),
+                        ballEKF->getXUncert(), ballEKF->getYUncert(),
+                        ballEKF->getXVelocityUncert(),
+                        ballEKF->getYVelocityUncert();
+          loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
+                        loc->getLastOdo().deltaR;
+        } else
+          for (int i = 0; i < 19; i++)
+            loc_values += 0;
+
+        serial.write_floats(loc_values);
+    }
+
 }
 
 void

@@ -34,11 +34,14 @@ class Comm
     int start();
     void stop();
     void run();
+
     int  startTOOL();
     void stopTOOL();
     const boost::shared_ptr<TriggeredEvent> getTOOLTrigger() {
         return tool.getTrigger();
     }
+    void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
+                               boost::shared_ptr<BallEKF> _ballEKF);
 
     void discover_broadcast();
     void error(socket_error err) throw();
@@ -51,6 +54,8 @@ class Comm
     std::list<std::vector<float> >* latestComm();
     RangeBearingMeasurement getTeammateBallReport();
     void setData(std::vector<float> &data);
+
+    void add_to_module();
 
   private:
     void bind()                 throw(socket_error);
@@ -71,8 +76,6 @@ class Comm
                       int size)  throw();
     bool validate_packet(const char* msg, int len, CommPacketHeader& packet)
       throw();
-
-    void add_to_module();
 
   private:
     // TOOLConnect sub-thread controller
@@ -99,6 +102,8 @@ class Comm
     char buf[UDP_BUF_SIZE];
 
 };
+
+bool c_init_comm(void);
 
 #endif // ROBOT(NAO) - commenting out the entire file
 

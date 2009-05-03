@@ -26,10 +26,12 @@ public:
            MotionInterface * _minterface);
     virtual ~Noggin();
 
+    // reinitialize and reload the Python interpreter
+    void reload_hard ();
     // reload Brain module
-    void reload ();
+    void reload_brain ();
     // reload specified modules
-    void reload (std::string modules);
+    void reload_modules (std::string modules);
     // run behavioral step
     void runStep();
 
@@ -37,8 +39,10 @@ public:
     bool inErrorState() { return error_state; }
 
 private:
-    // Initialize the interpreter, the vision module, and PyVision instance
-    void initializeVision(boost::shared_ptr<Vision> v);
+    // Initialize the interpreter and C Python extensions
+    void initializePython(boost::shared_ptr<Vision> v);
+    // Insert the man directory in the system path
+    void modifySysPath();
     // Import the util.module_helper and noggin.Brain modules
     bool import_modules();
     // Instantiate a Brain instance
@@ -67,10 +71,13 @@ private:
     PyObject *brain_instance;
     MotionInterface * motion_interface;
 
-    //GC stuff
+    // GC stuff
     bool registeredGCReset;
     // Teammate ball stuff
     int ballFramesOff;
+    // Reload specifiers
+    int do_reload;
+    std::vector<std::string> module_list;
 
 // Public members
 public:

@@ -18,8 +18,8 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef PYMOTION_H_DEFINED
-#define PYMOTION_H_DEFINED
+#ifndef PYROBOGAURDIAN_H_DEFINED
+#define PYROBOGAURDIAN_H_DEFINED
 
 #include <boost/shared_ptr.hpp>
 

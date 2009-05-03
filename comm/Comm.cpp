@@ -219,6 +219,12 @@ PyComm_stopTOOL (PyObject *self, PyObject *)
   return Py_None;
 }
 
+void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
+                                 shared_ptr<BallEKF> _ballEKF)
+{
+  tool.setLocalizationAccess(_loc, _ballEKF);
+}
+
 static PyObject *
 PyComm_getRobotName (PyObject *self, PyObject *)
 {
@@ -440,8 +446,6 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
   broadcast_addr.sin_family = AF_INET;
   broadcast_addr.sin_port = htons(UDP_PORT);
   broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-
-  add_to_module();
 }
 
 Comm::~Comm ()

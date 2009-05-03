@@ -6,6 +6,10 @@
 #include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
+#include "_ledsmodule.h"
+#include "PySensors.h"
+#include "PyRoboGuardian.h"
+#include "PyMotion.h"
 
 //#define DEBUG_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
@@ -25,17 +29,15 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
       error_state(false), brain_module(NULL), brain_instance(NULL),
-      motion_interface(_minterface),registeredGCReset(false), ballFramesOff(0)
+      motion_interface(_minterface),registeredGCReset(false), ballFramesOff(0),
+      do_reload(0)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
 #endif
 
-    // Initialize the interpreter, the vision module, and PyVision instance
-    initializeVision(v);
-
-    // Initialize localization stuff
-    initializeLocalization();
+    // Initialize the interpreter and C python extensions
+    initializePython(v);
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
@@ -58,11 +60,25 @@ Noggin::~Noggin ()
     Py_XDECREF(brain_module);
 }
 
-void Noggin::initializeVision(shared_ptr<Vision> v)
+void Noggin::initializePython(shared_ptr<Vision> v)
 {
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing interpreter and extension modules\n");
 #endif
+
+    Py_Initialize();
+
+    modifySysPath();
+
+    brain_module = NULL;
+
+    // Initialize low-level modules
+    c_init_sensors();
+    init_leds();
+    c_init_roboguardian();
+    c_init_motion();
+    c_init_comm();
+    comm->add_to_module();
 
     // Initialize PyVision module
     vision = v;
@@ -77,6 +93,9 @@ void Noggin::initializeVision(shared_ptr<Vision> v)
     }
     vision_addToModule(result, MODULE_HEAD);
     pyvision = reinterpret_cast<PyVision*>(result);
+
+    // Initialize localization stuff
+    initializeLocalization();
 
 }
 
@@ -95,19 +114,22 @@ void Noggin::initializeLocalization()
     set_loc_reference(loc);
     set_ballEKF_reference(ballEKF);
     c_init_localization();
+
+    // Set the comm localization access pointers
+    comm->setLocalizationAccess(loc, ballEKF);
 }
 
 bool Noggin::import_modules ()
 {
-#ifdef  DEBUG_NOGGIN_INITIALIZATION
-    printf("  Importing noggin.Brain\n");
-#endif
-
     // Load Brain module
     //
-    if (brain_module == NULL)
+    if (brain_module == NULL) {
         // Import brain module
+#ifdef  DEBUG_NOGGIN_INITIALIZATION
+        printf("  Importing noggin.Brain\n");
+#endif
         brain_module = PyImport_ImportModule(BRAIN_MODULE);
+    }
 
     if (brain_module == NULL) {
         // error, couldn't import noggin.Brain
@@ -122,7 +144,20 @@ bool Noggin::import_modules ()
     return true;
 }
 
-void Noggin::reload ()
+void Noggin::reload_hard ()
+{
+    printf("Reloading Noggin Python interpreter\n");
+    // finalize and reinitialize the Python interpreter
+    Py_Finalize();
+    // load C extension modules
+    initializePython(vision);
+    // import noggin.Brain and instantiate a Brain reference
+    import_modules();
+    // Instantiate a Brain instance
+    getBrainInstance();
+}
+
+void Noggin::reload_brain ()
 {
     if (brain_module == NULL)
         if (!import_modules())
@@ -134,7 +169,7 @@ void Noggin::reload ()
     getBrainInstance();
 }
 
-void Noggin::reload(std::string modules)
+void Noggin::reload_modules(std::string modules)
 {
     if (brain_module == NULL)
         if (!import_modules())
@@ -184,7 +219,6 @@ void Noggin::runStep ()
     if (error_state)
         return;
 #endif
-
 
     //Check button pushes for game controller signals
     processGCButtonClicks();
@@ -368,6 +402,7 @@ void Noggin::processGCButtonClicks(){
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
     static const int REVERT_TO_INITIAL_CLICKS = 4;
+    static const int RELOAD_PYTHON_HARD = 6;
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
@@ -376,6 +411,10 @@ void Noggin::processGCButtonClicks(){
 #ifdef DEBUG_NOGGIN_GC
         cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
 #endif
+    }
+    if (chestButton->peekNumClicks() == RELOAD_PYTHON_HARD) {
+        chestButton->getAndClearNumClicks();
+        reload_hard();
     }
     //Only toggle colors and kickoff when you are in initial
     if(gc->gameState() == STATE_INITIAL){
@@ -414,3 +453,43 @@ void Noggin::processGCButtonClicks(){
     }
 
 }
+
+void Noggin::modifySysPath ()
+{
+    // Enter the current working directory into the python module path
+    //
+#if ROBOT(NAO)
+#ifndef OFFLINE
+    char *cwd = "/opt/naoqi/modules/lib";
+#else
+    char *cwd = "/usr/local/nao/modules/lib";
+#endif
+#else
+    const char *cwd = get_current_dir_name();
+#endif
+
+#ifdef DEBUG_NOGGIN_INITIALIZATION
+    printf("  Adding %s to sys.path\n", cwd);
+#endif
+
+    PyObject *sys_module = PyImport_ImportModule("sys");
+    if (sys_module == NULL) {
+        fprintf(stderr, "** Error importing sys module: **");
+        if (PyErr_Occurred())
+            PyErr_Print();
+        else
+            fprintf(stderr, "** No Python exception information available **");
+    }else {
+        PyObject *dict = PyModule_GetDict(sys_module);
+        PyObject *path = PyDict_GetItemString(dict, "path");
+        PyList_Append(path, PyString_FromString(cwd));
+        Py_DECREF(sys_module);
+    }
+
+#if !ROBOT(NAO)
+    free(cwd);
+#endif
+
+}
+
+
