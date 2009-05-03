@@ -117,21 +117,22 @@ private:
 class PyStiffnessCommand {
 public:
     PyStiffnessCommand(){
-        command =  new StiffnessCommand();
+        command =  boost::shared_ptr<StiffnessCommand>(new StiffnessCommand());
     }
     PyStiffnessCommand(const float bodyStiffness){
-        command =  new StiffnessCommand(bodyStiffness);
+        command =  boost::shared_ptr<StiffnessCommand>
+            (new StiffnessCommand(bodyStiffness));
     }
     PyStiffnessCommand(const int chainID, const float chainStiffness){
-        command =  new StiffnessCommand((ChainID)chainID,chainStiffness);
+        command = boost::shared_ptr<StiffnessCommand>
+            (new StiffnessCommand((ChainID)chainID,chainStiffness));
     }
     void setChainStiffness(const int chainID, const float chainStiffness){
-        if(command)
-            command->setChainStiffness((ChainID) chainID, chainStiffness );
+        command->setChainStiffness((ChainID) chainID, chainStiffness );
     }
-    StiffnessCommand * getCommand() const {return command;}
+    boost::shared_ptr<StiffnessCommand>  getCommand() const {return command;}
 private:
-    StiffnessCommand * command;
+    boost::shared_ptr<StiffnessCommand> command;
 };
 
 class PyBodyJointCommand {

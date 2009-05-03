@@ -76,7 +76,7 @@ public:
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const boost::shared_ptr<GaitCommand> command);
 	void sendMotionCommand(const SetHeadCommand* command);
-	void sendMotionCommand(const StiffnessCommand* command);
+	void sendMotionCommand(const boost::shared_ptr<StiffnessCommand> command);
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
@@ -121,11 +121,12 @@ private:
 
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
-    mutable bool newStiffness;
+    mutable bool newStiffness, newStiffnessCommandSent;
 
     bool readyToSend;
 
-    std::list<const StiffnessCommand *> stiffnessRequests;
+    //std::list< boost::shared_ptr<StiffnessCommand> > stiffnessRequests;
+    boost::shared_ptr<StiffnessCommand> nextStiffnessCommand;
 
     static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];
 

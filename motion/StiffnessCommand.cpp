@@ -27,7 +27,6 @@ StiffnessCommand::StiffnessCommand(const float stiffness)
     setChainStiffness(LLEG_CHAIN,stiffness);
     setChainStiffness(RLEG_CHAIN,stiffness);
     setChainStiffness(RARM_CHAIN,stiffness);
-
 }
 
 StiffnessCommand::StiffnessCommand(const ChainID id,
@@ -45,7 +44,8 @@ StiffnessCommand::~StiffnessCommand()
 }
 
 
-const  std::vector<float>*
+
+const  std::vector<float>
 StiffnessCommand::getChainStiffness(const Kinematics::ChainID chainID) const{
     return stiffnesses[chainID];
 
@@ -69,10 +69,7 @@ void StiffnessCommand::setChainStiffness(const Kinematics::ChainID chainID,
 {
     const float safe_stiffness = clipStiffness(chain_stiffness);
 
-    if(stiffnesses[chainID]){
-        delete stiffnesses[chainID];
-    }
-    stiffnesses[chainID]=  new vector<float>(chain_lengths[chainID],
-                                                    safe_stiffness);
+    stiffnesses[chainID]=  vector<float>(chain_lengths[chainID],
+                                         safe_stiffness);
 
 }

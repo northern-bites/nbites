@@ -213,6 +213,13 @@ void Noggin::getBrainInstance ()
 
 void Noggin::runStep ()
 {
+    static const int RELOAD_PYTHON_HARD = 6;
+    //Check to see if we should reload python or not:
+    if (chestButton->peekNumClicks() == RELOAD_PYTHON_HARD) {
+        chestButton->getAndClearNumClicks();
+        reload_hard();
+    }
+
 #ifdef USE_NOGGIN_AUTO_HALT
     // don't bother doing anything if there's a Python error and we
     // haven't reloaded
@@ -402,7 +409,6 @@ void Noggin::processGCButtonClicks(){
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
     static const int REVERT_TO_INITIAL_CLICKS = 4;
-    static const int RELOAD_PYTHON_HARD = 6;
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
@@ -412,10 +418,7 @@ void Noggin::processGCButtonClicks(){
         cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
 #endif
     }
-    if (chestButton->peekNumClicks() == RELOAD_PYTHON_HARD) {
-        chestButton->getAndClearNumClicks();
-        reload_hard();
-    }
+
     //Only toggle colors and kickoff when you are in initial
     if(gc->gameState() == STATE_INITIAL){
         if(leftFootButton->peekNumClicks() ==  SWITCH_TEAM_CLICKS){

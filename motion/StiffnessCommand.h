@@ -37,19 +37,19 @@ public:
     void setChainStiffness(const Kinematics::ChainID chainID,
                            const float chainStiffness);
 
-    const  std::vector<float>*
+    const  std::vector<float>
     getChainStiffness(const Kinematics::ChainID chainID) const;
     const  float
     getJointStiffness(const Kinematics::JointNames joint) const;
-    const std::vector<float>*
+    const std::vector<float>
     getHeadStiffness(void) const { return stiffnesses[Kinematics::HEAD_CHAIN]; }
-    const std::vector<float>*
+    const std::vector<float>
     getLArmStiffness(void) const { return stiffnesses[Kinematics::LARM_CHAIN]; }
-    const std::vector<float>*
+    const std::vector<float>
     getLLegStiffness(void) const { return stiffnesses[Kinematics::LLEG_CHAIN]; }
-    const std::vector<float>*
+    const std::vector<float>
     getRLegStiffness(void) const { return stiffnesses[Kinematics::RLEG_CHAIN]; }
-    const std::vector<float>*
+    const std::vector<float>
     getRArmStiffness(void) const { return stiffnesses[Kinematics::RARM_CHAIN]; }
 
 public:
@@ -59,6 +59,7 @@ public:
     static const float FULL_STIFFNESS;
 
 private:
+
     virtual void setChainList() {
         chainList.insert(chainList.end(),
                          MotionConstants::STIFFNESS_CHAINS,
@@ -68,13 +69,10 @@ private:
 
     void init(){
         setChainList();
-        for(int i = Kinematics::HEAD_CHAIN; i <= Kinematics::RARM_CHAIN; i++){
-            stiffnesses[i] = NULL;
-        }
     }
 
 private:
-    const  std::vector<float> * stiffnesses[Kinematics::NUM_CHAINS];
+    std::vector<float> stiffnesses[Kinematics::NUM_CHAINS];
 
 };
 
