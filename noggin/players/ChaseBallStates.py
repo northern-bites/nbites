@@ -44,16 +44,16 @@ def scanFindBall(player):
         player.brain.tracker.trackBall()
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('positionOnBall')
+        return player.goLater('positionOnBall')
 
     if transitions.shouldTurnToBall_FoundBall(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('turnToBallFar')
+        return player.goLater('turnToBallFar')
     elif transitions.shouldSpinFindBall(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('spinFindBall')
+        return player.goLater('spinFindBall')
 
     return player.stay()
 
@@ -79,12 +79,12 @@ def spinFindBall(player):
         player.brain.tracker.trackBall()
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('positionOnBall')
+        return player.goLater('positionOnBall')
 
     if transitions.shouldTurnToBall_FoundBall(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('turnToBallFar')
+        return player.goLater('turnToBallFar')
 #     elif transitions.shouldCantFindBall(player):
 #         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
 #                       + ", " + str(player.brain.ball.locDist) + ")")
@@ -116,11 +116,11 @@ def turnToBallFar(player):
 
 
     if transitions.shouldPositionForKick(player):
-        return player.goNow('positionForKick')
+        return player.goLater('positionForKick')
     elif transitions.shouldApproachBall(player):
-        return player.goNow('approachBall')
+        return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
-        return player.goNow('scanFindBall')
+        return player.goLater('scanFindBall')
 
     elif player.currentSpinDir != MyMath.sign(turnRate):
         player.stopWalking()
@@ -170,7 +170,7 @@ def approachBall(player):
     elif transitions.shouldScanFindBall(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('scanFindBall')
+        return player.goLater('scanFindBall')
 
     return player.stay()
 
@@ -210,7 +210,7 @@ def positionForKick(player):
     if transitions.shouldKick(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")
-        return player.goNow('decideKick')
+        return player.goLater('decideKick')
     if transitions.shouldApproachForKick(player):
         player.printf("Ball bearing and dist are (" + str(player.brain.ball.locBearing)
                       + ", " + str(player.brain.ball.locDist) + ")")

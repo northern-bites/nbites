@@ -27,6 +27,7 @@ class HeadTracking(FSA.FSA):
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
         self.activePanDir = False
+        self.currentHeadScan = None
 
     def ballTrackingHelper(self,args):
         self.target = None
@@ -151,3 +152,8 @@ class HeadTracking(FSA.FSA):
         headMove = motion.SetHeadCommand(newYaw,newPitch,
                                          maxSpeed, maxSpeed)
         self.brain.motion.setHead(headMove)
+
+    def startScan(self, newScan):
+        if newScan != self.currentHeadScan:
+            self.currentHeadScan = newScan
+            self.switchTo('scanning')

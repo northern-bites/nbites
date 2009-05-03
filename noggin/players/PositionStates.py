@@ -23,7 +23,7 @@ def playbookPosition(player):
 
     # we're at the point, let's switch to another state
     if player.brain.nav.isStopped() and player.counter > 0:
-        return player.goNow('atPosition')
+        return player.goLater('atPosition')
 
     return player.stay()
 
@@ -31,15 +31,15 @@ def positionOnBall(player):
     # for now we want a way to not rely on localization for chasing
     if not ChaseConstants.USE_LOC_CHASE:
         if chaseTransitions.shouldApproachBall(player):
-            return player.goNow('approachBall')
+            return player.goLater('approachBall')
         elif chaseTransitions.shouldTurnToBall_ApproachBall(player):
-            return player.goNow('turnToBallFar')
+            return player.goLater('turnToBallFar')
         elif chaseTransitions.shouldSpinFindBall(player):
-            return player.goNow('spinFindBall')
+            return player.goLater('spinFindBall')
         elif chaseTransitions.shouldTurnToBallClose(player):
-            return player.goNow('turnToBallClose')
+            return player.goLater('turnToBallClose')
         else :
-            return player.goNow('scanFindBall')
+            return player.goLater('scanFindBall')
 
     nextX, nextY,nextH = player.getBehindBallPosition()
 
@@ -102,7 +102,7 @@ def atSpinBallPosition(player):
         player.brain.tracker.activeLoc()
 
     if chaseTransitions.shouldTurnToBall_fromAtBallPosition(player):
-        return player.goNow('spinToBall')
+        return player.goLater('spinToBall')
     elif chaseTransitions.shouldSpinFindBallPosition(player):
         return player.goLater('spinFindBallPosition')
 
@@ -123,7 +123,7 @@ def spinFindBallPosition(player):
 
 
     if chaseTransitions.shouldTurnToBall_fromAtBallPosition(player):
-        return player.goNow('spinToBall')
+        return player.goLater('spinToBall')
     if chaseTransitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('atSpinBallPosition')
 
