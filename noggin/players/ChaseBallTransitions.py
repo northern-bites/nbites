@@ -85,8 +85,8 @@ def shouldKick(player):
     if (ball.on and
         ball.locRelY > constants.BALL_KICK_LEFT_Y_R and
         ball.locRelY < constants.BALL_KICK_LEFT_Y_L and
-        ball.locRelX > constants.BALL_KICK_LEFT_X_CLOSE and
-        ball.locRelX < constants.BALL_KICK_LEFT_X_FAR ):
+         ball.locRelX > constants.BALL_KICK_LEFT_X_CLOSE and
+         ball.locRelX < constants.BALL_KICK_LEFT_X_FAR ):
         return True
     return False
 

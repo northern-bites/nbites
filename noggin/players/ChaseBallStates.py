@@ -3,6 +3,7 @@ import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import man.motion.SweetMoves as SweetMoves
 from math import fabs
+import man.motion.StiffnessModes as StiffnessModes
 
 def chase(player):
     if player.brain.ball.on and constants.USE_LOC_CHASE:
@@ -132,9 +133,8 @@ def positionForKick(player):
         player.currentChaseWalkTheta = 0
 
     ball = player.brain.ball
-    targetY = (player.brain.ball.locRelY +
-               constants.BALL_KICK_LEFT_Y_R )*constants.POS_KICK_TARGET_Y_GAIN
-    sY = MyMath.clip((targetY)*constants.APPROACH_CLOSE_Y_GAIN,
+    targetY = (ball.locRelY - constants.BALL_KICK_LEFT_Y_R )
+    sY = MyMath.clip((targetY),
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
 
@@ -144,23 +144,17 @@ def positionForKick(player):
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif (MyMath.sign(player.currentChaseWalkY) != MyMath.sign(sY) or
-          fabs(sY - player.currentChaseWalkY) > constants.CHASE_Y_EPSILON):
-        player.printf("Changing positionSpeed",'cyan')
-        player.printf("My current sY is " + str(player.currentChaseWalkY), 'cyan')
-        player.printf("My new sY is " + str(sY), 'cyan')
-
-        player.currentChaseWalkY = sY
-        player.stopWalking()
     elif ball.on and player.brain.nav.isStopped():
-        player.printf("Changing positionSpeed",'yellow')
-        player.printf("My current sY is " + str(player.currentChaseWalkY), 'yellow')
-        player.printf("My new sY is " + str(sY), 'yellow')
 
         player.currentChaseWalkY = sY
         if player.currentGait != constants.NORMAL_GAIT:
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
         player.setSpeed(0,sY,0)
+    elif (MyMath.sign(player.currentChaseWalkY) != MyMath.sign(sY) or
+          fabs(sY - player.currentChaseWalkY) > constants.CHASE_Y_EPSILON):
+
+        player.currentChaseWalkY = sY
+        player.stopWalking()
 
     return player.stay()
 
@@ -195,11 +189,14 @@ def decideKick(player):
         return player.goLater('kickBall')
 
 def kickBall(player):
+    if player.firstFrame():
+        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
     if player.counter == 2:
-        player.executeMove(SweetMoves.NEW_KICK)
+        player.executeMove(SweetMoves.LEFT_FAR_KICK)
 
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.NEW_KICK):
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
         # trick the robot into standing up instead of leaning to the side
+        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
         player.setSpeed(0,0,0)
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
@@ -213,4 +210,10 @@ def kickBall(player):
     return player.stay()
 
 def done(player):
+    return player.stay()
+
+def ignoreOwnGoal(player):
+    if transitions.shouldSpinFindBall(player):
+        return player.goNow('spinFindBall')
+
     return player.stay()
