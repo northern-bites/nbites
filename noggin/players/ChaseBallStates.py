@@ -344,6 +344,7 @@ def decideKick(player):
 
 def kickBallStraight(player):
     if player.firstFrame():
+        player.brain.tracker.trackBall()
         player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
         player.printf("We should kick straight!", 'cyan')
     if player.counter == 2:
@@ -366,6 +367,7 @@ def kickBallStraight(player):
 
 def kickBallLeft(player):
     if player.firstFrame():
+        player.brain.tracker.trackBall()
         player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
         player.printf("We should kick left!", 'cyan')
     if player.counter == 2:
@@ -388,6 +390,7 @@ def kickBallLeft(player):
 
 def kickBallRight(player):
     if player.firstFrame():
+        player.brain.tracker.trackBall()
         player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
         player.printf("We should kick right!", 'cyan')
     if player.counter == 2:
