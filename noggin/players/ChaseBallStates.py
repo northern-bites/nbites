@@ -31,8 +31,7 @@ def scanFindBall(player):
     if player.brain.ball.on and constants.USE_LOC_CHASE:
         player.brain.tracker.trackBall()
         return player.goLater('positionOnBall')
-
-    if transitions.shouldTurnToBall_FoundBall(player):
+    elif transitions.shouldTurnToBall_FoundBall(player):
         return player.goLater('turnToBallFar')
     elif transitions.shouldSpinFindBall(player):
         return player.goLater('spinFindBall')
@@ -48,6 +47,7 @@ def spinFindBall(player):
         player.brain.tracker.trackBall()
 
     if player.brain.nav.isStopped():
+        player.brain.CoA.setRobotGait(player.brain.motion)
         player.setSpeed(0,
                         0,
                         constants.SPIN_SPEED)
@@ -91,7 +91,6 @@ def turnToBallFar(player):
     elif ball.on and player.brain.nav.isStopped():
         player.currentChaseWalkTheta = turnRate
         player.brain.CoA.setRobotTurnGait(player.brain.motion)
-
         player.setSpeed(x=0,y=0,theta=turnRate)
 
     return player.stay()
@@ -138,6 +137,8 @@ def positionForKick(player):
     sY = MyMath.clip((targetY)*constants.APPROACH_CLOSE_Y_GAIN,
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
+    player.printf("My current sY is " + str(player.currentChaseWalkY), 'cyan')
+    player.printf("My new sY is " + str(sY), 'cyan')
 
     if transitions.shouldKick(player):
         return player.goLater('decideKick')
