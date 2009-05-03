@@ -32,9 +32,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       nextStiffness(vector<float>(NUM_JOINTS,0.0f)),
 	  running(false),
       newJoints(false),
-      newStiffness(false),
+      newStiffness(false),newStiffnessCommandSent(false),
       readyToSend(false),
-      stiffnessRequests(),
       noWalkTransitionCommand(true)
 
 {
@@ -451,7 +450,8 @@ void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
 
 void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> command){
     pthread_mutex_lock(&stiffness_mutex);
-    stiffnessRequests.push_back(command);
+    nextStiffnessCommand = command;
+    newStiffnessCommandSent = true;
     pthread_mutex_unlock(&stiffness_mutex);
 
 }
@@ -463,41 +463,36 @@ void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> co
  */
 int MotionSwitchboard::processStiffness(){
     int changed  = 0;
+    if(!newStiffnessCommandSent)
+        return changed;
+
     pthread_mutex_lock(&stiffness_mutex);
+    //For each command, we look at each chain and see if there is anything
+    //that needs to be done
+    for(unsigned int i = HEAD_CHAIN; i <=RARM_CHAIN; i++){
+        const vector <float> stiffnesses =
+            nextStiffnessCommand->getChainStiffness((ChainID) i);
 
-
-
-    //Get all the pending commands out of the queue
-    while(!stiffnessRequests.empty()){
-        boost::shared_ptr<StiffnessCommand> next = stiffnessRequests.front();
-
-        stiffnessRequests.pop_front();
-
-        //For each command, we look at each chain and see if there is anything
-        //that needs to be done
-        for(unsigned int i = HEAD_CHAIN; i <=RARM_CHAIN; i++){
-            const vector <float> * stiffnesses =
-                next->getChainStiffness((ChainID) i);
-
-            //Skip empty chains
-            if(stiffnesses==NULL)
-                continue;
-
-            //Each chain has several joints we need to update
-            //Ignore unchanged values or when the value is explicitly
-            //set to NOT_SET
-            for(unsigned int j = 0; j < chain_lengths[i]; j ++){
-                if (nextStiffness[chain_first_joint[i] + j]
-                    != stiffnesses->at(j) &&
-                    stiffnesses->at(j) != StiffnessCommand::NOT_SET){
-                    nextStiffness[chain_first_joint[i] + j] =
-                        stiffnesses->at(j);
-                    changed += 1; //flag when a value is changed
-                }
-            }
-
+        //Skip empty chains
+        if(stiffnesses.size() == 0){
+            continue;
         }
+        //Each chain has several joints we need to update
+        //Ignore unchanged values or when the value is explicitly
+        //set to NOT_SET
+        for(unsigned int j = 0; j < chain_lengths[i]; j ++){
+            if (nextStiffness[chain_first_joint[i] + j]
+                != stiffnesses.at(j) &&
+                stiffnesses.at(j) != StiffnessCommand::NOT_SET){
+                nextStiffness[chain_first_joint[i] + j] =
+                    stiffnesses.at(j);
+                changed += 1; //flag when a value is changed
+            }
+        }
+
     }
+
+    newStiffnessCommandSent = false;
     if(changed){
         newStiffness = true;
     }
