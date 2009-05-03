@@ -58,7 +58,7 @@ def postScan(tracker):
 def activeLocScan(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
-        tracker.execute(SweetMoves.LOC_PANS)
+        tracker.execute(SweetMoves.QUICK_PANS)
     if tracker.target.on:
         return tracker.goLater('activeTracking')
     return tracker.stay()
