@@ -8,10 +8,7 @@ import man.motion as motion
 from man.motion import SweetMoves
 from ..util import FSA
 from . import CoreSoccerStates
-
-STANDUP_GAINS_VALUE = 1.0
-GAINS_ON_VALUE = 0.85
-GAINS_OFF_VALUE = 0.0
+from man.motion import StiffnessModes
 
 class SoccerFSA(FSA.FSA):
     def __init__(self,brain):
@@ -100,22 +97,19 @@ class SoccerFSA(FSA.FSA):
         """
         Turn off the gains
         """
-        shutoff = motion.StiffnessCommand(GAINS_OFF_VALUE)
-        self.brain.motion.sendStiffness(shutoff)
+        self.executeStiffness(StiffnessModes.NO_STIFFNESSES)
 
     def gainsOn(self):
         """
         Turn on the gains
         """
-        turnon = motion.StiffnessCommand(GAINS_ON_VALUE)
-        self.brain.motion.sendStiffness(turnon)
+        self.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
 
     def standupGainsOn(self):
         """
         Turn on the gains
         """
-        turnon = motion.StiffnessCommand(STANDUP_GAINS_VALUE)
-        self.brain.motion.sendStiffness(turnon)
+        self.executeStiffness(StiffnessModes.STANDUP_STIFFNESSES)
 
     def penalizeHeads(self):
         """
@@ -132,3 +126,10 @@ class SoccerFSA(FSA.FSA):
         self.brain.tracker.switchTo('stopped')
         self.brain.motion.stopHeadMoves()
         self.executeMove(SweetMoves.ZERO_HEADS)
+
+
+    def executeStiffness(self,stiffnesses):
+        stiffnessCommand = motion.StiffnessCommand(0.0)
+        for i in xrange(len(stiffnesses)):
+            stiffnessCommand.setChainStiffness(i,stiffnesses[i])
+        self.brain.motion.sendStiffness(stiffnessCommand)

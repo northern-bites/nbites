@@ -116,7 +116,7 @@ void RoboGuardian::shutoffGains(){
 }
 
 void RoboGuardian::enableGains(){
-    playFile(stiffness_removed_wav);
+    playFile(stiffness_enabled_wav);
     motion_interface->sendStiffness(ENABLE_GAINS);
 }
 
