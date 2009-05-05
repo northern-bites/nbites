@@ -21,8 +21,6 @@
 #ifndef _ALEnactor_h_DEFINED
 #define _ALEnactor_h_DEFINED
 
-#ifdef NAOQI1
-
 #include <boost/shared_ptr.hpp>
 #include "alerror.h"
 #include "almotionproxy.h"
@@ -80,7 +78,5 @@ private:
 
     bool almotion_link;
 };
-
-#endif //NAOQI1
 
 #endif//_ALEnactor_h_DEFINED

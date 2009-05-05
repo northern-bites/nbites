@@ -37,9 +37,7 @@
 #include "almemoryfastaccess.h"
 #include "alptr.h"
 
-#ifdef NAOQI1
 #include "dcmproxy.h"
-#endif
 
 #ifdef USE_DCM
 
@@ -81,11 +79,8 @@ class Man : public AL::ALModule, public Thread
 public:
 
     // contructors
-#ifdef NAOQI1
     Man(AL::ALPtr<AL::ALBroker> pBroker, std::string pName);
-#else
-    Man();
-#endif
+
     // destructor
     virtual ~Man();
 
@@ -137,12 +132,8 @@ private:
 
     void initMan (void);
     void closeMan(void);
-#ifdef NAOQI1
     void registerCamera();
     void initCameraSettings(int whichCam);
-#else
-    void initCamera();
-#endif
     void releaseImage(void);
 
   //
@@ -171,15 +162,11 @@ public:
 
 private:
     // Interfaces/Proxies to robot
-#ifdef NAOQI1
+
     AL::ALPtr<AL::ALLoggerProxy> log;
     AL::ALPtr<AL::ALProxy> camera;
     AL::ALPtr<AL::ALProxy> lem;
-#else
-    AL::ALLoggerProxy *log;
-    AL::ALProxy *camera;
-    AL::ALProxy *lem;
-#endif
+
     std::string lem_name;
 
     bool camera_active;

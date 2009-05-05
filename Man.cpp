@@ -48,22 +48,12 @@ using boost::shared_ptr;
 //                                     //
 /////////////////////////////////////////
 
-#ifdef NAOQI1
 Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
     : ALModule(pBroker,pName),
-#else
-Man::Man ()
-    : ALModule("Man"),
-#endif
     // this is not good usage of shared_ptr...  oh well
     Thread(shared_ptr<Synchro>(new Synchro()), "Man"),
-#ifdef NAOQI1
     // call the default constructor of all the shared pointers
     log(), camera(), lem(), 
-#else
-    // initialize all pointers to NULL or 0
-    log(0), camera(0), lem(0),
-#endif
     lem_name(""),
     camera_active(false)
 {
@@ -148,12 +138,7 @@ Man::initMan()
     printf("  Opening proxies\n");
 #endif
     try {
-
-#ifdef NAOQI1
         log = getParentBroker()->getLoggerProxy();
-#else
-        log = ALLoggerProxy::getInstance();
-#endif
         // Possible values are
         // lowDebug, debug, lowInfo, info, warning, error, fatal
         log->setVerbosity("lowDebug");
@@ -164,15 +149,11 @@ Man::initMan()
     // initialize ALMemory for access to stuff like bumpers, etc
 
 #ifdef USE_VISION
-#ifdef NAOQI1
     registerCamera();
     if(camera_active){
         //initCameraSettings(TOP_CAMERA);
         initCameraSettings(BOTTOM_CAMERA);
     }
-#else
-    initCamera();
-#endif
 #endif
 
 #ifdef DEBUG_MAN_INITIALIZATION
@@ -181,7 +162,6 @@ Man::initMan()
 }
 
 #ifdef USE_VISION
-#ifdef NAOQI1
 
 void
 Man::registerCamera() {
@@ -466,135 +446,7 @@ Man::initCameraSettings(int whichCam){
 	}
 }
 
-#else//NAOQI1
-void Man::initCamera(){
-    camera = NULL;
-    lem = NULL;
 
-
-    try {
-        camera = new ALProxy("NaoCam");
-    }catch (ALError &e) {
-        log->error("Man", "Could not create a proxy to NaoCam module");
-        return;
-    }
-
-    lem_name = "Man_LEM";
-    int format = NAO_IMAGE_SIZE;
-    int colorSpace = NAO_COLOR_SPACE;
-    int fps = 15;
-
-#ifdef DEBUG_MAN_INITIALIZATION
-    printf("  Registering LEM with format=%i colorSpace=%i fps=%i\n", format,
-           colorSpace, fps);
-#endif
-
-    try {
-        lem_name = camera->call<std::string>("register", lem_name, format,
-                                             colorSpace, fps);
-    } catch (ALError &e) {
-        cout << "Failed to initialize the camera"<<endl;
-        camera_active = false;
-    }
-
-
-    // Turn off auto settings
-    // Auto exposure
-    try {
-        camera->callVoid("setParam", kCameraAutoExpositionID,
-                         DEFAULT_CAMERA_AUTO_EXPOSITION);
-    } catch (ALError &e){
-        log->error("Man", "Couldn't set AutoExposition");
-    }
-    // Auto white balance
-    try {
-        camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
-                         DEFAULT_CAMERA_AUTO_WHITEBALANCE);
-
-    } catch (ALError &e){
-        log->error("Man", "Couldn't set AutoWhiteBalance");
-    }
-    // Auto gain
-    try {
-        camera->callVoid("setParam", kCameraAutoGainID,
-                         DEFAULT_CAMERA_AUTO_GAIN);
-    } catch (ALError &e){
-        log->error("Man", "Couldn't set AutoGain");
-    }
-    // Set camera defaults
-    // brightness
-    try {
-        camera->callVoid("setParam", kCameraBrightnessID,
-                         DEFAULT_CAMERA_BRIGHTNESS);
-    } catch (ALError &e){
-        log->error("Man", "Couldn't set Brightness ");
-    }
-    // contrast
-    try {
-        camera->callVoid("setParam", kCameraContrastID,
-                         DEFAULT_CAMERA_CONTRAST);
-    } catch (ALError &e){
-        log->error("Man", "Couldn't set Contrast");
-    }
-    // Red chroma
-    try {
-        camera->callVoid("setParam", kCameraRedChromaID,
-                         DEFAULT_CAMERA_REDCHROMA);
-    } catch (ALError &e){
-        log->error("Man", "Couldn't set RedChroma");
-    }
-    // Blue chroma
-    try {
-        camera->callVoid("setParam", kCameraBlueChromaID,
-                         DEFAULT_CAMERA_BLUECHROMA);
-    } catch (ALError &e){
-        log->error("Man", "Couldn't set BlueChroma");
-    }
-    // Exposure length
-    try {
-        camera->callVoid("setParam",kCameraExposureID,
-                         DEFAULT_CAMERA_EXPOSURE);
-    } catch (ALError &e) {
-        log->error("Man", "Couldn't set Exposure");
-    }
-    // Gain
-    try {
-        camera->callVoid("setParam",kCameraGainID,
-                         DEFAULT_CAMERA_GAIN);
-    } catch (ALError &e) {
-        log->error("Man", "Couldn't set Gain");
-    }
-    // Saturation
-    try {
-        camera->callVoid("setParam",kCameraSaturationID,
-                         DEFAULT_CAMERA_SATURATION);
-    } catch (ALError &e) {
-        log->error("Man", "Couldn't set Saturation");
-    }
-    // Hue
-    try {
-        camera->callVoid("setParam",kCameraHueID,
-                         DEFAULT_CAMERA_HUE);
-    } catch (ALError &e) {
-        log->error("Man", "Couldn't set Hue");
-    }
-    // Lens correction X
-    try {
-        camera->callVoid("setParam",kCameraLensXID,
-                         DEFAULT_CAMERA_LENSX);
-    } catch (ALError &e) {
-        log->error("Man", "Couldn't set Lens Correction X");
-    }
-    // Lens correction Y
-    try {
-        camera->callVoid("setParam",kCameraLensXID,
-                         DEFAULT_CAMERA_LENSY);
-    } catch (ALError &e) {
-        log->error("Man", "Couldn't set Lens Correction Y");
-    }
-
-}
-#endif//NAOQI1
 #endif // USE_VISION
 
 
@@ -714,7 +566,6 @@ Man::run ()
 
 }
 
-#ifdef NAOQI1
 void
 Man::waitForImage ()
 {
@@ -800,68 +651,8 @@ Man::waitForImage ()
         log->error("NaoMain", "Caught an error in run():\n" + e.toString());
     }
 }
-#else//NAOQI1
-void
-Man::waitForImage ()
-{
-    try {
-        const unsigned char *data;
-#ifndef MAN_IS_REMOTE
-        ALVisionImage *image = NULL;
-#else
-        ALValue image;
-        image.arraySetSize(6);
-#endif
 
-        SleepMs(100);
-        data = NULL;
-#ifndef MAN_IS_REMOTE
-#ifdef DEBUG_IMAGE_REQUESTS
-        printf("Requesting local image of size %ix%i, color space %i\n",
-               IMAGE_WIDTH, IMAGE_HEIGHT, NAO_COLOR_SPACE);
-#endif
 
-        // Attempt to retrive the next image
-        try {
-            image = (ALVisionImage*) (lem->call<int>("fetchNextLocal"));
-        }catch (ALError &e) {
-            log->error("NaoMain", "Could not call the fetchNextLocal method of the "
-                       "NaoCam module");
-        }
-        if (image != NULL)
-            data = image->getFrame();
-
-#else
-#ifdef DEBUG_IMAGE_REQUESTS
-        printf("Requesting remote image of size %ix%i, color space %i\n",
-               IMAGE_WIDTH, IMAGE_HEIGHT, NAO_COLOR_SPACE);
-#endif
-
-        // Attempt to retrive the next image
-        try {
-            image = lem->call<ALValue>("fetchNextRemote");
-        }catch (ALError &e) {
-            log->error("NaoMain", "Could not call the fetchNextRemote method of the "
-                       "NaoCam module");
-        }
-        data = static_cast<const unsigned char *>(image[5].GetBinary());
-
-#endif
-
-        if (data != NULL) {
-            // Update Sensors image pointer
-            sensors->lockImage();
-            sensors->setImage(data);
-            sensors->releaseImage();
-        }
-
-    }catch (ALError &e) {
-        log->error("NaoMain", "Caught an error in run():\n" + e.toString());
-    }
-}
-#endif//NAOQI1
-
-#ifdef NAOQI1
 void Man::releaseImage(){
   //Now you have finished with the image, you have to release it in the V.I.M.
   try
@@ -872,7 +663,7 @@ void Man::releaseImage(){
     log->error( "Man", "could not call the releaseImage method of the NaoCam module" );
   }
 }
-#endif
+
 
 void
 Man::processFrame ()
