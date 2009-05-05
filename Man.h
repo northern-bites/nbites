@@ -54,6 +54,8 @@ typedef ALEnactor EnactorT;
 
 
 #include "ALTranscriber.h"
+#include "ImageSubscriber.h"
+#include "ImageTranscriber.h"
 #include "Common.h"
 #include "Profiler.h"
 #include "Sensors.h"
@@ -74,7 +76,7 @@ typedef ALEnactor EnactorT;
  * @author Jeremy R. Fishman
  * @author Bowdoin College Northern Bites
  */
-class Man : public AL::ALModule, public Thread
+class Man : public AL::ALModule, public Thread, public ImageSubscriber
 {
 public:
 
@@ -136,6 +138,8 @@ private:
     void initCameraSettings(int whichCam);
     void releaseImage(void);
 
+    void notifyNextVisionImage();
+
   //
   // Variables
   //
@@ -148,6 +152,7 @@ public:
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;
+    boost::shared_ptr<ImageTranscriber> imageTranscriber;
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
     boost::shared_ptr<EnactorT> enactor;

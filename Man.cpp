@@ -71,6 +71,11 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
     setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(pBroker)));
 
     transcriber = shared_ptr<Transcriber>(new ALTranscriber(pBroker, sensors));
+    imageTranscriber =
+        shared_ptr<ImageTranscriber>(new ImageTranscriber(sensors));
+    imageTranscriber->setNewImageCallback(
+        &ImageSubscriber::notifyNextVisionImage);
+
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
 
     // initialize core processing modules
@@ -693,3 +698,7 @@ Man::processFrame ()
 
 }
 
+
+void Man::notifyNextVisionImage() {
+
+}
