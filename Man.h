@@ -55,7 +55,7 @@ typedef ALEnactor EnactorT;
 
 #include "ALTranscriber.h"
 #include "ImageSubscriber.h"
-#include "ImageTranscriber.h"
+#include "ALImageTranscriber.h"
 #include "Common.h"
 #include "Profiler.h"
 #include "Sensors.h"
@@ -76,7 +76,7 @@ typedef ALEnactor EnactorT;
  * @author Jeremy R. Fishman
  * @author Bowdoin College Northern Bites
  */
-class Man : public AL::ALModule, public Thread, public ImageSubscriber
+class Man : public AL::ALModule, public ImageSubscriber
 {
 public:
 
@@ -119,24 +119,17 @@ public:
        profiler->profiling = false;
     }
 
-    //HelperBoundMethods:
-    void manStart() { Thread::start(); } //should return 'int' or ALValue
-    void manStop() { Thread::stop(); }
-    void manAwaitOn() { getTrigger()->await_on(); }
-    void manAwaitOff() { getTrigger()->await_off(); }
+    // start/stop called by manmodule
+    void manStart();
+    void manStop();
 
-    void helloWorld(){std::cout<<"HelloWorld, C++ Style"<<std::endl;};
+
 private:
     // run Vision and call Noggin's main loop function
     void processFrame(void);
-    // wait for and retrieve the latest image
-    void waitForImage(void);
 
     void initMan (void);
     void closeMan(void);
-    void registerCamera();
-    void initCameraSettings(int whichCam);
-    void releaseImage(void);
 
     void notifyNextVisionImage();
 
@@ -144,6 +137,7 @@ private:
   // Variables
   //
 public:
+    boost::shared_ptr<Synchro> synchro;
     // Sub-module instances
     // ** ORDER MATTERS HERE **
     //   if the modules are not instantiated in this order, some dependedcies
@@ -152,7 +146,7 @@ public:
     boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;
-    boost::shared_ptr<ImageTranscriber> imageTranscriber;
+    boost::shared_ptr<ALImageTranscriber> imageTranscriber;
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
     boost::shared_ptr<EnactorT> enactor;
@@ -165,54 +159,6 @@ public:
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN
 
-private:
-    // Interfaces/Proxies to robot
-
-    AL::ALPtr<AL::ALLoggerProxy> log;
-    AL::ALPtr<AL::ALProxy> camera;
-    AL::ALPtr<AL::ALProxy> lem;
-
-    std::string lem_name;
-
-    bool camera_active;
-
-// nBites Camera Constants
-public:
-    // Camera identification
-    static const int TOP_CAMERA = 0;
-    static const int BOTTOM_CAMERA = 1;
-
-    // Camera setup information
-    static const int CAMERA_SLEEP_TIME = 200;
-    static const int CAM_PARAM_RETRIES = 3;
-
-    // Default Camera Settings
-    // Basic Settings
-    static const int DEFAULT_CAMERA_RESOLUTION = 14;
-    static const int DEFAULT_CAMERA_FRAMERATE = 15;
-    static const int DEFAULT_CAMERA_BUFFERSIZE = 16;
-    // Color Settings
-    // Gain: 26 / Exp: 83
-    // Gain: 28 / Exp: 60
-    // Gain: 35 / Exp: 40
-    static const int DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-    static const int DEFAULT_CAMERA_GAIN = 26;
-    static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-    static const int DEFAULT_CAMERA_BLUECHROMA = 128;
-    static const int DEFAULT_CAMERA_REDCHROMA = 68;
-    static const int DEFAULT_CAMERA_BRIGHTNESS = 140;
-    static const int DEFAULT_CAMERA_CONTRAST = 64;
-    static const int DEFAULT_CAMERA_SATURATION = 128;
-    static const int DEFAULT_CAMERA_HUE = 0;
-    // Lens correction
-    static const int DEFAULT_CAMERA_LENSX = 0;
-    static const int DEFAULT_CAMERA_LENSY = 0;
-    // Exposure length
-    static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-    static const int DEFAULT_CAMERA_EXPOSURE = 83;
-    // Image orientation
-    static const int DEFAULT_CAMERA_HFLIP = 0;
-    static const int DEFAULT_CAMERA_VFLIP = 0;
 };
 
 

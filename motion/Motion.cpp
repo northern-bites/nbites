@@ -85,6 +85,8 @@ void Motion<EnactorType>::stop() {
 template <class EnactorType>
 void Motion<EnactorType>::run(){
     cout <<"Motion::run"<<endl;
+    Thread::trigger->on();
+
     switchboard.run();
     Thread::trigger->off();
 }

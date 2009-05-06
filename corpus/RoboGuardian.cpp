@@ -94,6 +94,7 @@ RoboGuardian::~RoboGuardian(){
 
 void RoboGuardian::run(){
     Thread::running = true;
+    Thread::trigger->on();
 
     while(Thread::running){
 
