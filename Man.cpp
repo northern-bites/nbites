@@ -170,27 +170,41 @@ void Man::manStart() {
 #ifdef DEBUG_MAN_THREADING
     cout << "  run :: Signalling start" << endl;
 #endif
-
+    
 }
 
 void Man::manStop() {
 #ifdef DEBUG_MAN_THREADING
-    cout << "  run :: Signalling stop" << endl;
+    cout << "  Man stoping:" << endl;
 #endif
 
     imageTranscriber->stop();
     imageTranscriber->getTrigger()->await_off();
+#ifdef DEBUG_MAN_THREADING
+    cout << "  Image Transcriber thread is stopped" << endl;
+#endif
 #ifdef USE_MOTION
     // Finished with run loop, stop sub-threads and exit
     motion->stop();
     motion->getTrigger()->await_off();
+#ifdef DEBUG_MAN_THREADING
+    cout << "  Motion thread is stopped" << endl;
+#endif
+
     guardian->stop();
     guardian->getTrigger()->await_off();
+#ifdef DEBUG_MAN_THREADING
+    cout << "  Guardian thread is stopped" << endl;
+#endif
+
 #endif
     comm->stop();
     comm->getTrigger()->await_off();
     // @jfishman - tool will not exit, due to socket blocking
     //comm->getTOOLTrigger()->await_off();
+#ifdef DEBUG_MAN_THREADING
+    cout << "  Comm thread is stopped" << endl;
+#endif
 
 }
 
@@ -220,7 +234,6 @@ Man::processFrame ()
     PROF_NFRAME(profiler.get());
 
     PROF_ENTER(profiler.get(), P_GETIMAGE);
-
 }
 
 

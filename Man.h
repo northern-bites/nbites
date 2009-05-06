@@ -106,10 +106,6 @@ public:
     // Our methods
     //
 
-    // Man runs, and runs, and runs.  In the current thread.  Use start() and
-    // stop() (provided by the Thread class) to run in separate thread.
-    void run();
-
     // Profiling methods
     void startProfiling(int nframes) {
        profiler->reset();
@@ -122,7 +118,6 @@ public:
     // start/stop called by manmodule
     void manStart();
     void manStop();
-
 
 private:
     // run Vision and call Noggin's main loop function

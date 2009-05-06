@@ -42,8 +42,6 @@ using namespace AL;
 //</ODECLAREINSTANCE> don't remove this comment
 static boost::shared_ptr<Man> man;
 
-
-
 void ALCreateMan( ALPtr<ALBroker> pBroker ){
 
     man = boost::shared_ptr<Man> (new Man(pBroker,"Man"));
@@ -106,8 +104,8 @@ ALCALL int _closeModule(  )
   //<OKILLINSTANCE> don't remove this comment
   //ALPtr<ALProxy>
   // man  = pBroker->getProxy("Man");
-  //  man->manStop();
-    ALDestroyMan();
+    man->manStop();
+    //ALDestroyMan();
   //</OKILLINSTANCE> don't remove this comment
 
   return 0;
@@ -125,7 +123,7 @@ void _terminationHandler( int signum )
   if (signum == SIGINT) {
     // no direct exit, main thread will exit when finished
     cerr << "Exiting Man via thread stop." << endl;
-    man->manStop();
+    ALDestroyMan();
   }
   else {
     cerr << "Emergency stop -- exiting immediately" << endl;
@@ -213,18 +211,13 @@ int main( int argc, char *argv[] )
   //man = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
   ALCreateMan(pBroker);
 
-  //man->manStart();
-  cout << "Main method finished starting man" <<endl;
-  //manptr->manAwaitOn();
-  //manptr->manAwaitOff();
-
-  man->comm->getTrigger()->await_off();
+  //man->getTrigger()->await_off();
 //   //   Not sure what the purpose of this modulegenerator code is: //EDIT -JS
-//   pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
-//   while( 1 )
-//   {
-//     SleepMs( 100 );
-//   }
+   pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
+   while( 1)
+   {
+     SleepMs( 100 );
+   }
 
   cout << "Main method finished" <<endl;
 
