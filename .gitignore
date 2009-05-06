@@ -13,3 +13,5 @@ noggin/util/fakeData/*
 /noggin/util/obsToLoc
 /noggin/offline/obsToLoc
 /noggin/offline/navToObs
+/TAGS
+/man
