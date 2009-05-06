@@ -157,10 +157,13 @@ void Man::manStart() {
 // Start Motion thread (it handles its own threading
     if (motion->start() != 0)
         cerr << "Motion failed to start" << endl;
-    //else
-    //  motion->getStart()->await();
+    else
+        motion->getTrigger()->await_on();
+
     if(guardian->start() != 0)
         cout << "RoboGuardian failed to start" << endl;
+    else
+        guardian->getTrigger()->await_on();
 #endif
 
 #ifdef DEBUG_MAN_THREADING
@@ -189,109 +192,6 @@ void Man::manStop() {
     //comm->getTOOLTrigger()->await_off();
 
 }
-
-/*
-void
-Man::run ()
-{
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "Man::running" << endl;
-#endif
-
-    // Start Comm thread (it handles its own threading
-    if (comm->start() != 0)
-        cerr << "Comm failed to start" << endl;
-    else
-        comm->getTrigger()->await_on();
-
-#ifdef USE_MOTION
-// Start Motion thread (it handles its own threading
-    if (motion->start() != 0)
-        cerr << "Motion failed to start" << endl;
-    //else
-    //  motion->getStart()->await();
-    if(guardian->start() != 0)
-        cout << "RoboGuardian failed to start" << endl;
-#endif
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "  run :: Signalling start" << endl;
-#endif
-
-    running = true;
-    trigger->on();
-
-    while (running) {
-        //start timer
-        const long long startTime = micro_time();
-#ifdef USE_VISION
-        // Wait for signal
-        //image_sig->await();
-        // wait for and retrieve the latest image
-        //if(camera_active)
-        //    waitForImage();
-#endif // USE_VISION
-
-        // Break out of loop if thread should exit
-        if (!running)
-            break;
-
-        // Synchronize noggin's information about joint angles with the motion
-        // thread's information
-        sensors->updateVisionAngles();
-
-        transcriber->postVisionSensors();
-
-        // Process current frame
-        processFrame();
-
-        //Release the camera image
-        //if(camera_active)
-        //    releaseImage();
-
-        // Make sure messages are printed
-        fflush(stdout);
-
-        // Broadcast a signal that we have finished processing this frame
-        //vision_sig->signal();
-
-        //stop timer
-        const long long processTime = micro_time() - startTime;
-        //sleep until next frame
-        if (processTime > VISION_FRAME_LENGTH_uS){
-            cout << "Time spent in Man loop longer than frame length: "
-                 << processTime <<endl;
-            //Don't sleep at all
-        } else{
-            usleep(static_cast<useconds_t>(VISION_FRAME_LENGTH_uS
-                                           -processTime));
-        }
-    }
-
-#ifdef USE_MOTION
-    // Finished with run loop, stop sub-threads and exit
-    motion->stop();
-    motion->getTrigger()->await_off();
-    guardian->stop();
-    guardian->getTrigger()->await_off();
-#endif
-    comm->stop();
-    comm->getTrigger()->await_off();
-    // @jfishman - tool will not exit, due to socket blocking
-    //comm->getTOOLTrigger()->await_off();
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "  run :: Signalling stop" << endl;
-#endif
-
-    // Signal stop event
-    running = false;
-    trigger->off();
-
-}
-
-*/
 
 void
 Man::processFrame ()
