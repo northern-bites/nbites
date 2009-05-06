@@ -42,6 +42,25 @@ using namespace AL;
 //</ODECLAREINSTANCE> don't remove this comment
 static boost::shared_ptr<Man> man;
 
+
+
+void ALCreateMan( ALPtr<ALBroker> pBroker ){
+
+    man = boost::shared_ptr<Man> (new Man(pBroker,"Man"));
+    man->manStart();
+}
+
+void ALDestroyMan(){
+    man->manStop();
+}
+
+
+
+
+
+
+
+
 #ifndef MAN_IS_REMOTE
 
 #ifdef _WIN32
@@ -74,8 +93,9 @@ ALCALL int _createModule( ALPtr<ALBroker> pBroker )
   //</OGETINSTANCE> don't remove this comment
 
   //NBites code
-  man  = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
-  man->manStart();
+  ALCreateMan(pBroker);
+  //man  = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
+  //man->manStart();
 
   return 0;
 }
@@ -86,7 +106,8 @@ ALCALL int _closeModule(  )
   //<OKILLINSTANCE> don't remove this comment
   //ALPtr<ALProxy>
   // man  = pBroker->getProxy("Man");
-    man->manStop();
+  //  man->manStop();
+    ALDestroyMan();
   //</OKILLINSTANCE> don't remove this comment
 
   return 0;
@@ -177,7 +198,6 @@ int main( int argc, char *argv[] )
 
   //<OGETINSTANCE> don't remove this comment
  //ALPtr<Man> manptr = ALModule::createModule<Man>(pBroker,"Man" );
- man = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
   //</OGETINSTANCE> don't remove this comment
 
 #ifndef _WIN32
@@ -190,18 +210,21 @@ int main( int argc, char *argv[] )
   sigaction( SIGINT, &new_action, NULL );
 #endif
 
+  //man = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
+  ALCreateMan(pBroker);
 
-  man->manStart();
+  //man->manStart();
   cout << "Main method finished starting man" <<endl;
   //manptr->manAwaitOn();
   //manptr->manAwaitOff();
 
-  //   Not sure what the purpose of this modulegenerator code is: //EDIT -JS
-  pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
-  while( 1 )
-  {
-    SleepMs( 100 );
-  }
+  man->comm->getTrigger()->await_off();
+//   //   Not sure what the purpose of this modulegenerator code is: //EDIT -JS
+//   pBroker.reset(); // because of while( 1 ), broker counted by brokermanager
+//   while( 1 )
+//   {
+//     SleepMs( 100 );
+//   }
 
   cout << "Main method finished" <<endl;
 
