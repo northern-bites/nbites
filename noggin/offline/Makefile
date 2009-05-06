@@ -66,7 +66,6 @@ OBJS = Utility.o \
        VisBall.o \
        Observation.o \
        MCL.o \
-       EKF.o \
        BallEKF.o \
        LocEKF.o \
        fakerIO.o \
@@ -141,8 +140,6 @@ VisBall.o : $(VISBALL_SRCS)
 Observation.o : $(OBS_SRCS)
 	 $(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 MCL.o : $(MCL_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-EKF.o : $(EKF_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 BallEKF.o :$(BALLEKF_SRCS) EKF.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@

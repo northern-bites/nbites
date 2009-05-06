@@ -2,6 +2,7 @@
 #include "fakerIO.h"
 #include "fakerIterators.h"
 #include "NBMath.h"
+#include "Common.h"
 #define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
 using namespace std;
 using namespace boost;
@@ -57,9 +58,14 @@ int main(int argc, char** argv)
     shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
     // Iterate through the path
     cout << "Running EKF loc" << endl;
+    long long ekfTime = -micro_time();
+    ekfLoc->setUseAmbiguous(true);
     iterateObsPath(&ekfFile, &ekfCoreFile,
                    ekfLoc, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
+    ekfTime += micro_time();
+    ekfTime *= 0.001;
+    cout << "EKF time was " << ekfTime << endl;
     ekfFile.close();
     ekfCoreFile.close();
 
@@ -68,6 +74,7 @@ int main(int argc, char** argv)
     fstream ekfNoAmbigCoreFile;
     string ekfNoAmbigFileName(argv[1]);
     string ekfNoAmbigCoreFileName(argv[1]);
+
     ekfNoAmbigFileName.replace(ekfNoAmbigFileName.end()-3,
                                ekfNoAmbigFileName.end(),
                                "ekf.na");
@@ -79,12 +86,16 @@ int main(int argc, char** argv)
 
     // Create the EKF no ambiguous data system
     shared_ptr<LocEKF> ekfNoAmbigLoc = shared_ptr<LocEKF>(new LocEKF());
-    ekfNoAmbigLoc->setUseAmbiguous(true);
+    ekfNoAmbigLoc->setUseAmbiguous(false);
     // Iterate through the path
     cout << "Running EKF loc ignoring ambiguous data" << endl;
+    long long ekfNATime = -micro_time();
     iterateObsPath(&ekfNoAmbigFile, &ekfNoAmbigCoreFile,
                    ekfLoc, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
+    ekfNATime += micro_time();
+    ekfNATime *= 0.001;
+    cout << "EKF no ambiguous time was " << ekfNATime << endl;
     ekfNoAmbigFile.close();
     ekfNoAmbigCoreFile.close();
 
@@ -129,10 +140,18 @@ void runMCL(char * base, string name, int numParticles, bool useBest)
         cout << " using best particle.";
     }
     cout << endl;
-
+    long long mclTime = -micro_time();
     iterateMCLObsPath(&mclFile, &mclCoreFile,
                       mcl, &realPoses, &ballPoses, &odos,
                       &sightings, &ballDists, &ballBearings, BALL_ID);
+    mclTime += micro_time();
+    mclTime *= 0.001;
+    cout << "MCL " << numParticles << " particles";
+    if (useBest) {
+        cout << " using best particle";
+    }
+    cout << " time was " << mclTime << endl;
+
     mclFile.close();
     mclCoreFile.close();
 }
