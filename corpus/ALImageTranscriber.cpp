@@ -28,7 +28,12 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
 #ifdef USE_VISION
     registerCamera(broker);
     if(camera_active) {
+        try{
         initCameraSettings(BOTTOM_CAMERA);
+        }catch(ALError &e){
+            cout << "Failed to init the camera settings:"<<e.toString()<<endl;
+            camera_active = false;
+        }
     }
     else
         cout << "\tCamera is inactive!" << endl;
@@ -61,8 +66,8 @@ void ALImageTranscriber::run() {
         const long long processTime = micro_time() - startTime;
         //sleep until next frame
         if (processTime > VISION_FRAME_LENGTH_uS){
-            cout << "Time spent in Man loop longer than frame length: "
-                 << processTime <<endl;
+            cout << "Time spent in ALImageTranscriber loop longer than"
+                 << " frame length: " << processTime <<endl;
             //Don't sleep at all
         } else{
             //cout << "Sleeping for " << VISION_FRAME_LENGTH_uS

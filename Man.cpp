@@ -140,13 +140,6 @@ void Man::manStart() {
     cout << "Man::start" << endl;
 #endif
 
-    // Start Image transcriber thread (it handles its own threading
-    if (imageTranscriber->start() != 0) {
-        cerr << "Image transcriber failed to start" << endl;
-    }
-    else
-        imageTranscriber->getTrigger()->await_on();
-
     // Start Comm thread (it handles its own threading
     if (comm->start() != 0)
         cerr << "Comm failed to start" << endl;
@@ -165,6 +158,14 @@ void Man::manStart() {
     else
         guardian->getTrigger()->await_on();
 #endif
+
+    // Start Image transcriber thread (it handles its own threading
+    if (imageTranscriber->start() != 0) {
+        cerr << "Image transcriber failed to start" << endl;
+    }
+    else
+        imageTranscriber->getTrigger()->await_on();
+
 
 #ifdef DEBUG_MAN_THREADING
     cout << "  run :: Signalling start" << endl;

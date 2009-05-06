@@ -192,7 +192,7 @@ int main( int argc, char *argv[] )
 #endif
 
 
-  manptr->start();
+  manptr->manStart();
   cout << "Main method finished starting man" <<endl;
   //manptr->manAwaitOn();
   //manptr->manAwaitOff();
