@@ -40,7 +40,7 @@ using namespace AL;
 //<ODECLAREINSTANCE> don't remove this comment
 
 //</ODECLAREINSTANCE> don't remove this comment
-static ALPtr<ALProxy> man;
+static boost::shared_ptr<Man> man;
 
 #ifndef MAN_IS_REMOTE
 
@@ -70,13 +70,12 @@ ALCALL int _createModule( ALPtr<ALBroker> pBroker )
 
   // create modules instance
   //<OGETINSTANCE> don't remove this comment
-  ALModule::createModule<Man>(pBroker,"Man" );
 
   //</OGETINSTANCE> don't remove this comment
 
   //NBites code
-  man  = pBroker->getProxy("Man");
-  man->callVoid("start");
+  man  = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
+  man->manStart();
 
   return 0;
 }
@@ -87,7 +86,7 @@ ALCALL int _closeModule(  )
   //<OKILLINSTANCE> don't remove this comment
   //ALPtr<ALProxy>
   // man  = pBroker->getProxy("Man");
-  man->callVoid("stop");
+    man->manStop();
   //</OKILLINSTANCE> don't remove this comment
 
   return 0;
@@ -105,7 +104,7 @@ void _terminationHandler( int signum )
   if (signum == SIGINT) {
     // no direct exit, main thread will exit when finished
     cerr << "Exiting Man via thread stop." << endl;
-    man->callVoid("stop");
+    man->manStop();
   }
   else {
     cerr << "Emergency stop -- exiting immediately" << endl;
@@ -177,8 +176,8 @@ int main( int argc, char *argv[] )
 
 
   //<OGETINSTANCE> don't remove this comment
- ALPtr<Man> manptr = ALModule::createModule<Man>(pBroker,"Man" );
-
+ //ALPtr<Man> manptr = ALModule::createModule<Man>(pBroker,"Man" );
+ man = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
   //</OGETINSTANCE> don't remove this comment
 
 #ifndef _WIN32
@@ -192,7 +191,7 @@ int main( int argc, char *argv[] )
 #endif
 
 
-  manptr->manStart();
+  man->manStart();
   cout << "Main method finished starting man" <<endl;
   //manptr->manAwaitOn();
   //manptr->manAwaitOff();
