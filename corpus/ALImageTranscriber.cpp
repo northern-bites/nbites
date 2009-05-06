@@ -36,7 +36,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
 }
 
 ALImageTranscriber::~ALImageTranscriber() {
-    //delete [] image;
+    delete [] image;
     stop();
 }
 
@@ -396,8 +396,8 @@ void ALImageTranscriber::waitForImage ()
                        "NaoCam module");
         }
         if (ALimage != NULL) {
-            //memcpy(&image[0], ALimage->getFrame(), IMAGE_BYTE_SIZE);
-            image = ALimage->getFrame();
+            memcpy(&image[0], ALimage->getFrame(), IMAGE_BYTE_SIZE);
+            //image = ALimage->getFrame();
         }
         else
             cout << "\tALVisionImage from camera was null!!" << endl;

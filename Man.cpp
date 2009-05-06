@@ -299,15 +299,15 @@ Man::processFrame ()
 #ifdef USE_VISION
     //  This is called from Python right now
     //if(camera_active)
-    vision->copyImage(sensors->getImage());
+    //vision->copyImage(sensors->getImage());
 #endif
     PROF_EXIT(profiler.get(), P_GETIMAGE);
 
     PROF_ENTER(profiler.get(), P_FINAL);
 #ifdef USE_VISION
     //if(camera_active)
-    //vision->notifyImage(sensors->getImage());
-    vision->notifyImage();
+    vision->notifyImage(sensors->getImage());
+    //vision->notifyImage();
 #endif
 
     // run Python behaviors
