@@ -49,11 +49,7 @@ using boost::shared_ptr;
 /////////////////////////////////////////
 
 Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
-    : ALModule(pBroker,pName)
 {
-    // open lems
-    initMan();
-
     synchro = shared_ptr<Synchro>(new Synchro());
 
     // initialize system helper modules
@@ -98,40 +94,6 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
 Man::~Man ()
 {
     cout << "Man destructor" << endl;
-}
-
-void
-Man::initMan()
-{
-#ifdef DEBUG_MAN_INITIALIZATION
-    printf("Man::initializing\n");
-    printf("  Binding functions\n");
-#endif
-
-    // Describe the module here
-    setModuleDescription("Nao robotic soccer player");
-
-    // Define callable methods with there description
-    functionName("start", "Man", "Begin environment processing");
-    BIND_METHOD(Man::manStart);
-
-    functionName("stop", "Man", "Halt environment processing");
-    BIND_METHOD(Man::manStop);
-
-    functionName("startProfiling", "Man", "Start vision frame profiling, "
-                 "for given number of frames");
-    BIND_METHOD(Man::startProfiling);
-
-    functionName("stopProfiling", "Man", "Stop vision frame profiling");
-    BIND_METHOD(Man::stopProfiling);
-
-#ifdef DEBUG_MAN_INITIALIZATION
-    printf("  Opening proxies\n");
-#endif
-
-#ifdef DEBUG_MAN_INITIALIZATION
-    printf("  DONE!\n");
-#endif
 }
 
 void Man::manStart() {

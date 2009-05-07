@@ -76,7 +76,7 @@ typedef ALEnactor EnactorT;
  * @author Jeremy R. Fishman
  * @author Bowdoin College Northern Bites
  */
-class Man : public AL::ALModule, public ImageSubscriber
+class Man : public ImageSubscriber
 {
 public:
 
@@ -89,18 +89,6 @@ public:
     //
     // ALModule methods
     //
-
-    /**
-     * Called by stm when the subcription has been modified.
-     *
-     * @param pDataName Name of the suscribed data
-     * @param pValue Value of the suscribed data
-     * @param pMessage Message written by user during subscription
-     */
-    void dataChanged(const std::string& pDataName, const ALValue& pValue,
-        const std::string& pMessage) {};
-
-    std::string version() { return "1.2.0-r"; /*TRUNK_REVISION;*/ };
 
     //
     // Our methods
@@ -122,9 +110,6 @@ public:
 private:
     // run Vision and call Noggin's main loop function
     void processFrame(void);
-
-    void initMan (void);
-    void closeMan(void);
 
     void notifyNextVisionImage();
 
