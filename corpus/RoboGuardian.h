@@ -31,15 +31,9 @@
 #include "synchro.h"
 #include "Sensors.h"
 #include "MotionInterface.h"
-#include "ClickableButton.h"
+#include "ButtonProcessor.h"
 
-enum  ButtonID {
-    CHEST_BUTTON = 0,
-    LEFT_FOOT_BUTTON,
-    RIGHT_FOOT_BUTTON
-};
-
-class RoboGuardian : public Thread {
+class RoboGuardian : public Thread, public ButtonProcessor {
 public:
     RoboGuardian(boost::shared_ptr<Synchro>,
                  boost::shared_ptr<Sensors>,
