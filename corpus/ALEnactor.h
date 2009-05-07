@@ -39,9 +39,12 @@
 
 class ALEnactor : public ThreadedMotionEnactor {
 public:
-    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s,
-              boost::shared_ptr<Transcriber> t)
-        : ThreadedMotionEnactor(), broker(_pbroker), sensors(s),
+    ALEnactor(boost::shared_ptr<Sensors> s,
+              boost::shared_ptr<Synchro> synchro,
+              boost::shared_ptr<Transcriber> t,
+              AL::ALPtr<AL::ALBroker> _pbroker )
+        : ThreadedMotionEnactor(synchro,"ALEnactor"),
+          broker(_pbroker), sensors(s),
           transcriber(t), almotion_link(false){
 
         try {
@@ -57,9 +60,10 @@ public:
     };
     virtual ~ALEnactor() { };
 
-    virtual void run();
-    virtual void sendCommands();
-    virtual void postSensors();
+    void run();
+
+    void sendCommands();
+    void postSensors();
 
 private:
     void sendJoints();

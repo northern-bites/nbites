@@ -72,8 +72,10 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
 
     // initialize core processing modules
 #ifdef USE_MOTION
-    enactor = shared_ptr<EnactorT>(new EnactorT(pBroker, sensors,
-                                       transcriber));
+    enactor = shared_ptr<EnactorT>(new EnactorT(sensors,
+                                                synchro,
+                                                transcriber,
+                                                pBroker));
     motion = shared_ptr<Motion<EnactorT> >(
         new Motion<EnactorT>(synchro, enactor, sensors));
     guardian = shared_ptr<RoboGuardian>(

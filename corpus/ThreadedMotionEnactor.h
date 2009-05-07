@@ -14,51 +14,16 @@
 #ifndef _ThreadedMotionEnactor_h_DEFINED
 #define _ThreadedMotionEnactor_h_DEFINED
 
-#include <iostream>
-#include <pthread.h>
-
 #include "MotionEnactor.h"
+#include "synchro.h"
 
-class ThreadedMotionEnactor : public MotionEnactor {
+class ThreadedMotionEnactor : public MotionEnactor , public Thread{
 public:
-    ThreadedMotionEnactor()
-        : MotionEnactor(), running(false){};
+    ThreadedMotionEnactor(boost::shared_ptr<Synchro> synchro,
+                          string name)
+        : MotionEnactor(), Thread(synchro, name){};
     virtual ~ThreadedMotionEnactor() { }
 
-    void start() {
-#ifdef DEBUG_INITIALIZATION
-        cout << "ThreadedEnactor::initializing" << endl;
-        cout << "  creating threads" << endl;
-#endif
-        fflush(stdout);
-
-        running = true;
-
-        // set thread attributes
-        pthread_attr_t attr;
-        pthread_attr_init (&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-        // create & start thread.
-        pthread_create(&enactor_thread, &attr, runThread, (void *)this);
-        // destroy the used attributes
-        pthread_attr_destroy(&attr);
-    }
-
-    void stop() {
-        running = false;
-    }
-
-    static void* runThread(void *enactor) {
-        // This is a common routine for all possible enactors.
-        ((ThreadedMotionEnactor*)enactor)->run();
-        pthread_exit(NULL);
-    }
-
-    virtual void run() = 0;
-
-protected:
-    bool running;
-    pthread_t enactor_thread;
 };
 
 #endif
