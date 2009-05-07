@@ -37,8 +37,7 @@ class RoboGuardian : public Thread, public ButtonProcessor {
 public:
     RoboGuardian(boost::shared_ptr<Synchro>,
                  boost::shared_ptr<Sensors>,
-                 AL::ALPtr<AL::ALBroker>,
-                 MotionInterface *);
+                 AL::ALPtr<AL::ALBroker>);
     virtual ~RoboGuardian();
 
     void run();
@@ -52,6 +51,9 @@ public:
     bool isRobotFallen()const { return fallen; }
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
+
+    void setMotionInterface(MotionInterface * minterface)
+        { motion_interface = minterface; }
 
 //private: // Since this feature is not really production ready
 // from George: I removed the private tag, so that Python can call this method

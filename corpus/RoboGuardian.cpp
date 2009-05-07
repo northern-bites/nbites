@@ -57,10 +57,9 @@ void RoboGuardian::playFile(string str)const{
 
 RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
                            boost::shared_ptr<Sensors> s,
-                           AL::ALPtr<AL::ALBroker> _broker,
-                           MotionInterface * _interface)
+                           AL::ALPtr<AL::ALBroker> _broker)
     : Thread(_synchro,"RoboGuardian"), sensors(s),
-      broker(_broker),motion_interface(_interface),
+      broker(_broker),motion_interface(NULL),
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
       chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
@@ -113,12 +112,14 @@ void RoboGuardian::run(){
 
 void RoboGuardian::shutoffGains(){
     playFile(stiffness_removed_wav);
-    motion_interface->sendStiffness(REMOVE_GAINS);
+    if(motion_interface != NULL)
+        motion_interface->sendStiffness(REMOVE_GAINS);
 }
 
 void RoboGuardian::enableGains(){
     playFile(stiffness_enabled_wav);
-    motion_interface->sendStiffness(ENABLE_GAINS);
+    if(motion_interface != NULL)
+        motion_interface->sendStiffness(ENABLE_GAINS);
 }
 
 static const float FALL_SPEED_THRESH = 0.03f; //rads/20ms
