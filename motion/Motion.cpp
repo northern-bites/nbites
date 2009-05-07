@@ -26,9 +26,8 @@ using namespace boost;
 #include "PyMotion.h"
 #include "NaoEnactor.h"
 
-template <class EnactorType>
-Motion<EnactorType>::Motion (shared_ptr<Synchro> _synchro,
-                   shared_ptr<EnactorType> _enactor,
+Motion::Motion (shared_ptr<Synchro> _synchro,
+                   shared_ptr<MotionEnactor> _enactor,
                    shared_ptr<Sensors> s)
   : Thread(_synchro, "Motion"),
     switchboard(s),
@@ -39,58 +38,27 @@ Motion<EnactorType>::Motion (shared_ptr<Synchro> _synchro,
     set_motion_interface(&interface);
 }
 
-template <class EnactorType>
-Motion<EnactorType>::~Motion() {
+Motion::~Motion() {
     enactor->setSwitchboard(NULL);
 }
-
-/********* Special definition of the start method for Nao Enactor *********/
-
-template <>
-int Motion<NaoEnactor>::start() {
-    // Note: no need to call enactor->start() !
+int Motion::start() {
     switchboard.start();
-    //Setup the callback  in the enactor so it knows to call the switchboard
-    enactor->setSwitchboard(&switchboard);
 
     return Thread::start();
 }
 
-template <>
-void Motion<NaoEnactor>::stop() {
+void Motion::stop() {
     switchboard.stop();
     Thread::stop();
 }
 
-
-/********* General definition of the start method for other enactors *********/
-
-template <class EnactorType>
-int Motion<EnactorType>::start() {
-    enactor->start();
-    switchboard.start();
-    //Setup the callback  in the enactor so it knows to call the switchboard
-    enactor->setSwitchboard(&switchboard);
-
-    return Thread::start();
-}
-
-template <class EnactorType>
-void Motion<EnactorType>::stop() {
-    enactor->stop();
-    switchboard.stop();
-    Thread::stop();
-}
-
-template <class EnactorType>
-void Motion<EnactorType>::run(){
+void Motion::run(){
     cout <<"Motion::run"<<endl;
     Thread::trigger->on();
+
+    //Setup the callback  in the enactor so it knows to call the switchboard
+    enactor->setSwitchboard(&switchboard);
 
     switchboard.run();
     Thread::trigger->off();
 }
-
-
-template class Motion<NaoEnactor>;
-template class Motion<ALEnactor>;

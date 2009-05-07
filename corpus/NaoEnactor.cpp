@@ -26,9 +26,9 @@ void staticSendCommands(NaoEnactor * n) {
     n->sendCommands();
 }
 
-NaoEnactor::NaoEnactor(AL::ALPtr<AL::ALBroker> _pbroker,
-                       boost::shared_ptr<Sensors> s,
-                       boost::shared_ptr<Transcriber> t)
+NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
+                       boost::shared_ptr<Transcriber> t,
+                       AL::ALPtr<AL::ALBroker> _pbroker)
     : MotionEnactor(), broker(_pbroker), sensors(s),
       transcriber(t),
       jointValues(Kinematics::NUM_JOINTS,0.0f),  // current values of joints

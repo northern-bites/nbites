@@ -72,12 +72,17 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
 
     // initialize core processing modules
 #ifdef USE_MOTION
-    enactor = shared_ptr<EnactorT>(new EnactorT(sensors,
-                                                synchro,
-                                                transcriber,
-                                                pBroker));
-    motion = shared_ptr<Motion<EnactorT> >(
-        new Motion<EnactorT>(synchro, enactor, sensors));
+#ifdef USE_DCM
+    enactor = shared_ptr<EnactorT>(new NaoEnactor(sensors,
+                                                       transcriber,pBroker));
+#else//USE_DCM
+    enactor = shared_ptr<EnactorT>(new ALEnactor(sensors,synchro,
+                                                      transcriber,pBroker));
+#endif//USE_DCM
+
+    motion = shared_ptr<Motion>(
+        new Motion(synchro, enactor, sensors));
+
     guardian = shared_ptr<RoboGuardian>(
         new RoboGuardian(synchro,sensors, pBroker, motion->getInterface()));
 
@@ -102,6 +107,13 @@ void Man::manStart() {
 
 #ifdef DEBUG_MAN_THREADING
     cout << "Man::start" << endl;
+#endif
+
+#ifndef USE_DCM
+    if(enactor->start()!=0)
+        cout << "Failed to start enactor" <<endl;
+    else
+        enactor->getTrigger()->await_on();
 #endif
 
     // Start Comm thread (it handles its own threading
@@ -170,6 +182,13 @@ void Man::manStop() {
     cout << "  Comm thread is stopped" << endl;
 #endif
 
+#ifndef USE_DCM
+    enactor->stop();
+    enactor->getTrigger()->await_off();
+#ifdef DEBUG_MAN_THREADING
+    cout << "  Enactor thread is stopped" << endl;
+#endif
+#endif
 }
 
 void

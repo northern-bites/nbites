@@ -130,7 +130,7 @@ public:
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
     boost::shared_ptr<EnactorT> enactor;
-    boost::shared_ptr<Motion<EnactorT> > motion;
+    boost::shared_ptr<Motion> motion;
     boost::shared_ptr<RoboGuardian> guardian;
 #endif
     boost::shared_ptr<Vision> vision;
