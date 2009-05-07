@@ -84,7 +84,9 @@ Man::Man (ALPtr<ALBroker> pBroker, std::string pName)
         new Motion(synchro, enactor, sensors));
 
     guardian = shared_ptr<RoboGuardian>(
-        new RoboGuardian(synchro,sensors, pBroker, motion->getInterface()));
+        new RoboGuardian(synchro,sensors, pBroker));
+
+    guardian->setMotionInterface( motion->getInterface());
 
     // give python a pointer to the guardian. Method defined in PyRoboguardian.h
     set_guardian_pointer(guardian);

@@ -14,15 +14,13 @@
 #include "Comm.h"
 #include "GameController.h"
 
-#include "RoboGuardian.h"
-#include "ClickableButton.h"
-
+#include "ButtonProcessor.h"
 
 class Noggin
 {
 public:
     Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v,
-           boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
+           boost::shared_ptr<Comm> c, boost::shared_ptr<ButtonProcessor> rbg,
            MotionInterface * _minterface);
     virtual ~Noggin();
 
