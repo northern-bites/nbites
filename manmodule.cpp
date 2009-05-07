@@ -29,6 +29,7 @@
 
 using namespace std;
 using namespace AL;
+using boost::shared_ptr;
 
 //<EXE_INCLUDE> don't remove this comment
 #include "Man.h" //EDIT -JS
@@ -40,11 +41,32 @@ using namespace AL;
 //<ODECLAREINSTANCE> don't remove this comment
 
 //</ODECLAREINSTANCE> don't remove this comment
-static boost::shared_ptr<Man> man;
+static shared_ptr<Man> man;
+static shared_ptr<Sensors> sensors;
+static shared_ptr<Synchro> synchro;
+ static shared_ptr<Transcriber> transcriber;
+//static shared_ptr<ALImageTranscriber> imageTranscriber;
+ static shared_ptr<ALEnactor> enactor;
+ static shared_ptr<RoboGuardian> guardian;
 
-void ALCreateMan( ALPtr<ALBroker> pBroker ){
-
-    man = boost::shared_ptr<Man> (new Man(pBroker,"Man"));
+void ALCreateMan( ALPtr<ALBroker> broker){
+    synchro = shared_ptr<Synchro>(new Synchro());
+    sensors = shared_ptr<Sensors>(new Sensors);
+     transcriber = shared_ptr<Transcriber>(new ALTranscriber(broker,sensors));
+//     imageTranscriber =
+//         shared_ptr<ALImageTranscriber>
+//         (new ALImageTranscriber(synchro, sensors, broker));
+     enactor = shared_ptr<ALEnactor>(new ALEnactor(sensors,synchro,
+                                                   transcriber,broker));
+     guardian = shared_ptr<RoboGuardian>(new RoboGuardian(synchro,
+                                                          sensors, broker));
+    man = boost::shared_ptr<Man> (new Man(sensors,
+                                           transcriber,
+//                                           imageTranscriber,
+                                           enactor,
+                                           guardian,
+                                          synchro,
+                                          broker));
     man->startSubThreads();
 }
 

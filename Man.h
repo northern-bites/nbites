@@ -81,7 +81,13 @@ class Man : public ImageSubscriber
 public:
 
     // contructors
-    Man(AL::ALPtr<AL::ALBroker> pBroker, std::string pName);
+    Man(boost::shared_ptr<Sensors> _sensors,
+         boost::shared_ptr<Transcriber> _transcriber,
+        //boost::shared_ptr<ALImageTranscriber> _imageTranscriber,
+         boost::shared_ptr<ALEnactor> _enactor,
+         boost::shared_ptr<RoboGuardian> _rbg,
+        boost::shared_ptr<Synchro> synchro
+        ,AL::ALPtr<AL::ALBroker> broker);
 
     // destructor
     virtual ~Man();
@@ -113,19 +119,20 @@ private:
   // Variables
   //
 public:
-    boost::shared_ptr<Synchro> synchro;
+    boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Transcriber> transcriber;
+    boost::shared_ptr<ALImageTranscriber> imageTranscriber;
+    boost::shared_ptr<EnactorT> enactor;
+
+    //boost::shared_ptr<Synchro> synchro;
     // Sub-module instances
     // ** ORDER MATTERS HERE **
     //   if the modules are not instantiated in this order, some dependedcies
     //   (i.e. the Python modules exported) will not be available by the time
     //   other modules are imported
     boost::shared_ptr<Profiler> profiler;
-    boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<Transcriber> transcriber;
-    boost::shared_ptr<ALImageTranscriber> imageTranscriber;
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
-    boost::shared_ptr<EnactorT> enactor;
     boost::shared_ptr<Motion> motion;
     boost::shared_ptr<RoboGuardian> guardian;
 #endif
