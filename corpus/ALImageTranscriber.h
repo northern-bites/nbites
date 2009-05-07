@@ -6,10 +6,10 @@
 #include "alptr.h"
 #include "alloggerproxy.h"
 
-#include "ImageTranscriber.h"
+#include "ThreadedImageTranscriber.h"
 #include "synchro.h"
 
-class ALImageTranscriber : public ImageTranscriber, public Thread {
+class ALImageTranscriber : public ThreadedImageTranscriber {
 public:
     ALImageTranscriber(boost::shared_ptr<Synchro> synchro,
                        boost::shared_ptr<Sensors> s,

@@ -12,7 +12,7 @@ using namespace AL;
 ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
                                        shared_ptr<Sensors> s,
                                        ALPtr<ALBroker> broker)
-    : ImageTranscriber(s), Thread(synchro, "ALImageTranscriber"),
+    : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
       image(new unsigned char[IMAGE_BYTE_SIZE])
 {
