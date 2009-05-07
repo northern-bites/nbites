@@ -45,11 +45,11 @@ static boost::shared_ptr<Man> man;
 void ALCreateMan( ALPtr<ALBroker> pBroker ){
 
     man = boost::shared_ptr<Man> (new Man(pBroker,"Man"));
-    man->manStart();
+    man->startSubThreads();
 }
 
 void ALDestroyMan(){
-    man->manStop();
+    man->stopSubThreads();
 }
 
 
@@ -104,8 +104,7 @@ ALCALL int _closeModule(  )
   //<OKILLINSTANCE> don't remove this comment
   //ALPtr<ALProxy>
   // man  = pBroker->getProxy("Man");
-    man->manStop();
-    //ALDestroyMan();
+    ALDestroyMan();
   //</OKILLINSTANCE> don't remove this comment
 
   return 0;

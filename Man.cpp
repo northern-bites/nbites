@@ -103,7 +103,7 @@ Man::~Man ()
     cout << "Man destructor" << endl;
 }
 
-void Man::manStart() {
+void Man::startSubThreads() {
 
 #ifdef DEBUG_MAN_THREADING
     cout << "Man::start" << endl;
@@ -149,7 +149,7 @@ void Man::manStart() {
     
 }
 
-void Man::manStop() {
+void Man::stopSubThreads() {
 #ifdef DEBUG_MAN_THREADING
     cout << "  Man stoping:" << endl;
 #endif

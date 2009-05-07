@@ -87,10 +87,6 @@ public:
     virtual ~Man();
 
     //
-    // ALModule methods
-    //
-
-    //
     // Our methods
     //
 
@@ -104,8 +100,8 @@ public:
     }
 
     // start/stop called by manmodule
-    void manStart();
-    void manStop();
+    virtual void startSubThreads();
+    virtual void stopSubThreads();
 
 private:
     // run Vision and call Noggin's main loop function
