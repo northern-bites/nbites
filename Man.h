@@ -123,6 +123,7 @@ public:
     boost::shared_ptr<Transcriber> transcriber;
     boost::shared_ptr<ALImageTranscriber> imageTranscriber;
     boost::shared_ptr<EnactorT> enactor;
+    boost::shared_ptr<RoboGuardian> guardian;
 
     //boost::shared_ptr<Synchro> synchro;
     // Sub-module instances
@@ -134,7 +135,6 @@ public:
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
     boost::shared_ptr<Motion> motion;
-    boost::shared_ptr<RoboGuardian> guardian;
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;

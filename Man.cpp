@@ -61,49 +61,31 @@ Man::Man (shared_ptr<Sensors> _sensors,
       enactor(_enactor),
       guardian(_guardian)
 {
-    cout << "Entering Man constructor body"<<endl;
-    //synchro = shared_ptr<Synchro>(new Synchro());
-
     // initialize system helper modules
     profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
-    //messaging = shared_ptr<Messenger>(new Messenger());
-//     sensors = shared_ptr<Sensors>(new Sensors());
+
     // give python a pointer to the sensors structure. Method defined in
     // Sensors.h
     set_sensors_pointer(sensors);
 
     setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
-    //transcriber = shared_ptr<Transcriber>(new ALTranscriber(broker, sensors));
-    //imageTranscriber =
-    //    shared_ptr<ALImageTranscriber>(new ALImageTranscriber(synchro, sensors,
-    //                                                          broker));
     imageTranscriber->setSubscriber(this);
 
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
 
     // initialize core processing modules
 #ifdef USE_MOTION
-// #ifdef USE_DCM
-//     enactor = shared_ptr<EnactorT>(new NaoEnactor(sensors,
-//                                                        transcriber,broker));
-// #else//USE_DCM
-//     enactor = shared_ptr<EnactorT>(new ALEnactor(sensors,synchro,
-//                                                       transcriber,broker));
-// #endif//USE_DCM
-
     motion = shared_ptr<Motion>(
         new Motion(synchro, enactor, sensors));
 
-//     guardian = shared_ptr<RoboGuardian>(
-//         new RoboGuardian(synchro,sensors, broker));
-
     guardian->setMotionInterface( motion->getInterface());
+#endif
 
+    // initialize python roboguardian module.
     // give python a pointer to the guardian. Method defined in PyRoboguardian.h
     set_guardian_pointer(guardian);
-    // initialize python roboguardian module.
-#endif
+
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
