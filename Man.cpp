@@ -101,12 +101,6 @@ void Man::startSubThreads() {
     cout << "Man::start" << endl;
 #endif
 
-#ifndef USE_DCM
-    if(enactor->start()!=0)
-        cout << "Failed to start enactor" <<endl;
-    else
-        enactor->getTrigger()->await_on();
-#endif
 
     // Start Comm thread (it handles its own threading
     if (comm->start() != 0)
@@ -120,19 +114,7 @@ void Man::startSubThreads() {
         cerr << "Motion failed to start" << endl;
     else
         motion->getTrigger()->await_on();
-
-    if(guardian->start() != 0)
-        cout << "RoboGuardian failed to start" << endl;
-    else
-        guardian->getTrigger()->await_on();
 #endif
-
-    // Start Image transcriber thread (it handles its own threading
-    if (imageTranscriber->start() != 0) {
-        cerr << "Image transcriber failed to start" << endl;
-    }
-    else
-        imageTranscriber->getTrigger()->await_on();
 
 
 #ifdef DEBUG_MAN_THREADING
@@ -146,11 +128,6 @@ void Man::stopSubThreads() {
     cout << "  Man stoping:" << endl;
 #endif
 
-    imageTranscriber->stop();
-    imageTranscriber->getTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-    cout << "  Image Transcriber thread is stopped" << endl;
-#endif
 #ifdef USE_MOTION
     // Finished with run loop, stop sub-threads and exit
     motion->stop();

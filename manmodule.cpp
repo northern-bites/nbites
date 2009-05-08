@@ -26,7 +26,7 @@
 
 //NBites includes
 #include "alproxy.h"
-#include "Man.h"
+#include "ALMan.h"
 #include "_ledsmodule.h"
 
 using namespace std;
@@ -36,7 +36,7 @@ using boost::shared_ptr;
 
 
 
-static shared_ptr<Man> man;
+static shared_ptr<ALMan> man;
 static shared_ptr<Sensors> sensors;
 static shared_ptr<Synchro> synchro;
 static shared_ptr<Transcriber> transcriber;
@@ -58,7 +58,7 @@ void ALCreateMan( ALPtr<ALBroker> broker){
 
     setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
-    man = boost::shared_ptr<Man> (new Man(sensors,
+    man = boost::shared_ptr<ALMan> (new ALMan(sensors,
                                           transcriber,
                                           imageTranscriber,
                                           enactor,
