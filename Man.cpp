@@ -50,14 +50,14 @@ using boost::shared_ptr;
 
 Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<Transcriber> _transcriber,
-          //shared_ptr<ALImageTranscriber> _imageTranscriber,
+          shared_ptr<ALImageTranscriber> _imageTranscriber,
           shared_ptr<ALEnactor> _enactor,
           shared_ptr<RoboGuardian> _guardian,
           shared_ptr<Synchro> synchro
           ,ALPtr<ALBroker> broker)
     : sensors(_sensors),
       transcriber(_transcriber),
-      //imageTranscriber(imageTranscriber),
+      imageTranscriber(_imageTranscriber),
       enactor(_enactor),
       guardian(_guardian)
 {
@@ -75,9 +75,9 @@ Man::Man (shared_ptr<Sensors> _sensors,
     setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
     //transcriber = shared_ptr<Transcriber>(new ALTranscriber(broker, sensors));
-    imageTranscriber =
-        shared_ptr<ALImageTranscriber>(new ALImageTranscriber(synchro, sensors,
-                                                              broker));
+    //imageTranscriber =
+    //    shared_ptr<ALImageTranscriber>(new ALImageTranscriber(synchro, sensors,
+    //                                                          broker));
     imageTranscriber->setSubscriber(this);
 
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
