@@ -8,7 +8,7 @@
 ALMan::ALMan(boost::shared_ptr<Sensors> _sensors,
              boost::shared_ptr<ALTranscriber> _transcriber,
              boost::shared_ptr<ALImageTranscriber> _imageTranscriber,
-             boost::shared_ptr<ALEnactor> _enactor,
+             boost::shared_ptr<EnactorT> _enactor,
              boost::shared_ptr<Synchro> synchro)
     :Man(_sensors,_transcriber,_imageTranscriber,_enactor,synchro),
      alImageTranscriber(_imageTranscriber),

@@ -44,7 +44,7 @@ static shared_ptr<Sensors> sensors;
 static shared_ptr<Synchro> synchro;
 static shared_ptr<ALTranscriber> transcriber;
 static shared_ptr<ALImageTranscriber> imageTranscriber;
-static shared_ptr<ALEnactor> enactor;
+static shared_ptr<EnactorT> enactor;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
     try{
@@ -62,8 +62,15 @@ void ALCreateMan( ALPtr<ALBroker> broker){
     imageTranscriber =
         shared_ptr<ALImageTranscriber>
         (new ALImageTranscriber(synchro, sensors, broker));
-    enactor = shared_ptr<ALEnactor>(new ALEnactor(sensors,synchro,
-                                                  transcriber,broker));
+
+#ifdef USE_DCM
+    enactor = shared_ptr<EnactorT>(new EnactorT(sensors,
+                                                transcriber,broker));
+#else
+    enactor = shared_ptr<EnactorT>(new EnactorT(sensors,synchro,
+                                                transcriber,broker));
+#endif
+
 
     setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
