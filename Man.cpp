@@ -136,12 +136,6 @@ void Man::stopSubThreads() {
     cout << "  Motion thread is stopped" << endl;
 #endif
 
-    guardian->stop();
-    guardian->getTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-    cout << "  Guardian thread is stopped" << endl;
-#endif
-
 #endif
     comm->stop();
     comm->getTrigger()->await_off();
@@ -149,14 +143,6 @@ void Man::stopSubThreads() {
     //comm->getTOOLTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
     cout << "  Comm thread is stopped" << endl;
-#endif
-
-#ifndef USE_DCM
-    enactor->stop();
-    enactor->getTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-    cout << "  Enactor thread is stopped" << endl;
-#endif
 #endif
 }
 
