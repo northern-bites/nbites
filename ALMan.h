@@ -8,12 +8,19 @@
 class ALMan : public Man {
 public:
 
-    ALMan(AL::ALPtr<AL::ALBroker> broker);
+    ALMan(boost::shared_ptr<Sensors> _sensors,
+         boost::shared_ptr<Transcriber> _transcriber,
+        boost::shared_ptr<ALImageTranscriber> _imageTranscriber,
+         boost::shared_ptr<ALEnactor> _enactor,
+         boost::shared_ptr<RoboGuardian> _rbg,
+        boost::shared_ptr<Synchro> synchro
+        ,AL::ALPtr<AL::ALBroker> broker);
+
     virtual ~ALMan();
 
-    void startSubThreads();
+    virtual void startSubThreads();
 
-    void stopSubThreads();
+    virtual void stopSubThreads();
 
 private:
     boost::shared_ptr<Sensors> sensors;

@@ -27,6 +27,7 @@
 //NBites includes
 #include "alproxy.h"
 #include "Man.h"
+#include "_ledsmodule.h"
 
 using namespace std;
 using namespace AL;
@@ -54,13 +55,15 @@ void ALCreateMan( ALPtr<ALBroker> broker){
                                                   transcriber,broker));
     guardian = shared_ptr<RoboGuardian>(new RoboGuardian(synchro,
                                                          sensors, broker));
+
+    setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
+
     man = boost::shared_ptr<Man> (new Man(sensors,
                                           transcriber,
                                           imageTranscriber,
                                           enactor,
                                           guardian,
-                                          synchro,
-                                          broker));
+                                          synchro));
     man->startSubThreads();
 }
 

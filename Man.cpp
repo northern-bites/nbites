@@ -35,7 +35,6 @@ using namespace boost::assign;
 #include "corpus/synchro.h"
 #include "VisionDef.h"
 #include "Common.h"
-#include "_ledsmodule.h"
 
 using namespace std;
 using namespace AL;
@@ -53,8 +52,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<ALImageTranscriber> _imageTranscriber,
           shared_ptr<ALEnactor> _enactor,
           shared_ptr<RoboGuardian> _guardian,
-          shared_ptr<Synchro> synchro
-          ,ALPtr<ALBroker> broker)
+          shared_ptr<Synchro> synchro)
     : sensors(_sensors),
       transcriber(_transcriber),
       imageTranscriber(_imageTranscriber),
@@ -67,8 +65,6 @@ Man::Man (shared_ptr<Sensors> _sensors,
     // give python a pointer to the sensors structure. Method defined in
     // Sensors.h
     set_sensors_pointer(sensors);
-
-    setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
     imageTranscriber->setSubscriber(this);
 
