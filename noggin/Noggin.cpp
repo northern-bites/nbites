@@ -22,7 +22,7 @@ using namespace boost;
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
-                shared_ptr<Comm> c, shared_ptr<ButtonProcessor> rbg,
+                shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
                 MotionInterface * _minterface)
     : comm(c),gc(c->getGC()),
       chestButton(rbg->getButton(CHEST_BUTTON)),

@@ -51,13 +51,11 @@ Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ALImageTranscriber> _imageTranscriber,
           shared_ptr<ALEnactor> _enactor,
-          shared_ptr<RoboGuardian> _guardian,
           shared_ptr<Synchro> synchro)
     : sensors(_sensors),
       transcriber(_transcriber),
       imageTranscriber(_imageTranscriber),
-      enactor(_enactor),
-      guardian(_guardian)
+      enactor(_enactor)
 {
     // initialize system helper modules
     profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
@@ -69,6 +67,8 @@ Man::Man (shared_ptr<Sensors> _sensors,
     imageTranscriber->setSubscriber(this);
 
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
+    
+    guardian = shared_ptr<RoboGuardian>(new RoboGuardian(synchro, sensors));
 
     // initialize core processing modules
 #ifdef USE_MOTION
@@ -117,13 +117,25 @@ void Man::startSubThreads() {
 #endif
 
 
+    if(guardian->start() != 0)
+        cout << "RoboGuardian failed to start" << endl;
+    else
+        guardian->getTrigger()->await_on();
+
+
 #ifdef DEBUG_MAN_THREADING
     cout << "  run :: Signalling start" << endl;
 #endif
-    
 }
 
 void Man::stopSubThreads() {
+
+    guardian->stop();
+    guardian->getTrigger()->await_off();
+#ifdef DEBUG_MAN_THREADING
+    cout << "  Guardian thread is stopped" << endl;
+#endif
+
 #ifdef DEBUG_MAN_THREADING
     cout << "  Man stoping:" << endl;
 #endif

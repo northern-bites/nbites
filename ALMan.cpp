@@ -9,9 +9,8 @@ ALMan::ALMan(boost::shared_ptr<Sensors> _sensors,
              boost::shared_ptr<Transcriber> _transcriber,
              boost::shared_ptr<ALImageTranscriber> _imageTranscriber,
              boost::shared_ptr<ALEnactor> _enactor,
-             boost::shared_ptr<RoboGuardian> _rbg,
              boost::shared_ptr<Synchro> synchro)
-    :Man(_sensors,_transcriber,_imageTranscriber,_enactor,_rbg,synchro){}
+    :Man(_sensors,_transcriber,_imageTranscriber,_enactor,synchro){}
 
 ALMan::~ALMan(){
 
@@ -28,11 +27,6 @@ void ALMan::startSubThreads(){
 #endif
 
     Man::startSubThreads();
-
-    if(guardian->start() != 0)
-        cout << "RoboGuardian failed to start" << endl;
-    else
-        guardian->getTrigger()->await_on();
 
     // Start Image transcriber thread (it handles its own threading
     if (imageTranscriber->start() != 0) {
@@ -52,12 +46,6 @@ void ALMan::stopSubThreads(){
     imageTranscriber->getTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
     cout << "  Image Transcriber thread is stopped" << endl;
-#endif
-
-    guardian->stop();
-    guardian->getTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-    cout << "  Guardian thread is stopped" << endl;
 #endif
 
     Man::stopSubThreads();

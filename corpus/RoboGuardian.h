@@ -25,19 +25,22 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "albroker.h"
-#include "alptr.h"
-
 #include "synchro.h"
 #include "Sensors.h"
 #include "MotionInterface.h"
-#include "ButtonProcessor.h"
+#include "ClickableButton.h"
 
-class RoboGuardian : public Thread, public ButtonProcessor {
+
+enum  ButtonID {
+    CHEST_BUTTON = 0,
+    LEFT_FOOT_BUTTON,
+    RIGHT_FOOT_BUTTON
+};
+
+class RoboGuardian : public Thread {
 public:
     RoboGuardian(boost::shared_ptr<Synchro>,
-                 boost::shared_ptr<Sensors>,
-                 AL::ALPtr<AL::ALBroker>);
+                 boost::shared_ptr<Sensors>);
     virtual ~RoboGuardian();
 
     void run();
@@ -61,6 +64,9 @@ public:
     void enableFallProtection(bool _useFallProtection)const //off by default
         { useFallProtection = _useFallProtection; };
 
+
+    const std::string discoverIP() const;
+
 public:
     static const int NO_CLICKS;
 
@@ -83,7 +89,6 @@ private:
 private:
 
     boost::shared_ptr<Sensors> sensors;
-    AL::ALPtr<AL::ALBroker> broker;
     MotionInterface * motion_interface;
     std::vector<float> lastTemps;
     float lastBatteryCharge;
