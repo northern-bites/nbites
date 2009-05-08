@@ -4,6 +4,18 @@
 #include "albroker.h"
 
 #include "Man.h"
+#ifdef USE_DCM
+
+#  if defined USE_DCM && defined MAN_IS_REMOTE
+#    error "DCM not compatible with remote!!!"
+#  endif
+
+#include "NaoEnactor.h"
+typedef NaoEnactor EnactorT;
+#else
+#include "ALEnactor.h"
+typedef ALEnactor EnactorT;
+#endif
 
 class ALMan : public Man {
 public:
@@ -21,7 +33,8 @@ public:
     virtual void stopSubThreads();
 
 private:
-    boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<ALImageTranscriber> alImageTranscriber;
+    boost::shared_ptr<EnactorT> alEnactor;
 
 };
 

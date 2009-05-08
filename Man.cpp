@@ -49,8 +49,8 @@ using boost::shared_ptr;
 
 Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<Transcriber> _transcriber,
-          shared_ptr<ALImageTranscriber> _imageTranscriber,
-          shared_ptr<ALEnactor> _enactor,
+          shared_ptr<ImageTranscriber> _imageTranscriber,
+          shared_ptr<MotionEnactor> _enactor,
           shared_ptr<Synchro> synchro)
     : sensors(_sensors),
       transcriber(_transcriber),
@@ -67,25 +67,22 @@ Man::Man (shared_ptr<Sensors> _sensors,
     imageTranscriber->setSubscriber(this);
 
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
-    
+
     guardian = shared_ptr<RoboGuardian>(new RoboGuardian(synchro, sensors));
 
     // initialize core processing modules
 #ifdef USE_MOTION
     motion = shared_ptr<Motion>(
         new Motion(synchro, enactor, sensors));
-
-    guardian->setMotionInterface( motion->getInterface());
+    guardian->setMotionInterface(motion->getInterface());
 #endif
-
     // initialize python roboguardian module.
     // give python a pointer to the guardian. Method defined in PyRoboguardian.h
     set_guardian_pointer(guardian);
-
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
-    noggin = shared_ptr<Noggin>(new Noggin(profiler, vision,comm, guardian,
+    noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                            motion->getInterface()));
 #endif// USE_NOGGIN
 }

@@ -10,7 +10,12 @@ ALMan::ALMan(boost::shared_ptr<Sensors> _sensors,
              boost::shared_ptr<ALImageTranscriber> _imageTranscriber,
              boost::shared_ptr<ALEnactor> _enactor,
              boost::shared_ptr<Synchro> synchro)
-    :Man(_sensors,_transcriber,_imageTranscriber,_enactor,synchro){}
+    :Man(_sensors,_transcriber,_imageTranscriber,_enactor,synchro),
+     alImageTranscriber(_imageTranscriber),
+     alEnactor(_enactor)
+{
+
+}
 
 ALMan::~ALMan(){
 
@@ -20,20 +25,20 @@ ALMan::~ALMan(){
 
 void ALMan::startSubThreads(){
 #ifndef USE_DCM
-    if(enactor->start()!=0)
+    if(alEnactor->start()!=0)
         cout << "Failed to start enactor" <<endl;
     else
-        enactor->getTrigger()->await_on();
+        alEnactor->getTrigger()->await_on();
 #endif
 
     Man::startSubThreads();
 
     // Start Image transcriber thread (it handles its own threading
-    if (imageTranscriber->start() != 0) {
+    if (alImageTranscriber->start() != 0) {
         cerr << "Image transcriber failed to start" << endl;
     }
     else
-        imageTranscriber->getTrigger()->await_on();
+        alImageTranscriber->getTrigger()->await_on();
 
 }
 
@@ -42,8 +47,8 @@ void ALMan::stopSubThreads(){
     cout << "  ALMan stoping:" << endl;
 #endif
 
-    imageTranscriber->stop();
-    imageTranscriber->getTrigger()->await_off();
+    alImageTranscriber->stop();
+    alImageTranscriber->getTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
     cout << "  Image Transcriber thread is stopped" << endl;
 #endif
@@ -51,8 +56,8 @@ void ALMan::stopSubThreads(){
     Man::stopSubThreads();
 
 #ifndef USE_DCM
-    enactor->stop();
-    enactor->getTrigger()->await_off();
+    alEnactor->stop();
+    alEnactor->getTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
     cout << "  Enactor thread is stopped" << endl;
 #endif

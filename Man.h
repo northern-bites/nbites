@@ -39,20 +39,8 @@
 
 #include "dcmproxy.h"
 
-#ifdef USE_DCM
 
-#  if defined USE_DCM && defined MAN_IS_REMOTE
-#    error "DCM not compatible with remote!!!"
-#  endif
-
-#include "NaoEnactor.h"
-typedef NaoEnactor EnactorT;
-#else
-#include "ALEnactor.h"
-typedef ALEnactor EnactorT;
-#endif
-
-
+#include "MotionEnactor.h"
 #include "ALTranscriber.h"
 #include "ImageSubscriber.h"
 #include "ALImageTranscriber.h"
@@ -83,8 +71,8 @@ public:
     // contructors
     Man(boost::shared_ptr<Sensors> _sensors,
         boost::shared_ptr<Transcriber> _transcriber,
-        boost::shared_ptr<ALImageTranscriber> _imageTranscriber,
-        boost::shared_ptr<ALEnactor> _enactor,
+        boost::shared_ptr<ImageTranscriber> _imageTranscriber,
+        boost::shared_ptr<MotionEnactor> _enactor,
         boost::shared_ptr<Synchro> synchro);
 
     // destructor
@@ -119,9 +107,8 @@ private:
 public:
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;
-    boost::shared_ptr<ALImageTranscriber> imageTranscriber;
-    boost::shared_ptr<EnactorT> enactor;
-
+    boost::shared_ptr<ImageTranscriber> imageTranscriber;
+    boost::shared_ptr<MotionEnactor> enactor;
     boost::shared_ptr<RoboGuardian> guardian;
 
     //boost::shared_ptr<Synchro> synchro;
