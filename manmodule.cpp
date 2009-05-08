@@ -27,11 +27,11 @@
 //NBites includes
 #include "alproxy.h"
 #include "ALMan.h"
+
 #include "_ledsmodule.h"
 
 #include "almodule.h"
 #include "alsentinelproxy.h"
-
 using namespace std;
 using namespace AL;
 using boost::shared_ptr;
@@ -42,7 +42,7 @@ using boost::shared_ptr;
 static shared_ptr<ALMan> man;
 static shared_ptr<Sensors> sensors;
 static shared_ptr<Synchro> synchro;
-static shared_ptr<Transcriber> transcriber;
+static shared_ptr<ALTranscriber> transcriber;
 static shared_ptr<ALImageTranscriber> imageTranscriber;
 static shared_ptr<ALEnactor> enactor;
 
@@ -58,7 +58,7 @@ void ALCreateMan( ALPtr<ALBroker> broker){
 
     synchro = shared_ptr<Synchro>(new Synchro());
     sensors = shared_ptr<Sensors>(new Sensors);
-    transcriber = shared_ptr<Transcriber>(new ALTranscriber(broker,sensors));
+    transcriber = shared_ptr<ALTranscriber>(new ALTranscriber(broker,sensors));
     imageTranscriber =
         shared_ptr<ALImageTranscriber>
         (new ALImageTranscriber(synchro, sensors, broker));

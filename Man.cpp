@@ -27,9 +27,6 @@
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
 
-#include "alvisionimage.h"
-#include "alvisiondefinitions.h"
-
 #include "Man.h"
 #include "manconfig.h"
 #include "corpus/synchro.h"
@@ -37,7 +34,6 @@ using namespace boost::assign;
 #include "Common.h"
 
 using namespace std;
-using namespace AL;
 using boost::shared_ptr;
 
 

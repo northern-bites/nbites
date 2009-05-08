@@ -28,22 +28,11 @@
 
 #include "manconfig.h"
 
-#include "alxplatform.h"
-#include "altools.h"
-#include "albroker.h"
-#include "almodule.h"
-#include "alloggerproxy.h"
-#include "almemoryproxy.h"
-#include "almemoryfastaccess.h"
-#include "alptr.h"
-
-#include "dcmproxy.h"
-
 
 #include "MotionEnactor.h"
-#include "ALTranscriber.h"
 #include "ImageSubscriber.h"
-#include "ALImageTranscriber.h"
+#include "ImageTranscriber.h"
+#include "Transcriber.h"
 #include "Common.h"
 #include "Profiler.h"
 #include "Sensors.h"
@@ -56,7 +45,6 @@
 #include "RoboGuardian.h"
 #include "PyRoboGuardian.h"
 #include "PySensors.h"
-
 
 /**
  * The Naoqi module to run our main Nao robot system.

@@ -42,7 +42,7 @@
 
 #include "synchro.h"
 #include "MotionSwitchboard.h"
-#include "ALEnactor.h"
+#include "MotionEnactor.h"
 #include "MotionInterface.h"
 #include "Sensors.h"
 
