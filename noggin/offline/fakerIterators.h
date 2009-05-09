@@ -54,9 +54,10 @@ void iterateMCLObsPath(std::fstream * locFile, std::fstream * coreFile,
                        int ball_id);
 
 void iterateFakerPath(std::fstream * mclFile, std::fstream * ekfFile,
-                      NavPath * letsGo);
+                      NavPath * letsGo, float noiseLevel = 0.05);
 std::vector<Observation> determineObservedLandmarks(PoseEst myPos,
-                                                    float neckYaw);
+                                                    float neckYaw,
+                                                    float noiseLevel = 0.05);
 estimate determineBallEstimate(PoseEst * currentPose, BallPose * currentBall,
                                float neckYaw);
 float sampleNormalDistribution(float sd);

@@ -99,19 +99,16 @@ int main(int argc, char** argv)
     ekfNoAmbigFile.close();
     ekfNoAmbigCoreFile.close();
 
-    runMCL(argv[1], "5", 5, false);
-    runMCL(argv[1], "5.best", 5, true);
-    runMCL(argv[1], "10", 10, false);
-    runMCL(argv[1], "10.best", 10, true);
-    runMCL(argv[1], "50", 50, false);
-    runMCL(argv[1], "50.best", 50, true);
-    runMCL(argv[1], "100", 100, false);
-    runMCL(argv[1], "100.best", 100, true);
-    runMCL(argv[1], "500", 500, false);
-    runMCL(argv[1], "500.best", 500, true);
-    runMCL(argv[1], "1000", 1000, false);
-    runMCL(argv[1], "1000.best", 1000, true);
-
+    int sampleSizes[] = {5,10,50,100,500,1000};
+    for (int x = 0; x < 6; ++x) {
+        for (int i = 1; i <= 10; ++i) {
+            stringstream st;
+            st << sampleSizes[x] << "-" << i;
+            runMCL(argv[1], st.str(), sampleSizes[x], false);
+            st << ".best";
+            runMCL(argv[1], st.str(), sampleSizes[x], true);
+        }
+    }
     return 0;
 }
 
@@ -140,6 +137,8 @@ void runMCL(char * base, string name, int numParticles, bool useBest)
         cout << " using best particle.";
     }
     cout << endl;
+    cout << "\tThe file is " << mclFileName << endl;
+
     long long mclTime = -micro_time();
     iterateMCLObsPath(&mclFile, &mclCoreFile,
                       mcl, &realPoses, &ballPoses, &odos,

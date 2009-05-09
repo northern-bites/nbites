@@ -53,6 +53,8 @@ OBS_TO_LOC_SRCS = obsToLoc.cpp \
 FAKER_SRCS = LocLogFaker.cpp \
 	../NogginStructs.h
 
+NOISE_SRCS = noiseVaccuracy.cpp
+
 OBJS = Utility.o \
        ConcreteLandmark.o \
        ConcreteCorner.o \
@@ -76,14 +78,18 @@ EXECS = faker.o \
 	navToObs.o \
 	obsToLoc.o \
 	navToObs \
-	obsToLoc
+	obsToLoc \
+	noiseVaccuracy
 
 LDLIBS = $(OBJS)
 LDFLAGS = $(LDLIBS)
 
-all : navToObs obsToLoc faker
+all : navToObs obsToLoc faker noiseVaccuracy
 
 # The faker tool
+noiseVaccuracy : $(NOISE_SRCS) $(OBJS) noiseVaccuracy.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) noiseVaccuracy.o -DNO_ZLIB -o $@
+
 faker : $(FAKER_SRCS) $(OBJS) faker.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) faker.o -DNO_ZLIB -o $@
 
@@ -92,6 +98,9 @@ obsToLoc : $(OBS_TO_LOC_SRCS) $(OBJS) obsToLoc.o
 
 navToObs : $(NAV_TO_OBS_SRCS) $(OBJS) navToObs.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) navToObs.o -DNO_ZLIB -o $@
+
+noiseVaccuracy.o : $(NOISE_SRCS) $(OBJS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
 faker.o : $(FAKER_SRCS) $(OBJS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@

@@ -13,3 +13,6 @@ noggin/util/fakeData/*
 /noggin/util/obsToLoc
 /noggin/offline/obsToLoc
 /noggin/offline/navToObs
+/noggin/offline/noiseVaccuracy
+/noggin/offline/.Rhistory
+/noggin/offline/.RData
