@@ -5,7 +5,8 @@
 
 #include <vector>
 #include "Kinematics.h"
-#include "MotionConstants.h"
+#include "JointCommand.h"
+
 
 // At the moment, this only works for Linear Interpolation.
 // Will later extended to apply to Smooth Interpolation
@@ -18,10 +19,9 @@ public:
 	// ***SHOULD NOT BE USED***
 	ChoppedCommand() : finished(true) { }
 
-	ChoppedCommand (std::vector<float> *first,
-					std::vector<float> *diffs,
-
-					int chops,int motionType);
+	ChoppedCommand ( const JointCommand *command,
+					 std::vector<float> first,
+					 int chops );
 	std::vector<float> getNextJoints(int id);
 	bool isDone();
 
@@ -42,12 +42,30 @@ private:
 	int numChops;
 	std::vector<int> numChopped;
 	int motionType;
+	int interpolationType;
 	bool finished;
 
-	std::vector<float>* getCurrentChain(int id);
-	std::vector<float>* getDiffChain(int id);
+	// Sub-next joint methods
+	std::vector<float>* getNextLinearJoints(int id);
+	std::vector<float> getNextSmoothJoints(int id);
+
+
 	void incrCurrChain(int id);
 	void checkDone();
+
+
+	std::vector<float> getFinalJoints(const JointCommand *command,
+                                      std::vector<float> currentJoints);
+
+	std::vector<float> getDiffPerChop( std::vector<float> current,
+									   std::vector<float> final,
+									   int numChops );
+
+	// Helper methods
+	std::vector<float>* getCurrentChain(int id);
+	std::vector<float>* getDiffChain(int id);
+	void buildCurrentChains( std::vector<float> currentJoints );
+	void buildDiffChains( std::vector<float> diffPerChop );
 
 };
 

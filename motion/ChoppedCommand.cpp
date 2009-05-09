@@ -19,63 +19,73 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "ChoppedCommand.h"
+#include "MotionConstants.h"
+#include "JointCommand.h"
+
+
 using namespace std;
 
 using namespace Kinematics;
 
-ChoppedCommand::ChoppedCommand(vector<float> *first,
-							   vector<float> *diffs,
-							   int chops,int type)
-	: currentHead(chain_lengths[Kinematics::HEAD_CHAIN],0),
-	  currentLArm(chain_lengths[Kinematics::LARM_CHAIN],0),
-	  currentLLeg(chain_lengths[Kinematics::LLEG_CHAIN],0),
-	  currentRLeg(chain_lengths[Kinematics::RLEG_CHAIN],0),
-	  currentRArm(chain_lengths[Kinematics::RARM_CHAIN],0),
-	  diffHead(chain_lengths[Kinematics::HEAD_CHAIN],0),
-	  diffLArm(chain_lengths[Kinematics::LARM_CHAIN],0),
-	  diffLLeg(chain_lengths[Kinematics::LLEG_CHAIN],0),
-	  diffRLeg(chain_lengths[Kinematics::RLEG_CHAIN],0),
-	  diffRArm(chain_lengths[Kinematics::RARM_CHAIN],0),
-	  numChops(chops),
-	  numChopped(Kinematics::NUM_CHAINS,0),
-	  motionType(type),
+ChoppedCommand::ChoppedCommand(const JointCommand *command,
+							   vector<float> currentJoints,
+							   int chops )
+	: numChops(chops),
+	  numChopped(NUM_CHAINS,0),
+	  motionType( command->getType() ),
+	  interpolationType( command->getInterpolation() ),
 	  finished(false)
 {
-	// Build the chain diff and current vectors
-	vector<float>::iterator i = first->begin();
-	vector<float>::iterator j = diffs->begin();
+	buildCurrentChains(currentJoints);
 
-	// Iterate over all the current chain vectors
-	// and copy in the first joints
-	vector<float> * currentChain;
-	vector<float> * diffChain;
-	for (unsigned int chain = 0; chain < Kinematics::NUM_CHAINS ; ++chain) {
-		currentChain = getCurrentChain(chain);
-		diffChain = getDiffChain(chain);
-		for (unsigned int joint = 0; joint < chain_lengths[chain] ; ++joint) {
-			// Put the next value in the appropriate vector
-			currentChain->at(joint) = *i;
-			diffChain->at(joint) = *j;
+	vector<float> finalJoints = getFinalJoints(command, currentJoints);
 
-			// Next first joint
-			++i;
-			// Next diff joint
-			++j;
-		}
+	vector<float> diffPerChop = getDiffPerChop(currentJoints,
+											   finalJoints,
+											   numChops );
+
+	buildDiffChains( diffPerChop );
+
+}
+
+void ChoppedCommand::buildCurrentChains( vector<float> currentJoints ) {
+	vector<float>::iterator firstCurrentJoint = currentJoints.begin();
+	vector<float>::iterator chainStart, chainEnd;
+
+	for (unsigned int chain = 0; chain < NUM_CHAINS ; ++chain) {
+		vector<float> *currentChain = getCurrentChain(chain);
+
+		chainStart = firstCurrentJoint + chain_first_joint[chain];
+		chainEnd = firstCurrentJoint + chain_last_joint[chain] + 1;
+		currentChain->assign( chainStart, chainEnd );
+	}
+}
+
+void ChoppedCommand::buildDiffChains( vector<float>diffPerChop ) {
+	vector<float>::iterator firstDiffJoint = diffPerChop.begin();
+	vector<float>::iterator chainStart,chainEnd;
+
+	for (unsigned int chain = 0; chain < NUM_CHAINS ; ++chain) {
+		vector<float> *diffChain = getDiffChain(chain);
+
+		chainStart = firstDiffJoint + chain_first_joint[chain];
+		chainEnd = firstDiffJoint + chain_last_joint[chain] + 1;
+		diffChain->assign( chainStart, chainEnd );
+
 	}
 }
 
 vector<float>* ChoppedCommand::getCurrentChain(int id) {
 	switch (id) {
-	case Kinematics::HEAD_CHAIN:
+	case HEAD_CHAIN:
 		return &currentHead;
-	case Kinematics::LARM_CHAIN:
+	case LARM_CHAIN:
 		return &currentLArm;
-	case Kinematics::LLEG_CHAIN:
+	case LLEG_CHAIN:
 		return &currentLLeg;
-	case Kinematics::RLEG_CHAIN:
+	case RLEG_CHAIN:
 		return &currentRLeg;
-	case Kinematics::RARM_CHAIN:
+	case RARM_CHAIN:
 		return &currentRArm;
 	default:
 		std::cout << "INVALID CHAINID" << std::endl;
@@ -83,17 +93,18 @@ vector<float>* ChoppedCommand::getCurrentChain(int id) {
 	}
 }
 
+
 vector<float>* ChoppedCommand::getDiffChain(int id) {
 	switch (id) {
-	case Kinematics::HEAD_CHAIN:
+	case HEAD_CHAIN:
 		return &diffHead;
-	case Kinematics::LARM_CHAIN:
+	case LARM_CHAIN:
 		return &diffLArm;
-	case Kinematics::LLEG_CHAIN:
+	case LLEG_CHAIN:
 		return &diffLLeg;
-	case Kinematics::RLEG_CHAIN:
+	case RLEG_CHAIN:
 		return &diffRLeg;
-	case Kinematics::RARM_CHAIN:
+	case RARM_CHAIN:
 		return &diffRArm;
 	default:
 		std::cout << "INVALID CHAINID" << std::endl;
@@ -102,22 +113,32 @@ vector<float>* ChoppedCommand::getDiffChain(int id) {
 }
 
 vector<float> ChoppedCommand::getNextJoints(int id) {
+	if ( interpolationType == INTERPOLATION_LINEAR ) {
+		return *getNextLinearJoints(id);
+	}
+	else if ( interpolationType == INTERPOLATION_SMOOTH )
+		return getNextSmoothJoints(id);
+}
 
+vector<float>* ChoppedCommand::getNextLinearJoints(int id) {
 	if (numChopped.at(id) <= numChops) {
 		// Increment the current chain
-		incrCurrChain(id);
 
+		incrCurrChain(id);
 		// Since we changed the command's current status, we
 		// need to check to see if it's finished yet.
 		checkDone();
 
 		// Return a copy of the current chain at this id
-		return *getCurrentChain(id);
+		return getCurrentChain(id);
 
 	} else {
 		// Don't increment anymore and just return the current chain
-		return *getCurrentChain(id);
+		return getCurrentChain(id);
 	}
+}
+
+vector<float> ChoppedCommand::getNextSmoothJoints(int id) {
 
 }
 
@@ -151,7 +172,7 @@ void ChoppedCommand::checkDone() {
 
 	// If body joint command, must check all chains
 	if (motionType == MotionConstants::BODY_JOINT){
-		for (unsigned int i = LARM_CHAIN; i <Kinematics::NUM_CHAINS ; ++i){
+		for (unsigned int i = LARM_CHAIN; i <NUM_CHAINS ; ++i){
 			if (numChopped.at(i) >= numChops){
 				allDone = true;
 			} else {
@@ -167,9 +188,54 @@ void ChoppedCommand::checkDone() {
 		else
 			allDone = false;
 	} else {
-		std::cout << "WHAT IS GOING ON? WRONG MOTIONTYPE, DAMNIT" << std::endl;
+		std::cout << "WHAT IS GOING ON? WRONG MOTIONTYPE, DAMMIT" << std::endl;
 	}
 	finished = allDone;
 }
 
-// Is a particular chain done with its motion command?
+
+vector<float> ChoppedCommand::getDiffPerChop( vector<float> current,
+											  vector<float> final,
+											  int numChops ) {
+	vector<float> diffPerChop;
+
+	for (unsigned int joint_id=0; joint_id < NUM_JOINTS ;++joint_id) {
+		diffPerChop.push_back( (final.at(joint_id) -
+								current.at(joint_id)) / (float)numChops);
+	}
+
+	return diffPerChop;
+}
+
+vector<float> ChoppedCommand::getFinalJoints(const JointCommand *command,
+									   vector<float> currentJoints) {
+	vector<float> finalJoints(0);
+	vector<float>::iterator currentStart = currentJoints.begin();
+	vector<float>::iterator currentEnd = currentJoints.begin();
+
+	for (unsigned int chain=0; chain < NUM_CHAINS;chain++) {
+		// First, get chain joints from command
+		const vector<float> *nextChain = command->getJoints((ChainID)chain);
+
+		// Set the end iterator
+		currentEnd += chain_lengths[chain];
+
+		// If the next chain is not queued (empty), add current joints
+		if ( nextChain == 0 ||
+			 nextChain->size() == 0 ||
+			 nextChain->empty() ) {
+			finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
+
+		}else {
+			// Add each chain of joints to the final joints
+			finalJoints.insert( finalJoints.end(),
+								nextChain->begin(),
+								nextChain->end() );
+		}
+		// Set the start iterator into the right position for the
+		// next chain
+		currentStart += chain_lengths[chain];
+	}
+	return finalJoints;
+
+}

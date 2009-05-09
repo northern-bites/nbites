@@ -26,7 +26,7 @@ fi
 
 if [ $REMOTE = "ON" ]; then
 
-  echo "Installing remotly"
+  echo "Installing remotely"
 
   DEST=/opt/naoqi/modules
 

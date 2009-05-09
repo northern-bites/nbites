@@ -50,12 +50,6 @@ private:
     boost::shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command);
 
 	std::vector<float> getCurrentJoints();
-	std::vector<float> getFinalJoints(const JointCommand *command,
-                                      std::vector<float> *currentJoints);
-
-	std::vector<float> getDiffPerChop(int numChops,
-                                      std::vector<float> *current,
-                                      std::vector<float> *final);
 	void vectorToRad(std::vector<float> *vect);
 
 };
