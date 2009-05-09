@@ -29,6 +29,7 @@
 #include "Kinematics.h"
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
+#include "LinearChoppedCommand.h"
 
 
 class ChopShop

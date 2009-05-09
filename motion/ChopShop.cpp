@@ -84,10 +84,10 @@ ChopShop::chopLinear(const JointCommand *command) {
 
 	vector<float> currentJoints = getCurrentJoints();
 
-	shared_ptr<ChoppedCommand> chopped( new ChoppedCommand(
-											 command,
-											 currentJoints,
-											 numChops ) );
+	shared_ptr<ChoppedCommand> chopped( new LinearChoppedCommand(
+											command,
+											currentJoints,
+											numChops ) );
 
 	return chopped;
 }

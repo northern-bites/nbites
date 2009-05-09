@@ -31,7 +31,8 @@ ScriptedProvider::ScriptedProvider(float motionFrameLength,
     sensors(s),
     FRAME_LENGTH_S(motionFrameLength),
     chopper(sensors, FRAME_LENGTH_S),
-	currCommand(new ChoppedCommand()), // INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
+	// INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
+	currCommand(new ChoppedCommand()),
     bodyCommandQueue()
 
 {

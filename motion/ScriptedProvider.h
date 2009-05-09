@@ -29,6 +29,7 @@
 #include "BodyJointCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
+#include "ChoppedCommand.h"
 #include "Kinematics.h"
 
 class ScriptedProvider : public MotionProvider {

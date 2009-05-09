@@ -27,142 +27,14 @@ using namespace std;
 
 using namespace Kinematics;
 
-ChoppedCommand::ChoppedCommand(const JointCommand *command,
-							   vector<float> currentJoints,
-							   int chops )
+ChoppedCommand::ChoppedCommand(const JointCommand *command, int chops )
 	: numChops(chops),
 	  numChopped(NUM_CHAINS,0),
 	  motionType( command->getType() ),
 	  interpolationType( command->getInterpolation() ),
 	  finished(false)
 {
-	buildCurrentChains(currentJoints);
 
-	vector<float> finalJoints = getFinalJoints(command, currentJoints);
-
-	vector<float> diffPerChop = getDiffPerChop(currentJoints,
-											   finalJoints,
-											   numChops );
-
-	buildDiffChains( diffPerChop );
-
-}
-
-void ChoppedCommand::buildCurrentChains( vector<float> currentJoints ) {
-	vector<float>::iterator firstCurrentJoint = currentJoints.begin();
-	vector<float>::iterator chainStart, chainEnd;
-
-	for (unsigned int chain = 0; chain < NUM_CHAINS ; ++chain) {
-		vector<float> *currentChain = getCurrentChain(chain);
-
-		chainStart = firstCurrentJoint + chain_first_joint[chain];
-		chainEnd = firstCurrentJoint + chain_last_joint[chain] + 1;
-		currentChain->assign( chainStart, chainEnd );
-	}
-}
-
-void ChoppedCommand::buildDiffChains( vector<float>diffPerChop ) {
-	vector<float>::iterator firstDiffJoint = diffPerChop.begin();
-	vector<float>::iterator chainStart,chainEnd;
-
-	for (unsigned int chain = 0; chain < NUM_CHAINS ; ++chain) {
-		vector<float> *diffChain = getDiffChain(chain);
-
-		chainStart = firstDiffJoint + chain_first_joint[chain];
-		chainEnd = firstDiffJoint + chain_last_joint[chain] + 1;
-		diffChain->assign( chainStart, chainEnd );
-
-	}
-}
-
-vector<float>* ChoppedCommand::getCurrentChain(int id) {
-	switch (id) {
-	case HEAD_CHAIN:
-		return &currentHead;
-	case LARM_CHAIN:
-		return &currentLArm;
-	case LLEG_CHAIN:
-		return &currentLLeg;
-	case RLEG_CHAIN:
-		return &currentRLeg;
-	case RARM_CHAIN:
-		return &currentRArm;
-	default:
-		std::cout << "INVALID CHAINID" << std::endl;
-		return new vector<float>(0);
-	}
-}
-
-
-vector<float>* ChoppedCommand::getDiffChain(int id) {
-	switch (id) {
-	case HEAD_CHAIN:
-		return &diffHead;
-	case LARM_CHAIN:
-		return &diffLArm;
-	case LLEG_CHAIN:
-		return &diffLLeg;
-	case RLEG_CHAIN:
-		return &diffRLeg;
-	case RARM_CHAIN:
-		return &diffRArm;
-	default:
-		std::cout << "INVALID CHAINID" << std::endl;
-		return new vector<float>(0);
-	}
-}
-
-vector<float> ChoppedCommand::getNextJoints(int id) {
-	if ( interpolationType == INTERPOLATION_LINEAR ) {
-		return *getNextLinearJoints(id);
-	}
-	else if ( interpolationType == INTERPOLATION_SMOOTH )
-		return getNextSmoothJoints(id);
-}
-
-vector<float>* ChoppedCommand::getNextLinearJoints(int id) {
-	if (numChopped.at(id) <= numChops) {
-		// Increment the current chain
-
-		incrCurrChain(id);
-		// Since we changed the command's current status, we
-		// need to check to see if it's finished yet.
-		checkDone();
-
-		// Return a copy of the current chain at this id
-		return getCurrentChain(id);
-
-	} else {
-		// Don't increment anymore and just return the current chain
-		return getCurrentChain(id);
-	}
-}
-
-vector<float> ChoppedCommand::getNextSmoothJoints(int id) {
-
-}
-
-void ChoppedCommand::incrCurrChain(int id) {
-	vector<float> * currentChain = getCurrentChain(id);
-	vector<float> * diffChain = getDiffChain(id);
-
-	// Set iterators to diff and current vectors
-	vector<float>::iterator i = currentChain->begin();
-	vector<float>::iterator j = diffChain->begin();
-
-	numChopped.at(id)++;
-	while (i != currentChain->end() &&
-		   j != diffChain->end() ) {
-		*i += *j;
-		++i;
-		++j;
-	}
-}
-
-bool ChoppedCommand::isDone() {
-	// Check all the vectors to see if they're all
-	// fully chopped
-	return finished;
 }
 
 // Check's to see if the command has executed the required
@@ -191,20 +63,6 @@ void ChoppedCommand::checkDone() {
 		std::cout << "WHAT IS GOING ON? WRONG MOTIONTYPE, DAMMIT" << std::endl;
 	}
 	finished = allDone;
-}
-
-
-vector<float> ChoppedCommand::getDiffPerChop( vector<float> current,
-											  vector<float> final,
-											  int numChops ) {
-	vector<float> diffPerChop;
-
-	for (unsigned int joint_id=0; joint_id < NUM_JOINTS ;++joint_id) {
-		diffPerChop.push_back( (final.at(joint_id) -
-								current.at(joint_id)) / (float)numChops);
-	}
-
-	return diffPerChop;
 }
 
 vector<float> ChoppedCommand::getFinalJoints(const JointCommand *command,
