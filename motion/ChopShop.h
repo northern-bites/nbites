@@ -30,6 +30,7 @@
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
 #include "LinearChoppedCommand.h"
+#include "SmoothChoppedCommand.h"
 
 
 class ChopShop
@@ -48,7 +49,14 @@ private:
 	float FRAME_LENGTH_S;
 
 // 	shared_ptr<ChoppedCommand> chopSmooth(const JointCommand *command);
-    boost::shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command);
+    boost::shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command,
+												 std::vector<float> currentJoints,
+												 int numChops);
+
+    boost::shared_ptr<ChoppedCommand> chopSmooth(const JointCommand *command,
+												 std::vector<float> currentJoints,
+												 int numChops);
+
 
 	std::vector<float> getCurrentJoints();
 	void vectorToRad(std::vector<float> *vect);

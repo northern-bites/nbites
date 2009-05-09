@@ -40,34 +40,43 @@ ChopShop::ChopShop (shared_ptr<Sensors> s, float motionFrameLength)
 /*************************************************************************/
 /*******  THIS WILL DELETE THE JOINT COMMAND PASSED TO IT!   *************/
 /*************************************************************************/
-shared_ptr<ChoppedCommand> ChopShop::chopCommand(const JointCommand *command) {
+shared_ptr<ChoppedCommand>
+ChopShop::chopCommand(const JointCommand *command) {
 	shared_ptr<ChoppedCommand> chopped;
+
+	int numChops = (int)(command->getDuration() / FRAME_LENGTH_S);
+	vector<float> currentJoints = getCurrentJoints();
+
 	// It's a BJC so it deals with 4 chains
 	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
-		chopped = chopLinear(command);
+		chopped = chopLinear(command, currentJoints, numChops);
 	}
 
-// 	else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
-// 		chopped =  chopSmooth(command);
-// 	}
+ 	else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
+ 		chopped =  chopSmooth(command, currentJoints, numChops);
+ 	}
 
 	else {
 		cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING LINEARLY" << endl;
-		chopped = chopLinear(command) ;
+		chopped = chopLinear(command, currentJoints, numChops) ;
 	}
 	// Deleting command!
 	delete command;
 	return chopped;
 }
 
-// Smooth interpolation motion
-// ChoppedCommand *
-// ChopShop::chopSmooth(const JointCommand *command) {
+//Smooth interpolation motion
+shared_ptr<ChoppedCommand>
+ChopShop::chopSmooth(const JointCommand *command,
+					 vector<float> currentJoints,
+					 int numChops) {
+	shared_ptr<ChoppedCommand> chopped( new SmoothChoppedCommand(
+											command,
+											currentJoints,
+											numChops ) );
 
-// 	// PLACE HOLDER
-// 	ChoppedCommand* a = new ChoppedCommand();
-// 	return a;
-// }
+	return chopped;
+}
 
 /*
  * Linear interpolation chopping:
@@ -78,11 +87,9 @@ shared_ptr<ChoppedCommand> ChopShop::chopCommand(const JointCommand *command) {
  *
  */
 shared_ptr<ChoppedCommand>
-ChopShop::chopLinear(const JointCommand *command) {
-
-	int numChops = (int)(command->getDuration() / FRAME_LENGTH_S);
-
-	vector<float> currentJoints = getCurrentJoints();
+ChopShop::chopLinear(const JointCommand *command,
+					 vector<float> currentJoints,
+					 int numChops) {
 
 	shared_ptr<ChoppedCommand> chopped( new LinearChoppedCommand(
 											command,
