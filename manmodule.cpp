@@ -15,7 +15,6 @@
 //NB NOTE: This file contains the interface to Man used for Naoqi
 //         See webotsmodule.cpp for the Webots interface.
 
-#ifndef WEBOTS_BACKEND
 
 #ifndef _WIN32
 #include <signal.h>
@@ -263,5 +262,3 @@ int main( int argc, char *argv[] )
   exit( 0 );
 }
 #endif//MAN_IS_REMOTE
-
-#endif //WEBOTS_BACKEND

@@ -100,17 +100,15 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 #Possibly, don't need to include any AL or WEBOTS stuff in this directory
 # since we may inherit it from man
 IF(WEBOTS_BACKEND)
-INCLUDE_DIRECTORIES(${WEBOTS_INCLUDE_DIR}
-       )
+  INCLUDE_DIRECTORIES(${WEBOTS_INCLUDE_DIR})
 
-ADD_DEFINITIONS( ${WEBOTS_DEFINITIONS})
+  ADD_DEFINITIONS( ${WEBOTS_DEFINITIONS})
 
 ELSE(WEBOTS_BACKEND)
-INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR}
-                    ${TINYXML_INCLUDE_DIR}
-		    )
-ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS} 
-                 ${TINYXML_DEFINITIONS})
+  INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR}
+                      ${TINYXML_INCLUDE_DIR})
+  ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS}
+                   ${TINYXML_DEFINITIONS})
 
 ENDIF(WEBOTS_BACKEND)
 
@@ -121,35 +119,31 @@ SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
                   ${CORPUS_INCLUDE_DIR}/NaoPose )
 
 
+###### LEDS ############
 IF(WEBOTS_BACKEND)
-
-SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_webotsledsmodule )
-
+  SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_webotsledsmodule )
 ELSE(WEBOTS_BACKEND)
-
-SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )
-
+  SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )
 ENDIF(WEBOTS_BACKEND)
+
 SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
                   ${CORPUS_INCLUDE_DIR}/_synchromodule
                   ${CORPUS_INCLUDE_DIR}/messaging
                   )
-SET( ROBOT_CONNECT_SRCS 
-                        ${CORPUS_INCLUDE_DIR}/AccEKF
+
+########### ROBOT CONNET #########
+SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/AccEKF
 			${CORPUS_INCLUDE_DIR}/RoboGuardian
 			${CORPUS_INCLUDE_DIR}/ClickableButton
-			${CORPUS_INCLUDE_DIR}/PyRoboGuardian
-			)
+			${CORPUS_INCLUDE_DIR}/PyRoboGuardian)
 
 IF(WEBOTS_BACKEND)
 
 ELSE(WEBOTS_BACKEND)
-LIST( APPEND ROBOT_CONNET_SRCS
-                        ${CORPUS_INCLUDE_DIR}/ALEnactor
-                        ${CORPUS_INCLUDE_DIR}/NaoEnactor
-                        ${CORPUS_INCLUDE_DIR}/ALTranscriber
-			${CORPUS_INCLUDE_DIR}/ALImageTranscriber)
-
+  LIST( APPEND ROBOT_CONNET_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
+                                 ${CORPUS_INCLUDE_DIR}/NaoEnactor
+				 ${CORPUS_INCLUDE_DIR}/ALTranscriber
+				 ${CORPUS_INCLUDE_DIR}/ALImageTranscriber)
 ENDIF(WEBOTS_BACKEND)
 
 

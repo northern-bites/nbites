@@ -26,7 +26,7 @@ using namespace std;
 int main() {
   wb_robot_init();
 
-  int time_step = wb_robot_get_basic_time_step();
+  int time_step = static_cast<int>(wb_robot_get_basic_time_step());
 
   // load and start forward motion
   WbMotionRef forwards = wbu_motion_new("../motions/Forwards50.motion");

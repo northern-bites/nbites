@@ -6,9 +6,13 @@
 #include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
-#ifndef WEBOTS_BACKEND //HACK!!
+
+#ifndef WEBOTS_BACKEND //HACK-ish should make abstract Lights object..!!
 #include "_ledsmodule.h"
+#else
+#include "_webotsledsmodule.h"
 #endif
+
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
@@ -76,9 +80,7 @@ void Noggin::initializePython(shared_ptr<Vision> v)
 
     // Initialize low-level modules
     c_init_sensors();
-#ifndef WEBOTS_BACKEND
     init_leds();
-#endif
     c_init_roboguardian();
     c_init_motion();
     c_init_comm();
