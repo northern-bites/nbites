@@ -58,6 +58,9 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 MotionSwitchboard::~MotionSwitchboard() {
     pthread_mutex_destroy(&next_joints_mutex);
     pthread_mutex_destroy(&calc_new_joints_mutex);
+    pthread_mutex_destroy(&stiffness_mutex);
+    pthread_cond_destroy(&calc_new_joints_cond);
+
 #ifdef DEBUG_JOINTS_OUTPUT
     closeDebugLogs();
 #endif
@@ -80,15 +83,11 @@ void MotionSwitchboard::start() {
 
 void MotionSwitchboard::stop() {
     running = false;
+    cout << "Switchboard signaled to stop" <<endl;
     //signal to end waiting in the run method,
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_signal(&calc_new_joints_cond);
     pthread_mutex_unlock(&calc_new_joints_mutex);
-
-    pthread_mutex_destroy(&next_joints_mutex);
-    pthread_mutex_destroy(&calc_new_joints_mutex);
-    pthread_mutex_destroy(&stiffness_mutex);
-    pthread_cond_destroy(&calc_new_joints_cond);
 }
 
 
@@ -132,6 +131,7 @@ void MotionSwitchboard::run() {
         fcount++;
 
     }
+    cout << "Switchboard run has exited" <<endl;
 }
 
 int MotionSwitchboard::processProviders(){

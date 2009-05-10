@@ -5,10 +5,6 @@
 
 using namespace std;
 
-#include "almodule.h"
-#include "alsentinelproxy.h"
-using namespace AL;
-
 #include "Kinematics.h"
 
 #include "StiffnessCommand.h"
@@ -56,11 +52,9 @@ void RoboGuardian::playFile(string str)const{
 
 
 RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
-                           boost::shared_ptr<Sensors> s,
-                           AL::ALPtr<AL::ALBroker> _broker,
-                           MotionInterface * _interface)
+                           boost::shared_ptr<Sensors> s)
     : Thread(_synchro,"RoboGuardian"), sensors(s),
-      broker(_broker),motion_interface(_interface),
+      motion_interface(NULL),
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
       chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
@@ -76,14 +70,6 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       useFallProtection(false)
 {
     pthread_mutex_init(&click_mutex,NULL);
-    try{
-        ALSentinelProxy sentinel(broker);
-        sentinel.enableDefaultActionSimpleClick(false);
-        sentinel.enableDefaultActionDoubleClick(false);
-        sentinel.enableDefaultActionTripleClick(false);
-    }catch(ALError &e){
-        cout << "Failed to access the ALSentinel: "<<e.toString()<<endl;
-    }
     executeStartupAction();
 }
 RoboGuardian::~RoboGuardian(){
@@ -94,6 +80,7 @@ RoboGuardian::~RoboGuardian(){
 
 void RoboGuardian::run(){
     Thread::running = true;
+    Thread::trigger->on();
 
     while(Thread::running){
 
@@ -112,12 +99,14 @@ void RoboGuardian::run(){
 
 void RoboGuardian::shutoffGains(){
     playFile(stiffness_removed_wav);
-    motion_interface->sendStiffness(REMOVE_GAINS);
+    if(motion_interface != NULL)
+        motion_interface->sendStiffness(REMOVE_GAINS);
 }
 
 void RoboGuardian::enableGains(){
     playFile(stiffness_enabled_wav);
-    motion_interface->sendStiffness(ENABLE_GAINS);
+    if(motion_interface != NULL)
+        motion_interface->sendStiffness(ENABLE_GAINS);
 }
 
 static const float FALL_SPEED_THRESH = 0.03f; //rads/20ms
@@ -413,11 +402,26 @@ string RoboGuardian::getHostName()const {
     return string(name);
 }
 
+const string RoboGuardian::discoverIP() const{
+    system("/opt/naoqi/bin/ip.sh > /tmp/ip.txt");
+    char ip[100];
+    FILE * ipf = fopen("/tmp/ip.txt","r");
+    if(ipf != NULL){
+        fscanf(ipf,"%s\n",ip);
+        return ip;
+        fclose(ipf);
+    }else{
+        cout << "Unable to read IP from this platform"<<endl;
+        return "1.1.1.1";
+    }
+
+}
+
 void RoboGuardian::speakIPAddress()const {
     //Currently we poll the broker. If this breaks in the future
     //you can try to call /opt/naoqi/bin/ip.sh or
     //parse the output of if config yourself
-    const string IP = broker->getIP();
+    const string IP = discoverIP();//broker->getIP();
     const string host = getHostName();
 
     string speech_command = sout;

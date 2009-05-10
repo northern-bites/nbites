@@ -28,40 +28,17 @@
 
 #include "manconfig.h"
 
-#include "alxplatform.h"
-#include "altools.h"
-#include "albroker.h"
-#include "almodule.h"
-#include "alloggerproxy.h"
-#include "almemoryproxy.h"
-#include "almemoryfastaccess.h"
-#include "alptr.h"
 
-#ifdef NAOQI1
-#include "dcmproxy.h"
-#endif
-
-#ifdef USE_DCM
-
-#  if defined USE_DCM && defined MAN_IS_REMOTE
-#    error "DCM not compatible with remote!!!"
-#  endif
-
-#include "NaoEnactor.h"
-typedef NaoEnactor EnactorT;
-#else
-#include "ALEnactor.h"
-typedef ALEnactor EnactorT;
-#endif
-
-
-#include "ALTranscriber.h"
+#include "MotionEnactor.h"
+#include "ImageSubscriber.h"
+#include "ImageTranscriber.h"
+#include "Transcriber.h"
 #include "Common.h"
 #include "Profiler.h"
 #include "Sensors.h"
-#include "Comm.h"
 #include "Vision.h"
 #include "Noggin.h"
+#include "Comm.h" 
 #include "Motion.h"
 #include "NaoPose.h"
 #include "synchro.h"
@@ -69,49 +46,29 @@ typedef ALEnactor EnactorT;
 #include "PyRoboGuardian.h"
 #include "PySensors.h"
 
-
 /**
  * The Naoqi module to run our main Nao robot system.
  *
  * @author Jeremy R. Fishman
  * @author Bowdoin College Northern Bites
  */
-class Man : public AL::ALModule, public Thread
+class Man : public ImageSubscriber
 {
 public:
 
     // contructors
-#ifdef NAOQI1
-    Man(AL::ALPtr<AL::ALBroker> pBroker, std::string pName);
-#else
-    Man();
-#endif
+    Man(boost::shared_ptr<Sensors> _sensors,
+        boost::shared_ptr<Transcriber> _transcriber,
+        boost::shared_ptr<ImageTranscriber> _imageTranscriber,
+        boost::shared_ptr<MotionEnactor> _enactor,
+        boost::shared_ptr<Synchro> synchro);
+
     // destructor
     virtual ~Man();
 
     //
-    // ALModule methods
-    //
-
-    /**
-     * Called by stm when the subcription has been modified.
-     *
-     * @param pDataName Name of the suscribed data
-     * @param pValue Value of the suscribed data
-     * @param pMessage Message written by user during subscription
-     */
-    void dataChanged(const std::string& pDataName, const ALValue& pValue,
-        const std::string& pMessage) {};
-
-    std::string version() { return "1.2.0-r"; /*TRUNK_REVISION;*/ };
-
-    //
     // Our methods
     //
-
-    // Man runs, and runs, and runs.  In the current thread.  Use start() and
-    // stop() (provided by the Thread class) to run in separate thread.
-    void run();
 
     // Profiling methods
     void startProfiling(int nframes) {
@@ -122,46 +79,36 @@ public:
        profiler->profiling = false;
     }
 
-    //HelperBoundMethods:
-    void manStart() { Thread::start(); } //should return 'int' or ALValue
-    void manStop() { Thread::stop(); }
-    void manAwaitOn() { getTrigger()->await_on(); }
-    void manAwaitOff() { getTrigger()->await_off(); }
+    // start/stop called by manmodule
+    virtual void startSubThreads();
+    virtual void stopSubThreads();
 
-    void helloWorld(){std::cout<<"HelloWorld, C++ Style"<<std::endl;};
 private:
     // run Vision and call Noggin's main loop function
     void processFrame(void);
-    // wait for and retrieve the latest image
-    void waitForImage(void);
 
-    void initMan (void);
-    void closeMan(void);
-#ifdef NAOQI1
-    void registerCamera();
-    void initCameraSettings(int whichCam);
-#else
-    void initCamera();
-#endif
-    void releaseImage(void);
+    void notifyNextVisionImage();
 
   //
   // Variables
   //
 public:
+    boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<Transcriber> transcriber;
+    boost::shared_ptr<ImageTranscriber> imageTranscriber;
+    boost::shared_ptr<MotionEnactor> enactor;
+    boost::shared_ptr<RoboGuardian> guardian;
+
+    //boost::shared_ptr<Synchro> synchro;
     // Sub-module instances
     // ** ORDER MATTERS HERE **
     //   if the modules are not instantiated in this order, some dependedcies
     //   (i.e. the Python modules exported) will not be available by the time
     //   other modules are imported
     boost::shared_ptr<Profiler> profiler;
-    boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<Transcriber> transcriber;
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
-    boost::shared_ptr<EnactorT> enactor;
-    boost::shared_ptr<Motion<EnactorT> > motion;
-    boost::shared_ptr<RoboGuardian> guardian;
+    boost::shared_ptr<Motion> motion;
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
@@ -169,58 +116,6 @@ public:
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN
 
-private:
-    // Interfaces/Proxies to robot
-#ifdef NAOQI1
-    AL::ALPtr<AL::ALLoggerProxy> log;
-    AL::ALPtr<AL::ALProxy> camera;
-    AL::ALPtr<AL::ALProxy> lem;
-#else
-    AL::ALLoggerProxy *log;
-    AL::ALProxy *camera;
-    AL::ALProxy *lem;
-#endif
-    std::string lem_name;
-
-    bool camera_active;
-
-// nBites Camera Constants
-public:
-    // Camera identification
-    static const int TOP_CAMERA = 0;
-    static const int BOTTOM_CAMERA = 1;
-
-    // Camera setup information
-    static const int CAMERA_SLEEP_TIME = 200;
-    static const int CAM_PARAM_RETRIES = 3;
-
-    // Default Camera Settings
-    // Basic Settings
-    static const int DEFAULT_CAMERA_RESOLUTION = 14;
-    static const int DEFAULT_CAMERA_FRAMERATE = 15;
-    static const int DEFAULT_CAMERA_BUFFERSIZE = 16;
-    // Color Settings
-    // Gain: 26 / Exp: 83
-    // Gain: 28 / Exp: 60
-    // Gain: 35 / Exp: 40
-    static const int DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-    static const int DEFAULT_CAMERA_GAIN = 26;
-    static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-    static const int DEFAULT_CAMERA_BLUECHROMA = 128;
-    static const int DEFAULT_CAMERA_REDCHROMA = 68;
-    static const int DEFAULT_CAMERA_BRIGHTNESS = 140;
-    static const int DEFAULT_CAMERA_CONTRAST = 64;
-    static const int DEFAULT_CAMERA_SATURATION = 128;
-    static const int DEFAULT_CAMERA_HUE = 0;
-    // Lens correction
-    static const int DEFAULT_CAMERA_LENSX = 0;
-    static const int DEFAULT_CAMERA_LENSY = 0;
-    // Exposure length
-    static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-    static const int DEFAULT_CAMERA_EXPOSURE = 83;
-    // Image orientation
-    static const int DEFAULT_CAMERA_HFLIP = 0;
-    static const int DEFAULT_CAMERA_VFLIP = 0;
 };
 
 

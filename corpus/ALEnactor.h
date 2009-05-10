@@ -21,8 +21,6 @@
 #ifndef _ALEnactor_h_DEFINED
 #define _ALEnactor_h_DEFINED
 
-#ifdef NAOQI1
-
 #include <boost/shared_ptr.hpp>
 #include "alerror.h"
 #include "almotionproxy.h"
@@ -41,9 +39,12 @@
 
 class ALEnactor : public ThreadedMotionEnactor {
 public:
-    ALEnactor(AL::ALPtr<AL::ALBroker> _pbroker, boost::shared_ptr<Sensors> s,
-              boost::shared_ptr<Transcriber> t)
-        : ThreadedMotionEnactor(), broker(_pbroker), sensors(s),
+    ALEnactor(boost::shared_ptr<Sensors> s,
+              boost::shared_ptr<Synchro> synchro,
+              boost::shared_ptr<Transcriber> t,
+              AL::ALPtr<AL::ALBroker> _pbroker )
+        : ThreadedMotionEnactor(synchro,"ALEnactor"),
+          broker(_pbroker), sensors(s),
           transcriber(t), almotion_link(false){
 
         try {
@@ -59,9 +60,10 @@ public:
     };
     virtual ~ALEnactor() { };
 
-    virtual void run();
-    virtual void sendCommands();
-    virtual void postSensors();
+    void run();
+
+    void sendCommands();
+    void postSensors();
 
 private:
     void sendJoints();
@@ -80,7 +82,5 @@ private:
 
     bool almotion_link;
 };
-
-#endif //NAOQI1
 
 #endif//_ALEnactor_h_DEFINED

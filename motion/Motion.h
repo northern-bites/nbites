@@ -42,24 +42,17 @@
 
 #include "synchro.h"
 #include "MotionSwitchboard.h"
-#include "SimulatorEnactor.h"
-#include "ALEnactor.h"
+#include "MotionEnactor.h"
 #include "MotionInterface.h"
 #include "Sensors.h"
 
-template <class EnactorType>
 class Motion : public Thread
 {
 public:
-#ifdef NAOQI1
     Motion(boost::shared_ptr<Synchro> synchro,
            //boost::shared_ptr<MotionEnactor> _enactor,
-           boost::shared_ptr<EnactorType> _enactor,
+           boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Sensors> s);
-#else
-    Motion(ALMotionProxy * _proxy, boost::shared_ptr<Synchro> synchro,
-            boost::shared_ptr<Sensors> s);
-#endif
     ~Motion();
 
     int start();
@@ -68,12 +61,8 @@ public:
     MotionInterface * getInterface(){return &interface;}
 private:
     MotionSwitchboard switchboard;
-#ifdef NAOQI1
-    boost::shared_ptr<EnactorType> enactor;
+    boost::shared_ptr<MotionEnactor> enactor;
     //boost::shared_ptr<MotionEnactor> enactor;
-#else
-    boost::shared_ptr<SimulatorEnactor> enactor;
-#endif
     MotionInterface interface;
 };
 

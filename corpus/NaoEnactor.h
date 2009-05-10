@@ -15,9 +15,9 @@
 class NaoEnactor : public MotionEnactor {
 
 public:
-	NaoEnactor(AL::ALPtr<AL::ALBroker> broker,
-               boost::shared_ptr<Sensors> s,
-               boost::shared_ptr<Transcriber> transcriber);
+	NaoEnactor(boost::shared_ptr<Sensors> s,
+               boost::shared_ptr<Transcriber> transcriber,
+               AL::ALPtr<AL::ALBroker> broker);
     virtual ~NaoEnactor() { };
     void sendCommands();
     void postSensors();

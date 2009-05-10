@@ -25,13 +25,11 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "albroker.h"
-#include "alptr.h"
-
 #include "synchro.h"
 #include "Sensors.h"
 #include "MotionInterface.h"
 #include "ClickableButton.h"
+
 
 enum  ButtonID {
     CHEST_BUTTON = 0,
@@ -42,9 +40,7 @@ enum  ButtonID {
 class RoboGuardian : public Thread {
 public:
     RoboGuardian(boost::shared_ptr<Synchro>,
-                 boost::shared_ptr<Sensors>,
-                 AL::ALPtr<AL::ALBroker>,
-                 MotionInterface *);
+                 boost::shared_ptr<Sensors>);
     virtual ~RoboGuardian();
 
     void run();
@@ -59,11 +55,17 @@ public:
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
+    void setMotionInterface(MotionInterface * minterface)
+        { motion_interface = minterface; }
+
 //private: // Since this feature is not really production ready
 // from George: I removed the private tag, so that Python can call this method
     //setters
     void enableFallProtection(bool _useFallProtection)const //off by default
         { useFallProtection = _useFallProtection; };
+
+
+    const std::string discoverIP() const;
 
 public:
     static const int NO_CLICKS;
@@ -87,7 +89,6 @@ private:
 private:
 
     boost::shared_ptr<Sensors> sensors;
-    AL::ALPtr<AL::ALBroker> broker;
     MotionInterface * motion_interface;
     std::vector<float> lastTemps;
     float lastBatteryCharge;

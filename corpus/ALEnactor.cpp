@@ -35,9 +35,9 @@ const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RA
 
 //#define SPEEDY_ENACTOR
 
-#ifdef NAOQI1
 void ALEnactor::run() {
-    std::cout << "ALEnactor::run()" << std::endl;
+    Thread::running = true;
+    Thread::trigger->on();
 
     long long currentTime;
     while (running) {
@@ -61,6 +61,8 @@ void ALEnactor::run() {
 #endif
 
     }
+    Thread::running = true;
+    Thread::trigger->off();
 }
 void ALEnactor::sendCommands(){
     if(!switchboard)
@@ -116,4 +118,4 @@ void ALEnactor::postSensors() {
     transcriber->postMotionSensors();
     switchboard->signalNextFrame();
 }
-#endif//NAOQI1
+
