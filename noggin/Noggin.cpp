@@ -6,7 +6,9 @@
 #include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
+#ifndef WEBOTS_BACKEND //HACK!!
 #include "_ledsmodule.h"
+#endif
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
@@ -74,7 +76,9 @@ void Noggin::initializePython(shared_ptr<Vision> v)
 
     // Initialize low-level modules
     c_init_sensors();
+#ifndef WEBOTS_BACKEND
     init_leds();
+#endif
     c_init_roboguardian();
     c_init_motion();
     c_init_comm();
