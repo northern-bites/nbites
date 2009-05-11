@@ -31,7 +31,27 @@
 
 //NBites includes
 #include "alproxy.h"
-#include "ALMan.h"
+
+#ifdef USE_DCM
+#  if defined USE_DCM && defined MAN_IS_REMOTE
+#    error "DCM not compatible with remote!!!"
+#  endif
+
+#include "TMan.h"
+#include "NaoEnactor.h"
+
+typedef NaoEnactor EnactorT;
+typedef TMan ALMan;
+#else
+#include "TTMan.h"
+#include "ALEnactor.h"
+typedef ALEnactor EnactorT;
+typedef TTMan ALMan;
+#endif
+
+#include "ALTranscriber.h"
+#include "ALImageTranscriber.h"
+
 
 #include "_ledsmodule.h"
 
@@ -40,6 +60,7 @@
 using namespace std;
 using namespace AL;
 using boost::shared_ptr;
+
 
 
 

@@ -203,14 +203,16 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
 
-SET( MAN_SRCS ${MAN_INCLUDE_DIR}/Man )
+SET( MAN_SRCS ${MAN_INCLUDE_DIR}/Man
+	      ${MAN_INCLUDE_DIR}/TMan
+              ${MAN_INCLUDE_DIR}/TTMan
+		       )
 
 IF(WEBOTS_BACKEND)
   LIST(APPEND MAN_SRCS ${MAN_INCLUDE_DIR}/nao_soccer_player
 			)
 ELSE(WEBOTS_BACKEND)
-  LIST(APPEND MAN_SRCS ${MAN_INCLUDE_DIR}/ALMan
-                       ${MAN_INCLUDE_DIR}/manmodule
+  LIST(APPEND MAN_SRCS ${MAN_INCLUDE_DIR}/manmodule
 		       )
 ENDIF(WEBOTS_BACKEND)
 
