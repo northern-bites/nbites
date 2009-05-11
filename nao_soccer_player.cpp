@@ -53,7 +53,7 @@ void WBCreateMan(){
                                               imageTranscriber,
                                               enactor,
                                               synchro));
-    man->startSubThreads();
+    //man->startSubThreads();
 }
 
 void WBDestroyMan(){
@@ -62,12 +62,13 @@ void WBDestroyMan(){
 
 
 int main() {
-  WBCreateMan();
 
   wb_robot_init();
 
-  int time_step = static_cast<int>(wb_robot_get_basic_time_step());
+  WBCreateMan();
 
+  int time_step = static_cast<int>(wb_robot_get_basic_time_step());
+  cout << "Robot time step is " << time_step <<endl;
   // load and start forward motion
   WbMotionRef forwards = wbu_motion_new("../motions/Forwards50.motion");
   wbu_motion_set_loop(forwards, true);
@@ -83,8 +84,8 @@ int main() {
   WbDeviceTag us4 = wb_robot_get_device("US/BottomLeft");
   */
   WbDeviceTag an_fsr = wb_robot_get_device("LFsrFR");
-  string angle = "LKneePitch";
-  WbDeviceTag angleTag = wb_robot_get_device(angle.c_str());
+  //string angle = "LKneePitch";
+  //WbDeviceTag angleTag = wb_robot_get_device(angle.c_str());
   //double kneeAngle = wb_servo_get_position(angleTag);
   //WbDeviceTag servos[
 
@@ -93,7 +94,7 @@ int main() {
 
   wb_accelerometer_enable (acc, 20);
   wb_gyro_enable (gyro, 20);
-  wb_servo_enable_position (angleTag, 20);
+  //wb_servo_enable_position (angleTag, 20);
   wb_touch_sensor_enable (an_fsr, 20);
   wb_camera_enable(camera, 20);
 
@@ -103,6 +104,8 @@ int main() {
     printf("testing balls balls\n");
 
     wb_robot_step(time_step);
+    transcriber->postMotionSensors();
+
     const double *acc_values = wb_accelerometer_get_values (acc);
     printf("accelerometers: x: %f, y: %f, z: %f\n",
 	   acc_values[0], acc_values[1], acc_values[2]);
@@ -110,8 +113,8 @@ int main() {
     const double *gyro_values = wb_gyro_get_values (gyro);
     printf("gyros: x: %f, y: %f\n", gyro_values[0], gyro_values[1]);
 
-    double kneeAngle = wb_servo_get_position(angleTag);
-    cout << "kneeAngle: " << kneeAngle << endl;
+    //double kneeAngle = wb_servo_get_position(angleTag);
+    //cout << "kneeAngle: " << kneeAngle << endl;
 
     double an_fsr_value = wb_touch_sensor_get_value(an_fsr);
     cout << "an fsr: " << an_fsr_value << endl;

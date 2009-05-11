@@ -1,6 +1,9 @@
 #ifndef WBTranscriber_h
 #define WBTranscriber_H
 
+
+#include <webots/servo.h>
+
 #include "Transcriber.h"
 #include "AccEKF.h"
 
@@ -15,7 +18,7 @@ public:
 private:
     AccEKF accEKF;
     std::vector<float> jointValues;
-
+    std::vector<WbDeviceTag> jointDevices;
 };
 
 #endif
