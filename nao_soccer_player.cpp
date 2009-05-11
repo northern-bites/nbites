@@ -21,7 +21,7 @@ using namespace std;
 
 #include <webots/camera.h>
 
-//#include "Man.h"
+#include "Man.h"
 
 int main() {
   wb_robot_init();
