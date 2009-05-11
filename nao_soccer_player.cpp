@@ -21,9 +21,49 @@ using namespace std;
 
 #include <webots/camera.h>
 
-#include "Man.h"
+#include "TTMan.h"
+#include "WBEnactor.h"
+#include "WBImageTranscriber.h"
+#include "WBTranscriber.h"
+
+using boost::shared_ptr;
+
+static shared_ptr<TTMan> man;
+static shared_ptr<Sensors> sensors;
+static shared_ptr<Synchro> synchro;
+static shared_ptr<WBTranscriber> transcriber;
+static shared_ptr<WBImageTranscriber> imageTranscriber;
+static shared_ptr<WBEnactor> enactor;
+
+
+void WBCreateMan(){
+
+    synchro = shared_ptr<Synchro>(new Synchro());
+    sensors = shared_ptr<Sensors>(new Sensors);
+    transcriber = shared_ptr<WBTranscriber>(new WBTranscriber(sensors));
+    imageTranscriber =
+        shared_ptr<WBImageTranscriber>
+        (new WBImageTranscriber(sensors,synchro));
+
+    enactor = shared_ptr<WBEnactor>(new WBEnactor(sensors,synchro,
+                                                  transcriber));
+
+    man = boost::shared_ptr<TTMan> (new TTMan(sensors,
+                                              transcriber,
+                                              imageTranscriber,
+                                              enactor,
+                                              synchro));
+    man->startSubThreads();
+}
+
+void WBDestroyMan(){
+    man->stopSubThreads();
+}
+
 
 int main() {
+  WBCreateMan();
+
   wb_robot_init();
 
   int time_step = static_cast<int>(wb_robot_get_basic_time_step());
@@ -80,6 +120,7 @@ int main() {
     cout << "third value in the image: " << (int)image[80 * 119 * 3] << endl;
   }
 
+  WBDestroyMan();
   // never reached
   return 0;
 }
