@@ -45,8 +45,8 @@ void iterateNavPath(fstream * obsFile, NavPath * letsGo)
                                                           &currentBall,
                                                           0.0));
 
-            printOutObsLine(obsFile, Z_t, letsGo->myMoves[i].move,
-                            &currentPose, &currentBall, *visBall, BALL_ID);
+            // printOutObsLine(obsFile, Z_t, letsGo->myMoves[i].move,
+            //                 &currentPose, &currentBall, *visBall, BALL_ID);
         }
     }
 
@@ -59,11 +59,12 @@ void iterateNavPath(fstream * obsFile, NavPath * letsGo)
  * @param outputFile The file to have everything printed to
  * @param letsGo The robot path from which to localize
  */
-void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
+void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
+                      float noiseLevel)
 {
     // Method variables
     vector<Observation> Z_t;
-    shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL());
+    shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL(100));
     shared_ptr<BallEKF> MCLballEKF = shared_ptr<BallEKF>(new BallEKF());
     shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
     shared_ptr<BallEKF> EKFballEKF = shared_ptr<BallEKF>(new BallEKF());
@@ -78,12 +79,10 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
     currentBall = letsGo->ballStart;
 
     // Print out starting configuration
-    printOutMCLLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
-                       &currentBall, MCLballEKF, *visBall, TEAM_COLOR,
-                       PLAYER_NUMBER, BALL_ID);
-    printOutLogLine(ekfFile, ekfLoc, Z_t, noMove, &currentPose,
-                    &currentBall, EKFballEKF, *visBall, TEAM_COLOR,
-                    PLAYER_NUMBER, BALL_ID);
+    printCoreLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
+                     &currentBall, MCLballEKF);
+    printCoreLogLine(ekfFile, ekfLoc, Z_t, noMove, &currentPose,
+                     &currentBall, EKFballEKF);
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -96,7 +95,7 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
             currentPose += letsGo->myMoves[i].move;
             currentBall += letsGo->myMoves[i].ballVel;
 
-            Z_t = determineObservedLandmarks(currentPose, 0.0);
+            Z_t = determineObservedLandmarks(currentPose, 0.0, noiseLevel);
 
             // Figure out the current ball distance and bearing
             visBall->setDistanceEst(determineBallEstimate(&currentPose,
@@ -125,13 +124,11 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo)
             }
 
             // Print the current MCL frame to file
-            printOutMCLLogLine(mclFile, mclLoc, Z_t, letsGo->myMoves[i].move,
-                               &currentPose, &currentBall, MCLballEKF,
-                               *visBall, TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+            printCoreLogLine(mclFile, mclLoc, Z_t, letsGo->myMoves[i].move,
+                             &currentPose, &currentBall, MCLballEKF);
             // Print the current EKF frame to file
-            printOutLogLine(ekfFile, ekfLoc, Z_t, letsGo->myMoves[i].move,
-                               &currentPose, &currentBall, EKFballEKF,
-                               *visBall, TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+            printCoreLogLine(ekfFile, ekfLoc, Z_t, letsGo->myMoves[i].move,
+                                &currentPose, &currentBall, EKFballEKF);
         }
     }
 
@@ -157,10 +154,10 @@ void iterateObsPath(fstream * locFile, fstream * coreFile,
     visBall->setBearingWithSD(0.0f);
     vector<Observation> sx;
 
-    printOutLogLine(locFile, loc, sx, noMove,
-                    &(*realPoses)[0], &(*ballPoses)[0],
-                    ballEKF, *visBall,
-                    TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+    // printOutLogLine(locFile, loc, sx, noMove,
+    //                 &(*realPoses)[0], &(*ballPoses)[0],
+    //                 ballEKF, *visBall,
+    //                 TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
 
     printCoreLogLine(coreFile, loc, sx, noMove,
                      &(*realPoses)[0], &(*ballPoses)[0],
@@ -177,10 +174,10 @@ void iterateObsPath(fstream * locFile, fstream * coreFile,
         ballEKF->updateModel(m, loc->getCurrentEstimate(),
                              true);
 
-        printOutLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
-                        &(*realPoses)[i], &(*ballPoses)[i],
-                        ballEKF, *visBall,
-                        TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+        // printOutLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
+        //                 &(*realPoses)[i], &(*ballPoses)[i],
+        //                 ballEKF, *visBall,
+        //                 TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
         printCoreLogLine(coreFile, loc, (*sightings)[i], (*odos)[i],
                          &(*realPoses)[i], &(*ballPoses)[i],
                          ballEKF);
@@ -207,10 +204,10 @@ void iterateMCLObsPath(fstream * locFile, fstream * coreFile,
     visBall->setBearingWithSD(0.0f);
     vector<Observation> sx;
 
-    printOutMCLLogLine(locFile, loc, sx, noMove,
-                       &(*realPoses)[0], &(*ballPoses)[0],
-                       ballEKF, *visBall,
-                       TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+    // printOutMCLLogLine(locFile, loc, sx, noMove,
+    //                    &(*realPoses)[0], &(*ballPoses)[0],
+    //                    ballEKF, *visBall,
+    //                    TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
 
     printCoreLogLine(coreFile, loc, sx, noMove,
                      &(*realPoses)[0], &(*ballPoses)[0],
@@ -227,10 +224,10 @@ void iterateMCLObsPath(fstream * locFile, fstream * coreFile,
         ballEKF->updateModel(m, loc->getCurrentEstimate(),
                              true);
 
-        printOutMCLLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
-                           &(*realPoses)[i], &(*ballPoses)[i],
-                           ballEKF, *visBall,
-                           TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+        // printOutMCLLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
+        //                    &(*realPoses)[i], &(*ballPoses)[i],
+        //                    ballEKF, *visBall,
+        //                    TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
         printCoreLogLine(coreFile, loc, (*sightings)[i], (*odos)[i],
                          &(*realPoses)[i], &(*ballPoses)[i],
                          ballEKF);
@@ -247,7 +244,8 @@ void iterateMCLObsPath(fstream * locFile, fstream * coreFile,
  *
  * @return A vector containing all of the observable landmarks at myPose
  */
-vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
+vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw,
+                                               float noiseLevel)
 {
     vector<Observation> Z_t;
     // Measurements between robot position and seen object
@@ -269,7 +267,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Get measurement variance and add noise to reading
             if (!use_perfect_dists) {
-                visDist += sampleNormalDistribution(visDist * 0.05);
+                visDist += sampleNormalDistribution(visDist * noiseLevel);
             }
 
             // Build the (visual) field object
@@ -310,7 +308,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw)
 
             // Get measurement variance and add noise to reading
             if(!use_perfect_dists) {
-                visDist += sampleNormalDistribution(0.05*visDist);
+                visDist += sampleNormalDistribution(visDist*noiseLevel);
             }
 
             // Ignore the center circle for right now

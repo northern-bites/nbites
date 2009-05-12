@@ -15,3 +15,6 @@ noggin/util/fakeData/*
 /noggin/offline/navToObs
 /TAGS
 /man
+/noggin/offline/noiseVaccuracy
+/noggin/offline/.Rhistory
+/noggin/offline/.RData
