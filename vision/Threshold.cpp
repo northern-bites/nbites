@@ -292,11 +292,18 @@ void Threshold::runs() {
                 switch (lastPixel) {
                     // possible horizon detection and for postID (not that impt)
                 case NAVY:
+		  // we're looking for blue robots, so we use some special rules.
+		  // mainly that the blue should be paired with white
+		  // also we try and create huge vertical runs that cover the length of
+		  // the robot if possible
                     if (currentRun > 8 && (previousRun == WHITE ||
                                            previousRun == NAVY)) {
                         //navyblue->newRun(i, j, currentRun);
                         lastGoodPixel = j;
                     }
+		    // check if this is a viable chunk of robot.  Yes if:
+		    //      just saw something white or navy or green
+		    //      it is really big
                     if (currentRun > 3 &&
                         (previousRun == WHITE || previousRun == NAVY ||
                          (previousRun == GREEN || currentRun > 20))) {
@@ -304,6 +311,7 @@ void Threshold::runs() {
                         navyTops[i] = j;
                         //drawPoint(i, j, YELLOW);
                     }
+		    // if we hadn't seen a bottom already, then now is the time
                     if (navyBottoms[i] == -1 && currentRun > 3 &&
                         (previousRun == WHITE || previousRun == GREEN ||
                          currentRun > 20)) {
@@ -312,6 +320,7 @@ void Threshold::runs() {
                     }
                     break;
                 case RED:
+		  // see comments for Navy.  We also have to be careful about seeing ball pixels
                     if (currentRun > 8 && (previousRun == WHITE ||
                                            previousRun == RED ||
                                            previousRun == ORANGE ||
@@ -334,6 +343,7 @@ void Threshold::runs() {
                     }
                     break;
                 case GREEN:
+		  // if we see a big stretch of green, then it is highly unlikely that there is a robot here
                     if (currentRun > 20) {
                         redBottoms[i] = -1;
                         navyBottoms[i] = -1;
@@ -393,13 +403,21 @@ void Threshold::runs() {
         //}
         //}
     }//end i loop
+
+    // now do some robot scanning stuff - we're going to analyze our runs and see if they
+    // could be turned into viable robot runs that we will feed to ObjectFragments
     int bigh = IMAGE_HEIGHT, firstn = -1, lastn = -1, bot = -1;
+    // first do the Navy robots
     for (i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
+      // if we saw a navy run in this scanline then process it
         if (navyTops[i] != -1) {
+	  // our goal is to find a swath of runs and essentially grab them all at once
+	  // in a sense we're blobbing here
             firstn = i;
             lastn = 0;
             bigh = navyTops[i];
             bot = navyBottoms[i];
+	    // as long as we're connected to more runs, keep scooping them up
             while ((navyTops[i] != -1 || navyTops[i+1] != -1) &&
                    i < IMAGE_WIDTH - 3) {
                 if (navyTops[i] < bigh && navyTops[i] != -1) {
@@ -411,6 +429,7 @@ void Threshold::runs() {
                 i+=1;
                 lastn+=1;
             }
+	    // now feed them all into object fragments
             for (int k = firstn; k < firstn + lastn; k+= 1) {
                 navyblue->newRun(k, bigh, bot - bigh);
                 // cout << "Runs " << k << " " << bigh << " " << (bot - bigh)
@@ -420,6 +439,7 @@ void Threshold::runs() {
             //drawRect(firstn, bigh, lastn, bot - bigh, RED);
         }
     }
+    // logic should be identical to navy
     for (i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
         if (redTops[i] != -1) {
             firstn = i;
