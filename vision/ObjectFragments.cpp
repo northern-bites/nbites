@@ -317,6 +317,9 @@ void ObjectFragments::getTopAndMerge(int maxY)
     }
 }
 
+/*
+  Checks all of the blobs of this color.  Can be used to draw the widest blob.
+*/
 void ObjectFragments::getWidest()
 {
     topBlob = zeroBlob;
@@ -336,7 +339,7 @@ void ObjectFragments::getWidest()
 }
 
 /* Turn a blob back to zeros because of merging.
-   @param which
+   @param which     The index of the blob to be zeroed
 */
 
 void ObjectFragments::zeroTheBlob(int which)
@@ -353,7 +356,8 @@ void ObjectFragments::zeroTheBlob(int which)
     blobs[which].area = 0;
 }
 
-/* Merge blobs.
+/* Merge blobs.  If two blobs are discovered to be connected, then they
+   should be merged into one.  This is done here.
    @param first         one of the blobs
    @param second        the other
 */
@@ -427,11 +431,18 @@ void ObjectFragments::newRun(int x, int y, int h)
 /* Robot recognition methods
  */
 
-/* Try and recognize robots
+/* Try and recognize robots.  Basically we're doing blobbing here, but with lots of extra
+   twists.  Mainly we're being extremely loose with the conditions under which we consider
+   blobs to be "connected."  We're trying to take advantage of the properties of the robots -
+   namely that they stand vertically normally.
  */
 void ObjectFragments::robot(int bigGreen)
 {
     int lastrunx = -30, lastruny = 0, lastrunh = 0;
+
+    // loop through all of the runs of this color
+    // NOTE: "20" is a guess at something that should be a constant
+    // and with the change in resolution, this ought to be changed
     for (int i = 0; i < numberOfRuns; i++) {
         //drawPoint(runs[i].x, runs[i].y, BLACK);
         if (runs[i].x < lastrunx + 20) {
@@ -440,18 +451,29 @@ void ObjectFragments::robot(int bigGreen)
                 blobIt(k, lastruny, lastrunh);
             }
         }
+	// now we can add the run normally
         blobIt(runs[i].x, runs[i].y, runs[i].h);
+	// set the current as the last
         lastrunx = runs[i].x; lastruny = runs[i].y; lastrunh = runs[i].h;
     }
+    // make first pass at attempting to identify robots
     getRobots(bigGreen);
+    // check each of the candidate blobs to see if it might reasonably be
+    // called a piece of a robot
     for (int i = 0; i < numBlobs; i++) {
-        if (blobWidth(blobs[i]) > 5) {
-            transferBlob(blobs[i], topBlob);
-            expandRobotBlob();
-            transferBlob(topBlob, blobs[i]);
-        }
+      // NOTE: "5" is another constant that needs to be checked and changed
+      if (blobWidth(blobs[i]) > 5) {
+	// temporarily put the blob into topBlob
+	transferBlob(blobs[i], topBlob);
+	// see if we can expand it to other parts
+	expandRobotBlob();
+	// put it back
+	transferBlob(topBlob, blobs[i]);
+      }
     }
+    // now that we've done some expansion, see if we can merge any of the big blobs
     mergeBigBlobs();
+    // try expanding again after the merging
     for (int i = 0; i < numBlobs; i++) {
         if (blobWidth(blobs[i]) > 5) {
             transferBlob(blobs[i], topBlob);
@@ -460,7 +482,9 @@ void ObjectFragments::robot(int bigGreen)
         }
     }
     int biggest = -1, index1 = -1, second = -1, index2 = -1;
+    // collect up the two biggest blobs - those are the two we'll put into field objects
     for (int i = 0; i < numBlobs; i++) {
+      // for now we'll use closest y - eventually we should use pixestimated distance
         // TODO: for now we'll use closest y - eventually we should use
         // pixestimated distance
         int area = blobArea(blobs[i]);
@@ -474,12 +498,18 @@ void ObjectFragments::robot(int bigGreen)
             index2 = i;
         }
     }
+    // if we found some viable blobs, then add them as field objects
     if (index1 != -1) {
         updateRobots(1, index1);
         if (index2 != -1)
             updateRobots(2, index2);
     }
 }
+
+/*  We have a "blob" that might be part of a robot.  We built our blobs a little strangely and they
+    may not be complete.  Let's see if we can expand them a bit.  Essentially we look around the
+    sides of the blobs and see if we can expand the area of the blob.
+ */
 
 void ObjectFragments::expandRobotBlob()
 {
@@ -489,16 +519,20 @@ void ObjectFragments::expandRobotBlob()
     int x, y;
     int bestr = topBlob.rightTop.x;
     bool good = true;
+    // start on the right side and keep going until we're sure we're done
     for (x = bestr; good && x < IMAGE_WIDTH - 1; x++) {
         good = false;
+	// if we see anything of the right color that's good enough to expand our blob
         for (y = topBlob.rightTop.y; y < topBlob.rightBottom.y && !good;
              y += 1) {
             if (thresh->thresholded[y][x] == color)
                 good = true;
         }
     }
+    // now reset the right side information to reflect the new state of things
     topBlob.rightTop.x = x - 1;
     topBlob.rightBottom.x = x - 1;
+    // repeat the process on the left side
     good = true;
     for (x = topBlob.leftTop.x; good && x >  -1; x--) {
         good = false;
@@ -510,11 +544,17 @@ void ObjectFragments::expandRobotBlob()
     }
     topBlob.leftTop.x = x + 1;
     topBlob.leftBottom.x = x + 1;
+
+    // now try the bottom.  We're going to do this differently.
+    // robots are mainly white, so if we run into a big swatch of white we'll
+    // assume that its the same robot.
     int whites = IMAGE_WIDTH, pix, width = blobWidth(topBlob) / 4;
     int goods = 0, lastSaw = 0;
+    // loop down from the bottom until we can't expand anymore
     for (y = topBlob.leftBottom.y; whites >= width && y < IMAGE_HEIGHT - 1;y++){
         whites = 0;
         goods = 0;
+	// check this row of pixels for white or same color (good), or for opposite color (bad)
         for (x = topBlob.leftBottom.x; x < topBlob.rightTop.x && whites < width;
              x++) {
             if(topBlob.leftBottom.x < 0) {
@@ -523,6 +563,9 @@ void ObjectFragments::expandRobotBlob()
             pix = thresh->thresholded[y][x];
             if (pix == color) {
                 whites++;
+		// theoretically a color match of enough pixels would be plenty of evidence that we're
+		// able to expand here.  Currently we don't seem to increment goods.  Something to
+		// experiment with.
                 if (goods > 5) {
                     whites = width;
                 }
@@ -530,6 +573,7 @@ void ObjectFragments::expandRobotBlob()
                 whites++;
             } else if ((color ==  NAVY && pix == RED) ||
                        (color == RED && pix == NAVY)) {
+	      // Uh oh, we may be seeing another robot of the opposite color.  Could be trouble.
                 whites -= 5;
             }
         }
@@ -542,6 +586,7 @@ void ObjectFragments::expandRobotBlob()
     int gain = y - 1 - topBlob.leftBottom.y;
     topBlob.leftBottom.y = y - 1;
     topBlob.rightBottom.y = y - 1;
+    // if we expanded enough, it is probably worth looking at the sides again.
     if (gain > 5) {
         good = true;
         for (x = topBlob.rightTop.x; good && x < IMAGE_WIDTH - 1; x++) {
@@ -569,6 +614,13 @@ void ObjectFragments::expandRobotBlob()
     }
 }
 
+/*
+  We have detected something big enough to be called a robot.  Set the appropriate
+  field object.
+  @param which    whether it is the biggest or the second biggest object
+  @param index    the index of the blob in question
+ */
+
 void ObjectFragments::updateRobots(int which, int index)
 {
     //cout << "Updating robot " << which << " " << color << endl;
@@ -588,6 +640,8 @@ void ObjectFragments::updateRobots(int which, int index)
     }
 }
 
+/* Like regular merging of blobs except that with robots we used a relaxed criteria.
+ */
 void ObjectFragments::mergeBigBlobs()
 {
     for (int i = 0; i < numBlobs - 1; i++) {
@@ -606,6 +660,11 @@ void ObjectFragments::mergeBigBlobs()
     }
 }
 
+/*  Are two robot blobs close enough to merge?
+    Needless to say this needs lots of experimentation.  "40" was based on some, but
+    at high resolution.  Obviously it should be a constant.
+ */
+
 bool ObjectFragments::closeEnough(blob a, blob b)
 {
     // EXAMINED: change constant to lower res stuff
@@ -623,6 +682,10 @@ bool ObjectFragments::closeEnough(blob a, blob b)
     return false;
 }
 
+/*  Are the two blobs big enough to merge.  Again the constants are merely guesses
+    at this stage.  And guesses at high rez to boot.
+ */
+
 bool ObjectFragments::bigEnough(blob a, blob b)
 {
     // EXAMINED: change constant to lower res stuff // at half right now
@@ -634,6 +697,15 @@ bool ObjectFragments::bigEnough(blob a, blob b)
         return true;
     return false;
 }
+
+/*  Is this blob potentially a robot?  Return true if so.  Basically we look at
+    the blob and see how many pixels seem to be "robot" pixels.  If there are
+    enough, then we call it good enough.  This is probably a dumb way to do this
+    because it is slow as heck.
+    See the comments for the other things - the constants should become real constants!
+    @param a   the index of the blob we're checking
+    @return    whether it meets our criteria
+ */
 
 bool ObjectFragments::viableRobot(blob a)
 {
@@ -914,6 +986,7 @@ int ObjectFragments::findTrueLineVertical(point <int> top, point <int> bottom,
     int dir = 1;
     if (left)
         dir = -1;
+    // go until you hit enough bad pixels or some strong reason to stop
     for (j = 1; count < spanY / 3 && top.x + dir * j >= 0
              && top.x + dir * j < IMAGE_WIDTH && good > spanY / 2 ; j++) {
         count = 0;
@@ -969,6 +1042,13 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
     bool atTop = false;
     //drawPoint(top.x, top.y, RED);
     //drawPoint(bottom.x, bottom.y, RED);
+    /* loop until we now longer have viable expansion
+          too many bad lines in a row
+          top is off the edge of the screen
+       basically we scan the next line out and count how many good and bad points we
+       get along that scanline.  If there are enough good ones, we expand and keep
+       moving.  If not, then we may stop
+    */
     for (j = 1; badLines < 2 && top.x + dir * j >= 0
              && top.x + dir * j < IMAGE_WIDTH; j+=increment) {
         //count = 0;
@@ -981,6 +1061,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
         //cout << "Actual y is " << actualY << endl;
         if (actualY < 1) atTop = true;
         //cout << "Actual y is " << actualY << endl;
+	// here's where we do the scanning.  Stop early if we have enough information good or bad.
         for (i = actualY; count < minCount  &&
                  i <= actualY + spanY && (run < minRun || goodRun > spanY / 2)
                  && (top.y > 1 || initRun < minRun);
@@ -1023,6 +1104,9 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
         //if (!left)
         //drawPoint(theSpot, i, BLACK);
     }
+
+    // ok so we did the basic thing.  The problem is that sometimes we ended early because we hit
+    // a screen edge and weren't really done.  Try and check for those situations.
     int temp = top.x;
     //drawPoint(top.x, top.y, BLACK);
     top.x = top.x + dir * (j - badLines) - dir;
@@ -1108,6 +1192,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
     int greens = 0;
     int fakegood = 0;
 
+    // loop until we can't expand anymore
     for (j = 1; count < minCount && left.y + dir * j >= 0
              && left.y + dir * j < IMAGE_HEIGHT && badLines < 2
              && greens < max(minRun, maxgreen); j++) {
@@ -1117,6 +1202,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
         greens = 0;
         fakegood = 0;
         int actualX = xProject(left.x, left.y, left.y + dir * j);
+	// count up the good and bad pixels in this scanline
         for (int i = actualX; count < minCount && i <= actualX + spanX
                  && greens < maxgreen; i++) {
             theSpot = yProject(actualX, left.y + dir * j, i);
@@ -1234,7 +1320,14 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
     return left.y + dir * j - dir;
 }
 
-// is our object on a slant?
+/*  In theory our pose information tells us the slant of an object.  In practice it doesn't always get it
+    for a vareity of reasons.  This is an attempt to correct for the errors in the process.  At this point
+    it is basically a rough draft of a good methodology.
+    @param post    the blob we're examining
+    @param c       primary color
+    @param c2      secondary color
+ */
+
 void ObjectFragments::correct(blob & post, int c, int c2) {
     if (c2 != 10000) return;
     // scan along the bottom
@@ -1991,6 +2084,12 @@ int ObjectFragments::checkIntersection(blob post) {
     }
     return NOPOST;
 }
+
+/*  We have a post and wonder which one it is.  This method looks for the nearby intersection
+    of the goal line and the goal box.  If it can be found it is the best way to ID the goal.
+    @param post    the post we have id'd
+    @return        the id of the post (or lack of id)
+ */
 
 int ObjectFragments::checkCorners(blob post) {
     if (post.rightBottom.y - post.rightTop.y < 30) return NOPOST;
