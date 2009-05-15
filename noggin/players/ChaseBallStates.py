@@ -144,13 +144,24 @@ def positionForKick(player):
     sY = MyMath.clip((targetY),
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
+    player.printf("Position for kick target_y is " +
+                  str(targetY))
+
+    if transitions.shouldApproachForKick(player):
+        sX = ball.relX
+    else:
+        sX = 0
+
 
     if transitions.shouldKick(player):
         return player.goLater('waitBeforeKick')
-    elif transitions.shouldApproachForKick(player):
-        return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
+    elif (MyMath.sign(player.currentChaseWalkY) != MyMath.sign(sY) or
+          fabs(sY - player.currentChaseWalkY) > constants.CHASE_Y_EPSILON):
+
+        player.currentChaseWalkY = sY
+        player.stopWalking()
     elif ball.on and player.brain.nav.isStopped():
 
         player.currentChaseWalkY = sY
@@ -158,11 +169,6 @@ def positionForKick(player):
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
             player.currentGait = constants.NORMAL_GAIT
         player.setSpeed(0,sY,0)
-    elif (MyMath.sign(player.currentChaseWalkY) != MyMath.sign(sY) or
-          fabs(sY - player.currentChaseWalkY) > constants.CHASE_Y_EPSILON):
-
-        player.currentChaseWalkY = sY
-        player.stopWalking()
 
     return player.stay()
 
