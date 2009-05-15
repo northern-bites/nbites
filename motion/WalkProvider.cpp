@@ -137,7 +137,7 @@ void WalkProvider::setActive(){
     }
 }
 
-BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
+std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = nextGait->getWalkStance();
 
@@ -155,6 +155,25 @@ BodyJointCommand * WalkProvider::getGaitTransitionCommand(){
     const float  MAX_RAD_PER_SEC =  M_PI*0.15;
     float time = max_change/MAX_RAD_PER_SEC;
 
-    return new BodyJointCommand(time,gaitJoints,
-                                Kinematics::INTERPOLATION_LINEAR);
+    vector<BodyJointCommand *> commands;
+
+    if(time <= 0.02f)
+        return commands;
+
+    //larm: (0.,90.,0.,0.)
+    //rarm: (0.,-90.,0.,0.)
+    float larm_angles[] = {0.0f, M_PI_FLOAT*0.35,0.0f,0.0f};
+    float rarm_angles[] = {0.0f,-M_PI_FLOAT*0.35,0.0f,0.0f};
+
+    vector<float> *safe_larm = new vector<float>(larm_angles,
+                                                 &larm_angles[ARM_JOINTS]);
+    vector<float> * safe_rarm =new vector<float>(rarm_angles,
+                                                 &rarm_angles[ARM_JOINTS]);
+
+    commands.push_back(new BodyJointCommand(1.0f,safe_larm,NULL,NULL,safe_rarm,
+                                            Kinematics::INTERPOLATION_SMOOTH));
+
+    commands.push_back(new BodyJointCommand(time,gaitJoints,
+                                            Kinematics::INTERPOLATION_SMOOTH));
+    return commands;
 }

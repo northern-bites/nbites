@@ -67,7 +67,7 @@ public:
         }
 	void setCommand(const WalkCommand * command);
 	void setCommand(const boost::shared_ptr<GaitCommand> command);
-    BodyJointCommand * getGaitTransitionCommand();
+    std::vector<BodyJointCommand *> getGaitTransitionCommand();
     MotionModel getOdometryUpdate(){
         const std::vector<float> odo = stepGenerator.getOdometryUpdate();
         return MotionModel(odo[0]*MM_TO_CM,odo[1]*MM_TO_CM,odo[2]);

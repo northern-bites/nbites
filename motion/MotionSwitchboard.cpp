@@ -239,7 +239,7 @@ int MotionSwitchboard::processProviders(){
  * required when switching between providers
  */
 void MotionSwitchboard::swapBodyProvider(){
-    BodyJointCommand * gaitSwitch = NULL;
+    std::vector<BodyJointCommand *> gaitSwitches;
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
         //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOAR IS BROKEN!
@@ -250,9 +250,11 @@ void MotionSwitchboard::swapBodyProvider(){
         //We need to ensure we are in the correct gait before walking
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;
-            gaitSwitch = walkProvider.getGaitTransitionCommand();
-            if(gaitSwitch->getDuration() >= 0.02f){
-                scriptedProvider.setCommand(gaitSwitch);
+            gaitSwitches = walkProvider.getGaitTransitionCommand();
+            if(gaitSwitches.size() >= 1){
+                for(unsigned int i = 0; i< gaitSwitches.size(); i++){
+                    scriptedProvider.setCommand(gaitSwitches[i]);
+                }
                 curProvider = static_cast<MotionProvider * >(&scriptedProvider);
                 break;
             }
