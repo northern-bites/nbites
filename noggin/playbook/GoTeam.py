@@ -315,8 +315,8 @@ class GoTeam:
                 mate.active = False
             if (mate.ballDist > 0):
                 self.brain.ball.reportBallSeen()
-        self.activeMates = self.getActiveFieldPlayers()
-        self.numActiveFieldPlayers = len(self.activeMates)
+        self.activeFieldPlayers = self.getActiveFieldPlayers()
+        self.numActiveFieldPlayers = len(self.activeFieldPlayers)
 
 
     def aPosterioriTeammateUpdate(self):
@@ -331,7 +331,7 @@ class GoTeam:
            including me'''
         active_teammates = []
         for mate in self.teammates:
-            if (mate.active and (mate.playerNumber != PBConstants.GOALIE_NUMBER 
+            if (mate.active and (!mate.isGoalie() 
                                  or (mate.isGoalie() and self.goaliePulled))):
                 active_teammates.append(mate)
         return active_teammates

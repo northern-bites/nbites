@@ -27,7 +27,7 @@ class Teammate:
         self.ballLocDist = 0
         self.ballLocBearing = 0
         self.calledRole = 0
-        self.lastPacketTime = 0
+        self.lastPacketTime = self.brain.playbook.getTime()
 
         self.brain = tbrain        # brain instance
         self.role = 0 # known role
@@ -78,7 +78,7 @@ class Teammate:
         self.kicking = False
         #(packet.ballDist == 
         #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
-        self.lastPacketTime = time.time()
+        self.lastPacketTime = self.brain.playbook.getTime()
 
 
     def updateMe(self):
@@ -98,7 +98,7 @@ class Teammate:
         self.ballLocDist = self.brain.ball.locDist
         self.ballLocBearing = self.brain.ball.locBearing
         self.active = not self.brain.gameController.currentState =='gamePenalized'
-        self.lastPacketTime = time.time()
+        self.lastPacketTime = self.brain.playbook.getTime()
         self.grabbing = (self.ballDist == 
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.dribbling = (self.ballDist == 
@@ -191,7 +191,7 @@ class Teammate:
         however, the dog could still be on but sending really laggy packets.
         '''
         return (PBConstants.PACKET_DEAD_PERIOD <
-                    time.time() - self.lastPacketTime)
+                    self.brain.playbook.getTime() - self.lastPacketTime)
 
     def hasBall(self):
         '''
