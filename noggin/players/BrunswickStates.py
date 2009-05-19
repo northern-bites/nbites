@@ -9,7 +9,8 @@ def gameReady(player):
     if player.firstFrame():
         player.standup()
         player.brain.tracker.switchTo('locPans')
-    return player.stay()
+        player.getRoleState(player.currentRole)
+    return player.goNow(roleState)
 
 def gameSet(player):
     """

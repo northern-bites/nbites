@@ -7,6 +7,7 @@ from .. import NogginConstants
 from math import hypot
 from ..util.MyMath import safe_atan2
 from . import BrunswickStates
+from . import BrunswickGoalieStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -52,13 +53,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             #return 'decideKick'
         elif role == PBConstants.OFFENDER:
             return 'playbookPosition'
-            #return 'spinFindBallPosition'
         elif role == PBConstants.DEFENDER:
             return 'playbookPosition'
-            #return 'spinFindBallPosition'
         elif role == PBConstants.GOALIE:
-            #return 'playbookPosition'
-            return 'atPosition'
+            return 'goaliePosition'
         elif role == PBConstants.PENALTY_ROLE:
             return 'gamePenalized'
         elif role == PBConstants.SEARCHER:
