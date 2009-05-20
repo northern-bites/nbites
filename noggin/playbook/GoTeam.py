@@ -218,7 +218,7 @@ class GoTeam:
         self.subRole = self.currentSubRole
 
     ######################################################
-    ############ Role Switching Stuff ##########
+    ############       Role Switching Stuff     ##########
     ######################################################
     def determineChaser(self):
         '''return the player number of the chaser'''
@@ -294,7 +294,7 @@ class GoTeam:
                 return positions[1]
 
     ######################################################
-    ############ Teammate Stuff ################
+    ############       Teammate Stuff     ################
     ######################################################
 
     def aPrioriTeammateUpdate(self):
@@ -370,7 +370,7 @@ class GoTeam:
         self.teammates[packet.playerNumber-1].update(packet)
 
     ######################################################
-    ############ Strategy Decision Stuff ###########
+    ############   Strategy Decision Stuff     ###########
     ######################################################
     def shouldUseDubD(self):
         return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
@@ -442,7 +442,7 @@ class GoTeam:
         return False
 
 ################################################################################
-##################### Utility Functions ###############################
+#####################     Utility Functions      ###############################
 ################################################################################
 
     def getTime(self):
