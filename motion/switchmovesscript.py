@@ -41,7 +41,6 @@ def switch_move(file_name, move_name):
 
             chains.append(file_lines[line_index])
             line_index +=1
-            print line_index
         if NEW_MOVE.match(file_lines[line_index] ): break
 
         split_chains(chains[0],chains[1],chains[2],chains[3])
@@ -66,7 +65,7 @@ def write_move(write_file, move_name):
 def build_new_chains():
     c = " , "
     endl = "),\n"
-    new_larm = "((" + str(rsp) +c+ str(-rsr) +c+ str(rey) +c+ str(-rer) + endl
+    new_larm = "((" + str(rsp) +c+ str(-rsr) +c+ str(-rey) +c+ str(-rer) + endl
 
     new_lleg = "(" + str(rhyp) +c+  str(-rhr) +c+ str(rhp) +c+ str(rkp)+c+ \
         str(rap) +c+ str(-rar) + endl
@@ -74,8 +73,8 @@ def build_new_chains():
     new_rleg = "(" + str(lhyp) +c+  str(-lhr) +c+ str(lhp) +c+ str(lkp)+c+ \
         str(lap) +c+ str(-lar) + endl
 
-    new_rarm = "("+ str(lsp) +c+ str(-lsr) +c+ str(ley) +c+ str(-ler) +"), " \
-        + str(time) +c+ str(interpolation) + endl + '\n'
+    new_rarm = "("+ str(lsp) +c+ str(-lsr) +c+ str(-ley) +c+ str(-ler) +"), " \
+        + str(time) +c+ str(int(interpolation)) + endl + '\n'
 
     return new_larm, new_lleg, new_rleg, new_rarm
 
@@ -111,7 +110,6 @@ def split_chain(chain):
             chain.remove('')
             continue
         chain[i] = float(chain[i])
-    print chain
     return chain
 
 def assign_joints(split_larm, split_lleg, split_rleg, split_rarm):
