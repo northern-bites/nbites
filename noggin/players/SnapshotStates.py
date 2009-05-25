@@ -18,7 +18,8 @@ def gamePlaying(player):
 
 def saveFrames(player):
     if player.firstFrame():
-        player.brain.tracker.locPans()
+        player.brain.tracker.trackBall()
+        player.standup()
         player.setSpeed(0,0,0)
     if player.counter % FRAME_SAVE_RATE == 0:
         player.brain.sensors.saveFrame()

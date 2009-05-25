@@ -10,9 +10,8 @@ from . import BrunswickStates
 from . import BrunswickGoalieStates
 
 #arbitrary, currently same as AIBO
-CENTER_SAVE_THRESH = 15.
-BODY_SAVE_OFFSET_DIST_Y = 5
-BALL_SAVE_LIMIT_TIME = 1.35
+BODY_SAVE_OFFSET_DIST_X = 5
+BALL_SAVE_LIMIT_TIME = 2
 MOVE_TO_SAVE_DIST_THRESH = 200.
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -91,6 +90,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if ball.on:
             relX = ball.relX
             relY = ball.relY
+            self.printf(("relX = ", relX, " relY = ", relY))
         else:
             relX = ball.locRelX
             relY = ball.locRelY
@@ -98,17 +98,19 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Test velocity values as to which one would work:
         relVelX = ball.relVelX
         relVelY = ball.relVelY
-        if relVelY < 0.0:
-          timeUntilSave = (relY - BODY_SAVE_OFFSET_DIST_Y) / -relVelY
-          anticipatedX = (relX + relVelX * (timeUntilSave - BALL_SAVE_LIMIT_TIME))
+        if relVelX < 0.0:
+          timeUntilSave = (relX - BODY_SAVE_OFFSET_DIST_X) / -relVelX
+          anticipatedY = (relY + relVelY * (timeUntilSave - BALL_SAVE_LIMIT_TIME))
         else:
           timeUntilSave = -1
-          anticipatedX = ball.x
-
+          anticipatedY = ball.y
+        self.printf(("relVelX = ", relVelX, " relVelY = ", relVelY,
+                " timeUntilSave = ", timeUntilSave,
+                " anticipatedY = ", anticipatedY))
         # No Time, Save now
         if (0 <= timeUntilSave < BALL_SAVE_LIMIT_TIME and
-            ball.framesOn > 5. and relVelY < 0.
-            and relY < MOVE_TO_SAVE_DIST_THRESH):
+            ball.framesOn > 5. and relVelX < 0.
+            and relX < MOVE_TO_SAVE_DIST_THRESH):
             return True;
         return False;
 
@@ -116,16 +118,16 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         ball = self.brain.ball
 
         if ball.on:
-            relY = ball.relY
+            relX = ball.relX
         else:
-            relY = ball.locRelY
-        relVelY = ball.relVelY
-        if relVelY < 0.0:
-            timeUntilSave = (relY - BODY_SAVE_OFFSET_DIST_Y) / -relVelY
+            relX = ball.locRelX
+        relVelX = ball.relVelX
+        if relVelX < 0.0:
+            timeUntilSave = (relX - BODY_SAVE_OFFSET_DIST_X) / -relVelX
         else:
             timeUntilSave = -1
-        if 0 <= timeUntilSave < BALL_SAVE_LIMIT_TIME and relVelY < 0 and\
-            relY < MOVE_TO_SAVE_DIST_THRESH:
+        if 0 <= timeUntilSave < BALL_SAVE_LIMIT_TIME and relVelX < 0 and\
+            relX < MOVE_TO_SAVE_DIST_THRESH:
             return True
         return False
 

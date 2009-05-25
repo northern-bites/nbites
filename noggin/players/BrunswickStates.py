@@ -7,7 +7,7 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.firstFrame():
-        #player.standup()
+        player.standup()
         player.brain.tracker.switchTo('locPans')
         roleState = player.getNextState()
     return player.goNow(roleState)

@@ -237,6 +237,8 @@ KICKOFF_PLAY_OFFENDER = [NogginConstants.FIELD_WIDTH * 4./5.,
 KICKOFF_PLAY_DEFENDER = [NogginConstants.FIELD_WIDTH * 1./2.,
                     NogginConstants.FIELD_HEIGHT * 1./4.]
 
+DEFAULT_CHASER_NUMBER = 3
+
 # Defender
 DEFENDER_BALL_DIST = 100
 SWEEPER_X = NogginConstants.MY_GOALBOX_RIGHT_X + 50.
