@@ -163,6 +163,21 @@ public:
                       static_cast<InterpolationType>(interpolationType));
     }
 
+	// Single chain command
+	PyBodyJointCommand(float time,
+					   int chainID, tuple chainJoints,
+					   int interpolationType) {
+        vector<float> * chain = new vector<float>;
+
+        // The joints come in in degrees. Convert them to radians here
+        for (unsigned int i=0; i < chain_lengths[chainID] ; i++)
+            chain->push_back(extract<float>(chainJoints[i]) * TO_RAD);
+
+        command = new BodyJointCommand(time, static_cast<ChainID>(chainID),
+									   chain, static_cast<InterpolationType>(interpolationType));
+	}
+
+
     BodyJointCommand* getCommand() const { return command; }
 
 private:
@@ -279,8 +294,11 @@ BOOST_PYTHON_MODULE(_motion)
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple, tuple, int>(
- "A container for a body joint command passed to the motion engine"))
-        ;
+								   "A container for a body joint command passed to the motion engine"))
+		.def(init<float, int, tuple, int>( // Single chain command
+				 args("time","chainID", "joints","interpolation"),
+				 "A container for a body joint command passed to the motion engine"))
+		;
     class_<PySetHeadCommand>("SetHeadCommand",
                              init<float, float>(args("yaw", "pitch"),
  "A container for a set head command. Holds yaw and pitch angles in degrees."))
