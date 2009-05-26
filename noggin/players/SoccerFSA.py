@@ -43,18 +43,26 @@ class SoccerFSA(FSA.FSA):
                                                position[3], #rarm
                                                position[5], #interpolation type
                                                )
-                self.brain.motion.enqueue(move)
+
 
             elif len(position) == 3:
                 move = motion.HeadJointCommand(position[1],#time
                                                position[0],#head pos
                                                position[2],#interpolation type
                                                    )
-                self.brain.motion.enqueue(move)
+
+            elif len(position) == 4:
+                move = motion.BodyJointCommand(position[2], # time
+                                               position[0], # chainID
+                                               position[1], # chain angles
+                                               position[3], # interpolation type
+                                               )
 
             else:
+                move = motion.BodyJointCommand(3.0,1,(0.0,0.0),1) # Junk move
                 self.printf("What kind of sweet ass-Move is this?")
 
+            self.brain.motion.enqueue(move)
     def setSpeed(self,x,y,theta):
         """
         Wrapper method to easily change the walk vector of the robot
