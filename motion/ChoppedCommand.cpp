@@ -80,7 +80,6 @@ vector<float> ChoppedCommand::getFinalJoints(const JointCommand *command,
 
 		// If the next chain is not queued (empty), add current joints
 		if ( nextChain == 0 ||
-			 nextChain->size() == 0 ||
 			 nextChain->empty() ) {
 			finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
 
