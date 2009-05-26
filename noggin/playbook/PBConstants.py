@@ -257,7 +257,7 @@ RIGHT_WING_MIN_Y = NogginConstants.CENTER_FIELD_Y
 RIGHT_WING_MAX_Y = (NogginConstants.FIELD_WIDTH - NogginConstants.GREEN_PAD_Y)
 
 #GOALIE
-BALL_LOC_LIMIT = 250 # Dist at which we stop active localization and just track
+BALL_LOC_LIMIT = NogginConstants.CENTER_FIELD_X #250 # Dist at which we stop active localization and just track
 GOALIE_HOME_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X + 15
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
 DIST_FROM_GOAL_INTERCEPT = 25.

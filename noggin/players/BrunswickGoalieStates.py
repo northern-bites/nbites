@@ -1,9 +1,12 @@
 from .. import NogginConstants as Constants
+from ..playbook import PBConstants 
 import man.motion.SweetMoves as SweetMoves
+import BrunswickGoalieTransitions as helper
+
 CENTER_SAVE_THRESH = 15.
 
 def goaliePosition(player):
-    if player.shouldSave():
+    if player.shouldSave(player):
         return player.goNow('goalieSave')
     #for now we don't want the goalie trying to move
     return player.goLater('goalieAtPosition')
@@ -30,17 +33,26 @@ def goalieAtPosition(player):
     """
     State for when we're at the position
     """
-    if player.shouldSave():
+    if helper.shouldSave(player):
         return player.goNow('goalieSave')
     if player.brain.playbook.subRole == "GOALIE_CHASER":
         #there is chase positioning in playbook, but if the goalie
         #needs to be chasing then ball is close enough that relative position
         #should be better
-        pass
         #return player.goNow('chase')
+        pass
     if player.firstFrame():
         player.stopWalking()
+    
+    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT \
+        and not player.trackingBall:
         player.brain.tracker.trackBall()
+        player.trackingBall = True
+    
+    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT \
+        and player.trackingBall:
+        player.brain.tracker.activeLoc()
+        player.trackingBall = False
 
     return player.stay()
 
@@ -56,10 +68,10 @@ def goalieSave(player):
 
     # Decide the type of save
     if relY > CENTER_SAVE_THRESH:
-        print "Should be saving right"
+        print "Should be saving left"
         return player.goNow('saveLeft')
     elif relY < -CENTER_SAVE_THRESH:
-        print "Should be saving left"
+        print "Should be saving right"
         return player.goNow('saveRight')
     else:
         print "Should be saving center"
@@ -87,22 +99,22 @@ def saveCenter(player):
     return player.stay()
 
 def holdRightSave(player):
-    if player.shouldHoldSave():
-        player.executeMove(Constants.SAVE_RIGHT_HOLD_DEBUG)
+    if helper.shouldHoldSave(player):
+        player.executeMove(SweetMoves.SAVE_RIGHT_HOLD_DEBUG)
     else:
         return player.goLater('postSave')
     return player.stay()
 
 def holdLeftSave(player):
-    if player.shouldHoldSave():
-        player.executeMove(Constants.SAVE_LEFT_HOLD_DEBUG)
+    if helper.shouldHoldSave(player):
+        player.executeMove(SweetMoves.SAVE_LEFT_HOLD_DEBUG)
     else:
         return player.goLater('postSave')
     return player.stay()
 
 def holdCenterSave(player):
-    if player.shouldHoldSave():
-        player.executeMove(Constants.SAVE_CENTER_HOLD_DEBUG)
+    if helper.shouldHoldSave(player):
+        player.executeMove(SweetMoves.SAVE_CENTER_HOLD_DEBUG)
     else:
         return player.goLater('postSave')
     return player.stay()

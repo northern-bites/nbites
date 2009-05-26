@@ -2,6 +2,7 @@ from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER
 ###
 # Reimplementation of Game Controller States for pBrunswick
 ###
+
 def gameReady(player):
     """
     Stand up, and pan for localization
@@ -9,8 +10,7 @@ def gameReady(player):
     if player.firstFrame():
         player.standup()
         player.brain.tracker.switchTo('locPans')
-        roleState = player.getNextState()
-    return player.goNow(roleState)
+    return player.stay()
 
 def gameSet(player):
     """
