@@ -3,14 +3,12 @@
 
 #include "ThreadedImageTranscriber.h"
 
-class WBImageTranscriber : public ThreadedImageTranscriber{
+class WBImageTranscriber : public ImageTranscriber{
 public:
-    WBImageTranscriber(boost::shared_ptr<Sensors> s,
-                       boost::shared_ptr<Synchro> synchro);
+    WBImageTranscriber(boost::shared_ptr<Sensors> s);
     ~WBImageTranscriber();
 
     void releaseImage();
-    void run();
 
 private:
     void waitForImage();

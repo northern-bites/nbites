@@ -19,6 +19,12 @@ private:
     AccEKF accEKF;
     std::vector<float> jointValues;
     std::vector<WbDeviceTag> jointDevices;
+    std::vector<float> fsrValues;
+    std::vector<WbDeviceTag> fsrDevices;
+    WbDeviceTag acc;
+    WbDeviceTag gyro;
+
+
 };
 
 #endif

@@ -5,17 +5,14 @@
 #include "Transcriber.h"
 #include "ThreadedMotionEnactor.h"
 
-class WBEnactor : public ThreadedMotionEnactor {
+class WBEnactor : public MotionEnactor {
 public:
     WBEnactor(boost::shared_ptr<Sensors> _sensors,
-              boost::shared_ptr<Synchro> synchro,
               boost::shared_ptr<Transcriber> transcriber);
     virtual ~WBEnactor();
 
     void postSensors();
     void sendCommands();
-
-    void run();
 
 protected:
     boost::shared_ptr<Sensors> sensors;

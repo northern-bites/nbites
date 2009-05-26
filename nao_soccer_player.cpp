@@ -28,7 +28,9 @@ using namespace std;
 
 using boost::shared_ptr;
 
-static shared_ptr<TTMan> man;
+typedef Man WBMan;
+
+static shared_ptr<WBMan> man;
 static shared_ptr<Sensors> sensors;
 static shared_ptr<Synchro> synchro;
 static shared_ptr<WBTranscriber> transcriber;
@@ -43,12 +45,12 @@ void WBCreateMan(){
     transcriber = shared_ptr<WBTranscriber>(new WBTranscriber(sensors));
     imageTranscriber =
         shared_ptr<WBImageTranscriber>
-        (new WBImageTranscriber(sensors,synchro));
+        (new WBImageTranscriber(sensors));
 
-    enactor = shared_ptr<WBEnactor>(new WBEnactor(sensors,synchro,
+    enactor = shared_ptr<WBEnactor>(new WBEnactor(sensors,
                                                   transcriber));
 
-    man = boost::shared_ptr<TTMan> (new TTMan(sensors,
+    man = boost::shared_ptr<WBMan> (new WBMan(sensors,
                                               transcriber,
                                               imageTranscriber,
                                               enactor,
@@ -68,11 +70,11 @@ int main() {
   WBCreateMan();
 
   int time_step = static_cast<int>(wb_robot_get_basic_time_step());
-  cout << "Robot time step is " << time_step <<endl;
+   cout << "Robot time step is " << time_step <<endl;
   // load and start forward motion
   WbMotionRef forwards = wbu_motion_new("../motions/Forwards50.motion");
-  wbu_motion_set_loop(forwards, true);
-  wbu_motion_play(forwards);
+  //wbu_motion_set_loop(forwards, true);
+  //wbu_motion_play(forwards);
 
   // These are all the sensors tags that we will need
   WbDeviceTag acc = wb_robot_get_device("accelerometer");
@@ -101,26 +103,26 @@ int main() {
 
   // forever
   for (;;) {
-    printf("testing balls balls\n");
+      //printf("testing balls balls\n");
 
     wb_robot_step(time_step);
     transcriber->postMotionSensors();
 
-    const double *acc_values = wb_accelerometer_get_values (acc);
-    printf("accelerometers: x: %f, y: %f, z: %f\n",
-	   acc_values[0], acc_values[1], acc_values[2]);
+//     const double *acc_values = wb_accelerometer_get_values (acc);
+//     printf("accelerometers: x: %f, y: %f, z: %f\n",
+// 	   acc_values[0], acc_values[1], acc_values[2]);
 
-    const double *gyro_values = wb_gyro_get_values (gyro);
-    printf("gyros: x: %f, y: %f\n", gyro_values[0], gyro_values[1]);
+//     const double *gyro_values = wb_gyro_get_values (gyro);
+//     printf("gyros: x: %f, y: %f\n", gyro_values[0], gyro_values[1]);
 
-    //double kneeAngle = wb_servo_get_position(angleTag);
-    //cout << "kneeAngle: " << kneeAngle << endl;
+//     //double kneeAngle = wb_servo_get_position(angleTag);
+//     //cout << "kneeAngle: " << kneeAngle << endl;
 
-    double an_fsr_value = wb_touch_sensor_get_value(an_fsr);
-    cout << "an fsr: " << an_fsr_value << endl;
+//     double an_fsr_value = wb_touch_sensor_get_value(an_fsr);
+//     cout << "an fsr: " << an_fsr_value << endl;
 
-    const unsigned char *image = wb_camera_get_image (camera);
-    cout << "third value in the image: " << (int)image[80 * 119 * 3] << endl;
+//     const unsigned char *image = wb_camera_get_image (camera);
+//     cout << "third value in the image: " << (int)image[80 * 119 * 3] << endl;
   }
 
   WBDestroyMan();
