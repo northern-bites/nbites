@@ -1,8 +1,6 @@
 #ifndef VisionHelpers_h_defined
 inline int ROUND2(float x) {
-    if ((x-(int)x) >= 0.5) return ((int)x+1);
-    if ((x-(int)x) <= -0.5) return ((int)x-1);
-    return (int)x;
+	return static_cast<int>( std::floor(x + 0.5f) );
 }
 
 /* Calculate the euclidian distance between two points.
@@ -13,7 +11,8 @@ inline int ROUND2(float x) {
  * @return      the distance between the objects
  */
 inline float dist(int x, int y, int x1, int y1) {
-    return sqrt((float)abs(x - x1) * abs(x - x1) + abs(y - y1) * abs(y - y1));
+    return std::sqrt(static_cast<float>(std::abs(x - x1) * std::abs(x - x1) +
+										std::abs(y - y1) * std::abs(y - y1) ));
 }
 
 /* Finds and returns the midpoint of two numbers.

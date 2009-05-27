@@ -138,9 +138,7 @@ public:
     int getVisionHorizon() { return horizon; }
 
     inline static int ROUND(float x) {
-        if ((x-(int)x) >= 0.5) return ((int)x+1);
-        if ((x-(int)x) <= -0.5) return ((int)x-1);
-        else return (int)x;
+		return static_cast<int>( std::floor(x + 0.5f) );
     }
 
 
