@@ -34,11 +34,11 @@ def fTwoField(team):
         return [PBConstants.TWO_FIELD] + defInfo
 
 def fThreeField(team):
-
+    '''right now (2009) we will only have 3 field players if the goalie is
+        pulled.'''
     # gets teammate that is chaser (could be me)
     chaser_mate = team.determineChaser()
     chaser_mate.role = PBConstants.CHASER
-
     # if i am chaser
     if chaser_mate.playerNumber == team.brain.my.playerNumber:
         return [PBConstants.THREE_FIELD] + Roles.rChaser(team)
@@ -127,9 +127,8 @@ def fReady(team):
     '''kickoff positions'''
     if team.me.isGoalie():
         return [PBConstants.READY] + Roles.rGoalie(team)
-
     # if two dogs alive, position normally
-    if team.numActiveFieldPlayers == 2:
+    if team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
         if team.me.playerNumber == 2:
             return [PBConstants.READY, PBConstants.DEFENDER] + \
                 SubRoles.pReadyDefender(team)

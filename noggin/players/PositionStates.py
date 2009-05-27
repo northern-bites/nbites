@@ -64,7 +64,7 @@ def atPosition(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
-    if player.brain.ball.dist < 25:
+    if 0 < player.brain.ball.dist < 25:
         return player.goLater('kickAtPosition')
     return player.stay()
 
@@ -121,7 +121,7 @@ def spinFindBallPosition(player):
     if player.firstFrame() and player.stoppedWalk:
         player.setSpeed(0,
                         0,
-                        ChaseConstants.SPIN_SPEED)
+                        ChaseConstants.FIND_BALL_SPIN_SPEED)
         player.brain.tracker.trackBall()
 
 

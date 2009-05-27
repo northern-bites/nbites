@@ -1,4 +1,4 @@
-
+from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER
 ###
 # Reimplementation of Game Controller States for pBrunswick
 ###
@@ -18,7 +18,7 @@ def gameSet(player):
     if player.firstFrame():
         player.brain.loc.reset()
         player.stopWalking()
-        if player.brain.my.playerNumber == 3:
+        if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()

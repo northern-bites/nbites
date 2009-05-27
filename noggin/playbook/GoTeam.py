@@ -114,7 +114,9 @@ class GoTeam:
             return Strategies.sTestOffender(self)
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
-        # Now we look at shorthanded strategies
+        # Now we look at game strategies
+        if True:
+            return Strategies.sTwoField(self)
         elif self.numActiveFieldPlayers == 0:
             return Strategies.sNoFieldPlayers(self)
         elif self.numActiveFieldPlayers == 1:
@@ -330,7 +332,7 @@ class GoTeam:
             including me'''
         active_teammates = []
         for mate in self.teammates:
-            if (mate.active and (!mate.isGoalie()
+            if (mate.active and (not mate.isGoalie()
                                  or (mate.isGoalie() and self.pulledGoalie))):
                 active_teammates.append(mate)
         return active_teammates

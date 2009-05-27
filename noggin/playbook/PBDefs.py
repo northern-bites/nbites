@@ -27,9 +27,9 @@ class Teammate:
         self.ballLocDist = 0
         self.ballLocBearing = 0
         self.calledRole = 0
-        self.lastPacketTime = self.brain.playbook.getTime()
+        self.lastPacketTime = time.time()
 
-        self.brain = tbrain        # brain instance
+        self.brain = tbrain # brain instance
         self.role = 0 # known role
         self.active = True
         self.grabbing = False # dog is grabbing

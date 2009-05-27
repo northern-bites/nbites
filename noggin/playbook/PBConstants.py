@@ -8,7 +8,7 @@ from .. import NogginConstants
 # Test switches to force one role to always be given out
 TEST_DEFENDER = False
 TEST_OFFENDER = False
-TEST_CHASER = True
+TEST_CHASER = False
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
@@ -20,6 +20,7 @@ KICKOFF_PLAY = False # Forces the more intelligent and restrictive kickoff play
 PULL_THE_GOALIE = False
 
 GOALIE_NUMBER = 1
+DEFAULT_CHASER_NUMBER = 3
 # Length of time to spend in the kickoff play
 KICKOFF_FORMATION_TIME = 5
 

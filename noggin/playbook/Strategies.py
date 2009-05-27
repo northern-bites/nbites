@@ -92,6 +92,8 @@ def sThreeField(team):
                return ['sThreeField'] + Formations.fKickoffPlay(team)
            # Kickoff
            else:
+               #use twokickoff b/c we want the goalie starting in goal
+               #like in twoKickoff
                return ['sThreeField'] + Formations.fTwoKickoff(team)
 
        # Formation for ball in our goal box
