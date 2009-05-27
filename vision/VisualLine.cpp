@@ -218,8 +218,10 @@ void VisualLine::calculateWidths() {
 
 
 const float VisualLine::getLength(const VisualLine& line) {
-    return Utility::getLength(line.start.x, line.start.y,
-                              line.end.x, line.end.y);
+    return Utility::getLength( static_cast<float>(line.start.x),
+							   static_cast<float>(line.start.y),
+                               static_cast<float>(line.end.x),
+							   static_cast<float>(line.end.y) );
 }
 
 // Get the angle from horizontal (in degrees) the line makes on the screen
@@ -267,12 +269,12 @@ getLineComponents(const VisualLine &aLine) {
 // y = mx + b
 // we need to find m and b
 pair <float, float> VisualLine::
-leastSquaresFit(const vector <linePoint> &thePoints) {
+	leastSquaresFit(const vector <linePoint> &thePoints) {
     // Use least squares to fit the line to the points
     // from http://www.efunda.com/math/leastsquares/lstsqr1dcurve.cfm
     // y = mx + b
     // we need to find m and b
-    int numPoints = static_cast<int> (thePoints.size());
+    float numPoints = static_cast<float>(thePoints.size());
     float ySum = 0.0;
     float xSum = 0.0;
     float xYSum = 0.0;
@@ -280,10 +282,10 @@ leastSquaresFit(const vector <linePoint> &thePoints) {
 
     for (vector <linePoint>::const_iterator i = thePoints.begin();
          i != thePoints.end(); i++) {
-        xSum += i->x;
-        ySum += i->y;
-        xYSum += (i->x * i->y);
-        xSquaredSum += (i->x * i->x);
+        xSum += static_cast<float>(i->x);
+        ySum += static_cast<float>(i->y);
+        xYSum += static_cast<float>(i->x * i->y);
+        xSquaredSum += static_cast<float>(i->x * i->x);
     }
     /*
       for (int i = 0; i < numPoints; i++) {
@@ -294,10 +296,10 @@ leastSquaresFit(const vector <linePoint> &thePoints) {
       }*/
 
     float b = ((ySum * xSquaredSum) - (xSum * xYSum)) /
-        ((numPoints * xSquaredSum) - (xSum * xSum));
+		((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
-    float m = ( (numPoints * xYSum) - (xSum * ySum) ) /
-        ((numPoints * xSquaredSum) - (xSum * xSum));
+    float m =  ( (numPoints * xYSum) - (xSum * ySum) ) /
+		((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
     return pair<float, float>(m, b);
 }

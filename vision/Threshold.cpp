@@ -853,9 +853,11 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
 
         // find angle x/y (relative to camera)
-        objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/
-                          MAX_BEARING_RAD);
-        objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/
+        objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
+											  objPtr->getCenterX() ) /
+						   MAX_BEARING_RAD );
+        objPtr->setAngleY(static_cast<float>(HALF_IMAGE_HEIGHT -
+											 objPtr->getCenterY() )/
                           MAX_ELEVATION_RAD);
 
         // if object is a goal post
@@ -870,16 +872,19 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             float distw = getGoalPostDistFromWidth(width);
             float disth = getGoalPostDistFromHeight(height);
 
-            	    const float bottomLeftX = objPtr->getLeftBottomX();
-		  const float bottomRightX = objPtr->getRightBottomX();
-		  const float bottomLeftY = objPtr->getLeftBottomY();
-		  const float bottomRightY = objPtr->getRightBottomY();
+			const int bottomLeftX = objPtr->getLeftBottomX();
+			const int bottomRightX = objPtr->getRightBottomX();
+			const int bottomLeftY = objPtr->getLeftBottomY();
+			const int bottomRightY = objPtr->getRightBottomY();
 
-		  const float bottomOfObjectX = (bottomLeftX + bottomRightX) * 0.5f;
-		  const float bottomOfObjectY = (bottomLeftY + bottomRightY) * 0.5f;
-		  const float poseDist = pose->pixEstimate(bottomOfObjectX,
-					   bottomOfObjectY,
-					   0).dist;
+			const float bottomOfObjectX = static_cast<float>(bottomLeftX +
+															 bottomRightX) * 0.5f;
+			const float bottomOfObjectY = static_cast<float>(bottomLeftY
+															 + bottomRightY) * 0.5f;
+
+			const float poseDist = pose->pixEstimate(
+				static_cast<int>(bottomOfObjectX),
+				static_cast<int>(bottomOfObjectY), 0.0f).dist;
 
             switch (cert) {
             case HEIGHT_UNSURE:
@@ -959,10 +964,12 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
 
         // find angle x/y (relative to camera)
-        objPtr->setAngleX((HALF_IMAGE_WIDTH - objPtr->getCenterX())/
-                          MAX_BEARING_RAD);
-        objPtr->setAngleY((HALF_IMAGE_HEIGHT - objPtr->getCenterY())/
-                          MAX_ELEVATION_RAD);
+        objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
+											  objPtr->getCenterX() ) /
+						   MAX_BEARING_RAD );
+        objPtr->setAngleY( static_cast<float>(HALF_IMAGE_HEIGHT -
+											  objPtr->getCenterY() ) /
+						   MAX_ELEVATION_RAD );
 
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
@@ -1005,7 +1012,7 @@ float Threshold::getGoalPostDistFromWidth(float width) {
     return 2360.1*pow((double) width,-1.0516);
 #else
     // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
-    return 3116.59f/width + 21.75;
+    return 3116.59f/width + 21.75f;
 #endif
 }
 
@@ -1215,7 +1222,8 @@ int Threshold::distance(int x1, int x2, int x3, int x4) {
  * @return          the distance between them
  */
 float Threshold::getEuclidianDist(point <int> coord1, point <int> coord2) {
-    return sqrt(pow((float)coord2.y-coord1.y,2)+pow((float)coord2.x-coord1.x,2));
+    return std::sqrt( std::pow( static_cast<float>(coord2.y-coord1.y), 2) +
+					  std::pow( static_cast<float>(coord2.x-coord1.x), 2) );
 }
 
 /*  A bunch of methods for offline debugging.  Basically we create an extra image
@@ -1271,13 +1279,13 @@ void Threshold::drawBox(int left, int right, int bottom, int top, int c) {
             top < IMAGE_HEIGHT &&
             i >= 0 &&
             i < IMAGE_WIDTH) {
-            debugImage[top][i] = c;
+            debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
             (top + height) < IMAGE_HEIGHT &&
             i >= 0 &&
             i < IMAGE_WIDTH) {
-            debugImage[top + height][i] = c;
+            debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
@@ -1285,13 +1293,13 @@ void Threshold::drawBox(int left, int right, int bottom, int top, int c) {
             i < IMAGE_HEIGHT &&
             left >= 0 &&
             left < IMAGE_WIDTH) {
-            debugImage[i][left] = c;
+            debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
             i < IMAGE_HEIGHT &&
             (left+width) >= 0 &&
             (left+width) < IMAGE_WIDTH) {
-            debugImage[i][left + width] = c;
+            debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
 #endif
@@ -1318,13 +1326,13 @@ void Threshold::drawRect(int left, int top, int width, int height, int c) {
 
     for (int i = left; i < left + width; i++) {
         if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-            debugImage[top][i] = c;
+            debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
             (top + height) < IMAGE_HEIGHT &&
             i >= 0 &&
             i < IMAGE_WIDTH) {
-            debugImage[top + height][i] = c;
+            debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
@@ -1332,13 +1340,13 @@ void Threshold::drawRect(int left, int top, int width, int height, int c) {
             i < IMAGE_HEIGHT &&
             left >= 0 &&
             left < IMAGE_WIDTH) {
-            debugImage[i][left] = c;
+            debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
             i < IMAGE_HEIGHT &&
             (left+width) >= 0 &&
             (left+width) < IMAGE_WIDTH) {
-            debugImage[i][left + width] = c;
+            debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
 #endif
@@ -1359,23 +1367,27 @@ void Threshold::drawLine(const point<int> start, const point<int> end,
 void Threshold::drawLine(int x, int y, int x1, int y1, int c) {
 
 #ifdef OFFLINE
-    float slope = (float)(y - y1) / (float)(x - x1);
+    float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
     int sign = 1;
     if ((abs(y - y1)) > (abs(x - x1))) {
-        slope = 1.0 / slope;
+        slope = 1.0f / slope;
         if (y > y1) sign = -1;
         for (int i = y; i != y1; i += sign) {
-            int newx = x + (int)(slope * (i - y));
+            int newx = x +
+				static_cast<int>(slope * static_cast<float>(i - y) );
+
             if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT)
-                debugImage[i][newx] = c;
+                debugImage[i][newx] = static_cast<unsigned char>(c);
         }
     } else if (slope != 0) {
         //slope = 1.0 / slope;
         if (x > x1) sign = -1;
         for (int i = x; i != x1; i += sign) {
-            int newy = y + (int)(slope * (i - x));
+            int newy = y +
+				static_cast<int>(slope * static_cast<float>(i - x) );
+
             if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH)
-                debugImage[newy][i] = c;
+                debugImage[newy][i] = static_cast<unsigned char>(c);
         }
     }
     else if (slope == 0) {
@@ -1383,7 +1395,7 @@ void Threshold::drawLine(int x, int y, int x1, int y1, int c) {
         int endX = max(x, x1);
         for (int i = startX; i <= endX; i++) {
             if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                debugImage[y][i] = c;
+                debugImage[y][i] = static_cast<unsigned char>(c);
             }
         }
     }
@@ -1406,23 +1418,23 @@ void Threshold::drawPoint(int x, int y, int c) {
 
 #ifdef OFFLINE
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y][x] = c;
+        debugImage[y][x] = static_cast<unsigned char>(c);
     }if (y+1 > 0 && x > 0 && y+1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y+1][x] = c;
+        debugImage[y+1][x] = static_cast<unsigned char>(c);
     }if (y+2 > 0 && x > 0 && y+2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y+2][x] = c;
+        debugImage[y+2][x] = static_cast<unsigned char>(c);
     }if (y-1 > 0 && x > 0 && y-1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y-1][x] = c;
+        debugImage[y-1][x] = static_cast<unsigned char>(c);
     }if (y-2 > 0 && x > 0 && y-2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y-2][x] = c;
+        debugImage[y-2][x] = static_cast<unsigned char>(c);
     }if (y > 0 && x+1 > 0 && y < (IMAGE_HEIGHT) && x+1 < (IMAGE_WIDTH)) {
-        debugImage[y][x+1] = c;
+        debugImage[y][x+1] = static_cast<unsigned char>(c);
     }if (y > 0 && x+2 > 0 && y < (IMAGE_HEIGHT) && x+2 < (IMAGE_WIDTH)) {
-        debugImage[y][x+2] = c;
+        debugImage[y][x+2] = static_cast<unsigned char>(c);
     }if (y > 0 && x-1 > 0 && y < (IMAGE_HEIGHT) && x-1 < (IMAGE_WIDTH)) {
-        debugImage[y][x-1] = c;
+        debugImage[y][x-1] = static_cast<unsigned char>(c);
     }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
-        debugImage[y][x-2] = c;
+        debugImage[y][x-2] = static_cast<unsigned char>(c);
     }
 #endif
 }
@@ -1431,17 +1443,17 @@ void Threshold::drawPoint(int x, int y, int c) {
 void Threshold::drawX(int x, int y, int c) {
 #ifdef OFFLINE
     // Mid point
-    debugImage[y-2][x-2] = c;
-    debugImage[y-1][x-1] = c;
-    debugImage[y][x] = c;
-    debugImage[y+1][x+1] = c;
-    debugImage[y+2][x+2] = c;
+    debugImage[y-2][x-2] = static_cast<unsigned char>(c);
+    debugImage[y-1][x-1] = static_cast<unsigned char>(c);
+    debugImage[y][x] = static_cast<unsigned char>(c);
+    debugImage[y+1][x+1] = static_cast<unsigned char>(c);
+    debugImage[y+2][x+2] = static_cast<unsigned char>(c);
 
-    debugImage[y-2][x+2] = c;
-    debugImage[y-1][x+1] = c;
+    debugImage[y-2][x+2] = static_cast<unsigned char>(c);
+    debugImage[y-1][x+1] = static_cast<unsigned char>(c);
 
-    debugImage[y+1][x-1] = c;
-    debugImage[y+2][x-2] = c;
+	debugImage[y+1][x-1] = static_cast<unsigned char>(c);
+    debugImage[y+2][x-2] = static_cast<unsigned char>(c);
 
 #endif
 

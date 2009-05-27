@@ -78,10 +78,10 @@ private: // Class Variables
 
     // Member functions
     float robotDistanceToSD(float _distance) {
-        return 0.00000004f * pow(_distance,4.079f);
+        return 0.00000004f * std::pow(_distance,4.079f);
     }
     float robotBearingToSD(float _bearing) {
-        return static_cast<float>(M_PI) / 8.0f;
+        return static_cast<float>(M_PI_FLOAT) / 8.0f;
     }
 
 };

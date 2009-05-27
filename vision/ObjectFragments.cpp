@@ -2255,7 +2255,7 @@ void ObjectFragments::setShot(VisualCrossbar* one) {
                     white++;
                     run++;
                 }
-            } else if (colorSeen && pix == GREY || pix == BLACK) {
+            } else if ( colorSeen && (pix == GREY || pix == BLACK) ) {
                 grey++;
                 greyrun++;
             } else if (pix == GREEN || pix == BLUEGREEN) {
@@ -2427,7 +2427,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
         middle->setRightBottomY(bot);
         middle->setX(index);
         middle->setY(bot);
-        middle->setWidth(big);
+        middle->setWidth( static_cast<float>(big) );
         middle->setHeight(20);
         middle->setCenterX(middle->getLeftTopX() + ROUND2(middle->getWidth() /
                                                           2));
@@ -2621,7 +2621,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose) {
         }
     }
     index3 = i; index32 = i;
-    for (i++ ; i < IMAGE_WIDTH / divider; i++) {
+    for (i++ ; i < (IMAGE_WIDTH / divider) ; i++) {
         if (open[i] > open[index3]) {
             index3 = i;
         }
@@ -3014,8 +3014,8 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
             (nextX > trueRight && post == RIGHT)) {
             runs[i].h = 0;
         }
-        if (nextX > trueLeft - 10 && post == RIGHT ||
-            nextX < trueRight + 10 && post == LEFT) {
+        if ( (nextX > trueLeft - 10 && post == RIGHT) ||
+			 (nextX < trueRight + 10 && post == LEFT) ) {
             runs[i].h = 0;
         }
     }
@@ -3230,7 +3230,7 @@ float ObjectFragments::rightHalfColor(blob tempobj) {
     int spanX = tempobj.rightTop.x - x;
     int good = 0, good1 = 0, good2 = 0;
     int pix;
-    if (rightColor(tempobj, ORANGE) < 0.15) return 0.10;
+    if (rightColor(tempobj, ORANGE) < 0.15f) return 0.10f;
     for (int i = spanY / 2; i < spanY; i++) {
         for (int j = 0; j < spanX; j++) {
             pix = thresh->thresholded[y + i][x + j];
@@ -3308,9 +3308,11 @@ float ObjectFragments::rightColor(blob tempobj, int col) {
     if (blobArea(tempobj) > 1000) return (float) good /
                                       (float) blobArea(tempobj);
     //if (ogood < 2 * orgood) return 0.1; // at least two thirds of the "orange" pixels should be orange
-    if (red > spanX * spanY * 0.10) return 0.1;
-    if (ogood < spanX * spanY * 0.20) return 0.1;
-    if (tempobj.area > 1000 && ogood+oygood > (spanX * spanY * 0.4)  && good < (spanX * spanY * 0.65)) return 0.65;
+    if (red > static_cast<float>(spanX * spanY) * 0.10f) return 0.1f;
+    if (ogood < static_cast<float>(spanX * spanY) * 0.20f) return 0.1f;
+    if (tempobj.area > 1000 &&
+		ogood + oygood > (static_cast<float>(spanX * spanY) * 0.4f)  &&
+		good < ( static_cast<float>(spanX * spanY) * 0.65f)) return 0.65f;
     float percent = (float)good / (float) (spanX * spanY);
     if (col == GREEN)
         return (float)good;
@@ -3455,7 +3457,8 @@ int ObjectFragments::scanOut(int start_x, int start_y, float slopel, int dir){
         //printf("Got a good point at (%d,%d) bad:%d, goodEdge %d \n",lastGoodX,lastGoodY,bad,goodEdge);
         if(DEBUGBALLPOINTS)
             drawPoint(lastGoodX,lastGoodY,BLUE);
-        addPoint(lastGoodX,lastGoodY);
+        addPoint(static_cast<float>(lastGoodX),
+				 static_cast<float>(lastGoodY) );
         return 0;
     }
 
@@ -3473,7 +3476,7 @@ int  ObjectFragments::roundness(blob b) {
     int h = blobHeight(b);
     int x = b.leftTop.x;
     int y = b.leftTop.y;
-    float ratio = (float)w / (float)h;
+    float ratio = static_cast<float>(w) / static_cast<float>(h);
     int r = 10;
     if ((h < SMALLBALLDIM && w < SMALLBALLDIM && ratio > BALLTOOTHIN && ratio < BALLTOOFAT)) {
     } else if (ratio > THINBALL && ratio < FATBALL) {
@@ -3481,10 +3484,14 @@ int  ObjectFragments::roundness(blob b) {
         if (BALLDEBUG)
             cout << "Checking ratio on occluded ball:  " << ratio << endl;
         // we're on an edge so allow for streching - first check for top of bottom
-        if (h > 4 && w > 4 && (y + h > IMAGE_HEIGHT - 2 || y == 0) && ratio < MIDFAT && ratio > 1) {
+        if (h > 4 && w > 4 && (y + h > IMAGE_HEIGHT - 2 || y == 0) &&
+			ratio < MIDFAT && ratio > 1) {
             // then sides
-        } else if (h > 4 && w > 4 && (x == 0 || x + w > IMAGE_WIDTH - 2) && ratio > MIDTHIN && ratio < 1) {
-        } else if ((h > 20 || w > 20) && (ratio > OCCLUDEDTHIN && ratio < OCCLUDEDFAT) ) {
+        } else if (h > 4 && w > 4
+				   && (x == 0 || x + w > IMAGE_WIDTH - 2)
+				   && ratio > MIDTHIN && ratio < 1) {
+        } else if ((h > 20 || w > 20)
+				   && (ratio > OCCLUDEDTHIN && ratio < OCCLUDEDFAT) ) {
             // when we have big slivers then allow for extra
         } else if (b.leftBottom.y > IMAGE_HEIGHT - 3 && w > 15) {
             // the bottom is a really special case
@@ -3502,10 +3509,10 @@ int  ObjectFragments::roundness(blob b) {
         return BADVALUE;
     }
     if (ratio < 1.0) {
-        int offRat = ROUND2((1.0 - ratio) * 10.0);
+        int offRat = ROUND2((1.0f - ratio) * 10.0f);
         r -= offRat;
     } else {
-        int offRat = ROUND2((1.0 - 1.0/ratio) * 10.0);
+        int offRat = ROUND2((1.0f - 1.0f/ratio) * 10.0f);
         r -= offRat;
     }
     if (w * h > SMALLBALL) {
@@ -3515,7 +3522,7 @@ int  ObjectFragments::roundness(blob b) {
         if (y + h > IMAGE_HEIGHT - 3 || x == 0 || (x + w) > IMAGE_WIDTH - 2 || y == 0) {
         } else {
             // we're in the screen
-            int d = ROUND2((float)max(w, h) / 6.0);
+            int d = ROUND2(static_cast<float>(std::max(w, h)) / 6.0f);
             int d3 = min(w, h);
             for (int i = 0; i < d3; i++) {
                 pix = thresh->thresholded[y+i][x+i];
@@ -3774,7 +3781,9 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
     int cenX = midPoint(topBlob.leftTop.x, topBlob.rightBottom.x);
     int cenY = midPoint(topBlob.leftTop.y, topBlob.leftBottom.y);
 
-    for(float angle = 0; angle < PI; angle +=PI/NUM_EDGE_POINTS){
+    for(float angle = 0; angle < M_PI_FLOAT;
+		angle += M_PI_FLOAT / static_cast<float>(NUM_EDGE_POINTS) ){
+
         scanOut(cenX,cenY,tan(angle), 1);
         scanOut(cenX,cenY,tan(angle), -1);
     }
@@ -3801,7 +3810,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
     }
     float colPer = rightColor(topBlob, ORANGE);
 
-    confidence -= ROUND2((0.85 - colPer) * 10);
+    confidence -= ROUND2((0.85f - colPer) * 10.0f);
     //cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
     if (topBlob.area < 75) {
         confidence -= 3;
@@ -3823,9 +3832,10 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
     thisBall->setX(topBlob.leftTop.x);
     thisBall->setY(topBlob.leftTop.y);
 
-    thisBall->setWidth(w);
-    thisBall->setHeight(h);
-    thisBall->setRadius((float)max((float)w/2.0, (float)h/2.0));
+    thisBall->setWidth( static_cast<float>(w) );
+    thisBall->setHeight( static_cast<float>(h) );
+    thisBall->setRadius( std::max(static_cast<float>(w)/2.0f,
+								  static_cast<float>(h)/2.0f ) );
     int amount = h / 2;
     if (w > h)
         amount = w / 2;
@@ -4132,9 +4142,11 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2, int span
         return false;
     }
     if (spanY2 > 70) return true;
-    if (spanX2 > 2 && (spanY2 > spanY / 2 || spanY2 > BIGPOST ||
-                       (spanY2 > spanY / 3 && spanX2 > 10) &&
-                       (spanX2 <= spanX / 2 || fudge != 0)) && (spanX2 > spanX / 4))  {
+    if (spanX2 > 2
+		&& (spanY2 > spanY / 2 || spanY2 > BIGPOST ||
+			( (spanY2 > spanY / 3 && spanX2 > 10) &&
+			  (spanX2 <= spanX / 2 || fudge != 0)) ) &&
+		(spanX2 > spanX / 4))  {
         return true;
     }
     if (t1 < 1 && t2 < 1) return true;

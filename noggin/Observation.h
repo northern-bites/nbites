@@ -47,7 +47,7 @@ public:
     /*
      * @return The bearing reported by the visual sighting in degrees
      */
-    const float getVisBearingDeg() const { return DEG_OVER_RAD * visBearing; }
+    const float getVisBearingDeg() const { return TO_DEG * visBearing; }
     /**
      * @return The standard deviation of the distance of the observation.
      */

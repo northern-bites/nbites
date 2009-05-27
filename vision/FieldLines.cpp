@@ -343,9 +343,13 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
                         int width = greenWhiteY - whiteGreenY;
                         float distance = pose->pixEstimate(x, linePointY, 0).dist;
 
-                        if (isReasonableVerticalWidth(x, linePointY, distance, width)) {
+                        if (isReasonableVerticalWidth(x, linePointY,
+													  distance, width)) {
+
                             // assign x, y, lineWidth
-                            linePoint point(x, linePointY, width, distance, VERTICAL);
+                            linePoint point(x, linePointY,
+											static_cast<float>(width),
+											distance, VERTICAL);
                             if (debugVertEdgeDetect) {
                                 cout << "\t\t\tPoint " << point << " passed all checks!"
                                      << endl;
@@ -535,7 +539,8 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
                         if (isReasonableHorizontalWidth(linePointX, y, distance, width)) {
                             // assign x, y, lineWidth
                             linePoint point(linePointX, y,
-                                            width, distance, HORIZONTAL);
+                                            static_cast<float>(width)
+											, distance, HORIZONTAL);
                             if (debugHorEdgeDetect) {
                                 cout << "\t\tPoint " << point << " accepted." << endl;
                             }
@@ -990,7 +995,7 @@ const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
     // See https://robocup.bowdoin.edu/files/nao/NaoLineWidthData.xls
     //const int ERROR_ALLOWED = 8;
     //return true;
-    return width < 6111.8 * pow((double)distance, -1.0701);
+    return width < 6111.8f * std::pow(distance, -1.0701f);
 }
 
 
@@ -1123,14 +1128,14 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
                 float distanceDifference = curPointDistance - lastPointDistance;
                 float lineWidthDifference = currentPoint->lineWidth - lastLineWidth;
 
-                if (distanceDifference < 0 && // line is going toward us
+                if ((distanceDifference < 0 && // line is going toward us
                     // TODO named constant
                     (lineWidthDifference < -2 || // The line shouldn't shrink more than 2 pix
-                     lineWidthDifference > 5) ||
+                     lineWidthDifference > 5) ) ||
 
-                    distanceDifference >= 0 && // line is going away from us
+                    (distanceDifference >= 0 && // line is going away from us
                     (lineWidthDifference > 2 ||
-                     lineWidthDifference < -5)) {
+                     lineWidthDifference < -5)) ) {
                     if (debugCreateLines)
                         cout << "\tSecond loop: Sanity check 'Points of similar line widths "
                              << "failed', line width 1: " << lastLineWidth
@@ -1154,7 +1159,10 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
             if (currentPoint->lineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
                 lastLineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
                 abs(pointX - lineEndpointX) > abs(pointY - lineEndpointY) &&
-                Utility::getLength(lineEndpointX, lineEndpointY, pointX, pointY)
+                Utility::getLength(static_cast<float>(lineEndpointX),
+								   static_cast<float>(lineEndpointY),
+								   static_cast<float>(pointX),
+								   static_cast<float>(pointY) )
                 < MIN_SEPARATION_TO_NOT_CHECK) {
                 percentGreen = 0;
             }
@@ -1183,8 +1191,11 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
             // not extremely close to each other - if they are, the angle error will
             // be too high.
             if (legitimateLinePoints.size() != 1 &&
-                Utility::getLength(lineEndpointX, lineEndpointY, pointX,
-                                   pointY) >  MIN_PIXEL_DIST_TO_CHECK_ANGLE) {
+                Utility::getLength(static_cast<float>(lineEndpointX),
+								   static_cast<float>(lineEndpointY),
+								   static_cast<float>(pointX),
+                                   static_cast<float>(pointY) ) >
+				MIN_PIXEL_DIST_TO_CHECK_ANGLE) {
                 float curLineAngle = Utility::getAngle(lineStartpointX,
                                                        lineStartpointY,
                                                        lineEndpointX,
@@ -1642,8 +1653,8 @@ void FieldLines::extendLineVertically(VisualLine &line) {
     }
 
     list <linePoint> foundLinePoints;
-    double slope = line.a;
-    double yIntercept = line.b;
+    float slope = line.a;
+    float yIntercept = line.b;
 
     // Keep track of coords so that we can check between the last point and
     // current point for green
@@ -1786,8 +1797,8 @@ void FieldLines::extendLineHorizontally(VisualLine &line) {
     }
 
     list <linePoint> foundLinePoints;
-    double slope = line.a;
-    double yIntercept = line.b;
+    float slope = line.a;
+    float yIntercept = line.b;
 
     // Keep track of coords so that we can check between the last point and
     // current point for green
@@ -1987,7 +1998,9 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
             linePointX = (leftX + rightX) / 2;
             lineWidth = rightX - leftX;
         }
-        linePoint newPoint(linePointX, y, lineWidth, HORIZONTAL);
+        linePoint newPoint(linePointX, y,
+						   static_cast<float>(lineWidth),
+						   HORIZONTAL);
         return newPoint;
     }
     // Vertical
@@ -2047,7 +2060,8 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
             linePointY = (topY + bottomY) / 2;
             lineWidth = bottomY - topY;
         }
-        linePoint newPoint(x, linePointY, lineWidth, VERTICAL);
+        linePoint newPoint(x, linePointY,
+						   static_cast<float>(lineWidth), VERTICAL);
         return newPoint;
     }
 }
@@ -2406,19 +2420,27 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             point<int> line1Closer;
             point<int> line2Closer;
 
-            if (Utility::getLength(intersectX, intersectY,
-                                   i->start.x, i->start.y) <
-                Utility::getLength(intersectX, intersectY,
-                                   i->end.x, i->end.y)) {
+            if (Utility::getLength(static_cast<float>(intersectX),
+								   static_cast<float>(intersectY),
+                                   static_cast<float>(i->start.x),
+								   static_cast<float>(i->start.y) ) <
+                Utility::getLength(static_cast<float>(intersectX),
+								   static_cast<float>(intersectY),
+                                   static_cast<float>(i->end.x),
+								   static_cast<float>(i->end.y)) ) {
                 line1Closer = i->start;
             }
             else
                 line1Closer = i->end;
 
-            if (Utility::getLength(intersectX, intersectY,
-                                   j->start.x, j->start.y) <
-                Utility::getLength(intersectX, intersectY,
-                                   j->end.x, j->end.y)) {
+            if (Utility::getLength(static_cast<float>(intersectX),
+								   static_cast<float>(intersectY),
+                                   static_cast<float>(j->start.x),
+								   static_cast<float>(j->start.y) ) <
+                Utility::getLength(static_cast<float>(intersectX),
+								   static_cast<float>(intersectY),
+                                   static_cast<float>(j->end.x),
+								   static_cast<float>(j->end.y) )) {
                 line2Closer = j->start;
             }
             else
@@ -2822,7 +2844,8 @@ getPossibleClassifications(const VisualCorner &corner,
             // percent error for subsequent objects
             const float ERROR_ALLOWANCE_INCREASE = 5.0f;
             float relErrorRelaxation =
-                ERROR_ALLOWANCE_INCREASE * numCorroboratingObjects;
+                ERROR_ALLOWANCE_INCREASE *
+				static_cast<float>(numCorroboratingObjects);
 
             if (numCorroboratingObjects > 0 &&
                 relativeError < MAX_RELATIVE_ERROR + relErrorRelaxation) {
@@ -3576,7 +3599,7 @@ float FieldLines::getEstimatedAngle(const VisualLine &line1,
 
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
-    float theta = DEG_OVER_RAD * acos(dotProduct/
+    float theta = TO_DEG * acos(dotProduct/
                                       (lengthOfVector1 * lengthOfVector2));
     return theta;
 }
@@ -3640,7 +3663,10 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
                    // The corner is extremely close in the picture to the object, use
                    // pix estimate
                    // TODO: named constant
-                   Utility::getLength(midX, midBottomY, c->getX(), c->getY()) < 15)) {
+                   Utility::getLength(static_cast<float>(midX),
+									  static_cast<float>(midBottomY),
+									  static_cast<float>(c->getX()),
+									  static_cast<float>(c->getY()) ) < 15)) {
 
         typeOfEstimate = "Pose Pix Estimate";
         pixEstimate = true;
@@ -3800,7 +3826,7 @@ const float FieldLines::percentSurrounding(const int x, const int y,
     }
     int totalPixels = (endX - startX + 1) * (endY - startY + 1);
     return (static_cast<float> (numFound) /
-            static_cast<float> (totalPixels)) * 100.0;
+            static_cast<float> (totalPixels)) * 100.0f;
 }
 
 // Alternative form of percent surrounding that uses points.
@@ -3871,11 +3897,13 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
         int sign = 1;
 
         if ((abs(y2 - y1)) > (abs(x2 - x1))) {
-            slope = 1.0 / slope;
+            slope = 1.0f / slope;
             if (y1 > y2) sign = -1;
             for (int i = y1; i != y2; i += sign) {
                 ++totalPixels;
-                int newx = x1 + (int)(slope * (i - y1));
+                int newx = x1 +
+					static_cast<int>( (slope * static_cast<float>(i - y1)) );
+
                 if (Utility::isElementInArray(vision->thresh->thresholded[i][newx],
                                               colors, numColors))
                     ++numFound;
@@ -3887,7 +3915,8 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
             if (x1 > x2) sign = -1;
             for (int i = x1; i != x2; i += sign) {
                 ++totalPixels;
-                int newy = y1 + (int)(slope * (i - x1));
+                int newy = y1 +
+					static_cast<int>( (slope * static_cast<float>(i - x1)) );
                 if (Utility::isElementInArray(vision->thresh->thresholded[newy][i],
                                               colors, numColors))
                     ++numFound;
@@ -3906,8 +3935,8 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
         }
     }
 
-    return static_cast<float> (numFound) /
-        static_cast<float> (totalPixels) * 100.0;
+    return ( static_cast<float> (numFound) /
+			 static_cast<float> (totalPixels) * 100.0f );
 }
 
 
@@ -3953,7 +3982,8 @@ const float FieldLines::percentColor(const int x, const int y,
             }
         }
     }
-    return static_cast<float>(numFound) / static_cast<float>(numTotal) * 100.0;
+    return (static_cast<float>(numFound) /
+			static_cast<float>(numTotal) * 100.0f);
 }
 
 /* Since this is a specific case where we're just testing for the percent
