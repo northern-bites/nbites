@@ -433,9 +433,6 @@ def kickBallRight(player):
 
     return player.stay()
 
-def done(player):
-    return player.stay()
-
 def ignoreOwnGoal(player):
     if transitions.shouldSpinFindBall(player):
         return player.goNow('spinFindBall')
