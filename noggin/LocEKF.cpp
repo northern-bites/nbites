@@ -12,7 +12,7 @@ const float LocEKF::BETA_LOC = 1.0f;
 const float LocEKF::GAMMA_LOC = 0.1f;
 const float LocEKF::BETA_LAT = 0.03f;
 const float LocEKF::GAMMA_LAT = 0.04f;
-const float LocEKF::BETA_ROT = M_PI/16.0f;
+const float LocEKF::BETA_ROT = M_PI_FLOAT/16.0f;
 const float LocEKF::GAMMA_ROT = 0.1f;
 
 // Default initialization values
@@ -21,13 +21,13 @@ const float LocEKF::INIT_LOC_Y = 270.0f;
 const float LocEKF::INIT_LOC_H = 0.0f;
 const float LocEKF::X_UNCERT_MAX = 680.0f;
 const float LocEKF::Y_UNCERT_MAX = 440.0f;
-const float LocEKF::H_UNCERT_MAX = 4*M_PI;
-const float LocEKF::X_UNCERT_MIN = 1.0e-6;
-const float LocEKF::Y_UNCERT_MIN = 1.0e-6;
-const float LocEKF::H_UNCERT_MIN = 1.0e-6;
+const float LocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
+const float LocEKF::X_UNCERT_MIN = 1.0e-6f;
+const float LocEKF::Y_UNCERT_MIN = 1.0e-6f;
+const float LocEKF::H_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
-const float LocEKF::INIT_H_UNCERT = M_PI * 2.0f;
+const float LocEKF::INIT_H_UNCERT = M_PI_FLOAT * 2.0f;
 const float LocEKF::X_EST_MIN = -600.0f;
 const float LocEKF::Y_EST_MIN = -1000.0f;
 const float LocEKF::X_EST_MAX = 600.0f;
@@ -209,8 +209,8 @@ void LocEKF::incorporateMeasurement(Observation z,
 
         // Convert our sighting to cartesian coordinates
         MeasurementVector z_x(2);
-        z_x(0) = z.getVisDistance() * cos(z.getVisBearing());
-        z_x(1) = z.getVisDistance() * sin(z.getVisBearing());
+        z_x(0) = z.getVisDistance() * std::cos(z.getVisBearing());
+        z_x(1) = z.getVisDistance() * std::sin(z.getVisBearing());
 
         // Get expected values of the post
         const float x_b = z.getPointPossibilities()[obsIndex].x;
@@ -262,8 +262,8 @@ void LocEKF::incorporateMeasurement(Observation z,
         const float y = xhat_k_bar(1);
         const float h = xhat_k_bar(2);
 
-        d_x(0) = hypot(x - x_b, y - y_b);
-        d_x(1) = atan2(y_b - y, x_b - x) - h;
+        d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
+        d_x(1) = std::atan2(y_b - y, x_b - x) - h;
         d_x(1) = NBMath::subPIAngle(d_x(1));
 
         // Calculate invariance
@@ -332,8 +332,8 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
     const float x = xhat_k_bar(0);
     const float y = xhat_k_bar(1);
     const float h = xhat_k_bar(2);
-    float x_b_r = z->getVisDistance() * cos(z->getVisBearing());
-    float y_b_r = z->getVisDistance() * sin(z->getVisBearing());
+    float x_b_r = z->getVisDistance() * std::cos(z->getVisBearing());
+    float y_b_r = z->getVisDistance() * std::sin(z->getVisBearing());
 
     float sinh, cosh;
     sincosf(h, &sinh, &cosh);
@@ -341,7 +341,7 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
     float x_b  = (pt.x - x) * cosh + (pt.y - y) * sinh;
     float y_b = -(pt.x - x) * sinh + (pt.y - y) * cosh;
 
-    return hypot(x_b_r - x_b, y_b_r - y_b);
+    return static_cast<float>(hypot(x_b_r - x_b, y_b_r - y_b));
 }
 
 /**

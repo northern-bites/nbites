@@ -23,9 +23,9 @@ const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
 const float BallEKF::X_UNCERT_MAX = 740.0f;
 const float BallEKF::Y_UNCERT_MAX = 270.0f;
 const float BallEKF::VELOCITY_UNCERT_MAX = 300.0;
-const float BallEKF::X_UNCERT_MIN = 1.0e-6;
-const float BallEKF::Y_UNCERT_MIN = 1.0e-6;
-const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6;
+const float BallEKF::X_UNCERT_MIN = 1.0e-6f;
+const float BallEKF::Y_UNCERT_MIN = 1.0e-6f;
+const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::INIT_X_UNCERT = 740.0f;
 const float BallEKF::INIT_Y_UNCERT = 270.0f;
 const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
@@ -49,8 +49,8 @@ BallEKF::BallEKF()
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1.0 / ASSUMED_FPS;
-    A_k(1,3) = 1.0 / ASSUMED_FPS;
+    A_k(0,2) = 1.0f / ASSUMED_FPS;
+    A_k(1,3) = 1.0f / ASSUMED_FPS;
 
     // Setup initial values
     setXEst(INIT_BALL_X);
@@ -92,8 +92,8 @@ BallEKF::BallEKF(float initX, float initY,
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1.0 / ASSUMED_FPS;
-    A_k(1,3) = 1.0 / ASSUMED_FPS;
+    A_k(0,2) = 1.0f / ASSUMED_FPS;
+    A_k(1,3) = 1.0f / ASSUMED_FPS;
 
     // Setup initial values
     setXEst(initX);
@@ -194,8 +194,8 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
         // std::cout << "Ball dist is " << z.distance << std::endl;
         // std::cout << "Cartesian ball dist is " << USE_CARTESIAN_BALL_DIST << std::endl;
         // Convert our sighting to cartesian coordinates
-        const float x_b_r = z.distance * cos(z.bearing);
-        const float y_b_r = z.distance * sin(z.bearing);
+        const float x_b_r = z.distance * std::cos(z.bearing);
+        const float y_b_r = z.distance * std::sin(z.bearing);
         MeasurementVector z_x(2);
 
         z_x(0) = x_b_r;
@@ -239,8 +239,8 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
 
         MeasurementVector d_x(2);
 
-        d_x(0) = hypot(x_b - robotPose.x, y_b - robotPose.y);
-        d_x(1) = atan2(y_b - robotPose.y, x_b - robotPose.x) - robotPose.h;
+        d_x(0) = static_cast<float>(hypot(x_b - robotPose.x, y_b - robotPose.y));
+        d_x(1) = std::atan2(y_b - robotPose.y, x_b - robotPose.x) - robotPose.h;
 
         // Calculate invariance
         V_k = z_x - d_x;

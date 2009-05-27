@@ -38,7 +38,7 @@ public:
 };
 
 // Constants
-static const float MIN_SIMILARITY = 1.0e-20; // Minimum possible similarity
+static const float MIN_SIMILARITY = static_cast<float>(1.0e-20); // Minimum possible similarity
 
 // The Monte Carlo Localization class
 class MCL : public LocSystem
@@ -84,7 +84,7 @@ public:
     /**
      * @return The current heading esitamte of the robot in degrees
      */
-    const float getHEstDeg() const { return curEst.h * DEG_OVER_RAD;}
+    const float getHEstDeg() const { return curEst.h * TO_DEG;}
 
     /**
      * @return The uncertainty associated with the x estimate of the robot.
@@ -104,7 +104,7 @@ public:
     /**
      * @return The uncertainty associated with the robot's heading estimate.
      */
-    const float getHUncertDeg() const { return curUncert.h * 2 * DEG_OVER_RAD;}
+    const float getHUncertDeg() const { return curUncert.h * 2 * TO_DEG;}
 
     const MotionModel getLastOdo() const { return lastOdo; }
 

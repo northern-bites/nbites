@@ -13,11 +13,11 @@
 using namespace std;
 #define MAX_CHANGE_X 5.0f
 #define MAX_CHANGE_Y 5.0f
-#define MAX_CHANGE_H M_PI / 16.0f
+#define MAX_CHANGE_H M_PI_FLOAT / 16.0f
 #define MAX_CHANGE_F 5.0f
 #define MAX_CHANGE_L 5.0f
-#define MAX_CHANGE_R M_PI / 16.0f
-#define UNIFORM_1_NEG_1 (2*(rand() / (float(RAND_MAX)+1)) - 1)
+#define MAX_CHANGE_R M_PI_FLOAT / 16.0f
+#define UNIFORM_1_NEG_1 (2.0f*(static_cast<float>(rand()) / (static_cast<float>(RAND_MAX)+1)) - 1.0f)
 
 /**
  * Initializes the sampel sets so that the first update works appropriately
@@ -31,9 +31,9 @@ MCL::MCL(int _M) : useBest(false), lastOdo(0,0,0), frameCounter(0), M(_M)
         // X bounded by width of the field
         // Y bounded by height of the field
         // H between +-pi
-        PoseEst x_m(float(rand() % int(FIELD_WIDTH)),
-                    float(rand() % int(FIELD_HEIGHT)),
-                    UNIFORM_1_NEG_1 * (M_PI / 2.0f));
+        PoseEst x_m(static_cast<float>(rand() % static_cast<int>(FIELD_WIDTH)),
+                    static_cast<float>(rand() % static_cast<int>(FIELD_HEIGHT)),
+                    UNIFORM_1_NEG_1 * (M_PI_FLOAT / 2.0f));
         Particle p_m(x_m, 1.0f);
         X_t.push_back(p_m);
     }
@@ -57,9 +57,9 @@ void MCL::reset()
         // X bounded by width of the field
         // Y bounded by height of the field
         // H between +-pi
-        PoseEst x_m(float(rand() % int(FIELD_WIDTH)),
-                    float(rand() % int(FIELD_HEIGHT)),
-                    UNIFORM_1_NEG_1 * (M_PI / 2.0f));
+        PoseEst x_m(static_cast<float>(rand() % static_cast<int>(FIELD_WIDTH)),
+                    static_cast<float>(rand() % static_cast<int>(FIELD_HEIGHT)),
+                    UNIFORM_1_NEG_1 * (M_PI_FLOAT / 2.0f));
         Particle p_m(x_m, 1.0f);
         X_t.push_back(p_m);
     }
@@ -209,12 +209,14 @@ void MCL::resample(std::vector<Particle> * X_bar_t, float totalWeights) {
 
 void MCL::lowVarianceResample(std::vector<Particle> * X_bar_t,
                               float totalWeights) {
-    float r = ((rand() / float(RAND_MAX)) * (1/M));
+    float r = ((static_cast<float>(rand()) /
+				static_cast<float>(RAND_MAX)) *
+			   (1.0f/static_cast<float>(M) ));
     float c = (*X_bar_t)[0].weight / totalWeights;
     int i = 0;
     for (int m = 0; m < M; ++m) {
 
-        float U = r = m * (1/M);
+        float U = r = static_cast<float>(m) * (1.0f/static_cast<float>(M));
 
         // Normalize the particle weights
         (*X_bar_t)[m].weight /= totalWeights;
@@ -317,7 +319,7 @@ float MCL::determinePointWeight(Observation z, PoseEst x_t, PointLandmark pt)
     float r_a;
 
     // Determine expected distance to the landmark
-    d_hat = hypot(pt.x - x_t.x, pt.y - x_t.y);
+    d_hat = static_cast<float>(hypot(pt.x - x_t.x, pt.y - x_t.y));
     // Expected bearing
     a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
 
@@ -373,8 +375,8 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
         ((line.y1 < line.y2) && (pt.y < line.y1 || pt.y > line.y2)) ||
         ((line.y1 > line.y2) && (pt.y > line.y1 || pt.y < line.y2))) {
         // Point is outside the bound of the bounds of the line segment
-        float d_1 = hypot(line.x1 - x_t.x, line.y1 - x_t.y);
-        float d_2 = hypot(line.x2 - x_t.x, line.y2 - x_t.y);
+        float d_1 = static_cast<float>(hypot(line.x1 - x_t.x, line.y1 - x_t.y));
+        float d_2 = static_cast<float>(hypot(line.x2 - x_t.x, line.y2 - x_t.y));
         if (d_1 < d_2) {
             d_hat = d_1;
             a_hat = atan2(line.y1 - x_t.y, line.x1 - x_t.x) - x_t.h;
@@ -386,7 +388,7 @@ float MCL::determineLineWeight(Observation z, PoseEst x_t, LineLandmark line)
     } else {
 
         // Determine nearest expected point on the line
-        d_hat = hypot(pt.x - x_t.x, pt.y - x_t.y);
+        d_hat = static_cast<float>(hypot(pt.x - x_t.x, pt.y - x_t.y));
         // Expected bearing
         a_hat = atan2(pt.y - x_t.y, pt.x - x_t.x) - x_t.h;
     }
@@ -446,15 +448,18 @@ float MCL::sampleNormalDistribution(float sd)
 {
     float samp = 0;
     for(int i = 0; i < 12; i++) {
-        samp += (2*(rand() / float(RAND_MAX)) * sd) - sd;
+        samp += (2*(static_cast<float>(rand()) /
+					static_cast<float>(RAND_MAX)) * sd) - sd;
     }
-    return 0.5*samp;
+    return 0.5f*samp;
 }
 
 float MCL::sampleTriangularDistribution(float sd)
 {
-    return sqrt(6.0)*0.5 * ((2*sd*(rand() / float(RAND_MAX))) - sd +
-                            (2*sd*(rand() / float(RAND_MAX))) - sd);
+    return std::sqrt(6.0f)*0.5f * ((2.0f*sd*(static_cast<float>(rand()) /
+								   static_cast<float>(RAND_MAX))) - sd +
+                            (2.0f*sd*(static_cast<float>(rand()) /
+								   static_cast<float>(RAND_MAX))) - sd);
 }
 
 // Particle
