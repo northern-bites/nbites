@@ -46,7 +46,7 @@ static const boost::shared_ptr<StiffnessCommand> ENABLE_GAINS =
 
 //Non blocking!!
 void RoboGuardian::playFile(string str)const{
-    system((sout+str+" &").c_str());
+    int result = system((sout+str+" &").c_str()); // system returns an int. 
 }
 
 
@@ -392,7 +392,7 @@ void RoboGuardian::executeStartupAction() const{
 void RoboGuardian::executeShutdownAction()const {
     cout << Thread::name<<" is shutting down the robot NOW!!!"<<endl;
     playFile(shutdown_wav);
-    system("shutdown -h now &");
+    int result = system("shutdown -h now &");
 }
 
 string RoboGuardian::getHostName()const {
@@ -403,11 +403,11 @@ string RoboGuardian::getHostName()const {
 }
 
 const string RoboGuardian::discoverIP() const{
-    system("/opt/naoqi/bin/ip.sh > /tmp/ip.txt");
+    int result = system("/opt/naoqi/bin/ip.sh > /tmp/ip.txt");
     char ip[100];
     FILE * ipf = fopen("/tmp/ip.txt","r");
     if(ipf != NULL){
-        fscanf(ipf,"%s\n",ip);
+        int fscanfResult = fscanf(ipf,"%s\n",ip);
         return ip;
         fclose(ipf);
     }else{
@@ -444,7 +444,7 @@ void RoboGuardian::speakIPAddress()const {
          << " my internet address is "
          <<IP<<endl;
 
-    system(speech_command.c_str());
+    int result = system(speech_command.c_str());
 }
 
 
@@ -465,5 +465,5 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
 
 void RoboGuardian::resetWifiConnection(){
     playFile(wifi_restart_wav);
-    system("/etc/init.d/wireless restart &");
+    int result = system("/etc/init.d/wireless restart &");
 }

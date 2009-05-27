@@ -166,12 +166,12 @@ float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int
     // Perfectly vertical; no need to find where the point would hit.
     // Hack.
     else if (aLine.left == aLine.right) {
-        return abs(aLine.left - x);
+        return abs( static_cast<float>(aLine.left - x) );
     }
     // A line that is not perfectly vertical but is more vertical than horizontal
     else {
         float lineX = static_cast<float>(getLineX(y, aLine));
-        return fabs(static_cast<float>(x) - lineX);
+        return abs(static_cast<float>(x) - lineX);
     }
 }
 
@@ -197,7 +197,10 @@ const float Utility::getLength(const point <const float> &p1,
 
 const float Utility::getLength(const point <const int> &p1,
                                const point <const int> &p2) {
-    return getLength(p1.x, p1.y, p2.x, p2.y);
+    return getLength( static_cast<float>(p1.x),
+					  static_cast<float>(p1.y),
+					  static_cast<float>(p2.x),
+					  static_cast<float>(p2.y) );
 }
 
 
@@ -205,7 +208,7 @@ const float Utility::getLength(const point <const int> &p1,
 // get angle between two lines
 // http://www.tpub.com/math2/5.htm
 float Utility::getAngle(const VisualLine& line1, const VisualLine& line2) {
-    return DEG_OVER_RAD * atan((line2.a - line1.a) / (1 + line1.a * line2.a));
+    return TO_DEG * atan((line2.a - line1.a) / (1 + line1.a * line2.a));
 }
 
 float Utility::getAngle(int x1, int y1, int x2, int y2) {
@@ -214,13 +217,13 @@ float Utility::getAngle(int x1, int y1, int x2, int y2) {
         else         return 90.0;
     }
     // y1-y2 due to flipped coordinate system
-    return DEG_OVER_RAD * atan( static_cast<float>(y1-y2) / static_cast<float>(x2-x1) );
+    return TO_DEG * atan( static_cast<float>(y1-y2) / static_cast<float>(x2-x1) );
 }
 
 
 // get y-coord with given x-coord, slopoe, and y-intercept
 int Utility::getLineY(int x, float y_intercept, float slope) {
-    return NBMath::ROUND(y_intercept+slope*x);
+    return NBMath::ROUND( y_intercept + slope*static_cast<float>(x) );
 }
 
 int Utility::getLineY(int x, const VisualLine &aLine) {
@@ -231,7 +234,8 @@ int Utility::getLineY(int x, const VisualLine &aLine) {
 // get x-coord with given y-coord, slope, and y-intercept
 int Utility::getLineX(int y, float y_intercept, float slope) {
     if (slope != 0) {
-        return NBMath::ROUND((float)(y - y_intercept)/(float)slope);
+        return NBMath::ROUND( static_cast<float>(y) - y_intercept /
+							  static_cast<float>(slope) );
     }
     return 0;
 }
@@ -243,7 +247,7 @@ int Utility::getLineX(int y, const VisualLine &aLine) {
 
 // get y-intercept given line slope plus a point the line goes through
 float Utility::getInterceptY(int x1, int y1, float slope){
-    return (-slope*x1 + y1);
+    return ( -slope*static_cast<float>(x1) + static_cast<float>(y1) );
 }
 
 // Returns the (x, y) coordinate where the two lines intersect, or (NO_INTERSECTION, NO_INTERSECTION)
@@ -401,7 +405,7 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
     }
 
     // Can divide with impunity now that we've removed chance of division by 0
-    float slope = (y2 - y1)/(float)(x2 - x1);
+    float slope = static_cast<float>((y2 - y1))/static_cast<float>((x2 - x1));
 
     // Horizontal line
     if (slope == 0) {
@@ -433,26 +437,26 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
     // slope.
 
     float alpha = atan(slope);
-    float betaX = paraBuff * cos(alpha);
-    float betaY = paraBuff * sin(alpha);
+    float betaX = static_cast<float>(paraBuff) * cos(alpha);
+    float betaY = static_cast<float>(paraBuff) * sin(alpha);
 
-    float orthoSlope = -1.0 / slope;
+    float orthoSlope = -1.0f / slope;
 
     float theta = atan(orthoSlope);
-    float deltaX = orthoBuff * cos(theta);
-    float deltaY = orthoBuff * sin(theta);
+    float deltaX = static_cast<float>(orthoBuff) * cos(theta);
+    float deltaY = static_cast<float>(orthoBuff) * sin(theta);
 
-    box.corners[0].x = (int)(x1 + deltaX - betaX);
-    box.corners[0].y = (int)(y1 + deltaY - betaY);
+    box.corners[0].x = x1 + static_cast<int>(deltaX - betaX);
+    box.corners[0].y = y1 + static_cast<int>(deltaY - betaY);
 
-    box.corners[1].x = (int)(x1 - deltaX - betaX);
-    box.corners[1].y = (int)(y1 - deltaY - betaY);
+	box.corners[1].x = x1 - static_cast<int>(deltaX - betaX);
+    box.corners[1].y = y1 - static_cast<int>(deltaY - betaY);
 
-    box.corners[2].x = (int)(x2 - deltaX + betaX);
-    box.corners[2].y = (int)(y2 - deltaY + betaY);
+    box.corners[2].x = x2 - static_cast<int>(deltaX + betaX);
+    box.corners[2].y = y2 - static_cast<int>(deltaY + betaY);
 
-    box.corners[3].x = (int)(x2 + deltaX + betaX);
-    box.corners[3].y = (int)(y2 + deltaY + betaY);
+    box.corners[3].x = x2 + static_cast<int>(deltaX + betaX);
+    box.corners[3].y = y2 + static_cast<int>(deltaY + betaY);
 
     return box;
 
@@ -519,13 +523,15 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
     float slope = (float) (line1end.y - line1start.y) /
         (float) (line1end.x - line1start.x);
 
-    float intercept = line1end.y - slope * line1end.x;
+    float intercept = static_cast<float>(line1end.y) -
+		slope * static_cast<float>(line1end.x);
+
     // Determine the y value of line at x value of plumbline
-    float y = slope * plumbTop.x + intercept;
+    float y = slope * static_cast<float>(plumbTop.x) + intercept;
 
     if (y >= plumbTop.y && y <= plumbBottom.y) {
         intersection.first = plumbTop.x;
-        intersection.second = (int) y;
+        intersection.second = static_cast<int>(y);
     }
     // if y weren't in the range of the plumb line, then return NO_INTERSECTION, NO_INTERSECTION.
     return intersection;
@@ -610,16 +616,19 @@ int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
 }
 
 bool Utility::boxContainsPoint(BoundingBox box, int x, int y) {
-    float xCoords[] = {box.corners[0].x,
-                       box.corners[1].x,
-                       box.corners[2].x,
-                       box.corners[3].x};
-    float yCoords[] = {box.corners[0].y,
-                       box.corners[1].y,
-                       box.corners[2].y,
-                       box.corners[3].y};
+    float xCoords[] = { static_cast<float>(box.corners[0].x),
+						static_cast<float>(box.corners[1].x),
+						static_cast<float>(box.corners[2].x),
+						static_cast<float>(box.corners[3].x) };
+
+    float yCoords[] = { static_cast<float>(box.corners[0].y),
+						static_cast<float>(box.corners[1].y),
+						static_cast<float>(box.corners[2].y),
+						static_cast<float>(box.corners[3].y) };
     // pnpoly returns 1 iff point is within the polygon described
-    return static_cast<bool>(pnpoly(4, xCoords, yCoords, x, y));
+    return static_cast<bool>(pnpoly(4, xCoords, yCoords,
+									static_cast<float>(x),
+									static_cast<float>(y)));
 }
 
 

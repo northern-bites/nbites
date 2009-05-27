@@ -47,7 +47,7 @@ public:
     int peekNumClicks() const { return numClicks; };
     int getAndClearNumClicks() const;
     float getClickLength() const  //in seconds
-        { return float(buttonOnCounter) / fps; };
+        { return static_cast<float>(buttonOnCounter) / static_cast<float>(fps); };
 
 private:
     void setNumClicks(int _numClicks) ;

@@ -21,7 +21,7 @@
 #ifndef CoordFrame_h_DEFINED
 #define CoordFrame_h_DEFINED
 
-#include <cmath>
+#include <math.h>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -47,8 +47,8 @@ namespace CoordFrame3D{
         NBMath::ufmatrix3 rot =
             boost::numeric::ublas::identity_matrix <float>(3);
 
-        const float sinAngle = sin(angle);
-        const float cosAngle = cos(angle);
+        const float sinAngle = std::sin(angle);
+        const float cosAngle = std::cos(angle);
         if (angle == 0.0) { //OPTIMIZAION POINT
             return rot;
         }

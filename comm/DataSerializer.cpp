@@ -515,7 +515,7 @@ DataSerializer::read_floats (float *data, int len) throw(socket_error&)
   read_array_header(TYPE_FLOAT_ARRAY, len * SIZEOF_FLOAT);
 
   for (int i = 0; i < len; i++)
-    data[i] = raw_read_int();
+	  data[i] = static_cast<float>(raw_read_int());
 }
 
 void
@@ -524,7 +524,7 @@ DataSerializer::read_doubles (double *data, int len) throw(socket_error&)
   read_array_header(TYPE_DOUBLE_ARRAY, len * SIZEOF_DOUBLE);
 
   for (int i = 0; i < len; i++)
-    data[i] = raw_read_long();
+	  data[i] = static_cast<double>( raw_read_long() );
 }
 
 

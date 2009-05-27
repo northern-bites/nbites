@@ -845,9 +845,9 @@ Comm::parse_packet (const CommPacketHeader &packet, const char* data, int size)
   int len = size / sizeof(float);
 
   vector<float> v(len + 3);
-  v[0] = packet.team;
-  v[1] = packet.player;
-  v[2] = packet.color;
+  v[0] = static_cast<float>(packet.team);
+  v[1] = static_cast<float>(packet.player);
+  v[2] = static_cast<float>(packet.color);
   memcpy(&v[3], data, len * sizeof(float));
 
   if (latest->size() >= MAX_MESSAGE_MEMORY)
@@ -891,7 +891,7 @@ RangeBearingMeasurement Comm::getTeammateBallReport()
     float ballYUncert = 0.0f;
     for (i = latest->begin(); i != latest->end(); ++i) {
         // Get the combined uncert x and y
-        float curUncert = hypot((*i)[6],(*i)[7]);
+        float curUncert = static_cast<float>( hypot((*i)[6],(*i)[7]) );
 
         // If the teammate sees the ball and its uncertainty is less than the
         if ((*i)[13] > 0.0 && curUncert < minUncert) {
