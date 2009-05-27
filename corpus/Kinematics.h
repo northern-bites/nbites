@@ -21,7 +21,7 @@
 #include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
 #include <boost/numeric/ublas/io.hpp>              // for cout
 
-#include <cmath>
+#include <math.h>
 #include "NBMath.h"
 #include "NBMatrixMath.h"
 
@@ -52,8 +52,8 @@ namespace Kinematics {
         boost::numeric::ublas::matrix <float> rot = boost::numeric::ublas::identity_matrix <float>(4);
 
         //TODO: Make this one call:
-        const float sinAngle = (float)sin(angle);
-        const float cosAngle = (float)cos(angle);
+        const float sinAngle = std::sin(angle);
+        const float cosAngle = std::cos(angle);
         if (angle == 0.0) { //OPTIMIZAION POINT
             return rot;
         }
@@ -281,20 +281,20 @@ namespace Kinematics {
     //from $AL_DIR/doc/reddoc
     //M=motor r = reduction ratio
 
-    static const float M1R1_NOMINAL = 0.0658;
-    static const float M1R2_NOMINAL = 0.1012;
-    static const float M2R1_NOMINAL = 0.1227;
-    static const float M2R2_NOMINAL = 0.1065;
+    static const float M1R1_NOMINAL = 0.0658f;
+    static const float M1R2_NOMINAL = 0.1012f;
+    static const float M2R1_NOMINAL = 0.1227f;
+    static const float M2R2_NOMINAL = 0.1065f;
 
-    static const float M1R1_NO_LOAD = 0.08308;
-    static const float M1R2_NO_LOAD = 0.1279;
-    static const float M2R1_NO_LOAD = 0.16528;
-    static const float M2R2_NO_LOAD = 0.1438;
+    static const float M1R1_NO_LOAD = 0.08308f;
+    static const float M1R2_NO_LOAD = 0.1279f;
+    static const float M2R1_NO_LOAD = 0.16528f;
+    static const float M2R2_NO_LOAD = 0.1438f;
 
-    static const float M1R1_AVG = (M1R1_NOMINAL + M1R1_NO_LOAD )*0.5;
-    static const float M1R2_AVG = (M1R2_NOMINAL + M1R2_NO_LOAD )*0.5;
-    static const float M2R1_AVG = (M2R1_NOMINAL + M2R1_NO_LOAD )*0.5;
-    static const float M2R2_AVG = (M2R2_NOMINAL + M2R2_NO_LOAD )*0.5;
+    static const float M1R1_AVG = (M1R1_NOMINAL + M1R1_NO_LOAD )*0.5f;
+    static const float M1R2_AVG = (M1R2_NOMINAL + M1R2_NO_LOAD )*0.5f;
+    static const float M2R1_AVG = (M2R1_NOMINAL + M2R1_NO_LOAD )*0.5f;
+    static const float M2R2_AVG = (M2R2_NOMINAL + M2R2_NO_LOAD )*0.5f;
 
     static const float jointsMaxVelNominal[Kinematics::NUM_JOINTS] = {
         //head

@@ -22,7 +22,7 @@ const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     : sensors(s),
       walkProvider(sensors),
-	  scriptedProvider(1/50.,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
+	  scriptedProvider(1/50.0f,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
 	  headProvider(1/50.0f,sensors),
 	  curProvider(&scriptedProvider),
 	  nextProvider(&scriptedProvider),
@@ -319,8 +319,8 @@ void MotionSwitchboard::signalNextFrame(){
  * then the bad value is replaced
  */
 int MotionSwitchboard::realityCheckJoints(){
-    static const float joint_override_thresh = 0.12;//radians
-    static const float head_joint_override_thresh = 0.3;//need diff for head
+    static const float joint_override_thresh = 0.12f;//radians
+    static const float head_joint_override_thresh = 0.3f;//need diff for head
 
     int changed = 0;
     vector<float> sensorAngles = sensors->getBodyAngles();

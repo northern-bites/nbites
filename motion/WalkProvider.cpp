@@ -141,18 +141,18 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = nextGait->getWalkStance();
 
-    float max_change = -M_PI*10.0f;
+    float max_change = -M_PI_FLOAT*10.0f;
     int max_index = -1;
     for(unsigned int i = 0; i < gaitJoints->size(); i++){
 
-        if (max_change < fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)))
+        if (max_change < abs(gaitJoints->at(i) - curJoints.at(i+HEAD_JOINTS)))
             max_index = i;
-        max_change = fmax(max_change,
-                          fabs(gaitJoints->at(i)-curJoints.at(i+HEAD_JOINTS)));
+        max_change = max(max_change,
+						 fabs(gaitJoints->at(i) - curJoints.at(i+HEAD_JOINTS)));
     }
 
     // this is the max we allow, not the max the hardware can do
-    const float  MAX_RAD_PER_SEC =  M_PI*0.15;
+    const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.15f;
     float time = max_change/MAX_RAD_PER_SEC;
 
     vector<BodyJointCommand *> commands;
@@ -162,8 +162,8 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
 
     //larm: (0.,90.,0.,0.)
     //rarm: (0.,-90.,0.,0.)
-    float larm_angles[] = {0.0f, M_PI_FLOAT*0.35,0.0f,0.0f};
-    float rarm_angles[] = {0.0f,-M_PI_FLOAT*0.35,0.0f,0.0f};
+    float larm_angles[] = {0.0f, M_PI_FLOAT*0.35f,0.0f,0.0f};
+    float rarm_angles[] = {0.0f,-M_PI_FLOAT*0.35f,0.0f,0.0f};
 
     vector<float> *safe_larm = new vector<float>(larm_angles,
                                                  &larm_angles[ARM_JOINTS]);

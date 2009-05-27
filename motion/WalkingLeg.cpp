@@ -153,11 +153,12 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
 
     //HORIZONTAL PROGRESS:
     float percent_complete =
-        frameCounter/static_cast<float>(walkParams->singleSupportFrames);
+		( static_cast<float>(frameCounter) /
+		  static_cast<float>(walkParams->singleSupportFrames));
 
-    float theta = percent_complete*2.0f*M_PI;
+    float theta = percent_complete*2.0f*M_PI_FLOAT;
     float stepHeight = walkParams->stepHeight;
-    float percent_to_dest_horizontal = cycloidx(theta)/(2.0f*M_PI);
+    float percent_to_dest_horizontal = cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
     //Then we can express the destination as the proportionate distance to cover
     float dest_x = src_f(0) + percent_to_dest_horizontal*dist_to_cover_x;
@@ -233,10 +234,11 @@ const float WalkingLeg::getFootRotation(){
         return swing_src->theta;
 
     const float percent_complete =
-        frameCounter/static_cast<float>(walkParams->singleSupportFrames);
+        static_cast<float>(frameCounter) /
+		static_cast<float>(walkParams->singleSupportFrames);
 
-    const float theta = percent_complete*2.0f*M_PI;
-    const float percent_to_dest = cycloidx(theta)/(2.0f*M_PI);
+    const float theta = percent_complete*2.0f*M_PI_FLOAT;
+    const float percent_to_dest = cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
     const float end = swing_dest->theta;
     const float start = swing_src->theta;
@@ -296,8 +298,9 @@ WalkingLeg::getHipHack(const float curHYPAngle){
         // we want to raise the foot up for the first third of the step duration
         hr_offset = MAX_HIP_ANGLE_OFFSET*
             static_cast<float>(frameCounter) /
-            ((walkParams->singleSupportFrames/3));
-        if (frameCounter >= walkParams->singleSupportFrames/3.)
+            (static_cast<float>(walkParams->singleSupportFrames)/3.0f);
+        if (frameCounter >= (static_cast<float>(walkParams->singleSupportFrames)
+							 / 3.0f) )
             stage++;
 
     }
@@ -312,7 +315,8 @@ WalkingLeg::getHipHack(const float curHYPAngle){
                         MAX_HIP_ANGLE_OFFSET*
                         static_cast<float>(walkParams->singleSupportFrames
                                            -frameCounter)/
-                        (walkParams->singleSupportFrames/3));
+                        ( static_cast<float>(walkParams->singleSupportFrames)/
+						  3.0f) );
     }
 
     //we've calcuated the correct magnitude, but need to adjust for specific
@@ -320,8 +324,10 @@ WalkingLeg::getHipHack(const float curHYPAngle){
     //AND we also need to rotate some of the correction to the hip pitch motor
     // (This is kind of a HACK until we move the step lifting to be taken
     // directly into account when we determine x,y 3d targets for each leg)
-    const float hipPitchAdjustment = -hr_offset *sin(-curHYPAngle);
-    const float hipRollAdjustment = hr_offset *leg_sign* cos(-curHYPAngle);
+    const float hipPitchAdjustment = -hr_offset * std::sin(-curHYPAngle);
+    const float hipRollAdjustment = (hr_offset *
+									 static_cast<float>(leg_sign)*
+									 std::cos(-curHYPAngle) );
 
     return boost::tuple<const float, const float> (hipPitchAdjustment,
                                                    hipRollAdjustment);

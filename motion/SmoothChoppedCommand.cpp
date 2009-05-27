@@ -137,12 +137,12 @@ vector<float> SmoothChoppedCommand::getNextChainFromCycloid(int id) {
 }
 
 float SmoothChoppedCommand::getCycloidAngle(float d_theta, float t) {
-	return ( (d_theta/(2*M_PI)) * (t - sin(t)) );
+	return ( (d_theta/(2*M_PI_FLOAT)) * (t - sin(t)) );
 }
 
 float SmoothChoppedCommand::getCycloidStep( int id ) {
 	return ( ( static_cast<float>(numChopped.at(id)) /
-			   static_cast<float>(numChops) ) * M_PI*2);
+			   static_cast<float>(numChops) ) * M_PI_FLOAT*2.0f);
 }
 
 bool SmoothChoppedCommand::isChainFinished(int id) {
