@@ -1,5 +1,4 @@
 
-from .. import NogginConstants
 from . import PBConstants
 from . import Formations
 
@@ -74,7 +73,7 @@ def sTwoField(team):
 
 def sThreeField(team):
     '''
-    This is our standard strategy.  Based around the 2008.
+    This is our pulled goalie strategy.
     '''
     # Game Ready Setup
     if team.brain.gameController.currentState == 'gameReady' or\

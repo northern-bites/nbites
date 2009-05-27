@@ -115,8 +115,6 @@ class GoTeam:
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
         # Now we look at game strategies
-        if True:
-            return Strategies.sTwoField(self)
         elif self.numActiveFieldPlayers == 0:
             return Strategies.sNoFieldPlayers(self)
         elif self.numActiveFieldPlayers == 1:
