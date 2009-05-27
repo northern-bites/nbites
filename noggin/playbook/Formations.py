@@ -1,5 +1,3 @@
-
-
 from . import Roles
 from . import SubRoles
 from . import PBConstants
@@ -13,9 +11,7 @@ def fNoFieldPlayers(team):
             PBConstants.INIT_SUB_ROLE, [0,0] ]
 
 def fOneField(team):
-    """
-    Formation for one field player
-    """
+    """Formation for one field player"""
     if team.me.isGoalie():
         return [PBConstants.ONE_FIELD] + Roles.rGoalie(team)
 
@@ -60,7 +56,7 @@ def fDubD(team):
         # Figure out who isn't penalized with you
         other_teammate = team.getOtherActiveTeammate()
 
-        # Determine if we should have two defenders or a defender 
+        # Determine if we should have two defenders or a defender
         # and a middie dependent on score differential
         pos1 = PBConstants.LEFT_DEEP_BACK_POS
         pos2 = PBConstants.RIGHT_DEEP_BACK_POS
@@ -103,7 +99,7 @@ def fKickoffPlay(team):
     if team.brain.my.playerNumber == 2:
         return [PBConstants.KICKOFF_PLAY, PBConstants.DEFENDER] + \
             SubRoles.pKickoffPlaySweeper(team)
-    elif team.brain.my.playerNumber == 3:
+    elif team.brain.my.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
         return [PBConstants.KICKOFF_PLAY] + Roles.rChaser(team)
 
 def fTwoKickoff(team):
@@ -114,7 +110,7 @@ def fTwoKickoff(team):
         #team.me.role = PBConstants.DEFENDER
         return [PBConstants.KICKOFF,PBConstants.DEFENDER] + \
             SubRoles.pKickoffSweeper(team)
-    elif team.me.playerNumber == 3:
+    elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
         #team.me.role = PBConstants.CHASER
         return [PBConstants.KICKOFF] + Roles.rChaser(team)
 
@@ -138,7 +134,7 @@ def fReady(team):
             return [PBConstants.READY, PBConstants.DEFENDER] + \
                 SubRoles.pReadyDefender(team)
 
-        elif team.me.playerNumber == 3:
+        elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
             return [PBConstants.READY, PBConstants.CHASER] + \
                 SubRoles.pReadyChaser(team)
 

@@ -1,4 +1,3 @@
-
 from math import (fabs, hypot)
 
 from . import PBDefs
@@ -116,13 +115,13 @@ class GoTeam:
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
         # Now we look at shorthanded strategies
-        elif self.activeMates == 0:
+        elif self.numActiveFieldPlayers == 0:
             return Strategies.sNoFieldPlayers(self)
-        elif self.activeMates == 1:
+        elif self.numActiveFieldPlayers == 1:
             return Strategies.sOneField(self)
-        elif self.activeMates == 2:
+        elif self.numActiveFieldPlayers == 2:
             return Strategies.sTwoField(self)
-        elif self.activeMates == 3:
+        elif self.numActiveFieldPlayers == 3:
             return Strategies.sThreeField(self)
 
     def updateStateInfo(self):
@@ -219,7 +218,7 @@ class GoTeam:
         self.subRole = self.currentSubRole
 
     ######################################################
-    ############       Role Switching Stuff     ##########
+    ############ Role Switching Stuff ##########
     ######################################################
     def determineChaser(self):
         '''return the player number of the chaser'''
@@ -295,7 +294,7 @@ class GoTeam:
                 return positions[1]
 
     ######################################################
-    ############       Teammate Stuff     ################
+    ############ Teammate Stuff ################
     ######################################################
 
     def aPrioriTeammateUpdate(self):
@@ -310,7 +309,7 @@ class GoTeam:
         self.pulledGoalie = self.pullTheGoalie()
         # loop through teammates
         for mate in self.teammates:
-            if (mate.isPenalized() or mate.isDead()): # 
+            if (mate.isPenalized() or mate.isDead()): #
                 #reset to false when we get a new packet from mate
                 mate.active = False
             if (mate.ballDist > 0):
@@ -328,11 +327,11 @@ class GoTeam:
 
     def getActiveFieldPlayers(self):
         '''cycles through teammate objects and returns active teammates
-           including me'''
+            including me'''
         active_teammates = []
         for mate in self.teammates:
-            if (mate.active and (!mate.isGoalie() 
-                                 or (mate.isGoalie() and self.goaliePulled))):
+            if (mate.active and (!mate.isGoalie()
+                                 or (mate.isGoalie() and self.pulledGoalie))):
                 active_teammates.append(mate)
         return active_teammates
 
@@ -371,11 +370,11 @@ class GoTeam:
         self.teammates[packet.playerNumber-1].update(packet)
 
     ######################################################
-    ############   Strategy Decision Stuff     ###########
+    ############ Strategy Decision Stuff ###########
     ######################################################
     def shouldUseDubD(self):
         return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y -5.  and
+                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
                 (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
                  self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
@@ -432,8 +431,7 @@ class GoTeam:
 
         for mate in self.teammates:
             if (mate.active and (mate.calledRole == PBConstants.CHASER
-                                       or mate.calledRole ==
-                                       PBConstants.SEARCHER)):
+                                   or mate.calledRole == PBConstants.SEARCHER)):
                 return False
         return True
 
@@ -444,7 +442,7 @@ class GoTeam:
         return False
 
 ################################################################################
-#####################     Utility Functions      ###############################
+##################### Utility Functions ###############################
 ################################################################################
 
     def getTime(self):
