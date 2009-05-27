@@ -3,6 +3,9 @@
 
 #include "ThreadedImageTranscriber.h"
 
+#include <webots/robot.h>
+#include <webots/camera.h>
+
 class WBImageTranscriber : public ImageTranscriber{
 public:
     WBImageTranscriber(boost::shared_ptr<Sensors> s);
@@ -10,8 +13,12 @@ public:
 
     void releaseImage();
 
-private:
+public:
     void waitForImage();
+
+private: //members
+    WbDeviceTag camera;
+
 };
 
 #endif

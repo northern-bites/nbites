@@ -107,6 +107,7 @@ int main() {
 
     wb_robot_step(time_step);
     transcriber->postMotionSensors();
+    imageTranscriber->waitForImage();
 
 //     const double *acc_values = wb_accelerometer_get_values (acc);
 //     printf("accelerometers: x: %f, y: %f, z: %f\n",
