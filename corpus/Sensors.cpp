@@ -77,9 +77,6 @@ Sensors::Sensors ()
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
-
-    char * frm_folder = getenv("HOME");
-    cout << "The HOME folder is  " << string(frm_folder) <<endl;
 }
 
 Sensors::~Sensors ()
