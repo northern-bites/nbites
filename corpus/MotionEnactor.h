@@ -57,6 +57,7 @@ public:
     virtual void postSensors() = 0;
 
     void setSwitchboard(MotionSwitchboard * s){
+        std::cout << "Switchboard Set" <<std::endl;
         switchboard = s;
         switchboardSet = true;
     }

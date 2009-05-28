@@ -108,7 +108,7 @@ void MotionSwitchboard::run() {
     //IMPORTANT Before anything else happens we need to put the correct
     //angles into sensors->motionBodyAngles:
     sensors->setMotionBodyAngles(sensors->getBodyAngles());
-
+    cout << "Switchboard is here..." <<endl;
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
     pthread_mutex_unlock(&calc_new_joints_mutex);
@@ -135,6 +135,8 @@ void MotionSwitchboard::run() {
 }
 
 int MotionSwitchboard::processProviders(){
+
+
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
 
@@ -181,6 +183,7 @@ int MotionSwitchboard::processProviders(){
 		const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
 		const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
 		const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
+
 		const vector <float > larmJoints = curProvider->getChainJoints(LARM_CHAIN);
 
 		//Copy the new values into place, and wait to be signaled.

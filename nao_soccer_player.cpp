@@ -55,7 +55,7 @@ void WBCreateMan(){
                                               imageTranscriber,
                                               enactor,
                                               synchro));
-    //man->startSubThreads();
+    man->startSubThreads();
 }
 
 void WBDestroyMan(){
@@ -108,23 +108,20 @@ int main() {
     wb_robot_step(time_step);
 
     //step motion
-    transcriber->postMotionSensors();
     enactor->sendCommands();
     enactor->postSensors();
-
     //step vision
     transcriber->postVisionSensors();
     imageTranscriber->waitForImage();
 
     //step motion (2nd time)
     //step motion
-    transcriber->postMotionSensors();
+    usleep(2000);
     enactor->sendCommands();
     enactor->postSensors();
 
     //sensors->saveFrame();
     //sleep before ending the loop?
-    //usleep(10000);
 
     //imageTranscriber->waitForImage();
     

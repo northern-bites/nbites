@@ -5,6 +5,8 @@
 #include "Transcriber.h"
 #include "ThreadedMotionEnactor.h"
 
+#include <webots/robot.h>
+
 class WBEnactor : public MotionEnactor {
 public:
     WBEnactor(boost::shared_ptr<Sensors> _sensors,
@@ -22,6 +24,9 @@ protected:
     static const float MOTION_FRAME_LENGTH_uS; // in microseconds
     static const float MOTION_FRAME_LENGTH_S; // in seconds
 
+private:
+    std::vector<float> motionValues;
+    std::vector<WbDeviceTag> jointDevices;
 };
 
 #endif

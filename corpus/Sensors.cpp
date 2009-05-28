@@ -50,6 +50,7 @@ Sensors::Sensors ()
     : bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
       motionBodyAngles(NUM_ACTUATORS),
       bodyAnglesError(NUM_ACTUATORS),
+      bodyTemperatures(NUM_ACTUATORS,0.0f),
       leftFootFSR(0.0f, 0.0f, 0.0f, 0.0f),
       rightFootFSR(leftFootFSR),
       leftFootBumper(0.0f, 0.0f),
