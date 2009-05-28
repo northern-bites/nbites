@@ -26,7 +26,7 @@ public:
 private:
     void setTwoYUV(unsigned char *image, const int baseIndex,
                    const YUV yuv1, const YUV yuv2);
-    const YUV getWBYUV(const unsigned char image[], const int baseIndex);
+    const YUV getWBYUVFromRGB(const unsigned char image[], const int baseIndex);
 
 private: //members
     WbDeviceTag camera;

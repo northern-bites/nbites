@@ -37,21 +37,21 @@ WBImageTranscriber::~WBImageTranscriber(){}
 void WBImageTranscriber::releaseImage(){}
 
 
-const YUV WBImageTranscriber::getWBYUV(const unsigned char * wimage,
+const YUV WBImageTranscriber::getWBYUVFromRGB(const unsigned char * wimage,
                                        const int baseIndex){
-    const float R = wimage[baseIndex + 0];
-    const float G = wimage[baseIndex + 1];
-    const float B = wimage[baseIndex + 2];
+    const int R = wimage[baseIndex + 0];
+    const int G = wimage[baseIndex + 1];
+    const int B = wimage[baseIndex + 2];
 
-    const unsigned char Y =16 + (static_cast<int>( 65.738 * R +
-                                                   129.057 * G +
-                                                   25.064 * B  )) >> 8;
-    const unsigned char U =128 + (static_cast<int>(-37.945 * R +
-                                                   -74.494 * G +
-                                                   112.439 * B  )) >> 8;
-    const unsigned char V =128 + (static_cast<int>(112.439 * R +
-                                                   -97.154 * G +
-                                                   -18.285 * B  )) >> 8;
+    const unsigned char Y =16 + (( 66 * R +
+                                                   129 * G +
+                                                   25 * B   + 128)) >> 8;
+    const unsigned char U =128 + ((-38 * R +
+                                                   -74 * G +
+                                                   112 * B  +128)) >> 8;
+    const unsigned char V =128 + ((112 * R +
+                                                   -94 * G +
+                                                   -18 * B  +128)) >> 8;
     const YUV result = {Y,U,V};
     return result;
 }
@@ -83,79 +83,30 @@ void WBImageTranscriber::waitForImage(){
             const int baseIndex2 = baseIndex + 3;
 
             //start by converting the RGB values into corresponding YUV
-            const YUV yuv1 = getWBYUV(wbimage, baseIndex);
-            const YUV yuv2 = getWBYUV(wbimage, baseIndex2);
+            const YUV yuv1 = getWBYUVFromRGB(wbimage, baseIndex);
+            const YUV yuv2 = getWBYUVFromRGB(wbimage, baseIndex2);
+            
 
-
-
-            const int yuvBaseIndex = (i*IMAGE_WIDTH/2 + j)*4;
-            const int yuvBaseIndex2 = (i*IMAGE_WIDTH/2 + j +1)*4;
-            const int yuvBaseIndex3 = ((i+1)*IMAGE_WIDTH/2 + j)*4;
-            const int yuvBaseIndex4 = ((i+1)*IMAGE_WIDTH/2 + j +1)*4;
-            const int yuvBaseIndex5 = ((i+2)*IMAGE_WIDTH/2 + j)*4;
-            const int yuvBaseIndex6 = ((i+2)*IMAGE_WIDTH/2 + j +1)*4;
-            const int yuvBaseIndex7 = ((i+3)*IMAGE_WIDTH/2 + j)*4;
-            const int yuvBaseIndex8 = ((i+3)*IMAGE_WIDTH/2 + j +1)*4;
-
-            if(i  == 0 && j == 0){
-                cout << "YUV at 60,80 is "<< (int)yuv1.Y <<","
-                     << (int)yuv1.U<<"," <<(int)yuv1.V<<endl;
-                cout << "RGB at 60,80 is "<< (int)wbimage[baseIndex + 0] <<","
-                     << (int)wbimage[baseIndex + 1]<<","
-                     <<(int)wbimage[baseIndex + 2]<<endl;
-
-                cout << "yuv indices :" << yuvBaseIndex << ","
-                     << yuvBaseIndex2 << ","
-                     << yuvBaseIndex3 << ","
-                     << yuvBaseIndex4 << ","<<endl;
-            }
-            //Now, we need to back the values in like YUYV, but we also need
-            //to place them in four places...
-
-//            const int yuvBaseIndex = (i*IMAGE_WIDTH + j)*4;
-//             setTwoYUV(image,yuvBaseIndex,yuv1,yuv2);
-//             
-
-            const YUV test1 = {87,245,4};
-            const YUV test2 = {87,245,4};
-
-            setTwoYUV(image,yuvBaseIndex,yuv1,yuv2);
-            setTwoYUV(image,yuvBaseIndex2,yuv1,yuv2);
-            setTwoYUV(image,yuvBaseIndex3,yuv1,yuv2);
-            setTwoYUV(image,yuvBaseIndex4,yuv1,yuv2);
-            setTwoYUV(image,yuvBaseIndex5,yuv1,yuv2);
-            setTwoYUV(image,yuvBaseIndex6,yuv1,yuv2);
-            setTwoYUV(image,yuvBaseIndex7,yuv1,yuv2);
-            setTwoYUV(image,yuvBaseIndex8,yuv1,yuv2);
-
-//             for(int k = i*HEIGHT_SCALE;
-//                 k<(i + HEIGHT_SCALE-1)*HEIGHT_SCALE; k++ ){
-//                 for(int l = j*WIDTH_SCALE;
-//                     j<(j +WIDTH_SCALE-1)*WIDTH_SCALE; l+=2){
-
-//                     const int yuvBaseIndex = (k*IMAGE_WIDTH + l)*4;
-//                     cout << "yuvbaseindex" << yuvBaseIndex<<endl;
-//                     maxIndex = std::max(maxIndex,yuvBaseIndex);
-//                     //setTwoYUV(image,yuvBaseIndex,yuv1,yuv2);
-//                     setTwoYUV(&image[0],yuvBaseIndex,test1,test2);
-//                 }
-//             }
-            //This means we are throwing out every other U and V value
-
+            const int yuvIndex = (i*HEIGHT_SCALE*IMAGE_WIDTH + j*WIDTH_SCALE)*2;
+            setTwoYUV(image,yuvIndex,yuv1,yuv2);
+            setTwoYUV(image,yuvIndex+4,yuv1,yuv2);
+            setTwoYUV(image,yuvIndex+IMAGE_WIDTH*2,yuv1,yuv2);
+            setTwoYUV(image,yuvIndex+IMAGE_WIDTH*2+4,yuv1,yuv2);
         }
     }
+
     cout << "Max index was balls" << maxIndex<<endl;
     //Tell sensors that we have a new image for it
     sensors->lockImage();
     sensors->setImage(image);
     sensors->releaseImage();
 
-
+    const int testIndex = 60 * IMAGE_WIDTH + 80;
     cout << "The values of first four rows of the image are "<<
-        (int)image[0]<< ","<<
-        (int)image[640]<< ","<<
-        (int)image[1280]<< ","<<
-        (int)image[1920]<< ","<<endl;
+        (int)image[testIndex]<< ","<<
+        (int)image[testIndex + 1]<< ","<<
+        (int)image[testIndex + 2]<< ","<<
+        (int)image[testIndex + 3]<< ","<<endl;
     subscriber->notifyNextVisionImage();
 }
 
