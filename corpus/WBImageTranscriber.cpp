@@ -1,6 +1,6 @@
 #include "WBImageTranscriber.h"
 #include "VisionDef.h"
-
+#include <webots/servo.h>
 using boost::shared_ptr;
 using namespace std;
 
@@ -28,6 +28,10 @@ WBImageTranscriber::WBImageTranscriber(shared_ptr<Sensors> s)
     for (int i =0; i< IMAGE_BYTE_SIZE; i++){
         image[i] = 0;
     }
+
+    WbDeviceTag camServo  = wb_robot_get_device("CameraSelect");
+    wb_servo_enable_position(camServo,20);
+    wb_servo_set_position(camServo,0.6981);
 }
 
 
