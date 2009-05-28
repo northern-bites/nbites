@@ -6,28 +6,28 @@ import BrunswickGoalieTransitions as helper
 CENTER_SAVE_THRESH = 15.
 
 def goaliePosition(player):
-    if player.shouldSave(player):
+    if helper.shouldSave(player):
         return player.goNow('goalieSave')
-    #for now we don't want the goalie trying to move
+    elif player.brain.playbook.subRole == "GOALIE_CHASER":
+        return player.goNow('chase')
     return player.goLater('goalieAtPosition')
-    '''
-    
+    #for now we don't want the goalie trying to move
+    #return player.goLater('goalieAtPosition')
     position = player.brain.playbook.position
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
         #keep constant x,y change signs only
-        player.brain.nav.setWalk(x,y,0)
+        player.brain.nav.goTo(position[0], position[1], player.brain.ball.locBearing)
     if player.brain.nav.destX != position[0] or \
             player.brain.nav.destY != position[1]:
-        player.brain.nav.setWalk(x,y,0)
+        player.brain.nav.goTo(position[0], position[1], player.brain.ball.locBearing)
 
     # we're at the point, let's switch to another state
     if player.brain.nav.isStopped() and player.counter > 0:
         return player.goLater('goalieAtPosition')
 
     return player.stay()
-    '''
 
 def goalieAtPosition(player):
     """
@@ -35,12 +35,8 @@ def goalieAtPosition(player):
     """
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
-    if player.brain.playbook.subRole == "GOALIE_CHASER":
-        #there is chase positioning in playbook, but if the goalie
-        #needs to be chasing then ball is close enough that relative position
-        #should be better
-        #return player.goNow('chase')
-        pass
+    elif player.brain.playbook.subRole == "GOALIE_CHASER":
+        return player.goNow('chase')
     if player.firstFrame():
         player.stopWalking()
     
