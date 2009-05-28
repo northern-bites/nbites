@@ -44,22 +44,19 @@ const YUV WBImageTranscriber::getWBYUVFromRGB(const unsigned char * wimage,
     const int G = wimage[baseIndex + 1];
     const int B = wimage[baseIndex + 2];
 
+    //This formula was reverse engineered from the forumla in the TOOL using
+    //mathmematica (just solving an eq in 3 vars)
+    //And then the U and V channels were switched.  The formula is the same
+    //as the one published, except it has R and B switched in the input
     const unsigned char Y = 16+ (( 25 * R + 129 * G + 66*B)>>8);
     const unsigned char V = 128+ (( 112 * R + -74 * G + -37*B)>>8);
     const unsigned char U = 128+ (( -18 * R + -94 * G + 112*B)>>8);
-//     const int R = wimage[baseIndex + 0];
-//     const int G = wimage[baseIndex + 1];
-//     const int B = wimage[baseIndex + 2];
 
-//     const unsigned char Y =16 + (( 66 * R +
-//                                                    129 * G +
-//                                                    25 * B   + 128)) >> 8;
-//     const unsigned char U =128 + ((-38 * R +
-//                                                    -74 * G +
-//                                                    112 * B  +128)) >> 8;
-//     const unsigned char V =128 + ((112 * R +
-//                                                    -94 * G +
-//                                                    -18 * B  +128)) >> 8;
+//This is the old "correct" forumla
+//     const unsigned char Y =16  + (( 66 * R + 129 * G + 25  *   + 128)) >> 8;
+//     const unsigned char U =128 + ((-38 * R - 74  * G + 112 * B + 128)) >> 8;
+//     const unsigned char V =128 + ((112 * R - 94  * G - 18  * B + 128)) >> 8;
+
     const YUV result = {Y,U,V};
     return result;
 }
@@ -76,8 +73,6 @@ void WBImageTranscriber::setTwoYUV(unsigned char *image, const int baseIndex,
 void WBImageTranscriber::waitForImage(){
     //in this case, we don't wait at all...
 
-    cout << "Height scale is  " << HEIGHT_SCALE <<endl;
-    cout << "Image width is " << IMAGE_WIDTH <<endl;
     //First, get the RGB buffer from webots
     const unsigned char *wbimage = wb_camera_get_image (camera);
 
@@ -93,8 +88,11 @@ void WBImageTranscriber::waitForImage(){
             //start by converting the RGB values into corresponding YUV
             const YUV yuv1 = getWBYUVFromRGB(wbimage, baseIndex);
             const YUV yuv2 = getWBYUVFromRGB(wbimage, baseIndex2);
-            
 
+            //TODO: (BUG). This method of expanding the image
+            //causes streaking in the final image. fixing this requires
+            //really understanding how two YUV values are packed into the same
+            //place, and probably requires only setting on YUV pixel at a time
             const int yuvIndex = (i*HEIGHT_SCALE*IMAGE_WIDTH + j*WIDTH_SCALE)*2;
             setTwoYUV(image,yuvIndex,yuv1,yuv2);
             setTwoYUV(image,yuvIndex+4,yuv1,yuv2);
@@ -103,18 +101,11 @@ void WBImageTranscriber::waitForImage(){
         }
     }
 
-    cout << "Max index was balls" << maxIndex<<endl;
     //Tell sensors that we have a new image for it
     sensors->lockImage();
     sensors->setImage(image);
     sensors->releaseImage();
 
-    const int testIndex = 60 * IMAGE_WIDTH + 80;
-    cout << "The values of first four rows of the image are "<<
-        (int)image[testIndex]<< ","<<
-        (int)image[testIndex + 1]<< ","<<
-        (int)image[testIndex + 2]<< ","<<
-        (int)image[testIndex + 3]<< ","<<endl;
     subscriber->notifyNextVisionImage();
 }
 

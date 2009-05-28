@@ -122,7 +122,7 @@ int main() {
     enactor->sendCommands();
     enactor->postSensors();
 
-    sensors->saveFrame();
+    //sensors->saveFrame();
     //sleep before ending the loop?
     //usleep(10000);
 
