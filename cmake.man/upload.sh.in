@@ -15,6 +15,10 @@ REMOTE="${REMOTE_INSTALL}"
 WEBOTS="${WEBOTS_BACKEND}"
 ROBOT=${REMOTE_ADDRESS}
 
+if [ "$WEBOTS" = "" ]; then
+    WEBOTS="OFF"
+fi
+
 NAO_CONTROLLER=projects/contests/nao_robocup/controllers/nao_soccer_player_red
 
 if [ $WEBOTS = "ON" ]; then
