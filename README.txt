@@ -96,3 +96,10 @@ is present in that list. Additionally, you must disable pythonbridge for the Pyt
 
 TROUBLESHOOTING:
 Still having trouble?  Take a look at our wiki at http://robocup.bowdoin.edu/trac. Particularly, the page http://robocup.bowdoin.edu/trac/wiki/PracticalNao might give links to more detailed instructions then those shown here.
+
+
+KNOWN BUGS:
+SIMULATOR (in robostadium contest mode without NaoQi):
+	  -angleX and angleY are calculated incorrectly (they are just 0.0)
+	  -GameController (i.e. Comm) is not working, so switching into playing is not possible
+	  -Use the "webots.mtb" table
