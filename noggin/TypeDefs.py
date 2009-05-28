@@ -1,5 +1,3 @@
-
-from math import fabs, radians, sin, cos
 import time
 
 from . import NogginConstants as Constants
@@ -502,12 +500,12 @@ class Packet:
 
     def __str__(self):
         '''returns string with all important values'''
-        return ("#%d role: %d subRole: %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %  
+        return ("#%d role: %d subRole: %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %
             (self.playerNumber,
              self.role, self.calledSubRole, self.chaseTime,
-             self.playerX, self.playerY, self.playerH, 
-             self.uncertX, self.uncertY, self.uncertH, 
-             self.ballX, self.ballY, self.ballUncertX, 
+             self.playerX, self.playerY, self.playerH,
+             self.uncertX, self.uncertY, self.uncertH,
+             self.ballX, self.ballY, self.ballUncertX,
              self.ballUncertY, self.ballDist))
 
 class Sonar:

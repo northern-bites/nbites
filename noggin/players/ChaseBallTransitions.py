@@ -103,3 +103,28 @@ def shouldBeAtSpinDir(player):
          abs(ball.bearing) < constants.BALL_SPIN_POSITION_THRESH ):
         return True
     return False
+
+def shouldAvoidObstacleLeft(player):
+    sonar = player.brain.sonar
+    if (#(sonar.LLdist != sonar.UNKNOWN_VALUE and
+        # sonar.LLdist < constants.AVOID_OBSTACLE_DIST) or
+        (sonar.LRdist != sonar.UNKNOWN_VALUE and
+         sonar.LRdist < constants.AVOID_OBSTACLE_DIST)):
+        return True
+
+    return False
+
+def shouldAvoidObstacleRight(player):
+    sonar = player.brain.sonar
+    if (#(sonar.RRdist != sonar.UNKNOWN_VALUE and
+        # sonar.RRdist < constants.AVOID_OBSTACLE_DIST) or
+        (sonar.RLdist != sonar.UNKNOWN_VALUE and
+         sonar.RLdist < constants.AVOID_OBSTACLE_DIST)):
+        return True
+
+    return False
+
+def shouldAvoidObstacle(player):
+    return (shouldAvoidObstacleLeft(player) or
+            shouldAvoidObstacleRight(player))
+

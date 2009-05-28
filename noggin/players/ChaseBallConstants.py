@@ -70,3 +70,6 @@ MIN_Y_MAGNITUDE = 1.5
 # Keep track of what gait we're using
 FAST_GAIT = "fastGait"
 NORMAL_GAIT = "normalGait"
+
+# Obstacle avoidance stuff
+AVOID_OBSTACLE_DIST = 40.0 #cm

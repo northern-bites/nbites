@@ -86,11 +86,10 @@ def turnToBallFar(player):
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
 
-    if ball.on and player.stoppedWalk:
+    if ball.on and player.stoppedWalk and player.currentGait != constants.FAST_GAIT:
         player.printf("Switching to fast gait in turn to ball far")
-        if player.currentGait != constants.NORMAL_GAIT:
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
-            player.currentGait = constants.NORMAL_GAIT
+        player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.currentGait = constants.FAST_GAIT
 
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
@@ -141,6 +140,8 @@ def approachBall(player):
         return player.goLater('turnToBallFar')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
+    elif transitions.shouldAvoidObstacle(player):
+        return player.goLater('avoidObstacle')
 
     return player.stay()
 
@@ -189,8 +190,8 @@ def positionForKick(player):
 
     if transitions.shouldApproachForKick(player):
         sX = ball.locRelX
-        player.printf("Ball print x is: " +
-                      str(), "cyan")
+        player.printf("Forward speed is: " +
+                      str(sX), "cyan")
     else:
         sX = 0
 
@@ -470,4 +471,17 @@ def ignoreOwnGoal(player):
     if transitions.shouldSpinFindBall(player):
         return player.goNow('spinFindBall')
 
+    return player.stay()
+
+def avoidObstacle(player):
+    if player.firstFrame():
+        player.stopWalking()
+
+    #player.printf(player.brain.sonar)
+
+    if not transitions.shouldAvoidObstacle(player):
+        if player.brain.ball.on:
+            return player.goLater("chase")
+        else:
+            return player.goLater("scanFindBall")
     return player.stay()
