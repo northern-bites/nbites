@@ -39,19 +39,27 @@ void WBImageTranscriber::releaseImage(){}
 
 const YUV WBImageTranscriber::getWBYUVFromRGB(const unsigned char * wimage,
                                        const int baseIndex){
+
     const int R = wimage[baseIndex + 0];
     const int G = wimage[baseIndex + 1];
     const int B = wimage[baseIndex + 2];
 
-    const unsigned char Y =16 + (( 66 * R +
-                                                   129 * G +
-                                                   25 * B   + 128)) >> 8;
-    const unsigned char U =128 + ((-38 * R +
-                                                   -74 * G +
-                                                   112 * B  +128)) >> 8;
-    const unsigned char V =128 + ((112 * R +
-                                                   -94 * G +
-                                                   -18 * B  +128)) >> 8;
+    const unsigned char Y = 16+ (( 25 * R + 129 * G + 66*B)>>8);
+    const unsigned char V = 128+ (( 112 * R + -74 * G + -37*B)>>8);
+    const unsigned char U = 128+ (( -18 * R + -94 * G + 112*B)>>8);
+//     const int R = wimage[baseIndex + 0];
+//     const int G = wimage[baseIndex + 1];
+//     const int B = wimage[baseIndex + 2];
+
+//     const unsigned char Y =16 + (( 66 * R +
+//                                                    129 * G +
+//                                                    25 * B   + 128)) >> 8;
+//     const unsigned char U =128 + ((-38 * R +
+//                                                    -74 * G +
+//                                                    112 * B  +128)) >> 8;
+//     const unsigned char V =128 + ((112 * R +
+//                                                    -94 * G +
+//                                                    -18 * B  +128)) >> 8;
     const YUV result = {Y,U,V};
     return result;
 }
