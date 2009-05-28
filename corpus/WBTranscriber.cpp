@@ -4,6 +4,7 @@
 #include <webots/gyro.h>
 #include <webots/servo.h>
 #include <webots/touch_sensor.h>
+#include <webots/distance_sensor.h>
 
 #include "Kinematics.h"
 using boost::shared_ptr;
@@ -35,6 +36,16 @@ WBTranscriber::WBTranscriber(shared_ptr<Sensors> s)
     wb_accelerometer_enable (acc, 20);
     wb_gyro_enable (gyro, 20);
 
+    us1 = wb_robot_get_device("US/TopRight");
+    us2 = wb_robot_get_device("US/BottomRight");
+    us3 = wb_robot_get_device("US/TopLeft");
+    us4 = wb_robot_get_device("US/BottomLeft");
+
+    wb_distance_sensor_enable(us1,40);
+    wb_distance_sensor_enable(us2,40);
+    wb_distance_sensor_enable(us3,40);
+    wb_distance_sensor_enable(us4,40);
+
     //enable the FSRs
     for(unsigned int fsr = 0; fsr < NUM_FSR; fsr++){
         fsrDevices[fsr] = wb_robot_get_device(FSR_CORE[fsr].c_str());
@@ -47,7 +58,38 @@ WBTranscriber::~WBTranscriber(){}
 
 
 
-void WBTranscriber::postVisionSensors(){}
+void WBTranscriber::postVisionSensors(){
+    //The following sensors need to updated on the vision cycle
+    //Bumpers
+    //Battery
+    //UltraSound
+    const float lFBL = 0.0f;
+    const float rFBL = 0.0f;
+    const float lFBR = 0.0f;
+    const float rFBR = 0.0f;
+
+    const float usd1 = wb_distance_sensor_get_value(us1);
+    const float usd2 = wb_distance_sensor_get_value(us2);
+    const float usd3 = wb_distance_sensor_get_value(us3);
+    const float usd4 = wb_distance_sensor_get_value(us4);
+
+    const int ultraSoundMode =0;
+
+    const float usDist =  std::min(
+        std::min(usd1,usd2),
+        std::min(usd3,usd4));
+
+    const float batteryCharge = 1.0;
+    const float batteryCurrent = 0.0;
+    sensors->
+        setVisionSensors(FootBumper(lFBL, rFBL),
+                         FootBumper(lFBR, rFBR),
+                         usDist,
+                         // UltraSoundMode is just an enum
+                         static_cast<UltraSoundMode> (ultraSoundMode),
+                         batteryCharge,
+                         batteryCurrent);
+}
 void WBTranscriber::postMotionSensors(){
 //The following sensors need to be updated on the motion cycle:
 //Foot sensors
