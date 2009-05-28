@@ -69,12 +69,17 @@ def turnToBallFar(player):
     ''' Rotate to align with the ball. When we get close, we will approach it '''
     ball = player.brain.ball
     if player.firstFrame():
-        player.stopWalking()
         player.brain.tracker.trackBall()
         player.currentChaseWalkX = 0
         player.currentChaseWalkY = 0
         player.currentChaseWalkTheta = 0
-        player.stoppedWalk = False
+
+        if player.currentGait != constants.FAST_GAIT:
+            player.stopWalking()
+            player.stoppedWalk = False
+        else:
+            player.stoppedWalk = True
+
 
     turnRate = MyMath.clip(ball.bearing*constants.BALL_SPIN_GAIN,
                            -constants.BALL_SPIN_SPEED,
@@ -88,7 +93,7 @@ def turnToBallFar(player):
 
     if ball.on and player.stoppedWalk and player.currentGait != constants.FAST_GAIT:
         player.printf("Switching to fast gait in turn to ball far")
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.brain.CoA.setRobotGait(player.brain.motion)
         player.currentGait = constants.FAST_GAIT
 
     if transitions.shouldPositionForKick(player):
@@ -113,11 +118,14 @@ def approachBall(player):
     Once we are alligned with the ball, approach it
     '''
     if player.firstFrame():
-        player.stopWalking()
         player.currentChaseWalkX = 0
         player.currentChaseWalkY = 0
         player.currentChaseWalkTheta = 0
-        player.stoppedWalk = False
+        if player.currentGait != constants.FAST_GAIT:
+            player.stopWalking()
+            player.stoppedWalk = False
+        else:
+            player.stoppedWalk = True
 
     ball = player.brain.ball
     sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
@@ -160,7 +168,6 @@ def positionForKick(player):
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
     if fabs(sY) < constants.MIN_Y_MAGNITUDE:
-        #sY = constants.MIN_Y_MAGNITUDE * MyMath.sign(sY)
         sY = 0.0
 
 #     player.printf("Position for kick target_y is " +
@@ -177,17 +184,6 @@ def positionForKick(player):
 #                   str(constants.BALL_KICK_LEFT_X_CLOSE) +
 #                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
 
-
-    # Set the correct gait, to make us walk better
-    if player.brain.nav.isStopped():
-        player.stoppedWalk = True
-
-    if ball.on and player.stoppedWalk:
-        player.printf("Switching to normal gait in position for kick")
-        if player.currentGait != constants.NORMAL_GAIT:
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
-            player.currentGait = constants.NORMAL_GAIT
-
     if transitions.shouldApproachForKick(player):
         sX = ball.locRelX
         player.printf("Forward speed is: " +
@@ -195,14 +191,23 @@ def positionForKick(player):
     else:
         sX = 0
 
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+
+    # Walk if we have switched to the correct gait
+    if ball.on and player.stoppedWalk:
+        # Set the correct gait, to make us walk better
+        if player.currentGait != constants.NORMAL_GAIT:
+            player.printf("Switching to normal gait in position for kick")
+            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+            player.currentGait = constants.NORMAL_GAIT
+        player.currentChaseWalkY = sY
+        player.setSpeed(0,sY,0)
 
     if transitions.shouldKick(player):
         return player.goLater('waitBeforeKick')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif ball.on:
-        player.currentChaseWalkY = sY
-        player.setSpeed(0,sY,0)
 
     return player.stay()
 
