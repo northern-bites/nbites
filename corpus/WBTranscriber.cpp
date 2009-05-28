@@ -115,8 +115,11 @@ void WBTranscriber::postMotionSensors(){
     //HACK!!!! TODO compute angleX and angleY better (filter?)
     //Currently when the gravity accell is in one direction,
     //we use that to consider that the robot is rotated along the other axis
-    const float angleX = accY/GRAVITY_mss * M_PI_FLOAT;
-    const float angleY = -accX/GRAVITY_mss * M_PI_FLOAT;
+//     const float angleX = accY/GRAVITY_mss * M_PI_FLOAT;
+//     const float angleY = -accX/GRAVITY_mss * M_PI_FLOAT;
+    //better approximation, for now
+    const float angleX = 0.0f;
+    const float angleY = 0.0f;
 
     Inertial wbInertial= Inertial(accX,accY,accZ,gyroX,gyroY,angleX,angleY);
 
