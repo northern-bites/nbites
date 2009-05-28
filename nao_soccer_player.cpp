@@ -106,9 +106,28 @@ int main() {
       //printf("testing balls balls\n");
 
     wb_robot_step(time_step);
+
+    //step motion
     transcriber->postMotionSensors();
+    enactor->sendCommands();
+    enactor->postSensors();
+
+    //step vision
+    transcriber->postVisionSensors();
     imageTranscriber->waitForImage();
 
+    //step motion (2nd time)
+    //step motion
+    transcriber->postMotionSensors();
+    enactor->sendCommands();
+    enactor->postSensors();
+
+    sensors->saveFrame();
+    //sleep before ending the loop?
+    //usleep(10000);
+
+    //imageTranscriber->waitForImage();
+    
 //     const double *acc_values = wb_accelerometer_get_values (acc);
 //     printf("accelerometers: x: %f, y: %f, z: %f\n",
 // 	   acc_values[0], acc_values[1], acc_values[2]);
