@@ -163,6 +163,8 @@ class Ball:
             self.on = True
             self.framesOn += 1
             self.framesOff = 0
+            self.relX = getRelativeX(self.dist, self.bearing)
+            self.relY = getRelativeY(self.dist, self.bearing)
         else:
             self.angleX = 0
             self.angleY = 0
@@ -171,9 +173,8 @@ class Ball:
             self.on = False
             self.framesOff += 1
             self.framesOn = 0
-
-            self.relX = getRelativeX(self.dist, self.bearing)
-            self.relY = getRelativeY(self.dist, self.bearing)
+            self.relX = 0.0
+            self.relY = 0.0
 
     def reportBallSeen(self):
         """

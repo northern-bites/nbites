@@ -54,9 +54,9 @@ POS_KICK_TARGET_X_GAIN = 0.5
 
 # positionForKick() values
 BALL_KICK_LEFT_Y_L = 14
-BALL_KICK_LEFT_Y_R = 2
+BALL_KICK_LEFT_Y_R = 8
 BALL_KICK_LEFT_X_CLOSE = 10
-BALL_KICK_LEFT_X_FAR = 12
+BALL_KICK_LEFT_X_FAR = 14
 
 # Values to clip are approaching speed to
 MAX_X_SPEED = 7.5
@@ -65,7 +65,7 @@ MIN_X_SPEED = -7.5
 # Values for controlling the strafing
 MAX_Y_SPEED = 3.0
 MIN_Y_SPEED = -MAX_Y_SPEED
-CHASE_Y_EPSILON = 0.75
+MIN_Y_MAGNITUDE = 1.5
 
 # Keep track of what gait we're using
 FAST_GAIT = "fastGait"

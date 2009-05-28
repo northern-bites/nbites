@@ -101,8 +101,9 @@ def turnToBallFar(player):
 
     elif MyMath.sign(player.currentChaseWalkTheta) != MyMath.sign(turnRate):
         player.currentChaseWalkTheta = turnRate
+        player.stoppedWalk = False
         player.stopWalking()
-    elif ball.on:
+    elif ball.on and player.stoppedWalk:
         player.currentChaseWalkTheta = turnRate
         player.setSpeed(x=0,y=0,theta=turnRate)
 
@@ -152,23 +153,28 @@ def positionForKick(player):
         player.stoppedWalk = False
 
     ball = player.brain.ball
-    targetY = (ball.relY - constants.BALL_KICK_LEFT_Y_R )
+    targetY = (ball.locRelY -
+               (constants.BALL_KICK_LEFT_Y_L + constants.BALL_KICK_LEFT_Y_R) / 2.0 )
     sY = MyMath.clip((targetY),
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
+    if fabs(sY) < constants.MIN_Y_MAGNITUDE:
+        #sY = constants.MIN_Y_MAGNITUDE * MyMath.sign(sY)
+        sY = 0.0
 
 #     player.printf("Position for kick target_y is " +
-#                   str(targetY))
-#     player.printf("Ball dist is: " + str(ball.dist))
+#                   str(targetY), "cyan")
+#     player.printf("Position for kick sY is " + str(sY), "cyan")
+#     player.printf("Ball dist is: " + str(ball.dist), "cyan")
 #     player.printf("Ball current y is: " +
 #                   str(ball.locRelY) + " want between " +
 #                   str(constants.BALL_KICK_LEFT_Y_L) +
 #                   " and " +
-#                   str(constants.BALL_KICK_LEFT_Y_R))
+#                   str(constants.BALL_KICK_LEFT_Y_R), "cyan")
 #     player.printf("Ball current x is: " +
 #                   str(ball.locRelX) + " want between " +
 #                   str(constants.BALL_KICK_LEFT_X_CLOSE) +
-#                   " and " + str(constants.BALL_KICK_LEFT_X_FAR))
+#                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
 
 
     # Set the correct gait, to make us walk better
@@ -183,6 +189,8 @@ def positionForKick(player):
 
     if transitions.shouldApproachForKick(player):
         sX = ball.locRelX
+        player.printf("Ball print x is: " +
+                      str(), "cyan")
     else:
         sX = 0
 
@@ -191,13 +199,9 @@ def positionForKick(player):
         return player.goLater('waitBeforeKick')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif (ball.on and MyMath.sign(player.currentChaseWalkY) !=
-          -MyMath.sign(sY)):
+    elif ball.on:
         player.currentChaseWalkY = sY
         player.setSpeed(0,sY,0)
-    elif MyMath.sign(player.currentChaseWalkY) == -MyMath.sign(sY):
-        player.currentChaseWalkY = sY
-        player.stopWalking()
 
     return player.stay()
 
