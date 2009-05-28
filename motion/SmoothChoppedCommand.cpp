@@ -74,7 +74,7 @@ void SmoothChoppedCommand::setDiffChainsToFinalJoints(
 }
 
 void SmoothChoppedCommand::subtractBodyStartFromFinalAngles() {
-	for (uint chain = 0; chain < NUM_CHAINS ; chain++ )
+	for (unsigned int chain = 0; chain < NUM_CHAINS ; chain++ )
 		subtractChainStartFromFinalAngles(chain);
 }
 
