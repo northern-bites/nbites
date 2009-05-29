@@ -368,22 +368,6 @@ RIGHT_FAR_KICK = (
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
      (80.0 , -40.0 , 50.0 , 70.0), 1.0 , 0) )
-SAVE_LEFT_DEBUG = ( ((-90,0,0,0), (), (), (), 3.0, 0))
-
-SAVE_RIGHT_DEBUG = ( ((), (), (), (-90,0,0,0), 3.0, 0))
-
-SAVE_CENTER_DEBUG = ( ((-90,0,0,0), (), (), (-90,0,0,0), 3.0, 0))
-
-SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0), (), (), (), 0.1, 0))
-SAVE_LEFT_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]), 
-                    (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 1.5, 0), )
-
-SAVE_RIGHT_DEBUG = ( ((INITIAL_POS[0][0]),(INITIAL_POS[0][1]),
-                    (INITIAL_POS[0][2]), (-90,0,0,0), 1.5, 0), )
-
-SAVE_CENTER_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
-                    (INITIAL_POS[0][2]), (-90,0,0,0), 1.5,0), )
-SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0), (), (), (-90,0,0,0), 0.1, 0))
 
 LEFT_SIDE_KICK = (
     ((80.,90.,-50.,-70.),
@@ -404,8 +388,6 @@ LEFT_SIDE_KICK = (
      (0.,23.,-13.,20.,-10.,-25.),
      (80.,-40.,50.,70.),0.2,0),
 
-SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]), 
-                        (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 0.1, 0), )
     ((80.,70.,-10.,-10.),
      (0.,23.,-13.,20.,-10.,-25.),
      (0.,20.,-13.,20.,-10.,-25.),
@@ -435,6 +417,20 @@ RIGHT_SIDE_KICK = (
      (0.0 , -20.0 , -13.0 , 20.0 , -10.0 , 25.0),
      (0.0 , -23.0 , -13.0 , 20.0 , -10.0 , 25.0),
      (80.0 , -70.0 , 10.0 , 10.0), 0.8 , 0) )
+
+# Goalie saving stuff
+SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
+                        (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 0.1, 0), )
+
+SAVE_LEFT_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
+                    (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 1.5, 0), )
+
+SAVE_RIGHT_DEBUG = ( ((INITIAL_POS[0][0]),(INITIAL_POS[0][1]),
+                    (INITIAL_POS[0][2]), (-90,0,0,0), 1.5, 0), )
+
+SAVE_CENTER_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
+                    (INITIAL_POS[0][2]), (-90,0,0,0), 1.5,0), )
+SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0), (), (), (-90,0,0,0), 0.1, 0))
 
 SAVE_RIGHT_HOLD_DEBUG = ( ((INITIAL_POS[0][0]),(INITIAL_POS[0][1]),
                             (INITIAL_POS[0][2]), (-90,0,0,0), 0.1, 0), )
