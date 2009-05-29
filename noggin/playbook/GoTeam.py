@@ -115,8 +115,6 @@ class GoTeam:
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
         # Now we look at game strategies
-        if True:
-            return Strategies.sThreeField(self)
         elif self.numActiveFieldPlayers == 0:
             return Strategies.sNoFieldPlayers(self)
         elif self.numActiveFieldPlayers == 1:
@@ -375,7 +373,6 @@ class GoTeam:
     ############ Strategy Decision Stuff ###########
     ######################################################
     def shouldUseDubD(self):
-        return True
         return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
                  self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
