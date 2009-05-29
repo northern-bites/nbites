@@ -18,7 +18,7 @@ def chase(player):
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
     elif transitions.shouldTurnToBall_ApproachBall(player):
-        return player.goNow('turnToBallFar')
+        return player.goNow('turnToBall')
     elif transitions.shouldSpinFindBall(player):
         return player.goNow('spinFindBall')
     else:
@@ -37,7 +37,7 @@ def scanFindBall(player):
         player.brain.tracker.trackBall()
         return player.goLater('positionOnBall')
     elif transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBallFar')
+        return player.goLater('turnToBall')
     elif transitions.shouldSpinFindBall(player):
         return player.goLater('spinFindBall')
 
@@ -78,11 +78,11 @@ def spinFindBall(player):
         player.brain.tracker.trackBall()
         return player.goLater('positionOnBall')
     elif transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBallFar')
+        return player.goLater('turnToBall')
 
     return player.stay()
 
-def turnToBallFar(player):
+def turnToBall(player):
     """
     Rotate to align with the ball. When we get close, we will approach it
     """
@@ -112,8 +112,6 @@ def turnToBallFar(player):
     # Determine that we have stopped walking
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
-
-
 
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
@@ -154,7 +152,7 @@ def approachBall(player):
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
-        return player.goLater('turnToBallFar')
+        return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
     elif transitions.shouldAvoidObstacle(player):
@@ -172,7 +170,7 @@ def approachBall(player):
                          constants.APPROACH_SPIN_SPEED)
     # Avoid spinning so slowly that we step in place
     if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
-        sTheta = constants.MIN_APPROACH_SPIN_SPEED
+        sTheta = 0.0
 
     # Set our walk towards the ball
     if ball.on and player.stoppedWalk:
@@ -210,7 +208,7 @@ def positionForKick(player):
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
     elif transitions.shouldTurnToBall_ApproachBall(player):
-        return player.goLater('turnToBallFar')
+        return player.goLater('turnToBall')
 
 
     # Determine approach speed
@@ -471,7 +469,7 @@ def kickBallStraight(player):
         elif transitions.shouldPositionForKick(player):
             return player.goLater('positionForKick')
         elif transitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBallFar')
+            return player.goLater('turnToBall')
 
     return player.stay()
 
@@ -512,7 +510,7 @@ def kickBallRight(player):
         elif transitions.shouldPositionForKick(player):
             return player.goLater('positionForKick')
         elif transitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBallFar')
+            return player.goLater('turnToBall')
 
     return player.stay()
 
@@ -540,7 +538,7 @@ def kickBallLeftExecute(player):
         elif transitions.shouldPositionForKick(player):
             return player.goLater('positionForKick')
         elif transitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBallFar')
+            return player.goLater('turnToBall')
 
     return player.stay()
 
