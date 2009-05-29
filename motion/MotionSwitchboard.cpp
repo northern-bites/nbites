@@ -29,7 +29,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       curGait(NULL),
       nextGait(&DEFAULT_PARAMETERS),
       nextJoints(s->getBodyAngles()),
-      nextStiffness(vector<float>(NUM_JOINTS,0.0f)),
+      nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
 	  running(false),
       newJoints(false),
       newStiffness(false),newStiffnessCommandSent(false),
@@ -48,7 +48,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     initDebugLogs();
 #endif
 
-    //temp
+    //temp - HACK
     scriptedProvider.setStiffness(0.0f);
     headProvider.setStiffness(0.0f);
     walkProvider.setStiffness(0.0f);
@@ -235,44 +235,38 @@ void MotionSwitchboard::processJoints(){
  * too much too it:
  */
 void MotionSwitchboard::processStiffness(){
-    int changed  = 0;
-    if(!newStiffnessCommandSent)
-        return;
+    if(headProvider.isActive()){
+		const vector <float > headStiffnesses = curProvider->getChainStiffnesses(LLEG_CHAIN);
 
-    pthread_mutex_lock(&stiffness_mutex);
-    //For each command, we look at each chain and see if there is anything
-    //that needs to be done
-    for(unsigned int i = HEAD_CHAIN; i <=RARM_CHAIN; i++){
-        const vector <float> stiffnesses =
-            nextStiffnessCommand->getChainStiffness((ChainID) i);
-
-        //Skip empty chains
-        if(stiffnesses.size() == 0){
-            continue;
+		pthread_mutex_lock(&stiffness_mutex);
+        for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
+            nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
         }
-        //Each chain has several joints we need to update
-        //Ignore unchanged values or when the value is explicitly
-        //set to NOT_SET
-        for(unsigned int j = 0; j < chain_lengths[i]; j ++){
-            if (nextStiffness[chain_first_joint[i] + j]
-                != stiffnesses.at(j) &&
-                stiffnesses.at(j) != StiffnessCommand::NOT_SET){
-                nextStiffness[chain_first_joint[i] + j] =
-                    stiffnesses.at(j);
-                changed += 1; //flag when a value is changed
-            }
-        }
+		pthread_mutex_unlock(&stiffness_mutex);
 
     }
 
-    newStiffnessCommandSent = false;
-    if(changed){
-        newStiffness = true;
+    if(curProvider->isActive()){
+		const vector <float > llegStiffnesses = curProvider->getChainStiffnesses(LLEG_CHAIN);
+		const vector <float > rlegStiffnesses = curProvider->getChainStiffnesses(RLEG_CHAIN);
+		const vector <float > rarmStiffnesses = curProvider->getChainStiffnesses(RARM_CHAIN);
+		const vector <float > larmStiffnesses = curProvider->getChainStiffnesses(LARM_CHAIN);
+
+		pthread_mutex_lock(&stiffness_mutex);
+        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+            nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
+        }
+        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+            nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
+        }
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+            nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
+        }
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+            nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
+        }
+        pthread_mutex_unlock(&stiffness_mutex);
     }
-
-
-    pthread_mutex_unlock(&stiffness_mutex);
-
 }
 
 
@@ -362,7 +356,7 @@ const bool MotionSwitchboard::hasNewStiffness() const {
 
 const vector<float>  MotionSwitchboard::getNextStiffness() const{
     pthread_mutex_lock(&stiffness_mutex);
-    vector<float> result(nextStiffness);
+    vector<float> result(nextStiffnesses);
     newStiffness = false;
     pthread_mutex_unlock(&stiffness_mutex);
     return result;
@@ -518,8 +512,12 @@ void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
 
 void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> command){
     pthread_mutex_lock(&stiffness_mutex);
-    nextStiffnessCommand = command;
-    newStiffnessCommandSent = true;
+    vector<float> stiff = command->getChainStiffness((ChainID) 0);
+    float newStiff = stiff[0];
+    cout << "Setting the stiffness to " << newStiff<<endl;
+    scriptedProvider.setStiffness(newStiff);
+    headProvider.setStiffness(newStiff);
+    walkProvider.setStiffness(newStiff);
     pthread_mutex_unlock(&stiffness_mutex);
 
 }

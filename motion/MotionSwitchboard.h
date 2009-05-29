@@ -120,7 +120,7 @@ private:
     const WalkingParameters *nextGait;
 
     std::vector <float> nextJoints;
-    std::vector <float> nextStiffness;
+    std::vector <float> nextStiffnesses;
 
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
