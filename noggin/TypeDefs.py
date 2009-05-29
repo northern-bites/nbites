@@ -116,6 +116,8 @@ class Ball:
          self.lastVisionAngleX,
          self.lastVisionAngleY,
          self.lastTimeSeen,
+         self.lastSeenDist,
+         self.lastSeenBearing,
          self.on) = [0]*Constants.NUM_TOTAL_BALL_VALUES
 
         self.updateVision(visionBall)
@@ -129,6 +131,10 @@ class Ball:
         self.lastVisionCenterY = self.centerY
         self.lastVisionAngleX = self.angleX
         self.lastVisionAngleY = self.angleY
+
+        if self.dist > 0:
+            self.lastSeenBearing = self.bearing
+            self.lastSeenDist = self.dist
 
         # Now update to the new stuff
         self.centerX = visionBall.centerX
@@ -148,13 +154,6 @@ class Ball:
             self.angleY = (((Constants.IMAGE_HEIGHT/2.-1) - self.centerY)/
                            Constants.IMAGE_ANGLE_Y)
 
-            # records last known visual center x, ys and stuff
-            self.lastVisionCenterX = self.centerX
-            self.lastVisionCenterY = self.centerY
-            self.lastVisionAngleX = self.angleX
-            self.lastVisionAngleY = self.angleY
-            self.lastVisionDist = self.dist
-            self.lastVisionBearing = self.bearing
             self.reportBallSeen()
             if not self.on:
                 self.prevFramesOff = self.framesOff

@@ -1,4 +1,5 @@
 import man.motion.SweetMoves as SweetMoves
+import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
 
 
@@ -20,7 +21,7 @@ def shouldCantFindBall(player):
     return False
 
 def shouldSpinFindBall(player):
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SCAN_BALL):
+    if player.stateTime >= SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL):
         return True
     return False
 

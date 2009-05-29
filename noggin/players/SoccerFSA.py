@@ -1,11 +1,11 @@
 # Soccer FSA that implements an FSA but holds all the important
 # soccer-playing functionality
 #
-# @author Jack Morrison
 #
 
 import man.motion as motion
 from man.motion import SweetMoves
+from man.motion import HeadMoves
 from ..util import FSA
 from . import CoreSoccerStates
 from man.motion import StiffnessModes
@@ -125,7 +125,7 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.tracker.switchTo('stopped')
         self.brain.motion.stopHeadMoves()
-        self.executeMove(SweetMoves.PENALIZED_HEADS)
+        self.executeMove(HeadMoves.PENALIZED_HEADS)
 
     def zeroHeads(self):
         """
@@ -133,7 +133,7 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.tracker.switchTo('stopped')
         self.brain.motion.stopHeadMoves()
-        self.executeMove(SweetMoves.ZERO_HEADS)
+        self.executeMove(HeadMoves.ZERO_HEADS)
 
 
     def executeStiffness(self,stiffnesses):
