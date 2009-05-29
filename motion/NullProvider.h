@@ -7,21 +7,31 @@
 #include "OnFreezeCommand.h"
 #include "OffFreezeCommand.h"
 
+#include "Sensors.h"
 
 class NullProvider : public MotionProvider {
 public:
-    NullProvider();
-    ~NullProvider();
+    NullProvider(boost::shared_ptr<Sensors> s, std::vector<bool> chain_mask);
+    virtual ~NullProvider();
 
-    virtual void calculateNextJointsAndStiffnesses();
-    virtual void hardReset();
+    void calculateNextJointsAndStiffnesses();
+    void hardReset(){} //Not implemented
 
-    virtual void setCommand(const boost::shared_ptr<OnFreezeCommand> command);
-    virtual void setCommand(const boost::shared_ptr<OffFreezeCommand> command);
+    void setCommand(const boost::shared_ptr<OnFreezeCommand> command);
+    void setCommand(const boost::shared_ptr<OffFreezeCommand> command);
 
 protected:
-    virtual void setActive();
-    virtual void requestStopFirstInstance();
+    void setActive();
+    void requestStopFirstInstance(){} //Not implemented
+private:
+    void readNewStiffness();
+private:
+    boost::shared_ptr<Sensors> sensors;
+    std::vector<float> currentStiffness,lastStiffness;
+    std::vector<bool> chainMask;
+    mutable pthread_mutex_t null_provider_mutex;
+    bool frozen, freezingOn, freezingOff, newCommand;
+    boost::shared_ptr<FreezeCommand> nextCommand;
 };
 
 #endif

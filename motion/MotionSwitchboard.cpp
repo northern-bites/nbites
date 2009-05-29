@@ -157,7 +157,12 @@ void MotionSwitchboard::preProcess(){
 #endif
         curProvider->requestStop();
     }
-
+	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isStopping()){
+#ifdef DEBUG_SWITCHBOARD
+		cout << "Requesting stop on "<< *curHeadProvider <<endl;
+#endif
+        curHeadProvider->requestStop();
+    }
 }
 
 void MotionSwitchboard::processJoints(){
@@ -306,7 +311,7 @@ void MotionSwitchboard::swapBodyProvider(){
     std::vector<BodyJointCommand *> gaitSwitches;
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
-        //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOAR IS BROKEN!
+        //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOARD IS BROKEN!
         //TODO/HACK: Since we overwrite Joint angles in realityCheck
         //we may want to ensure that a gaitTranstition command is only run
         // ONCE (Maybe twice?), instead of doing this forever.

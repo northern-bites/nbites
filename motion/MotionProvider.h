@@ -39,7 +39,8 @@
 enum ProviderType{
     SCRIPTED_PROVIDER,
     WALK_PROVIDER,
-    HEAD_PROVIDER
+    HEAD_PROVIDER,
+    NULL_PROVIDER
 };
 
 class MotionProvider {
@@ -60,6 +61,9 @@ public:
                   break;
               case HEAD_PROVIDER:
                   provider_name = "HeadProvider";
+                  break;
+              case NULL_PROVIDER:
+                  provider_name = "NullProvider";
                   break;
               }
           }

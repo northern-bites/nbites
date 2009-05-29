@@ -31,7 +31,9 @@ namespace MotionConstants {
 		HEAD_JOINT,
         GAIT,
         SET_HEAD,
-        STIFFNESS
+        STIFFNESS,
+        FREEZE,
+        UNFREEZE
 	};
 
 	const static unsigned int WALK_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
@@ -39,6 +41,7 @@ namespace MotionConstants {
 	const static unsigned int HEAD_JOINT_NUM_CHAINS = 1;
     const static unsigned int GAIT_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
     const static unsigned int STIFFNESS_NUM_CHAINS = Kinematics::NUM_CHAINS;
+    const static unsigned int FREEZE_NUM_CHAINS = Kinematics::NUM_CHAINS;
 
 
 	const static int WALK_CHAINS[WALK_NUM_CHAINS] =
@@ -69,6 +72,14 @@ namespace MotionConstants {
         Kinematics::RLEG_CHAIN,
         Kinematics::RARM_CHAIN };
 
+    const static int FREEZE_CHAINS[FREEZE_NUM_CHAINS] =
+      { Kinematics::HEAD_CHAIN,
+        Kinematics::LARM_CHAIN,
+        Kinematics::LLEG_CHAIN,
+        Kinematics::RLEG_CHAIN,
+        Kinematics::RARM_CHAIN };
 
+    static const float DEFAULT_ON_STIFFNESS = 0.85f;
+    static const float DEFAULT_OFF_STIFFNESS = 0.0f;
 };
 #endif
