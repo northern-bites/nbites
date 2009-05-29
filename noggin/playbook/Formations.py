@@ -138,9 +138,11 @@ def fReady(team):
                 SubRoles.pReadyChaser(team)
 
     # one dogs alive, alter positions a bit
-    elif team.numActiveFieldPlayers == 1:
+    #elif team.numActiveFieldPlayers == 1:
+    else:
         return [PBConstants.READY, PBConstants.CHASER] + \
             SubRoles.pReadyChaser(team)
+
 
 # Formations for testing roles
 def fTestDefender(team):

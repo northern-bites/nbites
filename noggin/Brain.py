@@ -3,7 +3,6 @@
 import sys
 _stderr = sys.stderr
 sys.stderr = sys.stdout
-import time
 
 # Packages and modules from super-directories
 from man import comm
@@ -11,7 +10,7 @@ from man import motion
 from man import vision
 from man.corpus import leds
 import sensors
-from man.motion import MotionConstants
+
 # Modules from this directory
 from . import GameController
 from . import FallController
@@ -77,8 +76,12 @@ class Brain(object):
         # Functional Variables
         self.my.teamNumber = self.comm.gc.team
         self.my.playerNumber = self.comm.gc.player
+        # Information about the environment
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
+        self.sonar = TypeDefs.Sonar()
+
+        # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
@@ -170,6 +173,7 @@ class Brain(object):
         # Update Environment
         self.ball.updateVision(self.vision.ball)
         self.updateFieldObjects()
+        self.sonar.updateSensors(self.sensors,sensors.UltraSoundMode)
 
         # Communications update
         self.updateComm()

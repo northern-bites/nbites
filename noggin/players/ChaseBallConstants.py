@@ -53,9 +53,9 @@ POS_KICK_TARGET_Y_GAIN = -3.0
 POS_KICK_TARGET_X_GAIN = 0.5
 
 # positionForKick() values
-BALL_KICK_LEFT_Y_L = 14
-BALL_KICK_LEFT_Y_R = 8
-BALL_KICK_LEFT_X_CLOSE = 10
+BALL_KICK_LEFT_Y_L = 8
+BALL_KICK_LEFT_Y_R = 4
+BALL_KICK_LEFT_X_CLOSE = 2
 BALL_KICK_LEFT_X_FAR = 14
 
 # Values to clip are approaching speed to
@@ -70,3 +70,6 @@ MIN_Y_MAGNITUDE = 1.5
 # Keep track of what gait we're using
 FAST_GAIT = "fastGait"
 NORMAL_GAIT = "normalGait"
+
+# Obstacle avoidance stuff
+AVOID_OBSTACLE_DIST = 40.0 #cm
