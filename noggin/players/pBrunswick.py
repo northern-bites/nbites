@@ -20,6 +20,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentChaseWalkTheta = None
         self.currentChaseWalkX = None
         self.currentChaseWalkY = None
+        self.currentSpinDir = None
         self.currentGait = None
         self.sawOwnGoal = False
         self.sawOppGoal = False
@@ -50,11 +51,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'chase'
             #return 'decideKick'
         elif role == PBConstants.OFFENDER:
-            #return 'playbookPosition'
-            return 'spinFindBallPosition'
+            return 'playbookPosition'
+            #return 'spinFindBallPosition'
         elif role == PBConstants.DEFENDER:
-            #return 'playbookPosition'
-            return 'spinFindBallPosition'
+            return 'playbookPosition'
+            #return 'spinFindBallPosition'
         elif role == PBConstants.GOALIE:
             #return 'playbookPosition'
             return 'atPosition'
