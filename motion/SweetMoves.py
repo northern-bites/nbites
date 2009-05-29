@@ -418,22 +418,20 @@ RIGHT_SIDE_KICK = (
      (0.0 , -23.0 , -13.0 , 20.0 , -10.0 , 25.0),
      (80.0 , -70.0 , 10.0 , 10.0), 0.8 , 0) )
 
-# Goalie saving stuff
-SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
-                        (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 0.1, 0), )
-
-SAVE_LEFT_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
-                    (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 1.5, 0), )
+SAVE_LEFT_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]), 
+             (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 1.5, 0), )
 
 SAVE_RIGHT_DEBUG = ( ((INITIAL_POS[0][0]),(INITIAL_POS[0][1]),
-                    (INITIAL_POS[0][2]), (-90,0,0,0), 1.5, 0), )
+             (INITIAL_POS[0][2]), (-90,0,0,0), 1.5, 0), )
 
 SAVE_CENTER_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
-                    (INITIAL_POS[0][2]), (-90,0,0,0), 1.5,0), )
-SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0), (), (), (-90,0,0,0), 0.1, 0))
+             (INITIAL_POS[0][2]), (-90,0,0,0), 1.5,0), )
+
+SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]), 
+                 (INITIAL_POS[0][2]),(INITIAL_POS[0][3]), 0.1, 0), )
 
 SAVE_RIGHT_HOLD_DEBUG = ( ((INITIAL_POS[0][0]),(INITIAL_POS[0][1]),
-                            (INITIAL_POS[0][2]), (-90,0,0,0), 0.1, 0), )
+                     (INITIAL_POS[0][2]), (-90,0,0,0), 0.1, 0), )
 
 SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0), (INITIAL_POS[0][1]),
-                            (INITIAL_POS[0][2]), (-90,0,0,0), 0.1, 0), )
+                     (INITIAL_POS[0][2]), (-90,0,0,0), 0.1, 0), )
