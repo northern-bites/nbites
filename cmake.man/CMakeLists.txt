@@ -124,13 +124,7 @@ SET( OFFLINE_NAOQI_PATH
   "The local path of the naoqi distribution to use with Webots"
   )
 
-############################ USING_LAB_FIELD
-# Should are field constants be those of the lab or the standard field
-OPTION( USING_LAB_FIELD
-    "Set field constants to use the lab field constants"
-    OFF
-    )
-SET( USING_LAB_FIELD ${USING_LAB_FIELD} )
+
 
 ############################ REMOTE INSTALLATION
 # Define this to remotely install the binary or library on the robot.
@@ -150,7 +144,7 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
-  "tables/watson/chownmay1.mtb"
+  "tables/223-09/tucker.mtb"
   #"tables/lab120/shutter83-2.mtb"
   CACHE STRING
   "Path relative to man directory for the desired color table"
