@@ -28,3 +28,5 @@ def gameSet(player):
 def gamePlaying(player):
     roleState = player.getRoleState(player.currentRole)
     return player.goNow(roleState)
+
+#gameInitial = gamePlaying

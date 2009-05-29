@@ -2,62 +2,54 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
 
-
 def shouldTurnToBall_FoundBall(player):
-    if player.brain.ball.framesOn > constants.FRAMES_ON_THRESH:
+    """
+    Should we turn to the ball heading after searching for the ball
+    """
+    if player.brain.ball.framesOn > constants.BALL_ON_THRESH:
         return True
     return False
 
 def shouldTurnToBall_ApproachBall(player):
+    """
+    Should turn to the ball, if we are currently approaching it
+    """
     ball = player.brain.ball
     if (ball.on and
-        abs(ball.bearing) > constants.BALL_BEARING_OFF_THRESH):
-        return True
-    return False
-
-def shouldCantFindBall(player):
-    if player.stateTime >= constants.GIVE_UP_THRESH:
-        return True
-    return False
-
-def shouldSpinFindBall(player):
-    if player.stateTime >= SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL):
-        return True
-    return False
-
-def shouldSpinFindBallPosition(player):
-    if player.brain.ball.framesOff >= 50:
+        abs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH):
         return True
     return False
 
 def shouldScanFindBall(player):
-    if player.brain.ball.framesOff > constants.FRAMES_OFF_THRESH:
+    """
+    We lost the ball, scan to find it
+    """
+    if player.brain.ball.framesOff > constants.BALL_OFF_THRESH:
+        return True
+    return False
+
+def shouldSpinFindBall(player):
+    """
+    Should spin if we already tried searching
+    """
+    if player.stateTime >= SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL):
         return True
     return False
 
 def shouldApproachBall(player):
+    """
+    Begin walking to the ball if it is close to straight in front of us
+    """
     ball = player.brain.ball
     if ( ball.on and
-         abs(ball.bearing) < constants.BALL_BEARING_THRESH ):
+         abs(ball.bearing) < constants.BALL_APPROACH_BEARING_THRESH ):
         return True
     return False
-
-def shouldApproachBallClose(player):
-    ball = player.brain.ball
-    if ball.dist < constants.BALL_CLOSE_DIST_THRESH and \
-            abs(ball.bearing) < constants.BALL_CLOSE_APPROACH_BEARING_THRESH and\
-            ball.on :
-        return True
-    return False
-
-def shouldTurnToBallClose(player):
-    ball = player.brain.ball
-    if ( ball.on and
-         abs(ball.bearing) > constants.BALL_CLOSE_TURN_BEARING_THRESH and
-         ball.dist < constants.BALL_CLOSE_DIST_THRESH):
-        return True
 
 def shouldPositionForKick(player):
+    """
+    Should begin aligning on the ball for a kick when close
+    """
     ball = player.brain.ball
     if (ball.on and
         abs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH and
@@ -66,21 +58,19 @@ def shouldPositionForKick(player):
     return False
 
 def shouldApproachForKick(player):
+    """
+    While positioning for kick, we need to walk forward
+    """
     ball = player.brain.ball
     if (ball.on and
         ball.relX > constants.BALL_KICK_LEFT_X_FAR ):
         return True
     return False
 
-def shouldTurnForKick(player):
-    ball = player.brain.ball
-    if ( ball.on and
-          abs(ball.bearing) > constants.BALL_TURN_KICK_BEARING_THRESH and
-         ball.dist < constants.BALL_POS_KICK_DIST_THRESH ):
-        return True
-    return False
-
 def shouldKick(player):
+    """
+    Ball is in the correct foot position to kick
+    """
     ball = player.brain.ball
     if (ball.framesOff < 10 and
         ball.locRelY > constants.BALL_KICK_LEFT_Y_R and
@@ -90,21 +80,10 @@ def shouldKick(player):
         return True
     return False
 
-def shouldTurnToBall_fromAtBallPosition(player):
-    ball = player.brain.ball
-    if (ball.on and
-        abs(ball.bearing) > constants.BALL_SPIN_POSITION_THRESH + 10):
-        return True
-    return False
-
-def shouldBeAtSpinDir(player):
-    ball = player.brain.ball
-    if ( ball.on and
-         abs(ball.bearing) < constants.BALL_SPIN_POSITION_THRESH ):
-        return True
-    return False
-
 def shouldAvoidObstacleLeft(player):
+    """
+    Need to avoid an obstacle on our left side
+    """
     sonar = player.brain.sonar
     if (#(sonar.LLdist != sonar.UNKNOWN_VALUE and
         # sonar.LLdist < constants.AVOID_OBSTACLE_DIST) or
@@ -115,6 +94,9 @@ def shouldAvoidObstacleLeft(player):
     return False
 
 def shouldAvoidObstacleRight(player):
+    """
+    Need to avoid an obstacle on our right side
+    """
     sonar = player.brain.sonar
     if (#(sonar.RRdist != sonar.UNKNOWN_VALUE and
         # sonar.RRdist < constants.AVOID_OBSTACLE_DIST) or
@@ -125,6 +107,9 @@ def shouldAvoidObstacleRight(player):
     return False
 
 def shouldAvoidObstacle(player):
+    """
+    Should avoid an obstacle
+    """
     return (shouldAvoidObstacleLeft(player) or
             shouldAvoidObstacleRight(player))
 
