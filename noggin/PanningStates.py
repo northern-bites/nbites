@@ -16,8 +16,7 @@ def scanBall(tracker):
 #         tracker.execute((((0.0,HeadMoves.SCAN_BALL[0][0][1]),moveTime,1),))
 
     if not tracker.brain.motion.isHeadActive():
-        tracker.execute(HeadMoves.SCAN_BALL)
-
+        tracker.execute(HeadMoves.MID_SCAN_BALL)
     return tracker.stay()
 
 def scanning(tracker):
