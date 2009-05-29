@@ -142,6 +142,8 @@ def approachBall(player):
         player.currentChaseWalkX = sX
         player.setSpeed(sX,0,0)
 
+    player.printf(player.brain.sonar)
+
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
@@ -155,16 +157,20 @@ def approachBall(player):
 
 def positionForKick(player):
     if player.firstFrame():
-        player.stopWalking()
         player.currentChaseWalkX = 0
         player.currentChaseWalkY = 0
         player.currentChaseWalkTheta = 0
-        player.stoppedWalk = False
+
+        if player.currentGait != constants.NORMAL_GAIT:
+            player.stoppedWalk = False
+            player.stopWalking()
+        else:
+            player.stoppedWalk = True
 
     ball = player.brain.ball
     targetY = (ball.locRelY -
                (constants.BALL_KICK_LEFT_Y_L + constants.BALL_KICK_LEFT_Y_R) / 2.0 )
-    sY = MyMath.clip((targetY),
+    sY = MyMath.clip(targetY,
                      constants.MIN_Y_SPEED,
                      constants.MAX_Y_SPEED)
     if fabs(sY) < constants.MIN_Y_MAGNITUDE:
@@ -185,9 +191,12 @@ def positionForKick(player):
 #                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
 
     if transitions.shouldApproachForKick(player):
-        sX = ball.locRelX
-        player.printf("Forward speed is: " +
-                      str(sX), "cyan")
+        targetX = (ball.locRelX -
+                   (constants.BALL_KICK_LEFT_X_CLOSE +
+                    constants.BALL_KICK_LEFT_X_FAR) / 2.0)
+        sX = MyMath.clip(ball.locRelX,
+                         constants.MIN_X_SPEED,
+                         constants.MAX_X_SPEED)
     else:
         sX = 0
 
@@ -482,7 +491,7 @@ def avoidObstacle(player):
     if player.firstFrame():
         player.stopWalking()
 
-    #player.printf(player.brain.sonar)
+    player.printf(player.brain.sonar)
 
     if not transitions.shouldAvoidObstacle(player):
         if player.brain.ball.on:
