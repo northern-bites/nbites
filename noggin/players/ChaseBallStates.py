@@ -158,8 +158,8 @@ def approachBall(player):
     # Determine our speed for approaching the ball
     ball = player.brain.ball
     sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
-                     constants.MIN_X_SPEED,
-                     constants.MAX_X_SPEED)
+                     constants.MIN_APPROACH_X_SPEED,
+                     constants.MAX_APPROACH_X_SPEED)
 
     # Determine the speed to turn to the ball
     sTheta = MyMath.clip(ball.bearing*constants.APPROACH_SPIN_GAIN,
@@ -212,9 +212,9 @@ def positionForKick(player):
     targetY = (ball.locRelY -
                (constants.BALL_KICK_LEFT_Y_L + constants.BALL_KICK_LEFT_Y_R) / 2.0 )
     sY = MyMath.clip(targetY,
-                     constants.MIN_Y_SPEED,
-                     constants.MAX_Y_SPEED)
-    if fabs(sY) < constants.MIN_Y_MAGNITUDE:
+                     constants.PFK_MIN_Y_SPEED,
+                     constants.PFK_MAX_Y_SPEED)
+    if fabs(sY) < constants.PFK_MIN_Y_MAGNITUDE:
         sY = 0.0
 
     if transitions.shouldApproachForKick(player):
@@ -222,8 +222,8 @@ def positionForKick(player):
                    (constants.BALL_KICK_LEFT_X_CLOSE +
                     constants.BALL_KICK_LEFT_X_FAR) / 2.0)
         sX = MyMath.clip(ball.locRelX,
-                         constants.MIN_X_SPEED,
-                         constants.MAX_X_SPEED)
+                         constants.PFK_MIN_X_SPEED,
+                         constants.PFK_MAX_X_SPEED)
     else:
         sX = 0.0
 
