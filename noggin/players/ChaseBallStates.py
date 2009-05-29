@@ -174,20 +174,6 @@ def positionForKick(player):
     if fabs(sY) < constants.MIN_Y_MAGNITUDE:
         sY = 0.0
 
-#     player.printf("Position for kick target_y is " +
-#                   str(targetY), "cyan")
-#     player.printf("Position for kick sY is " + str(sY), "cyan")
-#     player.printf("Ball dist is: " + str(ball.dist), "cyan")
-#     player.printf("Ball current y is: " +
-#                   str(ball.locRelY) + " want between " +
-#                   str(constants.BALL_KICK_LEFT_Y_L) +
-#                   " and " +
-#                   str(constants.BALL_KICK_LEFT_Y_R), "cyan")
-#     player.printf("Ball current x is: " +
-#                   str(ball.locRelX) + " want between " +
-#                   str(constants.BALL_KICK_LEFT_X_CLOSE) +
-#                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
-
     if transitions.shouldApproachForKick(player):
         targetX = (ball.locRelX -
                    (constants.BALL_KICK_LEFT_X_CLOSE +
@@ -196,7 +182,22 @@ def positionForKick(player):
                          constants.MIN_X_SPEED,
                          constants.MAX_X_SPEED)
     else:
-        sX = 0
+        sX = 0.0
+
+#     player.printf("\tPosition for kick target_y is " +
+#                   str(targetY), "cyan")
+#     player.printf("\tPosition for kick sY is " + str(sY), "cyan")
+#     player.printf("\tPosition for kick sX is " + str(sX), "cyan")
+#     player.printf("\tBall dist is: " + str(ball.dist), "cyan")
+#     player.printf("\tBall current y is: " +
+#                   str(ball.locRelY) + " want between " +
+#                   str(constants.BALL_KICK_LEFT_Y_L) +
+#                   " and " +
+#                   str(constants.BALL_KICK_LEFT_Y_R), "cyan")
+#     player.printf("\tBall current x is: " +
+#                   str(ball.locRelX) + " want between " +
+#                   str(constants.BALL_KICK_LEFT_X_CLOSE) +
+#                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
 
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
@@ -209,7 +210,8 @@ def positionForKick(player):
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
             player.currentGait = constants.NORMAL_GAIT
         player.currentChaseWalkY = sY
-        player.setSpeed(0,sY,0)
+        player.currentChaseWalkX = sX
+        player.setSpeed(0,sY,sX)
 
     if transitions.shouldKick(player):
         return player.goLater('waitBeforeKick')
@@ -227,9 +229,9 @@ def waitBeforeKick(player):
 
     if not player.brain.nav.isStopped():
         return player.stay()
-    elif transitions.shouldApproachForKick(player):
-        player.brain.tracker.trackBall()
-        return player.goLater('approachBall')
+#     elif transitions.shouldApproachForKick(player):
+#         player.brain.tracker.trackBall()
+#         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
         player.brain.tracker.trackBall()
         return player.goLater('scanFindBall')
