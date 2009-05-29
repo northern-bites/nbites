@@ -3492,7 +3492,7 @@ void FieldLines::printThresholdedImage() {
 // and have SURE certainty
 vector <const VisualFieldObject*> FieldLines::getVisibleFieldObjects() const {
     vector <const VisualFieldObject*> visibleObjects;
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < NUM_FIELD_OBJECTS_WITH_DIST_INFO; ++i) {
         if (allFieldObjects[i]->getDistance() > 0 &&
             // We don't want to identify corners based on posts that aren't sure,
             // for instance
