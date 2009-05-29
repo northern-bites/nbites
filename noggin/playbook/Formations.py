@@ -14,7 +14,6 @@ def fOneField(team):
     """Formation for one field player"""
     if team.me.isGoalie():
         return [PBConstants.ONE_FIELD] + Roles.rGoalie(team)
-
     return [PBConstants.ONE_FIELD] + Roles.rChaser(team)
 
 
@@ -51,7 +50,7 @@ def fThreeField(team):
 def fDubD(team):
     if team.me.isGoalie():
         return [PBConstants.DUB_D] + Roles.rGoalie(team)
-    if team.numActiveFieldPlayers == 2:
+    if team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
 
         # Figure out who isn't penalized with you
         other_teammate = team.getOtherActiveTeammate()
@@ -77,7 +76,7 @@ def fDubD(team):
             subRole = PBConstants.DUBD_OFFENDER
 
     # If we are the only player, become the sweeper
-    elif team.numActiveFieldPlayers == 1:
+    else:
         pos = (PBConstants.SWEEPER_X, PBConstants.SWEEPER_Y)
         role = PBConstants.DEFENDER
         subRole = PBConstants.SWEEPER
