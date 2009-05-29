@@ -6,6 +6,7 @@
 #include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
+#include <cstdlib>
 
 #ifndef WEBOTS_BACKEND //HACK-ish should make abstract Lights object..!!
 #include "_ledsmodule.h"
@@ -469,13 +470,14 @@ void Noggin::modifySysPath ()
     //
 #if ROBOT(NAO)
 #if defined OFFLINE || defined STRAIGHT
-    char *cwd = "/usr/local/nao/modules/lib";
+    const char *cwd = "/usr/local/nao/modules/lib";
 #else
 #  ifdef WEBOTS_BACKEND
-    char *cwd = "/usr/local/webots/projects/contests"
-        "/nao_robocup/controllers/nao_soccer_player_red/lib";
+    const char *cwd = string(string(getenv("WEBOTS_HOME")) +
+                       "/projects/contests" +
+                       "/nao_robocup/controllers/nao_soccer_player_red/lib").c_str();
 #  else //WEBOTS
-    char *cwd = "/opt/naoqi/modules/lib";
+    const char *cwd = "/opt/naoqi/modules/lib";
 #  endif
 #endif
 #else//ROBOT(NAO)

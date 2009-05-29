@@ -12,7 +12,10 @@ ENDIF(  "${WEBOTS_DIR}" STREQUAL "")
 
 SET(WEBOTS_DEFINITIONS -DWEBOTS_BACKEND)
 
-#This needs to get set for other platforms besides Linux, eventually
-SET(WEBOTS_LIBRARIES "${WEBOTS_DIR}/lib/libController.so")
-
+IF( APPLE )
+  SET(WEBOTS_LIBRARIES "${WEBOTS_DIR}/lib/libController.dylib")
+ELSE ( APPLE )
+  #This needs to get set for other platforms besides Linux, eventually
+  SET(WEBOTS_LIBRARIES "${WEBOTS_DIR}/lib/libController.so")
+ENDIF ( APPLE )
 MARK_AS_ADVANCED( WEBOTS_INCLUDE_DIR )

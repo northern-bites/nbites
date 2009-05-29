@@ -79,8 +79,9 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 # if ! defined WEBOTS_BACKEND && ! defined OFFLINE 
     initTable("/opt/naoqi/modules/etc/table.mtb");
 # elif defined WEBOTS_BACKEND
-    initTable("/usr/local/webots/projects/contests/nao_robocup/"
-              "controllers/nao_soccer_player_red/etc/table.mtb");
+    initTable(string(string(getenv("WEBOTS_HOME"))+
+                  "/projects/contests/nao_robocup/" +
+                     "controllers/nao_soccer_player_red/etc/table.mtb"));
 
 # endif
 
