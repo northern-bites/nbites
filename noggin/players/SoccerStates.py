@@ -3,6 +3,7 @@ import math
 
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
+import man.motion.HeadMoves as HeadMoves
 import man.motion.MotionConstants as MotionConstants
 
 
@@ -276,7 +277,7 @@ def approachBallClose(player):
         pass
 
     if not player.brain.ball.framesOff == 2:
-        player.executeMove(SweetMoves.NEUT_HEADS)
+        player.executeMove(HeadMoves.NEUT_HEADS)
         print "neut heads"
 
     if player.brain.ball.on and (player.brain.ball.dist > 70 or
@@ -371,7 +372,7 @@ def gameInitial(player):
     
     if player.counter == 2:
         player.executeMove(SweetMoves.INITIAL_POS)
-        player.executeMove(SweetMoves.NEUT_HEADS)
+        player.executeMove(HeadMoves.NEUT_HEADS)
     """
     if (player.brain.oppGoalLeftPost.on or
         player.brain.oppGoalRightPost.on or

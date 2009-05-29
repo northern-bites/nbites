@@ -135,6 +135,7 @@ ENDIF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
 SET( MOTION_PYTHON_SRCS ${MOTION_INCLUDE_DIR}/__init__.py
                         ${MOTION_INCLUDE_DIR}/MotionConstants.py
                         ${MOTION_INCLUDE_DIR}/SweetMoves.py
+                        ${MOTION_INCLUDE_DIR}/HeadMoves.py
                         ${MOTION_INCLUDE_DIR}/RobotGaits.py
                         ${MOTION_INCLUDE_DIR}/StiffnessModes.py
                         )

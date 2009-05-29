@@ -124,13 +124,6 @@ class Ball:
 
     def updateVision(self,visionBall):
         '''update method gets list of vision updated information'''
-        # Hold our history
-        self.lastVisionDist = self.dist
-        self.lastVisionBearing = self.bearing
-        self.lastVisionCenterX = self.centerX
-        self.lastVisionCenterY = self.centerY
-        self.lastVisionAngleX = self.angleX
-        self.lastVisionAngleY = self.angleY
 
         # Now update to the new stuff
         self.centerX = visionBall.centerX
