@@ -13,12 +13,14 @@ CMAKE_SRCS := $(addprefix $(CMAKE_DIR),$(CMAKE_SRCS))
 CONFIG_FILE = manconfig.h
 CROSS_FILE = $(BUILD_DIR)/cross
 STRAIGHT_FILE = $(BUILD_DIR)/straight
+WEBOTS_FILE = $(BUILD_DIR)/webots
 
 PYC_FILES = $(shell find . -name "*.pyc")
 
 CROSS_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
-CMAKE_DEFS = -DOE_CROSS_BUILD=OFF
+CMAKE_DEFS = -DOE_CROSS_BUILD=OFF -DSTRAIGHT=ON
 CMAKE_CROSS_DEFS = -DCMAKE_TOOLCHAIN_FILE=$(CROSS_TOOLCHAIN) -DOE_CROSS_BUILD=ON
+CMAKE_WEBOTS_DEFS = -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON
 
 TRUNK_REVISION = r0# $(shell svn info | grep Revision | awk 'FS=" " {print $$2}')
 export TRUNK_REVISION
@@ -46,15 +48,17 @@ straight: $(STRAIGHT_FILE)
 		$(CD) $(BUILD_DIR); \
 		$(CCMAKE) .
 
-$(CMAKE_DEPEND): 
-	@if [ ! -e $(STRAIGHT_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) cross; \
-	else \
+$(CMAKE_DEPEND):
+	@if [ -f $(WEBOTS_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) webots; \
+	elif [ -f $(STRAIGHT_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) straight; \
+	else \
+		$(MAKE) $(MAKE_OPTIONS) cross; \
 	fi
 
 $(STRAIGHT_FILE):
-	@if [ -e $(CROSS_FILE) ]; then \
+	@if [ -e $(CROSS_FILE) ]  || [ -f $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) clean; \
 	fi
 	@set -e; \
@@ -69,7 +73,7 @@ cross: $(CROSS_FILE)
 		$(CCMAKE) .
 
 $(CROSS_FILE):
-	@if [ -e $(STRAIGHT_FILE) ]; then \
+	@if [ -e $(STRAIGHT_FILE) ] || [ -e $(WEBOTS_FILE) ]; then \
 	       $(MAKE) clean; \
         fi
 	@set -e; \
@@ -77,6 +81,23 @@ $(CROSS_FILE):
 		$(TOUCH) $(CROSS_FILE); \
 		$(CD) $(BUILD_DIR); \
 		$(CMAKE) $(CMAKE_CROSS_DEFS) $(CURDIR)/$(CMAKE_DIR)
+
+
+webots: $(WEBOTS_FILE)
+	@set -e;
+		$(CD) $(BUILD_DIR); \
+		$(CCMAKE) .
+
+$(WEBOTS_FILE):
+	@if [ -e $(STRAIGHT_FILE) ] || [ -e $(CROSS_FILE) ]; then \
+	       $(MAKE) clean; \
+        fi
+	@set -e; \
+		$(MKDIR) -p $(BUILD_DIR); \
+		$(TOUCH) $(WEBOTS_FILE); \
+		$(CD) $(BUILD_DIR); \
+		$(CMAKE) $(CMAKE_WEBOTS_DEFS) $(CURDIR)/$(CMAKE_DIR)
+
 
 install: $(CMAKE_DEPEND)
 	@$(MAKE) $(MAKE_OPTIONS) -C $(BUILD_DIR) install

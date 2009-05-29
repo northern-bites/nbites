@@ -20,7 +20,7 @@
 class ThreadedMotionEnactor : public MotionEnactor , public Thread{
 public:
     ThreadedMotionEnactor(boost::shared_ptr<Synchro> synchro,
-                          string name)
+                          std::string name)
         : MotionEnactor(), Thread(synchro, name){};
     virtual ~ThreadedMotionEnactor() { }
 

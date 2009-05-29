@@ -54,17 +54,22 @@ FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PTHREAD  REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
 
-IF( APPLE )
-  MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
- #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
- #when we want to compile just the vision/sensors libraries for the TOOL
-  FIND_PACKAGE( ALCOMMON )
-  FIND_PACKAGE( TINYXML )
-ELSE( APPLE )
-  FIND_PACKAGE( ALCOMMON REQUIRED )
-  FIND_PACKAGE( TINYXML  REQUIRED )
-ENDIF( APPLE )
 
+IF(WEBOTS_BACKEND)
+  FIND_PACKAGE(WEBOTS REQUIRED)
+ELSE(WEBOTS_BACKEND)
+
+  IF( APPLE )
+    MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
+    #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
+    #when we want to compile just the vision/sensors libraries for the TOOL
+    FIND_PACKAGE( ALCOMMON )
+    FIND_PACKAGE( TINYXML )
+  ELSE( APPLE )
+    FIND_PACKAGE( ALCOMMON REQUIRED )
+    FIND_PACKAGE( TINYXML  REQUIRED )
+  ENDIF( APPLE )
+ENDIF(WEBOTS_BACKEND)
 
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
@@ -77,8 +82,6 @@ CONFIGURE_FILE(
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
-                 ${ALCOMMON_DEFINITIONS}
-		 ${TINYXML_DEFINITIONS}
                  ${PTHREAD_DEFINITIONS}
                  ${PYTHON_DEFINITIONS}
                  )
@@ -87,8 +90,6 @@ ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-                     ${ALCOMMON_INCLUDE_DIR}
-		     ${TINYXML_INCLUDE_DIR}
                      ${PTHREAD_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
@@ -96,26 +97,58 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      )
 
 
+#Possibly, don't need to include any AL or WEBOTS stuff in this directory
+# since we may inherit it from man
+IF(WEBOTS_BACKEND)
+  INCLUDE_DIRECTORIES(${WEBOTS_INCLUDE_DIR})
+
+  ADD_DEFINITIONS( ${WEBOTS_DEFINITIONS})
+
+ELSE(WEBOTS_BACKEND)
+  INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR}
+                      ${TINYXML_INCLUDE_DIR})
+  ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS}
+                   ${TINYXML_DEFINITIONS})
+
+ENDIF(WEBOTS_BACKEND)
+
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
 SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
      		  ${CORPUS_INCLUDE_DIR}/PySensors
-                  ${CORPUS_INCLUDE_DIR}/NaoPose
-                  )
-SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )
+                  ${CORPUS_INCLUDE_DIR}/NaoPose )
+
+
+###### LEDS ############
+IF(WEBOTS_BACKEND)
+  SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_webotsledsmodule )
+ELSE(WEBOTS_BACKEND)
+  SET( LEDS_SRCS   ${CORPUS_INCLUDE_DIR}/_ledsmodule )
+ENDIF(WEBOTS_BACKEND)
+
 SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
                   ${CORPUS_INCLUDE_DIR}/_synchromodule
                   ${CORPUS_INCLUDE_DIR}/messaging
                   )
-SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
-                        ${CORPUS_INCLUDE_DIR}/NaoEnactor
-                        ${CORPUS_INCLUDE_DIR}/ALTranscriber
-                        ${CORPUS_INCLUDE_DIR}/AccEKF
+
+########### ROBOT CONNET #########
+SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/AccEKF
 			${CORPUS_INCLUDE_DIR}/RoboGuardian
 			${CORPUS_INCLUDE_DIR}/ClickableButton
-			${CORPUS_INCLUDE_DIR}/PyRoboGuardian
-			${CORPUS_INCLUDE_DIR}/ALImageTranscriber
-			)
+			${CORPUS_INCLUDE_DIR}/PyRoboGuardian)
+
+IF(WEBOTS_BACKEND)
+  LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/WBEnactor
+                                  ${CORPUS_INCLUDE_DIR}/WBTranscriber
+                                  ${CORPUS_INCLUDE_DIR}/WBImageTranscriber
+				 )
+ELSE(WEBOTS_BACKEND)
+  LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
+                                 ${CORPUS_INCLUDE_DIR}/NaoEnactor
+				 ${CORPUS_INCLUDE_DIR}/ALTranscriber
+				 ${CORPUS_INCLUDE_DIR}/ALImageTranscriber)
+ENDIF(WEBOTS_BACKEND)
+
 
 #IF( PYTHON_SHARED_CORPUS )
 #  LIST( APPEND SENSORS_SRCS ${VISION_INCLUDE_DIR}/Pose
@@ -147,6 +180,7 @@ IF( PYTHON_SHARED_CORPUS )
     SHARED
     ${LEDS_SRCS}
     )
+
   ADD_LIBRARY(
     ${SYNCHRO_TARGET}
     SHARED
@@ -175,6 +209,7 @@ IF( PYTHON_SHARED_CORPUS )
     CONFIGURATIONS "" Debug Release
     RENAME ${LEDS_TARGET}module.so
     )
+
   INSTALL(
     FILES ${SYNCHRO_TARGET_LOCATION}
     DESTINATION ${CORPUS_PYTHON_TARGET_DIR}

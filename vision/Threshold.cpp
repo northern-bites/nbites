@@ -76,9 +76,14 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 
     // loads the color table on the MS into memory
 #if ROBOT(NAO_RL)
-# ifndef OFFLINE
+# if ! defined WEBOTS_BACKEND && ! defined OFFLINE 
     initTable("/opt/naoqi/modules/etc/table.mtb");
-#endif
+# elif defined WEBOTS_BACKEND
+    initTable("/usr/local/webots/projects/contests/nao_robocup/"
+              "controllers/nao_soccer_player_red/etc/table.mtb");
+
+# endif
+
 #elif ROBOT(NAO_SIM)
 #  error Compressed table not set up for simulator Nao yet
 #else

@@ -21,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <cstdlib>
 using namespace std;
 
 #include <boost/assign/std/vector.hpp>
@@ -49,6 +50,7 @@ Sensors::Sensors ()
     : bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
       motionBodyAngles(NUM_ACTUATORS),
       bodyAnglesError(NUM_ACTUATORS),
+      bodyTemperatures(NUM_ACTUATORS,0.0f),
       leftFootFSR(0.0f, 0.0f, 0.0f, 0.0f),
       rightFootFSR(leftFootFSR),
       leftFootBumper(0.0f, 0.0f),
@@ -58,7 +60,8 @@ Sensors::Sensors ()
       image(&global_image[0]),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-      chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f)
+      chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
+      FRM_FOLDER(string(getenv("HOME"))+"/frames")
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
@@ -75,7 +78,6 @@ Sensors::Sensors ()
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
-
 }
 
 Sensors::~Sensors ()
@@ -739,10 +741,9 @@ void Sensors::saveFrame()
     string EXT(".NBFRM");
     string BASE("/");
     int NUMBER = saved_frames;
-    string FOLDER("/home/root/frames");
     stringstream FRAME_PATH;
 
-    FRAME_PATH << FOLDER << BASE << NUMBER << EXT;
+    FRAME_PATH << FRM_FOLDER << BASE << NUMBER << EXT;
     fstream fout(FRAME_PATH.str().c_str(), fstream::out);
 
     // Retrive joints

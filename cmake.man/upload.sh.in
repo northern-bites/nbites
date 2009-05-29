@@ -11,20 +11,28 @@ set -o nounset
 
 #CMake configured options
 REMOTE="${REMOTE_INSTALL}"
-LOCAL="${OFFLINE}"
+
+WEBOTS="${WEBOTS_BACKEND}"
 ROBOT=${REMOTE_ADDRESS}
-LOCAL_DEST=${OFFLINE_NAOQI_PATH}/modules
+
+if [ "$WEBOTS" = "" ]; then
+    WEBOTS="OFF"
+fi
+
+NAO_CONTROLLER=projects/contests/nao_robocup/controllers/nao_soccer_player_red
+
+if [ $WEBOTS = "ON" ]; then
+echo "Setting local install to WEBOT"
+    LOCAL_DEST=$WEBOTS_HOME/$NAO_CONTROLLER
+else
+    LOCAL_DEST=${OFFLINE_NAOQI_PATH}/modules
+fi
+
 COLOR_TABLE_PATH=${COLOR_TABLE}
 COLOR_TABLE_DIR=install/etc
 TABLE_STD_NAME=table.mtb
-if [ $REMOTE = "ON" ] && [ $LOCAL = "ON" ]; then
-  echo "Install Error: Cannot instal both remotely and locally."
-  echo "               Please check your CMake options."
-  exit 1
-fi
 
-
-if [ $REMOTE = "ON" ]; then
+if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
 
   echo "Installing remotely"
 
@@ -36,13 +44,10 @@ if [ $REMOTE = "ON" ]; then
   fi
   DEST=root@$ROBOT:$DEST
 
-elif [ $LOCAL = "ON" ]; then
+else
   echo "Installing locally"
   DEST=$LOCAL_DEST
-  
-else
-  echo "No installation specified!"
-  exit 0
+
 fi
 
 #if [ $REMOTE != "ON" ]; then

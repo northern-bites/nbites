@@ -82,17 +82,25 @@ FIND_PACKAGE( PTHREAD  REQUIRED )
 FIND_PACKAGE( BOOST_PYTHON REQUIRED )
 FIND_PACKAGE( BOOST_SIGNALS REQUIRED )
 
+IF(APPLE)
+  FIND_PACKAGE( FINK )
+ENDIF(APPLE)
+
+
+IF(WEBOTS_BACKEND)
+  FIND_PACKAGE(WEBOTS)
+ELSE(WEBOTS_BACKEND)
 IF( APPLE )
   MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
  #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs 
  #when we want to compile just the vision/sensors libraries for the TOOL 
-  FIND_PACKAGE( FINK )
   FIND_PACKAGE( ALCOMMON )
   FIND_PACKAGE( TINYXML )
 ELSE( APPLE )
   FIND_PACKAGE( ALCOMMON REQUIRED )
   FIND_PACKAGE( TINYXML  REQUIRED )
 ENDIF( APPLE )
+ENDIF(WEBOTS_BACKEND)
 
 
 ############################ CONFIG.H GENERATION
@@ -169,6 +177,7 @@ ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
 		 ${TINYXML_DEFINITIONS}
                  ${PTHREAD_DEFINITIONS}
                  ${PYTHON_DEFINITIONS}
+		 ${WEBOTS_DEFINITIONS}
                  )
 
 
@@ -188,15 +197,24 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${NOGGIN_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
                      ${MAN_INCLUDE_DIR}
+		     ${WEBOTS_INCLUDE_DIR}
                      )
-
 
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
+
 SET( MAN_SRCS ${MAN_INCLUDE_DIR}/Man
-              ${MAN_INCLUDE_DIR}/ALMan
-              ${MAN_INCLUDE_DIR}/manmodule
-              )
+	      ${MAN_INCLUDE_DIR}/TMan
+              ${MAN_INCLUDE_DIR}/TTMan
+		       )
+
+IF(WEBOTS_BACKEND)
+  LIST(APPEND MAN_SRCS ${MAN_INCLUDE_DIR}/nao_soccer_player
+			)
+ELSE(WEBOTS_BACKEND)
+  LIST(APPEND MAN_SRCS ${MAN_INCLUDE_DIR}/manmodule
+		       )
+ENDIF(WEBOTS_BACKEND)
 
 SET( MAN_PYTHON_SRCS ${MAN_INCLUDE_DIR}/__init__.py )
 
@@ -249,6 +267,7 @@ TARGET_LINK_LIBRARIES(
   ${MOTION_TARGET}
   ${NOGGIN_TARGET}
   ${VISION_TARGET}
+  ${WEBOTS_LIBRARIES}
   )
 
 

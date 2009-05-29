@@ -254,6 +254,7 @@ private:
     float batteryCurrent;
 
     static int saved_frames;
+    std::string FRM_FOLDER;
 };
 
 

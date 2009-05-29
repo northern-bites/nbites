@@ -6,7 +6,13 @@
 #include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
+
+#ifndef WEBOTS_BACKEND //HACK-ish should make abstract Lights object..!!
 #include "_ledsmodule.h"
+#else
+#include "_webotsledsmodule.h"
+#endif
+
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
@@ -462,12 +468,17 @@ void Noggin::modifySysPath ()
     // Enter the current working directory into the python module path
     //
 #if ROBOT(NAO)
-#ifndef OFFLINE
-    char *cwd = "/opt/naoqi/modules/lib";
-#else
+#if defined OFFLINE || defined STRAIGHT
     char *cwd = "/usr/local/nao/modules/lib";
-#endif
 #else
+#  ifdef WEBOTS_BACKEND
+    char *cwd = "/usr/local/webots/projects/contests"
+        "/nao_robocup/controllers/nao_soccer_player_red/lib";
+#  else //WEBOTS
+    char *cwd = "/opt/naoqi/modules/lib";
+#  endif
+#endif
+#else//ROBOT(NAO)
     const char *cwd = get_current_dir_name();
 #endif
 

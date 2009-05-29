@@ -96,3 +96,15 @@ is present in that list. Additionally, you must disable pythonbridge for the Pyt
 
 TROUBLESHOOTING:
 Still having trouble?  Take a look at our wiki at http://robocup.bowdoin.edu/trac. Particularly, the page http://robocup.bowdoin.edu/trac/wiki/PracticalNao might give links to more detailed instructions then those shown here.
+
+
+KNOWN BUGS:
+SIMULATOR (in robostadium contest mode without NaoQi):
+	  -angleX and angleY are calculated incorrectly (they are just 0.0)
+	  -GameController (i.e. Comm) is not working, so switching into playing is not possible
+	  -Use the "webots.mtb" table
+	  -We incorrectly convert the image from the native 120x160 RGB webots format
+           to the YUV half VGA format (240 x 320) we use in our code.
+	   The problem is that we introduce vertical stripes because we incorrectly
+	   expand a Y1 U Y2 V block into a block twice as large in each dimension 
+	   (See WBImageTranscriber) 
