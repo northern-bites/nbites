@@ -468,7 +468,7 @@ void Noggin::modifySysPath ()
     // Enter the current working directory into the python module path
     //
 #if ROBOT(NAO)
-#ifdef OFFLINE
+#if defined OFFLINE || defined STRAIGHT
     char *cwd = "/usr/local/nao/modules/lib";
 #else
 #  ifdef WEBOTS_BACKEND
