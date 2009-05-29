@@ -10,7 +10,7 @@ def scanBall(tracker):
         return tracker.goNow('ballTracking')
 
     if not tracker.brain.motion.isHeadActive():
-        lastBallDist = ball.lastVisionDist
+        lastBallDist = ball.lastSeenDist
         if lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.execute(HeadMoves.HIGH_SCAN_BALL)
 
