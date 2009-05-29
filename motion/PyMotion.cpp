@@ -77,7 +77,7 @@ public:
                    const float maxx, const float maxy, const float maxtheta,
                    const float sensorFeedback)
 
-        : command(new GaitCommand(0.02,_bh*CM_TO_MM, //HACK
+        : command(new GaitCommand(0.02f,_bh*CM_TO_MM, //HACK
                                   _hox*CM_TO_MM, _yao*TO_RAD, _dur,
                                   _dblSupFrac, _stepHeight*CM_TO_MM,
                                   _footLengthX*CM_TO_MM, _dblInactivePerc,

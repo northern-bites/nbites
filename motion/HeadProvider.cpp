@@ -104,7 +104,7 @@ void HeadProvider::calculateNextJoints() {
 //Method called during the 'SET' Mode
 void HeadProvider::setMode(){
     //Maximum head movement is Rad/motion frame (6 deg/20ms from AL docs)
-    const float MAX_HEAD_VEL = 6.0*TO_RAD;
+    const float MAX_HEAD_VEL = 6.0f*TO_RAD;
 
     //Calculate how much we can move toward the goal
     const float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,

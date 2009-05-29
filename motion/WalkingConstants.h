@@ -117,9 +117,9 @@ struct LegConstants{
 
 
 static const float LARM_WALK_ANGLES[Kinematics::ARM_JOINTS] =
-{M_PI/2 ,.26,0.0f,0.0f};
+{M_PI_FLOAT/2.0f ,.26f,0.0f,0.0f};
 static const float RARM_WALK_ANGLES[Kinematics::ARM_JOINTS] =
-{M_PI/2,-.26,0.0f,0.0f};
+{M_PI_FLOAT/2.0f,-.26f,0.0f,0.0f};
 
 //NOTE You must never set these variables except with a constructor
 //or you must update single,doubleSupportFrames  manually with

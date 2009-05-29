@@ -75,7 +75,7 @@
 #define _StepGenerator_h_DEFINED
 
 #include <cstdio>
-#include <cmath>
+#include <math.h>
 #include <list>
 
 #include <boost/tuple/tuple.hpp>

@@ -11,7 +11,7 @@ class VisualBall; // forward reference
 
 // BALL CONSTANTS
 #define BallAt1M         16 // pixel width of objects one meter away.
-#define PinkBallAt1M     12.46268657 // pixel width of PINK one meter away.
+#define PinkBallAt1M     12.46268657f // pixel width of PINK one meter away.
 #define MAXBALLDISTANCE  300
 
 class VisualBall : public VisualDetection {
@@ -29,8 +29,10 @@ public:
     void setDistanceWithSD(float _dist);
     void setBearingWithSD(float b);
     void findAngles() {
-        setAngleX((IMAGE_WIDTH/2 - centerX) / MAX_BEARING_RAD);
-        setAngleY((IMAGE_HEIGHT/2 - centerY) / MAX_ELEVATION_RAD);
+        setAngleX((static_cast<float>(IMAGE_WIDTH)/2 -
+				   static_cast<float>(centerX) ) / MAX_BEARING_RAD);
+        setAngleY((static_cast<float>(IMAGE_HEIGHT)/2 -
+				   static_cast<float>(centerY) ) / MAX_ELEVATION_RAD);
     }
 
     // calibration pre-huge chown changes
@@ -54,7 +56,7 @@ public:
 
     // Member functions
     const float ballDistanceToSD(float _distance) const {
-        return 10 + distance * 0.2;
+        return 10 + distance * 0.2f;
     }
     const float ballBearingToSD(float _bearing) const {
         return static_cast<float>(M_PI) / 8.0f;

@@ -203,7 +203,7 @@ void StepGenerator::findSensorZMP(){
 
 float StepGenerator::scaleSensors(const float sensorZMP, const float perfectZMP){
     const float sensorWeight = walkParams->sensorFeedback;
-    return sensorZMP*sensorWeight + (1.0 - sensorWeight)*perfectZMP;
+    return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
 void StepGenerator::tick_controller(){
@@ -424,8 +424,8 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //look at the newStep, and make ZMP values:
     const float stepTime = newSupportStep->duration;
     //update the lastZMPD Step
-    const int sign = (newSupportStep->foot == LEFT_FOOT ? 1 : -1);
-    const int last_sign = -sign;
+    const float sign = (newSupportStep->foot == LEFT_FOOT ? 1.0f : -1.0f);
+    const float last_sign = -sign;
 
     //The intent of this constant is to be approximately the length of the foot
     //and corresponds to the distance we would like the ZMP to move along the
@@ -496,8 +496,8 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 
     //First, split up the frames:
     const int halfNumDSChops = //DS - DoubleStaticChops
-        int(walkParams->doubleSupportFrames*
-            walkParams->dblSupInactivePercentage/2.0f);
+        static_cast<int>( static_cast<float>(walkParams->doubleSupportFrames)*
+			walkParams->dblSupInactivePercentage/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
         walkParams->doubleSupportFrames - halfNumDSChops*2;
 
@@ -510,7 +510,9 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //phase 2) - move from start_i to
     for(int i = 0; i< numDMChops; i++){
         ufvector3 new_i = start_i +
-            (static_cast<float>(i)/numDMChops)*(mid_i-start_i);
+            (static_cast<float>(i)/
+			 static_cast<float>(numDMChops) ) *
+			(mid_i-start_i);
 
         zmp_ref_x.push_back(new_i(0));
         zmp_ref_y.push_back(new_i(1));
@@ -530,7 +532,9 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 //    for(int i = 0; i< walkParams->stepDurationFrames; i++){
 
         ufvector3 new_i = mid_i +
-            (static_cast<float>(i)/numSChops)*(end_i-mid_i);
+            (static_cast<float>(i) /
+			 static_cast<float>(numSChops) ) *
+			(end_i-mid_i);
 
         zmp_ref_x.push_back(new_i(0));
         zmp_ref_y.push_back(new_i(1));
@@ -594,7 +598,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     const float new_x = _x*walkParams->stepDuration;
     const float new_y = _y*walkParams->stepDuration;
     //we only turn every other step, so double the turning!
-    const float new_theta = _theta*walkParams->stepDuration*2.0;
+    const float new_theta = _theta*walkParams->stepDuration*2.0f;
 
     //If the walk vector isn't changing,
     if(abs(new_x - x) <= NEW_VECTOR_THRESH_MMS &&
@@ -857,7 +861,7 @@ void StepGenerator::generateStep( float _x,
  * foot ('f') coordinate frame and the next f coordinate frame rooted at 'step'
  */
 const ufmatrix3 StepGenerator::get_fprime_f(const shared_ptr<Step> step){
-    const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
+    const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
     const float y = step->y;
@@ -879,7 +883,7 @@ const ufmatrix3 StepGenerator::get_fprime_f(const shared_ptr<Step> step){
  * returned by the 'get_fprime_f'
  */
 const ufmatrix3 StepGenerator::get_f_fprime(const shared_ptr<Step> step){
-    const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
+    const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
     const float y = step->y;
@@ -899,7 +903,7 @@ const ufmatrix3 StepGenerator::get_f_fprime(const shared_ptr<Step> step){
  * the difference between sprime and s is based on 'step'
  */
 const ufmatrix3 StepGenerator::get_sprime_s(const shared_ptr<Step> step){
-    const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
+    const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
     const float y = step->y;
@@ -920,7 +924,7 @@ const ufmatrix3 StepGenerator::get_sprime_s(const shared_ptr<Step> step){
  * Step (s' being the last s frame).
  */
 const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
-    const int leg_sign = (step->foot == LEFT_FOOT ? 1 : -1);
+    const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
     const float y = step->y;

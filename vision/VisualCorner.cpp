@@ -90,8 +90,14 @@ const shape VisualCorner::getLClassification() {
     point <int> line1End, line2End;
 
     // corner is closer to start point of line 1
-    if (Utility::getLength(cornerX, cornerY, line1.start.x, line1.start.y) <
-        Utility::getLength(cornerX, cornerY, line1.end.x, line1.end.y)) {
+    if (Utility::getLength(static_cast<float>(cornerX),
+						   static_cast<float>(cornerY),
+						   static_cast<float>(line1.start.x),
+						   static_cast<float>(line1.start.y) ) <
+        Utility::getLength(static_cast<float>(cornerX),
+						   static_cast<float>(cornerY),
+						   static_cast<float>(line1.end.x),
+						   static_cast<float>(line1.end.y) )) {
         line1End = line1.end;
     }
     // Closer to end
@@ -103,8 +109,14 @@ const shape VisualCorner::getLClassification() {
     }
 
     // corner is closer to start point of line 2
-    if (Utility::getLength(cornerX, cornerY, line2.start.x, line2.start.y) <
-        Utility::getLength(cornerX, cornerY, line2.end.x, line2.end.y)) {
+    if (Utility::getLength(static_cast<float>(cornerX),
+						   static_cast<float>(cornerY),
+						   static_cast<float>(line2.start.x),
+						   static_cast<float>(line2.start.y) ) <
+        Utility::getLength(static_cast<float>(cornerX),
+						   static_cast<float>(cornerY),
+						   static_cast<float>(line2.end.x),
+						   static_cast<float>(line2.end.y) )) {
         line2End = line2.end;
     }
     // Closer to end
@@ -118,12 +130,14 @@ const shape VisualCorner::getLClassification() {
 
     // By this point, we now have the actual vector representations of the lines
     // and can calculate theta
-    float dotProduct = (line1Basis.first * line2Basis.first) +
-        (line1Basis.second * line2Basis.second);
+    float dotProduct = static_cast<float>( (line1Basis.first *
+											 line2Basis.first) +
+										   (line1Basis.second *
+											 line2Basis.second) );
 
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
-    float theta = DEG_OVER_RAD * acos(dotProduct/(line1.length * line2.length));
+    float theta = TO_DEG * acos(dotProduct/(line1.length * line2.length));
     /*
       cout << " first line: " << line1->start << ", " << line1->end << endl;
       cout << " second line: " << line2->start << ", " << line2->end << endl;

@@ -88,7 +88,7 @@
 #ifndef _NaoPose_h_DEFINED
 #define _NaoPose_h_DEFINED
 
-#include <cmath>
+#include <math.h>
 #include <vector>
 #include <algorithm>
 
@@ -191,8 +191,8 @@ protected: // helper methods
       getHomLength(const boost::numeric::ublas::vector <float> &vec);
 
     // takes in two sides of a triangle, returns hypotenuse
-    static const double getHypotenuse(const float x, const float y) {
-        return sqrt(x*x + y*y);
+    static const float getHypotenuse(const float x, const float y) {
+        return std::sqrt(x*x + y*y);
     }
 
     //returns an 'estimate' object for a homogeneous vector pointing to an

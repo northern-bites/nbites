@@ -348,7 +348,7 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
   }
 
   estimate est = getEstimate(objectInWorldFrame);
-  est.dist = correctDistance(est.dist);
+  est.dist = correctDistance(static_cast<float>(est.dist) );
 
   return est;
 }
@@ -417,11 +417,11 @@ estimate NaoPose::getEstimate(ublas::vector <float> objInWorldFrame){
   if (temp != 0) {
     //quadrants +x,+y and +x-y
     if( xPos && (yPos || !yPos) ){
-      pix_est.bearing = atan(temp);
+		pix_est.bearing = std::atan(temp);
     }else if( yPos){ //quadrant -x+y
-      pix_est.bearing = atan(temp) + M_PI;
+		pix_est.bearing = std::atan(temp) + M_PI_FLOAT;
     }else{//quadrant -x+y
-      pix_est.bearing = atan(temp) - M_PI;
+		pix_est.bearing = std::atan(temp) - M_PI_FLOAT;
     }
   }
 
