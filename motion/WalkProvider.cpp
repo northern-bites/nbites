@@ -61,7 +61,7 @@ void WalkProvider::hardReset(){
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 
-void WalkProvider::calculateNextJoints() {
+void WalkProvider::calculateNextJointsAndStiffnesses() {
     pthread_mutex_lock(&walk_provider_mutex);
     if ( nextGait != curGait){
         if( stepGenerator.resetGait(nextGait)){
@@ -106,6 +106,19 @@ void WalkProvider::calculateNextJoints() {
     setNextChainJoints(LLEG_CHAIN,lleg_results);
     setNextChainJoints(RLEG_CHAIN,rleg_results);
     setNextChainJoints(RARM_CHAIN,rarm_angles);
+
+
+    vector<float> larm_gains(ARM_JOINTS, gblStiffness);
+    vector<float> lleg_gains(LEG_JOINTS, gblStiffness);
+    vector<float> rleg_gains(LEG_JOINTS, gblStiffness);
+    vector<float> rarm_gains(ARM_JOINTS, gblStiffness);
+
+    //Return the stiffnesses for each joint
+    setNextChainStiffnesses(LARM_CHAIN,larm_gains);
+    setNextChainStiffnesses(LLEG_CHAIN,lleg_gains);
+    setNextChainStiffnesses(RLEG_CHAIN,rleg_gains);
+    setNextChainStiffnesses(RARM_CHAIN,rarm_gains);
+    
 
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);

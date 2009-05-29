@@ -38,7 +38,7 @@ public:
     virtual ~ScriptedProvider();
 
     void requestStopFirstInstance();
-    void calculateNextJoints();
+    void calculateNextJointsAndStiffnesses();
 
     void hardReset();
 

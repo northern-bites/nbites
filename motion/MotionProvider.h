@@ -45,8 +45,10 @@ enum ProviderType{
 class MotionProvider {
 public:
     MotionProvider(ProviderType _provider_type)
-        : _active(false), _stopping(false),
+        :gblStiffness(0.0f),
+        _active(false), _stopping(false),
           nextJoints(Kinematics::NUM_CHAINS,std::vector<float>()),
+          nextStiffnesses(Kinematics::NUM_CHAINS,std::vector<float>()),
           provider_type(_provider_type)
           {
               switch(provider_type){
@@ -76,9 +78,12 @@ public:
 
     const bool isActive() const { return _active; }
     const bool isStopping() const {return _stopping;}
-    virtual void calculateNextJoints() = 0;
+    virtual void calculateNextJointsAndStiffnesses() = 0;
     std::vector<float> getChainJoints(const Kinematics::ChainID id) {
         return nextJoints[id];
+    }
+    std::vector<float> getChainStiffnesses(const Kinematics::ChainID id){
+        return nextStiffnesses[id];
     }
     const std::string getName(){return provider_name;}
     const ProviderType getType(){return provider_type;}
@@ -93,11 +98,22 @@ public:
         //       about it anyway.
         return LEFT_SUPPORT;
     }
+    float gblStiffness;
+
+    //temporary code
+    void setStiffness(float newStiffness){
+        gblStiffness = newStiffness;
+    }
 
 protected:
     void setNextChainJoints(const Kinematics::ChainID id,
                             const std::vector <float> &chainJoints) {
         nextJoints[id] = chainJoints;
+    }
+
+    void setNextChainStiffnesses(const Kinematics::ChainID id,
+                            const std::vector <float> &chainJoints) {
+        nextStiffnesses[id] = chainJoints;
     }
 
     //Method that must be implemented, and called at the end of each frame
@@ -113,6 +129,8 @@ private:
     bool _active;
     bool _stopping;
     std::vector < std::vector <float> > nextJoints;
+    std::vector < std::vector <float> > nextStiffnesses;
+
     const ProviderType provider_type;
     std::string provider_name;
 

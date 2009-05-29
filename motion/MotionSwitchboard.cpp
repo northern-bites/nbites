@@ -48,6 +48,11 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     initDebugLogs();
 #endif
 
+    //temp
+    scriptedProvider.setStiffness(0.0f);
+    headProvider.setStiffness(0.0f);
+    walkProvider.setStiffness(0.0f);
+
     //Very Important, ensure that we have selected a default walk parameter set
     boost::shared_ptr<GaitCommand>  defaultGait(new GaitCommand(DEFAULT_P));
 
@@ -155,7 +160,7 @@ int MotionSwitchboard::processProviders(){
 #endif
     if (headProvider.isActive()) {
 		// Calculate the next joints and get them
-		headProvider.calculateNextJoints();
+		headProvider.calculateNextJointsAndStiffnesses();
 		// get headJoints from headProvider
 		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
 
@@ -179,7 +184,7 @@ int MotionSwitchboard::processProviders(){
 #endif
     if (curProvider->isActive()){
 		//Request new joints
-		curProvider->calculateNextJoints();
+		curProvider->calculateNextJointsAndStiffnesses();
 		const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
 		const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
 		const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
