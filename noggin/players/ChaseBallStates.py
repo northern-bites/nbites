@@ -6,6 +6,10 @@ from math import fabs
 import man.motion.StiffnessModes as StiffnessModes
 
 def chase(player):
+    """
+    Method to determine which chase state should be used.
+    We dump the robot into this state when we our switching from something else.
+    """
     if player.brain.ball.on and constants.USE_LOC_CHASE:
         return player.goNow('positionOnBall')
     elif transitions.shouldScanFindBall(player):
@@ -45,54 +49,68 @@ def spinFindBall(player):
     '''
     if player.firstFrame():
         player.brain.tracker.trackBall()
-
-    if player.brain.nav.isStopped():
-        if player.currentGait != constants.FAST_GAIT:
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            player.currentGait = constants.FAST_GAIT
-
-        player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
-
-#     if not player.brain.motion.isHeadActive():
-#         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
-
-    if player.brain.ball.on and constants.USE_LOC_CHASE:
-        player.brain.tracker.trackBall()
-        return player.goLater('positionOnBall')
-
-    if transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBallFar')
-
-    return player.stay()
-
-def turnToBallFar(player):
-    ''' Rotate to align with the ball. When we get close, we will approach it '''
-    ball = player.brain.ball
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.currentChaseWalkX = 0
-        player.currentChaseWalkY = 0
-        player.currentChaseWalkTheta = 0
-
+        # Stop walking if we need to switch gaits
         if player.currentGait != constants.FAST_GAIT:
             player.stopWalking()
             player.stoppedWalk = False
         else:
             player.stoppedWalk = True
 
+    # Determine if we have stopped walking
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
 
+    # Walk if we have stopped walking
+    if player.stoppedWalk:
+        # Switch to the fast gait for better spinning
+        if player.currentGait != constants.FAST_GAIT:
+            player.brain.CoA.setRobotGait(player.brain.motion)
+            player.currentGait = constants.FAST_GAIT
+
+        player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
+
+    # Determine if we should leave this state
+    if player.brain.ball.on and constants.USE_LOC_CHASE:
+        player.brain.tracker.trackBall()
+        return player.goLater('positionOnBall')
+    elif transitions.shouldTurnToBall_FoundBall(player):
+        return player.goLater('turnToBallFar')
+
+    return player.stay()
+
+def turnToBallFar(player):
+    """
+    Rotate to align with the ball. When we get close, we will approach it
+    """
+    ball = player.brain.ball
+
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.currentChaseWalkX = 0
+        player.currentChaseWalkY = 0
+        player.currentChaseWalkTheta = 0
+        # Stop walking if we need to switch gaits
+        if player.currentGait != constants.FAST_GAIT:
+            player.stopWalking()
+            player.stoppedWalk = False
+        else:
+            player.stoppedWalk = True
+
+    # Determine the speed to turn to the ball
     turnRate = MyMath.clip(ball.bearing*constants.BALL_SPIN_GAIN,
                            -constants.BALL_SPIN_SPEED,
                            constants.BALL_SPIN_SPEED)
 
+    # Avoid spinning so slowly that we step in place
     if fabs(turnRate) < constants.MIN_BALL_SPIN_SPEED:
         turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_SPEED
 
+    # Determine that we have stopped walking
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
 
-    if ball.on and player.stoppedWalk and player.currentGait != constants.FAST_GAIT:
-        player.printf("Switching to fast gait in turn to ball far")
+    # Switch gaits if necessary
+    if player.stoppedWalk and player.currentGait != constants.FAST_GAIT:
         player.brain.CoA.setRobotGait(player.brain.motion)
         player.currentGait = constants.FAST_GAIT
 
@@ -127,21 +145,11 @@ def approachBall(player):
         else:
             player.stoppedWalk = True
 
-    ball = player.brain.ball
-    sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
-                     constants.MIN_X_SPEED,
-                     constants.MAX_X_SPEED)
+    # Determine if we have stopped walking
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
 
-    if ball.on and player.stoppedWalk:
-        if player.currentGait != constants.FAST_GAIT:
-            player.printf("Switching to fast gait in approach ball")
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            player.currentGait = constants.FAST_GAIT
-        player.currentChaseWalkX = sX
-        player.setSpeed(sX,0,0)
-
+    # Switch to other states if we should
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
@@ -151,21 +159,60 @@ def approachBall(player):
     elif transitions.shouldAvoidObstacle(player):
         return player.goLater('avoidObstacle')
 
+    # Determine our speed for approaching the ball
+    ball = player.brain.ball
+    sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
+                     constants.MIN_X_SPEED,
+                     constants.MAX_X_SPEED)
+
+    # Determine the speed to turn to the ball
+    sTheta = MyMath.clip(ball.bearing*constants.APPROACH_SPIN_GAIN,
+                         -constants.APPROACH_SPIN_SPEED,
+                         constants.APPROACH_SPIN_SPEED)
+    # Avoid spinning so slowly that we step in place
+    if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
+        sTheta = 0.0
+
+    # Set our walk towards the ball
+    if ball.on and player.stoppedWalk:
+        if player.currentGait != constants.FAST_GAIT:
+            player.brain.CoA.setRobotGait(player.brain.motion)
+            player.currentGait = constants.FAST_GAIT
+        player.currentChaseWalkX = sX
+        player.currentChaseWalkTheta = sTheta
+        player.setSpeed(sX,0,sTheta)
+
     return player.stay()
 
 def positionForKick(player):
+    """
+    State to align on the ball once we are near it
+    Currently aligns the ball on the left foot
+    """
+    ball = player.brain.ball
+
     if player.firstFrame():
         player.currentChaseWalkX = 0
         player.currentChaseWalkY = 0
         player.currentChaseWalkTheta = 0
 
+        # Stop if we need to switch gaits
         if player.currentGait != constants.NORMAL_GAIT:
             player.stoppedWalk = False
             player.stopWalking()
         else:
             player.stoppedWalk = True
 
-    ball = player.brain.ball
+    # Leave this state if necessary
+    if transitions.shouldKick(player):
+        return player.goLater('waitBeforeKick')
+    elif transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    elif transitions.shouldTurnToBall_ApproachBall(player):
+        return player.goLater('turnToBallFar')
+
+
+    # Determine approach speed
     targetY = (ball.locRelY -
                (constants.BALL_KICK_LEFT_Y_L + constants.BALL_KICK_LEFT_Y_R) / 2.0 )
     sY = MyMath.clip(targetY,
@@ -199,28 +246,26 @@ def positionForKick(player):
 #                   str(constants.BALL_KICK_LEFT_X_CLOSE) +
 #                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
 
+    # Determine if we have stopped
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
 
-    # Walk if we have switched to the correct gait
+    # Walk if we have stopped or have the correct gait already
     if ball.on and player.stoppedWalk:
         # Set the correct gait, to make us walk better
         if player.currentGait != constants.NORMAL_GAIT:
-            player.printf("Switching to normal gait in position for kick")
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
             player.currentGait = constants.NORMAL_GAIT
         player.currentChaseWalkY = sY
         player.currentChaseWalkX = sX
         player.setSpeed(0,sY,sX)
 
-    if transitions.shouldKick(player):
-        return player.goLater('waitBeforeKick')
-    elif transitions.shouldScanFindBall(player):
-        return player.goLater('scanFindBall')
-
     return player.stay()
 
 def waitBeforeKick(player):
+    """
+    Stop before we kick to make sure we want to kick
+    """
     if player.firstFrame():
         player.stopWalking()
         player.currentChaseWalkX = 0
@@ -243,7 +288,7 @@ def waitBeforeKick(player):
 
 def decideKick(player):
     """
-    Decides if we should kick.
+    Decides which kick to use
     """
     if player.firstFrame():
         player.stopWalking()
@@ -403,6 +448,9 @@ def decideKick(player):
         return player.goLater('kickBallStraight')
 
 def kickBallStraight(player):
+    """
+    Kick the ball forward.  Currently uses the left foot
+    """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
@@ -413,7 +461,8 @@ def kickBallStraight(player):
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
         # trick the robot into standing up instead of leaning to the side
         player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
-        player.setSpeed(0,0,0)
+        player.walkPose()
+
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
         elif transitions.shouldApproachBall(player):
@@ -426,6 +475,9 @@ def kickBallStraight(player):
     return player.stay()
 
 def kickBallLeft(player):
+    """
+    Strafe in order to line up to kick the ball to the right
+    """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.setSpeed(0,1.5,0)
@@ -435,18 +487,23 @@ def kickBallLeft(player):
         return player.goLater('kickBallLeftExecute')
     return player.stay()
 
-def kickBallLeftExecute(player):
+def kickBallRight(player):
+    """
+    Kick the ball to the right, using the left foot
+    """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.executeStiffness(StiffnessModes.LEFT_SIDE_KICK_STIFFNESSES)
-        player.printf("We should kick left!", 'cyan')
+        player.printf("We should kick right!", 'cyan')
     if player.counter == 2:
+        # Left side kick, means the sideways kick with the left foot
+        # Kicks the ball to the right
         player.executeMove(SweetMoves.LEFT_SIDE_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_SIDE_KICK):
         # trick the robot into standing up instead of leaning to the side
         player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
-        player.setSpeed(0,0,0)
+        player.walkPose()
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
         elif transitions.shouldApproachBall(player):
@@ -458,18 +515,23 @@ def kickBallLeftExecute(player):
 
     return player.stay()
 
-def kickBallRight(player):
+def kickBallLeftExecute(player):
+    """
+    Kicks the ball to the left, using the right foot
+    """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.executeStiffness(StiffnessModes.RIGHT_SIDE_KICK_STIFFNESSES)
-        player.printf("We should kick right!", 'cyan')
+        player.printf("We should kick left!", 'cyan')
     if player.counter == 2:
+        # Right side kick, means the sideways kick with the right foot
+        # Kicks the ball to the left
         player.executeMove(SweetMoves.RIGHT_SIDE_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.RIGHT_SIDE_KICK):
         # trick the robot into standing up instead of leaning to the side
         player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
-        player.setSpeed(0,0,0)
+        player.walkPose()
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
         elif transitions.shouldApproachBall(player):
@@ -482,12 +544,18 @@ def kickBallRight(player):
     return player.stay()
 
 def ignoreOwnGoal(player):
+    """
+    Method to intelligently ignore kicking into our own goal
+    """
     if transitions.shouldSpinFindBall(player):
         return player.goNow('spinFindBall')
 
     return player.stay()
 
 def avoidObstacle(player):
+    """
+    If we detect something in front of us, dodge it
+    """
     if player.firstFrame():
         player.stopWalking()
 

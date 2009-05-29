@@ -14,11 +14,6 @@ def shouldTurnToBall_ApproachBall(player):
         return True
     return False
 
-def shouldCantFindBall(player):
-    if player.stateTime >= constants.GIVE_UP_THRESH:
-        return True
-    return False
-
 def shouldSpinFindBall(player):
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SCAN_BALL):
         return True
