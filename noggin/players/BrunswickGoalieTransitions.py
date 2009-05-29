@@ -20,9 +20,9 @@ def shouldSave(player):
     if relVelX < 0.0:
       timeUntilSave = relX / -relVelX
       anticipatedY = (relY + relVelY * (timeUntilSave - BALL_SAVE_LIMIT_TIME))
-      player.printf(("relVelX = ", relVelX, " relVelY = ", relVelY,
+      '''player.printf(("relVelX = ", relVelX, " relVelY = ", relVelY,
               " timeUntilSave = ", timeUntilSave,
-              " anticipatedY = ", anticipatedY))
+              " anticipatedY = ", anticipatedY))'''
     else:
       timeUntilSave = -1
       anticipatedY = ball.y
@@ -51,15 +51,24 @@ def shouldHoldSave(player):
     return False
 
 def shouldChase(player):
-    return player.brain.playbook.subRole == "GOALIE_CHASER"
+    if player.brain.playbook.subRole == PBConstants.GOALIE_CHASER\
+        and player.brain.ball.dist <= 20:
+        return True
+    return False
 
-def shouldStopChase(player):
+def shouldStopChaseLoc(player):
     my = player.brain.my
     if (my.x > Constants.MY_GOALBOX_RIGHT_X + PBConstants.END_CLEAR_BUFFER
         or my.y > Constants.MY_GOALBOX_TOP_Y + PBConstants.END_CLEAR_BUFFER
         or my.y < Constants.MY_GOALBOX_BOTTOM_Y + PBConstants.END_CLEAR_BUFFER):
         return True
     return False
+
+def shouldStopChase(player):
+    if player.brain.ball.dist > 20:
+        return True
+    return False
+
 
 def ballBtwnMeAndGoal(player):
     '''circle the ball if it's between us and our own goal'''

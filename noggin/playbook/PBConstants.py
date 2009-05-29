@@ -98,37 +98,37 @@ SUB_ROLE_SWITCH_BUFFER = 10.
 NUM_SUB_ROLES = 23
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
-                                            #OFFENDER SUB ROLES 1-3
+                                            #OFFENDER SUB ROLES 2-4
                                             "LEFT_WING",
                                             "RIGHT_WING",
                                             "DUBD_OFFENDER",
 
-                                            # DEFENDER SUB ROLES 4-8
+                                            # DEFENDER SUB ROLES 5-9
                                             "STOPPER",
                                             "DEEP_STOPPER",
                                             "SWEEPER",
                                             "LEFT_DEEP_BACK",
                                             "RIGHT_DEEP_BACK",
 
-                                            # CHASER SUB ROLES 8-9
+                                            # CHASER SUB ROLES 10-11
                                             "CHASE_NORMAL",
                                             "CHASE_AROUND_BOX",
 
-                                            # FINDER SUB ROLES 10-13
+                                            # FINDER SUB ROLES 12-15
                                             "FRONT_FINDER",
                                             "LEFT_FINDER",
                                             "RIGHT_FINDER",
                                             "OTHER_FINDER",
 
-                                            # GOALIE SUB ROLE 14
+                                            # GOALIE SUB ROLE 16-17
                                             "GOALIE_NORMAL",
                                             "GOALIE_CHASER",
 
-                                            # KICKOFF SUB ROLES 15-16
+                                            # KICKOFF SUB ROLES 18-19
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 17-19
+                                            # READY SUB ROLES 20-22
                                             "READY_CHASER",
                                             "READY_DEFENDER",
                                             "READY_OFFENDER")))

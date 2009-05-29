@@ -8,8 +8,8 @@ CENTER_SAVE_THRESH = 15.
 def goaliePosition(player):
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
-    elif player.brain.playbook.subRole == "GOALIE_CHASER":
-        return player.goNow('chase')
+    elif helper.shouldChase(player):
+        return player.goNow('goalieChase')
     return player.goLater('goalieAtPosition')
     #for now we don't want the goalie trying to move
     #return player.goLater('goalieAtPosition')
@@ -35,8 +35,9 @@ def goalieAtPosition(player):
     """
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
-    elif player.brain.playbook.subRole == "GOALIE_CHASER":
-        return player.goNow('chase')
+    s = helper.shouldChase(player)
+    if s:
+        return player.goNow('goalieChase')
     if player.firstFrame():
         player.stopWalking()
     

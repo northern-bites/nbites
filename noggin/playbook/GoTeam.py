@@ -417,13 +417,16 @@ class GoTeam:
 
         return pos_x,pos_y
 
+    def goalieShouldChase(self):
+        return self.noCalledChaser()
+
     def noCalledChaser(self):
         """
         Returns true if no one is chasing and they are not searching
         """
         # If everyone else is out, let's not go for the ball
-        if len(self.getActiveFieldPlayers()) == 0:
-            return False
+        #if len(self.getActiveFieldPlayers()) == 0:
+            #return False
 
         if self.brain.gameController.currentState == 'gameReady' or\
                 self.brain.gameController.currentState =='gameSet':

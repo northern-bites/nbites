@@ -8,6 +8,7 @@ from math import hypot
 from ..util.MyMath import safe_atan2
 from . import BrunswickStates
 from . import BrunswickGoalieStates
+from . import GoalieChaseBallStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -16,6 +17,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(BrunswickStates)
         self.addStates(PositionStates)
         self.addStates(BrunswickGoalieStates)
+        self.addStates(GoalieChaseBallStates)
         self.setName('pBrunswick')
         self.currentRole = PBConstants.INIT_ROLE
         self.stoppedWalk = False
