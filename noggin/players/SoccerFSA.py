@@ -141,3 +141,11 @@ class SoccerFSA(FSA.FSA):
         for i in xrange(len(stiffnesses)):
             stiffnessCommand.setChainStiffness(i,stiffnesses[i])
         self.brain.motion.sendStiffness(stiffnessCommand)
+
+    def walkPose(self):
+        """
+        We should usually not call this method from outside nav.
+        This is a quasi-hack created by Tucker
+        He can do hacks like this, you can't
+        """
+        self.brain.nav.setSpeed(0,0,0)

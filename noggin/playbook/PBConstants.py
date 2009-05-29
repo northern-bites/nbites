@@ -8,7 +8,7 @@ from .. import NogginConstants
 # Test switches to force one role to always be given out
 TEST_DEFENDER = False
 TEST_OFFENDER = False
-TEST_CHASER = False
+TEST_CHASER = True
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
