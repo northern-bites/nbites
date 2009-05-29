@@ -103,10 +103,10 @@ def turnToBallFar(player):
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
 
-    elif MyMath.sign(player.currentChaseWalkTheta) != MyMath.sign(turnRate):
-        player.currentChaseWalkTheta = turnRate
-        player.stoppedWalk = False
-        player.stopWalking()
+#     elif MyMath.sign(player.currentChaseWalkTheta) != MyMath.sign(turnRate):
+#         player.currentChaseWalkTheta = turnRate
+#         player.stoppedWalk = False
+#         player.stopWalking()
     elif ball.on and player.stoppedWalk:
         player.currentChaseWalkTheta = turnRate
         player.setSpeed(x=0,y=0,theta=turnRate)
@@ -141,8 +141,6 @@ def approachBall(player):
             player.currentGait = constants.FAST_GAIT
         player.currentChaseWalkX = sX
         player.setSpeed(sX,0,0)
-
-    player.printf(player.brain.sonar)
 
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
