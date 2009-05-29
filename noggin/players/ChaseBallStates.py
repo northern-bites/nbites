@@ -109,10 +109,7 @@ def turnToBallFar(player):
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
 
-    # Switch gaits if necessary
-    if player.stoppedWalk and player.currentGait != constants.FAST_GAIT:
-        player.brain.CoA.setRobotGait(player.brain.motion)
-        player.currentGait = constants.FAST_GAIT
+
 
     if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
@@ -120,12 +117,12 @@ def turnToBallFar(player):
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-
-#     elif MyMath.sign(player.currentChaseWalkTheta) != MyMath.sign(turnRate):
-#         player.currentChaseWalkTheta = turnRate
-#         player.stoppedWalk = False
-#         player.stopWalking()
     elif ball.on and player.stoppedWalk:
+        # Switch gaits if necessary
+        if player.currentGait != constants.FAST_GAIT:
+            player.brain.CoA.setRobotGait(player.brain.motion)
+            player.currentGait = constants.FAST_GAIT
+
         player.currentChaseWalkTheta = turnRate
         player.setSpeed(x=0,y=0,theta=turnRate)
 
@@ -171,7 +168,7 @@ def approachBall(player):
                          constants.APPROACH_SPIN_SPEED)
     # Avoid spinning so slowly that we step in place
     if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
-        sTheta = 0.0
+        sTheta = constants.MIN_APPROACH_SPIN_SPEED
 
     # Set our walk towards the ball
     if ball.on and player.stoppedWalk:

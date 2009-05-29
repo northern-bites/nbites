@@ -1,21 +1,16 @@
-# Frame thresholds
-FRAMES_ON_THRESH = 2
-FRAMES_OFF_THRESH = 12
-SUPER_SAFE_KICKS = False
+# Component Switches
+SUPER_SAFE_KICKS = False # Only kick straight when we see the goal
+USE_LOC_CHASE = False
+
+# Ball on and off frame thresholds
+BALL_ON_THRESH = 2
+BALL_OFF_THRESH = 12
 
 # Turning
 # Value to stop spinning to ball and approach
-BALL_BEARING_THRESH = 10
+BALL_APPROACH_BEARING_THRESH = 10
 # Value to start spinning to ball
-BALL_BEARING_OFF_THRESH = 17
-
-BALL_SPIN_POSITION_THRESH = 10
-USE_LOC_CHASE = False
-
-# close approach/turn thresholds
-BALL_CLOSE_DIST_THRESH = 42
-BALL_CLOSE_TURN_BEARING_THRESH = 15
-BALL_CLOSE_APPROACH_BEARING_THRESH = 5
+BALL_APPROACH_BEARING_OFF_THRESH = 17
 
 BALL_POS_KICK_DIST_THRESH = 15.0
 BALL_POS_KICK_BEARING_THRESH = 30
