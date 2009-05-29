@@ -84,8 +84,6 @@ IF(COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 OLD)
     # CMake policy regarding excaping definitions
     CMAKE_POLICY(SET CMP0005 OLD)
-    # CMake policy regarding scoped include
-    CMAKE_POLICY(SET CMP0011 OLD)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
