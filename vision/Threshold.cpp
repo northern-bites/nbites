@@ -1193,7 +1193,7 @@ void Threshold::setYUV(const uchar* newyuv) {
         // our color tables, inverted=non-inverted and non-inverted=inverted
         uplane = yplane + 1;
         vplane = yplane + 3;
-#elif ROBO(NAO_SIM)
+#elif ROBOT(NAO_SIM)
 #else
 #    error Undefined robot type
 #endif
