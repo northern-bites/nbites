@@ -2,6 +2,7 @@ import man.noggin.util.MyMath as MyMath
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import man.motion.SweetMoves as SweetMoves
+import man.motion.HeadMoves as HeadMoves
 from math import fabs
 import man.motion.StiffnessModes as StiffnessModes
 
@@ -54,7 +55,7 @@ def spinFindBall(player):
         player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
 
 #     if not player.brain.motion.isHeadActive():
-#         player.executeMove(SweetMoves.FIND_BALL_HEADS_LEFT)
+#         player.executeMove(HeadMoves.FIND_BALL_HEADS_LEFT)
 
     if player.brain.ball.on and constants.USE_LOC_CHASE:
         player.brain.tracker.trackBall()
@@ -200,13 +201,13 @@ def decideKick(player):
         player.sawOppGoal = False
         player.brain.tracker.switchTo('stopped')
         player.brain.motion.stopHeadMoves()
-        player.executeMove(SweetMoves.KICK_SCAN)
+        player.executeMove(HeadMoves.KICK_SCAN)
         player.oppGoalLeftPostBearings = []
         player.oppGoalRightPostBearings = []
         player.myGoalLeftPostBearings = []
         player.myGoalRightPostBearings = []
 
-    if (player.stateTime < SweetMoves.getMoveTime(SweetMoves.KICK_SCAN)):
+    if (player.stateTime < SweetMoves.getMoveTime(HeadMoves.KICK_SCAN)):
         if player.brain.myGoalLeftPost.on:
             player.sawOwnGoal = True
             player.myGoalLeftPostBearings.append(player.brain.myGoalLeftPost.bearing)
