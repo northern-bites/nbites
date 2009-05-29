@@ -1,18 +1,21 @@
 #include "NullProvider.h"
 
 using namespace std;
-#include "Kinematics.h"
 
-NullProvider::NullProvider(boost::shared_ptr<Sensors> s,vector<bool> chain_mask)
+NullProvider::NullProvider(boost::shared_ptr<Sensors> s,
+                           const bool chain_mask[Kinematics::NUM_CHAINS])
     :MotionProvider(NULL_PROVIDER),
      sensors(s),
      currentStiffness(Kinematics::NUM_JOINTS,0.0f),
      lastStiffness(Kinematics::NUM_JOINTS,0.0f),
-     chainMask(chain_mask),
      frozen(false), freezingOn(false), freezingOff(false), newCommand(false)
 {
-
     pthread_mutex_init(&null_provider_mutex,NULL);
+    cout << "The mask for this NullProvider is";
+    for(unsigned int c =0; c <  Kinematics::NUM_CHAINS; c++){
+        chainMask[c] = chain_mask[c];
+        if(chainMask[c]) cout <<" true "; else  cout << "false";
+    }
 }
 NullProvider::~NullProvider(){
     pthread_mutex_destroy(&null_provider_mutex);

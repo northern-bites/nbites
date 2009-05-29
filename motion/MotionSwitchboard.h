@@ -43,6 +43,8 @@
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
+#include "NullHeadProvider.h"
+#include "NullBodyProvider.h"
 #include "Sensors.h"
 #include "MotionConstants.h"
 
@@ -113,6 +115,8 @@ private:
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
+    NullHeadProvider nullHeadProvider;
+    NullBodyProvider nullBodyProvider;
 
 	MotionProvider * curProvider;
 	MotionProvider * nextProvider;

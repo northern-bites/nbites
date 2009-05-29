@@ -8,10 +8,12 @@
 #include "OffFreezeCommand.h"
 
 #include "Sensors.h"
+#include "Kinematics.h"
 
 class NullProvider : public MotionProvider {
 public:
-    NullProvider(boost::shared_ptr<Sensors> s, std::vector<bool> chain_mask);
+    NullProvider(boost::shared_ptr<Sensors> s,
+                 const bool chain_mask[Kinematics::NUM_CHAINS]);
     virtual ~NullProvider();
 
     void calculateNextJointsAndStiffnesses();
@@ -28,7 +30,7 @@ private:
 private:
     boost::shared_ptr<Sensors> sensors;
     std::vector<float> currentStiffness,lastStiffness;
-    std::vector<bool> chainMask;
+    bool chainMask[Kinematics::NUM_CHAINS];
     mutable pthread_mutex_t null_provider_mutex;
     bool frozen, freezingOn, freezingOff, newCommand;
     boost::shared_ptr<FreezeCommand> nextCommand;
