@@ -13,6 +13,11 @@ FIND_BALL_HEADS_RIGHT =  (((-45.,-10.),0.8,0),
                           ((-45.,200.),0.3,1))
 
 
+# Distance that can be seen at a certain head pitch
+# | degree | close | far |
+# |     20 |    15 |  53 |
+# |     -5 |    33 | 104 |
+# |    -30 |   104 | inf |
 #HEAD SCANS
 
 LOC_PANS = (
@@ -32,7 +37,8 @@ QUICK_PANS = (
     ((-65.0,-25.0),.4,  1),
     ((-30.0,-25.0),.4,  1))
 
-HIGH_SCAN_BALL= (
+HIGH_SCAN_CLOSE_BOUND = 104
+HIGH_SCAN_BALL = (
     (( -65.0, -30.0),0.6,  1),
     (( 65.0, -30.0),1.3, 1),
     ((65.,-5.),0.3,  1),
@@ -42,7 +48,9 @@ HIGH_SCAN_BALL= (
     ((65.0, -5.0) ,0.3, 1),
     (( -65.0, -5.0),1.3,  1),)
 
-MID_DOWN_SCAN_BALL= (
+MID_SCAN_CLOSE_BOUND = 40
+MID_SCAN_FAR_BOUND = 104
+MID_DOWN_SCAN_BALL = (
     ((65.,-5.),0.6,  1),
     ((-65.,-5.),1.4, 1),
     ((-65.,20.),0.3,1),
@@ -52,7 +60,7 @@ MID_DOWN_SCAN_BALL= (
     (( -65.0, -30.0),0.3,  1),
     (( 65.0, -30.0),1.3, 1),)
 
-MID_UP_SCAN_BALL= (
+MID_UP_SCAN_BALL = (
     ((65.0, -5.0) ,0.6, 1),
     (( -65.0, -5.0),1.3,  1),
     (( -65.0, -30.0),0.3,  1),
@@ -62,7 +70,9 @@ MID_UP_SCAN_BALL= (
     ((-65.,-30.),0.3,1),
     ((65.,-30.),1.4, 1),)
 
-LOW_SCAN_BALL= (
+LOW_SCAN_CLOSE_BOUND = 0
+LOW_SCAN_FAR_BOUND = 40
+LOW_SCAN_BALL = (
     ((-65.,20.),0.6,1),
     ((65.,20.),1.4, 1),
     ((65.0, -5.0) ,0.3, 1),

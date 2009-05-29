@@ -1,22 +1,25 @@
-import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 1 #num frms after which to switch to scanfindbl
 
 def scanBall(tracker):
+    ball = tracker.brain.ball
 
-
-    if tracker.target == tracker.brain.ball and \
+    if tracker.target == ball and \
             tracker.target.framesOn >= TRACKER_FRAMES_ON_TRACK_THRESH:
         return tracker.goNow('ballTracking')
-#     if tracker.firstFrame():
-#         # move head to beginning (0.0,SCAN_BALL start head yaw)
-#         # Move the head at 4 deg /sec
-#         moveTime = (abs(tracker.brain.sensors.motionAngles[0]) / 23.0)
-#         tracker.execute((((0.0,HeadMoves.SCAN_BALL[0][0][1]),moveTime,1),))
 
     if not tracker.brain.motion.isHeadActive():
-        tracker.execute(HeadMoves.MID_SCAN_BALL)
+        lastBallDist = ball.lastVisionDist
+        if lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
+            tracker.execute(HeadMoves.HIGH_SCAN_BALL)
+
+        elif lastBallDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
+                lastBallDist < HeadMoves.MID_SCAN_FAR_BOUND:
+            tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
+        else:
+            tracker.execute(HeadMoves.LOW_SCAN_BALL)
+
     return tracker.stay()
 
 def scanning(tracker):
