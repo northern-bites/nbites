@@ -93,8 +93,10 @@ public:
     }
 
 private:
-    int processProviders();
-    int processStiffness();
+    void preProcess();
+    void processJoints();
+    void processStiffness();
+    int  postProcess();
     void swapBodyProvider();
     BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
     int realityCheckJoints();

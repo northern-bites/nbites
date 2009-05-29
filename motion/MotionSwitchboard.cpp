@@ -120,9 +120,11 @@ void MotionSwitchboard::run() {
 
     while(running) {
         realityCheckJoints();
-        processStiffness();
-        bool active  = processProviders();
 
+        preProcess();
+        processJoints();
+        processStiffness();
+        bool active  = postProcess();
 
 #ifdef DEBUG_JOINTS_OUTPUT
         if(active)
@@ -139,9 +141,7 @@ void MotionSwitchboard::run() {
     cout << "Switchboard run has exited" <<endl;
 }
 
-int MotionSwitchboard::processProviders(){
-
-
+void MotionSwitchboard::preProcess(){
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
 
@@ -155,6 +155,10 @@ int MotionSwitchboard::processProviders(){
 #endif
         curProvider->requestStop();
     }
+
+}
+
+void MotionSwitchboard::processJoints(){
 #ifdef DEBUG_SWITCHBOARD
     static bool switchedHeadToInactive = true;
 #endif
@@ -220,6 +224,59 @@ int MotionSwitchboard::processProviders(){
         switchedToInactive = true;
 #endif
     }
+
+
+}
+
+
+/**
+ * Method to process remaining stiffness requests
+ * Technically this could be handled by another provider, but there isn't
+ * too much too it:
+ */
+void MotionSwitchboard::processStiffness(){
+    int changed  = 0;
+    if(!newStiffnessCommandSent)
+        return;
+
+    pthread_mutex_lock(&stiffness_mutex);
+    //For each command, we look at each chain and see if there is anything
+    //that needs to be done
+    for(unsigned int i = HEAD_CHAIN; i <=RARM_CHAIN; i++){
+        const vector <float> stiffnesses =
+            nextStiffnessCommand->getChainStiffness((ChainID) i);
+
+        //Skip empty chains
+        if(stiffnesses.size() == 0){
+            continue;
+        }
+        //Each chain has several joints we need to update
+        //Ignore unchanged values or when the value is explicitly
+        //set to NOT_SET
+        for(unsigned int j = 0; j < chain_lengths[i]; j ++){
+            if (nextStiffness[chain_first_joint[i] + j]
+                != stiffnesses.at(j) &&
+                stiffnesses.at(j) != StiffnessCommand::NOT_SET){
+                nextStiffness[chain_first_joint[i] + j] =
+                    stiffnesses.at(j);
+                changed += 1; //flag when a value is changed
+            }
+        }
+
+    }
+
+    newStiffnessCommandSent = false;
+    if(changed){
+        newStiffness = true;
+    }
+
+
+    pthread_mutex_unlock(&stiffness_mutex);
+
+}
+
+
+int MotionSwitchboard::postProcess(){
     newJoints = true;
 
     //Make sure that if the current provider just became inactive,
@@ -241,6 +298,7 @@ int MotionSwitchboard::processProviders(){
     return curProvider->isActive() ||  headProvider.isActive();
 
 }
+
 
 /**
  * Method handles switching providers. Also handles any special action
@@ -466,49 +524,3 @@ void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> co
 
 }
 
-/**
- * Method to process remaining stiffness requests
- * Technically this could be handled by another provider, but there isn't
- * too much too it:
- */
-int MotionSwitchboard::processStiffness(){
-    int changed  = 0;
-    if(!newStiffnessCommandSent)
-        return changed;
-
-    pthread_mutex_lock(&stiffness_mutex);
-    //For each command, we look at each chain and see if there is anything
-    //that needs to be done
-    for(unsigned int i = HEAD_CHAIN; i <=RARM_CHAIN; i++){
-        const vector <float> stiffnesses =
-            nextStiffnessCommand->getChainStiffness((ChainID) i);
-
-        //Skip empty chains
-        if(stiffnesses.size() == 0){
-            continue;
-        }
-        //Each chain has several joints we need to update
-        //Ignore unchanged values or when the value is explicitly
-        //set to NOT_SET
-        for(unsigned int j = 0; j < chain_lengths[i]; j ++){
-            if (nextStiffness[chain_first_joint[i] + j]
-                != stiffnesses.at(j) &&
-                stiffnesses.at(j) != StiffnessCommand::NOT_SET){
-                nextStiffness[chain_first_joint[i] + j] =
-                    stiffnesses.at(j);
-                changed += 1; //flag when a value is changed
-            }
-        }
-
-    }
-
-    newStiffnessCommandSent = false;
-    if(changed){
-        newStiffness = true;
-    }
-
-
-    pthread_mutex_unlock(&stiffness_mutex);
-
-    return changed;
-}
