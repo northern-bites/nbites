@@ -26,6 +26,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	  headProvider(1/50.0f,sensors),
 	  curProvider(&scriptedProvider),
 	  nextProvider(&scriptedProvider),
+      curHeadProvider(&headProvider),
+      nextHeadProvider(&headProvider),
       curGait(NULL),
       nextGait(&DEFAULT_PARAMETERS),
       nextJoints(s->getBodyAngles()),
@@ -144,10 +146,10 @@ void MotionSwitchboard::run() {
 void MotionSwitchboard::preProcess(){
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
-
         swapBodyProvider();
-
-
+	}
+	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive()) {
+        swapHeadProvider();
 	}
 	if (curProvider != nextProvider && !curProvider->isStopping()){
 #ifdef DEBUG_SWITCHBOARD
@@ -162,11 +164,11 @@ void MotionSwitchboard::processJoints(){
 #ifdef DEBUG_SWITCHBOARD
     static bool switchedHeadToInactive = true;
 #endif
-    if (headProvider.isActive()) {
+    if (curHeadProvider->isActive()) {
 		// Calculate the next joints and get them
-		headProvider.calculateNextJointsAndStiffnesses();
+		curHeadProvider->calculateNextJointsAndStiffnesses();
 		// get headJoints from headProvider
-		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
+		vector <float > headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
 
         for(unsigned int i = 0; i < HEAD_JOINTS;i++){
             nextJoints[HEAD_YAW + i] = headJoints.at(i);
@@ -178,7 +180,7 @@ void MotionSwitchboard::processJoints(){
     }else{
 #ifdef DEBUG_SWITCHBOARD
         if (!switchedHeadToInactive)
-            cout << headProvider << " is inactive" <<endl;
+            cout << *curHeadProvider << " is inactive" <<endl;
         switchedHeadToInactive = true;
 #endif
     }
@@ -235,8 +237,8 @@ void MotionSwitchboard::processJoints(){
  * too much too it:
  */
 void MotionSwitchboard::processStiffness(){
-    if(headProvider.isActive()){
-		const vector <float > headStiffnesses = curProvider->getChainStiffnesses(LLEG_CHAIN);
+    if(curHeadProvider->isActive()){
+		const vector <float > headStiffnesses = curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
 
 		pthread_mutex_lock(&stiffness_mutex);
         for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
@@ -280,7 +282,9 @@ int MotionSwitchboard::postProcess(){
 	if (curProvider != nextProvider && !curProvider->isActive()) {
         swapBodyProvider();
 	}
-
+	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive()) {
+        swapHeadProvider();
+	}
     // Update sensors with the correct support foot because it may have
     // changed this frame.
     // TODO: This can be improved by keeping a local copy of the SupportFoot
@@ -289,7 +293,7 @@ int MotionSwitchboard::postProcess(){
     sensors->setSupportFoot(curProvider->getSupportFoot());
 
     //return if one of the enactors 
-    return curProvider->isActive() ||  headProvider.isActive();
+    return curProvider->isActive() ||  curHeadProvider->isActive();
 
 }
 
@@ -329,6 +333,15 @@ void MotionSwitchboard::swapBodyProvider(){
 #ifdef DEBUG_SWITCHBOARD
         cout << "Switched to " << *curProvider << endl;
 #endif
+    }
+
+}
+
+void MotionSwitchboard::swapHeadProvider(){
+    switch(nextHeadProvider->getType()){
+    case HEAD_PROVIDER:
+    default:
+        curHeadProvider = nextHeadProvider;
     }
 
 }
@@ -502,11 +515,11 @@ void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
     scriptedProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
-    // headProvider is NEVER the nextProvider. NEVER.
+    nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
-    // headProvider is NEVER the nextProvider. NEVER.
+    nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
 
@@ -514,7 +527,7 @@ void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> co
     pthread_mutex_lock(&stiffness_mutex);
     vector<float> stiff = command->getChainStiffness((ChainID) 0);
     float newStiff = stiff[0];
-    cout << "Setting the stiffness to " << newStiff<<endl;
+    cout << "Deprecated!!! Setting the stiffness to " << newStiff<<endl;
     scriptedProvider.setStiffness(newStiff);
     headProvider.setStiffness(newStiff);
     walkProvider.setStiffness(newStiff);

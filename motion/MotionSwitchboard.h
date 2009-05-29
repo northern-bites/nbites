@@ -98,6 +98,7 @@ private:
     void processStiffness();
     int  postProcess();
     void swapBodyProvider();
+    void swapHeadProvider();
     BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
     int realityCheckJoints();
 
@@ -115,6 +116,9 @@ private:
 
 	MotionProvider * curProvider;
 	MotionProvider * nextProvider;
+
+	MotionProvider * curHeadProvider;
+	MotionProvider * nextHeadProvider;
 
     const WalkingParameters *curGait;
     const WalkingParameters *nextGait;
