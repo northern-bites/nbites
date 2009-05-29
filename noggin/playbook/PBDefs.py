@@ -27,11 +27,11 @@ class Teammate:
         self.ballLocDist = 0
         self.ballLocBearing = 0
         self.calledRole = 0
-        self.lastPacketTime = 0
+        self.lastPacketTime = time.time()
 
-        self.brain = tbrain        # brain instance
+        self.brain = tbrain # brain instance
         self.role = 0 # known role
-        self.inactive = False # dead basically just means inactive
+        self.active = True
         self.grabbing = False # dog is grabbing
         self.dribbling = False # dog is dribbling
         self.kicking = False # dog is kicking[
@@ -69,9 +69,8 @@ class Teammate:
         self.ballLocDist = self.getDistToBall()
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
-
-        self.inactive = False
-
+        self.active = True
+        
         self.grabbing = (packet.ballDist <= 
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.dribbling = (packet.ballDist <= 
@@ -79,7 +78,7 @@ class Teammate:
         self.kicking = False
         #(packet.ballDist == 
         #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
-        self.lastPacketTime = time.time()
+        self.lastPacketTime = self.brain.playbook.getTime()
 
 
     def updateMe(self):
@@ -98,8 +97,8 @@ class Teammate:
         self.ballDist = self.brain.ball.dist
         self.ballLocDist = self.brain.ball.locDist
         self.ballLocBearing = self.brain.ball.locBearing
-        self.inactive = self.brain.gameController.currentState =='gamePenalized'
-        self.lastPacketTime = time.time()
+        self.active = not self.brain.gameController.currentState =='gamePenalized'
+        self.lastPacketTime = self.brain.playbook.getTime()
         self.grabbing = (self.ballDist == 
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.dribbling = (self.ballDist == 
@@ -168,7 +167,10 @@ class Teammate:
                 self.calledSubRole == PBConstants.SWEEPER or
                 self.calledSubRole == PBConstants.LEFT_DEEP_BACK or
                 self.calledSubRole == PBConstants.RIGHT_DEEP_BACK)
-    
+
+    def isGoalie(self):
+        return self.playerNumber == PBConstants.GOALIE_NUMBER
+
     def isPenalized(self):
         '''
         this checks GameController to see if a player is penalized.
@@ -189,7 +191,7 @@ class Teammate:
         however, the dog could still be on but sending really laggy packets.
         '''
         return (PBConstants.PACKET_DEAD_PERIOD <
-                    time.time() - self.lastPacketTime)
+                    self.brain.playbook.getTime() - self.lastPacketTime)
 
     def hasBall(self):
         '''

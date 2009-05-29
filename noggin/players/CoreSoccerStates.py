@@ -15,6 +15,7 @@ def gamePenalized(player):
         player.stopWalking()
         player.motion.stopBodyMoves()
         player.penalizeHeads()
+        player.executeMove(SweetMoves.PENALIZED_POS)
     return player.stay()
 
 def gameInitial(player):

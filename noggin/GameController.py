@@ -63,6 +63,13 @@ class GameController(FSA.FSA):
     def timeSincePlay(self):
         return Constants.LENGTH_OF_HALF - self.timeRemaining
 
+    def getScoreDifferential(self):
+        '''
+        negative when we're losing
+        '''
+        return self.brain.gameController.gc.teams(self.brain.my.teamColor)[1] -\
+            self.brain.gameController.gc.teams((self.brain.my.teamColor+1)%2)[1]
+
     def setGCLEDS(self):
         '''
         Method to set the chest and feet according to the current

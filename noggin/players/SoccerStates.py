@@ -354,8 +354,8 @@ def gamePenalized(player):
         player.brain.tracker.switchTo('nothing')
         player.brain.motion.stopHeadMoves()
         player.brain.motion.stopBodyMoves()
-        player.executeMove(SweetMoves.PENALIZED_POS)
         player.brain.nav.stopWalking()
+        player.executeMove(SweetMoves.PENALIZED_POS)
         player.brain.tracker.switchTo('nothing')
     # kill joint stiffness
     return player.stay()

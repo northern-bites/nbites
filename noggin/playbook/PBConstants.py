@@ -8,7 +8,7 @@ from .. import NogginConstants
 # Test switches to force one role to always be given out
 TEST_DEFENDER = False
 TEST_OFFENDER = False
-TEST_CHASER = True
+TEST_CHASER = False
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
@@ -16,9 +16,11 @@ DEBUG_SEARCHER = False
 
 USE_FINDER = False
 USE_DEEP_STOPPER = False # Fallback to a deep defensive position
-KICKOFF_PLAY = True # Forces the more intelligent and restrictive kickoff play
+KICKOFF_PLAY = False # Forces the more intelligent and restrictive kickoff play
+PULL_THE_GOALIE = False
 
 GOALIE_NUMBER = 1
+DEFAULT_CHASER_NUMBER = 3
 # Length of time to spend in the kickoff play
 KICKOFF_FORMATION_TIME = 5
 
@@ -278,17 +280,18 @@ LEFT_DEEP_BACK_POS =  (DEEP_BACK_X, LEFT_DEEP_BACK_Y)
 RIGHT_DEEP_BACK_POS = (DEEP_BACK_X, RIGHT_DEEP_BACK_Y)
 
 # number of formations
-NUM_FORMATIONS = 14
+NUM_FORMATIONS = 15
 # dictionary of formations
 FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "PENALTY_FORMATION",
                                               "NO_FIELD_PLAYERS",
-                                              "ONE_DOWN",
-                                              "SPREAD",
+                                              "ONE_FIELD",
+                                              "TWO_FIELD",
+                                              "THREE_FIELD",
                                               "DUB_D",
                                               "FINDER",
                                               "KICKOFF_PLAY",
-                                              "KICKOFF",
+                                              "TWO_KICKOFF",
                                               "ONE_KICKOFF",
                                               "READY",
                                               "TEST_DEFEND",
@@ -298,12 +301,13 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
 (INIT_FORMATION,
  PENALTY_FORMATION,
  NO_FIELD_PLAYERS,
- ONE_DOWN,
- SPREAD,
+ ONE_FIELD,
+ TWO_FIELD,
+ THREE_FIELD,
  DUB_D,
  FINDER,
  KICKOFF_PLAY,
- KICKOFF,
+ TWO_KICKOFF,
  ONE_KICKOFF,
  READY,
  TEST_DEFEND,
