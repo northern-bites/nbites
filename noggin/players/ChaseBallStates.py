@@ -70,9 +70,6 @@ def spinFindBall(player):
 
         player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
 
-#     if not player.brain.motion.isHeadActive():
-#         player.executeMove(HeadMoves.FIND_BALL_HEADS_LEFT)
-
     # Determine if we should leave this state
     if player.brain.ball.on and constants.USE_LOC_CHASE:
         player.brain.tracker.trackBall()
