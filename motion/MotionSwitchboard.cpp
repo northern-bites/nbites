@@ -529,7 +529,27 @@ void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<OnFreezeCommand> command){
+    //Special case where we need to "freeze" the robot.
+    curProvider->hardReset();
+    curHeadProvider->hardReset();
+    nextProvider->hardReset();
+    nextHeadProvider->hardReset();
 
+    curProvider = &nullBodyProvider;
+    curHeadProvider = &nullHeadProvider;
+    nextProvider = &nullBodyProvider;
+    nextHeadProvider = &nullHeadProvider;
+
+    nullHeadProvider.setCommand(command);
+    nullBodyProvider.setCommand(command);
+}
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<OffFreezeCommand> command){
+    if(curHeadProvider == &nullHeadProvider)
+        nullHeadProvider.setCommand(command);
+    if(curProvider == &nullBodyProvider)
+        nullBodyProvider.setCommand(command);
+}
 void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> command){
     pthread_mutex_lock(&stiffness_mutex);
     vector<float> stiff = command->getChainStiffness((ChainID) 0);
