@@ -71,7 +71,6 @@ public:
 
 	const std::vector <float> getNextJoints() const;
 	const std::vector<float> getNextStiffness() const;
-    const bool hasNewStiffness() const;
     void signalNextFrame();
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
@@ -134,7 +133,6 @@ private:
 
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
-    mutable bool newStiffness, newStiffnessCommandSent;
 
     bool readyToSend;
 

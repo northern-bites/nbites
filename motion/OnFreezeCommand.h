@@ -5,7 +5,7 @@
 
 class OnFreezeCommand : public FreezeCommand {
 public:
-    OnFreezeCommand() : FreezeCommand(MotionConstants::DEFAULT_ON_STIFFNESS){}
+    OnFreezeCommand() : FreezeCommand(MotionConstants::DEFAULT_OFF_STIFFNESS){}
     ~OnFreezeCommand(){};
 
 };

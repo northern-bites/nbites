@@ -36,7 +36,6 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
 	  running(false),
       newJoints(false),
-      newStiffness(false),newStiffnessCommandSent(false),
       readyToSend(false),
       noWalkTransitionCommand(true)
 
@@ -59,9 +58,9 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     nullHeadProvider.setCommand(paralyze);
 
     //temp - HACK
-    scriptedProvider.setStiffness(0.0f);
-    headProvider.setStiffness(0.0f);
-    walkProvider.setStiffness(0.0f);
+    scriptedProvider.setStiffness(0.85f);
+    headProvider.setStiffness(0.85f);
+    walkProvider.setStiffness(0.85f);
 
     //Very Important, ensure that we have selected a default walk parameter set
     boost::shared_ptr<GaitCommand>  defaultGait(new GaitCommand(DEFAULT_P));
@@ -282,6 +281,7 @@ void MotionSwitchboard::processStiffness(){
         }
         pthread_mutex_unlock(&stiffness_mutex);
     }
+
 }
 
 
@@ -373,17 +373,9 @@ const vector <float> MotionSwitchboard::getNextJoints() const {
     return vec;
 }
 
-const bool MotionSwitchboard::hasNewStiffness() const {
-    pthread_mutex_lock(&stiffness_mutex);
-    bool result(newStiffness);
-    pthread_mutex_unlock(&stiffness_mutex);
-    return result;
-}
-
 const vector<float>  MotionSwitchboard::getNextStiffness() const{
     pthread_mutex_lock(&stiffness_mutex);
     vector<float> result(nextStiffnesses);
-    newStiffness = false;
     pthread_mutex_unlock(&stiffness_mutex);
     return result;
 }
