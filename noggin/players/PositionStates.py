@@ -34,11 +34,9 @@ def positionOnBall(player):
         if chaseTransitions.shouldApproachBall(player):
             return player.goLater('approachBall')
         elif chaseTransitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBallFar')
+            return player.goLater('turnToBall')
         elif chaseTransitions.shouldSpinFindBall(player):
             return player.goLater('spinFindBall')
-        elif chaseTransitions.shouldTurnToBallClose(player):
-            return player.goLater('turnToBallClose')
         else :
             return player.goLater('scanFindBall')
 

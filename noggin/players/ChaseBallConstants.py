@@ -1,5 +1,4 @@
 # Component Switches
-SUPER_SAFE_KICKS = False # Only kick straight when we see the goal
 USE_LOC_CHASE = False
 
 # Transitions' Constants

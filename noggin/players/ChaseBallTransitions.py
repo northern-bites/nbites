@@ -2,6 +2,8 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
 
+####### CHASING STUFF ##############
+
 def shouldTurnToBall_FoundBall(player):
     """
     Should we turn to the ball heading after searching for the ball
@@ -17,22 +19,6 @@ def shouldTurnToBall_ApproachBall(player):
     ball = player.brain.ball
     if (ball.on and
         abs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH):
-        return True
-    return False
-
-def shouldScanFindBall(player):
-    """
-    We lost the ball, scan to find it
-    """
-    if player.brain.ball.framesOff > constants.BALL_OFF_THRESH:
-        return True
-    return False
-
-def shouldSpinFindBall(player):
-    """
-    Should spin if we already tried searching
-    """
-    if player.stateTime >= SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL):
         return True
     return False
 
@@ -80,6 +66,8 @@ def shouldKick(player):
         return True
     return False
 
+####### AVOIDANCE STUFF ##############
+
 def shouldAvoidObstacleLeft(player):
     """
     Need to avoid an obstacle on our left side
@@ -112,4 +100,22 @@ def shouldAvoidObstacle(player):
     """
     return (shouldAvoidObstacleLeft(player) or
             shouldAvoidObstacleRight(player))
+
+####### FIND BALL STUFF ##############
+
+def shouldScanFindBall(player):
+    """
+    We lost the ball, scan to find it
+    """
+    if player.brain.ball.framesOff > constants.BALL_OFF_THRESH:
+        return True
+    return False
+
+def shouldSpinFindBall(player):
+    """
+    Should spin if we already tried searching
+    """
+    if player.stateTime >= SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL):
+        return True
+    return False
 

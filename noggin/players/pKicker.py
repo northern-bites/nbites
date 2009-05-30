@@ -8,7 +8,7 @@
 #
 
 from . import SoccerFSA
-from . import KickingStates
+from . import KickerStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
