@@ -52,9 +52,12 @@ const YUV WBImageTranscriber::getWBYUVFromRGB(const unsigned char * wimage,
     //mathmematica (just solving an eq in 3 vars)
     //And then the U and V channels were switched.  The formula is the same
     //as the one published, except it has R and B switched in the input
-    const unsigned char Y = 16+ (( 25 * R + 129 * G + 66*B)>>8);
-    const unsigned char V = 128+ (( 112 * R + -74 * G + -37*B)>>8);
-    const unsigned char U = 128+ (( -18 * R + -94 * G + 112*B)>>8);
+    const unsigned char Y =
+        static_cast<unsigned char>(16+ ((  25  * R + 129 * G +  66*B)>>8));
+    const unsigned char V =
+        static_cast<unsigned char>(128+ (( 112 * R + -74 * G + -37*B)>>8));
+    const unsigned char U =
+        static_cast<unsigned char>(128+ (( -18 * R + -94 * G + 112*B)>>8));
 
 //This is the old "correct" forumla
 //     const unsigned char Y =16  + (( 66 * R + 129 * G + 25  *   + 128)) >> 8;
