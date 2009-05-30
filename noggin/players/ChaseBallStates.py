@@ -443,6 +443,26 @@ def decideKick(player):
         # use localization for kick
         return player.goLater('kickBallStraight')
 
+def afterKick(player):
+    """
+    State to follow up after a kick.
+    Currently exits after one frame.
+    """
+    # trick the robot into standing up instead of leaning to the side
+    player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
+    player.walkPose()
+
+    if transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    elif transitions.shouldApproachBall(player):
+        return player.goLater('approachBall')
+    elif transitions.shouldPositionForKick(player):
+        return player.goLater('positionForKick')
+    elif transitions.shouldTurnToBall_ApproachBall(player):
+        return player.goLater('turnToBall')
+    else:
+        return player.goLater('chase')
+
 def kickBallStraight(player):
     """
     Kick the ball forward.  Currently uses the left foot
@@ -455,18 +475,7 @@ def kickBallStraight(player):
         player.executeMove(SweetMoves.LEFT_FAR_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
-        # trick the robot into standing up instead of leaning to the side
-        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
-        player.walkPose()
-
-        if transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
-        elif transitions.shouldApproachBall(player):
-            return player.goLater('approachBall')
-        elif transitions.shouldPositionForKick(player):
-            return player.goLater('positionForKick')
-        elif transitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBall')
+        return player.goNow("afterKick")
 
     return player.stay()
 
@@ -497,17 +506,7 @@ def kickBallRight(player):
         player.executeMove(SweetMoves.LEFT_SIDE_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_SIDE_KICK):
-        # trick the robot into standing up instead of leaning to the side
-        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
-        player.walkPose()
-        if transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
-        elif transitions.shouldApproachBall(player):
-            return player.goLater('approachBall')
-        elif transitions.shouldPositionForKick(player):
-            return player.goLater('positionForKick')
-        elif transitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBall')
+        return player.goNow("afterKick")
 
     return player.stay()
 
@@ -525,17 +524,7 @@ def kickBallLeftExecute(player):
         player.executeMove(SweetMoves.RIGHT_SIDE_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.RIGHT_SIDE_KICK):
-        # trick the robot into standing up instead of leaning to the side
-        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
-        player.walkPose()
-        if transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
-        elif transitions.shouldApproachBall(player):
-            return player.goLater('approachBall')
-        elif transitions.shouldPositionForKick(player):
-            return player.goLater('positionForKick')
-        elif transitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBall')
+        return player.goNow("afterKick")
 
     return player.stay()
 

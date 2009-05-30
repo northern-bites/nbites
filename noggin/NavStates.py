@@ -145,8 +145,8 @@ def walking(nav):
     """
     if nav.firstFrame() or nav.updatedTrajectory:
         #HACK nav.brain.CoA.setRobotGait(nav.brain.motion)
-        nav.printf("New walk is (" + str(nav.walkX) + ", " +
-                   str(nav.walkY) + ", " + str(nav.walkTheta) + ")")
+#         nav.printf("New walk is (" + str(nav.walkX) + ", " +
+#                    str(nav.walkY) + ", " + str(nav.walkTheta) + ")")
         nav.setSpeed(nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 
