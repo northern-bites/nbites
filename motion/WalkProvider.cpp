@@ -108,10 +108,10 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     setNextChainJoints(RARM_CHAIN,rarm_angles);
 
 
-    vector<float> larm_gains(ARM_JOINTS, gblStiffness);
-    vector<float> lleg_gains(LEG_JOINTS, gblStiffness);
-    vector<float> rleg_gains(LEG_JOINTS, gblStiffness);
-    vector<float> rarm_gains(ARM_JOINTS, gblStiffness);
+    vector<float> larm_gains(ARM_JOINTS, curGait->armStiffness);
+    vector<float> lleg_gains(LEG_JOINTS, curGait->maxStiffness);
+    vector<float> rleg_gains(LEG_JOINTS, curGait->maxStiffness);
+    vector<float> rarm_gains(ARM_JOINTS, curGait->armStiffness);
 
     //Return the stiffnesses for each joint
     setNextChainStiffnesses(LARM_CHAIN,larm_gains);
