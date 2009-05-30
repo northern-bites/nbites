@@ -118,7 +118,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     setNextChainStiffnesses(LLEG_CHAIN,lleg_gains);
     setNextChainStiffnesses(RLEG_CHAIN,rleg_gains);
     setNextChainStiffnesses(RARM_CHAIN,rarm_gains);
-    
+
 
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);

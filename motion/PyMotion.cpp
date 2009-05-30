@@ -19,7 +19,7 @@
 // <http://www.gnu.org/licenses/>.
 //For gaitcommands
 
-#define BOOST_PYTHON_MAX_ARITY 19
+#define BOOST_PYTHON_MAX_ARITY 23
 
 #include <Python.h>
 #include <boost/python.hpp>
@@ -75,7 +75,9 @@ public:
                    const float _lZMPSwOffY,const float _rZMPSwOffY,
                    const float _tZMPOffY, const float _sZMPOffY,
                    const float maxx, const float maxy, const float maxtheta,
-                   const float sensorFeedback)
+                   const float sensorFeedback, const float maxStiffness,
+                   const float kneeStiffness, const float ankleStiffness,
+                   const float armStiffness)
 
         : command(new GaitCommand(0.02f,_bh*CM_TO_MM, //HACK
                                   _hox*CM_TO_MM, _yao*TO_RAD, _dur,
@@ -86,7 +88,8 @@ public:
                                   // Note: no conversion for these
                                   _tZMPOffY, _sZMPOffY,
                                   maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD,
-                                  sensorFeedback))
+                                  sensorFeedback, maxStiffness,
+                                  kneeStiffness,ankleStiffness, armStiffness))
         {
         }
 
@@ -315,13 +318,15 @@ BOOST_PYTHON_MODULE(_motion)
                           float, float, float, float,
                           float, float, float, float,
                           float, float, float, float,
+                          float, float, float, float,
                           float, float>(
 "A container for setting the walking gait of the robot. "
 "(bodyHeight,hipOffsetX,XAngleOffset,stepDuration,doubleSupportFraction,"
 "stepHeight,"
 "footLengthX,dblSupInactivePercentage,leftSwingHipRollAddition,"
 "rightSwingHipRollAddition,leftZMPSwingOffsetY,rightZMPSwingOffsetY,"
-"turnZMPOffsetY, strafeZMPOffsetY, sensorFeedback"))
+"turnZMPOffsetY, strafeZMPOffsetY, sensorFeedback, maxStiffness, kneeStiffness,"
+"ankleStiffness,armStiffness"))
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple, tuple, int>(
