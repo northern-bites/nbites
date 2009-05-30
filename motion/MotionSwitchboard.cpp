@@ -457,6 +457,31 @@ void MotionSwitchboard::initDebugLogs(){
         "R_ELBOW_YAW\t"
         "R_ELBOW_ROLL\t\n");
 
+    stiffness_log = fopen("/tmp/stiff_log.xls","w");
+    fprintf(stiffness_log,"time\t"
+        "HEAD_YAW\t"
+        "HEAD_PITCH\t"
+        "L_SHOULDER_PITCH\t"
+        "L_SHOULDER_ROLL\t"
+        "L_ELBOW_YAW\t"
+        "L_ELBOW_ROLL\t"
+        "L_HIP_YAW_PITCH\t"
+        "L_HIP_ROLL\t"
+        "L_HIP_PITCH\t"
+        "L_KNEE_PITCH\t"
+        "L_ANKLE_PITCH\t"
+        "L_ANKLE_ROLL\t"
+        "R_HIP_YAW_PITCH\t"
+        "R_HIP_ROLL\t"
+        "R_HIP_PITCH\t"
+        "R_KNEE_PITCH\t"
+        "R_ANKLE_PITCH\t"
+        "R_ANKLE_ROLL\t"
+        "R_SHOULDER_PITCH\t"
+        "R_SHOULDER_ROLL\t"
+        "R_ELBOW_YAW\t"
+        "R_ELBOW_ROLL\t\n");
+
     effector_log = fopen("/tmp/effector_log.xls","w");
     fprintf(effector_log,"time\t"
             "HEAD_CHAIN_X\t"
@@ -478,6 +503,8 @@ void MotionSwitchboard::initDebugLogs(){
 }
 void MotionSwitchboard::closeDebugLogs(){
     fclose(joints_log);
+    fclose(stiffness_log);
+    fclose(effector_log);
 }
 void MotionSwitchboard::updateDebugLogs(){
     static float time = 0.0f;
@@ -501,6 +528,15 @@ void MotionSwitchboard::updateDebugLogs(){
     }
     fprintf(effector_log,"\n");
     pthread_mutex_unlock(&next_joints_mutex);
+
+    //Log the stiffnesses as well
+    pthread_mutex_lock(&stiffness_mutex);
+    fprintf(stiffness_log, "%f\t",time);
+    for(unsigned int i = 0; i < NUM_JOINTS; i++)
+        fprintf(stiffness_log, "%f\t",nextStiffnesses[i]);
+    fprintf(stiffness_log, "\n");
+    pthread_mutex_unlock(&stiffness_mutex);
+
 
     time += 0.05f;
 }
