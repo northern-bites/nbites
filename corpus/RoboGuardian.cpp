@@ -7,7 +7,8 @@ using namespace std;
 
 #include "Kinematics.h"
 
-#include "StiffnessCommand.h"
+#include "FreezeCommand.h"
+#include "UnfreezeCommand.h"
 
 //#define DEBUG_GUARDIAN_CLICKS
 
@@ -36,13 +37,13 @@ static const string wifi_restart_wav = nbsdir +"wifi_restart"+wav;
 static const string dot = ".";
 
 
-static const boost::shared_ptr<StiffnessCommand> REMOVE_GAINS =
-    boost::shared_ptr<StiffnessCommand>
-    (new StiffnessCommand(StiffnessCommand::NO_STIFFNESS));
+static const boost::shared_ptr<FreezeCommand> REMOVE_GAINS =
+    boost::shared_ptr<FreezeCommand>
+    (new FreezeCommand());
 
-static const boost::shared_ptr<StiffnessCommand> ENABLE_GAINS =
-    boost::shared_ptr<StiffnessCommand>
-    (new StiffnessCommand(StiffnessCommand::FULL_STIFFNESS));
+static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
+    boost::shared_ptr<UnfreezeCommand>
+    (new UnfreezeCommand());
 
 //Non blocking!!
 void RoboGuardian::playFile(string str)const{
@@ -100,13 +101,13 @@ void RoboGuardian::run(){
 void RoboGuardian::shutoffGains(){
     playFile(stiffness_removed_wav);
     if(motion_interface != NULL)
-        motion_interface->sendStiffness(REMOVE_GAINS);
+        motion_interface->sendFreezeCommand(REMOVE_GAINS);
 }
 
 void RoboGuardian::enableGains(){
     playFile(stiffness_enabled_wav);
     if(motion_interface != NULL)
-        motion_interface->sendStiffness(ENABLE_GAINS);
+        motion_interface->sendFreezeCommand(ENABLE_GAINS);
 }
 
 static const float FALL_SPEED_THRESH = 0.03f; //rads/20ms

@@ -24,15 +24,18 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
       walkProvider(sensors),
 	  scriptedProvider(1/50.0f,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
 	  headProvider(1/50.0f,sensors),
-	  curProvider(&scriptedProvider),
-	  nextProvider(&scriptedProvider),
+      nullHeadProvider(sensors),
+      nullBodyProvider(sensors),
+	  curProvider(&nullBodyProvider),
+	  nextProvider(&nullBodyProvider),
+      curHeadProvider(&nullHeadProvider),
+      nextHeadProvider(&nullHeadProvider),
       curGait(NULL),
       nextGait(&DEFAULT_PARAMETERS),
       nextJoints(s->getBodyAngles()),
-      nextStiffness(vector<float>(NUM_JOINTS,0.0f)),
+      nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
 	  running(false),
       newJoints(false),
-      newStiffness(false),newStiffnessCommandSent(false),
       readyToSend(false),
       noWalkTransitionCommand(true)
 
@@ -47,6 +50,17 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 #ifdef DEBUG_JOINTS_OUTPUT
     initDebugLogs();
 #endif
+
+    boost::shared_ptr<FreezeCommand> paralyze
+        = boost::shared_ptr<FreezeCommand>(new FreezeCommand());
+
+    nullBodyProvider.setCommand(paralyze);
+    nullHeadProvider.setCommand(paralyze);
+
+    //temp - HACK
+    scriptedProvider.setStiffness(0.85f);
+    headProvider.setStiffness(0.85f);
+    walkProvider.setStiffness(0.85f);
 
     //Very Important, ensure that we have selected a default walk parameter set
     boost::shared_ptr<GaitCommand>  defaultGait(new GaitCommand(DEFAULT_P));
@@ -115,9 +129,11 @@ void MotionSwitchboard::run() {
 
     while(running) {
         realityCheckJoints();
-        processStiffness();
-        bool active  = processProviders();
 
+        preProcess();
+        processJoints();
+        processStiffness();
+        bool active  = postProcess();
 
 #ifdef DEBUG_JOINTS_OUTPUT
         if(active)
@@ -134,15 +150,13 @@ void MotionSwitchboard::run() {
     cout << "Switchboard run has exited" <<endl;
 }
 
-int MotionSwitchboard::processProviders(){
-
-
+void MotionSwitchboard::preProcess(){
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
-
         swapBodyProvider();
-
-
+	}
+	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive()) {
+        swapHeadProvider();
 	}
 	if (curProvider != nextProvider && !curProvider->isStopping()){
 #ifdef DEBUG_SWITCHBOARD
@@ -150,14 +164,23 @@ int MotionSwitchboard::processProviders(){
 #endif
         curProvider->requestStop();
     }
+	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isStopping()){
+#ifdef DEBUG_SWITCHBOARD
+		cout << "Requesting stop on "<< *curHeadProvider <<endl;
+#endif
+        curHeadProvider->requestStop();
+    }
+}
+
+void MotionSwitchboard::processJoints(){
 #ifdef DEBUG_SWITCHBOARD
     static bool switchedHeadToInactive = true;
 #endif
-    if (headProvider.isActive()) {
+    if (curHeadProvider->isActive()) {
 		// Calculate the next joints and get them
-		headProvider.calculateNextJoints();
+		curHeadProvider->calculateNextJointsAndStiffnesses();
 		// get headJoints from headProvider
-		vector <float > headJoints = headProvider.getChainJoints(HEAD_CHAIN);
+		vector <float > headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
 
         for(unsigned int i = 0; i < HEAD_JOINTS;i++){
             nextJoints[HEAD_YAW + i] = headJoints.at(i);
@@ -169,7 +192,7 @@ int MotionSwitchboard::processProviders(){
     }else{
 #ifdef DEBUG_SWITCHBOARD
         if (!switchedHeadToInactive)
-            cout << headProvider << " is inactive" <<endl;
+            cout << *curHeadProvider << " is inactive" <<endl;
         switchedHeadToInactive = true;
 #endif
     }
@@ -179,7 +202,7 @@ int MotionSwitchboard::processProviders(){
 #endif
     if (curProvider->isActive()){
 		//Request new joints
-		curProvider->calculateNextJoints();
+		curProvider->calculateNextJointsAndStiffnesses();
 		const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
 		const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
 		const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
@@ -215,6 +238,54 @@ int MotionSwitchboard::processProviders(){
         switchedToInactive = true;
 #endif
     }
+
+
+}
+
+
+/**
+ * Method to process remaining stiffness requests
+ * Technically this could be handled by another provider, but there isn't
+ * too much too it:
+ */
+void MotionSwitchboard::processStiffness(){
+    if(curHeadProvider->isActive()){
+		const vector <float > headStiffnesses = curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
+
+		pthread_mutex_lock(&stiffness_mutex);
+        for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
+            nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
+        }
+		pthread_mutex_unlock(&stiffness_mutex);
+
+    }
+
+    if(curProvider->isActive()){
+		const vector <float > llegStiffnesses = curProvider->getChainStiffnesses(LLEG_CHAIN);
+		const vector <float > rlegStiffnesses = curProvider->getChainStiffnesses(RLEG_CHAIN);
+		const vector <float > rarmStiffnesses = curProvider->getChainStiffnesses(RARM_CHAIN);
+		const vector <float > larmStiffnesses = curProvider->getChainStiffnesses(LARM_CHAIN);
+
+		pthread_mutex_lock(&stiffness_mutex);
+        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+            nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
+        }
+        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+            nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
+        }
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+            nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
+        }
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+            nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
+        }
+        pthread_mutex_unlock(&stiffness_mutex);
+    }
+
+}
+
+
+int MotionSwitchboard::postProcess(){
     newJoints = true;
 
     //Make sure that if the current provider just became inactive,
@@ -224,7 +295,9 @@ int MotionSwitchboard::processProviders(){
 	if (curProvider != nextProvider && !curProvider->isActive()) {
         swapBodyProvider();
 	}
-
+	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive()) {
+        swapHeadProvider();
+	}
     // Update sensors with the correct support foot because it may have
     // changed this frame.
     // TODO: This can be improved by keeping a local copy of the SupportFoot
@@ -233,9 +306,10 @@ int MotionSwitchboard::processProviders(){
     sensors->setSupportFoot(curProvider->getSupportFoot());
 
     //return if one of the enactors 
-    return curProvider->isActive() ||  headProvider.isActive();
+    return curProvider->isActive() ||  curHeadProvider->isActive();
 
 }
+
 
 /**
  * Method handles switching providers. Also handles any special action
@@ -245,7 +319,7 @@ void MotionSwitchboard::swapBodyProvider(){
     std::vector<BodyJointCommand *> gaitSwitches;
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
-        //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOAR IS BROKEN!
+        //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOARD IS BROKEN!
         //TODO/HACK: Since we overwrite Joint angles in realityCheck
         //we may want to ensure that a gaitTranstition command is only run
         // ONCE (Maybe twice?), instead of doing this forever.
@@ -276,6 +350,15 @@ void MotionSwitchboard::swapBodyProvider(){
 
 }
 
+void MotionSwitchboard::swapHeadProvider(){
+    switch(nextHeadProvider->getType()){
+    case HEAD_PROVIDER:
+    default:
+        curHeadProvider = nextHeadProvider;
+    }
+
+}
+
 const vector <float> MotionSwitchboard::getNextJoints() const {
     pthread_mutex_lock(&next_joints_mutex);
     if(!newJoints && readyToSend){
@@ -290,17 +373,9 @@ const vector <float> MotionSwitchboard::getNextJoints() const {
     return vec;
 }
 
-const bool MotionSwitchboard::hasNewStiffness() const {
-    pthread_mutex_lock(&stiffness_mutex);
-    bool result(newStiffness);
-    pthread_mutex_unlock(&stiffness_mutex);
-    return result;
-}
-
 const vector<float>  MotionSwitchboard::getNextStiffness() const{
     pthread_mutex_lock(&stiffness_mutex);
-    vector<float> result(nextStiffness);
-    newStiffness = false;
+    vector<float> result(nextStiffnesses);
     pthread_mutex_unlock(&stiffness_mutex);
     return result;
 }
@@ -445,65 +520,43 @@ void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
     scriptedProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
-    // headProvider is NEVER the nextProvider. NEVER.
+    nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
-    // headProvider is NEVER the nextProvider. NEVER.
+    nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<FreezeCommand> command){
+    //Special case where we need to "freeze" the robot.
+    curProvider->hardReset();
+    curHeadProvider->hardReset();
+    nextProvider->hardReset();
+    nextHeadProvider->hardReset();
 
+    curProvider = &nullBodyProvider;
+    curHeadProvider = &nullHeadProvider;
+    nextProvider = &nullBodyProvider;
+    nextHeadProvider = &nullHeadProvider;
+
+    nullHeadProvider.setCommand(command);
+    nullBodyProvider.setCommand(command);
+}
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command){
+    if(curHeadProvider == &nullHeadProvider)
+        nullHeadProvider.setCommand(command);
+    if(curProvider == &nullBodyProvider)
+        nullBodyProvider.setCommand(command);
+}
 void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> command){
     pthread_mutex_lock(&stiffness_mutex);
-    nextStiffnessCommand = command;
-    newStiffnessCommandSent = true;
+    vector<float> stiff = command->getChainStiffness((ChainID) 0);
+    float newStiff = stiff[0];
+    cout << "Deprecated!!! Setting the stiffness to " << newStiff<<endl;
+    scriptedProvider.setStiffness(newStiff);
+    headProvider.setStiffness(newStiff);
+    walkProvider.setStiffness(newStiff);
     pthread_mutex_unlock(&stiffness_mutex);
 
 }
 
-/**
- * Method to process remaining stiffness requests
- * Technically this could be handled by another provider, but there isn't
- * too much too it:
- */
-int MotionSwitchboard::processStiffness(){
-    int changed  = 0;
-    if(!newStiffnessCommandSent)
-        return changed;
-
-    pthread_mutex_lock(&stiffness_mutex);
-    //For each command, we look at each chain and see if there is anything
-    //that needs to be done
-    for(unsigned int i = HEAD_CHAIN; i <=RARM_CHAIN; i++){
-        const vector <float> stiffnesses =
-            nextStiffnessCommand->getChainStiffness((ChainID) i);
-
-        //Skip empty chains
-        if(stiffnesses.size() == 0){
-            continue;
-        }
-        //Each chain has several joints we need to update
-        //Ignore unchanged values or when the value is explicitly
-        //set to NOT_SET
-        for(unsigned int j = 0; j < chain_lengths[i]; j ++){
-            if (nextStiffness[chain_first_joint[i] + j]
-                != stiffnesses.at(j) &&
-                stiffnesses.at(j) != StiffnessCommand::NOT_SET){
-                nextStiffness[chain_first_joint[i] + j] =
-                    stiffnesses.at(j);
-                changed += 1; //flag when a value is changed
-            }
-        }
-
-    }
-
-    newStiffnessCommandSent = false;
-    if(changed){
-        newStiffness = true;
-    }
-
-
-    pthread_mutex_unlock(&stiffness_mutex);
-
-    return changed;
-}

@@ -98,10 +98,10 @@ void WBImageTranscriber::waitForImage(){
             //really understanding how two YUV values are packed into the same
             //place, and probably requires only setting on YUV pixel at a time
             const int yuvIndex = (i*HEIGHT_SCALE*IMAGE_WIDTH + j*WIDTH_SCALE)*2;
-            setTwoYUV(image,yuvIndex,yuv1,yuv2);
-            setTwoYUV(image,yuvIndex+4,yuv1,yuv2);
-            setTwoYUV(image,yuvIndex+IMAGE_WIDTH*2,yuv1,yuv2);
-            setTwoYUV(image,yuvIndex+IMAGE_WIDTH*2+4,yuv1,yuv2);
+            setTwoYUV(image,yuvIndex,yuv1,yuv1);
+            setTwoYUV(image,yuvIndex+4,yuv2,yuv2);
+            setTwoYUV(image,yuvIndex+IMAGE_WIDTH*2,yuv1,yuv1);
+            setTwoYUV(image,yuvIndex+IMAGE_WIDTH*2+4,yuv2,yuv2);
         }
     }
 
