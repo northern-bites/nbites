@@ -1,7 +1,6 @@
-from .. import NogginConstants as Constants
-from ..playbook import PBConstants 
+from ..playbook import PBConstants
 import man.motion.SweetMoves as SweetMoves
-import BrunswickGoalieTransitions as helper
+import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15.
 
@@ -40,12 +39,12 @@ def goalieAtPosition(player):
         return player.goNow('goalieChase')
     if player.firstFrame():
         player.stopWalking()
-    
+
     if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT \
         and not player.trackingBall:
         player.brain.tracker.trackBall()
         player.trackingBall = True
-    
+
     elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT \
         and player.trackingBall:
         player.brain.tracker.activeLoc()

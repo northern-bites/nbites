@@ -2,28 +2,30 @@
 from . import SoccerFSA
 from . import ChaseBallStates
 from . import PositionStates
+from . import FindBallStates
+from . import KickingStates
 from ..playbook import PBConstants
 from .. import NogginConstants
 from math import hypot
 from ..util.MyMath import safe_atan2
 from . import BrunswickStates
-from . import BrunswickGoalieStates
+from . import GoaliePositionStates
 from . import GoalieChaseBallStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(GoaliePositionStates)
+        self.addStates(GoalieChaseBallStates)
+        self.addStates(PositionStates)
+        self.addStates(FindBallStates)
+        self.addStates(KickingStates)
         self.addStates(ChaseBallStates)
         self.addStates(BrunswickStates)
-        self.addStates(PositionStates)
-        self.addStates(BrunswickGoalieStates)
-        self.addStates(GoalieChaseBallStates)
+
         self.setName('pBrunswick')
         self.currentRole = PBConstants.INIT_ROLE
         self.stoppedWalk = False
-        self.currentChaseWalkTheta = None
-        self.currentChaseWalkX = None
-        self.currentChaseWalkY = None
         self.currentSpinDir = None
         self.currentGait = None
         self.sawOwnGoal = False
