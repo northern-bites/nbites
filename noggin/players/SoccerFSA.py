@@ -105,13 +105,15 @@ class SoccerFSA(FSA.FSA):
         """
         Turn off the gains
         """
-        self.executeStiffness(StiffnessModes.NO_STIFFNESSES)
+        freeze = motion.FreezeCommand()
+        self.brain.motion.sendFreezeCommand(freeze)
 
     def gainsOn(self):
         """
         Turn on the gains
         """
-        self.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
+        unFreeze = motion.UnfreezeCommand(0.85)
+        self.brain.motion.sendFreezeCommand(unFreeze)
 
     def standupGainsOn(self):
         """

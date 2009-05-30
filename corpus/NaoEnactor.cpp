@@ -33,7 +33,8 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
       transcriber(t),
       jointValues(Kinematics::NUM_JOINTS,0.0f),  // current values of joints
       motionValues(Kinematics::NUM_JOINTS,0.0f),  // commands sent to joints
-      lastMotionCommandAngles(Kinematics::NUM_JOINTS,0.0f)
+      lastMotionCommandAngles(Kinematics::NUM_JOINTS,0.0f),
+      lastMotionHardness(Kinematics::NUM_JOINTS,0.0f)
 
 {
     try {
@@ -73,8 +74,7 @@ void NaoEnactor::sendCommands(){
     }
 
     sendJoints();
-    if (switchboard->hasNewStiffness())
-        sendHardness();
+    sendHardness();
     sendUltraSound();
 
 }
@@ -122,6 +122,7 @@ void NaoEnactor::sendJoints() {
 void NaoEnactor::sendHardness(){
     motionHardness = switchboard->getNextStiffness();
 
+    bool diffStiff = false;
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (unsigned int i = 0; i<Kinematics::NUM_JOINTS; i++) {
         static float hardness =0.0f;
@@ -130,9 +131,17 @@ void NaoEnactor::sendHardness(){
 
         //sets the value for hardness
         //hardness_command[5][i].arraySetSize(1);
+        if(lastMotionHardness[i] != hardness)
+            diffStiff = true;
         hardness_command[5][i][0] = hardness;
+
+        //store for next time
+        lastMotionHardness[i] = hardness;
     }
     hardness_command[4][0] = dcmProxy->getTime(0);
+
+    if(!diffStiff)
+        return;
 
 	// Turn off slarti shoulder!
 // #ifdef ROBOT_NAME_zaphod

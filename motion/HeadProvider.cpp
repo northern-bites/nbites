@@ -82,7 +82,7 @@ void HeadProvider::hardReset(){
 
 
 //Method called during the 'SCRIPTED' mode
-void HeadProvider::calculateNextJoints() {
+void HeadProvider::calculateNextJointsAndStiffnesses() {
 
     switch(curMode){
     case SCRIPTED:
@@ -130,6 +130,10 @@ void HeadProvider::setMode(){
     vector<float> newChainAngles  =
         vector<float>(newHeads,newHeads + Kinematics::HEAD_JOINTS);
     setNextChainJoints(HEAD_CHAIN,newChainAngles);
+
+    vector<float> head_gains(HEAD_JOINTS, gblStiffness);
+    //Return the stiffnesses for each joint
+    setNextChainStiffnesses(HEAD_CHAIN,head_gains);
 }
 
 void HeadProvider::scriptedMode(){
@@ -142,6 +146,10 @@ void HeadProvider::scriptedMode(){
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
     }
+    vector<float> head_gains(HEAD_JOINTS, gblStiffness);
+    //Return the stiffnesses for each joint
+    setNextChainStiffnesses(HEAD_CHAIN,head_gains);
+
 }
 
 void HeadProvider::setCommand(const SetHeadCommand *command) {

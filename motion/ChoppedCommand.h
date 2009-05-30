@@ -4,7 +4,6 @@
 #define __ChoppedCommand_h
 
 #include <vector>
-#include "Kinematics.h"
 #include "JointCommand.h"
 
 

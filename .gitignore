@@ -18,3 +18,7 @@ noggin/util/fakeData/*
 /noggin/offline/noiseVaccuracy
 /noggin/offline/.Rhistory
 /noggin/offline/.RData
+/comm/TAGS
+/motion/TAGS
+/vision/TAGS
+/updateTags.sh
