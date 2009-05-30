@@ -244,3 +244,22 @@ def kickBallLeftExecute(player):
         return player.goNow("afterKick")
 
     return player.stay()
+
+def kickAtPosition(player):
+    """
+    Method to simply kick while standing in position
+    Used for a very simple goalie behavior
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
+    if player.counter == 2:
+        player.executeMove(SweetMoves.LEFT_FAR_KICK)
+
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
+        # trick the robot into standing up instead of leaning to the side
+        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
+        player.setSpeed(0,0,0)
+        return player.goLater('atPosition')
+
+    return player.stay()

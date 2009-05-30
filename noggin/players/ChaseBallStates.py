@@ -12,9 +12,7 @@ def chase(player):
     Method to determine which chase state should be used.
     We dump the robot into this state when we our switching from something else.
     """
-    if player.brain.ball.on and constants.USE_LOC_CHASE:
-        return player.goNow('positionOnBall')
-    elif transitions.shouldScanFindBall(player):
+    if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')

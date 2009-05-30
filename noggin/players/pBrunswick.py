@@ -64,7 +64,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             #return 'playbookPosition'
             return 'spinFindBallPosition'
         elif role == PBConstants.GOALIE:
-            #return 'goaliePosition'
             return 'goaliePosition'
         elif role == PBConstants.PENALTY_ROLE:
             return 'gamePenalized'
