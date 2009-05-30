@@ -12,10 +12,8 @@ NullProvider::NullProvider(boost::shared_ptr<Sensors> s,
      doOnce(false) //Hack
 {
     pthread_mutex_init(&null_provider_mutex,NULL);
-    cout << "The mask for this NullProvider is";
     for(unsigned int c =0; c <  Kinematics::NUM_CHAINS; c++){
         chainMask[c] = chain_mask[c];
-        if(chainMask[c]) cout <<" true "; else  cout << "false";
     }
 }
 NullProvider::~NullProvider(){
