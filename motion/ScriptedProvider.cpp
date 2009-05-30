@@ -92,7 +92,7 @@ bool ScriptedProvider::commandQueueEmpty(){
     return bodyCommandQueue.empty();
 }
 
-void ScriptedProvider::calculateNextJoints() {
+void ScriptedProvider::calculateNextJointsAndStiffnesses() {
 	pthread_mutex_lock(&scripted_mutex);
 	if (currCommandEmpty())
 		setNextBodyCommand();
@@ -104,13 +104,18 @@ void ScriptedProvider::calculateNextJoints() {
 
 	for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
 		Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
-		if ( currCommand->isDone() ) {
+		if ( currCommand->isDone() ){
 			setNextChainJoints( cid,
 								currentChains->at(cid) );
-		} else {
+		}else{
+			
 			setNextChainJoints( cid,
 								currCommand->getNextJoints(cid) );
 		}
+		// Curr command will allways provide the current stiffnesses
+		// even if it is finished providing new joint angles.
+		setNextChainStiffnesses( cid,
+								 currCommand->getStiffness(cid) );
 	}
 
     setActive();

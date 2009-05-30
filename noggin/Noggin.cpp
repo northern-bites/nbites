@@ -473,9 +473,10 @@ void Noggin::modifySysPath ()
     const char *cwd = "/usr/local/nao/modules/lib";
 #else
 #  ifdef WEBOTS_BACKEND
-    const char *cwd = string(string(getenv("WEBOTS_HOME")) +
-                       "/projects/contests" +
-                       "/nao_robocup/controllers/nao_soccer_player_red/lib").c_str();
+    const string test = std::string(getenv("WEBOTS_HOME")) +
+        std::string("/projects/contests") +
+        std::string("/nao_robocup/controllers/nao_soccer_player_red/lib");
+    const char *cwd = test.c_str();
 #  else //WEBOTS
     const char *cwd = "/opt/naoqi/modules/lib";
 #  endif

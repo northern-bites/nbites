@@ -26,7 +26,7 @@
 
 #include "Sensors.h"
 #include "BodyJointCommand.h"
-#include "Kinematics.h"
+
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
 #include "LinearChoppedCommand.h"
@@ -41,14 +41,9 @@ public:
     boost::shared_ptr<ChoppedCommand> chopCommand(const JointCommand *command);
 
 private:
-	// Inside most vector: joint values for a chain
-	// Next: vector for each choppped move (holding each chain,
-	// instead of just holding the joint values in a row)
-	// Outside: vector to hold all the chopped moves
     boost::shared_ptr<Sensors> sensors;
 	float FRAME_LENGTH_S;
 
-// 	shared_ptr<ChoppedCommand> chopSmooth(const JointCommand *command);
     boost::shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command,
 												 std::vector<float> currentJoints,
 												 int numChops);
@@ -59,7 +54,6 @@ private:
 
 
 	std::vector<float> getCurrentJoints();
-	void vectorToRad(std::vector<float> *vect);
 
 };
 

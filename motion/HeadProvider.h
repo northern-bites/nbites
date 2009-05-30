@@ -38,7 +38,7 @@ public:
     virtual ~HeadProvider();
 
     void requestStopFirstInstance();
-    void calculateNextJoints();
+    void calculateNextJointsAndStiffnesses();
 
     void hardReset();
 
