@@ -6,9 +6,10 @@ NullProvider::NullProvider(boost::shared_ptr<Sensors> s,
                            const bool chain_mask[Kinematics::NUM_CHAINS])
     :MotionProvider(NULL_PROVIDER),
      sensors(s),
-     currentStiffness(Kinematics::NUM_JOINTS,0.0f),
+     nextStiffness(Kinematics::NUM_JOINTS,0.0f),
      lastStiffness(Kinematics::NUM_JOINTS,0.0f),
-     frozen(false), freezingOn(false), freezingOff(false), newCommand(false)
+     frozen(false), freezingOn(false), freezingOff(false), newCommand(false),
+     doOnce(false) //Hack
 {
     pthread_mutex_init(&null_provider_mutex,NULL);
     cout << "The mask for this NullProvider is";
@@ -70,7 +71,7 @@ void NullProvider::calculateNextJointsAndStiffnesses(){
             joint <= endI;
             joint++,chain_joint++){
             chainJoints[chain_joint] = curMotionAngles[joint];
-            chainStiffness[chain_joint] = currentStiffness[joint];
+            chainStiffness[chain_joint] = nextStiffness[joint];
         }
         setNextChainJoints(static_cast<Kinematics::ChainID>(chain),chainJoints);
         setNextChainStiffnesses(static_cast<Kinematics::ChainID>(chain),
@@ -84,14 +85,19 @@ void NullProvider::calculateNextJointsAndStiffnesses(){
 void NullProvider::readNewStiffness(){
     //parse any new commands
     pthread_mutex_lock(&null_provider_mutex);
+    if (freezingOff && doOnce){
+        frozen = false;
+        freezingOff = false;
+        doOnce = false;
+    }
+
     if(newCommand){
-        currentStiffness = vector<float>(Kinematics::NUM_JOINTS,
+        nextStiffness = vector<float>(Kinematics::NUM_JOINTS,
                                          nextCommand->getStiffness());
         newCommand = false;
         //maybe change if we want to change duration of transition
         if(freezingOff){
-            frozen = false;
-            freezingOff = false;
+            doOnce = true;
         }else if(freezingOn){
             frozen = true;
             freezingOn = false;

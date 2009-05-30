@@ -29,10 +29,11 @@ private:
     void readNewStiffness();
 private:
     boost::shared_ptr<Sensors> sensors;
-    std::vector<float> currentStiffness,lastStiffness;
+    std::vector<float> nextStiffness,lastStiffness;
     bool chainMask[Kinematics::NUM_CHAINS];
     mutable pthread_mutex_t null_provider_mutex;
     bool frozen, freezingOn, freezingOff, newCommand;
+    bool doOnce;
     boost::shared_ptr<FreezeCommand> nextCommand;
 };
 
