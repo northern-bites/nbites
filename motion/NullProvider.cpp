@@ -77,7 +77,7 @@ void NullProvider::calculateNextJointsAndStiffnesses(){
                                 chainStiffness);
 
     }
-
+    setActive();
 }
 
 

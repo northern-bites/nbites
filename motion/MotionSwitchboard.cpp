@@ -26,10 +26,10 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 	  headProvider(1/50.0f,sensors),
       nullHeadProvider(sensors),
       nullBodyProvider(sensors),
-	  curProvider(&scriptedProvider),
-	  nextProvider(&scriptedProvider),
-      curHeadProvider(&headProvider),
-      nextHeadProvider(&headProvider),
+	  curProvider(&nullBodyProvider),
+	  nextProvider(&nullBodyProvider),
+      curHeadProvider(&nullHeadProvider),
+      nextHeadProvider(&nullHeadProvider),
       curGait(NULL),
       nextGait(&DEFAULT_PARAMETERS),
       nextJoints(s->getBodyAngles()),
@@ -51,6 +51,12 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
 #ifdef DEBUG_JOINTS_OUTPUT
     initDebugLogs();
 #endif
+
+    boost::shared_ptr<OnFreezeCommand> paralyze
+        = boost::shared_ptr<OnFreezeCommand>(new OnFreezeCommand());
+
+    nullBodyProvider.setCommand(paralyze);
+    nullHeadProvider.setCommand(paralyze);
 
     //temp - HACK
     scriptedProvider.setStiffness(0.0f);
