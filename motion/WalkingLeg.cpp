@@ -74,7 +74,7 @@ void WalkingLeg::resetGait(const WalkingParameters * _wp){
     walkParams =_wp;
 }
 
-vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
+LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
                                 boost::shared_ptr<Step> _swing_dest,
                                 ufmatrix3 fc_Transform){
@@ -89,7 +89,7 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
     //ufvector3 dest_c = prod(fc_Transform,dest_f);
     //float dest_x = dest_c(0);
     //float dest_y = dest_c(1);
-    vector<float> result(6);
+    LegJointStiffTuple result;
     switch(state){
     case SUPPORTING:
         result  = supporting(fc_Transform);
@@ -128,7 +128,7 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
 }
 
 
-vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
+LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     ufvector3 src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
 
@@ -188,11 +188,13 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
     result.angles[2] -= walkParams->XAngleOffset;
     result.angles[2] += hipHacks.get<0>(); //HipPitch
 
-    memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    vector<float> stiff_result = vector<float>(LEG_JOINTS,walkParams->maxStiffness);
+    return LegJointStiffTuple(joint_result,stiff_result);
+
 }
 
-vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, float dest_y) {
+LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, float dest_y) {
     /**
        this method calculates the angles for this leg when it is on the ground
        (i.e. the leg on the ground in single support, or either leg in double
@@ -223,7 +225,9 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
     result.angles[2] += hipHacks.get<0>(); //HipPitch
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    vector<float> stiff_result = vector<float>(LEG_JOINTS,walkParams->maxStiffness);
+    return LegJointStiffTuple(joint_result,stiff_result);
 }
 
 /*  Returns the rotation for this motion frame which we expect

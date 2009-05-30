@@ -65,12 +65,22 @@
 #  define DEBUG_WALKING_LOCUS_LOGGING
 #  define DEBUG_WALKING_DEST_LOGGING
 #endif
+
+typedef boost::tuple<std::vector<float>,
+                     std::vector<float> > LegJointStiffTuple;
+
+
+enum JointStiffIndex {
+    JOINT_INDEX,
+    STIFF_INDEX
+};
+
 class WalkingLeg  {
 public:
     WalkingLeg(Kinematics::ChainID id);
     ~WalkingLeg();
 
-    std::vector <float> tick(boost::shared_ptr<Step> step,
+    LegJointStiffTuple tick(boost::shared_ptr<Step> step,
                              boost::shared_ptr<Step> swing_src,
                              boost::shared_ptr<Step> _suppoting,
                              NBMath::ufmatrix3 fc_Transform);
@@ -104,8 +114,8 @@ public:
     void resetGait(const WalkingParameters * _wp);
 private:
     //Execution methods, get called depending on which state the leg is in
-    std::vector <float> supporting(NBMath::ufmatrix3 fc_Transform);
-    std::vector <float> swinging(NBMath::ufmatrix3 fc_Transform);
+    LegJointStiffTuple supporting(NBMath::ufmatrix3 fc_Transform);
+    LegJointStiffTuple swinging(NBMath::ufmatrix3 fc_Transform);
 
     //FSA methods
     void setState(SupportMode newState);

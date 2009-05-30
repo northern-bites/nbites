@@ -90,28 +90,22 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     // Now ask the step generator to get the leg angles
     WalkLegsTuple legs_result = stepGenerator.tick_legs();
 
-    //Get the joints for each Leg
-    vector<float> lleg_results = legs_result.get<LEFT_FOOT>();
-    vector<float> rleg_results = legs_result.get<RIGHT_FOOT>();
+    //Get the joints and stiffnesses for each Leg
+    vector<float> lleg_joints = legs_result.get<LEFT_FOOT>().get<JOINT_INDEX>();
+    vector<float> rleg_joints = legs_result.get<RIGHT_FOOT>().get<JOINT_INDEX>();
+    vector<float> lleg_gains = legs_result.get<LEFT_FOOT>().get<STIFF_INDEX>();
+    vector<float> rleg_gains = legs_result.get<RIGHT_FOOT>().get<STIFF_INDEX>();
 
-    // vector<float> rarm_results = vector<float>(ARM_JOINTS, 0.0f);
-//     vector<float> larm_results = vector<float>(ARM_JOINTS, 0.0f);
-
-//     cout << "2rarm size "<< rarm_results.size()
-//          << "larm size "<< larm_results.size() <<endl;
+    //grab the stiffnesses for the arms
+    vector<float> larm_gains(ARM_JOINTS, curGait->armStiffness);
+    vector<float> rarm_gains(ARM_JOINTS, curGait->armStiffness);
 
 
     //Return the joints for the legs
     setNextChainJoints(LARM_CHAIN,larm_angles);
-    setNextChainJoints(LLEG_CHAIN,lleg_results);
-    setNextChainJoints(RLEG_CHAIN,rleg_results);
+    setNextChainJoints(LLEG_CHAIN,lleg_joints);
+    setNextChainJoints(RLEG_CHAIN,rleg_joints);
     setNextChainJoints(RARM_CHAIN,rarm_angles);
-
-
-    vector<float> larm_gains(ARM_JOINTS, curGait->armStiffness);
-    vector<float> lleg_gains(LEG_JOINTS, curGait->maxStiffness);
-    vector<float> rleg_gains(LEG_JOINTS, curGait->maxStiffness);
-    vector<float> rarm_gains(ARM_JOINTS, curGait->armStiffness);
 
     //Return the stiffnesses for each joint
     setNextChainStiffnesses(LARM_CHAIN,larm_gains);

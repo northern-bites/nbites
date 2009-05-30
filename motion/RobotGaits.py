@@ -63,7 +63,7 @@ SLARTI_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       4.0,   # max y speed
                                       30.0,   # max theta speed()
                                       0.0,   #sensorScale
-                                      0.85,  #maxStiffness
+                                      0.5,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
                                       0.2)   #armStiffness
