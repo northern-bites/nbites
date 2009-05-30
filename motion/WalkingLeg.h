@@ -129,6 +129,7 @@ public:
     const float getFootRotation();
 private:
     const float getHipYawPitch();
+    const std::vector<float> getStiffnesses();
     const boost::tuple<const float,const float>getHipHack(const float HYPAngle);
     const float cycloidy(float theta);
     const float cycloidx(float theta);
