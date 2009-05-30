@@ -25,10 +25,10 @@ def chase(player):
         return player.goNow('scanFindBall')
 
 def scanFindBall(player):
-    '''
+    """
     State to move the head to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we spin to keep looking
-    '''
+    """
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
@@ -44,10 +44,10 @@ def scanFindBall(player):
     return player.stay()
 
 def spinFindBall(player):
-    '''
+    """
     State to spin to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we go to a garbage state
-    '''
+    """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         # Stop walking if we need to switch gaits
@@ -128,9 +128,9 @@ def turnToBall(player):
     return player.stay()
 
 def approachBall(player):
-    '''
+    """
     Once we are alligned with the ball, approach it
-    '''
+    """
     if player.firstFrame():
         player.currentChaseWalkX = 0
         player.currentChaseWalkY = 0
@@ -554,12 +554,32 @@ def avoidObstacle(player):
     """
     if player.firstFrame():
         player.stopWalking()
+        player.stoppedWalk = False
+        player.printf(player.brain.sonar)
 
-    player.printf(player.brain.sonar)
+    # Check if we've stopped
+    if player.brain.nav.isStopped():
+        player.stoppedWalk = True
+        if player.currentGait != constants.NORMAL_GAIT:
+            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+            player.currentGait = constants.NORMAL_GAIT
 
-    if not transitions.shouldAvoidObstacle(player):
-        if player.brain.ball.on:
-            return player.goLater("chase")
-        else:
-            return player.goLater("scanFindBall")
+    if (transitions.shouldAvoidObstacleLeft(player) and
+        transitions.shouldAvoidObstacleRight(player)):
+        # Backup
+        if player.stoppedWalk:
+            if player.currentGait != constants.FAST_GAIT:
+                player.brain.CoA.setRobotGait(player.brain.motion)
+                player.currentGait = constants.FAST_GAIT
+            player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
+    elif transitions.shouldAvoidObstacleLeft(player):
+        # Dodge right
+        if player.stoppedWalk:
+            player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
+    elif transitions.shouldAvoidObstacleRight(player):
+        # Dodge left
+        if player.stoppedWalk:
+            player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
+    else:
+        return player.goLater("chase")
     return player.stay()
