@@ -7,8 +7,8 @@ using namespace std;
 
 #include "Kinematics.h"
 
-#include "OnFreezeCommand.h"
-#include "OffFreezeCommand.h"
+#include "FreezeCommand.h"
+#include "UnfreezeCommand.h"
 
 //#define DEBUG_GUARDIAN_CLICKS
 
@@ -37,13 +37,13 @@ static const string wifi_restart_wav = nbsdir +"wifi_restart"+wav;
 static const string dot = ".";
 
 
-static const boost::shared_ptr<OnFreezeCommand> REMOVE_GAINS =
-    boost::shared_ptr<OnFreezeCommand>
-    (new OnFreezeCommand());
+static const boost::shared_ptr<FreezeCommand> REMOVE_GAINS =
+    boost::shared_ptr<FreezeCommand>
+    (new FreezeCommand());
 
-static const boost::shared_ptr<OffFreezeCommand> ENABLE_GAINS =
-    boost::shared_ptr<OffFreezeCommand>
-    (new OffFreezeCommand());
+static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
+    boost::shared_ptr<UnfreezeCommand>
+    (new UnfreezeCommand());
 
 //Non blocking!!
 void RoboGuardian::playFile(string str)const{

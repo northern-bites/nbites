@@ -1,17 +1,13 @@
 #ifndef FreezeCommand_h
 #define FreezeCommand_h
 
-#include "MotionCommand.h"
+#include "BaseFreezeCommand.h"
 
-class FreezeCommand : public MotionCommand {
+class FreezeCommand : public BaseFreezeCommand {
 public:
-    FreezeCommand(float stiffness);
-    virtual ~FreezeCommand();
+    FreezeCommand() : BaseFreezeCommand(MotionConstants::DEFAULT_OFF_STIFFNESS){}
+    ~FreezeCommand(){};
 
-    float getStiffness();
-private:
-    void setChainList();
-    float targetStiffness;
 };
 
 #endif

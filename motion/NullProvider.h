@@ -4,8 +4,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "MotionProvider.h"
-#include "OnFreezeCommand.h"
-#include "OffFreezeCommand.h"
+#include "FreezeCommand.h"
+#include "UnfreezeCommand.h"
 
 #include "Sensors.h"
 #include "Kinematics.h"
@@ -19,8 +19,8 @@ public:
     void calculateNextJointsAndStiffnesses();
     void hardReset(){} //Not implemented
 
-    void setCommand(const boost::shared_ptr<OnFreezeCommand> command);
-    void setCommand(const boost::shared_ptr<OffFreezeCommand> command);
+    void setCommand(const boost::shared_ptr<FreezeCommand> command);
+    void setCommand(const boost::shared_ptr<UnfreezeCommand> command);
 
 protected:
     void setActive();
@@ -34,7 +34,7 @@ private:
     mutable pthread_mutex_t null_provider_mutex;
     bool frozen, freezingOn, freezingOff, newCommand;
     bool doOnce;
-    boost::shared_ptr<FreezeCommand> nextCommand;
+    boost::shared_ptr<BaseFreezeCommand> nextCommand;
 };
 
 #endif

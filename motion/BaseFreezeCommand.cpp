@@ -1,26 +1,26 @@
-#include "FreezeCommand.h"
+#include "BaseFreezeCommand.h"
 
 
 
-FreezeCommand::FreezeCommand(float stiffness)
+BaseFreezeCommand::BaseFreezeCommand(float stiffness)
     :MotionCommand(MotionConstants::FREEZE)
 {
     setChainList();
     targetStiffness = stiffness;
 }
 
-void FreezeCommand::setChainList() {
+void BaseFreezeCommand::setChainList() {
     chainList.insert(chainList.end(),
                      MotionConstants::FREEZE_CHAINS,
                      MotionConstants::FREEZE_CHAINS +
                      MotionConstants::FREEZE_NUM_CHAINS);
 }
 
-FreezeCommand::~FreezeCommand(){
+BaseFreezeCommand::~BaseFreezeCommand(){
 
 }
 
 
-float FreezeCommand::getStiffness(){
+float BaseFreezeCommand::getStiffness(){
     return targetStiffness;
 }

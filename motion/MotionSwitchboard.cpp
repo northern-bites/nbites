@@ -51,8 +51,8 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     initDebugLogs();
 #endif
 
-    boost::shared_ptr<OnFreezeCommand> paralyze
-        = boost::shared_ptr<OnFreezeCommand>(new OnFreezeCommand());
+    boost::shared_ptr<FreezeCommand> paralyze
+        = boost::shared_ptr<FreezeCommand>(new FreezeCommand());
 
     nullBodyProvider.setCommand(paralyze);
     nullHeadProvider.setCommand(paralyze);
@@ -527,7 +527,7 @@ void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
-void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<OnFreezeCommand> command){
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<FreezeCommand> command){
     //Special case where we need to "freeze" the robot.
     curProvider->hardReset();
     curHeadProvider->hardReset();
@@ -542,7 +542,7 @@ void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<OnFreezeComman
     nullHeadProvider.setCommand(command);
     nullBodyProvider.setCommand(command);
 }
-void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<OffFreezeCommand> command){
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command){
     if(curHeadProvider == &nullHeadProvider)
         nullHeadProvider.setCommand(command);
     if(curProvider == &nullBodyProvider)

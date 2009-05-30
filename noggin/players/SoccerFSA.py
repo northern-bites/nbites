@@ -1,7 +1,6 @@
 # Soccer FSA that implements an FSA but holds all the important
 # soccer-playing functionality
 #
-# @author Jack Morrison
 #
 
 import man.motion as motion
@@ -105,17 +104,15 @@ class SoccerFSA(FSA.FSA):
         """
         Turn off the gains
         """
-        freeze = motion.OnFreezeCommand()
+        freeze = motion.FreezeCommand()
         self.brain.motion.sendFreezeCommand(freeze)
-        #self.executeStiffness(StiffnessModes.NO_STIFFNESSES)
 
     def gainsOn(self):
         """
         Turn on the gains
         """
-        unFreeze = motion.OffFreezeCommand(0.85)
+        unFreeze = motion.UnfreezeCommand(0.85)
         self.brain.motion.sendFreezeCommand(unFreeze)
-        #self.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
 
     def standupGainsOn(self):
         """

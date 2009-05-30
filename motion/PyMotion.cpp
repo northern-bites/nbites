@@ -203,24 +203,24 @@ private:
 };
 
 
-class PyOnFreezeCommand{
+class PyFreezeCommand{
 public:
     //Later, one could add more specific stiffness options
-    PyOnFreezeCommand()
-        :command(boost::shared_ptr<OnFreezeCommand>(new OnFreezeCommand())){}
-    const boost::shared_ptr<OnFreezeCommand> getCommand() const{return command;}
+    PyFreezeCommand()
+        :command(boost::shared_ptr<FreezeCommand>(new FreezeCommand())){}
+    const boost::shared_ptr<FreezeCommand> getCommand() const{return command;}
 private:
-    boost::shared_ptr<OnFreezeCommand> command;
+    boost::shared_ptr<FreezeCommand> command;
 };
 
-class PyOffFreezeCommand{
+class PyUnfreezeCommand{
 public:
     //Later, one could add more specific stiffness options
-    PyOffFreezeCommand(float stiffness)
-        :command(boost::shared_ptr<OffFreezeCommand>(new OffFreezeCommand())){}
-    const boost::shared_ptr<OffFreezeCommand> getCommand()const{return command;}
+    PyUnfreezeCommand(float stiffness)
+        :command(boost::shared_ptr<UnfreezeCommand>(new UnfreezeCommand())){}
+    const boost::shared_ptr<UnfreezeCommand> getCommand()const{return command;}
 private:
-    boost::shared_ptr<OffFreezeCommand> command;
+    boost::shared_ptr<UnfreezeCommand> command;
 };
 
 class PyMotionInterface {
@@ -249,10 +249,10 @@ public:
     void sendStiffness(const PyStiffnessCommand *command){
         motionInterface->sendStiffness(command->getCommand());
     }
-    void sendFreezeCommand(const PyOnFreezeCommand *command){
+    void sendFreezeCommand(const PyFreezeCommand *command){
         motionInterface->sendFreezeCommand(command->getCommand());
     }
-    void sendFreezeCommand(const PyOffFreezeCommand *command){
+    void sendFreezeCommand(const PyUnfreezeCommand *command){
         motionInterface->sendFreezeCommand(command->getCommand());
     }
     bool isWalkActive() {
@@ -297,9 +297,9 @@ void (PyMotionInterface::*enq1)(const PyHeadJointCommand*) =
 void (PyMotionInterface::*enq2)(const PyBodyJointCommand*) =
     &PyMotionInterface::enqueue;
 
-void (PyMotionInterface::*frz1)(const PyOnFreezeCommand*) =
+void (PyMotionInterface::*frz1)(const PyFreezeCommand*) =
     &PyMotionInterface::sendFreezeCommand;
-void (PyMotionInterface::*frz2)(const PyOffFreezeCommand*) =
+void (PyMotionInterface::*frz2)(const PyUnfreezeCommand*) =
     &PyMotionInterface::sendFreezeCommand;
 
 
@@ -341,12 +341,12 @@ BOOST_PYTHON_MODULE(_motion)
  "A container for a walk command. Holds an x, y and theta which represents a"
  " walk vector"))
         ;
-    class_<PyOnFreezeCommand>("OnFreezeCommand",
+    class_<PyFreezeCommand>("FreezeCommand",
                               init<>("A container for a "
                                    "command to freeze the robot"))
         ;
 
-    class_<PyOffFreezeCommand>("OffFreezeCommand",
+    class_<PyUnfreezeCommand>("UnfreezeCommand",
                               init<float>(args("stiffness"),
                                           "A container for a command to "
                                           "UNfreeze the robot"))

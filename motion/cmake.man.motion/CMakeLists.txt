@@ -114,7 +114,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ChoppedCommand
 		     ${MOTION_INCLUDE_DIR}/LinearChoppedCommand
 		     ${MOTION_INCLUDE_DIR}/SmoothChoppedCommand
-		     ${MOTION_INCLUDE_DIR}/FreezeCommand
+		     ${MOTION_INCLUDE_DIR}/BaseFreezeCommand
 		     ${MOTION_INCLUDE_DIR}/HeadProvider
 		     ${MOTION_INCLUDE_DIR}/ChopShop
 		     ${MOTION_INCLUDE_DIR}/NullProvider

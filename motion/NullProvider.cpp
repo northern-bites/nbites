@@ -31,7 +31,7 @@ void NullProvider::setActive(){
         inactive();
 }
 
-void NullProvider::setCommand(const boost::shared_ptr<OnFreezeCommand> command){
+void NullProvider::setCommand(const boost::shared_ptr<FreezeCommand> command){
     pthread_mutex_lock(&null_provider_mutex);
     nextCommand = command;
     pthread_mutex_unlock(&null_provider_mutex);
@@ -39,7 +39,7 @@ void NullProvider::setCommand(const boost::shared_ptr<OnFreezeCommand> command){
     newCommand = true;
     setActive();
 }
-void NullProvider::setCommand(const boost::shared_ptr<OffFreezeCommand> command){
+void NullProvider::setCommand(const boost::shared_ptr<UnfreezeCommand> command){
     pthread_mutex_lock(&null_provider_mutex);
     nextCommand = command;
     pthread_mutex_unlock(&null_provider_mutex);

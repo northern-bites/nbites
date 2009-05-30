@@ -39,10 +39,10 @@ void MotionInterface::setHead(const SetHeadCommand *command){
 void MotionInterface::sendStiffness(const boost::shared_ptr<StiffnessCommand> command){
     switchboard->sendMotionCommand(command);
 }
-void MotionInterface::sendFreezeCommand(const boost::shared_ptr<OnFreezeCommand> command){
+void MotionInterface::sendFreezeCommand(const boost::shared_ptr<FreezeCommand> command){
     switchboard->sendMotionCommand(command);
 }
-void MotionInterface::sendFreezeCommand(const boost::shared_ptr<OffFreezeCommand> command){
+void MotionInterface::sendFreezeCommand(const boost::shared_ptr<UnfreezeCommand> command){
     switchboard->sendMotionCommand(command);
 }
 
