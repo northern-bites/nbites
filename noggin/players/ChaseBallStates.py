@@ -64,7 +64,8 @@ def spinFindBall(player):
     # Walk if we have stopped walking
     if player.stoppedWalk:
         # Switch to the fast gait for better spinning
-        if player.currentGait != constants.FAST_GAIT:
+        if (player.brain.nav.isStopped() and
+            player.currentGait != constants.FAST_GAIT):
             player.brain.CoA.setRobotGait(player.brain.motion)
             player.currentGait = constants.FAST_GAIT
 
@@ -118,7 +119,8 @@ def turnToBall(player):
         return player.goLater('scanFindBall')
     elif ball.on and player.stoppedWalk:
         # Switch gaits if necessary
-        if player.currentGait != constants.FAST_GAIT:
+        if (player.brain.nav.isStopped() and
+            player.currentGait != constants.FAST_GAIT):
             player.brain.CoA.setRobotGait(player.brain.motion)
             player.currentGait = constants.FAST_GAIT
 
@@ -171,7 +173,8 @@ def approachBall(player):
 
     # Set our walk towards the ball
     if ball.on and player.stoppedWalk:
-        if player.currentGait != constants.FAST_GAIT:
+        if (player.brain.nav.isStopped() and
+            player.currentGait != constants.FAST_GAIT):
             player.brain.CoA.setRobotGait(player.brain.motion)
             player.currentGait = constants.FAST_GAIT
         player.currentChaseWalkX = sX
@@ -249,7 +252,8 @@ def positionForKick(player):
     # Walk if we have stopped or have the correct gait already
     if ball.on and player.stoppedWalk:
         # Set the correct gait, to make us walk better
-        if player.currentGait != constants.NORMAL_GAIT:
+        if (player.brain.nav.isStopped() and
+            player.currentGait != constants.NORMAL_GAIT) :
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
             player.currentGait = constants.NORMAL_GAIT
         player.currentChaseWalkY = sY
@@ -448,6 +452,11 @@ def afterKick(player):
     State to follow up after a kick.
     Currently exits after one frame.
     """
+    if player.firstFrame():
+        if player.currentGait != constants.NORMAL_GAIT:
+            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+            player.currentGait = constants.NORMAL_GAIT
+
     # trick the robot into standing up instead of leaning to the side
     player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
     player.walkPose()
@@ -549,7 +558,8 @@ def avoidObstacle(player):
     # Check if we've stopped
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
-        if player.currentGait != constants.NORMAL_GAIT:
+        if (player.brain.nav.isStopped() and
+            player.currentGait != constants.NORMAL_GAIT):
             player.brain.CoA.setRobotTurnGait(player.brain.motion)
             player.currentGait = constants.NORMAL_GAIT
 
@@ -557,7 +567,8 @@ def avoidObstacle(player):
         transitions.shouldAvoidObstacleRight(player)):
         # Backup
         if player.stoppedWalk:
-            if player.currentGait != constants.FAST_GAIT:
+            if (player.brain.nav.isStopped() and
+                player.currentGait != constants.FAST_GAIT):
                 player.brain.CoA.setRobotGait(player.brain.motion)
                 player.currentGait = constants.FAST_GAIT
             player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
