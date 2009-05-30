@@ -20,16 +20,16 @@
 
 #include "BodyJointCommand.h"
 using namespace std;
-
 using namespace MotionConstants;
 using namespace Kinematics;
 
 BodyJointCommand::BodyJointCommand
 (const float time,
  const vector<float> *bodyJoints,
- const Kinematics::InterpolationType _type)
-: JointCommand(BODY_JOINT, time, _type), larm_joints(0),
-  lleg_joints(0), rleg_joints(0), rarm_joints(0)
+ const vector<float> *body_stiffness,
+ const InterpolationType _type)
+	: JointCommand(BODY_JOINT, time, _type, body_stiffness),
+	  larm_joints(0), lleg_joints(0), rleg_joints(0), rarm_joints(0)
 {
   setChainList();
   // bodyJoints must contain joints for the _entire_ body
@@ -74,11 +74,13 @@ BodyJointCommand::BodyJointCommand
 
 }
 
-BodyJointCommand::BodyJointCommand(const float time, ChainID chainID,
-				   const vector<float> *joints,
-				   const Kinematics::InterpolationType _type)
-: JointCommand(BODY_JOINT, time, _type), larm_joints(0),
-  lleg_joints(0), rleg_joints(0), rarm_joints(0)
+BodyJointCommand::BodyJointCommand(const float time,
+								   ChainID chainID,
+								   const vector<float> *joints,
+								   const vector<float> *body_stiffness,
+								   const InterpolationType _type)
+	: JointCommand(BODY_JOINT, time, _type, body_stiffness), larm_joints(0),
+	  lleg_joints(0), rleg_joints(0), rarm_joints(0)
 {
   setChainList();
   switch (chainID) {
@@ -100,19 +102,23 @@ BodyJointCommand::BodyJointCommand(const float time, ChainID chainID,
 }
 
 BodyJointCommand::BodyJointCommand(const float time, const vector<float> *larm,
-				   const vector<float> *lleg,
-				   const vector<float> *rleg,
-				   const vector<float> *rarm,
-				   const Kinematics::InterpolationType _type)
-: JointCommand(BODY_JOINT, time, _type), larm_joints(larm),
-  lleg_joints(lleg), rleg_joints(rleg), rarm_joints(rarm)
+								   const vector<float> *lleg,
+								   const vector<float> *rleg,
+								   const vector<float> *rarm,
+								   const vector<float> *body_stiffness,
+								   const InterpolationType _type)
+	: JointCommand(BODY_JOINT, time, _type, body_stiffness), larm_joints(larm),
+	  lleg_joints(lleg), rleg_joints(rleg), rarm_joints(rarm)
 {
   setChainList();
 }
 
 BodyJointCommand::BodyJointCommand(const BodyJointCommand &other)
-: JointCommand(BODY_JOINT, other.getDuration(), other.getInterpolation()),
-  larm_joints(0), lleg_joints(0), rleg_joints(0), rarm_joints(0)
+	: JointCommand( BODY_JOINT,
+					other.getDuration(),
+					other.getInterpolation(),
+					other.getStiffness() ),
+	  larm_joints(0), lleg_joints(0), rleg_joints(0), rarm_joints(0)
 {
   setChainList();
   if (other.larm_joints)
