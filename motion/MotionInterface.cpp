@@ -39,6 +39,13 @@ void MotionInterface::setHead(const SetHeadCommand *command){
 void MotionInterface::sendStiffness(const boost::shared_ptr<StiffnessCommand> command){
     switchboard->sendMotionCommand(command);
 }
+void MotionInterface::sendFreezeCommand(const boost::shared_ptr<OnFreezeCommand> command){
+    switchboard->sendMotionCommand(command);
+}
+void MotionInterface::sendFreezeCommand(const boost::shared_ptr<OffFreezeCommand> command){
+    switchboard->sendMotionCommand(command);
+}
+
 
 void MotionInterface::stopBodyMoves() {
     std::cout << "Stopping the body not yet implemented" << std::endl;

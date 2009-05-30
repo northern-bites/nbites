@@ -5,4 +5,6 @@ from _motion import (MotionInterface,
                      GaitCommand,
                      SetHeadCommand,
                      WalkCommand,
-                     StiffnessCommand)
+                     StiffnessCommand,
+                     OnFreezeCommand,
+                     OffFreezeCommand)

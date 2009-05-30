@@ -61,6 +61,8 @@ class MotionInterface
     void stopHeadMoves();
     void resetWalkProvider();
     void resetScriptedProvider();
+    void sendFreezeCommand(const boost::shared_ptr<OnFreezeCommand> command);
+    void sendFreezeCommand(const boost::shared_ptr<OffFreezeCommand> command);
 
     //For noggin
     MotionModel getOdometryUpdate(){

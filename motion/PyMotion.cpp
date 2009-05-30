@@ -203,6 +203,26 @@ private:
 };
 
 
+class PyOnFreezeCommand{
+public:
+    //Later, one could add more specific stiffness options
+    PyOnFreezeCommand()
+        :command(boost::shared_ptr<OnFreezeCommand>(new OnFreezeCommand())){}
+    const boost::shared_ptr<OnFreezeCommand> getCommand() const{return command;}
+private:
+    boost::shared_ptr<OnFreezeCommand> command;
+};
+
+class PyOffFreezeCommand{
+public:
+    //Later, one could add more specific stiffness options
+    PyOffFreezeCommand(float stiffness)
+        :command(boost::shared_ptr<OffFreezeCommand>(new OffFreezeCommand())){}
+    const boost::shared_ptr<OffFreezeCommand> getCommand()const{return command;}
+private:
+    boost::shared_ptr<OffFreezeCommand> command;
+};
+
 class PyMotionInterface {
 public:
     PyMotionInterface() {
@@ -229,7 +249,12 @@ public:
     void sendStiffness(const PyStiffnessCommand *command){
         motionInterface->sendStiffness(command->getCommand());
     }
-
+    void sendFreezeCommand(const PyOnFreezeCommand *command){
+        motionInterface->sendFreezeCommand(command->getCommand());
+    }
+    void sendFreezeCommand(const PyOffFreezeCommand *command){
+        motionInterface->sendFreezeCommand(command->getCommand());
+    }
     bool isWalkActive() {
         return motionInterface->isWalkActive();
     }
@@ -272,6 +297,12 @@ void (PyMotionInterface::*enq1)(const PyHeadJointCommand*) =
 void (PyMotionInterface::*enq2)(const PyBodyJointCommand*) =
     &PyMotionInterface::enqueue;
 
+void (PyMotionInterface::*frz1)(const PyOnFreezeCommand*) =
+    &PyMotionInterface::sendFreezeCommand;
+void (PyMotionInterface::*frz2)(const PyOffFreezeCommand*) =
+    &PyMotionInterface::sendFreezeCommand;
+
+
 BOOST_PYTHON_MODULE(_motion)
 {
     class_<PyHeadJointCommand>("HeadJointCommand",
@@ -310,6 +341,17 @@ BOOST_PYTHON_MODULE(_motion)
  "A container for a walk command. Holds an x, y and theta which represents a"
  " walk vector"))
         ;
+    class_<PyOnFreezeCommand>("OnFreezeCommand",
+                              init<>("A container for a "
+                                   "command to freeze the robot"))
+        ;
+
+    class_<PyOffFreezeCommand>("OffFreezeCommand",
+                              init<float>(args("stiffness"),
+                                          "A container for a command to "
+                                          "UNfreeze the robot"))
+
+        ;
     class_<PyStiffnessCommand>("StiffnessCommand",
                                init<float>(args("bodyStiffness"),
 "A container for a stiffness comamnd. Allows setting stiffness per chain or "
@@ -325,6 +367,8 @@ BOOST_PYTHON_MODULE(_motion)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead",&PyMotionInterface::setHead)
         .def("sendStiffness",&PyMotionInterface::sendStiffness)
+        .def("sendFreezeCommand",frz1)
+        .def("sendFreezeCommand",frz2)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("isHeadActive", &PyMotionInterface::isHeadActive)
 		.def("isBodyActive", &PyMotionInterface::isBodyActive)
