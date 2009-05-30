@@ -43,15 +43,20 @@ static MotionInterface* interface_reference = 0;
 
 class PyHeadJointCommand {
 public:
-    PyHeadJointCommand(float time, tuple joints, int interpolationType) {
-        vector<float> * jointsVector = new vector<float>;
+    PyHeadJointCommand(float time, tuple joints,
+					   tuple stiffness, int interpolationType) {
 
+        vector<float> * jointsVector = new vector<float>;
+        vector<float> * head_stiffness = new vector<float>;
         // Head joint commands are sent in as degree values and we deal with
         // radians in the motion engine. They get converted here.
         for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
             jointsVector->push_back(extract<float>(joints[i]) * TO_RAD);
 
-        command = new HeadJointCommand(time, jointsVector,
+		for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
+			head_stiffness->push_back(extract<float>(stiffness[i]));
+
+        command = new HeadJointCommand(time, jointsVector, head_stiffness,
                       static_cast<InterpolationType>(interpolationType));
     }
 
@@ -140,11 +145,13 @@ public:
     PyBodyJointCommand(float time,
                        tuple larmJoints, tuple llegJoints,
                        tuple rlegJoints, tuple rarmJoints,
+					   tuple stiffness,
                        int interpolationType) {
         vector<float> * larm = new vector<float>;
         vector<float> * lleg = new vector<float>;
         vector<float> * rleg = new vector<float>;
         vector<float> * rarm = new vector<float>;
+		vector<float> * body_stiffness = new vector<float>;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
@@ -159,22 +166,32 @@ public:
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
             rarm->push_back(extract<float>(rarmJoints[i]) * TO_RAD);
 
+		for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
+			body_stiffness->push_back(extract<float>(stiffness[i]));
+
         command = new BodyJointCommand(time, larm, lleg, rleg, rarm,
-                      static_cast<InterpolationType>(interpolationType));
+									   body_stiffness,
+									   static_cast<InterpolationType>(interpolationType));
     }
 
 	// Single chain command
 	PyBodyJointCommand(float time,
 					   int chainID, tuple chainJoints,
+					   tuple stiffness,
 					   int interpolationType) {
         vector<float> * chain = new vector<float>;
+		vector<float> * body_stiffness = new vector<float>;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < chain_lengths[chainID] ; i++)
             chain->push_back(extract<float>(chainJoints[i]) * TO_RAD);
 
+		for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
+			body_stiffness->push_back(extract<float>(stiffness[i]));
+
         command = new BodyJointCommand(time, static_cast<ChainID>(chainID),
-									   chain, static_cast<InterpolationType>(interpolationType));
+									   chain, body_stiffness,
+									   static_cast<InterpolationType>(interpolationType));
 	}
 
 
@@ -306,7 +323,7 @@ void (PyMotionInterface::*frz2)(const PyUnfreezeCommand*) =
 BOOST_PYTHON_MODULE(_motion)
 {
     class_<PyHeadJointCommand>("HeadJointCommand",
-                               init<float, tuple, int>(
+                               init<float, tuple, tuple, int>(
  "A container for a head joint command passed to the motion engine"))
         ;
     class_<PyGaitCommand>("GaitCommand",
@@ -324,10 +341,11 @@ BOOST_PYTHON_MODULE(_motion)
 "turnZMPOffsetY, strafeZMPOffsetY, sensorFeedback"))
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
-                               init<float, tuple, tuple, tuple, tuple, int>(
+                               init<float, tuple, tuple, tuple,
+							        tuple, tuple, int>(
 								   "A container for a body joint command passed to the motion engine"))
-		.def(init<float, int, tuple, int>( // Single chain command
-				 args("time","chainID", "joints","interpolation"),
+		.def(init<float, int, tuple, tuple, int>( // Single chain command
+				 args("time","chainID", "joints","body_stiffness","interpolation"),
 				 "A container for a body joint command passed to the motion engine"))
 		;
     class_<PySetHeadCommand>("SetHeadCommand",

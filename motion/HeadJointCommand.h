@@ -31,7 +31,6 @@
 #include <vector>
 #include <string>
 
-//#include "WalkCommand.h"
 #include "Kinematics.h"
 #include "JointCommand.h"
 #include "MotionConstants.h"
@@ -39,11 +38,11 @@
 class HeadJointCommand : public JointCommand {
 public:
 	HeadJointCommand(const float time, const std::vector<float> *joints,
+					 const std::vector<float> *head_stiffness,
 					 const Kinematics::InterpolationType _type);
 	HeadJointCommand(const HeadJointCommand &other);
 	virtual ~HeadJointCommand();
 
-	// TODO @JGM NEED A CHECK ON THE CHAINID REQUEST
 	virtual const std::vector<float>* getJoints(Kinematics::ChainID chain) const {
 		if (chain == Kinematics::HEAD_CHAIN) {
 			return headJoints;
@@ -52,7 +51,6 @@ public:
 		}
 	}
 private:
-	//const skew_function skew_func;
 	const std::vector<float> *headJoints;
 	virtual void setChainList();
 	const std::vector<float> noJoints;
