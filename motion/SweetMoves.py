@@ -3,6 +3,7 @@
 #import MotionConstants
 
 import StiffnessModes as stiff
+import HeadMoves
 
 SWEET_MOVE_LENGTH = 7
 CHAIN_MOVE_LENGTH = 5
@@ -14,7 +15,7 @@ def getMoveTime(move):
         if len(target) == SWEET_MOVE_LENGTH or \
                 len(target) == CHAIN_MOVE_LENGTH:
             totalTime += target[4]
-        elif len(target) == CHAIN_MOVE_LENGTH:
+        elif len(target) == HeadMoves.HEAD_MOVE_LENGTH:
             totalTime += target[1]
     return totalTime
 
