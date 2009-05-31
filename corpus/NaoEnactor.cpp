@@ -143,10 +143,10 @@ void NaoEnactor::sendHardness(){
     if(!diffStiff)
         return;
 
-	// Turn off slarti shoulder!
-// #ifdef ROBOT_NAME_zaphod
-//     hardness_command[5][3][0] = -1.0f;
-// #endif
+	// Turn off marvin  shoulder!
+ #ifdef ROBOT_NAME_marvin
+     hardness_command[5][3][0] = -1.0f;
+ #endif
 
 #ifndef NO_ACTUAL_MOTION
     try {
