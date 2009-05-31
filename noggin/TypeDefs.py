@@ -514,7 +514,7 @@ class Sonar:
     def __init__(self):
         # Class constants
         self.UNKNOWN_VALUE = "unknown distance"
-        self.MIN_DIST = 25.0 # minimum readable distance in cm
+        self.MIN_DIST = 0.0 #25.0 # minimum readable distance in cm
         self.MAX_DIST = 255.0 # maximum readable distance in cm
 
         self.lastDist = self.UNKNOWN_VALUE
@@ -532,8 +532,8 @@ class Sonar:
         self.lastDist = sensors.ultraSoundDistance
         self.lastMode = sensors.ultraSoundMode
 
-        if (self.lastDist < self.MIN_DIST or
-            self.lastDist > self.MAX_DIST):
+        if (self.lastDist <= self.MIN_DIST or
+            self.lastDist >= self.MAX_DIST):
             self.lastDist = self.UNKNOWN_VALUE
         if self.lastMode == modes.LL:
             self.LLdist = self.lastDist

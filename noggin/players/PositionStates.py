@@ -1,14 +1,18 @@
 from .. import NogginConstants as Constants
 from . import ChaseBallConstants as ChaseConstants
-import ChaseBallTransitions as chaseTransitions
 import man.noggin.util.MyMath as MyMath
-import man.motion.SweetMoves as SweetMoves
+import PositionTransitions as Transitions
 
 def positionLocalize(player):
-
+    """
+    Localize better in order to position
+    """
     return player.stay()
 
 def playbookPosition(player):
+    """
+    Have the robot navigate to the position reported to it from playbook
+    """
     position = player.brain.playbook.position
     if player.firstFrame():
         player.stopWalking()
@@ -27,33 +31,6 @@ def playbookPosition(player):
 
     return player.stay()
 
-def positionOnBall(player):
-    # for now we want a way to not rely on localization for chasing
-    if not ChaseConstants.USE_LOC_CHASE:
-        if chaseTransitions.shouldApproachBall(player):
-            return player.goLater('approachBall')
-        elif chaseTransitions.shouldTurnToBall_ApproachBall(player):
-            return player.goLater('turnToBall')
-        elif chaseTransitions.shouldSpinFindBall(player):
-            return player.goLater('spinFindBall')
-        else :
-            return player.goLater('scanFindBall')
-
-    nextX, nextY,nextH = player.getBehindBallPosition()
-
-    if player.firstFrame():
-        player.brain.nav.goTo(nextX,nextY,nextH)
-
-    #player.printf("position = "+str(nextX)+" , "+str(nextY) )
-    if player.brain.nav.destX != nextX or \
-            player.brain.nav.destY != nextY:
-        player.brain.nav.goTo(nextX,nextY,nextH)
-
-    if player.brain.nav.isStopped():
-        return player.goLater('chase')
-
-    return player.stay()
-
 def atPosition(player):
     """
     State for when we're at the position
@@ -61,7 +38,7 @@ def atPosition(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
-    if 0 < player.brain.ball.dist < 25:
+    if Transitions.shouldKickAtPosition(player):
         return player.goLater('kickAtPosition')
     return player.stay()
 
@@ -78,10 +55,10 @@ def spinToBall(player):
                            -ChaseConstants.BALL_SPIN_SPEED,
                            ChaseConstants.BALL_SPIN_SPEED)
 
-    if chaseTransitions.shouldBeAtSpinDir(player):
+    if Transitions.atSpinBallDir(player):
         return player.goLater('atSpinBallPosition')
 
-    elif chaseTransitions.shouldSpinFindBallPosition(player):
+    elif Transitions.shouldSpinFindBallPosition(player):
         return player.goLater('spinFindBallPosition')
 
     elif player.currentSpinDir != MyMath.sign(turnRate):
@@ -101,9 +78,9 @@ def atSpinBallPosition(player):
         player.stopWalking()
         player.brain.tracker.activeLoc()
 
-    if chaseTransitions.shouldTurnToBall_fromAtBallPosition(player):
+    if Transitions.shouldTurnToBall_fromAtBallPosition(player):
         return player.goLater('spinToBall')
-    elif chaseTransitions.shouldSpinFindBallPosition(player):
+    elif Transitions.shouldSpinFindBallPosition(player):
         return player.goLater('spinFindBallPosition')
 
     return player.stay()
@@ -122,23 +99,9 @@ def spinFindBallPosition(player):
         player.brain.tracker.trackBall()
 
 
-    if chaseTransitions.shouldTurnToBall_fromAtBallPosition(player):
+    if Transitions.shouldTurnToBall_fromAtBallPosition(player):
         return player.goLater('spinToBall')
-    if chaseTransitions.shouldTurnToBall_ApproachBall(player):
+    if Transitions.atSpinBallDir(player):
         return player.goLater('atSpinBallPosition')
-
-    return player.stay()
-
-
-def kickAtPosition(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-    if player.counter == 2:
-        player.executeMove(SweetMoves.LEFT_FAR_KICK)
-
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
-        # trick the robot into standing up instead of leaning to the side
-        player.setSpeed(0,0,0)
-        return player.goLater('atPosition')
 
     return player.stay()

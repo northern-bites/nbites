@@ -71,8 +71,8 @@ MID_UP_SCAN_BALL = (
     (( 65.0, -30.0),1.3, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.,-5.),0.3,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-5.),1.4, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-65.,-30.),0.3,1, stiff.LOW_HEAD_STIFFNESSES),
-    ((65.,-30.),1.4, 1, stiff.LOW_HEAD_STIFFNESSES),)
+    ((-65.,20.),0.3,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.,20.),1.4, 1, stiff.LOW_HEAD_STIFFNESSES),)
 
 LOW_SCAN_CLOSE_BOUND = 0
 LOW_SCAN_FAR_BOUND = 40

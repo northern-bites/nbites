@@ -13,7 +13,6 @@ import man.motion.SweetMoves as SweetMoves
 def gamePenalized(player):
     if player.firstFrame():
         player.stopWalking()
-        player.motion.stopBodyMoves()
         player.penalizeHeads()
     return player.stay()
 
@@ -25,7 +24,6 @@ def gameInitial(player):
     """
     if player.firstFrame():
         player.gainsOn()
-        player.motion.stopBodyMoves()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
     return player.stay()
@@ -45,7 +43,6 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        #player.brain.tracker.trackBall()
         player.brain.tracker.activeLoc()
     return player.stay()
 
@@ -54,7 +51,6 @@ def gamePlaying(player):
     This method must be overriden by intersted SoccerPlayers
     """
     if player.firstFrame():
-        player.motion.stopBodyMoves()
         player.brain.tracker.stopHeadMoves()
     return player.stay()
 

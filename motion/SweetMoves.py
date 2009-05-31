@@ -3,7 +3,6 @@
 #import MotionConstants
 
 import StiffnessModes as stiff
-import HeadMoves
 
 SWEET_MOVE_LENGTH = 7
 CHAIN_MOVE_LENGTH = 5
@@ -12,11 +11,8 @@ CHAIN_MOVE_LENGTH = 5
 def getMoveTime(move):
     totalTime = 0.0
     for target in move:
-        if len(target) == SWEET_MOVE_LENGTH or \
-                len(target) == CHAIN_MOVE_LENGTH:
-            totalTime += target[4]
-        elif len(target) == HeadMoves.HEAD_MOVE_LENGTH:
-            totalTime += target[1]
+        totalTime += target[-3]
+
     return totalTime
 
 OFF = None #OFF means the joint chain doesnt get enqueued during this motion
