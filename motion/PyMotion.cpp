@@ -146,7 +146,7 @@ public:
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
             rarm->push_back(extract<float>(rarmJoints[i]) * TO_RAD);
 
-		for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
+		for (unsigned int i=0; i < Kinematics::NUM_JOINTS; i++)
 			body_stiffness->push_back(extract<float>(stiffness[i]));
 
         command = new BodyJointCommand(time, larm, lleg, rleg, rarm,
