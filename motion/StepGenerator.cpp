@@ -337,7 +337,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
 
 void StepGenerator::swapSupportLegs(){
-
         if (currentZMPDSteps.size() +  futureSteps.size() <
             MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
@@ -616,6 +615,10 @@ void StepGenerator::setSpeed(const float _x, const float _y,
         }
     }
 
+    x = new_x;
+    y=new_y;
+    theta=new_theta;
+
 #ifdef DEBUG_STEPGENERATOR
     cout << "New Walk Vector is:" << endl
          << "    x: " << x << " y: " << y << " theta: " << theta << endl;
@@ -648,8 +651,13 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 void StepGenerator::takeSteps(const float _x, const float _y, const float _theta,
                               const int _numSteps){
 
+#ifdef DEBUG_STEPGENERATOR
     cout << "takeSteps called with (" << _x << "," << _y<<","<<_theta
          <<") and with nsteps = "<<_numSteps<<endl;
+#endif
+
+    // We have to reevalaute future steps, so we forget about any future plans
+    futureSteps.clear();
 
     //convert speeds in cm/s and rad/s into steps and clip according to the gait
     const float new_x =  clip(_x,walkParams->maxXSpeed)
@@ -666,19 +674,26 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
             <<") and with "<<_numSteps<<" Steps were APPENDED because"
             "StepGenerator is already active!!" <<endl;
     }else{
-        if(new_y < 0.0f || new_theta < 0.0f)
+       //we are starting fresh from a stopped state, so we need to clear all remaining 
+        //steps and zmp values.
+        resetQueues();
+
+        if(new_y < 0.0f || new_theta < 0.0f){
+            cout << "Starting right" <<endl;
             startRight();
-        else
+        }else
             startLeft();
+
+        //Adding this step is necessary because it was not added in the start left right
+        generateStep(new_x, new_y, new_theta);
+
         done = false;
+
     }
 
-    //HACK, but currently necessary, because of some crazy stuff in generateStep
-    generateStep(new_x, new_y, new_theta);
 
     for(int i =0; i < _numSteps; i++){
         generateStep(new_x, new_y, new_theta);
-        done = false;
     }
 
 
