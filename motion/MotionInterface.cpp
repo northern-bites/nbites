@@ -23,7 +23,10 @@
 void MotionInterface::setNextWalkCommand(const WalkCommand *command){
     switchboard->sendMotionCommand(command);
 }
-
+void
+MotionInterface::sendStepCommand(const boost::shared_ptr<StepCommand> command){
+    switchboard->sendMotionCommand(command);
+}
 void MotionInterface::enqueue(const BodyJointCommand *command){
     switchboard->sendMotionCommand(command);
 }

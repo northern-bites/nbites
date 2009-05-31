@@ -595,4 +595,9 @@ void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> co
     pthread_mutex_unlock(&stiffness_mutex);
 
 }
+void
+MotionSwitchboard::sendMotionCommand(const shared_ptr<StepCommand> command){
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+}
 

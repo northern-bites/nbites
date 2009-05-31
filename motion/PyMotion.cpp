@@ -37,6 +37,7 @@ using namespace boost::python;
 #include "StiffnessCommand.h"
 #include "MotionInterface.h"
 #include "Kinematics.h"
+#include "StepCommand.h"
 using namespace Kinematics;
 
 static MotionInterface* interface_reference = 0;
@@ -116,6 +117,23 @@ private:
     WalkCommand *command;
 };
 
+class PyStepCommand {
+public:
+    PyStepCommand(float x_cms, float m_cms, float theta_degs, int numStep) {
+        //All python units should be in CM and DEG per second
+        //C++ is in mm and rads, so we need to convert
+        command =
+            boost::shared_ptr<StepCommand>(new StepCommand(x_cms*CM_TO_MM,
+                                                           m_cms*CM_TO_MM,
+                                                           theta_degs*TO_RAD,
+                                                           numStep));
+    }
+
+    boost::shared_ptr<StepCommand> getCommand() const { return command; }
+
+private:
+    boost::shared_ptr<StepCommand> command;
+};
 
 class PyStiffnessCommand {
 public:

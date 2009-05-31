@@ -33,6 +33,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s)
       curGait(NULL),nextGait(NULL),
       stepGenerator(sensors),
       pendingCommands(false),
+      pendingStepCommands(false),
       nextCommand(NULL)
 {
     pthread_mutex_init(&walk_provider_mutex,NULL);
@@ -78,6 +79,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     pendingCommands = false;
     nextCommand = NULL;
 
+    //Also need to process stepCommands here
 
     if(!isActive()){
         cout << "WARNING, I wouldn't be calling the Walkprovider while"
@@ -132,12 +134,20 @@ void WalkProvider::setCommand(const WalkCommand * command){
 
 
 void WalkProvider::setCommand(const boost::shared_ptr<GaitCommand> command){
+    pthread_mutex_lock(&walk_provider_mutex);
     nextGait = new WalkingParameters(command->getGait());
+    pthread_mutex_unlock(&walk_provider_mutex);
 }
-
+void WalkProvider::setCommand(const boost::shared_ptr<StepCommand> command){
+    pthread_mutex_lock(&walk_provider_mutex);
+    nextStepCommand = command;
+    pendingStepCommands = true;
+    setActive();
+    pthread_mutex_unlock(&walk_provider_mutex);
+}
 void WalkProvider::setActive(){
     //check to see if the walk engine is active
-    if(stepGenerator.isDone() && !pendingCommands){
+    if(stepGenerator.isDone() && !pendingCommands && !pendingStepCommands){
         inactive();
     }else{
         active();
