@@ -4,6 +4,19 @@ from . import BirthCertificate
 
 from man.motion import RobotGaits as gaits
 
+def read_hostname():
+    """
+    Method reads the hostname from the hostname file
+    """
+    result = os.system('/bin/hostname > /tmp/hostname.txt')
+    try:
+        hostfile = open('/tmp/hostname.txt','r')
+        host = hostfile.readline()
+        host = host.rstrip("\n")
+        return host
+    except IOError:
+        print ("Unable to read hostname from this platform")
+        return "NONE"
 #technically, we should set gaits according to the number stored in the chest
 #board, however, reading this is not currently setup. -js
 
@@ -55,7 +68,6 @@ stole the Heart of Gold Spaceship, and helped rescue the Universe from the
 Krikkit robots.''',
             gait = gaits.ZAPHOD_GAIT,
             turn_gait = gaits.ZAPHOD_TURN_GAIT,
-
             )
 
 
@@ -73,9 +85,9 @@ unknown = BirthCertificate.BirthCertificate(
 This robot is currently unknown.  That is, we could not identify it
 from its hostname (%s).  The recognized robots are %s.''' %
             #(socket.gethostname(), robot_map.keys()),# temp removed -js
-            ('\''+open("/etc/hostname",'r').readline().rstrip()+'\'', robot_map.keys()), 
-            gait = gaits.WEBOTS_GAIT,
-            turn_gait = gaits.WEBOTS_GAIT,
+            ('\''+ read_hostname() +'\'', robot_map.keys()), 
+            gait = gaits.TRILLIAN_GAIT,
+            turn_gait = gaits.TRILLIAN_TURN_GAIT,
             )
 
 
@@ -83,11 +95,4 @@ def get_certificate():
     return robot_map.setdefault(read_hostname(),
                                 unknown) # switched to use the file read method
     #return robot_map.setdefault(socket.gethostname(), unknown)
-
-def read_hostname():
-    """
-    Method reads the hostname from the hostname file
-    """
-    return open("/etc/hostname",'r').readline().rstrip()
-
 
