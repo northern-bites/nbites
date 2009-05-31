@@ -347,6 +347,13 @@ WalkingLeg::getHipHack(const float curHYPAngle){
  * supporting.
  *
  * During the double support phases, we gradually transition the stiffness
+ *
+ * COMMENTS:
+ *    The stiffness settings defined below are not really ideal.
+ *    The problem is that we want low stiffness in the knee right
+ *    during touchdown, but not during the actual swinging motion.
+ *    It might make more sense to move this code into the respective
+ *    swinging/supporting methods to make it easier to define the stiffness
  */
 const vector<float> WalkingLeg::getStiffnesses(){
     //get shorter names for all the constants
