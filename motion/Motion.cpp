@@ -27,14 +27,14 @@ using namespace boost;
 #include "NaoEnactor.h"
 
 Motion::Motion (shared_ptr<Synchro> _synchro,
-                   shared_ptr<MotionEnactor> _enactor,
-                   shared_ptr<Sensors> s)
+				shared_ptr<MotionEnactor> _enactor,
+				shared_ptr<Sensors> s, shared_ptr<Profiler> p)
   : Thread(_synchro, "Motion"),
-    switchboard(s),
+    switchboard(s,p),
     enactor(_enactor),
-    interface(&switchboard)
+    interface(&switchboard),
+	profiler(p)
 {
-
     set_motion_interface(&interface);
 }
 

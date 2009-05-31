@@ -33,6 +33,10 @@ enum ProfiledComponent {
   P_MCL,
   P_PYRUN,
   P_PYTHON,
+  P_SWITCHBOARD,
+  P_SCRIPTED,
+  P_WALK,
+  P_HEAD,
   P_FINAL,
 };
 static const int NUM_PCOMPONENTS = P_FINAL + 1;

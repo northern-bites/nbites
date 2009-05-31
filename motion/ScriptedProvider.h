@@ -32,9 +32,14 @@
 #include "ChoppedCommand.h"
 #include "Kinematics.h"
 
+#include "Profiler.h"
+
+
 class ScriptedProvider : public MotionProvider {
 public:
-    ScriptedProvider(float motionFrameLength, boost::shared_ptr<Sensors> s);
+    ScriptedProvider(float motionFrameLength,
+					 boost::shared_ptr<Sensors> s,
+					 boost::shared_ptr<Profiler> p);
     virtual ~ScriptedProvider();
 
     void requestStopFirstInstance();

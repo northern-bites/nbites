@@ -23,6 +23,10 @@ static const char *PCOMPONENT_NAMES[] = {
   "MCL",
   "PyRun",
   "Python",
+  "Switchboard",
+  "Scripted Provider",
+  "Walk Provider",
+  "Head Provider",
   "Final"
 };
 
@@ -46,6 +50,10 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
   /*P_MCL         --> */ P_LOC,
   /*P_PYRUN       --> */ P_PYTHON,
   /*P_PYTHON      --> */ P_FINAL,
+  /*P_SWITCHBOARD --> */ P_FINAL,
+  /*P_SCRIPTED    --> */ P_SWITCHBOARD,
+  /*P_WALK        --> */ P_SWITCHBOARD,
+  /*P_HEAD        --> */ P_SWITCHBOARD,
   /*P_FINAL       --> */ P_FINAL
 };
 

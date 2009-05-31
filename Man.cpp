@@ -55,6 +55,8 @@ Man::Man (shared_ptr<Sensors> _sensors,
 {
     // initialize system helper modules
     profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
+	profiler->profiling = true;
+	profiler->profileFrames(200);
 
     // give python a pointer to the sensors structure. Method defined in
     // Sensors.h
@@ -69,7 +71,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     // initialize core processing modules
 #ifdef USE_MOTION
     motion = shared_ptr<Motion>(
-        new Motion(synchro, enactor, sensors));
+        new Motion(synchro, enactor, sensors,profiler));
     guardian->setMotionInterface(motion->getInterface());
 #endif
     // initialize python roboguardian module.

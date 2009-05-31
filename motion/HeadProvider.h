@@ -34,7 +34,9 @@
 
 class HeadProvider : public MotionProvider {
 public:
-    HeadProvider(float motionFrameLength, boost::shared_ptr<Sensors> s);
+    HeadProvider(float motionFrameLength,
+				 boost::shared_ptr<Sensors> s,
+				 boost::shared_ptr<Profiler> p);
     virtual ~HeadProvider();
 
     void requestStopFirstInstance();

@@ -28,8 +28,10 @@ using boost::shared_ptr;
 
 //#define DEBUG_HEADPROVIDER
 
-HeadProvider::HeadProvider(float motionFrameLength, shared_ptr<Sensors> s)
-	: MotionProvider(HEAD_PROVIDER),
+HeadProvider::HeadProvider(float motionFrameLength,
+						   shared_ptr<Sensors> s,
+						   shared_ptr<Profiler> p)
+	: MotionProvider(HEAD_PROVIDER, p),
 	  sensors(s),
 	  FRAME_LENGTH_S(motionFrameLength),
 	  chopper(sensors, FRAME_LENGTH_S),
