@@ -227,7 +227,6 @@ public abstract class Field
         drawOval(g2, LINES_COLOR, LINE_THICKNESS, MIDFIELD_X,
                  MIDFIELD_Y, CENTER_CIRCLE_RADIUS, CENTER_CIRCLE_RADIUS);
 
-
         // Left goal box
         drawRect(g2, LINES_COLOR, LINE_THICKNESS,
                  LEFT_SIDELINE_X, GOAL_BOX_BOTTOM_Y,
@@ -238,6 +237,28 @@ public abstract class Field
                  RIGHT_SIDELINE_X - GOAL_BOX_DEPTH, GOAL_BOX_BOTTOM_Y,
                  GOAL_BOX_DEPTH, GOAL_BOX_WIDTH);
 
+        // Left side cross
+        drawLine(g2, LINES_COLOR, LINE_THICKNESS,
+                 LEFT_SIDELINE_X + 180.0f - 5.0f,
+                 CENTER_FIELD_Y,
+                 LEFT_SIDELINE_X + 180.0f + 5.0f,
+                 CENTER_FIELD_Y);
+        drawLine(g2, LINES_COLOR, LINE_THICKNESS,
+                 LEFT_SIDELINE_X + 180.0f,
+                 CENTER_FIELD_Y + 5.0f,
+                 LEFT_SIDELINE_X + 180.0f,
+                 CENTER_FIELD_Y - 5.0f);
+        // Right side cross
+        drawLine(g2, LINES_COLOR, LINE_THICKNESS,
+                 RIGHT_SIDELINE_X - 180.0f - 5.0f,
+                 CENTER_FIELD_Y,
+                 RIGHT_SIDELINE_X - 180.0f + 5.0f,
+                 CENTER_FIELD_Y);
+        drawLine(g2, LINES_COLOR, LINE_THICKNESS,
+                 RIGHT_SIDELINE_X - 180.0f,
+                 CENTER_FIELD_Y + 5.0f,
+                 RIGHT_SIDELINE_X - 180.0f,
+                 CENTER_FIELD_Y - 5.0f);
     }
 
     /**
