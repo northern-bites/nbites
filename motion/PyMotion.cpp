@@ -19,7 +19,7 @@
 // <http://www.gnu.org/licenses/>.
 //For gaitcommands
 
-#define BOOST_PYTHON_MAX_ARITY 19
+#define BOOST_PYTHON_MAX_ARITY 23
 
 #include <Python.h>
 #include <boost/python.hpp>
@@ -34,7 +34,6 @@ using namespace boost::python;
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
 #include "WalkCommand.h"
-#include "StiffnessCommand.h"
 #include "MotionInterface.h"
 #include "Kinematics.h"
 using namespace Kinematics;
@@ -43,15 +42,20 @@ static MotionInterface* interface_reference = 0;
 
 class PyHeadJointCommand {
 public:
-    PyHeadJointCommand(float time, tuple joints, int interpolationType) {
-        vector<float> * jointsVector = new vector<float>;
+    PyHeadJointCommand(float time, tuple joints,
+					   tuple stiffness, int interpolationType) {
 
+        vector<float> * jointsVector = new vector<float>;
+        vector<float> * head_stiffness = new vector<float>;
         // Head joint commands are sent in as degree values and we deal with
         // radians in the motion engine. They get converted here.
         for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
             jointsVector->push_back(extract<float>(joints[i]) * TO_RAD);
 
-        command = new HeadJointCommand(time, jointsVector,
+		for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
+			head_stiffness->push_back(extract<float>(stiffness[i]));
+
+        command = new HeadJointCommand(time, jointsVector, head_stiffness,
                       static_cast<InterpolationType>(interpolationType));
     }
 
@@ -75,7 +79,9 @@ public:
                    const float _lZMPSwOffY,const float _rZMPSwOffY,
                    const float _tZMPOffY, const float _sZMPOffY,
                    const float maxx, const float maxy, const float maxtheta,
-                   const float sensorFeedback)
+                   const float sensorFeedback, const float maxStiffness,
+                   const float kneeStiffness, const float ankleStiffness,
+                   const float armStiffness)
 
         : command(new GaitCommand(0.02f,_bh*CM_TO_MM, //HACK
                                   _hox*CM_TO_MM, _yao*TO_RAD, _dur,
@@ -86,7 +92,8 @@ public:
                                   // Note: no conversion for these
                                   _tZMPOffY, _sZMPOffY,
                                   maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD,
-                                  sensorFeedback))
+                                  sensorFeedback, maxStiffness,
+                                  kneeStiffness,ankleStiffness, armStiffness))
         {
         }
 
@@ -113,38 +120,18 @@ private:
     WalkCommand *command;
 };
 
-
-class PyStiffnessCommand {
-public:
-    PyStiffnessCommand(){
-        command =  boost::shared_ptr<StiffnessCommand>(new StiffnessCommand());
-    }
-    PyStiffnessCommand(const float bodyStiffness){
-        command =  boost::shared_ptr<StiffnessCommand>
-            (new StiffnessCommand(bodyStiffness));
-    }
-    PyStiffnessCommand(const int chainID, const float chainStiffness){
-        command = boost::shared_ptr<StiffnessCommand>
-            (new StiffnessCommand((ChainID)chainID,chainStiffness));
-    }
-    void setChainStiffness(const int chainID, const float chainStiffness){
-        command->setChainStiffness((ChainID) chainID, chainStiffness );
-    }
-    boost::shared_ptr<StiffnessCommand>  getCommand() const {return command;}
-private:
-    boost::shared_ptr<StiffnessCommand> command;
-};
-
 class PyBodyJointCommand {
 public:
     PyBodyJointCommand(float time,
                        tuple larmJoints, tuple llegJoints,
                        tuple rlegJoints, tuple rarmJoints,
+					   tuple stiffness,
                        int interpolationType) {
         vector<float> * larm = new vector<float>;
         vector<float> * lleg = new vector<float>;
         vector<float> * rleg = new vector<float>;
         vector<float> * rarm = new vector<float>;
+		vector<float> * body_stiffness = new vector<float>;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
@@ -159,22 +146,32 @@ public:
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
             rarm->push_back(extract<float>(rarmJoints[i]) * TO_RAD);
 
+		for (unsigned int i=0; i < Kinematics::NUM_JOINTS; i++)
+			body_stiffness->push_back(extract<float>(stiffness[i]));
+
         command = new BodyJointCommand(time, larm, lleg, rleg, rarm,
-                      static_cast<InterpolationType>(interpolationType));
+									   body_stiffness,
+									   static_cast<InterpolationType>(interpolationType));
     }
 
 	// Single chain command
 	PyBodyJointCommand(float time,
 					   int chainID, tuple chainJoints,
+					   tuple stiffness,
 					   int interpolationType) {
         vector<float> * chain = new vector<float>;
+		vector<float> * body_stiffness = new vector<float>;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < chain_lengths[chainID] ; i++)
             chain->push_back(extract<float>(chainJoints[i]) * TO_RAD);
 
+		for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
+			body_stiffness->push_back(extract<float>(stiffness[i]));
+
         command = new BodyJointCommand(time, static_cast<ChainID>(chainID),
-									   chain, static_cast<InterpolationType>(interpolationType));
+									   chain, body_stiffness,
+									   static_cast<InterpolationType>(interpolationType));
 	}
 
 
@@ -203,6 +200,26 @@ private:
 };
 
 
+class PyFreezeCommand{
+public:
+    //Later, one could add more specific stiffness options
+    PyFreezeCommand()
+        :command(boost::shared_ptr<FreezeCommand>(new FreezeCommand())){}
+    const boost::shared_ptr<FreezeCommand> getCommand() const{return command;}
+private:
+    boost::shared_ptr<FreezeCommand> command;
+};
+
+class PyUnfreezeCommand{
+public:
+    //Later, one could add more specific stiffness options
+    PyUnfreezeCommand(float stiffness)
+        :command(boost::shared_ptr<UnfreezeCommand>(new UnfreezeCommand())){}
+    const boost::shared_ptr<UnfreezeCommand> getCommand()const{return command;}
+private:
+    boost::shared_ptr<UnfreezeCommand> command;
+};
+
 class PyMotionInterface {
 public:
     PyMotionInterface() {
@@ -226,10 +243,12 @@ public:
     void setHead(const PySetHeadCommand *command) {
         motionInterface->setHead(command->getCommand());
     }
-    void sendStiffness(const PyStiffnessCommand *command){
-        motionInterface->sendStiffness(command->getCommand());
+    void sendFreezeCommand(const PyFreezeCommand *command){
+        motionInterface->sendFreezeCommand(command->getCommand());
     }
-
+    void sendFreezeCommand(const PyUnfreezeCommand *command){
+        motionInterface->sendFreezeCommand(command->getCommand());
+    }
     bool isWalkActive() {
         return motionInterface->isWalkActive();
     }
@@ -272,14 +291,21 @@ void (PyMotionInterface::*enq1)(const PyHeadJointCommand*) =
 void (PyMotionInterface::*enq2)(const PyBodyJointCommand*) =
     &PyMotionInterface::enqueue;
 
+void (PyMotionInterface::*frz1)(const PyFreezeCommand*) =
+    &PyMotionInterface::sendFreezeCommand;
+void (PyMotionInterface::*frz2)(const PyUnfreezeCommand*) =
+    &PyMotionInterface::sendFreezeCommand;
+
+
 BOOST_PYTHON_MODULE(_motion)
 {
     class_<PyHeadJointCommand>("HeadJointCommand",
-                               init<float, tuple, int>(
+                               init<float, tuple, tuple, int>(
  "A container for a head joint command passed to the motion engine"))
         ;
     class_<PyGaitCommand>("GaitCommand",
                           init<
+                          float, float, float, float,
                           float, float, float, float,
                           float, float, float, float,
                           float, float, float, float,
@@ -290,13 +316,15 @@ BOOST_PYTHON_MODULE(_motion)
 "stepHeight,"
 "footLengthX,dblSupInactivePercentage,leftSwingHipRollAddition,"
 "rightSwingHipRollAddition,leftZMPSwingOffsetY,rightZMPSwingOffsetY,"
-"turnZMPOffsetY, strafeZMPOffsetY, sensorFeedback"))
+"turnZMPOffsetY, strafeZMPOffsetY, sensorFeedback, maxStiffness, kneeStiffness,"
+"ankleStiffness,armStiffness"))
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
-                               init<float, tuple, tuple, tuple, tuple, int>(
+                               init<float, tuple, tuple, tuple,
+							        tuple, tuple, int>(
 								   "A container for a body joint command passed to the motion engine"))
-		.def(init<float, int, tuple, int>( // Single chain command
-				 args("time","chainID", "joints","interpolation"),
+		.def(init<float, int, tuple, tuple, int>( // Single chain command
+				 args("time","chainID", "joints","body_stiffness","interpolation"),
 				 "A container for a body joint command passed to the motion engine"))
 		;
     class_<PySetHeadCommand>("SetHeadCommand",
@@ -310,13 +338,16 @@ BOOST_PYTHON_MODULE(_motion)
  "A container for a walk command. Holds an x, y and theta which represents a"
  " walk vector"))
         ;
-    class_<PyStiffnessCommand>("StiffnessCommand",
-                               init<float>(args("bodyStiffness"),
-"A container for a stiffness comamnd. Allows setting stiffness per chain or "
-"for the whole body"))
-        .def(init<int,float>(args("chainID","chainStiffness")))
-        .def(init<>())
-        .def("setChainStiffness", &PyStiffnessCommand::setChainStiffness)
+    class_<PyFreezeCommand>("FreezeCommand",
+                              init<>("A container for a "
+                                   "command to freeze the robot"))
+        ;
+
+    class_<PyUnfreezeCommand>("UnfreezeCommand",
+                              init<float>(args("stiffness"),
+                                          "A container for a command to "
+                                          "UNfreeze the robot"))
+
         ;
     class_<PyMotionInterface>("MotionInterface")
         .def("enqueue", enq1)
@@ -324,7 +355,8 @@ BOOST_PYTHON_MODULE(_motion)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead",&PyMotionInterface::setHead)
-        .def("sendStiffness",&PyMotionInterface::sendStiffness)
+        .def("sendFreezeCommand",frz1)
+        .def("sendFreezeCommand",frz2)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("isHeadActive", &PyMotionInterface::isHeadActive)
 		.def("isBodyActive", &PyMotionInterface::isBodyActive)

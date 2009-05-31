@@ -43,6 +43,8 @@
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
+#include "NullHeadProvider.h"
+#include "NullBodyProvider.h"
 #include "Sensors.h"
 #include "MotionConstants.h"
 
@@ -51,7 +53,6 @@
 #include "WalkCommand.h"
 #include "GaitCommand.h"
 #include "SetHeadCommand.h"
-#include "StiffnessCommand.h"
 
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
@@ -69,14 +70,14 @@ public:
 
 	const std::vector <float> getNextJoints() const;
 	const std::vector<float> getNextStiffness() const;
-    const bool hasNewStiffness() const;
     void signalNextFrame();
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const boost::shared_ptr<GaitCommand> command);
 	void sendMotionCommand(const SetHeadCommand* command);
-	void sendMotionCommand(const boost::shared_ptr<StiffnessCommand> command);
+	void sendMotionCommand(const boost::shared_ptr<FreezeCommand> command);
+	void sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command);
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
@@ -93,9 +94,12 @@ public:
     }
 
 private:
-    int processProviders();
-    int processStiffness();
+    void preProcess();
+    void processJoints();
+    void processStiffness();
+    int  postProcess();
     void swapBodyProvider();
+    void swapHeadProvider();
     BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
     int realityCheckJoints();
 
@@ -110,24 +114,25 @@ private:
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
+    NullHeadProvider nullHeadProvider;
+    NullBodyProvider nullBodyProvider;
 
 	MotionProvider * curProvider;
 	MotionProvider * nextProvider;
+
+	MotionProvider * curHeadProvider;
+	MotionProvider * nextHeadProvider;
 
     const WalkingParameters *curGait;
     const WalkingParameters *nextGait;
 
     std::vector <float> nextJoints;
-    std::vector <float> nextStiffness;
+    std::vector <float> nextStiffnesses;
 
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
-    mutable bool newStiffness, newStiffnessCommandSent;
 
     bool readyToSend;
-
-    //std::list< boost::shared_ptr<StiffnessCommand> > stiffnessRequests;
-    boost::shared_ptr<StiffnessCommand> nextStiffnessCommand;
 
     static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];
 
@@ -141,6 +146,7 @@ private:
 
 #ifdef DEBUG_JOINTS_OUTPUT
     FILE* joints_log;
+    FILE* stiffness_log;
     FILE* effector_log;
 #endif
 

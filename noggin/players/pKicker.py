@@ -8,11 +8,11 @@
 #
 
 from . import SoccerFSA
-from . import KickingStates
+from . import KickerStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
-        self.addStates(KickingStates)
+        self.addStates(KickerStates)
         self.setName('pKicker')
 

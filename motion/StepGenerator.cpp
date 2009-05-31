@@ -311,9 +311,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
     //Since we'd like to ignore the state information of the WalkinLeg as much
     //as possible, we send in the source of the swinging leg to both, regardless
-    vector<float> left  = leftLeg.tick(leftStep_f,swingingStepSource_f,
+    LegJointStiffTuple left  = leftLeg.tick(leftStep_f,swingingStepSource_f,
                                        swingingStep_f,fc_Transform);
-    vector<float> right = rightLeg.tick(rightStep_f,swingingStepSource_f,
+    LegJointStiffTuple right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         swingingStep_f,fc_Transform);
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
@@ -948,8 +948,8 @@ bool StepGenerator::resetGait(const WalkingParameters * _wp){
         return true;
     }
     else{
-        cout << "Failed to change the gait since StepGenerator is active."
-             << endl;
+        // cout << "Failed to change the gait since StepGenerator is active."
+        //      << endl;
         return false;
     }
     //HACK When we switch gaits, we probably need to do other things as well

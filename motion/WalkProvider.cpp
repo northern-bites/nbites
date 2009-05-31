@@ -61,7 +61,7 @@ void WalkProvider::hardReset(){
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 
-void WalkProvider::calculateNextJoints() {
+void WalkProvider::calculateNextJointsAndStiffnesses() {
     pthread_mutex_lock(&walk_provider_mutex);
     if ( nextGait != curGait){
         if( stepGenerator.resetGait(nextGait)){
@@ -90,22 +90,29 @@ void WalkProvider::calculateNextJoints() {
     // Now ask the step generator to get the leg angles
     WalkLegsTuple legs_result = stepGenerator.tick_legs();
 
-    //Get the joints for each Leg
-    vector<float> lleg_results = legs_result.get<LEFT_FOOT>();
-    vector<float> rleg_results = legs_result.get<RIGHT_FOOT>();
+    //Get the joints and stiffnesses for each Leg
+    vector<float> lleg_joints = legs_result.get<LEFT_FOOT>().get<JOINT_INDEX>();
+    vector<float> rleg_joints = legs_result.get<RIGHT_FOOT>().get<JOINT_INDEX>();
+    vector<float> lleg_gains = legs_result.get<LEFT_FOOT>().get<STIFF_INDEX>();
+    vector<float> rleg_gains = legs_result.get<RIGHT_FOOT>().get<STIFF_INDEX>();
 
-    // vector<float> rarm_results = vector<float>(ARM_JOINTS, 0.0f);
-//     vector<float> larm_results = vector<float>(ARM_JOINTS, 0.0f);
-
-//     cout << "2rarm size "<< rarm_results.size()
-//          << "larm size "<< larm_results.size() <<endl;
+    //grab the stiffnesses for the arms
+    vector<float> larm_gains(ARM_JOINTS, curGait->armStiffness);
+    vector<float> rarm_gains(ARM_JOINTS, curGait->armStiffness);
 
 
     //Return the joints for the legs
     setNextChainJoints(LARM_CHAIN,larm_angles);
-    setNextChainJoints(LLEG_CHAIN,lleg_results);
-    setNextChainJoints(RLEG_CHAIN,rleg_results);
+    setNextChainJoints(LLEG_CHAIN,lleg_joints);
+    setNextChainJoints(RLEG_CHAIN,rleg_joints);
     setNextChainJoints(RARM_CHAIN,rarm_angles);
+
+    //Return the stiffnesses for each joint
+    setNextChainStiffnesses(LARM_CHAIN,larm_gains);
+    setNextChainStiffnesses(LLEG_CHAIN,lleg_gains);
+    setNextChainStiffnesses(RLEG_CHAIN,rleg_gains);
+    setNextChainStiffnesses(RARM_CHAIN,rarm_gains);
+
 
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
@@ -170,10 +177,18 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> * safe_rarm =new vector<float>(rarm_angles,
                                                  &rarm_angles[ARM_JOINTS]);
 
+	// HACK @joho get gait stiffness params. nextGait->maxStiffness
+	vector<float> * stiffness = new vector<float>(Kinematics::NUM_JOINTS,
+												  0.85f);
+	vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
+												  0.85f);
+
     commands.push_back(new BodyJointCommand(1.0f,safe_larm,NULL,NULL,safe_rarm,
+											stiffness,
                                             Kinematics::INTERPOLATION_SMOOTH));
 
     commands.push_back(new BodyJointCommand(time,gaitJoints,
+											stiffness2,
                                             Kinematics::INTERPOLATION_SMOOTH));
     return commands;
 }

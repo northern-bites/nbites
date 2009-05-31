@@ -39,6 +39,7 @@ private: // Members
     std::vector<float> motionValues;
     std::vector<float> lastMotionCommandAngles;
     std::vector<float> motionHardness;
+    std::vector<float> lastMotionHardness;
     AL::ALValue hardness_command;
     AL::ALValue joint_command;
     AL::ALValue us_command;

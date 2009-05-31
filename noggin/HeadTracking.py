@@ -23,7 +23,7 @@ class HeadTracking(FSA.FSA):
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
-        self.setPrintStateChanges(True)
+        self.setPrintStateChanges(False)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
         self.activePanDir = False
@@ -62,25 +62,36 @@ class HeadTracking(FSA.FSA):
 
     def execute(self,sweetMove):
         for position in sweetMove:
-            if len(position) == 6:
+            if len(position) == 7:
                 move = motion.BodyJointCommand(position[4], #time
                                                position[0], #larm
                                                position[1], #lleg
                                                position[2], #rleg
                                                position[3], #rarm
+                                               position[6], # Chain Stiffnesses
                                                position[5], #interpolation type
                                                )
-                self.brain.motion.enqueue(move)
 
-            elif len(position) == 3:
-                move = motion.HeadJointCommand(position[1],#time
-                                               position[0],#head pos
-                                               position[2],#interpolation type
+
+            elif len(position) == 4:
+                move = motion.HeadJointCommand(position[1] ,# time
+                                               position[0], # head pos
+                                               position[3], # chain stiffnesses
+                                               position[2], # interpolation type
                                                    )
-                self.brain.motion.enqueue(move)
+
+            elif len(position) == 5:
+                move = motion.BodyJointCommand(position[2], # time
+                                               position[0], # chainID
+                                               position[1], # chain angles
+                                               position[4], # chain stiffnesses
+                                               position[3], # interpolation type
+                                               )
 
             else:
-                print "What kind of sweet ass-Move is this?"
+                self.printf("What kind of sweet ass-Move is this?")
+
+            self.brain.motion.enqueue(move)
 
     def activeLoc(self):
         self.target = self.brain.ball

@@ -55,7 +55,7 @@ public:
     virtual ~WalkProvider();
 
     void requestStopFirstInstance();
-    void calculateNextJoints();
+    void calculateNextJointsAndStiffnesses();
 
     void hardReset();
 

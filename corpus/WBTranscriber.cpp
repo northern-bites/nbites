@@ -68,10 +68,10 @@ void WBTranscriber::postVisionSensors(){
     const float lFBR = 0.0f;
     const float rFBR = 0.0f;
 
-    const float usd1 = wb_distance_sensor_get_value(us1);
-    const float usd2 = wb_distance_sensor_get_value(us2);
-    const float usd3 = wb_distance_sensor_get_value(us3);
-    const float usd4 = wb_distance_sensor_get_value(us4);
+    const float usd1 = static_cast<float>(wb_distance_sensor_get_value(us1));
+    const float usd2 = static_cast<float>(wb_distance_sensor_get_value(us2));
+    const float usd3 = static_cast<float>(wb_distance_sensor_get_value(us3));
+    const float usd4 = static_cast<float>(wb_distance_sensor_get_value(us4));
 
     const int ultraSoundMode =0;
 
@@ -127,7 +127,8 @@ void WBTranscriber::postMotionSensors(){
 
     //FSRs
     for(unsigned int fsr = 0 ; fsr< NUM_FSR; fsr++){
-        fsrValues[fsr] = wb_touch_sensor_get_value(fsrDevices[fsr]);
+        fsrValues[fsr] =
+            static_cast<float>(wb_touch_sensor_get_value(fsrDevices[fsr]));
     }
 
 
@@ -147,7 +148,8 @@ void WBTranscriber::postMotionSensors(){
 
     //Joint Angles
     for(unsigned int joint = 0; joint < NUM_JOINTS; joint++){
-        jointValues[joint] = wb_servo_get_position(jointDevices[joint]);
+        jointValues[joint] =
+            static_cast<float>(wb_servo_get_position(jointDevices[joint]));
     }
     sensors->setBodyAngles(jointValues);
 

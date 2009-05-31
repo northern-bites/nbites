@@ -39,7 +39,8 @@
 enum ProviderType{
     SCRIPTED_PROVIDER,
     WALK_PROVIDER,
-    HEAD_PROVIDER
+    HEAD_PROVIDER,
+    NULL_PROVIDER
 };
 
 class MotionProvider {
@@ -47,6 +48,7 @@ public:
     MotionProvider(ProviderType _provider_type)
         : _active(false), _stopping(false),
           nextJoints(Kinematics::NUM_CHAINS,std::vector<float>()),
+          nextStiffnesses(Kinematics::NUM_CHAINS,std::vector<float>()),
           provider_type(_provider_type)
           {
               switch(provider_type){
@@ -58,6 +60,9 @@ public:
                   break;
               case HEAD_PROVIDER:
                   provider_name = "HeadProvider";
+                  break;
+              case NULL_PROVIDER:
+                  provider_name = "NullProvider";
                   break;
               }
           }
@@ -76,9 +81,12 @@ public:
 
     const bool isActive() const { return _active; }
     const bool isStopping() const {return _stopping;}
-    virtual void calculateNextJoints() = 0;
+    virtual void calculateNextJointsAndStiffnesses() = 0;
     std::vector<float> getChainJoints(const Kinematics::ChainID id) {
         return nextJoints[id];
+    }
+    std::vector<float> getChainStiffnesses(const Kinematics::ChainID id){
+        return nextStiffnesses[id];
     }
     const std::string getName(){return provider_name;}
     const ProviderType getType(){return provider_type;}
@@ -100,6 +108,11 @@ protected:
         nextJoints[id] = chainJoints;
     }
 
+    void setNextChainStiffnesses(const Kinematics::ChainID id,
+                            const std::vector <float> &chainJoints) {
+        nextStiffnesses[id] = chainJoints;
+    }
+
     //Method that must be implemented, and called at the end of each frame
     //to set whether the provider is currently active or not
     virtual void setActive() = 0;
@@ -113,6 +126,8 @@ private:
     bool _active;
     bool _stopping;
     std::vector < std::vector <float> > nextJoints;
+    std::vector < std::vector <float> > nextStiffnesses;
+
     const ProviderType provider_type;
     std::string provider_name;
 

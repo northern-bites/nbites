@@ -104,7 +104,6 @@ SET( MOTION_SRCS
                      ${MOTION_INCLUDE_DIR}/BodyJointCommand
 		     ${MOTION_INCLUDE_DIR}/HeadJointCommand
 		     ${MOTION_INCLUDE_DIR}/JointCommand
-		     ${MOTION_INCLUDE_DIR}/StiffnessCommand
 		     ${MOTION_INCLUDE_DIR}/MotionCommand
                      ${MOTION_INCLUDE_DIR}/MotionConstants
                      ${MOTION_INCLUDE_DIR}/Motion.cpp
@@ -114,8 +113,10 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ChoppedCommand
 		     ${MOTION_INCLUDE_DIR}/LinearChoppedCommand
 		     ${MOTION_INCLUDE_DIR}/SmoothChoppedCommand
+		     ${MOTION_INCLUDE_DIR}/BaseFreezeCommand
 		     ${MOTION_INCLUDE_DIR}/HeadProvider
 		     ${MOTION_INCLUDE_DIR}/ChopShop
+		     ${MOTION_INCLUDE_DIR}/NullProvider
 		     ${MOTION_INCLUDE_DIR}/WalkProvider
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
 		     ${MOTION_INCLUDE_DIR}/PreviewController

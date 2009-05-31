@@ -101,8 +101,8 @@
 
 typedef boost::tuple<const std::list<float>*,
                      const std::list<float>*> zmp_xy_tuple;
-typedef boost::tuple<std::vector<float>,
-                     std::vector<float> > WalkLegsTuple;
+typedef boost::tuple<LegJointStiffTuple,
+                      LegJointStiffTuple> WalkLegsTuple;
 
 static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
                                      //steps stored in future, current lists

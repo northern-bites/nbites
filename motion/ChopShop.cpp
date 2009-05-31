@@ -18,9 +18,8 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#include <iostream>
-#include <list>
 #include "ChopShop.h"
+#include "Kinematics.h"
 
 using namespace std;
 
@@ -44,10 +43,9 @@ shared_ptr<ChoppedCommand>
 ChopShop::chopCommand(const JointCommand *command) {
 	shared_ptr<ChoppedCommand> chopped;
 
-	int numChops = (int)(command->getDuration() / FRAME_LENGTH_S);
+	int numChops = static_cast<int>(command->getDuration() / FRAME_LENGTH_S);
 	vector<float> currentJoints = getCurrentJoints();
 
-	// It's a BJC so it deals with 4 chains
 	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
 		chopped = chopLinear(command, currentJoints, numChops);
 	}
@@ -57,9 +55,10 @@ ChopShop::chopCommand(const JointCommand *command) {
  	}
 
 	else {
-		cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING LINEARLY" << endl;
-		chopped = chopLinear(command, currentJoints, numChops) ;
+		cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING SMOOTHLY" << endl;
+		chopped = chopSmooth(command, currentJoints, numChops) ;
 	}
+
 	// Deleting command!
 	delete command;
 	return chopped;
@@ -68,50 +67,29 @@ ChopShop::chopCommand(const JointCommand *command) {
 //Smooth interpolation motion
 shared_ptr<ChoppedCommand>
 ChopShop::chopSmooth(const JointCommand *command,
-					 vector<float> currentJoints,
-					 int numChops) {
-	shared_ptr<ChoppedCommand> chopped( new SmoothChoppedCommand(
+					 vector<float> currentJoints, int numChops) {
+	return shared_ptr<ChoppedCommand> ( new SmoothChoppedCommand(
 											command,
 											currentJoints,
 											numChops ) );
-
-	return chopped;
 }
 
 /*
  * Linear interpolation chopping:
  * Retrieves current joint angels and acquiries the differences
  * between the current and the intended final. Send them to
- *
- *
- *
  */
 shared_ptr<ChoppedCommand>
 ChopShop::chopLinear(const JointCommand *command,
 					 vector<float> currentJoints,
 					 int numChops) {
 
-	shared_ptr<ChoppedCommand> chopped( new LinearChoppedCommand(
+	return shared_ptr<ChoppedCommand> ( new LinearChoppedCommand(
 											command,
 											currentJoints,
 											numChops ) );
-
-	return chopped;
 }
 
 vector<float> ChopShop::getCurrentJoints() {
     return sensors->getMotionBodyAngles();
-}
-
-
-
-void ChopShop::vectorToRad(vector<float> *vect) {
-	vector<float>::iterator i;
-	i = vect->begin();
-	while ( i != vect->end() ) {
-		// Convert joints to radians from degrees
-		*i = *i * TO_RAD;
-		i++;
-	}
-
 }

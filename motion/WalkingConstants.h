@@ -146,6 +146,10 @@ public:
     float maxYSpeed;
     float maxThetaSpeed;
     float sensorFeedback;
+    float maxStiffness; //default stiffness
+    float kneeStiffness; //knee stiffness when swinging
+    float ankleStiffness; //ankle stiffness when swinging
+    float armStiffness;
 //calculated from parameters
 public:
     int stepDurationFrames; //one double + one single support
@@ -164,7 +168,9 @@ public:
                       const float _tZMPOffY, const float _sZMPOffY,
                       const float maxx_mms, const float maxy_mms,
                       const float maxtheta_rads,
-                      const float _sensorFeedback)
+                      const float _sensorFeedback, const float _maxStiffness,
+                      const float _kneeStiffness, const float _ankleStiffness,
+                      const float _armStiffness)
         :  motion_frame_length_s( _motion_frame_length_s),
            bodyHeight(_bh), hipOffsetX(_hox), XAngleOffset(_yao),
            stepDuration(_dur),
@@ -176,7 +182,9 @@ public:
            leftZMPSwingOffsetY(_lZMPSwOffY),rightZMPSwingOffsetY(_rZMPSwOffY),
            turnZMPOffsetY(_tZMPOffY), strafeZMPOffsetY(_sZMPOffY),
            maxXSpeed(maxx_mms),maxYSpeed(maxy_mms),maxThetaSpeed(maxtheta_rads),
-           sensorFeedback(_sensorFeedback)
+           sensorFeedback(_sensorFeedback), maxStiffness(_maxStiffness),
+           kneeStiffness(_kneeStiffness), ankleStiffness(_ankleStiffness),
+           armStiffness(_armStiffness)
         {
             updateFrameLengths();
         }
@@ -264,7 +272,7 @@ const WalkingParameters DEFAULT_PARAMETERS
 = WalkingParameters(0.02f,        // motion frame length - FIXME constant
                     310.0f,       // COM height
                     19.0f,        // hipOffsetX
-                    0.0,          // XAngleOffset
+                    0.0f,          // XAngleOffset
                     0.5f,         // stepDuration
                     0.1f,         // fraction in double support mode
                     16.5f,        // stepHeight
@@ -279,7 +287,11 @@ const WalkingParameters DEFAULT_PARAMETERS
                     100.0f,       // max speed x (mm/s)
                     50.0f,        // max speed y (mm/s)
                     0.50f,        // max speed theta (rad/s)
-                    0.0f);        // sensor feedback
+                    0.0f,         // sensor feedback
+                    0.85f,        // max stiffness
+                    0.85f,        // knee stiffness
+                    0.85f,         // ankle stiffness
+                    0.2f);        // arm stiffness
 const WalkingParameters GOALIE_PARAMETERS = DEFAULT_PARAMETERS;
 
 const WalkingParameters WALK_PARAMS[] = {DEFAULT_PARAMETERS,GOALIE_PARAMETERS};

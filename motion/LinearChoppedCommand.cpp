@@ -131,15 +131,15 @@ void LinearChoppedCommand::incrCurrChain(int id) {
 	vector<float> * diffChain = getDiffChain(id);
 
 	// Set iterators to diff and current vectors
-	vector<float>::iterator i = currentChain->begin();
-	vector<float>::iterator j = diffChain->begin();
+	vector<float>::iterator curr = currentChain->begin();
+	vector<float>::iterator diff = diffChain->begin();
 
 	numChopped.at(id)++;
-	while (i != currentChain->end() &&
-		   j != diffChain->end() ) {
-		*i += *j;
-		++i;
-		++j;
+	while (curr != currentChain->end() &&
+		   diff != diffChain->end() ) {
+		*curr += *diff;
+		++curr;
+		++diff;
 	}
 }
 
