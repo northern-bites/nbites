@@ -208,7 +208,7 @@ def waitBeforeKick(player):
     elif transitions.shouldScanFindBall(player):
         player.brain.tracker.trackBall()
         return player.goLater('scanFindBall')
-#     elif transitions.shouldPositionForKick(player):
+#     elif transitions.shouldPositionForKickClose(player):
 #         player.brain.tracker.trackBall()
 #         return player.goLater('positionForKick')
     else:

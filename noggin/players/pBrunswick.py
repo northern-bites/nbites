@@ -70,6 +70,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif role == PBConstants.SEARCHER:
             return 'scanFindBall'
         else:
+            #return 'decideKick'
             return 'scanFindBall'
 
     def getBehindBallPosition(self):

@@ -9,59 +9,91 @@ import KickingConstants as constants
 import ChaseBallConstants
 from math import fabs
 
+class KickDecider:
+    """
+    Class to hold all the things we need to decide a kick
+    """
+
+    def __init__(self):
+        self.oppGoalLeftPostBearings = []
+        self.oppGoalRightPostBearings = []
+        self.myGoalLeftPostBearings = []
+        self.myGoalRightPostBearings = []
+
+        self.oppLeftPostBearing = None
+        self.oppRightPostBearing = None
+        self.myLeftPostBearing = None
+        self.myRightPostBearing = None
+
+    def collectData(self, info):
+        """
+        Collect info on any observed goals
+        """
+        if info.myGoalLeftPost.on:
+            self.myGoalLeftPostBearings.append(info.myGoalLeftPost.bearing)
+        if info.myGoalRightPost.on:
+            self.myGoalRightPostBearings.append(info.myGoalRightPost.bearing)
+        if info.oppGoalLeftPost.on:
+            self.oppGoalLeftPostBearings.append(info.oppGoalRightPost.bearing)
+        if info.oppGoalRightPost.on:
+            self.oppGoalRightPostBearings.append(info.oppGoalRightPost.bearing)
+
+    def calculate(self):
+        """
+        Get usable data from the collected data
+        """
+        if len(self.myGoalLeftPostBearings) > 0:
+            self.myLeftPostBearing = (sum(self.myGoalLeftPostBearings) /
+                                      len(self.myGoalLeftPostBearings))
+        if len(self.myGoalRightPostBearings) > 0:
+            self.myRightPostBearing = (sum(self.myGoalRightPostBearings) /
+                                       len(self.myGoalRightPostBearings))
+        if len(self.oppGoalLeftPostBearings) > 0:
+            self.oppLeftPostBearing = (sum(self.oppGoalLeftPostBearings) /
+                                       len(self.oppGoalLeftPostBearings))
+        if len(self.oppGoalRightPostBearings) > 0:
+            self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
+                                        len(self.oppGoalRightPostBearings))
+
+    def sawOwnGoal(self):
+        return (len(self.myGoalLeftPostBearings) > 0 or
+                len(self.myGoalRightPostBearings) > 0)
+
+    def sawOppGoal(self):
+        return (len(self.oppGoalLeftPostBearings) > 0 or
+                len(self.oppGoalRightPostBearings) > 0)
+
+
 def decideKick(player):
     """
     Decides which kick to use
     """
     if player.firstFrame():
-        player.stopWalking()
-        player.currentChaseWalkX = 0
-        player.currentChaseWalkY = 0
-        player.currentChaseWalkTheta = 0
-        player.sawOwnGoal = False
-        player.sawOppGoal = False
         player.brain.tracker.switchTo('stopped')
         player.brain.motion.stopHeadMoves()
         player.executeMove(HeadMoves.KICK_SCAN)
-        player.oppGoalLeftPostBearings = []
-        player.oppGoalRightPostBearings = []
-        player.myGoalLeftPostBearings = []
-        player.myGoalRightPostBearings = []
 
+        player.kickDecider = KickDecider()
+
+    # If scanning, then collect data
     if (player.stateTime < SweetMoves.getMoveTime(HeadMoves.KICK_SCAN)):
-        if player.brain.myGoalLeftPost.on:
-            player.sawOwnGoal = True
-            player.myGoalLeftPostBearings.append(player.brain.myGoalLeftPost.bearing)
-        if player.brain.myGoalRightPost.on:
-            player.sawOwnGoal = True
-            player.myGoalRightPostBearings.append(player.brain.myGoalRightPost.bearing)
-        if player.brain.oppGoalLeftPost.on:
-            player.sawOppGoal = True
-            player.oppGoalLeftPostBearings.append(player.brain.oppGoalRightPost.bearing)
-        if player.brain.oppGoalRightPost.on:
-            player.sawOppGoal = True
-            player.oppGoalRightPostBearings.append(player.brain.oppGoalRightPost.bearing)
+        player.kickDecider.collectData(player.brain)
         return player.stay()
-    elif player.sawOwnGoal:
-        player.brain.tracker.trackBall()
+
+    # Done scanning time to act
+    player.brain.tracker.trackBall()
+    player.kickDecider.calculate()
+
+    # Get references to the collected data
+    myLeftPostBearing =  player.kickDecider.myLeftPostBearing
+    myRightPostBearing = player.kickDecider.myRightPostBearing
+    oppLeftPostBearing = player.kickDecider.oppLeftPostBearing
+    oppRightPostBearing = player.kickDecider.oppRightPostBearing
+
+    # Things to do if we saw our own goal
+    if player.kickDecider.sawOwnGoal():
         if constants.SUPER_SAFE_KICKS:
             return player.goLater('ignoreOwnGoal')
-        myLeftPostBearing = None
-        myRightPostBearing = None
-        oppLeftPostBearing = None
-        oppRightPostBearing = None
-        if len(player.myGoalLeftPostBearings) > 0:
-            myLeftPostBearing = (sum(player.myGoalLeftPostBearings) /
-                                 len(player.myGoalLeftPostBearings))
-        if len(player.myGoalRightPostBearings) > 0:
-            myRightPostBearing = (sum(player.myGoalRightPostBearings) /
-                                  len(player.myGoalRightPostBearings))
-        if len(player.oppGoalLeftPostBearings) > 0:
-            oppLeftPostBearing = (sum(player.oppGoalLeftPostBearings) /
-                                 len(player.oppGoalLeftPostBearings))
-        if len(player.oppGoalRightPostBearings) > 0:
-            oppRightPostBearing = (sum(player.oppGoalRightPostBearings) /
-                                   len(player.oppGoalRightPostBearings))
 
         if myLeftPostBearing is not None:
             player.printf("My left post bearing is: " + str(myLeftPostBearing),'cyan')
@@ -120,13 +152,7 @@ def decideKick(player):
 
         # don't do anything
         return player.goLater('ignoreOwnGoal')
-    elif player.sawOppGoal:
-        return player.goLater('kickBallStraight')
-        myLeftPostBearing = None
-        myRightPostBearing = None
-        oppLeftPostBearing = None
-        oppRightPostBearing = None
-        player.brain.tracker.trackBall()
+    elif player.kickDecider.sawOppGoal():
         if len(player.myGoalLeftPostBearings) > 0:
             myLeftPostBearing = (sum(player.myGoalLeftPostBearings) /
                                  len(player.myGoalLeftPostBearings))
