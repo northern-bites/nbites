@@ -9,75 +9,6 @@ import KickingConstants as constants
 import ChaseBallConstants
 from math import fabs
 
-class KickDecider:
-    """
-    Class to hold all the things we need to decide a kick
-    """
-
-    def __init__(self):
-        self.oppGoalLeftPostBearings = []
-        self.oppGoalRightPostBearings = []
-        self.myGoalLeftPostBearings = []
-        self.myGoalRightPostBearings = []
-
-        self.oppLeftPostBearing = None
-        self.oppRightPostBearing = None
-        self.myLeftPostBearing = None
-        self.myRightPostBearing = None
-
-    def collectData(self, info):
-        """
-        Collect info on any observed goals
-        """
-        if info.myGoalLeftPost.on:
-            self.myGoalLeftPostBearings.append(info.myGoalLeftPost.bearing)
-        if info.myGoalRightPost.on:
-            self.myGoalRightPostBearings.append(info.myGoalRightPost.bearing)
-        if info.oppGoalLeftPost.on:
-            self.oppGoalLeftPostBearings.append(info.oppGoalRightPost.bearing)
-        if info.oppGoalRightPost.on:
-            self.oppGoalRightPostBearings.append(info.oppGoalRightPost.bearing)
-
-    def calculate(self):
-        """
-        Get usable data from the collected data
-        """
-        if len(self.myGoalLeftPostBearings) > 0:
-            self.myLeftPostBearing = (sum(self.myGoalLeftPostBearings) /
-                                      len(self.myGoalLeftPostBearings))
-        if len(self.myGoalRightPostBearings) > 0:
-            self.myRightPostBearing = (sum(self.myGoalRightPostBearings) /
-                                       len(self.myGoalRightPostBearings))
-        if len(self.oppGoalLeftPostBearings) > 0:
-            self.oppLeftPostBearing = (sum(self.oppGoalLeftPostBearings) /
-                                       len(self.oppGoalLeftPostBearings))
-        if len(self.oppGoalRightPostBearings) > 0:
-            self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
-                                        len(self.oppGoalRightPostBearings))
-
-    def sawOwnGoal(self):
-        return (len(self.myGoalLeftPostBearings) > 0 or
-                len(self.myGoalRightPostBearings) > 0)
-
-    def sawOppGoal(self):
-        return (len(self.oppGoalLeftPostBearings) > 0 or
-                len(self.oppGoalRightPostBearings) > 0)
-
-
-    def __str__(self):
-        s = ""
-        if self.myLeftPostBearing is not None:
-            s += ("My left post bearing is: " + str(self.myLeftPostBearing) + "\n")
-        if self.myRightPostBearing is not None:
-            s += ("My right post bearing is: " + str(self.myRightPostBearing) + "\n")
-        if self.oppLeftPostBearing is not None:
-            s += ("Opp left post bearing is: " + str(self.oppLeftPostBearing) + "\n")
-        if self.oppRightPostBearing is not None:
-            s += ("Opp right post bearing is: " + str(self.oppRightPostBearing) + "\n")
-        if s == "":
-            s = "No goal posts observed"
-        return s
-
 def decideKick(player):
     """
     Decides which kick to use
@@ -183,22 +114,6 @@ def decideKick(player):
         # use localization for kick
         return player.goLater('kickBallStraight')
 
-def afterKick(player):
-    """
-    State to follow up after a kick.
-    Currently exits after one frame.
-    """
-    # trick the robot into standing up instead of leaning to the side
-    player.walkPose()
-
-    if player.brain.nav.isStopped():
-        player.brain.CoA.setRobotGait(player.brain.motion)
-        player.currentGait = ChaseBallConstants.FAST_GAIT
-
-        return player.goLater("chase")
-    else:
-        return player.stay()
-
 def kickBallStraight(player):
     """
     Kick the ball forward.  Currently uses the left foot
@@ -261,6 +176,22 @@ def kickBallLeftExecute(player):
 
     return player.stay()
 
+def afterKick(player):
+    """
+    State to follow up after a kick.
+    Currently exits after one frame.
+    """
+    # trick the robot into standing up instead of leaning to the side
+    player.walkPose()
+
+    if player.brain.nav.isStopped():
+        player.brain.CoA.setRobotGait(player.brain.motion)
+        player.currentGait = ChaseBallConstants.FAST_GAIT
+
+        return player.goLater("chase")
+    else:
+        return player.stay()
+
 def kickAtPosition(player):
     """
     Method to simply kick while standing in position
@@ -281,3 +212,72 @@ def kickAtPosition(player):
             return player.goLater('atPosition')
 
     return player.stay()
+
+class KickDecider:
+    """
+    Class to hold all the things we need to decide a kick
+    """
+
+    def __init__(self):
+        self.oppGoalLeftPostBearings = []
+        self.oppGoalRightPostBearings = []
+        self.myGoalLeftPostBearings = []
+        self.myGoalRightPostBearings = []
+
+        self.oppLeftPostBearing = None
+        self.oppRightPostBearing = None
+        self.myLeftPostBearing = None
+        self.myRightPostBearing = None
+
+    def collectData(self, info):
+        """
+        Collect info on any observed goals
+        """
+        if info.myGoalLeftPost.on:
+            self.myGoalLeftPostBearings.append(info.myGoalLeftPost.bearing)
+        if info.myGoalRightPost.on:
+            self.myGoalRightPostBearings.append(info.myGoalRightPost.bearing)
+        if info.oppGoalLeftPost.on:
+            self.oppGoalLeftPostBearings.append(info.oppGoalRightPost.bearing)
+        if info.oppGoalRightPost.on:
+            self.oppGoalRightPostBearings.append(info.oppGoalRightPost.bearing)
+
+    def calculate(self):
+        """
+        Get usable data from the collected data
+        """
+        if len(self.myGoalLeftPostBearings) > 0:
+            self.myLeftPostBearing = (sum(self.myGoalLeftPostBearings) /
+                                      len(self.myGoalLeftPostBearings))
+        if len(self.myGoalRightPostBearings) > 0:
+            self.myRightPostBearing = (sum(self.myGoalRightPostBearings) /
+                                       len(self.myGoalRightPostBearings))
+        if len(self.oppGoalLeftPostBearings) > 0:
+            self.oppLeftPostBearing = (sum(self.oppGoalLeftPostBearings) /
+                                       len(self.oppGoalLeftPostBearings))
+        if len(self.oppGoalRightPostBearings) > 0:
+            self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
+                                        len(self.oppGoalRightPostBearings))
+
+    def sawOwnGoal(self):
+        return (len(self.myGoalLeftPostBearings) > 0 or
+                len(self.myGoalRightPostBearings) > 0)
+
+    def sawOppGoal(self):
+        return (len(self.oppGoalLeftPostBearings) > 0 or
+                len(self.oppGoalRightPostBearings) > 0)
+
+
+    def __str__(self):
+        s = ""
+        if self.myLeftPostBearing is not None:
+            s += ("My left post bearing is: " + str(self.myLeftPostBearing) + "\n")
+        if self.myRightPostBearing is not None:
+            s += ("My right post bearing is: " + str(self.myRightPostBearing) + "\n")
+        if self.oppLeftPostBearing is not None:
+            s += ("Opp left post bearing is: " + str(self.oppLeftPostBearing) + "\n")
+        if self.oppRightPostBearing is not None:
+            s += ("Opp right post bearing is: " + str(self.oppRightPostBearing) + "\n")
+        if s == "":
+            s = "No goal posts observed"
+        return s

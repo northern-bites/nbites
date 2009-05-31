@@ -1,4 +1,6 @@
 from math import (fabs, hypot)
+from ..util.MyMath import safe_atan2
+
 
 from . import PBDefs
 from . import PBConstants
@@ -470,3 +472,22 @@ class GoTeam:
                 RESET_COLORS_CODE)
         else:
             self.brain.out.printf(str(outputString))
+
+    def getBehindBallPosition(self):
+        """
+        Returns a position between the ball and own goal
+        """
+        dist_from_ball = 30
+
+        ball = self.brain.ball
+
+        delta_y = ball.y - NogginConstants.OPP_GOALBOX_MIDDLE_Y
+        delta_x = ball.x - NogginConstants.OPP_GOALBOX_LEFT_X
+
+        pos_x = ball.x - (dist_from_ball/
+                                     hypot(delta_x,delta_y))*delta_x
+        pos_y = ball.y + (dist_from_ball/
+                                     hypot(delta_x,delta_y))*delta_y
+        heading = -safe_atan2(delta_y,delta_x)
+
+        return pos_x,pos_y,heading

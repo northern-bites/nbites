@@ -5,12 +5,10 @@ from . import PositionStates
 from . import FindBallStates
 from . import KickingStates
 from ..playbook import PBConstants
-from .. import NogginConstants
-from math import hypot
-from ..util.MyMath import safe_atan2
 from . import BrunswickStates
 from . import GoaliePositionStates
 from . import GoalieChaseBallStates
+from . import ChaseBallTransitions
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -49,7 +47,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         playbookRole = self.brain.playbook.currentRole
         if playbookRole == self.currentRole:
             return self.currentState
-        else :
+        # We don't stop chasing if we are in certain roles
+        elif (self.currentRole == PBConstants.CHASER and
+              ChaseBallTransitions.shouldntStopChasing(self)):
+            return self.currentState
+        else:
             self.currentRole = playbookRole
             return self.getRoleState(playbookRole)
 
@@ -70,21 +72,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif role == PBConstants.SEARCHER:
             return 'scanFindBall'
         else:
-            #return 'decideKick'
             return 'scanFindBall'
-
-    def getBehindBallPosition(self):
-        dist_from_ball = 30
-
-        ball = self.brain.ball
-
-        delta_y = ball.y - NogginConstants.OPP_GOALBOX_MIDDLE_Y
-        delta_x = ball.x - NogginConstants.OPP_GOALBOX_LEFT_X
-
-        pos_x = ball.x - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_x
-        pos_y = ball.y + (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_y
-        heading = -safe_atan2(delta_y,delta_x)
-
-        return pos_x,pos_y,heading
