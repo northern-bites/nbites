@@ -22,3 +22,9 @@ noggin/util/fakeData/*
 /motion/TAGS
 /vision/TAGS
 /updateTags.sh
+/corpus/TAGS
+/noggin/TAGS
+/noggin/offline/TAGS
+/noggin/playbook/TAGS
+/noggin/players/TAGS
+/noggin/util/TAGS
