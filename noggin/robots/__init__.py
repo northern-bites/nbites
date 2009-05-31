@@ -74,8 +74,8 @@ This robot is currently unknown.  That is, we could not identify it
 from its hostname (%s).  The recognized robots are %s.''' %
             #(socket.gethostname(), robot_map.keys()),# temp removed -js
             ('\''+open("/etc/hostname",'r').readline().rstrip()+'\'', robot_map.keys()), 
-            gait = gaits.TRILLIAN_GAIT,
-            turn_gait = gaits.TRILLIAN_TURN_GAIT,
+            gait = gaits.WEBOTS_GAIT,
+            turn_gait = gaits.WEBOTS_GAIT,
             )
 
 

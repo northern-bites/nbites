@@ -151,6 +151,7 @@ private:
 
 #ifdef DEBUG_JOINTS_OUTPUT
     FILE* joints_log;
+    FILE* stiffness_log;
     FILE* effector_log;
 #endif
 

@@ -74,7 +74,7 @@ void WalkingLeg::resetGait(const WalkingParameters * _wp){
     walkParams =_wp;
 }
 
-vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
+LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
                                 boost::shared_ptr<Step> _swing_src,
                                 boost::shared_ptr<Step> _swing_dest,
                                 ufmatrix3 fc_Transform){
@@ -89,7 +89,7 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
     //ufvector3 dest_c = prod(fc_Transform,dest_f);
     //float dest_x = dest_c(0);
     //float dest_y = dest_c(1);
-    vector<float> result(6);
+    LegJointStiffTuple result;
     switch(state){
     case SUPPORTING:
         result  = supporting(fc_Transform);
@@ -128,7 +128,7 @@ vector <float> WalkingLeg::tick(boost::shared_ptr<Step> step,
 }
 
 
-vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
+LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     ufvector3 src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
 
@@ -189,10 +189,13 @@ vector <float> WalkingLeg::swinging(ufmatrix3 fc_Transform){
     result.angles[2] += hipHacks.get<0>(); //HipPitch
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+
+    vector<float> stiff_result = getStiffnesses();
+    return LegJointStiffTuple(joint_result,stiff_result);
 }
 
-vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, float dest_y) {
+LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, float dest_y) {
     /**
        this method calculates the angles for this leg when it is on the ground
        (i.e. the leg on the ground in single support, or either leg in double
@@ -223,7 +226,10 @@ vector <float> WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, fl
     result.angles[2] += hipHacks.get<0>(); //HipPitch
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+
+    vector<float> stiff_result = getStiffnesses();
+    return LegJointStiffTuple(joint_result,stiff_result);
 }
 
 /*  Returns the rotation for this motion frame which we expect
@@ -332,6 +338,69 @@ WalkingLeg::getHipHack(const float curHYPAngle){
     return boost::tuple<const float, const float> (hipPitchAdjustment,
                                                    hipRollAdjustment);
     //return leg_sign*hr_offset;
+}
+
+/**
+ * Determine the stiffness for all the joints in the leg at the current point
+ * in the gait cycle. The basic idea is to have low stiffnesses in the ankle
+ * and knees when this leg is swinging, and then to have them high when the leg is
+ * supporting.
+ *
+ * During the double support phases, we gradually transition the stiffness
+ */
+const vector<float> WalkingLeg::getStiffnesses(){
+    //get shorter names for all the constants
+    const float maxS = walkParams->maxStiffness;
+    float ankleS = walkParams->ankleStiffness;
+    float kneeS = walkParams->kneeStiffness;
+
+    //make variables before the switch, and assign bogus values
+    float ankleStart = walkParams->ankleStiffness;
+    float ankleEnd = walkParams->ankleStiffness;
+
+    float kneeStart = walkParams->kneeStiffness;
+    float kneeEnd = walkParams->kneeStiffness;
+
+    float state_duration = walkParams->singleSupportFrames;
+    //Depending on the current support state, we select stiffnesses differently
+    switch(state){
+    case DOUBLE_SUPPORT: //Go from high to low
+        ankleStart = maxS; ankleEnd = ankleS;
+        kneeStart  = maxS;  kneeEnd  = kneeS;
+        state_duration = static_cast<float>(walkParams->doubleSupportFrames);
+        break;
+    case PERSISTENT_DOUBLE_SUPPORT: // Go from low to high
+        ankleStart = ankleS; ankleEnd = maxS;
+        kneeStart  = kneeS;  kneeEnd  = maxS;
+        state_duration = static_cast<float>(walkParams->doubleSupportFrames);
+        break;
+    case SWINGING: //Keep stiffnesses low
+        ankleStart = ankleEnd = ankleS;
+        kneeStart = kneeEnd = kneeS;
+        state_duration = static_cast<float>(walkParams->singleSupportFrames);
+        break;
+    case SUPPORTING: //Keep stiffnesses high
+        ankleStart = ankleEnd = kneeStart = kneeEnd = maxS;
+        state_duration = static_cast<float>(walkParams->singleSupportFrames);
+        break;
+    default:
+        break;
+    }
+
+    //finally, interpolate between the start and end values for the duration
+    //of the state
+    float percent_complete =(static_cast<float>(frameCounter) /
+                             state_duration);
+    const float kneeDiff = kneeEnd - kneeStart;
+    kneeS = kneeStart  + kneeDiff*percent_complete;
+    const float ankleDiff = ankleEnd - ankleStart;
+    ankleS = ankleStart  + ankleDiff*percent_complete;
+
+    float stiffnesses[NUM_JOINTS] = {maxS, maxS, maxS, kneeS,ankleS,ankleS};
+    vector<float> stiff_result = vector<float>(stiffnesses,
+                                               &stiffnesses[NUM_JOINTS]);
+    return stiff_result;
+
 }
 
 const float  WalkingLeg::cycloidx(float theta){
