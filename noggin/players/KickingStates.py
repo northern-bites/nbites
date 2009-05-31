@@ -64,6 +64,20 @@ class KickDecider:
                 len(self.oppGoalRightPostBearings) > 0)
 
 
+    def __str__(self):
+        s = ""
+        if self.myLeftPostBearing is not None:
+            s += ("My left post bearing is: " + str(self.myLeftPostBearing) + "\n")
+        if self.myRightPostBearing is not None:
+            s += ("My right post bearing is: " + str(self.myRightPostBearing) + "\n")
+        if self.oppLeftPostBearing is not None:
+            s += ("Opp left post bearing is: " + str(self.oppLeftPostBearing) + "\n")
+        if self.oppRightPostBearing is not None:
+            s += ("Opp right post bearing is: " + str(self.oppRightPostBearing) + "\n")
+        if s == "":
+            s = "No goal posts observed"
+        return s
+
 def decideKick(player):
     """
     Decides which kick to use
@@ -90,19 +104,12 @@ def decideKick(player):
     oppLeftPostBearing = player.kickDecider.oppLeftPostBearing
     oppRightPostBearing = player.kickDecider.oppRightPostBearing
 
+    player.printf(player.kickDecider)
+
     # Things to do if we saw our own goal
     if player.kickDecider.sawOwnGoal():
         if constants.SUPER_SAFE_KICKS:
             return player.goLater('ignoreOwnGoal')
-
-        if myLeftPostBearing is not None:
-            player.printf("My left post bearing is: " + str(myLeftPostBearing),'cyan')
-        if myRightPostBearing is not None:
-            player.printf("My right post bearing is: " + str(myRightPostBearing),'cyan')
-        if oppLeftPostBearing is not None:
-            player.printf("Opp left post bearing is: " + str(oppLeftPostBearing),'cyan')
-        if oppRightPostBearing is not None:
-            player.printf("Opp right post bearing is: " + str(oppRightPostBearing),'cyan')
 
         # We see both posts
         if myLeftPostBearing is not None and myRightPostBearing is not None:
@@ -153,26 +160,6 @@ def decideKick(player):
         # don't do anything
         return player.goLater('ignoreOwnGoal')
     elif player.kickDecider.sawOppGoal():
-        if len(player.myGoalLeftPostBearings) > 0:
-            myLeftPostBearing = (sum(player.myGoalLeftPostBearings) /
-                                 len(player.myGoalLeftPostBearings))
-        if len(player.myGoalRightPostBearings) > 0:
-            myRightPostBearing = (sum(player.myGoalRightPostBearings) /
-                                  len(player.myGoalRightPostBearings))
-        if len(player.oppGoalLeftPostBearings) > 0:
-            oppLeftPostBearing = (sum(player.oppGoalLeftPostBearings) /
-                                 len(player.oppGoalLeftPostBearings))
-        if len(player.oppGoalRightPostBearings) > 0:
-            oppRightPostBearing = (sum(player.oppGoalRightPostBearings) /
-                                   len(player.oppGoalRightPostBearings))
-        if myLeftPostBearing is not None:
-            player.printf("My left post bearing is: " + str(myLeftPostBearing),'cyan')
-        if myRightPostBearing is not None:
-            player.printf("My right post bearing is: " + str(myRightPostBearing),'cyan')
-        if oppLeftPostBearing is not None:
-            player.printf("Opp left post bearing is: " + str(oppLeftPostBearing),'cyan')
-        if oppRightPostBearing is not None:
-            player.printf("Opp right post bearing is: " + str(oppRightPostBearing),'cyan')
 
         if oppLeftPostBearing is not None and oppRightPostBearing is not None:
             if oppLeftPostBearing < 0 and oppRightPostBearing > 0:
