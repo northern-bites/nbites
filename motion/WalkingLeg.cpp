@@ -361,7 +361,7 @@ const vector<float> WalkingLeg::getStiffnesses(){
     float kneeStart = walkParams->kneeStiffness;
     float kneeEnd = walkParams->kneeStiffness;
 
-    float state_duration = walkParams->singleSupportFrames;
+    float state_duration = static_cast<float>(walkParams->singleSupportFrames);
     //Depending on the current support state, we select stiffnesses differently
     switch(state){
     case DOUBLE_SUPPORT: //Go from high to low
@@ -387,10 +387,11 @@ const vector<float> WalkingLeg::getStiffnesses(){
         break;
     }
 
-    //finally, interpolate between the start and end values for the duration
-    //of the state
-    float percent_complete =(static_cast<float>(frameCounter) /
-                             state_duration);
+    //finally, interpolate between the start and end values for HALF! the duration
+    //of the state, so by the time we get close to switching states, we will 
+    //already have been at the desired stiffness for a whileg
+    float percent_complete =std::min(2.0f *(static_cast<float>(frameCounter) /
+                                             state_duration), 1.0f);
     const float kneeDiff = kneeEnd - kneeStart;
     kneeS = kneeStart  + kneeDiff*percent_complete;
     const float ankleDiff = ankleEnd - ankleStart;

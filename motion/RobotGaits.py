@@ -1,17 +1,17 @@
 import man.motion as motion
 
 MARVIN_FAST_GAIT = motion.GaitCommand(31.00, # com height
-                                      1.40,  # hip offset x
+                                      1.50,  # hip offset x
                                       0.0,  # x-axis angle offset
                                       0.5,  # step duration
-                                      0.2,   # fraction in double support
-                                      0.9,  # stepHeight
+                                      0.3,   # fraction in double support
+                                      1.4,  # stepHeight
                                       0.0,   # footLengthX
                                       0.3,   # zmp static percentage
                                       4.5,   # left swing hip roll addition
                                       4.5,   # right swing hip roll addition
-                                      0.40,  # left zmp off
-                                      0.40,  # right zmp off
+                                      0.50,  # left zmp off
+                                      0.50,  # right zmp off
                                       6.6,   # turn zmp offset
                                       0.01,  # strafe zmp offset
                                       7.0,  # max x speed
@@ -19,8 +19,8 @@ MARVIN_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       30.0,   # max theta speed()
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
-                                      0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.3,  #kneeStiffness
+                                      0.35,  #ankleStiffness
                                       0.2)   #armStiffness
 SLARTI_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       1.40,  # hip offset x
@@ -202,10 +202,10 @@ MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         4.0,   # max y speed
                                         30.0,   # max theta speed()
                                         0.0,   #sensorScale
-                                      0.85,  #maxStiffness
-                                      0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
+                                        0.85,  #maxStiffness
+                                        0.85,  #kneeStiffness
+                                        0.85,  #ankleStiffness
+                                        0.2)   #armStiffness
 
 MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
                                                 1.40, # hip offset x
