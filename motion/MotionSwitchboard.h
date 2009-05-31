@@ -53,7 +53,6 @@
 #include "WalkCommand.h"
 #include "GaitCommand.h"
 #include "SetHeadCommand.h"
-#include "StiffnessCommand.h"
 
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
@@ -77,7 +76,6 @@ public:
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const boost::shared_ptr<GaitCommand> command);
 	void sendMotionCommand(const SetHeadCommand* command);
-	void sendMotionCommand(const boost::shared_ptr<StiffnessCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<FreezeCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<StepCommand> command);
@@ -136,9 +134,6 @@ private:
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
 
     bool readyToSend;
-
-    //std::list< boost::shared_ptr<StiffnessCommand> > stiffnessRequests;
-    boost::shared_ptr<StiffnessCommand> nextStiffnessCommand;
 
     static const float sitDownAngles[Kinematics::NUM_BODY_JOINTS];
 

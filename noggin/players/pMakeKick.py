@@ -37,9 +37,3 @@ class SoccerPlayer(FSA.FSA):
 
             else:
                 self.printf("What kind of sweet ass-Move is this?")
-
-    def executeStiffness(self,stiffnesses):
-        stiffnessCommand = motion.StiffnessCommand(0.0)
-        for i in xrange(len(stiffnesses)):
-            stiffnessCommand.setChainStiffness(i,stiffnesses[i])
-        self.brain.motion.sendStiffness(stiffnessCommand)

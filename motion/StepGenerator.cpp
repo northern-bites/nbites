@@ -1004,8 +1004,8 @@ bool StepGenerator::resetGait(const WalkingParameters * _wp){
         return true;
     }
     else{
-        cout << "Failed to change the gait since StepGenerator is active."
-             << endl;
+        // cout << "Failed to change the gait since StepGenerator is active."
+        //      << endl;
         return false;
     }
     //HACK When we switch gaits, we probably need to do other things as well

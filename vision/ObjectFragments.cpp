@@ -1444,7 +1444,7 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
                     drawPoint(x, y, PINK);
                 }
                 // now scan horizontally
-                for (x = startX, y = startY; x < IMAGE_WIDTH; ) {
+                for (x = startX, y = startY; x < IMAGE_WIDTH && x >= 0; ) {
                     // if it is the color we're looking for - good
                     if (thresh->thresholded[y][x] == c ||
                         thresh->thresholded[y][x] == c2) {

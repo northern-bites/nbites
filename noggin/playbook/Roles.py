@@ -83,7 +83,7 @@ def rGoalie(team):
     """
     The Goalie
     """
-    if team.noCalledChaser():
+    if team.goalieShouldChase():
         return [PBConstants.GOALIE] + SubRoles.pGoalieChaser(team)
     else:
         return [PBConstants.GOALIE] + SubRoles.pGoalieNormal(team)

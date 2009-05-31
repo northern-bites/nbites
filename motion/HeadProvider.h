@@ -66,6 +66,7 @@ private:
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 
+
     boost::shared_ptr<ChoppedCommand> currCommand;
 	// Queue of all future commands
 	std::queue<const HeadJointCommand*> headCommandQueue;
@@ -73,7 +74,7 @@ private:
 	HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;
 	float pitchMaxSpeed, yawMaxSpeed;
-
+	float headSetStiffness;
 
     pthread_mutex_t scripted_mode_mutex,set_mode_mutex;
 

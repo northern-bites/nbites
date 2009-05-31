@@ -195,10 +195,18 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> * safe_rarm =new vector<float>(rarm_angles,
                                                  &rarm_angles[ARM_JOINTS]);
 
+	// HACK @joho get gait stiffness params. nextGait->maxStiffness
+	vector<float> * stiffness = new vector<float>(Kinematics::NUM_JOINTS,
+												  0.85f);
+	vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
+												  0.85f);
+
     commands.push_back(new BodyJointCommand(1.0f,safe_larm,NULL,NULL,safe_rarm,
+											stiffness,
                                             Kinematics::INTERPOLATION_SMOOTH));
 
     commands.push_back(new BodyJointCommand(time,gaitJoints,
+											stiffness2,
                                             Kinematics::INTERPOLATION_SMOOTH));
     return commands;
 }

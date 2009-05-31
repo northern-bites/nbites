@@ -39,7 +39,8 @@ HeadProvider::HeadProvider(float motionFrameLength, shared_ptr<Sensors> s)
 	  curMode(SCRIPTED),
 	  yawDest(0.0f), pitchDest(0.0f),
 	  lastYawDest(0.0f), lastPitchDest(0.0f),
-	  pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f)
+	  pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f),
+	  headSetStiffness(0.6f)
 {
     pthread_mutex_init (&scripted_mode_mutex, NULL);
     pthread_mutex_init (&set_mode_mutex, NULL);
@@ -131,7 +132,7 @@ void HeadProvider::setMode(){
         vector<float>(newHeads,newHeads + Kinematics::HEAD_JOINTS);
     setNextChainJoints(HEAD_CHAIN,newChainAngles);
 
-    vector<float> head_gains(HEAD_JOINTS, gblStiffness);
+    vector<float> head_gains(HEAD_JOINTS, headSetStiffness);
     //Return the stiffnesses for each joint
     setNextChainStiffnesses(HEAD_CHAIN,head_gains);
 }
@@ -146,9 +147,9 @@ void HeadProvider::scriptedMode(){
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
     }
-    vector<float> head_gains(HEAD_JOINTS, gblStiffness);
-    //Return the stiffnesses for each joint
-    setNextChainStiffnesses(HEAD_CHAIN,head_gains);
+	setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
+							 currCommand->getStiffness(Kinematics::HEAD_CHAIN) );
+
 
 }
 

@@ -4,11 +4,9 @@
 #
 
 import man.motion as motion
-from man.motion import SweetMoves
 from man.motion import HeadMoves
 from ..util import FSA
 from . import CoreSoccerStates
-from man.motion import StiffnessModes
 
 class SoccerFSA(FSA.FSA):
     def __init__(self,brain):
@@ -34,32 +32,35 @@ class SoccerFSA(FSA.FSA):
         Can either take in a head move or a body command
         (see SweetMove files for descriptions of command tuples)
         """
+
         for position in sweetMove:
-            if len(position) == 6:
+            if len(position) == 7:
                 move = motion.BodyJointCommand(position[4], #time
                                                position[0], #larm
                                                position[1], #lleg
                                                position[2], #rleg
                                                position[3], #rarm
+                                               position[6], # Chain Stiffnesses
                                                position[5], #interpolation type
                                                )
 
 
-            elif len(position) == 3:
-                move = motion.HeadJointCommand(position[1],#time
-                                               position[0],#head pos
-                                               position[2],#interpolation type
+            elif len(position) == 4:
+                move = motion.HeadJointCommand(position[1] ,# time
+                                               position[0], # head pos
+                                               position[3], # chain stiffnesses
+                                               position[2], # interpolation type
                                                    )
 
-            elif len(position) == 4:
+            elif len(position) == 5:
                 move = motion.BodyJointCommand(position[2], # time
                                                position[0], # chainID
                                                position[1], # chain angles
+                                               position[4], # chain stiffnesses
                                                position[3], # interpolation type
                                                )
 
             else:
-                move = motion.BodyJointCommand(3.0,1,(0.0,0.0),1) # Junk move
                 self.printf("What kind of sweet ass-Move is this?")
 
             self.brain.motion.enqueue(move)
@@ -115,12 +116,6 @@ class SoccerFSA(FSA.FSA):
         unFreeze = motion.UnfreezeCommand(0.85)
         self.brain.motion.sendFreezeCommand(unFreeze)
 
-    def standupGainsOn(self):
-        """
-        Turn on the gains
-        """
-        self.executeStiffness(StiffnessModes.STANDUP_STIFFNESSES)
-
     def penalizeHeads(self):
         """
         Put head into penalized position, stop tracker
@@ -138,8 +133,10 @@ class SoccerFSA(FSA.FSA):
         self.executeMove(HeadMoves.ZERO_HEADS)
 
 
-    def executeStiffness(self,stiffnesses):
-        stiffnessCommand = motion.StiffnessCommand(0.0)
-        for i in xrange(len(stiffnesses)):
-            stiffnessCommand.setChainStiffness(i,stiffnesses[i])
-        self.brain.motion.sendStiffness(stiffnessCommand)
+    def walkPose(self):
+        """
+        We should usually not call this method from outside nav.
+        This is a quasi-hack created by Tucker
+        He can do hacks like this, you can't
+        """
+        self.brain.nav.setSpeed(0,0,0)

@@ -28,7 +28,6 @@
 #include "Kinematics.h"
 #include "WalkCommand.h"
 #include "BodyJointCommand.h"
-#include "StiffnessCommand.h"
 #include "MotionSwitchboard.h"
 #include "WalkingConstants.h"
 #include "StepCommand.h"
@@ -57,7 +56,6 @@ class MotionInterface
     inline bool isBodyActive(){return switchboard->isBodyActive();}
     void setGait(const boost::shared_ptr<GaitCommand> command);
     void setHead(const SetHeadCommand * command);
-    void sendStiffness(const boost::shared_ptr<StiffnessCommand> command);
     void stopBodyMoves();
     void stopHeadMoves();
     void resetWalkProvider();

@@ -11,7 +11,7 @@ from .util.MyMath import (dist,
 
 
 class MyInfo:
-    '''
+    """
     Class just to store important information about me, containing
     -x -- x coordinate on the field, according to ekf
     -y -- y coordinate on the field, according to ekf
@@ -23,7 +23,7 @@ class MyInfo:
     -number -- player number on team
     -teamNumber -- team number according to GameController
     -teamColor -- team color , either TEAM_BLUE or TEAM_RED (see Constants.py)
-    '''
+    """
     def __init__(self):
         self.x = 0.0
         self.y = 0.0
@@ -58,7 +58,7 @@ class MyInfo:
                  self.h, self.uncertX, self.uncertY, self.uncertH))
 
 class Ball:
-    '''
+    """
     Class for holding all current Ball information, contains:
 
     -centerX,centerY -- center (x,y) coordinates of ball on image screen
@@ -75,7 +75,7 @@ class Ball:
     -locDist -- euclidian distance between (x,y) of self to (x,y) of ball (ekf)
     -locBearing -- relative bearing between self (x,y) and ball (x,y) via ekf
     -on -- simple bool if ball is on vision frame or not
-    '''
+    """
     def __init__(self, visionBall):
         (self.centerX,
          self.centerY,
@@ -123,7 +123,7 @@ class Ball:
         self.updateVision(visionBall)
 
     def updateVision(self,visionBall):
-        '''update method gets list of vision updated information'''
+        """update method gets list of vision updated information"""
         # Hold our history
         self.lastVisionDist = self.dist
         self.lastVisionBearing = self.bearing
@@ -218,7 +218,7 @@ class Ball:
         self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
 
     def __str__(self):
-        '''returns string with all class variables'''
+        """returns string with all class variables"""
         return ("vision dist: %g bearing: %g elevation: %g center: (%d,%d) aX/aY: %g/%g, framesOn: %d framesOff: %d on: %s\n loc: (%g,%g) uncert: (%g,%g) sd: %g vel (%g,%g) dist: %g bearing: %g" %
                 (self.dist, self.bearing, self.elevation,
                  self.centerX, self.centerY, self.angleX, self.angleY,
@@ -227,7 +227,7 @@ class Ball:
                  self.velX,self.velY, self.locDist, self.locBearing))
 
 class FieldObject:
-    '''
+    """
     FieldObject is a class for field landmarks, storing visual information
     -landmarks:
     -yglp,ygrp,bglp,bgrp (yellow and blue goal left and right posts)
@@ -245,9 +245,9 @@ class FieldObject:
     -framesOff -- # of consecutive frames the obj has been not recognized
     -on -- simple bool if field object is on vision frame or not
     -x,y -- coordinates of the landmark on the field
-    '''
+    """
     def __init__(self, visionInfos, visionName):
-        '''initialization all values for FieldObject() class'''
+        """initialization all values for FieldObject() class"""
         # Things to be filled out later
         self.x = 0
         self.y = 0
@@ -273,7 +273,7 @@ class FieldObject:
         self.localId = relativeLandmark[2]
 
     def updateVision(self, visionInfos):
-        '''updates class variables with new vision information'''
+        """updates class variables with new vision information"""
         self.centerX = visionInfos.centerX
         self.centerY = visionInfos.centerY
         self.width = visionInfos.width
@@ -306,7 +306,7 @@ class FieldObject:
             self.framesOn = 0
 
     def __str__(self):
-        '''returns string with all class variables'''
+        """returns string with all class variables"""
         return ("%s, %s at (%d,%d): dist: %g bearing: %g center: ""(%d,%d) w/h: %g/%g aX/aY: %g/%g, framesOn: %d framesOff: %d on: %s" %
                 (Constants.visionObjectTuple[self.visionId],
                  Constants.landmarkTuple[self.localId],
@@ -316,16 +316,16 @@ class FieldObject:
                  self.framesOn, self.framesOff, self.on))
 
 class Corner:
-    '''
+    """
     Class for one single corner, contains:
     -id -- this is an unique identifier for every type of corner
     -dist -- distance from center of body to corner in cm
     -bearing -- angle on x-axis from center of body to corner in degrees
-    '''
+    """
     INVALID_FIELD_POSITION = -1
 
     def __init__(self, visionCorner):
-        '''init method for corner class.'''
+        """init method for corner class."""
         self.x = self.INVALID_FIELD_POSITION
         self.y = self.INVALID_FIELD_POSITION
         self.updateVision(visionCorner)
@@ -337,25 +337,25 @@ class Corner:
         self.possibilities = visionCorner.possibilities
 
     def getData(self):
-        '''returns [possibilities, dist, bearing]'''
+        """returns [possibilities, dist, bearing]"""
         return [self.possiblities,self.dist,self.bearing]
 
     def __str__(self):
-        '''returns string of all values in class -- can just print corner'''
+        """returns string of all values in class -- can just print corner"""
         return ("possibilities: %g dist: %g bearing: %g" % (self.possibilities,
                                                             self.dist,
                                                             self.bearing))
 
 class Line:
-    '''
+    """
     class for one single line, contains:
     -x1,y1 -- left coordinate on image screen
     -x2,y2 -- right coordinate on image screen
     -slope -- slope of line. remember that (0,0) is top-left corner of image
     -length -- length of the line
-    '''
+    """
     def __init__(self, visionLine):
-        '''init method'''
+        """init method"""
         self.x1 = visionLine.x1
         self.y1 = visionLine.y1
         self.x2 = visionLine.x2
@@ -368,11 +368,11 @@ class Line:
                 (self.x1,self.y1,self.x2,self.y1,self.slope,self.length))
 
 class Crossbar:
-    '''
+    """
     Crossbar class, what used to be the backstop class
-    '''
+    """
     def __init__(self, visionInfos, visionName):
-        '''initialization all values for FieldObject() class'''
+        """initialization all values for FieldObject() class"""
         # Things to be filled out later
         self.framesOn = 0
         self.framesOff = 0
@@ -383,7 +383,7 @@ class Crossbar:
         self.updateVision(visionInfos)
 
     def updateVision(self, visionInfos):
-        '''updates class variables with new vision information'''
+        """updates class variables with new vision information"""
         self.x = visionInfos.x
         self.y = visionInfos.y
         self.angleX = visionInfos.angleX
@@ -412,7 +412,7 @@ class Crossbar:
             self.framesOn = 0
 
 class Packet:
-    '''
+    """
     Class for one single packet, contains:
     -teamHeader -- header string for nBites (should only receive our own)
     -teamNumber -- team number (should only receive our own)
@@ -434,8 +434,8 @@ class Packet:
     -subrole -- current sub role used in special situations in playbook and Coop
 
     can pass packet list into constructor, else it'll default to all zeros
-    '''
-    def __init__(self,new_packet=[0]*17): #
+    """
+    def __init__(self,new_packet=[0]*17):
         (self.teamNumber,
          self.playerNumber,
          self.color,
@@ -473,7 +473,7 @@ class Packet:
         self.chaseTime = float(self.chaseTime)
 
     def update(self,update_packet=[0]*17): #=[0]*16
-        '''update packet with a list of new values'''
+        """update packet with a list of new values"""
         # error checking if passed list is not right size
         if len(update_packet) != 17:
             raise ValueError("Packet().update got list of size:" +
@@ -498,7 +498,7 @@ class Packet:
          self.chaseTime) = update_packet
 
     def __str__(self):
-        '''returns string with all important values'''
+        """returns string with all important values"""
         return ("#%d role: %d subRole: %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %
             (self.playerNumber,
              self.role, self.calledSubRole, self.chaseTime,
@@ -514,8 +514,8 @@ class Sonar:
     def __init__(self):
         # Class constants
         self.UNKNOWN_VALUE = "unknown distance"
-        self.MIN_DIST = 25.0 # minimum readable distance in cm
-        self.MAX_DIST = 250.0 # maximum readable distance in cm
+        self.MIN_DIST = 0.0 #25.0 # minimum readable distance in cm
+        self.MAX_DIST = 255.0 # maximum readable distance in cm
 
         self.lastDist = self.UNKNOWN_VALUE
         self.lastMode = None
@@ -532,8 +532,8 @@ class Sonar:
         self.lastDist = sensors.ultraSoundDistance
         self.lastMode = sensors.ultraSoundMode
 
-        if (self.lastDist < self.MIN_DIST or
-            self.lastDist > self.MAX_DIST):
+        if (self.lastDist <= self.MIN_DIST or
+            self.lastDist >= self.MAX_DIST):
             self.lastDist = self.UNKNOWN_VALUE
         if self.lastMode == modes.LL:
             self.LLdist = self.lastDist

@@ -98,37 +98,37 @@ SUB_ROLE_SWITCH_BUFFER = 10.
 NUM_SUB_ROLES = 23
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
-                                            #OFFENDER SUB ROLES 1-3
+                                            #OFFENDER SUB ROLES 2-4
                                             "LEFT_WING",
                                             "RIGHT_WING",
                                             "DUBD_OFFENDER",
 
-                                            # DEFENDER SUB ROLES 4-8
+                                            # DEFENDER SUB ROLES 5-9
                                             "STOPPER",
                                             "DEEP_STOPPER",
                                             "SWEEPER",
                                             "LEFT_DEEP_BACK",
                                             "RIGHT_DEEP_BACK",
 
-                                            # CHASER SUB ROLES 8-9
+                                            # CHASER SUB ROLES 10-11
                                             "CHASE_NORMAL",
                                             "CHASE_AROUND_BOX",
 
-                                            # FINDER SUB ROLES 10-13
+                                            # FINDER SUB ROLES 12-15
                                             "FRONT_FINDER",
                                             "LEFT_FINDER",
                                             "RIGHT_FINDER",
                                             "OTHER_FINDER",
 
-                                            # GOALIE SUB ROLE 14
+                                            # GOALIE SUB ROLE 16-17
                                             "GOALIE_NORMAL",
                                             "GOALIE_CHASER",
 
-                                            # KICKOFF SUB ROLES 15-16
+                                            # KICKOFF SUB ROLES 18-19
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 17-19
+                                            # READY SUB ROLES 20-22
                                             "READY_CHASER",
                                             "READY_DEFENDER",
                                             "READY_OFFENDER")))
@@ -237,6 +237,8 @@ KICKOFF_PLAY_OFFENDER = [NogginConstants.FIELD_WIDTH * 4./5.,
 KICKOFF_PLAY_DEFENDER = [NogginConstants.FIELD_WIDTH * 1./2.,
                     NogginConstants.FIELD_HEIGHT * 1./4.]
 
+DEFAULT_CHASER_NUMBER = 3
+
 # Defender
 DEFENDER_BALL_DIST = 100
 SWEEPER_X = NogginConstants.MY_GOALBOX_RIGHT_X + 50.
@@ -255,7 +257,7 @@ RIGHT_WING_MIN_Y = NogginConstants.CENTER_FIELD_Y
 RIGHT_WING_MAX_Y = (NogginConstants.FIELD_WIDTH - NogginConstants.GREEN_PAD_Y)
 
 #GOALIE
-BALL_LOC_LIMIT = 250 # Dist at which we stop active localization and just track
+BALL_LOC_LIMIT = NogginConstants.CENTER_FIELD_X #250 # Dist at which we stop active localization and just track
 GOALIE_HOME_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X + 15
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
 DIST_FROM_GOAL_INTERCEPT = 25.

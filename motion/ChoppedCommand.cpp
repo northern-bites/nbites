@@ -34,7 +34,26 @@ ChoppedCommand::ChoppedCommand(const JointCommand *command, int chops )
 	  interpolationType( command->getInterpolation() ),
 	  finished(false)
 {
+	constructStiffness(command);
+}
 
+void
+ChoppedCommand::constructStiffness(const JointCommand *command) {
+	for (unsigned int i=0; i < NUM_CHAINS; i++)
+		constructChainStiffness(static_cast<ChainID>(i),
+								command);
+}
+
+void
+ChoppedCommand::constructChainStiffness(ChainID id,
+										const JointCommand* command) {
+	const vector<float> *body_stiff = command->getStiffness();
+	vector<float>::const_iterator bodyStart = body_stiff->begin();
+
+	vector<float> *chain = getStiffnessRef(id);
+
+	chain->assign(bodyStart + chain_first_joint[id],
+				  bodyStart + chain_last_joint[id] + 1);
 }
 
 // Check's to see if the command has executed the required
@@ -66,7 +85,7 @@ void ChoppedCommand::checkDone() {
 }
 
 vector<float> ChoppedCommand::getFinalJoints(const JointCommand *command,
-									   vector<float> currentJoints) {
+											 vector<float> currentJoints) {
 	vector<float> finalJoints(0);
 	vector<float>::iterator currentStart = currentJoints.begin();
 	vector<float>::iterator currentEnd = currentJoints.begin();
@@ -80,7 +99,6 @@ vector<float> ChoppedCommand::getFinalJoints(const JointCommand *command,
 
 		// If the next chain is not queued (empty), add current joints
 		if ( nextChain == 0 ||
-			 nextChain->size() == 0 ||
 			 nextChain->empty() ) {
 			finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
 
@@ -95,5 +113,51 @@ vector<float> ChoppedCommand::getFinalJoints(const JointCommand *command,
 		currentStart += chain_lengths[chain];
 	}
 	return finalJoints;
+
+}
+
+const vector<float>
+ChoppedCommand::getStiffness( ChainID chainID ) const
+{
+	switch (chainID) {
+	case LARM_CHAIN:
+		return larm_stiff;
+	case LLEG_CHAIN:
+		return lleg_stiff;
+	case RLEG_CHAIN:
+		return rleg_stiff;
+	case RARM_CHAIN:
+		return rarm_stiff;
+	case HEAD_CHAIN:
+		return head_stiff;
+	case RANKLE_CHAIN:
+	case LANKLE_CHAIN:
+		break;
+	}
+	cout << "Should not have reached this point! ERROR!" << endl;
+	return larm_stiff;
+
+}
+
+vector<float>*
+ChoppedCommand::getStiffnessRef( ChainID chainID )
+{
+	switch (chainID) {
+	case LARM_CHAIN:
+		return &larm_stiff;
+	case LLEG_CHAIN:
+		return &lleg_stiff;
+	case RLEG_CHAIN:
+		return &rleg_stiff;
+	case RARM_CHAIN:
+		return &rarm_stiff;
+	case HEAD_CHAIN:
+		return &head_stiff;
+	case RANKLE_CHAIN:
+	case LANKLE_CHAIN:
+		break;
+	}
+	cout << "Should not have reached this point! ERROR!" << endl;
+	return &larm_stiff;
 
 }

@@ -18,3 +18,13 @@ noggin/util/fakeData/*
 /noggin/offline/noiseVaccuracy
 /noggin/offline/.Rhistory
 /noggin/offline/.RData
+/comm/TAGS
+/motion/TAGS
+/vision/TAGS
+/updateTags.sh
+/corpus/TAGS
+/noggin/TAGS
+/noggin/offline/TAGS
+/noggin/playbook/TAGS
+/noggin/players/TAGS
+/noggin/util/TAGS

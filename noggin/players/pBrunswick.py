@@ -2,24 +2,30 @@
 from . import SoccerFSA
 from . import ChaseBallStates
 from . import PositionStates
+from . import FindBallStates
+from . import KickingStates
 from ..playbook import PBConstants
 from .. import NogginConstants
 from math import hypot
 from ..util.MyMath import safe_atan2
 from . import BrunswickStates
+from . import GoaliePositionStates
+from . import GoalieChaseBallStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(GoaliePositionStates)
+        self.addStates(GoalieChaseBallStates)
+        self.addStates(PositionStates)
+        self.addStates(FindBallStates)
+        self.addStates(KickingStates)
         self.addStates(ChaseBallStates)
         self.addStates(BrunswickStates)
-        self.addStates(PositionStates)
+
         self.setName('pBrunswick')
         self.currentRole = PBConstants.INIT_ROLE
         self.stoppedWalk = False
-        self.currentChaseWalkTheta = None
-        self.currentChaseWalkX = None
-        self.currentChaseWalkY = None
         self.currentSpinDir = None
         self.currentGait = None
         self.sawOwnGoal = False
@@ -28,6 +34,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.oppGoalRightPostBearings = []
         self.myGoalLeftPostBearings = []
         self.myGoalRightPostBearings = []
+        self.trackingBall = False
 
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':
@@ -51,19 +58,19 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'chase'
             #return 'decideKick'
         elif role == PBConstants.OFFENDER:
-            return 'playbookPosition'
-            #return 'spinFindBallPosition'
-        elif role == PBConstants.DEFENDER:
-            return 'playbookPosition'
-            #return 'spinFindBallPosition'
-        elif role == PBConstants.GOALIE:
             #return 'playbookPosition'
-            return 'atPosition'
+            return 'spinFindBallPosition'
+        elif role == PBConstants.DEFENDER:
+            #return 'playbookPosition'
+            return 'spinFindBallPosition'
+        elif role == PBConstants.GOALIE:
+            return 'goaliePosition'
         elif role == PBConstants.PENALTY_ROLE:
             return 'gamePenalized'
         elif role == PBConstants.SEARCHER:
             return 'scanFindBall'
         else:
+            #return 'decideKick'
             return 'scanFindBall'
 
     def getBehindBallPosition(self):
@@ -81,4 +88,3 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         heading = -safe_atan2(delta_y,delta_x)
 
         return pos_x,pos_y,heading
-

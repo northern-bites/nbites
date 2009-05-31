@@ -46,8 +46,7 @@ enum ProviderType{
 class MotionProvider {
 public:
     MotionProvider(ProviderType _provider_type)
-        :gblStiffness(0.0f),
-        _active(false), _stopping(false),
+        : _active(false), _stopping(false),
           nextJoints(Kinematics::NUM_CHAINS,std::vector<float>()),
           nextStiffnesses(Kinematics::NUM_CHAINS,std::vector<float>()),
           provider_type(_provider_type)
@@ -101,12 +100,6 @@ public:
         //       As a consolation, you should know that it will never be asked
         //       about it anyway.
         return LEFT_SUPPORT;
-    }
-    float gblStiffness;
-
-    //temporary code
-    void setStiffness(float newStiffness){
-        gblStiffness = newStiffness;
     }
 
 protected:
