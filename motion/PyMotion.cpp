@@ -260,7 +260,9 @@ public:
     void setNextWalkCommand(const PyWalkCommand *command) {
         motionInterface->setNextWalkCommand(command->getCommand());
     }
-
+    void sendStepCommand(const PyStepCommand *command) {
+        motionInterface->sendStepCommand(command->getCommand());
+    }
     void setGait(const PyGaitCommand *command) {
         motionInterface->setGait(command->getCommand());
     }
@@ -364,6 +366,13 @@ BOOST_PYTHON_MODULE(_motion)
  "A container for a walk command. Holds an x, y and theta which represents a"
  " walk vector"))
         ;
+    class_<PyStepCommand>("StepCommand",
+                          init<float, float, float, int>(args("x","y","theta",
+                                                              "numSteps"),
+ "A container for a step command. Holds an x, y and theta which represents a"
+ " walk vector, in addition to the number of desired steps."))
+        ;
+
     class_<PyFreezeCommand>("FreezeCommand",
                               init<>("A container for a "
                                    "command to freeze the robot"))
@@ -387,6 +396,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq1)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
+        .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead",&PyMotionInterface::setHead)
         .def("sendStiffness",&PyMotionInterface::sendStiffness)

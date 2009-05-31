@@ -118,6 +118,8 @@ public:
     bool isDone() { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
+    void takeSteps(const float _x, const float _y, const float _theta,
+                   const int _numSteps);
 
     bool resetGait(const WalkingParameters * _wp);
 

@@ -7,7 +7,7 @@ public:
   : MotionCommand(MotionConstants::WALK),
     x_mms(_x_mms),y_mms(_y_mms),theta_rads(_theta_rads), numSteps(nSteps)
         { setChainList(); }
-    ~StepCommand();
+    ~StepCommand(){}
 public:
 //    velocities
     const float x_mms;    //mm/second

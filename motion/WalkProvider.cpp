@@ -79,6 +79,14 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     pendingCommands = false;
     nextCommand = NULL;
 
+    if(pendingStepCommands){
+        stepGenerator.takeSteps(nextStepCommand->x_mms,
+                                nextStepCommand->y_mms,
+                                nextStepCommand->theta_rads,
+                                nextStepCommand->numSteps);
+    }
+    pendingStepCommands=false;
+
     //Also need to process stepCommands here
 
     if(!isActive()){
