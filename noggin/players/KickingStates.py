@@ -175,7 +175,6 @@ def afterKick(player):
     Currently exits after one frame.
     """
     # trick the robot into standing up instead of leaning to the side
-    player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
     player.walkPose()
 
     return player.goLater("chase")
@@ -186,7 +185,6 @@ def kickBallStraight(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
         player.printf("We should kick straight!", 'cyan')
     if player.counter == 2:
         player.executeMove(SweetMoves.LEFT_FAR_KICK)
@@ -215,7 +213,6 @@ def kickBallRight(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeStiffness(StiffnessModes.LEFT_SIDE_KICK_STIFFNESSES)
         player.printf("We should kick right!", 'cyan')
     if player.counter == 2:
         # Left side kick, means the sideways kick with the left foot
@@ -233,7 +230,6 @@ def kickBallLeftExecute(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeStiffness(StiffnessModes.RIGHT_SIDE_KICK_STIFFNESSES)
         player.printf("We should kick left!", 'cyan')
     if player.counter == 2:
         # Right side kick, means the sideways kick with the right foot

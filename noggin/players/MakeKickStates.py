@@ -6,7 +6,6 @@ def gameInitial(player):
 
 def standup(player):
     if player.firstFrame():
-        player.executeStiffness(StiffnessModes.MAKE_KICK_STIFFNESSES)
         player.executeMove(SweetMoves.STAND_FOR_KICK_LEFT)
 
     if player.counter == 30:

@@ -7,7 +7,6 @@ import man.motion as motion
 from man.motion import HeadMoves
 from ..util import FSA
 from . import CoreSoccerStates
-from man.motion import StiffnessModes
 
 class SoccerFSA(FSA.FSA):
     def __init__(self,brain):
@@ -117,12 +116,6 @@ class SoccerFSA(FSA.FSA):
         unFreeze = motion.UnfreezeCommand(0.85)
         self.brain.motion.sendFreezeCommand(unFreeze)
 
-    def standupGainsOn(self):
-        """
-        Turn on the gains
-        """
-        self.executeStiffness(StiffnessModes.STANDUP_STIFFNESSES)
-
     def penalizeHeads(self):
         """
         Put head into penalized position, stop tracker
@@ -139,12 +132,6 @@ class SoccerFSA(FSA.FSA):
         self.brain.motion.stopHeadMoves()
         self.executeMove(HeadMoves.ZERO_HEADS)
 
-
-    def executeStiffness(self,stiffnesses):
-        stiffnessCommand = motion.StiffnessCommand(0.0)
-        for i in xrange(len(stiffnesses)):
-            stiffnessCommand.setChainStiffness(i,stiffnesses[i])
-        self.brain.motion.sendStiffness(stiffnessCommand)
 
     def walkPose(self):
         """

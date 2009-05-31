@@ -5,10 +5,9 @@
 
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
-from man.motion import StiffnessModes
 
 def gameInitial(player):
-    player.executeStiffness(StiffnessModes.NO_HEAD_STIFFNESSES)
+    player.gainsOn()
     return player.stay()
 
 def gameReady(player):
@@ -22,8 +21,6 @@ def gamePenalized(player):
 
 def standup(player):
     if player.firstFrame():
-
-        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
         walkCommand = motion.WalkCommand(x=0,y=0,theta=0)
         player.motion.setNextWalkCommand(walkCommand)
 

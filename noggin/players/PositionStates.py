@@ -3,7 +3,6 @@ from . import ChaseBallConstants as ChaseConstants
 import ChaseBallTransitions as chaseTransitions
 import man.noggin.util.MyMath as MyMath
 import man.motion.SweetMoves as SweetMoves
-import man.motion.StiffnessModes as StiffnessModes
 
 def positionLocalize(player):
 
@@ -134,13 +133,11 @@ def spinFindBallPosition(player):
 def kickAtPosition(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
     if player.counter == 2:
         player.executeMove(SweetMoves.LEFT_FAR_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
         # trick the robot into standing up instead of leaning to the side
-        player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
         player.setSpeed(0,0,0)
         return player.goLater('atPosition')
 
