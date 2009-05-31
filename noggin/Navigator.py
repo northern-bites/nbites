@@ -95,7 +95,6 @@ class Navigator(FSA.FSA):
         return abs(hDiff) < CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
 
-
     def notAtHeading(self, targetHeading= None):
         if targetHeading is None:
             targetHeading = self.destH
@@ -103,7 +102,6 @@ class Navigator(FSA.FSA):
         #self.printf("H diff is " + str(hDiff))
         return abs(hDiff) > ALMOST_CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
-
 
     def getRotScale(self, headingDiff):
         absHDiff = abs(headingDiff)
@@ -113,7 +111,6 @@ class Navigator(FSA.FSA):
             return HEADING_MEDIUM_SCALE
         else:
             return HEADING_FAR_SCALE
-
 
     def isStopped(self):
         return self.currentState == 'stopped'

@@ -229,26 +229,28 @@ class GoTeam:
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf(("chaser det: me == #", self.brain.my.playerNumber))
+
         # scroll through the teammates
         for mate in self.activeFieldPlayers:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf(("\t mate #", mate.playerNumber))
 
+            # If the player number is me, or our ball models are super divergent ignore
             if (mate.playerNumber == self.brain.my.playerNumber or
-                fabs(mate.ballY - self.brain.ball.y) > 200.0):
+                fabs(mate.ballY - self.brain.ball.y) >
+                PBConstants.BALL_DIVERGENCE_THRESH or
+                fabs(mate.ballX - self.brain.ball.x) >
+                PBConstants.BALL_DIVERGENCE_THRESH):
+
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf ("\t active or goalie or me")
+                    self.printf(("Ball models are divergent, or its me"))
                 continue
 
-            # if the player has got the ball, return his number
-            if mate.hasBall():
-                if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("\t grabbing")
-                return mate
             # if both robots see the ball use visual distances to ball
             if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
                 (mate.ballDist < chaser_mate.ballDist)):
                 chaser_mate = mate
+
             # use loc distances if both don't have a visual ball
             elif mate.ballLocDist < chaser_mate.ballLocDist:
                 chaser_mate = mate
@@ -343,16 +345,6 @@ class GoTeam:
         if activeMate.playerNumber > self.me.playerNumber:
             return False
         return True
-
-    def teammateHasBall(self):
-        '''returns True if any mate has the ball'''
-        for i,mate in enumerate(self.teammates):
-            if (not mate.active or
-                mate.playerNumber == self.me.playerNumber):
-                continue
-            elif (mate.hasBall()):
-                return True
-        return False
 
     def getOtherActiveTeammate(self):
         '''this returns the teammate instance of an active teammate that isn't
