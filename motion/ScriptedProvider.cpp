@@ -108,7 +108,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
 			setNextChainJoints( cid,
 								currentChains->at(cid) );
 		}else{
-			
+
 			setNextChainJoints( cid,
 								currCommand->getNextJoints(cid) );
 		}

@@ -34,7 +34,6 @@ using namespace boost::python;
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
 #include "WalkCommand.h"
-#include "StiffnessCommand.h"
 #include "MotionInterface.h"
 #include "Kinematics.h"
 using namespace Kinematics;
@@ -119,28 +118,6 @@ public:
 
 private:
     WalkCommand *command;
-};
-
-
-class PyStiffnessCommand {
-public:
-    PyStiffnessCommand(){
-        command =  boost::shared_ptr<StiffnessCommand>(new StiffnessCommand());
-    }
-    PyStiffnessCommand(const float bodyStiffness){
-        command =  boost::shared_ptr<StiffnessCommand>
-            (new StiffnessCommand(bodyStiffness));
-    }
-    PyStiffnessCommand(const int chainID, const float chainStiffness){
-        command = boost::shared_ptr<StiffnessCommand>
-            (new StiffnessCommand((ChainID)chainID,chainStiffness));
-    }
-    void setChainStiffness(const int chainID, const float chainStiffness){
-        command->setChainStiffness((ChainID) chainID, chainStiffness );
-    }
-    boost::shared_ptr<StiffnessCommand>  getCommand() const {return command;}
-private:
-    boost::shared_ptr<StiffnessCommand> command;
 };
 
 class PyBodyJointCommand {
@@ -266,9 +243,6 @@ public:
     void setHead(const PySetHeadCommand *command) {
         motionInterface->setHead(command->getCommand());
     }
-    void sendStiffness(const PyStiffnessCommand *command){
-        motionInterface->sendStiffness(command->getCommand());
-    }
     void sendFreezeCommand(const PyFreezeCommand *command){
         motionInterface->sendFreezeCommand(command->getCommand());
     }
@@ -375,21 +349,12 @@ BOOST_PYTHON_MODULE(_motion)
                                           "UNfreeze the robot"))
 
         ;
-    class_<PyStiffnessCommand>("StiffnessCommand",
-                               init<float>(args("bodyStiffness"),
-"A container for a stiffness comamnd. Allows setting stiffness per chain or "
-"for the whole body"))
-        .def(init<int,float>(args("chainID","chainStiffness")))
-        .def(init<>())
-        .def("setChainStiffness", &PyStiffnessCommand::setChainStiffness)
-        ;
     class_<PyMotionInterface>("MotionInterface")
         .def("enqueue", enq1)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead",&PyMotionInterface::setHead)
-        .def("sendStiffness",&PyMotionInterface::sendStiffness)
         .def("sendFreezeCommand",frz1)
         .def("sendFreezeCommand",frz2)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)

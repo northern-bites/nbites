@@ -4,12 +4,17 @@
 
 import StiffnessModes as stiff
 
+SWEET_MOVE_LENGTH = 7
+CHAIN_MOVE_LENGTH = 5
+
+
 def getMoveTime(move):
     totalTime = 0.0
     for target in move:
-        if len(target) == 6:
+        if len(target) == SWEET_MOVE_LENGTH or \
+                len(target) == CHAIN_MOVE_LENGTH:
             totalTime += target[4]
-        elif len(target) == 3:
+        elif len(target) == CHAIN_MOVE_LENGTH:
             totalTime += target[1]
     return totalTime
 

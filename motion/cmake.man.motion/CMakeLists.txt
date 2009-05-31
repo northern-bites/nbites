@@ -104,7 +104,6 @@ SET( MOTION_SRCS
                      ${MOTION_INCLUDE_DIR}/BodyJointCommand
 		     ${MOTION_INCLUDE_DIR}/HeadJointCommand
 		     ${MOTION_INCLUDE_DIR}/JointCommand
-		     ${MOTION_INCLUDE_DIR}/StiffnessCommand
 		     ${MOTION_INCLUDE_DIR}/MotionCommand
                      ${MOTION_INCLUDE_DIR}/MotionConstants
                      ${MOTION_INCLUDE_DIR}/Motion.cpp

@@ -2,6 +2,8 @@
 
 import StiffnessModes as stiff
 
+HEAD_MOVE_LENGTH = 4
+
 ZERO_HEADS = (((0.0,0.0),1.0,0, stiff.LOW_HEAD_STIFFNESSES),)
 
 NEUT_HEADS = (((0.,20.),2.0,0, stiff.LOW_HEAD_STIFFNESSES),)

@@ -57,11 +57,6 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
     nullBodyProvider.setCommand(paralyze);
     nullHeadProvider.setCommand(paralyze);
 
-    //temp - HACK
-    scriptedProvider.setStiffness(0.85f);
-    headProvider.setStiffness(0.85f);
-    walkProvider.setStiffness(0.85f);
-
     //Very Important, ensure that we have selected a default walk parameter set
     boost::shared_ptr<GaitCommand>  defaultGait(new GaitCommand(DEFAULT_P));
 
@@ -583,16 +578,5 @@ void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<UnfreezeComman
         nullHeadProvider.setCommand(command);
     if(curProvider == &nullBodyProvider)
         nullBodyProvider.setCommand(command);
-}
-void MotionSwitchboard::sendMotionCommand(boost::shared_ptr<StiffnessCommand> command){
-    pthread_mutex_lock(&stiffness_mutex);
-    vector<float> stiff = command->getChainStiffness((ChainID) 0);
-    float newStiff = stiff[0];
-    cout << "Deprecated!!! Setting the stiffness to " << newStiff<<endl;
-    scriptedProvider.setStiffness(newStiff);
-    headProvider.setStiffness(newStiff);
-    walkProvider.setStiffness(newStiff);
-    pthread_mutex_unlock(&stiffness_mutex);
-
 }
 
