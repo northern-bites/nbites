@@ -107,6 +107,9 @@ def approachBall(player):
     if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
         sTheta = 0.0
 
+    # Don't turn right now
+    sTheta = 0.0
+
     # Set our walk towards the ball
     if ball.on and player.stoppedWalk:
         if (player.brain.nav.isStopped() and
@@ -199,9 +202,9 @@ def waitBeforeKick(player):
 
     if not player.brain.nav.isStopped():
         return player.stay()
-#     elif transitions.shouldApproachForKick(player):
-#         player.brain.tracker.trackBall()
-#         return player.goLater('approachBall')
+    elif transitions.shouldApproachForKick(player):
+        player.brain.tracker.trackBall()
+        return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
         player.brain.tracker.trackBall()
         return player.goLater('scanFindBall')
@@ -233,18 +236,14 @@ def avoidObstacle(player):
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
         if (player.brain.nav.isStopped() and
-            player.currentGait != constants.NORMAL_GAIT):
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
-            player.currentGait = constants.NORMAL_GAIT
+            player.currentGait != constants.FAST_GAIT):
+            player.brain.CoA.setRobotGait(player.brain.motion)
+            player.currentGait = constants.FAST_GAIT
 
     if (transitions.shouldAvoidObstacleLeft(player) and
         transitions.shouldAvoidObstacleRight(player)):
         # Backup
         if player.stoppedWalk:
-            if (player.brain.nav.isStopped() and
-                player.currentGait != constants.FAST_GAIT):
-                player.brain.CoA.setRobotGait(player.brain.motion)
-                player.currentGait = constants.FAST_GAIT
             player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
     elif transitions.shouldAvoidObstacleLeft(player):
         # Dodge right

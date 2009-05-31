@@ -532,8 +532,8 @@ class Sonar:
         self.lastDist = sensors.ultraSoundDistance
         self.lastMode = sensors.ultraSoundMode
 
-        if (self.lastDist < self.MIN_DIST or
-            self.lastDist > self.MAX_DIST):
+        if (self.lastDist <= self.MIN_DIST or
+            self.lastDist >= self.MAX_DIST):
             self.lastDist = self.UNKNOWN_VALUE
         if self.lastMode == modes.LL:
             self.LLdist = self.lastDist

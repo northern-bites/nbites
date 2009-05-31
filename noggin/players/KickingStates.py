@@ -6,6 +6,7 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import man.motion.StiffnessModes as StiffnessModes
 import KickingConstants as constants
+import ChaseBallConstants
 from math import fabs
 
 def decideKick(player):
@@ -178,7 +179,13 @@ def afterKick(player):
     player.executeStiffness(StiffnessModes.LOOSE_ARMS_STIFFNESSES)
     player.walkPose()
 
-    return player.goLater("chase")
+    if player.brain.nav.isStopped():
+        player.brain.CoA.setRobotGait(player.brain.motion)
+        player.currentGait = ChaseBallConstants.FAST_GAIT
+
+        return player.goLater("chase")
+    else:
+        return player.stay()
 
 def kickBallStraight(player):
     """

@@ -4,6 +4,9 @@ import man.noggin.util.MyMath as MyMath
 import PositionTransitions as Transitions
 
 def positionLocalize(player):
+    """
+    Localize better in order to position
+    """
     return player.stay()
 
 def playbookPosition(player):
