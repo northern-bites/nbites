@@ -1,4 +1,4 @@
-import BrunswickGoalieTransitions as helper
+import GoalieTransitions as helper
 
 def goalieChase(player):
     if player.firstFrame():
