@@ -30,6 +30,7 @@
 #include "BodyJointCommand.h"
 #include "MotionSwitchboard.h"
 #include "WalkingConstants.h"
+#include "StepCommand.h"
 #define DUMMY_F 0.0f
 #define DUMMY_I 0
 
@@ -46,8 +47,8 @@ class MotionInterface
         : switchboard(_switchboard) {}
     virtual ~MotionInterface() {}
 
-    //depricated interface calls
     void setNextWalkCommand(const WalkCommand *command);
+    void sendStepCommand(const boost::shared_ptr<StepCommand> command);
     void enqueue(const BodyJointCommand *command);
     void enqueue(const HeadJointCommand *command);
     inline bool isWalkActive() {return switchboard->isWalkActive();}

@@ -46,6 +46,7 @@
 #include "WalkCommand.h"
 #include "GaitCommand.h"
 #include "BodyJointCommand.h"
+#include "StepCommand.h"
 
 //NOTE: we need to get passed a reference to the switchboard so we can
 //know the length of a motion frame!!
@@ -67,6 +68,8 @@ public:
         }
 	void setCommand(const WalkCommand * command);
 	void setCommand(const boost::shared_ptr<GaitCommand> command);
+	void setCommand(const boost::shared_ptr<StepCommand> command);
+
     std::vector<BodyJointCommand *> getGaitTransitionCommand();
     MotionModel getOdometryUpdate(){
         const std::vector<float> odo = stepGenerator.getOdometryUpdate();
@@ -85,9 +88,11 @@ private:
     const WalkingParameters * curGait, *nextGait;
     StepGenerator stepGenerator;
     bool pendingCommands;
+    bool pendingStepCommands;
 
     mutable pthread_mutex_t walk_provider_mutex;
     const WalkCommand * nextCommand;
+     boost::shared_ptr<StepCommand> nextStepCommand;
 
     //Temp solution to arms
     std::vector<float> rarm_angles, larm_angles;

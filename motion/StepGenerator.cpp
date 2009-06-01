@@ -337,7 +337,6 @@ WalkLegsTuple StepGenerator::tick_legs(){
 
 
 void StepGenerator::swapSupportLegs(){
-
         if (currentZMPDSteps.size() +  futureSteps.size() <
             MIN_NUM_ENQUEUED_STEPS)
             throw "Insufficient steps";
@@ -594,11 +593,14 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
                                   const float _theta)  {
-    //convert speeds in cm/s and rad/s into steps:
-    const float new_x = _x*walkParams->stepDuration;
-    const float new_y = _y*walkParams->stepDuration;
+    //convert speeds in cm/s and rad/s into steps and clip according to the gait
+    const float new_x =  clip(_x,walkParams->maxXSpeed)
+        *walkParams->stepDuration;
+    const float new_y = clip(_y,walkParams->maxYSpeed)
+        *walkParams->stepDuration;
     //we only turn every other step, so double the turning!
-    const float new_theta = _theta*walkParams->stepDuration*2.0f;
+    const float new_theta = clip(_theta,walkParams->maxThetaSpeed)
+        *walkParams->stepDuration*2.0f;
 
     //If the walk vector isn't changing,
     if(abs(new_x - x) <= NEW_VECTOR_THRESH_MMS &&
@@ -613,12 +615,9 @@ void StepGenerator::setSpeed(const float _x, const float _y,
         }
     }
 
-
-    //Clip the incoming values as dictated by the walkParameters
-    x     = clip(new_x,walkParams->maxXSpeed);
-    y     = clip(new_y,walkParams->maxYSpeed);
-    theta = clip(new_theta,walkParams->maxThetaSpeed);
-
+    x = new_x;
+    y=new_y;
+    theta=new_theta;
 
 #ifdef DEBUG_STEPGENERATOR
     cout << "New Walk Vector is:" << endl
@@ -642,6 +641,64 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
+}
+
+
+/*
+ * Method to enqueue a specific number of steps and then stop
+ *
+ */
+void StepGenerator::takeSteps(const float _x, const float _y, const float _theta,
+                              const int _numSteps){
+
+#ifdef DEBUG_STEPGENERATOR
+    cout << "takeSteps called with (" << _x << "," << _y<<","<<_theta
+         <<") and with nsteps = "<<_numSteps<<endl;
+#endif
+
+    // We have to reevalaute future steps, so we forget about any future plans
+    futureSteps.clear();
+
+    //convert speeds in cm/s and rad/s into steps and clip according to the gait
+    const float new_x =  clip(_x,walkParams->maxXSpeed)
+        *walkParams->stepDuration;
+    const float new_y = clip(_y,walkParams->maxYSpeed)
+        *walkParams->stepDuration;
+    //we only turn every other step, so double the turning!
+    const float new_theta = clip(_theta,walkParams->maxThetaSpeed)
+        *walkParams->stepDuration*2.0f;
+
+    //Ensure that we are currently stopped -- if not, throw warning
+    if(!done){
+        cout<< "Warning!!! Step Command with (" << _x << "," << _y<<","<<_theta
+            <<") and with "<<_numSteps<<" Steps were APPENDED because"
+            "StepGenerator is already active!!" <<endl;
+    }else{
+       //we are starting fresh from a stopped state, so we need to clear all remaining 
+        //steps and zmp values.
+        resetQueues();
+
+        if(new_y < 0.0f || new_theta < 0.0f){
+            cout << "Starting right" <<endl;
+            startRight();
+        }else
+            startLeft();
+
+        //Adding this step is necessary because it was not added in the start left right
+        generateStep(new_x, new_y, new_theta);
+
+        done = false;
+
+    }
+
+
+    for(int i =0; i < _numSteps; i++){
+        generateStep(new_x, new_y, new_theta);
+    }
+
+
+    //skip generating the end step, because it will be generated automatically:
+    x = 0.0f; y =0.0f; theta = 0.0f;
 }
 
 /*  Set up the walking engine for starting with a swinging step on the right */
@@ -795,7 +852,7 @@ void StepGenerator::generateStep( float _x,
                 type = REGULAR_STEP;
                 _x = 0.0f;
                 _y = 0.0f;
-                _theta = 0.0f;
+                 _theta = 0.0f;
             }else{
                 type = REGULAR_STEP;
                 lastQueuedStep->type = REGULAR_STEP;
@@ -805,7 +862,6 @@ void StepGenerator::generateStep( float _x,
             type = REGULAR_STEP;
         }
     }
-
 
     //check  if we need to clip lateral movement of this leg
     if(_y > 0){

@@ -6,4 +6,5 @@ from _motion import (MotionInterface,
                      SetHeadCommand,
                      WalkCommand,
                      FreezeCommand,
-                     UnfreezeCommand)
+                     UnfreezeCommand,
+                     StepCommand)

@@ -36,6 +36,7 @@ using namespace boost::python;
 #include "WalkCommand.h"
 #include "MotionInterface.h"
 #include "Kinematics.h"
+#include "StepCommand.h"
 using namespace Kinematics;
 
 static MotionInterface* interface_reference = 0;
@@ -118,6 +119,24 @@ public:
 
 private:
     WalkCommand *command;
+};
+
+class PyStepCommand {
+public:
+    PyStepCommand(float x_cms, float m_cms, float theta_degs, int numStep) {
+        //All python units should be in CM and DEG per second
+        //C++ is in mm and rads, so we need to convert
+        command =
+            boost::shared_ptr<StepCommand>(new StepCommand(x_cms*CM_TO_MM,
+                                                           m_cms*CM_TO_MM,
+                                                           theta_degs*TO_RAD,
+                                                           numStep));
+    }
+
+    boost::shared_ptr<StepCommand> getCommand() const { return command; }
+
+private:
+    boost::shared_ptr<StepCommand> command;
 };
 
 class PyBodyJointCommand {
@@ -236,7 +255,9 @@ public:
     void setNextWalkCommand(const PyWalkCommand *command) {
         motionInterface->setNextWalkCommand(command->getCommand());
     }
-
+    void sendStepCommand(const PyStepCommand *command) {
+        motionInterface->sendStepCommand(command->getCommand());
+    }
     void setGait(const PyGaitCommand *command) {
         motionInterface->setGait(command->getCommand());
     }
@@ -338,6 +359,13 @@ BOOST_PYTHON_MODULE(_motion)
  "A container for a walk command. Holds an x, y and theta which represents a"
  " walk vector"))
         ;
+    class_<PyStepCommand>("StepCommand",
+                          init<float, float, float, int>(args("x","y","theta",
+                                                              "numSteps"),
+ "A container for a step command. Holds an x, y and theta which represents a"
+ " walk vector, in addition to the number of desired steps."))
+        ;
+
     class_<PyFreezeCommand>("FreezeCommand",
                               init<>("A container for a "
                                    "command to freeze the robot"))
@@ -353,6 +381,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq1)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
+        .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead",&PyMotionInterface::setHead)
         .def("sendFreezeCommand",frz1)

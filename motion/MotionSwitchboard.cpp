@@ -580,3 +580,9 @@ void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<UnfreezeComman
         nullBodyProvider.setCommand(command);
 }
 
+void
+MotionSwitchboard::sendMotionCommand(const shared_ptr<StepCommand> command){
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+}
+
