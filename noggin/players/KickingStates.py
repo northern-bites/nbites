@@ -134,10 +134,11 @@ def kickBallLeft(player):
     Strafe in order to line up to kick the ball to the right
     """
     if player.firstFrame():
+        if player.currentGait != ChaseBallConstants.NORMAL_GAIT:
+            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+            player.currentGait = ChaseBallConstants.NORMAL_GAIT
         player.brain.tracker.trackBall()
-        player.setSpeed(0,1.5,0)
-    elif player.counter == 10:
-        player.stopWalking()
+        player.setSteps(0,3.0,0,1)
     elif player.brain.nav.isStopped():
         return player.goLater('kickBallLeftExecute')
     return player.stay()

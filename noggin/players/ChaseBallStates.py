@@ -142,7 +142,8 @@ def positionForKick(player):
         return player.goLater('scanFindBall')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBall')
-
+    elif transitions.shouldApproachFromPositionOnKick(player):
+        return player.goLater('approachBall')
 
     # Determine approach speed
     targetY = (ball.locRelY -
@@ -208,9 +209,9 @@ def waitBeforeKick(player):
     elif transitions.shouldScanFindBall(player):
         player.brain.tracker.trackBall()
         return player.goLater('scanFindBall')
-#     elif transitions.shouldPositionForKickClose(player):
-#         player.brain.tracker.trackBall()
-#         return player.goLater('positionForKick')
+    elif transitions.shouldRepositionForKick(player):
+        player.brain.tracker.trackBall()
+        return player.goLater('positionForKick')
     else:
         return player.goLater('decideKick')
 
