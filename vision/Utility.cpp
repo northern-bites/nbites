@@ -449,11 +449,11 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
     box.corners[0].x = x1 + static_cast<int>(deltaX - betaX);
     box.corners[0].y = y1 + static_cast<int>(deltaY - betaY);
 
-	box.corners[1].x = x1 - static_cast<int>(deltaX - betaX);
-    box.corners[1].y = y1 - static_cast<int>(deltaY - betaY);
+	box.corners[1].x = x1 + static_cast<int>(-deltaX - betaX);
+    box.corners[1].y = y1 + static_cast<int>(-deltaY - betaY);
 
-    box.corners[2].x = x2 - static_cast<int>(deltaX + betaX);
-    box.corners[2].y = y2 - static_cast<int>(deltaY + betaY);
+    box.corners[2].x = x2 + static_cast<int>(-deltaX + betaX);
+    box.corners[2].y = y2 + static_cast<int>(-deltaY + betaY);
 
     box.corners[3].x = x2 + static_cast<int>(deltaX + betaX);
     box.corners[3].y = y2 + static_cast<int>(deltaY + betaY);

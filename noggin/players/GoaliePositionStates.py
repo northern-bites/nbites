@@ -11,14 +11,10 @@ def goaliePosition(player):
     if helper.shouldChase(player):
         return player.goLater('goalieChase')
     
-    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT and \
-        not player.trackingBall:
-            player.brain.tracker.trackBall()
-            player.trackingBall = True
-    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT \
-        and player.trackingBall:
+    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+        player.brain.tracker.trackBall()
+    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
-        player.trackingBall = False
 
     return player.goLater('goalieAtPosition')
     #for now we don't want the goalie trying to move
@@ -50,14 +46,10 @@ def goalieAtPosition(player):
     if helper.shouldChase(player):
         return player.goLater('goalieChase')
 
-    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT and \
-        not player.trackingBall:
-            player.brain.tracker.trackBall()
-            player.trackingBall = True
-    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT \
-        and player.trackingBall:
+    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+        player.brain.tracker.trackBall()
+    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
-        player.trackingBall = False
 
     return player.stay()
 
@@ -70,9 +62,7 @@ def goalieSave(player):
     else:
         relX = ball.locRelX
         relY = ball.locRelY
-    if not player.trackingBall:
-        player.brain.tracker.trackBall()
-        player.trackingBall = True
+    player.brain.tracker.trackBall()
     # Decide the type of save
     if relY > CENTER_SAVE_THRESH:
         print "Should be saving left"
@@ -129,9 +119,7 @@ def holdCenterSave(player):
 def postSave(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.INITIAL_POS)
-        if not player.trackingBall:
-            player.brain.tracker.trackBall()
-            player.trackingBall = True
+        player.brain.tracker.trackBall()
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.INITIAL_POS):
         roleState = player.getRoleState(player.currentRole)
         return player.goLater(roleState)
