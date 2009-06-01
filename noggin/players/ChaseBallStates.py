@@ -258,6 +258,12 @@ def avoidObstacle(player):
         return player.goLater("chase")
     return player.stay()
 
+def orbitBall(player):
+    """
+    Method to spin around the ball before kicking
+    """
+    pass
+
 def steps(player):
     if player.brain.nav.isStopped():
         player.setSteps(3,3,0,5)
