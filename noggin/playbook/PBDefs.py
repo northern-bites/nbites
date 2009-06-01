@@ -32,9 +32,6 @@ class Teammate:
         self.brain = tbrain # brain instance
         self.role = 0 # known role
         self.active = True
-        self.grabbing = False # dog is grabbing
-        self.dribbling = False # dog is dribbling
-        self.kicking = False # dog is kicking[
         self.chaseTime = 0 # estimated time to chase the ball
         self.bearingToGoal = 0 # bearing to goal
 
@@ -44,7 +41,7 @@ class Teammate:
         have already been verified by timestamp system, so we can assume
         they are LEGIT.
         '''
-        
+
         # stores packet information locally
         self.x = packet.playerX
         self.y = packet.playerY
@@ -70,20 +67,17 @@ class Teammate:
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
-        
-        self.grabbing = (packet.ballDist <= 
-                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
-        self.dribbling = (packet.ballDist <= 
-                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.kicking = False
-        #(packet.ballDist == 
+        #(packet.ballDist ==
         #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
         self.lastPacketTime = self.brain.playbook.getTime()
 
 
     def updateMe(self):
-        '''updates my information as a teammate (since we don't get our own 
-        packets)'''
+        '''
+        updates my information as a teammate (since we don't get our own
+        packets)
+        '''
         self.x = self.brain.my.x
         self.y = self.brain.my.y
         self.h = self.brain.my.h
@@ -99,12 +93,6 @@ class Teammate:
         self.ballLocBearing = self.brain.ball.locBearing
         self.active = not self.brain.gameController.currentState =='gamePenalized'
         self.lastPacketTime = self.brain.playbook.getTime()
-        self.grabbing = (self.ballDist == 
-                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
-        self.dribbling = (self.ballDist == 
-                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
-        #self.kicking = (self.ballDist == 
-        #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
 
     def getBearingToGoal(self):
         '''returns bearing to goal'''
@@ -119,22 +107,22 @@ class Teammate:
         '''
         return hypot(self.brain.ball.x - self.x,
                      self.brain.ball.y - self.y)
-    
+
     def getBearingToBall(self):
         '''
-        returns teammate bearing to the ball in degrees. 
+        returns teammate bearing to the ball in degrees.
         -based on its own localization but my own ball estimates
         -return values is between -180,180
         '''
         return self.getOthersRelativeBearing(self.x, self.y, self.h,
                                                    self.brain.ball.x,
                                                    self.brain.ball.y)
-    
+
     def getOthersRelativeBearing(self,playerX,playerY,playerH,x,y):
         '''get another player's bearing to a point (x,y)'''
         return MyMath.sub180Angle(playerH - (degrees(MyMath.safe_atan2(y - playerY,
             x - playerX)) - 90.0))
-           
+
     def reset(self):
         '''Reset all important Teammate variables'''
         #self.playerNumber = 0 # doesn't reset player number
@@ -151,14 +139,11 @@ class Teammate:
         self.ballDist = 0
         self.ballLocDist = 0
         self.ballLocBearing = 0
-        self.grabbing = False
-        self.kicking = False
-        self.dribbling = False
         self.role = 0 # known role
         self.inactive = True # dead basically just means inactive
-    
+
     def isChaser(self):
-        return (self.calledSubRole == PBConstants.CHASE_NORMAL or 
+        return (self.calledSubRole == PBConstants.CHASE_NORMAL or
             self.calledSubRole == PBConstants.CHASE_AROUND_BOX)
 
     def isDefender(self):
@@ -192,12 +177,6 @@ class Teammate:
         '''
         return (PBConstants.PACKET_DEAD_PERIOD <
                     self.brain.playbook.getTime() - self.lastPacketTime)
-
-    def hasBall(self):
-        '''
-        returns true if we have the ball
-        '''
-        return (self.grabbing or self.dribbling or self.kicking)
 
     def __str__(self):
         return "I am player number " + self.playerNumber
