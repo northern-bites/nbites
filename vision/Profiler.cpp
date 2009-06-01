@@ -7,46 +7,60 @@
 
 static const char *PCOMPONENT_NAMES[] = {
   "GetImage",
+  "Vision",
   "Transform",
+  "ThreshRuns",
   "Threshold",
   "FGHorizon",
   "Runs",
-  "ThreshRuns",
   "Object",
   "Lines",
-  "Vision",
+  "Python",
+  "PyUpdate",
+  "PyRun",
+  "Switchboard",
+  "Scripted Provider CalcJS",
+  "ChoppedCommand",
+  "Walk Provider CalcJS",
+  "tick_legs()",
+  "Head Provider CalcJS",
+  "Enactor",
+  "Localization",
+  "MCL",
   "Logging",
   "AiboConnect",
   "TOOLConnect",
-  "PyUpdate",
-  "Localization",
-  "MCL",
-  "PyRun",
-  "Python",
   "Final"
 };
 
 // Map from subcomponent (index) to meta-component (value) for calculating
 // summary percentages.  Mapping to self means no parent.
 static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
-  /*P_GETIMAGE    --> */ P_GETIMAGE,
-  /*P_TRANSFORM   --> */ P_VISION,
-  /*P_THRESHOLD   --> */ P_THRESHRUNS,
-  /*P_FGHORIZON   --> */ P_THRESHRUNS,
-  /*P_RUNS        --> */ P_THRESHRUNS,
-  /*P_THRESHRUNS  --> */ P_VISION,
-  /*P_OBJECT      --> */ P_VISION,
-  /*P_LINES       --> */ P_VISION,
-  /*P_VISION      --> */ P_FINAL,
-  /*P_LOGGING     --> */ P_FINAL,
-  /*P_AIBOCONNECT --> */ P_FINAL,
-  /*P_TOOLCONNECT --> */ P_FINAL,
-  /*P_PYUPDATE    --> */ P_PYTHON,
-  /*P_LOC         --> */ P_FINAL,
-  /*P_MCL         --> */ P_LOC,
-  /*P_PYRUN       --> */ P_PYTHON,
-  /*P_PYTHON      --> */ P_FINAL,
-  /*P_FINAL       --> */ P_FINAL
+	/*P_GETIMAGE    --> */ P_GETIMAGE,
+	/*P_VISION      --> */ P_FINAL,
+	/*P_TRANSFORM   --> */ P_VISION,
+	/*P_THRESHRUNS  --> */ P_VISION,
+	/*P_THRESHOLD   --> */ P_THRESHRUNS,
+	/*P_FGHORIZON   --> */ P_THRESHRUNS,
+	/*P_RUNS        --> */ P_THRESHRUNS,
+	/*P_OBJECT      --> */ P_VISION,
+	/*P_LINES       --> */ P_VISION,
+	/*P_PYTHON      --> */ P_FINAL,
+	/*P_PYUPDATE    --> */ P_PYTHON,
+	/*P_PYRUN       --> */ P_PYTHON,
+	/*P_SWITCHBOARD --> */ P_SWITCHBOARD,
+	/*P_SCRIPTED    --> */ P_SWITCHBOARD,
+	/*P_CHOPPED     --> */ P_SCRIPTED,
+	/*P_WALK        --> */ P_SWITCHBOARD,
+	/*P_TICKLEGS    --> */ P_WALK,
+	/*P_HEAD        --> */ P_SWITCHBOARD,
+	/*P_ENACTOR     --> */ P_SWITCHBOARD,
+	/*P_LOC         --> */ P_FINAL,
+	/*P_MCL         --> */ P_LOC,
+	/*P_LOGGING     --> */ P_FINAL,
+	/*P_AIBOCONNECT --> */ P_FINAL,
+	/*P_TOOLCONNECT --> */ P_FINAL,
+	/*P_FINAL       --> */ P_FINAL
 };
 
 
@@ -172,8 +186,10 @@ Profiler::printSummary ()
   int length, max_length = 0;
   int comp;
   for (int i = 0; i < NUM_PCOMPONENTS; i++) {
+
     depths[i] = 0;
     comp = i;
+	//comp = PCOMPONENT_SUB_ORDER[i];
     while (comp != PCOMPONENT_SUB_ORDER[comp]) {
       depths[i]++;
       comp = PCOMPONENT_SUB_ORDER[comp];

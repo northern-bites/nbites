@@ -47,6 +47,7 @@
 #include "NullBodyProvider.h"
 #include "Sensors.h"
 #include "MotionConstants.h"
+#include "Profiler.h"
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
@@ -61,7 +62,8 @@
 
 class MotionSwitchboard {
 public:
-    MotionSwitchboard(boost::shared_ptr<Sensors> s);
+    MotionSwitchboard(boost::shared_ptr<Sensors> s,
+					  boost::shared_ptr<Profiler> p);
     ~MotionSwitchboard();
 
     void start();
@@ -112,6 +114,7 @@ private:
 
 private:
     boost::shared_ptr<Sensors> sensors;
+	boost::shared_ptr<Profiler> profiler;
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;

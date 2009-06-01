@@ -33,7 +33,7 @@ OPTION(
   OFF
   )
 OPTION(
-  USE_PROFILER_AUTO_HALT
+  USE_PROFILER_AUTO_PRINT
   "Turn on/off automatic profiling summary printing"
   ON
   )

@@ -25,8 +25,8 @@ namespace NBMath {
 
 #ifdef __APPLE__
     inline static void sincosf(float _x, float * _sinx, float * _cosx) {
-        *_sinx = static_cast<float>(sin(_x));
-        *_cosx = static_cast<float>(cos(_x));
+        *_sinx = std::sin(_x);
+		*_cosx = std::cos(_x);
     }
 #endif
 

@@ -19,13 +19,15 @@ const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
  1.57f,0.0f,1.13f,1.01f};
 
 
-MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s)
+MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
+									 shared_ptr<Profiler> p)
     : sensors(s),
-      walkProvider(sensors),
-	  scriptedProvider(1/50.0f,sensors), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
-	  headProvider(1/50.0f,sensors),
-      nullHeadProvider(sensors),
-      nullBodyProvider(sensors),
+	  profiler(p),
+      walkProvider(sensors,p),
+	  scriptedProvider(1/50.0f,sensors,p), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
+	  headProvider(1/50.0f,sensors,p),
+      nullHeadProvider(sensors, p),
+      nullBodyProvider(sensors, p),
 	  curProvider(&nullBodyProvider),
 	  nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
@@ -123,12 +125,14 @@ void MotionSwitchboard::run() {
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
     while(running) {
+		PROF_ENTER(profiler, P_SWITCHBOARD);
         realityCheckJoints();
 
         preProcess();
         processJoints();
         processStiffness();
         bool active  = postProcess();
+		PROF_EXIT(profiler, P_SWITCHBOARD);
 
 #ifdef DEBUG_JOINTS_OUTPUT
         if(active)
@@ -140,7 +144,6 @@ void MotionSwitchboard::run() {
         pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
         pthread_mutex_unlock(&calc_new_joints_mutex);
         fcount++;
-
     }
     cout << "Switchboard run has exited" <<endl;
 }

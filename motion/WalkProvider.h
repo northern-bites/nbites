@@ -48,11 +48,15 @@
 #include "BodyJointCommand.h"
 #include "StepCommand.h"
 
+#include "Profiler.h"
+
+
 //NOTE: we need to get passed a reference to the switchboard so we can
 //know the length of a motion frame!!
 class WalkProvider : public MotionProvider {
 public:
-    WalkProvider(boost::shared_ptr<Sensors> s);
+    WalkProvider(boost::shared_ptr<Sensors> s,
+				 boost::shared_ptr<Profiler> p);
     virtual ~WalkProvider();
 
     void requestStopFirstInstance();
