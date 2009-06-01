@@ -31,7 +31,7 @@ const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
                 MotionInterface * _minterface)
-    : comm(c),gc(c->getGC()),
+    : profiler(p), comm(c),gc(c->getGC()),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -250,6 +250,7 @@ void Noggin::runStep ()
     updateLocalization();
     PROF_EXIT(profiler, P_LOC);
 #endif //RUN_LOCALIZATION
+
 
     // Call main run() method of Brain
     PROF_ENTER(profiler, P_PYRUN);
