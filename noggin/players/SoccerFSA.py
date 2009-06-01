@@ -74,7 +74,23 @@ class SoccerFSA(FSA.FSA):
             if self.brain.nav.setWalk(x,y,theta):
                 self.brain.nav.switchTo('walking')
             else:
-                if False: self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) + " is ignored")
+                if False:
+                    self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) +
+                                " is ignored")
+
+    def setSteps(self, x, y, theta, numSteps=1):
+        """
+        Have the robot walk a specified number of steps
+        """
+        if self.brain.motion.isWalkActive():
+            return False
+        else:
+            self.brain.nav.stepX = x
+            self.brain.nav.stepY = y
+            self.brain.nav.stepTheta = theta
+            self.brain.nav.numSteps = numSteps
+            self.brain.nav.switchTo("stepping")
+            return True
 
     def standup(self):
         if self.brain.motion.isWalkActive():

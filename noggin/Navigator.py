@@ -31,15 +31,23 @@ class Navigator(FSA.FSA):
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
 
+        # Goto controls
         self.lastDestX = 0
         self.lastDestY = 0
         self.lastDestH = 0
         self.destX= 0
         self.destY= 0
         self.destH = 0
+
+        # Walk controls
         self.walkX = 0
         self.walkY = 0
         self.walkTheta = 0
+
+        # Step controls
+        self.stepX = 0
+        self.stepY = 0
+        self.stepTheta = 0
 
     def goTo(self,x,y,h=None):
         self.destH = h
@@ -75,6 +83,23 @@ class Navigator(FSA.FSA):
         walk = motion.WalkCommand(x=x,y=y,theta=theta)
         self.brain.motion.setNextWalkCommand(walk)
 
+    def setSteps(self, x, y, theta, numSteps):
+        """
+        Set the step commands
+        """
+        self.stepX = x
+        self.stepY = y
+        self.stepTheta = theta
+        self.numSteps = numSteps
+
+    def step(self,x,y,theta,numSteps):
+        """
+        Wrapper method to easily change the walk vector of the robot
+        """
+        steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
+        self.brain.motion.sendStepCommand(steps)
+
+
     def atDestination(self):
         """
         Returns true if we are at an (x, y) close enough to the one we want
@@ -95,7 +120,6 @@ class Navigator(FSA.FSA):
         return abs(hDiff) < CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
 
-
     def notAtHeading(self, targetHeading= None):
         if targetHeading is None:
             targetHeading = self.destH
@@ -103,7 +127,6 @@ class Navigator(FSA.FSA):
         #self.printf("H diff is " + str(hDiff))
         return abs(hDiff) > ALMOST_CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
-
 
     def getRotScale(self, headingDiff):
         absHDiff = abs(headingDiff)
@@ -113,7 +136,6 @@ class Navigator(FSA.FSA):
             return HEADING_MEDIUM_SCALE
         else:
             return HEADING_FAR_SCALE
-
 
     def isStopped(self):
         return self.currentState == 'stopped'
