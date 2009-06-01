@@ -5,8 +5,9 @@
 
 class NullHeadProvider : public NullProvider {
 public:
-    NullHeadProvider(boost::shared_ptr<Sensors> s) :
-        NullProvider(s, MotionConstants::null_head_mask){}
+    NullHeadProvider(boost::shared_ptr<Sensors> s,
+					 boost::shared_ptr<Profiler> p) :
+        NullProvider(s, p, MotionConstants::null_head_mask){}
     ~NullHeadProvider() {};
 };
 

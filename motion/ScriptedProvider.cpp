@@ -26,12 +26,13 @@ using namespace Kinematics;
 using boost::shared_ptr;
 
 ScriptedProvider::ScriptedProvider(float motionFrameLength,
-        shared_ptr<Sensors> s)
-  : MotionProvider(SCRIPTED_PROVIDER),
-    sensors(s),
-    FRAME_LENGTH_S(motionFrameLength),
-    chopper(sensors, FRAME_LENGTH_S),
-	// INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
+								   shared_ptr<Sensors> s,
+								   shared_ptr<Profiler> p)
+	: MotionProvider(SCRIPTED_PROVIDER,p),
+	  sensors(s),
+	  FRAME_LENGTH_S(motionFrameLength),
+	  chopper(sensors, FRAME_LENGTH_S),
+	  // INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
 	currCommand(new ChoppedCommand()),
     bodyCommandQueue()
 
@@ -93,6 +94,7 @@ bool ScriptedProvider::commandQueueEmpty(){
 }
 
 void ScriptedProvider::calculateNextJointsAndStiffnesses() {
+	PROF_ENTER(profiler,P_SCRIPTED);
 	pthread_mutex_lock(&scripted_mutex);
 	if (currCommandEmpty())
 		setNextBodyCommand();
@@ -108,7 +110,6 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
 			setNextChainJoints( cid,
 								currentChains->at(cid) );
 		}else{
-
 			setNextChainJoints( cid,
 								currCommand->getNextJoints(cid) );
 		}
@@ -120,6 +121,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
 
     setActive();
 	pthread_mutex_unlock(&scripted_mutex);
+	PROF_EXIT(profiler,P_SCRIPTED);
 }
 
 /*
@@ -155,8 +157,9 @@ void ScriptedProvider::setNextBodyCommand() {
 
 		// Replace the current command and delete the
 		// next command object
+		PROF_ENTER(profiler, P_CHOPPED);
 		currCommand = chopper.chopCommand(nextCommand);
-
+		PROF_EXIT(profiler, P_CHOPPED);
 	}
 }
 

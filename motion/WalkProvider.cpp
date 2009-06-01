@@ -27,8 +27,9 @@ using namespace std;
 
 using namespace Kinematics;
 
-WalkProvider::WalkProvider(shared_ptr<Sensors> s)
-    : MotionProvider(WALK_PROVIDER),
+WalkProvider::WalkProvider(shared_ptr<Sensors> s,
+						   shared_ptr<Profiler> p)
+    : MotionProvider(WALK_PROVIDER, p),
       sensors(s),
       curGait(NULL),nextGait(NULL),
       stepGenerator(sensors),
@@ -63,6 +64,7 @@ void WalkProvider::hardReset(){
 }
 
 void WalkProvider::calculateNextJointsAndStiffnesses() {
+	PROF_ENTER(profiler,P_WALK);
     pthread_mutex_lock(&walk_provider_mutex);
     if ( nextGait != curGait){
         if( stepGenerator.resetGait(nextGait)){
@@ -98,7 +100,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     stepGenerator.tick_controller();
 
     // Now ask the step generator to get the leg angles
+	PROF_ENTER(profiler,P_TICKLEGS);
     WalkLegsTuple legs_result = stepGenerator.tick_legs();
+	PROF_EXIT(profiler,P_TICKLEGS);
 
     //Get the joints and stiffnesses for each Leg
     vector<float> lleg_joints = legs_result.get<LEFT_FOOT>().get<JOINT_INDEX>();
@@ -126,6 +130,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
+	PROF_EXIT(profiler,P_WALK);
 }
 
 void WalkProvider::setCommand(const WalkCommand * command){
