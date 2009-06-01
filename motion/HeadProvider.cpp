@@ -86,7 +86,7 @@ void HeadProvider::hardReset(){
 
 //Method called during the 'SCRIPTED' mode
 void HeadProvider::calculateNextJointsAndStiffnesses() {
-
+	PROF_ENTER(profiler,P_HEAD);
     switch(curMode){
     case SCRIPTED:
         pthread_mutex_lock(&scripted_mode_mutex);
@@ -102,6 +102,7 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     }
 
     setActive();
+	PROF_EXIT(profiler,P_HEAD);
 }
 
 //Method called during the 'SET' Mode

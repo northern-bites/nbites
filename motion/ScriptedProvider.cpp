@@ -110,7 +110,6 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
 			setNextChainJoints( cid,
 								currentChains->at(cid) );
 		}else{
-
 			setNextChainJoints( cid,
 								currCommand->getNextJoints(cid) );
 		}
@@ -158,8 +157,9 @@ void ScriptedProvider::setNextBodyCommand() {
 
 		// Replace the current command and delete the
 		// next command object
+		PROF_ENTER(profiler, P_CHOPPED);
 		currCommand = chopper.chopCommand(nextCommand);
-
+		PROF_EXIT(profiler, P_CHOPPED);
 	}
 }
 

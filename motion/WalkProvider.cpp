@@ -90,7 +90,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     stepGenerator.tick_controller();
 
     // Now ask the step generator to get the leg angles
+	PROF_ENTER(profiler,P_TICKLEGS);
     WalkLegsTuple legs_result = stepGenerator.tick_legs();
+	PROF_EXIT(profiler,P_TICKLEGS);
 
     //Get the joints and stiffnesses for each Leg
     vector<float> lleg_joints = legs_result.get<LEFT_FOOT>().get<JOINT_INDEX>();

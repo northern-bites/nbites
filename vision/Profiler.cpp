@@ -19,9 +19,12 @@ static const char *PCOMPONENT_NAMES[] = {
   "PyUpdate",
   "PyRun",
   "Switchboard",
-  "Scripted Provider",
-  "Walk Provider",
-  "Head Provider",
+  "Scripted Provider CalcJS",
+  "ChoppedCommand",
+  "Walk Provider CalcJS",
+  "tick_legs()",
+  "Head Provider CalcJS",
+  "Enactor",
   "Localization",
   "MCL",
   "Logging",
@@ -45,10 +48,13 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 	/*P_PYTHON      --> */ P_FINAL,
 	/*P_PYUPDATE    --> */ P_PYTHON,
 	/*P_PYRUN       --> */ P_PYTHON,
-	/*P_SWITCHBOARD --> */ P_FINAL,
+	/*P_SWITCHBOARD --> */ P_SWITCHBOARD,
 	/*P_SCRIPTED    --> */ P_SWITCHBOARD,
+	/*P_CHOPPED     --> */ P_SCRIPTED,
 	/*P_WALK        --> */ P_SWITCHBOARD,
+	/*P_TICKLEGS    --> */ P_WALK,
 	/*P_HEAD        --> */ P_SWITCHBOARD,
+	/*P_ENACTOR     --> */ P_SWITCHBOARD,
 	/*P_LOC         --> */ P_FINAL,
 	/*P_MCL         --> */ P_LOC,
 	/*P_LOGGING     --> */ P_FINAL,
@@ -180,9 +186,10 @@ Profiler::printSummary ()
   int length, max_length = 0;
   int comp;
   for (int i = 0; i < NUM_PCOMPONENTS; i++) {
+
     depths[i] = 0;
-//    comp = i;
-	comp = PCOMPONENT_SUB_ORDER[i];
+    comp = i;
+	//comp = PCOMPONENT_SUB_ORDER[i];
     while (comp != PCOMPONENT_SUB_ORDER[comp]) {
       depths[i]++;
       comp = PCOMPONENT_SUB_ORDER[comp];
