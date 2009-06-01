@@ -55,8 +55,8 @@ Man::Man (shared_ptr<Sensors> _sensors,
 {
     // initialize system helper modules
     profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
-	profiler->profiling = true;
-	profiler->profileFrames(200);
+	//profiler->profiling = true;
+	//profiler->profileFrames(60);
 
     // give python a pointer to the sensors structure. Method defined in
     // Sensors.h
