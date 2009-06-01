@@ -44,6 +44,12 @@ SET_POS = INITIAL_POS
 
 READY_POS = INITIAL_POS
 
+#same as INITIAL_POS, except for time ot get to pos
+GOALIE_POS = (((80.,40.,-50.,-70.),
+                (0.,0.,-50.,100.,-50.,0.),
+                (0.,0.,-50.,100.,-50.,0.),
+                (80.,-40.,50.,70.),1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+
 #KICKS
 
 STAND_FOR_KICK_LEFT = (
@@ -308,37 +314,33 @@ RIGHT_SIDE_KICK = (
      (80.0 , -70.0 , 10.0 , 10.0), 0.8 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES) )
 
 # Goalie saving stuff
-SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0),
-                          (INITIAL_POS[0][1]),
-                          (INITIAL_POS[0][2]),
-                          (INITIAL_POS[0][3]), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_LEFT_DEBUG = ( ((-90,0,0,0),
-                     (INITIAL_POS[0][1]),
-                     (INITIAL_POS[0][2]),
-                     (INITIAL_POS[0][3]), 1.5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                     (GOALIE_POS[0][1]),
+                     (GOALIE_POS[0][2]),
+                     (GOALIE_POS[0][3]), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
-SAVE_RIGHT_DEBUG = ( ((INITIAL_POS[0][0]),
-                      (INITIAL_POS[0][1]),
-                      (INITIAL_POS[0][2]),
-                      (-90,0,0,0), 1.5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+SAVE_RIGHT_DEBUG = ( ((GOALIE_POS[0][0]),
+                      (GOALIE_POS[0][1]),
+                      (GOALIE_POS[0][2]),
+                      (-90,0,0,0), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_CENTER_DEBUG = ( ((-90,0,0,0),
-                       (INITIAL_POS[0][1]),
-                       (INITIAL_POS[0][2]),
-                       (-90,0,0,0), 1.5,0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                       (GOALIE_POS[0][1]),
+                       (GOALIE_POS[0][2]),
+                       (-90,0,0,0), .5,0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
-SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
-                            (),
-                            (),
-                            (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES))
+SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0),
+                         (GOALIE_POS[0][1]),
+                         (GOALIE_POS[0][2]),
+                         (GOALIE_POS[0][3]), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
-SAVE_RIGHT_HOLD_DEBUG = ( ((INITIAL_POS[0][0]),
-                           (INITIAL_POS[0][1]),
-                           (INITIAL_POS[0][2]),
+SAVE_RIGHT_HOLD_DEBUG = ( ((GOALIE_POS[0][0]),
+                           (GOALIE_POS[0][1]),
+                           (GOALIE_POS[0][2]),
                            (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
-                            (INITIAL_POS[0][1]),
-                            (INITIAL_POS[0][2]),
+                            (GOALIE_POS[0][1]),
+                            (GOALIE_POS[0][2]),
                             (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
