@@ -38,3 +38,10 @@ OPTION(
   ON
   )
 
+# Options pertaining to running the vision code OFFLINE
+OPTION( OFFLINE
+    "Debug flag for vision when we are running offline"
+    OFF
+    )
+
+

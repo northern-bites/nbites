@@ -27,6 +27,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include  "visionconfig.h"
 // including info header files
 #include "Common.h"
 #include "VisionDef.h"

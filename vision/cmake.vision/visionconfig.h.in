@@ -18,6 +18,12 @@
 #  undef  USE_PYVISION_FAKE_BACKEND
 #endif
 
+#define OFFLINE_${OFFLINE}
+#ifdef OFFLINE_ON
+#  define OFFLINE
+#else
+#  undef OFFLINE
+#endif
 
 #endif // !_visionconfig_h_DEFINED
 

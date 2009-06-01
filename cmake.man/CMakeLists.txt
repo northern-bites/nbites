@@ -112,11 +112,6 @@ CONFIGURE_FILE(
 
 
 ############################ OFFLINE
-# Options pertaining to running the code on the simulator  (OFFLINE)
-OPTION( OFFLINE
-    "Set the code to run with the simulator"
-    OFF
-    )
 
 SET( OFFLINE_NAOQI_PATH
   $ENV{AL_DIR}
