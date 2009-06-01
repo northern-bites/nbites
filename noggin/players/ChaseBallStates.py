@@ -256,3 +256,10 @@ def avoidObstacle(player):
     else:
         return player.goLater("chase")
     return player.stay()
+
+def steps(player):
+    if player.brain.nav.isStopped():
+        player.setSteps(3,3,0,5)
+    elif player.brain.nav.currentState != "stepping":
+        player.stopWalking()
+    return player.stay()

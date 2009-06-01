@@ -159,7 +159,7 @@ def stepping(nav):
     """
     if nav.firstFrame():
         nav.step(nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
-    elif not nav.brain.isWalkActive():
+    elif not nav.brain.motion.isWalkActive():
         return nav.goLater("stopped")
     return nav.stay()
 
