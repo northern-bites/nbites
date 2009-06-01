@@ -36,6 +36,131 @@
 #include <vector>
 using namespace std;
 
+
+// EK - inserted constants from .h class
+
+//here are defined the lower bounds on the sizes of goals, posts, and balls
+//IMPORTANT: they are only guesses right now.
+
+#define MIN_GOAL_HEIGHT	25
+#define MIN_GOAL_WIDTH  5
+
+// ID information on goal post constant
+static const int NOPOST = 0;   // don't know which
+static const int RIGHT = 1;
+static const int LEFT = 2;
+static const int USEBIG = 3;
+static const int BACKSTOP = 4;
+static const int MAX_NUM_BALL_RUNS = 500; //never use this!
+static const int BALL_RUNS_MALLOC_SIZE = 10000;
+
+
+// Comparison of spatial relationships of two blobs
+static const int OUTSIDE = 0;      // one is outside the other
+static const int TIGHT = 1;        // they are basically the same blob
+// the small one is way on the left side of the big one
+static const int CLOSELEFT = 2;
+// the small one is way on the right side of the big one
+static const int CLOSERIGHT = 3;
+// the small one is sort of in the middle of the big one
+static const int MURKY = 4;
+
+static const int BIGGAP = 80;
+static const int SIMILARSIZE = 5;
+
+// Relative size of posts
+static const int LARGE = 2;
+static const int MEDIUM = 1;
+static const int SMALL = 0;
+
+// Am I looking at a post or a beacon?
+//static const int BEACON = 0;
+static const int POST = 1;
+
+// Universal bad value used to id whether or not we successfully did something
+static const int BADVALUE = -100;
+
+
+// actually just skips 2 pixel noise in runs
+static const int NOISE_SKIP = 3;
+// minimum distance between goal and post - changed from 50 to 40 JS
+static const int MIN_SPLIT = 40;
+// Amount of post that has to match (so backstop isn't counted in posts)
+static const float PERCENTMATCH = 0.65f;
+// threshold for expanding sides back out
+static const float HALFISH = 0.49f;
+// highest ratio of width over height for posts
+static const float GOODRAT = 0.75f;
+// indicator that post may be salvagable
+static const float SQUATRAT = 1.2f;
+// EXAMINED: lowered
+// goal posts of the same color have to be this far apart
+static const int MIN_POST_SEPARATION = 7;
+// how big a post is to be declared a big post
+// EXAMINED: change this
+static const int BIGPOST = 25;
+static const float NORMALPOST = 0.6f;
+static const float QUESTIONABLEPOST = 0.85f;
+
+// Ball constants
+// EXAMINED: look at this switch - SMALLBALLDIM
+static const int SMALLBALLDIM = 4; // below this size balls are considered small
+static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
+// ratio of width/height worse than this is a very bad sign
+static const float BALLTOOFAT = 1.5f;
+// ditto
+static const float BALLTOOTHIN = 0.75f;
+// however, if the ball is occluded we can go thinner
+static const float OCCLUDEDTHIN = 0.2f;
+// or fatter
+static const float OCCLUDEDFAT = 4.0f;
+static const float MIDFAT = 3.0f;
+static const float MIDTHIN = 0.3f;
+// at least this much of the blob should be orange normally
+static const float MINORANGEPERCENT = 0.59f;
+static const float MINGOODBALL = 0.5f;
+static const float MAXGOODBALL = 3.0f;
+static const int BIGAREA = 400;
+static const int BIGGERAREA = 600;
+static const float FATBALL = 2.0f;
+static const float THINBALL = 0.5f;
+
+static const int DIST_POINT_FUDGE = 5;
+
+#ifdef OFFLINE
+static const int BALLDISTDEBUGN = 59;
+static const int PRINTOBJSN = 50;
+static const int POSTDEBUGN = 52;
+static const int POSTLOGICN = 51;
+static const int TOPFINDN = 55;
+static const int BALLDEBUGN = 54;
+static const int CORNERDEBUGN = 56;
+static const int BACKDEBUGN = 57;
+static const int SANITYN = 58;
+static const int DEBUGCIRCLEFITN = 60;
+static const int DEBUGBALLPOINTSN = 61;
+static const int CORRECTN = 63;
+static const int OPENFIELDN = 64;
+#else
+static const bool BALLDISTDEBUG = false;
+static const bool PRINTOBJS = false;
+static const bool POSTDEBUG = false;
+static const bool POSTLOGIC = false;
+static const bool TOPFIND = false;
+static const bool BALLDEBUG = false;
+static const bool CORNERDEBUG = false;
+static const bool BACKDEBUG = false;
+static const bool SANITY = false;
+static const bool DEBUGCIRCLEFIT = false;
+static const bool DEBUGBALLPOINTS = false;
+static const bool CORRECT = false;
+static const bool OPENFIELD = false;
+#endif
+
+//previous constants inserted from .h class
+
+
+
 ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
     : vision(vis), thresh(thr), color(_color), runsize(1)
 {
@@ -66,7 +191,7 @@ void ObjectFragments::init(float s)
     slope = s;
     biggestRun = 0;
     maxHeight = IMAGE_HEIGHT;
-    maxOfBiggestRun = 0;
+    maxOfBiggestRun = 0L;
     numberOfRuns = 0;
     indexOfBiggestRun = 0;
     numBlobs = 0;
@@ -121,24 +246,28 @@ void ObjectFragments::init(float s)
  */
 void ObjectFragments::setColor(int c)
 {
+    const int runNumInit = 3;
+    const int numWidthMult = 15;
+    const int sizeWidthMult = 5;
+
     runsize = 1;
-    int run_num = 3;
+    int run_num = runNumInit;
     color = c;
     // depending on the color we have more or fewer runs available
     switch (color) {
     case YELLOW:
     case BLUE:
-        run_num = IMAGE_WIDTH * 15;
-        runsize = IMAGE_WIDTH * 5;
+        run_num = IMAGE_WIDTH * numWidthMult;
+        runsize = IMAGE_WIDTH * sizeWidthMult;
         break;
     case RED:
     case NAVY:
-        run_num = IMAGE_WIDTH * 15;
-        runsize = IMAGE_WIDTH * 5;
+        run_num = IMAGE_WIDTH * numWidthMult;
+        runsize = IMAGE_WIDTH * sizeWidthMult;
         break;
     case ORANGE:
         runsize = BALL_RUNS_MALLOC_SIZE; //max number of runs
-        run_num = runsize * 3;
+        run_num = runsize * runNumInit;
         break;
     }
     runs = (run*)malloc(sizeof(run) * run_num);
@@ -150,22 +279,26 @@ void ObjectFragments::setColor(int c)
 
 void ObjectFragments::allocateColorRuns()
 {
-    int run_num = 3;
+	const int runNumInit = 3;
+	const int numWidthMult = 15;
+    const int sizeWidthMult = 5;
+
+    int run_num = runNumInit;
     // depending on the color we have more or fewer runs available
     switch (color) {
     case YELLOW:
     case BLUE:
-        run_num = IMAGE_WIDTH * 15;
-        runsize = IMAGE_WIDTH * 5;
+        run_num = IMAGE_WIDTH * numWidthMult;
+        runsize = IMAGE_WIDTH * sizeWidthMult;
         break;
     case RED:
     case NAVY:
-        run_num = IMAGE_WIDTH * 15;
-        runsize = IMAGE_WIDTH * 5;
+        run_num = IMAGE_WIDTH * numWidthMult;
+        runsize = IMAGE_WIDTH * sizeWidthMult;
         break;
     case ORANGE:
         runsize = BALL_RUNS_MALLOC_SIZE; //max number of runs
-        run_num = runsize * 3;
+        run_num = runsize * runNumInit;
         break;
     }
     runs = (run*)malloc(sizeof(run) * run_num);
@@ -191,10 +324,13 @@ void ObjectFragments::allocateColorRuns()
 */
 void ObjectFragments::blobIt(int x, int y, int h)
 {
+    const int contigVal = 4;
+    const int blobMin = 20;
+
     // start out deciding to make a new blob
     // the loop will decide not to run it
     bool newBlob = true;
-    int contig = 4;
+    int contig = contigVal;
 
     //cout << x << " " << y << " " << h << endl;
     // sanity check: too many blobs on screen
@@ -205,8 +341,8 @@ void ObjectFragments::blobIt(int x, int y, int h)
         numBlobs = 0;
         numberOfRuns = 0;
         return;
-    } else if (numBlobs > 20) {
-        contig = 4;
+    } else if (numBlobs > blobMin) {
+        contig = contigVal;
     }
 
     // is this run contiguous with any previous blob?
@@ -394,6 +530,8 @@ void ObjectFragments::mergeBlobs(int first, int second)
 */
 void ObjectFragments::newRun(int x, int y, int h)
 {
+    const int newRunMult = 3;
+
     if (numberOfRuns < runsize) {
         int last = numberOfRuns - 1;
         // skip over noise --- jumps over two pixel noise currently.
@@ -413,7 +551,7 @@ void ObjectFragments::newRun(int x, int y, int h)
         if (h > biggestRun) { // tracking largest run
             biggestRun = h;
             maxOfBiggestRun = y;
-            indexOfBiggestRun = numberOfRuns * 3;
+            indexOfBiggestRun = numberOfRuns * newRunMult;
         }
         if (y < maxHeight) { // we're counting backwards
             maxHeight = y;
@@ -436,16 +574,23 @@ void ObjectFragments::newRun(int x, int y, int h)
    blobs to be "connected."  We're trying to take advantage of the properties of the robots -
    namely that they stand vertically normally.
  */
+ 
+ 
 void ObjectFragments::robot(int bigGreen)
 {
-    int lastrunx = -30, lastruny = 0, lastrunh = 0;
+    const int lastRunXInit = -30;
+    const int resConst = 20;
+    const int blobWidthMin = 5;
+    const int robotBlobMin = 10;
+
+    int lastrunx = lastRunXInit, lastruny = 0, lastrunh = 0;
 
     // loop through all of the runs of this color
     // NOTE: "20" is a guess at something that should be a constant
     // and with the change in resolution, this ought to be changed
     for (int i = 0; i < numberOfRuns; i++) {
         //drawPoint(runs[i].x, runs[i].y, BLACK);
-        if (runs[i].x < lastrunx + 20) {
+        if (runs[i].x < lastrunx + resConst) {
             for (int k = lastrunx; k < runs[i].x; k+= 1) {
                 //cout << "merging " << k << " " << runs[i].x << endl;
                 blobIt(k, lastruny, lastrunh);
@@ -462,7 +607,7 @@ void ObjectFragments::robot(int bigGreen)
     // called a piece of a robot
     for (int i = 0; i < numBlobs; i++) {
       // NOTE: "5" is another constant that needs to be checked and changed
-      if (blobWidth(blobs[i]) > 5) {
+      if (blobWidth(blobs[i]) > blobWidthMin) {
 	// temporarily put the blob into topBlob
 	transferBlob(blobs[i], topBlob);
 	// see if we can expand it to other parts
@@ -475,7 +620,7 @@ void ObjectFragments::robot(int bigGreen)
     mergeBigBlobs();
     // try expanding again after the merging
     for (int i = 0; i < numBlobs; i++) {
-        if (blobWidth(blobs[i]) > 5) {
+        if (blobWidth(blobs[i]) > blobWidthMin) {
             transferBlob(blobs[i], topBlob);
             expandRobotBlob();
             transferBlob(topBlob, blobs[i]);
@@ -493,7 +638,7 @@ void ObjectFragments::robot(int bigGreen)
             index2 = index1;
             index1 = i;
             biggest = blobArea(blobs[i]);
-        } else if (viableRobot(blobs[i]) && blobArea(blobs[i]) > 10) {
+        } else if (viableRobot(blobs[i]) && blobArea(blobs[i]) > robotBlobMin) {
             second = area;
             index2 = i;
         }
@@ -513,6 +658,9 @@ void ObjectFragments::robot(int bigGreen)
 
 void ObjectFragments::expandRobotBlob()
 {
+	const int blobDiv = 4;
+    const int goodsMin = 5;
+
     //int spany = blobHeight(topBlob);
     //int spanx = blobWidth(topBlob);
     // expand right side
@@ -544,11 +692,12 @@ void ObjectFragments::expandRobotBlob()
     }
     topBlob.leftTop.x = x + 1;
     topBlob.leftBottom.x = x + 1;
+	
 
     // now try the bottom.  We're going to do this differently.
     // robots are mainly white, so if we run into a big swatch of white we'll
     // assume that its the same robot.
-    int whites = IMAGE_WIDTH, pix, width = blobWidth(topBlob) / 4;
+    int whites = IMAGE_WIDTH, pix, width = blobWidth(topBlob) / blobDiv;
     int goods = 0, lastSaw = 0;
     // loop down from the bottom until we can't expand anymore
     for (y = topBlob.leftBottom.y; whites >= width && y < IMAGE_HEIGHT - 1;y++){
@@ -566,7 +715,7 @@ void ObjectFragments::expandRobotBlob()
 		// theoretically a color match of enough pixels would be plenty of evidence that we're
 		// able to expand here.  Currently we don't seem to increment goods.  Something to
 		// experiment with.
-                if (goods > 5) {
+                if (goods > goodsMin) {
                     whites = width;
                 }
             } else if (pix == WHITE) {
@@ -574,10 +723,10 @@ void ObjectFragments::expandRobotBlob()
             } else if ((color ==  NAVY && pix == RED) ||
                        (color == RED && pix == NAVY)) {
 	      // Uh oh, we may be seeing another robot of the opposite color.  Could be trouble.
-                whites -= 5;
+                whites -= goodsMin;
             }
         }
-        if (goods < 5) {
+        if (goods < goodsMin) {
             lastSaw++;
         } else {
             lastSaw = 0;
@@ -587,7 +736,7 @@ void ObjectFragments::expandRobotBlob()
     topBlob.leftBottom.y = y - 1;
     topBlob.rightBottom.y = y - 1;
     // if we expanded enough, it is probably worth looking at the sides again.
-    if (gain > 5) {
+    if (gain > goodsMin) {
         good = true;
         for (x = topBlob.rightTop.x; good && x < IMAGE_WIDTH - 1; x++) {
             good = false;
@@ -669,6 +818,7 @@ bool ObjectFragments::closeEnough(blob a, blob b)
 {
     // EXAMINED: change constant to lower res stuff
     const int closeDistMax = 40;
+	
     int xd = distance(a.leftTop.x,a.rightTop.x,
                       b.leftTop.x,b.rightTop.x);
     int yd = distance(a.leftTop.y,a.leftBottom.y,
@@ -691,6 +841,7 @@ bool ObjectFragments::bigEnough(blob a, blob b)
     // EXAMINED: change constant to lower res stuff // at half right now
     const int minBlobArea = 100;
     const int horizonOffset = 50;
+	
     if (blobArea(a) > minBlobArea && blobArea(b) > minBlobArea)
         return true;
     if (a.leftBottom.y > horizonAt(a.leftBottom.x) + horizonOffset)
@@ -707,11 +858,15 @@ bool ObjectFragments::bigEnough(blob a, blob b)
     @return    whether it meets our criteria
  */
 
+
 bool ObjectFragments::viableRobot(blob a)
 {
+    const int blobPix = 10;
+    const float blobAreaMin = 0.10f;
+
     // get rid of obviously false ones
-// TODO: change constant to lower res stuff
-    if (!(a.rightBottom.y > horizonAt(a.rightBottom.x) && blobWidth(a) > 10)) {
+    // TODO: change constant to lower res stuff
+    if (!(a.rightBottom.y > horizonAt(a.rightBottom.x) && blobWidth(a) > blobPix)) {
         return false;
     }
     int whites = 0;
@@ -726,7 +881,7 @@ bool ObjectFragments::viableRobot(blob a)
             }
         }
     }
-    if ((float)(whites + col) / (float)blobArea(a) > 0.10f)
+    if ((float)(whites + col) / (float)blobArea(a) > blobAreaMin)
         return true;
     return false;
 }
@@ -735,13 +890,17 @@ bool ObjectFragments::viableRobot(blob a)
    @param maxY     max value - will be used to pick heads out
 */
 
+
+
 void ObjectFragments::getRobots(int maxY)
 {
+    const int spreadInit = 3;
+
     topBlob = zeroBlob;
     int size = 0;
     topSpot = 0;
     // TODO: experiment with this constant; probably 3; maybe 2
-    int spreadSeparation = 3;
+    int spreadSeparation = spreadInit;
     //check each blob in the array
     for (int i = 0; i < numBlobs; i++) {
         int spread = blobs[i].rightTop.x - blobs[i].leftTop.x;
@@ -781,12 +940,17 @@ void ObjectFragments::getRobots(int maxY)
 
 int ObjectFragments::isRobotCentered(int head, int left, int right)
 {
+    const int leftInit = 35;
+	const int rightInit = 100;
+    const int rangeDiv = 100;
+
     // these to be REAL constants
-    int LEFTRANGE = 35;
-    int RIGHTRANGE = 100 - LEFTRANGE;
-    if ((head - left) < (right - left) * LEFTRANGE / 100)
+    int LEFTRANGE = leftInit;
+    int RIGHTRANGE = rightInit - LEFTRANGE;
+	
+    if ((head - left) < (right - left) * LEFTRANGE / rangeDiv)
         return LEFT;
-    if ((head - left) > (right - left) * RIGHTRANGE / 100)
+    if ((head - left) > (right - left) * RIGHTRANGE / rangeDiv)
         return RIGHT;
     return 0;
 }
@@ -959,9 +1123,12 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
  * @return         was an edge detected?
  */
 
-bool ObjectFragments::checkEdge(int x, int y, int x2, int y2) {
+bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
+{
+    const int diffMin = 30;
+
     int ydiff = abs(thresh->getY(x, y) - thresh->getY(x2, y2));
-    if (ydiff > 30) {
+    if (ydiff > diffMin) {
         return true;
     }
     return false;
@@ -978,7 +1145,10 @@ bool ObjectFragments::checkEdge(int x, int y, int x2, int y2) {
  */
 
 int ObjectFragments::findTrueLineVertical(point <int> top, point <int> bottom,
-                                          int c, int c2, bool left) {
+                                          int c, int c2, bool left)
+{
+    const int countSpanDiv = 3;
+
     int spanY = bottom.y - top.y;
     int count = 0;
     int good = spanY;
@@ -987,11 +1157,11 @@ int ObjectFragments::findTrueLineVertical(point <int> top, point <int> bottom,
     if (left)
         dir = -1;
     // go until you hit enough bad pixels or some strong reason to stop
-    for (j = 1; count < spanY / 3 && top.x + dir * j >= 0
+    for (j = 1; count < spanY / countSpanDiv && top.x + dir * j >= 0
              && top.x + dir * j < IMAGE_WIDTH && good > spanY / 2 ; j++) {
         count = 0;
         good = 0;
-        for (int i = top.y; count < spanY / 3 && i <= bottom.y; i++) {
+        for (int i = top.y; count < spanY / countSpanDiv && i <= bottom.y; i++) {
             int _spot = top.x + dir * j;
             /*if (checkEdge(spot, i, _spot - dir, i)) {
               count++;
@@ -1019,7 +1189,13 @@ int ObjectFragments::findTrueLineVertical(point <int> top, point <int> bottom,
 
 void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
                                                  point <int>& bottom,
-                                                 int c, int c2, bool left) {
+                                                 int c, int c2, bool left)
+{
+    const int countSpanDiv = 3;
+	const int runX = 5;
+	const int initMin = 5;
+	const int imageDiff = 3;
+
     int increment = 1;
     int spanY = bottom.y - top.y + 1;
     int count = 0;
@@ -1033,8 +1209,8 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
     int initRun = 0;
     if (left)
         dir = -1;
-    int minCount = (spanY / 3) / increment;
-    int minRun = min(spanY, max(5, spanY / 2));
+    int minCount = (spanY / countSpanDiv) / increment;
+    int minRun = min(spanY, max(runX, spanY / 2));
     int minGood = max(1, (spanY / 2) / increment);
     int badLines = 0;
     int i = 0;
@@ -1085,7 +1261,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
                     goodRun = 0;
                     if (initRun > -1) {
                         initRun++;
-                        if (atTop && initRun > 5) break;
+                        if (atTop && initRun > initMin) break;
                         // cout << "Init run " << initRun << " " << top.y << " "
                         //      << minRun << endl;
                     }
@@ -1115,7 +1291,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
     bottom.y = top.y + spanY;
     bottom.x = xProject(top.x, top.y, top.y + spanY);
     //cout << "Checking " << top.x << " " << top.y << endl;
-    if (top.x < 2 || top.x > IMAGE_WIDTH - 3) {
+    if (top.x < 2 || top.x > IMAGE_WIDTH - imageDiff) {
         //cout << "In upward scan" << endl;
         for (j = 1; count < minCount && bottom.x + dir * j >= 0
                  && bottom.x + dir * j < IMAGE_WIDTH
@@ -1171,7 +1347,15 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
 
 void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
                                                    point <int>& right, int c,
-                                                   int c2, bool up) {
+                                                   int c2, bool up)
+{
+    const int greenInit = 3;
+    const int runX = 5;
+	const int runDiv = 5;
+	const int countDiv = 3;
+	const int goodDiv = 3;
+	const float spanMult = 0.5;
+
     int spanX = right.x - left.x + 1;
     int spanY = right.y - left.y + 1;
     int count = 0;
@@ -1181,14 +1365,14 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
     int theSpot = 0;
     int run = 0;
     int badLines = 0;
-    int maxgreen = 3;
+    int maxgreen = greenInit;
 // EXAMINED: change to lower res
     maxgreen = 100;
     if (up)
         dir = -1;
-    int minRun = min(spanX, max(5, spanX / 5));
-    int minCount = min(spanX, max(2,spanX / 3));
-    int minGood = max(1,spanX / 3);
+    int minRun = min(spanX, max(runX, spanX / runDiv));
+    int minCount = min(spanX, max(2, spanX / countDiv));
+    int minGood = max(1, spanX / goodDiv);
     int greens = 0;
     int fakegood = 0;
 
@@ -1265,7 +1449,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
                     good++;
                 }
             }
-            if (good > spanX * 0.5) {
+            if (good > spanX * spanMult) {
                 found = d;
             }
         }
@@ -1294,7 +1478,10 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
  */
 
 int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
-                                            int c, int c2, bool up) {
+                                            int c, int c2, bool up)
+{
+    const int spanDiv = 3;
+
     int spanX = right.x - left.x + 1;
     int count = 0;
     int good = spanX;
@@ -1302,11 +1489,11 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
     int dir = 1;
     if (up)
         dir = -1;
-    for (j = 1; count < spanX / 3 && left.y + dir * j >= 0
+    for (j = 1; count < spanX / spanDiv && left.y + dir * j >= 0
              && left.y + dir * j < IMAGE_HEIGHT && good > spanX / 2; j++) {
         count = 0;
         good = 0;
-        for (int i = left.x; count < spanX / 3 && i <= right.x; i++) {
+        for (int i = left.x; count < spanX / spanDiv && i <= right.x; i++) {
             int theSpot = left.y + dir * j;
             if (checkEdge(i, theSpot, i, theSpot - dir)) {
                 count++;
@@ -1328,18 +1515,25 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
     @param c2      secondary color
  */
 
-void ObjectFragments::correct(blob & post, int c, int c2) {
-    if (c2 != 10000) return;
+void ObjectFragments::correct(blob & post, int c, int c2)
+{
+    const int runVal = 10000;
+	const int postLeftMax = 75;
+	const int postScan = 4;
+	const float slopeMax = 0.5;
+	const float slopeMin = 0.05;
+
+    if (c2 != runVal) return;
     // scan along the bottom
     //int bad1 = -1, bad2 = -1, temp = 0, good = 0;
     int x = max(0, post.leftTop.x), y = max(0, post.leftTop.y);
     int startX = x, startY = y;
     // start with the upper left corner
     vertScan(x, y, 1, 4, c, c2);
-    if (post.leftBottom.y - post.leftTop.y < 75) return;
+    if (post.leftBottom.y - post.leftTop.y < postLeftMax) return;
     if (scan.good == 0) {
         // make sure
-        vertScan(post.rightBottom.x, post.rightBottom.y, -1, 4, c, c2);
+        vertScan(post.rightBottom.x, post.rightBottom.y, -1, postScan, c, c2);
         if (scan.good == 0) {
             // scan until we actually have a point
             for ( ; x > -1 && y > -1; ) { // go until we hit enough bad pixels
@@ -1376,8 +1570,8 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
             // the perpindicular line
             if (y != newy) {
                 float newslope = (float)(newx - x) / (float)(y - newy) ;
-                if (abs(newslope - slope) < 0.5 &&
-                    abs(newslope - slope) > 0.05) {
+                if (abs(newslope - slope) < slopeMax &&
+                    abs(newslope - slope) > slopeMin) {
                     if (CORRECT) {
                         drawBlob(post, PINK);
                     }
@@ -1421,10 +1615,10 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
     } else {
         x = min(IMAGE_WIDTH - 1,post.rightTop.x); y = max(0,post.rightTop.y);
         startX = x; startY = y;
-        vertScan(x, y, 1, 4, c, c2);
+        vertScan(x, y, 1, postScan, c, c2);
         if (scan.good == 0) {
             vertScan(max(0, post.leftBottom.x), min(post.leftBottom.y,
-                                                    IMAGE_HEIGHT - 1), -1, 4, c,
+                                                    IMAGE_HEIGHT - 1), -1, postScan, c,
                      c2);
             if (scan.good == 0) {
                 // scan until we actually have a point
@@ -1464,8 +1658,8 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
                 // calculating the perpindicular line
                 if (y != newy) {
                     float newslope = (float)(newx - x) / (float)(y - newy) ;
-                    if (abs(newslope - slope) < 0.5 &&
-                        abs(newslope - slope) > 0.05) {
+                    if (abs(newslope - slope) < slopeMax &&
+                        abs(newslope - slope) > slopeMin) {
                         if (CORRECT) {
                             drawBlob(post, PINK);
                         }
@@ -1546,17 +1740,20 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
  * @param c         the primary color
  * @param c2        the secondary color
  */
-void ObjectFragments::squareGoal(int x, int y, int c, int c2) {
+void ObjectFragments::squareGoal(int x, int y, int c, int c2)
+{
+    const int scanVal = 3;
+
     // so we can check for failure
     obj.leftTop.x = BADVALUE; obj.leftTop.y = BADVALUE;
     // first we try going up
-    vertScan(x, y, -1,  3, c, c2);
+    vertScan(x, y, -1,  scanVal, c, c2);
     int h = scan.good;
     // at this point we have a very rough idea of how tall the square is
     int top = scan.y;
     int topx = scan.x;
     // now go down
-    vertScan(x, y, 1,  3, c, c2);
+    vertScan(x, y, 1,  scanVal, c, c2);
     h += scan.good;
     if (h < 2) return;
     int bottom = scan.y;
@@ -1746,7 +1943,12 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, blob two,
  * @return         a constant indicating where the uncertainties (if any) lie
  */
 distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
-                                             int bottom) {
+                                             int bottom)
+{
+    const int scanParam = 6;
+	const int xDiff = 2;
+	const int nextXMax = 2;
+
     distanceCertainty dc = BOTH_SURE;
     int nextX, nextY;
     if (left < DIST_POINT_FUDGE || right > IMAGE_WIDTH - DIST_POINT_FUDGE) {
@@ -1764,10 +1966,10 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
     nextX = pole.leftBottom.x;
     nextY = pole.leftBottom.y;
     do {
-        vertScan(nextX, nextY, 1,  6, GREEN, GREEN);
-        nextX = nextX + 2;
+        vertScan(nextX, nextY, 1,  scanParam, GREEN, GREEN);
+        nextX = nextX + xDiff;
         nextY = yProject(pole.leftBottom, nextX);
-    } while (nextX <= pole.rightBottom.x && scan.good < 2);
+    } while (nextX <= pole.rightBottom.x && scan.good < nextXMax);
     if (scan.good > 1)
         return dc;
     else if (dc == WIDTH_UNSURE)
@@ -1789,7 +1991,13 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
  *  @param b   the square post
  *  @return   either RIGHT or LEFT if a crossbar found, or NOPOST if not
  */
-int ObjectFragments::crossCheck(blob b) {
+int ObjectFragments::crossCheck(blob b)
+{
+    const int needParam = 10;
+	const int hDiv = 5;
+	
+	
+
     // try and find the cross bar - start at the upper left corner
     int biggest = 0, biggest2 = 0;
     int x = b.leftTop.x;
@@ -1797,9 +2005,9 @@ int ObjectFragments::crossCheck(blob b) {
     int h = blobHeight(b);
     int w = blobWidth(b);
     //int need = min(w / 2, 20);
-    int need = max(w, 10);
+    int need = max(w, needParam);
 
-    for (int i = 0; i < h / 5 && biggest < need; i+=1) {
+    for (int i = 0; i < h / hDiv && biggest < need; i+=1) {
         int tx = xProject(x, y, y + i);
         horizontalScan(tx, y + i, -1, 6, color, color, max(0, x - 2 * w),
                        IMAGE_WIDTH - 1);
