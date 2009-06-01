@@ -375,13 +375,15 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
     def shouldUseDubD(self):
-        return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-                 self.teammates[0].calledRole == PBConstants.CHASER))
+        return (False and
+                ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+                  self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+                 (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+                  self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+                  self.teammates[0].calledRole == PBConstants.CHASER))
+                )
 
     def ballInMyGoalBox(self):
         '''
