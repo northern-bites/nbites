@@ -151,6 +151,17 @@ def walking(nav):
         nav.updatedTrajectory = False
 
     return nav.stay()
+# State to use with the setSteps method
+def stepping(nav):
+    """
+    We use this to go a specified number of steps.
+    This is different from walking.
+    """
+    if nav.firstFrame():
+        nav.step(nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+    elif not nav.brain.motion.isWalkActive():
+        return nav.goLater("stopped")
+    return nav.stay()
 
 ### Stopping States ###
 def stop(nav):

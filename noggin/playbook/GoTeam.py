@@ -1,4 +1,6 @@
 from math import (fabs, hypot)
+from ..util.MyMath import safe_atan2
+
 
 from . import PBDefs
 from . import PBConstants
@@ -227,26 +229,28 @@ class GoTeam:
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf(("chaser det: me == #", self.brain.my.playerNumber))
+
         # scroll through the teammates
         for mate in self.activeFieldPlayers:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf(("\t mate #", mate.playerNumber))
 
+            # If the player number is me, or our ball models are super divergent ignore
             if (mate.playerNumber == self.brain.my.playerNumber or
-                fabs(mate.ballY - self.brain.ball.y) > 200.0):
+                fabs(mate.ballY - self.brain.ball.y) >
+                PBConstants.BALL_DIVERGENCE_THRESH or
+                fabs(mate.ballX - self.brain.ball.x) >
+                PBConstants.BALL_DIVERGENCE_THRESH):
+
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf ("\t active or goalie or me")
+                    self.printf(("Ball models are divergent, or its me"))
                 continue
 
-            # if the player has got the ball, return his number
-            if mate.hasBall():
-                if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("\t grabbing")
-                return mate
             # if both robots see the ball use visual distances to ball
             if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
                 (mate.ballDist < chaser_mate.ballDist)):
                 chaser_mate = mate
+
             # use loc distances if both don't have a visual ball
             elif mate.ballLocDist < chaser_mate.ballLocDist:
                 chaser_mate = mate
@@ -342,16 +346,6 @@ class GoTeam:
             return False
         return True
 
-    def teammateHasBall(self):
-        '''returns True if any mate has the ball'''
-        for i,mate in enumerate(self.teammates):
-            if (not mate.active or
-                mate.playerNumber == self.me.playerNumber):
-                continue
-            elif (mate.hasBall()):
-                return True
-        return False
-
     def getOtherActiveTeammate(self):
         '''this returns the teammate instance of an active teammate that isn't
         you.'''
@@ -373,13 +367,15 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
     def shouldUseDubD(self):
-        return ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-                (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-                 self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-                 self.teammates[0].calledRole == PBConstants.CHASER))
+        return (False and
+                ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+                  self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+                 (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+                  self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+                  self.teammates[0].calledRole == PBConstants.CHASER))
+                )
 
     def ballInMyGoalBox(self):
         '''
@@ -470,3 +466,22 @@ class GoTeam:
                 RESET_COLORS_CODE)
         else:
             self.brain.out.printf(str(outputString))
+
+    def getBehindBallPosition(self):
+        """
+        Returns a position between the ball and own goal
+        """
+        dist_from_ball = 30
+
+        ball = self.brain.ball
+
+        delta_y = ball.y - NogginConstants.OPP_GOALBOX_MIDDLE_Y
+        delta_x = ball.x - NogginConstants.OPP_GOALBOX_LEFT_X
+
+        pos_x = ball.x - (dist_from_ball/
+                                     hypot(delta_x,delta_y))*delta_x
+        pos_y = ball.y + (dist_from_ball/
+                                     hypot(delta_x,delta_y))*delta_y
+        heading = -safe_atan2(delta_y,delta_x)
+
+        return pos_x,pos_y,heading
