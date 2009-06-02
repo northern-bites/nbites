@@ -356,6 +356,7 @@ WalkingLeg::getHipHack(const float curHYPAngle){
  *    swinging/supporting methods to make it easier to define the stiffness
  */
 const vector<float> WalkingLeg::getStiffnesses(){
+
     //get shorter names for all the constants
     const float maxS = walkParams->maxStiffness;
     float ankleS = walkParams->ankleStiffness;
@@ -370,45 +371,116 @@ const vector<float> WalkingLeg::getStiffnesses(){
 
     float state_duration = static_cast<float>(walkParams->singleSupportFrames);
     //Depending on the current support state, we select stiffnesses differently
+    float percent_complete =1.0; //this is how we determine how to interpolate
     switch(state){
     case DOUBLE_SUPPORT: //Go from high to low
+        //define the beginning and end values for the lower legs
         ankleStart = maxS; ankleEnd = ankleS;
         kneeStart  = maxS;  kneeEnd  = kneeS;
-        state_duration = static_cast<float>(walkParams->doubleSupportFrames);
+
+        //grab the correctly interpolated values:
+        ankleS = stiffnessAchievedEnd(walkParams->doubleSupportFrames,
+                                        ankleStart, ankleEnd);
+        kneeS = stiffnessAchievedEnd(walkParams->doubleSupportFrames,
+                                        kneeStart, kneeEnd);
+        kneeS = maxS;
         break;
     case PERSISTENT_DOUBLE_SUPPORT: // Go from low to high
         ankleStart = ankleS; ankleEnd = maxS;
         kneeStart  = kneeS;  kneeEnd  = maxS;
-        state_duration = static_cast<float>(walkParams->doubleSupportFrames);
+
+        ankleS = stiffnessAchievedBegin(walkParams->doubleSupportFrames,
+                                        ankleStart, ankleEnd);
+        kneeS = stiffnessAchievedBegin(walkParams->doubleSupportFrames,
+                                       kneeStart, kneeEnd);
         break;
     case SWINGING: //Keep stiffnesses low
-        ankleStart = ankleEnd = ankleS;
-        kneeStart = kneeEnd = kneeS;
-        state_duration = static_cast<float>(walkParams->singleSupportFrames);
+        //The lower legs are already correctly set
+        //ankleS = walkParams->ankleStiffness;
+        //kneeS = walkParams->kneeStiffness;
+        //kneeStart  = maxS;  kneeEnd  = kneeS;
+        //kneeS = kneeSwingingStiffness(kneeStart,kneeEnd);
         break;
     case SUPPORTING: //Keep stiffnesses high
-        ankleStart = ankleEnd = kneeStart = kneeEnd = maxS;
-        state_duration = static_cast<float>(walkParams->singleSupportFrames);
+        ankleS = maxS; kneeS = maxS;
         break;
     default:
         break;
     }
 
-    //finally, interpolate between the start and end values for HALF! the duration
-    //of the state, so by the time we get close to switching states, we will 
-    //already have been at the desired stiffness for a whileg
-    float percent_complete =std::min(2.0f *(static_cast<float>(frameCounter) /
-                                             state_duration), 1.0f);
-    const float kneeDiff = kneeEnd - kneeStart;
-    kneeS = kneeStart  + kneeDiff*percent_complete;
-    const float ankleDiff = ankleEnd - ankleStart;
-    ankleS = ankleStart  + ankleDiff*percent_complete;
-
     float stiffnesses[NUM_JOINTS] = {maxS, maxS, maxS, kneeS,ankleS,ankleS};
+    //float stiffnesses[NUM_JOINTS] = {maxS, maxS, maxS, kneeEnd,ankleEnd,ankleEnd};
     vector<float> stiff_result = vector<float>(stiffnesses,
                                                &stiffnesses[NUM_JOINTS]);
     return stiff_result;
 
+}
+
+/*
+ * Function to achieve the desired stiffness during the final third of state
+*/
+const float WalkingLeg::stiffnessAchievedEnd(int state_length,
+                                             float stiffStart, float stiffEnd){
+    const float trans_start = 0.66f;
+    const float trans_start_inv = 1.0f - trans_start;
+    const float state_length_f = static_cast<float>(state_length);
+
+    const int trans_start_frm  = static_cast<int>(trans_start*state_length_f);
+
+    float percentToGoal = 0.0f;
+    if( frameCounter < trans_start_frm){
+        return stiffStart;
+    }else{
+        float percentToGoal =
+            static_cast<float>(frameCounter - trans_start_frm)/
+            (static_cast<float>(state_length)*trans_start_inv);
+        return stiffStart + (stiffEnd-stiffStart)*percentToGoal;
+    }
+}
+
+/*
+ * Function to achieve the desired stiffness during the first third of state
+ */
+const float WalkingLeg::stiffnessAchievedBegin(int state_length,
+                                               float stiffStart, float stiffEnd){
+    const float trans_end = 0.33f;
+    //const float trans_start_inv = 1.0f - trans_start;
+    const float state_length_f = static_cast<float>(state_length);
+
+    const int trans_end_frm  = static_cast<int>(trans_end*state_length_f);
+
+    float percentToGoal = 0.0f;
+    if( frameCounter > trans_end){
+        return stiffEnd;
+    }else{
+        float percentToGoal =
+            static_cast<float>(frameCounter)/
+            (static_cast<float>(state_length)*trans_end);
+        return stiffStart + (stiffEnd-stiffStart)*percentToGoal;
+    }
+}
+
+const float WalkingLeg::kneeSwingingStiffness(float stiffStart, float stiffEnd){
+    const float trans_start = 0.60f;
+    const float trans_end = 0.70f;
+
+    const float trans_start_inv = trans_end - trans_start;
+    const float state_length_f = static_cast<float>(walkParams->singleSupportFrames);
+
+    const int trans_start_frm  = static_cast<int>(trans_start*state_length_f);
+    const int trans_end_frm  = static_cast<int>(trans_end*state_length_f);
+
+    float percentToGoal = 0.0f;
+    if( frameCounter < trans_start_frm){
+        return stiffStart;
+    }if(frameCounter >= trans_end_frm){
+        return stiffEnd;
+    }else{
+        float percentToGoal =
+            static_cast<float>(frameCounter - trans_start_frm)/
+            (static_cast<float>(walkParams->singleSupportFrames)*trans_start_inv);
+        return stiffStart + (stiffEnd-stiffStart)*percentToGoal;
+    }
 }
 
 const float  WalkingLeg::cycloidx(float theta){
