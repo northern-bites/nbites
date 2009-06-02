@@ -43,11 +43,23 @@ class Navigator(FSA.FSA):
         self.walkX = 0
         self.walkY = 0
         self.walkTheta = 0
+        self.currentGait = None
 
         # Step controls
         self.stepX = 0
         self.stepY = 0
         self.stepTheta = 0
+
+    def orthoGoTo(self, x,y,h):
+        '''
+        takes in a relative bearing [-180...0...180],
+        takes in a heading to keep your heading constant (relatively)
+        '''
+        self.destX = x
+        self.destY = y
+        self.destH = h
+
+        self.switchTo('orthoWalkToPoint')
 
     def goTo(self,x,y,h=None):
         self.destH = h
@@ -65,7 +77,8 @@ class Navigator(FSA.FSA):
             if self.walkX == 0 and self.walkY == 0 and self.walkTheta == 0:
                 return False
         # If the walk changes are really small, then ignore them
-        elif (fabs(self.walkX - x) < FORWARD_EPSILON and fabs(self.walkY - y) < STRAFE_EPSILON and
+        elif (fabs(self.walkX - x) < FORWARD_EPSILON and
+            fabs(self.walkY - y) < STRAFE_EPSILON and
             fabs(self.walkTheta - theta) < SPIN_EPSILON):
             return False
 
