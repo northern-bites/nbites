@@ -16,6 +16,8 @@ def chase(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
+    elif transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goNow('turnToBall')
     elif transitions.shouldSpinFindBall(player):
@@ -51,8 +53,10 @@ def turnToBall(player):
     if player.brain.nav.isStopped():
         player.stoppedWalk = True
 
-    if transitions.shouldPositionForKick(player):
-        return player.goLater('positionForKick')
+    if transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+    elif transitions.shouldPositionForKick(player):
+        return player.goNow('positionForKick')
     elif transitions.shouldApproachBall(player):
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
@@ -84,14 +88,16 @@ def approachBall(player):
         player.stoppedWalk = True
 
     # Switch to other states if we should
-    if transitions.shouldPositionForKick(player):
-        return player.goLater('positionForKick')
+    if transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+    elif transitions.shouldPositionForKick(player):
+        return player.goNow('positionForKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif transitions.shouldAvoidObstacle(player):
-        return player.goLater('avoidObstacle')
+#     elif transitions.shouldAvoidObstacle(player):
+#         return player.goLater('avoidObstacle')
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball
@@ -137,12 +143,12 @@ def positionForKick(player):
 
     # Leave this state if necessary
     if transitions.shouldKick(player):
-        return player.goLater('waitBeforeKick')
+        return player.goNow('waitBeforeKick')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif transitions.shouldTurnToBall_ApproachBall(player):
+    elif transitions.shouldTurnToBallFromPositionForKick(player):
         return player.goLater('turnToBall')
-    elif transitions.shouldApproachFromPositionOnKick(player):
+    elif transitions.shouldApproachFromPositionForKick(player):
         return player.goLater('approachBall')
 
     # Determine approach speed

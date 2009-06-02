@@ -26,14 +26,23 @@ def shouldApproachBall(player):
     return ( ball.on and
              abs(ball.bearing) < constants.BALL_APPROACH_BEARING_THRESH )
 
-def shouldApproachFromPositionOnKick(player):
+def shouldApproachFromPositionForKick(player):
     """
     Walk to the ball if its too far away
     """
     ball = player.brain.ball
     return ( ball.on and
              ball.relX > constants.BALL_POS_KICK_DIST_THRESH +
-             constants.POSITION_FOR_KICK_THRESH)
+             constants.POSITION_FOR_KICK_DIST_THRESH)
+
+def shouldTurnToBallFromPositionForKick(player):
+    """
+    Walk to the ball if its too far away
+    """
+    ball = player.brain.ball
+    return (ball.on and
+            abs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH +
+            constants.POSITION_FOR_KICK_BEARING_THRESH)
 
 def shouldPositionForKick(player):
     """
