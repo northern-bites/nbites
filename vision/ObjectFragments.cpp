@@ -1792,6 +1792,7 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
 int ObjectFragments::crossCheck(blob b) {
     // try and find the cross bar - start at the upper left corner
     int biggest = 0, biggest2 = 0;
+	int skewr = 0, skewl = 0;
     int x = b.leftTop.x;
     int y = b.leftTop.y;
     int h = blobHeight(b);
@@ -1799,6 +1800,7 @@ int ObjectFragments::crossCheck(blob b) {
     //int need = min(w / 2, 20);
     int need = max(w, 10);
 
+	// scan the left side to see how far out we can go seeing post
     for (int i = 0; i < h / 5 && biggest < need; i+=1) {
         int tx = xProject(x, y, y + i);
         horizontalScan(tx, y + i, -1, 6, color, color, max(0, x - 2 * w),
@@ -1807,9 +1809,9 @@ int ObjectFragments::crossCheck(blob b) {
             biggest = scan.good;
         }
     }
+	// now the right side
     x = b.rightTop.x;
     y = b.rightTop.y;
-
     for (int i = 0; i < h / 5 && biggest2 < need; i+=1) {
         int tx = xProject(x, y, y + i);
         horizontalScan(tx, y + i, 1, 6, color, color, x - 1, IMAGE_WIDTH - 1);
@@ -1817,43 +1819,45 @@ int ObjectFragments::crossCheck(blob b) {
             biggest2 = scan.good;
         }
     }
+
+	// now in principle we have all we need to know.  However, we still have the
+	// problem of skewed posts.  So let's see if we can correct for this.
+	// What we're going to do is scan opposite corners at the bottom and subtract 
+	// those results.
+	x = b.rightBottom.x;
+	y = b.rightBottom.y;
+    for (int i = 0; i < h / 5 && skewr < biggest; i+=1) {
+        int tx = xProject(x, y, y - i);
+        horizontalScan(tx, y - i, 1, 6, color, color, x - 1, IMAGE_WIDTH - 1);
+        if (scan.good > skewr) {
+            skewr = scan.good;
+        }
+    }
+	x = b.leftBottom.x;
+	y = b.leftBottom.y;
+    for (int i = 0; i < h / 5 && skewl < biggest2; i+=1) {
+        int tx = xProject(x, y, y - i);
+        horizontalScan(tx, y - i, -1, 6, color, color, max(0, x - 2 * w),
+                       IMAGE_WIDTH - 1);
+        if (scan.good > skewl) {
+            skewl = scan.good;
+        }
+    }
+
+	biggest = biggest - skewr;
+	biggest2 = biggest2 - skewl;
+
     if (POSTLOGIC) {
         cout << "Cross check " << biggest << " " << biggest2 << endl;
+		if (biggest > need)
+			drawRect(b.leftTop.x - biggest, b.leftTop.y, biggest, 20, ORANGE);
+		if (biggest2 > need)
+			drawRect(x, y, biggest2, 20, ORANGE);
     }
-    if (biggest >= need && (biggest2 < 3 || biggest > 2 * biggest2)) {
-        // make sure we're not just off badly
-        y = b.leftTop.y + h / 4;
-        x = xProject(b.leftTop, y);
-        //drawPoint(x, y, WHITE);
-        //drawRect(x, y, 20, 20, ORANGE);
-        biggest = 0;
-        for (int i = 0; i < h / 5 && biggest < 5; i+=1) {
-            int tx = xProject(x, y, y + i);
-            horizontalScan(tx, y + i, -1, 3, color, color, x - 12,
-                           IMAGE_WIDTH - 1);
-            if (scan.good > biggest) {
-                biggest = scan.good;
-            }
-        }
-        if (biggest < 10)
-            return RIGHT;
-    }
-    if (biggest2 > need && (biggest < 3 || biggest2 > 2 * biggest)) {
-        y = b.rightTop.y + h / 4;
-        x = xProject(b.rightTop, y);
-        //drawPoint(x, y, WHITE);
-        //drawRect(x, y, 20, 20, WHITE);
-        biggest2 = 0;
-        for (int i = 0; i < h / 5 && biggest2 < 5; i+=1) {
-            int tx = xProject(x, y, y + i);
-            horizontalScan(tx, y + i, 1, 3, color, color, x - 1, x + 13);
-            if (scan.good > biggest2) {
-                biggest2 = scan.good;
-            }
-        }
-        if (biggest2 < 10)
-            return LEFT;
-    }
+
+	if (biggest > need && biggest > 2 * biggest2) return RIGHT;
+	if (biggest2 > need && biggest2 > 2 * biggest) return LEFT;
+
     return NOPOST;
 }
 
