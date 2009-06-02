@@ -423,7 +423,7 @@ PyLEDs_fadeRGB (PyLEDs *self, PyObject *args)
 
   try {
 #ifdef USE_PYLEDS_CXX_BACKEND
-      self->proxy->callVoid("fadeRGB", *name, rgbHex, time);
+      //self->proxy->callVoid("fadeRGB", *name, rgbHex, time);
 #endif
   }catch (ALError &e) {
     PyErr_Format(PyExc_SystemError,
