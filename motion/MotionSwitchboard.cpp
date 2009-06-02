@@ -321,6 +321,7 @@ int MotionSwitchboard::postProcess(){
  */
 void MotionSwitchboard::swapBodyProvider(){
     std::vector<BodyJointCommand *> gaitSwitches;
+    std::string old_provider = curProvider->getName();
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
         //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOARD IS BROKEN!
@@ -344,13 +345,14 @@ void MotionSwitchboard::swapBodyProvider(){
         break;
     case SCRIPTED_PROVIDER:
     case HEAD_PROVIDER:
+    case NULL_PROVIDER:
     default:
         noWalkTransitionCommand = true;
         curProvider = nextProvider;
-#ifdef DEBUG_SWITCHBOARD
-        cout << "Switched to " << *curProvider << endl;
-#endif
     }
+#ifdef DEBUG_SWITCHBOARD
+    cout << "Switched to " << *curProvider << " from "<<old_provider<< endl;
+#endif
 
 }
 
@@ -573,6 +575,7 @@ void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<FreezeCommand>
     curHeadProvider->hardReset();
     nextProvider->hardReset();
     nextHeadProvider->hardReset();
+    noWalkTransitionCommand = true;
 
     curProvider = &nullBodyProvider;
     curHeadProvider = &nullHeadProvider;
@@ -581,12 +584,22 @@ void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<FreezeCommand>
 
     nullHeadProvider.setCommand(command);
     nullBodyProvider.setCommand(command);
+
+#ifdef DEBUG_SWITCHBOARD
+    cout << "Switched to " << *curProvider << endl;
+#endif
+
 }
 void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command){
-    if(curHeadProvider == &nullHeadProvider)
+    if(curHeadProvider == &nullHeadProvider){
         nullHeadProvider.setCommand(command);
-    if(curProvider == &nullBodyProvider)
+        nextHeadProvider->hardReset();
+    }
+    if(curProvider == &nullBodyProvider){
         nullBodyProvider.setCommand(command);
+        nextProvider->hardReset();
+    }
+
 }
 
 void

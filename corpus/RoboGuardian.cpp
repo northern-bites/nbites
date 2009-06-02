@@ -99,12 +99,14 @@ void RoboGuardian::run(){
 }
 
 void RoboGuardian::shutoffGains(){
+    cout << "RoboGuardian::shutoffGains()" <<endl;
     playFile(stiffness_removed_wav);
     if(motion_interface != NULL)
         motion_interface->sendFreezeCommand(REMOVE_GAINS);
 }
 
 void RoboGuardian::enableGains(){
+    cout << "RoboGuardian::enableGains()" <<endl;
     playFile(stiffness_enabled_wav);
     if(motion_interface != NULL)
         motion_interface->sendFreezeCommand(ENABLE_GAINS);
