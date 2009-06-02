@@ -5,7 +5,7 @@ using namespace boost;
 using namespace NBMath;
 
 // Parameters
-const float BallEKF::ASSUMED_FPS = 15.0f;
+const float BallEKF::ASSUMED_FPS = 30.0f;
 const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
 
 // How much uncertainty naturally grows per update
