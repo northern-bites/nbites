@@ -247,6 +247,7 @@ void MotionSwitchboard::processJoints(){
  * too much too it:
  */
 void MotionSwitchboard::processStiffness(){
+    try{
     if(curHeadProvider->isActive()){
 		const vector <float > headStiffnesses = curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
 
@@ -279,6 +280,11 @@ void MotionSwitchboard::processStiffness(){
         }
         pthread_mutex_unlock(&stiffness_mutex);
     }
+    }catch(std::out_of_range & e){
+        cout << "Out of range exception caught in processStiffness"<< e.what()<<endl;
+        exit(0);
+    }
+
 
 }
 

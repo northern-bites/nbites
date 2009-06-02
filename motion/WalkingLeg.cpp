@@ -408,10 +408,10 @@ const vector<float> WalkingLeg::getStiffnesses(){
         break;
     }
 
-    float stiffnesses[NUM_JOINTS] = {maxS, maxS, maxS, kneeS,ankleS,ankleS};
-    //float stiffnesses[NUM_JOINTS] = {maxS, maxS, maxS, kneeEnd,ankleEnd,ankleEnd};
+    float stiffnesses[LEG_JOINTS] = {maxS, maxS, maxS, kneeS,ankleS,ankleS};
+    //float stiffnesses[LEG_JOINTS] = {maxS, maxS, maxS, kneeEnd,ankleEnd,ankleEnd};
     vector<float> stiff_result = vector<float>(stiffnesses,
-                                               &stiffnesses[NUM_JOINTS]);
+                                               &stiffnesses[LEG_JOINTS]);
     return stiff_result;
 
 }
