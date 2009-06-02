@@ -232,7 +232,6 @@ class FieldObject:
     -landmarks:
     -yglp,ygrp,bglp,bgrp (yellow and blue goal left and right posts)
     -myGoalLeftPost,myGoalRightPost,oppGoalLeftPost,oppGoalRightPost
-    -yellow-blue beacon, blue-yellow beacon
 
     contains:
     -centerX,centerY -- center (x,y) coordinates of object on image screen
