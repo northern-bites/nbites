@@ -1946,8 +1946,6 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
                                              int bottom)
 {
     const int scanParam = 6;
-	const int xDiff = 2;
-	const int nextXMax = 2;
 
     distanceCertainty dc = BOTH_SURE;
     int nextX, nextY;
@@ -1967,9 +1965,9 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
     nextY = pole.leftBottom.y;
     do {
         vertScan(nextX, nextY, 1,  scanParam, GREEN, GREEN);
-        nextX = nextX + xDiff;
+        nextX = nextX + 2;
         nextY = yProject(pole.leftBottom, nextX);
-    } while (nextX <= pole.rightBottom.x && scan.good < nextXMax);
+    } while (nextX <= pole.rightBottom.x && scan.good < 2);
     if (scan.good > 1)
         return dc;
     else if (dc == WIDTH_UNSURE)
