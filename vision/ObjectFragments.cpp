@@ -1892,6 +1892,12 @@ int ObjectFragments::crossCheck2(blob b) {
     return NOPOST;
 }
 
+/* Try to use field line information to decide which post we're looking at.
+   This is actually considerably easier with the large goal boxes as the only
+   times you'll see corners reasonably near a post is when they are on the
+   same side as the post.
+ */
+
 int ObjectFragments::checkIntersection(blob post) {
     // TODO: check if this should be the same standard minHeight for a post
     if (post.rightBottom.y - post.rightTop.y < 30) return NOPOST;
@@ -1901,185 +1907,37 @@ int ObjectFragments::checkIntersection(blob post) {
     for (list <VisualCorner>::const_iterator k = corners->begin();
          k != corners->end(); k++) {
         if (k->getShape() == T) {
-            // George was here
-            // I couldn't understand Chown's code, so I am making my own since
-            // the one below seems to be very Aibo field specific.
-            // Basic idea:
-            //   1. Check whether the T is in the right or the left of the post
-            //   2. If on the right, assume the post is right. Else left.
-            //   3. Check whether the distance (as determined using some crazy
-            //      pix estimates and trig) between the corner and post is
-            //      reasonable.
-            /*
-            // check whether the T is on the right
-            if (k->getX() > post.rightBottom.x + ) {
-
-            }
-            */
-
-
             if (POSTLOGIC) {
                 cout << "Got a T" << endl;
             }
+
             //int mid = midPoint(post.leftBottom.x, post.rightBottom.x);
             int x = k->getX();
             int y = k->getY();
-            bool swap = false;
-            if (y < post.leftBottom.y) swap = true;
-            int close = max(spanx, spany / 4);
-            if (x <= post.leftBottom.x && x > post.leftBottom.x - 2 * close) {
-                //if (swap) return RIGHT;
-                return LEFT;
-            }
-            if (x >= post.rightBottom.x && x < post.rightBottom.x + 2 * close) {
-                //if (swap) return LEFT;
-                return RIGHT;
-            }
-            if (x < post.leftBottom.x || x > post.rightBottom.x) return NOPOST;
-            // if we're here we're probably at the side of the goal or looking
-            // at a beacon
-            //cout << "here" << endl;
-            int testX1 = midPoint(post.rightBottom.x, IMAGE_WIDTH - 1);
-            int testX2 = midPoint(0, post.leftBottom.x);
-            //int cross1 = 0, cross2 = 0;
-            // get the tstem and see if it intersect a plumb-line right or left
-            VisualLine tstem = k->getTStem();
-            point <int> plumbLineTop, plumbLineBottom;
-            plumbLineTop.x = testX1; plumbLineTop.y = post.rightBottom.y;
-            plumbLineBottom.x = testX1; plumbLineBottom.y = IMAGE_HEIGHT - 1;
-            pair<int, int> foo = Utility::
-                plumbIntersection(plumbLineTop, plumbLineBottom, tstem.start,
-                                  tstem.end);
-            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
-                if (swap) return RIGHT;
-                return LEFT;
-            }
-            plumbLineTop.x = testX2; plumbLineTop.y = post.leftBottom.y;
-            plumbLineBottom.x = testX2; plumbLineBottom.y = IMAGE_HEIGHT - 1;
-            foo = Utility::plumbIntersection(plumbLineTop, plumbLineBottom,
-                                             tstem.start, tstem.end);
-            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
-                if (swap) return LEFT;
-                return RIGHT;
-            }
-            //cout << "here 2" << endl;
-            // now test in "in the goal" cases
-            plumbLineTop.x = testX1; plumbLineTop.y = 0;
-            plumbLineBottom.x = testX1; plumbLineBottom.y = post.leftBottom.y;
-            foo = Utility::plumbIntersection(plumbLineTop, plumbLineBottom,
-                                             tstem.start, tstem.end);
-            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
-                if (swap) return RIGHT;
-                return LEFT;
-            }
-            plumbLineTop.x = testX2; plumbLineTop.y = 0;
-            plumbLineBottom.x = testX2; plumbLineBottom.y = post.rightBottom.y;
-            foo = Utility::plumbIntersection(plumbLineTop, plumbLineBottom,
-                                             tstem.start, tstem.end);
-            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
-                if (swap) return LEFT;
-                return RIGHT;
-            }
+            bool closeEnough = false;
+            if (y < post.leftBottom.y + spany) closeEnough = true;
+			// if the T is higher in the visual field than the bottom of the post
+			// then we have an easy job - we can decide based on which side its on
+			if (closeEnough) {
+				if (x <= post.leftBottom.x)
+					return LEFT;
+				return RIGHT;
+			}
         } else {
-            // cout << "Got a corner " << (k->getX()) << " " << (k->getY())
-            //      << " " << post.leftBottom.x << " " << post.rightBottom.x << " "
-            //      << post.leftBottom.y << endl;
-            if (k->getX() > post.leftBottom.x - spanx &&
-                k->getX() < post.rightBottom.x + spanx &&
-                post.leftBottom.y < k->getY()) {
-                if (k->getX() > post.leftBottom.x - 5 &&
-                    k->getX() < post.rightBottom.x + 5) {
-                    //cout << "Corner underneath" << endl;
-                    int whites = 0;
-                    for (int i = k->getY(); i > post.leftBottom.y; i--) {
-                        if (thresh->thresholded[i][k->getX()] == WHITE) {
-                            whites++;
-                        }
-                    }
-                    if (whites > (k->getY() - post.leftBottom.y) / 2) {
-                        if (POSTLOGIC) {
-                            cout << "Viable corner underneath post" << endl;
-                        }
-                        point<int> midTop(midPoint(post.leftBottom.x, 0),
-                                          post.leftBottom.y);
-                        point<int> midBottom(midPoint(post.leftBottom.x, 0),
-                                             midPoint(midPoint(
-                                                          post.leftBottom.y,
-                                                          IMAGE_HEIGHT - 1),
-                                                      post.leftBottom.y));
-                        // drawLine(midTop.x, midTop.y, midBottom.x, midBottom.y,
-                        //          RED);
-                        bool intersects = vision->fieldLines->
-                            intersectsFieldLines(midTop,midBottom);
-                        if (intersects) {
-                            return RIGHT;
-                        }
-                        midTop.x = midPoint(post.rightBottom.x,IMAGE_WIDTH - 1);
-                        midBottom.x = midTop.x;
-                        // drawLine(midTop.x, midTop.y, midBottom.x, midBottom.y,
-                        //          RED);
-                        // intersects = vision->fieldLines->intersectsFieldLines(
-                        //     midTop,midBottom);
-                        if (intersects) {
-                            return LEFT;
-                        }
-                        midTop.x = midPoint(midTop.x, post.rightBottom.x);
-                        midBottom.x = midTop.x;
-                        // drawLine(midTop.x, midTop.y, midBottom.x, midBottom.y,
-                        //          RED);
-                        intersects = vision->fieldLines->intersectsFieldLines(
-                            midTop,midBottom);
-                        if (intersects) {
-                            return LEFT;
-                        }
-                        midTop.x = midPoint(midPoint(post.leftBottom.x, 0),
-                                            post.leftBottom.x);
-                        intersects = vision->fieldLines->intersectsFieldLines(
-                            midTop,midBottom);
-                        if (intersects) {
-                            return RIGHT;
-                        }
-                    }
-                } else {
-                    //cout << "Offset corner " << endl;
-                    // if the corner is near enough we can use it to id the post
-
-                    point<int> midTop(post.leftBottom.x - 10, k->getY() + 10);
-                    point<int> midBottom(post.rightBottom.x + 10, k->getY()+10);
-                    bool intersects = vision->fieldLines->
-                        intersectsFieldLines(midTop,midBottom);
-                    if (intersects) {
-                        //cout << "Passed test" << endl;
-                        // drawLine(midTop.x, midTop.y, midBottom.x, midBottom.y,
-                        //          RED);
-                    } else {
-                        midTop.y = k->getY() - 10;
-                        midBottom.y = k->getY() - 10;
-                        intersects = vision->fieldLines->
-                            intersectsFieldLines(midTop,midBottom);
-                        if (intersects) {
-                            // drawLine(midTop.x, midTop.y, midBottom.x,
-                            //          midBottom.y, RED);
-                            // cout << "Passed test 2" << endl;
-                        }
-                    }
-                }
-            } else if (k->getX() > post.leftBottom.x - spanx && k->getX() <
-                       post.rightBottom.x + spanx &&
-                       post.leftBottom.y > k->getY() &&
-                       k->getY() > post.leftTop.y +
-                       (post.leftBottom.y - post.leftTop.y) / 2) {
-                if (POSTLOGIC) {
-                    cout << "Found a corner near and above the bottom of a post"
-                         << endl;
-                }
-                if (k->getX() < post.leftBottom.x + 5) {
-                    return LEFT;
-                }
-                if (k->getX() > post.rightBottom.x - 5) {
-                    return RIGHT;
-                }
-            }
+            int x = k->getX();
+            int y = k->getY();
+            bool closeEnough = false;
+			// we have a somwhat more stringent standard of closeness for corners for now
+            if (y < post.leftBottom.y) closeEnough = true;
+			// if the corner is higher in the visual field than the bottom of the post
+			// then we have an easy job - we can decide based on which side its on
+			// This is based on the layout of the field and the limitations of the
+			// camera (and the fact that the goal box is absurdly large)
+			if (closeEnough) {
+				if (x <= post.leftBottom.x)
+					return LEFT;
+				return RIGHT;
+			}
         }
     }
     return NOPOST;
@@ -2786,7 +2644,7 @@ int ObjectFragments::grabPost(int c, int c2, int horizon, int left, int right) {
 int ObjectFragments::checkOther(int left, int right, int height, int horizon) {
     int largel = 0;
     int larger = 0;
-    int mind = max(MIN_POST_SEPARATION, height);
+    int mind = max(MIN_POST_SEPARATION, height / 2);
     for (int i = 0; i < numberOfRuns; i++) {
         int nextX = runs[i].x;
         int nextY = runs[i].y;
@@ -2808,7 +2666,7 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon) {
                     larger = nextH;
                 }
             }
-}
+		}
     }
     if ((larger > height / 2 || larger > 20) && larger > largel) {
         if (POSTLOGIC)
@@ -2818,6 +2676,8 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon) {
         if (POSTLOGIC) cout << "Largel" << endl;
         return RIGHT;
     }
+	if (POSTLOGIC)
+		cout << "Large R " << larger << " " << largel << " " << endl;
     return NOPOST;
 }
 
