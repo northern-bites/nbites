@@ -312,14 +312,22 @@ class GoTeam:
         self.me.updateMe()
         self.pulledGoalie = self.pullTheGoalie()
         # loop through teammates
+        self.activeFieldPlayers = []
+        append = self.activeFieldPlayers.append
+
+        self.numActiveFieldPlayers = 0
         for mate in self.teammates:
             if (mate.isPenalized() or mate.isDead()): #
                 #reset to false when we get a new packet from mate
                 mate.active = False
-            if (mate.ballDist > 0):
-                self.brain.ball.reportBallSeen()
-        self.activeFieldPlayers = self.getActiveFieldPlayers()
-        self.numActiveFieldPlayers = len(self.activeFieldPlayers)
+            elif (mate.active and (not mate.isGoalie()
+                                 or (mate.isGoalie() and self.pulledGoalie))):
+                append(mate)
+                self.numActiveFieldPlayers += 1
+
+                # Not using teammate ball reports for now
+#             if (mate.ballDist > 0):
+#                 self.brain.ball.reportBallSeen()
 
 
     def aPosterioriTeammateUpdate(self):
