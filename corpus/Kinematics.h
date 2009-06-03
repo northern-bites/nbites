@@ -24,7 +24,7 @@
 #include <math.h>
 #include "NBMath.h"
 #include "NBMatrixMath.h"
-
+#include "CoordFrame.h"
 
 namespace Kinematics {
 
@@ -34,83 +34,6 @@ namespace Kinematics {
     static const float REALLY_LOW_ERROR = 0.1f; //mm
     static const float ACCEPTABLE_ERROR = 0.5f; //mm
     static const float COARSE_ERROR     = 1.0f; //mm
-
-    enum Axis {
-        X_AXIS = 0,
-        Y_AXIS,
-        Z_AXIS,
-        W_AXIS
-    };
-
-    // -------------------- Helper matrix methods --------------------
-
-    //TODO: Move all these rot4D, etc into a Coord4D namespace.
-    // also, make all these use bounded matrices (see NBMatrixMath)
-    static const boost::numeric::ublas::matrix <float>
-        rotation4D(const Axis axis,
-                   const float angle) {
-        boost::numeric::ublas::matrix <float> rot = boost::numeric::ublas::identity_matrix <float>(4);
-
-        //TODO: Make this one call:
-        const float sinAngle = std::sin(angle);
-        const float cosAngle = std::cos(angle);
-        if (angle == 0.0) { //OPTIMIZAION POINT
-            return rot;
-        }
-        switch(axis) {
-        case X_AXIS:
-            rot(Y_AXIS, Y_AXIS) =  cosAngle;
-            rot(Y_AXIS, Z_AXIS) = -sinAngle;
-            rot(Z_AXIS, Y_AXIS) =  sinAngle;
-            rot(Z_AXIS, Z_AXIS) =  cosAngle;
-            break;
-        case Y_AXIS:
-            rot(X_AXIS, X_AXIS) =  cosAngle;
-            rot(X_AXIS, Z_AXIS) =  sinAngle;
-            rot(Z_AXIS, X_AXIS) = -sinAngle;
-            rot(Z_AXIS, Z_AXIS) =  cosAngle;
-            break;
-        case Z_AXIS:
-            rot(X_AXIS, X_AXIS) =  cosAngle;
-            rot(X_AXIS, Y_AXIS) = -sinAngle;
-            rot(Y_AXIS, X_AXIS) =  sinAngle;
-            rot(Y_AXIS, Y_AXIS) =  cosAngle;
-            break;
-        default:
-            break;
-        }
-        return rot;
-    }
-
-    static const boost::numeric::ublas::matrix <float> translation4D(const float dx,
-                                                     const float dy,
-                                                     const float dz) {
-        boost::numeric::ublas::matrix <float> trans = boost::numeric::ublas::identity_matrix <float>(4);
-        trans(X_AXIS, W_AXIS) = dx;
-        trans(Y_AXIS, W_AXIS) = dy;
-        trans(Z_AXIS, W_AXIS) = dz;
-        return trans;
-    }
-
-    static const boost::numeric::ublas::vector <float> vector3D(const float x, const float y,
-                                                const float z) {
-        boost::numeric::ublas::vector <float> p = boost::numeric::ublas::zero_vector <float> (3);
-        p(0) = x;
-        p(1) = y;
-        p(2) = z;
-        return p;
-    }
-
-    static const boost::numeric::ublas::vector <float> vector4D(const float x, const float y,
-                                                const float z,
-                                                const float w = 1.0f) {
-        boost::numeric::ublas::vector <float> p = boost::numeric::ublas::zero_vector <float> (4);
-        p(0) = x;
-        p(1) = y;
-        p(2) = z;
-        p(3) = w;
-        return p;
-    }
 
     enum ChainID {
         HEAD_CHAIN = 0,
@@ -389,27 +312,27 @@ namespace Kinematics {
 
     //Base transforms to get from body center to beg. of chain
     static const boost::numeric::ublas::matrix <float> HEAD_BASE_TRANSFORMS[1]
-    = { translation4D( 0.0f,
+    = { CoordFrame4D::translation4D( 0.0f,
                        0.0f,
                        NECK_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> LEFT_ARM_BASE_TRANSFORMS[1]
-    = { translation4D( 0.0f,
+    = { CoordFrame4D::translation4D( 0.0f,
                        SHOULDER_OFFSET_Y,
                        SHOULDER_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> LEFT_LEG_BASE_TRANSFORMS[1]
-    ={ translation4D( 0.0f,
+    ={ CoordFrame4D::translation4D( 0.0f,
                       HIP_OFFSET_Y,
                       -HIP_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_LEG_BASE_TRANSFORMS[1]
-    ={ translation4D( 0.0f,
+    ={ CoordFrame4D::translation4D( 0.0f,
                       -HIP_OFFSET_Y,
                       -HIP_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_ARM_BASE_TRANSFORMS[1]
-    ={ translation4D( 0.0f,
+    ={ CoordFrame4D::translation4D( 0.0f,
                       -SHOULDER_OFFSET_Y,
                       SHOULDER_OFFSET_Z ) };
 
@@ -422,33 +345,33 @@ namespace Kinematics {
 
     //Base transforms to get from body center to beg. of chain
     static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS[4]
-    = { rotation4D(X_AXIS, M_PI_FLOAT/2),
-        rotation4D(Y_AXIS,M_PI_FLOAT/2),
-        translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z),
-        rotation4D(Y_AXIS, CAMERA_PITCH_ANGLE) };
+    = { CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, M_PI_FLOAT/2),
+        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,M_PI_FLOAT/2),
+        CoordFrame4D::translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z),
+        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, CAMERA_PITCH_ANGLE) };
 
 
     static const boost::numeric::ublas::matrix <float> LEFT_ARM_END_TRANSFORMS[2]
-    = { rotation4D(Z_AXIS, -M_PI_FLOAT/2),
-        translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
+    = { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, -M_PI_FLOAT/2),
+        CoordFrame4D::translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
 
     static const boost::numeric::ublas::matrix <float> LEFT_LEG_END_TRANSFORMS[3]
-    = { rotation4D(Z_AXIS, M_PI_FLOAT),
-        rotation4D(Y_AXIS, -M_PI_FLOAT/2),
-        translation4D(0.0f,
+    = { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, M_PI_FLOAT),
+        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -M_PI_FLOAT/2),
+        CoordFrame4D::translation4D(0.0f,
                       0.0f,
                       -FOOT_HEIGHT) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_LEG_END_TRANSFORMS[3] =
-        { rotation4D(Z_AXIS, M_PI_FLOAT),
-        rotation4D(Y_AXIS, -M_PI_FLOAT/2),
-        translation4D(0.0f,
+        { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, M_PI_FLOAT),
+        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -M_PI_FLOAT/2),
+        CoordFrame4D::translation4D(0.0f,
                       0.0f,
                       -FOOT_HEIGHT) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_ARM_END_TRANSFORMS[2] =
-        { rotation4D(Z_AXIS, -M_PI_FLOAT/2),
-        translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
+        { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, -M_PI_FLOAT/2),
+        CoordFrame4D::translation4D(LOWER_ARM_LENGTH,0.0f,0.0f) };
 
 
     static const boost::numeric::ublas::matrix <float> * END_TRANSFORMS[NUM_CHAINS] =

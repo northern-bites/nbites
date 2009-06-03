@@ -58,7 +58,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     controller_y(new Observer()),
     zmp_filter(),
     acc_filter(),
-    accInWorldFrame(Kinematics::vector4D(0.0f,0.0f,0.0f))
+    accInWorldFrame(CoordFrame4D::vector4D(0.0f,0.0f,0.0f))
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
@@ -159,10 +159,10 @@ void StepGenerator::findSensorZMP(){
 
     //TODO: Rotate with angleX,etc
     const ufmatrix4 bodyToWorldTransform =
-        prod(Kinematics::rotation4D(Kinematics::X_AXIS, -inertial.angleX),
-             Kinematics::rotation4D(Kinematics::Y_AXIS, -inertial.angleY));
+        prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
+             CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
 
-    const ufvector4 accInBodyFrame = Kinematics::vector4D(inertial.accX,
+    const ufvector4 accInBodyFrame = CoordFrame4D::vector4D(inertial.accX,
                                                           inertial.accY,
                                                           inertial.accZ);
 

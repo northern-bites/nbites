@@ -27,9 +27,12 @@ TO_RAD= math.pi/180.
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
+        player.gainsOn()
         player.brain.CoA.setRobotTurnGait(player.brain.motion)
 
-    return player.goLater('turnleft')
+    return player.goLater('walkstraightstop')
+
+#gameInitial=gamePlaying
 
 def switchGaits(player):
     pass
