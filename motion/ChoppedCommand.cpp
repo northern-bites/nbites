@@ -59,14 +59,12 @@ ChoppedCommand::constructChainStiffness(ChainID id,
 // Check's to see if the command has executed the required
 // number of steps
 void ChoppedCommand::checkDone() {
-	bool allDone = false;
+	bool allDone = true;
 
 	// If body joint command, must check all chains
 	if (motionType == MotionConstants::BODY_JOINT){
 		for (unsigned int i = LARM_CHAIN; i <NUM_CHAINS ; ++i){
-			if (numChopped.at(i) >= numChops){
-				allDone = true;
-			} else {
+			if (numChopped.at(i) < numChops){
 				allDone = false;
 				break;
 			}
@@ -74,13 +72,11 @@ void ChoppedCommand::checkDone() {
 
 		// Head command only needs to check head chain
 	} else if (motionType == MotionConstants::HEAD_JOINT) {
-		if (numChopped.at(HEAD_CHAIN) >= numChops)
-			allDone = true;
-		else
+		if (numChopped.at(HEAD_CHAIN) < numChops){
 			allDone = false;
-	} else {
-		std::cout << "WHAT IS GOING ON? WRONG MOTIONTYPE, DAMMIT" << std::endl;
+		}
 	}
+
 	finished = allDone;
 }
 

@@ -20,7 +20,7 @@
 
 #include "SmoothChoppedCommand.h"
 #include "MotionConstants.h"
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -146,7 +146,7 @@ float SmoothChoppedCommand::getCycloidStep( int id ) {
 }
 
 bool SmoothChoppedCommand::isChainFinished(int id) {
-	return (numChopped.at(id) > numChops);
+	return (numChopped.at(id) >= numChops);
 }
 vector<float>* SmoothChoppedCommand::getStartChain(int id) {
 	switch (id) {

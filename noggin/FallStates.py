@@ -62,6 +62,8 @@ def standFromFront(guard):
     return guard.goLater('standing')
 
 def standing(guard):
+    if guard.firstFrame():
+        guard.doneStandingCount = 0
 
     if guard.brain.motion.isBodyActive():
         return guard.stay()
@@ -69,8 +71,8 @@ def standing(guard):
         guard.doneStandingCount += 1
 
     if guard.doneStandingCount > guard.DONE_STANDING_THRESH:
-        guard.doneStandingCount = 0
         return guard.goLater('doneStanding')
+
     return guard.stay()
 
 def doneStanding(guard):
