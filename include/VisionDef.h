@@ -52,9 +52,10 @@ Vision Constants that span multiple classes and systems.
 #define NAO_SIM_IMAGE_ROW_OFFSET      (NAO_SIM_IMAGE_WIDTH * 3)
 
 
-#define VISION_FRAME_LENGTH_MS 66
-#define VISION_FRAME_LENGTH_uS 66000
-#define VISION_FPS 15
+#define VISION_FRAME_LENGTH_MS 34
+#define VISION_FRAME_LENGTH_uS 34000
+#define VISION_FRAME_LENGTH_PRINT_THRESH_uS 66000
+#define VISION_FPS 30
 
 #if ROBOT(NAO_SIM)
 

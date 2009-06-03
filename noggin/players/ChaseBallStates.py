@@ -109,9 +109,9 @@ def approachBall(player):
     sTheta = MyMath.clip(ball.bearing*constants.APPROACH_SPIN_GAIN,
                          -constants.APPROACH_SPIN_SPEED,
                          constants.APPROACH_SPIN_SPEED)
-    # Avoid spinning so slowly that we step in place
-    if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
-        sTheta = 0.0
+#     # Avoid spinning so slowly that we step in place
+#     if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
+#         sTheta = 0.0
 
     # Don't turn right now
     sTheta = 0.0

@@ -58,7 +58,7 @@ private: // nBites Camera Constants
     // Default Camera Settings
     // Basic Settings
     static const int DEFAULT_CAMERA_RESOLUTION = 14;
-    static const int DEFAULT_CAMERA_FRAMERATE = 15;
+    static const int DEFAULT_CAMERA_FRAMERATE = 30;
     static const int DEFAULT_CAMERA_BUFFERSIZE = 16;
     // Color Settings
     // Gain: 26 / Exp: 83

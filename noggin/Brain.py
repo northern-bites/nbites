@@ -211,36 +211,9 @@ class Brain(object):
 
         # Update the corner information
         self.corners = []
-        if Constants.DEBUG_CORNERS and self.vision.fieldLines.numCorners > 0:
-            self.out.printf("Number of corners: %g" %
-                            (self.vision.fieldLines.numCorners,))
-
-        for i, visionCorner in enumerate(self.vision.fieldLines.corners):
-            # List contains more than just the corners
-            if i >= self.vision.fieldLines.numCorners:
-                break
-
-            self.corners.append(TypeDefs.Corner(visionCorner))
-            if Constants.DEBUG_CORNERS:
-                self.out.printf("Corner number %d: %s\n" %
-                                (i, self.corners[i].__str__()))
 
         # Now we get the latest list of lines
         self.lines = []
-        if Constants.DEBUG_LINES and self.vision.fieldLines.numLines > 0:
-            self.out.printf("Number of lines: %g" %
-                            (self.vision.fieldLines.numLines,))
-
-        for i, visionLine in enumerate(self.vision.fieldLines.lines):
-            # List contains more than just the field lines
-            if i >= self.vision.fieldLines.numLines:
-                break
-
-            # Add our line to the list
-            self.lines.append(TypeDefs.Line(visionLine))
-            if Constants.DEBUG_LINES:
-                self.out.printf("Line numer %d: %s\n" %
-                                (i+1, self.lines[i].__str__(),))
 
     def updateComm(self):
         temp = self.comm.latestComm()
