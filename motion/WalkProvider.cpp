@@ -27,6 +27,8 @@ using namespace std;
 
 using namespace Kinematics;
 
+//#define DEBUG_WALKPROVIDER
+
 WalkProvider::WalkProvider(shared_ptr<Sensors> s,
 						   shared_ptr<Profiler> p)
     : MotionProvider(WALK_PROVIDER, p),
@@ -65,6 +67,10 @@ void WalkProvider::hardReset(){
 
 void WalkProvider::calculateNextJointsAndStiffnesses() {
 	PROF_ENTER(profiler,P_WALK);
+
+#ifdef DEBUG_WALKPROVIDER
+    cout << "WalkProvider::calculateNextJointsAndStiffnesses()"<<endl;
+#endif
     pthread_mutex_lock(&walk_provider_mutex);
     if ( nextGait != curGait){
         if( stepGenerator.resetGait(nextGait)){
@@ -95,7 +101,6 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
         cout << "WARNING, I wouldn't be calling the Walkprovider while"
             " it thinks its DONE if I were you!" <<endl;
     }
-
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
 

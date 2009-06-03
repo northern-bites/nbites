@@ -5,17 +5,23 @@ import GoalieTransitions as helper
 CENTER_SAVE_THRESH = 15.
 
 def goaliePosition(player):
+    
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
-    elif helper.shouldChase(player):
-        return player.goNow('goalieChase')
+    if helper.shouldChase(player):
+        return player.goLater('goalieChase')
+    
+    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+        player.brain.tracker.trackBall()
+    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
+        player.brain.tracker.activeLoc()
+
     return player.goLater('goalieAtPosition')
     #for now we don't want the goalie trying to move
     #return player.goLater('goalieAtPosition')
     position = player.brain.playbook.position
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.trackBall()
         #keep constant x,y change signs only
         player.brain.nav.goTo(position[0], position[1], player.brain.ball.locBearing)
     if player.brain.nav.destX != position[0] or \
@@ -32,23 +38,18 @@ def goalieAtPosition(player):
     """
     State for when we're at the position
     """
-    if helper.shouldSave(player):
-        return player.goNow('goalieSave')
-    s = helper.shouldChase(player)
-    if s:
-        return player.goNow('goalieChase')
     if player.firstFrame():
         player.stopWalking()
 
-    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT \
-        and not player.trackingBall:
-        player.brain.tracker.trackBall()
-        player.trackingBall = True
+    if helper.shouldSave(player):
+        return player.goNow('goalieSave')
+    if helper.shouldChase(player):
+        return player.goLater('goalieChase')
 
-    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT \
-        and player.trackingBall:
+    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+        player.brain.tracker.trackBall()
+    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
-        player.trackingBall = False
 
     return player.stay()
 
@@ -56,12 +57,12 @@ def goalieSave(player):
     ball = player.brain.ball
     # Figure out where the ball is going and when it will be there
     if ball.on:
-      relX = ball.relX
-      relY = ball.relY
+        relX = ball.relX
+        relY = ball.relY
     else:
-      relX = ball.locRelX
-      relY = ball.locRelY
-
+        relX = ball.locRelX
+        relY = ball.locRelY
+    player.brain.tracker.trackBall()
     # Decide the type of save
     if relY > CENTER_SAVE_THRESH:
         print "Should be saving left"
@@ -117,7 +118,10 @@ def holdCenterSave(player):
 
 def postSave(player):
     if player.firstFrame():
-        player.standup()
+        player.executeMove(SweetMoves.INITIAL_POS)
         player.brain.tracker.trackBall()
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.INITIAL_POS):
         roleState = player.getRoleState(player.currentRole)
-    return player.goNow(roleState)
+        return player.goLater(roleState)
+
+    return player.stay()

@@ -6,6 +6,6 @@ def goalieChase(player):
         player.brain.tracker.trackBall()
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
-    if helper.shouldStopChase(player):
+    if not helper.shouldChase(player):
         return player.goLater('goaliePosition')
     return player.stay()

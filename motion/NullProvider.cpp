@@ -52,7 +52,7 @@ void NullProvider::calculateNextJointsAndStiffnesses(){
     readNewStiffness();
 
     //transcode the appropriate stiffness and joint values
-    vector<float> curMotionAngles = sensors->getMotionBodyAngles();
+    vector<float> curMotionAngles = sensors->getBodyAngles();
 
     for(unsigned int chain = 0; chain < Kinematics::NUM_CHAINS; chain++){
         if( !chainMask[chain] )

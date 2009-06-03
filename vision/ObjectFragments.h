@@ -210,7 +210,7 @@ public:
 
     // finding square objects
     void squareGoal(int x, int y, int c, int c2);
-    void correct(blob& b, int c, int c2);
+    float correct(blob b, int c, int c2);
 
     // main methods
     void createObject(int c);

@@ -1,6 +1,6 @@
 
 from man.motion import SweetMoves as SweetMoves
-import man.motion as motion
+from man.motion import HeadMoves as HeadMoves
 
 """
 Fall Protection and Recovery States
@@ -15,6 +15,7 @@ def fallen(guard):
         guard.brain.tracker.stopHeadMoves()
         guard.brain.motion.resetWalk()
         guard.brain.motion.resetScripted()
+        guard.brain.player.gainsOn()
 
     # Put player into safe mode
 
@@ -37,8 +38,7 @@ def standup(guard):
 
     if guard.firstFrame():
         guard.brain.tracker.stopHeadMoves()
-        headscmd = motion.HeadJointCommand(.5,(0.,0.),1)
-        guard.brain.motion.enqueue(headscmd)
+        guard.brain.tracker.execute(HeadMoves.NEUT_HEADS)
 
     # If on back, perform back stand up
     if ( inertial.angleY < -guard.FALLEN_THRESH ):
@@ -69,7 +69,7 @@ def standing(guard):
         guard.doneStandingCount += 1
 
     if guard.doneStandingCount > guard.DONE_STANDING_THRESH:
-        guard.doneStandingCount
+        guard.doneStandingCount = 0
         return guard.goLater('doneStanding')
     return guard.stay()
 

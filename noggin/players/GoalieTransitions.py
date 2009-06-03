@@ -51,8 +51,8 @@ def shouldHoldSave(player):
     return False
 
 def shouldChase(player):
-    if player.brain.playbook.subRole == PBConstants.GOALIE_CHASER\
-        and player.brain.ball.dist <= 20:
+    if (player.brain.playbook.subRole == PBConstants.GOALIE_CHASER)\
+        and (player.brain.ball.locDist <= 60):
         return True
     return False
 
@@ -65,7 +65,7 @@ def shouldStopChaseLoc(player):
     return False
 
 def shouldStopChase(player):
-    if player.brain.ball.dist > 20:
+    if player.brain.ball.locDist > 60:
         return True
     return False
 
