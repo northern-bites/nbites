@@ -3793,14 +3793,14 @@ const float FieldLines::percentSurrounding(const int x, const int y,
                                            const int numPixels) const {
 
     if (!Utility::isPointOnScreen(x, y)) {
-        cout << "("<< x << ", " << y << ")" << endl;
-        cout << "Pixel passed to percentSurrounding was off the screen" << endl;
+        //cout << "("<< x << ", " << y << ")" << endl;
+        //cout << "Pixel passed to percentSurrounding was off the screen" << endl;
         return 0;
     }
     else if (numPixels <= 0) {
-        cout << numPixels << endl;
-        cout << "numPixels argument in percentSurrounding must be positive, got "
-             << numPixels << endl;
+        //cout << numPixels << endl;
+        //cout << "numPixels argument in percentSurrounding must be positive, got "
+		//   << numPixels << endl;
     }
 
     // Ensure that the x values over which we iterate are on the screen
