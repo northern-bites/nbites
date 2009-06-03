@@ -2,6 +2,7 @@
 #include <boost/numeric/ublas/io.hpp> // for cout
 #include "FieldConstants.h"
 //#define DEBUG_LOC_EKF_INPUTS
+#define DEBUG_STANDARD_ERROR
 using namespace boost::numeric;
 using namespace boost;
 
@@ -27,6 +28,8 @@ const float LocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6f;
+const float LocEKF::PRETTY_SURE_X_UNCERT = 680.0f / 4.0;
+const float LocEKF::PRETTY_SURE_Y_UNCERT = 440.0f / 4.0;
 // Initial estimates
 const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
@@ -51,7 +54,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
           LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0),
-      useAmbiguous(true)
+      useAmbiguous(true), frameCounter(0)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -95,6 +98,7 @@ void LocEKF::reset()
  */
 void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
+    std::cout << "Frame " << ++frameCounter << std::endl;
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "Loc update: " << std::endl;
     std::cout << "Before updates: " << *this << std::endl;
@@ -107,7 +111,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
     // Update expected position based on odometry
     timeUpdate(u);
-    limitAPrioriUncert();
+    //limitAPrioriUncert();
     lastOdo = u;
 
     if (! useAmbiguous) {
@@ -249,6 +253,7 @@ void LocEKF::incorporateMeasurement(Observation z,
         // Update the measurement covariance matrix
         R_k(0,0) = z.getDistanceSD();
         R_k(1,1) = z.getDistanceSD();
+
     } else {
 
 #ifdef DEBUG_LOC_EKF_INPUTS
@@ -302,6 +307,23 @@ void LocEKF::incorporateMeasurement(Observation z,
         std::cout << "\t\t\t\t\ty_b est is " << y_b << std::endl;
 #endif
     }
+
+    // Calculate the standard error of the measurement
+    StateMeasurementMatrix newP = prod(P_k, trans(H_k));
+    MeasurementMatrix se = prod(H_k, newP) + R_k;
+    se(0,0) = std::sqrt(se(0,0));
+    se(1,1) = std::sqrt(se(1,1));
+
+    // Ignore observations based on standard error
+    if ( se(0,0)*6.0f < abs(V_k(0))) {
+#ifdef DEBUG_STANDARD_ERROR
+        std::cout << "\t Ignoring measurement " << std::endl;
+        std::cout << "\t Standard error is " << se << std::endl;
+        std::cout << "\t Invariance is " << abs(V_k(0))*5 << std::endl;
+#endif
+        R_k(0,0) = DONT_PROCESS_KEY;
+    }
+
 }
 
 /**
@@ -357,17 +379,17 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
 void LocEKF::limitAPrioriUncert()
 {
     // Check x uncertainty
-    if(P_k_bar(0,0) < X_UNCERT_MIN) {
-        P_k_bar(0,0) = X_UNCERT_MIN;
-    }
-    // Check y uncertainty
-    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
-        P_k_bar(1,1) = Y_UNCERT_MIN;
-    }
-    // Check h uncertainty
-    if(P_k_bar(2,2) < H_UNCERT_MIN) {
-        P_k_bar(2,2) = H_UNCERT_MIN;
-    }
+    // if(P_k_bar(0,0) < X_UNCERT_MIN) {
+    //     P_k_bar(0,0) = X_UNCERT_MIN;
+    // }
+    // // Check y uncertainty
+    // if(P_k_bar(1,1) < Y_UNCERT_MIN) {
+    //     P_k_bar(1,1) = Y_UNCERT_MIN;
+    // }
+    // // Check h uncertainty
+    // if(P_k_bar(2,2) < H_UNCERT_MIN) {
+    //     P_k_bar(2,2) = H_UNCERT_MIN;
+    // }
     // Check x uncertainty
     if(P_k_bar(0,0) > X_UNCERT_MAX) {
         P_k_bar(0,0) = X_UNCERT_MAX;

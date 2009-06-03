@@ -153,6 +153,7 @@ private:
     // Last odometry update
     MotionModel lastOdo;
     bool useAmbiguous;
+    int frameCounter;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;
@@ -171,6 +172,8 @@ private:
     const static float X_UNCERT_MIN;
     const static float Y_UNCERT_MIN;
     const static float H_UNCERT_MIN;
+    const static float PRETTY_SURE_X_UNCERT;
+    const static float PRETTY_SURE_Y_UNCERT;
     const static float INIT_X_UNCERT;
     const static float INIT_Y_UNCERT;
     const static float INIT_H_UNCERT;
