@@ -259,6 +259,14 @@ public abstract class Field
                  CENTER_FIELD_Y + 5.0f,
                  RIGHT_SIDELINE_X - 180.0f,
                  CENTER_FIELD_Y - 5.0f);
+
+        // Center field cross
+        drawLine(g2, LINES_COLOR, LINE_THICKNESS,
+                 CENTER_FIELD_X - 5.0f,
+                 CENTER_FIELD_Y,
+                 CENTER_FIELD_X + 5.0f,
+                 CENTER_FIELD_Y);
+
     }
 
     /**
