@@ -197,8 +197,8 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
 
     //larm: (0.,90.,0.,0.)
     //rarm: (0.,-90.,0.,0.)
-    float larm_angles[] = {0.0f, M_PI_FLOAT*0.35f,0.0f,0.0f};
-    float rarm_angles[] = {0.0f,-M_PI_FLOAT*0.35f,0.0f,0.0f};
+    float larm_angles[] = {0.9f, 0.3f,0.0f,0.0f};
+    float rarm_angles[] = {0.9f,-0.3f,0.0f,0.0f};
 
     vector<float> *safe_larm = new vector<float>(larm_angles,
                                                  &larm_angles[ARM_JOINTS]);
@@ -211,7 +211,7 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
 	vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
 												  0.85f);
 
-    commands.push_back(new BodyJointCommand(1.0f,safe_larm,NULL,NULL,safe_rarm,
+    commands.push_back(new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
 											stiffness,
                                             Kinematics::INTERPOLATION_SMOOTH));
 
