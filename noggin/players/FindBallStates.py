@@ -28,25 +28,8 @@ def spinFindBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         # Stop walking if we need to switch gaits
-        if player.currentGait != constants.FAST_GAIT:
-            player.stopWalking()
-            player.stoppedWalk = False
-        else:
-            player.stoppedWalk = True
 
-    # Determine if we have stopped walking
-    if player.brain.nav.isStopped():
-        player.stoppedWalk = True
-
-    # Walk if we have stopped walking
-    if player.stoppedWalk:
-        # Switch to the fast gait for better spinning
-        if (player.brain.nav.isStopped() and
-            player.currentGait != constants.FAST_GAIT):
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            player.currentGait = constants.FAST_GAIT
-
-        player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
+    player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
 
     # Determine if we should leave this state
     if player.brain.ball.on and constants.USE_LOC_CHASE:
