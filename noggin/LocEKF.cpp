@@ -1,17 +1,19 @@
 #include "LocEKF.h"
 #include <boost/numeric/ublas/io.hpp> // for cout
+#include "FieldConstants.h"
 //#define DEBUG_LOC_EKF_INPUTS
+#define DEBUG_STANDARD_ERROR
 using namespace boost::numeric;
 using namespace boost;
 
 using namespace NBMath;
 
 // Parameters
+// Measurement conversion form
 const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
+// Uncertainty
 const float LocEKF::BETA_LOC = 1.0f;
 const float LocEKF::GAMMA_LOC = 0.1f;
-const float LocEKF::BETA_LAT = 0.03f;
-const float LocEKF::GAMMA_LAT = 0.04f;
 const float LocEKF::BETA_ROT = M_PI_FLOAT/16.0f;
 const float LocEKF::GAMMA_ROT = 0.1f;
 
@@ -19,19 +21,24 @@ const float LocEKF::GAMMA_ROT = 0.1f;
 const float LocEKF::INIT_LOC_X = 370.0f;
 const float LocEKF::INIT_LOC_Y = 270.0f;
 const float LocEKF::INIT_LOC_H = 0.0f;
+// Uncertainty limits
 const float LocEKF::X_UNCERT_MAX = 680.0f;
 const float LocEKF::Y_UNCERT_MAX = 440.0f;
 const float LocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6f;
+const float LocEKF::PRETTY_SURE_X_UNCERT = 680.0f / 4.0;
+const float LocEKF::PRETTY_SURE_Y_UNCERT = 440.0f / 4.0;
+// Initial estimates
 const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_H_UNCERT = M_PI_FLOAT * 2.0f;
-const float LocEKF::X_EST_MIN = -600.0f;
-const float LocEKF::Y_EST_MIN = -1000.0f;
-const float LocEKF::X_EST_MAX = 600.0f;
-const float LocEKF::Y_EST_MAX = 1000.0f;
+// Estimate limits
+const float LocEKF::X_EST_MIN = 0.0f;
+const float LocEKF::Y_EST_MIN = 0.0f;
+const float LocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
+const float LocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
 /**
  * Initialize the localization EKF class
@@ -47,7 +54,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
           LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0),
-      useAmbiguous(true)
+      useAmbiguous(true), frameCounter(0)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -91,6 +98,7 @@ void LocEKF::reset()
  */
 void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
+    std::cout << "Frame " << ++frameCounter << std::endl;
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "Loc update: " << std::endl;
     std::cout << "Before updates: " << *this << std::endl;
@@ -103,7 +111,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
     // Update expected position based on odometry
     timeUpdate(u);
-    limitAPrioriUncert();
+    //limitAPrioriUncert();
     lastOdo = u;
 
     if (! useAmbiguous) {
@@ -125,7 +133,10 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     } else {
         noCorrectionStep();
     }
-    limitPosteriorUncert();
+    //limitPosteriorUncert();
+
+    // Clip values if our estimate is off the field
+    clipRobotPose();
 
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "After updates: " << *this << std::endl;
@@ -242,6 +253,7 @@ void LocEKF::incorporateMeasurement(Observation z,
         // Update the measurement covariance matrix
         R_k(0,0) = z.getDistanceSD();
         R_k(1,1) = z.getDistanceSD();
+
     } else {
 
 #ifdef DEBUG_LOC_EKF_INPUTS
@@ -295,6 +307,23 @@ void LocEKF::incorporateMeasurement(Observation z,
         std::cout << "\t\t\t\t\ty_b est is " << y_b << std::endl;
 #endif
     }
+
+    // Calculate the standard error of the measurement
+    StateMeasurementMatrix newP = prod(P_k, trans(H_k));
+    MeasurementMatrix se = prod(H_k, newP) + R_k;
+    se(0,0) = std::sqrt(se(0,0));
+    se(1,1) = std::sqrt(se(1,1));
+
+    // Ignore observations based on standard error
+    if ( se(0,0)*6.0f < abs(V_k(0))) {
+#ifdef DEBUG_STANDARD_ERROR
+        std::cout << "\t Ignoring measurement " << std::endl;
+        std::cout << "\t Standard error is " << se << std::endl;
+        std::cout << "\t Invariance is " << abs(V_k(0))*5 << std::endl;
+#endif
+        R_k(0,0) = DONT_PROCESS_KEY;
+    }
+
 }
 
 /**
@@ -350,17 +379,17 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
 void LocEKF::limitAPrioriUncert()
 {
     // Check x uncertainty
-    if(P_k_bar(0,0) < X_UNCERT_MIN) {
-        P_k_bar(0,0) = X_UNCERT_MIN;
-    }
-    // Check y uncertainty
-    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
-        P_k_bar(1,1) = Y_UNCERT_MIN;
-    }
-    // Check h uncertainty
-    if(P_k_bar(2,2) < H_UNCERT_MIN) {
-        P_k_bar(2,2) = H_UNCERT_MIN;
-    }
+    // if(P_k_bar(0,0) < X_UNCERT_MIN) {
+    //     P_k_bar(0,0) = X_UNCERT_MIN;
+    // }
+    // // Check y uncertainty
+    // if(P_k_bar(1,1) < Y_UNCERT_MIN) {
+    //     P_k_bar(1,1) = Y_UNCERT_MIN;
+    // }
+    // // Check h uncertainty
+    // if(P_k_bar(2,2) < H_UNCERT_MIN) {
+    //     P_k_bar(2,2) = H_UNCERT_MIN;
+    // }
     // Check x uncertainty
     if(P_k_bar(0,0) > X_UNCERT_MAX) {
         P_k_bar(0,0) = X_UNCERT_MAX;
@@ -409,5 +438,40 @@ void LocEKF::limitPosteriorUncert()
     if(P_k(2,2) > H_UNCERT_MAX) {
         P_k(2,2) = H_UNCERT_MAX;
         P_k_bar(2,2) = H_UNCERT_MAX;
+    }
+}
+
+/**
+ * Method to use the estimate ellipse to intelligently clip the pose estimate
+ */
+void LocEKF::clipRobotPose()
+{
+    // Limit our X estimate
+    if (xhat_k(0) > X_EST_MAX) {
+        StateVector v(numStates);
+        v(0) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
+            inner_prod(v, prod(P_k,v));
+    }
+    else     if (xhat_k(0) < X_EST_MIN) {
+        StateVector v(numStates);
+        v(0) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
+            inner_prod(v, prod(P_k,v));
+    }
+
+    // Limit our Y estimate
+    if (xhat_k(1) < Y_EST_MIN) {
+        StateVector v(numStates);
+        v(1) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
+            inner_prod(v, prod(P_k,v));
+    }
+    else if (xhat_k(1) > Y_EST_MAX) {
+        StateVector v(numStates);
+        v(1) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - Y_EST_MAX) /
+            inner_prod(v, prod(P_k,v));
+
     }
 }

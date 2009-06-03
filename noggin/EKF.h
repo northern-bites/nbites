@@ -165,9 +165,8 @@ public:
             boost::numeric::ublas::scalar_matrix<float>(measurementSize,
                                         numStates, 0.0f);
         // Assumed error in measurment sensors
-        MeasurementMatrix R_k = boost::numeric::ublas::scalar_matrix<float>(measurementSize,
-                                                            measurementSize,
-                                                            0.0f);
+        MeasurementMatrix R_k = boost::numeric::ublas::scalar_matrix<float>(
+            measurementSize, measurementSize, 0.0f);
         // Measurement invariance
         MeasurementVector v_k(measurementSize);
 
