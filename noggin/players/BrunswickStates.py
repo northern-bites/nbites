@@ -36,7 +36,4 @@ def gamePlaying(player):
 
 if WEBOTS_ACTIVE:
     gameInitial=gamePlaying
-    print "Webots is active!!!!"
-else:
-    print "Webots is in-active!!!!"
 
