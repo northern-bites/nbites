@@ -33,12 +33,6 @@ def turnToBall(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        # Stop walking if we need to switch gaits
-        if player.currentGait != constants.FAST_GAIT:
-            player.stopWalking()
-            player.stoppedWalk = False
-        else:
-            player.stoppedWalk = True
 
     # Determine the speed to turn to the ball
     turnRate = MyMath.clip(ball.bearing*constants.BALL_SPIN_GAIN,
@@ -49,10 +43,6 @@ def turnToBall(player):
     if fabs(turnRate) < constants.MIN_BALL_SPIN_SPEED:
         turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_SPEED
 
-    # Determine that we have stopped walking
-    if player.brain.nav.isStopped():
-        player.stoppedWalk = True
-
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
     elif transitions.shouldPositionForKick(player):
@@ -61,13 +51,8 @@ def turnToBall(player):
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif ball.on and player.stoppedWalk:
-        # Switch gaits if necessary
-        if (player.brain.nav.isStopped() and
-            player.currentGait != constants.FAST_GAIT):
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            player.currentGait = constants.FAST_GAIT
 
+    elif ball.on:
         player.setSpeed(x=0,y=0,theta=turnRate)
 
     return player.stay()
@@ -76,16 +61,6 @@ def approachBall(player):
     """
     Once we are alligned with the ball, approach it
     """
-    if player.firstFrame():
-        if player.currentGait != constants.FAST_GAIT:
-            player.stopWalking()
-            player.stoppedWalk = False
-        else:
-            player.stoppedWalk = True
-
-    # Determine if we have stopped walking
-    if player.brain.nav.isStopped():
-        player.stoppedWalk = True
 
     # Switch to other states if we should
     if transitions.shouldKick(player):
@@ -117,11 +92,7 @@ def approachBall(player):
     sTheta = 0.0
 
     # Set our walk towards the ball
-    if ball.on and player.stoppedWalk:
-        if (player.brain.nav.isStopped() and
-            player.currentGait != constants.FAST_GAIT):
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            player.currentGait = constants.FAST_GAIT
+    if ball.on:
         player.setSpeed(sX,0,sTheta)
 
     return player.stay()
@@ -132,15 +103,7 @@ def positionForKick(player):
     Currently aligns the ball on the left foot
     """
     ball = player.brain.ball
-
-    if player.firstFrame():
-        # Stop if we need to switch gaits
-        if player.currentGait != constants.NORMAL_GAIT:
-            player.stoppedWalk = False
-            player.stopWalking()
-        else:
-            player.stoppedWalk = True
-
+    
     # Leave this state if necessary
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
@@ -185,17 +148,7 @@ def positionForKick(player):
 #                   str(constants.BALL_KICK_LEFT_X_CLOSE) +
 #                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
 
-    # Determine if we have stopped
-    if player.brain.nav.isStopped():
-        player.stoppedWalk = True
-
-    # Walk if we have stopped or have the correct gait already
-    if ball.on and player.stoppedWalk:
-        # Set the correct gait, to make us walk better
-        if (player.brain.nav.isStopped() and
-            player.currentGait != constants.NORMAL_GAIT) :
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
-            player.currentGait = constants.NORMAL_GAIT
+    if ball.on:
         player.setSpeed(0,sY,sX)
 
     return player.stay()
@@ -235,31 +188,20 @@ def avoidObstacle(player):
     If we detect something in front of us, dodge it
     """
     if player.firstFrame():
-        player.stopWalking()
-        player.stoppedWalk = False
         player.printf(player.brain.sonar)
-
-    # Check if we've stopped
-    if player.brain.nav.isStopped():
-        player.stoppedWalk = True
-        if (player.brain.nav.isStopped() and
-            player.currentGait != constants.FAST_GAIT):
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            player.currentGait = constants.FAST_GAIT
 
     if (transitions.shouldAvoidObstacleLeft(player) and
         transitions.shouldAvoidObstacleRight(player)):
         # Backup
-        if player.stoppedWalk:
-            player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
+        player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
+
     elif transitions.shouldAvoidObstacleLeft(player):
         # Dodge right
-        if player.stoppedWalk:
-            player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
+        player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
     elif transitions.shouldAvoidObstacleRight(player):
         # Dodge left
-        if player.stoppedWalk:
-            player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
+        player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
+
     else:
         return player.goLater("chase")
     return player.stay()
