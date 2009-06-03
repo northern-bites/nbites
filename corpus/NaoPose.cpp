@@ -26,6 +26,7 @@ using boost::shared_ptr;
 using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
+using namespace CoordFrame4D;
 
 // From camera docs:
 const float NaoPose::IMAGE_WIDTH_MM = 2.36f;
@@ -147,8 +148,8 @@ void NaoPose::transform () {
   bodyInclinationY = inertial.angleY;
 
   ublas::matrix <float> bodyToWorldTransform =
-      prod(Kinematics::rotation4D(Kinematics::X_AXIS, bodyInclinationX),
-      Kinematics::rotation4D(Kinematics::Y_AXIS, bodyInclinationY));
+      prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, bodyInclinationX),
+      CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, bodyInclinationY));
 
   ublas::vector <float> torsoLocationInLegFrame =
     prod(bodyToWorldTransform, supportLegLocation);
@@ -460,21 +461,21 @@ NaoPose::calculateForwardTransform(const ChainID id,
     //length L - movement along the X(i-1) axis
     if (currentmDHParameters[i*4 + L] != 0) {
       const ublas::matrix <float> transX =
-	Kinematics::translation4D(currentmDHParameters[i*4 + L],0.0f,0.0f);
+	CoordFrame4D::translation4D(currentmDHParameters[i*4 + L],0.0f,0.0f);
       fullTransform = prod(fullTransform, transX);
     }
 
     //twist: - rotate about the X(i-1) axis
     if (currentmDHParameters[i*4 + ALPHA] != 0) {
       const ublas::matrix <float> rotX =
-	Kinematics::rotation4D(Kinematics::X_AXIS,
+	CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
 			       currentmDHParameters[i*4 + ALPHA]);
       fullTransform = prod(fullTransform, rotX);
     }
     //theta - rotate about the Z(i) axis
     if (currentmDHParameters[i*4 + THETA] + angles[i] != 0) {
       const ublas::matrix <float> rotZ =
-	Kinematics::rotation4D(Kinematics::Z_AXIS,
+	CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS,
 			       currentmDHParameters[i*4 + THETA] +
 			       angles[i]);
       fullTransform = prod(fullTransform, rotZ);
@@ -482,7 +483,7 @@ NaoPose::calculateForwardTransform(const ChainID id,
     //offset D movement along the Z(i) axis
     if (currentmDHParameters[i*4 + D] != 0) {
       const ublas::matrix <float> transZ =
-	Kinematics::translation4D(0.0f,0.0f,currentmDHParameters[i*4 + D]);
+	CoordFrame4D::translation4D(0.0f,0.0f,currentmDHParameters[i*4 + D]);
       fullTransform = prod(fullTransform, transZ);
     }
   }
