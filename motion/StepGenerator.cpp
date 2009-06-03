@@ -554,8 +554,17 @@ StepGenerator::addStartZMP(const shared_ptr<Step> newSupportStep ){
     //Queue a starting step, where we step, but do nothing with the ZMP
     //so push tons of zero ZMP values
     //for (int i = 0; i < walkParams->stepDurationFrames; i++){
+
+    //Since NUM_PREVIEW_FRAMES is an unsigned int, if the difference
+    //we need to fill is negative, the value wraps to something very large
+    // and we get the equivalent of an infinite loop here. Only on the Nao tho.
+    if (Observer::NUM_PREVIEW_FRAMES <=
+        static_cast<unsigned int>(walkParams->stepDurationFrames)){
+        waitForController = 0;
+        return;
+    }
     for (unsigned int i = 0; i < Observer::NUM_PREVIEW_FRAMES -
-             walkParams->stepDurationFrames; ++i) {
+             static_cast<unsigned int>(walkParams->stepDurationFrames); ++i) {
         zmp_ref_x.push_back(end_i(0));
         zmp_ref_y.push_back(end_i(1));
     }
@@ -626,6 +635,12 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 #endif
 
     if(done){
+
+#ifdef DEBUG_STEPGENERATOR
+        cout << "The walk engine was previously inactive, so we need to do extra"
+            " work in stepGen::setSpeed()"<<endl;
+#endif
+
         //we are starting fresh from a stopped state, so we need to clear all remaining 
         //steps and zmp values.
         resetQueues();
@@ -641,6 +656,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     // We have to reevalaute future steps, so we forget about any future plans
     futureSteps.clear();
+
 }
 
 
@@ -703,6 +719,9 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
 
 /*  Set up the walking engine for starting with a swinging step on the right */
 void StepGenerator::startRight(){
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::startRight"<<endl;
+#endif
     //start off in a double support phase where the right leg swings first
     //HOWEVER, since the first support step is END, there will be no
     //actual swinging - the first actual swing will be 2 steps
@@ -755,6 +774,10 @@ void StepGenerator::startRight(){
 
 /*  Set up the walking engine for starting with a swinging step on the left */
 void StepGenerator::startLeft(){
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::startRight"<<endl;
+#endif
+
     //start off in a double support phase where the right leg swings first
     //HOWEVER, since the first support step is END, there will be no
     //actual swinging - the first actual swing will be 2 steps

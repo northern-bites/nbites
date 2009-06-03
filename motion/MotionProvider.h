@@ -87,9 +87,19 @@ public:
     const bool isStopping() const {return _stopping;}
     virtual void calculateNextJointsAndStiffnesses() = 0;
     std::vector<float> getChainJoints(const Kinematics::ChainID id) {
+        if(nextJoints[id].size() != Kinematics::chain_lengths[id]){
+            std::cout << "Getting joints in " << *this <<" and the length of the "
+                 <<id<<"th stiffness vector is "<<nextJoints[id].size()
+                      <<" not " <<Kinematics::chain_lengths[id]<<std::endl;
+        }
         return nextJoints[id];
     }
     std::vector<float> getChainStiffnesses(const Kinematics::ChainID id){
+        if(nextStiffnesses[id].size() != Kinematics::chain_lengths[id]){
+            std::cout << "Getting stiffness in " << *this <<" and the length of the "
+                 <<id<<"th stiffness vector is "<<nextStiffnesses[id].size()
+                      <<" not " <<Kinematics::chain_lengths[id]<<std::endl;
+        }
         return nextStiffnesses[id];
     }
     const std::string getName(){return provider_name;}
