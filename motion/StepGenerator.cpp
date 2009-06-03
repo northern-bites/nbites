@@ -428,7 +428,7 @@ void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 void
 StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //look at the newStep, and make ZMP values:
-    const float stepTime = newSupportStep->duration;
+    const float stepTime = newSupportStep->stepDuration;
     //update the lastZMPD Step
     const float sign = (newSupportStep->foot == LEFT_FOOT ? 1.0f : -1.0f);
     const float last_sign = -sign;
@@ -766,10 +766,13 @@ void StepGenerator::startRight(){
     shared_ptr<Step> firstSupportStep =
         shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
                                   walkParams->stepDuration,
+                                  walkParams->doubleSupportFraction,
                                   RIGHT_FOOT,END_STEP));
     shared_ptr<Step> dummyStep =
         shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                  walkParams->stepDuration, LEFT_FOOT));
+                                  walkParams->stepDuration,
+                                  walkParams->doubleSupportFraction,
+                                  LEFT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
@@ -822,10 +825,13 @@ void StepGenerator::startLeft(){
     shared_ptr<Step> firstSupportStep =
         shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
                                   walkParams->stepDuration,
+                                  walkParams->singleSupportFrames,
                                   LEFT_FOOT,END_STEP));
     shared_ptr<Step> dummyStep =
         shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
-                                  walkParams->stepDuration, RIGHT_FOOT));
+                                  walkParams->stepDuration,
+                                  walkParams->singleSupportFrames,
+                                  RIGHT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
@@ -922,6 +928,7 @@ void StepGenerator::generateStep( float _x,
 
     shared_ptr<Step> step(new Step(computed_x, computed_y, computed_theta,
                                    walkParams->stepDuration,
+                                   walkParams->doubleSupportFraction,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));

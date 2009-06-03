@@ -26,10 +26,11 @@
 #include "Kinematics.h"
 
 #include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
-
 #ifdef DEBUG_MOTION
 #  define WALK_DEBUG
 #endif
+
+#include "MotionConstants.h"
 
 
 enum SupportMode{
@@ -54,34 +55,60 @@ enum StepType {
 /**
  * Simple container to hold information about future steps.
  */
-struct Step{
+class Step{
+public:
     float x;
     float y;
     float theta;
-    float duration;
+    float stepDuration;
+    unsigned int stepDurationFrames;
+    unsigned int doubleSupportFrames;
+    unsigned int singleSupportFrames;
     Foot foot;
     StepType type;
     bool zmpd;
     Step(const float _x, const float _y, const float _theta,
-         const float _duration, const Foot _foot,
+         const float _duration, const float doubleSupportFraction,const Foot _foot,
          const StepType _type = REGULAR_STEP)
-        : x(_x),y(_y), theta(_theta), duration(_duration),
-          foot(_foot),type(_type),zmpd(false){}
+        : x(_x),y(_y), theta(_theta), stepDuration(_duration),
+          foot(_foot),type(_type),zmpd(false)
+        {
+            updateFrameLengths(doubleSupportFraction);
+        }
     // Copy constructor to allow changing reference frames:
     Step(const float new_x, const float new_y, const float new_theta,
          const boost::shared_ptr<Step> other)
-        : x(new_x),y(new_y), theta(new_theta), duration(other->duration),
+        : x(new_x),y(new_y), theta(new_theta),
+          stepDuration(other->stepDuration),
+          stepDurationFrames(other->stepDurationFrames),
+          doubleSupportFrames(other->doubleSupportFrames),
+          singleSupportFrames(other->singleSupportFrames),
           foot(other->foot),type(other->type),zmpd(other->zmpd){}
+
+    void updateFrameLengths(float doubleSupportFraction){
+
+        //need to calculate how many frames to spend in double, single
+        stepDurationFrames =
+            static_cast<unsigned int>(stepDuration /
+                                      MotionConstants::MOTION_FRAME_LENGTH_S);
+
+        doubleSupportFrames =
+            static_cast<unsigned int>(stepDuration *
+                                      doubleSupportFraction/
+                                      MotionConstants::MOTION_FRAME_LENGTH_S);
+        singleSupportFrames = stepDurationFrames - doubleSupportFrames;
+    }
+
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
             return o << "Step(" << s.x << "," << s.y << "," << s.theta
-                     << ") in " << s.duration <<" secs with foot "
+                     << ") in " << s.stepDuration <<" secs with foot "
                      << s.foot << " and type " << s.type;
         }
 };
 
 static const boost::shared_ptr<Step> EMPTY_STEP =
-    boost::shared_ptr<Step>(new Step(0.0f,0.0f,
+    boost::shared_ptr<Step>(new Step(0.0f,0.0f,0.0f,
                                      0.0f,0.0f,
                                      LEFT_FOOT));
 

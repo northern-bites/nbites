@@ -75,6 +75,13 @@ enum JointStiffIndex {
     STIFF_INDEX
 };
 
+struct WalkCycle{
+    boost::shared_ptr<Step> supportStep;
+    NBMath::ufvector3 swing_src;
+    NBMath::ufvector3 swing_dest;
+    WalkingParameters * params;
+};
+
 class WalkingLeg  {
 public:
     WalkingLeg(Kinematics::ChainID id);
