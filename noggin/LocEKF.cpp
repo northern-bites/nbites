@@ -486,8 +486,9 @@ void LocEKF::clipRobotPose()
  * @param EPS Size of the deadzone
  */
 void LocEKF::deadzone(float &R, float &innovation,
-                      float CPC, float EPS)
+                      float CPC, float eps)
 {
+    float invR = 0.0;
     // Not in a deadzone
     if ((eps < 1.0e-08) || (CPC < 1.0e-08) || (R < 1e-08)) {
         return;

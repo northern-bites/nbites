@@ -149,7 +149,7 @@ private:
     void limitAPrioriUncert();
     void limitPosteriorUncert();
     void clipRobotPose();
-    void deadzone(float &R, float &innovation, float CPC, float EPS)
+    void deadzone(float &R, float &innovation, float CPC, float EPS);
 
     // Last odometry update
     MotionModel lastOdo;
