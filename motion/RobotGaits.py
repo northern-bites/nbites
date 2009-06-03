@@ -23,28 +23,29 @@ SLARTI_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #ankleStiffness
                                       0.2)   #armStiffness
 
-TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00, # com height
-                                        1.40,  # hip offset x
-                                        0.0,  # x-axis angle offset
-                                        0.5,  # step duration
-                                        0.2,   # fraction in double support
-                                        0.9,  # stepHeight
-                                        0.0,   # footLengthX
-                                        0.3,   # zmp static percentage
-                                        4.5,   # left swing hip roll addition
-                                        4.5,   # right swing hip roll addition
-                                        0.40,  # left zmp off
-                                        0.40,  # right zmp off
-                                        7.5,   # turn zmp offset
-                                        0.01,  # strafe zmp offset
-                                        8.0,  # max x speed
-                                        4.0,   # max y speed
-                                        30.0,   # max theta speed()
-                                        0.0,   #sensorScale
+TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00,# com height
+                                      1.45, # hip offset x
+                                      3.0,  # x-axis angle offset
+                                      0.4, # step duration
+                                      0.2,  # fraction in double support
+                                      0.9,  # stepHeight
+                                      0.0,  # footLengthX
+                                      0.3,  # zmp static percentage
+                                      5.5, # left swing hip roll addition
+                                      5.5, # right swing hip roll addition
+                                      0.4,  # left zmp off
+                                      0.4,  # right zmp off
+                                      6.6,   # turn zmp offset
+                                      0.01,  # strafe zmp offset
+                                      7.0,  # max x speed
+                                      4.0,  # max y speed
+                                      30.0,  # max theta speed()
+                                      0.0,   #sensorScale
                                       0.85,  #maxStiffness
-                                      0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.4,  #kneeStiffness
+                                      0.3,  #ankleStiffness
                                       0.2)   #armStiffness
+
 
 ZAPHOD_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       1.40,  # hip offset x
@@ -277,16 +278,40 @@ WEBOTS_GAIT = motion.GaitCommand(31.00, # com height
                                  0.2,  #ankleStiffness
                                  0.2)   #armStiffness
 
+
+SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
+                                      1.45, # hip offset x
+                                      3.0,  # x-axis angle offset
+                                      0.4, # step duration
+                                      0.2,  # fraction in double support
+                                      0.9,  # stepHeight
+                                      0.0,  # footLengthX
+                                      0.3,  # zmp static percentage
+                                      5.5, # left swing hip roll addition
+                                      5.5, # right swing hip roll addition
+                                      0.4,  # left zmp off
+                                      0.4,  # right zmp off
+                                      6.6,   # turn zmp offset
+                                      0.01,  # strafe zmp offset
+                                      7.0,  # max x speed
+                                      4.0,  # max y speed
+                                      30.0,  # max theta speed()
+                                      0.0,   #sensorScale
+                                      0.85,  #maxStiffness
+                                      0.4,  #kneeStiffness
+                                      0.3,  #ankleStiffness
+                                      0.2)   #armStiffness
+
 #DEFAULT GAIT ASSIGNMENTS
 
-TRILLIAN_GAIT = SLARTI_FAST_GAIT
+TRILLIAN_GAIT = SHORT_FAST_GAIT
 ZAPHOD_GAIT   =   TUCKER_FAST_GAIT
-SLARTI_GAIT   =   TRILLIAN_FAST_GAIT
-MARVIN_GAIT   =   MARVIN_FAST_GAIT
+SLARTI_GAIT   =   SHORT_FAST_GAIT
+MARVIN_GAIT   =   SHORT_FAST_GAIT
 
-TRILLIAN_TURN_GAIT = TRILLIAN_MEDIUM_GAIT
+TRILLIAN_TURN_GAIT = SHORT_FAST_GAIT
 ZAPHOD_TURN_GAIT   =   TRILLIAN_MEDIUM_GAIT
-SLARTI_TURN_GAIT   =   TRILLIAN_MEDIUM_GAIT
-MARVIN_TURN_GAIT   =   MARVIN_FAST_GAIT
+SLARTI_TURN_GAIT   =   SHORT_FAST_GAIT
+MARVIN_TURN_GAIT   =   SHORT_FAST_GAIT
 
 
