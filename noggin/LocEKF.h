@@ -148,6 +148,7 @@ private:
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();
+    void clipRobotPose();
 
     // Last odometry update
     MotionModel lastOdo;
@@ -157,8 +158,6 @@ private:
     const static float USE_CARTESIAN_DIST;
     const static float BETA_LOC;
     const static float GAMMA_LOC;
-    const static float BETA_LAT;
-    const static float GAMMA_LAT;
     const static float BETA_ROT;
     const static float GAMMA_ROT;
 

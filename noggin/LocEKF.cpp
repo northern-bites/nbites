@@ -1,5 +1,6 @@
 #include "LocEKF.h"
 #include <boost/numeric/ublas/io.hpp> // for cout
+#include "FieldConstants.h"
 //#define DEBUG_LOC_EKF_INPUTS
 using namespace boost::numeric;
 using namespace boost;
@@ -7,11 +8,11 @@ using namespace boost;
 using namespace NBMath;
 
 // Parameters
+// Measurement conversion form
 const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
+// Uncertainty
 const float LocEKF::BETA_LOC = 1.0f;
 const float LocEKF::GAMMA_LOC = 0.1f;
-const float LocEKF::BETA_LAT = 0.03f;
-const float LocEKF::GAMMA_LAT = 0.04f;
 const float LocEKF::BETA_ROT = M_PI_FLOAT/16.0f;
 const float LocEKF::GAMMA_ROT = 0.1f;
 
@@ -19,19 +20,22 @@ const float LocEKF::GAMMA_ROT = 0.1f;
 const float LocEKF::INIT_LOC_X = 370.0f;
 const float LocEKF::INIT_LOC_Y = 270.0f;
 const float LocEKF::INIT_LOC_H = 0.0f;
+// Uncertainty limits
 const float LocEKF::X_UNCERT_MAX = 680.0f;
 const float LocEKF::Y_UNCERT_MAX = 440.0f;
 const float LocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6f;
+// Initial estimates
 const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_H_UNCERT = M_PI_FLOAT * 2.0f;
-const float LocEKF::X_EST_MIN = -600.0f;
-const float LocEKF::Y_EST_MIN = -1000.0f;
-const float LocEKF::X_EST_MAX = 600.0f;
-const float LocEKF::Y_EST_MAX = 1000.0f;
+// Estimate limits
+const float LocEKF::X_EST_MIN = 0.0f;
+const float LocEKF::Y_EST_MIN = 0.0f;
+const float LocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
+const float LocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
 /**
  * Initialize the localization EKF class
@@ -125,7 +129,10 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     } else {
         noCorrectionStep();
     }
-    limitPosteriorUncert();
+    //limitPosteriorUncert();
+
+    // Clip values if our estimate is off the field
+    clipRobotPose();
 
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "After updates: " << *this << std::endl;
@@ -409,5 +416,40 @@ void LocEKF::limitPosteriorUncert()
     if(P_k(2,2) > H_UNCERT_MAX) {
         P_k(2,2) = H_UNCERT_MAX;
         P_k_bar(2,2) = H_UNCERT_MAX;
+    }
+}
+
+/**
+ * Method to use the estimate ellipse to intelligently clip the pose estimate
+ */
+void LocEKF::clipRobotPose()
+{
+    // Limit our X estimate
+    if (xhat_k(0) > X_EST_MAX) {
+        StateVector v(numStates);
+        v(0) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
+            inner_prod(v, prod(P_k,v));
+    }
+    else     if (xhat_k(0) < X_EST_MIN) {
+        StateVector v(numStates);
+        v(0) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
+            inner_prod(v, prod(P_k,v));
+    }
+
+    // Limit our Y estimate
+    if (xhat_k(1) < Y_EST_MIN) {
+        StateVector v(numStates);
+        v(1) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
+            inner_prod(v, prod(P_k,v));
+    }
+    else if (xhat_k(1) > Y_EST_MAX) {
+        StateVector v(numStates);
+        v(1) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - Y_EST_MAX) /
+            inner_prod(v, prod(P_k,v));
+
     }
 }

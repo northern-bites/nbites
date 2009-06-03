@@ -64,8 +64,8 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
 {
     // Method variables
     vector<Observation> Z_t;
-    shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL(100));
-    shared_ptr<BallEKF> MCLballEKF = shared_ptr<BallEKF>(new BallEKF());
+    // shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL(100));
+    // shared_ptr<BallEKF> MCLballEKF = shared_ptr<BallEKF>(new BallEKF());
     shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
     shared_ptr<BallEKF> EKFballEKF = shared_ptr<BallEKF>(new BallEKF());
     PoseEst currentPose;
@@ -79,10 +79,11 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
     currentBall = letsGo->ballStart;
 
     // Print out starting configuration
-    printCoreLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
-                     &currentBall, MCLballEKF);
-    printCoreLogLine(ekfFile, ekfLoc, Z_t, noMove, &currentPose,
-                     &currentBall, EKFballEKF);
+    // printOutMCLLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
+    //                  &currentBall, MCLballEKF);
+    printOutLogLine(ekfFile, ekfLoc, Z_t, noMove, &currentPose,
+                    &currentBall, EKFballEKF,
+                    *visBall, TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -101,17 +102,18 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
             visBall->setDistanceEst(determineBallEstimate(&currentPose,
                                                           &currentBall,
                                                           0.0));
+            RangeBearingMeasurement m(visBall);
 
             // Update the MCL sytem
-            mclLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
-            // Update the MCL ball
-            RangeBearingMeasurement m(visBall);
-            if (usePerfectLocForBall) {
-                MCLballEKF->updateModel(m, currentPose, true);
-            } else {
-                MCLballEKF->updateModel(m, mclLoc->getCurrentEstimate(),
-                                        true);
-            }
+            // mclLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
+            // // Update the MCL ball
+
+            // if (usePerfectLocForBall) {
+            //     MCLballEKF->updateModel(m, currentPose, true);
+            // } else {
+            //     MCLballEKF->updateModel(m, mclLoc->getCurrentEstimate(),
+            //                             true);
+            // }
 
             // Update the EKF sytem
             ekfLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
@@ -124,11 +126,12 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
             }
 
             // Print the current MCL frame to file
-            printCoreLogLine(mclFile, mclLoc, Z_t, letsGo->myMoves[i].move,
-                             &currentPose, &currentBall, MCLballEKF);
+            // printCoreLogLine(mclFile, mclLoc, Z_t, letsGo->myMoves[i].move,
+            //                  &currentPose, &currentBall, MCLballEKF);
             // Print the current EKF frame to file
-            printCoreLogLine(ekfFile, ekfLoc, Z_t, letsGo->myMoves[i].move,
-                                &currentPose, &currentBall, EKFballEKF);
+            printOutLogLine(ekfFile, ekfLoc, Z_t, letsGo->myMoves[i].move,
+                            &currentPose, &currentBall, EKFballEKF,
+                            *visBall, TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
         }
     }
 
