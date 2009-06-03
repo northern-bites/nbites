@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# Script to sync frames between robocup and your local frames folder
+
+
+USAGE="./sync [up-down] <folder-name> \nExample: $> ./sync down watson"
+
+SERVER=robocup@robocup.bowdoin.edu:frames
+
+REMOTE_FOLDER=${2%/} #Strip the trailing slash if any
+
+RSYNC=rsync
+RSYNC_OPTS=-rvt
+
+if [ "$1" = "" ]; then
+    echo "No push direction specified"
+    echo $USAGE
+    exit 1
+fi
+
+if [ "$REMOTE_FOLDER" = "" ]; then
+    echo "No remote folder specified"
+    echo $USAGE
+    exit 1
+fi
+
+if [ "$1" = "up" ]; then
+
+    echo "Synching FROM `pwd`/$REMOTE_FOLDER TO $SERVER/$REMOTE_FOLDER"
+    echo "$RSYNC $RSYNC_OPTS $REMOTE_FOLDER $SERVER"
+    $RSYNC $RSYNC_OPTS $REMOTE_FOLDER $SERVER
+
+elif [ "$1" = "down" ]; then
+
+    echo "Synching FROM $SERVER/$REMOTE_FOLDER TO `pwd`/$REMOTE_FOLDER "
+    echo "$RSYNC $RSYNC_OPTS $SERVER/$REMOTE_FOLDER ./"
+    $RSYNC $RSYNC_OPTS $SERVER/$REMOTE_FOLDER ./
+else
+echo "Invalid parameters"
+echo $USAGE
+exit 1
+fi
