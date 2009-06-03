@@ -98,12 +98,17 @@ CONFIGURE_FILE(
     ESCAPE_QUOTES
   )
 CONFIGURE_FILE(
-  "${NOGGIN_INCLUDE_DIR}/players/Switch.py.in"
+  "${NOGGIN_CMAKE_DIR}/Switch.py.in"
   "${NOGGIN_INCLUDE_DIR}/players/Switch.py"
   )
 CONFIGURE_FILE(
-  "${NOGGIN_INCLUDE_DIR}/TeamConfig.py.in"
+  "${NOGGIN_CMAKE_DIR}/TeamConfig.py.in"
   "${NOGGIN_INCLUDE_DIR}/TeamConfig.py"
+  )
+
+CONFIGURE_FILE(
+  "${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in"
+  "${NOGGIN_INCLUDE_DIR}/WebotsConfig.py"
   )
 
 ############################ DEFINITION
@@ -151,6 +156,7 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
                         ${NOGGIN_INCLUDE_DIR}/TrackingStates.py
                         ${NOGGIN_INCLUDE_DIR}/TypeDefs.py
+                        ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
                         )
 
 SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/playbook

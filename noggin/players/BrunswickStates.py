@@ -1,4 +1,6 @@
 from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER
+from ..WebotsConfig import WEBOTS_ACTIVE
+
 ###
 # Reimplementation of Game Controller States for pBrunswick
 ###
@@ -32,4 +34,9 @@ def gamePlaying(player):
     roleState = player.getRoleState(player.currentRole)
     return player.goNow(roleState)
 
-#gameInitial = gamePlaying
+if WEBOTS_ACTIVE:
+    gameInitial=gamePlaying
+    print "Webots is active!!!!"
+else:
+    print "Webots is in-active!!!!"
+

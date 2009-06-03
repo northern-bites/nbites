@@ -5,7 +5,7 @@ import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import man.motion.RobotGaits as RobotGaits
 import man.motion.MotionConstants as MotionConstants
-
+from ..WebotsConfig import WEBOTS_ACTIVE
 
 TO_RAD= math.pi/180.
 
@@ -32,7 +32,11 @@ def gamePlaying(player):
 
     return player.goLater('walkstraightstop')
 
-#gameInitial=gamePlaying
+if WEBOTS_ACTIVE:
+    gameInitial=gamePlaying
+    print "Webots is active!!!!"
+else:
+    print "Webots is in-active!!!!"
 
 def switchGaits(player):
     pass
