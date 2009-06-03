@@ -117,7 +117,7 @@ class HeadTracking(FSA.FSA):
             changeY = self.target.angleY #the pitch is pos = down
         else:
             # by default, the change is none
-            self.player.printf( "No object")
+            #self.printf( "No object")
             return
 
         curPitch = self.brain.sensors.motionAngles[MotionConstants.HeadPitch]

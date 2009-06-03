@@ -69,7 +69,7 @@ def standing(guard):
         guard.doneStandingCount += 1
 
     if guard.doneStandingCount > guard.DONE_STANDING_THRESH:
-        guard.doneStandingCount
+        guard.doneStandingCount = 0
         return guard.goLater('doneStanding')
     return guard.stay()
 
