@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#Script to sync frames between robot and your computer
+ROBOT=$1
+
+LOCAL_DEST=$2
+
+USAGE="./grab <robot-name> <folder-destination>\nExample: $> ./grab slarti 223-09/slarti-sees-ball"
+
+if [ "$1" = "" ]; then
+    echo "No robot specified"
+    echo $USAGE
+    exit 1
+fi
+
+if [ "$2" = "" ]; then
+    echo "No local destination specified"
+    echo $USAGE
+    exit 1
+fi
+
+echo "mkdir -p $LOCAL_DEST"
+mkdir -p $LOCAL_DEST
+
+echo "scp -r root@$ROBOT:frames/* $LOCAL_DEST/"
+scp -r root@$ROBOT:frames/* $LOCAL_DEST/
