@@ -44,6 +44,7 @@ class Navigator(FSA.FSA):
         self.walkY = 0
         self.walkTheta = 0
         self.currentGait = None
+        self.movingOrtho = False
 
         # Step controls
         self.stepX = 0
@@ -58,10 +59,12 @@ class Navigator(FSA.FSA):
         self.destX = x
         self.destY = y
         self.destH = h
+        self.movingOrtho = True
 
         self.switchTo('orthoWalkToPoint')
 
     def goTo(self,x,y,h=None):
+        self.movingOrtho = False
         self.destH = h
         self.destX,self.destY = x,y
         self.switchTo('spinToWalkHeading')

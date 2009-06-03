@@ -38,8 +38,9 @@ def atPosition(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
-    if Transitions.shouldKickAtPosition(player):
-        return player.goLater('kickAtPosition')
+    if player.counter >= 30:
+        return player.goLater('playbookPosition')
+
     return player.stay()
 
 def spinToBall(player):
