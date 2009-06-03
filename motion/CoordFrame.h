@@ -31,6 +31,7 @@
 #include <boost/numeric/ublas/io.hpp>              // for cout
 
 #include "NBMatrixMath.h"
+#include "NBMath.h"
 
 //Homogeneous 3D coordinates (really this is 2D
 namespace CoordFrame3D{

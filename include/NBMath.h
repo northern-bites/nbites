@@ -21,14 +21,14 @@ static const float TO_RAD = M_PI_FLOAT/180.0f;
 #endif
 static const float QUART_CIRC_RAD = M_PI_FLOAT / 2.0f;
 
-namespace NBMath {
-
 #ifdef __APPLE__
     inline static void sincosf(float _x, float * _sinx, float * _cosx) {
         *_sinx = std::sin(_x);
 		*_cosx = std::cos(_x);
     }
 #endif
+
+namespace NBMath {
 
     inline static int ROUND(float x) {
         if ((x-static_cast<float>(
