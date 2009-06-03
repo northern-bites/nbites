@@ -5,6 +5,7 @@ install/*
 *.ekf
 *.mcl
 *.obs
+*.kpf
 upload.sh
 noggin/players/Switch.py
 noggin/TeamConfig.py

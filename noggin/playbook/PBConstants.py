@@ -153,12 +153,12 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  LEFT_FINDER,
  RIGHT_FINDER,
  OTHER_FINDER,
- 
+
  GOALIE_NORMAL,
  GOALIE_CHASER,
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,
- 
+
  READY_CHASER,
  READY_DEFENDER,
  READY_OFFENDER) = range(NUM_SUB_ROLES)
@@ -176,12 +176,12 @@ READY_KICKOFF_DEFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
                           NogginConstants.OPP_GOAL_HEADING] # left
 
 
-READY_KICKOFF_CHASER = [NogginConstants.CENTER_FIELD_X - 
+READY_KICKOFF_CHASER = [NogginConstants.CENTER_FIELD_X -
                           NogginConstants.CENTER_CIRCLE_RADIUS,
                         NogginConstants.CENTER_FIELD_Y,
                         NogginConstants.OPP_GOAL_HEADING] # center
 
-READY_KICKOFF_NORMAL_CHASER = [NogginConstants.CENTER_FIELD_X - 
+READY_KICKOFF_NORMAL_CHASER = [NogginConstants.CENTER_FIELD_X -
                                  NogginConstants.CENTER_CIRCLE_RADIUS,
                                NogginConstants.CENTER_FIELD_Y,
                                NogginConstants.OPP_GOAL_HEADING]
@@ -197,7 +197,7 @@ READY_KICKOFF_OFFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
 
 READY_KICKOFF_STOPPER = [NogginConstants.FIELD_WIDTH * 2./5.,
                          NogginConstants.FIELD_HEIGHT * 1./4.,
-                         NogginConstants.OPP_GOAL_HEADING]  
+                         NogginConstants.OPP_GOAL_HEADING]
 
 # READY_NON_KICKOFF
 # non kickoff positions: three in a row, one back in corner
@@ -205,7 +205,7 @@ READY_KICKOFF_STOPPER = [NogginConstants.FIELD_WIDTH * 2./5.,
 # Stricker should maintain straight line with the ball
 
 # Here we make the Y behind the halfway point of the y
-NON_KICKOFF_X = ((NogginConstants.CENTER_FIELD_X - 
+NON_KICKOFF_X = ((NogginConstants.CENTER_FIELD_X -
                   NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X) / 2.)
 
 READY_NON_KICKOFF_DEFENDER = [NON_KICKOFF_X - 50.,
@@ -213,7 +213,7 @@ READY_NON_KICKOFF_DEFENDER = [NON_KICKOFF_X - 50.,
                             NogginConstants.OPP_GOAL_HEADING] # right back
 
 READY_NON_KICKOFF_CHASER = [NON_KICKOFF_X,
-                            NogginConstants.FIELD_HEIGHT * 2./5.,                            
+                            NogginConstants.FIELD_HEIGHT * 2./5.,
                             NogginConstants.OPP_GOAL_HEADING] # left
 
 READY_NON_KICKOFF_OFFENDER = [NON_KICKOFF_X,
@@ -258,7 +258,7 @@ RIGHT_WING_MAX_Y = (NogginConstants.FIELD_WIDTH - NogginConstants.GREEN_PAD_Y)
 
 #GOALIE
 BALL_LOC_LIMIT = NogginConstants.CENTER_FIELD_X #250 # Dist at which we stop active localization and just track
-GOALIE_HOME_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X + 15
+GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
 DIST_FROM_GOAL_INTERCEPT = 25.
 END_CLEAR_BUFFER = 20.
@@ -269,7 +269,7 @@ RIGHT_LIMIT_POSITION = [NogginConstants.MIDFIELD_Y + LIMIT_Y_OFFSET, MIN_GOALIE_
 
 # Finder
 TWO_DOG_FINDER_POSITIONS = (
-    (NogginConstants.FIELD_WIDTH * 1./2., 
+    (NogginConstants.FIELD_WIDTH * 1./2.,
      NogginConstants.CENTER_FIELD_Y),
     (NogginConstants.FIELD_WIDTH * 1./3.,
      NogginConstants.CENTER_FIELD_Y))
