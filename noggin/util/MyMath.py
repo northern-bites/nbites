@@ -18,9 +18,10 @@ def sub180Angle(angle):
     Returns the angle identitical to the input angle that is between -180 and
     180 degrees.
     """
-    while angle > 180:
+    angle = angle % 360
+    if angle > 180:
         angle -= 360.
-    while angle < -180:
+    if angle < -180:
         angle += 360.
     return angle
 

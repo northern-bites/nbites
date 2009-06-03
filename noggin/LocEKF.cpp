@@ -2,7 +2,7 @@
 #include <boost/numeric/ublas/io.hpp> // for cout
 #include "FieldConstants.h"
 //#define DEBUG_LOC_EKF_INPUTS
-#define DEBUG_STANDARD_ERROR
+//#define DEBUG_STANDARD_ERROR
 using namespace boost::numeric;
 using namespace boost;
 
@@ -14,7 +14,7 @@ const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
 // Uncertainty
 const float LocEKF::BETA_LOC = 1.0f;
 const float LocEKF::GAMMA_LOC = 0.1f;
-const float LocEKF::BETA_ROT = M_PI_FLOAT/16.0f;
+const float LocEKF::BETA_ROT = M_PI_FLOAT/64.0f;
 const float LocEKF::GAMMA_ROT = 0.1f;
 
 // Default initialization values
@@ -28,8 +28,6 @@ const float LocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::H_UNCERT_MIN = 1.0e-6f;
-const float LocEKF::PRETTY_SURE_X_UNCERT = 680.0f / 4.0;
-const float LocEKF::PRETTY_SURE_Y_UNCERT = 440.0f / 4.0;
 // Initial estimates
 const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
 const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
@@ -98,7 +96,6 @@ void LocEKF::reset()
  */
 void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
-    std::cout << "Frame " << ++frameCounter << std::endl;
 #ifdef DEBUG_LOC_EKF_INPUTS
     std::cout << "Loc update: " << std::endl;
     std::cout << "Before updates: " << *this << std::endl;
@@ -111,7 +108,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
     // Update expected position based on odometry
     timeUpdate(u);
-    //limitAPrioriUncert();
+    limitAPrioriUncert();
     lastOdo = u;
 
     if (! useAmbiguous) {
@@ -133,7 +130,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     } else {
         noCorrectionStep();
     }
-    //limitPosteriorUncert();
+    limitPosteriorUncert();
 
     // Clip values if our estimate is off the field
     clipRobotPose();
@@ -379,17 +376,17 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
 void LocEKF::limitAPrioriUncert()
 {
     // Check x uncertainty
-    // if(P_k_bar(0,0) < X_UNCERT_MIN) {
-    //     P_k_bar(0,0) = X_UNCERT_MIN;
-    // }
-    // // Check y uncertainty
-    // if(P_k_bar(1,1) < Y_UNCERT_MIN) {
-    //     P_k_bar(1,1) = Y_UNCERT_MIN;
-    // }
-    // // Check h uncertainty
-    // if(P_k_bar(2,2) < H_UNCERT_MIN) {
-    //     P_k_bar(2,2) = H_UNCERT_MIN;
-    // }
+    if(P_k_bar(0,0) < X_UNCERT_MIN) {
+        P_k_bar(0,0) = X_UNCERT_MIN;
+    }
+    // Check y uncertainty
+    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
+        P_k_bar(1,1) = Y_UNCERT_MIN;
+    }
+    // Check h uncertainty
+    if(P_k_bar(2,2) < H_UNCERT_MIN) {
+        P_k_bar(2,2) = H_UNCERT_MIN;
+    }
     // Check x uncertainty
     if(P_k_bar(0,0) > X_UNCERT_MAX) {
         P_k_bar(0,0) = X_UNCERT_MAX;
@@ -418,11 +415,13 @@ void LocEKF::limitPosteriorUncert()
     if(P_k(1,1) < Y_UNCERT_MIN) {
         P_k(1,1) = Y_UNCERT_MIN;
         P_k_bar(1,1) = Y_UNCERT_MIN;
+
     }
     // Check h uncertainty
     if(P_k(2,2) < H_UNCERT_MIN) {
         P_k(2,2) = H_UNCERT_MIN;
         P_k_bar(2,2) = H_UNCERT_MIN;
+
     }
     // Check x uncertainty
     if(P_k(0,0) > X_UNCERT_MAX) {
@@ -453,7 +452,7 @@ void LocEKF::clipRobotPose()
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
             inner_prod(v, prod(P_k,v));
     }
-    else     if (xhat_k(0) < X_EST_MIN) {
+    else if (xhat_k(0) < X_EST_MIN) {
         StateVector v(numStates);
         v(0) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /

@@ -18,7 +18,7 @@
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
 
-//#define DEBUG_OBSERVATIONS
+#define DEBUG_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS

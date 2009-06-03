@@ -79,11 +79,12 @@ namespace NBMath {
      */
     inline static float subPIAngle(float theta)
     {
-        while( theta > M_PI) {
+        theta = fmod(theta, 2.0f*M_PI_FLOAT);
+        if( theta > M_PI) {
             theta -= 2.0f*M_PI_FLOAT;
         }
 
-        while( theta < -M_PI) {
+        if( theta < -M_PI) {
             theta += 2.0f*M_PI_FLOAT;
         }
         return theta;
