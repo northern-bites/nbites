@@ -475,3 +475,40 @@ void LocEKF::clipRobotPose()
 
     }
 }
+
+/**
+ * Detect if we are in a deadzone and apply the correct changes to keep the pose
+ * estimate from drifting
+ *
+ * @param R The measurement noise covariance matrix
+ * @param innovation The measurement divergence
+ * @param CPC Predicted measurement variance
+ * @param EPS Size of the deadzone
+ */
+void LocEKF::deadzone(float &R, float &innovation,
+                      float CPC, float EPS)
+{
+    // Not in a deadzone
+    if ((eps < 1.0e-08) || (CPC < 1.0e-08) || (R < 1e-08)) {
+        return;
+    }
+
+    if ( abs(innovation) > eps) {
+        // Decrease the covariance, so that it effects the estimate more
+        invR=( abs(innovation) / eps-1) / CPC;
+    } else {
+        // Decrease the innovations, so that it doesn't effect the estimate
+        innovation=0.0;
+        invR = 0.25 / (eps*eps) - 1.0/ CPC;
+    }
+
+    // Limit the min Covariance value
+    if (invR<1.0e-08) {
+        invR=1e-08;
+    }
+    // Set the covariance to be the adjusted value
+    if ( R < 1.0/invR ) {
+        R=1.0/invR;
+    }
+
+}
