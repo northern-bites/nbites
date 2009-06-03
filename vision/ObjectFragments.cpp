@@ -2533,7 +2533,8 @@ int ObjectFragments::grabPost(int c, int c2, int horizon, int left, int right) {
 int ObjectFragments::checkOther(int left, int right, int height, int horizon) {
     int largel = 0;
     int larger = 0;
-    int mind = max(MIN_POST_SEPARATION, height / 2);
+    //int mind = max(MIN_POST_SEPARATION, height / 2);
+	int mind = MIN_POST_SEPARATION;
     for (int i = 0; i < numberOfRuns; i++) {
         int nextX = runs[i].x;
         int nextY = runs[i].y;
