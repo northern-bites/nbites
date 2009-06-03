@@ -52,7 +52,7 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
     BACKDEBUG = false;
     SANITY = false;
     DEBUGBALLPOINTS = false;
-    CORRECT = false;
+    CORRECT = true;
     OPENFIELD = false;
 #endif
 }
@@ -1328,212 +1328,113 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
     @param c2      secondary color
  */
 
-void ObjectFragments::correct(blob & post, int c, int c2) {
-    if (c2 != 10000) return;
-    // scan along the bottom
-    //int bad1 = -1, bad2 = -1, temp = 0, good = 0;
-    int x = max(0, post.leftTop.x), y = max(0, post.leftTop.y);
-    int startX = x, startY = y;
-    // start with the upper left corner
-    vertScan(x, y, 1, 4, c, c2);
-    if (post.leftBottom.y - post.leftTop.y < 75) return;
-    if (scan.good == 0) {
-        // make sure
-        vertScan(post.rightBottom.x, post.rightBottom.y, -1, 4, c, c2);
-        if (scan.good == 0) {
-            // scan until we actually have a point
-            for ( ; x > -1 && y > -1; ) { // go until we hit enough bad pixels
-                //cout << "Vert scan " << x << " " << y << endl;
-                // if it is the color we're looking for - good
-                if (thresh->thresholded[y][x] == c ||
-                    thresh->thresholded[y][x] == c2) {
-                    break;
-                }
-                y = y + 1;
-                x = xProject(startX, startY, y);
-            }
-            int newx = x, newy = y, count = 0;
-            if (CORRECT) {
-                drawPoint(x, y, PINK);
-            }
-            // now scan horizontally
-            for (x = startX, y = startY; x < IMAGE_WIDTH; ) {
-                // if it is the color we're looking for - good
-                if (thresh->thresholded[y][x] == c ||
-                    thresh->thresholded[y][x] == c2) {
-                    break;
-                }
-                // we just do on a pure horizontal so we don't need to worry
-                // about going offscreen
-                x++;
-                count++;
-            }
-            if (CORRECT) {
-                drawPoint(x, y, ORANGE);
-            }
-            int counter = count;
-            // we do the inverse of the slope formula since we are calculating
-            // the perpindicular line
-            if (y != newy) {
-                float newslope = (float)(newx - x) / (float)(y - newy) ;
-                if (abs(newslope - slope) < 0.5 &&
-                    abs(newslope - slope) > 0.05) {
-                    if (CORRECT) {
-                        drawBlob(post, PINK);
-                    }
-                    post.leftTop.x = startX + count;
-                    post.rightTop.x = post.rightTop.x + count;
-                    post.leftBottom.x = post.leftBottom.x - count;
-                    post.rightBottom.x = post.rightBottom.x - count;
-                    // Now sometimes our right side estimate won't be so good
-                    y = max(0, post.rightTop.y);
-                    x = post.rightTop.x;
-                    count = 0;
-                    for ( ; x > post.leftTop.x; ) {
-                        int pix = thresh->thresholded[y][x];
-                        if (pix == c || pix == c2) {
-                            break;
-                        }
-                        // we just do on a pure horizontal so we don't need to
-                        // worry about going offscreen
-                        x--;
-                        count++;
-                    }
-                    int count2 = 0;
-                    y = post.rightBottom.y -1;
-                    x = post.rightBottom.x;
-                    for ( ; x > post.leftBottom.x; ) {
-                        int pix = thresh->thresholded[y][x];
-                        if (pix == c || pix == c2) {
-                            break;
-                        }
-                        // we just do on a pure horizontal so we don't need to
-                        // worry about going offscreen
-                        x--;
-                        count2++;
-                    }
-                    count = min(min(count, count2), counter);
-                    post.rightBottom.x = post.rightBottom.x - count;
-                    post.rightTop.x = post.rightTop.x - count;
-                }
-            }
+float ObjectFragments::correct(blob b, int color, int c2) {
+    // try and find the cross bar - start at the upper left corner
+    int biggest = 0, biggest2 = 0;
+	int skewr = 0, skewl = 0;
+    int x = b.leftTop.x;
+    int y = b.leftTop.y;
+    int h = blobHeight(b);
+    int w = blobWidth(b);
+    //int need = min(w / 2, 20);
+    int need = max(w, 10);
+	float newSlope = 0.0f;
+	if (CORRECT) {
+		//drawBlob(b, ORANGE);
+	}
+	// scan the left side to see how far out we can go seeing post
+    for (int i = 0; i < h / 5 && biggest < need; i+=1) {
+        int tx = xProject(x, y, y + i);
+        horizontalScan(tx, y + i, -1, 6, color, color, max(0, x - 2 * w),
+                       IMAGE_WIDTH - 1);
+        if (scan.good > biggest) {
+            biggest = scan.good;
         }
-    } else {
-        x = min(IMAGE_WIDTH - 1,post.rightTop.x); y = max(0,post.rightTop.y);
-        startX = x; startY = y;
-        vertScan(x, y, 1, 4, c, c2);
-        if (scan.good == 0) {
-            vertScan(max(0, post.leftBottom.x), min(post.leftBottom.y,
-                                                    IMAGE_HEIGHT - 1), -1, 4, c,
-                     c2);
-            if (scan.good == 0) {
-                // scan until we actually have a point
-                for ( ; x > -1 && y > -1; ) {
-                    // go until we hit enough bad pixels
-                    //cout << "Vert scan " << x << " " << y << endl;
-                    // if it is the color we're looking for - good
-                    if (thresh->thresholded[y][x] == c ||
-                        thresh->thresholded[y][x] == c2) {
-                        break;
-                    }
-                    y = y + 1;
-                    x = xProject(startX, startY, y);
-                }
-                int newx = x, newy = y, count = 0;
-                if (CORRECT) {
-                    drawPoint(x, y, PINK);
-                }
-                // now scan horizontally
-                for (x = startX, y = startY; x < IMAGE_WIDTH && x >= 0; ) {
-                    // if it is the color we're looking for - good
-                    if (thresh->thresholded[y][x] == c ||
-                        thresh->thresholded[y][x] == c2) {
-                        break;
-                    }
-                    // we just do on a pure horizontal so we don't need to
-                    // worry about going offscreen
-                    x--;
-                    count++;
-                }
-                if (CORRECT) {
-                    drawPoint(x, y, ORANGE);
-                    cout << "XY " << x << " " << y << endl;
-                }
-                int counter = count;
-                // we do the inverse of the slope formula since we are
-                // calculating the perpindicular line
-                if (y != newy) {
-                    float newslope = (float)(newx - x) / (float)(y - newy) ;
-                    if (abs(newslope - slope) < 0.5 &&
-                        abs(newslope - slope) > 0.05) {
-                        if (CORRECT) {
-                            drawBlob(post, PINK);
-                        }
-                        post.leftTop.x = post.leftTop.x - count;
-                        post.rightTop.x = post.rightTop.x - count;
-                        post.leftBottom.x = post.leftBottom.x + count;
-                        post.rightBottom.x = post.rightBottom.x + count;
-                        // Now sometimes our left side estimate won't be so good
-                        y = max(0, post.leftTop.y);
-                        x = post.leftTop.x;
-                        count = 0;
-                        for ( ; x < post.rightTop.x; ) {
-                            int pix = thresh->thresholded[y][x];
-                            if (pix == c || pix == c2) {
-                                break;
-                            }
-                            // we just do on a pure horizontal so we don't need
-                            // to worry about going offscreen
-                            x++;
-                            count++;
-                        }
-                        int count2 = 0;
-                        y = post.leftBottom.y - 1;
-                        x = post.leftBottom.x;
-                        for ( ; x < post.rightBottom.x; ) {
-                            int pix = thresh->thresholded[y][x];
-                            if (pix == c || pix == c2) {
-                                break;
-                            }
-                            // we just do on a pure horizontal so we don't need
-                            // to worry about going offscreen
-                            x++;
-                            count2++;
-                        }
-                        count = min(min(count, count2), counter);
-                        post.leftBottom.x = post.leftBottom.x + count;
-                        post.leftTop.x = post.leftTop.x - count;
-                        if (CORRECT) {
-                            drawBlob(post, GREEN);
-                        }
-                    }
-                }
-            }
+    }
+	// now the right side
+    x = b.rightTop.x;
+    y = b.rightTop.y;
+    for (int i = 0; i < h / 5 && biggest2 < need; i+=1) {
+        int tx = xProject(x, y, y + i);
+        horizontalScan(tx, y + i, 1, 6, color, color, x - 1, IMAGE_WIDTH - 1);
+        if (scan.good > biggest2) {
+            biggest2 = scan.good;
+        }
+    }
+	// What we're going to do is scan opposite corners at the bottom and subtract 
+	// those results.
+	x = b.rightBottom.x;
+	y = b.rightBottom.y;
+	int bestr = 0, bestl = 0;
+    for (int i = 0; i < h / 5 && skewr < biggest; i+=1) {
+        int tx = xProject(x, y, y - i);
+        horizontalScan(tx, y - i, 1, 6, color, color, x - 1, IMAGE_WIDTH - 1);
+        if (scan.good > skewr) {
+            skewr = scan.good;
+			bestr = i;
+        }
+    }
+	x = b.leftBottom.x;
+	y = b.leftBottom.y;
+    for (int i = 0; i < h / 5 && skewl < biggest2; i+=1) {
+        int tx = xProject(x, y, y - i);
+        horizontalScan(tx, y - i, -1, 6, color, color, max(0, x - 2 * w),
+                       IMAGE_WIDTH - 1);
+        if (scan.good > skewl) {
+			bestl = i;
+            skewl = scan.good;
         }
     }
 
-    // count up how many pixels from the left boundary until we hit one that has
-    // the right color
-    // do {
-    //     temp = thresh->thresholded[post.leftBottom.x + bad1][post.leftBottom.y];
-    //     bad1++;
-    // } while (temp != c && temp != c2);
-    // do {
-    //     temp = thresh->thresholded[post.rightBottom.x - bad1][post.rightBottom.y];
-    //     bad2++;
-    // } while (temp != c && temp != c2);
-    // if (bad1 > bad2) {
-    //     // possible slant to the left as we look at picture
-    // } else if (bad2 > bad1) {
-    //     // possible slant to the right
-    //     // in theory there should be a like amount of "extra" pixels on top -
-    //     // let's check it out
-    //     horizontalScan(post.topRight.x, post.topRight.y, 1, 3, c, c2, 0,
-    //                    IMAGE_WIDTH - 1);
-    //     if (scan.good > 1) {
-    //     }
-    // }
-}
+	int stops = 10;
+	if (biggest > 5 && skewr > 5) {
+		if (CORRECT)
+			cout << "Left lean detected " << biggest << " " << skewr << " " << bestr << endl;
+		int topmove = min(skewr, biggest);
+		//drawLine(b.leftTop.x - skewr, b.leftTop.y, b.leftBottom.x + skewr, b.leftBottom.y, ORANGE);
+		b.leftTop.x = max(0, b.leftTop.x - topmove);
+		b.rightBottom.x = b.rightBottom.x + skewr;
+		// make sure we don't over-correct
+		x = b.leftBottom.x + skewr;
+		y = b.leftBottom.y;
+		int backr = 0;
+		int stopper = max(stops, bestr);
+		for (int i = 0; i < stopper; i+=1) {
+			int tx = xProject(x, y, y - i);
+			horizontalScan(tx, y - i, -1, 6, color, color, max(0, x - 2 * w),
+						   IMAGE_WIDTH - 1);
+			if (scan.good > backr) {
+				backr = scan.good;
+			}
+		}
+		b.leftBottom.x = b.leftBottom.x + skewr - backr;
+		b.rightTop.x = min(IMAGE_WIDTH - 1, b.rightTop.x - topmove + backr);
+		newSlope = -(float)(b.leftBottom.x - b.leftTop.x) / (float)(b.leftBottom.y - b.leftTop.y);
+		return newSlope;
+	}
+	if (biggest2 > 5 && skewl > 5) {
+		if (CORRECT)
+			cout << "Right lean detected " << biggest2 << " " << skewl << " " << bestl << endl;
+		int topmove = min(skewl, biggest2);
+		b.rightTop.x = b.rightTop.x + topmove;
+		b.leftBottom.x = max(0, b.leftBottom.x - skewl);
+		x = max(0, b.rightBottom.x - skewl);
+		y = b.rightBottom.y;
+		int backl = 0;
+		int stopper = max(stops, bestl);
+		for (int i = 0; i < stopper; i+=1) {
+			int tx = xProject(x, y, y - i);
+			horizontalScan(tx, y - i, 1, 6, color, color, 0, IMAGE_WIDTH - 1);
+			if (scan.good > backl) {
+				backl = scan.good;
+			}
+		}
+		b.rightBottom.x = min(IMAGE_WIDTH - 1, b.rightBottom.x - skewl + backl);
+		b.leftTop.x = b.leftTop.x + topmove - backl;
+		newSlope = -(float)(b.rightBottom.x - b.rightTop.x) / (float)(b.rightBottom.y - b.rightTop.y);
+	}
+	return newSlope;
+	}
 
 /*  Routine to find a general square goal.
  * We start with a point.  We scan up from the point and down from the point
@@ -1548,37 +1449,48 @@ void ObjectFragments::correct(blob & post, int c, int c2) {
  */
 void ObjectFragments::squareGoal(int x, int y, int c, int c2) {
     // so we can check for failure
+	int count = 0;
+	bool looping = false;
     obj.leftTop.x = BADVALUE; obj.leftTop.y = BADVALUE;
-    // first we try going up
-    vertScan(x, y, -1,  3, c, c2);
-    int h = scan.good;
-    // at this point we have a very rough idea of how tall the square is
-    int top = scan.y;
-    int topx = scan.x;
-    // now go down
-    vertScan(x, y, 1,  3, c, c2);
-    h += scan.good;
-    if (h < 2) return;
-    int bottom = scan.y;
-    int bottomx = scan.x;
-    //drawPoint(topx, top, RED);
-    //drawPoint(bottomx, bottom, RED);
-    obj.leftTop.x = topx;
-    obj.leftTop.y = top;
-    obj.rightTop.x = topx;
-    obj.rightTop.y = top;
-    obj.leftBottom.x = bottomx;
-    obj.leftBottom.y = bottom;
-    obj.rightBottom.x = bottomx;
-    obj.rightBottom.y = bottom;
-    //int spanY = obj.leftBottom.y - obj.leftTop.y;
-    findTrueLineVerticalSloped(obj.leftTop, obj.leftBottom, c, c2, true);
-    //drawPoint(obj.leftTop.x, obj.leftTop.y, RED);
-    //drawPoint(obj.leftBottom.x, obj.leftBottom.y, RED);
-    findTrueLineVerticalSloped(obj.rightTop, obj.rightBottom, c, c2, false);
-    findTrueLineHorizontalSloped(obj.leftTop, obj.rightTop, c, c2, true);
-    findTrueLineHorizontalSloped(obj.leftBottom, obj.rightBottom, c, c2, false);
-    correct(obj, c, c2);
+	do {
+		// first we try going up
+		vertScan(x, y, -1,  3, c, c2);
+		int h = scan.good;
+		// at this point we have a very rough idea of how tall the square is
+		int top = scan.y;
+		int topx = scan.x;
+		// now go down
+		vertScan(x, y, 1,  3, c, c2);
+		h += scan.good;
+		if (h < 2) return;
+		int bottom = scan.y;
+		int bottomx = scan.x;
+		//drawPoint(topx, top, RED);
+		//drawPoint(bottomx, bottom, RED);
+		obj.leftTop.x = topx;
+		obj.leftTop.y = top;
+		obj.rightTop.x = topx;
+		obj.rightTop.y = top;
+		obj.leftBottom.x = bottomx;
+		obj.leftBottom.y = bottom;
+		obj.rightBottom.x = bottomx;
+		obj.rightBottom.y = bottom;
+		//int spanY = obj.leftBottom.y - obj.leftTop.y;
+		findTrueLineVerticalSloped(obj.leftTop, obj.leftBottom, c, c2, true);
+		//drawPoint(obj.leftTop.x, obj.leftTop.y, RED);
+		//drawPoint(obj.leftBottom.x, obj.leftBottom.y, RED);
+		findTrueLineVerticalSloped(obj.rightTop, obj.rightBottom, c, c2, false);
+		findTrueLineHorizontalSloped(obj.leftTop, obj.rightTop, c, c2, true);
+		findTrueLineHorizontalSloped(obj.leftBottom, obj.rightBottom, c, c2, false);
+		float newSlope = correct(obj, c, c2);
+		if (newSlope != 0.0) {
+			if (CORRECT)
+				cout << "Old slope was " << slope << " " << newSlope << endl;
+			slope = newSlope;
+			looping = true;
+		}
+		count++;
+	} while (count < 2 && looping);
     //drawBlob(obj, ORANGE);
 }
 
@@ -1819,33 +1731,6 @@ int ObjectFragments::crossCheck(blob b) {
             biggest2 = scan.good;
         }
     }
-
-	// now in principle we have all we need to know.  However, we still have the
-	// problem of skewed posts.  So let's see if we can correct for this.
-	// What we're going to do is scan opposite corners at the bottom and subtract 
-	// those results.
-	x = b.rightBottom.x;
-	y = b.rightBottom.y;
-    for (int i = 0; i < h / 5 && skewr < biggest; i+=1) {
-        int tx = xProject(x, y, y - i);
-        horizontalScan(tx, y - i, 1, 6, color, color, x - 1, IMAGE_WIDTH - 1);
-        if (scan.good > skewr) {
-            skewr = scan.good;
-        }
-    }
-	x = b.leftBottom.x;
-	y = b.leftBottom.y;
-    for (int i = 0; i < h / 5 && skewl < biggest2; i+=1) {
-        int tx = xProject(x, y, y - i);
-        horizontalScan(tx, y - i, -1, 6, color, color, max(0, x - 2 * w),
-                       IMAGE_WIDTH - 1);
-        if (scan.good > skewl) {
-            skewl = scan.good;
-        }
-    }
-
-	biggest = biggest - skewr;
-	biggest2 = biggest2 - skewl;
 
     if (POSTLOGIC) {
         cout << "Cross check " << biggest << " " << biggest2 << endl;
