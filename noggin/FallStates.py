@@ -52,28 +52,22 @@ def standup(guard):
 def standFromBack(guard):
     if guard.firstFrame():
         guard.brain.player.executeMove(SweetMoves.STAND_UP_BACK)
+        guard.standupMoveTime = SweetMoves.getMoveTime(SweetMoves.STAND_UP_BACK)
 
     return guard.goLater('standing')
 
 def standFromFront(guard):
     if guard.firstFrame():
         guard.brain.player.executeMove(SweetMoves.STAND_UP_FRONT)
+        guard.standupMoveTime = SweetMoves.getMoveTime(SweetMoves.STAND_UP_FRONT)
 
     return guard.goLater('standing')
 
 def standing(guard):
-    if guard.firstFrame():
-        guard.doneStandingCount = 0
-
-    if guard.brain.motion.isBodyActive():
+    if guard.stateTime <= guard.standupMoveTime:
         return guard.stay()
-    else :
-        guard.doneStandingCount += 1
 
-    if guard.doneStandingCount > guard.DONE_STANDING_THRESH:
-        return guard.goLater('doneStanding')
-
-    return guard.stay()
+    return guard.goLater('doneStanding')
 
 def doneStanding(guard):
     """
