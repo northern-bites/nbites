@@ -312,11 +312,11 @@ void LocEKF::incorporateMeasurement(Observation z,
     se(1,1) = std::sqrt(se(1,1));
 
     // Ignore observations based on standard error
-    if ( se(0,0)*6.0f < fabs(V_k(0))) {
+    if ( se(0,0)*6.0f < std::abs(V_k(0))) {
 #ifdef DEBUG_STANDARD_ERROR
         std::cout << "\t Ignoring measurement " << std::endl;
         std::cout << "\t Standard error is " << se << std::endl;
-        std::cout << "\t Invariance is " << fabs(V_k(0))*5 << std::endl;
+        std::cout << "\t Invariance is " << std::abs(V_k(0))*5 << std::endl;
 #endif
         R_k(0,0) = DONT_PROCESS_KEY;
     }
@@ -493,9 +493,9 @@ void LocEKF::deadzone(float &R, float &innovation,
         return;
     }
 
-    if ( fabs(innovation) > eps) {
+    if ( std::abs(innovation) > eps) {
         // Decrease the covariance, so that it effects the estimate more
-        invR=( fabs(innovation) / eps-1) / CPC;
+        invR=( std::abs(innovation) / eps-1) / CPC;
     } else {
         // Decrease the innovations, so that it doesn't effect the estimate
         innovation=0.0;
