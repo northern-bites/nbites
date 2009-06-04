@@ -89,6 +89,9 @@ class Brain(object):
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
+        # Log
+        self.out.startLocLog()
+
     def initFieldObjects(self):
         """
         Build our set of Field Objects which are team specific compared
