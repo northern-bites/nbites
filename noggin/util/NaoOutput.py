@@ -92,14 +92,6 @@ class NaoOutput:
         locLine = "%g %g %g %g %g %g %g %g %g %g %g %g %g" % (
             #ODOMETRY dF, dL, dA
             self.brain.loc.lastOdoF, self.brain.loc.lastOdoL, self.brain.loc.lastOdoR,
-            #YGLP DIST BEARING
-            self.brain.yglp.dist, self.brain.yglp.bearing,
-            #YGRP DIST BEARING
-            self.brain.ygrp.dist, self.brain.ygrp.bearing,
-            #BGLP DIST BEARING
-            self.brain.bglp.dist, self.brain.bglp.bearing,
-            #BGRP DIST BEARING
-            self.brain.bgrp.dist, self.brain.bgrp.bearing,
             #BALL DIST BEARING
             self.brain.ball.dist, self.brain.ball.bearing)
 

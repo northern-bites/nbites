@@ -89,10 +89,6 @@ class Brain(object):
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
-        # Log
-        if Constants.LOG_LOC:
-            self.out.startLocLog()
-
     def initFieldObjects(self):
         """
         Build our set of Field Objects which are team specific compared
@@ -287,4 +283,4 @@ class Brain(object):
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
-            self.loc.reset()
+        self.loc.reset()

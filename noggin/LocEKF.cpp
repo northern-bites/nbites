@@ -105,7 +105,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
         std::cout << "\t\t" << Z[i] <<std::endl;
     }
 #endif
-
+    ++frameCounter;
     // Update expected position based on odometry
     timeUpdate(u);
     limitAPrioriUncert();
@@ -130,7 +130,7 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
     } else {
         noCorrectionStep();
     }
-    limitPosteriorUncert();
+    //limitPosteriorUncert();
 
     // Clip values if our estimate is off the field
     clipRobotPose();
@@ -376,27 +376,36 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
 void LocEKF::limitAPrioriUncert()
 {
     // Check x uncertainty
-    if(P_k_bar(0,0) < X_UNCERT_MIN) {
-        P_k_bar(0,0) = X_UNCERT_MIN;
-    }
-    // Check y uncertainty
-    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
-        P_k_bar(1,1) = Y_UNCERT_MIN;
-    }
-    // Check h uncertainty
-    if(P_k_bar(2,2) < H_UNCERT_MIN) {
-        P_k_bar(2,2) = H_UNCERT_MIN;
-    }
+    // if(P_k_bar(0,0) < X_UNCERT_MIN) {
+    //     P_k_bar(0,0) = X_UNCERT_MIN;
+    // }
+    // // Check y uncertainty
+    // if(P_k_bar(1,1) < Y_UNCERT_MIN) {
+    //     P_k_bar(1,1) = Y_UNCERT_MIN;
+    // }
+    // // Check h uncertainty
+    // if(P_k_bar(2,2) < H_UNCERT_MIN) {
+    //     P_k_bar(2,2) = H_UNCERT_MIN;
+    // }
     // Check x uncertainty
     if(P_k_bar(0,0) > X_UNCERT_MAX) {
+        // std::cout << "Frame number " << frameCounter << std::endl;
+        // std::cout << "Limiting x uncert from " << P_k_bar(0,0)
+        //           << " to " << X_UNCERT_MAX << std::endl;
         P_k_bar(0,0) = X_UNCERT_MAX;
     }
     // Check y uncertainty
     if(P_k_bar(1,1) > Y_UNCERT_MAX) {
+        // std::cout << "Frame number " << frameCounter << std::endl;
+        // std::cout << "Limiting y uncert from " << P_k_bar(1,1)
+        //           << " to " << Y_UNCERT_MAX << std::endl;
         P_k_bar(1,1) = Y_UNCERT_MAX;
     }
     // Check h uncertainty
     if(P_k_bar(2,2) > H_UNCERT_MAX) {
+        // std::cout << "Frame number " << frameCounter << std::endl;
+        // std::cout << "Limiting h uncert from " << P_k_bar(2,2)
+        //           << " to " << H_UNCERT_MAX << std::endl;
         P_k_bar(2,2) = H_UNCERT_MAX;
     }
 }

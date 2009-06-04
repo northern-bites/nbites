@@ -1,6 +1,10 @@
 #include "fakerIO.h"
 using namespace std;
 using namespace boost;
+#define BGLP_ID 30
+#define BGRP_ID 31
+#define YGLP_ID 32
+#define YGRP_ID 33
 #define BALL_ID 40
 #define NO_DATA_VALUE -111.111f
 
@@ -466,9 +470,7 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     &currentPose, &currentBall, ballEKF, *_b,
                     teamColor, playerNumber, BALL_ID);
 
-    float yglpDist, yglpBearing, ygrpDist, ygrpBearing,
-        bglpDist, bglpBearing, bgrpDist, bgrpBearing,
-        ballDist, ballBearing;
+    float ballDist, ballBearing;
 
     // Collect the frame by frame data
     while(!inputFile->eof()) {
@@ -477,13 +479,21 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
         inputLine << line;
         // Read in the base data
         inputLine >> lastOdo.deltaF >> lastOdo.deltaL >> lastOdo.deltaR
-                  >> yglpDist >> yglpBearing >> ygrpDist >> ygrpBearing
-                  >> bglpDist >> bglpBearing >> bgrpDist >> bgrpBearing
                   >> ballDist >> ballBearing;
 
         // See if we have corners to read in
 
         // Update Observations
+        VisualFieldObject fo((fieldObjectID)ids[k]);
+        fo.setDistanceWithSD(dists[k]);
+        fo.setBearingWithSD(bearings[k]);
+        if (fo.getID() != BLUE_GOAL_POST ||
+            fo.getID() != YELLOW_GOAL_POST) {
+            fo.setIDCertainty(_SURE);
+        }
+
+                Observation seen(fo);
+
         // Update Ball
         if (ballDist > 0) {
             _b->setDistanceWithSD(ballDist);
