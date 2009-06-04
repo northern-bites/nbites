@@ -9,7 +9,7 @@ FRAME_DIR = "picSet/"
 RAW_HEADER_SIZE = 0
 
 # Logging
-LOG_DIR = "/home/root/logs/"
+LOG_DIR = "./lib/man/noggin/util/"
 # Localization Logs
 LOC_LOG_TYPE = "localization"
 NAO_HEADER_ID = "NAO"
@@ -21,7 +21,6 @@ class NaoOutput:
         class constructor
         """
         self.brain = brain
-        self.frameCounter = 0 # Used by saveFrame
         self.locLogCount = 0
         self.loggingLoc = False
 
@@ -138,7 +137,7 @@ class Log:
         """
         self.frame = 0
         self.logType = logType
-        logTitle = LOG_DIR + logType + "/out" + str(count) + ".log"
+        logTitle = LOG_DIR + logType + str(count) + ".log"
         self.logFile = open(logTitle, 'w')
 
     def writeLine(self, line):
