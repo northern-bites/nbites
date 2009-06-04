@@ -90,7 +90,8 @@ class Brain(object):
         self.fallController = FallController.FallController(self)
 
         # Log
-        self.out.startLocLog()
+        if Constants.LOG_LOC:
+            self.out.startLocLog()
 
     def initFieldObjects(self):
         """

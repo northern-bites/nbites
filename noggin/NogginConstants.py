@@ -5,23 +5,16 @@
 ##
 ##--------------------SWITCH BOARD ----------------#
 ##
-PACKET_HEADER = "borat_foobar"
-##### MODULE SWITCHES ####
-USE_VISION = True # Disable if you want faster processing
-
-#### DEBUG SWITCHES ####
-USE_SNAPSHOT = True # Enable if you want to take pictures with spacebar
-
+LOG_LOC = True
 # LED Related #
 DEBUG_BALL_LEDS = True
 DEBUG_GOAL_LEDS = True
 
-# Localization Related
-ODOMETRY_DEBUG = False
-DEBUG_LOC_INFO = False
-DEBUG_LINES = False
-DEBUG_CORNERS = False
-DEBUG_FIELD_OBJECTS = False
+##### MODULE SWITCHES ####
+USE_VISION = True # Disable if you want faster processing
+
+##--------------------COM HEADER -------------#
+PACKET_HEADER = "borat_foobar"
 
 ##
 ##--------------------WALK TIME CONSTANTS -------------#
