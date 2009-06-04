@@ -81,25 +81,25 @@ def decideKick(player):
     # Saw the opponent goal
     elif player.kickDecider.sawOppGoal:
         if oppLeftPostBearing is not None and oppRightPostBearing is not None:
-            if oppLeftPostBearing < 0 and oppRightPostBearing > 0:
+            if oppLeftPostBearing > 0 and oppRightPostBearing < 0:
                 # kick straight
                 if Constants.DEBUG_KICKS: print ("\t\t Straight 1")
                 return player.goLater('kickBallStraight')
-            elif oppLeftPostBearing > 0:
+            elif oppLeftPostBearing < 0:
                 if Constants.DEBUG_KICKS: print ("\t\t Left 5")
                 return player.goLater('kickBallLeft')
-            elif oppRightPostBearing < 0:
+            elif oppRightPostBearing > 0:
                 if Constants.DEBUG_KICKS: print ("\t\t Right 5")
                 return player.goLater('kickBallRight')
         elif oppLeftPostBearing is not None:
-            if oppLeftPostBearing > 0:
+            if oppLeftPostBearing < 0:
                 if Constants.DEBUG_KICKS: print ("\t\t Left 6")
                 return player.goLater('kickBallLeft')
             else:
                 if Constants.DEBUG_KICKS: print ("\t\t Straight 2")
                 return player.goLater('kickBallStraight')
         elif oppRightPostBearing is not None:
-            if oppRightPostBearing < 0:
+            if oppRightPostBearing > 0:
                 if Constants.DEBUG_KICKS: print ("\t\t Right 6")
                 return player.goLater('kickBallRight')
             else:
