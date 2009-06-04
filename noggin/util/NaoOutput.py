@@ -1,18 +1,14 @@
-
 """
 NaoOutput.py - File for holding all sorts of output and logging functions
 """
 
-# CONSTANTS
-# saveFrame
-FRAME_DIR = "picSet/"
-RAW_HEADER_SIZE = 0
+import time
 
+# CONSTANTS
 # Logging
 LOG_DIR = "./lib/man/noggin/util/"
 # Localization Logs
-LOC_LOG_TYPE = "localization"
-NAO_HEADER_ID = "NAO"
+LOC_LOG_TYPE = "loc"
 GREEN_COLOR_CODE = '\033[32m'
 RESET_COLORS_CODE = '\033[0m'
 class NaoOutput:
@@ -60,8 +56,8 @@ class NaoOutput:
         self.locLog = self.newLog(LOC_LOG_TYPE, self.locLogCount)
 
         # Write the first line holding teamColor and playerNumber
-        headerLine = str(self.brain.my.teamColor) + " " + \
-            str(self.brain.my.playerNumber) + " " + NAO_HEADER_ID
+        headerLine = (str(self.brain.my.teamColor) + " " +
+                      str(self.brain.my.playerNumber))
 
         # The second line holds the current loc values needed for self init
         initLine = ("%g %g %g %g %g %g %g %g %g %g %g %g %g %g"
@@ -137,7 +133,7 @@ class Log:
         """
         self.frame = 0
         self.logType = logType
-        logTitle = LOG_DIR + logType + str(count) + ".log"
+        logTitle = LOG_DIR + time.strftime("%Y-%m-%d-%H-%M-%S") + "." + logType
         self.logFile = open(logTitle, 'w')
 
     def writeLine(self, line):

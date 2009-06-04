@@ -1,6 +1,8 @@
 #include "fakerIO.h"
 using namespace std;
 using namespace boost;
+#define BALL_ID 40
+#define NO_DATA_VALUE -111.111f
 
 /**
  * Method to read in a robot path from a formatted file
@@ -405,4 +407,100 @@ void printCoreLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
                 << currentBall->y << " "
                 << currentBall->velX << " "
                 << currentBall->velY << endl;
+}
+
+/**
+ * Take a robot log and convert it to something we can use in the EKF log
+ *
+ * @param inputFile The robot log
+ * @param outputFile The log to be read in by TOOL
+ */
+void readRobotLogFile(fstream* inputFile, fstream* outputFile)
+{
+    vector<Observation> sightings;
+    MotionModel lastOdo(0.0f, 0.0f, 0.0f);
+    // Known robot and ball data, set to unknown
+    PoseEst currentPose(NO_DATA_VALUE, NO_DATA_VALUE, NO_DATA_VALUE);
+    BallPose currentBall(NO_DATA_VALUE, NO_DATA_VALUE,
+                         NO_DATA_VALUE, NO_DATA_VALUE);
+
+    VisualBall * _b = new VisualBall();
+
+    int teamColor, playerNumber;
+    char line[256];
+    float initX, initY, initH,
+        initUncertX, initUncertY, initUncertH,
+        initBallX, initBallY,
+        initBallXUncert, initBallYUncert,
+        initBallVelX, initBallVelY,
+        initBallVelXUncert, initBallVelYUncert;
+
+    if(!inputFile->eof()) {
+        stringstream headerLine(stringstream::in | stringstream::out);
+        // Read in the header line
+        inputFile->getline(line, 256);
+        headerLine << line;
+        headerLine >> teamColor >> playerNumber;
+
+        stringstream startLine(stringstream::in | stringstream::out);
+        // Read the EKF start configuration
+        inputFile->getline(line, 256);
+        startLine << line;
+        startLine >> initX >> initY >> initH
+                  >> initUncertX >> initUncertY >> initUncertH
+                  >> initBallX >> initBallY
+                  >> initBallXUncert >> initBallYUncert
+                  >> initBallVelX >> initBallVelY
+                  >> initBallVelXUncert >> initBallVelYUncert;
+    }
+    cout << "Start line is " << initX << " " << initY << " " << initH << endl;
+    // Initialize localization systems
+    shared_ptr<LocSystem> locEKF  = shared_ptr<LocEKF>(
+        new LocEKF(initX, initY, initH, initUncertX, initUncertY, initUncertH));
+    shared_ptr<BallEKF> ballEKF =  shared_ptr<BallEKF>(
+        new BallEKF(initBallX, initBallY, initBallVelX, initBallVelY,
+                    initBallXUncert, initBallYUncert,
+                    initBallVelXUncert, initBallVelYUncert));
+
+    printOutLogLine(outputFile,locEKF, sightings, lastOdo,
+                    &currentPose, &currentBall, ballEKF, *_b,
+                    teamColor, playerNumber, BALL_ID);
+
+    float yglpDist, yglpBearing, ygrpDist, ygrpBearing,
+        bglpDist, bglpBearing, bgrpDist, bgrpBearing,
+        ballDist, ballBearing;
+
+    // Collect the frame by frame data
+    while(!inputFile->eof()) {
+        stringstream inputLine(stringstream::in | stringstream::out);
+        inputFile->getline(line, 256);
+        inputLine << line;
+        // Read in the base data
+        inputLine >> lastOdo.deltaF >> lastOdo.deltaL >> lastOdo.deltaR
+                  >> yglpDist >> yglpBearing >> ygrpDist >> ygrpBearing
+                  >> bglpDist >> bglpBearing >> bgrpDist >> bgrpBearing
+                  >> ballDist >> ballBearing;
+
+        // See if we have corners to read in
+
+        // Update Observations
+        // Update Ball
+        if (ballDist > 0) {
+            _b->setDistanceWithSD(ballDist);
+            _b->setBearingWithSD(ballBearing);
+        } else {
+            _b->setDistanceWithSD(0.0f);
+            _b->setBearingWithSD(0.0f);
+        }
+        RangeBearingMeasurement m(_b);
+
+        // Update localization
+        locEKF->updateLocalization(lastOdo, sightings);
+        ballEKF->updateModel(m, locEKF->getCurrentEstimate());
+
+        // Write out the next observation line
+        printOutLogLine(outputFile, locEKF, sightings, lastOdo,
+                        &currentPose, &currentBall, ballEKF, *_b,
+                        teamColor, playerNumber, BALL_ID);
+    }
 }

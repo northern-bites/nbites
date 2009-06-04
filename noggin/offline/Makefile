@@ -55,6 +55,8 @@ FAKER_SRCS = LocLogFaker.cpp \
 
 NOISE_SRCS = noiseVaccuracy.cpp
 
+ROBOT_LOG_SRCS = convertRobotLog.cpp
+
 OBJS = Utility.o \
        ConcreteLandmark.o \
        ConcreteCorner.o \
@@ -79,14 +81,18 @@ EXECS = faker.o \
 	obsToLoc.o \
 	navToObs \
 	obsToLoc \
-	noiseVaccuracy
+	noiseVaccuracy \
+	convertRobotLog
 
 LDLIBS = $(OBJS)
 LDFLAGS = $(LDLIBS)
 
-all : navToObs obsToLoc faker noiseVaccuracy
+all : convertRobotLog faker
 
 # The faker tool
+convertRobotLog : $(ROBOT_LOG_SRCS) $(OBJS) convertRobotLog.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) convertRobotLog.o -DNO_ZLIB -o $@
+
 noiseVaccuracy : $(NOISE_SRCS) $(OBJS) noiseVaccuracy.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) noiseVaccuracy.o -DNO_ZLIB -o $@
 
@@ -99,10 +105,13 @@ obsToLoc : $(OBS_TO_LOC_SRCS) $(OBJS) obsToLoc.o
 navToObs : $(NAV_TO_OBS_SRCS) $(OBJS) navToObs.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) navToObs.o -DNO_ZLIB -o $@
 
+faker.o : $(ROBOT_LOG_SRCS) $(OBJS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+
 noiseVaccuracy.o : $(NOISE_SRCS) $(OBJS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
-faker.o : $(FAKER_SRCS) $(OBJS)
+convertRobotLog.o : $(ROBOT_LOG_SRCS) $(OBJS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
 obsToLoc.o : $(OBS_TO_LOC_SRCS) $(OBJS)
