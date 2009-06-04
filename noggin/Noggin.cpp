@@ -420,7 +420,7 @@ void Noggin::processGCButtonClicks(){
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
-        gc->advanceOneState();
+        gc->advanceButtonClickState();
         chestButton->getAndClearNumClicks();
 #ifdef DEBUG_NOGGIN_GC
         cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
@@ -509,5 +509,3 @@ void Noggin::modifySysPath ()
 #endif
 
 }
-
-

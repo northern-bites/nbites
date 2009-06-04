@@ -32,8 +32,8 @@ class GameController
 #endif
 public:
     GameController();
-    virtual ~GameController() {} 
-    
+    virtual ~GameController() {}
+
     /* interface functions for RoboCupGameControlData
        use these for on demand information rather than waiting
        for the updates */
@@ -63,19 +63,19 @@ public:
     void setGameState(GCGameState state);
     void setPenalty(GCPenalty penalized);
 
-    //Button 
-    void advanceOneState();
+    //Button
+    void advanceButtonClickState();
     void toggleTeamColor();
     void toggleKickoff();
 
-    
+
   private:
     // check the validity of the given message and store the data
     // (if valid) into the referenced RoboCupGameControlData struct
-    bool validatePacket(const char *msg, int len, RoboCupGameControlData &packet);    
+    bool validatePacket(const char *msg, int len, RoboCupGameControlData &packet);
     void swapTeams(int team);
     void rawSwapTeams(RoboCupGameControlData& data);
-   
+
   private:
     /* local copy of the GameController data */
     RoboCupGameControlData controlData;

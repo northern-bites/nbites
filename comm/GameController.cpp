@@ -301,21 +301,17 @@ GameController::setPenalty(GCPenalty penalty)
 
 
 
-void GameController::advanceOneState(){
+void GameController::advanceButtonClickState(){
     const GCGameState currentState = gameState();
     const GCPenalty currentPenalty  = penalty();
 
     //From the Nao Rules, when the chest button is pushed
     //We need to advance the states
-    //TODO: Enable LEDs for this
     switch(currentState){
     case STATE_INITIAL:
-        setGameState(STATE_READY);
-        break;
-    case STATE_READY:
-        setGameState(STATE_SET);
-        break;
-    case STATE_SET:
+        if(currentPenalty != PENALTY_NONE){
+            setPenalty(PENALTY_NONE);
+        }
         setGameState(STATE_PLAYING);
         break;
     case STATE_PLAYING:
@@ -325,7 +321,6 @@ void GameController::advanceOneState(){
             setPenalty(PENALTY_NONE);
         }
         break;
-    case STATE_FINISHED:
     default:
         break;
         //do nothing
