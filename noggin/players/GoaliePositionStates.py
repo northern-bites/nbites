@@ -1,34 +1,45 @@
 from ..playbook import PBConstants
 from .. import NogginConstants
 import man.motion.SweetMoves as SweetMoves
+import man.noggin.util.MyMath as MyMath
 import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15.
+ORTHO_GOTO_THRESH = NogginConstants.CENTER_FIELD_X/2
 
 def goaliePosition(player):
-
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
     if helper.shouldChase(player):
         return player.goLater('goalieChase')
+    brain = player.brain
+    ball = brain.ball
+    nav = brain.nav
 
-    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
-        player.brain.tracker.trackBall()
-    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
-        player.brain.tracker.activeLoc()
+    #if 0 < ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+    #    brain.tracker.trackBall()
+    #elif ball.locDist > PBConstants.BALL_LOC_LIMIT:
+    #    brain.tracker.activeLoc()
 
     position = player.brain.playbook.position
+    useOrtho = True #(MyMath.dist(brain.my.x, brain.my.y, position[0],
+                                   #position[1]) <= ORTHO_GOTO_THRESH)
     if player.firstFrame():
-        player.printf(position)
-        player.brain.nav.orthoGoTo(position[0], position[1],
-                                   NogginConstants.OPP_GOAL_HEADING)
-    if player.brain.nav.destX != position[0] or \
-            player.brain.nav.destY != position[1]:
-        player.brain.nav.orthoGoTo(position[0], position[1],
-                                   NogginConstants.OPP_GOAL_HEADING)
-
+        if useOrtho:
+            nav.orthoGoTo(position[0], position[1],
+                          NogginConstants.OPP_GOAL_HEADING)
+        else:
+            nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
+    elif nav.destX != position[0] or nav.destY != position[1] or\
+        useOrtho!=nav.movingOrtho:
+        if useOrtho:
+            nav.orthoGoTo(position[0], position[1],
+                          NogginConstants.OPP_GOAL_HEADING)
+        else:
+            nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
+    brain.tracker.activeLoc()
     # we're at the point, let's switch to another state
-    if player.brain.nav.isStopped() and player.counter > 0:
+    if nav.isStopped() and player.counter > 0:
         return player.goLater('goalieAtPosition')
 
     return player.stay()

@@ -120,7 +120,6 @@ def getSpinDir(my, targetH):
             spin = LEFT_SPIN
         else:
             spin = RIGHT_SPIN
-    print("my.h: %g   targetH: %g  spin: %g" % (h, targetH, spin))
     return spin
 
 def getSign(x):

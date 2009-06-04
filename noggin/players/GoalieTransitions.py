@@ -52,7 +52,7 @@ def shouldHoldSave(player):
 
 def shouldChase(player):
     if (player.brain.playbook.subRole == PBConstants.GOALIE_CHASER)\
-        and (player.brain.ball.locDist <= 60):
+        and (0 < player.brain.ball.locDist <= 60):
         return True
     return False
 
@@ -78,5 +78,4 @@ def ballBtwnMeAndGoal(player):
     if ((90 <= brain.my.h <= 180) or (-180 <= brain.my.h <= -90))\
         and brain.ball.on:
         #and my.uncertH < ?
-        return True 
-    
+        return True

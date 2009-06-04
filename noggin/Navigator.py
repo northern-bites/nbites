@@ -7,6 +7,7 @@ from math import fabs
 
 LOC_IS_ACTIVE_H  = 400
 CLOSE_ENOUGH_XY = 25.0
+CLOSER_XY = 5.0
 CLOSE_ENOUGH_H = 25.0
 ALMOST_CLOSE_ENOUGH_H = 45.0
 
@@ -125,6 +126,15 @@ class Navigator(FSA.FSA):
         return (abs(self.brain.my.x - self.destX) < CLOSE_ENOUGH_XY
                 and abs(self.brain.my.y - self.destY) < CLOSE_ENOUGH_XY)
 
+    def atDestinationCloser(self):
+        """
+        Returns true if we are at an (x, y) close enough to the one we want
+        """
+#         self.printf("X diff is " + str(self.brain.my.x - self.destX))
+#         self.printf("Y diff is " + str(self.brain.my.y - self.destY))
+        return (abs(self.brain.my.x - self.destX) < CLOSER_XY
+                and abs(self.brain.my.y - self.destY) < CLOSER_XY)
+
     def atHeading(self, targetHeading = None):
         """
         Returns true if we are at a heading close enough to what we want
@@ -133,7 +143,7 @@ class Navigator(FSA.FSA):
             targetHeading = self.destH
         hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
         #self.printf("H diff is " + str(hDiff))
-        return abs(hDiff) < CLOSE_ENOUGH_H and \
+        return hDiff < CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
 
     def notAtHeading(self, targetHeading= None):
@@ -141,7 +151,7 @@ class Navigator(FSA.FSA):
             targetHeading = self.destH
         hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
         #self.printf("H diff is " + str(hDiff))
-        return abs(hDiff) > ALMOST_CLOSE_ENOUGH_H and \
+        return hDiff > ALMOST_CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
 
     def getRotScale(self, headingDiff):

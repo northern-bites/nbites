@@ -60,4 +60,3 @@ def activeTracking(tracker):
         return tracker.stay()
     else:
         return tracker.goLater('activeLocScan')
-

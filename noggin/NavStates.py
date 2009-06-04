@@ -152,9 +152,9 @@ def orthoWalkToPoint(nav):
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
     absBearing = abs(bearing)
-    nav.printf('bearing: %g  absBearing: %g  my.x: %g   my.y: %g  my.h: %g' %
+    if DEBUG: nav.printf('bearing: %g  absBearing: %g  my.x: %g   my.y: %g  my.h: %g' %
                (bearing, absBearing, my.x, my.y, my.h))
-    nav.printf((' nav.destX: ', nav.destX,
+    if DEBUG: nav.printf((' nav.destX: ', nav.destX,
                ' nav.destY: ', nav.destY, ' nav.destH: ', nav.destH))
 
     if absBearing <= 45:
@@ -182,13 +182,12 @@ def orthoForward(nav):
         if nav.walkToPointSpinCount > GOTO_SURE_THRESH:
             return nav.goLater('spinToFinalHeading')
 
-    if nav.atDestination():
+    if nav.atDestinationCloser():
         nav.walkToPointCount += 1
         if nav.walkToPointCount > GOTO_SURE_THRESH:
             return nav.goLater('stop')
 
     nav.setSpeed(GOTO_FORWARD_SPEED,0,0)
-    nav.noWalkSet  = False
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
 
@@ -212,13 +211,12 @@ def orthoBackward(nav):
         if nav.walkToPointSpinCount > GOTO_SURE_THRESH:
             return nav.goLater('spinToFinalHeading')
 
-    if nav.atDestination():
+    if nav.atDestinationCloser():
         nav.walkToPointCount += 1
         if nav.walkToPointCount > GOTO_SURE_THRESH:
             return nav.goLater('stop')
 
     nav.setSpeed(GOTO_BACKWARD_SPEED,0,0)
-    nav.noWalkSet  = False
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
 
@@ -242,13 +240,12 @@ def orthoRightStrafe(nav):
         if nav.walkToPointSpinCount > GOTO_SURE_THRESH:
             return nav.goLater('spinToFinalHeading')
 
-    if nav.atDestination():
+    if nav.atDestinationCloser():
         nav.walkToPointCount += 1
         if nav.walkToPointCount > GOTO_SURE_THRESH:
             return nav.goLater('stop')
 
     nav.setSpeed(0, -GOTO_STRAFE_SPEED,0)
-    nav.noWalkSet  = False
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
 
@@ -272,11 +269,12 @@ def orthoLeftStrafe(nav):
         if nav.walkToPointSpinCount > GOTO_SURE_THRESH:
             return nav.goLater('spinToFinalHeading')
 
-    if nav.atDestination():
+    if nav.atDestinationCloser():
         nav.walkToPointCount += 1
         if nav.walkToPointCount > GOTO_SURE_THRESH:
             return nav.goLater('stop')
 
+    nav.setSpeed(0, GOTO_STRAFE_SPEED,0)
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
     absBearing = abs(bearing)

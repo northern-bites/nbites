@@ -23,7 +23,7 @@ class HeadTracking(FSA.FSA):
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
-        self.setPrintStateChanges(False)
+        self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
         self.activePanDir = False
@@ -97,7 +97,7 @@ class HeadTracking(FSA.FSA):
         self.target = self.brain.ball
         self.gain = 1.0
         if(self.currentState != 'panLeftOnce' or self.currentState != 'panRightOnce' or
-           self.currentState != 'activeTracking'):
+           self.currentState != 'activeTracking' or self.currentState != 'activeLocScan'):
            self.switchTo('activeTracking')
 
     def trackObject(self):
@@ -117,7 +117,7 @@ class HeadTracking(FSA.FSA):
             changeY = self.target.angleY #the pitch is pos = down
         else:
             # by default, the change is none
-            #self.printf( "No object")
+            self.printf( "No object")
             return
 
         curPitch = self.brain.sensors.motionAngles[MotionConstants.HeadPitch]
