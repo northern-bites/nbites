@@ -55,7 +55,7 @@ endif
 PYTHON_INCLUDE:= -I/usr/include/python2.5/
 PYLIBS := -lpython2.5
 
-NBITES_INCLUDE :=-I$(MAN_HOME)/vision -I$(MAN_HOME)/include -I$(MAN_HOME)/corpus 
+NBITES_INCLUDE :=-I$(MAN_HOME)/vision -I$(MAN_HOME)/include -I$(MAN_HOME)/corpus -I$(MAN_HOME)/motion
 VISION_INCLUDE := $(JAVA_INCLUDE) $(NBITES_INCLUDE) $(PYTHON_INCLUDE)  $(FINK_INCLUDE)
 
 
