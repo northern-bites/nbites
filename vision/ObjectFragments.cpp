@@ -44,15 +44,15 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
 #ifdef OFFLINE
     BALLDISTDEBUG = false;
     PRINTOBJS = true;
-    POSTDEBUG = true;
-    POSTLOGIC = true;
+    POSTDEBUG = false;
+    POSTLOGIC = false;
     TOPFIND = false;
     BALLDEBUG = false;
     CORNERDEBUG = false;
     BACKDEBUG = false;
     SANITY = false;
     DEBUGBALLPOINTS = false;
-    CORRECT = true;
+    CORRECT = false;
     OPENFIELD = false;
 #endif
 }
@@ -3435,6 +3435,7 @@ bool ObjectFragments::atBoundary(blob b) {
 int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
     int confidence = 10;
     occlusion = NOOCCLUSION;
+	static const int MAXDIAM = 100;
     if (numberOfRuns > 1) {
         for (int i = 0; i < numberOfRuns; i++) {
             // search for contiguous blocks
@@ -3444,48 +3445,59 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
             blobIt(nextX, nextY, nextH);
         }
     }
+	// when we have red uniforms, sometimes we get tons of orange blobs
+	// and sometimes they are inside of each other
+	if (numBlobs > 3) {
+		int big = 0, bigArea = blobArea(blobs[0]);
+		for (int i = 1; i < numBlobs; i++) {
+			if (blobArea(blobs[i]) > bigArea) {
+				big = i;
+				bigArea = blobArea(blobs[i]);
+			}
+		}
+		for (int i = 0; i < numBlobs; i++) {
+			if (i != big && blobs[i].rightTop.x > blobs[big].leftTop.x &&
+				blobs[i].leftTop.x < blobs[big].rightTop.x &&
+				blobs[i].leftBottom.y > blobs[big].leftTop.y &&
+				blobs[i].leftTop.y < blobs[big].leftBottom.y) {
+				if (BALLDEBUG) {
+					cout << "Screening an inner ball" << endl;
+					drawBlob(blobs[i], WHITE);
+				}
+				blobs[i].area = 0;
+			}
+		}
+	}
     // pre-screen blobs that don't meet our criteria
     //cout << "horizon " << horizon << " " << slope << endl;
     for (int i = 0; i < numBlobs; i++) {
         int ar = blobArea(blobs[i]);
         float perc = rightColor(blobs[i], ORANGE);
-        estimate es;
-        es = vision->pose->pixEstimate(blobs[i].leftTop.x + blobWidth(blobs[i]) / 2, blobs[i].leftTop.y + 2 * blobHeight(blobs[i]) / 3, 0.0);
         int diam = max(blobWidth(blobs[i]), blobHeight(blobs[i]));
-        /*int dist = (int)es.dist;
-          if (diam < 15) {
-          if (dist < 300) {
-          blobs[i].area = 0;
-          }
-          } else if (diam < 20) {
-          if (dist < 250 || dist > 500) {
-          blobs[i].area = 0;
-          }
-          } else if (diam < 25) {
-          if (dist < 200 || dist >  400) {
-          blobs[i].area = 0;
-          }
-          } else if (diam < 35) {
-          if (dist < 1400 || dist > 300) {
-          blobs[i].area = 0;
-          }
-          } else {
-          if (dist > 200) {
-          blobs[i].area = 0;
-          }
-          }
-          if (blobs[i].area == 0) {
-          cout << "Diam was " << diam << " " << dist << endl;
-          }*/
-        if (blobs[i].leftBottom.y + diam < horizonAt(blobs[i].leftTop.x)) {
-            blobs[i].area = 0;
-        } else if (ar > 35 && perc > MINORANGEPERCENT) {
-            // don't do anything
-        } else if (ar > 1000 && rightHalfColor(blobs[i]) > MINORANGEPERCENT) {
-        } else {
-            //drawBlob(blobs[i], BLACK);
-            blobs[i].area = 0;
-        }
+		if (blobs[i].area > 0) {
+			if (blobs[i].leftBottom.y + diam < horizonAt(blobs[i].leftTop.x)) {
+				blobs[i].area = 0;
+				if (BALLDEBUG) {
+					cout << "Screened one for horizon problems " << endl;
+					drawBlob(blobs[i], WHITE);
+				}
+			} else if (diam > MAXDIAM) {
+				blobs[i].area = 0;
+				if (BALLDEBUG) {
+					cout << "Screened one that was too big " << diam << endl;
+					drawBlob(blobs[i], NAVY);
+				}
+			} else if (ar > 35 && perc > MINORANGEPERCENT) {
+				// don't do anything
+			} else if (ar > 1000 && rightHalfColor(blobs[i]) > MINORANGEPERCENT) {
+			} else {
+				if (BALLDEBUG) {
+					drawBlob(blobs[i], BLACK);
+					cout << "Screened one for not being orange enough" << endl;
+				}
+				blobs[i].area = 0;
+			}
+		}
     }
     // now find the best remaining blob
     getTopAndMerge(horizon);
@@ -3499,7 +3511,8 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
     int w = blobWidth(topBlob);
     int h = blobHeight(topBlob);
     estimate e;
-    e = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, topBlob.leftTop.y + 2 * blobHeight(topBlob) / 3, 0.0);
+    e = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, 
+								  topBlob.leftTop.y + 2 * blobHeight(topBlob) / 3, 0.0);
     //cout << "Estimated distance is " << e.dist << endl;
     if (BALLDEBUG) {
         if (topBlob.leftTop.x > 0) {
@@ -3523,7 +3536,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
     }
 
     // for smallish blobs, make sure we're near some green
-    int whereIsGreen = ballNearGreen(topBlob);
+    //int whereIsGreen = ballNearGreen(topBlob);
     int horb = horizonAt(topBlob.leftBottom.x);
 
     //look for edge points!
@@ -3538,7 +3551,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
         scanOut(cenX,cenY,tan(angle), -1);
     }
 
-    if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
+    if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > 5) {
         if (badSurround(topBlob)) {
             if (BALLDEBUG) {
                 drawBlob(topBlob, BLACK);
@@ -3572,7 +3585,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
         confidence += 1;
     }
     if (BALLDEBUG) {
-        printBall(topBlob, confidence, colPer, occlusion, whereIsGreen);
+        printBall(topBlob, confidence, colPer, occlusion);
     }
 
     // SORT OUT BALL INFORMATION
@@ -4051,7 +4064,7 @@ void ObjectFragments::printBlob(blob b) {
  * @param o    what the occlusions are if any
  * @param bg   where around the ball there is green
  */
-void ObjectFragments::printBall(blob b, int c, float p, int o, int bg) {
+void ObjectFragments::printBall(blob b, int c, float p, int o) {
 #ifdef OFFLINE
     if (BALLDEBUG) {
         cout << "Ball info: " << b.leftTop.x << " " << b.leftTop.y << " "
@@ -4064,19 +4077,6 @@ void ObjectFragments::printBall(blob b, int c, float p, int o, int bg) {
         if (o % RIGHTOCCLUSION == 0) cout << "right ";
         if (o % TOPOCCLUSION == 0) cout << "top ";
         if (o % BOTTOMOCCLUSION == 0) cout << "bottom ";
-        if (bg == NOGREEN) {
-            cout << "No green anywhere";
-        } else {
-            cout << "Green can be found to the ";
-        }
-        if (bg % GREENBELOW == 0)
-            cout << "bottom ";
-        if (bg % GREENABOVE == 0)
-            cout << "top ";
-        if (bg % GREENLEFT == 0)
-            cout << "left ";
-        if (bg % GREENRIGHT == 0)
-            cout << "right";
         cout << endl;
     }
 #endif

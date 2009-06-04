@@ -103,7 +103,7 @@ static const float QUESTIONABLEPOST = 0.85f;
 
 // Ball constants
 // EXAMINED: look at this switch - SMALLBALLDIM
-static const int SMALLBALLDIM = 4; // below this size balls are considered small
+static const int SMALLBALLDIM = 8; // below this size balls are considered small
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
 // ratio of width/height worse than this is a very bad sign
 static const float BALLTOOFAT = 1.5f;
@@ -291,7 +291,7 @@ public:
 
     // debugging methods
     void printObjs();
-    void printBall(blob b, int c, float p, int o, int bg);
+    void printBall(blob b, int c, float p, int o);
     void drawPoint(int x, int y, int c);
     void drawRect(int x, int y, int w, int h, int c);
     void drawBlob(blob b, int c);
