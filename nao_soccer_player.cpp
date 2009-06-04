@@ -12,15 +12,6 @@
 #include <cstdlib>
 using namespace std;
 
-#include <webots/robot.h>
-#include <webots/utils/motion.h>
-#include <webots/accelerometer.h>
-#include <webots/gyro.h>
-#include <webots/servo.h>
-#include <webots/touch_sensor.h>
-
-#include <webots/camera.h>
-
 #include "TTMan.h"
 #include "WBEnactor.h"
 #include "WBImageTranscriber.h"
@@ -100,3 +91,11 @@ int main() {
  * Foot sensors: RFsrFL, RFsrFR, RFsrBR, RFsrBL
  *               LFsrFL, LFsrFR, LFsrBR, LFsrBL
  */
+
+//GPS Example
+//   #include <webots/gps.h>
+//   WbDeviceTag gps = wb_robot_get_device("gps");
+//   wb_gps_enable(gps,40);
+//   const double * gps_vals = wb_gps_get_values(gps);
+//   printf("Robot is at (%f,%f,%f) \n",
+//          gps_vals[0],gps_vals[1],gps_vals[2]);
