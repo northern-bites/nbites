@@ -19,7 +19,6 @@ def goaliePosition(player):
 
     position = player.brain.playbook.position
     if player.firstFrame():
-        player.stopWalking()
         player.printf(position)
         player.brain.nav.orthoGoTo(position[0], position[1],
                                    NogginConstants.OPP_GOAL_HEADING)
@@ -38,8 +37,6 @@ def goalieAtPosition(player):
     """
     State for when we're at the position
     """
-    if player.firstFrame():
-        player.stopWalking()
 
     if helper.shouldSave(player):
         return player.goNow('goalieSave')

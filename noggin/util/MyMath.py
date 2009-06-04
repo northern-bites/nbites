@@ -103,25 +103,28 @@ def getSpinDir(my, targetH):
     We compute two distances, each one represents going around the circle
     in either the left or the right directions (by adding 360 in some cases)
     """
+    h = my.h
     LEFT_SPIN = 1
     RIGHT_SPIN = -1
+    spin = 0
     if targetH == 0:
-        return -sign(my)
+        spin = -sign(h)
     elif targetH == (180 or -180):
-        return sign(my)
-    elif sign(targetH) == sign(my):
-        return sign(targetH - my)
-    elif my < 0:
-        if (my + 180) >= targetH:
-            return LEFT_SPIN
-        else: #(my +180 < targetH)
-            return RIGHT_SPIN
-    else: #(my>0)
-        if (my - 180) >=targetH:
-            return LEFT_SPIN
+        spin = sign(h)
+    elif sign(targetH) == sign(h):
+        spin = sign(targetH - h)
+    elif h < 0:
+        if (h + 180) >= targetH:
+            spin = LEFT_SPIN
+        else: #(h+180 < targetH)
+            spin = RIGHT_SPIN
+    else: #(h>0)
+        if (h - 180) >=targetH:
+            spin = LEFT_SPIN
         else:
-            return RIGHT_SPIN
-
+            spin = RIGHT_SPIN
+    print("my.h: %g   targetH: %g  spin: %g" % (h, targetH, spin))
+    return spin
 
 def getSign(x):
     if x < 0:

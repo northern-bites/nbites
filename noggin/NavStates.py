@@ -33,7 +33,6 @@ def spinToWalkHeading(nav):
         nav.changeSpinDirCounter = 0
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        nav.brain.CoA.setRobotTurnGait(nav.brain.motion)
         if DEBUG: nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -85,7 +84,6 @@ def walkToPoint(nav):
         nav.noWalkSet  = True
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         if DEBUG: nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -129,14 +127,16 @@ def spinToFinalHeading(nav):
     if DEBUG: nav.printf("Need to spin to %g, heading diff is %g, heading uncert is %g" %
                (targetH, headingDiff, nav.brain.my.uncertH))
     spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
+
     strafe = spinDir*GOTO_SPIN_STRAFE
     spin = spinDir*GOTO_SPIN_SPEED*nav.getRotScale(headingDiff)
     if DEBUG: nav.printf("strafe %g, spin %g" % (strafe, spin))
     nav.setSpeed(0, strafe, spin)
+
     nav.noWalkSet = False
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
-        if nav.stopSpinToWalkCount > GOTO_SURE_THRESH:
+        if nav.stopSpinToWalkCount > CHANGE_SPIN_DIR_THRESH:
             if nav.movingOrtho:
                 return nav.goLater('orthoWalkToPoint')
             return nav.goLater('stop')
