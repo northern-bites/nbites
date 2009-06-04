@@ -40,10 +40,10 @@ public class DebugViewer extends JFrame {
     public static final String BALL_VEL_UNCERT_X_STRING = "Vel. Uncert X: ";
     public static final String BALL_VEL_UNCERT_Y_STRING = "Y: ";
     public static final String BALL_STRING = "Ball Dist/Bearing:";
-    public static final String ODO_XYH_CHANGE_STRING = "Odo X,Y,H:";
-    public static final String ODO_X_CHANGE_STRING = "Odo X:";
-    public static final String ODO_Y_CHANGE_STRING = "Odo Y:";
-    public static final String ODO_H_CHANGE_STRING = "Odo H:";
+    public static final String ODO_XYH_CHANGE_STRING = "Odo F,L,R:";
+    public static final String ODO_X_CHANGE_STRING = "Odo F:";
+    public static final String ODO_Y_CHANGE_STRING = "Odo L:";
+    public static final String ODO_H_CHANGE_STRING = "Odo R:";
     public static final String
         LANDMARK_STUFF_STRING = "ID  :  Dist  /  Bearing";
 
