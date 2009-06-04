@@ -100,16 +100,16 @@ void RoboGuardian::run(){
 
 void RoboGuardian::shutoffGains(){
     cout << "RoboGuardian::shutoffGains()" <<endl;
-    playFile(stiffness_removed_wav);
     if(motion_interface != NULL)
         motion_interface->sendFreezeCommand(REMOVE_GAINS);
+    playFile(stiffness_removed_wav);
 }
 
 void RoboGuardian::enableGains(){
     cout << "RoboGuardian::enableGains()" <<endl;
-    playFile(stiffness_enabled_wav);
     if(motion_interface != NULL)
         motion_interface->sendFreezeCommand(ENABLE_GAINS);
+    playFile(stiffness_enabled_wav);
 }
 
 static const float FALL_SPEED_THRESH = 0.03f; //rads/20ms
