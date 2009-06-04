@@ -84,12 +84,9 @@ def approachBall(player):
     sTheta = MyMath.clip(ball.bearing*constants.APPROACH_SPIN_GAIN,
                          -constants.APPROACH_SPIN_SPEED,
                          constants.APPROACH_SPIN_SPEED)
-#     # Avoid spinning so slowly that we step in place
-#     if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
-#         sTheta = 0.0
-
-    # Don't turn right now
-    sTheta = 0.0
+    # Avoid spinning so slowly that we step in place
+    if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
+        sTheta = 0.0
 
     # Set our walk towards the ball
     if ball.on:
@@ -103,7 +100,7 @@ def positionForKick(player):
     Currently aligns the ball on the left foot
     """
     ball = player.brain.ball
-    
+
     # Leave this state if necessary
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
@@ -115,9 +112,9 @@ def positionForKick(player):
         return player.goLater('approachBall')
 
     # Determine approach speed
-    targetY = (ball.locRelY -
-               (constants.BALL_KICK_LEFT_Y_L + constants.BALL_KICK_LEFT_Y_R) / 2.0 )
-    sY = MyMath.clip(targetY,
+    targetY = ball.locRelY
+
+    sY = MyMath.clip(targetY * constants.PFK_Y_GAIN,
                      constants.PFK_MIN_Y_SPEED,
                      constants.PFK_MAX_Y_SPEED)
     if fabs(sY) < constants.PFK_MIN_Y_MAGNITUDE:
