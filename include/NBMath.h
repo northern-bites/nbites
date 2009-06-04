@@ -26,6 +26,12 @@ static const float QUART_CIRC_RAD = M_PI_FLOAT / 2.0f;
         *_sinx = std::sin(_x);
 		*_cosx = std::cos(_x);
     }
+
+	#define isnan(x)	\
+		(	sizeof (x) == sizeof(float )	?	__inline_isnanf((float)(x))	\
+		:	sizeof (x) == sizeof(double)	?	__inline_isnand((double)(x))	\
+											:	__inline_isnan ((long double)(x)))
+
 #endif
 
 namespace NBMath {
