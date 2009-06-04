@@ -44,6 +44,8 @@ namespace NBMath {
             return maxValue;
         else if (value < minValue)
             return minValue;
+        else if(isnan(value))
+            return 0.0f;
         else
             return value;
     }
