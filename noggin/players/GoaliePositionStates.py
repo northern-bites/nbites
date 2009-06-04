@@ -1,32 +1,32 @@
 from ..playbook import PBConstants
+from .. import NogginConstants
 import man.motion.SweetMoves as SweetMoves
 import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15.
 
 def goaliePosition(player):
-    
+
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
     if helper.shouldChase(player):
         return player.goLater('goalieChase')
-    
+
     if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.trackBall()
     elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
 
-    return player.goLater('goalieAtPosition')
-    #for now we don't want the goalie trying to move
-    #return player.goLater('goalieAtPosition')
     position = player.brain.playbook.position
     if player.firstFrame():
         player.stopWalking()
-        #keep constant x,y change signs only
-        player.brain.nav.goTo(position[0], position[1], player.brain.ball.locBearing)
+        player.printf(position)
+        player.brain.nav.orthoGoTo(position[0], position[1],
+                                   NogginConstants.OPP_GOAL_HEADING)
     if player.brain.nav.destX != position[0] or \
             player.brain.nav.destY != position[1]:
-        player.brain.nav.goTo(position[0], position[1], player.brain.ball.locBearing)
+        player.brain.nav.orthoGoTo(position[0], position[1],
+                                   NogginConstants.OPP_GOAL_HEADING)
 
     # we're at the point, let's switch to another state
     if player.brain.nav.isStopped() and player.counter > 0:
@@ -50,6 +50,8 @@ def goalieAtPosition(player):
         player.brain.tracker.trackBall()
     elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
+    if player.counter >= 60:
+        return player.goLater('goaliePosition')
 
     return player.stay()
 
