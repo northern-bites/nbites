@@ -149,6 +149,11 @@ void MotionSwitchboard::run() {
 }
 
 void MotionSwitchboard::preProcess(){
+    if((curProvider != &nullBodyProvider && nextProvider == &nullBodyProvider) ||
+       (curHeadProvider != &nullHeadProvider && nextHeadProvider == & nullHeadProvider)){
+        curProvider->hardReset();
+        curHeadProvider->hardReset();
+    }
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
         swapBodyProvider();
@@ -570,15 +575,6 @@ void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
     headProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<FreezeCommand> command){
-    //Special case where we need to "freeze" the robot.
-    curProvider->hardReset();
-    curHeadProvider->hardReset();
-    nextProvider->hardReset();
-    nextHeadProvider->hardReset();
-    noWalkTransitionCommand = true;
-
-    curProvider = &nullBodyProvider;
-    curHeadProvider = &nullHeadProvider;
     nextProvider = &nullBodyProvider;
     nextHeadProvider = &nullHeadProvider;
 
