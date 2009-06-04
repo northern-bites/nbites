@@ -3589,13 +3589,14 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall) {
     int amount = h / 2;
     if (w > h)
         amount = w / 2;
+
     if (occlusion == LEFTOCCLUSION) {
         thisBall->setCenterX(topBlob.rightTop.x - amount);
         thisBall->setX(topBlob.rightTop.x - amount * 2);
     } else {
         thisBall->setCenterX(topBlob.leftTop.x + amount);
     }
-    if (occlusion == BOTTOMOCCLUSION) {
+    if (occlusion != TOPOCCLUSION) {
         thisBall->setCenterY(topBlob.leftTop.y + amount);
     } else {
         thisBall->setCenterY(topBlob.leftBottom.y - amount);
