@@ -457,7 +457,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                   >> initBallVelX >> initBallVelY
                   >> initBallVelXUncert >> initBallVelYUncert;
     }
-    cout << "Start line is " << initX << " " << initY << " " << initH << endl;
     // Initialize localization systems
     shared_ptr<LocSystem> locEKF  = shared_ptr<LocEKF>(
         new LocEKF(initX, initY, initH, initUncertX, initUncertY, initUncertH));

@@ -22,9 +22,14 @@
 //#define DEBUG_BALL_OBSERVATIONS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
+#define LOG_LOCALIZATION
 static const float MAX_CORNER_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
+
+#ifdef LOG_LOCALIZATION
+static const fstream outputFile;
+#endif
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
@@ -124,6 +129,10 @@ void Noggin::initializeLocalization()
 
     // Set the comm localization access pointers
     comm->setLocalizationAccess(loc, ballEKF);
+
+#ifdef LOG_LOCALIZATION
+    cout << gc->color() << " " << gc->player() << endl;
+#endif
 }
 
 bool Noggin::import_modules ()
@@ -403,11 +412,10 @@ void Noggin::updateLocalization()
     }
 #endif
 
-    // Opponent Tracking
+#ifdef LOG_LOCALIZATION
 
-#ifdef DEBUG_OBSERVATIONS
-    //cout << *loc << endl;
 #endif
+
 }
 
 
