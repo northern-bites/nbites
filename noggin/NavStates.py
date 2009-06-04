@@ -14,7 +14,7 @@ GOTO_SURE_THRESH = 5
 
 CHANGE_SPIN_DIR_THRESH = 3
 
-DEBUG = True
+DEBUG = False
 # States for the standard spin - walk - spin go to
 def spinToWalkHeading(nav):
     """
@@ -33,9 +33,7 @@ def spinToWalkHeading(nav):
         nav.changeSpinDirCounter = 0
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if nav.currentGait != NORMAL_GAIT:
-            nav.currentGait = NORMAL_GAIT
-            nav.brain.CoA.setRobotTurnGait(nav.brain.motion)
+        nav.brain.CoA.setRobotTurnGait(nav.brain.motion)
         if DEBUG: nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -87,9 +85,7 @@ def walkToPoint(nav):
         nav.noWalkSet  = True
 
     if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if nav.currentGait != FAST_GAIT:
-            nav.brain.CoA.setRobotGait(nav.brain.motion)
-            nav.currentGait = FAST_GAIT
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         if DEBUG: nav.printf("Waiting for walk to stop")
         return nav.stay()
 
@@ -125,16 +121,8 @@ def spinToFinalHeading(nav):
     Stops when at heading
     """
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
         nav.noWalkSet  = True
         nav.stopSpinToWalkCount = 0
-
-    if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if nav.currentGait != NORMAL_GAIT:
-            nav.currentGait = NORMAL_GAIT
-            nav.brain.CoA.setRobotTurnGait(nav.brain.motion)
-        #if DEBUG: nav.printf("Waiting for walk to stop")
-        return nav.stay()
 
     targetH = nav.destH#MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
     headingDiff = abs(nav.brain.my.h - targetH)
@@ -184,18 +172,10 @@ def orthoWalkToPoint(nav):
 def orthoForward(nav):
 
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
         nav.noWalkSet  = True
-
-    if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if nav.currentGait != NORMAL_GAIT:
-            nav.brain.CoA.setRobotGait(nav.brain.motion)
-            nav.currentGait = NORMAL_GAIT
-        if DEBUG: nav.printf("Waiting for walk to stop")
-        return nav.stay()
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
@@ -222,18 +202,10 @@ def orthoForward(nav):
 
 def orthoBackward(nav):
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
         nav.noWalkSet  = True
-
-    if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if nav.currentGait != NORMAL_GAIT:
-            nav.brain.CoA.setRobotGait(nav.brain.motion)
-            nav.currentGait = NORMAL_GAIT
-        if DEBUG: nav.printf("Waiting for walk to stop")
-        return nav.stay()
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
@@ -260,18 +232,10 @@ def orthoBackward(nav):
 
 def orthoRightStrafe(nav):
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
         nav.noWalkSet  = True
-
-    if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if nav.currentGait != NORMAL_GAIT:
-            nav.brain.CoA.setRobotGait(nav.brain.motion)
-            nav.currentGait = NORMAL_GAIT
-        if DEBUG: nav.printf("Waiting for walk to stop")
-        return nav.stay()
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
@@ -298,18 +262,10 @@ def orthoRightStrafe(nav):
 
 def orthoLeftStrafe(nav):
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
         nav.noWalkSet  = True
-
-    if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if nav.currentGait != NORMAL_GAIT:
-            nav.brain.CoA.setRobotGait(nav.brain.motion)
-            nav.currentGait = NORMAL_GAIT
-        if DEBUG: nav.printf("Waiting for walk to stop")
-        return nav.stay()
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
