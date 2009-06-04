@@ -20,7 +20,7 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
-        player.brain.loc.reset()
+        #player.brain.resetLocalization()
         player.stopWalking()
         if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
             player.brain.tracker.trackBall()

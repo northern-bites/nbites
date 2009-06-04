@@ -510,5 +510,4 @@ void LocEKF::deadzone(float &R, float &innovation,
     if ( R < 1.0/invR ) {
         R=1.0/invR;
     }
-
 }
