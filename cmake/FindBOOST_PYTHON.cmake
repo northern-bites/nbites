@@ -13,7 +13,6 @@ SET( BOOST_PYTHON_DEFINITIONS "" )
 SET( BOOST_PYTHON_INCLUDE_DIR "PYTHON_INCLUDE_DIR-NOTFOUND" CACHE FILEPATH "Cleared." FORCE)
 SET( BOOST_PYTHON_LIBRARIES "PYTHON_LIBRARIES-NOTFOUND" CACHE FILEPATH "Cleared." FORCE)
 
-
 ##
 # Defined package variable
 ##
@@ -36,7 +35,12 @@ ELSE( WIN32 )
       SET( BOOST_PYTHON_LIBRARIES /sw/lib/libboost_python.dylib )
     ELSE ( APPLE )
       SET( BOOST_PYTHON_INCLUDE_DIR /usr/include/ )
-      SET( BOOST_PYTHON_LIBRARIES /usr/lib/libboost_python.so )
+
+      IF( EXISTS /usr/lib/libboost_python-py25.so )
+	SET( BOOST_PYTHON_LIBRARIES /usr/lib/libboost_python-py25.so )
+      ELSE( EXISTS /usr/lib/libboost_python-py25.so )
+	SET( BOOST_PYTHON_LIBRARIES /usr/lib/libboost_python.so )
+      ENDIF(EXISTS /usr/lib/libboost_python-py25.so )
     ENDIF( APPLE )
   ENDIF( OE_CROSS_BUILD )
 ENDIF( WIN32 )
