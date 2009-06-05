@@ -58,7 +58,7 @@ def goalieAtPosition(player):
         player.brain.tracker.trackBall()
     elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
-    if player.counter >= 60:
+    if nav.notAtHeading(nav.destH) or not nav.atDestinationCloser():
         return player.goLater('goaliePosition')
 
     return player.stay()

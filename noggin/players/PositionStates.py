@@ -38,7 +38,7 @@ def atPosition(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
-    if player.counter >= 30:
+    if nav.notAtHeading(nav.destH) or not nav.atDestinationCloser():
         return player.goLater('playbookPosition')
 
     return player.stay()
