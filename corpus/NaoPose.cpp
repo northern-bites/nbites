@@ -415,7 +415,7 @@ estimate NaoPose::getEstimate(ublas::vector <float> objInWorldFrame){
   const bool yPos = objInWorldFrame(Y) >= 0;
   const bool xPos = objInWorldFrame(X) >= 0;
   const float temp = objInWorldFrame(Y) / objInWorldFrame(X);
-  if (temp != 0) {
+  if (!isnan(temp)) {
     //quadrants +x,+y and +x-y
     if( xPos && (yPos || !yPos) ){
 		pix_est.bearing = std::atan(temp);
@@ -424,6 +424,8 @@ estimate NaoPose::getEstimate(ublas::vector <float> objInWorldFrame){
     }else{//quadrant -x+y
 		pix_est.bearing = std::atan(temp) - M_PI_FLOAT;
     }
+  }else{
+      pix_est.bearing = 0.0f;
   }
 
   pix_est.x = objInWorldFrame(X) * MM_TO_CM;
@@ -433,7 +435,7 @@ estimate NaoPose::getEstimate(ublas::vector <float> objInWorldFrame){
   float dist3D = getHomLength(objInWorldFrame); //in MM
   const float temp2 = objInWorldFrame(Z)/dist3D;
   if (temp2 <= 1.0)
-    pix_est.elevation = asin(temp2);
+      pix_est.elevation = NBMath::safe_asin(temp2);
 
   return pix_est;
 }

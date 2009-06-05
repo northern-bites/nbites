@@ -3599,7 +3599,7 @@ float FieldLines::getEstimatedAngle(const VisualLine &line1,
 
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
-    float theta = TO_DEG * acos(dotProduct/
+    float theta = TO_DEG * NBMath::safe_acos(dotProduct/
                                       (lengthOfVector1 * lengthOfVector2));
     return theta;
 }

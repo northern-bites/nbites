@@ -185,8 +185,8 @@ void StepGenerator::findSensorZMP(){
     //Rotate from the local C to the global I frame
     ufvector3 accel_c = CoordFrame3D::vector3D(acc_filter.getX(),
                                                acc_filter.getY());
-    float angle_fc = asin(fc_Transform(1,0));
-    float angle_if = asin(if_Transform(1,0));
+    float angle_fc = safe_asin(fc_Transform(1,0));
+    float angle_if = safe_asin(if_Transform(1,0));
     float tot_angle = -(angle_fc+angle_if);
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
@@ -383,11 +383,11 @@ void StepGenerator::swapSupportLegs(){
         //finally, we need to know how much turning there will be. Turns out,
         //we can simply read this out of the aforementioned translation matr.
         //this only works because its a 3D homog. coord matr - 4D would break
-        float swing_dest_angle = -asin(swing_reverse_trans(1,0));
+        float swing_dest_angle = -safe_asin(swing_reverse_trans(1,0));
 
         //we use the swinging source to calc. a path for the swinging foot
         //it is not clear now if we will need to angle offset or what
-        float swing_src_angle = -asin(stepTransform(1,0));
+        float swing_src_angle = -safe_asin(stepTransform(1,0));
 
         //in the F coordinate frames, we express Steps representing
         // the three footholds from above
@@ -1061,8 +1061,8 @@ void StepGenerator::resetQueues(){
  */
 vector<float> StepGenerator::getOdometryUpdate(){
     ufmatrix3 new_ic_Transform = prod(fc_Transform,if_Transform);
-    const float rot_new = -asin(new_ic_Transform(1,0));
-    const float rot_old = -asin(ic_Transform(1,0));
+    const float rot_new = -safe_asin(new_ic_Transform(1,0));
+    const float rot_old = -safe_asin(ic_Transform(1,0));
     const float rot_diff = rot_new - rot_old; //angle from cold to cnew
 
     const ufvector3 origin_i = CoordFrame3D::vector3D(0.0f,0.0f);

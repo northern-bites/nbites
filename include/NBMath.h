@@ -97,5 +97,13 @@ namespace NBMath {
         }
         return theta;
     }
+
+    static float safe_asin(const float input){
+        return std::asin(clip(input,1.0f));
+    }
+    static float safe_acos(const float input){
+        return std::acos(clip(input,1.0f));
+    }
+
 }
 #endif //NBMath_h
