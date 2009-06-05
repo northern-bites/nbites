@@ -1083,22 +1083,12 @@ void StepGenerator::resetOdometry(){
 
 /**
  * Called once per motion frame to update the odometry
+ *
+ *  We may not correctly account for the rotation around the S frame
+ *  rather than the C frame, which is what we are actually returning.
  */
 
 void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
-    printf("Odometry delta is (%g,%g,%g)\n",deltaOdo[0],deltaOdo[1],deltaOdo[2]);
-
-    static float thetaSum = 0.0f;
-    thetaSum +=deltaOdo[2];
-    cout << "ThetaSUm" << thetaSum<<endl;
-//     new_com_loc_f = 
-//     const ufmatrix3 trans_f_s =
-//         CoordFrame3D::translation3D(0,leg_sign*HIP_OFFSET_Y);
-
-//     const ufmatrix3 trans_s_f =
-//         prod(CoordFrame3D::translation3D(0,-leg_sign*HIP_OFFSET_Y);
-
-//     const ufmatrix3 correct_rotate = prod()
     const ufmatrix3 odoUpdate = prod(CoordFrame3D::translation3D(deltaOdo[0],
                                                                  deltaOdo[1]),
                                      CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,

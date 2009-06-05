@@ -510,9 +510,7 @@ void WalkingLeg::computeOdoUpdate(){
     const float thetaDiff = getFootRotation() - lastRotation;
     //TODO: add a odometry calibration section to walkParams
     const float thetaCOMMovement = -thetaDiff*0.33f; //.33 is somewhat experimental
-    cout << "this rotation" << getFootRotation() << ", last:"<<lastRotation
-         <<" "<<leg_name <<endl;
-    cout  << "theta COM Move " << thetaCOMMovement << " : "<<leg_name<<endl;
+
     const ufvector3 diff = goal-last_goal;
     const float xCOMMovement = -diff(0);
     const float yCOMMovement = -diff(1);
@@ -598,7 +596,6 @@ void WalkingLeg::setState(SupportMode newState){
     if(state == PERSISTENT_DOUBLE_SUPPORT ||
        state == DOUBLE_SUPPORT)
         lastRotation = -lastRotation;
-    cout << "next state: " << state<< endl;
 }
 
 
