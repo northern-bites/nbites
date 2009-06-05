@@ -508,8 +508,10 @@ inline ChainID WalkingLeg::getOtherLegChainID(){
 
 void WalkingLeg::computeOdoUpdate(){
     const float thetaDiff = getFootRotation() - lastRotation;
-    const float thetaCOMMovement = thetaDiff*leg_sign;
-
+    const float thetaCOMMovement = -thetaDiff*0.5f;
+    cout << "this rotation" << getFootRotation() << ", last:"<<lastRotation
+         <<" "<<leg_name <<endl;
+    cout  << "theta COM Move " << thetaCOMMovement << " : "<<leg_name<<endl;
     const ufvector3 diff = goal-last_goal;
     const float xCOMMovement = -diff(0);
     const float yCOMMovement = -diff(1);
@@ -592,6 +594,10 @@ void WalkingLeg::setState(SupportMode newState){
     state = newState;
     lastDiffState = state;
     frameCounter = 0;
+    if(state == PERSISTENT_DOUBLE_SUPPORT ||
+       state == DOUBLE_SUPPORT)
+        lastRotation = -lastRotation;
+    cout << "next state: " << state<< endl;
 }
 
 
