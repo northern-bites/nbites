@@ -208,7 +208,16 @@ const float Utility::getLength(const point <const int> &p1,
 // get angle between two lines
 // http://www.tpub.com/math2/5.htm
 float Utility::getAngle(const VisualLine& line1, const VisualLine& line2) {
-    return TO_DEG * atan((line2.a - line1.a) / (1 + line1.a * line2.a));
+    const float denom = (1 + line1.a * line2.a);
+    const float numer = (line2.a - line1.a);
+    const float quotient = numer/denom;
+    if (isnan(quotient)){
+        if(numer > 0.0f)
+            return M_PI_FLOAT * 0.5f * TO_DEG;
+        else
+            return -M_PI_FLOAT * 0.5f * TO_DEG;
+    }
+    return TO_DEG * atan(quotient);
 }
 
 float Utility::getAngle(int x1, int y1, int x2, int y2) {
