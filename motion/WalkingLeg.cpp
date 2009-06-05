@@ -515,9 +515,9 @@ void WalkingLeg::computeOdoUpdate(){
     const float xCOMMovement = -diff(0);
     const float yCOMMovement = -diff(1);
 
-    odoUpdate[0] =xCOMMovement;
-    odoUpdate[1] = yCOMMovement;
-    odoUpdate[2] = thetaCOMMovement;
+    odoUpdate[0] =xCOMMovement*walkParams->xOdoScale;
+    odoUpdate[1] = yCOMMovement*walkParams->yOdoScale;
+    odoUpdate[2] = thetaCOMMovement*walkParams->thetaOdoScale;
 }
 
 

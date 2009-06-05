@@ -122,6 +122,9 @@ def sitdown(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
 
+    elif player.brain.motion.isBodyActive():
+        return player.goLater("printloc")
+
     return player.stay()
 
 def shutoffgains(player):
@@ -131,5 +134,29 @@ def shutoffgains(player):
 
     return player.goLater('nothing')
 
-def  nothing(player):
+
+def odotune(player):
+    if player.firstFrame():
+        player.brain.loc.reset()
+        player.setSpeed(6.0,0,10)
+
+    if player.counter == 400:
+        return player.goLater('odostop')
+    return player.stay()
+
+def odostop(player):
+    if player.firstFrame():
+        player.executeMove(SweetMoves.SIT_POS)
+
+    elif not  player.brain.motion.isBodyActive():
+        return player.goLater("printloc")
+
+    return player.stay()
+
+def  printloc(player):
+    if player.firstFrame():
+        player.printf("Loc (X,Y,H) (%g,%g,%g"% 
+                      (player.brain.my.x,
+                       player.brain.my.y,
+                       player.brain.my.h))
     return player.stay()
