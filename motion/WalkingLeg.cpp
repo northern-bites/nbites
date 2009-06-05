@@ -508,7 +508,8 @@ inline ChainID WalkingLeg::getOtherLegChainID(){
 
 void WalkingLeg::computeOdoUpdate(){
     const float thetaDiff = getFootRotation() - lastRotation;
-    const float thetaCOMMovement = -thetaDiff*0.5f;
+    //TODO: add a odometry calibration section to walkParams
+    const float thetaCOMMovement = -thetaDiff*0.33f; //.33 is somewhat experimental
     cout << "this rotation" << getFootRotation() << ", last:"<<lastRotation
          <<" "<<leg_name <<endl;
     cout  << "theta COM Move " << thetaCOMMovement << " : "<<leg_name<<endl;

@@ -39,6 +39,7 @@ using namespace NBMath;
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
   : x(0.0f), y(0.0f), theta(0.0f),
     done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+    com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
     currentZMPDSteps(),
@@ -285,7 +286,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //Each frame, we must recalculate the location of the center of mass
     //relative to the support leg (f coord frame), based on the output
     //of the controller (in tick_controller() )
-    ufvector3 com_f = prod(if_Transform,com_i);
+    com_f = prod(if_Transform,com_i);
  
     //We want to get the incremental rotation of the center of mass
     //we need to ask one of the walking legs to give it:
@@ -1087,6 +1088,17 @@ void StepGenerator::resetOdometry(){
 void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
     printf("Odometry delta is (%g,%g,%g)\n",deltaOdo[0],deltaOdo[1],deltaOdo[2]);
 
+    static float thetaSum = 0.0f;
+    thetaSum +=deltaOdo[2];
+    cout << "ThetaSUm" << thetaSum<<endl;
+//     new_com_loc_f = 
+//     const ufmatrix3 trans_f_s =
+//         CoordFrame3D::translation3D(0,leg_sign*HIP_OFFSET_Y);
+
+//     const ufmatrix3 trans_s_f =
+//         prod(CoordFrame3D::translation3D(0,-leg_sign*HIP_OFFSET_Y);
+
+//     const ufmatrix3 correct_rotate = prod()
     const ufmatrix3 odoUpdate = prod(CoordFrame3D::translation3D(deltaOdo[0],
                                                                  deltaOdo[1]),
                                      CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,

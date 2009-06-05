@@ -172,7 +172,7 @@ private:
 
     bool done;
 
-    NBMath::ufvector3 com_i,last_com_c,est_zmp_i;
+    NBMath::ufvector3 com_i,last_com_c,com_f,est_zmp_i;
     //boost::numeric::ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     std::list<float> zmp_ref_x, zmp_ref_y;
