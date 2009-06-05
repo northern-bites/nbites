@@ -150,6 +150,9 @@ public:
     float kneeStiffness; //knee stiffness when swinging
     float ankleStiffness; //ankle stiffness when swinging
     float armStiffness;
+    float xOdoScale;
+    float yOdoScale;
+    float thetaOdoScale;
 //calculated from parameters
 public:
     int stepDurationFrames; //one double + one single support
@@ -170,7 +173,8 @@ public:
                       const float maxtheta_rads,
                       const float _sensorFeedback, const float _maxStiffness,
                       const float _kneeStiffness, const float _ankleStiffness,
-                      const float _armStiffness)
+                      const float _armStiffness, const float _xOdoScale,
+                      const float _yOdoScale, const float _thetaOdoScale)
         :  motion_frame_length_s( _motion_frame_length_s),
            bodyHeight(_bh), hipOffsetX(_hox), XAngleOffset(_yao),
            stepDuration(_dur),
@@ -184,7 +188,8 @@ public:
            maxXSpeed(maxx_mms),maxYSpeed(maxy_mms),maxThetaSpeed(maxtheta_rads),
            sensorFeedback(_sensorFeedback), maxStiffness(_maxStiffness),
            kneeStiffness(_kneeStiffness), ankleStiffness(_ankleStiffness),
-           armStiffness(_armStiffness)
+           armStiffness(_armStiffness), xOdoScale(_xOdoScale),
+           yOdoScale(_yOdoScale), thetaOdoScale(_thetaOdoScale)
         {
             updateFrameLengths();
         }
@@ -290,8 +295,11 @@ const WalkingParameters DEFAULT_PARAMETERS
                     0.0f,         // sensor feedback
                     0.85f,        // max stiffness
                     0.85f,        // knee stiffness
-                    0.85f,         // ankle stiffness
-                    0.2f);        // arm stiffness
+                    0.85f,        // ankle stiffness
+                    0.2f,         // arm stiffness
+                    1.0f,         // xOdoScale
+                    1.0f,         // yOdoScale
+                    1.0f);        //thetaOdoScale
 const WalkingParameters GOALIE_PARAMETERS = DEFAULT_PARAMETERS;
 
 const WalkingParameters WALK_PARAMS[] = {DEFAULT_PARAMETERS,GOALIE_PARAMETERS};
