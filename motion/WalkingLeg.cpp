@@ -34,6 +34,7 @@ WalkingLeg::WalkingLeg(ChainID id)
      chainID(id), walkParams(NULL),
      goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
+     lastRotation(0.0f),odoUpdate(3,0.0f),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
      leg_name(id == LLEG_CHAIN ? "left" : "right")
 {
@@ -117,7 +118,10 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
 
     debugProcessing();
 
+    computeOdoUpdate();
+
     last_goal = goal;
+    lastRotation = getFootRotation();
     frameCounter++;
     //Decide if it's time to switch states
     if ( shouldSwitchStates())
@@ -126,7 +130,6 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
     lastState=state;
     return result;
 }
-
 
 LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
@@ -500,6 +503,28 @@ const float  WalkingLeg::cycloidy(float theta){
 inline ChainID WalkingLeg::getOtherLegChainID(){
     return (chainID==LLEG_CHAIN ?
             RLEG_CHAIN : LLEG_CHAIN);
+}
+
+
+void WalkingLeg::computeOdoUpdate(){
+    const float thetaDiff = getFootRotation() - lastRotation;
+    const float thetaCOMMovement = thetaDiff*leg_sign;
+
+    const ufvector3 diff = goal-last_goal;
+    const float xCOMMovement = -diff(0);
+    const float yCOMMovement = -diff(1);
+
+    odoUpdate[0] =xCOMMovement;
+    odoUpdate[1] = yCOMMovement;
+    odoUpdate[2] = thetaCOMMovement;
+}
+
+
+/**
+ * Assuming this is the support foot, then we can return how far we have moved
+ */
+vector<float> WalkingLeg::getOdoUpdate(){
+    return odoUpdate;
 }
 
 void WalkingLeg::startLeft(){

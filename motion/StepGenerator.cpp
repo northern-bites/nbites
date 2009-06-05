@@ -46,7 +46,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
     if_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
-    ic_Transform(CoordFrame3D::identity3D()),
+    cc_Transform(CoordFrame3D::identity3D()),
     initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
@@ -315,6 +315,12 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                        swingingStep_f,fc_Transform);
     LegJointStiffTuple right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         swingingStep_f,fc_Transform);
+
+    if(supportStep_f->foot == LEFT_FOOT){
+        updateOdometry(leftLeg.getOdoUpdate());
+    }else{
+        updateOdometry(rightLeg.getOdoUpdate());
+    }
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
@@ -1060,45 +1066,38 @@ void StepGenerator::resetQueues(){
  * since the last call to getOdometryUpdate doesnt get lost
  */
 vector<float> StepGenerator::getOdometryUpdate(){
-    ufmatrix3 new_ic_Transform = prod(fc_Transform,if_Transform);
-    const float rot_new = -safe_asin(new_ic_Transform(1,0));
-    const float rot_old = -safe_asin(ic_Transform(1,0));
-    const float rot_diff = rot_new - rot_old; //angle from cold to cnew
-
-    const ufvector3 origin_i = CoordFrame3D::vector3D(0.0f,0.0f);
-    const ufvector3 start_pos_c_new = prod(new_ic_Transform,origin_i);
-    const ufvector3 start_pos_c_old = prod(ic_Transform,origin_i);
-    const ufvector3 start_pos_c_new_in_old =
-        prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-rot_diff),
-             start_pos_c_new);
-    const ufvector3 movement_c = start_pos_c_old - start_pos_c_new_in_old;
-
-    //NOT SURE THIS WORKS: TODO: TEST this out, since I think its broke
-
-    ic_Transform = new_ic_Transform; //save the new coordinate frame for later
-
-    //populate the vector. Note the units are mm and rad
-    vector<float> odoUpdate= vector<float>();
-    odoUpdate+=movement_c(0);odoUpdate+=movement_c(1);odoUpdate+=rot_diff;
-    return odoUpdate;
+    const float rotation = -safe_asin(cc_Transform(1,0));
+    const ufvector3 odo = prod(cc_Transform,CoordFrame3D::vector3D(0.0f,0.0f));
+    const float odoArray[3] = {odo(0),odo(1),rotation};
+    printf("Odometry update is (%g,%g,%g)\n",odoArray[0],odoArray[1],odoArray[2]);
+    cc_Transform = CoordFrame3D::translation3D(0.0f,0.0f);
+    return vector<float>(odoArray,&odoArray[3]);
 }
 
 /**
  * Ensures we don't loose odometry information if the walk is restarted.
  */
 void StepGenerator::resetOdometry(){
+}
 
-    vector<float> curOdoUpdate = getOdometryUpdate();
+/**
+ * Called once per motion frame to update the odometry
+ */
 
-    //since we are starting over, we need to
-    //assign the ic transform to account for any currently
-    //built up odometry. This means we need to init the i to c matrix
-    //to store the location of the c frame last time odometry was called:
-    ufmatrix3 odoHistory = prod(CoordFrame3D::translation3D(-curOdoUpdate[0],
-                                                            -curOdoUpdate[1]),
-                                CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
-                                                         -curOdoUpdate[2]));
-    ic_Transform.assign(odoHistory);
+void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
+    printf("Odometry delta is (%g,%g,%g)\n",deltaOdo[0],deltaOdo[1],deltaOdo[2]);
+
+    const ufmatrix3 odoUpdate = prod(CoordFrame3D::translation3D(deltaOdo[0],
+                                                                 deltaOdo[1]),
+                                     CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+                                                              deltaOdo[2]));
+    cout << "odoUpdate matrix: " << odoUpdate<<endl;
+
+    const ufmatrix3 new_cc_Transform  = prod(cc_Transform,odoUpdate);
+    cout << "old cc matrix: " << cc_Transform<<endl;
+    cc_Transform = new_cc_Transform;
+    cout << "new cc matrix: " << cc_Transform<<endl;
+
 }
 
 // void hackJointOrder(float angles[]) {

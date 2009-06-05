@@ -157,6 +157,7 @@ private: // Helper methods
 
     void resetQueues();
     void resetOdometry();
+    void updateOdometry(const std::vector<float> &deltaOdo);
     void debugLogging();
     void updateDebugMatrix();
 private:
@@ -202,7 +203,7 @@ private:
     //coord. frame into points in the 'f' coord frame
     NBMath::ufmatrix3 if_Transform;
     NBMath::ufmatrix3 fc_Transform;
-    NBMath::ufmatrix3 ic_Transform; //odometry
+    NBMath::ufmatrix3 cc_Transform; //odometry
     // These hold the initial position of the left/right foot when they are
     // in support mode. It is relative to the 'i' coord frame.
     NBMath::ufmatrix3 initStartLeft;
