@@ -23,7 +23,7 @@ class HeadTracking(FSA.FSA):
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
-        self.setPrintStateChanges(True)
+        self.setPrintStateChanges(False)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
         self.activePanDir = False
