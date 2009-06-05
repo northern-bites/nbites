@@ -234,7 +234,7 @@ int Utility::getLineY(int x, const VisualLine &aLine) {
 // get x-coord with given y-coord, slope, and y-intercept
 int Utility::getLineX(int y, float y_intercept, float slope) {
     if (slope != 0) {
-        return NBMath::ROUND( static_cast<float>(y) - y_intercept /
+        return NBMath::ROUND( (static_cast<float>(y) - y_intercept) /
 							  static_cast<float>(slope) );
     }
     return 0;
@@ -363,7 +363,6 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
              << "positive ints" << endl;
         return box;
     }
-
     // calculations require x1 to be left most point, swap x1, y1 with x2, y2
     // if it's not
     if (x1 > x2) {
