@@ -157,6 +157,7 @@ private: // Helper methods
 
     void resetQueues();
     void resetOdometry();
+    void updateOdometry(const std::vector<float> &deltaOdo);
     void debugLogging();
     void updateDebugMatrix();
 private:
@@ -171,7 +172,7 @@ private:
 
     bool done;
 
-    NBMath::ufvector3 com_i,last_com_c,est_zmp_i;
+    NBMath::ufvector3 com_i,last_com_c,com_f,est_zmp_i;
     //boost::numeric::ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     std::list<float> zmp_ref_x, zmp_ref_y;
@@ -202,7 +203,7 @@ private:
     //coord. frame into points in the 'f' coord frame
     NBMath::ufmatrix3 if_Transform;
     NBMath::ufmatrix3 fc_Transform;
-    NBMath::ufmatrix3 ic_Transform; //odometry
+    NBMath::ufmatrix3 cc_Transform; //odometry
     // These hold the initial position of the left/right foot when they are
     // in support mode. It is relative to the 'i' coord frame.
     NBMath::ufmatrix3 initStartLeft;

@@ -112,6 +112,10 @@ public:
             state == PERSISTENT_DOUBLE_SUPPORT || state == SUPPORTING;
     };
     void resetGait(const WalkingParameters * _wp);
+
+    std::vector<float> getOdoUpdate();
+    void computeOdoUpdate();
+
 private:
     //Execution methods, get called depending on which state the leg is in
     LegJointStiffTuple supporting(NBMath::ufmatrix3 fc_Transform);
@@ -156,6 +160,8 @@ private:
     float lastJoints[Kinematics::LEG_JOINTS];
     NBMath::ufvector3 goal;
     NBMath::ufvector3 last_goal;
+    float lastRotation;
+    std::vector<float> odoUpdate;
     int leg_sign; //-1 for right leg, 1 for left leg
     std::string leg_name;
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
