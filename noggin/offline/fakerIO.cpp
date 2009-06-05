@@ -483,15 +483,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
         // See if we have corners to read in
 
         // Update Observations
-        VisualFieldObject fo((fieldObjectID)ids[k]);
-        fo.setDistanceWithSD(dists[k]);
-        fo.setBearingWithSD(bearings[k]);
-        if (fo.getID() != BLUE_GOAL_POST ||
-            fo.getID() != YELLOW_GOAL_POST) {
-            fo.setIDCertainty(_SURE);
-        }
-
-                Observation seen(fo);
 
         // Update Ball
         if (ballDist > 0) {
