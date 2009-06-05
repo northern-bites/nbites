@@ -418,11 +418,14 @@ void Noggin::updateLocalization()
     if (loggingLoc) {
         // Print out odometry and ball readings
         outputFile << odometery.deltaF << " " << odometery.deltaL << " "
-                   << odometery.deltaR << " " << vision->ball->getDistance() << " "
-                   << vision->ball->getBearing();
-        // Separate observations with a colon
-        outputFile << ":";
+                   << odometery.deltaR << " " << vision->ball->getDistance()
+                   << " " << vision->ball->getBearing();
+        // Print out observation information
         for (unsigned int x = 0; x < observations.size(); ++x) {
+            // Separate observations with a colon
+            outputFile << ":";
+            outputFile << observations[x].getID() << " "
+                       << observations[x].getVisBearing();
         }
         outputFile << endl;
     }
@@ -545,7 +548,7 @@ void Noggin::startLocLog()
     locTime = localtime( &systime );
     strftime(buf, 80, "%Y-%m-%d-%H-%M-%S",locTime);
 
-    string s  = "./lib/man/noggin/offline/" + string(buf) + ".loc";
+    string s  = "./lib/man/noggin/" + string(buf) + ".loc";
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);
     outputFile << gc->color() << " " << gc->player() << endl;
