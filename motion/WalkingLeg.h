@@ -150,7 +150,7 @@ private:
 
 private:
     //FSA Attributes
-    SupportMode state, lastState,lastDiffState;
+    SupportMode state;
     SupportMode supportMode; //soon to be deprecated
     unsigned int frameCounter;
     unsigned int doubleSupportFrames;

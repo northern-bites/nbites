@@ -145,7 +145,6 @@ private: // Helper methods
     void fillZMP(const boost::shared_ptr<Step> newStep );
     void fillZMPRegular(const boost::shared_ptr<Step> newStep );
     void fillZMPEnd(const boost::shared_ptr<Step> newStep );
-    void addStartZMP(const boost::shared_ptr<Step> newStep );
 
     void resetSteps(const bool startLeft);
 

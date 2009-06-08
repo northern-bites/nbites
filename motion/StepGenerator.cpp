@@ -502,10 +502,10 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 
     //First, split up the frames:
     const int halfNumDSChops = //DS - DoubleStaticChops
-        static_cast<int>( static_cast<float>(walkParams->doubleSupportFrames)*
+        static_cast<int>( static_cast<float>(newSupportStep->doubleSupportFrames)*
 			walkParams->dblSupInactivePercentage/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
-        walkParams->doubleSupportFrames - halfNumDSChops*2;
+        newSupportStep->doubleSupportFrames - halfNumDSChops*2;
 
     //Phase 1) - stay at start_i
     for(int i = 0; i< halfNumDSChops; i++){
@@ -532,8 +532,8 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 
 
     //single support -  we want to stay over the new step
-    const int numSChops = walkParams->singleSupportFrames;
-    for(int i = 0; i< walkParams->singleSupportFrames; i++){
+    const int numSChops = newSupportStep->singleSupportFrames;
+    for(int i = 0; i< numSChops; i++){
 //    const int numSChops = walkParams->stepDurationFrames;
 //    for(int i = 0; i< walkParams->stepDurationFrames; i++){
 
@@ -553,39 +553,6 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 }
 
 void
-StepGenerator::addStartZMP(const shared_ptr<Step> newSupportStep ){
-    const ufvector3 end_s =
-        CoordFrame3D::vector3D(walkParams->hipOffsetX,
-                               0.0f);
-    const ufvector3 end_i = prod(si_Transform,end_s);
-    //Queue a starting step, where we step, but do nothing with the ZMP
-    //so push tons of zero ZMP values
-    //for (int i = 0; i < walkParams->stepDurationFrames; i++){
-
-    //Since NUM_PREVIEW_FRAMES is an unsigned int, if the difference
-    //we need to fill is negative, the value wraps to something very large
-    // and we get the equivalent of an infinite loop here. Only on the Nao tho.
-    if (Observer::NUM_PREVIEW_FRAMES <=
-        static_cast<unsigned int>(walkParams->stepDurationFrames)){
-        waitForController = 0;
-        return;
-    }
-    for (unsigned int i = 0; i < Observer::NUM_PREVIEW_FRAMES -
-             static_cast<unsigned int>(walkParams->stepDurationFrames); ++i) {
-        zmp_ref_x.push_back(end_i(0));
-        zmp_ref_y.push_back(end_i(1));
-    }
-
-    //An End step should never move the si_Transform!
-    //si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
-    //store the end of the zmp in the next s frame:
-    last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
-
-    waitForController =
-        (int)Observer::NUM_PREVIEW_FRAMES - walkParams->stepDurationFrames;
-}
-
-void
 StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
     const ufvector3 end_s =
         CoordFrame3D::vector3D(walkParams->hipOffsetX,
@@ -593,7 +560,7 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
     const ufvector3 end_i = prod(si_Transform,end_s);
     //Queue a starting step, where we step, but do nothing with the ZMP
     //so push tons of zero ZMP values
-    for (int i = 0; i < walkParams->stepDurationFrames; i++){
+    for (unsigned int i = 0; i < newSupportStep->stepDurationFrames; i++){
         zmp_ref_x.push_back(end_i(0));
         zmp_ref_y.push_back(end_i(1));
     }
@@ -795,12 +762,16 @@ void StepGenerator::resetSteps(const bool startLeft){
     }
     updateDebugMatrix();
 
+    const float supportStepTime = static_cast<float>(Observer::NUM_PREVIEW_FRAMES) *
+        MotionConstants::MOTION_FRAME_LENGTH_S;
+    const float supportStepDoubleSupportFraction = 1.0f;
+
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is START type.
     shared_ptr<Step> firstSupportStep =
         shared_ptr<Step>(new Step(0,HIP_OFFSET_Y*supportSign,0,
-                                  walkParams->stepDuration,
-                                  walkParams->doubleSupportFraction,
+                                  supportStepTime,
+                                  supportStepDoubleSupportFraction,
                                   firstSupportFoot,END_STEP));
     shared_ptr<Step> dummyStep =
         shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y*supportSign,0,
@@ -810,7 +781,7 @@ void StepGenerator::resetSteps(const bool startLeft){
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
-    addStartZMP(firstSupportStep);
+    //addStartZMP(firstSupportStep);
     currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
     lastQueuedStep = firstSupportStep;
 }

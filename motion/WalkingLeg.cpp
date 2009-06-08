@@ -27,7 +27,7 @@ using namespace NBMath;
 //#define DEBUG_WALKINGLEG
 
 WalkingLeg::WalkingLeg(ChainID id)
-    :state(SUPPORTING),lastState(SUPPORTING),lastDiffState(SUPPORTING),
+    :state(SUPPORTING),
      frameCounter(0),
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
      support_step(EMPTY_STEP),
@@ -97,7 +97,7 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
         result  = supporting(fc_Transform);
         break;
     case SWINGING:
-        if(support_step->type == REGULAR_STEP)
+        if(support_step->type == REGULAR_STEP) // HACK -- should get rid of if
             result  =  swinging(fc_Transform);
         else{
             // It's an Irregular step, so we are not swinging
@@ -125,9 +125,11 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
     lastRotation = getFootRotation();
     frameCounter++;
     //Decide if it's time to switch states
-    if ( shouldSwitchStates())
-        switchToNextState();
-    lastState=state;
+
+    //Decide if we need to switch states. Run twice in case state time of new
+    //state is zero 
+    for(unsigned int  i = 0; shouldSwitchStates() && i < 2; i++,switchToNextState());
+
     return result;
 }
 
@@ -461,7 +463,6 @@ void WalkingLeg::switchToNextState(){
 
 void WalkingLeg::setState(SupportMode newState){
     state = newState;
-    lastDiffState = state;
     frameCounter = 0;
     if(state == PERSISTENT_DOUBLE_SUPPORT ||
        state == DOUBLE_SUPPORT)
