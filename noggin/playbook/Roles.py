@@ -35,9 +35,6 @@ def rSearcher(team):
     '''
     Determines positioning for robots while using the finder formation
     '''
-    
-    #team.me.role = PBConstants.SEARCHER
-    
     if team.numActiveFieldPlayers == 1:
         pos = PBConstants.READY_KICKOFF_STOPPER
         subRole = PBConstants.OTHER_FINDER
@@ -60,7 +57,7 @@ def rDefender(team):
     # If the ball is deep in our side, we become a sweeper
     if team.brain.ball.x < PBConstants.SWEEPER_X:
         return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
-    
+
     # Stand between the ball and the back of the goal if it is on our side
     elif PBConstants.USE_DEEP_STOPPER:
         return [PBConstants.DEFENDER] + SubRoles.pDeepStopper(team)
