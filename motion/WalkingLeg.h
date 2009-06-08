@@ -134,6 +134,7 @@ private:
     SupportMode nextState();
     bool shouldSwitchStates();
     bool firstFrame(){return frameCounter == 0;}
+    void assignStateTimes(boost::shared_ptr<Step> step);
     void debugProcessing();
 //hack
 public:
@@ -152,6 +153,9 @@ private:
     SupportMode state, lastState,lastDiffState;
     SupportMode supportMode; //soon to be deprecated
     unsigned int frameCounter;
+    unsigned int doubleSupportFrames;
+    unsigned int singleSupportFrames;
+    unsigned int cycleFrames;
 
     //destination attributes
     boost::shared_ptr<Step> cur_dest, swing_src, swing_dest,support_step;

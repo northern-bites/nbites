@@ -702,7 +702,6 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
         resetQueues();
 
         if(new_y < 0.0f || new_theta < 0.0f){
-            cout << "Starting right" <<endl;
             startRight();
         }else
             startLeft();
@@ -785,7 +784,7 @@ void StepGenerator::startRight(){
 /*  Set up the walking engine for starting with a swinging step on the left */
 void StepGenerator::startLeft(){
 #ifdef DEBUG_STEPGENERATOR
-    cout << "StepGenerator::startRight"<<endl;
+    cout << "StepGenerator::startLeft"<<endl;
 #endif
 
     //start off in a double support phase where the right leg swings first
@@ -825,12 +824,12 @@ void StepGenerator::startLeft(){
     shared_ptr<Step> firstSupportStep =
         shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
                                   walkParams->stepDuration,
-                                  walkParams->singleSupportFrames,
+                                  walkParams->doubleSupportFraction,
                                   LEFT_FOOT,END_STEP));
     shared_ptr<Step> dummyStep =
         shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
                                   walkParams->stepDuration,
-                                  walkParams->singleSupportFrames,
+                                  walkParams->doubleSupportFraction,
                                   RIGHT_FOOT));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away

@@ -69,6 +69,7 @@ void WalkingLeg::setSteps(boost::shared_ptr<Step> _swing_src,
     swing_src = _swing_src;
     swing_dest = _swing_dest;
     support_step = _support_step;
+    assignStateTimes(support_step);
 }
 
 void WalkingLeg::resetGait(const WalkingParameters * _wp){
@@ -126,7 +127,6 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
     //Decide if it's time to switch states
     if ( shouldSwitchStates())
         switchToNextState();
-
     lastState=state;
     return result;
 }
@@ -157,7 +157,7 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     //HORIZONTAL PROGRESS:
     float percent_complete =
 		( static_cast<float>(frameCounter) /
-		  static_cast<float>(walkParams->singleSupportFrames));
+		  static_cast<float>(singleSupportFrames));
 
     float theta = percent_complete*2.0f*M_PI_FLOAT;
     float stepHeight = walkParams->stepHeight;
@@ -244,7 +244,7 @@ const float WalkingLeg::getFootRotation(){
 
     const float percent_complete =
         static_cast<float>(frameCounter) /
-		static_cast<float>(walkParams->singleSupportFrames);
+		static_cast<float>(singleSupportFrames);
 
     const float theta = percent_complete*2.0f*M_PI_FLOAT;
     const float percent_to_dest = cycloidx(theta)/(2.0f*M_PI_FLOAT);
@@ -307,8 +307,8 @@ WalkingLeg::getHipHack(const float curHYPAngle){
         // we want to raise the foot up for the first third of the step duration
         hr_offset = MAX_HIP_ANGLE_OFFSET*
             static_cast<float>(frameCounter) /
-            (static_cast<float>(walkParams->singleSupportFrames)/3.0f);
-        if (frameCounter >= (static_cast<float>(walkParams->singleSupportFrames)
+            (static_cast<float>(singleSupportFrames)/3.0f);
+        if (frameCounter >= (static_cast<float>(singleSupportFrames)
 							 / 3.0f) )
             stage++;
 
@@ -316,15 +316,15 @@ WalkingLeg::getHipHack(const float curHYPAngle){
     else if (stage == 1) { // keep it level
         hr_offset  = MAX_HIP_ANGLE_OFFSET;
 
-        if (frameCounter >= 2.* walkParams->singleSupportFrames/3)
+        if (frameCounter >= 2.* static_cast<float>(singleSupportFrames)/3)
             stage++;
     }
     else {// stage 2, set the foot back down on the ground
         hr_offset = max(0.0f,
                         MAX_HIP_ANGLE_OFFSET*
-                        static_cast<float>(walkParams->singleSupportFrames
+                        static_cast<float>(singleSupportFrames
                                            -frameCounter)/
-                        ( static_cast<float>(walkParams->singleSupportFrames)/
+                        ( static_cast<float>(singleSupportFrames)/
 						  3.0f) );
     }
 
@@ -442,13 +442,13 @@ SupportMode WalkingLeg::nextState(){
 bool WalkingLeg::shouldSwitchStates(){
     switch(state){
     case SUPPORTING:
-        return frameCounter >= static_cast<unsigned int>(walkParams->singleSupportFrames);
+        return frameCounter >= singleSupportFrames;
     case SWINGING:
-        return frameCounter >= static_cast<unsigned int>(walkParams->singleSupportFrames);
+        return frameCounter >= singleSupportFrames;
     case DOUBLE_SUPPORT:
-        return frameCounter >= static_cast<unsigned int>(walkParams->doubleSupportFrames);
+        return frameCounter >= doubleSupportFrames;
     case PERSISTENT_DOUBLE_SUPPORT:
-        return frameCounter >= static_cast<unsigned int>(walkParams->doubleSupportFrames);
+        return frameCounter >= doubleSupportFrames;
     }
 
     throw "Non existent state";
@@ -468,6 +468,11 @@ void WalkingLeg::setState(SupportMode newState){
         lastRotation = -lastRotation;
 }
 
+void WalkingLeg::assignStateTimes(boost::shared_ptr<Step> step){
+    doubleSupportFrames = step->doubleSupportFrames;
+    singleSupportFrames = step->singleSupportFrames;
+    cycleFrames = step->stepDurationFrames;
+}
 
 void WalkingLeg::debugProcessing(){
 #ifdef DEBUG_WALKING_STATE_TRANSITIONS
