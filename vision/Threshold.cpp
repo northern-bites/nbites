@@ -280,6 +280,7 @@ void Threshold::runs() {
         // potential yellow post location
         int lastGoodPixel = IMAGE_HEIGHT;
         //int horizonJ = pose->getHorizonY(i);
+		hor = horizon + (int)(horizonSlope * (float)(i));
 
         for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
             pixel = thresholded[j][i];
@@ -309,6 +310,7 @@ void Threshold::runs() {
 					// check if this is a viable chunk of robot.  Yes if:
 					//      just saw something white or navy or green
 					//      it is really big
+					/* For now we have turned robot recognition off
                     if (currentRun > 3 &&
                         (previousRun == WHITE || previousRun == NAVY ||
                          (previousRun == GREEN || currentRun > 20))) {
@@ -322,7 +324,7 @@ void Threshold::runs() {
                          currentRun > 20)) {
                         navyBottoms[i] = j + currentRun;
                         //drawPoint(i, j + currentRun, ORANGE);
-                    }
+						} */
                     break;
                 case RED:
 					// see comments for Navy.  We also have to be careful about seeing ball pixels
@@ -334,6 +336,7 @@ void Threshold::runs() {
                         //&& previousRunStop - j - currentRun < 10))) {
                         lastGoodPixel = j;
                     }
+					/*
                     if (currentRun > 3 && (previousRun == WHITE ||
                                            previousRun == RED ||
                                            previousRun == ORANGE ||
@@ -345,7 +348,7 @@ void Threshold::runs() {
                         (previousRun == WHITE || previousRun == GREEN ||
                          previousRun == ORANGE)) {
                         redBottoms[i] = j + currentRun;
-                    }
+						} */
                     break;
                 case GREEN:
 					// if we see a big stretch of green, then it is highly unlikely that there is a robot here
@@ -353,11 +356,11 @@ void Threshold::runs() {
                         redBottoms[i] = -1;
                         navyBottoms[i] = -1;
                     }
+					lastGoodPixel = j;
 
                     break;
                 case BLUE:
                     // add to Blue data structure
-                    hor = horizon + (int)(horizonSlope * (float)(i));
 
                     if (currentRun > MIN_RUN_SIZE) { // noise eliminator
                         lastGoodPixel = j;
@@ -399,9 +402,9 @@ void Threshold::runs() {
                 // store the position of the start of the run in the column (y-value)
                 //currentRunStart = j;
             }
-            if (j < horizon && lastGoodPixel - j > 10 &&
+            if (j < hor && lastGoodPixel - j > 15 &&
 				(currentRun == 1 || lastPixel == GREY)) {
-				//drawPoint(i, j, CYAN);
+				drawPoint(i, j, PINK);
 				j = 0;
 				break;
 			}
@@ -417,6 +420,7 @@ void Threshold::runs() {
 
     // now do some robot scanning stuff - we're going to analyze our runs and see if they
     // could be turned into viable robot runs that we will feed to ObjectFragments
+	/*
     int bigh = IMAGE_HEIGHT, firstn = -1, lastn = -1, bot = -1;
     // first do the Navy robots
     for (i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
@@ -476,7 +480,7 @@ void Threshold::runs() {
             //cout << "Last " << lastn << " " << bigh << " " << bot << endl;
             //drawRect(firstn, bigh, lastn, bot - bigh, RED);
         }
-    }
+		}*/
 
 }
 
