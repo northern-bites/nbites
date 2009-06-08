@@ -442,13 +442,13 @@ SupportMode WalkingLeg::nextState(){
 bool WalkingLeg::shouldSwitchStates(){
     switch(state){
     case SUPPORTING:
-        return frameCounter >= walkParams->singleSupportFrames;
+        return frameCounter >= static_cast<unsigned int>(walkParams->singleSupportFrames);
     case SWINGING:
-        return frameCounter >= walkParams->singleSupportFrames;
+        return frameCounter >= static_cast<unsigned int>(walkParams->singleSupportFrames);
     case DOUBLE_SUPPORT:
-        return frameCounter >= walkParams->doubleSupportFrames;
+        return frameCounter >= static_cast<unsigned int>(walkParams->doubleSupportFrames);
     case PERSISTENT_DOUBLE_SUPPORT:
-        return frameCounter >= walkParams->doubleSupportFrames;
+        return frameCounter >= static_cast<unsigned int>(walkParams->doubleSupportFrames);
     }
 
     throw "Non existent state";

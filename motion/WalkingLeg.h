@@ -151,7 +151,7 @@ private:
     //FSA Attributes
     SupportMode state, lastState,lastDiffState;
     SupportMode supportMode; //soon to be deprecated
-    int frameCounter;
+    unsigned int frameCounter;
 
     //destination attributes
     boost::shared_ptr<Step> cur_dest, swing_src, swing_dest,support_step;
