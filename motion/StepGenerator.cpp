@@ -287,7 +287,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //relative to the support leg (f coord frame), based on the output
     //of the controller (in tick_controller() )
     com_f = prod(if_Transform,com_i);
- 
+
     //We want to get the incremental rotation of the center of mass
     //we need to ask one of the walking legs to give it:
     const float body_rot_angle_fc = leftLeg.getFootRotation()/2; //relative to f
@@ -648,15 +648,13 @@ void StepGenerator::setSpeed(const float _x, const float _y,
             " work in stepGen::setSpeed()"<<endl;
 #endif
 
-        //we are starting fresh from a stopped state, so we need to clear all remaining 
+        //we are starting fresh from a stopped state, so we need to clear all remaining
         //steps and zmp values.
         resetQueues();
 
         //then we need to pick which foot to start with
-        if(y > 0 || theta > 0)
-            startLeft();
-        else
-            startRight();
+        const bool startLeft = decideStartLeft(new_y,new_theta);
+        resetSteps(startLeft);
     }
     done = false;
 
@@ -697,14 +695,13 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
             <<") and with "<<_numSteps<<" Steps were APPENDED because"
             "StepGenerator is already active!!" <<endl;
     }else{
-       //we are starting fresh from a stopped state, so we need to clear all remaining 
+       //we are starting fresh from a stopped state, so we need to clear all remaining
         //steps and zmp values.
         resetQueues();
 
-        if(new_y < 0.0f || new_theta < 0.0f){
-            startRight();
-        }else
-            startLeft();
+        //then we need to pick which foot to start with
+        const bool startLeft = decideStartLeft(new_y,new_theta);
+        resetSteps(startLeft);
 
         //Adding this step is necessary because it was not added in the start left right
         generateStep(new_x, new_y, new_theta);
@@ -723,18 +720,10 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
     x = 0.0f; y =0.0f; theta = 0.0f;
 }
 
-/*  Set up the walking engine for starting with a swinging step on the right */
-void StepGenerator::startRight(){
-#ifdef DEBUG_STEPGENERATOR
-    cout << "StepGenerator::startRight"<<endl;
-#endif
-    //start off in a double support phase where the right leg swings first
-    //HOWEVER, since the first support step is END, there will be no
-    //actual swinging - the first actual swing will be 2 steps
-    //after the first support step, in this case, causing right to swing first
-    leftLeg.startLeft();
-    rightLeg.startLeft();
 
+/*  Set up the walking engine for starting with a swinging step on the left,
+ if startLeft is true*/
+void StepGenerator::resetSteps(const bool startLeft){
     //When we start out again, we need to let odometry know to store
     //the distance covered so far. This needs to happen before
     //we reset any coordinate frames
@@ -749,95 +738,81 @@ void StepGenerator::startRight(){
     //Each time we restart, we need to reset the estimated sensor ZMP:
     zmp_filter = ZmpEKF();
 
-    //Second we setup the if_Transform such that the firstSupportStep is Right
-    //(When the firstSupportStep gets popped, it thinks we were over the other
-    //foot before, so we init the if_Transform to start under the opposite foot)
-    if_Transform.assign(initStartRight);
-    updateDebugMatrix();
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
     si_Transform = CoordFrame3D::identity3D();
     last_zmp_end_s = CoordFrame3D::vector3D(0.0f,0.0f);
 
-    //Support step is END Type, but the first swing step, generated
-    //in generateStep, is START type.
-    shared_ptr<Step> firstSupportStep =
-        shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
-                                  walkParams->stepDuration,
-                                  walkParams->doubleSupportFraction,
-                                  RIGHT_FOOT,END_STEP));
-    shared_ptr<Step> dummyStep =
-        shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
-                                  walkParams->stepDuration,
-                                  walkParams->doubleSupportFraction,
-                                  LEFT_FOOT));
-    //need to indicate what the current support foot is:
-    currentZMPDSteps.push_back(dummyStep);//right gets popped right away
-    fillZMP(firstSupportStep);
-    addStartZMP(firstSupportStep);
-    currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
-    lastQueuedStep = firstSupportStep;
-    nextStepIsLeft = true;
-}
 
-/*  Set up the walking engine for starting with a swinging step on the left */
-void StepGenerator::startLeft(){
-#ifdef DEBUG_STEPGENERATOR
-    cout << "StepGenerator::startLeft"<<endl;
-#endif
+    Foot dummyFoot = LEFT_FOOT;
+    Foot firstSupportFoot = RIGHT_FOOT;
+    float supportSign = 1.0f;
+    if(startLeft){
+        #ifdef DEBUG_STEPGENERATOR
+        cout << "StepGenerator::startLeft"<<endl;
+        #endif
 
-    //start off in a double support phase where the right leg swings first
-    //HOWEVER, since the first support step is END, there will be no
-    //actual swinging - the first actual swing will be 2 steps
-    //after the first support step, in this case, causing left to swing first
-    leftLeg.startRight();
-    rightLeg.startRight();
+        //start off in a double support phase where the right leg swings first
+        //HOWEVER, since the first support step is END, there will be no
+        //actual swinging - the first actual swing will be 2 steps
+        //after the first support step, in this case, causing left to swing first
+        leftLeg.startRight();
+        rightLeg.startRight();
 
-    //When we start out again, we need to let odometry know to store
-    //the distance covered so far. This needs to happen before
-    //we reset any coordinate frames
-    resetOdometry();
+        //we need to re-initialize the if_Transform matrix to reflect which
+        //side the we are starting.
+        if_Transform.assign(initStartLeft);
 
-    //This is the place where we reset the controller each time the walk starts
-    //over again.
-    //First we reset the controller back to the neutral position
-    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
-    controller_y->initState(0.0f,0.0f,0.0f);
+        //depending on we are starting, assign the appropriate steps
+        dummyFoot = RIGHT_FOOT;
+        firstSupportFoot = LEFT_FOOT;
+        supportSign = 1.0f;
+        nextStepIsLeft = false;
 
-    //Each time we restart, we need to reset the estimated sensor ZMP:
-    zmp_filter = ZmpEKF();
+    }else{ //startRight
+        #ifdef DEBUG_STEPGENERATOR
+        cout << "StepGenerator::startRight"<<endl;
+        #endif
 
-    //Second we setup the if_Transform such that the firstSupportStep is Right
-    //(When the firstSupportStep gets popped, it thinks we were over the other
-    //foot before, so we init the if_Transform to start under the opposite foot)
-    if_Transform.assign(initStartLeft);
+        //start off in a double support phase where the left leg swings first
+        //HOWEVER, since the first support step is END, there will be no
+        //actual swinging - the first actual swing will be 2 steps
+        //after the first support step, in this case, causing right to swing first
+        leftLeg.startLeft();
+        rightLeg.startLeft();
+
+        //we need to re-initialize the if_Transform matrix to reflect which
+        //side the we are starting.
+        if_Transform.assign(initStartRight);
+
+        //depending on we are starting, assign the appropriate steps
+        dummyFoot = LEFT_FOOT;
+        firstSupportFoot = RIGHT_FOOT;
+        supportSign = -1.0f;
+        nextStepIsLeft = true;
+
+    }
     updateDebugMatrix();
 
-    //Third, we reset the memory of where to generate ZMP from steps back to
-    //the origin
-    si_Transform = CoordFrame3D::identity3D();
-    last_zmp_end_s = CoordFrame3D::vector3D(0.0f,0.0f);
-
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is START type.
     shared_ptr<Step> firstSupportStep =
-        shared_ptr<Step>(new Step(0,HIP_OFFSET_Y,0,
+        shared_ptr<Step>(new Step(0,HIP_OFFSET_Y*supportSign,0,
                                   walkParams->stepDuration,
                                   walkParams->doubleSupportFraction,
-                                  LEFT_FOOT,END_STEP));
+                                  firstSupportFoot,END_STEP));
     shared_ptr<Step> dummyStep =
-        shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y,0,
+        shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y*supportSign,0,
                                   walkParams->stepDuration,
                                   walkParams->doubleSupportFraction,
-                                  RIGHT_FOOT));
+                                  dummyFoot));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
     addStartZMP(firstSupportStep);
     currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
     lastQueuedStep = firstSupportStep;
-    nextStepIsLeft = false;
 }
 
 
@@ -1057,13 +1032,13 @@ void StepGenerator::resetQueues(){
 
 /**
  * Returns the cumulative odometry changes since the last call
- * 
+ *
  * The basic idea is to keep track of where the start position is located
  * in two c-type frames. The new c frame is the c frame of the robot at the time
  * this method is called. The old c frame was the c frame of the robot when this
  * method was last called (or alternately since instantiation).
  *
- * The odometry update is then calculated by looking at the difference 
+ * The odometry update is then calculated by looking at the difference
  * between the location of the global origin (origin_i) in each of those frames.
  * This allows us to see how to translate, then rotate, from the old c frame
  * to the new one.
@@ -1102,6 +1077,22 @@ void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
     const ufmatrix3 new_cc_Transform  = prod(cc_Transform,odoUpdate);
     cc_Transform = new_cc_Transform;
 
+}
+
+/**
+ * Method to figure out when to start swinging with the left vs. right left
+ */
+const bool StepGenerator::decideStartLeft(const float lateralVelocity,
+                                       const float radialVelocity){
+    //Currently, the logic is very simple: if the strafe direction
+    //or the turn direction go left, then start that way
+    //Strafing takes precedence over turning.
+    if(lateralVelocity == 0.0f){
+        return radialVelocity > 0.0f;
+    }
+    return lateralVelocity > 0.0f;
+    //An alternate algorithm might compute a test value like
+    // lateralVelocity + 0.5f*radialVelocity  and decide on that
 }
 
 // void hackJointOrder(float angles[]) {
@@ -1144,7 +1135,7 @@ void StepGenerator::debugLogging(){
         -Kinematics::forwardKinematics((leftLeg.isSupporting()?
                                        LLEG_CHAIN: RLEG_CHAIN),//LLEG_CHAIN,
                                       (leftLeg.isSupporting()?
-                                       lleg_angles: rleg_angles)); 
+                                       lleg_angles: rleg_angles));
     leg_dest_c(2) = 1.0f;
 
     ufvector3 leg_dest_i = prod(fi_Transform,leg_dest_c);

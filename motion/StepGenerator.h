@@ -147,13 +147,15 @@ private: // Helper methods
     void fillZMPEnd(const boost::shared_ptr<Step> newStep );
     void addStartZMP(const boost::shared_ptr<Step> newStep );
 
-    void startRight();
-    void startLeft();
+    void resetSteps(const bool startLeft);
 
     static const NBMath::ufmatrix3 get_f_fprime(const boost::shared_ptr<Step> step);
     static const NBMath::ufmatrix3 get_fprime_f(const boost::shared_ptr<Step> step);
     static const NBMath::ufmatrix3 get_sprime_s(const boost::shared_ptr<Step> step);
     static const NBMath::ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
+
+    const bool decideStartLeft(const float lateralVelocity,
+                               const float radialVelocity);
 
     void resetQueues();
     void resetOdometry();
