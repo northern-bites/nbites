@@ -7,6 +7,7 @@ from math import fabs
 
 LOC_IS_ACTIVE_H  = 400
 CLOSE_ENOUGH_XY = 25.0
+CLOSER_XY = 5.0
 CLOSE_ENOUGH_H = 25.0
 ALMOST_CLOSE_ENOUGH_H = 45.0
 
@@ -43,13 +44,28 @@ class Navigator(FSA.FSA):
         self.walkX = 0
         self.walkY = 0
         self.walkTheta = 0
+        self.currentGait = None
+        self.movingOrtho = False
 
         # Step controls
         self.stepX = 0
         self.stepY = 0
         self.stepTheta = 0
 
+    def orthoGoTo(self, x,y,h):
+        '''
+        takes in a relative bearing [-180...0...180],
+        takes in a heading to keep your heading constant (relatively)
+        '''
+        self.destX = x
+        self.destY = y
+        self.destH = h
+        self.movingOrtho = True
+
+        self.switchTo('orthoWalkToPoint')
+
     def goTo(self,x,y,h=None):
+        self.movingOrtho = False
         self.destH = h
         self.destX,self.destY = x,y
         self.switchTo('spinToWalkHeading')
@@ -65,7 +81,8 @@ class Navigator(FSA.FSA):
             if self.walkX == 0 and self.walkY == 0 and self.walkTheta == 0:
                 return False
         # If the walk changes are really small, then ignore them
-        elif (fabs(self.walkX - x) < FORWARD_EPSILON and fabs(self.walkY - y) < STRAFE_EPSILON and
+        elif (fabs(self.walkX - x) < FORWARD_EPSILON and
+            fabs(self.walkY - y) < STRAFE_EPSILON and
             fabs(self.walkTheta - theta) < SPIN_EPSILON):
             return False
 
@@ -109,6 +126,15 @@ class Navigator(FSA.FSA):
         return (abs(self.brain.my.x - self.destX) < CLOSE_ENOUGH_XY
                 and abs(self.brain.my.y - self.destY) < CLOSE_ENOUGH_XY)
 
+    def atDestinationCloser(self):
+        """
+        Returns true if we are at an (x, y) close enough to the one we want
+        """
+#         self.printf("X diff is " + str(self.brain.my.x - self.destX))
+#         self.printf("Y diff is " + str(self.brain.my.y - self.destY))
+        return (abs(self.brain.my.x - self.destX) < CLOSER_XY
+                and abs(self.brain.my.y - self.destY) < CLOSER_XY)
+
     def atHeading(self, targetHeading = None):
         """
         Returns true if we are at a heading close enough to what we want
@@ -117,7 +143,7 @@ class Navigator(FSA.FSA):
             targetHeading = self.destH
         hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
         #self.printf("H diff is " + str(hDiff))
-        return abs(hDiff) < CLOSE_ENOUGH_H and \
+        return hDiff < CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
 
     def notAtHeading(self, targetHeading= None):
@@ -125,7 +151,7 @@ class Navigator(FSA.FSA):
             targetHeading = self.destH
         hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
         #self.printf("H diff is " + str(hDiff))
-        return abs(hDiff) > ALMOST_CLOSE_ENOUGH_H and \
+        return hDiff > ALMOST_CLOSE_ENOUGH_H and \
             self.brain.my.uncertH < LOC_IS_ACTIVE_H
 
     def getRotScale(self, headingDiff):

@@ -137,7 +137,8 @@ const shape VisualCorner::getLClassification() {
 
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
-    float theta = TO_DEG * acos(dotProduct/(line1.length * line2.length));
+    float theta = TO_DEG * NBMath::safe_acos(dotProduct/
+                                             (line1.length * line2.length));
     /*
       cout << " first line: " << line1->start << ", " << line1->end << endl;
       cout << " second line: " << line2->start << ", " << line2->end << endl;

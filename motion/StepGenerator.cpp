@@ -39,6 +39,7 @@ using namespace NBMath;
 StepGenerator::StepGenerator(shared_ptr<Sensors> s)
   : x(0.0f), y(0.0f), theta(0.0f),
     done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+    com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
     currentZMPDSteps(),
@@ -46,7 +47,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
     if_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
-    ic_Transform(CoordFrame3D::identity3D()),
+    cc_Transform(CoordFrame3D::identity3D()),
     initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
@@ -185,8 +186,8 @@ void StepGenerator::findSensorZMP(){
     //Rotate from the local C to the global I frame
     ufvector3 accel_c = CoordFrame3D::vector3D(acc_filter.getX(),
                                                acc_filter.getY());
-    float angle_fc = asin(fc_Transform(1,0));
-    float angle_if = asin(if_Transform(1,0));
+    float angle_fc = safe_asin(fc_Transform(1,0));
+    float angle_if = safe_asin(if_Transform(1,0));
     float tot_angle = -(angle_fc+angle_if);
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
@@ -285,7 +286,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //Each frame, we must recalculate the location of the center of mass
     //relative to the support leg (f coord frame), based on the output
     //of the controller (in tick_controller() )
-    ufvector3 com_f = prod(if_Transform,com_i);
+    com_f = prod(if_Transform,com_i);
  
     //We want to get the incremental rotation of the center of mass
     //we need to ask one of the walking legs to give it:
@@ -315,6 +316,12 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                        swingingStep_f,fc_Transform);
     LegJointStiffTuple right = rightLeg.tick(rightStep_f,swingingStepSource_f,
                                         swingingStep_f,fc_Transform);
+
+    if(supportStep_f->foot == LEFT_FOOT){
+        updateOdometry(leftLeg.getOdoUpdate());
+    }else{
+        updateOdometry(rightLeg.getOdoUpdate());
+    }
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
@@ -383,11 +390,11 @@ void StepGenerator::swapSupportLegs(){
         //finally, we need to know how much turning there will be. Turns out,
         //we can simply read this out of the aforementioned translation matr.
         //this only works because its a 3D homog. coord matr - 4D would break
-        float swing_dest_angle = -asin(swing_reverse_trans(1,0));
+        float swing_dest_angle = -safe_asin(swing_reverse_trans(1,0));
 
         //we use the swinging source to calc. a path for the swinging foot
         //it is not clear now if we will need to angle offset or what
-        float swing_src_angle = -asin(stepTransform(1,0));
+        float swing_src_angle = -safe_asin(stepTransform(1,0));
 
         //in the F coordinate frames, we express Steps representing
         // the three footholds from above
@@ -1060,45 +1067,35 @@ void StepGenerator::resetQueues(){
  * since the last call to getOdometryUpdate doesnt get lost
  */
 vector<float> StepGenerator::getOdometryUpdate(){
-    ufmatrix3 new_ic_Transform = prod(fc_Transform,if_Transform);
-    const float rot_new = -asin(new_ic_Transform(1,0));
-    const float rot_old = -asin(ic_Transform(1,0));
-    const float rot_diff = rot_new - rot_old; //angle from cold to cnew
-
-    const ufvector3 origin_i = CoordFrame3D::vector3D(0.0f,0.0f);
-    const ufvector3 start_pos_c_new = prod(new_ic_Transform,origin_i);
-    const ufvector3 start_pos_c_old = prod(ic_Transform,origin_i);
-    const ufvector3 start_pos_c_new_in_old =
-        prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,-rot_diff),
-             start_pos_c_new);
-    const ufvector3 movement_c = start_pos_c_old - start_pos_c_new_in_old;
-
-    //NOT SURE THIS WORKS: TODO: TEST this out, since I think its broke
-
-    ic_Transform = new_ic_Transform; //save the new coordinate frame for later
-
-    //populate the vector. Note the units are mm and rad
-    vector<float> odoUpdate= vector<float>();
-    odoUpdate+=movement_c(0);odoUpdate+=movement_c(1);odoUpdate+=rot_diff;
-    return odoUpdate;
+    const float rotation = -safe_asin(cc_Transform(1,0));
+    const ufvector3 odo = prod(cc_Transform,CoordFrame3D::vector3D(0.0f,0.0f));
+    const float odoArray[3] = {odo(0),odo(1),rotation};
+    //printf("Odometry update is (%g,%g,%g)\n",odoArray[0],odoArray[1],odoArray[2]);
+    cc_Transform = CoordFrame3D::translation3D(0.0f,0.0f);
+    return vector<float>(odoArray,&odoArray[3]);
 }
 
 /**
  * Ensures we don't loose odometry information if the walk is restarted.
  */
 void StepGenerator::resetOdometry(){
+}
 
-    vector<float> curOdoUpdate = getOdometryUpdate();
+/**
+ * Called once per motion frame to update the odometry
+ *
+ *  We may not correctly account for the rotation around the S frame
+ *  rather than the C frame, which is what we are actually returning.
+ */
 
-    //since we are starting over, we need to
-    //assign the ic transform to account for any currently
-    //built up odometry. This means we need to init the i to c matrix
-    //to store the location of the c frame last time odometry was called:
-    ufmatrix3 odoHistory = prod(CoordFrame3D::translation3D(-curOdoUpdate[0],
-                                                            -curOdoUpdate[1]),
-                                CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
-                                                         -curOdoUpdate[2]));
-    ic_Transform.assign(odoHistory);
+void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
+    const ufmatrix3 odoUpdate = prod(CoordFrame3D::translation3D(deltaOdo[0],
+                                                                 deltaOdo[1]),
+                                     CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+                                                              -deltaOdo[2]));
+    const ufmatrix3 new_cc_Transform  = prod(cc_Transform,odoUpdate);
+    cc_Transform = new_cc_Transform;
+
 }
 
 // void hackJointOrder(float angles[]) {

@@ -21,8 +21,10 @@ SLARTI_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       1.45, # hip offset x
                                       3.0,  # x-axis angle offset
@@ -44,8 +46,10 @@ TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       0.85,  #maxStiffness
                                       0.4,  #kneeStiffness
                                       0.3,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 
 ZAPHOD_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       1.40,  # hip offset x
@@ -68,8 +72,10 @@ ZAPHOD_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 #MISC EXPERIMENTAL GAITS
 
 
@@ -94,7 +100,10 @@ TRILLIAN_SLOW_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 TRILLIAN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                           1.40,  # hip offset x
                                           0.0,  # x-axis angle offset
@@ -116,7 +125,11 @@ TRILLIAN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
+
 ZAPHOD_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         1.40,  # hip offset x
                                         0.0,  # x-axis angle offset
@@ -138,8 +151,10 @@ ZAPHOD_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 SLARTI_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         1.40,  # hip offset x
                                         0.0,  # x-axis angle offset
@@ -161,8 +176,10 @@ SLARTI_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         1.40,  # hip offset x
                                         0.0,  # x-axis angle offset
@@ -184,8 +201,10 @@ MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         0.85,  #maxStiffness
                                         0.85,  #kneeStiffness
                                         0.85,  #ankleStiffness
-                                        0.2)   #armStiffness
-
+                                        0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
                                                 1.40, # hip offset x
                                                 0.0,  # x-axis angle offset
@@ -207,8 +226,10 @@ MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
                                                 0.85,  #maxStiffness
                                                 0.85,  #kneeStiffness
                                                 0.85,  #ankleStiffness
-                                                0.2)   #armStiffness
-
+                                                0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 MARVIN_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       1.45, # hip offset x
                                       3.0,  # x-axis angle offset
@@ -230,8 +251,10 @@ MARVIN_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       0.85,  #maxStiffness
                                       0.4,  #kneeStiffness
                                       0.3,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 TUCKER_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       1.40,  # hip offset x
                                       0.0,  # x-axis angle offset
@@ -253,8 +276,10 @@ TUCKER_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
                                       0.85,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 WEBOTS_GAIT = motion.GaitCommand(31.00, # com height
                                  1.40,  # hip offset x
                                  0.0,  # x-axis angle offset
@@ -276,8 +301,10 @@ WEBOTS_GAIT = motion.GaitCommand(31.00, # com height
                                  0.85,  #maxStiffness
                                  0.5,  #kneeStiffness
                                  0.2,  #ankleStiffness
-                                 0.2)   #armStiffness
-
+                                 0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 
 SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       1.45, # hip offset x
@@ -300,8 +327,10 @@ SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       0.85,  #maxStiffness
                                       0.4,  #kneeStiffness
                                       0.3,  #ankleStiffness
-                                      0.2)   #armStiffness
-
+                                      0.2,   #armStiffness
+                                      1.0,   #xOdoScale
+                                      1.0,   #yOdoScale
+                                      1.0)   #thetaOdoScale
 #DEFAULT GAIT ASSIGNMENTS
 
 TRILLIAN_GAIT = SHORT_FAST_GAIT

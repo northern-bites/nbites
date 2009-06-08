@@ -97,7 +97,7 @@ class HeadTracking(FSA.FSA):
         self.target = self.brain.ball
         self.gain = 1.0
         if(self.currentState != 'panLeftOnce' or self.currentState != 'panRightOnce' or
-           self.currentState != 'activeTracking'):
+           self.currentState != 'activeTracking' or self.currentState != 'activeLocScan'):
            self.switchTo('activeTracking')
 
     def trackObject(self):
