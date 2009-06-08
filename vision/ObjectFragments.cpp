@@ -43,11 +43,11 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
     allocateColorRuns();
 #ifdef OFFLINE
     BALLDISTDEBUG = false;
-    PRINTOBJS = true;
+    PRINTOBJS = false;
     POSTDEBUG = false;
     POSTLOGIC = false;
     TOPFIND = false;
-    BALLDEBUG = false;
+    BALLDEBUG = true;
     CORNERDEBUG = false;
     BACKDEBUG = false;
     SANITY = false;
@@ -3383,7 +3383,7 @@ bool ObjectFragments::badSurround(blob b) {
     int y = b.leftTop.y;
     int w = b.rightTop.x - b.leftTop.x + 1;
     int h = b.rightBottom.y - b.leftTop.y + 1;
-    int greens = 0, orange = 0, red = 0, borange = 0, pix;
+    int greens = 0, orange = 0, red = 0, borange = 0, pix, realred = 0;
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
             pix = thresh->thresholded[y + j][x + i];
@@ -3400,19 +3400,49 @@ bool ObjectFragments::badSurround(blob b) {
             pix = thresh->thresholded[y + j][x + i];
             if (pix == ORANGE || pix == ORANGEYELLOW)
                 orange++;
-            else if (pix == RED || pix == ORANGERED)
-                red++;
+            else if (pix == RED)
+                realred++;
+			else if (pix == ORANGERED)
+				red++;
             else if (pix == GREEN)
                 greens++;
         }
     }
     if (BALLDEBUG) {
-        cout << "Surround information " << red << " " << orange << " " << borange << " " << greens << endl;
+        cout << "Surround information " << red << " " << realred << " " 
+			 << orange << " " << borange << " " << greens << endl;
     }
-    if (red > orange) return true;
-    if (red > greens) return true;
-    if (red > borange) return true;
-    return false;
+    if (realred > orange) {
+		if (BALLDEBUG) {
+			cout << "Too much real red" << endl;
+		}
+		return true;
+	}
+    if (realred > greens) {
+		if (BALLDEBUG) {
+			cout << "Too much real red versus green" << endl;
+		}
+		return true;
+	}
+    if (realred > borange) {
+		if (BALLDEBUG) {
+			cout << "Too much real red vs borange" << endl;
+		}
+		return true;
+	}
+	if (red > orange && greens < (w * h) / 10) {
+		if (BALLDEBUG) {
+			cout << "Too much real orangered without enough green" << endl;
+		}
+		return true;
+	}
+	if (red > orange)  {
+		if (BALLDEBUG) {
+			cout << "Too much real red and the ball doesn't seem round enough" << endl;
+		}
+		return roundness(b) == BADVALUE;
+	}
+	return false;
 }
 
 /*  Is the ball at the boundary of the screen?

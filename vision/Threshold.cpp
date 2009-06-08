@@ -278,11 +278,10 @@ void Threshold::runs() {
         redBottoms[i] = -1;
         navyBottoms[i] = -1;
         // potential yellow post location
-        int lastGoodPixel = 0;
+        int lastGoodPixel = IMAGE_HEIGHT;
         //int horizonJ = pose->getHorizonY(i);
 
         for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
-            if (j < horizon && lastGoodPixel - j > 10 && currentRun == 1) break;
             pixel = thresholded[j][i];
 
             // check thresholded point with last thresholded point.
@@ -298,18 +297,18 @@ void Threshold::runs() {
                 switch (lastPixel) {
                     // possible horizon detection and for postID (not that impt)
                 case NAVY:
-		  // we're looking for blue robots, so we use some special rules.
-		  // mainly that the blue should be paired with white
-		  // also we try and create huge vertical runs that cover the length of
-		  // the robot if possible
+					// we're looking for blue robots, so we use some special rules.
+					// mainly that the blue should be paired with white
+					// also we try and create huge vertical runs that cover the length of
+					// the robot if possible
                     if (currentRun > 8 && (previousRun == WHITE ||
                                            previousRun == NAVY)) {
                         //navyblue->newRun(i, j, currentRun);
                         lastGoodPixel = j;
                     }
-		    // check if this is a viable chunk of robot.  Yes if:
-		    //      just saw something white or navy or green
-		    //      it is really big
+					// check if this is a viable chunk of robot.  Yes if:
+					//      just saw something white or navy or green
+					//      it is really big
                     if (currentRun > 3 &&
                         (previousRun == WHITE || previousRun == NAVY ||
                          (previousRun == GREEN || currentRun > 20))) {
@@ -317,7 +316,7 @@ void Threshold::runs() {
                         navyTops[i] = j;
                         //drawPoint(i, j, YELLOW);
                     }
-		    // if we hadn't seen a bottom already, then now is the time
+					// if we hadn't seen a bottom already, then now is the time
                     if (navyBottoms[i] == -1 && currentRun > 3 &&
                         (previousRun == WHITE || previousRun == GREEN ||
                          currentRun > 20)) {
@@ -326,7 +325,7 @@ void Threshold::runs() {
                     }
                     break;
                 case RED:
-		  // see comments for Navy.  We also have to be careful about seeing ball pixels
+					// see comments for Navy.  We also have to be careful about seeing ball pixels
                     if (currentRun > 8 && (previousRun == WHITE ||
                                            previousRun == RED ||
                                            previousRun == ORANGE ||
@@ -349,7 +348,7 @@ void Threshold::runs() {
                     }
                     break;
                 case GREEN:
-		  // if we see a big stretch of green, then it is highly unlikely that there is a robot here
+					// if we see a big stretch of green, then it is highly unlikely that there is a robot here
                     if (currentRun > 20) {
                         redBottoms[i] = -1;
                         navyBottoms[i] = -1;
@@ -400,6 +399,12 @@ void Threshold::runs() {
                 // store the position of the start of the run in the column (y-value)
                 //currentRunStart = j;
             }
+            if (j < horizon && lastGoodPixel - j > 10 &&
+				(currentRun == 1 || lastPixel == GREY)) {
+				//drawPoint(i, j, CYAN);
+				j = 0;
+				break;
+			}
             // every pixel.
             lastPixel = pixel;
         }//end j loop
