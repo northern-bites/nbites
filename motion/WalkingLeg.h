@@ -141,11 +141,6 @@ public:
 private:
     const float getHipYawPitch();
     const std::vector<float> getStiffnesses();
-    const float stiffnessAchievedEnd(int state_length,
-                                     float stiffStart, float stiffEnd);
-    const float stiffnessAchievedBegin(int state_length,
-                                     float stiffStart, float stiffEnd);
-    const float kneeSwingingStiffness(float stiffStart, float stiffEnd);
     const boost::tuple<const float,const float>getHipHack(const float HYPAngle);
     const float cycloidy(float theta);
     const float cycloidx(float theta);
