@@ -120,8 +120,9 @@ class HeadTracking(FSA.FSA):
             #self.printf( "No object")
             return
 
-        curPitch = self.brain.sensors.motionAngles[MotionConstants.HeadPitch]
-        curYaw = self.brain.sensors.motionAngles[MotionConstants.HeadYaw]
+        motionAngles = self.brain.sensors.motionAngles
+        curPitch = motionAngles[MotionConstants.HeadPitch]
+        curYaw = motionAngles[MotionConstants.HeadYaw]
 
         maxChange = 13.0
 
