@@ -42,6 +42,11 @@ def pReadyStopper(team):
     return [PBConstants.READY_DEFENDER, pos]
 
 # Game Playing SubRoles
+def pChaser(team):
+    my = team.brain.my
+    pos = [my.x, my.y]
+    return [PBConstants.CHASE_NORMAL, pos]
+
 def pLeftWing(team):
     '''position left winger'''
     y = MyMath.clip(team.brain.ball.y - PBConstants.WING_Y_OFFSET,

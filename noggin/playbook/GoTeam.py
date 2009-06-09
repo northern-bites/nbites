@@ -107,7 +107,8 @@ class GoTeam:
             return ('sInit', PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
                     PBConstants.INIT_SUB_ROLE, [0,0] )
         elif self.brain.gameController.currentState == 'gamePenalized':
-            return ('sInit', PBConstants.PENALTY_FORMATION, PBConstants.PENALTY_ROLE,
+            return ('sInit', PBConstants.PENALTY_FORMATION,
+                    PBConstants.PENALTY_ROLE,
                     PBConstants.PENALTY_SUB_ROLE, [0,0] )
         # First we check for testing stuff
         elif PBConstants.TEST_DEFENDER:

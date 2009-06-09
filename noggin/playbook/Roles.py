@@ -4,32 +4,8 @@ from . import PBConstants
 from . import SubRoles
 
 def rChaser(team):
-    """
-    Chaser role decides if normal chasing should occur or if pFields need
-    to be used in order to avoid the goalie box
-    """
-    # If we are in the corners or the ball is in a corner, we avoid the box
-    if ((team.brain.ball.x < NogginConstants.MY_GOALBOX_LEFT_X and
-        team.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y and
-        team.brain.my.x > NogginConstants.MY_GOALBOX_LEFT_X) or
-        (team.brain.ball.x > NogginConstants.MY_GOALBOX_RIGHT_X and
-        team.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y and
-        team.brain.my.x < NogginConstants.MY_GOALBOX_RIGHT_X) or
-        (team.brain.my.x < NogginConstants.MY_GOALBOX_LEFT_X and
-        team.brain.my.y < NogginConstants.MY_GOALBOX_TOP_Y and
-        team.brain.ball.x > NogginConstants.MY_GOALBOX_LEFT_X) or
-        (team.brain.my.x > NogginConstants.MY_GOALBOX_RIGHT_X and
-        team.brain.my.y < NogginConstants.MY_GOALBOX_TOP_Y and
-        team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X)):
-        pos = (team.brain.ball.x,team.brain.ball.y)
-        if (team.me.isGoalie()):
-            pos = (team.brain.my.x,team.brain.my.y)
-            return [PBConstants.CHASER, PBConstants.CHASE_NORMAL, pos]
-        return [PBConstants.CHASER, PBConstants.CHASE_AROUND_BOX, pos]
-    # Almost always chase normal, i.e. without potential fields
-    else:
-        pos = (team.brain.my.x,team.brain.my.y)
-        return [PBConstants.CHASER, PBConstants.CHASE_NORMAL, pos]
+    pos = (team.brain.my.x,team.brain.my.y)
+    return [PBConstants.CHASER, PBConstants.CHASE_NORMAL, pos]
 
 def rSearcher(team):
     '''
@@ -80,7 +56,9 @@ def rGoalie(team):
     """
     The Goalie
     """
+    subrole = None
     if team.goalieShouldChase():
-        return [PBConstants.GOALIE] + SubRoles.pGoalieChaser(team)
+        subrole = SubRoles.pGoalieChaser(team)
     else:
-        return [PBConstants.GOALIE] + SubRoles.pGoalieNormal(team)
+        subrole = SubRoles.pGoalieNormal(team)
+    return [PBConstants.GOALIE] + subrole

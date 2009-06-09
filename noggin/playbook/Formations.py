@@ -23,16 +23,17 @@ def fTwoField(team):
     role = None
     if team.me.isGoalie():
         role = Roles.rGoalie(team)
-    # gets teammate that is chaser (could be me)
-    chaser_mate = team.determineChaser()
-
-    # if i am chaser
-    if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        role = Roles.rChaser(team)
-    # Get where the defender should be
     else:
-        role = Roles.rDefender(team)
-	return [PBConstants.TWO_FIELD] + role
+        # gets teammate that is chaser (could be me)
+        chaser_mate = team.determineChaser()
+
+        # if i am chaser
+        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+            role = Roles.rChaser(team)
+        # Get where the defender should be
+        else:
+            role = Roles.rDefender(team)
+    return [PBConstants.TWO_FIELD] + role
 
 def fThreeField(team):
     '''right now (2009) we will only have 3 field players if the goalie is
@@ -46,12 +47,13 @@ def fThreeField(team):
     # Get where the defender should be
     elif team.me.isGoalie():
         role = Roles.rDefender(team)
-    elif team.me.highestActivePlayerNumber():
-        offInfo = Roles.rOffender(team)
-        role = offInfo
+    elif chaser_mate.isGoalie():
+        if team.me.highestActivePlayerNumber():
+            role = Roles.rOffender(team)
+        else:
+            role = Roles.rDefender(team)
     else:
-        defInfo = Roles.rDefender(team)
-        role = defInfo
+        role = Roles.rOffender(team)
     return [PBConstants.THREE_FIELD] + role
 
 def fDubD(team):
@@ -108,7 +110,7 @@ def fTwoKickoff(team):
         role = Roles.rDefender(team)
     elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
         role = Roles.rChaser(team)
-    return [PBConstants.KICKOFF] + role
+    return [PBConstants.TWO_KICKOFF] + role
 
 def fOneKickoff(team):
     """
@@ -129,7 +131,7 @@ def fReady(team):
     # if two dogs alive, position normally
     if team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
         if team.me.playerNumber == 2:
-            role =  PBConstants.DEFENDER] + SubRoles.pReadyDefender(team)
+            role =  [PBConstants.DEFENDER] + SubRoles.pReadyDefender(team)
         elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
             role = [PBConstants.CHASER] + SubRoles.pReadyChaser(team)
     else:
