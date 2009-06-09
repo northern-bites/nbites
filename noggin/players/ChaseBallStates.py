@@ -97,7 +97,6 @@ def approachBall(player):
 def positionForKick(player):
     """
     State to align on the ball once we are near it
-    Currently aligns the ball on the left foot
     """
     ball = player.brain.ball
 
