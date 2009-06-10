@@ -55,6 +55,14 @@ class Navigator(FSA.FSA):
         self.orbitDir = None
 
     def orthoGoTo(self, x,y,h):
+    def omniGoTo(self, x, y, h, oScale = 1.0, hScale = 1.0):
+        self.destX = x
+        self.destY = y
+        self.destH = h
+        self.movingOrtho = False
+        self.switchTo('omniWalkToPoint')
+
+    def orthoGoTo(self, x,y,h, oScale = 1.0, hScale = 1.0):
         '''
         takes in a relative bearing [-180...0...180],
         takes in a heading to keep your heading constant (relatively)

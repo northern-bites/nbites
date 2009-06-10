@@ -39,7 +39,7 @@ def goaliePosition(player):
                 nav.switchTo('stepping')
         else:
             if useOrtho:
-                nav.orthoGoTo(position[0], position[1],
+                nav.omniGoTo(position[0], position[1],
                               NogginConstants.OPP_GOAL_HEADING)
             else:
                 nav.goTo(position[0], position[1],
@@ -55,7 +55,7 @@ def goaliePosition(player):
                 nav.switchTo('stepping')
         else:
            if useOrtho:
-               nav.orthoGoTo(position[0], position[1],
+               nav.omniGoTo(position[0], position[1],
                              NogginConstants.OPP_GOAL_HEADING)
            else:
                nav.goTo(position[0], position[1],

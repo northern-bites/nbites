@@ -95,12 +95,12 @@ def getTargetHeading(my, targetX, targetY):
     '''determine the heading facing a target x, y'''
     return sub180Angle(degrees(safe_atan2(targetY - my.y, targetX - my.x)))
 
-def getSpinDir(my, targetH):
+def getSpinDir(myH, targetH):
     """
     Advanced function to get the spin direction for a given heading.
 
     """
-    h = my.h
+    h = myH
     LEFT_SPIN = 1
     RIGHT_SPIN = -1
     spin = 0
