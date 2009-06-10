@@ -42,7 +42,6 @@ class ObjectFragments; // forward reference
 static const int MAX_BLOBS = 400;
 static const int MAX_POINTS = 100;
 
-
 class ObjectFragments {
 public:
     ObjectFragments(Vision* vis, Threshold* thr, int _color);
@@ -65,6 +64,7 @@ public:
     int blobArea(blob a);
     int blobWidth(blob a);
     int blobHeight(blob a);
+	void checkForX(blob a);
 
     // robot recognition routines
     void getRobots(int maxY);
@@ -190,49 +190,6 @@ public:
     void drawLess(int x, int y, int c);
     void drawMore(int x, int y, int c);
 
-#ifdef OFFLINE
-    void setConstant(int c) {
-        switch (c) {
-        case PRINTOBJSN:
-            PRINTOBJS = !PRINTOBJS;
-            break;
-        case POSTLOGICN:
-            POSTLOGIC = !POSTLOGIC;
-            break;
-        case  POSTDEBUGN:
-            POSTDEBUG = !POSTDEBUG;
-            break;
-        case BALLDEBUGN:
-            BALLDEBUG = !BALLDEBUG;
-            break;
-        case TOPFINDN:
-            TOPFIND = !TOPFIND;
-            break;
-        case CORNERDEBUGN:
-            CORNERDEBUG = !CORNERDEBUG;
-            break;
-        case  BACKDEBUGN:
-            BACKDEBUG = !BACKDEBUG;
-            break;
-        case SANITYN:
-            SANITY = !SANITY;
-            break;
-        case BALLDISTDEBUGN:
-            BALLDISTDEBUG = !BALLDISTDEBUG;
-            break;
-        case DEBUGBALLPOINTSN:
-            DEBUGBALLPOINTS = !DEBUGBALLPOINTS;
-            break;
-        case CORRECTN:
-            CORRECT = !CORRECT;
-            break;
-        case OPENFIELDN:
-            OPENFIELD = !OPENFIELD;
-            break;
-        }
-    }
-
-#endif
 
 private:
     // class pointers
@@ -272,6 +229,7 @@ private:
     bool POSTLOGIC;
     bool POSTDEBUG;
     bool BALLDEBUG;
+	bool CROSSDEBUG;
     bool TOPFIND;
     bool CORNERDEBUG;
     bool BACKDEBUG;

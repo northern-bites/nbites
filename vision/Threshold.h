@@ -84,6 +84,7 @@ public:
     void storeFieldObjects();
     void setFieldObjectInfo(VisualFieldObject *objPtr);
     void setVisualRobotInfo(VisualRobot *objPtr);
+	void setVisualCrossInfo(VisualCross *objPtr);
     float getGoalPostDistFromHeight(float height);
     float getGoalPostDistFromWidth(float width);
     float getBeaconDistFromHeight(float height);

@@ -45,6 +45,7 @@ class Vision;   // forward reference
 #include "ConcreteFieldObject.h"
 #include "VisualBall.h"
 #include "VisualRobot.h"
+#include "VisualCross.h"
 #include "Threshold.h"
 #include "NaoPose.h"
 #include "FieldLines.h"
@@ -143,6 +144,7 @@ public:
     VisualCrossbar *ygCrossbar, *bgCrossbar;
     VisualRobot *red1, *red2;
     VisualRobot *navy1, *navy2;
+	VisualCross *cross;
     VisualBall *ball;
     Threshold *thresh;
     boost::shared_ptr<NaoPose> pose;
