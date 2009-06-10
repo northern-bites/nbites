@@ -20,7 +20,7 @@ def ballTracking(tracker): #Super state which handles following/refinding the ba
     if tracker.target.framesOff <= TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
-        return tracker.goNow('scanBall')
+        return tracker.goLater('scanBall')
 
 def tracking(tracker):
     ''' state askes it's parent (the tracker) for an object or angles to track
