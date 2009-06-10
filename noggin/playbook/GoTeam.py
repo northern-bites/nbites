@@ -403,7 +403,7 @@ class GoTeam:
                  (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
                   self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
                   self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-                  self.teammates[0].calledRole == PBConstants.CHASER))
+                  self.teammates[0].role == PBConstants.CHASER))
                 )
 
     def ballInMyGoalBox(self):
@@ -458,8 +458,8 @@ class GoTeam:
             return False
 
         for mate in self.teammates:
-            if (mate.active and (mate.calledRole == PBConstants.CHASER
-                                   or mate.calledRole == PBConstants.SEARCHER)):
+            if (mate.active and (mate.role == PBConstants.CHASER
+                                   or mate.role == PBConstants.SEARCHER)):
                 return False
         return True
 

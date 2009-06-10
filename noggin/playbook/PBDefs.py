@@ -34,7 +34,7 @@ class Teammate:
         self.ballLocBearing = None
         self.brain = tbrain # brain instance
         self.active = True
-        self.kicking = False
+        self.grabbing = False
         self.dribbling = False
 
     def update(self,packet):
@@ -66,11 +66,11 @@ class Teammate:
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
-        self.kicking = (packet.ballDist <=
-                        NogginConstants.BALL_TEAMMATE_DIST_KICKING)
+        self.grabbing = (packet.ballDist <=
+                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         #potential problem when goalie is grabbing?
         self.dribbling = (packet.ballDist <=
-                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
+                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.lastPacketTime = self.brain.playbook.time
 
 
@@ -101,8 +101,9 @@ class Teammate:
         self.ballLocBearing = ball.locBearing
         self.active = (not self.brain.gameController.currentState ==
                        'gamePenalized')
-        self.kicking = (ball.dist <= NogginConstants.BALL_TEAMMATE_DIST_KICKING)
         self.dribbling = (ball.dist <=
+                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
+        self.grabbing = (ball.dist <=
                           NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.lastPacketTime = self.brain.playbook.time
 
@@ -124,7 +125,7 @@ class Teammate:
         self.ballLocDist = 0
         self.ballLocBearing = 0
         self.active = False
-        self.kicking = False
+        self.grabbing = False
         self.dribbling = False
 
     def getBearingToGoal(self):
@@ -162,12 +163,12 @@ class Teammate:
         if self.ballDist > 0:
             ballDist = self.ballDist
         else: # use loc distances if no visual ball
-            ballDist = self.locBallDist
+            ballDist = self.ballLocDist
 
         return ballDist
 
     def hasBall(self):
-        return (self.dribbling or self.kicking)
+        return (self.dribbling or self.grabbing)
 
     def isChaser(self):
         return (self.role == PBConstants.CHASER)
