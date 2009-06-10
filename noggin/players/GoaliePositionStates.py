@@ -6,8 +6,9 @@ import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15.
 ORTHO_GOTO_THRESH = NogginConstants.CENTER_FIELD_X/2
-STRAFE_ONLY = True
-STRAFE_SPEED = 2
+STRAFE_ONLY = False
+STRAFE_SPEED = 6
+STRAFE_STEPS = 5
 
 def goaliePosition(player):
     if helper.shouldSave(player):
@@ -18,9 +19,9 @@ def goaliePosition(player):
     ball = brain.ball
     nav = brain.nav
 
-    if 0 < ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+    if 0 < ball.locDist <= PBConstants.BALL_LOC_LIMIT*(3./4.):
         brain.tracker.trackBall()
-    elif ball.locDist > PBConstants.BALL_LOC_LIMIT:
+    elif ball.locDist > PBConstants.BALL_LOC_LIMIT*(3./4.):
         brain.tracker.activeLoc()
 
     position = player.brain.playbook.position
@@ -34,10 +35,10 @@ def goaliePosition(player):
     if player.firstFrame():
         if STRAFE_ONLY:
             if relY > CENTER_SAVE_THRESH and nav.isStopped():
-                nav.setSteps(0, 2, 0, 4)
+                nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
             elif relY < -CENTER_SAVE_THRESH and nav.isStopped():
-                nav.setSteps(0, -2, 0, 4)
+                nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
         else:
             if useOrtho:
@@ -50,10 +51,10 @@ def goaliePosition(player):
         useOrtho!=nav.movingOrtho:
         if STRAFE_ONLY:
             if relY > CENTER_SAVE_THRESH and nav.isStopped():
-                nav.setSteps(0, 2, 0, 4)
+                nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
             elif relY < -CENTER_SAVE_THRESH and nav.isStopped():
-                nav.setSteps(0, -2, 0, 4)
+                nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
         else:
            if useOrtho:
