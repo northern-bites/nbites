@@ -123,19 +123,20 @@ static const float THINBALL = 0.5f;
 static const int DIST_POINT_FUDGE = 5;
 
 #ifdef OFFLINE
-static const int BALLDISTDEBUGN = 59;
-static const int PRINTOBJSN = 50;
-static const int POSTDEBUGN = 52;
-static const int POSTLOGICN = 51;
-static const int TOPFINDN = 55;
-static const int BALLDEBUGN = 54;
-static const int CORNERDEBUGN = 56;
-static const int BACKDEBUGN = 57;
-static const int SANITYN = 58;
-static const int DEBUGCIRCLEFITN = 60;
-static const int DEBUGBALLPOINTSN = 61;
-static const int CORRECTN = 63;
-static const int OPENFIELDN = 64;
+static const bool BALLDISTDEBUG = false;
+static const bool PRINTOBJS = false;
+static const bool POSTDEBUG = false;
+static const bool POSTLOGIC = false;
+static const bool TOPFIND = false;
+static const bool BALLDEBUG = false;
+static const bool CORNERDEBUG = false;
+static const bool CROSSDEBUG = false;
+static const bool BACKDEBUG = false;
+static const bool SANITY = false;
+static const bool DEBUGCIRCLEFIT = false;
+static const bool DEBUGBALLPOINTS = false;
+static const bool CORRECT = false;
+static const bool OPENFIELD = false;
 #else
 static const bool BALLDISTDEBUG = false;
 static const bool PRINTOBJS = false;
@@ -144,6 +145,7 @@ static const bool POSTLOGIC = false;
 static const bool TOPFIND = false;
 static const bool BALLDEBUG = false;
 static const bool CORNERDEBUG = false;
+static const bool CROSSDEBUG = false;
 static const bool BACKDEBUG = false;
 static const bool SANITY = false;
 static const bool DEBUGCIRCLEFIT = false;
@@ -166,8 +168,9 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
     POSTDEBUG = false;
     POSTLOGIC = false;
     TOPFIND = false;
-    BALLDEBUG = true;
+    BALLDEBUG = false;
     CORNERDEBUG = false;
+	CROSSDEBUG = false;
     BACKDEBUG = false;
     SANITY = false;
     DEBUGBALLPOINTS = false;
@@ -252,6 +255,7 @@ void ObjectFragments::setColor(int c)
     switch (color) {
     case YELLOW:
     case BLUE:
+	case WHITE:
         run_num = IMAGE_WIDTH * numWidthMult;
         runsize = IMAGE_WIDTH * sizeWidthMult;
         break;
@@ -282,6 +286,7 @@ void ObjectFragments::allocateColorRuns()
     switch (color) {
     case YELLOW:
     case BLUE:
+	case WHITE:
         run_num = IMAGE_WIDTH * numWidthMult;
         runsize = IMAGE_WIDTH * sizeWidthMult;
         break;
@@ -1688,6 +1693,103 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2)
 /*  Our "main" methods.  Entry points into just about everything else.
  */
 
+/* This method takes in a candidate field cross and decides if it is good enough.
+   We run it through a series of sanity checks.  If it passes them all then
+   it is called a cross.
+ */
+
+
+void ObjectFragments::checkForX(blob b) {
+	int x = b.leftTop.x;
+	int y = b.leftTop.y;
+	int w = blobWidth(b);
+	int h = blobHeight(b);
+	int count = 0, counter = 0;
+	// First we scan the outside of the blob.  It should basically be all
+	// green.  What we don't want are line fragments or robot fragments
+	// so finding white is very bad.
+	for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
+		if (x > 1) {
+			if (thresh->thresholded[i][x - 2] == GREEN)
+				count++;
+			else if (thresh->thresholded[i][x - 2] == WHITE)
+				count-=3;
+			counter++;
+		} else return;
+		if (x + w + 2 < IMAGE_WIDTH) {
+			if (thresh->thresholded[i][x + w+ 2] == GREEN)
+				count++;
+			else if (thresh->thresholded[i][x + w+ 2] == WHITE)
+				count-=3;
+			counter++;
+		} else return;
+	}
+	for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
+		if (y > 1) {
+			if (thresh->thresholded[y - 2][i] == GREEN)
+				count++;
+			else if (thresh->thresholded[y - 2][i] == WHITE)
+				count-=3;
+			counter++;
+		} else return;
+		if (y + h + 2 < IMAGE_HEIGHT) {
+			if (thresh->thresholded[y+h+2][i] == GREEN)
+				count++;
+			else if (thresh->thresholded[y+h+2][i] == WHITE)
+				count-=3;
+			counter++;
+		} else return;
+	}
+	// Next we check and make sure that this isn't part of any lines
+	if (count > (float)counter * 0.8f) {
+		// first make sure this isn't really a line
+        point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
+        plumbLineTop.x = x + w / 2; plumbLineTop.y = y;
+        plumbLineBottom.x = x; plumbLineBottom.y = y + h;
+        const vector <VisualLine>* lines = vision->fieldLines->getLines();
+        for (vector <VisualLine>::const_iterator k = lines->begin();
+             k != lines->end(); k++) {
+            pair<int, int> foo = Utility::
+                plumbIntersection(plumbLineTop, plumbLineBottom,
+                                  k->start, k->end);
+            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
+				if (CROSSDEBUG)
+					cout << "Throwing out blob that is part of a line" << endl;
+				return;
+            }
+        }
+		if (CROSSDEBUG) {
+			cout << "Found a cross " << endl;
+			printBlob(b);
+			drawBlob(b, RED);
+		}
+		// Is the cross white enough?  At least half the pixels must be white.
+		if (!rightBlobColor(b, 0.5f)) {
+			if (CROSSDEBUG) {
+				cout << "Tossing a blob for not being white enough " << endl;
+			}
+			return;
+		}
+		// Make sure we don't have more than one candidate cross.  Note:  we
+		// actually can see two crosses at some places on the field, but for
+		// now we just will ID one of them.
+		if (vision->cross->getWidth() > 0) {
+			if (w * h > vision->cross->getWidth() * vision->cross->getHeight()) {
+				vision->cross->updateCross(&b);
+				if (CROSSDEBUG) {
+					cout << "Larger than previous cross." << endl;
+				}
+			} else {
+				if (CROSSDEBUG) {
+					cout << "Threw out extra cross - smaller " << endl;
+				}
+			}
+		} else {
+			vision->cross->updateCross(&b);
+		}
+	}
+}
+
 
 /* This is the entry  point from object recognition in Threshold.cc  For now it
  * is only called on yellow, blue and orange.
@@ -1701,6 +1803,28 @@ void ObjectFragments::createObject(int c) {
     switch (color) {
     case GREEN:
         break;
+	case WHITE:
+		if (numberOfRuns > 1) {
+			for (int i = 0; i < numberOfRuns; i++) {
+				// search for contiguous blocks
+				int nextX = runs[i].x;
+				int nextY = runs[i].y;
+				int nextH = runs[i].h;
+				blobIt(nextX, nextY, nextH);
+			}
+		}
+		if (CROSSDEBUG)
+			cout << numBlobs << " white blobs" << endl;
+		for (int i = 0; i < numBlobs; i++) {
+			if (blobWidth(blobs[i]) < 55 && blobHeight(blobs[i]) < 55 &&
+				blobWidth(blobs[i]) > 3 && blobHeight(blobs[i]) > 3 &&
+				blobWidth(blobs[i]) < 5 * blobHeight(blobs[i])  &&
+				blobHeight(blobs[i]) < 5 * blobWidth(blobs[i])) {
+				checkForX(blobs[i]);
+			}
+			//else printBlob(blobs[i]);
+		}
+		break;
     case BLUE:
         // either we should see a marker or a goal
         blue(c);
@@ -4025,7 +4149,7 @@ bool ObjectFragments::rightBlobColor(blob tempobj, float minpercent) {
     if (percent > minpercent) {
         return true;
     }
-    //cout << "Tossed because of low percentage " << percent << " " << color << endl;
+    cout << "Tossed because of low percentage " << percent << " " << color << endl;
     return false;
 }
 

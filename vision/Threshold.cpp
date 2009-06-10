@@ -102,19 +102,8 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     orange = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                              ORANGE));
     green = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                            GREEN));
+                                                            WHITE));
 }
-
-#ifdef OFFLINE
-void Threshold::setConstant(int c) {
-    blue->setConstant(c);
-    yellow->setConstant(c);
-    orange->setConstant(c);
-    navyblue->setConstant(c);
-    red->setConstant(c);
-    green->setConstant(c);
-}
-#endif
 
 /* Main vision loop, called by Vision.cc
  */
@@ -387,8 +376,11 @@ void Threshold::runs() {
                     }
                     break;
                 case WHITE:
-                    if (currentRun >= MIN_RUN_SIZE) {
+                    if (currentRun >= 2) {
                         lastGoodPixel = j;
+						if (j + currentRun > IMAGE_HEIGHT / 3 && currentRun < 25) {
+							green->newRun(i, j, currentRun);
+						}
                     }
                     break;
                 }
@@ -404,7 +396,7 @@ void Threshold::runs() {
             }
             if (j < hor && lastGoodPixel - j > 15 &&
 				(currentRun == 1 || lastPixel == GREY)) {
-				drawPoint(i, j, PINK);
+				//drawPoint(i, j, PINK);
 				j = 0;
 				break;
 			}
@@ -721,6 +713,7 @@ void Threshold::objectRecognition() {
     // now get the posts and goals
     yellow->createObject(horizon);
     blue->createObject(horizon);
+	green->createObject(horizon);
 #if ROBOT(NAO)
     red->createObject(horizon);
     navyblue->createObject(horizon);
@@ -837,6 +830,7 @@ void Threshold::storeFieldObjects() {
     setFieldObjectInfo(vision->ygrp);
     setFieldObjectInfo(vision->bglp);
     setFieldObjectInfo(vision->bgrp);
+	setVisualCrossInfo(vision->cross);
     vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
@@ -997,6 +991,41 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
     }
 }
 
+/* Figures out center x,y, angle x,y, and foc/body dists for field objects.
+ * @param objPtr    the field object to study
+ */
+void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
+    // if the object is on screen, basically
+    if (objPtr->getHeight() > 0) {
+        // set center x,y
+        objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
+        objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
+
+        // find angle x/y (relative to camera)
+        objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
+											  objPtr->getCenterX() ) /
+						   MAX_BEARING_RAD );
+        objPtr->setAngleY( static_cast<float>(HALF_IMAGE_HEIGHT -
+											  objPtr->getCenterY() ) /
+						   MAX_ELEVATION_RAD );
+
+        // sets focal distance of the field object
+        objPtr->setFocDist(objPtr->getDistance());
+        // convert dist + angle estimates to body center
+        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+                                              objPtr->getCenterY(),
+                                              objPtr->getDistance());
+        objPtr->setDistanceWithSD(obj_est.dist);
+        objPtr->setBearingWithSD(obj_est.bearing);
+        objPtr->setElevation(obj_est.elevation);
+    } else {
+        objPtr->setFocDist(0.0);
+        objPtr->setDistanceWithSD(0.0);
+        objPtr->setBearingWithSD(0.0);
+        objPtr->setElevation(0.0);
+    }
+}
+
 /* Looks up goal post height in pixels to focal distance function.
  * @param height     the height of the post in pixels
  * @return           the distance to the post in centimeters
@@ -1047,6 +1076,9 @@ void Threshold::initObjects(void) {
     vision->navy2->init();
     // balls
     vision->ball->init();
+
+	// crosses
+	vision->cross->init();
 } // initObjects
 
 /*
@@ -1059,6 +1091,7 @@ void Threshold::initColors() {
     yellow->init(pose->getHorizonSlope());
     red->init(pose->getHorizonSlope());
     navyblue->init(pose->getHorizonSlope());
+	green->init(pose->getHorizonSlope());
 }
 
 /* This function loads a table file with the given file name
