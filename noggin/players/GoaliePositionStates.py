@@ -27,10 +27,7 @@ def goaliePosition(player):
     position = player.brain.playbook.position
     useOrtho = True #(MyMath.dist(brain.my.x, brain.my.y, position[0],
                                    #position[1]) <= ORTHO_GOTO_THRESH)
-    if ball.on:
-        relY = ball.relY
-    else:
-        relY = ball.locRelY
+    relY = ball.relY
 
     if player.firstFrame():
         if STRAFE_ONLY:
@@ -84,10 +81,7 @@ def goalieAtPosition(player):
     else:
         brain.tracker.activeLoc()
 
-    if brain.ball.on:
-        relY = brain.ball.relY
-    else:
-        relY = brain.ball.locRelY
+    relY = brain.ball.relY
 
     if STRAFE_ONLY:
         if player.brain.nav.isStopped() and\
