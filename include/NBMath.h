@@ -87,7 +87,7 @@ namespace NBMath {
      */
     inline static float subPIAngle(float theta)
     {
-        theta = fmod(theta, 2.0f*M_PI_FLOAT);
+        theta = std::fmod(theta, 2.0f*M_PI_FLOAT);
         if( theta > M_PI) {
             theta -= 2.0f*M_PI_FLOAT;
         }

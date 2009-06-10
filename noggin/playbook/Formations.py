@@ -60,7 +60,7 @@ def fDubD(team):
     role = None
     if team.me.isGoalie():
         role = Roles.rGoalie(team)
-    if team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
+    elif team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
         # Figure out who isn't penalized with you
         other_teammate = team.getOtherActiveTeammate()
 
@@ -106,7 +106,7 @@ def fTwoKickoff(team):
     role = None
     if team.me.isGoalie():
         role = Roles.rGoalie(team)
-    if team.me.playerNumber == 2:
+    elif team.me.playerNumber == 2:
         role = Roles.rDefender(team)
     elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
         role = Roles.rChaser(team)
@@ -129,7 +129,7 @@ def fReady(team):
     if team.me.isGoalie():
         role = Roles.rGoalie(team)
     # if two dogs alive, position normally
-    if team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
+    elif team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
         if team.me.playerNumber == 2:
             role =  [PBConstants.DEFENDER] + SubRoles.pReadyDefender(team)
         elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:

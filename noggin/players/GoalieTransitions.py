@@ -2,7 +2,7 @@ from ..playbook import PBConstants
 from .. import NogginConstants as Constants
 #arbitrary, currently same as AIBO
 BALL_SAVE_LIMIT_TIME = 2.5
-MOVE_TO_SAVE_DIST_THRESH = 200.
+MOVE_TO_SAVE_DIST_THRESH = 300.
 
 def shouldSave(player):
     ball = player.brain.ball

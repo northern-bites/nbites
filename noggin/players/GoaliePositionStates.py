@@ -83,13 +83,14 @@ def goalieAtPosition(player):
     elif brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
         brain.tracker.activeLoc()
 
-    if ball.on:
-        relY = ball.relY
+    if brain.ball.on:
+        relY = brain.ball.relY
     else:
-        relY = ball.locRelY
+        relY = brain.ball.locRelY
 
     if STRAFE_ONLY:
-        if abs(brain.ball.locRelY) > CENTER_SAVE_THRESH:
+        if player.brain.nav.isStopped() and\
+                abs(brain.ball.locRelY) > CENTER_SAVE_THRESH:
             return player.goLater('goaliePosition')
     elif brain.nav.notAtHeading(brain.nav.destH) or\
             not brain.nav.atDestinationCloser():
