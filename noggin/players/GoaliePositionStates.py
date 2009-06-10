@@ -6,6 +6,8 @@ import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15.
 ORTHO_GOTO_THRESH = NogginConstants.CENTER_FIELD_X/2
+STRAFE_ONLY = True
+STRAFE_SPEED = 2
 
 def goaliePosition(player):
     if helper.shouldSave(player):
@@ -16,29 +18,51 @@ def goaliePosition(player):
     ball = brain.ball
     nav = brain.nav
 
-    #if 0 < ball.locDist <= PBConstants.BALL_LOC_LIMIT:
-    #    brain.tracker.trackBall()
-    #elif ball.locDist > PBConstants.BALL_LOC_LIMIT:
-    #    brain.tracker.activeLoc()
+    if 0 < ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+        brain.tracker.trackBall()
+    elif ball.locDist > PBConstants.BALL_LOC_LIMIT:
+        brain.tracker.activeLoc()
 
     position = player.brain.playbook.position
     useOrtho = True #(MyMath.dist(brain.my.x, brain.my.y, position[0],
                                    #position[1]) <= ORTHO_GOTO_THRESH)
+    if ball.on:
+        relY = ball.relY
+    else:
+        relY = ball.locRelY
+
     if player.firstFrame():
-        if useOrtho:
-            nav.orthoGoTo(position[0], position[1],
-                          NogginConstants.OPP_GOAL_HEADING)
+        if STRAFE_ONLY:
+            if relY > CENTER_SAVE_THRESH and nav.isStopped():
+                nav.setSteps(0, 2, 0, 4)
+                nav.switchTo('stepping')
+            elif relY < -CENTER_SAVE_THRESH and nav.isStopped():
+                nav.setSteps(0, -2, 0, 4)
+                nav.switchTo('stepping')
         else:
-            nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
+            if useOrtho:
+                nav.orthoGoTo(position[0], position[1],
+                              NogginConstants.OPP_GOAL_HEADING)
+            else:
+                nav.goTo(position[0], position[1],
+                         NogginConstants.OPP_GOAL_HEADING)
     elif nav.destX != position[0] or nav.destY != position[1] or\
         useOrtho!=nav.movingOrtho:
-        if useOrtho:
-            nav.orthoGoTo(position[0], position[1],
-                          NogginConstants.OPP_GOAL_HEADING)
+        if STRAFE_ONLY:
+            if relY > CENTER_SAVE_THRESH and nav.isStopped():
+                nav.setSteps(0, 2, 0, 4)
+                nav.switchTo('stepping')
+            elif relY < -CENTER_SAVE_THRESH and nav.isStopped():
+                nav.setSteps(0, -2, 0, 4)
+                nav.switchTo('stepping')
         else:
-            nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
-    brain.tracker.activeLoc()
-    # we're at the point, let's switch to another state
+           if useOrtho:
+               nav.orthoGoTo(position[0], position[1],
+                             NogginConstants.OPP_GOAL_HEADING)
+           else:
+               nav.goTo(position[0], position[1],
+                        NogginConstants.OPP_GOAL_HEADING)
+        # we're at the point, let's switch to another state
     if nav.isStopped() and player.counter > 0:
         return player.goLater('goalieAtPosition')
 
@@ -48,22 +72,34 @@ def goalieAtPosition(player):
     """
     State for when we're at the position
     """
-
+    brain = player.brain
     if helper.shouldSave(player):
         return player.goNow('goalieSave')
     if helper.shouldChase(player):
         return player.goLater('goalieChase')
 
-    if player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
-        player.brain.tracker.trackBall()
-    elif player.brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
-        player.brain.tracker.activeLoc()
-    if nav.notAtHeading(nav.destH) or not nav.atDestinationCloser():
+    if brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+        brain.tracker.trackBall()
+    elif brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
+        brain.tracker.activeLoc()
+
+    if brain.ball.on:
+        relY = brain.ball.relY
+    else:
+        relY = brain.ball.locRelY
+
+    if STRAFE_ONLY:
+        if player.brain.nav.isStopped() and\
+                abs(brain.ball.locRelY) > CENTER_SAVE_THRESH:
+            return player.goLater('goaliePosition')
+    elif brain.nav.notAtHeading(brain.nav.destH) or\
+            not brain.nav.atDestinationCloser():
         return player.goLater('goaliePosition')
 
     return player.stay()
 
 def goalieSave(player):
+    player.brain.tracker.trackBall()
     ball = player.brain.ball
     # Figure out where the ball is going and when it will be there
     if ball.on:
@@ -72,7 +108,6 @@ def goalieSave(player):
     else:
         relX = ball.locRelX
         relY = ball.locRelY
-    player.brain.tracker.trackBall()
     # Decide the type of save
     if relY > CENTER_SAVE_THRESH:
         print "Should be saving left"

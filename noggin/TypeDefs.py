@@ -450,7 +450,7 @@ class Packet:
          self.ballUncertY,
          self.ballDist,
          self.role,
-         self.calledSubRole,
+         self.subRole,
          self.chaseTime) = new_packet
 
         self.teamNumber = int(self.teamNumber)
@@ -468,7 +468,7 @@ class Packet:
         self.ballUncertY = float(self.ballUncertY)
         self.ballDist = float(self.ballDist)
         self.role = float(self.role)
-        self.calledSubRole = float(self.calledSubRole)
+        self.subRole = float(self.subRole)
         self.chaseTime = float(self.chaseTime)
 
     def update(self,update_packet=[0]*17): #=[0]*16
