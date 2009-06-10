@@ -29,6 +29,11 @@ def decideKick(player):
     player.brain.tracker.trackBall()
     player.kickDecider.calculate()
 
+    if not player.brain.ball.on:
+        return player.stay()
+
+    player.kickDecider.ballForeWhichFoot()
+
     # Get references to the collected data
     myLeftPostBearing =  player.kickDecider.myLeftPostBearing
     myRightPostBearing = player.kickDecider.myRightPostBearing
@@ -38,7 +43,6 @@ def decideKick(player):
     player.printf(player.kickDecider)
 
 
-    return player.goLater('kickBallStraightChoose')
     # Things to do if we saw our own goal
     if player.kickDecider.sawOwnGoal:
         if Constants.SUPER_SAFE_KICKS:
@@ -147,21 +151,56 @@ def kickBallStraightChoose(player):
 
 def kickBallLeft(player):
     """
-    Strafe in order to line up to kick the ball to the right
+    Kick the ball to the left, with right foot
     """
-    if player.firstFrame():
-        player.chosenKick = SweetMoves.RIGHT_SIDE_KICK
-        return player.goNow('kickBallExecute')
-    return player.stay()
+
+    player.chosenKick = SweetMoves.RIGHT_SIDE_KICK
+    return player.goNow('sideStepForKick')
 
 def kickBallRight(player):
     """
     Kick the ball to the right, using the left foot
     """
-    if player.firstFrame():
-        player.chosenKick = SweetMoves.LEFT_SIDE_KICK
+    player.chosenKick = SweetMoves.LEFT_SIDE_KICK
+    return player.goNow('sideStepForKick')
+
+
+def sideStepForKick(player):
+    # Which foot is the ball in front of?
+    ballForeFoot = player.kickDecider.ballForeFoot
+
+    if ballForeFoot == Constants.MID_RIGHT or \
+            ballForeFoot == Constants.MID_LEFT:
         return player.goNow('kickBallExecute')
-    return player.stay()
+
+    # Ball too far outside to kick with
+    elif ballForeFoot == Constants.RIGHT_FOOT:
+        return player.goNow('stepRightForKick')
+
+    # Ball in front of wrong foot
+    elif ballForeFoot == Constants.LEFT_FOOT:
+        return player.goNow('stepLeftForKick')
+
+    # Ball must be in wrong place
+    else :
+        return player.goLater('positionForKick')
+
+def stepRightForKick(player):
+
+    stillStepping = player.setSteps(0,-4,0,5)
+    if stillStepping:
+        return player.stay()
+
+    return player.goNow('kickBallExecute')
+
+def stepLeftForKick(player):
+
+    stillStepping = player.setSteps(0,4,0,5)
+    if stillStepping:
+        return player.stay()
+
+    return player.goNow('kickBallExecute')
+
 
 def kickBallExecute(player):
     if player.firstFrame():
@@ -169,7 +208,7 @@ def kickBallExecute(player):
         player.executeMove(player.chosenKick)
 
     elif player.stateTime >= SweetMoves.getMoveTime(player.chosenKick):
-        return player.goLater("afterKick")
+        return player.goLater('afterKick')
 
     return player.stay()
 
@@ -273,21 +312,19 @@ class KickDecider:
             self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
                                         len(self.oppGoalRightPostBearings))
 
-        self.ballForeWhichFoot()
-
     def ballForeWhichFoot(self):
         ball = self.player.brain.ball
 
-        if Constants.LEFT_FOOT_L_Y > ball.locRelY >= Constants.LEFT_FOOT_R_Y:
+        if Constants.LEFT_FOOT_L_Y > ball.relY >= Constants.LEFT_FOOT_R_Y:
             self.ballForeFoot = Constants.LEFT_FOOT
 
-        elif Constants.LEFT_FOOT_R_Y > ball.locRelY >= 0:
+        elif Constants.LEFT_FOOT_R_Y > ball.relY >= 0:
             self.ballForeFoot = Constants.MID_LEFT
 
-        elif 0 > ball.locRelY > Constants.RIGHT_FOOT_L_Y:
+        elif 0 > ball.relY > Constants.RIGHT_FOOT_L_Y:
             self.ballForeFoot = Constants.MID_RIGHT
 
-        elif Constants.RIGHT_FOOT_L_Y > ball.locRelY > Constants.RIGHT_FOOT_R_Y:
+        elif Constants.RIGHT_FOOT_L_Y > ball.relY > Constants.RIGHT_FOOT_R_Y:
             self.ballForeFoot = Constants.RIGHT_FOOT
 
         else:
