@@ -21,7 +21,7 @@ def goaliePosition(player):
 
     if 0 < ball.locDist <= PBConstants.BALL_LOC_LIMIT*(3./4.):
         brain.tracker.trackBall()
-    elif ball.locDist > PBConstants.BALL_LOC_LIMIT*(3./4.):
+    else:
         brain.tracker.activeLoc()
 
     position = player.brain.playbook.position
@@ -79,9 +79,9 @@ def goalieAtPosition(player):
     if helper.shouldChase(player):
         return player.goLater('goalieChase')
 
-    if brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+    if 0 < brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
         brain.tracker.trackBall()
-    elif brain.ball.locDist > PBConstants.BALL_LOC_LIMIT:
+    else:
         brain.tracker.activeLoc()
 
     if brain.ball.on:
