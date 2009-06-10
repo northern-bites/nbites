@@ -30,7 +30,10 @@ def decideKick(player):
     player.kickDecider.calculate()
 
     if not player.brain.ball.on:
-        return player.stay()
+        if player.brain.ball.framesOff < 60: # HACK, should be constant, or better value
+            return player.stay()
+        else :
+            return player.goLater('scanFindBall')
 
     player.kickDecider.ballForeWhichFoot()
 
