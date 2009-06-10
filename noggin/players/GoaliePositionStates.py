@@ -6,7 +6,7 @@ import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15.
 ORTHO_GOTO_THRESH = NogginConstants.CENTER_FIELD_X/2
-STRAFE_ONLY = False
+STRAFE_ONLY = True
 STRAFE_SPEED = 6
 STRAFE_STEPS = 5
 
