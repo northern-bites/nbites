@@ -133,6 +133,7 @@ static const int POSTDEBUGN = 52;
 static const int POSTLOGICN = 51;
 static const int TOPFINDN = 55;
 static const int BALLDEBUGN = 54;
+static const int CROSSDEBUGN = 65;
 static const int CORNERDEBUGN = 56;
 static const int BACKDEBUGN = 57;
 static const int SANITYN = 58;
@@ -150,6 +151,7 @@ static const bool BALLDEBUG = false;
 static const bool CORNERDEBUG = false;
 static const bool BACKDEBUG = false;
 static const bool SANITY = false;
+static const bool CROSSDEBUG = false;
 static const bool DEBUGCIRCLEFIT = false;
 static const bool DEBUGBALLPOINTS = false;
 static const bool CORRECT = false;
@@ -178,6 +180,7 @@ public:
     int blobArea(blob a);
     int blobWidth(blob a);
     int blobHeight(blob a);
+	void checkForX(blob a);
 
     // robot recognition routines
     void getRobots(int maxY);
@@ -385,6 +388,7 @@ private:
     bool POSTLOGIC;
     bool POSTDEBUG;
     bool BALLDEBUG;
+	bool CROSSDEBUG;
     bool TOPFIND;
     bool CORNERDEBUG;
     bool BACKDEBUG;

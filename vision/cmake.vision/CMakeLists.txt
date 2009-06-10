@@ -137,6 +137,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/ConcreteCorner
                  ${VISION_INCLUDE_DIR}/VisualLandmark
 		 ${VISION_INCLUDE_DIR}/VisualFieldObject
 		 ${VISION_INCLUDE_DIR}/VisualRobot
+		 ${VISION_INCLUDE_DIR}/VisualCross
                  ${VISION_INCLUDE_DIR}/VisualLine
                  #${VISION_INCLUDE_DIR}/Zlib
                  )
