@@ -75,6 +75,13 @@ enum JointStiffIndex {
     STIFF_INDEX
 };
 
+struct WalkCycle{
+    boost::shared_ptr<Step> supportStep;
+    NBMath::ufvector3 swing_src;
+    NBMath::ufvector3 swing_dest;
+    WalkingParameters * params;
+};
+
 class WalkingLeg  {
 public:
     WalkingLeg(Kinematics::ChainID id);
@@ -127,6 +134,7 @@ private:
     SupportMode nextState();
     bool shouldSwitchStates();
     bool firstFrame(){return frameCounter == 0;}
+    void assignStateTimes(boost::shared_ptr<Step> step);
     void debugProcessing();
 //hack
 public:
@@ -134,11 +142,6 @@ public:
 private:
     const float getHipYawPitch();
     const std::vector<float> getStiffnesses();
-    const float stiffnessAchievedEnd(int state_length,
-                                     float stiffStart, float stiffEnd);
-    const float stiffnessAchievedBegin(int state_length,
-                                     float stiffStart, float stiffEnd);
-    const float kneeSwingingStiffness(float stiffStart, float stiffEnd);
     const boost::tuple<const float,const float>getHipHack(const float HYPAngle);
     const float cycloidy(float theta);
     const float cycloidx(float theta);
@@ -147,9 +150,12 @@ private:
 
 private:
     //FSA Attributes
-    SupportMode state, lastState,lastDiffState;
+    SupportMode state;
     SupportMode supportMode; //soon to be deprecated
-    int frameCounter;
+    unsigned int frameCounter;
+    unsigned int doubleSupportFrames;
+    unsigned int singleSupportFrames;
+    unsigned int cycleFrames;
 
     //destination attributes
     boost::shared_ptr<Step> cur_dest, swing_src, swing_dest,support_step;

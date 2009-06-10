@@ -61,6 +61,8 @@ def approachBall(player):
     """
     Once we are alligned with the ball, approach it
     """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
 
     # Switch to other states if we should
     if transitions.shouldKick(player):
@@ -97,7 +99,6 @@ def approachBall(player):
 def positionForKick(player):
     """
     State to align on the ball once we are near it
-    Currently aligns the ball on the left foot
     """
     ball = player.brain.ball
 
