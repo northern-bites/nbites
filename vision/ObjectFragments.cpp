@@ -4149,7 +4149,7 @@ bool ObjectFragments::rightBlobColor(blob tempobj, float minpercent) {
     if (percent > minpercent) {
         return true;
     }
-    cout << "Tossed because of low percentage " << percent << " " << color << endl;
+    //cout << "Tossed because of low percentage " << percent << " " << color << endl;
     return false;
 }
 
