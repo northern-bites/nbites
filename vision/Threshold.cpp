@@ -126,13 +126,15 @@ void Threshold::visionLoop() {
 
     PROF_ENTER(vision->profiler, P_LINES);
     vision->fieldLines->afterObjectFragments();
+	// For now we don't set shooting information
     if (vision->bgCrossbar->getWidth() > 0) {
-        blue->setShot(vision->bgCrossbar);
+        //blue->setShot(vision->bgCrossbar);
     }
     if (vision->ygCrossbar->getWidth() > 0) {
-        yellow->setShot(vision->ygCrossbar);
+        //yellow->setShot(vision->ygCrossbar);
     }
-    yellow->openDirection(horizon, pose.get());
+	// for now we also don't use open field information
+    //yellow->openDirection(horizon, pose.get());
     PROF_EXIT(vision->profiler, P_LINES);
 
 
