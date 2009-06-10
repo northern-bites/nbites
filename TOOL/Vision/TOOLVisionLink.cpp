@@ -156,7 +156,11 @@ extern "C" {
             jbyte* row = env->GetByteArrayElements(row_target,0);
 
             for(int j = 0; j < IMAGE_WIDTH; j++){
-                row[j]= vision.thresh->thresholded[i][j];
+				row[j]= vision.thresh->thresholded[i][j];
+				// uncomment the next part to see debug drawing
+				/*if (vision.thresh->debugImage[i][j] != 0) {
+					row[j]= vision.thresh->debugImage[i][j]; //thresholded[i][j];
+					}*/
             }
             env->ReleaseByteArrayElements(row_target, row, 0);
         }
@@ -182,16 +186,18 @@ extern "C" {
         //push each field object
         VisualFieldObject *obj;
         VisualCrossbar * cb;
+		VisualCross *cross;
         int k = 0;
         while(k != -1) {
             //loop through all the objects we want to pass
             switch(k){
-            case 0: obj = vision.bgrp; k++; cb = NULL; break;
-            case 1: obj = vision.bglp; k++; cb = NULL; break;
-            case 2: obj = vision.ygrp; k++; cb = NULL; break;
-            case 3: obj = vision.yglp; k++; cb = NULL; break;
-            case 4: cb = vision.ygCrossbar; k++; obj = NULL; break;
-            case 5: cb = vision.bgCrossbar; k++; obj = NULL; break;
+            case 0: obj = vision.bgrp; k++; cb = NULL; cross = NULL; break;
+            case 1: obj = vision.bglp; k++; cb = NULL; cross = NULL; break;
+            case 2: obj = vision.ygrp; k++; cb = NULL; cross = NULL; break;
+            case 3: obj = vision.yglp; k++; cb = NULL; cross = NULL; break;
+            case 4: cb = vision.ygCrossbar; k++; obj = NULL; cross = NULL; break;
+            case 5: cb = vision.bgCrossbar; k++; obj = NULL; cross = NULL; break;
+			case 6: cross = vision.cross; k++; cb = NULL; obj = NULL; break;
             default: k = -1; obj = NULL; cb = NULL; break;
             }
             if (obj != NULL) {
@@ -210,7 +216,15 @@ extern "C" {
                                     cb->getRightTopX(), cb->getRightTopY(),
                                     cb->getLeftBottomX(), cb->getLeftBottomY(),
                                     cb->getRightBottomX(), cb->getRightBottomY());
-            }
+            } else if (cross != NULL) {
+                env->CallVoidMethod(jobj, setFieldObjectInfo,
+                                    51,
+                                    cross->getWidth(), cross->getHeight(),
+                                    cross->getLeftTopX(), cross->getLeftTopY(),
+                                    cross->getRightTopX(), cross->getRightTopY(),
+                                    cross->getLeftBottomX(), cross->getLeftBottomY(),
+                                    cross->getRightBottomX(), cross->getRightBottomY());
+			}
         }
 
         //get the methodIDs for the visual line setter methods from java
