@@ -248,7 +248,7 @@ class GoTeam:
                 continue
 
             if mate.hasBall():
-                if DEBUG_DET_CHASER:
+                if PBConstants.DEBUG_DET_CHASER:
                     self.printf("have ball")
                 continue
 
