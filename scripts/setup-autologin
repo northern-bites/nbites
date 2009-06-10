@@ -17,11 +17,15 @@ SSH=~/.ssh
 ID_RSA_FILE=$SSH/id_rsa
 RSA_PUBLIC_KEY_FILE=$SSH/id_rsa.pub
 
-if [ "$1"  == "" ]; then
+if [ "$1"  = "" ]; then
     echo "Usage: ./setup-autologin <robot-ip>"
     exit 1
 fi
 
+if [ "$2" != "" ]; then
+    #we have a different user specified
+    REMOTE_USERNAME=$2
+fi
 echo "Configuring auto login. Only run this once per robot "
 
 
