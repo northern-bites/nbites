@@ -12,28 +12,28 @@ class Teammate:
         '''variables include lots from the Packet class'''
 
         # things in the Packet()
-        self.playerNumber = 0
-        self.x = 0
-        self.y = 0
-        self.h = 0
-        self.uncertX = 0
-        self.uncertY = 0
-        self.uncertH = 0
-        self.ballX = 0
-        self.ballY = 0
-        self.ballUncertX = 0
-        self.ballUncertY = 0
-        self.ballDist = 0
-        self.ballLocDist = 0
-        self.ballLocBearing = 0
-        self.calledRole = 0
+        self.x = None
+        self.y = None
+        self.h = None
+        self.uncertX = None
+        self.uncertY = None
+        self.uncertH = None
+        self.ballX = None
+        self.ballY = None
+        self.ballUncertX = None
+        self.ballUncertY = None
+        self.ballDist = None
+        self.role = None
+        self.subRole = None
         self.lastPacketTime = time.time()
 
+        #other info we want stored
+        self.ballLocDist = None
+        self.ballLocBearing = None
         self.brain = tbrain # brain instance
-        self.role = 0 # known role
         self.active = True
-        self.chaseTime = 0 # estimated time to chase the ball
-        self.bearingToGoal = 0 # bearing to goal
+        self.kicking = False
+        self.dribbling = False
 
     def update(self,packet):
         '''
@@ -54,23 +54,20 @@ class Teammate:
         self.ballUncertX = packet.ballUncertX
         self.ballUncertY = packet.ballUncertY
         self.ballDist = packet.ballDist
-        self.calledRole = packet.role
-        self.calledSubRole = packet.calledSubRole
-        if self.isChaser():
-            self.calledRole = PBConstants.CHASER
-        elif self.isDefender():
-            self.calledRole = PBConstants.DEFENDER
-        self.chaseTime = packet.chaseTime
+        self.role = packet.role
+        self.subRole = packet.subRole
 
         # calculates ball localization distance, bearing
         self.ballLocDist = self.getDistToBall()
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
-        self.kicking = False
-        #(packet.ballDist ==
-        #                NogginConstants.BALL_TEAMMATE_DIST_KICKING)
-        self.lastPacketTime = self.brain.playbook.getTime()
+        self.kicking = (packet.ballDist <=
+                        NogginConstants.BALL_TEAMMATE_DIST_KICKING)
+        #potential problem when goalie is grabbing?
+        self.dribbling = (packet.ballDist <=
+                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
+        self.lastPacketTime = self.brain.playbook.time
 
 
     def updateMe(self):
@@ -78,21 +75,31 @@ class Teammate:
         updates my information as a teammate (since we don't get our own
         packets)
         '''
-        self.x = self.brain.my.x
-        self.y = self.brain.my.y
-        self.h = self.brain.my.h
-        self.uncertX = self.brain.my.uncertX
-        self.uncertY = self.brain.my.uncertY
-        self.uncertH = self.brain.my.uncertH
-        self.ballX = self.brain.ball.x
-        self.ballY = self.brain.ball.y
-        self.ballUncertX = self.brain.ball.uncertX
-        self.ballUncertY = self.brain.ball.uncertY
-        self.ballDist = self.brain.ball.dist
-        self.ballLocDist = self.brain.ball.locDist
-        self.ballLocBearing = self.brain.ball.locBearing
-        self.active = not self.brain.gameController.currentState =='gamePenalized'
-        self.lastPacketTime = self.brain.playbook.getTime()
+        my = self.brain.my
+        ball = self.brain.ball
+
+        self.x = my.x
+        self.y = my.y
+        self.h = my.h
+        self.uncertX = my.uncertX
+        self.uncertY = my.uncertY
+        self.uncertH = my.uncertH
+        self.ballX = ball.x
+        self.ballY = ball.y
+        self.ballUncertX = ball.uncertX
+        self.ballUncertY = ball.uncertY
+        self.ballDist = ball.dist
+        self.role = self.brain.playbook.role
+        self.subRole = self.brain.playbook.subRole
+
+        self.ballLocDist = ball.locDist
+        self.ballLocBearing = ball.locBearing
+        self.active = (not self.brain.gameController.currentState ==
+                       'gamePenalized')
+        self.kicking = (ball.dist <= NogginConstants.BALL_TEAMMATE_DIST_KICKING)
+        self.dribbling = (ball.dist <=
+                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
+        self.lastPacketTime = self.brain.playbook.time
 
     def getBearingToGoal(self):
         '''returns bearing to goal'''
@@ -125,7 +132,6 @@ class Teammate:
 
     def reset(self):
         '''Reset all important Teammate variables'''
-        #self.playerNumber = 0 # doesn't reset player number
         self.x = 0
         self.y = 0
         self.h = 0
@@ -137,21 +143,22 @@ class Teammate:
         self.ballUncertX = 0
         self.ballUncertY = 0
         self.ballDist = 0
+        self.role = None # known role
+        self.subRole = None
         self.ballLocDist = 0
         self.ballLocBearing = 0
-        self.role = 0 # known role
-        self.inactive = True # dead basically just means inactive
+        self.active = False
+        self.kicking = False
+        self.dribbling = False
+
+    def hasBall(self):
+        return (self.dribbling or self.kicking)
 
     def isChaser(self):
-        return (self.calledSubRole == PBConstants.CHASE_NORMAL or
-            self.calledSubRole == PBConstants.CHASE_AROUND_BOX)
+        return (self.role == PBConstants.CHASER)
 
     def isDefender(self):
-        return (self.calledSubRole == PBConstants.STOPPER or
-                self.calledSubRole == PBConstants.DEEP_STOPPER or
-                self.calledSubRole == PBConstants.SWEEPER or
-                self.calledSubRole == PBConstants.LEFT_DEEP_BACK or
-                self.calledSubRole == PBConstants.RIGHT_DEEP_BACK)
+        return (self.role == PBConstants.DEFENDER)
 
     def isGoalie(self):
         return self.playerNumber == PBConstants.GOALIE_NUMBER
@@ -176,7 +183,7 @@ class Teammate:
         however, the dog could still be on but sending really laggy packets.
         '''
         return (PBConstants.PACKET_DEAD_PERIOD <
-                    self.brain.playbook.getTime() - self.lastPacketTime)
+                    self.brain.playbook.time - self.lastPacketTime)
 
     def __str__(self):
         return "I am player number " + self.playerNumber

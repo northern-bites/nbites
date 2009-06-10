@@ -27,6 +27,7 @@ class GoTeam:
         self.brain = brain
         self.printStateChanges = True
 
+        self.time = time.time()
         # Info about all of our states
         # Strategies
         self.currentStrategy = 'sInit'
@@ -139,11 +140,11 @@ class GoTeam:
                             self.currentStrategy)
             self.strategyCounter = 0
             self.lastDiffStrategy = self.lastStrategy
-            self.strategyStartTime = self.getTime()
+            self.strategyStartTime = self.time
             self.strategyTime = 0
         else:
             self.strategyCounter += 1
-            self.strategyTime = self.getTime() - self.strategyStartTime
+            self.strategyTime = self.time - self.strategyStartTime
 
         # Update Formations memory
         if self.lastFormation != self.currentFormation:
@@ -152,11 +153,11 @@ class GoTeam:
                             PBConstants.FORMATIONS[self.currentFormation])
             self.formationCounter = 0
             self.lastDiffFormation = self.lastFormation
-            self.formationStartTime = self.getTime()
+            self.formationStartTime = self.time
             self.formationTime = 0
         else:
             self.formationCounter += 1
-            self.formationTime = self.getTime() - self.formationStartTime
+            self.formationTime = self.time - self.formationStartTime
 
         # Update memory of roles
         if self.lastRole != self.currentRole:
@@ -165,13 +166,13 @@ class GoTeam:
                             PBConstants.ROLES[self.currentRole])
             self.roleCounter = 0
             self.lastDiffRole = self.lastRole
-            self.roleStartTime = self.getTime()
+            self.roleStartTime = self.time
             self.roleTime = 0
             self.subRoleOnDeck = self.currentSubRole
             self.subRoleOnDeckCounter = 0
         else:
             self.roleCounter += 1
-            self.roleTime = self.getTime() - self.roleStartTime
+            self.roleTime = self.time - self.roleStartTime
 
         # We buffer the subRole switching by making sure that a subrole is
         # returned for multiple frames in a row
@@ -201,11 +202,11 @@ class GoTeam:
                                      str(self.currentSubRole))
             self.roleCounter = 0
             self.lastDiffSubRole = self.lastSubRole
-            self.subRoleStartTime = self.getTime()
+            self.subRoleStartTime = self.time
             self.subRoleTime = 0
         else:
             self.subRoleCounter += 1
-            self.subRoleTime = self.getTime() - self.subRoleStartTime
+            self.subRoleTime = self.time - self.subRoleStartTime
 
         # Get ready for the next frame
         self.lastStrategy = self.currentStrategy
@@ -246,7 +247,7 @@ class GoTeam:
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf(("Ball models are divergent, or its me"))
                 continue
-
+            if mate.
             # if both robots see the ball use visual distances to ball
             if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
                 (mate.ballDist < chaser_mate.ballDist)):
@@ -310,6 +311,7 @@ class GoTeam:
         # self.kickoffFormation = (self.brain.gameController.theirTeam.teamScore) % 2
 
         # update my own information for role switching
+        self.time = time.time()
         self.me.updateMe()
         self.pulledGoalie = self.pullTheGoalie()
         # loop through teammates
@@ -452,9 +454,6 @@ class GoTeam:
 ################################################################################
 #####################     Utility Functions      ###############################
 ################################################################################
-
-    def getTime(self):
-        return time.time()
 
     def printf(self,outputString, printingColor='purple'):
         '''FSA print function that allows colors to be specified'''
