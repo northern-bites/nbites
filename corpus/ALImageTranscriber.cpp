@@ -58,9 +58,9 @@ void ALImageTranscriber::run() {
     while (Thread::running) {
         //start timer
         const long long startTime = micro_time();
+
         if (camera_active)
             waitForImage();
-
         subscriber->notifyNextVisionImage();
 
         //stop timer
@@ -68,7 +68,7 @@ void ALImageTranscriber::run() {
         //sleep until next frame
 
 		lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
-        if (lastProcessTimeAvg > VISION_FRAME_LENGTH_uS){
+        if (processTime > VISION_FRAME_LENGTH_uS){
 			if (lastProcessTimeAvg > VISION_FRAME_LENGTH_PRINT_THRESH_uS)
 				cout << "Time spent in ALImageTranscriber loop longer than"
 					 << " frame length: " << processTime <<endl;
@@ -82,7 +82,6 @@ void ALImageTranscriber::run() {
                                            -processTime));
         }
     }
-
     Thread::trigger->off();
 }
 

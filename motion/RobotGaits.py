@@ -283,7 +283,7 @@ TUCKER_FAST_GAIT = motion.GaitCommand(31.00, # com height
 WEBOTS_GAIT = motion.GaitCommand(31.00, # com height
                                  1.40,  # hip offset x
                                  0.0,  # x-axis angle offset
-                                 1.0,  # step duration
+                                 0.5,  # step duration
                                  0.2,   # fraction in double support
                                  1.5,  # stepHeight
                                  0.0,   # footLengthX

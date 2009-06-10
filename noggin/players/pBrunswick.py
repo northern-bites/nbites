@@ -34,6 +34,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.myGoalRightPostBearings = []
         self.trackingBall = False
 
+        self.chosenKick = None
+
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':
             roleState = self.getNextState()
