@@ -12,6 +12,7 @@ class Teammate:
         '''variables include lots from the Packet class'''
 
         # things in the Packet()
+        self.playerNumber = None
         self.x = None
         self.y = None
         self.h = None
@@ -25,6 +26,7 @@ class Teammate:
         self.ballDist = None
         self.role = None
         self.subRole = None
+        self.chaseTime = None
         self.lastPacketTime = time.time()
 
         #other info we want stored
@@ -43,6 +45,7 @@ class Teammate:
         '''
 
         # stores packet information locally
+        self.playerNumber = packet.playerNumber
         self.x = packet.playerX
         self.y = packet.playerY
         self.h = packet.playerH
@@ -56,6 +59,7 @@ class Teammate:
         self.ballDist = packet.ballDist
         self.role = packet.role
         self.subRole = packet.subRole
+        self.chaseTime = packet.chaseTime
 
         # calculates ball localization distance, bearing
         self.ballLocDist = self.getDistToBall()
@@ -91,6 +95,7 @@ class Teammate:
         self.ballDist = ball.dist
         self.role = self.brain.playbook.role
         self.subRole = self.brain.playbook.subRole
+        self.chaseTime = self.getChaseTime()
 
         self.ballLocDist = ball.locDist
         self.ballLocBearing = ball.locBearing
@@ -100,6 +105,27 @@ class Teammate:
         self.dribbling = (ball.dist <=
                           NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.lastPacketTime = self.brain.playbook.time
+
+    def reset(self):
+        '''Reset all important Teammate variables'''
+        self.x = 0
+        self.y = 0
+        self.h = 0
+        self.uncertX = 0
+        self.uncertY = 0
+        self.uncertH = 0
+        self.ballX = 0
+        self.ballY = 0
+        self.ballUncertX = 0
+        self.ballUncertY = 0
+        self.ballDist = 0
+        self.role = None # known role
+        self.subRole = None
+        self.ballLocDist = 0
+        self.ballLocBearing = 0
+        self.active = False
+        self.kicking = False
+        self.dribbling = False
 
     def getBearingToGoal(self):
         '''returns bearing to goal'''
@@ -122,34 +148,23 @@ class Teammate:
         -return values is between -180,180
         '''
         return self.getOthersRelativeBearing(self.x, self.y, self.h,
-                                                   self.brain.ball.x,
-                                                   self.brain.ball.y)
+                                             self.brain.ball.x,
+                                             self.brain.ball.y)
 
     def getOthersRelativeBearing(self,playerX,playerY,playerH,x,y):
         '''get another player's bearing to a point (x,y)'''
-        return MyMath.sub180Angle(playerH - (degrees(MyMath.safe_atan2(y - playerY,
-            x - playerX)) - 90.0))
+        return MyMath.sub180Angle(playerH -(degrees(MyMath.safe_atan2(
+                        y - playerY, x - playerX)) - 90.0))
 
-    def reset(self):
-        '''Reset all important Teammate variables'''
-        self.x = 0
-        self.y = 0
-        self.h = 0
-        self.uncertX = 0
-        self.uncertY = 0
-        self.uncertH = 0
-        self.ballX = 0
-        self.ballY = 0
-        self.ballUncertX = 0
-        self.ballUncertY = 0
-        self.ballDist = 0
-        self.role = None # known role
-        self.subRole = None
-        self.ballLocDist = 0
-        self.ballLocBearing = 0
-        self.active = False
-        self.kicking = False
-        self.dribbling = False
+    def getChaseTime(self):
+        # if the robot sees the ball use visual distances to ball
+        ballDist = None
+        if self.ballDist > 0:
+            ballDist = self.ballDist
+        else: # use loc distances if no visual ball
+            ballDist = self.locBallDist
+
+        return ballDist
 
     def hasBall(self):
         return (self.dribbling or self.kicking)
@@ -173,8 +188,7 @@ class Teammate:
         #penalty state is the first item the player tuple [0]
         #penalty state == 1 is penalized
         return (
-            self.brain.gameController.gc.players(
-                self.playerNumber)[0]!=0
+            self.brain.gameController.gc.players(self.playerNumber)[0]!=0
            )
 
     def isDead(self):

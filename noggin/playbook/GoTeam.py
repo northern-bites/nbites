@@ -97,7 +97,6 @@ class GoTeam:
             self.currentSubRole, self.position = self.strategize()
         # Update all of our new infos
         self.updateStateInfo()
-        self.aPosterioriTeammateUpdate()
 
     def strategize(self):
         """
@@ -247,15 +246,42 @@ class GoTeam:
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf(("Ball models are divergent, or its me"))
                 continue
-            if mate.
-            # if both robots see the ball use visual distances to ball
-            if ((mate.ballDist > 0 and chaser_mate.ballDist > 0) and
-                (mate.ballDist < chaser_mate.ballDist)):
+
+            if mate.hasBall():
+                if DEBUG_DET_CHASER:
+                    self.printf("have ball")
+                continue
+
+            mate.chaseTime = mate.getChaseTime()
+            # Tie break stuff
+            if self.me.chaseTime < mate.chaseTime:
+                chaseTimeScale = self.me.chaseTime
+            else:
+                chaseTimeScale = mate.chaseTime
+
+            if ((self.me.chaseTime - mate.chaseTime <
+                 PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
+                (self.me.chaseTime - mate.chaseTime <
+                 PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
+                 self.lastRole == PBConstants.CHASER)) and
+                mate.playerNumber < self.me.playerNumber):
+                if PBConstants.DEBUG_DET_CHASER:
+                    print ("\t #%d @ %g >= #%d @ %g" %
+                           (mate.playerNumber, mate.chaseTime,
+                            chaser_mate.playerNumber,
+                            chaser_mate.chaseTime))
+                continue
+
+            elif (mate.playerNumber > self.me.playerNumber and
+                  mate.chaseTime - self.me.chaseTime <
+                  PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
+                  mate.isChaser()):
                 chaser_mate = mate
 
-            # use loc distances if both don't have a visual ball
-            elif mate.ballLocDist < chaser_mate.ballLocDist:
-                chaser_mate = mate
+            # else pick the lowest chaseTime
+            else:
+                if mate.chaseTime < chaser_mate.chaseTime:
+                    chaser_mate = mate
 
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf (("\t #%d @ %g >= #%d @ %g" %
@@ -329,16 +355,8 @@ class GoTeam:
                 self.numActiveFieldPlayers += 1
 
                 # Not using teammate ball reports for now
-#             if (mate.ballDist > 0):
-#                 self.brain.ball.reportBallSeen()
-
-
-    def aPosterioriTeammateUpdate(self):
-        """
-        Here are updates to teammates which occur after running before
-        exiting the frame
-        """
-        pass
+                if (mate.ballDist > 0 and PBConstants.USE_FINDER):
+                    self.brain.ball.reportBallSeen()
 
     def getActiveFieldPlayers(self):
         '''cycles through teammate objects and returns active teammates
