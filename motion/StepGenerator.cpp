@@ -52,6 +52,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
     leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
+    leftArm(LARM_CHAIN), rightArm(RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
     //controller_x(new PreviewController()),
     //controller_y(new PreviewController())
@@ -726,6 +727,8 @@ void StepGenerator::resetSteps(const bool startLeft){
         //after the first support step, in this case, causing left to swing first
         leftLeg.startRight();
         rightLeg.startRight();
+        leftArm.startRight();
+        rightArm.startRight();
 
         //we need to re-initialize the if_Transform matrix to reflect which
         //side the we are starting.
@@ -748,6 +751,8 @@ void StepGenerator::resetSteps(const bool startLeft){
         //after the first support step, in this case, causing right to swing first
         leftLeg.startLeft();
         rightLeg.startLeft();
+        leftArm.startLeft();
+        rightArm.startLeft();
 
         //we need to re-initialize the if_Transform matrix to reflect which
         //side the we are starting.
@@ -983,6 +988,8 @@ bool StepGenerator::resetGait(const WalkingParameters * _wp){
         walkParams = _wp;
         leftLeg.resetGait(_wp);
         rightLeg.resetGait(_wp);
+        leftArm.resetGait(_wp);
+        rightArm.resetGait(_wp);
         return true;
     }
     else{
@@ -1066,11 +1073,14 @@ const bool StepGenerator::decideStartLeft(const float lateralVelocity,
     // lateralVelocity + 0.5f*radialVelocity  and decide on that
 }
 
-// void hackJointOrder(float angles[]) {
-//     float temp = angles[1];
-//     angles[1] = angles[2];
-//     angles[2] = temp;
-// }
+/**
+ * Method to return the arm joints during the walk
+ */
+WalkArmsTuple StepGenerator::tick_arms(){
+
+    return WalkArmsTuple(leftArm.tick(supportStep_f),
+                         rightArm.tick(supportStep_f));
+}
 
 void StepGenerator::updateDebugMatrix(){
 #ifdef DEBUG_CONTROLLER_COM

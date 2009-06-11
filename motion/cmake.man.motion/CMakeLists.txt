@@ -119,6 +119,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/NullProvider
 		     ${MOTION_INCLUDE_DIR}/WalkProvider
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
+		     ${MOTION_INCLUDE_DIR}/WalkingArm
 		     ${MOTION_INCLUDE_DIR}/PreviewController
 		     ${MOTION_INCLUDE_DIR}/Observer
 		     ${MOTION_INCLUDE_DIR}/ZmpEKF

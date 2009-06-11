@@ -98,8 +98,6 @@ private:
     const WalkCommand * nextCommand;
      boost::shared_ptr<StepCommand> nextStepCommand;
 
-    //Temp solution to arms
-    std::vector<float> rarm_angles, larm_angles;
 };
 
 #endif
