@@ -264,10 +264,11 @@ void Threshold::runs() {
         // the color of the last run of pixels - useful for object detection
         previousRun = GREEN;
         int previousRunStop = IMAGE_HEIGHT;
+		/* taken out since robot recognition is off
         navyTops[i] = -1;
         redTops[i] = -1;
         redBottoms[i] = -1;
-        navyBottoms[i] = -1;
+        navyBottoms[i] = -1; */
         // potential yellow post location
         int lastGoodPixel = IMAGE_HEIGHT;
         //int horizonJ = pose->getHorizonY(i);
@@ -343,10 +344,10 @@ void Threshold::runs() {
                     break;
                 case GREEN:
 					// if we see a big stretch of green, then it is highly unlikely that there is a robot here
-                    if (currentRun > 20) {
+                    /*if (currentRun > 20) {
                         redBottoms[i] = -1;
                         navyBottoms[i] = -1;
-                    }
+						}*/
 					lastGoodPixel = j;
 
                     break;

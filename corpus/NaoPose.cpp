@@ -389,8 +389,11 @@ const estimate NaoPose::bodyEstimate(const int x, const int y,
 
 
 const float NaoPose::correctDistance(const float uncorrectedDist) {
+	if (uncorrectedDist > 706.0f) {
+		return uncorrectedDist - 387.0f;
+	}
     return -0.000591972f * uncorrectedDist * uncorrectedDist +
-        0.858283f * uncorrectedDist + 2.18768f;
+        0.858283f * uncorrectedDist + 2.18768F;
 }
 
 
