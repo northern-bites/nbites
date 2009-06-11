@@ -1513,7 +1513,7 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
  */
 
 float ObjectFragments::correct(blob b, int color, int c2) {
-    
+
 	const int maxParam = 10;
 	const int hDiv = 5;
 	const int scanParam = 6;
@@ -1554,7 +1554,7 @@ float ObjectFragments::correct(blob b, int color, int c2) {
             biggest2 = scan.good;
         }
     }
-	// What we're going to do is scan opposite corners at the bottom and subtract 
+	// What we're going to do is scan opposite corners at the bottom and subtract
 	// those results.
 	x = b.rightBottom.x;
 	y = b.rightBottom.y;
@@ -2118,7 +2118,7 @@ int ObjectFragments::crossCheck2(blob b) {
  */
 
 int ObjectFragments::checkIntersection(blob post) {
-    
+
 	const int postBuff = 30;
 
     // TODO: check if this should be the same standard minHeight for a post
@@ -2237,7 +2237,7 @@ bool ObjectFragments::qualityPost(blob b, int c)
 {
     const int num = 3;
 	const int denom = 5;
-	
+
     int good = 0;
     //bool soFar;
     for (int i = b.leftTop.x; i < b.rightTop.x; i++)
@@ -3462,8 +3462,22 @@ float ObjectFragments::rightColor(blob tempobj, int col)
     if (blobArea(tempobj) > blobMin) return (float) good /
                                       (float) blobArea(tempobj);
     //if (ogood < 2 * orgood) return 0.1; // at least two thirds of the "orange" pixels should be orange
-    if (red > static_cast<float>(spanX * spanY) * redMult) return redMult;
-    if (ogood < static_cast<float>(spanX * spanY) * ogoodMult) return redMult;
+    if (red > static_cast<float>(spanX * spanY) * redMult) {
+		if (BALLDEBUG)
+			cout << "Too much red" << endl;
+		// before giving up let's try and salvage this one
+		if (ogood < static_cast<float>(spanX * spanY) * ogoodMult)
+			return redMult;
+		if (greenCheck(tempobj) && greenSide(tempobj) && roundness(tempobj) != BADVALUE) {
+			return goodMult;
+		}
+		return redMult;
+	}
+    /*if (ogood < static_cast<float>(spanX * spanY) * ogoodMult) {
+		if (BALLDEBUG)
+			cout << "Not enough pure orange" << endl;
+		return redMult;
+		}*/
     if (tempobj.area > blobMin &&
 		ogood + oygood > (static_cast<float>(spanX * spanY) * oygoodMult)  &&
 		good < ( static_cast<float>(spanX * spanY) * goodMult)) return goodMult;
@@ -3851,7 +3865,7 @@ bool ObjectFragments::badSurround(blob b) {
 		}
 		return true;
 	}
-    if (realred > borange) {
+    if (realred > borange && realred > orange) {
 		if (BALLDEBUG) {
 			cout << "Too much real red vs borange" << endl;
 		}
@@ -3906,6 +3920,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	const int blobHigh = 250;
 	const int blobMax = 500;
 	const float radDiv = 2.0f;
+	const float PIXACC = 50;
 
     int confidence = 10;
     occlusion = NOOCCLUSION;
@@ -3964,6 +3979,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 			} else if (ar > arMin && perc > MINORANGEPERCENT) {
 				// don't do anything
 			} else if (ar > arMax && rightHalfColor(blobs[i]) > MINORANGEPERCENT) {
+				//} else if (perc > 0.25f && redBallCheck()) {
 			} else {
 				if (BALLDEBUG) {
 					drawBlob(blobs[i], BLACK);
@@ -3987,6 +4003,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
     estimate e;
     e = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, 
 								  topBlob.leftTop.y + 2 * blobHeight(topBlob) / heightDiv, 0.0);
+
     //cout << "Estimated distance is " << e.dist << endl;
     if (BALLDEBUG) {
         if (topBlob.leftTop.x > 0) {
@@ -4018,12 +4035,12 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
     int cenX = midPoint(topBlob.leftTop.x, topBlob.rightBottom.x);
     int cenY = midPoint(topBlob.leftTop.y, topBlob.leftBottom.y);
 
-    for(float angle = 0; angle < M_PI_FLOAT;
+    /*for(float angle = 0; angle < M_PI_FLOAT;
 		angle += M_PI_FLOAT / static_cast<float>(NUM_EDGE_POINTS) ){
 
         scanOut(cenX,cenY,tan(angle), 1);
         scanOut(cenX,cenY,tan(angle), -1);
-    }
+		}*/
 
     if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > numMin) {
         if (badSurround(topBlob)) {
@@ -4097,6 +4114,13 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
                                           thisBall->getCenterY(),
                                           static_cast<float>(thisBall->
                                                              getFocDist())));
+	if (e.dist * 2 < thisBall->getDistance() && e.dist < PIXACC && e.dist > 0) {
+		if (BALLDEBUG) {
+			cout << "Screening due to distance mismatch " << e.dist << " " << thisBall->getDistance() << endl;
+		}
+		thisBall->init();
+		return 0;
+	}
     if (atBoundary(topBlob)) {
         // INFERRED MEASUREMENTS
         //estimate es;
