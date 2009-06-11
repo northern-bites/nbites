@@ -12,26 +12,26 @@ class Teammate:
         '''variables include lots from the Packet class'''
 
         # things in the Packet()
-        self.playerNumber = None
-        self.x = None
-        self.y = None
-        self.h = None
-        self.uncertX = None
-        self.uncertY = None
-        self.uncertH = None
-        self.ballX = None
-        self.ballY = None
-        self.ballUncertX = None
-        self.ballUncertY = None
-        self.ballDist = None
-        self.role = None
-        self.subRole = None
-        self.chaseTime = None
+        self.playerNumber = 0
+        self.x = 0
+        self.y = 0
+        self.h = 0
+        self.uncertX = 0
+        self.uncertY = 0
+        self.uncertH = 0
+        self.ballX = 0
+        self.ballY = 0
+        self.ballUncertX = 0
+        self.ballUncertY = 0
+        self.ballDist = 0
+        self.role = PBConstants.INIT_ROLE
+        self.subRole = PBConstants.INIT_SUB_ROLE
+        self.chaseTime = 0
         self.lastPacketTime = time.time()
 
         #other info we want stored
-        self.ballLocDist = None
-        self.ballLocBearing = None
+        self.ballLocDist = 0
+        self.ballLocBearing = 0
         self.brain = tbrain # brain instance
         self.active = True
         self.grabbing = False
