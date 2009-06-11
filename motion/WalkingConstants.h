@@ -180,6 +180,7 @@ public:
     float xOdoScale;
     float yOdoScale;
     float thetaOdoScale;
+    float armAmplitude;   //amount, in rads, that the arms should swing
 //calculated from parameters
 public:
     int stepDurationFrames; //one double + one single support
@@ -201,7 +202,8 @@ public:
                       const float _sensorFeedback, const float _maxStiffness,
                       const float _kneeStiffness, const float _ankleStiffness,
                       const float _armStiffness, const float _xOdoScale,
-                      const float _yOdoScale, const float _thetaOdoScale)
+                      const float _yOdoScale, const float _thetaOdoScale,
+                      const float _armAmplitude)
         :  motion_frame_length_s( _motion_frame_length_s),
            bodyHeight(_bh), hipOffsetX(_hox), XAngleOffset(_yao),
            stepDuration(_dur),
@@ -216,7 +218,8 @@ public:
            sensorFeedback(_sensorFeedback), maxStiffness(_maxStiffness),
            kneeStiffness(_kneeStiffness), ankleStiffness(_ankleStiffness),
            armStiffness(_armStiffness), xOdoScale(_xOdoScale),
-           yOdoScale(_yOdoScale), thetaOdoScale(_thetaOdoScale)
+           yOdoScale(_yOdoScale), thetaOdoScale(_thetaOdoScale),
+           armAmplitude(_armAmplitude)
         {
             updateFrameLengths();
         }
@@ -326,7 +329,8 @@ const WalkingParameters DEFAULT_PARAMETERS
                     0.2f,         // arm stiffness
                     1.0f,         // xOdoScale
                     1.0f,         // yOdoScale
-                    1.0f);        //thetaOdoScale
+                    1.0f,         //thetaOdoScale
+                    0.0f);        //armAmplitude
 const WalkingParameters GOALIE_PARAMETERS = DEFAULT_PARAMETERS;
 
 const WalkingParameters WALK_PARAMS[] = {DEFAULT_PARAMETERS,GOALIE_PARAMETERS};

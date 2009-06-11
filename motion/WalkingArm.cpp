@@ -5,8 +5,6 @@ using namespace Kinematics;
 using boost::shared_ptr;
 using namespace std;
 
-static const float ARM_AMPLITUDE = 0.75f;//in rads
-
 WalkingArm::WalkingArm(ChainID id)
     :state(SUPPORTING),
      chainID(id),
@@ -81,8 +79,8 @@ const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
         break;
     }
 
-    float start = -direction*ARM_AMPLITUDE;
-    float end = direction*ARM_AMPLITUDE;
+    float start = -direction*walkParams->armAmplitude;
+    float end = direction*walkParams->armAmplitude;
 
     //We need to intelligently deal with non-regular steps
     //Since end steps are employed in both the starting and stopping contexts
