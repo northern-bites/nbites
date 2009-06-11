@@ -30,8 +30,7 @@ private:
     SupportMode nextState();
     void setState(SupportMode newState);
 
-    ArmJointStiffTuple swinging();
-    ArmJointStiffTuple supporting();
+    const float getShoulderPitchAddition(boost::shared_ptr<Step> supportStep);
 
 private:
     SupportMode state;
@@ -41,7 +40,8 @@ private:
     unsigned int frameCounter;
     unsigned int singleSupportFrames;
     unsigned int doubleSupportFrames;
-
+    bool startStep;
+    StepType lastStepType;
 };
 
 #endif
