@@ -19,7 +19,7 @@
 // <http://www.gnu.org/licenses/>.
 //For gaitcommands
 
-#define BOOST_PYTHON_MAX_ARITY 26
+#define BOOST_PYTHON_MAX_ARITY 27
 
 #include <Python.h>
 #include <boost/python.hpp>
@@ -83,7 +83,8 @@ public:
                    const float sensorFeedback, const float maxStiffness,
                    const float kneeStiffness, const float ankleStiffness,
                    const float armStiffness, const float xOdoScale,
-                   const float yOdoScale, const float thetaOdoScale)
+                   const float yOdoScale, const float thetaOdoScale,
+                   const float armAmplitude)
 
         : command(new GaitCommand(0.02f,_bh*CM_TO_MM, //HACK
                                   _hox*CM_TO_MM, _yao*TO_RAD, _dur,
@@ -96,7 +97,8 @@ public:
                                   maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD,
                                   sensorFeedback, maxStiffness,
                                   kneeStiffness,ankleStiffness, armStiffness,
-                                  xOdoScale,yOdoScale,thetaOdoScale))
+                                  xOdoScale,yOdoScale,thetaOdoScale,
+                                  armAmplitude*TO_RAD))
         {
         }
 
@@ -334,14 +336,14 @@ BOOST_PYTHON_MODULE(_motion)
                           float, float, float, float,
                           float, float, float, float,
                           float, float, float, float,
-                          float>(
+                          float, float>(
 "A container for setting the walking gait of the robot. "
 "(bodyHeight,hipOffsetX,XAngleOffset,stepDuration,doubleSupportFraction,"
 "stepHeight,"
 "footLengthX,dblSupInactivePercentage,leftSwingHipRollAddition,"
 "rightSwingHipRollAddition,leftZMPSwingOffsetY,rightZMPSwingOffsetY,"
 "turnZMPOffsetY, strafeZMPOffsetY, sensorFeedback, maxStiffness, kneeStiffness,"
-"ankleStiffness,armStiffness"))
+"ankleStiffness,armStiffness,xOdoScale,yOdoScale,thetaOdoScale,armAmplitude"))
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple,

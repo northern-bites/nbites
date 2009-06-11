@@ -86,6 +86,7 @@
 #include "WalkController.h"
 #include "WalkingConstants.h"
 #include "WalkingLeg.h"
+#include "WalkingArm.h"
 #include "Kinematics.h"
 #include "CoordFrame.h"
 #include "Sensors.h"
@@ -103,6 +104,8 @@ typedef boost::tuple<const std::list<float>*,
                      const std::list<float>*> zmp_xy_tuple;
 typedef boost::tuple<LegJointStiffTuple,
                       LegJointStiffTuple> WalkLegsTuple;
+typedef boost::tuple<ArmJointStiffTuple,
+                     ArmJointStiffTuple> WalkArmsTuple;
 
 static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
                                      //steps stored in future, current lists
@@ -114,6 +117,7 @@ public:
 
     void tick_controller();
     WalkLegsTuple tick_legs();
+    WalkArmsTuple tick_arms();
 
     bool isDone() { return done; }
 
@@ -218,6 +222,8 @@ private:
     int waitForController;
 
     WalkingLeg leftLeg, rightLeg;
+    WalkingArm leftArm, rightArm;
+
     SupportFoot supportFoot;
 
     WalkController *controller_x, *controller_y;

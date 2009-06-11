@@ -163,7 +163,7 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
 
     float theta = percent_complete*2.0f*M_PI_FLOAT;
     float stepHeight = walkParams->stepHeight;
-    float percent_to_dest_horizontal = cycloidx(theta)/(2.0f*M_PI_FLOAT);
+    float percent_to_dest_horizontal = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
     //Then we can express the destination as the proportionate distance to cover
     float dest_x = src_f(0) + percent_to_dest_horizontal*dist_to_cover_x;
@@ -176,7 +176,7 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     float target_c_y = target_c(1);
 
     float radius =walkParams->stepHeight/2;
-    float heightOffGround = radius*cycloidy(theta);
+    float heightOffGround = radius*NBMath::cycloidy(theta);
 
     goal(0) = target_c_x;
     goal(1) = target_c_y;
@@ -249,7 +249,7 @@ const float WalkingLeg::getFootRotation(){
 		static_cast<float>(singleSupportFrames);
 
     const float theta = percent_complete*2.0f*M_PI_FLOAT;
-    const float percent_to_dest = cycloidx(theta)/(2.0f*M_PI_FLOAT);
+    const float percent_to_dest = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
     const float end = swing_dest->theta;
     const float start = swing_src->theta;
@@ -364,13 +364,6 @@ const vector<float> WalkingLeg::getStiffnesses(){
 
 }
 
-const float  WalkingLeg::cycloidx(float theta){
-    return theta - sin(theta);
-}
-
-const float  WalkingLeg::cycloidy(float theta){
-    return 1 - cos(theta);
-}
 
 inline ChainID WalkingLeg::getOtherLegChainID(){
     return (chainID==LLEG_CHAIN ?

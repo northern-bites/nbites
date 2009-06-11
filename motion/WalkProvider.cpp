@@ -41,11 +41,6 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
 {
     pthread_mutex_init(&walk_provider_mutex,NULL);
 
-    //Currently, the arm angles are static, and never change
-    larm_angles = vector<float>(LARM_WALK_ANGLES,
-                                LARM_WALK_ANGLES + ARM_JOINTS);
-    rarm_angles = vector<float>(RARM_WALK_ANGLES,
-                                RARM_WALK_ANGLES + ARM_JOINTS);
     setActive();
 }
 
@@ -109,6 +104,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     WalkLegsTuple legs_result = stepGenerator.tick_legs();
 	PROF_EXIT(profiler,P_TICKLEGS);
 
+    //Finally, ask the step generator for the arm angles
+    WalkArmsTuple arms_result = stepGenerator.tick_arms();
+
     //Get the joints and stiffnesses for each Leg
     vector<float> lleg_joints = legs_result.get<LEFT_FOOT>().get<JOINT_INDEX>();
     vector<float> rleg_joints = legs_result.get<RIGHT_FOOT>().get<JOINT_INDEX>();
@@ -116,15 +114,17 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     vector<float> rleg_gains = legs_result.get<RIGHT_FOOT>().get<STIFF_INDEX>();
 
     //grab the stiffnesses for the arms
-    vector<float> larm_gains(ARM_JOINTS, curGait->armStiffness);
-    vector<float> rarm_gains(ARM_JOINTS, curGait->armStiffness);
+    vector<float> larm_joints = arms_result.get<LEFT_FOOT>().get<JOINT_INDEX>();
+    vector<float> rarm_joints = arms_result.get<RIGHT_FOOT>().get<JOINT_INDEX>();
+    vector<float> larm_gains = arms_result.get<LEFT_FOOT>().get<STIFF_INDEX>();
+    vector<float> rarm_gains = arms_result.get<RIGHT_FOOT>().get<STIFF_INDEX>();
 
 
     //Return the joints for the legs
-    setNextChainJoints(LARM_CHAIN,larm_angles);
+    setNextChainJoints(LARM_CHAIN,larm_joints);
     setNextChainJoints(LLEG_CHAIN,lleg_joints);
     setNextChainJoints(RLEG_CHAIN,rleg_joints);
-    setNextChainJoints(RARM_CHAIN,rarm_angles);
+    setNextChainJoints(RARM_CHAIN,rarm_joints);
 
     //Return the stiffnesses for each joint
     setNextChainStiffnesses(LARM_CHAIN,larm_gains);

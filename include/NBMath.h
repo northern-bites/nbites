@@ -105,5 +105,15 @@ namespace NBMath {
         return std::acos(clip(input,1.0f));
     }
 
+
+static const float  cycloidx(const float theta){
+    return theta - std::sin(theta);
+}
+
+static const float  cycloidy(const float theta){
+    return 1.0f - std::cos(theta);
+}
+
+
 }
 #endif //NBMath_h
