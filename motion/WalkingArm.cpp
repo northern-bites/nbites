@@ -107,7 +107,13 @@ const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
             static_cast<float>(doubleSupportFrames);
     }
 
-    return start + percentComplete*(end - start);
+    //Even though we already calcualted percent complete, we should really
+    //have a more gradual arm motion, which we can do by employing a cycloid
+
+    const float theta = percentComplete*2.0f*M_PI_FLOAT;
+    const float percentToDest = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
+
+    return start + percentToDest*(end - start);
 
 }
 
