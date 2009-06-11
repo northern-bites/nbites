@@ -876,9 +876,13 @@ void StepGenerator::generateStep( float _x,
                                    HIP_OFFSET_Y : -HIP_OFFSET_Y)*cos(_theta);
     const float computed_theta = _theta;
 
+    const float dblSupp = (type == END_STEP ?
+                           1.0f :
+                           walkParams->doubleSupportFraction);
+
     shared_ptr<Step> step(new Step(computed_x, computed_y, computed_theta,
                                    walkParams->stepDuration,
-                                   walkParams->doubleSupportFraction,
+                                   dblSupp,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
