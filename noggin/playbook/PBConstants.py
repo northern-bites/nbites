@@ -10,7 +10,7 @@ TEST_DEFENDER = False
 TEST_OFFENDER = False
 TEST_CHASER = False
 # Print information as to how the chaser is determined
-DEBUG_DET_CHASER = True
+DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
 DEBUG_SEARCHER = False
 
@@ -22,7 +22,7 @@ PULL_THE_GOALIE = False
 GOALIE_NUMBER = 1
 DEFAULT_CHASER_NUMBER = 3
 # Length of time to spend in the kickoff play
-KICKOFF_FORMATION_TIME = 5
+KICKOFF_FORMATION_TIME = 3
 
 # Time limit for moving into the finder routine
 FINDER_TIME_THRESH = 5
