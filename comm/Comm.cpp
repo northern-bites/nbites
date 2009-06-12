@@ -4,9 +4,6 @@
 
 #include "Common.h"
 
-#if ROBOT(NAO)
-// Comment out the ENTIRE FILE if we are compiling for the Aibo
-
 #include <sys/socket.h> // socket(), connect(), send(), recv(), setsockopt()
 #include <arpa/inet.h>   // inet_aton(), htonl()
 #include <netdb.h>       // gethostbyname()
@@ -142,7 +139,7 @@ PyComm_setData (PyObject *self, PyObject *args)
   ((PyComm*)self)->comm->setData(values);
 
   Py_END_ALLOW_THREADS
-  
+
   Py_INCREF(Py_None);
   return Py_None;
 }
@@ -261,7 +258,7 @@ static PyMethodDef PyComm_methods[] = {
 
   {"stopTOOL", (PyCFunction)PyComm_stopTOOL, METH_NOARGS,
     "Stop only the TOOLConnect thread."},
-  
+
   {"getRobotName", (PyCFunction)PyComm_getRobotName, METH_NOARGS,
     "Retrieve the name of this robot on the network"},
 
@@ -347,7 +344,7 @@ c_init_comm (void)
   if (PyType_Ready(&PyCommType) < 0
 #ifdef USE_PYTHON_GC
       || PyType_Ready(&PyGameControllerType) < 0
-#endif 
+#endif
       ) {
     fprintf(stderr, "Error creating Comm Python class type\n");
     if (PyErr_Occurred())
@@ -356,7 +353,7 @@ c_init_comm (void)
       fprintf(stderr, "But no error available!\n");
     return false;
   }
-  
+
   comm_module = Py_InitModule3("_comm", module_methods,
       "Container module for Comm proxy class to C++");
 
@@ -419,7 +416,7 @@ c_init_comm (void)
   PyObject *pcomm = PyComm_new(new Comm(synchro, sensors, vision));
   PyModule_AddObject(comm_module, "inst", pcomm);
 #endif
-  
+
   return true;
 }
 
@@ -477,10 +474,9 @@ Comm::run ()
 
     while (running) {
       send();
-  
+
       while (running && !timer.time_for_packet()) {
         receive();
-         
         usleep(SLEEP_MILLIS);
       }
     }
@@ -611,8 +607,8 @@ Comm::bind () throw(socket_error)
 #ifdef USE_GAMECONTROLLER
   bind_gc();
 #endif
-  
-  
+
+
 }
 
 void
@@ -655,14 +651,14 @@ void
 Comm::send () throw(socket_error)
 {
   // create message string
- 
+
   pthread_mutex_lock (&comm_mutex);
 
   // C++ header data
   const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
                                     gc->team(), gc->player(), gc->color()};
   memcpy(&buf[0], &header, sizeof(header));
-  // variable Python extra data 
+  // variable Python extra data
   memcpy(&buf[sizeof(header)], &data[0], sizeof(float) * data.size());
 
   //jf- int pos = sizeof(header);
@@ -702,7 +698,7 @@ Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error)
       error(SOCKET_ERROR(errno));
   }
 #endif
-  
+
   // record last time we sent a message
   timer.sent_packet();
 }
@@ -797,7 +793,7 @@ Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 
     // validate packet format, check packet timestamp, and parse data
     CommPacketHeader packet;
-    if (validate_packet(msg, len, packet) && timer.check_packet(packet))
+    if (validate_packet(msg, len, packet))
       parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
 
   }
@@ -815,25 +811,36 @@ Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
   throw()
 {
   // check packet length
-  if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader))
-    return false;
+	if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)){
+		std::cout << "bad length" << std::endl;
+		return false;
+	}
 
   // cast packet data into CommPacketHeader struct
   packet = *reinterpret_cast<const CommPacketHeader*>(msg);
 
   // check packet header
-  if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0)
-    return false;
-
+  if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0){
+	  //std::cout << "bad header" << std::endl;
+	  return false;
+  }
   // check team number
-  if (packet.team != gc->team())
-    return false;
+  if (packet.team != gc->team()){
+	  //std::cout << "bad team number" << std::endl;
+	  return false;
+  }
 
   // check player number
   if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
-      packet.player == gc->player())
-    return false;
+      packet.player == gc->player()){
+	  //std::cout << "bad player number" << std::endl;
+	  return false;
+  }
 
+  if (!timer.check_packet(packet)){
+	  //std::cout << "bad timer" << std::endl;
+	  return false;
+  }
   // passed all checks, packet is valid
   return true;
 }
@@ -943,5 +950,3 @@ Comm::getRobotName ()
 
   return name;
 }
-
-#endif // ROBOT(NAO) - commenting out the entire file
