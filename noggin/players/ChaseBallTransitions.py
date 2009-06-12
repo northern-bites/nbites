@@ -73,11 +73,11 @@ def shouldKick(player):
     Ball is in the correct foot position to kick
     """
     ball = player.brain.ball
-    return (ball.framesOff < 10 and
-            ball.relY > constants.BALL_KICK_RIGHT_Y_R and
-            ball.relY < constants.BALL_KICK_LEFT_Y_L and
-            ball.relX > constants.BALL_KICK_LEFT_X_CLOSE and
-            ball.relX < constants.BALL_KICK_LEFT_X_FAR )
+    return ( ball.on and
+             ball.relY > constants.BALL_KICK_RIGHT_Y_R and
+             ball.relY < constants.BALL_KICK_LEFT_Y_L and
+             ball.relX > constants.BALL_KICK_LEFT_X_CLOSE and
+             ball.relX < constants.BALL_KICK_LEFT_X_FAR )
 
 ####### AVOIDANCE STUFF ##############
 

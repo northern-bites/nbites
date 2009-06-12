@@ -123,30 +123,7 @@ def decideKick(player):
                 # kick left
                 if Constants.DEBUG_KICKS: print ("\t\tleft 1")
                 return player.goLater('kickBallLeft')
-
-        elif myLeftPostBearing is not None:
-            if myLeftPostBearing > 0:
-                if Constants.DEBUG_KICKS: print ("\t\tright 2")
-                return player.goLater('kickBallRight')
-            else:
-                if Constants.DEBUG_KICKS: print ("\t\left 2")
-                return player.goLater('kickBallLeft')
-        elif myRightPostBearing is not None:
-            if player.brain.my.h > 0:
-                if Constants.DEBUG_KICKS: print ("\t\tright 3")
-                return player.goLater('kickBallRight')
-            else:
-                if Constants.DEBUG_KICKS: print ("\t\tleft 3")
-                return player.goLater('kickBallLeft')
-
-            if myRightPostBearing > 0:
-                if Constants.DEBUG_KICKS: print ("\t\tleft 4")
-                return player.goLater('kickBallLeft')
-            else:
-                if Constants.DEBUG_KICKS: print ("\t\tright 4")
-                return player.goLater('kickBallRight')
         else:
-            # don't do anything
             return player.goLater('orbitBall')
 
     else:
@@ -189,7 +166,7 @@ def kickBallStraight(player):
             return player.goNow('kickBallExecute')
 
         else :                  # INCORRECT_POS
-            return player.goLater('decideKick')
+            return player.goLater('chase')
 
 def kickBallLeft(player):
     """
@@ -212,24 +189,29 @@ def sideStepForKick(player):
         player.brain.tracker.trackBall()
 
     # Which foot is the ball in front of?
-    player.kickDecider.ballForeWhichFoot()
-    ballForeFoot = player.kickDecider.ballForeFoot
+    if player.brain.ball.on:
+        player.kickDecider.ballForeWhichFoot()
+        ballForeFoot = player.kickDecider.ballForeFoot
 
-    if ballForeFoot == Constants.MID_RIGHT or \
-            ballForeFoot == Constants.MID_LEFT:
-        return player.goNow('kickBallExecute')
+        if ballForeFoot == Constants.MID_RIGHT or \
+                ballForeFoot == Constants.MID_LEFT:
+            return player.goNow('kickBallExecute')
 
-    # Ball too far outside to kick with
-    elif ballForeFoot == Constants.RIGHT_FOOT:
-        return player.goNow('stepRightForKick')
+        # Ball too far outside to kick with
+        elif ballForeFoot == Constants.RIGHT_FOOT:
+            return player.goNow('stepRightForKick')
 
-    # Ball in front of wrong foot
-    elif ballForeFoot == Constants.LEFT_FOOT:
-        return player.goNow('stepLeftForKick')
+        # Ball in front of wrong foot
+        elif ballForeFoot == Constants.LEFT_FOOT:
+            return player.goNow('stepLeftForKick')
 
-    # Ball must be in wrong place
-    else :
-        return player.goLater('decideKick')
+        # Ball must be in wrong place
+        else :
+            return player.goLater('chase')
+
+    elif player.brain.ball.framesOff > ChaseBallConstants.BALL_OFF_THRESH:
+        return player.goLater('scanFindBall')
+
 
 def stepRightForKick(player):
 
@@ -361,7 +343,7 @@ class KickDecider:
         ball = self.player.brain.ball
 
         if not (Constants.MAX_KICK_X > ball.relX > Constants.MIN_KICK_X) or \
-                ball.dist == 0.0:
+                not ball.on:
             self.ballForeFoot = Constants.INCORRECT_POS
 
         elif Constants.LEFT_FOOT_L_Y > ball.relY >= Constants.LEFT_FOOT_R_Y:

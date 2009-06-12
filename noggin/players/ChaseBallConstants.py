@@ -4,7 +4,7 @@ USE_LOC_CHASE = False
 # Transitions' Constants
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 2
-BALL_OFF_THRESH = 12
+BALL_OFF_THRESH = 20
 # Value to stop spinning to ball and approach
 BALL_APPROACH_BEARING_THRESH = 30
 # Value to start spinning to ball
