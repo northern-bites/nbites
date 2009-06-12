@@ -8,6 +8,7 @@ import man.motion.StiffnessModes as StiffnessModes
 import KickingConstants as Constants
 import ChaseBallConstants
 from .. import NogginConstants
+from math import fabs
 
 def decideKick(player):
     """
@@ -30,7 +31,7 @@ def decideKick(player):
     player.kickDecider.calculate()
 
     if not player.brain.ball.on:
-        if player.brain.ball.framesOff < 60: # HACK, should be constant, or better value
+        if player.brain.ball.framesOff < 120: # HACK, should be constant, or better value
             return player.stay()
         else :
             return player.goLater('scanFindBall')
@@ -45,17 +46,70 @@ def decideKick(player):
 
     player.printf(player.kickDecider)
 
-
     # Things to do if we saw our own goal
-    if player.kickDecider.sawOwnGoal:
+    # Saw the opponent goal
+    if player.kickDecider.sawOppGoal:
+        if oppLeftPostBearing is not None and \
+                oppRightPostBearing is not None:
+            KICK_STRAIGHT_BEARING_THRESH = 30
+            avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
+            if fabs(avgOppBearing) < KICK_STRAIGHT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\t Straight 1")
+                return player.goLater('kickBallStraight')
+
+            elif avgOppBearing > KICK_STRAIGHT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\t Left 5")
+                return player.goLater('kickBallLeft')
+            elif avgOppBearing < -KICK_STRAIGHT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\t Right 5")
+                return player.goLater('kickBallRight')
+
+        elif oppLeftPostBearing is not None:
+            KICK_LEFT_BEARING_THRESH = 60
+            KICK_RIGHT_BEARING_THRESH = -10
+
+            if oppLeftPostBearing > KICK_LEFT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\t Left 6.1")
+                return player.goLater('kickBallLeft')
+            elif oppLeftPostBearing < KICK_RIGHT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\t Left 6.2")
+                return player.goLater('kickBallRight')
+            else:
+                if Constants.DEBUG_KICKS: print ("\t\t Straight 2")
+                return player.goLater('kickBallStraight')
+
+        elif oppRightPostBearing is not None:
+            KICK_LEFT_BEARING_THRESH = 10
+            KICK_RIGHT_BEARING_THRESH = -60
+
+            if oppRightPostBearing > KICK_LEFT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\t Right 6.1")
+                return player.goLater('kickBallLeft')
+            elif oppRightPostBearing < KICK_RIGHT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\t Right 6.2")
+                return player.goLater('kickBallRight')
+            else:
+                if Constants.DEBUG_KICKS: print ("\t\t Straight 3")
+                return player.goLater('kickBallStraight')
+        else:
+            if Constants.DEBUG_KICKS: print ("\t\t Straight 4")
+            return player.goLater('kickBallStraight')
+
+    elif player.kickDecider.sawOwnGoal:
         if Constants.SUPER_SAFE_KICKS:
-            return player.goLater('ignoreOwnGoal')
+            return player.goLater('orbitBall')
 
         # We see both posts
         if myLeftPostBearing is not None and myRightPostBearing is not None:
             # Goal in front
-            if myRightPostBearing > myLeftPostBearing > 0:
+            avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
+
+            ORBIT_BEARING_THRESH = 45
+            if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\torbit!")
+                return player.goLater('orbitBall')
                 # kick right
+            elif avgMyGoalBearing > 0:
                 if Constants.DEBUG_KICKS: print ("\t\tright 1")
                 return player.goLater('kickBallRight')
             else:
@@ -86,37 +140,7 @@ def decideKick(player):
                 return player.goLater('kickBallRight')
         else:
             # don't do anything
-            return player.goLater('ignoreOwnGoal')
-    # Saw the opponent goal
-    elif player.kickDecider.sawOppGoal:
-        if oppLeftPostBearing is not None and oppRightPostBearing is not None:
-            if oppLeftPostBearing > 0 and oppRightPostBearing < 0:
-                # kick straight
-                if Constants.DEBUG_KICKS: print ("\t\t Straight 1")
-                return player.goLater('kickBallStraightChoose')
-            elif oppLeftPostBearing < 0:
-                if Constants.DEBUG_KICKS: print ("\t\t Left 5")
-                return player.goLater('kickBallLeft')
-            elif oppRightPostBearing > 0:
-                if Constants.DEBUG_KICKS: print ("\t\t Right 5")
-                return player.goLater('kickBallRight')
-        elif oppLeftPostBearing is not None:
-            if oppLeftPostBearing < 0:
-                if Constants.DEBUG_KICKS: print ("\t\t Left 6")
-                return player.goLater('kickBallLeft')
-            else:
-                if Constants.DEBUG_KICKS: print ("\t\t Straight 2")
-                return player.goLater('kickBallStraightChoose')
-        elif oppRightPostBearing is not None:
-            if oppRightPostBearing > 0:
-                if Constants.DEBUG_KICKS: print ("\t\t Right 6")
-                return player.goLater('kickBallRight')
-            else:
-                if Constants.DEBUG_KICKS: print ("\t\t Straight 3")
-                return player.goLater('kickBallStraightChoose')
-        else:
-            if Constants.DEBUG_KICKS: print ("\t\t Straight 4")
-            return player.goLater('kickBallStraightChoose')
+            return player.goLater('orbitBall')
 
     else:
         # use localization for kick
@@ -128,9 +152,9 @@ def decideKick(player):
             return player.goLater('kickBallRight')
         else:
             if Constants.DEBUG_KICKS: print "\t\t Straight 5"
-            return player.goLater('kickBallStraightChoose')
+            return player.goLater('kickBallStraight')
 
-def kickBallStraightChoose(player):
+def kickBallStraight(player):
     """
     Kick the ball forward.  Currently uses the left foot
     """
@@ -223,6 +247,7 @@ def afterKick(player):
     """
     # trick the robot into standing up instead of leaning to the side
     player.walkPose()
+    player.brain.tracker.trackBall()
 
     if player.brain.nav.isStopped():
         return player.goLater("chase")
@@ -277,25 +302,23 @@ class KickDecider:
         Collect info on any observed goals
         """
         if info.myGoalLeftPost.on:
-            self.sawOwnGoal = True
             if info.myGoalLeftPost.certainty == NogginConstants.SURE:
+                self.sawOwnGoal = True
                 self.myGoalLeftPostBearings.append(info.myGoalLeftPost.bearing)
 
-
         if info.myGoalRightPost.on:
-            self.sawOwnGoal = True
             if info.myGoalRightPost.certainty == NogginConstants.SURE:
+                self.sawOwnGoal = True
                 self.myGoalRightPostBearings.append(info.myGoalRightPost.bearing)
 
-
         if info.oppGoalLeftPost.on:
-            self.sawOppGoal = True
             if info.oppGoalLeftPost.certainty == NogginConstants.SURE:
+                self.sawOppGoal = True
                 self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.bearing)
 
         if info.oppGoalRightPost.on:
-            self.sawOppGoal = True
             if info.oppGoalRightPost.certainty == NogginConstants.SURE:
+                self.sawOppGoal = True
                 self.oppGoalRightPostBearings.append(info.oppGoalRightPost.bearing)
 
     def calculate(self):
@@ -318,7 +341,10 @@ class KickDecider:
     def ballForeWhichFoot(self):
         ball = self.player.brain.ball
 
-        if Constants.LEFT_FOOT_L_Y > ball.relY >= Constants.LEFT_FOOT_R_Y:
+        if not (Constants.MAX_KICK_X > ball.relX > Constants.MIN_KICK_X):
+            self.ballForeFoot = Constants.INCORRECT_POS
+
+        elif Constants.LEFT_FOOT_L_Y > ball.relY >= Constants.LEFT_FOOT_R_Y:
             self.ballForeFoot = Constants.LEFT_FOOT
 
         elif Constants.LEFT_FOOT_R_Y > ball.relY >= 0:

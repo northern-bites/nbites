@@ -333,7 +333,7 @@ SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       6.6,   # turn zmp offset
                                       0.01,  # strafe zmp offset
                                       7.0,  # max x speed
-                                      4.0,  # max y speed
+                                      7.0,  # max y speed
                                       30.0,  # max theta speed()
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
