@@ -60,13 +60,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getRoleState(self,role):
         if role == PBConstants.CHASER:
             return 'chase'
-            #return 'decideKick'
         elif role == PBConstants.OFFENDER:
-            #return 'playbookPosition'
-            return 'spinFindBallPosition'
+            return 'playbookPosition'
         elif role == PBConstants.DEFENDER:
-            #return 'playbookPosition'
-            return 'spinFindBallPosition'
+            return 'playbookPosition'
         elif role == PBConstants.GOALIE:
             return 'goaliePosition'
         elif role == PBConstants.PENALTY_ROLE:
