@@ -229,16 +229,18 @@ class GoTeam:
         chaser_mate = self.me
 
         if PBConstants.DEBUG_DET_CHASER:
-            self.printf(("chaser det: me == #%g"% self.brain.my.playerNumber))
+            self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
 
         #save processing time and skip the rest if we have the ball
         if self.me.hasBall(): #and self.me.isChaser()?
+            if PBConstants.DEBUG_DET_CHASER:
+                self.printf("I have the ball")
             return chaser_mate
 
         # scroll through the teammates
         for mate in self.activeFieldPlayers:
             if PBConstants.DEBUG_DET_CHASER:
-                self.printf(("\t mate #", mate.playerNumber))
+                self.printf("\t mate #%g"% mate.playerNumber)
 
             # If the player number is me, or our ball models are super divergent ignore
             if (mate.playerNumber == self.me.playerNumber or
@@ -248,7 +250,7 @@ class GoTeam:
                 PBConstants.BALL_DIVERGENCE_THRESH):
 
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf(("Ball models are divergent, or it's me"))
+                    self.printf("Ball models are divergent, or it's me")
                 continue
             #dangerous- two players might both have ball, both would stay chaser
             #same as the aibo code but thresholds for hasBall are higher now
@@ -290,9 +292,9 @@ class GoTeam:
 
                     if PBConstants.DEBUG_DET_CHASER:
                         self.printf (("\t #%d @ %g >= #%d @ %g" %
-                                      (mate.playerNumber, mate.ballDist,
+                                      (mate.playerNumber, mate.chaseTime,
                                        chaser_mate.playerNumber,
-                                       chaser_mate.ballDist)))
+                                       chaser_mate.chaseTime)))
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf ("\t ---- MATE %g WINS" % (chaser_mate.playerNumber))
