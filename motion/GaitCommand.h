@@ -44,7 +44,8 @@ public:
                  const float maxtheta_rads,
                  const float _sensorFeedback,
                  const float _maxStiffness, const float _kneeStiffness,
-                 const float _ankleStiffness, const float _armStiffness,
+                 const float _anklePitchStiffness,
+                 const float _ankleRollStiffness, const float _armStiffness,
                  const float _xOdoScale, const float _yOdoScale,
                  const float _thetaOdoScale, const float _armAmplitude)
         :MotionCommand(MotionConstants::GAIT),
@@ -56,7 +57,8 @@ public:
               _lZMPSwOffY,_rZMPSwOffY,
               _tZMPOffY, _sZMPOffY,
               maxx_mms,maxy_mms,maxtheta_rads, _sensorFeedback,
-              _maxStiffness,_kneeStiffness,_ankleStiffness, _armStiffness,
+              _maxStiffness,_kneeStiffness,_anklePitchStiffness,
+              _ankleRollStiffness, _armStiffness,
               _xOdoScale,_yOdoScale,_thetaOdoScale,_armAmplitude)
         {
         }

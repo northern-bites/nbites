@@ -20,7 +20,8 @@ SLARTI_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -46,7 +47,8 @@ TRILLIAN_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.4,  #kneeStiffness
-                                      0.3,  #ankleStiffness
+                                      0.3,  #anklePitchStiffness
+                                      0.3,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -73,7 +75,8 @@ ZAPHOD_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -102,7 +105,8 @@ TRILLIAN_SLOW_GAIT = motion.GaitCommand(31.00, # com height
                                         0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -128,7 +132,8 @@ TRILLIAN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                           0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -155,7 +160,8 @@ ZAPHOD_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -181,7 +187,8 @@ SLARTI_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -207,7 +214,8 @@ MARVIN_MEDIUM_GAIT = motion.GaitCommand(31.00, # com height
                                         0.0,   #sensorScale
                                         0.85,  #maxStiffness
                                         0.85,  #kneeStiffness
-                                        0.85,  #ankleStiffness
+                                        0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                         0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -233,7 +241,8 @@ MARVIN_MEDIUM_SENSORS_GAIT = motion.GaitCommand(31.00,# com height
                                                 0.0,   #sensorScale
                                                 0.85,  #maxStiffness
                                                 0.85,  #kneeStiffness
-                                                0.85,  #ankleStiffness
+                                                0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                                 0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -259,7 +268,8 @@ MARVIN_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.4,  #kneeStiffness
-                                      0.3,  #ankleStiffness
+                                      0.3,  #anklePitchStiffness
+                                      0.3,  #anklePitchStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -285,7 +295,8 @@ TUCKER_FAST_GAIT = motion.GaitCommand(31.00, # com height
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.85,  #kneeStiffness
-                                      0.85,  #ankleStiffness
+                                      0.85,  #anklePitchStiffness
+                                      0.85,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -311,7 +322,8 @@ WEBOTS_GAIT = motion.GaitCommand(31.00, # com height
                                  0.0,   #sensorScale
                                  0.85,  #maxStiffness
                                  0.5,  #kneeStiffness
-                                 0.2,  #ankleStiffness
+                                 0.2,  #anklePitchStiffness
+                                 0.2,  #ankleRollStiffness
                                  0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale
@@ -338,7 +350,8 @@ SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
                                       0.4,  #kneeStiffness
-                                      0.3,  #ankleStiffness
+                                      0.3,  #anklePitchStiffness
+                                      0.3,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
                                       1.0,   #yOdoScale

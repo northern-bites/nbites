@@ -354,10 +354,12 @@ const vector<float> WalkingLeg::getStiffnesses(){
 
     //get shorter names for all the constants
     const float maxS = walkParams->maxStiffness;
-    const float ankleS = walkParams->ankleStiffness;
+    const float anklePitchS = walkParams->anklePitchStiffness;
+    const float ankleRollS = walkParams->ankleRollStiffness;
     const float kneeS = walkParams->kneeStiffness;
 
-    float stiffnesses[LEG_JOINTS] = {maxS, maxS, maxS, kneeS,ankleS,ankleS};
+    float stiffnesses[LEG_JOINTS] = {maxS, maxS, maxS,
+                                     kneeS,anklePitchS,ankleRollS};
     vector<float> stiff_result = vector<float>(stiffnesses,
                                                &stiffnesses[LEG_JOINTS]);
     return stiff_result;

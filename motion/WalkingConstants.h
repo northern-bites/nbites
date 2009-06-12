@@ -175,7 +175,8 @@ public:
     float sensorFeedback;
     float maxStiffness; //default stiffness
     float kneeStiffness; //knee stiffness when swinging
-    float ankleStiffness; //ankle stiffness when swinging
+    float anklePitchStiffness; //ankle pitch stiffness
+    float ankleRollStiffness; //ankle roll stiffnesses
     float armStiffness;
     float xOdoScale;
     float yOdoScale;
@@ -200,7 +201,8 @@ public:
                       const float maxx_mms, const float maxy_mms,
                       const float maxtheta_rads,
                       const float _sensorFeedback, const float _maxStiffness,
-                      const float _kneeStiffness, const float _ankleStiffness,
+                      const float _kneeStiffness, const float _anklePitchStiffness,
+                      const float _ankleRollStiffness,
                       const float _armStiffness, const float _xOdoScale,
                       const float _yOdoScale, const float _thetaOdoScale,
                       const float _armAmplitude)
@@ -216,7 +218,9 @@ public:
            turnZMPOffsetY(_tZMPOffY), strafeZMPOffsetY(_sZMPOffY),
            maxXSpeed(maxx_mms),maxYSpeed(maxy_mms),maxThetaSpeed(maxtheta_rads),
            sensorFeedback(_sensorFeedback), maxStiffness(_maxStiffness),
-           kneeStiffness(_kneeStiffness), ankleStiffness(_ankleStiffness),
+           kneeStiffness(_kneeStiffness), 
+           anklePitchStiffness(_anklePitchStiffness),
+           ankleRollStiffness(_ankleRollStiffness),
            armStiffness(_armStiffness), xOdoScale(_xOdoScale),
            yOdoScale(_yOdoScale), thetaOdoScale(_thetaOdoScale),
            armAmplitude(_armAmplitude)
@@ -325,7 +329,8 @@ const WalkingParameters DEFAULT_PARAMETERS
                     0.0f,         // sensor feedback
                     0.85f,        // max stiffness
                     0.85f,        // knee stiffness
-                    0.85f,        // ankle stiffness
+                    0.85f,        // ankle Pitch stiffness
+                    0.85f,        // ankle Roll stiffness
                     0.2f,         // arm stiffness
                     1.0f,         // xOdoScale
                     1.0f,         // yOdoScale

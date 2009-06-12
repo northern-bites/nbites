@@ -19,7 +19,7 @@
 // <http://www.gnu.org/licenses/>.
 //For gaitcommands
 
-#define BOOST_PYTHON_MAX_ARITY 27
+#define BOOST_PYTHON_MAX_ARITY 28
 
 #include <Python.h>
 #include <boost/python.hpp>
@@ -81,7 +81,8 @@ public:
                    const float _tZMPOffY, const float _sZMPOffY,
                    const float maxx, const float maxy, const float maxtheta,
                    const float sensorFeedback, const float maxStiffness,
-                   const float kneeStiffness, const float ankleStiffness,
+                   const float kneeStiffness, const float anklePitchStiffness,
+                   const float ankleRollStiffness,
                    const float armStiffness, const float xOdoScale,
                    const float yOdoScale, const float thetaOdoScale,
                    const float armAmplitude)
@@ -96,7 +97,8 @@ public:
                                   _tZMPOffY, _sZMPOffY,
                                   maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD,
                                   sensorFeedback, maxStiffness,
-                                  kneeStiffness,ankleStiffness, armStiffness,
+                                  kneeStiffness,anklePitchStiffness,
+                                  ankleRollStiffness,armStiffness,
                                   xOdoScale,yOdoScale,thetaOdoScale,
                                   armAmplitude*TO_RAD))
         {
@@ -336,7 +338,7 @@ BOOST_PYTHON_MODULE(_motion)
                           float, float, float, float,
                           float, float, float, float,
                           float, float, float, float,
-                          float, float>(
+                          float, float, float>(
 "A container for setting the walking gait of the robot. "
 "(bodyHeight,hipOffsetX,XAngleOffset,stepDuration,doubleSupportFraction,"
 "stepHeight,"
