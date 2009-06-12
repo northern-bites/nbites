@@ -66,10 +66,11 @@ class Teammate:
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
-        self.grabbing = (packet.ballDist <=
+        self.grabbing = (0 < packet.ballDist <=
                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         #potential problem when goalie is grabbing?
-        self.dribbling = (packet.ballDist <=
+        #only going to be dribbling or grabbing if you see the ball
+        self.dribbling = (0 < packet.ballDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.lastPacketTime = self.brain.playbook.time
 
@@ -82,6 +83,7 @@ class Teammate:
         my = self.brain.my
         ball = self.brain.ball
 
+        self.playerNumber = self.brain.my.playerNumber
         self.x = my.x
         self.y = my.y
         self.h = my.h
@@ -101,9 +103,10 @@ class Teammate:
         self.ballLocBearing = ball.locBearing
         self.active = (not self.brain.gameController.currentState ==
                        'gamePenalized')
-        self.dribbling = (ball.dist <=
+        #only going to be dribbling or grabbing if you see the ball
+        self.dribbling = (0 < ball.dist <=
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
-        self.grabbing = (ball.dist <=
+        self.grabbing = (0 < ball.dist <=
                           NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         self.lastPacketTime = self.brain.playbook.time
 
@@ -198,7 +201,7 @@ class Teammate:
         however, the dog could still be on but sending really laggy packets.
         '''
         return (PBConstants.PACKET_DEAD_PERIOD <
-                    self.brain.playbook.time - self.lastPacketTime)
+                (self.brain.playbook.time - self.lastPacketTime))
 
     def __str__(self):
         return "I am player number " + self.playerNumber

@@ -10,7 +10,7 @@ TEST_DEFENDER = False
 TEST_OFFENDER = False
 TEST_CHASER = False
 # Print information as to how the chaser is determined
-DEBUG_DET_CHASER = False
+DEBUG_DET_CHASER = True
 DEBUG_DET_SUPPORTER = False
 DEBUG_SEARCHER = False
 
