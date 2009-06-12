@@ -8,9 +8,11 @@ import man.motion.StiffnessModes as StiffnessModes
 import KickingConstants as Constants
 import ChaseBallConstants
 from .. import NogginConstants
+import ChaseBallTransitions
 from math import fabs
+from ..util.MyMath import getRelativeBearing
 
-def decideKick(player):
+def getKickInfo(player):
     """
     Decides which kick to use
     """
@@ -31,12 +33,17 @@ def decideKick(player):
     player.kickDecider.calculate()
 
     if not player.brain.ball.on:
-        if player.brain.ball.framesOff < 120: # HACK, should be constant, or better value
+        if player.brain.ball.framesOff < 100: # HACK, should be constant
             return player.stay()
         else :
             return player.goLater('scanFindBall')
 
-    player.kickDecider.ballForeWhichFoot()
+    return player.goNow('decideKick')
+
+def decideKick(player):
+
+    if ChaseBallTransitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
 
     # Get references to the collected data
     myLeftPostBearing =  player.kickDecider.myLeftPostBearing
@@ -144,10 +151,16 @@ def decideKick(player):
 
     else:
         # use localization for kick
-        if player.brain.my.h < -Constants.MAX_FORWARD_KICK_ANGLE:
+        my = player.brain.my
+        bearingToGoal = getRelativeBearing(my.x, my.y, my.h,
+                                           NogginConstants.OPP_GOALBOX_RIGHT_X,
+                                           NogginConstants.OPP_GOALBOX_MIDDLE_Y)
+
+        print "my bearing to goal is ",bearingToGoal
+        if bearingToGoal > Constants.MAX_FORWARD_KICK_ANGLE:
             if Constants.DEBUG_KICKS: print "\t\t Left 7"
             return player.goLater('kickBallLeft')
-        elif player.brain.my.h > Constants.MAX_FORWARD_KICK_ANGLE:
+        elif bearingToGoal < -Constants.MAX_FORWARD_KICK_ANGLE:
             if Constants.DEBUG_KICKS: print "\t\t Right 7"
             return player.goLater('kickBallRight')
         else:
@@ -161,6 +174,8 @@ def kickBallStraight(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.printf("We should kick straight!", 'cyan')
+        player.kickDecider.ballForeWhichFoot()
+
 
         ballForeFoot = player.kickDecider.ballForeFoot
         if ballForeFoot == Constants.LEFT_FOOT or \
@@ -174,7 +189,7 @@ def kickBallStraight(player):
             return player.goNow('kickBallExecute')
 
         else :                  # INCORRECT_POS
-            return player.goLater('positionForKick')
+            return player.goLater('decideKick')
 
 def kickBallLeft(player):
     """
@@ -193,7 +208,11 @@ def kickBallRight(player):
 
 
 def sideStepForKick(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
     # Which foot is the ball in front of?
+    player.kickDecider.ballForeWhichFoot()
     ballForeFoot = player.kickDecider.ballForeFoot
 
     if ballForeFoot == Constants.MID_RIGHT or \
@@ -210,7 +229,7 @@ def sideStepForKick(player):
 
     # Ball must be in wrong place
     else :
-        return player.goLater('positionForKick')
+        return player.goLater('decideKick')
 
 def stepRightForKick(player):
 
@@ -341,7 +360,8 @@ class KickDecider:
     def ballForeWhichFoot(self):
         ball = self.player.brain.ball
 
-        if not (Constants.MAX_KICK_X > ball.relX > Constants.MIN_KICK_X):
+        if not (Constants.MAX_KICK_X > ball.relX > Constants.MIN_KICK_X) or \
+                ball.dist == 0.0:
             self.ballForeFoot = Constants.INCORRECT_POS
 
         elif Constants.LEFT_FOOT_L_Y > ball.relY >= Constants.LEFT_FOOT_R_Y:

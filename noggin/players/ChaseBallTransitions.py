@@ -126,7 +126,8 @@ def shouldntStopChasing(player):
     """
     Dont switch out of chaser in certain circumstances
     """
-    return (player.currentState == 'decideKick' or
+    return (player.currentState == 'getKickInfo' or
+            player.currentState == 'decideKick' or
             player.currentState == 'kickBallStraight' or
             player.currentState == 'kickBallLeft' or
             player.currentState == 'kickBallRight' or

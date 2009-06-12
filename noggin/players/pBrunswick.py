@@ -35,6 +35,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.trackingBall = False
 
         self.chosenKick = None
+        self.kickDecider = None
 
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':
