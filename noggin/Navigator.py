@@ -52,6 +52,8 @@ class Navigator(FSA.FSA):
         self.stepY = 0
         self.stepTheta = 0
 
+        self.orbitDir = None
+
     def orthoGoTo(self, x,y,h):
         '''
         takes in a relative bearing [-180...0...180],
@@ -165,3 +167,7 @@ class Navigator(FSA.FSA):
 
     def isStopped(self):
         return self.currentState == 'stopped'
+
+    def orbit(self, orbitDir):
+        self.orbitDir = orbitDir
+        self.switchTo('orbitPoint')

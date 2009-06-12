@@ -318,3 +318,12 @@ def stop(nav):
 def stopped(nav):
     nav.walkX = nav.walkY = nav.walkTheta = 0
     return nav.stay()
+
+def orbitPoint(nav):
+    if nav.firstFrame():
+        nav.setSpeed(0,
+                     nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
+                     nav.orbitDir*constants.ORBIT_SPIN_SPEED )
+    return nav.stay()
+
+

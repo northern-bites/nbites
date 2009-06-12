@@ -46,8 +46,6 @@ def decideKick(player):
 
     player.printf(player.kickDecider)
 
-
-
     # Things to do if we saw our own goal
     # Saw the opponent goal
     if player.kickDecider.sawOppGoal:
@@ -69,6 +67,7 @@ def decideKick(player):
         elif oppLeftPostBearing is not None:
             KICK_LEFT_BEARING_THRESH = 60
             KICK_RIGHT_BEARING_THRESH = -10
+
             if oppLeftPostBearing > KICK_LEFT_BEARING_THRESH:
                 if Constants.DEBUG_KICKS: print ("\t\t Left 6.1")
                 return player.goLater('kickBallLeft')
@@ -82,6 +81,7 @@ def decideKick(player):
         elif oppRightPostBearing is not None:
             KICK_LEFT_BEARING_THRESH = 10
             KICK_RIGHT_BEARING_THRESH = -60
+
             if oppRightPostBearing > KICK_LEFT_BEARING_THRESH:
                 if Constants.DEBUG_KICKS: print ("\t\t Right 6.1")
                 return player.goLater('kickBallLeft')
@@ -97,13 +97,19 @@ def decideKick(player):
 
     elif player.kickDecider.sawOwnGoal:
         if Constants.SUPER_SAFE_KICKS:
-            return player.goLater('ignoreOwnGoal')
+            return player.goLater('orbitBall')
 
         # We see both posts
         if myLeftPostBearing is not None and myRightPostBearing is not None:
             # Goal in front
-            if myRightPostBearing > myLeftPostBearing > 0:
+            avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
+
+            ORBIT_BEARING_THRESH = 45
+            if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
+                if Constants.DEBUG_KICKS: print ("\t\torbit!")
+                return player.goLater('orbitBall')
                 # kick right
+            elif avgMyGoalBearing > 0:
                 if Constants.DEBUG_KICKS: print ("\t\tright 1")
                 return player.goLater('kickBallRight')
             else:
@@ -134,7 +140,7 @@ def decideKick(player):
                 return player.goLater('kickBallRight')
         else:
             # don't do anything
-            return player.goLater('ignoreOwnGoal')
+            return player.goLater('orbitBall')
 
     else:
         # use localization for kick
@@ -241,6 +247,7 @@ def afterKick(player):
     """
     # trick the robot into standing up instead of leaning to the side
     player.walkPose()
+    player.brain.tracker.trackBall()
 
     if player.brain.nav.isStopped():
         return player.goLater("chase")
@@ -334,7 +341,10 @@ class KickDecider:
     def ballForeWhichFoot(self):
         ball = self.player.brain.ball
 
-        if Constants.LEFT_FOOT_L_Y > ball.relY >= Constants.LEFT_FOOT_R_Y:
+        if not (Constants.MAX_KICK_X > ball.relX > Constants.MIN_KICK_X):
+            self.ballForeFoot = Constants.INCORRECT_POS
+
+        elif Constants.LEFT_FOOT_L_Y > ball.relY >= Constants.LEFT_FOOT_R_Y:
             self.ballForeFoot = Constants.LEFT_FOOT
 
         elif Constants.LEFT_FOOT_R_Y > ball.relY >= 0:

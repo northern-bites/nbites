@@ -5,6 +5,7 @@ Here we house all of the state methods used for chasing the ball
 import man.noggin.util.MyMath as MyMath
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from .. import NavConstants
 from math import fabs
 
 def chase(player):
@@ -122,7 +123,6 @@ def positionForKick(player):
         sY = 0.0
 
     if transitions.shouldApproachForKick(player):
-        print "should approach for kick"
         targetX = (ball.relX -
                    (constants.BALL_KICK_LEFT_X_CLOSE +
                     constants.BALL_KICK_LEFT_X_FAR) / 2.0)
@@ -209,7 +209,24 @@ def orbitBall(player):
     """
     Method to spin around the ball before kicking
     """
-    pass
+    my = player.brain.my
+
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+        if my.h < 0:
+            orbitDir = NavConstants.ORBIT_LEFT
+        else :
+            orbitDir = NavConstants.ORBIT_RIGHT
+        player.brain.nav.orbit(orbitDir)
+
+    if player.counter > constants.ORBIT_BALL_STEP_FRAMES:
+        player.stopWalking()
+
+        if player.brain.nav.isStopped():
+            return player.goLater('decideKick')
+
+    return player.stay()
 
 def steps(player):
     if player.brain.nav.isStopped():
