@@ -163,7 +163,8 @@ BallEKF.o :$(BALLEKF_SRCS) EKF.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 LocEKF.o :$(LOCEKF_SRCS) EKF.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-
+EKF.o : $(EKF_SRCS) EKF.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 .Phony : clean
 
 clean :
