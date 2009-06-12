@@ -66,11 +66,15 @@ class Teammate:
         self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
-        self.grabbing = (0 < packet.ballDist <=
+        self.grabbing = (0 < self.ballDist <=
+                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING) or\
+                        (0 < self.ballLocDist <=
                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         #potential problem when goalie is grabbing?
         #only going to be dribbling or grabbing if you see the ball
-        self.dribbling = (0 < packet.ballDist <=
+        self.dribbling = (0 < self.ballDist <=
+                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING) or\
+                          (0 < self.ballLocDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.lastPacketTime = self.brain.playbook.time
 
@@ -162,13 +166,14 @@ class Teammate:
 
     def getChaseTime(self):
         # if the robot sees the ball use visual distances to ball
-        ballDist = None
+        time = 0.0
         if self.ballDist > 0:
-            ballDist = self.ballDist
+            time += (self.ballDist / PBConstants.CHASE_SPEED) *\
+                PBConstants.SEC_TO_MILLIS
         else: # use loc distances if no visual ball
-            ballDist = self.ballLocDist
-
-        return ballDist
+            time += (self.ballLocDist / PBConstants.CHASE_SPEED) *\
+                PBConstants.SEC_TO_MILLIS
+        return time
 
     def hasBall(self):
         return (self.dribbling or self.grabbing)

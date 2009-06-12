@@ -226,34 +226,36 @@ class GoTeam:
     def determineChaser(self):
         '''return the player number of the chaser'''
 
-        chaser_mate = self.teammates[self.me.playerNumber-1]
+        chaser_mate = self.me
 
         if PBConstants.DEBUG_DET_CHASER:
-            self.printf(("chaser det: me == #", self.brain.my.playerNumber))
+            self.printf(("chaser det: me == #%g"% self.brain.my.playerNumber))
+
+        #save processing time and skip the rest if we have the ball
+        if self.me.hasBall(): #and self.me.isChaser()?
+            return chaser_mate
 
         # scroll through the teammates
         for mate in self.activeFieldPlayers:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf(("\t mate #", mate.playerNumber))
 
-            #dangerous- two players might both have ball, both would stay chaser
-            #same as the aibo code but thresholds for hasBall are higher now
-            if mate.hasBall():
-                if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("have ball")
-                chaser_mate = mate
-
             # If the player number is me, or our ball models are super divergent ignore
-            elif (mate.playerNumber == self.me.playerNumber or
+            if (mate.playerNumber == self.me.playerNumber or
                 fabs(mate.ballY - self.brain.ball.y) >
                 PBConstants.BALL_DIVERGENCE_THRESH or
                 fabs(mate.ballX - self.brain.ball.x) >
                 PBConstants.BALL_DIVERGENCE_THRESH):
 
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf(("Ball models are divergent, or its me"))
+                    self.printf(("Ball models are divergent, or it's me"))
                 continue
-
+            #dangerous- two players might both have ball, both would stay chaser
+            #same as the aibo code but thresholds for hasBall are higher now
+            elif mate.hasBall():#and self.me.isChaser()?
+                if PBConstants.DEBUG_DET_CHASER:
+                    self.printf("mate %g has ball" % mate.playerNumber)
+                chaser_mate = mate
             else:
                 mate.chaseTime = mate.getChaseTime()
                 # Tie break stuff
@@ -269,7 +271,7 @@ class GoTeam:
                       self.lastRole == PBConstants.CHASER)) and
                     mate.playerNumber < self.me.playerNumber):
                     if PBConstants.DEBUG_DET_CHASER:
-                        print ("\t #%d @ %g >= #%d @ %g" %
+                        self.printf("\t #%d @ %g >= #%d @ %g" %
                                (mate.playerNumber, mate.chaseTime,
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
@@ -286,11 +288,11 @@ class GoTeam:
                     if mate.chaseTime < chaser_mate.chaseTime:
                         chaser_mate = mate
 
-            if PBConstants.DEBUG_DET_CHASER:
-                self.printf (("\t #%d @ %g >= #%d @ %g" %
-                       (mate.playerNumber, mate.ballDist,
-                        chaser_mate.playerNumber,
-                        chaser_mate.ballDist)))
+                    if PBConstants.DEBUG_DET_CHASER:
+                        self.printf (("\t #%d @ %g >= #%d @ %g" %
+                                      (mate.playerNumber, mate.ballDist,
+                                       chaser_mate.playerNumber,
+                                       chaser_mate.ballDist)))
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf ("\t ---- MATE %g WINS" % (chaser_mate.playerNumber))
