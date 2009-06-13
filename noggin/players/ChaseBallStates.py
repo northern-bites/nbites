@@ -171,7 +171,7 @@ def waitBeforeKick(player):
         player.brain.tracker.trackBall()
         return player.goLater('positionForKick')
     else:
-        return player.goLater('decideKick')
+        return player.goLater('getKickInfo')
 
 def ignoreOwnGoal(player):
     """
@@ -224,7 +224,7 @@ def orbitBall(player):
         player.stopWalking()
 
         if player.brain.nav.isStopped():
-            return player.goLater('decideKick')
+            return player.goLater('getKickInfo')
 
     return player.stay()
 
