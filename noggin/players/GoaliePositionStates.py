@@ -5,7 +5,7 @@ import man.noggin.util.MyMath as MyMath
 import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15.
-ORTHO_GOTO_THRESH = NogginConstants.CENTER_FIELD_X/2
+ORTHO_GOTO_THRESH = 100.0
 STRAFE_ONLY = True
 STRAFE_SPEED = 6
 STRAFE_STEPS = 5
@@ -18,6 +18,7 @@ def goaliePosition(player):
     brain = player.brain
     ball = brain.ball
     nav = brain.nav
+    my = brain.my
 
     if 0 < ball.locDist <= PBConstants.BALL_LOC_LIMIT*(3./4.):
         brain.tracker.trackBall()
@@ -25,8 +26,8 @@ def goaliePosition(player):
         brain.tracker.activeLoc()
 
     position = player.brain.playbook.position
-    useOrtho = True #(MyMath.dist(brain.my.x, brain.my.y, position[0],
-                                   #position[1]) <= ORTHO_GOTO_THRESH)
+    useOmni = (MyMath.dist(my.x, my.y, position[0],
+                           position[1]) <= ORTHO_GOTO_THRESH)
     relY = ball.relY
 
     if player.firstFrame():
@@ -38,14 +39,14 @@ def goaliePosition(player):
                 nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
         else:
-            if useOrtho:
+            if useOmni:
                 nav.omniGoTo(position[0], position[1],
                               NogginConstants.OPP_GOAL_HEADING)
             else:
                 nav.goTo(position[0], position[1],
                          NogginConstants.OPP_GOAL_HEADING)
     elif nav.destX != position[0] or nav.destY != position[1] or\
-        useOrtho!=nav.movingOrtho:
+        useOmni!=nav.movingOmni:
         if STRAFE_ONLY:
             if relY > CENTER_SAVE_THRESH and nav.isStopped():
                 nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
@@ -54,13 +55,13 @@ def goaliePosition(player):
                 nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
         else:
-           if useOrtho:
-               nav.omniGoTo(position[0], position[1],
+            if useOmni:
+                nav.omniGoTo(position[0], position[1],
                              NogginConstants.OPP_GOAL_HEADING)
-           else:
-               nav.goTo(position[0], position[1],
-                        NogginConstants.OPP_GOAL_HEADING)
-        # we're at the point, let's switch to another state
+            else:
+                nav.goTo(position[0], position[1],
+                         NogginConstants.OPP_GOAL_HEADING)
+    # we're at the point, let's switch to another state
     if nav.isStopped() and player.counter > 0:
         return player.goLater('goalieAtPosition')
 

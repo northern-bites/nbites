@@ -104,7 +104,9 @@ def getSpinDir(myH, targetH):
     LEFT_SPIN = 1
     RIGHT_SPIN = -1
     spin = 0
-    if targetH == 0:
+    if abs(myH - targetH) < 5:
+        spin = 0
+    elif targetH == 0:
         spin = -sign(h)
     elif targetH == (180 or -180):
         spin = sign(h)
