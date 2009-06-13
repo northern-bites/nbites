@@ -5,6 +5,8 @@ from .util import FSA
 import man.motion as motion
 from man.motion import MotionConstants
 import util.MyMath as MyMath
+from man.motion import StiffnessModes
+from math import fabs
 
 #constants need to go in another file.
 #maybe auto generated on boot?
@@ -13,6 +15,8 @@ TRACKING = 'tracking'
 LOC_PANS = 'locPans'
 
 PAN_LEFT_ONCE = 'panLeftOnce'
+
+MAX_PAN_SPEED = 60              # deg/sec
 
 class HeadTracking(FSA.FSA):
     def __init__(self, brain):
@@ -26,8 +30,13 @@ class HeadTracking(FSA.FSA):
         self.setPrintStateChanges(False)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
-        self.activePanDir = False
+
         self.currentHeadScan = None
+
+        self.activePanDir = False
+        self.activeLocOn = False
+        self.activePanOut = False
+        self.preActivePanHeads = None
 
     def ballTrackingHelper(self,args):
         self.target = None
@@ -57,6 +66,7 @@ class HeadTracking(FSA.FSA):
            self.switchTo('ballTracking')
 
     def locPans(self):
+        self.activeLocOn = False
         self.stopHeadMoves()
         self.switchTo('locPans')
 
@@ -96,17 +106,17 @@ class HeadTracking(FSA.FSA):
     def activeLoc(self):
         self.target = self.brain.ball
         self.gain = 1.0
-        if(self.currentState != 'panLeftOnce' or self.currentState != 'panRightOnce' or
-           self.currentState != 'activeTracking' or self.currentState != 'activeLocScan'):
-           self.switchTo('activeTracking')
+        if( not self.activeLocOn ):
+            self.switchTo('activeTracking')
 
     def trackObject(self):
         """
-        Method to actually perform the tracking.  Should only be called explicitly from state
+        Method to actually perform the tracking.
+        Should only be called explicitly from state
         methods in TrackingStates.py
         """
-        if self.firstFrame():
-            self.brain.motion.stopHeadMoves()
+        #if self.firstFrame():
+         #   self.brain.motion.stopHeadMoves()
 
         (changeX,changeY) = (0.,0.)
         # Find the target's angular distance from the center of the screen
@@ -144,3 +154,21 @@ class HeadTracking(FSA.FSA):
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
             self.switchTo('scanning')
+
+    def panTo(self, heads):
+        """
+        Pan heads at appropriate speed to given heads
+        """
+        motionAngles = self.brain.sensors.motionAngles
+
+        headPitch = motionAngles[MotionConstants.HeadPitch]
+        headYaw = motionAngles[MotionConstants.HeadYaw]
+
+        pitchDiff = fabs(heads[0] - headPitch)
+        yawDiff = fabs(heads[1] - headYaw)
+
+        maxDiff = max(pitchDiff, yawDiff)
+        panTime = maxDiff/MAX_PAN_SPEED
+
+        self.execute( ((heads, panTime, 1,
+                        StiffnessModes.LOW_HEAD_STIFFNESSES),) )

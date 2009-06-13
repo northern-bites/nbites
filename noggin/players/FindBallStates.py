@@ -27,7 +27,6 @@ def spinFindBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        # Stop walking if we need to switch gaits
 
     player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
 
@@ -39,3 +38,4 @@ def spinFindBall(player):
         return player.goLater('turnToBall')
 
     return player.stay()
+
