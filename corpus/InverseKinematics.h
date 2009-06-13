@@ -19,16 +19,25 @@ namespace Kinematics{
     static const int maxAnkleIterations = 60;
     static const int maxHeelIterations = 20;
 
+
+    enum IKOutcome {
+        STUCK = 0,
+        SUCCESS = 1
+    };
+
+    struct IKLegResult {
+        IKOutcome outcome;
+        float angles[6];
+    };
+
     const void clipChainAngles(const ChainID id,
                                float angles[]);
     const float getMinValue(const ChainID id, const int jointNumber);
     const float getMaxValue(const ChainID id, const int jointNumber);
     const NBMath::ufvector3 forwardKinematics(const ChainID id,
                                               const float angles[]);
-    const NBMath::ufmatrix3 buildHeelJacobian(const ChainID chainID,
+    const NBMath::ufmatrix3 buildJacobians(const ChainID chainID,
                                               const float angles[]);
-    const NBMath::ufmatrix3 buildLegJacobian(const ChainID chainID,
-                                             const float angles[]);
 
     // Both adjustment methods return whether the search was successful.
     // The correct angles required to fulfill the goal are returned through
