@@ -226,68 +226,75 @@ class GoTeam:
     def determineChaser(self):
         '''return the player number of the chaser'''
 
-        chaser_mate = self.teammates[self.brain.my.playerNumber-1]
+        chaser_mate = self.me
 
         if PBConstants.DEBUG_DET_CHASER:
-            self.printf(("chaser det: me == #", self.brain.my.playerNumber))
+            self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
+
+        #save processing time and skip the rest if we have the ball
+        if self.me.hasBall(): #and self.me.isChaser()?
+            if PBConstants.DEBUG_DET_CHASER:
+                self.printf("I have the ball")
+            return chaser_mate
 
         # scroll through the teammates
         for mate in self.activeFieldPlayers:
             if PBConstants.DEBUG_DET_CHASER:
-                self.printf(("\t mate #", mate.playerNumber))
+                self.printf("\t mate #%g"% mate.playerNumber)
 
             # If the player number is me, or our ball models are super divergent ignore
-            if (mate.playerNumber == self.brain.my.playerNumber or
+            if (mate.playerNumber == self.me.playerNumber or
                 fabs(mate.ballY - self.brain.ball.y) >
                 PBConstants.BALL_DIVERGENCE_THRESH or
                 fabs(mate.ballX - self.brain.ball.x) >
                 PBConstants.BALL_DIVERGENCE_THRESH):
 
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf(("Ball models are divergent, or its me"))
+                    self.printf("Ball models are divergent, or it's me")
                 continue
-
-            if mate.hasBall():
+            #dangerous- two players might both have ball, both would stay chaser
+            #same as the aibo code but thresholds for hasBall are higher now
+            elif mate.hasBall():#and self.me.isChaser()?
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("have ball")
-                continue
-
-            mate.chaseTime = mate.getChaseTime()
-            # Tie break stuff
-            if self.me.chaseTime < mate.chaseTime:
-                chaseTimeScale = self.me.chaseTime
-            else:
-                chaseTimeScale = mate.chaseTime
-
-            if ((self.me.chaseTime - mate.chaseTime <
-                 PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
-                (self.me.chaseTime - mate.chaseTime <
-                 PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
-                 self.lastRole == PBConstants.CHASER)) and
-                mate.playerNumber < self.me.playerNumber):
-                if PBConstants.DEBUG_DET_CHASER:
-                    print ("\t #%d @ %g >= #%d @ %g" %
-                           (mate.playerNumber, mate.chaseTime,
-                            chaser_mate.playerNumber,
-                            chaser_mate.chaseTime))
-                continue
-
-            elif (mate.playerNumber > self.me.playerNumber and
-                  mate.chaseTime - self.me.chaseTime <
-                  PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
-                  mate.isChaser()):
+                    self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
-
-            # else pick the lowest chaseTime
             else:
-                if mate.chaseTime < chaser_mate.chaseTime:
+                mate.chaseTime = mate.getChaseTime()
+                # Tie break stuff
+                if self.me.chaseTime < mate.chaseTime:
+                    chaseTimeScale = self.me.chaseTime
+                else:
+                    chaseTimeScale = mate.chaseTime
+
+                if ((self.me.chaseTime - mate.chaseTime <
+                     PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
+                     (self.me.chaseTime - mate.chaseTime <
+                      PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
+                      self.lastRole == PBConstants.CHASER)) and
+                    mate.playerNumber < self.me.playerNumber):
+                    if PBConstants.DEBUG_DET_CHASER:
+                        self.printf("\t #%d @ %g >= #%d @ %g" %
+                               (mate.playerNumber, mate.chaseTime,
+                                chaser_mate.playerNumber,
+                                chaser_mate.chaseTime))
+                        continue
+
+                elif (mate.playerNumber > self.me.playerNumber and
+                      mate.chaseTime - self.me.chaseTime <
+                      PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
+                      mate.isChaser()):
                     chaser_mate = mate
 
-            if PBConstants.DEBUG_DET_CHASER:
-                self.printf (("\t #%d @ %g >= #%d @ %g" %
-                       (mate.playerNumber, mate.ballDist,
-                        chaser_mate.playerNumber,
-                        chaser_mate.ballDist)))
+                # else pick the lowest chaseTime
+                else:
+                    if mate.chaseTime < chaser_mate.chaseTime:
+                        chaser_mate = mate
+
+                    if PBConstants.DEBUG_DET_CHASER:
+                        self.printf (("\t #%d @ %g >= #%d @ %g" %
+                                      (mate.playerNumber, mate.chaseTime,
+                                       chaser_mate.playerNumber,
+                                       chaser_mate.chaseTime)))
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf ("\t ---- MATE %g WINS" % (chaser_mate.playerNumber))
@@ -350,23 +357,13 @@ class GoTeam:
                 #reset to false when we get a new packet from mate
                 mate.active = False
             elif (mate.active and (not mate.isGoalie()
-                                 or (mate.isGoalie() and self.pulledGoalie))):
+                                   or (mate.isGoalie() and self.pulledGoalie))):
                 append(mate)
                 self.numActiveFieldPlayers += 1
 
                 # Not using teammate ball reports for now
                 if (mate.ballDist > 0 and PBConstants.USE_FINDER):
                     self.brain.ball.reportBallSeen()
-
-    def getActiveFieldPlayers(self):
-        '''cycles through teammate objects and returns active teammates
-            including me'''
-        active_teammates = []
-        for mate in self.teammates:
-            if (mate.active and (not mate.isGoalie()
-                                 or (mate.isGoalie() and self.pulledGoalie))):
-                active_teammates.append(mate)
-        return active_teammates
 
     def highestActivePlayerNumber(self):
         '''returns true if the player is the highest active player number'''
