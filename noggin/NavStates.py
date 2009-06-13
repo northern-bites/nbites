@@ -11,18 +11,13 @@ def spinToWalkHeading(nav):
     """
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
     headingDiff = abs(nav.brain.my.h - targetH)
-    newSpinDir = MyMath.getSpinDir(nav.brain.my, targetH)
+    newSpinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
         nav.stopSpinToWalkCount = 0
-        nav.noWalkSet = True
         nav.curSpinDir = newSpinDir
         nav.changeSpinDirCounter = 0
-
-    if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if DEBUG: nav.printf("Waiting for walk to stop")
-        return nav.stay()
 
 #     nav.printf("Target heading is " + str(targetH))
 #     nav.printf("Current heading is " + str(nav.brain.my.h))
@@ -48,7 +43,6 @@ def spinToWalkHeading(nav):
                    " newSpinDir is " + str(newSpinDir))
     nav.setSpeed(0, spinDir * constants.GOTO_SPIN_STRAFE,
                  spinDir * constants.GOTO_SPIN_SPEED*nav.getRotScale(headingDiff))
-    nav.noWalkSet = False
 
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
@@ -68,15 +62,8 @@ def walkToPoint(nav):
         nav.setSpeed(0,0,0)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
-        nav.noWalkSet  = True
-
-    if nav.noWalkSet and nav.brain.motion.isWalkActive():
-        if DEBUG: nav.printf("Waiting for walk to stop")
-        return nav.stay()
 
     nav.setSpeed(constants.GOTO_FORWARD_SPEED, 0, 0)
-    nav.noWalkSet = False
-
 
     if nav.atDestination():
         nav.walkToPointCount += 1
@@ -106,21 +93,21 @@ def spinToFinalHeading(nav):
     Stops when at heading
     """
     if nav.firstFrame():
-        nav.noWalkSet  = True
         nav.stopSpinToWalkCount = 0
 
-    targetH = nav.destH#MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
-    headingDiff = abs(nav.brain.my.h - targetH)
-    if DEBUG: nav.printf("Need to spin to %g, heading diff is %g, heading uncert is %g" %
-               (targetH, headingDiff, nav.brain.my.uncertH))
-    spinDir = MyMath.getSpinDir(nav.brain.my, targetH)
+    targetH = nav.destH
+
+    headingDiff = nav.brain.my.h - targetH
+    if DEBUG:
+        nav.printf("Need to spin to %g, heading diff is %g,heading uncert is %g"
+                   % (targetH, headingDiff, nav.brain.my.uncertH))
+    spinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
     strafe = spinDir*constants.GOTO_SPIN_STRAFE
     spin = spinDir*constants.GOTO_SPIN_SPEED*nav.getRotScale(headingDiff)
     if DEBUG: nav.printf("strafe %g, spin %g" % (strafe, spin))
     nav.setSpeed(0, strafe, spin)
 
-    nav.noWalkSet = False
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
         if nav.stopSpinToWalkCount > constants.CHANGE_SPIN_DIR_THRESH:
@@ -139,8 +126,9 @@ def orthoWalkToPoint(nav):
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
     absBearing = abs(bearing)
-    if DEBUG: nav.printf('bearing: %g  absBearing: %g  my.x: %g   my.y: %g  my.h: %g' %
-               (bearing, absBearing, my.x, my.y, my.h))
+    if DEBUG:
+        nav.printf('bearing: %g  absBearing: %g  my.x: %g   my.y: %g  my.h: %g'%
+                   (bearing, absBearing, my.x, my.y, my.h))
     if DEBUG: nav.printf((' nav.destX: ', nav.destX,
                ' nav.destY: ', nav.destY, ' nav.destH: ', nav.destH))
 
@@ -162,7 +150,6 @@ def orthoForward(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
-        nav.noWalkSet  = True
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
@@ -191,7 +178,6 @@ def orthoBackward(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
-        nav.noWalkSet  = True
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
@@ -220,7 +206,6 @@ def orthoRightStrafe(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
-        nav.noWalkSet  = True
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
@@ -249,7 +234,6 @@ def orthoLeftStrafe(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
         nav.switchOrthoCount = 0
-        nav.noWalkSet  = True
 
     if nav.notAtHeading(nav.destH):
         nav.walkToPointSpinCount += 1
@@ -274,6 +258,51 @@ def orthoLeftStrafe(nav):
         return nav.goLater('orthoWalkToPoint')
     return nav.stay()
 
+def omniWalkToPoint(nav):
+    if nav.firstFrame():
+        nav.walkToPointCount = 0
+
+    if nav.atDestinationCloser() and nav.atHeading():
+        nav.walkToPointCount += 1
+        if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
+            return nav.goLater('stop')
+
+    my = nav.brain.my
+    bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX, nav.destY)
+    absBearing = abs(bearing)
+    verSpeed, horSpeed, spinSpeed = 0.0, 0.0, 0.0
+
+    if bearing != None:
+        if absBearing <= 45:
+            vertSpeed = constants.GOTO_FORWARD_SPEED
+            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED*\
+                (absBearing/45.0)
+        elif absBearing <= 90:
+            vertSpeed = constants.GOTO_FORWARD_SPEED*((90 - absBearing)/45.0)
+            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED
+        elif absBearing <= 135:
+            vertSpeed = constants.GOTO_BACKWARD_SPEED*((135-absBearing)/45.0)
+            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED
+        elif absBearing <= 180:
+            vertSpeed = constants.GOTO_BACKWARD_SPEED
+            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED*\
+                ((180-absBearing)/45.0)
+
+        if nav.oScale == -1:
+            nav.oScale = nav.getOScale()
+        vertSpeed = nav.oScale*vertSpeed
+        horSpeed = nav.oScale*horSpeed
+
+    if nav.destH != None:
+        if nav.hScale == -1:
+            nav.hScale = nav.getRotScale(my.h - nav.destH)
+        spinDir = MyMath.getSpinDir(my.h, nav.destH)
+        spinSpeed = constants.GOTO_SPIN_SPEED*spinDir*nav.hScale
+
+    if DEBUG: nav.printf("vertSpeed: %g  horSpeed: %g  spinSpeed: %g" %
+               (vertSpeed, horSpeed, spinSpeed))
+    nav.setSpeed(vertSpeed, horSpeed, spinSpeed)
+    return nav.stay()
 # State to be used with standard setSpeed movement
 def walking(nav):
     """

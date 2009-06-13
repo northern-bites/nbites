@@ -13,20 +13,31 @@ def playbookPosition(player):
     """
     Have the robot navigate to the position reported to it from playbook
     """
-    position = player.brain.playbook.position
-    if player.firstFrame():
-        player.stopWalking()
-        player.brain.tracker.activeLoc()
-        player.printf("I am going to " + str(player.brain.playbook.position))
-        player.brain.nav.goTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+    brain = player.brain
+    position = brain.playbook.position
+    nav = brain.nav
+    my = brain.my
 
-    if player.brain.nav.destX != position[0] or \
-            player.brain.nav.destY != position[1]:
-        player.brain.nav.goTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+    useOmni = False #(MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
+
+    if player.firstFrame():
+        player.brain.tracker.activeLoc()
+        player.printf("I am going to " + str(position))
+        if not useOmni:
+            nav.goTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+        else:
+            nav.omniGoTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+
+    if nav.destX != position[0] or nav.destY != position[1] or\
+            useOmni != nav.movingOmni:
+        if not useOmni:
+            nav.goTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+        else:
+            nav.omniGoTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
         #player.printf("position = "+str(position[0])+" , "+str(position[1]) )
 
     # we're at the point, let's switch to another state
-    if player.brain.nav.isStopped() and player.counter > 0:
+    if nav.isStopped() and player.counter > 0:
         return player.goLater('atPosition')
 
     return player.stay()
@@ -35,6 +46,7 @@ def atPosition(player):
     """
     State for when we're at the position
     """
+    nav = player.brain.nav
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
