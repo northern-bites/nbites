@@ -65,6 +65,7 @@ namespace Kinematics{
 
     const NBMath::ufmatrix3 buildHeelJacobian(const ChainID chainID,
                                               const float angles[]);
+    void hackJointOrder(float angles[]);
 
 };
 #endif

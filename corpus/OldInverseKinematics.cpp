@@ -4,7 +4,7 @@ using namespace boost::numeric;
 using namespace NBMath;
 using namespace std;
 
-void hackJointOrder(float angles[]) {
+void Kinematics::hackJointOrder(float angles[]) {
     float temp = angles[1];
     angles[1] = angles[2];
     angles[2] = temp;
