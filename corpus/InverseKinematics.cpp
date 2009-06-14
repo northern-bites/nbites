@@ -288,7 +288,6 @@ const bool Kinematics::adjustAnkle(const ChainID chainID,
     float dist_e;
     int iterations = 0;
 
-    cout << "Goal is" << goal<<endl;
     while (iterations < maxAnkleIterations) {
         iterations++;
         // Define the Jacobian that describes the linear approximation at the
@@ -301,11 +300,6 @@ const bool Kinematics::adjustAnkle(const ChainID chainID,
                               startAngles);
         const ufvector3 e = goal - currentAnklePosition;
 
-        cout << "Current position is " << currentAnklePosition <<endl;
-        cout << "Current error is " << e <<endl;
-        cout << "Current angles is [";
-        for(int i = 0; i < 6; i++){cout<<startAngles[i]<<",";}
-                cout <<"]"<<endl;
         // Check if we have gotten close enough
         dist_e = norm_2(e);
 
@@ -411,7 +405,6 @@ Kinematics::dls(const ChainID chainID,
 
     bool ankleSuccess =
         adjustAnkle(chainID, ankleGoal, currentAngles, maxError);
-    cout << "Ankle Success " << ankleSuccess<<endl;
 
     // calculate the position of the heel. It should be FOOT_HEIGHT below
     // where the ankle managed to go.
@@ -428,34 +421,4 @@ Kinematics::dls(const ChainID chainID,
     result.outcome = (ankleSuccess && heelSuccess ? SUCCESS : STUCK);
     memcpy(result.angles,currentAngles,LEG_JOINTS*sizeof(float));
     return result;
-}
-
-void inverseKin(){
-
-    const ufvector3 goal = CoordFrame3D::vector3D(0,50,-331);
-    float legAngles[] = {0.0f,0.0f,0.0f,
-                       0.0f,0.0f,0.0f};
-    Kinematics::IKLegResult result =  Kinematics::dls(Kinematics::LLEG_CHAIN,
-                                                      goal, legAngles);
-    for(int i =0; i < 6; i++){
-        cout <<result.angles[i]<<endl;
-    }
-    cout <<"OUtcome "<< result.outcome<<endl;
-
-}
-
-
-void forwardKin(){
-
-    float legAngles[] = {0.0f,0.0f,0.0f,
-                       0.0f,0.0f,0.0f};
-
-    ufvector3 result  = Kinematics::forwardKinematics(Kinematics::LANKLE_CHAIN,
-                                                      legAngles);
-    cout << "FK res " << result<<endl;
-}
-
-int main(){
-    inverseKin();
-    //forwardKin();
 }

@@ -39,6 +39,7 @@ namespace Kinematics{
     const NBMath::ufmatrix3 buildJacobians(const ChainID chainID,
                                               const float angles[]);
 
+
     // Both adjustment methods return whether the search was successful.
     // The correct angles required to fulfill the goal are returned through
     // startAngles by reference.
@@ -55,6 +56,15 @@ namespace Kinematics{
                           const float startAngles[],
                           const float maxError = ACCEPTABLE_ERROR,
                           const float maxHeelError = UNBELIEVABLY_LOW_ERROR);
+
+
+//Depricated methods
+
+    const NBMath::ufmatrix3 buildLegJacobian(const ChainID chainID,
+                                              const float angles[]);
+
+    const NBMath::ufmatrix3 buildHeelJacobian(const ChainID chainID,
+                                              const float angles[]);
 
 };
 #endif

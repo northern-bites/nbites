@@ -1,8 +1,14 @@
 #include <iostream>
-#include "Kinematics.h"
+#include "InverseKinematics.h"
 using namespace boost::numeric;
 using namespace NBMath;
 using namespace std;
+
+void hackJointOrder(float angles[]) {
+    float temp = angles[1];
+    angles[1] = angles[2];
+    angles[2] = temp;
+}
 
 /**
  * This method will destructively clip the chain angles that are passed to it.
@@ -507,11 +513,7 @@ const bool Kinematics::adjustHeel(const ChainID chainID,
     return false;
 }
 
-void Kinematics::hackJointOrder(float angles[]) {
-    float temp = angles[1];
-    angles[1] = angles[2];
-    angles[2] = temp;
-}
+
 
 /*
  * NOTE on a giant hack:
