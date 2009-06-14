@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       145,          7]
-NotebookDataLength[     91024,       2438]
-NotebookOptionsPosition[     90351,       2410]
-NotebookOutlinePosition[     90686,       2425]
-CellTagsIndexPosition[     90643,       2422]
+NotebookDataLength[     77264,       2091]
+NotebookOptionsPosition[     76596,       2063]
+NotebookOutlinePosition[     76931,       2078]
+CellTagsIndexPosition[     76888,       2075]
 WindowFrame->Normal
 ContainsDynamic->False*)
 
@@ -74,81 +74,7 @@ Cell[BoxData[
                 FractionBox["\[Pi]", "4"]}], "]"}], " ", 
               RowBox[{"Sin", "[", "HP", "]"}], " ", 
               RowBox[{"Sin", "[", "HYP", "]"}]}]}], ")"}], " ", 
-           RowBox[{"Sin", "[", "KP", "]"}]}]}], ")"}]}], "-", 
-       RowBox[{"FH", " ", 
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{
-           RowBox[{"Cos", "[", "AR", "]"}], " ", 
-           RowBox[{"(", 
-            RowBox[{
-             RowBox[{
-              RowBox[{"Sin", "[", "AP", "]"}], " ", 
-              RowBox[{"(", 
-               RowBox[{
-                RowBox[{
-                 RowBox[{"Cos", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Cos", "[", "HYP", "]"}]}], "-", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], " ", 
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}]}], ")"}]}], "-", 
-                RowBox[{
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HP", "]"}]}], "+", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}]}], ")"}], " ", 
-                 RowBox[{"Sin", "[", "KP", "]"}]}]}], ")"}]}], "+", 
-             RowBox[{
-              RowBox[{"Cos", "[", "AP", "]"}], " ", 
-              RowBox[{"(", 
-               RowBox[{
-                RowBox[{
-                 RowBox[{"Cos", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HP", "]"}]}], "+", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}]}], ")"}]}], "+", 
-                RowBox[{
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Cos", "[", "HYP", "]"}]}], "-", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], " ", 
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}]}], ")"}], " ", 
-                 RowBox[{"Sin", "[", "KP", "]"}]}]}], ")"}]}]}], ")"}]}], "-",
-           
-          RowBox[{
-           RowBox[{"Sin", "[", "AR", "]"}], " ", 
-           RowBox[{"Sin", "[", "HYP", "]"}], " ", 
-           RowBox[{"Sin", "[", 
-            RowBox[{"HR", "-", 
-             FractionBox["\[Pi]", "4"]}], "]"}]}]}], ")"}]}]}]},
+           RowBox[{"Sin", "[", "KP", "]"}]}]}], ")"}]}]}]},
      {
       RowBox[{
        RowBox[{"-", "HOY"}], "-", 
@@ -231,145 +157,7 @@ Cell[BoxData[
                  RowBox[{"Sin", "[", 
                   RowBox[{"HR", "-", 
                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                 SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}], "-", 
-       RowBox[{"FH", " ", 
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{
-           RowBox[{"-", 
-            RowBox[{"Sin", "[", "AR", "]"}]}], " ", 
-           RowBox[{"(", 
-            RowBox[{
-             FractionBox[
-              RowBox[{"Cos", "[", 
-               RowBox[{"HR", "-", 
-                FractionBox["\[Pi]", "4"]}], "]"}], 
-              SqrtBox["2"]], "-", 
-             FractionBox[
-              RowBox[{
-               RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-               RowBox[{"Sin", "[", 
-                RowBox[{"HR", "-", 
-                 FractionBox["\[Pi]", "4"]}], "]"}]}], 
-              SqrtBox["2"]]}], ")"}]}], "+", 
-          RowBox[{
-           RowBox[{"Cos", "[", "AR", "]"}], " ", 
-           RowBox[{"(", 
-            RowBox[{
-             RowBox[{
-              RowBox[{"Sin", "[", "AP", "]"}], " ", 
-              RowBox[{"(", 
-               RowBox[{
-                RowBox[{
-                 RowBox[{"-", 
-                  RowBox[{"Sin", "[", "KP", "]"}]}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   FractionBox[
-                    RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]], "+", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]]}], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}], "+", 
-                RowBox[{
-                 RowBox[{"Cos", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]], "-", 
-                   RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]]}], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}], "+", 
-             RowBox[{
-              RowBox[{"Cos", "[", "AP", "]"}], " ", 
-              RowBox[{"(", 
-               RowBox[{
-                RowBox[{
-                 RowBox[{"Cos", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   FractionBox[
-                    RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]], "+", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]]}], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}], "+", 
-                RowBox[{
-                 RowBox[{"Sin", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]], "-", 
-                   RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]]}], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}]}], 
-            ")"}]}]}], ")"}]}]}]},
+                 SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}]}]},
      {
       RowBox[{
        RowBox[{"-", "HOZ"}], "-", 
@@ -452,145 +240,7 @@ Cell[BoxData[
                  RowBox[{"Sin", "[", 
                   RowBox[{"HR", "-", 
                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                 SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}], "-", 
-       RowBox[{"FH", " ", 
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{
-           RowBox[{"-", 
-            RowBox[{"Sin", "[", "AR", "]"}]}], " ", 
-           RowBox[{"(", 
-            RowBox[{
-             FractionBox[
-              RowBox[{"Cos", "[", 
-               RowBox[{"HR", "-", 
-                FractionBox["\[Pi]", "4"]}], "]"}], 
-              SqrtBox["2"]], "+", 
-             FractionBox[
-              RowBox[{
-               RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-               RowBox[{"Sin", "[", 
-                RowBox[{"HR", "-", 
-                 FractionBox["\[Pi]", "4"]}], "]"}]}], 
-              SqrtBox["2"]]}], ")"}]}], "+", 
-          RowBox[{
-           RowBox[{"Cos", "[", "AR", "]"}], " ", 
-           RowBox[{"(", 
-            RowBox[{
-             RowBox[{
-              RowBox[{"Sin", "[", "AP", "]"}], " ", 
-              RowBox[{"(", 
-               RowBox[{
-                RowBox[{
-                 RowBox[{"-", 
-                  RowBox[{"Sin", "[", "KP", "]"}]}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]]}], "+", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}], "+", 
-                RowBox[{
-                 RowBox[{"Cos", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]]}], "-", 
-                   RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}], "+", 
-             RowBox[{
-              RowBox[{"Cos", "[", "AP", "]"}], " ", 
-              RowBox[{"(", 
-               RowBox[{
-                RowBox[{
-                 RowBox[{"Cos", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]]}], "+", 
-                   RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}], "+", 
-                RowBox[{
-                 RowBox[{"Sin", "[", "KP", "]"}], " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   RowBox[{"-", 
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HP", "]"}], " ", 
-                    RowBox[{"Sin", "[", "HYP", "]"}]}], 
-                    SqrtBox["2"]]}], "-", 
-                   RowBox[{
-                    RowBox[{"Sin", "[", "HP", "]"}], " ", 
-                    RowBox[{"(", 
-                    RowBox[{
-                    FractionBox[
-                    RowBox[{
-                    RowBox[{"Cos", "[", "HYP", "]"}], " ", 
-                    RowBox[{"Cos", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}]}], 
-                    SqrtBox["2"]], "-", 
-                    FractionBox[
-                    RowBox[{"Sin", "[", 
-                    RowBox[{"HR", "-", 
-                    FractionBox["\[Pi]", "4"]}], "]"}], 
-                    SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}]}], 
-            ")"}]}]}], ")"}]}]}]},
+                 SqrtBox["2"]]}], ")"}]}]}], ")"}]}]}], ")"}]}]}]},
      {"1"}
     },
     GridBoxAlignment->{
@@ -607,7 +257,10 @@ Cell[BoxData[
    MatrixForm[BoxForm`e$]]]], "Output",
  CellChangeTimes->{{3.453902573463025*^9, 3.4539026279352818`*^9}, 
    3.4539026660588017`*^9, 3.45390278321152*^9, 3.453903582748034*^9, 
-   3.4539038215964212`*^9, 3.453909782428619*^9}]
+   3.4539038215964212`*^9, 3.4539109177344313`*^9, {3.4539171597976837`*^9, 
+   3.453917179574657*^9}, {3.45399111132502*^9, 3.45399113319553*^9}, 
+   3.4539918854004107`*^9, 3.4539988275587397`*^9, {3.45399885875922*^9, 
+   3.4539988763264713`*^9}, 3.453998910565434*^9, 3.453998964603917*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -2426,19 +2079,19 @@ CellTagsIndex->{}
 Notebook[{
 Cell[CellGroupData[{
 Cell[590, 23, 240, 5, 32, "Input"],
-Cell[833, 30, 22249, 579, 134, "Output"]
+Cell[833, 30, 8494, 232, 149, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[23119, 614, 174, 3, 32, "Input"],
-Cell[23296, 619, 22249, 579, 134, "Output"]
+Cell[9364, 267, 174, 3, 32, "Input"],
+Cell[9541, 272, 22249, 579, 134, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[45582, 1203, 194, 4, 32, "Input"],
-Cell[45779, 1209, 18106, 508, 135, "Output"]
+Cell[31827, 856, 194, 4, 32, "Input"],
+Cell[32024, 862, 18106, 508, 135, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[63922, 1722, 191, 4, 32, "Input"],
-Cell[64116, 1728, 26219, 679, 135, "Output"]
+Cell[50167, 1375, 191, 4, 32, "Input"],
+Cell[50361, 1381, 26219, 679, 135, "Output"]
 }, Open  ]]
 }
 ]
