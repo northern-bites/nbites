@@ -8,6 +8,7 @@ from ..playbook import PBConstants
 from . import BrunswickStates
 from . import GoaliePositionStates
 from . import GoalieChaseBallStates
+from . import GoalieSaveStates
 from . import ChaseBallTransitions
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -15,6 +16,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieChaseBallStates)
+        self.addStates(GoalieSaveStates)
         self.addStates(PositionStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
@@ -36,6 +38,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.chosenKick = None
         self.kickDecider = None
+
+        self.shouldSaveCounter = 0
+        self.shouldChaseCounter = 0
 
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':

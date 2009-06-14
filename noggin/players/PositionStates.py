@@ -35,6 +35,7 @@ def atPosition(player):
     """
     State for when we're at the position
     """
+    nav = player.brain.nav
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.trackBall()
