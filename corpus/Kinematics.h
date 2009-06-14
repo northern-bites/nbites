@@ -169,16 +169,16 @@ namespace Kinematics {
                                                 {-2.09f,2.09f},
                                                 {0.0f,1.57f}};
 
-    // Order of leg joints: HYPitch HipPitch HipRoll KneePitch APitch ARoll
+    // Order of leg joints: HYPitch HipRoll HipPitch  KneePitch APitch ARoll
     static const float LEFT_LEG_BOUNDS[][2] = {{-1.57f,0.0f},
-                                               {-1.57f,.436f},
                                                {-.349f,.785f},
+                                               {-1.57f,.436f},
                                                {0.0f,2.269f},
                                                {-1.309f,.524f},
                                                {-.785f,.349f}};
     static const float RIGHT_LEG_BOUNDS[][2] = {{-1.57f,0.0f},
-                                                {-1.57f,.436f},
                                                 {-.785f,.349f},
+                                                {-1.57f,.436f},
                                                 {0.0f,2.269f},
                                                 {-1.309f,.524f},
                                                 {-.349f,.785f}};
