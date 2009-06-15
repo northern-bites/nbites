@@ -20,7 +20,6 @@ def scanBall(tracker):
             tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
         else:
             tracker.execute(HeadMoves.LOW_SCAN_BALL)
-
     return tracker.stay()
 
 def scanning(tracker):

@@ -62,7 +62,8 @@ class HeadTracking(FSA.FSA):
     def trackBall(self):
         self.target = self.brain.ball
         self.gain = 1.0
-        if(self.currentState != 'tracking' or self.currentState != 'scanBall'):
+        if (not self.currentState == 'tracking') and\
+                (not self.currentState == 'scanBall'):
            self.switchTo('ballTracking')
 
     def locPans(self):
@@ -117,7 +118,6 @@ class HeadTracking(FSA.FSA):
         """
         #if self.firstFrame():
          #   self.brain.motion.stopHeadMoves()
-
         (changeX,changeY) = (0.,0.)
         # Find the target's angular distance from the center of the screen
         # if we have an object, track that

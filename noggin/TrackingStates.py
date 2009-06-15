@@ -20,11 +20,10 @@ def stop(tracker):
     return tracker.stay()
 
 def ballTracking(tracker): #Super state which handles following/refinding the ball
-
     if tracker.target.framesOff <= TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
-        return tracker.goLater('scanBall')
+        return tracker.goNow('scanBall')
 
 def tracking(tracker):
     ''' state askes it's parent (the tracker) for an object or angles to track
@@ -35,8 +34,6 @@ def tracking(tracker):
     the sweet move conclude and then resume tracking afterward.'''
 
     if tracker.firstFrame():
-        #supersede anything in the motion queue:
-        if DEBUG: tracker.printf("stopping head moves, first frame",'cyan')
         tracker.activeLocOn = False
 
     tracker.trackObject()
@@ -77,6 +74,5 @@ def activeTracking(tracker):
             return tracker.goLater('panRightOnce')
         else:
             return tracker.goLater('panLeftOnce')
-
     return tracker.stay()
 

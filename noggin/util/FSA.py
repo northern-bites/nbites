@@ -117,7 +117,6 @@ class FSA:
 
         As a note: goLater(self.currentState) == stay()
         """
-        self.lastState = self.currentState
         return (NEXT_FRAME, newState)
 
     def firstFrame(self):
@@ -214,7 +213,7 @@ class FSA:
 
         elif self.currentState == newState:
             return
-
+        self.lastState = self.currentState
         self.currentState = newState
 
         self.updateStateInfo()
