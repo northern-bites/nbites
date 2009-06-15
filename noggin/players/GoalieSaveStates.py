@@ -9,10 +9,8 @@ def goalieSave(player):
     player.shouldSaveCounter = 0
     # Figure out where the ball is going and when it will be there
     if ball.on:
-        relX = ball.relX
         relY = ball.relY
     else:
-        relX = ball.locRelX
         relY = ball.locRelY
     # Decide the type of save
     if relY > CENTER_SAVE_THRESH:
@@ -68,11 +66,9 @@ def holdCenterSave(player):
     return player.stay()
 
 def postSave(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.GOALIE_POS)
-        player.brain.tracker.trackBall()
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.GOALIE_POS):
-        roleState = player.getRoleState(player.currentRole)
-        return player.goLater(roleState)
-
-    return player.stay()
+    player.walkPose()
+    #if player.brain.ball.on:
+    player.brain.tracker.trackBall()
+    #else: do not yet created postSaveScan
+    roleState = player.getRoleState(player.currentRole)
+    return player.goLater(roleState)

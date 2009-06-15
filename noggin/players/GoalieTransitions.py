@@ -16,16 +16,16 @@ def shouldSave(player):
     relVelX = ball.relVelX
     relVelY = ball.relVelY
     if relVelX < 0.0:
-      timeUntilSave = relX / -relVelX
-      '''player.printf(("relVelX = ", relVelX, " relVelY = ", relVelY,
-              " timeUntilSave = ", timeUntilSave,
-              " anticipatedY = ", anticipatedY))'''
+        timeUntilSave = relX / -relVelX
     else:
-      timeUntilSave = -1
+        timeUntilSave = -1
+        '''player.printf(("relVelX = ", relVelX, " relVelY = ", relVelY,
+        " timeUntilSave = ", timeUntilSave,
+        " anticipatedY = ", anticipatedY))'''
     # No Time, Save now
     if (timeUntilSave < BALL_SAVE_LIMIT_TIME and
         ball.framesOn > 3. and relVelX < 0.
-        and relX < MOVE_TO_SAVE_DIST_THRESH):
+        and 0 < relX < MOVE_TO_SAVE_DIST_THRESH):
         #player.brain.sensors.saveFrame()
         #player.printf("relVelX = %g  relVelY = %g  timeUntilSave = %g" %
                       #(relVelX, relVelY, timeUntilSave))
@@ -48,8 +48,8 @@ def shouldHoldSave(player):
         timeUntilSave = relX/ -relVelX
     else:
         timeUntilSave = -1
-    if timeUntilSave < BALL_SAVE_LIMIT_TIME*2 and relVelX < 0 and\
-        relX < MOVE_TO_SAVE_DIST_THRESH:
+    if 0 < timeUntilSave < BALL_SAVE_LIMIT_TIME*2 and relVelX < 0 and\
+            0 < relX < MOVE_TO_SAVE_DIST_THRESH:
         return True
     return False
 
