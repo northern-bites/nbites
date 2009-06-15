@@ -148,7 +148,7 @@ def positionForKick(player):
 #                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
 
     if ball.on:
-        player.setSpeed(0,sY,sX)
+        player.setSpeed(sX,sY,0)
 
     return player.stay()
 
