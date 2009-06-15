@@ -44,64 +44,51 @@ HeadProvider::HeadProvider(float motionFrameLength,
 	  pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f),
 	  headSetStiffness(0.6f)
 {
-    pthread_mutex_init (&scripted_mode_mutex, NULL);
-    pthread_mutex_init (&set_mode_mutex, NULL);
+    pthread_mutex_init (&head_provider_mutex, NULL);
 }
 
 
 // Motion Provider Methods
 HeadProvider::~HeadProvider() {
-    pthread_mutex_destroy(&scripted_mode_mutex);
-    pthread_mutex_destroy(&set_mode_mutex);
+    pthread_mutex_destroy(&head_provider_mutex);
     // remove all remaining values from chain queues
 }
 
 void HeadProvider::requestStopFirstInstance() {
     // Finish motion or stop immediately?
     //For the head, we will stop immediately:
-    pthread_mutex_lock(&scripted_mode_mutex);
-    pthread_mutex_lock(&set_mode_mutex);
-
+    pthread_mutex_lock(&head_provider_mutex);
     stopScripted();
     stopSet();
     setActive();
-
-    pthread_mutex_unlock(&set_mode_mutex);
-    pthread_mutex_unlock(&scripted_mode_mutex);
+    pthread_mutex_unlock(&head_provider_mutex);
 
 }
 
 void HeadProvider::hardReset(){
-    pthread_mutex_lock(&scripted_mode_mutex);
-    pthread_mutex_lock(&set_mode_mutex);
-
+    pthread_mutex_lock(&head_provider_mutex);
     stopScripted();
     stopSet();
     setActive();
-
-    pthread_mutex_unlock(&set_mode_mutex);
-    pthread_mutex_unlock(&scripted_mode_mutex);
+    pthread_mutex_unlock(&head_provider_mutex);
 }
 
 
 //Method called during the 'SCRIPTED' mode
 void HeadProvider::calculateNextJointsAndStiffnesses() {
 	PROF_ENTER(profiler,P_HEAD);
+	pthread_mutex_lock(&head_provider_mutex);
     switch(curMode){
     case SCRIPTED:
-        pthread_mutex_lock(&scripted_mode_mutex);
         scriptedMode();
-        pthread_mutex_unlock(&scripted_mode_mutex);
         break;
     case SET:
-        pthread_mutex_lock(&set_mode_mutex);
         setMode();
-        pthread_mutex_unlock(&set_mode_mutex);
         break;
 
     }
-
     setActive();
+	pthread_mutex_unlock(&head_provider_mutex);
 	PROF_EXIT(profiler,P_HEAD);
 }
 
@@ -145,35 +132,40 @@ void HeadProvider::scriptedMode(){
         setNextHeadCommand();
 
     if (!currCommand->isDone() ) {
-        setNextChainJoints( HEAD_CHAIN, currCommand->getNextJoints(HEAD_CHAIN) );
+        setNextChainJoints( HEAD_CHAIN,
+							currCommand->getNextJoints(HEAD_CHAIN) );
+		setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
+								 currCommand->getStiffness(
+									 Kinematics::HEAD_CHAIN) );
+
     }
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
+		setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
+								 vector<float>(HEAD_JOINTS, 0.0f) );
     }
-	setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
-							 currCommand->getStiffness(Kinematics::HEAD_CHAIN) );
 
 
 }
 
 void HeadProvider::setCommand(const SetHeadCommand *command) {
-    pthread_mutex_lock(&set_mode_mutex);
+    pthread_mutex_lock(&head_provider_mutex);
     transitionTo(SET);
     yawDest = command->getYaw();
     pitchDest = command->getPitch();
 	yawMaxSpeed = command->getMaxSpeedYaw();
 	pitchMaxSpeed = command->getMaxSpeedPitch();
     setActive();
-    pthread_mutex_unlock(&set_mode_mutex);
+    pthread_mutex_unlock(&head_provider_mutex);
 }
 
 void HeadProvider::setCommand(const HeadJointCommand *command) {
-	pthread_mutex_lock(&scripted_mode_mutex);
+	pthread_mutex_lock(&head_provider_mutex);
     transitionTo(SCRIPTED);
 
     headCommandQueue.push(command); //HACK this should probably be mutexed
     setActive();
-    pthread_mutex_unlock(&scripted_mode_mutex);
+    pthread_mutex_unlock(&head_provider_mutex);
 }
 
 void HeadProvider::enqueueSequence(std::vector<HeadJointCommand*> &seq) {
