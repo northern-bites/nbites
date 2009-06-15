@@ -391,8 +391,8 @@ namespace Kinematics {
     static const float FOOT_MASS_g  = 158.0f;
     static const float TOTAL_MASS  =
         CHEST_MASS_g + HEAD_MASS_g +
-        UPPER_ARM_MASS_g + LOWER_ARM_MASS_g + THIGH_MASS_g +
-        TIBIA_MASS_g + FOOT_MASS_g;
+        2.0f*(UPPER_ARM_MASS_g + LOWER_ARM_MASS_g + THIGH_MASS_g +
+              TIBIA_MASS_g + FOOT_MASS_g);
 
     //The locations of the massses are translated from their
     //global coordinate frame into the local frame in tuples like
@@ -415,14 +415,14 @@ namespace Kinematics {
         {-THIGH_MASS_Z, 0.0f, 0.0f, THIGH_MASS_g},
         {-TIBIA_MASS_Z, 0.0f, 0.0f, TIBIA_MASS_g},
         {0.0f, 0.0f, 0.0f, 0.0f},
-        {-FOOT_MASS_Z, -FOOT_MASS_X, 0.0f, FOOT_MASS_g}}; 
+        {-FOOT_MASS_Z,  0.0f, FOOT_MASS_X, FOOT_MASS_g}}; 
     static const float RIGHT_LEG_INERTIAL_POS[6][4] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f, 0.0f},
         {-THIGH_MASS_Z, 0.0f, 0.0f, THIGH_MASS_g},
         {-TIBIA_MASS_Z, 0.0f, 0.0f, TIBIA_MASS_g},
         {0.0f, 0.0f, 0.0f, 0.0f},
-        {-FOOT_MASS_Z, -FOOT_MASS_X, 0.0f, FOOT_MASS_g}};
+        {-FOOT_MASS_Z, 0.0f, FOOT_MASS_X, FOOT_MASS_g}};
     static const float RIGHT_ARM_INERTIAL_POS[4][4] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         { 0.0f, -UPPER_ARM_MASS_X, 0.0f, UPPER_ARM_MASS_g},
