@@ -99,6 +99,7 @@ class Navigator(FSA.FSA):
         """
         Wrapper method to easily change the walk vector of the robot
         """
+        self.walkX, self.walkY, self.walkTheta = x, y, theta
         walk = motion.WalkCommand(x=x,y=y,theta=theta)
         self.brain.motion.setNextWalkCommand(walk)
 
@@ -171,3 +172,7 @@ class Navigator(FSA.FSA):
     def orbit(self, orbitDir):
         self.orbitDir = orbitDir
         self.switchTo('orbitPoint')
+
+    def orbitAngle(self, angleToOrbit):
+        self.angleToOrbit = angleToOrbit
+        self.switchTo('orbitPointThruAngle')

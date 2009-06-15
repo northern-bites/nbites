@@ -2,6 +2,7 @@
 
 from .util import MyMath
 import NavConstants as constants
+from math import fabs
 
 DEBUG = False
 # States for the standard spin - walk - spin go to
@@ -327,3 +328,36 @@ def orbitPoint(nav):
     return nav.stay()
 
 
+def orbitPointThruAngle(nav):
+    """
+    Circles around a point in front of robot, for a certain angle
+    """
+    if nav.firstFrame():
+        if nav.angleToOrbit < 0:
+            nav.orbitDir = constants.ORBIT_LEFT
+        else:
+            nav.orbitDir = constants.ORBIT_RIGHT
+
+        if fabs(nav.angleToOrbit) <= constants.ORBIT_SMALL_ANGLE:
+            sY = constants.ORBIT_STRAFE_SPEED * constants.ORBIT_SMALL_GAIN
+            sT = constants.ORBIT_SPIN_SPEED * constants.ORBIT_SMALL_GAIN
+
+        elif fabs(nav.angleToOrbit) <= constants.ORBIT_LARGE_ANGLE:
+            sY = constants.ORBIT_STRAFE_SPEED * \
+                constants.ORBIT_MID_GAIN
+            sT = constants.ORBIT_SPIN_SPEED * \
+                constants.ORBIT_MID_GAIN
+        else :
+            sY = constants.ORBIT_STRAFE_SPEED * \
+                constants.ORBIT_LARGE_GAIN
+            sT = constants.ORBIT_SPIN_SPEED * \
+                constants.ORBIT_LARGE_GAIN
+
+        nav.setSpeed(0, nav.orbitDir*sY, nav.orbitDir*sT)
+
+    #  (frames/second) / (degrees/second)
+    framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *
+                         nav.angleToOrbit)
+    if nav.counter >= framesToOrbit:
+        return nav.goLater('stop')
+    return nav.stay()

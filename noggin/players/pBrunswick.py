@@ -37,6 +37,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.chosenKick = None
         self.kickDecider = None
 
+        self.angleToAlign = 0
+
     def run(self):
         if self.brain.gameController.currentState == 'gamePlaying':
             roleState = self.getNextState()

@@ -66,7 +66,7 @@ def shouldApproachForKick(player):
     """
     ball = player.brain.ball
     return (ball.on and
-            ball.relX > constants.BALL_KICK_LEFT_X_FAR + 5 ) # 5 is a BUFFER
+            ball.relX > constants.BALL_KICK_LEFT_X_FAR ) # 5 is a BUFFER
 
 def shouldKick(player):
     """
