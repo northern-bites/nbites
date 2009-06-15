@@ -17,11 +17,10 @@ def getMoveTime(move):
 
 OFF = None #OFF means the joint chain doesnt get enqueued during this motion
 
-
-INITIAL_POS = (((80.,40.,-50.,-70.),
-                (0.,0.,-50.,100.,-50.,0.),
-                (0.,0.,-50.,100.,-50.,0.),
-                (80.,-40.,50.,70.),4.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+INITIAL_POS = (((90.0, 15.0, 0.0, 0.0),
+                (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
+                (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
+                (90.0,-15.0, 0.0, 0.0),3.0,0,stiff.LOOSE_ARMS_STIFFNESSES_),)
 
 #Angles measured pretty exactly from the robot w/gains off.
 #might want to make them even different if we suspect the motors are weakening
