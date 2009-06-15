@@ -28,12 +28,6 @@
 
 namespace Kinematics {
 
-    //Accuracy constants for dls
-    //in mm, how close dls will get to the target
-    static const float UNBELIEVABLY_LOW_ERROR = 0.01f; //mm
-    static const float REALLY_LOW_ERROR = 0.1f; //mm
-    static const float ACCEPTABLE_ERROR = 0.5f; //mm
-    static const float COARSE_ERROR     = 1.0f; //mm
 
     enum ChainID {
         HEAD_CHAIN = 0,
@@ -41,8 +35,8 @@ namespace Kinematics {
         LLEG_CHAIN,
         RLEG_CHAIN,
         RARM_CHAIN,
-        LANKLE_CHAIN,
-        RANKLE_CHAIN
+        LANKLE_CHAIN, // only goes to the ankle
+        RANKLE_CHAIN  // (same)
     };
 
 	// Interpolation types
@@ -79,16 +73,6 @@ namespace Kinematics {
         R_SHOULDER_ROLL,
         R_ELBOW_YAW,
         R_ELBOW_ROLL
-    };
-
-    enum IKOutcome {
-        STUCK = 0,
-        SUCCESS = 1
-    };
-
-    struct IKLegResult {
-        IKOutcome outcome;
-        float angles[6];
     };
 
     /**
@@ -185,16 +169,16 @@ namespace Kinematics {
                                                 {-2.09f,2.09f},
                                                 {0.0f,1.57f}};
 
-    // Order of leg joints: HYPitch HipPitch HipRoll KneePitch APitch ARoll
+    // Order of leg joints: HYPitch HipRoll HipPitch  KneePitch APitch ARoll
     static const float LEFT_LEG_BOUNDS[][2] = {{-1.57f,0.0f},
-                                               {-1.57f,.436f},
                                                {-.349f,.785f},
+                                               {-1.57f,.436f},
                                                {0.0f,2.269f},
                                                {-1.309f,.524f},
                                                {-.785f,.349f}};
     static const float RIGHT_LEG_BOUNDS[][2] = {{-1.57f,0.0f},
-                                                {-1.57f,.436f},
                                                 {-.785f,.349f},
+                                                {-1.57f,.436f},
                                                 {0.0f,2.269f},
                                                 {-1.309f,.524f},
                                                 {-.349f,.785f}};
@@ -388,7 +372,15 @@ namespace Kinematics {
     /*
      * Declarations for constants and methods concerning forward and inverse
      * kinematics.
-     */
+     *//*
+
+    //Accuracy constants for dls
+    //in mm, how close dls will get to the target
+    static const float UNBELIEVABLY_LOW_ERROR = 0.01f; //mm
+    static const float REALLY_LOW_ERROR = 0.1f; //mm
+    static const float ACCEPTABLE_ERROR = 0.5f; //mm
+    static const float COARSE_ERROR     = 1.0f; //mm
+
     static const float dampFactor = 0.4f;
     static const float maxDeltaTheta = 0.5f;
     static const int maxAnkleIterations = 60;
@@ -424,7 +416,7 @@ namespace Kinematics {
 
 
     void hackJointOrder(float angles[]);
-
+*/
 };
 
 #endif

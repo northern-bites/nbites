@@ -1109,8 +1109,6 @@ void StepGenerator::debugLogging(){
         lleg_angles[i] = bodyAngles[bi];
     for(unsigned int i = 0; i < LEG_JOINTS; i++, bi++)
         rleg_angles[i] = bodyAngles[bi];
-    Kinematics::hackJointOrder(lleg_angles);
-    Kinematics::hackJointOrder(rleg_angles);
 
     //pick the supporting leg to decide how to calc. actual com pos
     //Currently hacked pretty heavily, and only the Y actually works

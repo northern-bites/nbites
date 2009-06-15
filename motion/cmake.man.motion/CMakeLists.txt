@@ -125,7 +125,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ZmpEKF
 		     ${MOTION_INCLUDE_DIR}/ZmpAccEKF
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
-                     ${CORPUS_INCLUDE_DIR}/Kinematics
+                     ${CORPUS_INCLUDE_DIR}/InverseKinematics
                      ${MOTION_INCLUDE_DIR}/PyMotion
                      )
 
