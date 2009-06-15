@@ -12,13 +12,22 @@ using namespace std;
  *    R p
  *    0 1 
  * Then the inverse is given as
- *   R^t 
+ *   R^t -R^td
+ *    0    1
  */
 
 const ufmatrix4 invertKinematicsMatrix(const ufmatrix4 source){
-    ufmatrix4 result = source;
-
-
+    const ufmatrix3 Rt = trans(subrange(source,0,3,0,3));
+    const ufvector3 Rtd = -prod(Rt,
+                                CoordFrame3D::vector3D(source(0,3),
+                                                       source(1,3),
+                                                       source(2,3)));
+    ufmatrix4 result = ublas::identity_matrix<float>(4);
+    subrange(result,0,3,0,3) = Rt;
+    result(0,3) = Rtd(0);
+    result(1,3) = Rtd(1);
+    result(2,3) = Rtd(2);
+    return result;
 }
 
 const ufvector4
@@ -99,6 +108,7 @@ calculateCom(const ChainID id,
   for (int i = 0; i < numEndTransforms; i++) {
     fullTransform = prod(fullTransform, END_TRANSFORMS[id][i]);
   }
+
   cout << "Weighted COM is " << comPos<<endl;
   return comPos;
 }
