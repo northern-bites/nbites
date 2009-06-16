@@ -254,7 +254,7 @@ class GoTeam:
                 continue
             #dangerous- two players might both have ball, both would stay chaser
             #same as the aibo code but thresholds for hasBall are higher now
-            elif mate.hasBall():#and self.me.isChaser()?
+            elif mate.hasBall():
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
@@ -393,15 +393,17 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
     def shouldUseDubD(self):
-        return (False and
-                ((self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                  self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-                 (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-                  self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-                  self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-                  self.teammates[0].role == PBConstants.CHASER))
-                )
+        if not PBConstants.USE_DUB_D:
+            return False
+        return (
+            (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+             self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+             self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+            (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+             self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+             self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+             self.teammates[0].role == PBConstants.CHASER)
+            )
 
     def ballInMyGoalBox(self):
         '''

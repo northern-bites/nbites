@@ -14,6 +14,7 @@ DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
 DEBUG_SEARCHER = False
 
+USE_DUB_D = False
 USE_FINDER = False
 USE_DEEP_STOPPER = False # Fallback to a deep defensive position
 KICKOFF_PLAY = False # Forces the more intelligent and restrictive kickoff play
