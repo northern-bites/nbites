@@ -2,7 +2,8 @@
 Here we house all of the state methods used for chasing the ball
 """
 
-import man.noggin.util.MyMath as MyMath
+from man.noggin.util import MyMath
+from man.motion import SweetMoves
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from .. import NavConstants
@@ -25,6 +26,29 @@ def chase(player):
         return player.goNow('spinFindBall')
     else:
         return player.goNow('scanFindBall')
+
+def chaseAfterKick(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+        if player.chosenKick == SweetMoves.LEFT_FAR_KICK or \
+                player.chosenKick == SweetMoves.RIGHT_FAR_KICK:
+            return player.goLater('chase')
+
+        if player.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+            turnDir = constants.TURN_RIGHT
+
+        elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+            turnDir = constants.TURN_LEFT
+
+        player.setSpeed(0, 0, turnDir * constants.BALL_SPIN_SPEED)
+        return player.stay()
+
+    if player.brain.ball.framesOn > constants.BALL_ON_THRESH:
+        return player.goLater('chase')
+    elif player.counter > constants.CHASE_AFTER_KICK_FRAMES:
+        return player.goLater('spinFindBall')
+    return player.stay()
 
 def turnToBall(player):
     """

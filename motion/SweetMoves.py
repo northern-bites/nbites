@@ -20,7 +20,7 @@ OFF = None #OFF means the joint chain doesnt get enqueued during this motion
 INITIAL_POS = (((90.0, 15.0, 0.0, 0.0),
                 (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
                 (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-                (90.0,-15.0, 0.0, 0.0),3.0,0,stiff.LOOSE_ARMS_STIFFNESSES_),)
+                (90.0,-15.0, 0.0, 0.0),3.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 #Angles measured pretty exactly from the robot w/gains off.
 #might want to make them even different if we suspect the motors are weakening
@@ -355,3 +355,9 @@ SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
                             (GOALIE_POS[0][1]),
                             (GOALIE_POS[0][2]),
                             (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+
+GOALIE_SAVE = (
+    ((0.0, 0.0, -16.0, -35),
+     ( -56.0, 42.0, 5.0,85, -38.0, -15),
+     ( -56.0, -42.0, 5.0,85, -38.0, 15),
+     (0.0, 0.0, 16.0, 35), 2.0, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
