@@ -199,7 +199,7 @@ void comControl(ChainID support_id){
 {
     0.0f,0.0f,
     1.57f,0.26f,0.0f,0.0f,
-    0.0f, 0.0f, -0.0f,0.0f,-0.0f,0.0f,
+    0.0f, M_PI_FLOAT/4, -0.0f,M_PI_FLOAT/10,-0.0f,0.0f,
     0.0f, 0.0f, -0.0f,0.0f,-0.0f,0.0f,
     1.57,-0.26f,0.0f,0.0f};
     vector<float> bodyAngles = vector<float>(bodyJoints,&bodyJoints[NUM_JOINTS]);
@@ -212,7 +212,7 @@ void comControl(ChainID support_id){
         partialComPos+= calculateChainCom((ChainID)i, getChainAngles((ChainID) i,
                                                                       bodyAngles));
     }
-
+    cout << "partialCom" << partialComPos<<endl;
 
     //Now calculate the COM in the support foot frame
     ufvector4 com_f = calculateBodyCom_f(support_id,getChainAngles(support_id,bodyAngles)
@@ -253,6 +253,6 @@ ufvector4 comPos = CoordFrame4D::vector4D(0,0,0,0);
 
 int main(){
     cout << "TOTAL MASS" << TOTAL_MASS<<endl;
-    //comControl(LLEG_CHAIN);
-    comTest();
+    comControl(LLEG_CHAIN);
+    //comTest();
 }

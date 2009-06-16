@@ -3,7 +3,7 @@
 
 MAN_DIR=../man
 
-CXX_INCLUDES=-I../../include -I../../corpus -I../../motion
+CXX_INCLUDES=-I../../include -I../../corpus -I../../motion -I/sw/include
 CXX_FLAGS=-Wall -Wno-unused #-DNDEBUG -O3
 CXX=g++
 
