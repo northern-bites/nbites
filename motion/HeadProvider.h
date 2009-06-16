@@ -78,7 +78,7 @@ private:
 	float pitchMaxSpeed, yawMaxSpeed;
 	float headSetStiffness;
 
-    pthread_mutex_t scripted_mode_mutex,set_mode_mutex;
+    pthread_mutex_t head_provider_mutex;
 
     std::vector<float> getCurrentHeads();
     void setNextHeadCommand();

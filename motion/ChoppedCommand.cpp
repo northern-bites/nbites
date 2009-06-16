@@ -116,6 +116,8 @@ const vector<float>
 ChoppedCommand::getStiffness( ChainID chainID ) const
 {
 	switch (chainID) {
+	case HEAD_CHAIN:
+		return head_stiff;
 	case LARM_CHAIN:
 		return larm_stiff;
 	case LLEG_CHAIN:
@@ -124,8 +126,6 @@ ChoppedCommand::getStiffness( ChainID chainID ) const
 		return rleg_stiff;
 	case RARM_CHAIN:
 		return rarm_stiff;
-	case HEAD_CHAIN:
-		return head_stiff;
 	case RANKLE_CHAIN:
 	case LANKLE_CHAIN:
 		break;
@@ -139,6 +139,8 @@ vector<float>*
 ChoppedCommand::getStiffnessRef( ChainID chainID )
 {
 	switch (chainID) {
+	case HEAD_CHAIN:
+		return &head_stiff;
 	case LARM_CHAIN:
 		return &larm_stiff;
 	case LLEG_CHAIN:
@@ -147,8 +149,6 @@ ChoppedCommand::getStiffnessRef( ChainID chainID )
 		return &rleg_stiff;
 	case RARM_CHAIN:
 		return &rarm_stiff;
-	case HEAD_CHAIN:
-		return &head_stiff;
 	case RANKLE_CHAIN:
 	case LANKLE_CHAIN:
 		break;
