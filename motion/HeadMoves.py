@@ -107,8 +107,8 @@ PAN_RIGHT = (
 
 
 KICK_SCAN = (
-    ((0.0,-25),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((90.,-25.),1.0,  1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-90.,-25.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((90.,-45.),1.0,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-90.,-45.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0,20.),1.0,1,stiff.LOW_HEAD_STIFFNESSES))
 
