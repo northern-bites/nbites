@@ -17,10 +17,10 @@ def getMoveTime(move):
 
 OFF = None #OFF means the joint chain doesnt get enqueued during this motion
 
-INITIAL_POS = (((90.0, 15.0, 0.0, 0.0),
+INITIAL_POS = (((60.0, 35.0, 0.0, 0.0),
                 (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
                 (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-                (90.0,-15.0, 0.0, 0.0),3.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+                (60.0,-35.0, 0.0, 0.0),3.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 #Angles measured pretty exactly from the robot w/gains off.
 #might want to make them even different if we suspect the motors are weakening
@@ -164,7 +164,7 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                    ( INITIAL_POS[0][0],
                      INITIAL_POS[0][1],
                      INITIAL_POS[0][2],
-                     INITIAL_POS[0][3],0.5,0, stiff.STANDUP_STIFFNESSES))
+                     INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES))
 
 STAND_UP_BACK = ( ((0,90,0,0),
                    (0,0,0,0,0,0),
@@ -220,7 +220,7 @@ STAND_UP_BACK = ( ((0,90,0,0),
                   ( INITIAL_POS[0][0],
                     INITIAL_POS[0][1],
                     INITIAL_POS[0][2],
-                    INITIAL_POS[0][3],0.5,0, stiff.STANDUP_STIFFNESSES))
+                    INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES))
 
 RIGHT_FAR_KICK = (
     ((80.0 , 40.0 , -50.0 , -70.0),
