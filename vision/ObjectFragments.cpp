@@ -3853,6 +3853,12 @@ bool ObjectFragments::badSurround(blob b) {
         cout << "Surround information " << red << " " << realred << " " 
 			 << orange << " " << borange << " " << greens << endl;
     }
+	if (orange - borange > borange * 0.3) {
+		if (BALLDEBUG) {
+			cout << "Too much orange outside of the ball" << endl;
+		}
+		return true;
+	}
     if (realred > orange) {
 		if (BALLDEBUG) {
 			cout << "Too much real red" << endl;
@@ -4042,7 +4048,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
         scanOut(cenX,cenY,tan(angle), -1);
 		}*/
 
-    if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > numMin) {
+    //if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > numMin) {
         if (badSurround(topBlob)) {
             if (BALLDEBUG) {
                 drawBlob(topBlob, BLACK);
@@ -4050,7 +4056,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
             }
             return 0;
         }
-    }
+		//}
 
     if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
         // small balls should be near the horizon - this check makes extra sure
