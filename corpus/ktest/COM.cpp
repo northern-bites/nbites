@@ -92,7 +92,7 @@ calculateChainCom(const ChainID id,
     const ufvector4 thisSegmentWeightedPos =
         prod(curMassTrans,origin)*curMassProportion;
     comPos += thisSegmentWeightedPos;
-
+    cout << "This segment update " <<thisSegmentWeightedPos<<endl;
   }
 
   // Do the end transforms
@@ -222,6 +222,13 @@ void comControl(ChainID support_id){
 
 
 void comTest(){
+    float zeroJoints[] = 
+{
+    0.0f,0.0f,
+    0.0,0.0f,0.0f,0.0f,
+    0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,
+    0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,
+    0.0f,0.0f,0.0f,0.0f};
     float bodyJoints[] = 
 {
     0.0f,0.0f,
@@ -232,8 +239,9 @@ void comTest(){
     vector<float> bodyAngles = vector<float>(bodyJoints,&bodyJoints[NUM_JOINTS]);
 
     ChainID leg = LLEG_CHAIN;
-    ufvector4 comPos = CoordFrame4D::vector4D(CHEST_MASS_X,0,CHEST_MASS_Z)*(CHEST_MASS_g/TOTAL_MASS);
-    for(unsigned int i = 0; i < NUM_CHAINS; i++){
+//ufvector4 comPos = CoordFrame4D::vector4D(CHEST_MASS_X,0,CHEST_MASS_Z)*(CHEST_MASS_g/TOTAL_MASS);
+ufvector4 comPos = CoordFrame4D::vector4D(0,0,0,0);
+    for(unsigned int i = 2; i < 3; i++){
         comPos+= calculateChainCom((ChainID)i, getChainAngles((ChainID) i,
                                                          bodyAngles));
         cout << endl;
@@ -244,5 +252,7 @@ void comTest(){
 }
 
 int main(){
-    comControl(LLEG_CHAIN);
+    cout << "TOTAL MASS" << TOTAL_MASS<<endl;
+    //comControl(LLEG_CHAIN);
+    comTest();
 }
