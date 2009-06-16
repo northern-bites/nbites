@@ -132,7 +132,9 @@ ALCALL int _createModule( ALPtr<ALBroker> pBroker )
 #ifdef REDIRECT_C_STDERR
   // Redirect stderr to stdout
   FILE *_syderr = stderr;
+#ifndef __APPLE__
   stderr = stdout;
+#endif
 #endif
 
   // init broker with the main broker inctance
