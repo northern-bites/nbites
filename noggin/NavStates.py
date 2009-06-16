@@ -352,8 +352,8 @@ def stopped(nav):
 def orbitPoint(nav):
     if nav.firstFrame():
         nav.setSpeed(0,
-                     nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
-                     nav.orbitDir*constants.ORBIT_SPIN_SPEED )
+                    nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
+                    nav.orbitDir*constants.ORBIT_SPIN_SPEED )
     return nav.stay()
 
 
@@ -382,7 +382,7 @@ def orbitPointThruAngle(nav):
             sT = constants.ORBIT_SPIN_SPEED * \
                 constants.ORBIT_LARGE_GAIN
 
-        nav.setSpeed(0, nav.orbitDir*sY, nav.orbitDir*sT)
+        nav.setSpeed(-0.5, nav.orbitDir*sY, nav.orbitDir*sT)
 
     #  (frames/second) / (degrees/second) * degrees
     framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *

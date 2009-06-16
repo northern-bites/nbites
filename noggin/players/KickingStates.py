@@ -165,15 +165,21 @@ def kickBallStraight(player):
 
 
         ballForeFoot = player.kickDecider.ballForeFoot
-        if ballForeFoot == Constants.LEFT_FOOT or \
-                ballForeFoot == Constants.MID_LEFT:
+        if ballForeFoot == Constants.LEFT_FOOT:
             player.chosenKick = SweetMoves.LEFT_FAR_KICK
             return player.goNow('kickBallExecute')
 
-        elif ballForeFoot == Constants.RIGHT_FOOT or \
-                ballForeFoot == Constants.MID_RIGHT:
+        elif ballForeFoot == Constants.RIGHT_FOOT:
             player.chosenKick = SweetMoves.RIGHT_FAR_KICK
             return player.goNow('kickBallExecute')
+
+        elif ballForeFoot == Constants.MID_RIGHT:
+            player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+            return player.goNow('stepLeftForKick')
+
+        elif ballForeFoot == Constants.MID_LEFT:
+            player.chosenKick = SweetMoves.LEFT_FAR_KICK
+            return player.goNow('stepRightForKick')
 
         else :                  # INCORRECT_POS
             return player.goLater('chase')
@@ -184,17 +190,16 @@ def kickBallLeft(player):
     """
 
     player.chosenKick = SweetMoves.RIGHT_SIDE_KICK
-    return player.goNow('sideStepForKick')
+    return player.goNow('sideStepForSideKick')
 
 def kickBallRight(player):
     """
     Kick the ball to the right, using the left foot
     """
     player.chosenKick = SweetMoves.LEFT_SIDE_KICK
-    return player.goNow('sideStepForKick')
+    return player.goNow('sideStepForSideKick')
 
-
-def sideStepForKick(player):
+def sideStepForSideKick(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
@@ -248,8 +253,7 @@ def alignOnBallStraightKick(player):
         # Want to orbit opposite angle of bearing to goal
         player.brain.nav.orbitAngle(-player.angleToAlign)
 
-# Deal with ball changed positions?
-
+    # Deal with ball changed positions?
     if player.brain.nav.isStopped():
         return player.goLater('positionForKick')
 
