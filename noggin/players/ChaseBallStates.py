@@ -233,22 +233,12 @@ def orbitBall(player):
     """
     Method to spin around the ball before kicking
     """
-    my = player.brain.my
-
     if player.firstFrame():
         player.brain.tracker.trackBall()
+        player.brain.nav.orbitAngle(player.orbitAngle)
 
-        if my.h < 0:
-            orbitDir = NavConstants.ORBIT_LEFT
-        else :
-            orbitDir = NavConstants.ORBIT_RIGHT
-        player.brain.nav.orbit(orbitDir)
-
-    if player.counter > constants.ORBIT_BALL_STEP_FRAMES:
-        player.stopWalking()
-
-        if player.brain.nav.isStopped():
-            return player.goLater('getKickInfo')
+    if player.brain.nav.isStopped():
+        return player.goLater('getKickInfo')
 
     return player.stay()
 

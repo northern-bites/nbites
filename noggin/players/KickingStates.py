@@ -105,6 +105,7 @@ def decideKick(player):
 
     elif player.kickDecider.sawOwnGoal:
         if Constants.SUPER_SAFE_KICKS:
+            player.orbitAngle = 180
             return player.goLater('orbitBall')
 
         # We see both posts
@@ -115,6 +116,8 @@ def decideKick(player):
             ORBIT_BEARING_THRESH = 45
             if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
                 if Constants.DEBUG_KICKS: print ("\t\torbit!")
+                player.orbitAngle = sign(avgMyGoalBearing) * \
+                    (180 - fabs(avgMyGoalBearing) )
                 return player.goLater('orbitBall')
                 # kick right
             elif avgMyGoalBearing > 0:
@@ -125,6 +128,12 @@ def decideKick(player):
                 if Constants.DEBUG_KICKS: print ("\t\tleft 1")
                 return player.goLater('kickBallLeft')
         else:
+            if myLeftPostBearing is not None:
+                player.orbitAngle = sign(myLeftPostBearing) * \
+                    (180 - fabs(myLeftPostBearing) )
+            else :
+                player.orbitAngle = sign(myRightPostBearing) * \
+                    (180 - fabs(myRightPostBearing) )
             return player.goLater('orbitBall')
 
     else:

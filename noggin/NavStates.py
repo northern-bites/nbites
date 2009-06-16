@@ -384,7 +384,7 @@ def orbitPointThruAngle(nav):
 
         nav.setSpeed(0, nav.orbitDir*sY, nav.orbitDir*sT)
 
-    #  (frames/second) / (degrees/second)
+    #  (frames/second) / (degrees/second) * degrees
     framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *
                          nav.angleToOrbit)
     if nav.counter >= framesToOrbit:

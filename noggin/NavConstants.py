@@ -43,5 +43,5 @@ POSITION_NEAR_SCALE = 0
 POSITION_MEDIUM_SCALE = 0.6
 POSITION_FAR_SCALE = 1.0
 
-FRAME_RATE = 19                 # Rough estimate. fps
+FRAME_RATE = 20                 # Rough estimate. fps
 
