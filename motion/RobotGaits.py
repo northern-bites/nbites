@@ -340,8 +340,8 @@ SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       0.3,  # zmp static percentage
                                       5.5, # left swing hip roll addition
                                       5.5, # right swing hip roll addition
-                                      0.4,  # left zmp off
-                                      0.4,  # right zmp off
+                                      0.0,  # left zmp off
+                                      0.0,  # right zmp off
                                       6.6,   # turn zmp offset
                                       0.01,  # strafe zmp offset
                                       9.0,  # max x speed

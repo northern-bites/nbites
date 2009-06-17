@@ -30,7 +30,7 @@ def gamePlaying(player):
         player.gainsOn()
         player.brain.CoA.setRobotTurnGait(player.brain.motion)
 
-    return player.goLater('walkturnstop')
+    return player.goLater('walkstraightstop')
 
 if WEBOTS_ACTIVE:
     gameInitial=gamePlaying
