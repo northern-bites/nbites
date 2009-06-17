@@ -8,6 +8,7 @@ STRAFE_ONLY = True
 STRAFE_SPEED = 6
 STRAFE_STEPS = 5
 MAX_STEPS_OFF_CENTER = 50
+BUFFER = 50
 
 def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
@@ -15,7 +16,7 @@ def goaliePosition(player):
     '''TODO-
     if shouldMoveToSave():
         player.goNow('goaliePositionForSave') '''
-    if 0 <= player.brain.ball.locDist <= PBConstants.BALL_LOC_LIMIT:
+    if 0 < player.brain.ball.dist <= PBConstants.BALL_LOC_LIMIT:
         return player.goNow('goaliePositionBallClose')
     return player.goNow('goaliePositionBallFar')
 
@@ -51,12 +52,13 @@ def goaliePositionBallClose(player):
 
     if STRAFE_ONLY:
         if nav.isStopped():
-            soc = player.stepsOffCenter
-            if relY > CENTER_SAVE_THRESH and soc < MAX_STEPS_OFF_CENTER:
+            if relY > CENTER_SAVE_THRESH and\
+                    player.stepsOffCenter < MAX_STEPS_OFF_CENTER:
                 nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
                 player.stepsOffCenter += STRAFE_STEPS
-            elif relY < -CENTER_SAVE_THRESH and soc > -MAX_STEPS_OFF_CENTER:
+            elif relY < -CENTER_SAVE_THRESH and\
+                    player.stepsOffCenter > -MAX_STEPS_OFF_CENTER:
                 nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
                 nav.switchTo('stepping')
                 player.stepsOffCenter -= STRAFE_STEPS
@@ -74,8 +76,9 @@ def goaliePositionBallClose(player):
             '''if nav.isStopped() and player.counter > 0:
             return player.goLater('goalieAtPosition')'''
 
-    if (not (0 < ball.dist <= PBConstants.BALL_LOC_LIMIT)) and\
-            player.counter > 2:
+    #switch out if we lose the ball for multiple frames
+    if (not (0 <= ball.dist <= PBConstants.BALL_LOC_LIMIT + BUFFER) or
+        ball.framesOff > 15) and player.counter > 2:
         return player.goNow('goaliePositionBallFar')
 
     return player.stay()
@@ -101,22 +104,18 @@ def goaliePositionBallFar(player):
     ball = brain.ball
     nav = brain.nav
 
-    if ball.on:
-        relY = ball.relY
-    else:
-        relY = 0
-
     player.brain.tracker.activeLoc()
 
     if STRAFE_ONLY:
-        if player.stepsOffCenter <= -STRAFE_STEPS and nav.isStopped():
-            nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
-            nav.switchTo('stepping')
-            player.stepsOffCenter += STRAFE_STEPS
-        elif player.stepsOffCenter >= STRAFE_STEPS and nav.isStopped():
-            nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
-            nav.switchTo('stepping')
-            player.stepsOffCenter -= STRAFE_STEPS
+        if nav.isStopped():
+            if player.stepsOffCenter <= -STRAFE_STEPS:
+                nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
+                nav.switchTo('stepping')
+                player.stepsOffCenter += STRAFE_STEPS
+            elif player.stepsOffCenter >= STRAFE_STEPS:
+                nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
+                nav.switchTo('stepping')
+                player.stepsOffCenter -= STRAFE_STEPS
     else:
         position = player.brain.playbook.position
         useOrtho = True #(MyMath.dist(brain.my.x, brain.my.y, position[0],
@@ -132,8 +131,8 @@ def goaliePositionBallFar(player):
     '''# we're at the point, let's switch to another state
     if nav.isStopped() and player.counter > 0:
         return player.goLater('goalieAtPosition')'''
-
-    if 0 < player.brain.ball.dist <= PBConstants.BALL_LOC_LIMIT and\
+    #don't switch out if we don't see the ball
+    if 0 < ball.dist <= PBConstants.BALL_LOC_LIMIT - BUFFER and\
             player.counter > 2:
         return player.goLater('goaliePositionBallClose')
     return player.stay()
