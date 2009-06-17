@@ -3663,6 +3663,7 @@ int  ObjectFragments::roundness(blob b)
     int y = b.leftTop.y;
     float ratio = static_cast<float>(w) / static_cast<float>(h);
     int r = 10;
+	//cout << "Height is " << h << " width is " << w << endl;
 	
     if ((h < SMALLBALLDIM && w < SMALLBALLDIM && ratio > BALLTOOTHIN && ratio < BALLTOOFAT)) {
     } else if (ratio > THINBALL && ratio < FATBALL) {
@@ -3713,27 +3714,39 @@ int  ObjectFragments::roundness(blob b)
             for (int i = 0; i < d3; i++) {
                 pix = thresh->thresholded[y+i][x+i];
                 if (i < d || (i > d3 - d)) {
-                    if (pix == ORANGE)
+                    if (pix == ORANGE || pix == ORANGERED) {
+						//drawPoint(x+i, y+i, BLACK);
                         badPix++;
+					}
                     else
                         goodPix++;
-                } else if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW)
-                    goodPix++;
-                else if (pix != GREY)
-                    badPix++;
+                } else {
+					if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW)
+						goodPix++;
+					else if (pix != GREY) {
+						badPix++;
+						//drawPoint(x+i, y+i, PINK);
+					}
+				}
                 pix = thresh->thresholded[y+i][x+w-i];
                 if (i < d || (i > d3 - d)) {
-                    if (pix == ORANGE)
+                    if (pix == ORANGE || pix == ORANGERED) {
+						//drawPoint(x+w-i, y+i, BLACK);
                         badPix++;
+					}
                     else
                         goodPix++;
                 } else if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW)
                     goodPix++;
-                else if (pix != GREY)
+                else if (pix != GREY) {
                     badPix++;
+					//drawPoint(x+w-i, y+i, BLACK);
+				}
             }
+			//cout << "here" << endl;
             for (int i = 0; i < h; i++) {
                 pix = thresh->thresholded[y+i][x + w/2];
+				//drawPoint(x + w/2, y+i, BLACK);
                 if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
                     goodPix++;
                 } else if (pix != GREY)
@@ -3742,14 +3755,16 @@ int  ObjectFragments::roundness(blob b)
         }
         for (int i = 0; i < w; i++) {
             pix = thresh->thresholded[y+h/2][x + i];
+			//drawPoint(x+i, y+h/2, BLACK);
             if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
                 goodPix++;
             } else if (pix != GREY)
                 badPix++;
         }
         if (BALLDEBUG)
-            cout << "Good " << goodPix << " " << badPix << endl;
-        if ((float)goodPix / (float)badPix < 2) {
+            cout << "Roundness: Good " << goodPix << " " << badPix << endl;
+		// if more than 20% or so of our pixels tested are bad, then we toss the ball out
+        if (goodPix < badPix * 5) {
             if (BALLDEBUG)
                 cout << "Screening for bad roundness" << endl;
             return BADVALUE;
@@ -3859,7 +3874,7 @@ bool ObjectFragments::badSurround(blob b) {
 		}
 		return true;
 	}
-    if (realred > orange) {
+    if (realred > borange) {
 		if (BALLDEBUG) {
 			cout << "Too much real red" << endl;
 		}
@@ -3885,7 +3900,13 @@ bool ObjectFragments::badSurround(blob b) {
 	}
 	if (red > orange)  {
 		if (BALLDEBUG) {
-			cout << "Too much real red and the ball doesn't seem round enough" << endl;
+			cout << "Too much real red - doing more checking" << endl;
+		}
+		if ((x < 1 || x + w > IMAGE_WIDTH - 2) && y + h > IMAGE_HEIGHT - 2) {
+			if (BALLDEBUG) {
+				cout << "Dangerous corner location detected " << endl;
+			}
+			return true;
 		}
 		return roundness(b) == BADVALUE;
 	}
