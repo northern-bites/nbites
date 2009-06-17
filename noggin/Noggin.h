@@ -15,6 +15,7 @@
 #include "GameController.h"
 
 #include "RoboGuardian.h"
+#define LOG_LOCALIZATION
 
 class Noggin
 {
@@ -81,8 +82,14 @@ private:
 public:
     boost::shared_ptr<LocSystem> loc;
     boost::shared_ptr<BallEKF> ballEKF;
-    boost::shared_ptr<LocEKF> locEKF;
+
+#ifdef LOG_LOCALIZATION
+    void startLocLog();
+    void stopLocLog();
+
+private:
+    bool loggingLoc;
+#endif // LOG_LOCALIZATION
 };
 
-
-#endif
+#endif // _Noggin_h_DEFINED

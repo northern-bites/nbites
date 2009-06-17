@@ -33,8 +33,7 @@ public:
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(RangeBearingMeasurement  ball, PoseEst p,
-                     bool _useCartesian=true);
+    void updateModel(RangeBearingMeasurement  ball, PoseEst p);
     void reset();
     // Getters
     /**

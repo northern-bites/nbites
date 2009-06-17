@@ -39,8 +39,7 @@ const float BallEKF::VELOCITY_EST_MIN = -300.0f;
 
 BallEKF::BallEKF()
     : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
-          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
-      useCartesian(true)
+          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -82,8 +81,7 @@ BallEKF::BallEKF(float initX, float initY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
     : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
-          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL),
-      useCartesian(true)
+          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -124,11 +122,9 @@ void BallEKF::reset()
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p,
-                          bool _useCartesian)
+void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
 {
     robotPose = p;
-    useCartesian = _useCartesian;
     // Update expected ball movement
     timeUpdate(MotionModel());
     limitAPrioriEst();

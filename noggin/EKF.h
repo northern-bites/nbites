@@ -6,14 +6,14 @@
 
 #ifndef EKF_h_DEFINED
 #define EKF_h_DEFINED
-
+#define DEBUG_JACOBIAN_JUNK
 // Boost libraries
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
 #include "NBMatrixMath.h"
 #include "NBMath.h"
-
+#include <boost/numeric/ublas/io.hpp> // for cout
 
 // Default parameters
 #define DEFAULT_BETA 3.0f
@@ -151,6 +151,28 @@ public:
         // Update error covariance matrix
         StateMatrix newP = prod(P_k, trans(A_k));
         P_k_bar = prod(A_k, newP) + Q_k;
+#ifdef DEBUG_JACOBIAN_JUNK
+        if(P_k_bar(0,0) < 0) {
+            std::cout << "\t x uncert is " << P_k_bar(0,0) << std::endl;
+            std::cout << "\t Q_k is " << Q_k << std::endl;
+            std::cout << "\t P_k_bar is " << P_k_bar << std::endl;
+            std::cout << "\t P_k is " << P_k << std::endl;
+            std::cout << "\t A_k is " << A_k << std::endl;
+            std::cout << "\t deltas are " << deltas << std:: endl;
+            std::cout << "\t betas are " << betas << std:: endl;
+            std::cout << "\t gammas are " << gammas << std:: endl;
+        }
+        if(P_k_bar(1,1) < 0) {
+            std::cout << "\t y uncert is " << P_k_bar(1,1) << std::endl;
+            std::cout << "\t Q_k is " << Q_k << std::endl;
+            std::cout << "\t P_k_bar is " << P_k_bar << std::endl;
+            std::cout << "\t P_k is " << P_k << std::endl;
+            std::cout << "\t A_k is " << A_k << std::endl;
+            std::cout << "\t deltas are " << deltas << std:: endl;
+            std::cout << "\t betas are " << betas << std:: endl;
+            std::cout << "\t gammas are " << gammas << std:: endl;
+        }
+#endif
     }
 
     virtual void correctionStep(std::vector<Measurement> z_k) {

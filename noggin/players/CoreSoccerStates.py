@@ -62,7 +62,7 @@ def fallen(player):
     Stops the player when the robot has fallen
     """
     player.brain.nav.switchTo('stopped')
-    player.brain.loc.reset()
+    #player.brain.resetLocalization()
     return player.stay()
 
 def gameFinished(player):

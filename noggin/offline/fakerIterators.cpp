@@ -109,20 +109,18 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
             // // Update the MCL ball
 
             // if (usePerfectLocForBall) {
-            //     MCLballEKF->updateModel(m, currentPose, true);
+            //     MCLballEKF->updateModel(m, currentPose;
             // } else {
-            //     MCLballEKF->updateModel(m, mclLoc->getCurrentEstimate(),
-            //                             true);
+            //     MCLballEKF->updateModel(m, mclLoc->getCurrentEstimate());
             // }
 
             // Update the EKF sytem
             ekfLoc->updateLocalization(letsGo->myMoves[i].move, Z_t);
             // Update the EKF ball
             if (usePerfectLocForBall) {
-                EKFballEKF->updateModel(m, currentPose, true);
+                EKFballEKF->updateModel(m, currentPose);
             } else {
-                EKFballEKF->updateModel(m, ekfLoc->getCurrentEstimate(),
-                                        true);
+                EKFballEKF->updateModel(m, ekfLoc->getCurrentEstimate());
             }
 
             // Print the current MCL frame to file
@@ -174,8 +172,7 @@ void iterateObsPath(fstream * locFile, fstream * coreFile,
 
         // Update the EKF ball
         RangeBearingMeasurement m(visBall);
-        ballEKF->updateModel(m, loc->getCurrentEstimate(),
-                             true);
+        ballEKF->updateModel(m, loc->getCurrentEstimate());
 
         // printOutLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
         //                 &(*realPoses)[i], &(*ballPoses)[i],
@@ -224,8 +221,7 @@ void iterateMCLObsPath(fstream * locFile, fstream * coreFile,
 
         // Update the EKF ball
         RangeBearingMeasurement m(visBall);
-        ballEKF->updateModel(m, loc->getCurrentEstimate(),
-                             true);
+        ballEKF->updateModel(m, loc->getCurrentEstimate());
 
         // printOutMCLLogLine(locFile, loc, (*sightings)[i], (*odos)[i],
         //                    &(*realPoses)[i], &(*ballPoses)[i],

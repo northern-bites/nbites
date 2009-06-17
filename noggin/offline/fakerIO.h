@@ -83,4 +83,6 @@ void printCoreLogLine(std::fstream* outputFile,
                       PoseEst *currentPose, BallPose * currentBall,
                       boost::shared_ptr<BallEKF> ballEKF);
 
+void readRobotLogFile(std::fstream* inputFile, std::fstream* outputFile);
+
 #endif // fakerIO_h_DEFINED

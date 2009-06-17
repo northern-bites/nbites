@@ -26,6 +26,11 @@ static const float MAX_CORNER_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
 
+#ifdef LOG_LOCALIZATION
+fstream outputFile;
+#include <ctime>
+#endif
+
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
@@ -65,6 +70,9 @@ Noggin::~Noggin ()
 {
     Py_XDECREF(brain_instance);
     Py_XDECREF(brain_module);
+#ifdef LOG_LOC
+    stopLocLog();
+#endif
 }
 
 void Noggin::initializePython(shared_ptr<Vision> v)
@@ -124,6 +132,10 @@ void Noggin::initializeLocalization()
 
     // Set the comm localization access pointers
     comm->setLocalizationAccess(loc, ballEKF);
+
+#ifdef LOG_LOCALIZATION
+    startLocLog();
+#endif
 }
 
 bool Noggin::import_modules ()
@@ -279,7 +291,6 @@ void Noggin::runStep ()
 void Noggin::updateLocalization()
 {
     // Self Localization
-    //MotionModel odometery(0.0f, 0.0f, 0.0f);
     MotionModel odometery = motion_interface->getOdometryUpdate();
 
     // Build the observations from vision data
@@ -403,11 +414,24 @@ void Noggin::updateLocalization()
     }
 #endif
 
-    // Opponent Tracking
-
-#ifdef DEBUG_OBSERVATIONS
-    //cout << *loc << endl;
+#ifdef LOG_LOCALIZATION
+    if (loggingLoc) {
+        // Print out odometry and ball readings
+        outputFile << odometery.deltaF << " " << odometery.deltaL << " "
+                   << odometery.deltaR << " " << vision->ball->getDistance()
+                   << " " << vision->ball->getBearing();
+        // Print out observation information
+        for (unsigned int x = 0; x < observations.size(); ++x) {
+            // Separate observations with a colon
+            outputFile << ":";
+            outputFile << observations[x].getID() << " "
+                       << observations[x].getVisDistance() << " "
+                       << observations[x].getVisBearing();
+        }
+        outputFile << endl;
+    }
 #endif
+
 }
 
 
@@ -509,3 +533,41 @@ void Noggin::modifySysPath ()
 #endif
 
 }
+
+#ifdef LOG_LOCALIZATION
+void Noggin::startLocLog()
+{
+    if (loggingLoc) {
+        return;
+    }
+    loggingLoc = true;
+
+    time_t systime;
+    struct tm * locTime;
+    char buf[80];
+    time( &systime );
+    locTime = localtime( &systime );
+    strftime(buf, 80, "%Y-%m-%d-%H-%M-%S",locTime);
+
+    string s  = "./lib/man/noggin/" + string(buf) + ".loc";
+    cout << "Started localization log at " << s << endl;
+    outputFile.open(s.c_str(), ios::out);
+    outputFile << gc->color() << " " << gc->player() << endl;
+    outputFile << loc->getXEst() << " " << loc->getYEst() << " "
+               << loc->getHEst() << " "
+               << loc->getXUncert() << " " << loc->getYUncert() << " "
+               << loc->getHUncert() << " "
+               << ballEKF->getXEst() << " " << ballEKF->getYEst() << " "
+               << ballEKF->getXUncert() << " " << ballEKF->getYUncert() << " "
+               << ballEKF->getXVelocityEst() << " "
+               << ballEKF->getYVelocityEst() << " "
+               << ballEKF->getXVelocityUncert() << " "
+               << ballEKF->getYVelocityUncert() << endl;
+}
+
+void Noggin::stopLocLog()
+{
+    outputFile.close();
+    loggingLoc = false;
+}
+#endif

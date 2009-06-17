@@ -94,7 +94,7 @@ def walkturnstop(player):
     if player.firstFrame():
         player.setSpeed(0.0,0,10)
 
-    if player.counter == 200:
+    if player.counter == 500:
         return player.goLater('stopwalking')
     return player.stay()
 
