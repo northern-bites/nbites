@@ -6,7 +6,7 @@
 
 #ifndef EKF_h_DEFINED
 #define EKF_h_DEFINED
-
+#define DEBUG_JACOBIAN_JUNK
 // Boost libraries
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -151,6 +151,7 @@ public:
         // Update error covariance matrix
         StateMatrix newP = prod(P_k, trans(A_k));
         P_k_bar = prod(A_k, newP) + Q_k;
+#ifdef DEBUG_JACOBIAN_JUNK
         if(P_k_bar(0,0) < 0) {
             std::cout << "\t x uncert is " << P_k_bar(0,0) << std::endl;
             std::cout << "\t Q_k is " << Q_k << std::endl;
@@ -171,7 +172,7 @@ public:
             std::cout << "\t betas are " << betas << std:: endl;
             std::cout << "\t gammas are " << gammas << std:: endl;
         }
-
+#endif
     }
 
     virtual void correctionStep(std::vector<Measurement> z_k) {

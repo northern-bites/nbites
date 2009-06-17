@@ -425,6 +425,7 @@ void Noggin::updateLocalization()
             // Separate observations with a colon
             outputFile << ":";
             outputFile << observations[x].getID() << " "
+                       << observations[x].getVisDistance() << " "
                        << observations[x].getVisBearing();
         }
         outputFile << endl;

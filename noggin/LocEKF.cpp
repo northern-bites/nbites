@@ -378,15 +378,15 @@ void LocEKF::limitAPrioriUncert()
     // Check x uncertainty
     if(P_k_bar(0,0) < X_UNCERT_MIN) {
         //P_k_bar(0,0) = X_UNCERT_MIN;
-        std::cout << "Frame number " << frameCounter << std::endl;
-        std::cout << "x uncert is " << P_k_bar(0,0) << std::endl;
+        //std::cout << "Frame number " << frameCounter << std::endl;
+        //std::cout << "x uncert is " << P_k_bar(0,0) << std::endl;
 
     }
     // Check y uncertainty
     if(P_k_bar(1,1) < Y_UNCERT_MIN) {
         //P_k_bar(1,1) = Y_UNCERT_MIN;
-        std::cout << "Frame number " << frameCounter << std::endl;
-        std::cout << "y uncert is " << P_k_bar(1,1) << std::endl;
+        //std::cout << "Frame number " << frameCounter << std::endl;
+        //std::cout << "y uncert is " << P_k_bar(1,1) << std::endl;
     }
     // Check h uncertainty
     if(P_k_bar(2,2) < H_UNCERT_MIN) {
