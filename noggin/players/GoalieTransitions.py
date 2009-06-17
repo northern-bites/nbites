@@ -14,7 +14,7 @@ def shouldSave(player):
 
     # Test velocity values as to which one would work:
     relVelX = ball.relVelX
-    relVelY = ball.relVelY
+
     if relVelX < 0.0:
         timeUntilSave = relX / -relVelX
     else:
