@@ -27,6 +27,7 @@ public class WorldController extends JPanel implements KeyListener,
 						       ActionListener,
 						       ChangeListener
 {
+    public TOOL t;
     //@todo integrate lines into simulation filter
     //@todo force the simulator to restart when a new simulation made is
     // selected
@@ -249,6 +250,7 @@ public class WorldController extends JPanel implements KeyListener,
 
     public WorldController(TOOL t)
     {
+        this.t = t;
         labField = new LabField2009();
         naoField = new NaoField2009();
 
@@ -535,6 +537,7 @@ public class WorldController extends JPanel implements KeyListener,
         fd.setDirectory(dir);
         fd.setVisible(true);
         String fullpath = fd.getDirectory() + fd.getFile();
+        t.wcLastDirectory = fd.getDirectory();
         fd.dispose();
         if (fd.getFile() == null) return null;
         return fullpath;
