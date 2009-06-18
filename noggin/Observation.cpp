@@ -55,7 +55,7 @@ Observation::Observation(const VisualCorner &_corner) :
 Observation::Observation(const VisualLine &_line) :
     visDist(_line.getDistance()), visBearing(_line.getBearing()),
     sigma_d(_line.getDistanceSD()), sigma_b(_line.getBearingSD()),
-    // id(_line.getID()),
+    id(_line.getID()),
     line_truth(true), numPossibilities(0)
 {
     // Build our possibilitiy list

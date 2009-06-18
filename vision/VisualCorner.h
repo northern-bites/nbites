@@ -59,7 +59,6 @@ public:
     const shape getShape() const { return cornerType; }
 
 
-
     // DO NOT USE THIS UNLESS getShape() returns inner or outer L; I have
     // not yet hooked up the angle thing for T corners
     const float getAngleBetweenLines() const { return angleBetweenLines; }
@@ -80,6 +79,7 @@ public:
 private: // private methods
     void determineCornerShape(); // called on object instantiation
     const shape getLClassification();
+    void determineCornerIDFromShape();
     inline float cornerDistanceToSD(float _distance) {
         return 2.0f * std::max(10 + _distance*0.00125f, 250.0f);
     }

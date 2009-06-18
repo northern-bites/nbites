@@ -50,15 +50,19 @@ void VisualCorner::determineCornerShape() {
         cornerType = T;
         tBar = line1;
         tStem = line2;
+        setID(T_CORNER);
     } else if(Utility::tValueInMiddleOfLine(t2, line2.length,
                                             MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line2;
         tStem = line1;
+        setID(T_CORNER);
     } else {
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
     }
+
+    determineCornerIDFromShape();
 }
 
 
@@ -249,4 +253,29 @@ void VisualCorner::setBearingWithSD(float _bearing)
 {
     setBearing(_bearing);
     setBearingSD(cornerBearingToSD(_bearing));
+}
+
+/**
+ * Set the corner ID dependent on the corner shape
+ */
+void VisualCorner::determineCornerIDFromShape()
+{
+    switch(cornerType) {
+    case INNER_L:
+        setID(L_INNER_CORNER);
+        break;
+    case OUTER_L:
+        setID(L_OUTER_CORNER);
+        break;
+    case T:
+        setID(T_CORNER);
+        break;
+    case CIRCLE:
+        setID(CENTER_CIRCLE);
+        break;
+    case UNKNOWN:
+        setID(CORNER_NO_IDEA_ID);
+        break;
+    }
+
 }
