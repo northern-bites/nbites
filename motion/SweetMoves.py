@@ -363,13 +363,34 @@ GOALIE_SAVE = (
      ( -76.0, 10.0, -50.0, 86.0, 0.0, -0),
      ( -76.0, -10.0, -50.0, 86.0, 0.0, 0),
      (60.0, -15.0, 0.0, 0), #left arm
-     2.0, 0, stiff.LOOSE_ARMS_STIFFNESSES),
+     1.5, 0, stiff.LOOSE_ARMS_STIFFNESSES),
 
     ((40.0, 15.0, 0.0, -0), #right arm
     ( -76.0, 10.0, -95.0, 65.0, 65.0, 0),
      ( -76.0, -10.0, -95.0, 65.0, 65.0, 0),
     (40.0, -15.0, 0.0, 0), #left arm
-    2.0, 0, stiff.LOOSE_ARMS_STIFFNESSES) )
+    .5, 0, stiff.LOOSE_ARMS_STIFFNESSES) )
+
+GOALIE_STAND_UP = (
+                   ((35,2,-14,-41),
+                    (-55,5,-90,123,-17,-17),
+                    (-55,-5,-90,123,-17,17),
+                    (35,2,14,41),0.8, 0, stiff.STANDUP_STIFFNESSES),
+
+                   ((64,7,-53,-74),
+                    (-45,6,-61,124,-41,-6),
+                    (-45,-6,-61,124,-41,6),
+                    (64,-7,53,74),1.2, 0, stiff.STANDUP_STIFFNESSES),
+
+                   ((93,10,-90,-80),
+                    (0,0,-60,120,-60,0),
+                    (0,0,-60,120,-60,0),
+                    (93,-10,90,80),1.0,0, stiff.STANDUP_STIFFNESSES),
+
+                   ( INITIAL_POS[0][0],
+                     INITIAL_POS[0][1],
+                     INITIAL_POS[0][2],
+                     INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES))
 
 CRAB_SIT = (
     ((120.0, 90.0, -12, 0),
