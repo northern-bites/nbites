@@ -18,13 +18,19 @@
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
 
-//#define DEBUG_OBSERVATIONS
+//#define DEBUG_CORNER_OBSERVATIONS
+//#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
 static const float MAX_CORNER_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
+
+#ifdef LOG_LOCALIZATION
+fstream outputFile;
+#include <ctime>
+#endif
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
@@ -65,6 +71,9 @@ Noggin::~Noggin ()
 {
     Py_XDECREF(brain_instance);
     Py_XDECREF(brain_module);
+#ifdef LOG_LOC
+    stopLocLog();
+#endif
 }
 
 void Noggin::initializePython(shared_ptr<Vision> v)
@@ -113,7 +122,6 @@ void Noggin::initializeLocalization()
 #endif
 
     // Initialize the localization modules
-    //loc = shared_ptr<MCL>(new MCL());
     loc = shared_ptr<LocEKF>(new LocEKF());
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
@@ -124,6 +132,10 @@ void Noggin::initializeLocalization()
 
     // Set the comm localization access pointers
     comm->setLocalizationAccess(loc, ballEKF);
+
+#ifdef LOG_LOCALIZATION
+    startLocLog();
+#endif
 }
 
 bool Noggin::import_modules ()
@@ -279,7 +291,6 @@ void Noggin::runStep ()
 void Noggin::updateLocalization()
 {
     // Self Localization
-    //MotionModel odometery(0.0f, 0.0f, 0.0f);
     MotionModel odometery = motion_interface->getOdometryUpdate();
 
     // Build the observations from vision data
@@ -291,7 +302,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bgrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -301,7 +312,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -311,7 +322,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw ygrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -321,7 +332,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw yglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -335,7 +346,7 @@ void Noggin::updateLocalization()
         if (i->getDistance() < MAX_CORNER_DISTANCE) {
             Observation seen(*i);
             observations.push_back(seen);
-#           ifdef DEBUG_OBSERVATIONS
+#           ifdef DEBUG_CORNER_OBSERVATIONS
             cout << "Saw corner " << i->getID() << " at distance "
                  << seen.getVisDistance() << " and bearing " << seen.getVisBearing()
                  << endl;
@@ -403,11 +414,39 @@ void Noggin::updateLocalization()
     }
 #endif
 
-    // Opponent Tracking
-
-#ifdef DEBUG_OBSERVATIONS
-    //cout << *loc << endl;
+#ifdef LOG_LOCALIZATION
+    if (loggingLoc) {
+        // Print out odometry and ball readings
+        outputFile << odometery.deltaF << " " << odometery.deltaL << " "
+                   << odometery.deltaR << " " << vision->ball->getDistance()
+                   << " " << vision->ball->getBearing();
+        // Print out observation information
+        for (unsigned int x = 0; x < observations.size(); ++x) {
+            // Separate observations with a colon
+            outputFile << ":";
+            outputFile << observations[x].getID() << " "
+                       << observations[x].getVisDistance() << " "
+                       << observations[x].getVisBearing() << " "
+                       << observations[x].getDistanceSD() << " "
+                       << observations[x].getBearingSD();
+            if( observations[x].isLine() ) {
+                vector<LineLandmark> ps;
+                ps = observations[x].getLinePossibilities();
+                for (unsigned int u = 0; u < ps.size(); ++u) {
+                    outputFile << " " << ps[u];
+                }
+            } else {
+                vector<PointLandmark> ps;
+                ps = observations[x].getPointPossibilities();
+                for (unsigned int u = 0; u < ps.size(); ++u) {
+                    outputFile << " " << ps[u];
+                }
+            }
+        }
+        outputFile << endl;
+    }
 #endif
+
 }
 
 
@@ -509,3 +548,41 @@ void Noggin::modifySysPath ()
 #endif
 
 }
+
+#ifdef LOG_LOCALIZATION
+void Noggin::startLocLog()
+{
+    if (loggingLoc) {
+        return;
+    }
+    loggingLoc = true;
+
+    time_t systime;
+    struct tm * locTime;
+    char buf[80];
+    time( &systime );
+    locTime = localtime( &systime );
+    strftime(buf, 80, "%Y-%m-%d-%H-%M-%S",locTime);
+
+    string s  = "./lib/man/noggin/" + string(buf) + ".loc";
+    cout << "Started localization log at " << s << endl;
+    outputFile.open(s.c_str(), ios::out);
+    outputFile << gc->color() << " " << gc->player() << endl;
+    outputFile << loc->getXEst() << " " << loc->getYEst() << " "
+               << loc->getHEst() << " "
+               << loc->getXUncert() << " " << loc->getYUncert() << " "
+               << loc->getHUncert() << " "
+               << ballEKF->getXEst() << " " << ballEKF->getYEst() << " "
+               << ballEKF->getXUncert() << " " << ballEKF->getYUncert() << " "
+               << ballEKF->getXVelocityEst() << " "
+               << ballEKF->getYVelocityEst() << " "
+               << ballEKF->getXVelocityUncert() << " "
+               << ballEKF->getYVelocityUncert() << endl;
+}
+
+void Noggin::stopLocLog()
+{
+    outputFile.close();
+    loggingLoc = false;
+}
+#endif

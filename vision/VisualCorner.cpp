@@ -11,7 +11,8 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _bearing,
                            const VisualLine l1, const VisualLine l2,
                            const float _t1, const float _t2)
-    : VisualDetection(_x, _y, _distance, _bearing), VisualLandmark(),
+    : VisualDetection(_x, _y, _distance, _bearing),
+      VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
       cornerType(UNKNOWN),
       line1(l1), line2(l2), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
@@ -31,7 +32,7 @@ VisualCorner::VisualCorner(const int _x, const int _y,
 VisualCorner::~VisualCorner() {}
 
 VisualCorner::VisualCorner(const VisualCorner& other)
-    : VisualDetection(other), VisualLandmark(other),
+    : VisualDetection(other), VisualLandmark<cornerID>(other),
       possibleCorners(other.possibleCorners),
       cornerType(other.cornerType),
       line1(other.line1), line2(other.line2), t1(other.t1), t2(other.t2),
@@ -49,15 +50,19 @@ void VisualCorner::determineCornerShape() {
         cornerType = T;
         tBar = line1;
         tStem = line2;
+        setID(T_CORNER);
     } else if(Utility::tValueInMiddleOfLine(t2, line2.length,
                                             MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line2;
         tStem = line1;
+        setID(T_CORNER);
     } else {
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
     }
+
+    determineCornerIDFromShape();
 }
 
 
@@ -248,4 +253,29 @@ void VisualCorner::setBearingWithSD(float _bearing)
 {
     setBearing(_bearing);
     setBearingSD(cornerBearingToSD(_bearing));
+}
+
+/**
+ * Set the corner ID dependent on the corner shape
+ */
+void VisualCorner::determineCornerIDFromShape()
+{
+    switch(cornerType) {
+    case INNER_L:
+        setID(L_INNER_CORNER);
+        break;
+    case OUTER_L:
+        setID(L_OUTER_CORNER);
+        break;
+    case T:
+        setID(T_CORNER);
+        break;
+    case CIRCLE:
+        setID(CENTER_CIRCLE);
+        break;
+    case UNKNOWN:
+        setID(CORNER_NO_IDEA_ID);
+        break;
+    }
+
 }

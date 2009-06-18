@@ -278,3 +278,9 @@ class Brain(object):
             ledHexValue = ledTuple[1]
             ledTime     = ledTuple[2]
             self.leds.fadeRGB(ledName,ledHexValue,ledTime)
+
+    def resetLocalization(self):
+        if self.out.loggingLoc:
+            self.out.stopLocLog()
+            self.out.startLocLog()
+        self.loc.reset()

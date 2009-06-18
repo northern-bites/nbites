@@ -47,7 +47,8 @@ enum cornerID {
     YELLOW_GOAL_LEFT_T, // 25
     YELLOW_GOAL_RIGHT_T,
     YELLOW_GOAL_LEFT_L,
-    YELLOW_GOAL_RIGHT_L
+    YELLOW_GOAL_RIGHT_L,
+    CORNER_NO_IDEA_ID
 };
 
 enum shape {

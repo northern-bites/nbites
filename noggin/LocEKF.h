@@ -1,7 +1,6 @@
 /**
- * BallEKF.h - Header file for the BallEKF class
- * All coordinates in C++ are in the local coordinate frame
- * We convert to the global frame when dealing with python
+ * LocEKF.h - Header file for the LocEKF class
+ * We use an Extended Kalman Filter for figuring out where we are on the field
  *
  * @author Tucker Hermans
  */
@@ -154,7 +153,6 @@ private:
     // Last odometry update
     MotionModel lastOdo;
     bool useAmbiguous;
-    int frameCounter;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;
