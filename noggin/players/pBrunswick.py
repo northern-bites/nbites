@@ -12,6 +12,8 @@ from . import GoalieSaveStates
 from . import ChaseBallTransitions
 from . import KickingConstants
 from .. import NogginConstants
+from . import ChaseBallConstants
+from man.motion import SweetMoves
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -34,6 +36,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.chosenKick = None
         self.kickDecider = None
+        self.justKicked = False
 
         self.shouldSaveCounter = 0
         self.shouldChaseCounter = 0
@@ -44,6 +47,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.kickObjective = None
 
     def run(self):
+        if self.lastDiffState == 'afterKick':
+            self.justKicked = True
+        else:
+            self.justKicked = False
+
         if self.brain.gameController.currentState == 'gamePlaying':
             roleState = self.getNextState()
 
@@ -123,3 +131,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         """
         Choose where to kick
         """
+
+
+    def getSpinDirAfterKick(self):
+        if self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+            return ChaseBallConstants.TURN_RIGHT
+        elif self.chosenKick == SweetMoves.RIGHT_FAR_KICK:
+            return ChaseBallConstants.TURN_LEFT
+        else :
+            return ChaseBallConstants.TURN_LEFT

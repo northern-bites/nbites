@@ -527,10 +527,13 @@ def afterKick(player):
     player.walkPose()
     player.brain.tracker.trackBall()
 
-    if player.brain.nav.isStopped():
-        return player.goLater("chase")
-    else:
-        return player.stay()
+    if player.chosenKick == SweetMoves.LEFT_FAR_KICK or \
+            player.chosenKick == SweetMoves.RIGHT_FAR_KICK:
+        return player.goLater('scanFindBall')
+    elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK or \
+            player.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+        return player.goLater('spinFindBall')
+    return player.stay()
 
 def kickAtPosition(player):
     """

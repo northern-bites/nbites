@@ -27,8 +27,12 @@ def spinFindBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
+    if player.justKicked:
+        spinDir = player.getSpinDirAfterKick()
+    else:
+        spinDir = constants.TURN_LEFT
 
-    player.setSpeed(0, 0, constants.FIND_BALL_SPIN_SPEED)
+    player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
     # Determine if we should leave this state
     if player.brain.ball.on and constants.USE_LOC_CHASE:
@@ -38,4 +42,3 @@ def spinFindBall(player):
         return player.goLater('turnToBall')
 
     return player.stay()
-
