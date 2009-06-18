@@ -6,7 +6,7 @@
 
 #ifndef EKF_h_DEFINED
 #define EKF_h_DEFINED
-#define DEBUG_JACOBIAN_JUNK
+//#define DEBUG_JACOBIAN_JUNK
 // Boost libraries
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -92,15 +92,16 @@ protected:
 
     StateVector betas; // constant uncertainty increase
     StateVector gammas; // scaled uncertainty increase
-
+    int frameCounter;
 public:
     // Constructors & Destructors
     EKF(float _beta, float _gamma)
-  : xhat_k(dimension), xhat_k_bar(dimension),
-    Q_k(dimension,dimension), A_k(dimension,dimension),
-    P_k(dimension,dimension), P_k_bar(dimension,dimension),
-    dimensionIdentity(dimension), numStates(dimension),
-    measurementSize(mSize),betas(dimension),gammas(dimension) {
+        : xhat_k(dimension), xhat_k_bar(dimension),
+          Q_k(dimension,dimension), A_k(dimension,dimension),
+          P_k(dimension,dimension), P_k_bar(dimension,dimension),
+          dimensionIdentity(dimension), numStates(dimension),
+          measurementSize(mSize), betas(dimension), gammas(dimension),
+          frameCounter(0) {
 
         // Initialize all matrix values to 0
         for(unsigned i = 0; i < dimension; ++i) {
@@ -138,6 +139,7 @@ public:
 
     // Core functions
     virtual void timeUpdate(UpdateModel u_k) {
+        ++frameCounter;
         // Have the time update prediction incorporated
         // i.e. odometery, natural roll, etc.
         StateVector deltas = associateTimeUpdate(u_k);
@@ -151,19 +153,21 @@ public:
         // Update error covariance matrix
         StateMatrix newP = prod(P_k, trans(A_k));
         P_k_bar = prod(A_k, newP) + Q_k;
+
 #ifdef DEBUG_JACOBIAN_JUNK
-        if(P_k_bar(0,0) < 0) {
-            std::cout << "\t x uncert is " << P_k_bar(0,0) << std::endl;
-            std::cout << "\t Q_k is " << Q_k << std::endl;
-            std::cout << "\t P_k_bar is " << P_k_bar << std::endl;
-            std::cout << "\t P_k is " << P_k << std::endl;
-            std::cout << "\t A_k is " << A_k << std::endl;
-            std::cout << "\t deltas are " << deltas << std:: endl;
-            std::cout << "\t betas are " << betas << std:: endl;
-            std::cout << "\t gammas are " << gammas << std:: endl;
+        bool outputInfos = false;
+        for(int a = 0; a < 3; a++) {
+            for (int b = 0; b < 3; b++) {
+                if (P_k_bar(a,b) < 0) {
+                    outputInfos = true;
+                }
+            }
         }
-        if(P_k_bar(1,1) < 0) {
+        if(outputInfos) {
+            std::cout << "Frame # " << frameCounter << std::endl;
+            std::cout << "\t x uncert is " << P_k_bar(0,0) << std::endl;
             std::cout << "\t y uncert is " << P_k_bar(1,1) << std::endl;
+            std::cout << "\t h uncert is " << P_k_bar(2,2) << std::endl;
             std::cout << "\t Q_k is " << Q_k << std::endl;
             std::cout << "\t P_k_bar is " << P_k_bar << std::endl;
             std::cout << "\t P_k is " << P_k << std::endl;

@@ -52,7 +52,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
           LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0),
-      useAmbiguous(true), frameCounter(0)
+      useAmbiguous(true)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -105,7 +105,6 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
         std::cout << "\t\t" << Z[i] <<std::endl;
     }
 #endif
-    ++frameCounter;
     // Update expected position based on odometry
     timeUpdate(u);
     limitAPrioriUncert();
@@ -170,8 +169,8 @@ LocEKF::associateTimeUpdate(MotionModel u)
     deltaLoc(1) = u.deltaF * sinh + u.deltaL * cosh;
     deltaLoc(2) = u.deltaR;
 
-    A_k(0,2) =  -u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) =  u.deltaF * cosh - u.deltaL * sinh;
+    A_k(0,2) =  0;//-u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) =  0;//u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
