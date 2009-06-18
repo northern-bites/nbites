@@ -122,7 +122,6 @@ void Noggin::initializeLocalization()
 #endif
 
     // Initialize the localization modules
-    //loc = shared_ptr<MCL>(new MCL());
     loc = shared_ptr<LocEKF>(new LocEKF());
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 

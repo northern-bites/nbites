@@ -16,7 +16,8 @@ class VisualFieldObject;
 
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
-class VisualFieldObject : public VisualLandmark , public VisualDetection {
+class VisualFieldObject : public VisualLandmark<fieldObjectID> ,
+                          public VisualDetection {
 
 public:
     // Construcotrs
@@ -59,7 +60,6 @@ public:
                                  _possibleFieldObjects) {
         possibleFieldObjects = _possibleFieldObjects;
     }
-    void setID(fieldObjectID _id) { id = _id; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     virtual void setIDCertainty(certainty c);
@@ -78,7 +78,6 @@ public:
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
-    const fieldObjectID getID() const { return id; }
     const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects() const {
         return possibleFieldObjects;
     }
@@ -91,7 +90,6 @@ private: // Class Variables
     point <int> leftBottom;
     point <int> rightBottom;
     point <float> fieldLocation;
-    fieldObjectID id;
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 

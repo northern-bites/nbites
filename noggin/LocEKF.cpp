@@ -112,7 +112,6 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
     if (! useAmbiguous) {
         // Remove ambiguous observations
-        //std::cout << "using ambiguous" << std::endl;
         std::vector<Observation>::iterator iter = Z.begin();
         while( iter != Z.end() )
         {
@@ -126,13 +125,9 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
     // Correct step based on the observed stuff
     if (Z.size() > 0) {
-        //std::cout << "correct step about to call" << std::endl;
         correctionStep(Z);
-        //std::cout << "correct step completed" << std::endl;
     } else {
-        //std::cout << "no correct step about to call" << std::endl;
         noCorrectionStep();
-        //std::cout << "no correct step completed" << std::endl;
     }
     //limitPosteriorUncert();
 

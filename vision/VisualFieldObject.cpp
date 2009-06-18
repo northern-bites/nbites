@@ -2,25 +2,27 @@
 using namespace std;
 
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
-    : VisualLandmark(), VisualDetection(), id(_id)
+    : VisualLandmark<fieldObjectID>(_id), VisualDetection()
 {
     init();
 }
 
 
 VisualFieldObject::VisualFieldObject()
-    : VisualLandmark(), VisualDetection(), id(UNKNOWN_FIELD_OBJECT) {
+    : VisualLandmark<fieldObjectID>(UNKNOWN_FIELD_OBJECT), VisualDetection()
+ {
     init();
 }
 
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,
                                      const float _distance,
                                      const float _bearing)
-    : VisualLandmark(), VisualDetection(_x, _y, _distance, _bearing)
+    : VisualLandmark<fieldObjectID>(UNKNOWN_FIELD_OBJECT),
+      VisualDetection(_x, _y, _distance, _bearing)
 {
 }
 VisualFieldObject::VisualFieldObject(const VisualFieldObject& other) :
-    VisualLandmark(other), VisualDetection(other)
+    VisualLandmark<fieldObjectID>(other), VisualDetection(other)
 {
 }
 

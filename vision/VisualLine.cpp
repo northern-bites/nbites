@@ -14,7 +14,8 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
-    : possibleLines(ConcreteLine::concreteLines)
+    : VisualLandmark<lineID>(UNKNOWN_LINE),
+      possibleLines(ConcreteLine::concreteLines)
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
          i != nodes.end(); i++) {
@@ -24,7 +25,8 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     init();
 }
 
-VisualLine::VisualLine() : possibleLines(ConcreteLine::concreteLines)
+VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),
+                           possibleLines(ConcreteLine::concreteLines)
 {
 
 }
@@ -33,7 +35,8 @@ VisualLine::VisualLine() : possibleLines(ConcreteLine::concreteLines)
 
 
 VisualLine::VisualLine(list<linePoint> &linePoints)
-    : possibleLines(ConcreteLine::concreteLines)
+    : VisualLandmark<lineID>(UNKNOWN_LINE),
+      possibleLines(ConcreteLine::concreteLines)
 {
     for (list<linePoint>::iterator i = linePoints.begin();
          i != linePoints.end(); i++) {
@@ -45,7 +48,8 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 
 
 VisualLine::VisualLine(const VisualLine& other)
-    : start(other.start), end(other.end), left(other.left), right(other.right),
+    : VisualLandmark<lineID>(other),
+      start(other.start), end(other.end), left(other.left), right(other.right),
       bottom(other.bottom), top(other.top), points(other.points),
       angle(other.angle), a(other.a), b(other.b), length(other.length),
       color(other.color), colorStr(other.colorStr),

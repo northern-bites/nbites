@@ -11,7 +11,8 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _bearing,
                            const VisualLine l1, const VisualLine l2,
                            const float _t1, const float _t2)
-    : VisualDetection(_x, _y, _distance, _bearing), VisualLandmark(),
+    : VisualDetection(_x, _y, _distance, _bearing),
+      VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
       cornerType(UNKNOWN),
       line1(l1), line2(l2), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
@@ -31,7 +32,7 @@ VisualCorner::VisualCorner(const int _x, const int _y,
 VisualCorner::~VisualCorner() {}
 
 VisualCorner::VisualCorner(const VisualCorner& other)
-    : VisualDetection(other), VisualLandmark(other),
+    : VisualDetection(other), VisualLandmark<cornerID>(other),
       possibleCorners(other.possibleCorners),
       cornerType(other.cornerType),
       line1(other.line1), line2(other.line2), t1(other.t1), t2(other.t2),
