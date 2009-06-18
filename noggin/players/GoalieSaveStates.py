@@ -7,10 +7,11 @@ def goalieSave(player):
     brain = player.brain
 
     if player.firstFrame():
-        brain.nav.setSpeed(0,0,0)
+        brain.motion.stopHeadMoves()
+        brain.nav.switchTo('stopped')
+        #player.gainsOff()
+        #player.gainsOn()
         brain.tracker.trackBall()
-    if brain.motion.isWalkActive():
-        return player.stay()
 
     ball = brain.ball
     player.shouldSaveCounter = 0
@@ -73,7 +74,7 @@ def holdCenterSave(player):
     return player.stay()
 
 def postSave(player):
-    player.brain.nav.setSpeed(0,0,0)
+    player.walkPose()
     #if player.brain.ball.on:
     player.brain.tracker.trackBall()
     #else: do not yet created postSaveScan

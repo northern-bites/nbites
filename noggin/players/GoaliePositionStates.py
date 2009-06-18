@@ -51,16 +51,13 @@ def goaliePositionBallClose(player):
     brain.tracker.trackBall()
 
     if STRAFE_ONLY:
-        if nav.isStopped():
-            if relY > CENTER_SAVE_THRESH and\
-                    player.stepsOffCenter < MAX_STEPS_OFF_CENTER:
-                nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
-                nav.switchTo('stepping')
+        if relY > CENTER_SAVE_THRESH and\
+                player.stepsOffCenter < MAX_STEPS_OFF_CENTER:
+            if player.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS):
                 player.stepsOffCenter += STRAFE_STEPS
-            elif relY < -CENTER_SAVE_THRESH and\
-                    player.stepsOffCenter > -MAX_STEPS_OFF_CENTER:
-                nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
-                nav.switchTo('stepping')
+        elif relY < -CENTER_SAVE_THRESH and\
+                player.stepsOffCenter > -MAX_STEPS_OFF_CENTER:
+            if player.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS):
                 player.stepsOffCenter -= STRAFE_STEPS
             '''else:
                 return player.goLater('goalieAtPosition')
@@ -107,14 +104,11 @@ def goaliePositionBallFar(player):
     player.brain.tracker.activeLoc()
 
     if STRAFE_ONLY:
-        if nav.isStopped():
-            if player.stepsOffCenter <= -STRAFE_STEPS:
-                nav.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS)
-                nav.switchTo('stepping')
+        if player.stepsOffCenter <= -STRAFE_STEPS:
+            if player.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS):
                 player.stepsOffCenter += STRAFE_STEPS
-            elif player.stepsOffCenter >= STRAFE_STEPS:
-                nav.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS)
-                nav.switchTo('stepping')
+        elif player.stepsOffCenter >= STRAFE_STEPS:
+            if player.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS):
                 player.stepsOffCenter -= STRAFE_STEPS
     else:
         position = player.brain.playbook.position
