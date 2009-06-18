@@ -572,6 +572,8 @@ Comm::discover_broadcast ()
 void
 Comm::bind () throw(socket_error)
 {
+  int one = 1;
+
   // create socket
   sockn = ::socket(AF_INET, SOCK_DGRAM, 0);
   if (sockn == -1) {
@@ -585,6 +587,9 @@ Comm::bind () throw(socket_error)
   bind_addr.sin_port = htons(UDP_PORT);
   bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
+  // set shared UDP socket (other processes may bind this port)
+  ::setsockopt(sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+
   // bind socket to address
   if (::bind(sockn, reinterpret_cast<const struct sockaddr*>(&bind_addr),
         sizeof(bind_addr)) == -1) {
@@ -594,8 +599,7 @@ Comm::bind () throw(socket_error)
 #endif
 
   // Set broadcast enabled on the socket
-  int on = 1;
-  setsockopt(sockn, SOL_SOCKET, SO_BROADCAST, &on, sizeof(on));
+  setsockopt(sockn, SOL_SOCKET, SO_BROADCAST, &one, sizeof(one));
 
   // Set socket to nonblocking io mode
   int flags = fcntl(sockn, F_GETFL);
@@ -614,6 +618,8 @@ Comm::bind () throw(socket_error)
 void
 Comm::bind_gc () throw(socket_error)
 {
+  int one = 1;
+
   // create socket
   gc_sockn = ::socket(AF_INET, SOCK_DGRAM, 0);
   if (gc_sockn == -1) {
@@ -628,6 +634,9 @@ Comm::bind_gc () throw(socket_error)
   bind_addr.sin_port = htons(GAMECONTROLLER_PORT);
   bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
+  // set shared UDP socket (other processes may bind this port)
+  ::setsockopt(sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+
   // bind socket to address
   if (::bind(gc_sockn, (const struct sockaddr*)&bind_addr,
         sizeof(bind_addr)) == -1) {
@@ -637,8 +646,7 @@ Comm::bind_gc () throw(socket_error)
 #endif
 
   // Set broadcast enabled on the socket
-  int on = 1;
-  setsockopt(gc_sockn, SOL_SOCKET, SO_BROADCAST, &on, sizeof(on));
+  setsockopt(gc_sockn, SOL_SOCKET, SO_BROADCAST, &one, sizeof(one));
 
 //#ifdef COMM_LISTEN
   // Set socket to nonblocking io mode
