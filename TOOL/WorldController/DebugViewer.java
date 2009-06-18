@@ -129,6 +129,7 @@ public class DebugViewer extends JFrame {
     public static final int YELLOW_GOAL_RIGHT_T = 26;
     public static final int YELLOW_GOAL_LEFT_L = 27;
     public static final int YELLOW_GOAL_RIGHT_L = 28;
+    public static final int CORNER_NO_IDEA_ID = 29;
 
     // Field Objects
     public static final int BLUE_GOAL_TOP_POST = 30;
@@ -575,6 +576,9 @@ public class DebugViewer extends JFrame {
         objectIDStringMap.put(new Integer(13), "YELLOW GOAL OUTER L");
         objectIDMap.put(new Integer(14), emptyPoint);
         objectIDStringMap.put(new Integer(14), "CENTER T");
+        objectIDMap.put(new Integer(29), emptyPoint);
+        objectIDStringMap.put(new Integer(29), "NO IDEA CORNER");
+
         // Specific Corners
         Point2D.Double blueCornerTopL =
             new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
@@ -764,6 +768,6 @@ public class DebugViewer extends JFrame {
 
     public boolean isDistinctLandmarkID(int ID)
     {
-        return ( ID >= 15 && ID <= 33);
+        return ( ID >= 15 && ID <= 33 && ID != 29);
     }
 }
