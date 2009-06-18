@@ -30,12 +30,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.stoppedWalk = False
         self.currentSpinDir = None
         self.currentGait = None
-        self.sawOwnGoal = False
-        self.sawOppGoal = False
-        self.oppGoalLeftPostBearings = []
-        self.oppGoalRightPostBearings = []
-        self.myGoalLeftPostBearings = []
-        self.myGoalRightPostBearings = []
         self.trackingBall = False
 
         self.chosenKick = None
@@ -95,13 +89,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         avgOppGoalDist = 0.0
 
         if kickDecider.sawOppGoal:
-            if kickDecider.oppGoalLeftPostBearing is not None and \
-                    kickDecider.oppGoalRightPostBearing is not None:
-                avgOppGoalDist = (kickDecider.oppGoalLeftPostDist +
-                                  kickDecider.oppGoalRightPostDist ) / 2
+            if kickDecider.oppLeftPostBearing is not None and \
+                    kickDecider.oppRightPostBearing is not None:
+                avgOppGoalDist = (kickDecider.oppLeftPostDist +
+                                  kickDecider.oppRightPostDist ) / 2
             else :
-                avgOppGoalDist = max(kickDecider.oppGoalRightPostDist,
-                                     kickDecider.oppGoalLeftPostDist)
+                avgOppGoalDist = max(kickDecider.oppRightPostDist,
+                                     kickDecider.oppLeftPostDist)
 
             if avgOppGoalDist > NogginConstants.FIELD_WIDTH * 2.0/3.0:
                 return KickingConstants.OBJECTIVE_CLEAR
@@ -109,18 +103,23 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                 return KickingConstants.OBJECTIVE_CENTER
             else :
                 return KickingConstants.OBJECTIVE_SHOOT
-        elif kickDecider.sawOppGoal:
-            if kickDecider.ownGoalLeftPostBearing is not None and \
-                    kickDecider.ownGoalRightPostBearing is not None:
-                avgOwnGoalDist = (kickDecider.ownGoalLeftPostDist +
-                                  kickDecider.ownGoalRightPostDist ) / 2
+        elif kickDecider.sawOwnGoal:
+            if kickDecider.myLeftPostBearing is not None and \
+                    kickDecider.myRightPostBearing is not None:
+                avgMyGoalDist = (kickDecider.myLeftPostDist +
+                                  kickDecider.myRightPostDist ) / 2
             else :
-                avgOwnGoalDist = max(kickDecider.ownGoalRightPostDist,
-                                     kickDecider.ownGoalLeftPostDist)
-            if avgOwnGoalDist < NogginConstants.FIELD_WIDTH /2.0:
+                avgMyGoalDist = max(kickDecider.myRightPostDist,
+                                     kickDecider.myLeftPostDist)
+            if avgMyGoalDist < NogginConstants.FIELD_WIDTH /2.0:
                 return KickingConstants.OBJECTIVE_CLEAR
             else :
                 return KickingConstants.OBJECTIVE_SHOOT
         else :
             return KickingConstants.OBJECTIVE_UNCLEAR
 
+
+    def selectKick(self, objective):
+        """
+        Choose where to kick
+        """
