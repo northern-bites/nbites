@@ -24,13 +24,13 @@
 class Observation
 {
 public:
-    // Fields
-    std::vector< std::pair<float, float> > posibilities;
-
     // Construcotrs & Destructors
     Observation(VisualFieldObject &_object);
     Observation(const VisualCorner &_corner);
     Observation(const VisualLine &_line);
+    Observation(int _ID = -1, float _visDist = 0.0, float _visBearing = 0.0,
+                float _distSD = 0.0, float _bearingSD = 0.0,
+                bool _line_truth = false);
     virtual ~Observation();
 
     // Core Functions
@@ -66,14 +66,6 @@ public:
      * @return The ID of the landmark, element of ObservationID enumeration.
      */
     const int getID() const { return id; }
-    /*
-     * @return The x value of the landmark on the playing field.
-     */
-    const float getX() const { return x; }
-    /*
-     * @return The y value of the landmark on the playing field.
-     */
-    const float getY() const { return y; }
 
     /*
      * @return true if the observed object is a line
@@ -105,12 +97,17 @@ public:
     void setDistanceSD(float _sdD) { sigma_d = _sdD; }
     void setBearingSD(float _sdB) { sigma_b = _sdB; }
     void setID(int _id) { id = _id; }
+    void addPointPossibility(PointLandmark p);
+    void addLinePossibility(LineLandmark l);
 
+    // Helper functions
     friend std::ostream& operator<< (std::ostream &o, const Observation &c) {
         return o << "Obs " << c.id << ": (" << c.visDist << ", " << c.visBearing
                  << ", " << c.sigma_d << ", " << c.sigma_b << ")";
     }
-
+    static const bool isLineID(int toTest) {
+        return (toTest >= 50 && toTest <= 68);
+    }
 
 private:
     // Vision information
@@ -121,9 +118,6 @@ private:
 
     // Identity information
     int id;
-    float x;
-    float y;
-    float slope;
     bool line_truth;
     std::vector<LineLandmark> linePossibilities;
     std::vector<PointLandmark> pointPossibilities;

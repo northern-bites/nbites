@@ -18,7 +18,8 @@
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
 
-//#define DEBUG_OBSERVATIONS
+//#define DEBUG_CORNER_OBSERVATIONS
+//#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
@@ -302,7 +303,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bgrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -312,7 +313,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -322,7 +323,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw ygrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -332,7 +333,7 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_OBSERVATIONS
+#ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw yglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
 #endif
@@ -346,7 +347,7 @@ void Noggin::updateLocalization()
         if (i->getDistance() < MAX_CORNER_DISTANCE) {
             Observation seen(*i);
             observations.push_back(seen);
-#           ifdef DEBUG_OBSERVATIONS
+#           ifdef DEBUG_CORNER_OBSERVATIONS
             cout << "Saw corner " << i->getID() << " at distance "
                  << seen.getVisDistance() << " and bearing " << seen.getVisBearing()
                  << endl;
@@ -426,7 +427,22 @@ void Noggin::updateLocalization()
             outputFile << ":";
             outputFile << observations[x].getID() << " "
                        << observations[x].getVisDistance() << " "
-                       << observations[x].getVisBearing();
+                       << observations[x].getVisBearing() << " "
+                       << observations[x].getDistanceSD() << " "
+                       << observations[x].getBearingSD();
+            if( observations[x].isLine() ) {
+                vector<LineLandmark> ps;
+                ps = observations[x].getLinePossibilities();
+                for (unsigned int u = 0; u < ps.size(); ++u) {
+                    outputFile << " " << ps[u];
+                }
+            } else {
+                vector<PointLandmark> ps;
+                ps = observations[x].getPointPossibilities();
+                for (unsigned int u = 0; u < ps.size(); ++u) {
+                    outputFile << " " << ps[u];
+                }
+            }
         }
         outputFile << endl;
     }

@@ -480,10 +480,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
         inputLine >> lastOdo.deltaF >> lastOdo.deltaL >> lastOdo.deltaR
                   >> ballDist >> ballBearing;
 
-        // See if we have corners to read in
-
-        // Update Observations
-
         // Update Ball
         if (ballDist > 0) {
             _b->setDistanceWithSD(ballDist);
@@ -493,6 +489,41 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
             _b->setBearingWithSD(0.0f);
         }
         RangeBearingMeasurement m(_b);
+
+        // Read in observations
+        sightings.clear();
+        cout << endl;
+        // Observations are separated by colons
+        while(inputLine.peek() == ':') {
+            int id;
+            char c;
+            float dist, bearing, distSD, bearingSD;
+            inputLine >> c >> id >> dist >> bearing >> distSD >> bearingSD;
+            cout << "Read in following info -- " << c << " " << id << " "
+                 << dist << " " << bearing << " " << distSD << " "
+                 << bearingSD << " ";
+            Observation obs(id, dist, bearing, distSD, bearingSD,
+                             Observation::isLineID(id));
+            while(inputLine.peek() != ':' &&
+                  inputLine.peek() != EOF) {
+                if(obs.isLine()) {
+                    LineLandmark l;
+                    inputLine >> l.x1 >> l.y1 >> l.x2 >> l.y2;
+                    obs.addLinePossibility(l);
+                    cout << "Line " << l.x1 << " " << l.y1 << " "
+                         << l.x2 << " " << l.y2 << " ";
+                } else {
+                    PointLandmark p;
+                    inputLine >> p.x >> p.y;
+                    obs.addPointPossibility(p);
+                    cout << "Point " << p.x << " " << p.y << " ";
+                }
+            }
+            cout << endl;
+            if (! obs.isLine()) {
+                sightings.push_back(obs);
+            }
+        }
 
         // Update localization
         locEKF->updateLocalization(lastOdo, sightings);

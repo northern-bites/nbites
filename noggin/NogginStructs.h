@@ -118,6 +118,11 @@ public:
     PointLandmark() {}
     float x;
     float y;
+  friend std::ostream& operator<< (std::ostream &o, const PointLandmark &c)
+  {
+      return o << c.x << " " << c.y;
+  }
+
 };
 
 /**
@@ -133,5 +138,10 @@ public:
     float y1;
     float x2;
     float y2;
+  friend std::ostream& operator<< (std::ostream &o, const LineLandmark &c)
+  {
+      return o << c.x1 << " " << c.y1 << " " << c.x2 << " " << c.y2;
+  }
+
 };
 #endif // NogginStructs
