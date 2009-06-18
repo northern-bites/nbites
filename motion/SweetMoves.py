@@ -357,7 +357,17 @@ SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
                             (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 GOALIE_SAVE = (
-    ((0.0, 0.0, -16.0, -35),
-     ( -56.0, 42.0, 5.0,85, -38.0, -15),
-     ( -56.0, -42.0, 5.0,85, -38.0, 15),
-     (0.0, 0.0, 16.0, 35), 2.0, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+    #shoulder pitch, shoulder roll, elbow yaw, elbow roll
+    #hip yaw pitch, hip roll, hip pitch, knee pitch, ankle pitch, ankle roll
+    ((0.0, 0.0, -16.0, -35), #right arm
+     ( -56.0, 42.0, 5.0, 85, -38.0, -15),
+     ( -56.0, -42.0, 5.0, 85, -38.0, 15),
+     (0.0, 0.0, 16.0, 35), #left arm
+     2.0, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+
+CRAB_SIT = (
+    ((120.0, 90.0, -12, 0),
+     (-66.0, 5.0, -90.0, 47.0, 65.0, -3.0),
+     (-66.0, -5.0, -90.0, 47.0, 65.0, 3.0),
+     (120.0, -90.0, 12, 0),
+     5.0, 0, stiff.LOOSE_ARMS_STIFFNESSES),)
