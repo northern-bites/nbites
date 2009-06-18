@@ -3831,7 +3831,7 @@ int ObjectFragments::ballNearGreen(blob b)
 bool ObjectFragments::badSurround(blob b) {
     // basically check around the blob and see if it is ok - ideally we'd have
     // some green, worrisome would be lots of RED
-    static const int surround = 12;
+    static const int SURROUND = 12;
 	
 	const int greenDiv = 10;
 
@@ -3839,12 +3839,16 @@ bool ObjectFragments::badSurround(blob b) {
     int y = b.leftTop.y;
     int w = b.rightTop.x - b.leftTop.x + 1;
     int h = b.rightBottom.y - b.leftTop.y + 1;
+	int surround = min(SURROUND, w/2);
     int greens = 0, orange = 0, red = 0, borange = 0, pix, realred = 0;
-    for (int i = 0; i < w; i++) {
-        for (int j = 0; j < h; j++) {
-            pix = thresh->thresholded[y + j][x + i];
-            if (pix == ORANGE)
-                borange++;
+    for (int i = -1; i < w+1; i++) {
+        for (int j = -1; j < h+1; j++) {
+			if (x + i > -1 && x + i < IMAGE_WIDTH && y + j > -1 &&
+				y + j < IMAGE_HEIGHT) {
+				pix = thresh->thresholded[y + j][x + i];
+				if (pix == ORANGE)
+					borange++;
+			}
         }
     }
     x = max(0, x - surround);
@@ -3868,7 +3872,7 @@ bool ObjectFragments::badSurround(blob b) {
         cout << "Surround information " << red << " " << realred << " " 
 			 << orange << " " << borange << " " << greens << endl;
     }
-	if (orange - borange > borange * 0.3) {
+	if (orange - borange > borange * 0.3 && orange - borange > 10) {
 		if (BALLDEBUG) {
 			cout << "Too much orange outside of the ball" << endl;
 		}
@@ -3902,9 +3906,11 @@ bool ObjectFragments::badSurround(blob b) {
 		if (BALLDEBUG) {
 			cout << "Too much real red - doing more checking" << endl;
 		}
-		if ((x < 1 || x + w > IMAGE_WIDTH - 2) && y + h > IMAGE_HEIGHT - 2) {
+		x = b.leftTop.x;
+		y = b.leftBottom.y;
+		if ((x < 1 || x + w > IMAGE_WIDTH - 2) && y  > IMAGE_HEIGHT - 2) {
 			if (BALLDEBUG) {
-				cout << "Dangerous corner location detected " << endl;
+				cout << "Dangerous corner location detected " << x << " " << y <<  endl;
 			}
 			return true;
 		}
