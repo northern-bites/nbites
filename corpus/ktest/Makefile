@@ -12,7 +12,7 @@ CXX=g++
 oldik : OldInverseKinematics.cpp
 	$(CXX) $(CXX_FLAGS) $(CXX_INCLUDES) -c ../OldInverseKinematics.cpp
 
-newik : InverseKinematics.cpp
+newik : ../InverseKinematics.cpp
 	$(CXX) $(CXX_FLAGS) $(CXX_INCLUDES) -c ../InverseKinematics.cpp
 
 oldmain : oldik
@@ -21,7 +21,7 @@ oldmain : oldik
 newmain : newik
 	$(CXX) $(CXX_FLAGS) $(CXX_INCLUDES) -o newiktest main.cpp InverseKinematics.o
 
-com : COM.cpp
-		$(CXX) $(CXX_FLAGS) $(CXX_INCLUDES) -o comtest COM.cpp
+com : newik COM.cpp
+		$(CXX) $(CXX_FLAGS) $(CXX_INCLUDES) -o comtest COM.cpp InverseKinematics.o
 
 all: com
