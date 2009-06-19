@@ -79,9 +79,6 @@ private: // Class Variables
     point <int> rightBottom;
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteCross *> * possibleCrosses;
-    //int backLeft;
-    //int backRight;
-    //int backDir;
 
     // Member functions
     float robotDistanceToSD(float _distance) {
