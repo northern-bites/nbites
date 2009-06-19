@@ -4,8 +4,6 @@
 #include <iomanip>
 #include <cstdlib>
 
-class VisualCross;
-
 #include "VisualLandmark.h"
 #include "VisualDetection.h"
 #include "ConcreteFieldObject.h"
@@ -13,12 +11,13 @@ class VisualCross;
 #include "Structs.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
+#include "ConcreteCross.h"
 
 // Values for the Standard Deviation calculations
 
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
-class VisualCross : public VisualDetection {
+class VisualCross : public VisualDetection, public VisualLandmark<crossID> {
 
 public:
     // Construcotrs
@@ -54,6 +53,10 @@ public:
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     void updateCross(blob *b);
+    void setPossibleCrosses(const std::list <const ConcreteCross *> *
+                            _possibleCrosses) {
+        possibleCrosses = _possibleCrosses;
+    }
 
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
@@ -64,6 +67,9 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
+    const std::list <const ConcreteCross *> * getPossibleCrosses() const {
+        return possibleCrosses;
+    }
 
 private: // Class Variables
 
@@ -71,10 +77,8 @@ private: // Class Variables
     point <int> rightTop;
     point <int> leftBottom;
     point <int> rightBottom;
-
-    int backLeft;
-    int backRight;
-    int backDir;
+    // This list will hold all the possibilities for this objects's specific ID
+    const std::list <const ConcreteCross *> * possibleCrosses;
 
     // Member functions
     float robotDistanceToSD(float _distance) {

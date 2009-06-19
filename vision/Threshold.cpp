@@ -1012,12 +1012,13 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 											  objPtr->getCenterY() ) /
 						   MAX_ELEVATION_RAD );
 
-        // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
         // convert dist + angle estimates to body center
-        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              objPtr->getDistance());
+        estimate obj_est = pose->pixEstimate(objPtr->getCenterX(),
+                                             objPtr->getCenterY(),
+                                             0.0);
+        obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+                                     objPtr->getCenterY(),
+                                     obj_est.dist);
         objPtr->setDistanceWithSD(obj_est.dist);
         objPtr->setBearingWithSD(obj_est.bearing);
         objPtr->setElevation(obj_est.elevation);

@@ -21,8 +21,10 @@
 //#define DEBUG_CORNER_OBSERVATIONS
 //#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
+#define DEBUG_CROSS_OBSERVATIONS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
+#define USE_TEAMMATE_BALL_REPORTS
 static const float MAX_CORNER_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
@@ -348,12 +350,23 @@ void Noggin::updateLocalization()
             observations.push_back(seen);
 #           ifdef DEBUG_CORNER_OBSERVATIONS
             cout << "Saw corner " << i->getID() << " at distance "
-                 << seen.getVisDistance() << " and bearing " << seen.getVisBearing()
-                 << endl;
+                 << seen.getVisDistance() << " and bearing "
+                 << seen.getVisBearing() << endl;
 #            endif
         }
     }
 #endif
+
+    // Field Cross
+    if (vision->cross->getDistance() > 0) {
+        Observation seen(*vision->cross);
+        observations.push_back(seen);
+#ifdef DEBUG_CROSS_OBSERVATIONS
+        cout << "Saw cross " << vision->cross->getID() << " at distance "
+             << vision->cross->getDistance() << " and bearing "
+             << vision->cross->getBearing() << endl;
+#endif
+    }
 
     // Lines
     // const vector<VisualLine> * lines = vision->fieldLines->getLines();
@@ -382,31 +395,31 @@ void Noggin::updateLocalization()
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     } else {
         // If it's off for more then the threshold, then try and use mate data
+        TeammateBallMeasurement n;
         RangeBearingMeasurement m;
         // HUGE HACK!!!!
         // This returns the ball x, y, which need to be converted to dist and
         // bearing
-        // m = comm->getTeammateBallReport();
+#       ifdef USE_TEAMMATE_BALL_REPORTS
+        n = comm->getTeammateBallReport();
 
-        // if (!(m.distance == 0.0 && m.bearing == 0.0) &&
-        //     !(gc->gameState() == STATE_INITIAL ||
-        //       gc->gameState() == STATE_FINISHED)) {
-        //     float ballX = m.distance;
-        //     float ballY = m.bearing;
-        //     float ballXUncert = m.distanceSD;
-        //     float ballYUncert = m.bearingSD;
-        //     m.distance = hypot(loc->getXEst() - ballX, loc->getYEst() - ballY);
-        //     m.bearing = subPIAngle(atan2(ballY - loc->getYEst(), ballX -
-        //                                  loc->getXEst()) - loc->getHEst());
-        //     m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
-        //     m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
-        //     // cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
-        //     //      << m.bearing << ")" << endl;
-        // }
+        if (!(m.distance == 0.0 && m.bearing == 0.0) &&
+            !(gc->gameState() == STATE_INITIAL ||
+              gc->gameState() == STATE_FINISHED)) {
+            m.distance = hypot(loc->getXEst() - n.ballX,
+                               loc->getYEst() - n.ballY);
+            m.bearing = subPIAngle(atan2(n.ballY - loc->getYEst(),
+                                         n.ballX - loc->getXEst()) -
+                                   loc->getHEst());
+            m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
+            m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
+            // cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
+            //      << m.bearing << ")" << endl;
+        }
 
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
-
+#       endif
 #ifdef DEBUG_BALL_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {
         cout << "Ball seen at distance " << vision->ball->getDistance()
@@ -564,7 +577,11 @@ void Noggin::startLocLog()
     locTime = localtime( &systime );
     strftime(buf, 80, "%Y-%m-%d-%H-%M-%S",locTime);
 
+#ifdef WEBOTS_BACKEND
     string s  = "./lib/man/noggin/" + string(buf) + ".loc";
+#else
+    string s  = "/home/root/" + string(buf) + ".loc";
+#endif
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);
     outputFile << gc->color() << " " << gc->player() << endl;

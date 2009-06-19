@@ -1,10 +1,12 @@
 #include "VisualCross.h"
-VisualCross::VisualCross() : VisualDetection()
+VisualCross::VisualCross() :
+    VisualDetection(), VisualLandmark<crossID>(ABSTRACT_CROSS)
 {
     init();
 }
 
-VisualCross::VisualCross(const VisualCross& o) : VisualDetection(o) {}
+VisualCross::VisualCross(const VisualCross& o) :
+    VisualDetection(o), VisualLandmark<crossID>(o.id){}
 
 // Initialization, happens every frame.
 void VisualCross::init()
@@ -47,7 +49,7 @@ void VisualCross::updateCross(blob *b)
     setCenterX(getLeftTopX() + ROUND2(getWidth() / 2));
     setCenterY(getRightTopY() + ROUND2(getHeight() / 2));
     setDistance(1);
-
+    setPossibleCrosses(&ConcreteCross::abstractCrossList);
 }
 
 /**
