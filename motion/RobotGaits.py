@@ -334,10 +334,10 @@ SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       1.45, # hip offset x
                                       3.0,  # x-axis angle offset
                                       0.4, # step duration
-                                      0.2,  # fraction in double support
+                                      0.25,  # fraction in double support
                                       0.9,  # stepHeight
                                       0.0,  # footLengthX
-                                      0.3,  # zmp static percentage
+                                      0.4,  # zmp static percentage
                                       5.5, # left swing hip roll addition
                                       5.5, # right swing hip roll addition
                                       0.4,  # left zmp off
@@ -349,8 +349,8 @@ SHORT_FAST_GAIT = motion.GaitCommand(31.00,# com height
                                       30.0,  # max theta speed()
                                       0.0,   #sensorScale
                                       0.85,  #maxStiffness
-                                      0.4,  #kneeStiffness
-                                      0.3,  #anklePitchStiffness
+                                      0.3,  #kneeStiffness
+                                      0.4,  #anklePitchStiffness
                                       0.3,  #ankleRollStiffness
                                       0.2,   #armStiffness
                                       1.0,   #xOdoScale
