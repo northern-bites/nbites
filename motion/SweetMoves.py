@@ -44,10 +44,11 @@ SET_POS = INITIAL_POS
 READY_POS = INITIAL_POS
 
 #same as INITIAL_POS, except for time ot get to pos
-GOALIE_POS = (((80.,40.,-50.,-70.),
-                (0.,0.,-50.,100.,-50.,0.),
-                (0.,0.,-50.,100.,-50.,0.),
-                (80.,-40.,50.,70.),1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+GOALIE_POS = ((INITIAL_POS[0][0],
+               INITIAL_POS[0][1],
+               INITIAL_POS[0][2],
+               INITIAL_POS[0][3],
+               1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 #KICKS
 

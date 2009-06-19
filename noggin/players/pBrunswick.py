@@ -10,6 +10,10 @@ from . import GoaliePositionStates
 from . import GoalieChaseBallStates
 from . import GoalieSaveStates
 from . import ChaseBallTransitions
+from . import KickingConstants
+from .. import NogginConstants
+from . import ChaseBallConstants
+from man.motion import SweetMoves
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -28,24 +32,30 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.stoppedWalk = False
         self.currentSpinDir = None
         self.currentGait = None
-        self.sawOwnGoal = False
-        self.sawOppGoal = False
-        self.oppGoalLeftPostBearings = []
-        self.oppGoalRightPostBearings = []
-        self.myGoalLeftPostBearings = []
-        self.myGoalRightPostBearings = []
         self.trackingBall = False
 
         self.chosenKick = None
         self.kickDecider = None
+        self.justKicked = False
 
         self.shouldSaveCounter = 0
         self.shouldChaseCounter = 0
         self.stepsOffCenter = 0
 
+        self.shouldAvoidObstacleRightCounter = 0
+        self.shouldAvoidObstacleLeftCounter = 0
+
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0
+
+        self.kickObjective = None
+
     def run(self):
+        if self.lastDiffState == 'afterKick':
+            self.justKicked = True
+        else:
+            self.justKicked = False
+
         if self.brain.gameController.currentState == 'gamePlaying':
             roleState = self.getNextState()
 
@@ -81,3 +91,56 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'scanFindBall'
         else:
             return 'scanFindBall'
+
+
+    def getKickObjective(self):
+        """
+        Figure out what to do with the ball
+        """
+        kickDecider = self.kickDecider
+        avgOppGoalDist = 0.0
+
+        if kickDecider.sawOppGoal:
+            if kickDecider.oppLeftPostBearing is not None and \
+                    kickDecider.oppRightPostBearing is not None:
+                avgOppGoalDist = (kickDecider.oppLeftPostDist +
+                                  kickDecider.oppRightPostDist ) / 2
+            else :
+                avgOppGoalDist = max(kickDecider.oppRightPostDist,
+                                     kickDecider.oppLeftPostDist)
+
+            if avgOppGoalDist > NogginConstants.FIELD_WIDTH * 2.0/3.0:
+                return KickingConstants.OBJECTIVE_CLEAR
+            elif avgOppGoalDist > NogginConstants.FIELD_WIDTH /2.0:
+                return KickingConstants.OBJECTIVE_CENTER
+            else :
+                return KickingConstants.OBJECTIVE_SHOOT
+        elif kickDecider.sawOwnGoal:
+            if kickDecider.myLeftPostBearing is not None and \
+                    kickDecider.myRightPostBearing is not None:
+                avgMyGoalDist = (kickDecider.myLeftPostDist +
+                                  kickDecider.myRightPostDist ) / 2
+            else :
+                avgMyGoalDist = max(kickDecider.myRightPostDist,
+                                     kickDecider.myLeftPostDist)
+            if avgMyGoalDist < NogginConstants.FIELD_WIDTH /2.0:
+                return KickingConstants.OBJECTIVE_CLEAR
+            else :
+                return KickingConstants.OBJECTIVE_SHOOT
+        else :
+            return KickingConstants.OBJECTIVE_UNCLEAR
+
+
+    def selectKick(self, objective):
+        """
+        Choose where to kick
+        """
+
+
+    def getSpinDirAfterKick(self):
+        if self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+            return ChaseBallConstants.TURN_RIGHT
+        elif self.chosenKick == SweetMoves.RIGHT_FAR_KICK:
+            return ChaseBallConstants.TURN_LEFT
+        else :
+            return ChaseBallConstants.TURN_LEFT

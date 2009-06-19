@@ -316,7 +316,7 @@ WEBOTS_GAIT = motion.GaitCommand(31.00, # com height
                                  0.20,  # right zmp off
                                  7.5,   # turn zmp offset
                                  0.01,  # strafe zmp offset
-                                 6.0,  # max x speed
+                                 10.0,  # max x speed
                                  4.0,   # max y speed
                                  30.0,   # max theta speed()
                                  0.0,   #sensorScale
