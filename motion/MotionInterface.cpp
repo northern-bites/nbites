@@ -48,7 +48,7 @@ void MotionInterface::sendFreezeCommand(const boost::shared_ptr<UnfreezeCommand>
 
 
 void MotionInterface::stopBodyMoves() {
-    std::cout << "Stopping the body not yet implemented" << std::endl;
+	switchboard->stopBodyMoves();
 }
 
 void MotionInterface::stopHeadMoves() {

@@ -86,20 +86,37 @@ def shouldAvoidObstacleLeft(player):
     Need to avoid an obstacle on our left side
     """
     sonar = player.brain.sonar
-    return (#(sonar.LLdist != sonar.UNKNOWN_VALUE and
-        # sonar.LLdist < constants.AVOID_OBSTACLE_DIST) or
-        (sonar.LRdist != sonar.UNKNOWN_VALUE and
-         sonar.LRdist < constants.AVOID_OBSTACLE_DIST))
+    if  (sonar.LLdist != sonar.UNKNOWN_VALUE and
+         sonar.LLdist < constants.AVOID_OBSTACLE_FRONT_DIST) or \
+         (sonar.LRdist != sonar.UNKNOWN_VALUE and
+          sonar.LRdist < constants.AVOID_OBSTACLE_SIDE_DIST):
+        player.shouldAvoidObstacleLeftCounter += 1
+    else :
+        player.shouldAvoidObstacleLeftCounter = 0
+
+
+    if player.shouldAvoidObstacleLeftCounter > \
+            constants.AVOID_OBSTACLE_FRAMES_THRESH:
+        return True
+    return False
 
 def shouldAvoidObstacleRight(player):
     """
     Need to avoid an obstacle on our right side
     """
     sonar = player.brain.sonar
-    return (#(sonar.RRdist != sonar.UNKNOWN_VALUE and
-        # sonar.RRdist < constants.AVOID_OBSTACLE_DIST) or
-        (sonar.RLdist != sonar.UNKNOWN_VALUE and
-         sonar.RLdist < constants.AVOID_OBSTACLE_DIST))
+    if (sonar.RRdist != sonar.UNKNOWN_VALUE and
+         sonar.RRdist < constants.AVOID_OBSTACLE_SIDE_DIST) or \
+         (sonar.RLdist != sonar.UNKNOWN_VALUE and
+          sonar.RLdist < constants.AVOID_OBSTACLE_FRONT_DIST):
+         player.shouldAvoidObstacleRightCounter += 1
+    else :
+        player.shouldAvoidObstacleRightCounter = 0
+
+    if player.shouldAvoidObstacleRightCounter > \
+            constants.AVOID_OBSTACLE_FRAMES_THRESH:
+        return True
+    return False
 
 def shouldAvoidObstacle(player):
     """

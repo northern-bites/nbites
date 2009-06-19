@@ -84,6 +84,9 @@ public:
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
+	void stopBodyMoves(){
+		curProvider->requestStop();
+	}
 
     bool isWalkActive(){return walkProvider.isActive();}
     bool isHeadActive(){return headProvider.isActive();}
