@@ -35,6 +35,7 @@ public class UDPServer extends Thread {
 	    if (!QUIET)
 		System.out.println("Binding socket to port " + port);
 	    socket = new DatagramSocket(port);
+        socket.setReuseAddress(true);
 	} catch (SocketException e) {
 	    System.err.println("Could not open socket");
 	    e.printStackTrace();
