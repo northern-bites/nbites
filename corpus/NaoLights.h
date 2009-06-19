@@ -12,9 +12,14 @@ public:
 public:
     void setRGB(std::string led_id, int rdbHex);
 
+    void postLights();
+private:
+    void initDCMAliases();
+    void initDCMCommands();
+
 private:
     AL::ALPtr<AL::DCMProxy> dcmProxy;
-
+    AL::ALValue lights_command;
 
 };
 

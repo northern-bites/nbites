@@ -18,3 +18,17 @@ void NaoLights::setRGB(std::string led_id, int rgbHex){
 
 
 }
+
+void NaoLights::postLights(){
+
+
+}
+
+
+void NaoLights::initDCMAliases(){
+
+}
+
+void NaoLights::initDCMCommands(){
+
+}
