@@ -14,6 +14,7 @@ from . import KickingConstants
 from .. import NogginConstants
 from . import ChaseBallConstants
 from man.motion import SweetMoves
+from ..util import MyMath
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -100,43 +101,24 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         kickDecider = self.kickDecider
         avgOppGoalDist = 0.0
 
-        if kickDecider.sawOppGoal:
-            if kickDecider.oppLeftPostBearing is not None and \
-                    kickDecider.oppRightPostBearing is not None:
-                avgOppGoalDist = (kickDecider.oppLeftPostDist +
-                                  kickDecider.oppRightPostDist ) / 2
-            else :
-                avgOppGoalDist = max(kickDecider.oppRightPostDist,
-                                     kickDecider.oppLeftPostDist)
+        my = self.brain.my
 
-            if avgOppGoalDist > NogginConstants.FIELD_WIDTH * 2.0/3.0:
-                return KickingConstants.OBJECTIVE_CLEAR
-            elif avgOppGoalDist > NogginConstants.FIELD_WIDTH /2.0:
-                return KickingConstants.OBJECTIVE_CENTER
-            else :
-                return KickingConstants.OBJECTIVE_SHOOT
-        elif kickDecider.sawOwnGoal:
-            if kickDecider.myLeftPostBearing is not None and \
-                    kickDecider.myRightPostBearing is not None:
-                avgMyGoalDist = (kickDecider.myLeftPostDist +
-                                  kickDecider.myRightPostDist ) / 2
-            else :
-                avgMyGoalDist = max(kickDecider.myRightPostDist,
-                                     kickDecider.myLeftPostDist)
-            if avgMyGoalDist < NogginConstants.FIELD_WIDTH /2.0:
-                return KickingConstants.OBJECTIVE_CLEAR
-            else :
-                return KickingConstants.OBJECTIVE_SHOOT
+        if my.x < NogginConstants.FIELD_WIDTH / 2:
+            return KickingConstants.OBJECTIVE_CLEAR
+
+        elif MyMath.dist(my.x, my.y,
+                       NogginConstants.OPP_GOALBOX_RIGHT_X,
+                       NogginConstants.OPP_GOALBOX_MIDDLE_Y ) > \
+                       NogginConstants.FIELD_WIDTH / 3 :
+                       return KickingConstants.OBJECTIVE_CENTER
+        elif self.inOppCorner():
+            return KickingConstants.OBJECTIVE_CENTER
         else :
-            return KickingConstants.OBJECTIVE_UNCLEAR
+            return KickingConstants.OBJECTIVE_SHOOT
 
 
-    def selectKick(self, objective):
-        """
-        Choose where to kick
-        """
 
-
+    ###### HELPER METHODS ######
     def getSpinDirAfterKick(self):
         if self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
             return ChaseBallConstants.TURN_RIGHT
@@ -144,3 +126,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return ChaseBallConstants.TURN_LEFT
         else :
             return ChaseBallConstants.TURN_LEFT
+
+
+    def inOppCorner(self):
+        my = self.brain.my
+        return my.x > KickingConstants.OPP_CORNER_LEFT_X and \
+            (my.y < KickingConstants.BOTTOM_OPP_CORNER_SLOPE * \
+                 (my.x - KickingConstants.OPP_CORNER_LEFT_X) or
+             my.y > KickingConstants.TOP_OPP_CORNER_SLOPE * \
+                 (my.x - KickingConstants.OPP_CORNER_LEFT_X) + \
+                 KickingConstants.TOP_OPP_CORNER_Y )
