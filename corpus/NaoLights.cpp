@@ -1,5 +1,5 @@
 #include "NaoLights.h"
-
+#include "ALLedNames.h"
 
 NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
     :Lights()
