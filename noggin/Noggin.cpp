@@ -47,9 +47,9 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
       motion_interface(_minterface),registeredGCReset(false), ballFramesOff(0),
       do_reload(0)
 {
-#ifdef DEBUG_NOGGIN_INITIALIZATION
+#   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
-#endif
+#   endif
 
     // Initialize the interpreter and C python extensions
     initializePython(v);
@@ -57,32 +57,32 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
 
-#ifdef DEBUG_NOGGIN_INITIALIZATION
+#   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Retrieving Brain.Brain instance\n");
-#endif
+#   endif
 
     // Instantiate a Brain instance
     getBrainInstance();
 
-#ifdef DEBUG_NOGGIN_INITIALIZATION
+#   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  DONE!\n");
-#endif
+#   endif
 }
 
 Noggin::~Noggin ()
 {
     Py_XDECREF(brain_instance);
     Py_XDECREF(brain_module);
-#ifdef LOG_LOC
+#   ifdef LOG_LOC
     stopLocLog();
-#endif
+#   endif
 }
 
 void Noggin::initializePython(shared_ptr<Vision> v)
 {
-#ifdef DEBUG_NOGGIN_INITIALIZATION
+#   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing interpreter and extension modules\n");
-#endif
+#   endif
 
     Py_Initialize();
 
@@ -119,9 +119,9 @@ void Noggin::initializePython(shared_ptr<Vision> v)
 
 void Noggin::initializeLocalization()
 {
-#ifdef DEBUG_NOGGIN_INITIALIZATION
+#   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Initializing localization modules\n");
-#endif
+#   endif
 
     // Initialize the localization modules
     loc = shared_ptr<LocEKF>(new LocEKF());
@@ -135,9 +135,9 @@ void Noggin::initializeLocalization()
     // Set the comm localization access pointers
     comm->setLocalizationAccess(loc, ballEKF);
 
-#ifdef LOG_LOCALIZATION
+#   ifdef LOG_LOCALIZATION
     startLocLog();
-#endif
+#   endif
 }
 
 bool Noggin::import_modules ()
@@ -146,9 +146,9 @@ bool Noggin::import_modules ()
     //
     if (brain_module == NULL) {
         // Import brain module
-#ifdef  DEBUG_NOGGIN_INITIALIZATION
+#       ifdef  DEBUG_NOGGIN_INITIALIZATION
         printf("  Importing noggin.Brain\n");
-#endif
+#       endif
         brain_module = PyImport_ImportModule(BRAIN_MODULE);
     }
 
@@ -241,12 +241,12 @@ void Noggin::runStep ()
         reload_hard();
     }
 
-#ifdef USE_NOGGIN_AUTO_HALT
+#   ifdef USE_NOGGIN_AUTO_HALT
     // don't bother doing anything if there's a Python error and we
     // haven't reloaded
     if (error_state)
         return;
-#endif
+#   endif
 
     //Check button pushes for game controller signals
     processGCButtonClicks();
@@ -258,12 +258,12 @@ void Noggin::runStep ()
     PyVision_update(pyvision);
     PROF_EXIT(profiler, P_PYUPDATE);
 
-#ifdef RUN_LOCALIZATION
+#   ifdef RUN_LOCALIZATION
     // Update localization information
     PROF_ENTER(profiler, P_LOC);
     updateLocalization();
     PROF_EXIT(profiler, P_LOC);
-#endif //RUN_LOCALIZATION
+#   endif //RUN_LOCALIZATION
 
 
     // Call main run() method of Brain
@@ -304,44 +304,44 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_POST_OBSERVATIONS
+#       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bgrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
-#endif
+#       endif
     }
 
     fo = *vision->bglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_POST_OBSERVATIONS
+#       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
-#endif
+#       endif
     }
 
     fo = *vision->ygrp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_POST_OBSERVATIONS
+#       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw ygrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
-#endif
+#       endif
     }
 
     fo = *vision->yglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         Observation seen(fo);
         observations.push_back(seen);
-#ifdef DEBUG_POST_OBSERVATIONS
+#       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw yglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
-#endif
+#       endif
     }
 
     // Corners
-#ifdef USE_LOC_CORNERS
+#   ifdef USE_LOC_CORNERS
     const list<VisualCorner> * corners = vision->fieldLines->getCorners();
     list <VisualCorner>::const_iterator i;
     for ( i = corners->begin(); i != corners->end(); ++i) {
@@ -352,20 +352,20 @@ void Noggin::updateLocalization()
             cout << "Saw corner " << i->getID() << " at distance "
                  << seen.getVisDistance() << " and bearing "
                  << seen.getVisBearing() << endl;
-#            endif
+#           endif
         }
     }
-#endif
+#   endif
 
     // Field Cross
     if (vision->cross->getDistance() > 0) {
         Observation seen(*vision->cross);
         observations.push_back(seen);
-#ifdef DEBUG_CROSS_OBSERVATIONS
+#       ifdef DEBUG_CROSS_OBSERVATIONS
         cout << "Saw cross " << vision->cross->getID() << " at distance "
              << vision->cross->getDistance() << " and bearing "
              << vision->cross->getBearing() << endl;
-#endif
+#       endif
     }
 
     // Lines
@@ -397,9 +397,6 @@ void Noggin::updateLocalization()
         // If it's off for more then the threshold, then try and use mate data
         TeammateBallMeasurement n;
         RangeBearingMeasurement m;
-        // HUGE HACK!!!!
-        // This returns the ball x, y, which need to be converted to dist and
-        // bearing
 #       ifdef USE_TEAMMATE_BALL_REPORTS
         n = comm->getTeammateBallReport();
 
@@ -413,21 +410,23 @@ void Noggin::updateLocalization()
                                    loc->getHEst());
             m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
             m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
-            // cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
-            //      << m.bearing << ")" << endl;
+#           ifdef DEBUG_TEAMMATE_BALL_OBSERVATIONS
+            cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
+                 << m.bearing << ")" << endl;
+#           endif
         }
 
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
-#       endif
-#ifdef DEBUG_BALL_OBSERVATIONS
+#   endif
+#   ifdef DEBUG_BALL_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {
         cout << "Ball seen at distance " << vision->ball->getDistance()
              << " and bearing " << vision->ball->getBearing() << endl;
     }
-#endif
+#   endif
 
-#ifdef LOG_LOCALIZATION
+#   ifdef LOG_LOCALIZATION
     if (loggingLoc) {
         // Print out odometry and ball readings
         outputFile << odometery.deltaF << " " << odometery.deltaL << " "
@@ -458,7 +457,7 @@ void Noggin::updateLocalization()
         }
         outputFile << endl;
     }
-#endif
+#   endif
 
 }
 
@@ -474,9 +473,9 @@ void Noggin::processGCButtonClicks(){
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
         gc->advanceButtonClickState();
         chestButton->getAndClearNumClicks();
-#ifdef DEBUG_NOGGIN_GC
+#       ifdef DEBUG_NOGGIN_GC
         cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
-#endif
+#       endif
     }
 
     //Only toggle colors and kickoff when you are in initial
@@ -484,14 +483,14 @@ void Noggin::processGCButtonClicks(){
         if(leftFootButton->peekNumClicks() ==  SWITCH_TEAM_CLICKS){
             gc->toggleTeamColor();
             leftFootButton->getAndClearNumClicks();
-#ifdef DEBUG_NOGGIN_GC
+#           ifdef DEBUG_NOGGIN_GC
             cout << "Button pushing switched GC to color : ";
             if(gc->color() == TEAM_BLUE)
                 cout << "BLUE" <<endl;
             else
                 cout << "RED" <<endl;
 
-#endif
+#           endif
         }
 
         if(rightFootButton->peekNumClicks() ==  SWITCH_KICKOFF_CLICKS){
