@@ -8,11 +8,10 @@ def goalieSave(player):
 
     if player.firstFrame():
         brain.motion.stopHeadMoves()
-        brain.nav.switchTo('stopped')
-        #player.gainsOff()
-        #player.gainsOn()
+        brain.nav.switchTo('stop')
         brain.tracker.trackBall()
-
+    if not brain.nav.isStopped():
+        return player.stay()
     ball = brain.ball
     player.shouldSaveCounter = 0
     # Figure out where the ball is going and when it will be there
