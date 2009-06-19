@@ -41,6 +41,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.shouldSaveCounter = 0
         self.shouldChaseCounter = 0
+        self.stepsOffCenter = 0
 
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0

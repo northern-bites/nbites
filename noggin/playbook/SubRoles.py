@@ -126,7 +126,7 @@ def pGoalieNormal(team):
                                 ball.y - goalLineIntersectionY)
     #lets try maintaining home position until the ball is closer in
     #might help us stay localized better
-    if ball.locDist < PBConstants.BALL_LOC_LIMIT:
+    if 0 < ball.locDist < PBConstants.BALL_LOC_LIMIT:
         position[1] = ((PBConstants.DIST_FROM_GOAL_INTERCEPT /
                         ballToInterceptDist)*
                        (ball.y - goalLineIntersectionY) +

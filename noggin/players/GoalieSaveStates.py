@@ -4,8 +4,16 @@ import GoalieTransitions as helper
 CENTER_SAVE_THRESH = 15
 
 def goalieSave(player):
-    player.brain.tracker.trackBall()
-    ball = player.brain.ball
+    brain = player.brain
+
+    if player.firstFrame():
+        brain.motion.stopHeadMoves()
+        brain.nav.switchTo('stopped')
+        #player.gainsOff()
+        #player.gainsOn()
+        brain.tracker.trackBall()
+
+    ball = brain.ball
     player.shouldSaveCounter = 0
     # Figure out where the ball is going and when it will be there
     if ball.on:
