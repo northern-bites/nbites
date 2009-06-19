@@ -50,6 +50,26 @@ Observation::Observation(const VisualCorner &_corner) :
 }
 
 /**
+ * @param cross VisualCros that was seen and reported.
+ */
+Observation::Observation(VisualCross &_cross) :
+    visDist(_cross.getDistance()), visBearing(_cross.getBearing()),
+    sigma_d(_cross.getDistanceSD()), sigma_b(_cross.getBearingSD()),
+    id(_cross.getID()), line_truth(false), numPossibilities(0)
+{
+    list <const ConcreteCross *>::const_iterator theIterator;
+    const list <const ConcreteCross *> * objList =
+        _cross.getPossibleCrosses();
+    for( theIterator = objList->begin(); theIterator != objList->end();
+         ++theIterator) {
+        PointLandmark objectLandmark((**theIterator).getFieldX(),
+                                     (**theIterator).getFieldY());
+        pointPossibilities.push_back(objectLandmark);
+        ++numPossibilities;
+    }
+}
+
+/**
  * @param l Line that was seen and reported.
  */
 Observation::Observation(const VisualLine &_line) :

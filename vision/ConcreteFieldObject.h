@@ -92,17 +92,6 @@ private: // Instance variables recording location on field and identifier
     fieldObjectID id;
 
 }; // class ConcreteFieldObject
-////////////////////////////////////////////////////////////
-// Constants for absolute coordinates on the field of the six
-// most meaningful field objects (in terms of stationary things
-// we extract distance information from).  Since we do not use
-// backstops for any distance/bearing information, I am not including
-// it here.
-// (0,0) is the lower left corner of the field when BLUE goal is at the
-// bottom
-// NICK
-//
-////////////////////////////////////////////////////////////
 
 static const point <float> BLUE_GOAL_BOTTOM_POST_LOC =
     point<float>(LANDMARK_BLUE_GOAL_BOTTOM_POST_X,
@@ -119,20 +108,6 @@ static const point <float> YELLOW_GOAL_TOP_POST_LOC =
 static const point <float> YELLOW_GOAL_BOTTOM_POST_LOC =
     point<float>(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X,
                   LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y);
-
-// Arc locations are defined to be the center of the quarter circle spanned
-// by the arc
-static const point <float> BLUE_GOAL_YELLOW_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_LEFT_SIDELINE_X, FIELD_WHITE_BOTTOM_SIDELINE_Y);
-
-static const point <float> BLUE_GOAL_BLUE_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_RIGHT_SIDELINE_X, FIELD_WHITE_BOTTOM_SIDELINE_Y);
-
-static const point <float> YELLOW_GOAL_YELLOW_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_RIGHT_SIDELINE_X, FIELD_WHITE_TOP_SIDELINE_Y);
-
-static const point <float> YELLOW_GOAL_BLUE_ARC_CENTER_LOC =
-    point<float>(FIELD_WHITE_LEFT_SIDELINE_X, FIELD_WHITE_TOP_SIDELINE_Y);
 
 static const point <float> UNKNOWN_LOC =
     point<float>(-1, -1);

@@ -15,6 +15,7 @@
 #include "VisualLine.h"
 #include "VisualCorner.h"
 #include "VisualFieldObject.h"
+#include "VisualCross.h"
 #include "NBMath.h"
 #include "NogginStructs.h"
 
@@ -26,6 +27,7 @@ class Observation
 public:
     // Construcotrs & Destructors
     Observation(VisualFieldObject &_object);
+    Observation(VisualCross &_cross);
     Observation(const VisualCorner &_corner);
     Observation(const VisualLine &_line);
     Observation(int _ID = -1, float _visDist = 0.0, float _visBearing = 0.0,

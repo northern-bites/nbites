@@ -122,6 +122,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 SET( VISION_SRCS ${VISION_INCLUDE_DIR}/ConcreteCorner
                  ${VISION_INCLUDE_DIR}/ConcreteLandmark
                  ${VISION_INCLUDE_DIR}/ConcreteFieldObject
+                 ${VISION_INCLUDE_DIR}/ConcreteCross
                  ${VISION_INCLUDE_DIR}/ConcreteLine
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/ObjectFragments

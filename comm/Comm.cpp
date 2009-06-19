@@ -894,16 +894,13 @@ Comm::latestComm()
   return old;
 }
 
-RangeBearingMeasurement Comm::getTeammateBallReport()
+TeammateBallMeasurement Comm::getTeammateBallReport()
 {
     // Iterate through latest, checking if anyone has a ball report
     // Choose the ball report from the robot with min uncertainty
     list<vector<float> >::iterator i;
+    TeammateBallMeasurement m;
     float minUncert = 10000.0f;
-    float ballX = 0.0f;
-    float ballY = 0.0f;
-    float ballXUncert = 0.0f;
-    float ballYUncert = 0.0f;
     for (i = latest->begin(); i != latest->end(); ++i) {
         // Get the combined uncert x and y
         float curUncert = static_cast<float>( hypot((*i)[6],(*i)[7]) );
@@ -911,21 +908,12 @@ RangeBearingMeasurement Comm::getTeammateBallReport()
         // If the teammate sees the ball and its uncertainty is less than the
         if ((*i)[13] > 0.0 && curUncert < minUncert) {
             minUncert = curUncert;
-            ballX = (*i)[9];
-            ballY = (*i)[10];
-            ballXUncert = (*i)[6];
-            ballYUncert = (*i)[7];
+            m.ballX = (*i)[9];
+            m.ballY = (*i)[10];
+            m.ballXUncert = (*i)[6];
+            m.ballYUncert = (*i)[7];
         }
     }
-
-    RangeBearingMeasurement m;
-    if(ballX != 0.0f || ballY != 0.0f) {
-        m.distance = ballX;
-        m.bearing = ballY;
-        m.distanceSD = ballXUncert;
-        m.bearingSD = ballYUncert;
-    }
-
     return m;
 }
 

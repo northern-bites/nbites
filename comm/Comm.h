@@ -21,7 +21,7 @@
 #include "TOOLConnect.h"
 #include "Vision.h"
 #include "CommTimer.h"
-#include "EKFStructs.h"
+#include "NogginStructs.h"
 
 class Comm
   : public Thread
@@ -52,14 +52,14 @@ class Comm
     int getTOOLState();
     std::string getRobotName();
     std::list<std::vector<float> >* latestComm();
-    RangeBearingMeasurement getTeammateBallReport();
+    TeammateBallMeasurement getTeammateBallReport();
     void setData(std::vector<float> &data);
 
     void add_to_module();
 
   private:
-    void bind()                 throw(socket_error);
-    void bind_gc()              throw(socket_error);
+    void bind() throw(socket_error);
+    void bind_gc() throw(socket_error);
     void handle_comm(struct sockaddr_in &addr,
                      const char *msg,
                      int len
