@@ -26,10 +26,10 @@ namespace ALNames {
         LEFT_LED = 0,
         RIGHT_LED
     };
-    static const int NUM_FACE_LEDS = 8;
-    static const int NUM_EAR_LEDS = 10;
-    static const int NUM_LED_COLORS = 3;
-    static const int NUM_LED_ORIENTATIONS = 2;
+    static const unsigned int NUM_FACE_LEDS = 8;
+    static const unsigned int NUM_EAR_LEDS = 10;
+    static const unsigned int NUM_LED_COLORS = 3;
+    static const unsigned int NUM_LED_ORIENTATIONS = 2;
     static const string faceL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS][NUM_FACE_LEDS] ={
 /*  Face Leds Left */
     {

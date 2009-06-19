@@ -19,7 +19,7 @@ private:
 
 private:
     AL::ALPtr<AL::DCMProxy> dcmProxy;
-    AL::ALValue lights_command;
+    //AL::ALValue eyeLightsAlias;
 
 };
 
