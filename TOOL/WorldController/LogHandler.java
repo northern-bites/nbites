@@ -583,8 +583,10 @@ public class LogHandler
             // get the list of possible landmarks
             ++ambiguousLandmarkCount;
             for (int pos_id : getPossibleIDs(ID)) {
-                painter.sawLandmark((float)debugViewer.objectIDMap.get(pos_id).x,
-                                    (float)debugViewer.objectIDMap.get(pos_id).y,
+                painter.sawLandmark((float)
+                                    debugViewer.objectIDMap.get(pos_id).x,
+                                    (float)
+                                    debugViewer.objectIDMap.get(pos_id).y,
                                     ambiguousLandmarkCount);
             }
         } else { // We Have a ball ignore...
@@ -682,6 +684,10 @@ public class LogHandler
         case DebugViewer.YELLOW_GOAL_POST:
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_TOP_POST));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_BOTTOM_POST));
+            break;
+        case DebugViewer.ABSTRACT_CROSS:
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_CROSS));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_CROSS));
             break;
         }
         return pos;

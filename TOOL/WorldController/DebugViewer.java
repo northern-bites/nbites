@@ -139,6 +139,11 @@ public class DebugViewer extends JFrame {
     public static final int BLUE_GOAL_POST = 34;
     public static final int YELLOW_GOAL_POST = 35;
 
+    // Visual Cross
+    public static final int BLUE_GOAL_CROSS = 80;
+    public static final int YELLOW_GOAL_CROSS = 81;
+    public static final int ABSTRACT_CROSS = 82;
+
     public int[] LANDMARK_X;
     public int[] LANDMARK_Y;
     // TODO: Change this ID value...
@@ -689,6 +694,21 @@ public class DebugViewer extends JFrame {
         objectIDStringMap.put(new Integer(34), "Blue Goal Post");
         objectIDMap.put(new Integer(35), emptyPoint);
         objectIDStringMap.put(new Integer(35), "Yellow Goal Post");
+
+        Point2D.Double bg_cross =
+            new Point2D.Double(wc.the_field.LEFT_SIDELINE_X + 180.0f - 5.0f,
+                               wc.the_field.CENTER_FIELD_Y);
+        Point2D.Double yg_cross =
+            new Point2D.Double(wc.the_field.RIGHT_SIDELINE_X - 180.0f - 5.0f,
+                               wc.the_field.CENTER_FIELD_Y);
+
+
+        objectIDMap.put(new Integer(80), bg_cross);
+        objectIDStringMap.put(new Integer(80), "Blue Goal Cross");
+        objectIDMap.put(new Integer(81), yg_cross);
+        objectIDStringMap.put(new Integer(81), "Yellow Goal Cross");
+        objectIDMap.put(new Integer(82), emptyPoint);
+        objectIDStringMap.put(new Integer(82), "Abstract Cross");
     }
 
     public Dimension getMinimumSize()
@@ -768,6 +788,6 @@ public class DebugViewer extends JFrame {
 
     public boolean isDistinctLandmarkID(int ID)
     {
-        return ( ID >= 15 && ID <= 33 && ID != 29);
+        return ( ID >= 15 && ID <= 33 && ID != 29 && ID != 82);
     }
 }
