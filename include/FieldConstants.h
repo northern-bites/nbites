@@ -101,16 +101,16 @@ static const float LINE_CROSS_OFFSET = 130;
 static const float LINE_CROSS_OFFSET = 180;
 #endif // USING_LAB_FIELD
 
-static const float BLUE_GOAL_LINE_CROSS_X = FIELD_WHITE_LEFT_SIDELINE_X +
+static const float LANDMARK_BLUE_GOAL_CROSS_X = FIELD_WHITE_LEFT_SIDELINE_X +
     LINE_CROSS_OFFSET;
-static const float BLUE_GOAL_LINE_CROSS_Y = MIDFIELD_Y;
-static const float YELLOW_GOAL_LINE_CROSS_X = FIELD_WHITE_RIGHT_SIDELINE_X -
+static const float LANDMARK_BLUE_GOAL_CROSS_Y = MIDFIELD_Y;
+static const float LANDMARK_YELLOW_GOAL_CROSS_X = FIELD_WHITE_RIGHT_SIDELINE_X -
     LINE_CROSS_OFFSET;
-static const float YELLOW_GOAL_LINE_CROSS_Y = MIDFIELD_Y;
+static const float LANDMARK_YELLOW_GOAL_CROSS_Y = MIDFIELD_Y;
 
 static const float CC_LINE_CROSS_X = MIDFIELD_X;
 static const float CC_LINE_CROSS_Y = MIDFIELD_Y;
 
-static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross segment in cm
+static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
 
 #endif // File
