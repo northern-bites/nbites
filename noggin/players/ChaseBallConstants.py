@@ -52,6 +52,7 @@ NORMAL_GAIT = "normalGait"
 
 # Obstacle avoidance stuff
 AVOID_OBSTACLE_DIST = 40.0 #cm
+AVOID_OBSTACLE_FRAMES_THRESH = 2
 DODGE_BACK_SPEED = -2.0 # cm/s
 DODGE_RIGHT_SPEED = -3.0 # cm/s
 DODGE_LEFT_SPEED = 3.0 # cm/s

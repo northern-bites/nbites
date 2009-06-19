@@ -6,7 +6,6 @@ from man.noggin.util import MyMath
 from man.motion import SweetMoves
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
-from .. import NavConstants
 from math import fabs
 
 def chase(player):
@@ -98,8 +97,8 @@ def approachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-#     elif transitions.shouldAvoidObstacle(player):
-#         return player.goLater('avoidObstacle')
+    elif transitions.shouldAvoidObstacle(player):
+         return player.goLater('avoidObstacle')
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball
@@ -213,20 +212,23 @@ def avoidObstacle(player):
     if player.firstFrame():
         player.printf(player.brain.sonar)
 
-    if (transitions.shouldAvoidObstacleLeft(player) and
-        transitions.shouldAvoidObstacleRight(player)):
-        # Backup
-        player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
 
-    elif transitions.shouldAvoidObstacleLeft(player):
-        # Dodge right
-        player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
-    elif transitions.shouldAvoidObstacleRight(player):
-        # Dodge left
-        player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
+        if (transitions.shouldAvoidObstacleLeft(player) and
+            transitions.shouldAvoidObstacleRight(player)):
+            # Backup
+            player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
 
-    else:
-        return player.goLater("chase")
+        elif transitions.shouldAvoidObstacleLeft(player):
+            # Dodge right
+            player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
+
+        elif transitions.shouldAvoidObstacleRight(player):
+            # Dodge left
+            player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
+
+    elif not transitions.shouldAvoidObstacle(player):
+        player.brain.motion.stopBodyMoves()
+        return player.goLater('walkForward')
     return player.stay()
 
 def orbitBall(player):
