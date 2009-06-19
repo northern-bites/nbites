@@ -97,8 +97,8 @@ def approachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif transitions.shouldAvoidObstacle(player):
-         return player.goLater('avoidObstacle')
+    #elif transitions.shouldAvoidObstacle(player):
+    #    return player.goLater('avoidObstacle')
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball
