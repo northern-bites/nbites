@@ -8,7 +8,7 @@ ZERO_HEADS = (((0.0,0.0),1.0,0, stiff.LOW_HEAD_STIFFNESSES),)
 
 NEUT_HEADS = (((0.,20.),2.0,0, stiff.LOW_HEAD_STIFFNESSES),)
 
-LOOK_DOWN = ( ((0.0,25.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
+LOOK_DOWN = ( ((0.0,30.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
 LOOK_UP =  ( ((0.0,-30.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
