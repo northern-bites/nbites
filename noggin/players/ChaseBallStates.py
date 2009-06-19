@@ -227,8 +227,8 @@ def avoidObstacle(player):
             player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
 
     elif not transitions.shouldAvoidObstacle(player):
-        player.brain.motion.stopBodyMoves()
-        return player.goLater('walkForward')
+        player.stopWalking()
+        return player.goLater('chase')
     return player.stay()
 
 def orbitBall(player):

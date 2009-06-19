@@ -87,9 +87,9 @@ def shouldAvoidObstacleLeft(player):
     """
     sonar = player.brain.sonar
     if  (sonar.LLdist != sonar.UNKNOWN_VALUE and
-         sonar.LLdist < constants.AVOID_OBSTACLE_DIST) or \
+         sonar.LLdist < constants.AVOID_OBSTACLE_FRONT_DIST) or \
          (sonar.LRdist != sonar.UNKNOWN_VALUE and
-          sonar.LRdist < constants.AVOID_OBSTACLE_DIST):
+          sonar.LRdist < constants.AVOID_OBSTACLE_SIDE_DIST):
         player.shouldAvoidObstacleLeftCounter += 1
     else :
         player.shouldAvoidObstacleLeftCounter = 0
@@ -106,9 +106,9 @@ def shouldAvoidObstacleRight(player):
     """
     sonar = player.brain.sonar
     if (sonar.RRdist != sonar.UNKNOWN_VALUE and
-         sonar.RRdist < constants.AVOID_OBSTACLE_DIST) or \
+         sonar.RRdist < constants.AVOID_OBSTACLE_SIDE_DIST) or \
          (sonar.RLdist != sonar.UNKNOWN_VALUE and
-          sonar.RLdist < constants.AVOID_OBSTACLE_DIST):
+          sonar.RLdist < constants.AVOID_OBSTACLE_FRONT_DIST):
          player.shouldAvoidObstacleRightCounter += 1
     else :
         player.shouldAvoidObstacleRightCounter = 0
