@@ -7,7 +7,7 @@ using namespace NBMath;
 using namespace std;
 
 enum COMOutcome{
-    STUCK = 0,
+    STUCK2 = 0,
     SUCCESS2 = 1
 };
 
@@ -137,7 +137,7 @@ const ufmatrix3 buildComJacobian(const ChainID id,
 
 const ufvector4
 slowCalculateChainCom(const ChainID id,
-             const std::vector <float> &angles) {
+             const float angles[]) {
   ufmatrix4 fullTransform = ublas::identity_matrix <float> (4);
   ufvector4 comPos = CoordFrame4D::vector4D(0,0,0,0);
 
@@ -211,7 +211,7 @@ slowCalculateChainCom(const ChainID id,
 
 const ufvector4
 slowCalculateBodyCom_f(const ChainID id,
-                   const std::vector <float> &angles,
+                   const float angles[],
                    const ufvector4 partialBodyCom_c) {
   ufmatrix4 fullTransform = ublas::identity_matrix <float> (4);
   ufvector4 partialCom_c = CoordFrame4D::vector4D(0,0,0,0);
@@ -283,8 +283,15 @@ slowCalculateBodyCom_f(const ChainID id,
   }
 
   const ufmatrix4 cf_Transform = invertKinematicsMatrix(fullTransform);
-  cout << "com in Body frame " << partialCom_c+partialBodyCom_c<<endl;
-  ufvector4 bodyCom_f  = prod(cf_Transform,(partialCom_c+partialBodyCom_c));
+  ufvector4 com_c = partialCom_c+partialBodyCom_c;
+  com_c(3) = 1.0f;
+  // cout << "com in Body frame " << com_c<<endl;
+
+  // cout << "Full transform " << fullTransform<<endl;
+  // cout << "cfTransform " << cf_Transform<<endl;
+  // cout << "fullTransform.origin "<< prod(fullTransform,CoordFrame4D::vector4D(0,0,0))<<endl;
+  // cout << "cf_Transform.origin "<< prod(cf_Transform,CoordFrame4D::vector4D(0,0,0))<<endl;
+  ufvector4 bodyCom_f  = prod(cf_Transform,com_c);
   return bodyCom_f;
 }
 
@@ -298,31 +305,18 @@ vector<float> getChainAngles(ChainID id, vector<float> bodyAngles){
     }
     return result;
 }
-static const unsigned int maxComIterations = 50;
+static const unsigned int maxComIterations = 1;
+static const float dampFactor2 = 1000.0f;
 
-const COMLegResult adjustLeg(const ChainID support_id, const vector<float> bodyAngles,
-                          const ufvector4 COMTarget, const float maxError){
+const bool adjustLeg(const ChainID support_id, float currentAngles[],
+                             const ufvector4 COMTarget, const ufvector4 partialComPos,
+                             const float maxError){
     const ChainID ankleChainID = (support_id == LLEG_CHAIN ?
                             LANKLE_CHAIN : RANKLE_CHAIN);
-    float currentAngles[LEG_JOINTS];
-    for(unsigned int i = 0; i < LEG_JOINTS; i++){
-        currentAngles[i] = bodyAngles[chain_first_joint[support_id] + i];
-    }
 
-    //start by adding up all the coms of the chains in the body:
-    ufvector4 partialComPos =
-        CoordFrame4D::vector4D(CHEST_MASS_X,
-                               0,CHEST_MASS_Z)
-        *(CHEST_MASS_g/TOTAL_MASS);
-    for(unsigned int i = 0; i < NUM_CHAINS; i++){
-        if((ChainID) i == support_id)
-            continue;
-        partialComPos+= slowCalculateChainCom((ChainID)i, getChainAngles((ChainID) i,
-                                                                         bodyAngles));
-    }
 
     const ufmatrix3 dampenMatrix =
-        ublas::identity_matrix<float> (3)*(Kinematics::dampFactor*Kinematics::dampFactor);
+        ublas::identity_matrix<float> (3)*(dampFactor2*dampFactor2);
 
     for(unsigned int  iterations = 0; iterations<maxComIterations; iterations++){
         //At the beginning of each iteration, we need to adjust the heel
@@ -340,19 +334,29 @@ const COMLegResult adjustLeg(const ChainID support_id, const vector<float> bodyA
 
         // Define the Jacobian that describes the linear approximation at the
         // current angle values.        
-        const ufmatrix3 j = buildComJacobian(ankleChainID, currentAngles,
+        const ufmatrix3 j = buildComJacobian(support_id, currentAngles,
                                              partialComPos);
+        cout << "partialCOM "<<partialComPos<<endl;
+        cout << "Jacobian "<<j<<endl;
+        for(int i =0;i<6; i++){ cout << currentAngles[i]<<",";}cout <<endl;
         const ufmatrix3 j_t = trans(j);
 
-        const ufvector3 currentCOM_f = calculateCom_f(support_id, currentAngles,
+        const ufvector4 currentCOM_f = calculateCom_f(support_id, currentAngles,
                                                       partialComPos);
-        const ufvector3 e = COMTarget - currentCOM_f;
+//        const ufvector3 currentCOM_f = subrange(currentCOM_f4,0,3);
+        const ufvector3 e = subrange((COMTarget - currentCOM_f),0,3);
+
 
         // Check if we have gotten close enough
         float dist_e = norm_2(e);
+        cout << "Iteration "<<iterations<<":"<<endl;
+        cout << "  Current COM_f" <<currentCOM_f<<endl;
+        cout << "  Current error" <<e<<endl;
+        cout << "  Current dist" <<dist_e<<endl;
+        cout << "  Current ankle success " <<heelSuccess<<endl;
 
         if (dist_e < maxError)
-            break;
+            return true && heelSuccess;
 
         ufmatrix3 temp = prod(j, j_t);
         temp += dampenMatrix;
@@ -362,7 +366,8 @@ const COMLegResult adjustLeg(const ChainID support_id, const vector<float> bodyA
         const ufvector3 result = solve(temp, e);
         // Now we multiply j_t by result and we get delta_theta
         ufvector3 ankleDeltaTheta = prod(j_t, result);
-
+        // ankleDeltaTheta(0) =  ankleDeltaTheta(0);
+        cout<< " moving the angles by" <<ankleDeltaTheta<<endl;
         currentAngles[1] += clip(ankleDeltaTheta(0),
                                -maxDeltaTheta,
                                maxDeltaTheta);
@@ -375,11 +380,58 @@ const COMLegResult adjustLeg(const ChainID support_id, const vector<float> bodyA
         clipChainAngles(support_id, currentAngles);
     }
 
+    return false;
+}
+
+const COMLegResult comDLS(const ChainID support_id, float bodyAngles[],
+            const ufvector4 COMTarget, const float maxError){
+    float currentAngles[LEG_JOINTS];
+    for(unsigned int i = 0; i < LEG_JOINTS; i++){
+        currentAngles[i] = bodyAngles[chain_first_joint[support_id] + i];
+    }
+
+    //start by adding up all the coms of the chains in the body:
+    ufvector4 partialComPos =
+        CoordFrame4D::vector4D(CHEST_MASS_X,
+                               0,CHEST_MASS_Z)
+        *(CHEST_MASS_g/TOTAL_MASS);
+    for(unsigned int i = 0; i < NUM_CHAINS; i++){
+        if((ChainID) i == support_id)
+            continue;
+        partialComPos+= slowCalculateChainCom((ChainID)i,  &bodyAngles[chain_first_joint[i]]);
+    }
+
+    const bool success = adjustLeg(support_id, currentAngles, COMTarget,
+                                   partialComPos, maxError);
+
     COMLegResult result;
-    result.outcome = SUCCESS2;
+    if(success)
+        result.outcome = SUCCESS2;
+    else
+        result.outcome = STUCK2;
     memcpy(result.angles,currentAngles,LEG_JOINTS*sizeof(float));
     return result;
 }
+
+void dls_test(){
+        //just assume we start at zero
+        float zeroJoints[Kinematics::LEG_JOINTS] = {0.0f,0.0f,0.0f,
+                                                    0.0f,0.0f,0.0f};
+
+    NBMath::ufvector3 lgoal = NBMath::ufvector3(3);
+    lgoal(0)=-20; lgoal(1) = 10; lgoal(2) = -310;
+    Kinematics::IKLegResult lresult =
+        Kinematics::dls(Kinematics::LLEG_CHAIN,
+                        lgoal, zeroJoints);
+    std::vector<float> lleg_angles(lresult.angles,
+                                   lresult.angles +
+                                   Kinematics::LEG_JOINTS);
+
+    for(int i =0 ; i< 6; i++){cout << lleg_angles[i]<<"f,";}
+    cout <<endl;
+    cout << "succes?" << lresult.outcome<<endl;
+}
+
 
 void comControl(ChainID support_id){
     float zeroJoints[] =
@@ -390,36 +442,65 @@ void comControl(ChainID support_id){
     0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,
     0.0f,0.0f,0.0f,0.0f};
     float bodyJoints[] =
-{
-    0.0f,0.0f,
-    1.57f,0.26f,0.0f,0.0f,
-    0.0f, M_PI_FLOAT/4, -0.0f,M_PI_FLOAT/10,-0.0f,0.0f,
-    0.0f, 0.0f, -0.0f,0.0f,-0.0f,0.0f,
-    1.57,-0.26f,0.0f,0.0f};
-    vector<float> bodyAngles = vector<float>(zeroJoints,&zeroJoints[NUM_JOINTS]);
-
-    //Calculate the COM of the rest of the leg
-    ufvector4 partialComPos = CoordFrame4D::vector4D(CHEST_MASS_X,0,CHEST_MASS_Z)*(CHEST_MASS_g/TOTAL_MASS);
-    for(unsigned int i = 0; i < NUM_CHAINS; i++){
+        {
+            0.0f,0.0f,
+            1.57f,0.26f,0.0f,0.0f,
+            0.0f,-0.219852f,-0.287731f,0.792687f,-0.504934f,0.219965f, //nearly com centered over foot
+0.0f,-0.219852f,-0.287731f,0.792687f,-0.504934f,0.219965f,
+// 0.0f,-0.272387f,-0.256487f,0.727372f,-0.470844f,0.272536f,
+// 0.0f,-0.272387f,-0.256487f,0.727372f,-0.470844f,0.272536f,
+    // 0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,
+    // 0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,
+            // 0.0f, M_PI_FLOAT/4, -0.0f,M_PI_FLOAT/10,-0.0f,0.0f,
+            // 0.0f, M_PI_FLOAT/4, -0.0f,M_PI_FLOAT/10,-0.0f,0.0f,
+    // 0.0f, 0.0f, -0.378f,0.91f,-0.53f,0.0f,
+    // 0.0f, 0.0f, -0.378f,0.91f,-0.53f,0.0f,
+            1.57,-0.26f,0.0f,0.0f};
+    vector<float> bodyAngles = vector<float>(bodyJoints,&bodyJoints[NUM_JOINTS]);
+    
+    ufvector4 chestCOM = CoordFrame4D::vector4D(CHEST_MASS_X,0,CHEST_MASS_Z)*(CHEST_MASS_g/TOTAL_MASS);
+//Calculate the COM of the rest of the leg
+    ufvector4 zeroComPos = CoordFrame4D::vector4D(0,0,0,0);
+    ufvector4 partialComPos = chestCOM;//
+    for(unsigned int i = 2; i < 3; i++){
         if((ChainID) i == support_id)
             continue;
-        partialComPos+= slowCalculateChainCom((ChainID)i, getChainAngles((ChainID) i,
-                                                                      bodyAngles));
+        partialComPos+= slowCalculateChainCom((ChainID)i, &bodyJoints[chain_first_joint[i]]);
     }
-    cout << "partialCom" << partialComPos<<endl;
-
+    cout << "partialCom " << partialComPos<<endl;
+    //partialComPos = zeroComPos;
     //Now calculate the COM in the support foot frame
-ufvector4 com_f = slowCalculateBodyCom_f(support_id,getChainAngles(support_id,bodyAngles)
-                                         ,partialComPos);
-    cout <<"Com in foot frame " <<com_f<<endl;
+// ufvector4 com_f = slowCalculateBodyCom_f(support_id,getChainAngles(support_id,bodyAngles)
+//                                          ,partialComPos);
+//     cout <<"Com in foot frame " <<com_f<<endl;
 
 
-ufvector4 COMTarget_f = CoordFrame4D::vector4D(20,0,270);
-COMLegResult result  = adjustLeg(support_id,bodyAngles,
-                                 COMTarget_f,REALLY_LOW_ERROR);
-
+ufvector4 fast_com_f = calculateCom_f(support_id,
+                                      &bodyAngles[chain_first_joint[support_id]],
+                                      partialComPos);
+cout << "Fast com in foot frame "<< fast_com_f<<endl;
+ufvector4 COMTarget_f = CoordFrame4D::vector4D(20,0,260);
+COMLegResult result  = comDLS(support_id,bodyJoints,
+                              COMTarget_f,REALLY_LOW_ERROR);
+cout<< " result.outcome "<< result.outcome<<endl;
 }
 
+
+void jacobianTest(){
+    ufvector4 partialCom = CoordFrame4D::vector4D(0,0,0);
+    float leg_angles[6] = {0.0f,-0.219852f,-0.287731f,
+                           0.792687f,-0.504934f,0.219965f};
+    // float leg_angles[6] = {0.0f,0.0f,0.1f,0.0f,0.0f,0.0f};
+    ufmatrix3 j = buildComJacobian(LLEG_CHAIN,leg_angles,partialCom);
+    for(int i =0; i < 6; i++){cout << leg_angles[i]<<",";} cout <<endl;
+    cout << "Jacobian" <<j<<endl;
+    ufvector4 com_f = calculateCom_f(LLEG_CHAIN, leg_angles,partialCom);
+    cout << "Com_F "<<com_f<<endl;
+
+    ufvector4 slow_com_f = slowCalculateBodyCom_f(LLEG_CHAIN, leg_angles,partialCom);
+    cout <<"  slow Com_f "<< slow_com_f<<endl;
+
+}
 
 void comTest(){
     float zeroJoints[] =
@@ -442,8 +523,7 @@ void comTest(){
 //ufvector4 comPos = CoordFrame4D::vector4D(CHEST_MASS_X,0,CHEST_MASS_Z)*(CHEST_MASS_g/TOTAL_MASS);
     ufvector4 comPos = CoordFrame4D::vector4D(0,0,0,0);
     for(unsigned int i = 2; i < 3; i++){
-        comPos+= slowCalculateChainCom((ChainID)i, getChainAngles((ChainID) i,
-                                                              bodyAngles));
+        comPos+= slowCalculateChainCom((ChainID)i, &bodyJoints[chain_first_joint[i]]);
         cout << endl;
     }
     cout << "long way : final comPos is"<<comPos <<endl;
@@ -452,6 +532,8 @@ void comTest(){
 }
 
 int main(){
-    comControl(LLEG_CHAIN);
+    jacobianTest();
+    //dls_test();
+    //comControl(LLEG_CHAIN);
     //comTest();
 }
