@@ -146,7 +146,8 @@ ELSE(WEBOTS_BACKEND)
   LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
                                  ${CORPUS_INCLUDE_DIR}/NaoEnactor
 				 ${CORPUS_INCLUDE_DIR}/ALTranscriber
-				 ${CORPUS_INCLUDE_DIR}/ALImageTranscriber)
+				 ${CORPUS_INCLUDE_DIR}/ALImageTranscriber
+				 ${CORPUS_INCLUDE_DIR}/NaoLights)
 ENDIF(WEBOTS_BACKEND)
 
 
