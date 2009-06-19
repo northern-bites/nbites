@@ -159,6 +159,7 @@ private: // Helper methods
 
     const bool decideStartLeft(const float lateralVelocity,
                                const float radialVelocity);
+    void clearFutureSteps();
 
     void resetQueues();
     void resetOdometry();

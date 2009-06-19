@@ -586,10 +586,9 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     const float new_theta = clip(_theta,walkParams->maxThetaSpeed)
         *walkParams->stepDuration*2.0f;
 
-    //If the new command is a stop command, then clear future steps
-    if(new_x == 0.0f && new_y == 0.0f && new_theta == 0.0f){
-        futureSteps.clear();
-    }
+
+    //Regardless, we are changing the walk vector, so we need to scrap any future plans
+    clearFutureSteps();
 
     //If the walk vector isn't changing,
     if(abs(new_x - x) <= NEW_VECTOR_THRESH_MMS &&
@@ -631,10 +630,6 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     }
     done = false;
 
-
-    // We have to reevalaute future steps, so we forget about any future plans
-    futureSteps.clear();
-
 }
 
 
@@ -651,7 +646,7 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
 #endif
 
     // We have to reevalaute future steps, so we forget about any future plans
-    futureSteps.clear();
+    clearFutureSteps();
 
     //convert speeds in cm/s and rad/s into steps and clip according to the gait
     const float new_x =  clip(_x,walkParams->maxXSpeed)
@@ -1091,6 +1086,17 @@ WalkArmsTuple StepGenerator::tick_arms(){
                          rightArm.tick(supportStep_f));
 }
 
+void StepGenerator::clearFutureSteps(){
+    //first, we need to scrap all future steps:
+    futureSteps.clear();
+    if(currentZMPDSteps.size() > 0){
+        lastQueuedStep = currentZMPDSteps.back();
+        //Then, we need to make sure that the next step we generate will be of the correct type
+        //If the last ZMPd step is left, the next one shouldn't be
+        nextStepIsLeft = (lastQueuedStep->foot != LEFT_FOOT);
+    }
+}
+
 void StepGenerator::updateDebugMatrix(){
 #ifdef DEBUG_CONTROLLER_COM
     static ublas::matrix<float> identity(ublas::identity_matrix<float>(3));
@@ -1098,6 +1104,7 @@ void StepGenerator::updateDebugMatrix(){
     fi_Transform = solve(test,identity);
 #endif
 }
+
 void StepGenerator::debugLogging(){
 
 
