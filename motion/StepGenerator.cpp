@@ -586,6 +586,24 @@ void StepGenerator::setSpeed(const float _x, const float _y,
     const float new_theta = clip(_theta,walkParams->maxThetaSpeed)
         *walkParams->stepDuration*2.0f;
 
+    //If the new command is a stop command, then clear future steps
+    if(new_x == 0.0f && new_y == 0.0f && new_theta == 0.0f){
+        futureSteps.clear();
+    }
+
+    //If the walk vector isn't changing,
+    if(abs(new_x - x) <= NEW_VECTOR_THRESH_MMS &&
+       abs(new_y - y) <= NEW_VECTOR_THRESH_MMS &&
+       abs(new_theta - theta) <= NEW_VECTOR_THRESH_RADS){
+
+        //and there are plenty of steps,
+        if(futureSteps.size() + currentZMPDSteps.size() >= MIN_NUM_ENQUEUED_STEPS){
+            //since we don't need steps, and the new vector is not very different,
+            //we just return
+            return;
+        }
+    }
+
     x = new_x;
     y=new_y;
     theta=new_theta;
