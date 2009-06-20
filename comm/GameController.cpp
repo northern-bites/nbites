@@ -43,9 +43,11 @@ printGCData(RoboCupGameControlData& packet)
 }
 
 
-/* class constructor */ 
+/* class constructor */
 GameController::GameController()
-  : controlData(), myTeam(&controlData.teams[TEAM_BLUE]), playerNumber(1)
+    : controlData(), myTeam(&controlData.teams[TEAM_BLUE]), playerNumber(1),
+      justManuallyPenalized(false), manuallyPenalized(false)
+
 {
   pthread_mutex_init (&mutex, NULL);
 }
@@ -61,7 +63,7 @@ GameController::handle_packet(const char *msg, int len)
     rawSwapTeams(packet);
 
   //beepOnUnfairPenalize(packet);
-  
+
   // if data has changed
   if (memcmp(&packet, &controlData, sizeof(controlData)) != 0) {
 
@@ -317,8 +319,10 @@ void GameController::advanceButtonClickState(){
     case STATE_PLAYING:
         if(currentPenalty == PENALTY_NONE){
             setPenalty(PENALTY_MANUAL);
+            manualPenalize(true);
         }else{
             setPenalty(PENALTY_NONE);
+            manualPenalize(false);
         }
         break;
     default:
@@ -348,9 +352,31 @@ void GameController::toggleKickoff(){
         setKickOffTeam(team());
     }
 }
+
+void GameController::manualPenalize(bool penalize)
+{
+    justManuallyPenalized = true;
+    manuallyPenalized = penalize;
+}
+
+bool GameController::shouldSendManualPenalty()
+{
+    return justManuallyPenalized;
+}
+
+void GameController::sentManualPenalty()
+{
+    justManuallyPenalized = false;
+}
+
+const bool GameController::isManuallyPenalized(void)
+{
+    return manuallyPenalized;
+}
+
 //
 // Python GameController interface
-// 
+//
 
 #ifdef USE_PYTHON_GC
 
@@ -506,7 +532,7 @@ PyGameController_dealloc (PyObject* self)
   self->ob_type->tp_free(self);
 }
 
-/** 
+/**
  * Retrieve a C++ GameController data attribute from Python.  Closure supplied
  * in definition determines the type requested.  Uses Py_BEGIN_ALLOW_THREADS
  * and Py_END_ALLOW_THREADS to prevent Python blocking in other threads while

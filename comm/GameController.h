@@ -55,7 +55,7 @@ public:
     const GCPenalty penalties(uint16 player);
     const uint16 penaltySeconds();
     const uint16 penaltySeconds(uint16 player);
-
+    const bool isManuallyPenalized(void);
     void setTeam(uint8 team);
     void setColor(uint8 color);
     void setPlayer(uint8 player);
@@ -63,11 +63,13 @@ public:
     void setGameState(GCGameState state);
     void setPenalty(GCPenalty penalized);
 
-    //Button
+    // Button Click Methods
     void advanceButtonClickState();
     void toggleTeamColor();
     void toggleKickoff();
-
+    void manualPenalize(bool penalize);
+    bool shouldSendManualPenalty();
+    void sentManualPenalty();
 
   private:
     // check the validity of the given message and store the data
@@ -81,6 +83,8 @@ public:
     RoboCupGameControlData controlData;
     TeamInfo* myTeam;
     uint8 playerNumber;
+    bool justManuallyPenalized;
+    bool manuallyPenalized;
 
     static const uint8 NUM_TEAMS;//2
 
