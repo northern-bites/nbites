@@ -8,14 +8,15 @@ DEBUG_GOAL_LEDS = True
 LED_OFF = 0
 LED_ON = 1
 
-#GROUPS
-LEFT_EYE_LED    = "LeftEye"
-RIGHT_EYE_LED   = "RightEye"
-LEFT_EAR_LED   = "LeftEar"
-RIGHT_EAR_LED   = "RightEar"
-CHEST_LED       = "Chest"
-LEFT_FOOT_LED   = "LeftFoot"
-RIGHT_FOOT_LED  = "RightFoot"
+#The order here must match the order of the string defined in Lights.h 
+# and in ALLedNames.h
+(LEFT_EYE_LED,
+RIGHT_EYE_LED,
+LEFT_EAR_LED,
+RIGHT_EAR_LED,
+CHEST_LED,
+LEFT_FOOT_LED,
+RIGHT_FOOT_LED) = range(_lights.NUM_LED_GROUPS)
 
 
 #COLORS

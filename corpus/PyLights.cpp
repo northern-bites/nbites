@@ -45,6 +45,8 @@ BOOST_PYTHON_MODULE(_lights)
         ;
 
     scope().attr("lights") = lights_pointer;
+    scope().attr("NUM_LED_GROUPS") = static_cast<int>(Lights::NUM_LED_NAMES);
+
 }
 
 void c_init_lights () {
