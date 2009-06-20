@@ -80,6 +80,9 @@ class Brain(object):
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
         self.sonar = TypeDefs.Sonar()
+        # workaround for slarti sonar problems
+        if self.CoA.name == 'slarti':
+            self.sonar.MIN_DIST = 30.0
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
