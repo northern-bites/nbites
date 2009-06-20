@@ -224,20 +224,26 @@ READY_NON_KICKOFF_OFFENDER = [NON_KICKOFF_X,
 
 # KICK OFF POSITIONS (right after kickoff, rather)
 KICKOFF_OFFENDER_0 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 1./4.]
+                      NogginConstants.FIELD_HEIGHT * 1./4.,
+                      NogginConstants.OPP_GOAL_HEADING]
 KICKOFF_OFFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 3./4.]
+                      NogginConstants.FIELD_HEIGHT * 3./4.,
+                      NogginConstants.OPP_GOAL_HEADING]
 
 KICKOFF_DEFENDER_0 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 1./4.]
+                      NogginConstants.FIELD_HEIGHT * 1./4.,
+                      NogginConstants.OPP_GOAL_HEADING]
 KICKOFF_DEFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 3./4.]
+                      NogginConstants.FIELD_HEIGHT * 3./4.,
+                      NogginConstants.OPP_GOAL_HEADING]
 
 # KICK OFF POSITIONS (right after kickoff, rather)
 KICKOFF_PLAY_OFFENDER = [NogginConstants.FIELD_WIDTH * 4./5.,
-                         NogginConstants.FIELD_HEIGHT * 2./3.]
+                         NogginConstants.FIELD_HEIGHT * 2./3.,
+                         NogginConstants.OPP_GOAL_HEADING]
 KICKOFF_PLAY_DEFENDER = [NogginConstants.FIELD_WIDTH * 1./2.,
-                         NogginConstants.FIELD_HEIGHT * 1./4.]
+                         NogginConstants.FIELD_HEIGHT * 1./4.,
+                         NogginConstants.OPP_GOAL_HEADING]
 
 DEFAULT_CHASER_NUMBER = 3
 

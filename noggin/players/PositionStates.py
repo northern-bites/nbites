@@ -31,8 +31,11 @@ def playbookPosition(player):
     if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
         changedOmni = True
 
-    if player.firstFrame() or nav.destX != position[0] or \
-            nav.destY != position[1] or changedOmni:
+    if player.firstFrame() or \
+            nav.destX != position[0] or \
+            nav.destY != position[1] or \
+            nav.destH != position[2] or \
+            changedOmni:
         if player.brain.gameController.currentState == 'gameReady':
             player.brain.tracker.locPans()
         else :
@@ -46,9 +49,9 @@ def playbookPosition(player):
             return player.goLater('relocalize')
 
         if not useOmni:
-            nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
+            nav.goTo(position)
         else:
-            nav.omniGoTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
+            nav.omniGoTo(position)
 
     if transitions.shouldAvoidObstacle(player):
         return player.goNow('avoidObstacle')
