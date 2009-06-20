@@ -10,10 +10,10 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h 
 # and in ALLedNames.h
-(LEFT_EYE_LED,
-RIGHT_EYE_LED,
-LEFT_EAR_LED,
+(LEFT_EAR_LED,
 RIGHT_EAR_LED,
+LEFT_EYE_LED,
+RIGHT_EYE_LED,
 CHEST_LED,
 LEFT_FOOT_LED,
 RIGHT_FOOT_LED) = range(_lights.NUM_LED_GROUPS)
