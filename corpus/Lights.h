@@ -15,8 +15,8 @@
  */
 class Lights{
 public:
-    Lights(){};
-    virtual ~Lights(){};
+    Lights();
+    virtual ~Lights();
 
 public:
     virtual void setRGB(std::string led_id, int rdbHex) = 0;
@@ -29,10 +29,4 @@ public:
     static const float OFF = 0.0f;
 
 };
-
-const std::string Lights::LED_NAMES[Lights::NUM_LED_NAMES] = {
-    "LeftEar","RightEar",
-    "LeftEye","RightEye",
-    "Chest",
-    "LeftFoot", "RightFoot"};
 #endif

@@ -54,6 +54,7 @@ typedef TTMan ALMan;
 
 
 #include "_ledsmodule.h"
+#include "NaoLights.h"
 
 #include "almodule.h"
 #include "alsentinelproxy.h"
@@ -71,6 +72,7 @@ static shared_ptr<Synchro> synchro;
 static shared_ptr<ALTranscriber> transcriber;
 static shared_ptr<ALImageTranscriber> imageTranscriber;
 static shared_ptr<EnactorT> enactor;
+static shared_ptr<Lights> lights;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
     try{
@@ -96,15 +98,16 @@ void ALCreateMan( ALPtr<ALBroker> broker){
     enactor = shared_ptr<EnactorT>(new EnactorT(sensors,synchro,
                                                 transcriber,broker));
 #endif
+    lights = shared_ptr<Lights>(new NaoLights(broker));
 
-
-    setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
+    //setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
     man = boost::shared_ptr<ALMan> (new ALMan(sensors,
                                           transcriber,
                                           imageTranscriber,
                                           enactor,
-                                          synchro));
+                                              synchro,
+                                              lights));
     man->startSubThreads();
 }
 

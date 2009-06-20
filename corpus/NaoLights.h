@@ -3,7 +3,7 @@
 
 #include "Lights.h"
 #include "dcmproxy.h"
-
+#include "ALLedNames.h"
 /**
  *  This class implements LED capability on the Nao robot using the DCM in Naoqi
  *  @author Johannes Strom
@@ -22,7 +22,9 @@ public:
 private:
     void initDCMAliases();
     void initDCMCommands();
-
+    const float getColor(const ALNames::LedColor c, const int rgbHex);
+    void updateLightCommand(ALValue &command, const int rgbHex,
+                     const unsigned int numRGBLeds);
 private:
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     AL::ALValue leftFaceLedCommand;

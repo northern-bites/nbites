@@ -4,11 +4,11 @@
 #include "ALNames.h"
 namespace ALNames {
 
-    static const string FaceLed ="/Face/Led";
-    static const string EarLed ="/Ear/Led";
-    static const string LFootLed ="/LFoot/Led";
-    static const string RFootLed ="/RFoot/Led";
-    static const string ChestLed ="/ChestBoard/Led";
+    static const string FaceLed ="Face/Led";
+    static const string EarLed ="Ear/Led";
+    static const string LFootLed ="LFoot/Led";
+    static const string RFootLed ="RFoot/Led";
+    static const string ChestLed ="ChestBoard/Led";
 
     static const string Green ="/Green";
     static const string Red ="/Red";
@@ -17,7 +17,7 @@ namespace ALNames {
     static const string Left ="/Left";
     static const string Right ="/Right";
 
-    enum LedColors{
+    enum LedColor{
         RED_LED = 0,
         GREEN_LED,
         BLUE_LED
@@ -37,7 +37,7 @@ namespace ALNames {
     {
         /* Red*/
         {ValuePreFix + FaceLed +  Red + Left + "/0Deg"+LedPostFix,
-         ValuePreFix + FaceLed +  Red + Left + "/35Deg"+LedPostFix,
+         ValuePreFix + FaceLed +  Red + Left + "/45Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Red + Left + "/90Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Red + Left + "/135Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Red + Left + "/180Deg"+LedPostFix,
@@ -46,7 +46,7 @@ namespace ALNames {
          ValuePreFix + FaceLed +  Red + Left + "/315Deg"+LedPostFix},
         /* Green*/
         {ValuePreFix + FaceLed +  Green + Left + "/0Deg"+LedPostFix,
-         ValuePreFix + FaceLed +  Green + Left + "/35Deg"+LedPostFix,
+         ValuePreFix + FaceLed +  Green + Left + "/45Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Green + Left + "/90Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Green + Left + "/135Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Green + Left + "/180Deg"+LedPostFix,
@@ -55,7 +55,7 @@ namespace ALNames {
          ValuePreFix + FaceLed +  Green + Left + "/315Deg"+LedPostFix},
         /* Blue*/
         {ValuePreFix + FaceLed +  Blue + Left + "/0Deg"+LedPostFix,
-         ValuePreFix + FaceLed +  Blue + Left + "/35Deg"+LedPostFix,
+         ValuePreFix + FaceLed +  Blue + Left + "/45Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Blue + Left + "/90Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Blue + Left + "/135Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Blue + Left + "/180Deg"+LedPostFix,
@@ -67,7 +67,7 @@ namespace ALNames {
     {
         /* Red*/
         {ValuePreFix + FaceLed +  Red + Right + "/0Deg"+LedPostFix,
-         ValuePreFix + FaceLed +  Red + Right + "/35Deg"+LedPostFix,
+         ValuePreFix + FaceLed +  Red + Right + "/45Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Red + Right + "/90Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Red + Right + "/135Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Red + Right + "/180Deg"+LedPostFix,
@@ -76,7 +76,7 @@ namespace ALNames {
          ValuePreFix + FaceLed +  Red + Right + "/315Deg"+LedPostFix},
         /* Green*/
         {ValuePreFix + FaceLed +  Green + Right + "/0Deg"+LedPostFix,
-         ValuePreFix + FaceLed +  Green + Right + "/35Deg"+LedPostFix,
+         ValuePreFix + FaceLed +  Green + Right + "/45Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Green + Right + "/90Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Green + Right + "/135Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Green + Right + "/180Deg"+LedPostFix,
@@ -85,7 +85,7 @@ namespace ALNames {
          ValuePreFix + FaceLed +  Green + Right + "/315Deg"+LedPostFix},
         /* Blue*/
         {ValuePreFix + FaceLed +  Blue + Right + "/0Deg"+LedPostFix,
-         ValuePreFix + FaceLed +  Blue + Right + "/35Deg"+LedPostFix,
+         ValuePreFix + FaceLed +  Blue + Right + "/45Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Blue + Right + "/90Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Blue + Right + "/135Deg"+LedPostFix,
          ValuePreFix + FaceLed +  Blue + Right + "/180Deg"+LedPostFix,

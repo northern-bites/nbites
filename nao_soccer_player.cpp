@@ -28,6 +28,7 @@ static shared_ptr<Synchro> synchro;
 static shared_ptr<WBTranscriber> transcriber;
 static shared_ptr<WBImageTranscriber> imageTranscriber;
 static shared_ptr<WBEnactor> enactor;
+static shared_ptr<Lights> lights;
 
 
 void WBCreateMan(){
@@ -41,12 +42,14 @@ void WBCreateMan(){
 
     enactor = shared_ptr<WBEnactor>(new WBEnactor(sensors,
                                                   transcriber));
+    lights  = shared_ptr<Lights>(new WBLights());
 
     man = boost::shared_ptr<WBMan> (new WBMan(sensors,
                                               transcriber,
                                               imageTranscriber,
                                               enactor,
-                                              synchro));
+                                              synchro,
+                                              lights));
     man->startSubThreads();
 }
 

@@ -16,7 +16,8 @@ public:
           boost::shared_ptr<Transcriber> _transcriber,
           boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
           boost::shared_ptr<ThreadedMotionEnactor> _enactor,
-          boost::shared_ptr<Synchro> synchro);
+          boost::shared_ptr<Synchro> synchro,
+          boost::shared_ptr<Lights> _lights);
     ~TTMan();
 
     void startSubThreads();

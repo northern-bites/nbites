@@ -1,6 +1,9 @@
 #include "NaoLights.h"
 #include "ALLedNames.h"
 
+#define LEDS_ENABLED
+#define DEBUG_NAOLIGHTS_INIT
+
 NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
     :Lights()
 {
@@ -9,6 +12,9 @@ NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
     } catch(AL::ALError &e) {
         cout << "Failed to initialize proxy to DCM" << endl;
     }
+
+    initDCMAliases();
+    initDCMCommands();
 }
 
 
@@ -22,12 +28,11 @@ void NaoLights::setRGB(std::string led_id, int rgbHex){
 void NaoLights::sendLights(){
 
     //Left Eye
-    for(unsigned int i = 0; i < ALNames::NUM_ONE_EYE_LEDS; i++){
-        leftFaceLedCommand[5][i][0] = OFF;
-    }
-
-    leftFaceLedCommand[4][0] = dcmProxy->getTime(20);
-
+    updateLightCommand(leftFaceLedCommand,0,ALNames::NUM_FACE_LEDS);
+    // for(unsigned int i = 0; i < ALNames::NUM_ONE_EYE_LEDS; i++){
+    //     leftFaceLedCommand[5][i][0] = OFF;
+    // }
+    // leftFaceLedCommand[4][0] = dcmProxy->getTime(20);
 #ifdef LEDS_ENABLED
     try {
         dcmProxy->setAlias(leftFaceLedCommand);
@@ -37,10 +42,35 @@ void NaoLights::sendLights(){
 #endif
 }
 
+void NaoLights::updateLightCommand(ALValue & command, const int rgbHex,
+                                   const unsigned int numRGBLeds){
+    unsigned int ledIndex = 0;
+    for(unsigned int c = 0; c < ALNames::NUM_LED_COLORS; c++){
+        for(unsigned int led = 0; led < numRGBLeds; led++){
+            const float color =
+                getColor(static_cast<ALNames::LedColor>(c),rgbHex);
+            command[5][ledIndex][0] = color;
+            ledIndex++;
+        }
+    }
+    command[4][0] = dcmProxy->getTime(20);
+}
+
+/*
+ * Returns a float between 0.0 and 1.0 corresponding to the 'c' channel
+ * of the hex value 
+ */
+const float NaoLights::getColor(const ALNames::LedColor c, const int rgbHex){
+    return OFF;
+}
+
 /**
  * Creates the appropriate aliases with the DCM
  */
 void NaoLights::initDCMAliases(){
+#ifdef DEBUG_NAOLIGHTS_INIT
+    std::cout << "  NaoLights::initDCMAliases() start" << std::endl;
+#endif
     ALValue leftFaceLightsAlias;
     leftFaceLightsAlias.arraySetSize(3);
     leftFaceLightsAlias[0] = string("LeftFaceLeds");
@@ -48,15 +78,20 @@ void NaoLights::initDCMAliases(){
                                         ALNames::NUM_LED_COLORS);
     int faceIndex = 0;
     //Left Eye
-    for(unsigned int c = 0; c < ALNames::NUM_LED_ORIENTATIONS; c++){
+    for(unsigned int c = 0; c < ALNames::NUM_LED_COLORS; c++){
         for(unsigned int n = 0; n < ALNames::NUM_FACE_LEDS; n++){
             leftFaceLightsAlias[1][faceIndex] =
                 ALNames::faceL[ALNames::LEFT_LED][c][n];
+            cout << ALNames::faceL[ALNames::LEFT_LED][c][n] <<endl;
+
             faceIndex++;
         }
     }
 
     dcmProxy->createAlias(leftFaceLightsAlias);
+#ifdef DEBUG_NAOLIGHTS_INIT
+    std::cout << "  NaoLights::initDCMAliases() end" << std::endl;
+#endif
 }
 
 /**
@@ -65,6 +100,9 @@ void NaoLights::initDCMAliases(){
  *
  */
 void NaoLights::initDCMCommands(){
+#ifdef DEBUG_NAOLIGHTS_INIT
+    std::cout << "  NaoLights::initDCMCommands() start" << std::endl;
+#endif
     //Left Eye
     leftFaceLedCommand.arraySetSize(6);
     leftFaceLedCommand[0] = string("LeftFaceLeds");
@@ -77,5 +115,9 @@ void NaoLights::initDCMCommands(){
         leftFaceLedCommand[5][i].arraySetSize(1);
         leftFaceLedCommand[5][i][0]  = OFF;
     }
+
+#ifdef DEBUG_NAOLIGHTS_INIT
+    std::cout << "  NaoLights::initDCMCommands() end" << std::endl;
+#endif
 }
 
