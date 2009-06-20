@@ -150,10 +150,7 @@ class TeammateBallMeasurement
 public:
     float ballX;
     float ballY;
-    float ballXUncert;
-    float ballYUncert;
-    TeammateBallMeasurement(float _x = 0.0f, float _y = 0.0f,
-                            float _uncertX = 0.0f, float _uncertY = 0.0f) :
-        ballX(_x), ballY(_y), ballXUncert(_uncertX), ballYUncert(_uncertY) {}
+    TeammateBallMeasurement(float _x = 0.0f, float _y = 0.0f) :
+        ballX(_x), ballY(_y) {}
 };
 #endif // NogginStructs

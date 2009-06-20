@@ -137,6 +137,7 @@ private:
     void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
     void limitPosteriorUncert(void);
+    void clipBallEstimate(void);
     bool useCartesian;
     PoseEst robotPose;
     const static float ASSUMED_FPS;

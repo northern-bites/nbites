@@ -3,7 +3,7 @@ using namespace boost::numeric;
 using namespace boost;
 
 using namespace NBMath;
-
+#include "FieldConstants.h"
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;
 const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
@@ -30,10 +30,10 @@ const float BallEKF::INIT_X_UNCERT = 740.0f;
 const float BallEKF::INIT_Y_UNCERT = 270.0f;
 const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
 const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
-const float BallEKF::X_EST_MIN = -1000.0f;
-const float BallEKF::Y_EST_MIN = -600.0f;
-const float BallEKF::X_EST_MAX = 1000.0f;
-const float BallEKF::Y_EST_MAX = 600.0f;
+const float BallEKF::X_EST_MIN = 0.0f;
+const float BallEKF::Y_EST_MIN = 0.0f;
+const float BallEKF::X_EST_MAX = FIELD_WIDTH;
+const float BallEKF::Y_EST_MAX = FIELD_HEIGHT;
 const float BallEKF::VELOCITY_EST_MAX = 300.0f;
 const float BallEKF::VELOCITY_EST_MIN = -300.0f;
 
@@ -90,8 +90,8 @@ BallEKF::BallEKF(float initX, float initY,
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1.0f / ASSUMED_FPS;
-    A_k(1,3) = 1.0f / ASSUMED_FPS;
+    A_k(0,2) = 0.0f; //1.0f / ASSUMED_FPS;
+    A_k(1,3) = 0.0f; //1.0f / ASSUMED_FPS;
 
     // Setup initial values
     setXEst(initX);
@@ -143,8 +143,7 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
 
         noCorrectionStep();
     }
-    limitPosteriorEst();
-    limitPosteriorUncert();
+    clipBallEstimate();
 }
 
 /**
@@ -408,4 +407,57 @@ void BallEKF::limitPosteriorUncert()
         P_k(3,3) = VELOCITY_UNCERT_MAX;
         P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
     }
+}
+
+/**
+ * Method to use the estimate ellipse to intelligently clip the ball estimate
+ */
+void BallEKF::clipBallEstimate()
+{
+    // Limit our X estimate
+    if (xhat_k(0) > X_EST_MAX) {
+        StateVector v(numStates);
+        v(0) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
+            inner_prod(v, prod(P_k,v));
+    }
+    else if (xhat_k(0) < X_EST_MIN) {
+        StateVector v(numStates);
+        v(0) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
+            inner_prod(v, prod(P_k,v));
+    }
+
+    // Limit our Y estimate
+    if (xhat_k(1) < Y_EST_MIN) {
+        StateVector v(numStates);
+        v(1) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
+            inner_prod(v, prod(P_k,v));
+    }
+    else if (xhat_k(1) > Y_EST_MAX) {
+        StateVector v(numStates);
+        v(1) = 1.0f;
+        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - Y_EST_MAX) /
+            inner_prod(v, prod(P_k,v));
+
+    }
+
+    if(xhat_k(2) > VELOCITY_EST_MAX) {
+        xhat_k_bar(2) = VELOCITY_EST_MAX;
+        xhat_k(2) = VELOCITY_EST_MAX;
+    }
+    if(xhat_k(2) < VELOCITY_EST_MIN) {
+        xhat_k_bar(2) = VELOCITY_EST_MIN;
+        xhat_k(2) = VELOCITY_EST_MIN;
+    }
+    if(xhat_k(3) > VELOCITY_EST_MAX) {
+        xhat_k_bar(3) = VELOCITY_EST_MAX;
+        xhat_k(3) = VELOCITY_EST_MAX;
+    }
+    if(xhat_k(3) < VELOCITY_EST_MIN) {
+        xhat_k_bar(3) = VELOCITY_EST_MIN;
+        xhat_k(3) = VELOCITY_EST_MIN;
+    }
+
 }

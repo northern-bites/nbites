@@ -22,7 +22,8 @@
 //#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_BALL_OBSERVATIONS
 //#define DEBUG_CROSS_OBSERVATIONS
-//#define USE_TEAMMATE_BALL_REPORTS
+//#define DEBUG_TEAMMATE_BALL_OBSERVATIONS
+#define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
 static const float MAX_CORNER_DISTANCE = 150.0f;
@@ -399,8 +400,7 @@ void Noggin::updateLocalization()
         RangeBearingMeasurement m;
 #       ifdef USE_TEAMMATE_BALL_REPORTS
         n = comm->getTeammateBallReport();
-
-        if (!(m.distance == 0.0 && m.bearing == 0.0) &&
+        if (!(n.ballX == 0.0 && n.ballY == 0.0) &&
             !(gc->gameState() == STATE_INITIAL ||
               gc->gameState() == STATE_FINISHED)) {
             m.distance = hypot(loc->getXEst() - n.ballX,
@@ -411,14 +411,16 @@ void Noggin::updateLocalization()
             m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
             m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
 #           ifdef DEBUG_TEAMMATE_BALL_OBSERVATIONS
-            cout << "\t\tUsing teammate ball report of (" << m.distance << ", "
-                 << m.bearing << ")" << endl;
+            cout << setprecision(4)
+                 << "Using teammate ball report of (" << m.distance << ", "
+                 << m.bearing << ")" << "\tReported x,y : "
+                 << "(" << n.ballX << ", " << n.ballY << ")" << endl;
 #           endif
         }
-
+#       endif
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
-#   endif
+
 #   ifdef DEBUG_BALL_OBSERVATIONS
     if(vision->ball->getDistance() > 0.0) {
         cout << "Ball seen at distance " << vision->ball->getDistance()

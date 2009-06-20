@@ -904,14 +904,12 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
     for (i = latest->begin(); i != latest->end(); ++i) {
         // Get the combined uncert x and y
         float curUncert = static_cast<float>( hypot((*i)[6],(*i)[7]) );
-
         // If the teammate sees the ball and its uncertainty is less than the
+        // Current minimum, then we
         if ((*i)[13] > 0.0 && curUncert < minUncert) {
             minUncert = curUncert;
             m.ballX = (*i)[9];
             m.ballY = (*i)[10];
-            m.ballXUncert = (*i)[6];
-            m.ballYUncert = (*i)[7];
         }
     }
     return m;

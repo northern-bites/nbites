@@ -56,7 +56,7 @@ public:
 
     // Member functions
     const float ballDistanceToSD(float _distance) const {
-        return 10 + distance * 0.2f;
+        return 10 + _distance * 0.2f;
     }
     const float ballBearingToSD(float _bearing) const {
         return static_cast<float>(M_PI) / 8.0f;
