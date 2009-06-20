@@ -3,6 +3,8 @@ from man.motion import MotionConstants
 DEBUG = False
 TRACKER_FRAMES_OFF_REFIND_THRESH = 10 #num frms after which to switch to scanfindbl
 ACTIVE_LOC_STARE_THRESH = 30
+ACTIVE_LOC_OFF_REFIND_THRESH = 40
+
 def stopped(tracker):
     '''default state where the tracker does nothing'''
     tracker.activeLocOn = False
@@ -56,7 +58,8 @@ def activeTracking(tracker):
     if tracker.activePanOut:
         return tracker.goLater('returnHeadsPan')
 
-    if tracker.target.framesOff > TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.framesOff > TRACKER_FRAMES_OFF_REFIND_THRESH and \
+            not tracker.brain.motion.isHeadActive():
         return tracker.goLater('activeLocScan')
 
     if not tracker.activePanOut and \
@@ -67,8 +70,8 @@ def activeTracking(tracker):
 
         motionAngles = tracker.brain.sensors.motionAngles
         tracker.preActivePanHeads = (
-            motionAngles[MotionConstants.HeadPitch],
-            motionAngles[MotionConstants.HeadYaw] )
+            motionAngles[MotionConstants.HeadYaw],
+            motionAngles[MotionConstants.HeadPitch])
 
         if tracker.activePanDir:
             return tracker.goLater('panRightOnce')

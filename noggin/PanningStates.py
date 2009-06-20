@@ -1,4 +1,6 @@
 import man.motion.HeadMoves as HeadMoves
+import man.motion.SweetMoves as SweetMoves
+
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 1 #num frms after which to switch to scanfindbl
 
@@ -38,7 +40,8 @@ def locPans(tracker):
 
 def panLeftOnce(tracker):
     if tracker.firstFrame():
-        tracker.execute(HeadMoves.PAN_LEFT)
+        tracker.panTo(HeadMoves.PAN_LEFT_HEADS)
+        return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
@@ -47,7 +50,8 @@ def panLeftOnce(tracker):
 
 def panRightOnce(tracker):
     if tracker.firstFrame():
-        tracker.execute(HeadMoves.PAN_RIGHT)
+        tracker.panTo(HeadMoves.PAN_RIGHT_HEADS)
+        return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)

@@ -169,6 +169,5 @@ class HeadTracking(FSA.FSA):
 
         maxDiff = max(pitchDiff, yawDiff)
         panTime = maxDiff/MAX_PAN_SPEED
-
         self.execute( ((heads, panTime, 1,
                         StiffnessModes.LOW_HEAD_STIFFNESSES),) )

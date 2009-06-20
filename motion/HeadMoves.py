@@ -99,11 +99,9 @@ POST_SCAN = (
     ((65.,-25.),2.0,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-25.),2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
-PAN_LEFT = (
-    (( 65.0, -25.0),1.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+PAN_LEFT_HEADS = ( 65.0, -25.0)
 
-PAN_RIGHT = (
-    (( -65.0, -25.0),1.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+PAN_RIGHT_HEADS = ( -65.0, -25.0)
 
 
 KICK_SCAN = (
