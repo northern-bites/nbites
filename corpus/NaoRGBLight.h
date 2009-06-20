@@ -38,8 +38,8 @@ private:
     const unsigned int endColor;
 
 public:
-    static const float ON = 1.0f;
-    static const float OFF = 0.0f;
+    static const float LED_ON = 1.0f;
+    static const float LED_OFF = 0.0f;
 
 };
 #endif

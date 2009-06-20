@@ -128,16 +128,16 @@ namespace ALNames {
          ValuePreFix + EarLed + Left + std::string("/288Deg")+LedPostFix,
          ValuePreFix + EarLed + Left + std::string("/324Deg")+LedPostFix},
 /* Ear Led Right*/
-        {ValuePreFix + EarLed + Left + std::string("/0Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/36Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/72Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/108Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/144Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/180Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/216Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/252Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/288Deg")+LedPostFix,
-         ValuePreFix + EarLed + Left + std::string("/324Deg")+LedPostFix},
+        {ValuePreFix + EarLed + Right + std::string("/0Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/36Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/72Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/108Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/144Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/180Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/216Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/252Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/288Deg")+LedPostFix,
+         ValuePreFix + EarLed + Right + std::string("/324Deg")+LedPostFix},
     };
 
     static const std::string footL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS]={

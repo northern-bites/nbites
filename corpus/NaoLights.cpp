@@ -48,12 +48,21 @@ void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
 }
 
 void NaoLights::sendLights(){
+#ifdef DEBUG_NAOLIGHTS_INIT
+    // std::cout << "  NaoLights::sendLights() start" << std::endl;
+#endif
     pthread_mutex_lock(&lights_mutex);
+
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
-        if(ledList[i]->updateCommand(hexList[i]))
+        if(ledList[i]->updateCommand(hexList[i])){
             sendLightCommand(*ledList[i]->getCommand());
+            std::cout << "Setting LED " <<i<<std::endl;
+        }
     }
     pthread_mutex_unlock(&lights_mutex);
+#ifdef DEBUG_NAOLIGHTS_INIT
+    // std::cout << "  NaoLights::sendLights() end" << std::endl;
+#endif
 }
 
 void NaoLights::generateLeds(){
@@ -85,7 +94,7 @@ void NaoLights::sendLightCommand(ALValue & command){
  * of the hex value 
  */
 const float NaoLights::getColor(const ALNames::LedColor c, const int rgbHex){
-    return NaoRGBLight::OFF;
+    return 0.0f;
 }
 
 /**
@@ -137,7 +146,7 @@ void NaoLights::initDCMCommands(){
     leftFaceLedCommand[5].arraySetSize(ALNames::NUM_ONE_EYE_LEDS);
     for(unsigned int i = 0; i<ALNames::NUM_ONE_EYE_LEDS; i++){
         leftFaceLedCommand[5][i].arraySetSize(1);
-        leftFaceLedCommand[5][i][0]  = NaoRGBLight::OFF;
+        leftFaceLedCommand[5][i][0]  = 0.0f;
     }
 
 #ifdef DEBUG_NAOLIGHTS_INIT

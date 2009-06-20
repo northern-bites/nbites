@@ -12,7 +12,8 @@ public:
     ~WBLights(){};
 
 public:
-    void setRGB(std::string led_id, int rdbHex){};
+    void setRGB(const std::string led_id, const int rdbHex){};
+    void setRGB(const unsigned int led_id, const int rdbHex){};
 
     void sendLights(){};
 };
