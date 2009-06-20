@@ -46,6 +46,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.shouldAvoidObstacleRightCounter = 0
         self.shouldAvoidObstacleLeftCounter = 0
 
+        self.notAtPositionCounter = 0
+
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0
 

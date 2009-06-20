@@ -21,21 +21,17 @@ def playbookPosition(player):
 
     useOmni = False #(MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
 
-    if transitions.shouldRelocalize(player):
-        return player.goLater('relocalize')
-
     if player.firstFrame() or \
             nav.destX != position[0] or \
             nav.destY != position[1] or \
             useOmni != nav.movingOmni:
 
         player.brain.tracker.locPans()
-        #player.printf("I am going to " + str(position))
+
         if not useOmni:
             nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
         else:
             nav.omniGoTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
-        #player.printf("position = "+str(position[0])+" , "+str(position[1]) )
 
     # we're at the point, let's switch to another state
     if nav.isStopped() and player.counter > 0:
@@ -50,8 +46,16 @@ def atPosition(player):
     nav = player.brain.nav
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.trackBall()
-    if nav.notAtHeading(nav.destH) or not nav.atDestinationCloser():
+        player.brain.tracker.activeLoc()
+        player.notAtPositionCounter = 0
+
+    if nav.notAtHeading(nav.destH) or not nav.atDestination():
+        player.notAtPositionCounter += 1
+    else:
+        player.notAtPositionCounter = 0
+
+    if player.notAtPositionCounter > constants.NOT_AT_POSITION_FRAMES_THRESH \
+            and transitions.isWellLocalized(player):
         return player.goLater('playbookPosition')
 
     return player.stay()

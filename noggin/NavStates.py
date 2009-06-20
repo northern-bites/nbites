@@ -35,10 +35,13 @@ def spinToWalkHeading(nav):
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
     else :
-        nav.stopSpinToWalkCount = 0
+        nav.stopSpinToWalkCount -= 1
+        nav.stopSpinToWalkCount = max(0, nav.stopSpinToWalkCount)
 
     if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('walkStraightToPoint')
+    if nav.atDestinationCloser():
+        return nav.goLater('spinToFinalHeading')
 
     if not nav.brain.motion.isWalkActive():
         nav.setSpeed(0, nav.curSpinDir * constants.GOTO_SPIN_STRAFE,
@@ -58,7 +61,7 @@ def walkStraightToPoint(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
-    if nav.atDestination():
+    if nav.atDestinationCloser():
         nav.walkToPointCount += 1
     else :
         nav.walkToPointCount = 0
