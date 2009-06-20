@@ -47,11 +47,13 @@ Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
-          shared_ptr<Synchro> synchro)
+          shared_ptr<Synchro> synchro,
+          shared_ptr<Lights> _lights)
     : sensors(_sensors),
       transcriber(_transcriber),
       imageTranscriber(_imageTranscriber),
-      enactor(_enactor)
+      enactor(_enactor),
+      lights(_lights)
 {
     // initialize system helper modules
     profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
@@ -77,6 +79,9 @@ Man::Man (shared_ptr<Sensors> _sensors,
     // initialize python roboguardian module.
     // give python a pointer to the guardian. Method defined in PyRoboguardian.h
     set_guardian_pointer(guardian);
+
+    set_lights_pointer(_lights);
+
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
@@ -174,6 +179,9 @@ Man::processFrame ()
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif
+    PROF_ENTER(profiler.get(), P_LIGHTS);
+    lights->sendLights();
+    PROF_EXIT(profiler.get(), P_LIGHTS);
 
     PROF_EXIT(profiler.get(), P_FINAL);
     PROF_NFRAME(profiler.get());

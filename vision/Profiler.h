@@ -40,6 +40,7 @@ enum ProfiledComponent {
   P_LOGGING,
   P_AIBOCONNECT,
   P_TOOLCONNECT,
+  P_LIGHTS,
   P_FINAL,
 };
 static const int NUM_PCOMPONENTS = P_FINAL + 1;

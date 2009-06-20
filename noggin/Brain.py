@@ -8,7 +8,7 @@ sys.stderr = sys.stdout
 from man import comm
 from man import motion
 from man import vision
-from man.corpus import leds
+#from man.corpus import leds
 import sensors
 
 # Modules from this directory
@@ -21,7 +21,7 @@ from . import NogginConstants as Constants
 from . import TypeDefs
 from . import Loc
 from . import TeamConfig
-from . import LedConstants
+from . import Leds
 # Packages and modules from sub-directories
 from . import robots
 from .playbook import GoTeam
@@ -49,8 +49,8 @@ class Brain(object):
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
 
         #initalize the leds
-        print leds
-        self.leds = leds._leds.LEDs()
+        #print leds
+        self.leds = Leds.Leds(self)
 
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
@@ -185,7 +185,7 @@ class Brain(object):
         self.updateLocalization()
 
         #Set LEDS
-        self.processLeds()
+        self.leds.processLeds()
 
         # Behavior stuff
         self.gameController.run()
@@ -256,31 +256,6 @@ class Brain(object):
                           2)#self.playbook.me.chaseTime) # Chase Time
 
 
-    def processLeds(self):
-        ### for the ball ###
-        if Constants.DEBUG_BALL_LEDS:
-            if self.ball.on:
-                self.executeLeds(LedConstants.BALL_ON_LEDS)
-            else:
-                self.executeLeds(LedConstants.BALL_OFF_LEDS)
-
-        if Constants.DEBUG_GOAL_LEDS:
-            if self.oppGoalRightPost.on or self.oppGoalLeftPost.on or \
-                    self.myGoalRightPost.on or self.myGoalLeftPost.on:
-                self.executeLeds(LedConstants.GOAL_ON_LEDS)
-            else:
-                self.executeLeds(LedConstants.GOAL_OFF_LEDS)
-
-    def executeLeds(self,listOfLeds):
-
-        for ledTuple in listOfLeds:
-            if len(ledTuple) != 3:
-                self.printf("Invalid print command!! " + str(ledTuple))
-                continue
-            ledName     = ledTuple[0]
-            ledHexValue = ledTuple[1]
-            ledTime     = ledTuple[2]
-            self.leds.fadeRGB(ledName,ledHexValue,ledTime)
 
     def resetLocalization(self):
         if self.out.loggingLoc:

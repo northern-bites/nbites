@@ -1,18 +1,20 @@
 #ifndef _ALNames_DEFINED
 #define _ALNames_DEFINED
 
+#include <string>
 #include "Kinematics.h"
 
 namespace ALNames {
 
 
-    static const string PositionPostFix = "/Position/Actuator/Value";
-    static const string HardnessPostFix = "/Hardness/Actuator/Value";
-    static const string ValuePostFix    = "/Position/Sensor/Value";
-    static const string ValuePreFix     = "Device/SubDeviceList/";
-    static const string TempValuePostFix= "/Temperature/Sensor/Value";
+    static const std::string PositionPostFix = "/Position/Actuator/Value";
+    static const std::string HardnessPostFix = "/Hardness/Actuator/Value";
+    static const std::string LedPostFix      = "/Actuator/Value";
+    static const std::string ValuePostFix    = "/Position/Sensor/Value";
+    static const std::string ValuePreFix     = "Device/SubDeviceList/";
+    static const std::string TempValuePostFix= "/Temperature/Sensor/Value";
 
-    static const string jointsP[Kinematics::NUM_JOINTS] = {
+    static const std::string jointsP[Kinematics::NUM_JOINTS] = {
         "HeadYaw" + PositionPostFix,
         "HeadPitch" + PositionPostFix,
         "LShoulderPitch" + PositionPostFix,
@@ -37,7 +39,7 @@ namespace ALNames {
         "RElbowYaw" + PositionPostFix,
         "RElbowRoll" + PositionPostFix
     };
-    static const string jointsH[Kinematics::NUM_JOINTS] = {
+    static const std::string jointsH[Kinematics::NUM_JOINTS] = {
         "HeadYaw" + HardnessPostFix,
         "HeadPitch" + HardnessPostFix,
         "LShoulderPitch" + HardnessPostFix,
@@ -62,7 +64,7 @@ namespace ALNames {
         "RElbowYaw" + HardnessPostFix,
         "RElbowRoll" + HardnessPostFix
     };
-    static const string jointsV[Kinematics::NUM_JOINTS] = {
+    static const std::string jointsV[Kinematics::NUM_JOINTS] = {
         ValuePreFix + "HeadYaw" + ValuePostFix,
         ValuePreFix + "HeadPitch" + ValuePostFix,
         ValuePreFix + "LShoulderPitch" + ValuePostFix,
@@ -87,7 +89,7 @@ namespace ALNames {
         ValuePreFix + "RElbowYaw" + ValuePostFix,
         ValuePreFix + "RElbowRoll" + ValuePostFix
     };
-    static const string jointsT[Kinematics::NUM_JOINTS] = {
+    static const std::string jointsT[Kinematics::NUM_JOINTS] = {
         ValuePreFix + "HeadYaw" + TempValuePostFix,
         ValuePreFix + "HeadPitch" + TempValuePostFix,
         ValuePreFix + "LShoulderPitch" + TempValuePostFix,
@@ -113,5 +115,5 @@ namespace ALNames {
         ValuePreFix + "RElbowRoll" + TempValuePostFix
     };
 
-}
+};
 #endif

@@ -30,6 +30,7 @@ static const char *PCOMPONENT_NAMES[] = {
   "Logging",
   "AiboConnect",
   "TOOLConnect",
+  "Lights",
   "Final"
 };
 
@@ -60,6 +61,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 	/*P_LOGGING     --> */ P_FINAL,
 	/*P_AIBOCONNECT --> */ P_FINAL,
 	/*P_TOOLCONNECT --> */ P_FINAL,
+    /*P_LIGHTS      --> */ P_FINAL,
 	/*P_FINAL       --> */ P_FINAL
 };
 

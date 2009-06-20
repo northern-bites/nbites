@@ -5,7 +5,7 @@ from . import NogginConstants as Constants
 from . import GameStates
 from .util import FSA
 
-from . import LedConstants
+from . import Leds
 
 
 TEAM_BLUE = 0
@@ -80,31 +80,31 @@ class GameController(FSA.FSA):
         #if self.gc.kickOff != self.kickOff:
         if self.gc.kickOff == self.gc.team:
             #self.printf("Setting LEDS to KICKOFF (WHITE)")
-            self.brain.executeLeds(LedConstants.HAVE_KICKOFF_LEDS)
+            self.brain.leds.executeLeds(Leds.HAVE_KICKOFF_LEDS)
         else:
             #self.printf("Setting LEDS to KICKOFF (OFF)")
-            self.brain.executeLeds(LedConstants.NO_KICKOFF_LEDS)
+            self.brain.leds.executeLeds(Leds.NO_KICKOFF_LEDS)
 
         ###### TEAM COLOR ######
         if self.gc.color == TEAM_BLUE:
-            self.brain.executeLeds(LedConstants.TEAM_BLUE_LEDS)
+            self.brain.leds.executeLeds(Leds.TEAM_BLUE_LEDS)
         else:
-            self.brain.executeLeds(LedConstants.TEAM_RED_LEDS)
+            self.brain.leds.executeLeds(Leds.TEAM_RED_LEDS)
 
         ###### GAME STATE ######
 
         if self.gc.state == comm.STATE_INITIAL:
-            self.brain.executeLeds(LedConstants.STATE_INITIAL_LEDS)
+            self.brain.leds.executeLeds(Leds.STATE_INITIAL_LEDS)
         elif self.gc.state == comm.STATE_SET:
-            self.brain.executeLeds(LedConstants.STATE_SET_LEDS)
+            self.brain.leds.executeLeds(Leds.STATE_SET_LEDS)
             self.switchTo('gameSet')
         elif self.gc.state == comm.STATE_READY:
-            self.brain.executeLeds(LedConstants.STATE_READY_LEDS)
+            self.brain.leds.executeLeds(Leds.STATE_READY_LEDS)
             self.switchTo('gameReady')
         elif self.gc.state == comm.STATE_PLAYING:
             if self.gc.penalty != comm.PENALTY_NONE:
-                self.brain.executeLeds(LedConstants.STATE_PENALIZED_LEDS)
+                self.brain.leds.executeLeds(Leds.STATE_PENALIZED_LEDS)
             else:
-                self.brain.executeLeds(LedConstants.STATE_PLAYING_LEDS)
+                self.brain.leds.executeLeds(Leds.STATE_PLAYING_LEDS)
         elif self.gc.state == comm.STATE_FINISHED:
-            self.brain.executeLeds(LedConstants.STATE_FINISHED_LEDS)
+            self.brain.leds.executeLeds(Leds.STATE_FINISHED_LEDS)
