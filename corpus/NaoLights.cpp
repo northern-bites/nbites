@@ -5,7 +5,8 @@
 #define DEBUG_NAOLIGHTS_INIT
 
 NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
-    :Lights()
+    :Lights(),
+     ledList(0)
 {
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
@@ -29,17 +30,7 @@ void NaoLights::sendLights(){
 
     //Left Eye
     updateLightCommand(leftFaceLedCommand,0,ALNames::NUM_FACE_LEDS);
-    // for(unsigned int i = 0; i < ALNames::NUM_ONE_EYE_LEDS; i++){
-    //     leftFaceLedCommand[5][i][0] = OFF;
-    // }
-    // leftFaceLedCommand[4][0] = dcmProxy->getTime(20);
-#ifdef LEDS_ENABLED
-    try {
-        dcmProxy->setAlias(leftFaceLedCommand);
-    } catch(AL::ALError& e) {
-        std::cout << "dcm value set error " << e.toString() << std::endl;
-    }
-#endif
+    sendLightCommand(leftFaceLedCommand);
 }
 
 void NaoLights::updateLightCommand(ALValue & command, const int rgbHex,
@@ -53,7 +44,18 @@ void NaoLights::updateLightCommand(ALValue & command, const int rgbHex,
             ledIndex++;
         }
     }
+}
+
+void NaoLights::sendLightCommand(ALValue & command){
     command[4][0] = dcmProxy->getTime(20);
+#ifdef LEDS_ENABLED
+    try {
+        dcmProxy->setAlias(leftFaceLedCommand);
+    } catch(AL::ALError& e) {
+        std::cout << "dcm value set error " << e.toString() << std::endl;
+    }
+#endif
+
 }
 
 /*

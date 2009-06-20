@@ -10,6 +10,14 @@
  *  @date June 2009
  */
 
+struct NaoRGBLight{
+    std::string NBLedName;
+    ALValue * command;
+    bool newValue;
+    int rgbHex;
+    int numRGBSubLeds;
+};
+
 class NaoLights : public Lights{
 public:
     NaoLights(AL::ALPtr<AL::ALBroker> broker);
@@ -25,10 +33,11 @@ private:
     const float getColor(const ALNames::LedColor c, const int rgbHex);
     void updateLightCommand(ALValue &command, const int rgbHex,
                      const unsigned int numRGBLeds);
+    void sendLightCommand(ALValue &command);
 private:
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     AL::ALValue leftFaceLedCommand;
-
+    std::vector<NaoRGBLight> ledList;
 };
 
 #endif

@@ -28,9 +28,22 @@ namespace ALNames {
     };
     static const unsigned int NUM_FACE_LEDS = 8;
     static const unsigned int NUM_EAR_LEDS = 10;
+    static const unsigned int NUM_FOOT_LEDS = 1;
+    static const unsigned int NUM_CHEST_LEDS = 1;
+
     static const unsigned int NUM_LED_COLORS = 3;
     static const unsigned int NUM_LED_ORIENTATIONS = 2;
     static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
+
+    static const unsigned int NUM_UNIQUE_LEDS = 7;
+    static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
+        NUM_EAR_LEDS,
+        NUM_EAR_LEDS,
+        NUM_FACE_LEDS,
+        NUM_FACE_LEDS,
+        NUM_CHEST_LEDS,
+        NUM_FOOT_LEDS,
+        NUM_FOOT_LEDS};
 
     static const string faceL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS][NUM_FACE_LEDS] ={
 /*  Face Leds Left */
@@ -137,6 +150,16 @@ namespace ALNames {
         ValuePreFix +ChestLed + Blue +LedPostFix
     };
 
+    //static const string * strPtr = &earL[LEFT_LED][0][0];
+    // static const string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
+    //     &earL[LEFT_LED][0][0],
+    //     &earL[RIGHT_LED][0][0],
+    //     &faceL[LEFT_LED][0][0],
+    //     &faceL[RIGHT_LED][0][0],
+    //     &chestL[0],
+    //     &footL[LEFT_LED][0],
+    //     &footL[RIGHT_LED][0],
+    // };
 };
 
 #endif
