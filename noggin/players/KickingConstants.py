@@ -1,3 +1,4 @@
+from .. import NogginConstants
 SUPER_SAFE_KICKS = False # Only kick straight when we see the goal
 MAX_FORWARD_KICK_ANGLE = 55
 MIN_SIDEWASE_KICK_ANGLE = 15
@@ -32,3 +33,9 @@ NUM_OBJECTIVES = 4
  OBJECTIVE_CENTER,
  OBJECTIVE_UNCLEAR) = range(NUM_OBJECTIVES)
 
+# inOppCorner constants
+TOP_OPP_CORNER_SLOPE = -1
+BOTTOM_OPP_CORNER_SLOPE = 1
+
+OPP_CORNER_LEFT_X = NogginConstants.FIELD_WIDTH - 100.
+TOP_OPP_CORNER_Y = NogginConstants.FIELD_HEIGHT

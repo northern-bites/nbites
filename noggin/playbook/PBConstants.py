@@ -179,7 +179,7 @@ READY_KICKOFF_DEFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
 
 
 READY_KICKOFF_CHASER = [NogginConstants.CENTER_FIELD_X -
-                          NogginConstants.CENTER_CIRCLE_RADIUS,
+                          NogginConstants.CENTER_CIRCLE_RADIUS/2,
                         NogginConstants.CENTER_FIELD_Y,
                         NogginConstants.OPP_GOAL_HEADING] # center
 

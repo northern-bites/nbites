@@ -33,3 +33,16 @@ def shouldKickAtPosition(player):
     """
     return (player.brain.ball.on and
             player.brain.ball.dist < constants.AT_POSITION_KICK_DIST)
+
+
+def shouldRelocalize(player):
+    my = player.brain.my
+    return my.uncertX > constants.RELOC_UNCERT_XY_THRESH or \
+        my.uncertY > constants.RELOC_UNCERT_XY_THRESH or \
+        my.uncertH > constants.RELOC_UNCERT_THETA_THRESH
+
+def isWellLocalized(player):
+    my = player.brain.my
+    return my.uncertX < constants.WELL_LOCED_UNCERT_XY and \
+        my.uncertY > constants.WELL_LOCED_UNCERT_XY and \
+        my.uncertH > constants.WELL_LOCED_UNCERT_THRESH
