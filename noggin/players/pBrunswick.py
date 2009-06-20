@@ -45,6 +45,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.shouldAvoidObstacleRightCounter = 0
         self.shouldAvoidObstacleLeftCounter = 0
+        self.doneAvoidingCounter = 0
 
         self.notAtPositionCounter = 0
         self.shouldRelocalizeCounter = 0

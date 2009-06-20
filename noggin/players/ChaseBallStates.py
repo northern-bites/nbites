@@ -210,13 +210,14 @@ def avoidObstacle(player):
     If we detect something in front of us, dodge it
     """
     if player.firstFrame():
+        player.doneAvoidingCounter = 0
         player.printf(player.brain.sonar)
 
 
         if (transitions.shouldAvoidObstacleLeft(player) and
             transitions.shouldAvoidObstacleRight(player)):
             # Backup
-            player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
+            player.setSpeed(constants.DODGE_LEFT_SPEED, 0, 0)
 
         elif transitions.shouldAvoidObstacleLeft(player):
             # Dodge right
@@ -226,9 +227,18 @@ def avoidObstacle(player):
             # Dodge left
             player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
 
-    elif not transitions.shouldAvoidObstacle(player):
+    if not transitions.shouldAvoidObstacle(player):
+        player.doneAvoidingCounter += 1
+    else :
+        player.doneAvoidingCounter -= 1
+        player.doneAvoidingCounter = max(0, player.doneAvoidingCounter)
+
+    if player.doneAvoidingCounter > constants.DONE_AVOIDING_FRAMES_THRESH:
+        player.shouldAvoidObstacleRight = 0
+        player.shouldAvoidObstacleLeft = 0
         player.stopWalking()
-        return player.goLater('chase')
+        return player.goLater(player.lastDiffState)
+
     return player.stay()
 
 def orbitBall(player):

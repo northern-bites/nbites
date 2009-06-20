@@ -25,8 +25,10 @@ def playbookPosition(player):
             nav.destX != position[0] or \
             nav.destY != position[1] or \
             useOmni != nav.movingOmni:
-
-        player.brain.tracker.locPans()
+        if player.brain.gameController.currentState == 'gameReady':
+            player.brain.tracker.locPans()
+        else :
+            player.brain.tracker.activeLoc()
 
         if transitions.shouldRelocalize(player):
             player.shouldRelocalizeCounter += 1
@@ -39,6 +41,9 @@ def playbookPosition(player):
             nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
         else:
             nav.omniGoTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
+
+    if transitions.shouldAvoidObstacle(player):
+        return player.goNow('avoidObstacle')
 
     # we're at the point, let's switch to another state
     if nav.isStopped() and player.counter > 0:
@@ -53,7 +58,6 @@ def atPosition(player):
     nav = player.brain.nav
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.activeLoc()
         player.notAtPositionCounter = 0
 
     if nav.notAtHeading(nav.destH) or not nav.atDestination():

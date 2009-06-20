@@ -1,4 +1,5 @@
 import PositionConstants as constants
+import ChaseBallTransitions
 
 ####### POSITIONING STUFF ##############
 
@@ -46,3 +47,8 @@ def isWellLocalized(player):
     return my.uncertX < constants.WELL_LOCED_UNCERT_XY and \
         my.uncertY > constants.WELL_LOCED_UNCERT_XY and \
         my.uncertH > constants.WELL_LOCED_UNCERT_THRESH
+
+def shouldAvoidObstacle(player):
+    return ChaseBallTransitions.shouldAvoidObstacle(player) and \
+        (player.brain.nav.currentState == 'omniWalkToPoint' or
+         player.brain.nav.currentState == 'walkStraightToPoint')
