@@ -1,7 +1,8 @@
-from .. import NogginConstants as Constants
+from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
 import man.noggin.util.MyMath as MyMath
-import PositionTransitions as Transitions
+import PositionTransitions as transitions
+import PositionConstants as constants
 
 def positionLocalize(player):
     """
@@ -20,20 +21,20 @@ def playbookPosition(player):
 
     useOmni = False #(MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
 
-    if player.firstFrame():
-        player.brain.tracker.activeLoc()
-        player.printf("I am going to " + str(position))
-        if not useOmni:
-            nav.goTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
-        else:
-            nav.omniGoTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+    if transitions.shouldRelocalize(player):
+        return player.goLater('relocalize')
 
-    if nav.destX != position[0] or nav.destY != position[1] or\
+    if player.firstFrame() or \
+            nav.destX != position[0] or \
+            nav.destY != position[1] or \
             useOmni != nav.movingOmni:
+
+        player.brain.tracker.locPans()
+        #player.printf("I am going to " + str(position))
         if not useOmni:
-            nav.goTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+            nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
         else:
-            nav.omniGoTo(position[0], position[1], Constants.OPP_GOAL_HEADING)
+            nav.omniGoTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
         #player.printf("position = "+str(position[0])+" , "+str(position[1]) )
 
     # we're at the point, let's switch to another state
@@ -68,10 +69,10 @@ def spinToBall(player):
                            -ChaseConstants.BALL_SPIN_SPEED,
                            ChaseConstants.BALL_SPIN_SPEED)
 
-    if Transitions.atSpinBallDir(player):
+    if transitions.atSpinBallDir(player):
         return player.goLater('atSpinBallPosition')
 
-    elif Transitions.shouldSpinFindBallPosition(player):
+    elif transitions.shouldSpinFindBallPosition(player):
         return player.goLater('spinFindBallPosition')
 
     elif player.currentSpinDir != MyMath.sign(turnRate):
@@ -91,9 +92,9 @@ def atSpinBallPosition(player):
         player.stopWalking()
         player.brain.tracker.activeLoc()
 
-    if Transitions.shouldTurnToBall_fromAtBallPosition(player):
+    if transitions.shouldTurnToBall_fromAtBallPosition(player):
         return player.goLater('spinToBall')
-    elif Transitions.shouldSpinFindBallPosition(player):
+    elif transitions.shouldSpinFindBallPosition(player):
         return player.goLater('spinFindBallPosition')
 
     return player.stay()
@@ -112,9 +113,22 @@ def spinFindBallPosition(player):
         player.brain.tracker.trackBall()
 
 
-    if Transitions.shouldTurnToBall_fromAtBallPosition(player):
+    if transitions.shouldTurnToBall_fromAtBallPosition(player):
         return player.goLater('spinToBall')
-    if Transitions.atSpinBallDir(player):
+    if transitions.atSpinBallDir(player):
         return player.goLater('atSpinBallPosition')
 
+    return player.stay()
+
+def relocalize(player):
+    if player.firstFrame():
+        player.stopWalking()
+    if transitions.isWellLocalized(player):
+        return player.goLater(player.lastDiffState)
+
+    if not player.brain.motion.isHeadActive():
+        player.brain.tracker.locPans()
+
+    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
+        player.setSpeed(0 , 0, constants.RELOC_SPIN_SPEED)
     return player.stay()

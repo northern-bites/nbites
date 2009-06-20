@@ -66,11 +66,10 @@ class Navigator(FSA.FSA):
 
         self.switchTo('orthoWalkToPoint')
 
-    def goTo(self,x,y,h=None):
+    def goTo(self,x,y,h = 0.0):
         self.movingOrtho = False
         self.movingOmni = False
-        self.destH = h
-        self.destX,self.destY = x,y
+        self.destX,self.destY, self.destH = x, y, h
         self.switchTo('spinToWalkHeading')
 
     def setWalk(self, x, y, theta):

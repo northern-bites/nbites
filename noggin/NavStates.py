@@ -11,81 +11,78 @@ def spinToWalkHeading(nav):
     Spin to the heading needed to walk to a specific point
     """
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
-    headingDiff = abs(nav.brain.my.h - targetH)
+    headingDiff = fabs(nav.brain.my.h - targetH)
     newSpinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
+        nav.changeSpinDirCounter = 0
         nav.stopSpinToWalkCount = 0
         nav.curSpinDir = newSpinDir
-        nav.changeSpinDirCounter = 0
 
-#     nav.printf("Target heading is " + str(targetH))
-#     nav.printf("Current heading is " + str(nav.brain.my.h))
-
-    spinDir = nav.curSpinDir
     if newSpinDir != nav.curSpinDir:
         nav.changeSpinDirCounter += 1
     else:
-        nav.changeSpinDirCounter -= 1
-        nav.changeSpinDirCounter = max(0,nav.changeSpinDirCounter)
+        nav.changeSpinDirCounter = 0
 
     if nav.changeSpinDirCounter >  constants.CHANGE_SPIN_DIR_THRESH:
-        spinDir = newSpinDir
-        nav.curSpinDir = spinDir
+        nav.curSpinDir = newSpinDir
         nav.changeSpinDirCounter = 0
-        if DEBUG: nav.printf("Switching spin directions my.h " + str(nav.brain.my.h)+
-                   " and my target h: " + str(targetH))
-    else:
-        spinDir = nav.curSpinDir
-
-    if spinDir == None:
-        nav.printf("Spindir is none: nav.curSpinDir" +str(nav.curSpinDir) +
-                   " newSpinDir is " + str(newSpinDir))
-    nav.setSpeed(0, spinDir * constants.GOTO_SPIN_STRAFE,
-                 spinDir * constants.GOTO_SPIN_SPEED*nav.getRotScale(headingDiff))
+        if DEBUG: nav.printf("Switching spin directions my.h " +
+                             str(nav.brain.my.h)+
+                             " and my target h: " + str(targetH))
 
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
+    else :
+        nav.stopSpinToWalkCount = 0
 
     if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
-        return nav.goLater('walkToPoint')
+        return nav.goLater('walkStraightToPoint')
+
+    if not nav.brain.motion.isWalkActive():
+        nav.setSpeed(0, nav.curSpinDir * constants.GOTO_SPIN_STRAFE,
+                     nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
+                         nav.getRotScale(headingDiff))
 
     return nav.stay()
 
-def walkToPoint(nav):
+def walkStraightToPoint(nav):
     """
-    State to walk forward until localization thinks we are close to the point
+    State to walk forward w/some turning
+    until localization thinks we are close to the point
     Stops if we get there
-    If we no longer are heading towards it change to the spin state
+    If we no longer are heading towards it change to the spin state.
     """
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
-    nav.setSpeed(constants.GOTO_FORWARD_SPEED, 0, 0)
-
     if nav.atDestination():
         nav.walkToPointCount += 1
+    else :
+        nav.walkToPointCount = 0
 
     if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
-        if nav.destH is None:
-#             nav.printf("Stopping at position (" + str(nav.brain.my.x) +
-#                        ", " + str(nav.brain.my.y) + ") going to (" + str(nav.destX)
-#                        + ", " + str(nav.destY) + ")")
-            return nav.goLater('stop')
-        else:
-            return nav.goLater('spinToFinalHeading')
+        return nav.goLater('spinToFinalHeading')
 
     targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
 
     if nav.notAtHeading(targetH):
         nav.walkToPointSpinCount += 1
+    else :
+        nav.walkToPointSpinCount = 0
 
     if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToWalkHeading')
 
+    bearingToTarget = MyMath.sub180Angle(targetH - nav.brain.my.h)
+
+    sTheta = MyMath.clip(bearingToTarget,
+                         -constants.GOTO_STRAIGHT_SPIN_SPEED,
+                         constants.GOTO_STRAIGHT_SPIN_SPEED )
+
+    nav.setSpeed(constants.GOTO_FORWARD_SPEED, 0, sTheta)
     return nav.stay()
 
 def spinToFinalHeading(nav):
@@ -106,15 +103,20 @@ def spinToFinalHeading(nav):
 
     strafe = spinDir*constants.GOTO_SPIN_STRAFE
     spin = spinDir*constants.GOTO_SPIN_SPEED*nav.getRotScale(headingDiff)
+
     if DEBUG: nav.printf("strafe %g, spin %g" % (strafe, spin))
-    nav.setSpeed(0, strafe, spin)
 
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
-        if nav.stopSpinToWalkCount > constants.CHANGE_SPIN_DIR_THRESH:
-            if nav.movingOrtho:
-                return nav.goLater('orthoWalkToPoint')
-            return nav.goLater('stop')
+    else:
+        nav.stopSpinToWalkCount = 0
+
+    if nav.stopSpinToWalkCount > constants.CHANGE_SPIN_DIR_THRESH:
+        if nav.movingOrtho:
+            return nav.goLater('orthoWalkToPoint')
+        return nav.goLater('stop')
+
+    nav.setSpeed(0, strafe, spin)
     return nav.stay()
 
 def orthoWalkToPoint(nav):
@@ -123,10 +125,9 @@ def orthoWalkToPoint(nav):
     Stops if we get there
     If we no longer are heading towards it change to the spin state
     """
-
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
-    absBearing = abs(bearing)
+    absBearing = fabs(bearing)
     if DEBUG:
         nav.printf('bearing: %g  absBearing: %g  my.x: %g   my.y: %g  my.h: %g'%
                    (bearing, absBearing, my.x, my.y, my.h))
@@ -310,9 +311,6 @@ def walking(nav):
     State to be used when setSpeed is called
     """
     if nav.firstFrame() or nav.updatedTrajectory:
-        #HACK nav.brain.CoA.setRobotGait(nav.brain.motion)
-#         nav.printf("New walk is (" + str(nav.walkX) + ", " +
-#                    str(nav.walkY) + ", " + str(nav.walkTheta) + ")")
         nav.setSpeed(nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 
@@ -337,7 +335,7 @@ def stop(nav):
     if nav.firstFrame():
         if nav.brain.motion.isWalkActive():
             nav.setSpeed(0,0,0)
-        nav.walkX = nav.walkY = nav.walkTheta = 0
+    nav.walkX = nav.walkY = nav.walkTheta = 0
 
 
     if not nav.brain.motion.isWalkActive():

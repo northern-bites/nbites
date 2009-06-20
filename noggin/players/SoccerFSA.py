@@ -73,10 +73,9 @@ class SoccerFSA(FSA.FSA):
         else:
             if self.brain.nav.setWalk(x,y,theta):
                 self.brain.nav.switchTo('walking')
-            else:
-                if False:
-                    self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) +
-                                " is ignored")
+            # else:
+            #     self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) +
+            #                 " is ignored")
 
     def setSteps(self, x, y, theta, numSteps=1):
         """
