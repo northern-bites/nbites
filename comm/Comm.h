@@ -24,9 +24,9 @@
 #include "NogginStructs.h"
 
 class Comm
-  : public Thread
+    : public Thread
 {
-  public:
+public:
     Comm(boost::shared_ptr<Synchro> _synchro, boost::shared_ptr<Sensors> s,
          boost::shared_ptr<Vision> v);
     ~Comm();
@@ -57,17 +57,17 @@ class Comm
 
     void add_to_module();
 
-  private:
+private:
     void bind() throw(socket_error);
     void bind_gc() throw(socket_error);
     void handle_comm(struct sockaddr_in &addr,
                      const char *msg,
                      int len
-                     )          throw();
+        )          throw();
     void handle_gc(struct sockaddr_in &addr,
                    const char *msg,
                    int len
-                   )            throw();
+        )            throw();
     void receive()              throw(socket_error);
     void receive_gc()           throw(socket_error);
     void send()                 throw(socket_error);
@@ -75,9 +75,9 @@ class Comm
     void parse_packet(const CommPacketHeader& packet, const char* data,
                       int size)  throw();
     bool validate_packet(const char* msg, int len, CommPacketHeader& packet)
-      throw();
+        throw();
 
-  private:
+private:
     // TOOLConnect sub-thread controller
     TOOLConnect tool;
     int toolCommandState;
@@ -99,6 +99,7 @@ class Comm
     int gc_sockn;
     struct sockaddr_in bind_addr;
     struct sockaddr_in broadcast_addr;
+    struct sockaddr_in gc_broadcast_addr;
     char buf[UDP_BUF_SIZE];
 
 };

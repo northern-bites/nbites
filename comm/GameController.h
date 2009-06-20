@@ -15,8 +15,8 @@ class GameController;
 #include <Python.h>
 
 typedef struct PyGameController_t {
-  PyObject_HEAD
-  boost::shared_ptr<GameController> _gc;
+    PyObject_HEAD
+    boost::shared_ptr<GameController> _gc;
 } PyGameController;
 
 extern PyObject* PyGameController_new(boost::shared_ptr<GameController> _gc);
@@ -71,14 +71,15 @@ public:
     bool shouldSendManualPenalty();
     void sentManualPenalty();
 
-  private:
+private:
     // check the validity of the given message and store the data
     // (if valid) into the referenced RoboCupGameControlData struct
-    bool validatePacket(const char *msg, int len, RoboCupGameControlData &packet);
+    bool validatePacket(const char *msg, int len,
+                        RoboCupGameControlData &packet);
     void swapTeams(int team);
     void rawSwapTeams(RoboCupGameControlData& data);
 
-  private:
+private:
     /* local copy of the GameController data */
     RoboCupGameControlData controlData;
     TeamInfo* myTeam;
