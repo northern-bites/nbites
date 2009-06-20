@@ -19,7 +19,8 @@ public:
     virtual ~Lights();
 
 public:
-    virtual void setRGB(std::string led_id, int rdbHex) = 0;
+    virtual void setRGB(const std::string led_id, const int newRgbHex) = 0;
+    virtual void setRGB(const unsigned int led_id, const int newRgbHex) = 0;
     virtual void sendLights() = 0;
 
     static const unsigned int NUM_LED_NAMES = 7;

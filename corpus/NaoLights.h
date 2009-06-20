@@ -1,6 +1,8 @@
 #ifndef NaoLights_h_DEFINED
 #define NaoLights_h_DEFINED
 
+#include <pthread.h>
+
 #include "Lights.h"
 #include "dcmproxy.h"
 #include "ALLedNames.h"
@@ -19,7 +21,8 @@ public:
     virtual ~NaoLights();
 
 public:
-    void setRGB(std::string led_id, int rdbHex);
+    void setRGB(const std::string led_id, const int newRgbHex);
+    void setRGB(const unsigned int led_id, const int newRgbHex);
 
     void sendLights();
 private:
@@ -37,6 +40,9 @@ private:
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     AL::ALValue leftFaceLedCommand;
     std::vector<NaoRGBLight*> ledList;
+    std::vector<int> hexList;
+
+    mutable pthread_mutex_t lights_mutex;
 };
 
 #endif

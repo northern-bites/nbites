@@ -5,7 +5,8 @@
 #define DEBUG_NAOLIGHTS_INIT
 
 NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
-    :Lights()
+    :Lights(),
+     hexList(ALNames::NUM_UNIQUE_LEDS,0)
 {
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
@@ -13,8 +14,12 @@ NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
         cout << "Failed to initialize proxy to DCM" << endl;
     }
 
-    initDCMAliases();
-    initDCMCommands();
+    generateLeds();
+    //We need to set each LED initially, no matter what
+    for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
+        sendLightCommand(*ledList[i]->getCommand());
+    }
+    pthread_mutex_init(&lights_mutex,NULL);
 }
 
 
@@ -22,18 +27,33 @@ NaoLights::~NaoLights(){
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         delete ledList[i];
     }
+    pthread_mutex_destroy(&lights_mutex);
 }
 
-void NaoLights::setRGB(std::string led_id, int rgbHex){
+void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
+    pthread_mutex_lock(&lights_mutex);
+    //Slow, but there are only 7 leds, so it shouldn't be too bad...
+    for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
+        if(LED_NAMES[i].compare(led_id) == 0){
+            hexList[i] = newRgbHex;
+        }
+    }
+    pthread_mutex_unlock(&lights_mutex);
+}
 
-
+void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
+    pthread_mutex_lock(&lights_mutex);
+    hexList[led_id] = newRgbHex;
+    pthread_mutex_unlock(&lights_mutex);
 }
 
 void NaoLights::sendLights(){
-
-    //Left Eye
-    updateLightCommand(leftFaceLedCommand,0,ALNames::NUM_FACE_LEDS);
-    sendLightCommand(leftFaceLedCommand);
+    pthread_mutex_lock(&lights_mutex);
+    for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
+        if(ledList[i]->updateCommand(hexList[i]))
+            sendLightCommand(*ledList[i]->getCommand());
+    }
+    pthread_mutex_unlock(&lights_mutex);
 }
 
 void NaoLights::generateLeds(){
@@ -44,21 +64,7 @@ void NaoLights::generateLeds(){
                                           ALNames::NUM_RGB_LEDS[i],
                                           ALNames::LED_START_COLOR[i],
                                           ALNames::LED_END_COLOR[i]));
-    }
-}
-
-void NaoLights::updateLightCommand(ALValue & command, const int rgbHex,
-                                   const unsigned int numRGBLeds,
-                                   const unsigned int startColor,
-                                   const unsigned int endColor){
-    unsigned int ledIndex = 0;
-    for(unsigned int c = startColor; c < endColor; c++){
-        for(unsigned int led = 0; led < numRGBLeds; led++){
-            const float color =
-                getColor(static_cast<ALNames::LedColor>(c),rgbHex);
-            command[5][ledIndex][0] = color;
-            ledIndex++;
-        }
+        dcmProxy->createAlias(*ledList[i]->getAlias());
     }
 }
 
