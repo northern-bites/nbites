@@ -34,7 +34,6 @@ def playbookPosition(player):
     if player.firstFrame() or \
             nav.destX != position[0] or \
             nav.destY != position[1] or \
-            nav.destH != position[2] or \
             changedOmni:
         if player.brain.gameController.currentState == 'gameReady':
             player.brain.tracker.locPans()

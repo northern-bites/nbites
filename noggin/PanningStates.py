@@ -1,6 +1,4 @@
 import man.motion.HeadMoves as HeadMoves
-import man.motion.SweetMoves as SweetMoves
-
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 1 #num frms after which to switch to scanfindbl
 
@@ -12,9 +10,13 @@ def scanBall(tracker):
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
 
+
     if not tracker.brain.motion.isHeadActive():
         lastBallDist = ball.lastSeenDist
-        if lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
+        if tracker.brain.player.justKicked:
+            tracker.execute(HeadMoves.HIGH_SCAN_BALL)
+
+        elif lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.execute(HeadMoves.HIGH_SCAN_BALL)
 
         elif lastBallDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \

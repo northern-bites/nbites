@@ -44,7 +44,11 @@ class Navigator(FSA.FSA):
         self.orbitDir = None
 
     def omniGoTo(self, dest):
-        self.destX,self.destY, self.destH = dest
+        if len(dest) == 2:
+            self.destX, self.destY = dest
+            self.destH = 0.0
+        elif len(dest) == 3:
+            self.destX,self.destY, self.destH = dest
         self.movingOrtho = False
         self.movingOmni = True
         self.switchTo('omniWalkToPoint')
@@ -54,7 +58,11 @@ class Navigator(FSA.FSA):
         takes in a relative bearing [-180...0...180],
         takes in a heading to keep your heading constant (relatively)
         '''
-        self.destX,self.destY, self.destH = dest
+        if len(dest) == 2:
+            self.destX, self.destY = dest
+            self.destH = 0.0
+        elif len(dest) == 3:
+            self.destX,self.destY, self.destH = dest
         self.oScale = oScale
         self.hScale = hScale
         self.movingOrtho = True
@@ -65,7 +73,11 @@ class Navigator(FSA.FSA):
     def goTo(self,dest):
         self.movingOrtho = False
         self.movingOmni = False
-        self.destX,self.destY, self.destH = dest
+        if len(dest) == 2:
+            self.destX, self.destY = dest
+            self.destH = 0.0
+        elif len(dest) == 3:
+            self.destX,self.destY, self.destH = dest
         self.switchTo('spinToWalkHeading')
 
     def setWalk(self, x, y, theta):
