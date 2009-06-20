@@ -15,8 +15,8 @@ class GameController;
 #include <Python.h>
 
 typedef struct PyGameController_t {
-  PyObject_HEAD
-  boost::shared_ptr<GameController> _gc;
+    PyObject_HEAD
+    boost::shared_ptr<GameController> _gc;
 } PyGameController;
 
 extern PyObject* PyGameController_new(boost::shared_ptr<GameController> _gc);
@@ -55,7 +55,7 @@ public:
     const GCPenalty penalties(uint16 player);
     const uint16 penaltySeconds();
     const uint16 penaltySeconds(uint16 player);
-
+    const bool isManuallyPenalized(void);
     void setTeam(uint8 team);
     void setColor(uint8 color);
     void setPlayer(uint8 player);
@@ -63,24 +63,29 @@ public:
     void setGameState(GCGameState state);
     void setPenalty(GCPenalty penalized);
 
-    //Button
+    // Button Click Methods
     void advanceButtonClickState();
     void toggleTeamColor();
     void toggleKickoff();
+    void manualPenalize(bool penalize);
+    bool shouldSendManualPenalty();
+    void sentManualPenalty();
 
-
-  private:
+private:
     // check the validity of the given message and store the data
     // (if valid) into the referenced RoboCupGameControlData struct
-    bool validatePacket(const char *msg, int len, RoboCupGameControlData &packet);
+    bool validatePacket(const char *msg, int len,
+                        RoboCupGameControlData &packet);
     void swapTeams(int team);
     void rawSwapTeams(RoboCupGameControlData& data);
 
-  private:
+private:
     /* local copy of the GameController data */
     RoboCupGameControlData controlData;
     TeamInfo* myTeam;
     uint8 playerNumber;
+    bool justManuallyPenalized;
+    bool manuallyPenalized;
 
     static const uint8 NUM_TEAMS;//2
 
