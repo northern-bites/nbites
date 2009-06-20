@@ -8,12 +8,6 @@
 #include "EKFStructs.h"
 #include <cstdlib>
 
-#ifndef WEBOTS_BACKEND //HACK-ish should make abstract Lights object..!!
-#include "_ledsmodule.h"
-#else
-#include "_webotsledsmodule.h"
-#endif
-
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"

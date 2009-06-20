@@ -52,8 +52,6 @@ typedef TTMan ALMan;
 #include "ALTranscriber.h"
 #include "ALImageTranscriber.h"
 
-
-#include "_ledsmodule.h"
 #include "NaoLights.h"
 
 #include "almodule.h"
