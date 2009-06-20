@@ -13,10 +13,8 @@ def scanBall(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         lastBallDist = ball.lastSeenDist
-        if tracker.brain.player.justKicked:
-            tracker.execute(HeadMoves.HIGH_SCAN_BALL)
 
-        elif lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
+        if lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.execute(HeadMoves.HIGH_SCAN_BALL)
 
         elif lastBallDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \

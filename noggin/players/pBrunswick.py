@@ -57,7 +57,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.kickObjective = None
 
     def run(self):
-        if self.lastDiffState == 'afterKick':
+        if self.currentState == 'afterKick' or \
+                self.lastDiffState == 'afterKick':
             self.justKicked = True
         else:
             self.justKicked = False
