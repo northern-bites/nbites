@@ -1,7 +1,7 @@
 #include "NaoRGBLight.h"
 
 using std::string;
-#define DEBUG_NAOLIGHTS_INIT
+//#define DEBUG_NAOLIGHTS_INIT
 
 NaoRGBLight::NaoRGBLight(const string _NBLedName,
                          const unsigned int _NBLedID,
@@ -28,6 +28,11 @@ NaoRGBLight::NaoRGBLight(const string _NBLedName,
 
 NaoRGBLight::~NaoRGBLight(){}
 
+/**
+ * Each time a new command is sent to this LED, we check to see if it
+ * will change the color of the LED. If so, we update the ALValue command
+ * and return true so that NaoLights will send the command to the DCM
+ */
 bool NaoRGBLight::updateCommand(const int newRgbHex){
     if(newRgbHex == rgbHex){
         return false;
@@ -52,9 +57,16 @@ bool NaoRGBLight::updateCommand(const int newRgbHex){
  * of the hex value 
  */
 const float NaoRGBLight::getColor(const ALNames::LedColor c, const int rgbHex){
-    return LED_OFF;
+    const int channelColor = rgbHex >> ((2-c)*8);
+    const float fchannelColor= static_cast<float>(channelColor);
+    return fchannelColor * (1.0f/255.0f);
 }
 
+/**
+ * Each NBLedName is actually many individual leds. We need to alias the large
+ * group of leds to one name with the DCM. Then we can send commands directly
+ * just to that group.
+ */
 void NaoRGBLight::makeAlias(){
 #ifdef DEBUG_NAOLIGHTS_INIT
     std::cout << "  NaoRGBLight::makeAlias()-"<<NBLedName << ":"<<std::endl;
@@ -80,6 +92,10 @@ void NaoRGBLight::makeAlias(){
     }
 }
 
+/**
+ *  This sets up the command which will be sent by NaoLights each time 
+ *  the color of this LED is updated. 
+ */
 void NaoRGBLight::makeCommand(){
 #ifdef DEBUG_NAOLIGHTS_INIT
     std::cout << "  NaoRGBLights::makeCommand()-"
@@ -99,7 +115,7 @@ void NaoRGBLight::makeCommand(){
     command[5].arraySetSize(numLedsTotal);
     for(unsigned int i = 0; i< numLedsTotal; i++){
         command[5][i].arraySetSize(1);
-        command[5][i][0]  = 0.0f; //Should be a named constant
+        command[5][i][0]  = LED_OFF;
     }
 
 }

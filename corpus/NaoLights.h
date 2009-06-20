@@ -9,6 +9,14 @@
 #include "NaoRGBLight.h"
 /**
  *  This class implements LED capability on the Nao robot using the DCM in Naoqi
+ *
+ *  The basic design is to make a NaoRGBLight for each LED group.  That instance
+ *  handles the creation of the appropropriatly formatted ALValue to send to
+ *  the DCM low level.
+ *
+ *  Led groups can be referenced either by ID or by string name, through
+ *  the latter is currently not as fast as it could be (TODO: fix that)
+ *
  *  @author Johannes Strom
  *  @date June 2009
  */
@@ -27,14 +35,6 @@ public:
     void sendLights();
 private:
     void generateLeds();
-    void initDCMAliases();
-    void initDCMCommands();
-    const float getColor(const ALNames::LedColor c, const int rgbHex);
-    void updateLightCommand(ALValue &command, const int rgbHex,
-                            const unsigned int numRGBLeds,
-                            const unsigned int startColor = 0,
-                            const unsigned int endColor =
-                            ALNames::NUM_LED_COLORS);
     void sendLightCommand(ALValue &command);
 private:
     AL::ALPtr<AL::DCMProxy> dcmProxy;
