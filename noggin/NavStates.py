@@ -2,7 +2,7 @@
 
 from .util import MyMath
 import NavConstants as constants
-from math import fabs
+from math import fabs, cos, sin, radians
 
 DEBUG = False
 # States for the standard spin - walk - spin go to
@@ -69,7 +69,8 @@ def walkStraightToPoint(nav):
     if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToFinalHeading')
 
-    targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
+    my = nav.brain.my
+    targetH = MyMath.getTargetHeading(my, nav.destX, nav.destY)
 
     if nav.notAtHeading(targetH):
         nav.walkToPointSpinCount += 1
@@ -79,9 +80,9 @@ def walkStraightToPoint(nav):
     if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToWalkHeading')
 
-    bearingToTarget = MyMath.sub180Angle(targetH - nav.brain.my.h)
+    bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
 
-    sTheta = MyMath.clip(bearingToTarget,
+    sTheta = MyMath.clip(bearing,
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
 
@@ -269,45 +270,33 @@ def omniWalkToPoint(nav):
 
     if nav.atDestinationCloser() and nav.atHeading():
         nav.walkToPointCount += 1
-        if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
+    else :
+        nav.walkToPointCount -= 1
+        nav.walkToPointCount = max(nav.walkToPointCount, 0)
+    if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
             return nav.goLater('stop')
 
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX, nav.destY)
     absBearing = abs(bearing)
-    verSpeed, horSpeed, spinSpeed = 0.0, 0.0, 0.0
+    sX, sY, sTheta = 0.0, 0.0, 0.0
 
-    if bearing != None:
-        if absBearing <= 45:
-            vertSpeed = constants.GOTO_FORWARD_SPEED
-            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED*\
-                (absBearing/45.0)
-        elif absBearing <= 90:
-            vertSpeed = constants.GOTO_FORWARD_SPEED*((90 - absBearing)/45.0)
-            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED
-        elif absBearing <= 135:
-            vertSpeed = constants.GOTO_BACKWARD_SPEED*((135-absBearing)/45.0)
-            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED
-        elif absBearing <= 180:
-            vertSpeed = constants.GOTO_BACKWARD_SPEED
-            horSpeed = MyMath.sign(bearing)*constants.GOTO_STRAFE_SPEED*\
-                ((180-absBearing)/45.0)
+    sX = constants.OMNI_GOTO_FORWARD_SPEED * cos(radians(bearing))
+    sY = constants.OMNI_GOTO_STRAFE_SPEED * sin(radians(bearing))
 
-        if nav.oScale == -1:
-            nav.oScale = nav.getOScale()
-        vertSpeed = nav.oScale*vertSpeed
-        horSpeed = nav.oScale*horSpeed
+    spinDir = MyMath.getSpinDir(my.h, nav.destH)
+    sTheta = spinDir * fabs(my.h - nav.destH)
 
-    if nav.destH != None:
-        if nav.hScale == -1:
-            nav.hScale = nav.getRotScale(my.h - nav.destH)
-        spinDir = MyMath.getSpinDir(my.h, nav.destH)
-        spinSpeed = constants.GOTO_SPIN_SPEED*spinDir*nav.hScale
+    if nav.atDestinationCloser():
+        sX = sY = 0.0
+    if nav.atHeading():
+        sTheta = 0.0
 
-    if DEBUG: nav.printf("vertSpeed: %g  horSpeed: %g  spinSpeed: %g" %
-               (vertSpeed, horSpeed, spinSpeed))
-    nav.setSpeed(vertSpeed, horSpeed, spinSpeed)
+    if DEBUG: nav.printf("sX: %g  sY: %g  sTheta: %g" %
+               (sX, sY, sTheta))
+    nav.setSpeed(sX, sY, sTheta)
     return nav.stay()
+
 # State to be used with standard setSpeed movement
 def walking(nav):
     """

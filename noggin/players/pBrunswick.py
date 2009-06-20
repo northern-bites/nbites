@@ -48,6 +48,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.doneAvoidingCounter = 0
 
         self.notAtPositionCounter = 0
+        self.changeOmniGoToCounter = 0
         self.shouldRelocalizeCounter = 0
 
         self.angleToAlign = 0.0
