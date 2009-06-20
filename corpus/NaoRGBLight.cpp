@@ -16,6 +16,11 @@ NaoRGBLight::NaoRGBLight(const string _NBLedName,
      startColor(_startColor),
      endColor(_endColor)
 {
+#ifdef DEBUG_NAOLIGHTS_INIT
+    std::cout << "  NaoRGBLight()-"<<NBLedName << ", id="
+              << NBLedID << ", numSubLeds"<<numSubLeds
+              << ", startC = "<<startColor<< ", endC=" << endColor <<std::endl;
+#endif
     makeAlias();
     makeCommand();
 }
@@ -54,7 +59,7 @@ void NaoRGBLight::makeAlias(){
 #ifdef DEBUG_NAOLIGHTS_INIT
     std::cout << "  NaoRGBLight::makeAlias()-"<<NBLedName << ":"<<std::endl;
 #endif
-    alias.arraySetSize(3);
+    alias.arraySetSize(2);
     alias[0] = string(NBLedName);
 
     const int numTotLeds = numRGBSubLeds*(endColor - startColor);
@@ -67,7 +72,7 @@ void NaoRGBLight::makeAlias(){
         for(unsigned int n = 0; n < numRGBSubLeds; n++){
             const unsigned int subIndex = (c-startColor)*numRGBSubLeds + n;
 #ifdef DEBUG_NAOLIGHTS_INIT
-            std::cout << "  " <<ALNames::RGB_LED_STRINGS[NBLedID][subIndex] <<std::endl;
+            std::cout << "    " <<ALNames::RGB_LED_STRINGS[NBLedID][subIndex] <<std::endl;
 #endif
             alias[1][index] = ALNames::RGB_LED_STRINGS[NBLedID][subIndex];
             index++;
@@ -92,7 +97,7 @@ void NaoRGBLight::makeCommand(){
               << numLedsTotal <<":"<< std::endl; 
 #endif
     command[5].arraySetSize(numLedsTotal);
-    for(unsigned int i = 0; i< numRGBSubLeds; i++){
+    for(unsigned int i = 0; i< numLedsTotal; i++){
         command[5][i].arraySetSize(1);
         command[5][i][0]  = 0.0f; //Should be a named constant
     }

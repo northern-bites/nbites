@@ -5,7 +5,7 @@
 namespace ALNames {
 
     static const std::string FaceLed ="Face/Led";
-    static const std::string EarLed ="Ear/Led";
+    static const std::string EarLed ="Ears/Led";
     static const std::string LFootLed ="LFoot/Led";
     static const std::string RFootLed ="RFoot/Led";
     static const std::string ChestLed ="ChestBoard/Led";
