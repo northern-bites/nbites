@@ -19,7 +19,7 @@ def playbookPosition(player):
     nav = brain.nav
     my = brain.my
 
-    useOmni = False #(MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
+    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
 
     if player.firstFrame() or \
             nav.destX != position[0] or \
@@ -27,6 +27,13 @@ def playbookPosition(player):
             useOmni != nav.movingOmni:
 
         player.brain.tracker.locPans()
+
+        if transitions.shouldRelocalize(player):
+            player.shouldRelocalizeCounter += 1
+        else:
+            player.shouldRelocalizeCounter = 0
+        if player.shouldRelocalizeCounter > constants.SHOULD_RELOC_FRAME_THRESH:
+            return player.goLater('relocalize')
 
         if not useOmni:
             nav.goTo(position[0], position[1], NogginConstants.OPP_GOAL_HEADING)
