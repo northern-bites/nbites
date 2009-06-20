@@ -626,7 +626,8 @@ PyObject* PyGameController_players (PyGameController* self, PyObject* args)
 {
     if (!PyInt_Check(args)) {
         PyErr_Format(PyExc_TypeError,
-                     "expected an integer argument (%s given)", args->ob_type->tp_name);
+                     "expected an integer argument (%s given)",
+                     args->ob_type->tp_name);
         return NULL;
     }
 
@@ -661,7 +662,8 @@ PyObject* PyGameController_teams (PyGameController* self, PyObject* args)
 {
     if (!PyInt_Check(args)) {
         PyErr_Format(PyExc_TypeError,
-                     "expected an integer argument (%s given)", args->ob_type->tp_name);
+                     "expected an integer argument (%s given)",
+                     args->ob_type->tp_name);
         return NULL;
     }
 

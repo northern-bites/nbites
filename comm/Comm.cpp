@@ -649,6 +649,8 @@ void Comm::send () throw(socket_error)
 
     // Let game controller know that we have been manually penalized
     if (gc->shouldSendManualPenalty()) {
+        gc->sentManualPenalty();
+
         RoboCupGameControlReturnData returnPacket;
 
         if (gc->isManuallyPenalized()) {
