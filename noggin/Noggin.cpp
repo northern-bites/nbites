@@ -17,6 +17,7 @@
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
+#include "PyLights.h"
 
 //#define DEBUG_CORNER_OBSERVATIONS
 //#define DEBUG_POST_OBSERVATIONS
@@ -92,7 +93,8 @@ void Noggin::initializePython(shared_ptr<Vision> v)
 
     // Initialize low-level modules
     c_init_sensors();
-    init_leds();
+    //init_leds();
+    c_init_lights();
     c_init_roboguardian();
     c_init_motion();
     c_init_comm();

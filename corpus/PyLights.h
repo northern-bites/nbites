@@ -25,9 +25,9 @@
 
 #include "Lights.h"
 
-void c_init_leds();
+void c_init_lights();
 // C++ backend insertion (must be set before import)
 //    steals a reference to the supplied Lights instance
-void set_leds_pointer (boost::shared_ptr<Lights> lights_ptr);
+void set_lights_pointer (boost::shared_ptr<Lights> lights_ptr);
 
 #endif

@@ -47,3 +47,18 @@ BOOST_PYTHON_MODULE(_lights)
     scope().attr("lights") = lights_pointer;
 }
 
+void c_init_lights () {
+    if (!Py_IsInitialized())
+        Py_Initialize();
+
+    try {
+        init_lights();
+    } catch (error_already_set) {
+        PyErr_Print();
+    }
+
+}
+
+void set_lights_pointer (shared_ptr<Lights> _lights_ptr) {
+    lights_pointer = _lights_ptr;
+}

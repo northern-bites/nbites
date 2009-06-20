@@ -79,6 +79,9 @@ Man::Man (shared_ptr<Sensors> _sensors,
     // initialize python roboguardian module.
     // give python a pointer to the guardian. Method defined in PyRoboguardian.h
     set_guardian_pointer(guardian);
+
+    set_lights_pointer(_lights);
+
     vision = shared_ptr<Vision>(new Vision(pose, profiler));
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN

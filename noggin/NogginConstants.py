@@ -6,9 +6,6 @@
 ##--------------------SWITCH BOARD ----------------#
 ##
 LOG_LOC = True
-# LED Related #
-DEBUG_BALL_LEDS = True
-DEBUG_GOAL_LEDS = True
 
 ##### MODULE SWITCHES ####
 USE_VISION = True # Disable if you want faster processing

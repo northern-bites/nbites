@@ -57,7 +57,7 @@ bool NaoRGBLight::updateCommand(const int newRgbHex){
  * of the hex value 
  */
 const float NaoRGBLight::getColor(const ALNames::LedColor c, const int rgbHex){
-    const int channelColor = rgbHex >> ((2-c)*8);
+    const int channelColor = (rgbHex >> ((2-c)*8)) % 256;
     const float fchannelColor= static_cast<float>(channelColor);
     return fchannelColor * (1.0f/255.0f);
 }

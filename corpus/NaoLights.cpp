@@ -38,6 +38,7 @@ void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         if(LED_NAMES[i].compare(led_id) == 0){
             hexList[i] = newRgbHex;
+            break;
         }
     }
     pthread_mutex_unlock(&lights_mutex);
@@ -58,7 +59,6 @@ void NaoLights::sendLights(){
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){ //HAack
         if(ledList[i]->updateCommand(hexList[i])){
             sendLightCommand(*ledList[i]->getCommand());
-            std::cout << "Setting LED " <<i<<std::endl;
         }
     }
 

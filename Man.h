@@ -46,6 +46,7 @@
 #include "RoboGuardian.h"
 #include "PyRoboGuardian.h"
 #include "PySensors.h"
+#include "PyLights.h"
 
 /**
  * The Naoqi module to run our main Nao robot system.
