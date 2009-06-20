@@ -5,8 +5,7 @@
 #define DEBUG_NAOLIGHTS_INIT
 
 NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
-    :Lights(),
-     ledList(0)
+    :Lights()
 {
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
@@ -19,7 +18,11 @@ NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
 }
 
 
-NaoLights::~NaoLights(){}
+NaoLights::~NaoLights(){
+    for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
+        delete ledList[i];
+    }
+}
 
 void NaoLights::setRGB(std::string led_id, int rgbHex){
 
@@ -33,10 +36,23 @@ void NaoLights::sendLights(){
     sendLightCommand(leftFaceLedCommand);
 }
 
+void NaoLights::generateLeds(){
+    for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
+
+        ledList.push_back(new NaoRGBLight(LED_NAMES[i],
+                                          i,
+                                          ALNames::NUM_RGB_LEDS[i],
+                                          ALNames::LED_START_COLOR[i],
+                                          ALNames::LED_END_COLOR[i]));
+    }
+}
+
 void NaoLights::updateLightCommand(ALValue & command, const int rgbHex,
-                                   const unsigned int numRGBLeds){
+                                   const unsigned int numRGBLeds,
+                                   const unsigned int startColor,
+                                   const unsigned int endColor){
     unsigned int ledIndex = 0;
-    for(unsigned int c = 0; c < ALNames::NUM_LED_COLORS; c++){
+    for(unsigned int c = startColor; c < endColor; c++){
         for(unsigned int led = 0; led < numRGBLeds; led++){
             const float color =
                 getColor(static_cast<ALNames::LedColor>(c),rgbHex);
@@ -63,7 +79,7 @@ void NaoLights::sendLightCommand(ALValue & command){
  * of the hex value 
  */
 const float NaoLights::getColor(const ALNames::LedColor c, const int rgbHex){
-    return OFF;
+    return NaoRGBLight::OFF;
 }
 
 /**
@@ -115,7 +131,7 @@ void NaoLights::initDCMCommands(){
     leftFaceLedCommand[5].arraySetSize(ALNames::NUM_ONE_EYE_LEDS);
     for(unsigned int i = 0; i<ALNames::NUM_ONE_EYE_LEDS; i++){
         leftFaceLedCommand[5][i].arraySetSize(1);
-        leftFaceLedCommand[5][i][0]  = OFF;
+        leftFaceLedCommand[5][i][0]  = NaoRGBLight::OFF;
     }
 
 #ifdef DEBUG_NAOLIGHTS_INIT

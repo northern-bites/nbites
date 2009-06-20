@@ -148,7 +148,8 @@ ELSE(WEBOTS_BACKEND)
                                  ${CORPUS_INCLUDE_DIR}/NaoEnactor
 				 ${CORPUS_INCLUDE_DIR}/ALTranscriber
 				 ${CORPUS_INCLUDE_DIR}/ALImageTranscriber
-				 ${CORPUS_INCLUDE_DIR}/NaoLights)
+				 ${CORPUS_INCLUDE_DIR}/NaoLights
+				 ${CORPUS_INCLUDE_DIR}/NaoRGBLight)
 ENDIF(WEBOTS_BACKEND)
 
 

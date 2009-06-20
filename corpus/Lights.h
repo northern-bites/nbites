@@ -25,8 +25,5 @@ public:
     static const unsigned int NUM_LED_NAMES = 7;
     static const std::string LED_NAMES[NUM_LED_NAMES];
 
-    static const float ON = 1.0f;
-    static const float OFF = 0.0f;
-
 };
 #endif
