@@ -16,6 +16,7 @@ using namespace std;
 #include "WBEnactor.h"
 #include "WBImageTranscriber.h"
 #include "WBTranscriber.h"
+#include "WBLights.h"
 
 using boost::shared_ptr;
 
