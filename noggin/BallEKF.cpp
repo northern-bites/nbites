@@ -22,20 +22,20 @@ const float BallEKF::INIT_BALL_X_VEL = 0.0f;
 const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
 const float BallEKF::X_UNCERT_MAX = 740.0f;
 const float BallEKF::Y_UNCERT_MAX = 270.0f;
-const float BallEKF::VELOCITY_UNCERT_MAX = 300.0f;
+const float BallEKF::VELOCITY_UNCERT_MAX = 150.0f;
 const float BallEKF::X_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::INIT_X_UNCERT = 740.0f;
 const float BallEKF::INIT_Y_UNCERT = 270.0f;
-const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
-const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
+const float BallEKF::INIT_X_VEL_UNCERT = 150.0f;
+const float BallEKF::INIT_Y_VEL_UNCERT = 150.0f;
 const float BallEKF::X_EST_MIN = 0.0f;
 const float BallEKF::Y_EST_MIN = 0.0f;
 const float BallEKF::X_EST_MAX = FIELD_WIDTH;
 const float BallEKF::Y_EST_MAX = FIELD_HEIGHT;
-const float BallEKF::VELOCITY_EST_MAX = 300.0f;
-const float BallEKF::VELOCITY_EST_MIN = -300.0f;
+const float BallEKF::VELOCITY_EST_MAX = 150.0f;
+const float BallEKF::VELOCITY_EST_MIN = -150.0f;
 
 BallEKF::BallEKF()
     : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
@@ -90,8 +90,8 @@ BallEKF::BallEKF(float initX, float initY,
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 0.0f; //1.0f / ASSUMED_FPS;
-    A_k(1,3) = 0.0f; //1.0f / ASSUMED_FPS;
+    A_k(0,2) = 1.0f / ASSUMED_FPS;
+    A_k(1,3) = 1.0f / ASSUMED_FPS;
 
     // Setup initial values
     setXEst(initX);
@@ -137,12 +137,12 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
         correctionStep(z);
 
     } else { // No ball seen
-
+        noCorrectionStep();
         setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
         setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
-
-        noCorrectionStep();
     }
+    limitPosteriorEst();
+    limitPosteriorUncert();
     clipBallEstimate();
 }
 
@@ -161,10 +161,16 @@ EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
     // Calculate the assumed change in ball position
     // Assume no decrease in ball velocity
     StateVector deltaBall(BALL_EKF_DIMENSION);
-    deltaBall(0) = getXVelocityEst() * (1.0f / ASSUMED_FPS);
-    deltaBall(1) = getYVelocityEst() * (1.0f / ASSUMED_FPS);
-    deltaBall(2) = sign(getXVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
-    deltaBall(3) = sign(getYVelocityEst()) * (CARPET_FRICTION / ASSUMED_FPS);
+
+    float dt = 1.0f / ASSUMED_FPS;
+
+    deltaBall(0) = getXVelocityEst() * dt;
+    deltaBall(1) = getYVelocityEst() * dt;
+    deltaBall(2) = sign(getXVelocityEst()) * CARPET_FRICTION * dt;
+    deltaBall(3) = sign(getYVelocityEst()) * CARPET_FRICTION * dt;
+
+    A_k(0,2) = dt;
+    A_k(1,3) = dt;
 
     return deltaBall;
 }
@@ -257,18 +263,6 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
  */
 void BallEKF::limitAPrioriEst()
 {
-    if(xhat_k_bar(0) > X_EST_MAX) {
-        xhat_k_bar(0) = X_EST_MAX;
-    }
-    if(xhat_k_bar(0) < X_EST_MIN) {
-        xhat_k_bar(0) = X_EST_MIN;
-    }
-    if(xhat_k_bar(1) > Y_EST_MAX) {
-        xhat_k_bar(1) = Y_EST_MAX;
-    }
-    if(xhat_k_bar(1) < Y_EST_MIN) {
-        xhat_k_bar(1) = Y_EST_MIN;
-    }
     if(xhat_k_bar(2) > VELOCITY_EST_MAX) {
         xhat_k_bar(2) = VELOCITY_EST_MAX;
     }
@@ -458,6 +452,13 @@ void BallEKF::clipBallEstimate()
     if(xhat_k(3) < VELOCITY_EST_MIN) {
         xhat_k_bar(3) = VELOCITY_EST_MIN;
         xhat_k(3) = VELOCITY_EST_MIN;
+    }
+
+    if (std::abs(xhat_k(2)) < 0.2f) {
+        xhat_k(2) = 0.0f;
+    }
+    if (std::abs(xhat_k(3)) < 0.2f) {
+        xhat_k(3) = 0.0f;
     }
 
 }

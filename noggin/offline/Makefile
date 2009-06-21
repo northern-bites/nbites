@@ -22,8 +22,7 @@ VFO_SRCS = ../../vision/VisualFieldObject.cpp \
 EKF_SRCS = ../EKF.h
 VISBALL_SRCS = ../../vision/VisualBall.cpp \
 	  ../../vision/VisualBall.h
-VLANDMARK_SRCS = ../../vision/VisualLandmark.cpp \
-	 ../../vision/VisualLandmark.h
+VLANDMARK_SRCS = ../../vision/VisualLandmark.h
 VISDETECTION_SRCS = ../../vision/VisualDetection.cpp \
 	 ../../vision/VisualDetection.h
 CLANDMARK_SRCS = ../../vision/ConcreteLandmark.cpp \

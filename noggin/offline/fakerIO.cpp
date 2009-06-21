@@ -492,16 +492,16 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
 
         // Read in observations
         sightings.clear();
-        cout << endl;
+        //cout << endl;
         // Observations are separated by colons
         while(inputLine.peek() == ':') {
             int id;
             char c;
             float dist, bearing, distSD, bearingSD;
             inputLine >> c >> id >> dist >> bearing >> distSD >> bearingSD;
-            cout << "Read in following info -- " << c << " " << id << " "
-                 << dist << " " << bearing << " " << distSD << " "
-                 << bearingSD << " ";
+            // cout << "Read in following info -- " << c << " " << id << " "
+            //      << dist << " " << bearing << " " << distSD << " "
+            //      << bearingSD << " ";
             Observation obs(id, dist, bearing, distSD, bearingSD,
                              Observation::isLineID(id));
             while(inputLine.peek() != ':' &&
@@ -516,10 +516,10 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     PointLandmark p;
                     inputLine >> p.x >> p.y;
                     obs.addPointPossibility(p);
-                    cout << "Point " << p.x << " " << p.y << " ";
+                    //cout << "Point " << p.x << " " << p.y << " ";
                 }
             }
-            cout << endl;
+            //cout << endl;
             if (! obs.isLine()) {
                 sightings.push_back(obs);
             }
