@@ -7,6 +7,7 @@
 #include <webots/distance_sensor.h>
 
 #include "Kinematics.h"
+#include <cmath>
 using boost::shared_ptr;
 using namespace std;
 using namespace Kinematics;
@@ -108,9 +109,12 @@ void WBTranscriber::postMotionSensors(){
     const float accX = -static_cast<float>(acc_values[0]);
     const float accY = -static_cast<float>(acc_values[1]);
     const float accZ = -static_cast<float>(acc_values[2]);
+    cout<<"anglex "<<std::acos(-accX/GRAVITY_mss)*(180/3.14)<<"\n";
+    cout<<"angley "<<std::acos(-accY/GRAVITY_mss)*(180/3.14);
 
     const float gyroX = static_cast<float>(gyro_values[0]);
     const float gyroY = static_cast<float>(gyro_values[1]);
+
 
     //HACK!!!! TODO compute angleX and angleY better (filter?)
     //Currently when the gravity accell is in one direction,
