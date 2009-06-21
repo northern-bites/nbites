@@ -13,10 +13,10 @@
 #include "PyMotion.h"
 #include "PyLights.h"
 
-//#define DEBUG_CORNER_OBSERVATIONS
 //#define DEBUG_POST_OBSERVATIONS
-//#define DEBUG_BALL_OBSERVATIONS
+//#define DEBUG_CORNER_OBSERVATIONS
 //#define DEBUG_CROSS_OBSERVATIONS
+//#define DEBUG_BALL_OBSERVATIONS
 //#define DEBUG_TEAMMATE_BALL_OBSERVATIONS
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
@@ -34,8 +34,9 @@ const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
-                MotionInterface * _minterface)
+                shared_ptr<Sensors> _sensors, MotionInterface * _minterface)
     : profiler(p), comm(c),gc(c->getGC()),
+      sensors(_sensors),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -346,9 +347,12 @@ void Noggin::updateLocalization()
             Observation seen(*i);
             observations.push_back(seen);
 #           ifdef DEBUG_CORNER_OBSERVATIONS
-            cout << "Saw corner " << i->getID() << " at distance "
+            cout << "Saw corner "
+                 << ConcreteCorner::cornerIDToString(i->getID())
+                 << " at distance "
                  << seen.getVisDistance() << " and bearing "
                  << seen.getVisBearing() << endl;
+            //sensors->saveFrame();
 #           endif
         }
     }
@@ -359,9 +363,11 @@ void Noggin::updateLocalization()
         Observation seen(*vision->cross);
         observations.push_back(seen);
 #       ifdef DEBUG_CROSS_OBSERVATIONS
-        cout << "Saw cross " << vision->cross->getID() << " at distance "
-             << vision->cross->getDistance() << " and bearing "
-             << vision->cross->getBearing() << endl;
+        cout << "Saw cross "
+             << vision->cross->getID()
+             << " at distance " << vision->cross->getDistance()
+             << " and bearing " << vision->cross->getBearing() << endl;
+        //sensors->saveFrame();
 #       endif
     }
 
@@ -381,6 +387,11 @@ void Noggin::updateLocalization()
     // Ball Tracking
     if (vision->ball->getDistance() > 0.0) {
         ballFramesOff = 0;
+        //sensors->saveFrame();
+#   ifdef DEBUG_BALL_OBSERVATIONS
+        cout << "Ball seen at distance " << vision->ball->getDistance()
+             << " and bearing " << vision->ball->getBearing() << endl;
+#   endif
     } else {
         ++ballFramesOff;
     }
@@ -416,13 +427,6 @@ void Noggin::updateLocalization()
 #       endif
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
-
-#   ifdef DEBUG_BALL_OBSERVATIONS
-    if(vision->ball->getDistance() > 0.0) {
-        cout << "Ball seen at distance " << vision->ball->getDistance()
-             << " and bearing " << vision->ball->getBearing() << endl;
-    }
-#   endif
 
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {

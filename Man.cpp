@@ -86,7 +86,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
     noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
-                                           motion->getInterface()));
+                                           sensors, motion->getInterface()));
 #endif// USE_NOGGIN
 }
 

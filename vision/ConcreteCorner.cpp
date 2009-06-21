@@ -227,7 +227,10 @@ const string ConcreteCorner::getShapeString(shape s) {
 }
 
 const string ConcreteCorner::toString() const {
-    switch (id) {
+    return cornerIDToString(id);
+}
+const string ConcreteCorner::cornerIDToString(const cornerID _id) {
+    switch (_id) {
         //Blue ones
     case BLUE_CORNER_TOP_L:
         return "Blue Corner Top L";
@@ -264,10 +267,41 @@ const string ConcreteCorner::toString() const {
     case CENTER_CIRCLE:
         return "Center Circle Corner";
 
-    default:
-        return "Invalid Corner Id";
-    }
+        // Abstract corners
+    case L_INNER_CORNER:
+        return "L Inner Corner";
+    case L_OUTER_CORNER:
+        return "L Outer Corner";
+    case CORNER_INNER_L:
+        return "Corner Inner L";
+    case T_CORNER:
+        return "T Corner";
+    case BLUE_GOAL_T:
+        return "Blue Goal T";
+    case YELLOW_GOAL_T:
+        return "Yellow Goal T";
+    case CENTER_T:
+        return "Center T";
+    case BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L:
+        return "Blue Goal Right L Or Yellow Goal Left L";
+    case BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L:
+        return "Blue Goal Left L Or Yellow Goal Right L";
+    case BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L:
+        return "Blue Corner Top L Or Yellow Corner Bottom L";
+    case BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L:
+        return "Blue Corner Bottom L Or Yellow Corner Top L";
+    case GOAL_BOX_INNER_L:
+        return "Goal Box Inner L";
+    case BLUE_GOAL_OUTER_L:
+        return "Blue Goal Outer L";
+    case YELLOW_GOAL_OUTER_L:
+        return "Yellow Goal Outer L";
 
+    case CORNER_NO_IDEA_ID:
+        return "Unknown Corner";
+    default:
+         return "Invalid Corner Id";
+    }
 }
 
 const shape ConcreteCorner::inferCornerType(const cornerID id) {
@@ -276,9 +310,10 @@ const shape ConcreteCorner::inferCornerType(const cornerID id) {
     case L_OUTER_CORNER:
     case BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L:
     case BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L:
+    case BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L:
+    case BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L:
     case CORNER_INNER_L:
     case GOAL_BOX_INNER_L:
-        //  case CORNER_OR_GOAL_INNER_L:
     case BLUE_GOAL_OUTER_L:
     case YELLOW_GOAL_OUTER_L:
     case BLUE_CORNER_TOP_L:
@@ -304,10 +339,9 @@ const shape ConcreteCorner::inferCornerType(const cornerID id) {
         return T;
     case CENTER_CIRCLE:
         return CIRCLE;
-
+    case CORNER_NO_IDEA_ID:
     default:
-        // Should never be reached. Some IDs must have been missed.
-        throw -1;
+        return UNKNOWN;
     }
 }
 

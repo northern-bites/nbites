@@ -13,8 +13,9 @@
 #include "BallEKF.h"
 #include "Comm.h"
 #include "GameController.h"
-
 #include "RoboGuardian.h"
+#include "Sensors.h"
+
 #define LOG_LOCALIZATION
 
 class Noggin
@@ -22,6 +23,7 @@ class Noggin
 public:
     Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v,
            boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
+           boost::shared_ptr<Sensors> _sensors,
            MotionInterface * _minterface);
     virtual ~Noggin();
 
@@ -58,6 +60,7 @@ private:
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
     boost::shared_ptr<GameController> gc;
+    boost::shared_ptr<Sensors> sensors;
 
     boost::shared_ptr<ClickableButton> chestButton;
     boost::shared_ptr<ClickableButton> leftFootButton;

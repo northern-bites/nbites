@@ -131,7 +131,7 @@ public:
                         center_circle;
 
     static const std::string getShapeString(shape s);
-
+    static const std::string cornerIDToString(const cornerID _id);
     static const ConcreteCorner* concreteCornerList[NUM_CORNERS];
 
 private: // These are only used internally by the getPossibleCorners method
