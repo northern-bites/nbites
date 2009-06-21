@@ -1,3 +1,48 @@
+/**
+ *
+ *  This file contains an incomplete protoype for inverse kinematics using
+ *  center of mass information to allow moving CoM relative to a support foot
+ *
+ *  The approach is very similar to the DLS inverse kinematics model we 
+ *  currently use. In Mathmatica (see motion/mathematica/COMKinematics.nb)
+ *  we develop a symbolic expression for the CoM if we know:
+ *    - pComX, pComY, pComZ (the partial CoM excluding the support foot)
+ *    - HYP,HR,HP,KP,AP,AR of the support leg
+ *  then calculate the CoM in the C coordinate frame, and in the F frame (of 
+ *  the support leg).
+ *
+ *  Using this symbolic expression for CoM_f, we can take the jacobian using 
+ *  mathematica in order to find out how to move the joint angles in order
+ *  to move the CoM_f a certain direction.
+ *
+ *  The tricky part of this process is finding an expression for CoM_f.
+ *  This is hard because we need to ensure that the ankles still remain
+ *  parrallel to the body frame. In order to do this, we assume the foot
+ *  mass to always be directly below the ankle (with appropriate offsets)
+ *  in the C frame.  At the same time, we've also calculated fullTransform
+ *  which provides means for translating points from the F frame into the C 
+ *  frame. What we would really like is to translate the CoM_c vector into
+ *  the CoM_f frame, which required the inverse of the fullTransform.
+ *
+ *  The closed form expressions for the forwardCoM-IK and the COM-Jacobians
+ *  are then translated into Cxx code using mathmatica/convert-to-cxx.el,
+ *  and can be found below in this file.
+ *
+ *  The current problems (as of 6/20/09) are that the outputs of the jacobians 
+ *  do not correctly move the leg angles towards realizing the desired CoM.
+ *  This is really odd because the forwardCoM expression seems correct
+ *  and because Mathematica should be able to generate the jacobians correctly.
+ * 
+ *  Possible solutions: 
+ *   - Implement a compass search instead of Jacobian based.
+ *   - Test the jacobian on some simple cases and find out why its wrong
+ *   - Find another approach to CoM control
+ *
+ *  I'd be happy to discuss this further if there is interest.
+ *  @author Johannes Strom
+ *  (Original IK author, George Slavov)
+ *  @date June 2009
+ */
 #include "Kinematics.h"
 #include "InverseKinematics.h"
 
