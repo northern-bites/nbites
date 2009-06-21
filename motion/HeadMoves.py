@@ -109,5 +109,5 @@ KICK_SCAN = (
     ((90.,-25.),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-90.,-25.),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((0.0,20.),0.5,1,stiff.LOW_HEAD_STIFFNESSES))
+    ((0.0,30.),0.5,1,stiff.LOW_HEAD_STIFFNESSES))
 
