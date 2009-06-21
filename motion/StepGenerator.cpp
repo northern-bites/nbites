@@ -730,10 +730,6 @@ void StepGenerator::resetSteps(const bool startLeft){
         leftArm.startRight();
         rightArm.startRight();
 
-        //we need to re-initialize the if_Transform matrix to reflect which
-        //side the we are starting.
-        if_Transform.assign(initStartLeft);
-
         //depending on we are starting, assign the appropriate steps
         dummyFoot = RIGHT_FOOT;
         firstSupportFoot = LEFT_FOOT;
@@ -754,10 +750,6 @@ void StepGenerator::resetSteps(const bool startLeft){
         leftArm.startLeft();
         rightArm.startLeft();
 
-        //we need to re-initialize the if_Transform matrix to reflect which
-        //side the we are starting.
-        if_Transform.assign(initStartRight);
-
         //depending on we are starting, assign the appropriate steps
         dummyFoot = LEFT_FOOT;
         firstSupportFoot = RIGHT_FOOT;
@@ -765,6 +757,14 @@ void StepGenerator::resetSteps(const bool startLeft){
         nextStepIsLeft = true;
 
     }
+
+    //we need to re-initialize the if_Transform matrix to reflect which
+    //side the we are starting.
+    const ufmatrix3 initStart =
+        CoordFrame3D::translation3D(0.0f,
+                                    supportSign*(HIP_OFFSET_Y));
+    if_Transform.assign(initStart);
+
     updateDebugMatrix();
 
     const float supportStepTime = static_cast<float>(Observer::NUM_PREVIEW_FRAMES) *
@@ -870,10 +870,11 @@ void StepGenerator::generateStep( float _x,
         }
     }
 
-
+    const float leg_sign = (nextStepIsLeft ?
+                           1.0f : -1.0f);
     const float computed_x = _x - sin(abs(_theta)) * HIP_OFFSET_Y;
-    const float computed_y = _y + (nextStepIsLeft ?
-                                   HIP_OFFSET_Y : -HIP_OFFSET_Y)*cos(_theta);
+    const float computed_y = _y +
+        leg_sign*HIP_OFFSET_Y*cos(_theta);
     const float computed_theta = _theta;
 
     const float dblSupp = (type == END_STEP ?
