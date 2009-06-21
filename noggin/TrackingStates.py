@@ -63,16 +63,24 @@ def activeTracking(tracker):
             tracker.counter > constants.ACTIVE_LOC_STARE_THRESH:
 
         tracker.activePanOut = True
-        tracker.activePanDir = not tracker.activePanDir
+        tracker.activePanDir = (tracker.activePanDir + 1) % \
+            constants.NUM_ACTIVE_PANS
+
 
         motionAngles = tracker.brain.sensors.motionAngles
         tracker.preActivePanHeads = (
             motionAngles[MotionConstants.HeadYaw],
             motionAngles[MotionConstants.HeadPitch])
 
-        if tracker.activePanDir:
+        if tracker.activePanDir == constants.PAN_RIGHT:
             return tracker.goLater('panRightOnce')
-        else:
+        elif tracker.activePanDir == constants.PAN_LEFT:
             return tracker.goLater('panLeftOnce')
+        elif tracker.activePanDir == constants.PAN_UP:
+            if tracker.preActivePanHeads[1] >= constants.PAN_UP_PITCH_THRESH:
+                return tracker.goLater('panUpOnce')
+            else:
+                tracker.activePanDir += 1
+                return tracker.goLater('panRightOnce')
     return tracker.stay()
 

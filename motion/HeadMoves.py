@@ -103,6 +103,7 @@ PAN_LEFT_HEADS = ( 65.0, -25.0)
 
 PAN_RIGHT_HEADS = ( -65.0, -25.0)
 
+PAN_UP_HEADS = ( 0.0, -40.0)
 
 KICK_SCAN = (
     ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),

@@ -45,7 +45,6 @@ def panLeftOnce(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
-
     return tracker.stay()
 
 def panRightOnce(tracker):
@@ -55,7 +54,15 @@ def panRightOnce(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
+    return tracker.stay()
 
+def panUpOnce(tracker):
+    if tracker.firstFrame():
+        tracker.panTo(HeadMoves.PAN_UP_HEADS)
+        return tracker.stay()
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
 def postScan(tracker):
