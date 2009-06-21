@@ -12,7 +12,7 @@ const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
 const float BallEKF::BETA_BALL = 5.0f;
 // How much ball velocity should effect uncertainty
 const float BallEKF::GAMMA_BALL = 0.4f;
-const float BallEKF::CARPET_FRICTION = -25.0f; // 25 cm/s^2
+const float BallEKF::CARPET_FRICTION = -(1.0f / 4.0f);//25.0f; // 25 cm/s^2
 const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
 
 // Default initialization values
@@ -127,7 +127,7 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     robotPose = p;
     // Update expected ball movement
     timeUpdate(MotionModel());
-    limitAPrioriEst();
+    //limitAPrioriEst();
     limitAPrioriUncert();
 
     // We've seen a ball
@@ -138,10 +138,10 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
 
     } else { // No ball seen
         noCorrectionStep();
-        setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
-        setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
+        // setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
+        // setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
     }
-    limitPosteriorEst();
+    //limitPosteriorEst();
     limitPosteriorUncert();
     clipBallEstimate();
 }
@@ -158,19 +158,22 @@ EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
     BALL_MEASUREMENT_DIMENSION>::StateVector BallEKF::associateTimeUpdate(
         MotionModel u)
 {
-    // Calculate the assumed change in ball position
-    // Assume no decrease in ball velocity
     StateVector deltaBall(BALL_EKF_DIMENSION);
 
     float dt = 1.0f / ASSUMED_FPS;
-
+    // Calculate the assumed change in ball position
     deltaBall(0) = getXVelocityEst() * dt;
     deltaBall(1) = getYVelocityEst() * dt;
-    deltaBall(2) = sign(getXVelocityEst()) * CARPET_FRICTION * dt;
-    deltaBall(3) = sign(getYVelocityEst()) * CARPET_FRICTION * dt;
+    // Decrease in velocity with respect to velocity and friction
+    deltaBall(2) = CARPET_FRICTION * getXVelocityEst() *dt;
+    deltaBall(3) = CARPET_FRICTION * getYVelocityEst() *dt;
 
     A_k(0,2) = dt;
     A_k(1,3) = dt;
+    // I believe these are the derivatives with respect to x and y velocities
+    // If you turn them on, then velocities are always 0 - Tucker
+    // A_k(2,2) = CARPET_FRICTION * sign(getXVelocityEst()) * dt;
+    // A_k(3,3) = CARPET_FRICTION * sign(getYVelocityEst()) *dt;
 
     return deltaBall;
 }
