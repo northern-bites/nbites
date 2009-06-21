@@ -1,9 +1,6 @@
 from man.motion import MotionConstants
-
+from . import TrackingConstants as constants
 DEBUG = False
-TRACKER_FRAMES_OFF_REFIND_THRESH = 10 #num frms after which to switch to scanfindbl
-ACTIVE_LOC_STARE_THRESH = 30
-ACTIVE_LOC_OFF_REFIND_THRESH = 40
 
 def stopped(tracker):
     '''default state where the tracker does nothing'''
@@ -22,7 +19,7 @@ def stop(tracker):
     return tracker.stay()
 
 def ballTracking(tracker): #Super state which handles following/refinding the ball
-    if tracker.target.framesOff <= TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
         return tracker.goNow('scanBall')
@@ -41,7 +38,7 @@ def tracking(tracker):
     tracker.trackObject()
     if not tracker.target.on:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
-        if tracker.target.framesOff > TRACKER_FRAMES_OFF_REFIND_THRESH:
+        if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
             return tracker.goLater(tracker.lastDiffState)
         return tracker.stay()
 
@@ -58,12 +55,12 @@ def activeTracking(tracker):
     if tracker.activePanOut:
         return tracker.goLater('returnHeadsPan')
 
-    if tracker.target.framesOff > TRACKER_FRAMES_OFF_REFIND_THRESH and \
+    if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH and \
             not tracker.brain.motion.isHeadActive():
         return tracker.goLater('activeLocScan')
 
     if not tracker.activePanOut and \
-            tracker.counter > ACTIVE_LOC_STARE_THRESH:
+            tracker.counter > constants.ACTIVE_LOC_STARE_THRESH:
 
         tracker.activePanOut = True
         tracker.activePanDir = not tracker.activePanDir

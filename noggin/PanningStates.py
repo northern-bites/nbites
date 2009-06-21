@@ -1,12 +1,12 @@
 import man.motion.HeadMoves as HeadMoves
+from . import TrackingConstants as constants
 
-TRACKER_FRAMES_ON_TRACK_THRESH = 1 #num frms after which to switch to scanfindbl
 
 def scanBall(tracker):
     ball = tracker.brain.ball
 
     if tracker.target == ball and \
-            tracker.target.framesOn >= TRACKER_FRAMES_ON_TRACK_THRESH:
+            tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
 
