@@ -155,8 +155,9 @@ class HeadTracking(FSA.FSA):
         headPitch = motionAngles[MotionConstants.HeadPitch]
         headYaw = motionAngles[MotionConstants.HeadYaw]
 
-        pitchDiff = fabs(heads[0] - headPitch)
-        yawDiff = fabs(heads[1] - headYaw)
+        yawDiff = fabs(heads[0] - headYaw)
+        pitchDiff = fabs(heads[1] - headPitch)
+
 
         maxDiff = max(pitchDiff, yawDiff)
         panTime = maxDiff/constants.MAX_PAN_SPEED
