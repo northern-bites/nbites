@@ -270,7 +270,6 @@ namespace Kinematics {
     const float LEFT_LEG_MDH_PARAMS[6][4] = {{ -3*M_PI_FLOAT/4, 0.0f,  -M_PI_FLOAT/2, 0.0f},
                                              { -M_PI_FLOAT/2,   0.0f,   M_PI_FLOAT/4, 0.0f},
                                              { M_PI_FLOAT/2,    0.0f,     0.0f, 0.0f},
-                                             //{ M_PI_FLOAT/2,-THIGH_LENGTH,0.0f, 0.0f},
                                              {   0.0f,-THIGH_LENGTH,0.0f, 0.0f},
                                              {   0.0f,-TIBIA_LENGTH,0.0f, 0.0f},
                                              {-M_PI_FLOAT/2,    0.0f,     0.0f, 0.0f}};
@@ -278,7 +277,6 @@ namespace Kinematics {
     const float RIGHT_LEG_MDH_PARAMS[6][4]= {{ -M_PI_FLOAT/4,  0.0f,   -M_PI_FLOAT/2, 0.0f},
                                              { -M_PI_FLOAT/2,   0.0f,  -M_PI_FLOAT/4, 0.0f},
                                              {  M_PI_FLOAT/2,    0.0f,    0.0f, 0.0f},
-                                             //{  M_PI_FLOAT/2,-THIGH_LENGTH,0.0f,0.0f},
                                              { 0.0f,-THIGH_LENGTH,0.0f, 0.0f},
                                              {0.0f,-TIBIA_LENGTH,0.0f,0.0f},
                                              {-M_PI_FLOAT/2,0.0f,0.0f,0.0f}};
@@ -368,55 +366,77 @@ namespace Kinematics {
     static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {4,2,3,3,2};
     static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};
 
+    //locally expressed constants (with respect to an individual joint
+    //and the GLOBAL coordinate frame)
 
-    /*
-     * Declarations for constants and methods concerning forward and inverse
-     * kinematics.
-     *//*
+    static const float CHEST_MASS_Z = 46.466f;
+    static const float CHEST_MASS_X = -7.8f;
 
-    //Accuracy constants for dls
-    //in mm, how close dls will get to the target
-    static const float UNBELIEVABLY_LOW_ERROR = 0.01f; //mm
-    static const float REALLY_LOW_ERROR = 0.1f; //mm
-    static const float ACCEPTABLE_ERROR = 0.5f; //mm
-    static const float COARSE_ERROR     = 1.0f; //mm
+    static const float HEAD_MASS_Z = 170.9f - NECK_OFFSET_Z;
+    static const float UPPER_ARM_MASS_X = 59.5f;
+    static const float LOWER_ARM_MASS_X = 166.15f - UPPER_ARM_LENGTH;
+    static const float THIGH_MASS_Z = 123.0f - HIP_OFFSET_Z;
+    static const float TIBIA_MASS_Z = 251.1f - HIP_OFFSET_Z - THIGH_LENGTH;
+    static const float FOOT_MASS_Z = 315.0f - HIP_OFFSET_Z -
+        THIGH_LENGTH - TIBIA_LENGTH;
+    static const float FOOT_MASS_X = 18.015f;
 
-    static const float dampFactor = 0.4f;
-    static const float maxDeltaTheta = 0.5f;
-    static const int maxAnkleIterations = 60;
-    static const int maxHeelIterations = 20;
+    //Weight constants
+    static const float CHEST_MASS_g = 1217.1f;
+    static const float HEAD_MASS_g = 401.0f;
+    static const float UPPER_ARM_MASS_g = 87.0f;
+    static const float LOWER_ARM_MASS_g = 163.0f;
+    static const float THIGH_MASS_g  = 533.0f;
+    static const float TIBIA_MASS_g  = 423.0f;
+    static const float FOOT_MASS_g  = 158.0f;
+    static const float TOTAL_MASS  =
+        CHEST_MASS_g + HEAD_MASS_g +
+        2.0f*(UPPER_ARM_MASS_g + LOWER_ARM_MASS_g + THIGH_MASS_g +
+              TIBIA_MASS_g + FOOT_MASS_g);
 
-    const void clipChainAngles(const ChainID id,
-                               float angles[]);
-    const float getMinValue(const ChainID id, const int jointNumber);
-    const float getMaxValue(const ChainID id, const int jointNumber);
-    const NBMath::ufvector3 forwardKinematics(const ChainID id,
-                                              const float angles[]);
-    const NBMath::ufmatrix3 buildHeelJacobian(const ChainID chainID,
-                                              const float angles[]);
-    const NBMath::ufmatrix3 buildLegJacobian(const ChainID chainID,
-                                             const float angles[]);
+    //The locations of the massses are translated from their
+    //global coordinate frame into the local frame in tuples like
+    // {X,Y,Z,WEIGHT}
 
-    // Both adjustment methods return whether the search was successful.
-    // The correct angles required to fulfill the goal are returned through
-    // startAngles by reference.
-    const bool adjustAnkle(const ChainID chainID,
-                           const NBMath::ufvector3 &goal,
-                           float startAngles[],
-                           const float maxError);
-    const bool adjustHeel(const ChainID chainID,
-                          const NBMath::ufvector3 &goal,
-                          float startAngles[],
-                          const float maxError);
-    const IKLegResult dls(const ChainID chainID,
-                          const NBMath::ufvector3 &goal,
-                          const float startAngles[],
-                          const float maxError = ACCEPTABLE_ERROR,
-                          const float maxHeelError = UNBELIEVABLY_LOW_ERROR);
+    static const float HEAD_INERTIAL_POS[2][4] = {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {HEAD_MASS_Z, 0.0f, 0.0f, HEAD_MASS_g}};
 
+    static const float LEFT_ARM_INERTIAL_POS[4][4] = {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, -UPPER_ARM_MASS_X, 0.0f, UPPER_ARM_MASS_g},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f,-UPPER_ARM_MASS_X, 0.0f, LOWER_ARM_MASS_g}};
 
-    void hackJointOrder(float angles[]);
-*/
+    //Z,X,Y is the correct order for most of the leg
+    static const float LEFT_LEG_INERTIAL_POS[6][4] = {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {-THIGH_MASS_Z, 0.0f, 0.0f, THIGH_MASS_g},
+        {-TIBIA_MASS_Z, 0.0f, 0.0f, TIBIA_MASS_g},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {-FOOT_MASS_Z,  0.0f, FOOT_MASS_X, FOOT_MASS_g}}; 
+    static const float RIGHT_LEG_INERTIAL_POS[6][4] = {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {-THIGH_MASS_Z, 0.0f, 0.0f, THIGH_MASS_g},
+        {-TIBIA_MASS_Z, 0.0f, 0.0f, TIBIA_MASS_g},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {-FOOT_MASS_Z, 0.0f, FOOT_MASS_X, FOOT_MASS_g}};
+    static const float RIGHT_ARM_INERTIAL_POS[4][4] = {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, -UPPER_ARM_MASS_X, 0.0f, UPPER_ARM_MASS_g},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f,-UPPER_ARM_MASS_X, 0.0f, LOWER_ARM_MASS_g}};
+
+    static const float* INERTIAL_POS[NUM_CHAINS] = {&HEAD_INERTIAL_POS[0][0],
+                                                    &LEFT_ARM_INERTIAL_POS[0][0],
+                                                    &LEFT_LEG_INERTIAL_POS[0][0],
+                                                    &RIGHT_LEG_INERTIAL_POS[0][0],
+                                                    &RIGHT_ARM_INERTIAL_POS[0][0]};
+
+    static const unsigned int MASS_INDEX = 3;
+
 };
 
 #endif

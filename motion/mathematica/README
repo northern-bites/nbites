@@ -27,3 +27,7 @@ convert-to-cxx.el  this file contains an emacs macro to convert a
 		     -removing stray !
 		     -adding ; to the end of every line
 		     - splitting the jacobian expressions with new lines for each tab
+
+COMKinematics.nb  this file currently relies on other files in this directory
+		  also, the outputs don't work correctly. See COM.cpp in
+		  corpus/ktest/COM.cpp for more comments
