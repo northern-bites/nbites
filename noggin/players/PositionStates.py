@@ -40,7 +40,7 @@ def playbookPosition(player):
         else :
             player.brain.tracker.activeLoc()
 
-        if transitions.shouldRelocalize(player):
+        if player.brain.my.locScore == NogginConstants.BAD_LOC:
             player.shouldRelocalizeCounter += 1
         else:
             player.shouldRelocalizeCounter = 0
@@ -76,7 +76,7 @@ def atPosition(player):
         player.notAtPositionCounter = 0
 
     if player.notAtPositionCounter > constants.NOT_AT_POSITION_FRAMES_THRESH \
-            and transitions.isWellLocalized(player):
+            and player.brain.my.locScore == NogginConstants.GOOD_LOC:
         return player.goLater('playbookPosition')
 
     return player.stay()
@@ -148,7 +148,7 @@ def spinFindBallPosition(player):
 def relocalize(player):
     if player.firstFrame():
         player.stopWalking()
-    if transitions.isWellLocalized(player):
+    if player.brain.my.locScore == NogginConstants.GOOD_LOC:
         return player.goLater(player.lastDiffState)
 
     if not player.brain.motion.isHeadActive():
