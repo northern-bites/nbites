@@ -144,6 +144,7 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     //limitPosteriorEst();
     limitPosteriorUncert();
     clipBallEstimate();
+    testForNaNReset();
 }
 
 /**
@@ -464,4 +465,12 @@ void BallEKF::clipBallEstimate()
         xhat_k(3) = 0.0f;
     }
 
+}
+
+void BallEKF::testForNaNReset()
+{
+    if (isnan(getXEst()) || isnan(getYEst()) ||
+        isnan(getXVelocityEst()) || isnan(getYVelocityEst())) {
+        reset();
+    }
 }
