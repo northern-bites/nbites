@@ -23,9 +23,15 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
+        player.stopWalking()
         player.gainsOn()
         player.zeroHeads()
+        player.GAME_INITIAL_satDown = False
+
+    elif player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown:
+        player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
+
     return player.stay()
 
 def gameReady(player):
