@@ -40,10 +40,10 @@ def sub180Diff(angle, from_angle):
 
 def dist(x1,y1,x2,y2):
     ''' returns euclidian dist'''
-    if x1 != x1 or \
-            y1 != y1 or \
-            y2 != y2 or \
-            x2 != x2:
+    # HACK HACK HACK HACK for infinity values HACK HACK
+    if x2 == float('inf') or \
+            y2 == float('inf'):
+        print "WE HAVE AN INFINITY = ", x1,y1,x2,y2
         return 10000
     return hypot(y2-y1,x2-x1)
 
