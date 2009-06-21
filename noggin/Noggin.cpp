@@ -387,10 +387,10 @@ void Noggin::updateLocalization()
     // Ball Tracking
     if (vision->ball->getDistance() > 0.0) {
         ballFramesOff = 0;
-        //sensors->saveFrame();
 #   ifdef DEBUG_BALL_OBSERVATIONS
         cout << "Ball seen at distance " << vision->ball->getDistance()
              << " and bearing " << vision->ball->getBearing() << endl;
+        //sensors->saveFrame();
 #   endif
     } else {
         ++ballFramesOff;
