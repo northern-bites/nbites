@@ -38,7 +38,8 @@ def shouldApproachFromPositionForKick(player):
     """
     ball = player.brain.ball
     return shouldApproachBall(player) and \
-        not shouldPositionForKick(player)
+        not shouldPositionForKick(player) and \
+        ball.locDist > 50.0
 
 def shouldTurnToBallFromPositionForKick(player):
     """
