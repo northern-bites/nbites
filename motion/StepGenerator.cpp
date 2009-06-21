@@ -48,8 +48,6 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     if_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
-    initStartLeft(CoordFrame3D::translation3D(0.0f,HIP_OFFSET_Y)),
-    initStartRight(CoordFrame3D::translation3D(0.0f,-HIP_OFFSET_Y)),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
     leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
     leftArm(LARM_CHAIN), rightArm(RARM_CHAIN),
@@ -692,11 +690,6 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
 /*  Set up the walking engine for starting with a swinging step on the left,
  if startLeft is true*/
 void StepGenerator::resetSteps(const bool startLeft){
-    //When we start out again, we need to let odometry know to store
-    //the distance covered so far. This needs to happen before
-    //we reset any coordinate frames
-    resetOdometry();
-
     //This is the place where we reset the controller each time the walk starts
     //over again.
     //First we reset the controller back to the neutral position
@@ -766,6 +759,12 @@ void StepGenerator::resetSteps(const bool startLeft){
     if_Transform.assign(initStart);
 
     updateDebugMatrix();
+
+
+    //When we start out again, we need to let odometry know to store
+    //the distance covered so far. This needs to happen before
+    //we reset any coordinate frames
+    resetOdometry(walkParams->hipOffsetX,-supportSign*HIP_OFFSET_Y);
 
     const float supportStepTime = static_cast<float>(Observer::NUM_PREVIEW_FRAMES) *
         MotionConstants::MOTION_FRAME_LENGTH_S;
@@ -1034,7 +1033,7 @@ vector<float> StepGenerator::getOdometryUpdate(){
     const float rotation = -safe_asin(cc_Transform(1,0));
     const ufvector3 odo = prod(cc_Transform,CoordFrame3D::vector3D(0.0f,0.0f));
     const float odoArray[3] = {odo(0),odo(1),rotation};
-    //printf("Odometry update is (%g,%g,%g)\n",odoArray[0],odoArray[1],odoArray[2]);
+    printf("Odometry update is (%g,%g,%g)\n",odoArray[0],odoArray[1],odoArray[2]);
     cc_Transform = CoordFrame3D::translation3D(0.0f,0.0f);
     return vector<float>(odoArray,&odoArray[3]);
 }
@@ -1042,7 +1041,8 @@ vector<float> StepGenerator::getOdometryUpdate(){
 /**
  * Ensures we don't loose odometry information if the walk is restarted.
  */
-void StepGenerator::resetOdometry(){
+void StepGenerator::resetOdometry(const float initX, const float initY){
+    cc_Transform = CoordFrame3D::translation3D(-initX,-initY);
 }
 
 /**

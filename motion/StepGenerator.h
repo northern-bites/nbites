@@ -162,7 +162,7 @@ private: // Helper methods
     void clearFutureSteps();
 
     void resetQueues();
-    void resetOdometry();
+    void resetOdometry(const float initX, const float initY);
     void updateOdometry(const std::vector<float> &deltaOdo);
     void debugLogging();
     void updateDebugMatrix();
@@ -210,10 +210,6 @@ private:
     NBMath::ufmatrix3 if_Transform;
     NBMath::ufmatrix3 fc_Transform;
     NBMath::ufmatrix3 cc_Transform; //odometry
-    // These hold the initial position of the left/right foot when they are
-    // in support mode. It is relative to the 'i' coord frame.
-    NBMath::ufmatrix3 initStartLeft;
-    NBMath::ufmatrix3 initStartRight;
 
     boost::shared_ptr<Sensors> sensors;
     const WalkingParameters *walkParams;
