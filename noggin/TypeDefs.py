@@ -23,6 +23,7 @@ class MyInfo:
     -number -- player number on team
     -teamNumber -- team number according to GameController
     -teamColor -- team color , either TEAM_BLUE or TEAM_RED (see Constants.py)
+    -locScore -- GOOD_LOC, OK_LOC, BAD_LOC; how good is our localization
     """
     def __init__(self):
         self.x = 0.0
@@ -37,6 +38,8 @@ class MyInfo:
         self.teamColor = Constants.TEAM_BLUE
         self.penalized = False
         self.kicking = False
+        self.locScoreXY = Constants.BAD_LOC
+        self.locScoreTheta = Constants.BAD_LOC
 
     def updateLoc(self, loc):
         if self.teamColor == Constants.TEAM_BLUE:
@@ -50,6 +53,27 @@ class MyInfo:
         self.uncertX = loc.xUncert
         self.uncertY = loc.yUncert
         self.uncertH = loc.hUncert
+        self.locScoreTheta = self.updateLocScoreTheta()
+        self.locScoreXY = self.updateLocScoreXY()
+        self.locScore = min(self.locScoreTheta, self.locScoreXY)
+
+    def updateLocScoreTheta(self):
+        if self.uncertH < Constants.GOOD_LOC_XY_UNCERT_THRESH:
+            return Constants.GOOD_LOC
+        elif self.uncertH < Constants.OK_LOC_XY_UNCERT_THRESH:
+            return Constants.OK_LOC
+        else :
+            return Constants.BAD_LOC
+
+    def updateLocScoreXY(self):
+        if self.uncertX < Constants.GOOD_LOC_XY_UNCERT_THRESH and \
+                self.uncertY < Constants.GOOD_LOC_XY_UNCERT_THRESH:
+            return Constants.GOOD_LOC
+        elif self.uncertX < Constants.OK_LOC_XY_UNCERT_THRESH and \
+                self.uncertY < Constants.OK_LOC_XY_UNCERT_THRESH:
+            return Constants.OK_LOC
+        else :
+            return Constants.BAD_LOC
 
     def __str__(self):
         return ("name: %s #%d on team: %d color: %s @ (%g,%g,%g) uncert: (%g,%g,%g)" %

@@ -6,6 +6,7 @@ from man.noggin.util import MyMath
 from man.motion import SweetMoves
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from .. import NogginConstants
 from math import fabs
 
 def chase(player):
