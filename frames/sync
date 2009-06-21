@@ -10,7 +10,7 @@ SERVER=robocup@robocup.bowdoin.edu:frames
 REMOTE_FOLDER=${2%/} #Strip the trailing slash if any
 
 RSYNC=rsync
-RSYNC_OPTS=-rvt
+RSYNC_OPTS=-rvtR
 
 if [ "$1" = "" ]; then
     echo "No push direction specified"
@@ -33,8 +33,8 @@ if [ "$1" = "up" ]; then
 elif [ "$1" = "down" ]; then
 
     echo "Synching FROM $SERVER/$REMOTE_FOLDER TO `pwd`/$REMOTE_FOLDER "
-    echo "$RSYNC $RSYNC_OPTS $SERVER/$REMOTE_FOLDER ./"
-    $RSYNC $RSYNC_OPTS $SERVER/$REMOTE_FOLDER ./
+    echo "cd ../ && $RSYNC $RSYNC_OPTS $SERVER/$REMOTE_FOLDER ./"
+    cd ../ && $RSYNC $RSYNC_OPTS $SERVER/$REMOTE_FOLDER ./
 else
 echo "Invalid parameters"
 echo $USAGE
