@@ -97,12 +97,7 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
         result  = supporting(fc_Transform);
         break;
     case SWINGING:
-        if(support_step->type == REGULAR_STEP) // HACK -- should get rid of if
-            result  =  swinging(fc_Transform);
-        else{
-            // It's an Irregular step, so we are not swinging
-            result = supporting(fc_Transform);
-        }
+        result  =  swinging(fc_Transform);
         break;
     case DOUBLE_SUPPORT:
         //In dbl sup, we have already got the final target after swinging in
