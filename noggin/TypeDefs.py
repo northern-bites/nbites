@@ -40,6 +40,7 @@ class MyInfo:
         self.kicking = False
         self.locScoreXY = Constants.BAD_LOC
         self.locScoreTheta = Constants.BAD_LOC
+        self.locScoreFramesBad = 0
 
     def updateLoc(self, loc):
         if self.teamColor == Constants.TEAM_BLUE:
@@ -56,6 +57,11 @@ class MyInfo:
         self.locScoreTheta = self.updateLocScoreTheta()
         self.locScoreXY = self.updateLocScoreXY()
         self.locScore = min(self.locScoreTheta, self.locScoreXY)
+
+        if self.locScore == Constants.BAD_LOC:
+            self.locScoreFramesBad += 1
+        else :
+            self.locScoreFramesBad = 0
 
     def updateLocScoreTheta(self):
         if self.uncertH < Constants.GOOD_LOC_XY_UNCERT_THRESH:

@@ -12,9 +12,10 @@ from . import GoalieSaveStates
 from . import ChaseBallTransitions
 from . import KickingConstants
 from .. import NogginConstants
-from . import ChaseBallConstants
+from . import ChaseBallConstants as ChaseConstants
 from man.motion import SweetMoves
 from ..util import MyMath
+from math import sin, cos, radians
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -46,6 +47,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.shouldAvoidObstacleRightCounter = 0
         self.shouldAvoidObstacleLeftCounter = 0
         self.doneAvoidingCounter = 0
+        self.shouldApproachWithoutLoc = 0
 
         self.notAtPositionCounter = 0
         self.changeOmniGoToCounter = 0
@@ -127,11 +129,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     ###### HELPER METHODS ######
     def getSpinDirAfterKick(self):
         if self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
-            return ChaseBallConstants.TURN_RIGHT
+            return ChaseConstants.TURN_RIGHT
         elif self.chosenKick == SweetMoves.RIGHT_FAR_KICK:
-            return ChaseBallConstants.TURN_LEFT
+            return ChaseConstants.TURN_LEFT
         else :
-            return ChaseBallConstants.TURN_LEFT
+            return ChaseConstants.TURN_LEFT
 
 
     def inOppCorner(self):
@@ -142,3 +144,55 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
              my.y > KickingConstants.TOP_OPP_CORNER_SLOPE * \
                  (my.x - KickingConstants.OPP_CORNER_LEFT_X) + \
                  KickingConstants.TOP_OPP_CORNER_Y )
+
+    def inFrontOfBall(self):
+        ball = self.brain.ball
+        my = self.brain.my
+        return my.x > ball.x and \
+            my.y < ChaseConstants.IN_FRONT_SLOPE*(my.x - ball.x) + ball.y and \
+            my.y > -ChaseConstants.IN_FRONT_SLOPE*(my.x-ball.x) + ball.y
+
+    def getApproachPosition(self):
+        ball = self.brain.ball
+        my = self.brain.my
+        if self.inFrontOfBall():
+            destH = self.getApproachHeadingFromFront()
+        else :
+            destH = self.getApproachHeadingFromBehind()
+
+        destX = ball.x - ChaseConstants.APPROACH_DIST_TO_BALL * \
+            cos(radians(destH))
+        destY = ball.y - ChaseConstants.APPROACH_DIST_TO_BALL * \
+            sin(radians(destH))
+        return destX, destY, destH
+
+    def getApproachHeadingFromBehind(self):
+        ball = self.brain.ball
+        ballBearingToGoal = MyMath.getRelativeBearing(ball.x, ball.y,
+                                                      NogginConstants.
+                                                      OPP_GOAL_HEADING,
+                                                      NogginConstants.
+                                                      OPP_GOALBOX_RIGHT_X,
+                                                      NogginConstants.
+                                                      OPP_GOALBOX_MIDDLE_Y)
+        return ballBearingToGoal
+
+    def getApproachHeadingFromFront(self):
+        ball = self.brain.ball
+        my = self.brain.my
+        kickDest = self.getKickGoalDest()
+        ballBearingToKickDest = MyMath.getRelativeBearing(ball.x,
+                                                          ball.y,
+                                                          NogginConstants.
+                                                          OPP_GOAL_HEADING,
+                                                          kickDest[0],
+                                                          kickDest[1] )
+        if my.y > ball.y:
+            destH = ballBearingToKickDest - 90
+        else :
+            destH = ballBearingToKickDest + 90
+        return destH
+
+    def getKickGoalDest(self):
+        return NogginConstants.OPP_GOALBOX_RIGHT_X, \
+            NogginConstants.OPP_GOALBOX_MIDDLE_Y

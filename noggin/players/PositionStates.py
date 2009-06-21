@@ -14,12 +14,17 @@ def playbookPosition(player):
     """
     Have the robot navigate to the position reported to it from playbook
     """
-    if player.firstFrame():
-        player.changeOmniGoToCounter = 0
     brain = player.brain
     position = brain.playbook.position
     nav = brain.nav
     my = brain.my
+
+    if player.firstFrame():
+        player.changeOmniGoToCounter = 0
+        if brain.gameController.currentState == 'gameReady':
+            brain.tracker.locPans()
+        else :
+            brain.tracker.activeLoc()
 
     useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
     changedOmni = False
@@ -35,12 +40,8 @@ def playbookPosition(player):
             nav.destX != position[0] or \
             nav.destY != position[1] or \
             changedOmni:
-        if player.brain.gameController.currentState == 'gameReady':
-            player.brain.tracker.locPans()
-        else :
-            player.brain.tracker.activeLoc()
 
-        if player.brain.my.locScore == NogginConstants.BAD_LOC:
+        if brain.my.locScore == NogginConstants.BAD_LOC:
             player.shouldRelocalizeCounter += 1
         else:
             player.shouldRelocalizeCounter = 0

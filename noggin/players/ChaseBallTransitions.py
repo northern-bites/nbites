@@ -1,6 +1,7 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
+from .. import NogginConstants
 
 ####### CHASING STUFF ##############
 
@@ -26,14 +27,18 @@ def shouldApproachBall(player):
     return ( ball.on and
              abs(ball.bearing) < constants.BALL_APPROACH_BEARING_THRESH )
 
+def shouldApproachBallWithLoc(player):
+    return player.brain.ball.on and \
+        player.brain.my.locScore >= NogginConstants.OK_LOC and \
+        constants.USE_LOC_CHASE
+
 def shouldApproachFromPositionForKick(player):
     """
     Walk to the ball if its too far away
     """
     ball = player.brain.ball
-    return ( ball.on and
-             ball.relX > constants.BALL_POS_KICK_DIST_THRESH +
-             constants.POSITION_FOR_KICK_DIST_THRESH)
+    return shouldApproachBall(player) and \
+        not shouldPositionForKick(player)
 
 def shouldTurnToBallFromPositionForKick(player):
     """
@@ -49,9 +54,11 @@ def shouldPositionForKick(player):
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return (ball.on and
-            abs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH and
-            ball.dist < constants.BALL_POS_KICK_DIST_THRESH )
+    return ball.on and \
+        constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
+        constants.BALL_POS_KICK_RIGHT_Y and \
+        constants.BALL_POS_KICK_MAX_X > ball.relX > \
+        constants.BALL_POS_KICK_MIN_X
 
 def shouldRepositionForKick(player):
     """
