@@ -2,10 +2,30 @@
 
 #include "InverseKinematics.h"
 
+#define USE_ANALYTIC_IK
 
 using namespace boost::numeric;
 using namespace NBMath;
 using namespace std;
+
+
+/**
+ * Wrapper method for simple IK, which just picks between the various
+ * methods of inverse kinematics we use
+ */
+const Kinematics::IKLegResult Kinematics::simpleLegIK(const ChainID chainID,
+                                                      const ufvector3 & legGoal,
+                                                      float startAngles []){
+#ifdef USE_ANALYTIC_IK
+    const ufvector3 footOrientation = CoordFrame3D::vector3D(0,0,0);
+    const ufvector3 bodyGoal = CoordFrame3D::vector3D(0,0,0);
+    const ufvector3 bodyOrientation = CoordFrame3D::vector3D(0,0,0);
+    return analyticLegIK(chainID,legGoal,footOrientation,
+                         bodyGoal,bodyOrientation,startAngles[0]);
+#else
+    return dls(chainID,legGoal,startAngles,REALLY_LOW_ERROR);
+#endif
+}
 
 /**
  * This method will destructively clip the chain angles that are passed to it.
@@ -692,3 +712,5 @@ ufmatrix4 Kinematics::rotationHYPRightInv(const float HYP){
 
     return r;
 }
+
+

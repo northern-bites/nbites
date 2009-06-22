@@ -258,7 +258,7 @@ public:
         NBMath::ufvector3 lgoal = NBMath::ufvector3(3);
         lgoal(0)=-x; lgoal(1) = ly; lgoal(2) = -z;
         Kinematics::IKLegResult lresult =
-            Kinematics::dls(Kinematics::LLEG_CHAIN,
+            Kinematics::simpleLegIK(Kinematics::LLEG_CHAIN,
                             lgoal, zeroJoints);
         std::vector<float> lleg_angles(lresult.angles,
                                        lresult.angles +
@@ -268,7 +268,7 @@ public:
         NBMath::ufvector3 rgoal = NBMath::ufvector3(3);
         rgoal(0)=-x; rgoal(1) = ry; rgoal(2) = -z;
         Kinematics::IKLegResult rresult =
-            Kinematics::dls(Kinematics::RLEG_CHAIN,
+            Kinematics::simpleLegIK(Kinematics::RLEG_CHAIN,
                             rgoal, zeroJoints);
         std::vector<float> rleg_angles(rresult.angles,
                                        rresult.angles +

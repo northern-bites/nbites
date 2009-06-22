@@ -180,8 +180,7 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     //Set the desired HYP in lastJoints, which will be read by dls
     const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
-    IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
-                                         REALLY_LOW_ERROR);
+    IKLegResult result = Kinematics::simpleLegIK(chainID,goal,lastJoints);
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] -= hipHacks.get<1>(); //HipRoll
@@ -217,8 +216,7 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
     //calculate the new angles
-    IKLegResult result = Kinematics::dls(chainID,goal,lastJoints,
-                                         REALLY_LOW_ERROR);
+    IKLegResult result = Kinematics::simpleLegIK(chainID,goal,lastJoints);
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] += hipHacks.get<1>(); //HipRoll

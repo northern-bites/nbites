@@ -32,6 +32,10 @@ namespace Kinematics{
         float angles[6];
     };
 
+    const IKLegResult simpleLegIK(const ChainID chainID,
+                                  const NBMath::ufvector3 & legGoal,
+                                  float startAngles []);
+
     const void clipChainAngles(const ChainID id,
                                float angles[]);
     const float getMinValue(const ChainID id, const int jointNumber);

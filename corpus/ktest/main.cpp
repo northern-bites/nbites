@@ -58,7 +58,7 @@ void ikSpeedTest(){
                             0.0f,0.0f,0.0f};
 
 
-    const int NUM_ITERS = 1000000;
+    const int NUM_ITERS = 10000;
 
 
     for(int i = 0; i < NUM_ITERS; i++){
@@ -105,10 +105,11 @@ void ikSpeedTest(){
             break;
 
         }
-//#define DLS
+#define DLS
 #ifdef DLS
-        Kinematics::IKLegResult result =  Kinematics::dls(leg,
-                                                          goal, startAngles);
+        Kinematics::IKLegResult result =  Kinematics::simpleLegIK(leg,
+                                                                  goal, 
+                                                                  startAngles);
 #else
     ufvector3 footGoal = CoordFrame3D::vector3D(20,-60,-310);
     ufvector3 footOrientation = CoordFrame3D::vector3D(0,0,0);
