@@ -423,8 +423,51 @@ Kinematics::dls(const ChainID chainID,
     return result;
 }
 
+/**
+ * The following method implements the analytic (exact) IK solution for the Nao
+ * which Dr. Dan Lee from UPenn was so gracious to show me. The code is ported
+ * from Matlab.
+ *
+ * Note that there are several frames of reference which are important to
+ * understanding this approach:
+ *  F -- the coordinate frame aligned with the bottom of the foot in question,
+ *       located directly beneath the heel
+ *  C -- the coordinate frame aligned with the body, located at the bellybutton
+ *  O -- an aritrary origin, which may coincide with F, C or neither
+ *
+ *  When referencing 4x4 homogeneous matrices, the convention is to label them
+ *  ab_Transform which means ab_Tranform*Va = Vb, that is, the ab transform
+ *  moves points from the a coordinate frame into the b coordinate frame.
+ */
 
+const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
+                                      const ufvector3 &footGoal,
+                                      const ufvector3 &footOrientation,
+                                      const ufvector3 &bodyGoal,
+                                      const ufvector3 &bodyOrientation,
+                                      const float givenHYPAngle)
+{
 
-void Kinematics::hackJointOrder(float angles[]) {
-    //none
+    //fo - translate from f to o
+    const ufmatrix4 fo_Transform = CoordFrame4D::get6DTransform(footGoal(0),
+                                                footGoal(1),footGoal(2),
+                                                footOrientation(0),
+                                                footOrientation(1),
+                                                footOrientation(2));
+    //co - translate from c to o
+    const ufmatrix4 co_Transform = CoordFrame4D::get6DTransform(bodyGoal(0),
+                                                bodyGoal(1),bodyGoal(2),
+                                                bodyOrientation(0),
+                                                bodyOrientation(1),
+                                                bodyOrientation(2));
+    //fc - translate from f to o to c
+    const ufmatrix4 fc_Transform =
+        prod(CoordFrame4D::invertHomogenous(co_Transform),fo_Transform);
+
+    //cf - translate from c to o to f
+    const ufmatrix4 cf_Transform =
+        prod(CoordFrame4D::invertHomogenous(fo_Transform),co_Transform);
+
+    IKLegResult result;
+    return result;
 }

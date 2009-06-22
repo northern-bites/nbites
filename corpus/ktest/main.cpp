@@ -26,7 +26,6 @@ void inverseKin(){
     cout <<"Outcome "<< result.outcome<<endl;
     
     //Forward kinematics says we are at
-    Kinematics::hackJointOrder(result.angles); //hack
     ufvector3 resultZ  = Kinematics::forwardKinematics(ankle,
                                                        result.angles);
     cout << "FK res 1" << resultZ<<endl;
@@ -112,7 +111,23 @@ void ikSpeedTest(){
 
 }
 
+
+void anaIK(){
+
+    ufvector3 footGoal = CoordFrame3D::vector3D(20,50,-310);
+    ufvector3 footOrientation = CoordFrame3D::vector3D(0,0,0);
+    ufvector3 bodyGoal = CoordFrame3D::vector3D(0,0,0);
+    ufvector3 bodyOrientation = CoordFrame3D::vector3D(0,0,0);
+
+    Kinematics::IKLegResult result  = Kinematics::analyticLegIK(LLEG_CHAIN,
+                                                                footGoal,
+                                                                footOrientation,
+                                                                bodyGoal,
+                                                                bodyOrientation);
+}
+
 int main(){
+    anaIK();
     //inverseKin();
     ikSpeedTest();
     //forwardKin();
