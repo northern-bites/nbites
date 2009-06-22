@@ -22,47 +22,29 @@ static const float TO_RAD = M_PI_FLOAT/180.0f;
 static const float QUART_CIRC_RAD = M_PI_FLOAT / 2.0f;
 
 #ifdef __APPLE__
-    inline static void sincosf(float _x, float * _sinx, float * _cosx) {
-        *_sinx = std::sin(_x);
-		*_cosx = std::cos(_x);
-    }
+inline static void sincosf(float _x, float * _sinx, float * _cosx) {
+    *_sinx = std::sin(_x);
+    *_cosx = std::cos(_x);
+}
 
-	#define isnan(x)	\
-		(	sizeof (x) == sizeof(float )	?	__inline_isnanf((float)(x))	\
-		:	sizeof (x) == sizeof(double)	?	__inline_isnand((double)(x))	\
-											:	__inline_isnan ((long double)(x)))
-	#define isinf(x)	\
-		(	sizeof (x) == sizeof(float )	?	__inline_isinff((float)(x))	\
-		:	sizeof (x) == sizeof(double)	?	__inline_isinfd((double)(x))	\
-											:	__inline_isinf ((long double)(x)))
+#define isnan(x)                                                        \
+    (	sizeof (x) == sizeof(float )	?	__inline_isnanf((float)(x))	\
+		:	sizeof (x) == sizeof(double)	?	__inline_isnand((double)(x)) \
+        :	__inline_isnan ((long double)(x)))
+#define isinf(x)                                                        \
+    (	sizeof (x) == sizeof(float )	?	__inline_isinff((float)(x))	\
+		:	sizeof (x) == sizeof(double)	?	__inline_isinfd((double)(x)) \
+        :	__inline_isinf ((long double)(x)))
 
 #endif
 
 namespace NBMath {
 
-    inline static int ROUND(float x) {
-        if ((x-static_cast<float>(
-                 static_cast<int>(x))) >= 0.5) return (static_cast<int>(x)+1);
-        if ((x-static_cast<float>(
-                 static_cast<int>(x))) <= -0.5) return (static_cast<int>(x)-1);
-        else return (int)x;
-    }
+    const int ROUND(float x);
 
-    static const float clip(const float value, const float minValue,
-                            const float maxValue) {
-        if (value > maxValue)
-            return maxValue;
-        else if (value < minValue)
-            return minValue;
-        else if(isnan(value))
-            return 0.0f;
-        else
-            return value;
-    }
-
-    static const float clip(const float value, const float minMax){
-        return clip(value,-minMax,minMax);
-    }
+    const float clip(const float value, const float minValue,
+                     const float maxValue);
+    const float clip(const float value, const float minMax);
 
     /**
      * Given a float return its sign
@@ -70,53 +52,26 @@ namespace NBMath {
      * @param f the number to examine the sign of
      * @return -1.0f if f is less than 0.0f, 1.0f otherwise
      */
-    static float sign(const float f)
-    {
-        if (f < 0.0f) {
-            return -1.0f;
-        } else if (f > 0.0f) {
-            return 1.0f;
-        } else {
-            return 0.0f;
-        }
-    }
+    const float sign(const float f);
 
     /**
-     * Returns an equivalent angle to the one passed in with value between positive
-     * and negative pi.
+     * Returns an equivalent angle to the one passed in with value between 
+     * positive and negative pi.
      *
      * @param theta The angle to be simplified
      *
      * @return The equivalent angle between -pi and pi.
      */
-    inline static float subPIAngle(float theta)
-    {
-        theta = std::fmod(theta, 2.0f*M_PI_FLOAT);
-        if( theta > M_PI) {
-            theta -= 2.0f*M_PI_FLOAT;
-        }
+    const  float subPIAngle(float theta);
 
-        if( theta < -M_PI) {
-            theta += 2.0f*M_PI_FLOAT;
-        }
-        return theta;
-    }
-
-    static float safe_asin(const float input){
-        return std::asin(clip(input,1.0f));
-    }
-    static float safe_acos(const float input){
-        return std::acos(clip(input,1.0f));
-    }
+    const float safe_asin(const float input);
+    const float safe_acos(const float input);
 
 
-static const float  cycloidx(const float theta){
-    return theta - std::sin(theta);
-}
+    const float  cycloidx(const float theta);
 
-static const float  cycloidy(const float theta){
-    return 1.0f - std::cos(theta);
-}
+    const float  cycloidy(const float theta);
+
 
 
 }
