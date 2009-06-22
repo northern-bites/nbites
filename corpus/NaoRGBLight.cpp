@@ -57,7 +57,7 @@ bool NaoRGBLight::updateCommand(const int newRgbHex){
 
 /*
  * Returns a float between 0.0 and 1.0 corresponding to the 'c' channel
- * of the hex value 
+ * of the hex value
  */
 const float NaoRGBLight::getColor(const ALNames::LedColor c, const int rgbHex){
     const int channelColor = (rgbHex >> ((2-c)*8)) % 256;
@@ -87,7 +87,8 @@ void NaoRGBLight::makeAlias(){
         for(unsigned int n = 0; n < numRGBSubLeds; n++){
             const unsigned int subIndex = (c-startColor)*numRGBSubLeds + n;
 #ifdef DEBUG_NAOLIGHTS_INIT
-            std::cout << "    " <<ALNames::RGB_LED_STRINGS[NBLedID][subIndex] <<std::endl;
+            std::cout << "    " <<ALNames::RGB_LED_STRINGS[NBLedID][subIndex]
+                      << std::endl;
 #endif
             alias[1][index] = ALNames::RGB_LED_STRINGS[NBLedID][subIndex];
             index++;
@@ -96,13 +97,13 @@ void NaoRGBLight::makeAlias(){
 }
 
 /**
- *  This sets up the command which will be sent by NaoLights each time 
- *  the color of this LED is updated. 
+ *  This sets up the command which will be sent by NaoLights each time
+ *  the color of this LED is updated.
  */
 void NaoRGBLight::makeCommand(){
 #ifdef DEBUG_NAOLIGHTS_INIT
     std::cout << "  NaoRGBLights::makeCommand()-"
-              << NBLedName <<":"<< std::endl; 
+              << NBLedName <<":"<< std::endl;
 #endif
     command.arraySetSize(6);
     command[0] = string(NBLedName);
@@ -113,7 +114,7 @@ void NaoRGBLight::makeCommand(){
     const unsigned int numLedsTotal = numRGBSubLeds* (endColor - startColor);
 #ifdef DEBUG_NAOLIGHTS_INIT
     std::cout << "  NaoRGBLights::makeCommand()-numToLeds"
-              << numLedsTotal <<":"<< std::endl; 
+              << numLedsTotal <<":"<< std::endl;
 #endif
     command[5].arraySetSize(numLedsTotal);
     for(unsigned int i = 0; i< numLedsTotal; i++){
