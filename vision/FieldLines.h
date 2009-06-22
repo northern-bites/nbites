@@ -107,11 +107,6 @@ private:
     // Number of pixels to skip between rows in image when searching for
     // linepoints horizontally
     static const int ROW_SKIP = IMAGE_HEIGHT / NUM_ROWS_TO_TEST;
-    // AIBOSPECIFIC
-    // Due to problems with the horizon, sometimes it appears too low in the
-    // image and so we fudge a little and scan higher when searching for
-    // line points
-    static const int PIXELS_TO_USE_ABOVE_HORIZON = 10;
 
     // percentage of pixels needed to be green on either side of the line
     static const int GREEN_PERCENT_CLEARANCE = 40;
@@ -144,7 +139,7 @@ private:
     static const int MAX_GREEN_PERCENT_ALLOWED_IN_LINE = 15;
 
     // AIBO_SPECIFIC
-    static const int MAX_LINE_WIDTH_DIFFERENCE = 5; // FIXME chosen randomly
+    static const int MAX_LINE_WIDTH_DIFFERENCE = 5; // FIXME: chosen randomly
 
     // max number of pixels offset to connect two points in createLines
     static const int GROUP_MAX_X_OFFSET = static_cast<int>(.30 * IMAGE_WIDTH);
@@ -184,7 +179,8 @@ private:
     // The bounding box extends ~40 pixels on either side parallel to the line
     static const int INTERSECT_MAX_PARALLEL_EXTENSION =
         static_cast<int>(.15 * IMAGE_WIDTH);
-    // the bounding box extends 10 pixels on either side perpendicular to the line
+    // the bounding box extends 10 pixels on either side perpendicular to the
+    // line
     static const int INTERSECT_MAX_ORTHOGONAL_EXTENSION =
         static_cast<int>(.05 * IMAGE_WIDTH);
     // for dupeCorner() checks
@@ -231,16 +227,6 @@ private:
     // at most this constant if there is another line on scren
     static const int MAX_INNER_L_ANGLE = 140;
 
-
-
-    // If the difference between the estimated distance for a corner to a landmark
-    // and the real distance between the center circle to that landmark is less
-    // than this constant, we conclude that the corner is at the center circle
-    // and ignore all corners in the frame
-    // AIBOSPECIFIC
-    static const int MAX_DIST_ERROR_FOR_CENTER_CIRCLE_DETERMINATION = 50;
-
-
     ////////////////////////////////////////////////////////////
     // Identify corners constants
     ////////////////////////////////////////////////////////////
@@ -258,18 +244,18 @@ public:
     // master loop
     void lineLoop();
 
-    // While lineLoop is called before object recognition so that ObjectFragments
-    // can make use of VisualLines and VisualCorners, the methods called from
-    // here use FieldObjects and as such must be performed after the
-    // ObjectFragments loop is completed.
+    // While lineLoop is called before object recognition so that
+    // ObjectFragments can make use of VisualLines and VisualCorners,
+    // the methods called from here use FieldObjects and as such must be
+    // performed after the ObjectFragments loop is completed.
     void afterObjectFragments();
 
     // This method populates the points vector with line points it finds in
     // the image.  A line point ideally occurs in the middle of a line on the
     // screen.  We detect lines via a simple edge detection scheme -
-    // a transition from green to white involves a big positive jump in Y channel,
-    // while a transition from white to green involves a big negative jump in Y
-    // channel.
+    // a transition from green to white involves a big positive jump in Y
+    // channel, while a transition from white to green involves a big negative
+    // jump in Y channel.
     //
     // The vertical in this method name refers to the fact that we start at the
     // bottom of the image and scan up for points.
@@ -280,9 +266,9 @@ public:
     // This method populates the points vector with line points it finds in
     // the image.  A line point ideally occurs in the middle of a line on the
     // screen.  We detect lines via a simple edge detection scheme -
-    // a transition from green to white involves a big positive jump in Y channel,
-    // while a transition from white to green involves a big negative jump in Y
-    // channel.
+    // a transition from green to white involves a big positive jump in Y
+    // channel, while a transition from white to green involves a big negative
+    // jump in Y channel.
     //
     // The horizontal in the method name denotes that we start at the left of
     // the image and scan to the right to find these points
@@ -290,8 +276,8 @@ public:
     // the scan
     void findHorizontalLinePoints(std::vector<linePoint> &horLinePoints);
 
-    // Attempts to create lines out of a list of linePoints.  In order for points
-    // to be fit onto a line, they must pass a battery of sanity checks
+    // Attempts to create lines out of a list of linePoints.  In order for
+    // points to be fit onto a line, they must pass a battery of sanity checks
     std::vector<VisualLine> createLines(std::list<linePoint> &linePoints);
 
     // Attempts to fit the left over points that were not used within the
@@ -307,7 +293,8 @@ public:
     void joinLines(std::vector<VisualLine> &lines);
 
     // Copies the data from line1 and 2 into a new single line.
-    const VisualLine mergeLines(const VisualLine &line1, const VisualLine &line2);
+    const VisualLine mergeLines(const VisualLine &line1,
+                                const VisualLine &line2);
 
     // Given a vector of lines, attempts to extend the near vertical ones to the
     // top and bottom, and the more horizontal ones to the left and right
@@ -328,16 +315,16 @@ public:
     void extendLineVertically(VisualLine &line);
 
     // Returns true if the new point trying to be added to the line is offscreen
-    // or  there is too much green in between the old and new point.  Any further
-    // searching in this direction would be foolish.
+    // or  there is too much green in between the old and new point.
+    // Any further searching in this direction would be foolish.
     const bool shouldStopExtendingLine(const int oldX, const int oldY,
                                        const int newX, const int newY) const;
 
-    // Given an (x, y) location and a direction (horizontal or vertical) in which
-    // to look, attempts to find edges on either side of the (x,y) location.  If
-    // there are no edges, or if another sanity check fails, returns
-    // VisualLine::DUMMY_LINEPOINT.  Otherwise it returns the linepoint with
-    // the correct (x,y) location and width and scan.
+    // Given an (x, y) location and a direction (horizontal or vertical) in
+    // which to look, attempts to find edges on either side of the (x,y)
+    // location.  If there are no edges, or if another sanity check fails,
+    // returns VisualLine::DUMMY_LINEPOINT.  Otherwise it returns the linepoint
+    // with the correct (x,y) location and width and scan.
     linePoint findLinePointFromMiddleOfLine(int x, int y, ScanDirection dir);
 
     // Unlike our normal method for finding line points, this searches from the
@@ -352,50 +339,36 @@ public:
     // is a legitimate corner on the field.
     // @param lines - the vector of visual lines that have been found after
     // createLines, join lines, and fit unused points.
-    // @return a vector of VisualCorners created from the intersection points that
-    // successfully pass all sanity checks.
+    // @return a vector of VisualCorners created from the intersection points
+    // that successfully pass all sanity checks.
     //
     std::list<VisualCorner> intersectLines(std::vector<VisualLine> &lines);
-
-    // AIBOSPECIFIC:
-    // Determines from the lines and corners found on the screen whether the
-    // robot is probably at the center circle.  Uses the fact that limitations
-    // in the robot's camera prevent us from seeing more than a certain number
-    // of lines when legitimately seeing lines and intersections in order to
-    // screen out cases where we see too many (like at the center circle).
-    const bool probablyAtCenterCircle(std::vector<VisualLine> &lines,
-                                      std::list<VisualCorner> &corners);
 
     // Iterates over the corners and removes those that are too risky to
     // use for localization data
     void removeRiskyCorners(//vector<VisualLine> &lines,
         std::list<VisualCorner> &corners);
 
-    // This one is in addition to the first one but runs after
-    // ObjectFragments because it needs field objects to be detected.
-    const bool probablyAtCenterCircle2(std::vector<VisualLine> &lines,
-                                       std::list<VisualCorner> &corners);
-
-
-
-    // Given a list of VisualCorners, attempts to assign ConcreteCorners (ideally
-    // one, but sometimes multiple) that correspond with where the corner could
-    // possibly be on the field.  For instance, if we have a T corner and it is
-    // right next to the blue goal left post, then it is the blue goal right T.
-    // Modifies the corners passed in by calling the setPossibleCorners method;
-    // in certain cases the shape of a corner might be switched too (if an L
-    // corner is determined to be a T instead, its shape is changed accordingly).
+    // Given a list of VisualCorners, attempts to assign ConcreteCorners
+    // (ideally one, but sometimes multiple) that correspond with where the
+    // corner could possibly be on the field.  For instance, if we have a T
+    // corner and it is right next to the blue goal left post, then it is the
+    // blue goal right T. Modifies the corners passed in by calling the
+    // setPossibleCorners method; in certain cases the shape of a corner might
+    // be switched too (if an L corner is determined to be a T instead, its
+    // shape is changed accordingly).
     void identifyCorners(std::list<VisualCorner> &corners);
 
     const bool nearGoalTCornerLocation(const VisualCorner& corner,
                                        const VisualFieldObject * post) const;
 
-    // Determines if the given L corner does not geometrically make sense for its
-    // shape given the objects on the screen.
+    // Determines if the given L corner does not geometrically make sense for
+    // its shape given the objects on the screen.
     const bool LCornerShouldBeTCorner(const VisualCorner &L) const;
 
     // In some Nao frames, robots obscure part of the goal and the bottom is not
-    // visible.  We can only use pix estimates of goals whose bottoms are visible
+    // visible.  We can only use pix estimates of goals whose bottoms are
+    // visible
     const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
 
     // If it's a legitimate L, the post should be INSIDE of the two lines
@@ -408,17 +381,21 @@ public:
 
     // Helper method that iterates over a list of ConcreteCorner pointers and
     // prints their string representations
-    void printPossibilities(const std::list <const ConcreteCorner*> &list) const;
+    void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
 
-    // Last sanity checks before localization gets the IDs.  Uses the information
+    // Last sanity checks before localization gets the IDs.  Uses the
+    // information
     // about what is visible on the screen to throw out corners that could not
     // be visible.
     void eliminateImpossibleIDs(VisualCorner &c,
-                                std::vector <const VisualFieldObject*>& visibleObjects,
-                                std::list <const ConcreteCorner*>& possibleClassifications);
+                                std::vector <const VisualFieldObject*>&
+                                visibleObjects,
+                                std::list <const ConcreteCorner*>&
+                                possibleClassifications);
 
     int numPixelsToHitColor(const int x, const int y, const int colors[],
-                            const int numColors, const TestDirection testDir) const;
+                            const int numColors,
+                            const TestDirection testDir) const;
     int numPixelsToHitColor(const int x, const int y, const int color,
                             const TestDirection testDir) const;
 
@@ -437,7 +414,8 @@ public:
 
     // Estimates the distance between the corner and the object based on
     // vectors
-    float getEstimatedDistance(const VisualCorner *c, const VisualFieldObject *obj) const;
+    float getEstimatedDistance(const VisualCorner *c,
+                               const VisualFieldObject *obj) const;
 
     float getEstimatedAngle(const VisualCorner &corner) const;
 
@@ -467,7 +445,8 @@ public:
       bool isOutOfBoundsT(corner &t, int i);
     */
 
-    const bool dupeCorner(const std::list<VisualCorner> &corners, const int x, const int y, const int testNumber) const;
+    const bool dupeCorner(const std::list<VisualCorner> &corners, const int x,
+                          const int y, const int testNumber) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
                              const int color, const int numPixels) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
@@ -509,7 +488,8 @@ public:
                                    int &numUndefined, int &numNonWhite);
 
 #ifdef OFFLINE
-    static void resetLineCounters(int &numWhite, int &numUndefined, int &numNonWhite);
+    static void resetLineCounters(int &numWhite, int &numUndefined,
+                                  int &numNonWhite);
 
     bool countersHitSanityChecks(const int numWhite, const int numUndefined,
                                  const int numNonWhite, const bool print) const;
@@ -575,7 +555,9 @@ public:
     const std::vector <VisualLine>* getLines() const { return &linesList; }
     const std::list <VisualCorner>* getCorners() const {return &cornersList; }
     const int getNumCorners() { return cornersList.size(); }
-    const std::list<linePoint>* getUnusedPoints() const { return &unusedPointsList; }
+    const std::list<linePoint>* getUnusedPoints() const {
+        return &unusedPointsList;
+    }
 
     // Returns true if the line segment drawn between first and second
     // intersects any field line on the screen; false otherwise
@@ -586,9 +568,6 @@ public:
 #ifdef OFFLINE
     void printThresholdedImage();
 #endif
-
-
-
 
     /* ----------------  Section for verbose helper methods ----------------
      * These methods are all really simple and their names are meant to be self
@@ -729,8 +708,9 @@ private:
     bool debugBallCheck;
     bool debugCornerAndObjectDistances;
     bool debugFitUnusedPoints;
-    // Normal users of cortex do not need to see as much debugging information as
-    // I have been drawing; now there will be fewer colors etc to keep track of
+    // Normal users of cortex do not need to see as much debugging information
+    // as I have been drawing; now there will be fewer colors etc to keep
+    // track of
     bool standardView;
 
 
