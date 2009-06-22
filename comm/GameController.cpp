@@ -141,6 +141,14 @@ bool GameController::validatePacket(const char *msg, int len,
     }
 }
 
+bool
+GameController::shouldResetTimer()
+{
+	if (controlData.state == STATE_INITIAL)
+		return true;
+	return false;
+}
+
 /* swap the teams in memory to maintain BLUE team first order */
 void GameController::rawSwapTeams (RoboCupGameControlData& data)
 {
