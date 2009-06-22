@@ -56,7 +56,7 @@ public:
     void setData(std::vector<float> &data);
 
     void add_to_module();
-
+    static const int NUM_PACKET_DATA_ELEMENTS = 16;
 private:
     void bind() throw(socket_error);
     void bind_gc() throw(socket_error);

@@ -481,7 +481,9 @@ class Packet:
          self.ballDist,
          self.role,
          self.subRole,
-         self.chaseTime) = new_packet
+         self.chaseTime,
+         self.ballVelX,
+         self.ballVelY) = new_packet
 
         self.teamNumber = int(self.teamNumber)
         self.playerNumber = int(self.playerNumber)
@@ -500,6 +502,8 @@ class Packet:
         self.role = float(self.role)
         self.subRole = float(self.subRole)
         self.chaseTime = float(self.chaseTime)
+        self.ballVelX = float(self.ballVelX)
+        self.ballVelY = float(self.ballVelY)
 
     def update(self,update_packet=[0]*17): #=[0]*16
         """update packet with a list of new values"""
@@ -524,7 +528,9 @@ class Packet:
          self.ballDist,
          self.role,
          self.calledSubRole,
-         self.chaseTime) = update_packet
+         self.chaseTime,
+         self.ballVelX,
+         self.ballVelY) = update_packet
 
     def __str__(self):
         """returns string with all important values"""
@@ -534,7 +540,8 @@ class Packet:
              self.playerX, self.playerY, self.playerH,
              self.uncertX, self.uncertY, self.uncertH,
              self.ballX, self.ballY, self.ballUncertX,
-             self.ballUncertY, self.ballDist))
+             self.ballUncertY, self.ballDist, self.ballVelX,
+             self.ballVelY))
 
 class Sonar:
     """

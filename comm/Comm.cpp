@@ -432,7 +432,7 @@ PyMODINIT_FUNC init_comm (void)
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), tool(_synchro, s, v),
-      data(14,0), latest(new list<vector<float> >),
+      data(NUM_PACKET_DATA_ELEMENTS,0), latest(new list<vector<float> >),
       sensors(s), timer(&micro_time), gc(new GameController())
 {
     pthread_mutex_init(&comm_mutex,NULL);
