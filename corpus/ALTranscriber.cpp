@@ -194,8 +194,8 @@ void ALTranscriber::syncMotionWithALMemory() {
         accY = calibrate_acc_y(sensorValues[10]),
         accZ = calibrate_acc_z(sensorValues[11]),
         gyrX = sensorValues[12], gyrY = sensorValues[13],
-        angleX = clip(sensorValues[14],-M_PI_FLOAT,M_PI_FLOAT),
-        angleY = clip(sensorValues[15],-M_PI_FLOAT,M_PI_FLOAT);
+        angleX = sensorValues[14],//,-M_PI_FLOAT,M_PI_FLOAT),
+        angleY = sensorValues[15];//,-M_PI_FLOAT,M_PI_FLOAT);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();
@@ -207,8 +207,9 @@ void ALTranscriber::syncMotionWithALMemory() {
     float filteredAngleY = lastAngleY;
     if(std::abs(lastAngleX -angleX) < 2.0f*M_PI_FLOAT &&
        std::abs(lastAngleY -angleY) < 2.0f*M_PI_FLOAT){
-        filteredAngleX = (angleX + lastAngleX) *0.5f;
-        filteredAngleY = (angleY + lastAngleY) *0.5f;
+        const float newWeight = 0.33f;
+        filteredAngleX = newWeight*angleX + (1-newWeight)*lastAngleX ;
+        filteredAngleY = newWeight*angleY + (1-newWeight)*lastAngleY ;
     }else{
         //Do nothing, since the values are bad
     }

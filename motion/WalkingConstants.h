@@ -257,9 +257,13 @@ public:
         //Use inverse kinematics to find the left leg angles
         NBMath::ufvector3 lgoal = NBMath::ufvector3(3);
         lgoal(0)=-x; lgoal(1) = ly; lgoal(2) = -z;
+
+
+        const float angleX = 0.0;
+        const float angleY = XAngleOffset;
         Kinematics::IKLegResult lresult =
-            Kinematics::simpleLegIK(Kinematics::LLEG_CHAIN,
-                            lgoal, zeroJoints);
+            Kinematics::angleXYIK(Kinematics::LLEG_CHAIN,
+                                  lgoal, angleX,angleY , 0.0f);
         std::vector<float> lleg_angles(lresult.angles,
                                        lresult.angles +
                                        Kinematics::LEG_JOINTS);
@@ -268,8 +272,8 @@ public:
         NBMath::ufvector3 rgoal = NBMath::ufvector3(3);
         rgoal(0)=-x; rgoal(1) = ry; rgoal(2) = -z;
         Kinematics::IKLegResult rresult =
-            Kinematics::simpleLegIK(Kinematics::RLEG_CHAIN,
-                            rgoal, zeroJoints);
+            Kinematics::angleXYIK(Kinematics::RLEG_CHAIN,
+                                  rgoal,angleX,angleY,0.0f);//X Y switch
         std::vector<float> rleg_angles(rresult.angles,
                                        rresult.angles +
                                        Kinematics::LEG_JOINTS);
@@ -281,9 +285,6 @@ public:
         const unsigned int rightHipPitchIndex
             = Kinematics::R_HIP_PITCH -
             Kinematics::chain_first_joint[Kinematics::RLEG_CHAIN];
-
-        lleg_angles[leftHipPitchIndex]  -= XAngleOffset;
-        rleg_angles[rightHipPitchIndex] -= XAngleOffset;
 
         std::vector<float> * allJoints = new std::vector<float>();
 
