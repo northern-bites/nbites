@@ -3,6 +3,9 @@
 using std::string;
 //#define DEBUG_NAOLIGHTS_INIT
 
+const float NaoRGBLight::LED_ON = 1.0f;
+const float NaoRGBLight::LED_OFF = 0.0f;
+
 NaoRGBLight::NaoRGBLight(const string _NBLedName,
                          const unsigned int _NBLedID,
                          const unsigned int numSubLeds,
@@ -115,7 +118,7 @@ void NaoRGBLight::makeCommand(){
     command[5].arraySetSize(numLedsTotal);
     for(unsigned int i = 0; i< numLedsTotal; i++){
         command[5][i].arraySetSize(1);
-        command[5][i][0]  = LED_OFF;
+        command[5][i][0] = LED_OFF;
     }
 
 }
