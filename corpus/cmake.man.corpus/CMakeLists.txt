@@ -168,6 +168,8 @@ SET( CORPUS_TEST_DIR ${CORPUS_INCLUDE_DIR}/test )
 
 SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
      		    ${NBCOMMON_INCLUDE_DIR}/NBMath
+                     ${CORPUS_INCLUDE_DIR}/CoordFrame4D
+                     ${CORPUS_INCLUDE_DIR}/CoordFrame3D
                    )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
