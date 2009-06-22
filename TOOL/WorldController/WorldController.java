@@ -152,6 +152,7 @@ public class WorldController extends JPanel implements KeyListener,
     public final static String RELOAD_LOG_STRING = "Reload Log";
     public final static String QUIT_LOG_STRING = "Quit Log";
     public final static String DISCONNECT_STRING = "Disconnect";
+    public final static String LIMIT_TEAM_STRING = "Restrict to Team:";
     public final static String DRAW_EST_STRING = "Draw Estimates";
 
     // Button Action Commands
@@ -165,6 +166,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String QUIT_EKF_LOG_ACTION = "quitekflog";
     public static final String CONNECT_ACTION = "connectme";
     public static final String DISCONNECT_ACTION = "disconnectme";
+    public static final String LIMIT_TEAM_ACTION = "limitteam";
     public static final String CLEAR_FIELD_ACTION = "clearfield";
 
     // Menu Strings
@@ -238,6 +240,7 @@ public class WorldController extends JPanel implements KeyListener,
     private JButton button_one;
     private JButton button_two;
     private JButton button_three;
+    private JTextField field_one;
     private JButton connect_button;
     private JButton draw_real_button;
     private JButton draw_est_button;
@@ -386,6 +389,12 @@ public class WorldController extends JPanel implements KeyListener,
         } else if (cmd.equals(DISCONNECT_ACTION)) {
             udp_server.setReceiving(false);
             startDoNothing();
+        } else if (cmd.equals(LIMIT_TEAM_ACTION)) {
+            try {
+                udp_server.limitToTeam(Integer.parseInt(field_one.getText()));
+            } catch (NumberFormatException asdf) {
+                System.out.println("Excepted an integer");
+            }
         }
 
         // keeps keyboard focus
@@ -448,6 +457,10 @@ public class WorldController extends JPanel implements KeyListener,
         button_three.addActionListener(this);
         button_area.add(button_three);
         button_three.setVisible(false);
+        field_one = new JTextField();
+        field_one.addActionListener(this);
+        button_area.add(field_one);
+        field_one.setVisible(false);
 
         // fps playback
         fps_label = new JLabel(FPS_LABEL_STRING, JLabel.CENTER);
@@ -468,6 +481,7 @@ public class WorldController extends JPanel implements KeyListener,
         button_one.setVisible(false);
         button_two.setVisible(false);
         button_three.setVisible(false);
+        field_one.setVisible(false);
         fps_label.setVisible(false);
         fps_slide.setVisible(false);
     }
@@ -510,6 +524,10 @@ public class WorldController extends JPanel implements KeyListener,
         button_two.setText(CLEAR_FIELD_STRING);
         button_two.setActionCommand(CLEAR_FIELD_ACTION);
         button_two.setVisible(true);
+        button_three.setText(LIMIT_TEAM_STRING);
+        button_three.setActionCommand(LIMIT_TEAM_ACTION);
+        button_three.setVisible(true);
+        field_one.setVisible(true);
     }
 
 
