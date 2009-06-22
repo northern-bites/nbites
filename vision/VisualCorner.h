@@ -13,7 +13,6 @@ class VisualCorner;
 #include "Utility.h"
 #include "Structs.h"
 
-
 class VisualCorner : public VisualDetection, public VisualLandmark<cornerID> {
 private: // Constants
     // Number of pixels that must extend beyond the intersection for a line to

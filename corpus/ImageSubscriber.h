@@ -4,6 +4,7 @@
 class ImageSubscriber {
 public:
     virtual void notifyNextVisionImage() = 0;
+    virtual ~ImageSubscriber() {}
 };
 
 #endif

@@ -14,7 +14,7 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
-    : VisualLandmark<lineID>(UNKNOWN_LINE),
+    : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines)
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
@@ -25,7 +25,7 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     init();
 }
 
-VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),
+VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
                            possibleLines(ConcreteLine::concreteLines)
 {
 
@@ -35,7 +35,7 @@ VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),
 
 
 VisualLine::VisualLine(list<linePoint> &linePoints)
-    : VisualLandmark<lineID>(UNKNOWN_LINE),
+    : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines)
 {
     for (list<linePoint>::iterator i = linePoints.begin();
@@ -61,6 +61,7 @@ VisualLine::VisualLine(const VisualLine& other)
       thickestVertPoint(other.thickestVertPoint),
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
+      ccLine(other.getCCLine()),
       possibleLines(ConcreteLine::concreteLines)
 {
 }
