@@ -87,9 +87,15 @@ yellow_goal_right_l(YELLOW_GOALBOX_LEFT_X,
                     YELLOW_GOAL_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
-center_circle(MIDFIELD_X,
-              MIDFIELD_Y,
-              CENTER_CIRCLE);
+top_cc(TOP_CC_X, TOP_CC_Y, TOP_CC);
+
+const ConcreteCorner ConcreteCorner::
+bottom_cc(BOTTOM_CC_X, BOTTOM_CC_Y, BOTTOM_CC);
+
+// Not added to the concreteCornerList, because this corner is fake and only
+// Exists because of a sanity check in FieldLines
+const ConcreteCorner ConcreteCorner::
+fake_cc(CENTER_FIELD_X, CENTER_FIELD_Y, CENTER_CIRCLE);
 
 const ConcreteCorner ConcreteCorner::
 center_bottom_t(MIDFIELD_X,
@@ -116,7 +122,8 @@ const ConcreteCorner* ConcreteCorner::concreteCornerList[NUM_CORNERS] =
  &yellow_goal_right_t,
  &yellow_goal_left_l,
  &yellow_goal_right_l,
- &center_circle
+ &top_cc,
+ &bottom_cc
 };
 
 
@@ -142,7 +149,8 @@ const ConcreteCorner* ConcreteCorner::T_CORNERS[NUM_T_CORNERS] = {
 };
 
 const ConcreteCorner* ConcreteCorner::CC_CORNERS[NUM_CC_CORNERS] = {
-    &center_circle
+    &top_cc,
+    &bottom_cc
 };
 
 
@@ -299,6 +307,12 @@ const string ConcreteCorner::cornerIDToString(const cornerID _id) {
 
     case CORNER_NO_IDEA_ID:
         return "Unknown Corner";
+
+    case TOP_CC:
+        return "Top Center Circle";
+    case BOTTOM_CC:
+        return "Bottom Center Circle";
+
     default:
          return "Invalid Corner Id";
     }

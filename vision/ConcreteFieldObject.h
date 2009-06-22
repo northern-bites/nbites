@@ -15,7 +15,7 @@ class ConcreteFieldObject;
 #include "FieldConstants.h"
 #include "ConcreteLandmark.h"
 
-#define CONCRETE_FIELD_OBJECT_START_ID 30
+#define CONCRETE_FIELD_OBJECT_START_ID 40
 enum fieldObjectID {
     BLUE_GOAL_LEFT_POST = CONCRETE_FIELD_OBJECT_START_ID,
     BLUE_GOAL_RIGHT_POST,

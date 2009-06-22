@@ -48,7 +48,9 @@ enum cornerID {
     YELLOW_GOAL_RIGHT_T,
     YELLOW_GOAL_LEFT_L,
     YELLOW_GOAL_RIGHT_L,
-    CORNER_NO_IDEA_ID
+    CORNER_NO_IDEA_ID,
+    TOP_CC, // 30
+    BOTTOM_CC
 };
 
 enum shape {
@@ -77,7 +79,7 @@ private:
 public: // Constants
     static const int NUM_L_CORNERS = 8;
     static const int NUM_T_CORNERS = 6;
-    static const int NUM_CC_CORNERS = 1;
+    static const int NUM_CC_CORNERS = 2;
     static const int NUM_CORNERS = NUM_L_CORNERS + NUM_T_CORNERS +
         NUM_CC_CORNERS;
     static const int NUM_YELLOW_GOAL_CORNERS = 4;
@@ -128,7 +130,9 @@ public:
                         yellow_goal_right_t,
                         yellow_goal_left_l,
                         yellow_goal_right_l,
-                        center_circle;
+                        top_cc,
+                        bottom_cc,
+                        fake_cc;
 
     static const std::string getShapeString(shape s);
     static const std::string cornerIDToString(const cornerID _id);
