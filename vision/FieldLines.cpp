@@ -2616,6 +2616,79 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 
 }
 
+// Iterates over the corners and removes those that are too risky to
+// use for localization data
+void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
+    list<VisualCorner> &corners) {
+
+    // It's very risky for us to allow any L corners at the edges of the
+    // screen if there are no field objects on the screen to corroborate
+    // what they are.
+    // In some cases, the L is actually a T that got cut off by the
+    // edge of the screen.  When we identify corners, the L will be kept
+    // completely abstract and localization will try to fit the L to
+    // whatever it can, which will be very wrong if the L is in fact a T.
+    // If we do see field objects on the screen, we can use distance to
+    // determine that the L corner is actually a T.
+
+    // We now also cut off T's near the edge since they may be CC intersections
+
+    int oldNumCorners = corners.size();
+
+    const int NUM_PIXELS_CLOSE_TO_EDGE = 15;
+    const int T_NUM_PIXELS_CLOSE_TO_EDGE = 20;
+
+    // No field objects on screen..
+    if (getVisibleFieldObjects().empty()) {
+        int numLByEdge =
+            count_if(corners.begin(), corners.end(),
+                     LCornerNearEdgeOfScreen(SCREEN, NUM_PIXELS_CLOSE_TO_EDGE));
+        list<VisualCorner>::iterator riskyCorners =
+            remove_if(corners.begin(), corners.end(),
+                      LCornerNearEdgeOfScreen(SCREEN,
+                                              NUM_PIXELS_CLOSE_TO_EDGE));
+
+        // We found at least one risky corner
+        if (riskyCorners != corners.end()) {
+            if (debugRiskyCorners || debugIdentifyCorners) {
+                cout << "Removing " << numLByEdge
+                     << " L corners that are within "
+                     << NUM_PIXELS_CLOSE_TO_EDGE
+                     << " pixels from the edge of the "
+                     << "screen; likely a T that is cut off." << endl;
+            }
+            corners.erase(riskyCorners, corners.end());
+        }
+
+        // Do it again for T corners which may be CC intersections
+        int numTByEdge =
+            count_if(corners.begin(), corners.end(),
+                     TCornerNearEdgeOfScreen(SCREEN,
+                                             T_NUM_PIXELS_CLOSE_TO_EDGE));
+        list<VisualCorner>::iterator riskyTCorners =
+            remove_if(corners.begin(), corners.end(),
+                      TCornerNearEdgeOfScreen(SCREEN,
+                                              T_NUM_PIXELS_CLOSE_TO_EDGE));
+
+        // We found at least one risky corner
+        if (riskyTCorners != corners.end()) {
+            if (debugRiskyCorners || debugIdentifyCorners) {
+                cout << "Removing " << numTByEdge
+                     << " T corners that are within "
+                     << T_NUM_PIXELS_CLOSE_TO_EDGE
+                     << " pixels from the edge of the "
+                     << "screen; likely a CC that is cut off." << endl;
+            }
+            corners.erase(riskyTCorners, corners.end());
+        }
+    }
+
+    if (debugRiskyCorners || debugIdentifyCorners) {
+        cout << "\tRemoved " << oldNumCorners - corners.size()
+             << " risky corner(s). "  << endl;
+    }
+}
+
 
 // Given a list of VisualCorners, attempts to assign ConcreteCorners (ideally
 // one, but sometimes multiple) that correspond with where the corner could
