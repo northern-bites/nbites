@@ -23,8 +23,7 @@ def spinToWalkHeading(nav):
     if newSpinDir != nav.curSpinDir:
         nav.changeSpinDirCounter += 1
     else:
-        nav.changeSpinDirCounter -= 1
-        nav.changeSpinDirCounter = max(0, nav.changeSpinDirCounter)
+        nav.changeSpinDirCounter = 0
 
     if nav.changeSpinDirCounter >  constants.CHANGE_SPIN_DIR_THRESH:
         nav.curSpinDir = newSpinDir
@@ -90,8 +89,9 @@ def walkStraightToPoint(nav):
     sTheta = MyMath.clip(bearing,
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
-
-    nav.setSpeed(constants.GOTO_FORWARD_SPEED, 0, sTheta)
+    gain = constants.GOTO_GAIN * MyMath.dist(my.x, my.y,
+                                             nav.destX, nav.destY)
+    nav.setSpeed(constants.GOTO_FORWARD_SPEED*gain, 0, sTheta*gain)
     return nav.stay()
 
 def spinToFinalHeading(nav):
@@ -286,11 +286,16 @@ def omniWalkToPoint(nav):
     absBearing = abs(bearing)
     sX, sY, sTheta = 0.0, 0.0, 0.0
 
-    sX = constants.OMNI_GOTO_FORWARD_SPEED * cos(radians(bearing))
-    sY = constants.OMNI_GOTO_STRAFE_SPEED * sin(radians(bearing))
+    distToDest = MyMath.dist(my.x, my.y, nav.destX, nav.destY)
+
+    gain = constants.GOTO_GAIN * distToDest
+    spinGain = constants.GOTO_SPIN_GAIN * distToDest
+
+    sX = constants.OMNI_GOTO_FORWARD_SPEED * cos(radians(bearing)) * gain
+    sY = constants.OMNI_GOTO_STRAFE_SPEED * sin(radians(bearing)) * gain
 
     spinDir = MyMath.getSpinDir(my.h, nav.destH)
-    sTheta = spinDir * fabs(my.h - nav.destH)
+    sTheta = spinDir * fabs(my.h - nav.destH) * spinGain
 
     if nav.atDestinationCloser():
         sX = sY = 0.0

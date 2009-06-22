@@ -152,7 +152,7 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
         // setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
     }
     limitPosteriorUncert();
-    clipBallEstimate();
+    //clipBallEstimate();
     limitPosteriorEst();
     testForNaNReset();
 }
