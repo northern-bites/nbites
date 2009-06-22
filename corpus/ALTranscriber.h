@@ -63,6 +63,7 @@ private: //Members
 
     AccEKF accelerationFilter;
 
+    float lastAngleX, lastAngleY;
 private: //Helper Methods
 
     //For the motion thread (enactor)

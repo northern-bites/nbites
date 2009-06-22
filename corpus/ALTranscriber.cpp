@@ -20,7 +20,8 @@ ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
                               boost::shared_ptr<Sensors> _sensors)
     :Transcriber(_sensors),
      broker(_broker),
-     accelerationFilter()
+     accelerationFilter(),
+     lastAngleX(0.0f), lastAngleY(0.0f)
 {
     try{
         initSyncMotionWithALMemory();
@@ -193,21 +194,35 @@ void ALTranscriber::syncMotionWithALMemory() {
         accY = calibrate_acc_y(sensorValues[10]),
         accZ = calibrate_acc_z(sensorValues[11]),
         gyrX = sensorValues[12], gyrY = sensorValues[13],
-        angleX = clip(sensorValues[14],-M_PI_FLOAT,M_PI_FLOAT),
-        angleY = clip(sensorValues[15],-M_PI_FLOAT,M_PI_FLOAT);
+        angleX = sensorValues[14],//,-M_PI_FLOAT,M_PI_FLOAT),
+        angleY = sensorValues[15];//,-M_PI_FLOAT,M_PI_FLOAT);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();
     const float filteredY = accelerationFilter.getY();
     const float filteredZ = accelerationFilter.getZ();
 
+    //Filter angleX for large jumps, which are board errors
+    float filteredAngleX = lastAngleX;
+    float filteredAngleY = lastAngleY;
+    if(std::abs(lastAngleX -angleX) < 2.0f*M_PI_FLOAT &&
+       std::abs(lastAngleY -angleY) < 2.0f*M_PI_FLOAT){
+        const float newWeight = 0.33f;
+        filteredAngleX = newWeight*angleX + (1-newWeight)*lastAngleX ;
+        filteredAngleY = newWeight*angleY + (1-newWeight)*lastAngleY ;
+    }else{
+        //Do nothing, since the values are bad
+    }
+
+    lastAngleX = filteredAngleX;
+    lastAngleY = filteredAngleY;
     //TODO: don't allocate these FSR, etc objects each time
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
                          FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
                          chestButton,
                          Inertial(filteredX, filteredY, filteredZ,
-                                  gyrX, gyrY, angleX, angleY),
+                                  gyrX, gyrY, filteredAngleX, filteredAngleY),
                          Inertial(accX, accY, accZ,
                                   gyrX, gyrY, angleX, angleY));
 }

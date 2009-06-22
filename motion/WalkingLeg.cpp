@@ -26,8 +26,10 @@ using namespace NBMath;
 
 //#define DEBUG_WALKINGLEG
 
-WalkingLeg::WalkingLeg(ChainID id)
-    :state(SUPPORTING),
+WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
+                       ChainID id)
+    :sensors(s),
+     state(SUPPORTING),
      frameCounter(0),
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
      support_step(EMPTY_STEP),
@@ -127,7 +129,8 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
 
     return result;
 }
-
+//#define SENSOR_SCALE 0.75f
+#define SENSOR_SCALE 0.0f
 LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     ufvector3 src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
@@ -180,11 +183,16 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     //Set the desired HYP in lastJoints, which will be read by dls
     const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
-    IKLegResult result = Kinematics::simpleLegIK(chainID,goal,lastJoints);
+    Inertial inertial = sensors->getInertial();
+    const float angleScale = SENSOR_SCALE;
+    const float angleX = inertial.angleX*angleScale;
+    const float angleY = walkParams->XAngleOffset
+        +(inertial.angleY-walkParams->XAngleOffset)*angleScale;
+
+    IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,angleY,HYPAngle);
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] -= hipHacks.get<1>(); //HipRoll
-    result.angles[2] -= walkParams->XAngleOffset;
     result.angles[2] += hipHacks.get<0>(); //HipPitch
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
@@ -216,11 +224,17 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
     //calculate the new angles
-    IKLegResult result = Kinematics::simpleLegIK(chainID,goal,lastJoints);
+    Inertial inertial = sensors->getInertial();
+    const float angleScale = SENSOR_SCALE;
+    const float angleX = inertial.angleX*angleScale;
+    const float angleY = walkParams->XAngleOffset 
+        +(inertial.angleY-walkParams->XAngleOffset)*angleScale;
+
+    IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
+                                               angleY, HYPAngle);
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] += hipHacks.get<1>(); //HipRoll
-    result.angles[2] -= walkParams->XAngleOffset;
     result.angles[2] += hipHacks.get<0>(); //HipPitch
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
