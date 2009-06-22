@@ -29,6 +29,9 @@ public class Robot {
     final static int PACKET_BALL_UNCERT_Y = 14;
     final static int PACKET_BALL_DIST = 15;
     final static int PACKET_ROLE = 16;
+    final static int PACKET_SUB_ROLE = 17;
+    final static int PACKET_BALL_VEL_X = 18;
+    final static int PACKET_BALL_VEL_Y = 19;
 
     private Integer team;
     private Integer color;
@@ -69,8 +72,8 @@ public class Robot {
     public static Robot parseData(byte[] rawData, int length) {
         // ensure packet length
         if (length < HEADER_DATA_SIZE) {
-            System.out.println("UDP PACKET REJECTED: length: " + length +
-                               " < HEADER_DATA_SIZE: " + HEADER_DATA_SIZE);
+            // System.out.println("UDP PACKET REJECTED: length: " + length +
+            //                    " < HEADER_DATA_SIZE: " + HEADER_DATA_SIZE);
             return null;
         }
         // swap endianness of all float values
@@ -117,7 +120,6 @@ public class Robot {
 
 class RobotData {
 
-    // XXX - these need to be changed to Float objects
     private Integer time;
     private Float robotX;
     private Float robotY;
@@ -127,12 +129,13 @@ class RobotData {
     private Float ballY;
     private Float ballXUncert;
     private Float ballYUncert;
-    private Float ballXVel;
-    private Float ballYVel;
     private Float ballDist;
     private boolean ballTrapped;
+    private Integer calledRole;
     private Integer calledSubRole;
     private Float chaseTime;
+    private Float ballXVel;
+    private Float ballYVel;
 
     public RobotData() {
         time = new Integer(0);
@@ -149,6 +152,9 @@ class RobotData {
         robotUncertY = new Float(0);
         robotUncertH = new Float(0);
         calledSubRole = new Integer(0);
+        calledRole = new Integer(0);
+        ballXVel = new Float(0);
+        ballYVel = new Float(0);
     }
 
     public RobotData(Integer time, Float robotX, Float robotY, Float robotHeading,
@@ -190,12 +196,19 @@ class RobotData {
         ballXUncert   = values.get(8);
         ballYUncert   = values.get(9);
         ballDist      = values.get(10);
-        calledSubRole = values.get(11).intValue();
-        chaseTime     = values.get(12);
-        // XXX - not currently sending these!
-        ballXVel = new Float(0);
-        ballYVel = new Float(0);
-        ballTrapped = false;
+        calledRole    = values.get(11).intValue();
+        calledSubRole = values.get(12).intValue();
+        chaseTime     = values.get(13);
+        try {
+            ballXVel      = values.get(14);
+            ballYVel      = values.get(15);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("\n\nYou are using an old version of man. "+
+                               " Please update. :)");
+            ballXVel      = new Float(0);
+            ballYVel      = new Float(0);
+        }
+        ballTrapped   = false;
     }
 
     //public Integer getIDNumber() {
