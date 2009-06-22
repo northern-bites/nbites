@@ -32,7 +32,7 @@ def spinToWalkHeading(nav):
                              str(nav.brain.my.h)+
                              " and my target h: " + str(targetH))
 
-    if nav.atHeading(targetH):
+    if nav.atHeadingGoTo(targetH):
         nav.stopSpinToWalkCount += 1
     else :
         nav.stopSpinToWalkCount -= 1
@@ -89,9 +89,9 @@ def walkStraightToPoint(nav):
     sTheta = MyMath.clip(bearing,
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
-    gain = constants.GOTO_GAIN * MyMath.dist(my.x, my.y,
+    gain = constants.GOTO_FORWARD_GAIN * MyMath.dist(my.x, my.y,
                                              nav.destX, nav.destY)
-    nav.setSpeed(constants.GOTO_FORWARD_SPEED*gain, 0, sTheta*gain)
+    nav.setSpeed(constants.GOTO_FORWARD_SPEED*gain, 0, sTheta)
     return nav.stay()
 
 def spinToFinalHeading(nav):
@@ -283,11 +283,12 @@ def omniWalkToPoint(nav):
 
     distToDest = MyMath.dist(my.x, my.y, nav.destX, nav.destY)
 
-    gain = constants.GOTO_GAIN * distToDest
+    forwardGain = constants.GOTO_FORWARD_GAIN * distToDest
+    strafeGain = constants.GOTO_STRAFE_GAIN * distToDest
     spinGain = constants.GOTO_SPIN_GAIN * distToDest
 
-    sX = constants.OMNI_GOTO_FORWARD_SPEED * cos(radians(bearing)) * gain
-    sY = constants.OMNI_GOTO_STRAFE_SPEED * sin(radians(bearing)) * gain
+    sX = constants.OMNI_GOTO_FORWARD_SPEED * cos(radians(bearing)) * forwardGain
+    sY = constants.OMNI_GOTO_STRAFE_SPEED * sin(radians(bearing)) * strafeGain
 
     spinDir = MyMath.getSpinDir(my.h, nav.destH)
     sTheta = spinDir * fabs(my.h - nav.destH) * spinGain
@@ -356,6 +357,8 @@ def orbitPointThruAngle(nav):
     """
     Circles around a point in front of robot, for a certain angle
     """
+    if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
+        return nav.goNow('stop')
     if nav.firstFrame():
         if nav.angleToOrbit < 0:
             nav.orbitDir = constants.ORBIT_LEFT

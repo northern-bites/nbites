@@ -59,7 +59,12 @@ def shouldPositionForKick(player):
         constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
         constants.BALL_POS_KICK_RIGHT_Y and \
         constants.BALL_POS_KICK_MAX_X > ball.relX > \
-        constants.BALL_POS_KICK_MIN_X
+        constants.BALL_POS_KICK_MIN_X and \
+        ball.bearing < constants.BALL_POS_KICK_BEARING_THRESH
+
+def shouldPositionForKickFromApproachLoc(player):
+    return shouldPositionForKick(player) and \
+        player.brain.nav.atHeading()
 
 def shouldRepositionForKick(player):
     """
@@ -140,6 +145,12 @@ def shouldScanFindBall(player):
     We lost the ball, scan to find it
     """
     return (player.brain.ball.framesOff > constants.BALL_OFF_THRESH)
+
+def shouldScanFindBallActiveLoc(player):
+    """
+    We lost the ball, scan to find it
+    """
+    return (player.brain.ball.framesOff > constants.BALL_OFF_ACTIVE_LOC_THRESH)
 
 def shouldSpinFindBall(player):
     """

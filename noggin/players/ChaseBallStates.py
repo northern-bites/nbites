@@ -91,18 +91,23 @@ def approachBallWithLoc(player):
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
-    if transitions.shouldPositionForKick(player):
+    elif transitions.shouldPositionForKickFromApproachLoc(player):
         return player.goLater('positionForKick')
-    # elif transitions.shouldScanFindBall(player):
-    #     return player.goLater('scanFindBall')
-    # elif transitions.shouldAvoidObstacle(player):
-    #     return player.goLater('avoidObstacle')
-    # elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
-    #     return player.goLater('approachBall')
+    elif transitions.shouldAvoidObstacle(player):
+        return player.goLater('avoidObstacle')
+    #elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
+        #return player.goLater('approachBall')
+    elif not player.brain.tracker.activeLocOn and \
+            transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    elif player.brain.tracker.activeLocOn and \
+            transitions.shouldScanFindBallActiveLoc(player):
+        return player.goLater('scanFindBall')
+
     nav = player.brain.nav
     my = player.brain.my
 
-    if player.brain.ball.locDist > 100:
+    if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
         player.brain.tracker.activeLoc()
     else :
         player.brain.tracker.trackBall()
