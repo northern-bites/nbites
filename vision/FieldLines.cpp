@@ -122,10 +122,10 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     debugHorEdgeDetect = false;
     debugSecondVertEdgeDetect = false;
     debugCreateLines = false;
-    debugJoinLines = true;
-    debugExtendLines = true;
-    debugIntersectLines = true;
-    debugIdentifyCorners = true;
+    debugJoinLines = false;
+    debugExtendLines = false;
+    debugIntersectLines = false;
+    debugIdentifyCorners = false;
     debugCornerAndObjectDistances = false;
     debugCcScan = false;
     standardView = true;//false;
