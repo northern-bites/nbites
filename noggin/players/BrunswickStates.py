@@ -41,6 +41,7 @@ if WEBOTS_ACTIVE:
 def penaltyShotsGameReady(player):
     if player.firstFrame():
         player.brain.tracker.locPans()
+        player.standup()
     return player.stay()
 
 def penaltyShotsGameSet(player):

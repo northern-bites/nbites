@@ -1,5 +1,5 @@
 
 def penaltyKick(player):
     player.penaltyKicking = True
-    return player.stay()
+    return player.goNow('approachBallWithLoc')
 
