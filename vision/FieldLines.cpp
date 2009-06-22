@@ -31,15 +31,35 @@ using namespace std;
 #ifndef OFFLINE
 #define haveFound(edgeY) edgeY != NO_EDGE
 
-#define isEdgeClose(edgeLoc, newLoc) (abs(edgeLoc - newLoc) < ADJACENT_SAME_EDGE_SEPARATION)
-#define isMoreSuitableTopEdge(topEdgeY,newY,imageColumn) (topEdgeY == NO_EDGE || isEdgeClose(topEdgeY, newY))
-#define isMoreSuitableRightEdge(rightEdgeX,newX,y) (rightEdgeX == NO_EDGE || isEdgeClose(rightEdgeX, newX))
+#define isEdgeClose(edgeLoc, newLoc) (abs(edgeLoc - newLoc) < \
+                                      ADJACENT_SAME_EDGE_SEPARATION)
+#define isMoreSuitableTopEdge(topEdgeY,newY,imageColumn) (topEdgeY == NO_EDGE\
+                                                          || \
+                                                          isEdgeClose(topEdgeY,\
+                                                                      newY))
+
+#define isMoreSuitableRightEdge(rightEdgeX,newX,y) (rightEdgeX == NO_EDGE || \
+                                                    isEdgeClose(rightEdgeX, \
+                                                                newX))
+
 #define downhillEdgeWasTooFar(imageColumn,imageRow,dir)
 #define secondDownhillButInvalid(imageColumn,imageRow,dir)
 #define foundDownhillNoUphill(imageColumn,imageRow,dir)
 #define couldNotFindCorrespondingBottom(imageColumn,imageRow)
-#define isUphillEdge(new_y_value,old_y_value,dir) (dir == VERTICAL ? new_y_value - old_y_value >= VERTICAL_TRANSITION_VALUE : new_y_value - old_y_value >= HORIZONTAL_TRANSITION_VALUE)
-#define isDownhillEdge(new_y_value,old_y_value,dir) (dir == VERTICAL ? old_y_value - new_y_value >= VERTICAL_TRANSITION_VALUE : old_y_value - new_y_value >= HORIZONTAL_TRANSITION_VALUE)
+#define isUphillEdge(new_y_value,old_y_value,dir)(dir == VERTICAL ?     \
+                                                  new_y_value - old_y_value \
+                                                  >= VERTICAL_TRANSITION_VALUE \
+                                                  : new_y_value - old_y_value \
+                                                  >=                    \
+                                                  HORIZONTAL_TRANSITION_VALUE)
+
+#define isDownhillEdge(new_y_value,old_y_value,dir)(dir == VERTICAL ? \
+                                                    old_y_value - new_y_value \
+                                                    >=                  \
+                                                    VERTICAL_TRANSITION_VALUE \
+                                                    : old_y_value -     \
+                                                    new_y_value >=      \
+                                                    HORIZONTAL_TRANSITION_VALUE)
 
 /* Check to see if we are at the top of the image. The top could be capped
  * by the horizon as well.
@@ -47,11 +67,16 @@ using namespace std;
 
 #define isAtTopOfImage(y, stopValue) (y-stopValue == 1) || (y == 1)
 #define isAtRightOfImage(x, endX) (x == endX - 1)
-#define isWaitingForAnotherTopEdge(topEdgeY, currentY) (topEdgeY - currentY <= 3)
-#define isWaitingForAnotherRightEdge(rightEdgeX, currentX) (currentX - rightEdgeX <= 3)
+#define isWaitingForAnotherTopEdge(topEdgeY, currentY)(topEdgeY - currentY <= 3)
+#define isWaitingForAnotherRightEdge(rightEdgeX, currentX) (currentX - \
+                                                            rightEdgeX <= 3)
+
 #define isFirstUphillEdge(uphillEdgeLoc,x,y,dir) (!haveFound(uphillEdgeLoc))
-#define resetLineCounters(numWhite,numUndefined,numNonWhite) (numWhite=numUndefined=numNonWhite=0)
-#define countersHitSanityChecks(numWhite,numUndefined,numNonWhite,print) (numNonWhite > NUM_NON_WHITE_SANITY_CHECK || numUndefined > NUM_UNDEFINED_SANITY_CHECK)
+#define resetLineCounters(numWhite,numUndefined,numNonWhite) (\
+        numWhite=numUndefined=numNonWhite=0)
+#define countersHitSanityChecks(numWhite,numUndefined,numNonWhite,print) \
+    (numNonWhite > NUM_NON_WHITE_SANITY_CHECK || numUndefined > \
+     NUM_UNDEFINED_SANITY_CHECK)
 #endif
 
 using boost::shared_ptr;
@@ -94,7 +119,7 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     allFieldObjects[3] = vision->yglp;
 
     // When online, these variables are always false and can never be changed,
-    // but offline they can be toggled		
+    // but offline they can be toggled
 #ifdef OFFLINE
     debugVertEdgeDetect = false;
     debugHorEdgeDetect = false;
@@ -169,11 +194,11 @@ void FieldLines::lineLoop() {
     unusedPointsList = linePoints;
 
     //  startTime = vision->getMillisFromStartup();
-    
-     if (isGoalie) {
-     extendLines(linesList);
-    }
-    
+
+    //if (isGoalie) {
+    extendLines(linesList);
+    //}
+
 
     // Corners is a global member of FieldLines
     //startTime = vision->getMillisFromStartup();
@@ -1129,13 +1154,13 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
                 float lineWidthDifference = currentPoint->lineWidth - lastLineWidth;
 
                 if ((distanceDifference < 0 && // line is going toward us
-                    // TODO named constant
-                    (lineWidthDifference < -2 || // The line shouldn't shrink more than 2 pix
-                     lineWidthDifference > 5) ) ||
+                     // TODO named constant
+                     (lineWidthDifference < -2 || // The line shouldn't shrink more than 2 pix
+                      lineWidthDifference > 5) ) ||
 
                     (distanceDifference >= 0 && // line is going away from us
-                    (lineWidthDifference > 2 ||
-                     lineWidthDifference < -5)) ) {
+                     (lineWidthDifference > 2 ||
+                      lineWidthDifference < -5)) ) {
                     if (debugCreateLines)
                         cout << "\tSecond loop: Sanity check 'Points of similar line widths "
                              << "failed', line width 1: " << lastLineWidth
@@ -2343,7 +2368,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             float t_J = Utility::
                 findLinePointDistanceFromStart(intersection, *j);
 
-
+            // TODO: Make this identify the corner as a center circle corner
             if (Utility::tValueInMiddleOfLine(t_I, i->length,
                                               static_cast<float>(MIN_CROSS_EXTEND)) &&
                 Utility::tValueInMiddleOfLine(t_J, j->length,
@@ -2451,15 +2476,15 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
                      << " and " << line2Closer << endl;
 
             float percent1 = percentSurrounding((line1Closer.x + intersectX)/2,
-                                               (line1Closer.y + intersectY)/2,
-                                               FIELD_COLORS,
-                                               NUM_FIELD_COLORS,
-                                               1);
+                                                (line1Closer.y + intersectY)/2,
+                                                FIELD_COLORS,
+                                                NUM_FIELD_COLORS,
+                                                1);
             float percent2 = percentSurrounding((line2Closer.x + intersectX)/2,
-                                               (line2Closer.y + intersectY)/2,
-                                               FIELD_COLORS,
-                                               NUM_FIELD_COLORS,
-                                               1);
+                                                (line2Closer.y + intersectY)/2,
+                                                FIELD_COLORS,
+                                                NUM_FIELD_COLORS,
+                                                1);
             if (debugIntersectLines)
                 cout << "Percent green in between line 1 and corner: "
                      << percent1 << ". between line 2 --- : " << percent2
@@ -2523,13 +2548,13 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 
     if (debugIdentifyCorners)
-        cout << "Beginning identifyCorners() with " << corners.size() << " corners"
-             << endl;
+        cout << "Beginning identifyCorners() with " << corners.size()
+             << " corners" << endl;
 
     vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
 
     // No explicit movement of iterator; will do it manually
-    for (list <VisualCorner>::iterator i = corners.begin(); i != corners.end();) {
+    for (list <VisualCorner>::iterator i = corners.begin();i != corners.end();){
 
         if (debugIdentifyCorners) {
             cout << endl << "Before identification: Corner: " << *i << endl;
@@ -2552,23 +2577,24 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 
         // Keep it completely abstract
         if (possibleClassifications.empty()) {
-            i->setPossibleCorners(ConcreteCorner::getPossibleCorners(i->getShape()));
+            i->setPossibleCorners(ConcreteCorner::getPossibleCorners(
+                                      i->getShape()));
             if (debugIdentifyCorners) {
-                cout << "No matches were found for this corner; going to keep it "
-                     << "completely abstract." << endl;
+                cout << "No matches were found for this corner; going to keep "
+                     << "it completely abstract." << endl;
                 printPossibilities(i->getPossibleCorners());
             }
             ++i;
         }
 
         // It is unique, append to the front of the list
-        // In python we want the positively identified corners to come first so that
-        // they can inform the localization system and help identify abstract
-        // corners that might be in the frame
+        // For localization we want the positively identified corners to come
+        // first so  that  they can inform the localization system and help
+        // identify abstract corners that might be in the frame
         else if (possibleClassifications.size() == 1) {
             if (debugIdentifyCorners) {
-                cout << "Only one possibility; appending to the front of the list "
-                     << endl;
+                cout << "Only one possibility; appending to the front of the "
+                     << "list " << endl;
                 printPossibilities(possibleClassifications);
             }
 
@@ -2606,14 +2632,15 @@ const bool FieldLines::LCornerShouldBeTCorner(const VisualCorner &L) const {
 
 
     for (int i = 0; i < NUM_POSTS; ++i) {
-        if (posts[i]->getDistance() > 0 && posts[i]->getDistance() < CLOSE_DIST &&
+        if (posts[i]->getDistance() > 0 && posts[i]->getDistance() < CLOSE_DIST
             // Make sure the corner is approximately where a T should be
-            nearGoalTCornerLocation(L, posts[i])) {
+            && nearGoalTCornerLocation(L, posts[i])) {
 
             if (!LWorksWithPost(L, posts[i])) {
                 if (debugIdentifyCorners) {
-                    cout << "\tCorner should be classified as a T due to bad geometrical "
-                         << "configuration with the " << posts[i]->toString() << endl;
+                    cout << "\tCorner should be classified as a T due to bad "
+                         << "geometrical configuration with the "
+                         << posts[i]->toString() << endl;
                 }
                 return true;
             }
@@ -3196,8 +3223,6 @@ const bool FieldLines::probablyAtCenterCircle(vector<VisualLine> &lines,
 void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
     list<VisualCorner> &corners) {
 
-
-
     // It's very risky for us to allow any L corners at the edges of the
     // screen if there are no field objects on the screen to corroborate
     // what they are.
@@ -3208,10 +3233,13 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
     // If we do see field objects on the screen, we can use distance to
     // determine that the L corner is actually a T.
 
+    // We now also cut off T's near the edge since they may be CC intersections
+
     int oldNumCorners = corners.size();
 
-
     const int NUM_PIXELS_CLOSE_TO_EDGE = 15;
+    const int T_NUM_PIXELS_CLOSE_TO_EDGE = 20;
+
     // No field objects on screen..
     if (getVisibleFieldObjects().empty()) {
         int numLByEdge =
@@ -3219,16 +3247,41 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
                      LCornerNearEdgeOfScreen(SCREEN, NUM_PIXELS_CLOSE_TO_EDGE));
         list<VisualCorner>::iterator riskyCorners =
             remove_if(corners.begin(), corners.end(),
-                      LCornerNearEdgeOfScreen(SCREEN, NUM_PIXELS_CLOSE_TO_EDGE));
+                      LCornerNearEdgeOfScreen(SCREEN,
+                                              NUM_PIXELS_CLOSE_TO_EDGE));
 
         // We found at least one risky corner
         if (riskyCorners != corners.end()) {
             if (debugRiskyCorners || debugIdentifyCorners) {
-                cout << "Removing " << numLByEdge << " L corners that are within "
-                     << NUM_PIXELS_CLOSE_TO_EDGE << " pixels from the edge of the "
+                cout << "Removing " << numLByEdge
+                     << " L corners that are within "
+                     << NUM_PIXELS_CLOSE_TO_EDGE
+                     << " pixels from the edge of the "
                      << "screen; likely a T that is cut off." << endl;
             }
             corners.erase(riskyCorners, corners.end());
+        }
+
+        // Do it again for T corners which may be CC intersections
+        int numTByEdge =
+            count_if(corners.begin(), corners.end(),
+                     TCornerNearEdgeOfScreen(SCREEN,
+                                             T_NUM_PIXELS_CLOSE_TO_EDGE));
+        list<VisualCorner>::iterator riskyTCorners =
+            remove_if(corners.begin(), corners.end(),
+                      TCornerNearEdgeOfScreen(SCREEN,
+                                              T_NUM_PIXELS_CLOSE_TO_EDGE));
+
+        // We found at least one risky corner
+        if (riskyTCorners != corners.end()) {
+            if (debugRiskyCorners || debugIdentifyCorners) {
+                cout << "Removing " << numTByEdge
+                     << " T corners that are within "
+                     << T_NUM_PIXELS_CLOSE_TO_EDGE
+                     << " pixels from the edge of the "
+                     << "screen; likely a CC that is cut off." << endl;
+            }
+            corners.erase(riskyTCorners, corners.end());
         }
     }
 
@@ -3258,7 +3311,7 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
     // and calculate its distances from various field objects that are
     // visible in field.  Attempt to determine if the visual corner we have
     // matches up with this prototypical center circle corner in terms of distance
-    ConcreteCorner const * center_circle_corner = &ConcreteCorner::center_circle;
+    ConcreteCorner const * center_circle_corner = &ConcreteCorner::fake_cc;
     vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
 
     // If there's a close goal in the frame, we couldn't be near the center
@@ -3600,7 +3653,7 @@ float FieldLines::getEstimatedAngle(const VisualLine &line1,
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
     float theta = TO_DEG * NBMath::safe_acos(dotProduct/
-                                      (lengthOfVector1 * lengthOfVector2));
+                                             (lengthOfVector1 * lengthOfVector2));
     return theta;
 }
 
