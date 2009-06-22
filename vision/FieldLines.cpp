@@ -169,11 +169,11 @@ void FieldLines::lineLoop() {
     unusedPointsList = linePoints;
 
     //  startTime = vision->getMillisFromStartup();
-    
+
      if (isGoalie) {
      extendLines(linesList);
     }
-    
+
 
     // Corners is a global member of FieldLines
     //startTime = vision->getMillisFromStartup();
@@ -2343,7 +2343,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             float t_J = Utility::
                 findLinePointDistanceFromStart(intersection, *j);
 
-
+            // TODO: Make this identify the corner as a center circle corner
             if (Utility::tValueInMiddleOfLine(t_I, i->length,
                                               static_cast<float>(MIN_CROSS_EXTEND)) &&
                 Utility::tValueInMiddleOfLine(t_J, j->length,
@@ -3258,7 +3258,7 @@ const bool FieldLines::probablyAtCenterCircle2(vector<VisualLine> &lines,
     // and calculate its distances from various field objects that are
     // visible in field.  Attempt to determine if the visual corner we have
     // matches up with this prototypical center circle corner in terms of distance
-    ConcreteCorner const * center_circle_corner = &ConcreteCorner::center_circle;
+    ConcreteCorner const * center_circle_corner = &ConcreteCorner::fake_cc;
     vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
 
     // If there's a close goal in the frame, we couldn't be near the center

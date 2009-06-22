@@ -111,6 +111,11 @@ static const float LANDMARK_YELLOW_GOAL_CROSS_Y = MIDFIELD_Y;
 static const float CC_LINE_CROSS_X = MIDFIELD_X;
 static const float CC_LINE_CROSS_Y = MIDFIELD_Y;
 
+static const float TOP_CC_Y = CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS;
+static const float TOP_CC_X = CENTER_FIELD_X;
+static const float BOTTOM_CC_Y = CENTER_FIELD_Y - CENTER_CIRCLE_RADIUS;
+static const float BOTTOM_CC_X = CENTER_FIELD_X;
+
 static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
 
 #endif // File
