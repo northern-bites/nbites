@@ -253,7 +253,10 @@ class Brain(object):
                           self.ball.dist,
                           self.playbook.role,
                           self.playbook.currentSubRole,
-                          2)#self.playbook.me.chaseTime) # Chase Time
+                          2, #self.playbook.me.chaseTime, # Chase Time
+                          self.loc.ballVelX,
+                          self.loc.ballVelY)
+
 
 
 
