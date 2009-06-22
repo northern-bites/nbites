@@ -9,45 +9,9 @@
 #include <iomanip> // setprecision for cout
 #include <boost/shared_ptr.hpp>
 
-
 class FieldLines;
 
-
-//#define LINES_PROFILING
-
-// LINE IDS
-// COMPLETELY GENERAL ID
-#define INDETERMINATE_LINE 0
-
-// FUZZY LINE IDS
-#define GOAL_FRONT 1
-#define GOAL_LEFT 2
-#define GOAL_RIGHT 3
-#define GOAL_BACK 4
-// Cannot see which side of the field you're on
-#define SIDELINE 5
-
-// SPECIFIC LINE IDS
-#define MIDLINE 6
-#define BY_LINE 7
-#define YB_LINE 8
-#define BLUE_GOAL_BACK_LINE 9
-#define BLUE_GOAL_FRONT_LINE 10
-#define BLUE_GOAL_LEFT_LINE 11
-#define BLUE_GOAL_RIGHT_LINE 12
-#define YELLOW_GOAL_BACK_LINE 13
-#define YELLOW_GOAL_FRONT_LINE 14
-#define YELLOW_GOAL_LEFT_LINE 15
-#define YELLOW_GOAL_RIGHT_LINE 16
-
-
-// CENTER CIRCLE IDS
-#define PARTIALLY_OBSCURED 0
-#define ALL_VISIBLE 1
-
-
 #include "FieldConstants.h"
-
 
 // Signifies that the angle between two lines could not be calculated
 static const int BAD_ANGLE = -22354;
@@ -59,17 +23,15 @@ enum TestDirection {TEST_UP, TEST_DOWN, TEST_LEFT, TEST_RIGHT};
 
 struct linePoint;
 
-
-#include "Common.h"                   //
-#include "ifdefs.h"                   //
-#include "VisualFieldObject.h"        //
-#include "ConcreteFieldObject.h"        //
-#include "ConcreteCorner.h"           //
-#include "VisualCorner.h"             //
+#include "Common.h" //
+#include "ifdefs.h" //
+#include "VisualFieldObject.h" //
+#include "ConcreteFieldObject.h" //
+#include "ConcreteCorner.h" //
+#include "VisualCorner.h" //
 #include "VisualLine.h"
-#include "Utility.h"                  //
-#include "NaoPose.h"                     // Used to estimate distances in the image
-
+#include "Utility.h" //
+#include "NaoPose.h" // Used to estimate distances in the image
 #include "Vision.h"
 
 // functor that returns true if the line passed in is used in the creation
@@ -82,10 +44,6 @@ public:
         return c.getLine1() == line || c.getLine2() == line;
     }
 };
-
-// The definition of the struct cornerArc and centerCircle can be found circa
-// revision 4850
-
 
 static const int NO_EDGE = -3;
 
@@ -243,9 +201,9 @@ private:
 
     // AIBOSPECIFIC
     static const int MIN_CROSS_EXTEND = 10;
-    // When estimating the angle between two lines on the field, anything less than
-    // MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect and
-    // disallowed; ideally our estimates would always be 90.0 degrees
+    // When estimating the angle between two lines on the field, anything less
+    // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
+    // and disallowed; ideally our estimates would always be 90.0 degrees
     static const int MIN_ANGLE_ON_FIELD = 65;
     static const int MAX_ANGLE_ON_FIELD = 120;
     // AIBOSPECIFIC
