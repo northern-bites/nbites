@@ -1,17 +1,19 @@
 import man.motion.HeadMoves as HeadMoves
+from . import TrackingConstants as constants
 
-TRACKER_FRAMES_ON_TRACK_THRESH = 1 #num frms after which to switch to scanfindbl
 
 def scanBall(tracker):
     ball = tracker.brain.ball
 
     if tracker.target == ball and \
-            tracker.target.framesOn >= TRACKER_FRAMES_ON_TRACK_THRESH:
+            tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
 
+
     if not tracker.brain.motion.isHeadActive():
         lastBallDist = ball.lastSeenDist
+
         if lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.execute(HeadMoves.HIGH_SCAN_BALL)
 
@@ -38,20 +40,29 @@ def locPans(tracker):
 
 def panLeftOnce(tracker):
     if tracker.firstFrame():
-        tracker.execute(HeadMoves.PAN_LEFT)
+        tracker.panTo(HeadMoves.PAN_LEFT_HEADS)
+        return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
-
     return tracker.stay()
 
 def panRightOnce(tracker):
     if tracker.firstFrame():
-        tracker.execute(HeadMoves.PAN_RIGHT)
+        tracker.panTo(HeadMoves.PAN_RIGHT_HEADS)
+        return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
+    return tracker.stay()
 
+def panUpOnce(tracker):
+    if tracker.firstFrame():
+        tracker.panTo(HeadMoves.PAN_UP_HEADS)
+        return tracker.stay()
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
 def postScan(tracker):

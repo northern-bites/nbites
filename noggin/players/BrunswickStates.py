@@ -13,7 +13,7 @@ def gameReady(player):
 
     player.gainsOn()
     player.standup()
-    player.brain.tracker.switchTo('locPans')
+    player.brain.tracker.locPans()
     return player.goLater('playbookPosition')
 
 def gameSet(player):
@@ -38,3 +38,16 @@ def gamePlaying(player):
 if WEBOTS_ACTIVE:
     gameInitial=gamePlaying
 
+def penaltyShotsGameReady(player):
+    if player.firstFrame():
+        player.brain.tracker.locPans()
+        player.standup()
+    return player.stay()
+
+def penaltyShotsGameSet(player):
+    if player.firstFrame():
+        player.brain.tracker.activeLoc()
+    return player.stay()
+
+def penaltyShotsGamePlaying(player):
+    return player.goNow('penaltyKick')

@@ -67,8 +67,7 @@ def goaliePositionBallClose(player):
         position = player.brain.playbook.position
         if nav.destX != position[0] or nav.destY != position[1] or\
                 player.firstFrame():
-            nav.orthoGoTo(position[0], position[1],
-                          NogginConstants.OPP_GOAL_HEADING)
+            nav.orthoGoTo(position)
         # we're at the point, let's switch to another state
             '''if nav.isStopped() and player.counter > 0:
             return player.goLater('goalieAtPosition')'''
@@ -117,11 +116,9 @@ def goaliePositionBallFar(player):
         if nav.destX != position[0] or nav.destY != position[1] or\
                 useOrtho!=nav.movingOrtho or player.firstFrame():
             if useOrtho:
-                nav.orthoGoTo(position[0], position[1],
-                              NogginConstants.OPP_GOAL_HEADING)
+                nav.orthoGoTo(position)
             else:
-                nav.goTo(position[0], position[1],
-                         NogginConstants.OPP_GOAL_HEADING)
+                nav.goTo(position)
     '''# we're at the point, let's switch to another state
     if nav.isStopped() and player.counter > 0:
         return player.goLater('goalieAtPosition')'''

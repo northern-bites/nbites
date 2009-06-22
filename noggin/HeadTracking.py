@@ -1,4 +1,5 @@
 
+from . import TrackingConstants as constants
 from . import TrackingStates
 from . import PanningStates
 from .util import FSA
@@ -7,16 +8,6 @@ from man.motion import MotionConstants
 import util.MyMath as MyMath
 from man.motion import StiffnessModes
 from math import fabs
-
-#constants need to go in another file.
-#maybe auto generated on boot?
-TRACKING = 'tracking'
-
-LOC_PANS = 'locPans'
-
-PAN_LEFT_ONCE = 'panLeftOnce'
-
-MAX_PAN_SPEED = 60              # deg/sec
 
 class HeadTracking(FSA.FSA):
     def __init__(self, brain):
@@ -54,7 +45,7 @@ class HeadTracking(FSA.FSA):
                              " specifiy both angleX and angleY"+str(len(args)))
 
     def isTracking(self):
-        return self.currentState == TRACKING
+        return self.currentState == constants.TRACKING
 
     def stopHeadMoves(self):
         self.switchTo('stop')
@@ -164,11 +155,11 @@ class HeadTracking(FSA.FSA):
         headPitch = motionAngles[MotionConstants.HeadPitch]
         headYaw = motionAngles[MotionConstants.HeadYaw]
 
-        pitchDiff = fabs(heads[0] - headPitch)
-        yawDiff = fabs(heads[1] - headYaw)
+        yawDiff = fabs(heads[0] - headYaw)
+        pitchDiff = fabs(heads[1] - headPitch)
+
 
         maxDiff = max(pitchDiff, yawDiff)
-        panTime = maxDiff/MAX_PAN_SPEED
-
+        panTime = maxDiff/constants.MAX_PAN_SPEED
         self.execute( ((heads, panTime, 1,
                         StiffnessModes.LOW_HEAD_STIFFNESSES),) )

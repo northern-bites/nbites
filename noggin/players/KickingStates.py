@@ -54,6 +54,9 @@ def decideKick(player):
 
     player.printf(player.kickDecider)
 
+    if player.penaltyKicking:
+        return player.goNow('penaltyKickBall')
+
     kickObjective = player.getKickObjective()
 
     if kickObjective == constants.OBJECTIVE_CLEAR:
@@ -313,7 +316,7 @@ def kickBallStraight(player):
             return player.goNow('stepRightForKick')
 
         else :                  # INCORRECT_POS
-            return player.goLater('chase')
+            return player.goLater('positionForKick')
 
 def shootBall(player):
     """
@@ -428,6 +431,13 @@ def shootBall(player):
             if constants.DEBUG_KICKS: print "\t\t Straight 5"
             return player.goLater('kickBallStraight')
 
+def penaltyKickBall(player):
+    if not player.penaltyMadeFirstKick:
+        return player.goLater('kickBallStraight')
+    if not player.penaltyMadeSecondKick:
+        return player.goLater('alignOnBallStraightKick')
+    return player.stay()
+
 
 def kickBallLeft(player):
     """
@@ -504,13 +514,15 @@ def alignOnBallStraightKick(player):
 
     return player.stay()
 
-
-
-
 def kickBallExecute(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.executeMove(player.chosenKick)
+
+        if not player.penaltyMadeFirstKick:
+            player.penaltyMadeFirstKick = True
+        elif not player.penaltyMadeSecondKick:
+            player.penaltyMadeSecondKick = True
 
     elif player.stateTime >= SweetMoves.getMoveTime(player.chosenKick):
         return player.goLater('afterKick')
