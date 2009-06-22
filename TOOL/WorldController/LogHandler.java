@@ -238,8 +238,9 @@ public class LogHandler
      */
     public boolean initLog()
     {
+        // Save the last used directory
         logFile = wc.openDialog("Locate Log File to Load",
-                                System.getProperty("user.dir"),
+                                wc.t.wcLastDirectory,
                                 FileDialog.LOAD);
 
         if (logFile == null) {
@@ -247,7 +248,7 @@ public class LogHandler
             wc.setMode(wc.DO_NOTHING);
             return false;
         } else if (!loadLog(logFile)) {
-            System.out.println("log file not unable to load");
+            System.out.println("log file unable to load");
             return false;
         }
 
@@ -582,8 +583,10 @@ public class LogHandler
             // get the list of possible landmarks
             ++ambiguousLandmarkCount;
             for (int pos_id : getPossibleIDs(ID)) {
-                painter.sawLandmark((float)debugViewer.objectIDMap.get(pos_id).x,
-                                    (float)debugViewer.objectIDMap.get(pos_id).y,
+                painter.sawLandmark((float)
+                                    debugViewer.objectIDMap.get(pos_id).x,
+                                    (float)
+                                    debugViewer.objectIDMap.get(pos_id).y,
                                     ambiguousLandmarkCount);
             }
         } else { // We Have a ball ignore...
@@ -598,6 +601,23 @@ public class LogHandler
     {
         Vector<Integer> pos =  new Vector<Integer>();
         switch(ID) {
+        case DebugViewer.CORNER_NO_IDEA_ID:
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_BOTTOM_L));
+            pos.add(new Integer(DebugViewer.BLUE_CORNER_TOP_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_BOTTOM_L));
+            pos.add(new Integer(DebugViewer.YELLOW_CORNER_TOP_L));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_L));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_L));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_LEFT_T));
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_RIGHT_T));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_LEFT_T));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_RIGHT_T));
+            pos.add(new Integer(DebugViewer.CENTER_BOTTOM_T));
+            pos.add(new Integer(DebugViewer.CENTER_TOP_T));
+            break;
+
         case DebugViewer.L_INNER_CORNER:
         case DebugViewer.L_OUTER_CORNER:
             pos.add(new Integer(DebugViewer.BLUE_CORNER_BOTTOM_L));
@@ -664,6 +684,10 @@ public class LogHandler
         case DebugViewer.YELLOW_GOAL_POST:
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_TOP_POST));
             pos.add(new Integer(DebugViewer.YELLOW_GOAL_BOTTOM_POST));
+            break;
+        case DebugViewer.ABSTRACT_CROSS:
+            pos.add(new Integer(DebugViewer.BLUE_GOAL_CROSS));
+            pos.add(new Integer(DebugViewer.YELLOW_GOAL_CROSS));
             break;
         }
         return pos;

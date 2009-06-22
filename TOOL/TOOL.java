@@ -87,7 +87,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private JSplitPane split_pane;
     private JTabbedPane tabs;
     private boolean split_changing;
-
+    public String wcLastDirectory;
     //menu components
     JMenuItem quit, about, controls;
     //menus
@@ -132,6 +132,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private static final String DEFAULT_COLOR_TABLE_STRING =
         "default_color_table";
 
+    private static final String DEFAULT_WC_DIRECTORY_STRING =
+        "default_wc_directory_string";
     //starts an instance of a tool, which ties together all the sub modules
     public TOOL(){
 
@@ -187,6 +189,10 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // sql - load datasets from the MySQL HiveMind database
         //addModule(new SQLModule(this));
         // wordcontroller - view and control robot udp broadcasts in realtime
+
+        // Try to get the last directory we used for the world controller
+        wcLastDirectory = prefs.get(DEFAULT_WC_DIRECTORY_STRING,
+                                    System.getProperty("user.dir"));
         addModule(new WorldControllerModule(this));
 
         // Tell the modules which colortable they should use.
@@ -577,6 +583,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         saveWindowPrefs(prefs, mainWindow);
         saveTabPrefs(prefs, multiPane);
         saveColorTablePrefs(prefs);
+        saveDirectoryPrefs(prefs);
     }
 
     public void saveWindowPrefs(Preferences prefs, Window w) {
@@ -602,6 +609,9 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         }
     }
 
+    public void saveDirectoryPrefs(Preferences prefs) {
+        prefs.put(DEFAULT_WC_DIRECTORY_STRING, wcLastDirectory);
+    }
 
     public static void main(String[] args) {
         TOOL t = new TOOL();

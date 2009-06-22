@@ -40,10 +40,10 @@ public class DebugViewer extends JFrame {
     public static final String BALL_VEL_UNCERT_X_STRING = "Vel. Uncert X: ";
     public static final String BALL_VEL_UNCERT_Y_STRING = "Y: ";
     public static final String BALL_STRING = "Ball Dist/Bearing:";
-    public static final String ODO_XYH_CHANGE_STRING = "Odo X,Y,H:";
-    public static final String ODO_X_CHANGE_STRING = "Odo X:";
-    public static final String ODO_Y_CHANGE_STRING = "Odo Y:";
-    public static final String ODO_H_CHANGE_STRING = "Odo H:";
+    public static final String ODO_XYH_CHANGE_STRING = "Odo F,L,R:";
+    public static final String ODO_X_CHANGE_STRING = "Odo F:";
+    public static final String ODO_Y_CHANGE_STRING = "Odo L:";
+    public static final String ODO_H_CHANGE_STRING = "Odo R:";
     public static final String
         LANDMARK_STUFF_STRING = "ID  :  Dist  /  Bearing";
 
@@ -129,6 +129,7 @@ public class DebugViewer extends JFrame {
     public static final int YELLOW_GOAL_RIGHT_T = 26;
     public static final int YELLOW_GOAL_LEFT_L = 27;
     public static final int YELLOW_GOAL_RIGHT_L = 28;
+    public static final int CORNER_NO_IDEA_ID = 29;
 
     // Field Objects
     public static final int BLUE_GOAL_TOP_POST = 30;
@@ -137,6 +138,11 @@ public class DebugViewer extends JFrame {
     public static final int YELLOW_GOAL_TOP_POST = 33;
     public static final int BLUE_GOAL_POST = 34;
     public static final int YELLOW_GOAL_POST = 35;
+
+    // Visual Cross
+    public static final int BLUE_GOAL_CROSS = 80;
+    public static final int YELLOW_GOAL_CROSS = 81;
+    public static final int ABSTRACT_CROSS = 82;
 
     public int[] LANDMARK_X;
     public int[] LANDMARK_Y;
@@ -575,6 +581,9 @@ public class DebugViewer extends JFrame {
         objectIDStringMap.put(new Integer(13), "YELLOW GOAL OUTER L");
         objectIDMap.put(new Integer(14), emptyPoint);
         objectIDStringMap.put(new Integer(14), "CENTER T");
+        objectIDMap.put(new Integer(29), emptyPoint);
+        objectIDStringMap.put(new Integer(29), "NO IDEA CORNER");
+
         // Specific Corners
         Point2D.Double blueCornerTopL =
             new Point2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
@@ -685,6 +694,21 @@ public class DebugViewer extends JFrame {
         objectIDStringMap.put(new Integer(34), "Blue Goal Post");
         objectIDMap.put(new Integer(35), emptyPoint);
         objectIDStringMap.put(new Integer(35), "Yellow Goal Post");
+
+        Point2D.Double bg_cross =
+            new Point2D.Double(wc.the_field.LEFT_SIDELINE_X + 180.0f - 5.0f,
+                               wc.the_field.CENTER_FIELD_Y);
+        Point2D.Double yg_cross =
+            new Point2D.Double(wc.the_field.RIGHT_SIDELINE_X - 180.0f - 5.0f,
+                               wc.the_field.CENTER_FIELD_Y);
+
+
+        objectIDMap.put(new Integer(80), bg_cross);
+        objectIDStringMap.put(new Integer(80), "Blue Goal Cross");
+        objectIDMap.put(new Integer(81), yg_cross);
+        objectIDStringMap.put(new Integer(81), "Yellow Goal Cross");
+        objectIDMap.put(new Integer(82), emptyPoint);
+        objectIDStringMap.put(new Integer(82), "Abstract Cross");
     }
 
     public Dimension getMinimumSize()
@@ -764,6 +788,6 @@ public class DebugViewer extends JFrame {
 
     public boolean isDistinctLandmarkID(int ID)
     {
-        return ( ID >= 15 && ID <= 33);
+        return ( ID >= 15 && ID <= 33 && ID != 29 && ID != 82);
     }
 }
