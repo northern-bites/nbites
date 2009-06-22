@@ -37,3 +37,7 @@ def gameFinished(game):
         game.brain.player.switchTo('gameFinished')
 
     return game.stay()
+def penaltyShoots(game):
+    if game.firstFrame():
+        game.brain.player.switchTo('penaltyShots')
+    return game.stay()

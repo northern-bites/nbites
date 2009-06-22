@@ -54,7 +54,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     """
-    This method must be overriden by intersted SoccerPlayers
+    This method must be overriden by interested SoccerPlayers
     """
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
@@ -92,3 +92,20 @@ def gameFinished(player):
     if not player.motion.isBodyActive() and  player.GAME_FINISHED_satDown:
         player.gainsOff()
     return player.stay()
+
+
+########## PENALTY SHOT STATES #################
+def penaltyShotsGameInitial(player):
+    return player.goNow('gameInitial')
+
+def penaltyShotsGameReady(player):
+    return player.stay()
+
+def penaltyShotsGameSet(player):
+    return player.stay()
+
+def penaltyShotsGamePlaying(player):
+    return player.stay()
+
+def penaltyShotsGameFinished(player):
+    return player.goNow('gameFinished')

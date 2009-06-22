@@ -51,6 +51,7 @@ public:
     const uint8 player();
     const uint8 kickOffTeam();
     const GCGameState gameState();
+	const uint8 gameSecondaryState();
     const GCPenalty penalty();
     const GCPenalty penalties(uint16 player);
     const uint16 penaltySeconds();
