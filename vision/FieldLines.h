@@ -146,10 +146,10 @@ private:
     // static const int JOIN_MAX_X_OFFSET = static_cast<int>(.35 * IMAGE_WIDTH);
     // static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
     static const int MAX_ANGLE_TO_JOIN_LINES = 5;
-    // TODO: We want to be able to identify center circle lines by angles in the
-    //       joined lines
+    static const int MIN_ANGLE_TO_JOIN_CC_LINES = 10;
     static const int MAX_ANGLE_TO_JOIN_CC_LINES = 45;
     static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 6;
+    static const int MAX_DIST_BETWEEN_TO_JOIN_CC_LINES = 10;
 
 
     ////////////////////////////////////////////////////////////
@@ -182,14 +182,14 @@ private:
         static_cast<int>(.05 * IMAGE_WIDTH);
     // for dupeCorner() checks
     static const int DUPE_MIN_X_SEPARATION = 7;
-    static const int DUPE_MIN_Y_SEPARATION = 7;
+    static const int DUPE_MIN_Y_SEPARATION = 15;
 
     static const int MAX_CORNER_DISTANCE = 600;
     static const int MIN_CORNER_DISTANCE = 10;
 
     static const int CORNER_TEST_RADIUS = 1;
 
-    static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 10;
+    static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 25;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
     static const int MIN_CROSS_EXTEND = 20;
     // When estimating the angle between two lines on the field, anything less
@@ -345,8 +345,6 @@ public:
     // If it's a legitimate L, the post should be INSIDE of the two lines
     const bool LWorksWithPost(const VisualCorner& c,
                               const VisualFieldObject * post) const;
-
-    void identifyGoalieCorners(std::list<VisualCorner> &corners);
 
     void printFieldObjectsInformation();
 
@@ -678,8 +676,6 @@ private:
     static const bool printLinePointInfo = false;
     static const char *linePointInfoFile;
 
-    //whether player is a goalie
-    static const bool isGoalie = false;//true;
 #else
     static const bool debugVertEdgeDetect = false;
     static const bool debugHorEdgeDetect = false;
@@ -696,8 +692,6 @@ private:
     static const bool debugFitUnusedPoints = false;
 
     static const bool standardView = false;
-
-    bool isGoalie;
 
     static const bool printLinePointInfo = false;
     static const char *linePointInfoFile;
