@@ -58,7 +58,7 @@ void ikSpeedTest(){
                             0.0f,0.0f,0.0f};
 
 
-    const int NUM_ITERS = 10000;
+    const int NUM_ITERS = 1000000;
 
 
     for(int i = 0; i < NUM_ITERS; i++){
@@ -105,29 +105,62 @@ void ikSpeedTest(){
             break;
 
         }
+//#define DLS
+#ifdef DLS
         Kinematics::IKLegResult result =  Kinematics::dls(leg,
                                                           goal, startAngles);
+#else
+    ufvector3 footGoal = CoordFrame3D::vector3D(20,-60,-310);
+    ufvector3 footOrientation = CoordFrame3D::vector3D(0,0,0);
+    ufvector3 bodyGoal = CoordFrame3D::vector3D(0,0,0);
+    ufvector3 bodyOrientation = CoordFrame3D::vector3D(0,0,0);
+
+    Kinematics::IKLegResult result  = Kinematics::analyticLegIK(leg,
+                                                                goal,
+                                                                footOrientation,
+                                                                bodyGoal,
+                                                                bodyOrientation,
+                                                                startAngles[0]);
+#endif
     }
 
 }
 
 
 void anaIK(){
+    float startAngles[] = {-1.0f,0.0f,0.0f,
+                            0.0f,0.0f,0.0f};
 
-    ufvector3 footGoal = CoordFrame3D::vector3D(20,50,-310);
+    ufvector3 footGoal = CoordFrame3D::vector3D(20,-60,-310);
     ufvector3 footOrientation = CoordFrame3D::vector3D(0,0,0);
     ufvector3 bodyGoal = CoordFrame3D::vector3D(0,0,0);
     ufvector3 bodyOrientation = CoordFrame3D::vector3D(0,0,0);
 
-    Kinematics::IKLegResult result  = Kinematics::analyticLegIK(LLEG_CHAIN,
+    Kinematics::IKLegResult result  = Kinematics::analyticLegIK(RLEG_CHAIN,
                                                                 footGoal,
                                                                 footOrientation,
                                                                 bodyGoal,
-                                                                bodyOrientation);
+                                                                bodyOrientation,
+                                                                startAngles[0]);
+    cout << "Result angles: [";
+    for(int i =0; i < 6; i++){
+        cout <<result.angles[i]<<",";
+    }
+    cout <<"]"<<endl<<"Outcome "<< result.outcome<<endl;
+
+    cout<<endl<<endl;
+    Kinematics::IKLegResult result_dls =  Kinematics::dls(RLEG_CHAIN,
+                                                          footGoal,startAngles);
+    cout << "Result angles dls: [";
+    for(int i =0; i < 6; i++){
+        cout <<result_dls.angles[i]<<",";
+    }
+    cout <<"]"<<endl<<"Outcome dls"<<result_dls.outcome<<endl;
+
 }
 
 int main(){
-    anaIK();
+    //anaIK();
     //inverseKin();
     ikSpeedTest();
     //forwardKin();

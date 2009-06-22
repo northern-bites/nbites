@@ -446,7 +446,7 @@ Kinematics::dls(const ChainID chainID,
  * Overview - first we find all the angles in the knee, and ankle
  *            then we tackle the hip
  */
-
+//#define DEBUG_ANA
 const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
                                       const ufvector3 &footGoal,
                                       const ufvector3 &footOrientation,
@@ -454,7 +454,15 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
                                       const ufvector3 &bodyOrientation,
                                       const float givenHYPAngle)
 {
-
+    bool success = true;
+#ifdef DEBUG_ANA
+    cout << "anaIK inputs:"<<endl
+         <<"  footGoal: "<<footGoal<<endl
+         <<"  footOrientation: "<<footOrientation<<endl
+         <<"  bodyGoal: "<<bodyGoal<<endl
+         <<"  bodyOrientation: "<<bodyOrientation<<endl
+         <<"  HYP Angle: " <<givenHYPAngle<<endl;
+#endif
     //fo - translate from f to o
     const ufmatrix4 fo_Transform = CoordFrame4D::get6DTransform(footGoal(0),
                                                 footGoal(1),footGoal(2),
@@ -467,6 +475,10 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
                                                 bodyOrientation(0),
                                                 bodyOrientation(1),
                                                 bodyOrientation(2));
+#ifdef DEBUG_ANA
+    cout << "fo_Transform: "<<endl<< "  "<<fo_Transform<<endl;
+    cout << "co_Transform: "<<endl<< "  "<<co_Transform<<endl;
+#endif
     //fc - translate from f to o to c
     const ufmatrix4 fc_Transform =
         prod(CoordFrame4D::invertHomogenous(co_Transform),fo_Transform);
@@ -475,13 +487,17 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
     const ufmatrix4 cf_Transform =
         prod(CoordFrame4D::invertHomogenous(fo_Transform),co_Transform);
 
+#ifdef DEBUG_ANA
+    cout << "cf_Transform: "<<endl<< "  "<<cf_Transform<<endl;
+    cout << "fc_Transform: "<<endl<< "  "<<fc_Transform<<endl;
+#endif
 
     const float leg_sign = (chainID == LLEG_CHAIN ? 1.0f : -1.0f);
 
     //The location of the hip rotation center in the C frame
     const ufvector4 hipOffset_c = CoordFrame4D::vector4D(0.0f,
                                                          leg_sign*HIP_OFFSET_Y,
-                                                         HIP_OFFSET_Z);
+                                                         -HIP_OFFSET_Z);
     const ufvector4 ankleOffset_f =CoordFrame4D::vector4D(0.0f,
                                                           0.0f,
                                                           FOOT_HEIGHT);
@@ -491,22 +507,40 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
     const ufvector4 hipPosition_fprime =
         prod(cf_Transform,hipOffset_c) - ankleOffset_f;
 
+#ifdef DEBUG_ANA
+    cout<< "Hip position in fprime: "<< hipPosition_fprime<<endl;
+#endif
 
     //squared dist from ankle to hip
-    const float legLengthSq = norm_2(hipPosition_fprime);
-    const float legLength = std::sqrt(legLengthSq);
+    const float legLength = norm_2(hipPosition_fprime);
+    const float legLengthSq = std::pow(legLength,2);
+    if(legLength > THIGH_LENGTH+TIBIA_LENGTH)
+        success = false;
+#ifdef DEBUG_ANA
+    cout<< "LegLength: "<< legLength << ", sqrd = "<<legLengthSq<<endl;
+#endif
+
     //Using the law of cosines to find knee pitch in TTL triangle
     const float kneeCosine =
-        (legLengthSq -TIBIA_LENGTH*TIBIA_LENGTH - TIBIA_LENGTH*TIBIA_LENGTH)/
+        (legLengthSq -TIBIA_LENGTH*TIBIA_LENGTH - THIGH_LENGTH*THIGH_LENGTH)/
                   (2.0f*TIBIA_LENGTH*THIGH_LENGTH);
+#ifdef DEBUG_ANA
+    cout<< "KneeCosine: "<<kneeCosine
+        << " unclipped cos"<< std::acos(kneeCosine)<<endl;
+#endif
+
     const float KP = std::acos(std::min(std::max(kneeCosine,-1.0f),
                                                1.0f));
-
-
+#ifdef DEBUG_ANA
+    cout<< "Calculated KP: "<<KP<<endl;
+#endif
     //Now, we can find the ankle roll using only the position of hip in f:
     const float AR = std::atan2(hipPosition_fprime(CoordFrame4D::Y_AXIS),
                                 hipPosition_fprime(CoordFrame4D::Z_AXIS));
 
+#ifdef DEBUG_ANA
+    cout<< "Calculated AR: "<<AR<<endl;
+#endif
 
     //To find AP, we first use the law of sines to find angle opposite
     //the THIGH in the TTL tri.
@@ -516,6 +550,10 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
     const float pitch0 = std::asin(THIGH_LENGTH*std::sin(KP)/legLength);
     const float AP =
         std::asin(-hipPosition_fprime(CoordFrame4D::X_AXIS)/legLength) - pitch0;
+
+#ifdef DEBUG_ANA
+    cout<< "Calculated AP: "<<AP<<endl;
+#endif
 
     float tempHYP = givenHYPAngle;
     //If the HYP was not passed in, we need to find it:
@@ -562,6 +600,9 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
         }
     }
     const float HYP = tempHYP;
+#ifdef DEBUG_ANA
+    cout<< "Calculated HYP: "<<HYP<<endl;
+#endif
 
     //Now we are left only to find the HipRoll and HipPitch
 
@@ -581,12 +622,18 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
     //Finding the hip Roll easy in the d frame:
     const float HR = std::atan2(anklePosition_d(CoordFrame4D::Y_AXIS),
                                 -anklePosition_d(CoordFrame4D::Z_AXIS));
+#ifdef DEBUG_ANA
+    cout<< "Calculated HR: "<<HR<<endl;
+#endif
 
     //Again, using the law of sines, we can find the angle accross from
     //TIBIA_LENGTH in the triangle TTL:
     const float pitch1 = std::asin(TIBIA_LENGTH*std::sin(KP)/legLength);
     const float HP = std::asin(-anklePosition_d(CoordFrame4D::X_AXIS)
-                               /legLength);
+                               /legLength) - pitch1;
+#ifdef DEBUG_ANA
+    cout<< "Calculated HP: "<<HP<<endl;
+#endif
 
     //Setup the return value:
     IKLegResult result;
@@ -597,7 +644,7 @@ const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
     result.angles[3] = KP;
     result.angles[4] = AP;
     result.angles[5] = AR;
-    result.outcome = SUCCESS;
+    result.outcome = (success ? SUCCESS : STUCK);
     return result;
 }
 
