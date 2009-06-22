@@ -32,7 +32,8 @@ MAN_HOME := $(META_DIR)/../man
 
 NATIVE_VISION_SRCS := TOOLVisionLink.cpp
 NATIVE_VISION_LIBS := $(MAN_HOME)/build/cmake.vision/libvision.a \
-	$(MAN_HOME)/build/cmake.man.corpus/lib_sensors.a
+	$(MAN_HOME)/build/cmake.man.corpus/lib_sensors.a \
+$(MAN_HOME)/build/cmake.man.corpus/lib_nb_include.a
 
 
 NATIVE_VISION_CLASS_FILE := TOOLVisionLink
