@@ -165,9 +165,16 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         my = self.brain.my
 
         if self.penaltyKicking:
-            return self.getPenaltyKickingApproachPosition()
+            destKickLocX, destKickLocY =  \
+                self.getPenaltyKickingBallDest()
+            destH = MyMath.getRelativeBearing(ball.x,
+                                              ball.y,
+                                              NogginConstants.
+                                              OPP_GOAL_HEADING,
+                                              destKickLocX,
+                                              destKickLocY)
 
-        if self.inFrontOfBall():
+        elif self.inFrontOfBall():
             destH = self.getApproachHeadingFromFront()
         else :
             destH = self.getApproachHeadingFromBehind()
@@ -209,9 +216,17 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         return NogginConstants.OPP_GOALBOX_RIGHT_X, \
             NogginConstants.OPP_GOALBOX_MIDDLE_Y
 
-    def getPenaltyKickingApproachPosition(self):
+    def getPenaltyKickingBallDest(self):
         if not self.penaltyMadeFirstKick:
-            return NogginConstants.FIELD_WIDTH * 3/4, \
-                NogginConstants.FIELD_HEIGHT /4
-        if not self.penaltyMadeSecondKick:
-            return NogginConstants.OPP_GOAL_MIDPOINT
+            return (NogginConstants.FIELD_WIDTH * 3/4,
+                    NogginConstants.FIELD_HEIGHT /4)
+
+        return (NogginConstants.OPP_GOAL_MIDPOINT[0],
+                NogginConstants.OPP_GOAL_MIDPOINT[1] )
+
+    def ballInOppGoalBox(self):
+        ball = self.brain.ball
+        return NogginConstants.OPP_GOALBOX_LEFT_X < ball.x < \
+            NogginConstants.OPP_GOALBOX_RIGHT_X and \
+            NogginConstants.OPP_GOALBOX_TOP_Y > ball.y > \
+            NogginConstants.OPP_GOALBOX_BOTTOM_Y

@@ -77,10 +77,5 @@ def activeTracking(tracker):
         elif tracker.activePanDir == constants.PAN_LEFT:
             return tracker.goLater('panLeftOnce')
         elif tracker.activePanDir == constants.PAN_UP:
-            if tracker.preActivePanHeads[1] >= constants.PAN_UP_PITCH_THRESH:
-                return tracker.goLater('panUpOnce')
-            else:
-                tracker.activePanDir += 1
-                return tracker.goLater('panRightOnce')
+            return tracker.goLater('panUpOnce')
     return tracker.stay()
-

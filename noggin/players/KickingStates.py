@@ -10,7 +10,7 @@ import ChaseBallConstants
 from .. import NogginConstants
 import ChaseBallTransitions
 from math import fabs
-from ..util.MyMath import getRelativeBearing, sign
+from ..util import MyMath
 
 
 def getKickInfo(player):
@@ -136,7 +136,7 @@ def clearBall(player):
             ORBIT_BEARING_THRESH = 45
             if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
                 if constants.DEBUG_KICKS: print ("\t\torbit!")
-                player.orbitAngle = sign(avgMyGoalBearing) * \
+                player.orbitAngle = MyMath.sign(avgMyGoalBearing) * \
                     (180 - fabs(avgMyGoalBearing) )
                 return player.goLater('orbitBall')
             # kick right
@@ -149,17 +149,17 @@ def clearBall(player):
                 return player.goLater('kickBallLeft')
         else:
             if myLeftPostBearing is not None:
-                player.orbitAngle = sign(myLeftPostBearing) * \
+                player.orbitAngle = MyMath.sign(myLeftPostBearing) * \
                     (180 - fabs(myLeftPostBearing) )
             else :
-                player.orbitAngle = sign(myRightPostBearing) * \
+                player.orbitAngle = MyMath.sign(myRightPostBearing) * \
                     (180 - fabs(myRightPostBearing) )
             return player.goLater('orbitBall')
 
     else:
         # use localization for kick
         my = player.brain.my
-        bearingToGoal = getRelativeBearing(my.x, my.y, my.h,
+        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                            NogginConstants.OPP_GOALBOX_RIGHT_X,
                                            NogginConstants.OPP_GOALBOX_MIDDLE_Y)
 
@@ -248,7 +248,7 @@ def centerBall(player):
             ORBIT_BEARING_THRESH = 45
             if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
                 if constants.DEBUG_KICKS: print ("\t\torbit!")
-                player.orbitAngle = sign(avgMyGoalBearing) * \
+                player.orbitAngle = MyMath.sign(avgMyGoalBearing) * \
                     (180 - fabs(avgMyGoalBearing) )
                 return player.goLater('orbitBall')
             # kick right
@@ -261,17 +261,17 @@ def centerBall(player):
                 return player.goLater('kickBallLeft')
         else:
             if myLeftPostBearing is not None:
-                player.orbitAngle = sign(myLeftPostBearing) * \
+                player.orbitAngle = MyMath.sign(myLeftPostBearing) * \
                     (180 - fabs(myLeftPostBearing) )
             else :
-                player.orbitAngle = sign(myRightPostBearing) * \
+                player.orbitAngle = MyMath.sign(myRightPostBearing) * \
                     (180 - fabs(myRightPostBearing) )
             return player.goLater('orbitBall')
 
     else:
         # use localization for kick
         my = player.brain.my
-        bearingToGoal = getRelativeBearing(my.x, my.y, my.h,
+        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                            NogginConstants.OPP_GOALBOX_RIGHT_X,
                                            NogginConstants.OPP_GOALBOX_MIDDLE_Y)
 
@@ -393,7 +393,7 @@ def shootBall(player):
             ORBIT_BEARING_THRESH = 45
             if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
                 if constants.DEBUG_KICKS: print ("\t\torbit!")
-                player.orbitAngle = sign(avgMyGoalBearing) * \
+                player.orbitAngle = MyMath.sign(avgMyGoalBearing) * \
                     (180 - fabs(avgMyGoalBearing) )
                 return player.goLater('orbitBall')
             # kick right
@@ -406,17 +406,17 @@ def shootBall(player):
                 return player.goLater('kickBallLeft')
         else:
             if myLeftPostBearing is not None:
-                player.orbitAngle = sign(myLeftPostBearing) * \
+                player.orbitAngle = MyMath.sign(myLeftPostBearing) * \
                     (180 - fabs(myLeftPostBearing) )
             else :
-                player.orbitAngle = sign(myRightPostBearing) * \
+                player.orbitAngle = MyMath.sign(myRightPostBearing) * \
                     (180 - fabs(myRightPostBearing) )
             return player.goLater('orbitBall')
 
     else:
         # use localization for kick
         my = player.brain.my
-        bearingToGoal = getRelativeBearing(my.x, my.y, my.h,
+        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                            NogginConstants.OPP_GOALBOX_RIGHT_X,
                                            NogginConstants.OPP_GOALBOX_MIDDLE_Y)
 
@@ -432,10 +432,27 @@ def shootBall(player):
             return player.goLater('kickBallStraight')
 
 def penaltyKickBall(player):
+    ball = player.brain.ball
+
     if not player.penaltyMadeFirstKick:
         return player.goLater('kickBallStraight')
     if not player.penaltyMadeSecondKick:
-        return player.goLater('alignOnBallStraightKick')
+
+
+        ballBearingToGoal = MyMath.getRelativeBearing(ball.x,
+                                                      ball.y,
+                                                      NogginConstants.
+                                                      OPP_GOAL_HEADING,
+                                                      NogginConstants.
+                                                      OPP_GOAL_MIDPOINT[0],
+                                                      NogginConstants.
+                                                      OPP_GOAL_MIDPOINT[1] )
+
+        player.angleToAlign = ballBearingToGoal - player.brain.my.h
+        if player.angleToAlign < constants.ALIGN_FOR_KICK_MIN_ANGLE:
+            return player.goLater('kickBallStraight')
+        else:
+            return player.goLater('alignOnBallStraightKick')
     return player.stay()
 
 
@@ -509,7 +526,7 @@ def alignOnBallStraightKick(player):
         player.brain.nav.orbitAngle(-player.angleToAlign)
 
     # Deal with ball changed positions?
-    if player.brain.nav.isStopped():
+    elif player.brain.nav.isStopped():
         return player.goLater('positionForKick')
 
     return player.stay()
@@ -538,6 +555,9 @@ def afterKick(player):
     # trick the robot into standing up instead of leaning to the side
     player.walkPose()
     player.brain.tracker.trackBall()
+
+    if player.penaltyKicking:
+        return player.goLater('penaltyKickRelocalize')
 
     if player.chosenKick == SweetMoves.LEFT_FAR_KICK or \
             player.chosenKick == SweetMoves.RIGHT_FAR_KICK:

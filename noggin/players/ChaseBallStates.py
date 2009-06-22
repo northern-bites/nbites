@@ -91,7 +91,7 @@ def approachBallWithLoc(player):
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
-    elif transitions.shouldPositionForKick(player):
+    if transitions.shouldPositionForKick(player):
         return player.goLater('positionForKick')
     # elif transitions.shouldScanFindBall(player):
     #     return player.goLater('scanFindBall')
@@ -108,7 +108,8 @@ def approachBallWithLoc(player):
         player.brain.tracker.trackBall()
 
     dest = player.getApproachPosition()
-    useOmni = MyMath.dist(my.x, my.y, dest[0], dest[1]) <= 30.0
+    useOmni = MyMath.dist(my.x, my.y, dest[0], dest[1]) <= \
+        constants.APPROACH_OMNI_DIST
     changedOmni = False
 
     if useOmni != nav.movingOmni:
@@ -137,6 +138,11 @@ def approachBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
+
+    if player.penaltyKicking and \
+            player.ballInOppGoalBox():
+        player.stopWalking()
+        return player.stay()
 
     # Switch to other states if we should
     if transitions.shouldKick(player):
@@ -189,7 +195,7 @@ def positionForKick(player):
     # Determine approach speed
     targetY = ball.relY
 
-    sY = MyMath.clip(targetY * constants.PFK_Y_GAIN,
+    sY = MyMath.clip(targetY * constants.PFK_GAIN,
                      constants.PFK_MIN_Y_SPEED,
                      constants.PFK_MAX_Y_SPEED)
     if fabs(sY) < constants.PFK_MIN_Y_MAGNITUDE:
@@ -199,7 +205,7 @@ def positionForKick(player):
         targetX = (ball.relX -
                    (constants.BALL_KICK_LEFT_X_CLOSE +
                     constants.BALL_KICK_LEFT_X_FAR) / 2.0)
-        sX = MyMath.clip(ball.relX,
+        sX = MyMath.clip(ball.relX * constants.PFK_GAIN,
                          constants.PFK_MIN_X_SPEED,
                          constants.PFK_MAX_X_SPEED)
     else:
