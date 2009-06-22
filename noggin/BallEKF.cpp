@@ -107,6 +107,17 @@ BallEKF::BallEKF(float initX, float initY,
 
 void BallEKF::reset()
 {
+    // Reset all of the matrices to zeros
+    for(unsigned i = 0; i < numStates; ++i) {
+        for(unsigned j = 0; j < numStates; ++j) {
+            Q_k(i,j) = 0.0f;
+            P_k(i,j) = 0.0f;
+            P_k_bar(i,j) = 0.0f;
+        }
+        // xhat_k(i) = 0.0f;
+        // xhat_k_bar(i) = 0.0f;
+    }
+    // Set the initial values
     setXEst(INIT_BALL_X);
     setYEst(INIT_BALL_Y);
     setXVelocityEst(INIT_BALL_X_VEL);
@@ -127,7 +138,6 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     robotPose = p;
     // Update expected ball movement
     timeUpdate(MotionModel());
-    //limitAPrioriEst();
     limitAPrioriUncert();
 
     // We've seen a ball
@@ -141,9 +151,9 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
         // setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
         // setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
     }
-    //limitPosteriorEst();
     limitPosteriorUncert();
     clipBallEstimate();
+    limitPosteriorEst();
     testForNaNReset();
 }
 
@@ -283,18 +293,36 @@ void BallEKF::limitPosteriorEst()
     if(xhat_k(0) > X_EST_MAX) {
         xhat_k_bar(0) = X_EST_MAX;
         xhat_k(0) = X_EST_MAX;
+        xhat_k_bar(2) = 0.0f;
+        xhat_k(2) = 0.0f;
+        xhat_k_bar(3) = 0.0f;
+        xhat_k(3) = 0.0f;
+
     }
     if(xhat_k(0) < X_EST_MIN) {
         xhat_k_bar(0) = X_EST_MIN;
         xhat_k(0) = X_EST_MIN;
+        xhat_k_bar(2) = 0.0f;
+        xhat_k(2) = 0.0f;
+        xhat_k_bar(3) = 0.0f;
+        xhat_k(3) = 0.0f;
+
     }
     if(xhat_k(1) > Y_EST_MAX) {
         xhat_k_bar(1) = Y_EST_MAX;
         xhat_k(1) = Y_EST_MAX;
+        xhat_k_bar(2) = 0.0f;
+        xhat_k(2) = 0.0f;
+        xhat_k_bar(3) = 0.0f;
+        xhat_k(3) = 0.0f;
     }
     if(xhat_k(1) < Y_EST_MIN) {
         xhat_k_bar(1) = Y_EST_MIN;
         xhat_k(1) = Y_EST_MIN;
+        xhat_k_bar(2) = 0.0f;
+        xhat_k(2) = 0.0f;
+        xhat_k_bar(3) = 0.0f;
+        xhat_k(3) = 0.0f;
     }
     if(xhat_k(2) > VELOCITY_EST_MAX) {
         xhat_k_bar(2) = VELOCITY_EST_MAX;
@@ -465,8 +493,15 @@ void BallEKF::testForNaNReset()
 {
     if (isnan(getXEst()) || isnan(getYEst()) ||
         isnan(getXVelocityEst()) || isnan(getYVelocityEst())) {
-        reset();
         std::cout << "Reseting BallEKF do to nan value." << std::endl;
         std::cout << "Current values are " << *this << std::endl;
+        reset();
     }
+    if (isinf(getXEst()) || isinf(getYEst()) ||
+        isinf(getXVelocityEst()) || isinf(getYVelocityEst())) {
+        std::cout << "Reseting BallEKF do to inf value." << std::endl;
+        std::cout << "Current values are " << *this << std::endl;
+        reset();
+    }
+
 }

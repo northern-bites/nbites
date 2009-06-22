@@ -470,7 +470,7 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     teamColor, playerNumber, BALL_ID);
 
     float ballDist, ballBearing;
-
+    int lineCounter = 1;
     // Collect the frame by frame data
     while(!inputFile->eof()) {
         stringstream inputLine(stringstream::in | stringstream::out);
@@ -492,16 +492,19 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
 
         // Read in observations
         sightings.clear();
-        //cout << endl;
+        //cout << "Line #" << ++lineCounter << " basic data: " << lastOdo << " "
+        //     << ballDist << " " << ballBearing << " ";
+
         // Observations are separated by colons
         while(inputLine.peek() == ':') {
             int id;
             char c;
             float dist, bearing, distSD, bearingSD;
             inputLine >> c >> id >> dist >> bearing >> distSD >> bearingSD;
-            // cout << "Read in following info -- " << c << " " << id << " "
-            //      << dist << " " << bearing << " " << distSD << " "
-            //      << bearingSD << " ";
+
+            //cout  << c << " " << id << " " << dist << " " << bearing << " " << distSD << " "
+            //<< bearingSD << " ";
+
             Observation obs(id, dist, bearing, distSD, bearingSD,
                              Observation::isLineID(id));
             while(inputLine.peek() != ':' &&
@@ -510,8 +513,8 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     LineLandmark l;
                     inputLine >> l.x1 >> l.y1 >> l.x2 >> l.y2;
                     obs.addLinePossibility(l);
-                    cout << "Line " << l.x1 << " " << l.y1 << " "
-                         << l.x2 << " " << l.y2 << " ";
+                    // cout << "Line " << l.x1 << " " << l.y1 << " "
+                    //      << l.x2 << " " << l.y2 << " ";
                 } else {
                     PointLandmark p;
                     inputLine >> p.x >> p.y;
@@ -519,11 +522,11 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     //cout << "Point " << p.x << " " << p.y << " ";
                 }
             }
-            //cout << endl;
             if (! obs.isLine()) {
                 sightings.push_back(obs);
             }
         }
+        //cout << endl;
 
         // Update localization
         locEKF->updateLocalization(lastOdo, sightings);
