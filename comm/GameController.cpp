@@ -75,7 +75,6 @@ GameController::handle_packet(const char *msg, int len)
 
     // update global data
     controlData = packet;
-
     pthread_mutex_unlock(&mutex);
   }
 
@@ -140,6 +139,14 @@ GameController::validatePacket(const char *msg, int len,
     // passed all check, packet is valid
     return true;
   }
+}
+
+bool
+GameController::shouldResetTimer()
+{
+	if (controlData.state == STATE_INITIAL)
+		return true;
+	return false;
 }
 
 /* swap the teams in memory to maintain BLUE team first order */

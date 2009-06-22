@@ -811,7 +811,10 @@ Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 void
 Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw()
 {
-  gc->handle_packet(msg, len);
+	gc->handle_packet(msg, len);
+	if (gc->shouldResetTimer()){
+			timer.reset();
+		}
 }
 
 bool

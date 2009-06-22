@@ -41,7 +41,7 @@ public:
     const RoboCupGameControlData& getGameData() { return controlData; }
 
     void handle_packet(const char *msg, int len);
-
+	bool shouldResetTimer();
 
     // Public data access interface
     const uint32 timeRemaining();
