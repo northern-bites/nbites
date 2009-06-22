@@ -156,11 +156,13 @@ extern "C" {
             jbyte* row = env->GetByteArrayElements(row_target,0);
 
             for(int j = 0; j < IMAGE_WIDTH; j++){
-				row[j]= vision.thresh->thresholded[i][j];
-				// uncomment the next part to see debug drawing
-				/*if (vision.thresh->debugImage[i][j] != 0) {
-					row[j]= vision.thresh->debugImage[i][j]; //thresholded[i][j];
-					}*/
+                row[j]= vision.thresh->thresholded[i][j];
+#ifdef OFFLINE
+                if (vision.thresh->debugImage[i][j] != GREY) {
+                    row[j]= vision.thresh->debugImage[i][j];
+                }
+#endif
+
             }
             env->ReleaseByteArrayElements(row_target, row, 0);
         }
