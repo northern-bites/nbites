@@ -66,8 +66,8 @@ public:
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////
-    void setPossibleCorners(std::list <const ConcreteCorner *> _possibleCorners) {
-        possibleCorners = _possibleCorners; }
+    void setPossibleCorners(std::list <const ConcreteCorner *> _possibleCorners)
+        { possibleCorners = _possibleCorners; }
     void setShape(const shape s) { cornerType = s; }
     void setLine1(const VisualLine l1) { line1 = l1; }
     void setLine2(const VisualLine l2) { line2 = l2; }
@@ -138,6 +138,27 @@ public:
              abs(edges.right - x) < minPixelSeparation ||
              abs(edges.top - y) < minPixelSeparation ||
              abs(edges.bottom - y) < minPixelSeparation);
+    }
+};
+
+class TCornerNearEdgeOfScreen : public std::unary_function<VisualCorner,bool>
+{
+    Rectangle edges;
+    int minPixelSeparation;
+public:
+    explicit TCornerNearEdgeOfScreen(Rectangle _edges, int _pixels) :
+        edges(_edges), minPixelSeparation(_pixels) {}
+    bool operator() (const VisualCorner& c) const {
+        int x = c.getX();
+        int y = c.getY();
+
+        // Must be an L..
+        return (c.getShape() == T &&
+                // Edges must match
+                (abs(edges.left - x) < minPixelSeparation ||
+                 abs(edges.right - x) < minPixelSeparation ||
+                 abs(edges.top - y) < minPixelSeparation ||
+                 abs(edges.bottom - y) < minPixelSeparation));
     }
 };
 
