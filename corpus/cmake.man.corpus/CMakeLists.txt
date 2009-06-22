@@ -164,6 +164,11 @@ SET( CORPUS_PYTHON_SRCS ${CORPUS_INCLUDE_DIR}/__init__.py
 SET( CORPUS_TEST_DIR ${CORPUS_INCLUDE_DIR}/test )
 
 
+###### NBINCLUDE STUFF ####
+
+SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
+                   )
+
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
 # commands
@@ -185,10 +190,18 @@ IF( PYTHON_SHARED_CORPUS )
     SHARED
     ${ROBOT_CONNECT_SRCS}
     )
+  ADD_LIBRARY(
+    ${NBINCLUDE_TARGET}
+    SHARED
+    ${NBINCLUDE_SRCS}
+    )
+
   GET_TARGET_PROPERTY( SENSORS_TARGET_LOCATION ${SENSORS_TARGET} LOCATION )
   GET_TARGET_PROPERTY( SYNCHRO_TARGET_LOCATION   ${SYNCHRO_TARGET}   LOCATION )
   GET_TARGET_PROPERTY( ROBOT_CONNECT_TARGET_LOCATION
                        ${ROBOT_CONNECT_TARGET}   LOCATION )
+  GET_TARGET_PROPERTY( NBINCLUDE_TARGET_LOCATION
+                       ${NBINCLUDE_TARGET}   LOCATION )
   # Install to TARGETmodule.so, instead of lib_TARGET.so
   INSTALL(
     FILES ${SENSORS_TARGET_LOCATION}
@@ -208,6 +221,12 @@ IF( PYTHON_SHARED_CORPUS )
     CONFIGURATIONS "" Debug Release
     RENAME ${ROBOT_CONNECT_TARGET}module.so
     )
+  INSTALL(
+    FILES ${NBINCLUDE_TARGET_LOCATION}
+    DESTINATION ${CORPUS_PYTHON_TARGET_DIR}
+    CONFIGURATIONS "" Debug Release
+    RENAME ${NBINCLUDE_TARGET_LOCATION}module.so
+    )
 
 ELSE( PYTHON_SHARED_CORPUS )
   ADD_LIBRARY(
@@ -224,6 +243,11 @@ ELSE( PYTHON_SHARED_CORPUS )
     ${ROBOT_CONNECT_TARGET}
     STATIC
     ${ROBOT_CONNECT_SRCS}
+    )
+  ADD_LIBRARY(
+    ${NBINCLUDE_TARGET}
+    STATIC
+    ${NBINCLUDE_SRCS}
     )
   # No INSTALL target when static
 ENDIF( PYTHON_SHARED_CORPUS )
@@ -263,7 +287,8 @@ TARGET_LINK_LIBRARIES( ${ROBOT_CONNECT_TARGET} ${NBCOMMON_LIBRARIES}
                                                ${PTHREAD_LIBRARIES}
                                                ${PYTHON_LIBRARIES}
                                                )
-
+TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET} ${NBCOMMON_LIBRARIES}
+                                               )
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories (some may not actually be subdirectories) to

@@ -55,6 +55,7 @@ SET( NOGGIN_TARGET      noggin     )
 SET( SENSORS_TARGET     _sensors   )
 SET( SYNCHRO_TARGET     _synchro   )
 SET( ROBOT_CONNECT_TARGET     _robot_connect   )
+SET( NBINCLUDE_TARGET     _nb_include   )
 SET( VISION_TARGET      vision     )
 
 SET( MAN_PYTHON_TARGET_DIR    ${OUTPUT_ROOT_DIR_LIB}/man        )
