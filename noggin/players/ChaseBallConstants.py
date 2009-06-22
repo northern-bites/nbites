@@ -57,7 +57,8 @@ PFK_MIN_Y_SPEED = -PFK_MAX_Y_SPEED
 PFK_MAX_X_SPEED = 4.0
 PFK_MIN_X_SPEED = 0.0
 PFK_MIN_Y_MAGNITUDE = 1.5
-PFK_GAIN = 0.3
+PFK_X_GAIN = 0.1
+PFK_Y_GAIN = 0.8
 
 # Keep track of what gait we're using
 FAST_GAIT = "fastGait"

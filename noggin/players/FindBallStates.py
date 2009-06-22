@@ -1,5 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..util import MyMath
 
 def scanFindBall(player):
     """
@@ -30,7 +31,10 @@ def spinFindBall(player):
     if player.justKicked:
         spinDir = player.getSpinDirAfterKick()
     else:
-        spinDir = constants.TURN_LEFT
+        my = player.brain.my
+        ball = player.brain.ball
+        spinDir = MyMath.getSpinDir(my.h,
+                                    ball.bearing + my.h)
 
     player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 

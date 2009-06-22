@@ -195,7 +195,7 @@ def positionForKick(player):
     # Determine approach speed
     targetY = ball.relY
 
-    sY = MyMath.clip(targetY * constants.PFK_GAIN,
+    sY = MyMath.clip(targetY * constants.PFK_Y_GAIN,
                      constants.PFK_MIN_Y_SPEED,
                      constants.PFK_MAX_Y_SPEED)
     if fabs(sY) < constants.PFK_MIN_Y_MAGNITUDE:
@@ -205,7 +205,7 @@ def positionForKick(player):
         targetX = (ball.relX -
                    (constants.BALL_KICK_LEFT_X_CLOSE +
                     constants.BALL_KICK_LEFT_X_FAR) / 2.0)
-        sX = MyMath.clip(ball.relX * constants.PFK_GAIN,
+        sX = MyMath.clip(ball.relX * constants.PFK_X_GAIN,
                          constants.PFK_MIN_X_SPEED,
                          constants.PFK_MAX_X_SPEED)
     else:

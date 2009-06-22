@@ -541,7 +541,10 @@ def kickBallExecute(player):
         elif not player.penaltyMadeSecondKick:
             player.penaltyMadeSecondKick = True
 
-    elif player.stateTime >= SweetMoves.getMoveTime(player.chosenKick):
+    if player.brain.ball.framesOff > constants.LOOK_POST_KICK_FRAMES_OFF:
+        player.lookPostKick()
+
+    if player.stateTime >= SweetMoves.getMoveTime(player.chosenKick):
         return player.goLater('afterKick')
 
     return player.stay()
@@ -552,19 +555,24 @@ def afterKick(player):
     State to follow up after a kick.
     Currently exits after one frame.
     """
+    tracker = player.brain.tracker
+    chosenKick = player.chosenKick
+
     # trick the robot into standing up instead of leaning to the side
-    player.walkPose()
-    player.brain.tracker.trackBall()
+    if player.firstFrame():
+        player.walkPose()
 
-    if player.penaltyKicking:
-        return player.goLater('penaltyKickRelocalize')
+        if player.penaltyKicking:
+            return player.goLater('penaltyKickRelocalize')
 
-    if player.chosenKick == SweetMoves.LEFT_FAR_KICK or \
-            player.chosenKick == SweetMoves.RIGHT_FAR_KICK:
+        if player.brain.ball.on:
+            tracker.trackBall()
+        else:
+            player.lookPostKick()
+        return player.stay()
+
+    if not player.brain.motion.isHeadActive():
         return player.goLater('scanFindBall')
-    elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK or \
-            player.chosenKick == SweetMoves.LEFT_SIDE_KICK:
-        return player.goLater('spinFindBall')
     return player.stay()
 
 def kickAtPosition(player):

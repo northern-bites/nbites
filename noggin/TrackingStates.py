@@ -1,6 +1,7 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
 DEBUG = False
+from man.motion import HeadMoves
 
 def stopped(tracker):
     '''default state where the tracker does nothing'''
@@ -25,12 +26,14 @@ def ballTracking(tracker): #Super state which handles following/refinding the ba
         return tracker.goNow('scanBall')
 
 def tracking(tracker):
-    ''' state askes it's parent (the tracker) for an object or angles to track
+    """
+    state askes it's parent (the tracker) for an object or angles to track
     while the object is on screen, or angles are passed, we track it.
     Otherwise, we continually write the current values into motion via setHeads.
 
     If a sweet move is begun while we are tracking, the current setup is to let
-    the sweet move conclude and then resume tracking afterward.'''
+    the sweet move conclude and then resume tracking afterward.
+    """
 
     if tracker.firstFrame():
         tracker.activeLocOn = False
@@ -78,4 +81,14 @@ def activeTracking(tracker):
             return tracker.goLater('panLeftOnce')
         elif tracker.activePanDir == constants.PAN_UP:
             return tracker.goLater('panUpOnce')
+    return tracker.stay()
+
+def trackAfterKick(tracker):
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.panTo(HeadMoves.PAN_UP_HEADS)
+        return tracker.stay()
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('stop')
     return tracker.stay()

@@ -502,7 +502,9 @@ class Packet:
         self.chaseTime = float(self.chaseTime)
 
     def update(self,update_packet=[0]*17): #=[0]*16
-        """update packet with a list of new values"""
+        """
+        update packet with a list of new values
+        """
         # error checking if passed list is not right size
         if len(update_packet) != 17:
             raise ValueError("Packet().update got list of size:" +

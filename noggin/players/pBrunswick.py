@@ -230,3 +230,14 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             NogginConstants.OPP_GOALBOX_RIGHT_X and \
             NogginConstants.OPP_GOALBOX_TOP_Y > ball.y > \
             NogginConstants.OPP_GOALBOX_BOTTOM_Y
+
+    def lookPostKick(self):
+        tracker = self.brain.tracker
+        if self.chosenKick == SweetMoves.LEFT_FAR_KICK or \
+                self.chosenKick == SweetMoves.RIGHT_FAR_KICK:
+            tracker.lookToDir('up')
+        elif self.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+            tracker.lookToDir('left')
+        elif self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+            tracker.lookToDir('right')
+

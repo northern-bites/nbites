@@ -29,6 +29,8 @@ class HeadTracking(FSA.FSA):
         self.activePanOut = False
         self.preActivePanHeads = None
 
+        self.lookDirection = None
+
     def ballTrackingHelper(self,args):
         self.target = None
         self.gain = 1.0
@@ -163,3 +165,8 @@ class HeadTracking(FSA.FSA):
         panTime = maxDiff/constants.MAX_PAN_SPEED
         self.execute( ((heads, panTime, 1,
                         StiffnessModes.LOW_HEAD_STIFFNESSES),) )
+
+    def lookToDir(self, direction):
+        self.lookDirection = direction
+        self.brain.motion.stopHeadMoves()
+        self.switchTo('look')
