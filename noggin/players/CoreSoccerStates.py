@@ -109,3 +109,6 @@ def penaltyShotsGamePlaying(player):
 
 def penaltyShotsGameFinished(player):
     return player.goNow('gameFinished')
+
+def penaltyShotsGamePenalized(player):
+    return player.goNow('gamePenalized')

@@ -37,7 +37,34 @@ def gameFinished(game):
         game.brain.player.switchTo('gameFinished')
 
     return game.stay()
-def penaltyShoots(game):
+
+def penaltyShotsGameInitial(game):
     if game.firstFrame():
-        game.brain.player.switchTo('penaltyShots')
+        game.brain.player.switchTo('penaltyShotsGameInitial')
     return game.stay()
+
+def penaltyShotsGameReady(game):
+    if game.firstFrame():
+        game.brain.player.switchTo('penaltyShotsGameReady')
+    return game.stay()
+
+def penaltyShotsGameSet(game):
+    if game.firstFrame():
+        game.brain.player.switchTo('penaltyShotsGameSet')
+    return game.stay()
+
+def penaltyShotsGamePlaying(game):
+    if game.firstFrame():
+        game.brain.player.switchTo('penaltyShotsGamePlaying')
+    return game.stay()
+
+def penaltyShotsGameFinished(game):
+    if game.firstFrame():
+        game.brain.player.switchTo('penaltyShotsGameFinished')
+    return game.stay()
+
+def penaltyShotsGamePenalized(game):
+    if game.firstFrame():
+        game.brain.player.switchTo('penaltyShotsGamePenalized')
+    return game.stay()
+

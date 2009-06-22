@@ -9,6 +9,7 @@ from . import BrunswickStates
 from . import GoaliePositionStates
 from . import GoalieChaseBallStates
 from . import GoalieSaveStates
+from . import PenaltyKickStates
 from . import ChaseBallTransitions
 from . import KickingConstants
 from .. import NogginConstants
@@ -20,6 +21,7 @@ from math import sin, cos, radians
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(PenaltyKickStates)
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieChaseBallStates)
         self.addStates(GoalieSaveStates)
@@ -57,6 +59,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.orbitAngle = 0.0
 
         self.kickObjective = None
+
+        # Penalty kick player variables
+        self.penaltyKicking = False
+        self.penaltyMadeFirstKick = False
+        self.penaltyMadeSecondKick = False
+
 
     def run(self):
         if self.currentState == 'afterKick' or \
@@ -155,6 +163,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getApproachPosition(self):
         ball = self.brain.ball
         my = self.brain.my
+
+        if self.penaltyKicking:
+            return self.getPenaltyKickingApproachPosition()
+
         if self.inFrontOfBall():
             destH = self.getApproachHeadingFromFront()
         else :
@@ -196,3 +208,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getKickGoalDest(self):
         return NogginConstants.OPP_GOALBOX_RIGHT_X, \
             NogginConstants.OPP_GOALBOX_MIDDLE_Y
+
+    def getPenaltyKickingApproachPosition(self):
+        if not self.penaltyMadeFirstKick:
+            return NogginConstants.FIELD_WIDTH * 3/4, \
+                NogginConstants.FIELD_HEIGHT /4
+        if not self.penaltyMadeSecondKick:
+            return NogginConstants.OPP_GOAL_MIDPOINT

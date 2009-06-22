@@ -39,7 +39,7 @@ class GameController(FSA.FSA):
                 self.switchTo('penaltyShotsGameReady')
             elif self.gc.state == comm.STATE_PLAYING:
                 if self.gc.penalty != comm.PENALTY_NONE:
-                    self.switchTo("penaltyShotsGamePenalized")
+                    self.switchTo('penaltyShotsGamePenalized')
                 else:
                     self.switchTo("penaltyShotsGamePlaying")
             elif self.gc.state == comm.STATE_FINISHED:
@@ -114,10 +114,8 @@ class GameController(FSA.FSA):
             self.brain.leds.executeLeds(Leds.STATE_INITIAL_LEDS)
         elif self.gc.state == comm.STATE_SET:
             self.brain.leds.executeLeds(Leds.STATE_SET_LEDS)
-            self.switchTo('gameSet')
         elif self.gc.state == comm.STATE_READY:
             self.brain.leds.executeLeds(Leds.STATE_READY_LEDS)
-            self.switchTo('gameReady')
         elif self.gc.state == comm.STATE_PLAYING:
             if self.gc.penalty != comm.PENALTY_NONE:
                 self.brain.leds.executeLeds(Leds.STATE_PENALIZED_LEDS)
