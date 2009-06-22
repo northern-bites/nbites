@@ -297,10 +297,11 @@ void GameController::advanceButtonClickState(){
     //We need to advance the states
     switch(currentState){
     case STATE_INITIAL:
-        if(currentPenalty != PENALTY_NONE){
-            setPenalty(PENALTY_NONE);
-        }
         setGameState(STATE_PLAYING);
+        if(currentPenalty != PENALTY_MANUAL){
+            setPenalty(PENALTY_MANUAL);
+            manualPenalize(true);
+        }
         break;
     case STATE_PLAYING:
         if(currentPenalty == PENALTY_NONE){
