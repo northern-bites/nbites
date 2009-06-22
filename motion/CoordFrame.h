@@ -48,11 +48,12 @@ namespace CoordFrame3D{
         NBMath::ufmatrix3 rot =
             boost::numeric::ublas::identity_matrix <float>(3);
 
-        const float sinAngle = std::sin(angle);
-        const float cosAngle = std::cos(angle);
         if (angle == 0.0) { //OPTIMIZAION POINT
             return rot;
         }
+        const float sinAngle = std::sin(angle);
+        const float cosAngle = std::cos(angle);
+
         switch(axis) {
         case Z_AXIS:
             rot(X_AXIS, X_AXIS) =  cosAngle;
@@ -108,14 +109,15 @@ namespace CoordFrame4D{
                const float angle) {
         NBMath::ufmatrix4 rot = boost::numeric::ublas::identity_matrix <float>(4);
 
+        if (angle == 0.0) { //OPTIMIZAION POINT
+            return rot;
+        }
+
         //TODO: Make this one call:
         float sinAngle;
         float cosAngle;
         sincosf(angle, &sinAngle, &cosAngle);
 
-        if (angle == 0.0) { //OPTIMIZAION POINT
-            return rot;
-        }
         switch(axis) {
         case X_AXIS:
             rot(Y_AXIS, Y_AXIS) =  cosAngle;
@@ -212,6 +214,6 @@ namespace CoordFrame4D{
         result(1,3) = Rtd(1);
         result(2,3) = Rtd(2);
         return result;
-}
+    }
 };
 #endif

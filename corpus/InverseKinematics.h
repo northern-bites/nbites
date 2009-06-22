@@ -67,5 +67,9 @@ namespace Kinematics{
                                     const NBMath::ufvector3 &bodyOrientation,
                                     const float givenHYPAngle = HYP_NOT_SET);
 
+
+    NBMath::ufmatrix4 rotationHYPRightInv(const float HYP);
+    NBMath::ufmatrix4 rotationHYPLeftInv(const float HYP);
+
 };
 #endif
