@@ -54,9 +54,7 @@ static const int FIT_VERT_POINT_COLOR = BROWN;
 
 static const int USED_HOR_POINT_COLOR = RED;
 static const int UNUSED_HOR_POINT_COLOR = PURPLE;
-
 static const int FIT_HOR_POINT_COLOR = SEA_GREEN;
-static const int UNUSED_INTERSECTION_POINT_COLOR = LAWN_GREEN;
 
 static const int TENTATIVE_INTERSECTION_POINT_COLOR = LAWN_GREEN;
 static const int LEGIT_INTERSECTION_POINT_COLOR = ORANGE;
@@ -64,7 +62,6 @@ static const int INVALIDATED_INTERSECTION_POINT_COLOR = PURPLE;
 
 static const int FIT_UNUSED_POINTS_BOX_COLOR = MAROON;
 static const int JOIN_LINES_BOX_COLOR = PINK;
-
 
 static const Rectangle SCREEN = {0, IMAGE_WIDTH - 1,
                                  0, IMAGE_HEIGHT - 1};
@@ -125,9 +122,8 @@ private:
     ////////////////////////////////////////////////////////////
 
     // AIBO_SPECIFIC
-    static const int MIN_PIXEL_WIDTH_FOR_GREEN_CHECK = 4;
-    // AIBOSPECIFIC (distance in pixels)
-    static const int MIN_SEPARATION_TO_NOT_CHECK = 20;
+    static const int MIN_PIXEL_WIDTH_FOR_GREEN_CHECK = 2;
+    static const int MIN_SEPARATION_TO_NOT_CHECK = 10;
     // AIBOSPECIFIC
     // Two line points must have at least this Euclidean distance between
     // them in order for us to check their angle
@@ -135,24 +131,24 @@ private:
 
     static const int MAX_ANGLE_LINE_SEGMENT = 4;
 
-
-    static const int MAX_GREEN_PERCENT_ALLOWED_IN_LINE = 15;
-
-    // AIBO_SPECIFIC
-    static const int MAX_LINE_WIDTH_DIFFERENCE = 5; // FIXME: chosen randomly
+    static const int MAX_GREEN_PERCENT_ALLOWED_IN_LINE = 10;
 
     // max number of pixels offset to connect two points in createLines
     static const int GROUP_MAX_X_OFFSET = static_cast<int>(.30 * IMAGE_WIDTH);
+    // NOTE: Currently Unused
     // max number of pixels offset to connect two y points
-    static const int GROUP_MAX_Y_OFFSET = static_cast<int>(.20 * IMAGE_WIDTH);
+    //static const int GROUP_MAX_Y_OFFSET = static_cast<int>(.20 * IMAGE_WIDTH);
 
     ////////////////////////////////////////////////////////////
     // Join Lines Constants
     ////////////////////////////////////////////////////////////
-    static const int JOIN_MAX_X_OFFSET = static_cast<int>(.35 * IMAGE_WIDTH);
-    static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
+    // NOTE: Currently Unused
+    // static const int JOIN_MAX_X_OFFSET = static_cast<int>(.35 * IMAGE_WIDTH);
+    // static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
     static const int MAX_ANGLE_TO_JOIN_LINES = 5;
-
+    // TODO: We want to be able to identify center circle lines by angles in the
+    //       joined lines
+    static const int MAX_ANGLE_TO_JOIN_CC_LINES = 45;
     static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 6;
 
 
@@ -160,7 +156,8 @@ private:
     // Fit Unused Points Constants
     ////////////////////////////////////////////////////////////
     static const int MAX_VERT_FIT_UNUSED_WIDTH_DIFFERENCE = 2;
-    static const int MAX_HOR_FIT_UNUSED_WIDTH_DIFFERENCE = 2;
+    // NOTE: Currently Unused
+    //static const int MAX_HOR_FIT_UNUSED_WIDTH_DIFFERENCE = 2;
 
     ////////////////////////////////////////////////////////////
     // Extend Lines constants
@@ -194,38 +191,13 @@ private:
 
     static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 10;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
-
-    // AIBOSPECIFIC
-    static const int MIN_CROSS_EXTEND = 10;
+    static const int MIN_CROSS_EXTEND = 20;
     // When estimating the angle between two lines on the field, anything less
     // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
     // and disallowed; ideally our estimates would always be 90.0 degrees
     static const int MIN_ANGLE_ON_FIELD = 65;
     static const int MAX_ANGLE_ON_FIELD = 120;
-    // AIBOSPECIFIC
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
-
-
-
-    ////////////////////////////////////////////////////////////
-    // Center circle check constants
-    ////////////////////////////////////////////////////////////
-    // AIBOSPECIFIC
-    // Given limitations of Aibo cam, we do not see more than 4 lines or
-    // corners legitimately - only if we're at the center circle.
-    static const unsigned int MAX_NUM_LINES = 4;
-    static const unsigned int MAX_NUM_CORNERS = 4;
-    static const unsigned int MAX_NUM_SMALL_LINES = 2;
-
-    static const int LONG_LINE_LENGTH = (IMAGE_WIDTH * 2) / 3;
-    static const int MEDIUM_LINE_LENGTH = IMAGE_WIDTH / 2;
-
-    // The angle between the lines forming the corner of an outer L must be
-    // at most this constant
-    static const int MAX_OUTER_L_ANGLE = 160;
-    // The angle between the lines forming the corner of an inner L must be
-    // at most this constant if there is another line on scren
-    static const int MAX_INNER_L_ANGLE = 140;
 
     ////////////////////////////////////////////////////////////
     // Identify corners constants
@@ -233,7 +205,6 @@ private:
     // AIBOSPECIFIC
     // Distance in centimeters
     static const int MAXIMUM_DIST_TO_USE_PIX_ESTIMATE = 400;
-    // AIBOSPECIFIC
     static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
 
 public:
@@ -514,12 +485,10 @@ public:
     void setDebugJoinLines(bool _bool) { debugJoinLines = _bool; }
     void setDebugExtendLines(bool _bool) { debugExtendLines = _bool; }
     void setDebugIntersectLines(bool _bool) { debugIntersectLines = _bool; }
-    void setDebugProcessCorners(bool _bool) { debugProcessCorners = _bool; }
     void setDebugIdentifyCorners(bool _bool) { debugIdentifyCorners = _bool; }
     void setDebugCcScan(bool _bool) { debugCcScan = _bool; }
     void setDebugRiskyCorners(bool _bool) { debugRiskyCorners = _bool; }
 
-    void setDebugBallCheck(bool _bool) {debugBallCheck = _bool; }
     void setDebugCornerAndObjectDistances(bool _bool) {
         debugCornerAndObjectDistances = _bool;
     }
@@ -533,19 +502,13 @@ public:
         return debugSecondVertEdgeDetect;
     }
     const bool getDebugCreateLines() const { return debugCreateLines; }
-
     const bool getDebugJoinLines() const { return debugJoinLines; }
     const bool getDebugFitUnusedPoints() const { return debugFitUnusedPoints; }
     const bool getDebugExtendLines() const { return debugExtendLines; }
     const bool getDebugIntersectLines() const { return debugIntersectLines; }
-    const bool getDebugProcessCorners() const { return debugProcessCorners; }
     const bool getDebugIdentifyCorners() const { return debugIdentifyCorners; }
-
     const bool getDebugCcScan() const { return debugCcScan; }
     const bool getDebugRiskyCorners() const { return debugRiskyCorners; }
-
-    // TODO:Unused
-    const bool getDebugBallCheck() const { return debugBallCheck; }
     const bool getDebugCornerAndObjectDistances() const {
         return debugCornerAndObjectDistances;
     }
@@ -701,11 +664,9 @@ private:
     bool debugJoinLines;
     bool debugIntersectLines;
     bool debugExtendLines;
-    bool debugProcessCorners;
     bool debugIdentifyCorners;
     bool debugCcScan;
     bool debugRiskyCorners;
-    bool debugBallCheck;
     bool debugCornerAndObjectDistances;
     bool debugFitUnusedPoints;
     // Normal users of cortex do not need to see as much debugging information
@@ -728,11 +689,9 @@ private:
     static const bool debugJoinLines = false;
     static const bool debugExtendLines = false;
     static const bool debugIntersectLines = false;
-    static const bool debugProcessCorners = false;
     static const bool debugIdentifyCorners = false;
     static const bool debugCcScan = false;
     static const bool debugRiskyCorners = false;
-    static const bool debugBallCheck = false;
     static const bool debugCornerAndObjectDistances = false;
     static const bool debugFitUnusedPoints = false;
 

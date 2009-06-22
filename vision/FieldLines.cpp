@@ -88,9 +88,6 @@ const int FieldLines::LINE_COLORS[NUM_WHITE_COLORS] =
 
 const char * FieldLines::linePointInfoFile = "linepoints.xls";
 
-//const float FieldLines::MAX_PERCENT_ERROR_IN_JOIN_LINES = .024f;
-
-
 FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     vision = visPtr;
     pose = posePtr;
@@ -125,20 +122,13 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     debugHorEdgeDetect = false;
     debugSecondVertEdgeDetect = false;
     debugCreateLines = false;
-    debugJoinLines = false;
-    debugIntersectLines = false;
-    debugProcessCorners = false;
-    debugIdentifyCorners = false;
+    debugJoinLines = true;
+    debugExtendLines = true;
+    debugIntersectLines = true;
+    debugIdentifyCorners = true;
     debugCornerAndObjectDistances = false;
     debugCcScan = false;
-
-    debugBallCheck = false;
-
     standardView = true;//false;
-#else
-    //if we're working offline (in cortex) set isGoalie manually
-    //otherwise is goalie is true if player number is 1
-    isGoalie = ((vision->getPlayerNumber()) == 1);
 #endif
 
     // Makes setprecision dictate number of decimal places
@@ -195,10 +185,7 @@ void FieldLines::lineLoop() {
 
     //  startTime = vision->getMillisFromStartup();
 
-    //if (isGoalie) {
-    extendLines(linesList);
-    //}
-
+    //extendLines(linesList);
 
     // Corners is a global member of FieldLines
     //startTime = vision->getMillisFromStartup();
@@ -281,6 +268,15 @@ void FieldLines::afterObjectFragments() {
     }
 
     identifyCorners(cornersList);
+#ifdef OFFLINE
+    if (debugVertEdgeDetect || debugHorEdgeDetect ||
+        debugSecondVertEdgeDetect || debugCreateLines ||
+        debugJoinLines || debugExtendLines || debugIntersectLines ||
+        debugIdentifyCorners || debugCornerAndObjectDistances ||
+        debugCcScan) {
+        cout << endl << endl << endl;
+    }
+#endif
 }
 
 
@@ -1197,42 +1193,6 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
             }
             //long startTime;
             //startTime = vision->getMillisFromStartup();
-            // TODO: move to bottom
-            // SANITY CHECK: Check to see if the segment formed by the old line
-            // endpoint and the current point, has green in between.
-
-            // Do not do the check if the line point is thin and far away
-            // because by nature of the integer truncation, the line points can
-            // show up towards the bottom of the line, where there will be green
-            // between the two points. Furthermore, only skip this check if it's
-            // horizontally oriented
-            float percentGreen;
-            if (currentPoint->lineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
-                lastLineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
-                abs(pointX - lineEndpointX) > abs(pointY - lineEndpointY) &&
-                Utility::getLength(static_cast<float>(lineEndpointX),
-								   static_cast<float>(lineEndpointY),
-								   static_cast<float>(pointX),
-								   static_cast<float>(pointY) )
-                < MIN_SEPARATION_TO_NOT_CHECK) {
-                percentGreen = 0;
-            }
-            else {
-                percentGreen = percentColorBetween(lineEndpointX, lineEndpointY,
-                                                   pointX, pointY,
-                                                   GREEN);
-            }
-            if (percentGreen > MAX_GREEN_PERCENT_ALLOWED_IN_LINE) {
-                if (debugCreateLines)
-                    cout << "\tSecond loop: sanity check 'Found too much green "
-                         << "between line points.'  Found " << percentGreen
-                         << "%, max of " << MAX_GREEN_PERCENT_ALLOWED_IN_LINE
-                         << "% allowed." << endl;
-                continue;
-            }
-            //timeInPercentColorBetween += vision->getMillisFromStartup() -
-            // startTime;
-
 
             //startTime = vision->getMillisFromStartup();
             // ANGLE CHECK:  Check to see if the horizontal angle of the line as
@@ -1270,7 +1230,43 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
                     continue;
                 }
             }
+
             //timeInGetAngle += vision->getMillisFromStartup() - startTime;
+
+            // SANITY CHECK: Check to see if the segment formed by the old line
+            // endpoint and the current point, has green in between.
+
+            // Do not do the check if the line point is thin and far away
+            // because by nature of the integer truncation, the line points can
+            // show up towards the bottom of the line, where there will be green
+            // between the two points. Furthermore, only skip this check if it's
+            // horizontally oriented
+            float percentGreen;
+            if (currentPoint->lineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
+                lastLineWidth < MIN_PIXEL_WIDTH_FOR_GREEN_CHECK &&
+                abs(pointX - lineEndpointX) > abs(pointY - lineEndpointY) &&
+                Utility::getLength(static_cast<float>(lineEndpointX),
+								   static_cast<float>(lineEndpointY),
+								   static_cast<float>(pointX),
+								   static_cast<float>(pointY) )
+                < MIN_SEPARATION_TO_NOT_CHECK) {
+                percentGreen = 0;
+            } else {
+                percentGreen = percentColorBetween(lineEndpointX, lineEndpointY,
+                                                   pointX, pointY,
+                                                   GREEN);
+            }
+
+            if (percentGreen > MAX_GREEN_PERCENT_ALLOWED_IN_LINE) {
+                if (debugCreateLines)
+                    cout << "\tSecond loop: sanity check 'Found too much green "
+                         << "between line points.'  Found " << percentGreen
+                         << "%, max of " << MAX_GREEN_PERCENT_ALLOWED_IN_LINE
+                         << "% allowed." << endl;
+                continue;
+            }
+            //timeInPercentColorBetween += vision->getMillisFromStartup() -
+            // startTime;
 
             ////// SECOND LOOP MEAT /////
 
@@ -1628,13 +1624,18 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
             const float angleBetween = min(fabs(i->angle - j->angle),
                                            fabs(180-(fabs(i->angle-j->angle))));
             if (angleBetween > MAX_ANGLE_TO_JOIN_LINES) {
-                if (debugJoinLines) {
-                    cout << "\tAngle sanity check failed: lines had an angle "
-                         << "of " << setprecision(2) << angleBetween
-                         << " between them; expected a maximum difference of "
-                         << MAX_ANGLE_TO_JOIN_LINES << endl;
+                // TODO: Use this to identify center circle lines
+                if (angleBetween < MAX_ANGLE_TO_JOIN_CC_LINES) {
+                    // The two lines possibly line on the center circle
+                } else {
+                    if (debugJoinLines) {
+                        cout << "\tAngle sanity check failed: lines had an angle "
+                             << "of " << setprecision(2) << angleBetween
+                             << " between them; expected a maximum difference of "
+                             << MAX_ANGLE_TO_JOIN_LINES << endl;
+                    continue;
+                    }
                 }
-                continue;
             }
 
             // DISTANCE sanity check: even if two lines have a very small angle
@@ -1718,7 +1719,7 @@ void FieldLines::extendLines(vector <VisualLine> &lines) {
         }
         // Scan to the left and right
         else {
-            //extendLineHorizontally(*i);
+            extendLineHorizontally(*i);
         }
     }
 }
@@ -2571,7 +2572,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
                      << percent1 << ". between line 2 --- : " << percent2
                      << endl;
 
-            const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 66.0f;
+            const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 45.0f;
             if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
                 percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
                 if (debugIntersectLines) {
@@ -2609,7 +2610,11 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
     }
 
     if (debugIntersectLines) {
-        cout << "Found " << corners.size() << " legitimate corners." << endl;
+        cout << "Found " << corners.size() << " legitimate corner";
+        if (corners.size() != 1) {
+            cout << "s";
+        }
+        cout << "." << endl;
     }
 
     return corners;
@@ -2635,7 +2640,7 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
 
     int oldNumCorners = corners.size();
 
-    const int NUM_PIXELS_CLOSE_TO_EDGE = 15;
+    const int NUM_PIXELS_CLOSE_TO_EDGE = 20;
     const int T_NUM_PIXELS_CLOSE_TO_EDGE = 20;
 
     // No field objects on screen..
@@ -2843,7 +2848,6 @@ const bool FieldLines::goalSuitableForPixEstimate(const VisualFieldObject *
     // When we're the goalie, we don't expect there to be any robots blocking
     // the goal.  Furthermore, we're seeing it from a much different angle where
     // the green will not be at the bottom of the post
-    if (isGoalie) { return true; }
     const int MAX_PIXEL_DIFF = 10;
     int greenHorizon = vision->thresh->getVisionHorizon();
     int midBottomY = (goal->getLeftBottomY() + goal->getRightBottomY())/2;
@@ -3509,8 +3513,6 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
     string typeOfEstimate;
 
     estimate cornerEst = vision->pose->pixEstimate(c->getX(), c->getY(), 0);
-
-    //fieldObjectID id = obj->getID();
 
     int midX = (obj->getLeftBottomX() + obj->getRightBottomX()) / 2;
     int midBottomY = (obj->getLeftBottomY() + obj->getRightBottomY()) / 2;
