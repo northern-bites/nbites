@@ -392,6 +392,7 @@ public class WorldController extends JPanel implements KeyListener,
         } else if (cmd.equals(LIMIT_TEAM_ACTION)) {
             try {
                 udp_server.limitToTeam(Integer.parseInt(field_one.getText()));
+                painter.clearSimulationHistory();
             } catch (NumberFormatException asdf) {
                 System.out.println("Excepted an integer");
             }
