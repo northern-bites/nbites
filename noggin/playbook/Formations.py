@@ -7,8 +7,8 @@ def fNoFieldPlayers(team):
     if team.me.isGoalie():
         return [PBConstants.NO_FIELD_PLAYERS] + Roles.rGoalie(team)
 
-	return [PBConstants.NO_FIELD_PLAYERS, PBConstants.INIT_ROLE,
-	    PBConstants.INIT_SUB_ROLE, [0,0] ]
+    return [PBConstants.NO_FIELD_PLAYERS, PBConstants.INIT_ROLE,
+            PBConstants.INIT_SUB_ROLE, [0,0,0] ]
 
 def fOneField(team):
     """Formation for one field player"""

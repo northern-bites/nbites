@@ -374,6 +374,10 @@ bool c_init_comm (void)
                        PyInt_FromLong(STATE_PLAYING));
     PyModule_AddObject(comm_module, "STATE_FINISHED",
                        PyInt_FromLong(STATE_FINISHED));
+	PyModule_AddObject(comm_module, "STATE2_NORMAL",
+					   PyInt_FromLong(STATE2_NORMAL));
+	PyModule_AddObject(comm_module, "STATE2_PENALTYSHOOT",
+					   PyInt_FromLong(STATE2_PENALTYSHOOT));
 
     PyModule_AddObject(comm_module, "PENALTY_NONE",
                        PyInt_FromLong(PENALTY_NONE));
@@ -397,6 +401,7 @@ bool c_init_comm (void)
                        PyInt_FromLong(PENALTY_DAMAGE));
     PyModule_AddObject(comm_module, "PENALTY_MANUAL",
                        PyInt_FromLong(PENALTY_MANUAL));
+
 
 #ifdef USE_PYCOMM_FAKE_BACKEND
     shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());

@@ -10,9 +10,9 @@ def scanFindBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if player.brain.ball.on and constants.USE_LOC_CHASE:
+    if transitions.shouldApproachBallWithLoc(player):
         player.brain.tracker.trackBall()
-        return player.goLater('positionOnBall')
+        return player.goLater('approachBallWithLoc')
     elif transitions.shouldTurnToBall_FoundBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldSpinFindBall(player):
@@ -35,9 +35,9 @@ def spinFindBall(player):
     player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
     # Determine if we should leave this state
-    if player.brain.ball.on and constants.USE_LOC_CHASE:
+    if transitions.shouldApproachBallWithLoc(player):
         player.brain.tracker.trackBall()
-        return player.goLater('positionOnBall')
+        return player.goLater('approachBallWithLoc')
     elif transitions.shouldTurnToBall_FoundBall(player):
         return player.goLater('turnToBall')
 

@@ -204,6 +204,15 @@ const GCGameState GameController::gameState()
     return state;
 }
 
+const uint8 GameController::gameSecondaryState()
+{
+    pthread_mutex_lock(&mutex);
+	const uint8 secondaryState = controlData.secondaryState;
+    pthread_mutex_unlock(&mutex);
+    return secondaryState;
+}
+
+
 const GCPenalty GameController::penalty()
 {
     pthread_mutex_lock(&mutex);
@@ -381,7 +390,8 @@ enum PyGameController_attr {
     GC_PLAYER,
     GC_KICKOFF,
     GC_STATE,
-    GC_PENAL
+    GC_PENAL,
+	GC_SECOND
 };
 
 static PyGetSetDef PyGameController_getsetters[] = {
@@ -414,6 +424,11 @@ static PyGetSetDef PyGameController_getsetters[] = {
      reinterpret_cast<setter>(PyGameController_set),
      "This robot's penalized state",
      reinterpret_cast<void*>(GC_PENAL)},
+
+	{"secondaryState",reinterpret_cast<getter>(PyGameController_get),
+	 reinterpret_cast<setter>(PyGameController_set),
+	 "The current GameController secondary game state",
+	 reinterpret_cast<void*>(GC_SECOND)},
 
     // Sentinel
     {NULL}
@@ -538,6 +553,10 @@ PyObject* PyGameController_get (PyGameController* self, void* closure)
     case GC_PENAL:
         result = PyInt_FromLong(self->_gc->penalty());
         break;
+	case GC_SECOND:
+        result = PyInt_FromLong(self->_gc->gameSecondaryState());
+        break;
+
     }
     Py_END_ALLOW_THREADS;
 

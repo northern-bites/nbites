@@ -16,7 +16,9 @@ try:
                         STATE_INITIAL,
                         STATE_PLAYING,
                         STATE_READY,
-                        STATE_SET)
+                        STATE_SET,
+                        STATE2_NORMAL,
+                        STATE2_PENALTYSHOOT)
 except ImportError:
     import sys
     print >>sys.stderr, "**** WARNING - No backend _comm module located ****"

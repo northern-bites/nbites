@@ -148,6 +148,7 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
 			${NOGGIN_INCLUDE_DIR}/FallController.py
                         ${NOGGIN_INCLUDE_DIR}/FallStates.py
                         ${NOGGIN_INCLUDE_DIR}/HeadTracking.py
+			${NOGGIN_INCLUDE_DIR}/TrackingConstants.py
                         ${NOGGIN_INCLUDE_DIR}/PanningStates.py
                         ${NOGGIN_INCLUDE_DIR}/NavStates.py
 			${NOGGIN_INCLUDE_DIR}/NavConstants.py

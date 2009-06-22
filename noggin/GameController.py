@@ -25,23 +25,40 @@ class GameController(FSA.FSA):
         self.setPrintFunction(self.brain.out.printf)
         self.timeRemaining = self.gc.timeRemaining()
         self.kickOff = self.gc.kickOff
+        self.penaltyShots = False
 
     def run(self):
         self.setGCLEDS()
 
-        if self.gc.state == comm.STATE_INITIAL:
-            self.switchTo('gameInitial')
-        elif self.gc.state == comm.STATE_SET:
-            self.switchTo('gameSet')
-        elif self.gc.state == comm.STATE_READY:
-            self.switchTo('gameReady')
-        elif self.gc.state == comm.STATE_PLAYING:
-            if self.gc.penalty != comm.PENALTY_NONE:
-                self.switchTo("gamePenalized")
-            else:
-                self.switchTo("gamePlaying")
-        elif self.gc.state == comm.STATE_FINISHED:
-            self.switchTo('gameFinished')
+        if self.gc.secondaryState == comm.STATE2_PENALTYSHOOT:
+            if self.gc.state == comm.STATE_INITIAL:
+                self.switchTo('penaltyShotsGameInitial')
+            elif self.gc.state == comm.STATE_SET:
+                self.switchTo('penaltyShotsGameSet')
+            elif self.gc.state == comm.STATE_READY:
+                self.switchTo('penaltyShotsGameReady')
+            elif self.gc.state == comm.STATE_PLAYING:
+                if self.gc.penalty != comm.PENALTY_NONE:
+                    self.switchTo('penaltyShotsGamePenalized')
+                else:
+                    self.switchTo("penaltyShotsGamePlaying")
+            elif self.gc.state == comm.STATE_FINISHED:
+                self.switchTo('penaltyShotsGameFinished')
+
+        elif self.gc.secondaryState == comm.STATE2_NORMAL:
+            if self.gc.state == comm.STATE_INITIAL:
+                self.switchTo('gameInitial')
+            elif self.gc.state == comm.STATE_SET:
+                self.switchTo('gameSet')
+            elif self.gc.state == comm.STATE_READY:
+                self.switchTo('gameReady')
+            elif self.gc.state == comm.STATE_PLAYING:
+                if self.gc.penalty != comm.PENALTY_NONE:
+                    self.switchTo("gamePenalized")
+                else:
+                    self.switchTo("gamePlaying")
+            elif self.gc.state == comm.STATE_FINISHED:
+                self.switchTo('gameFinished')
         self.timeRemaining = self.gc.timeRemaining()
         #Set team color
         if self.gc.color != self.brain.my.teamColor:
@@ -97,10 +114,8 @@ class GameController(FSA.FSA):
             self.brain.leds.executeLeds(Leds.STATE_INITIAL_LEDS)
         elif self.gc.state == comm.STATE_SET:
             self.brain.leds.executeLeds(Leds.STATE_SET_LEDS)
-            self.switchTo('gameSet')
         elif self.gc.state == comm.STATE_READY:
             self.brain.leds.executeLeds(Leds.STATE_READY_LEDS)
-            self.switchTo('gameReady')
         elif self.gc.state == comm.STATE_PLAYING:
             if self.gc.penalty != comm.PENALTY_NONE:
                 self.brain.leds.executeLeds(Leds.STATE_PENALIZED_LEDS)

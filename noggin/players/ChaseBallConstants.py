@@ -1,5 +1,5 @@
 # Component Switches
-USE_LOC_CHASE = False
+USE_LOC_CHASE = True
 
 # Transitions' Constants
 # Ball on and off frame thresholds
@@ -12,6 +12,10 @@ BALL_APPROACH_BEARING_OFF_THRESH = 40
 # Should position for kick
 BALL_POS_KICK_DIST_THRESH = 15.0
 BALL_POS_KICK_BEARING_THRESH = 30
+BALL_POS_KICK_LEFT_Y = 15.0
+BALL_POS_KICK_RIGHT_Y = -15.0
+BALL_POS_KICK_MAX_X = 35
+BALL_POS_KICK_MIN_X = 5
 
 # States' constants
 # turnToBall
@@ -27,6 +31,11 @@ MIN_APPROACH_SPIN_SPEED = 10
 APPROACH_SPIN_GAIN = 1.1
 MAX_APPROACH_X_SPEED = 11.0
 MIN_APPROACH_X_SPEED = -11.0
+
+# approachBallWithLoc() values
+IN_FRONT_SLOPE = 5.6
+APPROACH_DIST_TO_BALL = 25
+APPROACH_NO_LOC_THRESH = 4
 
 # positionForKick() values
 BALL_KICK_LEFT_Y_L = 10

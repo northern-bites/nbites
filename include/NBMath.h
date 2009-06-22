@@ -31,6 +31,10 @@ static const float QUART_CIRC_RAD = M_PI_FLOAT / 2.0f;
 		(	sizeof (x) == sizeof(float )	?	__inline_isnanf((float)(x))	\
 		:	sizeof (x) == sizeof(double)	?	__inline_isnand((double)(x))	\
 											:	__inline_isnan ((long double)(x)))
+	#define isinf(x)	\
+		(	sizeof (x) == sizeof(float )	?	__inline_isinff((float)(x))	\
+		:	sizeof (x) == sizeof(double)	?	__inline_isinfd((double)(x))	\
+											:	__inline_isinf ((long double)(x)))
 
 #endif
 

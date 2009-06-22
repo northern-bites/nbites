@@ -6,6 +6,8 @@ from man.noggin.util import MyMath
 from man.motion import SweetMoves
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+import PositionConstants
+from .. import NogginConstants
 from math import fabs
 
 def chase(player):
@@ -15,6 +17,8 @@ def chase(player):
     """
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
+    elif transitions.shouldApproachBallWithLoc(player):
+        return player.goNow('approachBallWithLoc')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
     elif transitions.shouldKick(player):
@@ -81,6 +85,52 @@ def turnToBall(player):
 
     return player.stay()
 
+def approachBallWithLoc(player):
+    nav = player.brain.nav
+    my = player.brain.my
+
+    if transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+    elif transitions.shouldPositionForKick(player):
+        return player.goLater('positionForKick')
+    # elif transitions.shouldScanFindBall(player):
+    #     return player.goLater('scanFindBall')
+    # elif transitions.shouldAvoidObstacle(player):
+    #     return player.goLater('avoidObstacle')
+    # elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
+    #     return player.goLater('approachBall')
+    nav = player.brain.nav
+    my = player.brain.my
+
+    if player.brain.ball.locDist > 100:
+        player.brain.tracker.activeLoc()
+    else :
+        player.brain.tracker.trackBall()
+
+    dest = player.getApproachPosition()
+    useOmni = MyMath.dist(my.x, my.y, dest[0], dest[1]) <= 30.0
+    changedOmni = False
+
+    if useOmni != nav.movingOmni:
+        player.changeOmniGoToCounter += 1
+    else :
+        player.changeOmniGoToCounter = 0
+    if player.changeOmniGoToCounter > PositionConstants.CHANGE_OMNI_THRESH:
+        changedOmni = True
+
+    if player.firstFrame() or \
+            nav.destX != dest[0] or \
+            nav.destY != dest[1] or \
+            nav.destH != dest[2] or \
+            changedOmni:
+        if not useOmni:
+            nav.goTo(dest)
+        else:
+            nav.omniGoTo(dest)
+
+    return player.stay()
+
+
 def approachBall(player):
     """
     Once we are alligned with the ball, approach it
@@ -97,8 +147,8 @@ def approachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    #elif transitions.shouldAvoidObstacle(player):
-    #    return player.goLater('avoidObstacle')
+    elif transitions.shouldAvoidObstacle(player):
+        return player.goLater('avoidObstacle')
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball

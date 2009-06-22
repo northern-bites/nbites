@@ -23,7 +23,8 @@ def spinToWalkHeading(nav):
     if newSpinDir != nav.curSpinDir:
         nav.changeSpinDirCounter += 1
     else:
-        nav.changeSpinDirCounter = 0
+        nav.changeSpinDirCounter -= 1
+        nav.changeSpinDirCounter = max(0, nav.changeSpinDirCounter)
 
     if nav.changeSpinDirCounter >  constants.CHANGE_SPIN_DIR_THRESH:
         nav.curSpinDir = newSpinDir
@@ -43,10 +44,14 @@ def spinToWalkHeading(nav):
     if nav.atDestinationCloser():
         return nav.goLater('spinToFinalHeading')
 
-    if not nav.brain.motion.isWalkActive():
-        nav.setSpeed(0, nav.curSpinDir * constants.GOTO_SPIN_STRAFE,
-                     nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
-                         nav.getRotScale(headingDiff))
+    sX = 0
+    sY =  nav.curSpinDir * constants.GOTO_SPIN_STRAFE
+    sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
+        nav.getRotScale(headingDiff)
+    if sX != nav.walkX or \
+            sY != nav.walkY or \
+            sTheta != nav.walkTheta:
+        nav.setSpeed(0, sY, sTheta)
 
     return nav.stay()
 
