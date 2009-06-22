@@ -4,6 +4,8 @@ PENALTY_RELOCALIZE_FRAMES = 100
 
 def penaltyKick(player):
     player.penaltyKicking = True
+    player.penaltyMadeFirstKick = False
+    player.penaltyMadeSecondKick = False
     return player.goNow('approachBallWithLoc')
 
 def penaltyKickRelocalize(player):

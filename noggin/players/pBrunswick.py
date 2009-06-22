@@ -221,9 +221,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return (NogginConstants.FIELD_WIDTH * 3/4,
                     NogginConstants.FIELD_HEIGHT /4)
 
-        if not self.penaltyMadeSecondKick:
-            return (NogginConstants.OPP_GOAL_MIDPOINT[0],
-                    NogginConstants.OPP_GOAL_MIDPOINT[1] )
+        return (NogginConstants.OPP_GOAL_MIDPOINT[0],
+                NogginConstants.OPP_GOAL_MIDPOINT[1] )
 
     def ballInOppGoalBox(self):
         ball = self.brain.ball

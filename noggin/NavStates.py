@@ -274,12 +274,7 @@ def omniWalkToPoint(nav):
         nav.walkToPointCount = 0
 
     if nav.atDestinationCloser() and nav.atHeading():
-        nav.walkToPointCount += 1
-    else :
-        nav.walkToPointCount -= 1
-        nav.walkToPointCount = max(nav.walkToPointCount, 0)
-    if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
-            return nav.goLater('stop')
+            return nav.goNow('stop')
 
     my = nav.brain.my
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX, nav.destY)

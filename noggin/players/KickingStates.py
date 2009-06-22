@@ -437,15 +437,22 @@ def penaltyKickBall(player):
     if not player.penaltyMadeFirstKick:
         return player.goLater('kickBallStraight')
     if not player.penaltyMadeSecondKick:
-        player.angleToAlign = MyMath.getRelativeBearing(ball.x,
-                                                        ball.y,
-                                                        NogginConstants.
-                                                        OPP_GOAL_HEADING,
-                                                        NogginConstants.
-                                                        OPP_GOAL_MIDPOINT[0],
-                                                        NogginConstants.
-                                                        OPP_GOAL_MIDPOINT[1] )
-        return player.goLater('alignOnBallStraightKick')
+
+
+        ballBearingToGoal = MyMath.getRelativeBearing(ball.x,
+                                                      ball.y,
+                                                      NogginConstants.
+                                                      OPP_GOAL_HEADING,
+                                                      NogginConstants.
+                                                      OPP_GOAL_MIDPOINT[0],
+                                                      NogginConstants.
+                                                      OPP_GOAL_MIDPOINT[1] )
+
+        player.angleToAlign = ballBearingToGoal - player.brain.my.h
+        if player.angleToAlign < constants.ALIGN_FOR_KICK_MIN_ANGLE:
+            return player.goLater('kickBallStraight')
+        else:
+            return player.goLater('alignOnBallStraightKick')
     return player.stay()
 
 

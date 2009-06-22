@@ -91,9 +91,8 @@ def approachBallWithLoc(player):
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
-    if nav.isStopped():
-        if transitions.shouldPositionForKick(player):
-            return player.goLater('positionForKick')
+    if transitions.shouldPositionForKick(player):
+        return player.goLater('positionForKick')
     # elif transitions.shouldScanFindBall(player):
     #     return player.goLater('scanFindBall')
     # elif transitions.shouldAvoidObstacle(player):
