@@ -49,7 +49,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     fc_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
     sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
-    leftLeg(LLEG_CHAIN), rightLeg(RLEG_CHAIN),
+    leftLeg(s,LLEG_CHAIN), rightLeg(s,RLEG_CHAIN),
     leftArm(LARM_CHAIN), rightArm(RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
     //controller_x(new PreviewController()),

@@ -57,6 +57,7 @@
 #include "CoordFrame.h"
 #include "Kinematics.h"
 #include "NBMatrixMath.h"
+#include  "Sensors.h"
 
 //DEBUG Switches:
 #ifdef WALK_DEBUG
@@ -84,7 +85,8 @@ struct WalkCycle{
 
 class WalkingLeg  {
 public:
-    WalkingLeg(Kinematics::ChainID id);
+    WalkingLeg(    boost::shared_ptr<Sensors> s,
+                   Kinematics::ChainID id);
     ~WalkingLeg();
 
     LegJointStiffTuple tick(boost::shared_ptr<Step> step,
@@ -149,6 +151,7 @@ private:
     inline Kinematics::ChainID getOtherLegChainID();
 
 private:
+    boost::shared_ptr<Sensors> sensors;
     //FSA Attributes
     SupportMode state;
     SupportMode supportMode; //soon to be deprecated

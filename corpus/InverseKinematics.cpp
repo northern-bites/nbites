@@ -27,6 +27,19 @@ const Kinematics::IKLegResult Kinematics::simpleLegIK(const ChainID chainID,
 #endif
 }
 
+const Kinematics::IKLegResult Kinematics::angleXYIK(const ChainID chainID,
+                                                      const ufvector3 & legGoal,
+                                                    const float bodyAngleX,
+                                                    const float bodyAngleY,
+                                                    const float HYPAngle){
+    const ufvector3 footOrientation = CoordFrame3D::vector3D(0,0,0);
+    const ufvector3 bodyGoal = CoordFrame3D::vector3D(0,0,0);
+    const ufvector3 bodyOrientation = CoordFrame3D::vector3D(bodyAngleX,
+                                                             bodyAngleY,0);
+    return analyticLegIK(chainID,legGoal,footOrientation,
+                         bodyGoal,bodyOrientation,HYPAngle);
+}
+
 /**
  * This method will destructively clip the chain angles that are passed to it.
  * This means that it will modify the array that was passed by reference

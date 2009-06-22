@@ -36,6 +36,17 @@ namespace Kinematics{
                                   const NBMath::ufvector3 & legGoal,
                                   float startAngles []);
 
+    /**
+     * Wrapper method for IK which finds leg angles given a location
+     * for the leg, and angles for the body relative to the world
+     * and the HYP angle
+     */
+    const IKLegResult angleXYIK(const ChainID chainID,
+                                const NBMath::ufvector3 & legGoal,
+                                const float bodyAngleX,
+                                const float bodyAngleY,
+                                const float HYPAngle);
+
     const void clipChainAngles(const ChainID id,
                                float angles[]);
     const float getMinValue(const ChainID id, const int jointNumber);
