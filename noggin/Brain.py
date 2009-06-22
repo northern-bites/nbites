@@ -253,14 +253,14 @@ class Brain(object):
                           self.ball.dist,
                           self.playbook.role,
                           self.playbook.currentSubRole,
-                          2, #self.playbook.me.chaseTime, # Chase Time
+                          self.playbook.me.getChaseTime(),
                           self.loc.ballVelX,
                           self.loc.ballVelY)
 
-
-
-
     def resetLocalization(self):
+        """
+        Reset our localization
+        """
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
