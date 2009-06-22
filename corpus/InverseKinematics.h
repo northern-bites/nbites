@@ -20,6 +20,8 @@ namespace Kinematics{
     static const int maxHeelIterations = 20;
 
 
+    static const float HYP_NOT_SET = -1000.0f;
+
     enum IKOutcome {
         STUCK = 0,
         SUCCESS = 1
@@ -29,6 +31,10 @@ namespace Kinematics{
         IKOutcome outcome;
         float angles[6];
     };
+
+    const IKLegResult simpleLegIK(const ChainID chainID,
+                                  const NBMath::ufvector3 & legGoal,
+                                  float startAngles []);
 
     const void clipChainAngles(const ChainID id,
                                float angles[]);
@@ -58,14 +64,16 @@ namespace Kinematics{
                           const float maxHeelError = UNBELIEVABLY_LOW_ERROR);
 
 
-//Depricated methods
+    const IKLegResult analyticLegIK(const ChainID chainID,
+                                    const NBMath::ufvector3 &footGoal,
+                                    const NBMath::ufvector3 &footOrientation,
+                                    const NBMath::ufvector3 &bodyGoal,
+                                    const NBMath::ufvector3 &bodyOrientation,
+                                    const float givenHYPAngle = HYP_NOT_SET);
 
-    const NBMath::ufmatrix3 buildLegJacobian(const ChainID chainID,
-                                              const float angles[]);
 
-    const NBMath::ufmatrix3 buildHeelJacobian(const ChainID chainID,
-                                              const float angles[]);
-    void hackJointOrder(float angles[]);
+    NBMath::ufmatrix4 rotationHYPRightInv(const float HYP);
+    NBMath::ufmatrix4 rotationHYPLeftInv(const float HYP);
 
 };
 #endif

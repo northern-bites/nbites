@@ -2,10 +2,30 @@
 
 #include "InverseKinematics.h"
 
+#define USE_ANALYTIC_IK
 
 using namespace boost::numeric;
 using namespace NBMath;
 using namespace std;
+
+
+/**
+ * Wrapper method for simple IK, which just picks between the various
+ * methods of inverse kinematics we use
+ */
+const Kinematics::IKLegResult Kinematics::simpleLegIK(const ChainID chainID,
+                                                      const ufvector3 & legGoal,
+                                                      float startAngles []){
+#ifdef USE_ANALYTIC_IK
+    const ufvector3 footOrientation = CoordFrame3D::vector3D(0,0,0);
+    const ufvector3 bodyGoal = CoordFrame3D::vector3D(0,0,0);
+    const ufvector3 bodyOrientation = CoordFrame3D::vector3D(0,0,0);
+    return analyticLegIK(chainID,legGoal,footOrientation,
+                         bodyGoal,bodyOrientation,startAngles[0]);
+#else
+    return dls(chainID,legGoal,startAngles,REALLY_LOW_ERROR);
+#endif
+}
 
 /**
  * This method will destructively clip the chain angles that are passed to it.
@@ -423,8 +443,274 @@ Kinematics::dls(const ChainID chainID,
     return result;
 }
 
+/**
+ * The following method implements the analytic (exact) IK solution for the Nao
+ * which Dr. Dan Lee from UPenn was so gracious to show me. The code is ported
+ * from Matlab.
+ *
+ * Note that there are several frames of reference which are important to
+ * understanding this approach:
+ *  F -- the coordinate frame aligned with the bottom of the foot in question,
+ *       located directly beneath the heel
+ *  C -- the coordinate frame aligned with the body, located at the bellybutton
+ *  O -- an aritrary origin, which may coincide with F, C or neither
+ *
+ *  When referencing 4x4 homogeneous matrices, the convention is to label them
+ *  ab_Transform which means ab_Tranform*Va = Vb, that is, the ab transform
+ *  moves points from the a coordinate frame into the b coordinate frame.
+ *
+ * Triangles:
+ *  TTL --  THIGH_LENGTH, TIBIA_LENTH, legLenth triangle, where legLength
+ *          is the distance between the ankle and the hip
+ *
+ * Overview - first we find all the angles in the knee, and ankle
+ *            then we tackle the hip
+ */
+//#define DEBUG_ANA
+const Kinematics::IKLegResult Kinematics::analyticLegIK(const ChainID chainID,
+                                      const ufvector3 &footGoal,
+                                      const ufvector3 &footOrientation,
+                                      const ufvector3 &bodyGoal,
+                                      const ufvector3 &bodyOrientation,
+                                      const float givenHYPAngle)
+{
+    bool success = true;
+#ifdef DEBUG_ANA
+    cout << "anaIK inputs:"<<endl
+         <<"  footGoal: "<<footGoal<<endl
+         <<"  footOrientation: "<<footOrientation<<endl
+         <<"  bodyGoal: "<<bodyGoal<<endl
+         <<"  bodyOrientation: "<<bodyOrientation<<endl
+         <<"  HYP Angle: " <<givenHYPAngle<<endl;
+#endif
+    //fo - translate from f to o
+    const ufmatrix4 fo_Transform = CoordFrame4D::get6DTransform(footGoal(0),
+                                                footGoal(1),footGoal(2),
+                                                footOrientation(0),
+                                                footOrientation(1),
+                                                footOrientation(2));
+    //co - translate from c to o
+    const ufmatrix4 co_Transform = CoordFrame4D::get6DTransform(bodyGoal(0),
+                                                bodyGoal(1),bodyGoal(2),
+                                                bodyOrientation(0),
+                                                bodyOrientation(1),
+                                                bodyOrientation(2));
+#ifdef DEBUG_ANA
+    cout << "fo_Transform: "<<endl<< "  "<<fo_Transform<<endl;
+    cout << "co_Transform: "<<endl<< "  "<<co_Transform<<endl;
+#endif
+    //fc - translate from f to o to c
+    const ufmatrix4 fc_Transform =
+        prod(CoordFrame4D::invertHomogenous(co_Transform),fo_Transform);
+
+    //cf - translate from c to o to f
+    const ufmatrix4 cf_Transform =
+        prod(CoordFrame4D::invertHomogenous(fo_Transform),co_Transform);
+
+#ifdef DEBUG_ANA
+    cout << "cf_Transform: "<<endl<< "  "<<cf_Transform<<endl;
+    cout << "fc_Transform: "<<endl<< "  "<<fc_Transform<<endl;
+#endif
+
+    const float leg_sign = (chainID == LLEG_CHAIN ? 1.0f : -1.0f);
+
+    //The location of the hip rotation center in the C frame
+    const ufvector4 hipOffset_c = CoordFrame4D::vector4D(0.0f,
+                                                         leg_sign*HIP_OFFSET_Y,
+                                                         -HIP_OFFSET_Z);
+    const ufvector4 ankleOffset_f =CoordFrame4D::vector4D(0.0f,
+                                                          0.0f,
+                                                          FOOT_HEIGHT);
+
+    //Find the location of the hip in the F frame that is shifted
+    //to the ankle from the bottom of the foot
+    const ufvector4 hipPosition_fprime =
+        prod(cf_Transform,hipOffset_c) - ankleOffset_f;
+
+#ifdef DEBUG_ANA
+    cout<< "Hip position in fprime: "<< hipPosition_fprime<<endl;
+#endif
+
+    //squared dist from ankle to hip
+    const float legLength = norm_2(hipPosition_fprime);
+    const float legLengthSq = std::pow(legLength,2);
+    if(legLength > THIGH_LENGTH+TIBIA_LENGTH)
+        success = false;
+#ifdef DEBUG_ANA
+    cout<< "LegLength: "<< legLength << ", sqrd = "<<legLengthSq<<endl;
+#endif
+
+    //Using the law of cosines to find knee pitch in TTL triangle
+    const float kneeCosine =
+        (legLengthSq -TIBIA_LENGTH*TIBIA_LENGTH - THIGH_LENGTH*THIGH_LENGTH)/
+                  (2.0f*TIBIA_LENGTH*THIGH_LENGTH);
+#ifdef DEBUG_ANA
+    cout<< "KneeCosine: "<<kneeCosine
+        << " unclipped cos"<< std::acos(kneeCosine)<<endl;
+#endif
+
+    const float KP = std::acos(std::min(std::max(kneeCosine,-1.0f),
+                                               1.0f));
+#ifdef DEBUG_ANA
+    cout<< "Calculated KP: "<<KP<<endl;
+#endif
+    //Now, we can find the ankle roll using only the position of hip in f:
+    const float AR = std::atan2(hipPosition_fprime(CoordFrame4D::Y_AXIS),
+                                hipPosition_fprime(CoordFrame4D::Z_AXIS));
+
+#ifdef DEBUG_ANA
+    cout<< "Calculated AR: "<<AR<<endl;
+#endif
+
+    //To find AP, we first use the law of sines to find angle opposite
+    //the THIGH in the TTL tri.
+    //Also, note, even though the TTL triangle is not in the plane XZ plane of
+    //the F frame, the following still works, since scaling the triangle into
+    //that frame creates a similar triangle with the same angles
+    const float pitch0 = std::asin(THIGH_LENGTH*std::sin(KP)/legLength);
+    const float AP =
+        std::asin(-hipPosition_fprime(CoordFrame4D::X_AXIS)/legLength) - pitch0;
+
+#ifdef DEBUG_ANA
+    cout<< "Calculated AP: "<<AP<<endl;
+#endif
+
+    float tempHYP = givenHYPAngle;
+    //If the HYP was not passed in, we need to find it:
+    if(givenHYPAngle == HYP_NOT_SET){
+        //find the rotation-only transform from C to F back to Hip
+        const ufmatrix3 cf_Rot  = subrange(cf_Transform,0,3,0,3);
+        const ufmatrix3 temp =
+            prod(CoordFrame3D::rotation3D(CoordFrame3D::Y_AXIS,
+                                          AP+KP),
+                 CoordFrame3D::rotation3D(CoordFrame3D::X_AXIS,
+                                          AR));
+        const ufmatrix3 cfh_Transform =
+            prod(temp,
+                 cf_Rot);
+
+        // next, grab the hipYawPitch angle from the cfh_Transform matrix.
+        // What? that's right!
+        // Here's how it works. The rHip rotation describes C->after_hip
+        // transform. If we assume that the HYP was the only joint one could use
+        // in the hip, then to modify rHip to be a C->C transform (i.e. I),
+        // you could do the following:
+        // find the the matrix RHYP, such that I = RHYP*rHip, let
+        // RHYP^-1 = rHip
+        // If you find RHYP = Rotx[-3Pi/4].Rotx[HYP].Rotx[3Pi/4] (for left),
+        // then you can evaluate (symbolicaly) RHYP^-1 with a transpose,
+        // and see that to solve for HYP, you can apply the formulas below
+        // neat stuff...
+        if(chainID == LLEG_CHAIN){
+            tempHYP =
+                std::atan2(std::sqrt(2.0f)*cfh_Transform(CoordFrame3D::Y_AXIS,
+                                                         CoordFrame3D::X_AXIS),
+                           cfh_Transform(CoordFrame3D::Y_AXIS,
+                                         CoordFrame3D::Y_AXIS) +
+                           cfh_Transform(CoordFrame3D::Y_AXIS,
+                                         CoordFrame3D::Z_AXIS));
+        }else{
+            tempHYP =
+                std::atan2(-std::sqrt(2.0f)*cfh_Transform(CoordFrame3D::Y_AXIS,
+                                                         CoordFrame3D::X_AXIS),
+                           cfh_Transform(CoordFrame3D::Y_AXIS,
+                                         CoordFrame3D::Y_AXIS) -
+                           cfh_Transform(CoordFrame3D::Y_AXIS,
+                                         CoordFrame3D::Z_AXIS));
+        }
+    }
+    const float HYP = tempHYP;
+#ifdef DEBUG_ANA
+    cout<< "Calculated HYP: "<<HYP<<endl;
+#endif
+
+    //Now we are left only to find the HipRoll and HipPitch
+
+    //Find the location of the ankle in a C frame shifted to hip
+    const ufvector4 anklePosition_cprime = prod(fc_Transform,
+                                                ankleOffset_f) - hipOffset_c;
+
+    //Now, we have already found HYP, so we will shift the cprime
+    //frame to the d frame. The d frame is positioned at the hip,
+    //and parrallel to the cprime EXCEPT for the HYP rotation, which is added:
+    const ufvector4 anklePosition_d = prod(( chainID == LLEG_CHAIN ?
+                                             rotationHYPLeftInv(HYP) :
+                                             rotationHYPRightInv(HYP)),
+                                           anklePosition_cprime);
 
 
-void Kinematics::hackJointOrder(float angles[]) {
-    //none
+    //Finding the hip Roll easy in the d frame:
+    const float HR = std::atan2(anklePosition_d(CoordFrame4D::Y_AXIS),
+                                -anklePosition_d(CoordFrame4D::Z_AXIS));
+#ifdef DEBUG_ANA
+    cout<< "Calculated HR: "<<HR<<endl;
+#endif
+
+    //Again, using the law of sines, we can find the angle accross from
+    //TIBIA_LENGTH in the triangle TTL:
+    const float pitch1 = std::asin(TIBIA_LENGTH*std::sin(KP)/legLength);
+    const float HP = std::asin(-anklePosition_d(CoordFrame4D::X_AXIS)
+                               /legLength) - pitch1;
+#ifdef DEBUG_ANA
+    cout<< "Calculated HP: "<<HP<<endl;
+#endif
+
+    //Setup the return value:
+    IKLegResult result;
+
+    result.angles[0] = HYP;
+    result.angles[1] = HR;
+    result.angles[2] = HP;
+    result.angles[3] = KP;
+    result.angles[4] = AP;
+    result.angles[5] = AR;
+    result.outcome = (success ? SUCCESS : STUCK);
+    return result;
 }
+
+ufmatrix4 Kinematics::rotationHYPLeftInv(const float HYP){
+    float sinHYP, cosHYP;
+    sincosf(HYP,&sinHYP,&cosHYP);
+    const float sqrt2 = std::sqrt(2.0f);
+
+    ufmatrix4 r  = ublas::identity_matrix<float>(4);
+
+    r(0,0) = cosHYP;
+    r(0,1) = -sinHYP/sqrt2;
+    r(0,2) = -sinHYP/sqrt2;
+
+    r(1,0) = sinHYP/sqrt2;
+    r(1,1) = 0.5f+cosHYP/2;
+    r(1,2) = -0.5f+cosHYP/2;
+
+    r(2,0) = sinHYP/sqrt2;
+    r(2,1) = -0.5f+cosHYP/2;
+    r(2,2) = 0.5f+cosHYP/2;
+
+    return r;
+}
+
+
+ufmatrix4 Kinematics::rotationHYPRightInv(const float HYP){
+    float sinHYP, cosHYP;
+    sincosf(HYP,&sinHYP,&cosHYP);
+    const float sqrt2 = std::sqrt(2.0f);
+
+    ufmatrix4 r  = ublas::identity_matrix<float>(4);
+
+    r(0,0) = cosHYP;
+    r(0,1) = sinHYP/sqrt2;
+    r(0,2) = -sinHYP/sqrt2;
+
+    r(1,0) = -sinHYP/sqrt2;
+    r(1,1) = 0.5f+cosHYP/2;
+    r(1,2) = 0.5f-cosHYP/2;
+
+    r(2,0) = sinHYP/sqrt2;
+    r(2,1) = 0.5f-cosHYP/2;
+    r(2,2) = 0.5f+cosHYP/2;
+
+    return r;
+}
+
+
