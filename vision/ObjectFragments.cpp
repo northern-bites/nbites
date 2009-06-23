@@ -3928,6 +3928,7 @@ bool ObjectFragments::atBoundary(blob b) {
         || b.leftBottom.y >= IMAGE_HEIGHT - 1;
 }
 
+
 /* See if there is a ball onscreen.  Basically we get all of the orange blobs
  * and test them for viability.  Once we've screened all of the obviously bad
  * ones we then pick the biggest one and check it some more.
@@ -4004,10 +4005,49 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 					drawBlob(blobs[i], WHITE);
 				}
 			} else if (diam > MAXDIAM) {
-				blobs[i].area = 0;
-				if (BALLDEBUG) {
-					cout << "Screened one that was too big " << diam << endl;
-					drawBlob(blobs[i], NAVY);
+				if (blobWidth(blobs[i]) > MAXDIAM) {
+					if (diam < MAXDIAM + 20) {
+						// Try trimming the ball
+						int lefty = diam / 2, righty = diam / 2, pix;
+						// scan in from the sides and see where we see orange faster - trim other side
+						for (int j = blobs[i].leftTop.x; j < blobs[i].leftTop.x + diam / 2; j++) {
+							pix = thresh->thresholded[blobs[i].leftTop.y + 20][j];
+							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
+								lefty = j - blobs[i].leftTop.x;
+								j = IMAGE_WIDTH;
+							}
+						}
+						for (int j = blobs[i].rightTop.x; j > blobs[i].rightTop.x - diam / 2; j--) {
+							pix = thresh->thresholded[blobs[i].leftTop.y + 20][j];
+							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
+								righty = blobs[i].leftTop.x - j;
+								j = 0;
+							}
+						}
+						if (lefty < righty) {
+							// the right side is too wide
+							blobs[i].rightTop.x = blobs[i].leftTop.x + MAXDIAM;
+							blobs[i].rightBottom.x = blobs[i].rightTop.x;
+						} else {
+							blobs[i].leftTop.x = blobs[i].rightTop.x - MAXDIAM;
+							blobs[i].leftBottom.x = blobs[i].leftTop.x;
+						}
+						if (blobHeight(blobs[i]) > MAXDIAM) {
+							blobs[i].leftBottom.y = blobs[i].leftTop.y + MAXDIAM;
+							blobs[i].rightBottom.y = blobs[i].leftBottom.y;
+						}
+					} else {
+						blobs[i].area = 0;
+						if (BALLDEBUG) {
+							cout << "Screened one that was too big " << diam << endl;
+							drawBlob(blobs[i], NAVY);
+						}
+					}
+				} else {
+					// Hacktacular:  trim the height to equal the width
+					int newHeight = blobWidth(blobs[i]);
+					blobs[i].leftBottom.y = blobs[i].leftTop.y + newHeight;
+					blobs[i].rightBottom.y = blobs[i].leftBottom.y;
 				}
 			} else if (ar > arMin && perc > MINORANGEPERCENT) {
 				// don't do anything
