@@ -40,6 +40,13 @@ struct RangeBearingMeasurement
     RangeBearingMeasurement(VisualBall * ball) :
         distance(ball->getDistance()), bearing(ball->getBearing()),
         distanceSD(ball->getDistanceSD()), bearingSD(ball->getBearingSD()) {}
+
+    friend std::ostream& operator<< (std::ostream &o,
+                                     const RangeBearingMeasurement &m) {
+        return o << "(" << m.distance << ", " << m.bearing << ", "
+                 << m.distanceSD << ", " << m.bearingSD << ")";
+    }
+
     float distance;
     float bearing;
     float distanceSD;

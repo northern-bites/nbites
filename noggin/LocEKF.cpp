@@ -157,6 +157,7 @@ void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
             cout << endl << "\t\t" << *iter;
             ++iter;
         }
+        cout << endl;
     }
 
 #ifdef DEBUG_LOC_EKF_INPUTS
