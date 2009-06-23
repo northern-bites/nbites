@@ -45,6 +45,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
 
     //Allow safe access to the next joints
     pthread_mutex_init(&next_joints_mutex, NULL);
+    pthread_mutex_init(&next_provider_mutex, NULL);
     pthread_mutex_init(&calc_new_joints_mutex, NULL);
     pthread_mutex_init(&stiffness_mutex, NULL);
     pthread_cond_init(&calc_new_joints_cond,NULL);
@@ -68,6 +69,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
 
 MotionSwitchboard::~MotionSwitchboard() {
     pthread_mutex_destroy(&next_joints_mutex);
+    pthread_mutex_destroy(&next_provider_mutex);
     pthread_mutex_destroy(&calc_new_joints_mutex);
     pthread_mutex_destroy(&stiffness_mutex);
     pthread_cond_destroy(&calc_new_joints_cond);
@@ -149,11 +151,15 @@ void MotionSwitchboard::run() {
 }
 
 void MotionSwitchboard::preProcess(){
+    pthread_mutex_lock(&next_provider_mutex);
+
     if((curProvider != &nullBodyProvider && nextProvider == &nullBodyProvider) ||
        (curHeadProvider != &nullHeadProvider && nextHeadProvider == & nullHeadProvider)){
-        curProvider->hardReset();
-        curHeadProvider->hardReset();
+        headProvider.hardReset();
+        scriptedProvider.hardReset();
+        walkProvider.hardReset();
     }
+
     //determine the curProvider, and do any necessary swapping
 	if (curProvider != nextProvider && !curProvider->isActive()) {
         swapBodyProvider();
@@ -173,6 +179,8 @@ void MotionSwitchboard::preProcess(){
 #endif
         curHeadProvider->requestStop();
     }
+    pthread_mutex_unlock(&next_provider_mutex);
+
 }
 
 void MotionSwitchboard::processJoints(){
@@ -295,6 +303,8 @@ void MotionSwitchboard::processStiffness(){
 
 
 int MotionSwitchboard::postProcess(){
+    pthread_mutex_lock(&next_provider_mutex);
+
     newJoints = true;
 
     //Make sure that if the current provider just became inactive,
@@ -314,6 +324,8 @@ int MotionSwitchboard::postProcess(){
     //       The overhead of the mutex shouldn't be that high though.
     sensors->setSupportFoot(curProvider->getSupportFoot());
 
+    pthread_mutex_unlock(&next_provider_mutex);
+
     //return if one of the enactors 
     return curProvider->isActive() ||  curHeadProvider->isActive();
 
@@ -327,6 +339,7 @@ int MotionSwitchboard::postProcess(){
 void MotionSwitchboard::swapBodyProvider(){
     std::vector<BodyJointCommand *> gaitSwitches;
     std::string old_provider = curProvider->getName();
+
     switch(nextProvider->getType()){
     case WALK_PROVIDER:
         //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOARD IS BROKEN!
@@ -348,9 +361,9 @@ void MotionSwitchboard::swapBodyProvider(){
         }
         curProvider = nextProvider;
         break;
+    case NULL_PROVIDER:
     case SCRIPTED_PROVIDER:
     case HEAD_PROVIDER:
-    case NULL_PROVIDER:
     default:
         noWalkTransitionCommand = true;
         curProvider = nextProvider;
@@ -358,7 +371,6 @@ void MotionSwitchboard::swapBodyProvider(){
 #ifdef DEBUG_SWITCHBOARD
     cout << "Switched to " << *curProvider << " from "<<old_provider<< endl;
 #endif
-
 }
 
 void MotionSwitchboard::swapHeadProvider(){
@@ -367,7 +379,6 @@ void MotionSwitchboard::swapHeadProvider(){
     default:
         curHeadProvider = nextHeadProvider;
     }
-
 }
 
 const vector <float> MotionSwitchboard::getNextJoints() const {
@@ -558,51 +569,69 @@ void MotionSwitchboard::updateDebugLogs(){
 void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<GaitCommand> command){
     //Don't request to switch providers when we get a gait command
     //nextProvider = &walkProvider;
+
     walkProvider.setCommand(command);
 }
 void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
+    pthread_mutex_lock(&next_provider_mutex);
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+
 }
 void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
+    pthread_mutex_lock(&next_provider_mutex);
     nextProvider = &scriptedProvider;
     scriptedProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+
 }
 void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
+    pthread_mutex_lock(&next_provider_mutex);
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+
 }
 void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
+    pthread_mutex_lock(&next_provider_mutex);
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+
 }
-void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<FreezeCommand> command){
+void
+MotionSwitchboard::sendMotionCommand(const shared_ptr<FreezeCommand> command){
+    pthread_mutex_lock(&next_provider_mutex);
     nextProvider = &nullBodyProvider;
     nextHeadProvider = &nullHeadProvider;
 
     nullHeadProvider.setCommand(command);
     nullBodyProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
 
 #ifdef DEBUG_SWITCHBOARD
     cout << "Switched to " << *curProvider << endl;
 #endif
 
 }
-void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command){
+void
+MotionSwitchboard::sendMotionCommand(const shared_ptr<UnfreezeCommand> command){
+    pthread_mutex_lock(&next_provider_mutex);
     if(curHeadProvider == &nullHeadProvider){
         nullHeadProvider.setCommand(command);
-        nextHeadProvider->hardReset();
     }
     if(curProvider == &nullBodyProvider){
         nullBodyProvider.setCommand(command);
-        nextProvider->hardReset();
     }
-
+    pthread_mutex_unlock(&next_provider_mutex);
 }
 
 void
 MotionSwitchboard::sendMotionCommand(const shared_ptr<StepCommand> command){
+    pthread_mutex_lock(&next_provider_mutex);
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
 }
 
