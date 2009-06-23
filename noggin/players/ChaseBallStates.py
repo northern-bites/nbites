@@ -108,9 +108,6 @@ def approachBallWithLoc(player):
             transitions.shouldScanFindBallActiveLoc(player):
         return player.goLater('scanFindBall')
 
-    nav = player.brain.nav
-    my = player.brain.my
-
     if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
         player.brain.tracker.activeLoc()
     else :

@@ -46,7 +46,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.shouldSaveCounter = 0
         self.shouldChaseCounter = 0
+        self.shouldStopCaseCounter = 0
+        self.posForSaveCounter = 0
         self.stepsOffCenter = 0
+        self.ballRelY = 0.0
+        self.ballRelX = 0.0
+        self.isChasing = False
+        self.saving = False
 
         self.shouldAvoidObstacleRightCounter = 0
         self.shouldAvoidObstacleLeftCounter = 0
@@ -61,8 +67,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0
-        self.ballRelY = 0.0
-        self.ballRelX = 0.0
 
         self.kickObjective = None
 
@@ -82,9 +86,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if self.brain.gameController.currentState == 'gamePlaying':
             roleState = self.getNextState()
 
-            if self.currentRole == PBConstants.GOALIE:
-                GoalieTransitions.goalieRunChecks(self)
-
             if roleState != self.currentState:
                 self.switchTo(roleState)
 
@@ -94,6 +95,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         playbookRole = self.brain.playbook.role
         playbookSubRole = self.brain.playbook.subRole
         if playbookSubRole == self.subRole:
+            if playbookRole == PBConstants.GOALIE:
+                state = GoalieTransitions.goalieRunChecks(self)
+                return state
             return self.currentState
         # We don't stop chasing if we are in certain roles
         elif (self.currentRole == PBConstants.CHASER and

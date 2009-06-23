@@ -5,8 +5,9 @@ CENTER_SAVE_THRESH = 15
 
 def goalieSave(player):
     brain = player.brain
-
     if player.firstFrame():
+        player.saving = True
+        player.isChasing = False
         brain.motion.stopHeadMoves()
         brain.nav.switchTo('stop')
         brain.tracker.trackBall()
@@ -78,4 +79,5 @@ def postSave(player):
     player.brain.tracker.trackBall()
     #else: do not yet created postSaveScan
     roleState = player.getRoleState(player.currentRole)
+    player.saving = False
     return player.goLater(roleState)
