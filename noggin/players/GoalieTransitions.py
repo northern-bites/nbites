@@ -10,6 +10,7 @@ STRAFE_SPEED = 6
 STRAFE_STEPS = 5
 MAX_STEPS_OFF_CENTER = 50
 BUFFER = 50
+DEBUG = False
 
 def goalieRunChecks(player):
 
@@ -39,7 +40,8 @@ def goalieRunChecks(player):
             print "should chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
-                return 'goalieChase'
+                player.isChasing = True
+                return 'chase'
         else:
             player.shouldChaseCounter = 0
 
@@ -49,6 +51,7 @@ def goalieRunChecks(player):
             print "should stop chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
+                player.isChasing = False
                 return 'goaliePosition'
         else:
             player.shouldChaseCounter = 0
@@ -102,7 +105,7 @@ def shouldPositionForSave(player):
     if (20  > timeUntilSave > BALL_SAVE_LIMIT_TIME and
         ball.framesOn > 3. and relVelX < 0.
         and player.ballRelX < MOVE_TO_SAVE_DIST_THRESH):
-        player.brain.sensors.saveFrame()
+        if DEBUG: player.brain.sensors.saveFrame()
         #player.printf("relVelX = %g  timeUntilSave = %g" %
                       #(relVelX, timeUntilSave))
         return True;
@@ -137,7 +140,7 @@ def shouldSave(player):
     if (timeUntilSave < BALL_SAVE_LIMIT_TIME and
         ball.framesOn > 3. and relVelX < 0.
         and player.ballRelX < MOVE_TO_SAVE_DIST_THRESH):
-        player.brain.sensors.saveFrame()
+        if DEBUG: player.brain.sensors.saveFrame()
         #player.printf("relVelX = %g  timeUntilSave = %g" %
                       #(relVelX, timeUntilSave))
         return True;
@@ -157,7 +160,7 @@ def shouldHoldSave(player):
         timeUntilSave = -1
     if timeUntilSave < BALL_SAVE_LIMIT_TIME*2 and relVelX < 0 and\
             0 < player.ballRelX < MOVE_TO_SAVE_DIST_THRESH:
-        player.brain.sensors.saveFrame()
+        if DEBUG: player.brain.sensors.saveFrame()
         return True
     return False
 
@@ -176,7 +179,7 @@ def shouldChaseLoc(player):
     elif (my.x < Constants.MY_GOALBOX_RIGHT_X + 5 and
           my.y < Constants.MY_GOALBOX_TOP_Y + 5 and
           my.y > Constants.MY_GOALBOX_BOTTOM_Y - 5 and
-          (ball.locDist <= 60 or 0 < ball.dist <= 60)):
+          (0 < ball.locDist <= 60 or 0 < ball.dist <= 60)):
         return True
     return False
 
