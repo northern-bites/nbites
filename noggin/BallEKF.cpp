@@ -7,7 +7,7 @@ using namespace std;
 
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;
-const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
+const float BallEKF::USE_CARTESIAN_BALL_DIST = 50.0f;
 
 // How much uncertainty naturally grows per update
 const float BallEKF::BETA_BALL = 5.0f;
@@ -19,18 +19,18 @@ const float BallEKF::CARPET_FRICTION = -(1.0f / 4.0f);//25.0f; // 25 cm/s^2
 const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
 
 // Default initialization values
-const float BallEKF::INIT_BALL_X = CENTER_FIELD_X;
-const float BallEKF::INIT_BALL_Y = CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS;
+const float BallEKF::INIT_BALL_X = CENTER_FIELD_X + CENTER_CIRCLE_RADIUS;
+const float BallEKF::INIT_BALL_Y = CENTER_FIELD_Y;
 const float BallEKF::INIT_BALL_X_VEL = 0.0f;
 const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
-const float BallEKF::X_UNCERT_MAX = FIELD_HEIGHT / 2.0f;
-const float BallEKF::Y_UNCERT_MAX = FIELD_WIDTH / 2.0f;
+const float BallEKF::X_UNCERT_MAX = FIELD_WIDTH / 2.0f;
+const float BallEKF::Y_UNCERT_MAX = FIELD_HEIGHT / 2.0f;
 const float BallEKF::VELOCITY_UNCERT_MAX = 150.0f;
 const float BallEKF::X_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6f;
-const float BallEKF::INIT_X_UNCERT = FIELD_HEIGHT / 4.0f;
-const float BallEKF::INIT_Y_UNCERT = FIELD_WIDTH / 4.0f;
+const float BallEKF::INIT_X_UNCERT = FIELD_WIDTH / 4.0f;
+const float BallEKF::INIT_Y_UNCERT = FIELD_HEIGHT / 4.0f;
 const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
 const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
 const float BallEKF::X_EST_MIN = 0.0f;
@@ -58,10 +58,10 @@ BallEKF::BallEKF()
     A_k(1,3) = 1.0f / ASSUMED_FPS;
 
     // Set velocity uncertainty parameters
+    betas(2) = BETA_BALL_VEL;
     betas(3) = BETA_BALL_VEL;
-    betas(4) = BETA_BALL_VEL;
+    gammas(2) = GAMMA_BALL_VEL;
     gammas(3) = GAMMA_BALL_VEL;
-    gammas(4) = GAMMA_BALL_VEL;
 
     // Setup initial values
     setXEst(INIT_BALL_X);
@@ -153,6 +153,10 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     // Update expected ball movement
     timeUpdate(MotionModel());
     limitAPrioriUncert();
+
+    cout << "Betas " << betas << endl;
+    cout << "Gammas " << gammas << endl;
+    cout << *this << endl;
 
     // We've seen a ball
     if (ball.distance > 0.0) {
@@ -257,11 +261,15 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
 
         MeasurementVector d_x(2);
 
-        d_x(0) = static_cast<float>(hypot(x_b - robotPose.x, y_b - robotPose.y));
-        d_x(1) = atan2(y_b - robotPose.y, x_b - robotPose.x) - robotPose.h;
+        d_x(0) = static_cast<float>(hypot(x_b - robotPose.x,
+                                          y_b - robotPose.y));
+        d_x(1) = subPIAngle(safe_atan2(y_b - robotPose.y,
+                                       x_b - robotPose.x) - robotPose.h);
 
         // Calculate invariance
         V_k = z_x - d_x;
+        // cout << "\tExpected was: " << d_x << endl;
+        // cout << "\tObserved was: " << z_x << endl;
 
         // Calculate jacobians
         H_k(0,0) = (x_b - robotPose.x) / d_x(0);

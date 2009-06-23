@@ -5,8 +5,8 @@
 //#define DEBUG_STANDARD_ERROR
 using namespace boost::numeric;
 using namespace boost;
-using namespace NBMath;
 using namespace std;
+using namespace NBMath;
 
 // Parameters
 // Measurement conversion form
@@ -297,7 +297,8 @@ void LocEKF::incorporateMeasurement(Observation z,
         const float h = xhat_k_bar(2);
 
         d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
-        d_x(1) = atan2(y_b - y, x_b - x) - h;
+        d_x(1) = safe_atan2(y_b - y,
+                            x_b - x) - h;
         d_x(1) = NBMath::subPIAngle(d_x(1));
 
         // Calculate invariance

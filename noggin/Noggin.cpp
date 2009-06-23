@@ -403,7 +403,6 @@ void Noggin::updateLocalization()
         // no ball seen
         RangeBearingMeasurement k(vision->ball);
         m = k;
-        ballEKF->updateModel(m, loc->getCurrentEstimate());
     } else {
         // If it's off for more then the threshold, then try and use mate data
         TeammateBallMeasurement n;
@@ -427,8 +426,10 @@ void Noggin::updateLocalization()
 #           endif
         }
 #       endif
-        ballEKF->updateModel(m, loc->getCurrentEstimate());
     }
+    cout << "\tUpdating model" << endl;
+    ballEKF->updateModel(m, loc->getCurrentEstimate());
+    cout << "\tUpdated model" << endl;
 
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {
