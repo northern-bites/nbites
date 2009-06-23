@@ -101,6 +101,6 @@ def look(tracker):
         heads = HeadMoves.LOOK_HEADS[tracker.lookDirection]
         tracker.panTo(heads)
         return tracker.stay()
-    if not tracker.brain.motion.isHeadActive():
-        return tracker.goNow('stop')
+    if tracker.brain.ball.on:
+        return tracker.goNow('ballTracking')
     return tracker.stay()

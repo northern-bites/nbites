@@ -548,7 +548,7 @@ def afterKick(player):
         if player.brain.ball.on:
             tracker.trackBall()
         else:
-            player.lookPostKick()
+           player.lookPostKick()
         return player.stay()
 
     if player.chosenKick == SweetMoves.LEFT_SIDE_KICK or \
