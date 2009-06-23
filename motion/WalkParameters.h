@@ -183,14 +183,14 @@ public:
     std::vector<float> * getWalkStance();
 
 public:
-    std::vector<float> stance_config,
-        step_config,
-        zmp_config,
-        joint_hack_config,
-        sensor_config,
-        stiffness_config,
-        odo_config,
-        arm_config;
+    std::vector<float> stance,
+        step,
+        zmp,
+        hack,
+        sensor,
+        stiffness,
+        odo,
+        arm;
 //HACK:
 public:
     float motion_frame_length_s;

@@ -13,24 +13,24 @@ WalkParameters::WalkParameters(const vector<float> &_stance_config,
                                      const vector<float> &_stiffness_config,
                                      const vector<float> &_odo_config,
                                      const vector<float> &_arm_config)
-    :stance_config(_stance_config),
-     step_config(_step_config),
-     zmp_config(_zmp_config),
-     joint_hack_config(_joint_hack_config),
-     sensor_config(_sensor_config),
-     stiffness_config(_stiffness_config),
-     odo_config(_odo_config),
-     arm_config(_arm_config)
+    :stance(_stance_config),
+     step(_step_config),
+     zmp(_zmp_config),
+     hack(_joint_hack_config),
+     sensor(_sensor_config),
+     stiffness(_stiffness_config),
+     odo(_odo_config),
+     arm(_arm_config)
 {
     //Double check that the lengths of the vectors are correct
-    assert(stance_config.size()     ==  WP::LEN_STANCE_CONFIG);
-    assert(step_config.size()       ==  WP::LEN_STEP_CONFIG);
-    assert(zmp_config.size()        ==  WP::LEN_ZMP_CONFIG);
-    assert(joint_hack_config.size() ==  WP::LEN_HACK_CONFIG);
-    assert(sensor_config.size()     ==  WP::LEN_SENSOR_CONFIG);
-    assert(stiffness_config.size()  ==  WP::LEN_STIFF_CONFIG);
-    assert(odo_config.size()        ==  WP::LEN_ODO_CONFIG);
-    assert(arm_config.size()        ==  WP::LEN_ARM_CONFIG);
+    assert(stance.size()     ==  WP::LEN_STANCE_CONFIG);
+    assert(step.size()       ==  WP::LEN_STEP_CONFIG);
+    assert(zmp.size()        ==  WP::LEN_ZMP_CONFIG);
+    assert(hack.size() ==  WP::LEN_HACK_CONFIG);
+    assert(sensor.size()     ==  WP::LEN_SENSOR_CONFIG);
+    assert(stiffness.size()  ==  WP::LEN_STIFF_CONFIG);
+    assert(odo.size()        ==  WP::LEN_ODO_CONFIG);
+    assert(arm.size()        ==  WP::LEN_ARM_CONFIG);
 
 }
 WalkParameters::WalkParameters(
@@ -43,16 +43,16 @@ WalkParameters::WalkParameters(
     const float _odo_config[WP::LEN_ODO_CONFIG],
     const float _arm_config[WP::LEN_ARM_CONFIG])
     :
-    stance_config(_stance_config,&_stance_config[WP::LEN_STANCE_CONFIG]),
-    step_config(_step_config,&_step_config[WP::LEN_STEP_CONFIG]),
-    zmp_config(_zmp_config,&_zmp_config[WP::LEN_ZMP_CONFIG]),
-    joint_hack_config(_joint_hack_config,
+    stance(_stance_config,&_stance_config[WP::LEN_STANCE_CONFIG]),
+    step(_step_config,&_step_config[WP::LEN_STEP_CONFIG]),
+    zmp(_zmp_config,&_zmp_config[WP::LEN_ZMP_CONFIG]),
+    hack(_joint_hack_config,
                       &_joint_hack_config[WP::LEN_HACK_CONFIG]),
-    sensor_config(_sensor_config,&_sensor_config[WP::LEN_STIFF_CONFIG]),
-    stiffness_config(_stiffness_config,
+    sensor(_sensor_config,&_sensor_config[WP::LEN_STIFF_CONFIG]),
+    stiffness(_stiffness_config,
                      &_stiffness_config[WP::LEN_STIFF_CONFIG]),
-    odo_config(_odo_config,&_odo_config[WP::LEN_ODO_CONFIG]),
-    arm_config(_arm_config,&_arm_config[WP::LEN_ARM_CONFIG])
+    odo(_odo_config,&_odo_config[WP::LEN_ODO_CONFIG]),
+    arm(_arm_config,&_arm_config[WP::LEN_ARM_CONFIG])
 {}
 
 
