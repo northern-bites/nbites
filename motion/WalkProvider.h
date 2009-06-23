@@ -71,7 +71,7 @@ public:
             pthread_mutex_unlock(&walk_provider_mutex);
         }
 	void setCommand(const WalkCommand * command);
-	void setCommand(const boost::shared_ptr<GaitCommand> command);
+	void setCommand(const boost::shared_ptr<WalkParameters> command);
 	void setCommand(const boost::shared_ptr<StepCommand> command);
 
     std::vector<BodyJointCommand *> getGaitTransitionCommand();
@@ -89,7 +89,8 @@ private:
 
     boost::shared_ptr<Sensors> sensors;
 
-    const WalkingParameters * curGait, *nextGait;
+    boost::shared_ptr<WalkParameters> nextGait;
+    bool newGait;
     StepGenerator stepGenerator;
     bool pendingCommands;
     bool pendingStepCommands;
