@@ -4,8 +4,9 @@
 ROBOT=$1
 
 LOCAL_DEST=$2
+LOCAL_DEST=$LOCAL_DEST-$ROBOT
 
-USAGE="./grab <robot-name> <folder-destination>\nExample: $> ./grab slarti 223-09/slarti-sees-ball"
+USAGE="./grab <robot-name> <folder-destination>\nExample: $> ./grab zaphod graz/falseBalls"
 
 if [ "$1" = "" ]; then
     echo "No robot specified"
