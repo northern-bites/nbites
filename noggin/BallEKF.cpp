@@ -10,26 +10,28 @@ const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
 
 // How much uncertainty naturally grows per update
 const float BallEKF::BETA_BALL = 5.0f;
+const float BallEKF::BETA_BALL_VEL = 50.0f;
 // How much ball velocity should effect uncertainty
 const float BallEKF::GAMMA_BALL = 0.4f;
+const float BallEKF::GAMMA_BALL_VEL = 1.0f;
 const float BallEKF::CARPET_FRICTION = -(1.0f / 4.0f);//25.0f; // 25 cm/s^2
 const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
 
 // Default initialization values
-const float BallEKF::INIT_BALL_X = 370.0f;
-const float BallEKF::INIT_BALL_Y = 270.0f;
+const float BallEKF::INIT_BALL_X = CENTER_FIELD_X;
+const float BallEKF::INIT_BALL_Y = CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS;
 const float BallEKF::INIT_BALL_X_VEL = 0.0f;
 const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
-const float BallEKF::X_UNCERT_MAX = 740.0f;
-const float BallEKF::Y_UNCERT_MAX = 270.0f;
+const float BallEKF::X_UNCERT_MAX = FIELD_HEIGHT;
+const float BallEKF::Y_UNCERT_MAX = FIELD_WIDTH;
 const float BallEKF::VELOCITY_UNCERT_MAX = 150.0f;
 const float BallEKF::X_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6f;
-const float BallEKF::INIT_X_UNCERT = 740.0f;
-const float BallEKF::INIT_Y_UNCERT = 270.0f;
-const float BallEKF::INIT_X_VEL_UNCERT = 150.0f;
-const float BallEKF::INIT_Y_VEL_UNCERT = 150.0f;
+const float BallEKF::INIT_X_UNCERT = FIELD_HEIGHT;
+const float BallEKF::INIT_Y_UNCERT = FIELD_WIDTH;
+const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
+const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
 const float BallEKF::X_EST_MIN = 0.0f;
 const float BallEKF::Y_EST_MIN = 0.0f;
 const float BallEKF::X_EST_MAX = FIELD_WIDTH;
@@ -50,6 +52,12 @@ BallEKF::BallEKF()
     // Assummed change in position necessary for velocity to work correctly
     A_k(0,2) = 1.0f / ASSUMED_FPS;
     A_k(1,3) = 1.0f / ASSUMED_FPS;
+
+    // Set velocity uncertainty parameters
+    betas(3) = BETA_BALL_VEL;
+    betas(4) = BETA_BALL_VEL;
+    gammas(3) = GAMMA_BALL_VEL;
+    gammas(4) = GAMMA_BALL_VEL;
 
     // Setup initial values
     setXEst(INIT_BALL_X);
@@ -183,8 +191,8 @@ EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
     A_k(1,3) = dt;
     // I believe these are the derivatives with respect to x and y velocities
     // If you turn them on, then velocities are always 0 - Tucker
-    // A_k(2,2) = CARPET_FRICTION * sign(getXVelocityEst()) * dt;
-    // A_k(3,3) = CARPET_FRICTION * sign(getYVelocityEst()) *dt;
+     A_k(2,2) = CARPET_FRICTION * signNoZero(getXVelocityEst()) * dt;
+     A_k(3,3) = CARPET_FRICTION * signNoZero(getYVelocityEst()) *dt;
 
     return deltaBall;
 }

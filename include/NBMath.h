@@ -50,12 +50,19 @@ namespace NBMath {
      * Given a float return its sign
      *
      * @param f the number to examine the sign of
-     * @return -1.0f if f is less than 0.0f, 1.0f otherwise
+     * @return -1.0f if f is less than 0.0f, 1.0f if positive, 0.0f otherwise
      */
     const float sign(const float f);
+    /**
+     * Given a float return its sign
+     *
+     * @param f the number to examine the sign of
+     * @return -1.0f if f is less than 0.0f, 1.0f otherwise
+     */
+    const float signNoZero(const float f);
 
     /**
-     * Returns an equivalent angle to the one passed in with value between 
+     * Returns an equivalent angle to the one passed in with value between
      * positive and negative pi.
      *
      * @param theta The angle to be simplified

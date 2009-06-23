@@ -143,7 +143,9 @@ private:
     PoseEst robotPose;
     const static float ASSUMED_FPS;
     const static float BETA_BALL;
+    const static float BETA_BALL_VEL;
     const static float GAMMA_BALL;
+    const static float GAMMA_BALL_VEL;
     const static float CARPET_FRICTION;
     const static float BALL_DECAY_PERCENT;
     const static float INIT_BALL_X;
