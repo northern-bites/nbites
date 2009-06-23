@@ -191,40 +191,5 @@ public:
         stiffness,
         odo,
         arm;
-//HACK:
-public:
-    float motion_frame_length_s;
-    float bodyHeight;
-    float hipOffsetX;
-    float XAngleOffset;
-    float stepDuration; // seconds
-    float doubleSupportFraction; //Fraction of time spent in double support
-    float stepHeight; // in mm
-    float footLengthX;
-    float dblSupInactivePercentage; // time we aren't moving zmp in dbl support
-    float leftSwingHipRollAddition; //angle added to hip during single suppor
-    float rightSwingHipRollAddition; // in rad
-    float leftZMPSwingOffsetY; //in mm, distance to offset zmp from center of foot
-    float rightZMPSwingOffsetY;//in the Y direction (side to side)
-    float turnZMPOffsetY; // in mm per radians of turn
-    float strafeZMPOffsetY; // in mm per mm of step->y
-    float maxXSpeed;
-    float maxYSpeed;
-    float maxThetaSpeed;
-    float sensorFeedback;
-    float maxStiffness; //default stiffness
-    float kneeStiffness; //knee stiffness when swinging
-    float anklePitchStiffness; //ankle pitch stiffness
-    float ankleRollStiffness; //ankle roll stiffnesses
-    float armStiffness;
-    float xOdoScale;
-    float yOdoScale;
-    float thetaOdoScale;
-    float armAmplitude;   //amount, in rads, that the arms should swing
-//calculated from parameters
-public:
-    int stepDurationFrames; //one double + one single support
-    int doubleSupportFrames; //num frames to spend in double support
-    int singleSupportFrames; //num frames to spend in single support
 };
 #endif
