@@ -340,7 +340,7 @@ SAVE_RIGHT_DEBUG = ( ((GOALIE_POS[0][0]),
 SAVE_CENTER_DEBUG = ( ((-90,0,0,0),
                        (GOALIE_POS[0][1]),
                        (GOALIE_POS[0][2]),
-                       (-90,0,0,0), .5,0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                       (-90,0,0,0), .5,0, stiff.NORMAL_STIFFNESSES), )
 
 SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0),
                          (GOALIE_POS[0][1]),

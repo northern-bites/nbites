@@ -93,7 +93,7 @@ static const int TOOL_ACCEPT_LEN = strlen(TOOL_ACCEPT_MSG);
 // Comm constants and MACRO definitions
 //
 
-#define PACKET_HEADER "borat_foobar"
+#define PACKET_HEADER "ilikeyoulots"
 
 static const long PACKETS_PER_SECOND = 6;
 static const long SLEEP_MILLIS = 5000;

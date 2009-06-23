@@ -11,7 +11,7 @@ LOG_LOC = True
 USE_VISION = True # Disable if you want faster processing
 
 ##--------------------COM HEADER -------------#
-PACKET_HEADER = "borat_foobar"
+PACKET_HEADER = "ilikeyoulots"
 
 ##
 ##--------------------WALK TIME CONSTANTS -------------#
