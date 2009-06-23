@@ -175,7 +175,7 @@ void WalkProvider::setActive(){
 
 std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> curJoints = sensors->getMotionBodyAngles();
-    vector<float> * gaitJoints = nextGait->getWalkStance();
+    vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
 
     float max_change = -M_PI_FLOAT*10.0f;
     int max_index = -1;
@@ -196,8 +196,7 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     if(time <= 0.02f)
         return commands;
 
-    //larm: (0.,90.,0.,0.)
-    //rarm: (0.,-90.,0.,0.)
+    //Generate an intermediat for the arms
     float larm_angles[] = {0.9f, 0.3f,0.0f,0.0f};
     float rarm_angles[] = {0.9f,-0.3f,0.0f,0.0f};
 

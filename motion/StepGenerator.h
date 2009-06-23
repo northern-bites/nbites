@@ -48,6 +48,10 @@
  *    ways, so I'm not sure how to do this.
  *  - We need to clip incoming x,y,theta because there is no protection currently
  *  - We need an observer or we need to fix the preview controller's bugs
+ *
+ *  - make tick_legs return location of com_f, then make WalkProvider
+ *    own the WalkingLegs/Arms, and move a bunch of that code out of here
+ *
  * MUSINGS ON BETTER DESIGN:
  *  - Each Step could have a list of sub states which it must undergo
  *    A normal step would have just one DBL and one SINGLE in a row
@@ -135,6 +139,8 @@ public:
     const SupportFoot getSupportFoot() const {
         return supportFoot;
     }
+
+    static std::vector<float>* getDefaultStance(boost::shared_ptr<WalkParameters> wp);
 
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();

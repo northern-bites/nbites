@@ -126,6 +126,11 @@ public:
     std::vector<float> getOdoUpdate();
     void computeOdoUpdate();
 
+    static std::vector<float>
+    getAnglesFromGoal(const Kinematics::ChainID chainID,
+                      const NBMath::ufvector3 & goal,
+                      const std::vector<float> & stance);
+
 private:
     //Execution methods, get called depending on which state the leg is in
     LegJointStiffTuple supporting(NBMath::ufmatrix3 fc_Transform);
@@ -139,15 +144,18 @@ private:
     bool firstFrame(){return frameCounter == 0;}
     void assignStateTimes(boost::shared_ptr<Step> step);
     void debugProcessing();
+
 //hack
 public:
     const float getFootRotation();
 private:
     const float getHipYawPitch();
-    const std::vector<float> getStiffnesses();
+    const std::vector<float>
+    getStiffnesses();
     const boost::tuple<const float,const float>getHipHack(const float HYPAngle);
     const float cycloidy(float theta);
     const float cycloidx(float theta);
+
 
     inline Kinematics::ChainID getOtherLegChainID();
 

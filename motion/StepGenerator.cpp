@@ -897,6 +897,42 @@ void StepGenerator::generateStep( float _x,
     nextStepIsLeft = !nextStepIsLeft;
 }
 
+
+/**
+ * Method to return the default stance of the robot (including arms)
+ *
+ */
+vector<float>*
+StepGenerator::getDefaultStance(boost::shared_ptr<WalkParameters> wp){
+    const ufvector3 lleg_goal =
+        CoordFrame3D::vector3D(-wp->stance[WP::BODY_OFF_X],
+                               wp->stance[WP::LEG_SEPARATION_Y]*0.5f,
+                               -wp->stance[WP::BODY_HEIGHT]);
+    const ufvector3 rleg_goal =
+        CoordFrame3D::vector3D(-wp->stance[WP::BODY_OFF_X],
+                               -wp->stance[WP::LEG_SEPARATION_Y]*0.5f,
+                               -wp->stance[WP::BODY_HEIGHT]);
+
+    const vector<float> lleg = WalkingLeg::getAnglesFromGoal(LLEG_CHAIN,
+                                                             lleg_goal,
+                                                             wp->stance);
+    const vector<float> rleg = WalkingLeg::getAnglesFromGoal(RLEG_CHAIN,
+                                                             rleg_goal,
+                                                             wp->stance);
+
+    const vector<float> larm(LARM_WALK_ANGLES,&LARM_WALK_ANGLES[ARM_JOINTS]);
+    const vector<float> rarm(RARM_WALK_ANGLES,&RARM_WALK_ANGLES[ARM_JOINTS]);
+
+    vector<float> *allJoints = new vector<float>();
+
+    //now combine all the vectors together
+    allJoints->insert(allJoints->end(),larm.begin(),larm.end());
+    allJoints->insert(allJoints->end(),lleg.begin(),lleg.end());
+    allJoints->insert(allJoints->end(),rleg.begin(),rleg.end());
+    allJoints->insert(allJoints->end(),rarm.begin(),rarm.end());
+    return allJoints;
+}
+
 /**
  * Method returns the transformation matrix that goes between the previous
  * foot ('f') coordinate frame and the next f coordinate frame rooted at 'step'

@@ -129,6 +129,41 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
 
     return result;
 }
+
+/**
+ *  STATIC!! method to get angles from a goal, and the components of walking params
+ */
+vector<float> 
+WalkingLeg::getAnglesFromGoal(const ChainID chainID,
+                              const ufvector3 & goal,
+                              const vector<float> &stance){
+        assert(stance.size() == LEN_STANCE_CONFIG);
+
+        const float sign = (chainID == LLEG_CHAIN ? 1.0f : -1.0f);
+
+        const ufvector3 body_orientation =
+            CoordFrame3D::vector3D(0.0f,
+                                   stance[WP::BODY_ROT_Y],
+                                   0.0f);
+
+        const ufvector3 foot_orientation =
+            CoordFrame3D::vector3D(0.0f,
+                                   0.0f,
+                                   sign*stance[WP::LEG_ROT_Z]);
+        const ufvector3 body_goal =
+            CoordFrame3D::vector3D(0.0f,0.0f,0.0f);
+
+
+        IKLegResult result = analyticLegIK(chainID,
+                                           goal,
+                                           foot_orientation,
+                                           body_goal,
+                                           body_orientation);
+        return  vector<float>(result.angles,&result.angles[LEG_JOINTS]);
+
+}
+
+
 //#define SENSOR_SCALE 0.75f
 #define SENSOR_SCALE 0.0f
 LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
