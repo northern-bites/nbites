@@ -470,7 +470,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     teamColor, playerNumber, BALL_ID);
 
     float ballDist, ballBearing;
-    int lineCounter = 2;
     // Collect the frame by frame data
 
     while(!inputFile->eof()) {
@@ -494,7 +493,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
 
         // Read in observations
         sightings.clear();
-        cout << "Line #" << ++lineCounter << endl << "\t" << line << endl;
 
         // Observations are separated by colons
         while(inputLine.peek() == ':') {
@@ -503,9 +501,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
             float dist, bearing, distSD, bearingSD;
             inputLine >> c >> id >> dist >> bearing >> distSD >> bearingSD;
 
-            //cout  << c << " " << id << " " << dist << " " << bearing << " " << distSD << " "
-            //<< bearingSD << " ";
-
             Observation obs(id, dist, bearing, distSD, bearingSD,
                              Observation::isLineID(id));
             while(inputLine.peek() != ':' &&
@@ -513,7 +508,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                 PointLandmark p;
                 inputLine >> p.x >> p.y;
                 obs.addPointPossibility(p);
-                //cout << "Point " << p.x << " " << p.y << " ";
             }
             sightings.push_back(obs);
         }
@@ -526,6 +520,5 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
         printOutLogLine(outputFile, locEKF, sightings, lastOdo,
                         &currentPose, &currentBall, ballEKF, *_b,
                         teamColor, playerNumber, BALL_ID);
-        //if (lineCounter >= 6054) break;
     }
 }
