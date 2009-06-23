@@ -167,6 +167,8 @@ class HeadTracking(FSA.FSA):
                         StiffnessModes.LOW_HEAD_STIFFNESSES),) )
 
     def lookToDir(self, direction):
-        self.lookDirection = direction
-        self.brain.motion.stopHeadMoves()
-        self.switchTo('look')
+        if self.currentState is not 'look' or \
+                self.lookDirection is not direction:
+            self.lookDirection = direction
+            self.brain.motion.stopHeadMoves()
+            self.switchTo('look')

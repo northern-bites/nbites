@@ -2,6 +2,7 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
 from .. import NogginConstants
+from ..util import MyMath
 
 ####### CHASING STUFF ##############
 
@@ -91,6 +92,33 @@ def shouldKick(player):
         constants.BALL_KICK_RIGHT_Y_R and \
         constants.BALL_KICK_LEFT_X_CLOSE < ball.locRelX < \
         constants.BALL_KICK_LEFT_X_FAR
+######### BALL IN BOX ###############
+
+def shouldChaseAroundBox(player):
+    ball = player.brain.ball
+    my = player.brain.my
+    intersect = MyMath.linesIntersect
+
+    return ( intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
+                    NogginConstants.MY_GOALBOX_LEFT_X,
+                    NogginConstants.MY_GOALBOX_BOTTOM_Y,
+                    NogginConstants.MY_GOALBOX_RIGHT_X,
+                    NogginConstants.MY_GOALBOX_BOTTOM_Y) or
+         intersect( my.x, my.y, ball.x, ball.y, # LEFT_GOALBOX_LINE
+                    NogginConstants.MY_GOALBOX_RIGHT_X,
+                    NogginConstants.MY_GOALBOX_TOP_Y,
+                    NogginConstants.MY_GOALBOX_RIGHT_X,
+                    NogginConstants.MY_GOALBOX_BOTTOM_Y) or
+         intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
+                    NogginConstants.MY_GOALBOX_LEFT_X,
+                    NogginConstants.MY_GOALBOX_TOP_Y,
+                    NogginConstants.MY_GOALBOX_RIGHT_X,
+                    NogginConstants.MY_GOALBOX_TOP_Y) )
+
+
+
+
+
 
 ####### AVOIDANCE STUFF ##############
 
