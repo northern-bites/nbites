@@ -70,7 +70,7 @@ public class UDPServer extends Thread {
                 }
 		    }
 		    else {
-                System.out.println("robot is null");
+                //System.out.println("robot is null");
 		    }
 		}
 	    }catch (IOException e) {

@@ -9,7 +9,7 @@ import java.util.Vector;
 public class Robot {
 
     final static int NUM_MSG_COMPONENTS = 17;
-    final static String HEADER = "borat_foobar";
+    final static String HEADER = "ilikeyoulots";//"ilikeyoulots";
     final static int HEADER_DATA_SIZE = HEADER.length() + 1 + 5 * 8;
 
     final static int PACKET_TEAM_HEADER = 0;
@@ -88,7 +88,7 @@ public class Robot {
             input.readFully(rawHeader);
             String header = new String(rawHeader, "ASCII");
             if (!header.equals(HEADER)) {
-                System.out.println("UDP PACKET REJECTED: header = " + header);
+                //System.out.println("UDP PACKET REJECTED: header = " + header);
                 return null;
             }
             // parse header data
