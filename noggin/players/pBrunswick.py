@@ -54,6 +54,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.notAtPositionCounter = 0
         self.changeOmniGoToCounter = 0
         self.shouldRelocalizeCounter = 0
+        self.shouldChaseAroundBox = 0
+        self.shouldNotChaseAroundBox = 0
 
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0
@@ -230,3 +232,21 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             NogginConstants.OPP_GOALBOX_RIGHT_X and \
             NogginConstants.OPP_GOALBOX_TOP_Y > ball.y > \
             NogginConstants.OPP_GOALBOX_BOTTOM_Y
+
+    def ballInMyGoalBox(self):
+        ball = self.brain.ball
+        return NogginConstants.MY_GOALBOX_LEFT_X < ball.x < \
+            NogginConstants.MY_GOALBOX_RIGHT_X and \
+            NogginConstants.MY_GOALBOX_TOP_Y > ball.y > \
+            NogginConstants.MY_GOALBOX_BOTTOM_Y
+
+    def lookPostKick(self):
+        tracker = self.brain.tracker
+        if self.chosenKick == SweetMoves.LEFT_FAR_KICK or \
+                self.chosenKick == SweetMoves.RIGHT_FAR_KICK:
+            tracker.lookToDir('up')
+        elif self.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+            tracker.lookToDir('left')
+        elif self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+            tracker.lookToDir('right')
+

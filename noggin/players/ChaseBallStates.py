@@ -91,18 +91,27 @@ def approachBallWithLoc(player):
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
-    if transitions.shouldPositionForKick(player):
+    elif transitions.shouldPositionForKickFromApproachLoc(player):
         return player.goLater('positionForKick')
-    # elif transitions.shouldScanFindBall(player):
-    #     return player.goLater('scanFindBall')
-    # elif transitions.shouldAvoidObstacle(player):
-    #     return player.goLater('avoidObstacle')
-    # elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
-    #     return player.goLater('approachBall')
+    elif player.ballInMyGoalBox():
+        return player.goLater('ballInMyBox')
+    elif transitions.shouldChaseAroundBox(player):
+        return player.goLater('chaseAroundBox')
+    elif transitions.shouldAvoidObstacle(player):
+        return player.goLater('avoidObstacle')
+    elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
+        return player.goLater('approachBall')
+    elif not player.brain.tracker.activeLocOn and \
+            transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    elif player.brain.tracker.activeLocOn and \
+            transitions.shouldScanFindBallActiveLoc(player):
+        return player.goLater('scanFindBall')
+
     nav = player.brain.nav
     my = player.brain.my
 
-    if player.brain.ball.locDist > 100:
+    if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
         player.brain.tracker.activeLoc()
     else :
         player.brain.tracker.trackBall()
@@ -149,6 +158,14 @@ def approachBall(player):
         return player.goNow('waitBeforeKick')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('positionForKick')
+    elif player.ballInMyGoalBox():
+        player.brain.tracker.activeLoc()
+        player.stopWalking()
+        return player.stay()
+    elif transitions.shouldChaseAroundBox(player):
+        return player.goLater('chaseAroundBox')
+    elif transitions.shouldApproachBallWithLoc(player):
+        return player.goNow('approachBallWithLoc')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):
@@ -195,7 +212,7 @@ def positionForKick(player):
     # Determine approach speed
     targetY = ball.relY
 
-    sY = MyMath.clip(targetY * constants.PFK_GAIN,
+    sY = MyMath.clip(targetY * constants.PFK_Y_GAIN,
                      constants.PFK_MIN_Y_SPEED,
                      constants.PFK_MAX_Y_SPEED)
     if fabs(sY) < constants.PFK_MIN_Y_MAGNITUDE:
@@ -205,30 +222,14 @@ def positionForKick(player):
         targetX = (ball.relX -
                    (constants.BALL_KICK_LEFT_X_CLOSE +
                     constants.BALL_KICK_LEFT_X_FAR) / 2.0)
-        sX = MyMath.clip(ball.relX * constants.PFK_GAIN,
+        sX = MyMath.clip(ball.relX * constants.PFK_X_GAIN,
                          constants.PFK_MIN_X_SPEED,
                          constants.PFK_MAX_X_SPEED)
     else:
         sX = 0.0
 
-#     player.printf("\tPosition for kick target_y is " +
-#                   str(targetY), "cyan")
-#     player.printf("\tPosition for kick sY is " + str(sY), "cyan")
-#     player.printf("\tPosition for kick sX is " + str(sX), "cyan")
-#     player.printf("\tBall dist is: " + str(ball.dist), "cyan")
-#     player.printf("\tBall current y is: " +
-#                   str(ball.locRelY) + " want between " +
-#                   str(constants.BALL_KICK_LEFT_Y_L) +
-#                   " and " +
-#                   str(constants.BALL_KICK_LEFT_Y_R), "cyan")
-#     player.printf("\tBall current x is: " +
-#                   str(ball.locRelX) + " want between " +
-#                   str(constants.BALL_KICK_LEFT_X_CLOSE) +
-#                   " and " + str(constants.BALL_KICK_LEFT_X_FAR), "cyan")
-
     if ball.on:
         player.setSpeed(sX,sY,0)
-
     return player.stay()
 
 def waitBeforeKick(player):
@@ -251,15 +252,6 @@ def waitBeforeKick(player):
         return player.goLater('positionForKick')
     else:
         return player.goLater('getKickInfo')
-
-def ignoreOwnGoal(player):
-    """
-    Method to intelligently ignore kicking into our own goal
-    """
-    if transitions.shouldSpinFindBall(player):
-        return player.goNow('spinFindBall')
-
-    return player.stay()
 
 def avoidObstacle(player):
     """
@@ -297,6 +289,60 @@ def avoidObstacle(player):
 
     return player.stay()
 
+def chaseAroundBox(player):
+    if player.firstFrame():
+        player.shouldNotChaseAroundBox = 0
+
+    if transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+    elif transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    elif transitions.shouldAvoidObstacle(player):
+        return player.goLater('avoidObstacle')
+
+    if not transitions.shouldChaseAroundBox(player):
+        player.shouldChaseAroundBox += 1
+    else :
+        player.shouldChaseAroundBox = 0
+    if player.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
+        return player.goLater('chase')
+
+    ball = player.brain.ball
+    my = player.brain.my
+    if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
+        # go to corner nearest ball
+        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
+            player.brain.nav.goTo( (NogginConstants.MY_GOALBOX_RIGHT_X +
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOALBOX_TOP_Y +
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOAL_HEADING ))
+
+        if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOAL_HEADING ))
+
+    if my.x < NogginConstants.MY_GOALBOX_RIGHT_X:
+        # go to corner nearest ball
+        if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
+            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOALBOX_TOP_Y +
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOAL_HEADING ))
+
+        if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                                    constants.GOALBOX_OFFSET,
+                                    NogginConstants.MY_GOAL_HEADING ))
+    return player.stay()
+
+
 def orbitBall(player):
     """
     Method to spin around the ball before kicking
@@ -315,4 +361,12 @@ def steps(player):
         player.setSteps(3,3,0,5)
     elif player.brain.nav.currentState != "stepping":
         player.stopWalking()
+    return player.stay()
+
+def ballInMyBox(player):
+    if player.firstFrame():
+        player.brain.tracker.activeLoc()
+        player.stopWalking()
+    if not player.ballInMyGoalBox():
+        return player.goLater('chase')
     return player.stay()

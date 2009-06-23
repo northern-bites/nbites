@@ -123,39 +123,19 @@ def clearBall(player):
             if constants.DEBUG_KICKS: print ("\t\t Straight 4")
             return player.goLater('kickBallStraight')
 
-    elif player.kickDecider.sawOwnGoal:
-        if constants.SUPER_SAFE_KICKS:
-            player.orbitAngle = 180
-            return player.goLater('orbitBall')
+    elif myLeftPostBearing is not None and myRightPostBearing is not None:
+        # Goal in front
+        avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
 
-        # We see both posts
-        if myLeftPostBearing is not None and myRightPostBearing is not None:
-            # Goal in front
-            avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-
-            ORBIT_BEARING_THRESH = 45
-            if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\torbit!")
-                player.orbitAngle = MyMath.sign(avgMyGoalBearing) * \
-                    (180 - fabs(avgMyGoalBearing) )
-                return player.goLater('orbitBall')
+        ORBIT_BEARING_THRESH = 45
             # kick right
-            elif avgMyGoalBearing > 0:
-                if constants.DEBUG_KICKS: print ("\t\tright 1")
-                return player.goLater('kickBallRight')
-            else:
-                # kick left
-                if constants.DEBUG_KICKS: print ("\t\tleft 1")
-                return player.goLater('kickBallLeft')
+        if avgMyGoalBearing > 0:
+            if constants.DEBUG_KICKS: print ("\t\tright 1")
+            return player.goLater('kickBallRight')
         else:
-            if myLeftPostBearing is not None:
-                player.orbitAngle = MyMath.sign(myLeftPostBearing) * \
-                    (180 - fabs(myLeftPostBearing) )
-            else :
-                player.orbitAngle = MyMath.sign(myRightPostBearing) * \
-                    (180 - fabs(myRightPostBearing) )
-            return player.goLater('orbitBall')
-
+            # kick left
+            if constants.DEBUG_KICKS: print ("\t\tleft 1")
+            return player.goLater('kickBallLeft')
     else:
         # use localization for kick
         my = player.brain.my
@@ -541,7 +521,10 @@ def kickBallExecute(player):
         elif not player.penaltyMadeSecondKick:
             player.penaltyMadeSecondKick = True
 
-    elif player.stateTime >= SweetMoves.getMoveTime(player.chosenKick):
+    if player.brain.ball.framesOff > constants.LOOK_POST_KICK_FRAMES_OFF:
+        player.lookPostKick()
+
+    if player.stateTime >= SweetMoves.getMoveTime(player.chosenKick):
         return player.goLater('afterKick')
 
     return player.stay()
@@ -552,19 +535,28 @@ def afterKick(player):
     State to follow up after a kick.
     Currently exits after one frame.
     """
+    tracker = player.brain.tracker
+    chosenKick = player.chosenKick
+
     # trick the robot into standing up instead of leaning to the side
-    player.walkPose()
-    player.brain.tracker.trackBall()
+    if player.firstFrame():
+        player.walkPose()
 
-    if player.penaltyKicking:
-        return player.goLater('penaltyKickRelocalize')
+        if player.penaltyKicking:
+            return player.goLater('penaltyKickRelocalize')
 
-    if player.chosenKick == SweetMoves.LEFT_FAR_KICK or \
-            player.chosenKick == SweetMoves.RIGHT_FAR_KICK:
-        return player.goLater('scanFindBall')
-    elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK or \
-            player.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+        if player.brain.ball.on:
+            tracker.trackBall()
+        else:
+            player.lookPostKick()
+        return player.stay()
+
+    if player.chosenKick == SweetMoves.LEFT_SIDE_KICK or \
+            player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
         return player.goLater('spinFindBall')
+
+    if not player.brain.motion.isHeadActive():
+        return player.goLater('scanFindBall')
     return player.stay()
 
 def kickAtPosition(player):

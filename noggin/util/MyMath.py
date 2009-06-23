@@ -127,3 +127,18 @@ def getSpinDir(h, targetH):
         else:
             spinDir = RIGHT_SPIN
     return spinDir
+
+def linesIntersect(x11, y11, x21, y21,
+                   x12, y12, x22, y22):
+    if x12 - x22 == 0.0:
+        slope1 = 10000000
+
+    else :
+        slope1 = (y12 - y22)/(x12 - x22)
+
+    # Check if points of line2 are on opposite sides
+    # of line1
+    return (y11 > slope1 * (x11 - x12) + y12 and
+            y21 < slope1 * (x21 - x12) + y12) or \
+            (y11 < slope1 * (x11 - x12) + y12 and
+             y21 > slope1 * (x21 - x12) + y12)

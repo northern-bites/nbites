@@ -149,6 +149,12 @@ class Navigator(FSA.FSA):
         return (abs(self.brain.my.x - self.destX) < constants.CLOSER_XY
                 and abs(self.brain.my.y - self.destY) < constants.CLOSER_XY)
 
+    def atHeadingGoTo(self,targetHeading):
+        hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
+        #self.printf("H diff is " + str(hDiff))
+        return hDiff < constants.AT_HEADING_GOTO_DEG and \
+            self.brain.my.uncertH < constants.LOC_IS_ACTIVE_H
+
     def atHeading(self, targetHeading = None):
         """
         Returns true if we are at a heading close enough to what we want

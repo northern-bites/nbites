@@ -12,13 +12,13 @@ def scanBall(tracker):
 
 
     if not tracker.brain.motion.isHeadActive():
-        lastBallDist = ball.lastSeenDist
+        ballDist = ball.locDist
 
-        if lastBallDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
+        if ballDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.execute(HeadMoves.HIGH_SCAN_BALL)
 
-        elif lastBallDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
-                lastBallDist < HeadMoves.MID_SCAN_FAR_BOUND:
+        elif ballDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
+                ballDist < HeadMoves.MID_SCAN_FAR_BOUND:
             tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
         else:
             tracker.execute(HeadMoves.LOW_SCAN_BALL)
@@ -94,4 +94,13 @@ def returnHeadsPan(tracker):
             tracker.target.on:
         tracker.trackObject()
         return tracker.goLater(tracker.lastDiffState)
+    return tracker.stay()
+
+def look(tracker):
+    if tracker.firstFrame():
+        heads = HeadMoves.LOOK_HEADS[tracker.lookDirection]
+        tracker.panTo(heads)
+        return tracker.stay()
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goNow('stop')
     return tracker.stay()
