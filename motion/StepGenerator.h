@@ -140,7 +140,8 @@ public:
         return supportFoot;
     }
 
-    static std::vector<float>* getDefaultStance(boost::shared_ptr<WalkParameters> wp);
+    static std::vector<float>*
+    getDefaultStance(boost::shared_ptr<WalkParameters> wp);
 
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
@@ -219,7 +220,7 @@ private:
     NBMath::ufmatrix3 cc_Transform; //odometry
 
     boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<WalkParameters> walkParams;
+    const WalkParameters * walkParams;
     bool nextStepIsLeft;
 
     WalkingLeg leftLeg, rightLeg;

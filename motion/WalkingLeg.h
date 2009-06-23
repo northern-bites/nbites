@@ -81,7 +81,7 @@ struct WalkCycle{
     boost::shared_ptr<Step> supportStep;
     NBMath::ufvector3 swing_src;
     NBMath::ufvector3 swing_dest;
-    boost::shared_ptr<WalkParameters> params;
+    const WalkParameters * params;
 };
 
 class WalkingLeg  {
@@ -121,7 +121,7 @@ public:
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT || state == SUPPORTING;
     };
-    void resetGait(boost::shared_ptr<WalkParameters> _wp);
+    void resetGait(const WalkParameters * _wp);
 
     std::vector<float> getOdoUpdate();
     void computeOdoUpdate();
@@ -129,7 +129,7 @@ public:
     static std::vector<float>
     getAnglesFromGoal(const Kinematics::ChainID chainID,
                       const NBMath::ufvector3 & goal,
-                      const std::vector<float> & stance);
+                      const float stance[WP::LEN_STANCE_CONFIG]);
 
 private:
     //Execution methods, get called depending on which state the leg is in
@@ -174,7 +174,7 @@ private:
 
     //Leg Attributes
     Kinematics::ChainID chainID; //keep track of which leg this is
-    boost::shared_ptr<WalkParameters> walkParams;
+    const WalkParameters * walkParams;
     float lastJoints[Kinematics::LEG_JOINTS];
     NBMath::ufvector3 goal;
     NBMath::ufvector3 last_goal;

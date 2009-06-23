@@ -3,34 +3,30 @@
 #include <iostream>
 using namespace std;
 
+WalkParameters::WalkParameters(const WalkParameters & other){
+    memcpy(stance,other.stance,WP::LEN_STANCE_CONFIG*sizeof(float));
+    memcpy(step,other.step,WP::LEN_STEP_CONFIG*sizeof(float));
+    memcpy(zmp,other.zmp,WP::LEN_ZMP_CONFIG*sizeof(float));
+    memcpy(hack,other.hack,WP::LEN_HACK_CONFIG*sizeof(float));
 
+    memcpy(sensor,other.sensor,WP::LEN_STIFF_CONFIG*sizeof(float));
+    memcpy(stiffness,other.stiffness,WP::LEN_STIFF_CONFIG*sizeof(float));
+    memcpy(odo,other.odo,WP::LEN_ODO_CONFIG*sizeof(float));
+    memcpy(arm,other.arm,WP::LEN_ARM_CONFIG*sizeof(float));
+    std::cout << toString() <<endl;
 
-WalkParameters::WalkParameters(const vector<float> &_stance_config,
-                                     const vector<float> &_step_config,
-                                     const vector<float> &_zmp_config,
-                                     const vector<float> &_joint_hack_config,
-                                     const vector<float> &_sensor_config,
-                                     const vector<float> &_stiffness_config,
-                                     const vector<float> &_odo_config,
-                                     const vector<float> &_arm_config)
-    :stance(_stance_config),
-     step(_step_config),
-     zmp(_zmp_config),
-     hack(_joint_hack_config),
-     sensor(_sensor_config),
-     stiffness(_stiffness_config),
-     odo(_odo_config),
-     arm(_arm_config)
-{
-    //Double check that the lengths of the vectors are correct
-    assert(stance.size()     ==  WP::LEN_STANCE_CONFIG);
-    assert(step.size()       ==  WP::LEN_STEP_CONFIG);
-    assert(zmp.size()        ==  WP::LEN_ZMP_CONFIG);
-    assert(hack.size() ==  WP::LEN_HACK_CONFIG);
-    assert(sensor.size()     ==  WP::LEN_SENSOR_CONFIG);
-    assert(stiffness.size()  ==  WP::LEN_STIFF_CONFIG);
-    assert(odo.size()        ==  WP::LEN_ODO_CONFIG);
-    assert(arm.size()        ==  WP::LEN_ARM_CONFIG);
+}
+WalkParameters::WalkParameters(const boost::shared_ptr<WalkParameters> other){
+    memcpy(stance,other->stance,WP::LEN_STANCE_CONFIG*sizeof(float));
+    memcpy(step,other->step,WP::LEN_STEP_CONFIG*sizeof(float));
+    memcpy(zmp,other->zmp,WP::LEN_ZMP_CONFIG*sizeof(float));
+    memcpy(hack,other->hack,WP::LEN_HACK_CONFIG*sizeof(float));
+
+    memcpy(sensor,other->sensor,WP::LEN_STIFF_CONFIG*sizeof(float));
+    memcpy(stiffness,other->stiffness,WP::LEN_STIFF_CONFIG*sizeof(float));
+    memcpy(odo,other->odo,WP::LEN_ODO_CONFIG*sizeof(float));
+    memcpy(arm,other->arm,WP::LEN_ARM_CONFIG*sizeof(float));
+    std::cout << toString() <<endl;
 
 }
 WalkParameters::WalkParameters(
@@ -42,18 +38,18 @@ WalkParameters::WalkParameters(
     const float _stiffness_config[WP::LEN_STIFF_CONFIG],
     const float _odo_config[WP::LEN_ODO_CONFIG],
     const float _arm_config[WP::LEN_ARM_CONFIG])
-    :
-    stance(_stance_config,&_stance_config[WP::LEN_STANCE_CONFIG]),
-    step(_step_config,&_step_config[WP::LEN_STEP_CONFIG]),
-    zmp(_zmp_config,&_zmp_config[WP::LEN_ZMP_CONFIG]),
-    hack(_joint_hack_config,
-                      &_joint_hack_config[WP::LEN_HACK_CONFIG]),
-    sensor(_sensor_config,&_sensor_config[WP::LEN_STIFF_CONFIG]),
-    stiffness(_stiffness_config,
-                     &_stiffness_config[WP::LEN_STIFF_CONFIG]),
-    odo(_odo_config,&_odo_config[WP::LEN_ODO_CONFIG]),
-    arm(_arm_config,&_arm_config[WP::LEN_ARM_CONFIG])
-{}
+{
+    memcpy(stance,_stance_config,WP::LEN_STANCE_CONFIG*sizeof(float));
+    memcpy(step,_step_config,WP::LEN_STEP_CONFIG*sizeof(float));
+    memcpy(zmp,_zmp_config,WP::LEN_ZMP_CONFIG*sizeof(float));
+    memcpy(hack,_joint_hack_config,WP::LEN_HACK_CONFIG*sizeof(float));
+
+    memcpy(sensor,_sensor_config,WP::LEN_STIFF_CONFIG*sizeof(float));
+    memcpy(stiffness,_stiffness_config,WP::LEN_STIFF_CONFIG*sizeof(float));
+    memcpy(odo,_odo_config,WP::LEN_ODO_CONFIG*sizeof(float));
+    memcpy(arm,_arm_config,WP::LEN_ARM_CONFIG*sizeof(float));
+    std::cout << toString() <<endl;
+}
 
 
 //Default constructor - use at your own risk
@@ -62,8 +58,43 @@ WalkParameters::WalkParameters(){
         " construct walk parameters?"<<std::endl;
 }
 
+using namespace WP;
+std::string WalkParameters::toString() const {
 
-vector<float>* WalkParameters::getWalkStance(){
-    return new vector<float>(20,0.0f);//HACK
+    string out;
+    char temp[200];
 
+    out+="#### STANCE #####\n";
+    for(int i =0; i < LEN_STIFF_CONFIG; i++){
+        sprintf(temp,"%f,",stance[i]);out+=string(temp);
+    }out+="\n#### STEP #####\n";
+
+    for(int i =0; i < LEN_STEP_CONFIG; i++){
+        sprintf(temp,"%f,",step[i]);out+=string(temp);
+    }out+="\n#### ZMP #####\n";
+
+    for(int i =0; i < LEN_ZMP_CONFIG; i++){
+        sprintf(temp,"%f,",zmp[i]);out+=string(temp);
+    }out+="\n#### HACK #####\n";
+
+    for(int i =0; i < LEN_HACK_CONFIG; i++){
+        sprintf(temp,"%f,",hack[i]);out+=string(temp);
+    }out+="\n#### SENSOR #####\n";
+
+    for(int i =0; i < LEN_SENSOR_CONFIG; i++){
+        sprintf(temp,"%f,",sensor[i]);out+=string(temp);
+    }out+="\n#### STIFF #####\n";
+
+    for(int i =0; i < LEN_STIFF_CONFIG; i++){
+        sprintf(temp,"%f,",stiffness[i]);out+=string(temp);
+    }out+="\n#### ODO #####\n";
+
+    for(int i =0; i < LEN_ODO_CONFIG; i++){
+        sprintf(temp,"%f,",odo[i]);out+=string(temp);
+    }out+="\n#### ARM #####\n";
+
+    for(int i =0; i < LEN_ARM_CONFIG; i++){
+        sprintf(temp,"%f,",arm[i]);out+=string(temp);
+    }out+="\n#########\n";
+    return out;
 }

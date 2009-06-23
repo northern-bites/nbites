@@ -2,6 +2,7 @@
 #define _WalkParameters_h_DEFINED
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include "NBMath.h"
 
 namespace WP {
@@ -162,14 +163,8 @@ enum ArmConfig{
 
 class WalkParameters{
 public:
-    WalkParameters(const std::vector<float> &_stance_config,
-                   const std::vector<float> &_step_config,
-                   const std::vector<float> &_zmp_config,
-                   const std::vector<float> &_joint_hack_config,
-                   const std::vector<float> &_sensor_config,
-                   const std::vector<float> &_stiffness_config,
-                   const std::vector<float> &_odo_config,
-                   const std::vector<float> &_arm_config);
+    WalkParameters(const WalkParameters & other);
+    WalkParameters(const boost::shared_ptr<WalkParameters> other);
     WalkParameters(const float _stance_config[WP::LEN_STANCE_CONFIG],
                    const float _step_config[WP::LEN_STEP_CONFIG],
                    const float _zmp_config[WP::LEN_ZMP_CONFIG],
@@ -178,18 +173,20 @@ public:
                    const float _stiffness_config[WP::LEN_STIFF_CONFIG],
                    const float _odo_config[WP::LEN_ODO_CONFIG],
                    const float _arm_config[WP::LEN_ARM_CONFIG]);
+
+    std::string toString() const ;
+
+private:
     WalkParameters();
 
-    std::vector<float> * getWalkStance();
-
 public:
-    std::vector<float> stance,
-        step,
-        zmp,
-        hack,
-        sensor,
-        stiffness,
-        odo,
-        arm;
+    float stance[WP::LEN_STANCE_CONFIG],
+        step[WP::LEN_STEP_CONFIG],
+        zmp[WP::LEN_ZMP_CONFIG],
+        hack[WP::LEN_HACK_CONFIG],
+        sensor[WP::LEN_SENSOR_CONFIG],
+        stiffness[WP::LEN_STIFF_CONFIG],
+        odo[WP::LEN_ODO_CONFIG],
+        arm[WP::LEN_ARM_CONFIG];
 };
 #endif

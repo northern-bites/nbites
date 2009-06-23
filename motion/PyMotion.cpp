@@ -81,32 +81,59 @@ public:
                      const tuple &_sensor_config,
                      const tuple &_stiffness_config,
                      const tuple &_odo_config,
-                     const tuple &_arm_config):
-        command(new WalkParameters(
-                    getRadVector<float,WP::LEN_STANCE_CONFIG>
-                    (_stance_config,WP::STANCE_CONVERSION),
-                    getRadVector<float,WP::LEN_STEP_CONFIG>
-                    (_step_config,WP::STEP_CONVERSION),
-                    getRadVector<float,WP::LEN_ZMP_CONFIG>
-                    (_zmp_config,WP::ZMP_CONVERSION),
-                    getRadVector<float,WP::LEN_HACK_CONFIG>
-                    (_joint_hack_config,WP::HACK_CONVERSION),
-                    getRadVector<float,WP::LEN_SENSOR_CONFIG>
-                    (_sensor_config,WP::SENSOR_CONVERSION),
-                    getRadVector<float,WP::LEN_STIFF_CONFIG>
-                    (_stiffness_config,WP::STIFF_CONVERSION),
-                    getRadVector<float,WP::LEN_ODO_CONFIG>
-                    (_odo_config,WP::ODO_CONVERSION),
-                    getRadVector<float,WP::LEN_ARM_CONFIG>
-                    (_arm_config,WP::ARM_CONVERSION))){}
+                     const tuple &_arm_config)
+{
+
+    float stance[WP::LEN_STANCE_CONFIG];
+    fillArray<float,WP::LEN_STANCE_CONFIG>
+        (stance,_stance_config,WP::STANCE_CONVERSION);
+
+    float step[WP::LEN_STEP_CONFIG];
+    fillArray<float,WP::LEN_STEP_CONFIG>
+        (step,_step_config,WP::STEP_CONVERSION);
+
+    float zmp[WP::LEN_ZMP_CONFIG];
+    fillArray<float,WP::LEN_ZMP_CONFIG>
+        (zmp,_zmp_config,WP::ZMP_CONVERSION);
+
+    float hack[WP::LEN_HACK_CONFIG];
+    fillArray<float,WP::LEN_HACK_CONFIG>
+        (hack,_joint_hack_config,WP::HACK_CONVERSION);
+
+    float sensor[WP::LEN_SENSOR_CONFIG];
+    fillArray<float,WP::LEN_SENSOR_CONFIG>
+        (sensor,_sensor_config,WP::SENSOR_CONVERSION);
+
+    float stiffness[WP::LEN_STIFF_CONFIG];
+    fillArray<float,WP::LEN_STIFF_CONFIG>
+        (stiffness,_stiffness_config,WP::STIFF_CONVERSION);
+
+    float odo[WP::LEN_ODO_CONFIG];
+    fillArray<float,WP::LEN_ODO_CONFIG>
+        (odo,_odo_config,WP::ODO_CONVERSION);
+
+    float arm[WP::LEN_ARM_CONFIG];
+    fillArray<float,WP::LEN_ARM_CONFIG>
+        (arm,_arm_config,WP::ARM_CONVERSION);
+
+    command = boost::shared_ptr<WalkParameters>(new WalkParameters(
+                                                    stance,step,
+                                                    zmp,
+                                                    hack,
+                                                    sensor,
+                                                    stiffness,
+                                                    odo,
+                                                    arm));
+
+
+}
     boost::shared_ptr<WalkParameters> getCommand()const{return command;}
-    template <class T, const unsigned int size> std::vector<T>
-    getRadVector(tuple t, const float convert_units[size]){
-    vector<float> v(size);
-    for(unsigned int i = 0; i < size;i++){
-        v[i] = extract<T>(t[i])*convert_units[i];
+
+    template <class T, const unsigned int size> void
+    fillArray( T target[size], tuple t, const T convert_units[size]){
+    for(unsigned int i = 0; i < size; i++){
+        target[i] = extract<T>(t[i])*convert_units[i];
     }
-    return v;
 }
 private:
     boost::shared_ptr<WalkParameters> command;

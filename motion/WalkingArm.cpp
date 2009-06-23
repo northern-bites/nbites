@@ -183,6 +183,6 @@ void WalkingArm::setState(SupportMode newState){
 
 
 
-void WalkingArm::resetGait(boost::shared_ptr<WalkParameters> _wp){
+void WalkingArm::resetGait(const WalkParameters * _wp){
     walkParams = _wp;
 }

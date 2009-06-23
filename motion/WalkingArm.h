@@ -23,7 +23,7 @@ public:
     void startLeft();
     void startRight();
 
-    void resetGait(boost::shared_ptr<WalkParameters> _wp);
+    void resetGait(const WalkParameters * _wp);
 
 private:
     bool shouldSwitchStates();
@@ -36,7 +36,7 @@ private:
 private:
     SupportMode state;
     Kinematics::ChainID chainID;
-    boost::shared_ptr<WalkParameters> walkParams;
+    const WalkParameters * walkParams;
 
     unsigned int frameCounter;
     unsigned int singleSupportFrames;

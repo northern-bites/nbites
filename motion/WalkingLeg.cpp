@@ -74,7 +74,7 @@ void WalkingLeg::setSteps(boost::shared_ptr<Step> _swing_src,
     assignStateTimes(support_step);
 }
 
-void WalkingLeg::resetGait(boost::shared_ptr<WalkParameters> _wp){
+void WalkingLeg::resetGait(const WalkParameters *  _wp){
     walkParams =_wp;
 }
 
@@ -133,10 +133,10 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
 /**
  *  STATIC!! method to get angles from a goal, and the components of walking params
  */
-vector<float> 
+vector<float>
 WalkingLeg::getAnglesFromGoal(const ChainID chainID,
                               const ufvector3 & goal,
-                              const vector<float> &stance){
+                              const float stance[WP::LEN_STANCE_CONFIG]){
         assert(stance.size() == LEN_STANCE_CONFIG);
 
         const float sign = (chainID == LLEG_CHAIN ? 1.0f : -1.0f);
