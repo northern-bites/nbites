@@ -93,11 +93,11 @@ enum SensorConfig{
  * armStiff     -- stiffnesses for the arms
  */
 enum StiffnessConfig{
-    HIP_STIFF = 0,
-    KP_STIFF,
-    AP_STIFF,
-    AR_STIFF,
-    ARM_STIFF,
+    HIP = 0,
+    KP,
+    AP,
+    AR,
+    ARM,
     LEN_STIFF_CONFIG
 };
 
@@ -108,9 +108,9 @@ enum StiffnessConfig{
  * thetaOdoScale  -- odometry calibration for rotational direction
  */
 enum OdoConfig{
-    X_ODO_SCALE = 0,
-    Y_ODO_SCALE,
-    Z_ODO_SCALE,
+    X_SCALE = 0,
+    Y_SCALE,
+    THETA_SCALE,
     LEN_ODO_CONFIG
 };
 
@@ -119,7 +119,7 @@ enum OdoConfig{
  * armAmplitude -- angle amplitude of arm motion
  */
 enum ArmConfig{
-    ARM_AMPLITUDE = 0,
+    AMPLITUDE = 0,
     LEN_ARM_CONFIG
 };
 

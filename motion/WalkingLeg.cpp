@@ -160,7 +160,7 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
 		  static_cast<float>(singleSupportFrames));
 
     float theta = percent_complete*2.0f*M_PI_FLOAT;
-    float stepHeight = walkParams->stepHeight;
+    float stepHeight = walkParams->step[WP::STEP_HEIGHT];
     float percent_to_dest_horizontal = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
     //Then we can express the destination as the proportionate distance to cover
@@ -173,21 +173,22 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     float target_c_x = target_c(0);
     float target_c_y = target_c(1);
 
-    float radius =walkParams->stepHeight/2;
+    float radius =walkParams->step[WP::STEP_HEIGHT]/2;
     float heightOffGround = radius*NBMath::cycloidy(theta);
 
     goal(0) = target_c_x;
     goal(1) = target_c_y;
-    goal(2) = -walkParams->bodyHeight + heightOffGround;
+    goal(2) = -walkParams->stance[WP::BODY_HEIGHT] + heightOffGround;
 
     //Set the desired HYP in lastJoints, which will be read by dls
     const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
+    //TODO consolidate the IK code from swinging and supporting better
     Inertial inertial = sensors->getInertial();
     const float angleScale = SENSOR_SCALE;
     const float angleX = inertial.angleX*angleScale;
-    const float angleY = walkParams->XAngleOffset
-        +(inertial.angleY-walkParams->XAngleOffset)*angleScale;
+    const float angleY = walkParams->stance[WP::BODY_ROT_Y]
+        +(inertial.angleY-walkParams->stance[WP::BODY_ROT_Y])*angleScale;
 
     IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,angleY,HYPAngle);
 
@@ -218,7 +219,7 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     float physicalHipOffY = 0;
     goal(0) = dest_x; //targetX for this leg
     goal(1) = dest_y;  //targetY
-    goal(2) = -walkParams->bodyHeight;         //targetZ
+    goal(2) = -walkParams->stance[WP::BODY_HEIGHT];         //targetZ
 
     //Set the desired HYP in lastJoints, which will be read by dls
     const float HYPAngle = lastJoints[0] = getHipYawPitch();
@@ -227,8 +228,8 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     Inertial inertial = sensors->getInertial();
     const float angleScale = SENSOR_SCALE;
     const float angleX = inertial.angleX*angleScale;
-    const float angleY = walkParams->XAngleOffset 
-        +(inertial.angleY-walkParams->XAngleOffset)*angleScale;
+    const float angleY = walkParams->stance[WP::BODY_ROT_Y]
+        +(inertial.angleY-walkParams->stance[WP::BODY_ROT_Y])*angleScale;
 
     IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
                                                angleY, HYPAngle);
@@ -302,8 +303,8 @@ WalkingLeg::getHipHack(const float curHYPAngle){
 
     //Calculate the compensation to the HIPROLL
     float MAX_HIP_ANGLE_OFFSET = (hack_chain == LLEG_CHAIN ?
-                                  walkParams->leftSwingHipRollAddition:
-                                  walkParams->rightSwingHipRollAddition);
+                                  walkParams->hack[WP::L_HIP_AMP]:
+                                  walkParams->hack[WP::R_HIP_AMP]);
 
     // the swinging leg will follow a trapezoid in 3-d. The trapezoid has
     // three stages: going up, a level stretch, going back down to the ground
@@ -360,10 +361,10 @@ WalkingLeg::getHipHack(const float curHYPAngle){
 const vector<float> WalkingLeg::getStiffnesses(){
 
     //get shorter names for all the constants
-    const float maxS = walkParams->maxStiffness;
-    const float anklePitchS = walkParams->anklePitchStiffness;
-    const float ankleRollS = walkParams->ankleRollStiffness;
-    const float kneeS = walkParams->kneeStiffness;
+    const float maxS = walkParams->stiffness[WP::HIP];
+    const float anklePitchS = walkParams->stiffness[WP::AP];
+    const float ankleRollS = walkParams->stiffness[WP::AR];
+    const float kneeS = walkParams->stiffness[WP::KP];
 
     float stiffnesses[LEG_JOINTS] = {maxS, maxS, maxS,
                                      kneeS,anklePitchS,ankleRollS};
@@ -389,9 +390,9 @@ void WalkingLeg::computeOdoUpdate(){
     const float xCOMMovement = -diff(0);
     const float yCOMMovement = -diff(1);
 
-    odoUpdate[0] =xCOMMovement*walkParams->xOdoScale;
-    odoUpdate[1] = yCOMMovement*walkParams->yOdoScale;
-    odoUpdate[2] = thetaCOMMovement*walkParams->thetaOdoScale;
+    odoUpdate[0] =xCOMMovement*walkParams->odo[WP::X_SCALE];
+    odoUpdate[1] = yCOMMovement*walkParams->odo[WP::Y_SCALE];
+    odoUpdate[2] = thetaCOMMovement*walkParams->odo[WP::THETA_SCALE];
 }
 
 
