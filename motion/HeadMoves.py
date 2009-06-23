@@ -99,16 +99,24 @@ POST_SCAN = (
     ((65.,-25.),2.0,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-25.),2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
-PAN_LEFT_HEADS = ( 65.0, -25.0)
-
-PAN_RIGHT_HEADS = ( -65.0, -25.0)
-
-PAN_UP_HEADS = ( 0.0, -40.0)
 
 KICK_SCAN = (
     ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((90.,-25.),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-90.,-25.),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((0.0,30.),0.5,1,stiff.LOW_HEAD_STIFFNESSES))
+    ((0.0,40.),0.5,1,stiff.LOW_HEAD_STIFFNESSES))
 
+
+PAN_LEFT_HEADS = ( 65.0, -25.0)
+
+PAN_RIGHT_HEADS = ( -65.0, -25.0)
+
+PAN_UP_HEADS = ( 0.0, -40.0)
+
+PAN_DOWN_HEADS = (0.0, 35.0)
+
+LOOK_HEADS = {'left' : PAN_LEFT_HEADS,
+              'right' : PAN_RIGHT_HEADS,
+              'up' : PAN_UP_HEADS,
+              'down' : PAN_DOWN_HEADS }

@@ -1,5 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..util import MyMath
 
 def scanFindBall(player):
     """
