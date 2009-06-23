@@ -55,7 +55,7 @@ void WalkProvider::requestStopFirstInstance() {
 void WalkProvider::hardReset(){
     pthread_mutex_lock(&walk_provider_mutex);
     stepGenerator.resetHard();
-
+    pendingCommands = pendingStepCommands =false;
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
 }

@@ -146,6 +146,7 @@ private:
     pthread_t       switchboard_thread;
     pthread_cond_t  calc_new_joints_cond;
     mutable pthread_mutex_t calc_new_joints_mutex;
+    mutable pthread_mutex_t next_provider_mutex;
     mutable pthread_mutex_t next_joints_mutex;
     mutable pthread_mutex_t stiffness_mutex;
 
