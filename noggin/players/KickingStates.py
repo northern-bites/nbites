@@ -123,39 +123,19 @@ def clearBall(player):
             if constants.DEBUG_KICKS: print ("\t\t Straight 4")
             return player.goLater('kickBallStraight')
 
-    elif player.kickDecider.sawOwnGoal:
-        if constants.SUPER_SAFE_KICKS:
-            player.orbitAngle = 180
-            return player.goLater('orbitBall')
+    elif myLeftPostBearing is not None and myRightPostBearing is not None:
+        # Goal in front
+        avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
 
-        # We see both posts
-        if myLeftPostBearing is not None and myRightPostBearing is not None:
-            # Goal in front
-            avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-
-            ORBIT_BEARING_THRESH = 45
-            if fabs(avgMyGoalBearing) < ORBIT_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\torbit!")
-                player.orbitAngle = MyMath.sign(avgMyGoalBearing) * \
-                    (180 - fabs(avgMyGoalBearing) )
-                return player.goLater('orbitBall')
+        ORBIT_BEARING_THRESH = 45
             # kick right
-            elif avgMyGoalBearing > 0:
-                if constants.DEBUG_KICKS: print ("\t\tright 1")
-                return player.goLater('kickBallRight')
-            else:
-                # kick left
-                if constants.DEBUG_KICKS: print ("\t\tleft 1")
-                return player.goLater('kickBallLeft')
+        if avgMyGoalBearing > 0:
+            if constants.DEBUG_KICKS: print ("\t\tright 1")
+            return player.goLater('kickBallRight')
         else:
-            if myLeftPostBearing is not None:
-                player.orbitAngle = MyMath.sign(myLeftPostBearing) * \
-                    (180 - fabs(myLeftPostBearing) )
-            else :
-                player.orbitAngle = MyMath.sign(myRightPostBearing) * \
-                    (180 - fabs(myRightPostBearing) )
-            return player.goLater('orbitBall')
-
+            # kick left
+            if constants.DEBUG_KICKS: print ("\t\tleft 1")
+            return player.goLater('kickBallLeft')
     else:
         # use localization for kick
         my = player.brain.my
