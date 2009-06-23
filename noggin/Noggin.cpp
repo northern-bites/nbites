@@ -22,6 +22,7 @@
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
 static const float MAX_CORNER_DISTANCE = 150.0f;
+static const float MAX_CROSS_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
 
@@ -359,7 +360,8 @@ void Noggin::updateLocalization()
 #   endif
 
     // Field Cross
-    if (vision->cross->getDistance() > 0) {
+    if (vision->cross->getDistance() > 0 &&
+        vision->cross->getDistance() < MAX_CROSS_DISTANCE) {
         Observation seen(*vision->cross);
         observations.push_back(seen);
 #       ifdef DEBUG_CROSS_OBSERVATIONS
@@ -395,16 +397,16 @@ void Noggin::updateLocalization()
     } else {
         ++ballFramesOff;
     }
-
+    RangeBearingMeasurement m;
     if( ballFramesOff < TEAMMATE_FRAMES_OFF_THRESH) {
         // If it's less than the threshold then we either see a ball or report
         // no ball seen
-        RangeBearingMeasurement m(vision->ball);
+        RangeBearingMeasurement k(vision->ball);
+        m = k;
         ballEKF->updateModel(m, loc->getCurrentEstimate());
     } else {
         // If it's off for more then the threshold, then try and use mate data
         TeammateBallMeasurement n;
-        RangeBearingMeasurement m;
 #       ifdef USE_TEAMMATE_BALL_REPORTS
         n = comm->getTeammateBallReport();
         if (!(n.ballX == 0.0 && n.ballY == 0.0) &&
@@ -432,8 +434,8 @@ void Noggin::updateLocalization()
     if (loggingLoc) {
         // Print out odometry and ball readings
         outputFile << odometery.deltaF << " " << odometery.deltaL << " "
-                   << odometery.deltaR << " " << vision->ball->getDistance()
-                   << " " << vision->ball->getBearing();
+                   << odometery.deltaR << " " << m.distance
+                   << " " << m.bearing;
         // Print out observation information
         for (unsigned int x = 0; x < observations.size(); ++x) {
             // Separate observations with a colon

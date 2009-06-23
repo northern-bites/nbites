@@ -10,7 +10,6 @@ GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
 
 
 def gamePlaying(player):
-    player.brain.resetLocalization()
     player.goToPoint = GOTO_POINTS[0]
     player.goToCounter = 0
     return player.goNow('goToPoint')
@@ -39,6 +38,5 @@ def atFinalPoint(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
         player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.resetSaveFrame()
 
     return player.stay()
