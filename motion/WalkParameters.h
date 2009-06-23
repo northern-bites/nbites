@@ -33,7 +33,7 @@ enum StanceConfig {
  *  maxVelTheta          -- maximum angular velocity of step
  */
 enum StepConfig{
-    STEP_DURATION,
+    DURATION,
     DBL_SUPP_P,
     STEP_HEIGHT,
     MAX_VEL_X,

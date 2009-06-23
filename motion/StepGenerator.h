@@ -215,9 +215,6 @@ private:
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<WalkParameters> walkParams;
     bool nextStepIsLeft;
-    // HACK: this variable holds the number of frames we have to wait before
-    //       we can start walking (NUM_PREVIEW_FRAMES).
-    int waitForController;
 
     WalkingLeg leftLeg, rightLeg;
     WalkingArm leftArm, rightArm;
