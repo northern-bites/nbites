@@ -64,6 +64,6 @@ WalkParameters::WalkParameters(){
 
 
 vector<float>* WalkParameters::getWalkStance(){
-    return new vector<float>(20,0.0f);
+    return new vector<float>(20,0.0f);//HACK
 
 }

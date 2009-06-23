@@ -83,20 +83,28 @@ public:
                      const tuple &_odo_config,
                      const tuple &_arm_config):
         command(new WalkParameters(
-                    getRadVector<float>(_stance_config,WP::LEN_STANCE_CONFIG),
-                    getRadVector<float>(_step_config,WP::LEN_STEP_CONFIG),
-                    getRadVector<float>(_zmp_config,WP::LEN_ZMP_CONFIG),
-                    getRadVector<float>(_joint_hack_config,WP::LEN_HACK_CONFIG),
-                    getRadVector<float>(_sensor_config,WP::LEN_SENSOR_CONFIG),
-                    getRadVector<float>(_stiffness_config,WP::LEN_STIFF_CONFIG),
-                    getRadVector<float>(_odo_config,WP::LEN_ODO_CONFIG),
-                    getRadVector<float>(_arm_config,WP::LEN_ARM_CONFIG))){}
+                    getRadVector<float,WP::LEN_STANCE_CONFIG>
+                    (_stance_config,WP::STANCE_CONVERSION),
+                    getRadVector<float,WP::LEN_STEP_CONFIG>
+                    (_step_config,WP::STEP_CONVERSION),
+                    getRadVector<float,WP::LEN_ZMP_CONFIG>
+                    (_zmp_config,WP::ZMP_CONVERSION),
+                    getRadVector<float,WP::LEN_HACK_CONFIG>
+                    (_joint_hack_config,WP::HACK_CONVERSION),
+                    getRadVector<float,WP::LEN_SENSOR_CONFIG>
+                    (_sensor_config,WP::SENSOR_CONVERSION),
+                    getRadVector<float,WP::LEN_STIFF_CONFIG>
+                    (_stiffness_config,WP::STIFF_CONVERSION),
+                    getRadVector<float,WP::LEN_ODO_CONFIG>
+                    (_odo_config,WP::ODO_CONVERSION),
+                    getRadVector<float,WP::LEN_ARM_CONFIG>
+                    (_arm_config,WP::ARM_CONVERSION))){}
     boost::shared_ptr<WalkParameters> getCommand()const{return command;}
-    template <class T> std::vector<T> getRadVector(tuple t,
-                                                   unsigned int size){
+    template <class T, const unsigned int size> std::vector<T>
+    getRadVector(tuple t, const float convert_units[size]){
     vector<float> v(size);
     for(unsigned int i = 0; i < size;i++){
-        v[i] = extract<T>(t[i]); //HACK -- convert units here!!
+        v[i] = extract<T>(t[i])*convert_units[i];
     }
     return v;
 }

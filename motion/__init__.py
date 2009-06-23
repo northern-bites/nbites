@@ -7,5 +7,4 @@ from _motion import (MotionInterface,
                      WalkCommand,
                      FreezeCommand,
                      UnfreezeCommand,
-                     StepCommand,
-                     WalkParameters)
+                     StepCommand)
