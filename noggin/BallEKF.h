@@ -133,6 +133,7 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+    virtual void beforeCorrectionFinish(void);
     void limitAPrioriEst(void);
     void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
@@ -143,7 +144,9 @@ private:
     PoseEst robotPose;
     const static float ASSUMED_FPS;
     const static float BETA_BALL;
+    const static float BETA_BALL_VEL;
     const static float GAMMA_BALL;
+    const static float GAMMA_BALL_VEL;
     const static float CARPET_FRICTION;
     const static float BALL_DECAY_PERCENT;
     const static float INIT_BALL_X;
@@ -166,6 +169,7 @@ private:
     const static float Y_EST_MAX;
     const static float VELOCITY_EST_MAX;
     const static float VELOCITY_EST_MIN;
+    const static float BALL_JUMP_VEL_THRESH;
     const static float USE_CARTESIAN_BALL_DIST;
 };
 #endif // File

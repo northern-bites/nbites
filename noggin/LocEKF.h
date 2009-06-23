@@ -39,6 +39,7 @@ public:
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
     virtual void reset();
+    virtual void goalieReset();
 
     // Getters
     /**
@@ -165,6 +166,9 @@ private:
     const static float INIT_LOC_X;
     const static float INIT_LOC_Y;
     const static float INIT_LOC_H;
+    const static float INIT_GOALIE_LOC_X;
+    const static float INIT_GOALIE_LOC_Y;
+    const static float INIT_GOALIE_LOC_H;
     const static float X_UNCERT_MAX;
     const static float Y_UNCERT_MAX;
     const static float H_UNCERT_MAX;

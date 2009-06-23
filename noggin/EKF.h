@@ -224,15 +224,26 @@ public:
             // Update associate uncertainty
             P_k_bar = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);
         }
+
+        // Allow implementing classes to do things before copying the vectors
+        // For most implementations this should be ignored
+        beforeCorrectionFinish();
+
         xhat_k = xhat_k_bar;
         P_k = P_k_bar;
     }
 
-    virtual void noCorrectionStep() {
+    virtual void noCorrectionStep(void) {
         // Set current estimates to a priori estimates
         xhat_k = xhat_k_bar;
         P_k = P_k_bar;
     }
+
+    /**
+     * Allow implementing classes to do things before copying the vectors
+     * For most implementations this should be ignored
+     */
+    virtual void beforeCorrectionFinish(void) {}
 
 protected:
     // Pure virtual methods to be specified by implementing class

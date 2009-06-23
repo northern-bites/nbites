@@ -18,9 +18,13 @@ const float LocEKF::BETA_ROT = M_PI_FLOAT/64.0f;
 const float LocEKF::GAMMA_ROT = 0.1f;
 
 // Default initialization values
-const float LocEKF::INIT_LOC_X = 370.0f;
-const float LocEKF::INIT_LOC_Y = 270.0f;
+const float LocEKF::INIT_LOC_X = CENTER_FIELD_X;
+const float LocEKF::INIT_LOC_Y = CENTER_FIELD_Y;
 const float LocEKF::INIT_LOC_H = 0.0f;
+const float LocEKF::INIT_GOALIE_LOC_X = (FIELD_WHITE_LEFT_SIDELINE_X +
+                                         GOALBOX_DEPTH / 2.0f);
+const float LocEKF::INIT_GOALIE_LOC_Y = CENTER_FIELD_Y;
+const float LocEKF::INIT_GOALIE_LOC_H = 0.0f;
 // Uncertainty limits
 const float LocEKF::X_UNCERT_MAX = 680.0f;
 const float LocEKF::Y_UNCERT_MAX = 440.0f;
@@ -83,6 +87,19 @@ void LocEKF::reset()
     setXEst(INIT_LOC_X);
     setYEst(INIT_LOC_Y);
     setHEst(INIT_LOC_H);
+    setXUncert(INIT_X_UNCERT);
+    setYUncert(INIT_Y_UNCERT);
+    setHUncert(INIT_H_UNCERT);
+}
+
+/**
+ * Reset the EKF to a starting configuration
+ */
+void LocEKF::goalieReset()
+{
+    setXEst(INIT_GOALIE_LOC_X);
+    setYEst(INIT_GOALIE_LOC_Y);
+    setHEst(INIT_GOALIE_LOC_H);
     setXUncert(INIT_X_UNCERT);
     setYUncert(INIT_Y_UNCERT);
     setHUncert(INIT_H_UNCERT);

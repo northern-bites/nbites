@@ -34,6 +34,10 @@ public:
         loc->reset();
         ballEKF->reset();
     }
+    void goalieReset() {
+        loc->goalieReset();
+        ballEKF->reset();
+    }
 
     /* Getters */
     // We use degreees in python, and radians in C++
@@ -99,6 +103,8 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("lastOdoR", &PyLoc::getOdoR)
         // functional
         .def("reset", &PyLoc::reset, "reset the localization system")
+        .def("goalieReset", &PyLoc::goalieReset,
+             "reset the localization system")
         ;
 }
 

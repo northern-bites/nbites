@@ -1,41 +1,46 @@
 #include "BallEKF.h"
+#include "FieldConstants.h"
 using namespace boost::numeric;
 using namespace boost;
-
 using namespace NBMath;
-#include "FieldConstants.h"
+
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;
 const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
 
 // How much uncertainty naturally grows per update
 const float BallEKF::BETA_BALL = 5.0f;
+const float BallEKF::BETA_BALL_VEL = 50.0f;
 // How much ball velocity should effect uncertainty
 const float BallEKF::GAMMA_BALL = 0.4f;
+const float BallEKF::GAMMA_BALL_VEL = 1.0f;
 const float BallEKF::CARPET_FRICTION = -(1.0f / 4.0f);//25.0f; // 25 cm/s^2
 const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
 
 // Default initialization values
-const float BallEKF::INIT_BALL_X = 370.0f;
-const float BallEKF::INIT_BALL_Y = 270.0f;
+const float BallEKF::INIT_BALL_X = CENTER_FIELD_X;
+const float BallEKF::INIT_BALL_Y = CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS;
 const float BallEKF::INIT_BALL_X_VEL = 0.0f;
 const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
-const float BallEKF::X_UNCERT_MAX = 740.0f;
-const float BallEKF::Y_UNCERT_MAX = 270.0f;
+const float BallEKF::X_UNCERT_MAX = FIELD_HEIGHT;
+const float BallEKF::Y_UNCERT_MAX = FIELD_WIDTH;
 const float BallEKF::VELOCITY_UNCERT_MAX = 150.0f;
 const float BallEKF::X_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6f;
-const float BallEKF::INIT_X_UNCERT = 740.0f;
-const float BallEKF::INIT_Y_UNCERT = 270.0f;
-const float BallEKF::INIT_X_VEL_UNCERT = 150.0f;
-const float BallEKF::INIT_Y_VEL_UNCERT = 150.0f;
+const float BallEKF::INIT_X_UNCERT = FIELD_HEIGHT;
+const float BallEKF::INIT_Y_UNCERT = FIELD_WIDTH;
+const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
+const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
 const float BallEKF::X_EST_MIN = 0.0f;
 const float BallEKF::Y_EST_MIN = 0.0f;
 const float BallEKF::X_EST_MAX = FIELD_WIDTH;
 const float BallEKF::Y_EST_MAX = FIELD_HEIGHT;
 const float BallEKF::VELOCITY_EST_MAX = 150.0f;
 const float BallEKF::VELOCITY_EST_MIN = -150.0f;
+// Distance to see a ball "jump" at which we reset velocity to 0
+const float BallEKF::BALL_JUMP_VEL_THRESH = 250.0f;
+static const bool USE_BALL_JUMP_RESET = true;
 
 BallEKF::BallEKF()
     : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
@@ -50,6 +55,12 @@ BallEKF::BallEKF()
     // Assummed change in position necessary for velocity to work correctly
     A_k(0,2) = 1.0f / ASSUMED_FPS;
     A_k(1,3) = 1.0f / ASSUMED_FPS;
+
+    // Set velocity uncertainty parameters
+    betas(3) = BETA_BALL_VEL;
+    betas(4) = BETA_BALL_VEL;
+    gammas(3) = GAMMA_BALL_VEL;
+    gammas(4) = GAMMA_BALL_VEL;
 
     // Setup initial values
     setXEst(INIT_BALL_X);
@@ -114,8 +125,6 @@ void BallEKF::reset()
             P_k(i,j) = 0.0f;
             P_k_bar(i,j) = 0.0f;
         }
-        // xhat_k(i) = 0.0f;
-        // xhat_k_bar(i) = 0.0f;
     }
     // Set the initial values
     setXEst(INIT_BALL_X);
@@ -123,9 +132,13 @@ void BallEKF::reset()
     setXVelocityEst(INIT_BALL_X_VEL);
     setYVelocityEst(INIT_BALL_Y_VEL);
     setXUncert(INIT_X_UNCERT);
+    P_k_bar(0,0) = INIT_X_UNCERT;
     setYUncert(INIT_Y_UNCERT);
+    P_k_bar(1,1) = INIT_Y_UNCERT;
     setXVelocityUncert(INIT_X_VEL_UNCERT);
+    P_k_bar(2,2) = INIT_X_VEL_UNCERT;
     setYVelocityUncert(INIT_X_VEL_UNCERT);
+    P_k_bar(3,3) = INIT_Y_VEL_UNCERT;
 }
 
 /**
@@ -148,11 +161,8 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
 
     } else { // No ball seen
         noCorrectionStep();
-        // setXVelocityEst(getXVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
-        // setYVelocityEst(getYVelocityEst() * (1.0f - BALL_DECAY_PERCENT));
     }
     limitPosteriorUncert();
-    //clipBallEstimate();
     limitPosteriorEst();
     testForNaNReset();
 }
@@ -181,10 +191,6 @@ EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
 
     A_k(0,2) = dt;
     A_k(1,3) = dt;
-    // I believe these are the derivatives with respect to x and y velocities
-    // If you turn them on, then velocities are always 0 - Tucker
-    // A_k(2,2) = CARPET_FRICTION * sign(getXVelocityEst()) * dt;
-    // A_k(3,3) = CARPET_FRICTION * sign(getYVelocityEst()) *dt;
 
     return deltaBall;
 }
@@ -264,6 +270,26 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
         R_k(0,0) = z.distanceSD;
         R_k(1,1) = z.bearingSD;
     }
+
+}
+
+void BallEKF::beforeCorrectionFinish(void)
+{
+    // We set velocity to 0, if the ball jumps too much
+    // The ball was likely moved by a referee or hasn't been seen in a while
+    // If the ball IS moving, then we'll pick it up in the next frame
+    if (USE_BALL_JUMP_RESET &&
+        (std::abs(xhat_k(2) - xhat_k_bar(2)) > BALL_JUMP_VEL_THRESH ||
+         std::abs(xhat_k(3) - xhat_k_bar(3)) > BALL_JUMP_VEL_THRESH) ) {
+        xhat_k_bar(2) = 0.0f;
+        xhat_k(2) = 0.0f;
+        xhat_k_bar(3) = 0.0f;
+        xhat_k(3) = 0.0f;
+        P_k(2,2) = VELOCITY_UNCERT_MAX;
+        P_k_bar(2,2) = VELOCITY_UNCERT_MAX;
+        P_k(3,3) = VELOCITY_UNCERT_MAX;
+        P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
+    }
 }
 
 /**
@@ -290,6 +316,8 @@ void BallEKF::limitAPrioriEst()
  */
 void BallEKF::limitPosteriorEst()
 {
+    // Clip the ball position estimate if it goes off of the field
+    // Reset the velocity to zero if we do this
     if(xhat_k(0) > X_EST_MAX) {
         xhat_k_bar(0) = X_EST_MAX;
         xhat_k(0) = X_EST_MAX;

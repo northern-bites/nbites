@@ -3,6 +3,10 @@ C++-FLAGS = -Wall -O3 -DNDEBUG
 RM = rm -f
 INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
 
+NBMATH_SRCS = ../../include/NBMath.cpp \
+	      ../../include/NBMath.h
+NBMATRIXMATH_SRCS = ../../include/NBMatrixMath.cpp \
+                    ../../include/NBMatrixMath.h
 VL_SRCS = ../../vision/VisualLine.cpp \
 	../../vision/VisualLine.h
 VC_SRCS = ../../vision/VisualCorner.cpp \
@@ -22,7 +26,7 @@ VFO_SRCS = ../../vision/VisualFieldObject.cpp \
 EKF_SRCS = ../EKF.h
 VISBALL_SRCS = ../../vision/VisualBall.cpp \
 	  ../../vision/VisualBall.h
-VLANDMARK_SRCS = ../../vision/VisualLandmark.h
+#VLANDMARK_SRCS = ../../vision/VisualLandmark.h
 VISDETECTION_SRCS = ../../vision/VisualDetection.cpp \
 	 ../../vision/VisualDetection.h
 CLANDMARK_SRCS = ../../vision/ConcreteLandmark.cpp \
@@ -56,12 +60,13 @@ NOISE_SRCS = noiseVaccuracy.cpp
 
 ROBOT_LOG_SRCS = convertRobotLog.cpp
 
-OBJS = Utility.o \
+OBJS = NBMath.o \
+       NBMatrixMath.o \
+       Utility.o \
        ConcreteLandmark.o \
        ConcreteCorner.o \
        ConcreteFieldObject.o \
        ConcreteLine.o \
-       VisualLandmark.o \
        VisualDetection.o \
        VisualFieldObject.o \
        VisualCorner.o \
@@ -125,6 +130,12 @@ fakerIterators.o : $(FAKER_ITERATORS_SRCS)
 fakerIO.o : $(FAKER_IO_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
+# NBMath
+NBMath.o : $(NBMATH_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+NBMatrixMath.o : $(NBMATRIXMATH_SRCS)
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+
 # Vision utilities
 Utility.o : $(UTILITY_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
@@ -142,11 +153,9 @@ ConcreteLine.o : $(CL_SRCS)
 # Visual Vision Stuff
 VisualDetection.o : $(VISDETECTION_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-VisualLandmark.o : $(VLANDMARK_SRCS)
-	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-VisualCorner.o : $(VC_SRCS) VisualLandmark.o
+VisualCorner.o : $(VC_SRCS) #VisualLandmark.o
 	 $(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-VisualFieldObject.o : $(VFO_SRCS) VisualLandmark.o
+VisualFieldObject.o : $(VFO_SRCS) #VisualLandmark.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 VisualLine.o : $(VL_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
@@ -158,11 +167,11 @@ Observation.o : $(OBS_SRCS)
 	 $(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 MCL.o : $(MCL_SRCS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-BallEKF.o :$(BALLEKF_SRCS) EKF.o
+BallEKF.o :$(BALLEKF_SRCS) EKF.o NBMath.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-LocEKF.o :$(LOCEKF_SRCS) EKF.o
+LocEKF.o :$(LOCEKF_SRCS) EKF.o NBMath.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
-EKF.o : $(EKF_SRCS)
+EKF.o : $(EKF_SRCS) NBMath.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 .Phony : clean
 

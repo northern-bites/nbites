@@ -29,7 +29,7 @@ const float NBMath::clip(const float value, const float minMax){
  * Given a float return its sign
  *
  * @param f the number to examine the sign of
- * @return -1.0f if f is less than 0.0f, 1.0f otherwise
+ * @return -1.0f if f is less than 0.0f, 1.0f if greater than, 0.0f otherwise
  */
 const float NBMath::sign(const float f)
 {
@@ -39,6 +39,21 @@ const float NBMath::sign(const float f)
         return 1.0f;
     } else {
         return 0.0f;
+    }
+}
+
+/**
+ * Given a float return its sign
+ *
+ * @param f the number to examine the sign of
+ * @return -1.0f if f is less than 0.0f, 1.0f otherwise
+ */
+const float NBMath::signNoZero(const float f)
+{
+    if (f < 0.0f) {
+        return -1.0f;
+    } else {
+        return 1.0f;
     }
 }
 

@@ -265,3 +265,12 @@ class Brain(object):
             self.out.stopLocLog()
             self.out.startLocLog()
         self.loc.reset()
+
+    def resetGoalieLocalization(self):
+        """
+        Reset our localization
+        """
+        if self.out.loggingLoc:
+            self.out.stopLocLog()
+            self.out.startLocLog()
+        self.loc.goalieReset()

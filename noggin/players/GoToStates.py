@@ -10,6 +10,7 @@ GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
 
 
 def gamePlaying(player):
+    player.brain.resetGoalieLocalization()
     player.goToPoint = GOTO_POINTS[0]
     player.goToCounter = 0
     return player.goNow('goToPoint')
