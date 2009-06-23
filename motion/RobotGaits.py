@@ -50,7 +50,24 @@ NEW_GAIT = motion.GaitCommand(STANCE_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
 
-WEBOTS_GAIT=NEW_GAIT
+
+WEBOTS_ZMP_CONFIG =(0.0,  # footCenterLocX
+                    0.4,  # zmp static percentage
+                    0.0,  # left zmp off
+                    0.0,  # right zmp off
+                    0.01,  # strafe zmp offse
+                    6.6)   # turn zmp offset
+WEBOTS_HACK_CONFIG = (0.0, # left swing hip roll addition
+                      0.0) # right swing hip roll addition
+
+WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
+            STEP_CONFIG,
+            WEBOTS_ZMP_CONFIG,
+            WEBOTS_HACK_CONFIG,
+            SENSOR_CONFIG,
+            STIFFNESS_CONFIG,
+            ODO_CONFIG,
+            ARM_CONFIG)
 # WEBOTS_GAIT = motion.GaitCommand(31.00, # com height
 #                                  1.40,  # hip offset x
 #                                  0.0,  # x-axis angle offset
