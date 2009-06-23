@@ -13,7 +13,7 @@ WalkParameters::WalkParameters(const WalkParameters & other){
     memcpy(stiffness,other.stiffness,WP::LEN_STIFF_CONFIG*sizeof(float));
     memcpy(odo,other.odo,WP::LEN_ODO_CONFIG*sizeof(float));
     memcpy(arm,other.arm,WP::LEN_ARM_CONFIG*sizeof(float));
-    std::cout << toString() <<endl;
+    //std::cout << toString() <<endl;
 
 }
 WalkParameters::WalkParameters(const boost::shared_ptr<WalkParameters> other){
@@ -26,7 +26,7 @@ WalkParameters::WalkParameters(const boost::shared_ptr<WalkParameters> other){
     memcpy(stiffness,other->stiffness,WP::LEN_STIFF_CONFIG*sizeof(float));
     memcpy(odo,other->odo,WP::LEN_ODO_CONFIG*sizeof(float));
     memcpy(arm,other->arm,WP::LEN_ARM_CONFIG*sizeof(float));
-    std::cout << toString() <<endl;
+    //std::cout << toString() <<endl;
 
 }
 WalkParameters::WalkParameters(
@@ -48,7 +48,7 @@ WalkParameters::WalkParameters(
     memcpy(stiffness,_stiffness_config,WP::LEN_STIFF_CONFIG*sizeof(float));
     memcpy(odo,_odo_config,WP::LEN_ODO_CONFIG*sizeof(float));
     memcpy(arm,_arm_config,WP::LEN_ARM_CONFIG*sizeof(float));
-    std::cout << toString() <<endl;
+    //std::cout << toString() <<endl;
 }
 
 
