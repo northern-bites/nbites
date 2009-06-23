@@ -37,7 +37,7 @@ def goalieRunChecks(player):
     if not player.isChasing:
         if shouldChaseLoc(player):
             player.shouldChaseCounter+=1
-            print "should chase: ", player.shouldChaseCounter
+            #print "should chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
                 player.isChasing = True
@@ -48,7 +48,7 @@ def goalieRunChecks(player):
     elif player.isChasing:
         if shouldStopChaseLoc(player):
             player.shouldChaseCounter+=1
-            print "should stop chase: ", player.shouldChaseCounter
+            #print "should stop chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
                 player.isChasing = False
@@ -97,8 +97,8 @@ def shouldPositionForSave(player):
 
     if relVelX < 0.0:
         timeUntilSave = player.ballRelX / -relVelX
-        player.printf(("relVelX = %g   timeUntilSave = %g") %
-                      (relVelX, timeUntilSave))
+        #player.printf(("relVelX = %g   timeUntilSave = %g") %
+        #              (relVelX, timeUntilSave))
     else:
         timeUntilSave = -1
     # No Time, Save now
@@ -132,8 +132,8 @@ def shouldSave(player):
 
     if relVelX < 0.0:
         timeUntilSave = player.ballRelX / -relVelX
-        player.printf(("relVelX = %g   timeUntilSave = %g") %
-                      (relVelX, timeUntilSave))
+        # player.printf(("relVelX = %g   timeUntilSave = %g") %
+        #               (relVelX, timeUntilSave))
     else:
         timeUntilSave = -1
     # No Time, Save now
