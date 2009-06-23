@@ -11,6 +11,7 @@ from .. import NogginConstants
 import ChaseBallTransitions
 from math import fabs
 from ..util import MyMath
+import KickingHelpers as helpers
 
 
 def getKickInfo(player):
@@ -80,79 +81,76 @@ def clearBall(player):
 
     # Things to do if we saw our own goal
     # Saw the opponent goal
-    if player.kickDecider.sawOppGoal:
-        if oppLeftPostBearing is not None and \
-                oppRightPostBearing is not None:
 
-            avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
-            if fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\t Straight 1")
-                return player.goLater('kickBallStraight')
+    if oppLeftPostBearing is not None and \
+            oppRightPostBearing is not None:
 
-            elif avgOppBearing > constants.ALIGN_FOR_KICK_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\t Left 5")
-                return player.goLater('kickBallLeft')
-            elif avgOppBearing < -constants.ALIGN_FOR_KICK_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\t Right 5")
-                return player.goLater('kickBallRight')
-
-        elif oppLeftPostBearing is not None:
-
-            if oppLeftPostBearing > constants.ACROSS_GOAL_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\t Left 6.1")
-                return player.goLater('kickBallLeft')
-            elif oppLeftPostBearing < constants.OUT_OF_GOAL_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\t Left 6.2")
-                return player.goLater('kickBallRight')
-            else:
-                if constants.DEBUG_KICKS: print ("\t\t Straight 2")
-                return player.goLater('kickBallStraight')
-
-        elif oppRightPostBearing is not None:
-
-            if oppRightPostBearing > -constants.OUT_OF_GOAL_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\t Right 6.1")
-                return player.goLater('kickBallLeft')
-            elif oppRightPostBearing < -constants.ACROSS_GOAL_BEARING_THRESH:
-                if constants.DEBUG_KICKS: print ("\t\t Right 6.2")
-                return player.goLater('kickBallRight')
-            else:
-                if constants.DEBUG_KICKS: print ("\t\t Straight 3")
-                return player.goLater('kickBallStraight')
-        else:
-            if constants.DEBUG_KICKS: print ("\t\t Straight 4")
+        avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
+        if fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH:
+            if constants.DEBUG_KICKS: print ("\t\t Straight 1")
             return player.goLater('kickBallStraight')
 
-    elif myLeftPostBearing is not None and myRightPostBearing is not None:
-        # Goal in front
-        avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-
-        ORBIT_BEARING_THRESH = 45
-            # kick right
-        if avgMyGoalBearing > 0:
-            if constants.DEBUG_KICKS: print ("\t\tright 1")
-            return player.goLater('kickBallRight')
-        else:
-            # kick left
-            if constants.DEBUG_KICKS: print ("\t\tleft 1")
+        elif avgOppBearing > constants.ALIGN_FOR_KICK_BEARING_THRESH:
+            if constants.DEBUG_KICKS: print ("\t\t Left 5")
             return player.goLater('kickBallLeft')
+        elif avgOppBearing < -constants.ALIGN_FOR_KICK_BEARING_THRESH:
+            if constants.DEBUG_KICKS: print ("\t\t Right 5")
+            return player.goLater('kickBallRight')
+
+    elif player.kickDecider.sawOwnGoal:
+        if myLeftPostBearing is not None and myRightPostBearing is not None:
+            # Goal in front
+            avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
+
+            if avgMyGoalBearing > 0:
+                if constants.DEBUG_KICKS: print ("\t\tright 1")
+                return player.goLater('kickBallRight')
+            else:
+                if constants.DEBUG_KICKS: print ("\t\tleft 1")
+                return player.goLater('kickBallLeft')
+        else :
+            postBearing = 0.0
+            if myLeftPostBearing is not None:
+                postBearing = myLeftPostBearing
+            else :
+                postBearing = myRightPostBearing
+            if postBearing > 0:
+                return player.goLater('kickBallRight')
+            else :
+                return player.goLater('kickBallLeft')
     else:
         # use localization for kick
         my = player.brain.my
-        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                           NogginConstants.OPP_GOALBOX_RIGHT_X,
-                                           NogginConstants.OPP_GOALBOX_MIDDLE_Y)
+        if helpers.inCenterOfField(player):
+            if abs(my.h) <= constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
+                return player.goLater('kickBallStraight')
+            elif my.h < -constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
+                return player.goLater('kickBallLeft')
+            elif my.h > constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
+                return player.goLater('kickBallRight')
 
-        print "my bearing to goal is ",bearingToGoal
-        if bearingToGoal > constants.MAX_FORWARD_KICK_ANGLE:
-            if constants.DEBUG_KICKS: print "\t\t Left 7"
-            return player.goLater('kickBallLeft')
-        elif bearingToGoal < -constants.MAX_FORWARD_KICK_ANGLE:
-            if constants.DEBUG_KICKS: print "\t\t Right 7"
-            return player.goLater('kickBallRight')
-        else:
-            if constants.DEBUG_KICKS: print "\t\t Straight 5"
-            return player.goLater('kickBallStraight')
+        elif helpers.inTopOfField(player):
+            print "in top of field"
+            if helpers.isFacingSideline(player):
+                return player.goNow('kickAwayFromSideline')
+            elif my.h > 180 - constants.FACING_SIDELINE_ANGLE:
+                return player.goLater('kickBallRight')
+            elif my.h < -90:
+                return player.goLater('kickBallLeft')
+            else :
+                return player.goLater('kickBallStraight')
+
+        elif helpers.inBottomOfField(player):
+            if helpers.isFacingSideline(player):
+                return player.goNow('kickAwayFromSideline')
+            elif my.h < -180 + constants.FACING_SIDELINE_ANGLE:
+                return player.goLater('kickBallLeft')
+            elif my.h > 90:
+                return player.goLater('kickBallRight')
+            else :
+                return player.goLater('kickBallStraight')
+def kickAwayFromSideline(player):
+    return player.stay()
 
 def centerBall(player):
     """
@@ -692,6 +690,8 @@ class KickDecider:
             self.ballForeFoot = constants.RIGHT_FOOT
 
         else:
+            print "ball in incorrect pos, ball at %.2f, %.2f" % (ball.relX,
+                                                                 ball.relY)
             self.ballForeFoot = constants.INCORRECT_POS
 
     def __str__(self):
