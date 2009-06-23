@@ -94,9 +94,7 @@ def approachBallWithLoc(player):
     elif transitions.shouldPositionForKickFromApproachLoc(player):
         return player.goLater('positionForKick')
     elif player.ballInMyGoalBox():
-        player.brain.tracker.activeLoc()
-        player.stopWalking()
-        return player.stay()
+        return player.goLater('ballInMyBox')
     elif transitions.shouldChaseAroundBox(player):
         return player.goLater('chaseAroundBox')
     elif transitions.shouldAvoidObstacle(player):
@@ -297,12 +295,6 @@ def chaseAroundBox(player):
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
-    elif transitions.shouldPositionForKick(player):
-        return player.goNow('positionForKick')
-    elif transitions.shouldApproachBallWithLoc(player):
-        return player.goNow('approachBallWithLoc')
-    elif transitions.shouldTurnToBall_ApproachBall(player):
-        return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
     elif transitions.shouldAvoidObstacle(player):
@@ -369,4 +361,12 @@ def steps(player):
         player.setSteps(3,3,0,5)
     elif player.brain.nav.currentState != "stepping":
         player.stopWalking()
+    return player.stay()
+
+def ballInMyBox(player):
+    if player.firstFrame():
+        player.brain.tracker.activeLoc()
+        player.stopWalking()
+    if not player.ballInMyGoalBox():
+        return player.goLater('chase')
     return player.stay()
