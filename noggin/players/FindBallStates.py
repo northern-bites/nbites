@@ -31,10 +31,7 @@ def spinFindBall(player):
     if player.justKicked:
         spinDir = player.getSpinDirAfterKick()
     else:
-        my = player.brain.my
-        ball = player.brain.ball
-        spinDir = MyMath.getSpinDir(my.h,
-                                    ball.bearing + my.h)
+        spinDir = constants.TURN_LEFT
 
     player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 

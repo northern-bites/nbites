@@ -95,8 +95,8 @@ def approachBallWithLoc(player):
         return player.goLater('positionForKick')
     elif transitions.shouldAvoidObstacle(player):
         return player.goLater('avoidObstacle')
-    #elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
-        #return player.goLater('approachBall')
+    elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
+        return player.goLater('approachBall')
     elif not player.brain.tracker.activeLocOn and \
             transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
@@ -154,6 +154,8 @@ def approachBall(player):
         return player.goNow('waitBeforeKick')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('positionForKick')
+    elif transitions.shouldApproachBallWithLoc(player):
+        return player.goNow('approachBallWithLoc')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldScanFindBall(player):

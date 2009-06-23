@@ -1,4 +1,4 @@
-''' States for finding our way on the field '''
+""" States for finding our way on the field """
 
 from .util import MyMath
 import NavConstants as constants
@@ -44,9 +44,18 @@ def spinToWalkHeading(nav):
         return nav.goLater('spinToFinalHeading')
 
     sX = 0
-    sY =  nav.curSpinDir * constants.GOTO_SPIN_STRAFE
+    sY = nav.curSpinDir * constants.GOTO_SPIN_STRAFE
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
         nav.getRotScale(headingDiff)
+
+    if sX == 0 and sY == 0 and sTheta == 0:
+        print "not moving. all zeros. nav's are %.2f, %.2f, %.2f" % (nav.walkX,
+                                                                     nav.walkY,
+                                                                     nav.walkTheta)
+        print targetH, headingDiff, newSpinDir, nav.curSpinDir
+        print nav.destX, nav.destY, nav.destH, \
+            nav.brain.ball.x, nav.brain.ball.y
+
     if sX != nav.walkX or \
             sY != nav.walkY or \
             sTheta != nav.walkTheta:
@@ -327,9 +336,9 @@ def stepping(nav):
 
 ### Stopping States ###
 def stop(nav):
-    '''
+    """
     Wait until the walk is finished.
-    '''
+    """
     if nav.firstFrame():
         if nav.brain.motion.isWalkActive():
             nav.setSpeed(0,0,0)

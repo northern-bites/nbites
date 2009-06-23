@@ -571,6 +571,10 @@ def afterKick(player):
             player.lookPostKick()
         return player.stay()
 
+    if player.chosenKick == SweetMoves.LEFT_SIDE_KICK or \
+            player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+        return player.goLater('spinFindBall')
+
     if not player.brain.motion.isHeadActive():
         return player.goLater('scanFindBall')
     return player.stay()
