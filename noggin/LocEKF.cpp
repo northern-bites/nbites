@@ -5,8 +5,8 @@
 //#define DEBUG_STANDARD_ERROR
 using namespace boost::numeric;
 using namespace boost;
-
 using namespace NBMath;
+using namespace std;
 
 // Parameters
 // Measurement conversion form
@@ -75,7 +75,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
     gammas(2) = GAMMA_ROT;
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-    std::cout << "Initializing LocEKF with: " << *this << std::endl;
+    cout << "Initializing LocEKF with: " << *this << endl;
 #endif
 }
 
@@ -111,15 +111,15 @@ void LocEKF::goalieReset()
  * @param u The odometry since the last frame
  * @param Z The observations from the current frame
  */
-void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
+void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
-    std::cout << "Loc update: " << std::endl;
-    std::cout << "Before updates: " << *this << std::endl;
-    std::cout << "\tOdometery is " << u <<std::endl;
-    std::cout << "\tObservations are: " << std::endl;
+    cout << "Loc update: " << endl;
+    cout << "Before updates: " << *this << endl;
+    cout << "\tOdometery is " << u <<endl;
+    cout << "\tObservations are: " << endl;
     for(unsigned int i = 0; i < Z.size(); ++i) {
-        std::cout << "\t\t" << Z[i] <<std::endl;
+        cout << "\t\t" << Z[i] <<endl;
     }
 #endif
     // Update expected position based on odometry
@@ -129,9 +129,8 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
     if (! useAmbiguous) {
         // Remove ambiguous observations
-        std::vector<Observation>::iterator iter = Z.begin();
-        while( iter != Z.end() )
-        {
+        vector<Observation>::iterator iter = Z.begin();
+        while( iter != Z.end() ) {
             if (iter->getNumPossibilities() > 1 ) {
                 iter = Z.erase( iter );
             } else {
@@ -150,12 +149,21 @@ void LocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
     // Clip values if our estimate is off the field
     clipRobotPose();
+    if (testForNaNReset()) {
+        cout << "\tLast odo is: " << lastOdo << endl;
+        cout << "Observations are: ";
+        vector<Observation>::iterator iter = Z.begin();
+        while( iter != Z.end() ) {
+            cout << endl << "\t\t" << *iter;
+            ++iter;
+        }
+    }
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-    std::cout << "After updates: " << *this << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
+    cout << "After updates: " << *this << endl;
+    cout << endl;
+    cout << endl;
+    cout << endl;
 #endif
 }
 
@@ -172,7 +180,7 @@ EKF<Observation, MotionModel,
 LocEKF::associateTimeUpdate(MotionModel u)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
-    std::cout << "\t\t\tUpdating Odometry of " << u << std::endl;
+    cout << "\t\t\tUpdating Odometry of " << u << endl;
 #endif
 
     // Calculate the assumed change in loc position
@@ -208,7 +216,7 @@ void LocEKF::incorporateMeasurement(Observation z,
                                     MeasurementVector &V_k)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
-    std::cout << "\t\t\tIncorporating measurement " << z << std::endl;
+    cout << "\t\t\tIncorporating measurement " << z << endl;
 #endif
     int obsIndex;
 
@@ -228,13 +236,13 @@ void LocEKF::incorporateMeasurement(Observation z,
     if (z.getVisDistance() < USE_CARTESIAN_DIST) {
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-        std::cout << "\t\t\tUsing cartesian " << std::endl;
+        cout << "\t\t\tUsing cartesian " << endl;
 #endif
 
         // Convert our sighting to cartesian coordinates
         MeasurementVector z_x(2);
-        z_x(0) = z.getVisDistance() * std::cos(z.getVisBearing());
-        z_x(1) = z.getVisDistance() * std::sin(z.getVisBearing());
+        z_x(0) = z.getVisDistance() * cos(z.getVisBearing());
+        z_x(1) = z.getVisDistance() * sin(z.getVisBearing());
 
         // Get expected values of the post
         const float x_b = z.getPointPossibilities()[obsIndex].x;
@@ -270,7 +278,7 @@ void LocEKF::incorporateMeasurement(Observation z,
     } else {
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-        std::cout << "\t\t\tUsing polar " << std::endl;
+        cout << "\t\t\tUsing polar " << endl;
 #endif
 
         // Get the observed range and bearing
@@ -288,7 +296,7 @@ void LocEKF::incorporateMeasurement(Observation z,
         const float h = xhat_k_bar(2);
 
         d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
-        d_x(1) = std::atan2(y_b - y, x_b - x) - h;
+        d_x(1) = atan2(y_b - y, x_b - x) - h;
         d_x(1) = NBMath::subPIAngle(d_x(1));
 
         // Calculate invariance
@@ -309,30 +317,30 @@ void LocEKF::incorporateMeasurement(Observation z,
         R_k(1,1) = z.getBearingSD();
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-        std::cout << "\t\t\tR vector is" << R_k << std::endl;
-        std::cout << "\t\t\tH vector is" << H_k << std::endl;
-        std::cout << "\t\t\tV vector is" << V_k << std::endl;
-        std::cout << "\t\t\t\td vector is" << d_x << std::endl;
-        std::cout << "\t\t\t\t\tx est is " << x << std::endl;
-        std::cout << "\t\t\t\t\ty est is " << y << std::endl;
-        std::cout << "\t\t\t\t\th est is " << h << std::endl;
-        std::cout << "\t\t\t\t\tx_b est is " << x_b << std::endl;
-        std::cout << "\t\t\t\t\ty_b est is " << y_b << std::endl;
+        cout << "\t\t\tR vector is" << R_k << endl;
+        cout << "\t\t\tH vector is" << H_k << endl;
+        cout << "\t\t\tV vector is" << V_k << endl;
+        cout << "\t\t\t\td vector is" << d_x << endl;
+        cout << "\t\t\t\t\tx est is " << x << endl;
+        cout << "\t\t\t\t\ty est is " << y << endl;
+        cout << "\t\t\t\t\th est is " << h << endl;
+        cout << "\t\t\t\t\tx_b est is " << x_b << endl;
+        cout << "\t\t\t\t\ty_b est is " << y_b << endl;
 #endif
     }
 
     // Calculate the standard error of the measurement
     StateMeasurementMatrix newP = prod(P_k, trans(H_k));
     MeasurementMatrix se = prod(H_k, newP) + R_k;
-    se(0,0) = std::sqrt(se(0,0));
-    se(1,1) = std::sqrt(se(1,1));
+    se(0,0) = sqrt(se(0,0));
+    se(1,1) = sqrt(se(1,1));
 
     // Ignore observations based on standard error
-    if ( se(0,0)*6.0f < std::abs(V_k(0))) {
+    if ( se(0,0)*6.0f < abs(V_k(0))) {
 #ifdef DEBUG_STANDARD_ERROR
-        std::cout << "\t Ignoring measurement " << std::endl;
-        std::cout << "\t Standard error is " << se << std::endl;
-        std::cout << "\t Invariance is " << std::abs(V_k(0))*5 << std::endl;
+        cout << "\t Ignoring measurement " << endl;
+        cout << "\t Standard error is " << se << endl;
+        cout << "\t Invariance is " << abs(V_k(0))*5 << endl;
 #endif
         R_k(0,0) = DONT_PROCESS_KEY;
     }
@@ -347,7 +355,7 @@ void LocEKF::incorporateMeasurement(Observation z,
  */
 int LocEKF::findBestLandmark(Observation *z)
 {
-    std::vector<PointLandmark> possiblePoints = z->getPointPossibilities();
+    vector<PointLandmark> possiblePoints = z->getPointPossibilities();
     float minDivergence = 250.0f;
     int minIndex = -1;
     for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
@@ -374,8 +382,8 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
     const float x = xhat_k_bar(0);
     const float y = xhat_k_bar(1);
     const float h = xhat_k_bar(2);
-    float x_b_r = z->getVisDistance() * std::cos(z->getVisBearing());
-    float y_b_r = z->getVisDistance() * std::sin(z->getVisBearing());
+    float x_b_r = z->getVisDistance() * cos(z->getVisBearing());
+    float y_b_r = z->getVisDistance() * sin(z->getVisBearing());
 
     float sinh, cosh;
     sincosf(h, &sinh, &cosh);
@@ -394,15 +402,15 @@ void LocEKF::limitAPrioriUncert()
     // Check x uncertainty
     if(P_k_bar(0,0) < X_UNCERT_MIN) {
         //P_k_bar(0,0) = X_UNCERT_MIN;
-        //std::cout << "Frame number " << frameCounter << std::endl;
-        //std::cout << "x uncert is " << P_k_bar(0,0) << std::endl;
+        //cout << "Frame number " << frameCounter << endl;
+        //cout << "x uncert is " << P_k_bar(0,0) << endl;
 
     }
     // Check y uncertainty
     if(P_k_bar(1,1) < Y_UNCERT_MIN) {
         //P_k_bar(1,1) = Y_UNCERT_MIN;
-        //std::cout << "Frame number " << frameCounter << std::endl;
-        //std::cout << "y uncert is " << P_k_bar(1,1) << std::endl;
+        //cout << "Frame number " << frameCounter << endl;
+        //cout << "y uncert is " << P_k_bar(1,1) << endl;
     }
     // Check h uncertainty
     if(P_k_bar(2,2) < H_UNCERT_MIN) {
@@ -410,23 +418,23 @@ void LocEKF::limitAPrioriUncert()
     }
     // Check x uncertainty
     if(P_k_bar(0,0) > X_UNCERT_MAX) {
-        // std::cout << "Frame number " << frameCounter << std::endl;
-        // std::cout << "Limiting x uncert from " << P_k_bar(0,0)
-        //           << " to " << X_UNCERT_MAX << std::endl;
+        // cout << "Frame number " << frameCounter << endl;
+        // cout << "Limiting x uncert from " << P_k_bar(0,0)
+        //           << " to " << X_UNCERT_MAX << endl;
         P_k_bar(0,0) = X_UNCERT_MAX;
     }
     // Check y uncertainty
     if(P_k_bar(1,1) > Y_UNCERT_MAX) {
-        // std::cout << "Frame number " << frameCounter << std::endl;
-        // std::cout << "Limiting y uncert from " << P_k_bar(1,1)
-        //           << " to " << Y_UNCERT_MAX << std::endl;
+        // cout << "Frame number " << frameCounter << endl;
+        // cout << "Limiting y uncert from " << P_k_bar(1,1)
+        //           << " to " << Y_UNCERT_MAX << endl;
         P_k_bar(1,1) = Y_UNCERT_MAX;
     }
     // Check h uncertainty
     if(P_k_bar(2,2) > H_UNCERT_MAX) {
-        // std::cout << "Frame number " << frameCounter << std::endl;
-        // std::cout << "Limiting h uncert from " << P_k_bar(2,2)
-        //           << " to " << H_UNCERT_MAX << std::endl;
+        // cout << "Frame number " << frameCounter << endl;
+        // cout << "Limiting h uncert from " << P_k_bar(2,2)
+        //           << " to " << H_UNCERT_MAX << endl;
         P_k_bar(2,2) = H_UNCERT_MAX;
     }
 }
@@ -523,9 +531,9 @@ void LocEKF::deadzone(float &R, float &innovation,
         return;
     }
 
-    if ( std::abs(innovation) > eps) {
+    if ( abs(innovation) > eps) {
         // Decrease the covariance, so that it effects the estimate more
-        invR=( std::abs(innovation) / eps-1) / CPC;
+        invR=( abs(innovation) / eps-1) / CPC;
     } else {
         // Decrease the innovations, so that it doesn't effect the estimate
         innovation=0.0;
@@ -540,4 +548,26 @@ void LocEKF::deadzone(float &R, float &innovation,
     if ( R < 1.0/invR ) {
         R=1.0/invR;
     }
+}
+
+
+bool LocEKF::testForNaNReset()
+{
+    bool didReset = false;
+    if (isnan(getXEst()) || isnan(getYEst()) ||
+        isnan(getHEst())) {
+        cout << "Reseting LocEKF do to nan value." << endl;
+        cout << "Current values are " << *this << endl;
+        reset();
+        didReset = true;
+    }
+    if (isinf(getXEst()) || isinf(getYEst()) ||
+        isinf(getHEst())) {
+        cout << "Reseting LocEKF do to inf value." << endl;
+        cout << "Current values are " << *this << endl;
+        reset();
+        didReset = true;
+    }
+    return didReset;
+
 }
