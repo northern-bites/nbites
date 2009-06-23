@@ -94,6 +94,9 @@ void StepGenerator::resetHard(){
     //Clear all zmp, clear footsteps
     resetQueues();
     done  = true;
+    cout << "Walk was reset hard."<<endl
+         << "  Current motion vector is ("<<x<<","<<y<<","<<theta<<")"<<endl
+         << "  Current support step_f is "<<*supportStep_s<<endl;
     //I don't think there is much else we need to do....
 }
 

@@ -226,6 +226,10 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
         +(inertial.angleY-walkParams->stance[WP::BODY_ROT_Y])*angleScale;
 
     IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,angleY,HYPAngle);
+    if(result.outcome != Kinematics::SUCCESS){
+        cout << "IK ERROR: tried to go to "<<goal<< " with leg "<<leg_name<<endl
+             << "   and aX,aY,HYP = "<<angleX<<","<<angleY<<","<<HYPAngle<<endl;
+    }
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] -= hipHacks.get<1>(); //HipRoll
@@ -268,6 +272,10 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 
     IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
                                                angleY, HYPAngle);
+    if(result.outcome != Kinematics::SUCCESS){
+        cout << "IK ERROR: tried to go to "<<goal<< " with leg "<<leg_name<<endl
+             << "   and aX,aY,HYP = "<<angleX<<","<<angleY<<","<<HYPAngle<<endl;
+    }
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] += hipHacks.get<1>(); //HipRoll
