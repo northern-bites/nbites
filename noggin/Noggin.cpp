@@ -587,7 +587,7 @@ void Noggin::startLocLog()
 #endif
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);
-    outputFile << gc->color() << " " << gc->player() << endl;
+    outputFile << (int)gc->color() << " " << (int)gc->player() << endl;
     outputFile << loc->getXEst() << " " << loc->getYEst() << " "
                << loc->getHEst() << " "
                << loc->getXUncert() << " " << loc->getYUncert() << " "

@@ -133,6 +133,7 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+    virtual void beforeCorrectionFinish(void);
     void limitAPrioriEst(void);
     void limitPosteriorEst(void);
     void limitAPrioriUncert(void);
@@ -168,6 +169,7 @@ private:
     const static float Y_EST_MAX;
     const static float VELOCITY_EST_MAX;
     const static float VELOCITY_EST_MIN;
+    const static float BALL_JUMP_VEL_THRESH;
     const static float USE_CARTESIAN_BALL_DIST;
 };
 #endif // File
