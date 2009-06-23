@@ -30,6 +30,8 @@
 using namespace std;
 using namespace boost::python;
 
+#include "WalkParameters.h"
+
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
@@ -308,6 +310,40 @@ private:
     MotionInterface *motionInterface;
 };
 
+
+class PyWalkParameters{
+private:
+    template <class T> std::vector<T> getVector(tuple t, unsigned int size){
+        vector<float> v(size);
+        for(unsigned int i = 0; i < size;i++){
+            v[i] = extract<T>(t[i]);
+        }
+        return v;
+    }
+public:
+    PyWalkParameters(const tuple &_stance_config,
+                     const tuple &_step_config,
+                     const tuple &_zmp_config,
+                     const tuple &_joint_hack_config,
+                     const tuple &_sensor_config,
+                     const tuple &_stiffness_config,
+                     const tuple &_odo_config,
+                     const tuple &_arm_config):
+        command(new WalkParameters(
+                    getVector<float>(_stance_config,WP::LEN_STANCE_CONFIG),
+                    getVector<float>(_step_config,WP::LEN_STEP_CONFIG),
+                    getVector<float>(_zmp_config,WP::LEN_ZMP_CONFIG),
+                    getVector<float>(_joint_hack_config,WP::LEN_JOINT_HACK_CONFIG),
+                    getVector<float>(_sensor_config,WP::LEN_SENSOR_CONFIG),
+                    getVector<float>(_stiffness_config,WP::LEN_STIFF_CONFIG),
+                    getVector<float>(_odo_config,WP::LEN_ODO_CONFIG),
+                    getVector<float>(_arm_config,WP::LEN_ARM_CONFIG))){}
+private:
+    boost::shared_ptr<WalkParameters> command;
+
+};
+
+
 /**
  * If you want to expose an overloaded function to python, you have to create
  * pointers to each method which has a different signature and then add each
@@ -384,6 +420,14 @@ BOOST_PYTHON_MODULE(_motion)
                                           "UNfreeze the robot"))
 
         ;
+    class_<PyWalkParameters>("WalkParameters",init<
+                           tuple, tuple, tuple, tuple,
+                           tuple, tuple, tuple, tuple
+                           >(args("stance,step,zmp,"
+                                  "joint_hack,sensor,"
+                                  "stiffness,odo,arms"),
+                             "Parameterization of the"
+                             " walk engine"));
     class_<PyMotionInterface>("MotionInterface")
         .def("enqueue", enq1)
         .def("enqueue", enq2)
