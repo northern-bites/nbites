@@ -8,7 +8,7 @@ using namespace std;
 WalkingArm::WalkingArm(ChainID id)
     :state(SUPPORTING),
      chainID(id),
-     walkParams(NULL),
+//     walkParams(NULL),
      frameCounter(0),
      startStep(true),
      lastStepType(REGULAR_STEP)
@@ -182,6 +182,6 @@ void WalkingArm::setState(SupportMode newState){
 
 
 
-void WalkingArm::resetGait(const WalkingParameters * _wp){
+void WalkingArm::resetGait(boost::shared_ptr<WalkParameters> _wp){
     walkParams = _wp;
 }

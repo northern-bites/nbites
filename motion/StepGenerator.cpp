@@ -48,7 +48,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     if_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
-    sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
+    sensors(s),//walkParams(NULL),
+    nextStepIsLeft(true),waitForController(0),
     leftLeg(s,LLEG_CHAIN), rightLeg(s,RLEG_CHAIN),
     leftArm(LARM_CHAIN), rightArm(RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
@@ -987,7 +988,7 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
 }
 
 
-bool StepGenerator::resetGait(const WalkingParameters * _wp){
+bool StepGenerator::resetGait(boost::shared_ptr<WalkParameters> _wp){
     if(done){
         walkParams = _wp;
         leftLeg.resetGait(_wp);

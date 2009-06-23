@@ -33,7 +33,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
 						   shared_ptr<Profiler> p)
     : MotionProvider(WALK_PROVIDER, p),
       sensors(s),
-      curGait(NULL),nextGait(NULL),
+      newGait(false),
       stepGenerator(sensors),
       pendingCommands(false),
       pendingStepCommands(false),
@@ -67,9 +67,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     cout << "WalkProvider::calculateNextJointsAndStiffnesses()"<<endl;
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
-    if ( nextGait != curGait){
+    if ( newGait){
         if( stepGenerator.resetGait(nextGait)){
-            curGait = nextGait;
+            newGait = false;
         }else{
             cout << "Failed to set gait, trying again next time"<<endl;
         }
@@ -151,9 +151,10 @@ void WalkProvider::setCommand(const WalkCommand * command){
 }
 
 
-void WalkProvider::setCommand(const boost::shared_ptr<GaitCommand> command){
+void WalkProvider::setCommand(const boost::shared_ptr<WalkParameters> command){
     pthread_mutex_lock(&walk_provider_mutex);
-    nextGait = new WalkingParameters(command->getGait());
+    nextGait = command;
+    newGait = true;
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 void WalkProvider::setCommand(const boost::shared_ptr<StepCommand> command){

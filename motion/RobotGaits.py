@@ -1,10 +1,13 @@
 import man.motion as motion
+import math.pi
 
+TO_RAD = pi/180.
+CM_TO_MM = 10.
 
 STANCE_CONFIG = (31.00, # CoM height
                  1.45,  # Forward displacement of CoM
                  10.0,  # Horizontal distance between feet
-                 3.0,   # Body angle around y axis
+                 3.0*TO_RAD,   # Body angle around y axis
                  0.0)   # Angle between feet
 
 STEP_CONFIG = (0.4, # step duration
@@ -19,8 +22,8 @@ ZMP_CONFIG = (0.0,  # footCenterLocX
               0.4,  # zmp static percentage
               0.4,  # left zmp off
               0.4,  # right zmp off
-              6.6,   # turn zmp offset
-              0.01)  # strafe zmp offset
+              0.01,  # strafe zmp offse
+              6.6)   # turn zmp offset
 
 JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                      5.5) # right swing hip roll addition

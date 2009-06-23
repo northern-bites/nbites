@@ -41,6 +41,10 @@ using namespace boost::python;
 #include "StepCommand.h"
 using namespace Kinematics;
 
+
+
+
+
 static MotionInterface* interface_reference = 0;
 
 class PyHeadJointCommand {
@@ -68,48 +72,37 @@ private:
     HeadJointCommand *command;
 };
 
-class PyGaitCommand {
+class PyGaitCommand{
 public:
-    /**
-     * The constructor takes a list of headJointCommands and whether they
-     * should be executed forever in a sequence
-     */
-    PyGaitCommand( const float _bh,
-                   const float _hox, const float _yao, const float _dur,
-                   const float _dblSupFrac, const float _stepHeight,
-                   const float _footLengthX, const float _dblInactivePerc,
-                   const float _lSwHRAdd,const float _rSwHRAdd,
-                   const float _lZMPSwOffY,const float _rZMPSwOffY,
-                   const float _tZMPOffY, const float _sZMPOffY,
-                   const float maxx, const float maxy, const float maxtheta,
-                   const float sensorFeedback, const float maxStiffness,
-                   const float kneeStiffness, const float anklePitchStiffness,
-                   const float ankleRollStiffness,
-                   const float armStiffness, const float xOdoScale,
-                   const float yOdoScale, const float thetaOdoScale,
-                   const float armAmplitude)
-
-        : command(new GaitCommand(0.02f,_bh*CM_TO_MM, //HACK
-                                  _hox*CM_TO_MM, _yao*TO_RAD, _dur,
-                                  _dblSupFrac, _stepHeight*CM_TO_MM,
-                                  _footLengthX*CM_TO_MM, _dblInactivePerc,
-                                  _lSwHRAdd*TO_RAD,_rSwHRAdd*TO_RAD,
-                                  _lZMPSwOffY*CM_TO_MM,_rZMPSwOffY*CM_TO_MM,
-                                  // Note: no conversion for these
-                                  _tZMPOffY, _sZMPOffY,
-                                  maxx*CM_TO_MM,maxy*CM_TO_MM,maxtheta*TO_RAD,
-                                  sensorFeedback, maxStiffness,
-                                  kneeStiffness,anklePitchStiffness,
-                                  ankleRollStiffness,armStiffness,
-                                  xOdoScale,yOdoScale,thetaOdoScale,
-                                  armAmplitude*TO_RAD))
-        {
-        }
-
-    boost::shared_ptr<GaitCommand> getCommand() const { return command; }
-
+    PyGaitCommand(const tuple &_stance_config,
+                     const tuple &_step_config,
+                     const tuple &_zmp_config,
+                     const tuple &_joint_hack_config,
+                     const tuple &_sensor_config,
+                     const tuple &_stiffness_config,
+                     const tuple &_odo_config,
+                     const tuple &_arm_config):
+        command(new WalkParameters(
+                    getRadVector<float>(_stance_config,WP::LEN_STANCE_CONFIG),
+                    getRadVector<float>(_step_config,WP::LEN_STEP_CONFIG),
+                    getRadVector<float>(_zmp_config,WP::LEN_ZMP_CONFIG),
+                    getRadVector<float>(_joint_hack_config,WP::LEN_HACK_CONFIG),
+                    getRadVector<float>(_sensor_config,WP::LEN_SENSOR_CONFIG),
+                    getRadVector<float>(_stiffness_config,WP::LEN_STIFF_CONFIG),
+                    getRadVector<float>(_odo_config,WP::LEN_ODO_CONFIG),
+                    getRadVector<float>(_arm_config,WP::LEN_ARM_CONFIG))){}
+    boost::shared_ptr<WalkParameters> getCommand()const{return command;}
+    template <class T> std::vector<T> getRadVector(tuple t,
+                                                   unsigned int size){
+    vector<float> v(size);
+    for(unsigned int i = 0; i < size;i++){
+        v[i] = extract<T>(t[i]); //HACK -- convert units here!!
+    }
+    return v;
+}
 private:
-    boost::shared_ptr<GaitCommand> command;
+    boost::shared_ptr<WalkParameters> command;
+
 };
 
 
@@ -311,39 +304,6 @@ private:
 };
 
 
-class PyWalkParameters{
-private:
-    template <class T> std::vector<T> getVector(tuple t, unsigned int size){
-        vector<float> v(size);
-        for(unsigned int i = 0; i < size;i++){
-            v[i] = extract<T>(t[i]);
-        }
-        return v;
-    }
-public:
-    PyWalkParameters(const tuple &_stance_config,
-                     const tuple &_step_config,
-                     const tuple &_zmp_config,
-                     const tuple &_joint_hack_config,
-                     const tuple &_sensor_config,
-                     const tuple &_stiffness_config,
-                     const tuple &_odo_config,
-                     const tuple &_arm_config):
-        command(new WalkParameters(
-                    getVector<float>(_stance_config,WP::LEN_STANCE_CONFIG),
-                    getVector<float>(_step_config,WP::LEN_STEP_CONFIG),
-                    getVector<float>(_zmp_config,WP::LEN_ZMP_CONFIG),
-                    getVector<float>(_joint_hack_config,WP::LEN_JOINT_HACK_CONFIG),
-                    getVector<float>(_sensor_config,WP::LEN_SENSOR_CONFIG),
-                    getVector<float>(_stiffness_config,WP::LEN_STIFF_CONFIG),
-                    getVector<float>(_odo_config,WP::LEN_ODO_CONFIG),
-                    getVector<float>(_arm_config,WP::LEN_ARM_CONFIG))){}
-private:
-    boost::shared_ptr<WalkParameters> command;
-
-};
-
-
 /**
  * If you want to expose an overloaded function to python, you have to create
  * pointers to each method which has a different signature and then add each
@@ -365,23 +325,6 @@ BOOST_PYTHON_MODULE(_motion)
     class_<PyHeadJointCommand>("HeadJointCommand",
                                init<float, tuple, tuple, int>(
  "A container for a head joint command passed to the motion engine"))
-        ;
-    class_<PyGaitCommand>("GaitCommand",
-                          init<
-                          float, float, float, float,
-                          float, float, float, float,
-                          float, float, float, float,
-                          float, float, float, float,
-                          float, float, float, float,
-                          float, float, float, float,
-                          float, float, float>(
-"A container for setting the walking gait of the robot. "
-"(bodyHeight,hipOffsetX,XAngleOffset,stepDuration,doubleSupportFraction,"
-"stepHeight,"
-"footLengthX,dblSupInactivePercentage,leftSwingHipRollAddition,"
-"rightSwingHipRollAddition,leftZMPSwingOffsetY,rightZMPSwingOffsetY,"
-"turnZMPOffsetY, strafeZMPOffsetY, sensorFeedback, maxStiffness, kneeStiffness,"
-"ankleStiffness,armStiffness,xOdoScale,yOdoScale,thetaOdoScale,armAmplitude"))
         ;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple,
@@ -420,7 +363,7 @@ BOOST_PYTHON_MODULE(_motion)
                                           "UNfreeze the robot"))
 
         ;
-    class_<PyWalkParameters>("WalkParameters",init<
+    class_<PyGaitCommand>("GaitCommand",init<
                            tuple, tuple, tuple, tuple,
                            tuple, tuple, tuple, tuple
                            >(args("stance,step,zmp,"

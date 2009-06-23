@@ -33,7 +33,7 @@ WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
      frameCounter(0),
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
      support_step(EMPTY_STEP),
-     chainID(id), walkParams(NULL),
+     chainID(id), //walkParams(NULL),
      goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      lastRotation(0.0f),odoUpdate(3,0.0f),
@@ -74,7 +74,7 @@ void WalkingLeg::setSteps(boost::shared_ptr<Step> _swing_src,
     assignStateTimes(support_step);
 }
 
-void WalkingLeg::resetGait(const WalkingParameters * _wp){
+void WalkingLeg::resetGait(boost::shared_ptr<WalkParameters> _wp){
     walkParams =_wp;
 }
 
