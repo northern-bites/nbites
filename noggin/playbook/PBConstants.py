@@ -14,11 +14,12 @@ DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
 DEBUG_SEARCHER = False
 
-USE_DUB_D = False
+USE_DUB_D = True
 USE_FINDER = False
 USE_DEEP_STOPPER = False # Fallback to a deep defensive position
 KICKOFF_PLAY = False # Forces the more intelligent and restrictive kickoff play
 PULL_THE_GOALIE = False
+USE_FANCY_GOALIE = False
 
 GOALIE_NUMBER = 1
 DEFAULT_CHASER_NUMBER = 3

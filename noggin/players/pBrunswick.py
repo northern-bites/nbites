@@ -9,6 +9,7 @@ from . import BrunswickStates
 from . import GoaliePositionStates
 from . import GoalieChaseBallStates
 from . import GoalieSaveStates
+from . import GoalieTransitions
 from . import PenaltyKickStates
 from . import ChaseBallTransitions
 from . import KickingConstants
@@ -33,6 +34,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.setName('pBrunswick')
         self.currentRole = PBConstants.INIT_ROLE
+        self.subRole = PBConstants.INIT_SUB_ROLE
         self.stoppedWalk = False
         self.currentSpinDir = None
         self.currentGait = None
@@ -59,6 +61,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0
+        self.ballRelY = 0.0
+        self.ballRelX = 0.0
 
         self.kickObjective = None
 
@@ -78,14 +82,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if self.brain.gameController.currentState == 'gamePlaying':
             roleState = self.getNextState()
 
+            if self.currentRole == PBConstants.GOALIE:
+                GoalieTransitions.goalieRunChecks(self)
+
             if roleState != self.currentState:
                 self.switchTo(roleState)
 
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        playbookRole = self.brain.playbook.currentRole
-        if playbookRole == self.currentRole:
+        playbookRole = self.brain.playbook.role
+        playbookSubRole = self.brain.playbook.subRole
+        if playbookSubRole == self.subRole:
             return self.currentState
         # We don't stop chasing if we are in certain roles
         elif (self.currentRole == PBConstants.CHASER and
@@ -93,6 +101,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return self.currentState
         else:
             self.currentRole = playbookRole
+            self.subRole = playbookSubRole
             return self.getRoleState(playbookRole)
 
     def getRoleState(self,role):

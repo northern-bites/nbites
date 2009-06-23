@@ -3,22 +3,23 @@ import GoalieTransitions as helper
 def goalieChase(player):
     if player.firstFrame():
         player.shouldChaseCounter = 0
-        player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if helper.shouldSave(player):
-        player.shouldSaveCounter += 1
-        if player.shouldSaveCounter >= 2:
-            return player.goNow('goalieSave')
+    if helper.shouldScanFindBall(player):
+        return player.goNow('scanFindBall')
+    elif helper.shouldApproachBallWithLoc(player):
+        return player.goNow('approachBallWithLoc')
+    elif helper.shouldApproachBall(player):
+        return player.goNow('approachBall')
+    elif helper.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+    elif helper.shouldTurnToBall_ApproachBall(player):
+        return player.goNow('turnToBall')
+    elif helper.shouldSpinFindBall(player):
+        return player.goNow('spinFindBall')
     else:
-        player.shouldSaveCounter = 0
+        return player.goNow('scanFindBall')
 
-    if not helper.shouldChase(player):
-        player.shouldChaseCounter+=1
-        if player.shouldChaseCounter >= 3:
-            player.shouldChaseCounter = 0
-            return player.goLater('goaliePosition')
-    else:
-        player.shouldChaseCounter += 1
+def goalieScanFindBall(player):
 
     return player.stay()

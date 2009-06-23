@@ -13,7 +13,7 @@ def goalieSave(player):
     if not brain.nav.isStopped():
         return player.stay()
     ball = brain.ball
-    player.shouldSaveCounter = 0
+
     # Figure out where the ball is going and when it will be there
     if ball.on:
         relY = ball.relY
