@@ -17,7 +17,7 @@ public class UDPServer extends Thread {
     private boolean receiving;  // Whether this server is currently listening
     private DatagramPacket packet;    // UDP packet (buffer) used to recieve data
     private Vector<RobotListener> listens; // Objects that will be notfied of data
-
+    private int restrictedTeamNumber;
     public UDPServer() {
 	this(DEF_PORT);
     }
@@ -29,22 +29,25 @@ public class UDPServer extends Thread {
      * @param port   The port on which the server should bind and listen for
      * packets
      */
-    public UDPServer(int port) {
-	super();
-	try {
-	    if (!QUIET)
-		System.out.println("Binding socket to port " + port);
-	    socket = new DatagramSocket(port);
-	} catch (SocketException e) {
-	    System.err.println("Could not open socket");
-	    e.printStackTrace();
-	    System.exit(1);
-	}
+    public UDPServer(int port)
+    {
+        super();
+        try {
+            if (!QUIET)
+                System.out.println("Binding socket to port " + port);
+            socket = new DatagramSocket(port);
+            socket.setReuseAddress(true);
+        } catch (SocketException e) {
+            System.err.println("Could not open socket");
+            e.printStackTrace();
+            System.exit(1);
+        }
 
-	packet = new DatagramPacket(new byte[DEF_BUF],200);
-	listens = new Vector<RobotListener>();
-	receiving = false;
-	start();
+        packet = new DatagramPacket(new byte[DEF_BUF],200);
+        listens = new Vector<RobotListener>();
+        receiving = false;
+        start();
+        restrictedTeamNumber = -1;
     }
 
     /**
@@ -60,7 +63,11 @@ public class UDPServer extends Thread {
 		if (isReceiving()) {
 		    Robot robot = Robot.parseData(packet.getData(),packet.getLength());
 		    if (robot != null) {
-			notifyListeners(robot);
+                if (restrictedTeamNumber < 0 ||
+                    (restrictedTeamNumber >= 0 &&
+                     robot.getTeam().intValue() == restrictedTeamNumber)) {
+                    notifyListeners(robot);
+                }
 		    }
 		    else {
 			System.out.println("robot is null");
@@ -72,6 +79,12 @@ public class UDPServer extends Thread {
 	    }
 	}
     }
+
+    public void limitToTeam(int teamNumber)
+    {
+        restrictedTeamNumber = teamNumber;
+    }
+
 
     public void addRobotListener(RobotListener dl) {
 	listens.add(dl);
@@ -104,17 +117,20 @@ public class UDPServer extends Thread {
      * @param toReceive   Whether or not the server should receive packets
      */
     public void setReceiving(boolean toReceive) {
-	if (receiving && toReceive)
-	    return;
-    
-	receiving = toReceive;
-    
-	if (receiving)
-	    System.out.println("Listening to packets on the socket");
-	else if (!QUIET)
-	    System.out.println("No longer listening");
+        if (receiving && toReceive)
+            return;
+
+        receiving = toReceive;
+
+        if (receiving) {
+            System.out.println("Listening to packets on the socket");
+        }
+        else if (!QUIET) {
+            System.out.println("No longer listening");
+            restrictedTeamNumber = -1;
+        }
     }
-  
+
     public static void main(String[] args) {
 	(new UDPServer()).setReceiving(true);
     }
