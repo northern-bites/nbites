@@ -1,4 +1,4 @@
-from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER
+from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER, GOALIE
 from ..WebotsConfig import WEBOTS_ACTIVE
 
 ###
@@ -26,6 +26,8 @@ def gameSet(player):
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()
+        if player.brain.my.playerNumber == GOALIE:
+            player.brain.resetGoalieLocalization()
 
     return player.stay()
 
