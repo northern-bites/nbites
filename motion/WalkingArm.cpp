@@ -8,7 +8,7 @@ using namespace std;
 WalkingArm::WalkingArm(ChainID id)
     :state(SUPPORTING),
      chainID(id),
-//     walkParams(NULL),
+     walkParams(NULL),
      frameCounter(0),
      startStep(true),
      lastStepType(REGULAR_STEP)
@@ -30,8 +30,7 @@ ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
                                              &RARM_WALK_ANGLES[ARM_JOINTS]));
 
     armJoints[0] += getShoulderPitchAddition(supportStep);
-    const vector<float> armStiffnesses(ARM_JOINTS,
-                                       walkParams->stiffness[WP::ARM]);
+    const vector<float> armStiffnesses(ARM_JOINTS,walkParams->armStiffness);
 
     frameCounter++;
     for(unsigned int  i = 0; shouldSwitchStates() && i < 2; i++){
@@ -80,8 +79,8 @@ const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
         break;
     }
 
-    float start = -direction*walkParams->arm[WP::AMPLITUDE];
-    float end = direction*walkParams->arm[WP::AMPLITUDE];
+    float start = -direction*walkParams->armAmplitude;
+    float end = direction*walkParams->armAmplitude;
 
     //We need to intelligently deal with non-regular steps
     //Since end steps are employed in both the starting and stopping contexts
@@ -183,6 +182,6 @@ void WalkingArm::setState(SupportMode newState){
 
 
 
-void WalkingArm::resetGait(const WalkParameters * _wp){
+void WalkingArm::resetGait(const WalkingParameters * _wp){
     walkParams = _wp;
 }

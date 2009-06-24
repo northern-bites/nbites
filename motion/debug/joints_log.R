@@ -39,7 +39,7 @@ chain_lengths = function(chainID){
 
 c_names = c("head","larm","lleg","rleg","rarm")
 for(chn in c(1:5)){
-      pdf(paste(c_names[chn],"_",name,PDF,sep=""),width=80, height=20)
+      pdf(paste(c_names[chn],"_",name,PDF,sep=""))
       indices=chain_lengths(chn)
 
       #find the range of the graph
@@ -55,7 +55,7 @@ for(chn in c(1:5)){
       for(i in indices){
       	    color = color +1
       	    color_list = append(color_list,c(color))
-      	    points(dat$time,dat[,i],type="b",col=color)
+      	    points(dat$time,dat[,i],type="l",col=color)
       }
       legend("top",lwd=2,legend=labels(dat)[[2]][indices],col=color_list)
       dev.off()

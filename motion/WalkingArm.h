@@ -2,7 +2,6 @@
 #define WalkingArm_h
 
 #include "WalkingConstants.h"
-#include "WalkParameters.h"
 #include "Kinematics.h"
 
 
@@ -23,7 +22,7 @@ public:
     void startLeft();
     void startRight();
 
-    void resetGait(const WalkParameters * _wp);
+    void resetGait(const WalkingParameters * _wp);
 
 private:
     bool shouldSwitchStates();
@@ -36,7 +35,7 @@ private:
 private:
     SupportMode state;
     Kinematics::ChainID chainID;
-    const WalkParameters * walkParams;
+    const WalkingParameters *walkParams;
 
     unsigned int frameCounter;
     unsigned int singleSupportFrames;

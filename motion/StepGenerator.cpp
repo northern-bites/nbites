@@ -48,8 +48,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     if_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
-    sensors(s),walkParams(NULL),
-    nextStepIsLeft(true),
+    sensors(s),walkParams(NULL),nextStepIsLeft(true),waitForController(0),
     leftLeg(s,LLEG_CHAIN), rightLeg(s,RLEG_CHAIN),
     leftArm(LARM_CHAIN), rightArm(RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
@@ -103,7 +102,7 @@ void StepGenerator::resetHard(){
 
 /**
  * Central method to get the previewed zmp_refernce values
- * In the process of getting these values, this method handles the following:
+ * In the process of getting these values, this method handles the following:    80
  *
  *  * Handles transfer from futureSteps list to the currentZMPDsteps list.
  *    When the Future ZMP values we want run out, we pop the next future step
@@ -206,7 +205,7 @@ void StepGenerator::findSensorZMP(){
 }
 
 float StepGenerator::scaleSensors(const float sensorZMP, const float perfectZMP){
-    const float sensorWeight = walkParams->sensor[WP::OBSERVER_SCALE];
+    const float sensorWeight = walkParams->sensorFeedback;
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
@@ -265,6 +264,15 @@ WalkLegsTuple StepGenerator::tick_legs(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_legs" << endl;
 #endif
+    static WalkLegsTuple noMovement;
+
+    bool firstFrame = waitForController ==
+        (int)Observer::NUM_PREVIEW_FRAMES - walkParams->stepDurationFrames;
+    if (waitForController > 0 &&
+        !firstFrame) {
+        --waitForController;
+        return noMovement;
+    }
 
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
@@ -327,6 +335,11 @@ WalkLegsTuple StepGenerator::tick_legs(){
     }
 
     debugLogging();
+
+    if (firstFrame) {
+        noMovement = WalkLegsTuple(left,right);
+        --waitForController;
+    }
 
     return WalkLegsTuple(left,right);
 }
@@ -435,17 +448,15 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //   hurting us. This could be fixed with an observer
     // in anycase, we'll leave this at -20 for now. (The effect is that
     // the com path 'pauses' over the support foot, which is quite nice)
-    float X_ZMP_FOOT_LENGTH = walkParams->zmp[WP::FOOT_CENTER_X];//HACK/FIXME
+    float X_ZMP_FOOT_LENGTH = walkParams->footLengthX;
 
     // An additional HACK:
     // When we are turning, we have this problem that the direction in which
     // we turn, the opening step is well balanced but the step which brings the
     // foot back is bad. We need to swing more toward the opening step in
     // order to not fall inward.
-    const float HACK_AMOUNT_PER_PI_OF_TURN =
-        walkParams->zmp[WP::TURN_ZMP_OFF];
-    const float HACK_AMOUNT_PER_1_OF_LATERAL =
-        walkParams->zmp[WP::STRAFE_ZMP_OFF];
+    const float HACK_AMOUNT_PER_PI_OF_TURN = walkParams->turnZMPOffsetY;
+    const float HACK_AMOUNT_PER_1_OF_LATERAL = walkParams->strafeZMPOffsetY;
     float adjustment = ((newSupportStep->theta / M_PI_FLOAT)
                         * HACK_AMOUNT_PER_PI_OF_TURN);
     adjustment += (newSupportStep->y - (sign*HIP_OFFSET_Y))
@@ -454,8 +465,8 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //Another HACK (ie. zmp is not perfect)
     //This moves the zmp reference to the outside of the foot
     float Y_ZMP_OFFSET = (newSupportStep->foot == LEFT_FOOT ?
-                          walkParams->zmp[WP::L_ZMP_OFF_Y] :
-                          walkParams->zmp[WP::R_ZMP_OFF_Y]);
+                          walkParams->leftZMPSwingOffsetY :
+                          walkParams->rightZMPSwingOffsetY);
 
     Y_ZMP_OFFSET += adjustment;
 
@@ -468,13 +479,11 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //to use bezier curves, we would need also directions for each point
     const ufvector3 start_s = last_zmp_end_s;
     const ufvector3 end_s =
-        CoordFrame3D::vector3D(newSupportStep->x +
-                               walkParams->stance[WP::BODY_OFF_X] +
+        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX +
                                y_zmp_offset_x,
                                newSupportStep->y + sign*y_zmp_offset_y);
     const ufvector3 mid_s =
-        CoordFrame3D::vector3D(newSupportStep->x +
-                               walkParams->stance[WP::BODY_OFF_X] +
+        CoordFrame3D::vector3D(newSupportStep->x + walkParams->hipOffsetX +
                                y_zmp_offset_x - X_ZMP_FOOT_LENGTH,
                                newSupportStep->y + sign*y_zmp_offset_y);
 
@@ -496,7 +505,7 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //First, split up the frames:
     const int halfNumDSChops = //DS - DoubleStaticChops
         static_cast<int>( static_cast<float>(newSupportStep->doubleSupportFrames)*
-                          walkParams->zmp[WP::DBL_SUP_STATIC_P]/2.0f);
+			walkParams->dblSupInactivePercentage/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
         newSupportStep->doubleSupportFrames - halfNumDSChops*2;
 
@@ -548,7 +557,7 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 void
 StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
     const ufvector3 end_s =
-        CoordFrame3D::vector3D(walkParams->stance[WP::BODY_OFF_X],
+        CoordFrame3D::vector3D(walkParams->hipOffsetX,
                                0.0f);
     const ufvector3 end_i = prod(si_Transform,end_s);
     //Queue a starting step, where we step, but do nothing with the ZMP
@@ -570,13 +579,13 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
 void StepGenerator::setSpeed(const float _x, const float _y,
                                   const float _theta)  {
     //convert speeds in cm/s and rad/s into steps and clip according to the gait
-    const float new_x =  clip(_x,walkParams->step[WP::MAX_VEL_X])
-        *walkParams->step[WP::DURATION];
-    const float new_y = clip(_y,walkParams->step[WP::MAX_VEL_Y])
-        *walkParams->step[WP::DURATION];
+    const float new_x =  clip(_x,walkParams->maxXSpeed)
+        *walkParams->stepDuration;
+    const float new_y = clip(_y,walkParams->maxYSpeed)
+        *walkParams->stepDuration;
     //we only turn every other step, so double the turning!
-    const float new_theta = clip(_theta,walkParams->step[WP::MAX_VEL_THETA])
-        *walkParams->step[WP::DURATION]*2.0f;
+    const float new_theta = clip(_theta,walkParams->maxThetaSpeed)
+        *walkParams->stepDuration*2.0f;
 
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
@@ -640,15 +649,14 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
     // We have to reevalaute future steps, so we forget about any future plans
     clearFutureSteps();
 
-    //TODO :: Consolidate take steps and setSpeed -> reduce duplicate code
     //convert speeds in cm/s and rad/s into steps and clip according to the gait
-    const float new_x =  clip(_x,walkParams->step[WP::MAX_VEL_X])
-        *walkParams->step[WP::DURATION];
-    const float new_y = clip(_y,walkParams->step[WP::MAX_VEL_Y])
-        *walkParams->step[WP::DURATION];
+    const float new_x =  clip(_x,walkParams->maxXSpeed)
+        *walkParams->stepDuration;
+    const float new_y = clip(_y,walkParams->maxYSpeed)
+        *walkParams->stepDuration;
     //we only turn every other step, so double the turning!
-    const float new_theta = clip(_theta,walkParams->step[WP::MAX_VEL_THETA])
-        *walkParams->step[WP::DURATION]*2.0f;
+    const float new_theta = clip(_theta,walkParams->maxThetaSpeed)
+        *walkParams->stepDuration*2.0f;
 
     //Ensure that we are currently stopped -- if not, throw warning
     if(!done){
@@ -688,8 +696,7 @@ void StepGenerator::resetSteps(const bool startLeft){
     //This is the place where we reset the controller each time the walk starts
     //over again.
     //First we reset the controller back to the neutral position
-    controller_x->initState(walkParams->stance[WP::BODY_OFF_X],0.0f,
-                            walkParams->stance[WP::BODY_OFF_X]);
+    controller_x->initState(walkParams->hipOffsetX,0.0f,walkParams->hipOffsetX);
     controller_y->initState(0.0f,0.0f,0.0f);
 
     //Each time we restart, we need to reset the estimated sensor ZMP:
@@ -760,10 +767,9 @@ void StepGenerator::resetSteps(const bool startLeft){
     //When we start out again, we need to let odometry know to store
     //the distance covered so far. This needs to happen before
     //we reset any coordinate frames
-    resetOdometry(walkParams->stance[WP::BODY_OFF_X],-supportSign*HIP_OFFSET_Y);
+    resetOdometry(walkParams->hipOffsetX,-supportSign*HIP_OFFSET_Y);
 
-    const float supportStepTime =
-        static_cast<float>(Observer::NUM_PREVIEW_FRAMES) *
+    const float supportStepTime = static_cast<float>(Observer::NUM_PREVIEW_FRAMES) *
         MotionConstants::MOTION_FRAME_LENGTH_S;
     const float supportStepDoubleSupportFraction = 1.0f;
 
@@ -776,8 +782,8 @@ void StepGenerator::resetSteps(const bool startLeft){
                                   firstSupportFoot,END_STEP));
     shared_ptr<Step> dummyStep =
         shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y*supportSign,0,
-                                  walkParams->step[WP::DURATION],
-                                  walkParams->step[WP::DBL_SUPP_P],
+                                  walkParams->stepDuration,
+                                  walkParams->doubleSupportFraction,
                                   dummyFoot));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
@@ -875,10 +881,10 @@ void StepGenerator::generateStep( float _x,
 
     const float dblSupp = (type == END_STEP ?
                            1.0f :
-                           walkParams->step[WP::DBL_SUPP_P]);
+                           walkParams->doubleSupportFraction);
 
     shared_ptr<Step> step(new Step(computed_x, computed_y, computed_theta,
-                                   walkParams->step[WP::DURATION],
+                                   walkParams->stepDuration,
                                    dblSupp,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
@@ -898,42 +904,6 @@ void StepGenerator::generateStep( float _x,
     lastQueuedStep = step;
     //switch feet after each step is generated
     nextStepIsLeft = !nextStepIsLeft;
-}
-
-
-/**
- * Method to return the default stance of the robot (including arms)
- *
- */
-vector<float>*
-StepGenerator::getDefaultStance(boost::shared_ptr<WalkParameters> wp){
-    const ufvector3 lleg_goal =
-        CoordFrame3D::vector3D(-wp->stance[WP::BODY_OFF_X],
-                               wp->stance[WP::LEG_SEPARATION_Y]*0.5f,
-                               -wp->stance[WP::BODY_HEIGHT]);
-    const ufvector3 rleg_goal =
-        CoordFrame3D::vector3D(-wp->stance[WP::BODY_OFF_X],
-                               -wp->stance[WP::LEG_SEPARATION_Y]*0.5f,
-                               -wp->stance[WP::BODY_HEIGHT]);
-
-    const vector<float> lleg = WalkingLeg::getAnglesFromGoal(LLEG_CHAIN,
-                                                             lleg_goal,
-                                                             wp->stance);
-    const vector<float> rleg = WalkingLeg::getAnglesFromGoal(RLEG_CHAIN,
-                                                             rleg_goal,
-                                                             wp->stance);
-
-    const vector<float> larm(LARM_WALK_ANGLES,&LARM_WALK_ANGLES[ARM_JOINTS]);
-    const vector<float> rarm(RARM_WALK_ANGLES,&RARM_WALK_ANGLES[ARM_JOINTS]);
-
-    vector<float> *allJoints = new vector<float>();
-
-    //now combine all the vectors together
-    allJoints->insert(allJoints->end(),larm.begin(),larm.end());
-    allJoints->insert(allJoints->end(),lleg.begin(),lleg.end());
-    allJoints->insert(allJoints->end(),rleg.begin(),rleg.end());
-    allJoints->insert(allJoints->end(),rarm.begin(),rarm.end());
-    return allJoints;
 }
 
 /**
@@ -1020,16 +990,13 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
 }
 
 
-bool StepGenerator::resetGait(boost::shared_ptr<WalkParameters> _wp){
+bool StepGenerator::resetGait(const WalkingParameters * _wp){
     if(done){
-        if(walkParams)
-            delete walkParams;
-        walkParams = new WalkParameters(_wp);
-        //cout<<walkParams->toString()<<endl;
-        leftLeg.resetGait(walkParams);
-        rightLeg.resetGait(walkParams);
-        leftArm.resetGait(walkParams);
-        rightArm.resetGait(walkParams);
+        walkParams = _wp;
+        leftLeg.resetGait(_wp);
+        rightLeg.resetGait(_wp);
+        leftArm.resetGait(_wp);
+        rightArm.resetGait(_wp);
         return true;
     }
     else{

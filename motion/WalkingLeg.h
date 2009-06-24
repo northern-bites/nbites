@@ -54,7 +54,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 #include "WalkingConstants.h"
-#include "WalkParameters.h"
 #include "CoordFrame.h"
 #include "Kinematics.h"
 #include "NBMatrixMath.h"
@@ -81,7 +80,7 @@ struct WalkCycle{
     boost::shared_ptr<Step> supportStep;
     NBMath::ufvector3 swing_src;
     NBMath::ufvector3 swing_dest;
-    const WalkParameters * params;
+    WalkingParameters * params;
 };
 
 class WalkingLeg  {
@@ -121,15 +120,10 @@ public:
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT || state == SUPPORTING;
     };
-    void resetGait(const WalkParameters * _wp);
+    void resetGait(const WalkingParameters * _wp);
 
     std::vector<float> getOdoUpdate();
     void computeOdoUpdate();
-
-    static std::vector<float>
-    getAnglesFromGoal(const Kinematics::ChainID chainID,
-                      const NBMath::ufvector3 & goal,
-                      const float stance[WP::LEN_STANCE_CONFIG]);
 
 private:
     //Execution methods, get called depending on which state the leg is in
@@ -144,18 +138,15 @@ private:
     bool firstFrame(){return frameCounter == 0;}
     void assignStateTimes(boost::shared_ptr<Step> step);
     void debugProcessing();
-
 //hack
 public:
     const float getFootRotation();
 private:
     const float getHipYawPitch();
-    const std::vector<float>
-    getStiffnesses();
+    const std::vector<float> getStiffnesses();
     const boost::tuple<const float,const float>getHipHack(const float HYPAngle);
     const float cycloidy(float theta);
     const float cycloidx(float theta);
-
 
     inline Kinematics::ChainID getOtherLegChainID();
 
@@ -174,7 +165,7 @@ private:
 
     //Leg Attributes
     Kinematics::ChainID chainID; //keep track of which leg this is
-    const WalkParameters * walkParams;
+    const WalkingParameters *walkParams;
     float lastJoints[Kinematics::LEG_JOINTS];
     NBMath::ufvector3 goal;
     NBMath::ufvector3 last_goal;

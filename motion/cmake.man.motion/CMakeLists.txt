@@ -118,7 +118,6 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/ChopShop
 		     ${MOTION_INCLUDE_DIR}/NullProvider
 		     ${MOTION_INCLUDE_DIR}/WalkProvider
-                     ${MOTION_INCLUDE_DIR}/WalkParameters
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
 		     ${MOTION_INCLUDE_DIR}/WalkingArm
 		     ${MOTION_INCLUDE_DIR}/PreviewController

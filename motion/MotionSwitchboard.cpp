@@ -61,9 +61,9 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
     nullHeadProvider.setCommand(paralyze);
 
     //Very Important, ensure that we have selected a default walk parameter set
-    // boost::shared_ptr<WalkingParameters>  defaultGait(new GaitCommand(DEFAULT_P));
+    boost::shared_ptr<GaitCommand>  defaultGait(new GaitCommand(DEFAULT_P));
 
-    // sendMotionCommand(defaultGait);
+    sendMotionCommand(defaultGait);
 
 }
 
@@ -566,7 +566,7 @@ void MotionSwitchboard::updateDebugLogs(){
 }
 #endif
 
-void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<WalkParameters> command){
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<GaitCommand> command){
     //Don't request to switch providers when we get a gait command
     //nextProvider = &walkProvider;
 

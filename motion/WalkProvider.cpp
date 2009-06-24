@@ -33,7 +33,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
 						   shared_ptr<Profiler> p)
     : MotionProvider(WALK_PROVIDER, p),
       sensors(s),
-      newGait(false),
+      curGait(NULL),nextGait(NULL),
       stepGenerator(sensors),
       pendingCommands(false),
       pendingStepCommands(false),
@@ -67,9 +67,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     cout << "WalkProvider::calculateNextJointsAndStiffnesses()"<<endl;
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
-    if ( newGait){
+    if ( nextGait != curGait){
         if( stepGenerator.resetGait(nextGait)){
-            newGait = false;
+            curGait = nextGait;
         }else{
             cout << "Failed to set gait, trying again next time"<<endl;
         }
@@ -151,10 +151,9 @@ void WalkProvider::setCommand(const WalkCommand * command){
 }
 
 
-void WalkProvider::setCommand(const boost::shared_ptr<WalkParameters> command){
+void WalkProvider::setCommand(const boost::shared_ptr<GaitCommand> command){
     pthread_mutex_lock(&walk_provider_mutex);
-    nextGait = command;
-    newGait = true;
+    nextGait = new WalkingParameters(command->getGait());
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 void WalkProvider::setCommand(const boost::shared_ptr<StepCommand> command){
@@ -175,7 +174,7 @@ void WalkProvider::setActive(){
 
 std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> curJoints = sensors->getMotionBodyAngles();
-    vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
+    vector<float> * gaitJoints = nextGait->getWalkStance();
 
     float max_change = -M_PI_FLOAT*10.0f;
     int max_index = -1;
@@ -196,7 +195,8 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     if(time <= 0.02f)
         return commands;
 
-    //Generate an intermediat for the arms
+    //larm: (0.,90.,0.,0.)
+    //rarm: (0.,-90.,0.,0.)
     float larm_angles[] = {0.9f, 0.3f,0.0f,0.0f};
     float rarm_angles[] = {0.9f,-0.3f,0.0f,0.0f};
 
