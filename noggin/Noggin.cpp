@@ -427,9 +427,8 @@ void Noggin::updateLocalization()
         }
 #       endif
     }
-    cout << "\tUpdating model" << endl;
+
     ballEKF->updateModel(m, loc->getCurrentEstimate());
-    cout << "\tUpdated model" << endl;
 
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {

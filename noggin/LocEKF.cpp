@@ -26,8 +26,8 @@ const float LocEKF::INIT_GOALIE_LOC_X = (FIELD_WHITE_LEFT_SIDELINE_X +
 const float LocEKF::INIT_GOALIE_LOC_Y = CENTER_FIELD_Y;
 const float LocEKF::INIT_GOALIE_LOC_H = 0.0f;
 // Uncertainty limits
-const float LocEKF::X_UNCERT_MAX = 680.0f;
-const float LocEKF::Y_UNCERT_MAX = 440.0f;
+const float LocEKF::X_UNCERT_MAX = FIELD_WIDTH / 2.0f;
+const float LocEKF::Y_UNCERT_MAX = FIELD_HEIGHT / 2.0f;
 const float LocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
 const float LocEKF::X_UNCERT_MIN = 1.0e-6f;
 const float LocEKF::Y_UNCERT_MIN = 1.0e-6f;
@@ -150,8 +150,9 @@ void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
     // Clip values if our estimate is off the field
     clipRobotPose();
     if (testForNaNReset()) {
+        cout << "LocEKF reset to: "<< *this << endl;
         cout << "\tLast odo is: " << lastOdo << endl;
-        cout << "Observations are: ";
+        cout << "\tObservations are: ";
         vector<Observation>::iterator iter = Z.begin();
         while( iter != Z.end() ) {
             cout << endl << "\t\t" << *iter;
@@ -402,43 +403,27 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
 void LocEKF::limitAPrioriUncert()
 {
     // Check x uncertainty
-    if(P_k_bar(0,0) < X_UNCERT_MIN) {
-        //P_k_bar(0,0) = X_UNCERT_MIN;
-        //cout << "Frame number " << frameCounter << endl;
-        //cout << "x uncert is " << P_k_bar(0,0) << endl;
-
-    }
-    // Check y uncertainty
-    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
-        //P_k_bar(1,1) = Y_UNCERT_MIN;
-        //cout << "Frame number " << frameCounter << endl;
-        //cout << "y uncert is " << P_k_bar(1,1) << endl;
-    }
-    // Check h uncertainty
-    if(P_k_bar(2,2) < H_UNCERT_MIN) {
-        //P_k_bar(2,2) = H_UNCERT_MIN;
-    }
-    // Check x uncertainty
     if(P_k_bar(0,0) > X_UNCERT_MAX) {
-        // cout << "Frame number " << frameCounter << endl;
-        // cout << "Limiting x uncert from " << P_k_bar(0,0)
-        //           << " to " << X_UNCERT_MAX << endl;
         P_k_bar(0,0) = X_UNCERT_MAX;
     }
     // Check y uncertainty
     if(P_k_bar(1,1) > Y_UNCERT_MAX) {
-        // cout << "Frame number " << frameCounter << endl;
-        // cout << "Limiting y uncert from " << P_k_bar(1,1)
-        //           << " to " << Y_UNCERT_MAX << endl;
         P_k_bar(1,1) = Y_UNCERT_MAX;
     }
     // Check h uncertainty
     if(P_k_bar(2,2) > H_UNCERT_MAX) {
-        // cout << "Frame number " << frameCounter << endl;
-        // cout << "Limiting h uncert from " << P_k_bar(2,2)
-        //           << " to " << H_UNCERT_MAX << endl;
         P_k_bar(2,2) = H_UNCERT_MAX;
     }
+
+    // We don't want any covariance values getting too large
+    for (unsigned int i = 0; i < numStates; ++i) {
+        for (unsigned int j = 0; j < numStates; ++j) {
+            if(P_k(i,j) > X_UNCERT_MAX) {
+                P_k(i,j) = X_UNCERT_MAX;
+            }
+        }
+    }
+
 }
 
 /**
@@ -550,26 +535,4 @@ void LocEKF::deadzone(float &R, float &innovation,
     if ( R < 1.0/invR ) {
         R=1.0/invR;
     }
-}
-
-
-bool LocEKF::testForNaNReset()
-{
-    bool didReset = false;
-    if (isnan(getXEst()) || isnan(getYEst()) ||
-        isnan(getHEst())) {
-        cout << "Reseting LocEKF do to nan value." << endl;
-        cout << "Current values are " << *this << endl;
-        reset();
-        didReset = true;
-    }
-    if (isinf(getXEst()) || isinf(getYEst()) ||
-        isinf(getHEst())) {
-        cout << "Reseting LocEKF do to inf value." << endl;
-        cout << "Current values are " << *this << endl;
-        reset();
-        didReset = true;
-    }
-    return didReset;
-
 }

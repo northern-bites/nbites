@@ -150,7 +150,6 @@ private:
     void limitPosteriorUncert();
     void clipRobotPose();
     void deadzone(float &R, float &innovation, float CPC, float EPS);
-    bool testForNaNReset();
 
     // Last odometry update
     MotionModel lastOdo;

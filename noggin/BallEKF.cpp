@@ -7,7 +7,7 @@ using namespace std;
 
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;
-const float BallEKF::USE_CARTESIAN_BALL_DIST = 50.0f;
+const float BallEKF::USE_CARTESIAN_BALL_DIST = 50000.0f;
 
 // How much uncertainty naturally grows per update
 const float BallEKF::BETA_BALL = 5.0f;
@@ -19,7 +19,7 @@ const float BallEKF::CARPET_FRICTION = -(1.0f / 4.0f);//25.0f; // 25 cm/s^2
 const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
 
 // Default initialization values
-const float BallEKF::INIT_BALL_X = CENTER_FIELD_X + CENTER_CIRCLE_RADIUS;
+const float BallEKF::INIT_BALL_X = CENTER_FIELD_X;
 const float BallEKF::INIT_BALL_Y = CENTER_FIELD_Y;
 const float BallEKF::INIT_BALL_X_VEL = 0.0f;
 const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
@@ -58,10 +58,10 @@ BallEKF::BallEKF()
     A_k(1,3) = 1.0f / ASSUMED_FPS;
 
     // Set velocity uncertainty parameters
-    betas(2) = BETA_BALL_VEL;
-    betas(3) = BETA_BALL_VEL;
-    gammas(2) = GAMMA_BALL_VEL;
-    gammas(3) = GAMMA_BALL_VEL;
+    // betas(2) = BETA_BALL_VEL;
+    // betas(3) = BETA_BALL_VEL;
+    // gammas(2) = GAMMA_BALL_VEL;
+    // gammas(3) = GAMMA_BALL_VEL;
 
     // Setup initial values
     setXEst(INIT_BALL_X);
@@ -154,10 +154,6 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     timeUpdate(MotionModel());
     limitAPrioriUncert();
 
-    cout << "Betas " << betas << endl;
-    cout << "Gammas " << gammas << endl;
-    cout << *this << endl;
-
     // We've seen a ball
     if (ball.distance > 0.0) {
         vector<RangeBearingMeasurement> z;
@@ -170,6 +166,7 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     limitPosteriorUncert();
     limitPosteriorEst();
     if (testForNaNReset()) {
+        cout << "\tBallEKF reset to " << *this << endl;
         cout << "\tObservation was: " << ball << endl;
     }
 }
@@ -446,6 +443,17 @@ void BallEKF::limitPosteriorUncert()
         P_k(3,3) = VELOCITY_UNCERT_MIN;
         P_k_bar(3,3) = VELOCITY_UNCERT_MIN;
     }
+
+    // We don't want any covariance values getting too large
+    for (unsigned int i = 0; i < numStates; ++i) {
+        for (unsigned int j = 0; j < numStates; ++j) {
+            if(P_k(i,j) > X_UNCERT_MAX) {
+                P_k(i,j) = X_UNCERT_MAX;
+                P_k_bar(i,j) = X_UNCERT_MAX;
+            }
+        }
+    }
+
     // Check x uncertainty
     if(P_k(0,0) > X_UNCERT_MAX) {
         P_k(0,0) = X_UNCERT_MAX;
@@ -526,24 +534,4 @@ void BallEKF::clipBallEstimate()
         xhat_k(3) = 0.0f;
     }
 
-}
-
-bool BallEKF::testForNaNReset()
-{
-    bool didReset = false;
-    if (isnan(getXEst()) || isnan(getYEst()) ||
-        isnan(getXVelocityEst()) || isnan(getYVelocityEst())) {
-        cout << "Reseting BallEKF do to nan value." << endl;
-        cout << "Current values are " << *this << endl;
-        reset();
-        didReset = true;
-    }
-    if (isinf(getXEst()) || isinf(getYEst()) ||
-        isinf(getXVelocityEst()) || isinf(getYVelocityEst())) {
-        cout << "Reseting BallEKF do to inf value." << endl;
-        cout << "Current values are " << *this << endl;
-        reset();
-        didReset = true;
-    }
-    return didReset;
 }
