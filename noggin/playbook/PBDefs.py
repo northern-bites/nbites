@@ -101,7 +101,7 @@ class Teammate:
         self.ballDist = ball.dist
         self.role = self.brain.playbook.role
         self.subRole = self.brain.playbook.subRole
-        self.chaseTime = self.getChaseTime()
+        self.chaseTime = self.determineChaseTime()
 
         self.ballLocDist = ball.locDist
         self.ballLocBearing = ball.locBearing
@@ -164,7 +164,7 @@ class Teammate:
         return MyMath.sub180Angle(playerH -(degrees(MyMath.safe_atan2(
                         y - playerY, x - playerX)) - 90.0))
 
-    def getChaseTime(self):
+    def determineChaseTime(self, useZone = False):
         # if the robot sees the ball use visual distances to ball
         time = 0.0
         if self.ballDist > 0:

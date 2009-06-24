@@ -221,7 +221,7 @@ class Brain(object):
     def updateComm(self):
         temp = self.comm.latestComm()
         for packet in temp:
-            if len(packet)==17:
+            if len(packet) == Constants.NUM_PACKET_ELEMENTS:
                 packet = TypeDefs.Packet(packet)
                 if packet.playerNumber != self.my.playerNumber:
                     self.playbook.update(packet)
@@ -253,7 +253,7 @@ class Brain(object):
                           self.ball.dist,
                           self.playbook.role,
                           self.playbook.currentSubRole,
-                          self.playbook.me.getChaseTime(),
+                          self.playbook.me.determineChaseTime(),
                           self.loc.ballVelX,
                           self.loc.ballVelY)
 
