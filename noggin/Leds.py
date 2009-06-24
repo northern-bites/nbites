@@ -1,14 +1,15 @@
 import _lights
-
+import playbook.PBConstants as PBConstants
 # LED Related #
 DEBUG_BALL_LEDS = True
 DEBUG_GOAL_LEDS = True
+DEBUG_CHASER_LEDS = True
 
 ####### LED DEFINITIONS #############
 LED_OFF = 0
 LED_ON = 1
 
-#The order here must match the order of the string defined in Lights.h 
+#The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
 (LEFT_EAR_LED,
 RIGHT_EAR_LED,
@@ -49,10 +50,11 @@ STATE_FINISHED_LEDS = ((CHEST_LED, OFF,    NOW),)
 
 ##### Brain ######
 #### Ball #######
-BALL_ON_LEDS = ((LEFT_EYE_LED, RED,    NOW),
-                (RIGHT_EYE_LED, RED,    NOW),)
-BALL_OFF_LEDS = ((LEFT_EYE_LED, BLUE,    NOW),
-                 (RIGHT_EYE_LED, BLUE,    NOW),)
+BALL_ON_LEDS = ((LEFT_EYE_LED, RED, NOW),)
+BALL_OFF_LEDS = ((LEFT_EYE_LED, BLUE, NOW),)
+#### Chaser #######
+CHASER_ON_LEDS = ((RIGHT_EYE_LED, GREEN, NOW),)
+CHASER_OFF_LEDS = ((RIGHT_EYE_LED, BLUE, NOW),)
 
 
 #### GOAL ######
@@ -82,6 +84,12 @@ class Leds():
                 self.executeLeds(GOAL_ON_LEDS)
             else:
                 self.executeLeds(GOAL_OFF_LEDS)
+
+        if DEBUG_CHASER_LEDS:
+            if self.brain.playbook.role == PBConstants.CHASER:
+                self.executeLeds(CHASER_ON_LEDS)
+            else:
+                self.executeLeds(CHASER_OFF_LEDS)
 
     def executeLeds(self,listOfLeds):
 

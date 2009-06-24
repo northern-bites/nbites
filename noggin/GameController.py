@@ -94,12 +94,12 @@ class GameController(FSA.FSA):
         '''
 
         #######  KICKOFF  ######
-        #if self.gc.kickOff != self.kickOff:
-        if self.gc.kickOff == self.gc.team:
-            #self.printf("Setting LEDS to KICKOFF (WHITE)")
+        if (self.gc.kickOff == self.gc.team and
+            (self.gc.state == comm.STATE_INITAL or
+             self.gc.state == comm.STATE_READY or
+             self.gc.state == comm.STATE_PLAYING)):
             self.brain.leds.executeLeds(Leds.HAVE_KICKOFF_LEDS)
         else:
-            #self.printf("Setting LEDS to KICKOFF (OFF)")
             self.brain.leds.executeLeds(Leds.NO_KICKOFF_LEDS)
 
         ###### TEAM COLOR ######
