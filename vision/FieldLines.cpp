@@ -2492,16 +2492,10 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
                                                   MIN_CROSS_EXTEND))) {
                 if (debugIntersectLines || debugCcScan)
                     cout <<"\t" << numChecksPassed
-                         << "-'Cross corner' sanity check failed, intersection "
+                         << "-Identified center circle intersection "
                          << "point was within the endpoints of both lines.  "
                          <<"Discarding all corners" << endl;
-                // at this point, we are by a center and so we discard all
-                // corners after recoloring them so we can tell they are
-                // illegitimate
-                drawCorners(corners, INVALIDATED_INTERSECTION_POINT_COLOR);
                 isCCIntersection = true;
-                // corners.clear();
-                // return corners;
             }
             ++numChecksPassed;
 

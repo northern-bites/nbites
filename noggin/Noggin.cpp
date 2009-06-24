@@ -31,6 +31,10 @@ fstream outputFile;
 #include <ctime>
 #endif
 
+#ifdef DEBUG_CC_DETECTION_SAVE_FRAMES
+#include "ConcreteCorner.h"
+#endif
+
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
@@ -353,7 +357,11 @@ void Noggin::updateLocalization()
                  << " at distance "
                  << seen.getVisDistance() << " and bearing "
                  << seen.getVisBearing() << endl;
-            //sensors->saveFrame();
+#           endif
+#           ifdef DEBUG_CC_DETECTION_SAVE_FRAMES
+            if (i->getShape() == CIRCLE) {
+                sensors->saveFrame();
+            }
 #           endif
         }
     }
