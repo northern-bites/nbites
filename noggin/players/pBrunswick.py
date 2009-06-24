@@ -49,6 +49,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.shouldStopCaseCounter = 0
         self.posForSaveCounter = 0
         self.timeFromCenter = 0
+        self.stepsOffCenter = 0
         self.lastStepTime = self.getTime()
         self.ballRelY = 0.0
         self.ballRelX = 0.0
