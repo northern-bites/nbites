@@ -225,7 +225,9 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     const float angleY = walkParams->stance[WP::BODY_ROT_Y]
         +(inertial.angleY-walkParams->stance[WP::BODY_ROT_Y])*angleScale;
 
-    IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,angleY,HYPAngle);
+    //IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,angleY,HYPAngle);
+    IKLegResult result =
+        Kinematics::simpleLegIK(chainID,goal,lastJoints);
     if(result.outcome != Kinematics::SUCCESS){
         cout << "IK ERROR: tried to go to "<<goal<< " with leg "<<leg_name<<endl
              << "   and aX,aY,HYP = "<<angleX<<","<<angleY<<","<<HYPAngle<<endl;
@@ -234,6 +236,7 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] -= hipHacks.get<1>(); //HipRoll
     result.angles[2] += hipHacks.get<0>(); //HipPitch
+    result.angles[2] -=  walkParams->stance[WP::BODY_ROT_Y]; //HACK
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);
@@ -270,8 +273,11 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     const float angleY = walkParams->stance[WP::BODY_ROT_Y]
         +(inertial.angleY-walkParams->stance[WP::BODY_ROT_Y])*angleScale;
 
-    IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
-                                               angleY, HYPAngle);
+    // IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
+    //                                            angleY, HYPAngle);
+    IKLegResult result =
+        Kinematics::simpleLegIK(chainID,goal,lastJoints);
+
     if(result.outcome != Kinematics::SUCCESS){
         cout << "IK ERROR: tried to go to "<<goal<< " with leg "<<leg_name<<endl
              << "   and aX,aY,HYP = "<<angleX<<","<<angleY<<","<<HYPAngle<<endl;
@@ -280,6 +286,8 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] += hipHacks.get<1>(); //HipRoll
     result.angles[2] += hipHacks.get<0>(); //HipPitch
+    result.angles[2] -=  walkParams->stance[WP::BODY_ROT_Y]; //HACK
+
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);

@@ -2,7 +2,7 @@
 
 #include "InverseKinematics.h"
 
-#define USE_ANALYTIC_IK
+//#define USE_ANALYTIC_IK
 
 using namespace boost::numeric;
 using namespace NBMath;
