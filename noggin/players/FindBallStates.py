@@ -1,5 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..playbook import PBConstants as pbc
 
 def scanFindBall(player):
     """
@@ -10,13 +11,19 @@ def scanFindBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if transitions.shouldApproachBallWithLoc(player):
-        player.brain.tracker.trackBall()
-        return player.goLater('approachBallWithLoc')
-    elif transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBall')
-    elif transitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBall')
+    if player.currentRole == pbc.GOALIE:
+        if transitions.shouldTurnToBall_FoundBall(player):
+            return player.goLater('turnToBall')
+        elif transitions.shouldSpinFindBall(player):
+            return player.goLater('spinFindBall')
+    else:
+        if transitions.shouldApproachBallWithLoc(player):
+            player.brain.tracker.trackBall()
+            return player.goLater('approachBallWithLoc')
+        elif transitions.shouldTurnToBall_FoundBall(player):
+            return player.goLater('turnToBall')
+        elif transitions.shouldSpinFindBall(player):
+            return player.goLater('spinFindBall')
 
     return player.stay()
 
@@ -35,10 +42,14 @@ def spinFindBall(player):
     player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
     # Determine if we should leave this state
-    if transitions.shouldApproachBallWithLoc(player):
-        player.brain.tracker.trackBall()
-        return player.goLater('approachBallWithLoc')
-    elif transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBall')
+    if player.currentRole == pbc.GOALIE:
+        if transitions.shouldTurnToBall_FoundBall(player):
+            return player.goLater('turnToBall')
+    else:
+        if transitions.shouldApproachBallWithLoc(player):
+            player.brain.tracker.trackBall()
+            return player.goLater('approachBallWithLoc')
+        elif transitions.shouldTurnToBall_FoundBall(player):
+            return player.goLater('turnToBall')
 
     return player.stay()
