@@ -102,30 +102,45 @@ class GoTeam:
         """
         Picks the strategy to run and returns all sorts of infos
         """
+        # We don't control anything in initial or finished
         if self.brain.gameController.currentState == 'gameInitial' or\
             self.brain.gameController.currentState == 'gameFinished':
             return ('sInit', PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
                     PBConstants.INIT_SUB_ROLE, [0,0] )
+
+        # Have a separate strategy to easily deal with being penalized
         elif self.brain.gameController.currentState == 'gamePenalized':
             return ('sInit', PBConstants.PENALTY_FORMATION,
                     PBConstants.PENALTY_ROLE,
                     PBConstants.PENALTY_SUB_ROLE, [0,0] )
-        # First we check for testing stuff
+
+        # Check for testing stuff
         elif PBConstants.TEST_DEFENDER:
             return Strategies.sTestDefender(self)
         elif PBConstants.TEST_OFFENDER:
             return Strategies.sTestOffender(self)
         elif PBConstants.TEST_CHASER:
             return Strategies.sTestChaser(self)
+
+        # Have a separate ready section to make things simpler
+        elif (self.brain.gameController.currentState == 'gameReady' or
+              self.brain.gameController.currentState =='gameSet'):
+            return Strategies.sReady(self)
+
         # Now we look at game strategies
         elif self.numActiveFieldPlayers == 0:
             return Strategies.sNoFieldPlayers(self)
         elif self.numActiveFieldPlayers == 1:
             return Strategies.sOneField(self)
+
+        # This is the important area, what is usually used during play
         elif self.numActiveFieldPlayers == 2:
             if PBConstants.USE_ZONE_STRATEGY:
                 return Strategies.sTwoZone(self)
-            return Strategies.sTwoField(self)
+            #return Strategies.sTwoField(self)
+            return Strategies.sDefensiveMid(self)
+
+        # This can only be used right now if the goalie is pulled
         elif self.numActiveFieldPlayers == 3:
             return Strategies.sThreeField(self)
 

@@ -2,21 +2,13 @@
 from . import PBConstants
 from . import Formations
 
+def sReady(team):
+    return ['sReady'] + Formations.fReady(team)
+
 def sNoFieldPlayers(team):
-    # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady' or\
-        team.brain.gameController.currentState =='gameSet':
-        # team is kicking off
-        return ['sNoFieldPlayers'] + Formations.fReady(team)
     return ['sNoFieldPlayers'] + Formations.fNoFieldPlayers(team)
 
 def sOneField(team):
-    # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady' or\
-        team.brain.gameController.currentState =='gameSet':
-        # team is kicking off
-        return ['sOneField'] + Formations.fReady(team)
-
     # Kickoff Formations
     if (team.brain.gameController.timeSincePlay() <
         PBConstants.KICKOFF_FORMATION_TIME):
@@ -38,14 +30,8 @@ def sTwoField(team):
     '''
     This is our standard strategy.  Based around the 2008.
     '''
-    # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady' or\
-        team.brain.gameController.currentState =='gameSet':
-        # team is kicking off
-        return ['sTwoField'] + Formations.fReady(team)
-
     # Game Playing Formations
-    elif team.brain.gameController.currentState == 'gamePlaying':
+    if team.brain.gameController.currentState == 'gamePlaying':
 
         # Kickoff Formations
         if (team.brain.gameController.timeSincePlay() <
@@ -61,24 +47,17 @@ def sTwoField(team):
         elif (PBConstants.USE_FINDER and
               team.brain.ball.timeSinceSeen() >
               PBConstants.FINDER_TIME_THRESH):
-              #and team.brain.gameController.getTimeSinceUnpenalized() >
-              #PBConstants.FINDER_TIME_THRESH):
             return ['sTwoField'] + Formations.fFinder(team)
-    # Standard spread formation
+
+    # Keep a defender and a chaser
     return ['sTwoField'] + Formations.fTwoField(team)
 
 def sThreeField(team):
     '''
     This is our pulled goalie strategy.
     '''
-    # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady' or\
-       team.brain.gameController.currentState =='gameSet':
-       # team is kicking off
-       return ['sThreeField'] + Formations.fReady(team)
-
     # Game Playing Formations
-    elif team.brain.gameController.currentState == 'gamePlaying':
+    if team.brain.gameController.currentState == 'gamePlaying':
         # Kickoff Formations
         if (team.brain.gameController.timeSincePlay() <
             PBConstants.KICKOFF_FORMATION_TIME):
@@ -93,14 +72,36 @@ def sThreeField(team):
         # ball hasn't been seen by me or teammates in a while
         elif (PBConstants.USE_FINDER and team.brain.ball.timeSinceSeen() >
               PBConstants.FINDER_TIME_THRESH):
-            #and team.brain.gameController.getTimeSinceUnpenalized() >
-            #PBConstants.FINDER_TIME_THRESH):
             return ['sThreeField'] + Formations.fFinder(team)
+
     # Standard spread formation
     return ['sThreeField'] + Formations.fThreeField(team)
 
 def sTwoZone(team):
     return sTwoField(team)
+
+def sDefensiveMid(team):
+    strat = ["sDefensiveMid"]
+    # Kickoff Formations
+    if (team.brain.gameController.timeSincePlay() <
+        PBConstants.KICKOFF_FORMATION_TIME):
+        # Kickoff
+        return strat + Formations.fTwoKickoff(team)
+
+    # Formation for ball in our goal box
+    elif team.shouldUseDubD():
+        return strat + Formations.fDubD(team)
+
+    # ball hasn't been seen by me or teammates in a while
+    elif (PBConstants.USE_FINDER and
+          team.brain.ball.timeSinceSeen() >
+          PBConstants.FINDER_TIME_THRESH):
+        return strat + Formations.fFinder(team)
+
+    # Move the defender forward if the ball is close enough to opp goal, then become a middie
+    if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+        return strat + Formations.fNeutralDefense(team)
+    return strat + Formations.fDefensive(team)
 
 # Add strategies for testing various roles
 def sTestDefender(team):

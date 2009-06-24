@@ -35,9 +35,84 @@ def fTwoField(team):
             role = Roles.rDefender(team)
     return [PBConstants.TWO_FIELD] + role
 
+def fDefensive(team):
+    role = None
+    if team.me.isGoalie():
+        role = Roles.rGoalie(team)
+    else:
+        # gets teammate that is chaser (could be me)
+        chaser_mate = team.determineChaser()
+
+        # if i am chaser
+        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+            role = Roles.rChaser(team)
+        # Get where the defender should be
+        else:
+            role = Roles.rDefender(team)
+    return [PBConstants.DEFENSIVE] + role
+
+def fNeutralDefense(team):
+    """
+    Have a defensive midfielder
+    """
+    role = None
+    if team.me.isGoalie():
+        role = Roles.rGoalie(team)
+    else:
+        # gets teammate that is chaser (could be me)
+        chaser_mate = team.determineChaser()
+
+        # if i am chaser
+        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+            role = Roles.rChaser(team)
+        # Get where the middie should be
+        else:
+            role = Roles.rDefensiveMiddie(team)
+    return [PBConstants.NEUTRAL_DEFENSE] + role
+
+def fNeutralOffense(team):
+    """
+    Have an offensive midfielder
+    """
+    role = None
+    if team.me.isGoalie():
+        role = Roles.rGoalie(team)
+    else:
+        # gets teammate that is chaser (could be me)
+        chaser_mate = team.determineChaser()
+
+        # if i am chaser
+        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+            role = Roles.rChaser(team)
+        # Get where the middie should be
+        else:
+            role = Roles.rOffensiveMiddie(team)
+    return [PBConstants.NEUTRAL_OFFENSE] + role
+
+def fOffensive(team):
+    """
+    Have a supporting attacker
+    """
+    role = None
+    if team.me.isGoalie():
+        role = Roles.rGoalie(team)
+    else:
+        # gets teammate that is chaser (could be me)
+        chaser_mate = team.determineChaser()
+
+        # if i am chaser
+        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+            role = Roles.rChaser(team)
+        # Get where the offender should be
+        else:
+            role = Roles.rOffender(team)
+    return [PBConstants.OFFENSIVE] + role
+
 def fThreeField(team):
-    '''right now (2009) we will only have 3 field players if the goalie is
-	pulled.'''
+    """
+    right now (2009) we will only have 3 field players if the goalie is
+	pulled.
+    """
     role = None
     # gets teammate that is chaser (could be me)
     chaser_mate = team.determineChaser()
