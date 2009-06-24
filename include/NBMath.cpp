@@ -93,3 +93,15 @@ const float  NBMath::cycloidx(const float theta){
 const float  NBMath::cycloidy(const float theta){
     return 1.0f - std::cos(theta);
 }
+
+const float NBMath::safe_atan2(const float y, const float x)
+{
+    if (x == 0.0f) {
+        if ( y > 0.0f) {
+            return M_PI_FLOAT / 2.0f;
+        } else {
+            return -M_PI_FLOAT / 2.0f;
+        }
+    }
+    return atan2(y,x);
+}

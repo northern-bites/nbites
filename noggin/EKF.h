@@ -252,6 +252,23 @@ protected:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k) = 0;
+    virtual void reset() {}
+    virtual bool testForNaNReset() {
+        for (unsigned int i = 0; i < numStates; ++i) {
+            for (unsigned int j = 0; j < numStates; ++j) {
+                if(isnan(P_k(i,j)) || isnan(P_k_bar(i,j)) ||
+                   isnan(xhat_k(i)) || isnan(xhat_k_bar(i)) ||
+                   isinf(P_k(i,j)) || isinf(P_k_bar(i,j)) ||
+                   isinf(xhat_k(i)) || isinf(xhat_k_bar(i))) {
+                    std::cout << "Reseting EKF do to nan or inf value."
+                              << std::endl;
+                    reset();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 };
 
 #endif //EKF_h_DEFINED

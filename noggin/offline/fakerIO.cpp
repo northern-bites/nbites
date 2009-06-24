@@ -52,7 +52,7 @@ void readObsInputFile(fstream * inputFile,
                       vector<float> * ballDists,
                       vector<float> * ballBearings, int ball_id)
 {
-    char line[256];
+    char line[1024];
 
     while(!inputFile->eof()) {
         PoseEst pose;
@@ -65,7 +65,7 @@ void readObsInputFile(fstream * inputFile,
         stringstream inputLine(stringstream::in | stringstream::out);
 
         // Read in the next line
-        inputFile->getline(line, 256);
+        inputFile->getline(line, 1024);
         inputLine << line;
 
         readObsInputLine(&inputLine, &pose, &ball, &odo,
@@ -431,7 +431,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
     VisualBall * _b = new VisualBall();
 
     int teamColor, playerNumber;
-    char line[256];
     float initX, initY, initH,
         initUncertX, initUncertY, initUncertH,
         initBallX, initBallY,
@@ -441,14 +440,15 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
 
     if(!inputFile->eof()) {
         stringstream headerLine(stringstream::in | stringstream::out);
+        char line[1024];
         // Read in the header line
-        inputFile->getline(line, 256);
+        inputFile->getline(line, 1024);
         headerLine << line;
         headerLine >> teamColor >> playerNumber;
 
         stringstream startLine(stringstream::in | stringstream::out);
         // Read the EKF start configuration
-        inputFile->getline(line, 256);
+        inputFile->getline(line, 1024);
         startLine << line;
         startLine >> initX >> initY >> initH
                   >> initUncertX >> initUncertY >> initUncertH
@@ -470,11 +470,12 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     teamColor, playerNumber, BALL_ID);
 
     float ballDist, ballBearing;
-    int lineCounter = 1;
     // Collect the frame by frame data
+
     while(!inputFile->eof()) {
         stringstream inputLine(stringstream::in | stringstream::out);
-        inputFile->getline(line, 256);
+        char line[1024];
+        inputFile->getline(line, 1024);
         inputLine << line;
         // Read in the base data
         inputLine >> lastOdo.deltaF >> lastOdo.deltaL >> lastOdo.deltaR
@@ -492,8 +493,6 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
 
         // Read in observations
         sightings.clear();
-        //cout << "Line #" << ++lineCounter << " basic data: " << lastOdo << " "
-        //     << ballDist << " " << ballBearing << " ";
 
         // Observations are separated by colons
         while(inputLine.peek() == ':') {
@@ -502,31 +501,16 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
             float dist, bearing, distSD, bearingSD;
             inputLine >> c >> id >> dist >> bearing >> distSD >> bearingSD;
 
-            //cout  << c << " " << id << " " << dist << " " << bearing << " " << distSD << " "
-            //<< bearingSD << " ";
-
             Observation obs(id, dist, bearing, distSD, bearingSD,
                              Observation::isLineID(id));
             while(inputLine.peek() != ':' &&
                   inputLine.peek() != EOF) {
-                if(obs.isLine()) {
-                    LineLandmark l;
-                    inputLine >> l.x1 >> l.y1 >> l.x2 >> l.y2;
-                    obs.addLinePossibility(l);
-                    // cout << "Line " << l.x1 << " " << l.y1 << " "
-                    //      << l.x2 << " " << l.y2 << " ";
-                } else {
-                    PointLandmark p;
-                    inputLine >> p.x >> p.y;
-                    obs.addPointPossibility(p);
-                    //cout << "Point " << p.x << " " << p.y << " ";
-                }
+                PointLandmark p;
+                inputLine >> p.x >> p.y;
+                obs.addPointPossibility(p);
             }
-            if (! obs.isLine()) {
-                sightings.push_back(obs);
-            }
+            sightings.push_back(obs);
         }
-        //cout << endl;
 
         // Update localization
         locEKF->updateLocalization(lastOdo, sightings);

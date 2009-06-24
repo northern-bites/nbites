@@ -59,7 +59,7 @@ public:
         return 10 + _distance * 0.2f;
     }
     const float ballBearingToSD(float _bearing) const {
-        return static_cast<float>(M_PI) / 8.0f;
+        return static_cast<float>(M_PI) / 4.0f;
     }
 
 private:

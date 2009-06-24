@@ -73,6 +73,8 @@ namespace NBMath {
 
     const float safe_asin(const float input);
     const float safe_acos(const float input);
+    const float safe_atan2(const float y,
+                           const float x);
 
 
     const float  cycloidx(const float theta);

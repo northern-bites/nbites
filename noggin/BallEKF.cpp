@@ -3,10 +3,11 @@
 using namespace boost::numeric;
 using namespace boost;
 using namespace NBMath;
+using namespace std;
 
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;
-const float BallEKF::USE_CARTESIAN_BALL_DIST = 5000.0f;
+const float BallEKF::USE_CARTESIAN_BALL_DIST = 50000.0f;
 
 // How much uncertainty naturally grows per update
 const float BallEKF::BETA_BALL = 5.0f;
@@ -19,17 +20,17 @@ const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
 
 // Default initialization values
 const float BallEKF::INIT_BALL_X = CENTER_FIELD_X;
-const float BallEKF::INIT_BALL_Y = CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS;
+const float BallEKF::INIT_BALL_Y = CENTER_FIELD_Y;
 const float BallEKF::INIT_BALL_X_VEL = 0.0f;
 const float BallEKF::INIT_BALL_Y_VEL = 0.0f;
-const float BallEKF::X_UNCERT_MAX = FIELD_HEIGHT;
-const float BallEKF::Y_UNCERT_MAX = FIELD_WIDTH;
+const float BallEKF::X_UNCERT_MAX = FIELD_WIDTH / 2.0f;
+const float BallEKF::Y_UNCERT_MAX = FIELD_HEIGHT / 2.0f;
 const float BallEKF::VELOCITY_UNCERT_MAX = 150.0f;
 const float BallEKF::X_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::Y_UNCERT_MIN = 1.0e-6f;
 const float BallEKF::VELOCITY_UNCERT_MIN = 1.0e-6f;
-const float BallEKF::INIT_X_UNCERT = FIELD_HEIGHT;
-const float BallEKF::INIT_Y_UNCERT = FIELD_WIDTH;
+const float BallEKF::INIT_X_UNCERT = FIELD_WIDTH / 4.0f;
+const float BallEKF::INIT_Y_UNCERT = FIELD_HEIGHT / 4.0f;
 const float BallEKF::INIT_X_VEL_UNCERT = 300.0f;
 const float BallEKF::INIT_Y_VEL_UNCERT = 300.0f;
 const float BallEKF::X_EST_MIN = 0.0f;
@@ -57,10 +58,10 @@ BallEKF::BallEKF()
     A_k(1,3) = 1.0f / ASSUMED_FPS;
 
     // Set velocity uncertainty parameters
-    betas(3) = BETA_BALL_VEL;
-    betas(4) = BETA_BALL_VEL;
-    gammas(3) = GAMMA_BALL_VEL;
-    gammas(4) = GAMMA_BALL_VEL;
+    // betas(2) = BETA_BALL_VEL;
+    // betas(3) = BETA_BALL_VEL;
+    // gammas(2) = GAMMA_BALL_VEL;
+    // gammas(3) = GAMMA_BALL_VEL;
 
     // Setup initial values
     setXEst(INIT_BALL_X);
@@ -155,7 +156,7 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
 
     // We've seen a ball
     if (ball.distance > 0.0) {
-        std::vector<RangeBearingMeasurement> z;
+        vector<RangeBearingMeasurement> z;
         z.push_back(ball);
         correctionStep(z);
 
@@ -164,7 +165,10 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     }
     limitPosteriorUncert();
     limitPosteriorEst();
-    testForNaNReset();
+    if (testForNaNReset()) {
+        cout << "\tBallEKF reset to " << *this << endl;
+        cout << "\tObservation was: " << ball << endl;
+    }
 }
 
 /**
@@ -212,8 +216,8 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
 {
     if (z.distance < USE_CARTESIAN_BALL_DIST) {
         // Convert our sighting to cartesian coordinates
-        const float x_b_r = z.distance * std::cos(z.bearing);
-        const float y_b_r = z.distance * std::sin(z.bearing);
+        const float x_b_r = z.distance * cos(z.bearing);
+        const float y_b_r = z.distance * sin(z.bearing);
         MeasurementVector z_x(2);
 
         z_x(0) = x_b_r;
@@ -254,11 +258,15 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
 
         MeasurementVector d_x(2);
 
-        d_x(0) = static_cast<float>(hypot(x_b - robotPose.x, y_b - robotPose.y));
-        d_x(1) = std::atan2(y_b - robotPose.y, x_b - robotPose.x) - robotPose.h;
+        d_x(0) = static_cast<float>(hypot(x_b - robotPose.x,
+                                          y_b - robotPose.y));
+        d_x(1) = subPIAngle(safe_atan2(y_b - robotPose.y,
+                                       x_b - robotPose.x) - robotPose.h);
 
         // Calculate invariance
         V_k = z_x - d_x;
+        // cout << "\tExpected was: " << d_x << endl;
+        // cout << "\tObserved was: " << z_x << endl;
 
         // Calculate jacobians
         H_k(0,0) = (x_b - robotPose.x) / d_x(0);
@@ -279,8 +287,8 @@ void BallEKF::beforeCorrectionFinish(void)
     // The ball was likely moved by a referee or hasn't been seen in a while
     // If the ball IS moving, then we'll pick it up in the next frame
     if (USE_BALL_JUMP_RESET &&
-        (std::abs(xhat_k(2) - xhat_k_bar(2)) > BALL_JUMP_VEL_THRESH ||
-         std::abs(xhat_k(3) - xhat_k_bar(3)) > BALL_JUMP_VEL_THRESH) ) {
+        (abs(xhat_k(2) - xhat_k_bar(2)) > BALL_JUMP_VEL_THRESH ||
+         abs(xhat_k(3) - xhat_k_bar(3)) > BALL_JUMP_VEL_THRESH) ) {
         xhat_k_bar(2) = 0.0f;
         xhat_k(2) = 0.0f;
         xhat_k_bar(3) = 0.0f;
@@ -435,6 +443,17 @@ void BallEKF::limitPosteriorUncert()
         P_k(3,3) = VELOCITY_UNCERT_MIN;
         P_k_bar(3,3) = VELOCITY_UNCERT_MIN;
     }
+
+    // We don't want any covariance values getting too large
+    for (unsigned int i = 0; i < numStates; ++i) {
+        for (unsigned int j = 0; j < numStates; ++j) {
+            if(P_k(i,j) > X_UNCERT_MAX) {
+                P_k(i,j) = X_UNCERT_MAX;
+                P_k_bar(i,j) = X_UNCERT_MAX;
+            }
+        }
+    }
+
     // Check x uncertainty
     if(P_k(0,0) > X_UNCERT_MAX) {
         P_k(0,0) = X_UNCERT_MAX;
@@ -508,28 +527,11 @@ void BallEKF::clipBallEstimate()
         xhat_k(3) = VELOCITY_EST_MIN;
     }
 
-    if (std::abs(xhat_k(2)) < 0.2f) {
+    if (abs(xhat_k(2)) < 0.2f) {
         xhat_k(2) = 0.0f;
     }
-    if (std::abs(xhat_k(3)) < 0.2f) {
+    if (abs(xhat_k(3)) < 0.2f) {
         xhat_k(3) = 0.0f;
-    }
-
-}
-
-void BallEKF::testForNaNReset()
-{
-    if (isnan(getXEst()) || isnan(getYEst()) ||
-        isnan(getXVelocityEst()) || isnan(getYVelocityEst())) {
-        std::cout << "Reseting BallEKF do to nan value." << std::endl;
-        std::cout << "Current values are " << *this << std::endl;
-        reset();
-    }
-    if (isinf(getXEst()) || isinf(getYEst()) ||
-        isinf(getXVelocityEst()) || isinf(getYVelocityEst())) {
-        std::cout << "Reseting BallEKF do to inf value." << std::endl;
-        std::cout << "Current values are " << *this << std::endl;
-        reset();
     }
 
 }
