@@ -540,7 +540,7 @@ def afterKick(player):
 
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
-        player.walkPose()
+        player.standup()
 
         if player.penaltyKicking:
             return player.goLater('penaltyKickRelocalize')
@@ -571,7 +571,7 @@ def kickAtPosition(player):
         player.executeMove(SweetMoves.LEFT_FAR_KICK)
 
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
-        player.walkPose()
+        player.standup()
 
         if player.brain.nav.isStopped():
             player.brain.CoA.setRobotGait(player.brain.motion)
