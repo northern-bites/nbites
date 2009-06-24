@@ -130,14 +130,21 @@ public class DebugViewer extends JFrame {
     public static final int YELLOW_GOAL_LEFT_L = 27;
     public static final int YELLOW_GOAL_RIGHT_L = 28;
     public static final int CORNER_NO_IDEA_ID = 29;
+    public static final int TOP_CC = 30;
+    public static final int BOTTOM_CC = 31;
 
     // Field Objects
-    public static final int BLUE_GOAL_TOP_POST = 30;
-    public static final int BLUE_GOAL_BOTTOM_POST = 31;
-    public static final int YELLOW_GOAL_BOTTOM_POST = 32;
-    public static final int YELLOW_GOAL_TOP_POST = 33;
-    public static final int BLUE_GOAL_POST = 34;
-    public static final int YELLOW_GOAL_POST = 35;
+    public static final int BLUE_GOAL_TOP_POST = 40;
+    public static final int BLUE_GOAL_BOTTOM_POST = 41;
+    public static final int YELLOW_GOAL_BOTTOM_POST = 42;
+    public static final int YELLOW_GOAL_TOP_POST = 43;
+    public static final int BLUE_GOAL_POST = 44;
+    public static final int YELLOW_GOAL_POST = 45;
+
+    // Visual Cross
+    public static final int BLUE_GOAL_CROSS = 80;
+    public static final int YELLOW_GOAL_CROSS = 81;
+    public static final int ABSTRACT_CROSS = 82;
 
     // Visual Cross
     public static final int BLUE_GOAL_CROSS = 80;
@@ -261,7 +268,7 @@ public class DebugViewer extends JFrame {
 
         window = getContentPane();
         num_landmarks = 0;
-        landmark_components = new Component[30];
+        landmark_components = new Component[50];
 
         cornerIDMap = new HashMap<Integer, Point2D.Double>();
         cornerMap = new HashMap<Point2D.Double,String>();
@@ -581,8 +588,6 @@ public class DebugViewer extends JFrame {
         objectIDStringMap.put(new Integer(13), "YELLOW GOAL OUTER L");
         objectIDMap.put(new Integer(14), emptyPoint);
         objectIDStringMap.put(new Integer(14), "CENTER T");
-        objectIDMap.put(new Integer(29), emptyPoint);
-        objectIDStringMap.put(new Integer(29), "NO IDEA CORNER");
 
         // Specific Corners
         Point2D.Double blueCornerTopL =
@@ -668,32 +673,35 @@ public class DebugViewer extends JFrame {
         objectIDMap.put(new Integer(28), yellowGoalRightL);
         objectIDStringMap.put(new Integer(28), "Yellow Goal Right L");
 
+        objectIDMap.put(new Integer(29), emptyPoint);
+        objectIDStringMap.put(new Integer(29), "NO IDEA CORNER");
+
         // Field objects
         Point2D.Double bglpPT =
             new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X,
                                wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_Y);
-        objectIDMap.put(new Integer(30), bglpPT);
-        objectIDStringMap.put(new Integer(30), "Blue goal left post");
+        objectIDMap.put(new Integer(40), bglpPT);
+        objectIDStringMap.put(new Integer(40), "Blue goal left post");
         Point2D.Double bgrpPT =
             new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_X,
                                wc.the_field.LANDMARK_LEFT_GOAL_BOTTOM_POST_Y);
-        objectIDMap.put(new Integer(31), bgrpPT);
-        objectIDStringMap.put(new Integer(31), "Blue goal right post");
+        objectIDMap.put(new Integer(41), bgrpPT);
+        objectIDStringMap.put(new Integer(41), "Blue goal right post");
         Point2D.Double ygrpPT =
             new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_X,
                                wc.the_field.LANDMARK_RIGHT_GOAL_BOTTOM_POST_Y);
-        objectIDMap.put(new Integer(32), ygrpPT);
-        objectIDStringMap.put(new Integer(32), "Yellow goal left post");
+        objectIDMap.put(new Integer(42), ygrpPT);
+        objectIDStringMap.put(new Integer(42), "Yellow goal left post");
         Point2D.Double yglpPT =
             new Point2D.Double(wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_X,
                                wc.the_field.LANDMARK_RIGHT_GOAL_TOP_POST_Y);
-        objectIDMap.put(new Integer(33), yglpPT);
-        objectIDStringMap.put(new Integer(33), "Yellow goal right post");
+        objectIDMap.put(new Integer(43), yglpPT);
+        objectIDStringMap.put(new Integer(43), "Yellow goal right post");
         // Ambiguous field objects
-        objectIDMap.put(new Integer(34), emptyPoint);
-        objectIDStringMap.put(new Integer(34), "Blue Goal Post");
-        objectIDMap.put(new Integer(35), emptyPoint);
-        objectIDStringMap.put(new Integer(35), "Yellow Goal Post");
+        objectIDMap.put(new Integer(44), emptyPoint);
+        objectIDStringMap.put(new Integer(44), "Blue Goal Post");
+        objectIDMap.put(new Integer(45), emptyPoint);
+        objectIDStringMap.put(new Integer(45), "Yellow Goal Post");
 
         Point2D.Double bg_cross =
             new Point2D.Double(wc.the_field.LEFT_SIDELINE_X + 180.0f - 5.0f,
@@ -788,6 +796,6 @@ public class DebugViewer extends JFrame {
 
     public boolean isDistinctLandmarkID(int ID)
     {
-        return ( ID >= 15 && ID <= 33 && ID != 29 && ID != 82);
+        return ( ID >= 15 && ID <= 43 && ID != 29 && ID != 82);
     }
 }
