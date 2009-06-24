@@ -123,6 +123,8 @@ class GoTeam:
         elif self.numActiveFieldPlayers == 1:
             return Strategies.sOneField(self)
         elif self.numActiveFieldPlayers == 2:
+            if PBConstants.USE_ZONE_STRATEGY:
+                return Strategies.sTwoZone(self)
             return Strategies.sTwoField(self)
         elif self.numActiveFieldPlayers == 3:
             return Strategies.sThreeField(self)
@@ -259,7 +261,6 @@ class GoTeam:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
             else:
-                mate.chaseTime = mate.getChaseTime()
                 # Tie break stuff
                 if self.me.chaseTime < mate.chaseTime:
                     chaseTimeScale = self.me.chaseTime
