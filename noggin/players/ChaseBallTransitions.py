@@ -31,7 +31,8 @@ def shouldApproachBall(player):
 def shouldApproachBallWithLoc(player):
     return player.brain.ball.on and \
         player.brain.my.locScore >= NogginConstants.OK_LOC and \
-        constants.USE_LOC_CHASE
+        constants.USE_LOC_CHASE and \
+        player.brain.ball.locDist > 30
 
 def shouldApproachFromPositionForKick(player):
     """

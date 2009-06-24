@@ -55,4 +55,4 @@ POSITION_FAR_SCALE = 1.0
 
 FRAME_RATE = 20                 # Rough estimate. fps
 
-
+MIN_SPIN_SPEED = 3.0

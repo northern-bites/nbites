@@ -170,5 +170,4 @@ class HeadTracking(FSA.FSA):
         if self.currentState is not 'look' or \
                 self.lookDirection != direction:
             self.lookDirection = direction
-            self.brain.motion.stopHeadMoves()
             self.switchTo('look')

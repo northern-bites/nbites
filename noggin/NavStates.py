@@ -43,23 +43,21 @@ def spinToWalkHeading(nav):
     if nav.atDestinationCloser():
         return nav.goLater('spinToFinalHeading')
 
-    sX = 0
-    sY = nav.curSpinDir * constants.GOTO_SPIN_STRAFE
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
         nav.getRotScale(headingDiff)
 
-    if sX == 0 and sY == 0 and sTheta == 0:
-        print "not moving. all zeros. nav's are %.2f, %.2f, %.2f" % (nav.walkX,
-                                                                     nav.walkY,
-                                                                     nav.walkTheta)
-        print targetH, headingDiff, newSpinDir, nav.curSpinDir
+    if sTheta == 0:
+        print "not moving. all zeros. nav's are %.2f, %.2f, %.2f" % \
+            (nav.walkX,
+             nav.walkY,
+             nav.walkTheta)
+
+        print targetH, nav.brain.my.h, headingDiff, newSpinDir, nav.curSpinDir
         print nav.destX, nav.destY, nav.destH, \
             nav.brain.ball.x, nav.brain.ball.y
 
-    if sX != nav.walkX or \
-            sY != nav.walkY or \
-            sTheta != nav.walkTheta:
-        nav.setSpeed(0, sY, sTheta)
+    if sTheta != nav.walkTheta:
+        nav.setSpeed(0, 0, sTheta)
 
     return nav.stay()
 
@@ -100,6 +98,8 @@ def walkStraightToPoint(nav):
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
     gain = constants.GOTO_FORWARD_GAIN * MyMath.dist(my.x, my.y,
                                              nav.destX, nav.destY)
+    if sTheta < constants.MIN_SPIN_SPEED:
+        sTheta = 0
     nav.setSpeed(constants.GOTO_FORWARD_SPEED*gain, 0, sTheta)
     return nav.stay()
 
