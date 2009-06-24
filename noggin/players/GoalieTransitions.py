@@ -10,7 +10,7 @@ STRAFE_SPEED = 6
 STRAFE_STEPS = 5
 MAX_STEPS_OFF_CENTER = 50
 BUFFER = 50
-DEBUG = True
+DEBUG = False
 
 def goalieRunChecks(player):
 

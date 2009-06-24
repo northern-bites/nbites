@@ -90,7 +90,10 @@ def goalieSpinToPosition(player):
 
 def goalieOutOfPosition(player):
     nav = player.brain.nav
-    player.brain.tracker.activeLoc()
+    if helper.useFarPosition(player):
+        player.brain.tracker.activeLoc()
+    else:
+        player.brain.tracker.trackBall()
 
     position = player.brain.playbook.position
     if player.firstFrame() or\
