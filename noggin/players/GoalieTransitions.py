@@ -10,7 +10,7 @@ STRAFE_SPEED = 6
 STRAFE_STEPS = 5
 MAX_STEPS_OFF_CENTER = 50
 BUFFER = 50
-DEBUG = False
+DEBUG = True
 
 def goalieRunChecks(player):
 
@@ -37,7 +37,7 @@ def goalieRunChecks(player):
     if not player.isChasing:
         if shouldChaseLoc(player):
             player.shouldChaseCounter+=1
-            #print "should chase: ", player.shouldChaseCounter
+            if DEBUG: print "should chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
                 player.isChasing = True
@@ -48,7 +48,7 @@ def goalieRunChecks(player):
     elif player.isChasing:
         if shouldStopChaseLoc(player):
             player.shouldChaseCounter+=1
-            #print "should stop chase: ", player.shouldChaseCounter
+            if DEBUG: print "should stop chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
                 player.isChasing = False
@@ -65,7 +65,7 @@ def useFarPosition(player):
     ball = player.brain.ball
     #switch out if we lose the ball for multiple frames
     return (not (0 <= ball.dist <= PBConstants.BALL_LOC_LIMIT + BUFFER) or
-            ball.framesOff > 150)
+            ball.framesOff > 500)
 
 def useLeftStrafeClose(player):
     return (player.ballRelY > CENTER_SAVE_THRESH and\
@@ -97,8 +97,8 @@ def shouldPositionForSave(player):
 
     if relVelX < 0.0:
         timeUntilSave = player.ballRelX / -relVelX
-        #player.printf(("relVelX = %g   timeUntilSave = %g") %
-        #              (relVelX, timeUntilSave))
+        if DEBUG: player.printf(("relVelX = %g   timeUntilSave = %g") %
+                      (relVelX, timeUntilSave))
     else:
         timeUntilSave = -1
     # No Time, Save now
@@ -132,8 +132,8 @@ def shouldSave(player):
 
     if relVelX < 0.0:
         timeUntilSave = player.ballRelX / -relVelX
-        # player.printf(("relVelX = %g   timeUntilSave = %g") %
-        #               (relVelX, timeUntilSave))
+        if DEBUG: player.printf(("relVelX = %g   timeUntilSave = %g") %
+                      (relVelX, timeUntilSave))
     else:
         timeUntilSave = -1
     # No Time, Save now
@@ -185,9 +185,24 @@ def shouldChaseLoc(player):
 
 def shouldStopChaseLoc(player):
     my = player.brain.my
+    ball = player.brain.ball
     if (my.x > Constants.MY_GOALBOX_RIGHT_X + PBConstants.END_CLEAR_BUFFER
         or my.y > Constants.MY_GOALBOX_TOP_Y + PBConstants.END_CLEAR_BUFFER
         or my.y < Constants.MY_GOALBOX_BOTTOM_Y + PBConstants.END_CLEAR_BUFFER):
+        return True
+    elif (ball.y < Constants.MY_GOALBOX_BOTTOM_Y - 10  and
+          ball.y > Constants.MY_GOALBOX_TOP_Y + 10 and
+          ball.x < Constants.MY_GOALBOX_RIGHT_X + 10) and\
+          player.subRole == PBConstants.GOALIE_CHASER:
+          return True
+    elif (ball.y < Constants.MY_GOALBOX_BOTTOM_Y - 5  and
+          ball.y > Constants.MY_GOALBOX_TOP_Y + 5 and
+          ball.x > Constants.MY_GOALBOX_RIGHT_X + 5):
+        return True
+    elif (my.x > Constants.MY_GOALBOX_RIGHT_X + 5
+          or my.y > Constants.MY_GOALBOX_TOP_Y + 5
+          or my.y < Constants.MY_GOALBOX_BOTTOM_Y + 5) and\
+          (0 < ball.locDist <= 60 or 0 < ball.dist <= 60):
         return True
     return False
 
