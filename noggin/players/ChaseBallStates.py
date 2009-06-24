@@ -19,10 +19,10 @@ def chase(player):
     if player.currentRole == pbc.GOALIE:
         if transitions.shouldScanFindBall(player):
             return player.goNow('scanFindBall')
-        elif transitions.shouldApproachBallWithLoc(player):
-            return player.goNow('approachBallWithLoc')
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
+        elif transitions.shouldKick(player):
+            return player.goNow('waitBeforeKick')
         elif transitions.shouldTurnToBall_ApproachBall(player):
             return player.goNow('turnToBall')
         elif transitions.shouldSpinFindBall(player):
@@ -87,7 +87,11 @@ def turnToBall(player):
         turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_SPEED
 
     if player.currentRole == pbc.GOALIE:
-        if transitions.shouldApproachBall(player):
+        if transitions.shouldKick(player):
+            return player.goNow('waitBeforeKick')
+        elif transitions.shouldPositionForKick(player):
+            return player.goNow('positionForKick')
+        elif transitions.shouldApproachBall(player):
             return player.goLater('approachBall')
         elif transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
@@ -110,7 +114,11 @@ def approachBallWithLoc(player):
     nav = player.brain.nav
     my = player.brain.my
     if player.currentRole == pbc.GOALIE:
-        if transitions.shouldAvoidObstacle(player):
+        if transitions.shouldKick(player):
+            return player.goNow('waitBeforeKick')
+        elif transitions.shouldPositionForKickFromApproachLoc(player):
+            return player.goLater('positionForKick')
+        elif transitions.shouldAvoidObstacle(player):
             return player.goLater('avoidObstacle')
         elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
             return player.goLater('approachBall')
@@ -184,8 +192,10 @@ def approachBall(player):
 
     # Switch to other states if we should
     if player.currentRole == pbc.GOALIE:
-        if transitions.shouldApproachBallWithLoc(player):
-            return player.goNow('approachBallWithLoc')
+        if transitions.shouldKick(player):
+            return player.goNow('waitBeforeKick')
+        elif transitions.shouldPositionForKick(player):
+            return player.goNow('positionForKick')
         elif transitions.shouldTurnToBall_ApproachBall(player):
             return player.goLater('turnToBall')
         elif transitions.shouldScanFindBall(player):
