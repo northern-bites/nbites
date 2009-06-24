@@ -221,7 +221,7 @@ class Brain(object):
     def updateComm(self):
         temp = self.comm.latestComm()
         for packet in temp:
-            if len(packet)==17:
+            if len(packet) == Constants.NUM_PACKET_ELEMENTS:
                 packet = TypeDefs.Packet(packet)
                 if packet.playerNumber != self.my.playerNumber:
                     self.playbook.update(packet)
