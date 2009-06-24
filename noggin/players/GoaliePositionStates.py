@@ -46,6 +46,9 @@ def goaliePositionBallClose(player):
         helper.strafeLeft(player)
     elif helper.useRightStrafeClose(player):
         helper.strafeRight(player)
+    else:
+        player.stopWalking()
+        player.lastStepTime = player.getTime()
 
     #switch out if we lose the ball for multiple frames
     if helper.useFarPosition(player):
@@ -66,6 +69,9 @@ def goaliePositionBallFar(player):
         helper.strafeLeft(player)
     elif helper.useRightStrafeFar(player):
         helper.strafeRight(player)
+    else:
+        player.stopWalking()
+        player.lastStepTime = player.getTime()
 
     #don't switch out if we don't see the ball
     if helper.useClosePosition(player):
@@ -101,7 +107,7 @@ def goalieOutOfPosition(player):
         nav.omniGoTo(position)
 
     if nav.isStopped() and player.counter > 0:
-        player.stepsOffCenter = 0
+        player.timeFromCenter = 0
         return player.goLater('goaliePosition')
 
     return player.stay()

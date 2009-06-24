@@ -7,8 +7,8 @@ CENTER_SAVE_THRESH = 15.
 ORTHO_GOTO_THRESH = Constants.CENTER_FIELD_X * 0.5
 STRAFE_ONLY = True
 STRAFE_SPEED = 6
-STRAFE_STEPS = 5
-MAX_STEPS_OFF_CENTER = 50
+STRAFE_STEPS = 1
+MAX_TIME_OFF_CENTER = Constants.CROSSBAR_CM_WIDTH / STRAFE_SPEED #apx 11.66
 BUFFER = 50
 DEBUG = False
 
@@ -69,25 +69,27 @@ def useFarPosition(player):
 
 def useLeftStrafeClose(player):
     return (player.ballRelY > CENTER_SAVE_THRESH and\
-            player.stepsOffCenter < MAX_STEPS_OFF_CENTER )
+            player.timeFromCenter < MAX_TIME_OFF_CENTER )
 
 def useRightStrafeClose(player):
     return (player.ballRelY < -CENTER_SAVE_THRESH and\
-            player.stepsOffCenter > -MAX_STEPS_OFF_CENTER)
+            player.timeFromCenter > -MAX_TIME_OFF_CENTER)
 
 def useLeftStrafeFar(player):
-    return (player.stepsOffCenter <= -STRAFE_STEPS)
+    return (player.timeFromCenter <= -STRAFE_STEPS)
 
 def useRightStrafeFar(player):
-    return (player.stepsOffCenter >= STRAFE_STEPS)
+    return (player.timeFromCenter >= STRAFE_STEPS)
 
 def strafeLeft(player):
-    if player.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS):
-        player.stepsOffCenter += STRAFE_STEPS
+    player.setSpeed(0, STRAFE_SPEED, 0)
+    player.timeFromCenter += (player.getTime() - player.lastStepTime)
+    player.lastStepTime = player.getTime()
 
 def strafeRight(player):
-    if player.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS):
-        player.stepsOffCenter -= STRAFE_STEPS
+    player.setSpeed(0, -STRAFE_SPEED, 0)
+    player.timeFromCenter -= (player.getTime() - player.lastStepTime)
+    player.lastStepTime = player.getTime()
 
 def shouldPositionForSave(player):
     ball = player.brain.ball
