@@ -83,7 +83,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         else:
             self.justKicked = False
 
-        if self.brain.gameController.currentState == 'gamePlaying':
+        gcState = self.brain.gameController.currentState
+        if gcState == 'gamePlaying' or\
+                (gcState == 'penaltyShotsGamePlaying'
+                 and self.currentRole == PBConstants.GOALIE):
             roleState = self.getNextState()
 
             if roleState != self.currentState:
