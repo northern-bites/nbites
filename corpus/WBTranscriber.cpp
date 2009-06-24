@@ -21,7 +21,8 @@ WBTranscriber::WBTranscriber(shared_ptr<Sensors> s)
      jointValues(NUM_JOINTS,0.0f),
      jointDevices(NUM_JOINTS),
      fsrValues(NUM_FSR,0.0f),
-     fsrDevices(NUM_FSR)
+     fsrDevices(NUM_FSR),
+     angleEKF()
 {
 
     //assign and enable the joint devices
@@ -52,6 +53,10 @@ WBTranscriber::WBTranscriber(shared_ptr<Sensors> s)
         fsrDevices[fsr] = wb_robot_get_device(FSR_CORE[fsr].c_str());
         wb_touch_sensor_enable(fsrDevices[fsr], 20);
     }
+
+    //initialize prevAngleX, prevAngleY and the angle EKF
+    prevAngleX = 0;
+    prevAngleY = 0;
 }
 
 
@@ -109,12 +114,21 @@ void WBTranscriber::postMotionSensors(){
     const float accX = -static_cast<float>(acc_values[0]);
     const float accY = -static_cast<float>(acc_values[1]);
     const float accZ = -static_cast<float>(acc_values[2]);
-    cout<<"anglex "<<std::acos(-accX/GRAVITY_mss)*(180/3.14)<<"\n";
-    cout<<"angley "<<std::acos(-accY/GRAVITY_mss)*(180/3.14);
+    //cout<<"anglex "<<std::asin(-accX/GRAVITY_mss)*(180/3.14)<<"\n";
+    //cout<<"angley "<<std::asin(-accY/GRAVITY_mss)*(180/3.14)<<"\n";
+    angleEKF.update(std::asin(-accX/GRAVITY_mss),std::asin(-accY/GRAVITY_mss));
 
     const float gyroX = static_cast<float>(gyro_values[0]);
     const float gyroY = static_cast<float>(gyro_values[1]);
+    angleEKF.update(prevAngleX + gyroX, prevAngleY + gyroY);
+    //    cout<<"anglex gyro "<<prevAngleX * (180/3.14)<<"\n";
+    //    cout<<"angley gyro "<<prevAngleY * (180/3.14)<<"\n";
+    const float angleX = angleEKF.getAngleX();
+    const float angleY = angleEKF.getAngleY();
+    prevAngleX = angleX;
+    prevAngleY = angleY;
 
+    cout<<angleX<<" "<<angleY<<"\n";
 
     //HACK!!!! TODO compute angleX and angleY better (filter?)
     //Currently when the gravity accell is in one direction,
@@ -122,8 +136,8 @@ void WBTranscriber::postMotionSensors(){
 //     const float angleX = accY/GRAVITY_mss * M_PI_FLOAT;
 //     const float angleY = -accX/GRAVITY_mss * M_PI_FLOAT;
     //better approximation, for now
-    const float angleX = 0.0f;
-    const float angleY = 0.0f;
+    //const float angleX = 0.0f;
+    //const float angleY = 0.0f;
 
     Inertial wbInertial= Inertial(accX,accY,accZ,gyroX,gyroY,angleX,angleY);
 

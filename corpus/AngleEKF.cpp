@@ -44,7 +44,7 @@ void AngleEKF::update(const float angleX,
 		      const float angleY) {
     timeUpdate(0); // update model? we don't have one. it's an int. don't care.
 
-    AngleMeasurement m = { accX, accY, accZ };
+    AngleMeasurement m = { angleX, angleY };
     // we create a vector of size 1 and default value m
     std::vector<AngleMeasurement> z(1,m);
     correctionStep(z);

@@ -6,6 +6,7 @@
 
 #include "Transcriber.h"
 #include "AccEKF.h"
+#include "AngleEKF.h"
 
 class WBTranscriber : public Transcriber{
 public:
@@ -24,6 +25,8 @@ private:
     WbDeviceTag acc;
     WbDeviceTag gyro;
     WbDeviceTag us1,us2,us3,us4;
+    float prevAngleX, prevAngleY;
+    AngleEKF angleEKF;
 
 };
 
