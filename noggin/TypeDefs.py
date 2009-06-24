@@ -464,7 +464,7 @@ class Packet:
 
     can pass packet list into constructor, else it'll default to all zeros
     """
-    def __init__(self,new_packet=[0]*17):
+    def __init__(self,new_packet=[0]*Constants.NUM_PACKET_ELEMENTS):
         (self.teamNumber,
          self.playerNumber,
          self.color,
@@ -505,14 +505,15 @@ class Packet:
         self.ballVelX = float(self.ballVelX)
         self.ballVelY = float(self.ballVelY)
 
-    def update(self,update_packet=[0]*17): #=[0]*16
+    def update(self,update_packet=[0]*Constants.NUM_PACKET_ELEMENTS):
         """
         update packet with a list of new values
         """
         # error checking if passed list is not right size
-        if len(update_packet) != 17:
+        if len(update_packet) != Constants.NUM_PACKET_ELEMENTS:
             raise ValueError("Packet().update got list of size:" +
-                     str(len(update_packet)) + " but should have size 17 ")
+                     str(len(update_packet)) + " but should have size " +
+                             Constants.NUM_PACKET_ELEMENTS)
         # else, update values
         (self.teamNumber,
          self.playerNumber,

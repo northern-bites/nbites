@@ -99,6 +99,9 @@ def sThreeField(team):
     # Standard spread formation
     return ['sThreeField'] + Formations.fThreeField(team)
 
+def sTwoZone(team):
+    return sTwoField(team)
+
 # Add strategies for testing various roles
 def sTestDefender(team):
     return ['sTestDefender'] + Formations.fTestDefender(team)
