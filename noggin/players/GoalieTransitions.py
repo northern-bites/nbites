@@ -62,6 +62,9 @@ def useClosePosition(player):
     return (0 < player.brain.ball.dist <= (PBConstants.BALL_LOC_LIMIT - BUFFER))
 
 def useFarPosition(player):
+    if player.penaltyKicking:
+        return False
+
     ball = player.brain.ball
     #switch out if we lose the ball for multiple frames
     return (not (0 <= ball.dist <= PBConstants.BALL_LOC_LIMIT + BUFFER) or
@@ -165,6 +168,9 @@ def shouldHoldSave(player):
     return False
 
 def shouldChaseLoc(player):
+    if player.penaltyKicking:
+        return False
+
     ball = player.brain.ball
     my = player.brain.my
     if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y - 10  and
@@ -207,6 +213,9 @@ def shouldStopChaseLoc(player):
     return False
 
 def outOfPosition(player):
+    if player.penaltyKicking:
+        return False
+
     my = player.brain.my
     if ((my.x > Constants.MY_GOALBOX_RIGHT_X + 20) and my.uncertX < 90)\
             or (my.x > Constants.MIDFIELD_X * 0.5):

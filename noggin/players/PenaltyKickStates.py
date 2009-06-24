@@ -1,4 +1,5 @@
 from .. import NogginConstants
+from ..playbook.PBConstants import GOALIE
 
 PENALTY_RELOCALIZE_FRAMES = 100
 
@@ -16,3 +17,13 @@ def penaltyKickRelocalize(player):
             player.counter < PENALTY_RELOCALIZE_FRAMES:
         return player.stay()
     return player.goNow('scanFindBall')
+
+def penaltyGoalie(player):
+    player.penaltyKicking = True
+    player.penaltyMadeFirstKick = False
+    player.penaltyMadeSecondKick = False
+
+    roleState = player.getRoleState(GOALIE)
+    return player.goNow(roleState)
+
+

@@ -26,7 +26,7 @@ def gameSet(player):
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()
-        if player.brain.my.playerNumber == GOALIE:
+        if player.brain.playbook.role == GOALIE:
             player.brain.resetGoalieLocalization()
 
     return player.stay()
@@ -43,12 +43,19 @@ def penaltyShotsGameReady(player):
     if player.firstFrame():
         player.brain.tracker.locPans()
         player.walkPose()
+        if player.brain.playbook.role == GOALIE:
+            player.brain.resetGoalieLocalization()
     return player.stay()
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
-        player.brain.tracker.activeLoc()
+        if player.brain.playbook.role == GOALIE:
+            player.brain.tracker.trackBall()
+        else:
+            player.brain.tracker.activeLoc()
     return player.stay()
 
 def penaltyShotsGamePlaying(player):
+    if player.brain.playbook.role == GOALIE:
+        return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
