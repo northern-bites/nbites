@@ -70,7 +70,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
     if ( pendingGaitCommands){
-        //metaGait.setNewGaitTarget(nextGait);
+        metaGait.setNewGaitTarget(nextGait);
     }
     pendingGaitCommands = false;
     if(nextCommand){
@@ -95,6 +95,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
         cout << "WARNING, I wouldn't be calling the Walkprovider while"
             " it thinks its DONE if I were you!" <<endl;
     }
+
+    metaGait.tick_gait();
+
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
 
