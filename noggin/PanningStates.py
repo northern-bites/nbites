@@ -40,6 +40,7 @@ def locPans(tracker):
 
 def panLeftOnce(tracker):
     if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
         tracker.panTo(HeadMoves.PAN_LEFT_HEADS)
         return tracker.stay()
 
@@ -49,6 +50,7 @@ def panLeftOnce(tracker):
 
 def panRightOnce(tracker):
     if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
         tracker.panTo(HeadMoves.PAN_RIGHT_HEADS)
         return tracker.stay()
 
@@ -58,6 +60,7 @@ def panRightOnce(tracker):
 
 def panUpOnce(tracker):
     if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
         tracker.panTo(HeadMoves.PAN_UP_HEADS)
         return tracker.stay()
 
@@ -86,7 +89,7 @@ def returnHeadsPan(tracker):
     Return the heads to pre-active pan position
     """
     if tracker.firstFrame():
-        tracker.activePanOut = False
+        tracker.brain.motion.stopHeadMoves()
         tracker.panTo(tracker.preActivePanHeads)
         return tracker.stay()
 
