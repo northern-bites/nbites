@@ -40,7 +40,7 @@ else:
 
 def switchgaits1(player):
     if player.firstFrame():
-        player.setSpeed(8,0,0)
+        player.setSpeed(0,4,0)
 
     if player.counter == 140:
         return player.goLater('switchgaits2')
@@ -48,11 +48,19 @@ def switchgaits1(player):
 
 def switchgaits2(player):
     if player.firstFrame():
-        player.brain.motion.setGait(RobotGaits.WEBOTS_GAIT2)
+        player.brain.motion.setGait(RobotGaits.DUCK_GAIT)
+
+    if player.counter == 140:
+        return player.goLater('switchgaits3')
+    return player.stay()
+def switchgaits3(player):
+    if player.firstFrame():
+        player.brain.CoA.setRobotTurnGait(player.brain.motion)
 
     if player.counter == 140:
         return player.goLater('sitdown')
     return player.stay()
+
 
 
 def walkleft(player):

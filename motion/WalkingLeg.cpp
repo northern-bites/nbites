@@ -214,8 +214,8 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& legGoal){
 
 
     //Set the desired HYP in lastJoints, which will be read by dls
-    const float HYPAngle = lastJoints[0] = getHipYawPitch() +
-        gait->stance[WP::LEG_ROT_Z];
+    const float HYPAngle = lastJoints[0] = getHipYawPitch()
+        - gait->stance[WP::LEG_ROT_Z];
 
     //calculate the new angles
     Inertial inertial = sensors->getInertial();
