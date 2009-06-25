@@ -1623,8 +1623,8 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
             // have an angle of maybe -88 or something.  This is a workaround
             const float angleBetween = min(fabs(i->angle - j->angle),
                                            fabs(180-(fabs(i->angle-j->angle))));
-            if (angleBetween > MAX_ANGLE_TO_JOIN_LINES) {
-                if (false && MIN_ANGLE_TO_JOIN_CC_LINES < angleBetween &&
+            if (false && angleBetween > MAX_ANGLE_TO_JOIN_LINES) {
+                if (MIN_ANGLE_TO_JOIN_CC_LINES < angleBetween &&
                     angleBetween < MAX_ANGLE_TO_JOIN_CC_LINES) {
                     // The two lines possibly lie on the center circle
                     isCCLine = true;
@@ -2349,32 +2349,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             vision->thresh->drawPoint(intersectX, intersectY,
                                       TENTATIVE_INTERSECTION_POINT_COLOR);
 
-            // Duplicate corner check:  ensure that corner is not too close to
-            // any previously found corners
-            if (dupeCorner(corners, intersectX, intersectY, numChecksPassed)) {
-                ++numDupes;
-                if (numDupes > MAX_NUM_DUPES) {
-                    if (debugIntersectLines || debugCcScan) {
-                        cout <<"\t" << numChecksPassed
-                             << "-'Num duplicates' sanity check failed; found "
-                             << numDupes
-                             << " duplicate intersections; max allowed is "
-                             << MAX_NUM_DUPES << endl;
-                    }
-                    vision->drawPoint(intersectX, intersectY,
-                                      INVALIDATED_INTERSECTION_POINT_COLOR);
-                    // at this point, we are by a center and so we discard all
-                    // corners after recoloring them so we can tell they are
-                    // illegitimate
-                    drawCorners(corners, INVALIDATED_INTERSECTION_POINT_COLOR);
-                    corners.clear();
-                    return corners;
-                }
-                continue;
-            }
-            ++numChecksPassed;
-
-
+            bool isCCIntersection = false;
 
             // Angle check: only intersect those lines that have a minimum angle
             // between them.  This catches many bad intersections at the center
@@ -2472,7 +2447,6 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             }
             ++numChecksPassed;
 
-            bool isCCIntersection = false;
             // Cross corner check: if the point is between the endpoints of both
             // lines then we know it is a center circle intersection
 
@@ -2620,6 +2594,35 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             ++numChecksPassed;
 
 
+            // Duplicate corner check:  ensure that corner is not too close to
+            // any previously found corners
+            if (dupeCorner(corners, intersectX, intersectY, numChecksPassed)) {
+                ++numDupes;
+                if (numDupes > MAX_NUM_DUPES) {
+                    if (debugIntersectLines || debugCcScan) {
+                        cout <<"\t" << numChecksPassed
+                             << "-'Num duplicates' sanity check failed; found "
+                             << numDupes
+                             << " duplicate intersections; max allowed is "
+                             << MAX_NUM_DUPES << endl;
+                    }
+                    vision->drawPoint(intersectX, intersectY,
+                                      INVALIDATED_INTERSECTION_POINT_COLOR);
+                    // at this point, we are by a center and so we discard all
+                    // corners after recoloring them so we can tell they are
+                    // illegitimate
+					// Chown-dawg says - why not use the center corners?
+                    //drawCorners(corners, INVALIDATED_INTERSECTION_POINT_COLOR);
+					// clear the duplicate in case it is misclassified
+                    corners.clear();
+					isCCIntersection = true;
+                    //return corners;
+                }
+            }
+            ++numChecksPassed;
+
+
+
             // Make sure the intersection point stands out, even against balls
             vision->thresh->drawPoint(intersectX - 1, intersectY, BLACK);
             vision->thresh->drawPoint(intersectX + 1, intersectY, BLACK);
@@ -2633,7 +2636,95 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
                            *i, *j, t_I, t_J);
             if (isCCIntersection) {
                 c.setShape(CIRCLE);
-            }
+            } else if (c.getShape() == T) {
+				// could it really be a center circle intersection?
+				// first identify which line is the stem
+				int tX = line2Closer.x, tY = line2Closer.y;
+				if (c.getTStem().start.x == i->start.x) {
+					tX = line1Closer.x;
+					tY = line1Closer.y;
+				}
+				// we're going to deal with distance squared to avoid taking roots
+				// Get the distance from the stem to the intersection
+				int targetDist = (tX - intersectX) * (tX - intersectX) +
+					(tY - intersectY) * (tY - intersectY);
+				// loop through all unused points try to find one that is close
+				// but not part of our two lines that make up the T
+				for (linePointNode firstPoint = unusedPointsList.begin();
+					 firstPoint != unusedPointsList.end(); firstPoint++) {
+					int pX = firstPoint->x;
+					int pY = firstPoint->y;
+					bool boxContains1 = Utility::
+						boxContainsPoint(box1, pX, pY);
+					bool boxContains2 = Utility::
+						boxContainsPoint(box2, pX, pY);
+					if (!(boxContains1 || boxContains2)) {
+						// get distance to the intersection
+						int diff = (pX - intersectX) * (pX - intersectX) +
+							(pY - intersectY) * (pY - intersectY);
+						// get distance to the nearest point on the stem
+						int diff2 = (pX - tX) * (pX - tX) + (pX - tY) * (pX - tY);
+						int distSq = static_cast<int>(firstPoint->lineWidth);
+						//diff = abs(diff - targetDist);
+						// idea - the point should also be about twice the distance to the line point
+						//cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
+						//" " << distSq << endl;
+						if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
+							diff > targetDist / 2) {
+							if (debugIntersectLines) {
+								cout << "Possible center intersection" << endl;
+							}
+							c.setShape(CIRCLE);
+						}
+					}
+				}
+			} else if (c.getShape() == INNER_L || c.getShape() == OUTER_L) {
+				// if it near a screen edge then it could be a center circle
+				const int NUM_PIXELS_CLOSE_TO_EDGE = 20;
+				const int DANGER_ZONE = 50;
+				const int BADCOUNT = 10;
+				int x = intersectX, y = intersectY;
+				// if we are near any edge, but not near enough to toss the point
+				// look out for a line continuation
+				// simply scan around the edge looking for white
+				int count = 0;
+				if (x < DANGER_ZONE || x > IMAGE_WIDTH - DANGER_ZONE) {
+					int xVal = 1;
+					if (x > IMAGE_WIDTH - DANGER_ZONE) {
+						xVal = IMAGE_WIDTH - 2;
+					}
+					for (int l = max(y - x, 0); l < min(IMAGE_HEIGHT - 1, y + x); l++) {
+						if (vision->thresh->thresholded[l][xVal] == WHITE) {
+							count++;
+						}
+					}
+					if (count > BADCOUNT) {
+						// problably a center circle, but let's just toss it
+						if (debugIntersectLines) {
+							cout << "Tossed a corner that is probably a center circle corner "
+								 << count << endl;
+						}
+						continue;
+					}
+				} else if (y < DANGER_ZONE || y > IMAGE_HEIGHT - DANGER_ZONE) {
+					int yVal = 1;
+					if (y > IMAGE_HEIGHT - DANGER_ZONE) {
+						yVal = IMAGE_HEIGHT - 2;
+					}
+					for (int l = max(x - y, 0); l < min(IMAGE_WIDTH - 1, y + x); l++) {
+						if (vision->thresh->thresholded[yVal][l] == WHITE) {
+							count++;
+						}
+					}
+					if (count > BADCOUNT) {
+						if (debugIntersectLines) {
+							cout << "Tossed a corner that is probably a center circle corner "
+								 << count << endl;
+						}
+						continue;
+					}
+				}
+			}
             corners.push_back(c);
 
             // TODO:  Should I be adding the intersection point to both lines?
