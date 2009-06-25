@@ -8,7 +8,6 @@ def gameReady(player):
     """
     Stand up, and pan for localization
     """
-    player.gainsOn()
     player.standup()
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
