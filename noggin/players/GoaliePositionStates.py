@@ -10,9 +10,9 @@ def goaliePosition(player):
     if helper.shouldMoveToSave():
         player.goNow('goaliePositionForSave') '''
     player.isChasing = False
-    if player.brain.nav.notAtHeading(NogginConstants.OPP_GOAL_HEADING):
-        return player.goLater('goalieSpinToPosition')
-    elif helper.useClosePosition(player):
+    #if player.brain.nav.notAtHeading(NogginConstants.OPP_GOAL_HEADING):
+    #    return player.goLater('goalieSpinToPosition')
+    if helper.useClosePosition(player):
         return player.goNow('goaliePositionBallClose')
     return player.goNow('goaliePositionBallFar')
 
@@ -36,18 +36,14 @@ def goaliePositionBallClose(player):
     nav = player.brain.nav
     player.brain.tracker.trackBall()
 
-    if player.firstFrame():
-        player.lastStepTime = player.getTime()
-
-    if not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
-        return player.goLater('goalieSpinToPosition')
-    elif helper.useLeftStrafeCloseSpeed(player):
+    #if not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
+    #    return player.goLater('goalieSpinToPosition')
+    if helper.useLeftStrafeCloseSpeed(player):
         helper.strafeLeftSpeed(player)
     elif helper.useRightStrafeCloseSpeed(player):
         helper.strafeRightSpeed(player)
     else:
         player.stopWalking()
-        player.lastStepTime = player.getTime()
 
     #switch out if we lose the ball for multiple frames
     if helper.useFarPosition(player):
@@ -59,20 +55,17 @@ def goaliePositionBallFar(player):
 
     nav = player.brain.nav
     player.brain.tracker.activeLoc()
-    if player.firstFrame():
-        player.lastStepTime = player.getTime()
 
     if helper.outOfPosition(player):
         player.goLater('goalieOutOfPosition')
-    elif not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
-        return player.goLater('goalieSpinToPosition')
-    elif helper.useLeftStrafeFar(player):
+    #elif not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
+    #    return player.goLater('goalieSpinToPosition')
+    elif helper.useLeftStrafeFarSpeed(player):
         helper.strafeLeftSpeed(player)
-    elif helper.useRightStrafeFar(player):
+    elif helper.useRightStrafeFarSpeed(player):
         helper.strafeRightSpeed(player)
     else:
         player.stopWalking()
-        player.lastStepTime = player.getTime()
 
     #Don't switch out if we don't see the ball
     if helper.useClosePosition(player):
@@ -85,12 +78,14 @@ def goalieSpinToPosition(player):
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall()
+
     if not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
         spinDir = MyMath.getSpinDir(player.brain.my.h,
                                     NogginConstants.OPP_GOAL_HEADING)
-        player.setSpeed(-1, 0, spinDir*10)
+        player.setSpeed(0, 0, spinDir*10)
         return player.stay()
     else:
+        player.stopWalking()
         return player.goLater('goaliePosition')
 
     return player.stay()
@@ -110,8 +105,8 @@ def goalieOutOfPosition(player):
     if helper.useClosePosition(player):
         return player.goLater('goaliePositionBallClose')
     if nav.isStopped() and player.counter > 0:
-        player.timeFromCenter = 0
-        player.stepsOffCenter = 0
+        player.framesFromCenter = 0
+        player.stepOffCenter = 0
         return player.goLater('goaliePosition')
 
     return player.stay()

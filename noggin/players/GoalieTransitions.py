@@ -8,16 +8,16 @@ ORTHO_GOTO_THRESH = Constants.CENTER_FIELD_X * 0.5
 STRAFE_ONLY = True
 STRAFE_SPEED = 6
 STRAFE_STEPS = 3
-MAX_TIME_OFF_CENTER = Constants.CROSSBAR_CM_WIDTH / STRAFE_SPEED #apx 11.66
+MAX_FRAMES_OFF_CENTER = 360
 MAX_STEPS_OFF_CENTER = 50
 BUFFER = 50
-STRAFE_THRESH_ONE = 5
-STRAFE_THRESH_TWO = 10
-STRAFE_THRESH_THREE = 15
-STRAFE_THRESH_FOUR = 20
-STRAFE_THRESH_FIVE = 25
-STRAFE_THRESH_SIX = 30
-STRAFE_THESH_SEVEN = 35
+STRAFE_THRESH_ONE = 10
+STRAFE_THRESH_TWO = 15
+STRAFE_THRESH_THREE = 25
+STRAFE_THRESH_FOUR = 35
+STRAFE_THRESH_FIVE = 45
+STRAFE_THRESH_SIX = 55
+STRAFE_THESH_SEVEN = 65
 DEBUG = False
 
 def goalieRunChecks(player):
@@ -88,35 +88,37 @@ def useRightStrafeClose(player):
 
 def useLeftStrafeCloseSpeed(player):
     strafeLeftThresh = getLeftStrafeThresh(player)
-    print "ballRelY ", player.ballRelY
     return (player.ballRelY > strafeLeftThresh and\
-            player.timeFromCenter < MAX_TIME_OFF_CENTER )
+            player.framesFromCenter < MAX_FRAMES_OFF_CENTER )
 
 def useRightStrafeCloseSpeed(player):
     strafeRightThresh = getRightStrafeThresh(player)
-    print "ballRelY ", player.ballRelY
     return (player.ballRelY < strafeRightThresh and\
-            player.timeFromCenter > -MAX_TIME_OFF_CENTER)
+            player.framesFromCenter > -MAX_FRAMES_OFF_CENTER)
 
 def useLeftStrafeFar(player):
     return (player.stepsOffCenter <= -STRAFE_STEPS)
 
+def useLeftStrafeFarSpeed(player):
+    return (player.framesFromCenter <= -1)
+
 def useRightStrafeFar(player):
     return (player.stepsOffCenter >= STRAFE_STEPS)
 
+def useRightStrafeFarSpeed(player):
+    return (player.framesFromCenter >= 1)
+
 def strafeLeftSpeed(player):
-    player.setSpeed(-.25, STRAFE_SPEED, 0)
-    player.timeFromCenter += (player.getTime() - player.lastStepTime)
-    player.lastStepTime = player.getTime()
+    player.setSpeed(-.75, STRAFE_SPEED, .25)
+    player.framesFromCenter += 1
 
 def strafeLeft(player):
     if player.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS):
         player.stepsOffCenter += STRAFE_STEPS
 
 def strafeRightSpeed(player):
-    player.setSpeed(-.25, -STRAFE_SPEED, 0)
-    player.timeFromCenter -= (player.getTime() - player.lastStepTime)
-    player.lastStepTime = player.getTime()
+    player.setSpeed(-.75, -STRAFE_SPEED, -.25)
+    player.framesFromCenter -= 1
 
 def strafeRight(player):
     if player.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS):
@@ -124,44 +126,46 @@ def strafeRight(player):
 
 def getLeftStrafeThresh(player):
     '''return a positive number'''
-    tfc = player.timeFromCenter
+    ffc = player.framesFromCenter
+    if abs(ffc) > MAX_FRAMES_OFF_CENTER:
+        print "!! ffc: ", ffc
     thresh = 0
-    if tfc < 0:
+    if ffc < 0:
         thresh = STRAFE_THRESH_ONE
-    elif 0 <= tfc <= 1:
+    elif 0 <= ffc <= 100:
         thresh = STRAFE_THRESH_ONE
-    elif 1 < tfc <= 3:
+    elif 100 < ffc <= 160:
         thresh = STRAFE_THRESH_TWO
-    elif 3 < tfc <= 5:
+    elif 160 < ffc <= 220:
         thresh =  STRAFE_THRESH_THREE
-    elif 5 < tfc <= 7:
+    elif 220 < ffc <= 280:
         thresh = STRAFE_THRESH_FOUR
-    elif 7 < tfc <= 9:
+    elif 280 < ffc <= 340:
         thresh = STRAFE_THRESH_FIVE
     else:
         thresh = STRAFE_THRESH_SIX
-    print "thresh: ", thresh, "  tfc: ", tfc
     return thresh
 
 def getRightStrafeThresh(player):
     '''return a negative number'''
-    tfc = player.timeFromCenter
+    ffc = player.framesFromCenter
+    if abs(ffc) > MAX_FRAMES_OFF_CENTER:
+        print "!! ffc: ", ffc
     thresh = 0
-    if tfc > 0:
+    if ffc > 0:
         thresh = -STRAFE_THRESH_ONE
-    elif -1 <= tfc <= 0:
+    elif -100 <= ffc <= 0:
         thresh = -STRAFE_THRESH_ONE
-    elif -3 <= tfc <= -1:
+    elif -160 <= ffc <= -100:
         thresh = -STRAFE_THRESH_TWO
-    elif -5 <= tfc <= -3:
+    elif -220 <= ffc <= -160:
         thresh = -STRAFE_THRESH_THREE
-    elif -7 <= tfc <= -5:
+    elif -280 <= ffc <= -220:
         thresh =  -STRAFE_THRESH_FOUR
-    elif -9 <= tfc <= -7:
+    elif -340 <= ffc <= -280:
         thresh = -STRAFE_THRESH_FIVE
     else:
         thresh = -STRAFE_THRESH_SIX
-    print "thresh: ", thresh, "  tfc: ", tfc
     return thresh
 
 def shouldPositionForSave(player):
