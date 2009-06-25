@@ -25,8 +25,13 @@ def playbookPosition(player):
             brain.tracker.locPans()
         else :
             brain.tracker.activeLoc()
+    print position
+    distToPoint = MyMath.dist(my.x, my.y, position[0], position[1])
 
-    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
+    useOmni = (distToPoint <= \
+                   constants.OMNI_POSITION_DIST)
+    if useOmni:
+        print "distance to point is ", distToPoint
     changedOmni = False
 
     if useOmni != nav.movingOmni:
@@ -149,7 +154,8 @@ def spinFindBallPosition(player):
 def relocalize(player):
     if player.firstFrame():
         player.stopWalking()
-    if player.brain.my.locScore == NogginConstants.GOOD_LOC:
+    if player.brain.my.locScore == NogginConstants.GOOD_LOC or \
+            player.brain.my.locScore == NogginConstants.OK_LOC:
         return player.goLater(player.lastDiffState)
 
     if not player.brain.motion.isHeadActive():

@@ -27,6 +27,7 @@ class HeadTracking(FSA.FSA):
         self.activePanDir = False
         self.activeLocOn = False
         self.activePanOut = False
+        self.activePanUp = False
         self.preActivePanHeads = None
 
         self.lookDirection = None
@@ -163,12 +164,11 @@ class HeadTracking(FSA.FSA):
 
         maxDiff = max(pitchDiff, yawDiff)
         panTime = maxDiff/constants.MAX_PAN_SPEED
-        self.execute( ((heads, panTime, 1,
+        self.execute( ((heads, panTime, 0,
                         StiffnessModes.LOW_HEAD_STIFFNESSES),) )
 
     def lookToDir(self, direction):
         if self.currentState is not 'look' or \
                 self.lookDirection != direction:
             self.lookDirection = direction
-            self.brain.motion.stopHeadMoves()
             self.switchTo('look')

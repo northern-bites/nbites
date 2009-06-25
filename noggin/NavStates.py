@@ -43,23 +43,21 @@ def spinToWalkHeading(nav):
     if nav.atDestinationCloser():
         return nav.goLater('spinToFinalHeading')
 
-    sX = 0
-    sY = nav.curSpinDir * constants.GOTO_SPIN_STRAFE
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
         nav.getRotScale(headingDiff)
 
-    if sX == 0 and sY == 0 and sTheta == 0:
-        print "not moving. all zeros. nav's are %.2f, %.2f, %.2f" % (nav.walkX,
-                                                                     nav.walkY,
-                                                                     nav.walkTheta)
-        print targetH, headingDiff, newSpinDir, nav.curSpinDir
+    if sTheta == 0:
+        print "not moving. all zeros. nav's are %.2f, %.2f, %.2f" % \
+            (nav.walkX,
+             nav.walkY,
+             nav.walkTheta)
+
+        print targetH, nav.brain.my.h, headingDiff, newSpinDir, nav.curSpinDir
         print nav.destX, nav.destY, nav.destH, \
             nav.brain.ball.x, nav.brain.ball.y
 
-    if sX != nav.walkX or \
-            sY != nav.walkY or \
-            sTheta != nav.walkTheta:
-        nav.setSpeed(0, sY, sTheta)
+    if sTheta != nav.walkTheta:
+        nav.setSpeed(0, 0, sTheta)
 
     return nav.stay()
 
@@ -95,12 +93,22 @@ def walkStraightToPoint(nav):
 
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
 
-    sTheta = MyMath.clip(bearing,
-                         -constants.GOTO_STRAIGHT_SPIN_SPEED,
-                         constants.GOTO_STRAIGHT_SPIN_SPEED )
     gain = constants.GOTO_FORWARD_GAIN * MyMath.dist(my.x, my.y,
                                              nav.destX, nav.destY)
-    nav.setSpeed(constants.GOTO_FORWARD_SPEED*gain, 0, sTheta)
+    sTheta = MyMath.clip(MyMath.sign(bearing) *
+                         constants.GOTO_STRAIGHT_SPIN_SPEED *
+                         nav.getRotScale(bearing),
+                         -constants.GOTO_STRAIGHT_SPIN_SPEED,
+                         constants.GOTO_STRAIGHT_SPIN_SPEED )
+
+    if fabs(sTheta) < constants.MIN_SPIN_SPEED:
+        sTheta = 0
+
+    sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
+                     constants.WALK_TO_MIN_X_SPEED,
+                     constants.WALK_TO_MAX_X_SPEED)
+
+    nav.setSpeed(sX, 0, sTheta)
     return nav.stay()
 
 def spinToFinalHeading(nav):
@@ -119,10 +127,7 @@ def spinToFinalHeading(nav):
                    % (targetH, headingDiff, nav.brain.my.uncertH))
     spinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
-    strafe = spinDir*constants.GOTO_SPIN_STRAFE
     spin = spinDir*constants.GOTO_SPIN_SPEED*nav.getRotScale(headingDiff)
-
-    if DEBUG: nav.printf("strafe %g, spin %g" % (strafe, spin))
 
     if nav.atHeading(targetH):
         nav.stopSpinToWalkCount += 1
@@ -134,7 +139,7 @@ def spinToFinalHeading(nav):
             return nav.goLater('orthoWalkToPoint')
         return nav.goLater('stop')
 
-    nav.setSpeed(0, strafe, spin)
+    nav.setSpeed(0, 0, spin)
     return nav.stay()
 
 def orthoWalkToPoint(nav):
@@ -292,15 +297,37 @@ def omniWalkToPoint(nav):
 
     distToDest = MyMath.dist(my.x, my.y, nav.destX, nav.destY)
 
-    forwardGain = constants.GOTO_FORWARD_GAIN * distToDest
-    strafeGain = constants.GOTO_STRAFE_GAIN * distToDest
-    spinGain = constants.GOTO_SPIN_GAIN * distToDest
+    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
+        cos(radians(bearing))
+    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
+        sin(radians(bearing))
+    spinGain = constants.GOTO_SPIN_GAIN
 
-    sX = constants.OMNI_GOTO_FORWARD_SPEED * cos(radians(bearing)) * forwardGain
-    sY = constants.OMNI_GOTO_STRAFE_SPEED * sin(radians(bearing)) * strafeGain
+    sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
+    sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
+
+    sX = MyMath.clip(sX,
+                     constants.OMNI_MIN_X_SPEED,
+                     constants.OMNI_MAX_X_SPEED)
+    sY = MyMath.clip(sY,
+                     constants.OMNI_MIN_Y_SPEED,
+                     constants.OMNI_MAX_Y_SPEED,)
+
+    if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
+        sY = 0
+    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
+        sX = 0
+
 
     spinDir = MyMath.getSpinDir(my.h, nav.destH)
     sTheta = spinDir * fabs(my.h - nav.destH) * spinGain
+
+    sTheta = MyMath.clip(sTheta,
+                         constants.OMNI_MIN_SPIN_SPEED,
+                         constants.OMNI_MAX_SPIN_SPEED)
+
+    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+        sTheta = 0.0
 
     if nav.atDestinationCloser():
         sX = sY = 0.0

@@ -4,17 +4,21 @@ from . import ChaseBallStates
 from . import PositionStates
 from . import FindBallStates
 from . import KickingStates
-from ..playbook import PBConstants
-from . import BrunswickStates
+from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieChaseBallStates
 from . import GoalieSaveStates
+from . import BrunswickStates
+
 from . import GoalieTransitions
-from . import PenaltyKickStates
 from . import ChaseBallTransitions
+from . import KickingHelpers
+
 from . import KickingConstants
 from .. import NogginConstants
+from ..playbook import PBConstants
 from . import ChaseBallConstants as ChaseConstants
+
 from man.motion import SweetMoves
 from ..util import MyMath
 from math import sin, cos, radians
@@ -129,27 +133,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'scanFindBall'
 
 
-    def getKickObjective(self):
-        """
-        Figure out what to do with the ball
-        """
-        kickDecider = self.kickDecider
-        avgOppGoalDist = 0.0
-
-        my = self.brain.my
-
-        if my.x < NogginConstants.FIELD_WIDTH / 2:
-            return KickingConstants.OBJECTIVE_CLEAR
-
-        elif MyMath.dist(my.x, my.y,
-                       NogginConstants.OPP_GOALBOX_RIGHT_X,
-                       NogginConstants.OPP_GOALBOX_MIDDLE_Y ) > \
-                       NogginConstants.FIELD_WIDTH / 3 :
-                       return KickingConstants.OBJECTIVE_CENTER
-        elif self.inOppCorner():
-            return KickingConstants.OBJECTIVE_CENTER
-        else :
-            return KickingConstants.OBJECTIVE_SHOOT
 
 
 
@@ -206,19 +189,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getApproachHeadingFromBehind(self):
         ball = self.brain.ball
+        aimPoint = KickingHelpers.getShotAimPoint(self)
         ballBearingToGoal = MyMath.getRelativeBearing(ball.x, ball.y,
                                                       NogginConstants.
                                                       OPP_GOAL_HEADING,
-                                                      NogginConstants.
-                                                      OPP_GOALBOX_RIGHT_X,
-                                                      NogginConstants.
-                                                      OPP_GOALBOX_MIDDLE_Y)
+                                                      aimPoint[0],
+                                                      aimPoint[1])
         return ballBearingToGoal
 
     def getApproachHeadingFromFront(self):
         ball = self.brain.ball
         my = self.brain.my
-        kickDest = self.getKickGoalDest()
+        kickDest = KickingHelpers.getShotAimPoint(self)
         ballBearingToKickDest = MyMath.getRelativeBearing(ball.x,
                                                           ball.y,
                                                           NogginConstants.
@@ -230,10 +212,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         else :
             destH = ballBearingToKickDest + 90
         return destH
-
-    def getKickGoalDest(self):
-        return NogginConstants.OPP_GOALBOX_RIGHT_X, \
-            NogginConstants.OPP_GOALBOX_MIDDLE_Y
 
     def getPenaltyKickingBallDest(self):
         if not self.penaltyMadeFirstKick:

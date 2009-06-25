@@ -152,8 +152,8 @@ class Navigator(FSA.FSA):
     def atHeadingGoTo(self,targetHeading):
         hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
         #self.printf("H diff is " + str(hDiff))
-        return hDiff < constants.AT_HEADING_GOTO_DEG and \
-            self.brain.my.uncertH < constants.LOC_IS_ACTIVE_H
+        return hDiff < constants.AT_HEADING_GOTO_DEG
+
 
     def atHeading(self, targetHeading = None):
         """

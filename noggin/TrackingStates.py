@@ -52,35 +52,42 @@ def activeTracking(tracker):
     """
     Method to perform tracking
     """
-    tracker.trackObject()
-    tracker.activeLocOn = True
+    if tracker.firstFrame():
+        tracker.activeLocOn = True
 
-    if tracker.activePanOut:
-        return tracker.goLater('returnHeadsPan')
+    if tracker.target.on and \
+            not (tracker.activePanOut or tracker.activePanUp) and \
+            tracker.counter <= constants.ACTIVE_LOC_STARE_THRESH:
+        tracker.trackObject()
+        tracker.activePanOut = tracker.activePanUp = False
 
-    if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH and \
-            not tracker.brain.motion.isHeadActive():
+    elif tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH \
+            and not tracker.brain.motion.isHeadActive() \
+            and not (tracker.activePanUp or tracker.activePanOut):
         return tracker.goLater('activeLocScan')
 
-    if not tracker.activePanOut and \
-            tracker.counter > constants.ACTIVE_LOC_STARE_THRESH:
+    elif tracker.activePanOut and tracker.activePanUp:
+        tracker.activePanUp = tracker.activePanOut = False
+        return tracker.goLater('returnHeadsPan')
 
+    elif not tracker.activePanUp:
+        tracker.activePanUp = True
+        motionAngles = tracker.brain.sensors.motionAngles
+        tracker.preActivePanHeads = (
+            motionAngles[MotionConstants.HeadYaw],
+            motionAngles[MotionConstants.HeadPitch])
+        return tracker.goLater('panUpOnce')
+
+    elif not tracker.activePanOut:
         tracker.activePanOut = True
         tracker.activePanDir = (tracker.activePanDir + 1) % \
             constants.NUM_ACTIVE_PANS
 
 
-        motionAngles = tracker.brain.sensors.motionAngles
-        tracker.preActivePanHeads = (
-            motionAngles[MotionConstants.HeadYaw],
-            motionAngles[MotionConstants.HeadPitch])
-
         if tracker.activePanDir == constants.PAN_RIGHT:
             return tracker.goLater('panRightOnce')
         elif tracker.activePanDir == constants.PAN_LEFT:
             return tracker.goLater('panLeftOnce')
-        elif tracker.activePanDir == constants.PAN_UP:
-            return tracker.goLater('panUpOnce')
     return tracker.stay()
 
 def trackAfterKick(tracker):
