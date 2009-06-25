@@ -70,7 +70,11 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
     if ( pendingGaitCommands){
-        metaGait.setNewGaitTarget(nextGait);
+        if(stepGenerator.isDone()){
+            //If we just did a standup, then we need to force which gaits are set
+            metaGait.setStartGait(nextGait);
+        }else
+            metaGait.setNewGaitTarget(nextGait);
     }
     pendingGaitCommands = false;
     if(nextCommand){
@@ -175,6 +179,7 @@ void WalkProvider::setActive(){
 }
 
 std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
+    pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
 
@@ -220,5 +225,6 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     commands.push_back(new BodyJointCommand(time,gaitJoints,
 											stiffness2,
                                             Kinematics::INTERPOLATION_SMOOTH));
+    pthread_mutex_unlock(&walk_provider_mutex);
     return commands;
 }

@@ -19,16 +19,16 @@ void MetaGait::tick_gait(){
 #ifdef DEBUG_META_GAIT
 //    cout << "MetaGait::tick_gait()"<<endl;
 #endif
-//     if(updateGaits()){
-// #ifdef DEBUG_META_GAIT
-//         cout << "Interpolating Gaits percent = "<<getPercentComplete()<<endl;
-// #endif
-//         interpolateGaits(*this,curGait,nextGait,getPercentComplete());
-//         cout<< "Gait 1 is "<<endl<<curGait.toString()<<endl;
-//         cout<< "Gait 2 is "<<endl<<nextGait.toString()<<endl;
-//         cout<< "result is"<<endl<<toString()<<endl;
-//     }
-    interpolateGaits(*this,DEFAULT_GAIT,DEFAULT_GAIT,1.0f);
+    if(updateGaits()){
+#ifdef DEBUG_META_GAIT
+        cout << "Interpolating Gaits percent = "<<getPercentComplete()<<endl;
+#endif
+        interpolateGaits(*this,curGait,nextGait,getPercentComplete());
+        cout<< "Gait 1 is "<<endl<<curGait.toString()<<endl;
+        cout<< "Gait 2 is "<<endl<<nextGait.toString()<<endl;
+        cout<< "result is"<<endl<<toString()<<endl;
+    }
+    //interpolateGaits(*this,DEFAULT_GAIT,DEFAULT_GAIT,1.0f);
 
 }
 

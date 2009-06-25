@@ -1,12 +1,12 @@
 import man.motion as motion
 
 
-STANCE_CONFIG = (31.00, # CoM height
+STANCE_CONFIG = (28.00, # CoM height
                  1.45,  # Forward displacement of CoM
                  10.0,  # Horizontal distance between feet
-                 3.0,   # Body angle around y axis
+                 0.0,   # Body angle around y axis
                  0.0,   # Angle between feet
-                 0.1)   # Time to transition to/from this stance
+                 0.3)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
