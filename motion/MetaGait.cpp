@@ -11,7 +11,7 @@ MetaGait::MetaGait():
     newGaitSent(false),
     transitionCounter(0),
     transitionFrames(0)
-{}
+{setGaitFromGait(DEFAULT_GAIT);}
 
 MetaGait::~MetaGait(){}
 

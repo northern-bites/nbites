@@ -327,6 +327,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
     }
 
     debugLogging();
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::tick_legs DONE" << endl;
+#endif
 
     return WalkLegsTuple(left,right);
 }

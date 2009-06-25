@@ -8,7 +8,7 @@ using namespace std;
 WalkingArm::WalkingArm(const MetaGait * _gait,ChainID id)
     :state(SUPPORTING),
      chainID(id),
-     gait(NULL),
+     gait(_gait),
      frameCounter(0),
      startStep(true),
      lastStepType(REGULAR_STEP)

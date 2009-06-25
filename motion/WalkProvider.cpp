@@ -70,7 +70,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
     if ( pendingGaitCommands){
-        metaGait.setNewGaitTarget(nextGait);
+        //metaGait.setNewGaitTarget(nextGait);
     }
     pendingGaitCommands = false;
     if(nextCommand){
@@ -130,7 +130,6 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     setNextChainStiffnesses(LLEG_CHAIN,lleg_gains);
     setNextChainStiffnesses(RLEG_CHAIN,rleg_gains);
     setNextChainStiffnesses(RARM_CHAIN,rarm_gains);
-
 
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);

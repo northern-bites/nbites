@@ -34,7 +34,7 @@ private:
 private:
     SupportMode state;
     Kinematics::ChainID chainID;
-    const Gait *gait;
+    const MetaGait *gait;
 
     unsigned int frameCounter;
     unsigned int singleSupportFrames;

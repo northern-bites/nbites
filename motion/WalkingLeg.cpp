@@ -108,6 +108,7 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
         result  = supporting(fc_Transform);
         break;
     default:
+        cout << "Invalid SupportMode"<<endl;
         throw "Invalid SupportMode passed to WalkingLeg::tick";
     }
 
