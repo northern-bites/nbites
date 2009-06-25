@@ -6,6 +6,7 @@ from ..util import MyMath
 def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
     #goalie is out of position. difference in accuracy?
+    return player.goNow('playbookPosition')
     '''TODO-
     if helper.shouldMoveToSave():
         player.goNow('goaliePositionForSave') '''

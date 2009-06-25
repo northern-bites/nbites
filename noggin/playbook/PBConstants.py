@@ -22,7 +22,7 @@ USE_FINDER = False
 USE_DEEP_STOPPER = False # Fallback to a deep defensive position
 KICKOFF_PLAY = False # Forces the more intelligent and restrictive kickoff play
 PULL_THE_GOALIE = False
-USE_FANCY_GOALIE = False
+USE_FANCY_GOALIE = True
 
 GOALIE_NUMBER = 1
 DEFAULT_CHASER_NUMBER = 3
@@ -284,7 +284,7 @@ BALL_LOC_LIMIT = 270 # Dist at which we stop active localization and just track
 GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X +\
     NogginConstants.GOALBOX_DEPTH * 0.5
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
-DIST_FROM_GOAL_INTERCEPT = 25.
+DIST_FROM_GOAL_INTERCEPT = 40.
 END_CLEAR_BUFFER = 20.
 MIN_GOALIE_X = 10.
 LIMIT_Y_OFFSET = DIST_FROM_GOAL_INTERCEPT
