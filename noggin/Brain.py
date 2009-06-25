@@ -273,4 +273,7 @@ class Brain(object):
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
-        self.loc.goalieReset()
+        if self.my.teamColor == Constants.TEAM_BLUE:
+            self.loc.blueGoalieReset()
+        else:
+            self.loc.redGoalieReset()

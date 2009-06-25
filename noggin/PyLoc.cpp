@@ -34,8 +34,12 @@ public:
         loc->reset();
         ballEKF->reset();
     }
-    void goalieReset() {
-        loc->goalieReset();
+    void blueGoalieReset() {
+        loc->blueGoalieReset();
+        ballEKF->reset();
+    }
+    void redGoalieReset() {
+        loc->redGoalieReset();
         ballEKF->reset();
     }
 
@@ -103,7 +107,9 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("lastOdoR", &PyLoc::getOdoR)
         // functional
         .def("reset", &PyLoc::reset, "reset the localization system")
-        .def("goalieReset", &PyLoc::goalieReset,
+        .def("blueGoalieReset", &PyLoc::blueGoalieReset,
+             "reset the localization system")
+        .def("redGoalieReset", &PyLoc::redGoalieReset,
              "reset the localization system")
         ;
 }
