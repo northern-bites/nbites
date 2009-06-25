@@ -323,7 +323,7 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "KICKOFF_PLAY",
                                               "TWO_KICKOFF",
                                               "ONE_KICKOFF",
-                                              "READY",
+                                              "READY_FORMATION",
                                               "TEST_DEFEND",
                                               "TEST_OFFEND",
                                               "TEST_CHASE")))
@@ -343,7 +343,7 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
  KICKOFF_PLAY,
  TWO_KICKOFF,
  ONE_KICKOFF,
- READY,
+ READY_FORMATION,
  TEST_DEFEND,
  TEST_OFFEND,
  TEST_CHASE) = range(NUM_FORMATIONS)
@@ -358,3 +358,39 @@ OFFENSIVE_MIDDIE_X = NogginConstants.CENTER_FIELD_X + MIDDIE_X_OFFSET
 
 # S_DEFENSIVE_MID strategy
 S_MIDDIE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.5
+
+NUM_STRATEGIES = 12
+
+STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
+                                             "READY_STRATEGY",
+
+                                             # field player number strategies
+                                             "NO_FIELD_PLAYERS",
+                                             "ONE_FIELD_PLAYER",
+                                             "TWO_FIELD_PLAYERS",
+                                             "THREE_FIELD_PLAYERS",
+
+                                             # More 2 field player strats
+                                             "TWO_PLAYER_ZONE",
+                                             "DEFENSIVE_MID",
+
+                                             # Test strategies
+                                             "TEST_DEFENDER",
+                                             "TEST_OFFENDER",
+                                             "TEST_MIDDIE",
+                                             "TEST_CHASER"
+                                             )))
+(S_INIT,
+ S_READY,
+ S_NO_FIELD_PLAYERS,
+ S_ONE_FIELD_PLAYER,
+ S_TWO_FIELD_PLAYERS,
+ S_THREE_FIELD_PLAYERS,
+
+ S_TWO_ZONE,
+ S_DEFENSIVE_MID,
+
+ S_TEST_DEFENDER,
+ S_TEST_OFFENDER,
+ S_TESET_MIDDIE,
+ S_TEST_CHASER) = range(NUM_STRATEGIES)

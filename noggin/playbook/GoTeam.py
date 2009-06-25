@@ -30,9 +30,9 @@ class GoTeam:
         self.time = time.time()
         # Info about all of our states
         # Strategies
-        self.currentStrategy = 'sInit'
-        self.lastStrategy = 'sInit'
-        self.lastDiffStrategy = 'sInit'
+        self.currentStrategy = PBConstants.S_INIT
+        self.lastStrategy = PBConstants.S_INIT
+        self.lastDiffStrategy = PBConstants.S_INIT
         self.strategyCounter = 0
         self.strategyStartTime = 0
         self.strategyTime = 0
@@ -105,12 +105,12 @@ class GoTeam:
         # We don't control anything in initial or finished
         if self.brain.gameController.currentState == 'gameInitial' or\
             self.brain.gameController.currentState == 'gameFinished':
-            return ('sInit', PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
+            return (PBConstants.S_INIT, PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
                     PBConstants.INIT_SUB_ROLE, [0,0] )
 
         # Have a separate strategy to easily deal with being penalized
         elif self.brain.gameController.currentState == 'gamePenalized':
-            return ('sInit', PBConstants.PENALTY_FORMATION,
+            return (PBConstants.S_INIT, PBConstants.PENALTY_FORMATION,
                     PBConstants.PENALTY_ROLE,
                     PBConstants.PENALTY_SUB_ROLE, [0,0] )
 
@@ -153,7 +153,7 @@ class GoTeam:
         if self.lastStrategy != self.currentStrategy:
             if self.printStateChanges:
                 self.printf("Strategy switched to "+
-                            self.currentStrategy)
+                            PBConstants.STRATEGIES[self.currentStrategy])
             self.strategyCounter = 0
             self.lastDiffStrategy = self.lastStrategy
             self.strategyStartTime = self.time
