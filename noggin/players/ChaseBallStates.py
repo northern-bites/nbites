@@ -314,14 +314,17 @@ def avoidObstacle(player):
         if (transitions.shouldAvoidObstacleLeft(player) and
             transitions.shouldAvoidObstacleRight(player)):
             # Backup
-            player.setSpeed(constants.DODGE_LEFT_SPEED, 0, 0)
+            player.printf("Avoid by backup");
+            player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
 
         elif transitions.shouldAvoidObstacleLeft(player):
             # Dodge right
+            player.printf("Avoid by right dodge");
             player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
 
         elif transitions.shouldAvoidObstacleRight(player):
             # Dodge left
+            player.printf("Avoid by left dodge");
             player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
 
     if not transitions.shouldAvoidObstacle(player):

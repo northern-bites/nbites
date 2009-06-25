@@ -78,11 +78,12 @@ CENTER_FIELD_DIST_THRESH = 125.
 ####
 
 # number of roles
-NUM_ROLES = 7
+NUM_ROLES = 8
 # dictionary of roles
 ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
                                     "PENALTY_ROLE",
                                     "CHASER",
+                                    "MIDDIE",
                                     "OFFENDER",
                                     "DEFENDER",
                                     "SEARCHER",
@@ -91,6 +92,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 (INIT_ROLE,
  PENALTY_ROLE,
  CHASER,
+ MIDDIE,
  OFFENDER,
  DEFENDER,
  SEARCHER,
@@ -99,7 +101,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 #### SUB_ROLE CONSTANTS ####
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 23
+NUM_SUB_ROLES = 25
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
                                             #OFFENDER SUB ROLES 2-4
@@ -135,7 +137,11 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             # READY SUB ROLES 20-22
                                             "READY_CHASER",
                                             "READY_DEFENDER",
-                                            "READY_OFFENDER")))
+                                            "READY_OFFENDER",
+
+                                            # MIDDIE SUB ROLES 23-24
+                                            "DEFENSIVE_MIDDIE",
+                                            "OFFENSIVE_MIDDIE" )))
 # tuple of subRoles
 (INIT_SUB_ROLE,
  PENALTY_SUB_ROLE,
@@ -165,7 +171,10 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 
  READY_CHASER,
  READY_DEFENDER,
- READY_OFFENDER) = range(NUM_SUB_ROLES)
+ READY_OFFENDER,
+
+ DEFENSIVE_MIDDIE,
+ OFFENSIVE_MIDDIE) = range(NUM_SUB_ROLES)
 
 
 ## POSITION CONSTANTS ##
@@ -293,7 +302,7 @@ LEFT_DEEP_BACK_POS =  (DEEP_BACK_X, LEFT_DEEP_BACK_Y)
 RIGHT_DEEP_BACK_POS = (DEEP_BACK_X, RIGHT_DEEP_BACK_Y)
 
 # number of formations
-NUM_FORMATIONS = 15
+NUM_FORMATIONS = 19
 # dictionary of formations
 FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "PENALTY_FORMATION",
@@ -301,6 +310,10 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "ONE_FIELD",
                                               "TWO_FIELD",
                                               "THREE_FIELD",
+                                              "DEFENSIVE",
+                                              "NEUTRAL_DEFENSE",
+                                              "NEUTRAL_OFFENSE",
+                                              "OFFENSIVE",
                                               "DUB_D",
                                               "FINDER",
                                               "KICKOFF_PLAY",
@@ -317,6 +330,10 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
  ONE_FIELD,
  TWO_FIELD,
  THREE_FIELD,
+ DEFENSIVE,
+ NEUTRAL_DEFENSE,
+ NEUTRAL_OFFENSE,
+ OFFENSIVE,
  DUB_D,
  FINDER,
  KICKOFF_PLAY,
@@ -326,3 +343,14 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
  TEST_DEFEND,
  TEST_OFFEND,
  TEST_CHASE) = range(NUM_FORMATIONS)
+
+# Middie Positions
+MIDDIE_X_OFFSET = 75.0
+MIDDIE_Y_OFFSET = 75.0
+MIN_MIDDIE_Y = NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y + MIDDIE_Y_OFFSET
+MAX_MIDDIE_Y = NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - MIDDIE_Y_OFFSET
+DEFENSIVE_MIDDIE_X = NogginConstants.CENTER_FIELD_X - MIDDIE_X_OFFSET
+OFFENSIVE_MIDDIE_X = NogginConstants.CENTER_FIELD_X + MIDDIE_X_OFFSET
+
+# S_DEFENSIVE_MID strategy
+S_MIDDIE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.5

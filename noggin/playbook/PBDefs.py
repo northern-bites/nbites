@@ -160,11 +160,18 @@ class Teammate:
                                              self.brain.ball.y)
 
     def getOthersRelativeBearing(self,playerX,playerY,playerH,x,y):
-        '''get another player's bearing to a point (x,y)'''
+        """
+        get another player's bearing to a point (x,y)
+        """
         return MyMath.sub180Angle(playerH -(degrees(MyMath.safe_atan2(
                         y - playerY, x - playerX)) - 90.0))
 
     def determineChaseTime(self, useZone = False):
+        """
+        Metric for deciding chaser.
+        Attempt to define a time to get to the ball.
+        Can give bonuses or penalties in certain situations.
+        """
         # if the robot sees the ball use visual distances to ball
         time = 0.0
         if self.ballDist > 0:

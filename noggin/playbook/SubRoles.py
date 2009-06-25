@@ -6,39 +6,39 @@ from ..util import MyMath
 def pReadyChaser(team):
     kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
     if kickOff:
-        pos = PBConstants.READY_KICKOFF_NORMAL_CHASER[:2]
+        pos = PBConstants.READY_KICKOFF_NORMAL_CHASER
     else:
-        pos = PBConstants.READY_NON_KICKOFF_CHASER[:2]
+        pos = PBConstants.READY_NON_KICKOFF_CHASER
     return [PBConstants.READY_CHASER, pos]
 
 def pReadyOffender(team):
     kickOff = (team.brain.gameController.gc.kickOff== team.brain.my.teamColor)
     if kickOff:
         if team.kickoffFormation == 0:
-            pos = PBConstants.READY_KICKOFF_OFFENDER_0[:2]
+            pos = PBConstants.READY_KICKOFF_OFFENDER_0
         else:
-            pos = PBConstants.READY_KICKOFF_OFFENDER_1[:2]
+            pos = PBConstants.READY_KICKOFF_OFFENDER_1
     else:
-        pos = PBConstants.READY_NON_KICKOFF_OFFENDER[:2]
+        pos = PBConstants.READY_NON_KICKOFF_OFFENDER
     return [PBConstants.READY_OFFENDER, pos]
 
 def pReadyDefender(team):
     kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
     if kickOff:
         if team.kickoffFormation == 0:
-            pos = PBConstants.READY_KICKOFF_DEFENDER_0[:2]
+            pos = PBConstants.READY_KICKOFF_DEFENDER_0
         else:
-            pos = PBConstants.READY_KICKOFF_DEFENDER_1[:2]
+            pos = PBConstants.READY_KICKOFF_DEFENDER_1
     else:
-        pos = PBConstants.READY_NON_KICKOFF_DEFENDER[:2]
+        pos = PBConstants.READY_NON_KICKOFF_DEFENDER
     return [PBConstants.READY_DEFENDER, pos]
 
 def pReadyStopper(team):
     kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
     if kickOff:
-        pos = PBConstants.READY_KICKOFF_STOPPER[:2]
+        pos = PBConstants.READY_KICKOFF_STOPPER
     else:
-        pos = PBConstants.READY_NON_KICKOFF_DEFENDER[:2]
+        pos = PBConstants.READY_NON_KICKOFF_DEFENDER
     return [PBConstants.READY_DEFENDER, pos]
 
 # Game Playing SubRoles
@@ -161,25 +161,39 @@ def pGoalieChaser(team):
 def pKickoffSweeper(team):
     '''position kickoff sweeper'''
     if team.kickoffFormation == 0:
-        pos = PBConstants.KICKOFF_DEFENDER_0[:2]
+        pos = PBConstants.KICKOFF_DEFENDER_0
     else:
-        pos = PBConstants.KICKOFF_DEFENDER_1[:2]
+        pos = PBConstants.KICKOFF_DEFENDER_1
     return [PBConstants.KICKOFF_SWEEPER, pos]
 
 def pKickoffStriker(team):
     '''position kickoff striker'''
     if team.kickoffFormation == 0:
-        pos = PBConstants.KICKOFF_OFFENDER_0[:2]
+        pos = PBConstants.KICKOFF_OFFENDER_0
     else:
-        pos = PBConstants.KICKOFF_OFFENDER_1[:2]
+        pos = PBConstants.KICKOFF_OFFENDER_1
     return [PBConstants.KICKOFF_STRIKER, pos]
 
 def pKickoffPlaySweeper(team):
     '''position kickoff sweeper'''
-    pos = PBConstants.KICKOFF_PLAY_DEFENDER[:2]
+    pos = PBConstants.KICKOFF_PLAY_DEFENDER
     return [PBConstants.KICKOFF_SWEEPER, pos]
 
 def pKickoffPlayStriker(team):
     '''position kickoff striker'''
-    pos = PBConstants.KICKOFF_PLAY_OFFENDER[:2]
+    pos = PBConstants.KICKOFF_PLAY_OFFENDER
     return [PBConstants.KICKOFF_STRIKER, pos]
+
+def pDefensiveMiddie(team):
+    y = MyMath.clip(team.brain.ball.y,
+                    PBConstants.MIN_MIDDIE_Y,
+                    PBConstants.MAX_MIDDIE_Y)
+    pos = [PBConstants.DEFENSIVE_MIDDIE_X, y]
+    return [PBConstants.DEFENSIVE_MIDDIE, pos]
+
+def pOffensiveMiddie(team):
+    y = MyMath.clip(team.brain.ball.y,
+                    PBConstants.MIN_MIDDIE_Y,
+                    PBConstants.MAX_MIDDIE_Y)
+    pos = [PBConstants.OFFENSIVE_MIDDIE_POS_X, y]
+    return [PBConstants.OFFENSIVE_MIDDIE, pos]

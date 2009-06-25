@@ -18,7 +18,8 @@ public:
     virtual void updateLocalization(MotionModel u_t,
                                     std::vector<Observation> z_t) = 0;
     virtual void reset() = 0;
-    virtual void goalieReset() {}
+    virtual void blueGoalieReset() {}
+    virtual void redGoalieReset() {}
 
     // Getters
     virtual const PoseEst getCurrentEstimate() const = 0;

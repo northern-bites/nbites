@@ -80,8 +80,8 @@ class Brain(object):
         self.initFieldObjects()
         self.ball = TypeDefs.Ball(self.vision.ball)
         self.sonar = TypeDefs.Sonar()
-        # workaround for slarti sonar problems
-        if self.CoA.name == 'slarti':
+        # workaround for slarti (now trillian) sonar problems
+        if self.CoA.name == 'trillian':
             self.sonar.MIN_DIST = 30.0
 
         # FSAs
@@ -273,4 +273,7 @@ class Brain(object):
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
-        self.loc.goalieReset()
+        if self.my.teamColor == Constants.TEAM_BLUE:
+            self.loc.blueGoalieReset()
+        else:
+            self.loc.redGoalieReset()

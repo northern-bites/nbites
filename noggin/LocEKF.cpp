@@ -21,10 +21,14 @@ const float LocEKF::GAMMA_ROT = 0.1f;
 const float LocEKF::INIT_LOC_X = CENTER_FIELD_X;
 const float LocEKF::INIT_LOC_Y = CENTER_FIELD_Y;
 const float LocEKF::INIT_LOC_H = 0.0f;
-const float LocEKF::INIT_GOALIE_LOC_X = (FIELD_WHITE_LEFT_SIDELINE_X +
+const float LocEKF::INIT_BLUE_GOALIE_LOC_X = (FIELD_WHITE_LEFT_SIDELINE_X +
                                          GOALBOX_DEPTH / 2.0f);
-const float LocEKF::INIT_GOALIE_LOC_Y = CENTER_FIELD_Y;
-const float LocEKF::INIT_GOALIE_LOC_H = 0.0f;
+const float LocEKF::INIT_BLUE_GOALIE_LOC_Y = CENTER_FIELD_Y;
+const float LocEKF::INIT_BLUE_GOALIE_LOC_H = 0.0f;
+const float LocEKF::INIT_RED_GOALIE_LOC_X = (FIELD_WHITE_RIGHT_SIDELINE_X -
+                                             GOALBOX_DEPTH / 2.0f);
+const float LocEKF::INIT_RED_GOALIE_LOC_Y = CENTER_FIELD_Y;
+const float LocEKF::INIT_RED_GOALIE_LOC_H = M_PI_FLOAT;
 // Uncertainty limits
 const float LocEKF::X_UNCERT_MAX = FIELD_WIDTH / 2.0f;
 const float LocEKF::Y_UNCERT_MAX = FIELD_HEIGHT / 2.0f;
@@ -93,13 +97,26 @@ void LocEKF::reset()
 }
 
 /**
- * Reset the EKF to a starting configuration
+ * Reset the EKF to a blue goalie starting configuration
  */
-void LocEKF::goalieReset()
+void LocEKF::blueGoalieReset()
 {
-    setXEst(INIT_GOALIE_LOC_X);
-    setYEst(INIT_GOALIE_LOC_Y);
-    setHEst(INIT_GOALIE_LOC_H);
+    setXEst(INIT_BLUE_GOALIE_LOC_X);
+    setYEst(INIT_BLUE_GOALIE_LOC_Y);
+    setHEst(INIT_BLUE_GOALIE_LOC_H);
+    setXUncert(INIT_X_UNCERT);
+    setYUncert(INIT_Y_UNCERT);
+    setHUncert(INIT_H_UNCERT);
+}
+
+/**
+ * Reset the EKF to a red goalie starting configuration
+ */
+void LocEKF::redGoalieReset()
+{
+    setXEst(INIT_RED_GOALIE_LOC_X);
+    setYEst(INIT_RED_GOALIE_LOC_Y);
+    setHEst(INIT_RED_GOALIE_LOC_H);
     setXUncert(INIT_X_UNCERT);
     setYUncert(INIT_Y_UNCERT);
     setHUncert(INIT_H_UNCERT);

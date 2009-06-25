@@ -21,6 +21,7 @@
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
+#define DEBUG_CC_DETECTION_SAVE_FRAMES
 static const float MAX_CORNER_DISTANCE = 150.0f;
 static const float MAX_CROSS_DISTANCE = 150.0f;
 using namespace std;
@@ -431,13 +432,13 @@ void Noggin::updateLocalization()
                  << "Using teammate ball report of (" << m.distance << ", "
                  << m.bearing << ")" << "\tReported x,y : "
                  << "(" << n.ballX << ", " << n.ballY << ")" << endl;
+            cout << *ballEKF << endl;
 #           endif
         }
 #       endif
     }
 
     ballEKF->updateModel(m, loc->getCurrentEstimate());
-
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {
         // Print out odometry and ball readings
