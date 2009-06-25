@@ -33,8 +33,9 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
 						   shared_ptr<Profiler> p)
     : MotionProvider(WALK_PROVIDER, p),
       sensors(s),
+      metaGait(),
       nextGait(DEFAULT_GAIT),
-      stepGenerator(sensors),
+      stepGenerator(sensors,&metaGait),
       pendingCommands(false),
       pendingStepCommands(false),
       pendingGaitCommands(false),
@@ -69,12 +70,13 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
     if ( pendingGaitCommands){
-        if(stepGenerator.resetGait(nextGait)){
-            pendingGaitCommands = false;
-        }else{
-            cout << "Failed to set gait, trying again next time"<<endl;
-        }
+        if(stepGenerator.isDone()){
+            //If we just did a standup, then we need to force which gaits are set
+            metaGait.setStartGait(nextGait);
+        }else
+            metaGait.setNewGaitTarget(nextGait);
     }
+    pendingGaitCommands = false;
     if(nextCommand){
         stepGenerator.setSpeed(nextCommand->x_mms,
                                nextCommand->y_mms,
@@ -97,6 +99,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
         cout << "WARNING, I wouldn't be calling the Walkprovider while"
             " it thinks its DONE if I were you!" <<endl;
     }
+
+    metaGait.tick_gait();
+
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
 
@@ -132,7 +137,6 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     setNextChainStiffnesses(LLEG_CHAIN,lleg_gains);
     setNextChainStiffnesses(RLEG_CHAIN,rleg_gains);
     setNextChainStiffnesses(RARM_CHAIN,rarm_gains);
-
 
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
@@ -175,6 +179,7 @@ void WalkProvider::setActive(){
 }
 
 std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
+    pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
 
@@ -220,5 +225,6 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     commands.push_back(new BodyJointCommand(time,gaitJoints,
 											stiffness2,
                                             Kinematics::INTERPOLATION_SMOOTH));
+    pthread_mutex_unlock(&walk_provider_mutex);
     return commands;
 }

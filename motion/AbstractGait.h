@@ -32,8 +32,8 @@ protected:
                               const float scalar);
 
     static void interpolateGaits(AbstractGait &targetGait,
-                                 AbstractGait &startGait,
-                                 AbstractGait &endGait,
+                                 const AbstractGait &startGait,
+                                 const AbstractGait &endGait,
                                  const float percentComplete);
     template<const unsigned int length>
     static void

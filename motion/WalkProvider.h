@@ -44,7 +44,7 @@
 #include "WalkingConstants.h"
 #include "StepGenerator.h"
 #include "WalkCommand.h"
-#include "Gait.h"
+#include "MetaGait.h"
 #include "BodyJointCommand.h"
 #include "StepCommand.h"
 
@@ -89,6 +89,7 @@ private:
 
     boost::shared_ptr<Sensors> sensors;
 
+    MetaGait metaGait;
     Gait nextGait;
     StepGenerator stepGenerator;
     bool pendingCommands;

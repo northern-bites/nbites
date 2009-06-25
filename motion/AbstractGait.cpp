@@ -59,8 +59,8 @@ void AbstractGait::multiplySubComponent(float target[length],
 
 
 void AbstractGait::interpolateGaits(AbstractGait &targetGait,
-                                    AbstractGait &startGait,
-                                    AbstractGait &endGait,
+                                    const AbstractGait &startGait,
+                                    const AbstractGait &endGait,
                                     const float percentComplete){
 
     if(percentComplete == 0.0f){

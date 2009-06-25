@@ -36,7 +36,7 @@ using namespace NBMath;
 
 //#define DEBUG_STEPGENERATOR
 
-StepGenerator::StepGenerator(shared_ptr<Sensors> s)
+StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
     done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
@@ -48,9 +48,9 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s)
     if_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
-    sensors(s),gait(NULL),nextStepIsLeft(true),waitForController(0),
-    leftLeg(s,LLEG_CHAIN), rightLeg(s,RLEG_CHAIN),
-    leftArm(LARM_CHAIN), rightArm(RARM_CHAIN),
+    sensors(s),gait(_gait),nextStepIsLeft(true),waitForController(0),
+    leftLeg(s,gait,LLEG_CHAIN), rightLeg(s,gait,RLEG_CHAIN),
+    leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
     //controller_x(new PreviewController()),
     //controller_y(new PreviewController())
@@ -327,6 +327,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
     }
 
     debugLogging();
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::tick_legs DONE" << endl;
+#endif
 
     return WalkLegsTuple(left,right);
 }
@@ -1011,27 +1014,6 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
         prod(CoordFrame3D::translation3D(x,y),
              CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,theta));
     return prod(trans_sprime_f,trans_f_s);
-}
-
-
-bool StepGenerator::resetGait(const Gait & _wp){
-    if(done){
-        if(gait)
-            delete gait;
-        gait = new Gait(_wp);
-        leftLeg.resetGait(gait);
-        rightLeg.resetGait(gait);
-        leftArm.resetGait(gait);
-        rightArm.resetGait(gait);
-        return true;
-    }
-    else{
-        // cout << "Failed to change the gait since StepGenerator is active."
-        //      << endl;
-        return false;
-    }
-    //HACK When we switch gaits, we probably need to do other things as well
-    //like restart the walk.
 }
 
 void StepGenerator::resetQueues(){
