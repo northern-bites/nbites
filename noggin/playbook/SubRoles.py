@@ -1,45 +1,7 @@
 from . import PBConstants
 from .. import NogginConstants
 from ..util import MyMath
-# SubRoles for ready state
 
-def pReadyChaser(team):
-    kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
-    if kickOff:
-        pos = PBConstants.READY_KICKOFF_NORMAL_CHASER
-    else:
-        pos = PBConstants.READY_NON_KICKOFF_CHASER
-    return [PBConstants.READY_CHASER, pos]
-
-def pReadyOffender(team):
-    kickOff = (team.brain.gameController.gc.kickOff== team.brain.my.teamColor)
-    if kickOff:
-        if team.kickoffFormation == 0:
-            pos = PBConstants.READY_KICKOFF_OFFENDER_0
-        else:
-            pos = PBConstants.READY_KICKOFF_OFFENDER_1
-    else:
-        pos = PBConstants.READY_NON_KICKOFF_OFFENDER
-    return [PBConstants.READY_OFFENDER, pos]
-
-def pReadyDefender(team):
-    kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
-    if kickOff:
-        if team.kickoffFormation == 0:
-            pos = PBConstants.READY_KICKOFF_DEFENDER_0
-        else:
-            pos = PBConstants.READY_KICKOFF_DEFENDER_1
-    else:
-        pos = PBConstants.READY_NON_KICKOFF_DEFENDER
-    return [PBConstants.READY_DEFENDER, pos]
-
-def pReadyStopper(team):
-    kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
-    if kickOff:
-        pos = PBConstants.READY_KICKOFF_STOPPER
-    else:
-        pos = PBConstants.READY_NON_KICKOFF_DEFENDER
-    return [PBConstants.READY_DEFENDER, pos]
 
 # Game Playing SubRoles
 def pChaser(team):
@@ -73,6 +35,20 @@ def pDubDOffender(team):
     x = MyMath.clip(team.brain.ball.x + 150, NogginConstants.GREEN_PAD_X,
                          NogginConstants.CENTER_FIELD_X)
     return [PBConstants.DUBD_OFFENDER, [x,y]]
+
+def pDefensiveMiddie(team):
+    y = MyMath.clip(team.brain.ball.y,
+                    PBConstants.MIN_MIDDIE_Y,
+                    PBConstants.MAX_MIDDIE_Y)
+    pos = [PBConstants.DEFENSIVE_MIDDIE_X, y]
+    return [PBConstants.DEFENSIVE_MIDDIE, pos]
+
+def pOffensiveMiddie(team):
+    y = MyMath.clip(team.brain.ball.y,
+                    PBConstants.MIN_MIDDIE_Y,
+                    PBConstants.MAX_MIDDIE_Y)
+    pos = [PBConstants.OFFENSIVE_MIDDIE_POS_X, y]
+    return [PBConstants.OFFENSIVE_MIDDIE, pos]
 
 # Defender sub roles
 def pStopper(team):
@@ -232,16 +208,33 @@ def pKickoffPlayStriker(team):
     pos = PBConstants.KICKOFF_PLAY_OFFENDER
     return [PBConstants.KICKOFF_STRIKER, pos]
 
-def pDefensiveMiddie(team):
-    y = MyMath.clip(team.brain.ball.y,
-                    PBConstants.MIN_MIDDIE_Y,
-                    PBConstants.MAX_MIDDIE_Y)
-    pos = [PBConstants.DEFENSIVE_MIDDIE_X, y]
-    return [PBConstants.DEFENSIVE_MIDDIE, pos]
+# SubRoles for ready state
+def pReadyChaser(team):
+    kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
+    if kickOff:
+        pos = PBConstants.READY_KICKOFF_NORMAL_CHASER
+    else:
+        pos = PBConstants.READY_NON_KICKOFF_CHASER
+    return [PBConstants.READY_CHASER, pos]
 
-def pOffensiveMiddie(team):
-    y = MyMath.clip(team.brain.ball.y,
-                    PBConstants.MIN_MIDDIE_Y,
-                    PBConstants.MAX_MIDDIE_Y)
-    pos = [PBConstants.OFFENSIVE_MIDDIE_POS_X, y]
-    return [PBConstants.OFFENSIVE_MIDDIE, pos]
+def pReadyOffender(team):
+    kickOff = (team.brain.gameController.gc.kickOff== team.brain.my.teamColor)
+    if kickOff:
+        if team.kickoffFormation == 0:
+            pos = PBConstants.READY_KICKOFF_OFFENDER_0
+        else:
+            pos = PBConstants.READY_KICKOFF_OFFENDER_1
+    else:
+        pos = PBConstants.READY_NON_KICKOFF_OFFENDER
+    return [PBConstants.READY_OFFENDER, pos]
+
+def pReadyDefender(team):
+    kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
+    if kickOff:
+        if team.kickoffFormation == 0:
+            pos = PBConstants.READY_KICKOFF_DEFENDER_0
+        else:
+            pos = PBConstants.READY_KICKOFF_DEFENDER_1
+    else:
+        pos = PBConstants.READY_NON_KICKOFF_DEFENDER
+    return [PBConstants.READY_DEFENDER, pos]

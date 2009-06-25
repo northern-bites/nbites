@@ -105,7 +105,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 #### SUB_ROLE CONSTANTS ####
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 26
+NUM_SUB_ROLES = 24
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
                                             #OFFENDER SUB ROLES 2-4
@@ -113,40 +113,38 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "RIGHT_WING",
                                             "DUBD_OFFENDER",
 
-                                            # MIDDIE SUB ROLES 23-24
+                                            # MIDDIE SUB ROLES 5-6
                                             "DEFENSIVE_MIDDIE",
                                             "OFFENSIVE_MIDDIE",
 
-                                            # DEFENDER SUB ROLES 5-9
+                                            # DEFENDER SUB ROLES 7-11
                                             "STOPPER",
                                             "DEEP_STOPPER",
                                             "SWEEPER",
                                             "LEFT_DEEP_BACK",
                                             "RIGHT_DEEP_BACK",
 
-                                            # CHASER SUB ROLES 10-11
+                                            # CHASER SUB ROLES 12
                                             "CHASE_NORMAL",
 
-                                            # GOALIE SUB ROLE 16-17
+                                            # GOALIE SUB ROLE 13-14
                                             "GOALIE_NORMAL",
                                             "GOALIE_CHASER",
 
-                                            # FINDER SUB ROLES 12-15
+                                            # FINDER SUB ROLES 15-18
                                             "FRONT_FINDER",
                                             "LEFT_FINDER",
                                             "RIGHT_FINDER",
                                             "OTHER_FINDER",
 
-                                            # KICKOFF SUB ROLES 18-19
+                                            # KICKOFF SUB ROLES 19-20
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 20-22
+                                            # READY SUB ROLES 21-23
                                             "READY_CHASER",
                                             "READY_DEFENDER",
-                                            "READY_OFFENDER",
-
-)))
+                                            "READY_OFFENDER" )))
 # tuple of subRoles
 (INIT_SUB_ROLE,
  PENALTY_SUB_ROLE,
@@ -155,6 +153,9 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  RIGHT_WING,
  DUBD_OFFENDER,
 
+ DEFENSIVE_MIDDIE,
+ OFFENSIVE_MIDDIE,
+
  STOPPER,
  DEEP_STOPPER,
  SWEEPER,
@@ -162,24 +163,22 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  RIGHT_DEEP_BACK,
 
  CHASE_NORMAL,
- CHASE_AROUND_BOX,
+
+ GOALIE_NORMAL,
+ GOALIE_CHASER,
 
  FRONT_FINDER,
  LEFT_FINDER,
  RIGHT_FINDER,
  OTHER_FINDER,
 
- GOALIE_NORMAL,
- GOALIE_CHASER,
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,
 
  READY_CHASER,
  READY_DEFENDER,
- READY_OFFENDER,
-
- DEFENSIVE_MIDDIE,
- OFFENSIVE_MIDDIE) = range(NUM_SUB_ROLES)
+ READY_OFFENDER
+) = range(NUM_SUB_ROLES)
 
 
 ## POSITION CONSTANTS ##
