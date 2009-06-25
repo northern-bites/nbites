@@ -101,7 +101,7 @@ class Teammate:
         self.ballDist = ball.dist
         self.role = self.brain.playbook.role
         self.subRole = self.brain.playbook.subRole
-        self.chaseTime = self.determineChaseTime()
+        self.chaseTime = self.brain.playbook.determineChaseTime()
 
         self.ballLocDist = ball.locDist
         self.ballLocBearing = ball.locBearing
@@ -165,22 +165,6 @@ class Teammate:
         """
         return MyMath.sub180Angle(playerH -(degrees(MyMath.safe_atan2(
                         y - playerY, x - playerX)) - 90.0))
-
-    def determineChaseTime(self, useZone = False):
-        """
-        Metric for deciding chaser.
-        Attempt to define a time to get to the ball.
-        Can give bonuses or penalties in certain situations.
-        """
-        # if the robot sees the ball use visual distances to ball
-        time = 0.0
-        if self.ballDist > 0:
-            time += (self.ballDist / PBConstants.CHASE_SPEED) *\
-                PBConstants.SEC_TO_MILLIS
-        else: # use loc distances if no visual ball
-            time += (self.ballLocDist / PBConstants.CHASE_SPEED) *\
-                PBConstants.SEC_TO_MILLIS
-        return time
 
     def hasBall(self):
         return (self.dribbling or self.grabbing)
