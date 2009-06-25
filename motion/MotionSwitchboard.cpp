@@ -579,6 +579,7 @@ void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
 }
 void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
     pthread_mutex_lock(&next_provider_mutex);
+	noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
     scriptedProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
