@@ -54,7 +54,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 #include "WalkingConstants.h"
-#include "Gait.h"
+#include "MetaGait.h"
 #include "Step.h"
 #include "CoordFrame.h"
 #include "Kinematics.h"
@@ -78,16 +78,10 @@ enum JointStiffIndex {
     STIFF_INDEX
 };
 
-struct WalkCycle{
-    boost::shared_ptr<Step> supportStep;
-    NBMath::ufvector3 swing_src;
-    NBMath::ufvector3 swing_dest;
-    Gait * params;
-};
-
 class WalkingLeg  {
 public:
     WalkingLeg(    boost::shared_ptr<Sensors> s,
+                   const MetaGait * _gait,
                    Kinematics::ChainID id);
     ~WalkingLeg();
 
@@ -122,7 +116,6 @@ public:
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT || state == SUPPORTING;
     };
-    void resetGait(const Gait * _wp);
 
     std::vector<float> getOdoUpdate();
     void computeOdoUpdate();
@@ -172,7 +165,7 @@ private:
 
     //Leg Attributes
     Kinematics::ChainID chainID; //keep track of which leg this is
-    const Gait *gait;
+    const MetaGait *gait;
     float lastJoints[Kinematics::LEG_JOINTS];
     NBMath::ufvector3 goal;
     NBMath::ufvector3 last_goal;

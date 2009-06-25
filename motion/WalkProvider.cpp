@@ -33,8 +33,9 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
 						   shared_ptr<Profiler> p)
     : MotionProvider(WALK_PROVIDER, p),
       sensors(s),
+      metaGait(),
       nextGait(DEFAULT_GAIT),
-      stepGenerator(sensors),
+      stepGenerator(sensors,&metaGait),
       pendingCommands(false),
       pendingStepCommands(false),
       pendingGaitCommands(false),
@@ -69,12 +70,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
     if ( pendingGaitCommands){
-        if(stepGenerator.resetGait(nextGait)){
-            pendingGaitCommands = false;
-        }else{
-            cout << "Failed to set gait, trying again next time"<<endl;
-        }
+        metaGait.setNewGaitTarget(nextGait);
     }
+    pendingGaitCommands = false;
     if(nextCommand){
         stepGenerator.setSpeed(nextCommand->x_mms,
                                nextCommand->y_mms,

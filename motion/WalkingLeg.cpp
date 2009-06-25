@@ -27,13 +27,14 @@ using namespace NBMath;
 //#define DEBUG_WALKINGLEG
 
 WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
+                       const MetaGait * _gait,
                        ChainID id)
     :sensors(s),
      state(SUPPORTING),
      frameCounter(0),
      cur_dest(EMPTY_STEP),swing_src(EMPTY_STEP),swing_dest(EMPTY_STEP),
      support_step(EMPTY_STEP),
-     chainID(id), gait(NULL),
+     chainID(id), gait(_gait),
      goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      lastRotation(0.0f),odoUpdate(3,0.0f),
@@ -72,10 +73,6 @@ void WalkingLeg::setSteps(boost::shared_ptr<Step> _swing_src,
     swing_dest = _swing_dest;
     support_step = _support_step;
     assignStateTimes(support_step);
-}
-
-void WalkingLeg::resetGait(const Gait * _wp){
-    gait =_wp;
 }
 
 LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,

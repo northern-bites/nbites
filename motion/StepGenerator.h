@@ -112,7 +112,7 @@ static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at 
 
 class StepGenerator {
 public:
-    StepGenerator(boost::shared_ptr<Sensors> s);
+    StepGenerator(boost::shared_ptr<Sensors> s, const MetaGait * _gait);
     ~StepGenerator();
 
     void tick_controller();
@@ -124,8 +124,6 @@ public:
     void setSpeed(const float _x, const float _y, const float _theta);
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
-
-    bool resetGait(const Gait & _wp);
 
     std::vector <float> getOdometryUpdate();
 
@@ -215,7 +213,7 @@ private:
     NBMath::ufmatrix3 cc_Transform; //odometry
 
     boost::shared_ptr<Sensors> sensors;
-    const Gait *gait;
+    const MetaGait *gait;
     bool nextStepIsLeft;
     // HACK: this variable holds the number of frames we have to wait before
     //       we can start walking (NUM_PREVIEW_FRAMES).

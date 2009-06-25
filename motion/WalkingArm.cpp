@@ -5,7 +5,7 @@ using namespace Kinematics;
 using boost::shared_ptr;
 using namespace std;
 
-WalkingArm::WalkingArm(ChainID id)
+WalkingArm::WalkingArm(const MetaGait * _gait,ChainID id)
     :state(SUPPORTING),
      chainID(id),
      gait(NULL),
@@ -178,10 +178,4 @@ SupportMode WalkingArm::nextState(){
 void WalkingArm::setState(SupportMode newState){
     state = newState;
     frameCounter = 0;
-}
-
-
-
-void WalkingArm::resetGait(const Gait * _wp){
-    gait = _wp;
 }

@@ -4,7 +4,7 @@
 #include "WalkingConstants.h"
 #include "Kinematics.h"
 #include "Step.h"
-#include "Gait.h"
+#include "MetaGait.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -15,15 +15,13 @@ typedef boost::tuple<std::vector<float>,
 
 class WalkingArm{
 public:
-    WalkingArm(Kinematics::ChainID id);
+    WalkingArm(const MetaGait * _gait,Kinematics::ChainID id);
     ~WalkingArm();
 
     ArmJointStiffTuple tick(boost::shared_ptr<Step> );
 
     void startLeft();
     void startRight();
-
-    void resetGait(const Gait * _wp);
 
 private:
     bool shouldSwitchStates();
