@@ -208,9 +208,7 @@ def approachBall(player):
         elif transitions.shouldPositionForKick(player):
             return player.goNow('positionForKick')
         elif player.ballInMyGoalBox():
-            player.brain.tracker.activeLoc()
-            player.stopWalking()
-            return player.stay()
+            return player.goLater('ballInMyBox')
         elif transitions.shouldChaseAroundBox(player):
             return player.goLater('chaseAroundBox')
         elif transitions.shouldApproachBallWithLoc(player):

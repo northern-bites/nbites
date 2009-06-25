@@ -249,7 +249,7 @@ def shootBall(player):
             if constants.DEBUG_KICKS: print ("\t\tbottomfieldkick")
             if 90 > avgMyGoalBearing > -30:
                 return player.goLater('kickBallLeft')
-            elif avgMyGoalBearing > 30:
+            elif avgMyGoalBearing < -30:
                 return player.goLater('kickBallRight')
             else :
                 return player.goLater('kickBallStraight')

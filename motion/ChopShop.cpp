@@ -42,8 +42,11 @@ ChopShop::ChopShop (shared_ptr<Sensors> s, float motionFrameLength)
 shared_ptr<ChoppedCommand>
 ChopShop::chopCommand(const JointCommand *command) {
 	shared_ptr<ChoppedCommand> chopped;
+	int numChops = 1;
+	if (command->getDuration() > FRAME_LENGTH_S) {
+		numChops = static_cast<int>(command->getDuration() / FRAME_LENGTH_S);
+	}
 
-	int numChops = static_cast<int>(command->getDuration() / FRAME_LENGTH_S);
 	vector<float> currentJoints = getCurrentJoints();
 
 	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
