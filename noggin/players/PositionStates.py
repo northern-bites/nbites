@@ -72,11 +72,13 @@ def atPosition(player):
     State for when we're at the position
     """
     nav = player.brain.nav
+    position = player.brain.playbook.position
     if player.firstFrame():
         player.stopWalking()
         player.notAtPositionCounter = 0
 
-    if nav.notAtHeading(nav.destH) or not nav.atDestination():
+    if not nav.atHeading(nav.destH) or not nav.atDestinationCloser() or\
+            nav.destX != position[0] or nav.destY != position[1]:
         player.notAtPositionCounter += 1
     else:
         player.notAtPositionCounter = 0

@@ -1,11 +1,13 @@
 from ..playbook import PBConstants
 from .. import NogginConstants
+import PositionConstants as constants
 import GoalieTransitions as helper
 from ..util import MyMath
 
 def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
     #goalie is out of position. difference in accuracy?
+    return player.goNow('goalieAwesomePosition')
     '''TODO-
     if helper.shouldMoveToSave():
         player.goNow('goaliePositionForSave') '''
@@ -15,6 +17,45 @@ def goaliePosition(player):
     if helper.useClosePosition(player):
         return player.goNow('goaliePositionBallClose')
     return player.goNow('goaliePositionBallFar')
+
+def goalieAwesomePosition(player):
+    """
+    Have the robot navigate to the position reported to it from playbook
+    """
+    brain = player.brain
+    position = brain.playbook.position
+    nav = brain.nav
+    my = brain.my
+
+    if player.firstFrame():
+        player.changeOmniGoToCounter = 0
+
+    if helper.useFarPosition(player):
+        player.brain.tracker.activeLoc()
+    else:
+        player.brain.tracker.trackBall()
+
+    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 70.0)
+    changedOmni = False
+
+    if useOmni != nav.movingOmni:
+        player.changeOmniGoToCounter += 1
+    else :
+        player.changeOmniGoToCounter = 0
+    if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
+        changedOmni = True
+
+    if player.firstFrame() or \
+            nav.destX != position[0] or \
+            nav.destY != position[1] or \
+            changedOmni:
+
+        if not useOmni:
+            nav.goTo((position[0], position[1], brain.ball.locBearing))
+        else:
+            nav.omniGoTo((position[0], position[1], brain.ball.locBearing))
+
+    return player.stay()
 
 def goaliePositionForSave(player):
     if player.firstFrame():
