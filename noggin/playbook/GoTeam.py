@@ -526,3 +526,44 @@ class GoTeam:
         heading = -safe_atan2(delta_y,delta_x)
 
         return pos_x,pos_y,heading
+
+    def determineChaseTime(self, useZone = False):
+        """
+        Metric for deciding chaser.
+        Attempt to define a time to get to the ball.
+        Can give bonuses or penalties in certain situations.
+        """
+        # if the robot sees the ball use visual distances to ball
+        time = 0.0
+
+        if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
+            self.printf("DETERMINE CHASE TIME DEBUG")
+        if self.me.ballDist > 0:
+            time += (self.me.ballDist / PBConstants.CHASE_SPEED) *\
+                PBConstants.SEC_TO_MILLIS
+
+            if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
+                self.printf("\tChase time base is " + str(time))
+
+            # Give a bonus for seeing the ball
+            time -= PBConstants.BALL_ON_BONUS
+
+            if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
+                self.printf("\tChase time after ball on bonus " + str(time))
+
+        else: # use loc distances if no visual ball
+            time += (self.me.ballLocDist / PBConstants.CHASE_SPEED) *\
+                PBConstants.SEC_TO_MILLIS
+            if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
+                self.printf("\tChase time base is " + str(time))
+
+
+        # Add a penalty for being fallen over
+        time += (self.brain.fallController.getTimeRemainingEst() *
+                 PBConstants.SEC_TO_MILLIS)
+
+        if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
+            self.printf("\tChase time after fallen over penalty " + str(time))
+            self.printf("")
+
+        return time
