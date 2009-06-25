@@ -233,7 +233,7 @@ def shootBall(player):
         avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
         if helpers.inCenterOfField(player):
             if constants.DEBUG_KICKS: print ("\t\tcenterfieldkick")
-            if avgMyGoalBearing < 0:
+            if avgMyGoalBearing > 0:
                 return player.goLater('kickBallRight')
             else :
                 return player.goLater('kickBallLeft')
