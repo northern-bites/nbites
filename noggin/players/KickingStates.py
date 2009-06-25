@@ -203,6 +203,7 @@ def shootBall(player):
     myRightPostBearing = player.kickDecider.myRightPostBearing
     oppLeftPostBearing = player.kickDecider.oppLeftPostBearing
     oppRightPostBearing = player.kickDecider.oppRightPostBearing
+    my = player.brain.my
 
     if oppLeftPostBearing is not None and \
             oppRightPostBearing is not None:
@@ -230,31 +231,46 @@ def shootBall(player):
     elif myLeftPostBearing is not None and myRightPostBearing is not None:
 
         avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-        if avgMyGoalBearing > 0:
-            if constants.DEBUG_KICKS: print ("\t\tright 1")
-            return player.goLater('kickBallRight')
-        else:
-            if constants.DEBUG_KICKS: print ("\t\tleft 1")
-            return player.goLater('kickBallLeft')
+        if helpers.inCenterOfField(player):
+            if constants.DEBUG_KICKS: print ("\t\tcenterfieldkick")
+            if avgMyGoalBearing < 0:
+                return player.goLater('kickBallRight')
+            else :
+                return player.goLater('kickBallLeft')
+        elif helpers.inTopOfField(player):
+            if constants.DEBUG_KICKS: print ("\t\ttopfieldkick")
+            if -90 < avgMyGoalBearing < 30:
+                return player.goLater('kickBallLeft')
+            elif avgMyGoalBearing > 30:
+                return player.goLater('kickBallRight')
+            else :
+                return player.goLater('kickBallStraight')
+        elif helpers.inBottomOfField(player):
+            if constants.DEBUG_KICKS: print ("\t\tbottomfieldkick")
+            if 90 > avgMyGoalBearing > -30:
+                return player.goLater('kickBallLeft')
+            elif avgMyGoalBearing > 30:
+                return player.goLater('kickBallRight')
+            else :
+                return player.goLater('kickBallStraight')
 
-    else:
-        # use localization for kick
-        my = player.brain.my
-        shotAimPoint = helpers.getShotAimPoint(player)
-        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                  shotAimPoint[0],
-                                                  shotAimPoint[1])
-        print "bearing to goal is ", bearingToGoal
-        if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
-                constants.SHOOT_BALL_LOC_ALIGN_ANGLE:
-            player.angleToAlign = bearingToGoal
-            return player.goNow('alignOnBallStraightKick')
-        elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
-            return player.goNow('kickBallLeft')
-        elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
-            return player.goNow('kickBallRight')
-        else :
-            return player.goLater('kickBallStraight')
+    # if somehow we didn't return already with our kick choice,
+    # use localization for kick
+    shotAimPoint = helpers.getShotAimPoint(player)
+    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                              shotAimPoint[0],
+                                              shotAimPoint[1])
+    print "bearing to goal is ", bearingToGoal
+    if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
+            constants.SHOOT_BALL_LOC_ALIGN_ANGLE:
+        player.angleToAlign = bearingToGoal
+        return player.goNow('alignOnBallStraightKick')
+    elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+        return player.goNow('kickBallLeft')
+    elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+        return player.goNow('kickBallRight')
+    else :
+        return player.goLater('kickBallStraight')
 
 
 def penaltyKickBall(player):
