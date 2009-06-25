@@ -24,9 +24,9 @@ def isFacingSideline(player):
 
 def getShotAimPoint(player):
     if player.brain.my.y < NogginConstants.MIDFIELD_Y:
-        return constants.SHOT_FROM_LEFT_AIM_POINT
+        return constants.SHOOT_AT_LEFT_AIM_POINT
     else :
-        return constants.SHOT_FROM_RIGHT_AIM_POINT
+        return constants.SHOOT_AT_RIGHT_AIM_POINT
 
 def getKickObjective(player):
     """

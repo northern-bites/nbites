@@ -50,12 +50,12 @@ LOOK_POST_KICK_FRAMES_OFF = 10
 CLEAR_CENTER_FIELD_STRAIGHT_ANGLE = 60
 FACING_SIDELINE_ANGLE = 30
 
-SHOT_FROM_LEFT_AIM_POINT = (NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
+SHOOT_AT_LEFT_AIM_POINT = (NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
                             NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
                             NogginConstants.GOAL_WIDTH *3.0/4.0)
 
 
-SHOT_FROM_RIGHT_AIM_POINT = ( NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
+SHOOT_AT_RIGHT_AIM_POINT = ( NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
                               NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
                               NogginConstants.GOAL_WIDTH/4.0)
 
