@@ -25,7 +25,7 @@ def playbookPosition(player):
             brain.tracker.locPans()
         else :
             brain.tracker.activeLoc()
-    print position
+
     distToPoint = MyMath.dist(my.x, my.y, position[0], position[1])
 
     useOmni = (distToPoint <= \

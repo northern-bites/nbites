@@ -199,3 +199,6 @@ def shouldntStopChasing(player):
             player.currentState == 'kickBallLeft' or
             player.currentState == 'kickBallRight' or
             player.currentState == 'kickBallLeftExecute')
+
+def shouldWalkToBallLocPos(player):
+    return player.brain.ball.framesOff > constants.WALK_TO_BALL_LOC_POS_FRAMES

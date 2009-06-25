@@ -128,17 +128,30 @@ def getSpinDir(h, targetH):
             spinDir = RIGHT_SPIN
     return spinDir
 
-def linesIntersect(x11, y11, x21, y21,
-                   x12, y12, x22, y22):
-    if x12 - x22 == 0.0:
-        slope1 = 10000000
+def linesIntersect(x1,y1, x2, y2,
+                     u1,v1, u2,v2):
+    # Both lines are vertical, parallel and can't intersect
+    if u1 == u2 and x1 == x2:
+        return False
 
-    else :
-        slope1 = (y12 - y22)/(x12 - x22)
+    if u1 == u2:
+        y = ((y1-y2)/(x1-x2)) * (u1 - x1) + y1
+        return v1 < y < v2 or v2 < y < v2
 
-    # Check if points of line2 are on opposite sides
-    # of line1
-    return (y11 > slope1 * (x11 - x12) + y12 and
-            y21 < slope1 * (x21 - x12) + y12) or \
-            (y11 < slope1 * (x11 - x12) + y12 and
-             y21 > slope1 * (x21 - x12) + y12)
+    if x1 == x2:
+        y = ((v1-v2)/(u1-u2)) * (x1 - u1) + v1
+        return y1 < y < y2 or y2 < y < y1
+
+    b1 = (y2-y1)/(x2-x1)
+    b2 = (v2-v1)/(u2-u1)
+
+    if b1 == b2: return False
+
+    a1 = y1-b1*x1
+    a2 = v1-b2*u1
+
+    xi = - (a1-a2)/(b1-b2)
+    yi = a1+b1*xi
+
+    return (x1-xi)*(xi-x2)>=0 and (u1-xi)*(xi-u2)>=0 and \
+        (y1-yi)*(yi-y2)>=0 and (v1-yi)*(yi-v2)>=0
