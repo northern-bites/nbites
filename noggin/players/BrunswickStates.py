@@ -1,5 +1,4 @@
 from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER, GOALIE
-from ..WebotsConfig import WEBOTS_ACTIVE
 
 ###
 # Reimplementation of Game Controller States for pBrunswick
@@ -33,9 +32,6 @@ def gameSet(player):
 def gamePlaying(player):
     roleState = player.getRoleState(player.currentRole)
     return player.goNow(roleState)
-
-if WEBOTS_ACTIVE:
-    gameInitial=gamePlaying
 
 def penaltyShotsGameReady(player):
     if player.firstFrame():
