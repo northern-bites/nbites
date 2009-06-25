@@ -1,7 +1,7 @@
 #include  "MetaGait.h"
 #include  "MotionConstants.h"
 
-#define DEBUG_META_GAIT
+//#define DEBUG_META_GAIT
 using namespace std;
 
 MetaGait::MetaGait():
@@ -24,9 +24,9 @@ void MetaGait::tick_gait(){
         cout << "Interpolating Gaits percent = "<<getPercentComplete()<<endl;
 #endif
         interpolateGaits(*this,curGait,nextGait,getPercentComplete());
-        cout<< "Gait 1 is "<<endl<<curGait.toString()<<endl;
-        cout<< "Gait 2 is "<<endl<<nextGait.toString()<<endl;
-        cout<< "result is"<<endl<<toString()<<endl;
+        // cout<< "Gait 1 is "<<endl<<curGait.toString()<<endl;
+        // cout<< "Gait 2 is "<<endl<<nextGait.toString()<<endl;
+        // cout<< "result is"<<endl<<toString()<<endl;
     }
     //interpolateGaits(*this,DEFAULT_GAIT,DEFAULT_GAIT,1.0f);
 

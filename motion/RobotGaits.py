@@ -1,12 +1,18 @@
 import man.motion as motion
 
 
-STANCE_CONFIG = (28.00, # CoM height
+STANCE_CONFIG = (31.00, # CoM height
                  1.45,  # Forward displacement of CoM
                  10.0,  # Horizontal distance between feet
-                 0.0,   # Body angle around y axis
+                 3.0,   # Body angle around y axis
                  0.0,   # Angle between feet
-                 0.3)   # Time to transition to/from this stance
+                 0.1)   # Time to transition to/from this stance
+TEST_STANCE_CONFIG = (31.00, # CoM height
+                      1.45,  # Forward displacement of CoM
+                      10.0,  # Horizontal distance between feet
+                      20.0,   # Body angle around y axis
+                      0.0,   # Angle between feet
+                      0.3)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
@@ -63,6 +69,15 @@ WEBOTS_HACK_CONFIG = (0.0, # left swing hip roll addition
                       0.0) # right swing hip roll addition
 
 WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
+            STEP_CONFIG,
+            WEBOTS_ZMP_CONFIG,
+            WEBOTS_HACK_CONFIG,
+            SENSOR_CONFIG,
+            STIFFNESS_CONFIG,
+            ODO_CONFIG,
+            ARM_CONFIG)
+
+WEBOTS_GAIT2=motion.GaitCommand(TEST_STANCE_CONFIG,
             STEP_CONFIG,
             WEBOTS_ZMP_CONFIG,
             WEBOTS_HACK_CONFIG,

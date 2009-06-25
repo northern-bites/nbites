@@ -38,8 +38,22 @@ if WEBOTS_ACTIVE:
 else:
     print "Webots is in-active!!!!"
 
-def switchGaits(player):
-    pass
+def switchgaits1(player):
+    if player.firstFrame():
+        player.setSpeed(8,0,0)
+
+    if player.counter == 140:
+        return player.goLater('switchgaits2')
+    return player.stay()
+
+def switchgaits2(player):
+    if player.firstFrame():
+        player.brain.motion.setGait(RobotGaits.WEBOTS_GAIT2)
+
+    if player.counter == 140:
+        return player.goLater('sitdown')
+    return player.stay()
+
 
 def walkleft(player):
     if player.firstFrame():
