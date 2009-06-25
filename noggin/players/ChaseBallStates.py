@@ -83,8 +83,8 @@ def turnToBall(player):
                            constants.BALL_SPIN_SPEED)
 
     # Avoid spinning so slowly that we step in place
-    if fabs(turnRate) < constants.MIN_BALL_SPIN_SPEED:
-        turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_SPEED
+    if fabs(turnRate) < constants.MIN_BALL_SPIN_MAGNITUDE:
+        turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_MAGNITUDE
 
     if player.currentRole == pbc.GOALIE:
         if transitions.shouldKick(player):
@@ -231,7 +231,7 @@ def approachBall(player):
                          -constants.APPROACH_SPIN_SPEED,
                          constants.APPROACH_SPIN_SPEED)
     # Avoid spinning so slowly that we step in place
-    if fabs(sTheta) < constants.MIN_APPROACH_SPIN_SPEED:
+    if fabs(sTheta) < constants.MIN_APPROACH_SPIN_MAGNITUDE:
         sTheta = 0.0
 
     # Set our walk towards the ball
