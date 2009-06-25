@@ -152,6 +152,11 @@ void NaoEnactor::sendHardness(){
     hardness_command[5][Kinematics::HEAD_YAW][0] = -1.0f;
     hardness_command[5][Kinematics::HEAD_PITCH][0] = -1.0f;
  #endif
+ #ifdef ROBOT_NAME_slarti
+     // turn off broken neck
+    hardness_command[5][Kinematics::HEAD_YAW][0] = -1.0f;
+    hardness_command[5][Kinematics::HEAD_PITCH][0] = -1.0f;
+ #endif
 
 #ifndef NO_ACTUAL_MOTION
     try {
