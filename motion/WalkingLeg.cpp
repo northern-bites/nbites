@@ -178,30 +178,8 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     goal(1) = target_c_y;
     goal(2) = -gait->stance[WP::BODY_HEIGHT] + heightOffGround;
 
-    //Set the desired HYP in lastJoints, which will be read by dls
-    const float HYPAngle = lastJoints[0] = getHipYawPitch();
 
-    Inertial inertial = sensors->getInertial();
-    const float angleScale = SENSOR_SCALE;
-    const float angleX = inertial.angleX*angleScale;
-    const float angleY = gait->stance[WP::BODY_ROT_Y]
-        +(inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
-
-    //IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,angleY,HYPAngle);
-    IKLegResult result =
-        Kinematics::simpleLegIK(chainID,goal,lastJoints);
-    if(result.outcome != Kinematics::SUCCESS){
-        cout << "IK ERROR: tried to go to "<<goal<< " with leg "<<leg_name<<endl
-             << "   and aX,aY,HYP = "<<angleX<<","<<angleY<<","<<HYPAngle<<endl;
-    }
-
-    boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
-    result.angles[1] -= hipHacks.get<1>(); //HipRoll
-    result.angles[2] += hipHacks.get<0>(); //HipPitch
-    result.angles[2] -=  gait->stance[WP::BODY_ROT_Y]; //HACK
-
-    memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    vector<float> joint_result = finalizeJoints(goal);
 
     vector<float> stiff_result = getStiffnesses();
     return LegJointStiffTuple(joint_result,stiff_result);
@@ -225,15 +203,26 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     goal(1) = dest_y;  //targetY
     goal(2) = -gait->stance[WP::BODY_HEIGHT];         //targetZ
 
+    vector<float> joint_result = finalizeJoints(goal);
+    vector<float> stiff_result = getStiffnesses();
+    return LegJointStiffTuple(joint_result,stiff_result);
+}
+
+
+const vector<float> WalkingLeg::finalizeJoints(const ufvector3& legGoal){
+    float support_sign = (state !=SWINGING? 1.0f : -1.0f);
+
+
     //Set the desired HYP in lastJoints, which will be read by dls
-    const float HYPAngle = lastJoints[0] = getHipYawPitch();
+    const float HYPAngle = lastJoints[0] = getHipYawPitch() +
+        gait->stance[WP::LEG_ROT_Z];
 
     //calculate the new angles
     Inertial inertial = sensors->getInertial();
     const float angleScale = SENSOR_SCALE;
     const float angleX = inertial.angleX*angleScale;
     const float angleY = gait->stance[WP::BODY_ROT_Y];
-    +(inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
+    //+(inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
 
     // IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
     //                                            angleY, HYPAngle);
@@ -246,16 +235,14 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     }
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
-    result.angles[1] += hipHacks.get<1>(); //HipRoll
+    result.angles[1] += support_sign*hipHacks.get<1>(); //HipRoll
     result.angles[2] += hipHacks.get<0>(); //HipPitch
     result.angles[2] -=  gait->stance[WP::BODY_ROT_Y]; //HACK
 
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
-    vector<float> joint_result = vector<float>(result.angles, &result.angles[LEG_JOINTS]);
+    return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 
-    vector<float> stiff_result = getStiffnesses();
-    return LegJointStiffTuple(joint_result,stiff_result);
 }
 
 /*  Returns the rotation for this motion frame which we expect

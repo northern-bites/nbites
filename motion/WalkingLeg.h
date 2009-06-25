@@ -130,6 +130,9 @@ private:
     LegJointStiffTuple supporting(NBMath::ufmatrix3 fc_Transform);
     LegJointStiffTuple swinging(NBMath::ufmatrix3 fc_Transform);
 
+    //Consolidated goal handleing
+    const std::vector<float> finalizeJoints(const NBMath::ufvector3& legGoal );
+
     //FSA methods
     void setState(SupportMode newState);
     void switchToNextState();
