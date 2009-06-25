@@ -211,7 +211,7 @@ def fReady(team):
             role = [PBConstants.CHASER] + SubRoles.pReadyChaser(team)
     else:
         role = [PBConstants.CHASER] + SubRoles.pReadyChaser(team)
-    return [PBConstants.READY] + role
+    return [PBConstants.READY_FORMATION] + role
 
 # Formations for testing roles
 def fTestDefender(team):
