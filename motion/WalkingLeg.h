@@ -54,6 +54,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 #include "WalkingConstants.h"
+#include "Gait.h"
+#include "Step.h"
 #include "CoordFrame.h"
 #include "Kinematics.h"
 #include "NBMatrixMath.h"
@@ -80,7 +82,7 @@ struct WalkCycle{
     boost::shared_ptr<Step> supportStep;
     NBMath::ufvector3 swing_src;
     NBMath::ufvector3 swing_dest;
-    WalkingParameters * params;
+    Gait * params;
 };
 
 class WalkingLeg  {
@@ -120,10 +122,15 @@ public:
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT || state == SUPPORTING;
     };
-    void resetGait(const WalkingParameters * _wp);
+    void resetGait(const Gait * _wp);
 
     std::vector<float> getOdoUpdate();
     void computeOdoUpdate();
+
+    static std::vector<float>
+    getAnglesFromGoal(const Kinematics::ChainID chainID,
+                      const NBMath::ufvector3 & goal,
+                      const float stance[WP::LEN_STANCE_CONFIG]);
 
 private:
     //Execution methods, get called depending on which state the leg is in
@@ -165,7 +172,7 @@ private:
 
     //Leg Attributes
     Kinematics::ChainID chainID; //keep track of which leg this is
-    const WalkingParameters *walkParams;
+    const Gait *gait;
     float lastJoints[Kinematics::LEG_JOINTS];
     NBMath::ufvector3 goal;
     NBMath::ufvector3 last_goal;

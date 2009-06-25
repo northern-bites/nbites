@@ -32,8 +32,6 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
 	  nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
       nextHeadProvider(&nullHeadProvider),
-      curGait(NULL),
-      nextGait(&DEFAULT_PARAMETERS),
       nextJoints(s->getBodyAngles()),
       nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
 	  running(false),
@@ -61,7 +59,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
     nullHeadProvider.setCommand(paralyze);
 
     //Very Important, ensure that we have selected a default walk parameter set
-    boost::shared_ptr<GaitCommand>  defaultGait(new GaitCommand(DEFAULT_P));
+    boost::shared_ptr<Gait>  defaultGait(new Gait(DEFAULT_GAIT));
 
     sendMotionCommand(defaultGait);
 
@@ -566,7 +564,7 @@ void MotionSwitchboard::updateDebugLogs(){
 }
 #endif
 
-void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<GaitCommand> command){
+void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<Gait> command){
     //Don't request to switch providers when we get a gait command
     //nextProvider = &walkProvider;
 

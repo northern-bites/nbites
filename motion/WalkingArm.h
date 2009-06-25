@@ -3,7 +3,8 @@
 
 #include "WalkingConstants.h"
 #include "Kinematics.h"
-
+#include "Step.h"
+#include "Gait.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -22,7 +23,7 @@ public:
     void startLeft();
     void startRight();
 
-    void resetGait(const WalkingParameters * _wp);
+    void resetGait(const Gait * _wp);
 
 private:
     bool shouldSwitchStates();
@@ -35,7 +36,7 @@ private:
 private:
     SupportMode state;
     Kinematics::ChainID chainID;
-    const WalkingParameters *walkParams;
+    const Gait *gait;
 
     unsigned int frameCounter;
     unsigned int singleSupportFrames;

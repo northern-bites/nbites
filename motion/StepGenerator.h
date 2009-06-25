@@ -125,11 +125,14 @@ public:
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
 
-    bool resetGait(const WalkingParameters * _wp);
+    bool resetGait(const Gait & _wp);
 
     std::vector <float> getOdometryUpdate();
 
     void resetHard();
+
+    static std::vector<float>*
+    getDefaultStance(const Gait & wp);
 
     const SupportFoot getSupportFoot() const {
         return supportFoot;
@@ -212,7 +215,7 @@ private:
     NBMath::ufmatrix3 cc_Transform; //odometry
 
     boost::shared_ptr<Sensors> sensors;
-    const WalkingParameters *walkParams;
+    const Gait *gait;
     bool nextStepIsLeft;
     // HACK: this variable holds the number of frames we have to wait before
     //       we can start walking (NUM_PREVIEW_FRAMES).

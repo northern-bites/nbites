@@ -52,7 +52,7 @@
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
 #include "WalkCommand.h"
-#include "GaitCommand.h"
+#include "Gait.h"
 #include "SetHeadCommand.h"
 
 #ifdef DEBUG_MOTION
@@ -76,7 +76,7 @@ public:
 	void sendMotionCommand(const BodyJointCommand* command);
 	void sendMotionCommand(const HeadJointCommand* command);
 	void sendMotionCommand(const WalkCommand* command);
-	void sendMotionCommand(const boost::shared_ptr<GaitCommand> command);
+	void sendMotionCommand(const boost::shared_ptr<Gait> command);
 	void sendMotionCommand(const SetHeadCommand* command);
 	void sendMotionCommand(const boost::shared_ptr<FreezeCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command);
@@ -106,7 +106,6 @@ private:
     int  postProcess();
     void swapBodyProvider();
     void swapHeadProvider();
-    BodyJointCommand * getGaitTransitionCommand(const WalkingParameters * new_gait);
     int realityCheckJoints();
 
 #ifdef DEBUG_JOINTS_OUTPUT
@@ -129,9 +128,6 @@ private:
 
 	MotionProvider * curHeadProvider;
 	MotionProvider * nextHeadProvider;
-
-    const WalkingParameters *curGait;
-    const WalkingParameters *nextGait;
 
     std::vector <float> nextJoints;
     std::vector <float> nextStiffnesses;
