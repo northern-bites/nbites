@@ -9,7 +9,6 @@ def gameReady(player):
     """
     Stand up, and pan for localization
     """
-    player.gainsOn()
     player.standup()
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
@@ -30,7 +29,6 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    player.gainsOn()
     roleState = player.getRoleState(player.currentRole)
     return player.goNow(roleState)
 
