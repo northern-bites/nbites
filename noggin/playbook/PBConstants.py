@@ -9,11 +9,12 @@ from .. import NogginConstants
 TEST_DEFENDER = False
 TEST_OFFENDER = False
 TEST_CHASER = False
+
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
 DEBUG_SEARCHER = False
-DEBUG_DETERMINE_CHASE_TIME = True
+DEBUG_DETERMINE_CHASE_TIME = False
 
 USE_ZONE_STRATEGY = False
 USE_DUB_D = True
