@@ -1,4 +1,4 @@
-
+from man.motion import SweetMoves as SweetMoves
 from . import FallStates
 from .util import FSA
 
@@ -6,7 +6,6 @@ class FallController(FSA.FSA):
     def __init__(self, brain):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
-        #jf- self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(FallStates)
         self.currentState = 'notFallen'
         self.setName('FallController')
@@ -49,3 +48,10 @@ class FallController(FSA.FSA):
             return False
 
         return False
+
+    def getTimeRemainingEst(self):
+        if (self.currentState == "notFallen" or
+            self.currentState == "doneStanding"):
+            return 0
+        else:
+            return SweetMoves.getMoveTime(SweetMoves.STAND_UP_FRONT)
