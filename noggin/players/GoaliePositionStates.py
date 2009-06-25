@@ -42,7 +42,7 @@ def goalieAwesomePosition(player):
         player.changeOmniGoToCounter += 1
     else :
         player.changeOmniGoToCounter = 0
-    if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
+    if player.changeOmniGoToCounter > NogginConstants.CHANGE_OMNI_THRESH:
         changedOmni = True
 
     if player.firstFrame() or \
