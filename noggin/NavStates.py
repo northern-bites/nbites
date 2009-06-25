@@ -297,12 +297,14 @@ def omniWalkToPoint(nav):
 
     distToDest = MyMath.dist(my.x, my.y, nav.destX, nav.destY)
 
-    forwardGain = constants.GOTO_FORWARD_GAIN * distToDest
-    strafeGain = constants.GOTO_STRAFE_GAIN * distToDest
+    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
+        cos(radians(bearing))
+    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
+        sin(radians(bearing))
     spinGain = constants.GOTO_SPIN_GAIN
 
-    sX = constants.OMNI_GOTO_FORWARD_SPEED * cos(radians(bearing)) * forwardGain
-    sY = constants.OMNI_GOTO_STRAFE_SPEED * sin(radians(bearing)) * strafeGain
+    sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
+    sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
 
     sX = MyMath.clip(sX,
                      constants.OMNI_MIN_X_SPEED,
