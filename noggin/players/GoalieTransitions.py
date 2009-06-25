@@ -249,20 +249,21 @@ def shouldChaseLoc(player):
 
     ball = player.brain.ball
     my = player.brain.my
-    if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y - 10  and
+    if player.subRole == PBConstants.GOALIE_CHASER:
+        if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y - 10  and
         ball.y < Constants.MY_GOALBOX_TOP_Y + 10 and
-        ball.x < Constants.MY_GOALBOX_RIGHT_X + 10) and\
-        player.subRole == PBConstants.GOALIE_CHASER:
-        return True
-    elif (ball.y > Constants.MY_GOALBOX_BOTTOM_Y - 5  and
-          ball.y < Constants.MY_GOALBOX_TOP_Y + 5 and
-          ball.x < Constants.MY_GOALBOX_RIGHT_X + 5):
-        return True
-    elif (my.x < Constants.MY_GOALBOX_RIGHT_X + 5 and
-          my.y < Constants.MY_GOALBOX_TOP_Y + 5 and
-          my.y > Constants.MY_GOALBOX_BOTTOM_Y - 5 and
-          (0 < ball.locDist <= 30 or 0 < ball.dist <= 30)):
-        return True
+        ball.x < Constants.MY_GOALBOX_RIGHT_X + 10):
+            return True
+    else:
+        if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y - 5  and
+            ball.y < Constants.MY_GOALBOX_TOP_Y + 5 and
+            ball.x < Constants.MY_GOALBOX_RIGHT_X + 5):
+            return True
+        elif (my.x < Constants.MY_GOALBOX_RIGHT_X + 5 and
+              my.y < Constants.MY_GOALBOX_TOP_Y + 5 and
+              my.y > Constants.MY_GOALBOX_BOTTOM_Y - 5 and
+              (0 < ball.locDist <= 30 or 0 < ball.dist <= 30)):
+            return True
     return False
 
 def shouldStopChaseLoc(player):

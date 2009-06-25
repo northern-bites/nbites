@@ -29,12 +29,13 @@ def goalieAwesomePosition(player):
 
     if player.firstFrame():
         player.changeOmniGoToCounter = 0
-        if brain.gameController.currentState == 'gameReady':
-            brain.tracker.locPans()
-        else :
-            brain.tracker.activeLoc()
 
-    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 50.0)
+    if helper.useFarPosition(player):
+        player.brain.tracker.activeLoc()
+    else:
+        player.brain.tracker.trackBall()
+
+    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 70.0)
     changedOmni = False
 
     if useOmni != nav.movingOmni:
@@ -49,13 +50,8 @@ def goalieAwesomePosition(player):
             nav.destY != position[1] or \
             changedOmni:
 
-        if brain.my.locScore == NogginConstants.BAD_LOC:
-            player.shouldRelocalizeCounter += 1
-        else:
-            player.shouldRelocalizeCounter = 0
-
         if not useOmni:
-            nav.orthoGoTo((position[0], position[1], brain.ball.locBearing))
+            nav.goTo((position[0], position[1], brain.ball.locBearing))
         else:
             nav.omniGoTo((position[0], position[1], brain.ball.locBearing))
 

@@ -105,13 +105,17 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 #### SUB_ROLE CONSTANTS ####
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 25
+NUM_SUB_ROLES = 26
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
                                             #OFFENDER SUB ROLES 2-4
                                             "LEFT_WING",
                                             "RIGHT_WING",
                                             "DUBD_OFFENDER",
+
+                                            # MIDDIE SUB ROLES 23-24
+                                            "DEFENSIVE_MIDDIE",
+                                            "OFFENSIVE_MIDDIE",
 
                                             # DEFENDER SUB ROLES 5-9
                                             "STOPPER",
@@ -122,17 +126,16 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 
                                             # CHASER SUB ROLES 10-11
                                             "CHASE_NORMAL",
-                                            "CHASE_AROUND_BOX",
+
+                                            # GOALIE SUB ROLE 16-17
+                                            "GOALIE_NORMAL",
+                                            "GOALIE_CHASER",
 
                                             # FINDER SUB ROLES 12-15
                                             "FRONT_FINDER",
                                             "LEFT_FINDER",
                                             "RIGHT_FINDER",
                                             "OTHER_FINDER",
-
-                                            # GOALIE SUB ROLE 16-17
-                                            "GOALIE_NORMAL",
-                                            "GOALIE_CHASER",
 
                                             # KICKOFF SUB ROLES 18-19
                                             "KICKOFF_SWEEPER",
@@ -143,9 +146,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "READY_DEFENDER",
                                             "READY_OFFENDER",
 
-                                            # MIDDIE SUB ROLES 23-24
-                                            "DEFENSIVE_MIDDIE",
-                                            "OFFENSIVE_MIDDIE" )))
+)))
 # tuple of subRoles
 (INIT_SUB_ROLE,
  PENALTY_SUB_ROLE,
@@ -284,12 +285,12 @@ BALL_LOC_LIMIT = 270 # Dist at which we stop active localization and just track
 GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X +\
     NogginConstants.GOALBOX_DEPTH * 0.5
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
-DIST_FROM_GOAL_INTERCEPT = 40.
+DIST_FROM_GOAL_INTERCEPT = NogginConstants.GOALBOX_DEPTH
 END_CLEAR_BUFFER = 20.
-MIN_GOALIE_X = 10.
+MIN_GOALIE_X = NogginConstants.MY_GOALBOX_LEFT_X
 LIMIT_Y_OFFSET = DIST_FROM_GOAL_INTERCEPT
-LEFT_LIMIT_POSITION = [NogginConstants.MIDFIELD_Y - LIMIT_Y_OFFSET, MIN_GOALIE_X]
-RIGHT_LIMIT_POSITION = [NogginConstants.MIDFIELD_Y + LIMIT_Y_OFFSET, MIN_GOALIE_X]
+LEFT_LIMIT_POSITION = [MIN_GOALIE_X, NogginConstants.MIDFIELD_Y + LIMIT_Y_OFFSET]
+RIGHT_LIMIT_POSITION = [MIN_GOALIE_X, NogginConstants.MIDFIELD_Y - LIMIT_Y_OFFSET]
 
 # Finder
 TWO_DOG_FINDER_POSITIONS = (

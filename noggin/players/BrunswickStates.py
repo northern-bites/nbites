@@ -8,6 +8,7 @@ def gameReady(player):
     """
     Stand up, and pan for localization
     """
+    player.gainsOn()
     player.standup()
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
@@ -20,12 +21,12 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
+        if player.brain.playbook.role == GOALIE:
+            player.brain.resetGoalieLocalization()
+        elif player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()
-        if player.brain.playbook.role == GOALIE:
-            pass#player.brain.resetGoalieLocalization()
 
     return player.stay()
 
@@ -38,7 +39,7 @@ def penaltyShotsGameReady(player):
         player.brain.tracker.locPans()
         player.walkPose()
         if player.brain.playbook.role == GOALIE:
-            pass#player.brain.resetGoalieLocalization()
+            player.brain.resetGoalieLocalization()
     return player.stay()
 
 def penaltyShotsGameSet(player):
