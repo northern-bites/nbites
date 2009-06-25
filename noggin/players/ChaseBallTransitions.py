@@ -179,7 +179,9 @@ def shouldScanFindBallActiveLoc(player):
     """
     We lost the ball, scan to find it
     """
-    return (player.brain.ball.framesOff > constants.BALL_OFF_ACTIVE_LOC_THRESH)
+    return not (player.brain.tracker.activePanUp or
+                player.brain.tracker.activePanOut) and \
+        (player.brain.ball.framesOff > constants.BALL_OFF_ACTIVE_LOC_THRESH)
 
 def shouldSpinFindBall(player):
     """
