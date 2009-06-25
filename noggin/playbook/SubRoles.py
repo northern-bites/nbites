@@ -78,8 +78,8 @@ def pDubDOffender(team):
 def pStopper(team):
     '''position stopper'''
     x,y = team.getPointBetweenBallAndGoal(PBConstants.DEFENDER_BALL_DIST)
-    x = MyMath.clip(x, PBConstants.SWEEPER_X,
-                        PBConstants.STOPPER_MAX_X)
+    if x < PBConstants.SWEEPER_X:
+        x = PBConstants.SWEEPER_X
     return [PBConstants.STOPPER, [x,y]]
 
 def pDeepStopper(team):
