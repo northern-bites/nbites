@@ -8,6 +8,10 @@ GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
                (FC.MY_GOALBOX_RIGHT_X, FC.FIELD_HEIGHT*0.75, FC.OPP_GOAL_HEADING),
                (FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING)]
 
+def gameReady(player):
+    if player.firstFrame():
+        player.brain.tracker.scanBall()
+    return player.stay()
 
 def gamePlaying(player):
     player.brain.resetGoalieLocalization()
