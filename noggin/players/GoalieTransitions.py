@@ -7,9 +7,17 @@ CENTER_SAVE_THRESH = 15.
 ORTHO_GOTO_THRESH = Constants.CENTER_FIELD_X * 0.5
 STRAFE_ONLY = True
 STRAFE_SPEED = 6
-STRAFE_STEPS = 5
+STRAFE_STEPS = 3
+MAX_TIME_OFF_CENTER = Constants.CROSSBAR_CM_WIDTH / STRAFE_SPEED #apx 11.66
 MAX_STEPS_OFF_CENTER = 50
 BUFFER = 50
+STRAFE_THRESH_ONE = 5
+STRAFE_THRESH_TWO = 10
+STRAFE_THRESH_THREE = 15
+STRAFE_THRESH_FOUR = 20
+STRAFE_THRESH_FIVE = 25
+STRAFE_THRESH_SIX = 30
+STRAFE_THESH_SEVEN = 35
 DEBUG = False
 
 def goalieRunChecks(player):
@@ -71,12 +79,24 @@ def useFarPosition(player):
             ball.framesOff > 500)
 
 def useLeftStrafeClose(player):
-    return (player.ballRelY > CENTER_SAVE_THRESH and\
-            player.stepsOffCenter < MAX_STEPS_OFF_CENTER )
+    return (player.ballRelY > CENTER_SAVE_THRESH and
+            player.stepsOffCenter < MAX_STEPS_OFF_CENTER)
 
 def useRightStrafeClose(player):
     return (player.ballRelY < -CENTER_SAVE_THRESH and\
             player.stepsOffCenter > -MAX_STEPS_OFF_CENTER)
+
+def useLeftStrafeCloseSpeed(player):
+    strafeLeftThresh = getLeftStrafeThresh(player)
+    print "ballRelY ", player.ballRelY
+    return (player.ballRelY > strafeLeftThresh and\
+            player.timeFromCenter < MAX_TIME_OFF_CENTER )
+
+def useRightStrafeCloseSpeed(player):
+    strafeRightThresh = getRightStrafeThresh(player)
+    print "ballRelY ", player.ballRelY
+    return (player.ballRelY < strafeRightThresh and\
+            player.timeFromCenter > -MAX_TIME_OFF_CENTER)
 
 def useLeftStrafeFar(player):
     return (player.stepsOffCenter <= -STRAFE_STEPS)
@@ -84,13 +104,65 @@ def useLeftStrafeFar(player):
 def useRightStrafeFar(player):
     return (player.stepsOffCenter >= STRAFE_STEPS)
 
+def strafeLeftSpeed(player):
+    player.setSpeed(-.25, STRAFE_SPEED, 0)
+    player.timeFromCenter += (player.getTime() - player.lastStepTime)
+    player.lastStepTime = player.getTime()
+
 def strafeLeft(player):
     if player.setSteps(0, STRAFE_SPEED, 0, STRAFE_STEPS):
         player.stepsOffCenter += STRAFE_STEPS
 
+def strafeRightSpeed(player):
+    player.setSpeed(-.25, -STRAFE_SPEED, 0)
+    player.timeFromCenter -= (player.getTime() - player.lastStepTime)
+    player.lastStepTime = player.getTime()
+
 def strafeRight(player):
     if player.setSteps(0, -STRAFE_SPEED, 0, STRAFE_STEPS):
         player.stepsOffCenter -= STRAFE_STEPS
+
+def getLeftStrafeThresh(player):
+    '''return a positive number'''
+    tfc = player.timeFromCenter
+    thresh = 0
+    if tfc < 0:
+        thresh = STRAFE_THRESH_ONE
+    elif 0 <= tfc <= 1:
+        thresh = STRAFE_THRESH_ONE
+    elif 1 < tfc <= 3:
+        thresh = STRAFE_THRESH_TWO
+    elif 3 < tfc <= 5:
+        thresh =  STRAFE_THRESH_THREE
+    elif 5 < tfc <= 7:
+        thresh = STRAFE_THRESH_FOUR
+    elif 7 < tfc <= 9:
+        thresh = STRAFE_THRESH_FIVE
+    else:
+        thresh = STRAFE_THRESH_SIX
+    print "thresh: ", thresh, "  tfc: ", tfc
+    return thresh
+
+def getRightStrafeThresh(player):
+    '''return a negative number'''
+    tfc = player.timeFromCenter
+    thresh = 0
+    if tfc > 0:
+        thresh = -STRAFE_THRESH_ONE
+    elif -1 <= tfc <= 0:
+        thresh = -STRAFE_THRESH_ONE
+    elif -3 <= tfc <= -1:
+        thresh = -STRAFE_THRESH_TWO
+    elif -5 <= tfc <= -3:
+        thresh = -STRAFE_THRESH_THREE
+    elif -7 <= tfc <= -5:
+        thresh =  -STRAFE_THRESH_FOUR
+    elif -9 <= tfc <= -7:
+        thresh = -STRAFE_THRESH_FIVE
+    else:
+        thresh = -STRAFE_THRESH_SIX
+    print "thresh: ", thresh, "  tfc: ", tfc
+    return thresh
 
 def shouldPositionForSave(player):
     ball = player.brain.ball
@@ -185,7 +257,7 @@ def shouldChaseLoc(player):
     elif (my.x < Constants.MY_GOALBOX_RIGHT_X + 5 and
           my.y < Constants.MY_GOALBOX_TOP_Y + 5 and
           my.y > Constants.MY_GOALBOX_BOTTOM_Y - 5 and
-          (0 < ball.locDist <= 60 or 0 < ball.dist <= 60)):
+          (0 < ball.locDist <= 30 or 0 < ball.dist <= 30)):
         return True
     return False
 
@@ -205,10 +277,10 @@ def shouldStopChaseLoc(player):
           ball.y > Constants.MY_GOALBOX_TOP_Y + 5 and
           ball.x > Constants.MY_GOALBOX_RIGHT_X + 5):
         return True
-    elif (my.x > Constants.MY_GOALBOX_RIGHT_X + 5
-          or my.y > Constants.MY_GOALBOX_TOP_Y + 5
-          or my.y < Constants.MY_GOALBOX_BOTTOM_Y + 5) and\
-          (0 < ball.locDist <= 60 or 0 < ball.dist <= 60):
+    elif (my.x < Constants.MY_GOALBOX_RIGHT_X + 5
+          or my.y < Constants.MY_GOALBOX_TOP_Y + 5
+          or my.y > Constants.MY_GOALBOX_BOTTOM_Y + 5) and\
+          (ball.locDist >= 60 or ball.dist >= 60):
         return True
     return False
 
@@ -217,7 +289,7 @@ def outOfPosition(player):
         return False
 
     my = player.brain.my
-    if ((my.x > Constants.MY_GOALBOX_RIGHT_X + 20) and my.uncertX < 90)\
+    if (my.x > Constants.MY_GOALBOX_RIGHT_X and my.uncertX < 90)\
             or (my.x > Constants.MIDFIELD_X * 0.5):
         #print "my.x ", my.x, " my.uncertX ", my.uncertX
         return True
