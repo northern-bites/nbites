@@ -15,7 +15,6 @@ def spinToWalkHeading(nav):
     newSpinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
         nav.changeSpinDirCounter = 0
         nav.stopSpinToWalkCount = 0
         nav.curSpinDir = newSpinDir
@@ -101,7 +100,7 @@ def walkStraightToPoint(nav):
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
 
-    if fabs(sTheta) < constants.MIN_SPIN_SPEED:
+    if fabs(sTheta) < constants.MIN_SPIN_MAGNITUDE_WALK:
         sTheta = 0
 
     sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
