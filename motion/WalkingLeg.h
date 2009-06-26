@@ -140,6 +140,8 @@ private:
     bool shouldSwitchStates();
     bool firstFrame(){return frameCounter == 0;}
     void assignStateTimes(boost::shared_ptr<Step> step);
+    void resetSensorFeedback();
+    const boost::tuple<const float, const float> getSensorFeedback();
     void debugProcessing();
 //hack
 public:
@@ -178,6 +180,10 @@ private:
     std::vector<float> odoUpdate;
     int leg_sign; //-1 for right leg, 1 for left leg
     std::string leg_name;
+
+    //sensor feedback stuff
+    float lastSensorAngleX,lastSensorAngleY;
+
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     FILE * locus_log;
 #endif
