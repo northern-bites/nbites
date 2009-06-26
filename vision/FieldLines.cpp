@@ -2354,6 +2354,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 							  << endl;
 					}
 					lines.erase(j);
+					break;
 				} else {
 					BoundingBox box1 = Utility::
 						getBoundingBox(*i,
@@ -2365,10 +2366,11 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 						boxContainsPoint(box1, j->end.x, j->end.y);
 					if (box1Contains || box1Contains2) {
 						if (debugIntersectLines) {
-							cout  << "Found duplicate line - removing "
+							cout  << "Found duplicate line 2 - removing "
 								  << endl;
 						}
 						lines.erase(j);
+						break;
 					}
 				}
 			}
