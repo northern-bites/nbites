@@ -210,13 +210,6 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 
 
 const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
-    float support_sign = (state !=SWINGING? 1.0f : -1.0f);
-
-
-    //Set the desired HYP in lastJoints, which will be read by dls
-    const float HYPAngle = lastJoints[0] = getHipYawPitch()
-        - gait->stance[WP::LEG_ROT_Z]*0.5;
-
     //calculate the new angles
     Inertial inertial = sensors->getInertial();
     const float angleScale = SENSOR_SCALE;
@@ -225,11 +218,6 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
         +(inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
     const float footAngleZ = getFootRotation_c()
         + leg_sign*gait->stance[WP::LEG_ROT_Z]*0.5;
-
-    // IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
-    //                                            angleY, HYPAngle);
-    // IKLegResult result =
-    //     Kinematics::simpleLegIK(chainID,goal,lastJoints);
 
     const ufvector3 bodyOrientation = CoordFrame3D::vector3D(bodyAngleX,
                                                        bodyAngleY, 0.0f);
@@ -240,17 +228,9 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
 
     IKLegResult result =
         Kinematics::legIK(chainID,footGoal,footOrientation,
-                          bodyGoal,bodyOrientation);//, HYPAngle);
+                          bodyGoal,bodyOrientation);
 
-     // IKLegResult result =
-     //     Kinematics::simpleLegIK(chainID,footGoal,lastJoints);
-
-
-    boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
-    result.angles[1] += support_sign*hipHacks.get<1>(); //HipRoll
-    result.angles[2] += hipHacks.get<0>(); //HipPitch
-    //result.angles[2] -=  gait->stance[WP::BODY_ROT_Y]; //HACK
-
+    applyHipHacks(result.angles);
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
@@ -276,8 +256,6 @@ const float WalkingLeg::getFootRotation(){
 
     const float value = start + (end-start)*percent_to_dest;
     return value;
-
-
 }
 
 /* Returns the foot rotation for this foot relative to the C frame*/
@@ -296,6 +274,12 @@ const float WalkingLeg::getHipYawPitch(){
     return -fabs(getFootRotation()*0.5f);
 }
 
+void WalkingLeg::applyHipHacks(float angles[]){
+    const float footAngleZ = getFootRotation_c();
+    boost::tuple <const float, const float > hipHacks  = getHipHack(footAngleZ);
+    angles[1] += hipHacks.get<1>(); //HipRoll
+    angles[2] += hipHacks.get<0>(); //HipPitch
+}
 
 /**
  * Function returns the angle to add to the hip roll joint depending on
@@ -306,14 +290,7 @@ const float WalkingLeg::getHipYawPitch(){
  * want to be hacking the hio when we are starting and stopping.
  */
 const boost::tuple<const float, const float>
-WalkingLeg::getHipHack(const float curHYPAngle){
-    //When we are starting and stopping we have no hip hack
-    //since the foot is never lifted in this instance
-    if(support_step->type != REGULAR_STEP){
-        // Supporting step is irregular, returning 0 hip hack
-        return 0.0f;
-    }
-
+WalkingLeg::getHipHack(const float footAngleZ){
     ChainID hack_chain;
     if(state == SUPPORTING){
         hack_chain = chainID;
@@ -323,6 +300,9 @@ WalkingLeg::getHipHack(const float curHYPAngle){
         // This step is double support, returning 0 hip hack
         return 0.0f;
     }
+    const float support_sign = (state !=SWINGING? 1.0f : -1.0f);
+    const float absFootAngle = std::abs(footAngleZ);
+
 
     //Calculate the compensation to the HIPROLL
     float MAX_HIP_ANGLE_OFFSET = (hack_chain == LLEG_CHAIN ?
@@ -366,10 +346,10 @@ WalkingLeg::getHipHack(const float curHYPAngle){
     //AND we also need to rotate some of the correction to the hip pitch motor
     // (This is kind of a HACK until we move the step lifting to be taken
     // directly into account when we determine x,y 3d targets for each leg)
-    const float hipPitchAdjustment = -hr_offset * std::sin(-curHYPAngle);
-    const float hipRollAdjustment = (hr_offset *
+    const float hipPitchAdjustment = -hr_offset * std::sin(footAngleZ);
+    const float hipRollAdjustment = support_sign*(hr_offset *
 									 static_cast<float>(leg_sign)*
-									 std::cos(-curHYPAngle) );
+									 std::cos(footAngleZ) );
 
     return boost::tuple<const float, const float> (hipPitchAdjustment,
                                                    hipRollAdjustment);
