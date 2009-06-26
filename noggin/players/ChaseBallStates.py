@@ -118,7 +118,7 @@ def approachBallWithLoc(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKickFromApproachLoc(player):
             return player.goLater('positionForKick')
-        elif transitions.shouldAvoidObstacle(player):
+        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
             return player.goLater('avoidObstacle')
         elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
             return player.goLater('approachBall')
@@ -137,7 +137,7 @@ def approachBallWithLoc(player):
             return player.goLater('ballInMyBox')
         elif transitions.shouldChaseAroundBox(player):
             return player.goLater('chaseAroundBox')
-        elif transitions.shouldAvoidObstacle(player):
+        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
             return player.goLater('avoidObstacle')
         elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
             return player.goLater('approachBall')

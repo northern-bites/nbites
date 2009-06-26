@@ -1,18 +1,19 @@
 import man.motion as motion
 
-
 STANCE_CONFIG = (31.00, # CoM height
                  1.45,  # Forward displacement of CoM
                  10.0,  # Horizontal distance between feet
                  3.0,   # Body angle around y axis
                  0.0,   # Angle between feet
                  0.1)   # Time to transition to/from this stance
+
+
 DUCK_STANCE_CONFIG = (31.00, # CoM height
                       1.45,  # Forward displacement of CoM
                       10.0,  # Horizontal distance between feet
                       0.0,   # Body angle around y axis
-                      20.0,   # Angle between feet
-                      0.8)   # Time to transition to/from this stance
+                      30.0,   # Angle between feet
+                      1.0)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
@@ -22,6 +23,7 @@ STEP_CONFIG = (0.4, # step duration
                20.0)  # max theta speed()
 
 
+
 ZMP_CONFIG = (0.0,  # footCenterLocX
               0.4,  # zmp static percentage
               0.4,  # left zmp off
@@ -29,17 +31,21 @@ ZMP_CONFIG = (0.0,  # footCenterLocX
               0.01,  # strafe zmp offse
               6.6)   # turn zmp offset
 
+
+
 JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                      5.5) # right swing hip roll addition
 
 SENSOR_CONFIG = (0.0,   # observer sensor scale
-                 0.0)   # angle XY sensor scale
-
+                 0.50,  # angle XY sensor scale
+                 15.0,   # max angle X (compensation)
+                 15.0,   # max angle Y
+                 75.0)   # max angle vel (change in compensation)
 STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.3,  #kneeStiffness
                     0.4,  #anklePitchStiffness
                     0.3,  #ankleRollStiffness
-                    0.2)  #armStiffness
+                    0.1)  #armStiffness
 
 ODO_CONFIG = (1.0,   #xOdoScale
               1.0,   #yOdoScale
@@ -67,6 +73,43 @@ DUCK_GAIT = motion.GaitCommand(DUCK_STANCE_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
+
+
+
+
+
+FAST_STANCE_CONFIG = (31.00, # CoM height
+                      1.45,  # Forward displacement of CoM
+                      10.0,  # Horizontal distance between feet
+                      7.0,   # Body angle around y axis
+                      0.0,   # Angle between feet
+                      0.1)   # Time to transition to/from this stance
+FAST_STEP_CONFIG = (0.5, # step duration
+               0.2,  # fraction in double support
+               1.1,  # stepHeight
+               20.0,  # max x speed
+               20.0,  # max y speed
+               20.0)  # max theta speed()
+
+FAST_ZMP_CONFIG = (0.0,  # footCenterLocX
+              0.4,  # zmp static percentage
+              0.5,  # left zmp off
+              0.5,  # right zmp off
+              0.01,  # strafe zmp offse
+              6.6)   # turn zmp offset
+
+FAST_HACK_CONFIG = (5.5, # left swing hip roll addition
+                    5.5) # right swing hip roll addition
+
+
+FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
+                             FAST_STEP_CONFIG,
+                             FAST_ZMP_CONFIG,
+                             FAST_HACK_CONFIG,
+                             SENSOR_CONFIG,
+                             STIFFNESS_CONFIG,
+                             ODO_CONFIG,
+                             ARM_CONFIG)
 
 
 

@@ -33,8 +33,6 @@ def spinFindBall(player):
     State to spin to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we go to a garbage state
     """
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
 
     if player.currentRole == pbc.GOALIE:
         if transitions.shouldTurnToBall_FoundBall(player):
@@ -47,19 +45,21 @@ def spinFindBall(player):
             return player.goLater('turnToBall')
         elif transitions.shouldWalkToBallLocPos(player):
             return player.goLater('walkToBallLocPos')
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
 
-    if player.justKicked:
-        spinDir = player.getSpinDirAfterKick()
-    else:
-        my = player.brain.my
-        ball = player.brain.ball
-        bearingToBall = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                  ball.x,
-                                                  ball.y )
-        spinDir = MyMath.getSpinDir(my.h,
-                                    my.h + bearingToBall)
+        if player.justKicked:
+            spinDir = player.getSpinDirAfterKick()
+        else:
+            my = player.brain.my
+            ball = player.brain.ball
+            bearingToBall = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                      ball.x,
+                                                      ball.y )
+            spinDir = MyMath.getSpinDir(my.h,
+                                        my.h + bearingToBall)
 
-    player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+        player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
     return player.stay()
 

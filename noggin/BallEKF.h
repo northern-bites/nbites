@@ -169,6 +169,7 @@ private:
     const static float Y_EST_MAX;
     const static float VELOCITY_EST_MAX;
     const static float VELOCITY_EST_MIN;
+    const static float VELOCITY_EST_MIN_SPEED;
     const static float BALL_JUMP_VEL_THRESH;
     const static float USE_CARTESIAN_BALL_DIST;
 };

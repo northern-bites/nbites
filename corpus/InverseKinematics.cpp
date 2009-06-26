@@ -2,8 +2,8 @@
 
 #include "InverseKinematics.h"
 
-//#define USE_ANALYTIC_IK
-
+#define USE_ANALYTIC_IK
+//#define DEBUG_IK
 using namespace boost::numeric;
 using namespace NBMath;
 using namespace std;
@@ -28,7 +28,7 @@ const Kinematics::IKLegResult Kinematics::simpleLegIK(const ChainID chainID,
 }
 
 const Kinematics::IKLegResult Kinematics::angleXYIK(const ChainID chainID,
-                                                      const ufvector3 & legGoal,
+                                                    const ufvector3 & legGoal,
                                                     const float bodyAngleX,
                                                     const float bodyAngleY,
                                                     const float HYPAngle){
@@ -38,6 +38,42 @@ const Kinematics::IKLegResult Kinematics::angleXYIK(const ChainID chainID,
                                                              bodyAngleY,0);
     return analyticLegIK(chainID,legGoal,footOrientation,
                          bodyGoal,bodyOrientation,HYPAngle);
+}
+
+const Kinematics::IKLegResult
+ Kinematics::legIK(const ChainID chainID,
+                   const ufvector3 &footGoal,
+                   const ufvector3 &footOrientation,
+                   const ufvector3 &bodyGoal,
+                   const ufvector3 &bodyOrientation,
+                   const float HYPAngle){
+
+#ifdef USE_ANALYTIC_IK
+    IKLegResult result = analyticLegIK(chainID,footGoal,footOrientation,
+                                       bodyGoal,bodyOrientation);
+
+#ifdef DEBUG_IK
+    cout << "IK command with leg"<<chainID <<" :"<<endl
+             <<"    tried to put foot to "<<footGoal
+             << "      with orientation  "<<footOrientation<<endl
+             <<"    tried to put body to "<<bodyGoal
+             << "      with orientation  "<<bodyOrientation<<endl;
+        cout << "   result angles: {";
+        for(int i =0; i<6; i++){cout<<result.angles[i]<<",";}cout<<"}"<<endl;
+#endif
+
+#else
+    #error "JACOBIAN IK NOT SETUP RIGHT NOW"
+#endif
+    if(result.outcome != Kinematics::SUCCESS){
+        cout << "IK ERROR with leg"<<chainID <<" :"
+             <<"    tried to put foot to "<<footGoal
+             << "      with orientation  "<<footOrientation<<endl
+             <<"    tried to put body to "<<bodyGoal
+             << "      with orientation  "<<bodyOrientation<<endl;
+    }
+    return result;
+
 }
 
 /**

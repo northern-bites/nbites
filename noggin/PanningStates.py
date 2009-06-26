@@ -38,6 +38,13 @@ def locPans(tracker):
         tracker.execute(HeadMoves.QUICK_PANS)
     return tracker.stay()
 
+def ballScan(tracker):
+    if tracker.firstFrame() \
+            or not tracker.brain.motion.isHeadActive():
+        tracker.activeLocOn = False
+        tracker.execute(HeadMoves.HIGH_SCAN_BALL)
+    return tracker.stay()
+
 def panLeftOnce(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()

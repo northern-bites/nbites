@@ -209,40 +209,82 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 }
 
 
-const vector<float> WalkingLeg::finalizeJoints(const ufvector3& legGoal){
-    float support_sign = (state !=SWINGING? 1.0f : -1.0f);
+const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
+    boost::tuple <const float, const float > sensorAngles =
+        getSensorFeedback();
 
+    const float bodyAngleX = sensorAngles.get<0>();
+    const float bodyAngleY = gait->stance[WP::BODY_ROT_Y]
+        + sensorAngles.get<1>();
 
-    //Set the desired HYP in lastJoints, which will be read by dls
-    const float HYPAngle = lastJoints[0] = getHipYawPitch()
-        - gait->stance[WP::LEG_ROT_Z];
+    const float footAngleX = 0.0f;
+    const float footAngleY = 0.0f;
+    const float footAngleZ = getFootRotation_c()
+        + leg_sign*gait->stance[WP::LEG_ROT_Z]*0.5;
 
-    //calculate the new angles
-    Inertial inertial = sensors->getInertial();
-    const float angleScale = SENSOR_SCALE;
-    const float angleX = inertial.angleX*angleScale;
-    const float angleY = gait->stance[WP::BODY_ROT_Y];
-    //+(inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
+    const ufvector3 bodyOrientation = CoordFrame3D::vector3D(bodyAngleX,
+                                                       bodyAngleY, 0.0f);
+    const ufvector3 footOrientation = CoordFrame3D::vector3D(footAngleX,
+                                                             footAngleY,
+                                                             footAngleZ);
+    const ufvector3 bodyGoal = CoordFrame3D::vector3D(0.0f,
+                                                      0.0f,0.0f);
 
-    // IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
-    //                                            angleY, HYPAngle);
     IKLegResult result =
-        Kinematics::simpleLegIK(chainID,goal,lastJoints);
+        Kinematics::legIK(chainID,footGoal,footOrientation,
+                          bodyGoal,bodyOrientation);
 
-    if(result.outcome != Kinematics::SUCCESS){
-        cout << "IK ERROR: tried to go to "<<goal<< " with leg "<<leg_name<<endl
-             << "   and aX,aY,HYP = "<<angleX<<","<<angleY<<","<<HYPAngle<<endl;
-    }
-
-    boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
-    result.angles[1] += support_sign*hipHacks.get<1>(); //HipRoll
-    result.angles[2] += hipHacks.get<0>(); //HipPitch
-    result.angles[2] -=  gait->stance[WP::BODY_ROT_Y]; //HACK
-
+    applyHipHacks(result.angles);
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 
+}
+
+/*
+ * Get the sensor based adjustment to the body's rotation
+ *
+ */
+const boost::tuple<const float,const float> WalkingLeg::getSensorFeedback(){
+    const float MAX_SENSOR_ANGLE_X = gait->sensor[WP::MAX_ANGLE_X];
+    const float MAX_SENSOR_ANGLE_Y = gait->sensor[WP::MAX_ANGLE_Y];
+
+    const float MAX_SENSOR_VEL = gait->sensor[WP::MAX_ANGLE_VEL]*
+        MotionConstants::MOTION_FRAME_LENGTH_S;
+
+    //calculate the new angles, take into account gait angles already
+    Inertial inertial = sensors->getInertial();
+    const float angleScale = gait->sensor[WP::ANGLE_SCALE];
+
+    // const float desiredSensorAngleX =
+    //     std::pow(inertial.angleX,2)*std::sqrt(angleScale);
+    // const float desiredSensorAngleY =
+    //     std::pow(inertial.angleY-gait->stance[WP::BODY_ROT_Y],2)
+    //     *std::sqrt(angleScale);
+    const float desiredSensorAngleX =
+        inertial.angleX*angleScale;
+    const float desiredSensorAngleY =
+        (inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
+
+    //Clip the velocities, and max. limits
+    const float sensorAngleX =
+        NBMath::clip(
+            NBMath::clip(desiredSensorAngleX,
+                         desiredSensorAngleX - MAX_SENSOR_VEL,
+                         desiredSensorAngleX + MAX_SENSOR_VEL),
+            MAX_SENSOR_ANGLE_X);
+    const float sensorAngleY =
+        NBMath::clip(
+            NBMath::clip(desiredSensorAngleY,
+                         desiredSensorAngleY - MAX_SENSOR_VEL,
+                         desiredSensorAngleY + MAX_SENSOR_VEL),
+            MAX_SENSOR_ANGLE_Y);
+
+    lastSensorAngleX = sensorAngleX;
+    lastSensorAngleY = sensorAngleY;
+
+    return boost::tuple<const float, const float> (sensorAngleX,
+                                                   sensorAngleY);
 }
 
 /*  Returns the rotation for this motion frame which we expect
@@ -264,6 +306,15 @@ const float WalkingLeg::getFootRotation(){
 
     const float value = start + (end-start)*percent_to_dest;
     return value;
+}
+
+/* Returns the foot rotation for this foot relative to the C frame*/
+const float WalkingLeg::getFootRotation_c(){
+    const float abs_rot =  std::abs(getFootRotation());
+
+    const float rot_rel_c = abs_rot*0.5*leg_sign;
+
+    return rot_rel_c;
 
 
 }
@@ -273,6 +324,12 @@ const float WalkingLeg::getHipYawPitch(){
     return -fabs(getFootRotation()*0.5f);
 }
 
+void WalkingLeg::applyHipHacks(float angles[]){
+    const float footAngleZ = getFootRotation_c();
+    boost::tuple <const float, const float > hipHacks  = getHipHack(footAngleZ);
+    angles[1] += hipHacks.get<1>(); //HipRoll
+    angles[2] += hipHacks.get<0>(); //HipPitch
+}
 
 /**
  * Function returns the angle to add to the hip roll joint depending on
@@ -283,14 +340,7 @@ const float WalkingLeg::getHipYawPitch(){
  * want to be hacking the hio when we are starting and stopping.
  */
 const boost::tuple<const float, const float>
-WalkingLeg::getHipHack(const float curHYPAngle){
-    //When we are starting and stopping we have no hip hack
-    //since the foot is never lifted in this instance
-    if(support_step->type != REGULAR_STEP){
-        // Supporting step is irregular, returning 0 hip hack
-        return 0.0f;
-    }
-
+WalkingLeg::getHipHack(const float footAngleZ){
     ChainID hack_chain;
     if(state == SUPPORTING){
         hack_chain = chainID;
@@ -300,6 +350,9 @@ WalkingLeg::getHipHack(const float curHYPAngle){
         // This step is double support, returning 0 hip hack
         return 0.0f;
     }
+    const float support_sign = (state !=SWINGING? 1.0f : -1.0f);
+    const float absFootAngle = std::abs(footAngleZ);
+
 
     //Calculate the compensation to the HIPROLL
     float MAX_HIP_ANGLE_OFFSET = (hack_chain == LLEG_CHAIN ?
@@ -343,10 +396,10 @@ WalkingLeg::getHipHack(const float curHYPAngle){
     //AND we also need to rotate some of the correction to the hip pitch motor
     // (This is kind of a HACK until we move the step lifting to be taken
     // directly into account when we determine x,y 3d targets for each leg)
-    const float hipPitchAdjustment = -hr_offset * std::sin(-curHYPAngle);
-    const float hipRollAdjustment = (hr_offset *
+    const float hipPitchAdjustment = -hr_offset * std::sin(footAngleZ);
+    const float hipRollAdjustment = support_sign*(hr_offset *
 									 static_cast<float>(leg_sign)*
-									 std::cos(-curHYPAngle) );
+									 std::cos(footAngleZ) );
 
     return boost::tuple<const float, const float> (hipPitchAdjustment,
                                                    hipRollAdjustment);
@@ -414,16 +467,16 @@ WalkingLeg::getAnglesFromGoal(const ChainID chainID,
         const ufvector3 foot_orientation =
             CoordFrame3D::vector3D(0.0f,
                                    0.0f,
-                                   sign*stance[WP::LEG_ROT_Z]);
+                                   sign*stance[WP::LEG_ROT_Z]*0.5);
         const ufvector3 body_goal =
             CoordFrame3D::vector3D(0.0f,0.0f,0.0f);
 
 
-        IKLegResult result = analyticLegIK(chainID,
-                                           goal,
-                                           foot_orientation,
-                                           body_goal,
-                                           body_orientation);
+        IKLegResult result = Kinematics::legIK(chainID,
+                                               goal,
+                                               foot_orientation,
+                                               body_goal,
+                                               body_orientation);
         return  vector<float>(result.angles,&result.angles[LEG_JOINTS]);
 
 }
@@ -445,6 +498,8 @@ void WalkingLeg::startLeft(){
         setState(PERSISTENT_DOUBLE_SUPPORT);
     }
 
+    resetSensorFeedback();
+
 }
 void WalkingLeg::startRight(){
     if(chainID == LLEG_CHAIN){
@@ -454,7 +509,10 @@ void WalkingLeg::startRight(){
     }else{
         setState(DOUBLE_SUPPORT);
     }
-
+    resetSensorFeedback();
+}
+void WalkingLeg::resetSensorFeedback(){
+lastSensorAngleX = lastSensorAngleY = 0.0f;
 }
 
 
