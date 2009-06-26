@@ -88,45 +88,27 @@ def pGoalieNormal(team):
     #lets try maintaining home position until the ball is closer in
     #might help us stay localized better
         if 0 < ball.locDist < PBConstants.BALL_LOC_LIMIT:
-            leftPostToBall = MyMath.hypot(
-                NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_X - ball.x,
-                NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y - ball.y
-                )
-            rightPostToBall = MyMath.hypot(
-                NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_X - ball.x,
-                NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y -ball.y
-                )
-            goalLineIntersectionY =\
-                NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y +\
-                (rightPostToBall*NogginConstants.CROSSBAR_CM_WIDTH)/\
-                (rightPostToBall+leftPostToBall)
+            # Use an ellipse just above the goalline to determin x and y position
+            # We get the angle from goal center to the ball to determine our X,Y
+            theta = MyMath.safe_atan2( ball.x - PBConstants.GOAL_CENTER_X,
+                                       ball.y - PBConstants.GOAL_CENTER_Y )
+            print "theta: ", theta
+    # Clip the angle so that the (x,y)-coordinate is not too close to the posts
+            if PBConstants.ELLIPSE_ANGLE_MIN >\
+                    MyMath.sub180Angle(PBConstants.RAD_TO_DEG*theta):
+                theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
+            elif PBConstants.ELLIPSE_ANGLE_MAX <\
+                    MyMath.sub180Angle(PBConstants.RAD_TO_DEG*theta):
+                theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
 
-            ballToInterceptDist = MyMath.hypot(
-                ball.x - NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_X,
-                ball.y - goalLineIntersectionY
-                )
-            position[1] = ((PBConstants.DIST_FROM_GOAL_INTERCEPT /
-                            ballToInterceptDist)*
-                           (ball.y - goalLineIntersectionY) +
-                           goalLineIntersectionY)
+    # Determine X,Y of ellipse based on theta, set heading on the ball
+            position[0] = team.ellipse.getXfromTheta(theta)
+            position[1] = team.ellipse.getYfromTheta(theta)
+                #position[2] = self.brain.getObjectHeading(self.brain.ball.x,
+                #                                          self.brain.ball.y)
 
-            position[0] = ((PBConstants.DIST_FROM_GOAL_INTERCEPT /
-                            ballToInterceptDist)*
-                           (ball.x -
-                            NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_X) +
-                           NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_X)
-
-    # Here we are going to do some clipping of the
-            if position[0] < PBConstants.MIN_GOALIE_X:
-                position[0] = PBConstants.MIN_GOALIE_X
-                if position[1] < NogginConstants.MIDFIELD_Y:
-                    position = PBConstants.LEFT_LIMIT_POSITION
-                else:
-                    position = PBConstants.RIGHT_LIMIT_POSITION
-                    if position[0] > NogginConstants.MY_GOALBOX_RIGHT_X +\
-                            PBConstants.END_CLEAR_BUFFER:
-                        print "my x is too high! position=", position
-
+    print "ball.x: ", ball.x, "  ball.y: ", ball.y, "  xPos: ",  position[0],\
+        "  yPos: ", position[1]
     return [PBConstants.GOALIE_NORMAL, position]
 
 def pGoalieChaser(team):
