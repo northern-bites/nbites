@@ -31,7 +31,8 @@ def gameSet(player):
 
         if player.brain.playbook.role == GOALIE:
             player.brain.resetGoalieLocalization()
-        elif player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
+
+        if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()
