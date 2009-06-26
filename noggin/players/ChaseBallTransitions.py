@@ -167,6 +167,11 @@ def shouldAvoidObstacle(player):
     return (shouldAvoidObstacleLeft(player) or
             shouldAvoidObstacleRight(player))
 
+def shouldAvoidObstacleDuringApproachBall(player):
+    return shouldAvoidObstacle(player) and \
+        (player.brain.ball.locDist >
+         constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST)
+
 ####### FIND BALL STUFF ##############
 
 def shouldScanFindBall(player):
@@ -201,4 +206,5 @@ def shouldntStopChasing(player):
             player.currentState == 'kickBallLeftExecute')
 
 def shouldWalkToBallLocPos(player):
-    return player.brain.ball.framesOff > constants.WALK_TO_BALL_LOC_POS_FRAMES
+    return player.counter > constants.WALK_TO_BALL_LOC_POS_FRAMES and \
+        player.brain.ball.framesOff > constants.BALL_OFF_THRESH
