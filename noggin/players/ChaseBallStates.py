@@ -6,6 +6,7 @@ from man.noggin.util import MyMath
 from man.motion import SweetMoves
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+import GoalieTransitions as goalTran
 import PositionConstants
 from .. import NogginConstants
 from ..playbook import PBConstants as pbc
@@ -222,6 +223,9 @@ def approachBall(player):
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball
+    if player.currentRole == pbc.GOALIE and goalTran.dangerousBall(player):
+        return player.goNow('approachDangerousBall')
+
     sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
                      constants.MIN_APPROACH_X_SPEED,
                      constants.MAX_APPROACH_X_SPEED)
@@ -419,4 +423,32 @@ def ballInMyBox(player):
         player.stopWalking()
     if not player.ballInMyGoalBox():
         return player.goLater('chase')
+    return player.stay()
+
+def approachDangerousBall(player):
+    if player.firstFrame():
+        player.stopWalking()
+    print "approach dangerous ball"
+    my = player.brain.my
+    if -170 < my.h < -90: #ball to the right
+        player.setSteps(2,3,1,1)
+    elif 90 < my.h < 170:
+        player.setSteps(2,-3,-1,1)
+    else:
+        player.setSteps(1, -1, 1, 1)
+
+    if not goalTran.dangerousBall(player):
+        return player.goLater('approachBall')
+    #single steps towards ball and goal with spin
+    #still check for kicking
+
+    if transitions.shouldScanFindBall(player):
+        return player.goLater('goalieScanFindBall')
+    elif transitions.shouldKick(player):
+        return player.goLater('waitBeforeKick')
+    elif transitions.shouldTurnToBall_ApproachBall(player):
+        return player.goLater('turnToBall')
+    elif transitions.shouldSpinFindBall(player):
+        return player.goLater('spinFindBall')
+
     return player.stay()

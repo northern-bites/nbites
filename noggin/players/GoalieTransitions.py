@@ -281,6 +281,15 @@ def outOfPosition(player):
         return True
     return False
 
+def dangerousBall(player):
+    ball = player.brain.ball
+    if (ball.x < player.brain.my.x and ball.locDist <= 40) or \
+            player.brain.myGoalLeftPost.on or\
+            player.brain.myGoalRightPost.on or\
+            player.brain.myGoalCrossbar.on:
+        return True
+    #idea: draw ray from me to ball, see if it intersects goal
+
 def setRelY(player):
     ball = player.brain.ball
     if ball.on:
