@@ -1,6 +1,8 @@
 #include "VisualFieldObject.h"
 using namespace std;
 
+const float VisualFieldObject::BOTH_UNSURE_DISTANCE_SD = 2500;
+
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
     : VisualLandmark<fieldObjectID>(_id), VisualDetection()
 {
@@ -76,17 +78,22 @@ void VisualFieldObject::init(){
 void VisualFieldObject::setDistanceWithSD(float _distance)
 {
     setDistance(_distance);
-    // Calculate the SD based on the object type
-    switch (getID()) {
-    case BLUE_GOAL_LEFT_POST:
-    case BLUE_GOAL_RIGHT_POST:
-    case YELLOW_GOAL_LEFT_POST:
-    case YELLOW_GOAL_RIGHT_POST:
-        setDistanceSD(postDistanceToSD(_distance));
-        break;
-    default:
-        setDistanceSD(postDistanceToSD(_distance));
-        break;
+
+    if (getDistanceCertainty() == BOTH_UNSURE) {
+        setDistanceSD(BOTH_UNSURE_DISTANCE_SD);
+    } else {
+        // Calculate the SD based on the object type
+        switch (getID()) {
+        case BLUE_GOAL_LEFT_POST:
+        case BLUE_GOAL_RIGHT_POST:
+        case YELLOW_GOAL_LEFT_POST:
+        case YELLOW_GOAL_RIGHT_POST:
+            setDistanceSD(postDistanceToSD(_distance));
+            break;
+        default:
+            setDistanceSD(postDistanceToSD(_distance));
+            break;
+        }
     }
 }
 

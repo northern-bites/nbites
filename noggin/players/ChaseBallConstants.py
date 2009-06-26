@@ -1,6 +1,7 @@
 import BrunswickSpeeds as speeds
 # Component Switches
 USE_LOC_CHASE = True
+USE_DRIBBLE = False
 
 # Transitions' Constants
 # Ball on and off frame thresholds
@@ -19,6 +20,14 @@ BALL_POS_KICK_LEFT_Y = 11.0
 BALL_POS_KICK_RIGHT_Y = -BALL_POS_KICK_LEFT_Y
 BALL_POS_KICK_MAX_X = 35
 BALL_POS_KICK_MIN_X = 5
+
+# Should dribble should and should stop dribbling
+SHOULD_DRIBBLE_X = BALL_POS_KICK_MAX_X
+SHOULD_DRIBBLE_Y = BALL_POS_KICK_LEFT_Y
+SHOULD_DRIBBLE_BEARING = 30.0
+STOP_DRIBBLE_X = SHOULD_DRIBBLE_X + 20
+STOP_DRIBBLE_Y = SHOULD_DRIBBLE_Y + 20
+STOP_DRIBBLE_BEARING = 40.0
 
 # States' constants
 # turnToBall

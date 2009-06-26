@@ -101,6 +101,7 @@ private: // Class Variables
     inline float postBearingToSD(float _bearing) {
         return static_cast<float>(M_PI) / 8.0f;
     }
+    const static float BOTH_UNSURE_DISTANCE_SD;
 };
 
 #endif
