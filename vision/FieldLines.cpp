@@ -2326,6 +2326,54 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
         }
     }
 
+    // first compare every pair of lines trying to remove duplicates
+    for (vector <VisualLine>::iterator i = lines.begin(); i != lines.end();
+         ++i) {
+
+        for (vector <VisualLine>::iterator j = i+1; j != lines.end(); ++j) {
+            // get intersection
+            point<int> intersection = Utility::getIntersection(*i,*j);
+            int intersectX = intersection.x;
+            int intersectY = intersection.y;
+			const float OVERLAP = 3.0f;
+            float angleOnScreen = min(fabs(i->angle - j->angle),
+                                      fabs(180-(fabs(i->angle-j->angle))));
+			if (angleOnScreen < OVERLAP || intersectX == NO_INTERSECTION) {
+				// These lines may actually be the same - remove the later one
+				BoundingBox box1 = Utility::
+					getBoundingBox(*j,
+								   INTERSECT_MAX_ORTHOGONAL_EXTENSION,
+								   INTERSECT_MAX_PARALLEL_EXTENSION);
+				bool box1Contains = Utility::
+					boxContainsPoint(box1, i->start.x, i->start.y);
+				bool box1Contains2 = Utility::
+					boxContainsPoint(box1, i->end.x, i->end.y);
+				if (box1Contains || box1Contains2) {
+					if (debugIntersectLines) {
+						cout  << "Found duplicate line - removing "
+							  << endl;
+					}
+					lines.erase(j);
+				} else {
+					BoundingBox box1 = Utility::
+						getBoundingBox(*i,
+									   INTERSECT_MAX_ORTHOGONAL_EXTENSION,
+									   INTERSECT_MAX_PARALLEL_EXTENSION);
+					bool box1Contains = Utility::
+						boxContainsPoint(box1, j->start.x, j->start.y);
+					bool box1Contains2 = Utility::
+						boxContainsPoint(box1, j->end.x, j->end.y);
+					if (box1Contains || box1Contains2) {
+						if (debugIntersectLines) {
+							cout  << "Found duplicate line - removing "
+								  << endl;
+						}
+						lines.erase(j);
+					}
+				}
+			}
+		}
+	}
     // Compare every pair of lines
     for (vector <VisualLine>::iterator i = lines.begin(); i != lines.end();
          ++i) {
@@ -3848,7 +3896,7 @@ const bool FieldLines::dupeCorner(const list<VisualCorner> &corners,
 const bool FieldLines::dupeFakeCorner(const list<point<int> > &corners,
                                   const int x, const int y,
 									  const int testNumber) const {
-	int counter = 1;
+	unsigned int counter = 1;
 	 for (list<point<int> >::const_iterator i = corners.begin();
 		  i != corners.end(); ++i, counter++) {
         if (abs(x - i->x) < DUPE_MIN_X_SEPARATION &&
