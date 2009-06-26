@@ -7,16 +7,14 @@ from ..util import MyMath
 def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
     #goalie is out of position. difference in accuracy?
-    return player.goNow('goalieAwesomePosition')
-    '''TODO-
-    if helper.shouldMoveToSave():
-        player.goNow('goaliePositionForSave') '''
     player.isChasing = False
+    return player.goNow('goalieAwesomePosition')
+
     #if player.brain.nav.notAtHeading(NogginConstants.OPP_GOAL_HEADING):
     #    return player.goLater('goalieSpinToPosition')
-    if helper.useClosePosition(player):
-        return player.goNow('goaliePositionBallClose')
-    return player.goNow('goaliePositionBallFar')
+    #if helper.useClosePosition(player):
+    #    return player.goNow('goaliePositionBallClose')
+    #return player.goNow('goaliePositionBallFar')
 
 def goalieAwesomePosition(player):
     """
@@ -30,12 +28,13 @@ def goalieAwesomePosition(player):
     if player.firstFrame():
         player.changeOmniGoToCounter = 0
 
-    if helper.useFarPosition(player):
+    if brain.ball.x >= PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall()
 
-    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 70.0)
+    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <=
+               PBConstants.BALL_LOC_LIMIT)
     changedOmni = False
 
     if useOmni != nav.movingOmni:
@@ -45,15 +44,17 @@ def goalieAwesomePosition(player):
     if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
         changedOmni = True
 
-    if player.firstFrame() or \
-            nav.destX != position[0] or \
-            nav.destY != position[1] or \
-            changedOmni:
+    ball = brain.ball
+    bearing = None
+    if ball.on:
+        bearing = ball.bearing
+    else:
+        bearing = NogginConstants.OPP_GOAL_HEADING
 
-        if not useOmni:
-            nav.goTo((position[0], position[1], brain.ball.locBearing))
-        else:
-            nav.omniGoTo((position[0], position[1], brain.ball.locBearing))
+    if not useOmni:
+        nav.goTo((position[0], position[1], bearing))
+    else:
+        nav.omniGoTo((position[0], position[1], bearing))
 
     return player.stay()
 
@@ -63,10 +64,10 @@ def goaliePositionForSave(player):
         player.brain.tracker.trackBall()
 
     strafeDir = helper.strafeDirForSave(player)
-    if strafeDir == 'right':
-        helper.strafeRight(player)
-    elif strafeDir == 'left':
-        helper.strafeLeft(player)
+    if strafeDir == -1:
+        helper.strafeRightSpeed(player)
+    elif strafeDir == 1:
+        helper.strafeLeftSpeed(player)
     else:
         player.stopWalking()
 

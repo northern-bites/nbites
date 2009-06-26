@@ -1,4 +1,4 @@
-from math import (fabs, hypot)
+from math import (fabs, hypot, cos, sin, acos, asin)
 from ..util.MyMath import safe_atan2
 
 
@@ -85,6 +85,10 @@ class GoTeam:
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
         self.pulledGoalie = False
+        self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
+                               PBConstants.LARGE_ELLIPSE_CENTER_Y,
+                               PBConstants.LARGE_ELLIPSE_HEIGHT,
+                               PBConstants.LARGE_ELLIPSE_WIDTH)
 
     def run(self):
         """
@@ -567,3 +571,40 @@ class GoTeam:
             self.printf("")
 
         return time
+
+class Ellipse:
+  """
+  Class to hold information about an ellipse
+  """
+
+  def __init__(self, center_x, center_y, semimajorAxis, semiminorAxis):
+    self.centerX = center_x
+    self.centerY = center_y
+    self.a = semimajorAxis
+    self.b = semiminorAxis
+
+  def getXfromTheta(self, theta):
+    """
+    Method to return an X-value on the curve based on angle from center
+    Theta is in radians
+    """
+    return self.a*cos(theta)+self.centerX
+
+  def getYfromTheta(self, theta):
+    """
+    Method to return a Y-value on the curve based on angle from center
+    Theta is in radians
+    """
+    return self.b*sin(theta)+self.centerY
+
+  def getXfromY(self, y):
+    """
+    Method to determine the two possible x values based on the y value passed
+    """
+    return self.getXfromTheta(asin((y-self.centerY)/self.b))
+
+  def getYfromX(self, x):
+    """
+    Method to determine the two possible y values based on the x value passed
+    """
+    return self.getYfromTheta(acos((x-self.centerX)/self.a))

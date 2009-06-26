@@ -116,7 +116,13 @@ PAN_UP_HEADS = ( 0.0, -30.0)
 
 PAN_DOWN_HEADS = (0.0, 35.0)
 
+PAN_LEFT_DOWN_HEADS = (60.0, 25.0)
+
+PAN_RIGHT_DOWN_HEADS = (-60.0, 25.0)
+
 LOOK_HEADS = {'left' : PAN_LEFT_HEADS,
               'right' : PAN_RIGHT_HEADS,
               'up' : PAN_UP_HEADS,
-              'down' : PAN_DOWN_HEADS }
+              'down' : PAN_DOWN_HEADS,
+              'leftDown' : PAN_LEFT_DOWN_HEADS,
+              'rightDown' : PAN_RIGHT_DOWN_HEADS}

@@ -420,6 +420,8 @@ public:
 
     const bool dupeCorner(const std::list<VisualCorner> &corners, const int x,
                           const int y, const int testNumber) const;
+	const bool dupeFakeCorner(const std::list<point <int> > &corners,
+							  const int x, const int y, const int testNumber) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
                              const int color, const int numPixels) const;
     const float percentColor(const int x, const int y, const TestDirection dir,

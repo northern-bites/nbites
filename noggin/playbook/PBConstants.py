@@ -4,6 +4,7 @@ File to hold all of the cross field constants for the cooperative behavior syste
 """
 
 from .. import NogginConstants
+from math import pi
 
 # Test switches to force one role to always be given out
 TEST_DEFENDER = False
@@ -280,16 +281,26 @@ RIGHT_WING_MIN_Y = NogginConstants.CENTER_FIELD_Y
 RIGHT_WING_MAX_Y = (NogginConstants.FIELD_WIDTH - NogginConstants.GREEN_PAD_Y)
 
 #GOALIE
-BALL_LOC_LIMIT = 270 # Dist at which we stop active localization and just track
+BALL_LOC_LIMIT = 220 # Dist at which we stop active localization and just track
 GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X +\
-    NogginConstants.GOALBOX_DEPTH * 0.5
+    NogginConstants.GOALBOX_DEPTH * 0.65
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
-DIST_FROM_GOAL_INTERCEPT = NogginConstants.GOALBOX_DEPTH
 END_CLEAR_BUFFER = 20.
-MIN_GOALIE_X = NogginConstants.MY_GOALBOX_LEFT_X
-LIMIT_Y_OFFSET = DIST_FROM_GOAL_INTERCEPT
-LEFT_LIMIT_POSITION = [MIN_GOALIE_X, NogginConstants.MIDFIELD_Y + LIMIT_Y_OFFSET]
-RIGHT_LIMIT_POSITION = [MIN_GOALIE_X, NogginConstants.MIDFIELD_Y - LIMIT_Y_OFFSET]
+# elliptical positioning
+GOAL_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
+GOAL_CENTER_Y = NogginConstants.CENTER_FIELD_Y
+ELLIPSE_X_SHIFT = 5. # Increase this to account for the goalposts
+LARGE_ELLIPSE_HEIGHT = NogginConstants.GOALBOX_DEPTH / 2.0 #radius
+LARGE_ELLIPSE_WIDTH = NogginConstants.CROSSBAR_CM_WIDTH / 2.0 #radius
+LARGE_ELLIPSE_CENTER_Y = NogginConstants.CENTER_FIELD_Y
+LARGE_ELLIPSE_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
+# Angle limits for moving about ellipse
+ELLIPSE_ANGLE_MAX = 170.
+ELLIPSE_ANGLE_MIN = 10.
+RAD_TO_DEG = 180. / pi
+DEG_TO_RAD = pi / 180.
+BALL_FOCUS_UNCERT_THRESH = 100.
+
 
 # Finder
 TWO_DOG_FINDER_POSITIONS = (
