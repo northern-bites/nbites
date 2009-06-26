@@ -87,8 +87,8 @@ class GoTeam:
         self.pulledGoalie = False
         self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
-                               PBConstants.LARGE_ELLIPSE_WIDTH,
-                               PBConstants.LARGE_ELLIPSE_HEIGHT)
+                               PBConstants.LARGE_ELLIPSE_HEIGHT,
+                               PBConstants.LARGE_ELLIPSE_WIDTH)
 
     def run(self):
         """
