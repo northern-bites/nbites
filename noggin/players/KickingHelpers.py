@@ -22,7 +22,11 @@ def isFacingSideline(player):
              -constants.FACING_SIDELINE_ANGLE > h >
              -(180 - constants.FACING_SIDELINE_ANGLE) )
 
-def getShotAimPoint(player):
+def getShotCloseAimPoint(player):
+    return (NogginConstants.FIELD_WIDTH,
+            NogginConstants.MIDFIELD_Y)
+
+def getShotFarAimPoint(player):
     if player.brain.my.y < NogginConstants.MIDFIELD_Y:
         return constants.SHOOT_AT_LEFT_AIM_POINT
     else :
@@ -45,6 +49,10 @@ def getKickObjective(player):
                    NogginConstants.OPP_GOALBOX_MIDDLE_Y ) > \
                    NogginConstants.FIELD_WIDTH / 3 :
                    return constants.OBJECTIVE_CENTER
+    elif my.x > NogginConstants.FIELD_WIDTH * 3/4 and \
+            NogginConstants.FIELD_HEIGHT/4. < my.y < \
+            NogginConstants.FIELD_HEIGHT * 3./4.:
+        return constants.OBJECTIVE_SHOOT_CLOSE
     else :
-        return constants.OBJECTIVE_SHOOT
+        return constants.OBJECTIVE_SHOOT_FAR
 

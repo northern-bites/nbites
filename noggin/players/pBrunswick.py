@@ -189,7 +189,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getApproachHeadingFromBehind(self):
         ball = self.brain.ball
-        aimPoint = KickingHelpers.getShotAimPoint(self)
+        aimPoint = KickingHelpers.getShotFarAimPoint(self)
         ballBearingToGoal = MyMath.getRelativeBearing(ball.x, ball.y,
                                                       NogginConstants.
                                                       OPP_GOAL_HEADING,
@@ -200,7 +200,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getApproachHeadingFromFront(self):
         ball = self.brain.ball
         my = self.brain.my
-        kickDest = KickingHelpers.getShotAimPoint(self)
+        kickDest = KickingHelpers.getShotFarAimPoint(self)
         ballBearingToKickDest = MyMath.getRelativeBearing(ball.x,
                                                           ball.y,
                                                           NogginConstants.

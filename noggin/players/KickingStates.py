@@ -58,15 +58,12 @@ def decideKick(player):
     if player.penaltyKicking:
         return player.goNow('penaltyKickBall')
 
-    kickObjective = helpers.getKickObjective(player)
+    player.kickObjective = helpers.getKickObjective(player)
 
-    if kickObjective == constants.OBJECTIVE_CLEAR:
+    if player.kickObjective == constants.OBJECTIVE_CLEAR:
         return player.goNow('clearBall')
-    elif kickObjective == constants.OBJECTIVE_SHOOT_FAR:
-        # Once we have visual shot detection,
-        # this will be different from shoot ball
-        return player.goNow('shootBall')
-    elif kickObjective == constants.OBJECTIVE_SHOOT:
+    elif player.kickObjective == constants.OBJECTIVE_SHOOT_FAR or \
+            player.kickObjective == constants.OBJECTIVE_SHOOT_CLOSE:
         return player.goNow('shootBall')
     else :
         return player.goNow('clearBall')
@@ -193,11 +190,53 @@ def kickBallStraight(player):
     else :                  # INCORRECT_POS
         return player.goLater('positionForKick')
 
+def shootBallClose(player):
+    """
+    Slam-dunk!
+    """
+    my = player.brain.my
+    shotAimPoint = helpers.getShotCloseAimPoint(player)
+    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                              shotAimPoint[0],
+                                              shotAimPoint[1])
+    if DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
+    if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
+            constants.SHOOT_BALL_LOC_ALIGN_ANGLE:
+        player.angleToAlign = bearingToGoal
+        return player.goNow('alignOnBallStraightKick')
+    elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+        return player.goNow('kickBallLeft')
+    elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+        return player.goNow('kickBallRight')
+    else :
+        return player.goLater('kickBallStraight')
+
+def shootBallFar(player):
+    """
+    From 3 point range!
+    """
+    my = player.brain.my
+    shotAimPoint = helpers.getShotFarAimPoint(player)
+    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                              shotAimPoint[0],
+                                              shotAimPoint[1])
+    if DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
+    if constants.SHOOT_BALL_SIDE_FAR_KICK_ANGLE > abs(bearingToGoal) > \
+            constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE:
+        player.angleToAlign = bearingToGoal
+        return player.goNow('alignOnBallStraightKick')
+    elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+        return player.goNow('kickBallLeft')
+    elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+        return player.goNow('kickBallRight')
+    else :
+        return player.goLater('kickBallStraight')
+
+
 def shootBall(player):
     """
     Put it in the hole!
     """
-
     # Get references to the collected data
     myLeftPostBearing =  player.kickDecider.myLeftPostBearing
     myRightPostBearing = player.kickDecider.myRightPostBearing
@@ -217,6 +256,7 @@ def shootBall(player):
             if constants.DEBUG_KICKS: print ("\t\t Align 1")
             player.angleToAlign = avgOppBearing
             if constants.ALIGN_FOR_KICK:
+                player.angleToAlign = avgOppBearing
                 return player.goLater('alignOnBallStraightKick')
             else:
                 return player.goLater('kickBallStraight')
@@ -256,21 +296,10 @@ def shootBall(player):
 
     # if somehow we didn't return already with our kick choice,
     # use localization for kick
-    shotAimPoint = helpers.getShotAimPoint(player)
-    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                              shotAimPoint[0],
-                                              shotAimPoint[1])
-    print "bearing to goal is ", bearingToGoal
-    if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
-            constants.SHOOT_BALL_LOC_ALIGN_ANGLE:
-        player.angleToAlign = bearingToGoal
-        return player.goNow('alignOnBallStraightKick')
-    elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
-        return player.goNow('kickBallLeft')
-    elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
-        return player.goNow('kickBallRight')
+    if player.kickObjective == constants.OBJECTIVE_SHOOT_CLOSE:
+        return player.goNow('shootBallClose')
     else :
-        return player.goLater('kickBallStraight')
+        return player.goNow('shootBallFar')
 
 
 def penaltyKickBall(player):
@@ -364,7 +393,6 @@ def alignOnBallStraightKick(player):
     Align on ball with respect to goal
     """
     if player.firstFrame():
-        # Want to orbit opposite angle of bearing to goal
         player.brain.nav.orbitAngle(-player.angleToAlign)
 
     # Deal with ball changed positions?
