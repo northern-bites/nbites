@@ -27,6 +27,8 @@ def gameSet(player):
 
     if player.firstFrame():
         player.stopWalking()
+        player.brain.loc.resetBall()
+
         if player.brain.playbook.role == GOALIE:
             player.brain.resetGoalieLocalization()
         elif player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
