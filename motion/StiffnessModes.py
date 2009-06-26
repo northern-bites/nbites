@@ -243,3 +243,28 @@ MAKE_KICK_STIFFNESSES = (GAINS_OFF_VALUE, # Head
                           GAINS_ARMS_VALUE,
                           GAINS_ARMS_VALUE,)
 
+
+FARTHER_KICK_ANKLE_PITCH = 0.6
+FARTHER_KICK_SUPPORT_LEG_VALUE = 0.4
+LEFT_FARTHER_KICK_STIFFNESSES = (GAINS_ON_VALUE, # Head
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE, # larm
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE, # lleg
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 FARTHER_KICK_SUPPORT_LEG_VALUE, # rleg
+                                 FARTHER_KICK_SUPPORT_LEG_VALUE,
+                                 FARTHER_KICK_SUPPORT_LEG_VALUE,
+                                 FARTHER_KICK_SUPPORT_LEG_VALUE,
+                                 0.3,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE, # rarm
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,)
