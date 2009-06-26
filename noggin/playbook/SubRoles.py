@@ -87,7 +87,7 @@ def pGoalieNormal(team):
     if PBConstants.USE_FANCY_GOALIE:
     #lets try maintaining home position until the ball is closer in
     #might help us stay localized better
-        if 0 < ball.locDist < 220:
+        if 0 < ball.locDist < PBConstants.BALL_LOC_LIMIT:
             # Use an ellipse just above the goalline to determin x and y position
             # We get the angle from goal center to the ball to determine our X,Y
             theta = MyMath.safe_atan2( ball.y - PBConstants.GOAL_CENTER_Y,

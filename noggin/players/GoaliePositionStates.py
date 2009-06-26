@@ -33,7 +33,7 @@ def goalieAwesomePosition(player):
     else:
         player.brain.tracker.trackBall()
 
-    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 70.0)
+    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <= 90.0)
     changedOmni = False
 
     if useOmni != nav.movingOmni:

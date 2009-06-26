@@ -73,7 +73,7 @@ def goalieScanFindBall(player):
     if player.firstFrame():
         time = goalTrans.getTimeUntilSave(player)
         #timeUntilSave gives us an idea of if the ball was coming at us
-        if time != -1 and time < 10:
+        if (time != -1 and time < 5) or abs(ball.locBearing) < 50:
             turnDir = goalTrans.strafeDirForSave(player)
             if turnDir == 1:
                 head.lookToDir('leftDown')
