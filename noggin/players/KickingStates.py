@@ -247,6 +247,9 @@ def shootBall(player):
     if oppLeftPostBearing is not None and \
             oppRightPostBearing is not None:
 
+        if oppLeftPostBearing > 0 and oppRightPostBearing < 0:
+            return player.goLater('kickBallStraight')
+
         avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
         if fabs(avgOppBearing) < constants.KICK_STRAIGHT_BEARING_THRESH:
             if constants.DEBUG_KICKS: print ("\t\t Straight 1")
