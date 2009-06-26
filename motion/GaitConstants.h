@@ -53,7 +53,7 @@ namespace WP {
     enum StepConfig{
         DURATION,
         DBL_SUPP_P,
-        STEP_HEIGHT,
+        STEP_HEIGHT, //TODO move this to STANCE
         MAX_VEL_X,
         MAX_VEL_Y,
         MAX_VEL_THETA,

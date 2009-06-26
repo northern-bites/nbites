@@ -48,6 +48,7 @@
  *    ways, so I'm not sure how to do this.
  *  - We need to clip incoming x,y,theta because there is no protection currently
  *  - We need an observer or we need to fix the preview controller's bugs
+ *  - Move velocity clipping out of setSteps/takeSteps into Step object
  * MUSINGS ON BETTER DESIGN:
  *  - Each Step could have a list of sub states which it must undergo
  *    A normal step would have just one DBL and one SINGLE in a row

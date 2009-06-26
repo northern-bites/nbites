@@ -3,6 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <iostream>
+#include "Gait.h"
 
 enum StepType {
     REGULAR_STEP=0,
@@ -21,20 +22,22 @@ enum Foot {
  */
 class Step{
 public:
+    Step(const Step & other);
     Step(const float _x, const float _y, const float _theta,
-         const float _duration,
-         const float doubleSupportFraction,const Foot _foot,
+         const AbstractGait & gait, const Foot _foot,
          const StepType _type = REGULAR_STEP);
     // Copy constructor to allow changing reference frames:
     Step(const float new_x, const float new_y, const float new_theta,
-         const boost::shared_ptr<Step> other);
+         const Step& other);
 
-    void updateFrameLengths(float doubleSupportFraction);
+    void updateFrameLengths(const float duration,
+                            const float dblSuppF);
 
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
             return o << "Step(" << s.x << "," << s.y << "," << s.theta
-                     << ") in " << s.stepDuration <<" secs with foot "
+                     << ") in " << s.stepConfig[WP::DURATION]
+                     <<" secs with foot "
                      << s.foot << " and type " << s.type;
         }
 
@@ -42,17 +45,25 @@ public:
     float x;
     float y;
     float theta;
-    float stepDuration;
     unsigned int stepDurationFrames;
     unsigned int doubleSupportFrames;
     unsigned int singleSupportFrames;
     Foot foot;
     StepType type;
     bool zmpd;
+
+    float stepConfig[WP::LEN_STEP_CONFIG];
+    float zmpConfig[WP::LEN_ZMP_CONFIG];
+
+private:
+    void copyGaitAttributes(const float _step_config[],
+                            const float _zmp_config[]);
+    void copyAttributesFromOther(const Step &other);
+
 };
 
 static const boost::shared_ptr<Step> EMPTY_STEP =
     boost::shared_ptr<Step>(new Step(0.0f,0.0f,0.0f,
-                                     0.0f,0.0f,
+                                     DEFAULT_GAIT,
                                      LEFT_FOOT));
 #endif
