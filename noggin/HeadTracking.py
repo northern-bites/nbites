@@ -65,6 +65,11 @@ class HeadTracking(FSA.FSA):
         self.stopHeadMoves()
         self.switchTo('locPans')
 
+    def scanBall(self):
+        self.activeLocOn = False
+        self.stopHeadMoves()
+        self.switchTo('ballScan')
+
     def execute(self,sweetMove):
         for position in sweetMove:
             if len(position) == 7:
