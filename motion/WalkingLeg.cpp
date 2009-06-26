@@ -467,16 +467,16 @@ WalkingLeg::getAnglesFromGoal(const ChainID chainID,
         const ufvector3 foot_orientation =
             CoordFrame3D::vector3D(0.0f,
                                    0.0f,
-                                   sign*stance[WP::LEG_ROT_Z]);
+                                   sign*stance[WP::LEG_ROT_Z]*0.5);
         const ufvector3 body_goal =
             CoordFrame3D::vector3D(0.0f,0.0f,0.0f);
 
 
-        IKLegResult result = analyticLegIK(chainID,
-                                           goal,
-                                           foot_orientation,
-                                           body_goal,
-                                           body_orientation);
+        IKLegResult result = Kinematics::legIK(chainID,
+                                               goal,
+                                               foot_orientation,
+                                               body_goal,
+                                               body_orientation);
         return  vector<float>(result.angles,&result.angles[LEG_JOINTS]);
 
 }

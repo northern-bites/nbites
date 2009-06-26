@@ -24,9 +24,12 @@ void MetaGait::tick_gait(){
         cout << "Interpolating Gaits percent = "<<getPercentComplete()<<endl;
 #endif
         interpolateGaits(*this,curGait,nextGait,getPercentComplete());
-        // cout<< "Gait 1 is "<<endl<<curGait.toString()<<endl;
-        // cout<< "Gait 2 is "<<endl<<nextGait.toString()<<endl;
-        // cout<< "result is"<<endl<<toString()<<endl;
+
+#ifdef DEBUG_META_GAIT
+        cout<< "Gait 1 is "<<endl<<curGait.toString()<<endl;
+        cout<< "Gait 2 is "<<endl<<nextGait.toString()<<endl;
+        cout<< "result is"<<endl<<toString()<<endl;
+#endif
     }
     //interpolateGaits(*this,DEFAULT_GAIT,DEFAULT_GAIT,1.0f);
 

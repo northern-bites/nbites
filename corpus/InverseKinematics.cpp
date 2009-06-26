@@ -3,7 +3,7 @@
 #include "InverseKinematics.h"
 
 #define USE_ANALYTIC_IK
-
+//#define DEBUG_IK
 using namespace boost::numeric;
 using namespace NBMath;
 using namespace std;
@@ -51,6 +51,17 @@ const Kinematics::IKLegResult
 #ifdef USE_ANALYTIC_IK
     IKLegResult result = analyticLegIK(chainID,footGoal,footOrientation,
                                        bodyGoal,bodyOrientation);
+
+#ifdef DEBUG_IK
+    cout << "IK command with leg"<<chainID <<" :"<<endl
+             <<"    tried to put foot to "<<footGoal
+             << "      with orientation  "<<footOrientation<<endl
+             <<"    tried to put body to "<<bodyGoal
+             << "      with orientation  "<<bodyOrientation<<endl;
+        cout << "   result angles: {";
+        for(int i =0; i<6; i++){cout<<result.angles[i]<<",";}cout<<"}"<<endl;
+#endif
+
 #else
     #error "JACOBIAN IK NOT SETUP RIGHT NOW"
 #endif
