@@ -36,6 +36,12 @@ namespace Kinematics{
                                   const NBMath::ufvector3 & legGoal,
                                   float startAngles []);
 
+    const IKLegResult legIK(const ChainID chainID,
+                            const NBMath::ufvector3 &footGoal,
+                            const NBMath::ufvector3 &footOrientation,
+                            const NBMath::ufvector3 &bodyGoal,
+                            const NBMath::ufvector3 &bodyOrientation,
+                            const float HYPAngle = HYP_NOT_SET);
     /**
      * Wrapper method for IK which finds leg angles given a location
      * for the leg, and angles for the body relative to the world

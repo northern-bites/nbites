@@ -11,8 +11,8 @@ DUCK_STANCE_CONFIG = (31.00, # CoM height
                       1.45,  # Forward displacement of CoM
                       10.0,  # Horizontal distance between feet
                       0.0,   # Body angle around y axis
-                      20.0,   # Angle between feet
-                      0.8)   # Time to transition to/from this stance
+                      30.0,   # Angle between feet
+                      1.0)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support

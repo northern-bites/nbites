@@ -209,35 +209,47 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 }
 
 
-const vector<float> WalkingLeg::finalizeJoints(const ufvector3& legGoal){
+const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     float support_sign = (state !=SWINGING? 1.0f : -1.0f);
 
 
     //Set the desired HYP in lastJoints, which will be read by dls
     const float HYPAngle = lastJoints[0] = getHipYawPitch()
-        - gait->stance[WP::LEG_ROT_Z];
+        - gait->stance[WP::LEG_ROT_Z]*0.5;
 
     //calculate the new angles
     Inertial inertial = sensors->getInertial();
     const float angleScale = SENSOR_SCALE;
-    const float angleX = inertial.angleX*angleScale;
-    const float angleY = gait->stance[WP::BODY_ROT_Y];
-    //+(inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
+    const float bodyAngleX = inertial.angleX*angleScale;
+    const float bodyAngleY = gait->stance[WP::BODY_ROT_Y]
+        +(inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
+    const float footAngleZ = getFootRotation_c()
+        + leg_sign*gait->stance[WP::LEG_ROT_Z]*0.5;
 
     // IKLegResult result = Kinematics::angleXYIK(chainID,goal,angleX,
     //                                            angleY, HYPAngle);
-    IKLegResult result =
-        Kinematics::simpleLegIK(chainID,goal,lastJoints);
+    // IKLegResult result =
+    //     Kinematics::simpleLegIK(chainID,goal,lastJoints);
 
-    if(result.outcome != Kinematics::SUCCESS){
-        cout << "IK ERROR: tried to go to "<<goal<< " with leg "<<leg_name<<endl
-             << "   and aX,aY,HYP = "<<angleX<<","<<angleY<<","<<HYPAngle<<endl;
-    }
+    const ufvector3 bodyOrientation = CoordFrame3D::vector3D(bodyAngleX,
+                                                       bodyAngleY, 0.0f);
+    const ufvector3 footOrientation = CoordFrame3D::vector3D(0.0f,
+                                                       0.0f,footAngleZ);
+    const ufvector3 bodyGoal = CoordFrame3D::vector3D(0.0f,
+                                                      0.0f,0.0f);
+
+    IKLegResult result =
+        Kinematics::legIK(chainID,footGoal,footOrientation,
+                          bodyGoal,bodyOrientation);//, HYPAngle);
+
+     // IKLegResult result =
+     //     Kinematics::simpleLegIK(chainID,footGoal,lastJoints);
+
 
     boost::tuple <const float, const float > hipHacks  = getHipHack(HYPAngle);
     result.angles[1] += support_sign*hipHacks.get<1>(); //HipRoll
     result.angles[2] += hipHacks.get<0>(); //HipPitch
-    result.angles[2] -=  gait->stance[WP::BODY_ROT_Y]; //HACK
+    //result.angles[2] -=  gait->stance[WP::BODY_ROT_Y]; //HACK
 
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
@@ -264,6 +276,17 @@ const float WalkingLeg::getFootRotation(){
 
     const float value = start + (end-start)*percent_to_dest;
     return value;
+
+
+}
+
+/* Returns the foot rotation for this foot relative to the C frame*/
+const float WalkingLeg::getFootRotation_c(){
+    const float abs_rot =  std::abs(getFootRotation());
+
+    const float rot_rel_c = abs_rot*0.5*leg_sign;
+
+    return rot_rel_c;
 
 
 }
