@@ -5,8 +5,8 @@
 using namespace boost::numeric;
 
 const int AngleEKF::num_dimensions = ANGLE_NUM_DIMENSIONS;
-const float AngleEKF::beta = 0.2f;
-const float AngleEKF::gamma = .2f;
+const float AngleEKF::beta = 3.0f;
+const float AngleEKF::gamma = 2.0f;
 const float AngleEKF::variance  = 0.22f;
 //const float AccEKF::variance  = 100.00f;
 

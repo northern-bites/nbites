@@ -20,7 +20,7 @@
 #define _AngleEKF_h_DEFINED
 
 /**
- * Class for filtering accelerometer values received from sensors. Extends the
+ * Class for filtering angle values received from sensors. Extends the
  * abstract EKF class.
  */
 

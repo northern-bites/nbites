@@ -14,6 +14,9 @@ using namespace Kinematics;
 #include "WBNames.h"
 using namespace WBNames;
 
+//0 if not using angle. 1 if using angle
+const int USING_ANGLE = 0;
+
 #include "BasicWorldConstants.h"
 
 WBTranscriber::WBTranscriber(shared_ptr<Sensors> s)
@@ -114,21 +117,58 @@ void WBTranscriber::postMotionSensors(){
     const float accX = -static_cast<float>(acc_values[0]);
     const float accY = -static_cast<float>(acc_values[1]);
     const float accZ = -static_cast<float>(acc_values[2]);
-    //cout<<"anglex "<<std::asin(-accX/GRAVITY_mss)*(180/3.14)<<"\n";
-    //cout<<"angley "<<std::asin(-accY/GRAVITY_mss)*(180/3.14)<<"\n";
-    angleEKF.update(std::asin(-accX/GRAVITY_mss),std::asin(-accY/GRAVITY_mss));
+    //    cout<<"anglex "<<std::asin(-accX/GRAVITY_mss)*(180/3.14)<<"\n";
+    //    cout<<"angley "<<std::asin(-accY/GRAVITY_mss)*(180/3.14)<<"\n";
+    //the ratio can be bigger than 1 or smaller than -1 
+    //if the robot hits the floor
+    //gyroX does not correspond to accX so we have to invert them
+    const float ratioX = -accX/GRAVITY_mss;
+    const float ratioY = -accY/GRAVITY_mss;
+    float accAngleX = std::asin(ratioX);
+    float accAngleY = std::asin(ratioY);
 
-    const float gyroX = static_cast<float>(gyro_values[0]);
-    const float gyroY = static_cast<float>(gyro_values[1]);
-    angleEKF.update(prevAngleX + gyroX, prevAngleY + gyroY);
-    //    cout<<"anglex gyro "<<prevAngleX * (180/3.14)<<"\n";
-    //    cout<<"angley gyro "<<prevAngleY * (180/3.14)<<"\n";
+    if (ratioX >= 1){
+      accAngleX = M_PI_FLOAT/2;
+      prevAngleX = M_PI_FLOAT/2;
+    }
+    else
+      if (ratioX <= -1){
+	accAngleX = -M_PI_FLOAT/2;
+	prevAngleX = -M_PI_FLOAT/2;
+      }
+
+    if (ratioY >= 1){
+      accAngleY = M_PI_FLOAT/2;
+      prevAngleY = M_PI_FLOAT/2;
+    }
+    else
+      if (ratioY <= -1){
+	accAngleY = -M_PI_FLOAT/2;
+	prevAngleY = -M_PI_FLOAT/2;
+      }
+    angleEKF.update(accAngleX, accAngleY);
+
+    if (accAngleX <= .002 && accAngleX >= -.002)
+      prevAngleX = 0;
+    if (accAngleY <= .002 && accAngleY >= -.002)
+      prevAngleY = 0;
+    
+    const float gyroY = static_cast<float>(gyro_values[0]);
+    const float gyroX = static_cast<float>(gyro_values[1]);
+    //multiplying with .02 since gyro gives you rad/s and 
+    //the updating happens every 20 ms
+    angleEKF.update(prevAngleX + gyroX*0.02, prevAngleY + gyroY*0.02);
+    //    cout<<"anglex gyro "<<(prevAngleX + gyroX*0.02)* (180/3.14)<<"\n";
+    //    cout<<"angley gyro "<<(prevAngleY + gyroY*0.02)* (180/3.14)<<"\n";
     const float angleX = angleEKF.getAngleX();
     const float angleY = angleEKF.getAngleY();
-    prevAngleX = angleX;
-    prevAngleY = angleY;
 
-    cout<<angleX<<" "<<angleY<<"\n";
+   
+    prevAngleX += gyroX*0.02;
+    prevAngleY += gyroY*0.02;
+    
+
+    //    cout<<angleX*180/M_PI_FLOAT<<"\n"<<angleY*180/M_PI_FLOAT<<"\n";
 
     //HACK!!!! TODO compute angleX and angleY better (filter?)
     //Currently when the gravity accell is in one direction,
@@ -136,8 +176,10 @@ void WBTranscriber::postMotionSensors(){
 //     const float angleX = accY/GRAVITY_mss * M_PI_FLOAT;
 //     const float angleY = -accX/GRAVITY_mss * M_PI_FLOAT;
     //better approximation, for now
-    //const float angleX = 0.0f;
-    //const float angleY = 0.0f;
+    if (!USING_ANGLE){
+      const float angleX = 0.0f;
+      const float angleY = 0.0f;
+    }
 
     Inertial wbInertial= Inertial(accX,accY,accZ,gyroX,gyroY,angleX,angleY);
 
