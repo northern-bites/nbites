@@ -3954,7 +3954,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	const int blobHigh = 250;
 	const int blobMax = 500;
 	const float radDiv = 2.0f;
-	const float PIXACC = 50;
+	const float PIXACC = 300;
 
     int confidence = 10;
     occlusion = NOOCCLUSION;
@@ -4187,7 +4187,8 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
                                           thisBall->getCenterY(),
                                           static_cast<float>(thisBall->
                                                              getFocDist())));
-	if (e.dist * 2 < thisBall->getDistance() && e.dist < PIXACC && e.dist > 0) {
+	if ((e.dist * 2 < thisBall->getDistance() || thisBall->getDistance() * 2 < e.dist) &&
+		e.dist < PIXACC && e.dist > 0) {
 		if (BALLDEBUG) {
 			cout << "Screening due to distance mismatch " << e.dist << " " << thisBall->getDistance() << endl;
 		}
