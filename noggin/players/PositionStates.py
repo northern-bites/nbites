@@ -30,8 +30,6 @@ def playbookPosition(player):
 
     useOmni = (distToPoint <= \
                    constants.OMNI_POSITION_DIST)
-    if useOmni:
-        print "distance to point is ", distToPoint
     changedOmni = False
 
     if useOmni != nav.movingOmni:
