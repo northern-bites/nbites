@@ -93,6 +93,14 @@ def shouldKick(player):
         constants.BALL_KICK_RIGHT_Y_R and \
         constants.BALL_KICK_LEFT_X_CLOSE < ball.locRelX < \
         constants.BALL_KICK_LEFT_X_FAR
+
+
+def shouldDribble(player):
+    """
+    Ball is in between us and the opp goal, let's dribble for a while
+    """
+    return constants.BALL_POS_KICK_MAX_X > player.brain.ball.relX
+
 ######### BALL IN BOX ###############
 
 def shouldChaseAroundBox(player):
