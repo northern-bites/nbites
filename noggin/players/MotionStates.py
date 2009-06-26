@@ -40,7 +40,7 @@ else:
 
 def switchgaits1(player):
     if player.firstFrame():
-        player.setSpeed(0,4,0)
+        player.setSpeed(6,0,0)
 
     if player.counter == 140:
         return player.goLater('switchgaits2')
@@ -50,7 +50,7 @@ def switchgaits2(player):
     if player.firstFrame():
         player.brain.motion.setGait(RobotGaits.DUCK_GAIT)
 
-    if player.counter == 140:
+    if player.counter == 240:
         return player.goLater('switchgaits3')
     return player.stay()
 def switchgaits3(player):
@@ -108,7 +108,7 @@ def walkstraightstop(player):
     if player.firstFrame():
         player.setSpeed(6.0,0.0,0)
 
-    if player.counter == 300:
+    if player.counter == 500:
         return player.goLater('stopwalking')
     return player.stay()
 

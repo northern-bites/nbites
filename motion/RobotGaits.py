@@ -11,8 +11,8 @@ DUCK_STANCE_CONFIG = (31.00, # CoM height
                       1.45,  # Forward displacement of CoM
                       10.0,  # Horizontal distance between feet
                       0.0,   # Body angle around y axis
-                      20.0,   # Angle between feet
-                      0.8)   # Time to transition to/from this stance
+                      30.0,   # Angle between feet
+                      1.0)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
@@ -33,8 +33,10 @@ JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                      5.5) # right swing hip roll addition
 
 SENSOR_CONFIG = (0.0,   # observer sensor scale
-                 0.0)   # angle XY sensor scale
-
+                 0.50,  # angle XY sensor scale
+                 15.0,   # max angle X (compensation)
+                 15.0,   # max angle Y
+                 75.0)   # max angle vel (change in compensation)
 STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.3,  #kneeStiffness
                     0.4,  #anklePitchStiffness

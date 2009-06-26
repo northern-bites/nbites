@@ -93,10 +93,6 @@ void StepGenerator::resetHard(){
     //Clear all zmp, clear footsteps
     resetQueues();
     done  = true;
-    cout << "Walk was reset hard."<<endl
-         << "  Current motion vector is ("<<x<<","<<y<<","<<theta<<")"<<endl;
-    if(!done)
-        cout << "  Current support step_f is "<<*supportStep_s<<endl;
     //I don't think there is much else we need to do....
 }
 
@@ -392,13 +388,13 @@ void StepGenerator::swapSupportLegs(){
         // the three footholds from above
         supportStep_f =
             shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
-                                      0.0f,supportStep_s));
+                                      0.0f,*supportStep_s));
         swingingStep_f =
             shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
-                                      swing_dest_angle,swingingStep_s));
+                                      swing_dest_angle,*swingingStep_s));
         swingingStepSource_f  =
             shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
-                                      swing_src_angle,lastStep_s));
+                                      swing_src_angle,*lastStep_s));
 
 }
 
@@ -419,8 +415,6 @@ void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 
 void
 StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
-    //look at the newStep, and make ZMP values:
-    const float stepTime = newSupportStep->stepDuration;
     //update the lastZMPD Step
     const float sign = (newSupportStep->foot == LEFT_FOOT ? 1.0f : -1.0f);
     const float last_sign = -sign;
@@ -445,8 +439,11 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     // we turn, the opening step is well balanced but the step which brings the
     // foot back is bad. We need to swing more toward the opening step in
     // order to not fall inward.
-    const float HACK_AMOUNT_PER_PI_OF_TURN = gait->zmp[WP::TURN_ZMP_OFF];
-    const float HACK_AMOUNT_PER_1_OF_LATERAL = gait->zmp[WP::STRAFE_ZMP_OFF];
+    const float HACK_AMOUNT_PER_PI_OF_TURN =
+        newSupportStep->zmpConfig[WP::TURN_ZMP_OFF];
+    const float HACK_AMOUNT_PER_1_OF_LATERAL =
+        newSupportStep->zmpConfig[WP::STRAFE_ZMP_OFF];
+
     float adjustment = ((newSupportStep->theta / M_PI_FLOAT)
                         * HACK_AMOUNT_PER_PI_OF_TURN);
     adjustment += (newSupportStep->y - (sign*HIP_OFFSET_Y))
@@ -455,8 +452,8 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //Another HACK (ie. zmp is not perfect)
     //This moves the zmp reference to the outside of the foot
     float Y_ZMP_OFFSET = (newSupportStep->foot == LEFT_FOOT ?
-                          gait->zmp[WP::L_ZMP_OFF_Y]:
-                          gait->zmp[WP::R_ZMP_OFF_Y]);
+                          newSupportStep->zmpConfig[WP::L_ZMP_OFF_Y]:
+                          newSupportStep->zmpConfig[WP::R_ZMP_OFF_Y]);
 
     Y_ZMP_OFFSET += adjustment;
 
@@ -497,7 +494,7 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //First, split up the frames:
     const int halfNumDSChops = //DS - DoubleStaticChops
        static_cast<int>(static_cast<float>(newSupportStep->doubleSupportFrames)*
-                        gait->zmp[WP::DBL_SUP_STATIC_P]/2.0f);
+                        newSupportStep->zmpConfig[WP::DBL_SUP_STATIC_P]/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
         newSupportStep->doubleSupportFrames - halfNumDSChops*2;
 
@@ -761,21 +758,15 @@ void StepGenerator::resetSteps(const bool startLeft){
     //we reset any coordinate frames
     resetOdometry(gait->stance[WP::BODY_OFF_X],-supportSign*HIP_OFFSET_Y);
 
-    const float supportStepTime = static_cast<float>(Observer::NUM_PREVIEW_FRAMES) *
-        MotionConstants::MOTION_FRAME_LENGTH_S;
-    const float supportStepDoubleSupportFraction = 1.0f;
-
     //Support step is END Type, but the first swing step, generated
-    //in generateStep, is START type.
+    //in generateStep, is REGULAR type.
     shared_ptr<Step> firstSupportStep =
         shared_ptr<Step>(new Step(0,HIP_OFFSET_Y*supportSign,0,
-                                  supportStepTime,
-                                  supportStepDoubleSupportFraction,
+                                  *gait,
                                   firstSupportFoot,END_STEP));
     shared_ptr<Step> dummyStep =
         shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y*supportSign,0,
-                                  gait->step[WP::DURATION],
-                                  gait->step[WP::DBL_SUPP_P],
+                                  *gait,
                                   dummyFoot));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
@@ -871,23 +862,11 @@ void StepGenerator::generateStep( float _x,
         leg_sign*HIP_OFFSET_Y*cos(_theta);
     const float computed_theta = _theta;
 
-    const float dblSupp = (type == END_STEP ?
-                           1.0f :
-                           gait->step[WP::DBL_SUPP_P]);
-
     shared_ptr<Step> step(new Step(computed_x, computed_y, computed_theta,
-                                   gait->step[WP::DURATION],
-                                   dblSupp,
+                                   *gait,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
                                    type));
-
-//     shared_ptr<Step> step(new Step(_x,(nextStepIsLeft ?
-//                                        HIP_OFFSET_Y : -HIP_OFFSET_Y) + _y,
-//                                    _theta, gait->stepDuration,
-//                                    (nextStepIsLeft ?
-//                                     LEFT_FOOT : RIGHT_FOOT),
-//                                    type));
 
 #ifdef DEBUG_STEPGENERATOR
     cout << "Generated a new step: "<<*step<<endl;
