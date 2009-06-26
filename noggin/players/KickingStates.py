@@ -153,6 +153,37 @@ def clearBall(player):
                 if constants.DEBUG_KICKS: print ("\t\tbottom4")
                 return player.goLater('kickBallStraight')
 
+def kickBallStraightShort(player):
+    if player.brain.ball.on:
+        player.kickDecider.ballForeWhichFoot()
+    elif ChaseBallTransitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    else :
+        return player.stay()
+
+
+    player.brain.tracker.trackBall()
+
+    ballForeFoot = player.kickDecider.ballForeFoot
+    if ballForeFoot == constants.LEFT_FOOT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
+        return player.goNow('kickBallExecute')
+
+    elif ballForeFoot == constants.RIGHT_FOOT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
+        return player.goNow('kickBallExecute')
+
+    elif ballForeFoot == constants.MID_RIGHT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
+        return player.goNow('stepForRightFootKick')
+
+    elif ballForeFoot == constants.MID_LEFT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
+        return player.goNow('stepForLeftFootKick')
+
+    else :                  # INCORRECT_POS
+        return player.goLater('positionForKick')
+
 def kickBallStraight(player):
     """
     Kick the ball forward.
@@ -163,7 +194,6 @@ def kickBallStraight(player):
         return player.goLater('scanFindBall')
     else :
         return player.stay()
-
 
     player.brain.tracker.trackBall()
 
@@ -306,7 +336,7 @@ def penaltyKickBall(player):
     ball = player.brain.ball
 
     if not player.penaltyMadeFirstKick:
-        return player.goLater('kickBallStraight')
+        return player.goLater('kickBallStraightShort')
     if not player.penaltyMadeSecondKick:
 
 

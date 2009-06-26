@@ -187,8 +187,7 @@ def approachBall(player):
 
     if player.penaltyKicking and \
             player.ballInOppGoalBox():
-        player.stopWalking()
-        return player.stay()
+        return player.goNow('penaltyBallInOppGoalbox')
 
     # Switch to other states if we should
     if player.currentRole == pbc.GOALIE:
