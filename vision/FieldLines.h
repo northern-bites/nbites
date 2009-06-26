@@ -181,7 +181,7 @@ private:
     static const int INTERSECT_MAX_ORTHOGONAL_EXTENSION =
         static_cast<int>(.05 * IMAGE_WIDTH);
     // for dupeCorner() checks
-    static const int DUPE_MIN_X_SEPARATION = 7;
+    static const int DUPE_MIN_X_SEPARATION = 10;
     static const int DUPE_MIN_Y_SEPARATION = 15;
 
     static const int MAX_CORNER_DISTANCE = 600;
@@ -314,6 +314,10 @@ public:
     // that successfully pass all sanity checks.
     //
     std::list<VisualCorner> intersectLines(std::vector<VisualLine> &lines);
+
+	// Checks if a corner is too dangerous when it is relatively near the edge
+	// of the screen - scans the edge for a stripe of white
+	bool tooClose(int x, int y);
 
     // Iterates over the corners and removes those that are too risky to
     // use for localization data
