@@ -537,10 +537,10 @@ void BallEKF::clipBallEstimate()
         xhat_k(3) = VELOCITY_EST_MIN;
     }
 
-    if (abs(xhat_k(2)) < 0.2f) {
+    if (std::abs(xhat_k(2)) < VELOCITY_EST_MIN_SPEED) {
         xhat_k(2) = 0.0f;
     }
-    if (abs(xhat_k(3)) < 0.2f) {
+    if (std::abs(xhat_k(3)) < VELOCITY_EST_MIN_SPEED) {
         xhat_k(3) = 0.0f;
     }
 
