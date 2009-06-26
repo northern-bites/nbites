@@ -315,6 +315,10 @@ public:
     //
     std::list<VisualCorner> intersectLines(std::vector<VisualLine> &lines);
 
+	// Checks if a corner is too dangerous when it is relatively near the edge
+	// of the screen - scans the edge for a stripe of white
+	bool tooClose(int x, int y);
+
     // Iterates over the corners and removes those that are too risky to
     // use for localization data
     void removeRiskyCorners(//vector<VisualLine> &lines,

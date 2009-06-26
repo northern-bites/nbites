@@ -1653,6 +1653,15 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
                     }
                 }
             }
+			// line width sanity check: the two lines should have similar widths
+			if (abs(i->avgVerticalWidth - j->avgVerticalWidth) > 10 ||
+				abs(i->avgHorizontalWidth - j->avgHorizontalWidth) > 10) {
+				if (debugJoinLines) {
+					cout << "Lines had different widths" << endl;
+				}
+				continue;
+			}
+
 
             // DISTANCE sanity check: even if two lines have a very small angle
             // between them, they might not be legitimately part of the same
@@ -2667,10 +2676,12 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 						int distSq = static_cast<int>(firstPoint->lineWidth);
 						//diff = abs(diff - targetDist);
 						// idea - the point should also be about twice the distance to the line point
-						//cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
-						//" " << distSq << endl;
+						if (debugIntersectLines) {
+							cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
+								" " << distSq << endl;
+						}
 						if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
-							diff > targetDist / 2) {
+							diff > targetDist / 2 && diff > distSq * distSq) {
 							if (debugIntersectLines) {
 								cout << "Possible center intersection" << endl;
 							}
@@ -2678,51 +2689,21 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 						}
 					}
 				}
+				// if we didn't get a legit CC, worry about the edges of the screen
+				if (c.getShape() == T) {
+					if (tooClose(intersectX, intersectY)) {
+						if (debugIntersectLines) {
+							cout << "Tossed a T that may be a CC near the screen edge" << endl;
+						}
+						continue;
+					}
+				}
 			} else if (c.getShape() == INNER_L || c.getShape() == OUTER_L) {
-				// if it near a screen edge then it could be a center circle
-				const int NUM_PIXELS_CLOSE_TO_EDGE = 20;
-				const int DANGER_ZONE = 50;
-				const int BADCOUNT = 10;
-				int x = intersectX, y = intersectY;
-				// if we are near any edge, but not near enough to toss the point
-				// look out for a line continuation
-				// simply scan around the edge looking for white
-				int count = 0;
-				if (x < DANGER_ZONE || x > IMAGE_WIDTH - DANGER_ZONE) {
-					int xVal = 1;
-					if (x > IMAGE_WIDTH - DANGER_ZONE) {
-						xVal = IMAGE_WIDTH - 2;
+				if (tooClose(intersectX, intersectY)) {
+					if (debugIntersectLines) {
+						cout << "Tossed an L that may be a CC near the screen edge" << endl;
 					}
-					for (int l = max(y - x, 0); l < min(IMAGE_HEIGHT - 1, y + x); l++) {
-						if (vision->thresh->thresholded[l][xVal] == WHITE) {
-							count++;
-						}
-					}
-					if (count > BADCOUNT) {
-						// problably a center circle, but let's just toss it
-						if (debugIntersectLines) {
-							cout << "Tossed a corner that is probably a center circle corner "
-								 << count << endl;
-						}
-						continue;
-					}
-				} else if (y < DANGER_ZONE || y > IMAGE_HEIGHT - DANGER_ZONE) {
-					int yVal = 1;
-					if (y > IMAGE_HEIGHT - DANGER_ZONE) {
-						yVal = IMAGE_HEIGHT - 2;
-					}
-					for (int l = max(x - y, 0); l < min(IMAGE_WIDTH - 1, y + x); l++) {
-						if (vision->thresh->thresholded[yVal][l] == WHITE) {
-							count++;
-						}
-					}
-					if (count > BADCOUNT) {
-						if (debugIntersectLines) {
-							cout << "Tossed a corner that is probably a center circle corner "
-								 << count << endl;
-						}
-						continue;
-					}
+					continue;
 				}
 			}
             corners.push_back(c);
@@ -2746,6 +2727,48 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 
     return corners;
 
+}
+
+// Checks if a corner is too dangerous when it is near the edge of the screen
+bool FieldLines::tooClose(int x, int y) {
+	// if it near a screen edge then it could be a center circle
+	const int NUM_PIXELS_CLOSE_TO_EDGE = 20;
+	const int DANGER_ZONE = 50;
+	const int BADCOUNT = 10;
+
+	// if we are near any edge, but not near enough to toss the point
+	// look out for a line continuation
+	// simply scan around the edge looking for white
+	int count = 0;
+	if (x < DANGER_ZONE || x > IMAGE_WIDTH - DANGER_ZONE) {
+		int xVal = 1;
+		if (x > IMAGE_WIDTH - DANGER_ZONE) {
+			xVal = IMAGE_WIDTH - 2;
+		}
+		for (int l = max(y - x, 0); l < min(IMAGE_HEIGHT - 1, y + x); l++) {
+			if (vision->thresh->thresholded[l][xVal] == WHITE) {
+				count++;
+			}
+		}
+		if (count > BADCOUNT) {
+			// problably a center circle, but let's just toss it
+			return true;;
+		}
+	} else if (y < DANGER_ZONE || y > IMAGE_HEIGHT - DANGER_ZONE) {
+		int yVal = 1;
+		if (y > IMAGE_HEIGHT - DANGER_ZONE) {
+			yVal = IMAGE_HEIGHT - 2;
+		}
+		for (int l = max(x - y, 0); l < min(IMAGE_WIDTH - 1, y + x); l++) {
+			if (vision->thresh->thresholded[yVal][l] == WHITE) {
+				count++;
+			}
+		}
+		if (count > BADCOUNT) {
+			return true;
+		}
+	}
+	return false;
 }
 
 // Iterates over the corners and removes those that are too risky to
@@ -2838,7 +2861,17 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
              << " corners" << endl;
 
     vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
-
+	int numCorners = corners.size(), numTs = 0, numLs = 0;
+	if (numCorners > 1) {
+		for (list <VisualCorner>::iterator i = corners.begin();i != corners.end(); i++){
+			if (i->getShape() == T) {
+				numTs++;
+			}
+			if (i->getShape() == INNER_L || i->getShape() == OUTER_L) {
+				numLs++;
+			}
+		}
+	}
     // No explicit movement of iterator; will do it manually
     for (list <VisualCorner>::iterator i = corners.begin();i != corners.end();){
 
@@ -2894,6 +2927,21 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
         }
         // More than 1 possibility for the corner
         else {
+			// if we have more corners then those may help us ID the corner
+			if (numCorners > 1) {
+				if 	(i->getShape() == T) {
+					if (numTs > 1) {
+						// for now we'll just toss these
+						// TODO: Theoretically we can classify these
+						if (debugIdentifyCorners) {
+							cout << "Two Ts found - for now we throw them both out" << endl;
+						}
+						corners.clear();
+						return;
+					}
+				}
+			}
+
             // If either of the lines forming the corner are cc lines, then
             // the corner must be a cc intersection
             if (i->getShape() == CIRCLE ||
