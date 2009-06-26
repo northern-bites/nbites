@@ -95,7 +95,7 @@ class GameController(FSA.FSA):
 
         #######  KICKOFF  ######
         if (self.gc.kickOff == self.gc.team and
-            (self.gc.state == comm.STATE_INITAL or
+            (self.gc.state == comm.STATE_INITIAL or
              self.gc.state == comm.STATE_READY or
              self.gc.state == comm.STATE_PLAYING)):
             self.brain.leds.executeLeds(Leds.HAVE_KICKOFF_LEDS)
