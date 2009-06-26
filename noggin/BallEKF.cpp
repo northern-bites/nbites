@@ -39,6 +39,7 @@ const float BallEKF::X_EST_MAX = FIELD_WIDTH;
 const float BallEKF::Y_EST_MAX = FIELD_HEIGHT;
 const float BallEKF::VELOCITY_EST_MAX = 150.0f;
 const float BallEKF::VELOCITY_EST_MIN = -150.0f;
+const float BallEKF::VELOCITY_EST_MIN_SPEED = 0.01f;
 // Distance to see a ball "jump" at which we reset velocity to 0
 const float BallEKF::BALL_JUMP_VEL_THRESH = 250.0f;
 static const bool USE_BALL_JUMP_RESET = true;
@@ -375,6 +376,15 @@ void BallEKF::limitPosteriorEst()
     if(xhat_k(3) < VELOCITY_EST_MIN) {
         xhat_k_bar(3) = VELOCITY_EST_MIN;
         xhat_k(3) = VELOCITY_EST_MIN;
+    }
+
+    if(std::abs(xhat_k(2)) < VELOCITY_EST_MIN_SPEED) {
+        xhat_k_bar(2) = 0.0f;
+        xhat_k(2) = 0.0f;
+    }
+    if(std::abs(xhat_k(3)) < VELOCITY_EST_MIN_SPEED) {
+        xhat_k_bar(3) = 0.0f;
+        xhat_k(3) = 0.0f;
     }
 }
 
