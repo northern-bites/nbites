@@ -91,10 +91,13 @@ private:
 
     MetaGait metaGait;
     Gait nextGait;
+    Gait startGait;
+
     StepGenerator stepGenerator;
     bool pendingCommands;
     bool pendingStepCommands;
     bool pendingGaitCommands;
+    bool pendingStartGaitCommands;
 
     mutable pthread_mutex_t walk_provider_mutex;
     const WalkCommand * nextCommand;

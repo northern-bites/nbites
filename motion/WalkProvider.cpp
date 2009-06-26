@@ -35,10 +35,12 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
       sensors(s),
       metaGait(),
       nextGait(DEFAULT_GAIT),
+      startGait(DEFAULT_GAIT),
       stepGenerator(sensors,&metaGait),
       pendingCommands(false),
       pendingStepCommands(false),
       pendingGaitCommands(false),
+      pendingStartGaitCommands(false),
       nextCommand(NULL)
 {
     pthread_mutex_init(&walk_provider_mutex,NULL);
@@ -70,13 +72,15 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 #endif
     pthread_mutex_lock(&walk_provider_mutex);
     if ( pendingGaitCommands){
-        if(stepGenerator.isDone()){
+        if(stepGenerator.isDone() && pendingStartGaitCommands){
             //If we just did a standup, then we need to force which gaits are set
-            metaGait.setStartGait(nextGait);
-        }else
-            metaGait.setNewGaitTarget(nextGait);
+            metaGait.setStartGait(startGait);
+        }
+        metaGait.setNewGaitTarget(nextGait);
     }
     pendingGaitCommands = false;
+    pendingStartGaitCommands = false;
+
     if(nextCommand){
         stepGenerator.setSpeed(nextCommand->x_mms,
                                nextCommand->y_mms,
@@ -182,6 +186,8 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
+    startGait = nextGait;
+    pendingStartGaitCommands = true;
 
     float max_change = -M_PI_FLOAT*10.0f;
     int max_index = -1;
