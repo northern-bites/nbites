@@ -49,9 +49,9 @@ def goalieAwesomePosition(player):
             changedOmni:
 
         if not useOmni:
-            nav.goTo((position[0], position[1], brain.ball.locBearing))
+            nav.goTo((position[0], position[1], brain.ball.bearing))
         else:
-            nav.omniGoTo((position[0], position[1], brain.ball.locBearing))
+            nav.omniGoTo((position[0], position[1], brain.ball.bearing))
 
     return player.stay()
 

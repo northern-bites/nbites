@@ -287,13 +287,14 @@ GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X +\
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
 END_CLEAR_BUFFER = 20.
 # elliptical positioning
-GOAL_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
+GOAL_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X - 10
 GOAL_CENTER_Y = NogginConstants.CENTER_FIELD_Y
-ELLIPSE_X_SHIFT = 5. # Increase this to account for the goalposts
+ELLIPSE_X_SHIFT = 10. # Increase this to account for the goalposts
 LARGE_ELLIPSE_HEIGHT = NogginConstants.GOALBOX_DEPTH / 2.0 #radius
 LARGE_ELLIPSE_WIDTH = NogginConstants.CROSSBAR_CM_WIDTH / 2.0 #radius
 LARGE_ELLIPSE_CENTER_Y = NogginConstants.CENTER_FIELD_Y
-LARGE_ELLIPSE_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
+LARGE_ELLIPSE_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X +\
+    ELLIPSE_X_SHIFT
 # Angle limits for moving about ellipse
 ELLIPSE_ANGLE_MAX = 170.
 ELLIPSE_ANGLE_MIN = 10.
