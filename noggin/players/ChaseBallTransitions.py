@@ -1,6 +1,7 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
+import KickingHelpers as helpers
 from .. import NogginConstants
 from ..util import MyMath
 
@@ -99,7 +100,26 @@ def shouldDribble(player):
     """
     Ball is in between us and the opp goal, let's dribble for a while
     """
-    return constants.BALL_POS_KICK_MAX_X > player.brain.ball.relX
+    my = player.brain.my
+    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
+    goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                            dribbleAimPoint[0], dribbleAimPoint[1])
+    return  (constants.USE_DRIBBLE and
+             0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
+             0 < abs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
+             abs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING)
+
+def shouldStopDribbling(player):
+    """
+    While dribbling we should stop
+    """
+    my = player.brain.my
+    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
+    goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                            dribbleAimPoint[0], dribbleAimPoint[1])
+    return (player.brain.ball.relX > constants.STOP_DRIBBLE_X or
+            abs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
+            abs(goalBearing) > constants.STOP_DRIBBLE_BEARING)
 
 ######### BALL IN BOX ###############
 
@@ -123,11 +143,6 @@ def shouldChaseAroundBox(player):
                     NogginConstants.MY_GOALBOX_TOP_Y,
                     NogginConstants.MY_GOALBOX_RIGHT_X,
                     NogginConstants.MY_GOALBOX_TOP_Y) )
-
-
-
-
-
 
 ####### AVOIDANCE STUFF ##############
 

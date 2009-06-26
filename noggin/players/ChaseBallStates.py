@@ -1,7 +1,7 @@
 """
 Here we house all of the state methods used for chasing the ball
 """
-
+import KickingHelpers as helpers
 from man.noggin.util import MyMath
 from man.motion import SweetMoves
 import ChaseBallConstants as constants
@@ -48,8 +48,7 @@ def chase(player):
 
 def chaseAfterKick(player):
     if player.firstFrame():
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
         player.brain.tracker.trackBall()
 
@@ -80,8 +79,7 @@ def turnToBall(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
     # Determine the speed to turn to the ball
     turnRate = MyMath.clip(ball.bearing*constants.BALL_SPIN_GAIN,
@@ -118,8 +116,7 @@ def turnToBall(player):
 
 def approachBallWithLoc(player):
     if player.firstFrame():
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
     nav = player.brain.nav
     my = player.brain.my
@@ -194,8 +191,7 @@ def approachBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
     if player.penaltyKicking and \
             player.ballInOppGoalBox():
@@ -225,18 +221,23 @@ def approachBall(player):
     return approachBallWalk(player)
 
 def approachBallWalk(player):
-    if player.ballInMyGoalBox():
-        return player.goLater('ballInMyBox')
-    elif transitions.shouldChaseAroundBox(player):
-        return player.goLater('chaseAroundBox')
-    elif transitions.shouldApproachBallWithLoc(player):
-        return player.goNow('approachBallWithLoc')
-    elif transitions.shouldTurnToBall_ApproachBall(player):
-        return player.goLater('turnToBall')
-    elif transitions.shouldScanFindBall(player):
-        return player.goLater('scanFindBall')
-    elif transitions.shouldAvoidObstacle(player):
-        return player.goLater('avoidObstacle')
+    """
+    Method that is used by both approach ball and dribble
+    We use things as to when we should leave and how we should walk
+    """
+    if player.currentRole != pbc.GOALIE:
+        if player.ballInMyGoalBox():
+            return player.goLater('ballInMyBox')
+        elif transitions.shouldChaseAroundBox(player):
+            return player.goLater('chaseAroundBox')
+        elif transitions.shouldApproachBallWithLoc(player):
+            return player.goNow('approachBallWithLoc')
+        elif transitions.shouldTurnToBall_ApproachBall(player):
+            return player.goLater('turnToBall')
+        elif transitions.shouldScanFindBall(player):
+            return player.goLater('scanFindBall')
+        elif transitions.shouldAvoidObstacle(player):
+            return player.goLater('avoidObstacle')
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball
@@ -262,8 +263,8 @@ def positionForKick(player):
     """
     State to align on the ball once we are near it
     """
-    if player.lastState == 'dribble':
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
+    if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
     ball = player.brain.ball
 
@@ -306,6 +307,17 @@ def dribble(player):
     """
     if player.firstFrame():
         player.brain.motion.setGait(RobotGaits.DUCK_GAIT)
+
+    # if we should stop dribbling, see what else we should do
+    if transitions.shouldStopDribbling(player):
+
+        if transitions.shouldKick(player):
+            return player.goNow('waitBeforeKick')
+        elif transitions.shouldPositionForKick(player):
+            return player.goNow('positionForKick')
+        elif transitions.shouldApproachBall(player):
+            return player.goNow('approachBall')
+
     return approachBallWalk(player)
 
 def waitBeforeKick(player):
@@ -313,8 +325,7 @@ def waitBeforeKick(player):
     Stop before we kick to make sure we want to kick
     """
     if player.firstFrame():
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.brain.CoA.setRobotGait(player.brain.motion)
         player.stopWalking()
 
     if not player.brain.nav.isStopped():
@@ -338,9 +349,8 @@ def avoidObstacle(player):
     if player.firstFrame():
         player.doneAvoidingCounter = 0
         player.printf(player.brain.sonar)
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
 
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
         if (transitions.shouldAvoidObstacleLeft(player) and
             transitions.shouldAvoidObstacleRight(player)):
@@ -375,8 +385,8 @@ def avoidObstacle(player):
 def chaseAroundBox(player):
     if player.firstFrame():
         player.shouldNotChaseAroundBox = 0
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
@@ -435,8 +445,8 @@ def orbitBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.brain.nav.orbitAngle(player.orbitAngle)
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
 
     if player.brain.nav.isStopped():
@@ -455,8 +465,8 @@ def ballInMyBox(player):
     if player.firstFrame():
         player.brain.tracker.activeLoc()
         player.stopWalking()
-        if player.lastState == 'dribble':
-            player.brain.CoA.setRobotTurnGait(player.brain.motion)
+
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
     if not player.ballInMyGoalBox():
         return player.goLater('chase')

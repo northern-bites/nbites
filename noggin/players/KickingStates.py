@@ -221,7 +221,7 @@ def shootBallFar(player):
                                               shotAimPoint[0],
                                               shotAimPoint[1])
     if constants.DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
-    if constants.SHOOT_BALL_SIDE_FAR_KICK_ANGLE > abs(bearingToGoal) > \
+    if constants.SHOOT_BALL_FAR_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
             constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE:
         player.angleToAlign = bearingToGoal
         return player.goNow('alignOnBallStraightKick')
