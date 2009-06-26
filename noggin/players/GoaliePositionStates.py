@@ -7,16 +7,14 @@ from ..util import MyMath
 def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
     #goalie is out of position. difference in accuracy?
-    return player.goNow('goalieAwesomePosition')
-    '''TODO-
-    if helper.shouldMoveToSave():
-        player.goNow('goaliePositionForSave') '''
     player.isChasing = False
+    return player.goNow('goalieAwesomePosition')
+
     #if player.brain.nav.notAtHeading(NogginConstants.OPP_GOAL_HEADING):
     #    return player.goLater('goalieSpinToPosition')
-    if helper.useClosePosition(player):
-        return player.goNow('goaliePositionBallClose')
-    return player.goNow('goaliePositionBallFar')
+    #if helper.useClosePosition(player):
+    #    return player.goNow('goaliePositionBallClose')
+    #return player.goNow('goaliePositionBallFar')
 
 def goalieAwesomePosition(player):
     """
@@ -30,7 +28,7 @@ def goalieAwesomePosition(player):
     if player.firstFrame():
         player.changeOmniGoToCounter = 0
 
-    if helper.useFarPosition(player):
+    if brain.ball.locDist >= PBConstants.BALL_LOC_LIMIT:
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall()
@@ -42,7 +40,7 @@ def goalieAwesomePosition(player):
         player.changeOmniGoToCounter += 1
     else :
         player.changeOmniGoToCounter = 0
-    if player.changeOmniGoToCounter > NogginConstants.CHANGE_OMNI_THRESH:
+    if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
         changedOmni = True
 
     if player.firstFrame() or \
@@ -63,10 +61,10 @@ def goaliePositionForSave(player):
         player.brain.tracker.trackBall()
 
     strafeDir = helper.strafeDirForSave(player)
-    if strafeDir == 'right':
-        helper.strafeRight(player)
-    elif strafeDir == 'left':
-        helper.strafeLeft(player)
+    if strafeDir == -1:
+        helper.strafeRightSpeed(player)
+    elif strafeDir == 1:
+        helper.strafeLeftSpeed(player)
     else:
         player.stopWalking()
 

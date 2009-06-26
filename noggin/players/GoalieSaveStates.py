@@ -74,7 +74,7 @@ def holdCenterSave(player):
     return player.stay()
 
 def postSave(player):
-    player.walkPose()
+    player.standup()
     #if player.brain.ball.on:
     player.brain.tracker.trackBall()
     #else: do not yet created postSaveScan

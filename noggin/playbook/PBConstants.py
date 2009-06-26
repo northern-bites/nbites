@@ -284,7 +284,7 @@ BALL_LOC_LIMIT = 270 # Dist at which we stop active localization and just track
 GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X +\
     NogginConstants.GOALBOX_DEPTH * 0.5
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
-DIST_FROM_GOAL_INTERCEPT = NogginConstants.GOALBOX_DEPTH
+DIST_FROM_GOAL_INTERCEPT = 20 # NogginConstants.GOALBOX_DEPTH - 5
 END_CLEAR_BUFFER = 20.
 MIN_GOALIE_X = NogginConstants.MY_GOALBOX_LEFT_X
 LIMIT_Y_OFFSET = DIST_FROM_GOAL_INTERCEPT

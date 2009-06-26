@@ -99,7 +99,7 @@ def pGoalieNormal(team):
             goalLineIntersectionY =\
                 NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y +\
                 (rightPostToBall*NogginConstants.CROSSBAR_CM_WIDTH)/\
-                (rightPostToBall+rightPostToBall)
+                (rightPostToBall+leftPostToBall)
 
             ballToInterceptDist = MyMath.hypot(
                 ball.x - NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_X,
@@ -126,7 +126,7 @@ def pGoalieNormal(team):
                     if position[0] > NogginConstants.MY_GOALBOX_RIGHT_X +\
                             PBConstants.END_CLEAR_BUFFER:
                         print "my x is too high! position=", position
-    print "goalie position: ", position
+
     return [PBConstants.GOALIE_NORMAL, position]
 
 def pGoalieChaser(team):
@@ -134,51 +134,8 @@ def pGoalieChaser(team):
         pulling the goalie situations'''
 
     ball = team.brain.ball
-    position = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
-
-    if PBConstants.USE_FANCY_GOALIE:
-    #lets try maintaining home position until the ball is closer in
-    #might help us stay localized better
-        if 0 < ball.locDist < PBConstants.BALL_LOC_LIMIT:
-            leftPostToBall = MyMath.hypot(
-                NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y - ball.y,
-                NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_X - ball.x
-                )
-            rightPostToBall = MyMath.hypot(
-                NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y - ball.y,
-                NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_X - ball.x
-                )
-            goalLineIntersectionY =\
-                NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y +\
-                (rightPostToBall*NogginConstants.CROSSBAR_CM_WIDTH)/\
-                (leftPostToBall+rightPostToBall)
-
-            ballToInterceptDist = MyMath.hypot(
-                ball.x - NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_X,
-                ball.y - goalLineIntersectionY
-                )
-            position[1] = ((PBConstants.DIST_FROM_GOAL_INTERCEPT /
-                            ballToInterceptDist)*
-                           (ball.y - goalLineIntersectionY) +
-                           goalLineIntersectionY)
-
-            position[0] = ((PBConstants.DIST_FROM_GOAL_INTERCEPT /
-                            ballToInterceptDist)*
-                           (ball.x -
-                            NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_X) +
-                           NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_X)
-
-    # Here we are going to do some clipping of the
-            if position[0] < PBConstants.MIN_GOALIE_X:
-                position[0] = PBConstants.MIN_GOALIE_X
-                if position[1] < NogginConstants.MIDFIELD_Y:
-                    position = PBConstants.LEFT_LIMIT_POSITION
-                else:
-                    position = PBConstants.RIGHT_LIMIT_POSITION
-                    if position[0] > NogginConstants.MY_GOALBOX_RIGHT_X +\
-                            PBConstants.END_CLEAR_BUFFER:
-                        print "my x is too high! position=", position
-    print "goalie position: ", position
+    goal = pGoalieNormal(team)
+    position = [goal[1][0], goal[1][1]]
     return [PBConstants.GOALIE_CHASER, position]
 
 # Kickoff sub roles

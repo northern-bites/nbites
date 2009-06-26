@@ -1,6 +1,9 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+import GoalieTransitions as goalTrans
+import GoalieConstants as goalCon
 from ..playbook import PBConstants as pbc
+import man.motion.HeadMoves as HeadMoves
 from ..util import MyMath
 
 def scanFindBall(player):
@@ -63,23 +66,37 @@ def spinFindBall(player):
 
     return player.stay()
 
-def walkToBallLocPos(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-    if transitions.shouldApproachBallWithLoc(player):
-        player.brain.tracker.trackBall()
-        return player.goLater('approachBallWithLoc')
-    elif transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBall')
-
+def goalieScanFindBall(player):
     ball = player.brain.ball
-    destH = MyMath.getTargetHeading(player.brain.my, ball.x, ball.y)
-    dest = (ball.x, ball.y, destH)
+    head = player.brain.tracker
 
-    nav = player.brain.nav
-    if player.firstFrame() or \
-            nav.destX != dest[0] or \
-            nav.destY != dest[1] or \
-            nav.destH != dest[2]:
-        nav.goTo(dest)
+    if player.firstFrame():
+        time = goalTrans.getTimeUntilSave(player)
+        #timeUntilSave gives us an idea of if the ball was coming at us
+        if time != -1 and time < 10:
+            turnDir = goalTrans.strafeDirForSave(player)
+            if turnDir == 1:
+                head.lookToDir('leftDown')
+            if turnDir == -1:
+                head.lookToDir('rightDown')
+            return player.goLater('goalieSpinFindBall')
+        else:
+            head.trackBall()
+    if transitions.shouldTurnToBall_FoundBall(player):
+        return player.goLater('turnToBall')
+    elif transitions.shouldSpinFindBall(player):
+        return player.goLater('spinFindBall')
+
+    return player.stay()
+
+def goalieSpinFindBall(player):
+    ball = player.brain.ball
+    if player.firstFrame():
+        spinDir = goalTrans.strafeDirForSave(player)
+        #spinDir = MyMath.getSpinDir(ball.locBearing)
+        player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+    if not player.brain.motion.isHeadActive():
+        player.brain.tracker.trackBall()
+    if transitions.shouldTurnToBall_FoundBall(player):
+        return player.goLater('turnToBall')
     return player.stay()

@@ -18,7 +18,7 @@ def chase(player):
     """
     if player.currentRole == pbc.GOALIE:
         if transitions.shouldScanFindBall(player):
-            return player.goNow('scanFindBall')
+            return player.goNow('goalieScanFindBall')
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
         elif transitions.shouldKick(player):
@@ -28,7 +28,7 @@ def chase(player):
         elif transitions.shouldSpinFindBall(player):
             return player.goNow('spinFindBall')
         else:
-            return player.goNow('scanFindBall')
+            return player.goNow('goalieScanFindBall')
 
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
@@ -94,7 +94,7 @@ def turnToBall(player):
         elif transitions.shouldApproachBall(player):
             return player.goLater('approachBall')
         elif transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
+            return player.goLater('goalieScanFindBall')
     else:
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
@@ -199,7 +199,7 @@ def approachBall(player):
         elif transitions.shouldTurnToBall_ApproachBall(player):
             return player.goLater('turnToBall')
         elif transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
+            return player.goLater('goalieScanFindBall')
         elif transitions.shouldAvoidObstacle(player):
             return player.goLater('avoidObstacle')
     else:
