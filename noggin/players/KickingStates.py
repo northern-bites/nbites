@@ -199,7 +199,7 @@ def shootBallClose(player):
     bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                               shotAimPoint[0],
                                               shotAimPoint[1])
-    if DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
+    if constants.DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
     if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
             constants.SHOOT_BALL_LOC_ALIGN_ANGLE:
         player.angleToAlign = bearingToGoal
@@ -220,7 +220,7 @@ def shootBallFar(player):
     bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                               shotAimPoint[0],
                                               shotAimPoint[1])
-    if DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
+    if constants.DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
     if constants.SHOOT_BALL_SIDE_FAR_KICK_ANGLE > abs(bearingToGoal) > \
             constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE:
         player.angleToAlign = bearingToGoal
