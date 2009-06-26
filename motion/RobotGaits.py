@@ -33,8 +33,10 @@ JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                      5.5) # right swing hip roll addition
 
 SENSOR_CONFIG = (0.0,   # observer sensor scale
-                 0.75)   # angle XY sensor scale
-
+                 0.50,  # angle XY sensor scale
+                 15.0,   # max angle X (compensation)
+                 15.0,   # max angle Y
+                 75.0)   # max angle vel (change in compensation)
 STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.3,  #kneeStiffness
                     0.4,  #anklePitchStiffness

@@ -6,11 +6,14 @@
 /**
  * Checklist of things you need to update when adding an attribute to a
  * pre-existing Config:
+ *IN THIS FILE:
  *  - Add it to the enum. make sure to leave the LEN_XXX_CONFIG as the last
  *    item in the enum
  *  - Add the correct python->c++ conversion constant (e.g. LENGTH,ANGLE,NONE)
  *  - Add a reasonable default to initialize C instances incase walking is
  *    called without getting Gaits sent from Python first.
+ *IN ROBOTGAITS
+ *  - Fix the tuple lengths to match correctly
  */
 
 /**
@@ -99,6 +102,9 @@ namespace WP {
     enum SensorConfig{
         OBSERVER_SCALE=0,
         ANGLE_SCALE,
+        MAX_ANGLE_X,
+        MAX_ANGLE_Y,
+        MAX_ANGLE_VEL,
         LEN_SENSOR_CONFIG
     };
 
@@ -175,7 +181,10 @@ namespace WP {
      ANGLE};//hip hack r
     static const float SENSOR_CONVERSION[LEN_SENSOR_CONFIG]=
     {NONE,//Observer scale
-     NONE};//angle xy scale
+     NONE,
+     ANGLE,
+     ANGLE,
+     ANGLE};//angle xy scale
     static const float STIFF_CONVERSION[LEN_STIFF_CONFIG]=
     {NONE,//hip
      NONE,//knee
@@ -220,6 +229,9 @@ namespace WP {
      0.1f};//hip hack r
     static const float SENSOR_DEFAULT[LEN_SENSOR_CONFIG]=
     {0.0f,//Observer scale
+     0.0f,
+     0.0f,
+     0.0f,
      0.0f};//angle xy scale
     static const float STIFF_DEFAULT[LEN_STIFF_CONFIG]=
     {0.85f,//hip

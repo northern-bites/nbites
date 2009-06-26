@@ -246,32 +246,39 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
  *
  */
 const boost::tuple<const float,const float> WalkingLeg::getSensorFeedback(){
-    const float MAX_SENSOR_ANGLE_Y = 0.3f;
-    const float MAX_SENSOR_ANGLE_X = 0.2f;
+    const float MAX_SENSOR_ANGLE_X = gait->sensor[WP::MAX_ANGLE_X];
+    const float MAX_SENSOR_ANGLE_Y = gait->sensor[WP::MAX_ANGLE_Y];
 
-    const float MAX_SENSOR_VEL_Y = 0.1f;
-    const float MAX_SENSOR_VEL_X = 0.1f;
+    const float MAX_SENSOR_VEL = gait->sensor[WP::MAX_ANGLE_VEL]*
+        MotionConstants::MOTION_FRAME_LENGTH_S;
 
     //calculate the new angles, take into account gait angles already
     Inertial inertial = sensors->getInertial();
     const float angleScale = gait->sensor[WP::ANGLE_SCALE];
 
+    // const float desiredSensorAngleX =
+    //     std::pow(inertial.angleX,2)*std::sqrt(angleScale);
+    // const float desiredSensorAngleY =
+    //     std::pow(inertial.angleY-gait->stance[WP::BODY_ROT_Y],2)
+    //     *std::sqrt(angleScale);
     const float desiredSensorAngleX =
-        NBMath::clip(inertial.angleX*angleScale,
-                     MAX_SENSOR_ANGLE_X);
+        inertial.angleX*angleScale;
     const float desiredSensorAngleY =
-        NBMath::clip((inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale,
-                     MAX_SENSOR_ANGLE_Y);
+        (inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
 
-    //Clip the velocities
+    //Clip the velocities, and max. limits
     const float sensorAngleX =
-        NBMath::clip(desiredSensorAngleX,
-                     desiredSensorAngleX - MAX_SENSOR_VEL_X,
-                     desiredSensorAngleX + MAX_SENSOR_VEL_X);
+        NBMath::clip(
+            NBMath::clip(desiredSensorAngleX,
+                         desiredSensorAngleX - MAX_SENSOR_VEL,
+                         desiredSensorAngleX + MAX_SENSOR_VEL),
+            MAX_SENSOR_ANGLE_X);
     const float sensorAngleY =
-        NBMath::clip(desiredSensorAngleY,
-                     desiredSensorAngleY - MAX_SENSOR_VEL_Y,
-                     desiredSensorAngleY + MAX_SENSOR_VEL_Y);
+        NBMath::clip(
+            NBMath::clip(desiredSensorAngleY,
+                         desiredSensorAngleY - MAX_SENSOR_VEL,
+                         desiredSensorAngleY + MAX_SENSOR_VEL),
+            MAX_SENSOR_ANGLE_Y);
 
     lastSensorAngleX = sensorAngleX;
     lastSensorAngleY = sensorAngleY;
