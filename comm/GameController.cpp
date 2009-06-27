@@ -305,6 +305,8 @@ void GameController::advanceButtonClickState(){
     //We need to advance the states
     switch(currentState){
     case STATE_INITIAL:
+    case STATE_READY:
+    case STATE_SET:
         setGameState(STATE_PLAYING);
         if(currentPenalty != PENALTY_MANUAL){
             setPenalty(PENALTY_MANUAL);
