@@ -100,3 +100,21 @@ def goalieSpinFindBall(player):
     if transitions.shouldTurnToBall_FoundBall(player):
         return player.goLater('turnToBall')
     return player.stay()
+
+def walkToBallLocPos(player):
+    player.brain.tracker.trackBall()
+    if transitions.shouldApproachBallWithLoc(player):
+        player.brain.tracker.trackBall()
+        return player.goLater('approachBallWithLoc')
+    elif transitions.shouldTurnToBall_FoundBall(player):
+        ball = player.brain.ball
+        destH = MyMath.getTargetHeading(player.brain.my, ball.x, ball.y)
+        dest = (ball.x, ball.y, destH)
+
+    nav = player.brain.nav
+    if player.firstFrame() or \
+            nav.destX != dest[0] or \
+            nav.destY != dest[1] or \
+            nav.destH != dest[2]:
+        nav.goTo(dest)
+    return player.stay()
