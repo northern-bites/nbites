@@ -272,14 +272,18 @@ def positionForKick(player):
     if player.firstFrame():
         player.hasAlignedOnce = False
 
+    player.inKickingState = True
     # Leave this state if necessary
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
     elif transitions.shouldScanFindBall(player):
+        player.inKickingState = False
         return player.goLater('scanFindBall')
     elif transitions.shouldTurnToBallFromPositionForKick(player):
+        player.inKickingState = False
         return player.goLater('turnToBall')
     elif transitions.shouldApproachFromPositionForKick(player):
+        player.inKickingState = False
         return player.goLater('approachBall')
 
     # Determine approach speed
@@ -328,6 +332,7 @@ def waitBeforeKick(player):
     """
     Stop before we kick to make sure we want to kick
     """
+    player.inKickingState = True
     if player.firstFrame():
         player.brain.CoA.setRobotGait(player.brain.motion)
         player.stopWalking()
@@ -336,8 +341,10 @@ def waitBeforeKick(player):
         return player.stay()
     elif transitions.shouldApproachForKick(player):
         player.brain.tracker.trackBall()
+        player.inKickingState = False
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
+        player.inKickingState = False
         player.brain.tracker.trackBall()
         return player.goLater('scanFindBall')
     elif transitions.shouldRepositionForKick(player):
@@ -481,25 +488,16 @@ def approachDangerousBall(player):
         player.stopWalking()
     print "approach dangerous ball"
     my = player.brain.my
-    if -170 < my.h < -90: #ball to the right
-        player.setSteps(2,3,1,1)
-    elif 90 < my.h < 170:
-        player.setSteps(2,-3,-1,1)
-    else:
-        player.setSteps(1, -1, 1, 1)
+    #single steps towards ball and goal with spin
+    player.setSteps(0, 0, 0, 0)
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
-    #single steps towards ball and goal with spin
-    #still check for kicking
-
     if transitions.shouldScanFindBall(player):
         return player.goLater('goalieScanFindBall')
-    elif transitions.shouldKick(player):
-        return player.goLater('waitBeforeKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBall')
+        return player.goLater('goalieSpinFindBall')
 
     return player.stay()
