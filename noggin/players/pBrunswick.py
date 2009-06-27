@@ -47,6 +47,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.chosenKick = None
         self.kickDecider = None
         self.justKicked = False
+        self.inKickingState = False
 
         self.shouldSaveCounter = 0
         self.shouldChaseCounter = 0

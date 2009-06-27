@@ -18,6 +18,7 @@ def getKickInfo(player):
     """
     Decides which kick to use
     """
+    player.inKickingState = True
     if player.firstFrame():
         player.brain.tracker.switchTo('stopped')
         player.brain.motion.stopHeadMoves()
@@ -38,6 +39,7 @@ def getKickInfo(player):
         if player.brain.ball.framesOff < 100: # HACK, should be constant
             return player.stay()
         else :
+            player.inKickingState = False
             return player.goLater('scanFindBall')
 
     return player.goNow('decideKick')
@@ -45,6 +47,7 @@ def getKickInfo(player):
 def decideKick(player):
 
     if ChaseBallTransitions.shouldScanFindBall(player):
+        player.inKickingState = False
         return player.goLater('scanFindBall')
 
     # Get references to the collected data
@@ -160,6 +163,7 @@ def kickBallStraight(player):
     if player.brain.ball.on:
         player.kickDecider.ballForeWhichFoot()
     elif ChaseBallTransitions.shouldScanFindBall(player):
+        player.inKickingState = False
         return player.goLater('scanFindBall')
     else :
         return player.stay()
@@ -365,9 +369,11 @@ def sideStepForSideKick(player):
 
         # Ball must be in wrong place
         else :
+            player.inKickingState = False
             return player.goLater('chase')
 
     elif player.brain.ball.framesOff > ChaseBallConstants.BALL_OFF_THRESH:
+        player.inKickingState = False
         return player.goLater('scanFindBall')
     return player.stay()
 
@@ -481,6 +487,8 @@ def afterKick(player):
     """
     tracker = player.brain.tracker
     chosenKick = player.chosenKick
+    player.inKickingState = False
+
 
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():

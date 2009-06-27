@@ -270,15 +270,18 @@ def positionForKick(player):
         player.brain.CoA.setRobotGait(player.brain.motion)
 
     ball = player.brain.ball
-
+    player.inKickingState = True
     # Leave this state if necessary
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
     elif transitions.shouldScanFindBall(player):
+        player.inKickingState = False
         return player.goLater('scanFindBall')
     elif transitions.shouldTurnToBallFromPositionForKick(player):
+        player.inKickingState = False
         return player.goLater('turnToBall')
     elif transitions.shouldApproachFromPositionForKick(player):
+        player.inKickingState = False
         return player.goLater('approachBall')
 
     # Determine approach speed
@@ -327,6 +330,7 @@ def waitBeforeKick(player):
     """
     Stop before we kick to make sure we want to kick
     """
+    player.inKickingState = True
     if player.firstFrame():
         player.brain.CoA.setRobotGait(player.brain.motion)
         player.stopWalking()
@@ -335,8 +339,10 @@ def waitBeforeKick(player):
         return player.stay()
     elif transitions.shouldApproachForKick(player):
         player.brain.tracker.trackBall()
+        player.inKickingState = False
         return player.goLater('approachBall')
     elif transitions.shouldScanFindBall(player):
+        player.inKickingState = False
         player.brain.tracker.trackBall()
         return player.goLater('scanFindBall')
     elif transitions.shouldRepositionForKick(player):
