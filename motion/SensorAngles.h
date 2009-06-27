@@ -25,11 +25,18 @@ public:
     const boost::tuple<const float, const float> getAngles() const ;
 
 private:
+    void basic_sensor_feedback();
+    void spring_sensor_feedback();
+
+private:
     boost::shared_ptr<Sensors> sensors;
     const MetaGait * gait;
 
+    //store what will be returned by getAngles
     float sensorAngleX, sensorAngleY;
 
+
+    //OLD
     //State info
     //sensor feedback stuff
     float lastSensorAngleX,lastSensorAngleY;

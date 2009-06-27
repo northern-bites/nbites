@@ -16,6 +16,18 @@ SensorAngles::~SensorAngles(){}
 
 
 void SensorAngles::tick_sensors(){
+    basic_sensor_feedback();
+
+}
+
+
+void SensorAngles::spring_sensor_feedback(){
+
+
+
+}
+
+void SensorAngles::basic_sensor_feedback(){
     const float MAX_SENSOR_ANGLE_X = gait->sensor[WP::MAX_ANGLE_X];
     const float MAX_SENSOR_ANGLE_Y = gait->sensor[WP::MAX_ANGLE_Y];
 
