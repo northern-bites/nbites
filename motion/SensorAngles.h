@@ -22,7 +22,8 @@ public:
         Y
     };
 
-    const boost::tuple<const float, const float> getAngles() const ;
+    const boost::tuple<const float, const float>
+    getAngles(const float scale = 1.0f) const ;
 
 private:
     void basic_sensor_feedback();

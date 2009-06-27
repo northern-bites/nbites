@@ -148,6 +148,7 @@ private:
 public:
     const float getFootRotation();
 private:
+    const float getEndStepSensorScale();
     const float getFootRotation_c();
     const float getHipYawPitch();
     void applyHipHacks(float angles[]);

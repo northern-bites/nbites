@@ -77,8 +77,9 @@ void SensorAngles::reset(){
  * Get the sensor based adjustment to the body's rotation
  *
  */
-const boost::tuple<const float, const float> SensorAngles::getAngles() const {
+const boost::tuple<const float, const float>
+SensorAngles::getAngles(const float scale) const {
 
-    return boost::tuple<const float, const float> (sensorAngleX,
-                                                   sensorAngleY);
+    return boost::tuple<const float, const float> (sensorAngleX*scale,
+                                                   sensorAngleY*scale);
 }

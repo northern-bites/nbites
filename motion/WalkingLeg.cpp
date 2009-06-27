@@ -212,12 +212,16 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 
 
 const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
-    const boost::tuple <const float, const float > sensorCompensation =
-        sensorAngles->getAngles();
+    const float startStopSensorScale = getEndStepSensorScale();
 
-    const float bodyAngleX = sensorCompensation.get<SensorAngles::X>();
-    const float bodyAngleY = gait->stance[WP::BODY_ROT_Y]
-        + sensorCompensation.get<SensorAngles::Y>();
+    const boost::tuple <const float, const float > sensorCompensation =
+        sensorAngles->getAngles(startStopSensorScale);
+
+
+    const float bodyAngleX =
+        sensorCompensation.get<SensorAngles::X>();
+    const float bodyAngleY = gait->stance[WP::BODY_ROT_Y] +
+        sensorCompensation.get<SensorAngles::Y>();
 
     const float footAngleX = 0.0f;
     const float footAngleY = 0.0f;
@@ -241,6 +245,41 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 
+}
+
+/*
+ * When we are starting and stopping, we want to gradually turn on or off sensor
+ * feedback.  We do this by checking if the support step is an END step,
+ * and to see if the next step is also an end step. If so, and the next one
+ * is an end step as well, then we are stopping
+ * if not, then we are starting
+ */
+const float WalkingLeg::getEndStepSensorScale(){
+
+    //do nothing for regular steps
+    if(support_step->type == REGULAR_STEP)
+        return 1.0f;
+
+    float startScale, endScale;
+    if(swing_dest->type == REGULAR_STEP){
+        //Starting from stopped
+        //cout << "Starting!!!"<<endl;
+        startScale = 0.0f;
+        endScale = 1.0f;
+    }else{
+        //Stopping
+        //cout << "stopping!!!"<<endl;
+        startScale = 1.0f;
+        endScale = 0.0f;
+    }
+    //Assume in an END step, all frames are double support
+    float percent_complete = static_cast<float>(frameCounter) /
+        static_cast<float>(doubleSupportFrames);
+
+    const float theta = percent_complete*2.0f*M_PI_FLOAT;
+    const float percent_to_dest = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
+
+    return startScale + (endScale-startScale)*percent_complete;
 }
 
 /*  Returns the rotation for this motion frame which we expect
