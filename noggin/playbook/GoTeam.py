@@ -608,3 +608,9 @@ class Ellipse:
     Method to determine the two possible y values based on the x value passed
     """
     return self.getYfromTheta(acos((x-self.centerX)/self.a))
+
+  def getPositionFromTheta(self, theta):
+      """
+      return an (x, y) position from a given angle from the center
+      """
+      return [self.getXfromTheta(theta), self.getYfromTheta(theta)]
