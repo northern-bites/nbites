@@ -33,16 +33,8 @@ def goalieAwesomePosition(player):
     else:
         player.brain.tracker.trackBall()
 
-    useOmni = (MyMath.dist(my.x, my.y, position[0], position[1]) <=
-               PBConstants.BALL_LOC_LIMIT)
+    useOmni = helper.useOmni(player)
     changedOmni = False
-
-    if useOmni != nav.movingOmni:
-        player.changeOmniGoToCounter += 1
-    else :
-        player.changeOmniGoToCounter = 0
-    if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
-        changedOmni = True
 
     ball = brain.ball
     bearing = None
@@ -50,7 +42,6 @@ def goalieAwesomePosition(player):
         bearing = ball.bearing
     else:
         bearing = NogginConstants.OPP_GOAL_HEADING
-
     if not useOmni:
         nav.goTo((position[0], position[1], bearing))
     else:

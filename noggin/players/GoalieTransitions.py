@@ -55,7 +55,7 @@ def goalieRunChecks(player):
     return player.currentState
 
 def useClosePosition(player):
-    return (0 < player.brain.ball.dist <= (PBConstants.BALL_LOC_LIMIT - goalCon.BUFFER))
+    return (0 < player.brain.ball.x <= (PBConstants.BALL_LOC_LIMIT - goalCon.BUFFER))
 
 def useFarPosition(player):
     if player.penaltyKicking:
@@ -63,7 +63,7 @@ def useFarPosition(player):
 
     ball = player.brain.ball
     #switch out if we lose the ball for multiple frames
-    return (not (0 <= ball.dist <= PBConstants.BALL_LOC_LIMIT + goalCon.BUFFER) or
+    return (not (0 <= ball.x <= PBConstants.BALL_LOC_LIMIT + goalCon.BUFFER) or
             ball.framesOff > 500)
 
 def useLeftStrafeClose(player):
@@ -289,6 +289,17 @@ def dangerousBall(player):
             player.brain.myGoalCrossbar.on:
         return True
     #idea: draw ray from me to ball, see if it intersects goal
+
+def useOmni(player):
+    '''the '+' and '-' for y are intentionally reversed because of the
+    difficulty of using omniGoTo to get back from the points outside
+    of the goalposts'''
+    my = player.brain.my
+    if my.x < Constants.MY_GOALBOX_RIGHT_X + goalCon.BUFFER and\
+            my.y < Constants.MY_GOALBOX_TOP_Y - goalCon.BUFFER and\
+            my.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.BUFFER:
+        return True
+    return False
 
 def setRelY(player):
     ball = player.brain.ball
