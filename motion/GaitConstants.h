@@ -101,7 +101,10 @@ namespace WP {
  */
     enum SensorConfig{
         OBSERVER_SCALE=0,
-        ANGLE_SCALE,
+        GAMMA_X,
+        GAMMA_Y,
+        SPRING_K_X,
+        SPRING_K_Y,
         MAX_ANGLE_X,
         MAX_ANGLE_Y,
         MAX_ANGLE_VEL,
@@ -182,6 +185,9 @@ namespace WP {
     static const float SENSOR_CONVERSION[LEN_SENSOR_CONFIG]=
     {NONE,//Observer scale
      NONE,
+     NONE,
+     NONE,
+     NONE,
      ANGLE,
      ANGLE,
      ANGLE};//angle xy scale
@@ -229,9 +235,12 @@ namespace WP {
      0.1f};//hip hack r
     static const float SENSOR_DEFAULT[LEN_SENSOR_CONFIG]=
     {0.0f,//Observer scale
-     0.0f,
-     0.0f,
-     0.0f,
+     0.0f,//GX
+     0.0f,//GY
+     0.0f,//KX
+     0.0f,//KY
+     0.0f,//MAXVELX
+     0.0f,//MAXVELY
      0.0f};//angle xy scale
     static const float STIFF_DEFAULT[LEN_STIFF_CONFIG]=
     {0.85f,//hip

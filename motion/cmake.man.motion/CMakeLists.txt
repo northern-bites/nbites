@@ -123,6 +123,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/AbstractGait
 		     ${MOTION_INCLUDE_DIR}/MetaGait
 		     ${MOTION_INCLUDE_DIR}/SensorAngles
+		     ${MOTION_INCLUDE_DIR}/SpringSensor
 		     ${MOTION_INCLUDE_DIR}/WalkingLeg
 		     ${MOTION_INCLUDE_DIR}/WalkingArm
 		     ${MOTION_INCLUDE_DIR}/PreviewController

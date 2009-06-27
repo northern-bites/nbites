@@ -43,6 +43,10 @@ namespace CoordFrame3D{
     const NBMath::ufvector3 vector3D(const float x, const float y,
                                             const float z = 1.0f);
 
+    const NBMath::ufrowVector3 rowVector3D(const float x,
+                                           const float y,
+                                           const float z = 1.0f);
+
     const NBMath::ufmatrix3 identity3D();
 };
 

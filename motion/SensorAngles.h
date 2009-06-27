@@ -5,7 +5,7 @@
 #include <boost/tuple/tuple.hpp>
 #include "Sensors.h"
 #include "MetaGait.h"
-
+#include "SpringSensor.h"
 
 class SensorAngles{
 public:
@@ -36,6 +36,7 @@ private:
     //store what will be returned by getAngles
     float sensorAngleX, sensorAngleY;
 
+    SpringSensor springX,springY;
 
     //OLD
     //State info
