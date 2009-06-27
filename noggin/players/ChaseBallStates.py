@@ -486,25 +486,16 @@ def approachDangerousBall(player):
         player.stopWalking()
     print "approach dangerous ball"
     my = player.brain.my
-    if -170 < my.h < -90: #ball to the right
-        player.setSteps(2,3,1,1)
-    elif 90 < my.h < 170:
-        player.setSteps(2,-3,-1,1)
-    else:
-        player.setSteps(1, -1, 1, 1)
+    #single steps towards ball and goal with spin
+    player.setSteps(0, 0, 0, 0)
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
-    #single steps towards ball and goal with spin
-    #still check for kicking
-
     if transitions.shouldScanFindBall(player):
         return player.goLater('goalieScanFindBall')
-    elif transitions.shouldKick(player):
-        return player.goLater('waitBeforeKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBall')
+        return player.goLater('goalieSpinFindBall')
 
     return player.stay()
