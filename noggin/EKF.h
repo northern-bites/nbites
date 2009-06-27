@@ -28,6 +28,9 @@
 static const int ACC_NUM_DIMENSIONS = 3;
 static const int ACC_NUM_MEASUREMENTS = 3;
 
+static const int ANGLE_NUM_DIMENSIONS = 2;
+static const int ANGLE_NUM_MEASUREMENTS = 2;
+
 static const int ZMP_NUM_DIMENSIONS = 2;
 static const int ZMP_NUM_MEASUREMENTS = 2;
 static const float DONT_PROCESS_KEY = -1337.0f;
