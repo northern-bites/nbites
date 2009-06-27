@@ -223,10 +223,6 @@ def shootBallClose(player):
     """
     my = player.brain.my
     shotAimPoint = helpers.getShotCloseAimPoint(player)
-    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                              shotAimPoint[0],
-                                              shotAimPoint[1])
-
     leftPostBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                                 NogginConstants.
                                                 LANDMARK_OPP_GOAL_LEFT_POST_X,
@@ -237,18 +233,37 @@ def shootBallClose(player):
                                                  LANDMARK_OPP_GOAL_RIGHT_POST_X,
                                                  NogginConstants.
                                                  LANDMARK_OPP_GOAL_RIGHT_POST_Y)
+    # Am I looking between the posts?
     if rightPostBearing < 0 < leftPostBearing:
         return player.goNow('kickBallStraight')
 
-    if constants.DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
-    if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
+    leftShotPointBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                     constants.
+                                                     SHOOT_AT_LEFT_AIM_POINT[0],
+                                                     constants.
+                                                     SHOOT_AT_LEFT_AIM_POINT[1])
+
+    rightShotPointBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                      constants.
+                                                      SHOOT_AT_RIGHT_AIM_POINT[0],
+                                                      constants.
+                                                      SHOOT_AT_RIGHT_AIM_POINT[1])
+
+    # Turn to the closer shot point
+    if fabs(rightShotPointBearing) < fabs(leftShotPointBearing):
+        angleToAlign = rightShotPointBearing
+    else :
+        angleToAlign = leftShotPointBearing
+
+    if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(angleToAlign) > \
             constants.SHOOT_BALL_LOC_ALIGN_ANGLE and \
             not player.hasAlignedOnce:
-        player.angleToAlign = bearingToGoal
+        player.angleToAlign = angleToAlign
         return player.goNow('alignOnBallStraightKick')
-    elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+
+    elif angleToAlign > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallLeft')
-    elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+    elif angleToAlign < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallRight')
     else :
         return player.goLater('kickBallStraight')
