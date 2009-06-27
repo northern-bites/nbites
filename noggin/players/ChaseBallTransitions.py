@@ -105,9 +105,11 @@ def shouldDribble(player):
     goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                             dribbleAimPoint[0], dribbleAimPoint[1])
     return  (constants.USE_DRIBBLE and
+             not player.penaltyKicking and
              0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
              0 < abs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
-             abs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING)
+             abs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
+             not inOppGoalbox(player))
 
 def shouldStopDribbling(player):
     """
@@ -117,9 +119,17 @@ def shouldStopDribbling(player):
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
                                             dribbleAimPoint[0], dribbleAimPoint[1])
-    return (player.brain.ball.relX > constants.STOP_DRIBBLE_X or
+    return (player.penaltyKicking or
+            inOppGoalbox(player) or
+            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
             abs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
             abs(goalBearing) > constants.STOP_DRIBBLE_BEARING)
+
+
+def inOppGoalbox(player):
+    return (NogginConstants.OPP_GOALBOX_LEFT_X < player.brain.my.x and
+            NogginConstants.OPP_GOALBOX_BOTTOM_Y < player.brain.my.y <
+            NogginConstants.OPP_GOALBOX_TOP_Y)
 
 ######### BALL IN BOX ###############
 

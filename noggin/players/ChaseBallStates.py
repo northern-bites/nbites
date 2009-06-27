@@ -1,7 +1,6 @@
 """
 Here we house all of the state methods used for chasing the ball
 """
-import KickingHelpers as helpers
 from man.noggin.util import MyMath
 from man.motion import SweetMoves
 import ChaseBallConstants as constants
