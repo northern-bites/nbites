@@ -205,7 +205,7 @@ void StepGenerator::findSensorZMP(){
 }
 
 float StepGenerator::scaleSensors(const float sensorZMP, const float perfectZMP){
-    const float sensorWeight = gait->sensor[WP::OBSERVER_SCALE];
+    const float sensorWeight = 0.0f;//gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
@@ -214,7 +214,9 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
-    findSensorZMP();
+    //Turned off sensor zmp for now since we have a better method
+    //JS June 2009
+    //findSensorZMP();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 

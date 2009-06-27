@@ -4,13 +4,12 @@ using namespace std;
 
 Gait::Gait(const Gait & other){
     setGaitFromGait(other);
-    //cout << toString() <<endl;
+    //cout << "from Gait: "<<endl<< toString() <<endl;
 
 }
 Gait::Gait(const AbstractGait & other){
     setGaitFromGait(other);
-    //cout << toString() <<endl;
-
+    //cout << "from Abstract gait: "<<endl<< toString() <<endl;
 }
 
 Gait::Gait(
@@ -31,7 +30,7 @@ Gait::Gait(
                   _stiffness_config,
                   _odo_config,
                   _arm_config);
-    //cout << toString() <<endl;
+    //cout << "from arrays: "<<endl<< toString() <<endl;
 }
 
 

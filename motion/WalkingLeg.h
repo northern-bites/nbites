@@ -43,7 +43,18 @@
  * Eventually, the tick() method should probably be passed something like a
  * LocalStep, which is a step defined in the c frame. If this step has attr.
  * such as destination for the legs, duration, etc, we should be able to move
- * forward with steps of variable length, etc 
+ * forward with steps of variable length, etc
+ *
+ * BUGS: One architecture thing, between here and the switchboard is the fact
+ * that when we are stopping, we actually call through one frame into the next
+ * walk cycle, because we wait to find out that we are done until the end of 
+ * the frame after we've done work.
+ * Potential fix: check if we would be switching support frames at the end
+ * AND beginning of the tick_legs method, and then  return done correctly
+ * OR, pick a totally different metric for being done.
+ * actually, that is a much better idea -- the condition might be more explicit
+ * as simply when  the second endstep is enqueued, if it on the last frame
+ * of its computation in a cycle, then we are done.
  *
  */
 

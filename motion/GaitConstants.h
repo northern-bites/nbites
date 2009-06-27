@@ -100,8 +100,11 @@ namespace WP {
  * angleScale      -- proportion of angleXY feedback
  */
     enum SensorConfig{
-        OBSERVER_SCALE=0,
-        ANGLE_SCALE,
+        FEEDBACK_TYPE=0, //This is a bit bad, since we don't want to interpolate
+        GAMMA_X,
+        GAMMA_Y,
+        SPRING_K_X,
+        SPRING_K_Y,
         MAX_ANGLE_X,
         MAX_ANGLE_Y,
         MAX_ANGLE_VEL,
@@ -181,10 +184,13 @@ namespace WP {
      ANGLE};//hip hack r
     static const float SENSOR_CONVERSION[LEN_SENSOR_CONFIG]=
     {NONE,//Observer scale
-     NONE,
+     NONE,//gX
+     NONE,//gy
+     NONE,//kx
+     NONE,//ky
      ANGLE,
      ANGLE,
-     ANGLE};//angle xy scale
+     ANGLE};//angle vel
     static const float STIFF_CONVERSION[LEN_STIFF_CONFIG]=
     {NONE,//hip
      NONE,//knee
@@ -229,9 +235,12 @@ namespace WP {
      0.1f};//hip hack r
     static const float SENSOR_DEFAULT[LEN_SENSOR_CONFIG]=
     {0.0f,//Observer scale
-     0.0f,
-     0.0f,
-     0.0f,
+     0.0f,//GX
+     0.0f,//GY
+     0.0f,//KX
+     0.0f,//KY
+     0.0f,//MAXVELX
+     0.0f,//MAXVELY
      0.0f};//angle xy scale
     static const float STIFF_DEFAULT[LEN_STIFF_CONFIG]=
     {0.85f,//hip

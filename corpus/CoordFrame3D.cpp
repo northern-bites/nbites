@@ -75,6 +75,16 @@ const NBMath::ufvector3 CoordFrame3D::vector3D(const float x, const float y,
     return p;
 }
 
+const NBMath::ufrowVector3 CoordFrame3D::rowVector3D(const float x,
+                                                  const float y,
+                                                  const float z) {
+    NBMath::ufrowVector3 p;
+    p(0,0) = x;
+    p(0,1) = y;
+    p(0,2) = z;
+    return p;
+}
+
 const NBMath::ufmatrix3 CoordFrame3D::identity3D(){
     return boost::numeric::ublas::identity_matrix <float> (3);
 }
