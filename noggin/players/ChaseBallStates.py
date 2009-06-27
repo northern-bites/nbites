@@ -244,6 +244,8 @@ def positionForKick(player):
     State to align on the ball once we are near it
     """
     ball = player.brain.ball
+    if player.firstFrame():
+        player.hasAlignedOnce = False
 
     # Leave this state if necessary
     if transitions.shouldKick(player):
