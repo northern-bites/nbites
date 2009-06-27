@@ -68,6 +68,7 @@
 //#define DEBUG_WALKING_GOAL_CONTINUITY
 #  define DEBUG_WALKING_LOCUS_LOGGING
 #  define DEBUG_WALKING_DEST_LOGGING
+#  define DEBUG_WALKING_SENSOR_LOGGING
 #endif
 
 typedef boost::tuple<std::vector<float>,
@@ -184,12 +185,16 @@ private:
     std::string leg_name;
 
     const SensorAngles * sensorAngles;
+    float sensorAngleX, sensorAngleY;
 
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     FILE * locus_log;
 #endif
 #ifdef DEBUG_WALKING_DEST_LOGGING
     FILE * dest_log;
+#endif
+#ifdef DEBUG_WALKING_SENSOR_LOGGING
+    FILE * sensor_log;
 #endif
 };
 
