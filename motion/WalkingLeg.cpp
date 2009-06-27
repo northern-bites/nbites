@@ -28,6 +28,7 @@ using namespace NBMath;
 
 WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
                        const MetaGait * _gait,
+                       const SensorAngles * _sensorAngles,
                        ChainID id)
     :sensors(s),
      state(SUPPORTING),
@@ -39,7 +40,8 @@ WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      lastRotation(0.0f),odoUpdate(3,0.0f),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
-     leg_name(id == LLEG_CHAIN ? "left" : "right")
+     leg_name(id == LLEG_CHAIN ? "left" : "right"),
+     sensorAngles(_sensorAngles)
 {
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     char filepath[100];
@@ -210,12 +212,12 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 
 
 const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
-    boost::tuple <const float, const float > sensorAngles =
-        getSensorFeedback();
+    const boost::tuple <const float, const float > sensorCompensation =
+        sensorAngles->getAngles();
 
-    const float bodyAngleX = sensorAngles.get<0>();
+    const float bodyAngleX = sensorCompensation.get<SensorAngles::X>();
     const float bodyAngleY = gait->stance[WP::BODY_ROT_Y]
-        + sensorAngles.get<1>();
+        + sensorCompensation.get<SensorAngles::Y>();
 
     const float footAngleX = 0.0f;
     const float footAngleY = 0.0f;
@@ -239,52 +241,6 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 
-}
-
-/*
- * Get the sensor based adjustment to the body's rotation
- *
- */
-const boost::tuple<const float,const float> WalkingLeg::getSensorFeedback(){
-    const float MAX_SENSOR_ANGLE_X = gait->sensor[WP::MAX_ANGLE_X];
-    const float MAX_SENSOR_ANGLE_Y = gait->sensor[WP::MAX_ANGLE_Y];
-
-    const float MAX_SENSOR_VEL = gait->sensor[WP::MAX_ANGLE_VEL]*
-        MotionConstants::MOTION_FRAME_LENGTH_S;
-
-    //calculate the new angles, take into account gait angles already
-    Inertial inertial = sensors->getInertial();
-    const float angleScale = gait->sensor[WP::ANGLE_SCALE];
-
-    // const float desiredSensorAngleX =
-    //     std::pow(inertial.angleX,2)*std::sqrt(angleScale);
-    // const float desiredSensorAngleY =
-    //     std::pow(inertial.angleY-gait->stance[WP::BODY_ROT_Y],2)
-    //     *std::sqrt(angleScale);
-    const float desiredSensorAngleX =
-        inertial.angleX*angleScale;
-    const float desiredSensorAngleY =
-        (inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
-
-    //Clip the velocities, and max. limits
-    const float sensorAngleX =
-        NBMath::clip(
-            NBMath::clip(desiredSensorAngleX,
-                         desiredSensorAngleX - MAX_SENSOR_VEL,
-                         desiredSensorAngleX + MAX_SENSOR_VEL),
-            MAX_SENSOR_ANGLE_X);
-    const float sensorAngleY =
-        NBMath::clip(
-            NBMath::clip(desiredSensorAngleY,
-                         desiredSensorAngleY - MAX_SENSOR_VEL,
-                         desiredSensorAngleY + MAX_SENSOR_VEL),
-            MAX_SENSOR_ANGLE_Y);
-
-    lastSensorAngleX = sensorAngleX;
-    lastSensorAngleY = sensorAngleY;
-
-    return boost::tuple<const float, const float> (sensorAngleX,
-                                                   sensorAngleY);
 }
 
 /*  Returns the rotation for this motion frame which we expect
@@ -497,9 +453,6 @@ void WalkingLeg::startLeft(){
     }else{
         setState(PERSISTENT_DOUBLE_SUPPORT);
     }
-
-    resetSensorFeedback();
-
 }
 void WalkingLeg::startRight(){
     if(chainID == LLEG_CHAIN){
@@ -509,10 +462,6 @@ void WalkingLeg::startRight(){
     }else{
         setState(DOUBLE_SUPPORT);
     }
-    resetSensorFeedback();
-}
-void WalkingLeg::resetSensorFeedback(){
-lastSensorAngleX = lastSensorAngleY = 0.0f;
 }
 
 
