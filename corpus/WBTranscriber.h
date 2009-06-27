@@ -3,6 +3,7 @@
 
 
 #include <webots/servo.h>
+#include <boost/tuple/tuple.hpp>
 
 #include "Transcriber.h"
 #include "AccEKF.h"
@@ -16,6 +17,10 @@ public:
     void postMotionSensors();
     void postVisionSensors();
 
+private:
+    const boost::tuple<const float, const float>
+    WBTranscriber::angleWrapper(const float accX, const float accY,
+                                const float gyroX,const float gyroY);
 private:
     AccEKF accEKF;
     std::vector<float> jointValues;

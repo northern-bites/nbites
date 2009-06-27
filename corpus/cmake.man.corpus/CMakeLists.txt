@@ -128,7 +128,6 @@ SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
 
 ########### ROBOT CONNET #########
 SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/AccEKF
-                        ${CORPUS_INCLUDE_DIR}/AngleEKF
 			${CORPUS_INCLUDE_DIR}/RoboGuardian
 			${CORPUS_INCLUDE_DIR}/ClickableButton
 			${CORPUS_INCLUDE_DIR}/PyRoboGuardian
@@ -137,6 +136,7 @@ SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/AccEKF
 
 IF(WEBOTS_BACKEND)
   LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/WBEnactor
+  	                          ${CORPUS_INCLUDE_DIR}/AngleEKF
                                   ${CORPUS_INCLUDE_DIR}/WBTranscriber
                                   ${CORPUS_INCLUDE_DIR}/WBImageTranscriber
 				 )
