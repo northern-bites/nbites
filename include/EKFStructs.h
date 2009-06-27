@@ -64,6 +64,15 @@ struct AccelMeasurement {
     float z;
 };
 
+/**
+ * AngleMeasurement - a class for holding angleX, angleY
+ */
+
+struct AngleMeasurement{
+  float angleX;
+  float angleY;
+};
+
 
 /**
  * ZmpTimeUpdate - For ZmpEKF, the apriori input comes as the zmp from the

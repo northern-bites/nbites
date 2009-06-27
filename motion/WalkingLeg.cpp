@@ -28,6 +28,7 @@ using namespace NBMath;
 
 WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
                        const MetaGait * _gait,
+                       const SensorAngles * _sensorAngles,
                        ChainID id)
     :sensors(s),
      state(SUPPORTING),
@@ -39,7 +40,8 @@ WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      lastRotation(0.0f),odoUpdate(3,0.0f),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
-     leg_name(id == LLEG_CHAIN ? "left" : "right")
+     leg_name(id == LLEG_CHAIN ? "left" : "right"),
+     sensorAngles(_sensorAngles), sensorAngleX(0.0f), sensorAngleY(0.0f)
 {
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     char filepath[100];
@@ -52,6 +54,14 @@ WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
     sprintf(filepath2,"/tmp/%s_dest_log.xls",leg_name.c_str());
     dest_log  = fopen(filepath2,"w");
     fprintf(dest_log,"time\tdest_x\tdest_y\tsrc_x\tsrc_y\tstate\n");
+#endif
+#ifdef DEBUG_WALKING_SENSOR_LOGGING
+    char filepath3[120];
+    sprintf(filepath3,"/tmp/%s_sensor_log.xls",leg_name.c_str());
+    sensor_log  = fopen(filepath3,"w");
+    fprintf(sensor_log,"time\tbodyAngleX\tbodyAngleY\t"
+            "sensorAngleX\tsensorAngleY\t"
+            "angleX\tangleY\tstate\n");
 #endif
     for ( unsigned int i = 0 ; i< LEG_JOINTS; i++) lastJoints[i]=0.0f;
 }
@@ -210,12 +220,15 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 
 
 const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
-    boost::tuple <const float, const float > sensorAngles =
-        getSensorFeedback();
+    const float startStopSensorScale = getEndStepSensorScale();
 
-    const float bodyAngleX = sensorAngles.get<0>();
-    const float bodyAngleY = gait->stance[WP::BODY_ROT_Y]
-        + sensorAngles.get<1>();
+    const boost::tuple <const float, const float > sensorCompensation =
+        sensorAngles->getAngles(startStopSensorScale);
+
+    const float bodyAngleX = sensorAngleX =
+        sensorCompensation.get<SensorAngles::X>();
+    const float bodyAngleY = sensorAngleY = gait->stance[WP::BODY_ROT_Y] +
+        sensorCompensation.get<SensorAngles::Y>();
 
     const float footAngleX = 0.0f;
     const float footAngleY = 0.0f;
@@ -242,49 +255,40 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
 }
 
 /*
- * Get the sensor based adjustment to the body's rotation
- *
+ * When we are starting and stopping, we want to gradually turn on or off sensor
+ * feedback.  We do this by checking if the support step is an END step,
+ * and to see if the next step is also an end step. If so, and the next one
+ * is an end step as well, then we are stopping
+ * if not, then we are starting
  */
-const boost::tuple<const float,const float> WalkingLeg::getSensorFeedback(){
-    const float MAX_SENSOR_ANGLE_X = gait->sensor[WP::MAX_ANGLE_X];
-    const float MAX_SENSOR_ANGLE_Y = gait->sensor[WP::MAX_ANGLE_Y];
+const float WalkingLeg::getEndStepSensorScale(){
 
-    const float MAX_SENSOR_VEL = gait->sensor[WP::MAX_ANGLE_VEL]*
-        MotionConstants::MOTION_FRAME_LENGTH_S;
+    //do nothing for regular steps
+    if(support_step->type == REGULAR_STEP)
+        return 1.0f;
 
-    //calculate the new angles, take into account gait angles already
-    Inertial inertial = sensors->getInertial();
-    const float angleScale = gait->sensor[WP::ANGLE_SCALE];
+    if ( swing_src->type==END_STEP)
+        //We've already stopped, so don't scale down again!
+        return 0.0f;
 
-    // const float desiredSensorAngleX =
-    //     std::pow(inertial.angleX,2)*std::sqrt(angleScale);
-    // const float desiredSensorAngleY =
-    //     std::pow(inertial.angleY-gait->stance[WP::BODY_ROT_Y],2)
-    //     *std::sqrt(angleScale);
-    const float desiredSensorAngleX =
-        inertial.angleX*angleScale;
-    const float desiredSensorAngleY =
-        (inertial.angleY-gait->stance[WP::BODY_ROT_Y])*angleScale;
+    float startScale, endScale;
+    if(swing_dest->type == REGULAR_STEP){
+        //Starting from stopped
+        startScale = 0.0f;
+        endScale = 1.0f;
+    }else{
+        //Stopping
+        startScale = 1.0f;
+        endScale = 0.0f;
+    }
+    //WARNING: Assume in an END step, all frames of cycle are double support
+    float percent_complete = static_cast<float>(frameCounter) /
+        static_cast<float>(doubleSupportFrames);
 
-    //Clip the velocities, and max. limits
-    const float sensorAngleX =
-        NBMath::clip(
-            NBMath::clip(desiredSensorAngleX,
-                         desiredSensorAngleX - MAX_SENSOR_VEL,
-                         desiredSensorAngleX + MAX_SENSOR_VEL),
-            MAX_SENSOR_ANGLE_X);
-    const float sensorAngleY =
-        NBMath::clip(
-            NBMath::clip(desiredSensorAngleY,
-                         desiredSensorAngleY - MAX_SENSOR_VEL,
-                         desiredSensorAngleY + MAX_SENSOR_VEL),
-            MAX_SENSOR_ANGLE_Y);
+    const float theta = percent_complete*2.0f*M_PI_FLOAT;//TODO: move to common
+    const float percent_to_dest = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
-    lastSensorAngleX = sensorAngleX;
-    lastSensorAngleY = sensorAngleY;
-
-    return boost::tuple<const float, const float> (sensorAngleX,
-                                                   sensorAngleY);
+    return startScale + (endScale-startScale)*percent_to_dest;
 }
 
 /*  Returns the rotation for this motion frame which we expect
@@ -497,9 +501,6 @@ void WalkingLeg::startLeft(){
     }else{
         setState(PERSISTENT_DOUBLE_SUPPORT);
     }
-
-    resetSensorFeedback();
-
 }
 void WalkingLeg::startRight(){
     if(chainID == LLEG_CHAIN){
@@ -509,10 +510,6 @@ void WalkingLeg::startRight(){
     }else{
         setState(DOUBLE_SUPPORT);
     }
-    resetSensorFeedback();
-}
-void WalkingLeg::resetSensorFeedback(){
-lastSensorAngleX = lastSensorAngleY = 0.0f;
 }
 
 
@@ -604,6 +601,9 @@ void WalkingLeg::debugProcessing(){
     }
 #endif
 
+//DANGER/HACK these static timers probably get incremented twice per frame
+//once in th left leg, and once in the right leg
+
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     static float ttime= 0.0f;
     fprintf(locus_log,"%f\t%f\t%f\t%f\t%d\n",ttime,goal(0),goal(1),goal(2),state);
@@ -616,5 +616,18 @@ void WalkingLeg::debugProcessing(){
             swing_src->x,swing_src->y,state);
     stime += 0.02f;
 #endif
-
+#ifdef DEBUG_WALKING_SENSOR_LOGGING
+    static float sentime= 0.0f;
+    Inertial inertial = sensors->getInertial();
+    fprintf(sensor_log,
+            "%f\t%f\t"
+            "%f\t%f\t"
+            "%f\t%f\t"
+            "%f\t%d\n",sentime,
+            0.0f,gait->stance[WP::BODY_ROT_Y],
+            sensorAngleX,sensorAngleY,
+            inertial.angleX,inertial.angleY,
+            state);
+    sentime += 0.02f;
+#endif
 }

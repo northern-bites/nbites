@@ -55,6 +55,7 @@
 #include <boost/tuple/tuple.hpp>
 #include "WalkingConstants.h"
 #include "MetaGait.h"
+#include "SensorAngles.h"
 #include "Step.h"
 #include "CoordFrame.h"
 #include "Kinematics.h"
@@ -67,6 +68,7 @@
 //#define DEBUG_WALKING_GOAL_CONTINUITY
 #  define DEBUG_WALKING_LOCUS_LOGGING
 #  define DEBUG_WALKING_DEST_LOGGING
+#  define DEBUG_WALKING_SENSOR_LOGGING
 #endif
 
 typedef boost::tuple<std::vector<float>,
@@ -82,6 +84,7 @@ class WalkingLeg  {
 public:
     WalkingLeg(    boost::shared_ptr<Sensors> s,
                    const MetaGait * _gait,
+                   const SensorAngles * _sensorAngles,
                    Kinematics::ChainID id);
     ~WalkingLeg();
 
@@ -140,13 +143,13 @@ private:
     bool shouldSwitchStates();
     bool firstFrame(){return frameCounter == 0;}
     void assignStateTimes(boost::shared_ptr<Step> step);
-    void resetSensorFeedback();
     const boost::tuple<const float, const float> getSensorFeedback();
     void debugProcessing();
 //hack
 public:
     const float getFootRotation();
 private:
+    const float getEndStepSensorScale();
     const float getFootRotation_c();
     const float getHipYawPitch();
     void applyHipHacks(float angles[]);
@@ -181,14 +184,17 @@ private:
     int leg_sign; //-1 for right leg, 1 for left leg
     std::string leg_name;
 
-    //sensor feedback stuff
-    float lastSensorAngleX,lastSensorAngleY;
+    const SensorAngles * sensorAngles;
+    float sensorAngleX, sensorAngleY;
 
 #ifdef DEBUG_WALKING_LOCUS_LOGGING
     FILE * locus_log;
 #endif
 #ifdef DEBUG_WALKING_DEST_LOGGING
     FILE * dest_log;
+#endif
+#ifdef DEBUG_WALKING_SENSOR_LOGGING
+    FILE * sensor_log;
 #endif
 };
 

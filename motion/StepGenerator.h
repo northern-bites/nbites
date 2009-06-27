@@ -180,6 +180,8 @@ private:
 
     bool done;
 
+    SensorAngles sensorAngles;
+
     NBMath::ufvector3 com_i,last_com_c,com_f,est_zmp_i;
     //boost::numeric::ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)

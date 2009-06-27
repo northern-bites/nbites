@@ -38,7 +38,9 @@ using namespace NBMath;
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
-    done(true),com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+    done(true),
+    sensorAngles(s,_gait),
+    com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
@@ -49,7 +51,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     fc_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
     sensors(s),gait(_gait),nextStepIsLeft(true),waitForController(0),
-    leftLeg(s,gait,LLEG_CHAIN), rightLeg(s,gait,RLEG_CHAIN),
+    leftLeg(s,gait,&sensorAngles,LLEG_CHAIN),
+    rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
     leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
     //controller_x(new PreviewController()),
@@ -261,7 +264,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_legs" << endl;
 #endif
-
+    sensorAngles.tick_sensors();
     //Decide if this is the first frame into any double support phase
     //which is the critical point when we must swap coord frames, etc
     if(leftLeg.isSwitchingSupportMode() && leftLeg.stateIsDoubleSupport()){
@@ -691,6 +694,7 @@ void StepGenerator::resetSteps(const bool startLeft){
     //Each time we restart, we need to reset the estimated sensor ZMP:
     zmp_filter = ZmpEKF();
 
+    sensorAngles.reset();
 
     //Third, we reset the memory of where to generate ZMP from steps back to
     //the origin
