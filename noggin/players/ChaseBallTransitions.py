@@ -231,7 +231,7 @@ def shouldntStopChasing(player):
     """
     Dont switch out of chaser in certain circumstances
     """
-    return (player.isChasing)
+    return player.inKickingState
 
 def shouldWalkToBallLocPos(player):
     return player.counter > constants.WALK_TO_BALL_LOC_POS_FRAMES and \

@@ -282,7 +282,7 @@ RIGHT_WING_MAX_Y = (NogginConstants.FIELD_WIDTH - NogginConstants.GREEN_PAD_Y)
 
 #GOALIE
 BALL_LOC_LIMIT = 220 # Dist at which we stop active localization and just track
-END_CLEAR_BUFFER = 20.
+END_CLEAR_BUFFER = 10.
 # elliptical positioning
 GOAL_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
 GOAL_CENTER_Y = NogginConstants.CENTER_FIELD_Y

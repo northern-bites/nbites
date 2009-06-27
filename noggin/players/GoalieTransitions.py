@@ -10,47 +10,29 @@ def goalieRunChecks(player):
 
     setRelX(player)
     setRelY(player)
-    if not player.saving:
-        '''
-        if shouldSave(player):
-            player.shouldSaveCounter += 1
-            if player.shouldSaveCounter >= 2:
-                player.shouldSaveCounter = 0
-                return 'goalieSave'
+
+    if not player.isChasing:
+        if shouldChaseLoc(player):
+            player.shouldChaseCounter+=1
+            if DEBUG: print "should chase: ", player.shouldChaseCounter
+            if player.shouldChaseCounter >= 3:
+                player.shouldChaseCounter = 0
+                player.isChasing = True
+                return 'chase'
         else:
-            player.shouldSaveCounter = 0
+            player.shouldChaseCounter = 0
 
-        if player.currentState != 'goaliePositionForSave':
-            if shouldPositionForSave(player):
-                player.posForSaveCounter += 1
-                if player.posForSaveCounter >= 2:
-                    player.posForSaveCounter = 0
-                    return 'goaliePositionForSave'
-            else:
-                player.posForSaveCounter = 0
-                '''
-        if not player.isChasing:
-            if shouldChaseLoc(player):
-                player.shouldChaseCounter+=1
-                if DEBUG: print "should chase: ", player.shouldChaseCounter
-                if player.shouldChaseCounter >= 3:
-                    player.shouldChaseCounter = 0
-                    player.isChasing = True
-                    return 'chase'
-            else:
+    elif player.isChasing and\
+                not chaseTran.shouldntStopChasing(player):
+        if shouldStopChaseLoc(player) :
+            player.shouldChaseCounter+=1
+            if DEBUG: print "should stop chase: ", player.shouldChaseCounter
+            if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
-
-        elif player.isChasing:
-            if shouldStopChaseLoc(player) and\
-                    not chaseTran.shouldntStopChasing(player):
-                player.shouldChaseCounter+=1
-                if DEBUG: print "should stop chase: ", player.shouldChaseCounter
-                if player.shouldChaseCounter >= 3:
-                    player.shouldChaseCounter = 0
-                    player.isChasing = False
-                    return 'goaliePosition'
-            else:
-                player.shouldChaseCounter = 0
+                player.isChasing = False
+                return 'goaliePosition'
+        else:
+            player.shouldChaseCounter = 0
 
     return player.currentState
 
@@ -229,36 +211,29 @@ def shouldChaseLoc(player):
 
     ball = player.brain.ball
     my = player.brain.my
-    if player.subRole == PBConstants.GOALIE_CHASER and\
-            (ball.y > Constants.MY_GOALBOX_BOTTOM_Y - 10  and
-             ball.y < Constants.MY_GOALBOX_TOP_Y + 10 and
-             ball.x < Constants.MY_GOALBOX_RIGHT_X + 10):
-            return True
-    else:
-        if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y  and
-            ball.y < Constants.MY_GOALBOX_TOP_Y and
-            ball.x < Constants.MY_GOALBOX_RIGHT_X):
-            return True
+
+    if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y  and
+        ball.y < Constants.MY_GOALBOX_TOP_Y and
+        ball.x < Constants.MY_GOALBOX_RIGHT_X):
+        return True
+    '''
     if (my.x < Constants.MY_GOALBOX_RIGHT_X and
         my.y < Constants.MY_GOALBOX_TOP_Y and
         my.y > Constants.MY_GOALBOX_BOTTOM_Y and
         (0 < ball.locDist <= 50 or 0 < ball.dist <= 50)):
         return True
+    '''
     return False
 
 def shouldStopChaseLoc(player):
     my = player.brain.my
     ball = player.brain.ball
-    if player.subRole == PBConstants.GOALIE_CHASER and\
-            (ball.y < Constants.MY_GOALBOX_BOTTOM_Y - 10  and
-             ball.y > Constants.MY_GOALBOX_TOP_Y + 10 and
-             ball.x < Constants.MY_GOALBOX_RIGHT_X + 10):
-            return True
-    else:
-        if (ball.y < Constants.MY_GOALBOX_BOTTOM_Y - 5  and
-              ball.y > Constants.MY_GOALBOX_TOP_Y + 5 and
-              ball.x > Constants.MY_GOALBOX_RIGHT_X + 5):
-            return True
+    if (ball.y < Constants.MY_GOALBOX_BOTTOM_Y or
+        ball.y > Constants.MY_GOALBOX_TOP_Y or
+        ball.x > Constants.MY_GOALBOX_RIGHT_X +\
+            PBConstants.END_CLEAR_BUFFER):
+        return True
+    '''
     if (my.x > Constants.MY_GOALBOX_RIGHT_X + PBConstants.END_CLEAR_BUFFER
         or my.y > Constants.MY_GOALBOX_TOP_Y + PBConstants.END_CLEAR_BUFFER
         or my.y < Constants.MY_GOALBOX_BOTTOM_Y + PBConstants.END_CLEAR_BUFFER):
@@ -266,8 +241,9 @@ def shouldStopChaseLoc(player):
     elif (my.x < Constants.MY_GOALBOX_RIGHT_X
           or my.y < Constants.MY_GOALBOX_TOP_Y
           or my.y > Constants.MY_GOALBOX_BOTTOM_Y) and\
-          (ball.locDist >= 150 or ball.dist >= 150):
+          (ball.locDist >= 70 or ball.dist >= 70):
           return True
+    '''
     return False
 
 def outOfPosition(player):
