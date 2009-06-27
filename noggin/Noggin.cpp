@@ -21,7 +21,7 @@
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
-#define DEBUG_CC_DETECTION_SAVE_FRAMES
+//#define DEBUG_CC_DETECTION_SAVE_FRAMES
 static const float MAX_CORNER_DISTANCE = 150.0f;
 static const float MAX_CROSS_DISTANCE = 150.0f;
 using namespace std;

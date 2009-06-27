@@ -26,4 +26,9 @@ def penaltyGoalie(player):
     roleState = player.getRoleState(GOALIE)
     return player.goNow(roleState)
 
-
+def penaltyBallInOppGoalbox(player):
+    if player.firstFrame():
+        player.stopWalking()
+    if not player.ballInOppGoalBox():
+        return player.goLater('chase')
+    return player.stay()

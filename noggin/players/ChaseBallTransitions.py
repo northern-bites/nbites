@@ -63,7 +63,7 @@ def shouldPositionForKick(player):
         constants.BALL_POS_KICK_RIGHT_Y and \
         constants.BALL_POS_KICK_MAX_X > ball.relX > \
         constants.BALL_POS_KICK_MIN_X and \
-        ball.bearing < constants.BALL_POS_KICK_BEARING_THRESH
+        ball.bearing < constants.POSITION_FOR_KICK_BEARING_THRESH
 
 def shouldPositionForKickFromApproachLoc(player):
     return shouldPositionForKick(player) and \

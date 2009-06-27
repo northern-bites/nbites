@@ -59,6 +59,9 @@ def penaltyShotsGameReady(player):
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
+        player.stopWalking()
+        player.brain.loc.resetBall()
+
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
         if player.brain.playbook.role == GOALIE:
