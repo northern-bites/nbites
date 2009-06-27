@@ -5,7 +5,7 @@
 using namespace boost::numeric;
 using namespace NBMath;
 using namespace std;
-#define DEBUG_SPRING
+//#define DEBUG_SPRING
 
 SpringSensor::SpringSensor(const MetaGait * _gait,
     const SensorAxis _axis):
@@ -53,13 +53,15 @@ void SpringSensor::reset(){
 
 void SpringSensor::tick_sensor(const float sensorAngle){
     updateMatrices();
+
+#ifdef DEBUG_SPRING
     cout << "tick sensor "<<name<<endl
          << "   sensor"<<sensorAngle
          << "   start x_k"<<x_k
          << "   A:"<<A<<endl
          << "   b:"<<b<<endl
          << "   max Angle:"<<gait->sensor[MAX_INDEX]<<endl;
-
+#endif
 
     const float clippedSensorAngle  = NBMath::clip(sensorAngle,
                                                   gait->sensor[MAX_INDEX]);
@@ -80,7 +82,7 @@ void SpringSensor::tick_sensor(const float sensorAngle){
     cout << "   post-clip x_k: "<<x_k<<endl;
 #endif
 
-    lastSensorAngle = sensorAngle;
+    lastSensorAngle = sensorAngle;//unused
 }
 
 const float SpringSensor::getSensorAngle(){

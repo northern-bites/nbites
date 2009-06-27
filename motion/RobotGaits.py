@@ -36,14 +36,27 @@ ZMP_CONFIG = (0.0,  # footCenterLocX
 JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                      5.5) # right swing hip roll addition
 
-SENSOR_CONFIG = (0.0,   # observer sensor scale
-                 0.08,  # angle X scale (gamma)
-                 0.08,  # angle Y scale (gamma)
-                 100.00,  # spring constant k (kg/s^2)
-                 100.00,  # spring constant k (kg/s^2)
-                 15.0,   # max angle X (compensation)
-                 15.0,   # max angle Y
-                 75.0)   # max angle vel (change in compensation)
+NEW_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
+                     0.08,  # angle X scale (gamma)
+                     0.08,  # angle Y scale (gamma)
+                     100.00,  # spring constant k (kg/s^2)
+                     100.00,  # spring constant k (kg/s^2)
+                     15.0,   # max angle X (compensation)
+                     15.0,   # max angle Y
+                     75.0)   # max angle vel (change in compensation)
+
+OLD_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
+                     0.5,  # angle X scale (gamma)
+                     0.5,  # angle Y scale (gamma)
+                     0.00,  # spring constant k (kg/s^2)
+                     0.00,  # spring constant k (kg/s^2)
+                     15.0,   # max angle X (compensation)
+                     15.0,   # max angle Y
+                     75.0)   # max angle vel (change in compensation)
+
+
+CUR_SENSOR_CONFIG = OLD_SENSOR_CONFIG
+
 STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.3,  #kneeStiffness
                     0.4,  #anklePitchStiffness
@@ -62,7 +75,7 @@ NEW_GAIT = motion.GaitCommand(STANCE_CONFIG,
             STEP_CONFIG,
             ZMP_CONFIG,
             JOINT_HACK_CONFIG,
-            SENSOR_CONFIG,
+            CUR_SENSOR_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
@@ -72,7 +85,7 @@ DUCK_GAIT = motion.GaitCommand(DUCK_STANCE_CONFIG,
             STEP_CONFIG,
             ZMP_CONFIG,
             JOINT_HACK_CONFIG,
-            SENSOR_CONFIG,
+            CUR_SENSOR_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
@@ -109,7 +122,7 @@ FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
                              FAST_STEP_CONFIG,
                              FAST_ZMP_CONFIG,
                              FAST_HACK_CONFIG,
-                             SENSOR_CONFIG,
+                             CUR_SENSOR_CONFIG,
                              STIFFNESS_CONFIG,
                              ODO_CONFIG,
                              ARM_CONFIG)
@@ -129,7 +142,7 @@ WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
             STEP_CONFIG,
             WEBOTS_ZMP_CONFIG,
             WEBOTS_HACK_CONFIG,
-            SENSOR_CONFIG,
+            CUR_SENSOR_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
@@ -138,7 +151,7 @@ WEBOTS_GAIT2=motion.GaitCommand(DUCK_STANCE_CONFIG,
             STEP_CONFIG,
             WEBOTS_ZMP_CONFIG,
             WEBOTS_HACK_CONFIG,
-            SENSOR_CONFIG,
+            CUR_SENSOR_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)

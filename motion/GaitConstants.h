@@ -100,7 +100,7 @@ namespace WP {
  * angleScale      -- proportion of angleXY feedback
  */
     enum SensorConfig{
-        OBSERVER_SCALE=0,
+        FEEDBACK_TYPE=0, //This is a bit bad, since we don't want to interpolate
         GAMMA_X,
         GAMMA_Y,
         SPRING_K_X,
