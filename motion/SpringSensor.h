@@ -39,5 +39,7 @@ private:
     NBMath::ufrowVector3 c;
 
     std::string name;
+
+    float lastSensorAngle;
 };
 #endif

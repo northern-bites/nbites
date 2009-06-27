@@ -37,10 +37,10 @@ JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                      5.5) # right swing hip roll addition
 
 SENSOR_CONFIG = (0.0,   # observer sensor scale
-                 0.05,  # angle X scale (gamma)
-                 0.05,  # angle Y scale (gamma)
-                 0.00,  # spring constant k (kg/s^2)
-                 0.00,  # spring constant k (kg/s^2)
+                 0.08,  # angle X scale (gamma)
+                 0.08,  # angle Y scale (gamma)
+                 100.00,  # spring constant k (kg/s^2)
+                 100.00,  # spring constant k (kg/s^2)
                  15.0,   # max angle X (compensation)
                  15.0,   # max angle Y
                  75.0)   # max angle vel (change in compensation)
