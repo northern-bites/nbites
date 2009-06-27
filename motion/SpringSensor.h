@@ -38,5 +38,6 @@ private:
     NBMath::ufvector3 b;
     NBMath::ufrowVector3 c;
 
+    std::string name;
 };
 #endif

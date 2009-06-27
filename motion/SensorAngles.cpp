@@ -32,8 +32,9 @@ void SensorAngles::tick_sensors(){
 
 void SensorAngles::spring_sensor_feedback(){
     const Inertial inertial = sensors->getInertial();
+    std::cout << "AngleX/Y  = ("<<inertial.angleX<<","<<inertial.angleY<<")"<<std::endl;
     springX.tick_sensor(inertial.angleX);
-    springY.tick_sensor(inertial.angleX-gait->stance[WP::BODY_ROT_Y]);
+    springY.tick_sensor(inertial.angleY-gait->stance[WP::BODY_ROT_Y]);
 
     sensorAngleX = springX.getSensorAngle();
     sensorAngleY = springY.getSensorAngle();

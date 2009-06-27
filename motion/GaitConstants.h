@@ -184,13 +184,13 @@ namespace WP {
      ANGLE};//hip hack r
     static const float SENSOR_CONVERSION[LEN_SENSOR_CONFIG]=
     {NONE,//Observer scale
-     NONE,
-     NONE,
-     NONE,
-     NONE,
+     NONE,//gX
+     NONE,//gy
+     NONE,//kx
+     NONE,//ky
      ANGLE,
      ANGLE,
-     ANGLE};//angle xy scale
+     ANGLE};//angle vel
     static const float STIFF_CONVERSION[LEN_STIFF_CONFIG]=
     {NONE,//hip
      NONE,//knee

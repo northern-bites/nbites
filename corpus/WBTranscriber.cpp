@@ -14,7 +14,7 @@ using namespace Kinematics;
 #include "WBNames.h"
 using namespace WBNames;
 
-#define COMPUTE_WEBOTS_ANGLE
+//#define COMPUTE_WEBOTS_ANGLE
 
 #include "BasicWorldConstants.h"
 

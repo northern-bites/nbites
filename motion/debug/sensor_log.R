@@ -17,8 +17,8 @@ if(!file.exists(file))
 dat = read.table(file,header=T,na.strings=c("-"))
 
 dat$range = dat$angleX
-dat$range[1] = 1.6
-dat$range[2] = -1.6
+dat$range[1] = .6
+dat$range[2] = -.6
 
 pdf(paste(name,PDF,sep=""))
 plot(dat$time,dat$range,pch="",main=paste(foot,"leg","x"),xlab="s",ylab="rads")

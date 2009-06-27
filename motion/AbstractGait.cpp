@@ -20,7 +20,7 @@ void AbstractGait::setGaitFromArrays(
     memcpy(zmp,_zmp,WP::LEN_ZMP_CONFIG*sizeof(float));
     memcpy(hack,_hack,WP::LEN_HACK_CONFIG*sizeof(float));
 
-    memcpy(sensor,_sensor,WP::LEN_STIFF_CONFIG*sizeof(float));
+    memcpy(sensor,_sensor,WP::LEN_SENSOR_CONFIG*sizeof(float));
     memcpy(stiffness,_stiffness,WP::LEN_STIFF_CONFIG*sizeof(float));
     memcpy(odo,_odo,WP::LEN_ODO_CONFIG*sizeof(float));
     memcpy(arm,_arm,WP::LEN_ARM_CONFIG*sizeof(float));
