@@ -112,6 +112,12 @@ FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
                              ARM_CONFIG)
 
 
+WEBOTS_STEP_CONFIG = (0.4, # step duration
+                      0.25,  # fraction in double support
+                      1.1,  # stepHeight
+                      10.0,  # max x speed
+                      10.0,  # max y speed
+                      20.0)  # max theta speed()
 
 WEBOTS_ZMP_CONFIG =(0.0,  # footCenterLocX
                     0.4,  # zmp static percentage
@@ -123,7 +129,7 @@ WEBOTS_HACK_CONFIG = (0.0, # left swing hip roll addition
                       0.0) # right swing hip roll addition
 
 WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
-            STEP_CONFIG,
+            WEBOTS_STEP_CONFIG,
             WEBOTS_ZMP_CONFIG,
             WEBOTS_HACK_CONFIG,
             SENSOR_CONFIG,
