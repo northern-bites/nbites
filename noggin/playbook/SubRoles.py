@@ -85,28 +85,24 @@ def pGoalieNormal(team):
     position = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
 
     if PBConstants.USE_FANCY_GOALIE:
-    #lets try maintaining home position until the ball is closer in
-    #might help us stay localized better
-        if 0 < ball.locDist < PBConstants.BALL_LOC_LIMIT:
-            # Use an ellipse just above the goalline to determin x and y position
+        # lets try maintaining home position until the ball is closer in
+        # might help us stay localized better
+        if 0 < ball.locDist < PBConstants.ELLIPSE_POSITION_LIMIT:
+            # Use an ellipse just above the goalline to determine x and y position
             # We get the angle from goal center to the ball to determine our X,Y
-            theta = MyMath.safe_atan2( ball.y - PBConstants.GOAL_CENTER_Y,
-                                       ball.x - PBConstants.GOAL_CENTER_X )
+            theta = MyMath.safe_atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
+                                       ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
 
             thetaDeg = PBConstants.RAD_TO_DEG * theta
 
-    # Clip the angle so that the (x,y)-coordinate is not too close to the posts
-            if PBConstants.ELLIPSE_ANGLE_MIN >\
-                    MyMath.sub180Angle(thetaDeg):
+            # Clip the angle so that the (x,y)-coordinate is not too close to the posts
+            if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
                 theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
-            elif PBConstants.ELLIPSE_ANGLE_MAX <\
-                    MyMath.sub180Angle(thetaDeg):
+            elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
                 theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
-    # Determine X,Y of ellipse based on theta, set heading on the ball
-            position[0] = team.ellipse.getXfromTheta(theta)
-            position[1] = team.ellipse.getYfromTheta(theta)
-                #position[2] = self.brain.getObjectHeading(self.brain.ball.x,
-                #                                          self.brain.ball.y)
+
+            # Determine X,Y of ellipse based on theta, set heading on the ball
+            position = team.ellipse.getPositionFromTheta(theta)
 
     return [PBConstants.GOALIE_NORMAL, position]
 
