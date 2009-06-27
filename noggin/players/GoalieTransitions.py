@@ -212,9 +212,9 @@ def shouldChaseLoc(player):
     ball = player.brain.ball
     my = player.brain.my
 
-    if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y  and
-        ball.y < Constants.MY_GOALBOX_TOP_Y and
-        ball.x < Constants.MY_GOALBOX_RIGHT_X):
+    if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION and
+        ball.y < Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION and
+        ball.x < Constants.MY_GOALBOX_RIGHT_X + goalCon.AGGRESSIVENESS_OFFSET):
         return True
     '''
     if (my.x < Constants.MY_GOALBOX_RIGHT_X and
@@ -228,16 +228,16 @@ def shouldChaseLoc(player):
 def shouldStopChaseLoc(player):
     my = player.brain.my
     ball = player.brain.ball
-    if (ball.y < Constants.MY_GOALBOX_BOTTOM_Y or
-        ball.y > Constants.MY_GOALBOX_TOP_Y or
-        ball.x > Constants.MY_GOALBOX_RIGHT_X +\
-            PBConstants.END_CLEAR_BUFFER):
+
+    if (ball.y < (Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION -
+                  goalCon.END_CLEAR_BUFFER) or
+        ball.y > (Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION +
+                  goalCon.END_CLEAR_BUFFER) or
+        ball.x > (Constants.MY_GOALBOX_RIGHT_X + goalCon.AGGRESSIVENESS_OFFSET +
+                  goalCon.END_CLEAR_BUFFER )):
         return True
+
     '''
-    if (my.x > Constants.MY_GOALBOX_RIGHT_X + PBConstants.END_CLEAR_BUFFER
-        or my.y > Constants.MY_GOALBOX_TOP_Y + PBConstants.END_CLEAR_BUFFER
-        or my.y < Constants.MY_GOALBOX_BOTTOM_Y + PBConstants.END_CLEAR_BUFFER):
-        return True
     elif (my.x < Constants.MY_GOALBOX_RIGHT_X
           or my.y < Constants.MY_GOALBOX_TOP_Y
           or my.y > Constants.MY_GOALBOX_BOTTOM_Y) and\
