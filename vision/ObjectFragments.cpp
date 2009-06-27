@@ -2469,6 +2469,17 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
             leftb = max(0, rightb - (int)right->getHeight());
         }
     }
+	//cout << "Boundary " << leftb << " " << rightb << endl;
+	middle->setLeftTopX(leftb);
+	middle->setLeftBottomX(leftb);
+	middle->setRightTopX(rightb);
+	middle->setRightBottomX(rightb);
+	middle->setLeftBottomY(bottom);
+	middle->setRightBottomY(bottom);
+	middle->setLeftTopY(bottom - 10);
+	middle->setRightTopY(bottom - 10);
+	setShot(middle);
+	/*
     if (vision->red1->getDistance() > 0) {
         rl = vision->red1->getLeftBottomX();
         rr = vision->red1->getRightBottomX();
@@ -2544,7 +2555,7 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
                                                            2));
         middle->setDistance(1);
 
-    }
+		}*/
 }
 
 /*
