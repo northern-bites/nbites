@@ -195,8 +195,7 @@ def approachBall(player):
 
     if player.penaltyKicking and \
             player.ballInOppGoalBox():
-        player.stopWalking()
-        return player.stay()
+        return player.goNow('penaltyBallInOppGoalbox')
 
     # Switch to other states if we should
     if player.currentRole == pbc.GOALIE:
@@ -270,6 +269,8 @@ def positionForKick(player):
         player.brain.CoA.setRobotGait(player.brain.motion)
 
     ball = player.brain.ball
+    if player.firstFrame():
+        player.hasAlignedOnce = False
 
     # Leave this state if necessary
     if transitions.shouldKick(player):

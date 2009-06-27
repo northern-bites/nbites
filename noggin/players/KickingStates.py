@@ -153,6 +153,37 @@ def clearBall(player):
                 if constants.DEBUG_KICKS: print ("\t\tbottom4")
                 return player.goLater('kickBallStraight')
 
+def kickBallStraightShort(player):
+    if player.brain.ball.on:
+        player.kickDecider.ballForeWhichFoot()
+    elif ChaseBallTransitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    else :
+        return player.stay()
+
+
+    player.brain.tracker.trackBall()
+
+    ballForeFoot = player.kickDecider.ballForeFoot
+    if ballForeFoot == constants.LEFT_FOOT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
+        return player.goNow('kickBallExecute')
+
+    elif ballForeFoot == constants.RIGHT_FOOT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
+        return player.goNow('kickBallExecute')
+
+    elif ballForeFoot == constants.MID_RIGHT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
+        return player.goNow('stepForRightFootKick')
+
+    elif ballForeFoot == constants.MID_LEFT:
+        player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
+        return player.goNow('stepForLeftFootKick')
+
+    else :                  # INCORRECT_POS
+        return player.goLater('positionForKick')
+
 def kickBallStraight(player):
     """
     Kick the ball forward.
@@ -163,7 +194,6 @@ def kickBallStraight(player):
         return player.goLater('scanFindBall')
     else :
         return player.stay()
-
 
     player.brain.tracker.trackBall()
 
@@ -193,17 +223,47 @@ def shootBallClose(player):
     """
     my = player.brain.my
     shotAimPoint = helpers.getShotCloseAimPoint(player)
-    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                              shotAimPoint[0],
-                                              shotAimPoint[1])
-    if constants.DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
-    if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
-            constants.SHOOT_BALL_LOC_ALIGN_ANGLE:
-        player.angleToAlign = bearingToGoal
+    leftPostBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                NogginConstants.
+                                                LANDMARK_OPP_GOAL_LEFT_POST_X,
+                                                NogginConstants.
+                                                LANDMARK_OPP_GOAL_LEFT_POST_Y)
+    rightPostBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                 NogginConstants.
+                                                 LANDMARK_OPP_GOAL_RIGHT_POST_X,
+                                                 NogginConstants.
+                                                 LANDMARK_OPP_GOAL_RIGHT_POST_Y)
+    # Am I looking between the posts?
+    if rightPostBearing < 0 < leftPostBearing:
+        return player.goNow('kickBallStraight')
+
+    leftShotPointBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                     constants.
+                                                     SHOOT_AT_LEFT_AIM_POINT[0],
+                                                     constants.
+                                                     SHOOT_AT_LEFT_AIM_POINT[1])
+
+    rightShotPointBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                      constants.
+                                                      SHOOT_AT_RIGHT_AIM_POINT[0],
+                                                      constants.
+                                                      SHOOT_AT_RIGHT_AIM_POINT[1])
+
+    # Turn to the closer shot point
+    if fabs(rightShotPointBearing) < fabs(leftShotPointBearing):
+        angleToAlign = rightShotPointBearing
+    else :
+        angleToAlign = leftShotPointBearing
+
+    if constants.SHOOT_BALL_SIDE_KICK_ANGLE > abs(angleToAlign) > \
+            constants.SHOOT_BALL_LOC_ALIGN_ANGLE and \
+            not player.hasAlignedOnce:
+        player.angleToAlign = angleToAlign
         return player.goNow('alignOnBallStraightKick')
-    elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+
+    elif angleToAlign > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallLeft')
-    elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
+    elif angleToAlign < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallRight')
     else :
         return player.goLater('kickBallStraight')
@@ -227,8 +287,7 @@ def shootBallFar(player):
     elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallRight')
     else :
-        return player.goLater('kickBallStraight')
-
+        return player.goNow('kickBallStraight')
 
 def shootBall(player):
     """
@@ -244,7 +303,7 @@ def shootBall(player):
     if oppLeftPostBearing is not None and \
             oppRightPostBearing is not None:
 
-        if oppLeftPostBearing > 0 and oppRightPostBearing < 0:
+        if oppRightPostBearing < 0 < oppLeftPostBearing:
             return player.goLater('kickBallStraight')
 
         avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
@@ -306,7 +365,7 @@ def penaltyKickBall(player):
     ball = player.brain.ball
 
     if not player.penaltyMadeFirstKick:
-        return player.goLater('kickBallStraight')
+        return player.goLater('kickBallStraightShort')
     if not player.penaltyMadeSecondKick:
 
 
@@ -376,19 +435,21 @@ def alignForSideKick(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
     ball = player.brain.ball
-    if ball.on:
+    if ball.on and player.brain.nav.isStopped():
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
+
         if ballForeFoot == constants.MID_LEFT or \
                 ballForeFoot == constants.MID_RIGHT:
             player.stopWalking()
             return player.goLater('kickBallExecute')
+
         elif ballForeFoot == constants.INCORRECT_POS:
             return player.goLater('positionForKick')
+
         targetY = ball.relY
-        player.setSpeed(0,
-                        constants.SIDE_STEP_MAX_SPEED * MyMath.sign(targetY),
-                        0)
+        sY = MyMath.sign(targetY) * constants.SIDE_STEP_MAX_SPEED
+        player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
@@ -397,22 +458,20 @@ def alignForSideKick(player):
 def stepForRightFootKick(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
+
     ball = player.brain.ball
-    if ball.on:
+    if ball.on and player.brain.nav.isStopped():
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
-        if ballForeFoot == constants.LEFT_FOOT:
+        if ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
             return player.goLater('kickBallExecute')
         elif ballForeFoot == constants.INCORRECT_POS:
             return player.goLater('positionForKick')
 
         targetY = ball.relY - constants.RIGHT_FOOT_CENTER_Y
-
-
-        player.setSpeed(0,
-                        constants.SIDE_STEP_MAX_SPEED * MyMath.sign(targetY),
-                        0)
+        sY = MyMath.sign(targetY) * constants.SIDE_STEP_MAX_SPEED
+        player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
@@ -423,7 +482,7 @@ def stepForLeftFootKick(player):
         player.brain.tracker.trackBall()
 
     ball = player.brain.ball
-    if ball.on:
+    if ball.on and player.brain.nav.isStopped():
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
         if ballForeFoot == constants.LEFT_FOOT:
@@ -433,10 +492,9 @@ def stepForLeftFootKick(player):
             return player.goLater('positionForKick')
 
         targetY = ball.relY - constants.LEFT_FOOT_CENTER_Y
+        sY = MyMath.sign(targetY) * constants.SIDE_STEP_MAX_SPEED
+        player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
-        player.setSpeed(0,
-                        constants.SIDE_STEP_MAX_SPEED * MyMath.sign(targetY),
-                        0)
     if ChaseBallTransitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
     return player.stay()
@@ -446,6 +504,7 @@ def alignOnBallStraightKick(player):
     Align on ball with respect to goal
     """
     if player.firstFrame():
+        player.hasAlignedOnce = True
         player.brain.nav.orbitAngle(-player.angleToAlign)
 
     # Deal with ball changed positions?
@@ -484,6 +543,7 @@ def afterKick(player):
 
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
+        player.hasAlignedOnce = False
         player.standup()
 
         if player.penaltyKicking:
