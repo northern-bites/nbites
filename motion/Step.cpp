@@ -124,6 +124,7 @@ void Step::setStepSize(const WalkVector &target,
 #ifdef DEBUG_STEP
   printf("After vel clipping (%g,%g,%g)\n",new_walk.x,new_walk.y,new_walk.theta);
 #endif
+  walkVector = new_walk;
 
   //check  if we need to clip lateral movement of this leg
   if(new_walk.y > 0){
@@ -176,7 +177,7 @@ void Step::setStepSize(const WalkVector &target,
   y = computed_y;
   theta = computed_theta;
 
-  walkVector = new_walk;
+ 
 
 #ifdef DEBUG_STEP
   std::cout << "Clipped new step to ("<<x<<","<<y<<","<<theta<<")"<<std::endl;
