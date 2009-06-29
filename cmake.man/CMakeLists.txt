@@ -136,6 +136,17 @@ SET( @REMOTE_ADDRESS@
   )
 SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 
+############################ REMOTE INSTALLATION
+# Define this to remotely install the binary or library on the robot.
+# Cannot be selected unless OE_CROSS_BUILD is set to ON.
+SET( @ROBOT_NAME@
+  "zaphod"
+  CACHE STRING
+  "The NAME of the robot"
+  )
+SET( ROBOT_NAME ${@ROBOT_NAME@} )
+
+
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
