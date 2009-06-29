@@ -1,6 +1,5 @@
 from ..playbook import PBConstants
 from .. import NogginConstants
-import PositionConstants as constants
 import GoalieTransitions as helper
 from ..util import MyMath
 
@@ -40,12 +39,14 @@ def goalieAwesomePosition(player):
     bearing = None
     if ball.on:
         bearing = ball.bearing
+    elif ball.framesOff < 3:
+        bearing = ball.locBearing
     else:
         bearing = NogginConstants.OPP_GOAL_HEADING
     if not useOmni:
-        nav.goTo((position[0], position[1], bearing))
+        nav.goTo((position[0], position[1], my.h + bearing))
     else:
-        nav.omniGoTo((position[0], position[1], bearing))
+        nav.omniGoTo((position[0], position[1], my.h + bearing))
 
     return player.stay()
 

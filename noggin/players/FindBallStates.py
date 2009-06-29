@@ -1,7 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import GoalieTransitions as goalTrans
-import GoalieConstants as goalCon
 from ..playbook import PBConstants as pbc
 import man.motion.HeadMoves as HeadMoves
 from ..util import MyMath
@@ -92,8 +91,9 @@ def goalieScanFindBall(player):
 def goalieSpinFindBall(player):
     ball = player.brain.ball
     if player.firstFrame():
+        myH = player.brain.my.h
         spinDir = goalTrans.strafeDirForSave(player)
-        #spinDir = MyMath.getSpinDir(ball.locBearing)
+        #spinDir = MyMath.getSpinDir(myH, myH + ball.locBearing)
         player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
     if not player.brain.motion.isHeadActive():
         player.brain.tracker.trackBall()
