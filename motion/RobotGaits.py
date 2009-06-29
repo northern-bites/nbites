@@ -80,9 +80,9 @@ MARVIN_JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                             5.5) # right swing hip roll addition
 
 NEW_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
-                     0.08,  # angle X scale (gamma)
-                     0.08,  # angle Y scale (gamma)
-                     200.00,  # X spring constant k (kg/s^2)
+                     0.1,  # angle X scale (gamma)
+                     0.15,  # angle Y scale (gamma)
+                     150.00,  # X spring constant k (kg/s^2)
                      200.00,  # Y spring constant k (kg/s^2)
                      15.0,   # max angle X (compensation)
                      15.0,   # max angle Y
@@ -110,7 +110,7 @@ MARVIN_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
 
 CUR_SENSOR_CONFIG = OLD_SENSOR_CONFIG
 
-STIFFNESS_CONFIG = (0.85, #hipStiffness
+STIFFNESS_CONFIG = (0.95, #hipStiffness
                     0.3,  #kneeStiffness
                     0.4,  #anklePitchStiffness
                     0.3,  #ankleRollStiffness
@@ -184,10 +184,10 @@ FAST_HACK_CONFIG = (5.5, # left swing hip roll addition
 
 
 FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
-                             FAST_STEP_CONFIG,
+                             STATIONARY_STEP_CONFIG,
                              FAST_ZMP_CONFIG,
                              FAST_HACK_CONFIG,
-                             CUR_SENSOR_CONFIG,
+                             NEW_SENSOR_CONFIG,
                              STIFFNESS_CONFIG,
                              ODO_CONFIG,
                              ARM_CONFIG)
@@ -234,12 +234,12 @@ WEBOTS_GAIT2=motion.GaitCommand(STANCE_CONFIG,
 #DEFAULT GAIT ASSIGNMENTS
 
 TRILLIAN_GAIT = NEW_GAIT
-ZAPHOD_GAIT   =   NEW_GAIT
+ZAPHOD_GAIT   =   FAST_GAIT
 SLARTI_GAIT   =   NEW_GAIT
 MARVIN_GAIT   =   MARVIN_NEW_GAIT
 
 TRILLIAN_TURN_GAIT = NEW_GAIT
-ZAPHOD_TURN_GAIT   =   NEW_GAIT
+ZAPHOD_TURN_GAIT   =   FAST_GAIT
 SLARTI_TURN_GAIT   =   NEW_GAIT
 MARVIN_TURN_GAIT   =   MARVIN_NEW_GAIT
 
