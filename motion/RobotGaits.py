@@ -196,12 +196,12 @@ FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
 WEBOTS_STEP_CONFIG = (0.4, # step duration
                       0.25,  # fraction in double support
                       1.1,  # stepHeight
-                      10.0,  # max x speed
-                      10.0,  # max y speed
-                      20.0,  # max theta speed()
-                      10.0,  # max x acc
-                      10.0,  # max y acc
-                      10.0,  # max theta acc()
+                      25.0,  # max x speed
+                      25.0,  # max y speed
+                      80.0,  # max theta speed()
+                      5.0,  # max x acc
+                      5.0,  # max y acc
+                      20.0,  # max theta acc()
                       WALKING)
 
 WEBOTS_ZMP_CONFIG =(0.0,  # footCenterLocX

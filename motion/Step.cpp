@@ -105,11 +105,11 @@ void Step::setStepSize(const WalkVector &target,
 			      last.x - stepConfig[WP::MAX_ACC_X],
 			      last.x + stepConfig[WP::MAX_ACC_X]);
     new_walk.y = NBMath::clip(target.y,
-			      last.y - stepConfig[WP::MAX_ACC_Y],
-			      last.y + stepConfig[WP::MAX_ACC_Y]);
+			      last.y - stepConfig[WP::MAX_ACC_Y]*0.5,
+			      last.y + stepConfig[WP::MAX_ACC_Y]*0.5);
     new_walk.theta = NBMath::clip(target.theta,
-				  last.theta - stepConfig[WP::MAX_ACC_THETA],
-				  last.theta + stepConfig[WP::MAX_ACC_THETA]);
+				  last.theta - stepConfig[WP::MAX_ACC_THETA]*0.5,
+				  last.theta + stepConfig[WP::MAX_ACC_THETA]*0.5);
   }
   //new_walk = target;
 #ifdef DEBUG_STEP
