@@ -202,7 +202,7 @@ WEBOTS_HACK_CONFIG = (0.0, # left swing hip roll addition
                       0.0) # right swing hip roll addition
 
 WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
-            STATIONARY_STEP_CONFIG,
+            WEBOTS_STEP_CONFIG,
             WEBOTS_ZMP_CONFIG,
             WEBOTS_HACK_CONFIG,
             CUR_SENSOR_CONFIG,
@@ -210,8 +210,8 @@ WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
 
-WEBOTS_GAIT2=motion.GaitCommand(DUCK_STANCE_CONFIG,
-            STEP_CONFIG,
+WEBOTS_GAIT2=motion.GaitCommand(STANCE_CONFIG,
+            STATIONARY_STEP_CONFIG,
             WEBOTS_ZMP_CONFIG,
             WEBOTS_HACK_CONFIG,
             CUR_SENSOR_CONFIG,

@@ -34,7 +34,7 @@ using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
 
-#define DEBUG_STEPGENERATOR
+//#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -820,7 +820,6 @@ void StepGenerator::generateStep( float _x,
     //  want to start moving, else if are already moving.
     StepType type;
 
-    cout << "Walking type is "<<gait->step[WP::WALKING]<<endl;
     if(gait->step[WP::WALKING] == WP::NON_WALKING_GAIT){
       type = END_STEP;
     }else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
