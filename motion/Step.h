@@ -17,17 +17,24 @@ enum Foot {
     RIGHT_FOOT
 };
 
+struct WalkVector {
+  float x;
+  float y;
+  float theta;
+};
+
+static const WalkVector ZERO_WALKVECTOR = {0.0f,0.0f,0.0f};
+
 /**
  * Simple container to hold information about future steps.
  */
 class Step{
 public:
     Step(const Step & other);
-    Step(const float _x, const float _y, const float _theta,
-         const AbstractGait & gait,	 const Foot _foot,
-	 const float last_x = 0.0f,	 
-	 const float last_y= 0.0f,
-	 const float last_theta= 0.0f,
+    Step(const WalkVector &target,
+         const AbstractGait & gait,	 
+	 const Foot _foot,
+	 const WalkVector &last = ZERO_WALKVECTOR,
          const StepType _type = REGULAR_STEP);
     // Copy constructor to allow changing reference frames:
     Step(const float new_x, const float new_y, const float new_theta,
@@ -36,12 +43,8 @@ public:
     void updateFrameLengths(const float duration,
                             const float dblSuppF);
 
-    void setStepSize(const float new_x,
-		     const float new_y,
-		     const float new_theta,
-		     const float last_x,
-		     const float last_y,
-		     const float last_theta);
+    void setStepSize(const WalkVector &target,
+		     const WalkVector &last);
     
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
@@ -55,6 +58,7 @@ public:
     float x;
     float y;
     float theta;
+    WalkVector walkVector;
     unsigned int stepDurationFrames;
     unsigned int doubleSupportFrames;
     unsigned int singleSupportFrames;
@@ -75,7 +79,7 @@ private:
 };
 
 static const boost::shared_ptr<Step> EMPTY_STEP =
-    boost::shared_ptr<Step>(new Step(0.0f,0.0f,0.0f,
+  boost::shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                      DEFAULT_GAIT,
                                      LEFT_FOOT));
 #endif

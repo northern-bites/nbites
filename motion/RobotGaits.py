@@ -199,8 +199,8 @@ WEBOTS_STEP_CONFIG = (0.4, # step duration
                       10.0,  # max x speed
                       10.0,  # max y speed
                       20.0,  # max theta speed()
-                      5.0,  # max x acc
-                      5.0,  # max y acc
+                      10.0,  # max x acc
+                      10.0,  # max y acc
                       10.0,  # max theta acc()
                       WALKING)
 

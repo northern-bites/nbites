@@ -734,11 +734,11 @@ void StepGenerator::resetSteps(const bool startLeft){
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is REGULAR type.
     shared_ptr<Step> firstSupportStep =
-        shared_ptr<Step>(new Step(0.0f,0.0f,0.0f,
+      shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                   *gait,
-                                  firstSupportFoot,0.0f,0.0f,0.0f,END_STEP)); 
+                                  firstSupportFoot,ZERO_WALKVECTOR,END_STEP)); 
     shared_ptr<Step> dummyStep =
-        shared_ptr<Step>(new Step(0.0f,0.0f,0.0f,
+        shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                   *gait,
                                   dummyFoot));
     //need to indicate what the current support foot is:
@@ -814,40 +814,19 @@ void StepGenerator::generateStep( float _x,
         }
     }
 
-    //check  if we need to clip lateral movement of this leg
-    if(_y > 0){
-        if(!nextStepIsLeft){
-            _y = 0.0f;
-        }
-    }else if(_y < 0){
-        if(nextStepIsLeft){
-            _y = 0.0f;
-        }
-    }
-
-    if(_theta > 0){
-        if(!nextStepIsLeft){
-            _theta = 0.0f;
-        }
-    }else if (_theta < 0){
-        if(nextStepIsLeft){
-            _theta = 0.0f;
-        }
-    }
 
 
     //The input here is in velocities. We need to convert it to distances perstep
     //Also, we need to scale for the fact that we can only turn or strafe every other step
 
-    const float distX = _x * gait->step[WP::DURATION];
-    const float distY = _y * gait->step[WP::DURATION]*2.0f;
-    const float rotTheta = _theta * gait->step[WP::DURATION]*2.0f;
 
-    shared_ptr<Step> step(new Step(distX, distY, rotTheta,
+    const WalkVector new_walk = {_x,_y,_theta};
+
+    shared_ptr<Step> step(new Step(new_walk,
                                    *gait,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
-				   lastQueuedStep->x,lastQueuedStep->y,lastQueuedStep->theta,
+				   lastQueuedStep->walkVector,
                                    type));
 
 #ifdef DEBUG_STEPGENERATOR
