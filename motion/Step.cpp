@@ -3,6 +3,8 @@
 #include "MotionConstants.h"
 #include "Observer.h"
 
+#define DEBUG_STEP
+
 Step::Step(const Step& other)
 {
     copyAttributesFromOther(other);
@@ -11,10 +13,9 @@ Step::Step(const Step& other)
 Step::Step(const float _x, const float _y, const float _theta,
            const AbstractGait & gait,
            const Foot _foot, const StepType _type)
-    : x(_x),y(_y), theta(_theta),
-      foot(_foot),type(_type),zmpd(false)
+  : foot(_foot),type(_type),zmpd(false)
 {
-    copyGaitAttributes(gait.step,gait.zmp);
+  copyGaitAttributes(gait.step,gait.zmp,gait.stance);
 
     switch(_type){
     case REGULAR_STEP:
@@ -29,6 +30,9 @@ Step::Step(const float _x, const float _y, const float _theta,
                            1.0f);
         break;
     }
+
+    //After we assign elements of the gait to this step, lets clip 
+    setStepSize(_x,_y,_theta);
 }
 
 
@@ -66,11 +70,39 @@ void Step::copyAttributesFromOther(const Step &other){
     foot = other.foot;
     type = other.type;
     zmpd = other.zmpd;
-    copyGaitAttributes(other.stepConfig,other.zmpConfig);
+    copyGaitAttributes(other.stepConfig,other.zmpConfig,other.stanceConfig);
 }
 
 void Step::copyGaitAttributes(const float _step_config[WP::LEN_STEP_CONFIG],
-                              const float _zmp_config[WP::LEN_ZMP_CONFIG]){
+                              const float _zmp_config[WP::LEN_ZMP_CONFIG],
+			      const float _stance_config[WP::LEN_STANCE_CONFIG]){
     memcpy(stepConfig,_step_config,sizeof(float)*WP::LEN_STEP_CONFIG);
     memcpy(zmpConfig,_zmp_config,sizeof(float)*WP::LEN_ZMP_CONFIG);
+    memcpy(stanceConfig,_stance_config,sizeof(float)*WP::LEN_STANCE_CONFIG);
+}
+
+
+void Step::setStepSize(const float new_x,
+			const float new_y,
+			const float new_theta){
+      //convert speeds in cm/s and rad/s into steps and clip according to the gait
+  const float clipped_x =  NBMath::clip(new_x,stepConfig[WP::MAX_VEL_X]
+					*stepConfig[WP::DURATION]);
+
+  //For y, need to account for leg separation as well
+  const float clipped_y = NBMath::clip(new_y,stepConfig[WP::MAX_VEL_Y]
+				       *stepConfig[WP::DURATION] 
+				       +stanceConfig[WP::LEG_SEPARATION_Y]*0.5f);
+    //we only turn every other step, so double the turning!
+  const float clipped_theta = NBMath::clip(new_theta,stepConfig[WP::MAX_VEL_THETA]
+					   *stepConfig[WP::DURATION]);
+
+  x = clipped_x;
+  y = clipped_y;
+  theta = clipped_theta;
+
+#ifdef DEBUG_STEP
+  std::cout << "Clipped new step to ("<<x<<","<<y<<","<<theta<<")"<<std::endl;
+#endif
+
 }

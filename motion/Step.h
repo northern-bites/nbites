@@ -33,6 +33,10 @@ public:
     void updateFrameLengths(const float duration,
                             const float dblSuppF);
 
+    void setStepSize(const float new_x,
+		      const float new_y,
+		      const float new_theta);
+
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
             return o << "Step(" << s.x << "," << s.y << "," << s.theta
@@ -54,10 +58,11 @@ public:
 
     float stepConfig[WP::LEN_STEP_CONFIG];
     float zmpConfig[WP::LEN_ZMP_CONFIG];
-
+    float stanceConfig[WP::LEN_STANCE_CONFIG];
 private:
     void copyGaitAttributes(const float _step_config[],
-                            const float _zmp_config[]);
+                            const float _zmp_config[],
+			    const float _stance_config[]);
     void copyAttributesFromOther(const Step &other);
 
 };
