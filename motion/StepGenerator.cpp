@@ -822,6 +822,10 @@ void StepGenerator::generateStep( float _x,
 
     if(gait->step[WP::WALKING] == WP::NON_WALKING_GAIT){
       type = END_STEP;
+      _x = 0.0f;
+      _y = 0.0f;
+      _theta = 0.0f;
+
     }else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
 //         if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
 //            (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
