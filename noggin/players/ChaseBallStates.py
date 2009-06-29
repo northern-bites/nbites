@@ -484,7 +484,7 @@ def ballInMyBox(player):
 def approachDangerousBall(player):
     if player.firstFrame():
         player.stopWalking()
-    print "approach dangerous ball"
+    #print "approach dangerous ball"
     my = player.brain.my
     #single steps towards ball and goal with spin
     player.setSteps(0, 0, 0, 0)
