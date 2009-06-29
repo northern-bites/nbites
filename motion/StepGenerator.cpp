@@ -34,7 +34,7 @@ using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
 
-//#define DEBUG_STEPGENERATOR
+#define DEBUG_STEPGENERATOR
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -572,6 +572,12 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
                                   const float _theta)  {
+
+  #ifdef DEBUG_STEPGENERATOR
+  cout << "Clipping new step accordint to ("<<gait->step[WP::MAX_VEL_X]*gait->step[WP::DURATION]
+       <<","<<gait->step[WP::MAX_VEL_Y]*gait->step[WP::DURATION]
+       <<","<<gait->step[WP::MAX_VEL_THETA]*gait->step[WP::DURATION]<<")"<<endl;
+#endif
     //convert speeds in cm/s and rad/s into steps and clip according to the gait
     const float new_x =  clip(_x,gait->step[WP::MAX_VEL_X])
         *gait->step[WP::DURATION];
@@ -813,7 +819,11 @@ void StepGenerator::generateStep( float _x,
     //  different overall behaviors: check if we want to start, else if we
     //  want to start moving, else if are already moving.
     StepType type;
-    if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
+
+    cout << "Walking type is "<<gait->step[WP::WALKING]<<endl;
+    if(gait->step[WP::WALKING] == WP::NON_WALKING_GAIT){
+      type = END_STEP;
+    }else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
 //         if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
 //            (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
 //                                  1:-1)*HIP_OFFSET_Y) != 0)

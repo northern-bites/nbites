@@ -1,5 +1,8 @@
 import man.motion as motion
 
+WALKING = 1.0
+NON_WALKING = 0.0
+
 STANCE_CONFIG = (31.00, # CoM height
                  1.45,  # Forward displacement of CoM
                  10.0,  # Horizontal distance between feet
@@ -27,7 +30,9 @@ STEP_CONFIG = (0.4, # step duration
                0.9,  # stepHeight
                7.0,  # max x speed
                7.0,  # max y speed
-               20.0)  # max theta speed()
+               20.0, # max theta speed()
+               WALKING)  # walking gait = true
+
 
 MARVIN_STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
@@ -35,6 +40,16 @@ MARVIN_STEP_CONFIG = (0.4, # step duration
                7.0,  # max x speed
                7.0,  # max y speed
                20.0)  # max theta speed()
+
+STATIONARY_STEP_CONFIG = (0.4, # step duration
+               0.25,  # fraction in double support
+               0.0,  # stepHeight
+               0.0,  # max x speed
+               0.0,  # max y speed
+               0.0, # max theta speed()
+               NON_WALKING) # walking gait = false
+
+
 
 ZMP_CONFIG = (0.0,  # footCenterLocX
               0.4,  # zmp static percentage
@@ -141,11 +156,12 @@ FAST_STANCE_CONFIG = (31.00, # CoM height
                       0.0,   # Angle between feet
                       0.1)   # Time to transition to/from this stance
 FAST_STEP_CONFIG = (0.5, # step duration
-               0.2,  # fraction in double support
-               1.1,  # stepHeight
-               20.0,  # max x speed
-               20.0,  # max y speed
-               20.0)  # max theta speed()
+                    0.2,  # fraction in double support
+                    1.1,  # stepHeight
+                    20.0,  # max x speed
+                    20.0,  # max y speed
+                    20.0,  # max theta speed()
+                    WALKING)
 
 FAST_ZMP_CONFIG = (0.0,  # footCenterLocX
               0.4,  # zmp static percentage
@@ -173,7 +189,8 @@ WEBOTS_STEP_CONFIG = (0.4, # step duration
                       1.1,  # stepHeight
                       10.0,  # max x speed
                       10.0,  # max y speed
-                      20.0)  # max theta speed()
+                      20.0,  # max theta speed()
+                      WALKING)
 
 WEBOTS_ZMP_CONFIG =(0.0,  # footCenterLocX
                     0.4,  # zmp static percentage
@@ -185,7 +202,7 @@ WEBOTS_HACK_CONFIG = (0.0, # left swing hip roll addition
                       0.0) # right swing hip roll addition
 
 WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
-            WEBOTS_STEP_CONFIG,
+            STATIONARY_STEP_CONFIG,
             WEBOTS_ZMP_CONFIG,
             WEBOTS_HACK_CONFIG,
             CUR_SENSOR_CONFIG,
