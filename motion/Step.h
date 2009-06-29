@@ -24,7 +24,10 @@ class Step{
 public:
     Step(const Step & other);
     Step(const float _x, const float _y, const float _theta,
-         const AbstractGait & gait, const Foot _foot,
+         const AbstractGait & gait,	 const Foot _foot,
+	 const float last_x = 0.0f,	 
+	 const float last_y= 0.0f,
+	 const float last_theta= 0.0f,
          const StepType _type = REGULAR_STEP);
     // Copy constructor to allow changing reference frames:
     Step(const float new_x, const float new_y, const float new_theta,
@@ -34,9 +37,12 @@ public:
                             const float dblSuppF);
 
     void setStepSize(const float new_x,
-		      const float new_y,
-		      const float new_theta);
-
+		     const float new_y,
+		     const float new_theta,
+		     const float last_x,
+		     const float last_y,
+		     const float last_theta);
+    
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
             return o << "Step(" << s.x << "," << s.y << "," << s.theta
@@ -52,6 +58,7 @@ public:
     unsigned int stepDurationFrames;
     unsigned int doubleSupportFrames;
     unsigned int singleSupportFrames;
+    float sOffsetY;
     Foot foot;
     StepType type;
     bool zmpd;

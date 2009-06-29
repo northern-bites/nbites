@@ -734,11 +734,11 @@ void StepGenerator::resetSteps(const bool startLeft){
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is REGULAR type.
     shared_ptr<Step> firstSupportStep =
-        shared_ptr<Step>(new Step(0,HIP_OFFSET_Y*supportSign,0,
+        shared_ptr<Step>(new Step(0.0f,0.0f,0.0f,
                                   *gait,
-                                  firstSupportFoot,END_STEP));
+                                  firstSupportFoot,0.0f,0.0f,0.0f,END_STEP)); 
     shared_ptr<Step> dummyStep =
-        shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y*supportSign,0,
+        shared_ptr<Step>(new Step(0.0f,0.0f,0.0f,
                                   *gait,
                                   dummyFoot));
     //need to indicate what the current support foot is:
@@ -843,17 +843,11 @@ void StepGenerator::generateStep( float _x,
     const float distY = _y * gait->step[WP::DURATION]*2.0f;
     const float rotTheta = _theta * gait->step[WP::DURATION]*2.0f;
 
-    const float leg_sign = (nextStepIsLeft ?
-                           1.0f : -1.0f);
-    const float computed_x = distX - sin(abs(rotTheta)) * HIP_OFFSET_Y;
-    const float computed_y = distY +
-        leg_sign*HIP_OFFSET_Y*cos(rotTheta);
-    const float computed_theta = rotTheta;
-
-    shared_ptr<Step> step(new Step(computed_x, computed_y, computed_theta,
+    shared_ptr<Step> step(new Step(distX, distY, rotTheta,
                                    *gait,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
+				   lastQueuedStep->x,lastQueuedStep->y,lastQueuedStep->theta,
                                    type));
 
 #ifdef DEBUG_STEPGENERATOR

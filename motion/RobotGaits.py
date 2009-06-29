@@ -31,6 +31,9 @@ STEP_CONFIG = (0.4, # step duration
                7.0,  # max x speed
                7.0,  # max y speed
                20.0, # max theta speed()
+               7.0,  # max x accel
+               7.0,  # max y accel
+               20.0, # max theta speed()
                WALKING)  # walking gait = true
 
 
@@ -47,6 +50,9 @@ STATIONARY_STEP_CONFIG = (0.4, # step duration
                0.0,  # max x speed
                0.0,  # max y speed
                0.0, # max theta speed()
+               0.0,  # max x acc
+               0.0,  # max y acc
+               0.0, # max theta acc()
                NON_WALKING) # walking gait = false
 
 
@@ -161,6 +167,9 @@ FAST_STEP_CONFIG = (0.5, # step duration
                     20.0,  # max x speed
                     20.0,  # max y speed
                     20.0,  # max theta speed()
+                    7.0,  # max x speed
+                    7.0,  # max y speed
+                    20.0,  # max theta speed()
                     WALKING)
 
 FAST_ZMP_CONFIG = (0.0,  # footCenterLocX
@@ -190,6 +199,9 @@ WEBOTS_STEP_CONFIG = (0.4, # step duration
                       10.0,  # max x speed
                       10.0,  # max y speed
                       20.0,  # max theta speed()
+                      5.0,  # max x acc
+                      5.0,  # max y acc
+                      10.0,  # max theta acc()
                       WALKING)
 
 WEBOTS_ZMP_CONFIG =(0.0,  # footCenterLocX
