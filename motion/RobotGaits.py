@@ -76,8 +76,8 @@ MARVIN_JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
 NEW_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                      0.08,  # angle X scale (gamma)
                      0.08,  # angle Y scale (gamma)
-                     100.00,  # spring constant k (kg/s^2)
-                     100.00,  # spring constant k (kg/s^2)
+                     200.00,  # X spring constant k (kg/s^2)
+                     200.00,  # Y spring constant k (kg/s^2)
                      15.0,   # max angle X (compensation)
                      15.0,   # max angle Y
                      75.0)   # max angle vel (change in compensation)
@@ -167,7 +167,7 @@ FAST_ZMP_CONFIG = (0.0,  # footCenterLocX
               0.4,  # zmp static percentage
               0.5,  # left zmp off
               0.5,  # right zmp off
-              0.01,  # strafe zmp offse
+              0.02,  # strafe zmp offse
               6.6)   # turn zmp offset
 
 FAST_HACK_CONFIG = (5.5, # left swing hip roll addition
