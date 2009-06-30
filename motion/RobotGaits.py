@@ -90,6 +90,16 @@ NEW_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                      15.0,   # max angle Y
                      75.0)   # max angle vel (change in compensation)
 
+MARVIN_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
+                     0.1,  # angle X scale (gamma)
+                     0.15,  # angle Y scale (gamma)
+                     150.00,  # X spring constant k (kg/s^2)
+                     275.00,  # Y spring constant k (kg/s^2)
+                     15.0,   # max angle X (compensation)
+                     15.0,   # max angle Y
+                     75.0)   # max angle vel (change in compensation)
+
+
 OLD_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
                      0.5,  # angle X scale (gamma)
                      0.5,  # angle Y scale (gamma)
@@ -143,7 +153,6 @@ MARVIN_NEW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
                                      ODO_CONFIG,
                                      ARM_CONFIG)
 
-
 DUCK_GAIT = motion.GaitCommand(DUCK_STANCE_CONFIG,
             STEP_CONFIG,
             ZMP_CONFIG,
@@ -195,6 +204,14 @@ FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
                              ODO_CONFIG,
                              ARM_CONFIG)
 
+MARVIN_FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
+                             FAST_STEP_CONFIG,
+                             FAST_ZMP_CONFIG,
+                             FAST_HACK_CONFIG,
+                             MARVIN_SENSOR_CONFIG,
+                             STIFFNESS_CONFIG,
+                             ODO_CONFIG,
+                             ARM_CONFIG)
 
 WEBOTS_STEP_CONFIG = (0.4, # step duration
                       0.25,  # fraction in double support

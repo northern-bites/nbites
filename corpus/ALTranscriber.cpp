@@ -205,8 +205,8 @@ void ALTranscriber::syncMotionWithALMemory() {
     //Filter angleX for large jumps, which are board errors
     float filteredAngleX = lastAngleX;
     float filteredAngleY = lastAngleY;
-    if(std::abs(lastAngleX -angleX) < 0.15 &&
-       std::abs(lastAngleY -angleY) < 0.15){ //0.15 is experimental
+    if(std::abs(lastReadAngleX -angleX) < 0.15 &&
+       std::abs(lastReadAngleY -angleY) < 0.15){ //0.15 is experimental
         const float newWeight = 0.75f;
         filteredAngleX = newWeight*angleX + (1-newWeight)*lastAngleX ;
         filteredAngleY = newWeight*angleY + (1-newWeight)*lastAngleY ;
@@ -217,6 +217,9 @@ void ALTranscriber::syncMotionWithALMemory() {
 
     lastAngleX = filteredAngleX;
     lastAngleY = filteredAngleY;
+    lastReadAngleX = angleX;
+    lastReadAngleY = angleY;
+
     //TODO: don't allocate these FSR, etc objects each time
     sensors->
         setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
