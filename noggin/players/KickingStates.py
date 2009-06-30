@@ -525,10 +525,6 @@ def alignOnBallStraightKick(player):
 def kickBallExecute(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if player.chosenKick == SweetMoves.LEFT_SIDE_KICK:
-            player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
-        elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
-            player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
         player.executeMove(player.chosenKick)
 
         if not player.penaltyMadeFirstKick:
