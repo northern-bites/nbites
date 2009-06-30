@@ -203,8 +203,20 @@ extern "C" {
             default: k = -1; obj = NULL; cb = NULL; break;
             }
             if (obj != NULL) {
+                int id = (int) obj->getID();
+                if (obj->getPossibleFieldObjects()->size() > 1) {
+                    if (id == BLUE_GOAL_LEFT_POST ||
+                        id == BLUE_GOAL_RIGHT_POST ||
+                        id == BLUE_GOAL_POST) {
+                        id = BLUE_GOAL_POST;
+
+                    } else {
+                        id = YELLOW_GOAL_POST;
+                    }
+                }
+
                 env->CallVoidMethod(jobj, setFieldObjectInfo,
-                                    (int) obj->getID(),
+                                    id,
                                     obj->getWidth(), obj->getHeight(),
                                     obj->getLeftTopX(), obj->getLeftTopY(),
                                     obj->getRightTopX(), obj->getRightTopY(),
