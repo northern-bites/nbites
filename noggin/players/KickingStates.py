@@ -68,6 +68,9 @@ def decideKick(player):
     elif player.kickObjective == constants.OBJECTIVE_SHOOT_FAR or \
             player.kickObjective == constants.OBJECTIVE_SHOOT_CLOSE:
         return player.goNow('shootBall')
+    elif player.kickObjective == constants.OBJECTIVE_KICKOFF:
+        player.hasKickedOffKick = True
+        return player.goNow('kickBallStraightShort')
     else :
         return player.goNow('clearBall')
 
@@ -160,6 +163,7 @@ def kickBallStraightShort(player):
     if player.brain.ball.on:
         player.kickDecider.ballForeWhichFoot()
     elif ChaseBallTransitions.shouldScanFindBall(player):
+        player.inKickingState = False
         return player.goLater('scanFindBall')
     else :
         return player.stay()
@@ -364,7 +368,6 @@ def shootBall(player):
     else :
         return player.goNow('shootBallFar')
 
-
 def penaltyKickBall(player):
     ball = player.brain.ball
 
@@ -522,6 +525,10 @@ def alignOnBallStraightKick(player):
 def kickBallExecute(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
+        if player.chosenKick == SweetMoves.LEFT_SIDE_KICK:
+            player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
+        elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+            player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
         player.executeMove(player.chosenKick)
 
         if not player.penaltyMadeFirstKick:

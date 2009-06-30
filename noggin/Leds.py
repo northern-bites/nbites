@@ -63,14 +63,33 @@ GOAL_ON_LEDS = ((LEFT_EAR_LED, BLUE,    NOW),
 GOAL_OFF_LEDS = ((LEFT_EAR_LED, OFF,    NOW),
                  (RIGHT_EAR_LED, OFF,    NOW),)
 
+#### FLASH ####
+FLASH_ON_LEDS = ((LEFT_EYE_LED,  GREEN, NOW),
+                 (RIGHT_EYE_LED, GREEN, NOW),
+                 (LEFT_EAR_LED,  BLUE, NOW),
+                 (RIGHT_EAR_LED, BLUE, NOW),)
+FLASH_OFF_LEDS = ((LEFT_EYE_LED,  OFF, NOW),
+                  (RIGHT_EYE_LED, OFF, NOW),
+                  (LEFT_EAR_LED,  OFF, NOW),
+                  (RIGHT_EAR_LED, OFF, NOW),)
+
 
 
 class Leds():
     def __init__(self, brainPtr):
         self.lights = _lights.lights
         self.brain = brainPtr
+        self.flashing = False
+        self.flashOn = False
+        self.counter = 0
 
     def processLeds(self):
+        self.counter += 1
+
+        if self.flashing and self.counter % 5 == 0:
+            self.flashLeds()
+            return
+
         ### for the ball ###
         if DEBUG_BALL_LEDS:
             if self.brain.ball.on:
@@ -102,3 +121,20 @@ class Leds():
             if ledTuple[2] != NOW:
                 print "Invalid timing command in Leds.py"
             self.lights.setRGB(ledName,ledHexValue)
+
+    def startFlashing(self):
+        self.flashing = True
+        self.flashOn = False
+        self.flashLeds()
+
+    def stopFlashing(self):
+        self.flashing = False
+        self.flashOn = False
+
+    def flashLeds(self):
+        if self.flashOn:
+            self.executeLeds(FLASH_OFF_LEDS)
+        else:
+            self.executeLeds(FLASH_ON_LEDS)
+
+        self.flashOn = not self.flashOn

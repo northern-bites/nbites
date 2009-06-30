@@ -8,6 +8,10 @@ def gameReady(player):
     """
     Stand up, and pan for localization
     """
+    if player.brain.gameController.kickOff:
+        player.hasKickedOffKick = False
+    else:
+        player.hasKickedOffKick = True
     player.standup()
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
