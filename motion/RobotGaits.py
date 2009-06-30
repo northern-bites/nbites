@@ -28,6 +28,7 @@ DUCK_STANCE_CONFIG = (31.00, # CoM height
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
                0.9,  # stepHeight
+               0.0,  # step lift
                7.0,  # max x speed
                7.0,  # max y speed
                20.0, # max theta speed()
@@ -47,6 +48,7 @@ MARVIN_STEP_CONFIG = (0.4, # step duration
 STATIONARY_STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
                0.0,  # stepHeight
+               0.0,  # step lift
                0.0,  # max x speed
                0.0,  # max y speed
                0.0, # max theta speed()
@@ -81,9 +83,9 @@ MARVIN_JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
 
 NEW_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                      0.1,  # angle X scale (gamma)
-                     0.15,  # angle Y scale (gamma)
+                     0.20,  # angle Y scale (gamma)
                      150.00,  # X spring constant k (kg/s^2)
-                     200.00,  # Y spring constant k (kg/s^2)
+                     250.00,  # Y spring constant k (kg/s^2)
                      15.0,   # max angle X (compensation)
                      15.0,   # max angle Y
                      75.0)   # max angle vel (change in compensation)
@@ -164,6 +166,7 @@ FAST_STANCE_CONFIG = (31.00, # CoM height
 FAST_STEP_CONFIG = (0.5, # step duration
                     0.2,  # fraction in double support
                     1.1,  # stepHeight
+                    -6.0,  # step lift
                     20.0,  # max x speed
                     20.0,  # max y speed
                     40.0,  # max theta speed()
@@ -196,6 +199,7 @@ FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
 WEBOTS_STEP_CONFIG = (0.4, # step duration
                       0.25,  # fraction in double support
                       1.1,  # stepHeight
+                      0.0,  # step lift
                       25.0,  # max x speed
                       25.0,  # max y speed
                       80.0,  # max theta speed()

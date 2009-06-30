@@ -160,6 +160,8 @@ private:
 public:
     const float getFootRotation();
 private:
+    const boost::tuple <const float, const float > 
+      getAnkleAngles();
     const float getEndStepSensorScale();
     const float getFootRotation_c();
     const float getHipYawPitch();

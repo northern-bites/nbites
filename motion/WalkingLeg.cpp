@@ -230,8 +230,12 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     const float bodyAngleY = sensorAngleY = gait->stance[WP::BODY_ROT_Y] +
         sensorCompensation.get<SensorAngles::Y>();
 
-    const float footAngleX = 0.0f;
-    const float footAngleY = 0.0f;
+    //Hack
+    const boost::tuple <const float, const float > ankleAngleCompensation =
+      getAnkleAngles();
+
+    const float footAngleX = ankleAngleCompensation.get<0>();
+    const float footAngleY = ankleAngleCompensation.get<1>();
     const float footAngleZ = getFootRotation_c()
         + leg_sign*gait->stance[WP::LEG_ROT_Z]*0.5;
 
@@ -253,6 +257,22 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
 
 }
+
+const boost::tuple <const float, const float > 
+WalkingLeg::getAnkleAngles(){
+  if(state != SWINGING){
+    return boost::tuple<const float, const float>(0.0f,0.0f);
+  }
+  
+  const float angle = static_cast<float>(frameCounter)/
+    static_cast<float>(singleSupportFrames)*M_PI_FLOAT;
+
+  const float scale  = std::sin(angle);
+
+  const float ANKLE_LIFT_ANGLE = gait->step[WP::FOOT_LIFT_ANGLE];
+  return boost::tuple<const float, const float>(0.0f*scale,ANKLE_LIFT_ANGLE*scale);
+}
+
 
 /*
  * When we are starting and stopping, we want to gradually turn on or off sensor
@@ -345,6 +365,7 @@ void WalkingLeg::applyHipHacks(float angles[]){
  */
 const boost::tuple<const float, const float>
 WalkingLeg::getHipHack(const float footAngleZ){
+
     ChainID hack_chain;
     if(state == SUPPORTING){
         hack_chain = chainID;
