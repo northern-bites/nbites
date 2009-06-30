@@ -228,8 +228,8 @@ READY_NON_KICKOFF_CHASER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
                             NogginConstants.FIELD_WHITE_HEIGHT * 1./2.,
                             NogginConstants.OPP_GOAL_HEADING]
 
-READY_NON_KICKOFF_OFFENDER = [NogginConstants.FIELD_HEIGHT_WIDTH * 1./4.,
-                              NogginConstants.FIELD_WIDTH * 3./5.,
+READY_NON_KICKOFF_OFFENDER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
+                              NogginConstants.FIELD_WHITE_WIDTH * 3./5.,
                               NogginConstants.OPP_GOAL_HEADING]
 
 # KICK OFF POSITIONS (right after kickoff, rather)
