@@ -730,7 +730,7 @@ void Threshold::objectRecognition() {
     if ((ylp || yrp) && (blp || brp)) {
         // we see blue and yellow goal posts!
         // if we see two of either then use that color'
-        if (ylp && yrp) {
+        /*if (ylp && yrp) {
             vision->bglp->init();
             vision->bgrp->init();
             vision->bgCrossbar->init();
@@ -742,7 +742,7 @@ void Threshold::objectRecognition() {
             vision->ygCrossbar->init();
             ylp = false;
             yrp = false;
-        } else {
+	    } else {*/
             // we see one of each, so pick the biggest one
             float ylpw = vision->yglp->getWidth();
             float yrpw = vision->ygrp->getWidth();
@@ -750,30 +750,46 @@ void Threshold::objectRecognition() {
             float brpw = vision->bgrp->getWidth();
             if (ylpw > yrpw) {
                 if (blpw > brpw) {
-                    if (ylpw > blpw)
-                        vision->bglp->init();
-                    else
-                        vision->yglp->init();
+		  if (ylpw > blpw) {
+		    vision->bglp->init();
+		    vision->bgrp->init();
+		  }
+		  else {
+		    vision->yglp->init();
+		    vision->ygrp->init();
+		  }
                 } else {
-                    if (ylpw > brpw)
-                        vision->bgrp->init();
-                    else
-                        vision->yglp->init();
+		  if (ylpw > brpw) {
+		    vision->bgrp->init();
+		    vision->bglp->init();
+		  }
+		  else {
+		    vision->yglp->init();
+		    vision->ygrp->init();
+		  }
                 }
             } else {
                 if (blpw > brpw) {
-                    if (yrpw > blpw)
-                        vision->bglp->init();
-                    else
-                        vision->ygrp->init();
+		  if (yrpw > blpw) {
+		    vision->bglp->init();
+		    vision->bgrp->init();
+		  }
+		  else {
+		    vision->ygrp->init();
+		    vision->yglp->init();
+		  }
                 } else {
-                    if (yrpw > brpw)
-                        vision->bgrp->init();
-                    else
-                        vision->ygrp->init();
+		  if (yrpw > brpw) {
+		    vision->bglp->init();
+		    vision->bgrp->init();
+		  }
+		  else {
+		    vision->yglp->init();
+		    vision->ygrp->init();
+		  }
                 }
-            }
-        }
+		//}
+	    }
     }
 
 
