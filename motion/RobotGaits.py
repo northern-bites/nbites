@@ -166,7 +166,7 @@ FAST_STEP_CONFIG = (0.5, # step duration
                     1.1,  # stepHeight
                     20.0,  # max x speed
                     20.0,  # max y speed
-                    20.0,  # max theta speed()
+                    40.0,  # max theta speed()
                     7.0,  # max x speed
                     7.0,  # max y speed
                     20.0,  # max theta speed()
@@ -184,7 +184,7 @@ FAST_HACK_CONFIG = (5.5, # left swing hip roll addition
 
 
 FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
-                             STATIONARY_STEP_CONFIG,
+                             FAST_STEP_CONFIG,
                              FAST_ZMP_CONFIG,
                              FAST_HACK_CONFIG,
                              NEW_SENSOR_CONFIG,
