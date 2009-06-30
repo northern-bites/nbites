@@ -1,6 +1,7 @@
 from ..playbook import PBConstants
 from .. import NogginConstants
 import GoalieTransitions as helper
+import GoalieConstants as constants
 from ..util import MyMath
 
 def goaliePosition(player):
@@ -27,7 +28,7 @@ def goalieAwesomePosition(player):
     if player.firstFrame():
         player.changeOmniGoToCounter = 0
 
-    if brain.ball.x >= PBConstants.BALL_LOC_LIMIT:
+    if brain.ball.x >= constants.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall()
