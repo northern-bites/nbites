@@ -200,9 +200,9 @@ WEBOTS_STEP_CONFIG = (0.4, # step duration
                       0.25,  # fraction in double support
                       1.1,  # stepHeight
                       0.0,  # step lift
-                      25.0,  # max x speed
-                      25.0,  # max y speed
-                      80.0,  # max theta speed()
+                      10.0,  # max x speed
+                      10.0,  # max y speed
+                      30.0,  # max theta speed()
                       5.0,  # max x acc
                       5.0,  # max y acc
                       20.0,  # max theta acc()

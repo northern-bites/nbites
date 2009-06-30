@@ -2,8 +2,12 @@
 #define Step_h_DEFINED
 
 #include <boost/shared_ptr.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <iostream>
 #include "Gait.h"
+
+
+typedef boost::tuple<const float,const float, const float>  distVector;
 
 enum StepType {
     REGULAR_STEP=0,
@@ -76,6 +80,10 @@ private:
 			    const float _stance_config[]);
     void copyAttributesFromOther(const Step &other);
 
+    const WalkVector elipseClipVelocities(const WalkVector & source);
+    const WalkVector accelClipVelocities(const WalkVector & source,
+					 const WalkVector & source);
+    const WalkVector lateralClipVelocities(const WalkVector & source);
 };
 
 static const boost::shared_ptr<Step> EMPTY_STEP =
