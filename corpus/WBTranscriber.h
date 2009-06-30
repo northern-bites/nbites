@@ -19,7 +19,7 @@ public:
 
 private:
     const boost::tuple<const float, const float>
-    WBTranscriber::angleWrapper(const float accX, const float accY,
+    angleWrapper(const float accX, const float accY,
                                 const float gyroX,const float gyroY);
 private:
     AccEKF accEKF;
