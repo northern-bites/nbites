@@ -215,7 +215,7 @@ float NaoEnactor::SafetyCheck(float currentVal, float toCheck, float motionAngle
 
     const float absDiffInRad = fabs(currentVal - toCheck);
     const float allowedMotionDiffInRad = jointsMaxVelNoLoad[i];
-    const float allowedSensorDiffInRad = allowedMotionDiffInRad*2.0f;
+    const float allowedSensorDiffInRad = allowedMotionDiffInRad*6.0f;
     const float clippedMotionVal =
         NBMath::clip(toCheck, motionAngle - allowedMotionDiffInRad,
                               motionAngle + allowedMotionDiffInRad);
