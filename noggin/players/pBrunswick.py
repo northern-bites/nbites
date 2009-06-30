@@ -82,6 +82,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyMadeFirstKick = False
         self.penaltyMadeSecondKick = False
 
+        # Kickoff kick
+        self.hasKickedOffKick = True
+
 
     def run(self):
         if self.currentState == 'afterKick' or \

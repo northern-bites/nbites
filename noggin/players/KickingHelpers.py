@@ -41,6 +41,9 @@ def getKickObjective(player):
 
     my = player.brain.my
 
+    if not player.hasKickedOffKick:
+        return constants.OBJECTIVE_KICKOFF
+
     if my.x < NogginConstants.FIELD_WIDTH / 2:
         return constants.OBJECTIVE_CLEAR
 

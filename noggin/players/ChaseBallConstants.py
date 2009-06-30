@@ -1,7 +1,7 @@
 import BrunswickSpeeds as speeds
 # Component Switches
 USE_LOC_CHASE = True
-USE_DRIBBLE = True
+USE_DRIBBLE = False
 
 # Transitions' Constants
 # Ball on and off frame thresholds
