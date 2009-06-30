@@ -1,5 +1,6 @@
 import man.motion.SweetMoves as SweetMoves
 from .. import NogginConstants as FC
+from math import hypot
 
 POINTS_FILE = "/media/userdata/points.cfg"
 GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
@@ -19,18 +20,32 @@ def convertCoords(x):
     x[1] = x[1] + FC.CENTER_FIELD_Y
     return x
 
+def getNextPoint(player):
+    closestPoint = [0,0]
+    minDist = 1000000.
+
+    for x in player.GOTO_POINTS:
+        d = hypot(player.brain.my.x - x[0],
+                  player.brain.my.y - x[1])
+        if d < minDist:
+            minDist = d
+            closestPoint = x
+
+    player.GOTO_POINTS.remove(closestPoint)
+    return closestPoint
+
 def gamePlaying(player):
     f = open(POINTS_FILE, 'r')
     player.GOTO_POINTS = [convertCoords(x) for x in
                           [[float(i) for i in l.split()] for l in f.readlines()]]
-    player.goToPoint = player.GOTO_POINTS[0]
+    player.goToPoint = getNextPoint(player)
     player.goToCounter = 0
     return player.goNow('goToPoint')
 
 def goToPoint(player):
     if player.firstFrame():
         player.brain.tracker.locPans()
-        player.brain.nav.goTo(player.GOTO_POINTS[player.goToCounter])
+        player.brain.nav.goTo(getNextPoint(player))
     if player.brain.nav.isStopped() and not player.firstFrame():
         return player.goLater('atPoint')
 
@@ -39,8 +54,9 @@ def goToPoint(player):
 def atPoint(player):
     if player.firstFrame():
         player.goToCounter += 1
-        player.executeMove(SweetMoves.SAVE_CENTER_DEBUG)
-    elif player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SAVE_CENTER_DEBUG):
+        player.brain.leds.startFlashing()
+    elif player.stateTime > 10.0:
+        player.brain.leds.stopFlashing()
         if player.goToCounter >= len(GOTO_POINTS):
             return player.goLater('atFinalPoint')
         else:

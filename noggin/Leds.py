@@ -102,3 +102,12 @@ class Leds():
             if ledTuple[2] != NOW:
                 print "Invalid timing command in Leds.py"
             self.lights.setRGB(ledName,ledHexValue)
+
+    def startFlashing(self):
+        return
+
+    def stopFlashing(self):
+        return
+
+    def flashLeds(self):
+        return
