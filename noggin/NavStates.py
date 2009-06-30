@@ -45,16 +45,6 @@ def spinToWalkHeading(nav):
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
         nav.getRotScale(headingDiff)
 
-    if sTheta == 0:
-        print "not moving. all zeros. nav's are %.2f, %.2f, %.2f" % \
-            (nav.walkX,
-             nav.walkY,
-             nav.walkTheta)
-
-        print targetH, nav.brain.my.h, headingDiff, newSpinDir, nav.curSpinDir
-        print nav.destX, nav.destY, nav.destH, \
-            nav.brain.ball.x, nav.brain.ball.y
-
     if sTheta != nav.walkTheta:
         nav.setSpeed(0, 0, sTheta)
 
