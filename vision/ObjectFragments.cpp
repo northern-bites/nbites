@@ -2285,12 +2285,12 @@ bool ObjectFragments::checkSize(blob b, int c)
 void ObjectFragments::setShot(VisualCrossbar* one)
 {
     const int intersectNum = 3;
-	const int crossNum = 3;
-	const int stripMin = 5;
-	const int intersectMax = 10;
-	const int greyMax = 15;
-	const int runMax = 10;
-	const int spanDiv = 5;
+    const int crossNum = 3;
+    const int stripMin = 5;
+    const int intersectMax = 10;
+    const int greyMax = 15;
+    const int runMax = 10;
+    const int spanDiv = 5;
 
     int pix, bad, white, grey, run, greyrun;
     int ySpan = IMAGE_HEIGHT - one->getLeftBottomY();
@@ -2478,6 +2478,8 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
 	middle->setRightBottomY(bottom);
 	middle->setLeftTopY(bottom - 10);
 	middle->setRightTopY(bottom - 10);
+	middle->setWidth(rightb - leftb + 1);
+	middle->setHeight(10);
 	setShot(middle);
 	/*
     if (vision->red1->getDistance() > 0) {
