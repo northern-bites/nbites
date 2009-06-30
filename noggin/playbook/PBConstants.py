@@ -184,20 +184,19 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 
 ## POSITION CONSTANTS ##
 
-# READY_KICKOFF: two back, one forward
+# READY_KICKOFF: one on field cross, one back slightly and to the side
 READY_KICKOFF_DEFENDER_0 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                            NogginConstants.FIELD_HEIGHT * 1./4.,
-                            NogginConstants.OPP_GOAL_HEADING] # right
+                            NogginConstants.FIELD_WHITE_HEIGHT * 1./2. - 40.,
+                            NogginConstants.OPP_GOAL_HEADING] # behind forward, to right
 
 READY_KICKOFF_DEFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                            NogginConstants.FIELD_HEIGHT * 3./4.,
-                            NogginConstants.OPP_GOAL_HEADING] # left
-
+                            NogginConstants.FIELD_WHITE_HEIGHT * 1./2. + 40.,
+                            NogginConstants.OPP_GOAL_HEADING] # behind forward, to left
 
 READY_KICKOFF_CHASER = [NogginConstants.CENTER_FIELD_X -
                         NogginConstants.CENTER_CIRCLE_RADIUS/2,
                         NogginConstants.CENTER_FIELD_Y,
-                        NogginConstants.OPP_GOAL_HEADING] # center
+                        NogginConstants.OPP_GOAL_HEADING] # near center
 
 READY_KICKOFF_NORMAL_CHASER = [NogginConstants.CENTER_FIELD_X -
                                NogginConstants.CENTER_CIRCLE_RADIUS/2,
@@ -205,38 +204,33 @@ READY_KICKOFF_NORMAL_CHASER = [NogginConstants.CENTER_FIELD_X -
                                NogginConstants.OPP_GOAL_HEADING]
 
 READY_KICKOFF_OFFENDER_0 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                            NogginConstants.FIELD_HEIGHT * 3./4.,
+                            NogginConstants.FIELD_WHITE_HEIGHT * 3./4.,
                             NogginConstants.OPP_GOAL_HEADING] # left
 
 READY_KICKOFF_OFFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                            NogginConstants.FIELD_HEIGHT * 1./4.,
+                            NogginConstants.FIELD_WHITE_HEIGHT * 1./4.,
                             NogginConstants.OPP_GOAL_HEADING] # right
 
 
-READY_KICKOFF_STOPPER = [NogginConstants.FIELD_WIDTH * 2./5.,
-                         NogginConstants.FIELD_HEIGHT * 1./4.,
+READY_KICKOFF_STOPPER = [NogginConstants.FIELD_WHITE_WIDTH * 2./5.,
+                         NogginConstants.FIELD_WHITE_HEIGHT * 1./4.,
                          NogginConstants.OPP_GOAL_HEADING]
 
 # READY_NON_KICKOFF
-# non kickoff positions: three in a row, one back in corner
-# this was a really quick make, should be rethought out
-# Stricker should maintain straight line with the ball
+# player on the field cross, one behind and to the left
 
-# Here we make the Y behind the halfway point of the y
-NON_KICKOFF_X = ((NogginConstants.CENTER_FIELD_X -
-                  NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X) / 2.)
+# behind cross a bit and to the left
+READY_NON_KICKOFF_DEFENDER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4. - 20,
+                              NogginConstants.FIELD_WHITE_HEIGHT * 1./2. + 40,
+                              NogginConstants.OPP_GOAL_HEADING]
 
-READY_NON_KICKOFF_DEFENDER = [NON_KICKOFF_X - 50.,
-                              NogginConstants.FIELD_HEIGHT * 3./4.,
-                              NogginConstants.OPP_GOAL_HEADING] # right back
+READY_NON_KICKOFF_CHASER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
+                            NogginConstants.FIELD_WHITE_HEIGHT * 1./2.,
+                            NogginConstants.OPP_GOAL_HEADING]
 
-READY_NON_KICKOFF_CHASER = [NON_KICKOFF_X,
-                            NogginConstants.FIELD_HEIGHT * 2./5.,
-                            NogginConstants.OPP_GOAL_HEADING] # left
-
-READY_NON_KICKOFF_OFFENDER = [NON_KICKOFF_X,
+READY_NON_KICKOFF_OFFENDER = [NogginConstants.FIELD_HEIGHT_WIDTH * 1./4.,
                               NogginConstants.FIELD_WIDTH * 3./5.,
-                              NogginConstants.OPP_GOAL_HEADING] # right
+                              NogginConstants.OPP_GOAL_HEADING]
 
 # KICK OFF POSITIONS (right after kickoff, rather)
 KICKOFF_OFFENDER_0 = [NogginConstants.CENTER_FIELD_X * 1./2.,

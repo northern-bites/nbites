@@ -203,7 +203,7 @@ def fReady(team):
     role = None
     if team.me.isGoalie():
         role = Roles.rGoalie(team)
-    # if two dogs alive, position normally
+
     elif team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
         if team.me.playerNumber == 2:
             role =  [PBConstants.DEFENDER] + SubRoles.pReadyDefender(team)
