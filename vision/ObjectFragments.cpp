@@ -1952,11 +1952,17 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, blob two,
                                    distanceCertainty _distCertainty) {
     //cout << "Got an object" << endl;
     // before we do this let's make sure that the object is really our color
-    if (rightBlobColor(two, NORMALPOST)) {
+  const float BLUEPOST = 0.75f;
+  float perc = NORMALPOST;
+  if (_certainty != _SURE && blobHeight(two) < 40 && color == BLUE) {
+    //cout << "uppint the anty on blue" << endl;
+    perc = BLUEPOST;
+  }
+    if (rightBlobColor(two, perc)) {
         one->updateObject(&two, _certainty, _distCertainty);
         return true;
     } else {
-        //cout << "Screening object for low percentage of real color" << endl;
+      //cout << "Screening object for low percentage of real color" << endl;
         return false;
     }
 }
@@ -2213,11 +2219,11 @@ int ObjectFragments::checkCorners(blob post)
 int ObjectFragments::characterizeSize(blob b) {
     int w = b.rightTop.x - b.leftTop.x + 1;
     int h = b.leftBottom.y - b.leftTop.y + 1;
-    const int largePostHeight = 15;
-    const int smallPostHeight = 10;
-    const int smallPostWidth = 5;
-    const int midPostHeight = 20;
-    const int midPostWidth = 5;
+    const int largePostHeight = 30;
+    const int smallPostHeight = 15;
+    const int smallPostWidth = 10;
+    const int midPostHeight = 30;
+    const int midPostWidth = 15;
     if (h > largePostHeight) return LARGE;
     if (h < smallPostHeight || w < smallPostWidth) return SMALL;
     if (h < midPostHeight || w < midPostWidth) return MEDIUM;
@@ -4427,7 +4433,7 @@ bool ObjectFragments::horizonTopOk(int top, int hor)
 {
     const int drawX = 100;
 
-    if (hor <= 0) return false;
+    //if (hor <= 0) return false;
     if (top < 1) return true;
     if (top + MIN_GOAL_HEIGHT / 2 > hor) {
         if (SANITY) {
