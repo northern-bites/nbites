@@ -167,9 +167,9 @@ FAST_STEP_CONFIG = (0.5, # step duration
                     0.2,  # fraction in double support
                     1.5,  # stepHeight
                     -6.0,  # step lift
-                    20.0,  # max x speed
-                    20.0,  # max y speed
-                    40.0,  # max theta speed()
+                    13.0,  # max x speed
+                    13.0,  # max y speed
+                    30.0,  # max theta speed()
                     7.0,  # max x speed
                     7.0,  # max y speed
                     20.0,  # max theta speed()
