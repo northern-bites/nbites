@@ -63,14 +63,28 @@ GOAL_ON_LEDS = ((LEFT_EAR_LED, BLUE,    NOW),
 GOAL_OFF_LEDS = ((LEFT_EAR_LED, OFF,    NOW),
                  (RIGHT_EAR_LED, OFF,    NOW),)
 
+#### FLASH ####
+FLASH_ON_LEDS = ((LEFT_EYE_LED,  GREEN, NOW),
+                 (RIGHT_EYE_LED, GREEN, NOW),
+                 (LEFT_EAR_LED,  GREEN, NOW),
+                 (RIGHT_EAR_LED, GREEN, NOW),)
+FLASH_OFF_LEDS = ((LEFT_EYE_LED,  OFF, NOW),
+                  (RIGHT_EYE_LED, OFF, NOW),
+                  (LEFT_EAR_LED,  OFF, NOW),
+                  (RIGHT_EAR_LED, OFF, NOW),)
+
 
 
 class Leds():
     def __init__(self, brainPtr):
         self.lights = _lights.lights
         self.brain = brainPtr
+        self.flashing = False
+        self.flashOn = False
+        self.counter = 0
 
     def processLeds(self):
+        self.counter += 1
         ### for the ball ###
         if DEBUG_BALL_LEDS:
             if self.brain.ball.on:
@@ -91,6 +105,9 @@ class Leds():
             else:
                 self.executeLeds(CHASER_OFF_LEDS)
 
+        if self.flashing and self.counter % 5 == 0:
+            self.flashLeds()
+
     def executeLeds(self,listOfLeds):
 
         for ledTuple in listOfLeds:
@@ -104,10 +121,18 @@ class Leds():
             self.lights.setRGB(ledName,ledHexValue)
 
     def startFlashing(self):
-        return
+        self.flashing = True
+        self.flashOn = False
+        self.flashLeds()
 
     def stopFlashing(self):
-        return
+        self.flashing = False
+        self.flashOn = False
 
     def flashLeds(self):
-        return
+        if self.flashOn:
+            self.executeLeds(FLASH_OFF_LEDS)
+        else:
+            self.executeLeds(FLASH_ON_LEDS)
+
+        self.flashOn = not self.flashOn
