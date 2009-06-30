@@ -205,12 +205,13 @@ void ALTranscriber::syncMotionWithALMemory() {
     //Filter angleX for large jumps, which are board errors
     float filteredAngleX = lastAngleX;
     float filteredAngleY = lastAngleY;
-    if(std::abs(lastAngleX -angleX) < M_PI_FLOAT &&
-       std::abs(lastAngleY -angleY) < M_PI_FLOAT){
+    if(std::abs(lastAngleX -angleX) < 0.15 &&
+       std::abs(lastAngleY -angleY) < 0.15){ //0.15 is experimental
         const float newWeight = 0.75f;
         filteredAngleX = newWeight*angleX + (1-newWeight)*lastAngleX ;
         filteredAngleY = newWeight*angleY + (1-newWeight)*lastAngleY ;
     }else{
+      cout<< "Got a bad angleXY value!"<<endl;
         //Do nothing, since the values are bad
     }
 
