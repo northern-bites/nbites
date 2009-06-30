@@ -66,8 +66,8 @@ GOAL_OFF_LEDS = ((LEFT_EAR_LED, OFF,    NOW),
 #### FLASH ####
 FLASH_ON_LEDS = ((LEFT_EYE_LED,  GREEN, NOW),
                  (RIGHT_EYE_LED, GREEN, NOW),
-                 (LEFT_EAR_LED,  GREEN, NOW),
-                 (RIGHT_EAR_LED, GREEN, NOW),)
+                 (LEFT_EAR_LED,  BLUE, NOW),
+                 (RIGHT_EAR_LED, BLUE, NOW),)
 FLASH_OFF_LEDS = ((LEFT_EYE_LED,  OFF, NOW),
                   (RIGHT_EYE_LED, OFF, NOW),
                   (LEFT_EAR_LED,  OFF, NOW),
@@ -85,6 +85,11 @@ class Leds():
 
     def processLeds(self):
         self.counter += 1
+
+        if self.flashing and self.counter % 5 == 0:
+            self.flashLeds()
+            return
+
         ### for the ball ###
         if DEBUG_BALL_LEDS:
             if self.brain.ball.on:
@@ -104,9 +109,6 @@ class Leds():
                 self.executeLeds(CHASER_ON_LEDS)
             else:
                 self.executeLeds(CHASER_OFF_LEDS)
-
-        if self.flashing and self.counter % 5 == 0:
-            self.flashLeds()
 
     def executeLeds(self,listOfLeds):
 
