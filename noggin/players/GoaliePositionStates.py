@@ -44,10 +44,13 @@ def goalieAwesomePosition(player):
         bearing = ball.locBearing
     else:
         bearing = NogginConstants.OPP_GOAL_HEADING
-    if not useOmni:
-        nav.goTo((position[0], position[1], my.h + bearing))
-    else:
-        nav.omniGoTo((position[0], position[1], my.h + bearing))
+
+    if (not player.brain.nav.atDestinationGoalie() or
+        not player.brain.nav.atHeading()):
+        if not useOmni:
+            nav.goTo((position[0], position[1], my.h + bearing))
+        else:
+            nav.omniGoTo((position[0], position[1], my.h + bearing))
 
     return player.stay()
 
