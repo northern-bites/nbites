@@ -212,7 +212,7 @@ extern "C" {
                                     obj->getRightBottomX(), obj->getRightBottomY());
             } else if (cb != NULL) {
                 env->CallVoidMethod(jobj, setFieldObjectInfo,
-                                    50,
+                                    47,
                                     cb->getWidth(), cb->getHeight(),
                                     cb->getLeftTopX(), cb->getLeftTopY(),
                                     cb->getRightTopX(), cb->getRightTopY(),

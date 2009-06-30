@@ -13,14 +13,15 @@ package TOOL.Vision;
 public class VisualFieldObject {
 
     //some constants I yanked out of the Nao code -- temporary
-    public static final int BLUE_GOAL_LEFT_POST = 30,
-	BLUE_GOAL_RIGHT_POST = 31,
-	YELLOW_GOAL_LEFT_POST = 32,
-	YELLOW_GOAL_RIGHT_POST = 33,
-	BLUE_GOAL_POST = 34,
-	YELLOW_GOAL_POST = 35,
-	BLUE_GOAL_BACKSTOP = 36,
-	YELLOW_GOAL_BACKSTOP = 37;
+    public static final int BLUE_GOAL_LEFT_POST = 40,
+        BLUE_GOAL_RIGHT_POST = 41,
+        YELLOW_GOAL_LEFT_POST = 42,
+        YELLOW_GOAL_RIGHT_POST = 43,
+        BLUE_GOAL_POST = 44,
+        YELLOW_GOAL_POST = 45,
+        UNKNOWN_FIELD_OBJECT = 46,
+        BLUE_GOAL_BACKSTOP = 47,
+        YELLOW_GOAL_BACKSTOP = 48;
 
     private int id;
     private double w, h;
