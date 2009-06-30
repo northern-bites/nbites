@@ -132,9 +132,11 @@ def fThreeField(team):
     return [PBConstants.THREE_FIELD] + role
 
 def fDubD(team):
+    pos = None
     role = None
+    subRole = None
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        role, subRole, pos = Roles.rGoalie(team)
     elif team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
         # Figure out who isn't penalized with you
         other_teammate = team.getOtherActiveTeammate()
