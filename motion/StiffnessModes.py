@@ -271,21 +271,21 @@ LEFT_FARTHER_KICK_STIFFNESSES = (GAINS_ON_VALUE, # Head
 
 DIVE_RIGHT_STIFFNESSES=  (GAINS_OFF_VALUE, # Head
                                  GAINS_OFF_VALUE,
-                                 GAINS_ON_VALUE, # larm
-                                 GAINS_ON_VALUE,
-                                 GAINS_ON_VALUE,
-                                 GAINS_ON_VALUE,
+                                 GAINS_OFF_VALUE, # larm
+                                 GAINS_OFF_VALUE,
+                                 GAINS_OFF_VALUE,
+                                 GAINS_OFF_VALUE,
                                  GAINS_ON_VALUE, # lleg
                                  GAINS_ON_VALUE,
                                  GAINS_ON_VALUE,
                                  GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_OFF_VALUE, # rleg
                                  GAINS_OFF_VALUE,
                                  GAINS_OFF_VALUE,
-                                 GAINS_ON_VALUE, # rleg
-                                 GAINS_ON_VALUE,
-                                 GAINS_ON_VALUE,
-                                 GAINS_ON_VALUE,
-                                 GAINS_ON_VALUE,
+                                 GAINS_OFF_VALUE,
+                                 GAINS_OFF_VALUE,
                                  GAINS_OFF_VALUE,
                                  GAINS_OFF_VALUE, # rarm
                                  GAINS_OFF_VALUE,
