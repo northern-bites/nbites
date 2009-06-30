@@ -170,7 +170,7 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
     TOPFIND = false;
     BALLDEBUG = false;
     CORNERDEBUG = false;
-	CROSSDEBUG = false;
+    CROSSDEBUG = false;
     BACKDEBUG = false;
     SANITY = false;
     DEBUGBALLPOINTS = false;
@@ -1817,7 +1817,7 @@ void ObjectFragments::createObject(int c) {
 			cout << numBlobs << " white blobs" << endl;
 		for (int i = 0; i < numBlobs; i++) {
 			if (blobWidth(blobs[i]) < 55 && blobHeight(blobs[i]) < 55 &&
-				blobWidth(blobs[i]) > 3 && blobHeight(blobs[i]) > 3 &&
+				blobWidth(blobs[i]) > 5 && blobHeight(blobs[i]) > 5 &&
 				blobWidth(blobs[i]) < 5 * blobHeight(blobs[i])  &&
 				blobHeight(blobs[i]) < 5 * blobWidth(blobs[i])) {
 				checkForX(blobs[i]);
