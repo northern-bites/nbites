@@ -160,12 +160,12 @@ DUCK_GAIT = motion.GaitCommand(DUCK_STANCE_CONFIG,
 FAST_STANCE_CONFIG = (31.00, # CoM height
                       1.45,  # Forward displacement of CoM
                       10.0,  # Horizontal distance between feet
-                      7.0,   # Body angle around y axis
+                      3.0,   # Body angle around y axis
                       0.0,   # Angle between feet
                       0.1)   # Time to transition to/from this stance
 FAST_STEP_CONFIG = (0.5, # step duration
                     0.2,  # fraction in double support
-                    1.1,  # stepHeight
+                    1.5,  # stepHeight
                     -6.0,  # step lift
                     20.0,  # max x speed
                     20.0,  # max y speed
