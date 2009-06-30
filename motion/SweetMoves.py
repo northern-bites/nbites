@@ -405,16 +405,16 @@ GOALIE_DIVE_RIGHT = ( ((90.,0.,-65.,-57.),
                        (0.,0., 0., 0.,0,0.),
                        (-90.,0., 0., 0.),.1,0,stiff.NO_STIFFNESSES), )
 
-GOALIE_RIGHT_KICK_SAVE = ( ((90.,0.,-65.,-57.),
+GOALIE_RIGHT_KICK_SAVE = ( ((0., 90., 0., 0.),
                                  (0., 0., -55., 125.7, -75.7, 0.),
                                  (-76., 0., -25., 0, 75.7, 0.),
-                                 (90.,0.,65.,57.),
+                                 (120., 120., 0., 0.),
                                  1.5, 0, stiff.LOW_HEAD_STIFFNESSES), )
 
-GOALIE_PREP_RIGHT_KICK_SAVE = ( ((90.,0.,-65.,-57.),
+GOALIE_PREP_RIGHT_KICK_SAVE = ( ((0.,90., 0., 0.),
                                  (0., 0.,-55.,125.7,-75.7,0.),
                                  (-76., 0.,-25.,0, 75.7,0.),
-                                 (90.,0.,65.,57.),
+                                 (90.,-90., 0., 0.),
                                  1.5, 0, stiff.LOW_HEAD_STIFFNESSES), )
 GOALIE_STAND_UP = (
                    ((35,2,-14,-41),
