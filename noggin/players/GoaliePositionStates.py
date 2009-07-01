@@ -161,8 +161,8 @@ def goalieAtPosition(player):
     # Check that the position is correct
     position = player.brain.playbook.position
 
-    if (abs(nav.destX - position[0]) < constants.SHOULD_POSITION_DIFF or
-        abs(nav.destY - position[1]) <  constants.SHOULD_POSITION_DIFF or
+    if (abs(nav.destX - position[0]) > constants.SHOULD_POSITION_DIFF or
+        abs(nav.destY - position[1]) >  constants.SHOULD_POSITION_DIFF or
         not nav.atDestinationGoalie() or
         not nav.atHeading()):
         return player.goNow("goalieAwesomePosition")
