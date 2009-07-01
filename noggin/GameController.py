@@ -26,10 +26,11 @@ class GameController(FSA.FSA):
         self.timeRemaining = self.gc.timeRemaining()
         self.kickOff = self.gc.kickOff
         self.penaltyShots = False
-        self.ownKickOff = (self.kickOff == self.brain.my.teamColor)
+        self.ownKickOff = False
 
     def run(self):
         self.setGCLEDS()
+        self.ownKickOff = (self.gc.kickOff == self.brain.my.teamColor)
 
         if self.gc.secondaryState == comm.STATE2_PENALTYSHOOT:
             if self.gc.state == comm.STATE_INITIAL:

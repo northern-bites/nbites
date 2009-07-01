@@ -158,6 +158,7 @@ def clearBall(player):
             else :
                 if constants.DEBUG_KICKS: print ("\t\tbottom4")
                 return player.goLater('kickBallStraight')
+    return player.goLater('kickBallStraight')
 
 def kickBallStraightShort(player):
     if player.brain.ball.on:

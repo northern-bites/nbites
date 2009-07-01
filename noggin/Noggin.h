@@ -16,7 +16,7 @@
 #include "RoboGuardian.h"
 #include "Sensors.h"
 
-#define LOG_LOCALIZATION
+//#define LOG_LOCALIZATION
 
 class Noggin
 {
