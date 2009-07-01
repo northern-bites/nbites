@@ -4093,8 +4093,9 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
     int w = blobWidth(topBlob);
     int h = blobHeight(topBlob);
     estimate e;
+    const float BALL_REAL_HEIGHT = 8.6f;
     e = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, 
-								  topBlob.leftTop.y + 2 * blobHeight(topBlob) / heightDiv, 0.0);
+								  topBlob.leftTop.y + 2 * blobHeight(topBlob) / heightDiv, BALL_REAL_HEIGHT);
 
     //cout << "Estimated distance is " << e.dist << endl;
     if (BALLDEBUG) {
@@ -4103,6 +4104,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
             printBlob(topBlob);
             cout << topBlob.leftTop.x << " " << topBlob.leftTop.y << " " << w << " " << h << endl;
         }
+	
     }
     // check for obvious occlusions
     if (topBlob.leftBottom.y > IMAGE_HEIGHT - imgBuff) {
@@ -4206,14 +4208,54 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
                                           thisBall->getCenterY(),
                                           static_cast<float>(thisBall->
                                                              getFocDist())));
-	if ((e.dist * 2 < thisBall->getDistance() || thisBall->getDistance() * 2 < e.dist) &&
-		e.dist < PIXACC && e.dist > 0) {
-		if (BALLDEBUG) {
-			cout << "Screening due to distance mismatch " << e.dist << " " << thisBall->getDistance() << endl;
-		}
-		thisBall->init();
-		return 0;
+    if ((e.dist * 2 < thisBall->getDistance() || thisBall->getDistance() * 2 < e.dist) &&
+	e.dist < PIXACC && e.dist > 0) {
+      if (BALLDEBUG) {
+	cout << "Screening due to distance mismatch " << e.dist << " " << thisBall->getDistance() << endl;
+      }
+      thisBall->init();
+      return 0;
+    }
+    // sometimes when we're close to the ball we catch reflections off the tape or posts
+    if (thisBall->getDistance() < 75.0f && abs(h - w) > 3) { // && thisBall->getDistance() < e.dist - 5.0f) {
+      // we probably have misidentified the distance see if we can fix it.
+      if (BALLDISTDEBUG) {
+	cout << "Detected bad ball distance - trying to fix " << w << " " << h << endl;
+      }
+      if (h > w) {
+	// scan the sides to find the real sides
+	int count = -2;
+	if (topBlob.rightTop.x - h > 0) {
+	  for (int i = topBlob.rightTop.x - h; i < IMAGE_WIDTH - 1; i++) {
+	    for (int j = topBlob.leftTop.y; j < topBlob.leftBottom.y; j++) {
+	      if (thresh->thresholded[j][i] == ORANGE) {
+		topBlob.rightTop.x = i;
+		j = IMAGE_HEIGHT;
+		i = IMAGE_WIDTH;
+	      }
+	    }
+	    count++;
+	  }
 	}
+	if (topBlob.leftTop.x + h < IMAGE_WIDTH) {
+	  for (int i = topBlob.leftTop.x + h; i > -1; i--) {
+	    for (int j = topBlob.leftTop.y; j < topBlob.leftBottom.y; j++) {
+	      if (thresh->thresholded[j][i] == ORANGE) {
+		topBlob.rightTop.x = i;
+		j = IMAGE_HEIGHT;
+		i = -1;
+	      }
+	    }
+	    count++;
+	  }
+	}
+	cout << "Count is " << count << endl;
+	if (count > 1) {
+	}
+      } else {
+      }
+      thisBall->setDistanceEst(e);
+    }
     if (atBoundary(topBlob)) {
         // INFERRED MEASUREMENTS
         //estimate es;
@@ -4225,7 +4267,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
     if (BALLDISTDEBUG) {
         estimate es;
         es = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, topBlob.leftTop.y + 2
-			 * blobHeight(topBlob) / heightDiv, 0.0);
+			 * blobHeight(topBlob) / heightDiv, 8.0);
         cout << "Distance is " << thisBall->getDistance() << " " << thisBall->getFocDist() << " " << es.dist << endl;
         cout<< "Radius"<<thisBall->getRadius()<<endl;
     }
@@ -4340,7 +4382,7 @@ bool ObjectFragments::locationOk(blob b, int hor)
     int trueBottom = max(b.leftBottom.y, b.rightBottom.y); // bottommost value in teh blob
     int horizonLeft = yProject(0, hor, trueLeft);          // the horizon at the leftmost point
     int horizonRight = yProject(0, hor, trueRight);        // the horizon at the rightmost point
-    //cout << "Horizon stuff " << horizonLeft << " " << horizonRight << " " << hor << endl;
+    cout << "Horizon stuff " << horizonLeft << " " << horizonRight << " " << hor << endl;
     //drawPoint(trueLeft, horizonLeft, RED);
     //if (slope < 0) {
     //  horizonLeft = yProject(IMAGE_WIDTH - 1, hor, trueLeft);
@@ -4356,13 +4398,14 @@ bool ObjectFragments::locationOk(blob b, int hor)
         if (!greenCheck(b) || mh - trueBottom > spanY || spanX < spanMax ||
             mh - trueBottom > bottomMin) {
             if (spanY > minPostSpanY) {
-                return true;
-            }
-            if (SANITY) {
+	      //return true;
+            } else {
+	      if (SANITY) {
                 cout << "Screening blob for bottom reasons" << endl;
                 printBlob(b);
-            }
-            return false;
+	      }
+	      return false;
+	    }
         } else {
         }
     }

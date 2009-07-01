@@ -87,6 +87,8 @@ Vision Constants that span multiple classes and systems.
 
 #define FOV_X RAD_OVER_DEG*FOV_X_DEG
 #define FOV_Y RAD_OVER_DEG*FOV_Y_DEG
+static const float RAD_TO_PIX_Y = static_cast<float>(IMAGE_HEIGHT) / static_cast<float>(FOV_Y);
+static const float RAD_TO_PIX_X = static_cast<float>(IMAGE_WIDTH) / static_cast<float>(FOV_X);
 
 #define HALF_IMAGE_WIDTH  (IMAGE_WIDTH / 2)
 #define HALF_IMAGE_HEIGHT (IMAGE_HEIGHT / 2)
