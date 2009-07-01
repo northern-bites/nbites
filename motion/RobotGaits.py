@@ -269,8 +269,8 @@ MED_STEP = (0.4, # step duration
             0.25,  # fraction in double support
             0.9,  # stepHeight
             -5.0,  # step lift
-            7.0,  # max x speed
-            7.0,  # max y speed
+            10.0,  # max x speed
+            10.0,  # max y speed
             20.0, # max theta speed()
             7.0,  # max x accel
             7.0,  # max y accel
@@ -285,13 +285,13 @@ MED_ZMP = (0.0,  # footCenterLocX
            0.01,  # strafe zmp offse
            6.6)   # turn zmp offset
 
-MED_SENSOR =  (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
-               0.5,  # angle X scale (gamma)
-               0.3,  # angle Y scale (gamma)
+MED_SENSOR =  (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
+               0.07,  # angle X scale (gamma)
+               0.07,  # angle Y scale (gamma)
                250.00,  # X spring constant k (kg/s^2)
                250.00,  # Y spring constant k (kg/s^2)
                7.0,   # max angle X (compensation)
-               3.0,   # max angle Y
+               7.0,   # max angle Y
                45.0)   # max angle vel (change in compensation)
 
 MED_HACK = JOINT_HACK_CONFIG
