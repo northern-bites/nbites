@@ -178,8 +178,8 @@ const WalkVector Step::elipseClipVelocities(const WalkVector & source){
   const float thetaScale = std::floor((1.0f-percent_max)*2.0f +1.0f)*0.3333f;
   //cout <<"thetaScale = "<<thetaScale<<endl;
 
-  const float new_theta_vel = NBMath::clip(source.theta,stepConfig[WP::MAX_VEL_THETA])
-    *thetaScale;
+  const float new_theta_vel = NBMath::clip(source.theta,stepConfig[WP::MAX_VEL_THETA]
+                                           *thetaScale);
 
   const WalkVector clippedVelocity = {new_x_vel,new_y_vel,new_theta_vel};
   return clippedVelocity;
