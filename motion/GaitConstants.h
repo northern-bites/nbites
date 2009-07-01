@@ -57,11 +57,19 @@ namespace WP {
         DURATION,
         DBL_SUPP_P,
         STEP_HEIGHT, //TODO move this to STANCE
+	FOOT_LIFT_ANGLE,
         MAX_VEL_X,
         MAX_VEL_Y,
         MAX_VEL_THETA,
+        MAX_ACC_X,
+        MAX_ACC_Y,
+        MAX_ACC_THETA,
+	WALKING, //1.0 is walking, everything else is not walking.
         LEN_STEP_CONFIG
     };
+
+    static const float NON_WALKING_GAIT = 0.0f;
+    static const float WALKING_GAIT = 1.0f;
 
 /**
  * ZMP CONFIG holds the following parameters:
@@ -169,9 +177,14 @@ namespace WP {
     {NONE,//step time
      NONE,//dblSupFrac
      LENGTH,//step height
+     ANGLE, //foot lift angle
      LENGTH,//max vel x
      LENGTH,//max vel y
-     ANGLE};//max vel t
+     ANGLE,//max vel t
+     LENGTH,//max acc x
+     LENGTH,//max acc y
+     ANGLE,//max acc t
+     NONE};//Walking or not
     static const float ZMP_CONVERSION[LEN_ZMP_CONFIG]=
     {LENGTH,//foot center
      NONE,//zmp static perc
@@ -220,9 +233,14 @@ namespace WP {
     {0.4f,//step time
      0.25f,//dblSupFrac
      9.0f,//step height
+     0.0f,//lift angle
      70.0f,//max vel x
      70.0f,//max vel y
-     0.35f};//max vel t
+     0.35f,//max vel t
+     70.0f,//max acc x
+     70.0f,//max acc y
+     0.35f,//max acc t
+     WALKING_GAIT};//Walking or not
     static const float ZMP_DEFAULT[LEN_ZMP_CONFIG]=
     {0.0f,//foot center
      0.4f,//zmp static perc

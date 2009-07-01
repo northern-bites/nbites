@@ -572,35 +572,13 @@ StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
                                   const float _theta)  {
-    //convert speeds in cm/s and rad/s into steps and clip according to the gait
-    const float new_x =  clip(_x,gait->step[WP::MAX_VEL_X])
-        *gait->step[WP::DURATION];
-    const float new_y = clip(_y,gait->step[WP::MAX_VEL_Y])
-        *gait->step[WP::DURATION];
-    //we only turn every other step, so double the turning!
-    const float new_theta = clip(_theta,gait->step[WP::MAX_VEL_THETA])
-        *gait->step[WP::DURATION]*2.0f;
-
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
     clearFutureSteps();
 
-    //If the walk vector isn't changing,
-    if(abs(new_x - x) <= NEW_VECTOR_THRESH_MMS &&
-       abs(new_y - y) <= NEW_VECTOR_THRESH_MMS &&
-       abs(new_theta - theta) <= NEW_VECTOR_THRESH_RADS){
-
-        //and there are plenty of steps,
-        if(futureSteps.size() + currentZMPDSteps.size() >= MIN_NUM_ENQUEUED_STEPS){
-            //since we don't need steps, and the new vector is not very different,
-            //we just return
-            return;
-        }
-    }
-
-    x = new_x;
-    y=new_y;
-    theta=new_theta;
+    x = _x;
+    y = _y;
+    theta = _theta;
 
 #ifdef DEBUG_STEPGENERATOR
     cout << "New Walk Vector is:" << endl
@@ -620,7 +598,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
         resetQueues();
 
         //then we need to pick which foot to start with
-        const bool startLeft = decideStartLeft(new_y,new_theta);
+        const bool startLeft = decideStartLeft(y,theta);
         resetSteps(startLeft);
     }
     done = false;
@@ -640,17 +618,6 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
          <<") and with nsteps = "<<_numSteps<<endl;
 #endif
 
-    // We have to reevalaute future steps, so we forget about any future plans
-    clearFutureSteps();
-    //convert speeds in cm/s and rad/s into steps and clip according to the gait
-    const float new_x =  clip(_x,gait->step[WP::MAX_VEL_X])
-        *gait->step[WP::DURATION];
-    const float new_y = clip(_y,gait->step[WP::MAX_VEL_Y])
-        *gait->step[WP::DURATION];
-    //we only turn every other step, so double the turning!
-    const float new_theta = clip(_theta,gait->step[WP::MAX_VEL_THETA])
-        *gait->step[WP::DURATION]*2.0f;
-
     //Ensure that we are currently stopped -- if not, throw warning
     if(!done){
         cout<< "Warning!!! Step Command with (" << _x << "," << _y<<","<<_theta
@@ -662,11 +629,11 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
         resetQueues();
 
         //then we need to pick which foot to start with
-        const bool startLeft = decideStartLeft(new_y,new_theta);
+        const bool startLeft = decideStartLeft(_y,_theta);
         resetSteps(startLeft);
 
         //Adding this step is necessary because it was not added in the start left right
-        generateStep(new_x, new_y, new_theta);
+        generateStep(_x, _y, _theta);
 
         done = false;
 
@@ -674,7 +641,7 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
 
 
     for(int i =0; i < _numSteps; i++){
-        generateStep(new_x, new_y, new_theta);
+        generateStep(_x, _y, _theta);
     }
 
 
@@ -767,11 +734,11 @@ void StepGenerator::resetSteps(const bool startLeft){
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is REGULAR type.
     shared_ptr<Step> firstSupportStep =
-        shared_ptr<Step>(new Step(0,HIP_OFFSET_Y*supportSign,0,
+      shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                   *gait,
-                                  firstSupportFoot,END_STEP));
+                                  firstSupportFoot,ZERO_WALKVECTOR,END_STEP)); 
     shared_ptr<Step> dummyStep =
-        shared_ptr<Step>(new Step(0,-HIP_OFFSET_Y*supportSign,0,
+        shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                   *gait,
                                   dummyFoot));
     //need to indicate what the current support foot is:
@@ -813,7 +780,14 @@ void StepGenerator::generateStep( float _x,
     //  different overall behaviors: check if we want to start, else if we
     //  want to start moving, else if are already moving.
     StepType type;
-    if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
+
+    if(gait->step[WP::WALKING] == WP::NON_WALKING_GAIT){
+      type = END_STEP;
+      _x = 0.0f;
+      _y = 0.0f;
+      _theta = 0.0f;
+
+    }else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
 //         if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
 //            (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
 //                                  1:-1)*HIP_OFFSET_Y) != 0)
@@ -840,38 +814,19 @@ void StepGenerator::generateStep( float _x,
         }
     }
 
-    //check  if we need to clip lateral movement of this leg
-    if(_y > 0){
-        if(!nextStepIsLeft){
-            _y = 0.0f;
-        }
-    }else if(_y < 0){
-        if(nextStepIsLeft){
-            _y = 0.0f;
-        }
-    }
 
-    if(_theta > 0){
-        if(!nextStepIsLeft){
-            _theta = 0.0f;
-        }
-    }else if (_theta < 0){
-        if(nextStepIsLeft){
-            _theta = 0.0f;
-        }
-    }
 
-    const float leg_sign = (nextStepIsLeft ?
-                           1.0f : -1.0f);
-    const float computed_x = _x - sin(abs(_theta)) * HIP_OFFSET_Y;
-    const float computed_y = _y +
-        leg_sign*HIP_OFFSET_Y*cos(_theta);
-    const float computed_theta = _theta;
+    //The input here is in velocities. We need to convert it to distances perstep
+    //Also, we need to scale for the fact that we can only turn or strafe every other step
 
-    shared_ptr<Step> step(new Step(computed_x, computed_y, computed_theta,
+
+    const WalkVector new_walk = {_x,_y,_theta};
+
+    shared_ptr<Step> step(new Step(new_walk,
                                    *gait,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
+				   lastQueuedStep->walkVector,
                                    type));
 
 #ifdef DEBUG_STEPGENERATOR

@@ -16,6 +16,9 @@ if(!file.exists(file))
 	quit("no")
 dat = read.table(file,header=T,na.strings=c("-"))
 
+
+velY = diff(dat$angleY,lag=1,differences=1)
+
 dat$range = dat$angleX
 dat$range[1] = .6
 dat$range[2] = -.6
@@ -41,6 +44,10 @@ zeros = rep(-1.0,length(dat$time))
 points(dat$time,zeros,pch=1,col=dat$state+2)
 names = c("Supporting","Swinging","Dbl Sup", "P. Dbl Sup")
 legend("topleft",lwd=2,legend=names,col=c(2:5))
+dev.off()
+
+pdf(paste(name,"-vel",PDF,sep=""))
+plot(velY,type="l")
 dev.off()
 
 }

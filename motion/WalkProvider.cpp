@@ -73,13 +73,15 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     pthread_mutex_lock(&walk_provider_mutex);
     if ( pendingGaitCommands){
         if(stepGenerator.isDone() && pendingStartGaitCommands){
-            //If we just did a standup, then we need to force which gaits are set
             metaGait.setStartGait(startGait);
         }
         metaGait.setNewGaitTarget(nextGait);
     }
     pendingGaitCommands = false;
     pendingStartGaitCommands = false;
+
+    //The meta gait needs to be ticked BEFORE any commands are sent to stepGen
+    metaGait.tick_gait();
 
     if(nextCommand){
         stepGenerator.setSpeed(nextCommand->x_mms,
@@ -103,8 +105,6 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
         cout << "WARNING, I wouldn't be calling the Walkprovider while"
             " it thinks its DONE if I were you!" <<endl;
     }
-
-    metaGait.tick_gait();
 
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
@@ -186,6 +186,7 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
+
     startGait = nextGait;
     pendingStartGaitCommands = true;
 
