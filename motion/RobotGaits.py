@@ -41,9 +41,15 @@ STEP_CONFIG = (0.4, # step duration
 MARVIN_STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
                0.9,  # stepHeight
+               0.0,  # step lift
                7.0,  # max x speed
                7.0,  # max y speed
-               20.0)  # max theta speed()
+               20.0, # max theta speed()
+               7.0,  # max x accel
+               7.0,  # max y accel
+               20.0, # max theta speed()
+               20.0,  # max theta speed()
+                      WALKING)#walk gait = true
 
 STATIONARY_STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
@@ -122,7 +128,7 @@ MARVIN_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
 
 CUR_SENSOR_CONFIG = OLD_SENSOR_CONFIG
 
-STIFFNESS_CONFIG = (0.95, #hipStiffness
+STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.3,  #kneeStiffness
                     0.4,  #anklePitchStiffness
                     0.3,  #ankleRollStiffness
@@ -255,12 +261,12 @@ WEBOTS_GAIT2=motion.GaitCommand(STANCE_CONFIG,
 #DEFAULT GAIT ASSIGNMENTS
 
 TRILLIAN_GAIT = NEW_GAIT
-ZAPHOD_GAIT   =   FAST_GAIT
+ZAPHOD_GAIT   =   NEW_GAIT
 SLARTI_GAIT   =   NEW_GAIT
 MARVIN_GAIT   =   MARVIN_NEW_GAIT
 
 TRILLIAN_TURN_GAIT = NEW_GAIT
-ZAPHOD_TURN_GAIT   =   FAST_GAIT
+ZAPHOD_TURN_GAIT   =   NEW_GAIT
 SLARTI_TURN_GAIT   =   NEW_GAIT
 MARVIN_TURN_GAIT   =   MARVIN_NEW_GAIT
 
