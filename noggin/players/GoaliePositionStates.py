@@ -45,13 +45,14 @@ def goalieAwesomePosition(player):
     else:
         bearing = NogginConstants.OPP_GOAL_HEADING
 
-    if (not player.brain.nav.atDestinationGoalie() or
-        not player.brain.nav.atHeading()):
+    if (not nav.atDestinationGoalie() or
+        not nav.atHeading()):
         if not useOmni:
             nav.goTo((position[0], position[1], my.h + bearing))
         else:
             nav.omniGoTo((position[0], position[1], my.h + bearing))
-
+    else:
+        return player.goLater("goalieAtPosition")
     return player.stay()
 
 def goaliePositionForSave(player):
@@ -147,4 +148,22 @@ def goalieOutOfPosition(player):
         player.stepOffCenter = 0
         return player.goLater('goaliePosition')
 
+    return player.stay()
+
+def goalieAtPosition(player):
+    brain = player.brain
+    nav = player.brain.nav
+    if brain.ball.x >= constants.ACTIVE_LOC_THRESH:
+        player.brain.tracker.activeLoc()
+    else:
+        player.brain.tracker.trackBall()
+
+    # Check that the position is correct
+    position = player.brain.playbook.position
+
+    if (abs(nav.destX - position[0]) < constants.SHOULD_POSITION_DIFF or
+        abs(nav.destY - position[1]) <  constants.SHOULD_POSITION_DIFF or
+        not nav.atDestinationGoalie() or
+        not nav.atHeading()):
+        return player.goNow("goalieAwesomePosition")
     return player.stay()
