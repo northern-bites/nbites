@@ -18,6 +18,7 @@ def playbookPosition(player):
     position = brain.playbook.position
     nav = brain.nav
     my = brain.my
+    ball = brain.ball
 
     if player.firstFrame():
         player.changeOmniGoToCounter = 0
@@ -26,10 +27,15 @@ def playbookPosition(player):
         else :
             brain.tracker.activeLoc()
 
+    # Get a bearing to the ball
+    if ball.on:
+        bearing = ball.bearing
+    else:
+        bearing = ball.locBearing
+
     distToPoint = MyMath.dist(my.x, my.y, position[0], position[1])
 
-    useOmni = (distToPoint <= \
-                   constants.OMNI_POSITION_DIST)
+    useOmni = distToPoint <= constants.OMNI_POSITION_DIST
     changedOmni = False
 
     if useOmni != nav.movingOmni:
@@ -39,10 +45,11 @@ def playbookPosition(player):
     if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
         changedOmni = True
 
-    if player.firstFrame() or \
-            nav.destX != position[0] or \
-            nav.destY != position[1] or \
-            changedOmni:
+    # Send a goto if we have changed destinations or 
+    if (player.firstFrame() or
+        abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
+        abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
+        changedOmni):
 
         if brain.my.locScore == NogginConstants.BAD_LOC:
             player.shouldRelocalizeCounter += 1
@@ -51,10 +58,11 @@ def playbookPosition(player):
         if player.shouldRelocalizeCounter > constants.SHOULD_RELOC_FRAME_THRESH:
             return player.goLater('relocalize')
 
+        # Attempt to go to the point while looking at the ball
         if not useOmni:
-            nav.goTo(position)
+            nav.goTo((position[0], position[1], my.h + bearing))
         else:
-            nav.omniGoTo(position)
+            nav.omniGoTo((position[0], position[1], my.h + bearing))
 
     if transitions.shouldAvoidObstacle(player):
         return player.goNow('avoidObstacle')
