@@ -365,6 +365,11 @@ def waitBeforeKick(player):
         player.brain.tracker.trackBall()
         return player.goLater('positionForKick')
 
+    # Just don't get stuck here!
+    if player.counter > 50:
+        return player.goNow('scanFindBall')
+    return player.stay()
+
 # WARNING: avoidObstacle could possibly go into our own box
 def avoidObstacle(player):
     """
