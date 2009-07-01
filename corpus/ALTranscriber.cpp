@@ -211,7 +211,7 @@ void ALTranscriber::syncMotionWithALMemory() {
         filteredAngleX = newWeight*angleX + (1-newWeight)*lastAngleX ;
         filteredAngleY = newWeight*angleY + (1-newWeight)*lastAngleY ;
     }else{
-      cout<< "Got a bad angleXY value!"<<endl;
+        //cout<< "Got a bad angleXY value!"<<endl;
         //Do nothing, since the values are bad
     }
 
