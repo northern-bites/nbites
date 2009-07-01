@@ -15,6 +15,7 @@ def fallen(guard):
         guard.brain.tracker.stopHeadMoves()
         guard.brain.motion.resetWalk()
         guard.brain.motion.resetScripted()
+        guard.brain.motion.stopHeadMoves()
         guard.brain.player.gainsOn()
 
     # Put player into safe mode
