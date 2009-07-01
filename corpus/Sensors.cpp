@@ -110,6 +110,17 @@ const vector<float> Sensors::getBodyAngles () const
     return vec;
 }
 
+const vector<float> Sensors::getHeadAngles () const
+{
+    pthread_mutex_lock (&vision_angles_mutex);
+    vector<float> vec(2);
+    vec[0] = visionBodyAngles[0];
+    vec[1] = visionBodyAngles[1];
+    pthread_mutex_unlock (&vision_angles_mutex);
+
+    return vec;
+}
+
 const vector<float> Sensors::getBodyAngles_degs () const
 {
     pthread_mutex_lock (&angles_mutex);

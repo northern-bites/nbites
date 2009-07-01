@@ -252,6 +252,28 @@ void Threshold::runs() {
     // -they track when certain color combinations first occur
 
     horizonSlope = pose->getHorizonSlope();
+    cout << pose->getHeadYaw() << " " << pose->getHeadPitch() << endl;
+    const float headYaw = pose->getHeadYaw();
+    const float headPitch = pose->getHeadPitch();
+    const float HORIZONTAL_SHOULDER_THRESH_LEFT = 1.0f;
+    const float HORIZONTAL_SHOULDER_THRESH_RIGHT = -HORIZONTAL_SHOULDER_THRESH_LEFT;
+    const float angleInImageLeft = HORIZONTAL_SHOULDER_THRESH_LEFT - headYaw;
+    const float pixInImageLeft = -angleInImageLeft * RAD_TO_PIX_X + IMAGE_WIDTH / 2;
+
+    const float angleInImageRight = HORIZONTAL_SHOULDER_THRESH_RIGHT - headYaw;
+    const float pixInImageRight = -angleInImageRight * RAD_TO_PIX_X + IMAGE_WIDTH / 2;
+
+    drawLine(pixInImageLeft, 0,pixInImageLeft, IMAGE_HEIGHT - 1, RED);
+    drawLine(pixInImageRight, 0, pixInImageRight, IMAGE_HEIGHT - 1, BLACK);
+    
+    cout << "Computed " << pixInImageLeft << " " << RAD_TO_PIX_X << " " << FOV_X << " " << IMAGE_WIDTH << endl;
+
+    const float VERTICAL_SHOULDER_THRESH = -0.1f;
+    const float angleInImageUp = VERTICAL_SHOULDER_THRESH - headPitch;
+    const float pixInImageUp = angleInImageUp * RAD_TO_PIX_Y + IMAGE_HEIGHT / 2;
+
+    cout << "Up down " << pixInImageUp << endl;
+    drawLine(0, pixInImageUp, IMAGE_WIDTH - 1, pixInImageUp, ORANGE);
 
     // split up the loops
     for (i = 0; i < IMAGE_WIDTH; i += 1) {//scan across
@@ -533,7 +555,8 @@ void Threshold::findGreenHorizon() {
 
     // if the pose estimated horizon is less than 0, then just use it directly
     pH = pose->getHorizonY(0);
-    //if (pH < 0) {
+    cout << "Pose horizon " << pH << endl;
+    //if (pH < -20) {
     //horizon = pH;
     //return;
     //}
@@ -628,6 +651,9 @@ void Threshold::findGreenHorizon() {
         }
     }
     horizon = 0;
+    if (pH < 0) {
+      horizon = pH;
+    }
 }
 
 // point <int> Threshold::findIntersection(int col, int dir, int c) {

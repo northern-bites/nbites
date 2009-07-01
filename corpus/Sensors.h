@@ -94,6 +94,7 @@ class Sensors {
     //   Each of these methods first locks the associated mutex, copies the
     //   requested values, then unlocks the mutex before returning
     const std::vector<float> getBodyAngles() const;
+    const std::vector<float> getHeadAngles() const;
     const std::vector<float> getBodyAngles_degs() const;
     const std::vector<float> getVisionBodyAngles() const;
     const std::vector<float> getMotionBodyAngles() const;
