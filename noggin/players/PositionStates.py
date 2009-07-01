@@ -28,13 +28,17 @@ def playbookPosition(player):
             brain.tracker.activeLoc()
 
     # Get a bearing to the ball
-    if ball.on:
-        bearing = ball.bearing
+    if brain.gameController.currentState == 'gameReady':
+        destHeading = NogginConstants.OPP_GOAL_HEADING
+    elif ball.on:
+        destHeading = my.h + ball.bearing
+    elif ball.framesOff < 3:
+        destHeading = my.h + ball.locBearing
     else:
-        bearing = ball.locBearing
+        destHeading = NogginConstants.OPP_GOAL_HEADING
 
     distToPoint = MyMath.dist(my.x, my.y, position[0], position[1])
-
+    position = (position[0], position[1], destHeading)
     useOmni = distToPoint <= constants.OMNI_POSITION_DIST
     changedOmni = False
 
@@ -45,7 +49,7 @@ def playbookPosition(player):
     if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
         changedOmni = True
 
-    # Send a goto if we have changed destinations or 
+    # Send a goto if we have changed destinations or are just starting
     if (player.firstFrame() or
         abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
         abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
@@ -60,9 +64,9 @@ def playbookPosition(player):
 
         # Attempt to go to the point while looking at the ball
         if not useOmni:
-            nav.goTo((position[0], position[1], my.h + bearing))
+            nav.goTo(position)
         else:
-            nav.omniGoTo((position[0], position[1], my.h + bearing))
+            nav.omniGoTo(position)
 
     if transitions.shouldAvoidObstacle(player):
         return player.goNow('avoidObstacle')

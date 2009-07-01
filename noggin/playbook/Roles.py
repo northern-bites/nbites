@@ -76,10 +76,10 @@ def rDefensiveMiddie(team):
     """
     Midfielder who plays on the defensive side
     """
-    return [PBConstants.MIDDIE] + SubRoles.pDefensiveMiddie(team)
+    return [PBConstants.DEFENDER] + SubRoles.pDefensiveMiddie(team)
 
 def rOffensiveMiddie(team):
     """
     Midfielder who plays on the offensive side
     """
-    return [PBConstants.MIDDIE] + SubRoles.pOffensiveMiddie(team)
+    return [PBConstants.DEFNEDER] + SubRoles.pOffensiveMiddie(team)

@@ -264,9 +264,9 @@ SWEEPER_Y = NogginConstants.CENTER_FIELD_Y
 DEEP_STOPPER_X = NogginConstants.CENTER_FIELD_X * 1./2.
 STOPPER_MAX_X = NogginConstants.CENTER_FIELD_X - 75.
 
-STOPPER_X = NogginConstants.CENTER_FIELD_X - 200.
-TOP_STOPPER_Y = NogginConstants.CENTER_FIELD_Y + 150.
-BOTTOM_STOPPER_Y = NogginConstants.CENTER_FIELD_Y + 150.
+STOPPER_X = NogginConstants.CENTER_FIELD_X - 150.
+TOP_STOPPER_Y = NogginConstants.CENTER_FIELD_Y + 75.
+BOTTOM_STOPPER_Y = NogginConstants.CENTER_FIELD_Y - 75.
 
 # Offender
 WING_X_OFFSET = 100.
