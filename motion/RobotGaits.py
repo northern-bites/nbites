@@ -8,6 +8,13 @@ STANCE_CONFIG = (31.00, # CoM height
                  0.1)   # Time to transition to/from this stance
 
 
+MARVIN_STANCE_CONFIG = (31.00, # CoM height
+                 1.45,  # Forward displacement of CoM
+                 10.0,  # Horizontal distance between feet
+                 8.0,   # Body angle around y axis
+                 0.0,   # Angle between feet
+                 0.1)   # Time to transition to/from this stance
+
 DUCK_STANCE_CONFIG = (31.00, # CoM height
                       1.45,  # Forward displacement of CoM
                       10.0,  # Horizontal distance between feet
@@ -22,19 +29,34 @@ STEP_CONFIG = (0.4, # step duration
                7.0,  # max y speed
                20.0)  # max theta speed()
 
-
+MARVIN_STEP_CONFIG = (0.5, # step duration
+               0.25,  # fraction in double support
+               1.1,  # stepHeight
+               3.0,  # max x speed
+               3.0,  # max y speed
+               20.0)  # max theta speed()
 
 ZMP_CONFIG = (0.0,  # footCenterLocX
-              0.4,  # zmp static percentage
-              0.4,  # left zmp off
-              0.4,  # right zmp off
+              0.3,  # zmp static percentage
+              0.5,  # left zmp off
+              0.5,  # right zmp off
               0.01,  # strafe zmp offse
               6.6)   # turn zmp offset
 
 
+MARVIN_ZMP_CONFIG = (0.0,  # footCenterLocX
+              0.4,  # zmp static percentage
+              0.5,  # left zmp off
+              0.5,  # right zmp off
+              0.02,  # strafe zmp offse
+              6.8)   # turn zmp offset
+
 
 JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
                      5.5) # right swing hip roll addition
+
+MARVIN_JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
+                            5.5) # right swing hip roll addition
 
 NEW_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                      0.08,  # angle X scale (gamma)
@@ -53,6 +75,16 @@ OLD_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
                      15.0,   # max angle X (compensation)
                      15.0,   # max angle Y
                      75.0)   # max angle vel (change in compensation)
+
+
+MARVIN_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
+                        0.5,  # angle X scale (gamma)
+                        0.3,  # angle Y scale (gamma)
+                        0.00,  # spring constant k (kg/s^2)
+                        0.00,  # spring constant k (kg/s^2)
+                        7.0,   # max angle X (compensation)
+                        3.0,   # max angle Y
+                        45.0)   # max angle vel (change in compensation)
 
 
 CUR_SENSOR_CONFIG = OLD_SENSOR_CONFIG
@@ -79,6 +111,14 @@ NEW_GAIT = motion.GaitCommand(STANCE_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
+MARVIN_NEW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
+                                     MARVIN_STEP_CONFIG,
+                                     MARVIN_ZMP_CONFIG,
+                                     MARVIN_JOINT_HACK_CONFIG,
+                                     MARVIN_SENSOR_CONFIG,
+                                     STIFFNESS_CONFIG,
+                                     ODO_CONFIG,
+                                     ARM_CONFIG)
 
 
 DUCK_GAIT = motion.GaitCommand(DUCK_STANCE_CONFIG,
@@ -167,11 +207,11 @@ WEBOTS_GAIT2=motion.GaitCommand(DUCK_STANCE_CONFIG,
 TRILLIAN_GAIT = NEW_GAIT
 ZAPHOD_GAIT   =   NEW_GAIT
 SLARTI_GAIT   =   NEW_GAIT
-MARVIN_GAIT   =   NEW_GAIT
+MARVIN_GAIT   =   MARVIN_NEW_GAIT
 
 TRILLIAN_TURN_GAIT = NEW_GAIT
 ZAPHOD_TURN_GAIT   =   NEW_GAIT
 SLARTI_TURN_GAIT   =   NEW_GAIT
-MARVIN_TURN_GAIT   =   NEW_GAIT
+MARVIN_TURN_GAIT   =   MARVIN_NEW_GAIT
 
 
