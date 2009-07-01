@@ -6,3 +6,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(SquatGoalieStates)
         self.setName('pSquatGoalie')
+        self.squatting = False
