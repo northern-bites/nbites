@@ -193,6 +193,12 @@ def approachBall(player):
         player.brain.tracker.trackBall()
         player.brain.CoA.setRobotGait(player.brain.motion)
 
+    if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
+        player.brain.tracker.activeLoc()
+    else :
+        player.brain.tracker.trackBall()
+
+
     if player.penaltyKicking and \
             player.ballInOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
@@ -205,9 +211,10 @@ def approachBall(player):
             return player.goNow('positionForKick')
         elif transitions.shouldTurnToBall_ApproachBall(player):
             return player.goLater('turnToBall')
-        elif transitions.shouldScanFindBall(player):
+        elif not player.brain.tracker.activeLocOn and \
+                transitions.shouldScanFindBall(player):
             return player.goLater('goalieScanFindBall')
-        elif transitions.shouldAvoidObstacle(player):
+        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
             return player.goLater('avoidObstacle')
     else:
         if transitions.shouldDribble(player):
@@ -233,9 +240,13 @@ def approachBallWalk(player):
             return player.goNow('approachBallWithLoc')
         elif transitions.shouldTurnToBall_ApproachBall(player):
             return player.goLater('turnToBall')
-        elif transitions.shouldScanFindBall(player):
+        elif not player.brain.tracker.activeLocOn and \
+                transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
-        elif transitions.shouldAvoidObstacle(player):
+        elif player.brain.tracker.activeLocOn and \
+                transitions.shouldScanFindBallActiveLoc(player):
+            return player.goLater('scanFindBall')
+        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
             return player.goLater('avoidObstacle')
 
     # Determine our speed for approaching the ball
@@ -339,6 +350,9 @@ def waitBeforeKick(player):
 
     if not player.brain.nav.isStopped():
         return player.stay()
+
+    if transitions.shouldKick(player):
+        return player.goLater('getKickInfo')
     elif transitions.shouldApproachForKick(player):
         player.brain.tracker.trackBall()
         player.inKickingState = False
@@ -350,9 +364,13 @@ def waitBeforeKick(player):
     elif transitions.shouldRepositionForKick(player):
         player.brain.tracker.trackBall()
         return player.goLater('positionForKick')
-    else:
-        return player.goLater('getKickInfo')
 
+    # Just don't get stuck here!
+    if player.counter > 50:
+        return player.goNow('scanFindBall')
+    return player.stay()
+
+# WARNING: avoidObstacle could possibly go into our own box
 def avoidObstacle(player):
     """
     If we detect something in front of us, dodge it
@@ -403,7 +421,7 @@ def chaseAroundBox(player):
         return player.goNow('waitBeforeKick')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif transitions.shouldAvoidObstacle(player):
+    elif transitions.shouldAvoidObstacle(player): # Has potential to go into box!
         return player.goLater('avoidObstacle')
 
     if not transitions.shouldChaseAroundBox(player):
