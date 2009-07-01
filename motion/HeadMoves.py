@@ -51,8 +51,9 @@ QUICK_PANS = (
 
 HIGH_SCAN_CLOSE_BOUND = 104
 HIGH_SCAN_BALL = (
-    (( -65.0, -20.0),0.6,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( 65.0, -20.0),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    (( -65.0, -25.0),0.6,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 0.0, -35.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.,-5.),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-5.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,20.),0.2,1, stiff.LOW_HEAD_STIFFNESSES),
@@ -69,14 +70,16 @@ MID_DOWN_SCAN_BALL = (
     ((65.,20.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, -5.0) ,0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
     (( -65.0, -5.0),1.0,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( -65.0, -20.0),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( 65.0, -20.0),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),)
+    (( -65.0, -25.0),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 0.0, -35.0),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),)
 
 MID_UP_SCAN_BALL = (
     ((65.0, -5.0) ,0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
     (( -65.0, -5.0),1.0,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( -65.0, -20.0),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( 65.0, -20.0),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    (( -65.0, -25.0),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 0.0, -35.0),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.,-5.),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-5.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,20.),0.2,1, stiff.LOW_HEAD_STIFFNESSES),
@@ -89,15 +92,16 @@ LOW_SCAN_BALL = (
     ((65.,20.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, -5.0) ,0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
     (( -65.0, -5.0),1.0,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( -65.0, -20.0),0.4,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( 65.0, -20.0),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    (( -65.0, -25.0),0.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 0.0, -35.0),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.,-5.),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-5.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),)
 
 
 POST_SCAN = (
-    ((65.,-20.),2.0,  1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-65.,-20.),2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((65.,-25.),2.0,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.,-25.),2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 
 KICK_SCAN = (
