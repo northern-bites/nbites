@@ -252,28 +252,11 @@ void Threshold::runs() {
     // -they track when certain color combinations first occur
 
     horizonSlope = pose->getHorizonSlope();
-    cout << pose->getHeadYaw() << " " << pose->getHeadPitch() << endl;
-    const float headYaw = pose->getHeadYaw();
-    const float headPitch = pose->getHeadPitch();
-    const float HORIZONTAL_SHOULDER_THRESH_LEFT = 1.0f;
-    const float HORIZONTAL_SHOULDER_THRESH_RIGHT = -HORIZONTAL_SHOULDER_THRESH_LEFT;
-    const float angleInImageLeft = HORIZONTAL_SHOULDER_THRESH_LEFT - headYaw;
-    const float pixInImageLeft = -angleInImageLeft * RAD_TO_PIX_X + IMAGE_WIDTH / 2;
 
-    const float angleInImageRight = HORIZONTAL_SHOULDER_THRESH_RIGHT - headYaw;
-    const float pixInImageRight = -angleInImageRight * RAD_TO_PIX_X + IMAGE_WIDTH / 2;
-
-    drawLine(pixInImageLeft, 0,pixInImageLeft, IMAGE_HEIGHT - 1, RED);
-    drawLine(pixInImageRight, 0, pixInImageRight, IMAGE_HEIGHT - 1, BLACK);
-    
-    cout << "Computed " << pixInImageLeft << " " << RAD_TO_PIX_X << " " << FOV_X << " " << IMAGE_WIDTH << endl;
-
-    const float VERTICAL_SHOULDER_THRESH = -0.1f;
-    const float angleInImageUp = VERTICAL_SHOULDER_THRESH - headPitch;
-    const float pixInImageUp = angleInImageUp * RAD_TO_PIX_Y + IMAGE_HEIGHT / 2;
-
-    cout << "Up down " << pixInImageUp << endl;
-    drawLine(0, pixInImageUp, IMAGE_WIDTH - 1, pixInImageUp, ORANGE);
+    // To do:  This boundary should not be a simple square - see below
+    const int pixInImageLeft = getPixelBoundaryLeft();
+    const int pixInImageRight = getPixelBoundaryRight();
+    const int pixInImageUp = getPixelBoundaryUp();
 
     // split up the loops
     for (i = 0; i < IMAGE_WIDTH; i += 1) {//scan across
@@ -294,10 +277,16 @@ void Threshold::runs() {
         // potential yellow post location
         int lastGoodPixel = IMAGE_HEIGHT;
         //int horizonJ = pose->getHorizonY(i);
-		hor = horizon + (int)(horizonSlope * (float)(i));
+	hor = horizon + (int)(horizonSlope * (float)(i));
 
         for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
             pixel = thresholded[j][i];
+	    // ToDo:  This works ok, but could be much better.  We should really
+	    // calculate a trapezoid based on where the max height of the shoulder is
+	    if ((i < pixInImageLeft || i > pixInImageRight) && j > pixInImageUp 
+		&& thresholded[j][i] == BLUE) {
+	      thresholded[j][i] = GREY;
+	    }
 
             // check thresholded point with last thresholded point.
             // if the same, increment the current run
@@ -555,7 +544,7 @@ void Threshold::findGreenHorizon() {
 
     // if the pose estimated horizon is less than 0, then just use it directly
     pH = pose->getHorizonY(0);
-    cout << "Pose horizon " << pH << endl;
+    //cout << "Pose horizon " << pH << endl;
     //if (pH < -20) {
     //horizon = pH;
     //return;
@@ -651,9 +640,6 @@ void Threshold::findGreenHorizon() {
         }
     }
     horizon = 0;
-    if (pH < 0) {
-      horizon = pH;
-    }
 }
 
 // point <int> Threshold::findIntersection(int col, int dir, int c) {
@@ -1312,6 +1298,24 @@ int Threshold::distance(int x1, int x2, int x3, int x4) {
 float Threshold::getEuclidianDist(point <int> coord1, point <int> coord2) {
     return std::sqrt( std::pow( static_cast<float>(coord2.y-coord1.y), 2) +
 					  std::pow( static_cast<float>(coord2.x-coord1.x), 2) );
+}
+
+int Threshold::getPixelBoundaryLeft() {
+    const float headYaw = pose->getHeadYaw();
+    const float angleInImageLeft = HORIZONTAL_SHOULDER_THRESH_LEFT - headYaw;
+    return static_cast<int>(-angleInImageLeft * RAD_TO_PIX_X) + IMAGE_WIDTH / 2;
+}
+
+int Threshold::getPixelBoundaryRight() {
+    const float headYaw = pose->getHeadYaw();
+    const float angleInImageRight = HORIZONTAL_SHOULDER_THRESH_RIGHT - headYaw;
+    return static_cast<int>(-angleInImageRight * RAD_TO_PIX_X) + IMAGE_WIDTH / 2;
+}
+
+int Threshold::getPixelBoundaryUp() {
+    const float headPitch = pose->getHeadPitch();
+    const float angleInImageUp = VERTICAL_SHOULDER_THRESH - headPitch;
+    return static_cast<int>(angleInImageUp * RAD_TO_PIX_Y) + IMAGE_HEIGHT / 2;
 }
 
 /*  A bunch of methods for offline debugging.  Basically we create an extra image

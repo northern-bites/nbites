@@ -61,6 +61,11 @@ static const int VISUAL_HORIZON_COLOR = BROWN;
 static const float POST_MIN_FOC_DIST = 10.0f; // goal posts
 static const float POST_MAX_FOC_DIST = 800.0f;
 
+const float HORIZONTAL_SHOULDER_THRESH_LEFT = 1.05f;
+const float HORIZONTAL_SHOULDER_THRESH_RIGHT = -HORIZONTAL_SHOULDER_THRESH_LEFT;
+const float VERTICAL_SHOULDER_THRESH = -0.38f;
+
+
 class Threshold
 {
     friend class Vision;
@@ -101,6 +106,9 @@ public:
     void swapUV() { inverted = !inverted; setYUV(yuv); }
     void swapUV(bool _inverted) { inverted = _inverted; setYUV(yuv); }
 
+    int getPixelBoundaryLeft();
+    int getPixelBoundaryRight();
+    int getPixelBoundaryUp();
 
 #ifdef OFFLINE
     void setConstant(int c);

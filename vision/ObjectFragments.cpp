@@ -163,16 +163,16 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
     init(0.0);
     allocateColorRuns();
 #ifdef OFFLINE
-    BALLDISTDEBUG = true;
-    PRINTOBJS = true;
-    POSTDEBUG = true;
+    BALLDISTDEBUG = false;
+    PRINTOBJS = false;
+    POSTDEBUG = false;
     POSTLOGIC = false;
     TOPFIND = false;
     BALLDEBUG = false;
     CORNERDEBUG = false;
     CROSSDEBUG = false;
     BACKDEBUG = false;
-    SANITY = true;
+    SANITY = false;
     DEBUGBALLPOINTS = false;
     CORRECT = false;
     OPENFIELD = false;
@@ -4486,7 +4486,7 @@ bool ObjectFragments::horizonTopOk(int top, int hor)
 {
     const int drawX = 100;
 
-    if (hor <= 0) return false;
+    //if (hor <= 0) return false;
     if (top < 1) return true;
     if (top + MIN_GOAL_HEIGHT / 2 > hor) {
         if (SANITY) {
