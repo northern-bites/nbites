@@ -173,6 +173,14 @@ public:
     const float getPerpenSlope() const { return perpenHorizonSlope; }
     const float pixHeightToDistance(float pixHeight, float cmHeight) const;
     const float pixWidthToDistance(float pixWidth, float cmWidth) const;
+    const float getHeadYaw() {
+      return sensors->getHeadAngles()[0];
+    }
+
+    const float getHeadPitch() {
+      return sensors->getHeadAngles()[1];
+    }
+
 protected: // helper methods
     static const boost::numeric::ublas::matrix <float>
       calculateForwardTransform(const Kinematics::ChainID id,

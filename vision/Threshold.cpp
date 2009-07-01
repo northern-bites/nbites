@@ -253,6 +253,11 @@ void Threshold::runs() {
 
     horizonSlope = pose->getHorizonSlope();
 
+    // To do:  This boundary should not be a simple square - see below
+    const int pixInImageLeft = getPixelBoundaryLeft();
+    const int pixInImageRight = getPixelBoundaryRight();
+    const int pixInImageUp = getPixelBoundaryUp();
+
     // split up the loops
     for (i = 0; i < IMAGE_WIDTH; i += 1) {//scan across
         // the color of the last pixel before the current one
@@ -272,10 +277,16 @@ void Threshold::runs() {
         // potential yellow post location
         int lastGoodPixel = IMAGE_HEIGHT;
         //int horizonJ = pose->getHorizonY(i);
-		hor = horizon + (int)(horizonSlope * (float)(i));
+	hor = horizon + (int)(horizonSlope * (float)(i));
 
         for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
             pixel = thresholded[j][i];
+	    // ToDo:  This works ok, but could be much better.  We should really
+	    // calculate a trapezoid based on where the max height of the shoulder is
+	    if ((i < pixInImageLeft || i > pixInImageRight) && j > pixInImageUp 
+		&& thresholded[j][i] == BLUE) {
+	      thresholded[j][i] = GREY;
+	    }
 
             // check thresholded point with last thresholded point.
             // if the same, increment the current run
@@ -533,7 +544,8 @@ void Threshold::findGreenHorizon() {
 
     // if the pose estimated horizon is less than 0, then just use it directly
     pH = pose->getHorizonY(0);
-    //if (pH < 0) {
+    //cout << "Pose horizon " << pH << endl;
+    //if (pH < -20) {
     //horizon = pH;
     //return;
     //}
@@ -1286,6 +1298,24 @@ int Threshold::distance(int x1, int x2, int x3, int x4) {
 float Threshold::getEuclidianDist(point <int> coord1, point <int> coord2) {
     return std::sqrt( std::pow( static_cast<float>(coord2.y-coord1.y), 2) +
 					  std::pow( static_cast<float>(coord2.x-coord1.x), 2) );
+}
+
+int Threshold::getPixelBoundaryLeft() {
+    const float headYaw = pose->getHeadYaw();
+    const float angleInImageLeft = HORIZONTAL_SHOULDER_THRESH_LEFT - headYaw;
+    return static_cast<int>(-angleInImageLeft * RAD_TO_PIX_X) + IMAGE_WIDTH / 2;
+}
+
+int Threshold::getPixelBoundaryRight() {
+    const float headYaw = pose->getHeadYaw();
+    const float angleInImageRight = HORIZONTAL_SHOULDER_THRESH_RIGHT - headYaw;
+    return static_cast<int>(-angleInImageRight * RAD_TO_PIX_X) + IMAGE_WIDTH / 2;
+}
+
+int Threshold::getPixelBoundaryUp() {
+    const float headPitch = pose->getHeadPitch();
+    const float angleInImageUp = VERTICAL_SHOULDER_THRESH - headPitch;
+    return static_cast<int>(angleInImageUp * RAD_TO_PIX_Y) + IMAGE_HEIGHT / 2;
 }
 
 /*  A bunch of methods for offline debugging.  Basically we create an extra image
