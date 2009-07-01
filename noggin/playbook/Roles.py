@@ -31,6 +31,18 @@ def rDefender(team):
     if team.brain.ball.x < PBConstants.SWEEPER_X:
         return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
 
+    elif team.brain.ball.y < NogginConstants.MIDFIELD_Y:
+        return [PBConstants.DEFENDER] + SubRoles.pBottomStopper(team)
+    else:
+        return [PBConstants.DEFENDER] + SubRoles.pTopStopper(team)
+
+
+def rDefenderOld(team):
+    '''obsolete: gets positioning for defender'''
+    # If the ball is deep in our side, we become a sweeper
+    if team.brain.ball.x < PBConstants.SWEEPER_X:
+        return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
+
     # Stand between the ball and the back of the goal if it is on our side
     elif PBConstants.USE_DEEP_STOPPER:
         return [PBConstants.DEFENDER] + SubRoles.pDeepStopper(team)

@@ -217,6 +217,8 @@ def fReady(team):
 
 # Formations for testing roles
 def fTestDefender(team):
+    if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+        return  [PBConstants.TEST_DEFEND] + Roles.rDefensiveMiddie(team)
     return [PBConstants.TEST_DEFEND] + Roles.rDefender(team)
 def fTestOffender(team):
     return [PBConstants.TEST_OFFEND] + Roles.rOffender(team)

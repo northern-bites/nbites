@@ -37,9 +37,10 @@ def pDubDOffender(team):
     return [PBConstants.DUBD_OFFENDER, [x,y]]
 
 def pDefensiveMiddie(team):
-    y = MyMath.clip(team.brain.ball.y,
-                    PBConstants.MIN_MIDDIE_Y,
-                    PBConstants.MAX_MIDDIE_Y)
+    if team.brain.ball.y < NogginConstants.MIDFIELD_Y:
+        y = PBConstants.MIN_MIDDIE_Y
+    else:
+        y = PBConstants.MAX_MIDDIE_Y
     pos = [PBConstants.DEFENSIVE_MIDDIE_X, y]
     return [PBConstants.DEFENSIVE_MIDDIE, pos]
 
@@ -57,6 +58,16 @@ def pStopper(team):
     if x < PBConstants.SWEEPER_X:
         x = PBConstants.SWEEPER_X
     return [PBConstants.STOPPER, [x,y]]
+
+def pBottomStopper(team):
+    '''position stopper'''
+    return [PBConstants.STOPPER, [PBConstants.STOPPER_X,
+                                  PBConstants.TOP_STOPPER_Y]]
+
+def pTopStopper(team):
+    '''position stopper'''
+    return [PBConstants.STOPPER, [PBConstants.STOPPER_X,
+                                  PBConstants.BOTTOM_STOPPER_Y]]
 
 def pDeepStopper(team):
     '''position stopper'''
