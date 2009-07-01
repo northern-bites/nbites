@@ -62,12 +62,12 @@ def pStopper(team):
 def pBottomStopper(team):
     '''position stopper'''
     return [PBConstants.STOPPER, [PBConstants.STOPPER_X,
-                                  PBConstants.TOP_STOPPER_Y]]
+                                  PBConstants.BOTTOM_STOPPER_Y]]
 
 def pTopStopper(team):
     '''position stopper'''
     return [PBConstants.STOPPER, [PBConstants.STOPPER_X,
-                                  PBConstants.BOTTOM_STOPPER_Y]]
+                                  PBConstants.TOP_STOPPER_Y]]
 
 def pDeepStopper(team):
     '''position stopper'''

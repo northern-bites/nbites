@@ -93,8 +93,10 @@ def atPosition(player):
     else:
         player.notAtPositionCounter = 0
 
-    if player.notAtPositionCounter > constants.NOT_AT_POSITION_FRAMES_THRESH \
-            and player.brain.my.locScore == NogginConstants.GOOD_LOC:
+    if (abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
+        abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
+        not nav.atDestinationGoalie() or
+        not nav.atHeading()):
         return player.goLater('playbookPosition')
 
     return player.stay()
