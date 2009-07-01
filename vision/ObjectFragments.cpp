@@ -4382,7 +4382,7 @@ bool ObjectFragments::locationOk(blob b, int hor)
     int trueBottom = max(b.leftBottom.y, b.rightBottom.y); // bottommost value in teh blob
     int horizonLeft = yProject(0, hor, trueLeft);          // the horizon at the leftmost point
     int horizonRight = yProject(0, hor, trueRight);        // the horizon at the rightmost point
-    cout << "Horizon stuff " << horizonLeft << " " << horizonRight << " " << hor << endl;
+    //cout << "Horizon stuff " << horizonLeft << " " << horizonRight << " " << hor << endl;
     //drawPoint(trueLeft, horizonLeft, RED);
     //if (slope < 0) {
     //  horizonLeft = yProject(IMAGE_WIDTH - 1, hor, trueLeft);
