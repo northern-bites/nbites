@@ -37,9 +37,9 @@ MARVIN_STEP_CONFIG = (0.4, # step duration
                20.0)  # max theta speed()
 
 ZMP_CONFIG = (0.0,  # footCenterLocX
-              0.3,  # zmp static percentage
-              0.5,  # left zmp off
-              0.5,  # right zmp off
+              0.4,  # zmp static percentage
+              0.4,  # left zmp off
+              0.4,  # right zmp off
               0.01,  # strafe zmp offse
               6.6)   # turn zmp offset
 
