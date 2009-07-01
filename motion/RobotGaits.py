@@ -36,6 +36,7 @@ STEP_CONFIG = (0.4, # step duration
                0.9,  # stepHeight
                0.0,  # step lift
                7.0,  # max x speed
+               -7.0,  # max x speed
                7.0,  # max y speed
                20.0, # max theta speed()
                7.0,  # max x accel
@@ -49,6 +50,7 @@ MARVIN_STEP_CONFIG = (0.4, # step duration
                0.9,  # stepHeight
                0.0,  # step lift
                7.0,  # max x speed
+               -7.0,  # max x speed
                7.0,  # max y speed
                20.0, # max theta speed()
                7.0,  # max x accel
@@ -61,6 +63,7 @@ STATIONARY_STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
                0.0,  # stepHeight
                0.0,  # step lift
+               0.0,  # max x speed
                0.0,  # max x speed
                0.0,  # max y speed
                0.0, # max theta speed()
@@ -180,6 +183,7 @@ FAST_STEP_CONFIG = (0.5, # step duration
                     1.5,  # stepHeight
                     -6.0,  # step lift
                     13.0,  # max x speed
+                    -6.0,  # max x speed
                     13.0,  # max y speed
                     30.0,  # max theta speed()
                     7.0,  # max x speed
@@ -221,6 +225,7 @@ WEBOTS_STEP_CONFIG = (0.4, # step duration
                       1.1,  # stepHeight
                       0.0,  # step lift
                       10.0,  # max x speed
+                      -10.0,  # max x speed
                       10.0,  # max y speed
                       30.0,  # max theta speed()
                       5.0,  # max x acc
@@ -268,8 +273,9 @@ MED_STANCE = (31.00, # CoM height
 MED_STEP = (0.4, # step duration
             0.25,  # fraction in double support
             0.9,  # stepHeight
-            -5.0,  # step lift
+            0.0,  # step lift
             10.0,  # max x speed
+            -5.0,  # max x speed
             10.0,  # max y speed
             20.0, # max theta speed()
             7.0,  # max x accel
