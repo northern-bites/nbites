@@ -18,7 +18,7 @@ DEBUG_SEARCHER = False
 DEBUG_DETERMINE_CHASE_TIME = False
 
 USE_ZONE_STRATEGY = False
-USE_DUB_D = True
+USE_DUB_D = False
 USE_FINDER = False
 USE_DEEP_STOPPER = False # Fallback to a deep defensive position
 KICKOFF_PLAY = False # Forces the more intelligent and restrictive kickoff play
@@ -74,7 +74,7 @@ SUPPORT_SPIN = CHASE_SPIN
 SEC_TO_MILLIS = 1000.0
 NEAR_LINE_THRESH = 15.
 # Determine chaser junk
-BALL_DIVERGENCE_THRESH = 20000.0
+BALL_DIVERGENCE_THRESH = 250.0
 # Special cases for waiting for the ball at half field
 CENTER_FIELD_DIST_THRESH = 125.
 
