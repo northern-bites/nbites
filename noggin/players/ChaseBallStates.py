@@ -339,6 +339,9 @@ def waitBeforeKick(player):
 
     if not player.brain.nav.isStopped():
         return player.stay()
+
+    if transitions.shouldKick(player):
+        return player.goLater('getKickInfo')
     elif transitions.shouldApproachForKick(player):
         player.brain.tracker.trackBall()
         player.inKickingState = False
@@ -350,8 +353,6 @@ def waitBeforeKick(player):
     elif transitions.shouldRepositionForKick(player):
         player.brain.tracker.trackBall()
         return player.goLater('positionForKick')
-    else:
-        return player.goLater('getKickInfo')
 
 def avoidObstacle(player):
     """
