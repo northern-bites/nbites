@@ -9,11 +9,11 @@ STANCE_CONFIG = (31.00, # CoM height
 
 
 MARVIN_STANCE_CONFIG = (31.00, # CoM height
-                 1.45,  # Forward displacement of CoM
-                 10.0,  # Horizontal distance between feet
-                 8.0,   # Body angle around y axis
-                 0.0,   # Angle between feet
-                 0.1)   # Time to transition to/from this stance
+                        1.45,  # Forward displacement of CoM
+                        10.0,  # Horizontal distance between feet
+                        6.0,   # Body angle around y axis
+                        0.0,   # Angle between feet
+                        0.1)   # Time to transition to/from this stance
 
 DUCK_STANCE_CONFIG = (31.00, # CoM height
                       1.45,  # Forward displacement of CoM
@@ -29,11 +29,11 @@ STEP_CONFIG = (0.4, # step duration
                7.0,  # max y speed
                20.0)  # max theta speed()
 
-MARVIN_STEP_CONFIG = (0.5, # step duration
+MARVIN_STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
-               1.1,  # stepHeight
-               3.0,  # max x speed
-               3.0,  # max y speed
+               0.9,  # stepHeight
+               7.0,  # max x speed
+               7.0,  # max y speed
                20.0)  # max theta speed()
 
 ZMP_CONFIG = (0.0,  # footCenterLocX
@@ -45,11 +45,11 @@ ZMP_CONFIG = (0.0,  # footCenterLocX
 
 
 MARVIN_ZMP_CONFIG = (0.0,  # footCenterLocX
-              0.4,  # zmp static percentage
+              0.3,  # zmp static percentage
               0.5,  # left zmp off
               0.5,  # right zmp off
-              0.02,  # strafe zmp offse
-              6.8)   # turn zmp offset
+              0.01,  # strafe zmp offse
+              6.6)   # turn zmp offset
 
 
 JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
@@ -103,11 +103,11 @@ ARM_CONFIG = (0.0,)   #armAmplitude (degs)
 
 
 #Put together all the parts to make a gait - ORDER MATTERS!
-NEW_GAIT = motion.GaitCommand(STANCE_CONFIG,
+NEW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
             STEP_CONFIG,
             ZMP_CONFIG,
             JOINT_HACK_CONFIG,
-            CUR_SENSOR_CONFIG,
+            MARVIN_SENSOR_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
