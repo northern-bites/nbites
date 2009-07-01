@@ -2271,11 +2271,11 @@ bool ObjectFragments::checkSize(blob b, int c)
 
     int midY = b.leftTop.y + (b.leftBottom.y - b.leftTop.y) / 2;
     horizontalScan(b.leftTop.x, midY, -1,  horzScanParam, c, c, 0, b.leftTop.x + 1);
-    drawPoint(scan.x, scan.y, RED);
+    //drawPoint(scan.x, scan.y, RED);
     int leftMid = scan.good;
     horizontalScan(b.rightTop.x, midY, 1, horzScanParam, c, c, b.rightTop.x - 1,
                    b.rightTop.x + topBuff);
-    drawPoint(scan.x, scan.y, RED);
+    //drawPoint(scan.x, scan.y, RED);
     if (leftMid > truthMax && scan.good > truthMax) return false;
     return true;
 }
@@ -3093,7 +3093,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
 	const int postBuff = 5;
 	const int topMax = 10;
 
-    //cout << horizon << " " << slope << endl;
+	//cout << horizon << " " << slope << endl;
     // if we don't have any runs there is nothing to do
     if (numberOfRuns <= 1) return;
 
@@ -4318,7 +4318,7 @@ bool ObjectFragments::postBigEnough(blob b) {
 bool ObjectFragments::locationOk(blob b, int hor)
 {
     const int horzVal = -50;
-	const int minPostSpanY = 25;
+	const int minPostSpanY = 55;
 	const int spanMax = 5;
 	const int bottomMin = 25;
 	
@@ -4340,6 +4340,8 @@ bool ObjectFragments::locationOk(blob b, int hor)
     int trueBottom = max(b.leftBottom.y, b.rightBottom.y); // bottommost value in teh blob
     int horizonLeft = yProject(0, hor, trueLeft);          // the horizon at the leftmost point
     int horizonRight = yProject(0, hor, trueRight);        // the horizon at the rightmost point
+    //cout << "Horizon stuff " << horizonLeft << " " << horizonRight << " " << hor << endl;
+    //drawPoint(trueLeft, horizonLeft, RED);
     //if (slope < 0) {
     //  horizonLeft = yProject(IMAGE_WIDTH - 1, hor, trueLeft);
     //  horizonRight = yProject(IMAGE_WIDTH - 1, hor, trueRight);
@@ -4396,6 +4398,14 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight, int l
     //cout << (bottom + 5) << " " << minHeight << " " << top << " " << spanY << " " << spanX << " " << left << " " << right << endl;
     //int fudge = 20;
     if (spanY > spanYMin) return true;
+    if (color == BLUE) {
+      //cout << "Bottom info: " << (bottom + bottBuff) << " " << minHeight << " " << endl;
+      if (bottom + bottBuff < minHeight) {
+	if (SANITY)
+	  cout << "Removed risky blue post" << endl;
+	return false;
+      }
+    }
     if (bottom + bottBuff + min(spanX, param) < minHeight) {
         if (SANITY) {
             cout << "Bad height" << endl;
