@@ -1,5 +1,11 @@
 import man.motion as motion
 
+
+"""
+TODO: Note: It would probably be nice to store each separate gait in it's 
+own file -- say motion/gaits/MyGait.py 
+"""
+
 WALKING = 1.0
 NON_WALKING = 0.0
 
@@ -92,15 +98,6 @@ NEW_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                      0.20,  # angle Y scale (gamma)
                      150.00,  # X spring constant k (kg/s^2)
                      250.00,  # Y spring constant k (kg/s^2)
-                     15.0,   # max angle X (compensation)
-                     15.0,   # max angle Y
-                     75.0)   # max angle vel (change in compensation)
-
-MARVIN_SENSOR_CONFIG = (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
-                     0.1,  # angle X scale (gamma)
-                     0.15,  # angle Y scale (gamma)
-                     150.00,  # X spring constant k (kg/s^2)
-                     275.00,  # Y spring constant k (kg/s^2)
                      15.0,   # max angle X (compensation)
                      15.0,   # max angle Y
                      75.0)   # max angle vel (change in compensation)
@@ -211,13 +208,13 @@ FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
                              ARM_CONFIG)
 
 MARVIN_FAST_GAIT=motion.GaitCommand(FAST_STANCE_CONFIG,
-                             FAST_STEP_CONFIG,
-                             FAST_ZMP_CONFIG,
-                             FAST_HACK_CONFIG,
-                             MARVIN_SENSOR_CONFIG,
-                             STIFFNESS_CONFIG,
-                             ODO_CONFIG,
-                             ARM_CONFIG)
+                                    FAST_STEP_CONFIG,
+                                    FAST_ZMP_CONFIG,
+                                    FAST_HACK_CONFIG,
+                                    MARVIN_SENSOR_CONFIG,
+                                    STIFFNESS_CONFIG,
+                                    ODO_CONFIG,
+                                    ARM_CONFIG)
 
 WEBOTS_STEP_CONFIG = (0.4, # step duration
                       0.25,  # fraction in double support
@@ -258,16 +255,71 @@ WEBOTS_GAIT2=motion.GaitCommand(STANCE_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
 
-#DEFAULT GAIT ASSIGNMENTS
+
+########## MEDIUM GAIT #################
+MED_STANCE = (31.00, # CoM height
+              1.45,  # Forward displacement of CoM
+              10.0,  # Horizontal distance between feet
+              6.0,   # Body angle around y axis
+              0.0,   # Angle between feet
+              0.1)   # Time to transition to/from this stance
+
+
+MED_STEP = (0.4, # step duration
+            0.25,  # fraction in double support
+            0.9,  # stepHeight
+            -5.0,  # step lift
+            7.0,  # max x speed
+            7.0,  # max y speed
+            20.0, # max theta speed()
+            7.0,  # max x accel
+            7.0,  # max y accel
+            20.0, # max theta speed()
+            20.0,  # max theta speed()
+            WALKING)#walk gait = true
+
+MED_ZMP = (0.0,  # footCenterLocX
+           0.3,  # zmp static percentage
+           0.5,  # left zmp off
+           0.5,  # right zmp off
+           0.01,  # strafe zmp offse
+           6.6)   # turn zmp offset
+
+MED_SENSOR =  (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
+               0.5,  # angle X scale (gamma)
+               0.3,  # angle Y scale (gamma)
+               250.00,  # X spring constant k (kg/s^2)
+               250.00,  # Y spring constant k (kg/s^2)
+               7.0,   # max angle X (compensation)
+               3.0,   # max angle Y
+               45.0)   # max angle vel (change in compensation)
+
+MED_HACK = JOINT_HACK_CONFIG
+MED_STIFFNESS = STIFFNESS_CONFIG
+MED_ODO= ODO_CONFIG
+MED_ARM=ARM_CONFIG
+
+MARVIN_MEDIUM_GAIT = motion.GaitCommand(MED_STANCE,
+                                        MED_STEP,
+                                        MED_ZMP,
+                                        MED_HACK,
+                                        MED_SENSOR,
+                                        MED_STIFFNESS,
+                                        MED_ODO,
+                                        MED_ARM)
+##### END MEDIUM GAIT ####
+
+
+############# DEFAULT GAIT ASSIGNMENTS ##################
 
 TRILLIAN_GAIT = NEW_GAIT
 ZAPHOD_GAIT   =   NEW_GAIT
 SLARTI_GAIT   =   NEW_GAIT
-MARVIN_GAIT   =   MARVIN_NEW_GAIT
+MARVIN_GAIT   =   MARVIN_MEDIUM_GAIT
 
 TRILLIAN_TURN_GAIT = NEW_GAIT
 ZAPHOD_TURN_GAIT   =   NEW_GAIT
 SLARTI_TURN_GAIT   =   NEW_GAIT
-MARVIN_TURN_GAIT   =   MARVIN_NEW_GAIT
+MARVIN_TURN_GAIT   =   MARVIN_MEDIUM_GAIT
 
 

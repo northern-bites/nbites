@@ -29,7 +29,6 @@ def gamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.CoA.setRobotTurnGait(player.brain.motion)
-        player.brain.tracker.trackBall()
 
     return player.goLater('walkstraightstop')
 
@@ -107,9 +106,9 @@ def walkstraight(player):
 
 def walkstraightstop(player):
     if player.firstFrame():
-        player.setSpeed(-4.0,-4.0,15)
+        player.setSpeed(11.0,0.0,0)
 
-    if player.counter == 500:
+    if player.counter == 300:
         return player.goLater('stopwalking')
     return player.stay()
 
