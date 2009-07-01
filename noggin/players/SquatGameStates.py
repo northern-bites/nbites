@@ -63,22 +63,3 @@ def gamePenalized(player):
     if player.firstFrame():
         player.penalizeHeads()
     return player.stay()
-
-def squat(player):
-    if player.firstFrame() and not player.squatting:
-        player.executeMove(SweetMoves.INITIAL_POS)
-        player.squatting = True
-        player.executeMove(SweetMoves.GOALIE_SQUAT)
-    if not player.motion.isBodyActive():
-        return player.goLater('squatted')
-    return player.stay()
-
-def squatted(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-    #if my current position == getProperPosition
-    #or wrap in moveSquattedPosition
-    return player.stay()
-
-def moveSquatPosition(player):
-    return player.stay()
