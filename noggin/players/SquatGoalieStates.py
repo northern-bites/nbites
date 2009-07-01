@@ -20,29 +20,65 @@ def gameInitial(player):
     return player.stay()
 
 def gameReady(player):
-    if player.firstFrame() and not player.squatting:
-        player.standup()
-        player.squatting = True
-        player.executeMove(SweetMoves.GOALIE_CENTER_SAVE)
-    return player.stay()
+    if player.squatting:
+        return player.goLater('squatted')
+    return player.goLater('squat')
 
 def gameSet(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-    return player.stay()
+    if player.squatting:
+        return player.goLater('squatted')
+    return player.goLater('squat')
 
 def gamePlaying(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-    return player.stay()
+    if player.squatting:
+        return player.goLater('squatted')
+    return player.goLater('squat')
 
 def gameFinished(player):
-    if player.firstFrame():
+    """
+    Ensure we are sitting down and head is snapped forward.
+    In the future, we may wish to make the head move a bit slower here
+    Also, in the future, gameInitial may be responsible for turning off the gains
+    """
+    if player.squatting:
+        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
         player.squatting = False
+
+    if player.firstFrame():
+        player.zeroHeads()
+        player.GAME_FINISHED_satDown = False
+        return player.stay()
+
+    # Sit down once we've finished walking
+    if player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown:
+        player.GAME_FINISHED_satDown = True
+        player.executeMove(SweetMoves.SIT_POS)
+        return player.stay()
+
+    if not player.motion.isBodyActive() and player.GAME_FINISHED_satDown:
         player.gainsOff()
     return player.stay()
 
 def gamePenalized(player):
     if player.firstFrame():
         player.penalizeHeads()
+    return player.stay()
+
+def squat(player):
+    if player.firstFrame() and not player.squatting:
+        player.executeMove(SweetMoves.INITIAL_POS)
+        player.squatting = True
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
+    if not player.motion.isBodyActive():
+        return player.goLater('squatted')
+    return player.stay()
+
+def squatted(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+    #if my current position == getProperPosition
+    #or wrap in moveSquattedPosition
+    return player.stay()
+
+def moveSquatPosition(player):
     return player.stay()
