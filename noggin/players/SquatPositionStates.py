@@ -9,7 +9,9 @@ def squat(player):
         player.executeMove(SweetMoves.INITIAL_POS)
         player.squatting = True
         player.executeMove(SweetMoves.GOALIE_SQUAT)
-    if not player.motion.isBodyActive():
+    if (player.stateTime >=
+        SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT) +
+        SweetMoves.getMoveTime(SweetMoves.INITIAL_POS)):
         return player.goLater('squatted')
     return player.stay()
 
@@ -38,7 +40,8 @@ def squatPosition(player):
         brain.tracker.activeLoc()
     else:
         brain.tracker.trackBall()
-
+    if player.counter % 5 == 0:
+        player.brain.sensors.saveFrame()
     useOmni = helper.useOmni(player)
     changedOmni = False
 
@@ -66,10 +69,6 @@ def chasePrepare(player):
         if player.squatting:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             player.squatting = False
-
-        elif not player.motion.isBodyActive():
-            player.isChasing = True
-            return player.goNow('chase')
 
     elif (player.stateTime >=
         SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
