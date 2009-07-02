@@ -196,8 +196,10 @@ def shouldSave(player):
 def shouldHoldSave(player):
     # same as shouldSave() except for the ball.framesOn check
     # try to come up with better conditions to test
-    '''if the ball is still in front of me and coming at me, hold save
-    if it's going to arrive anytime soon'''
+    '''
+    if the ball is still in front of me and coming at me, hold save
+    if it's going to arrive anytime soon
+    '''
     ball = player.brain.ball
 
     relVelX = ball.relVelX
@@ -214,7 +216,8 @@ def shouldChaseLoc(player):
 
     ball = player.brain.ball
     my = player.brain.my
-    if player.squatting and ball.locDist <= 60 :
+    if (player.squatting and ball.locDist <= goalCon.CHASE_FROM_SQUAT_DIST and
+        abs(ball.locBearing) <= goalCon.CHASE_FROM_SQUAT_BEARING):
         return True
     if not player.squatting:
         if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION
@@ -222,13 +225,6 @@ def shouldChaseLoc(player):
            and ball.x < Constants.MY_GOALBOX_RIGHT_X +
            goalCon.AGGRESSIVENESS_OFFSET):
             return True
-    '''
-    if (my.x < Constants.MY_GOALBOX_RIGHT_X and
-        my.y < Constants.MY_GOALBOX_TOP_Y and
-        my.y > Constants.MY_GOALBOX_BOTTOM_Y and
-        (0 < ball.locDist <= 50 or 0 < ball.dist <= 50)):
-        return True
-    '''
     return False
 
 def shouldStopChaseLoc(player):
