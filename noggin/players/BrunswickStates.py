@@ -35,6 +35,9 @@ def gameSet(player):
 
         if player.brain.playbook.role == GOALIE:
             player.brain.resetGoalieLocalization()
+            if player.squatting:
+                return player.goLater('squatted')
+            return player.goLater('squat')
 
         if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
             player.brain.tracker.trackBall()

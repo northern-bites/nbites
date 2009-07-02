@@ -12,8 +12,13 @@ import man.motion.SweetMoves as SweetMoves
 
 def gamePenalized(player):
     if player.firstFrame():
-        player.stopWalking()
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
+        else:
+            player.stopWalking()
         player.penalizeHeads()
+
     return player.stay()
 
 def gameInitial(player):
@@ -67,6 +72,7 @@ def fallen(player):
     """
     Stops the player when the robot has fallen
     """
+    player.squatting = False
     player.brain.nav.switchTo('stopped')
     #player.brain.resetLocalization()
     return player.stay()

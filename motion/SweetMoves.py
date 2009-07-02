@@ -388,26 +388,20 @@ GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), #right arm
                         (-90., 50., -75., 90, 30, -20.),
                         (-90., -50., -75., 90, 30, 20.),
                         (-90., -90., 0., 0.),
-                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES) ,
+                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES))
 
-                       ((-90., 90., 0., 0.),
-                        (-90., 50., -75., 90, 30, -20.),
-                        (-90., -50., -75., 90, 30, 20.),
-                        (-90., -90., 0., 0.),
-                        .1, 0, stiff.LOW_LEG_STIFFNESSES)  )
-
-GOALIE_SQUAT_STAND_UP = ( ((60.0, 55.0, 0.0, -0), #right arm
+GOALIE_SQUAT_STAND_UP = ( ((0.0, 0.0, 0.0, -0), #right arm
                                  ( -76.0, 10.0, -50.0, 86.0, 0.0, -0),
                                  ( -76.0, -10.0, -50.0, 86.0, 0.0, 0),
-                                 (60.0, -55.0, 0.0, 0), #left arm
-                                 .5, 0, stiff.LOW_HEAD_STIFFNESSES) ,
+                                 (0.0, 00.0, 0.0, 0), #left arm
+                                 .5, 0, stiff.NORMAL_STIFFNESSES) ,
 
-                                ((90., 0., -65., -57.),
+                                ((0., 0., 0., 0.),
                                  (0., 0., -55., 125.7, -75.7, 0.),
                                  (0., 0., -55., 125.7, -75.7, 0.),
-                                 (90., 0., 65., 57.),
-                                 1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
-                                GOALIE_POS[0])
+                                 (0., 0., 0., 0.),
+                                 1.5, 0, stiff.NORMAL_STIFFNESSES),
+                                INITIAL_POS[0])
 
 GOALIE_PREP_RIGHT_DIVE = ( ((90.,0.,-65.,-57.),
                           (0.,20.,-55.,125.7,-75.7, 20.),

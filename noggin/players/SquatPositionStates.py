@@ -63,12 +63,17 @@ def chasePrepare(player):
         player.brain.tracker.trackBall()
         player.isChasing = False
 
-    if player.squatting:
-        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-        player.squatting = False
-        return player.stay()
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
 
-    if not player.motion.isBodyActive():
+        elif not player.motion.isBodyActive():
+            player.isChasing = True
+            return player.goNow('chase')
+
+    elif (player.stateTime >=
+        SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
         player.isChasing = True
         return player.goNow('chase')
+
     return player.stay()
