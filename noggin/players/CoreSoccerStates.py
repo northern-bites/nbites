@@ -7,13 +7,13 @@
 # When the robot is in playing, it does the same as in set
 # When the robot is in finish, it stops, sits down, and turns off its gains
 #
-
 import man.motion.SweetMoves as SweetMoves
 
 def gamePenalized(player):
     if player.firstFrame():
         player.stopWalking()
         player.penalizeHeads()
+
     return player.stay()
 
 def gameInitial(player):
@@ -67,6 +67,7 @@ def fallen(player):
     """
     Stops the player when the robot has fallen
     """
+    player.squatting = False
     player.brain.nav.switchTo('stopped')
     #player.brain.resetLocalization()
     return player.stay()

@@ -1,8 +1,19 @@
 from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER, GOALIE
-
+import man.motion.SweetMoves as SweetMoves
 ###
 # Reimplementation of Game Controller States for pBrunswick
 ###
+
+def gamePenalized(player):
+    if player.firstFrame():
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
+        else:
+            player.stopWalking()
+        player.penalizeHeads()
+
+    return player.stay()
 
 def gameReady(player):
     """
@@ -39,6 +50,9 @@ def gameSet(player):
 
         if player.brain.playbook.role == GOALIE:
             player.brain.resetGoalieLocalization()
+            if player.squatting:
+                return player.goLater('squatted')
+            return player.goLater('squat')
 
         if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
             player.brain.tracker.trackBall()

@@ -14,7 +14,7 @@ def scanFindBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if player.currentRole == pbc.GOALIE:
+    if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldTurnToBall_FoundBall(player):
             return player.goLater('turnToBall')
         elif transitions.shouldSpinFindBall(player):
@@ -36,7 +36,7 @@ def spinFindBall(player):
     move to align on it. If we don't find it, we go to a garbage state
     """
 
-    if player.currentRole == pbc.GOALIE:
+    if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldTurnToBall_FoundBall(player):
             return player.goLater('turnToBall')
     else:

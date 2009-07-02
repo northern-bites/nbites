@@ -17,6 +17,9 @@ def goalieRunChecks(player):
             if DEBUG: print "should chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
+                if player.currentState == 'squatted' or\
+                        player.currentState == 'squat':
+                    return 'chasePrepare'
                 player.isChasing = True
                 return 'chase'
         else:
@@ -211,11 +214,14 @@ def shouldChaseLoc(player):
 
     ball = player.brain.ball
     my = player.brain.my
-
-    if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION and
-        ball.y < Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION and
-        ball.x < Constants.MY_GOALBOX_RIGHT_X + goalCon.AGGRESSIVENESS_OFFSET):
+    if player.squatting and ball.locDist <= 60 :
         return True
+    if not player.squatting:
+        if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION
+           and ball.y < Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION
+           and ball.x < Constants.MY_GOALBOX_RIGHT_X +
+           goalCon.AGGRESSIVENESS_OFFSET):
+            return True
     '''
     if (my.x < Constants.MY_GOALBOX_RIGHT_X and
         my.y < Constants.MY_GOALBOX_TOP_Y and
