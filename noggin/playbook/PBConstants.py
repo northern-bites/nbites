@@ -387,7 +387,7 @@ STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
 
                                              # More 2 field player strats
                                              "TWO_PLAYER_ZONE",
-                                             "DEFENSIVE_MID",
+                                             "sWIN",
 
                                              # Test strategies
                                              "TEST_DEFENDER",
@@ -403,7 +403,7 @@ STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
  S_THREE_FIELD_PLAYERS,
 
  S_TWO_ZONE,
- S_DEFENSIVE_MID,
+ S_WIN,
 
  S_TEST_DEFENDER,
  S_TEST_OFFENDER,

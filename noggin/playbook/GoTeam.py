@@ -139,10 +139,7 @@ class GoTeam:
 
         # This is the important area, what is usually used during play
         elif self.numActiveFieldPlayers == 2:
-            if PBConstants.USE_ZONE_STRATEGY:
-                return Strategies.sTwoZone(self)
-            #return Strategies.sTwoField(self)
-            return Strategies.sDefensiveMid(self)
+            return Strategies.sWin(self)
 
         # This can only be used right now if the goalie is pulled
         elif self.numActiveFieldPlayers == 3:

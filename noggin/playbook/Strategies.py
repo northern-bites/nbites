@@ -78,8 +78,8 @@ def sTwoZone(team):
     """
     return sTwoField(team)
 
-def sDefensiveMid(team):
-    strat = [PBConstants.S_DEFENSIVE_MID]
+def sWin(team):
+    strat = [PBConstants.S_WIN]
     # Kickoff Formations
     if (team.brain.gameController.timeSincePlay() <
         PBConstants.KICKOFF_FORMATION_TIME):
