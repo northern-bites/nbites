@@ -1,4 +1,3 @@
-
 """
 File to hold all of the cross field constants for the cooperative behavior system
 """
@@ -186,10 +185,12 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 
 # READY_KICKOFF: one on field cross, one back slightly and to the side
 READY_KICKOFF_DEFENDER_0 = [NogginConstants.CENTER_FIELD_X * 1./2.,
+                            NogginConstants.GREEN_PAD_Y +
                             NogginConstants.FIELD_WHITE_HEIGHT * 1./2. - 40.,
                             NogginConstants.OPP_GOAL_HEADING] # behind forward, to right
 
 READY_KICKOFF_DEFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
+                            NogginConstants.GREEN_PAD_Y +
                             NogginConstants.FIELD_WHITE_HEIGHT * 1./2. + 40.,
                             NogginConstants.OPP_GOAL_HEADING] # behind forward, to left
 
