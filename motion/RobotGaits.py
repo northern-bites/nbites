@@ -289,13 +289,13 @@ MED_ZMP = (0.0,  # footCenterLocX
            0.4,  # left zmp off
            0.4,  # right zmp off
            0.01,  # strafe zmp offse
-           6.6)   # turn zmp offset
+           7.6)   # turn zmp offset
 
 MED_SENSOR =  (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
-               0.07,  # angle X scale (gamma)
-               0.07,  # angle Y scale (gamma)
-               250.00,  # X spring constant k (kg/s^2)
-               250.00,  # Y spring constant k (kg/s^2)
+               0.08,  # angle X scale (gamma)
+               0.08,  # angle Y scale (gamma)
+               100.00,  # X spring constant k (kg/s^2)
+               50,  # Y spring constant k (kg/s^2)
                7.0,   # max angle X (compensation)
                7.0,   # max angle Y
                45.0)   # max angle vel (change in compensation)
