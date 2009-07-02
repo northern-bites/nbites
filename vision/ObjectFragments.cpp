@@ -442,6 +442,11 @@ void ObjectFragments::getTopAndMerge(int maxY)
         }
         //drawBlob(blobs[i], BLACK);
     }
+	// major hack in the heat of competition in graz
+	// the only thing that calls getTopAndMerge is balls()
+	// it will keep calling looking for the next blob
+	// so we make sure it won't get the same one over and over
+	blobs[topSpot].area = 0;
     size = 0;
     for (int i = 0; i < numBlobs; i++) {
         if (blobs[i].area > size && i != topSpot) {
@@ -4070,152 +4075,173 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 				}
 			} else if (ar > arMin && perc > MINORANGEPERCENT) {
 				// don't do anything
+				if (BALLDEBUG) {
+					cout << "Candidate ball " << endl;
+					printBlob(blobs[i]);
+				}
 			} else if (ar > arMax && rightHalfColor(blobs[i]) > MINORANGEPERCENT) {
+				if (BALLDEBUG) {
+					cout << "Candidate ball " << endl;
+					printBlob(blobs[i]);
+				}
 				//} else if (perc > 0.25f && redBallCheck()) {
 			} else {
 				if (BALLDEBUG) {
 					drawBlob(blobs[i], BLACK);
-					cout << "Screened one for not being orange enough" << endl;
+					printBlob(blobs[i]);
+					if (perc < MINORANGEPERCENT) {
+						cout << "Screened one for not being orange enough, its percentage is "
+							 << perc << endl;
+					} else {
+						cout << "Screened one for being too small - its area is " << ar << endl;
+					}
 				}
 				blobs[i].area = 0;
 			}
 		}
     }
-    // now find the best remaining blob
-    getTopAndMerge(horizon);
-    if (!blobOk(topBlob)) {
-        if (BALLDEBUG)
-            cout << "No viable blobs" << endl;
-        return 0;
-    }
+	bool done = false;
+	int w, h;   // width and height of potential ball
+	estimate e; // pix estimate of ball's distance
+	while (!done) {
+		// now find the best remaining blob
+		getTopAndMerge(horizon);
+		if (!blobOk(topBlob)) {
+			if (BALLDEBUG)
+				cout << "No viable blobs" << endl;
+			return 0;
+		}
 
-    // try to screen out "false balls"
-    int w = blobWidth(topBlob);
-    int h = blobHeight(topBlob);
-    estimate e;
-    const float BALL_REAL_HEIGHT = 8.6f;
-    e = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, 
-								  topBlob.leftTop.y + 2 * blobHeight(topBlob) / heightDiv, BALL_REAL_HEIGHT);
+		// try to screen out "false balls"
+		w = blobWidth(topBlob);
+		h = blobHeight(topBlob);
+		const float BALL_REAL_HEIGHT = 8.6f;
+		e = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2,
+									  topBlob.leftTop.y + 2 * blobHeight(topBlob) / heightDiv, BALL_REAL_HEIGHT);
 
-    //cout << "Estimated distance is " << e.dist << endl;
-    if (BALLDEBUG) {
-        if (topBlob.leftTop.x > 0) {
-            cout << "Vision found ball " << endl;
-            printBlob(topBlob);
-            cout << topBlob.leftTop.x << " " << topBlob.leftTop.y << " " << w << " " << h << endl;
-        }
-	
-    }
-    // check for obvious occlusions
-    if (topBlob.leftBottom.y > IMAGE_HEIGHT - imgBuff) {
-        occlusion = BOTTOMOCCLUSION;
-    }
-    if (topBlob.leftTop.y < 1) {
-        occlusion *= TOPOCCLUSION;
-    }
-    if (topBlob.leftTop.x < 1) {
-        occlusion *= LEFTOCCLUSION;
-    }
-    if (topBlob.rightTop.x > IMAGE_WIDTH - 2) {
-        occlusion *= RIGHTOCCLUSION;
-    }
+		//cout << "Estimated distance is " << e.dist << endl;
+		if (BALLDEBUG) {
+			if (topBlob.leftTop.x > 0) {
+				cout << "Vision found ball " << endl;
+				printBlob(topBlob);
+				cout << topBlob.leftTop.x << " " << topBlob.leftTop.y << " " << w << " " << h << endl;
+			}
 
-    // for smallish blobs, make sure we're near some green
-    //int whereIsGreen = ballNearGreen(topBlob);
-    int horb = horizonAt(topBlob.leftBottom.x);
+		}
+		// check for obvious occlusions
+		if (topBlob.leftBottom.y > IMAGE_HEIGHT - imgBuff) {
+			occlusion = BOTTOMOCCLUSION;
+		}
+		if (topBlob.leftTop.y < 1) {
+			occlusion *= TOPOCCLUSION;
+		}
+		if (topBlob.leftTop.x < 1) {
+			occlusion *= LEFTOCCLUSION;
+		}
+		if (topBlob.rightTop.x > IMAGE_WIDTH - 2) {
+			occlusion *= RIGHTOCCLUSION;
+		}
 
-    //look for edge points!
-    int NUM_EDGE_POINTS = 20;
-    int cenX = midPoint(topBlob.leftTop.x, topBlob.rightBottom.x);
-    int cenY = midPoint(topBlob.leftTop.y, topBlob.leftBottom.y);
+		// for smallish blobs, make sure we're near some green
+		//int whereIsGreen = ballNearGreen(topBlob);
+		int horb = horizonAt(topBlob.leftBottom.x);
 
-    /*for(float angle = 0; angle < M_PI_FLOAT;
-		angle += M_PI_FLOAT / static_cast<float>(NUM_EDGE_POINTS) ){
+		//look for edge points!
+		int NUM_EDGE_POINTS = 20;
+		int cenX = midPoint(topBlob.leftTop.x, topBlob.rightBottom.x);
+		int cenY = midPoint(topBlob.leftTop.y, topBlob.leftBottom.y);
 
-        scanOut(cenX,cenY,tan(angle), 1);
-        scanOut(cenX,cenY,tan(angle), -1);
-		}*/
+		/*for(float angle = 0; angle < M_PI_FLOAT;
+		  angle += M_PI_FLOAT / static_cast<float>(NUM_EDGE_POINTS) ){
 
-    //if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > numMin) {
+		  scanOut(cenX,cenY,tan(angle), 1);
+		  scanOut(cenX,cenY,tan(angle), -1);
+		  }*/
+
+		//if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > numMin) {
         if (badSurround(topBlob)) {
             if (BALLDEBUG) {
                 drawBlob(topBlob, BLACK);
                 cout << "Screening for lack of green and bad surround" << endl;
             }
-            return 0;
-        }
-		//}
+            done = false;
+        } else {
 
-    if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
-        // small balls should be near the horizon - this check makes extra sure
-        if (topBlob.leftBottom.y > horb + horbBuff) {
-            if (BALLDEBUG)
-                cout << "Screening small ball for horizon" << endl;
-            return 0;
-        }
-        if (BALLDEBUG)
-            cout << "Small ball passed green and horizon tests" << endl;
-    }
-    float colPer = rightColor(topBlob, ORANGE);
-	
+			if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
+				// small balls should be near the horizon - this check makes extra sure
+				if (topBlob.leftBottom.y > horb + horbBuff) {
+					if (BALLDEBUG)
+						cout << "Screening small ball for horizon" << endl;
+					return 0;
+				}
+				if (BALLDEBUG)
+					cout << "Small ball passed green and horizon tests" << endl;
+			}
+			float colPer = rightColor(topBlob, ORANGE);
 
-    confidence -= ROUND2((roundParam - colPer) * roundMult);
-    //cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
-    if (topBlob.area < blobLow) {
-        confidence -= confAdjust;
-    } else if (topBlob.area < blobMid) {
-        confidence -= 1;
-    } else if (topBlob.area > blobMax) {
-        confidence += 2;
-    } else if (topBlob.area > blobHigh) {
-        confidence += 1;
-    }
-    if (BALLDEBUG) {
-        printBall(topBlob, confidence, colPer, occlusion);
-    }
 
-    // SORT OUT BALL INFORMATION
-    // start out by figuring out whether we're using blobs or inferred information
-    //float rat = (float) w / (float) h;
-    // x, y, width, and height. Not up for debate.
-    thisBall->setX(topBlob.leftTop.x);
-    thisBall->setY(topBlob.leftTop.y);
-	
-    thisBall->setWidth( static_cast<float>(w) );
-    thisBall->setHeight( static_cast<float>(h) );
-    thisBall->setRadius( std::max(static_cast<float>(w)/radDiv,
-								  static_cast<float>(h)/radDiv ) );
-    int amount = h / 2;
-    if (w > h)
-        amount = w / 2;
+			confidence -= ROUND2((roundParam - colPer) * roundMult);
+			//cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
+			if (topBlob.area < blobLow) {
+				confidence -= confAdjust;
+			} else if (topBlob.area < blobMid) {
+				confidence -= 1;
+			} else if (topBlob.area > blobMax) {
+				confidence += 2;
+			} else if (topBlob.area > blobHigh) {
+				confidence += 1;
+			}
+			if (BALLDEBUG) {
+				printBall(topBlob, confidence, colPer, occlusion);
+			}
 
-    if (occlusion == LEFTOCCLUSION) {
-        thisBall->setCenterX(topBlob.rightTop.x - amount);
-        thisBall->setX(topBlob.rightTop.x - amount * 2);
-    } else {
-        thisBall->setCenterX(topBlob.leftTop.x + amount);
-    }
-    if (occlusion != TOPOCCLUSION) {
-        thisBall->setCenterY(topBlob.leftTop.y + amount);
-    } else {
-        thisBall->setCenterY(topBlob.leftBottom.y - amount);
-    }
-    thisBall->setConfidence(SURE);
-    thisBall->findAngles();
-    thisBall->setFocalDistanceFromRadius();
-    thisBall->setDistanceEst(vision->pose->
-                             bodyEstimate(thisBall->getCenterX(),
-                                          thisBall->getCenterY(),
-                                          static_cast<float>(thisBall->
-                                                             getFocDist())));
-    if ((e.dist * 2 < thisBall->getDistance() || thisBall->getDistance() * 2 < e.dist) &&
-	e.dist < PIXACC && e.dist > 0) {
-      if (BALLDEBUG) {
-	cout << "Screening due to distance mismatch " << e.dist << " " << thisBall->getDistance() << endl;
-      }
-      thisBall->init();
-      return 0;
-    }
+			// SORT OUT BALL INFORMATION
+			// start out by figuring out whether we're using blobs or inferred information
+			//float rat = (float) w / (float) h;
+			// x, y, width, and height. Not up for debate.
+			thisBall->setX(topBlob.leftTop.x);
+			thisBall->setY(topBlob.leftTop.y);
+
+			thisBall->setWidth( static_cast<float>(w) );
+			thisBall->setHeight( static_cast<float>(h) );
+			thisBall->setRadius( std::max(static_cast<float>(w)/radDiv,
+										  static_cast<float>(h)/radDiv ) );
+			int amount = h / 2;
+			if (w > h)
+				amount = w / 2;
+
+			if (occlusion == LEFTOCCLUSION) {
+				thisBall->setCenterX(topBlob.rightTop.x - amount);
+				thisBall->setX(topBlob.rightTop.x - amount * 2);
+			} else {
+				thisBall->setCenterX(topBlob.leftTop.x + amount);
+			}
+			if (occlusion != TOPOCCLUSION) {
+				thisBall->setCenterY(topBlob.leftTop.y + amount);
+			} else {
+				thisBall->setCenterY(topBlob.leftBottom.y - amount);
+			}
+			thisBall->setConfidence(SURE);
+			thisBall->findAngles();
+			thisBall->setFocalDistanceFromRadius();
+			thisBall->setDistanceEst(vision->pose->
+									 bodyEstimate(thisBall->getCenterX(),
+												  thisBall->getCenterY(),
+												  static_cast<float>(thisBall->
+																	 getFocDist())));
+			done = true;
+			float distanceDifference = fabs(e.dist - thisBall->getDistance());
+			const float DISTANCE_MISMATCH = 50.0f;
+			if (distanceDifference > DISTANCE_MISMATCH && e.dist < PIXACC && e.dist > 0) {
+				if (BALLDEBUG) {
+					cout << "Screening due to distance mismatch " << e.dist <<
+						" " << thisBall->getDistance() << endl;
+				}
+				thisBall->init();
+				done = false;
+			}
+		}
+	}
     // sometimes when we're close to the ball we catch reflections off the tape or posts
     if (thisBall->getDistance() < 75.0f && abs(h - w) > 3) { // && thisBall->getDistance() < e.dist - 5.0f) {
       // we probably have misidentified the distance see if we can fix it.
@@ -4249,7 +4275,6 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	    count++;
 	  }
 	}
-	cout << "Count is " << count << endl;
 	if (count > 1) {
 	}
       } else {
@@ -4382,7 +4407,6 @@ bool ObjectFragments::locationOk(blob b, int hor)
     int trueBottom = max(b.leftBottom.y, b.rightBottom.y); // bottommost value in teh blob
     int horizonLeft = yProject(0, hor, trueLeft);          // the horizon at the leftmost point
     int horizonRight = yProject(0, hor, trueRight);        // the horizon at the rightmost point
-    //cout << "Horizon stuff " << horizonLeft << " " << horizonRight << " " << hor << endl;
     //drawPoint(trueLeft, horizonLeft, RED);
     //if (slope < 0) {
     //  horizonLeft = yProject(IMAGE_WIDTH - 1, hor, trueLeft);

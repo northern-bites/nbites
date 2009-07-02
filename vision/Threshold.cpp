@@ -377,7 +377,7 @@ void Threshold::runs() {
                 case ORANGE:
                 case ORANGERED:
                     // add to Ball data structure
-                    if (currentRun > 2 && j+currentRun > horizon - 30) {
+                    if (currentRun > 2 && j+currentRun > horizon - 10) {
                         orange->newRun(i, j, currentRun);
                         lastGoodPixel = j;
                     }
