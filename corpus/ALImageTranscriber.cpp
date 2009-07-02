@@ -20,7 +20,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
         log = broker->getLoggerProxy();
         // Possible values are
         // lowDebug, debug, lowInfo, info, warning, error, fatal
-        log->setVerbosity("lowDebug");
+        log->setVerbosity("error");
     }catch (ALError &e) {
         std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
     }
