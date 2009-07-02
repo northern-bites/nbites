@@ -220,8 +220,8 @@ READY_KICKOFF_STOPPER = [NogginConstants.FIELD_WHITE_WIDTH * 2./5.,
 # player on the field cross, one behind and to the left
 
 # behind cross a bit and to the left
-READY_NON_KICKOFF_DEFENDER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4. - 20,
-                              NogginConstants.FIELD_WHITE_HEIGHT * 1./2. + 40,
+READY_NON_KICKOFF_DEFENDER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
+                              NogginConstants.FIELD_WHITE_HEIGHT * 1./4.,
                               NogginConstants.OPP_GOAL_HEADING]
 
 READY_NON_KICKOFF_CHASER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
