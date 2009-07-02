@@ -224,7 +224,7 @@ READY_KICKOFF_STOPPER = [NogginConstants.FIELD_WHITE_WIDTH * 2./5.,
 READY_NON_KICKOFF_DEFENDER = [NogginConstants.GREEN_PAD_X +
                               NogginConstants.FIELD_GREEN_WIDTH * 1./4.,
                               NogginConstants.GREEN_PAD_Y +
-                              NogginConstants.FIELD_GREEN_HEIGHT * 1./4.,
+                              NogginConstants.FIELD_GREEN_HEIGHT * 1./5.,
                               NogginConstants.OPP_GOAL_HEADING]
 
 READY_NON_KICKOFF_CHASER = [NogginConstants.GREEN_PAD_X +
