@@ -37,6 +37,7 @@ Step::Step(const WalkVector &target,
 
     //After we assign elements of the gait to this step, lets clip 
     setStepSize(target,last);
+    setStepLiftMagnitude();
 }
 
 
@@ -160,10 +161,17 @@ const WalkVector Step::elipseClipVelocities(const WalkVector & source){
   const float theta = NBMath::safe_atan2(source.y,source.x);
 
   //cout<<"Theta = "<<theta<<endl;
-  const float forward_max = std::abs(stepConfig[WP::MAX_VEL_X]*std::cos(theta)); 
-  const float horizontal_max = std::abs(stepConfig[WP::MAX_VEL_Y]*std::sin(theta)); 
+  float forward_max =0.0f;
+  if(source.x > 0)
+    forward_max = std::abs(stepConfig[WP::MAX_VEL_X]*std::cos(theta)); 
+  else
+    forward_max = std::abs(stepConfig[WP::MIN_VEL_X]*std::cos(theta)); 
 
-  const float mag_max =  std::sqrt(std::pow(forward_max,2) + std::pow(horizontal_max,2));
+  const float horizontal_max = 
+    std::abs(stepConfig[WP::MAX_VEL_Y]*std::sin(theta)); 
+
+  const float mag_max =
+    std::sqrt(std::pow(forward_max,2) + std::pow(horizontal_max,2));
 
   //cout << "Clipping y="<<source.y<<" according to"<<horizontal_max<<endl;
   const float new_y_vel = NBMath::clip(source.y,horizontal_max);
@@ -230,4 +238,14 @@ const WalkVector Step::lateralClipVelocities(const WalkVector & source){
   }
 
   return result;
+}
+
+
+
+void Step::setStepLiftMagnitude(){
+
+  const float percent_of_forward_max  = NBMath::clip(x,0,stepConfig[WP::MAX_VEL_X])
+    / stepConfig[WP::MAX_VEL_X];
+
+  stepConfig[WP::FOOT_LIFT_ANGLE] *= percent_of_forward_max; 
 }

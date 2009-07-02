@@ -59,6 +59,7 @@ namespace WP {
         STEP_HEIGHT, //TODO move this to STANCE
 	FOOT_LIFT_ANGLE,
         MAX_VEL_X,
+        MIN_VEL_X,
         MAX_VEL_Y,
         MAX_VEL_THETA,
         MAX_ACC_X,
@@ -178,7 +179,8 @@ namespace WP {
      NONE,//dblSupFrac
      LENGTH,//step height
      ANGLE, //foot lift angle
-     LENGTH,//max vel x
+     LENGTH,//max forward vel x
+     LENGTH,//max backward vel x
      LENGTH,//max vel y
      ANGLE,//max vel t
      LENGTH,//max acc x
@@ -234,7 +236,8 @@ namespace WP {
      0.25f,//dblSupFrac
      9.0f,//step height
      0.0f,//lift angle
-     70.0f,//max vel x
+     70.0f,//max forward vel x
+     -50.0f,//max backward vel x
      70.0f,//max vel y
      0.35f,//max vel t
      70.0f,//max acc x

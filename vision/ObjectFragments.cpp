@@ -4275,6 +4275,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	    count++;
 	  }
 	}
+
 	if (count > 1) {
 	}
       } else {
