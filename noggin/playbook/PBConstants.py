@@ -194,12 +194,12 @@ READY_KICKOFF_DEFENDER_1 = [NogginConstants.CENTER_FIELD_X * 1./2.,
                             NogginConstants.OPP_GOAL_HEADING] # behind forward, to left
 
 READY_KICKOFF_CHASER = [NogginConstants.CENTER_FIELD_X -
-                        NogginConstants.CENTER_CIRCLE_RADIUS/2,
+                        NogginConstants.CENTER_CIRCLE_RADIUS/2.0,
                         NogginConstants.CENTER_FIELD_Y,
                         NogginConstants.OPP_GOAL_HEADING] # near center
 
 READY_KICKOFF_NORMAL_CHASER = [NogginConstants.CENTER_FIELD_X -
-                               NogginConstants.CENTER_CIRCLE_RADIUS/2,
+                               NogginConstants.CENTER_CIRCLE_RADIUS/2.0,
                                NogginConstants.CENTER_FIELD_Y,
                                NogginConstants.OPP_GOAL_HEADING]
 
@@ -220,15 +220,21 @@ READY_KICKOFF_STOPPER = [NogginConstants.FIELD_WHITE_WIDTH * 2./5.,
 # player on the field cross, one behind and to the left
 
 # behind cross a bit and to the left
-READY_NON_KICKOFF_DEFENDER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
-                              NogginConstants.FIELD_WHITE_HEIGHT * 1./4.,
+READY_NON_KICKOFF_DEFENDER = [NogginConstants.GREEN_PAD_X +
+                              NogginConstants.FIELD_GREEN_WIDTH * 1./4.,
+                              NogginConstants.GREEN_PAD_Y +
+                              NogginConstants.FIELD_GREEN_HEIGHT * 1./4.,
                               NogginConstants.OPP_GOAL_HEADING]
 
-READY_NON_KICKOFF_CHASER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
+READY_NON_KICKOFF_CHASER = [NogginConstants.GREEN_PAD_X +
+                            NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
+                            NogginConstants.GREEN_PAD_Y +
                             NogginConstants.FIELD_WHITE_HEIGHT * 1./2.,
                             NogginConstants.OPP_GOAL_HEADING]
 
-READY_NON_KICKOFF_OFFENDER = [NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
+READY_NON_KICKOFF_OFFENDER = [NogginConstants.GREEN_PAD_X +
+                              NogginConstants.FIELD_WHITE_WIDTH * 1./4.,
+                              NogginConstants.GREEN_PAD_Y +
                               NogginConstants.FIELD_WHITE_WIDTH * 3./5.,
                               NogginConstants.OPP_GOAL_HEADING]
 
