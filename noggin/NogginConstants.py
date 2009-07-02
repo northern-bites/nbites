@@ -234,6 +234,16 @@ visionObjectTuple = ("YGLP",
                      "BGLP",
                      "BGRP")
 
+if USING_LAB_FIELD:
+    LINE_CROSS_OFFSET = 130
+else :
+    LINE_CROSS_OFFSET = 180
+
+LANDMARK_OPP_FIELD_CROSS = [FIELD_WHITE_LEFT_SIDELINE_X + LINE_CROSS_OFFSET,
+                            MIDFIELD_Y]
+LANDMARK_MY_FIELD_CROSS = [FIELD_WHITE_RIGHT_SIDELINE_X - LINE_CROSS_OFFSET,
+                           MIDFIELD_Y]
+
 
 NUM_LOC_SCORES = 3
 (BAD_LOC,

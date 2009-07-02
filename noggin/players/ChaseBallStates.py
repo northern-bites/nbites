@@ -142,7 +142,7 @@ def approachBallWithLoc(player):
         elif transitions.shouldPositionForKickFromApproachLoc(player):
             player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
-        elif player.ballInMyGoalBox():
+        elif transitions.shouldNotGoInBox(player):
             player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('ballInMyBox')
         elif transitions.shouldChaseAroundBox(player):
@@ -242,7 +242,7 @@ def approachBallWalk(player):
     We use things as to when we should leave and how we should walk
     """
     if player.currentRole != pbc.GOALIE:
-        if player.ballInMyGoalBox():
+        if transitions.shouldNotGoInBox(player):
             return player.goLater('ballInMyBox')
         elif transitions.shouldChaseAroundBox(player):
             return player.goLater('chaseAroundBox')
@@ -317,8 +317,8 @@ def positionForKick(player):
     sY = MyMath.clip(targetY * constants.PFK_Y_GAIN,
                      constants.PFK_MIN_Y_SPEED,
                      constants.PFK_MAX_Y_SPEED)
-    if fabs(sY) < constants.PFK_MIN_Y_MAGNITUDE:
-        sY = 0.0
+
+    sY = max(constants.PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if transitions.shouldApproachForKick(player):
         targetX = (ball.relX -
@@ -507,10 +507,14 @@ def steps(player):
 def ballInMyBox(player):
     if player.firstFrame():
         player.brain.tracker.activeLoc()
-        player.stopWalking()
-
         player.brain.CoA.setRobotGait(player.brain.motion)
 
+    ball = player.brain.ball
+    if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
+        player.setSpeed(0, 0, constants.MAX_SPIN_SPEED *
+                        MyMath.sign(ball.bearing) )
+    elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
+        player.stopWalking()
     if not player.ballInMyGoalBox():
         return player.goLater('chase')
     return player.stay()
