@@ -3952,6 +3952,41 @@ bool ObjectFragments::atBoundary(blob b) {
         || b.leftBottom.y >= IMAGE_HEIGHT - 1;
 }
 
+void ObjectFragments::setBallInfo(int w, int h, VisualBall *thisBall) {
+
+	const float radDiv = 2.0f;
+	// x, y, width, and height. Not up for debate.
+	thisBall->setX(topBlob.leftTop.x);
+	thisBall->setY(topBlob.leftTop.y);
+
+	thisBall->setWidth( static_cast<float>(w) );
+	thisBall->setHeight( static_cast<float>(h) );
+	thisBall->setRadius( std::max(static_cast<float>(w)/radDiv,
+								  static_cast<float>(h)/radDiv ) );
+	int amount = h / 2;
+	if (w > h)
+		amount = w / 2;
+
+	if (occlusion == LEFTOCCLUSION) {
+		thisBall->setCenterX(topBlob.rightTop.x - amount);
+		thisBall->setX(topBlob.rightTop.x - amount * 2);
+	} else {
+		thisBall->setCenterX(topBlob.leftTop.x + amount);
+	}
+	if (occlusion != TOPOCCLUSION) {
+		thisBall->setCenterY(topBlob.leftTop.y + amount);
+	} else {
+		thisBall->setCenterY(topBlob.leftBottom.y - amount);
+	}
+	thisBall->setConfidence(SURE);
+	thisBall->findAngles();
+	thisBall->setFocalDistanceFromRadius();
+	thisBall->setDistanceEst(vision->pose->
+							 bodyEstimate(thisBall->getCenterX(),
+										  thisBall->getCenterY(),
+										  static_cast<float>(thisBall->
+															 getFocDist())));
+}
 
 /* See if there is a ball onscreen.  Basically we get all of the orange blobs
  * and test them for viability.  Once we've screened all of the obviously bad
@@ -3977,7 +4012,6 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	const int blobMid = 150;
 	const int blobHigh = 250;
 	const int blobMax = 500;
-	const float radDiv = 2.0f;
 	const float PIXACC = 300;
 
     int confidence = 10;
@@ -4196,39 +4230,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 			}
 
 			// SORT OUT BALL INFORMATION
-			// start out by figuring out whether we're using blobs or inferred information
-			//float rat = (float) w / (float) h;
-			// x, y, width, and height. Not up for debate.
-			thisBall->setX(topBlob.leftTop.x);
-			thisBall->setY(topBlob.leftTop.y);
-
-			thisBall->setWidth( static_cast<float>(w) );
-			thisBall->setHeight( static_cast<float>(h) );
-			thisBall->setRadius( std::max(static_cast<float>(w)/radDiv,
-										  static_cast<float>(h)/radDiv ) );
-			int amount = h / 2;
-			if (w > h)
-				amount = w / 2;
-
-			if (occlusion == LEFTOCCLUSION) {
-				thisBall->setCenterX(topBlob.rightTop.x - amount);
-				thisBall->setX(topBlob.rightTop.x - amount * 2);
-			} else {
-				thisBall->setCenterX(topBlob.leftTop.x + amount);
-			}
-			if (occlusion != TOPOCCLUSION) {
-				thisBall->setCenterY(topBlob.leftTop.y + amount);
-			} else {
-				thisBall->setCenterY(topBlob.leftBottom.y - amount);
-			}
-			thisBall->setConfidence(SURE);
-			thisBall->findAngles();
-			thisBall->setFocalDistanceFromRadius();
-			thisBall->setDistanceEst(vision->pose->
-									 bodyEstimate(thisBall->getCenterX(),
-												  thisBall->getCenterY(),
-												  static_cast<float>(thisBall->
-																	 getFocDist())));
+			setBallInfo(w, h, thisBall);
 			done = true;
 			float distanceDifference = fabs(e.dist - thisBall->getDistance());
 			const float DISTANCE_MISMATCH = 50.0f;
@@ -4246,43 +4248,79 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	}
     // sometimes when we're close to the ball we catch reflections off the tape or posts
     if (thisBall->getDistance() < 75.0f && abs(h - w) > 3) { // && thisBall->getDistance() < e.dist - 5.0f) {
-      // we probably have misidentified the distance see if we can fix it.
-      if (BALLDISTDEBUG) {
-	cout << "Detected bad ball distance - trying to fix " << w << " " << h << endl;
-      }
-      if (h > w) {
-	// scan the sides to find the real sides
-	int count = -2;
-	if (topBlob.rightTop.x - h > 0) {
-	  for (int i = topBlob.rightTop.x - h; i < IMAGE_WIDTH - 1; i++) {
-	    for (int j = topBlob.leftTop.y; j < topBlob.leftBottom.y; j++) {
-	      if (thresh->thresholded[j][i] == ORANGE) {
-		topBlob.rightTop.x = i;
-		j = IMAGE_HEIGHT;
-		i = IMAGE_WIDTH;
-	      }
-	    }
-	    count++;
-	  }
-	}
-	if (topBlob.leftTop.x + h < IMAGE_WIDTH) {
-	  for (int i = topBlob.leftTop.x + h; i > -1; i--) {
-	    for (int j = topBlob.leftTop.y; j < topBlob.leftBottom.y; j++) {
-	      if (thresh->thresholded[j][i] == ORANGE) {
-		topBlob.rightTop.x = i;
-		j = IMAGE_HEIGHT;
-		i = -1;
-	      }
-	    }
-	    count++;
-	  }
-	}
-
-	if (count > 1) {
-	}
-      } else {
-      }
-      thisBall->setDistanceEst(e);
+		// we probably have misidentified the distance see if we can fix it.
+		if (BALLDISTDEBUG) {
+			cout << "Detected bad ball distance - trying to fix " << w << " " << h << endl;
+		}
+		if (h > w) {
+			// scan the sides to find the real sides
+			int count = -2;
+			if (topBlob.rightTop.x - h > 0) {
+				for (int i = topBlob.rightTop.x - h; i < IMAGE_WIDTH - 1; i++) {
+					for (int j = topBlob.leftTop.y; j < topBlob.leftBottom.y; j++) {
+						if (thresh->thresholded[j][i] == ORANGE) {
+							topBlob.rightTop.x = i;
+							j = IMAGE_HEIGHT;
+							i = IMAGE_WIDTH;
+						}
+					}
+					count++;
+				}
+			}
+			if (topBlob.leftTop.x + h < IMAGE_WIDTH) {
+				for (int i = topBlob.leftTop.x + h; i > -1; i--) {
+					for (int j = topBlob.leftTop.y; j < topBlob.leftBottom.y; j++) {
+						if (thresh->thresholded[j][i] == ORANGE) {
+							topBlob.rightTop.x = i;
+							j = IMAGE_HEIGHT;
+							i = -1;
+						}
+					}
+					count++;
+				}
+			}
+			if (count > 1) {
+				if (BALLDISTDEBUG) {
+					cout << "Resetting ball dimensions.  Count was " << count << endl;
+				}
+				setBallInfo(w, w, thisBall);
+			}
+		} else {
+			/*
+			int count = -2;
+			// scan the top/bottom to find the real ones
+			if (topBlob.rightTop.y - w > 0) {
+				for (int i = topBlob.rightTop.y - w; i < IMAGE_HEIGHT - 1; i++) {
+					for (int j = topBlob.leftTop.x; j < topBlob.rightBottom.x; j++) {
+						if (thresh->thresholded[i][j] == ORANGE) {
+							topBlob.rightTop.y = i;
+							j = IMAGE_WIDTH;
+							i = IMAGE_HEIGHT;
+						}
+					}
+					count++;
+				}
+			}
+			if (topBlob.leftTop.y + w < IMAGE_HEIGHT) {
+				for (int i = topBlob.leftTop.y + w; i > -1; i--) {
+					for (int j = topBlob.leftTop.x; j < topBlob.rightTop.x; j++) {
+						if (thresh->thresholded[i][j] == ORANGE) {
+							topBlob.rightTop.y = i;
+							j = IMAGE_WIDTH;
+							i = -1;
+						}
+					}
+					count++;
+				}
+				if (count > 1) {
+					if (BALLDISTDEBUG) {
+						cout << "Resetting ball dimensions.  Count was " << count << endl;
+					}
+					setBallInfo(h, h, thisBall);
+				}
+				} */
+		}
+		thisBall->setDistanceEst(e);
     }
     if (atBoundary(topBlob)) {
         // INFERRED MEASUREMENTS
