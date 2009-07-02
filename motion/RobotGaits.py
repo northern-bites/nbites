@@ -272,7 +272,7 @@ MARVIN_MED_STANCE = (31.00, # CoM height
 MED_STANCE = (31.00, # CoM height
               1.45,  # Forward displacement of CoM
               10.0,  # Horizontal distance between feet
-              3.0,   # Body angle around y axis
+              5.0,   # Body angle around y axis
               0.0,   # Angle between feet
               0.1)   # Time to transition to/from this stance
 
@@ -323,8 +323,8 @@ MED_ZMP = (0.0,  # footCenterLocX
 MED_SENSOR =  (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                0.08,  # angle X scale (gamma)
                0.08,  # angle Y scale (gamma)
-               100.00,  # X spring constant k (kg/s^2)
-               50,  # Y spring constant k (kg/s^2)
+               100.0,  # X spring constant k (kg/s^2)
+               100.0,  # Y spring constant k (kg/s^2)
                7.0,   # max angle X (compensation)
                7.0,   # max angle Y
                45.0)   # max angle vel (change in compensation)

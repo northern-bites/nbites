@@ -4249,7 +4249,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	    count++;
 	  }
 	}
-	cout << "Count is " << count << endl;
+	
 	if (count > 1) {
 	}
       } else {
