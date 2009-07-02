@@ -9,7 +9,7 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.brain.gameController.ownKickOff:
-        player.hasKickedOffKick = False
+        player.hasKickedOffKick = True
     else:
         player.hasKickedOffKick = True
     player.standup()
