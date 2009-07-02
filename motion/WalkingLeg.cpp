@@ -19,6 +19,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "WalkingLeg.h"
+#include "COMKinematics.h"
 using namespace std;
 
 using namespace Kinematics;
@@ -220,6 +221,11 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 
 
 const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
+	const float COM_Z_OFF = 69.9f;
+
+    const ufvector4 com_c = Kinematics::getCOMc(sensors->getMotionBodyAngles());
+
+
     const float startStopSensorScale = getEndStepSensorScale();
 
     const boost::tuple <const float, const float > sensorCompensation =
@@ -244,11 +250,17 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     const ufvector3 footOrientation = CoordFrame3D::vector3D(footAngleX,
                                                              footAngleY,
                                                              footAngleZ);
-    const ufvector3 bodyGoal = CoordFrame3D::vector3D(0.0f,
-                                                      0.0f,0.0f);
+
+	ufvector3 comFootGoal = footGoal;
+	comFootGoal(2) += COM_Z_OFF;
+
+    const ufvector3 bodyGoal = CoordFrame3D::vector3D( -com_c(0),
+													   -com_c(1),
+													   COM_Z_OFF);
+
 
     IKLegResult result =
-        Kinematics::legIK(chainID,footGoal,footOrientation,
+        Kinematics::legIK(chainID,comFootGoal,footOrientation,
                           bodyGoal,bodyOrientation);
 
     applyHipHacks(result.angles);
