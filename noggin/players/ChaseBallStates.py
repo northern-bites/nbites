@@ -17,7 +17,7 @@ def chase(player):
     Method to determine which chase state should be used.
     We dump the robot into this state when we our switching from something else.
     """
-    if player.currentRole == pbc.GOALIE:
+    if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldScanFindBall(player):
             return player.goNow('goalieScanFindBall')
         elif transitions.shouldApproachBall(player):
@@ -90,7 +90,7 @@ def turnToBall(player):
     if fabs(turnRate) < constants.MIN_BALL_SPIN_MAGNITUDE:
         turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_MAGNITUDE
 
-    if player.currentRole == pbc.GOALIE:
+    if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKick(player):
@@ -120,7 +120,7 @@ def approachBallWithLoc(player):
 
     nav = player.brain.nav
     my = player.brain.my
-    if player.currentRole == pbc.GOALIE:
+    if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKickFromApproachLoc(player):
@@ -204,7 +204,7 @@ def approachBall(player):
         return player.goNow('penaltyBallInOppGoalbox')
 
     # Switch to other states if we should
-    if player.currentRole == pbc.GOALIE:
+    if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKick(player):
@@ -231,7 +231,7 @@ def approachBallWalk(player):
     Method that is used by both approach ball and dribble
     We use things as to when we should leave and how we should walk
     """
-    if player.currentRole != pbc.GOALIE:
+    if player.brain.playbook.role != pbc.GOALIE:
         if player.ballInMyGoalBox():
             return player.goLater('ballInMyBox')
         elif transitions.shouldChaseAroundBox(player):
@@ -251,7 +251,7 @@ def approachBallWalk(player):
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball
-    if player.currentRole == pbc.GOALIE and goalTran.dangerousBall(player):
+    if player.brain.playbook.role == pbc.GOALIE and goalTran.dangerousBall(player):
         return player.goNow('approachDangerousBall')
 
     sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,

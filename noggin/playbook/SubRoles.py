@@ -126,6 +126,13 @@ def pGoalieChaser(team):
     position = [goal[1][0], goal[1][1]]
     return [PBConstants.GOALIE_CHASER, position]
 
+def pGoalieReady(team):
+    """
+    Go to our home position during ready
+    """
+    position = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
+    return [PBConstants.GOALIE_NORMAL, position]
+
 # Kickoff sub roles
 def pKickoffSweeper(team):
     '''position kickoff sweeper'''

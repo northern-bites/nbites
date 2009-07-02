@@ -24,3 +24,6 @@ END_CLEAR_BUFFER = 10
 
 # Distance at which we use active localization
 ACTIVE_LOC_THRESH = 150.
+
+# Difference to goto a different point
+SHOULD_POSITION_DIFF = 5.0
