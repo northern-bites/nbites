@@ -73,7 +73,7 @@ SUPPORT_SPIN = CHASE_SPIN
 SEC_TO_MILLIS = 1000.0
 NEAR_LINE_THRESH = 15.
 # Determine chaser junk
-BALL_DIVERGENCE_THRESH = 250.0
+BALL_DIVERGENCE_THRESH = 2000.0
 # Special cases for waiting for the ball at half field
 CENTER_FIELD_DIST_THRESH = 125.
 
