@@ -5,6 +5,7 @@ from . import GoalieTransitions
 from . import ChaseBallStates
 from . import FindBallStates
 from . import KickingStates
+from . import PositionStates
 from ..playbook import PBConstants
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -15,6 +16,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(ChaseBallStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
+        self.addStates(PositionStates)
         self.setName('pSquatGoalie')
 
         self.squatting = False

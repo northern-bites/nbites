@@ -1,10 +1,11 @@
 import man.motion.SweetMoves as SweetMoves
 import GoalieConstants as constants
 import GoalieTransitions as helper
+from ..playbook import PBConstants
 from .. import NogginConstants
 
 def squat(player):
-    if player.firstFrame() and not player.squatting:
+    if player.firstFrame():
         player.executeMove(SweetMoves.INITIAL_POS)
         player.squatting = True
         player.executeMove(SweetMoves.GOALIE_SQUAT)
@@ -43,19 +44,15 @@ def squatPosition(player):
 
     ball = brain.ball
     bearing = None
-    if ball.on:
-        bearing = ball.bearing
-    elif ball.framesOff < 3:
-        bearing = ball.locBearing
-    else:
-        bearing = NogginConstants.OPP_GOAL_HEADING
 
     if (not nav.atDestinationGoalie() or
         not nav.atHeading()):
         if not useOmni:
-            nav.goTo((position[0], position[1], my.h + bearing))
+            nav.goTo((PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y,\
+                          NogginConstants.OPP_GOAL_HEADING))
         else:
-            nav.omniGoTo((position[0], position[1], my.h + bearing))
+            nav.omniGoTo((PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y,\
+                              NogginConstants.OPP_GOAL_HEADING))
     else:
         return player.goLater("squat")
 

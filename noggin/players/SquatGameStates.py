@@ -20,11 +20,21 @@ def gameInitial(player):
     return player.stay()
 
 def gameReady(player):
-    if player.squatting:
-        return player.goLater('squatted')
-    return player.goLater('squat')
+    """
+    Stand up, and pan for localization
+    """
+    player.standup()
+    player.brain.tracker.locPans()
+    if player.lastDiffState == 'gameInitial':
+        return player.goLater('relocalize')
+    if player.firstFrame() and \
+            player.lastDiffState == 'gamePenalized':
+        player.brain.resetLocalization()
+
+    return player.goLater('squatPosition')
 
 def gameSet(player):
+    player.brain.resetGoalieLocalization()
     if player.squatting:
         return player.goLater('squatted')
     return player.goLater('squat')
