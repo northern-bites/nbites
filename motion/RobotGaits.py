@@ -273,11 +273,11 @@ MED_STANCE = (31.00, # CoM height
 MED_STEP = (0.4, # step duration
             0.25,  # fraction in double support
             0.9,  # stepHeight
-            0.0,  # step lift
+            -5.0,  # step lift
             10.0,  # max x speed
             -5.0,  # max x speed
             10.0,  # max y speed
-            20.0, # max theta speed()
+            30.0, # max theta speed()
             7.0,  # max x accel
             7.0,  # max y accel
             20.0, # max theta speed()
@@ -286,8 +286,8 @@ MED_STEP = (0.4, # step duration
 
 MED_ZMP = (0.0,  # footCenterLocX
            0.3,  # zmp static percentage
-           0.5,  # left zmp off
-           0.5,  # right zmp off
+           0.4,  # left zmp off
+           0.4,  # right zmp off
            0.01,  # strafe zmp offse
            6.6)   # turn zmp offset
 
