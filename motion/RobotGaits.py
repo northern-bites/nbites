@@ -262,15 +262,22 @@ WEBOTS_GAIT2=motion.GaitCommand(STANCE_CONFIG,
 
 
 ########## MEDIUM GAIT #################
-MED_STANCE = (31.00, # CoM height
+MARVIN_MED_STANCE = (31.00, # CoM height
               1.45,  # Forward displacement of CoM
               10.0,  # Horizontal distance between feet
               6.0,   # Body angle around y axis
               0.0,   # Angle between feet
               0.1)   # Time to transition to/from this stance
 
+MED_STANCE = (31.00, # CoM height
+              1.45,  # Forward displacement of CoM
+              10.0,  # Horizontal distance between feet
+              3.0,   # Body angle around y axis
+              0.0,   # Angle between feet
+              0.1)   # Time to transition to/from this stance
 
-MED_STEP = (0.4, # step duration
+
+MARVIN_MED_STEP = (0.4, # step duration
             0.25,  # fraction in double support
             0.9,  # stepHeight
             -5.0,  # step lift
@@ -284,12 +291,34 @@ MED_STEP = (0.4, # step duration
             20.0,  # max theta speed()
             WALKING)#walk gait = true
 
-MED_ZMP = (0.0,  # footCenterLocX
+MED_STEP = (0.4, # step duration
+            0.25,  # fraction in double support
+            1.1,  # stepHeight
+            -5.0,  # step lift
+            10.0,  # max x speed
+            -5.0,  # max x speed
+            10.0,  # max y speed
+            30.0, # max theta speed()
+            7.0,  # max x accel
+            7.0,  # max y accel
+            20.0, # max theta speed()
+            20.0,  # max theta speed()
+            WALKING)#walk gait = true
+
+MARVIN_MED_ZMP = (0.0,  # footCenterLocX
            0.3,  # zmp static percentage
            0.4,  # left zmp off
            0.4,  # right zmp off
            0.01,  # strafe zmp offse
            7.6)   # turn zmp offset
+
+MED_ZMP = (0.0,  # footCenterLocX
+           0.3,  # zmp static percentage
+           0.5,  # left zmp off
+           0.5,  # right zmp off
+           0.01,  # strafe zmp offse
+           7.6)   # turn zmp offset
+
 
 MED_SENSOR =  (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                0.08,  # angle X scale (gamma)
@@ -305,27 +334,38 @@ MED_STIFFNESS = STIFFNESS_CONFIG
 MED_ODO= ODO_CONFIG
 MED_ARM=ARM_CONFIG
 
-MARVIN_MEDIUM_GAIT = motion.GaitCommand(MED_STANCE,
-                                        MED_STEP,
-                                        MED_ZMP,
+MARVIN_MEDIUM_GAIT = motion.GaitCommand(MARVIN_MED_STANCE,
+                                        MARVIN_MED_STEP,
+                                        MARVIN_MED_ZMP,
                                         MED_HACK,
                                         MED_SENSOR,
                                         MED_STIFFNESS,
                                         MED_ODO,
                                         MED_ARM)
+MEDIUM_GAIT = motion.GaitCommand(MED_STANCE,
+                                 MED_STEP,
+                                 MED_ZMP,
+                                 MED_HACK,
+                                 MED_SENSOR,
+                                 MED_STIFFNESS,
+                                 MED_ODO,
+                                 MED_ARM)
 ##### END MEDIUM GAIT ####
 
 
 ############# DEFAULT GAIT ASSIGNMENTS ##################
 
-TRILLIAN_GAIT = NEW_GAIT
-ZAPHOD_GAIT   =   NEW_GAIT
-SLARTI_GAIT   =   NEW_GAIT
-MARVIN_GAIT   =   MARVIN_MEDIUM_GAIT
+CUR_GAIT = MEDIUM_GAIT
+MARVIN_CUR_GAIT = MARVIN_MEDIUM_GAIT
 
-TRILLIAN_TURN_GAIT = NEW_GAIT
-ZAPHOD_TURN_GAIT   =   NEW_GAIT
-SLARTI_TURN_GAIT   =   NEW_GAIT
-MARVIN_TURN_GAIT   =   MARVIN_MEDIUM_GAIT
+TRILLIAN_GAIT = CUR_GAIT
+ZAPHOD_GAIT   = CUR_GAIT
+SLARTI_GAIT   = CUR_GAIT
+MARVIN_GAIT   = MARVIN_CUR_GAIT
+
+TRILLIAN_TURN_GAIT = CUR_GAIT
+ZAPHOD_TURN_GAIT   = CUR_GAIT
+SLARTI_TURN_GAIT   = CUR_GAIT
+MARVIN_TURN_GAIT   = MARVIN_CUR_GAIT
 
 
