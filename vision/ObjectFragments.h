@@ -153,6 +153,7 @@ public:
     int roundness(blob b);
     bool badSurround(blob b);
     bool atBoundary(blob b);
+	void setBallInfo(int w, int h, VisualBall *thisBall);
     int balls(int c, VisualBall *thisBall);
 
     // sanity checks
