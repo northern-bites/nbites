@@ -288,7 +288,8 @@ def shootBallFar(player):
                                               shotAimPoint[1])
     if constants.DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
     if constants.SHOOT_BALL_FAR_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
-            constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE:
+            constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE and \
+            not player.hasAlignedOnce:
         player.angleToAlign = bearingToGoal
         return player.goNow('alignOnBallStraightKick')
     elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
@@ -320,14 +321,11 @@ def shootBall(player):
             if constants.DEBUG_KICKS: print ("\t\t Straight 1")
             return player.goLater('kickBallStraight')
 
-        elif fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH:
+        elif fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH and \
+                not player.hasAlignedOnce:
             if constants.DEBUG_KICKS: print ("\t\t Align 1")
             player.angleToAlign = avgOppBearing
-            if constants.ALIGN_FOR_KICK:
-                player.angleToAlign = avgOppBearing
-                return player.goLater('alignOnBallStraightKick')
-            else:
-                return player.goLater('kickBallStraight')
+            return player.goLater('alignOnBallStraightKick')
 
         elif avgOppBearing > constants.ALIGN_FOR_KICK_BEARING_THRESH:
             if constants.DEBUG_KICKS: print ("\t\t Left 5")
@@ -389,7 +387,7 @@ def penaltyKickBall(player):
         player.angleToAlign = ballBearingToGoal - player.brain.my.h
         if player.angleToAlign < constants.ALIGN_FOR_KICK_MIN_ANGLE:
             return player.goLater('kickBallStraight')
-        else:
+        else :
             return player.goLater('alignOnBallStraightKick')
     return player.stay()
 

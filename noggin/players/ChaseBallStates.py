@@ -17,6 +17,7 @@ def chase(player):
     Method to determine which chase state should be used.
     We dump the robot into this state when we our switching from something else.
     """
+    player.hasAlignedOnce = False
     if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldScanFindBall(player):
             return player.goNow('goalieScanFindBall')
@@ -78,6 +79,7 @@ def turnToBall(player):
     ball = player.brain.ball
 
     if player.firstFrame():
+        player.hasAlignedOnce = False
         player.brain.tracker.trackBall()
         player.brain.CoA.setRobotGait(player.brain.motion)
 
@@ -117,6 +119,8 @@ def turnToBall(player):
 def approachBallWithLoc(player):
     if player.firstFrame():
         player.brain.CoA.setRobotGait(player.brain.motion)
+        player.hasAlignedOnce = False
+
 
     nav = player.brain.nav
     my = player.brain.my
@@ -200,6 +204,7 @@ def approachBall(player):
     Once we are alligned with the ball, approach it
     """
     if player.firstFrame():
+        player.hasAlignedOnce = False
         player.brain.tracker.trackBall()
         player.brain.CoA.setRobotGait(player.brain.motion)
 
@@ -291,8 +296,6 @@ def positionForKick(player):
         player.brain.CoA.setRobotSlowGait(player.brain.motion)
 
     ball = player.brain.ball
-    if player.firstFrame():
-        player.hasAlignedOnce = False
 
     player.inKickingState = True
     # Leave this state if necessary
