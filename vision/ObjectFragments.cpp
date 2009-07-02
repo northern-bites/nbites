@@ -4232,7 +4232,9 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 			done = true;
 			float distanceDifference = fabs(e.dist - thisBall->getDistance());
 			const float DISTANCE_MISMATCH = 50.0f;
-			if (distanceDifference > DISTANCE_MISMATCH && e.dist < PIXACC && e.dist > 0) {
+			if (distanceDifference > DISTANCE_MISMATCH &&
+				(e.dist *2 <  thisBall->getDistance() || thisBall->getDistance() * 2 < e.dist)
+				&& e.dist < PIXACC && e.dist > 0) {
 				if (BALLDEBUG) {
 					cout << "Screening due to distance mismatch " << e.dist <<
 						" " << thisBall->getDistance() << endl;
