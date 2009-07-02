@@ -47,9 +47,6 @@ public:
     void updateFrameLengths(const float duration,
                             const float dblSuppF);
 
-    void setStepSize(const WalkVector &target,
-		     const WalkVector &last);
-    
     friend std::ostream& operator<< (std::ostream &o, const Step &s)
         {
             return o << "Step(" << s.x << "," << s.y << "," << s.theta
@@ -79,6 +76,10 @@ private:
                             const float _zmp_config[],
 			    const float _stance_config[]);
     void copyAttributesFromOther(const Step &other);
+    void setStepSize(const WalkVector &target,
+		     const WalkVector &last);
+    
+    void setStepLiftMagnitude();
 
     const WalkVector elipseClipVelocities(const WalkVector & source);
     const WalkVector accelClipVelocities(const WalkVector & source,

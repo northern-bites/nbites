@@ -267,14 +267,12 @@ WalkingLeg::getAnkleAngles(){
   const float angle = static_cast<float>(frameCounter)/
     static_cast<float>(singleSupportFrames)*M_PI_FLOAT;
 
+  const float scale = std::sin(angle);
 
-  float scale =0.0f;
-  if((swing_dest->x -swing_src->x) > 0.0f  ){
-    scale = std::sin(angle);
-  }
   
-  const float ANKLE_LIFT_ANGLE = gait->step[WP::FOOT_LIFT_ANGLE];
-  return boost::tuple<const float, const float>(0.0f*scale,ANKLE_LIFT_ANGLE*scale);
+  const float ANKLE_LIFT_ANGLE = swing_dest->stepConfig[WP::FOOT_LIFT_ANGLE]*scale;
+
+  return boost::tuple<const float, const float>(0.0f,ANKLE_LIFT_ANGLE);
 }
 
 

@@ -37,6 +37,7 @@ Step::Step(const WalkVector &target,
 
     //After we assign elements of the gait to this step, lets clip 
     setStepSize(target,last);
+    setStepLiftMagnitude();
 }
 
 
@@ -237,4 +238,14 @@ const WalkVector Step::lateralClipVelocities(const WalkVector & source){
   }
 
   return result;
+}
+
+
+
+void Step::setStepLiftMagnitude(){
+
+  const float percent_of_forward_max  = NBMath::clip(x,0,stepConfig[WP::MAX_VEL_X])
+    / stepConfig[WP::MAX_VEL_X];
+
+  stepConfig[WP::FOOT_LIFT_ANGLE] *= percent_of_forward_max; 
 }
