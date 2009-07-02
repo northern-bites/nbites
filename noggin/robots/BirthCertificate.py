@@ -14,7 +14,7 @@ class BirthCertificate:
     next_id = 0
 
     def __init__(self, name, long_name, tts_name=None,
-                  doc='', gait=None, turn_gait=None):
+                  doc='', gait=None, turn_gait=None, slow_gait=None):
         self.id = BirthCertificate.next_id
         BirthCertificate.next_id += 1
 
@@ -26,6 +26,7 @@ class BirthCertificate:
         self.__doc__ = doc
         self.gait = gait
         self.turn_gait = turn_gait
+        self.slow_gait = slow_gait
 
     def setRobotGait(self, motion_interface):
         if self.gait is not None:
@@ -36,6 +37,10 @@ class BirthCertificate:
         if self.turn_gait is not None:
             print '\033[32m' + "BirthCertificates - Setting turn gait" + '\033[0m'
             motion_interface.setGait(self.turn_gait)
+    def setRobotSlowGait(self, motion_interface):
+        if self.slow_gait is not None:
+            print '\033[32m' + "BirthCertificates - Setting slow gait" + '\033[0m'
+            motion_interface.setGait(self.slow_gait)
 
     def __str__(self):
         s = "CoA: " + self.long_name

@@ -31,6 +31,7 @@ vast intelligence for evil. However, Marvin's depression infects his captors
 and is thus responsible for saving the Universe.''',
             gait = gaits.MARVIN_GAIT,
             turn_gait = gaits.MARVIN_TURN_GAIT,
+            slow_gait = gaits.MARVIN_SLOW_GAIT,
             )
 
 slarti = BirthCertificate.BirthCertificate(
@@ -44,6 +45,7 @@ Real Time, and stop the robots of Krikkit from bringing together the
 pieces of the Wikkit Gate!''',
             gait = gaits.SLARTI_GAIT,
             turn_gait = gaits.SLARTI_TURN_GAIT,
+            slow_gait = gaits.SLARTI_SLOW_GAIT,
             )
 
 trillian = BirthCertificate.BirthCertificate(
@@ -55,6 +57,7 @@ I am Tricia MacMillian. After saving the Universe from the Krikkit
 rebellion, I became a highly successful Sub Etha radio reporter.''',
             gait = gaits.TRILLIAN_GAIT,
             turn_gait = gaits.TRILLIAN_TURN_GAIT,
+            slow_gait = gaits.TRILLIAN_SLOW_GAIT,
             )
 
 zaphod = BirthCertificate.BirthCertificate(
@@ -68,6 +71,7 @@ stole the Heart of Gold Spaceship, and helped rescue the Universe from the
 Krikkit robots.''',
             gait = gaits.ZAPHOD_GAIT,
             turn_gait = gaits.ZAPHOD_TURN_GAIT,
+            slow_gait = gaits.ZAPHOD_SLOW_GAIT,
             )
 
 
@@ -88,6 +92,7 @@ from its hostname (%s).  The recognized robots are %s.''' %
             ('\''+ read_hostname() +'\'', robot_map.keys()), 
             gait = gaits.WEBOTS_GAIT,
             turn_gait = gaits.WEBOTS_GAIT,
+            slow_gait = gaits.WEBOTS_GAIT,
             )
 
 

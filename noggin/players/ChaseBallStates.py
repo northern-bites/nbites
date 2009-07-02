@@ -137,22 +137,30 @@ def approachBallWithLoc(player):
             return player.goLater('scanFindBall')
     else:
         if transitions.shouldKick(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKickFromApproachLoc(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
         elif player.ballInMyGoalBox():
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('ballInMyBox')
         elif transitions.shouldChaseAroundBox(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('chaseAroundBox')
         elif transitions.shouldAvoidObstacleDuringApproachBall(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('avoidObstacle')
         elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('approachBall')
         elif not player.brain.tracker.activeLocOn and \
                 transitions.shouldScanFindBall(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('scanFindBall')
         elif player.brain.tracker.activeLocOn and \
                 transitions.shouldScanFindBallActiveLoc(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('scanFindBall')
 
     if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
@@ -178,8 +186,10 @@ def approachBallWithLoc(player):
             nav.destH != dest[2] or \
             changedOmni:
         if not useOmni:
+            player.brain.CoA.setRobotGait(player.brain.motion)
             nav.goTo(dest)
         else:
+            player.brain.CoA.setRobotSlowGait(player.brain.motion)
             nav.omniGoTo(dest)
 
     return player.stay()
@@ -277,7 +287,7 @@ def positionForKick(player):
     State to align on the ball once we are near it
     """
     if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
+        player.brain.CoA.setRobotSlowGait(player.brain.motion)
 
     ball = player.brain.ball
     if player.firstFrame():
@@ -286,15 +296,19 @@ def positionForKick(player):
     player.inKickingState = True
     # Leave this state if necessary
     if transitions.shouldKick(player):
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goNow('waitBeforeKick')
     elif transitions.shouldScanFindBall(player):
         player.inKickingState = False
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
     elif transitions.shouldTurnToBallFromPositionForKick(player):
         player.inKickingState = False
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('turnToBall')
     elif transitions.shouldApproachFromPositionForKick(player):
         player.inKickingState = False
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('approachBall')
 
     # Determine approach speed

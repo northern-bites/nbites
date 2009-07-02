@@ -8,6 +8,8 @@ def gameReady(player):
     """
     Stand up, and pan for localization
     """
+    if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.brain.gameController.ownKickOff:
         player.hasKickedOffKick = True
     else:
@@ -26,6 +28,8 @@ def gameSet(player):
     """
     Fixate on the ball, or scan to look for it
     """
+    if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
 
@@ -44,6 +48,8 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
+    if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.firstFrame() and \
             player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
@@ -52,6 +58,8 @@ def gamePlaying(player):
     return player.goNow(roleState)
 
 def penaltyShotsGameReady(player):
+    if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.firstFrame():
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
@@ -62,6 +70,8 @@ def penaltyShotsGameReady(player):
     return player.stay()
 
 def penaltyShotsGameSet(player):
+    if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.firstFrame():
         player.stopWalking()
         player.brain.loc.resetBall()
@@ -75,6 +85,8 @@ def penaltyShotsGameSet(player):
     return player.stay()
 
 def penaltyShotsGamePlaying(player):
+    if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.lastDiffState == 'gamePenalized' and \
             player.firstFrame():
         player.brain.resetLocalization()

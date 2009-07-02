@@ -515,10 +515,12 @@ def alignOnBallStraightKick(player):
     """
     if player.firstFrame():
         player.hasAlignedOnce = True
+        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.nav.orbitAngle(-player.angleToAlign)
 
     # Deal with ball changed positions?
     elif player.brain.nav.isStopped():
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('positionForKick')
 
     return player.stay()
