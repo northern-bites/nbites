@@ -511,7 +511,7 @@ def ballInMyBox(player):
 
     ball = player.brain.ball
     if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
-        player.setSpeed(0, 0, constants.MAX_SPIN_SPEED *
+        player.setSpeed(0, 0, constants.BALL_SPIN_SPEED *
                         MyMath.sign(ball.bearing) )
     elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
         player.stopWalking()

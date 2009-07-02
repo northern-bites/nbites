@@ -473,9 +473,15 @@ def stepForRightFootKick(player):
     if ball.on and player.brain.nav.isStopped():
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
+
         if ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
             return player.goLater('kickBallExecute')
+        elif ballForeFoot == constants.LEFT_FOOT:
+            player.stopWalking()
+            player.chosenKick = SweetMoves.LEFT_FAR_KICK
+            return player.goLater('kickBallExecute')
+
         elif ballForeFoot == constants.INCORRECT_POS:
             return player.goLater('positionForKick')
 
@@ -495,9 +501,16 @@ def stepForLeftFootKick(player):
     if ball.on and player.brain.nav.isStopped():
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
+
         if ballForeFoot == constants.LEFT_FOOT:
             player.stopWalking()
             return player.goLater('kickBallExecute')
+        # switch foot!
+        elif ballForeFoot == constants.RIGHT_FOOT:
+            player.stopWalking()
+            player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+            return player.goLater('kickBallExecute')
+
         elif ballForeFoot == constants.INCORRECT_POS:
             return player.goLater('positionForKick')
 
