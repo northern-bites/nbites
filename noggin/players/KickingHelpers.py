@@ -1,6 +1,7 @@
 from .. import NogginConstants
 import KickingConstants as constants
 from ..util import MyMath
+from math import cos, sin
 
 def inCenterOfField(player):
     return NogginConstants.FIELD_HEIGHT *2/3 > player.brain.my.y > \
@@ -59,3 +60,9 @@ def getKickObjective(player):
     else :
         return constants.OBJECTIVE_SHOOT_FAR
 
+def getNextOrbitPos(player):
+    relX = constants.ORBIT_OFFSET_DIST * cos(constants.ORBIT_STEP_ANGLE)
+    relY = constants.ORBIT_OFFSET_DIST * sin(constants.ORBIT_STEP_ANGLE)
+    relTheta = constants.ORBIT_STEP_ANGLE
+
+    return relX, relY, relTheta
