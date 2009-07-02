@@ -13,8 +13,11 @@ def squat(player):
     return player.stay()
 
 def squatted(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
+    brain = player.brain
+    if brain.ball.x >= constants.ACTIVE_LOC_THRESH:
+        brain.tracker.activeLoc()
+    else:
+        brain.tracker.trackBall()
     #if my current position == getProperPosition
     #or wrap in moveSquattedPosition
     return player.stay()
@@ -31,9 +34,9 @@ def squatPosition(player):
         player.isChasing = False
 
     if brain.ball.x >= constants.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLoc()
+        brain.tracker.activeLoc()
     else:
-        player.brain.tracker.trackBall()
+        brain.tracker.trackBall()
 
     useOmni = helper.useOmni(player)
     changedOmni = False
@@ -70,5 +73,5 @@ def chasePrepare(player):
 
     if not player.motion.isBodyActive():
         player.isChasing = True
-        return player.goLater('chase')
+        return player.goNow('chase')
     return player.stay()
