@@ -4016,6 +4016,10 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 
     int confidence = 10;
     occlusion = NOOCCLUSION;
+	// TO DO: MAXDIAM should be based upon pose rather than taking lots of
+	// pictures.  For example, it used to be set to 100 which is the maxdiam
+	// when we are in our walk stance.  However, we had to up it to 150 since
+	// our goalie sometimes squats way down.
 	static const int MAXDIAM = 150;
     if (numberOfRuns > 1) {
         for (int i = 0; i < numberOfRuns; i++) {
