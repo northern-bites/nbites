@@ -35,7 +35,7 @@ Step::Step(const WalkVector &target,
         break;
     }
 
-    //After we assign elements of the gait to this step, lets clip 
+    //After we assign elements of the gait to this step, lets clip
     setStepSize(target,last);
     setStepLiftMagnitude();
 }
@@ -91,7 +91,7 @@ void Step::copyGaitAttributes(const float _step_config[WP::LEN_STEP_CONFIG],
 
 void Step::setStepSize(const WalkVector &target,
 		       const WalkVector &last){
-  
+
   WalkVector new_walk =ZERO_WALKVECTOR;
 
 #ifdef DEBUG_STEP
@@ -119,17 +119,17 @@ void Step::setStepSize(const WalkVector &target,
 #endif
 
   //Now that we have clipped the velocities, we need to convert them to distance
-  //for use with this step. Note that for y and theta, we need a factor of 
+  //for use with this step. Note that for y and theta, we need a factor of
   //two, since you can only stafe on every other step.
 
   //HACK! for bacwards compatibility, the step_y is not adjusted correctly
   const float step_x = new_walk.x*stepConfig[WP::DURATION];
-  const float step_y = new_walk.y*stepConfig[WP::DURATION];//*2.0f;  
+  const float step_y = new_walk.y*stepConfig[WP::DURATION];//*2.0f;
   const float step_theta = new_walk.theta*stepConfig[WP::DURATION]*2.0f;
 
   //Huge architectural HACK!!!  We need to fix our transforms so we don't need to do this
   //anymore
-  //This hack pmakes it possible to turn about the center of the robot, rather than the 
+  //This hack pmakes it possible to turn about the center of the robot, rather than the
   //center of the foot
   const float leg_sign = (foot==LEFT_FOOT ?
 			  1.0f : -1.0f);
@@ -144,7 +144,7 @@ void Step::setStepSize(const WalkVector &target,
   y = computed_y;
   theta = computed_theta;
 
- 
+
 
 #ifdef DEBUG_STEP
   std::cout << "Clipped new step to ("<<x<<","<<y<<","<<theta<<")"<<std::endl;
@@ -154,42 +154,60 @@ void Step::setStepSize(const WalkVector &target,
 
 
 const WalkVector Step::elipseClipVelocities(const WalkVector & source){
+  // std::cout << "Ellipsoid clip input ("<<source.x<<","<<source.y
+  // 			<<","<<source.theta<<")"<<std::endl;
 
-  //Convert velocities to distances, clip them with an ellipse, 
+  //Convert velocities to distances, clip them with an ellipse,
   //then convert back to velocities
 
   const float theta = NBMath::safe_atan2(source.y,source.x);
+  const float xy_mag = std::sqrt(std::pow(source.y,2) + std::pow(source.x,2));
 
-  //cout<<"Theta = "<<theta<<endl;
+  //To find phi, the elevation out of the xy plane, we need to find a way to compare
+  //radians to millimeters. The current way is to consider 'equally-weighted' 
+  //turning and lateral/forward motion by 'converting' the radians to something 
+  //more equally weighted with mm's
+  const float max_xy_mag = std::sqrt(std::pow(
+										 stepConfig[WP::MAX_VEL_Y]
+										 *std::sin(theta),2)
+									 + std::pow(
+										 stepConfig[WP::MAX_VEL_X]
+										 *std::cos(theta),2));
+  const float rad_to_mm = max_xy_mag / stepConfig[WP::MAX_VEL_THETA];
+  // cout << "xy_mag = " << xy_mag << " converted theta = " << source.theta*rad_to_mm<<endl;
+  const float phi = NBMath::safe_atan2(xy_mag,source.theta*rad_to_mm);
+
+  // cout << "Ellipsoid vel. clipping: theta = "<<theta<<", phi="<<phi<<endl;
+
   float forward_max =0.0f;
   if(source.x > 0)
-    forward_max = std::abs(stepConfig[WP::MAX_VEL_X]*std::cos(theta)); 
+    forward_max = std::abs(stepConfig[WP::MAX_VEL_X]
+						   *std::cos(theta)
+						   *std::sin(phi));
   else
-    forward_max = std::abs(stepConfig[WP::MIN_VEL_X]*std::cos(theta)); 
+    forward_max = std::abs(stepConfig[WP::MIN_VEL_X]
+						   *std::cos(theta)
+						   *std::sin(phi));
 
-  const float horizontal_max = 
-    std::abs(stepConfig[WP::MAX_VEL_Y]*std::sin(theta)); 
+  const float horizontal_max =
+    std::abs(stepConfig[WP::MAX_VEL_Y]
+			 *std::sin(theta)
+			 *std::sin(phi));
 
-  const float mag_max =
-    std::sqrt(std::pow(forward_max,2) + std::pow(horizontal_max,2));
-
-  //cout << "Clipping y="<<source.y<<" according to"<<horizontal_max<<endl;
+  const float turning_max =
+    std::abs(stepConfig[WP::MAX_VEL_THETA]
+			 *std::cos(phi));
+  // cout << "Clipping y="<<source.y<<" according to"<<horizontal_max<<endl;
   const float new_y_vel = NBMath::clip(source.y,horizontal_max);
-  //cout << "Clipping x="<<source.x<<" according to"<<forward_max<<endl;
+  // cout << "Clipping x="<<source.x<<" according to"<<forward_max<<endl;
   const float new_x_vel = NBMath::clip(source.x,forward_max);
-  
-  const float mag = std::sqrt(std::pow(new_y_vel,2) + std::pow(new_x_vel,2));
-  const float percent_max = mag/mag_max;
-  //cout << "Percent Max."<<percent_max<<endl;
+  // cout << "Clipping theta="<<source.theta<<" according to"<<turning_max<<endl;
+  const float new_theta_vel = NBMath::clip(source.theta,turning_max);
 
-  //When you are in the first third, you get max speed, in the last third, you get 1/3
-  const float thetaScale = std::floor((1.0f-percent_max)*2.0f +1.0f)*0.3333f;
-  //cout <<"thetaScale = "<<thetaScale<<endl;
-
-  const float new_theta_vel = NBMath::clip(source.theta,stepConfig[WP::MAX_VEL_THETA]
-                                           *thetaScale);
 
   const WalkVector clippedVelocity = {new_x_vel,new_y_vel,new_theta_vel};
+  // std::cout << "Ellipsoid clip output ("<<clippedVelocity.x<<","<<clippedVelocity.y
+  // 			<<","<<clippedVelocity.theta<<")"<<std::endl;
   return clippedVelocity;
 }
 
@@ -226,7 +244,7 @@ const WalkVector Step::lateralClipVelocities(const WalkVector & source){
       result.y = 0.0f;
     }
   }
-  
+
   if(result.theta > 0){
     if(!foot == LEFT_FOOT){
       result.theta = 0.0f;
@@ -247,5 +265,5 @@ void Step::setStepLiftMagnitude(){
   const float percent_of_forward_max  = NBMath::clip(x,0,stepConfig[WP::MAX_VEL_X])
     / stepConfig[WP::MAX_VEL_X];
 
-  stepConfig[WP::FOOT_LIFT_ANGLE] *= percent_of_forward_max; 
+  stepConfig[WP::FOOT_LIFT_ANGLE] *= percent_of_forward_max;
 }

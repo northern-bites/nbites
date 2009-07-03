@@ -1,7 +1,7 @@
 
 
 class BirthCertificate:
-    '''Defines all the per-robot configuraations that may need to be
+    '''Defines all the per-robot configurations that may need to be
     defined.  Each robot has an instance created in the robots package
     initialization module.  Holds information like name, walk config,
     etc..  Each new instance will receive an id number, but these are
@@ -27,19 +27,25 @@ class BirthCertificate:
         self.gait = gait
         self.turn_gait = turn_gait
         self.slow_gait = slow_gait
+        self.current_gait = None
 
     def setRobotGait(self, motion_interface):
-        if self.gait is not None:
+        if self.gait is not None and self.current_gait is not self.gait:
             print '\033[32m'+ "BirthCertificates - Setting regular gait"+'\033[0m'
+            self.current_gait = self.gait
             motion_interface.setGait(self.gait)
 
     def setRobotTurnGait(self, motion_interface):
-        if self.turn_gait is not None:
+        if self.turn_gait is not None and \
+                self.current_gait is not self.turn_gait:
             print '\033[32m' + "BirthCertificates - Setting turn gait" + '\033[0m'
+            self.current_gait = self.turn_gait
             motion_interface.setGait(self.turn_gait)
     def setRobotSlowGait(self, motion_interface):
-        if self.slow_gait is not None:
+        if self.slow_gait is not None and \
+                self.current_gait is not self.slow_gait:
             print '\033[32m' + "BirthCertificates - Setting slow gait" + '\033[0m'
+            self.current_gait = self.slow_gait
             motion_interface.setGait(self.slow_gait)
 
     def __str__(self):

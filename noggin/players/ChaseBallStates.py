@@ -5,6 +5,7 @@ from man.noggin.util import MyMath
 from man.motion import SweetMoves
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+import KickingHelpers
 import GoalieTransitions as goalTran
 import PositionConstants
 from .. import NogginConstants
@@ -120,7 +121,6 @@ def approachBallWithLoc(player):
     if player.firstFrame():
         player.brain.CoA.setRobotGait(player.brain.motion)
         player.hasAlignedOnce = False
-
 
     nav = player.brain.nav
     my = player.brain.my
@@ -483,23 +483,6 @@ def chaseAroundBox(player):
                                     NogginConstants.MY_GOAL_HEADING ))
     return player.stay()
 
-
-def orbitBall(player):
-    """
-    Method to spin around the ball before kicking
-    """
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.brain.nav.orbitAngle(player.orbitAngle)
-
-        player.brain.CoA.setRobotGait(player.brain.motion)
-
-
-    if player.brain.nav.isStopped():
-        return player.goLater('getKickInfo')
-
-    return player.stay()
-
 def steps(player):
     if player.brain.nav.isStopped():
         player.setSteps(3,3,0,5)
@@ -539,4 +522,52 @@ def approachDangerousBall(player):
     elif transitions.shouldSpinFindBall(player):
         return player.goLater('goalieSpinFindBall')
 
+    return player.stay()
+
+def orbitBeforeKick(player):
+    """
+    State for circling the ball when we're facing our goal.
+    """
+    brain = player.brain
+    my = brain.my
+    if player.firstFrame():
+        player.orbitStartH = my.h
+        brain.CoA.setRobotGait(brain.motion)
+        brain.tracker.trackBall()
+
+    if not player.brain.tracker.activeLocOn and \
+            transitions.shouldScanFindBall(player):
+        player.brain.CoA.setRobotGait(player.brain.motion)
+        return player.goLater('scanFindBall')
+    elif player.brain.tracker.activeLocOn and \
+            transitions.shouldScanFindBallActiveLoc(player):
+        player.brain.CoA.setRobotGait(player.brain.motion)
+        return player.goLater('scanFindBall')
+    elif brain.ball.dist > 50.0:
+        return player.goLater('chase')
+
+    shotPoint = KickingHelpers.getShotCloseAimPoint(player)
+    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                              shotPoint[0],
+                                              shotPoint[1] )
+
+    if brain.ball.on:
+        relDestX, relDestY, relDestTheta = player.getNextOrbitPos()
+        sX = constants.ORBIT_X_GAIN * relDestX
+        sY = constants.ORBIT_Y_GAIN * relDestY
+        sTheta = constants.ORBIT_SPIN_GAIN * relDestTheta
+        spinDir = MyMath.sign(bearingToGoal)
+
+        player.setSpeed(sX, sY * spinDir, sTheta * spinDir)
+
+    # if brain.oppGoalLeftPost.on or brain.oppGoalRightPost.on:
+    #     if brain.oppGoalLeftPost.on:
+    #         bearingToGoal = brain.oppGoalLeftPost.bearing
+    #     else :
+    #         bearingToGoal = brain.oppGoalRightPost.bearing
+    # elif brain.my.locScore >= NogginConstants.OK_LOC:
+    print bearingToGoal
+    if abs(my.h - player.orbitStartH) >= 90:
+        brain.CoA.setRobotGait(brain.motion)
+        return player.goLater('positionForKick')
     return player.stay()
