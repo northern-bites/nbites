@@ -8,6 +8,7 @@ def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
     #goalie is out of position. difference in accuracy?
     player.isChasing = False
+    player.squatting = False
     return player.goNow('squatPosition')
 
     #if player.brain.nav.notAtHeading(NogginConstants.OPP_GOAL_HEADING):

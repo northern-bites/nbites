@@ -40,7 +40,8 @@ def goalieRunChecks(player):
     return player.currentState
 
 def useClosePosition(player):
-    return (0 < player.brain.ball.x <= (PBConstants.BALL_LOC_LIMIT - goalCon.BUFFER))
+    return (0 < player.brain.ball.x <=
+            (PBConstants.BALL_LOC_LIMIT - goalCon.BUFFER))
 
 def useFarPosition(player):
     if player.penaltyKicking:

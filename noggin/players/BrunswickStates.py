@@ -13,6 +13,10 @@ def gamePenalized(player):
             player.stopWalking()
         player.penalizeHeads()
 
+    if (player.stateTime >=
+        SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
+        player.stopWalking()
+
     return player.stay()
 
 def gameReady(player):
