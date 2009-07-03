@@ -121,7 +121,6 @@ def approachBallWithLoc(player):
         player.brain.CoA.setRobotGait(player.brain.motion)
         player.hasAlignedOnce = False
 
-
     nav = player.brain.nav
     my = player.brain.my
     if player.brain.playbook.role == pbc.GOALIE:
