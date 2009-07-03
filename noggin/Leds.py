@@ -4,6 +4,7 @@ import playbook.PBConstants as PBConstants
 DEBUG_BALL_LEDS = True
 DEBUG_GOAL_LEDS = True
 DEBUG_CHASER_LEDS = True
+DEBUG_DEFENDER_LEDS = True
 
 ####### LED DEFINITIONS #############
 LED_OFF = 0
@@ -25,6 +26,8 @@ RED   = 0xFF0000
 GREEN = 0x00FF00
 BLUE  = 0x0000FF
 YELLOW= 0xFFFF00
+PURPLE= 0xFF00FF
+CYAN  = 0x00FFFF
 WHITE = 0xFFFFFF
 OFF   = 0x000000
 NOW = 0.0
@@ -52,10 +55,17 @@ STATE_FINISHED_LEDS = ((CHEST_LED, OFF,    NOW),)
 #### Ball #######
 BALL_ON_LEDS = ((LEFT_EYE_LED, RED, NOW),)
 BALL_OFF_LEDS = ((LEFT_EYE_LED, BLUE, NOW),)
+
+############### Roles ###############
 #### Chaser #######
 CHASER_ON_LEDS = ((RIGHT_EYE_LED, GREEN, NOW),)
+LOC_CHASER_ON_LEDS = ((RIGHT_EYE_LED, WHITE, NOW),)
+#### Defender ####
+SWEEPER_ON_LEDS = ((RIGHT_EYE_LED, PURPLE, NOW),)
+STOPPER_ON_LEDS = ((RIGHT_EYE_LED, CYAN, NOW),)
+MIDDIE_ON_LEDS =  ((RIGHT_EYE_LED, YELLOW, NOW),)
+#### Other ####
 CHASER_OFF_LEDS = ((RIGHT_EYE_LED, BLUE, NOW),)
-
 
 #### GOAL ######
 LEFT_GOAL_ON_LEDS = ((LEFT_EAR_LED, BLUE, NOW),)
@@ -98,18 +108,31 @@ class Leds():
                 self.executeLeds(BALL_OFF_LEDS)
 
         if DEBUG_GOAL_LEDS:
-            if (self.brain.myGoalLeftPost.on or self.brain.oppGoalLeftPost.on):
+            if (self.brain.myGoalLeftPost.on or
+                self.brain.oppGoalLeftPost.on or
+                self.brain.myGoalRightPost.on or
+                self.brain.oppGoalRightPost.on):
                 self.executeLeds(LEFT_GOAL_ON_LEDS)
+                self.executeLeds(RIGHT_GOAL_ON_LEDS)
             else:
                 self.executeLeds(LEFT_GOAL_OFF_LEDS)
-        if (self.brain.myGoalRightPost.on or self.brain.oppGoalRightPost.on):
-            self.executeLeds(RIGHT_GOAL_ON_LEDS)
-        else:
-            self.executeLeds(RIGHT_GOAL_OFF_LEDS)
+                self.executeLeds(RIGHT_GOAL_OFF_LEDS)
 
         if DEBUG_CHASER_LEDS:
             if self.brain.playbook.role == PBConstants.CHASER:
-                self.executeLeds(CHASER_ON_LEDS)
+                if self.brain.player.currentState == "approachBallWithLoc":
+                    self.executeLeds(LOC_CHASER_ON_LEDS)
+                else:
+                    self.executeLeds(CHASER_ON_LEDS)
+            elif self.brain.playbook.role == PBConstants.DEFENDER:
+                if self.brain.playbook.subRole == PBConstants.STOPPER:
+                    self.executeLeds(STOPPER_ON_LEDS)
+                elif self.brain.playbook.subRole == PBConstants.SWEEPER:
+                    self.executeLeds(SWEEPER_ON_LEDS)
+                elif self.brain.playbook.subRole == PBConstants.DEFENSIVE_MIDDIE:
+                    self.executeLeds(MIDDIE_ON_LEDS)
+                else:
+                    self.executeLeds(CHASER_OFF_LEDS)
             else:
                 self.executeLeds(CHASER_OFF_LEDS)
 
