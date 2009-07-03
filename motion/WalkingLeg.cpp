@@ -257,9 +257,10 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
 	comFootGoal(2) += COM_Z_OFF*startStopSensorScale;
 	//HACK -- the startStopSensor gives us a nice in/out scaling from motion
 	//we should really rename that function
-    const ufvector3 bodyGoal = CoordFrame3D::vector3D( -com_c(0)*startStopSensorScale,
-													   -com_c(1)*startStopSensorScale,
-													   COM_Z_OFF*startStopSensorScale);
+    const ufvector3 bodyGoal =
+		CoordFrame3D::vector3D( -com_c(0)*startStopSensorScale,
+								-com_c(1)*startStopSensorScale,
+								COM_Z_OFF*startStopSensorScale);
 
 
     IKLegResult result =
