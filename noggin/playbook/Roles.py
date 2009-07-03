@@ -32,10 +32,9 @@ def rDefender(team):
         return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
 
     elif team.brain.ball.y < NogginConstants.MIDFIELD_Y:
-        return [PBConstants.DEFENDER] + SubRoles.pBottomStopper(team)
-    else:
         return [PBConstants.DEFENDER] + SubRoles.pTopStopper(team)
-
+    else:
+        return [PBConstants.DEFENDER] + SubRoles.pBottomStopper(team)
 
 def rDefenderOld(team):
     '''obsolete: gets positioning for defender'''
