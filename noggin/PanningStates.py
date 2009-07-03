@@ -88,7 +88,11 @@ def activeLocScan(tracker):
 
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
-        tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
+        if tracker.brain.player.squatting:
+            tracker.execute(HeadMoves.SQUAT_LOW_SCAN_BALL)
+        else:
+            tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
+
     return tracker.stay()
 
 def returnHeadsPan(tracker):
