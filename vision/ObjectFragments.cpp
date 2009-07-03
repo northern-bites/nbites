@@ -4020,7 +4020,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 	// pictures.  For example, it used to be set to 100 which is the maxdiam
 	// when we are in our walk stance.  However, we had to up it to 150 since
 	// our goalie sometimes squats way down.
-	static const int MAXDIAM = 150;
+	static const int MAXDIAM = 100;
     if (numberOfRuns > 1) {
         for (int i = 0; i < numberOfRuns; i++) {
             // search for contiguous blocks
