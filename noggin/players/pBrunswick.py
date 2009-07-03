@@ -261,3 +261,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
             tracker.lookToDir('right')
 
+    def getNextOrbitPos(self):
+        relX = -ChaseConstants.ORBIT_OFFSET_DIST * \
+            cos(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relX
+        relY =  -ChaseConstants.ORBIT_OFFSET_DIST * \
+            sin(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relY
+        relTheta = ChaseConstants.ORBIT_STEP_ANGLE * 2 + self.brain.ball.bearing
+        return relX, relY, relTheta
