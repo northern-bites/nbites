@@ -39,7 +39,14 @@ def playbookPosition(player):
 
     distToPoint = MyMath.dist(my.x, my.y, position[0], position[1])
     position = (position[0], position[1], destHeading)
-    useOmni = distToPoint <= constants.OMNI_POSITION_DIST
+
+    if brain.gameController.currentState == 'gameReady':
+        useOmniDist = constants.OMNI_POSITION_READY_DIST
+    else:
+        useOmniDist = constants.OMNI_POSITION_DIST
+
+    useOmni = distToPoint <= useOmniDist
+
     changedOmni = False
 
     if useOmni != nav.movingOmni:
