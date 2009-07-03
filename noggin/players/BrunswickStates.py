@@ -68,8 +68,8 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.brain.CoA.setRobotGait(player.brain.motion)
-    if player.firstFrame() and \
-            player.lastDiffState == 'gamePenalized':
+    if (player.firstFrame() and
+        player.lastDiffState == 'gamePenalized'):
         player.brain.resetLocalization()
 
     roleState = player.getRoleState(player.currentRole)
@@ -112,3 +112,12 @@ def penaltyShotsGamePlaying(player):
     if player.brain.playbook.role == GOALIE:
         return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
+
+def fallen(player):
+    """
+    Stops the player when the robot has fallen
+    """
+    player.squatting = False
+    player.brain.nav.switchTo('stopped')
+    return player.stay()
+

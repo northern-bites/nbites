@@ -126,18 +126,20 @@ def approachBallWithLoc(player):
     my = player.brain.my
     if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldKick(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKickFromApproachLoc(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
         elif transitions.shouldAvoidObstacleDuringApproachBall(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('avoidObstacle')
         elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('approachBall')
         elif not player.brain.tracker.activeLocOn and \
                 transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
-        elif player.brain.tracker.activeLocOn and \
-                transitions.shouldScanFindBallActiveLoc(player):
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('scanFindBall')
     else:
         if transitions.shouldKick(player):

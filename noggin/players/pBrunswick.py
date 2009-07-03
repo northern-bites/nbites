@@ -135,7 +135,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif role == PBConstants.DEFENDER:
             return 'playbookPosition'
         elif role == PBConstants.GOALIE:
-            if self.squatting:
+            if (self.lastDiffState == 'gamePenalized' or
+                self.lastDiffState == 'fallen'):
+                return 'goaliePosition'
+            elif self.squatting:
                 return 'squatted'
             return 'squat'
         elif role == PBConstants.PENALTY_ROLE:
