@@ -29,7 +29,12 @@ def gameReady(player):
         player.hasKickedOffKick = True
     else:
         player.hasKickedOffKick = True
-    player.standup()
+
+    if player.squatting:
+        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+    else:
+        player.standup()
+
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
         return player.goLater('relocalize')
