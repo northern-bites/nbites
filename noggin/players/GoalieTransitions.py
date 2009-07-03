@@ -218,7 +218,9 @@ def shouldChaseLoc(player):
     ball = player.brain.ball
     my = player.brain.my
     if (player.squatting and ball.locDist <= goalCon.CHASE_FROM_SQUAT_DIST and
-        abs(ball.locBearing) <= goalCon.CHASE_FROM_SQUAT_BEARING):
+        abs(ball.locBearing) <= goalCon.CHASE_FROM_SQUAT_BEARING and
+        abs(ball.velX) <= goalCon.CHASE_FROM_SQUAT_VEL and
+        abs(ball.velY) <= goalCon.CHASE_FROM_SQUAT_VEL):
         return True
     if not player.squatting:
         if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION

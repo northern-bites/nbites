@@ -29,7 +29,7 @@ def goalieAwesomePosition(player):
     if player.firstFrame():
         player.changeOmniGoToCounter = 0
 
-    if brain.ball.x >= constants.ACTIVE_LOC_THRESH:
+    if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall()
@@ -154,7 +154,7 @@ def goalieOutOfPosition(player):
 def goalieAtPosition(player):
     brain = player.brain
     nav = player.brain.nav
-    if brain.ball.x >= constants.ACTIVE_LOC_THRESH:
+    if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall()
