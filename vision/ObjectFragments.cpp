@@ -4099,10 +4099,42 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 							blobs[i].rightBottom.y = blobs[i].leftBottom.y;
 						}
 					} else {
-						blobs[i].area = 0;
-						if (BALLDEBUG) {
-							cout << "Screened one that was too big " << diam << endl;
-							drawBlob(blobs[i], NAVY);
+						// This is going to be a hack added in graz
+						// what we're going to do is for really big blobs
+						// do a modified roundess check
+						const float maxDiv = 6.0f;
+						int w = blobWidth(blobs[i]);
+						int h = blobHeight(blobs[i]);
+						int x = blobs[i].leftTop.x, y = blobs[i].leftTop.y;
+						int d = ROUND2(static_cast<float>(w) / maxDiv);
+						int pix, badPix = 0, goodPix = 0;
+						for (int j = 0; j < d; j++) {
+							pix = thresh->thresholded[y+j][x+j];
+							if (pix == ORANGE || pix == ORANGERED) {
+								//drawPoint(x+i, y+i, BLACK);
+								badPix++;
+							}
+							else
+								goodPix++;
+							pix = thresh->thresholded[y+j][x+w-j];
+							if (pix == ORANGE || pix == ORANGERED) {
+								//drawPoint(x+w-i, y+i, BLACK);
+								badPix++;
+							}
+							else
+								goodPix++;
+						}
+						if (goodPix > badPix + 25) {
+							// do nothing
+							if (BALLDEBUG) {
+								cout << "Allowing ball: Good pix " << goodPix << " " << badPix << endl;
+							}
+						} else {
+							blobs[i].area = 0;
+							if (BALLDEBUG) {
+								cout << "Screened one that was too big " << diam << endl;
+								drawBlob(blobs[i], NAVY);
+							}
 						}
 					}
 				} else {
