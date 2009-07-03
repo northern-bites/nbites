@@ -441,6 +441,7 @@ def sideStepForSideKick(player):
 
 def alignForSideKick(player):
     if player.firstFrame():
+        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.tracker.trackBall()
     ball = player.brain.ball
     if ball.on and player.brain.nav.isStopped():
@@ -450,9 +451,11 @@ def alignForSideKick(player):
         if ballForeFoot == constants.MID_LEFT or \
                 ballForeFoot == constants.MID_RIGHT:
             player.stopWalking()
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
 
         targetY = ball.relY
@@ -460,11 +463,13 @@ def alignForSideKick(player):
         player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
     return player.stay()
 
 def stepForRightFootKick(player):
     if player.firstFrame():
+        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.tracker.trackBall()
 
     ball = player.brain.ball
@@ -474,13 +479,16 @@ def stepForRightFootKick(player):
 
         if ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
         elif ballForeFoot == constants.LEFT_FOOT:
             player.stopWalking()
             player.chosenKick = SweetMoves.LEFT_FAR_KICK
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
 
         targetY = ball.relY - constants.RIGHT_FOOT_CENTER_Y
@@ -488,11 +496,13 @@ def stepForRightFootKick(player):
         player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
     return player.stay()
 
 def stepForLeftFootKick(player):
     if player.firstFrame():
+        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.tracker.trackBall()
 
     ball = player.brain.ball
@@ -502,14 +512,17 @@ def stepForLeftFootKick(player):
 
         if ballForeFoot == constants.LEFT_FOOT:
             player.stopWalking()
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
         # switch foot!
         elif ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
             player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
+            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
 
         targetY = ball.relY - constants.LEFT_FOOT_CENTER_Y
@@ -517,6 +530,7 @@ def stepForLeftFootKick(player):
         player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
+        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
     return player.stay()
 
@@ -538,6 +552,7 @@ def alignOnBallStraightKick(player):
 
 def kickBallExecute(player):
     if player.firstFrame():
+        player.brain.CoA.setRobotGait(player.brain.motion)
         player.brain.tracker.trackBall()
         player.executeMove(player.chosenKick)
 
