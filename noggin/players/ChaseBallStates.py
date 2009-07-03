@@ -131,9 +131,6 @@ def approachBallWithLoc(player):
         elif transitions.shouldPositionForKickFromApproachLoc(player):
             player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
-        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            return player.goLater('avoidObstacle')
         elif my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH:
             player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('approachBall')
@@ -231,8 +228,6 @@ def approachBall(player):
         elif not player.brain.tracker.activeLocOn and \
                 transitions.shouldScanFindBall(player):
             return player.goLater('goalieScanFindBall')
-        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
-            return player.goLater('avoidObstacle')
     else:
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
