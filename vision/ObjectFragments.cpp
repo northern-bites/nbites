@@ -4016,7 +4016,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 
     int confidence = 10;
     occlusion = NOOCCLUSION;
-	static const int MAXDIAM = 100;
+	static const int MAXDIAM = 150;
     if (numberOfRuns > 1) {
         for (int i = 0; i < numberOfRuns; i++) {
             // search for contiguous blocks
