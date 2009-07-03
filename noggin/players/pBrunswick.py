@@ -8,6 +8,7 @@ from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieChaseBallStates
 from . import GoalieSaveStates
+from . import SquatPositionStates
 from . import BrunswickStates
 
 from . import GoalieTransitions
@@ -30,6 +31,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieChaseBallStates)
         self.addStates(GoalieSaveStates)
+        self.addStates(SquatPositionStates)
         self.addStates(PositionStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
@@ -85,6 +87,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Kickoff kick
         self.hasKickedOffKick = True
 
+        # Goalie squat save
+        self.squatting = False
+
 
     def run(self):
         if self.currentState == 'afterKick' or \
@@ -130,7 +135,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif role == PBConstants.DEFENDER:
             return 'playbookPosition'
         elif role == PBConstants.GOALIE:
-            return 'goaliePosition'
+            if (self.lastDiffState == 'gamePenalized' or
+                self.lastDiffState == 'fallen'):
+                return 'goaliePosition'
+            elif self.squatting:
+                return 'squatted'
+            return 'squat'
         elif role == PBConstants.PENALTY_ROLE:
             return 'gamePenalized'
         elif role == PBConstants.SEARCHER:

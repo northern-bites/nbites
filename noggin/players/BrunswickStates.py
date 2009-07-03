@@ -1,8 +1,23 @@
 from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER, GOALIE
-
+import man.motion.SweetMoves as SweetMoves
 ###
 # Reimplementation of Game Controller States for pBrunswick
 ###
+
+def gamePenalized(player):
+    if player.firstFrame():
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
+        else:
+            player.stopWalking()
+        player.penalizeHeads()
+
+    if (player.stateTime >=
+        SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
+        player.stopWalking()
+
+    return player.stay()
 
 def gameReady(player):
     """
@@ -39,6 +54,9 @@ def gameSet(player):
 
         if player.brain.playbook.role == GOALIE:
             player.brain.resetGoalieLocalization()
+            if player.squatting:
+                return player.goLater('squatted')
+            return player.goLater('squat')
 
         if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
             player.brain.tracker.trackBall()
@@ -50,8 +68,8 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.brain.CoA.setRobotGait(player.brain.motion)
-    if player.firstFrame() and \
-            player.lastDiffState == 'gamePenalized':
+    if (player.firstFrame() and
+        player.lastDiffState == 'gamePenalized'):
         player.brain.resetLocalization()
 
     roleState = player.getRoleState(player.currentRole)
@@ -94,3 +112,12 @@ def penaltyShotsGamePlaying(player):
     if player.brain.playbook.role == GOALIE:
         return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
+
+def fallen(player):
+    """
+    Stops the player when the robot has fallen
+    """
+    player.squatting = False
+    player.brain.nav.switchTo('stopped')
+    return player.stay()
+

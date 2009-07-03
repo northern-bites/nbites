@@ -371,64 +371,37 @@ GOALIE_SAVE = (
      (40.0, -15.0, 0.0, 0), #left arm
      .5, 0, stiff.LOOSE_ARMS_STIFFNESSES) )
 
-GOALIE_PREP_CENTER_SAVE = (((90., 90., 57., 0.),
-                            (-40., 0., -50., 125.7, -75.7, 0.),
-                            (-40., 0., -50., 125.7, -75.7, 0.),
-                            (90., -90., 57., 0.),
-                            1.5, 0, stiff.LOW_HEAD_STIFFNESSES) , )
-
-GOALIE_CENTER_SAVE = ( ((60.0, 35.0, 0.0, -0), #right arm
+#no longer necessary before center save, useful for testing though
+GOALIE_PREP_SQUAT = (((60.0, 55.0, 0.0, -0), #right arm
                         ( -76.0, 10.0, -50.0, 86.0, 0.0, -0),
                         ( -76.0, -10.0, -50.0, 86.0, 0.0, 0),
-                        (60.0, -35.0, 0.0, 0), #left arm
-                        1.5, 0, stiff.LOOSE_ARMS_STIFFNESSES),
-                       ((90., 90., 0., 0.),
+                        (60.0, -55.0, 0.0, 0), #left arm
+                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES), )
+
+GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), #right arm
+                        ( -76.0, 10.0, -50.0, 86.0, 0.0, -12),
+                        ( -76.0, -10.0, -50.0, 86.0, 0.0, 12),
+                        (60.0, -55.0, 0.0, 0), #left arm
+                        1.5, 0, stiff.NORMAL_STIFFNESSES),
+
+                       ((-90., 90., 0., 0.),
                         (-90., 50., -75., 90, 30, -20.),
                         (-90., -50., -75., 90, 30, 20.),
-                        (90., -90., 0., 0.),
-                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES) , )
+                        (-90., -90., 0., 0.),
+                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES))
 
-GOALIE_CENTER_SAVE_STAND_UP = ( ((120,0,5,0),
-                                 (-38,31,-90,96,45,0),
-                                 (-38,-31,-90,96,45,4),
-                                 (120,0,-5,0),
-                                 1.0,0, stiff.STANDUP_STIFFNESSES),
+GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0), #right arm
+                                 ( -76.0, 10.0, -50.0, 86.0,  0.0, -10),
+                                 ( -76.0, -10.0, -50.0, 86.0, 0.0, 10),
+                                 (0.0, -55.0, 0.0, 0), #left arm
+                                 .5, 0, stiff.NORMAL_STIFFNESSES) ,
 
-                                ((40,60,4,-28),
-                                 (-28,8,-49,126,-32,-22),
-                                 (-28,-31,-87,70,45,0),
-                                 (120,-33,-4,4),
-                                 1.0,0, stiff.STANDUP_STIFFNESSES),
-
-                                ((42,28,5,-47),
-                                 (-49,-16,22,101,-70,-5),
-                                 (-49,-32,-89,61,39,-7),
-                                 (101,-15,-4,3),
-                                 0.9,0, stiff.STANDUP_STIFFNESSES),
-
-                                ((42,28,4,-46),
-                                 (-23,11,-49,126,-70,6),
-                                 (-23,-17,-51,50,23,38),
-                                 (51,-50,0,26),
-                                 1.0,0, stiff.STANDUP_STIFFNESSES),
-
-                                ((42,28,4,-46),
-                                 (-23,21,-47,126,-70,5),
-                                 (-23,-1,-51,101,-33,15),
-                                 (51,-39,0,32),
-                                 0.5,0, stiff.STANDUP_STIFFNESSES),
-
-                                ((98,2,-72,-65),
-                                 (0,0,-50,120,-70,0),
-                                 (0,0,-50,120,-70,0),
-                                 (98,-2,72,65),
-                                 1.1,0, stiff.STANDUP_STIFFNESSES),
-
-                                ( INITIAL_POS[0][0],
-                                  INITIAL_POS[0][1],
-                                  INITIAL_POS[0][2],
-                                  INITIAL_POS[0][3],
-                                  1.0,0, stiff.STANDUP_STIFFNESSES) )
+                                ((0., 55., 0., 0.),
+                                 (0., 0., -55., 125.7, -75.7, 0.),
+                                 (0., 0., -55., 125.7, -75.7, 0.),
+                                 (0., -55., 0., 0.),
+                                 1.5, 0, stiff.NORMAL_STIFFNESSES),
+                                GOALIE_POS[0])
 
 GOALIE_PREP_RIGHT_DIVE = ( ((90.,0.,-65.,-57.),
                           (0.,20.,-55.,125.7,-75.7, 20.),

@@ -17,6 +17,9 @@ def goalieRunChecks(player):
             if DEBUG: print "should chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= 3:
                 player.shouldChaseCounter = 0
+                if player.currentState == 'squatted' or\
+                        player.currentState == 'squat':
+                    return 'chasePrepare'
                 player.isChasing = True
                 return 'chase'
         else:
@@ -37,7 +40,8 @@ def goalieRunChecks(player):
     return player.currentState
 
 def useClosePosition(player):
-    return (0 < player.brain.ball.x <= (PBConstants.BALL_LOC_LIMIT - goalCon.BUFFER))
+    return (0 < player.brain.ball.x <=
+            (PBConstants.BALL_LOC_LIMIT - goalCon.BUFFER))
 
 def useFarPosition(player):
     if player.penaltyKicking:
@@ -193,8 +197,10 @@ def shouldSave(player):
 def shouldHoldSave(player):
     # same as shouldSave() except for the ball.framesOn check
     # try to come up with better conditions to test
-    '''if the ball is still in front of me and coming at me, hold save
-    if it's going to arrive anytime soon'''
+    '''
+    if the ball is still in front of me and coming at me, hold save
+    if it's going to arrive anytime soon
+    '''
     ball = player.brain.ball
 
     relVelX = ball.relVelX
@@ -211,18 +217,17 @@ def shouldChaseLoc(player):
 
     ball = player.brain.ball
     my = player.brain.my
-
-    if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION and
-        ball.y < Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION and
-        ball.x < Constants.MY_GOALBOX_RIGHT_X + goalCon.AGGRESSIVENESS_OFFSET):
+    if (player.squatting and ball.locDist <= goalCon.CHASE_FROM_SQUAT_DIST and
+        abs(ball.locBearing) <= goalCon.CHASE_FROM_SQUAT_BEARING and
+        abs(ball.velX) <= goalCon.CHASE_FROM_SQUAT_VEL and
+        abs(ball.velY) <= goalCon.CHASE_FROM_SQUAT_VEL):
         return True
-    '''
-    if (my.x < Constants.MY_GOALBOX_RIGHT_X and
-        my.y < Constants.MY_GOALBOX_TOP_Y and
-        my.y > Constants.MY_GOALBOX_BOTTOM_Y and
-        (0 < ball.locDist <= 50 or 0 < ball.dist <= 50)):
-        return True
-    '''
+    if not player.squatting:
+        if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION
+           and ball.y < Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION
+           and ball.x < Constants.MY_GOALBOX_RIGHT_X +
+           goalCon.AGGRESSIVENESS_OFFSET):
+            return True
     return False
 
 def shouldStopChaseLoc(player):
