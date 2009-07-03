@@ -58,10 +58,10 @@ CHASER_OFF_LEDS = ((RIGHT_EYE_LED, BLUE, NOW),)
 
 
 #### GOAL ######
-GOAL_ON_LEDS = ((LEFT_EAR_LED, BLUE,    NOW),
-                (RIGHT_EAR_LED, BLUE,    NOW),)
-GOAL_OFF_LEDS = ((LEFT_EAR_LED, OFF,    NOW),
-                 (RIGHT_EAR_LED, OFF,    NOW),)
+LEFT_GOAL_ON_LEDS = ((LEFT_EAR_LED, BLUE, NOW),)
+LEFT_GOAL_OFF_LEDS = ((LEFT_EAR_LED, OFF, NOW),)
+RIGHT_GOAL_ON_LEDS = ((RIGHT_EAR_LED, BLUE, NOW),)
+RIGHT_GOAL_OFF_LEDS = ((RIGHT_EAR_LED, OFF, NOW),)
 
 #### FLASH ####
 FLASH_ON_LEDS = ((LEFT_EYE_LED,  GREEN, NOW),
@@ -98,11 +98,14 @@ class Leds():
                 self.executeLeds(BALL_OFF_LEDS)
 
         if DEBUG_GOAL_LEDS:
-            if self.brain.oppGoalRightPost.on or self.brain.oppGoalLeftPost.on or \
-                    self.brain.myGoalRightPost.on or self.brain.myGoalLeftPost.on:
-                self.executeLeds(GOAL_ON_LEDS)
+            if (self.brain.myGoalLeftPost.on or self.brain.oppGoalLeftPost.on):
+                self.executeLeds(LEFT_GOAL_ON_LEDS)
             else:
-                self.executeLeds(GOAL_OFF_LEDS)
+                self.executeLeds(LEFT_GOAL_OFF_LEDS)
+        if (self.brain.myGoalRightPost.on or self.brain.oppGoalRightPost.on):
+            self.executeLeds(RIGHT_GOAL_ON_LEDS)
+        else:
+            self.executeLeds(RIGHT_GOAL_OFF_LEDS)
 
         if DEBUG_CHASER_LEDS:
             if self.brain.playbook.role == PBConstants.CHASER:
