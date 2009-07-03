@@ -166,7 +166,8 @@ def approachBallWithLoc(player):
             player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('scanFindBall')
 
-    if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
+    #if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
+    if transitions.shouldActiveLoc(player):
         player.brain.tracker.activeLoc()
     else :
         player.brain.tracker.trackBall()
@@ -207,7 +208,8 @@ def approachBall(player):
         player.brain.tracker.trackBall()
         player.brain.CoA.setRobotGait(player.brain.motion)
 
-    if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
+    #if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
+    if transitions.shouldActiveLoc(player):
         player.brain.tracker.activeLoc()
     else :
         player.brain.tracker.trackBall()

@@ -240,3 +240,13 @@ def shouldntStopChasing(player):
 def shouldWalkToBallLocPos(player):
     return player.counter > constants.WALK_TO_BALL_LOC_POS_FRAMES and \
         player.brain.ball.framesOff > constants.BALL_OFF_THRESH
+
+def shouldActiveLoc(player):
+    if player.brain.ball.on:
+        return (player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST
+                and abs(player.brain.ball.locBearing) <
+                constants.APPROACH_ACTIVE_LOC_BEARING)
+
+    else:
+        return player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST
+
