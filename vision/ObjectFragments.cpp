@@ -2036,6 +2036,7 @@ int ObjectFragments::crossCheck(blob b)
 	const int hDiv = 5;
 	const int horzScanParam = 6;
 	const int drawParam = 20;
+	const int DISTANTPOST = 10;
 
     // try and find the cross bar - start at the upper left corner
     int biggest = 0, biggest2 = 0;
@@ -2046,6 +2047,12 @@ int ObjectFragments::crossCheck(blob b)
     int w = blobWidth(b);
     //int need = min(w / 2, 20);
     int need = max(w, needParam);
+
+	// don't try and look for the crossbar when the post is at the top
+	// unless it is small
+	if (y < 1 && w > DISTANTPOST) {
+		return NOPOST;
+	}
 
 	// scan the left side to see how far out we can go seeing post
     for (int i = 0; i < h / hDiv && biggest < need; i+=1) {
@@ -2942,7 +2949,7 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon)
     int largel = 0;
     int larger = 0;
     //int mind = max(MIN_POST_SEPARATION, height / 2);
-	int mind = MIN_POST_SEPARATION;
+	int mind = MIN_POST_SEPARATION + (right - left) / 2;
     for (int i = 0; i < numberOfRuns; i++) {
         int nextX = runs[i].x;
         int nextY = runs[i].y;
@@ -3145,7 +3152,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     }
     if (spanY + 1 == 0) return;
     float rat = (float)(spanX) / (float)(spanY);
-    if (!postRatiosOk(rat) && spanY < IMAGE_HEIGHT / 2) {
+    if (!postRatiosOk(rat) && spanY < IMAGE_HEIGHT / 2 && spanX < 30) {
         return;
     }
 
@@ -4527,6 +4534,7 @@ bool ObjectFragments::locationOk(blob b, int hor)
         } else {
         }
     }
+	if (trueTop < 1) return true;
     //if (trueRight - trueLeft > IMAGE_WIDTH - 10) return true;
     return horizonTopOk(trueTop, max(horizonAt(trueLeft),
                                      horizonAt(trueRight)));
@@ -4605,8 +4613,8 @@ bool ObjectFragments::horizonTopOk(int top, int hor)
     const int drawX = 100;
 
     //if (hor <= 0) return false;
-    if (top < 1) return true;
-    if (top + MIN_GOAL_HEIGHT / 2 > hor) {
+    if (top < 0) return true;
+    if (top + MIN_GOAL_HEIGHT / 2 > hor && hor > 0) {
         if (SANITY) {
             drawPoint(drawX, top, RED);
             drawPoint(drawX, hor, BLACK);
