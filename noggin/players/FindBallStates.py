@@ -29,7 +29,12 @@ def scanFindBall(player):
             return player.goLater('spinFindBall')
 
     if abs(player.brain.ball.locBearing) < constants.SCAN_FIND_BEARING_THRESH \
-            or player.brain.ball.locDist < constants.SCAN_FIND_DIST_THRESH:
+            or player.brain.ball.locDist < constants.SCAN_FIND_DIST_THRESH \
+            and not player.brain.playbook.role == pbc.GOALIE:
+        return player.stay()
+    elif player.brain.playbook.role == pbc.GOALIE and \
+            abs(player.brain.ball.locBearing) <\
+            constants.SCAN_FIND_BEARING_THRESH:
         return player.stay()
     elif player.firstFrame():
         return player.goLater('spinFindBall')
@@ -42,7 +47,10 @@ def spinFindBall(player):
     """
 
     if player.brain.playbook.role == pbc.GOALIE:
-        if transitions.shouldTurnToBall_FoundBall(player):
+        if transitions.shouldApproachBall(player):
+            player.brain.tracker.trackBall()
+            return player.goLater('approachBall')
+        elif transitions.shouldTurnToBall_FoundBall(player):
             return player.goLater('turnToBall')
     else:
         if transitions.shouldApproachBallWithLoc(player):
@@ -71,42 +79,6 @@ def spinFindBall(player):
 
         player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
-    return player.stay()
-
-def goalieScanFindBall(player):
-    ball = player.brain.ball
-    head = player.brain.tracker
-
-    if player.firstFrame():
-        time = goalTrans.getTimeUntilSave(player)
-        #timeUntilSave gives us an idea of if the ball was coming at us
-        if (time != -1 and time < 5) or abs(ball.locBearing) < 50:
-            turnDir = goalTrans.strafeDirForSave(player)
-            if turnDir == 1:
-                head.lookToDir('leftDown')
-            if turnDir == -1:
-                head.lookToDir('rightDown')
-            return player.goLater('goalieSpinFindBall')
-        else:
-            head.trackBall()
-    if transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBall')
-    elif transitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBall')
-
-    return player.stay()
-
-def goalieSpinFindBall(player):
-    ball = player.brain.ball
-    if player.firstFrame():
-        myH = player.brain.my.h
-        spinDir = goalTrans.strafeDirForSave(player)
-        #spinDir = MyMath.getSpinDir(myH, myH + ball.locBearing)
-        player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
-    if not player.brain.motion.isHeadActive():
-        player.brain.tracker.trackBall()
-    if transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBall')
     return player.stay()
 
 def walkToBallLocPos(player):
