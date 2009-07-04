@@ -4,11 +4,17 @@ import GoalieTransitions as helper
 from ..playbook import PBConstants
 from .. import NogginConstants
 
+DEBUG = False
+
 def squat(player):
     if player.firstFrame():
+        player.isChasing = False
         player.executeMove(SweetMoves.INITIAL_POS)
         player.squatting = True
-        player.executeMove(SweetMoves.GOALIE_SQUAT)
+        if DEBUG:
+            player.executeMove(SweetMoves.SAVE_CENTER_DEBUG)
+        else:
+            player.executeMove(SweetMoves.GOALIE_SQUAT)
     if (player.stateTime >=
         SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT) +
         SweetMoves.getMoveTime(SweetMoves.INITIAL_POS)):
@@ -16,6 +22,8 @@ def squat(player):
     return player.stay()
 
 def squatted(player):
+    player.isChasing = False
+    player.squatting = True
     brain = player.brain
     if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
         brain.tracker.activeLoc()
@@ -25,7 +33,8 @@ def squatted(player):
     return player.stay()
 
 def squatPosition(player):
-
+    player.isChasing = False
+    player.squatting = False
     brain = player.brain
     position = brain.playbook.position
     nav = brain.nav
@@ -56,6 +65,7 @@ def squatPosition(player):
             nav.omniGoTo((PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y,\
                               NogginConstants.OPP_GOAL_HEADING))
     else:
+        player.stopWalking()
         return player.goLater("squat")
 
     return player.stay()
@@ -66,8 +76,13 @@ def chasePrepare(player):
         player.isChasing = False
 
         if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-
+            if DEBUG:
+                pass
+            else:
+                player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+        else:
+            player.isChasing = True
+            return player.goNow('chase')
     elif (player.stateTime >=
         SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
         player.isChasing = True
