@@ -28,10 +28,10 @@ def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
         player.gainsOn()
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
-        player.penalizeHeads()
+        player.brain.CoA.setRobotGait(player.brain.motion)
+        player.brain.tracker.trackBall()
 
-    return player.goLater('walkstraightstop')
+    return player.goLater('switchgaits1')
 
 if WEBOTS_ACTIVE:
     gameInitial=gamePlaying
@@ -41,7 +41,7 @@ else:
 
 def switchgaits1(player):
     if player.firstFrame():
-        player.setSpeed(6,0,0)
+        player.setSpeed(6,-4,10)
 
     if player.counter == 140:
         return player.goLater('switchgaits2')
@@ -49,14 +49,15 @@ def switchgaits1(player):
 
 def switchgaits2(player):
     if player.firstFrame():
-        player.brain.motion.setGait(RobotGaits.DUCK_GAIT)
+        player.brain.CoA.setRobotDribbleGait(player.brain.motion)
+        player.setSpeed(10,-10,20)
 
     if player.counter == 240:
         return player.goLater('switchgaits3')
     return player.stay()
 def switchgaits3(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
+        player.brain.CoA.setRobotGait(player.brain.motion)
 
     if player.counter == 140:
         return player.goLater('sitdown')
@@ -107,7 +108,8 @@ def walkstraight(player):
 
 def walkstraightstop(player):
     if player.firstFrame():
-        player.setSpeed(10,0,30)
+        player.brain.CoA.setRobotDribbleGait(player.brain.motion)
+        player.setSpeed(7,7,30)
 
     if player.counter == 500:
         return player.goLater('stopwalking')

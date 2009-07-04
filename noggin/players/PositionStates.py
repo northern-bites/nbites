@@ -131,7 +131,6 @@ def spinToBall(player):
         player.stopWalking()
         player.currentSpinDir = MyMath.sign(turnRate)
     elif player.stoppedWalk and ball.on and player.brain.nav.isStopped():
-        player.brain.CoA.setRobotTurnGait(player.brain.motion)
         player.setSpeed(x=0,y=0,theta=turnRate)
 
     return player.stay()

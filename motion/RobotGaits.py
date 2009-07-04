@@ -24,13 +24,6 @@ MARVIN_STANCE_CONFIG = (31.00, # CoM height
                         0.0,   # Angle between feet
                         0.1)   # Time to transition to/from this stance
 
-DUCK_STANCE_CONFIG = (31.00, # CoM height
-                      1.45,  # Forward displacement of CoM
-                      10.0,  # Horizontal distance between feet
-                      5.0,   # Body angle around y axis
-                      80.0,   # Angle between feet
-                      2.0)   # Time to transition to/from this stance
-
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
                0.9,  # stepHeight
@@ -159,11 +152,44 @@ MARVIN_NEW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
                                      ODO_CONFIG,
                                      ARM_CONFIG)
 
-DUCK_GAIT = motion.GaitCommand(DUCK_STANCE_CONFIG,
+DUCK_SENSOR =  (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
+               0.08,  # angle X scale (gamma)
+               0.08,  # angle Y scale (gamma)
+               100.0,  # X spring constant k (kg/s^2)
+               100.0,  # Y spring constant k (kg/s^2)
+               7.0,   # max angle X (compensation)
+               7.0,   # max angle Y
+               45.0)   # max angle vel (change in compensation)
+DUCK_STANCE = (31.00, # CoM height
+               1.45,  # Forward displacement of CoM
+               10.0,  # Horizontal distance between feet
+               0.0,   # Body angle around y axis
+               80.0,   # Angle between feet
+               2.0)   # Time to transition to/from this stance
+DUCK_ZMP = (0.0,  # footCenterLocX
+            0.4,  # zmp static percentage
+            0.4,  # left zmp off
+            0.4,  # right zmp off
+            0.01,  # strafe zmp offse
+            6.6)   # turn zmp offset
+DUCK_STEP = (0.4, # step duration
+             0.25,  # fraction in double support
+             9.9,  # stepHeight
+             -5.0,  # step lift
+             7.0,  # max x speed
+             -7.0,  # max x speed
+             7.0,  # max y speed
+             5.0, # max theta speed()
+             7.0,  # max x accel
+             7.0,  # max y accel
+             20.0, # max theta speed()
+             WALKING)  # walking gait = true
+
+DUCK_GAIT = motion.GaitCommand(DUCK_STANCE,
             STEP_CONFIG,
             ZMP_CONFIG,
             JOINT_HACK_CONFIG,
-            CUR_SENSOR_CONFIG,
+            DUCK_SENSOR,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
@@ -356,9 +382,10 @@ MEDIUM_GAIT = motion.GaitCommand(MED_STANCE,
 ############# DEFAULT GAIT ASSIGNMENTS ##################
 
 CUR_GAIT = MEDIUM_GAIT
-MARVIN_CUR_GAIT = MARVIN_MEDIUM_GAIT
-
+CUR_DRIBBLE_GAIT = DUCK_GAIT
 CUR_SLOW_GAIT = NEW_GAIT
+
+MARVIN_CUR_GAIT = MARVIN_MEDIUM_GAIT
 MARVIN_CUR_SLOW_GAIT = MARVIN_NEW_GAIT
 
 TRILLIAN_GAIT = CUR_GAIT
@@ -366,10 +393,10 @@ ZAPHOD_GAIT   = CUR_GAIT
 SLARTI_GAIT   = CUR_GAIT
 MARVIN_GAIT   = MARVIN_CUR_GAIT
 
-TRILLIAN_TURN_GAIT = CUR_GAIT
-ZAPHOD_TURN_GAIT   = CUR_GAIT
-SLARTI_TURN_GAIT   = CUR_GAIT
-MARVIN_TURN_GAIT   = MARVIN_CUR_GAIT
+TRILLIAN_DRIBBLE_GAIT = CUR_DRIBBLE_GAIT
+ZAPHOD_DRIBBLE_GAIT   = CUR_DRIBBLE_GAIT
+SLARTI_DRIBBLE_GAIT   = CUR_DRIBBLE_GAIT
+MARVIN_DRIBBLE_GAIT   = CUR_DRIBBLE_GAIT
 
 TRILLIAN_SLOW_GAIT = CUR_SLOW_GAIT
 ZAPHOD_SLOW_GAIT   = CUR_SLOW_GAIT
