@@ -107,6 +107,8 @@ IGNORE_BALL_IN_BOX_DIST = 100
 
 # find ball
 WALK_TO_BALL_LOC_POS_FRAMES = 500
+SCAN_FIND_BEARING_THRESH = 50
+SCAN_FIND_DIST_THRESH = 40
 
 # Orbit ball
 ORBIT_OFFSET_DIST = 35          # from the ball to the center of the body
