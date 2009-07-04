@@ -381,7 +381,7 @@ SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
 
 GOALIE_SAVE = (
     #shoulder pitch, shoulder roll, elbow yaw, elbow roll
-    #hip yaw pitch, hip roll, hip pitch, knee pitch, ankle pitch, ankle roll
+    #hip yaw pitch, hip pitch, hip roll, knee pitch, ankle pitch, ankle roll
     ((60.0, 35.0, 0.0, -0), #right arm
      ( -76.0, 10.0, -50.0, 86.0, 0.0, -0),
      ( -76.0, -10.0, -50.0, 86.0, 0.0, 0),
@@ -395,29 +395,40 @@ GOALIE_SAVE = (
      .5, 0, stiff.LOOSE_ARMS_STIFFNESSES) )
 
 GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), #right arm
-                        ( -76.0, 15.0, -52.0, 86.0, 0.0, -11),
-                        ( -76.0, -15.0, -52.0, 86.0, 0.0, 11),
+                        ( -76.0, 14.0, -54.0, 86.0, 0.0, -11),
+                        ( -76.0, -14.0, -54.0, 86.0, 0.0, 11),
                         (60.0, -55.0, 0.0, 0), #left arm
                         .75, 0, stiff.NORMAL_STIFFNESSES),
 
                        ((-90., 90., 0., 0.),
-                        (-90., 50., -75., 90, 30, -20.),
-                        (-90., -50., -75., 90, 30, 20.),
+                        (-90., 38., -75., 90, 30, -20.),
+                        (-90., -38., -75., 90, 30, 20.),
                         (-90., -90., 0., 0.),
-                        .35, 0, stiff.LOW_HEAD_STIFFNESSES))
+                        .35, 0, stiff.LOW_HEAD_STIFFNESSES),
+                       ((-90., 90., 0., 0.),
+                        (-90., 38., -75., 90, 30, -20.),
+                        (-90., -38., -75., 90, 30, 20.),
+                        (-90., -90., 0., 0.),
+                        .01, 0, stiff.LOW_LEG_STIFFNESSES)
+)
 
 GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0), #right arm
                            ( -76.0, 10.0, -75.0, 125.0,  -10.7, -0),
                            ( -76.0, -10.0, -75.0, 125.0, -10.7, 0),
                            (0.0, -55.0, 0.0, 0), #left arm
                            .5, 0, stiff.STANDUP_STIFFNESSES) ,
-                          #ankle roll changed, to be tested
+
                           ((0.0, 45.0, 0.0, -0), #right arm
                            ( -46.0, 4.0, -50.0, 125.0,  -45., -5),
                            ( -46.0, -4.0, -50.0, 125.0, -45., 5),
                            (0.0, -45.0, 0.0, 0), #left arm
                            .5, 0, stiff.STANDUP_STIFFNESSES) ,
-                          GOALIE_POS[0]
+
+                          (INITIAL_POS[0][0],
+                           (0.0,  5.0, -28., 52.13, -30.3, 0.0),
+                           (0.0,  -5.0, -28., 52.13, -30.3, 0.0),
+                           INITIAL_POS[0][3],
+                           .75,0,stiff.STANDUP_STIFFNESSES),
                           )
 
 GOALIE_PREP_RIGHT_DIVE = ( ((90.,0.,-65.,-57.),
