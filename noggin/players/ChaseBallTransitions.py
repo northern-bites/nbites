@@ -268,3 +268,7 @@ def shouldStopPenaltyKickDribbling(player):
 def inPenaltyKickStrikezone(player):
     return (NogginConstants.OPP_GOALBOX_LEFT_X + 75. < player.brain.my.x)
 
+def shouldNotApproachWithLocAnymore(player):
+    return (player.brain.my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH
+            and
+            player.brain.ball.locDist > constants.APPROACH_NO_MORE_LOC_DIST )

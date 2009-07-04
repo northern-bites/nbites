@@ -50,7 +50,7 @@ def gameReady(player):
     if player.firstFrame():
         player.brain.CoA.setRobotGait(player.brain.motion)
     if player.brain.gameController.ownKickOff:
-        player.hasKickedOffKick = True
+        player.hasKickedOffKick = False
     else:
         player.hasKickedOffKick = True
 
