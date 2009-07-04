@@ -32,7 +32,7 @@ def gamePlaying(player):
         player.brain.tracker.trackBall()
 #        player.penalizeHeads();
 
-    return player.goLater('walkstraightstop')
+    return player.goLater('switchgaits1')
 
 if WEBOTS_ACTIVE:
     gameInitial=gamePlaying

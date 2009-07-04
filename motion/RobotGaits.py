@@ -161,11 +161,11 @@ DUCK_SENSOR =  (1.0,   # Feedback type (1.0 = spring, 0.0 = old)
                7.0,   # max angle Y
                45.0)   # max angle vel (change in compensation)
 DUCK_STANCE = (31.00, # CoM height
-               1.15,  # Forward displacement of CoM
+               -0.5,  # Forward displacement of CoM
                10.0,  # Horizontal distance between feet
                5.0,   # Body angle around y axis
                80.0,   # Angle between feet
-               2.0)   # Time to transition to/from this stance
+               0.5)   # Time to transition to/from this stance
 DUCK_ZMP = (0.0,  # footCenterLocX
             0.4,  # zmp static percentage
             0.4,  # left zmp off
@@ -174,7 +174,7 @@ DUCK_ZMP = (0.0,  # footCenterLocX
             6.6)   # turn zmp offset
 DUCK_STEP = (0.4, # step duration
              0.25,  # fraction in double support
-             9.9,  # stepHeight
+             0.9,  # stepHeight
              -5.0,  # step lift
              7.0,  # max x speed
              -7.0,  # min x speed
