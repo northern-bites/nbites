@@ -28,8 +28,6 @@ def chase(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldTurnToBall_ApproachBall(player):
             return player.goNow('turnToBall')
-        elif transitions.shouldSpinFindBall(player):
-            return player.goNow('spinFindBall')
         else:
             return player.goNow('goalieScanFindBall')
 
@@ -43,8 +41,6 @@ def chase(player):
         return player.goNow('waitBeforeKick')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goNow('turnToBall')
-    elif transitions.shouldSpinFindBall(player):
-        return player.goNow('spinFindBall')
     else:
         return player.goNow('scanFindBall')
 

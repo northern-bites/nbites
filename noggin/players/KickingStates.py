@@ -98,6 +98,7 @@ def clearBall(player):
         avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
         if fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH:
             if constants.DEBUG_KICKS: print ("\t\t Straight 1")
+            player.bigKick = True
             return player.goLater('kickBallStraight')
 
         elif avgOppBearing > constants.ALIGN_FOR_KICK_BEARING_THRESH:
@@ -135,6 +136,7 @@ def clearBall(player):
         if helpers.inCenterOfField(player):
             if abs(my.h) <= constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter1")
+                player.bigKick = True
                 return player.goLater('kickBallStraight')
             elif my.h < -constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter2")
@@ -152,6 +154,7 @@ def clearBall(player):
                 return player.goLater('kickBallLeft')
             else :
                 if constants.DEBUG_KICKS: print ("\t\ttop4")
+                player.bigKick = True
                 return player.goLater('kickBallStraight')
 
         elif helpers.inBottomOfField(player):
@@ -163,9 +166,10 @@ def clearBall(player):
                 return player.goLater('kickBallRight')
             else :
                 if constants.DEBUG_KICKS: print ("\t\tbottom4")
+                player.bigKick = True
                 return player.goLater('kickBallStraight')
+    player.bigKick = False
     return player.goLater('kickBallStraight')
-
 
 def shootBallClose(player):
     """
@@ -209,12 +213,14 @@ def shootBallClose(player):
             constants.SHOOT_BALL_LOC_ALIGN_ANGLE and \
             not player.hasAlignedOnce:
         player.angleToAlign = angleToAlign
+        player.bigKick = False
         return player.goNow('alignOnBallStraightKick')
     elif angleToAlign > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallLeft')
     elif angleToAlign < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallRight')
     else :
+        player.bigKick = True
         return player.goLater('kickBallStraight')
 
 def shootBallFar(player):
@@ -231,12 +237,14 @@ def shootBallFar(player):
             constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE and \
             not player.hasAlignedOnce:
         player.angleToAlign = bearingToGoal
+        player.bigKick = True
         return player.goNow('alignOnBallStraightKick')
     elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallLeft')
     elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallRight')
     else :
+        player.bigKick = True
         return player.goNow('kickBallStraight')
 
 def shootBall(player):
@@ -254,17 +262,20 @@ def shootBall(player):
             oppRightPostBearing is not None:
 
         if oppRightPostBearing < 0 < oppLeftPostBearing:
+            player.bigKick = True
             return player.goLater('kickBallStraight')
 
         avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
         if fabs(avgOppBearing) < constants.KICK_STRAIGHT_BEARING_THRESH:
             if constants.DEBUG_KICKS: print ("\t\t Straight 1")
+            player.bigKick = True
             return player.goLater('kickBallStraight')
 
         elif fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH and \
                 not player.hasAlignedOnce:
             if constants.DEBUG_KICKS: print ("\t\t Align 1")
             player.angleToAlign = avgOppBearing
+            player.bigKick = True
             return player.goLater('alignOnBallStraightKick')
 
         elif avgOppBearing > constants.ALIGN_FOR_KICK_BEARING_THRESH:
@@ -380,19 +391,31 @@ def kickBallStraight(player):
 
     ballForeFoot = player.kickDecider.ballForeFoot
     if ballForeFoot == constants.LEFT_FOOT:
-        player.chosenKick = SweetMoves.LEFT_FAR_KICK
+        if player.bigKick:
+            player.chosenKick = SweetMoves.LEFT_BIG_KICK
+        else :
+            player.chosenKick = SweetMoves.LEFT_FAR_KICK
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.RIGHT_FOOT:
-        player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+        if player.bigKick:
+            player.chosenKick = SweetMoves.RIGHT_BIG_KICK
+        else :
+            player.chosenKick = SweetMoves.RIGHT_FAR_KICK
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.MID_RIGHT:
-        player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+        if player.bigKick:
+            player.chosenKick = SweetMoves.RIGHT_BIG_KICK
+        else :
+            player.chosenKick = SweetMoves.RIGHT_FAR_KICK
         return player.goNow('stepForRightFootKick')
 
     elif ballForeFoot == constants.MID_LEFT:
-        player.chosenKick = SweetMoves.LEFT_FAR_KICK
+        if player.bigKick:
+            player.chosenKick = SweetMoves.LEFT_BIG_KICK
+        else :
+            player.chosenKick = SweetMoves.LEFT_FAR_KICK
         return player.goNow('stepForLeftFootKick')
 
     else :                  # INCORRECT_POS
@@ -576,7 +599,6 @@ def kickBallExecute(player):
         return player.goLater('afterKick')
 
     return player.stay()
-
 
 def afterKick(player):
     """

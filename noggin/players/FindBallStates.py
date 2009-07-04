@@ -63,11 +63,8 @@ def spinFindBall(player):
         else:
             my = player.brain.my
             ball = player.brain.ball
-            bearingToBall = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                      ball.x,
-                                                      ball.y )
             spinDir = MyMath.getSpinDir(my.h,
-                                        my.h + bearingToBall)
+                                        my.h + ball.bearing)
 
         player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 

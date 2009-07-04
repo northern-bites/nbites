@@ -75,6 +75,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0
         self.hasAlignedOnce = False
+        self.bigKick = False
 
         self.kickObjective = None
 
