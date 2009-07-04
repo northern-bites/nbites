@@ -564,3 +564,34 @@ SHORT_QUICK_LEFT_KICK = (
     )
 
 SHORT_QUICK_RIGHT_KICK = mirrorMove(SHORT_QUICK_LEFT_KICK)
+
+SHORT_LEFT_SIDE_KICK = (
+    ((80.,90.,-50.,-70.),
+     (0.,0.,-10.,20.,-10.,0.),
+     (0.,0.,-10.,20.,-10.,0.),
+     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    ((80.,40.,-50.,-70.),
+     (0.,20.,-10.,20.,-10.,-20.),
+     (0.,16.,-13.,20.,-10.,-22.),
+     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    (2, (0.,40.,-30.,70.,-32.,-20.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+    (2, (0.,40.,-50.,30.,20.,0.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    ((80.,70.,-10.,-10.),
+     (0.,26.,-60.,30.,23.,0.),
+     (0.,23.,-13.,20.,-10.,-25.),
+     (80.,-40.,50.,70.),0.2,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    ((80.,70.,-10.,-10.),
+     (0.,23.,-13.,20.,-10.,-25.),
+     (0.,20.,-13.,20.,-10.,-25.),
+     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    ((80.,90.,-50.,-70.),
+     (0.,0.,-10.,20.,-10.,0.),
+     (0.,0.,-10.,20.,-10.,0.),
+     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES) )
+
+#SHORT_RIGHT_SIDE_KICK = mirrorMove(SHORT_LEFT_SIDE_KICK)
