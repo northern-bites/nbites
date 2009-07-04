@@ -1,5 +1,6 @@
 from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
+import man.noggin.playbook.PBConstants as PBConstants
 import man.noggin.util.MyMath as MyMath
 import PositionTransitions as transitions
 import PositionConstants as constants
@@ -70,7 +71,9 @@ def playbookPosition(player):
             return player.goLater('relocalize')
 
         # Attempt to go to the point while looking at the ball
-        if not useOmni:
+        if (not useOmni or
+            (player.brain.playbook.role == PBConstants.DEFENDER and
+             player.brain.ball.x < player.brain.my.x)):
             nav.goTo(position)
         else:
             nav.omniGoTo(position)

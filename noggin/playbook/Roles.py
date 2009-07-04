@@ -31,6 +31,12 @@ def rDefender(team):
     if team.brain.ball.x < PBConstants.SWEEPER_X:
         return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
 
+    elif team.brain.ball.x > NogginConstants.MIDFIELD_X:
+        if team.brain.ball.y < NogginConstants.MIDFIELD_Y:
+            return [PBConstants.DEFENDER] + SubRoles.pBottomStopper(team)
+        else:
+            return [PBConstants.DEFENDER] + SubRoles.pTopStopper(team)
+
     elif team.brain.ball.y < NogginConstants.MIDFIELD_Y:
         return [PBConstants.DEFENDER] + SubRoles.pTopStopper(team)
     else:
