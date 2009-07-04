@@ -355,19 +355,19 @@ MEDIUM_GAIT = motion.GaitCommand(MED_STANCE,
 
 ########## MEDIUM GAIT #################
 COM_STANCE = (31.00, # CoM height
-              1.85,  # Forward displacement of CoM
+              2.5,  # Forward displacement of CoM
               10.0,  # Horizontal distance between feet
-              5.0,   # Body angle around y axis
+              0.0,   # Body angle around y axis
               0.0,   # Angle between feet
               0.1)   # Time to transition to/from this stance
 
 
-COM_STEP = (.5, # step duration
+COM_STEP = (.4, # step duration
             0.25,  # fraction in double support
-            1.1,  # stepHeight
+            1.5,  # stepHeight
             -5.0,  # step lift
-            10.0,  # max x speed
-            -5.0,  # max x speed
+            20.0,  # max x speed
+            -4.0,  # max x speed
             10.0,  # max y speed
             30.0, # max theta speed()
             7.0,  # max x accel
@@ -378,9 +378,9 @@ COM_STEP = (.5, # step duration
 
 
 COM_ZMP = (0.0,  # footCenterLocX
-           0.3,  # zmp static percentage
-           -1.0,  # left zmp off
-           -1.0,  # right zmp off
+           0.2,  # zmp static percentage
+           0.5,  # left zmp off
+           0.5,  # right zmp off
            0.01,  # strafe zmp offse
            7.6)   # turn zmp offset
 
@@ -395,8 +395,12 @@ COM_SENSOR =  (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
                45.0)   # max angle vel (change in compensation)
 
 COM_HACK = JOINT_HACK_CONFIG
-COM_STIFFNESS = STIFFNESS_CONFIG
-COM_ODO= ODO_CONFIG
+COM_STIFFNESS = (0.85, #hipStiffness
+                 0.3,  #kneeStiffness
+                 0.4,  #anklePitchStiffness
+                 0.3,  #ankleRollStiffness
+                 0.1)  #armStiffness
+COM_ODO=ODO_CONFIG
 COM_ARM=ARM_CONFIG
 
 COM_GAIT = motion.GaitCommand(COM_STANCE,
@@ -413,7 +417,7 @@ COM_GAIT = motion.GaitCommand(COM_STANCE,
 
 ############# DEFAULT GAIT ASSIGNMENTS ##################
 
-CUR_GAIT = MEDIUM_GAIT
+CUR_GAIT = COM_GAIT
 MARVIN_CUR_GAIT = COM_GAIT
 
 CUR_SLOW_GAIT = NEW_GAIT
