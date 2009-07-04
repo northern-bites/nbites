@@ -107,7 +107,7 @@ def walkstraight(player):
 
 def walkstraightstop(player):
     if player.firstFrame():
-        player.setSpeed(15,0,0)
+        player.setSpeed(7,0,0)
 
     if player.counter == 800:
         return player.goLater('stopwalking')
