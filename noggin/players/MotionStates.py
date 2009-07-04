@@ -30,8 +30,9 @@ def gamePlaying(player):
         player.gainsOn()
         player.brain.CoA.setRobotGait(player.brain.motion)
         player.brain.tracker.trackBall()
+#        player.penalizeHeads();
 
-    return player.goLater('switchgaits1')
+    return player.goLater('walkstraightstop')
 
 if WEBOTS_ACTIVE:
     gameInitial=gamePlaying
@@ -109,7 +110,7 @@ def walkstraight(player):
 def walkstraightstop(player):
     if player.firstFrame():
         player.brain.CoA.setRobotDribbleGait(player.brain.motion)
-        player.setSpeed(7,7,30)
+        player.setSpeed(1.5,-1.5,1.5)
 
     if player.counter == 500:
         return player.goLater('stopwalking')
