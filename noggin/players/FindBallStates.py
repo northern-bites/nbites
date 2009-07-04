@@ -23,6 +23,8 @@ def scanFindBall(player):
         if transitions.shouldApproachBallWithLoc(player):
             player.brain.tracker.trackBall()
             return player.goLater('approachBallWithLoc')
+        elif transitions.shouldSpinFindBall(player):
+            return player.goLater('spinFindBall')
         elif transitions.shouldTurnToBall_FoundBall(player):
             return player.goLater('turnToBall')
         elif transitions.shouldSpinFindBall(player):
@@ -64,7 +66,7 @@ def spinFindBall(player):
             my = player.brain.my
             ball = player.brain.ball
             spinDir = MyMath.getSpinDir(my.h,
-                                        my.h + ball.bearing)
+                                        my.h + ball.locBearing)
 
         player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
