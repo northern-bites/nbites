@@ -11,6 +11,9 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
+        player.isChasing = False
+        player.inKickingState = False
+        player.justKicked = False
         if player.squatting:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             player.squatting = False
@@ -30,6 +33,9 @@ def gameInitial(player):
 
 def gamePenalized(player):
     if player.firstFrame():
+        player.isChasing = False
+        player.inKickingState = False
+        player.justKicked = False
         if player.squatting:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             player.squatting = False
@@ -48,6 +54,9 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.firstFrame():
+        player.isChasing = False
+        player.inKickingState = False
+        player.justKicked = False
         player.brain.CoA.setRobotGait(player.brain.motion)
     if player.brain.gameController.ownKickOff:
         player.hasKickedOffKick = True
@@ -73,6 +82,9 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
+        player.isChasing = False
+        player.inKickingState = False
+        player.justKicked = False
         player.brain.CoA.setRobotGait(player.brain.motion)
     if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
@@ -153,6 +165,9 @@ def fallen(player):
     """
     Stops the player when the robot has fallen
     """
+    player.isChasing = False
+    player.inKickingState = False
+    player.justKicked = False
     player.squatting = False
     player.brain.nav.switchTo('stopped')
     return player.stay()
@@ -165,6 +180,9 @@ def gameFinished(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
+        player.isChasing = False
+        player.inKickingState = False
+        player.justKicked = False
         if player.squatting:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             player.squatting = False
