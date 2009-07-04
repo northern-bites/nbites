@@ -70,7 +70,8 @@ def decideKick(player):
         return player.goNow('shootBall')
     elif player.kickObjective == constants.OBJECTIVE_KICKOFF:
         player.hasKickedOffKick = True
-        return player.goNow('kickBallStraightShort')
+        player.bigKick = False
+        return player.goNow('kickBallStraight')
     else :
         return player.goNow('clearBall')
 
@@ -87,8 +88,7 @@ def clearBall(player):
     # Things to do if we saw our own goal
     # Saw the opponent goal
 
-    if player.brain.my.locScoreTheta > NogginConstants.OK_LOC and \
-            abs(player.brain.my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
+    if abs(player.brain.my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
             (helpers.inTopOfField(player) or helpers.inBottomOfField(player) ):
         return player.goLater('orbitBeforeKick')
 
@@ -220,7 +220,7 @@ def shootBallClose(player):
     elif angleToAlign < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallRight')
     else :
-        player.bigKick = True
+        player.bigKick = False
         return player.goLater('kickBallStraight')
 
 def shootBallFar(player):
@@ -503,7 +503,7 @@ def stepForRightFootKick(player):
         player.brain.tracker.trackBall()
 
     ball = player.brain.ball
-    if ball.on and player.brain.nav.isStopped():
+    if ball.on:
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
 
@@ -520,10 +520,10 @@ def stepForRightFootKick(player):
         elif ballForeFoot == constants.INCORRECT_POS:
             player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
-
-        targetY = ball.relY - constants.RIGHT_FOOT_CENTER_Y
-        sY = MyMath.sign(targetY) * constants.SIDE_STEP_MAX_SPEED
-        player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
+        if player.brain.nav.isStopped():
+            targetY = ball.relY - constants.RIGHT_FOOT_CENTER_Y
+            sY = MyMath.sign(targetY) * constants.SIDE_STEP_MAX_SPEED
+            player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
         player.brain.CoA.setRobotGait(player.brain.motion)

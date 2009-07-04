@@ -89,6 +89,9 @@ def turnToBall(player):
     if fabs(turnRate) < constants.MIN_BALL_SPIN_MAGNITUDE:
         turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_MAGNITUDE
 
+    if ball.on:
+        player.setSpeed(x=0,y=0,theta=turnRate)
+
     if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
@@ -107,9 +110,6 @@ def turnToBall(player):
             return player.goLater('approachBall')
         elif transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
-
-    if ball.on:
-        player.setSpeed(x=0,y=0,theta=turnRate)
 
     return player.stay()
 
@@ -534,37 +534,19 @@ def orbitBeforeKick(player):
         brain.CoA.setRobotGait(brain.motion)
         brain.tracker.trackBall()
 
+        shotPoint = KickingHelpers.getShotCloseAimPoint(player)
+        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                                  shotPoint[0],
+                                                  shotPoint[1] )
+        spinDir = -MyMath.sign(bearingToGoal)
+        player.brain.nav.orbitAngle(spinDir * 90)
     if not player.brain.tracker.activeLocOn and \
             transitions.shouldScanFindBall(player):
         player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
-    elif player.brain.tracker.activeLocOn and \
-            transitions.shouldScanFindBallActiveLoc(player):
-        player.brain.CoA.setRobotGait(player.brain.motion)
-        return player.goLater('scanFindBall')
-    elif brain.ball.dist > 50.0:
+    elif brain.ball.dist > constants.STOP_ORBIT_BALL_DIST:
         return player.goLater('chase')
 
-    shotPoint = KickingHelpers.getShotCloseAimPoint(player)
-    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                              shotPoint[0],
-                                              shotPoint[1] )
-
-    if brain.ball.on:
-        relDestX, relDestY, relDestTheta = player.getNextOrbitPos()
-        sX = constants.ORBIT_X_GAIN * relDestX
-        sY = constants.ORBIT_Y_GAIN * relDestY+1
-        sY = MyMath.sign(sY)*max(abs(sY),
-                                 constants.MIN_ORBIT_Y_MAGNITUDE)
-        sTheta = constants.ORBIT_SPIN_GAIN * relDestTheta
-
-        spinDir = MyMath.sign(bearingToGoal)
-        sTheta = MyMath.clip(sTheta,
-                             constants.MIN_ORBIT_SPIN_SPEED,
-                             constants.MAX_ORBIT_SPIN_SPEED)
-        player.setSpeed(sX, sY * spinDir, sTheta * spinDir)
-
-    if abs(my.h - player.orbitStartH) >= 90:
-        brain.CoA.setRobotGait(brain.motion)
+    if player.brain.nav.isStopped() and not player.firstFrame():
         return player.goLater('positionForKick')
     return player.stay()
