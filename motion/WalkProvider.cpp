@@ -201,7 +201,7 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     }
 
     // this is the max we allow, not the max the hardware can do
-    const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.15f;
+    const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.3f;
     float time = max_change/MAX_RAD_PER_SEC;
 
     vector<BodyJointCommand *> commands;
