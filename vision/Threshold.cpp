@@ -257,6 +257,7 @@ void Threshold::runs() {
     const int pixInImageLeft = getPixelBoundaryLeft();
     const int pixInImageRight = getPixelBoundaryRight();
     const int pixInImageUp = getPixelBoundaryUp();
+	//drawLine(pixInImageRight, 0, pixInImageRight, IMAGE_HEIGHT -1, RED);
 
     // split up the loops
     for (i = 0; i < IMAGE_WIDTH; i += 1) {//scan across
@@ -277,16 +278,16 @@ void Threshold::runs() {
         // potential yellow post location
         int lastGoodPixel = IMAGE_HEIGHT;
         //int horizonJ = pose->getHorizonY(i);
-	hor = horizon + (int)(horizonSlope * (float)(i));
+		hor = horizon + (int)(horizonSlope * (float)(i));
 
         for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
             pixel = thresholded[j][i];
-	    // ToDo:  This works ok, but could be much better.  We should really
-	    // calculate a trapezoid based on where the max height of the shoulder is
-	    if ((i < pixInImageLeft || i > pixInImageRight) && j > pixInImageUp 
-		&& thresholded[j][i] == BLUE) {
-	      thresholded[j][i] = GREY;
-	    }
+			// ToDo:  This works ok, but could be much better.  We should really
+			// calculate a trapezoid based on where the max height of the shoulder is
+			if ((i < pixInImageLeft || i > pixInImageRight) && j > pixInImageUp 
+				&& thresholded[j][i] == BLUE) {
+				thresholded[j][i] = GREY;
+			}
 
             // check thresholded point with last thresholded point.
             // if the same, increment the current run
