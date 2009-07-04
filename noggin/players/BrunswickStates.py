@@ -114,6 +114,7 @@ def penaltyShotsGameReady(player):
         player.walkPose()
         if player.brain.playbook.role == GOALIE:
             player.brain.resetGoalieLocalization()
+
     return player.stay()
 
 def penaltyShotsGameSet(player):
@@ -129,6 +130,12 @@ def penaltyShotsGameSet(player):
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()
+    if player.brain.playbook.role == GOALIE:
+        player.brain.resetGoalieLocalization()
+        if player.squatting:
+            return player.goLater('squatted')
+        return player.goLater('squat')
+
     return player.stay()
 
 def penaltyShotsGamePlaying(player):
