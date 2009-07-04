@@ -201,8 +201,9 @@ def shouldAvoidObstacle(player):
     """
     Should avoid an obstacle
     """
-    return (shouldAvoidObstacleLeft(player) or
-            shouldAvoidObstacleRight(player))
+    return ((shouldAvoidObstacleLeft(player) or
+             shouldAvoidObstacleRight(player)) and
+            not player.penaltyKicking)
 
 def shouldAvoidObstacleDuringApproachBall(player):
     return shouldAvoidObstacle(player) and \
@@ -249,4 +250,21 @@ def shouldActiveLoc(player):
 
     else:
         return player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST
+
+def shouldStopPenaltyKickDribbling(player):
+    """
+    While dribbling we should stop
+    """
+    my = player.brain.my
+    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
+    goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
+                                            dribbleAimPoint[0], dribbleAimPoint[1])
+    return (inPenaltyKickStrikezone(player) or
+            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
+            abs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
+            abs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
+            player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
+
+def inPenaltyKickStrikezone(player):
+    return (NogginConstants.OPP_GOALBOX_LEFT_X + 75. < player.brain.my.x)
 

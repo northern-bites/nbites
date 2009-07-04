@@ -371,7 +371,8 @@ def penaltyKickBall(player):
     ball = player.brain.ball
 
     if not player.penaltyMadeFirstKick:
-        return player.goLater('kickBallStraightShort')
+        return player.goLater('penaltyKickShortDribble')
+        #return player.goLater('kickBallStraightShort')
     if not player.penaltyMadeSecondKick:
 
 

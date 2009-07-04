@@ -1,6 +1,7 @@
 from .. import NogginConstants
 from ..playbook.PBConstants import GOALIE
-
+import ChaseBallStates
+import ChaseBallTransitions as transitions
 PENALTY_RELOCALIZE_FRAMES = 100
 
 def penaltyKick(player):
@@ -32,3 +33,17 @@ def penaltyBallInOppGoalbox(player):
     if not player.ballInOppGoalBox():
         return player.goLater('chase')
     return player.stay()
+
+def penaltyKickShortDribble(player):
+    if player.firstFrame():
+        player.penaltyMadeFirstKick = True
+    if transitions.shouldStopPenaltyKickDribbling(player):
+
+        if transitions.shouldKick(player):
+            return player.goNow('waitBeforeKick')
+        elif transitions.shouldPositionForKick(player):
+            return player.goNow('positionForKick')
+        elif transitions.shouldApproachBall(player):
+            return player.goNow('approachBall')
+
+    return ChaseBallStates.approachBallWalk(player)
