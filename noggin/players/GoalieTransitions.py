@@ -224,23 +224,31 @@ def shouldChaseLoc(player):
         return True
     if not player.squatting:
         if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION
-           and ball.y < Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION
-           and ball.x < Constants.MY_GOALBOX_RIGHT_X +
-           goalCon.AGGRESSIVENESS_OFFSET):
+            and ball.y < Constants.MY_GOALBOX_TOP_Y -goalCon.GOALBOX_Y_REDUCTION
+            and ball.x < Constants.MY_GOALBOX_RIGHT_X +
+            goalCon.AGGRESSIVENESS_OFFSET):
             return True
     return False
 
 def shouldStopChaseLoc(player):
     my = player.brain.my
     ball = player.brain.ball
+    #change to use ball uncertainty
+    if ball.uncertX < Constants.GOOD_LOC_XY_UNCERT_THRESH:
+        if ball.x > (Constants.CENTER_FIELD_X/2):
+            return True
 
-    if (ball.y < (Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION -
-                  goalCon.END_CLEAR_BUFFER) or
-        ball.y > (Constants.MY_GOALBOX_TOP_Y - goalCon.GOALBOX_Y_REDUCTION +
-                  goalCon.END_CLEAR_BUFFER) or
-        ball.x > (Constants.MY_GOALBOX_RIGHT_X + goalCon.AGGRESSIVENESS_OFFSET +
-                  goalCon.END_CLEAR_BUFFER )):
-        return True
+    #makes sure we have seen the ball at least once for this method to return
+    #true STOP_CHASE_BUFFER-times
+    if ball.framesOff <= goalCon.STOP_CHASE_BUFFER - 1:
+        if (ball.y < (Constants.MY_GOALBOX_BOTTOM_Y -
+                      goalCon.END_CLEAR_BUFFER) or
+            ball.y > (Constants.MY_GOALBOX_TOP_Y +
+                      goalCon.END_CLEAR_BUFFER) or
+            ball.x > (Constants.MY_GOALBOX_RIGHT_X
+                      + goalCon.AGGRESSIVENESS_OFFSET +
+                      goalCon.END_CLEAR_BUFFER )):
+            return True
 
     '''
     elif (my.x < Constants.MY_GOALBOX_RIGHT_X
