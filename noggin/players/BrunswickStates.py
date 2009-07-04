@@ -4,6 +4,30 @@ import man.motion.SweetMoves as SweetMoves
 # Reimplementation of Game Controller States for pBrunswick
 ###
 
+def gameInitial(player):
+    """
+    Ensure we are sitting down and head is snapped forward.
+    In the future, we may wish to make the head move a bit slower here
+    Also, in the future, gameInitial may be responsible for turning off the gains
+    """
+    if player.firstFrame():
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
+        else:
+            player.stopWalking()
+        player.gainsOn()
+        player.zeroHeads()
+        player.GAME_INITIAL_satDown = False
+        player.squatting = False
+
+    elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown 
+          and player.motion.isBodyActive()):
+        player.GAME_INITIAL_satDown = True
+        player.executeMove(SweetMoves.SIT_POS)
+
+    return player.stay()
+
 def gamePenalized(player):
     if player.firstFrame():
         if player.squatting:
@@ -126,3 +150,31 @@ def fallen(player):
     player.brain.nav.switchTo('stopped')
     return player.stay()
 
+
+def gameFinished(player):
+    """
+    Ensure we are sitting down and head is snapped forward.
+    In the future, we may wish to make the head move a bit slower here
+    Also, in the future, gameInitial may be responsible for turning off the gains
+    """
+    if player.firstFrame():
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
+        else:
+            player.stopWalking()
+
+        player.zeroHeads()
+        player.GAME_FINISHED_satDown = False
+        return player.stay()
+
+    # Sit down once we've finished walking
+    if (player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown
+        and not player.motion.isBodyActive()):
+        player.GAME_FINISHED_satDown = True
+        player.executeMove(SweetMoves.SIT_POS)
+        return player.stay()
+
+    if not player.motion.isBodyActive() and  player.GAME_FINISHED_satDown:
+        player.gainsOff()
+    return player.stay()
