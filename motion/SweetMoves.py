@@ -8,6 +8,29 @@ SWEET_MOVE_LENGTH = 7
 CHAIN_MOVE_LENGTH = 5
 
 
+#===============================================================================
+#   CODE FROM BURST-ISRAEL ROBOCUP 2009
+#
+#
+#    Usage:
+#    ------
+#    KICK_RIGHT = mirrorMove(KICK_LEFT)
+#===============================================================================
+
+def mirrorMove(positions):
+    return list(
+        list(((RShoulderPitch, -RShoulderRoll, -RElbowYaw, -RElbowRoll),
+              (RHipYawPitch, -RHipRoll, RHipPitch, RKneePitch, RAnklePitch, -RAnkleRoll),
+              (LHipYawPitch, -LHipRoll, LHipPitch, LKneePitch, LAnklePitch, -LAnkleRoll),
+              (LShoulderPitch, -LShoulderRoll, -LElbowYaw, -LElbowRoll),
+              interp_time, interpolation, stiffness))
+                  for
+        ((LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll),
+         (LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll),
+         (RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll),
+         (RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll),
+         interp_time, interpolation, stiffness) in positions)
+
 def getMoveTime(move):
     totalTime = 0.0
     for target in move:
@@ -469,46 +492,53 @@ CRAB_SIT = (
      (120.0, -90.0, 12, 0),
      5.0, 0, stiff.LOOSE_ARMS_STIFFNESSES),)
 
-LEFT_FARTHER_KICK = (
+LEFT_BIG_KICK = (
     #swing to the right
     ((80.,40.,-50.,-70.),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_FARTHER_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
     ((80.,40.,-50.,-70.),
      (0.,15.,-10.,20.,-10.,-20.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_FARTHER_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
     # Lift leg leg
     ((80.,40.,-50.,-70.),
-     (0.,15.,-45.,85.,-35.,-20.),
-     (0.,15.,-18.,33.,-16.,-20.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_FARTHER_KICK_STIFFNESSES),
+     (0.,15.,-45.,85.,-40.,-20.),
+     (0.,15.,-12.,16.,-10.,-20.),
+     (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
+    #cock left leg
+    ((20.,40.,0.,0.),
+     (0.,15.,-22.,120.,0.,-20.),
+     (0.,15.,-12.,16.,-10.,-20.),
+     (100.,-40.,0.,0.),0.8,0, stiff.NORMAL_STIFFNESSES),
     # kick left leg
-    ((80.,40.,-50.,-70.),
-     (0.,15.,-60.,41.,-10.,-20.),
-     (0.,15.,-6.,33.,-10.,-20.),
-     (80.,-40.,50.,70.),0.11,0, stiff.LEFT_FARTHER_KICK_STIFFNESSES),
+    ((50.,40.,0.,0.),
+     (0.,15.,-80.,60.,-20.,-20.),
+     (0.,15.,-22.,30.,-10.,-20.),
+     (20.,-40.,0.,0.),0.18,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
     # unkick foot
     ((80.,40.,-50.,-70.),
      (0.,15.,-45.,85.,-40.,-10.),
      (0.,15.,-12.,16.,-10.,-20.),
-     (80.,-40.,50.,70.),0.2,0, stiff.LOW_HEAD_STIFFNESSES),
+     (80.,-40.,50.,70.),1.5,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
     # put foot down
     ((80.,40.,-50.,-70.),
      (0.,15.,-22,42.,-20,-10.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),1.0,0, stiff.LOW_HEAD_STIFFNESSES),
+     (80.,-40.,50.,70.),1.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
     #swing to normal
     ((80.,40.,-50.,-70.),
      (0.,15.,-12.5,25.,-12.5,-20.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),0.7,0, stiff.LOW_HEAD_STIFFNESSES),
+     (80.,-40.,50.,70.),0.7,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
     ((80.,40.,-50.,-70.),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
      (80.,-40.,50.,70.),1.0,0, stiff.LOW_HEAD_STIFFNESSES)
     )
+
+RIGHT_BIG_KICK = mirrorMove(LEFT_BIG_KICK)
 
 SHORT_QUICK_LEFT_KICK = (
     ((90,15,0,0),
@@ -555,4 +585,5 @@ SHORT_QUICK_RIGHT_KICK = (
      (0.,0.,-15.,20.,-10.,0.),
      (90,-15,0,0),0.6,0, stiff.LOW_HEAD_STIFFNESSES),
     )
+
 
