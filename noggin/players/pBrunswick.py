@@ -1,4 +1,3 @@
-
 from . import SoccerFSA
 from . import ChaseBallStates
 from . import PositionStates
@@ -191,7 +190,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                               OPP_GOAL_HEADING,
                                               destKickLocX,
                                               destKickLocY)
-
+        elif self.shouldMoveAroundBall():
+            return self.getPointToMoveAroundBall()
         elif self.inFrontOfBall():
             destH = self.getApproachHeadingFromFront()
         else :
@@ -268,3 +268,21 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             sin(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relY
         relTheta = ChaseConstants.ORBIT_STEP_ANGLE * 2 + self.brain.ball.bearing
         return relX, relY, relTheta
+
+    def shouldMoveAroundBall(self):
+        return (self.brain.ball.x < self.brain.my.x
+                and (self.brain.my.x - self.brain.ball.x) <
+                75.0 )
+
+    def getPointToMoveAroundBall(self):
+        ball = self.brain.ball
+        x = ball.x
+
+        if ball.y > self.brain.my.y:
+            y = self.brain.ball.y - 75.0
+            destH = 90.0
+        else:
+            y = self.brain.ball.y + 75.0
+            destH = -90.0
+
+        return x, y, destH
