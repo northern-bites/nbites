@@ -30,6 +30,7 @@ def penaltyGoalie(player):
 def penaltyBallInOppGoalbox(player):
     if player.firstFrame():
         player.stopWalking()
+        player.brain.tracker.activeLoc()
     if not player.ballInOppGoalBox():
         return player.goLater('chase')
     return player.stay()
