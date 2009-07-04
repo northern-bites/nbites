@@ -3864,7 +3864,10 @@ bool ObjectFragments::badSurround(blob b) {
     int w = b.rightTop.x - b.leftTop.x + 1;
     int h = b.rightBottom.y - b.leftTop.y + 1;
 	int surround = min(SURROUND, w/2);
-    int greens = 0, orange = 0, red = 0, borange = 0, pix, realred = 0;
+    int greens = 0, orange = 0, red = 0, borange = 0, pix, realred = 0, 
+		yellows = 0;
+
+	// first collect information on the ball itself
     for (int i = -1; i < w+1; i++) {
         for (int j = -1; j < h+1; j++) {
 			if (x + i > -1 && x + i < IMAGE_WIDTH && y + j > -1 &&
@@ -3875,6 +3878,8 @@ bool ObjectFragments::badSurround(blob b) {
 			}
         }
     }
+
+	// now collect information on the area surrounding the ball
     x = max(0, x - surround);
     y = max(0, y - surround);
     w = w + surround * 2;
@@ -3890,18 +3895,15 @@ bool ObjectFragments::badSurround(blob b) {
 				red++;
             else if (pix == GREEN)
                 greens++;
+			else if (pix == YELLOW && j < surround)
+				yellows++;
         }
     }
     if (BALLDEBUG) {
         cout << "Surround information " << red << " " << realred << " " 
-			 << orange << " " << borange << " " << greens << endl;
+			 << orange << " " << borange << " " << greens << " "
+			 << yellows << endl;
     }
-	if (orange - borange > borange * 0.3 && orange - borange > 10) {
-		if (BALLDEBUG) {
-			cout << "Too much orange outside of the ball" << endl;
-		}
-		return true;
-	}
     if (realred > borange) {
 		if (BALLDEBUG) {
 			cout << "Too much real red" << endl;
@@ -3919,6 +3921,21 @@ bool ObjectFragments::badSurround(blob b) {
 			cout << "Too much real red vs borange" << endl;
 		}
 		return true;
+	}
+	if (orange - borange > borange * 0.3 && orange - borange > 10) {
+		if (BALLDEBUG) {
+			cout << "Too much orange outside of the ball" << endl;
+		}
+		// We can run into this problem with reflections - let's see if
+		// we're up against a post or something
+		if (yellows > w * 3) {
+			if (BALLDEBUG) {
+				cout << "But lots of yellow, doing nothing " << endl;
+			}
+			return false;
+		} else {
+			return true;
+		}
 	}
 	if (red > orange && greens < (w * h) / greenDiv) {
 		if (BALLDEBUG) {
