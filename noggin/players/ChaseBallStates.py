@@ -269,9 +269,12 @@ def approachBallWalk(player):
     if player.brain.playbook.role == pbc.GOALIE and goalTran.dangerousBall(player):
         return player.goNow('approachDangerousBall')
 
-    sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
-                     constants.MIN_APPROACH_X_SPEED,
-                     constants.MAX_APPROACH_X_SPEED)
+    if ball.dist < constants.APPROACH_WITH_GAIN_DIST:
+        sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
+                         constants.MIN_APPROACH_X_SPEED,
+                         constants.MAX_APPROACH_X_SPEED)
+    else :
+        sX = constants.MAX_APPROACH_X_SPEED
 
     # Determine the speed to turn to the ball
     sTheta = MyMath.clip(ball.bearing*constants.APPROACH_SPIN_GAIN,
@@ -554,19 +557,17 @@ def orbitBeforeKick(player):
     if brain.ball.on:
         relDestX, relDestY, relDestTheta = player.getNextOrbitPos()
         sX = constants.ORBIT_X_GAIN * relDestX
-        sY = constants.ORBIT_Y_GAIN * relDestY
+        sY = constants.ORBIT_Y_GAIN * relDestY+1
+        sY = MyMath.sign(sY)*max(abs(sY),
+                                 constants.MIN_ORBIT_Y_MAGNITUDE)
         sTheta = constants.ORBIT_SPIN_GAIN * relDestTheta
-        spinDir = MyMath.sign(bearingToGoal)
 
+        spinDir = MyMath.sign(bearingToGoal)
+        sTheta = MyMath.clip(sTheta,
+                             constants.MIN_ORBIT_SPIN_SPEED,
+                             constants.MAX_ORBIT_SPIN_SPEED)
         player.setSpeed(sX, sY * spinDir, sTheta * spinDir)
 
-    # if brain.oppGoalLeftPost.on or brain.oppGoalRightPost.on:
-    #     if brain.oppGoalLeftPost.on:
-    #         bearingToGoal = brain.oppGoalLeftPost.bearing
-    #     else :
-    #         bearingToGoal = brain.oppGoalRightPost.bearing
-    # elif brain.my.locScore >= NogginConstants.OK_LOC:
-    print bearingToGoal
     if abs(my.h - player.orbitStartH) >= 90:
         brain.CoA.setRobotGait(brain.motion)
         return player.goLater('positionForKick')

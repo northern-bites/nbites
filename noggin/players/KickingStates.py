@@ -87,8 +87,9 @@ def clearBall(player):
     # Things to do if we saw our own goal
     # Saw the opponent goal
 
-    if player.brain.my.locScoreTheta == NogginConstants.GOOD_LOC and \
-            abs(player.brain.my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH:
+    if player.brain.my.locScoreTheta > NogginConstants.OK_LOC and \
+            abs(player.brain.my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
+            (helpers.inTopOfField(player) or helpers.inBottomOfField(player) ):
         return player.goLater('orbitBeforeKick')
 
     if oppLeftPostBearing is not None and \
@@ -111,32 +112,26 @@ def clearBall(player):
             # Goal in front
             avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
 
-            if avgMyGoalBearing > constants.ORBIT_OWN_GOAL_ANGLE_THRESH:
+            if avgMyGoalBearing > 0:
                 if constants.DEBUG_KICKS: print ("\t\tright 1")
                 return player.goLater('kickBallRight')
-            elif avgMyGoalBearing < -constants.ORBIT_OWN_GOAL_ANGLE_THRESH:
+            else :
                 if constants.DEBUG_KICKS: print ("\t\tleft 1")
                 return player.goLater('kickBallLeft')
-            else :
-                if constants.DEBUG_KICKS: print ("orbit clear1")
-                return player.goLater('orbitBeforeKick')
         else :
             postBearing = 0.0
             if myLeftPostBearing is not None:
                 postBearing = myLeftPostBearing
             else :
                 postBearing = myRightPostBearing
-            if postBearing > constants.ORBIT_OWN_GOAL_ANGLE_THRESH:
+            if postBearing > 0:
                 return player.goLater('kickBallRight')
-            elif postBearing < -constants.ORBIT_OWN_GOAL_ANGLE_THRESH:
-                return player.goLater('kickBallLeft')
             else :
-                return player.goLater('orbitBeforeKick')
+                return player.goLater('kickBallLeft')
     else:
         # use localization for kick
         my = player.brain.my
-        if 180 - constants.ORBIT_OWN_GOAL_ANGLE_THRESH < abs(my.h):
-            return player.goLater('orbitBeforeKick')
+
         if helpers.inCenterOfField(player):
             if abs(my.h) <= constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter1")
@@ -215,8 +210,6 @@ def shootBallClose(player):
             not player.hasAlignedOnce:
         player.angleToAlign = angleToAlign
         return player.goNow('alignOnBallStraightKick')
-    elif abs(angleToAlign) > constants.ORBIT_OWN_GOAL_HEADING_THRESH:
-        return player.goNow('orbitBeforeKick')
     elif angleToAlign > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallLeft')
     elif angleToAlign < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
@@ -239,8 +232,6 @@ def shootBallFar(player):
             not player.hasAlignedOnce:
         player.angleToAlign = bearingToGoal
         return player.goNow('alignOnBallStraightKick')
-    elif abs(bearingToGoal) > constants.ORBIT_OWN_GOAL_HEADING_THRESH:
-        return player.goNow('orbitBeforeKick')
     elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
         return player.goNow('kickBallLeft')
     elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
@@ -286,8 +277,6 @@ def shootBall(player):
     elif myLeftPostBearing is not None and myRightPostBearing is not None:
 
         avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-        if avgMyGoalBearing < constants.ORBIT_OWN_GOAL_ANGLE_THRESH:
-            return player.goLater('orbitBeforeKick')
         if helpers.inCenterOfField(player):
             if constants.DEBUG_KICKS: print ("\t\tcenterfieldkick")
             if avgMyGoalBearing > 0:

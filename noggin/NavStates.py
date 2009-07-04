@@ -2,6 +2,7 @@
 
 from .util import MyMath
 import NavConstants as constants
+from .players import ChaseBallConstants
 from math import fabs, cos, sin, radians
 
 DEBUG = False
@@ -81,9 +82,13 @@ def walkStraightToPoint(nav):
         return nav.goLater('spinToWalkHeading')
 
     bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
+    distToDest = MyMath.dist(my.x, my.y, nav.destX, nav.destY)
+    if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
+        gain = constants.GOTO_FORWARD_GAIN * MyMath.dist(my.x, my.y,
+                                                         nav.destX, nav.destY)
+    else :
+        gain = 1.0
 
-    gain = constants.GOTO_FORWARD_GAIN * MyMath.dist(my.x, my.y,
-                                             nav.destX, nav.destY)
     sTheta = MyMath.clip(MyMath.sign(bearing) *
                          constants.GOTO_STRAIGHT_SPIN_SPEED *
                          nav.getRotScale(bearing),

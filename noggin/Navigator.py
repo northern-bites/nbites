@@ -78,10 +78,14 @@ class Navigator(FSA.FSA):
             self.destH = 0.0
         elif len(dest) == 3:
             self.destX,self.destY, self.destH = dest
+
         if not self.currentState == 'spinToWalkHeading' and \
                 not self.currentState == 'walkStraightToPoint' and \
                 not self.currentState == 'spinToFinalHeading':
-            self.switchTo('spinToWalkHeading')
+            if not self.atHeadingGoTo(self.destH):
+                self.switchTo('spinToWalkHeading')
+            elif self.atHeadingGoTo(self.destH):
+                self.switchTo('walkStraightToPoint')
 
     def setWalk(self, x, y, theta):
         """
