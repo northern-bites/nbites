@@ -5,6 +5,22 @@ GAINS_ARMS_VALUE = 0.2
 GAINS_OFF_VALUE = -1.0
 LOWER_HEAD_VALUE = 0.8
 
+def flipStiffness( (headYaw, headPitch,
+                    LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll,
+                    LHipYawPitch,
+                    LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll,
+                    RHipYawPitch,
+                    RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll,
+                    RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll) ):
+    return list((headYaw, headPitch,
+                 RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll,
+                 RHipYawPitch,
+                 RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll,
+                 LHipYawPitch,
+                 LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll,
+                 LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll))
+
+
 LOW_HEAD_STIFFNESSES = (LOWER_HEAD_VALUE, # Head
                         LOWER_HEAD_VALUE,
                         GAINS_ARMS_VALUE, # larm

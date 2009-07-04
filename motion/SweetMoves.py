@@ -23,7 +23,7 @@ def mirrorMove(positions):
               (RHipYawPitch, -RHipRoll, RHipPitch, RKneePitch, RAnklePitch, -RAnkleRoll),
               (LHipYawPitch, -LHipRoll, LHipPitch, LKneePitch, LAnklePitch, -LAnkleRoll),
               (LShoulderPitch, -LShoulderRoll, -LElbowYaw, -LElbowRoll),
-              interp_time, interpolation, stiffness))
+              interp_time, interpolation, stiff.flipStiffness(stiffness)))
                   for
         ((LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll),
          (LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll),
