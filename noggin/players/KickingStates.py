@@ -188,7 +188,8 @@ def shootBallClose(player):
                                                  NogginConstants.
                                                  LANDMARK_OPP_GOAL_RIGHT_POST_Y)
     # Am I looking between the posts?
-    if rightPostBearing < 0 < leftPostBearing:
+    if (rightPostBearing < -constants.KICK_STRAIGHT_POST_BEARING and
+        leftPostBearing > constants.KICK_STRAIGHT_POST_BEARING):
         return player.goNow('kickBallStraight')
 
     leftShotPointBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
@@ -261,7 +262,8 @@ def shootBall(player):
     if oppLeftPostBearing is not None and \
             oppRightPostBearing is not None:
 
-        if oppRightPostBearing < 0 < oppLeftPostBearing:
+        if (oppRightPostBearing < -constants.KICK_STRAIGHT_POST_BEARING and
+            oppLeftPostBearing > constants.KICK_STRAIGHT_POST_BEARING):
             player.bigKick = True
             return player.goLater('kickBallStraight')
 
