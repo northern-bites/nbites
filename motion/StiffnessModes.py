@@ -12,7 +12,7 @@ def flipStiffness( (headYaw, headPitch,
                     RHipYawPitch,
                     RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll,
                     RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll) ):
-    return list((headYaw, headPitch,
+    return ((headYaw, headPitch,
                  RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll,
                  RHipYawPitch,
                  RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll,

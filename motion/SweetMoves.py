@@ -18,8 +18,8 @@ CHAIN_MOVE_LENGTH = 5
 #===============================================================================
 
 def mirrorMove(positions):
-    return list(
-        list(((RShoulderPitch, -RShoulderRoll, -RElbowYaw, -RElbowRoll),
+    return tuple(
+        tuple(((RShoulderPitch, -RShoulderRoll, -RElbowYaw, -RElbowRoll),
               (RHipYawPitch, -RHipRoll, RHipPitch, RKneePitch, RAnklePitch, -RAnkleRoll),
               (LHipYawPitch, -LHipRoll, LHipPitch, LKneePitch, LAnklePitch, -LAnkleRoll),
               (LShoulderPitch, -LShoulderRoll, -LElbowYaw, -LElbowRoll),
