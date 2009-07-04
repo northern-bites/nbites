@@ -28,6 +28,11 @@ def scanFindBall(player):
         elif transitions.shouldSpinFindBall(player):
             return player.goLater('spinFindBall')
 
+    if abs(player.brain.ball.locBearing) < constants.SCAN_FIND_BEARING_THRESH \
+            or player.brain.ball.locDist < constants.SCAN_FIND_DIST_THRESH:
+        return player.stay()
+    elif player.firstFrame():
+        return player.goLater('spinFindBall')
     return player.stay()
 
 def spinFindBall(player):
@@ -43,6 +48,9 @@ def spinFindBall(player):
         if transitions.shouldApproachBallWithLoc(player):
             player.brain.tracker.trackBall()
             return player.goLater('approachBallWithLoc')
+        elif transitions.shouldApproachBall(player):
+            player.brain.tracker.trackBall()
+            return player.goLater('approachBall')
         elif transitions.shouldTurnToBall_FoundBall(player):
             return player.goLater('turnToBall')
         elif transitions.shouldWalkToBallLocPos(player):
