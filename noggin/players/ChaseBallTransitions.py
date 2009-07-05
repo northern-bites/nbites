@@ -155,8 +155,8 @@ def shouldChaseAroundBox(player):
                     NogginConstants.MY_GOALBOX_TOP_Y) )
 
 def shouldNotGoInBox(player):
-    return player.ballInMyGoalBox() and \
-        player.brain.ball.locDist < constants.IGNORE_BALL_IN_BOX_DIST
+    return (False and player.ballInMyGoalBox() and \
+                player.brain.ball.locDist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
 
