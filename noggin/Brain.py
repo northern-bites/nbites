@@ -81,7 +81,7 @@ class Brain(object):
         self.ball = TypeDefs.Ball(self.vision.ball)
         self.sonar = TypeDefs.Sonar()
         # workaround for slarti (now trillian) sonar problems
-        if self.CoA.name == 'trillian':
+        if self.CoA.name == 'marvin':
             self.sonar.MIN_DIST = 30.0
 
         # FSAs
