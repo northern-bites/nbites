@@ -81,7 +81,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         # Penalty kick player variables
         self.penaltyKicking = False
-        self.penaltyMadeFirstKick = False
+        self.penaltyMadeFirstKick = True
         self.penaltyMadeSecondKick = False
 
         # Kickoff kick
