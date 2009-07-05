@@ -109,7 +109,10 @@ def shouldDribble(player):
              0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
              0 < abs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
              abs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
-             not inOppGoalbox(player))
+             not inOppGoalbox(player) and
+             player.brain.my.x > (
+            NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
+            NogginConstants.GREEN_PAD_X) )
 
 def shouldStopDribbling(player):
     """
@@ -123,7 +126,9 @@ def shouldStopDribbling(player):
             inOppGoalbox(player) or
             player.brain.ball.relX > constants.STOP_DRIBBLE_X or
             abs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
-            abs(goalBearing) > constants.STOP_DRIBBLE_BEARING)
+            abs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
+            player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
+                                  NogginConstants.GREEN_PAD_X))
 
 
 def inOppGoalbox(player):
