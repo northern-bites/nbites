@@ -342,7 +342,7 @@ def dribble(player):
     Keep running at the ball, but dribble
     """
     if player.firstFrame():
-        player.brain.motion.setGait(RobotGaits.DUCK_GAIT)
+        player.brain.CoA.setRobotDribbleGait(player.brain.motion)
 
     # if we should stop dribbling, see what else we should do
     if transitions.shouldStopDribbling(player):

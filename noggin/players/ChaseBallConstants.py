@@ -6,7 +6,7 @@ MAX_SPIN_SPEED = speeds.MAX_SPIN_SPEED
 
 # Component Switches
 USE_LOC_CHASE = True
-USE_DRIBBLE = False
+USE_DRIBBLE = True
 
 # Transitions' Constants
 # Ball on and off frame thresholds
