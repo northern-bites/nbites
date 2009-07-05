@@ -141,15 +141,15 @@ def clearBall(player):
                 return player.goLater('kickBallStraight')
             elif my.h < -constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter2")
-                return player.goLater('kickBallLeftShort')
+                return player.goLater('kickBallLeft')
             elif my.h > constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter3")
-                return player.goLater('kickBallRightShort')
+                return player.goLater('kickBallRight')
 
         elif helpers.inTopOfField(player):
             if constants.FACING_SIDELINE_ANGLE < my.h:
                 if constants.DEBUG_KICKS: print ("\t\ttop1")
-                return player.goLater('kickBallRightShort')
+                return player.goLater('kickBallRight')
             elif my.h < -90:
                 if constants.DEBUG_KICKS: print ("\t\ttop3")
                 return player.goLater('kickBallLeft')
@@ -161,7 +161,7 @@ def clearBall(player):
         elif helpers.inBottomOfField(player):
             if -constants.FACING_SIDELINE_ANGLE > my.h:
                 if constants.DEBUG_KICKS: print ("\t\tbottom1")
-                return player.goLater('kickBallLeftShort')
+                return player.goLater('kickBallLeft')
             elif my.h > 90:
                 if constants.DEBUG_KICKS: print ("\t\tbottom3")
                 return player.goLater('kickBallRight')
@@ -341,6 +341,7 @@ def penaltyKickBall(player):
 
         player.angleToAlign = ballBearingToGoal - player.brain.my.h
         if player.angleToAlign < constants.ALIGN_FOR_KICK_MIN_ANGLE:
+            player.bigKick = True
             return player.goLater('kickBallStraight')
         else :
             return player.goLater('alignOnBallStraightKick')

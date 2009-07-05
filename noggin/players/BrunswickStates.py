@@ -65,6 +65,7 @@ def gameReady(player):
 
     if player.squatting:
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+        player.squatting = False
     else:
         player.standup()
 
