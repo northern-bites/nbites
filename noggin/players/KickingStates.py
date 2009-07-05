@@ -19,6 +19,7 @@ def getKickInfo(player):
     Decides which kick to use
     """
     player.inKickingState = True
+
     if player.firstFrame():
         player.brain.tracker.switchTo('stopped')
         player.brain.motion.stopHeadMoves()
@@ -140,15 +141,15 @@ def clearBall(player):
                 return player.goLater('kickBallStraight')
             elif my.h < -constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter2")
-                return player.goLater('kickBallLeft')
+                return player.goLater('kickBallLeftShort')
             elif my.h > constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter3")
-                return player.goLater('kickBallRight')
+                return player.goLater('kickBallRightShort')
 
         elif helpers.inTopOfField(player):
             if constants.FACING_SIDELINE_ANGLE < my.h:
                 if constants.DEBUG_KICKS: print ("\t\ttop1")
-                return player.goLater('kickBallRight')
+                return player.goLater('kickBallRightShort')
             elif my.h < -90:
                 if constants.DEBUG_KICKS: print ("\t\ttop3")
                 return player.goLater('kickBallLeft')
@@ -160,7 +161,7 @@ def clearBall(player):
         elif helpers.inBottomOfField(player):
             if -constants.FACING_SIDELINE_ANGLE > my.h:
                 if constants.DEBUG_KICKS: print ("\t\tbottom1")
-                return player.goLater('kickBallLeft')
+                return player.goLater('kickBallLeftShort')
             elif my.h > 90:
                 if constants.DEBUG_KICKS: print ("\t\tbottom3")
                 return player.goLater('kickBallRight')
@@ -439,6 +440,14 @@ def kickBallRight(player):
     player.chosenKick = SweetMoves.LEFT_SIDE_KICK
     return player.goNow('sideStepForSideKick')
 
+def kickBallRightShort(player):
+    player.chosenKick = SweetMoves.SHORT_LEFT_SIDE_KICK
+    return player.goNow('sideStepForSideKick')
+
+def kickBallLeftShort(player):
+    player.chosenKick = SweetMoves.SHORT_RIGHT_SIDE_KICK
+    return player.goNow('sideStepForSideKick')
+
 def sideStepForSideKick(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -654,7 +663,6 @@ def kickAtPosition(player):
             return player.goLater('atPosition')
 
     return player.stay()
-
 
 class KickDecider:
     """
