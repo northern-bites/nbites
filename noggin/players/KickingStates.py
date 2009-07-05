@@ -609,8 +609,6 @@ def afterKick(player):
     """
     tracker = player.brain.tracker
     chosenKick = player.chosenKick
-    player.inKickingState = False
-
 
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
@@ -628,9 +626,11 @@ def afterKick(player):
 
     if player.chosenKick == SweetMoves.LEFT_SIDE_KICK or \
             player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+        player.inKickingState = False
         return player.goLater('spinFindBall')
 
     if not player.brain.motion.isHeadActive():
+        player.inKickingState = False
         return player.goLater('scanFindBall')
     return player.stay()
 

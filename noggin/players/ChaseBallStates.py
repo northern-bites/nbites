@@ -18,10 +18,11 @@ def chase(player):
     Method to determine which chase state should be used.
     We dump the robot into this state when we our switching from something else.
     """
+    player.isChasing = True
     player.hasAlignedOnce = False
     if player.brain.playbook.role == pbc.GOALIE:
         if transitions.shouldScanFindBall(player):
-            return player.goNow('goalieScanFindBall')
+            return player.goNow('scanFindBall')
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
         elif transitions.shouldKick(player):
@@ -29,7 +30,7 @@ def chase(player):
         elif transitions.shouldTurnToBall_ApproachBall(player):
             return player.goNow('turnToBall')
         else:
-            return player.goNow('goalieScanFindBall')
+            return player.goNow('scanFindBall')
 
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
@@ -100,7 +101,7 @@ def turnToBall(player):
         elif transitions.shouldApproachBall(player):
             return player.goLater('approachBall')
         elif transitions.shouldScanFindBall(player):
-            return player.goLater('goalieScanFindBall')
+            return player.goLater('scanFindBall')
     else:
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
@@ -225,7 +226,7 @@ def approachBall(player):
             return player.goLater('turnToBall')
         elif not player.brain.tracker.activeLocOn and \
                 transitions.shouldScanFindBall(player):
-            return player.goLater('goalieScanFindBall')
+            return player.goLater('scanFindBall')
     else:
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
@@ -515,11 +516,11 @@ def approachDangerousBall(player):
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
     if transitions.shouldScanFindBall(player):
-        return player.goLater('goalieScanFindBall')
+        return player.goLater('scanFindBall')
     elif transitions.shouldTurnToBall_ApproachBall(player):
         return player.goLater('turnToBall')
     elif transitions.shouldSpinFindBall(player):
-        return player.goLater('goalieSpinFindBall')
+        return player.goLater('spinFindBall')
 
     return player.stay()
 
