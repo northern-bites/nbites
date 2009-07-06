@@ -224,11 +224,20 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     const float startStopSensorScale = getEndStepSensorScale();
 
 
-	const float COM_Z_OFF = 69.9f;
-
+	//Center of mass control
+#ifdef USE_COM_CONTROL
+	const float COM_SCALE = startStopSensorScale;
     const ufvector4 com_c = Kinematics::getCOMc(sensors->getMotionBodyAngles());
+#else
+	const float COM_SCALE = startStopSensorScale;
+    const ufvector4 com_c = CoordFrame4D::vector4D(0,0,0);
+#endif
 
-
+	//HACK -- the startStopSensor gives us a nice in/out scaling from motion
+	//we should really rename that function
+	const float COM_Z_OFF = 69.9f;
+	ufvector3 comFootGoal = footGoal;
+	comFootGoal(2) += COM_Z_OFF*COM_SCALE;
 
     const boost::tuple <const float, const float > sensorCompensation =
         sensorAngles->getAngles(startStopSensorScale);
@@ -253,14 +262,12 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
                                                              footAngleY,
                                                              footAngleZ);
 
-	ufvector3 comFootGoal = footGoal;
-	comFootGoal(2) += COM_Z_OFF*startStopSensorScale;
-	//HACK -- the startStopSensor gives us a nice in/out scaling from motion
-	//we should really rename that function
+
+
     const ufvector3 bodyGoal =
-		CoordFrame3D::vector3D( -com_c(0)*startStopSensorScale,
-								-com_c(1)*startStopSensorScale,
-								COM_Z_OFF*startStopSensorScale);
+		CoordFrame3D::vector3D( -com_c(0)*COM_SCALE,
+								-com_c(1)*COM_SCALE,
+								COM_Z_OFF*COM_SCALE);
 
 
     IKLegResult result =
