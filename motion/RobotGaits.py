@@ -315,8 +315,8 @@ FAST_STANCE = (31.00, # CoM height
 FAST_STEP = (0.5, # step duration
             0.2,  # fraction in double support
             1.5,  # stepHeight
-            -3.0,  # step lift
-            20.0,  # max x speed
+            -5.0,  # step lift
+            15.0,  # max x speed
             -5.0,  # max x speed
             15.0,  # max y speed
             45.0, # max theta speed()
@@ -327,9 +327,9 @@ FAST_STEP = (0.5, # step duration
 
 FAST_ZMP = (0.0,  # footCenterLocX
            0.3,  # zmp static percentage
-           0.5,  # left zmp off
-           0.5,  # right zmp off
-           0.01,  # strafe zmp offse
+           0.45,  # left zmp off
+           0.45,  # right zmp off
+            0.01,  # strafe zmp offse
            6.6)   # turn zmp offset
 
 
@@ -369,8 +369,8 @@ FAST_GAIT = motion.GaitCommand(FAST_STANCE,
 CUR_GAIT = FAST_GAIT
 MARVIN_CUR_GAIT = FAST_GAIT
 
-CUR_SLOW_GAIT = NEW_GAIT
-MARVIN_CUR_SLOW_GAIT = MARVIN_NEW_GAIT
+CUR_SLOW_GAIT = FAST_GAIT
+MARVIN_CUR_SLOW_GAIT = FAST_GAIT
 
 TRILLIAN_GAIT = CUR_GAIT
 ZAPHOD_GAIT   = CUR_GAIT
