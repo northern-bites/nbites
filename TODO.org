@@ -1,0 +1,125 @@
+* CURRENT BUGS & ISSUES
+
+** Motion
+
+*** TODO Gait switching interface
+    Needs to be moved into more sensible location in Python and its interface needs to be rethought. How we do it now is unsustainable and bug-inviting. Possible gait FSA?
+
+*** TODO Goalie issues
+
+**** TODO Correct switching from squatting to squatted
+
+**** TODO Correctly use spin find ball and chasing.
+
+** Vision
+
+** Localization
+
+** Behaviors
+
+*** TODO Fix stopping during approachBall, should never setSpeed(0,0,0) during approach or goTo
+
+** Misc.
+
+*** TODO Comment code
+    Tucker: Localization, comm
+    Joho: Motion
+    Chown: Vision?
+*** TODO Get more people. duh.
+
+* NEW FEATURES
+
+** Motion
+
+*** Walking
+
+**** TODO Better Webots gait
+
+**** TODO Faster stopping
+
+**** TODO Movable steps
+
+**** TODO ZMP recalculated after each frame depending on new steps
+
+**** TODO Walking interface to Python to move a certain distance & angle
+
+**** TODO Fix/Dehack how walk engine does turning steps
+
+**** TODO Make hip offsets variable, so we can widen stance of robot
+
+*** Kicking
+
+**** TODO [#B] Kick engine
+     Needs adjustable resultant distances and angles. Dynamic depending on ball placement.
+     Inverse kinematics plus COM-Control.
+
+*** Head
+**** TODO Look-To RelX, RelY in the HeadProvider
+
+*** Misc motion
+
+**** TODO Rapid spinning
+
+** Vision
+*** TODO Opponent recognition (also with sonar)
+*** TODO Open goal detection
+*** TODO Improve lines
+
+** Localization
+
+*** TODO Improve Kalman filter
+**** Investigate using unscented or multi-modal filter
+**** TODO Improve handling of unexpected observations
+     Could turn it off or use a counter for when to use observations again.
+**** TODO Move from boost/UBLAS to the Eigen matrix library.
+*** TODO Do ball covariance differently
+*** TODO Investigate sensor based odometry
+*** TODO Topological localization
+*** TODO Teammate localization
+*** TODO Opponent localization
+
+** Behaviors
+
+*** TODO [#A] Replace hand coded kick decision with computational best kick choice.
+
+*** TODO [#A] Python kick objects.
+    Objects store kick characteristics like distance, angle, and total move time.
+*** TODO [#A] Kick objectives define high level desired ball placement.
+    E.g. "in their goal", "opponent side of the field", "in front of my teammate"
+*** TODO [#A] Improve positioning on ball before kick.
+    Choose kick before stopping, then position accordingly.
+*** TODO [#B] Better shot aiming
+    First, aim where they're likely to not be. Then, add in shot detection.
+
+*** TODO Goalie positioning
+
+*** TODO Goalie saves (that do not harm the robot, preferably)
+    e.g. kick leg out when ball is close enough, or at least a gentle dive.
+
+*** TODO Fall protection, a la NuBots.
+    Keep detection in C++, but increase its robustness and add Python mid-fall response.
+
+*** TODO Smarter and faster panning, ball searching
+    Don't look of the field, face the field
+
+*** TODO Re-implement Aibo role selection as per NBites paper on subject
+
+*** TODO Work out 3 robot deployment strategy
+
+*** TODO Passing
+
+** Tools
+
+*** TOOL
+
+**** TODO Classifier.
+
+*** Trac
+
+**** TODO Use tickets more to manage team workflow
+
+*** Other
+
+**** Burst tools
+     Check out the burst tools and adapt them to our needs. Possibly write integrate into
+     TOOL.
