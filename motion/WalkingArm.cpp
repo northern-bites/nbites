@@ -30,7 +30,8 @@ ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
                                              &RARM_WALK_ANGLES[ARM_JOINTS]));
 
     armJoints[0] += getShoulderPitchAddition(supportStep);
-    const vector<float> armStiffnesses(ARM_JOINTS,gait->stiffness[WP::ARM]);
+    vector<float> armStiffnesses(ARM_JOINTS,gait->stiffness[WP::ARM]);
+	armStiffnesses[0] = gait->stiffness[WP::ARM_PITCH];
 
     frameCounter++;
     for(unsigned int  i = 0; shouldSwitchStates() && i < 2; i++){
