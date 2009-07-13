@@ -117,7 +117,6 @@ public:
 
     // post recognition routines
     int crossCheck(blob b);
-    int crossCheck2(blob b);
     int scanOut(int stopp, int spanX, int c);
     int checkOther(int left, int right, int height, int horizon);
     int characterizeSize(blob b);
@@ -207,7 +206,7 @@ private:
     int indexOfBiggestRun;
     run* runs;
 
-    blob topBlob, secondBlob, crossBlob;
+    blob topBlob;
     int numBlobs;
     blob checker, obj, pole, leftBox, rightBox;
     stop scan, scan1, scan2;

@@ -181,7 +181,7 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
 
 
 /* Initialize the data structure.
- * @param s     the slope corresponding to the dog's head tilt
+ * @param s     the slope corresponding to the robot's head tilt
  */
 void ObjectFragments::init(float s)
 {
@@ -200,22 +200,6 @@ void ObjectFragments::init(float s)
     zeroBlob.leftBottom.y = 0;
     zeroBlob.rightBottom.x = 0;
     zeroBlob.rightBottom.y = 0;
-    secondBlob.rightTop.y = 0;
-    secondBlob.rightTop.x = 0;
-    secondBlob.leftTop.x = BADVALUE;
-    secondBlob.leftTop.y = BADVALUE;
-    secondBlob.leftBottom.x = 0;
-    secondBlob.leftBottom.y = 0;
-    secondBlob.rightBottom.x = 0;
-    secondBlob.rightBottom.y = 0;
-    crossBlob.rightTop.y = 0;
-    crossBlob.rightTop.x = 0;
-    crossBlob.leftTop.x = BADVALUE;
-    crossBlob.leftTop.y = BADVALUE;
-    crossBlob.leftBottom.x = 0;
-    crossBlob.leftBottom.y = 0;
-    crossBlob.rightBottom.x = 0;
-    crossBlob.rightBottom.y = 0;
     checker.rightTop.y = 0;
     checker.rightTop.x = 0;
     checker.leftTop.x = BADVALUE;
@@ -424,7 +408,6 @@ void ObjectFragments::blobIt(int x, int y, int h)
  * are occluded (e.g. by a dog).
  * It may not be necessary though.  After this call the data structure "topBlob"
  * will have the top blob.
- * Additionally, the blob "secondBlob" will have the second biggest blob.
  * @param maxY     max value (ignored)
 */
 void ObjectFragments::getTopAndMerge(int maxY)
@@ -448,13 +431,6 @@ void ObjectFragments::getTopAndMerge(int maxY)
 	// so we make sure it won't get the same one over and over
 	blobs[topSpot].area = 0;
     size = 0;
-    for (int i = 0; i < numBlobs; i++) {
-        if (blobs[i].area > size && i != topSpot) {
-            size = blobs[i].area;
-            secondBlob = blobs[i];
-        }
-        //drawBlob(blobs[i], BLACK);
-    }
 }
 
 /*
@@ -920,7 +896,7 @@ void ObjectFragments::getRobots(int maxY)
         }
     }
     size = 0;
-    for (int i = 0; i < numBlobs; i++) {
+    /*for (int i = 0; i < numBlobs; i++) {
         int spread = blobWidth(blobs[i]);
         if (blobs[i].leftTop.x != BADVALUE && blobs[i].leftTop.y < maxY
             && spread > spreadSeparation) {
@@ -931,7 +907,7 @@ void ObjectFragments::getRobots(int maxY)
             secondBlob = blobs[i];
         }
         //drawBlob(blobs[i], BLACK);
-    }
+		}*/
 }
 
 /* Is a robot head centered on its blob?
@@ -1127,10 +1103,10 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
 
 bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
 {
-    const int diffMin = 30;
+    const int DIFFMIN = 30;  // the difference that constitutes an edge
 
     int ydiff = abs(thresh->getY(x, y) - thresh->getY(x2, y2));
-    if (ydiff > diffMin) {
+    if (ydiff > DIFFMIN) {
         return true;
     }
     return false;
@@ -1149,7 +1125,7 @@ bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
 int ObjectFragments::findTrueLineVertical(point <int> top, point <int> bottom,
                                           int c, int c2, bool left)
 {
-    const int countSpanDiv = 3;
+    const int POST_DIVISOR = 3;
 
     int spanY = bottom.y - top.y;
     int count = 0;
@@ -1159,11 +1135,11 @@ int ObjectFragments::findTrueLineVertical(point <int> top, point <int> bottom,
     if (left)
         dir = -1;
     // go until you hit enough bad pixels or some strong reason to stop
-    for (j = 1; count < spanY / countSpanDiv && top.x + dir * j >= 0
+    for (j = 1; count < spanY / POST_DIVISOR && top.x + dir * j >= 0
              && top.x + dir * j < IMAGE_WIDTH && good > spanY / 2 ; j++) {
         count = 0;
         good = 0;
-        for (int i = top.y; count < spanY / countSpanDiv && i <= bottom.y; i++) {
+        for (int i = top.y; count < spanY / POST_DIVISOR && i <= bottom.y; i++) {
             int _spot = top.x + dir * j;
             /*if (checkEdge(spot, i, _spot - dir, i)) {
               count++;
@@ -1193,10 +1169,10 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
                                                  point <int>& bottom,
                                                  int c, int c2, bool left)
 {
-    const int countSpanDiv = 3;
-	const int runX = 5;
-	const int initMin = 5;
-	const int imageDiff = 3;
+    const int POST_DIVISOR = 3;
+	const int MIN_WIDTH = 5;
+	const int INITIAL_MIN = 5;
+	const int IMAGE_DIFFERENCE = 3;
 
     int increment = 1;
     int spanY = bottom.y - top.y + 1;
@@ -1211,8 +1187,8 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
     int initRun = 0;
     if (left)
         dir = -1;
-    int minCount = (spanY / countSpanDiv) / increment;
-    int minRun = min(spanY, max(runX, spanY / 2));
+    int minCount = (spanY / POST_DIVISOR) / increment;
+    int minRun = min(spanY, max(MIN_WIDTH, spanY / 2));
     int minGood = max(1, (spanY / 2) / increment);
     int badLines = 0;
     int i = 0;
@@ -1263,7 +1239,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
                     goodRun = 0;
                     if (initRun > -1) {
                         initRun++;
-                        if (atTop && initRun > initMin) break;
+                        if (atTop && initRun > INITIAL_MIN) break;
                         // cout << "Init run " << initRun << " " << top.y << " "
                         //      << minRun << endl;
                     }
@@ -1293,7 +1269,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
     bottom.y = top.y + spanY;
     bottom.x = xProject(top.x, top.y, top.y + spanY);
     //cout << "Checking " << top.x << " " << top.y << endl;
-    if (top.x < 2 || top.x > IMAGE_WIDTH - imageDiff) {
+    if (top.x < 2 || top.x > IMAGE_WIDTH - IMAGE_DIFFERENCE) {
         //cout << "In upward scan" << endl;
         for (j = 1; count < minCount && bottom.x + dir * j >= 0
                  && bottom.x + dir * j < IMAGE_WIDTH
@@ -1351,12 +1327,12 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
                                                    point <int>& right, int c,
                                                    int c2, bool up)
 {
-    const int greenInit = 3;
-    const int runX = 5;
-	const int runDiv = 5;
-	const int countDiv = 3;
-	const int goodDiv = 3;
-	const float spanMult = 0.5;
+    const int INITIAL_GREEN = 3;
+    const int MIN_WIDTH = 5;
+	const int RUN_DIVISOR = 5;
+	const int COUNT_DIVISOR = 3;
+	const int GOOD_DIVISOR = 3;
+	const float SPAN_MULTIPLIER = 0.5;
 
     int spanX = right.x - left.x + 1;
     int spanY = right.y - left.y + 1;
@@ -1367,14 +1343,14 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
     int theSpot = 0;
     int run = 0;
     int badLines = 0;
-    int maxgreen = greenInit;
+    int maxgreen = INITIAL_GREEN;
 // EXAMINED: change to lower res
     maxgreen = 100;
     if (up)
         dir = -1;
-    int minRun = min(spanX, max(runX, spanX / runDiv));
-    int minCount = min(spanX, max(2, spanX / countDiv));
-    int minGood = max(1, spanX / goodDiv);
+    int minRun = min(spanX, max(MIN_WIDTH, spanX / RUN_DIVISOR));
+    int minCount = min(spanX, max(2, spanX / COUNT_DIVISOR));
+    int minGood = max(1, spanX / GOOD_DIVISOR);
     int greens = 0;
     int fakegood = 0;
 
@@ -1451,7 +1427,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
                     good++;
                 }
             }
-            if (good > spanX * spanMult) {
+            if (good > spanX * SPAN_MULTIPLIER) {
                 found = d;
             }
         }
@@ -1482,7 +1458,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
 int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
                                             int c, int c2, bool up)
 {
-    const int spanDiv = 3;
+    const int WIDTH_DIVISOR = 3;
 
     int spanX = right.x - left.x + 1;
     int count = 0;
@@ -1491,11 +1467,11 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
     int dir = 1;
     if (up)
         dir = -1;
-    for (j = 1; count < spanX / spanDiv && left.y + dir * j >= 0
+    for (j = 1; count < spanX / WIDTH_DIVISOR && left.y + dir * j >= 0
              && left.y + dir * j < IMAGE_HEIGHT && good > spanX / 2; j++) {
         count = 0;
         good = 0;
-        for (int i = left.x; count < spanX / spanDiv && i <= right.x; i++) {
+        for (int i = left.x; count < spanX / WIDTH_DIVISOR && i <= right.x; i++) {
             int theSpot = left.y + dir * j;
             if (checkEdge(i, theSpot, i, theSpot - dir)) {
                 count++;
@@ -1519,13 +1495,11 @@ int ObjectFragments::findTrueLineHorizontal(point <int> left, point <int> right,
 
 float ObjectFragments::correct(blob b, int color, int c2) {
 
-	const int maxParam = 10;
-	const int hDiv = 5;
-	const int scanParam = 6;
-	const int bigMin = 5;
-	const int skewrMin = 5;
-	const int bigMin2 = 5;
-	const int skewlMin = 5;
+	const int MIN_SIZE = 10;
+	const int HEIGHT_DIVISOR = 5;
+	const int ERROR_TOLERANCE = 6;
+	const int LEAN_THRESH = 5;
+	const int MINIMUM_SKEW = 5;
 
     // try and find the cross bar - start at the upper left corner
     int biggest = 0, biggest2 = 0;
@@ -1535,15 +1509,15 @@ float ObjectFragments::correct(blob b, int color, int c2) {
     int h = blobHeight(b);
     int w = blobWidth(b);
     //int need = min(w / 2, 20);
-    int need = max(w, maxParam);
+    int need = max(w, MIN_SIZE);
 	float newSlope = 0.0f;
 	if (CORRECT) {
 		//drawBlob(b, ORANGE);
 	}
 	// scan the left side to see how far out we can go seeing post
-    for (int i = 0; i < h / hDiv && biggest < need; i+=1) {
+    for (int i = 0; i < h / HEIGHT_DIVISOR && biggest < need; i+=1) {
         int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, -1, scanParam, color, color, max(0, x - 2 * w),
+        horizontalScan(tx, y + i, -1, ERROR_TOLERANCE, color, color, max(0, x - 2 * w),
                        IMAGE_WIDTH - 1);
         if (scan.good > biggest) {
             biggest = scan.good;
@@ -1552,9 +1526,9 @@ float ObjectFragments::correct(blob b, int color, int c2) {
 	// now the right side
     x = b.rightTop.x;
     y = b.rightTop.y;
-    for (int i = 0; i < h / hDiv && biggest2 < need; i+=1) {
+    for (int i = 0; i < h / HEIGHT_DIVISOR && biggest2 < need; i+=1) {
         int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, 1, scanParam, color, color, x - 1, IMAGE_WIDTH - 1);
+        horizontalScan(tx, y + i, 1, ERROR_TOLERANCE, color, color, x - 1, IMAGE_WIDTH - 1);
         if (scan.good > biggest2) {
             biggest2 = scan.good;
         }
@@ -1564,9 +1538,9 @@ float ObjectFragments::correct(blob b, int color, int c2) {
 	x = b.rightBottom.x;
 	y = b.rightBottom.y;
 	int bestr = 0, bestl = 0;
-    for (int i = 0; i < h / hDiv && skewr < biggest; i+=1) {
+    for (int i = 0; i < h / HEIGHT_DIVISOR && skewr < biggest; i+=1) {
         int tx = xProject(x, y, y - i);
-        horizontalScan(tx, y - i, 1, scanParam, color, color, x - 1, IMAGE_WIDTH - 1);
+        horizontalScan(tx, y - i, 1, ERROR_TOLERANCE, color, color, x - 1, IMAGE_WIDTH - 1);
         if (scan.good > skewr) {
             skewr = scan.good;
 			bestr = i;
@@ -1574,9 +1548,9 @@ float ObjectFragments::correct(blob b, int color, int c2) {
     }
 	x = b.leftBottom.x;
 	y = b.leftBottom.y;
-    for (int i = 0; i < h / hDiv && skewl < biggest2; i+=1) {
+    for (int i = 0; i < h / HEIGHT_DIVISOR && skewl < biggest2; i+=1) {
         int tx = xProject(x, y, y - i);
-        horizontalScan(tx, y - i, -1, scanParam, color, color, max(0, x - 2 * w),
+        horizontalScan(tx, y - i, -1, ERROR_TOLERANCE, color, color, max(0, x - 2 * w),
                        IMAGE_WIDTH - 1);
         if (scan.good > skewl) {
 			bestl = i;
@@ -1585,7 +1559,7 @@ float ObjectFragments::correct(blob b, int color, int c2) {
     }
 
 	int stops = 10;
-	if (biggest > bigMin && skewr > skewrMin) {
+	if (biggest > LEAN_THRESH && skewr > MINIMUM_SKEW) {
 		if (CORRECT)
 			cout << "Left lean detected " << biggest << " " << skewr << " " << bestr << endl;
 		int topmove = min(skewr, biggest);
@@ -1599,7 +1573,7 @@ float ObjectFragments::correct(blob b, int color, int c2) {
 		int stopper = max(stops, bestr);
 		for (int i = 0; i < stopper; i+=1) {
 			int tx = xProject(x, y, y - i);
-			horizontalScan(tx, y - i, -1, scanParam, color, color, max(0, x - 2 * w),
+			horizontalScan(tx, y - i, -1, ERROR_TOLERANCE, color, color, max(0, x - 2 * w),
 						   IMAGE_WIDTH - 1);
 			if (scan.good > backr) {
 				backr = scan.good;
@@ -1610,7 +1584,7 @@ float ObjectFragments::correct(blob b, int color, int c2) {
 		newSlope = -(float)(b.leftBottom.x - b.leftTop.x) / (float)(b.leftBottom.y - b.leftTop.y);
 		return newSlope;
 	}
-	if (biggest2 > bigMin2 && skewl > skewlMin) {
+	if (biggest2 > LEAN_THRESH && skewl > MINIMUM_SKEW) {
 		if (CORRECT)
 			cout << "Right lean detected " << biggest2 << " " << skewl << " " << bestl << endl;
 		int topmove = min(skewl, biggest2);
@@ -1622,7 +1596,7 @@ float ObjectFragments::correct(blob b, int color, int c2) {
 		int stopper = max(stops, bestl);
 		for (int i = 0; i < stopper; i+=1) {
 			int tx = xProject(x, y, y - i);
-			horizontalScan(tx, y - i, 1, scanParam, color, color, 0, IMAGE_WIDTH - 1);
+			horizontalScan(tx, y - i, 1, ERROR_TOLERANCE, color, color, 0, IMAGE_WIDTH - 1);
 			if (scan.good > backl) {
 				backl = scan.good;
 			}
@@ -1647,7 +1621,7 @@ float ObjectFragments::correct(blob b, int color, int c2) {
  */
 void ObjectFragments::squareGoal(int x, int y, int c, int c2)
 {
-    const int scanVal = 3;
+    const int ERROR_TOLERANCE = 3;
 
     // so we can check for failure
 	int count = 0;
@@ -1655,13 +1629,13 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2)
     obj.leftTop.x = BADVALUE; obj.leftTop.y = BADVALUE;
 	do {
 		// first we try going up
-		vertScan(x, y, -1,  scanVal, c, c2);
+		vertScan(x, y, -1,  ERROR_TOLERANCE, c, c2);
 		int h = scan.good;
 		// at this point we have a very rough idea of how tall the square is
 		int top = scan.y;
 		int topx = scan.x;
 		// now go down
-		vertScan(x, y, 1,  scanVal, c, c2);
+		vertScan(x, y, 1,  ERROR_TOLERANCE, c, c2);
 		h += scan.good;
 		if (h < 2) return;
 		int bottom = scan.y;
@@ -1986,7 +1960,7 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, blob two,
 distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
                                              int bottom)
 {
-    const int scanParam = 6;
+    const int ERROR_TOLERANCE = 6;
 
     distanceCertainty dc = BOTH_SURE;
     int nextX, nextY;
@@ -2005,7 +1979,7 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
     nextX = pole.leftBottom.x;
     nextY = pole.leftBottom.y;
     do {
-        vertScan(nextX, nextY, 1,  scanParam, GREEN, GREEN);
+        vertScan(nextX, nextY, 1,  ERROR_TOLERANCE, GREEN, GREEN);
         nextX = nextX + 2;
         nextY = yProject(pole.leftBottom, nextX);
     } while (nextX <= pole.rightBottom.x && scan.good < 2);
@@ -2032,10 +2006,10 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
  */
 int ObjectFragments::crossCheck(blob b)
 {
-    const int needParam = 10;
-	const int hDiv = 5;
-	const int horzScanParam = 6;
-	const int drawParam = 20;
+    const int MINIMUM_WIDTH = 10;
+	const int HEIGHT_DIVISOR = 5;
+	const int ERROR_TOLERANCE = 6;
+	const int DEBUG_DRAW_SIZE = 20;
 	const int DISTANTPOST = 10;
 
     // try and find the cross bar - start at the upper left corner
@@ -2046,7 +2020,7 @@ int ObjectFragments::crossCheck(blob b)
     int h = blobHeight(b);
     int w = blobWidth(b);
     //int need = min(w / 2, 20);
-    int need = max(w, needParam);
+    int need = max(w, MINIMUM_WIDTH);
 
 	// don't try and look for the crossbar when the post is at the top
 	// unless it is small
@@ -2055,9 +2029,9 @@ int ObjectFragments::crossCheck(blob b)
 	}
 
 	// scan the left side to see how far out we can go seeing post
-    for (int i = 0; i < h / hDiv && biggest < need; i+=1) {
+    for (int i = 0; i < h / HEIGHT_DIVISOR && biggest < need; i+=1) {
         int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, -1, horzScanParam, color, color, max(0, x - 2 * w),
+        horizontalScan(tx, y + i, -1, ERROR_TOLERANCE, color, color, max(0, x - 2 * w),
                        IMAGE_WIDTH - 1);
         if (scan.good > biggest) {
             biggest = scan.good;
@@ -2067,9 +2041,9 @@ int ObjectFragments::crossCheck(blob b)
     x = b.rightTop.x;
     y = b.rightTop.y;
 
-    for (int i = 0; i < h / hDiv && biggest2 < need; i+=1) {
+    for (int i = 0; i < h / HEIGHT_DIVISOR && biggest2 < need; i+=1) {
         int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, 1, horzScanParam, color, color, x - 1, IMAGE_WIDTH - 1);
+        horizontalScan(tx, y + i, 1, ERROR_TOLERANCE, color, color, x - 1, IMAGE_WIDTH - 1);
         if (scan.good > biggest2) {
             biggest2 = scan.good;
         }
@@ -2078,9 +2052,9 @@ int ObjectFragments::crossCheck(blob b)
     if (POSTLOGIC) {
         cout << "Cross check " << biggest << " " << biggest2 << endl;
 		if (biggest > need)
-			drawRect(b.leftTop.x - biggest, b.leftTop.y, biggest, drawParam, ORANGE);
+			drawRect(b.leftTop.x - biggest, b.leftTop.y, biggest, DEBUG_DRAW_SIZE, ORANGE);
 		if (biggest2 > need)
-			drawRect(x, y, biggest2, drawParam, ORANGE);
+			drawRect(x, y, biggest2, DEBUG_DRAW_SIZE, ORANGE);
     }
 
 	if (biggest > need && biggest > 2 * biggest2) return RIGHT;
@@ -2090,45 +2064,6 @@ int ObjectFragments::crossCheck(blob b)
 }
 
 
-int ObjectFragments::crossCheck2(blob b) {
-    // try and find the cross bar - start at the upper left corner
-    //int biggest = 0, biggest2 = 0;
-    int x = b.leftTop.x;
-    int y = b.leftTop.y;
-    int h = b.leftBottom.y - b.leftTop.y;
-    //int w = b.rightTop.x - b.leftTop.x;
-    // EXAMINED: look at constants 50 and 10
-    const int numLiesMin = 25;
-    const int numLiesFactorMin = 5;
-	
-	const int buff = 10;
-	const int ypAdd = 10;
-	
-    int lefties = 0, righties = 0;
-    for (int i = x - buff; i > max(0, x - h); i-=1) {
-        int yp = yProject(x, y, i);
-        for (int j = max(0, yp); j < yp + ypAdd; j++) {
-            if (thresh->thresholded[j][i] == color) {
-                lefties++;
-            }
-        }
-    }
-    for (int i = b.rightTop.x + buff; i < min(IMAGE_WIDTH - 1, b.rightTop.x + h);
-         i+=1) {
-        int yp = yProject(b.rightTop.x, b.rightTop.y, i);
-        for (int j = max(0, yp); j < yp + ypAdd; j++) {
-            if (thresh->thresholded[j][i] == color) {
-                righties++;
-            }
-        }
-    }
-    if (righties > numLiesMin && righties > numLiesFactorMin * lefties)
-        return LEFT;
-    if (lefties > numLiesMin && lefties > numLiesFactorMin * righties)
-        return RIGHT;
-    return NOPOST;
-}
-
 /* Try to use field line information to decide which post we're looking at.
    This is actually considerably easier with the large goal boxes as the only
    times you'll see corners reasonably near a post is when they are on the
@@ -2137,10 +2072,10 @@ int ObjectFragments::crossCheck2(blob b) {
 
 int ObjectFragments::checkIntersection(blob post) {
 
-	const int postBuff = 30;
+	const int MAXIMUM_Y_DIFF = 30;
 
     // TODO: check if this should be the same standard minHeight for a post
-    if (post.rightBottom.y - post.rightTop.y < postBuff) return NOPOST;
+    if (post.rightBottom.y - post.rightTop.y < MAXIMUM_Y_DIFF) return NOPOST;
     const list <VisualCorner>* corners = vision->fieldLines->getCorners();
     int spanx = blobWidth(post);
     int spany = blobHeight(post);
@@ -2191,10 +2126,10 @@ int ObjectFragments::checkIntersection(blob post) {
 
 int ObjectFragments::checkCorners(blob post)
 {
-    const int postDiffMin = 30;
-	const int postBuff = 5;
+    const int MAXIMUM_Y_DIFFERENCE = 30;  // max offset in Y between corner and post
+	const int X_TOLERANCE = 5;            // how close do X values need to be
 
-    if (post.rightBottom.y - post.rightTop.y < postDiffMin) return NOPOST;
+    if (post.rightBottom.y - post.rightTop.y < MAXIMUM_Y_DIFFERENCE) return NOPOST;
     const list <VisualCorner>* corners = vision->fieldLines->getCorners();
     int spanx = post.rightBottom.x - post.leftBottom.x;
     for (list <VisualCorner>::const_iterator k = corners->begin();
@@ -2204,8 +2139,8 @@ int ObjectFragments::checkCorners(blob post)
             if (k->getX() > post.leftBottom.x - spanx &&
                 k->getX() < post.rightBottom.x + spanx &&
                 post.leftBottom.y < k->getY()) {
-                if (k->getX() > post.leftBottom.x - postBuff &&
-                    k->getX() < post.rightBottom.x + postBuff) {
+                if (k->getX() > post.leftBottom.x - X_TOLERANCE &&
+                    k->getX() < post.rightBottom.x + X_TOLERANCE) {
                     // we checked these when we checked for Ts so ignore them
                 } else {
                     // if the corner is near enough we can use it to id the post
@@ -2253,8 +2188,7 @@ int ObjectFragments::characterizeSize(blob b) {
 
 bool ObjectFragments::qualityPost(blob b, int c)
 {
-    const int num = 3;
-	const int denom = 5;
+    const float PERCENT_NEEDED = 0.6f;  // percent of pixels that must be right
 
     int good = 0;
     //bool soFar;
@@ -2262,7 +2196,7 @@ bool ObjectFragments::qualityPost(blob b, int c)
         for (int j = b.leftTop.y; j < b.leftBottom.y; j++)
             if (thresh->thresholded[j][i] == c)
                 good++;
-    if (good < blobArea(b) * num / denom) return false;
+    if (good < blobArea(b) * PERCENT_NEEDED) return false;
     return true;
 }
 
@@ -2277,18 +2211,19 @@ bool ObjectFragments::qualityPost(blob b, int c)
 
 bool ObjectFragments::checkSize(blob b, int c)
 {
-    const int horzScanParam = 6;
-	const int topBuff = 10;
-	const int truthMax = 5;
+    const int ERROR_TOLERANCE = 6;     // how many bad pixels to scan over
+	const int FAR_ENOUGH = 10;         // how far to scan to be sure
+	const int PROBLEM_THRESHOLD = 5;   // haw many pixels presents a problem
 
     int midY = b.leftTop.y + (b.leftBottom.y - b.leftTop.y) / 2;
-    horizontalScan(b.leftTop.x, midY, -1,  horzScanParam, c, c, 0, b.leftTop.x + 1);
+    horizontalScan(b.leftTop.x, midY, -1,  ERROR_TOLERANCE, c, c, 0, b.leftTop.x + 1);
     //drawPoint(scan.x, scan.y, RED);
     int leftMid = scan.good;
-    horizontalScan(b.rightTop.x, midY, 1, horzScanParam, c, c, b.rightTop.x - 1,
-                   b.rightTop.x + topBuff);
+    horizontalScan(b.rightTop.x, midY, 1, ERROR_TOLERANCE, c, c,
+				   b.rightTop.x - 1, b.rightTop.x + FAR_ENOUGH);
     //drawPoint(scan.x, scan.y, RED);
-    if (leftMid > truthMax && scan.good > truthMax) return false;
+    if (leftMid > PROBLEM_THRESHOLD && scan.good > PROBLEM_THRESHOLD)
+		return false;
     return true;
 }
 
@@ -2302,13 +2237,13 @@ bool ObjectFragments::checkSize(blob b, int c)
 
 void ObjectFragments::setShot(VisualCrossbar* one)
 {
-    const int intersectNum = 3;
-    const int crossNum = 3;
-    const int stripMin = 5;
-    const int intersectMax = 10;
-    const int greyMax = 15;
-    const int runMax = 10;
-    const int spanDiv = 5;
+    const int INTERSECTIONS = 3;    // number of line intersections
+    const int CROSSINGS = 3;        // max number of intersections allowed
+    const int MINIMUM_PIXELS = 5;   // how many pixels constitute a run
+    const int LINE_WIDTH = 10;      // nearness to intersection and still on line
+    const int GREY_MAX = 15;        // how many undefined pixels are ok
+    const int MAX_RUN_SIZE = 10;    // how many pixels constitute a block
+    const int WIDTH_DIVISOR = 5;    // gives a percent of the width
 
     int pix, bad, white, grey, run, greyrun;
     int ySpan = IMAGE_HEIGHT - one->getLeftBottomY();
@@ -2316,7 +2251,7 @@ void ObjectFragments::setShot(VisualCrossbar* one)
     int lx = one->getLeftTopX(), ly = one->getLeftTopY(),
         rx = one->getRightTopX(), ry = one->getRightTopY();
     int bx = one->getLeftBottomX(), brx = one->getRightBottomX();
-    int intersections[intersectNum];
+    int intersections[INTERSECTIONS];
     int crossings = 0;
     bool lineFound = false;
     // now let's see if our backstop is "shootable" and where
@@ -2337,7 +2272,7 @@ void ObjectFragments::setShot(VisualCrossbar* one)
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
                 intersections[crossings] = foo.second;
                 crossings++;
-                if (crossings == crossNum) {
+                if (crossings == CROSSINGS) {
                     shoot[i] = false;
                     break;
                 }
@@ -2349,7 +2284,7 @@ void ObjectFragments::setShot(VisualCrossbar* one)
             pix = thresh->thresholded[j][i];
             if (pix == color) {
                 strip++;
-                if (strip > stripMin)
+                if (strip > MINIMUM_PIXELS)
                     colorSeen = true;
             }
             if (colorSeen && (pix == RED || pix == NAVY)) {
@@ -2360,7 +2295,7 @@ void ObjectFragments::setShot(VisualCrossbar* one)
                 if (!lineFound) {
                     for (int k = 0; k < crossings; k++) {
                         //cout << "Crassing at " << intersections[k] << endl;
-                        if (intersections[k] - j < intersectMax &&
+                        if (intersections[k] - j < LINE_WIDTH &&
                             intersections[k] - j > 0) {
                             lineFound = true;
                         }
@@ -2383,25 +2318,25 @@ void ObjectFragments::setShot(VisualCrossbar* one)
                 greyrun = 0;
                 lineFound = false;
             }
-            if (greyrun > greyMax) {
+            if (greyrun > GREY_MAX) {
                 //shoot[i] = false;
                 if (BACKDEBUG) {
                     //drawPoint(i, j, RED);
                 }
             }
-            if (run > runMax && (pix == NAVY || pix == RED)) {
+            if (run > MAX_RUN_SIZE && (pix == NAVY || pix == RED)) {
                 shoot[i] = false;
                 if (BACKDEBUG)
                     drawPoint(i, j, RED);
             }
-            if (run > runMax) {
+            if (run > MAX_RUN_SIZE) {
                 shoot[i] = false;
                 if (BACKDEBUG) {
                     drawPoint(i, j, RED);
                 }
             }
         }
-        if (bad > ySpan / spanDiv) {
+        if (bad > ySpan / WIDTH_DIVISOR) {
             shoot[i] = false;
         }
     }
@@ -2584,32 +2519,31 @@ void ObjectFragments::bestShot(VisualFieldObject* left,
  */
 void ObjectFragments::openDirection(int horizon, NaoPose *pose)
 {
-    const int intersectNum = 5;
-    const int divider = 10;
-	const int bound = 60;
-	const int crossMax = 5;
-	const int interUpper = 10;
-	const int greyMax = 15;
-	const int yBuff = 15;
-	const int runBuff = 10;
-	const int runMax = 10;
-	const int badMax = 3;
-	const int jumpMax = 11;
-	const int imgBuff= 10;
-	const int horzBuff = 20;
-	const int downMax = 10;
-	const int openBuff = 10;
-	const int imgDiv = 15;
-	const int widthDiv = 6;
-	const int lineDiv = 3;
+    const int INTERSECTIONS = 5;
+    const int SCAN_DIVISION = 10;
+	const int BOUND = 60;
+	const int MAX_CROSSINGS = 5;
+	const int INTERSECTION_NEARNESS = 10;
+	const int GREY_MAX = 15;
+	const int Y_BUFFER = 15;
+	const int RUN_BUFFER = 10;
+	const int MAX_RUN_SIZE = 10;
+	const int MAX_BAD_PIXELS = 3;
+	const int JUMP_MAX = 11;
+	const int BOTTOM_BUFFER= 10;
+	const int HORIZON_TOLERANCE = 20;
+	const int DOWNMAX = 10;
+	const int IMAGE_SECTIONS = 15;
+	const int X_AXIS_SECTIONS = 6;
+	const int LINE_DIVIDER = 3;
 
     int pix, bad, white, grey, run, greyrun;
-    int intersections[intersectNum];
+    int intersections[INTERSECTIONS];
     int crossings = 0;
     bool lineFound = false;
     int y;
-    int open[IMAGE_WIDTH / divider];
-    int open2[IMAGE_WIDTH / divider];
+    int open[IMAGE_WIDTH / SCAN_DIVISION];
+    int open2[IMAGE_WIDTH / SCAN_DIVISION];
     //cout << "In open direction " << endl;
     open[0] = horizon;
     open2[0] = horizon;
@@ -2618,7 +2552,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
     for (int i = IMAGE_HEIGHT - 1; i > horizon; i--) {
         estimate d = pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0);
         //cout << "Distances " << i << " " << d.dist << endl;
-        if (d.dist > bound && lastd < bound) {
+        if (d.dist > BOUND && lastd < BOUND) {
             if (OPENFIELD) {
                 drawPoint(IMAGE_WIDTH / 2, i, MAROON);
             }
@@ -2627,10 +2561,10 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
         lastd = (int)d.dist;
     }
     const vector <VisualLine>* lines = vision->fieldLines->getLines();
-    for (int x = divider; x < IMAGE_WIDTH - 1; x += divider) {
+    for (int x = SCAN_DIVISION; x < IMAGE_WIDTH - 1; x += SCAN_DIVISION) {
         bad = 0; white = 0; grey = 0; run = 0; greyrun = 0;
-        open[(int)(x / divider)] = horizon;
-        open2[(int)(x / divider)] = horizon;
+        open[(int)(x / SCAN_DIVISION)] = horizon;
+        open2[(int)(x / SCAN_DIVISION)] = horizon;
         // first - determine if any lines intersection this plumbline and where
         point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
         plumbLineTop.x = x; plumbLineTop.y = 0;
@@ -2644,7 +2578,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
                 intersections[crossings] = foo.second;
                 crossings++;
-                if (crossings == crossMax) {
+                if (crossings == MAX_CROSSINGS) {
                     break;
                 }
             }
@@ -2661,7 +2595,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
                 if (!lineFound) {
                     for (int k = 0; k < crossings; k++) {
                         //cout << "Crassing at " << intersections[k] << endl;
-                        if (intersections[k] - y < interUpper &&
+                        if (intersections[k] - y < INTERSECTION_NEARNESS &&
                             intersections[k] - y > 0) {
                             lineFound = true;
                         }
@@ -2684,31 +2618,31 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
                 greyrun = 0;
                 lineFound = false;
             }
-            if (greyrun == greyMax) {
+            if (greyrun == GREY_MAX) {
                 //shoot[i] = false;
-                if (open[(int)x / divider] == horizon) {
-                    open[(int)x / divider] = y + yBuff;
+                if (open[(int)x / SCAN_DIVISION] == horizon) {
+                    open[(int)x / SCAN_DIVISION] = y + Y_BUFFER;
                 }
-                open2[(int)x / divider] = y + yBuff;
+                open2[(int)x / SCAN_DIVISION] = y + Y_BUFFER;
                 //drawPoint(x, y, RED);
                 //drawPoint(x - 1, y, RED);
                 //drawPoint(x + 1, y, RED);
                 y = 0;
             }
-            if (run == runBuff) {
-                if (open[(int)x / divider] == horizon) {
-                    open[(int)x / divider] = y + runBuff;
+            if (run == RUN_BUFFER) {
+                if (open[(int)x / SCAN_DIVISION] == horizon) {
+                    open[(int)x / SCAN_DIVISION] = y + RUN_BUFFER;
                 }
-                if (bad == runBuff) {
-                    open2[(int)x / divider] = y + runBuff;
+                if (bad == RUN_BUFFER) {
+                    open2[(int)x / SCAN_DIVISION] = y + RUN_BUFFER;
                     y = 0;
                 }
                 //drawPoint(x, y, RED);
                 //drawPoint(x - 1, y, RED);
                 //drawPoint(x + 1, y, RED);
             }
-            if (run > runMax && (bad > badMax || y < sixty)) {
-                open2[(int)x / divider] = y + run;
+            if (run > MAX_RUN_SIZE && (bad > MAX_BAD_PIXELS || y < sixty)) {
+                open2[(int)x / SCAN_DIVISION] = y + run;
                 y = 0;
             }
         }
@@ -2719,20 +2653,20 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
     int longs = 0, longsize = 0, longIndex = 0, minsize = horizon;
     int jumpdown = -1, lastone = horizon;
     bool vert = false;
-    for (i = 0; i < IMAGE_WIDTH / divider; i++) {
-        if (i - jumpdown < jumpMax && !vert && open[i] > IMAGE_HEIGHT - imgBuff
+    for (i = 0; i < IMAGE_WIDTH / SCAN_DIVISION; i++) {
+        if (i - jumpdown < JUMP_MAX && !vert && open[i] > IMAGE_HEIGHT - BOTTOM_BUFFER
             && jumpdown != -1) {
             vert = true;
         }
-        if (open[i] > horizon + horzBuff &&  lastone < horizon + horzBuff && i != 0) {
+        if (open[i] > horizon + HORIZON_TOLERANCE &&  lastone < horizon + HORIZON_TOLERANCE && i != 0) {
             jumpdown = i;
             vert = false;
         }
-        if (vert && lastone > horizon + horzBuff  && open[i] < horizon + horzBuff) {
+        if (vert && lastone > horizon + HORIZON_TOLERANCE  && open[i] < horizon + HORIZON_TOLERANCE) {
             //cout << "Testing for vertical " << jumpdown << " " << i << endl;
-            if (i - jumpdown < downMax && jumpdown != -1) {
-                point<int> midTop(jumpdown * divider,IMAGE_HEIGHT - horizon /2);
-                point<int> midBottom(i * divider,IMAGE_HEIGHT- horizon/2);
+            if (i - jumpdown < DOWNMAX && jumpdown != -1) {
+                point<int> midTop(jumpdown * SCAN_DIVISION,IMAGE_HEIGHT - horizon /2);
+                point<int> midBottom(i * SCAN_DIVISION,IMAGE_HEIGHT- horizon/2);
                 bool intersects = vision->fieldLines->
                     intersectsFieldLines(midTop,midBottom);
                 if (intersects) {
@@ -2748,7 +2682,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
             }
         }
         lastone = open[i];
-        if (open[i] - openBuff <= horizon) {
+        if (open[i] - MAX_RUN_SIZE <= horizon) {
             longs++;
             if (longs > longsize) {
                 longIndex = i - longs;
@@ -2761,7 +2695,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
             minsize = open[i];
         }
     }
-    for (i = 1; i < IMAGE_WIDTH / imgDiv; i++) {
+    for (i = 1; i < IMAGE_WIDTH / IMAGE_SECTIONS; i++) {
         if (open[i] > open[index1]) {
             index1 = i;
         }
@@ -2770,7 +2704,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
         }
     }
     index2 = i; index22 = i;
-    for (i++ ; i < 2 * IMAGE_WIDTH / imgDiv; i++) {
+    for (i++ ; i < 2 * IMAGE_WIDTH / IMAGE_SECTIONS; i++) {
         if (open[i] > open[index2]) {
             index2 = i;
         }
@@ -2779,7 +2713,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
         }
     }
     index3 = i; index32 = i;
-    for (i++ ; i < (IMAGE_WIDTH / divider) ; i++) {
+    for (i++ ; i < (IMAGE_WIDTH / SCAN_DIVISION) ; i++) {
         if (open[i] > open[index3]) {
             index3 = i;
         }
@@ -2789,7 +2723,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
     }
     // All distance estimates are to the HARD values
     estimate e;
-    e = pose->pixEstimate(IMAGE_WIDTH/widthDiv, open2[index12], 0.0);
+    e = pose->pixEstimate(IMAGE_WIDTH/X_AXIS_SECTIONS, open2[index12], 0.0);
     vision->fieldOpenings[0].soft = open[index1];
     vision->fieldOpenings[0].hard = open2[index12];
     vision->fieldOpenings[0].horizonDiffSoft = open[index1] - horizon;
@@ -2807,7 +2741,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
     vision->fieldOpenings[1].bearing = e.bearing;
     vision->fieldOpenings[1].elevation = e.elevation;
 
-    e = pose->pixEstimate(divider*IMAGE_WIDTH/widthDiv, open2[index32],0.0);
+    e = pose->pixEstimate(SCAN_DIVISION*IMAGE_WIDTH/X_AXIS_SECTIONS, open2[index32],0.0);
     vision->fieldOpenings[2].soft = open[index3];
     vision->fieldOpenings[2].hard = open2[index32];
     vision->fieldOpenings[2].horizonDiffSoft = open[index3] - horizon;
@@ -2832,55 +2766,55 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
         //          open[index2] + 1, PINK);
         // drawLine(2 * IMAGE_WIDTH / 3, open[index3] + 1, IMAGE_WIDTH  - 1,
         //          open[index3] + 1, PINK);
-        drawLine(0, open2[index12], IMAGE_WIDTH / lineDiv, open2[index12], MAROON);
-        drawLine(IMAGE_WIDTH / lineDiv, open2[index22], 2 * IMAGE_WIDTH / lineDiv,
+        drawLine(0, open2[index12], IMAGE_WIDTH / LINE_DIVIDER, open2[index12], MAROON);
+        drawLine(IMAGE_WIDTH / LINE_DIVIDER, open2[index22], 2 * IMAGE_WIDTH / LINE_DIVIDER,
                  open2[index22], MAROON);
-        drawLine(2 * IMAGE_WIDTH / lineDiv, open2[index32], IMAGE_WIDTH  - 1,
+        drawLine(2 * IMAGE_WIDTH / LINE_DIVIDER, open2[index32], IMAGE_WIDTH  - 1,
                  open2[index32], MAROON);
-        drawLine(0, open2[index12] - 1, IMAGE_WIDTH / lineDiv, open2[index12] - 1,
+        drawLine(0, open2[index12] - 1, IMAGE_WIDTH / LINE_DIVIDER, open2[index12] - 1,
                  MAROON);
-        drawLine(IMAGE_WIDTH / lineDiv, open2[index22] - 1, 2 * IMAGE_WIDTH / lineDiv,
+        drawLine(IMAGE_WIDTH / LINE_DIVIDER, open2[index22] - 1, 2 * IMAGE_WIDTH / LINE_DIVIDER,
                  open2[index22] - 1, MAROON);
-        drawLine(2 * IMAGE_WIDTH / lineDiv, open2[index32] - 1, IMAGE_WIDTH  - 1,
+        drawLine(2 * IMAGE_WIDTH / LINE_DIVIDER, open2[index32] - 1, IMAGE_WIDTH  - 1,
                  open2[index32] - 1, MAROON);
         if (open2[index12] != open2[index22]) {
-            drawLine(IMAGE_WIDTH / lineDiv, open2[index12], IMAGE_WIDTH / lineDiv,
+            drawLine(IMAGE_WIDTH / LINE_DIVIDER, open2[index12], IMAGE_WIDTH / LINE_DIVIDER,
                      open2[index22], MAROON);
         }
         if (open2[index32] != open2[index22]) {
-            drawLine(2 * IMAGE_WIDTH / lineDiv, open2[index32], 2 * IMAGE_WIDTH / lineDiv,
+            drawLine(2 * IMAGE_WIDTH / LINE_DIVIDER, open2[index32], 2 * IMAGE_WIDTH / LINE_DIVIDER,
                      open2[index22], MAROON);
         }
         if (open2[index12] <  open2[index22] &&
             open2[index12] < open2[index32]) {
-            for (i = IMAGE_WIDTH / lineDiv; open[i / divider] <= open2[index12]; i++){
+            for (i = IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <= open2[index12]; i++){
             }
             drawMore(i, open2[index12], PINK);
         }
         else if (open2[index22] <  open2[index12] &&
                  open2[index22] < open2[index32]) {
-            for (i = IMAGE_WIDTH / lineDiv; open[i / divider] <= open2[index22]; i--){
+            for (i = IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <= open2[index22]; i--){
             }
             drawLess(i, open2[index22], PINK);
-            for (i = 2 * IMAGE_WIDTH / lineDiv; open[i / divider] <= open2[index22];
+            for (i = 2 * IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <= open2[index22];
                  i++) {}
             drawMore(i, open2[index22], PINK);
         }
         else if (open2[index32] <  open2[index22] &&
                  open2[index32] < open2[index12]) {
-            for (i = 2 * IMAGE_WIDTH / lineDiv; open[i / divider] <= open2[index32];
+            for (i = 2 * IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <= open2[index32];
                  i--) {}
             drawLess(i, open2[index32], PINK);
         }
         else if (open2[index22] ==  open2[index12] &&
                  open2[index22] < open2[index32]) {
-            for (i = 2 * IMAGE_WIDTH / lineDiv; open[i / divider] <= open2[index22];
+            for (i = 2 * IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <= open2[index22];
                  i++) {}
             drawMore(i, open2[index22], PINK);
         }
         else if (open2[index22] < open2[index12] &&
                  open2[index22] == open2[index32]) {
-            for (i = IMAGE_WIDTH / lineDiv; open[i / divider] <= open2[index22]; i--){
+            for (i = IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <= open2[index22]; i--){
             }
             drawLess(i, open2[index22], PINK);
         } else if (open2[index12] < open2[index22] &&
@@ -2888,7 +2822,7 @@ void ObjectFragments::openDirection(int horizon, NaoPose *pose)
             // vertical line?
             cout << "Vertical line?" << endl;
         }
-        // drawMore(longIndex * divider + longsize * divider + divider, horizon,
+        // drawMore(longIndex * SCAN_DIVISION + longsize * SCAN_DIVISION + SCAN_DIVISION, horizon,
         //          PINK);
         cout << "Estimate soft is " << open[index1] << " " << open[index2]
              << " " << open[index3] << endl;
@@ -2943,8 +2877,8 @@ int ObjectFragments::grabPost(int c, int c2, int horizon, int left, int right) {
 
 int ObjectFragments::checkOther(int left, int right, int height, int horizon)
 {
-    const int nextDiff = 10;
-	const int largeMax = 20;
+    const int HORIZON_TOLERANCE = 10;    // our other post should be near horizon
+	const int MIN_OTHER_THRESHOLD = 20;  // how big does it have to be?
 
     int largel = 0;
     int larger = 0;
@@ -2959,25 +2893,25 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon)
         if (nextH > 0) {
             if (nextX < left - mind && nextH > MIN_GOAL_HEIGHT &&
                 nextY < horizonAt(nextX) &&
-                nextY + nextH > horizonAt(nextX) - nextDiff) {
+                nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {
                 if (nextH > largel)
                     largel = nextH;
                 //drawPoint(nextX, nextY, ORANGE);
                 //cout << largel << endl;
             } else if (nextX > right + mind && nextH > MIN_GOAL_HEIGHT &&
                        nextY < horizonAt(nextX) &&
-                       nextY + nextH > horizonAt(nextX) - nextDiff) {
+                       nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {
                 if (nextH > larger) {
                     larger = nextH;
                 }
             }
 		}
     }
-    if ((larger > height / 2 || larger > largeMax) && larger > largel) {
+    if ((larger > height / 2 || larger > MIN_OTHER_THRESHOLD) && larger > largel) {
         if (POSTLOGIC)
             cout << "Larger" << endl;
         return LEFT;
-    } else if (largel > largeMax || largel > height / 2) {
+    } else if (largel > MIN_OTHER_THRESHOLD || largel > height / 2) {
         if (POSTLOGIC) cout << "Largel" << endl;
         return RIGHT;
     }
@@ -3007,7 +2941,7 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
                                        VisualFieldObject* right,
                                        VisualCrossbar* mid)
 {
-    const int blobMin = 10;
+    const int MIN_BLOB_SIZE = 10;
 
     // ok now we're going to try and figure out which post it is and where the other one might be
     int trueLeft = min(pole.leftTop.x, pole.leftBottom.x);          // leftmost value in the blob
@@ -3027,7 +2961,7 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
     if (!locationOk(pole, horizon)) {
         // once again check if the blob is better
         if (topBlob.leftTop.x != BADVALUE && topBlob.rightTop.x - topBlob.leftTop.x
-            > blobMin && locationOk(topBlob, horizon) && greenCheck(topBlob)) {
+            > MIN_BLOB_SIZE && locationOk(topBlob, horizon) && greenCheck(topBlob)) {
             return BACKSTOP;
         }
     }
@@ -3063,21 +2997,6 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
         return post;
     }
 
-    // post = crossCheck2(pole);        // look for the crossbar
-    // if (post != NOPOST) {
-    //     if (POSTLOGIC) {
-    //         cout << "Found crossbar2 " << post << endl;
-    //     }
-    //     return post;
-    // }
-
-    // //post = triangle(pole);        // look for the triangle
-    // if (post != NOPOST) {
-    //   if (POSTLOGIC) {
-    //     cout << "Found triangle " << post << endl;
-    //   }
-    //   return post;
-    // }
     return post;
 }
 
@@ -3100,10 +3019,10 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
                                VisualCrossbar* mid, int c, int c2,
                                bool beaconFound, int horizon)
 {
-    const int imgDiff = 3;
-	const int trueBuff = 10;
-	const int postBuff = 5;
-	const int topMax = 10;
+    const int IMAGE_EDGE = 3;
+	const int NEAR_DISTANCE = 10;
+	const int POST_NEAR_DIST = 5;
+	const int MAX_Y_VALUE = 10;
 
 	//cout << horizon << " " << slope << endl;
     // if we don't have any runs there is nothing to do
@@ -3165,7 +3084,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     } else if (post == RIGHT) {
         updateObject(left, pole, _SURE, dc);
     } else if (post == BACKSTOP) {
-    } else if (pole.rightTop.x - pole.leftTop.x > IMAGE_WIDTH - imgDiff) {
+    } else if (pole.rightTop.x - pole.leftTop.x > IMAGE_WIDTH - IMAGE_EDGE) {
     } else {
         if (howbig == LARGE)
             updateObject(right, pole, NOT_SURE, dc);
@@ -3188,8 +3107,8 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
             (nextX > trueRight && post == RIGHT)) {
             runs[i].h = 0;
         }
-        if ( (nextX > trueLeft - trueBuff && post == RIGHT) ||
-			 (nextX < trueRight + trueBuff && post == LEFT) ) {
+        if ( (nextX > trueLeft - NEAR_DISTANCE && post == RIGHT) ||
+			 (nextX < trueRight + NEAR_DISTANCE && post == LEFT) ) {
             runs[i].h = 0;
         }
     }
@@ -3203,7 +3122,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     int trueTop2 = 0;
     int second = 0;
     int spanX2 = 0, spanY2 = 0;
-    isItAPost = grabPost(c, c2, horizon, trueLeft - postBuff, trueRight + postBuff);
+    isItAPost = grabPost(c, c2, horizon, trueLeft - POST_NEAR_DIST, trueRight + POST_NEAR_DIST);
     if (isItAPost == NOPOST) {
         // before returning make sure we don't need to screen the previous post
         if (questions) {
@@ -3273,7 +3192,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
             if (locationOk(pole, horizon) && ratOk && goodSecondPost && pole.leftTop.x
                 > trueRight) {
                 // maybe it really is a side-goal situation
-                if (abs(trueTop - trueTop2) < topMax && qualityPost(pole, c)) {
+                if (abs(trueTop - trueTop2) < MAX_Y_VALUE && qualityPost(pole, c)) {
                     if (post == LEFT) {
                         second = 1;
                         updateObject(left, pole, _SURE, dc);
@@ -3399,8 +3318,8 @@ void ObjectFragments::transferTopBlob(VisualFieldObject * one, certainty cert,
 // only called on really big orange blobs
 float ObjectFragments::rightHalfColor(blob tempobj)
 {
-    const float maxColor = 0.15f;
-	const float colorNum = 0.10f;
+    const float COLOR_THRESH = 0.15f;
+	const float POOR_VALUE = 0.10f;
 
     int x = tempobj.leftTop.x;
     int y = tempobj.leftTop.y;
@@ -3408,7 +3327,7 @@ float ObjectFragments::rightHalfColor(blob tempobj)
     int spanX = tempobj.rightTop.x - x;
     int good = 0, good1 = 0, good2 = 0;
     int pix;
-    if (rightColor(tempobj, ORANGE) < maxColor) return colorNum;
+    if (rightColor(tempobj, ORANGE) < COLOR_THRESH) return POOR_VALUE;
     for (int i = spanY / 2; i < spanY; i++) {
         for (int j = 0; j < spanX; j++) {
             pix = thresh->thresholded[y + i][x + j];
@@ -3452,11 +3371,11 @@ float ObjectFragments::rightHalfColor(blob tempobj)
 
 float ObjectFragments::rightColor(blob tempobj, int col)
 {
-    const int blobMin = 1000;
-	const float redMult = 0.10f;
-	const float ogoodMult = 0.20f;
-	const float oygoodMult = 0.40f;
-	const float goodMult = 0.65f;
+    const int MIN_BLOB_SIZE = 1000;
+	const float RED_PERCENT = 0.10f;
+	const float ORANGE_PERCENT = 0.20f;
+	const float ORANGEYELLOW_PERCENT = 0.40f;
+	const float GOOD_PERCENT = 0.65f;
 
     int x = tempobj.leftTop.x;
     int y = tempobj.leftTop.y;
@@ -3490,28 +3409,28 @@ float ObjectFragments::rightColor(blob tempobj, int col)
         cout << "Orange " << ogood << " " << orgood << " " << red << " "
              << blobArea(tempobj) << endl;
     }
-    if (blobArea(tempobj) > blobMin) return (float) good /
+    if (blobArea(tempobj) > MIN_BLOB_SIZE) return (float) good /
                                       (float) blobArea(tempobj);
     //if (ogood < 2 * orgood) return 0.1; // at least two thirds of the "orange" pixels should be orange
-    if (red > static_cast<float>(spanX * spanY) * redMult) {
+    if (red > static_cast<float>(spanX * spanY) * RED_PERCENT) {
 		if (BALLDEBUG)
 			cout << "Too much red" << endl;
 		// before giving up let's try and salvage this one
-		if (ogood < static_cast<float>(spanX * spanY) * ogoodMult)
-			return redMult;
+		if (ogood < static_cast<float>(spanX * spanY) * ORANGE_PERCENT)
+			return RED_PERCENT;
 		if (greenCheck(tempobj) && greenSide(tempobj) && roundness(tempobj) != BADVALUE) {
-			return goodMult;
+			return GOOD_PERCENT;
 		}
-		return redMult;
+		return RED_PERCENT;
 	}
-    /*if (ogood < static_cast<float>(spanX * spanY) * ogoodMult) {
+    /*if (ogood < static_cast<float>(spanX * spanY) * ORANGE_PERCENT) {
 		if (BALLDEBUG)
 			cout << "Not enough pure orange" << endl;
-		return redMult;
+		return RED_PERCENT;
 		}*/
-    if (tempobj.area > blobMin &&
-		ogood + oygood > (static_cast<float>(spanX * spanY) * oygoodMult)  &&
-		good < ( static_cast<float>(spanX * spanY) * goodMult)) return goodMult;
+    if (tempobj.area > MIN_BLOB_SIZE &&
+		ogood + oygood > (static_cast<float>(spanX * spanY) * ORANGEYELLOW_PERCENT)  &&
+		good < ( static_cast<float>(spanX * spanY) * GOOD_PERCENT)) return GOOD_PERCENT;
     float percent = (float)good / (float) (spanX * spanY);
     if (col == GREEN)
         return (float)good;
@@ -3526,9 +3445,9 @@ float ObjectFragments::rightColor(blob tempobj, int col)
  */
 bool ObjectFragments::greenCheck(blob b)
 {
-    const int scanParam = 5;
-	const int iMax = 10;
-	const int badMax = 4;
+    const int ERROR_TOLERANCE = 5;
+	const int EXTRA_LINES = 10;
+	const int MAX_BAD_PIXELS = 4;
 
     if (b.rightBottom.y >= IMAGE_HEIGHT - 1 || b.leftBottom.y >= IMAGE_HEIGHT - 1) return true;
     if (b.rightTop.x - b.leftTop.x > IMAGE_WIDTH / 2) return true;
@@ -3537,13 +3456,13 @@ bool ObjectFragments::greenCheck(blob b)
     int x = b.leftBottom.x;
     for (int i = 0; i < w; i+= 2) {
         y = yProject(x, b.leftBottom.y, x + i);
-        vertScan(x + i, y, 1, scanParam, GREEN, GREEN);
+        vertScan(x + i, y, 1, ERROR_TOLERANCE, GREEN, GREEN);
         if (scan.good > 1)
             return true;
     }
     // try one more in case its a white line
     int bad = 0;
-    for (int i = 0; i < iMax && bad < badMax; i++) {
+    for (int i = 0; i < EXTRA_LINES && bad < MAX_BAD_PIXELS; i++) {
         x = max(0, xProject(x, b.leftBottom.y, b.leftBottom.y + i));
         int pix = thresh->thresholded[min(IMAGE_HEIGHT - 1, b.leftBottom.y + i)][x];
         if (pix == GREEN) return true;
@@ -3559,20 +3478,20 @@ bool ObjectFragments::greenCheck(blob b)
  */
 bool ObjectFragments::greenSide(blob b)
 {
-    const int scanParam = 5;
-	const int xDiff = 8;
+    const int ERROR_TOLERANCE = 5;
+	const int X_EXTRA = 8;
 
     int x = b.rightBottom.x;
     int y = b.rightBottom.y;
     for (int i = y; i > (b.rightBottom.y - b.rightTop.y) / 2; i = i - 2) {
-        horizontalScan(x, i, 1, scanParam, GREEN, GREEN, x - 1, x + xDiff);
+        horizontalScan(x, i, 1, ERROR_TOLERANCE, GREEN, GREEN, x - 1, x + X_EXTRA);
         if (scan.good > 0)
             return true;
     }
     x = b.leftBottom.x;
     y = b.leftBottom.y;
     for (int i = y; i > (b.leftBottom.y - b.leftTop.y) / 2; i = i - 2) {
-        horizontalScan(x, i, -1, scanParam, GREEN, GREEN, x - xDiff, x + 1);
+        horizontalScan(x, i, -1, ERROR_TOLERANCE, GREEN, GREEN, x - X_EXTRA, x + 1);
         if  (scan.good == 0)
             return true;
     }
@@ -3681,12 +3600,12 @@ int ObjectFragments::scanOut(int start_x, int start_y, float slopel, int dir){
 
 int  ObjectFragments::roundness(blob b)
 {
-    const int imgDiff = 3;
-	const int sizeMin = 4;
-	const int sizeMax = 20;
-	const int widthNum = 15;
-	const float ratioMult = 10.0f;
-	const float maxDiv = 6.0f;
+    const int IMAGE_EDGE = 3;
+	const int BIG_ENOUGH = 4;
+	const int TOO_BIG_TO_CHECK = 20;
+	const int WIDTH_AT_SCREEN_BOTTOM = 15;
+	const float RATIO_TO_INT = 10.0f;
+	const float CORNER_CHUNK_DIV = 6.0f;
 
     int w = blobWidth(b);
     int h = blobHeight(b);
@@ -3698,20 +3617,20 @@ int  ObjectFragments::roundness(blob b)
 	
     if ((h < SMALLBALLDIM && w < SMALLBALLDIM && ratio > BALLTOOTHIN && ratio < BALLTOOFAT)) {
     } else if (ratio > THINBALL && ratio < FATBALL) {
-    } else if (y + h > IMAGE_HEIGHT - imgDiff || x == 0 || (x + w) > IMAGE_WIDTH - 2 || y == 0) {
+    } else if (y + h > IMAGE_HEIGHT - IMAGE_EDGE || x == 0 || (x + w) > IMAGE_WIDTH - 2 || y == 0) {
         if (BALLDEBUG)
             cout << "Checking ratio on occluded ball:  " << ratio << endl;
         // we're on an edge so allow for streching - first check for top of bottom
-        if (h > sizeMin && w > sizeMin && (y + h > IMAGE_HEIGHT - 2 || y == 0) &&
+        if (h > BIG_ENOUGH && w > BIG_ENOUGH && (y + h > IMAGE_HEIGHT - 2 || y == 0) &&
 			ratio < MIDFAT && ratio > 1) {
             // then sides
-        } else if (h > sizeMin && w > sizeMin
+        } else if (h > BIG_ENOUGH && w > BIG_ENOUGH
 				   && (x == 0 || x + w > IMAGE_WIDTH - 2)
 				   && ratio > MIDTHIN && ratio < 1) {
-        } else if ((h > sizeMax || w > sizeMax)
+        } else if ((h > TOO_BIG_TO_CHECK || w > TOO_BIG_TO_CHECK)
 				   && (ratio > OCCLUDEDTHIN && ratio < OCCLUDEDFAT) ) {
             // when we have big slivers then allow for extra
-        } else if (b.leftBottom.y > IMAGE_HEIGHT - imgDiff && w > widthNum) {
+        } else if (b.leftBottom.y > IMAGE_HEIGHT - IMAGE_EDGE && w > WIDTH_AT_SCREEN_BOTTOM) {
             // the bottom is a really special case
         } else {
             if (BALLDEBUG)
@@ -3727,20 +3646,20 @@ int  ObjectFragments::roundness(blob b)
         return BADVALUE;
     }
     if (ratio < 1.0) {
-        int offRat = ROUND2((1.0f - ratio) * ratioMult);
+        int offRat = ROUND2((1.0f - ratio) * RATIO_TO_INT);
         r -= offRat;
     } else {
-        int offRat = ROUND2((1.0f - 1.0f/ratio) * ratioMult);
+        int offRat = ROUND2((1.0f - 1.0f/ratio) * RATIO_TO_INT);
         r -= offRat;
     }
     if (w * h > SMALLBALL) {
         // now make some scans through the blob - horizontal, vertical, and each diagonal
         int pix;
         int goodPix = 0, badPix = 0;
-        if (y + h > IMAGE_HEIGHT - imgDiff || x == 0 || (x + w) > IMAGE_WIDTH - 2 || y == 0) {
+        if (y + h > IMAGE_HEIGHT - IMAGE_EDGE || x == 0 || (x + w) > IMAGE_WIDTH - 2 || y == 0) {
         } else {
             // we're in the screen
-            int d = ROUND2(static_cast<float>(std::max(w, h)) / maxDiv);
+            int d = ROUND2(static_cast<float>(std::max(w, h)) / CORNER_CHUNK_DIV);
             int d3 = min(w, h);
             for (int i = 0; i < d3; i++) {
                 pix = thresh->thresholded[y+i][x+i];
@@ -3812,7 +3731,7 @@ int  ObjectFragments::roundness(blob b)
 
 int ObjectFragments::ballNearGreen(blob b)
 {
-    const int jMax = 6;
+    const int EXTRA_LINES = 6;
 
     // first check the bottom
     int w = b.rightTop.x - b.leftTop.x + 1;
@@ -3824,14 +3743,14 @@ int ObjectFragments::ballNearGreen(blob b)
     int x = b.leftTop.x;
     int y = b.leftTop.y;
     for (int i = 0; i < h && y + i < IMAGE_HEIGHT && where % GREENLEFT != 0; i= i+2) {
-        for (int j =-1; j < jMax && x + j > -1 && where % GREENLEFT != 0; j++) {
+        for (int j =-1; j < EXTRA_LINES && x + j > -1 && where % GREENLEFT != 0; j++) {
             if (thresh->thresholded[i+y][x - j] == GREEN) {
                 where = where * GREENLEFT;
             }
         }
     }
     for (int i = 0; i < w && x + i < IMAGE_WIDTH && where % GREENABOVE != 0; i= i+2) {
-        for (int j = 0; j < jMax && y - j > 0 && where % GREENABOVE != 0; j++) {
+        for (int j = 0; j < EXTRA_LINES && y - j > 0 && where % GREENABOVE != 0; j++) {
             if (thresh->thresholded[i+y][j+x] == GREEN) {
                 where = where * GREENABOVE;
             }
@@ -3841,7 +3760,7 @@ int ObjectFragments::ballNearGreen(blob b)
     x = b.rightTop.x;
     y = b.rightTop.y;
     for (int i = 0; i < h && y + i < IMAGE_HEIGHT && where % GREENRIGHT != 0; i= i+2) {
-        for (int j = 0; j < jMax && x + j < IMAGE_WIDTH && where % GREENRIGHT != 0; j++) {
+        for (int j = 0; j < EXTRA_LINES && x + j < IMAGE_WIDTH && where % GREENRIGHT != 0; j++) {
             if (thresh->thresholded[i+y][j+x] == GREEN) {
                 where = where * GREENRIGHT;
             }
@@ -3864,7 +3783,7 @@ bool ObjectFragments::badSurround(blob b) {
     // some green, worrisome would be lots of RED
     static const int SURROUND = 12;
 	
-	const int greenDiv = 10;
+	const float GREEN_PERCENT = 0.1f;
 
     int x = b.leftTop.x;
     int y = b.leftTop.y;
@@ -3944,7 +3863,7 @@ bool ObjectFragments::badSurround(blob b) {
 			return true;
 		}
 	}
-	if (red > orange && greens < (w * h) / greenDiv) {
+	if (red > orange && greens < (w * h) * GREEN_PERCENT) {
 		if (BALLDEBUG) {
 			cout << "Too much real orangered without enough green" << endl;
 		}
@@ -4022,20 +3941,19 @@ void ObjectFragments::setBallInfo(int w, int h, VisualBall *thisBall) {
  */
 int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 {
-    const int blobMin = 3;
-	const int arMin = 35;
-	const int arMax = 1000;
-	const int heightDiv = 3;
-	const int imgBuff = 3;
-	const int numMin = 5;
-	const int horbBuff = 30;
-	const float roundParam = 0.85f;
-	const float roundMult = 10.0f;
-	const int confAdjust = 3;
-	const int blobLow = 75;
-	const int blobMid = 150;
-	const int blobHigh = 250;
-	const int blobMax = 500;
+    const int MIN_BLOB_SIZE = 3;
+	const int MIN_AREA = 35;
+	const int MAX_AREA = 1000;
+	const int PIX_EST_DIV = 3;
+	const int BOTTOM_EDGE_BUFF = 3;
+	const int HORIZON_THRESHOLD = 30;
+	const float OPTIMAL_COLOR_PERCENT = 0.85f;
+	const float CONVERT_TO_INT = 10.0f;
+	const int CONFIDENCE_ADJUSTMENT = 3;
+	const int SMALL_BLOB = 75;
+	const int MEDIUM_BLOB = 150;
+	const int BIG_BLOB = 250;
+	const int HUGE_BLOB = 500;
 	const float PIXACC = 300;
 
     int confidence = 10;
@@ -4056,7 +3974,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
     }
 	// when we have red uniforms, sometimes we get tons of orange blobs
 	// and sometimes they are inside of each other
-	if (numBlobs > blobMin) {
+	if (numBlobs > MIN_BLOB_SIZE) {
 		int big = 0, bigArea = blobArea(blobs[0]);
 		for (int i = 1; i < numBlobs; i++) {
 			if (blobArea(blobs[i]) > bigArea) {
@@ -4126,11 +4044,11 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 						// This is going to be a hack added in graz
 						// what we're going to do is for really big blobs
 						// do a modified roundess check
-						const float maxDiv = 6.0f;
+						const float CORNER_CHUNK_DIV = 6.0f;
 						int w = blobWidth(blobs[i]);
 						int h = blobHeight(blobs[i]);
 						int x = blobs[i].leftTop.x, y = blobs[i].leftTop.y;
-						int d = ROUND2(static_cast<float>(w) / maxDiv);
+						int d = ROUND2(static_cast<float>(w) / CORNER_CHUNK_DIV);
 						int pix, badPix = 0, goodPix = 0;
 						for (int j = 0; j < d; j++) {
 							pix = thresh->thresholded[y+j][x+j];
@@ -4167,13 +4085,13 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 					blobs[i].leftBottom.y = blobs[i].leftTop.y + newHeight;
 					blobs[i].rightBottom.y = blobs[i].leftBottom.y;
 				}
-			} else if (ar > arMin && perc > MINORANGEPERCENT) {
+			} else if (ar > MIN_AREA && perc > MINORANGEPERCENT) {
 				// don't do anything
 				if (BALLDEBUG) {
 					cout << "Candidate ball " << endl;
 					printBlob(blobs[i]);
 				}
-			} else if (ar > arMax && rightHalfColor(blobs[i]) > MINORANGEPERCENT) {
+			} else if (ar > MAX_AREA && rightHalfColor(blobs[i]) > MINORANGEPERCENT) {
 				if (BALLDEBUG) {
 					cout << "Candidate ball " << endl;
 					printBlob(blobs[i]);
@@ -4211,7 +4129,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 		h = blobHeight(topBlob);
 		const float BALL_REAL_HEIGHT = 8.6f;
 		e = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2,
-									  topBlob.leftTop.y + 2 * blobHeight(topBlob) / heightDiv, BALL_REAL_HEIGHT);
+									  topBlob.leftTop.y + 2 * blobHeight(topBlob) / PIX_EST_DIV, BALL_REAL_HEIGHT);
 
 		//cout << "Estimated distance is " << e.dist << endl;
 		if (BALLDEBUG) {
@@ -4223,7 +4141,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 
 		}
 		// check for obvious occlusions
-		if (topBlob.leftBottom.y > IMAGE_HEIGHT - imgBuff) {
+		if (topBlob.leftBottom.y > IMAGE_HEIGHT - BOTTOM_EDGE_BUFF) {
 			occlusion = BOTTOMOCCLUSION;
 		}
 		if (topBlob.leftTop.y < 1) {
@@ -4263,7 +4181,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 
 			if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
 				// small balls should be near the horizon - this check makes extra sure
-				if (topBlob.leftBottom.y > horb + horbBuff) {
+				if (topBlob.leftBottom.y > horb + HORIZON_THRESHOLD) {
 					if (BALLDEBUG)
 						cout << "Screening small ball for horizon" << endl;
 					return 0;
@@ -4274,15 +4192,15 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
 			float colPer = rightColor(topBlob, ORANGE);
 
 
-			confidence -= ROUND2((roundParam - colPer) * roundMult);
+			confidence -= ROUND2((OPTIMAL_COLOR_PERCENT - colPer) * CONVERT_TO_INT);
 			//cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
-			if (topBlob.area < blobLow) {
-				confidence -= confAdjust;
-			} else if (topBlob.area < blobMid) {
+			if (topBlob.area < SMALL_BLOB) {
+				confidence -= CONFIDENCE_ADJUSTMENT;
+			} else if (topBlob.area < MEDIUM_BLOB) {
 				confidence -= 1;
-			} else if (topBlob.area > blobMax) {
+			} else if (topBlob.area > HUGE_BLOB) {
 				confidence += 2;
-			} else if (topBlob.area > blobHigh) {
+			} else if (topBlob.area > BIG_BLOB) {
 				confidence += 1;
 			}
 			if (BALLDEBUG) {
@@ -4393,7 +4311,7 @@ int ObjectFragments::balls(int horizon, VisualBall *thisBall)
     if (BALLDISTDEBUG) {
         estimate es;
         es = vision->pose->pixEstimate(topBlob.leftTop.x + blobWidth(topBlob) / 2, topBlob.leftTop.y + 2
-			 * blobHeight(topBlob) / heightDiv, 8.0);
+			 * blobHeight(topBlob) / PIX_EST_DIV, 8.0);
         cout << "Distance is " << thisBall->getDistance() << " " << thisBall->getFocDist() << " " << es.dist << endl;
         cout<< "Radius"<<thisBall->getRadius()<<endl;
     }
@@ -4445,13 +4363,13 @@ bool ObjectFragments::rightBlobColor(blob tempobj, float minpercent) {
 
 void ObjectFragments::screenCrossbar()
 {
-    const int blobMax = 100;
+    const int HUGE_BLOB = 100;
 
     //check each blob in the array
     for (int i = 0; i < numBlobs; i++) {
         for (int j = 0; j < numBlobs; j++) {
             if (i != j && distance(blobs[i].leftTop.x, blobs[i].rightTop.x, blobs[j].leftTop.x, blobs[j].rightTop.x) < 1) {
-                if (blobs[i].leftTop.y < blobs[j].leftTop.y && blobs[j].area > blobMax) {
+                if (blobs[i].leftTop.y < blobs[j].leftTop.y && blobs[j].area > HUGE_BLOB) {
                     blobs[i].area = 0;
                     if (POSTDEBUG) {
                         cout << "Screening blob " << i  << " because of blob " << j << " " << blobs[j].area << endl;
@@ -4485,10 +4403,10 @@ bool ObjectFragments::postBigEnough(blob b) {
 
 bool ObjectFragments::locationOk(blob b, int hor)
 {
-    const int horzVal = -50;
-	const int minPostSpanY = 55;
-	const int spanMax = 5;
-	const int bottomMin = 25;
+    const int MIN_HORIZON = -50;
+	const int TALL_POST = 55;
+	const int MIN_WIDTH = 5;
+	const int ALLOWABLE_HORIZON_DIFF = 25;
 	
     if (!blobOk(b)) {
         if (POSTLOGIC) {
@@ -4496,7 +4414,7 @@ bool ObjectFragments::locationOk(blob b, int hor)
         }
         return false;
     }
-    if (hor < horzVal) {
+    if (hor < MIN_HORIZON) {
         if (POSTLOGIC) {
             cout << "Horizon too high" << endl;
         }
@@ -4520,9 +4438,9 @@ bool ObjectFragments::locationOk(blob b, int hor)
     int mh = min(horizonLeft, horizonRight);
     if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom,
                          trueTop)) {
-        if (!greenCheck(b) || mh - trueBottom > spanY || spanX < spanMax ||
-            mh - trueBottom > bottomMin) {
-            if (spanY > minPostSpanY) {
+        if (!greenCheck(b) || mh - trueBottom > spanY || spanX < MIN_WIDTH ||
+            mh - trueBottom > ALLOWABLE_HORIZON_DIFF) {
+            if (spanY > TALL_POST) {
 	      //return true;
             } else {
 	      if (SANITY) {
@@ -4554,46 +4472,45 @@ bool ObjectFragments::locationOk(blob b, int hor)
 
 bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right, int bottom, int top)
 {
-    const int spanYMin = 100;
-	const int bottBuff = 5;
-	const int param = 20;
-	const int leftMax = 10;
-	const int imgDiff = 10;
-	const int topMax = 5;
-	const int spanMax = 15;
-	const int scanMin = 5;
+    const int TALL_POST = 100;
+	const int BOTTOM_FUDGE_FACTOR = 5;
+	const int ALLOWANCE_DUE_TO_WIDTH = 20;
+	const int IMAGE_EDGE = 10;
+	const int MAX_Y_VALUE = 5;
+	const int MIN_WIDTH = 15;
+	const int MIN_GOOD = 5;
 
     // add a width fudge factor in case the object is occluded - bigger objects will also be taller
     //cout << (bottom + 5) << " " << minHeight << " " << top << " " << spanY << " " << spanX << " " << left << " " << right << endl;
     //int fudge = 20;
-    if (spanY > spanYMin) return true;
+    if (spanY > TALL_POST) return true;
     if (color == BLUE) {
-      //cout << "Bottom info: " << (bottom + bottBuff) << " " << minHeight << " " << endl;
-      if (bottom + bottBuff < minHeight) {
+      //cout << "Bottom info: " << (bottom + BOTTOM_FUDGE_FACTOR) << " " << minHeight << " " << endl;
+      if (bottom + BOTTOM_FUDGE_FACTOR < minHeight) {
 	if (SANITY)
 	  cout << "Removed risky blue post" << endl;
 	return false;
       }
     }
-    if (bottom + bottBuff + min(spanX, param) < minHeight) {
+    if (bottom + BOTTOM_FUDGE_FACTOR + min(spanX, ALLOWANCE_DUE_TO_WIDTH) < minHeight) {
         if (SANITY) {
             cout << "Bad height" << endl;
         }
         return false;
     }
     // when we're at the edges of the image make the rules a bit more stringent
-    if (bottom + bottBuff < minHeight && (left < leftMax || right > IMAGE_WIDTH - imgDiff || top < topMax) && (spanY < spanMax)) {
+    if (bottom + BOTTOM_FUDGE_FACTOR < minHeight && (left < IMAGE_EDGE || right > IMAGE_WIDTH - IMAGE_EDGE || top < MAX_Y_VALUE) && (spanY < MIN_WIDTH)) {
         if (SANITY)
             cout << "Bad Edge Information" << endl;
         return false;
     }
     // if we're fudging then make sure there is green somewhere - in other words watch out for occluded beacons
-    if (top == 0 && bottom + bottBuff < minHeight) {
+    if (top == 0 && bottom + BOTTOM_FUDGE_FACTOR < minHeight) {
         //int x = left + spanX / 2;
         //int y = bottom + 5 + spanX;
         //vertScan(x, y, 1, 3, WHITE, ORANGEYELLOW);
         //drawPoint(x, y, RED);
-        if (scan.good > scanMin) {
+        if (scan.good > MIN_GOOD) {
             if (SANITY)
                 cout << "Occluded beacon?" << endl;
             return false;
@@ -4610,14 +4527,14 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight, int l
  */
 bool ObjectFragments::horizonTopOk(int top, int hor)
 {
-    const int drawX = 100;
+    const int DEBUG_X = 100;
 
     //if (hor <= 0) return false;
     if (top < 0) return true;
     if (top + MIN_GOAL_HEIGHT / 2 > hor && hor > 0) {
         if (SANITY) {
-            drawPoint(drawX, top, RED);
-            drawPoint(drawX, hor, BLACK);
+            drawPoint(DEBUG_X, top, RED);
+            drawPoint(DEBUG_X, hor, BLACK);
             drawBlob(pole, ORANGE);
             cout << "Top is " << top << " " << hor << endl;
             cout << "Problems at top" << endl;
@@ -4688,29 +4605,29 @@ bool ObjectFragments::blobOk(blob b) {
 
 bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2, int spanY2, int t1, int t2, int fudge)
 {
-    const int spanMin = 100;
-	const int spanMult = 3;
-	const int spanDiv = 4;
-	const int spanMin2 = 70;
-	const int spanDiv2 = 3;
-	const int spanDiff = 10;
+    const int SECOND_IS_TALL = 100;
+	const int SPAN_MULTIPLIER = 3;
+	const float SPAN_PERCENT = 0.25f;
+	const float SPAN2_PERCENT = 0.33f;
+	const int SECOND_IS_TALL2 = 70;
+	const int SMALL_POST = 10;
 
-    if (spanY2 > spanMin) return true;
-    if (spanY2 > spanMult * spanY / spanDiv) return true;
+    if (spanY2 > SECOND_IS_TALL) return true;
+    if (spanY2 > SPAN_MULTIPLIER * spanY * SPAN_PERCENT) return true;
     // we need to get the "real" offset
     int f = max(yProject(0, t1, spanY), yProject(IMAGE_WIDTH - 1, t1, IMAGE_WIDTH - spanY));
-    if (abs(t1 - t2) > spanMult * min(spanY, spanY2) / spanDiv + f)  {
+    if (abs(t1 - t2) > SPAN_MULTIPLIER * min(spanY, spanY2) * SPAN_PERCENT + f)  {
         if (SANITY) {
             cout << "Bad top offsets" << endl;
         }
         return false;
     }
-    if (spanY2 > spanMin2) return true;
+    if (spanY2 > SECOND_IS_TALL2) return true;
     if (spanX2 > 2
 		&& (spanY2 > spanY / 2 || spanY2 > BIGPOST ||
-			( (spanY2 > spanY / spanDiv2 && spanX2 > spanDiff) &&
+			( (spanY2 > spanY * SPAN2_PERCENT && spanX2 > SMALL_POST) &&
 			  (spanX2 <= spanX / 2 || fudge != 0)) ) &&
-		(spanX2 > spanX / spanDiv))  {
+		(spanX2 > spanX * SPAN_PERCENT))  {
         return true;
     }
     if (t1 < 1 && t2 < 1) return true;
