@@ -17,11 +17,7 @@ def goalieRunChecks(player):
             if DEBUG: print "should chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= goalCon.START_CHASE_BUFFER:
                 player.shouldChaseCounter = 0
-                if player.currentState == 'squatted' or\
-                        player.currentState == 'squat':
-                    return 'chasePrepare'
-                player.isChasing = True
-                return 'chase'
+                return 'chasePrepare'
         else:
             player.shouldChaseCounter = 0
 

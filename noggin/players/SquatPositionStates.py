@@ -33,8 +33,6 @@ def squatted(player):
     return player.stay()
 
 def squatPosition(player):
-    player.isChasing = False
-    player.squatting = False
     brain = player.brain
     position = brain.playbook.position
     nav = brain.nav

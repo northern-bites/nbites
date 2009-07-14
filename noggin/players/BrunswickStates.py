@@ -22,9 +22,8 @@ def gameInitial(player):
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
-        player.squatting = False
 
-    elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown 
+    elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and player.motion.isBodyActive()):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
