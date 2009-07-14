@@ -25,7 +25,7 @@ def squatted(player):
     player.isChasing = False
     player.squatting = True
     brain = player.brain
-    if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
+    if brain.ball.locDist >= constants.ACTIVE_LOC_THRESH:
         brain.tracker.activeLoc()
     else:
         brain.tracker.trackBall()
