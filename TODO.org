@@ -28,6 +28,14 @@
 *** TODO Get more people. duh.
 
 * NEW FEATURES
+** High Level and biggest goals
+   1. Significantly better localization
+      * This entails improvements in a few places (vision, Kalman filter). Will allow for improvements in positioning and kick decisions.
+   2. Kick engine
+      * Omni-directional and distance varying kicks
+   3. Precise stepping and stopping
+      * More accurate positioning before kicks.
+   4. Integrate previous components into behaviors
 
 ** Motion
 
