@@ -40,21 +40,27 @@
 ** Motion
 
 *** Walking
-
+**** TODO Move each gait into a separte file
+     All gaits get separate file, in a folder called motiuon/gaits
 **** TODO Better Webots gait
 
 **** TODO Faster stopping
-
-**** TODO Movable steps
-
-**** TODO ZMP recalculated after each frame depending on new steps
-
+     Decouple Step creation and ZMP generation
 **** TODO Walking interface to Python to move a certain distance & angle
 
 **** TODO Fix/Dehack how walk engine does turning steps
 
 **** TODO Make hip offsets variable, so we can widen stance of robot
 
+**** TODO Rearchitecutre Walking (see details)
+***** TODO Move more complexity out of step generator
+      And into Controller/WalkingLeg, and make Step Gen really just a glorified list
+***** TODO Movable steps
+
+***** TODO ZMP recalculated after each frame depending on new steps
+
+**** TODO Figure out a better way to use angleXY as sensor feedback
+**** TODO Clean out MotionInterface of unused functions
 *** Kicking
 
 **** TODO [#B] Kick engine
@@ -68,6 +74,8 @@
 
 **** TODO Rapid spinning
 
+** RoboGuardian
+*** Implement NUBot esque fall positions
 ** Vision
 *** TODO Opponent recognition (also with sonar)
 *** TODO Open goal detection
@@ -116,6 +124,9 @@
 
 *** TODO Passing
 
+*** TODO Monitor robot stability online:
+    (maybe by amplitude of aX/aY oscillation),
+    and potentially have behaviors react when this oscillation becomes too large
 ** Tools
 
 *** TOOL
@@ -131,3 +142,9 @@
 **** Burst tools
      Check out the burst tools and adapt them to our needs. Possibly write integrate into
      TOOL.
+
+** Website
+*** Added a captcha to reduce spam comments on blog
+** General
+*** Systematically ensure all method declarations are not in headers
+*** Systematically make sure GPL license is everywhere

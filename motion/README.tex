@@ -671,5 +671,18 @@ only relinquish control once it recieves the appropriate UnFreezeCommand.
 \section{Future Work}
 What follows is an unedited list of my ideas how to make the motion system better.
 \subsection{WalkProvider}
-
+\begin{itemize}
+\item Figure out a better way to use angleX/angleY among these might be
+\begin{itemize}
+   \item Use machine learning to discover the best constants in the spring model
+   \item Add a constant Beta, which is the coefficient of friction, and goes on
+      the diagonal in the state update matrix
+   \item Right now, the max angle and the spring constant are not in sync. This
+      means when the angle is measured at the max. value, the spring constant
+      is not guaranteed to be of the right magnitude to eventually bring the
+      'system' back to equillibrium.  Finding a constraint to ensure that this
+      is the case would probably be best.
+\end{itemize}
+\item Control Nao with a Playstation Controller
+\end{itemize}
 \end{document}
