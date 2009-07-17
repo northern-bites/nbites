@@ -133,7 +133,8 @@ namespace WP {
         KP,
         AP,
         AR,
-        ARM,
+		ARM,
+        ARM_PITCH,
         LEN_STIFF_CONFIG
     };
 
@@ -211,7 +212,8 @@ namespace WP {
      NONE,//knee
      NONE,//ap
      NONE,//ar
-     NONE};//arms
+	 NONE,//arms
+     NONE};//arm pitch
     static const float ODO_CONVERSION[LEN_ODO_CONFIG]=
     {NONE,//xodoscale
      NONE,//yodoscale
@@ -268,7 +270,8 @@ namespace WP {
      0.3f,//knee
      0.4f,//ap
      0.3f,//ar
-     0.2f};//arms
+     0.2f,//arm
+	 0.2f};//arm pitch
     static const float ODO_DEFAULT[LEN_ODO_CONFIG]=
     {1.0f,//xodoscale
      1.0f,//yodoscale
