@@ -1,7 +1,6 @@
 * CURRENT BUGS & ISSUES
 
 ** Motion
-
 *** TODO Gait switching interface
     Needs to be moved into more sensible location in Python and its interface needs to be rethought. How we do it now is unsustainable and bug-inviting. Possible gait FSA?
 
@@ -38,7 +37,8 @@
    4. Integrate previous components into behaviors
 
 ** Motion
-
+*** TODO Double check the MOTION TIME STEP
+    so we can make the switch to 10ms timesteps
 *** Walking
 **** TODO Move each gait into a separte file
      All gaits get separate file, in a folder called motiuon/gaits
@@ -59,8 +59,37 @@
 
 ***** TODO ZMP recalculated after each frame depending on new steps
 
+***** TODO Decouple ZMP and Step creation
+      Should be solved also if ZMP is constantly recalculated
+***** TODO Steamline cycloid calculation
+      Put cycloids and trapezoids in own class and only compute once
+***** TODO Consolidate FinalizeJoints
+      Ensure that nothing identical is calculated twice
+***** TODO See if STRAFE ZMP and L/R ZMP OFF can be merged
+      once the stance width actually works
 **** TODO Figure out a better way to use angleXY as sensor feedback
 **** TODO Clean out MotionInterface of unused functions
+**** TODO Figure out how to move each provider into its own directory
+     This probably requires a motion/include folder, and potentially
+     some virtual class to protect  other modules from including too
+     many headers from inside motion
+**** TODO DeHack the fake typing that exists inside MotionCommand.h
+     The enum of Command types needs to go. Maybe replace with a static
+     pointer to the associated Provider?
+**** TODO Determine if the PyXXCommand wrappers could be removed entirely
+     We might be able to totally remove the PyWrapper classes and just
+     use boost to wrap the actual command classes directly
+**** TODO Replace all pointers in PYXXCommands with boost pointers
+     This would allow only creating those commands once in Python. Otherwise
+     if the command is sent twice, a deleted pointer will get deleted again.
+**** TODO Investigate if Python could be fixing mutexes
+     Currently, if a walk command is sent, the python thread
+     must wait until all the walking processing is finished before it is able
+     to set the next command.  The walk provider should run pretty fast,  but
+     it doesnt run instantaneously. This may not be a huge issue also because
+     WalkCommands are only sent once a frame from python. A better solution
+     might be to keep a list of waiting commands, and only lock the provider
+     mutexes when the Switchboard is signaled.
 *** Kicking
 
 **** TODO [#B] Kick engine
@@ -71,7 +100,7 @@
 **** TODO Look-To RelX, RelY in the HeadProvider
 
 *** Misc motion
-
+**** TODO Potentially redo velocity clipping in NaoEnactor
 **** TODO Rapid spinning
 
 ** RoboGuardian

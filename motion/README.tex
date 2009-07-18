@@ -2,7 +2,13 @@
 \usepackage{fullpage}
 \usepackage{url}
 
+\title{Documentation for the Northern Bites Motion Engine}
+\author{Johannes Strom\\
+\url{j s t r o m @gmail}}
+\date{\today}
+
 \begin{document}
+\maketitle
 
 \begin{abstract}
 This README describes the architectural implementation of the motion engine for
@@ -11,13 +17,14 @@ in the code you should look for the code that fulfills a particular function,
 or which file might have instructions to lead you closer to that answer.
 
 For information regarding the conceptual meaning of the algorithms and
-architecture implemented here, I suggest you look at the following documents:
+architecture implemented here, I suggest you look at the following documents. TODO: put in links (currently available on the blog under 'Team History').
 \begin{enumerate}
 \item Dynamically Balanced Omnidirectional Humanoid Locomotion, by Johannes Strom
    Honors Thesis for the Bowdoin College Department of Computer Science, 2009
 \item  An Implementation of an Omnidirectional Walk Engine on a Nao Robot, by
    Johannes Strom, George Slavov and Eric Chown in RoboCup 2009, 2009
 \item Northern Bites Team Report for the Standard Platform League, 2009 (to appear)
+\item Presentation Slides: Biped Robot Locomotion. % \url{http://robocup.bowdoin.edu/public/docs/motion/nao-walking.pdf}.
 \end{enumerate}
 
 This PDF can be found at \url{http://robocup.bowdoin.edu/public/docs/motion/README.pdf}.
@@ -684,5 +691,12 @@ What follows is an unedited list of my ideas how to make the motion system bette
       is the case would probably be best.
 \end{itemize}
 \item Control Nao with a Playstation Controller
+\item To deal elegantly with having many gaits, we might consider implementing something
+like was presented in the other motion talk about parameters spaces and submanifolds to
+generate a good gait suited exactly for the speed/style etc we are trying to accomplish
+\item Resolve the philosophical question of whether sending potentially unsafe
+   commands to the walk engine should be limited from withing the walk provider
+   or if this responsibility should live in the behaviors
+\item More future work is in the file man/README.org
 \end{itemize}
 \end{document}
