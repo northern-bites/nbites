@@ -40,10 +40,13 @@
 *** TODO Double check the MOTION TIME STEP
     so we can make the switch to 10ms timesteps
 *** Walking
+**** TODO Navigator refuses Step commands
+     when the walk is already active.
 **** TODO Move each gait into a separte file
      All gaits get separate file, in a folder called motiuon/gaits
 **** TODO Better Webots gait
 
+**** TODO Fix factor of 2 in straffing
 **** TODO Faster stopping
      Decouple Step creation and ZMP generation
 **** TODO Walking interface to Python to move a certain distance & angle
@@ -90,6 +93,8 @@
      WalkCommands are only sent once a frame from python. A better solution
      might be to keep a list of waiting commands, and only lock the provider
      mutexes when the Switchboard is signaled.
+**** TODO Remove the MOTION_DEBUG ifdefs from the headers
+     this will speed up compilation when this flag is switched
 *** Kicking
 
 **** TODO [#B] Kick engine
