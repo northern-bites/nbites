@@ -31,6 +31,7 @@ noggin/util/fakeData/*
 /noggin/util/TAGS
 /noggin/offline/convertRobotLog
 /motion/README.dvi
+/motion/README.out
 /motion/README.aux
 /motion/README.log
 /motion/README.toc
