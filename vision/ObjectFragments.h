@@ -81,9 +81,9 @@ public:
     int yProject(point <int> point, int newy);
     int xProject(int startx, int starty, int newx);
     int xProject(point <int> point, int newx);
-    void vertScan(int x, int y, int dir, int stopper, int c, int c2);
+    void vertScan(int x, int y, int dir, int stopper, int c, int c2, stop & scan);
     void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
-                        int r);
+                        int r, stop & scan);
     int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2,
                              bool left);
     int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2,
@@ -96,7 +96,7 @@ public:
     int horizonAt(int x);
 
     // finding square objects
-    void squareGoal(int x, int y, int c, int c2);
+    void squareGoal(int x, int y, int c, int c2, blob & pole);
     float correct(blob b, int c, int c2);
 
     // main methods
@@ -113,11 +113,11 @@ public:
     int getBigRun(int left, int right, int hor);
     bool updateObject(VisualFieldObject* a, blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
-    distanceCertainty checkDist(int left, int right, int top, int bottom);
+    distanceCertainty checkDist(int left, int right, int top, int bottom,
+								blob pole);
 
     // post recognition routines
     int crossCheck(blob b);
-    int crossCheck2(blob b);
     int scanOut(int stopp, int spanX, int c);
     int checkOther(int left, int right, int height, int horizon);
     int characterizeSize(blob b);
@@ -129,16 +129,14 @@ public:
     void openDirection(int h, NaoPose *p);
     int classifyFirstPost(int horizon, int c, int c2, bool postFound,
                           VisualFieldObject* left, VisualFieldObject* right,
-                          VisualCrossbar* mid);
+                          VisualCrossbar* mid, blob pole);
 
     // the big kahuna
     void goalScan(VisualFieldObject *left, VisualFieldObject *right,
                   VisualCrossbar *mid, int c, int c2, bool post,
                   int horizon);
-    int grabPost(int c, int c2, int horizon, int left, int right);
+    int grabPost(int c, int c2, int horizon, int left, int right, blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
-    void transferToChecker(blob b);
-    void transferToPole();
     void transferTopBlob(VisualFieldObject * one, certainty cert,
                          distanceCertainty dc);
     void transferBlob(blob from, blob & to);
@@ -158,7 +156,6 @@ public:
 
     // sanity checks
     bool rightBlobColor(blob obj, float per);
-    void screenCrossbar();
     bool postBigEnough(blob b);
     bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
                          int bottom, int top);
@@ -207,10 +204,9 @@ private:
     int indexOfBiggestRun;
     run* runs;
 
-    blob topBlob, secondBlob, crossBlob;
+    blob topBlob;
     int numBlobs;
-    blob checker, obj, pole, leftBox, rightBox;
-    stop scan, scan1, scan2;
+    //blob checker, obj, pole, leftBox, rightBox;
     blob blobs[MAX_BLOBS];
     int projx[5], projy[5];
     int candidateX[4];
