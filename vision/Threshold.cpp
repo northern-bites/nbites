@@ -103,6 +103,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
                                                              ORANGE));
     green = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                             WHITE));
+	field = new Field(vision, this);
 }
 
 /* Main vision loop, called by Vision.cc
@@ -279,12 +280,13 @@ void Threshold::runs() {
         int lastGoodPixel = IMAGE_HEIGHT;
         //int horizonJ = pose->getHorizonY(i);
 		hor = horizon + (int)(horizonSlope * (float)(i));
+		greenEdge[i] = IMAGE_HEIGHT -2;
 
         for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
             pixel = thresholded[j][i];
 			// ToDo:  This works ok, but could be much better.  We should really
 			// calculate a trapezoid based on where the max height of the shoulder is
-			if ((i < pixInImageLeft || i > pixInImageRight) && j > pixInImageUp 
+			if ((i < pixInImageLeft || i > pixInImageRight) && j > pixInImageUp
 				&& thresholded[j][i] == BLUE) {
 				thresholded[j][i] = GREY;
 			}
@@ -296,7 +298,7 @@ void Threshold::runs() {
                 currentRun++;
             }
             // otherwise, do stuff according to color
-            if (lastPixel != pixel || j == 0) { // j == 0 means end of column
+            if (lastPixel != pixel || j == 0 || hor - j > 30) { // end of column
                 // switch for last thresholded pixel
 
                 switch (lastPixel) {
@@ -361,6 +363,9 @@ void Threshold::runs() {
                         navyBottoms[i] = -1;
 						}*/
 					lastGoodPixel = j;
+					if (currentRun >= MIN_RUN_SIZE) {
+						greenEdge[i] = j;
+					}
 
                     break;
                 case BLUE:
@@ -409,10 +414,13 @@ void Threshold::runs() {
                 // store the position of the start of the run in the column (y-value)
                 //currentRunStart = j;
             }
-            if (j < hor && lastGoodPixel - j > 15 &&
-				(currentRun == 1 || lastPixel == GREY)) {
+            if (j < hor && (hor - j > 30 || (lastGoodPixel - j > 15 &&
+											 (currentRun == 1 || lastPixel == GREY)))) {
 				//drawPoint(i, j, PINK);
+				//for ( ; j > 0; j--)
+				//debugImage[j][i] = PINK;
 				j = 0;
+				//drawPoint(i, greenEdge[i], BLACK);
 				break;
 			}
             // every pixel.
@@ -425,6 +433,7 @@ void Threshold::runs() {
         //}
     }//end i loop
 
+	field->findFieldEdges();
     // now do some robot scanning stuff - we're going to analyze our runs and see if they
     // could be turned into viable robot runs that we will feed to ObjectFragments
 	/*
@@ -510,9 +519,11 @@ void Threshold::thresholdAndRuns() {
     threshold();
     PROF_EXIT(vision->profiler, P_THRESHOLD);
 
+	initColors();
+
     // Determine where the field horizon is
     PROF_ENTER(vision->profiler, P_FGHORIZON);
-    findGreenHorizon();
+    horizon = field->findGreenHorizon(pose->getHorizonY(0));
     PROF_EXIT(vision->profiler, P_FGHORIZON);
 
     // 'Run' up the image to find color-grouped pixel sequences
@@ -524,196 +535,9 @@ void Threshold::thresholdAndRuns() {
 }
 
 
-/*
- * Check the left side of the image, looking to find an edge of the field.
- *  Our goal is to determine the basic shape of the field.  If we find the edge
- * on the left side, then we can use it to find any landmarks - which
- * ought to be right on the edge.
- */
-
-void Threshold::findGreenHorizon() {
-#ifdef JOHO_DEBUG
-    print("   Theshold::SweepLeft");
-#endif
-    // a useful point is where we stop seeing green in the first few pixels
-
-    //variable definitions
-    int pH, run, greenPixels, scanY;
-    register int i, j;
-    unsigned char pixel; //, lastPixel;
-    initColors();
-
-    // if the pose estimated horizon is less than 0, then just use it directly
-    pH = pose->getHorizonY(0);
-    //cout << "Pose horizon " << pH << endl;
-    //if (pH < -20) {
-    //horizon = pH;
-    //return;
-    //}
-
-    horizon = -1;
-    run = 0;                 // how many consecutive green pixels have I seen?
-    greenPixels = 0;
-    scanY = 0;
-    int firstpix = 0;
-    // we're going to do this backwards of how we used to - we start at the pose
-    // horizon and scan down
-    for (j = pH; j < IMAGE_HEIGHT && horizon == -1; j+=4) {
-        greenPixels = 0;
-        run = 0;
-        scanY = 0;
-        //lastBlue = bluepix;
-        //lastYellow = yellowpix;
-        for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
-                 && greenPixels < 3; i+= 10) {
-            pixel = thresholded[scanY][i];
-            if (pixel == GREEN) {
-                greenPixels++;
-            }
-            scanY = blue->yProject(0, j, i);
-        }
-        if (greenPixels > 2) {
-            break;
-        }
-    }
-    // we should have a base estimate, let's move it up
-    int k, l, minpix = IMAGE_WIDTH, minpixrow = -1;
-    //cout << "initial estimate is " << j << " " << pH << endl;
-    horizon = j;
-    for (k = min(horizon, IMAGE_HEIGHT - 2); k > -1; k-=4) {
-        greenPixels = 0;
-        run = 0;
-        scanY = 0;
-        for (l = max(0, firstpix - 5), firstpix = -1; l < IMAGE_WIDTH && scanY <
-                 IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
-                 greenPixels < 20; l+=3) {
-            //drawPoint(l, scanY, BLACK);
-            newPixel = thresholded[scanY][l];
-            if (newPixel == GREEN) {
-                if (firstpix == -1) {
-                    //cout << "firstpix " << i << endl;;
-                    firstpix = l;
-                    if (l <= minpix) {
-                        minpix = l;
-                        minpixrow = k;
-                    }
-                }
-                run++;
-                greenPixels++;
-            } else {
-                run = 0;
-            }
-            scanY = blue->yProject(0, k, l);
-        }
-        if (run < MIN_GREEN_SIZE && greenPixels < 20) {
-            // first make sure we didn't get fooled by firstpix
-            run = 0;
-            scanY = firstpix;
-            for (j = firstpix - 1; j >= 0; j--) {
-                if (scanY < 0) {
-                    //cout << "scanY < 0, value is: " << scanY << endl;
-                    scanY = 0;
-                }
-                if (scanY > IMAGE_HEIGHT) {
-                    //cout << "scanY > IMAGE_HEIGHT, value is: " << scanY << endl;
-                    scanY = IMAGE_HEIGHT;
-                }
-
-                newPixel = thresholded[scanY][j];
-                //drawPoint(j, scanY, BLACK);
-                if (newPixel == GREEN) {
-                    run++;
-                    greenPixels++;
-                    firstpix = j;
-                }
-                scanY = blue->yProject(0, k, j);
-            }
-            if (run < MIN_GREEN_SIZE && greenPixels < 20) {
-                // cout << "Found horizon " << k << " " << run << " "
-                //      << greenPixels << endl;
-                // drawPoint(100, k + 1, BLACK);
-                // drawLine(0, k+2, IMAGE_WIDTH - 1,
-                //          green->yProject(0, k+2, IMAGE_WIDTH - 1), MAROON);
-                // drawLine(minpix, minpixrow, firstpix, k + 2, RED);
-                horizon = k + 2;
-                return;
-            }
-        }
-    }
-    horizon = 0;
+int Threshold::greenEdgePoint(int x) {
+	return greenEdge[x];
 }
-
-// point <int> Threshold::findIntersection(int col, int dir, int c) {
-//   point <int> ret;
-//   ret.x = BADVALUE; ret.y = BADVALUE;
-//   for (int i = col; i > -1 && i < IMAGE_WIDTH; i += dir) {
-//     if (c == BLUE) {
-//       if (blueWhite[i] != BADVALUE) {
-// 	ret.x = i;
-// 	ret.y = blueWhite[i];
-// 	return ret;
-//       }
-//     } else {
-//       if (yellowWhite[i] != BADVALUE) {
-// 	ret.x = i;
-// 	ret.y = yellowWhite[i];
-// 	return ret;
-//       }
-//     }
-//   }
-//   return ret;
-// }
-
-// point <int> Threshold::crossbarCheck(bool which, int leftRange, int rightRange) {
-//   int left = -1, right = -1, total = 0;
-//   int bestLeft = -1, bestRight = -1, bestTotal = 0;
-//   int bads = 0;
-//   for (int i = leftRange + 1; i < rightRange; i++) {
-//     if ((which && greenBlue[i]) || (!which && greenYellow[i])) {
-//       bads = 0;
-//       if (total == 0)
-// 	left = i;
-//       right = i;
-//       total++;
-//       if (total > bestTotal) {
-// 	bestTotal = total;
-// 	bestLeft = left;
-// 	bestRight = right;
-//       }
-//     } else {
-//       bads++;
-//       if (bads > 1)
-// 	total = 0;
-//     }
-//   }
-//   point <int> result;
-//   result.x = bestLeft; result.y = bestRight;
-//   return result;
-// }
-
-// int Threshold::postCheck(bool which, int left, int right) {
-//   int rc = 0, lc = 0;
-//   if (which) {
-//     for (int i = 0; i < left; i++) {
-//       if (greenBlue[i])
-// 	lc++;
-//     }
-//     for (int i = right; i < IMAGE_WIDTH; i++) {
-//       if (greenBlue[i])
-// 	rc++;
-//     }
-//   } else {
-//     for (int i = 0; i < left; i++) {
-//       if (greenYellow[i])
-// 	lc++;
-//     }
-//     for (int i = right; i < IMAGE_WIDTH; i++) {
-//       if (greenYellow[i])
-// 	rc++;
-//     }
-//   }
-//   return lc - rc;
-// }
 
 
 /*  Makes the calls to the vision system to recognize objects.  Then performs some extra

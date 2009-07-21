@@ -11,6 +11,7 @@ class Threshold;  // forward reference
 
 #include "ObjectFragments.h"
 #include "NaoPose.h"
+#include "Field.h"
 #ifndef NO_ZLIB
 #include "Zlib.h"
 #endif
@@ -40,8 +41,6 @@ class Threshold;  // forward reference
 // THRESHOLDING CONSTANTS
 // Constants pertaining to object detection and horizon detection
 static const int MIN_RUN_SIZE = 5;
-// we're more demanding of Green because there is so much
-static const int MIN_GREEN_SIZE = 10;
 
 /* The following two constants are used in the traversal of the image
    inside thresholdAndRuns. We start at the bottom left of the image which
@@ -97,6 +96,7 @@ public:
     float getEuclidianDist(point <int> coord1, point <int> coord2);
     void findGreenHorizon();
     point <int> findIntersection(int col, int dir, int c);
+	int greenEdgePoint(int x);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uchar* newyuv);
@@ -173,6 +173,7 @@ private:
     // class pointers
     Vision* vision;
     boost::shared_ptr<NaoPose> pose;
+	Field* field;
 
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;
@@ -194,6 +195,7 @@ private:
     int redTops[IMAGE_WIDTH];
     int navyBottoms[IMAGE_WIDTH];
     int redBottoms[IMAGE_WIDTH];
+	int greenEdge[IMAGE_WIDTH];
 
     // thresholding variables
     int horizon;
