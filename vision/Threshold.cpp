@@ -99,8 +99,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
                                                                NAVY));
     red = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                           RED));
-    orange = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                             ORANGE));
+    orange = new Ball(vision, this, ORANGE);
     green = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                             WHITE));
 	field = new Field(vision, this);
@@ -646,9 +645,9 @@ void Threshold::objectRecognition() {
     }
 
     if (horizon < IMAGE_HEIGHT)
-        orange->createObject(horizon);
+        orange->createBall(horizon);
     else
-        orange->createObject(pose->getHorizonY(0));
+		orange->createBall(pose->getHorizonY(0)); 
 
     if (ylp || yrp) {
         yellow->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar);

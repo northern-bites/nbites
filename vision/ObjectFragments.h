@@ -37,10 +37,9 @@ class ObjectFragments; // forward reference
 #include "VisualBall.h"
 #include "Vision.h"
 
-
-//constants to constrain blob and point amounts
 static const int MAX_BLOBS = 400;
 static const int MAX_POINTS = 100;
+
 
 class ObjectFragments {
 public:
@@ -54,7 +53,6 @@ public:
     // Making object
     void init(float s);
 
-    // blobbing
     void getTopAndMerge(int maxY);
     void getWidest();
     void zeroTheBlob(int which);

@@ -10,6 +10,7 @@ class Threshold;  // forward reference
 #include "Vision.h"
 
 #include "ObjectFragments.h"
+#include "Ball.h"
 #include "NaoPose.h"
 #include "Field.h"
 #ifndef NO_ZLIB
@@ -153,11 +154,11 @@ public:
 
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
-    boost::shared_ptr<ObjectFragments> orange;
     boost::shared_ptr<ObjectFragments> green;
     boost::shared_ptr<ObjectFragments> navyblue;
     boost::shared_ptr<ObjectFragments> red;
 
+    Ball* orange;
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
 
