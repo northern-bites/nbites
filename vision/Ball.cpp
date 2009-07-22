@@ -92,6 +92,9 @@ Ball::Ball(Vision* vis, Threshold* thr, int _color)
  */
 void Ball::init(float s)
 {
+	for (int i = 0; i < MAX_BALLS; i++) {
+		blobs[i].init();
+	}
     slope = s;
     biggestRun = 0;
     maxHeight = IMAGE_HEIGHT;
@@ -284,7 +287,7 @@ void Ball::getWidest()
     //check each blob in the array
     for (int i = 0; i < numBlobs; i++) {
         width = blobs[i].width();
-        if (width > size && !blobs[i].getBad()) {
+        if (width > size) {
             size = width;
             topBlob = &blobs[i];
             topSpot = i; //store the one with the largest size.
@@ -1263,7 +1266,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	if (numBlobs > MIN_BLOB_SIZE) {
 		int big = 0, bigArea = blobs[0].getArea();
 		for (int i = 1; i < numBlobs; i++) {
-			if (blobs[i].getArea() > bigArea && !blobs[i].getBad()) {
+			if (blobs[i].getArea() > bigArea) {
 				big = i;
 				bigArea = blobs[i].getArea();
 			}
@@ -1288,7 +1291,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         int ar = blobs[i].getArea();
         float perc = rightColor(blobs[i], ORANGE);
         int diam = max(blobs[i].width(), blobs[i].height());
-		if (blobs[i].getArea() > 0 && !blobs[i].getBad()) {
+		if (blobs[i].getArea() > 0) {
 			if (blobs[i].getLeftBottomY() + diam < horizonAt(blobs[i].getLeftTopX())) {
 				blobs[i].setArea(0);
 				if (BALLDEBUG) {
@@ -1411,14 +1414,12 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 		// now find the best remaining blob
 		getTopAndMerge(horizon);
 
-		cout << "Here " << endl;
 		if (!blobOk(*topBlob)) {
 			if (BALLDEBUG)
 				cout << "No viable blobs" << endl;
 			return 0;
 		}
 
-		cout << "There " << endl;
 		// try to screen out "false balls"
 		w = topBlob->width();
 		h = topBlob->height();

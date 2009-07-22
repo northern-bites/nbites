@@ -6,7 +6,9 @@
 #include "NaoPose.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
+#include <stdlib.h>
 
+using namespace std;
 
 class Blob {
 public:
@@ -42,6 +44,10 @@ public:
 	point<int> getRightBottom() {return rightBottom;}
 	int getRightBottomX() {return rightBottom.x;}
 	int getRightBottomY() {return rightBottom.y;}
+	int getLeft() {return min(leftTop.x, leftBottom.x);}
+	int getRight() {return max(rightTop.x, rightTop.x);}
+	int getTop() {return min(leftTop.y, rightTop.y);}
+	int getBottom() {return max(leftBottom.y, rightBottom.y);}
 	int width();
 	int height();
 	int getArea();
@@ -50,6 +56,7 @@ public:
     // blobbing
 	void init();
 	void merge(Blob other);
+	void printBlob();
 
 private:
     // bounding coordinates of the blob

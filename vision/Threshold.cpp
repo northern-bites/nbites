@@ -100,8 +100,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     red = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                           RED));
     orange = new Ball(vision, this, ORANGE);
-    green = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                            WHITE));
+    cross = new Cross(vision, this);
 	field = new Field(vision, this);
 }
 
@@ -398,7 +397,7 @@ void Threshold::runs() {
                     if (currentRun >= 2) {
                         lastGoodPixel = j;
 						if (j + currentRun > IMAGE_HEIGHT / 3 && currentRun < 25) {
-							green->newRun(i, j, currentRun);
+							cross->newRun(i, j, currentRun);
 						}
                     }
                     break;
@@ -552,7 +551,7 @@ void Threshold::objectRecognition() {
     // now get the posts and goals
     yellow->createObject(horizon);
     blue->createObject(horizon);
-	green->createObject(horizon);
+	cross->createObject();
 #if ROBOT(NAO)
     red->createObject(horizon);
     navyblue->createObject(horizon);
@@ -947,7 +946,7 @@ void Threshold::initColors() {
     yellow->init(pose->getHorizonSlope());
     red->init(pose->getHorizonSlope());
     navyblue->init(pose->getHorizonSlope());
-	green->init(pose->getHorizonSlope());
+	cross->init();
 }
 
 /* This function loads a table file with the given file name

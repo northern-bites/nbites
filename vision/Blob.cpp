@@ -46,7 +46,6 @@ void Blob::init() {
 	setRightBottomY(0);
 	setArea(0);
 	setPixels(0);
-	bad = false;
 }
 
 int Blob::getArea() {
@@ -75,4 +74,19 @@ void Blob::merge(Blob other) {
     leftBottom.y = value;
     rightBottom.y = value;
 }
+
+/* Print debugging information for a blob.
+ */
+void Blob::printBlob() {
+#if defined OFFLINE
+    cout << "Outputting blob" << endl;
+    cout << leftTop.x << " " << leftTop.y << " " << rightTop.x << " "
+         << rightTop.y << endl;
+    cout << leftBottom.x << " " << leftBottom.y << " " << rightBottom.x
+         << " " << rightBottom.y << endl;
+#endif
+}
+
+
+
 

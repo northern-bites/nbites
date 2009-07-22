@@ -13,6 +13,7 @@ class Threshold;  // forward reference
 #include "Ball.h"
 #include "NaoPose.h"
 #include "Field.h"
+#include "Cross.h"
 #ifndef NO_ZLIB
 #include "Zlib.h"
 #endif
@@ -154,11 +155,11 @@ public:
 
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
-    boost::shared_ptr<ObjectFragments> green;
     boost::shared_ptr<ObjectFragments> navyblue;
     boost::shared_ptr<ObjectFragments> red;
 
     Ball* orange;
+	Cross* cross;
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
 

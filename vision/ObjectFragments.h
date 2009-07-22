@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
