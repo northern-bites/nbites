@@ -182,57 +182,6 @@ void Ball::newRun(int x, int y, int h)
 }
 
 
-/* The next group of methods has to do with scanning along axis parallel
- * dimensions in order to create objects without blobbing.
- */
-
-/* Project a line given a start coord and a new y value - note that this is
- * dangerous depending on how you do the projection.
- *
- * @param startx   the x point to start at
- * @param starty   the y point to start at
- * @param newy     the y point to end at
- * @return         the corresponding x point
- */
-int Ball::xProject(int startx, int starty, int newy)
-{
-    //slope is a float representing the slope of the horizon.
-    return startx - ROUND2(slope * (float)(newy - starty));
-}
-
-/* Project a line given a start coord and a new y value - note that this is
- * dangerous depending on how you do the projection.
- *
- * @param point    the point to start at
- * @param newy     the y point to end at
- * @return         the corresponding x point
- */
-int Ball::xProject(point <int> point, int newy) {
-    //slope is a float representing the slope of the horizon.
-    return point.x - ROUND2(slope * (float)(newy - point.y));
-}
-
-/* Project a line given a start coord and a new x value
- * @param startx   the x point to start at
- * @param starty   the y point to start at
- * @param newx     the x point to end at
- * @return         the corresponding y point
- */
-int Ball::yProject(int startx, int starty, int newx)
-{
-    return starty + ROUND2(slope * (float)(newx - startx));
-}
-
-/* Project a line given a start coord and a new x value
- * @param point    the point to start at
- * @param newx     the x point to end at
- * @return         the corresponding y point
- */
-int Ball::yProject(point <int> point, int newx)
-{
-    return point.y + ROUND2(slope * (float)(newx - point.x));
-}
-
 /* Scan from the point along the line until you have hit "stopper" points that
  * aren't color "c" return the last good point found and how many good and bad
  * points seen.  Though this is a void function it actually "returns"
@@ -240,6 +189,9 @@ int Ball::yProject(point <int> point, int newx)
  * points of the line (last point of appropriate color) and bad and good
  * represent how many bad and good pixels (pixels that are of the right color
  * or not) along the way.
+ *
+ * Note:  Since we are doing this for balls we are always scanning along
+ * the true vertical!  This is different than for other classes.
  * @param x        the x point to start at
  * @param y        the y point to start at
  * @param dir      the direction of the scan (positive or negative)
@@ -277,7 +229,6 @@ void Ball::vertScan(int x, int y, int dir, int stopper, int c,
             run = 0;
         }
         y = y + dir;
-        x = xProject(startX, startY, y);
     }
     scan.bad = bad;
     scan.good = good;
@@ -291,6 +242,8 @@ void Ball::vertScan(int x, int y, int dir, int stopper, int c,
  * variable. scan.x and scan.y represent the finish points of the line (last
  * point of appropriate color) and bad and good represent how many bad and good
  * pixels (pixels that are of the right color or not) along the way.
+ *
+ * Note always horizontal, since we are scanning with regard to ball.
  *
  * @param x          the x point to start at
  * @param y          the y point to start at
@@ -330,36 +283,10 @@ void Ball::horizontalScan(int x, int y, int dir, int stopper, int c,
             run = 0;
         }
         x = x + dir;
-        y = yProject(startX, startY, x);
     }
     scan.bad = bad;
     scan.good = good;
     //cout << "return with " << temp.x << endl;
-}
-
-/*
- * TODO: Check this edge value
- * Given two points determine if they constitute an "edge".  For now our
- * definition of an edge is a difference in Y values of 30 (sort of a standard
- * approach in our league).  This is a place for potential improvements in the
- * future.
- *
- * @param x        the x value of the first point
- * @param y        the y value of the first point
- * @param x2       the x value of the second point
- * @param y2       the y value of the second point
- * @return         was an edge detected?
- */
-
-bool Ball::checkEdge(int x, int y, int x2, int y2)
-{
-    const int DIFFMIN = 30;  // the difference that constitutes an edge
-
-    int ydiff = abs(thresh->getY(x, y) - thresh->getY(x2, y2));
-    if (ydiff > DIFFMIN) {
-        return true;
-    }
-    return false;
 }
 
 /* This is the entry  point ball recognition in Threshold.cc
@@ -373,7 +300,8 @@ void Ball::createBall(int h) {
 
 
 int Ball::horizonAt(int x) {
-    return yProject(0, thresh->getVisionHorizon(), x);
+	// projection code lifted from version in ObjectFragments
+	return thresh->getVisionHorizon() + ROUND2(slope * (float)(x));
 }
 
 
@@ -538,7 +466,7 @@ bool Ball::greenCheck(Blob b)
     int x = b.getLeftBottomX();
 	stop scan;
     for (int i = 0; i < w; i+= 2) {
-        y = yProject(x, b.getLeftBottomY(), x + i);
+        y = b.getLeftBottomY();
         vertScan(x + i, y, 1, ERROR_TOLERANCE, GREEN, GREEN, scan);
         if (scan.good > 1)
             return true;
@@ -546,7 +474,6 @@ bool Ball::greenCheck(Blob b)
     // try one more in case its a white line
     int bad = 0;
     for (int i = 0; i < EXTRA_LINES && bad < MAX_BAD_PIXELS; i++) {
-        x = max(0, xProject(x, b.getLeftBottomY(), b.getLeftBottomY() + i));
         int pix = thresh->thresholded[min(IMAGE_HEIGHT - 1,
 										  b.getLeftBottomY() + i)][x];
         if (pix == GREEN) return true;
@@ -1451,10 +1378,10 @@ bool Ball::rightBlobColor(Blob tempobj, float minpercent) {
     int good = 0, total = 0;
     for (int i = 0; i < spanY; i++) {
         starty = y + i;
-        startx = xProject(x, y, starty);
+        startx = x;
         for (int j = 0; j < spanX; j++) {
             nx = startx + j;
-            ny = yProject(startx, starty, nx);
+            ny = starty;
             if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
                 total++;
                 if (thresh->thresholded[ny][nx] == color) {
@@ -1611,26 +1538,3 @@ void Ball::drawLine(int x, int y, int x1, int y1, int c) {
 #endif
 }
 
-void Ball::drawLess(int x, int y, int c)
-{
-    const int lineBuff = 10;
-
-#ifdef OFFLINE
-    thresh->drawLine(x, y, x + lineBuff, y - lineBuff, c);
-    thresh->drawLine(x, y, x + lineBuff, y + lineBuff, c);
-    thresh->drawLine(x + 1, y, x + lineBuff + 1, y - lineBuff, c);
-    thresh->drawLine(x + 1, y, x + lineBuff + 1, y + lineBuff, c);
-#endif
-}
-
-void Ball::drawMore(int x, int y, int c)
-{
-    const int lineBuff = 10;
-
-#ifdef OFFLINE
-    thresh->drawLine(x, y, x - lineBuff, y - lineBuff, c);
-    thresh->drawLine(x, y, x - lineBuff, y + lineBuff, c);
-    thresh->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
-    thresh->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
-#endif
-}

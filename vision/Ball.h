@@ -60,14 +60,9 @@ public:
     void init(float s);
 
     // scan operations
-    int yProject(int startx, int starty, int newy);
-    int yProject(point <int> point, int newy);
-    int xProject(int startx, int starty, int newx);
-    int xProject(point <int> point, int newx);
     void vertScan(int x, int y, int dir, int stopper, int c, int c2, stop & scan);
     void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
                         int r, stop & scan);
-    bool checkEdge(int x, int y, int x1, int y1);
     int horizonAt(int x);
 
     // main methods
@@ -98,11 +93,8 @@ public:
     void drawBlob(Blob b, int c);
     void drawLine(int x, int y, int x1, int y1, int c);
     void printBlob(Blob b);
-    void printObject(VisualFieldObject * objs);
     void paintRun(int x,int y, int h, int c);
     void drawRun(const run& run, int c);
-    void drawLess(int x, int y, int c);
-    void drawMore(int x, int y, int c);
 
 
 private:
