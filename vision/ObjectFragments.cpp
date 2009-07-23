@@ -20,12 +20,17 @@
 
 /*
  * Object Fragment class - a ChownDawg production
- * There is one of these for each color.  It holds "runs" of pixels that are of
- * that color and vertically connected.
- * The idea is to use the runs to recognize objects.  We use the mechanics of
- * the field to help in this process in various ways.  In essence this is
- * "run length encoding."  We connect up runs into "blobs" and then filter
- * the blobs to try and pick out the most likely objects.
+ * ObjectFragments is no longer the major vision class. Instead it is
+ * now simply the place where we process goals.  We no longer do any
+ * run-length-encoding here.  We still use the color "run" collected
+ * in Threshold.cpp, but now we simply use them to look for likely
+ * posts.  Once we have identified a likely location then we  do
+ * active scanning to determine the outline of the post (if it is
+ * indeed a post).  After that we do lots of sanity checking to
+ * make sure that the post is reasonable.  In addition we try and
+ * figure out whether we are looking at a right or left post.  There
+ * are a number of ways to do this (is another post around?  do we
+ * see the crossbar?  the goalbox? etc.).
 */
 
 #include <iostream>
@@ -46,30 +51,12 @@ using namespace std;
 static const int NOPOST = 0;   // don't know which
 static const int RIGHT = 1;
 static const int LEFT = 2;
-static const int USEBIG = 3;
 static const int BACKSTOP = 4;
-
-// Comparison of spatial relationships of two blobs
-static const int OUTSIDE = 0;      // one is outside the other
-static const int TIGHT = 1;        // they are basically the same blob
-// the small one is way on the left side of the big one
-static const int CLOSELEFT = 2;
-// the small one is way on the right side of the big one
-static const int CLOSERIGHT = 3;
-// the small one is sort of in the middle of the big one
-static const int MURKY = 4;
-
-static const int BIGGAP = 80;
-static const int SIMILARSIZE = 5;
 
 // Relative size of posts
 static const int LARGE = 2;
 static const int MEDIUM = 1;
 static const int SMALL = 0;
-
-// Am I looking at a post or a beacon?
-//static const int BEACON = 0;
-static const int POST = 1;
 
 // Universal bad value used to id whether or not we successfully did something
 static const int BADVALUE = -100;
@@ -151,9 +138,6 @@ void ObjectFragments::init(float s)
     maxOfBiggestRun = 0L;
     numberOfRuns = 0;
     indexOfBiggestRun = 0;
-    numBlobs = 0;
-    topSpot = 0;
-    numPoints = 0;
     for (int i = 0; i < IMAGE_WIDTH; i++)
         shoot[i] = true;
 }
@@ -1032,27 +1016,13 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 void ObjectFragments::createObject(int c) {
     // these are in the relative order that they should be called
     switch (color) {
-    case GREEN:
-        break;
-	case WHITE:
-		break;
     case BLUE:
         // either we should see a marker or a goal
         blue(c);
         break;
-    case RED:
-    case NAVY:
-        // George: I am disabling robot recognition for now because it
-        // causes crashes. The blobs formed for robots have negative
-        // and/or incorrect dimensions. Those dimensions are later used
-        // to access the thresholded array.
-        //robot(c);
-        break;
     case YELLOW:
         // either we should see a marker or a goal
         yellow(c);
-        break;
-    case BLACK:
         break;
     }
 }
@@ -2838,19 +2808,6 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2,
         cout << spanX << " "  << spanY << " " << spanX2 << " " << spanY2 << endl;
     }
     return false;
-}
-
-/*  Try and add a new circle fitting point.
- * @param x     x value
- * @param y     y value
- */
-void ObjectFragments::addPoint(float x, float y){
-    if(numPoints < MAX_POINTS){
-        points[numPoints*2] = x;
-        points[numPoints*2+1] = y;
-        numPoints++;
-    }
-	else{}
 }
 
 /*  Is the ratio of width to height ok for the second post?

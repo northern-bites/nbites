@@ -81,7 +81,6 @@ public:
     void createObject(int c);
     void yellow(int pink);
     void blue(int pink);
-    void robot(int c);
 
     // miscelaneous goal processing  methods
     bool qualityPost(Blob b, int c);
@@ -131,7 +130,6 @@ public:
     bool blobOk(Blob b);
     bool locationOk(Blob b, int hor);
     bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
-    void addPoint(float x, float y);
 
     // misc.
     int distance(int x1, int x2, int x3, int x4);
@@ -158,7 +156,6 @@ private:
     Vision* vision;
     Threshold* thresh;
 
-    int topSpot; //keeps track of best blob -> global var for debugging purposes
     int color;
     int runsize;
     int biggestRun;
@@ -167,19 +164,8 @@ private:
     int numberOfRuns;
     int indexOfBiggestRun;
     run* runs;
-
-    int numBlobs;
-    int projx[5], projy[5];
-    int candidateX[4];
-    int candidateY[4];
     bool shoot[IMAGE_WIDTH];
-    int goodP;
-    int inferredConfidence;
     float slope;
-    int occlusion;
-    point <int> spot;
-    int numPoints;
-    float points[MAX_POINTS*2];
 
 #ifdef OFFLINE
     bool PRINTOBJS;
