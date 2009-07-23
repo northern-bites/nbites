@@ -73,10 +73,7 @@ static const bool DEBUGBALLPOINTS = false;
 Ball::Ball(Vision* vis, Threshold* thr, int _color)
     : vision(vis), thresh(thr), color(_color), runsize(1)
 {
-	zeroBlob = Blob();
-	for (int i = 0; i < MAX_BALLS; i++) {
-		blobs[i] = Blob();
-	}
+	blobs = new Blobs(MAX_BALLS);
     init(0.0);
     allocateColorRuns();
 #ifdef OFFLINE
@@ -92,21 +89,14 @@ Ball::Ball(Vision* vis, Threshold* thr, int _color)
  */
 void Ball::init(float s)
 {
-	for (int i = 0; i < MAX_BALLS; i++) {
-		blobs[i].init();
-	}
+	blobs->init();
     slope = s;
     biggestRun = 0;
     maxHeight = IMAGE_HEIGHT;
     maxOfBiggestRun = 0L;
     numberOfRuns = 0;
     indexOfBiggestRun = 0;
-    numBlobs = 0;
-    topSpot = 0;
     numPoints = 0;
-	zeroBlob.init();
-	zeroBlob.setLeftTopX(BAD_VALUE);
-	zeroBlob.setLeftTopY(BAD_VALUE);
 }
 
 
@@ -141,180 +131,6 @@ void Ball::allocateColorRuns()
 	runsize = BALL_RUNS_MALLOC_SIZE; //max number of runs
 	run_num = runsize * RUN_VALUES;
     runs = (run*)malloc(sizeof(run) * run_num);
-}
-
-/* The first group of methods have to do with blob creation.
- */
-
-
-/*
- * Pseudo-blobbing used for ball recognition.  Since the balls are squares we
- * should be able to just paste the new runs in to a main blob directly.
- * This uses the huge hack that our objects (except the ball) are square - so we
- * can just keep a bounding box.
- *
- * Basically we are collecting runs.  Everytime we get one we either add it to
- * an existing run or create a new run. In theory we can fragment runs this way.
- * In fact, we should probably check on that.
- *
- * @param x        x value of run
- * @param y        y value of run
- * @param h        height of run
-*/
-void Ball::blobIt(int x, int y, int h)
-{
-    const int WHAT_IS_CONTIGUOUS = 4;  // fudge factor for juding contiguity
-    const int MIN_BLOB_SIZE = 20;      // number of blobs before changing standard
-
-    // start out deciding to make a new blob
-    // the loop will decide not to run it
-    bool newBlob = true;
-    int contig = WHAT_IS_CONTIGUOUS;
-
-    //cout << x << " " << y << " " << h << endl;
-    // sanity check: too many blobs on screen
-    if (numBlobs >= MAX_BALLS) {
-        //cout << "Ran out of blob space " << color << endl;
-        // We're seeing too many blobs -it is unlikely we can do anything
-        // useful with this color
-        numBlobs = 0;
-        numberOfRuns = 0;
-        return;
-    } else if (numBlobs > MIN_BLOB_SIZE) {
-        contig = WHAT_IS_CONTIGUOUS;
-    }
-
-    // is this run contiguous with any previous blob?
-    for (int i = 0; i < numBlobs; i++) {
-
-        // first check: if currentBlob x is greater than blob left and less than
-        // a little bit more than the blob right.
-        // AND
-        // second check: currentBlob y is within fits within current blob
-        // OR
-        // currentBlob's bottom is within blob and height makes it higher
-        if ((x > blobs[i].getLeftTopX()  && x < blobs[i].getRightTopX()
-			 + contig) && ((y >= blobs[i].getLeftTopY() - contig &&
-							y < blobs[i].getLeftBottomY() + contig) ||
-						   (y < blobs[i].getLeftTopY() &&
-							y+h+contig > blobs[i].getLeftTopY()))) {
-
-            /* BOUNDING BOX CHECKS
-             * if current x or y increases the size of the box, do so and keep
-             * track of the corresponding x or y value
-             */
-            //assign the right, if it is better
-            if (x > blobs[i].getRightTopX()) {
-                blobs[i].setRightTopX(x);
-                blobs[i].setRightBottomX(x);
-            }
-
-            //assign the top, if it is better
-            if (blobs[i].getLeftTopY() > y) {
-                blobs[i].setLeftTopY(y);
-                blobs[i].setRightTopY(y);
-            }
-
-            // assign the top, if it is better
-            if (y+h > blobs[i].getLeftBottomY()) {
-                blobs[i].setLeftBottomY(y+h);
-                blobs[i].setRightBottomY(y + h);
-            }
-
-            //add the run length to the number of real pixels in the blob
-            //calculate the area of this blob under consideration
-            int s = (blobs[i].getRightTopX() - blobs[i].getLeftTopX() + 1) *
-                (blobs[i].getLeftBottomY() - blobs[i].getLeftTopY() + 1);
-            blobs[i].setArea(s); //store the area for later.
-            blobs[i].setPixels(blobs[i].getPixels() + h);
-
-            // don't create a blob
-            newBlob = false;
-            break;
-        }
-        // no else
-    } // END blob for loop
-
-    // create newBlob
-    if (newBlob) {
-        // bounding box
-        blobs[numBlobs].setLeftTopX(x);
-        blobs[numBlobs].setLeftTopY(y);
-        blobs[numBlobs].setRightTopX(x);
-        blobs[numBlobs].setRightTopY(y);
-        blobs[numBlobs].setLeftBottomX(x);
-        blobs[numBlobs].setLeftBottomY(y + h);
-        blobs[numBlobs].setRightBottomX(x);
-        blobs[numBlobs].setRightBottomY(y + h);
-        blobs[numBlobs].setPixels(h);
-        blobs[numBlobs].setArea(h);
-        numBlobs++;
-    }
-}
-
-/*
- * Find the biggest blob.  Ideally this will end up also merging blobs when they
- * are occluded (e.g. by a dog).
- * It may not be necessary though.  After this call the data structure "topBlob"
- * will have the top blob.
- * @param maxY     max value (ignored)
-*/
-void Ball::getTopAndMerge(int maxY)
-{
-    int size = 0;
-    topSpot = 0;
-    //cout << "Blobs " << numBlobs << " " << color << endl;
-    //check each blob in the array
-    for (int i = 0; i < numBlobs; i++) {
-        if (blobs[i].getArea() > size) {
-            size = blobs[i].getArea();
-            topBlob = &blobs[i];
-            topSpot = i; //store the one with the largest size.
-        }
-        //drawBlob(blobs[i], BLACK);
-    }
-    size = 0;
-}
-
-/*
-  Checks all of the blobs of this color.  Can be used to draw the widest blob.
-*/
-void Ball::getWidest()
-{
-    int size = 0;
-    topSpot = 0;
-    int width = 0;
-    //check each blob in the array
-    for (int i = 0; i < numBlobs; i++) {
-        width = blobs[i].width();
-        if (width > size) {
-            size = width;
-            topBlob = &blobs[i];
-            topSpot = i; //store the one with the largest size.
-        }
-        //drawBlob(blobs[i], BLACK);
-    }
-}
-
-/* Turn a blob back to zeros because of merging.
-   @param which     The index of the blob to be zeroed
-*/
-
-void Ball::zeroTheBlob(int which)
-{
-	blobs[which].init();
-    blobs[which].setLeftTopX(BAD_VALUE);
-}
-
-/* Merge blobs.  If two blobs are discovered to be connected, then they
-   should be merged into one.  This is done here.
-   @param first         one of the blobs
-   @param second        the other
-*/
-void Ball::mergeBlobs(int first, int second)
-{
-	blobs[first].merge(blobs[second]);
-	zeroTheBlob(second);
 }
 
 /* Adds a new run to the basic data structure.
@@ -1257,91 +1073,88 @@ int Ball::balls(int horizon, VisualBall *thisBall)
             int nextX = runs[i].x;
             int nextY = runs[i].y;
             int nextH = runs[i].h;
-            blobIt(nextX, nextY, nextH);
+            blobs->blobIt(nextX, nextY, nextH);
         }
     }
 
 	// when we have red uniforms, sometimes we get tons of orange blobs
 	// and sometimes they are inside of each other
-	if (numBlobs > MIN_BLOB_SIZE) {
-		int big = 0, bigArea = blobs[0].getArea();
-		for (int i = 1; i < numBlobs; i++) {
-			if (blobs[i].getArea() > bigArea) {
+	if (blobs->number() > MIN_BLOB_SIZE) {
+		int big = 0, bigArea = blobs->get(0).getArea();
+		for (int i = 1; i < blobs->number(); i++) {
+			if (blobs->get(i).getArea() > bigArea) {
 				big = i;
-				bigArea = blobs[i].getArea();
+				bigArea = blobs->get(i).getArea();
 			}
 		}
-		for (int i = 0; i < numBlobs; i++) {
-			if (i != big && blobs[i].getRightTopX() > blobs[big].getLeftTopX() &&
-				blobs[i].getLeftTopX() < blobs[big].getRightTopX() &&
-				blobs[i].getLeftBottomY() > blobs[big].getLeftTopY() &&
-				blobs[i].getLeftTopY() < blobs[big].getLeftBottomY()) {
+		for (int i = 0; i < blobs->number(); i++) {
+			if (i != big && blobs->get(i).getRightTopX() > blobs->get(big).getLeftTopX() &&
+				blobs->get(i).getLeftTopX() < blobs->get(big).getRightTopX() &&
+				blobs->get(i).getLeftBottomY() > blobs->get(big).getLeftTopY() &&
+				blobs->get(i).getLeftTopY() < blobs->get(big).getLeftBottomY()) {
 				if (BALLDEBUG) {
 					cout << "Screening an inner ball" << endl;
-					drawBlob(blobs[i], WHITE);
+					drawBlob(blobs->get(i), WHITE);
 				}
-				blobs[i].init();
+				blobs->init(i);
 			}
 		}
 	}
 
     // pre-screen blobs that don't meet our criteria
     //cout << "horizon " << horizon << " " << slope << endl;
-    for (int i = 0; i < numBlobs; i++) {
-        int ar = blobs[i].getArea();
-        float perc = rightColor(blobs[i], ORANGE);
-        int diam = max(blobs[i].width(), blobs[i].height());
-		if (blobs[i].getArea() > 0) {
-			if (blobs[i].getLeftBottomY() + diam < horizonAt(blobs[i].getLeftTopX())) {
-				blobs[i].setArea(0);
+    for (int i = 0; i < blobs->number(); i++) {
+        int ar = blobs->get(i).getArea();
+        float perc = rightColor(blobs->get(i), ORANGE);
+        int diam = max(blobs->get(i).width(), blobs->get(i).height());
+		if (blobs->get(i).getArea() > 0) {
+			if (blobs->get(i).getLeftBottomY() + diam < horizonAt(blobs->get(i).getLeftTopX())) {
+				blobs->init(i);
 				if (BALLDEBUG) {
 					cout << "Screened one for horizon problems " << endl;
-					drawBlob(blobs[i], WHITE);
+					drawBlob(blobs->get(i), WHITE);
 				}
 			} else if (diam > MAXDIAM) {
-				if (blobs[i].width() > MAXDIAM) {
+				if (blobs->get(i).width() > MAXDIAM) {
 					if (diam < MAXDIAM + 20) {
 						// Try trimming the ball
 						int lefty = diam / 2, righty = diam / 2, pix;
 						// scan in from the sides and see where we see orange faster
 						// trim other side
-						for (int j = blobs[i].getLeftTopX(); j < blobs[i].getLeftTopX() + diam / 2;
+						for (int j = blobs->get(i).getLeftTopX(); j < blobs->get(i).getLeftTopX() + diam / 2;
 							 j++) {
-							pix = thresh->thresholded[blobs[i].getLeftTopY() + 20][j];
+							pix = thresh->thresholded[blobs->get(i).getLeftTopY() + 20][j];
 							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
-								lefty = j - blobs[i].getLeftTopX();
+								lefty = j - blobs->get(i).getLeftTopX();
 								j = IMAGE_WIDTH;
 							}
 						}
-						for (int j = blobs[i].getRightTopX(); j > blobs[i].getRightTopX()
+						for (int j = blobs->get(i).getRightTopX(); j > blobs->get(i).getRightTopX()
 								 - diam / 2; j--)
 						{
-							pix = thresh->thresholded[blobs[i].getLeftTopY() + 20][j];
+							pix = thresh->thresholded[blobs->get(i).getLeftTopY() + 20][j];
 							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
-								righty = blobs[i].getLeftTopX() - j;
+								righty = blobs->get(i).getLeftTopX() - j;
 								j = 0;
 							}
 						}
 						if (lefty < righty) {
 							// the right side is too wide
-							blobs[i].setRightTopX(blobs[i].getLeftTopX() + MAXDIAM);
-							blobs[i].setRightBottomX(blobs[i].getRightTopX());
+							blobs->setRight(i, blobs->get(i).getLeftTopX() + MAXDIAM);
 						} else {
-							blobs[i].setLeftTopX(blobs[i].getRightTopX() - MAXDIAM);
-							blobs[i].setLeftBottomX(blobs[i].getLeftTopX());
+							blobs->setLeft(i, blobs->get(i).getRightTopX() - MAXDIAM);
 						}
-						if (blobs[i].height() > MAXDIAM) {
-							blobs[i].setLeftBottomY(blobs[i].getLeftTopY() + MAXDIAM);
-							blobs[i].setRightBottomY(blobs[i].getLeftBottomY());
+						if (blobs->get(i).height() > MAXDIAM) {
+							blobs->setBottom(i, blobs->get(i).getLeftTopY() + MAXDIAM);
 						}
 					} else {
 						// This is going to be a hack added in graz
 						// what we're going to do is for really big blobs
 						// do a modified roundess check
 						const float CORNER_CHUNK_DIV = 6.0f;
-						int w = blobs[i].width();
-						int h = blobs[i].height();
-						int x = blobs[i].getLeftTopX(), y = blobs[i].getLeftTopY();
+						int w = blobs->get(i).width();
+						int h = blobs->get(i).height();
+						int x = blobs->get(i).getLeftTopX(), y = blobs->get(i).getLeftTopY();
 						int d = ROUND2(static_cast<float>(w) / CORNER_CHUNK_DIV);
 						int pix, badPix = 0, goodPix = 0;
 						for (int j = 0; j < d; j++) {
@@ -1366,35 +1179,34 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 								cout << "Allowing ball: Good pix " << goodPix << " " << badPix << endl;
 							}
 						} else {
-							blobs[i].init();
 							if (BALLDEBUG) {
 								cout << "Screened one that was too big " << diam << endl;
-								drawBlob(blobs[i], NAVY);
+								drawBlob(blobs->get(i), NAVY);
 							}
+							blobs->init(i);
 						}
 					}
 				} else {
 					// Hacktacular:  trim the height to equal the width
-					int newHeight = blobs[i].width();
-					blobs[i].setLeftBottomY(blobs[i].getLeftTopY() + newHeight);
-					blobs[i].setRightBottomY(blobs[i].getLeftBottomY());
+					int newHeight = blobs->get(i).width();
+					blobs->setBottom(i, blobs->get(i).getLeftTopY() + newHeight);
 				}
 			} else if (ar > MIN_AREA && perc > MINORANGEPERCENT) {
 				// don't do anything
 				if (BALLDEBUG) {
 					cout << "Candidate ball " << endl;
-					printBlob(blobs[i]);
+					printBlob(blobs->get(i));
 				}
-			} else if (ar > MAX_AREA && rightHalfColor(blobs[i]) > MINORANGEPERCENT) {
+			} else if (ar > MAX_AREA && rightHalfColor(blobs->get(i)) > MINORANGEPERCENT) {
 				if (BALLDEBUG) {
 					cout << "Candidate ball " << endl;
-					printBlob(blobs[i]);
+					printBlob(blobs->get(i));
 				}
 				//} else if (perc > 0.25f && redBallCheck()) {
 			} else {
 				if (BALLDEBUG) {
-					drawBlob(blobs[i], BLACK);
-					printBlob(blobs[i]);
+					drawBlob(blobs->get(i), BLACK);
+					printBlob(blobs->get(i));
 					if (perc < MINORANGEPERCENT) {
 						cout << "Screened one for not being orange enough, its percentage is "
 							 << perc << endl;
@@ -1402,7 +1214,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 						cout << "Screened one for being too small - its area is " << ar << endl;
 					}
 				}
-				blobs[i].init();
+				blobs->init(i);
 			}
 		}
     }
@@ -1412,7 +1224,8 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	estimate e; // pix estimate of ball's distance
 	while (!done) {
 		// now find the best remaining blob
-		getTopAndMerge(horizon);
+		topBlob = blobs->getTopAndMerge(horizon);
+		if (topBlob == NULL) return 0;
 
 		if (!blobOk(*topBlob)) {
 			if (BALLDEBUG)
@@ -1605,11 +1418,6 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 		thisBall->setDistanceEst(e);
     }
     if (atBoundary(*topBlob)) {
-        // INFERRED MEASUREMENTS
-        //estimate es;
-        //es = vision->pose->pixEstimate(blobs[i].leftTop.x + blobWidth(blobs[i]) / 2, blobs[i].leftTop.y + 2
-		//	   * blobHeight(blobs[i]) / 3, 0.0);
-        //int dist = (int)es.dist;
         //thisBall->setConfidence(MILDLYSURE);
     }
     if (BALLDISTDEBUG) {

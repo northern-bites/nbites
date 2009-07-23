@@ -18,7 +18,12 @@ public:
     virtual ~Blobs() {}
 
 	void init();
+	void init(int which) {blobs[which].init();}
 	void blobIt(int x, int y, int h);
+	void setLeft(int which, int a);
+	void setRight(int which, int a);
+	void setTop(int which, int a);
+	void setBottom(int which, int a);
 	Blob* getTopAndMerge(int maxY);
 	Blob* getWidest();
 	void zeroTheBlob(int which);

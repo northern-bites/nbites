@@ -44,6 +44,25 @@ void Blobs::init() {
 	numBlobs = 0;
 }
 
+void Blobs::setLeft(int i, int x) {
+	blobs[i].setLeftTopX(x);
+	blobs[i].setLeftBottomX(x);
+}
+
+void Blobs::setRight(int i, int x) {
+	blobs[i].setRightTopX(x);
+	blobs[i].setRightBottomX(x);
+}
+
+void Blobs::setTop(int i, int y) {
+	blobs[i].setLeftTopY(y);
+	blobs[i].setRightTopY(y);
+}
+
+void Blobs::setBottom(int i, int y) {
+	blobs[i].setLeftBottomY(y);
+	blobs[i].setRightBottomY(y);
+}
 
 /*
  * Pseudo-blobbing used for goal recognition.  Since the goals are rectangles we

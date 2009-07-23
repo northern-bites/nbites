@@ -30,6 +30,7 @@
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 #include "Blob.h"
+#include "Blobs.h"
 
 class Ball; // forward reference
 #include "Threshold.h"
@@ -53,19 +54,10 @@ public:
     // SETTERS
     void setColor(int c);
     void allocateColorRuns();
+	void newRun(int x, int y, int h);
 
     // Making object
     void init(float s);
-
-    // blobbing
-    void getTopAndMerge(int maxY);
-    void getWidest();
-    void zeroTheBlob(int which);
-    void mergeBlobs(int first, int second);
-    void blobIt(int x, int y, int h);
-    void newRun(int x, int endY, int height);
-	void checkForX(Blob a);
-	bool blobOk(Blob a);
 
     // scan operations
     int yProject(int startx, int starty, int newy);
@@ -75,14 +67,6 @@ public:
     void vertScan(int x, int y, int dir, int stopper, int c, int c2, stop & scan);
     void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
                         int r, stop & scan);
-    int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2,
-                             bool left);
-    int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2,
-                               bool up);
-    void findTrueLineVerticalSloped(point <int>& top, point <int>& bottom, int c,
-                                    int c2, bool left);
-    void findTrueLineHorizontalSloped(point <int>& left, point <int>& right,
-                                      int c, int c2, bool up);
     bool checkEdge(int x, int y, int x1, int y1);
     int horizonAt(int x);
 
@@ -105,6 +89,7 @@ public:
     // sanity checks
     bool rightBlobColor(Blob obj, float per);
     void addPoint(float x, float y);
+	bool blobOk(Blob b);
 
     // debugging methods
     void printBall(Blob b, int c, float p, int o);
@@ -136,9 +121,8 @@ private:
     run* runs;
 
     Blob *topBlob, zeroBlob;
-    int numBlobs;
     //Blob checker, obj, pole, leftBox, rightBox;
-    Blob blobs[MAX_BALLS];
+    Blobs *blobs;
     int inferredConfidence;
     float slope;
     int occlusion;
