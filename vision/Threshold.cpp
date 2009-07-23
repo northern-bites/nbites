@@ -76,7 +76,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 
     // loads the color table on the MS into memory
 #if ROBOT(NAO_RL)
-# if ! defined WEBOTS_BACKEND && ! defined OFFLINE 
+# if ! defined WEBOTS_BACKEND && ! defined OFFLINE
     initTable("/opt/naoqi/modules/etc/table.mtb");
 # elif defined WEBOTS_BACKEND
     initTable(string(string(getenv("WEBOTS_HOME"))+
@@ -95,10 +95,8 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
                                                            BLUE));
     yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                              YELLOW));
-    navyblue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                               NAVY));
-    red = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                          RED));
+    navyblue = new Robots(vision, this, NAVY);
+	red = new Robots(vision, this, RED);
     orange = new Ball(vision, this, ORANGE);
     cross = new Cross(vision, this);
 	field = new Field(vision, this);
@@ -553,8 +551,8 @@ void Threshold::objectRecognition() {
     blue->createObject(horizon);
 	cross->createObject();
 #if ROBOT(NAO)
-    red->createObject(horizon);
-    navyblue->createObject(horizon);
+    red->robot(horizon);
+    navyblue->robot(horizon);
 #endif
 
     bool ylp = vision->yglp->getWidth() > 0;
@@ -944,8 +942,8 @@ void Threshold::initColors() {
     orange->init(pose->getHorizonSlope());
     blue->init(pose->getHorizonSlope());
     yellow->init(pose->getHorizonSlope());
-    red->init(pose->getHorizonSlope());
-    navyblue->init(pose->getHorizonSlope());
+    red->init();
+    navyblue->init();
 	cross->init();
 }
 

@@ -133,6 +133,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Profiler
                  ${VISION_INCLUDE_DIR}/PyVision
+		 ${VISION_INCLUDE_DIR}/Robots
                  ${VISION_INCLUDE_DIR}/Threshold
                  ${VISION_INCLUDE_DIR}/Utility
                  ${VISION_INCLUDE_DIR}/Vision

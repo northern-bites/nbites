@@ -13,6 +13,7 @@ class VisualFieldObject;
 #include "Structs.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
+#include "Blob.h"
 
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
@@ -44,7 +45,7 @@ public:
     // INITIALIZATION (happens every frame)
     void init();
     void printDebugInfo(FILE * out);
-    void updateObject(blob* b, certainty _certainty,
+    void updateObject(Blob* b, certainty _certainty,
                       distanceCertainty _distCertainty);
 
     // SETTERS

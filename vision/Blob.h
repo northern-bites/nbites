@@ -16,10 +16,14 @@ public:
     virtual ~Blob() {}
 
     // SETTERS
-	void setLeftTop(point <int> lt) {leftTop = lt;}
-	void setRightTop(point <int> rt) {rightTop = rt;}
-	void setLeftBottom(point <int> lb) {leftBottom = lb;}
-	void setRightBottom(point <int> rb) {rightBottom = rb;}
+	void setLeftTop(point <int> lt)
+		{leftTop.x = lt.x; leftTop.y = lt.y;}
+	void setRightTop(point <int> rt)
+		{rightTop.x = rt.x; rightTop.y = rt.y;}
+	void setLeftBottom(point <int> lb)
+		{leftBottom.x = lb.x; leftBottom.y = lb.y;}
+	void setRightBottom(point <int> rb)
+		{rightBottom.x = rb.x; rightBottom.y = rb.y;}
 	void setLeftTopX(int x) {leftTop.x = x;}
 	void setLeftTopY(int y) {leftTop.y = y;}
 	void setRightTopX(int x) {rightTop.x = x;}

@@ -14,6 +14,7 @@ class Threshold;  // forward reference
 #include "NaoPose.h"
 #include "Field.h"
 #include "Cross.h"
+#include "Robots.h"
 #ifndef NO_ZLIB
 #include "Zlib.h"
 #endif
@@ -155,9 +156,8 @@ public:
 
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
-    boost::shared_ptr<ObjectFragments> navyblue;
-    boost::shared_ptr<ObjectFragments> red;
 
+	Robots *red, *navyblue;
     Ball* orange;
 	Cross* cross;
     // main array
