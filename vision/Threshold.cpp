@@ -131,7 +131,7 @@ void Threshold::visionLoop() {
         //yellow->setShot(vision->ygCrossbar);
     }
 	// for now we also don't use open field information
-    //yellow->openDirection(horizon, pose.get());
+    //field->openDirection(horizon, pose.get());
     PROF_EXIT(vision->profiler, P_LINES);
 
 
@@ -519,7 +519,8 @@ void Threshold::thresholdAndRuns() {
 
     // Determine where the field horizon is
     PROF_ENTER(vision->profiler, P_FGHORIZON);
-    horizon = field->findGreenHorizon(pose->getHorizonY(0));
+    horizon = field->findGreenHorizon(pose->getHorizonY(0),
+									  pose->getHorizonSlope());
     PROF_EXIT(vision->profiler, P_FGHORIZON);
 
     // 'Run' up the image to find color-grouped pixel sequences
@@ -644,13 +645,13 @@ void Threshold::objectRecognition() {
     if (horizon < IMAGE_HEIGHT)
         orange->createBall(horizon);
     else
-		orange->createBall(pose->getHorizonY(0)); 
+		orange->createBall(pose->getHorizonY(0));
 
     if (ylp || yrp) {
-        yellow->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar);
+        field->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar, YELLOW);
     }
     if (blp || brp) {
-        blue->bestShot(vision->bgrp, vision->bglp, vision->bgCrossbar);
+        field->bestShot(vision->bgrp, vision->bglp, vision->bgCrossbar, BLUE);
     }
 
     // sanity check: if pose estimated horizon is completely above the image,

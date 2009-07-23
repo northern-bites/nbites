@@ -72,9 +72,13 @@ Field::Field(Vision* vis, Threshold * thr)
 #ifdef OFFLINE
 	debugHorizon = false;
 	debugFieldEdge = false;
+	openField = false;
+	debugShot = false;
 #else
 	debugHorizon = false;
 	debugFieldEdge = false;
+	openField = false;
+	debugShot = false;
 #endif
 }
 
@@ -256,9 +260,12 @@ void Field::findFieldEdges() {
  *  We start with a guess provided by our pose estimate.  We use
  * this as a baseline and try to improve it by doing a series of
  * scans going down until we find the field.
+ *
+ * This method also serves to initialize new field information for
+ * the current image.
  */
 
-int Field::findGreenHorizon(int pH) {
+int Field::findGreenHorizon(int pH, float sl) {
 	const int MIN_PIXELS_INITIAL = 2;
 	const int SCAN_INTERVAL_X = 10;
 	const int SCAN_INTERVAL_Y = 4;
@@ -266,6 +273,10 @@ int Field::findGreenHorizon(int pH) {
 	const int MIN_GREEN_SIZE = 10;
 	const int MIN_PIXELS_PRECISE = 20;
 
+	slope = sl;
+	// re init shooting info
+    for (int i = 0; i < IMAGE_WIDTH; i++)
+        shoot[i] = true;
     //variable definitions
     int run, greenPixels, scanY;
     register int i, j;
@@ -383,4 +394,707 @@ int Field::findGreenHorizon(int pH) {
 	return horizon;
 }
 
+/* Shooting stuff */
 
+/* Determines shooting information. Basically scans down from backstop and looks
+ * for occlusions.
+ * Sets the information found within the backstop data structure.
+ * @param one the backstop
+ */
+
+void Field::setShot(VisualCrossbar* one, int color)
+{
+    const int INTERSECTIONS = 3;   // number of line intersections
+    const int CROSSINGS = 3;       // max number of intersections allowed
+    const int MINIMUM_PIXELS = 5;  // how many pixels constitute a run
+    const int LINE_WIDTH = 10;     // nearness to intersection and still on line
+    const int GREY_MAX = 15;       // how many undefined pixels are ok
+    const int MAX_RUN_SIZE = 10;   // how many pixels constitute a block
+    const int WIDTH_DIVISOR = 5;   // gives a percent of the width
+
+    int pix, bad, white, grey, run, greyrun;
+    int ySpan = IMAGE_HEIGHT - one->getLeftBottomY();
+    bool colorSeen = false;
+    int lx = one->getLeftTopX(), ly = one->getLeftTopY(),
+        rx = one->getRightTopX(), ry = one->getRightTopY();
+    int bx = one->getLeftBottomX(), brx = one->getRightBottomX();
+    int intersections[INTERSECTIONS];
+    int crossings = 0;
+    bool lineFound = false;
+    // now let's see if our backstop is "shootable" and where
+    for (int i = max(min(lx, bx), 0); i < min(max(rx, brx), IMAGE_WIDTH - 1);
+         i++) {
+        bad = 0; white = 0; grey = 0; run = 0; greyrun = 0; colorSeen = false;
+        // first - determine if any lines intersection this plumbline and where
+        point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
+        plumbLineTop.x = i; plumbLineTop.y = ly;
+        plumbLineBottom.x = i; plumbLineBottom.y = IMAGE_HEIGHT;
+        const vector <VisualLine>* lines = vision->fieldLines->getLines();
+        crossings = 0;
+        for (vector <VisualLine>::const_iterator k = lines->begin();
+             k != lines->end(); k++) {
+            pair<int, int> foo = Utility::
+                plumbIntersection(plumbLineTop, plumbLineBottom,
+                                  k->start, k->end);
+            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
+                intersections[crossings] = foo.second;
+                crossings++;
+                if (crossings == CROSSINGS) {
+                    shoot[i] = false;
+                    break;
+                }
+            }
+        }
+
+        int strip = 0;
+        for (int j = min(ly, ry); j < IMAGE_HEIGHT && shoot[i]; j++) {
+            pix = thresh->thresholded[j][i];
+            if (pix == color) {
+                strip++;
+                if (strip > MINIMUM_PIXELS)
+                    colorSeen = true;
+            }
+            if (colorSeen && (pix == RED || pix == NAVY)) {
+                bad++;
+                run++;
+                lineFound = false;
+            } else if (colorSeen && pix == WHITE) {
+                if (!lineFound) {
+                    for (int k = 0; k < crossings; k++) {
+                        //cout << "Crassing at " << intersections[k] << endl;
+                        if (intersections[k] - j < LINE_WIDTH &&
+                            intersections[k] - j > 0) {
+                            lineFound = true;
+                        }
+                    }
+                }
+                if (lineFound) {
+                    //cout << "Intersection at " << j << endl;
+                    run = 0;
+                    greyrun = 0;
+                } else {
+                    //cout << "No Intersection at " << j << endl;
+                    white++;
+                    run++;
+                }
+            } else if ( colorSeen && (pix == GREY || pix == BLACK) ) {
+                grey++;
+                greyrun++;
+            } else if (pix == GREEN || pix == BLUEGREEN) {
+                run = 0;
+                greyrun = 0;
+                lineFound = false;
+            }
+            if (greyrun > GREY_MAX) {
+                //shoot[i] = false;
+                if (debugShot) {
+                    //drawPoint(i, j, RED);
+                }
+            }
+            if (run > MAX_RUN_SIZE && (pix == NAVY || pix == RED)) {
+                shoot[i] = false;
+                if (debugShot)
+                    thresh->drawPoint(i, j, RED);
+            }
+            if (run > MAX_RUN_SIZE) {
+                shoot[i] = false;
+                if (debugShot) {
+                    thresh->drawPoint(i, j, RED);
+                }
+            }
+        }
+        if (bad > ySpan / WIDTH_DIVISOR) {
+            shoot[i] = false;
+        }
+    }
+    // now find the range of shooting
+    int r1 = IMAGE_WIDTH / 2;
+    int r2 = IMAGE_WIDTH / 2;
+    for ( ;r1 < brx && r1 >= bx && shoot[r1]; r1--) {}
+    for ( ;r2 > bx && r2 <= rx && shoot[r2]; r2++) {}
+    if (r2 - r1 < MINSHOTWIDTH || abs(r1 - IMAGE_WIDTH / 2) < MINSHOTWIDTH / 2||
+        abs(r2 - IMAGE_WIDTH / 2) < MINSHOTWIDTH) {
+        one->setShoot(false);
+        one->setBackLeft(-1);
+        one->setBackRight(-1);
+    } else {
+        one->setShoot(true);
+        if (debugShot) {
+            thresh->drawLine(r1, ly, r1, IMAGE_HEIGHT - 1, RED);
+            thresh->drawLine(r2, ly, r2, IMAGE_HEIGHT - 1, RED);
+        }
+    }
+    one->setBackLeft(r1);
+    one->setBackRight(r2);
+
+    if (debugShot) {
+        thresh->drawPoint(r1, ly, RED);
+        thresh->drawPoint(r2, ly, BLACK);
+    }
+    // now figure out the optimal direction
+    int left = 0, right = 0;
+    for (int i = lx; i < IMAGE_WIDTH / 2; i++) {
+        if (shoot[i]) left++;
+    }
+    for (int i = IMAGE_WIDTH / 2; i < rx; i++) {
+        if (shoot[i]) right++;
+    }
+    one->setLeftOpening(left);
+    one->setRightOpening(right);
+
+    if (left > right)
+        one->setBackDir(MOVELEFT);
+    else if (right > left)
+        one->setBackDir(MOVERIGHT);
+    else if (right == 0)
+        one->setBackDir(ALLBLOCKED);
+    else
+        one->setBackDir(EITHERWAY);
+    if (debugShot) {
+        cout << "Crossbar info: Left Col: " << r1 << " Right Col: " << r2
+             << " Dir: " << one->getBackDir();
+        if (one->shotAvailable())
+            cout << " Take the shot!" << endl;
+        else
+            cout << " Don't shoot!" << endl;
+    }
+}
+
+
+void Field::bestShot(VisualFieldObject* left,
+					 VisualFieldObject* right,
+					 VisualCrossbar* middle, int color)
+{
+    const int bigSize = 10;
+	const int topBuff = 20;
+	const int newHeight = 20;
+
+    // start by setting boundaries
+    int leftb = 0, rightb = IMAGE_WIDTH - 1, bottom = 0;
+    int rl = 0, rr = 0;
+    bool screen[IMAGE_WIDTH];
+    for (int i = 0; i < IMAGE_WIDTH; i++) {
+        screen[i] = false;
+    }
+    if (left->getDistance() != 0) {
+        if (left->getIDCertainty() != _SURE) return;
+        leftb = left->getRightBottomX();
+        bottom = left->getLeftBottomY();
+        rightb = min(rightb, left->getRightBottomX() + (int)left->getHeight());
+    }
+    if (right->getDistance() != 0) {
+        rightb = right->getLeftBottomX();
+        bottom = right->getRightBottomY();
+        if (leftb == 0) {
+            leftb = max(0, rightb - (int)right->getHeight());
+        }
+    }
+	//cout << "Boundary " << leftb << " " << rightb << endl;
+	middle->setLeftTopX(leftb);
+	middle->setLeftBottomX(leftb);
+	middle->setRightTopX(rightb);
+	middle->setRightBottomX(rightb);
+	middle->setLeftBottomY(bottom);
+	middle->setRightBottomY(bottom);
+	middle->setLeftTopY(bottom - 10);
+	middle->setRightTopY(bottom - 10);
+	middle->setWidth(rightb - leftb + 1);
+	middle->setHeight(10);
+	setShot(middle, color);
+	/*
+    if (vision->red1->getDistance() > 0) {
+        rl = vision->red1->getLeftBottomX();
+        rr = vision->red1->getRightBottomX();
+        if (rr >= leftb && rl <= rightb) {
+            for (int i = rl; i <= rr; i++) {
+                screen[i] = true;
+            }
+        }
+    }
+    if (vision->red2->getDistance() > 0) {
+        rl = vision->red2->getLeftBottomX();
+        rr = vision->red2->getRightBottomX();
+        if (rr >= leftb && rl <= rightb) {
+            for (int i = rl; i <= rr; i++) {
+                screen[i] = true;
+            }
+        }
+    }
+    if (vision->navy1->getDistance() > 0) {
+        rl = vision->navy1->getLeftBottomX();
+        rr = vision->navy1->getRightBottomX();
+        if (rr >= leftb && rl <= rightb) {
+            for (int i = rl; i <= rr; i++) {
+                screen[i] = true;
+            }
+        }
+    }
+    if (vision->navy2->getDistance() > 0) {
+        rl = vision->navy2->getLeftBottomX();
+        rr = vision->navy2->getRightBottomX();
+        if (rr >= leftb && rl <= rightb) {
+            for (int i = rl; i <= rr; i++) {
+                screen[i] = true;
+            }
+        }
+    }
+    // now find the biggest swatch
+    int run = 0, index = -1, indexr = -1, big = 0;
+    for (int i = leftb; i <= rightb; i++) {
+        if (!screen[i]) {
+            run++;
+        } else {
+            if (run > big) {
+                indexr = i - 1;
+                index = indexr - run;
+                big = run;
+            }
+            run = 0;
+        }
+    }
+    if (run > big) {
+        indexr = rightb;
+        index = indexr - run;
+        big = run;
+    }
+    if (big > bigSize) {
+        int bot = max(horizonAt(index), bottom);
+        middle->setLeftTopX(index);
+        middle->setLeftTopY(bot - topBuff);
+        middle->setLeftBottomX(index);
+        middle->setLeftBottomY(bot);
+        middle->setRightTopX(indexr);
+        middle->setRightTopY(bot - topBuff);
+        middle->setRightBottomX(indexr);
+        middle->setRightBottomY(bot);
+        middle->setX(index);
+        middle->setY(bot);
+        middle->setWidth( static_cast<float>(big) );
+        middle->setHeight(newHeight);
+        middle->setCenterX(middle->getLeftTopX() + ROUND2(middle->getWidth() /
+                                                          2));
+        middle->setCenterY(middle->getRightTopY() + ROUND2(middle->getHeight() /
+                                                           2));
+        middle->setDistance(1);
+
+		}*/
+}
+
+/*
+ * Determines what is the most open part of the field.  Basically scans up and
+ * looks for occlusions.
+ */
+void Field::openDirection(int horizon, NaoPose *pose)
+{
+    const int INTERSECTIONS = 5;
+    const int SCAN_DIVISION = 10;
+	const int BOUND = 60;
+	const int MAX_CROSSINGS = 5;
+	const int INTERSECTION_NEARNESS = 10;
+	const int GREY_MAX = 15;
+	const int Y_BUFFER = 15;
+	const int RUN_BUFFER = 10;
+	const int MAX_RUN_SIZE = 10;
+	const int MAX_BAD_PIXELS = 3;
+	const int JUMP_MAX = 11;
+	const int BOTTOM_BUFFER= 10;
+	const int HORIZON_TOLERANCE = 20;
+	const int DOWNMAX = 10;
+	const int IMAGE_SECTIONS = 15;
+	const int X_AXIS_SECTIONS = 6;
+	const int LINE_DIVIDER = 3;
+
+    int pix, bad, white, grey, run, greyrun;
+    int intersections[INTERSECTIONS];
+    int crossings = 0;
+    bool lineFound = false;
+    int y;
+    int open[IMAGE_WIDTH / SCAN_DIVISION];
+    int open2[IMAGE_WIDTH / SCAN_DIVISION];
+    //cout << "In open direction " << endl;
+    open[0] = horizon;
+    open2[0] = horizon;
+    int lastd = 0;
+    int sixty = IMAGE_HEIGHT - 1;
+    for (int i = IMAGE_HEIGHT - 1; i > horizon; i--) {
+        estimate d = pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0);
+        //cout << "Distances " << i << " " << d.dist << endl;
+        if (d.dist > BOUND && lastd < BOUND) {
+            if (openField) {
+                thresh->drawPoint(IMAGE_WIDTH / 2, i, MAROON);
+            }
+            sixty = i;
+        }
+        lastd = (int)d.dist;
+    }
+    const vector <VisualLine>* lines = vision->fieldLines->getLines();
+    for (int x = SCAN_DIVISION; x < IMAGE_WIDTH - 1; x += SCAN_DIVISION) {
+        bad = 0; white = 0; grey = 0; run = 0; greyrun = 0;
+        open[(int)(x / SCAN_DIVISION)] = horizon;
+        open2[(int)(x / SCAN_DIVISION)] = horizon;
+        // first - determine if any lines intersection this plumbline and where
+        point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
+        plumbLineTop.x = x; plumbLineTop.y = 0;
+        plumbLineBottom.x = x; plumbLineBottom.y = IMAGE_HEIGHT;
+        crossings = 0;
+        for (vector <VisualLine>::const_iterator k = lines->begin();
+             k != lines->end(); k++) {
+            pair<int, int> foo = Utility::
+                plumbIntersection(plumbLineTop, plumbLineBottom,
+                                  k->start, k->end);
+            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
+                intersections[crossings] = foo.second;
+                crossings++;
+                if (crossings == MAX_CROSSINGS) {
+                    break;
+                }
+            }
+        }
+        int maxH = max(0, horizonAt(x));
+        //cout << "Got lines " << maxH << endl;
+        for (y = IMAGE_HEIGHT - 1; y > maxH; y--) {
+            pix = thresh->thresholded[y][x];
+            if ((pix == RED || pix == NAVY)) {
+                bad++;
+                run++;
+                lineFound = false;
+            } else if (pix == WHITE) {
+                if (!lineFound) {
+                    for (int k = 0; k < crossings; k++) {
+                        //cout << "Crassing at " << intersections[k] << endl;
+                        if (intersections[k] - y < INTERSECTION_NEARNESS &&
+                            intersections[k] - y > 0) {
+                            lineFound = true;
+                        }
+                    }
+                }
+                if (lineFound) {
+                    //cout << "Intersection at " << j << endl;
+                    run = 0;
+                    greyrun = 0;
+                } else {
+                    //cout << "No Intersection at " << j << endl;
+                    white++;
+                }
+            } else if (pix == GREY || pix == BLACK) {
+                grey++;
+                greyrun++;
+            } else if (pix == GREEN || pix == BLUEGREEN || pix == BLUE ||
+                       pix == ORANGE) {
+                run = 0;
+                greyrun = 0;
+                lineFound = false;
+            }
+            if (greyrun == GREY_MAX) {
+                //shoot[i] = false;
+                if (open[(int)x / SCAN_DIVISION] == horizon) {
+                    open[(int)x / SCAN_DIVISION] = y + Y_BUFFER;
+                }
+                open2[(int)x / SCAN_DIVISION] = y + Y_BUFFER;
+                //drawPoint(x, y, RED);
+                //drawPoint(x - 1, y, RED);
+                //drawPoint(x + 1, y, RED);
+                y = 0;
+            }
+            if (run == RUN_BUFFER) {
+                if (open[(int)x / SCAN_DIVISION] == horizon) {
+                    open[(int)x / SCAN_DIVISION] = y + RUN_BUFFER;
+                }
+                if (bad == RUN_BUFFER) {
+                    open2[(int)x / SCAN_DIVISION] = y + RUN_BUFFER;
+                    y = 0;
+                }
+                //drawPoint(x, y, RED);
+                //drawPoint(x - 1, y, RED);
+                //drawPoint(x + 1, y, RED);
+            }
+            if (run > MAX_RUN_SIZE && (bad > MAX_BAD_PIXELS || y < sixty)) {
+                open2[(int)x / SCAN_DIVISION] = y + run;
+                y = 0;
+            }
+        }
+    }
+    // OK let's see if we can say anything about how blocked we were
+    // left side first
+    int index1 = 0, index2, index3, i, index12 = 0, index22, index32;
+    int longs = 0, longsize = 0, longIndex = 0, minsize = horizon;
+    int jumpdown = -1, lastone = horizon;
+    bool vert = false;
+    for (i = 0; i < IMAGE_WIDTH / SCAN_DIVISION; i++) {
+        if (i - jumpdown < JUMP_MAX && !vert && open[i] >
+			IMAGE_HEIGHT - BOTTOM_BUFFER && jumpdown != -1) {
+            vert = true;
+        }
+        if (open[i] > horizon + HORIZON_TOLERANCE &&
+			lastone < horizon + HORIZON_TOLERANCE && i != 0) {
+            jumpdown = i;
+            vert = false;
+        }
+        if (vert && lastone > horizon + HORIZON_TOLERANCE  && open[i] <
+			horizon + HORIZON_TOLERANCE) {
+            //cout << "Testing for vertical " << jumpdown << " " << i << endl;
+            if (i - jumpdown < DOWNMAX && jumpdown != -1) {
+                point<int> midTop(jumpdown * SCAN_DIVISION,
+								  IMAGE_HEIGHT - horizon /2);
+                point<int> midBottom(i * SCAN_DIVISION,IMAGE_HEIGHT- horizon/2);
+                bool intersects = vision->fieldLines->
+                    intersectsFieldLines(midTop,midBottom);
+                if (intersects) {
+                    if (openField) {
+                        cout << "VERTICAL LINE DETECTED BY OPEN FIELD*********"
+                             << endl;
+                    }
+                    for (int k = jumpdown; k < i; k++) {
+                        open[k] = horizon;
+                        open2[k] = horizon;
+                    }
+                }
+            }
+        }
+        lastone = open[i];
+        if (open[i] - MAX_RUN_SIZE <= horizon) {
+            longs++;
+            if (longs > longsize) {
+                longIndex = i - longs;
+                longsize = longs;
+            }
+        } else {
+            longs = 0;
+        }
+        if (open[i] > minsize) {
+            minsize = open[i];
+        }
+    }
+    for (i = 1; i < IMAGE_WIDTH / IMAGE_SECTIONS; i++) {
+        if (open[i] > open[index1]) {
+            index1 = i;
+        }
+        if (open2[i] > open2[index12]) {
+            index12 = i;
+        }
+    }
+    index2 = i; index22 = i;
+    for (i++ ; i < 2 * IMAGE_WIDTH / IMAGE_SECTIONS; i++) {
+        if (open[i] > open[index2]) {
+            index2 = i;
+        }
+        if (open2[i] > open2[index22]) {
+            index22 = i;
+        }
+    }
+    index3 = i; index32 = i;
+    for (i++ ; i < (IMAGE_WIDTH / SCAN_DIVISION) ; i++) {
+        if (open[i] > open[index3]) {
+            index3 = i;
+        }
+        if (open2[i] > open2[index32]) {
+            index32 = i;
+        }
+    }
+    // All distance estimates are to the HARD values
+    estimate e;
+    e = pose->pixEstimate(IMAGE_WIDTH/X_AXIS_SECTIONS, open2[index12], 0.0);
+    vision->fieldOpenings[0].soft = open[index1];
+    vision->fieldOpenings[0].hard = open2[index12];
+    vision->fieldOpenings[0].horizonDiffSoft = open[index1] - horizon;
+    vision->fieldOpenings[0].horizonDiffHard = open2[index12] - horizon;
+    vision->fieldOpenings[0].dist = e.dist;
+    vision->fieldOpenings[0].bearing = e.bearing;
+    vision->fieldOpenings[0].elevation = e.elevation;
+
+    e = pose->pixEstimate(IMAGE_WIDTH/2, open2[index22],0.0);
+    vision->fieldOpenings[1].soft = open[index2];
+    vision->fieldOpenings[1].hard = open2[index22];
+    vision->fieldOpenings[1].horizonDiffSoft = open[index2] - horizon;
+    vision->fieldOpenings[1].horizonDiffHard = open2[index22] - horizon;
+    vision->fieldOpenings[1].dist = e.dist;
+    vision->fieldOpenings[1].bearing = e.bearing;
+    vision->fieldOpenings[1].elevation = e.elevation;
+
+    e = pose->pixEstimate(SCAN_DIVISION*IMAGE_WIDTH/X_AXIS_SECTIONS,
+						  open2[index32],0.0);
+    vision->fieldOpenings[2].soft = open[index3];
+    vision->fieldOpenings[2].hard = open2[index32];
+    vision->fieldOpenings[2].horizonDiffSoft = open[index3] - horizon;
+    vision->fieldOpenings[2].horizonDiffHard = open2[index32] - horizon;
+    vision->fieldOpenings[2].dist = e.dist;
+    vision->fieldOpenings[2].bearing = e.bearing;
+    vision->fieldOpenings[2].elevation = e.elevation;
+
+
+    if (openField) {
+        cout << "Obstacle 1 Dist:" << vision->fieldOpenings[0].dist << endl
+             << "Obstacle 2 Dist:" << vision->fieldOpenings[1].dist << endl
+             << "Obstacle 3 Dist:" << vision->fieldOpenings[2].dist << endl;
+        // drawLine(0, open[index1], IMAGE_WIDTH / 3, open[index1], PINK);
+        // drawLine(IMAGE_WIDTH / 3, open[index2], 2 * IMAGE_WIDTH / 3,
+        //          open[index2], PINK);
+        // drawLine(2 * IMAGE_WIDTH / 3, open[index3], IMAGE_WIDTH  - 1,
+        //          open[index3], PINK);
+        // drawLine(0, open[index1] + 1, IMAGE_WIDTH / 3, open[index1] + 1,
+        //          MAROON);
+        // drawLine(IMAGE_WIDTH / 3, open[index2] + 1, 2 * IMAGE_WIDTH / 3,
+        //          open[index2] + 1, PINK);
+        // drawLine(2 * IMAGE_WIDTH / 3, open[index3] + 1, IMAGE_WIDTH  - 1,
+        //          open[index3] + 1, PINK);
+        thresh->drawLine(0, open2[index12], IMAGE_WIDTH / LINE_DIVIDER, open2[index12],
+				 MAROON);
+        thresh->drawLine(IMAGE_WIDTH / LINE_DIVIDER, open2[index22], 2 * IMAGE_WIDTH /
+				 LINE_DIVIDER,
+                 open2[index22], MAROON);
+        thresh->drawLine(2 * IMAGE_WIDTH / LINE_DIVIDER, open2[index32],
+				 IMAGE_WIDTH  - 1,
+                 open2[index32], MAROON);
+        thresh->drawLine(0, open2[index12] - 1, IMAGE_WIDTH / LINE_DIVIDER,
+				 open2[index12] - 1,
+                 MAROON);
+        thresh->drawLine(IMAGE_WIDTH / LINE_DIVIDER, open2[index22] - 1,
+				 2 * IMAGE_WIDTH / LINE_DIVIDER,
+                 open2[index22] - 1, MAROON);
+        thresh->drawLine(2 * IMAGE_WIDTH / LINE_DIVIDER, open2[index32] - 1,
+				 IMAGE_WIDTH  - 1,
+                 open2[index32] - 1, MAROON);
+        if (open2[index12] != open2[index22]) {
+            thresh->drawLine(IMAGE_WIDTH / LINE_DIVIDER, open2[index12],
+					 IMAGE_WIDTH / LINE_DIVIDER,
+                     open2[index22], MAROON);
+        }
+        if (open2[index32] != open2[index22]) {
+            thresh->drawLine(2 * IMAGE_WIDTH / LINE_DIVIDER, open2[index32],
+					 2 * IMAGE_WIDTH / LINE_DIVIDER,
+                     open2[index22], MAROON);
+        }
+        if (open2[index12] <  open2[index22] &&
+            open2[index12] < open2[index32]) {
+            for (i = IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <=
+					 open2[index12]; i++){
+            }
+            drawMore(i, open2[index12], PINK);
+        }
+        else if (open2[index22] <  open2[index12] &&
+                 open2[index22] < open2[index32]) {
+            for (i = IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <=
+					 open2[index22]; i--){
+            }
+            drawLess(i, open2[index22], PINK);
+            for (i = 2 * IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <=
+					 open2[index22];
+                 i++) {}
+            drawMore(i, open2[index22], PINK);
+        }
+        else if (open2[index32] <  open2[index22] &&
+                 open2[index32] < open2[index12]) {
+            for (i = 2 * IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <=
+					 open2[index32];
+                 i--) {}
+            drawLess(i, open2[index32], PINK);
+        }
+        else if (open2[index22] ==  open2[index12] &&
+                 open2[index22] < open2[index32]) {
+            for (i = 2 * IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <=
+					 open2[index22];
+                 i++) {}
+            drawMore(i, open2[index22], PINK);
+        }
+        else if (open2[index22] < open2[index12] &&
+                 open2[index22] == open2[index32]) {
+            for (i = IMAGE_WIDTH / LINE_DIVIDER; open[i / SCAN_DIVISION] <=
+					 open2[index22]; i--){
+            }
+            drawLess(i, open2[index22], PINK);
+        } else if (open2[index12] < open2[index22] &&
+                   open2[index12] == open2[index32]) {
+            // vertical line?
+            cout << "Vertical line?" << endl;
+        }
+        // drawMore(longIndex * SCAN_DIVISION + longsize * SCAN_DIVISION +
+		// SCAN_DIVISION, horizon,
+        //          PINK);
+        cout << "Estimate soft is " << open[index1] << " " << open[index2]
+             << " " << open[index3] << endl;
+        cout << "Estimate hard is " << open2[index12] << " " << open2[index22]
+             << " " << open2[index32] << endl;
+    }
+}
+
+/* The horizon at the given x value.  Eventually we'll be changing this to
+ * return a value based upon the field edges.
+ * @param x     column to find the horizon in
+ * @return      projected value
+ */
+
+int Field::horizonAt(int x) {
+    return yProject(0, horizon, x);
+}
+
+/* Project a line given a start coord and a new y value - note that this is
+ * dangerous depending on how you do the projection.
+ *
+ * @param startx   the x point to start at
+ * @param starty   the y point to start at
+ * @param newy     the y point to end at
+ * @return         the corresponding x point
+ */
+int Field::xProject(int startx, int starty, int newy)
+{
+    //slope is a float representing the slope of the horizon.
+    return startx - ROUND2(slope * (float)(newy - starty));
+}
+
+/* Project a line given a start coord and a new y value - note that this is
+ * dangerous depending on how you do the projection.
+ *
+ * @param point    the point to start at
+ * @param newy     the y point to end at
+ * @return         the corresponding x point
+ */
+int Field::xProject(point <int> point, int newy) {
+    //slope is a float representing the slope of the horizon.
+    return point.x - ROUND2(slope * (float)(newy - point.y));
+}
+
+/* Project a line given a start coord and a new x value
+ * @param startx   the x point to start at
+ * @param starty   the y point to start at
+ * @param newx     the x point to end at
+ * @return         the corresponding y point
+ */
+int Field::yProject(int startx, int starty, int newx)
+{
+    return starty + ROUND2(slope * (float)(newx - startx));
+}
+
+/* Project a line given a start coord and a new x value
+ * @param point    the point to start at
+ * @param newx     the x point to end at
+ * @return         the corresponding y point
+ */
+int Field::yProject(point <int> point, int newx)
+{
+    return point.y + ROUND2(slope * (float)(newx - point.x));
+}
+
+
+void Field::drawLess(int x, int y, int c)
+{
+    const int lineBuff = 10;
+
+#ifdef OFFLINE
+    thresh->drawLine(x, y, x + lineBuff, y - lineBuff, c);
+    thresh->drawLine(x, y, x + lineBuff, y + lineBuff, c);
+    thresh->drawLine(x + 1, y, x + lineBuff + 1, y - lineBuff, c);
+    thresh->drawLine(x + 1, y, x + lineBuff + 1, y + lineBuff, c);
+#endif
+}
+
+void Field::drawMore(int x, int y, int c)
+{
+    const int lineBuff = 10;
+
+#ifdef OFFLINE
+    thresh->drawLine(x, y, x - lineBuff, y - lineBuff, c);
+    thresh->drawLine(x, y, x - lineBuff, y + lineBuff, c);
+    thresh->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
+    thresh->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
+#endif
+}

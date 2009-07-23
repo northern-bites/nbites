@@ -19,8 +19,23 @@ public:
     virtual ~Field() {}
 
     // main methods
-    int findGreenHorizon(int pH);
+    int findGreenHorizon(int pH, float sl);
 	void findFieldEdges();
+	int horizonAt(int x);
+
+    // scan operations
+    int yProject(int startx, int starty, int newy);
+    int yProject(point <int> point, int newy);
+    int xProject(int startx, int starty, int newx);
+    int xProject(point <int> point, int newx);
+
+    // shooting
+    void setShot(VisualCrossbar * one, int color);
+    void bestShot(VisualFieldObject * left, VisualFieldObject * right,
+                  VisualCrossbar * mid, int color);
+    void openDirection(int h, NaoPose *p);
+    void drawLess(int x, int y, int c);
+    void drawMore(int x, int y, int c);
 
 private:
 
@@ -32,6 +47,12 @@ private:
 	int horizon;
 	bool debugHorizon;
 	bool debugFieldEdge;
+	bool debugShot;
+	bool openField;
+
+	float slope;
+
+    bool shoot[IMAGE_WIDTH];
 };
 
 #endif // Field_h_DEFINED

@@ -77,10 +77,8 @@ public:
     void squareGoal(int x, int y, int c, int c2, Blob & pole);
     float correct(Blob b, int c, int c2);
 
-    // main methods
+    // main method
     void createObject(int c);
-    void yellow(int pink);
-    void blue(int pink);
 
     // miscelaneous goal processing  methods
     bool qualityPost(Blob b, int c);
@@ -99,18 +97,13 @@ public:
     int checkOther(int left, int right, int height, int horizon);
     int characterizeSize(Blob b);
 
-    // shooting
-    void setShot(VisualCrossbar * one);
-    void bestShot(VisualFieldObject * left, VisualFieldObject * right,
-                  VisualCrossbar * mid);
-    void openDirection(int h, NaoPose *p);
-    int classifyFirstPost(int horizon, int c, int c2, bool postFound,
+    int classifyFirstPost(int horizon, int c, int c2,
                           VisualFieldObject* left, VisualFieldObject* right,
                           VisualCrossbar* mid, Blob pole);
 
     // the big kahuna
     void goalScan(VisualFieldObject *left, VisualFieldObject *right,
-                  VisualCrossbar *mid, int c, int c2, bool post,
+                  VisualCrossbar *mid, int c, int c2,
                   int horizon);
     int grabPost(int c, int c2, int horizon, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
@@ -147,8 +140,6 @@ public:
     void printObject(VisualFieldObject * objs);
     void paintRun(int x,int y, int h, int c);
     void drawRun(const run& run, int c);
-    void drawLess(int x, int y, int c);
-    void drawMore(int x, int y, int c);
 
 
 private:
@@ -159,12 +150,8 @@ private:
     int color;
     int runsize;
     int biggestRun;
-    int maxHeight;
-    int maxOfBiggestRun;
     int numberOfRuns;
-    int indexOfBiggestRun;
     run* runs;
-    bool shoot[IMAGE_WIDTH];
     float slope;
 
 #ifdef OFFLINE
@@ -173,10 +160,8 @@ private:
     bool POSTDEBUG;
     bool TOPFIND;
     bool CORNERDEBUG;
-    bool BACKDEBUG;
     bool SANITY;
     bool CORRECT;
-    bool OPENFIELD;
 #endif
 
 };
