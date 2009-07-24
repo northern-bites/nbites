@@ -20,7 +20,20 @@
 
 /*
  * Robots.cpp is where we do our robot recognition work in vision.
-*/
+ * While it is true that this code sort of worked in 2008, we were
+ * foolishly using high-res images at that time.  Since then the code
+ * has languished and is frankly a mess.  However, the basic ideas
+ * are pretty good and it could probably be salvaged when someone
+ * has the time to do so.  We do not currently have this code turned
+ * on.
+ *
+ * The major idea of this code is to do a highly modified version of
+ * run-length-encoding where the runs are hybrid color runs that run
+ * from the first seen bit of color in a scanline to the last.  Since
+ * the colored pieces of the robot are not connected we often have
+ * to glue disparate blobs together.  This is not easy to do and it
+ * is where most of the work is needed.
+ */
 
 #include <iostream>
 #include "Robots.h"

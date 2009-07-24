@@ -20,7 +20,17 @@
 
 /*
  * This is where we do all major ball related processing.  For now we
- * still do run length encoding to find candidate balls.
+ * still do run length encoding to find candidate balls.  What we do
+ * is collect up all of the candidate blobs and run them through a
+ * series of initial sanity checks to whittle the list down to a smaller
+ * number.  From that list we then start with the biggest candidate
+ * ball and run more sanity checks until we find a ball that we
+ * are satisfied with.  Basically our sanity checks revolve around:
+ * color - the ball should be mostly orange, red is dangerous
+ * shape - the ball should be pretty round
+ * location - the ball should be on the field
+ * distance - the perceived distance of the ball should match where
+ *            it is in our field of view
 */
 
 #include <iostream>
@@ -99,6 +109,413 @@ void Ball::init(float s)
     numPoints = 0;
 }
 
+/* This is the entry  point ball recognition in Threshold.cc
+ * @param  h            field horizon
+ * @return              always 0
+ */
+
+void Ball::createBall(int h) {
+        balls(h, vision->ball);
+}
+
+
+/* See if there is a ball onscreen.  Basically we get all of the orange blobs
+ * and test them for viability.  Once we've screened all of the obviously bad
+ * ones we then pick the biggest one and check it some more.
+ *
+ * @param  horizon   the horizon intercept
+ * @param  thisBall  the ball object
+ * @return           we always return 0 - an artifact of other methods
+ */
+int Ball::balls(int horizon, VisualBall *thisBall)
+{
+    const int MIN_BLOB_SIZE = 3;
+	const int MIN_AREA = 35;
+	const int MAX_AREA = 1000;
+	const int PIX_EST_DIV = 3;
+	const int BOTTOM_EDGE_BUFF = 3;
+	const int HORIZON_THRESHOLD = 30;
+	const float OPTIMAL_COLOR_PERCENT = 0.85f;
+	const float CONVERT_TO_INT = 10.0f;
+	const int CONFIDENCE_ADJUSTMENT = 3;
+	const int SMALL_BLOB = 75;
+	const int MEDIUM_BLOB = 150;
+	const int BIG_BLOB = 250;
+	const int HUGE_BLOB = 500;
+	const float PIXACC = 300;
+
+    int confidence = 10;
+    occlusion = NOOCCLUSION;
+	// TO DO: MAXDIAM should be based upon pose rather than taking lots of
+	// pictures.  For example, it used to be set to 100 which is the maxdiam
+	// when we are in our walk stance.  However, we had to up it to 150 since
+	// our goalie sometimes squats way down.
+	static const int MAXDIAM = 100;
+    if (numberOfRuns > 1) {
+        for (int i = 0; i < numberOfRuns; i++) {
+            // search for contiguous blocks
+            int nextX = runs[i].x;
+            int nextY = runs[i].y;
+            int nextH = runs[i].h;
+            blobs->blobIt(nextX, nextY, nextH);
+        }
+    }
+
+	// when we have red uniforms, sometimes we get tons of orange blobs
+	// and sometimes they are inside of each other
+	if (blobs->number() > MIN_BLOB_SIZE) {
+		int big = 0, bigArea = blobs->get(0).getArea();
+		for (int i = 1; i < blobs->number(); i++) {
+			if (blobs->get(i).getArea() > bigArea) {
+				big = i;
+				bigArea = blobs->get(i).getArea();
+			}
+		}
+		for (int i = 0; i < blobs->number(); i++) {
+			if (i != big && blobs->get(i).getRightTopX() > blobs->get(big).getLeftTopX() &&
+				blobs->get(i).getLeftTopX() < blobs->get(big).getRightTopX() &&
+				blobs->get(i).getLeftBottomY() > blobs->get(big).getLeftTopY() &&
+				blobs->get(i).getLeftTopY() < blobs->get(big).getLeftBottomY()) {
+				if (BALLDEBUG) {
+					cout << "Screening an inner ball" << endl;
+					drawBlob(blobs->get(i), WHITE);
+				}
+				blobs->init(i);
+			}
+		}
+	}
+
+    // pre-screen blobs that don't meet our criteria
+    //cout << "horizon " << horizon << " " << slope << endl;
+    for (int i = 0; i < blobs->number(); i++) {
+        int ar = blobs->get(i).getArea();
+        float perc = rightColor(blobs->get(i), ORANGE);
+        int diam = max(blobs->get(i).width(), blobs->get(i).height());
+		if (blobs->get(i).getArea() > 0) {
+			if (blobs->get(i).getLeftBottomY() + diam <
+				horizonAt(blobs->get(i).getLeftTopX())) {
+				blobs->init(i);
+				if (BALLDEBUG) {
+					cout << "Screened one for horizon problems " << endl;
+					drawBlob(blobs->get(i), WHITE);
+				}
+			} else if (diam > MAXDIAM) {
+				if (blobs->get(i).width() > MAXDIAM) {
+					if (diam < MAXDIAM + 20) {
+						// Try trimming the ball
+						int lefty = diam / 2, righty = diam / 2, pix;
+						// scan in from the sides and see where we see orange faster
+						// trim other side
+						for (int j = blobs->get(i).getLeftTopX(); j < blobs->get(i).getLeftTopX()
+								 + diam / 2; j++) {
+							pix = thresh->thresholded[blobs->get(i).getLeftTopY() + 20][j];
+							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
+								lefty = j - blobs->get(i).getLeftTopX();
+								j = IMAGE_WIDTH;
+							}
+						}
+						for (int j = blobs->get(i).getRightTopX(); j > blobs->get(i).getRightTopX()
+								 - diam / 2; j--)
+						{
+							pix = thresh->thresholded[blobs->get(i).getLeftTopY() + 20][j];
+							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
+								righty = blobs->get(i).getLeftTopX() - j;
+								j = 0;
+							}
+						}
+						if (lefty < righty) {
+							// the right side is too wide
+							blobs->setRight(i, blobs->get(i).getLeftTopX() + MAXDIAM);
+						} else {
+							blobs->setLeft(i, blobs->get(i).getRightTopX() - MAXDIAM);
+						}
+						if (blobs->get(i).height() > MAXDIAM) {
+							blobs->setBottom(i, blobs->get(i).getLeftTopY() + MAXDIAM);
+						}
+					} else {
+						// This is going to be a hack added in graz
+						// what we're going to do is for really big blobs
+						// do a modified roundess check
+						const float CORNER_CHUNK_DIV = 6.0f;
+						int w = blobs->get(i).width();
+						int h = blobs->get(i).height();
+						int x = blobs->get(i).getLeftTopX(), y = blobs->get(i).getLeftTopY();
+						int d = ROUND2(static_cast<float>(w) / CORNER_CHUNK_DIV);
+						int pix, badPix = 0, goodPix = 0;
+						for (int j = 0; j < d; j++) {
+							pix = thresh->thresholded[y+j][x+j];
+							if (pix == ORANGE || pix == ORANGERED) {
+								//drawPoint(x+i, y+i, BLACK);
+								badPix++;
+							}
+							else
+								goodPix++;
+							pix = thresh->thresholded[y+j][x+w-j];
+							if (pix == ORANGE || pix == ORANGERED) {
+								//drawPoint(x+w-i, y+i, BLACK);
+								badPix++;
+							}
+							else
+								goodPix++;
+						}
+						if (goodPix > badPix + 25) {
+							// do nothing
+							if (BALLDEBUG) {
+								cout << "Allowing ball: Good pix " << goodPix << " " << badPix << endl;
+							}
+						} else {
+							if (BALLDEBUG) {
+								cout << "Screened one that was too big " << diam << endl;
+								drawBlob(blobs->get(i), NAVY);
+							}
+							blobs->init(i);
+						}
+					}
+				} else {
+					// Hacktacular:  trim the height to equal the width
+					int newHeight = blobs->get(i).width();
+					blobs->setBottom(i, blobs->get(i).getLeftTopY() + newHeight);
+				}
+			} else if (ar > MIN_AREA && perc > MINORANGEPERCENT) {
+				// don't do anything
+				if (BALLDEBUG) {
+					cout << "Candidate ball " << endl;
+					printBlob(blobs->get(i));
+				}
+			} else if (ar > MAX_AREA && rightHalfColor(blobs->get(i)) > MINORANGEPERCENT)
+			{
+				if (BALLDEBUG) {
+					cout << "Candidate ball " << endl;
+					printBlob(blobs->get(i));
+				}
+			} else {
+				if (BALLDEBUG) {
+					drawBlob(blobs->get(i), BLACK);
+					printBlob(blobs->get(i));
+					if (perc < MINORANGEPERCENT) {
+						cout << "Screened one for not being orange enough, its percentage is "
+							 << perc << endl;
+					} else {
+						cout << "Screened one for being too small - its area is " << ar << endl;
+					}
+				}
+				blobs->init(i);
+			}
+		}
+    }
+
+	bool done = false;
+	int w, h;   // width and height of potential ball
+	estimate e; // pix estimate of ball's distance
+	while (!done) {
+		// now find the best remaining blob
+		topBlob = blobs->getTopAndMerge(horizon);
+		if (topBlob == NULL) return 0;
+
+		if (!blobOk(*topBlob)) {
+			if (BALLDEBUG)
+				cout << "No viable blobs" << endl;
+			return 0;
+		}
+
+		// try to screen out "false balls"
+		w = topBlob->width();
+		h = topBlob->height();
+		const float BALL_REAL_HEIGHT = 8.6f;
+
+		e = vision->pose->pixEstimate((topBlob->getLeftTopX() + w) / 2,
+									  topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
+									  BALL_REAL_HEIGHT);
+
+		//cout << "Estimated distance is " << e.dist << endl;
+		if (BALLDEBUG) {
+			if (topBlob->getLeftTopX() > 0) {
+				cout << "Vision found ball " << endl;
+				printBlob(*topBlob);
+				cout << topBlob->getLeftTopX() << " " << topBlob->getLeftTopY() << " " <<
+					w << " " << h << endl;
+			}
+
+		}
+		// check for obvious occlusions
+		if (topBlob->getLeftBottomY() > IMAGE_HEIGHT - BOTTOM_EDGE_BUFF) {
+			occlusion = BOTTOMOCCLUSION;
+		}
+		if (topBlob->getLeftTopY() < 1) {
+			occlusion *= TOPOCCLUSION;
+		}
+		if (topBlob->getLeftTopX() < 1) {
+			occlusion *= LEFTOCCLUSION;
+		}
+		if (topBlob->getRightTopX() > IMAGE_WIDTH - 2) {
+			occlusion *= RIGHTOCCLUSION;
+		}
+
+		// for smallish blobs, make sure we're near some green
+		//int whereIsGreen = ballNearGreen(topBlob);
+		int horb = horizonAt(topBlob->getLeftBottomX());
+
+		//look for edge points!
+		int NUM_EDGE_POINTS = 20;
+		int cenX = midPoint(topBlob->getLeftTopX(), topBlob->getRightBottomX());
+		int cenY = midPoint(topBlob->getLeftTopY(), topBlob->getLeftBottomY());
+
+		/*for(float angle = 0; angle < M_PI_FLOAT;
+		  angle += M_PI_FLOAT / static_cast<float>(NUM_EDGE_POINTS) ){
+
+		  scanOut(cenX,cenY,tan(angle), 1);
+		  scanOut(cenX,cenY,tan(angle), -1);
+		  }*/
+
+		//if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > numMin) {
+        if (badSurround(*topBlob)) {
+            if (BALLDEBUG) {
+                drawBlob(*topBlob, BLACK);
+                cout << "Screening for lack of green and bad surround" << endl;
+            }
+			topBlob->init();
+            done = false;
+        } else {
+
+			if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
+				// small balls should be near the horizon - this check makes extra sure
+				if (topBlob->getLeftBottomY() > horb + HORIZON_THRESHOLD) {
+					if (BALLDEBUG)
+						cout << "Screening small ball for horizon" << endl;
+					return 0;
+				}
+				if (BALLDEBUG)
+					cout << "Small ball passed green and horizon tests" << endl;
+			}
+			float colPer = rightColor(*topBlob, ORANGE);
+
+
+			confidence -= ROUND2((OPTIMAL_COLOR_PERCENT - colPer) * CONVERT_TO_INT);
+			//cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
+			if (topBlob->getArea() < SMALL_BLOB) {
+				confidence -= CONFIDENCE_ADJUSTMENT;
+			} else if (topBlob->getArea() < MEDIUM_BLOB) {
+				confidence -= 1;
+			} else if (topBlob->getArea() > HUGE_BLOB) {
+				confidence += 2;
+			} else if (topBlob->getArea() > BIG_BLOB) {
+				confidence += 1;
+			}
+			if (BALLDEBUG) {
+				printBall(*topBlob, confidence, colPer, occlusion);
+			}
+
+			// SORT OUT BALL INFORMATION
+			setBallInfo(w, h, thisBall);
+			done = true;
+			float distanceDifference = fabs(e.dist - thisBall->getDistance());
+			const float DISTANCE_MISMATCH = 50.0f;
+			if (distanceDifference > DISTANCE_MISMATCH &&
+				(e.dist *2 <  thisBall->getDistance() ||
+				 thisBall->getDistance() * 2 < e.dist)
+				&& e.dist < PIXACC && e.dist > 0) {
+				if (BALLDEBUG) {
+					cout << "Screening due to distance mismatch " << e.dist <<
+						" " << thisBall->getDistance() << endl;
+				}
+				thisBall->init();
+				topBlob->init();
+				done = false;
+			}
+		}
+	}
+    // sometimes when we're close to the ball we catch reflections off
+	//the tape or posts
+    if (thisBall->getDistance() < 75.0f && abs(h - w) > 3) {
+		// we probably have misidentified the distance see if we can fix it.
+		if (BALLDISTDEBUG) {
+			cout << "Detected bad ball distance - trying to fix " << w <<
+				" " << h << endl;
+		}
+		if (h > w) {
+			// scan the sides to find the real sides
+			int count = -2;
+			if (topBlob->getRightTopX() - h > 0) {
+				for (int i = topBlob->getRightTopX() - h; i < IMAGE_WIDTH - 1; i++) {
+					for (int j = topBlob->getLeftTopY(); j < topBlob->getLeftBottomY(); j++) {
+						if (thresh->thresholded[j][i] == ORANGE) {
+							topBlob->setRightTopX(i);
+							j = IMAGE_HEIGHT;
+							i = IMAGE_WIDTH;
+						}
+					}
+					count++;
+				}
+			}
+			if (topBlob->getLeftTopX() + h < IMAGE_WIDTH) {
+				for (int i = topBlob->getLeftTopX() + h; i > -1; i--) {
+					for (int j = topBlob->getLeftTopY(); j < topBlob->getLeftBottomY(); j++) {
+						if (thresh->thresholded[j][i] == ORANGE) {
+							topBlob->setRightTopX(i);
+							j = IMAGE_HEIGHT;
+							i = -1;
+						}
+					}
+					count++;
+				}
+			}
+			if (count > 1) {
+				if (BALLDISTDEBUG) {
+					cout << "Resetting ball dimensions.  Count was " << count << endl;
+				}
+				setBallInfo(w, w, thisBall);
+			}
+		} else {
+			/*
+			int count = -2;
+			// scan the top/bottom to find the real ones
+			if (topBlob->rightTop.y - w > 0) {
+				for (int i = topBlob->rightTop.y - w; i < IMAGE_HEIGHT - 1; i++) {
+					for (int j = topBlob->leftTop.x; j < topBlob->rightBottom.x; j++) {
+						if (thresh->thresholded[i][j] == ORANGE) {
+							topBlob->rightTop.y = i;
+							j = IMAGE_WIDTH;
+							i = IMAGE_HEIGHT;
+						}
+					}
+					count++;
+				}
+			}
+			if (topBlob->leftTop.y + w < IMAGE_HEIGHT) {
+				for (int i = topBlob->leftTop.y + w; i > -1; i--) {
+					for (int j = topBlob->leftTop.x; j < topBlob->rightTop.x; j++) {
+						if (thresh->thresholded[i][j] == ORANGE) {
+							topBlob->rightTop.y = i;
+							j = IMAGE_WIDTH;
+							i = -1;
+						}
+					}
+					count++;
+				}
+				if (count > 1) {
+					if (BALLDISTDEBUG) {
+						cout << "Resetting ball dimensions.  Count was " << count << endl;
+					}
+					setBallInfo(h, h, thisBall);
+				}
+				} */
+		}
+		thisBall->setDistanceEst(e);
+    }
+    if (atBoundary(*topBlob)) {
+        //thisBall->setConfidence(MILDLYSURE);
+    }
+    if (BALLDISTDEBUG) {
+        estimate es;
+        es = vision->pose->pixEstimate(topBlob->getLeftTopX() + topBlob->width() /
+									   2, topBlob->getLeftTopY() + 2
+									   * topBlob->height() / PIX_EST_DIV, 8.0);
+        cout << "Distance is " << thisBall->getDistance() << " " <<
+			thisBall->getFocDist() << " " << es.dist << endl;
+        cout<< "Radius"<<thisBall->getRadius()<<endl;
+    }
+    return 0;
+}
 
 /* Set the primary color.  Depending on the color, we have different space needs
  * @param c        the color
@@ -288,16 +705,6 @@ void Ball::horizontalScan(int x, int y, int dir, int stopper, int c,
     scan.good = good;
     //cout << "return with " << temp.x << endl;
 }
-
-/* This is the entry  point ball recognition in Threshold.cc
- * @param  h            field horizon
- * @return              always 0
- */
-
-void Ball::createBall(int h) {
-        balls(h, vision->ball);
-}
-
 
 int Ball::horizonAt(int x) {
 	// projection code lifted from version in ObjectFragments
@@ -514,6 +921,7 @@ bool Ball::greenSide(Blob b)
 }
 
 /* Scan from a point in the ball, in a certain direction to find a point.
+ * TODO: Use this.  It would be especially usefor for occluded balls.
  * @param start_x     the x location of the point
  * @param start_y     the y location of the point
  * @param slopel      the slope of the scanline
@@ -560,25 +968,19 @@ int Ball::scanOut(int start_x, int start_y, float slopel, int dir){
             }
             lastGoodX = x;
             lastGoodY = y;
-#ifdef OFFLINE
             if(DEBUGBALLPOINTS)
                 thresh->debugImage[y][x] = NAVY;
-#endif
         }else if(thisPix == GREEN || thisPix == BLACK){
             good  = 0;
             bad++;
             goodEdge++;
-#ifdef OFFLINE
             if(DEBUGBALLPOINTS)
                 thresh->debugImage[y][x] = WHITE;
-#endif
         }else{
             good  = 0;
             bad++;
-#ifdef OFFLINE
             if(DEBUGBALLPOINTS)
                 thresh->debugImage[y][x] = BLACK;
-#endif
         }
 
         //update position for both y, x
@@ -609,6 +1011,8 @@ int Ball::scanOut(int start_x, int start_y, float slopel, int dir){
  * how round our current candidate is.  Among other things we check its
  * height/width ratio (should be about 1) and where the orange is (shouldn't
  * be in the corners, should be in the middle)
+ * TODO:  This needs LOTS of work.  Especially if we move to nontraditional
+ * colors or multi-colored balls.
  * @param b      the candidate ball
  * @return       a constant result - BAD_VALUE, or 0 for round
  */
@@ -628,7 +1032,6 @@ int  Ball::roundness(Blob b)
     int y = b.getLeftTopY();
     float ratio = static_cast<float>(w) / static_cast<float>(h);
     int r = 10;
-	//cout << "Height is " << h << " width is " << w << endl;
 
     if ((h < SMALLBALLDIM && w < SMALLBALLDIM && ratio > BALLTOOTHIN &&
 		 ratio < BALLTOOFAT)) {
@@ -637,7 +1040,7 @@ int  Ball::roundness(Blob b)
 			   IMAGE_WIDTH - 2 || y == 0) {
         if (BALLDEBUG)
             cout << "Checking ratio on occluded ball:  " << ratio << endl;
-        // we're on an edge so allow for streching 
+        // we're on an edge so allow for streching
         if (h > BIG_ENOUGH && w > BIG_ENOUGH && (y + h > IMAGE_HEIGHT - 2 ||
 												 y == 0) &&
 			ratio < MIDFAT && ratio > 1) {
@@ -658,9 +1061,9 @@ int  Ball::roundness(Blob b)
         }
     } else {
         if (BALLDEBUG) {
-            //drawBlob(b, BLACK);
-            //printBlob(b);
-            //cout << "Screening for ratios " << ratio << endl;
+            drawBlob(b, BLACK);
+            printBlob(b);
+            cout << "Screening for ratios " << ratio << endl;
         }
         return BAD_VALUE;
     }
@@ -960,403 +1363,6 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall) {
 										  thisBall->getCenterY(),
 										  static_cast<float>(thisBall->
 															 getFocDist())));
-}
-
-/* See if there is a ball onscreen.  Basically we get all of the orange blobs
- * and test them for viability.  Once we've screened all of the obviously bad
- * ones we then pick the biggest one and check it some more.
- *
- * @param  horizon   the horizon intercept
- * @param  thisBall  the ball object
- * @return           we always return 0 - an artifact of other methods
- */
-int Ball::balls(int horizon, VisualBall *thisBall)
-{
-    const int MIN_BLOB_SIZE = 3;
-	const int MIN_AREA = 35;
-	const int MAX_AREA = 1000;
-	const int PIX_EST_DIV = 3;
-	const int BOTTOM_EDGE_BUFF = 3;
-	const int HORIZON_THRESHOLD = 30;
-	const float OPTIMAL_COLOR_PERCENT = 0.85f;
-	const float CONVERT_TO_INT = 10.0f;
-	const int CONFIDENCE_ADJUSTMENT = 3;
-	const int SMALL_BLOB = 75;
-	const int MEDIUM_BLOB = 150;
-	const int BIG_BLOB = 250;
-	const int HUGE_BLOB = 500;
-	const float PIXACC = 300;
-
-    int confidence = 10;
-    occlusion = NOOCCLUSION;
-	// TO DO: MAXDIAM should be based upon pose rather than taking lots of
-	// pictures.  For example, it used to be set to 100 which is the maxdiam
-	// when we are in our walk stance.  However, we had to up it to 150 since
-	// our goalie sometimes squats way down.
-	static const int MAXDIAM = 100;
-    if (numberOfRuns > 1) {
-        for (int i = 0; i < numberOfRuns; i++) {
-            // search for contiguous blocks
-            int nextX = runs[i].x;
-            int nextY = runs[i].y;
-            int nextH = runs[i].h;
-            blobs->blobIt(nextX, nextY, nextH);
-        }
-    }
-
-	// when we have red uniforms, sometimes we get tons of orange blobs
-	// and sometimes they are inside of each other
-	if (blobs->number() > MIN_BLOB_SIZE) {
-		int big = 0, bigArea = blobs->get(0).getArea();
-		for (int i = 1; i < blobs->number(); i++) {
-			if (blobs->get(i).getArea() > bigArea) {
-				big = i;
-				bigArea = blobs->get(i).getArea();
-			}
-		}
-		for (int i = 0; i < blobs->number(); i++) {
-			if (i != big && blobs->get(i).getRightTopX() > blobs->get(big).getLeftTopX() &&
-				blobs->get(i).getLeftTopX() < blobs->get(big).getRightTopX() &&
-				blobs->get(i).getLeftBottomY() > blobs->get(big).getLeftTopY() &&
-				blobs->get(i).getLeftTopY() < blobs->get(big).getLeftBottomY()) {
-				if (BALLDEBUG) {
-					cout << "Screening an inner ball" << endl;
-					drawBlob(blobs->get(i), WHITE);
-				}
-				blobs->init(i);
-			}
-		}
-	}
-
-    // pre-screen blobs that don't meet our criteria
-    //cout << "horizon " << horizon << " " << slope << endl;
-    for (int i = 0; i < blobs->number(); i++) {
-        int ar = blobs->get(i).getArea();
-        float perc = rightColor(blobs->get(i), ORANGE);
-        int diam = max(blobs->get(i).width(), blobs->get(i).height());
-		if (blobs->get(i).getArea() > 0) {
-			if (blobs->get(i).getLeftBottomY() + diam < horizonAt(blobs->get(i).getLeftTopX())) {
-				blobs->init(i);
-				if (BALLDEBUG) {
-					cout << "Screened one for horizon problems " << endl;
-					drawBlob(blobs->get(i), WHITE);
-				}
-			} else if (diam > MAXDIAM) {
-				if (blobs->get(i).width() > MAXDIAM) {
-					if (diam < MAXDIAM + 20) {
-						// Try trimming the ball
-						int lefty = diam / 2, righty = diam / 2, pix;
-						// scan in from the sides and see where we see orange faster
-						// trim other side
-						for (int j = blobs->get(i).getLeftTopX(); j < blobs->get(i).getLeftTopX() + diam / 2;
-							 j++) {
-							pix = thresh->thresholded[blobs->get(i).getLeftTopY() + 20][j];
-							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
-								lefty = j - blobs->get(i).getLeftTopX();
-								j = IMAGE_WIDTH;
-							}
-						}
-						for (int j = blobs->get(i).getRightTopX(); j > blobs->get(i).getRightTopX()
-								 - diam / 2; j--)
-						{
-							pix = thresh->thresholded[blobs->get(i).getLeftTopY() + 20][j];
-							if (pix == ORANGE || pix == ORANGEYELLOW || pix == ORANGERED) {
-								righty = blobs->get(i).getLeftTopX() - j;
-								j = 0;
-							}
-						}
-						if (lefty < righty) {
-							// the right side is too wide
-							blobs->setRight(i, blobs->get(i).getLeftTopX() + MAXDIAM);
-						} else {
-							blobs->setLeft(i, blobs->get(i).getRightTopX() - MAXDIAM);
-						}
-						if (blobs->get(i).height() > MAXDIAM) {
-							blobs->setBottom(i, blobs->get(i).getLeftTopY() + MAXDIAM);
-						}
-					} else {
-						// This is going to be a hack added in graz
-						// what we're going to do is for really big blobs
-						// do a modified roundess check
-						const float CORNER_CHUNK_DIV = 6.0f;
-						int w = blobs->get(i).width();
-						int h = blobs->get(i).height();
-						int x = blobs->get(i).getLeftTopX(), y = blobs->get(i).getLeftTopY();
-						int d = ROUND2(static_cast<float>(w) / CORNER_CHUNK_DIV);
-						int pix, badPix = 0, goodPix = 0;
-						for (int j = 0; j < d; j++) {
-							pix = thresh->thresholded[y+j][x+j];
-							if (pix == ORANGE || pix == ORANGERED) {
-								//drawPoint(x+i, y+i, BLACK);
-								badPix++;
-							}
-							else
-								goodPix++;
-							pix = thresh->thresholded[y+j][x+w-j];
-							if (pix == ORANGE || pix == ORANGERED) {
-								//drawPoint(x+w-i, y+i, BLACK);
-								badPix++;
-							}
-							else
-								goodPix++;
-						}
-						if (goodPix > badPix + 25) {
-							// do nothing
-							if (BALLDEBUG) {
-								cout << "Allowing ball: Good pix " << goodPix << " " << badPix << endl;
-							}
-						} else {
-							if (BALLDEBUG) {
-								cout << "Screened one that was too big " << diam << endl;
-								drawBlob(blobs->get(i), NAVY);
-							}
-							blobs->init(i);
-						}
-					}
-				} else {
-					// Hacktacular:  trim the height to equal the width
-					int newHeight = blobs->get(i).width();
-					blobs->setBottom(i, blobs->get(i).getLeftTopY() + newHeight);
-				}
-			} else if (ar > MIN_AREA && perc > MINORANGEPERCENT) {
-				// don't do anything
-				if (BALLDEBUG) {
-					cout << "Candidate ball " << endl;
-					printBlob(blobs->get(i));
-				}
-			} else if (ar > MAX_AREA && rightHalfColor(blobs->get(i)) > MINORANGEPERCENT) {
-				if (BALLDEBUG) {
-					cout << "Candidate ball " << endl;
-					printBlob(blobs->get(i));
-				}
-				//} else if (perc > 0.25f && redBallCheck()) {
-			} else {
-				if (BALLDEBUG) {
-					drawBlob(blobs->get(i), BLACK);
-					printBlob(blobs->get(i));
-					if (perc < MINORANGEPERCENT) {
-						cout << "Screened one for not being orange enough, its percentage is "
-							 << perc << endl;
-					} else {
-						cout << "Screened one for being too small - its area is " << ar << endl;
-					}
-				}
-				blobs->init(i);
-			}
-		}
-    }
-
-	bool done = false;
-	int w, h;   // width and height of potential ball
-	estimate e; // pix estimate of ball's distance
-	while (!done) {
-		// now find the best remaining blob
-		topBlob = blobs->getTopAndMerge(horizon);
-		if (topBlob == NULL) return 0;
-
-		if (!blobOk(*topBlob)) {
-			if (BALLDEBUG)
-				cout << "No viable blobs" << endl;
-			return 0;
-		}
-
-		// try to screen out "false balls"
-		w = topBlob->width();
-		h = topBlob->height();
-		const float BALL_REAL_HEIGHT = 8.6f;
-
-		e = vision->pose->pixEstimate((topBlob->getLeftTopX() + w) / 2,
-									  topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
-									  BALL_REAL_HEIGHT);
-
-		//cout << "Estimated distance is " << e.dist << endl;
-		if (BALLDEBUG) {
-			if (topBlob->getLeftTopX() > 0) {
-				cout << "Vision found ball " << endl;
-				printBlob(*topBlob);
-				cout << topBlob->getLeftTopX() << " " << topBlob->getLeftTopY() << " " <<
-					w << " " << h << endl;
-			}
-
-		}
-		// check for obvious occlusions
-		if (topBlob->getLeftBottomY() > IMAGE_HEIGHT - BOTTOM_EDGE_BUFF) {
-			occlusion = BOTTOMOCCLUSION;
-		}
-		if (topBlob->getLeftTopY() < 1) {
-			occlusion *= TOPOCCLUSION;
-		}
-		if (topBlob->getLeftTopX() < 1) {
-			occlusion *= LEFTOCCLUSION;
-		}
-		if (topBlob->getRightTopX() > IMAGE_WIDTH - 2) {
-			occlusion *= RIGHTOCCLUSION;
-		}
-
-		// for smallish blobs, make sure we're near some green
-		//int whereIsGreen = ballNearGreen(topBlob);
-		int horb = horizonAt(topBlob->getLeftBottomX());
-
-		//look for edge points!
-		int NUM_EDGE_POINTS = 20;
-		int cenX = midPoint(topBlob->getLeftTopX(), topBlob->getRightBottomX());
-		int cenY = midPoint(topBlob->getLeftTopY(), topBlob->getLeftBottomY());
-
-		/*for(float angle = 0; angle < M_PI_FLOAT;
-		  angle += M_PI_FLOAT / static_cast<float>(NUM_EDGE_POINTS) ){
-
-		  scanOut(cenX,cenY,tan(angle), 1);
-		  scanOut(cenX,cenY,tan(angle), -1);
-		  }*/
-
-		//if (w < SMALLBALLDIM || h < SMALLBALLDIM || numBlobs > numMin) {
-        if (badSurround(*topBlob)) {
-            if (BALLDEBUG) {
-                drawBlob(*topBlob, BLACK);
-                cout << "Screening for lack of green and bad surround" << endl;
-            }
-			topBlob->init();
-            done = false;
-        } else {
-
-			if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
-				// small balls should be near the horizon - this check makes extra sure
-				if (topBlob->getLeftBottomY() > horb + HORIZON_THRESHOLD) {
-					if (BALLDEBUG)
-						cout << "Screening small ball for horizon" << endl;
-					return 0;
-				}
-				if (BALLDEBUG)
-					cout << "Small ball passed green and horizon tests" << endl;
-			}
-			float colPer = rightColor(*topBlob, ORANGE);
-
-
-			confidence -= ROUND2((OPTIMAL_COLOR_PERCENT - colPer) * CONVERT_TO_INT);
-			//cout << (ROUND2((0.85 - colPer) * 10)) << " " << confidence << endl;
-			if (topBlob->getArea() < SMALL_BLOB) {
-				confidence -= CONFIDENCE_ADJUSTMENT;
-			} else if (topBlob->getArea() < MEDIUM_BLOB) {
-				confidence -= 1;
-			} else if (topBlob->getArea() > HUGE_BLOB) {
-				confidence += 2;
-			} else if (topBlob->getArea() > BIG_BLOB) {
-				confidence += 1;
-			}
-			if (BALLDEBUG) {
-				printBall(*topBlob, confidence, colPer, occlusion);
-			}
-
-			// SORT OUT BALL INFORMATION
-			setBallInfo(w, h, thisBall);
-			done = true;
-			float distanceDifference = fabs(e.dist - thisBall->getDistance());
-			const float DISTANCE_MISMATCH = 50.0f;
-			if (distanceDifference > DISTANCE_MISMATCH &&
-				(e.dist *2 <  thisBall->getDistance() ||
-				 thisBall->getDistance() * 2 < e.dist)
-				&& e.dist < PIXACC && e.dist > 0) {
-				if (BALLDEBUG) {
-					cout << "Screening due to distance mismatch " << e.dist <<
-						" " << thisBall->getDistance() << endl;
-				}
-				thisBall->init();
-				topBlob->init();
-				done = false;
-			}
-		}
-	}
-    // sometimes when we're close to the ball we catch reflections off
-	//the tape or posts
-    if (thisBall->getDistance() < 75.0f && abs(h - w) > 3) {
-		// we probably have misidentified the distance see if we can fix it.
-		if (BALLDISTDEBUG) {
-			cout << "Detected bad ball distance - trying to fix " << w <<
-				" " << h << endl;
-		}
-		if (h > w) {
-			// scan the sides to find the real sides
-			int count = -2;
-			if (topBlob->getRightTopX() - h > 0) {
-				for (int i = topBlob->getRightTopX() - h; i < IMAGE_WIDTH - 1; i++) {
-					for (int j = topBlob->getLeftTopY(); j < topBlob->getLeftBottomY(); j++) {
-						if (thresh->thresholded[j][i] == ORANGE) {
-							topBlob->setRightTopX(i);
-							j = IMAGE_HEIGHT;
-							i = IMAGE_WIDTH;
-						}
-					}
-					count++;
-				}
-			}
-			if (topBlob->getLeftTopX() + h < IMAGE_WIDTH) {
-				for (int i = topBlob->getLeftTopX() + h; i > -1; i--) {
-					for (int j = topBlob->getLeftTopY(); j < topBlob->getLeftBottomY(); j++) {
-						if (thresh->thresholded[j][i] == ORANGE) {
-							topBlob->setRightTopX(i);
-							j = IMAGE_HEIGHT;
-							i = -1;
-						}
-					}
-					count++;
-				}
-			}
-			if (count > 1) {
-				if (BALLDISTDEBUG) {
-					cout << "Resetting ball dimensions.  Count was " << count << endl;
-				}
-				setBallInfo(w, w, thisBall);
-			}
-		} else {
-			/*
-			int count = -2;
-			// scan the top/bottom to find the real ones
-			if (topBlob->rightTop.y - w > 0) {
-				for (int i = topBlob->rightTop.y - w; i < IMAGE_HEIGHT - 1; i++) {
-					for (int j = topBlob->leftTop.x; j < topBlob->rightBottom.x; j++) {
-						if (thresh->thresholded[i][j] == ORANGE) {
-							topBlob->rightTop.y = i;
-							j = IMAGE_WIDTH;
-							i = IMAGE_HEIGHT;
-						}
-					}
-					count++;
-				}
-			}
-			if (topBlob->leftTop.y + w < IMAGE_HEIGHT) {
-				for (int i = topBlob->leftTop.y + w; i > -1; i--) {
-					for (int j = topBlob->leftTop.x; j < topBlob->rightTop.x; j++) {
-						if (thresh->thresholded[i][j] == ORANGE) {
-							topBlob->rightTop.y = i;
-							j = IMAGE_WIDTH;
-							i = -1;
-						}
-					}
-					count++;
-				}
-				if (count > 1) {
-					if (BALLDISTDEBUG) {
-						cout << "Resetting ball dimensions.  Count was " << count << endl;
-					}
-					setBallInfo(h, h, thisBall);
-				}
-				} */
-		}
-		thisBall->setDistanceEst(e);
-    }
-    if (atBoundary(*topBlob)) {
-        //thisBall->setConfidence(MILDLYSURE);
-    }
-    if (BALLDISTDEBUG) {
-        estimate es;
-        es = vision->pose->pixEstimate(topBlob->getLeftTopX() + topBlob->width() /
-									   2, topBlob->getLeftTopY() + 2
-									   * topBlob->height() / PIX_EST_DIV, 8.0);
-        cout << "Distance is " << thisBall->getDistance() << " " <<
-			thisBall->getFocDist() << " " << es.dist << endl;
-        cout<< "Radius"<<thisBall->getRadius()<<endl;
-    }
-    return 0;
 }
 
 /* Sanity check routines for beacons and posts

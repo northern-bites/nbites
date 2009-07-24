@@ -59,6 +59,15 @@ void Cross::init()
  */
 
 void Cross::createObject() {
+	// TODO:  These were thrown together in an hour.  They should
+	// be more rigorously determined
+	const int maxWidth = 55;
+	const int maxHeight = 55;
+	const int minWidth = 5;
+	const int minHeight = 5;
+	const int maxRatio = 5;
+
+	// do basic run-length encoding
 	if (numberOfRuns > 1) {
 		for (int i = 0; i < numberOfRuns; i++) {
 			// search for contiguous blocks
@@ -70,15 +79,16 @@ void Cross::createObject() {
 	}
 	if (CROSSDEBUG)
 		cout << blobs->number() << " white blobs" << endl;
+	// loop through all the blobs and test the ones that are the right
+	// basic size
 	for (int i = 0; i < blobs->number(); i++) {
 		Blob candidate = blobs->get(i);
-		if (candidate.width() < 55 && candidate.height() < 55 &&
-			candidate.width() > 5 && candidate.height() > 5 &&
-			candidate.width() < 5 * candidate.height()  &&
-			candidate.height() < 5 * candidate.width()) {
+		if (candidate.width() < maxWidth && candidate.height() < maxHeight &&
+			candidate.width() > minWidth && candidate.height() > minHeight &&
+			candidate.width() < maxRatio * candidate.height()  &&
+			candidate.height() < maxRatio * candidate.width()) {
 			checkForX(candidate);
 		}
-		//else printBlob(candidate);
 	}
 }
 
@@ -89,6 +99,8 @@ void Cross::createObject() {
 
 
 void Cross::checkForX(Blob b) {
+
+	const float greenThreshold = 0.8f;
 	int x = b.getLeftTopX();
 	int y = b.getLeftTopY();
 	int w = b.width();
@@ -97,6 +109,8 @@ void Cross::checkForX(Blob b) {
 	// First we scan the outside of the blob.  It should basically be all
 	// green.  What we don't want are line fragments or robot fragments
 	// so finding white is very bad.
+
+	// first scan the sides
 	for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
 		if (x > 1) {
 			if (thresh->thresholded[i][x - 2] == GREEN)
@@ -113,6 +127,8 @@ void Cross::checkForX(Blob b) {
 			counter++;
 		} else return;
 	}
+
+	// now scan above and below
 	for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
 		if (y > 1) {
 			if (thresh->thresholded[y - 2][i] == GREEN)
@@ -129,8 +145,8 @@ void Cross::checkForX(Blob b) {
 			counter++;
 		} else return;
 	}
-	// Next we check and make sure that this isn't part of any lines
-	if (count > (float)counter * 0.8f) {
+	// if we pass the basic threshold then make sure it isn't a line
+	if (count > (float)counter * greenThreshold) {
 		// first make sure this isn't really a line
         point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
         plumbLineTop.x = x + w / 2; plumbLineTop.y = y;
@@ -147,10 +163,6 @@ void Cross::checkForX(Blob b) {
 				return;
             }
         }
-		if (CROSSDEBUG) {
-			cout << "Found a cross " << endl;
-			b.printBlob();
-		}
 		// Is the cross white enough?  At least half the pixels must be white.
 		if (!rightBlobColor(b, 0.5f)) {
 			if (CROSSDEBUG) {
@@ -158,9 +170,16 @@ void Cross::checkForX(Blob b) {
 			}
 			return;
 		}
+		// passed all of our current sanity checks
+		if (CROSSDEBUG) {
+			cout << "Found a cross " << endl;
+			b.printBlob();
+		}
 		// Make sure we don't have more than one candidate cross.  Note:  we
 		// actually can see two crosses at some places on the field, but for
 		// now we just will ID one of them.
+		// TODO:  allow seeing two crosses - but must test whether they are
+		// correctly aligned with each other, etc.
 		if (vision->cross->getWidth() > 0) {
 			if (w * h > vision->cross->getWidth() * vision->cross->getHeight()) {
 				vision->cross->updateCross(&b);
@@ -229,7 +248,7 @@ void Cross::allocateColorRuns()
 
 /* Checks out how much of the blob is of the right color.
  * If it is enough returns true, if not false.
- * @param tempobj     the blob we're checking (usually a post)
+ * @param tempobj     the cross we're checking
  * @param minpercent  how good it needs to be
  * @return            was it good enough?
  */

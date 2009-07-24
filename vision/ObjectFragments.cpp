@@ -157,9 +157,8 @@ void ObjectFragments::createObject(int horizon) {
 }
 
 
-int ObjectFragments::horizonAt(int x) {
-    return yProject(0, thresh->getVisionHorizon(), x);
-}
+/*  Methods that have to do with the processing of "runs"
+ */
 
 /* Set the primary color.  Depending on the color, we have different space needs
  * @param c        the color
@@ -173,14 +172,8 @@ void ObjectFragments::setColor(int c)
     runsize = 1;
     int run_num = RUN_VALUES;
     color = c;
-    // depending on the color we have more or fewer runs available
-    switch (color) {
-    case YELLOW:
-    case BLUE:
-        run_num = IMAGE_WIDTH * RUNS_PER_SCANLINE;
-        runsize = IMAGE_WIDTH * RUNS_PER_LINE;
-        break;
-    }
+	run_num = IMAGE_WIDTH * RUNS_PER_SCANLINE;
+	runsize = IMAGE_WIDTH * RUNS_PER_LINE;
     runs = (run*)malloc(sizeof(run) * run_num);
 }
 
@@ -194,14 +187,8 @@ void ObjectFragments::allocateColorRuns()
     const int RUNS_PER_LINE = 5;
 
     int run_num = RUN_VALUES;
-    // depending on the color we have more or fewer runs available
-    switch (color) {
-    case YELLOW:
-    case BLUE:
-        run_num = IMAGE_WIDTH * RUNS_PER_SCANLINE;
-        runsize = IMAGE_WIDTH * RUNS_PER_LINE;
-        break;
-    }
+	run_num = IMAGE_WIDTH * RUNS_PER_SCANLINE;
+	runsize = IMAGE_WIDTH * RUNS_PER_LINE;
     runs = (run*)malloc(sizeof(run) * run_num);
 }
 
@@ -240,9 +227,52 @@ void ObjectFragments::newRun(int x, int y, int h)
 }
 
 
+/* Find the index of the biggest run left.  The "run" is our basic currency in
+ * vision.  Our idea in looking for the goal is to find the biggest run we can
+ * and assume that it is part of a goal beacon.  We look from there for a big
+ * square of the right color.  This method is very simple, it just scans all of
+ * the runs between "left" and "right" and picks out the bigest one.  Once done
+ * it returns the corresponding index.
+ *
+ * @param left    the left boundary of legal runs to consider
+ * @param right   the right boundary of legal runs to consider
+ * @param hor     a horizon boundary that we do not currently use
+ * @return index  the index of the largest run that meets the criteria
+ */
+int ObjectFragments::getBigRun(int left, int right, int hor) {
+    int maxRun = -100;
+    int nextH = 0;
+    int nextX = 0;
+    int nextY = 0;
+    int index = BADVALUE;
+    // find the biggest Run
+    for (int i = 0; i < numberOfRuns; i++) {
+        nextH = runs[i].h;
+        nextX = runs[i].x;
+        nextY = runs[i].y;
+        if (nextH > maxRun && (nextX < left || nextX > right)) {
+            maxRun = nextH;
+            index = i;
+        }
+    }
+    return index;
+}
+
+
 /* The next group of methods has to do with scanning along axis parallel
  * dimensions in order to create objects without blobbing.
  */
+
+
+/*  Find the visual horizon at the indicated x value.
+ * TODO: This should eventually be replaced by a field routine
+ * that uses the edge of the field for a better estimate.
+ * @param x     column where we'd like to know the horizon
+ * @return      field horizon at that point
+ */
+int ObjectFragments::horizonAt(int x) {
+    return yProject(0, thresh->getVisionHorizon(), x);
+}
 
 /* Project a line given a start coord and a new y value - note that this is
  * dangerous depending on how you do the projection.
@@ -319,7 +349,7 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     int run = 1;
     int width = IMAGE_WIDTH;
     int height = IMAGE_HEIGHT;
-    // go until we hit enough bad pixels
+    // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
@@ -372,7 +402,7 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     int startX = x;
     int startY = y;
     int height = IMAGE_HEIGHT;
-    // go until we hit enough bad pixels
+    // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
               && y < height && bad < stopper; ) {
         if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
@@ -397,6 +427,8 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
 
 /*
  * TODO: Check this edge value
+ * TODO: This isn't actually used.  But it would be nice to break free
+ * of the standard color approach.
  * Given two points determine if they constitute an "edge".  For now our
  * definition of an edge is a difference in Y values of 30 (sort of a standard
  * approach in our league).  This is a place for potential improvements in the
@@ -422,8 +454,13 @@ bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
 
 /*
  * Given two points that should define an edge of a structure, try and improve
- * them to find the true edge. Exactly like the previous function except that it
- * allows for a slope to the camera angle.
+ * them to find the true edge. The idea is pretty simply.  The passed in points
+ * form a potential edge to our goal.  However, they are just a starting point.
+ * WHat we want to do is to move the edge until it hits the real edge of the
+ * object.  So we essentially loop, constantly moving the edge in the passed
+ * in direction until we get to the new edge.
+ * TODO:  Use edge detection?
+ * TODO:  Do lower res scanning?
  *
  * @param top         the topmost estimated point
  * @param bottom      the bottommost estimated point
@@ -432,7 +469,7 @@ bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
  * @param left        whether the open space is to the left or the right
  */
 
-void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
+void ObjectFragments::findVerticalEdge(point <int>& top,
                                                  point <int>& bottom,
                                                  int c, int c2, bool left)
 {
@@ -479,9 +516,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
         goodRun = 0;
         initRun = 0;
         int actualY = yProject(top.x, top.y, top.x + dir * j);
-        //cout << "Actual y is " << actualY << endl;
         if (actualY < 1) atTop = true;
-        //cout << "Actual y is " << actualY << endl;
 		// here's where we do the scanning.  Stop early if we have enough information
         for (i = actualY; count < minCount  &&
                  i <= actualY + spanY && (run < minRun || goodRun > spanY / 2)
@@ -493,9 +528,6 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
                 i > IMAGE_HEIGHT - 1) {
                 fake++;
             } else {
-                //if (checkEdge(theSpot, i, theSpot - dir, i)) {
-                //count++;
-                //}
                 int curcol = thresh->thresholded[i][theSpot];
                 if (curcol == c || curcol == c2) {
                     good++;
@@ -507,42 +539,31 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
                     if (initRun > -1) {
                         initRun++;
                         if (atTop && initRun > INITIAL_MIN) break;
-                        // cout << "Init run " << initRun << " " << top.y << " "
-                        //      << minRun << endl;
                     }
                     if (curcol != ORANGE && curcol != WHITE)
                         run++;
-                    //if (run == 5)
-                    //drawPoint(theSpot, i, BLACK);
                 }
             }
         }
         if (good + fake < minGood || good < 1) {
             badLines++;
         }
-        // cout << good << " " << minGood << " " << count << " " << initRun << " "
-        //      << i << endl;
-        //if (!left)
-        //drawPoint(theSpot, i, BLACK);
     }
 
-    // ok so we did the basic thing.  The problem is that sometimes we ended
-	// early because we hit a screen edge and weren't really done.  Try and 
-	// check for those situations.
+    // ok so we did the basic scanning.  The problem is that sometimes we ended
+	// early because we hit a screen edge and weren't really done in the sense that
+	// we had found the edge.  Try and
+	// check for those situations and see if we can continue to expand the edge.
+	// TODO:  Surely this could be improved
     int temp = top.x;
-    //drawPoint(top.x, top.y, BLACK);
     top.x = top.x + dir * (j - badLines) - dir;
     top.y = yProject(temp, top.y, top.x);
-    //drawPoint(top.x, top.y, RED);
     bottom.y = top.y + spanY;
     bottom.x = xProject(top.x, top.y, top.y + spanY);
-    //cout << "Checking " << top.x << " " << top.y << endl;
     if (top.x < 2 || top.x > IMAGE_WIDTH - IMAGE_DIFFERENCE) {
-        //cout << "In upward scan" << endl;
         for (j = 1; count < minCount && bottom.x + dir * j >= 0
                  && bottom.x + dir * j < IMAGE_WIDTH
                  && good > minGood && run < minRun; j+=increment) {
-            //count = 0;
             good = 0;
             run = 0;
             int actualY = yProject(bottom.x, bottom.y, bottom.x + dir * j);
@@ -565,17 +586,13 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
                         run = 0;
                     } else {
                         run++;
-                        //if (run == 5)
-                        //drawPoint(theSpot, i, BLACK);
                     }
                 }
             }
         }
         temp = bottom.x;
-        //drawPoint(top.x, top.y, BLACK);
         bottom.x = bottom.x + dir * (j - increment) - dir;
         bottom.y = yProject(temp, bottom.y, bottom.x);
-        //drawPoint(top.x, top.y, RED);
         top.y = bottom.y - spanY;
         top.x = xProject(bottom.x, bottom.y, bottom.y - spanY);
     }
@@ -583,7 +600,13 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
 
 /*
  * Given two points that should define an edge of a structure, try and improve
- * them to find the true edge.
+ * them to find the true edge.  The idea is pretty simply.  The passed in points
+ * form a potential edge to our goal.  However, they are just a starting point.
+ * WHat we want to do is to move the edge until it hits the real edge of the
+ * object.  So we essentially loop, constantly moving the edge in the passed
+ * in direction until we get to the new edge.
+ * TODO:  Use edge detection?
+ * TODO:  Do lower res scanning?
  * @param left        the leftmost estimated point
  * @param right       the rightmost estimated point
  * @param c           the primary color of the structure
@@ -591,7 +614,7 @@ void ObjectFragments::findTrueLineVerticalSloped(point <int>& top,
  * @param up          whether the open space is up or down
  */
 
-void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
+void ObjectFragments::findHorizontalEdge(point <int>& left,
                                                    point <int>& right, int c,
                                                    int c2, bool up)
 {
@@ -622,11 +645,11 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
     int greens = 0;
     int fakegood = 0;
 
+	// Main loop - keep moving the edge in the right direction
     // loop until we can't expand anymore
     for (j = 1; count < minCount && left.y + dir * j >= 0
              && left.y + dir * j < IMAGE_HEIGHT && badLines < 2
              && greens < max(minRun, maxgreen); j++) {
-        //count = 0;
         good = 0;
         run = 0;
         greens = 0;
@@ -636,7 +659,6 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
         for (int i = actualX; count < minCount && i <= actualX + spanX
                  && greens < maxgreen; i++) {
             theSpot = yProject(actualX, left.y + dir * j, i);
-            //drawPoint(i, theSpot, RED);
             if (theSpot < 0 || theSpot > IMAGE_HEIGHT - 1 || theSpot - dir < 0
                 || theSpot - dir > IMAGE_HEIGHT - 1 || i < 0
                 || i > IMAGE_WIDTH - 1) {
@@ -655,8 +677,6 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
                         run++;
                     if (curcol == GREEN) {
                         greens++;
-                        //if (greens > 1)
-                        //cout << "Greens " << greens << " " << theSpot << endl;
                     }
                 }
             }
@@ -665,9 +685,8 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
         if (good < minGood)
             badLines++;
     }
-    // cout << good << " " << minGood << " " << run << " " << minRun << endl;
     // if we had to stop because we hit the left edge, then see if we can go
-    // farther by using the bottom
+    // farther by using the bottom.
     int temp = left.y;
     left.y =  left.y + dir * (j - badLines) - dir;
     left.x = xProject(left.x, temp, left.y);
@@ -675,15 +694,12 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
     right.y = left.y + spanY;
 
     if( right.x > IMAGE_WIDTH) {
-        //cout << "right.x > IMAGE_WIDTH, value is: " << right.x << endl;
         right.x = IMAGE_WIDTH;
     }
 
     if( left.x < 0) {
-        //cout << "left.x < 0, value is: " << left.x << endl;
         left.x = 0;
     }
-
 
     if (!up && thresh->getVisionHorizon() > left.y) {
         // for the heck of it let's scan down
@@ -705,7 +721,7 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
             right.x = left.x + spanX;
             right.y = left.y + spanY;
             //drawPoint(right.x, right.y, ORANGE);
-            findTrueLineHorizontalSloped(left, right, c, c2, up);
+            findHorizontalEdge(left, right, c, c2, up);
         }
     }
 }
@@ -714,8 +730,16 @@ void ObjectFragments::findTrueLineHorizontalSloped(point <int>& left,
 /*  In theory our pose information tells us the slant of an object.  In practice
 	it doesn't always get it for a vareity of reasons.  This is an attempt to
 	correct for the errors in the process.  At this point
-    it is basically a rough draft of a good methodology, but it does seem to work
-	pretty well.
+    it is basically a rough draft of a good methodology, but it does seem to
+	work pretty well.
+
+	Here's what we do:  We scan out from the corners of our blob.  For each corner
+	we check how much extra stuff of the same color as the goal is around.
+	If opposite corners both have extra stuff then it is taken as evidence
+	that the post is slanted differently than our pose estimate.  We then use
+	this evidence to generate a new slope estimate that we feed back to our
+	goal scanning routine.  It then uses that slope instead of the pose estimate
+	to find the post.
     @param post    the blob we're examining
     @param c       primary color
     @param c2      secondary color
@@ -851,7 +875,8 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
  * We start with a point.  We scan up from the point and down from the point
  * looking for a strip of the right color.  That serves as our starting point.
  * Then we try expanding the sides outward.  The we try expanding the top and
- * bottom in a similar fashion.
+ * bottom in a similar fashion.  Once we have our goal we call the correction
+ * routine to see if we could get a better rectangle by using a different slope.
  *
  * @param x         x value of our starter point
  * @param y         y value of our starter point
@@ -888,11 +913,11 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		point <int> leftBottom = point<int>(bottomx, bottom);
 		point <int> rightBottom = point<int>(bottomx, bottom);
 		// first expand the sides
-		findTrueLineVerticalSloped(leftTop, leftBottom, c, c2, true);
-		findTrueLineVerticalSloped(rightTop, rightBottom, c, c2, false);
+		findVerticalEdge(leftTop, leftBottom, c, c2, true);
+		findVerticalEdge(rightTop, rightBottom, c, c2, false);
 		// now expand the top and bottom
-		findTrueLineHorizontalSloped(leftTop, rightTop, c, c2, true);
-		findTrueLineHorizontalSloped(leftBottom, rightBottom, c, c2, false);
+		findHorizontalEdge(leftTop, rightTop, c, c2, true);
+		findHorizontalEdge(leftBottom, rightBottom, c, c2, false);
 		// store the information into our blob
 		obj.setLeftTop(leftTop);
 		obj.setRightTop(rightTop);
@@ -908,43 +933,10 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		}
 		count++;
 	} while (count < 2 && looping);
-    //drawBlob(obj, ORANGE);
 }
 
 /* A collection of miscelaneous methods used in processing goals.
  */
-
-
-/* Find the index of the biggest run left.  The "run" is our basic currency in
- * vision.  Our idea in looking for the goal is to find the biggest run we can
- * and assume that it is part of a goal beacon.  We look from there for a big
- * square of the right color.  This method is very simple, it just scans all of
- * the runs between "left" and "right" and picks out the bigest one.  Once done
- * it returns the corresponding index.
- *
- * @param left    the left boundary of legal runs to consider
- * @param right   the right boundary of legal runs to consider
- * @param hor     a horizon boundary that we do not currently use
- * @return index  the index of the largest run that meets the criteria
- */
-int ObjectFragments::getBigRun(int left, int right, int hor) {
-    int maxRun = -100;
-    int nextH = 0;
-    int nextX = 0;
-    int nextY = 0;
-    int index = BADVALUE;
-    // find the biggest Run
-    for (int i = 0; i < numberOfRuns; i++) {
-        nextH = runs[i].h;
-        nextX = runs[i].x;
-        nextY = runs[i].y;
-        if (nextH > maxRun && (nextX < left || nextX > right)) {
-            maxRun = nextH;
-            index = i;
-        }
-    }
-    return index;
-}
 
 
 /*  As we saw with beacons, we tend to work with blobs for convenience.  So at
@@ -961,14 +953,13 @@ int ObjectFragments::getBigRun(int left, int right, int hor) {
 bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
                                    certainty _certainty,
                                    distanceCertainty _distCertainty) {
-    //cout << "Got an object" << endl;
     // before we do this let's make sure that the object is really our color
-  const float BLUEPOST = 0.75f;
-  float perc = NORMALPOST;
-  if (_certainty != _SURE && two.height() < 40 && color == BLUE) {
-    //cout << "uppint the anty on blue" << endl;
-    perc = BLUEPOST;
-  }
+	const float BLUEPOST = 0.75f;
+	float perc = NORMALPOST;
+	if (_certainty != _SURE && two.height() < 40 && color == BLUE) {
+		//cout << "uppint the anty on blue" << endl;
+		perc = BLUEPOST;
+	}
     if (rightBlobColor(two, perc)) {
         one->updateObject(&two, _certainty, _distCertainty);
         return true;
@@ -1023,6 +1014,118 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
     return HEIGHT_UNSURE;
 }
 
+/*  Sometimes we process posts differently depending on how big they are.
+ * This just characterizes a post's size such that we can make that
+ * determination.
+ *
+ * TODO: These sizes are almost meaningless for the NAOs.  They have been
+ * updated some, but do not reflect the true size of the Nao goals.
+ * @param b   the post in question
+ * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
+ */
+// EXAMINED: change these constants
+int ObjectFragments::characterizeSize(Blob b) {
+    int w = b.getRightTopX() - b.getLeftTopX() + 1;
+    int h = b.getLeftBottomY() - b.getLeftTopY() + 1;
+    const int largePostHeight = 30;
+    const int smallPostHeight = 15;
+    const int smallPostWidth = 10;
+    const int midPostHeight = 30;
+    const int midPostWidth = 15;
+    if (h > largePostHeight) return LARGE;
+    if (h < smallPostHeight || w < smallPostWidth) return SMALL;
+    if (h < midPostHeight || w < midPostWidth) return MEDIUM;
+    return LARGE;
+}
+
+/* Sets a standard of proof for a post.  In this case that the blob comprising
+ * the post is at least 60% correct color.
+ * Note:  this is actually not the greatest idea when the angle of the head is
+ * significantly off horizontal.
+ * TODO:  This should use slopes to scan the actual blob.
+ *
+ * @param b   the post in question
+ * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
+ */
+
+bool ObjectFragments::qualityPost(Blob b, int c)
+{
+    const float PERCENT_NEEDED = 0.6f;  // percent of pixels that must be right
+
+    int good = 0;
+    //bool soFar;
+    for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++)
+        for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++)
+            if (thresh->thresholded[j][i] == c)
+                good++;
+    if (good < b.getArea() * PERCENT_NEEDED) return false;
+    return true;
+}
+
+/* Provides a kind of sanity check on the size of the post.  Essentially we are
+ * looking for cases where we don't have a post, but are looking at a backstop.
+ * Also just let's us know how good the size estimate is.
+ * This needs lots of beefing up.
+ * TODO: This needs to be updated for the Naos.  It was written for the Aibos
+ * and has not been updated.
+ *
+ * @param b   the post in question
+ * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
+ */
+
+bool ObjectFragments::checkSize(Blob b, int c)
+{
+    const int ERROR_TOLERANCE = 6;     // how many bad pixels to scan over
+	const int FAR_ENOUGH = 10;         // how far to scan to be sure
+	const int PROBLEM_THRESHOLD = 5;   // haw many pixels presents a problem
+
+    int midY = b.getLeftTopY() + (b.getLeftBottomY() - b.getLeftTopY()) / 2;
+	stop scan;
+    horizontalScan(b.getLeftTopX(), midY, -1,  ERROR_TOLERANCE, c, c, 0,
+				   b.getLeftTopX() + 1, scan);
+    //drawPoint(scan.x, scan.y, RED);
+    int leftMid = scan.good;
+    horizontalScan(b.getRightTopX(), midY, 1, ERROR_TOLERANCE, c, c,
+				   b.getRightTopX() - 1, b.getRightTopX() + FAR_ENOUGH, scan);
+    //drawPoint(scan.x, scan.y, RED);
+    if (leftMid > PROBLEM_THRESHOLD && scan.good > PROBLEM_THRESHOLD)
+		return false;
+    return true;
+}
+
+/* Try and find the biggest post left on the screen.  We start by looking for
+ * our longest "run" of the current color.
+ * We then call squareGoal to expand that into a post.  Later
+ * we will check if it actually meets the criteria for a good post.
+ * @param c       current color
+ * @param c2      secondary color
+ * @param horizon green horizon
+ * @param left    leftmost limit to look
+ * @param right   rightmost limit to look
+ * @param         indication of whether we found a decent candidate
+ */
+
+int ObjectFragments::grabPost(int c, int c2, int horizon, int left,
+							  int right, Blob & obj) {
+    int maxRun = 0, maxY = 0, maxX = 0, index = 0;
+    // find the biggest Run
+    index = getBigRun(left, right, horizon);
+    if (index == BADVALUE) return NOPOST;
+    maxRun = runs[index].h;  maxY = runs[index].y;  maxX = runs[index].x;
+
+    // Try and figure out the true axis-parallel post dimensions - we're going
+    // to try and start right in the middle
+    int startX = maxX;
+    int startY = maxY + maxRun / 2;
+    // starts a scan in the middle of the tallest run.
+    squareGoal(startX, startY, c, c2, obj);
+    // make sure we're looking at something big enough to be a post
+    if (!postBigEnough(obj)) {
+        return NOPOST;
+    }
+    return LEFT; // Just return something other than NOPOST
+}
+
 /*
  * Post recognition for NAOs
  */
@@ -1037,7 +1140,7 @@ distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
  *  @param b   the square post
  *  @return   either RIGHT or LEFT if a crossbar found, or NOPOST if not
  */
-int ObjectFragments::crossCheck(Blob b)
+int ObjectFragments::classifyByCrossbar(Blob b)
 {
     const int MINIMUM_WIDTH = 10;
 	const int HEIGHT_DIVISOR = 5;
@@ -1106,7 +1209,7 @@ int ObjectFragments::crossCheck(Blob b)
    same side as the post.
  */
 
-int ObjectFragments::checkIntersection(Blob post) {
+int ObjectFragments::classifyByLineIntersection(Blob post) {
 
 	const int MAXIMUM_Y_DIFF = 30;
 
@@ -1157,11 +1260,15 @@ int ObjectFragments::checkIntersection(Blob post) {
 /*  We have a post and wonder which one it is.  This method looks for the nearby
 	intersection of the goal line and the goal box.  If it can be found it is the
 	best way to ID the goal.
+	TODO:  In the side goal case sometimes you can see a T behind the near
+	post.  In such a case the post may be misidentified.  That should be fixed.
+	TODO:  This isn't actually used right now.  With better corner recognition
+	it should be.
     @param post    the post we have id'd
     @return        the id of the post (or lack of id)
  */
 
-int ObjectFragments::checkCorners(Blob post)
+int ObjectFragments::classifyByCheckingCorners(Blob post)
 {
     const int MAXIMUM_Y_DIFFERENCE = 30;  // max offset between corner and post
 	const int X_TOLERANCE = 5;            // how close do X values need to be
@@ -1193,113 +1300,6 @@ int ObjectFragments::checkCorners(Blob post)
     return NOPOST;
 }
 
-/*  Sometimes we process posts differently depending on how big they are.
- * This just characterizes a post's size such that we can make that
- * determination.
- *
- * @param b   the post in question
- * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
- */
-// EXAMINED: change these constants
-int ObjectFragments::characterizeSize(Blob b) {
-    int w = b.getRightTopX() - b.getLeftTopX() + 1;
-    int h = b.getLeftBottomY() - b.getLeftTopY() + 1;
-    const int largePostHeight = 30;
-    const int smallPostHeight = 15;
-    const int smallPostWidth = 10;
-    const int midPostHeight = 30;
-    const int midPostWidth = 15;
-    if (h > largePostHeight) return LARGE;
-    if (h < smallPostHeight || w < smallPostWidth) return SMALL;
-    if (h < midPostHeight || w < midPostWidth) return MEDIUM;
-    return LARGE;
-}
-
-/* Sets a standard of proof for a post.  In this case that the blob comprising
- * the post is at least 60% correct color.
- * Note:  this is actually not the greatest idea when the angle of the head is
- * significantly off horizontal.
- *
- * @param b   the post in question
- * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
- */
-
-bool ObjectFragments::qualityPost(Blob b, int c)
-{
-    const float PERCENT_NEEDED = 0.6f;  // percent of pixels that must be right
-
-    int good = 0;
-    //bool soFar;
-    for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++)
-        for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++)
-            if (thresh->thresholded[j][i] == c)
-                good++;
-    if (good < b.getArea() * PERCENT_NEEDED) return false;
-    return true;
-}
-
-/* Provides a kind of sanity check on the size of the post.  Essentially we are
- * looking for cases where we don't have a post, but are looking at a backstop.
- * Also just let's us know how good the size estimate is.
- * This needs lots of beefing up.
- *
- * @param b   the post in question
- * @return    a constant indicating size - SMALL, MEDIUM, or LARGE
- */
-
-bool ObjectFragments::checkSize(Blob b, int c)
-{
-    const int ERROR_TOLERANCE = 6;     // how many bad pixels to scan over
-	const int FAR_ENOUGH = 10;         // how far to scan to be sure
-	const int PROBLEM_THRESHOLD = 5;   // haw many pixels presents a problem
-
-    int midY = b.getLeftTopY() + (b.getLeftBottomY() - b.getLeftTopY()) / 2;
-	stop scan;
-    horizontalScan(b.getLeftTopX(), midY, -1,  ERROR_TOLERANCE, c, c, 0,
-				   b.getLeftTopX() + 1, scan);
-    //drawPoint(scan.x, scan.y, RED);
-    int leftMid = scan.good;
-    horizontalScan(b.getRightTopX(), midY, 1, ERROR_TOLERANCE, c, c,
-				   b.getRightTopX() - 1, b.getRightTopX() + FAR_ENOUGH, scan);
-    //drawPoint(scan.x, scan.y, RED);
-    if (leftMid > PROBLEM_THRESHOLD && scan.good > PROBLEM_THRESHOLD)
-		return false;
-    return true;
-}
-
-/* Try and find the biggest post left on the screen.  We start by looking for
- * our longest "run" of the current color.
- * We then call squareGoal to expand that into a post.  Later
- * we will check if it actually meets the criteria for a good post.
- * @param c       current color
- * @param c2      secondary color
- * @param horizon green horizon
- * @param left    leftmost limit to look
- * @param right   rightmost limit to look
- * @param         indication of whether we found a decent candidate
- */
-
-int ObjectFragments::grabPost(int c, int c2, int horizon, int left,
-							  int right, Blob & obj) {
-    int maxRun = 0, maxY = 0, maxX = 0, index = 0;
-    // find the biggest Run
-    index = getBigRun(left, right, horizon);
-    if (index == BADVALUE) return NOPOST;
-    maxRun = runs[index].h;  maxY = runs[index].y;  maxX = runs[index].x;
-
-    // Try and figure out the true axis-parallel post dimensions - we're going
-    // to try and start right in the middle
-    int startX = maxX;
-    int startY = maxY + maxRun / 2;
-    // starts a scan in the middle of the tallest run.
-    squareGoal(startX, startY, c, c2, obj);
-    // make sure we're looking at something big enough to be a post
-    if (!postBigEnough(obj)) {
-        return NOPOST;
-    }
-    return LEFT; // Just return something other than NOPOST
-}
-
 
 /* Another post classification method.  In this one we look left and right of
  * the post trying to find a really long run of the same color.  If we find one
@@ -1312,20 +1312,18 @@ int ObjectFragments::grabPost(int c, int c2, int horizon, int left,
  * @return           potential classification
  */
 
-int ObjectFragments::checkOther(int left, int right, int height, int horizon)
+int ObjectFragments::classifyByOtherRuns(int left, int right, int height, int horizon)
 {
     const int HORIZON_TOLERANCE = 10;    // our other post should be near horizon
 	const int MIN_OTHER_THRESHOLD = 20;  // how big does it have to be?
 
     int largel = 0;
     int larger = 0;
-    //int mind = max(MIN_POST_SEPARATION, height / 2);
 	int mind = MIN_POST_SEPARATION + (right - left) / 2;
     for (int i = 0; i < numberOfRuns; i++) {
         int nextX = runs[i].x;
         int nextY = runs[i].y;
         int nextH = runs[i].h;
-        //int nextB = nextY + nextH;
         // meanwhile collect some information on which post we're looking at
         if (nextH > 0) {
             if (nextX < left - mind && nextH > MIN_GOAL_HEIGHT &&
@@ -1333,8 +1331,6 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon)
                 nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {
                 if (nextH > largel)
                     largel = nextH;
-                //drawPoint(nextX, nextY, ORANGE);
-                //cout << largel << endl;
             } else if (nextX > right + mind && nextH > MIN_GOAL_HEIGHT &&
                        nextY < horizonAt(nextX) &&
                        nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {
@@ -1359,7 +1355,7 @@ int ObjectFragments::checkOther(int left, int right, int height, int horizon)
 }
 
 
-/* Main routine for classifying posts (Aibos).  We have a variety of methods to
+/* Main routine for classifying posts.  We have a variety of methods to
  * classify posts in our tool box.  The idea is to start with the best ones and
  * keep trying until one produces an answer.
  *
@@ -1392,14 +1388,15 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
 
 	// Our first test is whether we see a big blob of the same color
 	// somewhere else
-    int post = checkOther(trueLeft, trueRight, fakeBottom - trueTop, horizon);
+    int post = classifyByOtherRuns(trueLeft, trueRight,
+								   fakeBottom - trueTop, horizon);
     if (post != NOPOST) {
         if (POSTLOGIC)
             cout << "Found from checkOther" << endl;
         return post;
     }
 
-    post = crossCheck(pole);        // look for the crossbar
+    post = classifyByCrossbar(pole);        // look for the crossbar
     if (post != NOPOST) {
         if (POSTLOGIC) {
             cout << "Found crossbar " << post << endl;
@@ -1407,7 +1404,7 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
         return post;
     }
 
-    post = checkIntersection(pole);
+    post = classifyByLineIntersection(pole);
     if (post != NOPOST) {
         if (POSTLOGIC)
             cout << "Found from Intersection" << endl;
@@ -1566,7 +1563,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
         }
         return;
     } else {
-		// we managed to grab a second post - lets do more sanity check
+		// we managed to grab a second post - lets do more sanity checks
         int trueLeft2 = pole.getLeft();
         int trueRight2 = pole.getRight();
         int trueTop2 = pole.getTop();
@@ -1673,17 +1670,6 @@ void ObjectFragments::postSwap(VisualFieldObject * p1, VisualFieldObject * p2){
     p2->init();
 }
 
-void ObjectFragments::transferBlob(Blob from, Blob & to) {
-    to.setLeftTopX(from.getLeftTopX());
-    to.setLeftTopY(from.getLeftTopY());
-    to.setRightTopX(from.getRightTopX());
-    to.setRightTopY(from.getRightTopY());
-    to.setRightBottomX(from.getRightBottomX());
-    to.setRightBottomY(from.getRightBottomY());
-    to.setLeftBottomX(from.getLeftBottomX());
-    to.setLeftBottomY(from.getLeftBottomY());
-}
-
 /* Sanity check routines for beacons and posts
  */
 
@@ -1698,13 +1684,17 @@ bool ObjectFragments::greenCheck(Blob b)
 	const int EXTRA_LINES = 10;
 	const int MAX_BAD_PIXELS = 4;
 
-    if (b.getRightBottomY() >= IMAGE_HEIGHT - 1 || b.getLeftBottomY() >= IMAGE_HEIGHT-1)
+	// if the bottom of the post is at the bottom of the screen default to true
+    if (b.getRightBottomY() >= IMAGE_HEIGHT - 1 || b.getLeftBottomY() >=
+		IMAGE_HEIGHT-1)
 		return true;
+	// for huge posts default to true
     if (b.width() > IMAGE_WIDTH / 2) return true;
     int w = b.width();
     int y = 0;
     int x = b.getLeftBottomX();
 	stop scan;
+	// do the actual scanning under the blob
     for (int i = 0; i < w; i+= 2) {
         y = yProject(x, b.getLeftBottomY(), x + i);
         vertScan(x + i, y, 1, ERROR_TOLERANCE, GREEN, GREEN, scan);
@@ -1960,6 +1950,8 @@ bool ObjectFragments::blobOk(Blob b) {
 /*  When we have two candidate posts we don't want one to be huge and the other
  * tiny.  So we need to make
  * sure that the size ratios are within reason.
+ * TODO:  THis needs to be rethought and redone for the Naos.  It is very much
+ * a product of the Aibos.
  * @param spanX    the width of one post
  * @param spanY    its height
  * @param spanX2   the width of the other post

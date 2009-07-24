@@ -66,9 +66,9 @@ public:
                              bool left);
     int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2,
                                bool up);
-    void findTrueLineVerticalSloped(point <int>& top, point <int>& bottom, int c,
+    void findVerticalEdge(point <int>& top, point <int>& bottom, int c,
                                     int c2, bool left);
-    void findTrueLineHorizontalSloped(point <int>& left, point <int>& right,
+    void findHorizontalEdge(point <int>& left, point <int>& right,
                                       int c, int c2, bool up);
     bool checkEdge(int x, int y, int x1, int y1);
     int horizonAt(int x);
@@ -83,8 +83,6 @@ public:
     // miscelaneous goal processing  methods
     bool qualityPost(Blob b, int c);
     bool checkSize(Blob b, int c);
-    int checkIntersection(Blob b);
-    int checkCorners(Blob b);
     int getBigRun(int left, int right, int hor);
     bool updateObject(VisualFieldObject* a, Blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
@@ -92,9 +90,11 @@ public:
 								Blob pole);
 
     // post recognition routines
-    int crossCheck(Blob b);
-    int scanOut(int stopp, int spanX, int c);
-    int checkOther(int left, int right, int height, int horizon);
+    int classifyByCrossbar(Blob b);
+    int classifyByOtherRuns(int left, int right, int height, int horizon);
+    int classifyByLineIntersection(Blob b);
+    int classifyByCheckingCorners(Blob b);
+
     int characterizeSize(Blob b);
 
     int classifyFirstPost(int horizon, int c, int c2,
@@ -109,7 +109,6 @@ public:
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
                          distanceCertainty dc);
-    void transferBlob(Blob from, Blob & to);
 
     // sanity checks
     bool rightBlobColor(Blob obj, float per);
