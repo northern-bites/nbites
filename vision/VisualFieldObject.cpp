@@ -176,24 +176,24 @@ void VisualFieldObject::setIDCertainty(certainty _cert)
     }
 }
 
-void VisualFieldObject::updateObject(blob * b, certainty _certainty,
+void VisualFieldObject::updateObject(Blob * b, certainty _certainty,
                                      distanceCertainty _distCertainty)
 {
     // before we do this let's make sure that the object is really our color
-    setLeftTopX(b->leftTop.x);
-    setLeftTopY(b->leftTop.y);
-    setLeftBottomX(b->leftBottom.x);
-    setLeftBottomY(b->leftBottom.y);
-    setRightTopX(b->rightTop.x);
-    setRightTopY(b->rightTop.y);
-    setRightBottomX(b->rightBottom.x);
-    setRightBottomY(b->rightBottom.y);
-    setX(b->leftTop.x);
-    setY(b->leftTop.y);
-    setWidth(dist(b->rightTop.x, b->rightTop.y, b->leftTop.x,
-                  b->leftTop.y));
-    setHeight(dist(b->leftTop.x, b->leftTop.y, b->leftBottom.x,
-                   b->leftBottom.y));
+    setLeftTopX(b->getLeftTopX());
+    setLeftTopY(b->getLeftTopY());
+    setLeftBottomX(b->getLeftBottomX());
+    setLeftBottomY(b->getLeftBottomY());
+    setRightTopX(b->getRightTopX());
+    setRightTopY(b->getRightTopY());
+    setRightBottomX(b->getRightBottomX());
+    setRightBottomY(b->getRightBottomY());
+    setX(b->getLeftTopX());
+    setY(b->getLeftTopY());
+    setWidth(dist(b->getRightTopX(), b->getRightTopY(), b->getLeftTopX(),
+                  b->getLeftTopY()));
+    setHeight(dist(b->getLeftTopX(), b->getLeftTopY(), b->getLeftBottomX(),
+                   b->getLeftBottomY()));
     setCenterX(getLeftTopX() + ROUND2(getWidth() / 2));
     setCenterY(getRightTopY() + ROUND2(getHeight() / 2));
     setIDCertainty(_certainty);

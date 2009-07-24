@@ -10,7 +10,11 @@ class Threshold;  // forward reference
 #include "Vision.h"
 
 #include "ObjectFragments.h"
+#include "Ball.h"
 #include "NaoPose.h"
+#include "Field.h"
+#include "Cross.h"
+#include "Robots.h"
 #ifndef NO_ZLIB
 #include "Zlib.h"
 #endif
@@ -40,8 +44,6 @@ class Threshold;  // forward reference
 // THRESHOLDING CONSTANTS
 // Constants pertaining to object detection and horizon detection
 static const int MIN_RUN_SIZE = 5;
-// we're more demanding of Green because there is so much
-static const int MIN_GREEN_SIZE = 10;
 
 /* The following two constants are used in the traversal of the image
    inside thresholdAndRuns. We start at the bottom left of the image which
@@ -97,6 +99,7 @@ public:
     float getEuclidianDist(point <int> coord1, point <int> coord2);
     void findGreenHorizon();
     point <int> findIntersection(int col, int dir, int c);
+	int greenEdgePoint(int x);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uchar* newyuv);
@@ -153,11 +156,10 @@ public:
 
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
-    boost::shared_ptr<ObjectFragments> orange;
-    boost::shared_ptr<ObjectFragments> green;
-    boost::shared_ptr<ObjectFragments> navyblue;
-    boost::shared_ptr<ObjectFragments> red;
 
+	Robots *red, *navyblue;
+    Ball* orange;
+	Cross* cross;
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
 
@@ -173,6 +175,7 @@ private:
     // class pointers
     Vision* vision;
     boost::shared_ptr<NaoPose> pose;
+	Field* field;
 
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;
@@ -194,6 +197,7 @@ private:
     int redTops[IMAGE_WIDTH];
     int navyBottoms[IMAGE_WIDTH];
     int redBottoms[IMAGE_WIDTH];
+	int greenEdge[IMAGE_WIDTH];
 
     // thresholding variables
     int horizon;

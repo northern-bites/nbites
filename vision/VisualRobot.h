@@ -13,6 +13,7 @@ class VisualRobot;
 #include "Structs.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
+#include "Blob.h"
 
 // Values for the Standard Deviation calculations
 
@@ -53,7 +54,7 @@ public:
     void setRightBottomY(int _y){ rightBottom.y = _y; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
-    void updateRobot(blob *b);
+    void updateRobot(Blob b);
 
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
