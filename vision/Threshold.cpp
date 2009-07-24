@@ -91,15 +91,15 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #  error Undefined robot type
 #endif // OFFLINE
     // Set up object recognition object pointers
+	field = new Field(vision, this);
     blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                           BLUE));
+                                                           field, BLUE));
     yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                             YELLOW));
+                                                             field, YELLOW));
     navyblue = new Robots(vision, this, NAVY);
 	red = new Robots(vision, this, RED);
-    orange = new Ball(vision, this, ORANGE);
+    orange = new Ball(vision, this, field, ORANGE);
     cross = new Cross(vision, this);
-	field = new Field(vision, this);
 }
 
 /* Main vision loop, called by Vision.cc

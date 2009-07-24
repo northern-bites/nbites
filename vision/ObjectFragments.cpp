@@ -104,8 +104,8 @@ static const bool CORRECT = false;
 //previous constants inserted from .h class
 
 
-ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
-    : vision(vis), thresh(thr), color(_color), runsize(1)
+ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie, int _color)
+    : vision(vis), thresh(thr), field(fie), color(_color), runsize(1)
 {
     init(0.0);
     allocateColorRuns();
@@ -265,13 +265,12 @@ int ObjectFragments::getBigRun(int left, int right, int hor) {
 
 
 /*  Find the visual horizon at the indicated x value.
- * TODO: This should eventually be replaced by a field routine
  * that uses the edge of the field for a better estimate.
  * @param x     column where we'd like to know the horizon
  * @return      field horizon at that point
  */
 int ObjectFragments::horizonAt(int x) {
-    return yProject(0, thresh->getVisionHorizon(), x);
+    return field->horizonAt(x);
 }
 
 /* Project a line given a start coord and a new y value - note that this is

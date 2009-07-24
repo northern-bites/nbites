@@ -35,6 +35,7 @@ class ObjectFragments; // forward reference
 #include "ConcreteFieldObject.h"
 #include "VisualBall.h"
 #include "Vision.h"
+#include "Field.h"
 
 static const int MAX_BLOBS = 400;
 static const int MAX_POINTS = 100;
@@ -42,7 +43,7 @@ static const int MAX_POINTS = 100;
 
 class ObjectFragments {
 public:
-    ObjectFragments(Vision* vis, Threshold* thr, int _color);
+    ObjectFragments(Vision* vis, Threshold* thr, Field* fie, int _color);
     virtual ~ObjectFragments() {}
 
     // SETTERS
@@ -145,6 +146,7 @@ private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
+	Field* field;
 
     int color;
     int runsize;

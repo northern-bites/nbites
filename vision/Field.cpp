@@ -71,7 +71,7 @@ Field::Field(Vision* vis, Threshold * thr)
 {
 #ifdef OFFLINE
 	debugHorizon = false;
-	debugFieldEdge = false;
+	debugFieldEdge = true;
 	openField = false;
 	debugShot = false;
 #else
@@ -99,6 +99,11 @@ void Field::findFieldEdges() {
 	int trends[10];
 	float percentGreen;
 
+
+	// TODO:  we can occasionally have problem with a line that is right at the top
+	// of the screen - particularly on the right side of the image.  See, for
+	// example, graz/trillian/ball_5/ frames 19 and especially 38, plus
+	// 40, 41, 43
 	for (int i = 5; i < IMAGE_WIDTH; i++) {
 		// check for a discontinuity - note may need to upgrade this for horizontalish
 		// edges
@@ -242,14 +247,61 @@ void Field::findFieldEdges() {
 		}
 	}
 
-	// Display the detected edges
+	bool foundEdge[IMAGE_WIDTH];
+	// now compute the actual horizon at every point
+
+	// first initialize based on pose horizon or green found
+	for (int i = 0; i < IMAGE_WIDTH; i++) {
+		// initialize with the top of the image
+		foundEdge[i] = false;
+		if (thresh->greenEdgePoint(i) < yProject(0, horizon, i)) {
+			topEdge[i] = thresh->greenEdgePoint(i);
+		} else {
+			topEdge[i] = yProject(0, horizon, i);
+		}
+	}
+
+	// compute the actual horizon at every point using field edges where possible
+	for (int i = 0; i < pairs; i++) {
+		if (linePoints[i*2].x != -1) {
+			// either use the line itself or the projected line as a minimum
+			// get the slope of the line
+			slope1 = (float)(linePoints[(i)*2+1].y - linePoints[(i)*2].y) /
+				(float)(linePoints[(i)*2+1].x - linePoints[(i)*2].x);
+			// project the line to the left edge and scan back to the start
+			for (int j = 0; j < linePoints[i*2].x; j++) {
+				int y0 = linePoints[i*2].y + ROUND2(slope1 *
+													(float)(j - linePoints[i*2].x)) - 2;
+				// if the green in this column is above our line then it isn't a field edge
+				if (!foundEdge[j] || y0 > topEdge[j]) {
+					// use it as our horizon
+					topEdge[j] = y0;
+					foundEdge[j] = true;
+				}
+			}
+			// do the same thing on the right side of the line
+			for (int j = linePoints[i*2].x; j < IMAGE_WIDTH && linePoints[i*2].x != -1;
+				 j++) {
+				// project the y value of the line in this column
+				int y0 = linePoints[i*2].y + ROUND2(slope1 *
+													(float)(j - linePoints[i*2].x)) - 2;
+				// check it against the highest value seen
+				if (!foundEdge[j] || y0 > topEdge[j]) {
+					foundEdge[j] = true;
+					topEdge[j] = y0;
+				}
+			}
+		}
+	}
+
 	if (debugFieldEdge) {
-		for (int i = 0; i < pairs; i++) {
-			if (linePoints[i*2].x != -1) {
-				thresh->drawLine(linePoints[i*2].x, linePoints[i*2].y,
-								 linePoints[i*2+1].x, linePoints[i*2+1].y, BLACK);
-				thresh->drawLine(linePoints[i*2].x, linePoints[i*2].y+1,
-								 linePoints[i*2+1].x, linePoints[i*2+1].y+1, BLACK);
+		for (int i = 0; i < IMAGE_WIDTH; i++) {
+			if (topEdge[i] > 0) {
+				if (foundEdge[i]) {
+					thresh->drawPoint(i, topEdge[i], BLACK);
+				} //else {
+				//thresh->drawPoint(i, topEdge[i], RED);
+				//}
 			}
 		}
 	}
@@ -1024,7 +1076,8 @@ void Field::openDirection(int horizon, NaoPose *pose)
  */
 
 int Field::horizonAt(int x) {
-    return yProject(0, horizon, x);
+	return topEdge[x];
+    //return yProject(0, horizon, x);
 }
 
 /* Project a line given a start coord and a new y value - note that this is

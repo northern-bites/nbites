@@ -53,6 +53,7 @@ private:
 	float slope;
 
     bool shoot[IMAGE_WIDTH];
+	int  topEdge[IMAGE_WIDTH];
 };
 
 #endif // Field_h_DEFINED
