@@ -109,15 +109,6 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, int _color)
 {
     init(0.0);
     allocateColorRuns();
-#ifdef OFFLINE
-    PRINTOBJS = false;
-    POSTDEBUG = false;
-    POSTLOGIC = false;
-    TOPFIND = false;
-    CORNERDEBUG = false;
-    SANITY = false;
-    CORRECT = false;
-#endif
 }
 
 

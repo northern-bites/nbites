@@ -52,8 +52,5 @@ private:
 	Blobs* blobs;
 	int numberOfRuns, runsize;
 	run* runs;
-#ifdef OFFLINE
-    bool CROSSDEBUG;
-#endif
 };
 #endif

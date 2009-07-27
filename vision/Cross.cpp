@@ -29,17 +29,18 @@
 
 //using namespace std;
 
+#ifdef OFFLINE
+static bool CROSSDEBUG = false;
+#else
+static bool CROSSDEBUG = false;
+#endif
+
 Cross::Cross(Vision* vis, Threshold* thr)
     : vision(vis), thresh(thr)
 {
 	const int MAX_CROSS_RUNS = 400;
 	blobs = new Blobs(MAX_CROSS_RUNS);
     allocateColorRuns();
-#ifdef OFFLINE
-    CROSSDEBUG = false;
-#else
-	CROSSDEBUG = false;
-#endif
 }
 
 
@@ -50,9 +51,6 @@ void Cross::init()
 {
 	blobs->init();
 	numberOfRuns = 0;
-#ifdef OFFLINE
-	CROSSDEBUG = false;
-#endif
 }
 
 /* This is the entry  point for cross detection called in Threshold.cc

@@ -68,12 +68,10 @@ static const int DIST_POINT_FUDGE = 5;
 #ifdef OFFLINE
 static const bool BALLDISTDEBUG = false;
 static const bool BALLDEBUG = false;
-static const bool DEBUGCIRCLEFIT = false;
 static const bool DEBUGBALLPOINTS = false;
 #else
 static const bool BALLDISTDEBUG = false;
 static const bool BALLDEBUG = false;
-static const bool DEBUGCIRCLEFIT = false;
 static const bool DEBUGBALLPOINTS = false;
 #endif
 
@@ -86,11 +84,6 @@ Ball::Ball(Vision* vis, Threshold* thr, int _color)
 	blobs = new Blobs(MAX_BALLS);
     init(0.0);
     allocateColorRuns();
-#ifdef OFFLINE
-    BALLDISTDEBUG = false;
-    BALLDEBUG = false;
-    DEBUGBALLPOINTS = false;
-#endif
 }
 
 
@@ -968,19 +961,20 @@ int Ball::scanOut(int start_x, int start_y, float slopel, int dir){
             }
             lastGoodX = x;
             lastGoodY = y;
-            if(DEBUGBALLPOINTS)
-                thresh->debugImage[y][x] = NAVY;
+            if (DEBUGBALLPOINTS) {
+                //thresh->debugImage[y][x] = NAVY;
+			}
         }else if(thisPix == GREEN || thisPix == BLACK){
             good  = 0;
             bad++;
             goodEdge++;
-            if(DEBUGBALLPOINTS)
-                thresh->debugImage[y][x] = WHITE;
+            //if (DEBUGBALLPOINTS)
+			//thresh->debugImage[y][x] = WHITE;
         }else{
             good  = 0;
             bad++;
-            if(DEBUGBALLPOINTS)
-                thresh->debugImage[y][x] = BLACK;
+            //if (DEBUGBALLPOINTS)
+			//thresh->debugImage[y][x] = BLACK;
         }
 
         //update position for both y, x

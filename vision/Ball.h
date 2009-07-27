@@ -122,12 +122,6 @@ private:
     int numPoints;
     float points[MAX_BALL_POINTS*2];
 
-#ifdef OFFLINE
-    bool BALLDEBUG;
-    bool BALLDISTDEBUG;
-    bool DEBUGBALLPOINTS;
-#endif
-
 };
 
 #endif // Ball_h_DEFINED

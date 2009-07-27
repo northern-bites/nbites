@@ -42,17 +42,18 @@
 
 using namespace std;
 
+#ifdef OFFLINE
+static const bool ROBOTSDEBUG = false;
+#else
+static const bool ROBOTSDEBUG = false;
+#endif
+
 Robots::Robots(Vision* vis, Threshold* thr, int col)
     : vision(vis), thresh(thr), color(col)
 {
 	const int MAX_ROBOT_RUNS = 400;
 	blobs = new Blobs(MAX_ROBOT_RUNS);
     allocateColorRuns();
-#ifdef OFFLINE
-    ROBOTSDEBUG = false;
-#else
-	ROBOTSDEBUG = false;
-#endif
 }
 
 
@@ -63,9 +64,6 @@ void Robots::init()
 {
 	blobs->init();
 	numberOfRuns = 0;
-#ifdef OFFLINE
-	ROBOTSDEBUG = false;
-#endif
 }
 
 /* Set the primary color.  Depending on the color, we have different space needs

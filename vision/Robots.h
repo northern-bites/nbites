@@ -61,8 +61,5 @@ private:
 	int color;
 	Blob* topBlob;
 	run* runs;
-#ifdef OFFLINE
-    bool ROBOTSDEBUG;
-#endif
 };
 #endif

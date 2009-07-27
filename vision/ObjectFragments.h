@@ -152,17 +152,6 @@ private:
     int numberOfRuns;
     run* runs;
     float slope;
-
-#ifdef OFFLINE
-    bool PRINTOBJS;
-    bool POSTLOGIC;
-    bool POSTDEBUG;
-    bool TOPFIND;
-    bool CORNERDEBUG;
-    bool SANITY;
-    bool CORRECT;
-#endif
-
 };
 
 #endif // ObjectFragments_h_DEFINED
