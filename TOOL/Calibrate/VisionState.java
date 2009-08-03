@@ -33,7 +33,7 @@ public class VisionState {
     public final static byte VISUAL_OBJECT_THICKNESS = 2;
     public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.MAGENTA;
     public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.RED;
-    public final static byte GOAL_POST_BOX_COLOR = Vision.PINK;
+    public final static byte GOAL_POST_BOX_COLOR = Vision.BLACK;
 
     public final static byte BLUE_GOAL_BACKSTOP_COLOR = Vision.WHITE;
     public final static byte YELLOW_GOAL_BACKSTOP_COLOR = Vision.WHITE;
@@ -147,6 +147,8 @@ public class VisionState {
                     color = GOAL_RIGHT_POST_BOX_COLOR; break;
                 case VisualFieldObject.BLUE_GOAL_POST:
                 case VisualFieldObject.YELLOW_GOAL_POST:
+                    System.out.println("Drawing ambiguous goal post with id " +
+                                       obj.getID());
                     color = GOAL_POST_BOX_COLOR; break;
                 case VisualFieldObject.BLUE_GOAL_BACKSTOP:
                     color = BLUE_GOAL_BACKSTOP_COLOR; break;
