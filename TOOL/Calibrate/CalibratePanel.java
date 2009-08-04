@@ -48,7 +48,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     private ColorSwatchPanel colorSwatches;
     private JCheckBox undefineSpecific, smallTableMode;
     private ThreshSlider thresh;
-    private JButton fillHoles, undo, redo, prevImage, nextImage, jumpToButton;
+    private JButton fillHoles, undo, redo, prevImage,
+		nextImage, jumpToButton, skipForward, skipBack;
     private JTextField jumpToFrame;
     private JTextPane feedback;
     private InputMap im;
@@ -62,6 +63,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     private static final int NUM_COLUMNS = 20;
     private static final int NUM_ROWS = 2;
     private static final int DEFAULT_COLOR_SWATCH_WIDTH = 40;
+	private static final int NUM_SKIP_FRAMES = 10;
 
     public CalibratePanel(Calibrate aCalibrate) {
         super();
@@ -98,6 +100,12 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         nextImage = new JButton("Next (D)");
         nextImage.setFocusable(false);
 
+		skipForward = new JButton("Skip " + NUM_SKIP_FRAMES + " (Meta + D)");
+		skipForward.setFocusable(false);
+
+		skipBack = new JButton("Back " + (NUM_SKIP_FRAMES) + " (Meta + S)");
+		skipBack.setFocusable(false);
+
         fillHoles = new JButton("Fill Holes (H)");
         fillHoles.setFocusable(false);
 
@@ -124,7 +132,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-	
+
         drawColors = new JCheckBox("Draw Thresholded Colors");
         drawColors.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -137,7 +145,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
             });
         drawColors.setFocusable(false);
         drawColors.setSelected(true);
-	
+
 
 	selectorOverlayChoice = new JComboBox();
 	selectorOverlayChoice.addItem("Left Pane");
@@ -165,13 +173,13 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 		    setDisplayerOverlay(sourceBox);
 		}
 	    });
-	
-
 
         JPanel navigation = new JPanel();
-        navigation.setLayout(new GridLayout(4,2));
+        navigation.setLayout(new GridLayout(5,6));
         navigation.add(prevImage);
         navigation.add(nextImage);
+        navigation.add(skipBack);
+        navigation.add(skipForward);
         navigation.add(undo);
         navigation.add(redo);
         navigation.add(jumpToFrame);
@@ -239,6 +247,11 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "fillHoles");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "nextImage");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "lastImage");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D,
+									  KeyEvent.META_MASK), "skipForward");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+									  KeyEvent.META_MASK), "skipBack");
+
 
 
         am = this.getActionMap();
@@ -291,6 +304,17 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
                     calibrate.getTool().getDataManager().last();
                 }
             });
+		am.put("skipForward", new AbstractAction("skipForward") {
+				public void actionPerformed(ActionEvent e) {
+					calibrate.getTool().getDataManager().skip(NUM_SKIP_FRAMES);
+				}
+			});
+		am.put("skipBack", new AbstractAction("skipBack") {
+				public void actionPerformed(ActionEvent e) {
+					calibrate.getTool().getDataManager().revert(NUM_SKIP_FRAMES);
+				}
+			});
+
     }
 
 
@@ -328,6 +352,20 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
                     calibrate.getNextImage();
                 }
             });
+
+		skipBack.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    calibrate.skipBackward(NUM_SKIP_FRAMES);
+                }
+            });
+
+
+		skipForward.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    calibrate.skipForward(NUM_SKIP_FRAMES);
+                }
+            });
+
 
         fillHoles.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
@@ -376,7 +414,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
                     }
                 }
             });
-	
+
 
     }
 
@@ -396,7 +434,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 	    calibrate.getSelector().repaint();
 	}
     }
-	
+
     //
     public void setSelectorOverlay()
     {
@@ -414,7 +452,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 	    calibrate.getSelector().repaint();
 	}
     }
-	
+
 
     //
     public void setDisplayerOverlay(JComboBox sourceBox) {
@@ -431,7 +469,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 	    calibrate.getDisplayer().repaint();
 	}
     }
-    
+
     //
     //
     public void setDisplayerOverlay() {
