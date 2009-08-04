@@ -4,8 +4,8 @@
 ** TODO Ability to turn on and off DEBUG stuff without restarting the tool
 ** Existing Modules
 *** Calibrate
-**** TODO Display x,y position of cursor in image
-**** TODO jump 10 frames button
+**** DONE Display x,y position of cursor in image
+**** DONE jump 10 frames button
 *** Classifier
 **** TODO Make batch processing work
      Each directory has a key file with what each frame contains, then when batch processing runs, it lists what the system got right and wrong: correct IDs, missed IDs, false IDs.
