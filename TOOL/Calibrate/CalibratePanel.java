@@ -523,6 +523,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         redo.setEnabled(calibrate.canRedo());
         prevImage.setEnabled(calibrate.canGoBackward());
         nextImage.setEnabled(calibrate.canGoForward());
+		skipBack.setEnabled(calibrate.canGoBackward());
+		skipForward.setEnabled(calibrate.canGoForward());
         fillHoles.setEnabled(calibrate.hasImage());
         jumpToFrame.setEnabled(calibrate.hasImage());
         jumpToButton.setEnabled(calibrate.hasImage());
