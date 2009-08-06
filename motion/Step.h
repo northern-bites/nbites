@@ -83,7 +83,7 @@ private:
 
     const WalkVector elipseClipVelocities(const WalkVector & source);
     const WalkVector accelClipVelocities(const WalkVector & source,
-					 const WalkVector & source);
+                                         const WalkVector & last);
     const WalkVector lateralClipVelocities(const WalkVector & source);
 };
 
