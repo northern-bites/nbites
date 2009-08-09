@@ -112,10 +112,6 @@ void StepGenerator::resetHard(){
  *    the oldest value will be popped off before the list is sent to the
  *    controller.
  *
- *  * Another important point is that the size of the currentZMPDSteps should
- *    always be exactly 3. They are the current support foot, the place where
- *    we will step next, and the step after.
- *
  */
 zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     //Generate enough ZMPs so a) the controller can run
@@ -149,7 +145,13 @@ void StepGenerator::generate_steps(){
     }
 }
 
-
+/**
+ * This method calculates the sensor ZMP. This code is highly experimental,
+ * and probably not even being used right now.  The NaoDevils say they
+ * can calculate the sensor ZMP -- we are having trouble with it. We
+ * probably just need to be more careful about how we filter, and get more
+ * example data.
+ */
 void StepGenerator::findSensorZMP(){
 
     //TODO: Figure out how to use unfiltered
@@ -209,6 +211,10 @@ float StepGenerator::scaleSensors(const float sensorZMP, const float perfectZMP)
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
+/**
+ *  This method gets called by the walk provider to generate the output
+ *  of the ZMP controller. It generates the com location in the I frame
+ */
 void StepGenerator::tick_controller(){
 #ifdef DEBUG_STEPGENERATOR
     cout << "StepGenerator::tick_controller" << endl;
@@ -335,7 +341,10 @@ WalkLegsTuple StepGenerator::tick_legs(){
     return WalkLegsTuple(left,right);
 }
 
-
+/**
+ * This method handles updating all the necessary coordinate frames and steps
+ * when the support feet change
+ */
 void StepGenerator::swapSupportLegs(){
         if (currentZMPDSteps.size() +  futureSteps.size() <
             MIN_NUM_ENQUEUED_STEPS)
@@ -403,6 +412,15 @@ void StepGenerator::swapSupportLegs(){
 
 }
 
+/**
+ *  This method fills the ZMP queue with extra zmp based on a step
+ *  Note the bug that currently exists with this process (in the timing)
+ *  See the header and the README.tex/pdf
+ *
+ *  There are two types of ZMP patterns for when a step is supporting
+ *    - Regular, where there is another step coming after
+ *    - End, where the ZMP should move directly under the robot (origin of S)
+ */
 void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 
     switch(newSupportStep->type){
@@ -418,6 +436,9 @@ void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
     newSupportStep->zmpd = true;
 }
 
+/**
+ * Generates the ZMP reference pattern for a normal step
+ */
 void
 StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //update the lastZMPD Step
@@ -548,6 +569,10 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
 }
 
+/**
+ * Generates the ZMP reference pattern for a step when it is the support step
+ * such that it will be the last step before stopping
+ */
 void
 StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
     const ufvector3 end_s =
@@ -606,9 +631,9 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 }
 
 
-/*
+/**
  * Method to enqueue a specific number of steps and then stop
- *
+ * The input should be given in velocities (mm/s)
  */
 void StepGenerator::takeSteps(const float _x, const float _y, const float _theta,
                               const int _numSteps){
@@ -650,8 +675,10 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
 }
 
 
-/*  Set up the walking engine for starting with a swinging step on the left,
- if startLeft is true*/
+/**
+ *  Set up the walking engine for starting with a swinging step on the left,
+ *  if startLeft is true
+ */
 void StepGenerator::resetSteps(const bool startLeft){
     //This is the place where we reset the controller each time the walk starts
     //over again.
@@ -750,7 +777,9 @@ void StepGenerator::resetSteps(const bool startLeft){
 }
 
 
-//currently only does two sets of steps side by side
+/**
+ *  Creates a new step at the specified location (x,y,theta) specified in mm
+ */
 void StepGenerator::generateStep( float _x,
                                   float _y,
                                   float _theta) {
@@ -956,6 +985,10 @@ const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
     return prod(trans_sprime_f,trans_f_s);
 }
 
+/**
+ * Reset (remove all elements) in both the step queues (even ones which
+ * we have already committed to), as well as any zmp reference points
+ */
 void StepGenerator::resetQueues(){
     futureSteps.clear();
     currentZMPDSteps.clear();
@@ -990,6 +1023,7 @@ vector<float> StepGenerator::getOdometryUpdate(){
 }
 
 /**
+ * Method to reset our odometry counters when coordinate frames are switched
  * Ensures we don't loose odometry information if the walk is restarted.
  */
 void StepGenerator::resetOdometry(const float initX, const float initY){
@@ -1038,6 +1072,10 @@ WalkArmsTuple StepGenerator::tick_arms(){
                          rightArm.tick(supportStep_f));
 }
 
+/**
+ * Clears any future steps which are far enough in the future that we
+ * haven't committed to them yet
+ */
 void StepGenerator::clearFutureSteps(){
     //first, we need to scrap all future steps:
     futureSteps.clear();
