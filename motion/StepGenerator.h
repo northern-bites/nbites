@@ -19,10 +19,10 @@
 // <http://www.gnu.org/licenses/>.
 
 /**
- * The StepGenerator (will) house a ton of logic relating to how the steps are
+ * The StepGenerator house a large portion of logic relating to how the steps are
  * configured. It must handle the following tasks:
  *  - Provide future ZMP_REF values for both x and y dimensions
- *  - Decide where to place footsteps depending on input x,y,h
+ *  - Decide where to place footsteps depending on setSteps, setSpeed or setDist
  *  - Oversee the behavior of the WalkingLegs which actually do the leg work
  *  - Handle stopping, both as a motion vector, and when requested
  *    to stop by the underlying switchboard/provider.
@@ -37,18 +37,14 @@
  *  - Decide how to add new footsteps (when, etc)
  *
  * TODO:
- *  - Build access to work from the Switchboard or Interface. Need
- *    to be able to change gaits, start and stop, etc
- *  - Read through tick_legs, fillZMP, etc with a beginners mind and write
- *    lots of awesomely descriptive and informative comments.
- *  - Move some of the parameters in WalkingParameters into Steps. This includes
- *    stuff like step duration, frames in double support, step height, etc
- *  - Fix the ZMP leg length to be more intelligent. Must depend on if we are
- *    moving left/right, and how much, etc. This depends on the next step in many
- *    ways, so I'm not sure how to do this.
- *  - We need to clip incoming x,y,theta because there is no protection currently
- *  - We need an observer or we need to fix the preview controller's bugs
- *  - Move velocity clipping out of setSteps/takeSteps into Step object
+ *   - There is a BIG bug which is makes stopping take an extra step. See README
+ *     for details. The gist is that ZMP preview values are generated
+ *     for when the step we create becomes the support step.
+ *     Since when we initially generate the step, we want it as a destination,
+ *     when we move a step into currentZMPDSteps, we are committing not only
+ *     to having the robot place its foot there, but ALSO to taking another FULL
+ *     step with the other leg (since the ZMP values are generated as such)
+ *
  * MUSINGS ON BETTER DESIGN:
  *  - Each Step could have a list of sub states which it must undergo
  *    A normal step would have just one DBL and one SINGLE in a row
@@ -70,6 +66,7 @@
  * @author Johannes Strom
  * @author George Slavov
  * @date Jan 7 2009
+ * @updated August 2009
  */
 
 #ifndef _StepGenerator_h_DEFINED

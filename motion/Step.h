@@ -30,7 +30,11 @@ struct WalkVector {
 static const WalkVector ZERO_WALKVECTOR = {0.0f,0.0f,0.0f};
 
 /**
- * Simple container to hold information about future steps.
+ * Container to hold information about steps.
+ * Steps hold some arrays which contain the gait information from when they
+ * were created.
+ * Steps also house the logic to correctly clip steps using a few different
+ * metrics
  */
 class Step{
 public:
