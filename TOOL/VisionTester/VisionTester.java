@@ -63,9 +63,7 @@ public class VisionTester implements DataListener
 		DataManager dm = tool.getDataManager();
 
 		dm.set(0);				// Start with first frame
-
 		while (dm.hasElementAfter() ) { // hits all but last frame
-
 			processFrame( dm.activeFrame() );
 			dm.next();
 		}
@@ -73,8 +71,8 @@ public class VisionTester implements DataListener
 
 		notRunning = true;
 		mainPanel.fixButtons();
-		printObjectCounts();
-		resetObjectCounts();
+		printCounts();
+		resetCounts();
 	}
 
 	private void processFrame(Frame f) {
@@ -82,59 +80,79 @@ public class VisionTester implements DataListener
 		ColorTable colorTable = tool.getColorTable();
 		ProcessedImage thresholdedImage = new ProcessedImage(rawImage, colorTable);
 		thresholdedImage.thresholdImage(rawImage, colorTable);
-		addToObjectCounts(thresholdedImage);
+		addToCounts(thresholdedImage);
 	}
 
-	private void addToObjectCounts(ProcessedImage image) {
-		TOOLVisionLink visionLink = image.getVisionLink();
+	private void addToCounts(ProcessedImage image) {
+		updateBallCount(image);
+		updateFieldObjectCount(image);
+	}
+	private void updateBallCount(ProcessedImage image) {
 		Ball ball = image.getVisionLink().getBall();
 		if (ball.getRadius() > 0.0) {
 			numBalls++;
 		}
+	}
 
-		Vector<VisualFieldObject> visFieldObjs = image.getVisionLink().getVisualFieldObjects();
+	private void updateFieldObjectCount(ProcessedImage image) {
+		TOOLVisionLink vl = image.getVisionLink();
+		Vector<VisualFieldObject> visFieldObjs = vl.getVisualFieldObjects();
 		for (VisualFieldObject obj : visFieldObjs) {
-			if (obj.getWidth() > 0 ) {
-				int id = obj.getID();
-
-				if (!numFieldObjects.containsKey(id)){
-					numFieldObjects.put(id, 1);
-				} else {
-					numFieldObjects.put(id, numFieldObjects.get(id) + 1);
-				}
-			}
+			updateFieldObjectAtID(obj);
 		}
 	}
 
-	private void printObjectCounts() {
+	private void updateFieldObjectAtID(VisualFieldObject obj) {
+		if (obj.getWidth() <= 0 ) {
+			return;
+		}
+
+		int id = obj.getID();
+		if (numFieldObjects.containsKey(id)) {
+			numFieldObjects.put(id, numFieldObjects.get(id) + 1);
+		} else {
+			numFieldObjects.put(id, 1);
+		}
+	}
+
+	private void printCounts() {
+		printBallCounts();
+		printVisualFieldObjectCounts();
+	}
+	private void printBallCounts() {
 		System.out.println("Saw " + numBalls + " balls");
+	}
+	private void printVisualFieldObjectCounts() {
 		for ( Map.Entry<Integer, Integer> entry : numFieldObjects.entrySet() ) {
-			String objectName;
-			switch ( entry.getKey() ){
-			case VisualFieldObject.BLUE_GOAL_LEFT_POST:
-				objectName = "Blue Goal Left Post"; break;
-			case VisualFieldObject.YELLOW_GOAL_LEFT_POST:
-				objectName = "Yellow Goal Left Post"; break;
-			case VisualFieldObject.BLUE_GOAL_RIGHT_POST:
-				objectName = "Blue Goal Right Post"; break;
-			case VisualFieldObject.YELLOW_GOAL_RIGHT_POST:
-				objectName = "Yellow Goal Right Post"; break;
-			case VisualFieldObject.BLUE_GOAL_POST:
-				objectName = "Blue Goal Post"; break;
-			case VisualFieldObject.YELLOW_GOAL_POST:
-				objectName = "Yellow Goal Post"; break;
-			case VisualFieldObject.BLUE_GOAL_BACKSTOP:
-				objectName = "Blue Goal Backstop"; break;
-			case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
-				objectName = "Yellow Goal Backstop"; break;
-			default:
-				objectName = "Unknown Object"; break;
-			}
+			String objectName = visualFieldObjectStringFromID( entry.getKey() );
 			System.out.println("Saw " + entry.getValue() + " of " + objectName );
 		}
 	}
 
-	private void resetObjectCounts() {
+	private String visualFieldObjectStringFromID(int id) {
+		switch (id) {
+		case VisualFieldObject.BLUE_GOAL_LEFT_POST:
+			return "Blue Goal Left Post";
+		case VisualFieldObject.YELLOW_GOAL_LEFT_POST:
+			return "Yellow Goal Left Post";
+		case VisualFieldObject.BLUE_GOAL_RIGHT_POST:
+			return "Blue Goal Right Post";
+		case VisualFieldObject.YELLOW_GOAL_RIGHT_POST:
+			return "Yellow Goal Right Post";
+		case VisualFieldObject.BLUE_GOAL_POST:
+			return "Blue Goal Post";
+		case VisualFieldObject.YELLOW_GOAL_POST:
+			return "Yellow Goal Post";
+		case VisualFieldObject.BLUE_GOAL_BACKSTOP:
+			return "Blue Goal Backstop";
+		case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
+			return "Yellow Goal Backstop";
+		default:
+			return "Unknown Object";
+		}
+	}
+
+	private void resetCounts() {
 		numBalls = 0;
 		numFieldObjects.clear();
 	}
