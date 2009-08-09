@@ -74,10 +74,10 @@ public class VisionTester implements DataListener
 		notRunning = true;
 		mainPanel.fixButtons();
 		printObjectCounts();
+		resetObjectCounts();
 	}
 
 	private void processFrame(Frame f) {
-		System.out.println("frame #" + tool.getDataManager().activeFrameIndex());
 		TOOLImage rawImage = f.image();
 		ColorTable colorTable = tool.getColorTable();
 		ProcessedImage thresholdedImage = new ProcessedImage(rawImage, colorTable);
@@ -94,12 +94,14 @@ public class VisionTester implements DataListener
 
 		Vector<VisualFieldObject> visFieldObjs = image.getVisionLink().getVisualFieldObjects();
 		for (VisualFieldObject obj : visFieldObjs) {
-			int id = obj.getID();
+			if (obj.getWidth() > 0 ) {
+				int id = obj.getID();
 
-			if (!numFieldObjects.containsKey(id)){
-				numFieldObjects.put(id, 1);
-			} else {
-				numFieldObjects.put(id, numFieldObjects.get(id) + 1);
+				if (!numFieldObjects.containsKey(id)){
+					numFieldObjects.put(id, 1);
+				} else {
+					numFieldObjects.put(id, numFieldObjects.get(id) + 1);
+				}
 			}
 		}
 	}
@@ -126,9 +128,14 @@ public class VisionTester implements DataListener
 			case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
 				objectName = "Yellow Goal Backstop"; break;
 			default:
-				objectName = "Unknown Object";
+				objectName = "Unknown Object"; break;
 			}
-			System.out.println("Saw " + entry.getValue() + " of ID " + objectName );
+			System.out.println("Saw " + entry.getValue() + " of " + objectName );
 		}
+	}
+
+	private void resetObjectCounts() {
+		numBalls = 0;
+		numFieldObjects.clear();
 	}
 }
