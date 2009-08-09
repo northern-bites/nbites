@@ -52,7 +52,7 @@ public class VisionTesterPanel extends JPanel {
 		JPanel buttonGrid = new JPanel(new GridLayout(2,1));
 
 		runSetObjCount = new JButton("Total Object Counts");
-		runSetObjCount.setFocusable(true);
+		runSetObjCount.setFocusable(false);
 
 
 		runVisionEval = new JButton("Object Correctness Counts");
