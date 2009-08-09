@@ -23,6 +23,8 @@ public class VisionTesterPanel extends JPanel {
 
 	private JTextPane frameInfo;
 
+	private String defaultString = "Click to run test";
+
 	public VisionTesterPanel(VisionTester vt){
 		super();
 		visionTester = vt;
@@ -33,10 +35,10 @@ public class VisionTesterPanel extends JPanel {
 	}
 
 	private void setupWindow(){
-		setLayout(new GridLayout(0,2));
+		setLayout(new GridLayout(0,1));
 
 		frameInfo = new JTextPane();
-		frameInfo.setText("Click to run test");
+		frameInfo.setText(defaultString);
 		frameInfo.setBackground(this.getBackground());
 		frameInfo.setEditable(false);
 
@@ -67,7 +69,6 @@ public class VisionTesterPanel extends JPanel {
 	}
 
 	private void setupListeners(){
-
 		runSetObjCount.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					visionTester.runSetObjCount();
