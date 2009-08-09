@@ -1,5 +1,5 @@
 /**
- * EKF.h - Header file for the EKF class
+ * EKF.h - Implementation of the abstract EKF class
  *
  * @author Tucker Hermans
  */

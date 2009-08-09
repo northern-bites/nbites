@@ -1,0 +1,33 @@
+README Noggin
+
+Noggin is the module of man housing all components which reason about the world
+and make decisions about how the robot will act.  The main components are
+localization, ball tracking, and behaviors.  Additionally
+opponent tracking should be added to this module.  The module is controlled from
+the noggin class which is defined in "Noggin.*".  The main noggin thread is called
+every vision frame.
+
+LOCALIZATION
+
+Localization is the problem of determining where a robot is in the world.
+This is performed using inputs of the last frame's odometry and any landmark
+observations ("Observation.*") and gives output of an (x,y) coordinate and a
+heading on the field, along with associated uncertainties. The interface defining
+localization is "LocSystem.*". We currently have two implementations an extended
+Kalman filter (EKF) systen "LocEKF.*" and a Monte Carloe localization (MCL) or
+particle filter system "MCL.*".  See the system files for more
+detailed documentation.
+
+BALL TRACKING
+
+Ball tracking as currently implemented through the use of an EKF. The ball tracking
+system takes as input a ball observation and gives as output an estimate of the
+ball's (x,y) position and (x,y) velocites, as well as associated uncertainties for
+the four estimates.
+
+OPPONENT TRACKING
+
+Opponent tracking can be implemented similarly to ball tracking.  The one
+additional problem is in correctly associating opponent robot sightings with the
+correct opponent model.  There are many documented methods for doing this,
+the first try would be doing a simple nearest neighbor data association.

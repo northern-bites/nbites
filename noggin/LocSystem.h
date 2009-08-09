@@ -1,7 +1,9 @@
 /**
  * LocSystem.h - Header file for the simple abstract Loc System class
+ * Defines an interface for a localization system. Current implementing classes
+ * are LocEKF and MCL
  *
- * @authro Tucker Hermans
+ * @author Tucker Hermans
  */
 
 #ifndef LocSystem_h_DEFINED
