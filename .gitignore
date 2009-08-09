@@ -36,3 +36,4 @@ noggin/util/fakeData/*
 /motion/README.log
 /motion/README.toc
 /motion/README.pdf
+docs*
