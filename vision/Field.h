@@ -10,7 +10,7 @@ class Field;  // forward reference
 #include "Zlib.h"
 #endif
 #include "Profiler.h"
-
+#include "NaoPose.h"
 class Field
 {
     friend class Vision;

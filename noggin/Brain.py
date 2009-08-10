@@ -236,10 +236,8 @@ class Brain(object):
 
     # move to comm
     def setPacketData(self):
-        # currently, teamNumber, playerNumber, team color MUST be the first
-        # values passed to comm, whereas all the rest are Python-controlled.
-        # eventually, all game-controller set info should be handled by Comm
-        # alone, and extra Python stuff put in here
+        # Team color, team number, and player number are all appended to this
+        # list by the underlying comm module implemented in C++
         self.comm.setData(self.loc.x,
                           self.loc.y,
                           self.loc.h,

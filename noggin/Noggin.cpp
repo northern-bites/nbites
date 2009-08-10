@@ -382,6 +382,9 @@ void Noggin::updateLocalization()
 #       endif
     }
 
+    // We currently have lines turned off for localization, since we have no
+    // model for using them in the EKF.
+
     // Lines
     // const vector<VisualLine> * lines = vision->fieldLines->getLines();
     // vector <VisualLine>::const_iterator j;
