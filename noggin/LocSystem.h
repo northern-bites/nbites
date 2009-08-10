@@ -20,6 +20,8 @@ public:
     virtual void updateLocalization(MotionModel u_t,
                                     std::vector<Observation> z_t) = 0;
     virtual void reset() = 0;
+    // These should be made pure virtual and the implementing MCL class should
+    // be forced to implement them
     virtual void blueGoalieReset() {}
     virtual void redGoalieReset() {}
 

@@ -15,7 +15,7 @@
 #include "NBMath.h"
 #include <boost/numeric/ublas/io.hpp> // for cout
 
-// Default parameters
+// Default uncertainty growth parameters
 #define DEFAULT_BETA 3.0f
 #define DEFAULT_GAMMA 2.0f
 
