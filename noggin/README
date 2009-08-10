@@ -57,4 +57,11 @@ is called self.loc.
 
 LOGGING
 
-Look in the offline directory to view files for creating and processing localization logs.
+Localization logging is controlled by an #ifdef in Noggin.h nammed "LOG_LOCALIZATION".  It is
+currently turned off by default. By uncommenting the define of LOG_LOCALIZATION in Noggin.h, a
+timestamped dot loc file (See startLocLog() in Noggin.cpp) will be created in /home/root/ on the
+robot when the noggin module is initialized.  This file records the start configuration of the
+localization system and then records all observations and odometry information necessary for
+localization processing at each step of the updateLocalization() method in the Noggin class.
+
+Look in the offline directory to view files for processing localization logs.

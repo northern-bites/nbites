@@ -11,7 +11,6 @@ class Threshold;  // forward reference
 
 #include "ObjectFragments.h"
 #include "Ball.h"
-#include "NaoPose.h"
 #include "Field.h"
 #include "Cross.h"
 #include "Robots.h"
@@ -19,6 +18,7 @@ class Threshold;  // forward reference
 #include "Zlib.h"
 #endif
 #include "Profiler.h"
+#include "NaoPose.h"
 //
 // COLOR TABLE CONSTANTS
 // remember to change both values when chaning the color tables
