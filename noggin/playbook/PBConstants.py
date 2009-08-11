@@ -395,7 +395,7 @@ STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
                                              "TEST_MIDDIE",
                                              "TEST_CHASER"
                                              )))
-(S_INIT,
+(INIT_STRATEGY,
  S_READY,
  S_NO_FIELD_PLAYERS,
  S_ONE_FIELD_PLAYER,

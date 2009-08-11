@@ -175,8 +175,17 @@ class Teammate:
     def isDefender(self):
         return (self.role == PBConstants.DEFENDER)
 
+    def isMiddie(self):
+        return (self.role == PBConstants.MIDDIE)
+
     def isGoalie(self):
-        return self.playerNumber == PBConstants.GOALIE_NUMBER
+        return (self.role == PBConstants.GOALIE)
+
+    def isDefaultGoalie(self):
+        return (self.playerNumber == PBConstants.GOALIE_NUMBER)
+
+    def isDefaultChaser(self):
+        return (self.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER)
 
     def isPenalized(self):
         '''
