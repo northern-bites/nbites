@@ -41,6 +41,7 @@ import TOOL.Calibrate.CalibrateModule;
 import TOOL.ColorEdit.ColorEditModule;
 import TOOL.ColorEdit.ColorEdit;
 import TOOL.Classifier.ClassifierModule;
+import TOOL.Learning.LearningModule;
 import TOOL.Console.Console;
 import TOOL.GUI.MultiTabbedPane;
 import TOOL.Image.*;
@@ -173,6 +174,9 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         addModule(calibrator);
         // classifier
         //addModule(new ClassifierModule(this));
+		// learning
+
+		addModule(new LearningModule(this));
         // color edit
         ColorEditModule colorEditModule = new ColorEditModule(this);
         colorEdit = (ColorEdit) colorEditModule.getDisplayComponent();

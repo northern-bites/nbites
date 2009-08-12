@@ -146,11 +146,6 @@ public class DebugViewer extends JFrame {
     public static final int YELLOW_GOAL_CROSS = 81;
     public static final int ABSTRACT_CROSS = 82;
 
-    // Visual Cross
-    public static final int BLUE_GOAL_CROSS = 80;
-    public static final int YELLOW_GOAL_CROSS = 81;
-    public static final int ABSTRACT_CROSS = 82;
-
     public int[] LANDMARK_X;
     public int[] LANDMARK_Y;
     // TODO: Change this ID value...
