@@ -4,26 +4,26 @@ from . import Formations
 
 def sReady(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_READY)
-    Formations.fReady(team)
+    Formations.fReady(team, workingPlay)
 
 def sNoFieldPlayers(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_NO_FIELD_PLAYERS)
-    Formations.fNoFieldPlayers(team)
+    Formations.fNoFieldPlayers(team, workingPlay)
 
 def sOneField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_ONE_FIELD_PLAYER)
     # Kickoff Formations
     if useKickoffFormation(team):
-        Formations.fOneKickoff(team)
+        Formations.fOneKickoff(team, workingPlay)
 
     # Formation for ball in our goal box
     elif team.shouldUseDubD():
-        Formations.fDubD(team)
+        Formations.fDubD(team, workingPlay)
 
     elif useFinder(team):
-        Formations.fFinder(team)
+        Formations.fFinder(team, workingPlay)
     else:
-        Formations.fOneField(team)
+        Formations.fOneField(team, workingPlay)
 
 def sTwoField(team, workingPlay):
     '''
@@ -32,18 +32,18 @@ def sTwoField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_TWO_FIELD_PLAYERS)
     # Kickoff Formations
     if useKickoffFormation(team):
-        Formations.fTwoKickoff(team)
+        Formations.fTwoKickoff(team, workingPlay)
 
     # Formation for ball in our goal box
     elif team.shouldUseDubD():
-        Formations.fDubD(team)
+        Formations.fDubD(team, workingPlay)
 
     # ball hasn't been seen by me or teammates in a while
     elif useFinder(team):
-        Formations.fFinder(team)
+        Formations.fFinder(team, workingPlay)
     else:
         # Keep a defender and a chaser
-        Formations.fTwoField(team)
+        Formations.fTwoField(team, workingPlay)
 
 def sThreeField(team, workingPlay):
     '''
@@ -54,18 +54,19 @@ def sThreeField(team, workingPlay):
     if useKickoffFormation(team):
         #use twokickoff b/c we want the goalie starting in goal
         #like in twoKickoff
-        Formations.fTwoKickoff(team)
+        Formations.fTwoKickoff(team, workingPlay)
 
     # Formation for ball in our goal box
     elif team.shouldUseDubD():
-        Formations.fDubD(team)
+        Formations.fDubD(team, workingPlay)
 
     # ball hasn't been seen by me or teammates in a while
     elif useFinder(team):
-        Formations.fFinder(team)
+        Formations.fFinder(team, workingPlay)
+
+    # Standard spread formation
     else:
-        # Standard spread formation
-        Formations.fThreeField(team)
+        Formations.fThreeField(team, workingPlay)
 
 def sTwoZone(team, workingPlay):
     """
@@ -79,22 +80,21 @@ def sWin(team, workingPlay):
 
     # Kickoff Formations
     if useKickoffFormation(team):
-        # Kickoff
-        Formations.fTwoKickoff(team)
+        Formations.fTwoKickoff(team,workingPlay)
 
     # Formation for ball in our goal box
     elif team.shouldUseDubD():
-        Formations.fDubD(team)
+        Formations.fDubD(team, workingPlay)
 
     # ball hasn't been seen by me or teammates in a while
     elif useFinder(team):
-        Formations.fFinder(team)
+        Formations.fFinder(team, workingPlay)
 
     # Move the defender forward if the ball is close enough to opp goal, then become a middie
-    if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
-        Formations.fNeutralDefense(team)
+    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+        Formations.fNeutralDefense(team, workingPlay)
     else:
-        Formations.fDefensive(team)
+        Formations.fDefensive(team, workingPlay)
 
 # Add strategies for testing various roles
 def sTestDefender(team, workingPlay):

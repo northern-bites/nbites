@@ -3,91 +3,87 @@ from .. import NogginConstants
 from . import PBConstants
 from . import SubRoles
 
-def rChaser(team):
+def rChaser(team, workingPlay):
+    workingPlay.setRole(PBConstants.CHASER)
+    workingPlay.setSubRole(PBConstants.CHASE_NORMAL)
     pos = (team.brain.my.x,team.brain.my.y)
-    return [PBConstants.CHASER, PBConstants.CHASE_NORMAL, pos]
+    workingPlay.setPosition(pos)
 
-def rSearcher(team):
+def rSearcher(team, workingPlay):
     '''
     Determines positioning for robots while using the finder formation
     '''
+    workingPlay.setRole(PBConstants.SEARCHER)
     if team.numActiveFieldPlayers == 1:
-        pos = PBConstants.READY_KICKOFF_STOPPER
-        subRole = PBConstants.OTHER_FINDER
+        workingPlay.setSubRole(PBConstants.OTHER_FINDER)
+        workingPlay.setPosition(PBConstants.READY_KICKOFF_STOPPER)
     else:
+        teammate = team.getOtherActiveTeammate()
         pos = team.getLeastWeightPosition(
             PBConstants.TWO_DOG_FINDER_POSITIONS,
-            team.getOtherActiveTeammate())
+            teammate)
         if pos == PBConstants.TWO_DOG_FINDER_POSITIONS[0]:
-            subRole = PBConstants.FRONT_FINDER
+            workingPlay.setSubRole(PBConstants.FRONT_FINDER)
         else:
-            subRole = PBConstants.OTHER_FINDER
+            workingPlay.setSubRole(PBConstants.OTHER_FINDER)
+        workingPlay.setPosition(pos[:2])
 
-    return [PBConstants.SEARCHER, subRole, pos[:2]]
-
-def rDefender(team):
+def rDefender(team, workingPlay):
     '''gets positioning for defender'''
+    workingPlay.setRole(PBConstants.DEFENDER)
     # If the ball is deep in our side, we become a sweeper
     if team.brain.ball.x < PBConstants.SWEEPER_X:
-        return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
+        SubRoles.pSweeper(team, workingPlay)
 
     elif team.brain.ball.x > NogginConstants.MIDFIELD_X:
         if team.brain.ball.y < NogginConstants.MIDFIELD_Y:
-            return [PBConstants.DEFENDER] + SubRoles.pBottomStopper(team)
+            SubRoles.pBottomStopper(team, workingPlay)
         else:
-            return [PBConstants.DEFENDER] + SubRoles.pTopStopper(team)
+            SubRoles.pTopStopper(team, workingPlay)
 
     elif team.brain.ball.y < NogginConstants.MIDFIELD_Y:
-        return [PBConstants.DEFENDER] + SubRoles.pTopStopper(team)
+        SubRoles.pTopStopper(team, workingPlay)
     else:
-        return [PBConstants.DEFENDER] + SubRoles.pBottomStopper(team)
+        SubRoles.pBottomStopper(team, workingPlay)
 
-def rDefenderOld(team):
-    '''obsolete: gets positioning for defender'''
-    # If the ball is deep in our side, we become a sweeper
-    if team.brain.ball.x < PBConstants.SWEEPER_X:
-        return [PBConstants.DEFENDER] + SubRoles.pSweeper(team)
-
-    # Stand between the ball and the back of the goal if it is on our side
-    elif PBConstants.USE_DEEP_STOPPER:
-        return [PBConstants.DEFENDER] + SubRoles.pDeepStopper(team)
-    else:
-        return [PBConstants.DEFENDER] + SubRoles.pStopper(team)
-
-def rOffender(team):
+def rOffender(team, workingPlay):
     """
     The offensive attacker!
     """
+    workingPlay.setRole(PBConstants.OFFENDER)
     # RIGHT_WING  if ball is in opp half but not in a corner
     if ((team.brain.ball.x > NogginConstants.CENTER_FIELD_X) and
         (team.brain.ball.y < NogginConstants.CENTER_FIELD_Y)):
-        return [PBConstants.OFFENDER] + SubRoles.pRightWing(team)
+        SubRoles.pRightWing(team, workingPlay)
     # LEFT_WING otherwise
     else:
-        return [PBConstants.OFFENDER] + SubRoles.pLeftWing(team)
+        SubRoles.pLeftWing(team, workingPlay)
 
-def rGoalie(team):
+def rGoalie(team, workingPlay):
     """
     The Goalie
     """
-    subrole = None
+    workingPlay.setRole(PBConstants.GOALIE)
     if (team.brain.gameController.currentState == 'gameReady' or
         team.brain.gameController.currentState =='gameSet'):
-        subrole = SubRoles.pGoalieReady(team)
+        SubRoles.pGoalieReady(team, workingPlay)
     if team.goalieShouldChase():
-        subrole = SubRoles.pGoalieChaser(team)
+        SubRoles.pGoalieChaser(team, workingPlay)
     else:
-        subrole = SubRoles.pGoalieNormal(team)
-    return [PBConstants.GOALIE] + subrole
+        SubRoles.pGoalieNormal(team, workingPlay)
 
-def rDefensiveMiddie(team):
+def rDefensiveMiddie(team, workingPlay):
     """
     Midfielder who plays on the defensive side
     """
-    return [PBConstants.DEFENDER] + SubRoles.pDefensiveMiddie(team)
+    #HACK -courtesy of Tucker
+    workingPlay.setRole(PBConstants.DEFENDER)
+    SubRoles.pDefensiveMiddie(team, workingPlay)
 
-def rOffensiveMiddie(team):
+def rOffensiveMiddie(team, workingPlay):
     """
     Midfielder who plays on the offensive side
     """
-    return [PBConstants.DEFNEDER] + SubRoles.pOffensiveMiddie(team)
+    #HACK -courtesy of Tucker
+    workingPlay.setRole(PBConstants.DEFENDER)
+    SubRoles.pOffensiveMiddie(team, workingPlay)

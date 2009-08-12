@@ -2,141 +2,133 @@ from . import Roles
 from . import SubRoles
 from . import PBConstants
 
-def fNoFieldPlayers(team):
+def fNoFieldPlayers(team, workingPlay):
     '''when only the goalie is active'''
+    workingPlay.setFormation(PBConstants.NO_FIELD_PLAYERS)
     if team.me.isGoalie():
-        return [PBConstants.NO_FIELD_PLAYERS] + Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
+    #role, subrole and position are already initialized to INIT
 
-    return [PBConstants.NO_FIELD_PLAYERS, PBConstants.INIT_ROLE,
-            PBConstants.INIT_SUB_ROLE, [0,0,0] ]
-
-def fOneField(team):
+def fOneField(team, workingPlay):
     """Formation for one field player"""
-    role = None
+    workingPlay.setFormation(PBConstants.ONE_FIELD)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
     else:
-        role = Roles.rChaser(team)
-    return [PBConstants.ONE_FIELD] + role
+        Roles.rChaser(team, workingPlay)
 
-def fTwoField(team):
-    role = None
+def fTwoField(team, workingPlay):
+    workingPlay.setFormation(PBConstants.TWO_FIELD)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
+    else:
+        # gets teammate that is chaser (could be me)
+        chaser_mate = team.determineChaser()
+        # if i am chaser
+        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+            Roles.rChaser(team, workingPlay)
+        # Get where the defender should be
+        else:
+            Roles.rDefender(team, workingPlay)
+
+def fDefensive(team, workingPlay):
+    workingPlay.setFormation(PBConstants.DEFENSIVE)
+    if team.me.isGoalie():
+        Roles.rGoalie(team, workingPlay)
     else:
         # gets teammate that is chaser (could be me)
         chaser_mate = team.determineChaser()
 
         # if i am chaser
         if chaser_mate.playerNumber == team.brain.my.playerNumber:
-            role = Roles.rChaser(team)
+            Roles.rChaser(team, workingPlay)
         # Get where the defender should be
         else:
-            role = Roles.rDefender(team)
-    return [PBConstants.TWO_FIELD] + role
+            Roles.rDefender(team, workingPlay)
 
-def fDefensive(team):
-    role = None
-    if team.me.isGoalie():
-        role = Roles.rGoalie(team)
-    else:
-        # gets teammate that is chaser (could be me)
-        chaser_mate = team.determineChaser()
-
-        # if i am chaser
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
-            role = Roles.rChaser(team)
-        # Get where the defender should be
-        else:
-            role = Roles.rDefender(team)
-    return [PBConstants.DEFENSIVE] + role
-
-def fNeutralDefense(team):
+def fNeutralDefense(team, workingPlay):
     """
     Have a defensive midfielder
     """
-    role = None
+    workingPlay.setFormation(PBConstants.NEUTRAL_DEFENSE)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
     else:
         # gets teammate that is chaser (could be me)
         chaser_mate = team.determineChaser()
 
         # if i am chaser
         if chaser_mate.playerNumber == team.brain.my.playerNumber:
-            role = Roles.rChaser(team)
+            Roles.rChaser(team, workingPlay)
         # Get where the middie should be
         else:
-            role = Roles.rDefensiveMiddie(team)
-    return [PBConstants.NEUTRAL_DEFENSE] + role
+            Roles.rDefensiveMiddie(team, workingPlay)
 
-def fNeutralOffense(team):
+def fNeutralOffense(team, workingPlay):
     """
     Have an offensive midfielder
     """
-    role = None
+    workingPlay.setFormation(PBConstants.NEUTRAL_OFFENSE)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
     else:
         # gets teammate that is chaser (could be me)
         chaser_mate = team.determineChaser()
 
         # if i am chaser
         if chaser_mate.playerNumber == team.brain.my.playerNumber:
-            role = Roles.rChaser(team)
+            Roles.rChaser(team, workingPlay)
         # Get where the middie should be
         else:
-            role = Roles.rOffensiveMiddie(team)
-    return [PBConstants.NEUTRAL_OFFENSE] + role
+            Roles.rOffensiveMiddie(team, workingPlay)
 
-def fOffensive(team):
+def fOffensive(team, workingPlay):
     """
     Have a supporting attacker
     """
-    role = None
+    workingPlay.setFormation(PBConstants.OFFENSIVE)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
     else:
         # gets teammate that is chaser (could be me)
         chaser_mate = team.determineChaser()
 
         # if i am chaser
         if chaser_mate.playerNumber == team.brain.my.playerNumber:
-            role = Roles.rChaser(team)
+            Roles.rChaser(team, workingPlay)
         # Get where the offender should be
         else:
-            role = Roles.rOffender(team)
-    return [PBConstants.OFFENSIVE] + role
+            Roles.rOffender(team, workingPlay)
 
-def fThreeField(team):
+def fThreeField(team, workingPlay):
     """
     right now (2009) we will only have 3 field players if the goalie is
 	pulled.
     """
-    role = None
+    workingPlay.setFormation(PBConstants.THREE_FIELD)
     # gets teammate that is chaser (could be me)
     chaser_mate = team.determineChaser()
     # if i am chaser
     if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        role = Roles.rChaser(team)
+        Roles.rChaser(team, workingPlay)
     # Get where the defender should be
     elif team.me.isGoalie():
-        role = Roles.rDefender(team)
+        Roles.rDefender(team, workingPlay)
     elif chaser_mate.isGoalie():
         if team.me.highestActivePlayerNumber():
-            role = Roles.rOffender(team)
+        Roles.rOffender(team, workingPlay)
         else:
-            role = Roles.rDefender(team)
+        Roles.rDefender(team, workingPlay)
     else:
-        role = Roles.rOffender(team)
-    return [PBConstants.THREE_FIELD] + role
+        Roles.rOffender(team, workingPlay)
 
-def fDubD(team):
+def fDubD(team, workingPlay):
+    workingPlay.setFormation(PBConstants.DUB_D)
     pos = None
     role = None
     subRole = None
     if team.me.isGoalie():
-        role, subRole, pos = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
     elif team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
         # Figure out who isn't penalized with you
         other_teammate = team.getOtherActiveTeammate()
@@ -145,82 +137,86 @@ def fDubD(team):
         # and a middie dependent on score differential
         pos1 = PBConstants.LEFT_DEEP_BACK_POS
         pos2 = PBConstants.RIGHT_DEEP_BACK_POS
-        role = PBConstants.DEFENDER
 
-	    # Figure out who should go to which position
+        # Figure out who should go to which position
         pos = team.getLeastWeightPosition((pos1,pos2), other_teammate)
+        workingPlay.setPosition(pos)
         if pos == PBConstants.LEFT_DEEP_BACK_POS:
-            role = PBConstants.DEFENDER
-            subRole = PBConstants.LEFT_DEEP_BACK
+            workingPlay.setRole(PBConstants.DEFENDER)
+            workingPlay.setSubRole(PBConstants.LEFT_DEEP_BACK)
 
         elif pos == PBConstants.RIGHT_DEEP_BACK_POS:
-            role = PBConstants.DEFENDER
-            subRole = PBConstants.RIGHT_DEEP_BACK
+            workingPlay.setRole(PBConstants.DEFENDER)
+            workingPlay.setSubRole(PBConstants.RIGHT_DEEP_BACK)
+
         else:
-            role = PBConstants.OFFENDER
-            subRole = PBConstants.DUBD_OFFENDER
+            workingPlay.setRole(PBConstants.OFFENDER)
+            workingPlay.setSubRole(PBConstants.DUBD_OFFENDER)
 
     # If we are the only player, become the sweeper
     else:
         pos = (PBConstants.SWEEPER_X, PBConstants.SWEEPER_Y)
-        role = PBConstants.DEFENDER
-        subRole = PBConstants.SWEEPER
+        workingPlay.setPosition(pos)
+        workingPlay.setRole(PBConstants.DEFENDER)
+        workingPlay.setSubRole(PBConstants.SWEEPER)
 
-    # position setting
-    return [PBConstants.DUB_D, role, subRole, pos]
-
-def fFinder(team):
+def fFinder(team, workingPlay):
     '''no one knows where the ball is'''
-    role = None
+    workingPlay.setFormation(PBConstants.FINDER)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
     else:
-        role = Roles.rSearcher(team)
-    return [PBConstants.FINDER] + role
+        Roles.rSearcher(team, workingPlay)
 
-def fTwoKickoff(team):
+def fTwoKickoff(team, workingPlay):
     '''time immediately after kickoff'''
-    role = None
-    if team.me.isGoalie():
-        role = Roles.rGoalie(team)
-    elif team.me.playerNumber == 2:
-        role = Roles.rDefender(team)
-    elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
-        role = Roles.rChaser(team)
-    return [PBConstants.TWO_KICKOFF] + role
+    workingPlay.setFormation(PBConstants.TWO_KICKOFF)
+    if team.me.isDefaultGoalie():
+        Roles.rGoalie(team, workingPlay)
+    elif team.me.isDefaultDefender():
+        Roles.rDefender(team, workingPlay)
+    elif team.me.isDefaultChaser():
+        Roles.rChaser(team, workingPlay)
 
-def fOneKickoff(team):
+def fOneKickoff(team, workingPlay):
     """
     kickoff for only having one field player
     """
-    role = None
+    workingPlay.setFormation(PBConstants.ONE_KICKOFF)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
     else:
-        role = Roles.rChaser(team)
-    return [PBConstants.ONE_KICKOFF] + role
+        Roles.rChaser(team, workingPlay)
 
-def fReady(team):
+def fReady(team, workingPlay):
     '''kickoff positions'''
-    role = None
+    workingPlay.setFormation(PBConstants.READY_FORMATION)
     if team.me.isGoalie():
-        role = Roles.rGoalie(team)
+        Roles.rGoalie(team, workingPlay)
 
     elif team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
-        if team.me.playerNumber == 2:
-            role =  [PBConstants.DEFENDER] + SubRoles.pReadyDefender(team)
-        elif team.me.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER:
-            role = [PBConstants.CHASER] + SubRoles.pReadyChaser(team)
+        if team.me.isDefaultDefender():
+            workingPlay.setRole(PBConstants.DEFENDER)
+            SubRoles.pReadyDefender(team, workingPlay)
+        elif team.me.isDefaultChaser():
+            workingPlay.setRole(PBConstants.CHASER)
+            SubRoles.pReadyChaser(team, workingPlay)
     else:
-        role = [PBConstants.CHASER] + SubRoles.pReadyChaser(team)
-    return [PBConstants.READY_FORMATION] + role
+        workingPlay.setRole(PBConstants.CHASER)
+        SubRoles.pReadyChaser(team, workingPlay)
 
 # Formations for testing roles
-def fTestDefender(team):
+def fTestDefender(team, workingPlay):
+    workingPlay.setFormation(PBConstants.TEST_DEFEND)
     if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
-        return  [PBConstants.TEST_DEFEND] + Roles.rDefensiveMiddie(team)
-    return [PBConstants.TEST_DEFEND] + Roles.rDefender(team)
-def fTestOffender(team):
-    return [PBConstants.TEST_OFFEND] + Roles.rOffender(team)
-def fTestChaser(team):
-    return [PBConstants.TEST_CHASE] + Roles.rChaser(team)
+        Roles.rDefensiveMiddie(team, workingPlay)
+    else:
+        Roles.rDefender(team, workingPlay)
+
+def fTestOffender(team, workingPlay):
+    workingPlay.setFormation(PBConstants.TEST_OFFEND)
+    Roles.rOffender(team, workingPlay)
+
+def fTestChaser(team, workingPlay):
+    workingPlay.setFormation(PBConstants.TEST_CHASE)
+    Roles.rChaser(team, workingPlay)

@@ -182,10 +182,13 @@ class Teammate:
         return (self.role == PBConstants.GOALIE)
 
     def isDefaultGoalie(self):
-        return (self.playerNumber == PBConstants.GOALIE_NUMBER)
+        return (self.playerNumber == PBConstants.DEFAULT_GOALIE_NUMBER)
 
     def isDefaultChaser(self):
         return (self.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER)
+
+    def isDefaultDefender(self):
+        return (self.playerNumber == PBConstants.DEFAULT_DEFENDER_NUMBER)
 
     def isPenalized(self):
         '''
