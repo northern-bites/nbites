@@ -44,9 +44,8 @@ import TOOL.TOOL;
 
 public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
-    private JCheckBox human, ball;
     private JTextField jumpToFrame;
-	private JButton prevImage, nextImage, jumpToButton;
+	private JButton prevImage, nextImage, jumpToButton, writeKey;
     private JTextPane feedback;
     private InputMap im;
     private ActionMap am;
@@ -90,6 +89,9 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         jumpToButton = new JButton("Jump");
         jumpToButton.setFocusable(false);
 
+		writeKey = new JButton("Write Key");
+		writeKey.setFocusable(false);
+
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
 
@@ -99,6 +101,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         navigation.add(nextImage);
         navigation.add(jumpToFrame);
         navigation.add(jumpToButton);
+		navigation.add(writeKey);
 
         // Size the navigation panel to only take up as much room as needed
         Dimension navigationSize = new Dimension(2 * (int) prevImage.getPreferredSize().getWidth(), 4 * (int) jumpToFrame.getPreferredSize().getWidth());
@@ -123,6 +126,12 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
                     learn.getNextImage();
                 }
             });
+
+		writeKey.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					learn.writeData();
+				}
+			});
 
         jumpToFrame.addKeyListener(new KeyListener(){
                 public void keyPressed(KeyEvent e){

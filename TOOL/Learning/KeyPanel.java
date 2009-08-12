@@ -16,7 +16,8 @@ import java.awt.event.KeyEvent;
 
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseWheelEvent;
-
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 import javax.swing.InputMap;
 import javax.swing.ActionMap;
@@ -48,7 +49,7 @@ import TOOL.TOOL;
  */
 
 
-public class KeyPanel extends JPanel {
+public class KeyPanel extends JPanel implements ItemListener {
 
     private JCheckBox human, ball;
 	private JComboBox blueGoal;
@@ -63,7 +64,7 @@ public class KeyPanel extends JPanel {
     private static final int NUM_COLUMNS = 20;
     private static final int NUM_ROWS = 2;
 
-	public KeyPanel(Learning aLearn) {
+	public KeyPanel(Learning aLearn)  {
 		super();
 		learn = aLearn;
 		setUpWindows();
@@ -80,7 +81,7 @@ public class KeyPanel extends JPanel {
 		blueGoal.addItem("Right Post");
 		blueGoal.addItem("Both Posts");
 		blueGoal.addItem("Unknown Post");
-		blueGoal.addItem("No Post");
+		blueGoal.addItem("No Blue Post");
 		blueGoal.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					JComboBox sourceBox = (JComboBox) e.getSource();
@@ -91,7 +92,7 @@ public class KeyPanel extends JPanel {
 		yellowGoal.addItem("Right Post");
 		yellowGoal.addItem("Both Posts");
 		yellowGoal.addItem("Unknown Post");
-		yellowGoal.addItem("No Post");
+		yellowGoal.addItem("No Yellow Post");
 		yellowGoal.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					JComboBox sourceBox = (JComboBox) e.getSource();
@@ -253,55 +254,55 @@ public class KeyPanel extends JPanel {
 
 	public void setBlueGoalOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("Left Post")) {
-			learn.setBlueGoal(learn.LEFTPOST);
+			learn.setBlueGoal(GoalType.LEFT);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Right Post")) {
-			learn.setBlueGoal(learn.RIGHTPOST);
+			learn.setBlueGoal(GoalType.RIGHT);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Both Posts")) {
-			learn.setBlueGoal(learn.BOTHPOSTS);
+			learn.setBlueGoal(GoalType.BOTH);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Unknown Post")) {
-			learn.setBlueGoal(learn.UNKNOWNPOST);
+			learn.setBlueGoal(GoalType.UNSURE);
 		}
-		else if (((String) sourceBox.getSelectedItem()).equals("No Post")) {
-			learn.setBlueGoal(learn.NOPOST);
+		else if (((String) sourceBox.getSelectedItem()).equals("No Blue Post")) {
+			learn.setBlueGoal(GoalType.NO_POST);
 		}
 	}
 
 	public void setYellowGoalOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("Left Post")) {
-			learn.setYellowGoal(learn.LEFTPOST);
+			learn.setYellowGoal(GoalType.LEFT);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Right Post")) {
-			learn.setYellowGoal(learn.RIGHTPOST);
+			learn.setYellowGoal(GoalType.RIGHT);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Both Posts")) {
-			learn.setYellowGoal(learn.BOTHPOSTS);
+			learn.setYellowGoal(GoalType.BOTH);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Unknown Post")) {
-			learn.setYellowGoal(learn.UNKNOWNPOST);
+			learn.setYellowGoal(GoalType.UNSURE);
 		}
-		else if (((String) sourceBox.getSelectedItem()).equals("No Post")) {
-			learn.setYellowGoal(learn.NOPOST);
+		else if (((String) sourceBox.getSelectedItem()).equals("No Yellow Post")) {
+			learn.setYellowGoal(GoalType.NO_POST);
 		}
 	}
 
 	public void setCrossOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("Yellow Cross")) {
-			learn.setCross(learn.YELLOWCROSS);
+			learn.setCross(CrossType.YELLOW);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Blue Cross")) {
-			learn.setCross(learn.BLUECROSS);
+			learn.setCross(CrossType.BLUE);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Both Crosses")) {
-			learn.setCross(learn.BOTHCROSSES);
+			learn.setCross(CrossType.DOUBLE_CROSS);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Unknown Cross")) {
-			learn.setCross(learn.UNKNOWNCROSS);
+			learn.setCross(CrossType.UNKNOWN);
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("No Cross")) {
-			learn.setCross(learn.NOCROSS);
+			learn.setCross(CrossType.NO_CROSS);
 		}
 	}
 
@@ -339,6 +340,17 @@ public class KeyPanel extends JPanel {
 		else if (((String) sourceBox.getSelectedItem()).equals("Four")) {
 			learn.setBlueRobot(4);
 		}
+	}
+
+    /** Listens to the check boxes. */
+    public void itemStateChanged(ItemEvent e) {
+        Object source = e.getItemSelectable();
+
+        if (source == human) {
+			learn.setHuman(true);
+        } else if (source == ball) {
+			learn.setBall(!learn.getBall());
+        }
 	}
 
 }

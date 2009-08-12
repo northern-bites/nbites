@@ -22,6 +22,7 @@ import java.awt.Toolkit;
 import java.awt.Point;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 
 
@@ -121,13 +122,19 @@ public class Learning implements DataListener, MouseListener,
     protected int imageHeight, imageWidth;
 
     private Frame currentFrame;
+	private KeyFrame current;
+
+	private int ind;
 
 	protected Builder keys;
+	protected KeyFrame.Builder newKey;
 
     private JSplitPane split_pane;
     private boolean split_changing;
 
     private Point start, end;
+
+	private String keyName;
 
     public Learning(TOOL t){
         tool = t;
@@ -139,6 +146,8 @@ public class Learning implements DataListener, MouseListener,
 
 		key = new KeyPanel(this);
         setupWindowsAndListeners();
+
+		ind = 0;
 
     }
 
@@ -305,7 +314,7 @@ public class Learning implements DataListener, MouseListener,
     public void notifyDataSet(DataSet s, Frame f) {
 		boolean keyExists = true;
 		keys = Keys.newBuilder();
-		String keyName = s.path()+"KEY.KEY";
+		keyName = s.path()+"KEY.KEY";
 		// See if the key exists.
 		try {
 			FileInputStream input = new FileInputStream(keyName);
@@ -373,14 +382,16 @@ public class Learning implements DataListener, MouseListener,
 		visionState.updateObjects();
 
 		// retrieve the frame information
-		int ind = f.index();
-		KeyFrame current = keys.getFrame(ind);
+		ind = f.index();
+		current = keys.getFrame(ind);
 		// setup the buttons on the key panel to reflect the contents of the file
 		key.setHumanStatus(current.getHumanChecked());
 		if (current.getHumanChecked()) {
+			System.out.println("Getting old data");
 			key.setBallStatus(current.getBall());
 			key.setBlueGoalStatus(current.getBlueGoal());
 			key.setYellowGoalStatus(current.getYellowGoal());
+			System.out.println("Old Cross: "+current.getCross());
 			key.setCrossStatus(current.getCross());
 			key.setRedRobotStatus(current.getRedRobots());
 			key.setBlueRobotStatus(current.getBlueRobots());
@@ -401,6 +412,16 @@ public class Learning implements DataListener, MouseListener,
 		key.setRedRobot(getRedRobotString());
 		key.setBlueRobot(getBlueRobotString());
 		learnPanel.setOverlays();
+		// set up the builder in case we decide to edit
+		newKey =
+			KeyFrame.newBuilder()
+			.setHumanChecked(current.getHumanChecked())
+			.setBall(current.getBall())
+			.setBlueGoal(current.getBlueGoal())
+			.setYellowGoal(current.getYellowGoal())
+			.setCross(current.getCross())
+			.setRedRobots(current.getRedRobots())
+			.setBlueRobots(current.getBlueRobots());
 
 		selector.setOverlayImage(visionState.getThreshOverlay());
         selector.repaint();
@@ -425,28 +446,55 @@ public class Learning implements DataListener, MouseListener,
     }
 
 	public void setBall(boolean hasBall) {
-		if (hasBall)
-			System.out.println("got ball");
-		else
-			System.out.println("no ball");
+		if (newKey != null) {
+			newKey.setBall(hasBall);
+		}
+	}
+
+	public void writeData() {
+		// Write the new address book back to disk.
+		try {
+			FileOutputStream output = new FileOutputStream(keyName);
+			keys.build().writeTo(output);
+			output.close();
+			newKey = null;
+		} catch (java.io.IOException e) {
+			System.out.println("Problems with key file");
+		}
 	}
 
 	public void setHuman(boolean hasHuman) {
+		if (newKey != null) {
+			newKey.setHumanChecked(hasHuman);
+			keys.setFrame(ind , newKey);
+			newKey = null;
+		}
 	}
 
-	public void setCross(int which) {
+	public void setCross(CrossType which) {
+		System.out.println("Setting Cross "+which);
+		if (newKey != null)
+			newKey.setCross(which);
 	}
 
-	public void setYellowGoal(int which) {
+	public void setYellowGoal(GoalType which) {
+		if (newKey != null)
+			newKey.setYellowGoal(which);
 	}
 
-	public void setBlueGoal(int which) {
+	public void setBlueGoal(GoalType which) {
+		if (newKey != null)
+			newKey.setBlueGoal(which);
 	}
 
 	public void setRedRobot(int howMany) {
+		if (newKey != null)
+			newKey.setRedRobots(howMany);
 	}
 
 	public void setBlueRobot(int howMany) {
+		if (newKey != null)
+			newKey.setBlueRobots(howMany);
 	}
 
 	public boolean getBall() {
