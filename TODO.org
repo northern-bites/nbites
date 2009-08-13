@@ -122,14 +122,17 @@
 **** TODO Improve handling of unexpected observations
      Could turn it off or use a counter for when to use observations again.
 **** TODO Move from boost/UBLAS to the Eigen matrix library.
-*** TODO Do ball covariance differently
+*** TODO Do ball covariance differently / landmark cartesian coordinates
+    There will be comments in the LocEKF and BallEKF describing this
 *** TODO Investigate sensor based odometry
 *** TODO Topological localization
 *** TODO Teammate localization
 *** TODO Opponent localization
-
+    Each opponent can be treated the same way as the ball.  The code from the BallEKF should work fine, the one difference is that we need to do data association between the observations and the different robot estimates.  Said otherwise, we have to track four opponent robots and we need to have some way of matching the observation to the correct of the four robots.  First try is nearest neighbor. The literature has many other solutions. If people need help send Tucker an email and he can give you some jumping off papers.
+*** TODO Better ambiguous landmark usage
+**** Use a joint probability for all landmarks, instead of a NN association for each landmark independently
+**** Use a multi-modal kalman filter
 ** Behaviors
-
 *** TODO [#A] Replace hand coded kick decision with computational best kick choice.
 
 *** TODO [#A] Python kick objects.
@@ -153,26 +156,21 @@
     Don't look of the field, face the field
 
 *** TODO Re-implement Aibo role selection as per NBites paper on subject
-
+**** This is pretty much there
+**** Just need to add in stuff for the third robot
 *** TODO Work out 3 robot deployment strategy
-
 *** TODO Passing
-
 *** TODO Monitor robot stability online:
     (maybe by amplitude of aX/aY oscillation),
     and potentially have behaviors react when this oscillation becomes too large
 ** Tools
-
 *** TOOL
-
 **** TODO Classifier.
-
+**** TODO Setup TCP streaming to robots
+***** TODO Be able to stream localization info, including landmark detection from a robot in real time
 *** Trac
-
 **** TODO Use tickets more to manage team workflow
-
 *** Other
-
 **** Burst tools
      Check out the burst tools and adapt them to our needs. Possibly write integrate into
      TOOL.

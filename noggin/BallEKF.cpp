@@ -7,6 +7,7 @@ using namespace std;
 
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;
+// Currently we always use Cartesian measurements
 const float BallEKF::USE_CARTESIAN_BALL_DIST = 50000.0f;
 
 // How much uncertainty naturally grows per update
@@ -215,6 +216,10 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)
 {
+    // Currently we always use Cartesian measurements
+    // We originally only used this for ball's closer than 50cm,
+    // However it was found to make velocity estimates much less noisy to
+    // always use Cartesian coordinates
     if (z.distance < USE_CARTESIAN_BALL_DIST) {
         // Convert our sighting to cartesian coordinates
         const float x_b_r = z.distance * cos(z.bearing);
@@ -245,8 +250,20 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
         H_k(1,1) = cosh;
 
         // Update the measurement covariance matrix
+
+        // This could be done better to create an ellipse that more accurately
+        // measures uncertainty. Currently uncertainty is over-sized as a circle
+        // about the ball estimate.  The more correct implementation is the
+        // commented out code bellow the next 2 lines of code.  It should be
+        // tested and the beta and gamma parameters possibly tuned before being
+        // used.
         R_k(0,0) = z.distanceSD;
         R_k(1,1) = z.distanceSD;
+
+        // R_k(0,0) = z.distanceSD * cos(z.bearinsSD);
+        // R_k(1,1) = z.distanceSD * sin(z.bearinsSD);
+
+
     } else {
         // Convert our sighting to cartesian coordinates
         MeasurementVector z_x(2);
