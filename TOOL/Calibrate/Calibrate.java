@@ -432,6 +432,7 @@ public class Calibrate implements DataListener, MouseListener,
 
         // Make sure we can undo the overlay changes
         pushUndo(currentMove);
+
         redoStack.clear();
 
         //update the visionState
@@ -1007,10 +1008,16 @@ public class Calibrate implements DataListener, MouseListener,
         if (e.getSource() == selector) {
             displayer.setMarkerImagePosition(selector.getImageX(x),
                                              selector.getImageY(y));
+			calibratePanel.setXYText(selector.getImageX(x),
+									 selector.getImageY(y));
         }else if (e.getSource() == displayer) {
             selector.setMarkerImagePosition(displayer.getImageX(x),
                                             displayer.getImageY(y));
-        }
+			calibratePanel.setXYText(displayer.getImageX(x),
+                                            displayer.getImageY(y));
+        } else {
+			calibratePanel.setXYText(-1,-1);
+		}
     }
 
     //mouseWheelListener Methods
