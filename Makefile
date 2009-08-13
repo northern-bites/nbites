@@ -139,7 +139,11 @@ PYTHON = python2.5
 endif
 
 TRUST_STORE := trustStore
-JAVA_OPTS := -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
+ifeq "$(PLATFORM)" "Linux"
+JAVA_OPTS := -Xms512m -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./ -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel
+else
+JAVA_OPTS := -Xms512m -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
+endif
 #ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
 # JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar;."
 # else
