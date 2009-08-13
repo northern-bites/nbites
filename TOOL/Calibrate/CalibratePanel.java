@@ -194,7 +194,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         navigation.setLayout(new BoxLayout(navigation,
 										   BoxLayout.Y_AXIS));
 		navigation.add(XYPosition);
-		navigationButtons.setLayout(new GridLayout(5,6));
+		navigationButtons.setLayout(new GridLayout(0,2));
 
         navigationButtons.add(prevImage);
         navigationButtons.add(nextImage);
