@@ -41,21 +41,25 @@ import TOOL.Image.ImageOverlay;
 import TOOL.Calibrate.ColorSwatchParent;
 import TOOL.TOOL;
 
+/**  Panel used to navigate through frames in the learning system.  It also is used to
+	 tell when the user wants the edited information written out to a file.  This is
+	 largely copied from the Calibration version of the same panel, but rips out a lot
+	 of calibration stuff that isn't needed here.  There is probably a decent amount of
+	 code that can still be removed.
+	 @author Eric Chown, 2009
+ */
 
 public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
     private JTextField jumpToFrame;
 	private JButton prevImage, nextImage, jumpToButton, writeKey;
     private JTextPane feedback;
-    private InputMap im;
-    private ActionMap am;
-    protected JCheckBox drawColors;
 
     private Learning learn;
 
-    private static final int NUM_COLUMNS = 20;
-    private static final int NUM_ROWS = 2;
 
+	/**  Constructor.  Sets up panel and listeners.
+	 */
     public LearningPanel(Learning aLearn) {
         super();
 		learn = aLearn;
@@ -63,6 +67,8 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         setupListeners();
     }
 
+	/** Puts on all of the buttons and formats things.
+	 */
     private void setupWindow() {
 
         // centering text from http://forum.java.sun.com/thread.jspa?threadID=166685&messageID=504493
@@ -112,6 +118,8 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
     }
 
 
+	/** Sets up listeners for all of the buttons.
+	 */
     private void setupListeners() {
         learn.getTool().getDataManager().addDataListener(this);
 
@@ -167,10 +175,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
     /**
      * Greys out buttons depending on whether we can actually use them at this
-     * moment; e.g. undo button is initially grey because you cannot undo until
-     * there is something on the undo stack.  Similarly for the previous image
-     * and next image buttons.  Finally, fill holes and the jump button and
-     * text area are only accessible if we have an image loaded.
+     * moment;
      */
     public void fixButtons() {
         prevImage.setEnabled(learn.canGoBackward());
@@ -179,27 +184,30 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         jumpToButton.setEnabled(learn.hasImage());
     }
 
+	/** Sets the feedback text.
+		@param text   the new feedback message
+	 */
     public void setText(String text) {
         feedback.setText(text);
     }
 
+	/** Returns the current feedback message
+		@return  the feedback string
+	 */
     public String getText() {
-	return feedback.getText();
+		return feedback.getText();
     }
 
-	public void setOverlays() {
-	}
 
-
-    public void notifyDataSet(DataSet s, Frame f) {
-
-    }
 
     /** Set the text in the box to update the frame number. */
     public void notifyFrame(Frame f) {
         jumpToFrame.setText((new Integer(f.index())).toString());
     }
 
+	// These methods are place holders designed to fill contracts
+    public void notifyDataSet(DataSet s, Frame f) {
+    }
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
     public void keyTyped(KeyEvent e) {}

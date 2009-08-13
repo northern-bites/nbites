@@ -43,14 +43,20 @@ import TOOL.Calibrate.ColorSwatchParent;
 import TOOL.Data.Classification.KeyFrame.*;
 import TOOL.TOOL;
 
-/* A simple panel containing various buttons to set the data for a frame.  As we
+/** A simple panel containing various buttons to set the data for a frame.  As we
    extend the information that we learn on, we'll have to extend this panel
    accordingly.
+
+   This panel communicates directly with the main "Learning" class.  Getting info
+   from it on what to display.  And informing it when fields are set by the user.
+
+   @author Eric Chown
  */
 
 
 public class KeyPanel extends JPanel implements ItemListener {
 
+	// All of the stuff the user can set
     private JCheckBox human, ball;
 	private JComboBox blueGoal;
 	private JComboBox yellowGoal;
@@ -58,12 +64,14 @@ public class KeyPanel extends JPanel implements ItemListener {
 	private JComboBox redRobots;
 	private JComboBox blueRobots;
     private Learning learn;
+
+	// labels showing what the vision system has found for this frame
 	private JTextField visionHuman, visionBall, visionYellow, visionBlue;
 	private JTextField visionCross, visionRedRobot, visionBlueRobot;
 
-    private static final int NUM_COLUMNS = 20;
-    private static final int NUM_ROWS = 2;
 
+	/** Create the panel and set up the listeners.
+	 */
 	public KeyPanel(Learning aLearn)  {
 		super();
 		learn = aLearn;
@@ -71,6 +79,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 		setUpListeners();
 	}
 
+	/** Add all of the buttons and initialize to appropriate values.
+	 */
     public void setUpWindows() {
 
 		human = new JCheckBox("Human Approved");
@@ -158,6 +168,10 @@ public class KeyPanel extends JPanel implements ItemListener {
         setLayout(new GridLayout(7,2));
 	}
 
+
+	/** We actually have some redundancy as we already have an item listener
+		which might have to be removed.  But this listens for the buttons.
+	 */
     private void setUpListeners() {
         //learn.getTool().getDataManager().addDataListener(this);
         human.addActionListener(new ActionListener(){
@@ -174,42 +188,82 @@ public class KeyPanel extends JPanel implements ItemListener {
             });
     }
 
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the human field
+	 */
 	public void setHuman(String s) {
 		visionHuman.setText(s);
 	}
 
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the ball field
+	 */
 	public void setBall(String s) {
 		visionBall.setText(s);
 	}
 
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the cross field
+	 */
 	public void setCross(String s) {
 		visionCross.setText(s);
 	}
 
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the blue goal field
+	 */
 	public void setBlueGoal(String s) {
 		visionBlue.setText(s);
 	}
 
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the yellow goal field
+	 */
 	public void setYellowGoal(String s) {
 		visionYellow.setText(s);
 	}
 
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the red robot field
+	 */
 	public void setRedRobot(String s) {
 		visionRedRobot.setText(s);
 	}
 
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the blue robot field
+	 */
 	public void setBlueRobot(String s) {
 		visionBlueRobot.setText(s);
 	}
 
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param h     status of human approval
+	 */
 	public void setHumanStatus(boolean h) {
 		human.setSelected(h);
 	}
 
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param h     status of ball
+	 */
 	public void setBallStatus(boolean b) {
 		ball.setSelected(b);
 	}
 
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param h     status of blue goal
+	 */
 	public void setBlueGoalStatus(GoalType b)
 	{
 		switch (b) {
@@ -221,6 +275,10 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param h     status of yellow goal
+	 */
 	public void setYellowGoalStatus(GoalType y)
 	{
 		switch (y) {
@@ -232,6 +290,10 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param h     status of cross
+	 */
 	public void setCrossStatus(CrossType c) {
 		switch (c) {
 		case NO_CROSS: cross.setSelectedIndex(4); break;
@@ -242,16 +304,29 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param h     status of red robots
+	 */
 	public void setRedRobotStatus(int num) {
+		// currently we can't see more than 3 at a time
 		if (num > 3) num = 3;
 		redRobots.setSelectedIndex(num);
 	}
 
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param h     status of human approval
+	 */
 	public void setBlueRobotStatus(int num) {
 		if (num > 3) num = 3;
 		blueRobots.setSelectedIndex(num);
 	}
 
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
 	public void setBlueGoalOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("Left Post")) {
 			learn.setBlueGoal(GoalType.LEFT);
@@ -270,6 +345,10 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
 	public void setYellowGoalOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("Left Post")) {
 			learn.setYellowGoal(GoalType.LEFT);
@@ -288,6 +367,10 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
 	public void setCrossOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("Yellow Cross")) {
 			learn.setCross(CrossType.YELLOW);
@@ -306,6 +389,10 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
 	public void setRedRobotOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("No Red Robots")) {
 			learn.setRedRobot(0);
@@ -324,6 +411,10 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
 	public void setBlueRobotOverlay(JComboBox sourceBox) {
 		if (((String) sourceBox.getSelectedItem()).equals("No Blue Robots")) {
 			learn.setBlueRobot(0);
@@ -342,7 +433,9 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 	}
 
-    /** Listens to the check boxes. */
+    /** Listens to the check boxes. This method can probably be dumped.
+		@param e    the event to be processed.
+	 */
     public void itemStateChanged(ItemEvent e) {
         Object source = e.getItemSelectable();
 

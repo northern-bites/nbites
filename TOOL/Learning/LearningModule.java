@@ -23,12 +23,20 @@ import java.awt.Component;
 import TOOL.TOOL;
 import TOOL.TOOLModule;
 
+/** This class fits the learning system into the basic tool module
+	structure.  The main thing here is that we get a DataManager
+	so we can listen to when data sets are selected or new frames
+	chosen.  The code was basically cut as paste from other modules.
+	@author Eric Chown, 2009
+ */
+
 public class LearningModule extends TOOLModule {
-    /*
-    private LearningModule classifier;
-    */
     private Learning learn;
 
+	/** Constructor creates the main Learning class and gets the
+		data manager.
+		@param tool    the parent class
+	 */
     public LearningModule(TOOL tool) {
         super(tool);
 
@@ -40,15 +48,25 @@ public class LearningModule extends TOOLModule {
         t.getDataManager().addDataListener(classifier);*/
     }
 
+	/** Called to show which module we are
+		@return the name of the module
+	 */
     public String getDisplayName() {
         return "Learning";
     }
 
+	/** Called when this module is selected.  Returns
+		the main panel.
+		@return the main panel
+	 */
     public Component getDisplayComponent() {
         //return classifier;
         return learn.getContentPane();
     }
 
+	/** Returns the main object.
+		@return the learn object
+	 */
 	public Learning getLearning() {
 		return learn;
 	}

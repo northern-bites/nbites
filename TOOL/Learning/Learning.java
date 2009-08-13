@@ -86,6 +86,17 @@ import TOOL.TOOL;
 /**
  * This is the learning class. It is responsible for managing and running
  * our classification system so we can machine learn vision.
+ * Right now it checks for a given KEY.KEY file in the current data directory.
+ * If it finds one it reads it and displays the data along with the current
+ * frame.  If it doesn't then it creates one and uses the vision system to
+ * guess at what the contents of the file should be.  Then a human can
+ * go through and modify them as necessary or simply approve of the contents.
+ * Hitting the "human approved" button is a signal to save the new contents.
+ * However, the file is only written when the "Write" button is hit.
+ * This file is the main entry point and contains the big overall panel.
+ * It contains three subpanels - 1) an image viewing panel, 2) a panel for
+ * editting the contents of a single frame, and 3) a panel for moving
+ * through the frames.
  * @author modified Eric Chown, plus whoever wrote all the code I borrow from
  * other parts of the tool
  */
@@ -94,47 +105,36 @@ public class Learning implements DataListener, MouseListener,
                                   MouseMotionListener,
                                   PropertyChangeListener
 {
-	public static final int RIGHTPOST = 0;
-	public static final int LEFTPOST = 1;
-	public static final int UNKNOWNPOST = 2;
-	public static final int BOTHPOSTS = 3;
-	public static final int NOPOST = 4;
+    protected PixelSelectionPanel selector;    // Display panel
+	protected KeyPanel key;                    // editing panel
+	protected LearningPanel learnPanel;        // Moving throug frames
+    protected ImageOverlay overlay;            // To overlay object drawing
+    protected TOOLImage rawImage;              // raw image
+    protected TOOL tool;                       // parent class
+    protected ColorTable colorTable;           // current color table
+    protected VisionState visionState;         // processes vision
 
-	public static final int YELLOWCROSS = 0;
-	public static final int BLUECROSS = 1;
-	public static final int BOTHCROSSES = 2;
-	public static final int UNKNOWNCROSS = 3;
-	public static final int NOCROSS = 4;
+    protected JPanel main_panel;               // master panel
+    protected int imageHeight, imageWidth;     // size variables
 
+    private Frame currentFrame;                // normal frame data
+	private KeyFrame current;                  // current KEY data
 
-    protected PixelSelectionPanel selector;
-	protected KeyPanel key;
-	protected LearningPanel learnPanel;
-    protected ImageOverlay overlay;
-    protected TOOLImage rawImage;
-    protected int imageID;
-    protected ProcessedImage thresholdedImage;
-    protected TOOL tool;
-    protected ColorTable colorTable;
-    protected VisionState visionState;
+	private int ind;                           // index of current frame
 
-    protected JPanel main_panel;
-    protected int imageHeight, imageWidth;
+	protected Builder keys;                    // holds whole KEY.KEY file
+	protected KeyFrame.Builder newKey;         // temporary to build new item
 
-    private Frame currentFrame;
-	private KeyFrame current;
-
-	private int ind;
-
-	protected Builder keys;
-	protected KeyFrame.Builder newKey;
-
-    private JSplitPane split_pane;
+    private JSplitPane split_pane;             // we split panel up
     private boolean split_changing;
 
     private Point start, end;
 
-	private String keyName;
+	private String keyName;                    // filename of Key file
+
+	/** Constructor.  Makes the panels and sets up the listeners.
+	 * @param t     the parent TOOL class
+	 */
 
     public Learning(TOOL t){
         tool = t;
@@ -151,6 +151,10 @@ public class Learning implements DataListener, MouseListener,
 
     }
 
+	/**  Returns the current color table.  An artifact of copying code from other
+		places.  May not be needed in this class.
+		@return the current color table
+	 */
 
     public ColorTable getTable() {
         return colorTable;
@@ -211,51 +215,75 @@ public class Learning implements DataListener, MouseListener,
         return main_panel;
     }
 
+	// Methods dealing with moving through the frames
 
+	/** Move backwards one frame.
+	 */
     public void getLastImage() {
         tool.getDataManager().last();
         // fix the backward skipping button
         learnPanel.fixButtons();
     }
 
+	/** Move backwards one frame.
+	 */
     public void getNextImage() {
         tool.getDataManager().next();
         // fix the forward skipping button
         learnPanel.fixButtons();
     }
 
+	/** Move forwards to a later frame.
+	 * @param i   the frame to move to
+	 */
     public void skipForward(int i) {
         tool.getDataManager().skip(i);
         // fix the forward skipping button
         learnPanel.fixButtons();
     }
 
+	/** Move backwards to an earlier frame.
+	 * @param i    the frame to move to
+	 */
     public void skipBackward(int i) {
         tool.getDataManager().revert(i);
         // fix the backward skipping button
         learnPanel.fixButtons();
     }
 
+	/** Tell the data manager which image to use.
+	 *  This method may not be necessary in this class.
+	 * @param i   the index of the image
+	 */
     public void setImage(int i) {
         tool.getDataManager().set(i);
     }
 
-
+	/** Check if there is another image forward.  Used
+	 *  to set the button correctly.
+	 * @return true when there is an image
+	 */
     public boolean canGoForward() {
         return tool.getDataManager().hasElementAfter();
     }
 
+	/** Check if there is another image backward.  Used
+	 *  to set the button correctly.
+	 * @return true when there is an image
+	 */
     public boolean canGoBackward() {
         return tool.getDataManager().hasElementBefore();
     }
 
+	/** @return the parent class
+	 */
     public TOOL getTool() {
         return tool;
     }
 
     /** @return true if we have a thresholded image, else false. */
     public Boolean hasImage() {
-        return thresholdedImage != null;
+        return false;
     }
 
 
@@ -311,6 +339,17 @@ public class Learning implements DataListener, MouseListener,
     }
 
     //dataListener Methods
+
+	/** A new data set has been selected.  The big thing here
+	 * is to check for our key file.  If it doesn't exist then
+	 * we need to create a temporary version of one in case we
+	 * decide to edit it.  So we either read the data into our
+	 * data structure or we fill our data structure with default
+	 * values for every frame.  The file stuff uses Google's
+	 * protocol buffers system.
+	 * @param s     the Dataset that was selected
+	 * @param f     the current frame within the dataset
+	 */
     public void notifyDataSet(DataSet s, Frame f) {
 		boolean keyExists = true;
 		keys = Keys.newBuilder();
@@ -345,7 +384,13 @@ public class Learning implements DataListener, MouseListener,
 
         notifyFrame(f);
     }
+
+
     //to do: clean up this code - Octavian
+	/** A new frame has been selected.  We need to update all of our
+	 * information - vision, our key, etc.
+	 * @param f    the frame
+	 */
     public void notifyFrame(Frame f) {
         currentFrame = f;
         if (!f.hasImage())
@@ -356,16 +401,9 @@ public class Learning implements DataListener, MouseListener,
 		else
 			visionState.newFrame(f, tool.getColorTable());
 
-        thresholdedImage = visionState.getThreshImage();//sync the thresholded images
         rawImage = visionState.getImage();
-        imageID = rawImage.hashCode();
 
         colorTable = visionState.getColorTable();
-		/*
-		  if (drawThreshColors) {
-		  thresholdedImage.thresholdImage(colorTable, rawImage);
-		  }
-		*/
 
         // Since we now handle different sized frames, it's possible to
         // switch between modes, changing the image's size without updating
@@ -404,7 +442,7 @@ public class Learning implements DataListener, MouseListener,
 			key.setRedRobotStatus(getRedRobots());
 			key.setBlueRobotStatus(getBlueRobots());
 		}
-		// write out the vision data
+		// write out the vision data in the GUI
 		key.setBall(getBallString());
 		key.setBlueGoal(getBlueGoalString());
 		key.setYellowGoal(getYellowGoalString());
@@ -438,21 +476,36 @@ public class Learning implements DataListener, MouseListener,
     }
 
 
+	/** Returns the overlay containing image edges.  Can probably be dumped.
+	 * @ return the overlay
+	 */
     public ImageOverlay getEdgeOverlay() {
 		return overlay;
     }
+
+	/** Returns the object the runs vision processing for us.
+	 * @return link to vision
+	 */
     public VisionState getVisionState() {
 		return visionState;
     }
 
+	/** Used to set the information in the Key file.
+	 * @param hasBall    whether or not the frame has a ball
+	 */
 	public void setBall(boolean hasBall) {
 		if (newKey != null) {
 			newKey.setBall(hasBall);
 		}
 	}
 
+
+	/** When the "Write" button is pressed this is executed.
+	 *  It writes the contents of our data structure to the KEY.KEY
+	 *  file.
+	 */
 	public void writeData() {
-		// Write the new address book back to disk.
+		// Write the new key file back to disk.
 		try {
 			FileOutputStream output = new FileOutputStream(keyName);
 			keys.build().writeTo(output);
@@ -463,6 +516,9 @@ public class Learning implements DataListener, MouseListener,
 		}
 	}
 
+	/** Used to set the information in the Key file.
+	 * @param hasHuman    whether or not the frame was human approved
+	 */
 	public void setHuman(boolean hasHuman) {
 		if (newKey != null) {
 			newKey.setHumanChecked(hasHuman);
@@ -471,92 +527,152 @@ public class Learning implements DataListener, MouseListener,
 		}
 	}
 
+	/** Used to set the information in the Key file.
+	 * @param which    whether or not the frame has a cross and what type
+	 */
 	public void setCross(CrossType which) {
 		System.out.println("Setting Cross "+which);
 		if (newKey != null)
 			newKey.setCross(which);
 	}
 
+	/** Used to set the information in the Key file.
+	 * @param which    whether or not the frame has a yellow goal and what type
+	 */
 	public void setYellowGoal(GoalType which) {
 		if (newKey != null)
 			newKey.setYellowGoal(which);
 	}
 
+	/** Used to set the information in the Key file.
+	 * @param which    whether or not the frame has a blue goal and what type
+	 */
 	public void setBlueGoal(GoalType which) {
 		if (newKey != null)
 			newKey.setBlueGoal(which);
 	}
 
+	/** Used to set the information in the Key file.
+	 * @param howMany    the number of red robots
+	 */
 	public void setRedRobot(int howMany) {
 		if (newKey != null)
 			newKey.setRedRobots(howMany);
 	}
 
+	/** Used to set the information in the Key file.
+	 * @param howMany    the number of blue robots
+	 */
 	public void setBlueRobot(int howMany) {
 		if (newKey != null)
 			newKey.setBlueRobots(howMany);
 	}
 
+	/** Used to get information from vision.
+	 * @return    whether there is a ball or not
+	 */
 	public boolean getBall() {
 		if (visionState == null) return false;
 		return visionState.getBallVision();
 	}
 
+	/** Used to get information from vision.
+	 * @return    status of blue goal
+	 */
 	public GoalType getBlueGoal() {
 		if (visionState == null) return GoalType.NO_POST;
 		return visionState.getBlueGoalVision();
 	}
 
+	/** Used to get information from vision.
+	 * @return    status of yellow goal
+	 */
 	public GoalType getYellowGoal() {
 		if (visionState == null) return GoalType.NO_POST;
 		return visionState.getYellowGoalVision();
 	}
 
+	/** Used to get information from vision.
+	 * @return    status of field cross
+	 */
 	public CrossType getCross() {
 		if (visionState == null) return CrossType.NO_CROSS;
 		return visionState.getCrossVision();
 	}
 
+	/** Used to get information from vision.
+	 * @return    how many red robots
+	 */
 	public int getRedRobots() {
 		if (visionState == null) return 0;
 		return visionState.getRedRobotsVision();
 	}
 
+	/** Used to get information from vision.
+	 * @return    how many blue robots
+	 */
 	public int getBlueRobots() {
 		if (visionState == null) return 0;
 		return visionState.getBlueRobotsVision();
 	}
 
+	/** Used to get information from vision.
+	 * @return    whether human has approved or not
+	 */
 	public String getHuman() {
 		//return visionState.getHumanString();
 		return "No";
 	}
 
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   ball descriptor
+	 */
 	public String getBallString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getBallString();
 	}
 
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   cross descriptor
+	 */
 	public String getCrossString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getCrossString();
 	}
 
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   red robot descriptor
+	 */
 	public String getRedRobotString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getRedRobotString();
 	}
 
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   blue robot descriptor
+	 */
 	public String getBlueRobotString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getBlueRobotString();
 	}
 
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   blue goal descriptor
+	 */
 	public String getBlueGoalString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getBlueGoalString();
 	}
 
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   yellow goal descriptor
+	 */
 	public String getYellowGoalString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getYellowGoalString();
