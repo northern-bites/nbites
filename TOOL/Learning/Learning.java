@@ -519,11 +519,7 @@ public class Learning implements DataListener, MouseListener,
 		for human approval.
 	 */
 	public void runBatch () {
-		goodBall = 0; badBall = 0; goodCross = 0; badCross = 0;
-		goodBlue = 0; badBlue = 0; goodYellow = 0; badYellow = 0;
-		goodRed = 0; badRed = 0; goodBlueRobot = 0; badBlueRobot = 0;
-		missedBall = 0; missedCross = 0; missedBlue = 0; missedYellow = 0;
-		missedRed = 0; missedBlueRobot = 0;
+		initStats();
 		quietMode = true;
 		for (Frame d : currentSet) {
 			try {
@@ -543,6 +539,24 @@ public class Learning implements DataListener, MouseListener,
 				updateRobotStats();
 			}
 		}
+		quietMode = false;
+		printStats();
+	}
+
+
+	/** Initialize all of our statistics variables
+	 */
+	public void initStats() {
+		goodBall = 0; badBall = 0; goodCross = 0; badCross = 0;
+		goodBlue = 0; badBlue = 0; goodYellow = 0; badYellow = 0;
+		goodRed = 0; badRed = 0; goodBlueRobot = 0; badBlueRobot = 0;
+		missedBall = 0; missedCross = 0; missedBlue = 0; missedYellow = 0;
+		missedRed = 0; missedBlueRobot = 0;
+	}
+
+	/** Print out statistics.
+	 */
+	public void printStats() {
 		System.out.println("Ball Statistics:  Good : "+goodBall+" false positives: "+
 						   badBall+" Missed: "+missedBall);
 		System.out.println("Blue Goal Statistics:  Good: "+goodBlue+" fair: "+
@@ -551,7 +565,6 @@ public class Learning implements DataListener, MouseListener,
 						   okYellow+" false positives: "+badYellow+" missed: "+missedYellow);
 		System.out.println("Cross Statistics:  Good: "+goodCross+" false positives: "+
 						   badCross+" missed: "+missedCross);
-		quietMode = false;
 	}
 
 	/** Compare our key file against vision and update stats accordingly
