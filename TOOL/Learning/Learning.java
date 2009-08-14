@@ -80,6 +80,7 @@ import TOOL.GUI.IncrementalSliderParent;
 
 
 import TOOL.TOOL;
+import TOOL.TOOLException;
 
 
 
@@ -128,9 +129,22 @@ public class Learning implements DataListener, MouseListener,
     private JSplitPane split_pane;             // we split panel up
     private boolean split_changing;
 
+	private boolean quietMode;                 // Used when running in batch
+
     private Point start, end;
 
 	private String keyName;                    // filename of Key file
+	private DataSet currentSet;                // which data set we're processing
+	private int goodBall, badBall;             // ball stat variables
+	private int goodCross, badCross;           // cross stat variables
+	private int goodBlue, badBlue, okBlue;     // blue goal stats
+	private int goodYellow, badYellow, okYellow; // yellow goal stats
+	private int goodRed, badRed;               // red robot stats
+	private int goodBlueRobot, badBlueRobot;   // blue robot stats
+	private int missedBall, missedCross;       // false negatives
+	private int missedBlue;                    // ditto
+	private int missedYellow, missedRed;       // ditto
+	private int missedBlueRobot;               // ditto
 
 	/** Constructor.  Makes the panels and sets up the listeners.
 	 * @param t     the parent TOOL class
@@ -148,6 +162,7 @@ public class Learning implements DataListener, MouseListener,
         setupWindowsAndListeners();
 
 		ind = 0;
+		quietMode = false;
 
     }
 
@@ -208,6 +223,7 @@ public class Learning implements DataListener, MouseListener,
         main_panel.requestFocusInWindow();
 
 		learnPanel.fixButtons();
+		quietMode = false;
     }
 
     /** @return JPanel holding all of Calibrate stuff */
@@ -259,6 +275,12 @@ public class Learning implements DataListener, MouseListener,
         tool.getDataManager().set(i);
     }
 
+	/** Flips either from batch of off
+	 */
+	public void toggleQuietMode() {
+		quietMode = !quietMode;
+	}
+
 	/** Check if there is another image forward.  Used
 	 *  to set the button correctly.
 	 * @return true when there is an image
@@ -282,9 +304,14 @@ public class Learning implements DataListener, MouseListener,
     }
 
     /** @return true if we have a thresholded image, else false. */
-    public Boolean hasImage() {
+    public boolean hasImage() {
         return false;
     }
+
+	/** @return true if in quiet mode */
+	public boolean getQuietMode() {
+		return quietMode;
+	}
 
 
     ////////////////////////////////////////////////////////////
@@ -352,6 +379,7 @@ public class Learning implements DataListener, MouseListener,
 	 */
     public void notifyDataSet(DataSet s, Frame f) {
 		boolean keyExists = true;
+		currentSet = s;
 		keys = Keys.newBuilder();
 		keyName = s.path()+"KEY.KEY";
 		// See if the key exists.
@@ -392,88 +420,297 @@ public class Learning implements DataListener, MouseListener,
 	 * @param f    the frame
 	 */
     public void notifyFrame(Frame f) {
-        currentFrame = f;
-        if (!f.hasImage())
-            return;
-        //if visionState is null, initialize, else just load the frame
-		if (visionState == null)
-			visionState = new VisionState(f, tool.getColorTable());
-		else
-			visionState.newFrame(f, tool.getColorTable());
+		if (!quietMode) {
+			currentFrame = f;
+			if (!f.hasImage())
+				return;
+			//if visionState is null, initialize, else just load the frame
+			if (visionState == null)
+				visionState = new VisionState(f, tool.getColorTable());
+			else
+				visionState.newFrame(f, tool.getColorTable());
 
-        rawImage = visionState.getImage();
+			rawImage = visionState.getImage();
 
-        colorTable = visionState.getColorTable();
+			colorTable = visionState.getColorTable();
 
-        // Since we now handle different sized frames, it's possible to
-        // switch between modes, changing the image's size without updating
-        // the overlay.  This will catch that
-        if(overlay == null || overlay.getWidth() != rawImage.getWidth()) {
-            overlay = new ImageOverlay(rawImage.getWidth(),rawImage.getHeight());
-        }
-        imageHeight = rawImage.getHeight();
-        imageWidth = rawImage.getWidth();
+			// Since we now handle different sized frames, it's possible to
+			// switch between modes, changing the image's size without updating
+			// the overlay.  This will catch that
+			if(overlay == null || overlay.getWidth() != rawImage.getWidth()) {
+				overlay = new ImageOverlay(rawImage.getWidth(),rawImage.getHeight());
+			}
+			imageHeight = rawImage.getHeight();
+			imageWidth = rawImage.getWidth();
 
-        overlay.generateNewEdgeImage(rawImage);
-        selector.updateImage(rawImage);
-		visionState.update();
-		visionState.updateObjects();
+			overlay.generateNewEdgeImage(rawImage);
+			selector.updateImage(rawImage);
+			visionState.update();
+			visionState.updateObjects();
 
-		// retrieve the frame information
-		ind = f.index();
-		current = keys.getFrame(ind);
-		// setup the buttons on the key panel to reflect the contents of the file
-		key.setHumanStatus(current.getHumanChecked());
-		if (current.getHumanChecked()) {
-			System.out.println("Getting old data");
-			key.setBallStatus(current.getBall());
-			key.setBlueGoalStatus(current.getBlueGoal());
-			key.setYellowGoalStatus(current.getYellowGoal());
-			System.out.println("Old Cross: "+current.getCross());
-			key.setCrossStatus(current.getCross());
-			key.setRedRobotStatus(current.getRedRobots());
-			key.setBlueRobotStatus(current.getBlueRobots());
-		} else {
-			// set up based upon vision data
-			key.setBallStatus(getBall());
-			key.setBlueGoalStatus(getBlueGoal());
-			key.setYellowGoalStatus(getYellowGoal());
-			key.setCrossStatus(getCross());
-			key.setRedRobotStatus(getRedRobots());
-			key.setBlueRobotStatus(getBlueRobots());
-		}
-		// write out the vision data in the GUI
-		key.setBall(getBallString());
-		key.setBlueGoal(getBlueGoalString());
-		key.setYellowGoal(getYellowGoalString());
-		key.setCross(getCrossString());
-		key.setRedRobot(getRedRobotString());
-		key.setBlueRobot(getBlueRobotString());
-		learnPanel.setOverlays();
-		// set up the builder in case we decide to edit
-		newKey =
-			KeyFrame.newBuilder()
-			.setHumanChecked(current.getHumanChecked())
-			.setBall(current.getBall())
-			.setBlueGoal(current.getBlueGoal())
-			.setYellowGoal(current.getYellowGoal())
-			.setCross(current.getCross())
-			.setRedRobots(current.getRedRobots())
-			.setBlueRobots(current.getBlueRobots());
+			// retrieve the frame information
+			ind = f.index();
+			current = keys.getFrame(ind);
+			// setup the buttons on the key panel to reflect the contents of the file
+			key.setHumanStatus(current.getHumanChecked());
+			if (current.getHumanChecked()) {
+				key.setBallStatus(current.getBall());
+				key.setBlueGoalStatus(current.getBlueGoal());
+				key.setYellowGoalStatus(current.getYellowGoal());
+				key.setCrossStatus(current.getCross());
+				key.setRedRobotStatus(current.getRedRobots());
+				key.setBlueRobotStatus(current.getBlueRobots());
+				newKey =
+					KeyFrame.newBuilder()
+					.setHumanChecked(current.getHumanChecked())
+					.setBall(current.getBall())
+					.setBlueGoal(current.getBlueGoal())
+					.setYellowGoal(current.getYellowGoal())
+					.setCross(current.getCross())
+					.setRedRobots(current.getRedRobots())
+					.setBlueRobots(current.getBlueRobots());
+			} else {
+				// set up based upon vision data
+				key.setBallStatus(getBall());
+				key.setBlueGoalStatus(getBlueGoal());
+				key.setYellowGoalStatus(getYellowGoal());
+				key.setCrossStatus(getCross());
+				key.setRedRobotStatus(getRedRobots());
+				key.setBlueRobotStatus(getBlueRobots());
+				newKey =
+					KeyFrame.newBuilder()
+					.setHumanChecked(current.getHumanChecked())
+					.setBall(getBall())
+					.setBlueGoal(getBlueGoal())
+					.setYellowGoal(getYellowGoal())
+					.setCross(getCross())
+					.setRedRobots(getRedRobots())
+					.setBlueRobots(getBlueRobots());
+			}
+			// write out the vision data in the GUI
+			key.setBall(getBallString());
+			key.setBlueGoal(getBlueGoalString());
+			key.setYellowGoal(getYellowGoalString());
+			key.setCross(getCrossString());
+			key.setRedRobot(getRedRobotString());
+			key.setBlueRobot(getBlueRobotString());
+			//learnPanel.setOverlays();
+			// set up the builder in case we decide to edit
 
-		selector.setOverlayImage(visionState.getThreshOverlay());
-        selector.repaint();
+			selector.setOverlayImage(visionState.getThreshOverlay());
+			selector.repaint();
 
-        // They loaded something so make sure our buttons reflect the
-        // active state; e.g. that our undo stack and redo stack are
-        // empty.
-        learnPanel.fixButtons();
-        // 0 based indexing.
-        learnPanel.setText("Image " + (f.index()) + " of " +
+			// They loaded something so make sure our buttons reflect the
+			// active state; e.g. that our undo stack and redo stack are
+			// empty.
+			learnPanel.fixButtons();
+			// 0 based indexing.
+			learnPanel.setText("Image " + (f.index()) + " of " +
                                (f.dataSet().size() - 1) +
-			       " -  processed in " + visionState.getProcessTime() +
-			       " micro secs");
+							   " -  processed in " + visionState.getProcessTime() +
+							   " micro secs");
+		}
     }
+
+
+	/** Run a "batch" learning job.  We're going to bootstrap this.
+		Our first goal is simply to run all the frames in the current
+		directory and collect statistics on the ones that are marked
+		for human approval.
+	 */
+	public void runBatch () {
+		goodBall = 0; badBall = 0; goodCross = 0; badCross = 0;
+		goodBlue = 0; badBlue = 0; goodYellow = 0; badYellow = 0;
+		goodRed = 0; badRed = 0; goodBlueRobot = 0; badBlueRobot = 0;
+		missedBall = 0; missedCross = 0; missedBlue = 0; missedYellow = 0;
+		missedRed = 0; missedBlueRobot = 0;
+		quietMode = true;
+		for (Frame d : currentSet) {
+			try {
+				currentSet.load(d.index());
+			} catch (TOOLException e) {
+				System.out.println("Couldn't load frame");
+			}
+			current = keys.getFrame(d.index());
+			if (current.getHumanChecked()) {
+				// we have good data, so let's process the frame
+				visionState.newFrame(d, tool.getColorTable());
+				visionState.update();
+				visionState.updateObjects();
+				updateBallStats();
+				updateGoalStats();
+				updateCrossStats();
+				updateRobotStats();
+			}
+		}
+		System.out.println("Ball Statistics:  Good : "+goodBall+" false positives: "+
+						   badBall+" Missed: "+missedBall);
+		System.out.println("Blue Goal Statistics:  Good: "+goodBlue+" fair: "+
+						   okBlue+" false positives: "+badBlue+" missed: "+missedBlue);
+		System.out.println("Yellow Goal Statistics:  Good: "+goodYellow+" fair: "+
+						   okYellow+" false positives: "+badYellow+" missed: "+missedYellow);
+		System.out.println("Cross Statistics:  Good: "+goodCross+" false positives: "+
+						   badCross+" missed: "+missedCross);
+		quietMode = false;
+	}
+
+	/** Compare our key file against vision and update stats accordingly
+	 */
+	public void updateBallStats() {
+		if (current.getBall()) {
+			if (visionState.getBallVision())
+				goodBall++;
+			else
+				missedBall++;
+		} else if (visionState.getBallVision()) {
+			badBall++;
+		}
+	}
+
+	/** Compare our key file against vision and update stats accordingly
+	 */
+	public void updateGoalStats() {
+				switch (current.getBlueGoal()) {
+				case NO_POST:
+					switch (visionState.getBlueGoalVision()) {
+					case NO_POST: break;
+					case LEFT:
+					case RIGHT:
+					case UNSURE:
+						badBlue++; break;
+					case BOTH: badBlue += 2;
+					}
+					break;
+				case LEFT:
+					switch (visionState.getBlueGoalVision()) {
+					case NO_POST: missedBlue++; break;
+					case LEFT: goodBlue++; break;
+					case RIGHT: badBlue++; break;
+					case UNSURE: okBlue++; break;
+					case BOTH: badBlue++; break;
+					}
+					break;
+				case RIGHT:
+					switch (visionState.getBlueGoalVision()) {
+					case NO_POST: missedBlue++;break;
+					case LEFT: badBlue++; break;
+					case RIGHT: goodBlue++; break;
+					case UNSURE: okBlue++; break;
+					case BOTH: badBlue++; break;
+					}
+					break;
+				case BOTH:
+					switch (visionState.getBlueGoalVision()) {
+					case NO_POST: missedBlue += 2; break;
+					case LEFT: missedBlue++; break;
+					case RIGHT: missedBlue++; break;
+					case UNSURE: missedBlue++; okBlue++; break;
+					case BOTH: goodBlue+= 2; break;
+					}
+					break;
+				case UNSURE:
+					switch (visionState.getBlueGoalVision()) {
+					case NO_POST: missedBlue++; break;
+					case LEFT: okBlue++; break;
+					case RIGHT: okBlue++; break;
+					case UNSURE: goodBlue++; break;
+					case BOTH: badBlue++; okBlue++; break;
+					}
+					break;
+				}
+				switch (current.getYellowGoal()) {
+				case NO_POST:
+					switch (visionState.getYellowGoalVision()) {
+					case NO_POST: break;
+					case LEFT:
+					case RIGHT:
+					case UNSURE:
+						badYellow++; break;
+					case BOTH: badYellow += 2;
+					}
+					break;
+				case LEFT:
+					switch (visionState.getYellowGoalVision()) {
+					case NO_POST: missedYellow++; break;
+					case LEFT: goodYellow++; break;
+					case RIGHT: badYellow++; break;
+					case UNSURE: okYellow++; break;
+					case BOTH: badYellow++; break;
+					}
+					break;
+				case RIGHT:
+					switch (visionState.getYellowGoalVision()) {
+					case NO_POST: missedYellow++;break;
+					case LEFT: badYellow++; break;
+					case RIGHT: goodYellow++; break;
+					case UNSURE: okYellow++; break;
+					case BOTH: badYellow++; break;
+					}
+					break;
+				case BOTH:
+					switch (visionState.getYellowGoalVision()) {
+					case NO_POST: missedYellow += 2; break;
+					case LEFT: missedYellow++; break;
+					case RIGHT: missedYellow++; break;
+					case UNSURE: missedYellow++; okYellow++; break;
+					case BOTH: goodYellow+= 2; break;
+					}
+					break;
+				case UNSURE:
+					switch (visionState.getYellowGoalVision()) {
+					case NO_POST: missedYellow++; break;
+					case LEFT: okYellow++; break;
+					case RIGHT: okYellow++; break;
+					case UNSURE: goodYellow++; break;
+					case BOTH: badYellow++; okYellow++; break;
+					}
+					break;
+				}
+	}
+
+	/** Check our key file against our vision system and collect stats.
+	 */
+	public void updateCrossStats() {
+		switch (current.getCross()) {
+		case NO_CROSS:
+			switch (visionState.getCrossVision()) {
+			case NO_CROSS: break;
+			case BLUE:
+			case YELLOW:
+			case UNKNOWN:
+				badCross++; break;
+			case DOUBLE_CROSS: badCross+=2; break;
+			}
+			break;
+		case BLUE:
+		case YELLOW:
+		case UNKNOWN:
+			switch (visionState.getCrossVision()) {
+			case NO_CROSS: missedCross++; break;
+			case BLUE:
+			case YELLOW:
+			case UNKNOWN:
+				goodCross++; break;
+			case DOUBLE_CROSS: badCross++; goodCross++; break;
+			}
+			break;
+		case DOUBLE_CROSS:
+			switch (visionState.getCrossVision()) {
+			case NO_CROSS: missedCross+=2; break;
+			case BLUE:
+			case YELLOW:
+			case UNKNOWN:
+				missedCross++; break;
+			case DOUBLE_CROSS: goodCross+=2; break;
+			}
+		}
+	}
+
+	/** Someday we'll use this to collect robot stats.  But first we need to be
+		able to recognize them!
+	 */
+	public void updateRobotStats() {
+	}
 
 
 	/** Returns the overlay containing image edges.  Can probably be dumped.
@@ -531,7 +768,6 @@ public class Learning implements DataListener, MouseListener,
 	 * @param which    whether or not the frame has a cross and what type
 	 */
 	public void setCross(CrossType which) {
-		System.out.println("Setting Cross "+which);
 		if (newKey != null)
 			newKey.setCross(which);
 	}

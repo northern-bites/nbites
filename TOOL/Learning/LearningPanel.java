@@ -52,7 +52,7 @@ import TOOL.TOOL;
 public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
     private JTextField jumpToFrame;
-	private JButton prevImage, nextImage, jumpToButton, writeKey;
+	private JButton prevImage, nextImage, jumpToButton, writeKey, runBatch;
     private JTextPane feedback;
 
     private Learning learn;
@@ -98,6 +98,9 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		writeKey = new JButton("Write Key");
 		writeKey.setFocusable(false);
 
+		runBatch = new JButton("Run Batch");
+		runBatch.setFocusable(false);
+
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
 
@@ -108,6 +111,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         navigation.add(jumpToFrame);
         navigation.add(jumpToButton);
 		navigation.add(writeKey);
+		navigation.add(runBatch);
 
         // Size the navigation panel to only take up as much room as needed
         Dimension navigationSize = new Dimension(2 * (int) prevImage.getPreferredSize().getWidth(), 4 * (int) jumpToFrame.getPreferredSize().getWidth());
@@ -138,6 +142,12 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		writeKey.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					learn.writeData();
+				}
+			});
+
+		runBatch.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					learn.runBatch();
 				}
 			});
 
@@ -182,6 +192,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         nextImage.setEnabled(learn.canGoForward());
         jumpToFrame.setEnabled(learn.hasImage());
         jumpToButton.setEnabled(learn.hasImage());
+		writeKey.setEnabled(!learn.getQuietMode());
     }
 
 	/** Sets the feedback text.

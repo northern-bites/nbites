@@ -182,7 +182,6 @@ public class KeyPanel extends JPanel implements ItemListener {
 
         ball.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
-					System.out.println("Ball button");
                     learn.setBall(ball.isSelected());
                 }
             });

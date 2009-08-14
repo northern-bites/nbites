@@ -32,7 +32,6 @@ import TOOL.TOOLException;
 import TOOL.Data.AbstractDataSet;
 import TOOL.Data.DataSource;
 import TOOL.Data.Frame;
-import TOOL.Data.KeyFrame;
 import TOOL.Data.File.FileComparator;
 import TOOL.Image.TOOLImage;
 

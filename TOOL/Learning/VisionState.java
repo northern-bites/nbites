@@ -230,8 +230,6 @@ public class VisionState {
                     color = GOAL_RIGHT_POST_BOX_COLOR; break;
                 case VisualFieldObject.BLUE_GOAL_POST:
                 case VisualFieldObject.YELLOW_GOAL_POST:
-                    System.out.println("Drawing ambiguous goal post with id " +
-                                       obj.getID());
                     color = GOAL_POST_BOX_COLOR; break;
                 case VisualFieldObject.BLUE_GOAL_BACKSTOP:
                     color = BLUE_GOAL_BACKSTOP_COLOR; break;
