@@ -15,7 +15,7 @@
 #include "NogginStructs.h"
 
 /**
- * Class for tracking of ball position and velocity.  Extends the abstract
+ * @brief Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
 class BallEKF : public EKF<RangeBearingMeasurement, MotionModel,

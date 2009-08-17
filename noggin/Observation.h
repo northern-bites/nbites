@@ -20,7 +20,7 @@
 #include "NogginStructs.h"
 
 /**
- * Class to hold the informations associated with the observation of a landmark
+ * @brief Class to hold the informations associated with the observation of a landmark
  */
 class Observation
 {

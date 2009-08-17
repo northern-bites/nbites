@@ -17,7 +17,7 @@
 #include "LocSystem.h"
 
 /**
- * Class for tracking of loc position and velocity.  Extends the abstract
+ * @brief Class for tracking of loc position and velocity.  Extends the abstract
  * EKF class.
  */
 class LocEKF : public EKF<Observation,

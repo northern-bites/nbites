@@ -14,7 +14,9 @@
 #include "NBMath.h"
 using namespace NBMath;
 
-// Pose Estimate
+/**
+ * @brief Estimate of the robot's (x,y,heading) pose.
+ */
 class PoseEst
 {
 public:
@@ -73,7 +75,7 @@ public:
 };
 
 /**
- * Class to hold the ball positin and velocity in the x and y directions
+ * @brief Class to hold the ball positin and velocity in the x and y directions
  */
 class BallPose
 {
@@ -109,7 +111,7 @@ public:
 };
 
 /**
- * Stores field location information about a concrete point landmark
+ * @brief Stores field location information about a concrete point landmark
  */
 class PointLandmark
 {
@@ -126,7 +128,7 @@ public:
 };
 
 /**
- * Stores field location information about a concrete line landmark
+ * @brief Stores field location information about a concrete line landmark
  */
 class LineLandmark
 {

@@ -35,8 +35,8 @@ static const int ZMP_NUM_DIMENSIONS = 2;
 static const int ZMP_NUM_MEASUREMENTS = 2;
 static const float DONT_PROCESS_KEY = -1337.0f;
 /**
- * EKF - An abstract class which implements the computational components of
- *       an Extended Kalman Filter.
+ * @brief An abstract class which implements the computational components of
+ * an Extended Kalman Filter.
  *
  * @date August 2008
  * @author Tucker Hermans
