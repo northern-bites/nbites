@@ -454,6 +454,7 @@ public class Learning implements DataListener, MouseListener,
 			// setup the buttons on the key panel to reflect the contents of the file
 			key.setHumanStatus(current.getHumanChecked());
 			if (current.getHumanChecked()) {
+				key.setHumanStatus(true);
 				key.setBallStatus(current.getBall());
 				key.setBlueGoalStatus(current.getBlueGoal());
 				key.setYellowGoalStatus(current.getYellowGoal());
@@ -471,6 +472,7 @@ public class Learning implements DataListener, MouseListener,
 					.setBlueRobots(current.getBlueRobots());
 			} else {
 				// set up based upon vision data
+				key.setHumanStatus(false);
 				key.setBallStatus(getBall());
 				key.setBlueGoalStatus(getBlueGoal());
 				key.setYellowGoalStatus(getYellowGoal());
@@ -521,6 +523,8 @@ public class Learning implements DataListener, MouseListener,
 	public void runBatch () {
 		initStats();
 		quietMode = true;
+		int framesProcessed = 0;
+		long t = System.currentTimeMillis();
 		for (Frame d : currentSet) {
 			try {
 				currentSet.load(d.index());
@@ -537,10 +541,12 @@ public class Learning implements DataListener, MouseListener,
 				updateGoalStats();
 				updateCrossStats();
 				updateRobotStats();
+				framesProcessed++;
 			}
 		}
+		t = System.currentTimeMillis() - t;
 		quietMode = false;
-		printStats();
+		printStats(framesProcessed, t);
 	}
 
 
@@ -556,14 +562,15 @@ public class Learning implements DataListener, MouseListener,
 
 	/** Print out statistics.
 	 */
-	public void printStats() {
-		System.out.println("Ball Statistics:  Good : "+goodBall+" false positives: "+
+	public void printStats(int processed, long t) {
+		System.out.println("Processed "+processed+" frames in "+(t / 1000)+" seconds.");
+		System.out.println("Ball Statistics:         Good : "+goodBall+"    False positives: "+
 						   badBall+" Missed: "+missedBall);
-		System.out.println("Blue Goal Statistics:  Good: "+goodBlue+" fair: "+
+		System.out.println("Blue Goal Statistics:    Good: "+goodBlue+"     Fair: "+
 						   okBlue+" false positives: "+badBlue+" missed: "+missedBlue);
-		System.out.println("Yellow Goal Statistics:  Good: "+goodYellow+" fair: "+
+		System.out.println("Yellow Goal Statistics:  Good: "+goodYellow+"   Fair: "+
 						   okYellow+" false positives: "+badYellow+" missed: "+missedYellow);
-		System.out.println("Cross Statistics:  Good: "+goodCross+" false positives: "+
+		System.out.println("Cross Statistics:        Good: "+goodCross+"    False positives: "+
 						   badCross+" missed: "+missedCross);
 	}
 
@@ -771,10 +778,19 @@ public class Learning implements DataListener, MouseListener,
 	 */
 	public void setHuman(boolean hasHuman) {
 		if (newKey != null) {
-			newKey.setHumanChecked(hasHuman);
+			newKey.setHumanChecked(true);
 			keys.setFrame(ind , newKey);
-			newKey = null;
+			newKey =
+				KeyFrame.newBuilder()
+				.setHumanChecked(current.getHumanChecked())
+				.setBall(current.getBall())
+				.setBlueGoal(current.getBlueGoal())
+				.setYellowGoal(current.getYellowGoal())
+				.setCross(current.getCross())
+				.setRedRobots(current.getRedRobots())
+				.setBlueRobots(current.getBlueRobots());
 		}
+		key.setHumanStatus(hasHuman);
 	}
 
 	/** Used to set the information in the Key file.

@@ -57,7 +57,8 @@ import TOOL.TOOL;
 public class KeyPanel extends JPanel implements ItemListener {
 
 	// All of the stuff the user can set
-    private JCheckBox human, ball;
+	private JButton   human;
+    private JCheckBox ball;
 	private JComboBox blueGoal;
 	private JComboBox yellowGoal;
 	private JComboBox cross;
@@ -83,7 +84,7 @@ public class KeyPanel extends JPanel implements ItemListener {
 	 */
     public void setUpWindows() {
 
-		human = new JCheckBox("Human Approved");
+		human = new JButton("Update Information");
 		ball = new JCheckBox("Ball");
 
 		blueGoal = new JComboBox();
@@ -176,7 +177,7 @@ public class KeyPanel extends JPanel implements ItemListener {
         //learn.getTool().getDataManager().addDataListener(this);
         human.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
-                    learn.setHuman(human.isSelected());
+                    learn.setHuman(true);
                 }
             });
 
@@ -248,7 +249,10 @@ public class KeyPanel extends JPanel implements ItemListener {
 		@param h     status of human approval
 	 */
 	public void setHumanStatus(boolean h) {
-		human.setSelected(h);
+		if (h)
+			visionHuman.setText("Yes");
+		else
+			visionHuman.setText("No");
 	}
 
 	/** Sets the input device to reflect either what the Key file says of what the
@@ -438,9 +442,7 @@ public class KeyPanel extends JPanel implements ItemListener {
     public void itemStateChanged(ItemEvent e) {
         Object source = e.getItemSelectable();
 
-        if (source == human) {
-			learn.setHuman(true);
-        } else if (source == ball) {
+        if (source == ball) {
 			learn.setBall(!learn.getBall());
         }
 	}
