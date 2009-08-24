@@ -52,7 +52,8 @@ import TOOL.TOOL;
 public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
     private JTextField jumpToFrame;
-	private JButton prevImage, nextImage, jumpToButton, writeKey, runBatch;
+	private JButton prevImage, nextImage, jumpToButton, writeKey, runBatch,
+		useLastFrame, runRecursive;
     private JTextPane feedback;
 
     private Learning learn;
@@ -101,6 +102,12 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		runBatch = new JButton("Run Batch");
 		runBatch.setFocusable(false);
 
+		runRecursive = new JButton("Run Recursive");
+		runRecursive.setFocusable(false);
+
+		useLastFrame = new JButton("Use Last");
+		useLastFrame.setFocusable(false);
+
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
 
@@ -112,6 +119,8 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         navigation.add(jumpToButton);
 		navigation.add(writeKey);
 		navigation.add(runBatch);
+		navigation.add(runRecursive);
+		navigation.add(useLastFrame);
 
         // Size the navigation panel to only take up as much room as needed
         Dimension navigationSize = new Dimension(2 * (int) prevImage.getPreferredSize().getWidth(), 4 * (int) jumpToFrame.getPreferredSize().getWidth());
@@ -148,6 +157,18 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		runBatch.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					learn.runBatch();
+				}
+			});
+
+		runRecursive.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					learn.runRecursiveBatch();
+				}
+			});
+
+		useLastFrame.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					learn.useLast();
 				}
 			});
 

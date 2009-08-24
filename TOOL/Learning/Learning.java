@@ -34,6 +34,7 @@ import TOOL.Data.DataListener;
 import TOOL.Data.DataSet;
 import TOOL.Data.Frame;
 import TOOL.Data.ColorTableListener;
+import TOOL.Data.File.FileSource;
 //import TOOL.Misc.Pair;
 import TOOL.Misc.Estimate;
 
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -515,6 +517,32 @@ public class Learning implements DataListener, MouseListener,
     }
 
 
+	/* We often get a series of frames with the same data.  In this case the
+	   personn editing is saying that this frame is basically the same as the
+	   last.  So get its info and substitute it for the vision data.
+	 */
+	public void useLast() {
+		int ind = currentFrame.index();
+		current = keys.getFrame(ind - 1);
+		// setup the buttons on the key panel to reflect the contents of the file
+		key.setHumanStatus(false);
+		key.setBallStatus(current.getBall());
+		key.setBlueGoalStatus(current.getBlueGoal());
+		key.setYellowGoalStatus(current.getYellowGoal());
+		key.setCrossStatus(current.getCross());
+		key.setRedRobotStatus(current.getRedRobots());
+		key.setBlueRobotStatus(current.getBlueRobots());
+		newKey =
+			KeyFrame.newBuilder()
+			.setHumanChecked(current.getHumanChecked())
+			.setBall(current.getBall())
+			.setBlueGoal(current.getBlueGoal())
+			.setYellowGoal(current.getYellowGoal())
+			.setCross(current.getCross())
+			.setRedRobots(current.getRedRobots())
+			.setBlueRobots(current.getBlueRobots());
+	}
+
 	/** Run a "batch" learning job.  We're going to bootstrap this.
 		Our first goal is simply to run all the frames in the current
 		directory and collect statistics on the ones that are marked
@@ -542,6 +570,68 @@ public class Learning implements DataListener, MouseListener,
 				updateCrossStats();
 				updateRobotStats();
 				framesProcessed++;
+			}
+		}
+		t = System.currentTimeMillis() - t;
+		quietMode = false;
+		printStats(framesProcessed, t);
+	}
+
+	/** Run a recursive batch job.  We'll grab the higher level part of the
+		current path and try running batch on every data set it contains.
+		Obviously this is not for the faint of heart as it could take a very
+		long time depending on the amount of data contained.
+	 */
+	public void runRecursiveBatch() {
+		initStats();
+		quietMode = true;
+		int framesProcessed = 0;
+		long t = System.currentTimeMillis();
+		String topPath = currentSet.path();
+		// We need to get rid of the current directory
+		int end = topPath.length() - 2;
+		for ( ; end > -1 && !topPath.substring(end, end+1).equals(System.getProperty("file.separator"));
+			  end--) {}
+		if (end > -1) {
+			topPath = topPath.substring(0, end+1);
+			// topPath should now contain the parent directory pathname
+			// now we need to start retrieving all of the data sets that contain it
+			FileSource source = (FileSource)(tool.getSourceManager().activeSource());
+			List<DataSet> dataList = source.getDataSets();
+			for (DataSet d : dataList) {
+				if (d.path().startsWith(topPath)) {
+					// we have a target data set
+					String keyName = d.path()+"KEY.KEY";
+					// See if the key exists.
+					try {
+						FileInputStream input = new FileInputStream(keyName);
+						keys.mergeFrom(input);
+						input.close();
+						for (Frame f : d) {
+							try {
+								d.load(f.index());
+							} catch (TOOLException e) {
+								System.out.println("Couldn't load frame");
+							}
+							current = keys.getFrame(f.index());
+							if (current.getHumanChecked()) {
+								// we have good data, so let's process the frame
+								visionState.newFrame(f, tool.getColorTable());
+								visionState.update();
+								visionState.updateObjects();
+								updateBallStats();
+								updateGoalStats();
+								updateCrossStats();
+								updateRobotStats();
+								framesProcessed++;
+							}
+						}
+					} catch (FileNotFoundException e) {
+						// key file doesn't exist, so skip it
+					} catch (java.io.IOException e) {
+						// something went wrong, so keep going
+					}
+				}
 			}
 		}
 		t = System.currentTimeMillis() - t;
