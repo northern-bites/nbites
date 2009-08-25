@@ -47,6 +47,7 @@ def pDefensiveMiddie(team, workingPlay):
         y = PBConstants.MIN_MIDDIE_Y
     else:
         y = PBConstants.MAX_MIDDIE_Y
+
     pos = [PBConstants.DEFENSIVE_MIDDIE_X, y]
     workingPlay.setPosition(pos)
 
@@ -55,6 +56,7 @@ def pOffensiveMiddie(team, workingPlay):
     y = MyMath.clip(team.brain.ball.y,
                     PBConstants.MIN_MIDDIE_Y,
                     PBConstants.MAX_MIDDIE_Y)
+
     pos = [PBConstants.OFFENSIVE_MIDDIE_POS_X, y]
     workingPlay.setPosition(pos)
 
@@ -62,34 +64,31 @@ def pOffensiveMiddie(team, workingPlay):
 def pStopper(team, workingPlay):
     '''position stopper'''
     workingPlay.setSubRole(PBConstants.STOPPER)
-    x,y = team.getPointBetweenBallAndGoal(PBConstants.DEFENDER_BALL_DIST)
+    x,y = getPointBetweenBallAndGoal(team.brain.ball,
+                                     PBConstants.DEFENDER_BALL_DIST)
     if x < PBConstants.SWEEPER_X:
         x = PBConstants.SWEEPER_X
+    elif x > PBConstants.STOPPER_MAX_X:
+        pos_x = PBConstants.STOPPER_MAX_X
+        pos_y = (NogginConstants.MY_GOALBOX_MIDDLE_Y + delta_x / delta_y *
+                 (PBConstants.STOPPER_MAX_X -
+                  NogginConstants.MY_GOALBOX_LEFT_X))
+
     pos = [x,y]
     workingPlay.setPosition(pos)
 
 def pBottomStopper(team, workingPlay):
     '''position stopper'''
-    #HACK -courtesy of Tucker
-    workingPlay.setSubRole(PBConstants.STOPPER)
+    workingPlay.setSubRole(PBConstants.BOTTOM_STOPPER)
     pos = [PBConstants.STOPPER_X,
            PBConstants.BOTTOM_STOPPER_Y]
     workingPlay.setPosition(pos)
 
 def pTopStopper(team, workingPlay):
     '''position stopper'''
-    #HACK -courtesy of Tucker
-    workingPlay.setSubRole(PBConstants.STOPPER)
+    workingPlay.setSubRole(PBConstants.TOP_STOPPER)
     pos = [PBConstants.STOPPER_X,
            PBConstants.TOP_STOPPER_Y]
-    workingPlay.setPosition(pos)
-
-def pDeepStopper(team, workingPlay):
-    '''position stopper'''
-    workingPlay.setSubRole(PBConstants.DEEP_STOPPER)
-    x,y = team.getPointBetweenBallAndGoal(PBConstants.DEFENDER_BALL_DIST)
-    x = MyMath.clip(x, PBConstants.SWEEPER_X,PBConstants.DEEP_STOPPER_X)
-    pos = [x,y]
     workingPlay.setPosition(pos)
 
 def pSweeper(team, workingPlay):
@@ -97,58 +96,43 @@ def pSweeper(team, workingPlay):
     workingPlay.setSubRole(PBConstants.SWEEPER)
     x = PBConstants.SWEEPER_X
     y = PBConstants.SWEEPER_Y
+
     pos = [x,y]
     workingPlay.setPosition(pos)
 
 def pLeftDeepBack(team, workingPlay):
     '''position deep left back'''
     workingPlay.setSubRole(PBConstants.LEFT_DEEP_BACK)
-    pos = [PBConstants.LEFT_DEEP_BACK_POS]
+    pos = PBConstants.LEFT_DEEP_BACK_POS
     workingPlay.setPosition(pos)
 
 def pRightDeepBack(team, workingPlay):
     '''position deep right back'''
     workingPlay.setSubRole(PBConstants.RIGHT_DEEP_BACK)
-    pos = [PBConstants.RIGHT_DEEP_BACK_POS]
+    pos = PBConstants.RIGHT_DEEP_BACK_POS
     workingPlay.setPosition(pos)
 
 #Goalie sub roles
 def pGoalieNormal(team, workingPlay):
     '''normal goalie position'''
     workingPlay.setSubRole(PBConstants.GOALIE_NORMAL)
-    ball = team.brain.ball
-    position = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
+    pos = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
 
     if PBConstants.USE_FANCY_GOALIE:
-        # lets try maintaining home position until the ball is closer in
-        # might help us stay localized better
-        if 0 < ball.locDist < PBConstants.ELLIPSE_POSITION_LIMIT:
-            # Use an ellipse just above the goalline to determine x and y position
-            # We get the angle from goal center to the ball to determine our X,Y
-            theta = MyMath.safe_atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
-                                       ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
+       pos = fancyGoaliePosition(team)
 
-            thetaDeg = PBConstants.RAD_TO_DEG * theta
-
-            # Clip the angle so that the (x,y)-coordinate is not too close to the posts
-            if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
-                theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
-            elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
-                theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
-
-            # Determine X,Y of ellipse based on theta, set heading on the ball
-            position = team.ellipse.getPositionFromTheta(theta)
-    pos = [x,y]
     workingPlay.setPosition(pos)
-    #left for use by GoalieChaser
-    return  position
 
 def pGoalieChaser(team, workingPlay):
     '''goalie is being a chaser, presumably in/near goalbox not intended for
         pulling the goalie situations'''
     workingPlay.setSubRole(PBConstants.GOALIE_CHASER)
-    position = pGoalieNormal(team, workingPlay)
-    workingPlay.setPosition(position)
+    pos = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
+
+    if PBConstants.USE_FANCY_GOALIE:
+       pos = fancyGoaliePosition(team)
+
+    workingPlay.setPosition(pos)
 
 # Kickoff sub roles
 def pKickoffSweeper(team, workingPlay):
@@ -169,23 +153,13 @@ def pKickoffStriker(team, workingPlay):
         pos = PBConstants.KICKOFF_OFFENDER_1_POS
     workingPlay.setPosition(pos)
 
-def pKickoffPlaySweeper(team, workingPlay):
-    '''position kickoff sweeper'''
-    workingPlay.setSubRole(PBConstants.KICKOFF_SWEEPER)
-    workingPlay.setPosition(PBConstants.KICKOFF_PLAY_DEFENDER_POS)
-
-def pKickoffPlayStriker(team, workingPlay):
-    '''position kickoff striker'''
-    workingPlay.setSubRole(PBConstants.KICKOFF_STRIKER)
-    workingPlay.setPosition(PBConstants.KICKOFF_PLAY_OFFENDER_POS)
-
 # SubRoles for ready state
 def pReadyChaser(team, workingPlay):
     workingPlay.setSubRole(PBConstants.READY_CHASER)
     #TODO-have separate formations,roles(?),subroles
     kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
     if kickOff:
-        pos = PBConstants.READY_KICKOFF_NORMAL_CHASER_POS
+        pos = PBConstants.READY_KICKOFF_CHASER_POS
     else:
         pos = PBConstants.READY_NON_KICKOFF_CHASER_POS
     workingPlay.setPosition(pos)
@@ -220,7 +194,51 @@ def pGoalieReady(team, workingPlay):
     """
     Go to our home position during ready
     """
-    #HACK- courtesy of Tucker
-    workingPlay.setSubRole(PBConstants.GOALIE_NORMAL)
+    workingPlay.setSubRole(PBConstants.READY_GOALIE)
     position = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
     workingPlay.setPosition(position)
+
+
+def getPointBetweenBallAndGoal(ball,dist_from_ball):
+    '''returns defensive position between ball (x,y) and goal (x,y)
+    at <dist_from_ball> centimeters away from ball'''
+    delta_y = ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+    delta_x = ball.x - NogginConstants.MY_GOALBOX_LEFT_X
+
+    # don't divide by 0
+    if delta_x == 0:
+        delta_x = 0.1
+    if delta_y == 0:
+        delta_y = 0.1
+
+    pos_x = ball.x - ( dist_from_ball/
+                       hypot(delta_x,delta_y) )*delta_x
+    pos_y = ball.y - ( dist_from_ball/
+                       hypot(delta_x,delta_y) )*delta_y
+
+    return pos_x,pos_y
+
+def fancyGoaliePosition(team):
+    '''returns a goalie position using ellipse'''
+    position = [PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y]
+    # lets try maintaining home position until the ball is closer in
+    # might help us stay localized better
+    ball = team.brain.ball
+    if 0 < ball.locDist < PBConstants.ELLIPSE_POSITION_LIMIT:
+        # Use an ellipse just above the goalline to determine x and y position
+        # We get the angle from goal center to the ball to determine our X,Y
+        theta = MyMath.safe_atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
+                                   ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
+
+        thetaDeg = PBConstants.RAD_TO_DEG * theta
+
+        # Clip the angle so that the (x,y)-coordinate is not too close to the posts
+        if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
+            theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
+        elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
+            theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
+
+        # Determine X,Y of ellipse based on theta, set heading on the ball
+        position = team.ellipse.getPositionFromTheta(theta)
+
+    return position

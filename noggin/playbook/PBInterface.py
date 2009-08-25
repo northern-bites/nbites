@@ -17,29 +17,38 @@ class PBInterface:
         '''
         self.pb.run()
 
+    def getPlay(self):
+        return self.pb.play
+
+    def getPosition(self):
+        '''
+        returns the current goal position of the player
+        '''
+        return self.pb.play.position
+
     def getSubRole(self):
         '''
         returns the current subRole of the player
         '''
-        return self.pb.subRole
+        return self.pb.play.subRole
 
     def getRole(self):
         '''
         returns the current role of the player
         '''
-        return self.pb.role
+        return self.pb.play.role
 
     def getFormation(self):
         '''
         return the current formation of the player
         '''
-        return self.pb.formation
+        return self.pb.play.formation
 
     def getStrategy(self):
         '''
         return the current strategy of the player
         '''
-        return self.pb.strategy
+        return self.pb.play.strategy
 
     def isRoleChaser(self):
         '''

@@ -2,7 +2,7 @@ from math import (fabs, hypot, cos, sin, acos, asin)
 from ..util.MyMath import safe_atan2
 
 
-from . import PBDefs
+from . import Teammate
 from . import PBConstants
 from . import Strategies
 from . import Play
@@ -36,7 +36,7 @@ class GoTeam:
         # Information about teammates
         self.teammates = []
         for i in xrange(PBConstants.NUM_TEAM_PLAYERS):
-            mate = PBDefs.Teammate(brain)
+            mate = Teammate.Teammate(brain)
             mate.playerNumber = i + 1
             self.teammates.append(mate)
 
@@ -65,9 +65,10 @@ class GoTeam:
 
     def strategize(self):
         """
-        Picks the strategy to run and returns all sorts of infos
+        creates a play, picks the strategy to run, returns the play after
+        it is modified by Strategies
         """
-        workingPlay = Play.Play()
+        newPlay = Play.Play()
         # We don't control anything in initial or finished
         if self.brain.gameController.currentState == 'gameInitial' or\
             self.brain.gameController.currentState == 'gameFinished':
@@ -77,38 +78,38 @@ class GoTeam:
 
         # Have a separate strategy to easily deal with being penalized
         elif self.brain.gameController.currentState == 'gamePenalized':
-            workingPlay.setFormation(PBConstants.PENALTY_FORMATION)
-            workingPlay.setFormation(PBConstants.PENALTY_ROLE)
-            workingPlay.setFormation(PBConstants.PENALTY_SUB_ROLE)
+            newPlay.setFormation(PBConstants.PENALTY_FORMATION)
+            newPlay.setRole(PBConstants.PENALTY_ROLE)
+            newPlay.setSubRole(PBConstants.PENALTY_SUB_ROLE)
 
         # Check for testing stuff
         elif PBConstants.TEST_DEFENDER:
-            Strategies.sTestDefender(self)
+            Strategies.sTestDefender(self, newPlay)
         elif PBConstants.TEST_OFFENDER:
-            Strategies.sTestOffender(self)
+            Strategies.sTestOffender(self, newPlay)
         elif PBConstants.TEST_CHASER:
-            Strategies.sTestChaser(self)
+            Strategies.sTestChaser(self, newPlay)
 
         # Have a separate ready section to make things simpler
         elif (self.brain.gameController.currentState == 'gameReady' or
               self.brain.gameController.currentState =='gameSet'):
-            Strategies.sReady(self)
+            Strategies.sReady(self, newPlay)
 
         # Now we look at game strategies
         elif self.numActiveFieldPlayers == 0:
-            Strategies.sNoFieldPlayers(self)
+            Strategies.sNoFieldPlayers(self, newPlay)
         elif self.numActiveFieldPlayers == 1:
-            Strategies.sOneField(self)
+            Strategies.sOneField(self, newPlay)
 
         # This is the important area, what is usually used during play
         elif self.numActiveFieldPlayers == 2:
-            Strategies.sWin(self)
+            Strategies.sWin(self, newPlay)
 
         # This can only be used right now if the goalie is pulled
         elif self.numActiveFieldPlayers == 3:
-            Strategies.sThreeField(self)
+            Strategies.sThreeField(self, newPlay)
 
-        return workingPlay
+        return newPlay
 
     def updateStateInfo(self):
         """
@@ -205,7 +206,7 @@ class GoTeam:
 
     def getLeastWeightPosition(self,positions, mates = None):
         """
-        Gets the position for the dog such that the distance all dogs have
+        Gets the position for the robot such that the distance all robot have
         to move is the least possible
         """
         # if there is only one position return the position
@@ -255,7 +256,7 @@ class GoTeam:
 
         self.numActiveFieldPlayers = 0
         for mate in self.teammates:
-            if (mate.isPenalized() or mate.isDead()): #
+            if (mate.isPenalized() or mate.isDead()):
                 #reset to false when we get a new packet from mate
                 mate.active = False
             elif (mate.active and (not mate.isGoalie()
@@ -294,18 +295,6 @@ class GoTeam:
     ######################################################
     ############   Strategy Decision Stuff     ###########
     ######################################################
-    def shouldUseDubD(self):
-        if not PBConstants.USE_DUB_D:
-            return False
-        return (
-            (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-             self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-             self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-            (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-             self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-             self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-             self.teammates[0].role == PBConstants.CHASER)
-            )
 
     def ballInMyGoalBox(self):
         '''
@@ -316,32 +305,6 @@ class GoTeam:
         return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
-
-    def getPointBetweenBallAndGoal(self,dist_from_ball):
-        '''returns defensive position between ball (x,y) and goal (x,y)
-        at <dist_from_ball> centimeters away from ball'''
-        delta_y = self.brain.ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
-
-        delta_x = self.brain.ball.x - NogginConstants.MY_GOALBOX_LEFT_X
-
-        # don't divide by 0
-        if delta_x == 0:
-            delta_x = 0.1
-        if delta_y == 0:
-            delta_y = 0.1
-
-        pos_x = self.brain.ball.x - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_x
-        pos_y = self.brain.ball.y - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_y
-        if pos_x > PBConstants.STOPPER_MAX_X:
-            pos_x = PBConstants.STOPPER_MAX_X
-
-            pos_y = (NogginConstants.MY_GOALBOX_MIDDLE_Y + delta_x / delta_y *
-                     (PBConstants.STOPPER_MAX_X -
-                      NogginConstants.MY_GOALBOX_LEFT_X))
-
-        return pos_x,pos_y
 
     def goalieShouldChase(self):
         return self.noCalledChaser()
@@ -394,24 +357,6 @@ class GoTeam:
         else:
             self.brain.out.printf(str(outputString))
 
-    def getBehindBallPosition(self):
-        """
-        Returns a position between the ball and own goal
-        """
-        dist_from_ball = 30
-
-        ball = self.brain.ball
-
-        delta_y = ball.y - NogginConstants.OPP_GOALBOX_MIDDLE_Y
-        delta_x = ball.x - NogginConstants.OPP_GOALBOX_LEFT_X
-
-        pos_x = ball.x - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_x
-        pos_y = ball.y + (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_y
-        heading = -safe_atan2(delta_y,delta_x)
-
-        return pos_x,pos_y,heading
 
     def determineChaseTime(self, useZone = False):
         """

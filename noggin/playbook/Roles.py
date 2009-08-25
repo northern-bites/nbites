@@ -72,18 +72,20 @@ def rGoalie(team, workingPlay):
     else:
         SubRoles.pGoalieNormal(team, workingPlay)
 
-def rDefensiveMiddie(team, workingPlay):
-    """
-    Midfielder who plays on the defensive side
-    """
-    #HACK -courtesy of Tucker
-    workingPlay.setRole(PBConstants.DEFENDER)
+def rMiddie(team, workingPlay):
+    workingPlay.setRole(PBConstants.MIDDIE)
     SubRoles.pDefensiveMiddie(team, workingPlay)
 
-def rOffensiveMiddie(team, workingPlay):
-    """
-    Midfielder who plays on the offensive side
-    """
-    #HACK -courtesy of Tucker
-    workingPlay.setRole(PBConstants.DEFENDER)
-    SubRoles.pOffensiveMiddie(team, workingPlay)
+def rDefenderDubD(team, workingPlay):
+    workingplay.setRole(PBConstants.DEFENDER_DUB_D)
+     # Figure out who isn't penalized with you
+    other_teammate = team.getOtherActiveTeammate()
+    leftPos = PBConstants.LEFT_DEEP_BACK_POS
+    rightPos = PBConstants.RIGHT_DEEP_BACK_POS
+    # Figure out who should go to which position
+    pos = team.getLeastWeightPosition((leftPos,rightPos), other_teammate)
+
+    if pos == leftPos:
+        SubRoles.pLeftDeepBack(team, workingPlay)
+    else: #if pos == rightPos
+        SubRoles.pRightDeepBack(team, workingPlay)

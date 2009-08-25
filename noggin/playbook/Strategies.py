@@ -12,13 +12,10 @@ def sNoFieldPlayers(team, workingPlay):
 
 def sOneField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_ONE_FIELD_PLAYER)
-    # Kickoff Formations
-    if useKickoffFormation(team):
-        Formations.fOneKickoff(team, workingPlay)
-
+    # no kickoff formation- would be identical to fOneField
     # Formation for ball in our goal box
-    elif team.shouldUseDubD():
-        Formations.fDubD(team, workingPlay)
+    elif shouldUseDubD(team):
+        Formations.fOneDubD(team, workingPlay)
 
     elif useFinder(team):
         Formations.fFinder(team, workingPlay)
@@ -35,15 +32,15 @@ def sTwoField(team, workingPlay):
         Formations.fTwoKickoff(team, workingPlay)
 
     # Formation for ball in our goal box
-    elif team.shouldUseDubD():
-        Formations.fDubD(team, workingPlay)
+    elif shouldUseDubD(team):
+        Formations.fTwoDubD(team, workingPlay)
 
     # ball hasn't been seen by me or teammates in a while
     elif useFinder(team):
         Formations.fFinder(team, workingPlay)
     else:
         # Keep a defender and a chaser
-        Formations.fTwoField(team, workingPlay)
+        Formations.fDefensiveTwoField(team, workingPlay)
 
 def sThreeField(team, workingPlay):
     '''
@@ -57,8 +54,8 @@ def sThreeField(team, workingPlay):
         Formations.fTwoKickoff(team, workingPlay)
 
     # Formation for ball in our goal box
-    elif team.shouldUseDubD():
-        Formations.fDubD(team, workingPlay)
+    elif shouldUseDubD(team):
+        Formations.fThreeDubD(team, workingPlay)
 
     # ball hasn't been seen by me or teammates in a while
     elif useFinder(team):
@@ -83,8 +80,8 @@ def sWin(team, workingPlay):
         Formations.fTwoKickoff(team,workingPlay)
 
     # Formation for ball in our goal box
-    elif team.shouldUseDubD():
-        Formations.fDubD(team, workingPlay)
+    elif shouldUseDubD(team):
+        Formations.fTwoDubD(team, workingPlay)
 
     # ball hasn't been seen by me or teammates in a while
     elif useFinder(team):
@@ -92,9 +89,9 @@ def sWin(team, workingPlay):
 
     # Move the defender forward if the ball is close enough to opp goal, then become a middie
     elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
-        Formations.fNeutralDefense(team, workingPlay)
+        Formations.fNeutralDefenseTwoField(team, workingPlay)
     else:
-        Formations.fDefensive(team, workingPlay)
+        Formations.fDefensiveTwoField(team, workingPlay)
 
 # Add strategies for testing various roles
 def sTestDefender(team, workingPlay):
@@ -131,3 +128,17 @@ def useFinder(team):
         return True
     else:
         return False
+
+def shouldUseDubD(team):
+    if not PBConstants.USE_DUB_D:
+        return False
+    return (
+        (team.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+         team.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+         team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+        (team.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+         team.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+         team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+         team.teammates[0].isChaser())
+        )
+
