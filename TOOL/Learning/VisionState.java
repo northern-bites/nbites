@@ -45,20 +45,6 @@ public class VisionState {
     public final static byte VISUAL_LINE_THICKNESS = 2;
     public final static byte VISUAL_LINE_COLOR = Vision.BLUE;
 
-    public final static byte POINT_CROSS_SIZE = 4;
-    public final static byte POINT_CROSS_THICKNESS = 2;
-
-    public final static byte POINT_HORIZONTAL_COLOR = Vision.YELLOW;
-    public final static byte POINT_VERTICAL_COLOR = Vision.RED;
-
-    public final static byte UNUSED_POINT_HORIZONTAL_COLOR = Vision.NAVY;
-    public final static byte UNUSED_POINT_VERTICAL_COLOR = Vision.PINK;
-
-    public final static byte CORNER_POINT_COLOR = Vision.ORANGE;
-
-    public final static byte POSE_HORIZON_THICKNESS = 2;
-    public final static byte POSE_HORIZON_COLOR = Vision.BLUE;
-    public final static byte VISION_HORIZON_COLOR = Vision.MAGENTA;
     //images + colortable
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
@@ -72,10 +58,6 @@ public class VisionState {
 	private GoalType seeBlue, seeYellow;
 	private int seeRedRobots, seeBlueRobots;
     private Vector<VisualFieldObject> visualFieldObjects;
-    private Horizon poseHorizon;
-    private int visionHorizon;
-    //a boolean that says if we should draw the thresh colors
-    private boolean drawThreshColors = true;
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
@@ -101,32 +83,32 @@ public class VisionState {
         //init the objects
         if (rawImage != null && colorTable != null)  {
             thresholdedImage = new ProcessedImage(rawImage, colorTable);
-            thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
-                                                             thresholdedImage.getHeight());
+			if (thresholdedOverlay == null)
+				thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
+																 thresholdedImage.getHeight());
+			else
+				thresholdedOverlay.resetPixels();
 		}
     }
 
     //This updates the whole processed stuff
     //- the thresholded image, the field objects and the ball
-    public void update() {
+    public void update(boolean silent) {
 	//if the thresholdedImage is not null, process it again
         if (thresholdedImage != null)  {
             //we process the image; the visionLink updates itself with the new data from the bot
             thresholdedImage.thresholdImage(rawImage, colorTable);
-	    if (!drawThreshColors) thresholdedImage.clearColoring();
             //get the ball from the link
             ball = thresholdedImage.getVisionLink().getBall();
             visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
-            poseHorizon = thresholdedImage.getVisionLink().getPoseHorizon();
-            visionHorizon = thresholdedImage.getVisionLink().getVisionHorizon();
-
             //draw the stuff onto the overlay
-            drawObjectBoxes();
+			if (!silent)
+				drawObjectBoxes();
         }
 		//else the thresholdedImage is null, so initialize it
 		else {
 			thresholdedImage = new ProcessedImage(rawImage, colorTable);
-			update();
+			update(silent);
 		}
     }
 
@@ -246,59 +228,6 @@ public class VisionState {
                                                VISUAL_OBJECT_THICKNESS, color);
             }
         }
-        //set field lines
-        /*VisualLine line;
-        for (int i = 0; i < visualLines.size(); i++) {
-            line = visualLines.elementAt(i);
-            thresholdedOverlay.drawLine(line.getBeginX(), line.getBeginY(),
-                                        line.getEndX(), line.getEndY(),
-                                        VISUAL_LINE_THICKNESS, VISUAL_LINE_COLOR);
-
-            Vector<LinePoint> points;
-            points = line.getLinePoints();
-            LinePoint pt;
-            byte color;
-            for (int j = 0; j < points.size(); j++) {
-                pt = points.elementAt(j);
-                switch (pt.foundWithScan()) {
-                case LinePoint.HORIZONTAL : color = POINT_HORIZONTAL_COLOR; break;
-                case LinePoint.VERTICAL : color = POINT_VERTICAL_COLOR; break;
-                default : color = Vision.PINK;//this should never be the case
-                }
-                thresholdedOverlay.drawCross(pt.getX(), pt.getY(),
-                                             POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
-                                             color);
-            }
-        }
-        //set unused points
-        LinePoint unusedPoint;
-        byte color;
-        for (int i = 0; i < unusedPoints.size(); i++){
-            unusedPoint = unusedPoints.elementAt(i);
-            switch(unusedPoint.foundWithScan()) {
-            case LinePoint.HORIZONTAL : color = UNUSED_POINT_HORIZONTAL_COLOR; break;
-            case LinePoint.VERTICAL : color = UNUSED_POINT_VERTICAL_COLOR; break;
-            default : color = Vision.BLACK; //this should never happen
-            }
-            thresholdedOverlay.drawCross(unusedPoint.getX(), unusedPoint.getY(),
-                                         POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
-                                          color);
-        }
-        //set corners
-        VisualCorner corner;
-        for (int i = 0; i < visualCorners.size(); i++) {
-            corner = visualCorners.elementAt(i);
-            thresholdedOverlay.drawCross(corner.getX(), corner.getY(),
-                                         POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
-                                         CORNER_POINT_COLOR);
-        }
-        //set pose&vision horizon
-        thresholdedOverlay.drawLine(poseHorizon.getLeftX(), poseHorizon.getLeftY(),
-                                    poseHorizon.getRightX(), poseHorizon.getRightY(),
-                                    POSE_HORIZON_THICKNESS, POSE_HORIZON_COLOR);
-        thresholdedOverlay.drawCross(thresholdedOverlay.getWidth()/2, visionHorizon,
-                                     POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
-                                     VISION_HORIZON_COLOR);*/
     }
 
     //load frame - loads data from a frame - we're interested in the raw image
@@ -313,7 +242,6 @@ public class VisionState {
     public ColorTable getColorTable() { return colorTable;  }
     public Ball getBall() { return ball; }
     public int getProcessTime() { return thresholdedImage.getVisionLink().getProcessTime();}
-    public boolean getDrawThreshColors(){ return drawThreshColors;}
 	public String getBallString() {
 		if (seeBall)
 			return "Yes";
@@ -369,5 +297,4 @@ public class VisionState {
     public void setThreshImage(ProcessedImage i) { thresholdedImage = i;  }
     public void setColorTable(ColorTable c) { colorTable = c; }
     public void setBall(Ball b) { ball = b;  }
-    public void setDrawThreshColors(boolean dr){ drawThreshColors = dr;}
 }

@@ -69,8 +69,8 @@ public class ProcessedImage extends ThresholdedImage {
                     joints[i++] = value;
                 }
             }else{
-                tool.CONSOLE.message("Warning: Processing image w/o " +
-                                     "joint info");
+                //tool.CONSOLE.message("Warning: Processing image w/o " +
+				//                   "joint info");
             }
 
             float[] sensors = new float[RobotDef.NAO_DEF.numSensors()];
@@ -83,8 +83,8 @@ public class ProcessedImage extends ThresholdedImage {
                 }
             }
             else {
-                tool.CONSOLE.message("Warning: Processing image w/o " +
-                                     "sensor info");
+                //tool.CONSOLE.message("Warning: Processing image w/o " +
+				//                   "sensor info");
             }
 
             // Convert the TOOLImage to the one-dimensional format that the C++

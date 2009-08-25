@@ -151,8 +151,6 @@ public class KeyPanel extends JPanel implements ItemListener {
 		visionRedRobot = new JTextField(learn.getRedRobotString());
 		visionBlueRobot = new JTextField(learn.getBlueRobotString());
 
-		add(human);
-		add(visionHuman);
 		add(ball);
 		add(visionBall);
 		add(blueGoal);
@@ -165,6 +163,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 		add(visionRedRobot);
 		add(blueRobots);
 		add(visionBlueRobot);
+		add(human);
+		add(visionHuman);
 
         setLayout(new GridLayout(7,2));
 	}

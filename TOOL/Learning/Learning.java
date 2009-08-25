@@ -447,7 +447,7 @@ public class Learning implements DataListener, MouseListener,
 
 			overlay.generateNewEdgeImage(rawImage);
 			selector.updateImage(rawImage);
-			visionState.update();
+			visionState.update(true);
 			visionState.updateObjects();
 
 			// retrieve the frame information
@@ -563,7 +563,7 @@ public class Learning implements DataListener, MouseListener,
 			if (current.getHumanChecked()) {
 				// we have good data, so let's process the frame
 				visionState.newFrame(d, tool.getColorTable());
-				visionState.update();
+				visionState.update(false);
 				visionState.updateObjects();
 				updateBallStats();
 				updateGoalStats();
@@ -609,7 +609,7 @@ public class Learning implements DataListener, MouseListener,
 						input.close();
 						for (Frame f : d) {
 							try {
-								d.load(f.index());
+								f.load();
 							} catch (TOOLException e) {
 								System.out.println("Couldn't load frame");
 							}
@@ -617,13 +617,18 @@ public class Learning implements DataListener, MouseListener,
 							if (current.getHumanChecked()) {
 								// we have good data, so let's process the frame
 								visionState.newFrame(f, tool.getColorTable());
-								visionState.update();
+								visionState.update(false);
 								visionState.updateObjects();
 								updateBallStats();
 								updateGoalStats();
 								updateCrossStats();
 								updateRobotStats();
 								framesProcessed++;
+							}
+							try {
+								f.unload();
+							} catch (TOOLException e) {
+								System.out.println("Problem unloading frame");
 							}
 						}
 					} catch (FileNotFoundException e) {
