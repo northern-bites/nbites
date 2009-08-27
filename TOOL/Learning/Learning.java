@@ -450,7 +450,7 @@ public class Learning implements DataListener, MouseListener,
 
 			overlay.generateNewEdgeImage(rawImage);
 			selector.updateImage(rawImage);
-			visionState.update(true);
+			visionState.update(false);
 			visionState.updateObjects();
 
 			// retrieve the frame information
@@ -593,6 +593,9 @@ public class Learning implements DataListener, MouseListener,
 		int framesProcessed = 0;
 		long t = System.currentTimeMillis();
 		String topPath = currentSet.path();
+		boolean screen = false;
+		screen = learnPanel.getOnlyBalls() || learnPanel.getOnlyGoals() ||
+			learnPanel.getOnlyCrosses() || learnPanel.getOnlyBots();
 		// We need to get rid of the current directory
 		int end = topPath.length() - 2;
 		for ( ; end > -1 && !topPath.substring(end, end+1).equals(System.getProperty("file.separator"));
@@ -622,7 +625,13 @@ public class Learning implements DataListener, MouseListener,
 							}
 							current = keys.getFrame(f.index());
 							curFrameIndex = f.index();
-							if (current.getHumanChecked()) {
+							if (current.getHumanChecked() &&
+								(!screen || (learnPanel.getOnlyBalls() && current.getBall()) ||
+								 (learnPanel.getOnlyGoals() && (current.getBlueGoal().getNumber() != 0 ||
+																current.getYellowGoal().getNumber() != 0)) ||
+								 (learnPanel.getOnlyCrosses() && current.getCross().getNumber() != 0) ||
+								 (learnPanel.getOnlyBots() && (current.getRedRobots() != 0 ||
+															current.getBlueRobots() != 0)))) {
 								// we have good data, so let's process the frame
 								visionState.newFrame(f, tool.getColorTable());
 								visionState.update(false);

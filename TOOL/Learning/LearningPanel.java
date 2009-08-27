@@ -58,9 +58,10 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
     private Learning learn;
 
-	private JPanel logs;
+	private JPanel logs, screen;
 	private JCheckBox falseGoals, falseCrosses, falseBalls;
 	private JCheckBox missedGoals, missedCrosses, missedBalls;
+	private JCheckBox onlyBalls, onlyGoals, onlyCrosses, onlyBots;
 
 
 	/**  Constructor.  Sets up panel and listeners.
@@ -91,19 +92,18 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		logs.add(missedCrosses);
 		logs.add(missedBalls);
 
+		// checkboxes for screening frames - e.g. only give me frames with goals
+		screen = new JPanel();
+		screen.setLayout(new GridLayout(2, 2));
+		onlyGoals = new JCheckBox("Need Goals");
+		onlyCrosses = new JCheckBox("Need Cross");
+		onlyBalls = new JCheckBox("Need Ball");
+		onlyBots = new JCheckBox("Need Bots");
+		screen.add(onlyBalls);
+		screen.add(onlyGoals);
+		screen.add(onlyCrosses);
+		screen.add(onlyBots);
 
-        // centering text from http://forum.java.sun.com/thread.jspa?threadID=166685&messageID=504493
-        feedback = new JTextPane();
-        // Make the text centered
-        SimpleAttributeSet set = new SimpleAttributeSet();
-        StyledDocument doc = feedback.getStyledDocument();
-        StyleConstants.setAlignment(set,StyleConstants.ALIGN_CENTER);
-        feedback.setParagraphAttributes(set,true);
-
-        feedback.setEditable(false);
-        feedback.setText("Welcome to TOOL 1.0");
-        // Make the background match in color
-        feedback.setBackground(this.getBackground());
 
         prevImage = new JButton("Previous (S)");
         prevImage.setFocusable(false);
@@ -147,6 +147,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         navigation.setMinimumSize(navigationSize);
         navigation.setPreferredSize(navigationSize);
         navigation.setMaximumSize(navigationSize);
+		add(screen);
         add(navigation);
 		add(logs);
     }
@@ -261,6 +262,31 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		return missedCrosses.isSelected();
 	}
 
+	/* return true    if screening all but balls
+	 */
+	public boolean getOnlyBalls() {
+		return onlyBalls.isSelected();
+	}
+
+	/* return true    if screening all but goals
+	 */
+	public boolean getOnlyGoals() {
+		return onlyGoals.isSelected();
+	}
+
+	/* return true    if screening all but crosses
+	 */
+	public boolean getOnlyCrosses() {
+		return onlyCrosses.isSelected();
+	}
+
+	/* return true    if screening all but robots
+	 */
+	public boolean getOnlyBots() {
+		return onlyBots.isSelected();
+	}
+
+
     /**
      * Greys out buttons depending on whether we can actually use them at this
      * moment;
@@ -277,14 +303,13 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		@param text   the new feedback message
 	 */
     public void setText(String text) {
-        feedback.setText(text);
     }
 
 	/** Returns the current feedback message
 		@return  the feedback string
 	 */
     public String getText() {
-		return feedback.getText();
+		return "Yo!";
     }
 
 
