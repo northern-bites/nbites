@@ -20,10 +20,13 @@ package TOOL.Data.File;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Vector;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
 
 import TOOL.TOOLException;
 import TOOL.Data.AbstractDataSet;
@@ -68,8 +71,11 @@ public class FileSet extends AbstractDataSet {
         if (!fpath.exists())
             fpath.mkdir();
 
-        for (File f : fpath.listFiles(FrameLoader.FILTER))
-            frms.add(f);
+        for (File f : fpath.listFiles(FrameLoader.FILTER)) {
+			if (!f.getPath().toUpperCase().endsWith("KEY")) {
+				frms.add(f);
+			}
+		}
 
         Collections.sort(frms, FileComparator.NumericalOrder_F);
 
