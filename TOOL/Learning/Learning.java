@@ -148,6 +148,9 @@ public class Learning implements DataListener, MouseListener,
 	private int missedYellow, missedRed;       // ditto
 	private int missedBlueRobot;               // ditto
 
+	private String curFrame;                   // current frame of batch job
+	private int    curFrameIndex;              // index
+
 	/** Constructor.  Makes the panels and sets up the listeners.
 	 * @param t     the parent TOOL class
 	 */
@@ -553,6 +556,7 @@ public class Learning implements DataListener, MouseListener,
 		quietMode = true;
 		int framesProcessed = 0;
 		long t = System.currentTimeMillis();
+		curFrame = currentSet.path();
 		for (Frame d : currentSet) {
 			try {
 				currentSet.load(d.index());
@@ -560,6 +564,7 @@ public class Learning implements DataListener, MouseListener,
 				System.out.println("Couldn't load frame");
 			}
 			current = keys.getFrame(d.index());
+			curFrameIndex = d.index();
 			if (current.getHumanChecked()) {
 				// we have good data, so let's process the frame
 				visionState.newFrame(d, tool.getColorTable());
@@ -601,10 +606,12 @@ public class Learning implements DataListener, MouseListener,
 			for (DataSet d : dataList) {
 				if (d.path().startsWith(topPath)) {
 					// we have a target data set
+					curFrame = d.path();
 					String keyName = d.path()+"KEY.KEY";
 					// See if the key exists.
 					try {
 						FileInputStream input = new FileInputStream(keyName);
+						keys.clear();
 						keys.mergeFrom(input);
 						input.close();
 						for (Frame f : d) {
@@ -614,6 +621,7 @@ public class Learning implements DataListener, MouseListener,
 								System.out.println("Couldn't load frame");
 							}
 							current = keys.getFrame(f.index());
+							curFrameIndex = f.index();
 							if (current.getHumanChecked()) {
 								// we have good data, so let's process the frame
 								visionState.newFrame(f, tool.getColorTable());
@@ -673,12 +681,17 @@ public class Learning implements DataListener, MouseListener,
 	 */
 	public void updateBallStats() {
 		if (current.getBall()) {
-			if (visionState.getBallVision())
+			if (visionState.getBallVision()) {
 				goodBall++;
-			else
+			}else {
 				missedBall++;
+				if (learnPanel.getMissedBalls())
+					System.out.println("Missed ball in "+curFrame+" frame "+curFrameIndex);
+			}
 		} else if (visionState.getBallVision()) {
 			badBall++;
+			if (learnPanel.getFalseBalls())
+				System.out.println("False ball in "+curFrame+" frame "+curFrameIndex);
 		}
 	}
 
@@ -692,26 +705,56 @@ public class Learning implements DataListener, MouseListener,
 					case LEFT:
 					case RIGHT:
 					case UNSURE:
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
 						badBlue++; break;
 					case BOTH: badBlue += 2;
+						if (learnPanel.getFalseGoals())
+							System.out.println("Two False Goal Posts in "+curFrame+
+											   " frame "+curFrameIndex);
 					}
 					break;
 				case LEFT:
 					switch (visionState.getBlueGoalVision()) {
-					case NO_POST: missedBlue++; break;
+					case NO_POST: missedBlue++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case LEFT: goodBlue++; break;
-					case RIGHT: badBlue++; break;
+					case RIGHT: badBlue++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case UNSURE: okBlue++; break;
-					case BOTH: badBlue++; break;
+					case BOTH: badBlue++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					}
 					break;
 				case RIGHT:
 					switch (visionState.getBlueGoalVision()) {
-					case NO_POST: missedBlue++;break;
-					case LEFT: badBlue++; break;
+					case NO_POST: missedBlue++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case LEFT: badBlue++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case RIGHT: goodBlue++; break;
 					case UNSURE: okBlue++; break;
-					case BOTH: badBlue++; break;
+					case BOTH: badBlue++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					}
 					break;
 				case BOTH:
@@ -725,11 +768,19 @@ public class Learning implements DataListener, MouseListener,
 					break;
 				case UNSURE:
 					switch (visionState.getBlueGoalVision()) {
-					case NO_POST: missedBlue++; break;
+					case NO_POST: missedBlue++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case LEFT: okBlue++; break;
 					case RIGHT: okBlue++; break;
 					case UNSURE: goodBlue++; break;
-					case BOTH: badBlue++; okBlue++; break;
+					case BOTH: badBlue++; okBlue++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					}
 					break;
 				}
@@ -740,44 +791,99 @@ public class Learning implements DataListener, MouseListener,
 					case LEFT:
 					case RIGHT:
 					case UNSURE:
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
 						badYellow++; break;
-					case BOTH: badYellow += 2;
+					case BOTH:
+						if (learnPanel.getFalseGoals())
+							System.out.println("Two False Goal Posts in "+curFrame+
+											   " frame "+curFrameIndex);
+						badYellow += 2;
 					}
 					break;
 				case LEFT:
 					switch (visionState.getYellowGoalVision()) {
-					case NO_POST: missedYellow++; break;
+					case NO_POST: missedYellow++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case LEFT: goodYellow++; break;
-					case RIGHT: badYellow++; break;
+					case RIGHT: badYellow++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case UNSURE: okYellow++; break;
-					case BOTH: badYellow++; break;
+					case BOTH: badYellow++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					}
 					break;
 				case RIGHT:
 					switch (visionState.getYellowGoalVision()) {
-					case NO_POST: missedYellow++;break;
-					case LEFT: badYellow++; break;
+					case NO_POST: missedYellow++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case LEFT: badYellow++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case RIGHT: goodYellow++; break;
 					case UNSURE: okYellow++; break;
-					case BOTH: badYellow++; break;
+					case BOTH: badYellow++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					}
 					break;
 				case BOTH:
 					switch (visionState.getYellowGoalVision()) {
-					case NO_POST: missedYellow += 2; break;
-					case LEFT: missedYellow++; break;
-					case RIGHT: missedYellow++; break;
-					case UNSURE: missedYellow++; okYellow++; break;
+					case NO_POST: missedYellow += 2;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed two Goal Posts in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case LEFT: missedYellow++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case RIGHT: missedYellow++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case UNSURE: missedYellow++; okYellow++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case BOTH: goodYellow+= 2; break;
 					}
 					break;
 				case UNSURE:
 					switch (visionState.getYellowGoalVision()) {
-					case NO_POST: missedYellow++; break;
+					case NO_POST: missedYellow++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					case LEFT: okYellow++; break;
 					case RIGHT: okYellow++; break;
 					case UNSURE: goodYellow++; break;
-					case BOTH: badYellow++; okYellow++; break;
+					case BOTH: badYellow++; okYellow++;
+						if (learnPanel.getFalseGoals())
+							System.out.println("False Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
 					}
 					break;
 				}
@@ -793,29 +899,53 @@ public class Learning implements DataListener, MouseListener,
 			case BLUE:
 			case YELLOW:
 			case UNKNOWN:
-				badCross++; break;
-			case DOUBLE_CROSS: badCross+=2; break;
+				badCross++;
+				if (learnPanel.getFalseCrosses())
+					System.out.println("False Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
+			case DOUBLE_CROSS: badCross+=2;
+				if (learnPanel.getFalseCrosses())
+					System.out.println("Two False Crosses in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
 			}
 			break;
 		case BLUE:
 		case YELLOW:
 		case UNKNOWN:
 			switch (visionState.getCrossVision()) {
-			case NO_CROSS: missedCross++; break;
+			case NO_CROSS: missedCross++;
+				if (learnPanel.getMissedCrosses())
+					System.out.println("Missed Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
 			case BLUE:
 			case YELLOW:
 			case UNKNOWN:
 				goodCross++; break;
-			case DOUBLE_CROSS: badCross++; goodCross++; break;
+			case DOUBLE_CROSS: badCross++; goodCross++;
+				if (learnPanel.getFalseCrosses())
+					System.out.println("False Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
 			}
 			break;
 		case DOUBLE_CROSS:
 			switch (visionState.getCrossVision()) {
-			case NO_CROSS: missedCross+=2; break;
+			case NO_CROSS: missedCross+=2;
+				if (learnPanel.getMissedCrosses())
+					System.out.println("Two Missed Crosses in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
 			case BLUE:
 			case YELLOW:
 			case UNKNOWN:
-				missedCross++; break;
+				missedCross++;
+				if (learnPanel.getMissedCrosses())
+					System.out.println("Missed Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
 			case DOUBLE_CROSS: goodCross+=2; break;
 			}
 		}

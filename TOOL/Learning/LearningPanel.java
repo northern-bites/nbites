@@ -58,6 +58,10 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
     private Learning learn;
 
+	private JPanel logs;
+	private JCheckBox falseGoals, falseCrosses, falseBalls;
+	private JCheckBox missedGoals, missedCrosses, missedBalls;
+
 
 	/**  Constructor.  Sets up panel and listeners.
 	 */
@@ -71,6 +75,22 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 	/** Puts on all of the buttons and formats things.
 	 */
     private void setupWindow() {
+		logs = new JPanel();
+		logs.setLayout(new GridLayout(2, 3));
+		falseGoals = new JCheckBox("False Goals");
+		falseCrosses = new JCheckBox("False Cross");
+		falseBalls = new JCheckBox("False Balls");
+
+		missedGoals = new JCheckBox("Missed Goals");
+		missedCrosses = new JCheckBox("Missed Crosses");
+		missedBalls = new JCheckBox("Missed Balls");
+		logs.add(falseGoals);
+		logs.add(falseCrosses);
+		logs.add(falseBalls);
+		logs.add(missedGoals);
+		logs.add(missedCrosses);
+		logs.add(missedBalls);
+
 
         // centering text from http://forum.java.sun.com/thread.jspa?threadID=166685&messageID=504493
         feedback = new JTextPane();
@@ -128,6 +148,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         navigation.setPreferredSize(navigationSize);
         navigation.setMaximumSize(navigationSize);
         add(navigation);
+		add(logs);
     }
 
 
@@ -203,6 +224,42 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
             });
 
     }
+
+	/* return true    if false ball logging has been checked
+	 */
+	public boolean getFalseBalls() {
+		return falseBalls.isSelected();
+	}
+
+	/* return true    if false goal logging has been checked
+	 */
+	public boolean getFalseGoals() {
+		return falseGoals.isSelected();
+	}
+
+	/* return true    if false cross logging has been checked
+	 */
+	public boolean getFalseCrosses() {
+		return falseCrosses.isSelected();
+	}
+
+	/* return true    if missed ball logging has been checked
+	 */
+	public boolean getMissedBalls() {
+		return missedBalls.isSelected();
+	}
+
+	/* return true    if missed goal logging has been checked
+	 */
+	public boolean getMissedGoals() {
+		return missedGoals.isSelected();
+	}
+
+	/* return true    if missed cross logging has been checked
+	 */
+	public boolean getMissedCrosses() {
+		return missedCrosses.isSelected();
+	}
 
     /**
      * Greys out buttons depending on whether we can actually use them at this
