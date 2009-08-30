@@ -24,7 +24,7 @@ from . import TeamConfig
 from . import Leds
 # Packages and modules from sub-directories
 from . import robots
-from .playbook import GoTeam
+from .playbook import PBInterface
 from .players import Switch
 
 import _roboguardian
@@ -88,7 +88,7 @@ class Brain(object):
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
-        self.playbook = GoTeam.GoTeam(self)
+        self.playbook = PBInterface.PBInterface(self)
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
@@ -249,9 +249,8 @@ class Brain(object):
                           self.loc.ballXUncert,
                           self.loc.ballYUncert,
                           self.ball.dist,
-                          self.playbook.role,
-                          self.playbook.currentSubRole,
-                          self.playbook.determineChaseTime(),
+                          self.playbook.getPlay(),
+                          self.playbook.pb.me.chaseTime,
                           self.loc.ballVelX,
                           self.loc.ballVelY)
 

@@ -3,6 +3,7 @@ from math import (hypot, degrees)
 
 from .. import NogginConstants
 from . import PBConstants
+from . import Play
 from ..util import MyMath
 import time
 
@@ -24,8 +25,7 @@ class Teammate:
         self.ballUncertX = 0
         self.ballUncertY = 0
         self.ballDist = 0
-        self.role = PBConstants.INIT_ROLE
-        self.subRole = PBConstants.INIT_SUB_ROLE
+        self.play = Play.Play()
         self.chaseTime = 0
         self.lastPacketTime = time.time()
 
@@ -57,8 +57,7 @@ class Teammate:
         self.ballUncertX = packet.ballUncertX
         self.ballUncertY = packet.ballUncertY
         self.ballDist = packet.ballDist
-        self.role = packet.role
-        self.subRole = packet.subRole
+        self.play = packet.play
         self.chaseTime = packet.chaseTime
 
         # calculates ball localization distance, bearing
@@ -99,8 +98,7 @@ class Teammate:
         self.ballUncertX = ball.uncertX
         self.ballUncertY = ball.uncertY
         self.ballDist = ball.dist
-        self.role = self.brain.playbook.role
-        self.subRole = self.brain.playbook.subRole
+        self.play = self.brain.playbook.getPlay()
         self.chaseTime = self.brain.playbook.determineChaseTime()
 
         self.ballLocDist = ball.locDist
@@ -127,8 +125,7 @@ class Teammate:
         self.ballUncertX = 0
         self.ballUncertY = 0
         self.ballDist = 0
-        self.role = None # known role
-        self.subRole = None
+        self.play = Play.Play()
         self.ballLocDist = 0
         self.ballLocBearing = 0
         self.active = False
@@ -170,13 +167,25 @@ class Teammate:
         return (self.dribbling or self.grabbing)
 
     def isChaser(self):
-        return (self.role == PBConstants.CHASER)
+        return (self.play.getRole() == PBConstants.CHASER)
 
     def isDefender(self):
-        return (self.role == PBConstants.DEFENDER)
+        return (self.play.getRole() == PBConstants.DEFENDER)
+
+    def isMiddie(self):
+        return (self.play.getRole() == PBConstants.MIDDIE)
 
     def isGoalie(self):
-        return self.playerNumber == PBConstants.GOALIE_NUMBER
+        return (self.play.getRole() == PBConstants.GOALIE)
+
+    def isDefaultGoalie(self):
+        return (self.playerNumber == PBConstants.DEFAULT_GOALIE_NUMBER)
+
+    def isDefaultChaser(self):
+        return (self.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER)
+
+    def isDefaultDefender(self):
+        return (self.playerNumber == PBConstants.DEFAULT_DEFENDER_NUMBER)
 
     def isPenalized(self):
         '''

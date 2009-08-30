@@ -2,9 +2,10 @@ from math import (fabs, hypot, cos, sin, acos, asin)
 from ..util.MyMath import safe_atan2
 
 
-from . import PBDefs
+from . import Teammate
 from . import PBConstants
 from . import Strategies
+from . import Play
 from .. import NogginConstants
 import time
 
@@ -28,52 +29,14 @@ class GoTeam:
         self.printStateChanges = True
 
         self.time = time.time()
-        # Info about all of our states
-        # Strategies
-        self.currentStrategy = PBConstants.S_INIT
-        self.lastStrategy = PBConstants.S_INIT
-        self.lastDiffStrategy = PBConstants.S_INIT
-        self.strategyCounter = 0
-        self.strategyStartTime = 0
-        self.strategyTime = 0
 
-        # Formations
-        self.currentFormation = PBConstants.INIT_FORMATION
-        self.lastFormation = PBConstants.INIT_FORMATION
-        self.lastDiffFormation = PBConstants.INIT_FORMATION
-        self.formationCounter = 0
-        self.formationStartTime = 0
-        self.formationTime = 0
-
-        # Roles
-        self.currentRole = PBConstants.INIT_ROLE
-        self.lastRole = PBConstants.INIT_ROLE
-        self.lastDiffRole = PBConstants.INIT_ROLE
-        self.roleCounter = 0
-        self.roleStartTime = 0
-        self.roleTime = 0
-
-        # SubRoles
-        self.currentSubRole = PBConstants.INIT_SUB_ROLE
-        self.lastSubRole = PBConstants.INIT_SUB_ROLE
-        self.lastDiffSubRole = PBConstants.INIT_SUB_ROLE
-        self.subRoleCounter = 0
-        self.subRoleStartTime = 0
-        self.subRoleTime = 0
-
-        self.subRoleOnDeck = PBConstants.INIT_SUB_ROLE
-        self.lastSubRoleOnDeck = PBConstants.INIT_SUB_ROLE
-        self.subRoleOnDeckCount = 0
-
-        self.subRole = self.currentSubRole
-        self.role = self.currentRole
-        self.formation = self.currentFormation
-        self.strategy = self.currentStrategy
+        self.play = Play.Play()
+        self.lastPlay = Play.Play()
 
         # Information about teammates
         self.teammates = []
         for i in xrange(PBConstants.NUM_TEAM_PLAYERS):
-            mate = PBDefs.Teammate(brain)
+            mate = Teammate.Teammate(brain)
             mate.playerNumber = i + 1
             self.teammates.append(mate)
 
@@ -96,54 +59,57 @@ class GoTeam:
         """
         if self.brain.gameController.currentState != 'gamePenalized':
             self.aPrioriTeammateUpdate()
-        # We will always return a strategy
-        self.currentStrategy, self.currentFormation, self.currentRole, \
-            self.currentSubRole, self.position = self.strategize()
+        self.workingPlay = self.strategize()
         # Update all of our new infos
         self.updateStateInfo()
 
     def strategize(self):
         """
-        Picks the strategy to run and returns all sorts of infos
+        creates a play, picks the strategy to run, returns the play after
+        it is modified by Strategies
         """
+        newPlay = Play.Play()
         # We don't control anything in initial or finished
         if self.brain.gameController.currentState == 'gameInitial' or\
             self.brain.gameController.currentState == 'gameFinished':
-            return (PBConstants.S_INIT, PBConstants.INIT_FORMATION, PBConstants.INIT_ROLE,
-                    PBConstants.INIT_SUB_ROLE, [0,0] )
+            #a new play is always initialized to INIT values so there is no need
+            #to change them here
+            pass
 
         # Have a separate strategy to easily deal with being penalized
         elif self.brain.gameController.currentState == 'gamePenalized':
-            return (PBConstants.S_INIT, PBConstants.PENALTY_FORMATION,
-                    PBConstants.PENALTY_ROLE,
-                    PBConstants.PENALTY_SUB_ROLE, [0,0] )
+            newPlay.setFormation(PBConstants.PENALTY_FORMATION)
+            newPlay.setRole(PBConstants.PENALTY_ROLE)
+            newPlay.setSubRole(PBConstants.PENALTY_SUB_ROLE)
 
         # Check for testing stuff
         elif PBConstants.TEST_DEFENDER:
-            return Strategies.sTestDefender(self)
+            Strategies.sTestDefender(self, newPlay)
         elif PBConstants.TEST_OFFENDER:
-            return Strategies.sTestOffender(self)
+            Strategies.sTestOffender(self, newPlay)
         elif PBConstants.TEST_CHASER:
-            return Strategies.sTestChaser(self)
+            Strategies.sTestChaser(self, newPlay)
 
         # Have a separate ready section to make things simpler
         elif (self.brain.gameController.currentState == 'gameReady' or
               self.brain.gameController.currentState =='gameSet'):
-            return Strategies.sReady(self)
+            Strategies.sReady(self, newPlay)
 
         # Now we look at game strategies
         elif self.numActiveFieldPlayers == 0:
-            return Strategies.sNoFieldPlayers(self)
+            Strategies.sNoFieldPlayers(self, newPlay)
         elif self.numActiveFieldPlayers == 1:
-            return Strategies.sOneField(self)
+            Strategies.sOneField(self, newPlay)
 
         # This is the important area, what is usually used during play
         elif self.numActiveFieldPlayers == 2:
-            return Strategies.sWin(self)
+            Strategies.sWin(self, newPlay)
 
         # This can only be used right now if the goalie is pulled
         elif self.numActiveFieldPlayers == 3:
-            return Strategies.sThreeField(self)
+            Strategies.sThreeField(self, newPlay)
+
+        return newPlay
 
     def updateStateInfo(self):
         """
@@ -151,92 +117,12 @@ class GoTeam:
         """
         # Update our counters!
         # Update Strategy Memory
-        if self.lastStrategy != self.currentStrategy:
+        self.lastPlay = self.play
+        self.play = self.workingPlay
+
+        if self.lastPlay != self.play:
             if self.printStateChanges:
-                self.printf("Strategy switched to "+
-                            PBConstants.STRATEGIES[self.currentStrategy])
-            self.strategyCounter = 0
-            self.lastDiffStrategy = self.lastStrategy
-            self.strategyStartTime = self.time
-            self.strategyTime = 0
-        else:
-            self.strategyCounter += 1
-            self.strategyTime = self.time - self.strategyStartTime
-
-        # Update Formations memory
-        if self.lastFormation != self.currentFormation:
-            if self.printStateChanges:
-                self.printf("Formation switched to "+
-                            PBConstants.FORMATIONS[self.currentFormation])
-            self.formationCounter = 0
-            self.lastDiffFormation = self.lastFormation
-            self.formationStartTime = self.time
-            self.formationTime = 0
-        else:
-            self.formationCounter += 1
-            self.formationTime = self.time - self.formationStartTime
-
-        # Update memory of roles
-        if self.lastRole != self.currentRole:
-            if self.printStateChanges:
-                self.printf("Role switched to "+
-                            PBConstants.ROLES[self.currentRole])
-            self.roleCounter = 0
-            self.lastDiffRole = self.lastRole
-            self.roleStartTime = self.time
-            self.roleTime = 0
-            self.subRoleOnDeck = self.currentSubRole
-            self.subRoleOnDeckCounter = 0
-        else:
-            self.roleCounter += 1
-            self.roleTime = self.time - self.roleStartTime
-
-        # We buffer the subRole switching by making sure that a subrole is
-        # returned for multiple frames in a row
-        if (self.subRoleOnDeck and
-            self.subRoleOnDeck != self.currentSubRole):
-            # if the sub role on deck is the same as the last, increment
-            if self.subRoleOnDeck == self.lastSubRoleOnDeck:
-                self.subRoleOnDeckCounter += 1
-            # otherwise our idea of subRole has changed, null counter
-            else:
-                self.subRoleOnDeckCounter = 0
-
-            # if we are sure that we want to switch into this sub role
-            if (self.subRoleOnDeckCounter >
-                PBConstants.SUB_ROLE_SWITCH_BUFFER):
-                #self.currentSubRole = self.subRoleOnDeck
-                self.subRoleOnDeckCounter = 0
-
-        # SubRoles
-        if self.lastSubRole != self.currentSubRole:
-            if self.printStateChanges:
-                try:
-                    self.printf("SubRole switched to "+
-                                PBConstants.SUB_ROLES[self.currentSubRole])
-                except:
-                    raise ValueError("Incorrect currentSubRole:" +
-                                     str(self.currentSubRole))
-            self.roleCounter = 0
-            self.lastDiffSubRole = self.lastSubRole
-            self.subRoleStartTime = self.time
-            self.subRoleTime = 0
-        else:
-            self.subRoleCounter += 1
-            self.subRoleTime = self.time - self.subRoleStartTime
-
-        # Get ready for the next frame
-        self.lastStrategy = self.currentStrategy
-        self.lastFormation = self.currentFormation
-        self.lastRole = self.currentRole
-        self.lastSubRole = self.currentSubRole
-        self.lastSubRoleOnDeck = self.subRoleOnDeck
-
-        # Robots are funnnn.... :(
-        self.strategy = self.currentStrategy
-        self.formation = self.currentFormation
-        self.role = self.currentRole
-        self.subRole = self.currentSubRole
+                self.printf("Play switched to " + self.play)
 
     ######################################################
     ############       Role Switching Stuff     ##########
@@ -320,7 +206,7 @@ class GoTeam:
 
     def getLeastWeightPosition(self,positions, mates = None):
         """
-        Gets the position for the dog such that the distance all dogs have
+        Gets the position for the robot such that the distance all robot have
         to move is the least possible
         """
         # if there is only one position return the position
@@ -370,7 +256,7 @@ class GoTeam:
 
         self.numActiveFieldPlayers = 0
         for mate in self.teammates:
-            if (mate.isPenalized() or mate.isDead()): #
+            if (mate.isPenalized() or mate.isDead()):
                 #reset to false when we get a new packet from mate
                 mate.active = False
             elif (mate.active and (not mate.isGoalie()
@@ -409,18 +295,6 @@ class GoTeam:
     ######################################################
     ############   Strategy Decision Stuff     ###########
     ######################################################
-    def shouldUseDubD(self):
-        if not PBConstants.USE_DUB_D:
-            return False
-        return (
-            (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-             self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-             self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-            (self.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-             self.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-             self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-             self.teammates[0].role == PBConstants.CHASER)
-            )
 
     def ballInMyGoalBox(self):
         '''
@@ -431,32 +305,6 @@ class GoTeam:
         return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
                 self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
                 self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
-
-    def getPointBetweenBallAndGoal(self,dist_from_ball):
-        '''returns defensive position between ball (x,y) and goal (x,y)
-        at <dist_from_ball> centimeters away from ball'''
-        delta_y = self.brain.ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
-
-        delta_x = self.brain.ball.x - NogginConstants.MY_GOALBOX_LEFT_X
-
-        # don't divide by 0
-        if delta_x == 0:
-            delta_x = 0.1
-        if delta_y == 0:
-            delta_y = 0.1
-
-        pos_x = self.brain.ball.x - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_x
-        pos_y = self.brain.ball.y - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_y
-        if pos_x > PBConstants.STOPPER_MAX_X:
-            pos_x = PBConstants.STOPPER_MAX_X
-
-            pos_y = (NogginConstants.MY_GOALBOX_MIDDLE_Y + delta_x / delta_y *
-                     (PBConstants.STOPPER_MAX_X -
-                      NogginConstants.MY_GOALBOX_LEFT_X))
-
-        return pos_x,pos_y
 
     def goalieShouldChase(self):
         return self.noCalledChaser()
@@ -509,24 +357,6 @@ class GoTeam:
         else:
             self.brain.out.printf(str(outputString))
 
-    def getBehindBallPosition(self):
-        """
-        Returns a position between the ball and own goal
-        """
-        dist_from_ball = 30
-
-        ball = self.brain.ball
-
-        delta_y = ball.y - NogginConstants.OPP_GOALBOX_MIDDLE_Y
-        delta_x = ball.x - NogginConstants.OPP_GOALBOX_LEFT_X
-
-        pos_x = ball.x - (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_x
-        pos_y = ball.y + (dist_from_ball/
-                                     hypot(delta_x,delta_y))*delta_y
-        heading = -safe_atan2(delta_y,delta_x)
-
-        return pos_x,pos_y,heading
 
     def determineChaseTime(self, useZone = False):
         """

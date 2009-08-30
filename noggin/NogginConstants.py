@@ -12,7 +12,7 @@ USE_VISION = True # Disable if you want faster processing
 
 ##--------------------COM HEADER -------------#
 PACKET_HEADER = "ilikeyoulots"
-NUM_PACKET_ELEMENTS = 19
+NUM_PACKET_ELEMENTS = 18
 ##
 ##--------------------WALK TIME CONSTANTS -------------#
 ##
@@ -143,8 +143,8 @@ else:
     GOALBOX_DEPTH = 65.
     GOALBOX_WIDTH = 305.
 
-MIDFIELD_X = FIELD_GREEN_WIDTH / 2.
-MIDFIELD_Y = FIELD_GREEN_HEIGHT / 2.
+MIDFIELD_X = CENTER_FIELD_X
+MIDFIELD_Y = CENTER_FIELD_Y
 
 # my goal box constants relative to (0,0) on my team
 MY_GOALBOX_LEFT_X = GREEN_PAD_X
