@@ -1,7 +1,5 @@
 /**
  * BallEKF.h - Header file for the BallEKF class
- * All coordinates in C++ are in the local coordinate frame
- * We convert to the global frame when dealing with python
  *
  * @author Tucker Hermans
  */
@@ -17,7 +15,7 @@
 #include "NogginStructs.h"
 
 /**
- * Class for tracking of ball position and velocity.  Extends the abstract
+ * @brief Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
 class BallEKF : public EKF<RangeBearingMeasurement, MotionModel,

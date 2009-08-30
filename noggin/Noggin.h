@@ -18,6 +18,12 @@
 
 //#define LOG_LOCALIZATION
 
+/**
+ *
+ * @brief Class to control the main thread function of all reasoning and
+ * planning components of the robot.
+ */
+
 class Noggin
 {
 public:

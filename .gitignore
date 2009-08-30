@@ -30,3 +30,10 @@ noggin/util/fakeData/*
 /noggin/players/TAGS
 /noggin/util/TAGS
 /noggin/offline/convertRobotLog
+/motion/README.dvi
+/motion/README.out
+/motion/README.aux
+/motion/README.log
+/motion/README.toc
+/motion/README.pdf
+docs*

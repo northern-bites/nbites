@@ -484,6 +484,7 @@ void LocEKF::limitPosteriorUncert()
 
 /**
  * Method to use the estimate ellipse to intelligently clip the pose estimate
+ * of the robot using the information of the uncertainty ellipse.
  */
 void LocEKF::clipRobotPose()
 {
@@ -517,6 +518,10 @@ void LocEKF::clipRobotPose()
     }
 }
 
+
+
+// THIS METHOD IS NOT CURRENTLY BEING USED NOR HAS IT BEEN ADEQUATELY TESTED
+// CONSULT NUbots Team Report 2006 FOR MORE INFORMATION
 /**
  * Detect if we are in a deadzone and apply the correct changes to keep the pose
  * estimate from drifting

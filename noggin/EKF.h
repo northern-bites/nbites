@@ -1,5 +1,5 @@
 /**
- * EKF.h - Header file for the EKF class
+ * EKF.h - Implementation of the abstract EKF class
  *
  * @author Tucker Hermans
  */
@@ -15,7 +15,7 @@
 #include "NBMath.h"
 #include <boost/numeric/ublas/io.hpp> // for cout
 
-// Default parameters
+// Default uncertainty growth parameters
 #define DEFAULT_BETA 3.0f
 #define DEFAULT_GAMMA 2.0f
 
@@ -35,8 +35,8 @@ static const int ZMP_NUM_DIMENSIONS = 2;
 static const int ZMP_NUM_MEASUREMENTS = 2;
 static const float DONT_PROCESS_KEY = -1337.0f;
 /**
- * EKF - An abstract class which implements the computational components of
- *       an Extended Kalman Filter.
+ * @brief An abstract class which implements the computational components of
+ * an Extended Kalman Filter.
  *
  * @date August 2008
  * @author Tucker Hermans

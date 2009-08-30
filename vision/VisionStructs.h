@@ -1,6 +1,8 @@
 #ifndef VisionStructs_h_defined
 #define VisionStructs_h_defined
 
+#include "Structs.h"
+
 // a blob structure that holds information about its own location, and
 // information involving its larger blob structure
 struct blob {

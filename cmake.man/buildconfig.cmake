@@ -118,7 +118,7 @@ OPTION(
   )
 OPTION( USING_LAB_FIELD
   "Set field constants to use the lab field constants"
-  OFF
+  ON
   )
 
 

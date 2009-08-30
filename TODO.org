@@ -1,7 +1,6 @@
 * CURRENT BUGS & ISSUES
 
 ** Motion
-
 *** TODO Gait switching interface
     Needs to be moved into more sensible location in Python and its interface needs to be rethought. How we do it now is unsustainable and bug-inviting. Possible gait FSA?
 
@@ -38,23 +37,64 @@
    4. Integrate previous components into behaviors
 
 ** Motion
-
+*** TODO Double check the MOTION TIME STEP
+    so we can make the switch to 10ms timesteps
 *** Walking
-
+**** TODO Navigator refuses Step commands
+     when the walk is already active.
+**** TODO Move each gait into a separte file
+     All gaits get separate file, in a folder called motiuon/gaits
 **** TODO Better Webots gait
 
+**** TODO Fix factor of 2 in straffing
 **** TODO Faster stopping
-
-**** TODO Movable steps
-
-**** TODO ZMP recalculated after each frame depending on new steps
-
+     Decouple Step creation and ZMP generation
 **** TODO Walking interface to Python to move a certain distance & angle
 
 **** TODO Fix/Dehack how walk engine does turning steps
 
 **** TODO Make hip offsets variable, so we can widen stance of robot
 
+**** TODO Rearchitecutre Walking (see details)
+***** TODO Move more complexity out of step generator
+      And into Controller/WalkingLeg, and make Step Gen really just a glorified list
+***** TODO Movable steps
+
+***** TODO ZMP recalculated after each frame depending on new steps
+
+***** TODO Decouple ZMP and Step creation
+      Should be solved also if ZMP is constantly recalculated
+***** TODO Steamline cycloid calculation
+      Put cycloids and trapezoids in own class and only compute once
+***** TODO Consolidate FinalizeJoints
+      Ensure that nothing identical is calculated twice
+***** TODO See if STRAFE ZMP and L/R ZMP OFF can be merged
+      once the stance width actually works
+**** TODO Figure out a better way to use angleXY as sensor feedback
+**** TODO Clean out MotionInterface of unused functions
+**** TODO Figure out how to move each provider into its own directory
+     This probably requires a motion/include folder, and potentially
+     some virtual class to protect  other modules from including too
+     many headers from inside motion
+**** TODO DeHack the fake typing that exists inside MotionCommand.h
+     The enum of Command types needs to go. Maybe replace with a static
+     pointer to the associated Provider?
+**** TODO Determine if the PyXXCommand wrappers could be removed entirely
+     We might be able to totally remove the PyWrapper classes and just
+     use boost to wrap the actual command classes directly
+**** TODO Replace all pointers in PYXXCommands with boost pointers
+     This would allow only creating those commands once in Python. Otherwise
+     if the command is sent twice, a deleted pointer will get deleted again.
+**** TODO Investigate if Python could be fixing mutexes
+     Currently, if a walk command is sent, the python thread
+     must wait until all the walking processing is finished before it is able
+     to set the next command.  The walk provider should run pretty fast,  but
+     it doesnt run instantaneously. This may not be a huge issue also because
+     WalkCommands are only sent once a frame from python. A better solution
+     might be to keep a list of waiting commands, and only lock the provider
+     mutexes when the Switchboard is signaled.
+**** TODO Remove the MOTION_DEBUG ifdefs from the headers
+     this will speed up compilation when this flag is switched
 *** Kicking
 
 **** TODO [#B] Kick engine
@@ -65,9 +105,11 @@
 **** TODO Look-To RelX, RelY in the HeadProvider
 
 *** Misc motion
-
+**** TODO Potentially redo velocity clipping in NaoEnactor
 **** TODO Rapid spinning
 
+** RoboGuardian
+*** Implement NUBot esque fall positions
 ** Vision
 *** TODO Opponent recognition (also with sonar)
 *** TODO Open goal detection
@@ -80,14 +122,17 @@
 **** TODO Improve handling of unexpected observations
      Could turn it off or use a counter for when to use observations again.
 **** TODO Move from boost/UBLAS to the Eigen matrix library.
-*** TODO Do ball covariance differently
+*** TODO Do ball covariance differently / landmark cartesian coordinates
+    There will be comments in the LocEKF and BallEKF describing this
 *** TODO Investigate sensor based odometry
 *** TODO Topological localization
 *** TODO Teammate localization
 *** TODO Opponent localization
-
+    Each opponent can be treated the same way as the ball.  The code from the BallEKF should work fine, the one difference is that we need to do data association between the observations and the different robot estimates.  Said otherwise, we have to track four opponent robots and we need to have some way of matching the observation to the correct of the four robots.  First try is nearest neighbor. The literature has many other solutions. If people need help send Tucker an email and he can give you some jumping off papers.
+*** TODO Better ambiguous landmark usage
+**** Use a joint probability for all landmarks, instead of a NN association for each landmark independently
+**** Use a multi-modal kalman filter
 ** Behaviors
-
 *** TODO [#A] Replace hand coded kick decision with computational best kick choice.
 
 *** TODO [#A] Python kick objects.
@@ -111,23 +156,27 @@
     Don't look of the field, face the field
 
 *** TODO Re-implement Aibo role selection as per NBites paper on subject
-
+**** This is pretty much there
+**** Just need to add in stuff for the third robot
 *** TODO Work out 3 robot deployment strategy
-
 *** TODO Passing
-
+*** TODO Monitor robot stability online:
+    (maybe by amplitude of aX/aY oscillation),
+    and potentially have behaviors react when this oscillation becomes too large
 ** Tools
-
 *** TOOL
-
 **** TODO Classifier.
-
+**** TODO Setup TCP streaming to robots
+***** TODO Be able to stream localization info, including landmark detection from a robot in real time
 *** Trac
-
 **** TODO Use tickets more to manage team workflow
-
 *** Other
-
 **** Burst tools
      Check out the burst tools and adapt them to our needs. Possibly write integrate into
      TOOL.
+
+** Website
+*** Added a captcha to reduce spam comments on blog
+** General
+*** Systematically ensure all method declarations are not in headers
+*** Systematically make sure GPL license is everywhere

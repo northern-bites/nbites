@@ -119,15 +119,21 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-SET( VISION_SRCS ${VISION_INCLUDE_DIR}/ConcreteCorner
+SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
+                 ${VISION_INCLUDE_DIR}/Blob
+                 ${VISION_INCLUDE_DIR}/Blobs
+                 ${VISION_INCLUDE_DIR}/ConcreteCorner
                  ${VISION_INCLUDE_DIR}/ConcreteLandmark
                  ${VISION_INCLUDE_DIR}/ConcreteFieldObject
                  ${VISION_INCLUDE_DIR}/ConcreteCross
                  ${VISION_INCLUDE_DIR}/ConcreteLine
+                 ${VISION_INCLUDE_DIR}/Cross
+		 ${VISION_INCLUDE_DIR}/Field
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Profiler
                  ${VISION_INCLUDE_DIR}/PyVision
+		 ${VISION_INCLUDE_DIR}/Robots
                  ${VISION_INCLUDE_DIR}/Threshold
                  ${VISION_INCLUDE_DIR}/Utility
                  ${VISION_INCLUDE_DIR}/Vision

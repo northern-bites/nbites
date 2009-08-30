@@ -1,7 +1,8 @@
 /**
- * LocSystem.h - Header file for the simple abstract Loc System class
+ * @brief Defines an interface for a localization system. Current implementing classes
+ * are LocEKF and MCL
  *
- * @authro Tucker Hermans
+ * @author Tucker Hermans
  */
 
 #ifndef LocSystem_h_DEFINED
@@ -18,6 +19,8 @@ public:
     virtual void updateLocalization(MotionModel u_t,
                                     std::vector<Observation> z_t) = 0;
     virtual void reset() = 0;
+    // These should be made pure virtual and the implementing MCL class should
+    // be forced to implement them
     virtual void blueGoalieReset() {}
     virtual void redGoalieReset() {}
 

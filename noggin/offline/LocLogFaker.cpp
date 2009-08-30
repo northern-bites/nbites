@@ -4,21 +4,21 @@
  * Format of the navigation input file (*.nav):
  *
  * START POSITION LINE
- * x-value y-value heading-value
+ * x-value y-value heading-value ball-x ball-y
  *
  * NAVIGATION LINES
- * deltaForward deltaLateral deltaRotation
+ * deltaForward deltaLateral deltaRotation ball-vel-x ball-vel-y numFrames
  *
- * Format of the log output file (*.mcl):
+ * Format of the MCL log output file (*.mcl):
  *
- * PARTICLE INFO
+ * PARTICLE INFO (see fakerIO.cpp method printOutMCLLogLine())
  * x y h weight (for M particles)
  *
  * Colon signifying end of section
  *
- * DEBUG INFO
+ * DEBUG INFO (see fakerIO.cpp method printOutLogLine())
  * team_color player_number
- * x-estimate y-estimate heading-estimate deg
+ * x-estimate y-estimate heading-estimate
  * x-uncertinty y-uncert heading-uncert
  * ball-x ball-y
  * ball-uncert-x ball-uncert-y
@@ -27,11 +27,13 @@
  * odometery-lateral odometery-forward odometery-rotational
  *
  * ROBOT REAL INFO
- * x y h (as given by the system)
+ * x y h ball-x ball-y ball-vel-x ball-vel-y (as given by the system)
  *
  * LANDMARK INFO
  * ID dist bearing (for all landmarks observed in the frame)
  *
+ * The EKF log output file (*.ekf) is the same as the MCL file without the
+ * particle info.
  */
 #include "fakerIO.h"
 #include "fakerIterators.h"
