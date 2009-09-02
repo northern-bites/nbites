@@ -115,14 +115,16 @@ class GoTeam:
         """
         Update information specific to the coordinated behaviors
         """
-        # Update our counters!
-        # Update Strategy Memory
+        # Update Play Memory
         self.lastPlay = self.play
         self.play = self.workingPlay
 
-        if self.lastPlay != self.play:
+        #update teammate instance of self
+        self.me.play = self.play
+
+        if not self.play.equals(self.lastPlay):
             if self.printStateChanges:
-                self.printf("Play switched to " + self.play)
+                self.printf("Play switched to " + self.play.__str__())
 
     ######################################################
     ############       Role Switching Stuff     ##########
@@ -168,12 +170,12 @@ class GoTeam:
                     chaseTimeScale = self.me.chaseTime
                 else:
                     chaseTimeScale = mate.chaseTime
-
+                #TO-DO: break into a separate function call
                 if ((self.me.chaseTime - mate.chaseTime <
                      PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
                      (self.me.chaseTime - mate.chaseTime <
                       PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
-                      self.lastRole == PBConstants.CHASER)) and
+                      self.me.isTeammateRole(PBConstants.CHASER))) and
                     mate.playerNumber < self.me.playerNumber):
                     if PBConstants.DEBUG_DET_CHASER:
                         self.printf("\t #%d @ %g >= #%d @ %g" %
@@ -259,8 +261,8 @@ class GoTeam:
             if (mate.isPenalized() or mate.isDead()):
                 #reset to false when we get a new packet from mate
                 mate.active = False
-            elif (mate.active and (not mate.isGoalie()
-                                   or (mate.isGoalie() and self.pulledGoalie))):
+            elif (mate.active and (not mate.isTeammateRole(PBConstants.GOALIE)
+                                   or (mate.isDefaultGoalie() and self.pulledGoalie))):
                 append(mate)
                 self.numActiveFieldPlayers += 1
 
@@ -322,8 +324,8 @@ class GoTeam:
             return False
 
         for mate in self.teammates:
-            if (mate.active and (mate.role == PBConstants.CHASER
-                                   or mate.role == PBConstants.SEARCHER)):
+            if (mate.active and (mate.isTeammateRole(PBConstants.CHASER)
+                                 or mate.isTeammateRole(PBConstants.SEARCHER))):
                 return False
         return True
 

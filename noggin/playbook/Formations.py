@@ -125,10 +125,10 @@ def fTwoKickoff(team, workingPlay):
 def fReady(team, workingPlay):
     '''kickoff positions'''
     workingPlay.setFormation(PBConstants.READY_FORMATION)
-    if team.me.isGoalie():
+    if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
 
-    elif team.numActiveFieldPlayers == 2 or team.numActiveFieldPlayers == 3:
+    elif team.numActiveFieldPlayers >= 2:
         if team.me.isDefaultDefender():
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)

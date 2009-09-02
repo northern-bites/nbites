@@ -75,7 +75,7 @@ class Teammate:
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING) or\
                           (0 < self.ballLocDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
-        self.lastPacketTime = self.brain.playbook.time
+        self.lastPacketTime = self.brain.playbook.pb.time
 
 
     def updateMe(self):
@@ -98,8 +98,8 @@ class Teammate:
         self.ballUncertX = ball.uncertX
         self.ballUncertY = ball.uncertY
         self.ballDist = ball.dist
-        self.play = self.brain.playbook.getPlay()
-        self.chaseTime = self.brain.playbook.determineChaseTime()
+        self.play = self.brain.playbook.pb.play
+        self.chaseTime = self.brain.playbook.pb.determineChaseTime()
 
         self.ballLocDist = ball.locDist
         self.ballLocBearing = ball.locBearing
@@ -110,7 +110,7 @@ class Teammate:
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.grabbing = (0 < ball.dist <=
                           NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
-        self.lastPacketTime = self.brain.playbook.time
+        self.lastPacketTime = self.brain.playbook.pb.time
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -166,17 +166,8 @@ class Teammate:
     def hasBall(self):
         return (self.dribbling or self.grabbing)
 
-    def isChaser(self):
-        return (self.play.getRole() == PBConstants.CHASER)
-
-    def isDefender(self):
-        return (self.play.getRole() == PBConstants.DEFENDER)
-
-    def isMiddie(self):
-        return (self.play.getRole() == PBConstants.MIDDIE)
-
-    def isGoalie(self):
-        return (self.play.getRole() == PBConstants.GOALIE)
+    def isTeammateRole(self, roleToTest):
+        return (self.play.getRole() == roleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == PBConstants.DEFAULT_GOALIE_NUMBER)
@@ -206,7 +197,7 @@ class Teammate:
         however, the dog could still be on but sending really laggy packets.
         '''
         return (PBConstants.PACKET_DEAD_PERIOD <
-                (self.brain.playbook.time - self.lastPacketTime))
+                (self.brain.playbook.pb.time - self.lastPacketTime))
 
     def __str__(self):
         return "I am player number " + self.playerNumber

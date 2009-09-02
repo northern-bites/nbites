@@ -132,13 +132,16 @@ def useFinder(team):
 def shouldUseDubD(team):
     if not PBConstants.USE_DUB_D:
         return False
+    ballY = team.brain.ball.y
+    ballX = team.brain.ball.x
+    goalie = team.teammates[0]
     return (
-        (team.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-         team.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-         team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-        (team.brain.ball.y > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-         team.brain.ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-         team.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-         team.teammates[0].isChaser())
+        ( ballY > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+          ballY < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+          ballX < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+        ( ballY > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+          ballY < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+          ballX < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+          goalie.isTeammateRole(PBConstants.CHASER) )
         )
 

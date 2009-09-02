@@ -79,7 +79,7 @@ CENTER_FIELD_DIST_THRESH = 125.
 ####
 
 # number of roles
-NUM_ROLES = 8
+NUM_ROLES = 9
 # dictionary of roles
 ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
                                     "PENALTY_ROLE",
@@ -104,7 +104,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 #### SUB_ROLE CONSTANTS ####
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 25
+NUM_SUB_ROLES = 26
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
                                             #OFFENDER SUB ROLES 2-4
@@ -299,23 +299,20 @@ LEFT_DEEP_BACK_POS =  (DEEP_BACK_X, LEFT_DEEP_BACK_Y)
 RIGHT_DEEP_BACK_POS = (DEEP_BACK_X, RIGHT_DEEP_BACK_Y)
 
 # number of formations
-NUM_FORMATIONS = 19
+NUM_FORMATIONS = 16
 # dictionary of formations
 FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "PENALTY_FORMATION",
                                               "NO_FIELD_PLAYERS",
                                               "ONE_FIELD",
-                                              "TWO_FIELD",
+                                              "DEFENSIVE_TWO_FIELD",
+                                              "NEUTRAL_DEFENSE_TWO_FIEL",
                                               "THREE_FIELD",
-                                              "DEFENSIVE",
-                                              "NEUTRAL_DEFENSE",
-                                              "NEUTRAL_OFFENSE",
-                                              "OFFENSIVE",
-                                              "DUB_D",
+                                              "ONE_DUB_D",
+                                              "TWO_DUB_D",
+                                              "THREE_DUB_D",
                                               "FINDER",
-                                              "KICKOFF_PLAY",
-                                              "TWO_KICKOFF",
-                                              "ONE_KICKOFF",
+                                              "KICKOFF",
                                               "READY_FORMATION",
                                               "TEST_DEFEND",
                                               "TEST_OFFEND",
@@ -325,17 +322,14 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
  PENALTY_FORMATION,
  NO_FIELD_PLAYERS,
  ONE_FIELD,
- TWO_FIELD,
+ DEFENSIVE_TWO_FIELD,
+ NEUTRAL_DEFENSE_TWO_FIELD,
  THREE_FIELD,
- DEFENSIVE,
- NEUTRAL_DEFENSE,
- NEUTRAL_OFFENSE,
- OFFENSIVE,
- DUB_D,
+ ONE_DUB_D,
+ TWO_DUB_D,
+ THREE_DUB_D,
  FINDER,
- KICKOFF_PLAY,
- TWO_KICKOFF,
- ONE_KICKOFF,
+ KICKOFF,
  READY_FORMATION,
  TEST_DEFEND,
  TEST_OFFEND,
@@ -352,9 +346,10 @@ OFFENSIVE_MIDDIE_X = NogginConstants.CENTER_FIELD_X + MIDDIE_X_OFFSET
 # S_DEFENSIVE_MID strategy
 S_MIDDIE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.5
 
-NUM_STRATEGIES = 12
+NUM_STRATEGIES = 13
 
 STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
+                                              "PENALTY_STRATEGY",
                                              "READY_STRATEGY",
 
                                              # field player number strategies
@@ -374,6 +369,7 @@ STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
                                              "TEST_CHASER"
                                              )))
 (INIT_STRATEGY,
+ PENALTY_STRATEGY,
  S_READY,
  S_NO_FIELD_PLAYERS,
  S_ONE_FIELD_PLAYER,

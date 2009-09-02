@@ -1,9 +1,11 @@
+from . import PBConstants
+
 class Play:
     def __init__(self,
                  strategy = PBConstants.INIT_STRATEGY,
                  formation = PBConstants.INIT_FORMATION,
                  role = PBConstants.INIT_ROLE,
-                 subRole = PBConstants.INIT_SUBROLE,
+                 subRole = PBConstants.INIT_SUB_ROLE,
                  position = [0,0]
                  ):
         self.strategy = strategy
@@ -12,21 +14,49 @@ class Play:
         self.subRole = subRole
         self.position = position
 
-    def setStrategy(strategy):
+    def setStrategy(self, strategy):
         self.strategy = strategy
 
-    def setFormation(formation):
+    def setFormation(self, formation):
         self.formation = formation
 
-    def setRole(role):
+    def setRole(self, role):
         self.role = role
 
-    def setSubRole(subRole):
+    def setSubRole(self, subRole):
         self.subRole = subRole
 
-    def setPosition(position):
+    def setPosition(self, position):
         self.position = position
 
+    def getStrategy(self):
+        return self.strategy
+
+    def getFormation(self):
+        return self.formation
+
+    def getRole(self):
+        return self.role
+
+    def getSubRole(self):
+        return self.subRole
+
+    def getPosition(self):
+        return self.position
+
+    def equals(self, otherPlay):
+        '''compares two plays for equality by value'''
+        if( ( self.subRole != otherPlay.getSubRole() ) or
+            ( self.role != otherPlay.getRole() ) or
+            ( self.formation != otherPlay.getFormation() ) or
+            ( self.strategy != otherPlay.getStrategy() ) ):
+            return False
+
+        else:
+            return True
+
     def __str__(self):
-        return "Strategy: " + self.strategy + "  Formation: " + self.formation\
-            + "  Role:" + self.role + "  SubRole:" + self.subRole
+        return ("Strategy: " + PBConstants.STRATEGIES[self.strategy] +
+                "  Formation: " + PBConstants.FORMATIONS[self.formation] +
+                "  Role:" + PBConstants.ROLES[self.role] +
+                "  SubRole:" + PBConstants.SUB_ROLES[self.subRole])
