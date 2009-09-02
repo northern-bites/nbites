@@ -238,21 +238,24 @@ class Brain(object):
     def setPacketData(self):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
-        self.comm.setData(self.loc.x,
-                          self.loc.y,
-                          self.loc.h,
-                          self.loc.xUncert,
-                          self.loc.yUncert,
-                          self.loc.hUncert,
-                          self.loc.ballX,
-                          self.loc.ballY,
-                          self.loc.ballXUncert,
-                          self.loc.ballYUncert,
+        loc = self.loc
+        me = self.playbook.pb.me
+        self.comm.setData(loc.x,
+                          loc.y,
+                          loc.h,
+                          loc.xUncert,
+                          loc.yUncert,
+                          loc.hUncert,
+                          loc.ballX,
+                          loc.ballY,
+                          loc.ballXUncert,
+                          loc.ballYUncert,
                           self.ball.dist,
-                          self.playbook.getPlay(),
-                          self.playbook.pb.me.chaseTime,
-                          self.loc.ballVelX,
-                          self.loc.ballVelY)
+                          me.play.getRole(),
+                          me.play.getSubRole(),
+                          me.chaseTime,
+                          loc.ballVelX,
+                          loc.ballVelY)
 
     def resetLocalization(self):
         """

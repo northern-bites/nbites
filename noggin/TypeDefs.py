@@ -479,7 +479,8 @@ class Packet:
          self.ballUncertX,
          self.ballUncertY,
          self.ballDist,
-         self.packet,
+         self.role,
+         self.subRole,
          self.chaseTime,
          self.ballVelX,
          self.ballVelY) = new_packet
@@ -498,8 +499,8 @@ class Packet:
         self.ballUncertX = float(self.ballUncertX)
         self.ballUncertY = float(self.ballUncertY)
         self.ballDist = float(self.ballDist)
-        self.role = float(self.role)
-        self.subRole = float(self.subRole)
+        self.role = int(self.role)
+        self.subRole = int(self.role)
         self.chaseTime = float(self.chaseTime)
         self.ballVelX = float(self.ballVelX)
         self.ballVelY = float(self.ballVelY)
@@ -528,16 +529,17 @@ class Packet:
          self.ballUncertX,
          self.ballUncertY,
          self.ballDist,
-         self.play,
+         self.role,
+         self.subRole,
          self.chaseTime,
          self.ballVelX,
          self.ballVelY) = update_packet
 
     def __str__(self):
         """returns string with all important values"""
-        return ("#%d play: %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %
+        return ("#%d role:  %d subrole:  %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %
             (self.playerNumber,
-             self.play, self.chaseTime,
+             self.role, self.subRole, self.chaseTime,
              self.playerX, self.playerY, self.playerH,
              self.uncertX, self.uncertY, self.uncertH,
              self.ballX, self.ballY, self.ballUncertX,
