@@ -34,7 +34,7 @@ def squatted(player):
 
 def squatPosition(player):
     brain = player.brain
-    position = brain.playbook.position
+    position = brain.playbook.getPosition()
     nav = brain.nav
     my = brain.my
 

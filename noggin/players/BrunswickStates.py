@@ -1,4 +1,4 @@
-from ..playbook.PBConstants import DEFAULT_CHASER_NUMBER, GOALIE
+from ..playbook.PBConstants import GOALIE
 import man.motion.SweetMoves as SweetMoves
 ###
 # Reimplementation of Game Controller States for pBrunswick
@@ -93,13 +93,13 @@ def gameSet(player):
         player.stopWalking()
         player.brain.loc.resetBall()
 
-        if player.brain.playbook.role == GOALIE:
+        if player.brain.playbook.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
             if player.squatting:
                 return player.goLater('squatted')
             return player.goLater('squat')
 
-        if player.brain.my.playerNumber == DEFAULT_CHASER_NUMBER:
+        if player.brain.playbook.isDefaultChaser():
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()
@@ -113,7 +113,7 @@ def gamePlaying(player):
         player.lastDiffState == 'gamePenalized'):
         player.brain.resetLocalization()
 
-    roleState = player.getRoleState(player.currentRole)
+    roleState = player.getRoleState()
     return player.goNow(roleState)
 
 def penaltyShotsGameReady(player):
@@ -124,7 +124,7 @@ def penaltyShotsGameReady(player):
             player.brain.resetLocalization()
         player.brain.tracker.locPans()
         player.walkPose()
-        if player.brain.playbook.role == GOALIE:
+        if player.brain.playbook.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
     return player.stay()
@@ -138,11 +138,11 @@ def penaltyShotsGameSet(player):
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
-        if player.brain.playbook.role == GOALIE:
+        if player.brain.playbook.isRole(GOALIE):
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()
-    if player.brain.playbook.role == GOALIE:
+    if player.brain.playbook.isRole(GOALIE):
         player.brain.resetGoalieLocalization()
         if player.squatting:
             return player.goLater('squatted')
@@ -156,8 +156,7 @@ def penaltyShotsGamePlaying(player):
     if player.lastDiffState == 'gamePenalized' and \
             player.firstFrame():
         player.brain.resetLocalization()
-
-    if player.brain.playbook.role == GOALIE:
+    if player.brain.playbook.isRole(GOALIE):
         return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
 
