@@ -1,7 +1,7 @@
 from . import PBConstants
 from .. import NogginConstants
 from ..util import MyMath
-
+from math import hypot
 
 # Game Playing SubRoles
 def pChaser(team, workingPlay):
@@ -70,6 +70,8 @@ def pStopper(team, workingPlay):
         x = PBConstants.SWEEPER_X
     elif x > PBConstants.STOPPER_MAX_X:
         pos_x = PBConstants.STOPPER_MAX_X
+        delta_y = team.brain.ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+        delta_x = team.brain.ball.x - NogginConstants.MY_GOALBOX_LEFT_X
         pos_y = (NogginConstants.MY_GOALBOX_MIDDLE_Y + delta_x / delta_y *
                  (PBConstants.STOPPER_MAX_X -
                   NogginConstants.MY_GOALBOX_LEFT_X))

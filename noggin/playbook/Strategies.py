@@ -1,4 +1,4 @@
-
+from .. import NogginConstants
 from . import PBConstants
 from . import Formations
 
@@ -14,7 +14,7 @@ def sOneField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_ONE_FIELD_PLAYER)
     # no kickoff formation- would be identical to fOneField
     # Formation for ball in our goal box
-    elif shouldUseDubD(team):
+    if shouldUseDubD(team):
         Formations.fOneDubD(team, workingPlay)
 
     elif useFinder(team):
@@ -29,7 +29,7 @@ def sTwoField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_TWO_FIELD_PLAYERS)
     # Kickoff Formations
     if useKickoffFormation(team):
-        Formations.fTwoKickoff(team, workingPlay)
+        Formations.fKickoff(team, workingPlay)
 
     # Formation for ball in our goal box
     elif shouldUseDubD(team):
@@ -49,9 +49,7 @@ def sThreeField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_THREE_FIELD_PLAYERS)
     # Kickoff Formations
     if useKickoffFormation(team):
-        #use twokickoff b/c we want the goalie starting in goal
-        #like in twoKickoff
-        Formations.fTwoKickoff(team, workingPlay)
+        Formations.fKickoff(team, workingPlay)
 
     # Formation for ball in our goal box
     elif shouldUseDubD(team):
@@ -77,7 +75,7 @@ def sWin(team, workingPlay):
 
     # Kickoff Formations
     if useKickoffFormation(team):
-        Formations.fTwoKickoff(team,workingPlay)
+        Formations.fKickoff(team,workingPlay)
 
     # Formation for ball in our goal box
     elif shouldUseDubD(team):

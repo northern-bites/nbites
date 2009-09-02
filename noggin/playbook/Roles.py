@@ -73,13 +73,16 @@ def rGoalie(team, workingPlay):
         SubRoles.pGoalieNormal(team, workingPlay)
 
 def rMiddie(team, workingPlay):
+
     workingPlay.setRole(PBConstants.MIDDIE)
     SubRoles.pDefensiveMiddie(team, workingPlay)
 
 def rDefenderDubD(team, workingPlay):
-    workingplay.setRole(PBConstants.DEFENDER_DUB_D)
+
+    workingPlay.setRole(PBConstants.DEFENDER_DUB_D)
      # Figure out who isn't penalized with you
     other_teammate = team.getOtherActiveTeammate()
+
     leftPos = PBConstants.LEFT_DEEP_BACK_POS
     rightPos = PBConstants.RIGHT_DEEP_BACK_POS
     # Figure out who should go to which position

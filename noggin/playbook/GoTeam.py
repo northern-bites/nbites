@@ -1,6 +1,4 @@
 from math import (fabs, hypot, cos, sin, acos, asin)
-from ..util.MyMath import safe_atan2
-
 
 from . import Teammate
 from . import PBConstants
@@ -69,15 +67,17 @@ class GoTeam:
         it is modified by Strategies
         """
         newPlay = Play.Play()
+        currentGCState = self.brain.gameController.currentState
         # We don't control anything in initial or finished
-        if self.brain.gameController.currentState == 'gameInitial' or\
-            self.brain.gameController.currentState == 'gameFinished':
+        if (currentGCState == 'gameInitial' or
+            currentGCState == 'gameFinished'):
             #a new play is always initialized to INIT values so there is no need
             #to change them here
             pass
 
         # Have a separate strategy to easily deal with being penalized
-        elif self.brain.gameController.currentState == 'gamePenalized':
+        elif currentGCState == 'gamePenalized':
+            newPlay.setStrategy(PBConstants.PENALTY_STRATEGY)
             newPlay.setFormation(PBConstants.PENALTY_FORMATION)
             newPlay.setRole(PBConstants.PENALTY_ROLE)
             newPlay.setSubRole(PBConstants.PENALTY_SUB_ROLE)
@@ -91,8 +91,8 @@ class GoTeam:
             Strategies.sTestChaser(self, newPlay)
 
         # Have a separate ready section to make things simpler
-        elif (self.brain.gameController.currentState == 'gameReady' or
-              self.brain.gameController.currentState =='gameSet'):
+        elif (currentGCState == 'gameReady' or
+              currentGCState =='gameSet'):
             Strategies.sReady(self, newPlay)
 
         # Now we look at game strategies
@@ -183,7 +183,7 @@ class GoTeam:
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
                         continue
-
+                #TO-DO: break into a separate function call
                 elif (mate.playerNumber > self.me.playerNumber and
                       mate.chaseTime - self.me.chaseTime <
                       PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
@@ -304,9 +304,10 @@ class GoTeam:
         -includes all y values below top of goalbox
         (so inside the goal is included)
         '''
-        return (self.brain.ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
-                self.brain.ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
-                self.brain.ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
+        ball = self.brain.ball
+        return (ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
+                ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
+                ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
 
     def goalieShouldChase(self):
         return self.noCalledChaser()

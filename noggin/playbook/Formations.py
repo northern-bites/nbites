@@ -110,11 +110,11 @@ def fFinder(team, workingPlay):
     else:
         Roles.rSearcher(team, workingPlay)
 
-def fTwoKickoff(team, workingPlay):
+def fKickoff(team, workingPlay):
     '''time immediately after kickoff.
     chaser, defender, goalie. different than normal because roles are assigned
     entirely be player number'''
-    workingPlay.setFormation(PBConstants.TWO_KICKOFF)
+    workingPlay.setFormation(PBConstants.KICKOFF)
     if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
     elif team.me.isDefaultDefender():
