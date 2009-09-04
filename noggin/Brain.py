@@ -39,6 +39,7 @@ class Brain(object):
         """
         Class constructor
         """
+        self.profileFrames = 0
         self.on = True
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
@@ -168,6 +169,20 @@ class Brain(object):
 ##
 ##--------------CONTROL METHODS---------------##
 ##
+
+    def profileRun(self):
+        NUM_PROF_FRAMES = 1000
+        if profileFrames == NUM_PROF_FRAMES:
+            for x in xrange(NUM_PROF_FRAMES):
+                if x == 0:
+                    allStats = pstats.Stats('stats'+str(x))
+                else :
+                    allStats.add('stats'+str(x))
+            allStats.dump_stats('totalRunStats')
+
+        else :
+            cProfile.run('run()','stats'+str(profileFrames))
+            profileFrames += 1
 
     def run(self):
         """
