@@ -24,6 +24,14 @@ MARVIN_STANCE_CONFIG = (31.00, # CoM height
                         0.0,   # Angle between feet
                         0.1)   # Time to transition to/from this stance
 
+LAB_STANCE_CONFIG = (31.00, # CoM height
+                     1.1,  # Forward displacement of CoM
+                     10.0,  # Horizontal distance between feet
+                     3.0,   # Body angle around y axis
+                     0.0,   # Angle between feet
+                     0.1)   # Time to transition to/from this stance
+
+
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
                0.9,  # stepHeight
@@ -36,6 +44,19 @@ STEP_CONFIG = (0.4, # step duration
                7.0,  # max y accel
                20.0, # max theta speed()
                WALKING)  # walking gait = true
+
+LAB_STEP_CONFIG = (0.5, # step duration
+                   0.4,  # fraction in double support
+                   1.6,  # stepHeight
+                   0.0,  # step lift
+                   7.0,  # max x speed
+                   -7.0,  # max x speed
+                   7.0,  # max y speed
+                   20.0, # max theta speed()
+                   7.0,  # max x accel
+                   7.0,  # max y accel
+                   20.0, # max theta speed()
+                   WALKING)  # walking gait = true
 
 
 MARVIN_STEP_CONFIG = (0.4, # step duration
@@ -144,6 +165,16 @@ NEW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
             STIFFNESS_CONFIG,
             ODO_CONFIG,
             ARM_CONFIG)
+
+LAB_GAIT = motion.GaitCommand(LAB_STANCE_CONFIG,
+                              LAB_STEP_CONFIG,
+                              ZMP_CONFIG,
+                              JOINT_HACK_CONFIG,
+                              MARVIN_SENSOR_CONFIG,
+                              STIFFNESS_CONFIG,
+                              ODO_CONFIG,
+                              ARM_CONFIG)
+
 MARVIN_NEW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
                                      MARVIN_STEP_CONFIG,
                                      MARVIN_ZMP_CONFIG,
@@ -451,13 +482,12 @@ COM_ARM=ARM_CONFIG
 
 ############# DEFAULT GAIT ASSIGNMENTS ##################
 
-
-CUR_GAIT = MEDIUM_GAIT
+CUR_GAIT = LAB_GAIT
 CUR_DRIBBLE_GAIT = DUCK_GAIT
 CUR_SLOW_GAIT = NEW_GAIT
 
-MARVIN_CUR_GAIT = MARVIN_MEDIUM_GAIT
-MARVIN_CUR_SLOW_GAIT = MARVIN_NEW_GAIT
+MARVIN_CUR_GAIT = LAB_GAIT
+MARVIN_CUR_SLOW_GAIT = LAB_GAIT
 
 
 TRILLIAN_GAIT = CUR_GAIT
