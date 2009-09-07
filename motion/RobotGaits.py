@@ -46,7 +46,7 @@ STEP_CONFIG = (0.4, # step duration
                WALKING)  # walking gait = true
 
 LAB_STEP_CONFIG = (0.5, # step duration
-                   0.4,  # fraction in double support
+                   0.5,  # fraction in double support
                    1.6,  # stepHeight
                    0.0,  # step lift
                    7.0,  # max x speed
