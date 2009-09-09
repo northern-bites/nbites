@@ -29,6 +29,9 @@ from .players import Switch
 
 import _roboguardian
 
+import pstats
+import cProfile
+
 
 class Brain(object):
     """
@@ -39,6 +42,7 @@ class Brain(object):
         """
         Class constructor
         """
+        p = None
         self.profileFrames = 0
         self.on = True
         # Output Class
@@ -170,21 +174,7 @@ class Brain(object):
 ##--------------CONTROL METHODS---------------##
 ##
 
-    def profileRun(self):
-        NUM_PROF_FRAMES = 1000
-        if profileFrames == NUM_PROF_FRAMES:
-            for x in xrange(NUM_PROF_FRAMES):
-                if x == 0:
-                    allStats = pstats.Stats('stats'+str(x))
-                else :
-                    allStats.add('stats'+str(x))
-            allStats.dump_stats('totalRunStats')
-
-        else :
-            cProfile.run('run()','stats'+str(profileFrames))
-            profileFrames += 1
-
-    def run(self):
+    def profile(self):
         """
         Main control loop called every TIME_STEP milliseconds
         """
@@ -215,6 +205,25 @@ class Brain(object):
 
         # Update any logs we have
         self.out.updateLogs()
+
+    def run(self):
+        global p
+        NUM_PROF_FRAMES = 5
+        p = self.profile()
+        if self.profileFrames < NUM_PROF_FRAMES:
+            cProfile.run("p",'stats'+str(self.profileFrames))
+            self.profileFrames += 1
+
+        elif self.profileFrames == NUM_PROF_FRAMES:
+            self.player.printf( "done profiling")
+            for x in xrange(NUM_PROF_FRAMES):
+                if x == 0:
+                    allStats = pstats.Stats('stats'+str(x))
+                else :
+                    allStats.add('stats'+str(x))
+            allStats.dump_stats('totalRunStats')
+        else:
+            pass
 
     def updateFieldObjects(self):
         """
