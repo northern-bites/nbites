@@ -42,7 +42,6 @@ class Brain(object):
         """
         Class constructor
         """
-        p = None
         self.profileFrames = 0
         self.on = True
         # Output Class
@@ -174,10 +173,11 @@ class Brain(object):
 ##--------------CONTROL METHODS---------------##
 ##
 
-    def profile(self):
+    def run(self):
         """
         Main control loop called every TIME_STEP milliseconds
         """
+        print "run"
         # Update Environment
         self.ball.updateVision(self.vision.ball)
         self.updateFieldObjects()
@@ -206,12 +206,12 @@ class Brain(object):
         # Update any logs we have
         self.out.updateLogs()
 
-    def run(self):
-        global p
+    def profile(self):
+        print "profile"
         NUM_PROF_FRAMES = 5
-        p = self.profile()
+        print self.__dict__
         if self.profileFrames < NUM_PROF_FRAMES:
-            cProfile.run("p",'stats'+str(self.profileFrames))
+            cProfile.runctx('run()', self.__dict__, self.profile(), 'stats'+str(self.profileFrames))
             self.profileFrames += 1
 
         elif self.profileFrames == NUM_PROF_FRAMES:
