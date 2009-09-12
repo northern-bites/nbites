@@ -671,6 +671,20 @@ public class DebugViewer extends JFrame {
         objectIDMap.put(new Integer(29), emptyPoint);
         objectIDStringMap.put(new Integer(29), "NO IDEA CORNER");
 
+        Point2D.Double topCC =
+            new Point2D.Double(wc.the_field.CENTER_FIELD_X,
+                               wc.the_field.CENTER_FIELD_Y +
+                               wc.the_field.CENTER_CIRCLE_RADIUS);
+        objectIDMap.put(new Integer(30), topCC);
+        objectIDStringMap.put(new Integer(30), "Yellow Goal Right L");
+
+        Point2D.Double bottomCC =
+            new Point2D.Double(wc.the_field.CENTER_FIELD_X,
+                               wc.the_field.CENTER_FIELD_Y -
+                               wc.the_field.CENTER_CIRCLE_RADIUS);
+        objectIDMap.put(new Integer(31), bottomCC);
+        objectIDStringMap.put(new Integer(31), "Yellow Goal Right L");
+
         // Field objects
         Point2D.Double bglpPT =
             new Point2D.Double(wc.the_field.LANDMARK_LEFT_GOAL_TOP_POST_X,
