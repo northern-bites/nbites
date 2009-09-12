@@ -148,8 +148,8 @@ public class DebugViewer extends JFrame {
 
     public int[] LANDMARK_X;
     public int[] LANDMARK_Y;
-    // TODO: Change this ID value...
-    public final static int BALL_ID = 40;
+
+    public final static int BALL_ID = 99;
 
     // takes a Point and maps it to a string
     public HashMap <Point2D.Double,String> cornerMap;
