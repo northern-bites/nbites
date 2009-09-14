@@ -300,4 +300,23 @@ class Brain(object):
 
 def playbookProfile(it):
     Brain = it
-    cProfile.runctx("Brain.playbook.run()", globals(), locals(),)
+    NUM_PROF_FRAMES = 1000
+    FILE_PREFIX = "PBStats"
+    if Brain.profileFrames < NUM_PROF_FRAMES:
+        cProfile.runctx("Brain.playbook.run()", globals(), locals(),
+                        FILE_PREFIX +str(Brain.profileFrames))
+        Brain.profileFrames += 1
+
+    elif Brain.profileFrames == NUM_PROF_FRAMES:
+        Brain.profileFrames += 1
+        Brain.player.printf( "done profiling")
+        for x in xrange(NUM_PROF_FRAMES):
+            if x == 0:
+                allStats = pstats.Stats(FILE_PREFIX +str(x))
+            else :
+                allStats.add(FILE_PREFIX+str(x))
+            allStats.dump_stats('totalRunStats')
+    else:
+        pass
+
+
