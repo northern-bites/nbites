@@ -177,7 +177,6 @@ class Brain(object):
         """
         Main control loop called every TIME_STEP milliseconds
         """
-        print "run"
         # Update Environment
         self.ball.updateVision(self.vision.ball)
         self.updateFieldObjects()
@@ -195,7 +194,8 @@ class Brain(object):
         # Behavior stuff
         self.gameController.run()
         self.fallController.run()
-        self.playbook.run()
+        playbookProfile(self)
+        #self.playbook.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()
@@ -209,9 +209,8 @@ class Brain(object):
     def profile(self):
         print "profile"
         NUM_PROF_FRAMES = 5
-        print self.__dict__
         if self.profileFrames < NUM_PROF_FRAMES:
-            cProfile.runctx('run()', self.__dict__, self.profile(), 'stats'+str(self.profileFrames))
+            cProfile.run('self.profile(self)', 'stats'+str(self.profileFrames))
             self.profileFrames += 1
 
         elif self.profileFrames == NUM_PROF_FRAMES:
@@ -278,7 +277,6 @@ class Brain(object):
                           self.playbook.determineChaseTime(),
                           self.loc.ballVelX,
                           self.loc.ballVelY)
-
     def resetLocalization(self):
         """
         Reset our localization
@@ -299,3 +297,7 @@ class Brain(object):
             self.loc.blueGoalieReset()
         else:
             self.loc.redGoalieReset()
+
+def playbookProfile(it):
+    Brain = it
+    cProfile.runctx("Brain.playbook.run()", globals(), locals(),)
