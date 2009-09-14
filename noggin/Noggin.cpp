@@ -271,9 +271,9 @@ void Noggin::runStep ()
 
 
     // Call main run() method of Brain
-    PROF_ENTER(profiler, P_PYRUN);
+    //PROF_ENTER(profiler, P_PYRUN);
     if (brain_instance != NULL) {
-        PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
+        PyObject *result = PyObject_CallMethod(brain_instance, "printMe", "self");
         if (result == NULL) {
             // set Noggin in error state
             error_state = true;
@@ -289,7 +289,7 @@ void Noggin::runStep ()
             Py_DECREF(result);
         }
     }
-    PROF_EXIT(profiler, P_PYRUN);
+    //PROF_EXIT(profiler, P_PYRUN);
 
     PROF_EXIT(profiler, P_PYTHON);
 }

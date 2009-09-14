@@ -42,7 +42,6 @@ class Brain(object):
         """
         Class constructor
         """
-        p = None
         self.profileFrames = 0
         self.on = True
         # Output Class
@@ -174,7 +173,7 @@ class Brain(object):
 ##--------------CONTROL METHODS---------------##
 ##
 
-    def profile(self):
+    def run(self):
         """
         Main control loop called every TIME_STEP milliseconds
         """
@@ -195,7 +194,8 @@ class Brain(object):
         # Behavior stuff
         self.gameController.run()
         self.fallController.run()
-        self.playbook.run()
+        playbookProfile(self)
+        #self.playbook.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()
@@ -206,12 +206,11 @@ class Brain(object):
         # Update any logs we have
         self.out.updateLogs()
 
-    def run(self):
-        global p
+    def profile(self):
+        print "profile"
         NUM_PROF_FRAMES = 5
-        p = self.profile()
         if self.profileFrames < NUM_PROF_FRAMES:
-            cProfile.run("p",'stats'+str(self.profileFrames))
+            cProfile.run('self.profile(self)', 'stats'+str(self.profileFrames))
             self.profileFrames += 1
 
         elif self.profileFrames == NUM_PROF_FRAMES:
@@ -301,3 +300,26 @@ class Brain(object):
             self.loc.blueGoalieReset()
         else:
             self.loc.redGoalieReset()
+
+def playbookProfile(it):
+    Brain = it
+    NUM_PROF_FRAMES = 1000
+    FILE_PREFIX = "PBStats"
+    if Brain.profileFrames < NUM_PROF_FRAMES:
+        cProfile.runctx("Brain.playbook.run()", globals(), locals(),
+                        FILE_PREFIX +str(Brain.profileFrames))
+        Brain.profileFrames += 1
+
+    elif Brain.profileFrames == NUM_PROF_FRAMES:
+        Brain.profileFrames += 1
+        Brain.player.printf( "done profiling")
+        for x in xrange(NUM_PROF_FRAMES):
+            if x == 0:
+                allStats = pstats.Stats(FILE_PREFIX +str(x))
+            else :
+                allStats.add(FILE_PREFIX+str(x))
+            allStats.dump_stats('totalRunStats')
+    else:
+        pass
+
+
