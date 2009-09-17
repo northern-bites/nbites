@@ -7,7 +7,7 @@
 **** DONE Display x,y position of cursor in image
 **** DONE jump 10 frames button
 *** Classifier
-**** TODO Make batch processing work
+**** DONE Make batch processing work
      Each directory has a key file with what each frame contains, then when batch processing runs, it lists what the system got right and wrong: correct IDs, missed IDs, false IDs.
 *** World Controller
 *** Robot
