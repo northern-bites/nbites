@@ -1,0 +1,35 @@
+<project name="tool" default="run" basedir=".">
+  <description>
+    tool build file
+  </description>
+  <!-- set global properties for this build -->
+  <!-- if needed, should be something like
+       property="tool_dir" location="TOOL"
+       more information in the ant manual -->
+  
+  <target name="compile"
+          description="compile the source " >
+    <javac srcdir="." destdir=""/>
+  </target>
+  
+  <target name="run" depends="compile"
+	  description="runs the tool ">
+    <!--java classpath="." classname="TOOL.TOOL" /-->
+    <exec executable="java">
+      <arg value="TOOL.TOOL"/>
+    </exec>
+  </target>
+
+  <!-- Delete all the class files -->  
+  <target name="clean"
+          description="clean up" >
+    <delete>
+      <fileset dir="." includes="**/*.class"/>
+    </delete>
+  </target>
+
+  <target name="vision" depends="compile">
+    <javac classpath="/TOOL/Vision" srcdir="." destdir="" />
+  </target>
+
+</project>
