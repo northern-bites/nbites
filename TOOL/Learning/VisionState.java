@@ -45,6 +45,14 @@ public class VisionState {
     public final static byte VISUAL_LINE_THICKNESS = 2;
     public final static byte VISUAL_LINE_COLOR = Vision.BLUE;
 
+	public final static int ORANGE = 0;
+	public final static int WHITE = 5;
+	public final static int YELLOW = 1;
+	public final static int BLUE = 2;
+	public final static int RED = 4;
+	public final static int NAVY = 3;
+	public final static int GREEN = 6;
+
     //images + colortable
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
@@ -58,6 +66,8 @@ public class VisionState {
 	private GoalType seeBlue, seeYellow;
 	private int seeRedRobots, seeBlueRobots;
     private Vector<VisualFieldObject> visualFieldObjects;
+	private int tableSize = 128;
+	private int stats[][][][] = new int[tableSize][tableSize][tableSize][12];
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
@@ -76,6 +86,108 @@ public class VisionState {
 		seeRedRobots = 0;
 		seeBlueRobots = 0;
     }
+
+	/** We are going to collect stats on the pixels we see in a bunch of frames.  For any
+		given pixel value we'll collect how it correlates to the various objects we are
+		concerned with.
+	 */
+	public void initStats() {
+		for (int i = 0; i < tableSize; i++) {
+			for (int j = 0; j < tableSize; j++) {
+				for (int k = 0; k < tableSize; k++) {
+					for (int l = 0; l < 12; l++) {
+						stats[i][j][k][l] = 0;
+					}
+				}
+			}
+		}
+	}
+
+	/** Go through the current
+	 */
+	public void updateStats(boolean orange, boolean yellow, boolean blue, boolean white,
+							boolean red, boolean navy) {
+        int Y_SHIFT =colorTable.getYShift();
+        int CB_SHIFT =colorTable.getCBShift();
+        int CR_SHIFT =colorTable.getCRShift();
+
+		int h = rawImage.getHeight();
+		int w = rawImage.getWidth();
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				int[] current = rawImage.getPixel(i,j);
+				current[0] = current[0] >> Y_SHIFT;
+				current[1] = current[1] >> CB_SHIFT;
+				current[2] = current[2] >> CR_SHIFT;
+				if (orange) {
+					stats[current[0]][current[1]][current[2]][ORANGE]++;
+				} else {
+					stats[current[0]][current[1]][current[2]][ORANGE]-=10;
+				}
+				if (yellow) {
+					stats[current[0]][current[1]][current[2]][YELLOW]++;
+				} else {
+					stats[current[0]][current[1]][current[2]][YELLOW]-=10;
+				}
+				if (blue) {
+					stats[current[0]][current[1]][current[2]][BLUE]++;
+				} else {
+					stats[current[0]][current[1]][current[2]][BLUE]-=10;
+				}
+				if (white) {
+					stats[current[0]][current[1]][current[2]][WHITE]+=10;
+				} else {
+					stats[current[0]][current[1]][current[2]][WHITE]-=5;
+				}
+				if (red) {
+					stats[current[0]][current[1]][current[2]][RED]++;
+ 				} else {
+					stats[current[0]][current[1]][current[2]][RED]-=10;
+				}
+				if (navy) {
+					stats[current[0]][current[1]][current[2]][NAVY]++;
+				} else {
+					stats[current[0]][current[1]][current[2]][NAVY]-=10;
+				}
+				stats[current[0]][current[1]][current[2]][GREEN]++;
+			}
+		}
+	}
+
+	public void printStats() {
+		int pixie[] = new int[3];
+		for (int i = 0; i < tableSize; i++) {
+			for (int j = 0; j < tableSize; j++) {
+				for (int k = 0; k < tableSize; k++) {
+					for (int l = 0; l < 12; l++) {
+						if (stats[i][j][k][l] > 10) {
+							pixie[0] = i; pixie[1] = j; pixie[2] = k;
+							byte col = Vision.GREY;
+							switch (l) {
+							case ORANGE:
+								col = Vision.ORANGE; break;
+							case WHITE:
+								col = Vision.WHITE; break;
+							case YELLOW:
+								col = Vision.YELLOW; break;
+							case BLUE:
+								col = Vision.BLUE; break;
+							case NAVY:
+								col = Vision.NAVY; break;
+							case RED:
+								col = Vision.RED; break;
+							case GREEN:
+								col = Vision.GREEN; break;
+							}
+							colorTable.setRawColor(pixie, col);
+							l = 12;
+						}
+					}
+				}
+			}
+		}
+
+	}
 
     public void newFrame(Frame f, ColorTable c) {
 		rawImage = f.image();

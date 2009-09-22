@@ -53,7 +53,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
     private JTextField jumpToFrame;
 	private JButton prevImage, nextImage, jumpToButton, writeKey, runBatch,
-		useLastFrame, runRecursive;
+		useLastFrame, runRecursive, learnColor;
     private JTextPane feedback;
 
     private Learning learn;
@@ -128,11 +128,14 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		useLastFrame = new JButton("Use Last");
 		useLastFrame.setFocusable(false);
 
+		learnColor = new JButton("Learn Color");
+		learnColor.setFocusable(false);
+
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
 
         JPanel navigation = new JPanel();
-        navigation.setLayout(new GridLayout(4,2));
+        navigation.setLayout(new GridLayout(5,2));
         navigation.add(prevImage);
         navigation.add(nextImage);
         navigation.add(jumpToFrame);
@@ -141,6 +144,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		navigation.add(runBatch);
 		navigation.add(runRecursive);
 		navigation.add(useLastFrame);
+		navigation.add(learnColor);
 
         // Size the navigation panel to only take up as much room as needed
         Dimension navigationSize = new Dimension(2 * (int) prevImage.getPreferredSize().getWidth(), 4 * (int) jumpToFrame.getPreferredSize().getWidth());
@@ -185,6 +189,12 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		runRecursive.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					learn.runRecursiveBatch();
+				}
+			});
+
+		learnColor.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					learn.runRecursiveBatchLearning();
 				}
 			});
 

@@ -48,19 +48,19 @@ import TOOL.Vision.Vision;
  * and viewing all entries of a given color.
  *
  * The three modes YVIEW, UVIEW, and VVIEW correspond to fixing as constant the
- * Y, U, and V axes respectively.  The value of the slider corresponds with the 
+ * Y, U, and V axes respectively.  The value of the slider corresponds with the
  * fixed value through which you're slicing; e.g. if you are in YMODE and the
  * slider is set to 13, you will see all (13, U, V) values in the table.
  *
- * Within each of those three views, there is a different way of seeing the 
+ * Within each of those three views, there is a different way of seeing the
  * table.  By default, the ranges viewable depend on which color you choose.
  * For instance, if you pick blue in the YMODE, the program will look in the
  * color table to see the minimum Y value that's been thresholded as blue, as
  * well as the max, in order to fix the slider values.  The same thing happens
- * for U and V so that the table you see is "zoomed in" around the areas of 
+ * for U and V so that the table you see is "zoomed in" around the areas of
  * blue.
  *
- * If you choose the "All View" checkbox, you effectively zoom out from the 
+ * If you choose the "All View" checkbox, you effectively zoom out from the
  * table and see the entire thing.  Instead of fixing the YUV values based on
  * a given color, the view instead ranges over the min and max of each variable
  * for the entire table - so the minimum Y value in the whole table that's been
@@ -69,19 +69,19 @@ import TOOL.Vision.Vision;
  *
  * For the COLORVIEW, we go through the table and find every instance where
  * something has been thresholded as the current color, and display all the
- * shades on the screen in the order in which we found it.  This looks very 
- * pretty and mesmerizing but I'm honestly not sure why it's useful. 
+ * shades on the screen in the order in which we found it.  This looks very
+ * pretty and mesmerizing but I'm honestly not sure why it's useful.
  *
  * In each of the YUV Modes, you can change the thresholding of entries directly
  * if you are in edit mode.  Once in edit mode, choose the color you wish to
  * threshold and click the entry you wish to change.  You can also
  * press and drag a rectangle to fill a whole area with color.
  *
- * To come: 
+ * To come:
  * Fixed editing of color space
  * Zooming?
  * Simultaneous view with threshold view
- * 
+ *
  *
  * @author Eric Chown
  * @date   May 13, 2007
@@ -179,16 +179,16 @@ public class ColorEdit extends JPanel implements DataListener,
     private YCbCrColorSpace converter;
 
     public ColorEdit(TOOL t) {
-	super();
-        
-	tool = t;
-	colorTable = tool.getColorTable();
+		super();
+
+		tool = t;
+		colorTable = tool.getColorTable();
 
         // Get the necessary shifting info from table
-	yShift = colorTable.getYShift();
-	uShift = colorTable.getUShift();
-	vShift = colorTable.getVShift();
-        // and the size 
+		yShift = colorTable.getYShift();
+		uShift = colorTable.getUShift();
+		vShift = colorTable.getVShift();
+        // and the size
         yMax = colorTable.getYDimension();
         uMax = colorTable.getUDimension();
         vMax = colorTable.getVDimension();
@@ -196,28 +196,28 @@ public class ColorEdit extends JPanel implements DataListener,
         view = View.YVIEW;
 
         converter = new YCbCrColorSpace();
-	
+
         setupWindowsAndListeners();
         collectStats();
-        
+
         setColor(DEFAULT_COLOR);
         buttonPanel.setColor(DEFAULT_COLOR);
 
     }
-    
+
     private void setupWindowsAndListeners() {
         // Necessary to have the drawing panels size correctly
-        
+
         setLayout(new GridLayout(2,0));
 
         buttonPanel = new ColorEditPanel(this);
         imagePanel = new ColorTablePanel(this);
         imagePanel.changeSettings(ColorTablePanel.SCALE_RATIO_SIZE_HYBRID);
-        
+
         buffImage = new BufferedImage(DEFAULT_SIZE, DEFAULT_SIZE,
-                                      BufferedImage.TYPE_INT_ARGB); 
+                                      BufferedImage.TYPE_INT_ARGB);
         imagePanel.setImage(buffImage);
-        
+
         add(imagePanel);
         add(buttonPanel);
 
@@ -235,10 +235,10 @@ public class ColorEdit extends JPanel implements DataListener,
         colorTable = a;
 
         // Get the necessary shifting info from table
-	yShift = colorTable.getYShift();
-	uShift = colorTable.getUShift();
-	vShift = colorTable.getVShift();
-        // and the size 
+		yShift = colorTable.getYShift();
+		uShift = colorTable.getUShift();
+		vShift = colorTable.getVShift();
+        // and the size
         yMax = colorTable.getYDimension();
         uMax = colorTable.getUDimension();
         vMax = colorTable.getVDimension();
@@ -324,22 +324,37 @@ public class ColorEdit extends JPanel implements DataListener,
 
     // TODO: Fill in
     public void fillHoles() {
-	if(editing){
-	    ColorTableUpdate change = colorTable.fillHoles(curColor);
-	    
+		if(editing){
+			ColorTableUpdate change = colorTable.fillHoles(curColor);
 
-	    // figure out what needs to be colored..
-	    slice();
-	    repaint();
+			// figure out what needs to be colored..
+			slice();
+			repaint();
 
-	    // Alert all color table listeners that the color table has changed
-	    tool.getDataManager().notifyColorTableDependants(colorTable,
-							     change,
-							     this);
-	}else{
-	    System.out.println("Must be in EDIT mode to fill holes");
-	}
+			// Alert all color table listeners that the color table has changed
+			tool.getDataManager().notifyColorTableDependants(colorTable,
+															 change,
+															 this);
+		}else{
+			System.out.println("Must be in EDIT mode to fill holes");
+		}
     }
+
+	/** Get rid of pixels that aren't connected to any other pixels of the same color.
+	 */
+	public void loseIslands() {
+		if (editing) {
+			ColorTableUpdate change = colorTable.loseIslands(curColor);
+			slice();
+			repaint();
+			// Alert all color table listeners that the color table has changed
+			tool.getDataManager().notifyColorTableDependants(colorTable,
+															 change,
+															 this);
+		}else{
+			System.out.println("Must be in EDIT mode to lose islands");
+		}
+	}
 
     // Whereas refresh() will refresh entire screen and recalculate all stats,
     // by passing in a ColorTableUpdate we can selectively modify our stats
@@ -429,8 +444,8 @@ public class ColorEdit extends JPanel implements DataListener,
         }
     }
 
-    
-    
+
+
     /** Initializes the color table statistics.
      * Starts by assigning arbitrarily small values to the
      * max statistics and arbitrarily large values to the
@@ -438,7 +453,7 @@ public class ColorEdit extends JPanel implements DataListener,
      * entry, it becomes the new min and max for that channel,
      * and we go on from there.
      */
-    
+
     public void initStats() {
 	// init table
         for (int i = 0; i < NUM_COLORS+1; i++) {
@@ -456,21 +471,21 @@ public class ColorEdit extends JPanel implements DataListener,
 	    colorStats[i][NUMSTATS - 1] = 0;
 	}//end num colors loop
     }//end function
-    
-    /** Runs through the color table and counts up where the colors 
+
+    /** Runs through the color table and counts up where the colors
      *are and how many there are.
      */
     public void collectStats() {
-	initStats();
-        
+		initStats();
+
         for(int y=0; y<yMax; y++) {
             for(int u=0; u<uMax; u++) {
                 for(int v=0; v<vMax; v++){
-		    updateColor(y, u, v,
-				colorTable.getRawColor(y,u,v));
+					updateColor(y, u, v,
+								colorTable.getRawColor(y,u,v));
                 }//v
-	    }//u
-	}//y
+			}//u
+		}//y
 
         if (allView) {
             setText("Total num entries: "+colorStats[GLOBAL_INDEX][6]);
@@ -489,36 +504,36 @@ public class ColorEdit extends JPanel implements DataListener,
      * @precondition 0 <= color < NUM_COLORS
      */
     public void updateColor(int y, int u, int v, byte color) {
-	colorStats[color][Y_MIN] = Math.min(colorStats[color][Y_MIN], y); 
-	colorStats[color][Y_MAX] = Math.max(colorStats[color][Y_MAX], y); 
-	colorStats[color][U_MIN] = Math.min(colorStats[color][U_MIN], u); 
-	colorStats[color][U_MAX] = Math.max(colorStats[color][U_MAX], u); 
-	colorStats[color][V_MIN] = Math.min(colorStats[color][V_MIN], v); 
-	colorStats[color][V_MAX] = Math.max(colorStats[color][V_MAX], v); 
-	colorStats[color][NUM_ENTRIES]++;
+		colorStats[color][Y_MIN] = Math.min(colorStats[color][Y_MIN], y);
+		colorStats[color][Y_MAX] = Math.max(colorStats[color][Y_MAX], y);
+		colorStats[color][U_MIN] = Math.min(colorStats[color][U_MIN], u);
+		colorStats[color][U_MAX] = Math.max(colorStats[color][U_MAX], u);
+		colorStats[color][V_MIN] = Math.min(colorStats[color][V_MIN], v);
+		colorStats[color][V_MAX] = Math.max(colorStats[color][V_MAX], v);
+		colorStats[color][NUM_ENTRIES]++;
 
         // We don't want unthresholded values to affect the global table.
         if (color == GREY) { return; }
 
         // Increase global color table stats
-        colorStats[GLOBAL_INDEX][Y_MIN] = 
-            Math.min(colorStats[GLOBAL_INDEX][Y_MIN], y); 
-	colorStats[GLOBAL_INDEX][Y_MAX] = 
-            Math.max(colorStats[GLOBAL_INDEX][Y_MAX], y); 
-	colorStats[GLOBAL_INDEX][U_MIN] = 
-            Math.min(colorStats[GLOBAL_INDEX][U_MIN], u); 
-	colorStats[GLOBAL_INDEX][U_MAX] = 
-            Math.max(colorStats[GLOBAL_INDEX][U_MAX], u); 
-	colorStats[GLOBAL_INDEX][V_MIN] = 
-            Math.min(colorStats[GLOBAL_INDEX][V_MIN], v); 
-	colorStats[GLOBAL_INDEX][V_MAX] = 
-            Math.max(colorStats[GLOBAL_INDEX][V_MAX], v); 
-	// Increase the number of times color's been seen
-	colorStats[GLOBAL_INDEX][NUM_ENTRIES] ++;
+        colorStats[GLOBAL_INDEX][Y_MIN] =
+            Math.min(colorStats[GLOBAL_INDEX][Y_MIN], y);
+		colorStats[GLOBAL_INDEX][Y_MAX] =
+            Math.max(colorStats[GLOBAL_INDEX][Y_MAX], y);
+		colorStats[GLOBAL_INDEX][U_MIN] =
+            Math.min(colorStats[GLOBAL_INDEX][U_MIN], u);
+		colorStats[GLOBAL_INDEX][U_MAX] =
+            Math.max(colorStats[GLOBAL_INDEX][U_MAX], u);
+		colorStats[GLOBAL_INDEX][V_MIN] =
+            Math.min(colorStats[GLOBAL_INDEX][V_MIN], v);
+		colorStats[GLOBAL_INDEX][V_MAX] =
+            Math.max(colorStats[GLOBAL_INDEX][V_MAX], v);
+		// Increase the number of times color's been seen
+		colorStats[GLOBAL_INDEX][NUM_ENTRIES] ++;
 
     }
-    
-    
+
+
     public boolean getEditing() {
         return editing;
     }
@@ -839,10 +854,10 @@ public class ColorEdit extends JPanel implements DataListener,
      *
      * On top of the background colors we render the thresholded colors.  That
      * is to say, if we are in Y View at value = 58, and in our color table
-     * something at Y = 58, U = 28, V = 125 is say, Yellow, then we draw a 
+     * something at Y = 58, U = 28, V = 125 is say, Yellow, then we draw a
      * yellow pixel at that point.
      *
-     * If allView is on, then will scale to show all entries.  Otherwise, 
+     * If allView is on, then will scale to show all entries.  Otherwise,
      * this method changes what you look at based on what color you
      * have selected.  If you have green selected, for instance, the YUV
      * values will be scaled such that you almost always see green thresholded
@@ -862,33 +877,33 @@ public class ColorEdit extends JPanel implements DataListener,
         }
 
         // Used to avoid iterating over needless, empty values in color table.
-        int yMin = colorStats[axesScalingColor][Y_MIN]; 
-	int yMax = colorStats[axesScalingColor][Y_MAX];
-	int uMin = colorStats[axesScalingColor][U_MIN];
-	int uMax = colorStats[axesScalingColor][U_MAX];
-	int vMin = colorStats[axesScalingColor][V_MIN];
-	int vMax = colorStats[axesScalingColor][V_MAX];
-        
-	int ySize = Math.abs(yMax - yMin + 1);
-	int uSize = Math.abs(uMax - uMin + 1);
-	int vSize = Math.abs(vMax - vMin + 1);
+        int yMin = colorStats[axesScalingColor][Y_MIN];
+		int yMax = colorStats[axesScalingColor][Y_MAX];
+		int uMin = colorStats[axesScalingColor][U_MIN];
+		int uMax = colorStats[axesScalingColor][U_MAX];
+		int vMin = colorStats[axesScalingColor][V_MIN];
+		int vMax = colorStats[axesScalingColor][V_MAX];
+
+		int ySize = Math.abs(yMax - yMin + 1);
+		int uSize = Math.abs(uMax - uMin + 1);
+		int vSize = Math.abs(vMax - vMin + 1);
 
         // Size the swatch based on min and max.  in YVIEW, u and v vary, and
-        // so on and so forth.  Also keep track of our min and max on the 
+        // so on and so forth.  Also keep track of our min and max on the
         // axes so that we can display a scale correctly.
         int dim1 = 0; int dim2 = 0;
-        
+
         switch (view) {
         case YVIEW:
             // x coord is V, y coord is U
             dim1 = vSize;
             xAxisMin = vMin;
             xAxisMax = vMax;
-            
+
             dim2 = uSize;
             yAxisMin = uMin;
             yAxisMax = uMax;
-            
+
             break;
         case UVIEW:
             // x coord is Y, y coord is V
@@ -910,7 +925,7 @@ public class ColorEdit extends JPanel implements DataListener,
             yAxisMin = uMin;
             yAxisMax = uMax;
             break;
-            
+
         }
 
         // Create the swatch of the correct size to hold all entries, but only
@@ -918,25 +933,25 @@ public class ColorEdit extends JPanel implements DataListener,
         // an image; otherwise we'll just repaint over the old one
         if (buffImage == null || (buffImage.getWidth() != dim1 ||
                                   buffImage.getHeight() != dim2)) {
-            buffImage = new BufferedImage(dim1, dim2, 
+            buffImage = new BufferedImage(dim1, dim2,
                                           BufferedImage.TYPE_INT_ARGB);
         }
         if (overlay == null || (overlay.getWidth() != dim1 ||
                                 overlay.getHeight() != dim2)) {
-            overlay = new BufferedImage(dim1, dim2, 
+            overlay = new BufferedImage(dim1, dim2,
                                         BufferedImage.TYPE_INT_ARGB);
         }
-        
+
         imagePanel.setImage(buffImage);
         imagePanel.setColorTableOverlay(overlay);
 
         /** Check to see if we even need to draw anything */
-        
+
         if (noThresholdedValuesExist(view, sliderValue)) {
             Graphics2D g2 = buffImage.createGraphics();
             Color startColor = Color.WHITE;
             Color endColor = byteToColor(curColorForSlice);
-            GradientPaint colorGradient = 
+            GradientPaint colorGradient =
                 new GradientPaint(0, buffImage.getHeight() / 2,
                                   startColor,
                                   buffImage.getWidth(),
@@ -956,28 +971,27 @@ public class ColorEdit extends JPanel implements DataListener,
         }
 
 
-	for (int u = uMin; u <= uMax; u++) {
-	    for (int v = vMin; v <= vMax; v++) {
-		for (int y = yMin; y <= yMax; y++) {
-              
-		    // value = the int value specified by the slider.
-		    // We're slicing at a given YUV value, so we need to display
-		    // things if we're at the corresponding Y, U, or V value..
-		    if ((view == View.YVIEW && y == sliderValue) ||
-			(view == View.UVIEW && u == sliderValue) || 
-			(view == View.VVIEW && v == sliderValue)) {
+		for (int u = uMin; u <= uMax; u++) {
+			for (int v = vMin; v <= vMax; v++) {
+				for (int y = yMin; y <= yMax; y++) {
+					// value = the int value specified by the slider.
+					// We're slicing at a given YUV value, so we need to display
+					// things if we're at the corresponding Y, U, or V value..
+					if ((view == View.YVIEW && y == sliderValue) ||
+						(view == View.UVIEW && u == sliderValue) ||
+						(view == View.VVIEW && v == sliderValue)) {
 
                         boolean classified = true;
 
                         byte tableColor = colorTable.getRawColor(y,u,v);
                         if (tableColor == GREY) { classified = false; }
-                                         
+
                         // Note order: Y,V,U not YUV
-                        int color = converter.toRGB(y<<yShift, 
+                        int color = converter.toRGB(y<<yShift,
                                                     v<<vShift,
                                                     u<<uShift).getRGB();
-			// foreground color will be drawn on top of the 
-                        // background gradient if we've thresholded the 
+						// foreground color will be drawn on top of the
+                        // background gradient if we've thresholded the
                         // YUV value.
                         int foregroundColor;
                         if (classified) {

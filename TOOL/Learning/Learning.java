@@ -662,6 +662,99 @@ public class Learning implements DataListener, MouseListener,
 	}
 
 
+	/** Learn a new color table. Start by gathering
+		current path and try running batch on every data set it contains.
+		While doing that collect a bunch of stats on each of the colors
+		we care about.
+		Obviously this is not for the faint of heart as it could take a very
+		long time depending on the amount of data contained.
+	 */
+	public void runRecursiveBatchLearning() {
+		initStats();
+		quietMode = true;
+		int framesProcessed = 0;
+		long t = System.currentTimeMillis();
+		String topPath = currentSet.path();
+		boolean screen = false;
+		// We need to get rid of the current directory
+		int end = topPath.length() - 2;
+		for ( ; end > -1 && !topPath.substring(end, end+1).equals(System.getProperty("file.separator"));
+			  end--) {}
+		if (end > -1) {
+			visionState.initStats();
+			topPath = topPath.substring(0, end+1);
+			// topPath should now contain the parent directory pathname
+			// now we need to start retrieving all of the data sets that contain it
+			FileSource source = (FileSource)(tool.getSourceManager().activeSource());
+			List<DataSet> dataList = source.getDataSets();
+			for (DataSet d : dataList) {
+				if (d.path().startsWith(topPath)) {
+					// we have a target data set
+					curFrame = d.path();
+					String keyName = d.path()+"KEY.KEY";
+					// See if the key exists.
+					try {
+						FileInputStream input = new FileInputStream(keyName);
+						keys.clear();
+						keys.mergeFrom(input);
+						input.close();
+						for (Frame f : d) {
+							try {
+								f.load();
+							} catch (TOOLException e) {
+								System.out.println("Couldn't load frame");
+							}
+							current = keys.getFrame(f.index());
+							curFrameIndex = f.index();
+							if (current.getHumanChecked()) {
+								// we have good data, so let's process the frame
+								visionState.newFrame(f, tool.getColorTable());
+								// we need to figure out what objects are in the frame
+								boolean or, yell, bl, wh, re, na;
+								or = current.getBall();
+								switch (current.getYellowGoal()) {
+								case NO_POST: yell = false;
+									break;
+								default:
+									yell = true;
+								}
+								switch (current.getBlueGoal()) {
+								case NO_POST: bl = false;
+									break;
+								default:
+									bl = true;
+								}
+								switch (current.getCross()) {
+								case NO_CROSS: wh = false;
+									break;
+								default:
+									wh = true;
+								}
+								re = current.getRedRobots() > 0;
+								na = current.getBlueRobots() > 0;
+								visionState.updateStats(or, yell, bl, wh, re, na);
+								framesProcessed++;
+							}
+							try {
+								f.unload();
+							} catch (TOOLException e) {
+								System.out.println("Problem unloading frame");
+							}
+						}
+					} catch (FileNotFoundException e) {
+						// key file doesn't exist, so skip it
+					} catch (java.io.IOException e) {
+						// something went wrong, so keep going
+					}
+				}
+			}
+		}
+		t = System.currentTimeMillis() - t;
+		quietMode = false;
+		visionState.printStats();
+	}
+
+
 	/** Initialize all of our statistics variables
 	 */
 	public void initStats() {
@@ -1005,6 +1098,19 @@ public class Learning implements DataListener, MouseListener,
 		} catch (java.io.IOException e) {
 			System.out.println("Problems with key file");
 		}
+		// now as odd as this may seem, reread the data!
+		// this is because we have already used this builder
+		keys = Keys.newBuilder();
+		try {
+			FileInputStream input = new FileInputStream(keyName);
+			keys.mergeFrom(input);
+			input.close();
+		} catch (FileNotFoundException e) {
+			System.out.println(keyName + ": not found.  Creating a new file.");
+		} catch (java.io.IOException e) {
+			System.out.println("Problems with key file");
+		}
+
 	}
 
 	/** Used to set the information in the Key file.

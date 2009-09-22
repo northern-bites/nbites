@@ -98,7 +98,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     //temp menus to allow color table stuff
     JMenu actions;
     JMenuItem newColorTable, saveColorTable, saveColorTableAs,loadColorTable,
-        toggleAutoSave, toggleSoftColors;
+        toggleAutoSave, toggleSoftColors, intersectColorTable;
     JMenuItem addPane, removePane;
     //modules
     private Calibrate calibrate;
@@ -311,6 +311,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         loadColorTable = new JMenuItem("Load Color Table ");
         saveColorTable = new JMenuItem("Save Color Table");
         saveColorTableAs = new JMenuItem("Save Color Table As");
+		intersectColorTable = new JMenuItem("Intersect Color Table");
         toggleAutoSave = new JCheckBoxMenuItem("Autosave enabled");
         toggleSoftColors = new JCheckBoxMenuItem("Softcolors enabled");
         toggleSoftColors.setSelected(true);
@@ -320,6 +321,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
         newColorTable.addActionListener(this);
         loadColorTable.addActionListener(this);
+		intersectColorTable.addActionListener(this);
         saveColorTable.addActionListener(this);
         saveColorTableAs.addActionListener(this);
         toggleAutoSave.addActionListener(this);
@@ -330,6 +332,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 
         actions.add(newColorTable);
         actions.add(loadColorTable);
+		actions.add(intersectColorTable);
         actions.add(saveColorTable);
         actions.add(saveColorTableAs);
 
@@ -439,6 +442,9 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         else if(e.getSource() == newColorTable){
             newColorTable();
         }
+		else if(e.getSource() == intersectColorTable) {
+			intersectColorTable();
+		}
         else if (e.getSource() == addPane) {
             multiPane.addPane();
             if (multiPane.numPanes() > 1)
@@ -544,6 +550,26 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             colorEdit.setTable(colorTable);
 
             colorTable.setSoftColors(toggleSoftColors.isSelected());
+            // If they had been editing a table earlier, clear out their
+            // undos
+            calibrate.clearHistory();
+            dataManager.notifyDependants();
+        }
+
+    }
+
+    /**
+     * This method uses the abstract way of prompting for a file. More often
+     * than not, this will be a GUI dialog allowing you to navigate to a
+     * file in some path.
+     **/
+    public void intersectColorTable() {
+        String path = CONSOLE.promptFileOpen(
+                                             "Existing Color Table Location and Name",
+                                             ColorTable.LOAD_TABLE_PATH);
+
+        if (path != null) {
+			colorTable.intersect(path);
             // If they had been editing a table earlier, clear out their
             // undos
             calibrate.clearHistory();

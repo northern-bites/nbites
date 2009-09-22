@@ -53,6 +53,7 @@ public class ColorTable {
     public static final byte ORANGEYELLOW = Vision.ORANGEYELLOW;
     public static final byte RED = Vision.RED;
     public static final byte WHITE = Vision.WHITE;
+	public static final byte GREY = Vision.GREY;
 
 
     public static final int FAIL = 1;
@@ -311,6 +312,27 @@ public class ColorTable {
         for(Iterator<int[]> i = u.getIterator();i.hasNext();){
             int[] thisPixel = i.next();
             setRawColor(thisPixel, color);
+        }
+    }
+
+
+    //used for external modifications directly to the color table
+    //the only difference is that in this one, we attempt to auto save
+    //if necessary
+    public void modifyTableDirectly(ColorTableUpdate u, byte newColor){
+        modifyRawTable(u, newColor);
+
+        tickAutoSave();
+
+    }
+
+
+    //used for internal modifications directly to the color table
+    private void modifyRawTable(ColorTableUpdate u, byte newColor) {
+        modified = true;
+        for(Iterator<int[]> i = u.getIterator();i.hasNext();){
+            int[] thisPixel = i.next();
+            setRawColor(thisPixel, newColor);
         }
     }
 
@@ -590,6 +612,22 @@ public class ColorTable {
 
         return saveColorTable(path);
     }
+
+	/** Intersect the current table with a user specified table.
+	 */
+	public void intersect(String path) {
+		ColorTable c = new ColorTable(path);
+		// check for like values
+        for(int y=0; y<yMax; y++) {
+            for(int u=0; u<uMax; u++) {
+                for(int v=0; v<vMax; v++){
+					if (colorTable[y][u][v] != c.colorTable[y][u][v])
+						colorTable[y][u][v] = GREY;
+                }
+            }
+        }
+
+	}
 
     private int saveColorTable(String path){
         if(colorTable != null && path != null){
@@ -1075,6 +1113,86 @@ public class ColorTable {
 
         System.out.println("Filled " + update.getSize() +
                            " holes of color " +
+                           Vision.COLOR_STRINGS[colorToFillWith] );
+
+
+        return update;
+    }
+
+
+
+    /**
+       Method to get rid of all "islands" of a given color.  Basically the
+	   opposite of the fillHoles method.
+
+       We look at a 3D box around each entry in the color table to decide
+       if it should be removed or not.
+
+       @return ColorTableUpdate for all the holes now filled with desired color
+    */
+    public ColorTableUpdate loseIslands(byte colorToFillWith){
+        int BOX = 1; // size of the box we look for is 2*BOX + 1
+        double HOLE_THRESH_PERCENTAGE =.593; //what percent we need to fill a hole
+
+        //store the changes in a ColorTableUpdate
+        ColorTableUpdate update = new ColorTableUpdate(colorToFillWith);
+
+        //We look through all the entries in the color table,
+        // except those within BOX of the edge
+        for (int y = BOX; y < yMax - BOX; y++) {
+            for (int cr = BOX; cr < uMax - BOX; cr++) {
+                for (int cb = BOX; cb < vMax - BOX; cb++) {
+
+                    //gets the entry we are considering filling
+                    int target_color = colorTable[y][cr][cb];
+
+                    if(target_color != colorToFillWith){
+                        continue;
+                    }
+
+                    //this is an array of counters to track
+                    //the frequency of colors occuring in the BOX around target
+                    int[] neighbor_count = new int[POSSIBLE_COLORS];
+
+                    int maxColor = 0; //stores the most frequent color
+                    int maxVal = 0;//stores the frequency of that color
+
+                    //now look through all the pixels BOX away from the target
+					boolean island = true;
+                    for(int ii = y-BOX; ii <= y +BOX && island; ii++){
+                        for(int jj = cr -BOX; jj <= cr + BOX && island; jj++ ){
+                            for(int kk = cb -BOX; kk <= cb+BOX && island; kk++){
+
+                                //skip the center pixe, since it is the target
+                                if(y==ii && cr == jj && cb ==kk){
+                                    continue;
+                                }
+
+                                //grab a neighbor to the target, to test
+                                int test_color = colorTable[ii][jj][kk];
+								if (test_color == colorToFillWith) {
+									island = false;
+								}
+                            }
+                        }
+                    }//done looking through the BOX
+
+                    //lets see if we should assign the target something new:
+					if (island) {
+                        int[] yuv_to_fill = {y,cb,cr};
+						update.addPixel(yuv_to_fill,colorToFillWith);
+					}
+                }
+            }
+        }//done looking through the whole table
+
+        //push the changes
+        pushUndo(update);
+
+        modifyTableDirectly(update, Vision.GREY);
+
+        System.out.println("Got rid of " + update.getSize() +
+                           " islands of color " +
                            Vision.COLOR_STRINGS[colorToFillWith] );
 
 
