@@ -406,7 +406,7 @@ FAST_STIFFNESS = (0.85, #hipStiffness
                   0.1,  #armStiffness
                   0.5)  #arm pitch
 FAST_ODO= ODO_CONFIG
-FAST_ARM= (10,)
+FAST_ARM= (10.0,)
 
 FAST_GAIT = motion.GaitCommand(FAST_STANCE,
                                  FAST_STEP,

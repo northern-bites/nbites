@@ -1,4 +1,5 @@
 #ifndef VisionHelpers_h_defined
+#include <cstdlib>
 inline int ROUND2(float x) {
 	return static_cast<int>( std::floor(x + 0.5f) );
 }
