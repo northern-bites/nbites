@@ -6,11 +6,10 @@
 USAGE="./sync [up-down] <folder-name> \nExample: $> ./sync down watson"
 
 UP_OR_DOWN=$1
-
 REMOTE_FOLDER=${2%/} #Strip the trailing slash if any
 
 RSYNC=rsync
-RSYNC_OPTS=-rvtR
+RSYNC_OPTS=-rvt
 
 if [ "$1" = "" ]; then
     echo "No push direction specified"
@@ -41,7 +40,7 @@ elif [ "$UP_OR_DOWN" = "down" ]; then
 
     echo "Syncing FROM $SERVER/$REMOTE_FOLDER TO `pwd`/$REMOTE_FOLDER "
     echo "cd ../ && $RSYNC $RSYNC_OPTS $SERVER/$REMOTE_FOLDER ./"
-    cd ../ && $RSYNC $RSYNC_OPTS $SERVER/$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER ./$FRAMES_DIR
+    cd ../ && $RSYNC $RSYNC_OPTS $SERVER/$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/* ./$FRAMES_DIR/$REMOTE_FOLDER
 else
 echo "Invalid parameters"
 echo $USAGE
