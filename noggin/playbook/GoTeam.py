@@ -29,7 +29,8 @@ class GoTeam:
         self.time = time.time()
 
         self.play = Play.Play()
-        self.lastPlay = Play.Play()
+        self.workingPlay = None
+        self.lastPlay = None
 
         # Information about teammates
         self.teammates = []
@@ -118,9 +119,6 @@ class GoTeam:
         # Update Play Memory
         self.lastPlay = self.play
         self.play = self.workingPlay
-
-        #update teammate instance of self
-        self.me.play = self.play
 
         if not self.play.equals(self.lastPlay):
             if self.printStateChanges:
@@ -267,7 +265,7 @@ class GoTeam:
                 self.numActiveFieldPlayers += 1
 
                 # Not using teammate ball reports for now
-                if (mate.ballDist > 0 and PBConstants.USE_FINDER):
+                if (PBConstants.USE_FINDER and mate.ballDist > 0):
                     self.brain.ball.reportBallSeen()
 
     def highestActivePlayerNumber(self):
