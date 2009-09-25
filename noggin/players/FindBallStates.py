@@ -1,7 +1,7 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import GoalieTransitions as goalTrans
-from ..playbook import PBConstants as pbc
+from ..playbook.PBConstants import GOALIE
 import man.motion.HeadMoves as HeadMoves
 from ..util import MyMath
 
@@ -14,7 +14,7 @@ def scanFindBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if player.brain.playbook.role == pbc.GOALIE:
+    if player.brain.playbook.isRole(GOALIE):
         if transitions.shouldTurnToBall_FoundBall(player):
             return player.goLater('turnToBall')
         elif transitions.shouldSpinFindBall(player):
@@ -32,9 +32,9 @@ def scanFindBall(player):
 
     if abs(player.brain.ball.locBearing) < constants.SCAN_FIND_BEARING_THRESH \
             or player.brain.ball.locDist < constants.SCAN_FIND_DIST_THRESH \
-            and not player.brain.playbook.role == pbc.GOALIE:
+            and not player.brain.playbook.isRole(GOALIE):
         return player.stay()
-    elif player.brain.playbook.role == pbc.GOALIE and \
+    elif player.brain.playbook.isRole(GOALIE) and \
             abs(player.brain.ball.locBearing) <\
             constants.SCAN_FIND_BEARING_THRESH:
         return player.stay()
@@ -48,7 +48,7 @@ def spinFindBall(player):
     move to align on it. If we don't find it, we go to a garbage state
     """
 
-    if player.brain.playbook.role == pbc.GOALIE:
+    if player.brain.playbook.isRole(GOALIE):
         if transitions.shouldApproachBall(player):
             player.brain.tracker.trackBall()
             return player.goLater('approachBall')

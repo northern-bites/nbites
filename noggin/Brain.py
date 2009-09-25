@@ -24,10 +24,13 @@ from . import TeamConfig
 from . import Leds
 # Packages and modules from sub-directories
 from . import robots
-from .playbook import GoTeam
+from .playbook import PBInterface
 from .players import Switch
 
 import _roboguardian
+
+import pstats
+import cProfile
 
 
 class Brain(object):
@@ -39,6 +42,7 @@ class Brain(object):
         """
         Class constructor
         """
+        self.profileFrames = 0
         self.on = True
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
@@ -87,7 +91,7 @@ class Brain(object):
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
-        self.playbook = GoTeam.GoTeam(self)
+        self.playbook = PBInterface.PBInterface(self)
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
@@ -221,7 +225,7 @@ class Brain(object):
         temp = self.comm.latestComm()
         for packet in temp:
             if len(packet) == Constants.NUM_PACKET_ELEMENTS:
-                packet = Packet(packet)
+                packet = Packet.Packet(packet)
                 if packet.playerNumber != self.my.playerNumber:
                     self.playbook.update(packet)
 
@@ -237,22 +241,23 @@ class Brain(object):
     def setPacketData(self):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
-        self.comm.setData(self.loc.x,
-                          self.loc.y,
-                          self.loc.h,
-                          self.loc.xUncert,
-                          self.loc.yUncert,
-                          self.loc.hUncert,
-                          self.loc.ballX,
-                          self.loc.ballY,
-                          self.loc.ballXUncert,
-                          self.loc.ballYUncert,
+        loc = self.loc
+        self.comm.setData(loc.x,
+                          loc.y,
+                          loc.h,
+                          loc.xUncert,
+                          loc.yUncert,
+                          loc.hUncert,
+                          loc.ballX,
+                          loc.ballY,
+                          loc.ballXUncert,
+                          loc.ballYUncert,
                           self.ball.dist,
                           self.playbook.role,
-                          self.playbook.currentSubRole,
-                          self.playbook.determineChaseTime(),
-                          self.loc.ballVelX,
-                          self.loc.ballVelY)
+                          self.playbook.subRole,
+                          self.playbook.pb.me.chaseTime,
+                          loc.ballVelX,
+                          loc.ballVelY)
 
     def resetLocalization(self):
         """
@@ -274,3 +279,5 @@ class Brain(object):
             self.loc.blueGoalieReset()
         else:
             self.loc.redGoalieReset()
+
+

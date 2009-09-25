@@ -1,5 +1,6 @@
 import _lights
-import playbook.PBConstants as PBConstants
+from playbook import PBConstants
+
 # LED Related #
 DEBUG_BALL_LEDS = True
 DEBUG_GOAL_LEDS = True
@@ -119,17 +120,17 @@ class Leds():
                 self.executeLeds(RIGHT_GOAL_OFF_LEDS)
 
         if DEBUG_CHASER_LEDS:
-            if self.brain.playbook.role == PBConstants.CHASER:
+            if self.brain.playbook.isRole(PBConstants.CHASER):
                 if self.brain.player.currentState == "approachBallWithLoc":
                     self.executeLeds(LOC_CHASER_ON_LEDS)
                 else:
                     self.executeLeds(CHASER_ON_LEDS)
-            elif self.brain.playbook.role == PBConstants.DEFENDER:
-                if self.brain.playbook.subRole == PBConstants.STOPPER:
+            elif self.brain.playbook.isRole(PBConstants.DEFENDER):
+                if self.brain.playbook.isSubRole(PBConstants.STOPPER):
                     self.executeLeds(STOPPER_ON_LEDS)
-                elif self.brain.playbook.subRole == PBConstants.SWEEPER:
+                elif self.brain.playbook.isSubRole(PBConstants.SWEEPER):
                     self.executeLeds(SWEEPER_ON_LEDS)
-                elif self.brain.playbook.subRole == PBConstants.DEFENSIVE_MIDDIE:
+                elif self.brain.playbook.isSubRole(PBConstants.DEFENSIVE_MIDDIE):
                     self.executeLeds(MIDDIE_ON_LEDS)
                 else:
                     self.executeLeds(CHASER_OFF_LEDS)
