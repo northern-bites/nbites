@@ -23,12 +23,8 @@ class MyInfo:
         self.uncertX = 0.0
         self.uncertY = 0.0
         self.uncertH = 0.0
-        self.name = 0
         self.playerNumber = 3
-        self.teamNumber = 0
         self.teamColor = Constants.TEAM_BLUE
-        self.penalized = False
-        self.kicking = False
         self.locScoreXY = Constants.BAD_LOC
         self.locScoreTheta = Constants.BAD_LOC
         self.locScoreFramesBad = 0

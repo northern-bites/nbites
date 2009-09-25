@@ -74,7 +74,6 @@ class Brain(object):
         # Initialize various components
         self.my = MyInfo.MyInfo()
         # Functional Variables
-        self.my.teamNumber = self.comm.gc.team
         self.my.playerNumber = self.comm.gc.player
         # Information about the environment
         self.initFieldObjects()
