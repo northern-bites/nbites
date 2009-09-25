@@ -18,7 +18,7 @@ from . import HeadTracking
 from . import Navigator
 from .util import NaoOutput
 from . import NogginConstants as Constants
-from . import TypeDefs
+from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet)
 from . import Loc
 from . import TeamConfig
 from . import Leds
@@ -72,14 +72,14 @@ class Brain(object):
         self.out.printf("GC:  I am player  "+str(TeamConfig.PLAYER_NUMBER))
 
         # Initialize various components
-        self.my = TypeDefs.MyInfo()
+        self.my = MyInfo.MyInfo()
         # Functional Variables
         self.my.teamNumber = self.comm.gc.team
         self.my.playerNumber = self.comm.gc.player
         # Information about the environment
         self.initFieldObjects()
-        self.ball = TypeDefs.Ball(self.vision.ball)
-        self.sonar = TypeDefs.Sonar()
+        self.ball = Ball.Ball(self.vision.ball)
+        self.sonar = Sonar.Sonar()
         # workaround for slarti (now trillian) sonar problems
         if self.CoA.name == 'marvin':
             self.sonar.MIN_DIST = 30.0
@@ -99,19 +99,19 @@ class Brain(object):
         """
         # Build instances of the vision based field objects
         # Yello goal left and right posts
-        self.yglp = TypeDefs.FieldObject(self.vision.yglp,
+        self.yglp = Landmarks.FieldObject(self.vision.yglp,
                                          Constants.VISION_YGLP)
-        self.ygrp = TypeDefs.FieldObject(self.vision.ygrp,
+        self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
                                          Constants.VISION_YGRP)
         # Blue Goal left and right posts
-        self.bglp = TypeDefs.FieldObject(self.vision.bglp,
+        self.bglp = Landmarks.FieldObject(self.vision.bglp,
                                          Constants.VISION_BGLP)
-        self.bgrp = TypeDefs.FieldObject(self.vision.bgrp,
+        self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
                                          Constants.VISION_BGRP)
 
-        self.bgCrossbar = TypeDefs.Crossbar(self.vision.bgCrossbar,
+        self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
                                             Constants.VISION_BG_CROSSBAR)
-        self.ygCrossbar = TypeDefs.Crossbar(self.vision.ygCrossbar,
+        self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
                                             Constants.VISION_YG_CROSSBAR)
 
         # Now we setup the corners
@@ -222,7 +222,7 @@ class Brain(object):
         temp = self.comm.latestComm()
         for packet in temp:
             if len(packet) == Constants.NUM_PACKET_ELEMENTS:
-                packet = TypeDefs.Packet(packet)
+                packet = Packet(packet)
                 if packet.playerNumber != self.my.playerNumber:
                     self.playbook.update(packet)
 

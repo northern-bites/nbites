@@ -157,13 +157,13 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/Leds.py
                         ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
                         ${NOGGIN_INCLUDE_DIR}/TrackingStates.py
-                        ${NOGGIN_INCLUDE_DIR}/TypeDefs.py
                         ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
                         )
 
 SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/playbook
                            ${NOGGIN_INCLUDE_DIR}/players
                            ${NOGGIN_INCLUDE_DIR}/robots
+			   ${NOGGIN_INCLUDE_DIR}/typeDefs
                            ${NOGGIN_INCLUDE_DIR}/util )
 
 
