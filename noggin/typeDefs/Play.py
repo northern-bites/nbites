@@ -1,11 +1,18 @@
-from . import PBConstants
+from ..playbook.PBConstants import (INIT_STRATEGY,
+                                    INIT_FORMATION,
+                                    INIT_ROLE,
+                                    INIT_SUB_ROLE,
+                                    STRATEGIES,
+                                    FORMATIONS,
+                                    ROLES,
+                                    SUB_ROLES)
 
 class Play:
     def __init__(self,
-                 strategy = PBConstants.INIT_STRATEGY,
-                 formation = PBConstants.INIT_FORMATION,
-                 role = PBConstants.INIT_ROLE,
-                 subRole = PBConstants.INIT_SUB_ROLE,
+                 strategy = INIT_STRATEGY,
+                 formation = INIT_FORMATION,
+                 role = INIT_ROLE,
+                 subRole = INIT_SUB_ROLE,
                  position = [0,0]
                  ):
         self.strategy = strategy
@@ -56,7 +63,7 @@ class Play:
             return True
 
     def __str__(self):
-        return ("Strategy: " + PBConstants.STRATEGIES[self.strategy] +
-                "  Formation: " + PBConstants.FORMATIONS[self.formation] +
-                "  Role:" + PBConstants.ROLES[self.role] +
-                "  SubRole:" + PBConstants.SUB_ROLES[self.subRole])
+        return ("Strategy: " + STRATEGIES[self.strategy] +
+                "  Formation: " + FORMATIONS[self.formation] +
+                "  Role:" + ROLES[self.role] +
+                "  SubRole:" + SUB_ROLES[self.subRole])

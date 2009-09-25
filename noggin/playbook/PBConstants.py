@@ -31,7 +31,7 @@ KICKOFF_FORMATION_TIME = 3
 # Time limit for moving into the finder routine
 FINDER_TIME_THRESH = 5
 NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
-PACKET_DEAD_PERIOD = 5
+PACKET_DEAD_PERIOD = 5 # TO-DO: look at shortening so it replaces penalized
 
 ####
 #### Role Switching / Tie Breaking ####

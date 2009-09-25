@@ -2,7 +2,10 @@
 from math import (hypot, degrees)
 
 from .. import NogginConstants
-from . import PBConstants
+from ..playbook.PBConstants import (DEFAULT_GOALIE_NUMBER,
+                                   DEFAULT_CHASER_NUMBER,
+                                   DEFAULT_DEFENDER_NUMBER,
+                                   PACKET_DEAD_PERIOD)
 from ..util import MyMath
 import time
 
@@ -113,7 +116,7 @@ class TeamMember:
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.grabbing = (0 < self.ballDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
-        self.lastPacketTime = pb.time
+        self.lastPacketTime = pb.pb.time
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -174,13 +177,13 @@ class TeamMember:
         return (self.role == roleToTest)
 
     def isDefaultGoalie(self):
-        return (self.playerNumber == PBConstants.DEFAULT_GOALIE_NUMBER)
+        return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
 
     def isDefaultChaser(self):
-        return (self.playerNumber == PBConstants.DEFAULT_CHASER_NUMBER)
+        return (self.playerNumber == DEFAULT_CHASER_NUMBER)
 
     def isDefaultDefender(self):
-        return (self.playerNumber == PBConstants.DEFAULT_DEFENDER_NUMBER)
+        return (self.playerNumber == DEFAULT_DEFENDER_NUMBER)
 
     def isPenalized(self):
         '''
@@ -200,7 +203,7 @@ class TeamMember:
         returns True if teammates' last timestamp is sufficiently behind ours.
         however, the dog could still be on but sending really laggy packets.
         '''
-        return (PBConstants.PACKET_DEAD_PERIOD <
+        return (PACKET_DEAD_PERIOD <
                 (self.brain.playbook.pb.time - self.lastPacketTime))
 
     def __str__(self):

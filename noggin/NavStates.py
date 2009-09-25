@@ -3,6 +3,7 @@
 from .util import MyMath
 import NavConstants as constants
 from .players import ChaseBallConstants
+from .playbook.PBConstants import GOALIE
 from math import fabs, cos, sin, radians
 
 DEBUG = False
@@ -280,7 +281,7 @@ def orthoLeftStrafe(nav):
 def omniWalkToPoint(nav):
     if nav.firstFrame():
         nav.walkToPointCount = 0
-    if nav.brain.playbook.me.isGoalie():
+    if nav.brain.playbook.isRole(GOALIE):
         if nav.atDestinationGoalie() and nav.atHeading():
             return nav.goNow('stop')
     else:

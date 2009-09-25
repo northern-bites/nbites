@@ -1,9 +1,9 @@
 from math import (fabs, hypot, cos, sin, acos, asin)
 
-from . import Teammate
+from ..typeDefs import TeamMember as Teammate
 from . import PBConstants
 from . import Strategies
-from . import Play
+from ..typeDefs import Play
 from .. import NogginConstants
 import time
 
@@ -35,7 +35,7 @@ class GoTeam:
         # Information about teammates
         self.teammates = []
         for i in xrange(PBConstants.NUM_TEAM_PLAYERS):
-            mate = Teammate.Teammate(brain)
+            mate = Teammate.TeamMember(brain)
             mate.playerNumber = i + 1
             self.teammates.append(mate)
 

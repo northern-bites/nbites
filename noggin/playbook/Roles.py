@@ -1,4 +1,3 @@
-
 from .. import NogginConstants
 from . import PBConstants
 from . import SubRoles
