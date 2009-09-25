@@ -13,6 +13,8 @@ class Teammate:
         '''variables include lots from the Packet class'''
 
         # things in the Packet()
+        #setting playerNumber to default to your own allows immediate caching
+        #of values for default chaser and default goalie
         self.playerNumber = 0
         self.x = 0
         self.y = 0
@@ -25,7 +27,8 @@ class Teammate:
         self.ballUncertX = 0
         self.ballUncertY = 0
         self.ballDist = 0
-        self.play = Play.Play()
+        self.role = None
+        self.subRole = None
         self.chaseTime = 0
         self.lastPacketTime = time.time()
 
@@ -57,7 +60,8 @@ class Teammate:
         self.ballUncertX = packet.ballUncertX
         self.ballUncertY = packet.ballUncertY
         self.ballDist = packet.ballDist
-        self.play = packet.play
+        self.role = packet.role
+        self.subRole = packet.subRole
         self.chaseTime = packet.chaseTime
 
         # calculates ball localization distance, bearing
@@ -85,8 +89,9 @@ class Teammate:
         '''
         my = self.brain.my
         ball = self.brain.ball
+        pb = self.brain.playbook
 
-        self.playerNumber = self.brain.my.playerNumber
+        #self.playerNumber = self.brain.my.playerNumber
         self.x = my.x
         self.y = my.y
         self.h = my.h
@@ -98,19 +103,20 @@ class Teammate:
         self.ballUncertX = ball.uncertX
         self.ballUncertY = ball.uncertY
         self.ballDist = ball.dist
-        self.play = self.brain.playbook.pb.play
-        self.chaseTime = self.brain.playbook.pb.determineChaseTime()
+        self.role = pb.role
+        self.subRole = pb.subRole
+        self.chaseTime = pb.pb.determineChaseTime()
 
         self.ballLocDist = ball.locDist
         self.ballLocBearing = ball.locBearing
         self.active = (not self.brain.gameController.currentState ==
                        'gamePenalized')
         #only going to be dribbling or grabbing if you see the ball
-        self.dribbling = (0 < ball.dist <=
+        self.dribbling = (0 < self.ballDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
-        self.grabbing = (0 < ball.dist <=
+        self.grabbing = (0 < self.ballDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
-        self.lastPacketTime = self.brain.playbook.pb.time
+        self.lastPacketTime = pb.time
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -125,7 +131,8 @@ class Teammate:
         self.ballUncertX = 0
         self.ballUncertY = 0
         self.ballDist = 0
-        self.play = Play.Play()
+        self.role = None
+        self.subRole = None
         self.ballLocDist = 0
         self.ballLocBearing = 0
         self.active = False
@@ -167,7 +174,7 @@ class Teammate:
         return (self.dribbling or self.grabbing)
 
     def isTeammateRole(self, roleToTest):
-        return (self.play.getRole() == roleToTest)
+        return (self.role == roleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == PBConstants.DEFAULT_GOALIE_NUMBER)

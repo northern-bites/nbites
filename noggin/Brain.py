@@ -262,7 +262,6 @@ class Brain(object):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
         loc = self.loc
-        me = self.playbook.pb.me
         self.comm.setData(loc.x,
                           loc.y,
                           loc.h,
@@ -274,9 +273,9 @@ class Brain(object):
                           loc.ballXUncert,
                           loc.ballYUncert,
                           self.ball.dist,
-                          me.play.getRole(),
-                          me.play.getSubRole(),
-                          me.chaseTime,
+                          self.playbook.role,
+                          self.playbook.subRole,
+                          self.playbook.pb.me.chaseTime,
                           loc.ballVelX,
                           loc.ballVelY)
 
