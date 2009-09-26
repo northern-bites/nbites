@@ -120,17 +120,17 @@ class Leds():
                 self.executeLeds(RIGHT_GOAL_OFF_LEDS)
 
         if DEBUG_CHASER_LEDS:
-            if self.brain.playbook.isRole(PBConstants.CHASER):
+            if self.brain.play.isRole(PBConstants.CHASER):
                 if self.brain.player.currentState == "approachBallWithLoc":
                     self.executeLeds(LOC_CHASER_ON_LEDS)
                 else:
                     self.executeLeds(CHASER_ON_LEDS)
-            elif self.brain.playbook.isRole(PBConstants.DEFENDER):
-                if self.brain.playbook.isSubRole(PBConstants.STOPPER):
+            elif self.brain.play.isRole(PBConstants.DEFENDER):
+                if self.brain.play.isSubRole(PBConstants.STOPPER):
                     self.executeLeds(STOPPER_ON_LEDS)
-                elif self.brain.playbook.isSubRole(PBConstants.SWEEPER):
+                elif self.brain.play.isSubRole(PBConstants.SWEEPER):
                     self.executeLeds(SWEEPER_ON_LEDS)
-                elif self.brain.playbook.isSubRole(PBConstants.DEFENSIVE_MIDDIE):
+                elif self.brain.play.isSubRole(PBConstants.DEFENSIVE_MIDDIE):
                     self.executeLeds(MIDDIE_ON_LEDS)
                 else:
                     self.executeLeds(CHASER_OFF_LEDS)

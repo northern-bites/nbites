@@ -22,7 +22,7 @@ def goalieAwesomePosition(player):
     Have the robot navigate to the position reported to it from playbook
     """
     brain = player.brain
-    position = brain.playbook.getPosition()
+    position = brain.play.getPosition()
     nav = brain.nav
     my = brain.my
 
@@ -137,7 +137,7 @@ def goalieOutOfPosition(player):
     else:
         player.brain.tracker.trackBall()
 
-    position = player.brain.playbook.getPosition()
+    position = player.brain.play.getPosition()
     if player.firstFrame() or\
             nav.destX != position[0] or nav.destY != position[1]:
         nav.omniGoTo(position)
@@ -160,7 +160,7 @@ def goalieAtPosition(player):
         player.brain.tracker.trackBall()
 
     # Check that the position is correct
-    position = player.brain.playbook.getPosition()
+    position = player.brain.play.getPosition()
 
     if (abs(nav.destX - position[0]) > constants.SHOULD_POSITION_DIFF or
         abs(nav.destY - position[1]) >  constants.SHOULD_POSITION_DIFF or

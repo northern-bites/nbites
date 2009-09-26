@@ -21,7 +21,7 @@ def chase(player):
     player.isChasing = True
     player.hasAlignedOnce = False
 
-    if player.brain.playbook.isRole(GOALIE):
+    if player.brain.play.isRole(GOALIE):
         if transitions.shouldScanFindBall(player):
             return player.goNow('scanFindBall')
         elif transitions.shouldApproachBall(player):
@@ -112,7 +112,7 @@ def approachBallWithLoc(player):
 
     nav = player.brain.nav
     my = player.brain.my
-    if player.brain.playbook.isRole(GOALIE):
+    if player.brain.play.isRole(GOALIE):
         if transitions.shouldKick(player):
             player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goNow('waitBeforeKick')
@@ -208,7 +208,7 @@ def approachBall(player):
         return player.goNow('penaltyBallInOppGoalbox')
 
     # Switch to other states if we should
-    if player.brain.playbook.isRole(GOALIE):
+    if player.brain.play.isRole(GOALIE):
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKick(player):
@@ -234,7 +234,7 @@ def approachBallWalk(player):
     We use things as to when we should leave and how we should walk
     """
 
-    if not player.brain.playbook.isRole(GOALIE):
+    if not player.brain.play.isRole(GOALIE):
         if transitions.shouldNotGoInBox(player):
             return player.goLater('ballInMyBox')
         elif transitions.shouldChaseAroundBox(player):
@@ -254,7 +254,7 @@ def approachBallWalk(player):
 
     # Determine our speed for approaching the ball
     ball = player.brain.ball
-    if player.brain.playbook.isRole(GOALIE) and goalTran.dangerousBall(player):
+    if player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
         return player.goNow('approachDangerousBall')
 
     if ball.dist < constants.APPROACH_WITH_GAIN_DIST:

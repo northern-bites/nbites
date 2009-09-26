@@ -16,7 +16,7 @@ def playbookPosition(player):
     Have the robot navigate to the position reported to it from playbook
     """
     brain = player.brain
-    position = brain.playbook.getPosition()
+    position = brain.play.getPosition()
     nav = brain.nav
     my = brain.my
     ball = brain.ball
@@ -72,7 +72,7 @@ def playbookPosition(player):
 
         # Attempt to go to the point while looking at the ball
         if (not useOmni or
-            (player.brain.playbook.isRole(PBConstants.DEFENDER) and
+            (player.brain.play.isRole(PBConstants.DEFENDER) and
              player.brain.ball.x < player.brain.my.x)):
             nav.goTo(position)
         else:
@@ -92,7 +92,7 @@ def atPosition(player):
     State for when we're at the position
     """
     nav = player.brain.nav
-    position = player.brain.playbook.getPosition()
+    position = player.brain.play.getPosition()
     if player.firstFrame():
         player.stopWalking()
         player.notAtPositionCounter = 0

@@ -36,27 +36,21 @@ class Play:
     def setPosition(self, position):
         self.position = position
 
-    def getStrategy(self):
-        return self.strategy
+    def isSubRole(self, subRoleToTest):
+        return (self.subRole == subRoleToTest)
 
-    def getFormation(self):
-        return self.formation
-
-    def getRole(self):
-        return self.role
-
-    def getSubRole(self):
-        return self.subRole
+    def isRole(self, roleToTest):
+        return (self.role == roleToTest)
 
     def getPosition(self):
         return self.position
 
     def equals(self, otherPlay):
         '''compares two plays for equality by value'''
-        if( ( self.subRole != otherPlay.getSubRole() ) or
-            ( self.role != otherPlay.getRole() ) or
-            ( self.formation != otherPlay.getFormation() ) or
-            ( self.strategy != otherPlay.getStrategy() ) ):
+        if( ( self.subRole != otherPlay.subRole ) or
+            ( self.role != otherPlay.role ) or
+            ( self.formation != otherPlay.formation ) or
+            ( self.strategy != otherPlay.strategy ) ):
             return False
 
         else:

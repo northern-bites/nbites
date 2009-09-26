@@ -18,7 +18,7 @@ from . import HeadTracking
 from . import Navigator
 from .util import NaoOutput
 from . import NogginConstants as Constants
-from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet)
+from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet, Play)
 from . import Loc
 from . import TeamConfig
 from . import Leds
@@ -29,10 +29,6 @@ from .players import Switch
 
 import _roboguardian
 
-import pstats
-import cProfile
-
-
 class Brain(object):
     """
     Class brings all of our components together and runs the behaviors
@@ -42,7 +38,6 @@ class Brain(object):
         """
         Class constructor
         """
-        self.profileFrames = 0
         self.on = True
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
@@ -82,6 +77,7 @@ class Brain(object):
         # Information about the environment
         self.initFieldObjects()
         self.ball = Ball.Ball(self.vision.ball)
+        self.play = Play.Play()
         self.sonar = Sonar.Sonar()
         # workaround for slarti (now trillian) sonar problems
         if self.CoA.name == 'marvin':
@@ -193,7 +189,7 @@ class Brain(object):
         # Behavior stuff
         self.gameController.run()
         self.fallController.run()
-        self.playbook.run()
+        self.updatePlaybook()
         self.player.run()
         self.tracker.run()
         self.nav.run()
@@ -236,6 +232,12 @@ class Brain(object):
         # Update global information to current estimates
         self.my.updateLoc(self.loc)
         self.ball.updateLoc(self.loc, self.my)
+
+    def updatePlaybook(self):
+        """
+        updates self.play to the new play
+        """
+        self.play = self.playbook.update()
 
     # move to comm
     def setPacketData(self):

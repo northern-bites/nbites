@@ -89,7 +89,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
 
     def run(self):
-        self.pb = self.brain.playbook
+        self.play = self.brain.play
         if self.currentState == 'afterKick' or \
                 self.lastDiffState == 'afterKick':
             self.justKicked = True
@@ -99,7 +99,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         gcState = self.brain.gameController.currentState
         if gcState == 'gamePlaying' or\
                 (gcState == 'penaltyShotsGamePlaying'
-                 and self.brain.playbook.isRole(PBConstants.GOALIE)):
+                 and self.play.isRole(PBConstants.GOALIE)):
             roleState = self.getNextState()
 
             if roleState != self.currentState:
@@ -109,34 +109,34 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if not self.pb.subRoleChanged():
-            if self.pb.isRole(PBConstants.GOALIE):
+        if not self.brain.playbook.subRoleChanged():
+            if self.play.isRole(PBConstants.GOALIE):
                 state = GoalieTransitions.goalieRunChecks(self)
                 return state
             return self.currentState
         # We don't stop chasing if we are in certain roles
-        elif (self.pb.isRole(PBConstants.CHASER) and
+        elif (self.play.isRole(PBConstants.CHASER) and
               ChaseBallTransitions.shouldntStopChasing(self)):
             return self.currentState
         else:
             return self.getRoleState()
 
     def getRoleState(self):
-        if self.pb.isRole(PBConstants.CHASER):
+        if self.play.isRole(PBConstants.CHASER):
             return 'chase'
-        elif ( self.pb.isRole(PBConstants.OFFENDER) or
-               self.pb.isRole(PBConstants.DEFENDER) ):
+        elif ( self.play.isRole(PBConstants.OFFENDER) or
+               self.play.isRole(PBConstants.DEFENDER) ):
             return 'playbookPosition'
-        elif self.pb.isRole(PBConstants.GOALIE):
+        elif self.play.isRole(PBConstants.GOALIE):
             if (self.lastDiffState == 'gamePenalized' or
                 self.lastDiffState == 'fallen'):
                 return 'goaliePosition'
             elif self.squatting:
                 return 'squatted'
             return 'squat'
-        elif self.pb.isRole(PBConstants.PENALTY_ROLE):
+        elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
-        elif self.pb.isRole(PBConstants.SEARCHER):
+        elif self.play.isRole(PBConstants.SEARCHER):
             return 'scanFindBall'
         else:
             return 'scanFindBall'

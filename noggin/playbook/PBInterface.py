@@ -12,17 +12,16 @@ class PBInterface:
         self.pb = GoTeam.GoTeam(brain)
         self.subRole = None
         self.lastSubRole = None
-        self.role = None
-        self.position = None
         self.defaultChaser = self.pb.me.isDefaultChaser()
         self.defaultGoalie = self.pb.me.isDefaultGoalie()
 
-    def run(self):
+    def update(self):
         '''
         Runs the playbook (calls the run method of GoTeam)
         '''
         self.pb.run()
         self.storeUsedValues()
+        return self.pb.play
 
     def isDefaultChaser(self):
         ''' true if player is chaser at game start '''
@@ -31,14 +30,6 @@ class PBInterface:
     def isDefaultGoalie(self):
         '''true if player is goalie at game start'''
         return self.defaultGoalie
-
-    def isSubRole(self, subRoleToTest):
-        '''true if player is the given subrole'''
-        return (self.subRole == subRoleToTest)
-
-    def isRole(self, roleToTest):
-        '''true if player is the given role'''
-        return (self.role == roleToTest)
 
     def getPosition(self):
         return self.position
@@ -49,6 +40,4 @@ class PBInterface:
     def storeUsedValues(self):
         play = self.pb.play
         self.lastSubRole = self.subRole
-        self.subRole = play.getSubRole()
-        self.role = play.getRole()
-        self.position = play.getPosition()
+        self.subRole = play.subRole

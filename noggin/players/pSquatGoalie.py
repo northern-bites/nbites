@@ -33,7 +33,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         gcState = self.brain.gameController.currentState
         if gcState == 'gamePlaying' or\
                 (gcState == 'penaltyShotsGamePlaying'
-                 and self.brain.playbook.isRole(GOALIE)):
+                 and self.brain.play.isRole(GOALIE)):
                 state = GoalieTransitions.goalieRunChecks(self)
                 if state == 'goaliePosition':
                     state = 'squatPosition'
