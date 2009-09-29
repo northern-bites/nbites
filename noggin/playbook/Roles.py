@@ -15,7 +15,7 @@ def rSearcher(team, workingPlay):
     workingPlay.setRole(PBConstants.SEARCHER)
     if team.numActiveFieldPlayers == 1:
         workingPlay.setSubRole(PBConstants.OTHER_FINDER)
-        workingPlay.setPosition(PBConstants.READY_KICKOFF_STOPPER)
+        workingPlay.setPosition((PBConstants.SWEEPER_X, PBConstants.SWEEPER_Y))
     else:
         teammate = team.getOtherActiveTeammate()
         pos = team.getLeastWeightPosition(

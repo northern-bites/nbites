@@ -103,8 +103,8 @@ class TeamMember:
         self.ballUncertX = ball.uncertX
         self.ballUncertY = ball.uncertY
         self.ballDist = ball.dist
-        self.role = pb.role
-        self.subRole = pb.subRole
+        self.role = self.brain.play.role
+        self.subRole = self.brain.play.subRole
         self.chaseTime = pb.pb.determineChaseTime()
 
         self.ballLocDist = ball.locDist

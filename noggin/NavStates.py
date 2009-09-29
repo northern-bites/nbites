@@ -281,7 +281,7 @@ def orthoLeftStrafe(nav):
 def omniWalkToPoint(nav):
     if nav.firstFrame():
         nav.walkToPointCount = 0
-    if nav.brain.playbook.isRole(GOALIE):
+    if nav.brain.play.isRole(GOALIE):
         if nav.atDestinationGoalie() and nav.atHeading():
             return nav.goNow('stop')
     else:

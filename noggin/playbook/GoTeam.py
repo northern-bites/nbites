@@ -1,6 +1,6 @@
 from math import (fabs, hypot, cos, sin, acos, asin)
 
-from ..typeDefs import TeamMember as Teammate
+
 from . import PBConstants
 from . import Strategies
 from ..typeDefs import Play
@@ -33,14 +33,9 @@ class GoTeam:
         self.lastPlay = None
 
         # Information about teammates
-        self.teammates = []
-        for i in xrange(PBConstants.NUM_TEAM_PLAYERS):
-            mate = Teammate.TeamMember(brain)
-            mate.playerNumber = i + 1
-            self.teammates.append(mate)
 
-        self.position = []
-        self.me = self.teammates[self.brain.my.playerNumber - 1]
+        #self.position = []
+        self.me = self.brain.teamMembers[self.brain.my.playerNumber - 1]
         self.me.playerNumber = self.brain.my.playerNumber
         self.activeFieldPlayers = []
         self.numActiveFieldPlayers = 0
@@ -78,6 +73,8 @@ class GoTeam:
 
         # Have a separate strategy to easily deal with being penalized
         elif currentGCState == 'gamePenalized':
+            # look into saving time by not setting this if last play
+            # was penalized
             newPlay.setStrategy(PBConstants.PENALTY_STRATEGY)
             newPlay.setFormation(PBConstants.PENALTY_FORMATION)
             newPlay.setRole(PBConstants.PENALTY_ROLE)
@@ -255,7 +252,7 @@ class GoTeam:
         append = self.activeFieldPlayers.append
 
         self.numActiveFieldPlayers = 0
-        for mate in self.teammates:
+        for mate in self.brain.teamMembers:
             if (mate.isPenalized() or mate.isDead()):
                 #reset to false when we get a new packet from mate
                 mate.active = False
@@ -284,13 +281,13 @@ class GoTeam:
 
     def reset(self):
         '''resets all information stored from teammates'''
-        for i,mate in enumerate(self.teammates):
+        for i,mate in enumerate(self.brain.teamMembers):
             mate.reset()
 
     def update(self,packet):
         '''public method called by Brain.py to update a teammates' info
         with a new packet'''
-        self.teammates[packet.playerNumber-1].update(packet)
+        self.brain.teamMembers[packet.playerNumber-1].update(packet)
 
     ######################################################
     ############   Strategy Decision Stuff     ###########
@@ -321,8 +318,8 @@ class GoTeam:
         if self.brain.gameController.currentState == 'gameReady' or\
                 self.brain.gameController.currentState =='gameSet':
             return False
-
-        for mate in self.teammates:
+        # TO-DO: switch this to activeFieldPlayers
+        for mate in self.brain.teamMembers:
             if (mate.active and (mate.isTeammateRole(PBConstants.CHASER)
                                  or mate.isTeammateRole(PBConstants.SEARCHER))):
                 return False

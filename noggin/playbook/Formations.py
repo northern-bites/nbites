@@ -143,7 +143,7 @@ def fReady(team, workingPlay):
 def fTestDefender(team, workingPlay):
     workingPlay.setFormation(PBConstants.TEST_DEFEND)
     if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
-        Roles.rDefensiveMiddie(team, workingPlay)
+        Roles.rMiddie(team, workingPlay)
     else:
         Roles.rDefender(team, workingPlay)
 

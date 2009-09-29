@@ -18,7 +18,7 @@ from . import HeadTracking
 from . import Navigator
 from .util import NaoOutput
 from . import NogginConstants as Constants
-from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet, Play)
+from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet, Play, TeamMember)
 from . import Loc
 from . import TeamConfig
 from . import Leds
@@ -46,7 +46,7 @@ class Brain(object):
         self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
-
+        self.comm.gc.player = TeamConfig.PLAYER_NUMBER
         #initalize the leds
         #print leds
         self.leds = Leds.Leds(self)
@@ -65,7 +65,6 @@ class Brain(object):
         self.CoA.setRobotGait(self.motion)
 
         # coa is Certificate of Authenticity (to keep things short)
-        self.comm.gc.player = TeamConfig.PLAYER_NUMBER
         self.out.printf(self.CoA)
         self.out.printf("GC:  I am on team "+str(TeamConfig.TEAM_NUMBER))
         self.out.printf("GC:  I am player  "+str(TeamConfig.PLAYER_NUMBER))
@@ -76,6 +75,7 @@ class Brain(object):
         self.my.playerNumber = self.comm.gc.player
         # Information about the environment
         self.initFieldObjects()
+        self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
@@ -163,6 +163,14 @@ class Brain(object):
 
         # Build a list of all of the field objects with respect to team color
         self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
+
+    def initTeamMembers(self):
+        self.teamMembers = []
+        for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
+            mate = TeamMember.TeamMember(self)
+            mate.playerNumber = i + 1
+            self.teamMembers.append(mate)
+
 
 ##
 ##--------------CONTROL METHODS---------------##
@@ -255,8 +263,8 @@ class Brain(object):
                           loc.ballXUncert,
                           loc.ballYUncert,
                           self.ball.dist,
-                          self.playbook.role,
-                          self.playbook.subRole,
+                          self.play.role,
+                          self.play.subRole,
                           self.playbook.pb.me.chaseTime,
                           loc.ballVelX,
                           loc.ballVelY)
