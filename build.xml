@@ -1,35 +1,71 @@
+<!-- ant build file for the Northern-Bites tool -->
+<!-- @author Octavian Neamtu -->
 <project name="tool" default="run" basedir=".">
   <description>
-    tool build file
+    tool ant build file
   </description>
   <!-- set global properties for this build -->
-  <!-- if needed, should be something like
-       property="tool_dir" location="TOOL"
-       more information in the ant manual -->
+  <property name="classpath" location="."/>
+  
+  <!-- PATH structure that holds the classpath for the build-->
+  <path id="tool.paths">
+    <pathelement path="${classpath}"/>
+    <!-- look into folder lib and add all jars to the classpath -->
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
   
   <target name="compile"
           description="compile the source " >
-    <javac srcdir="." destdir=""/>
-  </target>
-  
-  <target name="run" depends="compile"
-	  description="runs the tool ">
-    <!--java classpath="." classname="TOOL.TOOL" /-->
-    <exec executable="java">
-      <arg value="TOOL.TOOL"/>
-    </exec>
+    <javac srcdir="." destdir="">
+      <classpath refid="tool.paths"/>
+    </javac>
   </target>
 
-  <!-- Delete all the class files -->  
+  <target name="vision.check">
+    <!-- check if we already have the TOOLVisionLink dynamic lib -->
+   <pathconvert property="vision.make" setonempty="false" pathsep=" ">
+    <path>
+      <fileset dir="."
+               includes="*TOOLVisionLink.*" />
+    </path>
+   </pathconvert>
+  </target>
+  
+  <target name="vision"
+	  depends="vision.check"
+	  unless="vision.make"
+	  description="compile the TOOLVisionLink">
+    <!-- at this point we just run an external calling make vision -->
+    <!-- TODO unify the build systems -->
+    <exec executable="make">
+      <arg value="vision"/>
+    </exec>
+  </target>
+  
+  <target name="run" 
+	  depends="compile,vision"
+	  description="runs the tool ">
+    <java classname="TOOL.TOOL"
+	  fork="true"
+	  maxmemory="512m">
+      <classpath refid="tool.paths"/>
+    </java>
+  </target>
+
+  <!-- Clean up everything -->  
   <target name="clean"
           description="clean up" >
     <delete>
-      <fileset dir="." includes="**/*.class"/>
+      <fileset dir="."> 
+	<include name="**/*.class"/>
+	<!-- delete the TOOLVisionLink dynamic lib -->
+	<include name="*TOOLVisionLink.*"/>
+	<!-- delete the JNI header generated for the TOOLVisionLink -->
+	<include name="**/*.h"/>
+      </fileset>
     </delete>
   </target>
-
-  <target name="vision" depends="compile">
-    <javac classpath="/TOOL/Vision" srcdir="." destdir="" />
-  </target>
-
+ 
 </project>
