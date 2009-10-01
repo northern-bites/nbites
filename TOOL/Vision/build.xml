@@ -1,12 +1,27 @@
-<project name="tool_vision" default="run" basedir="." 
+<project name="tool" default="run" basedir="../../.">
+  <description>
+    tool build file
+  </description>
+
+  <target name="run"
+	  description="run the tool">
+    <ant antfile="build.xml"/>
+  </target>
+</project>
+
+<!-- the following is a failed attempt to build vision. the way we do it now is just call an external function called make vision. 
+TODO: merge the two build forms
+I'm sure with some patience it can be done, so I'm appending the following in hopes that it will help somebody someday
+@author Octavian Neamtu -->
+<!--project name="tool_vision" default="run" basedir="." 
 	 xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
   <description>
     vision link ant build file
   </description>
-  <!-- import cpptasks, the tasks that aid the c++ compiling process-->
-  <!--taskdef resource="cpptasks.tasks"/>
-  <typedef resource="cpptasks.types"/-->
-  <!-- global variables-->
+  <! import cpptasks, the tasks that aid the c++ compiling process>
+  <!taskdef resource="cpptasks.tasks"/>
+  <typedef resource="cpptasks.types"/>
+  < global variables>
   <property name="tool.pkg" value="TOOL"/>
   <property name="vision.pkg" value="Vision"/>
   <property name="c.compiler" location="D:/cygwin/bin/gcc-3.exe"/>
@@ -34,27 +49,27 @@
       <includepath path="${man.include}"/>
       <includepath path="${vision.include}"/>
       <includepath path="${corpus.include}"/>
-      <!--includepath path="$/usr/include/python2.5"/-->
-      <!--libset dir="python2.5" libs=""/-->
+      <!includepath path="$/usr/include/python2.5"/>
+      <!libset dir="python2.5" libs=""/>
       <compilerarg value="-D__int64=long long"/>
       <compilerarg value="-DNO_ZLIB"/>
       <compilerarg value="-DNAO_RL"/>
-      <!--compilerarg value="-mno-cygwin"/-->
+      <!compilerarg value="-mno-cygwin"/>
       <libset dir="${vision.lib}" libs="vision"/>
       <libset dir="${sensors.lib}" libs="_sensors"/>
       <fileset file="TOOLVisionLink.cpp"/>
-      <!--fileset file="${vision.lib}"/>
-      <fileset file="${sensors.lib}"/-->
+      <!fileset file="${vision.lib}"/>
+      <fileset file="${sensors.lib}"/>
     </cpptasks:cc>
 
-    <!--exec executable="${c.compiler}">
+    <!exec executable="${c.compiler}">
       <arg value="-o"/>
       <arg value="lala.dll"/>
       <arg value="TOOLVisionLink.cpp"/>
       <arg value="${vision_lib}"/>
       <arg value="${sensors_lib}"/>
       <arg value="-shared"/>
-    </exec-->
+    </exec>
   </target>
 
   <target name="vclean"
@@ -64,4 +79,4 @@
     </delete>
   </target>
 
-</project>
+</project-->
