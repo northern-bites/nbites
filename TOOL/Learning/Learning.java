@@ -676,6 +676,7 @@ public class Learning implements DataListener, MouseListener,
 		long t = System.currentTimeMillis();
 		String topPath = currentSet.path();
 		boolean screen = false;
+		int balls = 0, yposts = 0, bposts = 0, crosses = 0, brobots = 0, rrobots = 0;
 		// We need to get rid of the current directory
 		int end = topPath.length() - 2;
 		for ( ; end > -1 && !topPath.substring(end, end+1).equals(System.getProperty("file.separator"));
@@ -712,26 +713,34 @@ public class Learning implements DataListener, MouseListener,
 								// we need to figure out what objects are in the frame
 								boolean or, yell, bl, wh, re, na;
 								or = current.getBall();
+								if (or) {
+									balls++;
+								}
 								switch (current.getYellowGoal()) {
 								case NO_POST: yell = false;
 									break;
 								default:
 									yell = true;
+									yposts++;
 								}
 								switch (current.getBlueGoal()) {
 								case NO_POST: bl = false;
 									break;
 								default:
 									bl = true;
+									bposts++;
 								}
 								switch (current.getCross()) {
 								case NO_CROSS: wh = false;
 									break;
 								default:
 									wh = true;
+									crosses++;
 								}
 								re = current.getRedRobots() > 0;
 								na = current.getBlueRobots() > 0;
+								if (re) rrobots++;
+								if (na) brobots++;
 								visionState.updateStats(or, yell, bl, wh, re, na);
 								framesProcessed++;
 							}
@@ -751,7 +760,8 @@ public class Learning implements DataListener, MouseListener,
 		}
 		t = System.currentTimeMillis() - t;
 		quietMode = false;
-		visionState.printStats();
+		System.out.println("Processed "+framesProcessed+" with "+balls);
+		visionState.printStats(framesProcessed, balls, yposts, bposts, crosses, rrobots, brobots);
 	}
 
 

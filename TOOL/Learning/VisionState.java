@@ -67,7 +67,7 @@ public class VisionState {
 	private int seeRedRobots, seeBlueRobots;
     private Vector<VisualFieldObject> visualFieldObjects;
 	private int tableSize = 128;
-	private int stats[][][][] = new int[tableSize][tableSize][tableSize][12];
+	private int stats[][][][] = new int[tableSize][tableSize][tableSize][7];
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
@@ -95,7 +95,7 @@ public class VisionState {
 		for (int i = 0; i < tableSize; i++) {
 			for (int j = 0; j < tableSize; j++) {
 				for (int k = 0; k < tableSize; k++) {
-					for (int l = 0; l < 12; l++) {
+					for (int l = 0; l < 7; l++) {
 						stats[i][j][k][l] = 0;
 					}
 				}
@@ -122,7 +122,7 @@ public class VisionState {
 				if (orange) {
 					stats[current[0]][current[1]][current[2]][ORANGE]++;
 				} else {
-					stats[current[0]][current[1]][current[2]][ORANGE]-=10;
+					stats[current[0]][current[1]][current[2]][ORANGE]-=50;
 				}
 				if (yellow) {
 					stats[current[0]][current[1]][current[2]][YELLOW]++;
@@ -134,34 +134,56 @@ public class VisionState {
 				} else {
 					stats[current[0]][current[1]][current[2]][BLUE]-=10;
 				}
-				if (white) {
-					stats[current[0]][current[1]][current[2]][WHITE]+=10;
+				if (white || red || navy) {
+					stats[current[0]][current[1]][current[2]][WHITE]++;
 				} else {
-					stats[current[0]][current[1]][current[2]][WHITE]-=5;
+					stats[current[0]][current[1]][current[2]][WHITE]-=2;
 				}
 				if (red) {
 					stats[current[0]][current[1]][current[2]][RED]++;
  				} else {
-					stats[current[0]][current[1]][current[2]][RED]-=10;
+					stats[current[0]][current[1]][current[2]][RED]-=5;
 				}
 				if (navy) {
 					stats[current[0]][current[1]][current[2]][NAVY]++;
 				} else {
-					stats[current[0]][current[1]][current[2]][NAVY]-=10;
+					stats[current[0]][current[1]][current[2]][NAVY]-=5;
 				}
 				stats[current[0]][current[1]][current[2]][GREEN]++;
 			}
 		}
 	}
 
-	public void printStats() {
+	public void printStats(int frames, int balls, int yposts, int bposts, int crosses,
+						   int rrobots, int brobots) {
 		int pixie[] = new int[3];
+		int avg[][] = new int[3][7];
+		int tots[] = new int[7];
+		for (int i = 0; i < 7; i++) {
+			avg[0][i] = 0;
+			avg[1][i] = 0;
+			avg[2][i] = 0;
+			tots[0] = 0;
+		}
 		for (int i = 0; i < tableSize; i++) {
 			for (int j = 0; j < tableSize; j++) {
 				for (int k = 0; k < tableSize; k++) {
-					for (int l = 0; l < 12; l++) {
-						if (stats[i][j][k][l] > 10) {
+					for (int l = 0; l < 7; l++) {
+						int need = 0;
+						switch (l) {
+						case ORANGE: need = balls / 10;
+							break;
+						case WHITE:  need = crosses / 2; break;
+						case YELLOW: need = yposts / 2; break;
+						case BLUE:   need = bposts * 3 / 5; break;
+						case NAVY:   need = brobots / 10; break;
+						case RED:    need = rrobots / 10; break;
+						case GREEN:  need = frames / 10;
+						}
+						if (stats[i][j][k][l] > need) {
 							pixie[0] = i; pixie[1] = j; pixie[2] = k;
+							avg[0][l] += i; avg[1][l] += j; avg[2][l] += k;
+							tots[l]++;
 							byte col = Vision.GREY;
 							switch (l) {
 							case ORANGE:
@@ -186,6 +208,33 @@ public class VisionState {
 				}
 			}
 		}
+		/*for (int l = 0; l < 7; l++) {
+			avg[0][l] = avg[0][l] / tots[l];
+			avg[1][l] = avg[1][l] / tots[l];
+			avg[2][l] = avg[2][l] / tots[l];
+			pixie[0] = avg[0][l];
+			pixie[1] = avg[1][l];
+			pixie[2] = avg[2][l];
+			byte col = Vision.GREY;
+			switch (l) {
+			case ORANGE:
+				col = Vision.ORANGE; break;
+			case WHITE:
+				col = Vision.WHITE; break;
+			case YELLOW:
+				col = Vision.YELLOW; break;
+			case BLUE:
+				col = Vision.BLUE; break;
+			case NAVY:
+				col = Vision.NAVY; break;
+			case RED:
+				col = Vision.RED; break;
+			case GREEN:
+				col = Vision.GREEN; break;
+			}
+			System.out.println("Color "+l+" "+pixie[0]+" "+pixie[1]+" "+pixie[2]);
+			colorTable.setRawColor(pixie, col);
+			}*/
 
 	}
 
