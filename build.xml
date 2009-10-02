@@ -63,7 +63,7 @@
 	<!-- delete the TOOLVisionLink dynamic lib -->
 	<include name="*TOOLVisionLink.*"/>
 	<!-- delete the JNI header generated for the TOOLVisionLink -->
-	<include name="**/*.h"/>
+	<include name="TOOL/**/*.h"/>
       </fileset>
     </delete>
   </target>
