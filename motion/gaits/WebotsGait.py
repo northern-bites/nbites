@@ -1,5 +1,11 @@
 import man.motion as motion
-from GaitConstants import *
+import GaitConstants as constants
+
+ODO_CONFIG = constants.ODO_CONFIG
+ARM_CONFIG = constants.ARM_CONFIG
+WALKING = constants.WALKING
+NON_WALKING = constants.NON_WALKING
+
 
 STANCE_CONFIG = (31.00, # CoM height
                  1.45,  # Forward displacement of CoM

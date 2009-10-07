@@ -3,9 +3,6 @@ import man.motion as motion
 """
 Gaits loaded from the gaits/ directory
 Each *Gait.py file should be self-sufficient
-
-Note that you will need to add your gaits to 
-cmake.man.motion/CMakeLists to get them to install
 """
 
 from .gaits.FastGait import FAST_GAIT
