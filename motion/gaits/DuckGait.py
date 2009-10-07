@@ -1,15 +1,6 @@
 import man.motion as motion
 from GaitConstants import *
 
-DUCK_GAIT = motion.GaitCommand(DUCK_STANCE,
-            STEP_CONFIG,
-            ZMP_CONFIG,
-            JOINT_HACK_CONFIG,
-            DUCK_SENSOR,
-            STIFFNESS_CONFIG,
-            ODO_CONFIG,
-            ARM_CONFIG)
-
 DUCK_STANCE = (31.00, # CoM height
                -0.5,  # Forward displacement of CoM
                10.0,  # Horizontal distance between feet
@@ -55,3 +46,12 @@ STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.3,  #ankleRollStiffness
                     0.1,  #armStiffness
                     0.1)  #arm pitch
+
+DUCK_GAIT = motion.GaitCommand(DUCK_STANCE,
+            STEP_CONFIG,
+            ZMP_CONFIG,
+            JOINT_HACK_CONFIG,
+            DUCK_SENSOR,
+            STIFFNESS_CONFIG,
+            ODO_CONFIG,
+            ARM_CONFIG)

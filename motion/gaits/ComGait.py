@@ -1,3 +1,5 @@
+import man.motion as motion
+from GaitConstants import *
 
 ########## COM GAIT #################
 COM_STANCE = (31.00, # CoM height

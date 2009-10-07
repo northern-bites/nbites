@@ -1,24 +1,6 @@
 import man.motion as motion
 from GaitConstants import *
 
-MARVIN_MEDIUM_GAIT = motion.GaitCommand(MARVIN_MED_STANCE,
-                                        MARVIN_MED_STEP,
-                                        MARVIN_MED_ZMP,
-                                        JOINT_HACK_CONFIG,
-                                        MED_SENSOR,
-                                        STIFFNESS_CONFIG,
-                                        ODO_CONFIG
-                                        ARM_CONFIG)
-MEDIUM_GAIT = motion.GaitCommand(MED_STANCE,
-                                 MED_STEP,
-                                 MED_ZMP,
-                                 JOINT_HACK_CONFIG,
-                                 MED_SENSOR,
-                                 STIFFNESS_CONFIG,
-                                 ODO_CONFIG,
-                                 ARM_CONFIG)
-
-
 MARVIN_MED_STANCE = (31.00, # CoM height
               1.45,  # Forward displacement of CoM
               10.0,  # Horizontal distance between feet
@@ -95,5 +77,20 @@ STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.1,  #armStiffness
                     0.1)  #arm pitch
 
+MARVIN_MEDIUM_GAIT = motion.GaitCommand(MARVIN_MED_STANCE,
+                                        MARVIN_MED_STEP,
+                                        MARVIN_MED_ZMP,
+                                        JOINT_HACK_CONFIG,
+                                        MED_SENSOR,
+                                        STIFFNESS_CONFIG,
+                                        ODO_CONFIG,
+                                        ARM_CONFIG)
 
-
+MEDIUM_GAIT = motion.GaitCommand(MED_STANCE,
+                                 MED_STEP,
+                                 MED_ZMP,
+                                 JOINT_HACK_CONFIG,
+                                 MED_SENSOR,
+                                 STIFFNESS_CONFIG,
+                                 ODO_CONFIG,
+                                 ARM_CONFIG)

@@ -149,6 +149,8 @@ SET( MOTION_PYTHON_SRCS ${MOTION_INCLUDE_DIR}/__init__.py
                         ${MOTION_INCLUDE_DIR}/StiffnessModes.py
                         )
 
+SET( MOTION_PYTHON_SUBDIRS ${MOTION_INCLUDE_DIR}/gaits )
+
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -171,6 +173,12 @@ IF( PYTHON_SHARED_MOTION )
     DESTINATION ${MOTION_PYTHON_TARGET_DIR}
     CONFIGURATIONS "" Debug Release
     RENAME ${MOTION_TARGET}module.so
+    )
+  INSTALL(
+    DIRECTORY ${MOTION_PYTHON_SUBDIRS}
+    DESTINATION ${MOTION_PYTHON_TARGET_DIR}/
+    CONFIGURATIONS "" Debug Release
+    FILES_MATCHING PATTERN "*.py"
     )
 ELSE( PYTHON_SHARED_MOTION )
   ADD_LIBRARY(

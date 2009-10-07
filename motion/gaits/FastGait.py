@@ -1,15 +1,6 @@
 import man.motion as motion
 from GaitConstants import *
 
-FAST_GAIT = motion.GaitCommand(FAST_STANCE,
-                                 FAST_STEP,
-                                 FAST_ZMP,
-                                 FAST_HACK,
-                                 FAST_SENSOR,
-                                 FAST_STIFFNESS,
-                                 FAST_ODO,
-                                 FAST_ARM)
-
 FAST_STANCE = (31.00, # CoM height
               1.45,  # Forward displacement of CoM
               10.0,  # Horizontal distance between feet
@@ -57,4 +48,11 @@ FAST_STIFFNESS = (0.85, #hipStiffness
 FAST_ODO= ODO_CONFIG
 FAST_ARM= (10.0,)
 
-
+FAST_GAIT = motion.GaitCommand(FAST_STANCE,
+                                 FAST_STEP,
+                                 FAST_ZMP,
+                                 FAST_HACK,
+                                 FAST_SENSOR,
+                                 FAST_STIFFNESS,
+                                 FAST_ODO,
+                                 FAST_ARM)

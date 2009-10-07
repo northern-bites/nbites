@@ -1,30 +1,25 @@
 import man.motion as motion
 from GaitConstants import *
 
-WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
-            WEBOTS_STEP_CONFIG,
-            WEBOTS_ZMP_CONFIG,
-            WEBOTS_HACK_CONFIG,
-            SENSOR_CONFIG,
-            STIFFNESS_CONFIG,
-            ODO_CONFIG,
-            ARM_CONFIG)
-
-WEBOTS_GAIT2=motion.GaitCommand(STANCE_CONFIG,
-            STATIONARY_STEP_CONFIG,
-            WEBOTS_ZMP_CONFIG,
-            WEBOTS_HACK_CONFIG,
-            SENSOR_CONFIG,
-            STIFFNESS_CONFIG,
-            ODO_CONFIG,
-            ARM_CONFIG)
-
 STANCE_CONFIG = (31.00, # CoM height
                  1.45,  # Forward displacement of CoM
                  10.0,  # Horizontal distance between feet
                  3.0,   # Body angle around y axis
                  0.0,   # Angle between feet
                  0.1)   # Time to transition to/from this stance
+
+STATIONARY_STEP_CONFIG = (0.4, # step duration
+               0.25,  # fraction in double support
+               0.0,  # stepHeight
+               0.0,  # step lift
+               0.0,  # max x speed
+               0.0,  # max x speed
+               0.0,  # max y speed
+               0.0, # max theta speed()
+               0.0,  # max x acc
+               0.0,  # max y acc
+               0.0, # max theta acc()
+               NON_WALKING) # walking gait = false
 
 WEBOTS_STEP_CONFIG = (0.4, # step duration
                       0.25,  # fraction in double support
@@ -64,3 +59,20 @@ STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.1,  #armStiffness
                     0.1)  #arm pitch
 
+WEBOTS_GAIT=motion.GaitCommand(STANCE_CONFIG,
+            WEBOTS_STEP_CONFIG,
+            WEBOTS_ZMP_CONFIG,
+            WEBOTS_HACK_CONFIG,
+            SENSOR_CONFIG,
+            STIFFNESS_CONFIG,
+            ODO_CONFIG,
+            ARM_CONFIG)
+
+WEBOTS_GAIT2=motion.GaitCommand(STANCE_CONFIG,
+            STATIONARY_STEP_CONFIG,
+            WEBOTS_ZMP_CONFIG,
+            WEBOTS_HACK_CONFIG,
+            SENSOR_CONFIG,
+            STIFFNESS_CONFIG,
+            ODO_CONFIG,
+            ARM_CONFIG)

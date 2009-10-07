@@ -1,16 +1,6 @@
 import man.motion as motion
 from GaitConstants import *
 
-#Put together all the parts to make a gait - ORDER MATTERS!
-SLOW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
-            STEP_CONFIG,
-            ZMP_CONFIG,
-            JOINT_HACK_CONFIG,
-            MARVIN_SENSOR_CONFIG,
-            STIFFNESS_CONFIG,
-            ODO_CONFIG,
-            ARM_CONFIG)
-
 MARVIN_STANCE_CONFIG = (31.00, # CoM height
                         1.45,  # Forward displacement of CoM
                         10.0,  # Horizontal distance between feet
@@ -57,3 +47,12 @@ STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.1,  #armStiffness
                     0.1)  #arm pitch
 
+#Put together all the parts to make a gait - ORDER MATTERS!
+SLOW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
+            STEP_CONFIG,
+            ZMP_CONFIG,
+            JOINT_HACK_CONFIG,
+            MARVIN_SENSOR_CONFIG,
+            STIFFNESS_CONFIG,
+            ODO_CONFIG,
+            ARM_CONFIG)

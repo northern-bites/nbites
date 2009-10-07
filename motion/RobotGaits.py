@@ -3,17 +3,20 @@ import man.motion as motion
 """
 Gaits loaded from the gaits/ directory
 Each *Gait.py file should be self-sufficient
+
+Note that you will need to add your gaits to 
+cmake.man.motion/CMakeLists to get them to install
 """
 
 from .gaits.FastGait import FAST_GAIT
-from .gaits.MedGait import MEDIUM_GAIT, MARVIN_MEDIUM_GATE
 from .gaits.LabGait import LAB_GAIT
 from .gaits.DuckGait import DUCK_GAIT
 from .gaits.SlowGait import SLOW_GAIT
 from .gaits.WebotsGait import WEBOTS_GAIT, WEBOTS_GAIT2
 
-# disabled / old gaits
+# disabled / unused gaits
 #from .gaits.ComGait import COM_GAIT 
+#from .gaits.MedGait import MEDIUM_GAIT, MARVIN_MEDIUM_GATE
 
 
 ############# DEFAULT GAIT ASSIGNMENTS ##################
