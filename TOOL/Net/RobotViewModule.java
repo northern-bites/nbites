@@ -21,6 +21,7 @@ package TOOL.Net;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +61,11 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
     private RemoteRobot selectedRobot;
 
+	private Thread streamingThread;
+	private DataType streamType;
+	private boolean isStreaming = false;
+	private JButton startStopButton, streamButton;
+
     public RobotViewModule(TOOL t, NetworkModule net_mod) {
         super(t);
 
@@ -70,6 +76,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         imagePanel = new ImagePanel();
 
         selectedRobot = null;
+
+		createStreamingThread();
+		streamingThread.start();
 
         initLayout();
     }
@@ -97,6 +106,19 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         subPanel.add(robotMenu);
         subPanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
+		createUpdateButtons(subPanel);
+		createStreamingButtons(subPanel);
+        displayPanel.add(subPanel);
+
+        subPanel = new JPanel();
+        subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.PAGE_AXIS));
+        subPanel.add(Box.createHorizontalGlue());
+        subPanel.add(imagePanel);
+
+        displayPanel.add(subPanel);
+    }
+
+	private void createUpdateButtons(JPanel subPanel){
         subPanel.add(new JLabel("Update:"));
         subPanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
@@ -106,17 +128,64 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
             b.addActionListener(this);
             subPanel.add(b);
         }
+	}
 
-        displayPanel.add(subPanel);
+	private void createStreamingButtons(JPanel subPanel){
+		subPanel.add(new JLabel("Streaming:"));
+		subPanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
-        subPanel = new JPanel();
-        subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.PAGE_AXIS));
-        subPanel.add(Box.createHorizontalGlue());
-        subPanel.add(imagePanel);
+		streamButton = new JButton("Stream Type");
+		streamButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					if (streamButton.getText() == DataTypes.title(DataTypes.DataType.THRESH)){
+						streamType = DataTypes.DataType.IMAGE;
+						streamButton.setText(DataTypes.title(DataTypes.DataType.IMAGE));
+					}
+					else {
+						streamType = DataTypes.DataType.THRESH;
+						streamButton.setText(DataTypes.title(DataTypes.DataType.THRESH));
+					}
+				}
+			});
+		subPanel.add(streamButton);
 
-        displayPanel.add(subPanel);
+		startStopButton = new JButton("Start");
+		startStopButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					isStreaming = !isStreaming;
+					if (isStreaming)
+						startStopButton.setText("Stop");
+					else
+						startStopButton.setText("Start");
+				}
+			});
+		subPanel.add(startStopButton);
+	}
 
-    }
+	// Pretty tremendous hack for streaming images from Nao, probably could
+	// and should be more elegant. Oh well.
+	private void createStreamingThread() {
+		streamingThread = new Thread(new Runnable() {
+				public void run() {
+					while (true){
+						try {
+							if (!isStreaming){
+								Thread.sleep(1500);
+								continue;
+							}
+							Thread.sleep(50);
+							TOOLImage i = null;
+							if (streamType == DataTypes.DataType.THRESH)
+								i = selectedRobot.retrieveThresh();
+							else if (streamType == DataTypes.DataType.IMAGE)
+								i = selectedRobot.retrieveImage();
+							if (i != null)
+								imagePanel.updateImage(i);
+						} catch (InterruptedException e){}
+					}
+				}
+			});
+	}
 
     public void retrieveType(DataType t) {
         if (selectedRobot == null)
@@ -124,18 +193,18 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
         TOOLImage i;
         switch (t) {
-            case IMAGE:
-                TOOL.CONSOLE.message("Requesting a raw image");
-                i = selectedRobot.retrieveImage();
-                if (i != null)
-                    imagePanel.updateImage(i);
-                break;
-            case THRESH:
-                TOOL.CONSOLE.message("Requesting a thresholded image");
-                i = selectedRobot.retrieveThresh();
-                if (i != null)
-                    imagePanel.updateImage(i);
-                break;
+		case IMAGE:
+			TOOL.CONSOLE.message("Requesting a raw image");
+			i = selectedRobot.retrieveImage();
+			if (i != null)
+				imagePanel.updateImage(i);
+			break;
+		case THRESH:
+			TOOL.CONSOLE.message("Requesting a thresholded image");
+			i = selectedRobot.retrieveThresh();
+			if (i != null)
+				imagePanel.updateImage(i);
+			break;
         }
     }
 
