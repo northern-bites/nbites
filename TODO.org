@@ -20,11 +20,11 @@
 
 ** Misc.
 
-*** TODO Comment code
+*** DONE Comment code
     Tucker: Localization, comm
     Joho: Motion
     Chown: Vision?
-*** TODO Get more people. duh.
+*** DONE Get more people. duh.
 
 * NEW FEATURES
 ** High Level and biggest goals
@@ -42,8 +42,8 @@
 *** Walking
 **** TODO Navigator refuses Step commands
      when the walk is already active.
-**** TODO Move each gait into a separte file
-     All gaits get separate file, in a folder called motiuon/gaits
+**** DONE Move each gait into a separte file
+     All gaits get separate file, in a folder called motion/gaits
 **** TODO Better Webots gait
 
 **** TODO Fix factor of 2 in straffing
