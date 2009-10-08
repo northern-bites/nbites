@@ -167,8 +167,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 	private void createStreamingThread() {
 		streamingThread = new Thread(new Runnable() {
 				public void run() {
-					while (true){
-						try {
+					try {
+						while (true){
 							if (!isStreaming){
 								Thread.sleep(1500);
 								continue;
@@ -181,8 +181,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 								i = selectedRobot.retrieveImage();
 							if (i != null)
 								imagePanel.updateImage(i);
-						} catch (InterruptedException e){}
-					}
+						}
+					} catch (InterruptedException e){}
 				}
 			});
 	}
