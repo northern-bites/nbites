@@ -8,6 +8,7 @@ import TOOL.WorldController.UDPServer;
 import TOOL.Data.Field;
 import TOOL.Data.LabField2009;
 import TOOL.Data.NaoField2009;
+import TOOL.Net.RobotViewModule;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,6 +56,9 @@ public class WorldController extends JPanel implements KeyListener,
     // Listen to live UDP data, used to visualize multiple robots' world states
     // simultaneously
     UDPServer udp_server;
+
+	// Robot view module for purpose of retrieving selected robot
+	RobotViewModule robotModule;
 
     // Modes
     public static final int DO_NOTHING = -1;
@@ -176,6 +180,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String VIEW_EKF_LOG_STRING = "View EKF Log";
     public static final String VIEW_MCL_LOG_STRING = "View MCL Log";
     public static final String VIEW_UDP_PACKETS_STRING = "View UDP Packets";
+    public static final String VIEW_TCP_STRING = "View TCP Stream";
 
     // Menu Action Commands
     public static final String VIEW_ROBOT_EKF_ACTION = "view robot ekfs";
@@ -184,6 +189,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String VIEW_EKF_LOG_ACTION = "viewekflog";
     public static final String VIEW_MCL_LOG_ACTION = "viewmcllog";
     public static final String VIEW_UDP_PACKETS_ACTION = "viewudpaction";
+	public static final String VIEW_TCP_ACTION = "viewtcpaction";
     public static final String CIRCLE_LINE_GOALIE_ACTION = "circlelinegoalie";
     public static final String GO_TO_XY_NORMAL_ACTION = "gotoxy";
     public static final String GO_TO_XY_LOOK_AT_POINT_ACTION =
@@ -234,6 +240,7 @@ public class WorldController extends JPanel implements KeyListener,
     private JButton button_view_robot_ekf;
     private JButton button_view_robot_mcl;
     private JButton button_view_udp_packets;
+	private JButton button_view_tcp;
     private JButton button_view_robot_log;
     private JButton button_view_ekf_log;
     private JButton button_view_mcl_log;
@@ -251,7 +258,7 @@ public class WorldController extends JPanel implements KeyListener,
 
     private int mode;
 
-    public WorldController(TOOL t)
+    public WorldController(TOOL t, RobotViewModule robot_mod)
     {
         this.t = t;
         labField = new LabField2009();
@@ -267,6 +274,8 @@ public class WorldController extends JPanel implements KeyListener,
         log = new LogHandler(this, painter, debugViewer);
         udp_server = new UDPServer();
         udp_server.addRobotListener(painter);
+
+		robotModule = robot_mod;
 
         setSize((int) (the_field.getPreferredSize().getWidth() +
                        BUTTON_AREA_WIDTH),
@@ -405,6 +414,9 @@ public class WorldController extends JPanel implements KeyListener,
         button_view_udp_packets.addActionListener(this);
         button_area.add(button_view_udp_packets);
 
+		// setup tcp stream button
+		button_view_tcp = new JButton(VIEW_TCP_STRING);
+
         // setup MCL log button
         button_view_mcl_log = new JButton(VIEW_MCL_LOG_STRING);
         button_view_mcl_log.setActionCommand(VIEW_MCL_LOG_ACTION);
@@ -510,6 +522,11 @@ public class WorldController extends JPanel implements KeyListener,
         field_one.setVisible(true);
     }
 
+	// Sets up the streaming object info from robot
+	// public void startRobotObjectStream()
+	// {
+
+	// }
 
     // master method for getting robot udp working
     public void startRobotUDP()

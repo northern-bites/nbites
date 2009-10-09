@@ -185,7 +185,8 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //addModule(new PlayBookEditorModule(this));
         // robotview - view up-to-date information live from the robot
         //    depends on NetworkModule
-        addModule(new RobotViewModule(this, net_mod));
+		RobotViewModule robot_mod = new RobotViewModule(this, net_mod);
+		addModule(robot_mod);
         // sql - load datasets from the MySQL HiveMind database
         //addModule(new SQLModule(this));
         // wordcontroller - view and control robot udp broadcasts in realtime
@@ -193,7 +194,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // Try to get the last directory we used for the world controller
         wcLastDirectory = prefs.get(DEFAULT_WC_DIRECTORY_STRING,
                                     System.getProperty("user.dir"));
-        addModule(new WorldControllerModule(this));
+        addModule(new WorldControllerModule(this), robot_mod);
 
         // Tell the modules which colortable they should use.
         updateColorTableReferences();
