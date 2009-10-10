@@ -55,11 +55,11 @@ public class DataSerializer {
     public static final byte TYPE_LONG_ARRAY   = 8;
     public static final byte TYPE_DOUBLE_ARRAY  = 9;
 
-    // 
+    //
     // Default Error messages
-    // 
+    //
     public static final String ERROR_NO_INPUT = "Input unavailable on socket.";
-    public static final String ERROR_NO_OUTPUT = 
+    public static final String ERROR_NO_OUTPUT =
         "Output unavailable on socket.";
     public static final String ERROR_DATATYPE = "Unexpected data type read " +
         "from socket connection.";
@@ -106,7 +106,7 @@ public class DataSerializer {
     //
     // Stream writing methods
     //
-    
+
     /**
      * Helper method to automate writing the correct header information for a
      * serialized array, of any type.
@@ -120,7 +120,7 @@ public class DataSerializer {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void writeInt(int value) throws IOException {
         if (output == null)
@@ -185,7 +185,7 @@ public class DataSerializer {
      * data type and length.
      */
     public synchronized void writeInts(int[][] data) throws IOException {
-        writeArrayHeader(TYPE_INT_ARRAY, 
+        writeArrayHeader(TYPE_INT_ARRAY,
             data.length * data[0].length * SIZEOF_INT);
 
         for (int i = 0; i < data.length; i++)
@@ -230,7 +230,7 @@ public class DataSerializer {
      * data type and length.
      */
     public synchronized void writeDoubles(double[][] data) throws IOException {
-        writeArrayHeader(TYPE_DOUBLE_ARRAY, 
+        writeArrayHeader(TYPE_DOUBLE_ARRAY,
             data.length * data[0].length * SIZEOF_DOUBLE);
 
         for (int i = 0; i < data.length; i++)
@@ -279,7 +279,7 @@ public class DataSerializer {
     //
     // Stream reading methods
     //
-    
+
     /**
      * Helper method to automate reading the expected header information for
      * a serialized array, of any type.
@@ -316,7 +316,7 @@ public class DataSerializer {
 
 
     /**
-     * 
+     *
      */
     public synchronized int readInt() throws IOException {
         if (input == null)
@@ -330,7 +330,7 @@ public class DataSerializer {
     }
 
     /**
-     * 
+     *
      */
     public synchronized byte readByte() throws IOException {
         if (input == null)
@@ -355,7 +355,7 @@ public class DataSerializer {
             data[i] = input.readInt();
     }
 
-    public synchronized int readInts(int[] data, boolean variableLength) 
+    public synchronized int readInts(int[] data, boolean variableLength)
             throws IOException {
         int length = readArrayHeader(TYPE_INT_ARRAY, data.length * SIZEOF_INT,
             variableLength) / SIZEOF_INT;
@@ -446,7 +446,7 @@ public class DataSerializer {
     }
 
     private void errorDataSize(int expected, int received) throws IOException {
-        throw new IOException(ERROR_DATASIZE + "\n  Expected=" + expected + 
+        throw new IOException(ERROR_DATASIZE + "\n  Expected=" + expected +
             ", received=" + received);
     }
 

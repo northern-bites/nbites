@@ -31,6 +31,7 @@ import TOOL.TOOL;
 import TOOL.TOOLException;
 import TOOL.Data.DataSource;
 import TOOL.Data.Frame;
+import TOOL.Data.RobotDef;
 import TOOL.Data.File.FileSet;
 import TOOL.Data.File.FrameLoader;
 import TOOL.Image.ThresholdedImage;
@@ -88,7 +89,7 @@ public class RemoteRobot extends FileSet {
     public boolean autoSave() {
         return true;
     }
-    
+
     public boolean dynamic() {
         return true;
     }
@@ -101,7 +102,7 @@ public class RemoteRobot extends FileSet {
             // return the existing frame
             return super.get(i);
     }
-    
+
     public void load(int i) throws TOOLException {
         Frame f = get(i);
         if (f.loaded())
@@ -169,9 +170,9 @@ public class RemoteRobot extends FileSet {
                 connect();
             proto.request(DataRequest.IMAGE_ONLY);
             return FrameLoader.loadBytes(proto.getRobotType(),
-                proto.getImage());
+										 proto.getImage());
         }catch (TOOLException e) {
-            NetworkModule.logError("Attempt to retreive direct image failed",
+            NetworkModule.logError("Attempt to retrieve direct image failed",
                                    e);
             return null;
         }
@@ -182,14 +183,31 @@ public class RemoteRobot extends FileSet {
             if (!proto.isConnected())
                 connect();
             proto.request(DataRequest.THRESH_ONLY);
-            return new ThresholdedImage(proto.getThresh(), 
-                    proto.getRobotDef().imageWidth(),
-                    proto.getRobotDef().imageHeight());
+            return new ThresholdedImage(proto.getThresh(),
+										proto.getRobotDef().imageWidth(),
+										proto.getRobotDef().imageHeight());
         }catch (TOOLException e) {
-            NetworkModule.logError("Attempt to retreive direct image failed",
+            NetworkModule.logError("Attempt to retrieve direct image failed",
                                    e);
             return null;
         }
     }
 
+	public void fillNewFrame(Frame f) {
+		try {
+
+			if (!proto.isConnected())
+				connect();
+
+			proto.request(DataRequest.IMAGE_JOINTS_SENSORS);
+
+			f.setType(RobotDef.NAO_VER);
+			f.setImage(FrameLoader.loadBytes(proto.getRobotType(), proto.getImage()));
+			f.setJoints(Arrays.asList(proto.getJoints()));
+			f.setSensors(Arrays.asList(proto.getSensors()));
+		} catch (TOOLException e) {
+			NetworkModule.logError("Attempt to retrieve joints failed",
+								   e);
+		}
+	}
 }

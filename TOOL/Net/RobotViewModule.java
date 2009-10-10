@@ -40,12 +40,14 @@ import javax.swing.event.PopupMenuListener;
 
 import TOOL.TOOL;
 import TOOL.Data.DataTypes;
+import TOOL.Data.Frame;
 import TOOL.Data.DataTypes.DataType;
 import TOOL.Image.ImagePanel;
 import TOOL.Image.TOOLImage;
 import TOOL.Net.DataRequest;
 
 import TOOL.TOOLModule;
+import TOOL.TOOLException;
 
 public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
@@ -166,7 +168,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 	// and should be more elegant. Oh well.
 	private void createStreamingThread() {
 		streamingThread = new Thread(new Runnable() {
+
 				public void run() {
+					int numFramesStreamed = 0;
 					try {
 						while (true){
 							if (!isStreaming){
@@ -174,15 +178,25 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 								continue;
 							}
 							Thread.sleep(50);
-							TOOLImage i = null;
+							TOOLImage img = null;
 							if (streamType == DataTypes.DataType.THRESH)
-								i = selectedRobot.retrieveThresh();
+								img = selectedRobot.retrieveThresh();
 							else if (streamType == DataTypes.DataType.IMAGE)
-								i = selectedRobot.retrieveImage();
-							if (i != null)
-								imagePanel.updateImage(i);
+								img = selectedRobot.retrieveImage();
+							if (img != null) {
+								imagePanel.updateImage(img);
+
+								// Write image to a frame
+								Frame newFrame = selectedRobot.get(numFramesStreamed);
+								selectedRobot.fillNewFrame(newFrame);
+								selectedRobot.load(numFramesStreamed);
+								selectedRobot.store(numFramesStreamed, "../man/frames/streaming");
+								numFramesStreamed++;
+							}
 						}
-					} catch (InterruptedException e){}
+					} catch (InterruptedException e){
+					} catch (TOOLException e) {}
+
 				}
 			});
 	}

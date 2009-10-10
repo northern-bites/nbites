@@ -172,13 +172,13 @@ public class TOOLProtocol {
     public void request(DataRequest r) {
         if (!connected)
             return;
-        
+
         try {
-            
+
             serial.writeByte(REQUEST_MSG);
             serial.writeBytes(r.getBytes());
             serial.flush();
-    
+
             if (r.info()) {
                 robotType = serial.readByte();
                 byte buf[] = new byte[1024];
@@ -189,16 +189,16 @@ public class TOOLProtocol {
                 calFile = new String(buf, 0, length, "US-ASCII");
                 processInfo();
             }
-    
+
             if (!gotInfo)
                 return;
-    
+
             if (r.joints())
                 serial.readFloats(joints);
-    
+
             if (r.sensors())
                 serial.readFloats(sensors);
-    
+
             if (r.image())
                 serial.readBytes(image);
 
@@ -306,5 +306,5 @@ public class TOOLProtocol {
             disconnect();
         }
     }
-        
+
 }
