@@ -1,6 +1,7 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 
+####Change these for picture taking####
 FRAME_SAVE_RATE = 1
 NUM_FRAMES_TO_SAVE = 500
 
@@ -18,7 +19,7 @@ def gamePlaying(player):
 
 def saveFrames(player):
     if player.firstFrame():
-        player.brain.tracker.startScan(HeadMoves.HIGH_SNAPSHOT_PAN)
+        player.brain.tracker.startScan(HeadMoves.COMB_SNAPSHOT_PAN)
         ##replace <TYPE_SNAPSHOT_PAN> with any PHOTO PAN in
         ##    man/motion/HeadMoves.py
         player.standup()

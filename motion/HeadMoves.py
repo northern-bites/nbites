@@ -59,17 +59,42 @@ HIGH_SNAPSHOT_PAN = (
     ((65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+HIGH_MID_SNAPSHOT_PAN = (
+    ((-65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -10.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0, -10.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
 MID_SNAPSHOT_PAN = (
     ((-65.0, -10.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, -10.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 0.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0, 0.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+MID_LOW_SNAPSHOT_PAN = (
+    ((-65.0, 0.0), 0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, 0.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, 20.0), 0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0, 20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
 LOW_SNAPSHOT_PAN = (
     ((-65.0, 5.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 5.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 20.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0, 20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+COMB_SNAPSHOT_PAN = (
+    ((-65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -10.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0, -10.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0, 0.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, 0.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, 20.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0, 20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
 
 ########################SCANS###########################
 
