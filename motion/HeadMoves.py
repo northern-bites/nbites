@@ -32,6 +32,8 @@ FIND_BALL_HEADS_RIGHT =  (((-45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
 # |    -30 |   104 | inf |
 #HEAD SCANS
 
+
+#####################BASIC PANS##########################
 LOC_PANS = (
     (( 65.0, 10.0),1.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.,-20.),1.0,  1, stiff.LOW_HEAD_STIFFNESSES),
@@ -48,6 +50,28 @@ QUICK_PANS = (
     ((-30.0,-25.0),.3,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0,-20.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-30.0,-25.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES))
+
+######################PHOTO PANS########################
+
+HIGH_SNAPSHOT_PAN = (
+    ((-65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+MID_SNAPSHOT_PAN = (
+    ((-65.0, -10.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -10.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, 0.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0, 0.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+LOW_SNAPSHOT_PAN = (
+    ((-65.0, 5.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, 5.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, 20.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0, 20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+########################SCANS###########################
 
 HIGH_SCAN_CLOSE_BOUND = 104
 HIGH_SCAN_BALL = (
