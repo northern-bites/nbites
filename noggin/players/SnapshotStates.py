@@ -19,7 +19,7 @@ def gamePlaying(player):
 
 def saveFrames(player):
     if player.firstFrame():
-        player.brain.tracker.startScan(HeadMoves.COMB_SNAPSHOT_PAN)
+        player.brain.tracker.startScan(HeadMoves.FORWARD_COMB_PAN)
         ##replace <TYPE_SNAPSHOT_PAN> with any PHOTO PAN in
         ##    man/motion/HeadMoves.py
         player.standup()

@@ -53,12 +53,14 @@ QUICK_PANS = (
 
 ######################PHOTO PANS########################
 
+#pans full field inf to about 2/3m
 HIGH_SNAPSHOT_PAN = (
     ((-65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+#pans full field inf to about .15m
 HIGH_MID_SNAPSHOT_PAN = (
     ((-65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
@@ -66,24 +68,28 @@ HIGH_MID_SNAPSHOT_PAN = (
     ((65.0, -10.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0, -10.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+#pans full field about 1m to about .15m
 MID_SNAPSHOT_PAN = (
     ((-65.0, -10.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, -10.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 0.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0, 0.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+#pans full field about 2/3m to 0m
 MID_LOW_SNAPSHOT_PAN = (
     ((-65.0, 0.0), 0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 0.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 20.0), 0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0, 20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+#pans full field about .5m to 0m
 LOW_SNAPSHOT_PAN = (
     ((-65.0, 5.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 5.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.0, 20.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0, 20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+#pans full field inf to 0m
 COMB_SNAPSHOT_PAN = (
     ((-65.0, -25.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, -35.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
@@ -95,6 +101,53 @@ COMB_SNAPSHOT_PAN = (
     ((65.0, 20.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.0, 20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+#pans in front of robot inf to about 2/3m
+FORWARD_HIGH_PAN = (
+    ((-30.0, -30.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, -30.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+#pans in front of robot inf to about .15m
+FORWARD_HIGH_MID_PAN = (
+    ((-30.0, -30.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, -30.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, -10.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0, -10.0), .8, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+#pans in front of robot about 1m to about .15m
+FORWARD_MID_PAN = (
+    ((-30.0, -10.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, -10.0), .8, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, 0.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0, 0.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+#pans in front of robot about 2/3m to 0m
+FORWARD_MID_LOW_PAN = (
+    ((-30.0, 0.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, 0.0), .8, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, 20.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0, 20.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+#pans in front of robot about .5m to 0m
+FORWARD_LOW_PAN = (
+    ((-30.0, 5.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, 5.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, 20.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0, 20.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+#pans in front of robot inf to 0m
+FORWARD_COMB_PAN = (
+    ((-30.0, -30.0), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, -35.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, -30.0), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, -10.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0, -10.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0, 0.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, 0.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((30.0, 20.0), 0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0, 20.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 ########################SCANS###########################
 
