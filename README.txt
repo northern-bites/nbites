@@ -1,14 +1,15 @@
  INSTALLING LIBRARIES AND CROSS COMPILER
 
-In order to compile the man binaries, you must first have the NaoQI libraries  and associated cross compiler installed on your machine.  The archives needed to do this are available on our server. The default configuration is to install to /usr/local/nao.
+In order to compile the man binaries, you must first have the NaoQI libraries  and associated cross compiler installed on your machine. These libraries are the property of Aldebaran Robotics, but are mirrored on our server for those with a Bowdoin login. You may contact Aldebaran for the libraries.
 
-NOTE: The given commands should be executed from the directory where you downloaded the archives. Also, depending on your system setup, you may need root privilages to install to /usr/local/nao
+ The default configuration is to install to /usr/local/nao.
+
+NOTE: The given commands should be executed from the directory where you downloaded the archives. Also, depending on your system setup, you may need root privileges to install to /usr/local/nao
 
 LINUX:
-First, get the NaoQI libraries by saving the file
-<https://robocup.bowdoin.edu/files/software/nao/NaoQi/NaoQiRobocup-1.0.0-Linux.tar.gz> to your computer. You should then extract the contents to /usr/local/nao (i.e. there should be a file /usr/local/nao/Release-notes.txt)
+First, get the NaoQI libraries by retrieving the file <https://robocup.bowdoin.edu/files/software/nao/NaoQi/1.2.0/linux/NaoQiRobocup-1.2.0-Linux.tar.gz>. You should then extract the contents to /usr/local/nao (i.e. there should be a file /usr/local/nao/Release-notes.txt)
 
-	sudo tar -xvzf NaoQiRobocup-1.0.0-Linux.tar.gz -C /usr/local
+	sudo tar -xvzf NaoQiRobocup-1.2.0-Linux.tar.gz -C /usr/local
 
 If the directory /usr/local/nao already exists you should move it first
 
@@ -16,23 +17,23 @@ If the directory /usr/local/nao already exists you should move it first
 
 Then you should move the NaoQi directory to /usr/local/nao
 
-	sudo mv /usr/local/NaoQiRobocup-1.0.0-Linux /usr/local/nao
+	sudo mv /usr/local/NaoQiRobocup-1.2.0-Linux /usr/local/nao
 
 You will also need the cross compiler, so start by creating its directory:
 
 	sudo mkdir /usr/local/nao/crosstoolchain
 
-Next, the new (1.0) cross tool chain is available from <https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff/ctc-1.0.0b.tar.bz2>
+Next, the new (1.0) cross tool chain is available from <https://robocup.bowdoin.edu/files/software/nao/NaoQi/1.2.0/ctc-robocup-1.2..tar.bz2>
 
-Double check to make sure you have folders named 'cross' and 'stagging' in $AL_DIR/crosstoolchain
+Double check to make sure you have folders named 'cross' and 'staging' in $AL_DIR/crosstoolchain
 
 DARWIN (MAC OS X):
-Download the Northern Bites nao tools from
-<https://robocup.bowdoin.edu/files/software/nao/NaoQi/nbites-nao-darwin.tar.bz2>
+Download the Northern Bites Nao tools from
+<https://robocup.bowdoin.edu/files/software/nao/NaoQi/1.2.0/darwin/darwin-nao-1.2.tar.bz2>
 
 Extract the archive using the following command:
 
-tar -xvvjf nao-darwin.tar.bz2
+tar -xvvjf darwin-nao-1.2.tar.bz2
 
 NOTE: if you currently have /usr/local/nao you should move it with the following command if you do not want to lose the contents:
 
@@ -63,7 +64,7 @@ generate the configuration files.
 If you are compiling for the robot you should make sure @MAN_IS_REMOTE@ is set
 to OFF.  If it is set to OFF, you can change it by moving over the OFF text area
 and hitting the enter key.  Here you should also set the appropriate player for
-the robot and the IP address. Help for the configuration tool is accesible by
+the robot and the IP address. Help for the configuration tool is accessible by
 typing h while the tool is running.
 
 Now to compile the code simply run:
@@ -71,11 +72,11 @@ Now to compile the code simply run:
     make
 
 If there are errors compiling and you need to change configuration files you can
-delete the configuration files and make the codebase ready for recompiling via:
+delete the configuration files and make the code base ready for recompiling via:
 
    make clean
 
-If you have an error compiling and need to clean your codebase, but do not wish
+If you have an error compiling and need to clean your code base, but do not wish
 to delete your configuration files you can delete the binaries only by using the
 command:
 
@@ -88,13 +89,12 @@ following command:
 
 
 RUNNING THE CODE
-Set the IP address of the remote robot on the configuration screenas described above.
-Next, ssh into the robot as root and edit the file /opt/naoqi/modules/lib/autoload.ini using `nano autoload.ini`  This file lists all the modules that are loaded by NaoQi on bootime. If you are running as a dynamically linked library, you must ensure that the line
-man
-is present in that list. Additionally, you must disable pythonbridge for the Python to run correctly in our code (if you don't do this, you will get a segfault).
+Set the IP address of the remote robot on the configuration screen as described above.
+Next, ssh into the robot as root and edit the file /opt/naoqi/modules/lib/autoload.ini using `nano autoload.ini`  This file lists all the modules that are loaded by NaoQi on boot time. If you are running as a dynamically linked library, you must ensure that the line
+man is present in that list. Additionally, you must disable pythonbridge for the Python to run correctly in our code (if you don't do this, you will get a segfault).
 
 
-SIMMULATOR:
+SIMULATOR:
 See the directions at http://robocup.bowdoin.edu/trac/wiki/Webots
 
 
@@ -107,3 +107,5 @@ SIMULATOR (in robostadium contest mode without NaoQi):
 	  -angleX and angleY are calculated incorrectly (they are just 0.0)
 	  -GameController (i.e. Comm) is not working, so switching into playing is not possible
 	  -Use the "webots.mtb" table
+
+ LocalWords:  NaoQI robocup
