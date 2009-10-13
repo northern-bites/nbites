@@ -40,6 +40,7 @@ void ALEnactor::run() {
     Thread::trigger->on();
 
     long long currentTime;
+	struct timespec interval, remainder;
     while (running) {
         currentTime = micro_time();
             sendCommands();
@@ -55,8 +56,10 @@ void ALEnactor::run() {
                  << processTime <<endl;
             //Don't sleep at all
         } else{
-            usleep(static_cast<useconds_t>(MOTION_FRAME_LENGTH_uS
-                                           - static_cast<float>(processTime)));
+			interval.tv_sec = 0;
+			interval.tv_nsec = static_cast<long long int>(MOTION_FRAME_LENGTH_uS
+														  - static_cast<float>(processTime));
+			nanosleep(&interval,&remainder);
         }
 #endif
 
