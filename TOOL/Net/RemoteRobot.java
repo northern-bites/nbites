@@ -201,7 +201,7 @@ public class RemoteRobot extends FileSet {
 
 			proto.request(DataRequest.IMAGE_JOINTS_SENSORS);
 
-			f.setType(RobotDef.NAO_VER);
+			f.setType(proto.getRobotType());
 			f.setImage(FrameLoader.loadBytes(proto.getRobotType(), proto.getImage()));
 			f.setJoints(Arrays.asList(proto.getJoints()));
 			f.setSensors(Arrays.asList(proto.getSensors()));

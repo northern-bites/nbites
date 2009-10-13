@@ -30,6 +30,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -37,6 +38,9 @@ import javax.swing.JPopupMenu;
 
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import TOOL.TOOL;
 import TOOL.Data.DataTypes;
@@ -66,7 +70,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 	private Thread streamingThread;
 	private DataType streamType;
 	private boolean isStreaming = false;
+	private boolean isSavingStream = false;
 	private JButton startStopButton, streamButton;
+	private JCheckBox saveStreamBox;
 
     public RobotViewModule(TOOL t, NetworkModule net_mod) {
         super(t);
@@ -162,6 +168,20 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 				}
 			});
 		subPanel.add(startStopButton);
+
+		saveStreamBox = new JCheckBox("Save stream");
+		saveStreamBox.addItemListener( new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+
+					if (e.getStateChange() == ItemEvent.SELECTED){
+						isSavingStream = true;
+					} else if (e.getStateChange() == ItemEvent.DESELECTED){
+						isSavingStream = false;
+					}
+
+				}
+			});
+		subPanel.add(saveStreamBox);
 	}
 
 	// Pretty tremendous hack for streaming images from Nao, probably could
@@ -185,7 +205,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 								img = selectedRobot.retrieveImage();
 							if (img != null) {
 								imagePanel.updateImage(img);
+							}
 
+							if (isSavingStream){
 								// Write image to a frame
 								Frame newFrame = selectedRobot.get(numFramesStreamed);
 								selectedRobot.fillNewFrame(newFrame);
