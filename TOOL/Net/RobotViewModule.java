@@ -33,8 +33,11 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+
+import javax.swing.JComboBox;
 
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -68,14 +71,20 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
     private RemoteRobot selectedRobot;
 
 	private Thread streamingThread;
-	private DataType streamType;
+	private DataType streamType = DataTypes.DataType.THRESH;
 	private boolean isStreaming = false;
 	private boolean isSavingStream = false;
 	private JButton startStopButton, streamButton;
 	private JCheckBox saveStreamBox;
 
+	private String saveFramePath = null;
+
+	private TOOL tool;
+
     public RobotViewModule(TOOL t, NetworkModule net_mod) {
         super(t);
+
+		tool = t;
 
         net = net_mod;
         displayPanel = new JPanel();
@@ -128,7 +137,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
 	private void createUpdateButtons(JPanel subPanel){
         subPanel.add(new JLabel("Update:"));
-        subPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+        subPanel.add(Box.createRigidArea(new Dimension(30, 10)));
 
         for (DataType t : DataTypes.types()) {
             JButton b = new JButton(DataTypes.title(t));
@@ -138,36 +147,72 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         }
 	}
 
-	private void createStreamingButtons(JPanel subPanel){
-		subPanel.add(new JLabel("Streaming:"));
-		subPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+	private void createStreamingButtons(JPanel panel){
+		JPanel subPanel = new JPanel();
+		subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.PAGE_AXIS));
+		panel.add(subPanel);
 
-		streamButton = new JButton("Stream Type");
-		streamButton.addActionListener( new ActionListener() {
+		subPanel.add(new JLabel("Streaming:"));
+
+
+		String streamingTypes[] = {DataTypes.title(DataTypes.DataType.THRESH),
+								   DataTypes.title(DataTypes.DataType.IMAGE)};
+		JComboBox streamComboBox = new JComboBox(streamingTypes);
+
+		Dimension maxDim = new Dimension(200,40);
+		Dimension prefDim = new Dimension(200,40);
+		streamComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+		streamComboBox.setMaximumSize(maxDim);
+		streamComboBox.setPreferredSize(prefDim);
+
+		streamComboBox.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
-					if (streamButton.getText() == DataTypes.title(DataTypes.DataType.THRESH)){
-						streamType = DataTypes.DataType.IMAGE;
-						streamButton.setText(DataTypes.title(DataTypes.DataType.IMAGE));
-					}
-					else {
+					JComboBox box = (JComboBox)e.getSource();
+					if (box.getSelectedItem() ==
+						DataTypes.title(DataTypes.DataType.THRESH)){
 						streamType = DataTypes.DataType.THRESH;
-						streamButton.setText(DataTypes.title(DataTypes.DataType.THRESH));
+					}
+					else if (box.getSelectedItem() ==
+							 DataTypes.title(DataTypes.DataType.IMAGE)){
+					streamType = DataTypes.DataType.IMAGE;
 					}
 				}
 			});
-		subPanel.add(streamButton);
+
+		subPanel.add(streamComboBox);
 
 		startStopButton = new JButton("Start");
 		startStopButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e){
+					if (selectedRobot == null)
+						return;
+
+					if (saveFramePath == null)
+						saveFramePath = tool.CONSOLE.promptDirOpen("Save Destination",saveFramePath);
+
+
+					if (saveFramePath == null)
+						return;
+
 					isStreaming = !isStreaming;
-					if (isStreaming)
+
+					if (isStreaming){
 						startStopButton.setText("Stop");
-					else
+					} else {
 						startStopButton.setText("Start");
+					}
+
 				}
 			});
 		subPanel.add(startStopButton);
+
+		JButton frameDestButton = new JButton("Set destination");
+		frameDestButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					saveFramePath = tool.CONSOLE.promptDirOpen("Save Destination",saveFramePath);
+				}
+			});
+		subPanel.add(frameDestButton);
 
 		saveStreamBox = new JCheckBox("Save stream");
 		saveStreamBox.addItemListener( new ItemListener() {
@@ -187,6 +232,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 	// Pretty tremendous hack for streaming images from Nao, probably could
 	// and should be more elegant. Oh well.
 	private void createStreamingThread() {
+
 		streamingThread = new Thread(new Runnable() {
 
 				public void run() {
@@ -212,7 +258,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 								Frame newFrame = selectedRobot.get(numFramesStreamed);
 								selectedRobot.fillNewFrame(newFrame);
 								selectedRobot.load(numFramesStreamed);
-								selectedRobot.store(numFramesStreamed, "../man/frames/streaming");
+								selectedRobot.store(numFramesStreamed,saveFramePath);
 								numFramesStreamed++;
 							}
 						}
