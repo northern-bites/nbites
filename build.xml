@@ -55,8 +55,8 @@
   </target>
 
   <!-- Clean up everything -->  
-  <target name="clean"
-          description="clean up" >
+  <target name="clean.all"
+          description="clean up everything" >
     <delete>
       <fileset dir="."> 
 	<include name="**/*.class"/>
@@ -64,6 +64,16 @@
 	<include name="*TOOLVisionLink.*"/>
 	<!-- delete the JNI header generated for the TOOLVisionLink -->
 	<include name="TOOL/**/*.h"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <!-- Clean class files -->
+  <target name="clean"
+	  description="clean .class files" >
+    <delete>
+      <fileset dir=".">
+	<include name="**/*.class"/>
       </fileset>
     </delete>
   </target>
