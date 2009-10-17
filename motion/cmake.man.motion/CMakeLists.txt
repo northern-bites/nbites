@@ -149,6 +149,8 @@ SET( MOTION_PYTHON_SRCS ${MOTION_INCLUDE_DIR}/__init__.py
                         ${MOTION_INCLUDE_DIR}/StiffnessModes.py
                         )
 
+SET( MOTION_PYTHON_SUBDIRS ${MOTION_INCLUDE_DIR}/gaits )
+
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -187,6 +189,12 @@ INSTALL(
   CONFIGURATIONS "" Debug Release
   )
 
+INSTALL(
+  DIRECTORY ${MOTION_PYTHON_SUBDIRS}
+  DESTINATION ${MOTION_PYTHON_TARGET_DIR}/
+  CONFIGURATIONS "" Debug Release
+  FILES_MATCHING PATTERN "*.py"
+  )
 
 ############################ LINKER LANGUAGE
 # For Mac's, set the target link language to use

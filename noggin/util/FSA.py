@@ -1,11 +1,10 @@
-
 """
 This file contains an implementation of a finite state automaton.
 """
-
 import time
 from . import NaoOutput
-DEBUG =False
+
+DEBUG = False
 
 #HELPER method syntax for external state changes requiring helpers
 HELPER = "Helper"
@@ -27,7 +26,7 @@ WHITE_COLOR_CODE = '\033[37m'
 DEFAULT_COLOR_CODE = '\033[39m'
 BLACK_BG_COLOR_CODE = '\033[40m'
 RED_BG_COLOR_CODE = '\033[41m'
-GREEN_BG_COLOR_CODE = '\033[42m\033[37m'
+GREEN_BG_COLOR_CODE = '\033[42m\033[37m' # White text
 YELLOW_BG_COLOR_CODE = '\033[43m'
 BLUE_BG_COLOR_CODE = '\033[44m'
 PURPLE_BG_COLOR_CODE = '\033[45m'
@@ -44,7 +43,6 @@ class FSA:
     """
     def __init__(self, owner):
         self.owner = owner
-
         self.currentState = ""
         self.lastState = ""
         self.lastDiffState = ""
@@ -86,12 +84,25 @@ class FSA:
         # by returning NEXT_FRAME
         while stayInFrame:
             # grab the method which describes what the current state does
-            methodCall = self.states[self.currentState]
+            try:
+                methodCall = self.states[self.currentState]
+            except KeyError:
+                self.printf("Attempted to change to non-existent state: \"" +
+                            self.currentState + "\" from state \"" +
+                            self.lastState + "\"!")
+                raise
             # execute the state
             if DEBUG:
                 print self.name
                 print " DEBUG: current state = ",self.currentState
-            (stayInFrame, nextState) = methodCall(self)
+
+            try:
+                (stayInFrame, nextState) = methodCall(self)
+            except TypeError:
+                self.printf("Forgot to return next state in state \"" +
+                            self.currentState + "\"!")
+                raise
+
             self.lastState = self.currentState
             self.currentState = nextState
             self.updateStateInfo()
@@ -147,7 +158,7 @@ class FSA:
         ''' default print method for the FSA '''
         print str
 
-    def printf(self,outputString, printingColor=''):
+    def printf(self,outputString, printingColor='green'):
         '''FSA print function that allows colors to be specified'''
         if printingColor == 'red':
             self.outputFunction(RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
@@ -165,6 +176,8 @@ class FSA:
             self.outputFunction(WHITE_BG_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         elif printingColor == 'greenbg':
             self.outputFunction(GREEN_BG_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
+        elif printingColor == 'green':
+            self.outputFunction(GREEN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         else:
             self.outputFunction(str(outputString))
 
