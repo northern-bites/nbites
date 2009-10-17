@@ -1,4 +1,4 @@
-from ..playbook import PBConstants
+
 from .. import NogginConstants
 import GoalieTransitions as helper
 import GoalieConstants as constants
