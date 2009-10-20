@@ -231,7 +231,7 @@ class Brain(object):
             if len(packet) == Constants.NUM_PACKET_ELEMENTS:
                 packet = Packet.Packet(packet)
                 if packet.playerNumber != self.my.playerNumber:
-                    self.playbook.update(packet)
+                    self.teamMembers[packet.playerNumber-1].update(packet)
 
     def updateLocalization(self):
         """

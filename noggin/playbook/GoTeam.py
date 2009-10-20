@@ -182,7 +182,7 @@ class GoTeam:
                 elif (mate.playerNumber > self.me.playerNumber and
                       mate.chaseTime - self.me.chaseTime <
                       PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
-                      mate.isChaser()):
+                      mate.isTeammateRole(PBConstants.CHASER)):
                     chaser_mate = mate
 
                 # else pick the lowest chaseTime
