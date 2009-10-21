@@ -81,6 +81,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
 	private TOOL tool;
 
+	private static final long FRAME_LENGTH_MILLIS = 40;
+
     public RobotViewModule(TOOL t, NetworkModule net_mod) {
         super(t);
 
@@ -237,13 +239,18 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
 				public void run() {
 					int numFramesStreamed = 0;
+
+					long startTime = 0;
+					long timeSpent = 0;
+
 					try {
 						while (true){
+							startTime = System.currentTimeMillis();
 							if (!isStreaming){
 								Thread.sleep(1500);
 								continue;
 							}
-							Thread.sleep(50);
+
 							TOOLImage img = null;
 							if (streamType == DataTypes.DataType.THRESH)
 								img = selectedRobot.retrieveThresh();
@@ -261,6 +268,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 								selectedRobot.store(numFramesStreamed,saveFramePath);
 								numFramesStreamed++;
 							}
+							timeSpent = System.currentTimeMillis() - startTime;
+							if (timeSpent < FRAME_LENGTH_MILLIS)
+								Thread.sleep(FRAME_LENGTH_MILLIS - timeSpent);
 						}
 					} catch (InterruptedException e){
 					} catch (TOOLException e) {}
