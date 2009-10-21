@@ -269,8 +269,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 								numFramesStreamed++;
 							}
 							timeSpent = System.currentTimeMillis() - startTime;
-							if (timeSpent < FRAME_LENGTH_MILLIS)
+							if (timeSpent < FRAME_LENGTH_MILLIS){
 								Thread.sleep(FRAME_LENGTH_MILLIS - timeSpent);
+							}
 						}
 					} catch (InterruptedException e){
 					} catch (TOOLException e) {}
