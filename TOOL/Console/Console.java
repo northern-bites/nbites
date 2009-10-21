@@ -97,9 +97,19 @@ public class Console {
             if (curdir != null)
                 fd.setDirectory(curdir);
             fd.setMode(file_mode);
+
+			if (filter_mode == DIRS) {
+				System.setProperty("apple.awt.fileDialogForDirectories", "true");
+			}
+
             fd.setVisible(true);
+
+			if (filter_mode == DIRS) {
+				System.setProperty("apple.awt.fileDialogForDirectories", "false");
+			}
+
             String fullpath = fd.getDirectory() + fd.getFile();
-            fd.dispose();  
+            fd.dispose();
 
             if (fd.getFile() == null)
                 return null;

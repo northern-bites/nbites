@@ -145,7 +145,7 @@ public class NetworkModule extends TOOLModule implements DataSource,
 
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BorderLayout());
-        
+
         JPanel addPanel = new JPanel();
         addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.LINE_AXIS));
         JButton addButton = new JButton("Add host");
@@ -227,7 +227,7 @@ public class NetworkModule extends TOOLModule implements DataSource,
     //
     // DataSource contract
     //
-    
+
     public SourceHandler getHandler() {
         return this;
     }
@@ -309,7 +309,7 @@ public class NetworkModule extends TOOLModule implements DataSource,
             TOOL.CONSOLE.error("Invalid url given to network module.");
             return null;
         }
-        
+
         // calculate name and address from the url
         int split = url.indexOf('@');
         String name, s_addr;
@@ -356,7 +356,7 @@ public class NetworkModule extends TOOLModule implements DataSource,
     public void robotFound(String name, InetAddress addr) {
         System.out.println("Robot found!  Creating dataset for " + name);
 
-        DataSet set = createNew(REMOTE_PATH + name + '@' 
+        DataSet set = createNew(REMOTE_PATH + name + '@'
                                 + addr.getHostAddress());
 
         if (set != null && robots.size() == 1)

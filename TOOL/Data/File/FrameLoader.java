@@ -224,6 +224,7 @@ public class FrameLoader implements FileFilter {
 
             case RobotDef.NAO:
             case RobotDef.NAO_RL:
+   		    case RobotDef.NAO_VER:
                 return new YUV422Image(data,
                         RobotDef.ROBOT_DEFS[type].imageWidth(),
                         RobotDef.ROBOT_DEFS[type].imageHeight());
@@ -241,39 +242,57 @@ public class FrameLoader implements FileFilter {
 
     public static void storeFrame(File f, Frame frm) throws TOOLException {
 
+		final Integer CURRENT_FRM_VERSION = new Integer(0);
+
         try {
             FileOutputStream fos = new FileOutputStream(f);
             DataOutputStream output = new DataOutputStream(fos);
 
             switch (frm.type()) {
-                case RobotDef.AIBO:
-                case RobotDef.AIBO_220:
-                case RobotDef.AIBO_ERS7:
-                    output.write(new byte[AIBO_HEADER_SIZE]);
+			case RobotDef.AIBO:
+			case RobotDef.AIBO_220:
+			case RobotDef.AIBO_ERS7:
+				output.write(new byte[AIBO_HEADER_SIZE]);
 
-                    if (frm.hasImage())
-                        frm.image().writeOutputStream(output);
+				if (frm.hasImage())
+					frm.image().writeOutputStream(output);
 
-                    if (frm.hasJoints())
-                        for (Float fl : frm.joints())
-                            output.writeBytes(fl.toString() + " ");
-                    break;
+				if (frm.hasJoints())
+					for (Float fl : frm.joints())
+						output.writeBytes(fl.toString() + " ");
+				break;
 
-                case RobotDef.NAO:
-                case RobotDef.NAO_RL:
-                    if (frm.hasImage())
-                        frm.image().writeOutputStream(output);
-                    if (frm.hasJoints())
-                        for (Float fl : frm.joints())
-                            output.writeBytes(fl.toString() + " ");
-                    if (frm.hasSensors())
-                        for (Float fl : frm.sensors())
-                            output.writeBytes(fl.toString() + " ");
-                    break;
+			case RobotDef.NAO:
+			case RobotDef.NAO_RL:
+				if (frm.hasImage())
+					frm.image().writeOutputStream(output);
+				if (frm.hasJoints())
+					for (Float fl : frm.joints())
+						output.writeBytes(fl.toString() + " ");
+				if (frm.hasSensors())
+					for (Float fl : frm.sensors())
+						output.writeBytes(fl.toString() + " ");
+				break;
 
-                case RobotDef.NAO_SIM:
-                    frm.image().writeOutputStream(output);
-                    break;
+			case RobotDef.NAO_SIM:
+				frm.image().writeOutputStream(output);
+				break;
+			case RobotDef.NAO_VER: // This writes a file of VERSION 0 for the TOOL
+				if (frm.hasImage()) {
+					frm.image().writeOutputStream(output);
+				}
+				// HACK. Should be done more eloquently?
+				output.writeBytes(CURRENT_FRM_VERSION.toString() + " ");
+
+				if (frm.hasJoints()){
+					for (Float fl : frm.joints())
+						output.writeBytes(fl.toString() + " ");
+				}
+				if (frm.hasSensors()){
+					for (Float fl : frm.sensors())
+						output.writeBytes(fl.toString() + " ");
+				}
+				break;
             }
         }catch (IOException e) {
             // raise TOOLException from IOException source, with module info

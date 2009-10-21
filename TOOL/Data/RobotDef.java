@@ -91,7 +91,8 @@ public class RobotDef {
         ERS220_DEF,
         NAO_DEF,
         NAO_SIM_DEF,
-        NAO_DEF,
+        NAO_DEF_VERSIONED,
+		NAO_DEF_VERSIONED
     };
 
     private int type;
