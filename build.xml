@@ -50,6 +50,7 @@
     <java classname="TOOL.TOOL"
 	  fork="true"
 	  maxmemory="512m">
+	  <sysproperty key="java.library.path" value="./"/>
       <classpath refid="tool.paths"/>
     </java>
   </target>
