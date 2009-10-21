@@ -46,11 +46,14 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import TOOL.TOOL;
+import TOOL.Calibrate.VisionState;
 import TOOL.Data.DataTypes;
 import TOOL.Data.Frame;
 import TOOL.Data.DataTypes.DataType;
 import TOOL.Image.ImagePanel;
+import TOOL.Image.ProcessedImage;
 import TOOL.Image.TOOLImage;
+import TOOL.Image.ThresholdedImageOverlay;
 import TOOL.Net.DataRequest;
 
 import TOOL.TOOLModule;
@@ -158,7 +161,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
 
 		String streamingTypes[] = {DataTypes.title(DataTypes.DataType.THRESH),
-								   DataTypes.title(DataTypes.DataType.IMAGE)};
+								   DataTypes.title(DataTypes.DataType.IMAGE),
+								   DataTypes.title(DataTypes.DataType.OBJECTS)};
 		JComboBox streamComboBox = new JComboBox(streamingTypes);
 
 		Dimension maxDim = new Dimension(200,40);
@@ -177,6 +181,10 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 					else if (box.getSelectedItem() ==
 							 DataTypes.title(DataTypes.DataType.IMAGE)){
 					streamType = DataTypes.DataType.IMAGE;
+					}
+					else if (box.getSelectedItem() ==
+							DataTypes.title(DataTypes.DataType.OBJECTS)){
+						streamType = DataTypes.DataType.OBJECTS;
 					}
 				}
 			});
@@ -242,6 +250,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
 					long startTime = 0;
 					long timeSpent = 0;
+					
+					VisionState visionState = null;
 
 					try {
 						while (true){
@@ -252,12 +262,36 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 							}
 
 							TOOLImage img = null;
+							ThresholdedImageOverlay threshOverlay = null;
+							Frame f = new Frame();
+							
 							if (streamType == DataTypes.DataType.THRESH)
 								img = selectedRobot.retrieveThresh();
 							else if (streamType == DataTypes.DataType.IMAGE)
 								img = selectedRobot.retrieveImage();
+							else if (streamType == DataTypes.DataType.OBJECTS){
+								selectedRobot.fillNewFrame(f);
+								if (f != null){
+									if (visionState == null){
+										visionState = new VisionState(f, 
+												tool.getColorTable());
+										img = visionState.getThreshImage();
+										threshOverlay = visionState.getThreshOverlay();
+									}
+									else {
+										visionState.newFrame(f, tool.getColorTable());
+										//visionState.setColorTable(tool.getColorTable());
+										visionState.update();
+										img = visionState.getThreshImage();
+										threshOverlay = visionState.getThreshOverlay();
+									}
+								}
+							}
 							if (img != null) {
 								imagePanel.updateImage(img);
+							}
+							if (threshOverlay != null) {
+								imagePanel.setOverlayImage(threshOverlay);
 							}
 
 							if (isSavingStream){

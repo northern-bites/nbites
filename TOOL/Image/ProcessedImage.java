@@ -28,8 +28,8 @@ import TOOL.Calibrate.VisionState;
 public class ProcessedImage extends ThresholdedImage {
     private TOOLVisionLink visionLink;//the link
 
-    public ProcessedImage(TOOLImage image, ColorTable cTable) {
-        super(image.getWidth(), image.getHeight());
+    public ProcessedImage(Frame currentFrame, ColorTable cTable) {
+        super(currentFrame.image().getWidth(), currentFrame.image().getHeight());
 
         visionLink = new TOOLVisionLink();
     }
@@ -41,10 +41,10 @@ public class ProcessedImage extends ThresholdedImage {
      * NOTE: This method assumes we are working with a NAO image. If someone
      *       cares to fix it...be my guest. Sincerely, George.
      */
-    public void thresholdImage(TOOLImage image, ColorTable table) {
+    public void thresholdImage(Frame currentFrame, ColorTable table) {
         // Grab a constant reference to the current instance of the TOOL
         final TOOL tool = TOOL.instance;
-
+        TOOLImage image = currentFrame.image();
         if(table == null)
             return;
         // Isn't it REALLY lame that these get initialized for the first time
@@ -57,10 +57,10 @@ public class ProcessedImage extends ThresholdedImage {
             super.thresholdImage(table, image);
         else {
             //Get the joints from the frame if it exists
-            Frame currentFrame = tool.getDataManager().activeFrame();
-
+        	
+            
             float[] joints = new float[RobotDef.NAO_DEF.numJoints()];
-            if(currentFrame.hasJoints()){
+            if(currentFrame != null && currentFrame.hasJoints()){
                 List<Float> list_joints = currentFrame.joints();
                 joints = new float[list_joints.size()];
                 int i = 0;
@@ -74,7 +74,7 @@ public class ProcessedImage extends ThresholdedImage {
             }
 
             float[] sensors = new float[RobotDef.NAO_DEF.numSensors()];
-            if (currentFrame.hasSensors()) {
+            if (currentFrame != null && currentFrame.hasSensors()) {
                 List<Float> list_sensors = currentFrame.sensors();
                 sensors = new float[list_sensors.size()];
                 int i = 0;
@@ -86,7 +86,7 @@ public class ProcessedImage extends ThresholdedImage {
                 tool.CONSOLE.message("Warning: Processing image w/o " +
                                      "sensor info");
             }
-
+            
             // Convert the TOOLImage to the one-dimensional format that the C++
             // side is used to.
             byte[] rawImage = new byte[baseImage.rawImageSize()];
