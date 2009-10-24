@@ -183,7 +183,7 @@ class Brain(object):
         # Update Environment
         self.ball.updateVision(self.vision.ball)
         self.updateFieldObjects()
-        self.sonar.updateSensors(self.sensors,sensors.UltraSoundMode)
+        self.sonar.updateSensors(self.sensors, sensors.UltraSoundMode)
 
         # Communications update
         self.updateComm()

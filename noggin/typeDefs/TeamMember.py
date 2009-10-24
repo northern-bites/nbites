@@ -2,12 +2,14 @@
 from math import (hypot, degrees)
 
 from .. import NogginConstants
-from ..playbook.PBConstants import (DEFAULT_GOALIE_NUMBER,
-                                   DEFAULT_CHASER_NUMBER,
-                                   DEFAULT_DEFENDER_NUMBER,
-                                   PACKET_DEAD_PERIOD)
 from ..util import MyMath
 import time
+
+PACKET_DEAD_PERIOD = 5 # TO-DO: look at shortening so it replaces penalized
+DEFAULT_GOALIE_NUMBER = 1
+DEFAULT_DEFENDER_NUMBER = 2
+DEFAULT_CHASER_NUMBER = 3
+
 
 class TeamMember:
     '''class for keeping track of teammates' info'''

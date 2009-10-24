@@ -1,4 +1,4 @@
-from ..playbook.PBConstants import GOALIE
+from ..playbook.PBConstants import (GOALIE, CHASER)
 import man.motion.SweetMoves as SweetMoves
 ###
 # Reimplementation of Game Controller States for pBrunswick
@@ -99,7 +99,7 @@ def gameSet(player):
                 return player.goLater('squatted')
             return player.goLater('squat')
 
-        if player.brain.playbook.isDefaultChaser():
+        if player.brain.play.isRole(CHASER):
             player.brain.tracker.trackBall()
         else:
             player.brain.tracker.activeLoc()

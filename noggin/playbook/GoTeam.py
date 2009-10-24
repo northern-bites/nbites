@@ -241,7 +241,8 @@ class GoTeam:
         Here we update information about teammates before running a new frame
         '''
         # Change which wing is forward based on the opponents score
-        # self.kickoffFormation = (self.brain.gameController.theirTeam.teamScore) % 2
+        # self.kickoffFormation =
+        #(self.brain.gameController.theirTeam.teamScore) % 2
 
         # update my own information for role switching
         self.time = time.time()
@@ -281,13 +282,8 @@ class GoTeam:
 
     def reset(self):
         '''resets all information stored from teammates'''
-        for i,mate in enumerate(self.brain.teamMembers):
+        for mate in enumerate(self.brain.teamMembers):
             mate.reset()
-
-    def update(self,packet):
-        '''public method called by Brain.py to update a teammates' info
-        with a new packet'''
-        self.brain.teamMembers[packet.playerNumber-1].update(packet)
 
     ######################################################
     ############   Strategy Decision Stuff     ###########
@@ -335,7 +331,7 @@ class GoTeam:
 #####################     Utility Functions      ###############################
 ################################################################################
 
-    def printf(self,outputString, printingColor='purple'):
+    def printf(self, outputString, printingColor='purple'):
         '''FSA print function that allows colors to be specified'''
         if printingColor == 'red':
             self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\

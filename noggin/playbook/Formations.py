@@ -66,7 +66,8 @@ def fThreeField(team, workingPlay):
     elif team.me.isDefaultGoalie():
         Roles.rDefender(team, workingPlay)
     elif chaser_mate.isDefaultGoalie():
-        if team.me.highestActivePlayerNumber():
+        #b/c all 3 nao's are active, the default chaser has highest player #
+        if team.me.isDefaultChaser():
             Roles.rOffender(team, workingPlay)
         else:
             Roles.rDefender(team, workingPlay)

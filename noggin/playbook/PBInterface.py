@@ -1,4 +1,4 @@
-import GoTeam
+from . import GoTeam
 
 class PBInterface:
     '''
@@ -12,8 +12,6 @@ class PBInterface:
         self.pb = GoTeam.GoTeam(brain)
         self.subRole = None
         self.lastSubRole = None
-        self.defaultChaser = self.pb.me.isDefaultChaser()
-        self.defaultGoalie = self.pb.me.isDefaultGoalie()
 
     def update(self):
         '''
@@ -23,21 +21,9 @@ class PBInterface:
         self.storeUsedValues()
         return self.pb.play
 
-    def isDefaultChaser(self):
-        ''' true if player is chaser at game start '''
-        return self.defaultChaser
-
-    def isDefaultGoalie(self):
-        '''true if player is goalie at game start'''
-        return self.defaultGoalie
-
-    def getPosition(self):
-        return self.position
-
     def subRoleChanged(self):
         return (self.subRole != self.lastSubRole)
 
     def storeUsedValues(self):
-        play = self.pb.play
         self.lastSubRole = self.subRole
-        self.subRole = play.subRole
+        self.subRole = self.pb.play.subRole
