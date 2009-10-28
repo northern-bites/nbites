@@ -287,7 +287,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
                                         //visionState.setColorTable(tool.getColorTable());
                                         visionState.update();
                                         img = visionState.getThreshImage();
-                                        threshOverlay = 
+                                        threshOverlay =
                                             visionState.getThreshOverlay();
                                     }
                                 }

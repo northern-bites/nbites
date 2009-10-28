@@ -78,8 +78,8 @@ public class VisionTester implements DataListener
 	private void processFrame(Frame f) {
 		TOOLImage rawImage = f.image();
 		ColorTable colorTable = tool.getColorTable();
-		ProcessedImage thresholdedImage = new ProcessedImage(rawImage, colorTable);
-		thresholdedImage.thresholdImage(rawImage, colorTable);
+		ProcessedImage thresholdedImage = new ProcessedImage(f, colorTable);
+		thresholdedImage.thresholdImage(f, colorTable);
 		addToCounts(thresholdedImage);
 	}
 
