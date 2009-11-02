@@ -303,7 +303,7 @@ extern "C" {
         // make sure the array for the estimate is big enough. There
         // should be room for five things in there. (subject to change)
         if (env->GetArrayLength(estimateResult) !=
-            sizeof(estimate)/sizeof(double)) {
+            sizeof(estimate)/sizeof(float)) {
             cout << "Error: the estimateResult array had incorrect "
                 "dimensions" << endl;
             return;
