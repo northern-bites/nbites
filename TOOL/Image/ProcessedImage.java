@@ -57,8 +57,7 @@ public class ProcessedImage extends ThresholdedImage {
             super.thresholdImage(table, image);
         else {
             //Get the joints from the frame if it exists
-        	
-            
+
             float[] joints = new float[RobotDef.NAO_DEF.numJoints()];
             if(currentFrame != null && currentFrame.hasJoints()){
                 List<Float> list_joints = currentFrame.joints();
