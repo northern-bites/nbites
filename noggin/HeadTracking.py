@@ -7,7 +7,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 import util.MyMath as MyMath
 from man.motion import StiffnessModes
-from math import fabs
+from math import (fabs, atan, sqrt)
 
 class HeadTracking(FSA.FSA):
     def __init__(self, brain):
@@ -177,3 +177,31 @@ class HeadTracking(FSA.FSA):
                 self.lookDirection != direction:
             self.lookDirection = direction
             self.switchTo('look')
+
+    def lookToLandmark(self, landmark):
+        self.lookToPoint(landmark.x, landmark.y, 0)
+
+    def lookToPoint(self, visGoalX, visGoalY, visGoalH):
+        relX = 0 #calculate myX relative to VisionGoalX
+        relY = 0 #calculate myY relative to VisionGoalY
+        relH = 0 #calculate myH relative to VisionGoalH
+        self.lookToRelativePoint(relX, relY, relH)
+
+    def lookToRelativePoint(self, relVisGoalX, relVisGoalY, relVisGoalH):
+        goalYaw = self.calculateGoalYaw(relVisGoalX, relVisGoalY)
+        goalPitch = self.calculateGoalPitch(relVisGoalX, relVisGoalY,
+                                            relVisGoalH)
+        headMove = motion.SetHeadCommand(goalYaw, goalPitch, 2.0, 2.0)
+        self.brain.motion.setHead(headMove)
+
+    def calculateGoalYaw(relX, relY):
+        localRelY = relY
+        if localRelY <= 0:
+            localRelY = .001
+        goalYaw = atan(relX/localRelY)
+        return goalYaw
+
+    def calculateGoalPitch(relX, relY, relH):
+        dist = sqrt(relX*relX, relY*relY)
+        pitch = atan(relH/dist)
+        return pitch
