@@ -251,7 +251,6 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
     private void createStreamingThread() {
 
         streamingThread = new Thread(new Runnable() {
-
                 public void run() {
                     int numFramesStreamed = 0;
 
@@ -272,11 +271,13 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
                             ThresholdedImageOverlay threshOverlay = null;
                             Frame f = new Frame();
 
-                            if (streamType == DataTypes.DataType.THRESH)
+                            if (streamType == DataTypes.DataType.THRESH) {
                                 img = selectedRobot.retrieveThresh();
-                            else if (streamType == DataTypes.DataType.IMAGE)
+                                imagePanel.setOverlayImage(null);
+                            } else if (streamType == DataTypes.DataType.IMAGE) {
                                 img = selectedRobot.retrieveImage();
-                            else if (streamType == DataTypes.DataType.OBJECTS){
+                                imagePanel.setOverlayImage(null);
+                            } else if (streamType == DataTypes.DataType.OBJECTS) {
                                 selectedRobot.fillNewFrame(f);
                                 if (f != null){
                                     if (visionState == null){
@@ -296,13 +297,15 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
                                             visionState.getThreshOverlay();
                                     }
                                 }
+                                imagePanel.setOverlayImage(threshOverlay);
                             }
                             if (img != null) {
                                 imagePanel.updateImage(img);
+                                //    imagePanel.setOverlayImage(null);
                             }
-                            if (threshOverlay != null) {
-                                imagePanel.setOverlayImage(threshOverlay);
-                            }
+                            //if (threshOverlay != null) {
+                            //   imagePanel.setOverlayImage(threshOverlay);
+                            //}
 
                             if (isSavingStream){
                                 // Write image to a frame
