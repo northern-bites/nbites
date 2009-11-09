@@ -7,7 +7,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 import util.MyMath as MyMath
 from man.motion import StiffnessModes
-from math import (fabs, atan, sqrt)
+from math import (fabs, atan, atan2, sqrt, pi)
 
 class HeadTracking(FSA.FSA):
     def __init__(self, brain):
@@ -181,27 +181,26 @@ class HeadTracking(FSA.FSA):
     def lookToLandmark(self, landmark):
         self.lookToPoint(landmark.x, landmark.y, 0)
 
-    def lookToPoint(self, visGoalX, visGoalY, visGoalH):
-        relX = 0 #calculate myX relative to VisionGoalX
-        relY = 0 #calculate myY relative to VisionGoalY
-        relH = 0 #calculate myH relative to VisionGoalH
-        self.lookToRelativePoint(relX, relY, relH)
+    def lookToPoint(self, visGoalX, visGoalY, visGoalHeight):
+        my = self.brain.my
+        relX = visGoalX - my.x #calculate myX relative to VisionGoalX
+        relY = visGoalY - my.y #calculate myY relative to VisionGoalY
+        relHeight = 150 #calculate myH relative to VisionGoalH
+        self.lookToRelativePoint(relX, relY, relHeight)
 
-    def lookToRelativePoint(self, relVisGoalX, relVisGoalY, relVisGoalH):
-        goalYaw = self.calculateGoalYaw(relVisGoalX, relVisGoalY)
+    def lookToRelativePoint(self, relVisGoalX, relVisGoalY, relVisGoalHeight):
+        goalYaw = self.calculateGoalYaw(relVisGoalX, relVisGoalY,
+                                        self.brain.my.h)
         goalPitch = self.calculateGoalPitch(relVisGoalX, relVisGoalY,
-                                            relVisGoalH)
+                                            relVisGoalHeight)
         headMove = motion.SetHeadCommand(goalYaw, goalPitch, 2.0, 2.0)
         self.brain.motion.setHead(headMove)
 
-    def calculateGoalYaw(relX, relY):
-        localRelY = relY
-        if localRelY <= 0:
-            localRelY = .001
-        goalYaw = atan(relX/localRelY)
+    def calculateGoalYaw(self, relX, relY, myBearing):
+        goalYaw = atan2(relX,relY) - myBearing*pi/180.
         return goalYaw
 
-    def calculateGoalPitch(relX, relY, relH):
-        dist = sqrt(relX*relX, relY*relY)
+    def calculateGoalPitch(self, relX, relY, relH):
+        dist = sqrt(relX*relX + relY*relY)
         pitch = atan(relH/dist)
         return pitch
