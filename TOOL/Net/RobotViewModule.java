@@ -198,14 +198,17 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
                         return;
 
                     // Assuming we are using proper directory structure,
-                    // set the default save folder to $ROBOCUP/man/frames.
+                    // set the default save folder to
+                    // $ROBOCUP/man/frames/stream.
 
-                    if (saveFramePath == null)
-                        try {
-                            saveFramePath = tool.CONSOLE.formatPath("../man", "frames");
-                        } catch (Exception ex) {
-                            saveFramePath = tool.CONSOLE.promptDirOpen("Save Destination" ,saveFramePath);
+                    if (saveFramePath == null) {
+                        if (tool.CONSOLE.pathExists("../man/frames/stream")) {
+                            saveFramePath = tool.CONSOLE.formatPath("../man/frames/stream");
+                        } else {
+                            saveFramePath = tool.CONSOLE.promptDirOpen("Save Destination",
+                                                                       "../man/frames");
                         }
+                    }
 
                     if (saveFramePath == null)
                         return;

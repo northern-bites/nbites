@@ -65,8 +65,12 @@ public class Console {
         System.err.println(msg);
     }
 
-    public String formatPath(String path, String file) {
-        return new File(path, file).getPath();
+    public String formatPath(String path) {
+        return new File(path).getPath();
+    }
+
+    public boolean pathExists(String path) {
+        return new File(path).exists();
     }
 
     public String promptOpen(String title, String curdir) {
