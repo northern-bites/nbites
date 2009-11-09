@@ -65,6 +65,10 @@ public class Console {
         System.err.println(msg);
     }
 
+    public String formatPath(String path, String file) {
+        return new File(path, file).getPath();
+    }
+
     public String promptOpen(String title, String curdir) {
         return openDialog(title, curdir, OPEN, BOTH);
     }
