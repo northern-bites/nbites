@@ -72,6 +72,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     // storing locally
 #ifdef OFFLINE
     visualHorizonDebug = false;
+	debugSelf = false;
 #endif
 
     // loads the color table on the MS into memory
@@ -96,8 +97,8 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
                                                            field, BLUE));
     yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                              field, YELLOW));
-    navyblue = new Robots(vision, this, NAVY);
-	red = new Robots(vision, this, RED);
+    navyblue = new Robots(vision, this, field, NAVY);
+	red = new Robots(vision, this, field, RED);
     orange = new Ball(vision, this, field, ORANGE);
     cross = new Cross(vision, this);
 }
@@ -236,266 +237,111 @@ void Threshold::threshold() {
  * helped with working out the slow sections of code.
  */
 void Threshold::runs() {
-    // variable declarations
-    int hor;
-    float horizonSlope;
-    register int address, i, j;
-    unsigned char pixel, lastPixel;
-
-    // variable initializations
-    hor = 0;
-    address = ADDRESS_START;
-    // these variables are used to detect posts
-    // -they track when certain color combinations first occur
-
-    horizonSlope = pose->getHorizonSlope();
-
-    // To do:  This boundary should not be a simple square - see below
-    const int pixInImageLeft = getPixelBoundaryLeft();
-    const int pixInImageRight = getPixelBoundaryRight();
-    const int pixInImageUp = getPixelBoundaryUp();
-	//drawLine(pixInImageRight, 0, pixInImageRight, IMAGE_HEIGHT -1, RED);
-
+	detectSelf();
     // split up the loops
-    for (i = 0; i < IMAGE_WIDTH; i += 1) {//scan across
-        // the color of the last pixel before the current one
-        lastPixel = GREEN;
-        // how big is the current run of like colored pixels?
-        currentRun = 0;
-        // where in the column did it begin?
-        //currentRunStart = IMAGE_HEIGHT - 1;
-        // the color of the last run of pixels - useful for object detection
-        previousRun = GREEN;
-        int previousRunStop = IMAGE_HEIGHT;
-		/* taken out since robot recognition is off
-        navyTops[i] = -1;
-        redTops[i] = -1;
-        redBottoms[i] = -1;
-        navyBottoms[i] = -1; */
-        // potential yellow post location
-        int lastGoodPixel = IMAGE_HEIGHT;
-        //int horizonJ = pose->getHorizonY(i);
-		hor = horizon + (int)(horizonSlope * (float)(i));
-		greenEdge[i] = IMAGE_HEIGHT -2;
-
-        for (j = IMAGE_HEIGHT - 1; j--; ) { //scan up
-            pixel = thresholded[j][i];
-			// ToDo:  This works ok, but could be much better.  We should really
-			// calculate a trapezoid based on where the max height of the shoulder is
-			if ((i < pixInImageLeft || i > pixInImageRight) && j > pixInImageUp
-				&& thresholded[j][i] == BLUE) {
-				thresholded[j][i] = GREY;
-			}
-
-            // check thresholded point with last thresholded point.
-            // if the same, increment the current run
-
-            if (lastPixel == pixel) {
-                currentRun++;
-            }
-            // otherwise, do stuff according to color
-            if (lastPixel != pixel || j == 0 || hor - j > 30) { // end of column
-                // switch for last thresholded pixel
-
-                switch (lastPixel) {
-                    // possible horizon detection and for postID (not that impt)
-                case NAVY:
-					// we're looking for blue robots, so we use some special rules.
-					// mainly that the blue should be paired with white
-					// also we try and create huge vertical runs that cover the length of
-					// the robot if possible
-                    if (currentRun > 8 && (previousRun == WHITE ||
-                                           previousRun == NAVY)) {
-                        //navyblue->newRun(i, j, currentRun);
-                        lastGoodPixel = j;
-                    }
-					// check if this is a viable chunk of robot.  Yes if:
-					//      just saw something white or navy or green
-					//      it is really big
-					/* For now we have turned robot recognition off
-                    if (currentRun > 3 &&
-                        (previousRun == WHITE || previousRun == NAVY ||
-                         (previousRun == GREEN || currentRun > 20))) {
-                        //&& previousRunStop - j - currentRun < 10))) {
-                        navyTops[i] = j;
-                        //drawPoint(i, j, YELLOW);
-                    }
-					// if we hadn't seen a bottom already, then now is the time
-                    if (navyBottoms[i] == -1 && currentRun > 3 &&
-                        (previousRun == WHITE || previousRun == GREEN ||
-                         currentRun > 20)) {
-                        navyBottoms[i] = j + currentRun;
-                        //drawPoint(i, j + currentRun, ORANGE);
-						} */
-                    break;
-                case RED:
-					// see comments for Navy.  We also have to be careful about seeing ball pixels
-                    if (currentRun > 8 && (previousRun == WHITE ||
-                                           previousRun == RED ||
-                                           previousRun == ORANGE ||
-                                           (previousRun == GREEN ) ||
-                                           currentRun > 20)) {
-                        //&& previousRunStop - j - currentRun < 10))) {
-                        lastGoodPixel = j;
-                    }
-					/*
-                    if (currentRun > 3 && (previousRun == WHITE ||
-                                           previousRun == RED ||
-                                           previousRun == ORANGE ||
-                                           previousRun == GREEN ||
-                                           currentRun > 20)) {
-                        redTops[i] = j;
-                    }
-                    if (redBottoms[i] == -1 && currentRun > 3 &&
-                        (previousRun == WHITE || previousRun == GREEN ||
-                         previousRun == ORANGE)) {
-                        redBottoms[i] = j + currentRun;
-						} */
-                    break;
-                case GREEN:
-					// if we see a big stretch of green, then it is highly unlikely that there is a robot here
-                    /*if (currentRun > 20) {
-                        redBottoms[i] = -1;
-                        navyBottoms[i] = -1;
-						}*/
-					lastGoodPixel = j;
-					if (currentRun >= MIN_RUN_SIZE) {
-						greenEdge[i] = j;
-					}
-
-                    break;
-                case BLUE:
-                    // add to Blue data structure
-
-                    if (currentRun > MIN_RUN_SIZE) { // noise eliminator
-                        lastGoodPixel = j;
-                        // add run: x of start, y of start, height of run
-                        // if (i > 5 && i < IMAGE_WIDTH - 5) {
-                        blue->newRun(i, j, currentRun);
-                        //}
-                    }
-                    break;
-
-                case ORANGE:
-                case ORANGERED:
-                    // add to Ball data structure
-                    if (currentRun > 2 && j+currentRun > horizon - 10) {
-                        orange->newRun(i, j, currentRun);
-                        lastGoodPixel = j;
-                    }
-                    break;
-                case YELLOW:
-                    // add to Yellow data structure
-                    if (currentRun >= MIN_RUN_SIZE) {
-                        lastGoodPixel = j;
-                        yellow->newRun(i, j, currentRun);
-                    }
-                    break;
-                case WHITE:
-                    if (currentRun >= 2) {
-                        lastGoodPixel = j;
-						if (j + currentRun > IMAGE_HEIGHT / 3 && currentRun < 25) {
-							cross->newRun(i, j, currentRun);
-						}
-                    }
-                    break;
-                }
-                // store the last run
-                if (currentRun > MIN_RUN_SIZE) {
-                    previousRun = lastPixel;
-                    previousRunStop = j;
-                }
-                // since this loop runs when a run ends, restart # pixels in run counter
-                currentRun = 1;
-                // store the position of the start of the run in the column (y-value)
-                //currentRunStart = j;
-            }
-            if (j < hor && (hor - j > 30 || (lastGoodPixel - j > 15 &&
-											 (currentRun == 1 || lastPixel == GREY)))) {
-				//drawPoint(i, j, PINK);
-				//for ( ; j > 0; j--)
-				//debugImage[j][i] = PINK;
-				j = 0;
-				//drawPoint(i, greenEdge[i], BLACK);
-				break;
-			}
-            // every pixel.
-            lastPixel = pixel;
-        }//end j loop
-        //if (j > 1) {
-        //for (j = j - 10 ; j > -1; j--) {
-        //thresholded[j][i] = BROWN;
-        //}
-        //}
-    }//end i loop
-
-	field->findFieldEdges();
-    // now do some robot scanning stuff - we're going to analyze our runs and see if they
-    // could be turned into viable robot runs that we will feed to ObjectFragments
-	/*
-    int bigh = IMAGE_HEIGHT, firstn = -1, lastn = -1, bot = -1;
-    // first do the Navy robots
-    for (i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
-      // if we saw a navy run in this scanline then process it
-        if (navyTops[i] != -1) {
-	  // our goal is to find a swath of runs and essentially grab them all at once
-	  // in a sense we're blobbing here
-            firstn = i;
-            lastn = 0;
-            bigh = navyTops[i];
-            bot = navyBottoms[i];
-	    // as long as we're connected to more runs, keep scooping them up
-            while ((navyTops[i] != -1 || navyTops[i+1] != -1) &&
-                   i < IMAGE_WIDTH - 3) {
-                if (navyTops[i] < bigh && navyTops[i] != -1) {
-                    bigh = navyTops[i];
-                }
-                if (navyBottoms[i] > bot) {
-                    bot = navyBottoms[i];
-                }
-                i+=1;
-                lastn+=1;
-            }
-	    // now feed them all into object fragments
-            for (int k = firstn; k < firstn + lastn; k+= 1) {
-                navyblue->newRun(k, bigh, bot - bigh);
-                // cout << "Runs " << k << " " << bigh << " " << (bot - bigh)
-                //      << endl;
-            }
-            //cout << "Last " << lastn << " " << bigh << " " << bot << endl;
-            //drawRect(firstn, bigh, lastn, bot - bigh, RED);
-        }
+    for (int i = 0; i < IMAGE_WIDTH; i += 1) {
+		int topEdge = max(0, field->horizonAt(i));
+		findBallsCrosses(i, topEdge);
+		findGoals(i, topEdge);
     }
-    // logic should be identical to navy
-    for (i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
-        if (redTops[i] != -1) {
-            firstn = i;
-            lastn = 0;
-            bigh = redTops[i];
-            bot = redBottoms[i];
-            while ((redTops[i] != -1 || redTops[i+1] != -1) &&
-                   i < IMAGE_WIDTH - 3) {
-                if (redTops[i] < bigh && redTops[i] != -1) {
-                    bigh = redTops[i];
-                }
-                if (redBottoms[i] > bot) {
-                    bot = redBottoms[i];
-                }
-                i+=2;
-                lastn+= 2;
-            }
-            for (int k = firstn; k < firstn + lastn; k+= 1) {
-                red->newRun(k, bigh, bot - bigh);
-                // cout << "Runs " << k << " " << bigh << " " << (bot - bigh)
-                //      << endl;
-            }
-            //cout << "Last " << lastn << " " << bigh << " " << bot << endl;
-            //drawRect(firstn, bigh, lastn, bot - bigh, RED);
-        }
-		}*/
 
 }
 
+void Threshold::findGoals(int column, int topEdge) {
+	const int BADSIZE = 5;
+	// scan up for goals
+	int bad = 0, blues = 0, yellows = 0, blueGreen = 0;
+	int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge, lastYellow = topEdge;
+	for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
+		// get the next pixel
+		unsigned char pixel = thresholded[j][column];
+		// otherwise, do stuff according to color
+		switch (pixel) {
+		case BLUE:
+			lastBlue = j;
+			blues++;
+			break;
+		case YELLOW:
+			lastYellow = j;
+			yellows++;
+			break;
+		case BLUEGREEN:
+			blueGreen++;
+			break;
+		default:
+			bad++;
+		}
+	}
+	// now do the same going down from the horizon
+	bad = 0;
+	for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
+		// get the next pixel
+		unsigned char pixel = thresholded[j][column];
+		// otherwise, do stuff according to color
+		switch (pixel) {
+		case BLUE:
+			firstBlue = j;
+			blues++;
+			break;
+		case YELLOW:
+			firstYellow = j;
+			yellows++;
+			break;
+		case BLUEGREEN:
+			blueGreen++;
+			break;
+		case GREEN:
+			bad += 2;
+			break;
+		default:
+			bad++;
+		}
+	}
+	if (blues > 10) {
+		blue->newRun(column, lastBlue, firstBlue - lastBlue);
+	} else if (yellows > 10) {
+		yellow->newRun(column, lastYellow, firstYellow - lastYellow);
+	}
+}
+
+void Threshold::findBallsCrosses(int column, int topEdge) {
+	// scan down finding balls and crosses
+	unsigned char lastPixel = GREEN;
+	int currentRun = 0;
+	// scan down the column looking for ORANGE and WHITE
+	for (int j = lowerBound[column]; j >= topEdge; j--) {
+		// get the next pixel
+		unsigned char pixel = thresholded[j][column];
+
+		// check thresholded point with last thresholded point.
+		// if the same, increment the current run
+		if (lastPixel == pixel) {
+			currentRun++;
+		}
+		// otherwise, do stuff according to color
+		if (lastPixel != pixel || j == topEdge) { // end of column
+			// switch for last thresholded pixel
+			switch (lastPixel) {
+			case ORANGE:
+			case ORANGERED:
+				// add to Ball data structure
+				if (currentRun > 2) {
+					orange->newRun(column, j, currentRun);
+				}
+				break;
+			case WHITE:
+				// add to the cross data structure
+				if (currentRun > 2) {
+					cross->newRun(column, j, currentRun);
+				}
+				break;
+			}
+			// since this loop runs when a run ends, restart # pixels in run counter
+			currentRun = 1;
+		}
+		lastPixel = pixel;
+	}
+}
 
 /*
  * Threshold and runs.  The goal here is to scan the image and collect up "runs"
@@ -531,9 +377,78 @@ void Threshold::thresholdAndRuns() {
     PROF_EXIT(vision->profiler, P_THRESHRUNS);
 }
 
+/** Given two lines defined by "detectSelf" set the lower bounds.
+ */
+
+void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3) {
+	float step = (float)(y1 - y2) / (float) (x2 - x1);
+	float start = (float)y1;
+	cout << "Bounds " << x1 << " " << y1 << " " << x2 << " " << y2 << " " << x3 << " " << y3 << endl;
+	for (int i = x1; i < x2 && i < IMAGE_WIDTH; i++) {
+		if (i >= 0) {
+			if (debugSelf) {
+				lowerBound[i] = (int) start;
+			}
+			drawPoint(i, (int) start, BLACK);
+		}
+		start -= step;
+	}
+	step = (float)(y3 - y2) / (float) (x3 - x2);
+	start = (float)y2;
+	for (int i = x2; i < x3 && i < IMAGE_WIDTH; i++) {
+		lowerBound[i] = (int) start;
+		if (debugSelf) {
+			drawPoint(i, (int) start, BLACK);
+		}
+		start += step;
+	}
+}
+
+/** Detect the shoulders of the robot and ignore them.  Our goal is to set lower
+	bounds for all of the vertical scanlines.
+ */
+void Threshold::detectSelf() {
+    // To do:  This boundary could be much better.
+	// To do:  Detect feet and arms too
+    const int pixInImageLeft = getPixelBoundaryLeft();
+    const int pixInImageRight = getPixelBoundaryRight();
+    const int pixInImageUp = getPixelBoundaryUp();
+	const int MIDY = 40;
+	const int MIDX = 90;
+
+	for (int i = 0; i < IMAGE_WIDTH; i++) {
+		lowerBound[i] = IMAGE_HEIGHT - 1;
+	}
+	int xp = -1, yp = -1;
+	if (pixInImageRight > 0 && pixInImageRight < IMAGE_WIDTH) {
+		xp = pixInImageRight + (IMAGE_WIDTH - pixInImageRight) / 2;
+		yp = pixInImageUp + MIDY;
+		setBoundaryPoints(pixInImageRight, IMAGE_HEIGHT-1, xp, yp,
+						  IMAGE_WIDTH - 1, pixInImageUp);
+	}
+	if (pixInImageLeft > 0 && pixInImageLeft < IMAGE_WIDTH) {
+		xp = pixInImageLeft - (IMAGE_WIDTH - pixInImageLeft) / 2;
+		yp = pixInImageUp + MIDY;
+		setBoundaryPoints(0, pixInImageUp, xp, yp, pixInImageLeft, IMAGE_HEIGHT - 1);
+	}
+}
 
 int Threshold::greenEdgePoint(int x) {
 	return greenEdge[x];
+}
+
+int Threshold::getRobotTop(int x, int c) {
+	if (c == RED) {
+		return redTops[x];
+	}
+	return navyTops[x];
+}
+
+int Threshold::getRobotBottom(int x, int c) {
+	if (c == RED) {
+		return redBottoms[x];
+	}
+	return navyBottoms[x];
 }
 
 
@@ -551,10 +466,8 @@ void Threshold::objectRecognition() {
     yellow->createObject(horizon);
     blue->createObject(horizon);
 	cross->createObject();
-#if ROBOT(NAO)
     red->robot(horizon);
     navyblue->robot(horizon);
-#endif
 
     bool ylp = vision->yglp->getWidth() > 0;
     bool yrp = vision->ygrp->getWidth() > 0;
@@ -772,10 +685,10 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 break;
             }
 	    #if defined OFFLINE && defined PRINT_VISION_INFO
-            
-            print("{%g,%g},", poseDist, dist);
 
-            print("goal post dist: %g %g %g\n", dist, distw, disth);
+            //print("{%g,%g},", poseDist, dist);
+
+            //print("goal post dist: %g %g %g\n", dist, distw, disth);
 	    #endif
 
             // sanity check: throw ridiculous distance estimates out
