@@ -74,7 +74,7 @@ void HeadProvider::hardReset(){
 }
 
 
-//Method called during the 'SCRIPTED' mode
+//Method called from MotionSwitchboard
 void HeadProvider::calculateNextJointsAndStiffnesses() {
 	PROF_ENTER(profiler,P_HEAD);
 	pthread_mutex_lock(&head_provider_mutex);
@@ -85,6 +85,9 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     case SET:
         setMode();
         break;
+	case COORD:
+		setMode();
+		break;
 
     }
     setActive();
@@ -147,7 +150,19 @@ void HeadProvider::scriptedMode(){
 
 
 }
+void HeadProvider::setCommand(const CoordHeadCommand *command) {
+    pthread_mutex_lock(&head_provider_mutex);
+    transitionTo(COORD);
 
+	yawDest = command->getGoalYaw();
+	pitchDest = command->getGoalPitch();
+
+	yawMaxSpeed = command->getMaxSpeedYaw();
+	pitchMaxSpeed = command->getMaxSpeedPitch();
+    setActive();
+    pthread_mutex_unlock(&head_provider_mutex);
+
+}
 void HeadProvider::setCommand(const SetHeadCommand *command) {
     pthread_mutex_lock(&head_provider_mutex);
     transitionTo(SET);
