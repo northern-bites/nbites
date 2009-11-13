@@ -282,7 +282,7 @@ class GoTeam:
 
     def reset(self):
         '''resets all information stored from teammates'''
-        for mate in enumerate(self.brain.teamMembers):
+        for mate in self.brain.teamMembers:
             mate.reset()
 
     ######################################################
