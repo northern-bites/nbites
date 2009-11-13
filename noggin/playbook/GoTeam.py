@@ -254,7 +254,7 @@ class GoTeam:
 
         self.numActiveFieldPlayers = 0
         for mate in self.brain.teamMembers:
-            if (mate.isPenalized() or mate.isDead()):
+            if (mate.isDead() or mate.isPenalized()):
                 #reset to false when we get a new packet from mate
                 mate.active = False
             elif (mate.active and (not mate.isTeammateRole(PBConstants.GOALIE)

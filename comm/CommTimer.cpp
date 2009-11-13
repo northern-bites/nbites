@@ -33,7 +33,7 @@ CommTimer::check_packet(const CommPacketHeader &p)
   }
   // TOO OLD CHECK
   if (p.timestamp + PACKET_GRACE_PERIOD < ts){
-	  std::cout << "too old to check. pt" << p.timestamp/1000 <<" ts: " << ts/1000 << std::endl;
+	  //std::cout << "too old to check. pt" << p.timestamp/1000 <<" ts: " << ts/1000 << std::endl;
 	  return false;
   }
 
