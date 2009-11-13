@@ -39,6 +39,10 @@ void MotionInterface::setHead(const SetHeadCommand *command){
     switchboard->sendMotionCommand(command);
 }
 
+void MotionInterface::coordHead(const CoordHeadCommand *command){
+    switchboard->sendMotionCommand(command);
+}
+
 void MotionInterface::sendFreezeCommand(const boost::shared_ptr<FreezeCommand> command){
     switchboard->sendMotionCommand(command);
 }

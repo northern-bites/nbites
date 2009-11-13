@@ -22,36 +22,41 @@
 #define _CoordHeadCommand_h_DEFINED
 
 #include "Kinematics.h"
+#include <cmath>
 
 class CoordHeadCommand : public MotionCommand
 {
 public:
     CoordHeadCommand(const int _robotX, const int _robotY,
-					 const int _cameraHeight = 0, const float _robotBearing.
-					 const int _visualGoalX, const int_visualGoalY,
+					 const int _cameraHeight, const float _robotBearing,
+					 const int _visualGoalX, const int _visualGoalY,
 					 const int _visualGoalHeight,
-				   const float _maxSpeedYaw =
-				   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
-				   const float _maxSpeedPitch =
-				   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
+					 const float _maxSpeedYaw =
+					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
+					 const float _maxSpeedPitch =
+					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		)
         : MotionCommand(MotionConstants::SET_HEAD),
           relX(_visualGoalX - _robotX), relY(_visualGoalY - _robotY),
 		  relHeight(_visualGoalHeight - _cameraHeight ),
 		  robotBearing(_robotBearing),
-		  maxSpeedYaw(_maxSpeedYaw), maxSpeedPitch(_maxSpeedPitch)
+		  maxSpeedYaw(_maxSpeedYaw), maxSpeedPitch(_maxSpeedPitch),
+		  yaw(calcYaw()),pitch(calcPitch())
         {
             setChainList();
         }
-	const float getGoalYaw() {
-		//atan2(relX, relY) - robotBearing*pi/180.
-	}
-	const float getGoalPitch() {
-		//dist = sqrt(getRelX()*getRelX(), getRelY()*getRelY())
-		//pitch = atan(getRelHeight()/dist)
-	}
-
+	const float getMaxSpeedYaw() const {return maxSpeedYaw; }
+	const float getMaxSpeedPitch() const {return maxSpeedPitch; }
+	const float getPitch() const { return pitch; }
+	const float getYaw() const { return yaw; }
 private:
+	const float calcYaw() {
+		return atan2(relX, relY) - robotBearing;
+	}
+	const float calcPitch() {
+		float dist = sqrt(relX*relX + relY*relY);
+		return atan(relHeight/dist);
+	}
 
     virtual void setChainList() {
         chainList.insert(chainList.end(),
@@ -61,7 +66,8 @@ private:
     }
 private:
     const int relX, relY, relHeight;
-	const float maxSpeedYaw, maxSpeedPitch, robotBearing;
+	const float robotBearing, maxSpeedYaw, maxSpeedPitch;
+	const float yaw, pitch;
 };
 
 #endif

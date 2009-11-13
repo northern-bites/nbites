@@ -56,6 +56,7 @@ class MotionInterface
     inline bool isBodyActive(){return switchboard->isBodyActive();}
     void setGait(const boost::shared_ptr<Gait> command);
     void setHead(const SetHeadCommand * command);
+    void coordHead(const CoordHeadCommand * command);
     void stopBodyMoves();
     void stopHeadMoves();
     void resetWalkProvider();

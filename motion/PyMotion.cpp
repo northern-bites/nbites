@@ -33,6 +33,7 @@ using namespace boost::python;
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
+#include "CoordHeadCommand.h"
 #include "WalkCommand.h"
 #include "Gait.h"
 #include "MotionInterface.h"
@@ -247,6 +248,22 @@ private:
     SetHeadCommand *command;
 };
 
+class PyCoordHeadCommand {
+public:
+	PyCoordHeadCommand(const int myX, const int myY, const int myHeight,
+					 const float myBearing,
+					 const int goalX, const int goalY, const int goalHeight,
+					 const float maxYawSpeed, const float maxPitchSpeed) {
+        command = new CoordHeadCommand( myX, myY, myBearing * TO_RAD,
+										goalX, goalY, goalHeight,
+										maxYawSpeed * TO_RAD,
+										maxPitchSpeed * TO_RAD);
+    }
+
+    CoordHeadCommand* getCommand() const { return command; }
+private:
+    CoordHeadCommand *command;
+};
 
 class PyFreezeCommand{
 public:
@@ -292,6 +309,9 @@ public:
     }
     void setHead(const PySetHeadCommand *command) {
         motionInterface->setHead(command->getCommand());
+    }
+    void coordHead(const PyCoordHeadCommand *command) {
+        motionInterface->coordHead(command->getCommand());
     }
     void sendFreezeCommand(const PyFreezeCommand *command){
         motionInterface->sendFreezeCommand(command->getCommand());
@@ -375,6 +395,25 @@ BOOST_PYTHON_MODULE(_motion)
 		.def(init<float,float,float,float>(args("yaw","pitch",
 												"maxYawSpeed","maxPitchSpeed")))
         ;
+
+    class_<PyCoordHeadCommand>("CoordHeadCommand",
+                             init<int,int,int,float,int,int,int,float,float>
+							   (args("myX", "myY", "myHeight",
+									 "myBearing", "goalX",
+									 "goalY", "goalHeight",
+									 "maxYawSpeed",
+									 "maxPitchSpeed"),
+								"A container for a coord head command. Holds way too much"))
+		.def(init<int,int,int,float,int,int,int,float,float>(args("myX", "myY",
+																  "myHeight",
+																  "myBearing",
+																  "goalX",
+																  "goalY",
+																  "goalHeight",
+																  "maxYawSpeed",
+																 "maxPitchSpeed"
+																 )));
+
     class_<PyWalkCommand>("WalkCommand",
                           init<float, float, float>(args("x","y","theta"),
  "A container for a walk command. Holds an x, y and theta which represents a"
@@ -404,7 +443,8 @@ BOOST_PYTHON_MODULE(_motion)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
         .def("setGait", &PyMotionInterface::setGait)
-        .def("setHead",&PyMotionInterface::setHead)
+        .def("setHead", &PyMotionInterface::setHead)
+		.def("coordHead", &PyMotionInterface::coordHead)
         .def("sendFreezeCommand",frz1)
         .def("sendFreezeCommand",frz2)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)

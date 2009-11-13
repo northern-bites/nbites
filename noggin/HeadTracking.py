@@ -181,26 +181,20 @@ class HeadTracking(FSA.FSA):
     def lookToLandmark(self, landmark):
         self.lookToPoint(landmark.x, landmark.y, 0)
 
+    #move to c++? relHeight easier to get. myX,myY would need to be passed
+    #in for easy access
     def lookToPoint(self, visGoalX, visGoalY, visGoalHeight):
         my = self.brain.my
-        relX = visGoalX - my.x #calculate myX relative to VisionGoalX
-        relY = visGoalY - my.y #calculate myY relative to VisionGoalY
-        relHeight = 150 #calculate myH relative to VisionGoalH
-        self.lookToRelativePoint(relX, relY, relHeight)
-
-    def lookToRelativePoint(self, relVisGoalX, relVisGoalY, relVisGoalHeight):
-        goalYaw = self.calculateGoalYaw(relVisGoalX, relVisGoalY,
-                                        self.brain.my.h)
-        goalPitch = self.calculateGoalPitch(relVisGoalX, relVisGoalY,
-                                            relVisGoalHeight)
-        headMove = motion.SetHeadCommand(goalYaw, goalPitch, 2.0, 2.0)
-        self.brain.motion.setHead(headMove)
-
-    def calculateGoalYaw(self, relX, relY, myBearing):
-        goalYaw = atan2(relX,relY) - myBearing*pi/180.
-        return goalYaw
-
-    def calculateGoalPitch(self, relX, relY, relH):
-        dist = sqrt(relX*relX + relY*relY)
-        pitch = atan(relH/dist)
-        return pitch
+        headMove = motion.CoordHeadCommand(my.x, my.y, 200, my.h,
+                                           visGoalX, visGoalY, visGoalHeight,
+                                           2.0, 2.0)
+        self.brain.motion.coordHead(headMove)
+'''
+File "/Applications/Webots/projects/contests/nao_robocup/controllers/nao_soccer_player_red/lib/man/noggin/HeadTracking.py", line 190, in lookToPoint
+[nao_soccer_player_red]     2.0, 2.0)
+[nao_soccer_player_red] Boost.Python.ArgumentError: Python argument types in
+[nao_soccer_player_red]     CoordHeadCommand.__init__(CoordHeadCommand, float, float, int, float, float, float, int, float, float)
+[nao_soccer_player_red] did not match C++ signature:
+[nao_soccer_player_red]     __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
+[nao_soccer_player_red]     __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
+'''

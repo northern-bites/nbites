@@ -82,13 +82,10 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     case SCRIPTED:
         scriptedMode();
         break;
+	case COORD:
     case SET:
         setMode();
         break;
-	case COORD:
-		setMode();
-		break;
-
     }
     setActive();
 	pthread_mutex_unlock(&head_provider_mutex);
@@ -154,11 +151,12 @@ void HeadProvider::setCommand(const CoordHeadCommand *command) {
     pthread_mutex_lock(&head_provider_mutex);
     transitionTo(COORD);
 
-	yawDest = command->getGoalYaw();
-	pitchDest = command->getGoalPitch();
+	yawDest = command->getYaw();
+	pitchDest = command->getPitch();
 
 	yawMaxSpeed = command->getMaxSpeedYaw();
 	pitchMaxSpeed = command->getMaxSpeedPitch();
+
     setActive();
     pthread_mutex_unlock(&head_provider_mutex);
 
@@ -218,9 +216,12 @@ void HeadProvider::setActive(){
 
 
 bool HeadProvider::isDone(){
-    const bool setDone = (yawDest == lastYawDest) && (pitchDest == lastPitchDest);
-    const bool scriptedDone = currCommand->isDone()  && headCommandQueue.empty();
+    const bool setDone = ((yawDest == lastYawDest) &&
+						  (pitchDest == lastPitchDest));
+    const bool scriptedDone = (currCommand->isDone()  &&
+							   headCommandQueue.empty());
     switch(curMode){
+    case COORD:
     case SET:
         return setDone;
         break;
@@ -255,6 +256,7 @@ void HeadProvider::transitionTo(HeadMode newMode){
         case SCRIPTED:
             stopScripted();
             break;
+		case COORD:
         case SET:
             //If we need to switch modes, then we may not know what the latest
             //angles are, so lets get them again from sensors

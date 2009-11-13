@@ -106,7 +106,7 @@ void MotionSwitchboard::stop() {
  * The switchboard run method is continuously looping. At each iteration
  * it grabs the appropriate joints from the designated provider, and
  * then copies them into place so an enactor can send them to the low level.
- * This threaed then ``hangs'' until the enactor signals it has read the current
+ * This threaed then 'hangs' until the enactor signals it has read the current
  * values. (This signaling is actually done in the getNextJoints method in
  * this class)
  *
@@ -586,6 +586,13 @@ void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
 
 }
 void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
+    pthread_mutex_lock(&next_provider_mutex);
+    nextHeadProvider = &headProvider;
+    headProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+
+}
+void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand * command){
     pthread_mutex_lock(&next_provider_mutex);
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);

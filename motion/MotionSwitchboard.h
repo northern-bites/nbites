@@ -54,6 +54,7 @@
 #include "WalkCommand.h"
 #include "Gait.h"
 #include "SetHeadCommand.h"
+#include "CoordHeadCommand.h"
 
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
@@ -78,6 +79,7 @@ public:
 	void sendMotionCommand(const WalkCommand* command);
 	void sendMotionCommand(const boost::shared_ptr<Gait> command);
 	void sendMotionCommand(const SetHeadCommand* command);
+	void sendMotionCommand(const CoordHeadCommand* command);
 	void sendMotionCommand(const boost::shared_ptr<FreezeCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<StepCommand> command);

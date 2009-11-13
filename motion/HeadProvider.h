@@ -28,6 +28,7 @@
 #include "MotionProvider.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
+#include "CoordHeadCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"
@@ -47,11 +48,13 @@ public:
 	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
 	void setCommand(const SetHeadCommand* command);
 	void setCommand(const HeadJointCommand* command);
+	void setCommand(const CoordHeadCommand* command);
 
 private:
     enum HeadMode {
         SCRIPTED,
-        SET
+        SET,
+		COORD
     };
 
     void transitionTo(HeadMode newMode);
