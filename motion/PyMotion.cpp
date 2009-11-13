@@ -254,7 +254,7 @@ public:
 					 const float myBearing,
 					 const int goalX, const int goalY, const int goalHeight,
 					 const float maxYawSpeed, const float maxPitchSpeed) {
-        command = new CoordHeadCommand( myX, myY, myBearing * TO_RAD,
+        command = new CoordHeadCommand( myX, myY, myHeight, myBearing * TO_RAD,
 										goalX, goalY, goalHeight,
 										maxYawSpeed * TO_RAD,
 										maxPitchSpeed * TO_RAD);

@@ -190,11 +190,9 @@ class HeadTracking(FSA.FSA):
                                            2.0, 2.0)
         self.brain.motion.coordHead(headMove)
 '''
-File "/Applications/Webots/projects/contests/nao_robocup/controllers/nao_soccer_player_red/lib/man/noggin/HeadTracking.py", line 190, in lookToPoint
-[nao_soccer_player_red]     2.0, 2.0)
-[nao_soccer_player_red] Boost.Python.ArgumentError: Python argument types in
-[nao_soccer_player_red]     CoordHeadCommand.__init__(CoordHeadCommand, float, float, int, float, float, float, int, float, float)
-[nao_soccer_player_red] did not match C++ signature:
-[nao_soccer_player_red]     __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
-[nao_soccer_player_red]     __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
+File "/Applications/Webots/projects/contests/nao_robocup/controllers/nao_soccer_player_red/lib/man/noggin/HeadTracking.py", line 190, in lookToPoint  2.0, 2.0)
+Boost.Python.ArgumentError: Python argument types in CoordHeadCommand.__init__(CoordHeadCommand, float, float, int, float, float, float, int, float, float)
+ did not match C++ signature:
+     __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
+    __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
 '''
