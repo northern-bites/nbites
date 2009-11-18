@@ -48,8 +48,8 @@ static const bool ROBOTSDEBUG = false;
 static const bool ROBOTSDEBUG = false;
 #endif
 
-Robots::Robots(Vision* vis, Threshold* thr, int col)
-    : vision(vis), thresh(thr), color(col)
+Robots::Robots(Vision* vis, Threshold* thr, Field* fie, int col)
+    : vision(vis), thresh(thr), field(fie), color(col)
 {
 	const int MAX_ROBOT_RUNS = 400;
 	blobs = new Blobs(MAX_ROBOT_RUNS);
@@ -103,31 +103,70 @@ void Robots::allocateColorRuns()
 /* Robot recognition methods
  */
 
+
+void Robots::preprocess() {
+    // do some robot scanning stuff - we're going to analyze our runs and see if
+	//they could be turned into viable robot runs
+    int bigh = IMAGE_HEIGHT, firstn = -1, lastn = -1, bot = -1;
+    // first do the Navy robots
+    for (int i = 0; i < IMAGE_WIDTH - 1; i+= 1) {
+		int colorRun = thresh->getRobotTop(i, color);
+		// if we saw a robot run in this scanline then process it
+        if (colorRun != -1) {
+			// our goal is to find a swath of runs and essentially grab them all at once
+			// in a sense we're blobbing here
+            firstn = i;
+            lastn = 0;
+            bigh = colorRun;
+            bot = thresh->getRobotBottom(i, color);
+			// as long as we're connected to more runs, keep scooping them up
+            while ((thresh->getRobotTop(i, color) != -1 ||
+					thresh->getRobotTop(i+1, color) != -1)
+				   && i < IMAGE_WIDTH - 3) {
+                if (thresh->getRobotTop(i, color) < bigh &&
+					thresh->getRobotTop(i, color) != -1) {
+                    bigh = thresh->getRobotTop(i, color);
+                }
+                if (thresh->getRobotBottom(i, color) > bot) {
+                    bot = thresh->getRobotBottom(i, color);
+                }
+                i+=1;
+                lastn+=1;
+            }
+			// now feed them all into our run structure
+            for (int k = firstn; k < firstn + lastn; k+= 1) {
+                newRun(k, bigh, bot - bigh);
+                // cout << "Runs " << k << " " << bigh << " " << (bot - bigh)
+                //      << endl;
+            }
+            //cout << "Last " << lastn << " " << bigh << " " << bot << endl;
+            //drawRect(firstn, bigh, lastn, bot - bigh, RED);
+        }
+    }
+}
+
+
 /* Try and recognize robots.  Basically we're doing blobbing here, but with lots of extra
    twists.  Mainly we're being extremely loose with the conditions under which we consider
    blobs to be "connected."  We're trying to take advantage of the properties of the robots -
    namely that they stand vertically normally.
  */
- 
- 
+
+
 void Robots::robot(int bigGreen)
 {
 	if (numberOfRuns < 1) return;
     const int lastRunXInit = -30;
-    const int resConst = 20;
-    const int blobWidthMin = 5;
+    const int resConst = 10;
+    const int blobHeightMin = 5;
     const int robotBlobMin = 10;
 
     int lastrunx = lastRunXInit, lastruny = 0, lastrunh = 0;
 
     // loop through all of the runs of this color
-    // NOTE: "20" is a guess at something that should be a constant
-    // and with the change in resolution, this ought to be changed
     for (int i = 0; i < numberOfRuns; i++) {
-        //drawPoint(runs[i].x, runs[i].y, BLACK);
         if (runs[i].x < lastrunx + resConst) {
             for (int k = lastrunx; k < runs[i].x; k+= 1) {
-                //cout << "merging " << k << " " << runs[i].x << endl;
                 blobs->blobIt(k, lastruny, lastrunh);
             }
         }
@@ -136,14 +175,20 @@ void Robots::robot(int bigGreen)
 		// set the current as the last
         lastrunx = runs[i].x; lastruny = runs[i].y; lastrunh = runs[i].h;
     }
-    // make first pass at attempting to identify robots
-    getRobots(bigGreen);
     // check each of the candidate blobs to see if it might reasonably be
     // called a piece of a robot
     for (int i = 0; i < blobs->number(); i++) {
-		// NOTE: "5" is another constant that needs to be checked and changed
-		if (blobs->get(i).width() > blobWidthMin) {
-			// see if we can expand it to other parts
+		// TODO:  Also need a check that there is some actual blob of
+		// color - we get carried away building this and can do so with
+		// very little in the way of actual robot color, which is dangerous
+		if (blobs->get(i).getBottom() < field->horizonAt(blobs->get(i).getLeft())) {
+			blobs->init(i);
+		} else if (noWhite(blobs->get(i))) {
+			thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
+			blobs->init(i);
+		}
+		if (blobs->get(i).height() > blobHeightMin) {
 			expandRobotBlob(i);
 		}
     }
@@ -151,10 +196,14 @@ void Robots::robot(int bigGreen)
     mergeBigBlobs();
     // try expanding again after the merging
     for (int i = 0; i < blobs->number(); i++) {
-        if (blobs->get(i).width() > blobWidthMin) {
-            expandRobotBlob(i);
-        }
-    }
+		if (ROBOTSDEBUG) {
+			if (blobs->get(i).width() > 1) {
+				thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+								 blobs->get(i).width(), blobs->get(i).height(), BLACK);
+			}
+		}
+	}
+	// TODO:  Need to see if any of our remaining blobs are subsumed by other blobs
     int biggest = -1, index1 = -1, second = -1, index2 = -1;
     // collect up the two biggest blobs - those are the two we'll put into field objects
     for (int i = 0; i < blobs->number(); i++) {
@@ -180,115 +229,192 @@ void Robots::robot(int bigGreen)
     }
 }
 
-/*  We have a "blob" that might be part of a robot.  We built our blobs a little strangely and they
-    may not be complete.  Let's see if we can expand them a bit.  Essentially we look around the
+/* We have a swatch of color.  Let's make sure that there is some white
+   around somewhere as befits our robots.
+ */
+
+bool Robots::noWhite(Blob b) {
+	const int MINWHITE = 5;
+
+	int left = b.getLeft(), right = b.getRight();
+	int top = b.getTop(), bottom = b.getBottom();
+	int width = b.width();
+	int tops, bottoms;
+	for (int i = 1; i < 10; i++) {
+		tops = 0; bottoms = 0;
+		for (int x = left; x <= right; x++) {
+			if (thresh->thresholded[top - i][x] == WHITE)
+				tops++;
+			if (thresh->thresholded[bottom+i][x] == WHITE)
+				bottoms++;
+			if (tops > width / 2 || tops == width) return false;
+			if (bottoms > width / 2 || tops == width) return false;
+		}
+	}
+	// perhaps there is white inside (hands do this sometime)
+	for (int i = top; i <= bottom; i++) {
+		tops = 0; bottoms = 0;
+		for (int x = left; x <= right; x++) {
+			if (thresh->thresholded[i][x] == WHITE)
+				tops++;
+			if (tops > width / 4) return false;
+		}
+	}
+	return true;
+}
+
+/*  We have a "blob" that might be part of a robot.
+	We built our blobs a little strangely and they
+    may not be complete.  Let's see if we can expand them a bit.
+	Essentially we look around the
     sides of the blobs and see if we can expand the area of the blob.
  */
 
 void Robots::expandRobotBlob(int which)
 {
-	const int blobDiv = 4;
-    const int goodsMin = 5;
+	const int BIGGAIN = 10;
+	int gain;
+	expandHorizontally(which, 1);
+	expandHorizontally(which, -1);
+	gain = expandVertically(which, 1);
+	gain += expandVertically(which, -1);
+	//cout << "Blob " << which << " gained " << gain << endl;
+	if (gain > BIGGAIN) {
+		expandHorizontally(which, 1);
+		expandHorizontally(which, -1);
+    }
+}
 
-    //int spany = blobHeight(topBlob);
-    //int spanx = blobWidth(topBlob);
-    // expand right side
+/* Try and expand one of the sides of the blob.
+   Keep scanning vertically from the side of the robot
+   looking for evidence that you are still getting part
+   of the robot.  Stop when you don't have that evidence.
+   Reset the size of the robot accordingly.
+ */
+
+void Robots::expandHorizontally(int which, int dir) {
+	int boundary;
+	if (dir < 0)
+		boundary = blobs->get(which).getLeft();
+	else
+		boundary = blobs->get(which).getRight();
+	int top = blobs->get(which).getTop();
+	int bottom = blobs->get(which).getBottom();
+	int height = blobs->get(which).height();
     int x, y;
-    int bestr = blobs->get(which).getRight();
-    bool good = true;
-    // start on the right side and keep going until we're sure we're done
-    for (x = bestr; good && x < IMAGE_WIDTH - 1; x++) {
+    bool good = true;   // lets us know if we are still expanding
+	int goodPix, gotCol, white, opposites, green;
+	// loop until we hit the image edge or can't expand anymore
+    for (x = boundary; good && x >  -1 && x < IMAGE_WIDTH; x+= dir) {
         good = false;
-		// if we see anything of the right color that's good enough to expand our blob
-        for (y = blobs->get(which).getRightTopY(); y < blobs->get(which).getRightBottomY() && !good;
-             y += 1) {
-            if (thresh->thresholded[y][x] == color)
-                good = true;
-        }
-    }
-    // now reset the right side information to reflect the new state of things
-    blobs->get(which).setRightTopX(x - 1);
-    blobs->get(which).setRightBottomX(x - 1);
-    // repeat the process on the left side
-    good = true;
-    for (x = blobs->get(which).getLeftTopX(); good && x >  -1; x--) {
-        good = false;
-        for (y = blobs->get(which).getRightTopY(); y < blobs->get(which).getRightBottomY() && !good;
-             y += 2) {
-            if (thresh->thresholded[y][x] == color)
-                good = true;
-        }
-    }
-    blobs->get(which).setLeftTopX(x + 1);
-    blobs->get(which).setLeftBottomX(x + 1);
+		gotCol = 0;
+		goodPix = 0;
+		white = 0;
+		opposites = 0;
+		green = 0;
+        for (y = top; y < bottom && !good; y += 1) {
+			int pix = thresh->thresholded[y][x];
+            if (pix == color) {
+                gotCol++;
+			}
+			else if (pix == WHITE) {
+				white++;
+			} else if (pix == GREY) {
+				// useful, but not as good as white
+				goodPix++;
+			} else if ((color ==  NAVY && pix == RED) ||
+					   (color == RED && pix == NAVY)) {
+				opposites++;
+			} else if (pix == GREEN) {
+				green++;
+			}
+			good = goodScan(gotCol, white, opposites, goodPix, green, height);
+		}
+	}
+	if (dir < 0)
+		blobs->setLeft(which, x+1);
+	else
+		blobs->setRight(which, x-1);
+}
 
+/* Try and expand one of the sides of the blob.
+   Keep scanning horizontally from above or below the robot
+   looking for evidence that you are still getting part
+   of the robot.  Stop when you don't have that evidence.
+   Reset the size of the robot accordingly.  Keep track
+   of how much the robot grew so that we might make
+   a decision about whether or not to do the horizontal
+   over again.
+ */
 
-    // now try the bottom.  We're going to do this differently.
-    // robots are mainly white, so if we run into a big swatch of white we'll
-    // assume that its the same robot.
-    int whites = IMAGE_WIDTH, pix, width = blobs->get(which).width() / blobDiv;
-    int goods = 0, lastSaw = 0;
-    // loop down from the bottom until we can't expand anymore
-    for (y = blobs->get(which).getLeftBottomY(); whites >= width && y < IMAGE_HEIGHT - 1;y++){
+int Robots::expandVertically(int which, int dir) {
+	int boundary;
+	if (dir < 0)
+		boundary = blobs->get(which).getTop();
+	else
+		boundary = blobs->get(which).getBottom();
+	int left = blobs->get(which).getLeft();
+	int right = blobs->get(which).getRight();
+	int width = blobs->get(which).width();
+	int topBound = field->horizonAt(left); // cap at horizon
+    int whites = 0, pix, greys = 0, col = 0, opposites = 0, green = 0, gain = 0;
+	bool good = true;
+	int x, y;
+    // loop until we can't expand anymore
+    for (y = boundary; good && y > topBound && y < IMAGE_HEIGHT; y+=dir){
         whites = 0;
-        goods = 0;
-		// check this row of pixels for white or same color (good), or for opposite color (bad)
-        for (x = blobs->get(which).getLeftBottomX(); x < blobs->get(which).getRightTopX() && whites < width;
-             x++) {
-            if(blobs->get(which).getLeftBottomX() < 0) {
-                cout << "Top blob left bottom is negative" << endl;
-            }
+		col = 0;
+		greys = 0;
+		opposites = 0;
+		good = false;
+		gain++;
+		green = 0;
+		// check this row of pixels for white or same color (good),
+		// grey (pretty good), or for opposite color (bad)
+        for (x = left; x < right && !good; x++) {
             pix = thresh->thresholded[y][x];
             if (pix == color) {
-                whites++;
-				// theoretically a color match of enough pixels would be plenty of evidence that we're
-				// able to expand here.  Currently we don't seem to increment goods.  Something to
-				// experiment with.
-                if (goods > goodsMin) {
-                    whites = width;
-                }
+                col++;
             } else if (pix == WHITE) {
                 whites++;
             } else if ((color ==  NAVY && pix == RED) ||
                        (color == RED && pix == NAVY)) {
-				// Uh oh, we may be seeing another robot of the opposite color.  Could be trouble.
-                whites -= goodsMin;
-            }
-        }
-        if (goods < goodsMin) {
-            lastSaw++;
-        } else {
-            lastSaw = 0;
+				// Uh oh, we may be seeing another robot of the opposite color.
+				opposites++;
+            } else if (pix == GREY) {
+				greys++;
+			} else if (pix == GREEN) {
+				green++;
+			}
+			good = goodScan(col, whites, opposites, greys, green, width);
         }
     }
-    int gain = y - 1 - blobs->get(which).getLeftBottomY();
-    blobs->get(which).setLeftBottomY(y - 1);
-    blobs->get(which).setRightBottomY(y - 1);
-    // if we expanded enough, it is probably worth looking at the sides again.
-    if (gain > goodsMin) {
-        good = true;
-        for (x = blobs->get(which).getRightTopX(); good && x < IMAGE_WIDTH - 1; x++) {
-            good = false;
-            for (y = blobs->get(which).getRightBottomY() - gain; y < blobs->get(which).getRightBottomY()
-                     && !good; y++) {
-                if (thresh->thresholded[y][x] == color)
-                    good = true;
-            }
-        }
-        blobs->get(which).setRightTopX(x - 1);
-        blobs->get(which).setRightBottomX(x - 1);
-        good = true;
-        for (x = blobs->get(which).getLeftTopX(); good && x >  -1; x--) {
-            good = false;
-            for (y = blobs->get(which).getRightBottomY() - gain; y < blobs->get(which).getRightBottomY()
-                     && !good; y++) {
-                if (thresh->thresholded[y][x] == color)
-                    good = true;
-            }
-        }
-        blobs->get(which).setLeftTopX(x + 1);
-        blobs->get(which).setLeftBottomX(x + 1);
-    }
+	//cout << "In vert " << col << " " << whites << " " << opposites <<
+	//" " << greys << " " << green << " " << width << endl;
+	gain--;
+	if (gain <= 0) return 0;
+	if (dir < 0) {
+		blobs->setTop(which, y+1);
+	} else {
+		blobs->setBottom(which, y-1);
+	}
+	return gain;
+}
+
+/* Determines whether we have enough evidence to call a scan for
+   expanding the robot "good" or not.
+ */
+bool Robots::goodScan(int col, int white, int opp, int greys, int green, int total) {
+	const int EXPAND = 10; // set at a level that is bigger than most lines
+	const int COLORSWATCH = 5;
+
+	if (green > total / 4)
+		return false;
+	if (greys + white > total / 2 && white > EXPAND)
+		return true;
+	if (col > COLORSWATCH && white * 2 > EXPAND)
+		return true;
+	return false;
 }
 
 /*
@@ -321,25 +447,133 @@ void Robots::updateRobots(int which, int index)
  */
 void Robots::mergeBigBlobs()
 {
+	//cout << "In merge" << endl;
     for (int i = 0; i < blobs->number() - 1; i++) {
-        for (int j = i+1; j < blobs->number(); j++) {
-            if (closeEnough(blobs->get(i), blobs->get(j)) &&
-                bigEnough(blobs->get(i), blobs->get(j))) {
-                //cout << "Merging blobs " << endl;
-                //printBlob(blobs[i]);
-                //printBlob(blobs[j]);
-				blobs->get(j).merge(blobs->get(i));
-                //cout << "Merged are now" << endl;
-                //printBlob(blobs[i]);
-                //printBlob(blobs[j]);
-            }
-        }
+		if (blobs->get(i).getLeft() > -1 && blobs->get(i).height() > 1) {
+			//cout << "Blob #" << (i+1) << endl;
+			printBlob(blobs->get(i));
+			for (int j = i+1; j < blobs->number(); j++) {
+				if (closeEnough(blobs->get(i), blobs->get(j)) &&
+					noGreen(blobs->get(i), blobs->get(j)) &&
+					bigEnough(blobs->get(i), blobs->get(j))) {
+					//cout << "Merging blobs " << endl;
+					blobs->mergeBlobs(i, j);
+					expandRobotBlob(i);
+				} else {
+					if (!closeEnough(blobs->get(i), blobs->get(j))) {
+						//cout << "blobs were too far apart " << endl;
+					} else if (!noGreen(blobs->get(i), blobs->get(j))) {
+						//cout << "Blobs had green between" << endl;
+					} else {
+						//cout << "one blob was too small" << endl;
+					}
+				}
+			}
+		}
     }
 }
 
+/* Before we merge make sure there isn't a lot of green
+ * between the pieces
+ * TODO: write this
+ */
+
+bool Robots::noGreen(Blob a, Blob b) {
+	// first determine where the blobs are relative to each other
+	// the way we create robot blobs means that blob a will always
+	// be to the left of blob b (or they will overlap)
+	int left, right, top, bottom;
+	if (a.getRight() > b.getLeft()) {
+		// they overlap in the horizontal dimension - find the intersection
+		left = b.getLeft();
+		right = a.getRight();
+		if (a.getBottom() < b.getTop()) {
+			// a is over b
+			top = a.getBottom();
+			bottom = b.getTop();
+		} else if (b.getBottom() < a.getTop()) {
+			// b is over a
+			top = b.getBottom();
+			bottom = a.getTop();
+		} else
+			// they overlap in both dimensions
+			return true;
+		return checkVertical(left, right, top, bottom);
+	} else {
+		left = a.getRight();
+		right = b.getLeft();
+		if (a.getBottom() < b.getTop()) {
+			// a is also fully over b - check both
+			return checkVertical(left, right, a.getBottom(), b.getTop());
+		} else if (b.getBottom() < a.getTop()) {
+			// b is fully over a
+			return checkVertical(left, right, b.getBottom(), a.getTop());
+		} else {
+			// they overlap in the vertical dimension
+			if (a.getTop() > b.getTop()) {
+				top = a.getTop();
+				if (a.getBottom() > b.getBottom()) {
+					bottom = b.getBottom();
+				} else {
+					bottom = a.getBottom();
+				}
+			} else {
+				top = b.getTop();
+				if (a.getBottom() > b.getBottom()) {
+					bottom = b.getBottom();
+				} else {
+					bottom = a.getBottom();
+				}
+			}
+			return checkHorizontal(left, right, top, bottom);
+		}
+	}
+	return true;
+}
+
+/* Check for a swath of green between two robots.  In this case
+   the robots overlap in the horizontal direction so we check if
+   they are separated in the vertical direction
+ */
+
+bool Robots::checkVertical(int left, int right, int top, int bottom) {
+	// scan vertically
+	int green = 0, width = right - left;
+	for (int y = top; y < bottom; y++) {
+		green = 0;
+		for (int x = left; x < right; x++) {
+			if (thresh->thresholded[y][x] == GREEN)
+				green++;
+		}
+		if (green > width / 2)
+			return false;
+	}
+	return true;
+}
+
+/* Check for a swath of green between two robots.  In this case
+   the robots overlap in the vertical direction so we check if
+   they are separated in the horizontal direction
+ */
+
+bool Robots::checkHorizontal(int left, int right, int top, int bottom) {
+	// scan horizontally
+	int green = 0, height = bottom - top;
+	for (int x = left; x < right; x++) {
+		green = 0;
+		for (int y = top; y < bottom; y++) {
+			if (thresh->thresholded[y][x] == GREEN)
+				green++;
+		}
+		if (green > height / 2)
+			return false;
+	}
+	return true;
+}
+
 /*  Are two robot blobs close enough to merge?
-    Needless to say this needs lots of experimentation.  "40" was based on some, but
-    at high resolution.  Obviously it should be a constant.
+    Needless to say this needs lots of experimentation.  "40" was based on some,
+	but at high resolution.  Obviously it should be a constant.
  */
 
 bool Robots::closeEnough(Blob a, Blob b)
@@ -347,10 +581,10 @@ bool Robots::closeEnough(Blob a, Blob b)
     // EXAMINED: change constant to lower res stuff
     const int closeDistMax = 40;
 
-    int xd = distance(a.getLeftTopX(),a.getRightTopX(),
-                      b.getLeftTopX(),b.getRightTopX());
-    int yd = distance(a.getLeftTopY(),a.getLeftBottomY(),
-                      b.getLeftTopY(),b.getRightBottomY());
+    int xd = distance(a.getLeft(),a.getRight(),
+                      b.getLeft(),b.getRight());
+    int yd = distance(a.getTop(),a.getBottom(),
+                      b.getTop(),b.getBottom());
     if (xd < closeDistMax) {
         if (yd < closeDistMax)
             return true;
@@ -367,7 +601,7 @@ bool Robots::closeEnough(Blob a, Blob b)
 bool Robots::bigEnough(Blob a, Blob b)
 {
     // EXAMINED: change constant to lower res stuff // at half right now
-    const int minBlobArea = 100;
+    const int minBlobArea = 10;
     const int horizonOffset = 50;
 
     if (a.getArea() > minBlobArea && b.getArea() > minBlobArea)
@@ -413,48 +647,6 @@ bool Robots::viableRobot(Blob a)
 }
 
 
-/* Find robot blobs.
-   @param maxY     max value - will be used to pick heads out
-*/
-
-void Robots::getRobots(int maxY)
-{
-    const int spreadInit = 3;
-
-    int size = 0;
-    int topSpot = 0;
-    // TODO: experiment with this constant; probably 3; maybe 2
-    int spreadSeparation = spreadInit;
-    //check each blob in the array
-    for (int i = 0; i < blobs->number(); i++) {
-        int spread = blobs->get(i).width();
-        if (blobs->get(i).getLeftTopX() < 0) {
-        } else if (blobs->get(i).getLeftTopY() > maxY || spread < spreadSeparation) {
-            //drawBlob(blobs->get(i), BLACK);
-        } else {
-            // could be a robot or robots
-            //splitBlob(i);
-        }
-        if (blobs->get(i).getArea() > size) {
-            size = blobs->get(i).getArea();
-            //topBlob = blobs->get(i);
-            topSpot = i; //store the one with the largest size.
-        }
-    }
-    size = 0;
-    /*for (int i = 0; i < numBlobs; i++) {
-        int spread = blobWidth(blobs->get(i));
-        if (blobs->get(i).getLeftTopX() != BADVALUE && blobs->get(i).getLeftTopY() < maxY
-            && spread > spreadSeparation) {
-            //drawBlob(blobs->get(i), ORANGE);
-        }
-        if (blobs->get(i).area > size && i != topSpot) {
-            size = blobs->get(i).area;
-            secondBlob = blobs->get(i);
-        }
-        //drawBlob(blobs->get(i), BLACK);
-		}*/
-}
 
 /* Adds a new run to the basic data structure.
 
@@ -502,8 +694,23 @@ void Robots::newRun(int x, int y, int h)
 int Robots::distance(int x1, int x2, int x3, int x4) {
     if (x2 < x3)
         return x3 - x2;
+	if (x1 > x3 && x1 < x4)
+		return 0;
     if (x1 > x4)
         return x1 - x4;
     return 0;
+}
+
+/* Print debugging information for a blob.
+ * @param b    the blob
+ */
+void Robots::printBlob(Blob b) {
+#if defined OFFLINE
+/*    cout << "Outputting blob" << endl;
+    cout << b.getLeftTopX() << " " << b.getLeftTopY() << " " << b.getRightTopX() << " "
+         << b.getRightTopY() << endl;
+    cout << b.getLeftBottomX() << " " << b.getLeftBottomY() << " " << b.getRightBottomX()
+	<< " " << b.getRightBottomY() << endl;*/
+#endif
 }
 

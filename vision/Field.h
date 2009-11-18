@@ -20,8 +20,10 @@ public:
 
     // main methods
     int findGreenHorizon(int pH, float sl);
-	void findFieldEdges();
+	void findFieldEdges(int poseHorizon);
+	void findConvexHull(int pH);
 	int horizonAt(int x);
+	int ccw(point<int> p1, point<int> p2, point<int> p3);
 
     // scan operations
     int yProject(int startx, int starty, int newy);
@@ -53,6 +55,7 @@ private:
 	float slope;
 
     bool shoot[IMAGE_WIDTH];
+	int  topEdge[IMAGE_WIDTH+1];
 };
 
 #endif // Field_h_DEFINED

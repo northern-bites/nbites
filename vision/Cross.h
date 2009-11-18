@@ -34,7 +34,7 @@ static const int NOISE = 4;
 
 class Cross {
 public:
-    Cross(Vision* vis, Threshold* thr);
+    Cross(Vision* vis, Threshold* thr, Field* fie);
     virtual ~Cross() {}
 
 	void init();
@@ -48,6 +48,7 @@ private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
+	Field* field;
 
 	Blobs* blobs;
 	int numberOfRuns, runsize;

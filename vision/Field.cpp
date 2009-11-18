@@ -61,6 +61,7 @@
 
 #include "Field.h"
 #include "debug.h"
+#include "Utility.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -71,7 +72,7 @@ Field::Field(Vision* vis, Threshold * thr)
 {
 #ifdef OFFLINE
 	debugHorizon = false;
-	debugFieldEdge = false;
+	debugFieldEdge = true;
 	openField = false;
 	debugShot = false;
 #else
@@ -85,84 +86,109 @@ Field::Field(Vision* vis, Threshold * thr)
 /*
  */
 
-void Field::findFieldEdges() {
+void Field::findFieldEdges(int poseHorizon) {
+	/*
 	// build field edge segments
 	const int DISCONTINUOUS = 5;          // max difference between points
-	const int MIN_FIELD_SEG = 25;         // minimum line segment size
-	const int CLOSE_SLOPE = 5;            // fudge factor for jaggy lines
-	const float CLOSE_LINE_SLOPE = 0.15f; // threshold for combining lines
+	const int MIN_FIELD_SEG = 15;         // minimum line segment size
+	const float CLOSE_SLOPE = 6.0f;            // fudge factor for jaggy lines
+	const float CLOSE_LINE_SLOPE = 0.20f; // threshold for combining lines
+	const int MAX_ANGLE_LINE_SEGMENT = 6;
 
 	int startSeg = 0;
 	int width, firstTrend = -1, currentTrend = -1, pairs = 0, points = 0;
 	int noise = 0;
 	point<int> linePoints[20];
-	int trends[10];
+	float trends[10];
 	float percentGreen;
+	float firstSlope;
+	int lineStartPointX, lineStartPointY, lineEndPointX, lineEndPointY;
+	lineStartPointX = 0; lineStartPointY = thresh->greenEdgePoint(0);
+	lineEndPointX = 10; lineEndPointY = thresh->greenEdgePoint(10);
 
-	for (int i = 5; i < IMAGE_WIDTH; i++) {
-		// check for a discontinuity - note may need to upgrade this for horizontalish
-		// edges
-		if (abs(thresh->greenEdgePoint(i) - thresh->greenEdgePoint(i-1)) >
-			DISCONTINUOUS || i == IMAGE_WIDTH - 1 ||
+
+	// TODO:  we can occasionally have problem with a line that is right at the top
+	// of the screen - particularly on the right side of the image.  See, for
+	// example, graz/trillian/ball_5/ frames 19 and especially 38, plus
+	// 40, 41, 43
+	for (int i = 10; i < IMAGE_WIDTH; i++) {
+		// this test lifted directly from FieldLines.cpp
+		float curLineAngle = Utility::getAngle(lineStartPointX,
+											   lineStartPointY,
+											   lineEndPointX,
+											   lineEndPointY);
+		float segmentAngle = Utility::getAngle(lineStartPointX,
+											   lineStartPointY,
+											   i,
+											   thresh->greenEdgePoint(i));
+		float difference = min(fabs(curLineAngle - segmentAngle),
+							   180 - (fabs(curLineAngle -
+										   segmentAngle)));
+		if (difference > MAX_ANGLE_LINE_SEGMENT ||
+			i == IMAGE_WIDTH - 1 ||
 			thresh->greenEdgePoint(i) > IMAGE_HEIGHT - 3 ||
 			thresh->greenEdgePoint(i) < 2) {
 			// ends current line segment
-			width = i - 1 - startSeg;
-			if (width > MIN_FIELD_SEG &&
-				(i > IMAGE_HEIGHT - 3 ||
-				 thresh->greenEdgePoint(i) > thresh->greenEdgePoint(i-1))) {
-
+			width = i - 1 - lineStartPointX;
+			if (width > MIN_FIELD_SEG) {
 				// create the line segment - store end points
-				linePoints[points++] = point<int>(startSeg,
-												  thresh->greenEdgePoint(startSeg));
+				linePoints[points++] = point<int>(lineStartPointX,
+												  thresh->greenEdgePoint(lineStartPointX));
 				linePoints[points++] = point<int>(i - 1, thresh->greenEdgePoint(i-1));
+				trends[pairs] = curLineAngle;
+				pairs++;
 				if (debugFieldEdge) {
 					cout << "Adding " << linePoints[points-2] << " " <<
 						linePoints[points-1] << endl;
 				}
-				trends[pairs++] = firstTrend; // tracks slope
-				startSeg = i;
-				noise = 0;
 			} else {
-				// there was no viable segment, so start fresh
-				startSeg = i;
-				noise = 0;
+				// reset the start of the line
+				i = lineStartPointX + 10;
 			}
-		} else if (i - startSeg >= 10) {
-			// get slope of last 10 points
-			currentTrend = thresh->greenEdgePoint(i) - thresh->greenEdgePoint(i-10);
+			lineStartPointX = i;
+			lineStartPointY = thresh->greenEdgePoint(i-1);
+			if (i < IMAGE_WIDTH - 10) {
+				lineEndPointX = i + 10;
+				lineEndPointY = thresh->greenEdgePoint(i +10);
+				i+= 10;
+			} else
+				i = IMAGE_WIDTH;
+		} else {
 			// check green unless we're at the top of the image
-			if (thresh->greenEdgePoint(startSeg) > 3 || thresh->greenEdgePoint(i) > 3) {
+			if (thresh->greenEdgePoint(lineStartPointX) > 3 || thresh->greenEdgePoint(i) > 3) {
 				percentGreen = vision->fieldLines->percentColorBetween(
-					startSeg, thresh->greenEdgePoint(startSeg), i,
+					lineStartPointX, thresh->greenEdgePoint(lineStartPointX), i,
 					max(0, thresh->greenEdgePoint(i) - 2), GREEN);
 			} else percentGreen = 0.0f;
 
 			// slopes must be close and there can't be a lot of green between
-			if (abs(currentTrend - firstTrend > CLOSE_SLOPE) || percentGreen > 50.0f) {
-				width = i - 1 - startSeg;
+			if (percentGreen > 50.0f) {
+				width = i - 1 - lineStartPointX;
 				if (width > MIN_FIELD_SEG) {
 					// the last segment was viable
-					linePoints[points++] = point<int>(startSeg,
-													  thresh->greenEdgePoint(startSeg));
+					linePoints[points++] = point<int>(lineStartPointX,
+													  thresh->greenEdgePoint(lineStartPointX));
 					linePoints[points++] = point<int>(i - 5, thresh->greenEdgePoint(i-5));
+					trends[pairs] = curLineAngle;
+					pairs++;
 					if (debugFieldEdge) {
-						cout << "Adding " << linePoints[points-2] << " "
+						cout << "Adding2 " << linePoints[points-2] << " "
 							 << linePoints[points-1] << endl;
 					}
-					trends[pairs++] = firstTrend;
-					startSeg = i;
 				} else {
-					// we allow a little bit of noise - but only one point
-					if (noise > 0) {
-						startSeg = i - 2;
-						noise = 0;
-					} else noise++;
+					i = lineStartPointX + 10;
 				}
-			} else if (i - startSeg == 10) {
-				// set the value for the first 10 points in the new segment
-				firstTrend = thresh->greenEdgePoint(i) - thresh->greenEdgePoint(startSeg);
-				noise = 0;
+				lineStartPointX = i - 4;
+				lineStartPointY = thresh->greenEdgePoint(i - 4);
+				if (i < IMAGE_WIDTH - 6) {
+					lineEndPointX = i + 6;
+					lineEndPointY = thresh->greenEdgePoint(i +6);
+					i+= 6;
+				} else
+					i = IMAGE_WIDTH;
+			} else {
+				lineEndPointX = i;
+				lineEndPointY = thresh->greenEdgePoint(i);
 			}
 		}
 	}
@@ -170,7 +196,8 @@ void Field::findFieldEdges() {
 	// now go through the line segments and see if we can combine them
 	float slope1, slope2;
 	for (int i = 1; i < pairs; i++) {
-		if (abs(trends[i] - trends[i-1]) < CLOSE_SLOPE) {
+		//cout << "Merge " << trends[i] << " " << trends[i-1] << endl;
+		if (fabs(trends[i] - trends[i-1]) < CLOSE_SLOPE) {
 			// we need to project the lines to check if they are parallel
 			// so first we need slopes
 			slope1 = (float)(linePoints[(i-1)*2+1].y - linePoints[(i-1)*2].y) /
@@ -184,8 +211,12 @@ void Field::findFieldEdges() {
 				// get the slope of the 2d line
 				slope2 = (float)(linePoints[(i)*2+1].y - linePoints[(i)*2].y) /
 					(float)(linePoints[(i)*2+1].x - linePoints[(i)*2].x);
+				//cout << "Testing for merge " << slope1 << " " << slope2 << endl;
 				if (fabs(slope1 - slope2) < CLOSE_LINE_SLOPE) {
 					// combine them
+					if (debugFieldEdge) {
+						cout << "Merging " << i << endl;
+					}
 					linePoints[i*2] = linePoints[(i-1)*2];
 					linePoints[(i-1)*2] = point<int>(-1, -1);
 				} else {
@@ -220,6 +251,8 @@ void Field::findFieldEdges() {
 					// if the green in this column is above our line then it isn't a field edge
 					if (y0 > thresh->greenEdgePoint(j) &&
 						thresh->greenEdgePoint(j) < IMAGE_HEIGHT - 2) {
+						thresh->drawPoint(j, y0, RED);
+						//cout << "Bad " << j << " " << y0 << endl;
 						// mark it as an unusable segment
 						linePoints[i*2].x = -1;
 					}
@@ -234,6 +267,8 @@ void Field::findFieldEdges() {
 					// check it against the highest value seen
 					if (y0 > thresh->greenEdgePoint(j) &&
 						thresh->greenEdgePoint(j) < IMAGE_HEIGHT - 2) {
+						thresh->drawPoint(j, y0, RED);
+						//cout << "Bad2 " << j << " " << y0 << endl;
 						// unusable segment
 						linePoints[i*2].x = -1;
 					}
@@ -242,17 +277,183 @@ void Field::findFieldEdges() {
 		}
 	}
 
-	// Display the detected edges
-	if (debugFieldEdge) {
-		for (int i = 0; i < pairs; i++) {
-			if (linePoints[i*2].x != -1) {
-				thresh->drawLine(linePoints[i*2].x, linePoints[i*2].y,
-								 linePoints[i*2+1].x, linePoints[i*2+1].y, BLACK);
-				thresh->drawLine(linePoints[i*2].x, linePoints[i*2].y+1,
-								 linePoints[i*2+1].x, linePoints[i*2+1].y+1, BLACK);
+	bool foundEdge[IMAGE_WIDTH];
+	// now compute the actual horizon at every point
+
+	// first initialize based on pose horizon or green found
+	for (int i = 0; i < IMAGE_WIDTH; i++) {
+		// initialize with the top of the image
+		foundEdge[i] = false;
+		if (thresh->greenEdgePoint(i) < yProject(0, horizon, i)) {
+			topEdge[i] = thresh->greenEdgePoint(i);
+		} else {
+			topEdge[i] = yProject(0, horizon, i);
+		}
+	}
+
+	// compute the actual horizon at every point using field edges where possible
+	for (int i = 0; i < pairs; i++) {
+		if (linePoints[i*2].x != -1) {
+			// either use the line itself or the projected line as a minimum
+			// get the slope of the line
+			slope1 = (float)(linePoints[(i)*2+1].y - linePoints[(i)*2].y) /
+				(float)(linePoints[(i)*2+1].x - linePoints[(i)*2].x);
+			// project the line to the left edge and scan back to the start
+			for (int j = 0; j < linePoints[i*2].x; j++) {
+				int y0 = linePoints[i*2].y + ROUND2(slope1 *
+													(float)(j - linePoints[i*2].x)) - 2;
+				// if the green in this column is above our line then it isn't a field edge
+				if (y0 >= topEdge[j]) {
+					// use it as our horizon
+					topEdge[j] = y0;
+					foundEdge[j] = true;
+				}
+			}
+			// do the same thing on the right side of the line
+			for (int j = linePoints[i*2].x; j < IMAGE_WIDTH && linePoints[i*2].x != -1;
+				 j++) {
+				// project the y value of the line in this column
+				int y0 = linePoints[i*2].y + ROUND2(slope1 *
+													(float)(j - linePoints[i*2].x)) - 2;
+				// check it against the highest value seen
+				if (y0 >= topEdge[j]) {
+					foundEdge[j] = true;
+					topEdge[j] = y0;
+				}
 			}
 		}
 	}
+
+	if (debugFieldEdge) {
+		cout << "Started with " << pairs << " potential edge segments " << endl;
+		for (int i = 0; i < IMAGE_WIDTH; i++) {
+			if (topEdge[i] > 0) {
+				if (foundEdge[i]) {
+					thresh->drawPoint(i, topEdge[i], BLACK);
+				} else {
+					thresh->drawPoint(i, topEdge[i], RED);
+				}
+			}
+		}
+		} */
+}
+
+/** Find the convex hull of the field.  We've already found the point of maximal green.
+	Now scan down from that point every SCANLINES lines and find the highest point of green
+	in each of those scanlines.  We collect those points and perform a Graham-Scan to find
+	their convex hull (see wikipedia.org).  The convex hull in turn forms our usable
+	horizon at any given scanline.
+	@param ph    the horizon determined by findGreenHorizon
+ */
+
+void Field::findConvexHull(int pH) {
+	int RUNSIZE = 3;
+	int SCANSIZE = 10;
+	int NOISE = 2;
+	int HULLS = IMAGE_WIDTH / SCANSIZE + 1;
+
+	int good, ok, top;
+	unsigned char pixel;
+	point<int> convex[HULLS];
+	// we need a better criteria for what the top is
+	for (int i = 0; i < HULLS; i++) {
+		good = 0;
+		ok = 0;
+		int poseProject = yProject(0, pH, i * SCANSIZE);
+		if (pH <= 0) poseProject = 0;
+		for (top = max(poseProject, 0);
+			 good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
+			// scan until we find a run of green pixels
+			int x = i * SCANSIZE;
+			if (i == HULLS - 1)
+				x--;
+			pixel = thresh->thresholded[top][x];
+			if (pixel == GREEN) {
+				good++;
+			} else if (pixel == BLUEGREEN || pixel == GREY) {
+				ok++;
+				if (ok > NOISE) {
+					good = 0;
+					ok = 0;
+				}
+			} else {
+				good = 0;
+				ok = 0;
+			}
+		}
+		if (good == RUNSIZE) {
+			convex[i] = point<int>(i * SCANSIZE, top - good);
+			if (poseProject < 0 && top - good < 10)
+				convex[i] = point<int>(i * SCANSIZE, 0);
+		} else {
+			convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
+		}
+	}
+	// now do the Graham scanning algorithm
+	int M = 2;
+	for (int i = 2; i < HULLS; i++) {
+		while (ccw(convex[M-1], convex[M], convex[i]) <= 0 && M >= 1) {
+			M--;
+		}
+		M++;
+		point<int> temp = convex[M];
+		convex[M] = convex[i];
+		convex[i] = temp;
+	}
+	// when we apply Graham scanning as we just did, there can be problems at each end
+	int diffy = convex[2].y - convex[1].y;
+	int diffx = convex[2].x - convex[1].x;
+	float steps = (float)diffy / (float)diffx;
+	int diffx2 = convex[1].x - convex[0].x;
+	float project = (float)convex[1].y - (float)diffx2 * steps;
+	if (convex[1].x < 50 && convex[0].y - (int)project > 5) {
+		//cout << "Init " << convex[0].y << " " << convex[1].y << " " << convex[2].y << endl;
+		//cout << "Initx " << convex[0].x << " " << convex[1].x << " " << convex[2].x << endl;
+		convex[0].y = (int)project;
+	}
+	// do the same for the right edge
+	if (M > 3) {
+		diffx = convex[M-1].x - convex[M-2].x;
+		diffy = convex[M-1].y - convex[M-2].y;
+		steps = (float)diffy / (float)diffx;
+		diffx2 = convex[M].x - convex[M-1].x;
+		project = (float)convex[M-1].y + (float)diffx2 * steps;
+		if (convex[M-1].x > IMAGE_WIDTH - 1 - 50 && convex[M].y - (int)project > 5) {
+			//cout << "Init Right " << convex[M-2].y << " " << convex[M-1].y << " " << convex[M].y << endl;
+			//cout << "Initx right " << convex[M-2].x << " " << convex[M-1].x << " " << convex[M].x << endl;
+			convex[M].y = (int)project;
+		}
+	}
+
+	// interpolate the points in the hull to determine values for every scanline
+	topEdge[0] = convex[0].y;
+	float maxPix = 0.0f;
+	//cout << "First is " << convex[0].x << " " << convex[0].y << endl;
+	estimate e;
+	for (int i = 1; i <= M; i++) {
+		//cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
+		int diff = convex[i].y - convex[i-1].y;
+		float step = (float)diff / (float)(convex[i].x - convex[i-1].x);
+		float cur = convex[i].y;
+		for (int j = convex[i].x; j > convex[i-1].x; j--) {
+			cur -= step;
+			topEdge[j] = (int)cur;
+			if (cur > 10) {
+				e = vision->pose->pixEstimate(j, (int)cur, 0.0f);
+				if (e.dist > maxPix)
+					maxPix = e.dist;
+			}
+			if (debugFieldEdge)
+				thresh->drawPoint(j, (int)cur, BLACK);
+		}
+		if (debugFieldEdge)
+			thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x, convex[i].y, ORANGE);
+	}
+	//cout << "Max dist is " << maxPix << endl;
+}
+
+int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
+	return (p2.x - p1.x)*(p3.y - p1.y) - (p2.y - p1.y)*(p3.x - p1.x);
 }
 
 /*
@@ -386,11 +587,13 @@ int Field::findGreenHorizon(int pH, float sl) {
 					thresh->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
 				}
                 horizon = k + 2;
+				findConvexHull(horizon);
                 return horizon;
             }
         }
     }
     horizon = 0;
+	findConvexHull(horizon);
 	return horizon;
 }
 
@@ -1024,7 +1227,8 @@ void Field::openDirection(int horizon, NaoPose *pose)
  */
 
 int Field::horizonAt(int x) {
-    return yProject(0, horizon, x);
+	return topEdge[x];
+    //return yProject(0, horizon, x);
 }
 
 /* Project a line given a start coord and a new y value - note that this is

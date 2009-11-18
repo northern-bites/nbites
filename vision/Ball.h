@@ -34,6 +34,7 @@
 
 class Ball; // forward reference
 #include "Threshold.h"
+#include "Field.h"
 #include "VisualBall.h"
 #include "Vision.h"
 
@@ -48,7 +49,7 @@ static const int NOISE_SKIPS = 1;
 
 class Ball {
 public:
-    Ball(Vision* vis, Threshold* thr, int _color);
+    Ball(Vision* vis, Threshold* thr, Field* fie, int _color);
     virtual ~Ball() {}
 
     // SETTERS
@@ -101,6 +102,7 @@ private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
+	Field* field;
 
     int topSpot; //keeps track of best blob -> global var for debugging purposes
     int color;

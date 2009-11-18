@@ -132,7 +132,7 @@ void Blobs::blobIt(int x, int y, int h)
                 blobs[i].setRightTopY(y);
             }
 
-            // assign the top, if it is better
+            // assign the bottom, if it is better
             if (y+h > blobs[i].getLeftBottomY()) {
                 blobs[i].setLeftBottomY(y+h);
                 blobs[i].setRightBottomY(y + h);

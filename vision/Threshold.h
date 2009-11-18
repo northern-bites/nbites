@@ -80,6 +80,10 @@ public:
     inline void threshold();
     inline void runs();
     void thresholdAndRuns();
+	void findGoals(int column, int top);
+	void findBallsCrosses(int column, int top);
+	void detectSelf();
+	void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
     void objectRecognition();
     // helper methods
     void initObjects(void);
@@ -100,6 +104,8 @@ public:
     void findGreenHorizon();
     point <int> findIntersection(int col, int dir, int c);
 	int greenEdgePoint(int x);
+	int getRobotTop(int x, int c);
+	int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uchar* newyuv);
@@ -199,6 +205,8 @@ private:
     int redBottoms[IMAGE_WIDTH];
 	int greenEdge[IMAGE_WIDTH];
 
+	int lowerBound[IMAGE_WIDTH];
+
     // thresholding variables
     int horizon;
     int lastPixel;
@@ -209,6 +217,7 @@ private:
 #ifdef OFFLINE
     // Visual horizon debugging
     bool visualHorizonDebug;
+	bool debugSelf;
 #endif
 };
 

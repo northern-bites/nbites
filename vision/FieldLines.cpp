@@ -2713,81 +2713,81 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             if (isCCIntersection) {
                 c.setShape(CIRCLE);
             } else if (c.getShape() == T) {
-	      if (dupeFakeCorner(dupeCorners, intersectX, intersectY, numChecksPassed)) {
-		c.setShape(CIRCLE);
-	      } else {
-		// could it really be a center circle intersection?
-		// first identify which line is the stem
-		int tX = line2Closer.x, tY = line2Closer.y;
-		if (c.getTStem().start.x == i->start.x) {
-		  tX = line1Closer.x;
-		  tY = line1Closer.y;
-		}
-		// we're going to deal with distance squared to avoid taking roots
-		// Get the distance from the stem to the intersection
-		int targetDist = (tX - intersectX) * (tX - intersectX) +
-		  (tY - intersectY) * (tY - intersectY);
-		// loop through all unused points try to find one that is close
-		// but not part of our two lines that make up the T
-		BoundingBox box1c = Utility::
-		  getBoundingBox(*j,
-				 INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
-				 INTERSECT_MAX_PARALLEL_EXTENSION -2);
-		BoundingBox box2c = Utility::
-		  getBoundingBox(*i,
-				 INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
-				 INTERSECT_MAX_PARALLEL_EXTENSION -2);
-		for (linePointNode firstPoint = unusedPointsList.begin();
-		     firstPoint != unusedPointsList.end(); firstPoint++) {
-		  int pX = firstPoint->x;
-		  int pY = firstPoint->y;
-		  bool boxContains1 = Utility::
-		    boxContainsPoint(box1c, pX, pY);
-		  bool boxContains2 = Utility::
-		    boxContainsPoint(box2c, pX, pY);
-		  if (!(boxContains1 || boxContains2)) {
-		    // get distance to the intersection
-		    int diff = (pX - intersectX) * (pX - intersectX) +
-		      (pY - intersectY) * (pY - intersectY);
-		    // get distance to the nearest point on the stem
-		    int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
-		    int distSq = static_cast<int>(firstPoint->lineWidth);
-		    //diff = abs(diff - targetDist);
-		    // idea - the point should also be about twice the distance to the line point
-		    if (debugIntersectLines) {
-		      cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
-			" " << distSq << endl;
-		      cout << "Critical vals are: " << (distSq * distSq) << endl;
-		    }
-		    if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
-			diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
-		      if (debugIntersectLines) {
-			cout << "Possible center intersection" << endl;
-		      }
-		      c.setShape(CIRCLE);
-		    }
-		  }
-		}
-	      }
-	      // if we didn't get a legit CC, worry about the edges of the screen
-	      if (c.getShape() == T) {
-		if (tooClose(intersectX, intersectY)) {
-		  if (debugIntersectLines) {
-		    cout << "Tossed a T that may be a CC near the screen edge" << endl;
-		  }
-		  continue;
-		}
-	      }
-	    } else if (c.getShape() == INNER_L || c.getShape() == OUTER_L) {
-	      if (tooClose(intersectX, intersectY)) {
-		if (debugIntersectLines) {
-		  cout << "Tossed an L that may be a CC near the screen edge" << endl;
-		}
-		continue;
-	      }
-	    }
+				if (dupeFakeCorner(dupeCorners, intersectX, intersectY, numChecksPassed)) {
+					c.setShape(CIRCLE);
+				} else {
+					// could it really be a center circle intersection?
+					// first identify which line is the stem
+					int tX = line2Closer.x, tY = line2Closer.y;
+					if (c.getTStem().start.x == i->start.x) {
+						tX = line1Closer.x;
+						tY = line1Closer.y;
+					}
+					// we're going to deal with distance squared to avoid taking roots
+					// Get the distance from the stem to the intersection
+					int targetDist = (tX - intersectX) * (tX - intersectX) +
+						(tY - intersectY) * (tY - intersectY);
+					// loop through all unused points try to find one that is close
+					// but not part of our two lines that make up the T
+					BoundingBox box1c = Utility::
+						getBoundingBox(*j,
+									   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
+									   INTERSECT_MAX_PARALLEL_EXTENSION -2);
+					BoundingBox box2c = Utility::
+						getBoundingBox(*i,
+									   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
+									   INTERSECT_MAX_PARALLEL_EXTENSION -2);
+					for (linePointNode firstPoint = unusedPointsList.begin();
+						 firstPoint != unusedPointsList.end(); firstPoint++) {
+						int pX = firstPoint->x;
+						int pY = firstPoint->y;
+						bool boxContains1 = Utility::
+							boxContainsPoint(box1c, pX, pY);
+						bool boxContains2 = Utility::
+							boxContainsPoint(box2c, pX, pY);
+						if (!(boxContains1 || boxContains2)) {
+							// get distance to the intersection
+							int diff = (pX - intersectX) * (pX - intersectX) +
+								(pY - intersectY) * (pY - intersectY);
+							// get distance to the nearest point on the stem
+							int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
+							int distSq = static_cast<int>(firstPoint->lineWidth);
+							//diff = abs(diff - targetDist);
+							// idea - the point should also be about twice the distance to the line point
+							if (debugIntersectLines) {
+								cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
+									" " << distSq << endl;
+								cout << "Critical vals are: " << (distSq * distSq) << endl;
+							}
+							if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
+								diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
+								if (debugIntersectLines) {
+									cout << "Possible center intersection" << endl;
+								}
+								c.setShape(CIRCLE);
+							}
+						}
+					}
+				}
+				// if we didn't get a legit CC, worry about the edges of the screen
+				if (c.getShape() == T) {
+					if (tooClose(intersectX, intersectY)) {
+						if (debugIntersectLines) {
+							cout << "Tossed a T that may be a CC near the screen edge" << endl;
+						}
+						continue;
+					}
+				}
+			} else if (c.getShape() == INNER_L || c.getShape() == OUTER_L) {
+				if (tooClose(intersectX, intersectY)) {
+					if (debugIntersectLines) {
+						cout << "Tossed an L that may be a CC near the screen edge" << endl;
+					}
+					continue;
+				}
+			}
             corners.push_back(c);
-	    
+
             // TODO:  Should I be adding the intersection point to both lines?
             //i->addPoint
 
@@ -2919,8 +2919,10 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
     }
 
     if (debugRiskyCorners || debugIdentifyCorners) {
-        cout << "\tRemoved " << oldNumCorners - corners.size()
-             << " risky corner(s). "  << endl;
+		if (corners.size() > 0) {
+			cout << "\tRemoved " << oldNumCorners - corners.size()
+				 << " risky corner(s). "  << endl;
+		}
     }
 }
 

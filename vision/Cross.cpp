@@ -35,8 +35,8 @@ static bool CROSSDEBUG = false;
 static bool CROSSDEBUG = false;
 #endif
 
-Cross::Cross(Vision* vis, Threshold* thr)
-    : vision(vis), thresh(thr)
+Cross::Cross(Vision* vis, Threshold* thr, Field* fie)
+    : vision(vis), thresh(thr), field(fie)
 {
 	const int MAX_CROSS_RUNS = 400;
 	blobs = new Blobs(MAX_CROSS_RUNS);
@@ -143,6 +143,12 @@ void Cross::checkForX(Blob b) {
 			counter++;
 		} else return;
 	}
+
+	const int HORIZONCHECK = 15;
+	// make sure we aren't too close to the horizon
+	if (y - HORIZONCHECK < field->horizonAt(x) && field->horizonAt(x) > 0) return;
+	if (y - HORIZONCHECK < field->horizonAt(x+w) && field->horizonAt(x+w) > 0) return;
+
 	// if we pass the basic threshold then make sure it isn't a line
 	if (count > (float)counter * greenThreshold) {
 		// first make sure this isn't really a line
