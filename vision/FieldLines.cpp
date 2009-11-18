@@ -2919,8 +2919,10 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
     }
 
     if (debugRiskyCorners || debugIdentifyCorners) {
-        cout << "\tRemoved " << oldNumCorners - corners.size()
-             << " risky corner(s). "  << endl;
+		if (corners.size() > 0) {
+			cout << "\tRemoved " << oldNumCorners - corners.size()
+				 << " risky corner(s). "  << endl;
+		}
     }
 }
 

@@ -72,7 +72,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     // storing locally
 #ifdef OFFLINE
     visualHorizonDebug = false;
-	debugSelf = false;
+	debugSelf = true;
 #endif
 
     // loads the color table on the MS into memory
@@ -100,7 +100,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     navyblue = new Robots(vision, this, field, NAVY);
 	red = new Robots(vision, this, field, RED);
     orange = new Ball(vision, this, field, ORANGE);
-    cross = new Cross(vision, this);
+    cross = new Cross(vision, this, field);
 }
 
 /* Main vision loop, called by Vision.cc
@@ -144,6 +144,41 @@ void Threshold::visionLoop() {
     transposeDebugImage();
 #endif
 }
+
+/*
+ * Threshold and runs.  The goal here is to scan the image and collect up "runs"
+ * of color.
+ * The ones we're particularly interested in are blue, yellow, orange and green
+ * (also red and dark blue).
+ * Then we send the runs off to the object recognition system.  We scan the
+ * image from bottom to top. Along the way we keep track of things like: where
+ * we saw blue-yellow and yellow-blue transitions, where the green horizon
+ * line is, etc.
+ */
+void Threshold::thresholdAndRuns() {
+    PROF_ENTER(vision->profiler, P_THRESHRUNS); // profiling
+
+    // Perform image thresholding
+    PROF_ENTER(vision->profiler, P_THRESHOLD);
+    threshold();
+    PROF_EXIT(vision->profiler, P_THRESHOLD);
+
+	initColors();
+
+    // Determine where the field horizon is
+    PROF_ENTER(vision->profiler, P_FGHORIZON);
+    horizon = field->findGreenHorizon(pose->getHorizonY(0),
+									  pose->getHorizonSlope());
+    PROF_EXIT(vision->profiler, P_FGHORIZON);
+
+    // 'Run' up the image to find color-grouped pixel sequences
+    PROF_ENTER(vision->profiler, P_RUNS);
+    runs();
+    PROF_EXIT(vision->profiler, P_RUNS);
+
+    PROF_EXIT(vision->profiler, P_THRESHRUNS);
+}
+
 
 /* Thresholding.  Since there's no real benefit (and in fact can it can be a
  * detriment with compiler optimizations on) to combine the thresholding and
@@ -235,6 +270,11 @@ void Threshold::threshold() {
 /* Image runs.  As explained in the comments for the threshold() method, I
  * (Jeremy) have split the thresholdAndRuns() method into parts.  This also
  * helped with working out the slow sections of code.
+ * We are now so far from pure run-length encoding that we do this a whole lot
+ * differently.  First, we figure out the top and bottom borders of the field.
+ * We get a convex hull for the top, and look out for our own body parts for the
+ * bottom.  The we scan a bit more intelligently for field objects (e.g.
+ * balls will only be in the confines of the field).
  */
 void Threshold::runs() {
 	detectSelf();
@@ -247,11 +287,20 @@ void Threshold::runs() {
 
 }
 
+/** Ideally goals will be either right at the field edge, or will have part above
+ * and part below.  So we scan up from the edge and also scan down.  All we're doing
+ * is trying to collect big runs of either BLUE or YELLOW.  We tolerate some noise.
+ * To Do:  Figure out the right amount of noise to tolerate.
+ * @param column     the current vertical scanline
+ * @param topEdge    the top of the field in that scanline
+ */
+
 void Threshold::findGoals(int column, int topEdge) {
 	const int BADSIZE = 5;
 	// scan up for goals
 	int bad = 0, blues = 0, yellows = 0, blueGreen = 0;
 	int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge, lastYellow = topEdge;
+	topEdge = min(topEdge, lowerBound[column]);
 	for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
 		// get the next pixel
 		unsigned char pixel = thresholded[j][column];
@@ -304,14 +353,36 @@ void Threshold::findGoals(int column, int topEdge) {
 	}
 }
 
+/* Balls and field crosses can only be on the actual field.  So we scan
+ * down from the top edge to the bottom of the image (or where we would
+ * see ourselves).  During the scan we collect up connected runs of
+ * ORANGE or WHITE.  We pass them to the relevant Object structures to
+ * be processed there.
+ * To Do:  Put robot detection back in.
+ * @param column     the current vertical scanline
+ * @param topEdge    the top of the field in that scanline
+ */
+
 void Threshold::findBallsCrosses(int column, int topEdge) {
 	// scan down finding balls and crosses
 	unsigned char lastPixel = GREEN;
 	int currentRun = 0;
+	int bound = lowerBound[column];
+	// if a ball is in the middle of the boundary, then look a little lower
+	if (bound < IMAGE_HEIGHT - 1) {
+		while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
+			bound++;
+		}
+	}
 	// scan down the column looking for ORANGE and WHITE
-	for (int j = lowerBound[column]; j >= topEdge; j--) {
+	for (int j = bound; j >= topEdge; j--) {
 		// get the next pixel
 		unsigned char pixel = thresholded[j][column];
+		// for simplicity treat ORANGERED as ORANGE - we'll look
+		// more carefully when we check whether or not it is a ball
+		if (pixel == ORANGERED) {
+			pixel = ORANGE;
+		}
 
 		// check thresholded point with last thresholded point.
 		// if the same, increment the current run
@@ -323,7 +394,6 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 			// switch for last thresholded pixel
 			switch (lastPixel) {
 			case ORANGE:
-			case ORANGERED:
 				// add to Ball data structure
 				if (currentRun > 2) {
 					orange->newRun(column, j, currentRun);
@@ -343,62 +413,33 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 	}
 }
 
-/*
- * Threshold and runs.  The goal here is to scan the image and collect up "runs"
- * of color.
- * The ones we're particularly interested in are blue, yellow, orange and green
- * (also red and dark blue).
- * Then we send the runs off to the object recognition system.  We scan the
- * image from bottom to top. Along the way we keep track of things like: where
- * we saw blue-yellow and yellow-blue transitions, where the green horizon
- * line is, etc.
- */
-void Threshold::thresholdAndRuns() {
-    PROF_ENTER(vision->profiler, P_THRESHRUNS); // profiling
-
-    // Perform image thresholding
-    PROF_ENTER(vision->profiler, P_THRESHOLD);
-    threshold();
-    PROF_EXIT(vision->profiler, P_THRESHOLD);
-
-	initColors();
-
-    // Determine where the field horizon is
-    PROF_ENTER(vision->profiler, P_FGHORIZON);
-    horizon = field->findGreenHorizon(pose->getHorizonY(0),
-									  pose->getHorizonSlope());
-    PROF_EXIT(vision->profiler, P_FGHORIZON);
-
-    // 'Run' up the image to find color-grouped pixel sequences
-    PROF_ENTER(vision->profiler, P_RUNS);
-    runs();
-    PROF_EXIT(vision->profiler, P_RUNS);
-
-    PROF_EXIT(vision->profiler, P_THRESHRUNS);
-}
-
-/** Given two lines defined by "detectSelf" set the lower bounds.
+/** Given two lines defined by "detectSelf" set the lower bounds.  We have
+ * detected a part of ourself, so we don't want to process it or we might
+ * mistake ourself for a cross or a ball.
  */
 
 void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3) {
 	float step = (float)(y1 - y2) / (float) (x2 - x1);
 	float start = (float)y1;
-	cout << "Bounds " << x1 << " " << y1 << " " << x2 << " " << y2 << " " << x3 << " " << y3 << endl;
 	for (int i = x1; i < x2 && i < IMAGE_WIDTH; i++) {
-		if (i >= 0) {
+		if (i >= 0 && start < IMAGE_HEIGHT) {
+			int temp = max(0, (int)start);
 			if (debugSelf) {
-				lowerBound[i] = (int) start;
+				drawPoint(i, temp, BLACK);
 			}
-			drawPoint(i, (int) start, BLACK);
+			lowerBound[i] = temp;
 		}
 		start -= step;
 	}
 	step = (float)(y3 - y2) / (float) (x3 - x2);
 	start = (float)y2;
 	for (int i = x2; i < x3 && i < IMAGE_WIDTH; i++) {
-		lowerBound[i] = (int) start;
-		if (debugSelf) {
-			drawPoint(i, (int) start, BLACK);
+		if (i >= 0 && start < IMAGE_HEIGHT) {
+			int temp = max(0, (int)start);
+			lowerBound[i] = temp;
+			if (debugSelf) {
+				drawPoint(i, temp, BLACK);
+			}
 		}
 		start += step;
 	}
@@ -406,7 +447,8 @@ void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3
 
 /** Detect the shoulders of the robot and ignore them.  Our goal is to set lower
 	bounds for all of the vertical scanlines.
- */
+	To Do:  Detect feet and hands.
+*/
 void Threshold::detectSelf() {
     // To do:  This boundary could be much better.
 	// To do:  Detect feet and arms too
@@ -415,21 +457,63 @@ void Threshold::detectSelf() {
     const int pixInImageUp = getPixelBoundaryUp();
 	const int MIDY = 40;
 	const int MIDX = 90;
+	const int LOWBOUND = -200;
+	const int RIGHTBAL = 571;
+	const int RIGHTFUDGE = 20;
+	const int UPTRANSLATE = 85;
+	const int HEIGHT = 200;
+	const int TOPRIGHT = 250;
+	const int HIGHBOUND = -50;
+	const int COMPENSATION = 20;
+
+	cout << "Values " << pixInImageLeft << " " << pixInImageRight << " " << pixInImageUp << endl;
 
 	for (int i = 0; i < IMAGE_WIDTH; i++) {
 		lowerBound[i] = IMAGE_HEIGHT - 1;
 	}
+	int up = pixInImageUp;
+	if (pixInImageUp < HIGHBOUND) {
+		up -= COMPENSATION;
+	} else if (pixInImageUp > -HIGHBOUND) {
+		up += COMPENSATION;
+	}
+	if (pixInImageRight < 150) {
+		up -= COMPENSATION;
+	}
+	if (pixInImageLeft > 170) {
+		up -= COMPENSATION;
+	}
 	int xp = -1, yp = -1;
-	if (pixInImageRight > 0 && pixInImageRight < IMAGE_WIDTH) {
-		xp = pixInImageRight + (IMAGE_WIDTH - pixInImageRight) / 2;
-		yp = pixInImageUp + MIDY;
-		setBoundaryPoints(pixInImageRight, IMAGE_HEIGHT-1, xp, yp,
-						  IMAGE_WIDTH - 1, pixInImageUp);
+	if (pixInImageRight > 0 && pixInImageRight < IMAGE_WIDTH + RIGHTFUDGE) {
+		xp = pixInImageRight - RIGHTFUDGE;
+		yp = IMAGE_HEIGHT  + (up - UPTRANSLATE);
+		setBoundaryPoints(xp, yp, xp + 100, yp - 130,
+						  pixInImageRight + TOPRIGHT, yp - HEIGHT);
+		if (pixInImageRight + TOPRIGHT < IMAGE_WIDTH -1) {
+			for (int i = pixInImageRight + TOPRIGHT; i < IMAGE_WIDTH; i++) {
+				lowerBound[i] = yp - HEIGHT;
+			}
+		}
 	}
 	if (pixInImageLeft > 0 && pixInImageLeft < IMAGE_WIDTH) {
-		xp = pixInImageLeft - (IMAGE_WIDTH - pixInImageLeft) / 2;
-		yp = pixInImageUp + MIDY;
-		setBoundaryPoints(0, pixInImageUp, xp, yp, pixInImageLeft, IMAGE_HEIGHT - 1);
+		xp = pixInImageLeft;
+		yp = IMAGE_HEIGHT + (up - UPTRANSLATE);
+		setBoundaryPoints(pixInImageLeft - TOPRIGHT, yp - HEIGHT,
+						  xp - 100, yp - 130,
+						  xp, yp);
+		if (pixInImageLeft > TOPRIGHT) {
+			for (int i = 0; i < pixInImageLeft - TOPRIGHT; i++) {
+				lowerBound[i] = yp - HEIGHT;
+			}
+		}
+	}
+
+	// screen out the robot's belly - note this still does not cover feet
+	if (pixInImageUp < LOWBOUND) {
+		int offset = (pixInImageRight - RIGHTBAL) / 4;
+		int lefty = IMAGE_HEIGHT + pixInImageUp - LOWBOUND - offset;
+		int righty = IMAGE_HEIGHT + pixInImageUp - LOWBOUND + offset;
+		setBoundaryPoints(0, lefty, IMAGE_WIDTH - 1, righty, -1, -1);
 	}
 }
 
@@ -463,79 +547,100 @@ void Threshold::objectRecognition() {
     // Chown-RLE
     initObjects();
     // now get the posts and goals
-    yellow->createObject(horizon);
-    blue->createObject(horizon);
+    yellow->createObject();
+    blue->createObject();
 	cross->createObject();
+	/* Shut off for now
     red->robot(horizon);
-    navyblue->robot(horizon);
+    navyblue->robot(horizon); */
 
     bool ylp = vision->yglp->getWidth() > 0;
     bool yrp = vision->ygrp->getWidth() > 0;
     bool blp = vision->bglp->getWidth() > 0;
     bool brp = vision->bgrp->getWidth() > 0;
 
+	// HACK:  This will have to do until we can properly model the shoulders
+	// for blue posts that run down into our shoulder boundary, disallow
+	// some based on the ratio of the height to how much is below the boundary
+	if (brp) {
+		int x = max(0, vision->bgrp->getLeftBottomX());
+		int y = min(vision->bgrp->getLeftBottomY(), IMAGE_HEIGHT -1);
+		int x1 = min(IMAGE_WIDTH - 1, vision->bgrp->getRightBottomX());
+		int y1 = min(IMAGE_HEIGHT - 1, vision->bgrp->getRightBottomY());
+		int h = vision->bgrp->getHeight();
+		if ((y  > lowerBound[x] && lowerBound[x] < IMAGE_HEIGHT - 1 &&
+				y - lowerBound[x] > h /2)
+			|| (y1 > lowerBound[x1] && lowerBound[x1] < IMAGE_HEIGHT - 1 &&
+				y1 - lowerBound[x1] > h / 2)) {
+			vision->bgrp->init();
+			//cout << "Screen " << x << " " << y << " " << x1 << " " << y1 << " " << h << endl;
+			brp = false;
+		}
+	}
+	if (blp) {
+		int x = max(0, vision->bglp->getLeftBottomX());
+		int y = min(vision->bglp->getLeftBottomY(), IMAGE_HEIGHT -1);
+		int x1 = min(IMAGE_WIDTH - 1, vision->bglp->getRightBottomX());
+		int y1 = min(IMAGE_HEIGHT - 1, vision->bglp->getRightBottomY());
+		int h = vision->bglp->getHeight();
+		if ((y  > lowerBound[x] && lowerBound[x] < IMAGE_HEIGHT - 1 &&
+				y - lowerBound[x] > h / 2)
+			|| (y1 > lowerBound[x1] && lowerBound[x1] < IMAGE_HEIGHT - 1 &&
+				y1 - lowerBound[x1] > h / 2)) {
+			vision->bglp->init();
+			//cout << "Screen1 " << x << " " << y << endl;
+			blp = false;
+		}
+	}
+
+
     if ((ylp || yrp) && (blp || brp)) {
-        // we see blue and yellow goal posts!
-        // if we see two of either then use that color'
-        /*if (ylp && yrp) {
-            vision->bglp->init();
-            vision->bgrp->init();
-            vision->bgCrossbar->init();
-            blp = false;
-            brp = false;
-        } else if (blp && brp) {
-            vision->yglp->init();
-            vision->ygrp->init();
-            vision->ygCrossbar->init();
-            ylp = false;
-            yrp = false;
-	    } else {*/
-            // we see one of each, so pick the biggest one
-            float ylpw = vision->yglp->getWidth();
-            float yrpw = vision->ygrp->getWidth();
-            float blpw = vision->bglp->getWidth();
-            float brpw = vision->bgrp->getWidth();
-            if (ylpw > yrpw) {
-                if (blpw > brpw) {
-		  if (ylpw > blpw) {
-		    vision->bglp->init();
-		    vision->bgrp->init();
-		  }
-		  else {
-		    vision->yglp->init();
-		    vision->ygrp->init();
-		  }
-                } else {
-		  if (ylpw > brpw) {
-		    vision->bgrp->init();
-		    vision->bglp->init();
-		  }
-		  else {
-		    vision->yglp->init();
-		    vision->ygrp->init();
-		  }
-                }
-            } else {
-                if (blpw > brpw) {
-		  if (yrpw > blpw) {
-		    vision->bglp->init();
-		    vision->bgrp->init();
-		  }
-		  else {
-		    vision->ygrp->init();
-		    vision->yglp->init();
-		  }
-                } else {
-		  if (yrpw > brpw) {
-		    vision->bglp->init();
-		    vision->bgrp->init();
-		  }
-		  else {
-		    vision->yglp->init();
-		    vision->ygrp->init();
-		  }
-                }
-		//}
+		// we see one of each, so pick the biggest one
+		float ylpw = vision->yglp->getWidth();
+		float yrpw = vision->ygrp->getWidth();
+		float blpw = vision->bglp->getWidth();
+		float brpw = vision->bgrp->getWidth();
+		if (ylpw > yrpw) {
+			if (blpw > brpw) {
+				if (ylpw > blpw) {
+					vision->bglp->init();
+					vision->bgrp->init();
+				}
+				else {
+					vision->yglp->init();
+					vision->ygrp->init();
+				}
+			} else {
+				if (ylpw > brpw) {
+					vision->bgrp->init();
+					vision->bglp->init();
+				}
+				else {
+					vision->yglp->init();
+					vision->ygrp->init();
+				}
+			}
+		} else {
+			if (blpw > brpw) {
+				if (yrpw > blpw) {
+					vision->bglp->init();
+					vision->bgrp->init();
+				}
+				else {
+					vision->ygrp->init();
+					vision->yglp->init();
+				}
+			} else {
+				if (yrpw > brpw) {
+					vision->bglp->init();
+					vision->bgrp->init();
+				}
+				else {
+					vision->yglp->init();
+					vision->ygrp->init();
+				}
+			}
+			//}
 	    }
     }
 
@@ -566,17 +671,6 @@ void Threshold::objectRecognition() {
     if (blp || brp) {
         field->bestShot(vision->bgrp, vision->bglp, vision->bgCrossbar, BLUE);
     }
-
-    // sanity check: if pose estimated horizon is completely above the image,
-    // shouldn't find any posts or goals
-    // if (pose->getLeftHorizonY() < 0 && pose->getRightHorizonY() < 0) {
-    //     vision->yglp->init();
-    //     vision->ygrp->init();
-    //     vision->ygCrossbar->init();
-    //     vision->bglp->init();
-    //     vision->bgrp->init();
-    //     vision->bgCrossbar->init();
-    // }
 
     storeFieldObjects();
 

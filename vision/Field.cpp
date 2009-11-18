@@ -392,28 +392,64 @@ void Field::findConvexHull(int pH) {
 	// now do the Graham scanning algorithm
 	int M = 2;
 	for (int i = 2; i < HULLS; i++) {
-		while (ccw(convex[M-1], convex[M], convex[i]) <= 0 && M >= 1)
+		while (ccw(convex[M-1], convex[M], convex[i]) <= 0 && M >= 1) {
 			M--;
+		}
 		M++;
 		point<int> temp = convex[M];
 		convex[M] = convex[i];
 		convex[i] = temp;
 	}
+	// when we apply Graham scanning as we just did, there can be problems at each end
+	int diffy = convex[2].y - convex[1].y;
+	int diffx = convex[2].x - convex[1].x;
+	float steps = (float)diffy / (float)diffx;
+	int diffx2 = convex[1].x - convex[0].x;
+	float project = (float)convex[1].y - (float)diffx2 * steps;
+	if (convex[1].x < 50 && convex[0].y - (int)project > 5) {
+		//cout << "Init " << convex[0].y << " " << convex[1].y << " " << convex[2].y << endl;
+		//cout << "Initx " << convex[0].x << " " << convex[1].x << " " << convex[2].x << endl;
+		convex[0].y = (int)project;
+	}
+	// do the same for the right edge
+	if (M > 3) {
+		diffx = convex[M-1].x - convex[M-2].x;
+		diffy = convex[M-1].y - convex[M-2].y;
+		steps = (float)diffy / (float)diffx;
+		diffx2 = convex[M].x - convex[M-1].x;
+		project = (float)convex[M-1].y + (float)diffx2 * steps;
+		if (convex[M-1].x > IMAGE_WIDTH - 1 - 50 && convex[M].y - (int)project > 5) {
+			//cout << "Init Right " << convex[M-2].y << " " << convex[M-1].y << " " << convex[M].y << endl;
+			//cout << "Initx right " << convex[M-2].x << " " << convex[M-1].x << " " << convex[M].x << endl;
+			convex[M].y = (int)project;
+		}
+	}
+
 	// interpolate the points in the hull to determine values for every scanline
 	topEdge[0] = convex[0].y;
+	float maxPix = 0.0f;
+	//cout << "First is " << convex[0].x << " " << convex[0].y << endl;
+	estimate e;
 	for (int i = 1; i <= M; i++) {
+		//cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
 		int diff = convex[i].y - convex[i-1].y;
 		float step = (float)diff / (float)(convex[i].x - convex[i-1].x);
 		float cur = convex[i].y;
 		for (int j = convex[i].x; j > convex[i-1].x; j--) {
 			cur -= step;
 			topEdge[j] = (int)cur;
+			if (cur > 10) {
+				e = vision->pose->pixEstimate(j, (int)cur, 0.0f);
+				if (e.dist > maxPix)
+					maxPix = e.dist;
+			}
 			if (debugFieldEdge)
 				thresh->drawPoint(j, (int)cur, BLACK);
 		}
 		if (debugFieldEdge)
 			thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x, convex[i].y, ORANGE);
 	}
+	//cout << "Max dist is " << maxPix << endl;
 }
 
 int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {

@@ -323,7 +323,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 		h = topBlob->height();
 		const float BALL_REAL_HEIGHT = 8.6f;
 
-		e = vision->pose->pixEstimate((topBlob->getLeftTopX() + w) / 2,
+		e = vision->pose->pixEstimate(topBlob->getLeftTopX() + (w / 2),
 									  topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
 									  BALL_REAL_HEIGHT);
 

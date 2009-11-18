@@ -79,7 +79,7 @@ static const int MIN_POST_SEPARATION = 7;
 // how big a post is to be declared a big post
 // EXAMINED: change this
 static const int BIGPOST = 25;
-static const float NORMALPOST = 0.6f;
+static const float NORMALPOST = 0.45f;
 static const float QUESTIONABLEPOST = 0.85f;
 static const int DIST_POINT_FUDGE = 5;
 
@@ -142,16 +142,15 @@ void ObjectFragments::init(float s)
  * @return              always 0
  */
 
-void ObjectFragments::createObject(int horizon) {
+void ObjectFragments::createObject() {
     // these are in the relative order that they should be called
     switch (color) {
     case BLUE:
-		goalScan(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE, BLUEGREEN,
-				 horizon);
+		goalScan(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE, BLUEGREEN);
         break;
     case YELLOW:
 		goalScan(vision->yglp, vision->ygrp, vision->ygCrossbar, YELLOW,
-				 ORANGEYELLOW, horizon);
+				 ORANGEYELLOW);
         break;
     }
 }
@@ -239,7 +238,7 @@ void ObjectFragments::newRun(int x, int y, int h)
  * @param hor     a horizon boundary that we do not currently use
  * @return index  the index of the largest run that meets the criteria
  */
-int ObjectFragments::getBigRun(int left, int right, int hor) {
+int ObjectFragments::getBigRun(int left, int right) {
     int maxRun = -100;
     int nextH = 0;
     int nextX = 0;
@@ -492,7 +491,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
         dir = -1;
     int minCount = (spanY / POST_DIVISOR) / increment;
     int minRun = min(spanY, max(MIN_WIDTH, spanY / 2));
-    int minGood = max(1, (spanY / 2) / increment);
+    int minGood = max(1, (spanY / 4) / increment);
     int badLines = 0;
     int i = 0;
     int fake = 0;
@@ -700,10 +699,10 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
         left.x = 0;
     }
 
-    if (!up && thresh->getVisionHorizon() > left.y) {
+    if (!up && horizonAt(left.x) > left.y) {
         // for the heck of it let's scan down
         int found = left.y;
-        for (int d = left.y; d < thresh->getVisionHorizon(); d+=1) {
+        for (int d = left.y; d < horizonAt(left.x); d+=1) {
             good = 0;
             for (int a = left.x; a < right.x; a++) {
                 if (thresh->thresholded[d][a] == c) {
@@ -953,7 +952,7 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
                                    certainty _certainty,
                                    distanceCertainty _distCertainty) {
     // before we do this let's make sure that the object is really our color
-	const float BLUEPOST = 0.75f;
+	const float BLUEPOST = 0.6f;
 	float perc = NORMALPOST;
 	if (_certainty != _SURE && two.height() < 40 && color == BLUE) {
 		//cout << "uppint the anty on blue" << endl;
@@ -963,7 +962,7 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
         one->updateObject(&two, _certainty, _distCertainty);
         return true;
     } else {
-      //cout << "Screening object for low percentage of real color" << endl;
+		//cout << "Screening object for low percentage of real color " << endl;
         return false;
     }
 }
@@ -1098,17 +1097,16 @@ bool ObjectFragments::checkSize(Blob b, int c)
  * we will check if it actually meets the criteria for a good post.
  * @param c       current color
  * @param c2      secondary color
- * @param horizon green horizon
  * @param left    leftmost limit to look
  * @param right   rightmost limit to look
  * @param         indication of whether we found a decent candidate
  */
 
-int ObjectFragments::grabPost(int c, int c2, int horizon, int left,
+int ObjectFragments::grabPost(int c, int c2, int left,
 							  int right, Blob & obj) {
     int maxRun = 0, maxY = 0, maxX = 0, index = 0;
     // find the biggest Run
-    index = getBigRun(left, right, horizon);
+    index = getBigRun(left, right);
     if (index == BADVALUE) return NOPOST;
     maxRun = runs[index].h;  maxY = runs[index].y;  maxX = runs[index].x;
 
@@ -1311,7 +1309,7 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
  * @return           potential classification
  */
 
-int ObjectFragments::classifyByOtherRuns(int left, int right, int height, int horizon)
+int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 {
     const int HORIZON_TOLERANCE = 10;    // our other post should be near horizon
 	const int MIN_OTHER_THRESHOLD = 20;  // how big does it have to be?
@@ -1358,7 +1356,6 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height, int ho
  * classify posts in our tool box.  The idea is to start with the best ones and
  * keep trying until one produces an answer.
  *
- * @param horizon        the green horizon (y value)
  * @param c              color of the post
  * @param c2             secondary color
  * @param beaconFound      did we find a beacon in this image?
@@ -1368,7 +1365,7 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height, int ho
  * @return               classification
  */
 
-int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
+int ObjectFragments::classifyFirstPost(int c,int c2,
                                        VisualFieldObject* left,
                                        VisualFieldObject* right,
                                        VisualCrossbar* mid, Blob pole)
@@ -1388,7 +1385,7 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
 	// Our first test is whether we see a big blob of the same color
 	// somewhere else
     int post = classifyByOtherRuns(trueLeft, trueRight,
-								   fakeBottom - trueTop, horizon);
+								   fakeBottom - trueTop);
     if (post != NOPOST) {
         if (POSTLOGIC)
             cout << "Found from checkOther" << endl;
@@ -1427,13 +1424,11 @@ int ObjectFragments::classifyFirstPost(int horizon, int c,int c2,
  * @param mid         the backstop
  * @param c           the color we're processing
  * @param c2          the soft color closest to it (e.g. bluegreen for blue)
- * @param horizon     the green field horizon
  */
 // Look for posts and goals given the runs we've collected
 void ObjectFragments::goalScan(VisualFieldObject* left,
                                VisualFieldObject* right,
-                               VisualCrossbar* mid, int c, int c2,
-                               int horizon)
+                               VisualCrossbar* mid, int c, int c2)
 {
     const int IMAGE_EDGE = 3;
 	const int NEAR_DISTANCE = 10;
@@ -1447,7 +1442,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     int nextH = 0;
     distanceCertainty dc = BOTH_UNSURE;
 	Blob pole;
-    int isItAPost = grabPost(c, c2, horizon, IMAGE_WIDTH, -1, pole);
+    int isItAPost = grabPost(c, c2, IMAGE_WIDTH, -1, pole);
 
     // make sure we're looking at something big enough to be a post
     if (isItAPost == NOPOST) {
@@ -1476,7 +1471,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     int pspanY = fakeBottom - trueTop;
 
     // do some sanity checking - this one makes sure the blob is ok
-    if (!locationOk(pole, horizon)) {
+    if (!locationOk(pole)) {
         if (POSTLOGIC)
             cout << "Bad location on post" << endl;
         return;
@@ -1484,6 +1479,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
 	// make sure we have some size to our post
     if (spanY + 1 == 0) return;
 
+	drawBlob(pole, BLACK);
 	// make sure that the ratio of height to width is reasonable
     float rat = (float)(spanX) / (float)(spanY);
     if (!postRatiosOk(rat) && spanY < IMAGE_HEIGHT / 2 && spanX < 30) {
@@ -1494,7 +1490,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     // first characterize the size of the possible pole
     int howbig = characterizeSize(pole);
 	// now see if we can figure out whether it is a right or left post
-    int post = classifyFirstPost(horizon, c, c2, left, right,
+    int post = classifyFirstPost(c, c2, left, right,
 								 mid, pole);
 	// based on those results update the proper data structure
     if (post == LEFT) {
@@ -1545,8 +1541,10 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     // the first post
     point <int> leftP = pole.getLeftTop();
     point <int> rightP = pole.getRightTop();
+	point <int> leftB = pole.getLeftBottom();
+	point <int> rightB = pole.getRightBottom();
 	// ready to grab the potential post
-    isItAPost = grabPost(c, c2, horizon, trueLeft - POST_NEAR_DIST,
+    isItAPost = grabPost(c, c2, trueLeft - POST_NEAR_DIST,
 						 trueRight + POST_NEAR_DIST, pole);
     if (isItAPost == NOPOST) {
 		// we didn't get one
@@ -1602,9 +1600,11 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
 		// sanity checks: post must be reasonably placed with regard
 		// to the field, and must not be too close to the other post
 		// also its size relative to the other post must be ok
-        if (locationOk(pole, horizon) && ratOk && goodSecondPost &&
+        if (locationOk(pole) && ratOk && goodSecondPost &&
             secondPostFarEnough(leftP, rightP, pole.getLeftTop(),
 								pole.getRightTop(), post) &&
+			secondPostFarEnough(leftB, rightB, pole.getLeftBottom(),
+								pole.getRightBottom(), post) &&
 			relativeSizesOk(spanX, pspanY, spanX2, spanY2, trueTop, trueTop2, fudge)) {
             if (post == LEFT) {
                 updateObject(left, pole, _SURE, dc);
@@ -1622,7 +1622,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
 			// before punting let's check if the post came from a side-goal
 			// situation where the relative locations and distances could
 			// be quite awkward
-            if (locationOk(pole, horizon) && ratOk && goodSecondPost &&
+            if (locationOk(pole) && ratOk && goodSecondPost &&
 				pole.getLeftTopX() > trueRight) {
                 // maybe it really is a side-goal situation
                 if (abs(trueTop - trueTop2) < MAX_Y_VALUE &&
@@ -1723,7 +1723,12 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     int y = tempobj.getLeftTopY();
     int spanX = tempobj.width();
     int spanY = tempobj.height();
-    if (spanX < 1 || spanY < 1) return false;
+    if (spanX < 1 || spanY < 1) {
+		if (POSTDEBUG) {
+			cout << "Invalid size in color check" << endl;
+		}
+		return false;
+	}
     int ny, nx, starty, startx;
     int good = 0, total = 0;
     for (int i = 0; i < spanY; i++) {
@@ -1741,9 +1746,13 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
         }
     }
     float percent = (float)good / (float) (total);
+	//cout << "Color check " << percent << " " << minpercent << endl;
     if (percent > minpercent) {
         return true;
     }
+	if (POSTDEBUG) {
+		cout << "Percentages " << percent << " " << minpercent << endl;
+	}
     return false;
 }
 
@@ -1764,11 +1773,10 @@ bool ObjectFragments::postBigEnough(Blob b) {
  * object is ok and the top too.
  * Also, just makes sure that the object is in fact an object.
  * @param b        the potential post
- * @param hor      the green horizon
  * @return         true if it is reasonably located, false otherwise
  */
 
-bool ObjectFragments::locationOk(Blob b, int hor)
+bool ObjectFragments::locationOk(Blob b)
 {
     const int MIN_HORIZON = -50;
 	const int TALL_POST = 55;
@@ -1781,18 +1789,12 @@ bool ObjectFragments::locationOk(Blob b, int hor)
         }
         return false;
     }
-    if (hor < MIN_HORIZON) {
-        if (POSTLOGIC) {
-            cout << "Horizon too high" << endl;
-        }
-        return false;
-    }
     int trueLeft = b.getLeft();       // leftmost value
     int trueRight = b.getRight();
     int trueTop = b.getTop();
     int trueBottom = b.getBottom();
-    int horizonLeft = yProject(0, hor, trueLeft);          // horizon at left
-    int horizonRight = yProject(0, hor, trueRight);        // horizon at right
+    int horizonLeft = horizonAt(trueLeft);
+    int horizonRight = horizonAt(trueRight);
     int spanX = b.width();
     int spanY = b.height();
     int mh = min(horizonLeft, horizonRight);
@@ -1812,10 +1814,7 @@ bool ObjectFragments::locationOk(Blob b, int hor)
         } else {
         }
     }
-	if (trueTop < 1) return true;
-    //if (trueRight - trueLeft > IMAGE_WIDTH - 10) return true;
-    return horizonTopOk(trueTop, max(horizonAt(trueLeft),
-                                     horizonAt(trueRight)));
+	return true;
 }
 
 /* Objects need to be at or below the horizon.  We get the basic shape of the
@@ -1871,33 +1870,6 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight,
     return true;
 }
 
-/* The top of objects need to be above the horizon.  Make sure they are.
- * Note:  we had to futz with this in Atlanta because of the wonky field
- * conditions.
- * @param top      the top of the post
- * @param hor      the green field horizon
- * @return         true when the horizon is below the top of the object
- */
-bool ObjectFragments::horizonTopOk(int top, int hor)
-{
-    const int DEBUG_X = 100;
-
-    //if (hor <= 0) return false;
-    if (top < 0) return true;
-    if (top + MIN_GOAL_HEIGHT / 2 > hor && hor > 0) {
-        if (SANITY) {
-            drawPoint(DEBUG_X, top, RED);
-            drawPoint(DEBUG_X, hor, BLACK);
-            cout << "Top is " << top << " " << hor << endl;
-            cout << "Problems at top" << endl;
-        }
-        return false;
-    }
-    if (SANITY)
-        cout << "Horizon top is ok " << top << " " << hor << endl;
-
-    return true;
-}
 
 /*  Posts shouldn't show up too close to each other (yes, I realize they can be
  * when you're looking from the side).  Make sure there is some separation.
