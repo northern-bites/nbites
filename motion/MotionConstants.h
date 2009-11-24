@@ -34,6 +34,7 @@ namespace MotionConstants {
 		HEAD_JOINT,
         GAIT,
         SET_HEAD,
+		COORD_HEAD,
         STIFFNESS,
         FREEZE,
         UNFREEZE

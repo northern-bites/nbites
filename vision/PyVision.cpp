@@ -155,8 +155,10 @@ PyPose_new (NaoPose *p)
         self->leftHorizonY = PyInt_FromLong(p->getLeftHorizonY());
         self->rightHorizonY = PyInt_FromLong(p->getRightHorizonY());
         self->horizonSlope = PyFloat_FromDouble(p->getHorizonSlope());
-        //self->bodyCenterHeight = PyFloat_FromDouble(p->getBodyCenterHeight());
+        self->bodyCenterHeight = PyFloat_FromDouble(p->getBodyCenterHeight());
         //self->panAngle = PyFloat_FromDouble(p->getPan());
+		self->cameraInWorldFrameZ =
+			PyFloat_FromDouble(p->getFocalPointInWorldFrameZ());
 
         if (self->leftHorizonY == NULL || self->rightHorizonY == NULL ||
             self->horizonSlope == NULL //|| self->bodyCenterHeight == NULL ||
@@ -182,13 +184,18 @@ PyPose_update (PyPose *self)
     Py_XDECREF(self->horizonSlope);
     self->horizonSlope = PyFloat_FromDouble(self->pose->getHorizonSlope());
 
-    //Py_XDECREF(self->bodyCenterHeight);
-    //self->bodyCenterHeight = PyFloat_FromDouble(
-    //    self->pose->getBodyCenterHeight());
+	Py_XDECREF(self->cameraInWorldFrameZ);
+	self->cameraInWorldFrameZ =
+		PyFloat_FromDouble(self->pose->getFocalPointInWorldFrameZ());
+
+    Py_XDECREF(self->bodyCenterHeight);
+    self->bodyCenterHeight = PyFloat_FromDouble(
+        self->pose->getBodyCenterHeight());
 
     //Py_XDECREF(self->panAngle);
     //self->panAngle = PyFloat_FromDouble(self->pose->getPan());
 }
+
 
 // backend methods
 extern PyObject *
@@ -205,8 +212,9 @@ PyPose_dealloc (PyPose *self)
     Py_XDECREF(self->leftHorizonY);
     Py_XDECREF(self->rightHorizonY);
     Py_XDECREF(self->horizonSlope);
-    //Py_XDECREF(self->bodyCenterHeight);
-    //Py_XDECREF(self->panAngle);
+    Py_XDECREF(self->bodyCenterHeight);
+	Py_XDECREF(self->cameraInWorldFrameZ);
+//Py_XDECREF(self->panAngle);
 
     self->ob_type->tp_free((PyObject *)self);
 }
@@ -220,7 +228,6 @@ PyPose_update (PyObject *self, PyObject *args)
     Py_INCREF(Py_None);
     return Py_None;
 }
-
 
 
 //

@@ -45,8 +45,9 @@ typedef struct PyPose_t {
     PyObject *leftHorizonY, *rightHorizonY;
     // Slope of the horizon line
     PyObject *horizonSlope;
+	PyObject *cameraInWorldFrameZ;
     // Height of body in space
-    //PyObject *bodyCenterHeight;
+    PyObject *bodyCenterHeight;
     // Angle of head to body
     //PyObject *panAngle;
 } PyPose;
@@ -82,8 +83,10 @@ static PyMemberDef PyPose_members[] = {
      "Right horizon y coordinate"},
     {"horizonSlope", T_OBJECT_EX, offsetof(PyPose, horizonSlope), READONLY,
      "Slope of the horizon line"},
-    //{"bodyCenterHeight", T_OBJECT_EX, offsetof(PyPose, bodyCenterHeight),
-    //  READONLY, "Height of center of body in space"},
+	{"cameraInWorldFrameZ",T_OBJECT_EX, offsetof(PyPose, cameraInWorldFrameZ),
+	 READONLY, "z coordinate of camera in global coord frame"},
+    {"bodyCenterHeight", T_OBJECT_EX, offsetof(PyPose, bodyCenterHeight),
+      READONLY, "Height of center of body in space"},
     //{"panAngle", T_OBJECT_EX, offsetof(PyPose, panAngle), READONLY,
     //   "Angle of the head to body"},
 

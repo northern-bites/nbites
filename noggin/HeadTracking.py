@@ -7,7 +7,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 import util.MyMath as MyMath
 from man.motion import StiffnessModes
-from math import (fabs, atan, atan2, sqrt, pi)
+from math import (fabs)
 
 class HeadTracking(FSA.FSA):
     def __init__(self, brain):
@@ -181,18 +181,22 @@ class HeadTracking(FSA.FSA):
     def lookToLandmark(self, landmark):
         self.lookToPoint(landmark.x, landmark.y, 0)
 
-    #move to c++? relHeight easier to get. myX,myY would need to be passed
-    #in for easy access
     def lookToPoint(self, visGoalX, visGoalY, visGoalHeight):
+        pose = self.brain.vision.pose
+        cameraInWorldFrameZ = pose.cameraInWorldFrameZ
+        comHeight = pose.bodyCenterHeight
+        lensHeight = cameraInWorldFrameZ + comHeight
+        lensHeightInCM = lensHeight/10.
         my = self.brain.my
-        headMove = motion.CoordHeadCommand(my.x, my.y, 200, my.h,
-                                           visGoalX, visGoalY, visGoalHeight,
-                                           2.0, 2.0)
+        print my.x, visGoalX
+        print my.y, visGoalY
+        # can't simply add cameraOffset from body to these b/c of the ability
+        # for the robot to turn (global y !=  robot y)
+        relX = visGoalX - my.x
+        relY = visGoalY - my.y
+        print my.h
+        #relH is relative to camera height. negative is normal
+        relHeight = visGoalHeight - (lensHeightInCM)
+        print relX, relY, relHeight
+        headMove = motion.CoordHeadCommand(relX, relY, relHeight, my.h)
         self.brain.motion.coordHead(headMove)
-'''
-File "/Applications/Webots/projects/contests/nao_robocup/controllers/nao_soccer_player_red/lib/man/noggin/HeadTracking.py", line 190, in lookToPoint  2.0, 2.0)
-Boost.Python.ArgumentError: Python argument types in CoordHeadCommand.__init__(CoordHeadCommand, float, float, int, float, float, float, int, float, float)
- did not match C++ signature:
-     __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
-    __init__(_object*, int myX, int myY, int myHeight, float myBearing, int goalX, int goalY, int goalHeight, float maxYawSpeed, float maxPitchSpeed)
-'''

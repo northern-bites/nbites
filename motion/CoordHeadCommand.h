@@ -22,26 +22,29 @@
 #define _CoordHeadCommand_h_DEFINED
 
 #include "Kinematics.h"
+#include "NaoPose.h"
 #include <cmath>
 
 class CoordHeadCommand : public MotionCommand
 {
 public:
-    CoordHeadCommand(const int _robotX, const int _robotY,
-					 const int _cameraHeight, const float _robotBearing,
-					 const int _visualGoalX, const int _visualGoalY,
-					 const int _visualGoalHeight,
+    CoordHeadCommand(const float _relX, const float _relY,
+					 const float _relHeight,
+					 const float _robotBearing,
 					 const float _maxSpeedYaw =
 					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 					 const float _maxSpeedPitch =
 					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		)
-        : MotionCommand(MotionConstants::SET_HEAD),
-          relX(_visualGoalX - _robotX), relY(_visualGoalY - _robotY),
-		  relHeight(_visualGoalHeight - _cameraHeight ),
-		  robotBearing(_robotBearing),
-		  maxSpeedYaw(_maxSpeedYaw), maxSpeedPitch(_maxSpeedPitch),
-		  yaw(calcYaw()),pitch(calcPitch())
+        : MotionCommand( MotionConstants::COORD_HEAD ),
+          relX( _relX),
+		  relY( _relY),
+		  relHeight( _relHeight),
+		  robotBearing( _robotBearing ),
+		  maxSpeedYaw( _maxSpeedYaw ),
+		  maxSpeedPitch( _maxSpeedPitch ),
+		  yaw(calcYaw()),
+		  pitch(calcPitch())
         {
             setChainList();
         }
@@ -51,11 +54,20 @@ public:
 	const float getYaw() const { return yaw; }
 private:
 	const float calcYaw() {
-		return atan2(relX, relY) - robotBearing;
+		std::cout << "robotBearing" << robotBearing << std::endl;
+		float yawTemp = atan2( relY, relX ) - robotBearing;
+		std::cout << "yaw" << yawTemp << std::endl;
+		return yawTemp;
 	}
 	const float calcPitch() {
-		float dist = sqrt(relX*relX + relY*relY);
-		return atan(relHeight/dist);
+		float groundDist = sqrt( relX * relX + relY * relY );
+		//b/c groundDist is always positive, no need for atan2
+		float pitchTemp = atan( relHeight / groundDist);
+		//b/c we use lower angled camera we need to adjust by constant angle
+		pitchTemp = pitchTemp - 0.6981;//40 degrees to radians (from reddoc)
+		std::cout << "groundDist" << groundDist << std::endl;
+		std::cout << "pitchTemp" << pitchTemp << std::endl;
+		return pitchTemp;
 	}
 
     virtual void setChainList() {
@@ -65,7 +77,7 @@ private:
                          + MotionConstants::HEAD_JOINT_NUM_CHAINS);
     }
 private:
-    const int relX, relY, relHeight;
+    const float relX, relY, relHeight;
 	const float robotBearing, maxSpeedYaw, maxSpeedPitch;
 	const float yaw, pitch;
 };

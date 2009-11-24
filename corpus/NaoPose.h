@@ -180,6 +180,8 @@ public:
     const float getHeadPitch() {
       return sensors->getHeadAngles()[1];
     }
+	const float getBodyCenterHeight() { return comHeight; }
+	const float getFocalPointInWorldFrameZ() { return focalPointInWorldFrame.z;}
 
 protected: // helper methods
     static const boost::numeric::ublas::matrix <float>
@@ -216,7 +218,7 @@ protected: // members
     float bodyInclinationY;
     boost::shared_ptr<Sensors> sensors;
     point <int> horizonLeft, horizonRight;
-    float horizonSlope,perpenHorizonSlope;;
+    float horizonSlope,perpenHorizonSlope;
     point3 <float> focalPointInWorldFrame;
     float comHeight; // center of mass height in mm
     // In this array we hold the matrix transformation which takes us from the

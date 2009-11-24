@@ -250,14 +250,12 @@ private:
 
 class PyCoordHeadCommand {
 public:
-	PyCoordHeadCommand(const int myX, const int myY, const int myHeight,
-					 const float myBearing,
-					 const int goalX, const int goalY, const int goalHeight,
-					 const float maxYawSpeed, const float maxPitchSpeed) {
-        command = new CoordHeadCommand( myX, myY, myHeight, myBearing * TO_RAD,
-										goalX, goalY, goalHeight,
-										maxYawSpeed * TO_RAD,
-										maxPitchSpeed * TO_RAD);
+	PyCoordHeadCommand( const float relX,
+						const float relY,
+						const float relHeight,
+						const float myBearing ) {
+        command = new CoordHeadCommand( relX, relY, relHeight,
+										myBearing * TO_RAD );
     }
 
     CoordHeadCommand* getCommand() const { return command; }
@@ -397,22 +395,12 @@ BOOST_PYTHON_MODULE(_motion)
         ;
 
     class_<PyCoordHeadCommand>("CoordHeadCommand",
-                             init<int,int,int,float,int,int,int,float,float>
-							   (args("myX", "myY", "myHeight",
-									 "myBearing", "goalX",
-									 "goalY", "goalHeight",
-									 "maxYawSpeed",
-									 "maxPitchSpeed"),
-								"A container for a coord head command. Holds way too much"))
-		.def(init<int,int,int,float,int,int,int,float,float>(args("myX", "myY",
-																  "myHeight",
-																  "myBearing",
-																  "goalX",
-																  "goalY",
-																  "goalHeight",
-																  "maxYawSpeed",
-																 "maxPitchSpeed"
-																 )));
+							   init<float, float, float, float>
+							   (args("relX", "relY", "relHeight", "myBearing"),
+								"A container for a coord head command."))
+		.def(init<float, float, float, float>( args( "relX", "relY",
+													 "relHeight", "myBearing")))
+		;
 
     class_<PyWalkCommand>("WalkCommand",
                           init<float, float, float>(args("x","y","theta"),
