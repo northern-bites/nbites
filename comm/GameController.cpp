@@ -549,7 +549,7 @@ PyObject* PyGameController_get (PyGameController* self, void* closure)
     PyObject *result = NULL;
 
     Py_BEGIN_ALLOW_THREADS;
-    switch (reinterpret_cast<int>(closure)) {
+    /*switch (reinterpret_cast<int>(closure)) {
     case GC_TEAM:
         result = PyInt_FromLong(self->_gc->team());
         break;
@@ -572,7 +572,7 @@ PyObject* PyGameController_get (PyGameController* self, void* closure)
         result = PyInt_FromLong(self->_gc->gameSecondaryState());
         break;
 
-    }
+		}*/
     Py_END_ALLOW_THREADS;
 
     return result;
@@ -593,7 +593,7 @@ int PyGameController_set (PyGameController* self, PyObject* value, void* closure
     int tmp, result = 0;
 
     Py_BEGIN_ALLOW_THREADS;
-    switch (reinterpret_cast<int>(closure)) {
+    /*switch (reinterpret_cast<int>(closure)) {
     case GC_TEAM:
         self->_gc->setTeam(static_cast<uint8>(PyInt_AsLong(value)));
         break;
@@ -640,7 +640,7 @@ int PyGameController_set (PyGameController* self, PyObject* value, void* closure
         }else
             self->_gc->setPenalty(static_cast<GCPenalty>(tmp));
         break;
-    }
+		}*/
     Py_END_ALLOW_THREADS;
 
     return result;

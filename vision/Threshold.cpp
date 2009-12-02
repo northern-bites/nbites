@@ -466,7 +466,7 @@ void Threshold::detectSelf() {
 	const int HIGHBOUND = -50;
 	const int COMPENSATION = 20;
 
-	cout << "Values " << pixInImageLeft << " " << pixInImageRight << " " << pixInImageUp << endl;
+	//cout << "Values " << pixInImageLeft << " " << pixInImageRight << " " << pixInImageUp << endl;
 
 	for (int i = 0; i < IMAGE_WIDTH; i++) {
 		lowerBound[i] = IMAGE_HEIGHT - 1;
@@ -567,7 +567,7 @@ void Threshold::objectRecognition() {
 		int y = min(vision->bgrp->getLeftBottomY(), IMAGE_HEIGHT -1);
 		int x1 = min(IMAGE_WIDTH - 1, vision->bgrp->getRightBottomX());
 		int y1 = min(IMAGE_HEIGHT - 1, vision->bgrp->getRightBottomY());
-		int h = vision->bgrp->getHeight();
+		int h = (int)vision->bgrp->getHeight();
 		if ((y  > lowerBound[x] && lowerBound[x] < IMAGE_HEIGHT - 1 &&
 				y - lowerBound[x] > h /2)
 			|| (y1 > lowerBound[x1] && lowerBound[x1] < IMAGE_HEIGHT - 1 &&
@@ -582,7 +582,7 @@ void Threshold::objectRecognition() {
 		int y = min(vision->bglp->getLeftBottomY(), IMAGE_HEIGHT -1);
 		int x1 = min(IMAGE_WIDTH - 1, vision->bglp->getRightBottomX());
 		int y1 = min(IMAGE_HEIGHT - 1, vision->bglp->getRightBottomY());
-		int h = vision->bglp->getHeight();
+		int h = (int)vision->bglp->getHeight();
 		if ((y  > lowerBound[x] && lowerBound[x] < IMAGE_HEIGHT - 1 &&
 				y - lowerBound[x] > h / 2)
 			|| (y1 > lowerBound[x1] && lowerBound[x1] < IMAGE_HEIGHT - 1 &&
@@ -749,35 +749,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 				static_cast<int>(bottomOfObjectX),
 				static_cast<int>(bottomOfObjectY), 0.0f).dist;
 
-            switch (cert) {
-            case HEIGHT_UNSURE:
-                // NOTE: turning this off, if the height is unsure, it probably
-                // means we have a bad blob off the height, and we shouldn't
-                // limit based on it
-
-                // // the height is too small - it can still be used as a ceiling
-                // if (disth < distw)
-                //     dist = disth;
-                // else
-                dist = distw;
-		if (distw < 200 && bottomOfObjectY < IMAGE_HEIGHT - 2) {
-		  dist = poseDist;
-		}
-                break;
-            case WIDTH_UNSURE:
-                dist = disth;
-                break;
-            case BOTH_UNSURE:
-                // We choose the min distance here, since that means more pixels
-	      if (bottomOfObjectY < IMAGE_HEIGHT - 4)
-		dist = min( poseDist, min(disth, distw));
-	      else
-		dist = min( disth, distw);
-                break;
-            case BOTH_SURE:
-                dist = disth;
-                break;
-            }
+			dist = chooseGoalDistance(cert, disth, distw, poseDist, bottomOfObjectY);
 	    #if defined OFFLINE && defined PRINT_VISION_INFO
 
             //print("{%g,%g},", poseDist, dist);
@@ -814,6 +786,36 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
     }
+}
+/** Choose the best way to measure goal distance based on our certainty about
+ * the sizes of width and height.
+ */
+
+float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
+									float distw, float poseDist, int bottom) {
+	float dist = 0.0f;
+	switch (cert) {
+	case HEIGHT_UNSURE:
+		dist = distw;
+		if (distw < 200 && bottom < IMAGE_HEIGHT - 2) {
+			dist = poseDist;
+		}
+		break;
+	case WIDTH_UNSURE:
+		dist = disth;
+		break;
+	case BOTH_UNSURE:
+		// We choose the min distance here, since that means more pixels
+		if (bottom < IMAGE_HEIGHT - 4)
+			dist = min( poseDist, min(disth, distw));
+		else
+			dist = min( disth, distw);
+		break;
+	case BOTH_SURE:
+		dist = disth;
+		break;
+	}
+	return dist;
 }
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.

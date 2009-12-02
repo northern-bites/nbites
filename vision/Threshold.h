@@ -96,6 +96,8 @@ public:
     void setFieldObjectInfo(VisualFieldObject *objPtr);
     void setVisualRobotInfo(VisualRobot *objPtr);
 	void setVisualCrossInfo(VisualCross *objPtr);
+	float chooseGoalDistance(distanceCertainty cert, float height, float width,
+							 float poseDist, int bottom);
     float getGoalPostDistFromHeight(float height);
     float getGoalPostDistFromWidth(float width);
     float getBeaconDistFromHeight(float height);

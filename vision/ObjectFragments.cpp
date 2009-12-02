@@ -963,16 +963,16 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
  * an object is too near one of the screen edges, or if we have some evidence
  * that it is occluded then we note uncertainty in that dimension.
  *
- * @param left     the leftmost point of the object
- * @param right    the rightmost point of the object
- * @param top      the topmost point of the object
- * @param bottom   the bottommost point of the object
+ * @param pole     the object we are checking
  * @return         a constant indicating where the uncertainties (if any) lie
  */
-distanceCertainty ObjectFragments::checkDist(int left, int right, int top,
-                                             int bottom, Blob pole)
+distanceCertainty ObjectFragments::checkDist(Blob pole)
 {
     const int ERROR_TOLERANCE = 6;
+	int left = pole.getLeft();
+	int right = pole.getRight();
+	int bottom = pole.getBottom();
+	int top = pole.getTop();
 
     distanceCertainty dc = BOTH_SURE;
     int nextX, nextY;
@@ -1111,6 +1111,10 @@ int ObjectFragments::grabPost(int c, int c2, int left,
     if (!postBigEnough(obj)) {
         return NOPOST;
     }
+	// check how big it is versus how big we think it should be
+	if (badDistance(obj)) {
+		return NOPOST;
+	}
     return LEFT; // Just return something other than NOPOST
 }
 
@@ -1477,7 +1481,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
         return;
     }
 
-    dc = checkDist(trueLeft, trueRight, trueTop, trueBottom, pole);
+    dc = checkDist(pole);
     // first characterize the size of the possible pole
     int howbig = characterizeSize(pole);
 	// now see if we can figure out whether it is a right or left post
@@ -1558,7 +1562,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
         int trueBottom2 = pole.getBottom();
         int spanX2 = pole.width();
         int spanY2 = pole.height();
-        dc = checkDist(trueLeft2, trueRight2, trueTop2, trueBottom2, pole);
+        dc = checkDist(pole);
         rat = (float)spanX2 / (float)spanY2;
         bool ratOk = postRatiosOk(rat) || (!greenCheck(pole) && rat < SQUATRAT);
         bool goodSecondPost = checkSize(pole, c);
@@ -1760,6 +1764,30 @@ bool ObjectFragments::postBigEnough(Blob b) {
     return true;
 }
 
+/** Compare the pixEstimated distance with the distance we get from
+ *  widths and/or height if possible.  If they are off by too much
+ *  then punt this object
+ */
+
+bool ObjectFragments::badDistance(Blob b) {
+	int x = b.getLeftBottomX();
+	int y = b.getLeftBottomY();
+	int bottom = b.getBottom();
+	estimate e = vision->pose->pixEstimate(x, y, 0.0);
+	distanceCertainty dc = checkDist(b);
+	float disth = thresh->getGoalPostDistFromHeight(b.height());
+	float distw = thresh->getGoalPostDistFromWidth(b.width());
+	float diste = e.dist;
+	// this is essentially the code from Threshold.h
+	float choose = thresh->chooseGoalDistance(dc, disth, distw, diste,
+											  bottom);
+	if (diste > 0.0f && choose > 2 * diste || choose * 2 < diste) {
+		cout << "Trowing out post.  Distance estimate is " << e.dist << endl;
+		cout << "Dist from height width " << disth << " " << distw << endl;
+	}
+	return false;
+}
+
 /* Combines several sanity checks into one.  Checks that the bottom of the
  * object is ok and the top too.
  * Also, just makes sure that the object is in fact an object.
@@ -1784,8 +1812,8 @@ bool ObjectFragments::locationOk(Blob b)
     int trueRight = b.getRight();
     int trueTop = b.getTop();
     int trueBottom = b.getBottom();
-    int horizonLeft = horizonAt(trueLeft);
-    int horizonRight = horizonAt(trueRight);
+    int horizonLeft = horizonAt(b.getLeftBottomX());
+    int horizonRight = horizonAt(b.getRightBottomX());
     int spanX = b.width();
     int spanY = b.height();
     int mh = min(horizonLeft, horizonRight);

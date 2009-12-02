@@ -6,10 +6,10 @@
 
 #The default is to read your username from the shell.
 #USERNAME = $(shell echo $$USER)
-#USERNAME = <enter your bowdoin id here>
-USERNAME = robocup
+USERNAME = echown
+#USERNAME = robocup
 EXCLUDE = Makefile*
-SOURCE = robocup.bowdoin.edu:/home/robocup/tables
+SOURCE = robocup.bowdoin.edu:/mnt/research/robocup/tables
 DEST = .
 RSYNC = rsync
 RSYNC_OPTS = -rvzc  #recursive, verbose, compress, checksum (binary diff)

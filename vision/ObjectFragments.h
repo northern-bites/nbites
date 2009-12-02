@@ -87,8 +87,7 @@ public:
     int getBigRun(int left, int right);
     bool updateObject(VisualFieldObject* a, Blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
-    distanceCertainty checkDist(int left, int right, int top, int bottom,
-								Blob pole);
+    distanceCertainty checkDist(Blob pole);
 
     // post recognition routines
     int classifyByCrossbar(Blob b);
@@ -119,6 +118,7 @@ public:
     bool secondPostFarEnough(point <int> l1, point <int> r1,
                              point <int> l2, point <int> r2, int p);
     bool blobOk(Blob b);
+	bool badDistance(Blob b);
     bool locationOk(Blob b);
     bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
 
