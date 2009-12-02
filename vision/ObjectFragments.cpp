@@ -1781,10 +1781,10 @@ bool ObjectFragments::badDistance(Blob b) {
 	// this is essentially the code from Threshold.h
 	float choose = thresh->chooseGoalDistance(dc, disth, distw, diste,
 											  bottom);
-	if (diste > 0.0f && choose > 2 * diste || choose * 2 < diste) {
-		cout << "Trowing out post.  Distance estimate is " << e.dist << endl;
+	/*if (diste > 0.0f && choose > 2 * diste || choose * 2 < diste) {
+		cout << "Throwing out post.  Distance estimate is " << e.dist << endl;
 		cout << "Dist from height width " << disth << " " << distw << endl;
-	}
+		}*/
 	return false;
 }
 
