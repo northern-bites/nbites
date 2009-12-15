@@ -1,4 +1,5 @@
 import man.motion.SweetMoves as SweetMoves
+import man.motion.HeadMoves as HeadMoves
 
 NUM_FRAMES_TO_SAVE = 500
 MAX_DIST_TO_MEASURE = 300
@@ -29,8 +30,8 @@ def standup(player):
     return player.stay()
 
 def saveFrames(player):
-    # if player.firstFrame():
-    #     player.brain.tracker.locPans()
+    if player.firstFrame():
+        player.brain.tracker.startScan(HeadMoves.DATA_PAN)
 
     #player.brain.sensors.saveFrame()
     player.savePostInfo()
@@ -45,8 +46,8 @@ def saveFrames(player):
     return player.stay()
 
 def waitBetweenDists(player):
-    if player.firstFrame():
-        player.zeroHeads()
+    # if player.firstFrame():
+    #     player.zeroHeads()
     if player.counter > FRAMES_TO_WAIT:
         return player.goLater('saveFrames')
     return player.stay()

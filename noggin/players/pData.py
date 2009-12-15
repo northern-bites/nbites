@@ -11,10 +11,16 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.lastDistance = 0
 
         # Specify which object is being studied
-        self.object = self.brain.ygrp
+        self.objects = (self.brain.ygrp, self.brain.yglp)
 
     def savePostInfo(self):
-        if self.object.dist == 0.0:
+        both_zero = True
+        for obj in self.objects:
+            if obj.dist != 0.0:
+                both_zero = False
+                break
+
+        if both_zero:
             return
 
         filename = "/home/root/postDistData" + str(self.postDistance) + ".csv"
@@ -25,7 +31,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                 os.path.exists(filename):
             self.lastDistance = self.postDistance
             os.remove(filename)
-        csv = open(filename,'a+')
+            csv = open(filename,'a+')
+            csv.write("dist,bearing\n")
+        else :
+            csv = open(filename,'a+')
 
-        csv.write(str(self.object.dist) + "," + str(self.object.bearing) + '\n')
+        for obj in self.objects:
+            if obj.dist !=0.0 and abs(obj.dist - self.postDistance) < 100:
+                csv.write(str(obj.dist) + "," + str(obj.bearing) + '\n')
+                print obj.dist, obj.bearing
         csv.close()
