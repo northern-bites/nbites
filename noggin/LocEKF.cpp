@@ -291,8 +291,8 @@ void LocEKF::incorporateMeasurement(Observation z,
         H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
 
         // Update the measurement covariance matrix
-        R_k(0,0) = z.getDistanceSD();
-        R_k(1,1) = z.getDistanceSD();
+        R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
+        R_k(1,1) = z.getDistanceSD() * z.getDistanceSD();
 
     } else {
 
@@ -333,8 +333,8 @@ void LocEKF::incorporateMeasurement(Observation z,
         H_k(1,2) = -1;
 
         // Update the measurement covariance matrix
-        R_k(0,0) = z.getDistanceSD();
-        R_k(1,1) = z.getBearingSD();
+        R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
+        R_k(1,1) = z.getBearingSD() * z.getBearingSD();
 
 #ifdef DEBUG_LOC_EKF_INPUTS
         cout << "\t\t\tR vector is" << R_k << endl;

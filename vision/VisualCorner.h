@@ -80,10 +80,10 @@ private: // private methods
     const shape getLClassification();
     void determineCornerIDFromShape();
     inline float cornerDistanceToSD(float _distance) {
-        return 2.0f * std::max(10 + _distance*0.00125f, 250.0f);
+        return sqrt(2.0f * std::max(10 + _distance*0.00125f, 250.0f));
     }
     inline float cornerBearingToSD(float _bearing) {
-        return static_cast<float>(M_PI) / 4.0f;
+        return sqrt(static_cast<float>(M_PI) / 4.0f);
     }
 
 
