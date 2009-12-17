@@ -188,7 +188,7 @@ private:
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;
 
-    unsigned char bigTable[YMAX][UMAX][VMAX];
+    unsigned char bigTable[UMAX][VMAX][YMAX];
 
     // open field variables
     int openField[IMAGE_WIDTH];

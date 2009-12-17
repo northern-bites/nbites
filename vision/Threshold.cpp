@@ -236,30 +236,30 @@ void Threshold::threshold() {
     // here is non-unrolled loop (unrolled by 2, actually)
     while (tPtr < tOff) {
         // we increment Y by 2 every time, and U and V by 4 every two times
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2; uPtr+=4; vPtr+=4;
     }
 
     // here is the unrolled loop
     while (tPtr < tEnd) {
         // Eight unrolled table lookups
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2; uPtr+=4; vPtr+=4;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2; uPtr+=4; vPtr+=4;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2; uPtr+=4; vPtr+=4;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2;
-        *tPtr++ = bigTable[*yPtr>>YSHIFT][*uPtr>>USHIFT][*vPtr>>VSHIFT];
+        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
         yPtr+=2; uPtr+=4; vPtr+=4;
     }
 
@@ -1028,9 +1028,9 @@ void Threshold::initTable(std::string filename) {
     }
 
     //actually read the table into memory
-    for(int i=0; i< YMAX; i++)
-        for(int j=0; j<UMAX; j++){
-            fread(bigTable[i][j], sizeof(unsigned char), VMAX, fp);
+    for(int i=0; i< UMAX; i++)
+        for(int j=0; j<VMAX; j++){
+            fread(bigTable[i][j], sizeof(unsigned char), YMAX, fp);
         }
 
 #ifndef OFFLINE
@@ -1045,13 +1045,13 @@ void Threshold::initTableFromBuffer(byte * tbfr)
 {
 
     byte* source = tbfr;
-    for(int i=0; i< YMAX; i++)
-        for(int j=0; j<UMAX; j++){
+    for(int i=0; i< UMAX; i++)
+        for(int j=0; j<VMAX; j++){
             //pointer to beginning of row:
             byte* dest = bigTable[i][j];
             //copy over a whole row into big table from the buffer
-            memcpy(dest,source,YMAX);
-            source+=YMAX;//advance the source bugger
+            memcpy(dest,source,UMAX);
+            source+=UMAX;//advance the source bugger
         }
 }
 
@@ -1099,12 +1099,12 @@ void Threshold::initCompressedTable(std::string filename){
     unsigned char *fileTraverse = fileData;
 
 
-    for(int i=0; i< YMAX; i++) {
+    for(int i=0; i< UMAX; i++) {
         //printf("vtoro");
-        for(int j=0; j<UMAX; j++){
+        for(int j=0; j<VMAX; j++){
             //64 bytes per chunk
             //fread(bigTable[i][j], sizeof(unsigned char), vMax, fp);
-            for(int k=0; k<VMAX; k++) {
+            for(int k=0; k<YMAX; k++) {
                 bigTable[i][j][k] = *fileTraverse;
                 fileTraverse++;
             }
