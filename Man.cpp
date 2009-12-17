@@ -88,6 +88,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                            sensors, motion->getInterface()));
 #endif// USE_NOGGIN
+	PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
 Man::~Man ()
@@ -166,9 +167,10 @@ Man::processFrame ()
     //if(camera_active)
     //vision->copyImage(sensors->getImage());
 #endif
-    PROF_EXIT(profiler.get(), P_GETIMAGE);
+
 
     PROF_ENTER(profiler.get(), P_FINAL);
+	PROF_EXIT(profiler.get(), P_GETIMAGE);
 #ifdef USE_VISION
     //if(camera_active)
     vision->notifyImage(sensors->getImage());
@@ -183,16 +185,16 @@ Man::processFrame ()
     lights->sendLights();
     PROF_EXIT(profiler.get(), P_LIGHTS);
 
+	PROF_ENTER(profiler.get(), P_GETIMAGE);
     PROF_EXIT(profiler.get(), P_FINAL);
     PROF_NFRAME(profiler.get());
-
-    PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
 
 void Man::notifyNextVisionImage() {
     // Synchronize noggin's information about joint angles with the motion
     // thread's information
+
     sensors->updateVisionAngles();
 
     transcriber->postVisionSensors();
