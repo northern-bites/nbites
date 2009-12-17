@@ -291,8 +291,13 @@ void LocEKF::incorporateMeasurement(Observation z,
         H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
 
         // Update the measurement covariance matrix
-        R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
-        R_k(1,1) = z.getDistanceSD() * z.getDistanceSD();
+		const float dist_sd_2 = pow(z.getDistanceSD(), 2);
+		const float v = dist_sd_2 * sin(z.getBearingSD()) * cos(z.getBearingSD());
+
+        R_k(0,0) = dist_sd_2 * pow(cos(z.getBearingSD()), 2);
+		R_k(0,1) = v;
+		R_k(1,0) = v;
+        R_k(1,1) = dist_sd_2 * pow(sin(z.getBearingSD()), 2);
 
     } else {
 
