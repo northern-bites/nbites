@@ -37,3 +37,5 @@ noggin/util/fakeData/*
 /motion/README.toc
 /motion/README.pdf
 docs*
+/noggin/offline/*.o
+/noggin/offline/faker
