@@ -4,6 +4,7 @@
 # The basic diefinitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
 
+cmake_policy(SET CMP0011 OLD)
 
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
