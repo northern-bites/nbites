@@ -14,6 +14,7 @@ class VisualFieldObject;
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 #include "Blob.h"
+#include "stdio.h"
 
 // This class should eventually inheret from VisualLandmark, once it is
 // cleaned a bit
