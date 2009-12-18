@@ -171,7 +171,7 @@ TARGETS = \
 	#$(PEDITOR_DIR) \
 	#$(ZSPACE_DIR) \
 
-.PHONY: all clean clean_java clean_python clean_vision vision run prompt $(TARGETS)
+.PHONY: all clean clean_java clean_python clean_vision vision $(TARGETS)
 
 all: $(JAVA_BUILD) #$(LOGGING_INSTALL)
 
@@ -222,13 +222,6 @@ $(LOGGING_CLEAN):
 
 %.class: %.java
 	$(JAVAC) $(JAVACFLAGS) $<
-
-run: all
-	$(JAVA) $(JAVA_OPTS) $(MAIN) #-jar $(JAR_FILE)
-	@#$(PYTHON) $(PYTHON_TOOL)
-
-prompt: all
-	@$(PYTHON) -ic "from jpype import startJVM, JArray, java; startJVM();java.net.URLClassLoader(JArray(java.net.URL)(java.net.URL('jar:file:///home/jfishman/robo/branches/TOOL/mysql-connector-java-5.1.6-bin.jar!/'))).loadClass('com.mysql.jdbc.Driver')"
 
 clean: clean_java clean_python clean_vision
 
