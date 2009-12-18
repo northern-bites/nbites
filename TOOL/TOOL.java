@@ -41,7 +41,6 @@ import TOOL.Calibrate.CalibrateModule;
 import TOOL.ColorEdit.ColorEditModule;
 import TOOL.ColorEdit.ColorEdit;
 import TOOL.Classifier.ClassifierModule;
-import TOOL.VisionTester.VisionTesterModule;
 import TOOL.Console.Console;
 import TOOL.GUI.MultiTabbedPane;
 import TOOL.Image.*;
@@ -172,8 +171,6 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         CalibrateModule calibrator = new CalibrateModule(this);
         calibrate = calibrator.getCalibrate();
         addModule(calibrator);
-		// Vision tester
-		addModule(new VisionTesterModule(this));
         // classifier
         //addModule(new ClassifierModule(this));
         // color edit

@@ -58,11 +58,6 @@ VISION_DIR := $(TOOL_DIR)/Vision
 VISION_SRCS := $(shell ls $(VISION_DIR)/*.java)
 VISION_OBJS := $(VISION_SRCS:%.java=%.class)
 
-VISION_TESTER_DIR := $(TOOL_DIR)/VisionTester
-VISION_TESTER_SRCS := $(shell ls $(VISION_TESTER_DIR)/*.java)
-VISION_TESTER_OBJS := $(VISION_TESTER_SRCS:%.java=%.class)
-
-
 #ZSPACE_DIR := $(TOOL_DIR)/ZSpace
 #ZSPACE_SRCS := $(shell ls $(ZSPACE_DIR)/*.java)
 #ZSPACE_OBJS := $(ZSPACE_SRCS:%.java=%.class)
