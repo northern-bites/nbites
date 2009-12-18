@@ -352,6 +352,8 @@ const shape ConcreteCorner::inferCornerType(const cornerID id) {
     case CENTER_T:
         return T;
     case CENTER_CIRCLE:
+	case TOP_CC:
+	case BOTTOM_CC:
         return CIRCLE;
     case CORNER_NO_IDEA_ID:
     default:
