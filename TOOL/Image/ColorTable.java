@@ -32,8 +32,13 @@ import TOOL.Vision.Vision;
  * if we just got from 0 - 127 in each of the Y,U,V channels and do no
  * bitshifting.
  *
+ * The table DOES NOT store the values in y,u,v order though. They are stored
+ * in u,v,y order to reflect the way they are thresholded. Since Y is the most
+ * frequently changing channel, it is in the least significant position.
+ *
  * @author Joho Strom
  * @author Nicholas Dunn modified for undo/redo functionality.
+ * @author Jack Morrison changed yuv ordering to uvy ordering
  * @see ColorTableUpdate, Calibrate, ThresholdedImage
  * @version 1.0
  */
