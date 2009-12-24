@@ -61,6 +61,9 @@ private:
 	}
 	const float calcPitch() {
 		float groundDist = sqrt( relX * relX + relY * relY );
+		if (groundDist == 0.0){
+			groundDist = 0.1;
+		}
 		//b/c groundDist is always positive, no need for atan2
 		float pitchTemp = atan( relHeight / groundDist);
 		//b/c we use lower angled camera we need to adjust by constant angle

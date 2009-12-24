@@ -182,21 +182,20 @@ class HeadTracking(FSA.FSA):
         self.lookToPoint(landmark.x, landmark.y, 0)
 
     def lookToPoint(self, visGoalX, visGoalY, visGoalHeight):
+        lensHeightInCM = self.getCameraHeight()
+        my = self.brain.my
+        relX = visGoalX - my.x
+        relY = visGoalY - my.y
+        #relH is relative to camera height. negative is normal
+        relHeight = visGoalHeight - (lensHeightInCM)
+        print "relX=", relX, " relY=",relY," relHeight=", relHeight
+        headMove = motion.CoordHeadCommand(relX, relY, relHeight, my.h)
+        self.brain.motion.coordHead(headMove)
+
+    def getCameraHeight(self):
         pose = self.brain.vision.pose
         cameraInWorldFrameZ = pose.cameraInWorldFrameZ
         comHeight = pose.bodyCenterHeight
         lensHeight = cameraInWorldFrameZ + comHeight
         lensHeightInCM = lensHeight/10.
-        my = self.brain.my
-        print my.x, visGoalX
-        print my.y, visGoalY
-        # can't simply add cameraOffset from body to these b/c of the ability
-        # for the robot to turn (global y !=  robot y)
-        relX = visGoalX - my.x
-        relY = visGoalY - my.y
-        print my.h
-        #relH is relative to camera height. negative is normal
-        relHeight = visGoalHeight - (lensHeightInCM)
-        print relX, relY, relHeight
-        headMove = motion.CoordHeadCommand(relX, relY, relHeight, my.h)
-        self.brain.motion.coordHead(headMove)
+        return lensHeightInCM
