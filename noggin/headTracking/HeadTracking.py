@@ -2,10 +2,10 @@
 from . import TrackingConstants as constants
 from . import TrackingStates
 from . import PanningStates
-from .util import FSA
+from ..util import FSA
 import man.motion as motion
 from man.motion import MotionConstants
-import util.MyMath as MyMath
+import ..util.MyMath as MyMath
 from man.motion import StiffnessModes
 from math import (fabs)
 
