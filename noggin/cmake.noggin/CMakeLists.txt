@@ -145,13 +145,13 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/Brain.py
                         ${NOGGIN_INCLUDE_DIR}/GameController.py
                         ${NOGGIN_INCLUDE_DIR}/GameStates.py
-			${NOGGIN_INCLUDE_DIR}/FallController.py
+			            ${NOGGIN_INCLUDE_DIR}/FallController.py
                         ${NOGGIN_INCLUDE_DIR}/FallStates.py
-                        ${NOGGIN_INCLUDE_DIR}/HeadTracking.py
-			${NOGGIN_INCLUDE_DIR}/TrackingConstants.py
+            			${NOGGIN_INCLUDE_DIR}/TrackingConstants.py
                         ${NOGGIN_INCLUDE_DIR}/PanningStates.py
+                        ${NOGGIN_INCLUDE_DIR}/ActiveLookStates.py
                         ${NOGGIN_INCLUDE_DIR}/NavStates.py
-			${NOGGIN_INCLUDE_DIR}/NavConstants.py
+            			${NOGGIN_INCLUDE_DIR}/NavConstants.py
                         ${NOGGIN_INCLUDE_DIR}/Navigator.py
                         ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
                         ${NOGGIN_INCLUDE_DIR}/Leds.py
@@ -160,10 +160,11 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
                         )
 
-SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/playbook
+SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/headTracking
+                           ${NOGGIN_INCLUDE_DIR}/playbook
                            ${NOGGIN_INCLUDE_DIR}/players
                            ${NOGGIN_INCLUDE_DIR}/robots
-			   ${NOGGIN_INCLUDE_DIR}/typeDefs
+            			   ${NOGGIN_INCLUDE_DIR}/typeDefs
                            ${NOGGIN_INCLUDE_DIR}/util )
 
 

@@ -1,6 +1,29 @@
 import man.motion.HeadMoves as HeadMoves
 from . import TrackingConstants as constants
 
+def findLandmark(tracker):
+    #if we've definitely found the target, track it
+    if tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.activeLocOn = False
+        return tracker.goNow('landmarkTracking')
+
+    if not tracker.brain.motion.isHeadActive():
+        #first, look to our best guess of where target is based on loc
+        if tracker.counter < constants.LOOK_TO_TIME_TO_FIND:
+            tracker.lookToLandmark(tracker.target)
+        else:
+            tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
+        #second, start looking to box around object?
+        '''e.g.
+        for i = 20 to 100, increment 20
+        tracker.lookToPoint(target.x+i, target.y+i, 0)
+        tracker.lookToPoint(target.x-i, target.y+i, 0)
+        tracker.lookToPoint(target.x-i, target.y-i, 0)
+        tracker.lookToPoint(target.x-i, target.y+i, 0)
+        #separate state?
+        '''
+
+    return tracker.stay()
 
 def scanBall(tracker):
     ball = tracker.brain.ball
@@ -36,13 +59,6 @@ def locPans(tracker):
             or not tracker.brain.motion.isHeadActive():
         tracker.activeLocOn = False
         tracker.execute(HeadMoves.QUICK_PANS)
-    return tracker.stay()
-
-def ballScan(tracker):
-    if tracker.firstFrame() \
-            or not tracker.brain.motion.isHeadActive():
-        tracker.activeLocOn = False
-        tracker.execute(HeadMoves.HIGH_SCAN_BALL)
     return tracker.stay()
 
 def panLeftOnce(tracker):
@@ -111,6 +127,7 @@ def returnHeadsPan(tracker):
     return tracker.stay()
 
 def look(tracker):
+    """down, right, up, left"""
     if tracker.firstFrame():
         heads = HeadMoves.LOOK_HEADS[tracker.lookDirection]
         tracker.panTo(heads)

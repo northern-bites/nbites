@@ -19,11 +19,20 @@ def stop(tracker):
 
     return tracker.stay()
 
-def ballTracking(tracker): #Super state which handles following/refinding the ball
+def ballTracking(tracker):
+    '''Super state which handles following/refinding the ball'''
     if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
         return tracker.goNow('scanBall')
+
+def landmarkTracking(tracker):
+    '''Super state which handles following/refinding the landmark'''
+    if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+        return tracker.goNow('tracking')
+    else:
+        return tracker.goNow('findLandmark')
+
 
 def tracking(tracker):
     """
@@ -55,8 +64,6 @@ def activeTracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = True
 
-
-
     if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH \
             and not tracker.brain.motion.isHeadActive() \
             and not (tracker.activePanUp or tracker.activePanOut):
@@ -85,19 +92,8 @@ def activeTracking(tracker):
         tracker.activePanDir = (tracker.activePanDir + 1) % \
             constants.NUM_ACTIVE_PANS
 
-
         if tracker.activePanDir == constants.PAN_RIGHT:
             return tracker.goLater('panRightOnce')
         elif tracker.activePanDir == constants.PAN_LEFT:
             return tracker.goLater('panLeftOnce')
-    return tracker.stay()
-
-def trackAfterKick(tracker):
-    if tracker.firstFrame():
-        tracker.brain.motion.stopHeadMoves()
-        tracker.panTo(HeadMoves.PAN_UP_HEADS)
-        return tracker.stay()
-
-    if not tracker.brain.motion.isHeadActive():
-        return tracker.goLater('stop')
     return tracker.stay()

@@ -54,9 +54,7 @@ public:
 	const float getYaw() const { return yaw; }
 private:
 	const float calcYaw() {
-		std::cout << "robotBearing" << robotBearing << std::endl;
 		float yawTemp = atan2( relY, relX ) - robotBearing;
-		std::cout << "yaw" << yawTemp << std::endl;
 		return yawTemp;
 	}
 	const float calcPitch() {
@@ -68,8 +66,6 @@ private:
 		float pitchTemp = atan( relHeight / groundDist);
 		//b/c we use lower angled camera we need to adjust by constant angle
 		pitchTemp = pitchTemp - 0.6981;//40 degrees to radians (from reddoc)
-		std::cout << "groundDist" << groundDist << std::endl;
-		std::cout << "pitchTemp" << pitchTemp << std::endl;
 		return pitchTemp;
 	}
 

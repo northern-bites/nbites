@@ -1,8 +1,8 @@
-
 from . import TrackingConstants as constants
 from . import TrackingStates
 from . import PanningStates
 from ..util import FSA
+from . import ActiveLookStates
 import man.motion as motion
 from man.motion import MotionConstants
 import ..util.MyMath as MyMath
@@ -10,11 +10,13 @@ from man.motion import StiffnessModes
 from math import (fabs)
 
 class HeadTracking(FSA.FSA):
+    """FSA to control actions performed by head"""
     def __init__(self, brain):
-        FSA.FSA.__init__(self,brain)
+        FSA.FSA.__init__(self, brain)
         self.brain = brain
         self.addStates(TrackingStates)
         self.addStates(PanningStates)
+        self.addStates(ActiveLookStates)
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
@@ -32,45 +34,9 @@ class HeadTracking(FSA.FSA):
 
         self.lookDirection = None
 
-    def ballTrackingHelper(self,args):
-        self.target = None
-        self.gain = 1.0
-        self.angleX = None
-        self.angleY = None
-        if len(args) == 4:
-            (self.target,self.gain,self.angleX,self.angleY) = args
-        elif len(args) ==2:
-            (self.target,self.gain) = args
-        elif len(args) == 1:
-            self.target = args[0]
-        else:
-            raise ValueError("Num params are wrong: besure to"+\
-                             " specifiy both angleX and angleY"+str(len(args)))
 
-    def isTracking(self):
-        return self.currentState == constants.TRACKING
-
-    def stopHeadMoves(self):
-        self.switchTo('stop')
-
-    def trackBall(self):
-        self.target = self.brain.ball
-        self.gain = 1.0
-        if (not self.currentState == 'tracking') and\
-                (not self.currentState == 'scanBall'):
-           self.switchTo('ballTracking')
-
-    def locPans(self):
-        self.activeLocOn = False
-        self.stopHeadMoves()
-        self.switchTo('locPans')
-
-    def scanBall(self):
-        self.activeLocOn = False
-        self.stopHeadMoves()
-        self.switchTo('ballScan')
-
-    def execute(self,sweetMove):
+    def execute(self, sweetMove):
+        """performs a sweetmove"""
         for position in sweetMove:
             if len(position) == 7:
                 move = motion.BodyJointCommand(position[4], #time
@@ -103,11 +69,6 @@ class HeadTracking(FSA.FSA):
 
             self.brain.motion.enqueue(move)
 
-    def activeLoc(self):
-        self.target = self.brain.ball
-        self.gain = 1.0
-        if( not self.activeLocOn ):
-            self.switchTo('activeTracking')
 
     def trackObject(self):
         """
@@ -117,7 +78,7 @@ class HeadTracking(FSA.FSA):
         """
         #if self.firstFrame():
          #   self.brain.motion.stopHeadMoves()
-        (changeX,changeY) = (0.,0.)
+        (changeX,changeY) = (0., 0.)
         # Find the target's angular distance from the center of the screen
         # if we have an object, track that
         if self.target and \
@@ -142,17 +103,12 @@ class HeadTracking(FSA.FSA):
         newYaw = curYaw + safeChangeX/3
         newPitch = curPitch - safeChangeY/3
 
-        newYaw = MyMath.clip(newYaw,-80.,80.)
+        newYaw = MyMath.clip(newYaw,-80., 80.)
 
         maxSpeed = 2.0
         headMove = motion.SetHeadCommand(newYaw,newPitch,
                                          maxSpeed, maxSpeed)
         self.brain.motion.setHead(headMove)
-
-    def startScan(self, newScan):
-        if newScan != self.currentHeadScan:
-            self.currentHeadScan = newScan
-            self.switchTo('scanning')
 
     def panTo(self, heads):
         """
@@ -172,27 +128,9 @@ class HeadTracking(FSA.FSA):
         self.execute( ((heads, panTime, 0,
                         StiffnessModes.LOW_HEAD_STIFFNESSES),) )
 
-    def lookToDir(self, direction):
-        if self.currentState is not 'look' or \
-                self.lookDirection != direction:
-            self.lookDirection = direction
-            self.switchTo('look')
-
-    def lookToLandmark(self, landmark):
-        self.lookToPoint(landmark.x, landmark.y, 0)
-
-    def lookToPoint(self, visGoalX, visGoalY, visGoalHeight):
-        lensHeightInCM = self.getCameraHeight()
-        my = self.brain.my
-        relX = visGoalX - my.x
-        relY = visGoalY - my.y
-        #relH is relative to camera height. negative is normal
-        relHeight = visGoalHeight - (lensHeightInCM)
-        print "relX=", relX, " relY=",relY," relHeight=", relHeight
-        headMove = motion.CoordHeadCommand(relX, relY, relHeight, my.h)
-        self.brain.motion.coordHead(headMove)
 
     def getCameraHeight(self):
+        """gets the height of the (hopefully)lower camera in cm"""
         pose = self.brain.vision.pose
         cameraInWorldFrameZ = pose.cameraInWorldFrameZ
         comHeight = pose.bodyCenterHeight
