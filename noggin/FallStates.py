@@ -39,7 +39,7 @@ def standup(guard):
 
     if guard.firstFrame():
         guard.brain.tracker.stopHeadMoves()
-        guard.brain.tracker.execute(HeadMoves.NEUT_HEADS)
+        guard.brain.tracker.helper.executeHeadMove(HeadMoves.NEUT_HEADS)
 
     # If on back, perform back stand up
     if ( inertial.angleY < -guard.FALLEN_THRESH ):

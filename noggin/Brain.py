@@ -14,7 +14,7 @@ import sensors
 # Modules from this directory
 from . import GameController
 from . import FallController
-from .headTracking import HeadTrackingInterface
+from .headTracking import HeadTracking
 from . import Navigator
 from .util import NaoOutput
 from . import NogginConstants as Constants

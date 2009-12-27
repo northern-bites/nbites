@@ -48,3 +48,18 @@ def landmarkScan(tracker):
     #tracker.trackLandmark(p)
 
     return tracker.stay()
+
+def lookToPoint(self, tracker):
+    """look to an absolute position on the field"""
+    lensHeightInCM = self.tracker.helper.getCameraHeight()
+    my = self.tracker.brain.my
+    relX = tracker.visGoalX - my.x
+    relY = tracker.visGoalY - my.y
+        #relH is relative to camera height. negative is normal
+    relHeight = tracker.visGoalHeight - (lensHeightInCM)
+    headMove = self.tracker.Motion.CoordHeadCommand(relX, relY,
+                                                    relHeight, my.h)
+    self.tracker.brain.motion.coordHead(headMove)
+
+    return tracker.stay()
+

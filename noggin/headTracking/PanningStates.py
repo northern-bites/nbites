@@ -12,7 +12,7 @@ def findLandmark(tracker):
         if tracker.counter < constants.LOOK_TO_TIME_TO_FIND:
             tracker.lookToLandmark(tracker.target)
         else:
-            tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
         #second, start looking to box around object?
         '''e.g.
         for i = 20 to 100, increment 20
@@ -38,33 +38,33 @@ def scanBall(tracker):
         ballDist = ball.locDist
 
         if ballDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
-            tracker.execute(HeadMoves.HIGH_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)
 
         elif ballDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
                 ballDist < HeadMoves.MID_SCAN_FAR_BOUND:
-            tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
         else:
-            tracker.execute(HeadMoves.LOW_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
     return tracker.stay()
 
 def scanning(tracker):
     if (tracker.firstFrame() or not
         tracker.brain.motion.isHeadActive()):
         tracker.activeLocOn = False
-        tracker.execute(tracker.currentHeadScan)
+        tracker.helper.executeHeadMove(tracker.currentHeadScan)
     return tracker.stay()
 
 def locPans(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
         tracker.activeLocOn = False
-        tracker.execute(HeadMoves.QUICK_PANS)
+        tracker.helper.executeHeadMove(HeadMoves.QUICK_PANS)
     return tracker.stay()
 
 def panLeftOnce(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.panTo(HeadMoves.PAN_LEFT_HEADS)
+        tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
         return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive():
@@ -74,7 +74,7 @@ def panLeftOnce(tracker):
 def panRightOnce(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.panTo(HeadMoves.PAN_RIGHT_HEADS)
+        tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
         return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive():
@@ -84,7 +84,7 @@ def panRightOnce(tracker):
 def panUpOnce(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.panTo(HeadMoves.PAN_UP_HEADS)
+        tracker.helper.panTo(HeadMoves.PAN_UP_HEADS)
         return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive():
@@ -95,7 +95,7 @@ def postScan(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
         tracker.activeLocOn = False
-        tracker.execute(HeadMoves.POST_SCAN)
+        tracker.helper.executeHeadMove(HeadMoves.POST_SCAN)
     return tracker.stay()
 
 def activeLocScan(tracker):
@@ -105,9 +105,9 @@ def activeLocScan(tracker):
     if tracker.firstFrame() \
             or not tracker.brain.motion.isHeadActive():
         if tracker.brain.player.squatting:
-            tracker.execute(HeadMoves.SQUAT_LOW_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.SQUAT_LOW_SCAN_BALL)
         else:
-            tracker.execute(HeadMoves.MID_UP_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
 
     return tracker.stay()
 
@@ -117,12 +117,12 @@ def returnHeadsPan(tracker):
     """
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.panTo(tracker.preActivePanHeads)
+        tracker.helper.panTo(tracker.preActivePanHeads)
         return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive() or \
             tracker.target.on:
-        tracker.trackObject()
+        tracker.helper.trackObject()
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
@@ -130,7 +130,7 @@ def look(tracker):
     """down, right, up, left"""
     if tracker.firstFrame():
         heads = HeadMoves.LOOK_HEADS[tracker.lookDirection]
-        tracker.panTo(heads)
+        tracker.helper.panTo(heads)
         return tracker.stay()
     if tracker.brain.ball.on:
         return tracker.goNow('ballTracking')

@@ -1,7 +1,6 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
 DEBUG = False
-from man.motion import HeadMoves
 
 def stopped(tracker):
     '''default state where the tracker does nothing'''
@@ -47,7 +46,7 @@ def tracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = False
 
-    tracker.trackObject()
+    tracker.helper.trackObject()
     if not tracker.target.on:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -71,7 +70,7 @@ def activeTracking(tracker):
 
     elif not (tracker.activePanOut or tracker.activePanUp) and \
             tracker.counter <= constants.ACTIVE_LOC_STARE_THRESH:
-        tracker.trackObject()
+        tracker.helper.trackObject()
         tracker.activePanOut = tracker.activePanUp = False
         return tracker.stay()
 
