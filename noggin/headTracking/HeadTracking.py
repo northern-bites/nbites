@@ -34,6 +34,11 @@ class HeadTracking(FSA.FSA):
         """stop all head moves. In TrackingStates.py"""
         self.switchTo('stop')
 
+    def setNeutralHead(self):
+        """executes sweet move to move head to neutral position.
+        Does not call stop head moves. In TrackingStates.py"""
+        self.switchTo('neutralHead')
+
     def trackBall(self):
         """automatically tracks the ball. scans for the ball if not in view"""
         self.target = self.brain.ball

@@ -9,35 +9,15 @@ class HeadTrackingHelper():
     def __init__(self, tracker):
         self.tracker = tracker
 
-    def executeHeadMove(self, sweetMove):
+    def executeHeadMove(self, headMove):
         """performs a sweetmove"""
-        for position in sweetMove:
-            if len(position) == 7:
-                move = motion.BodyJointCommand(position[4], #time
-                                               position[0], #larm
-                                               position[1], #lleg
-                                               position[2], #rleg
-                                               position[3], #rarm
-                                               position[6], # Chain Stiffnesses
-                                               position[5], #interpolation type
-                                               )
-
-
-            elif len(position) == 4:
+        for position in headMove:
+            if len(position) == 4:
                 move = motion.HeadJointCommand(position[1] ,# time
                                                position[0], # head pos
                                                position[3], # chain stiffnesses
                                                position[2], # interpolation type
-                                                   )
-
-            elif len(position) == 5:
-                move = motion.BodyJointCommand(position[2], # time
-                                               position[0], # chainID
-                                               position[1], # chain angles
-                                               position[4], # chain stiffnesses
-                                               position[3], # interpolation type
                                                )
-
             else:
                 self.printf("What kind of sweet ass-Move is this?")
 

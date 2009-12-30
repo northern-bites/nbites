@@ -18,6 +18,17 @@ def stop(tracker):
 
     return tracker.stay()
 
+def neutralHead(tracker):
+    '''move head to neutral position'''
+    if tracker.firstFrame():
+        tracker.activeLocOn = False
+        guard.brain.tracker.helper.executeHeadMove(HeadMoves.NEUT_HEADS)
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('stopped')
+
+    return tracker.stay()
+
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
