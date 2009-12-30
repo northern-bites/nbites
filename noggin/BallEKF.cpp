@@ -257,12 +257,12 @@ void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
         // commented out code bellow the next 2 lines of code.  It should be
         // tested and the beta and gamma parameters possibly tuned before being
         // used.
-        R_k(0,0) = z.distanceSD;
-        R_k(1,1) = z.distanceSD;
-
-        // R_k(0,0) = z.distanceSD * cos(z.bearinsSD);
-        // R_k(1,1) = z.distanceSD * sin(z.bearinsSD);
-
+		const float sd_dist_sq = pow(z.distanceSD, 2);
+		const float var = sd_dist_sq * sin(z.bearingSD) * cos(z.bearingSD);
+        R_k(0,0) = sd_dist_sq * pow(cos(z.bearingSD), 2);
+		R_k(0,1) = var;
+		R_k(1,0) = var;
+        R_k(1,1) = sd_dist_sq * pow(sin(z.bearingSD), 2);
 
     } else {
         // Convert our sighting to cartesian coordinates

@@ -1,7 +1,7 @@
 C++ = g++
 C++-FLAGS = -Wall -O3 -DNDEBUG
 RM = rm -f
-INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/boost-1_33_1/
+INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/
 
 NBMATH_SRCS = ../../include/NBMath.cpp \
 	      ../../include/NBMath.h
@@ -109,7 +109,7 @@ obsToLoc : $(OBS_TO_LOC_SRCS) $(OBJS) obsToLoc.o
 navToObs : $(NAV_TO_OBS_SRCS) $(OBJS) navToObs.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) $(LDFLAGS) navToObs.o -DNO_ZLIB -o $@
 
-faker.o : $(ROBOT_LOG_SRCS) $(OBJS)
+faker.o : $(FAKER_SRCS) $(OBJS)
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 
 noiseVaccuracy.o : $(NOISE_SRCS) $(OBJS)
