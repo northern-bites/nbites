@@ -22,7 +22,7 @@ const float LocEKF::INIT_LOC_X = CENTER_FIELD_X;
 const float LocEKF::INIT_LOC_Y = CENTER_FIELD_Y;
 const float LocEKF::INIT_LOC_H = 0.0f;
 const float LocEKF::INIT_BLUE_GOALIE_LOC_X = (FIELD_WHITE_LEFT_SIDELINE_X +
-                                         GOALBOX_DEPTH / 2.0f);
+											  GOALBOX_DEPTH / 2.0f);
 const float LocEKF::INIT_BLUE_GOALIE_LOC_Y = CENTER_FIELD_Y;
 const float LocEKF::INIT_BLUE_GOALIE_LOC_H = 0.0f;
 const float LocEKF::INIT_RED_GOALIE_LOC_X = (FIELD_WHITE_RIGHT_SIDELINE_X -
@@ -238,7 +238,6 @@ void LocEKF::incorporateMeasurement(Observation z,
     cout << "\t\t\tIncorporating measurement " << z << endl;
 #endif
     int obsIndex;
-
     // Get the best fit for ambigious data
     // NOTE: this is only done, if useAmbiguous is turned to true
     if (z.getNumPossibilities() > 1) {
@@ -253,6 +252,35 @@ void LocEKF::incorporateMeasurement(Observation z,
     }
 
     if (z.getVisDistance() < USE_CARTESIAN_DIST) {
+		incorporateCartesianMeasurement( obsIndex, z, H_k, R_k, V_k);
+    } else {
+		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
+    }
+
+    // Calculate the standard error of the measurement
+    StateMeasurementMatrix newP = prod(P_k, trans(H_k));
+    MeasurementMatrix se = prod(H_k, newP) + R_k;
+    se(0,0) = sqrt(se(0,0));
+    se(1,1) = sqrt(se(1,1));
+
+    // Ignore observations based on standard error
+    if ( se(0,0)*6.0f < abs(V_k(0))) {
+#ifdef DEBUG_STANDARD_ERROR
+        cout << "\t Ignoring measurement " << endl;
+        cout << "\t Standard error is " << se << endl;
+        cout << "\t Invariance is " << abs(V_k(0))*5 << endl;
+#endif
+        R_k(0,0) = DONT_PROCESS_KEY;
+    }
+
+}
+
+void LocEKF::incorporateCartesianMeasurement(int obsIndex,
+											   Observation z,
+											   StateMeasurementMatrix &H_k,
+											   MeasurementMatrix &R_k,
+											   MeasurementVector &V_k)
+{
 
 #ifdef DEBUG_LOC_EKF_INPUTS
         cout << "\t\t\tUsing cartesian " << endl;
@@ -294,8 +322,26 @@ void LocEKF::incorporateMeasurement(Observation z,
         R_k(0,0) = z.getDistanceSD();
         R_k(1,1) = z.getDistanceSD();
 
-    } else {
+#ifdef DEBUG_LOC_EKF_INPUTS
+        cout << "\t\t\tR vector is" << R_k << endl;
+        cout << "\t\t\tH vector is" << H_k << endl;
+        cout << "\t\t\tV vector is" << V_k << endl;
+        cout << "\t\t\t\td vector is" << d_x << endl;
+        cout << "\t\t\t\t\tx est is " << x << endl;
+        cout << "\t\t\t\t\ty est is " << y << endl;
+        cout << "\t\t\t\t\th est is " << h << endl;
+        cout << "\t\t\t\t\tx_b est is " << x_b << endl;
+        cout << "\t\t\t\t\ty_b est is " << y_b << endl;
+#endif
 
+}
+
+void LocEKF::incorporatePolarMeasurement(int obsIndex,
+										   Observation z,
+										   StateMeasurementMatrix &H_k,
+										   MeasurementMatrix &R_k,
+										   MeasurementVector &V_k)
+{
 #ifdef DEBUG_LOC_EKF_INPUTS
         cout << "\t\t\tUsing polar " << endl;
 #endif
@@ -347,23 +393,6 @@ void LocEKF::incorporateMeasurement(Observation z,
         cout << "\t\t\t\t\tx_b est is " << x_b << endl;
         cout << "\t\t\t\t\ty_b est is " << y_b << endl;
 #endif
-    }
-
-    // Calculate the standard error of the measurement
-    StateMeasurementMatrix newP = prod(P_k, trans(H_k));
-    MeasurementMatrix se = prod(H_k, newP) + R_k;
-    se(0,0) = sqrt(se(0,0));
-    se(1,1) = sqrt(se(1,1));
-
-    // Ignore observations based on standard error
-    if ( se(0,0)*6.0f < abs(V_k(0))) {
-#ifdef DEBUG_STANDARD_ERROR
-        cout << "\t Ignoring measurement " << endl;
-        cout << "\t Standard error is " << se << endl;
-        cout << "\t Invariance is " << abs(V_k(0))*5 << endl;
-#endif
-        R_k(0,0) = DONT_PROCESS_KEY;
-    }
 
 }
 
@@ -558,3 +587,4 @@ void LocEKF::deadzone(float &R, float &innovation,
         R=1.0/invR;
     }
 }
+

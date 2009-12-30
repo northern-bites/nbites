@@ -144,6 +144,18 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+	void incorporateCartesianMeasurement(int obsIndex,
+										   Observation z,
+										   StateMeasurementMatrix &H_k,
+										   MeasurementMatrix &R_k,
+										   MeasurementVector &V_k);
+	void incorporatePolarMeasurement(int obsIndex,
+									   Observation z,
+									   StateMeasurementMatrix &H_k,
+									   MeasurementMatrix &R_k,
+									   MeasurementVector &V_k);
+
+
     int findBestLandmark(Observation * z);
     float getDivergence(Observation * z, PointLandmark pt);
 
