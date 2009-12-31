@@ -79,8 +79,8 @@ class HeadTrackingHelper():
 
         maxDiff = max(pitchDiff, yawDiff)
         panTime = maxDiff/constants.MAX_PAN_SPEED
-        self.tracker.executeHeadMove( ((heads, panTime, 0,
-                        StiffnessModes.LOW_HEAD_STIFFNESSES),) )
+        self.executeHeadMove( ((heads, panTime, 0,
+                                StiffnessModes.LOW_HEAD_STIFFNESSES),) )
 
 
     def getCameraHeight(self):

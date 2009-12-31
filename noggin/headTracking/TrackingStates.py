@@ -1,5 +1,6 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
+from man.motion import HeadMoves
 DEBUG = False
 
 def stopped(tracker):
@@ -22,7 +23,7 @@ def neutralHead(tracker):
     '''move head to neutral position'''
     if tracker.firstFrame():
         tracker.activeLocOn = False
-        guard.brain.tracker.helper.executeHeadMove(HeadMoves.NEUT_HEADS)
+        tracker.helper.executeHeadMove(HeadMoves.NEUT_HEADS)
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater('stopped')
