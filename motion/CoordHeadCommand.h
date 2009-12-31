@@ -28,19 +28,17 @@
 class CoordHeadCommand : public MotionCommand
 {
 public:
-    CoordHeadCommand(const float _relX, const float _relY,
+    CoordHeadCommand(const float _xRelMe, const float _yRelMe,
 					 const float _relHeight,
-					 const float _robotBearing,
 					 const float _maxSpeedYaw =
 					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 					 const float _maxSpeedPitch =
 					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		)
         : MotionCommand( MotionConstants::COORD_HEAD ),
-          relX( _relX),
-		  relY( _relY),
+          relX( _xRelMe),
+		  relY( _yRelMe),
 		  relHeight( _relHeight),
-		  robotBearing( _robotBearing ),
 		  maxSpeedYaw( _maxSpeedYaw ),
 		  maxSpeedPitch( _maxSpeedPitch ),
 		  yaw(calcYaw()),
@@ -54,7 +52,7 @@ public:
 	const float getYaw() const { return yaw; }
 private:
 	const float calcYaw() {
-		float yawTemp = atan2( relY, relX ) - robotBearing;
+		float yawTemp = atan2( relY, relX );
 		return yawTemp;
 	}
 	const float calcPitch() {
@@ -77,7 +75,7 @@ private:
     }
 private:
     const float relX, relY, relHeight;
-	const float robotBearing, maxSpeedYaw, maxSpeedPitch;
+	const float maxSpeedYaw, maxSpeedPitch;
 	const float yaw, pitch;
 };
 

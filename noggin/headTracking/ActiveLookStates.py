@@ -1,4 +1,6 @@
 from . import TrackingConstants as constants
+from math import (hypot, sin, cos)
+from ..util.MyMath import getRelativeBearing
 
 def goalieActiveLook(tracker):
     '''goalie looks at ball, then own left post, opp left post, opp right post,
@@ -51,14 +53,18 @@ def landmarkScan(tracker):
 
 def lookToPoint(self, tracker):
     """look to an absolute position on the field"""
-    lensHeightInCM = self.tracker.helper.getCameraHeight()
     my = self.tracker.brain.my
-    relX = tracker.visGoalX - my.x
-    relY = tracker.visGoalY - my.y
+    globalRelX = tracker.visGoalX - my.x
+    globalRelY = tracker.visGoalY - my.y
+    dist = hypot(globalRelX, globalRelY)
+    bearingToPoint = getRelativeBearing( my.x, my.y, my.h,
+                                         tracker.visGoalX, tracker.visGoalY )
+    xRelMe = dist*sin(bearingToPoint)
+    yRelMe = dist*cos(bearingToPoint)
         #relH is relative to camera height. negative is normal
+    lensHeightInCM = self.tracker.helper.getCameraHeight()
     relHeight = tracker.visGoalHeight - (lensHeightInCM)
-    headMove = self.tracker.Motion.CoordHeadCommand(relX, relY,
-                                                    relHeight, my.h)
+    headMove = self.tracker.Motion.CoordHeadCommand(xRelMe, yRelMe, relHeight )
     self.tracker.brain.motion.coordHead(headMove)
 
     return tracker.stay()
