@@ -134,12 +134,14 @@ class LineLandmark
 {
 public:
     LineLandmark(float _x1, float _y1, float _x2, float _y2) :
-        x1(_x1), y1(_y2), x2(_x2), y2(_y2) {}
+        x1(_x1), y1(_y2), x2(_x2), y2(_y2), dx(y2-y1), dy(x2-x1) {}
     LineLandmark() {}
     float x1;
     float y1;
     float x2;
     float y2;
+	float dx;
+	float dy;
   friend std::ostream& operator<< (std::ostream &o, const LineLandmark &c)
   {
       return o << c.x1 << " " << c.y1 << " " << c.x2 << " " << c.y2;

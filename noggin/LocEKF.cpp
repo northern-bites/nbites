@@ -251,6 +251,10 @@ void LocEKF::incorporateMeasurement(Observation z,
         obsIndex = 0;
     }
 
+	if ( z.isLine() ){
+		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
+	}
+
     if (z.getVisDistance() < USE_CARTESIAN_DIST) {
 		incorporateCartesianMeasurement( obsIndex, z, H_k, R_k, V_k);
     } else {
@@ -276,15 +280,18 @@ void LocEKF::incorporateMeasurement(Observation z,
 }
 
 void LocEKF::incorporateCartesianMeasurement(int obsIndex,
-											   Observation z,
-											   StateMeasurementMatrix &H_k,
-											   MeasurementMatrix &R_k,
-											   MeasurementVector &V_k)
+											 Observation z,
+											 StateMeasurementMatrix &H_k,
+											 MeasurementMatrix &R_k,
+											 MeasurementVector &V_k)
 {
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-        cout << "\t\t\tUsing cartesian " << endl;
+	cout << "\t\t\tUsing cartesian " << endl;
 #endif
+	if ( z.isLine() ){
+
+	} else {
 
         // Convert our sighting to cartesian coordinates
         MeasurementVector z_x(2);
@@ -338,7 +345,7 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
         cout << "\t\t\t\t\tx_b est is " << x_b << endl;
         cout << "\t\t\t\t\ty_b est is " << y_b << endl;
 #endif
-
+	}
 }
 
 void LocEKF::incorporatePolarMeasurement(int obsIndex,
@@ -348,27 +355,76 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 										   MeasurementVector &V_k)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
-        cout << "\t\t\tUsing polar " << endl;
+	cout << "\t\t\tUsing polar " << endl;
 #endif
 
+
+	if ( z.isLine() ){
+
+		MeasurementVector z_x(2);
+		z_x(0) = z.getVisDistance();
+		z_x(1) = z.getVisBearing();
+
+		const LineLandmark l = z.getLinePossibilities()[obsIndex];
+
+		const float x_l = l.dx;
+		const float y_l = l.dy;
+
+		const float x_b = l.x1;
+		const float y_b = l.y1;
+
+		const float x_r = xhat_k_bar(0);
+		const float y_r = xhat_k_bar(1);
+		const float h_r = xhat_k_bar(2);
+
+		// Find closest point on the line to the robot (global frame)
+		const float x_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*x_l + x_b;
+		const float y_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*y_l + y_b;
+
+		// Relativize the closest point
+		const float relX_p = x_p - x_r;
+		const float relY_p = y_p - y_r;
+
+		// Jacobians for line updates
+        H_k(0,0) = (-2*y_b*x_l*y_l + x_b*(-1 + pow(x_l,2) + pow(y_l,2)) - (-1 + pow(x_l,2) + pow(y_l,2))*x_r)/ (pow(x_b - x_r + x_l*(x_l*(-x_b + x_r) + y_l*(y_b + y_r)),2) + pow(y_b - y_r + y_l*(x_l*(-x_b + x_r) + y_l*(y_b + y_r)),2));
+        H_k(0,1) = (2*x_l*y_l*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2*(-1 + pow(y_l,2))* (y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2)));
+        H_k(0,2) = 0;
+
+        H_k(1,0) = -(((-1 + pow(x_l,2) + pow(y_l,2))* (y_b - y_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2)));
+        H_k(1,1) = ((-1 + pow(x_l,2) + pow(y_l,2))*(x_b - x_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2));
+        H_k(1,2) = -1;
+
+		MeasurementVector d_x(2);
+		d_x(0) = static_cast<float>(hypot(relX_p, relY_p));
+		d_x(1) = safe_atan2(relY_p, relX_p) - h_r;
+		d_x(1) = subPIAngle(d_x(1));
+
+		// Calculate invariance
+        V_k = z_x - d_x;
+        V_k(1) = NBMath::subPIAngle(V_k(1));
+
+        R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
+        R_k(1,1) = z.getBearingSD() * z.getBearingSD();
+
+	} else{
         // Get the observed range and bearing
         MeasurementVector z_x(2);
         z_x(0) = z.getVisDistance();
         z_x(1) = z.getVisBearing();
 
-        // Get expected values of the post
-        const float x_b = z.getPointPossibilities()[obsIndex].x;
-        const float y_b = z.getPointPossibilities()[obsIndex].y;
-        MeasurementVector d_x(2);
+		// Get expected values of the post
+		const float x_b = z.getPointPossibilities()[obsIndex].x;
+		const float y_b = z.getPointPossibilities()[obsIndex].y;
+		MeasurementVector d_x(2);
 
-        const float x = xhat_k_bar(0);
-        const float y = xhat_k_bar(1);
-        const float h = xhat_k_bar(2);
+		const float x = xhat_k_bar(0);
+		const float y = xhat_k_bar(1);
+		const float h = xhat_k_bar(2);
 
-        d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
-        d_x(1) = safe_atan2(y_b - y,
-                            x_b - x) - h;
-        d_x(1) = NBMath::subPIAngle(d_x(1));
+		d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
+		d_x(1) = safe_atan2(y_b - y,
+							x_b - x) - h;
+		d_x(1) = NBMath::subPIAngle(d_x(1));
 
         // Calculate invariance
         V_k = z_x - d_x;
@@ -398,7 +454,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
         cout << "\t\t\t\t\tx_b est is " << x_b << endl;
         cout << "\t\t\t\t\ty_b est is " << y_b << endl;
 #endif
-
+	}
 }
 
 /**
@@ -409,18 +465,39 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
  */
 int LocEKF::findBestLandmark(Observation *z)
 {
-    vector<PointLandmark> possiblePoints = z->getPointPossibilities();
-    float minDivergence = 250.0f;
-    int minIndex = -1;
-    for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
-        float divergence = getDivergence(z, possiblePoints[i]);
+	if (z->isLine()){
+		return findMostLikelyLine(z);
+	} else {
+		return findNearestNeighbor(z);
+	}
+}
 
-        if (divergence < minDivergence) {
-            minDivergence = divergence;
-            minIndex = i;
-        }
-    }
-    return minIndex;
+int LocEKF::findMostLikelyLine(Observation *z)
+{
+
+
+}
+
+/**
+ * Find the point closest to our observation.
+ *
+ * @param The observed point
+ * @return Index of the nearest neighbor
+ */
+int LocEKF::findNearestNeighbor(Observation *z)
+{
+		vector<PointLandmark> possiblePoints = z->getPointPossibilities();
+		float minDivergence = 250.0f;
+		int minIndex = -1;
+		for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
+			float divergence = getDivergence(z, possiblePoints[i]);
+
+			if (divergence < minDivergence) {
+				minDivergence = divergence;
+				minIndex = i;
+			}
+		}
+		return minIndex;
 }
 
 /**

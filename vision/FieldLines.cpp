@@ -365,8 +365,10 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
                         // greenWhiteY is at bottom, hence higher in our
                         // coordinate system
                         int width = greenWhiteY - whiteGreenY;
-                        float distance = pose->pixEstimate(x, linePointY,
-                                                           0).dist;
+
+						const estimate pixEst = pose->pixEstimate(x, linePointY, 0);
+                        const float distance = pixEst.dist;
+						const float bearing = pixEst.bearing;
 
                         if (isReasonableVerticalWidth(x, linePointY,
 													  distance, width)) {
@@ -374,7 +376,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
                             // assign x, y, lineWidth
                             linePoint point(x, linePointY,
 											static_cast<float>(width),
-											distance, VERTICAL);
+											distance, bearing, VERTICAL);
                             if (debugVertEdgeDetect) {
                                 cout << "\t\t\tPoint " << point
                                      << " passed all checks!" << endl;
@@ -565,14 +567,16 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
                         // they are up close
                         int linePointX = (whiteGreenX + greenWhiteX) / 2;
                         int width = whiteGreenX - greenWhiteX;
-                        float distance = pose->pixEstimate(linePointX, y,
-                                                           0).dist;
+						const estimate pixEst = pose->pixEstimate(linePointX,
+																  y, 0);
+                        const float distance = pixEst.dist;
+						const float bearing = pixEst.bearing;
                         if (isReasonableHorizontalWidth(linePointX, y, distance,
                                                         width)) {
                             // assign x, y, lineWidth
                             linePoint point(linePointX, y,
                                             static_cast<float>(width)
-											, distance, HORIZONTAL);
+											, distance, bearing, HORIZONTAL);
                             if (debugHorEdgeDetect) {
                                 cout << "\t\tPoint " << point << " accepted."
                                      << endl;
@@ -1293,7 +1297,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
             VisualLine::NUM_POINTS_TO_BE_VALID_LINE)
             firstPoint++;
         else {
-            VisualLine aLine(legitimateLinePoints);
+            VisualLine aLine(pose,legitimateLinePoints);
             if (debugCreateLines) {
                 cout << "\tSecond loop: adding line " << lines.size()
                      << " with " << legitimateLinePoints.size()
@@ -1749,7 +1753,7 @@ const VisualLine FieldLines::mergeLines(const VisualLine &line1,
     merge(line1.points.begin(), line1.points.end(),
           line2.points.begin(), line2.points.end(),
           linePoints.begin());
-    return VisualLine(linePoints);
+    return VisualLine(pose,linePoints);
 }
 
 // For each line we have identified on the screen, attempts to extend the
@@ -2142,9 +2146,13 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
             linePointX = (leftX + rightX) / 2;
             lineWidth = rightX - leftX;
         }
+		const estimate pixEst = pose->pixEstimate(linePointX, y, 0);
+		const float distance = pixEst.dist;
+		const float bearing = pixEst.bearing;
+
         linePoint newPoint(linePointX, y,
 						   static_cast<float>(lineWidth),
-						   HORIZONTAL);
+						   distance, bearing, HORIZONTAL);
         return newPoint;
     }
     // Vertical
@@ -2206,8 +2214,13 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
             linePointY = (topY + bottomY) / 2;
             lineWidth = bottomY - topY;
         }
+		const estimate pixEst = pose->pixEstimate(x, linePointY, 0);
+		const float distance = pixEst.dist;
+		const float bearing = pixEst.bearing;
+
         linePoint newPoint(x, linePointY,
-						   static_cast<float>(lineWidth), VERTICAL);
+						   static_cast<float>(lineWidth),
+						   distance, bearing, VERTICAL);
         return newPoint;
     }
 }

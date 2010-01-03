@@ -157,6 +157,8 @@ private:
 
 
     int findBestLandmark(Observation * z);
+	int findMostLikelyLine(Observation *z);
+	int findNearestNeighbor(Observation *z);
     float getDivergence(Observation * z, PointLandmark pt);
 
     void limitAPrioriUncert();
