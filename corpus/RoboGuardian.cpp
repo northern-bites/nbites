@@ -83,6 +83,9 @@ void RoboGuardian::run(){
     Thread::running = true;
     Thread::trigger->on();
 
+	struct timespec interval, remainder;
+	interval.tv_sec = 0;
+	interval.tv_nsec = static_cast<long long int>(GUARDIAN_FRAME_LENGTH_uS * 1000);
     while(Thread::running){
 
         countButtonPushes();
@@ -92,7 +95,7 @@ void RoboGuardian::run(){
         checkTemperatures();
         processFallingProtection();
         processChestButtonPushes();
-         usleep(static_cast<useconds_t>(GUARDIAN_FRAME_LENGTH_uS));
+		nanosleep(&interval, &remainder);
     }
 
     Thread::trigger->off();

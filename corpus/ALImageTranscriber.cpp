@@ -55,6 +55,8 @@ void ALImageTranscriber::run() {
     Thread::trigger->on();
 
 	long long lastProcessTimeAvg = VISION_FRAME_LENGTH_uS;
+
+	struct timespec interval, remainder;
     while (Thread::running) {
         //start timer
         const long long startTime = micro_time();
@@ -74,12 +76,15 @@ void ALImageTranscriber::run() {
 					 << " frame length: " << processTime <<endl;
             //Don't sleep at all
         } else{
-            // cout << "Sleeping for " << VISION_FRAME_LENGTH_uS
-            //    -processTime << endl;
+			//cout << "Sleeping for " << VISION_FRAME_LENGTH_uS
+			//-processTime << endl;
 
-            //usleep(10000000);
-            usleep(static_cast<useconds_t>(VISION_FRAME_LENGTH_uS
-                                           -processTime));
+            //nanosleep(10000000);
+			interval.tv_sec = 0;
+			interval.tv_nsec = static_cast<long long int>((VISION_FRAME_LENGTH_uS
+														   -processTime) * 1000);
+
+            nanosleep(&interval, &remainder);
         }
     }
     Thread::trigger->off();

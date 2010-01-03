@@ -37,6 +37,6 @@ noggin/util/fakeData/*
 /motion/README.log
 /motion/README.toc
 /motion/README.pdf
-docs*/
+docs*
 /noggin/offline/c++filt
 /noggin/offline/faker

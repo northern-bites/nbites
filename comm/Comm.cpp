@@ -466,6 +466,10 @@ void Comm::run ()
     running = true;
     trigger->on();
 
+	struct timespec interval, remainder;
+	interval.tv_sec = 0;
+	interval.tv_nsec = SLEEP_MILLIS * 1000;
+
     try {
         bind();
 
@@ -476,7 +480,7 @@ void Comm::run ()
 
             while (running && !timer.time_for_packet()) {
                 receive();
-                usleep(SLEEP_MILLIS);
+                nanosleep(&interval, &remainder);
             }
         }
     }catch (socket_error &e) {
@@ -703,13 +707,17 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
     // send the udp message
     int result = -2;
 
+	struct timespec interval, remainder;
+	interval.tv_sec = 0;
+	interval.tv_nsec = 100000;
+
     while (result == -2) {
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
         // except if error is blocking error
         if (result == -1 && errno == EAGAIN) {
             result = -2;
-            usleep(100);
+            nanosleep(&interval, &remainder);
         }
     }
 
