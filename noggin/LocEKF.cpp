@@ -255,7 +255,7 @@ void LocEKF::incorporateMeasurement(Observation z,
 		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
 	}
 
-    if (z.getVisDistance() < USE_CARTESIAN_DIST) {
+    else if (z.getVisDistance() < USE_CARTESIAN_DIST) {
 		incorporateCartesianMeasurement( obsIndex, z, H_k, R_k, V_k);
     } else {
 		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
@@ -301,7 +301,6 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
         // Get expected values of the post
         const float x_b = z.getPointPossibilities()[obsIndex].x;
         const float y_b = z.getPointPossibilities()[obsIndex].y;
-        MeasurementVector d_x(2);
 
         const float x = xhat_k_bar(0);
         const float y = xhat_k_bar(1);
@@ -310,6 +309,7 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
         float sinh, cosh;
         sincosf(h, &sinh, &cosh);
 
+		MeasurementVector d_x(2);
         d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
         d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
