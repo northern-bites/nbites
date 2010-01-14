@@ -1297,7 +1297,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
             VisualLine::NUM_POINTS_TO_BE_VALID_LINE)
             firstPoint++;
         else {
-            VisualLine aLine(pose,legitimateLinePoints);
+            VisualLine aLine(legitimateLinePoints);
             if (debugCreateLines) {
                 cout << "\tSecond loop: adding line " << lines.size()
                      << " with " << legitimateLinePoints.size()
@@ -1753,7 +1753,7 @@ const VisualLine FieldLines::mergeLines(const VisualLine &line1,
     merge(line1.points.begin(), line1.points.end(),
           line2.points.begin(), line2.points.end(),
           linePoints.begin());
-    return VisualLine(pose,linePoints);
+    return VisualLine(linePoints);
 }
 
 // For each line we have identified on the screen, attempts to extend the
@@ -2800,7 +2800,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 	      }
 	    }
             corners.push_back(c);
-	    
+
             // TODO:  Should I be adding the intersection point to both lines?
             //i->addPoint
 

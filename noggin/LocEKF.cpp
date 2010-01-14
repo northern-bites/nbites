@@ -377,13 +377,11 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		const float y_r = xhat_k_bar(1);
 		const float h_r = xhat_k_bar(2);
 
-		// Find closest point on the line to the robot (global frame)
-		const float x_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*x_l + x_b;
-		const float y_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*y_l + y_b;
-
+		pair<float, float> closestLandmarkXY = findClosestLinePointCartesian(l, x_r,
+																			 y_r, h_r);
 		// Relativize the closest point
-		const float relX_p = x_p - x_r;
-		const float relY_p = y_p - y_r;
+		const float relX_p = closestLandmarkXY.first;
+		const float relY_p = closestLandmarkXY.second;
 
 		// Jacobians for line updates
         H_k(0,0) = (-2*y_b*x_l*y_l + x_b*(-1 + pow(x_l,2) + pow(y_l,2)) - (-1 + pow(x_l,2) + pow(y_l,2))*x_r)/ (pow(x_b - x_r + x_l*(x_l*(-x_b + x_r) + y_l*(y_b + y_r)),2) + pow(y_b - y_r + y_l*(x_l*(-x_b + x_r) + y_l*(y_b + y_r)),2));
@@ -472,11 +470,79 @@ int LocEKF::findBestLandmark(Observation *z)
 	}
 }
 
+/**
+ * Uses the Mahalanobis distance to find the most likely line choice
+ */
 int LocEKF::findMostLikelyLine(Observation *z)
 {
 
+	vector<LineLandmark> possibleLines = z->getLinePossibilities();
+	int minIndex = -1;
+	float minDivergence = 1000.0f;
+	for (unsigned int i = 0; i < possibleLines.size(); ++i) {
+		float distance = getMahalanobisDistance(z, possibleLines[i]);
 
+		if (distance < minDivergence) {
+			minDivergence = distance;
+			minIndex = i;
+		}
+	}
+	return minIndex;
 }
+
+/**
+ * Find the Mahalanobis distance from the observed line
+ * to the potential concrete line. Uses Cartesian coordinates.
+ *
+ * @param The observed line
+ * @param The ConcreteLine to compare against
+ * @return The Mahalanobis distance between the lines
+ */
+float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
+{
+	// x,y coordinates of observed line
+	MeasurementVector z_x(2);
+	z_x(0) = z->getVisDistance() * cos(z->getVisBearing());
+	z_x(1) = z->getVisDistance() * sin(z->getVisBearing());
+
+	const float x_r = xhat_k_bar(0);
+	const float y_r = xhat_k_bar(1);
+	const float h_r = xhat_k_bar(2);
+	pair<float, float> line_xy = findClosestLinePointCartesian(l, x_r,
+																	y_r, h_r);
+
+	MeasurementVector u(2);
+	u(0) = line_xy.first;
+	u(1) = line_xy.second;
+
+	const float dist_sd_2 = pow(z->getDistanceSD(), 2);
+	const float v = dist_sd_2 * sin(z->getBearingSD()) * cos(z->getBearingSD());
+
+	const float bsd = z->getBearingSD();
+
+	float cosb, sinb;
+	sincosf(bsd, &sinb, &cosb);
+
+	const float sinb_2 = sinb * sinb;
+	const float cosb_2 = cosb * cosb;
+
+	MeasurementMatrix s_inverse(2,2,0.0f);
+	s_inverse(0,0) = ((0.0001 + dist_sd_2*sinb_2)/
+			  (1.e-8 + (dist_sd_2*cosb_2)/10000. +
+			   (dist_sd_2*sinb_2)/10000.));
+	s_inverse(0,1) = (-((dist_sd_2*cosb*sinb)/
+				(1.e-8 + (dist_sd_2*cosb_2)/10000. +
+				 (dist_sd_2*sinb_2)/10000.)));
+	s_inverse(1,0) = -((dist_sd_2*cosb*sinb)/
+			   (1.e-8 + (dist_sd_2*cosb_2)/10000. +
+				(dist_sd_2*sinb_2)/10000.));
+	s_inverse(1,1) = ((0.0001 + dist_sd_2*cosb_2)/
+			  (1.e-8 + (dist_sd_2*cosb_2)/10000. +
+			   (dist_sd_2*sinb_2)/10000.));
+
+	return sqrt(inner_prod(trans(z_x-u),prod(s_inverse,z_x-u)));
+}
+
 
 /**
  * Find the point closest to our observation.
@@ -486,18 +552,18 @@ int LocEKF::findMostLikelyLine(Observation *z)
  */
 int LocEKF::findNearestNeighbor(Observation *z)
 {
-		vector<PointLandmark> possiblePoints = z->getPointPossibilities();
-		float minDivergence = 250.0f;
-		int minIndex = -1;
-		for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
-			float divergence = getDivergence(z, possiblePoints[i]);
+	vector<PointLandmark> possiblePoints = z->getPointPossibilities();
+	float minDivergence = 250.0f;
+	int minIndex = -1;
+	for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
+		float divergence = getDivergence(z, possiblePoints[i]);
 
-			if (divergence < minDivergence) {
-				minDivergence = divergence;
-				minIndex = i;
-			}
+		if (divergence < minDivergence) {
+			minDivergence = divergence;
+			minIndex = i;
 		}
-		return minIndex;
+	}
+	return minIndex;
 }
 
 /**
@@ -523,6 +589,26 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
     float y_b = -(pt.x - x) * sinh + (pt.y - y) * cosh;
 
     return static_cast<float>(hypot(x_b_r - x_b, y_b_r - y_b));
+}
+
+std::pair<float,float>
+LocEKF::findClosestLinePointCartesian(LineLandmark l, float x_r,
+									  float y_r, float h_r)
+{
+	const float x_l = l.dx;
+	const float y_l = l.dy;
+
+	const float x_b = l.x1;
+	const float y_b = l.y1;
+
+	// Find closest point on the line to the robot (global frame)
+	const float x_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*x_l + x_b;
+	const float y_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*y_l + y_b;
+
+	// Relativize the closest point
+	const float relX_p = x_p - x_r;
+	const float relY_p = y_p - y_r;
+	return std::pair<float,float>(relX_p, relX_p);
 }
 
 /**

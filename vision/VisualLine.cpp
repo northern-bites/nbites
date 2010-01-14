@@ -14,10 +14,9 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 }
 
 
-VisualLine::VisualLine(boost::shared_ptr<NaoPose> posePtr,
-					   list<list<linePoint>::iterator> &nodes)
+VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-      possibleLines(ConcreteLine::concreteLines), pose(posePtr)
+      possibleLines(ConcreteLine::concreteLines)
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
          i != nodes.end(); i++) {
@@ -36,10 +35,9 @@ VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
 
 
 
-VisualLine::VisualLine(boost::shared_ptr<NaoPose> posePtr,
-					   list<linePoint> &linePoints)
+VisualLine::VisualLine(list<linePoint> &linePoints)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-      possibleLines(ConcreteLine::concreteLines), pose(posePtr)
+      possibleLines(ConcreteLine::concreteLines)
 {
     for (list<linePoint>::iterator i = linePoints.begin();
          i != linePoints.end(); i++) {
@@ -158,7 +156,7 @@ void VisualLine::init()
     length = getLength(*this);
 
     calculateWidths();
-	calculateDistBearing();
+	//calculateDistBearing();
 }
 
 /**
@@ -167,14 +165,17 @@ void VisualLine::init()
  */
 void VisualLine::calculateDistBearing()
 {
-	const estimate startEst = pose->pixEstimate(start.x, start.y, 0);
-	const estimate endEst = pose->pixEstimate(end.x, end.y, 0);
+    // Points are sorted by x
+    // This is a temporary measure, until a better system of
+    // getting line segment endpoints is implemented
+	const linePoint startPt = points[0];
+	const linePoint endPt = points[points.size()-1];
 
-	const float startGroundX = startEst.dist * sin(startEst.bearing);
-	const float startGroundY = startEst.dist * cos(startEst.bearing);
+	const float startGroundX = startPt.distance * sin(startPt.bearing);
+	const float startGroundY = startPt.distance * cos(startPt.bearing);
 
-	const float endGroundX = endEst.dist * sin(endEst.bearing);
-	const float endGroundY = endEst.dist * cos(endEst.bearing);
+	const float endGroundX = endPt.distance * sin(endPt.bearing);
+	const float endGroundY = endPt.distance * cos(endPt.bearing);
 
 	const float slopeX = endGroundX - startGroundX;
 	const float slopeY = endGroundY - startGroundY;

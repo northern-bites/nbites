@@ -158,8 +158,14 @@ private:
 
     int findBestLandmark(Observation * z);
 	int findMostLikelyLine(Observation *z);
+	float getMahalanobisDistance(Observation *z, LineLandmark ll);
 	int findNearestNeighbor(Observation *z);
     float getDivergence(Observation * z, PointLandmark pt);
+
+	std::pair<float, float> findClosestLinePointCartesian(LineLandmark l,
+														  float x_r,
+														  float y_r,
+														  float h_r);
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();

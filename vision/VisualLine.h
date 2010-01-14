@@ -9,7 +9,6 @@
 
 #include "ConcreteLine.h"
 #include "VisualLandmark.h"
-#include "NaoPose.h"
 
 class VisualLine;
 
@@ -87,10 +86,8 @@ public: // Constants
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;
 
 public:
-    VisualLine(boost::shared_ptr<NaoPose> posePtr,
-			   std::list<std::list<linePoint>::iterator> &listOfIterators);
-    VisualLine(boost::shared_ptr<NaoPose> posePtr,
-			   std::list<linePoint> &listOfPoints);
+    VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
+    VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
     VisualLine(const VisualLine& other);
     ~VisualLine();
@@ -188,7 +185,6 @@ private: // Private member variables
     float bearingSD;
     bool ccLine;
     std::list <const ConcreteLine*> possibleLines;
-	boost::shared_ptr<NaoPose> pose;
 
 public:
     // Getters
