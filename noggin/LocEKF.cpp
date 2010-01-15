@@ -377,8 +377,9 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		const float y_r = xhat_k_bar(1);
 		const float h_r = xhat_k_bar(2);
 
-		pair<float, float> closestLandmarkXY = findClosestLinePointCartesian(l, x_r,
-																			 y_r, h_r);
+		pair<float, float> closestLandmarkXY =
+			Utility::findClosestLinePointCartesian(l, x_r, y_r, h_r);
+
 		// Relativize the closest point
 		const float relX_p = closestLandmarkXY.first;
 		const float relY_p = closestLandmarkXY.second;
@@ -508,8 +509,8 @@ float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
 	const float x_r = xhat_k_bar(0);
 	const float y_r = xhat_k_bar(1);
 	const float h_r = xhat_k_bar(2);
-	pair<float, float> line_xy = findClosestLinePointCartesian(l, x_r,
-																	y_r, h_r);
+	pair<float, float> line_xy =
+		Utility::findClosestLinePointCartesian(l, x_r, y_r, h_r);
 
 	MeasurementVector u(2);
 	u(0) = line_xy.first;
@@ -589,26 +590,6 @@ float LocEKF::getDivergence(Observation * z, PointLandmark pt)
     float y_b = -(pt.x - x) * sinh + (pt.y - y) * cosh;
 
     return static_cast<float>(hypot(x_b_r - x_b, y_b_r - y_b));
-}
-
-std::pair<float,float>
-LocEKF::findClosestLinePointCartesian(LineLandmark l, float x_r,
-									  float y_r, float h_r)
-{
-	const float x_l = l.dx;
-	const float y_l = l.dy;
-
-	const float x_b = l.x1;
-	const float y_b = l.y1;
-
-	// Find closest point on the line to the robot (global frame)
-	const float x_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*x_l + x_b;
-	const float y_p = ((x_r - x_b)*x_l + (y_r + y_b)*y_l)*y_l + y_b;
-
-	// Relativize the closest point
-	const float relX_p = x_p - x_r;
-	const float relY_p = y_p - y_r;
-	return std::pair<float,float>(relX_p, relX_p);
 }
 
 /**

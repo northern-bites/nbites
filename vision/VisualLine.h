@@ -89,6 +89,7 @@ public:
     VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
     VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
+	VisualLine(float _dist, float _bearing);
     VisualLine(const VisualLine& other);
     ~VisualLine();
 

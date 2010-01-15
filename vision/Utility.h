@@ -14,6 +14,8 @@ class Utility;
 #include "VisualLine.h"
 #include "VisionDef.h"
 #include "VisualLandmark.h"
+#include "VisualLine.h"
+#include "NogginStructs.h"
 
 // This class contains static utility functions which are used in many different
 // parts of our code.
@@ -75,9 +77,9 @@ public:
     // get length of line segment specified by (x1, y1), (x2, y2)
     static const float getLength(const float x1, const float y1,
                                  const float x2, const float y2);
-    static const float getLength(const point <const float> &p1, 
+    static const float getLength(const point <const float> &p1,
                                  const point <const float> &p2);
-    static const float getLength(const point <const int> &p1, 
+    static const float getLength(const point <const int> &p1,
                                  const point <const int> &p2);
 
 
@@ -85,10 +87,10 @@ public:
     // get angle between two lines
     // http://www.tpub.com/math2/5.htm
     static float getAngle(const VisualLine& line1, const VisualLine& line2);
-  
-    // Get the angle between the horizontal axis and the line specified by 
+
+    // Get the angle between the horizontal axis and the line specified by
     // (x1,y1),(x2,y2)
-    static float getAngle(int x1, int y1, int x2, int y2); 
+    static float getAngle(int x1, int y1, int x2, int y2);
 
     static float getAngle(const VisualLine& line1);
 
@@ -224,6 +226,11 @@ public:
     static const std::string getDistCertaintyString(int _cert);
 
     static const std::string getCornerIDString(int _id);
+
+	static const std::pair<float, float> findClosestLinePointCartesian(LineLandmark l,
+																	   float x_r,
+																	   float y_r,
+																	   float h_r);
 };
 
 

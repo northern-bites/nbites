@@ -32,6 +32,15 @@ VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
 
 }
 
+VisualLine::VisualLine(float _dist, float _bearing) :
+	VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+	possibleLines(ConcreteLine::concreteLines)
+{
+	setDistanceWithSD(_dist);
+	setBearingWithSD(_bearing);
+}
+
+
 
 
 
