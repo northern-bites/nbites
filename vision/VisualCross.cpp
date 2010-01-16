@@ -5,6 +5,13 @@ VisualCross::VisualCross() :
     init();
 }
 
+VisualCross::VisualCross(const crossID _id) :
+    VisualLandmark<crossID>(_id), VisualDetection()
+{
+    init();
+}
+
+
 VisualCross::VisualCross(const VisualCross& o) :
     VisualDetection(o), VisualLandmark<crossID>(o.id){}
 
@@ -23,6 +30,18 @@ void VisualCross::init()
     setDistance(0);
     setBearing(0);
     elevation = 0;
+
+	switch (id) {
+	case YELLOW_GOAL_CROSS:
+		setPossibleCrosses(&ConcreteCross::yellowGoalCrossList);
+		break;
+	case BLUE_GOAL_CROSS:
+		setPossibleCrosses(&ConcreteCross::blueGoalCrossList);
+		break;
+	case ABSTRACT_CROSS:
+		setPossibleCrosses(&ConcreteCross::abstractCrossList);
+		break;
+	}
 }
 
 /**

@@ -23,6 +23,7 @@ class VisualCross : public VisualDetection, public VisualLandmark<crossID> {
 public:
     // Construcotrs
     VisualCross();
+	VisualCross(const crossID id);
     // copy constructor
     VisualCross(const VisualCross&);
 

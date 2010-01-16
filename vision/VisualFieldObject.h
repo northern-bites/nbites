@@ -16,8 +16,6 @@ class VisualFieldObject;
 #include "Blob.h"
 #include "stdio.h"
 
-// This class should eventually inheret from VisualLandmark, once it is
-// cleaned a bit
 class VisualFieldObject : public VisualLandmark<fieldObjectID> ,
                           public VisualDetection {
 
