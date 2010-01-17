@@ -39,18 +39,18 @@ yellow_goal_endline(FIELD_WHITE_RIGHT_SIDELINE_X,
                     YELLOW_GOAL_ENDLINE);
 
 const ConcreteLine ConcreteLine::
-blue_yellow_sideline(FIELD_WHITE_LEFT_SIDELINE_X,
+top_sideline(FIELD_WHITE_LEFT_SIDELINE_X,
                      FIELD_WHITE_TOP_SIDELINE_Y,
                      FIELD_WHITE_RIGHT_SIDELINE_X,
                      FIELD_WHITE_TOP_SIDELINE_Y,
-                     BLUE_YELLOW_SIDELINE);
+                     TOP_SIDELINE);
 
 const ConcreteLine ConcreteLine::
-yellow_blue_sideline(FIELD_WHITE_LEFT_SIDELINE_X,
+bottom_sideline(FIELD_WHITE_LEFT_SIDELINE_X,
                      FIELD_WHITE_BOTTOM_SIDELINE_Y,
                      FIELD_WHITE_RIGHT_SIDELINE_X,
                      FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                     YELLOW_BLUE_SIDELINE);
+                     BOTTOM_SIDELINE);
 
 const ConcreteLine ConcreteLine::
 center_field_line(CENTER_FIELD_X,
@@ -59,6 +59,10 @@ center_field_line(CENTER_FIELD_X,
                   FIELD_WHITE_BOTTOM_SIDELINE_Y,
                   CENTER_FIELD_LINE);
 
+/**
+ * Goalbox lines are labeled as if looking out from within the goal.
+ * Top line is the "top" of the goalbox as the goalie sees it.
+ */
 const ConcreteLine ConcreteLine::
 blue_goalbox_top_line(BLUE_GOALBOX_RIGHT_X,
                       BLUE_GOALBOX_TOP_Y,
@@ -104,8 +108,8 @@ yellow_goalbox_right_line(YELLOW_GOALBOX_LEFT_X,
 const ConcreteLine* ConcreteLine::concreteLineList[NUM_LINES] =
 {&blue_goal_endline,
  &yellow_goal_endline,
- &blue_yellow_sideline,
- &yellow_blue_sideline,
+ &top_sideline,
+ &bottom_sideline,
  &center_field_line,
  &blue_goalbox_top_line,
  &blue_goalbox_left_line,
@@ -126,10 +130,10 @@ const string ConcreteLine::toString() const
         return "Blue Goal Sideline";
     case YELLOW_GOAL_ENDLINE:
         return "Yellow Goal Sideline";
-    case BLUE_YELLOW_SIDELINE:
-        return "Blue-Yellow Sideline";
-    case YELLOW_BLUE_SIDELINE:
-        return "Yellow-Blue Sideline";
+    case TOP_SIDELINE:
+        return "Top Sideline";
+    case BOTTOM_SIDELINE:
+        return "Bottom Sideline";
     case CENTER_FIELD_LINE:
         return "Center Field Line";
     case BLUE_GOALBOX_TOP_LINE:

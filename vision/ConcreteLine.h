@@ -27,8 +27,8 @@ enum lineID {
     BLUE_GOAL_ENDLINE,
     YELLOW_GOAL_ENDLINE,
     // looking from center field out, left end is at the blue goal
-    BLUE_YELLOW_SIDELINE,
-    YELLOW_BLUE_SIDELINE, // 60
+    TOP_SIDELINE,
+    BOTTOM_SIDELINE, // 60
     CENTER_FIELD_LINE,
     BLUE_GOALBOX_TOP_LINE,
     BLUE_GOALBOX_LEFT_LINE,
@@ -78,8 +78,8 @@ public:
 public:
     static const ConcreteLine blue_goal_endline,
                     yellow_goal_endline,
-                    blue_yellow_sideline,
-                    yellow_blue_sideline,
+                    top_sideline,
+                    bottom_sideline,
                     center_field_line,
                     blue_goalbox_top_line,
                     blue_goalbox_left_line,
