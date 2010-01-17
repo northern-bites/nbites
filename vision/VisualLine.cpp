@@ -165,7 +165,7 @@ void VisualLine::init()
     length = getLength(*this);
 
     calculateWidths();
-	//calculateDistBearing();
+	calculateDistBearing();
 }
 
 /**
