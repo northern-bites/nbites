@@ -249,6 +249,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw,
     vector<Observation> Z_t;
 
 	checkObjects(Z_t, myPos, noiseLevel);
+	checkCrosses(Z_t, myPos, noiseLevel);
 	checkCorners(Z_t, myPos, noiseLevel);
 	checkLines(Z_t, myPos);
 
@@ -303,10 +304,39 @@ void checkObjects(vector<Observation> &Z_t, PoseEst myPos, float noiseLevel)
     }
 }
 
+void checkCrosses(vector<Observation> &Z_t, PoseEst myPos, float noiseLevel)
+{
+    for(int i = 0; i < ConcreteCross::NUM_FIELD_CROSSES; ++i) {
+		const ConcreteCross* toView = ConcreteCross::concreteCrossList[i];
+        float deltaX = toView->getFieldX() - myPos.x;
+        float deltaY = toView->getFieldY() - myPos.y;
+        float visDist = hypot(deltaX, deltaY);
+        float visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h);
+
+        // Check if the object is viewable
+        if ((visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) &&
+            visDist < CORNER_MAX_VIEW_RANGE) {
+
+            // Get measurement variance and add noise to reading
+            if(!use_perfect_dists) {
+                visDist += sampleNormalDistribution(visDist*noiseLevel);
+            }
+
+            const crossID id = toView->getID();
+            // Build the visual corner
+            VisualCross vc = VisualCross(id);
+            vc.setDistanceWithSD(visDist);
+			vc.setBearingWithSD(visBearing);
+
+            // Build the observation
+            Observation seen(vc);
+            Z_t.push_back(seen);
+        }
+    }
+}
+
 void checkCorners(vector<Observation> &Z_t, PoseEst myPos, float noiseLevel)
 {
-    // Measurements between robot position and seen object
-    float deltaX, deltaY;
     // required measurements for the added observation
     float visDist, visBearing;
 
@@ -461,6 +491,14 @@ void checkLines(vector<Observation> &Z_t, PoseEst myPos)
 			line = &ConcreteLine::yellow_goalbox_left_line;
 			break;
 		case YELLOW_GOALBOX_RIGHT_LINE:
+		case UNKNOWN_LINE:
+		case SIDE_OR_ENDLINE:
+		case SIDELINE_LINE:
+		case ENDLINE_LINE:
+		case GOALBOX_LINE:
+		case GOALBOX_SIDE_LINE:
+		case GOALBOX_TOP_LINE:
+		default:
 			line = &ConcreteLine::yellow_goalbox_right_line;
 			break;
 		}

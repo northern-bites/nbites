@@ -16,7 +16,6 @@ enum ScanDirection {
     HORIZONTAL,
     VERTICAL
 };
-//struct linePoint;
 
 // structure for a single line point
 struct linePoint {

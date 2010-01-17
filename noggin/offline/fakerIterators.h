@@ -55,8 +55,12 @@ void iterateMCLObsPath(std::fstream * locFile, std::fstream * coreFile,
 
 void iterateFakerPath(std::fstream * mclFile, std::fstream * ekfFile,
                       NavPath * letsGo, float noiseLevel = 0.05);
-void checkObjects(std::vector<Observation> &Z_t, PoseEst myPos, float noiseLevel);
-void checkCorners(std::vector<Observation> &Z_t, PoseEst myPos, float noiseLevel);
+void checkObjects(std::vector<Observation> &Z_t, PoseEst myPos,
+				  float noiseLevel);
+void checkCorners(std::vector<Observation> &Z_t, PoseEst myPos,
+				  float noiseLevel);
+void checkCrosses(std::vector<Observation> &Z_t, PoseEst myPos,
+				  float noiseLevel);
 void checkLines(std::vector<Observation> &Z_t, PoseEst myPos);
 std::vector<Observation> determineObservedLandmarks(PoseEst myPos,
                                                     float neckYaw,
