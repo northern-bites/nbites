@@ -28,26 +28,26 @@
 class CoordHeadCommand : public MotionCommand
 {
 public:
-    CoordHeadCommand(const float _xRelMe, const float _yRelMe,
-					 const float _relHeight,
-					 const float _maxSpeedYaw =
-					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
-					 const float _maxSpeedPitch =
-					 Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
+    CoordHeadCommand( const float _xRelMe, const float _yRelMe,
+					  const float _relHeight,
+					  const float _maxSpeedYaw =
+                      Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
+                      const float _maxSpeedPitch =
+                      Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		)
         : MotionCommand( MotionConstants::COORD_HEAD ),
-          relX( _xRelMe),
-		  relY( _yRelMe),
+          relX( _xRelMe ),
+		  relY( _yRelMe ),
 		  relHeight( _relHeight),
 		  maxSpeedYaw( _maxSpeedYaw ),
 		  maxSpeedPitch( _maxSpeedPitch ),
-		  yaw(calcYaw()),
-		  pitch(calcPitch())
+		  yaw( calcYaw() ),
+		  pitch( calcPitch() )
         {
             setChainList();
         }
-	const float getMaxSpeedYaw() const {return maxSpeedYaw; }
-	const float getMaxSpeedPitch() const {return maxSpeedPitch; }
+	const float getMaxSpeedYaw() const { return maxSpeedYaw; }
+	const float getMaxSpeedPitch() const { return maxSpeedPitch; }
 	const float getPitch() const { return pitch; }
 	const float getYaw() const { return yaw; }
 private:
@@ -57,13 +57,17 @@ private:
 	}
 	const float calcPitch() {
 		float groundDist = sqrt( relX * relX + relY * relY );
-		if (groundDist == 0.0){
+		if (groundDist <= 0.0){
 			groundDist = 0.1;
 		}
 		//b/c groundDist is always positive, no need for atan2
 		float pitchTemp = atan( relHeight / groundDist);
-		//b/c we use lower angled camera we need to adjust by constant angle
+        std::cout << "relHeight = " << relHeight << std::endl;
+        std::cout << "pitchTemp = " << pitchTemp << std::endl;
+        //b/c we use lower angled camera we need to adjust by constant angle
 		pitchTemp = pitchTemp - 0.6981;//40 degrees to radians (from reddoc)
+        pitchTemp = -pitchTemp;
+        std::cout << "pitchTempModified = " << pitchTemp << std::endl;
 		return pitchTemp;
 	}
 

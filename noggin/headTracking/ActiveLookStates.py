@@ -3,6 +3,9 @@ from math import (hypot, sin, cos)
 import man.motion as motion
 from ..util.MyMath import getRelativeBearing
 
+
+# don't like this- no other states use externally accessible calls
+# should be moved out to HeadTracker.py
 def goalieActiveLook(tracker):
     '''goalie looks at ball, then own left post, opp left post, opp right post,
     own right post and repeats'''
