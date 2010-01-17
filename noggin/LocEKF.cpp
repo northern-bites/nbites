@@ -289,63 +289,58 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
 #ifdef DEBUG_LOC_EKF_INPUTS
 	cout << "\t\t\tUsing cartesian " << endl;
 #endif
-	if ( z.isLine() ){
+	// Convert our sighting to cartesian coordinates
+	MeasurementVector z_x(2);
+	z_x(0) = z.getVisDistance() * cos(z.getVisBearing());
+	z_x(1) = z.getVisDistance() * sin(z.getVisBearing());
 
-	} else {
+	// Get expected values of the post
+	const float x_b = z.getPointPossibilities()[obsIndex].x;
+	const float y_b = z.getPointPossibilities()[obsIndex].y;
 
-        // Convert our sighting to cartesian coordinates
-        MeasurementVector z_x(2);
-        z_x(0) = z.getVisDistance() * cos(z.getVisBearing());
-        z_x(1) = z.getVisDistance() * sin(z.getVisBearing());
+	const float x = xhat_k_bar(0);
+	const float y = xhat_k_bar(1);
+	const float h = xhat_k_bar(2);
 
-        // Get expected values of the post
-        const float x_b = z.getPointPossibilities()[obsIndex].x;
-        const float y_b = z.getPointPossibilities()[obsIndex].y;
+	float sinh, cosh;
+	sincosf(h, &sinh, &cosh);
 
-        const float x = xhat_k_bar(0);
-        const float y = xhat_k_bar(1);
-        const float h = xhat_k_bar(2);
+	MeasurementVector d_x(2);
+	d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
+	d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
-        float sinh, cosh;
-        sincosf(h, &sinh, &cosh);
+	// Calculate invariance
+	V_k = z_x - d_x;
 
-		MeasurementVector d_x(2);
-        d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
-        d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
+	// Calculate jacobians
+	H_k(0,0) = -cosh;
+	H_k(0,1) = -sinh;
+	H_k(0,2) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
-        // Calculate invariance
-        V_k = z_x - d_x;
+	H_k(1,0) = sinh;
+	H_k(1,1) = -cosh;
+	H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
 
-        // Calculate jacobians
-        H_k(0,0) = -cosh;
-        H_k(0,1) = -sinh;
-        H_k(0,2) = -(x_b - x) * sinh + (y_b - y) * cosh;
+	// Update the measurement covariance matrix
+	const float dist_sd_2 = pow(z.getDistanceSD(), 2);
+	const float v = dist_sd_2 * sin(z.getBearingSD()) * cos(z.getBearingSD());
 
-        H_k(1,0) = sinh;
-        H_k(1,1) = -cosh;
-        H_k(1,2) = -(x_b - x) * cosh - (y_b - y) * sinh;
-
-        // Update the measurement covariance matrix
-		const float dist_sd_2 = pow(z.getDistanceSD(), 2);
-		const float v = dist_sd_2 * sin(z.getBearingSD()) * cos(z.getBearingSD());
-
-        R_k(0,0) = dist_sd_2 * pow(cos(z.getBearingSD()), 2);
-		R_k(0,1) = v;
-		R_k(1,0) = v;
-        R_k(1,1) = dist_sd_2 * pow(sin(z.getBearingSD()), 2);
+	R_k(0,0) = dist_sd_2 * pow(cos(z.getBearingSD()), 2);
+	R_k(0,1) = v;
+	R_k(1,0) = v;
+	R_k(1,1) = dist_sd_2 * pow(sin(z.getBearingSD()), 2);
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-        cout << "\t\t\tR vector is" << R_k << endl;
-        cout << "\t\t\tH vector is" << H_k << endl;
-        cout << "\t\t\tV vector is" << V_k << endl;
-        cout << "\t\t\t\td vector is" << d_x << endl;
-        cout << "\t\t\t\t\tx est is " << x << endl;
-        cout << "\t\t\t\t\ty est is " << y << endl;
-        cout << "\t\t\t\t\th est is " << h << endl;
-        cout << "\t\t\t\t\tx_b est is " << x_b << endl;
-        cout << "\t\t\t\t\ty_b est is " << y_b << endl;
+	cout << "\t\t\tR vector is" << R_k << endl;
+	cout << "\t\t\tH vector is" << H_k << endl;
+	cout << "\t\t\tV vector is" << V_k << endl;
+	cout << "\t\t\t\td vector is" << d_x << endl;
+	cout << "\t\t\t\t\tx est is " << x << endl;
+	cout << "\t\t\t\t\ty est is " << y << endl;
+	cout << "\t\t\t\t\th est is " << h << endl;
+	cout << "\t\t\t\t\tx_b est is " << x_b << endl;
+	cout << "\t\t\t\t\ty_b est is " << y_b << endl;
 #endif
-	}
 }
 
 void LocEKF::incorporatePolarMeasurement(int obsIndex,
