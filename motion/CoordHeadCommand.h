@@ -38,7 +38,7 @@ public:
         : MotionCommand( MotionConstants::COORD_HEAD ),
           relX( _xRelMe ),
 		  relY( _yRelMe ),
-		  relHeight( _relHeight),
+		  relHeight( _relHeight ),
 		  maxSpeedYaw( _maxSpeedYaw ),
 		  maxSpeedPitch( _maxSpeedPitch ),
 		  yaw( calcYaw() ),
@@ -62,13 +62,9 @@ private:
 		}
 		//b/c groundDist is always positive, no need for atan2
 		float pitchTemp = atan( relHeight / groundDist);
-        std::cout << "relHeight = " << relHeight << std::endl;
-        std::cout << "pitchTemp = " << pitchTemp << std::endl;
         //b/c we use lower angled camera we need to adjust by constant angle
 		pitchTemp = pitchTemp - 0.6981;//40 degrees to radians (from reddoc)
-        pitchTemp = -pitchTemp;
-        std::cout << "pitchTempModified = " << pitchTemp << std::endl;
-		return pitchTemp;
+        return pitchTemp;
 	}
 
     virtual void setChainList() {
