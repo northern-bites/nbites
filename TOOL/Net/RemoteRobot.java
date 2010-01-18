@@ -203,6 +203,7 @@ public class RemoteRobot extends FileSet {
 		} catch (TOOLException e) {
             NetworkModule.logError("Attempt to retrieve objects failed",
                                    e);
+			return null;
 		}
 	}
 
