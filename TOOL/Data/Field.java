@@ -51,8 +51,8 @@ public abstract class Field
     public final double GOAL_DEPTH = getGoalDepth();
     public final double GOAL_SIDE_LENGTH = getGoalSideLength();
     public final double GOAL_WIDTH = getGoalWidth();
-    public final double GOAL_BOX_WIDTH = getGoalBoxWidth();
-    public final double GOAL_BOX_DEPTH = getGoalBoxDepth();
+    public final double GOALBOX_WIDTH = getGoalBoxWidth();
+    public final double GOALBOX_DEPTH = getGoalBoxDepth();
     public final double CENTER_CIRCLE_RADIUS = getCCRadius();
     public final double GOAL_POST_RADIUS = getGoalPostRadius();
     public final double BALL_RADIUS = getBallRadius();
@@ -94,10 +94,24 @@ public abstract class Field
 
     public final double GOAL_X_LEFT = MIDFIELD_X - (GOAL_WIDTH / 2.);
     public final double GOAL_X_CENTER = MIDFIELD_X;
-    public final double GOAL_BOX_TOP_Y = MIDFIELD_Y + (GOAL_BOX_WIDTH / 2.);
-    public final double GOAL_BOX_BOTTOM_Y = MIDFIELD_Y - (GOAL_BOX_WIDTH / 2.);
+    public final double GOALBOX_TOP_Y = MIDFIELD_Y + (GOALBOX_WIDTH / 2.);
+    public final double GOALBOX_BOTTOM_Y = MIDFIELD_Y - (GOALBOX_WIDTH / 2.);
     public final double RIGHT_GOAL_Y = BOTTOM_SIDELINE_Y;
     public final double LEFT_GOAL_Y = TOP_SIDELINE_Y;
+
+	// my goal box constants relative to (0,0) on my team
+	public final double BLUE_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
+	public final double BLUE_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
+	// bottom as in closest to (0,0)
+	public final double BLUE_GOALBOX_LEFT_X = GREEN_PAD_X;
+	public final double BLUE_GOALBOX_RIGHT_X = GREEN_PAD_X + GOALBOX_DEPTH;
+
+	// opp goal box constants relative to (0,0) on my team
+	public final double YELLOW_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
+	public final double YELLOW_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
+	public final double YELLOW_GOALBOX_LEFT_X =
+		FIELD_WHITE_RIGHT_SIDELINE_X - GOALBOX_DEPTH;
+	public final double YELLOW_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
 
     public final double DRAW_STROKE = 1.;
     public final Color FIELD_COLOR = new Color(0,200,0);//Color.GREEN;
@@ -229,13 +243,13 @@ public abstract class Field
 
         // Left goal box
         drawRect(g2, LINES_COLOR, LINE_THICKNESS,
-                 LEFT_SIDELINE_X, GOAL_BOX_BOTTOM_Y,
-                 GOAL_BOX_DEPTH, GOAL_BOX_WIDTH);
+                 LEFT_SIDELINE_X, GOALBOX_BOTTOM_Y,
+                 GOALBOX_DEPTH, GOALBOX_WIDTH);
 
         // Right goal box
         drawRect(g2, LINES_COLOR, LINE_THICKNESS,
-                 RIGHT_SIDELINE_X - GOAL_BOX_DEPTH, GOAL_BOX_BOTTOM_Y,
-                 GOAL_BOX_DEPTH, GOAL_BOX_WIDTH);
+                 RIGHT_SIDELINE_X - GOALBOX_DEPTH, GOALBOX_BOTTOM_Y,
+                 GOALBOX_DEPTH, GOALBOX_WIDTH);
 
         // Left side cross
         drawLine(g2, LINES_COLOR, LINE_THICKNESS,
