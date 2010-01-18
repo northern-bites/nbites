@@ -658,6 +658,11 @@ public class WorldControllerPainter implements RobotListener
     // 0 true, 1 false
     public void sawLandmark(float x, float y, int distinct)
     {
+		// This prevents us from gathering too much of a
+		// backlog of unpainted landmarks
+		if (numSeenLandmarks > seenLandmarks.length){
+			return;
+		}
         seenLandmarks[numSeenLandmarks][X_INDEX] = x;
         seenLandmarks[numSeenLandmarks][Y_INDEX] = y;
         seenLandmarks[numSeenLandmarks][DISTINCT_INDEX] = distinct;

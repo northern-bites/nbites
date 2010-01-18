@@ -162,6 +162,8 @@ public class WorldController extends JPanel implements KeyListener,
     public final static String DISCONNECT_STRING = "Disconnect";
     public final static String LIMIT_TEAM_STRING = "Restrict to Team:";
     public final static String DRAW_EST_STRING = "Draw Estimates";
+	public final static String START_TCP_STRING = "Start TCP Stream";
+	public final static String STOP_TCP_STRING = "Stop TCP Stream";
 
     // Button Action Commands
     public static final String SWITCH_FIELDS_ACTION = "switchfields";
@@ -383,7 +385,11 @@ public class WorldController extends JPanel implements KeyListener,
         } else if (cmd.equals(VIEW_UDP_PACKETS_ACTION)) {
             startRobotUDP();
 		} else if (cmd.equals(VIEW_TCP_ACTION)) {
+			viewTCPStream();
+		} else if (cmd.equals(START_TCP_ACTION)) {
 			startTCPStream();
+		} else if (cmd.equals(STOP_TCP_ACTION)) {
+			stopTCPStream();
         } else if (cmd.equals(DISCONNECT_ACTION)) {
             udp_server.setReceiving(false);
             startDoNothing();
@@ -539,10 +545,17 @@ public class WorldController extends JPanel implements KeyListener,
 	{
 		// Set buttons appropriately for whether
 		// TCP Streaming is active or not
-		button_one.setText("Stop TCP Streaming");
-		button_one.setActionCommand(STOP_TCP_ACTION);
-		button_one.setVisible(true);
-
+		if (tcp_handler.isReceiving()) {
+			button_one.setText(STOP_TCP_STRING);
+			button_one.setActionCommand(STOP_TCP_ACTION);
+			button_one.setVisible(true);
+			debugViewer.setVisible(true);
+		} else {
+			button_one.setText(START_TCP_STRING);
+			button_one.setActionCommand(START_TCP_ACTION);
+			button_one.setVisible(true);
+			debugViewer.setVisible(false);
+		}
 	}
 
 	// Sets up the streaming object info from robot
@@ -562,12 +575,23 @@ public class WorldController extends JPanel implements KeyListener,
         painter.setPositionsToDraw(1);
     }
 
-	public void startTCPStream()
+	public void viewTCPStream()
 	{
 		nothingButtons();
 		tcpButtons();
-		tcp_handler.setReceiving(true);
 		mode = VIEW_TCP_STREAM;
+	}
+
+	public void startTCPStream()
+	{
+		tcp_handler.setReceiving(true);
+		tcpButtons();
+	}
+
+	public void stopTCPStream()
+	{
+		tcp_handler.setReceiving(false);
+		tcpButtons();
 	}
 
     public void startDoNothing()

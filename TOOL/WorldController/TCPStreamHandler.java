@@ -45,8 +45,8 @@ public class TCPStreamHandler extends Thread {
 
 				displayObservations();
 				timeSpent = System.currentTimeMillis() - startTime;
-				if (timeSpent < robotModule.FRAME_LENGTH_MILLIS){
-					Thread.sleep((int)(robotModule.FRAME_LENGTH_MILLIS - timeSpent));
+				if (timeSpent < 80){
+					Thread.sleep((int)(80 - timeSpent));
 				}
 			}
 		} catch (InterruptedException e){
@@ -95,10 +95,15 @@ public class TCPStreamHandler extends Thread {
 
 		receiving = toReceive;
 		if (receiving) {
-			debugViewer.setVisible(true);
 			System.out.println("Receiving TCP Information from robot");
+		} else {
+			painter.reportEndFrame();
 		}
+	}
 
+	public boolean isReceiving()
+	{
+		return receiving;
 	}
 
 }
