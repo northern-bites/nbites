@@ -288,7 +288,7 @@ public class DebugViewer extends JFrame {
 
         window = getContentPane();
         num_landmarks = 0;
-        landmark_components = new Component[50];
+        landmark_components = new Component[100];
 
         cornerIDMap = new HashMap<Integer, Point2D.Double>();
         cornerMap = new HashMap<Point2D.Double,String>();

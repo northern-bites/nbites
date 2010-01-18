@@ -44,6 +44,7 @@ public class TOOLProtocol {
     public static final int NUM_HEAD_ENG   = 4;
 
 	private static final int NUM_POSSIBLE_OBJECTS = 120;
+	private static final float INIT_OBJECT_VALUE = -1.0f;
 
     private DataSerializer serial;
 
@@ -219,7 +220,9 @@ public class TOOLProtocol {
 
 			if (r.objects()){
 				objects = new float[NUM_POSSIBLE_OBJECTS];
-				serial.readFloats(objects);
+				for (int i=0; i < objects.length ; ++i)
+					objects[i] = INIT_OBJECT_VALUE;
+				serial.readFloats(objects,true);
 			}
 
         }catch (IOException e) {
@@ -302,8 +305,8 @@ public class TOOLProtocol {
 		if (connected) {
 			Vector<Observation> obs = new Vector<Observation>();
 			for (int i = 0; i < objects.length; ++i){
-				if (objects[i] != null)
-					obs.add(new Observation(i, ++i, ++i));
+				 if (objects[i] != INIT_OBJECT_VALUE)
+					 obs.add(new Observation((int)objects[i], objects[++i], objects[++i]));
 			}
 			return obs;
 		}

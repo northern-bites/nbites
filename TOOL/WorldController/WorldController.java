@@ -566,6 +566,7 @@ public class WorldController extends JPanel implements KeyListener,
 	{
 		nothingButtons();
 		tcpButtons();
+		tcp_handler.setReceiving(true);
 		mode = VIEW_TCP_STREAM;
 	}
 

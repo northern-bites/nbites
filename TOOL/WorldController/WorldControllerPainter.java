@@ -114,7 +114,7 @@ public class WorldControllerPainter implements RobotListener
     private double by_x,by_y;
     private double yb_x,yb_y;
 
-    private float[][] seenLandmarks = new float[30][3];
+    private float[][] seenLandmarks = new float[100][3];
     private int numSeenLandmarks;
     private static final int X_INDEX = 0;
     private static final int Y_INDEX = 1;
