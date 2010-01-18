@@ -406,4 +406,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         if (none)
             robotMenu.add("None available");
     }
+
+	public RemoteRobot getSelectedRobot() {
+		return selectedRobot;
+	}
 }

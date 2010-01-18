@@ -194,7 +194,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         // Try to get the last directory we used for the world controller
         wcLastDirectory = prefs.get(DEFAULT_WC_DIRECTORY_STRING,
                                     System.getProperty("user.dir"));
-        addModule(new WorldControllerModule(this), robot_mod);
+        addModule(new WorldControllerModule(this, robot_mod));
 
         // Tell the modules which colortable they should use.
         updateColorTableReferences();

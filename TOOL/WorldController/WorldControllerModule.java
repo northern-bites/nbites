@@ -5,6 +5,7 @@ import java.awt.Component;
 
 import TOOL.TOOL;
 import TOOL.TOOLModule;
+import TOOL.Net.RobotViewModule;
 //import TOOL.WorldController.WorldController;
 
 /**
@@ -15,19 +16,19 @@ import TOOL.TOOLModule;
 public class WorldControllerModule extends TOOLModule {
     private WorldController worldController;
 
-    public WorldControllerModule(TOOL tool) {
-	super(tool);
+    public WorldControllerModule(TOOL tool, RobotViewModule _robot_mod) {
+		super(tool);
 
-	worldController = new WorldController(t);
+		worldController = new WorldController(t, _robot_mod);
 
-//	t.getDataManager().addDataListener(worldController);
-}
+		//	t.getDataManager().addDataListener(worldController);
+	}
 
     public String getDisplayName() {
-	return "WorldController";
+		return "WorldController";
     }
 
     public Component getDisplayComponent() {
-	return worldController;
+		return worldController;
     }
 }

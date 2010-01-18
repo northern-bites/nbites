@@ -53,6 +53,9 @@ public class DataRequest {
     public static final DataRequest IMAGE_THRESH =
         new DataRequest(false, false, false, true, true, false, false, false,
                         false, false);
+	public static final DataRequest OBJECTS_ONLY =
+		new DataRequest(false, false, false, false, false,
+						false, true, false, false, false);
 
 
     public static boolean isImplemented(DataTypes.DataType type) {
@@ -74,7 +77,7 @@ public class DataRequest {
     private byte[] data;
 
     public DataRequest(boolean i, boolean j, boolean s, boolean img, boolean t,
-        boolean jpeg, boolean o, boolean m, boolean l, boolean c) {
+					   boolean jpeg, boolean o, boolean m, boolean l, boolean c) {
         this(new boolean[] {i, j, s, img, t, jpeg, o, m, l, c});
     }
     public DataRequest(boolean[] values) {

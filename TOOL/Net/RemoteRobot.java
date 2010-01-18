@@ -36,6 +36,7 @@ import TOOL.Data.File.FileSet;
 import TOOL.Data.File.FrameLoader;
 import TOOL.Image.ThresholdedImage;
 import TOOL.Image.TOOLImage;
+import TOOL.WorldController.Observation;
 
 /**
  * A RemoteRobot object represents an advanced DataSet layered over a network
@@ -192,6 +193,18 @@ public class RemoteRobot extends FileSet {
             return null;
         }
     }
+
+	public Vector<Observation> retrieveObjects() {
+		try {
+			if (!proto.isConnected())
+				connect();
+			proto.request(DataRequest.OBJECTS_ONLY);
+			return proto.getObjects();
+		} catch (TOOLException e) {
+            NetworkModule.logError("Attempt to retrieve objects failed",
+                                   e);
+		}
+	}
 
 	public void fillNewFrame(Frame f) {
 		try {
