@@ -1,5 +1,5 @@
 from . import TrackingConstants as constants
-from math import (hypot, sin, cos)
+from math import (hypot, sin, cos, pi)
 import man.motion as motion
 from ..util.MyMath import getRelativeBearing
 
@@ -60,13 +60,18 @@ def lookToPoint(tracker):
     my = tracker.brain.my
     globalRelX = tracker.visGoalX - my.x
     globalRelY = tracker.visGoalY - my.y
+    #print "globalRelX = ", str(globalRelX)
+    #print "globalRelY = ", str(globalRelY)
     dist = hypot(globalRelX, globalRelY)
-
-    bearingToPoint = getRelativeBearing( my.x, my.y, my.h,
+    #print "globalDist = ", str(dist)
+    bearingToPointInDeg = getRelativeBearing( my.x, my.y, my.h,
                                          tracker.visGoalX, tracker.visGoalY )
-    xRelMe = dist*sin(bearingToPoint)
-    yRelMe = dist*cos(bearingToPoint)
-
+    bearingToPointInRad = bearingToPointInDeg * (pi/180.)
+    xRelMe = dist*cos(bearingToPointInRad)
+    yRelMe = dist*sin(bearingToPointInRad)
+    #print "bearingToPoint = ", bearingToPointInRad
+    #print "xRelMe = ", xRelMe
+    #print "yRelMe = ", yRelMe
     #relH is relative to camera height. negative is normal
     lensHeightInCM = tracker.helper.getCameraHeight()
     relHeight = tracker.visGoalHeight - (lensHeightInCM)
