@@ -60,7 +60,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
           LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0),
-      useAmbiguous(true)
+	  lastObservations(0), useAmbiguous(true)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -143,6 +143,7 @@ void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
     timeUpdate(u);
     limitAPrioriUncert();
     lastOdo = u;
+	lastObservations = Z;
 
     if (! useAmbiguous) {
         // Remove ambiguous observations

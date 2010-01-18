@@ -102,6 +102,10 @@ public:
     virtual const MotionModel getLastOdo() const {
         return lastOdo;
     }
+
+	virtual const vector<Observation> getLastObservations() const {
+		return lastObservations;
+	}
     // Setters
     /**
      * @param val The new estimate of the loc x position
@@ -169,6 +173,7 @@ private:
 
     // Last odometry update
     MotionModel lastOdo;
+	vector<Observation> lastObservations;
     bool useAmbiguous;
 
     // Parameters

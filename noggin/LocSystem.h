@@ -36,6 +36,7 @@ public:
     virtual const float getHUncert() const = 0;
     virtual const float getHUncertDeg() const = 0;
     virtual const MotionModel getLastOdo() const = 0;
+	virtual const vector<Observation> getLastObservations() const = 0;
 
     // Setters
     virtual void setXEst(float xEst) = 0;

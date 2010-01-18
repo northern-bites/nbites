@@ -198,6 +198,20 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
         serial.write_bytes(&vision->thresh->thresholded[0][0],
                            IMAGE_WIDTH * IMAGE_HEIGHT);
 
+	if (r.objects) {
+		if (loc.get()) {
+			vector<Observation> obs = loc->getLastObservations();
+			vector<float> obs_values;
+
+			for (int i=0; i < obs.size() ; ++i){
+				obs_values.push_back(static_cast<float>(obs[i].getID()));
+				obs_values.push_back(obs[i].getVisDistance());
+				obs_values.push_back(obs[i].getVisBearing());
+			}
+			serial.write_floats(obs_values);
+		}
+	}
+
     if (r.local) {
         // send localization data
         vector<float> loc_values;
