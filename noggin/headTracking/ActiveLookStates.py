@@ -1,80 +1,62 @@
 from . import TrackingConstants as constants
-from math import (hypot, sin, cos, pi)
-import man.motion as motion
-from ..util.MyMath import getRelativeBearing
+import man.motion.HeadMoves as HeadMoves
 
-
-# don't like this- no other states use externally accessible calls
-# should be moved out to HeadTracker.py
-def goalieActiveLook(tracker):
-    '''goalie looks at ball, then own left post, opp left post, opp right post,
-    own right post and repeats'''
-    #field cross and goalbox corners prbly more useful
-    STARE_TIME = 30
-    if tracker.firstFrame():
-        tracker.lookToLandmark(tracker.brain.ball)
-    elif STARE_TIME < (tracker.counter % STARE_TIME*5) < STARE_TIME*2:
-        tracker.lookToLandmark(tracker.brain.myGoalLeftPost)
-    elif (tracker.counter % STARE_TIME*5) < STARE_TIME*3:
-        tracker.lookToLandmark(tracker.brain.oppGoalLeftPost)
-    elif (tracker.counter % STARE_TIME*5) < STARE_TIME*4:
-        tracker.lookToLandmark(tracker.brain.oppGoalRightPost)
-    elif (tracker.counter % STARE_TIME*5) < STARE_TIME*5:
-        tracker.lookToLandmark(tracker.brain.myGoalRightPost)
-    else:
-        tracker.lookToLandmark(tracker.brain.ball)
-
-    return tracker.stay()
-
-def activeLookBGLP(tracker):
-    #need to do every frame
-    bglp = tracker.brain.bglp
-    if bglp.on:
-        tracker.trackLandmark(bglp)
-    else:
-        tracker.lookToLandmark(bglp)
-
-def landmarkScan(tracker):
-    if tracker.firstFrame():
-        b = tracker.brain
-        landmarks = [ b.myGoalLeftPost, b.oppGoalLeftPost,
-                      b.oppGoalRightPost, b.myGoalRightPost ]
-        i = iter(landmarks)
-        print landmarks
-
-    try:
-        print tracker.counter % constants.LOOK_TO_TIME_TO_FIND
-        if ((tracker.counter % constants.LOOK_TO_TIME_TO_FIND) == 0):
-            print "getting next landmark"
-            p = i.next()
-
-    except StopIteration:
-        return tracker.goNow('stop')
-    #is switching us out of this state
-    #tracker.trackLandmark(p)
-
-    return tracker.stay()
+TIME_TO_LOOK_TO_TARGET = 1.0
 
 def lookToPoint(tracker):
-    """look to an absolute position on the field"""
-    my = tracker.brain.my
-    globalRelX = tracker.visGoalX - my.x
-    globalRelY = tracker.visGoalY - my.y
+    tracker.helper.lookToPoint()
+    return tracker.stay()
 
-    dist = hypot(globalRelX, globalRelY)
+def lookToTarget(tracker):
+    """looks to best guess of where target is"""
+    #should only be called by states that have already set activeLocOn=False
 
-    bearingToPointInDeg = getRelativeBearing( my.x, my.y, my.h,
-                                              tracker.visGoalX, tracker.visGoalY )
-    bearingToPointInRad = bearingToPointInDeg * (pi/180.)
+    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        return tracker.goNow('targetTracking')
 
-    xRelMe = dist*cos(bearingToPointInRad)
-    yRelMe = dist*sin(bearingToPointInRad)
+    elif tracker.stateTime >= TIME_TO_LOOK_TO_TARGET:
+        return tracker.goLater('scanForTarget')
 
-    #relH is relative to camera height. negative is normal
-    lensHeightInCM = tracker.helper.getCameraHeight()
-    relHeight = lensHeightInCM - tracker.visGoalHeight
-    headMove = motion.CoordHeadCommand( xRelMe, yRelMe, relHeight )
-    tracker.brain.motion.coordHead(headMove)
+    tracker.helper.lookToPoint()
 
     return tracker.stay()
 
+def scanForTarget(tracker):
+    """performs naive scan for target"""
+    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        return tracker.goNow('targetTracking')
+
+    if not tracker.brain.motion.isHeadActive():
+        targetDist = tracker.target.locDist
+
+        if targetDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
+            tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)
+
+        elif ( targetDist > HeadMoves.MID_SCAN_CLOSE_BOUND and
+               targetDist < HeadMoves.MID_SCAN_FAR_BOUND ):
+            tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
+
+        else:
+            tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
+
+    return tracker.stay()
+
+def targetTracking(tracker):
+    """
+    state askes it's parent (the tracker) for an object or angles to track
+    while the object is on screen, or angles are passed, we track it.
+    Otherwise, we continually write the current values into motion via setHeads.
+
+    If a sweet move is begun while we are tracking, the current setup is to let
+    the sweet move conclude and then resume tracking afterward.
+    """
+
+    if tracker.firstFrame():
+        tracker.activeLocOn = False
+
+    tracker.helper.trackObject()
+
+    if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+        return tracker.goLater('lookToTarget')
+
+    return tracker.stay()

@@ -27,7 +27,7 @@ def lookRightClose(player):
     brain.tracker.lookToPoint(my.x, my.y - 50, 0)
 
     if player.counter == 50:
-        return player.goLater('done')
+        return player.goLater('lookRightFar')
     return player.stay()
 
 def lookRightFar(player):

@@ -3,7 +3,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
-from math import (fabs)
+from math import (fabs, sin, cos, pi, hypot)
 
 class HeadTrackingHelper():
     def __init__(self, tracker):
@@ -80,7 +80,31 @@ class HeadTrackingHelper():
         maxDiff = max(pitchDiff, yawDiff)
         panTime = maxDiff/constants.MAX_PAN_SPEED
         self.executeHeadMove( ((heads, panTime, 0,
-                                StiffnessModes.LOW_HEAD_STIFFNESSES),) )
+                                 StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
+
+    def lookToPoint(self):
+        """look to an absolute position on the field"""
+        t = self.tracker
+        my = t.brain.my
+
+        globalRelX = t.visGoalX - my.x
+        globalRelY = t.visGoalY - my.y
+
+        dist = hypot(globalRelX, globalRelY)
+
+        bearingToPointInDeg = MyMath.getRelativeBearing( my.x, my.y, my.h,
+                                                         t.visGoalX,
+                                                         t.visGoalY )
+        bearingToPointInRad = bearingToPointInDeg * (pi/180.)
+
+        xRelMe = dist*cos(bearingToPointInRad)
+        yRelMe = dist*sin(bearingToPointInRad)
+
+        #relH is relative to camera height. negative is normal
+        lensHeightInCM = self.getCameraHeight()
+        relHeight = lensHeightInCM - t.visGoalHeight
+        headMove = motion.CoordHeadCommand( xRelMe, yRelMe, relHeight )
+        t.brain.motion.coordHead(headMove)
 
 
     def getCameraHeight(self):

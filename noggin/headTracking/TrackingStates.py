@@ -37,14 +37,6 @@ def ballTracking(tracker):
     else:
         return tracker.goNow('scanBall')
 
-def landmarkTracking(tracker):
-    '''Super state which handles following/refinding the landmark'''
-    if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-        return tracker.goNow('tracking')
-    else:
-        return tracker.goNow('findLandmark')
-
-
 def tracking(tracker):
     """
     state askes it's parent (the tracker) for an object or angles to track
