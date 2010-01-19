@@ -77,6 +77,7 @@ class HeadTracking(FSA.FSA):
         """automatically tracks landmark, scans for landmark if not in view
         only works if target has attribute locDist, framesOn, framesOff,x,y"""
         self.target = target
+        self.target.height = 0
         self.gain = 1.0
         if ( self.currentState is not
              ('targetTracking' or 'lookToTarget' or 'scanForTarget') ):
@@ -84,14 +85,12 @@ class HeadTracking(FSA.FSA):
 
     def lookToTarget(self, target):
         """looks toward our best guess of landmark position based on loc"""
-        self.visGoalX = target.x
-        self.visGoalY = target.y
-        self.visGoalHeight = 0
+        self.target.height = 0
         self.switchTo('lookToPoint')
 
     def lookToPoint(self, goalX, goalY, goalHeight):
         """continuously looks toward our best guess of goal based on loc"""
-        self.visGoalX = goalX
-        self.visGoalY = goalY
-        self.visGoalHeight = goalHeight
+        self.target.x = goalX
+        self.target.y = goalY
+        self.target.height = goalHeight
         self.switchTo('lookToPoint')

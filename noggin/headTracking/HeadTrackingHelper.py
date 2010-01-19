@@ -85,16 +85,16 @@ class HeadTrackingHelper():
     def lookToPoint(self):
         """look to an absolute position on the field"""
         t = self.tracker
+        target = t.target
         my = t.brain.my
 
-        globalRelX = t.visGoalX - my.x
-        globalRelY = t.visGoalY - my.y
+        globalRelX = target.x - my.x
+        globalRelY = target.y - my.y
 
         dist = hypot(globalRelX, globalRelY)
 
         bearingToPointInDeg = MyMath.getRelativeBearing( my.x, my.y, my.h,
-                                                         t.visGoalX,
-                                                         t.visGoalY )
+                                                         target.x, target.y )
         bearingToPointInRad = bearingToPointInDeg * (pi/180.)
 
         xRelMe = dist*cos(bearingToPointInRad)
@@ -102,7 +102,7 @@ class HeadTrackingHelper():
 
         #relH is relative to camera height. negative is normal
         lensHeightInCM = self.getCameraHeight()
-        relHeight = lensHeightInCM - t.visGoalHeight
+        relHeight = lensHeightInCM - target.height
         headMove = motion.CoordHeadCommand( xRelMe, yRelMe, relHeight )
         t.brain.motion.coordHead(headMove)
 
