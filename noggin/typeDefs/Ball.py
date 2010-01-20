@@ -90,18 +90,11 @@ class Ball(VisualObject):
         self.elevation = visionBall.elevation
         self.confidence = visionBall.confidence
 
-        # set angleX, angleY so that we don't create c->python object overhead
         if self.dist > 0:
-            self.angleX = (((Constants.IMAGE_WIDTH/2.-1) - self.centerX)/
-                           Constants.IMAGE_ANGLE_X)
-            self.angleY = (((Constants.IMAGE_HEIGHT/2.-1) - self.centerY)/
-                           Constants.IMAGE_ANGLE_Y)
             self.reportBallSeen()
             self.relX = getRelativeX(self.dist, self.bearing)
             self.relY = getRelativeY(self.dist, self.bearing)
         else:
-            self.angleX = 0
-            self.angleY = 0
             self.relX = 0.0
             self.relY = 0.0
 
@@ -151,9 +144,9 @@ class Ball(VisualObject):
 
     def __str__(self):
         """returns string with all class variables"""
-        return ("vision dist: %g bearing: %g elevation: %g center: (%d,%d) aX/aY: %g/%g, framesOn: %d framesOff: %d on: %s\n loc: (%g,%g) uncert: (%g,%g) sd: %g vel (%g,%g) dist: %g bearing: %g" %
-                (self.dist, self.bearing, self.elevation,
-                 self.centerX, self.centerY, self.angleX, self.angleY,
-                 self.framesOn, self.framesOff, self.on,
-                 self.x,self.y,self.uncertX,self.uncertY,self.sd,
-                 self.velX,self.velY, self.locDist, self.locBearing))
+        return (" loc: (%g,%g) uncert: (%g,%g) sd: %g vel (%g,%g) dist: %g \
+        bearing: %g \n \
+        vision: elevation: %g" %
+                (self.x,self.y,self.uncertX,self.uncertY,self.sd,
+                 self.velX,self.velY, self.locDist, self.locBearing, self.elevation)
+                + VisualObject.__str__(self) )

@@ -30,23 +30,16 @@ class VisualObject:
             self.on = True
             self.framesOn += 1
             self.framesOff = 0
-            """
-            ball and fieldObject calculate this here to avoid overhead
-            crossbar gets it from c++. is there a reason it needs to?
+            # set angleX, angleY so that we don't create c->python object overhead
             self.angleX = (((Constants.IMAGE_WIDTH/2.-1) - self.centerX)/
                            Constants.IMAGE_ANGLE_X)
             self.angleY = (((Constants.IMAGE_HEIGHT/2.-1) - self.centerY)/
                            Constants.IMAGE_ANGLE_Y)
-            """
         # obj not in this frame
         else:
             self.on = False
             self.framesOff += 1
             self.framesOn = 0
-            """
-            self.angleX = 0
-            self.angleY = 0
-            """
 
     def __str__(self):
         """returns string with all class variables"""

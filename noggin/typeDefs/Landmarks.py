@@ -50,16 +50,6 @@ class FieldObject(VisualObject):
         self.certainty = visionInfos.certainty
         self.distCertainty = visionInfos.distCertainty
 
-        # set angleX, angleY so that we don't create c->python object overhead
-        if self.dist > 0:
-            self.angleX = (((Constants.IMAGE_WIDTH/2-1) - self.centerX)/
-                           Constants.IMAGE_ANGLE_X)
-            self.angleY = (((Constants.IMAGE_HEIGHT/2-1) - self.centerY)/
-                           Constants.IMAGE_ANGLE_Y)
-        else:
-            self.angleX = 0
-            self.angleY = 0
-
     def __str__(self):
         """returns string with all class variables"""
         return ("%s, %s at (%d,%d)s" %
@@ -103,6 +93,7 @@ class Crossbar(VisualObject):
     def updateVision(self, visionInfos):
         """updates class variables with new vision information"""
         VisualObject.updateVision(self, visionInfos)
+
         self.x = visionInfos.x
         self.y = visionInfos.y
         self.angleX = visionInfos.angleX
@@ -111,3 +102,6 @@ class Crossbar(VisualObject):
         self.leftOpening = visionInfos.leftOpening
         self.rightOpening = visionInfos.rightOpening
         self.shoot = visionInfos.shoot
+
+    def __str__(self):
+        return VisualObject.__str__(self)
