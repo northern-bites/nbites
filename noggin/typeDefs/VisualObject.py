@@ -12,6 +12,9 @@ class VisualObject:
         self.focDist = 0
         self.dist = 0
         self.bearing = 0
+        self.framesOn = 0
+        self.framesOff = 0
+        self.on = False
 
     def updateVision(self, visionInfos):
         self.centerX = visionInfos.centerX
@@ -23,7 +26,7 @@ class VisualObject:
         self.bearing = visionInfos.bearing
 
         # obj is in this frame
-        if self.distance > 0:
+        if self.dist > 0:
             self.on = True
             self.framesOn += 1
             self.framesOff = 0

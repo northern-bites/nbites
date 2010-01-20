@@ -797,7 +797,7 @@ typedef struct PyFieldObject_t {
     PyObject *width;
     PyObject *height;
     PyObject *focDist;
-    PyObject *distance;
+    PyObject *dist;
     PyObject *bearing;
     PyObject *certainty;
     PyObject *distCertainty;

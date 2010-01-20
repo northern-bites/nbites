@@ -1,5 +1,5 @@
 from .. import NogginConstants as Constants
-from . import VisualObject
+from .VisualObject import VisualObject
 
 class FieldObject(VisualObject):
     """
@@ -102,7 +102,7 @@ class Crossbar(VisualObject):
 
     def updateVision(self, visionInfos):
         """updates class variables with new vision information"""
-        VisualObject.updateVision(visionInfos)
+        VisualObject.updateVision(self, visionInfos)
         self.x = visionInfos.x
         self.y = visionInfos.y
         self.angleX = visionInfos.angleX

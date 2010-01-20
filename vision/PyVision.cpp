@@ -1394,7 +1394,7 @@ extern PyObject * PyCrossbar_new (VisualCrossbar *b)
         self->width = PyFloat_FromDouble(b->getWidth());
         self->height = PyFloat_FromDouble(b->getHeight());
         self->focDist = PyFloat_FromDouble(b->getFocDist());
-        self->distance = PyFloat_FromDouble(b->getDistance());
+        self->dist = PyFloat_FromDouble(b->getDistance());
         self->bearing = PyFloat_FromDouble(b->getBearingDeg());
         self->elevation = PyFloat_FromDouble(b->getElevationDeg());
         self->leftOpening = PyFloat_FromDouble(b->getLeftOpening());
@@ -1403,7 +1403,7 @@ extern PyObject * PyCrossbar_new (VisualCrossbar *b)
 
         if (self->centerX == NULL || self->centerY == NULL ||
             self->width == NULL || self->height == NULL ||
-            self->focDist == NULL || self->distance == NULL ||
+            self->focDist == NULL || self->dist == NULL ||
             self->bearing == NULL || self->elevation == NULL) {
 
             PyCrossbar_dealloc(self);
@@ -1443,8 +1443,8 @@ extern void PyCrossbar_update (PyCrossbar *self)
     Py_XDECREF(self->focDist);
     self->focDist = PyFloat_FromDouble(self->crossbar->getFocDist());
 
-    Py_XDECREF(self->distance);
-    self->distance = PyFloat_FromDouble(self->crossbar->getDistance());
+    Py_XDECREF(self->dist);
+    self->dist = PyFloat_FromDouble(self->crossbar->getDistance());
 
     Py_XDECREF(self->bearing);
     self->bearing = PyFloat_FromDouble(self->crossbar->getBearingDeg());
@@ -1513,13 +1513,13 @@ extern PyObject * PyVisualRobot_new (VisualRobot *b)
         self->width = PyFloat_FromDouble(b->getWidth());
         self->height = PyFloat_FromDouble(b->getHeight());
         self->focDist = PyFloat_FromDouble(b->getFocDist());
-        self->distance = PyFloat_FromDouble(b->getDistance());
+        self->dist = PyFloat_FromDouble(b->getDistance());
         self->bearing = PyFloat_FromDouble(b->getBearingDeg());
         self->elevation = PyFloat_FromDouble(b->getElevationDeg());
 
         if (self->centerX == NULL || self->centerY == NULL ||
             self->width == NULL || self->height == NULL ||
-            self->focDist == NULL || self->distance == NULL ||
+            self->focDist == NULL || self->dist == NULL ||
             self->bearing == NULL || self->elevation == NULL) {
 
             PyVisualRobot_dealloc(self);
@@ -1559,8 +1559,8 @@ extern void PyVisualRobot_update (PyVisualRobot *self)
     Py_XDECREF(self->focDist);
     self->focDist = PyFloat_FromDouble(self->robot->getFocDist());
 
-    Py_XDECREF(self->distance);
-    self->distance = PyFloat_FromDouble(self->robot->getDistance());
+    Py_XDECREF(self->dist);
+    self->dist = PyFloat_FromDouble(self->robot->getDistance());
 
     Py_XDECREF(self->bearing);
     self->bearing = PyFloat_FromDouble(self->robot->getBearingDeg());

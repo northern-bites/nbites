@@ -1,6 +1,6 @@
 import time
 
-from . import VisualObject
+from .VisualObject import VisualObject
 from .. import NogginConstants as Constants
 from ..util.MyMath import (dist, getRelativeBearing,
                           getRelativeVelocityX,
@@ -30,6 +30,7 @@ class Ball(VisualObject):
     """
     def __init__(self, visionBall):
         VisualObject.__init__(self)
+
         (self.angleX,
          self.angleY,
          self.confidence,
