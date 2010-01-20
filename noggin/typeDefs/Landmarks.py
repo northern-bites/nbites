@@ -1,7 +1,7 @@
 from .. import NogginConstants as Constants
+from . import VisualObject
 
-
-class FieldObject:
+class FieldObject(VisualObject):
     """
     FieldObject is a class for field landmarks, storing visual information
     -landmarks:
@@ -23,6 +23,7 @@ class FieldObject:
     def __init__(self, visionInfos, visionName):
         """initialization all values for FieldObject() class"""
         # Things to be filled out later
+        VisualObject.__init__(self)
         self.x = 0
         self.y = 0
         self.localId = 0 # name based around team color
@@ -30,9 +31,6 @@ class FieldObject:
         self.locBearing = 0
         self.angleX = 0
         self.angleY = 0
-        self.framesOn = 0
-        self.framesOff = 0
-        self.on = False
 
         # Setup the data from vision
         self.visionId = visionName
@@ -48,13 +46,7 @@ class FieldObject:
 
     def updateVision(self, visionInfos):
         """updates class variables with new vision information"""
-        self.centerX = visionInfos.centerX
-        self.centerY = visionInfos.centerY
-        self.width = visionInfos.width
-        self.height = visionInfos.height
-        self.focDist = visionInfos.focDist
-        self.dist = visionInfos.dist
-        self.bearing = visionInfos.bearing
+        VisualObject.updateVision(self, visionInfos)
         self.certainty = visionInfos.certainty
         self.distCertainty = visionInfos.distCertainty
 
@@ -68,26 +60,11 @@ class FieldObject:
             self.angleX = 0
             self.angleY = 0
 
-        # obj is in this frame
-        if self.dist > 0:
-            self.on = True
-            self.framesOn += 1
-            self.framesOff = 0
-        # obj not in this frame
-        else:
-            self.on = False
-            self.framesOff += 1
-            self.framesOn = 0
-
     def __str__(self):
         """returns string with all class variables"""
-        return ("%s, %s at (%d,%d): dist: %g bearing: %g center: ""(%d,%d) w/h: %g/%g aX/aY: %g/%g, framesOn: %d framesOff: %d on: %s" %
+        return ("%s, %s at (%d,%d)s" %
                 (Constants.visionObjectTuple[self.visionId],
-                 Constants.landmarkTuple[self.localId],
-                 self.x, self.y, self.dist, self.bearing,
-                 self.centerX, self.centerY,
-                 self.width, self.height, self.angleX, self.angleY,
-                 self.framesOn, self.framesOff, self.on))
+                 Constants.landmarkTuple[self.localId])) + VisualObject.__str__(self)
 
 
 class Line:
@@ -112,46 +89,25 @@ class Line:
                 (self.x1,self.y1,self.x2,self.y1,self.slope,self.length))
 
 
-class Crossbar:
+class Crossbar(VisualObject):
     """
     Crossbar class, what used to be the backstop class
     """
     def __init__(self, visionInfos, visionName):
-        """initialization all values for FieldObject() class"""
-        # Things to be filled out later
-        self.framesOn = 0
-        self.framesOff = 0
-        self.on = False
-
+        """initialization of all values for Crossbar() class"""
+        VisualObject.__init__(self)
         # Setup the data from vision
         self.visionId = visionName
         self.updateVision(visionInfos)
 
     def updateVision(self, visionInfos):
         """updates class variables with new vision information"""
+        VisualObject.updateVision(visionInfos)
         self.x = visionInfos.x
         self.y = visionInfos.y
         self.angleX = visionInfos.angleX
         self.angleY = visionInfos.angleY
-        self.centerX = visionInfos.centerX
-        self.centerY = visionInfos.centerY
-        self.width = visionInfos.width
-        self.height = visionInfos.height
-        self.focDist = visionInfos.focDist
-        self.distance = visionInfos.distance
-        self.bearing = visionInfos.bearing
         self.elevation = visionInfos.elevation
         self.leftOpening = visionInfos.leftOpening
         self.rightOpening = visionInfos.rightOpening
         self.shoot = visionInfos.shoot
-
-        # obj is in this frame
-        if self.distance > 0:
-            self.on = True
-            self.framesOn += 1
-            self.framesOff = 0
-        # obj not in this frame
-        else:
-            self.on = False
-            self.framesOff += 1
-            self.framesOn = 0

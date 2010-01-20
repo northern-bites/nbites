@@ -1,5 +1,6 @@
 import time
 
+from . import VisualObject
 from .. import NogginConstants as Constants
 from ..util.MyMath import (dist, getRelativeBearing,
                           getRelativeVelocityX,
@@ -8,7 +9,7 @@ from ..util.MyMath import (dist, getRelativeBearing,
                           getRelativeY)
 
 
-class Ball:
+class Ball(VisualObject):
     """
     Class for holding all current Ball information, contains:
 
@@ -28,19 +29,11 @@ class Ball:
     -on -- simple bool if ball is on vision frame or not
     """
     def __init__(self, visionBall):
-        (self.centerX,
-         self.centerY,
-         self.width,
-         self.height,
-         self.angleX,
+        VisualObject.__init__(self)
+        (self.angleX,
          self.angleY,
-         self.focDist,
          self.confidence,
-         self.dist,
-         self.bearing,
          self.elevation,
-         self.framesOn,
-         self.framesOff,
          self.prevFramesOn,
          self.prevFramesOff,
          self.x,
@@ -68,8 +61,7 @@ class Ball:
          self.lastVisionAngleY,
          self.lastTimeSeen,
          self.lastSeenDist,
-         self.lastSeenBearing,
-         self.on) = [0]*Constants.NUM_TOTAL_BALL_VALUES
+         self.lastSeenBearing) = [0]*Constants.NUM_TOTAL_BALL_VALUES
 
         self.updateVision(visionBall)
 
@@ -86,15 +78,14 @@ class Ball:
         if self.dist > 0:
             self.lastSeenBearing = self.bearing
             self.lastSeenDist = self.dist
+            if not self.on:
+                self.prevFramesOff = self.framesOff
+        else:
+            if self.on:
+                self.prevFramesOn = self.framesOn
 
         # Now update to the new stuff
-        self.centerX = visionBall.centerX
-        self.centerY = visionBall.centerY
-        self.width = visionBall.width
-        self.height = visionBall.height
-        self.focDist = visionBall.focDist
-        self.dist = visionBall.dist
-        self.bearing = visionBall.bearing
+        VisualObject.updateVision(self, visionBall)
         self.elevation = visionBall.elevation
         self.confidence = visionBall.confidence
 
@@ -104,23 +95,12 @@ class Ball:
                            Constants.IMAGE_ANGLE_X)
             self.angleY = (((Constants.IMAGE_HEIGHT/2.-1) - self.centerY)/
                            Constants.IMAGE_ANGLE_Y)
-
             self.reportBallSeen()
-            if not self.on:
-                self.prevFramesOff = self.framesOff
-            self.on = True
-            self.framesOn += 1
-            self.framesOff = 0
             self.relX = getRelativeX(self.dist, self.bearing)
             self.relY = getRelativeY(self.dist, self.bearing)
         else:
             self.angleX = 0
             self.angleY = 0
-            if self.on:
-                self.prevFramesOn = self.framesOn
-            self.on = False
-            self.framesOff += 1
-            self.framesOn = 0
             self.relX = 0.0
             self.relY = 0.0
 

@@ -797,7 +797,7 @@ typedef struct PyFieldObject_t {
     PyObject *width;
     PyObject *height;
     PyObject *focDist;
-    PyObject *dist;
+    PyObject *distance;
     PyObject *bearing;
     PyObject *certainty;
     PyObject *distCertainty;
@@ -1107,7 +1107,7 @@ typedef struct PyCrossbar_t {
     PyObject *width;
     PyObject *height;
     PyObject *focDist;
-    PyObject *distance;
+    PyObject *dist;
     PyObject *bearing;
     PyObject *elevation;
     PyObject *leftOpening;
@@ -1156,7 +1156,7 @@ static PyMemberDef PyCrossbar_members[] = {
      "Crossbar height"},
     {"focDist", T_OBJECT_EX, offsetof(PyCrossbar, focDist), READONLY,
      "Crossbar focal distance"},
-    {"distance", T_OBJECT_EX, offsetof(PyCrossbar, distance), READONLY,
+    {"dist", T_OBJECT_EX, offsetof(PyCrossbar, dist), READONLY,
      "Crossbar linear distance"},
     {"bearing", T_OBJECT_EX, offsetof(PyCrossbar, bearing), READONLY,
      "Crossbar bearing to body"},
@@ -1233,7 +1233,7 @@ typedef struct PyVisualRobot_t {
     PyObject *width;
     PyObject *height;
     PyObject *focDist;
-    PyObject *distance;
+    PyObject *dist;
     PyObject *bearing;
     PyObject *elevation;
 
@@ -1279,7 +1279,7 @@ static PyMemberDef PyVisualRobot_members[] = {
      "VisualRobot height"},
     {"focDist", T_OBJECT_EX, offsetof(PyVisualRobot, focDist), READONLY,
      "VisualRobot focal distance"},
-    {"distance", T_OBJECT_EX, offsetof(PyVisualRobot, distance), READONLY,
+    {"dist", T_OBJECT_EX, offsetof(PyVisualRobot, dist), READONLY,
      "VisualRobot linear distance"},
     {"bearing", T_OBJECT_EX, offsetof(PyVisualRobot, bearing), READONLY,
      "VisualRobot bearing to body"},
