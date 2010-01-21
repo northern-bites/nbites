@@ -3,7 +3,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
-from math import (fabs, sin, cos, pi, hypot)
+from math import (fabs, atan, pi, hypot)
 
 class HeadTrackingHelper():
     def __init__(self, tracker):
@@ -82,36 +82,48 @@ class HeadTrackingHelper():
         self.executeHeadMove( ((heads, panTime, 0,
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
-    def lookToPoint(self):
+    def lookToPoint(self, target):
         """look to an absolute position on the field"""
-        t = self.tracker
-        target = t.target
-        my = t.brain.my
+        bearing = self.calcBearing(target)
+        headPitch = self.calcHeadPitch(target)
 
-        globalRelX = target.x - my.x
-        globalRelY = target.y - my.y
+        #makes and calls motion command
+        headMove = motion.CoordHeadCommand( bearing, headPitch )
+        self.tracker.brain.motion.coordHead(headMove)
 
-        dist = hypot(globalRelX, globalRelY)
+    def calcBearing(self, target):
+        """returns the bearing to target in radians. usable as headYaw"""
+        my = self.tracker.brain.my
 
         bearingToPointInDeg = MyMath.getRelativeBearing( my.x, my.y, my.h,
                                                          target.x, target.y )
         bearingToPointInRad = bearingToPointInDeg * (pi/180.)
 
-        xRelMe = dist*cos(bearingToPointInRad)
-        yRelMe = dist*sin(bearingToPointInRad)
+        return bearingToPointInRad
 
-        #relH is relative to camera height. negative is normal
+    def calcHeadPitch(self, target):
+        """returns the pitch to target in radians"""
+        my = self.tracker.brain.my
+
+        relX = target.x - my.x
+        relY = target.y - my.y
+        dist = hypot(relX, relY)
+
         lensHeightInCM = self.getCameraHeight()
         relHeight = lensHeightInCM - target.height
-        headMove = motion.CoordHeadCommand( xRelMe, yRelMe, relHeight )
-        t.brain.motion.coordHead(headMove)
 
+        #b/c we use lower angled camera we need to adjust by constant angle
+        headPitch = atan(relHeight/dist) - 0.6981 #40 deg to rad (from reddoc)
+        return headPitch
 
     def getCameraHeight(self):
-        """gets the height of the (hopefully)lower camera in cm"""
+        """gets the height of the lower camera in cm"""
         pose = self.tracker.brain.vision.pose
+
         cameraInWorldFrameZ = pose.cameraInWorldFrameZ
         comHeight = pose.bodyCenterHeight
         lensHeight = cameraInWorldFrameZ + comHeight
         lensHeightInCM = lensHeight/10.
+
         return lensHeightInCM
+    """ already had to calculate bearing and groundDist to get xRelMe, yRelMe. those were stupid in the first place because they were used in CoordHeadCommand to calculate bearing again (doh!) with groundDist already calculated all that was needed was a single call to atan. """

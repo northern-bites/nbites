@@ -250,17 +250,15 @@ private:
 
 class PyCoordHeadCommand {
 public:
-	PyCoordHeadCommand( const float relX,
-						const float relY,
-						const float relHeight ) {
-        command = new CoordHeadCommand( relX, relY, relHeight );
+	PyCoordHeadCommand( const float yaw,
+						const float pitch ) {
+        command = new CoordHeadCommand( yaw, pitch );
     }
-	PyCoordHeadCommand( const float relX,
-						const float relY,
-						const float relHeight,
+	PyCoordHeadCommand( const float yaw,
+						const float pitch,
                         const float maxYawSpeed,
                         const float maxPitchSpeed ) {
-        command = new CoordHeadCommand( relX, relY, relHeight,
+        command = new CoordHeadCommand( yaw, pitch,
                                         maxYawSpeed, maxPitchSpeed );
     }
 
@@ -401,11 +399,11 @@ BOOST_PYTHON_MODULE(_motion)
         ;
 
     class_<PyCoordHeadCommand>("CoordHeadCommand",
-							   init<float, float, float >
-							   (args("relX", "relY", "relHeight"),
+							   init<float, float>
+							   (args("yaw", "bearing"),
 								"A container for a coord head command."))
-		.def(init<float, float, float, float, float > (
-                 args( "relX", "relY", "relHeight",
+		.def(init<float, float, float, float> (
+                 args( "yaw", "bearing",
                        "maxYawSpeed", "maxPitchSpeed")))
 		;
 

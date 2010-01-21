@@ -28,21 +28,18 @@
 class CoordHeadCommand : public MotionCommand
 {
 public:
-    CoordHeadCommand( const float _xRelMe, const float _yRelMe,
-					  const float _relHeight,
+    CoordHeadCommand( const float _yaw,
+					  const float _pitch,
 					  const float _maxSpeedYaw =
                       Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
                       const float _maxSpeedPitch =
                       Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		)
         : MotionCommand( MotionConstants::COORD_HEAD ),
-          relX( _xRelMe ),
-		  relY( _yRelMe ),
-		  relHeight( _relHeight ),
+		  yaw( _yaw ),
+		  pitch( _pitch ),
 		  maxSpeedYaw( _maxSpeedYaw ),
-		  maxSpeedPitch( _maxSpeedPitch ),
-		  yaw( calcYaw() ),
-		  pitch( calcPitch() )
+		  maxSpeedPitch( _maxSpeedPitch )
         {
             setChainList();
         }
@@ -51,21 +48,6 @@ public:
 	const float getPitch() const { return pitch; }
 	const float getYaw() const { return yaw; }
 private:
-	const float calcYaw() {
-		float yawTemp = atan2( relY, relX );
-		return yawTemp;
-	}
-	const float calcPitch() {
-		float groundDist = sqrt( relX * relX + relY * relY );
-		if (groundDist <= 0.0){
-			groundDist = 0.1;
-		}
-		//b/c groundDist is always positive, no need for atan2
-		float pitchTemp = atan( relHeight / groundDist);
-        //b/c we use lower angled camera we need to adjust by constant angle
-		pitchTemp = pitchTemp - 0.6981;//40 degrees to radians (from reddoc)
-        return pitchTemp;
-	}
 
     virtual void setChainList() {
         chainList.insert(chainList.end(),
@@ -74,9 +56,8 @@ private:
                          + MotionConstants::HEAD_JOINT_NUM_CHAINS);
     }
 private:
-    const float relX, relY, relHeight;
-	const float maxSpeedYaw, maxSpeedPitch;
 	const float yaw, pitch;
+	const float maxSpeedYaw, maxSpeedPitch;
 };
 
 #endif
