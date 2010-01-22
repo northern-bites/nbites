@@ -80,8 +80,9 @@ class HeadTracking(FSA.FSA):
         self.target = target
         self.target.height = 0
         self.gain = 1.0
-        if ( self.currentState is not
-             ('targetTracking' or 'lookToTarget' or 'scanForTarget') ):
+        if (not self.currentState == 'targetTracking' and
+            not self.currentState == 'lookToTarget' and
+            not self.currentState == 'scanForTarget' ):
             self.switchTo('targetTracking')
 
     def lookToTarget(self, target):
@@ -89,7 +90,7 @@ class HeadTracking(FSA.FSA):
         self.target.height = 0
         self.switchTo('lookToPoint')
 
-    def lookToPoint(self, goalX, goalY, goalHeight):
+    def lookToPoint(self, goalX=0, goalY=0, goalHeight=0):
         """continuously looks toward our best guess of goal based on loc"""
         self.target.x = goalX
         self.target.y = goalY

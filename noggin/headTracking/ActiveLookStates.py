@@ -9,24 +9,37 @@ def lookToPoint(tracker):
 
 def lookToTarget(tracker):
     """looks to best guess of where target is"""
-    #should only be called by states that have already set activeLocOn=False
 
     if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
-        return tracker.goNow('targetTracking')
+        tracker.brain.motion.stopHeadMoves()
+        if tracker.activeLocOn:
+            tracker.brain.motion.stopHeadMoves()
+            return tracker.goNow('activeTracking')
+        else:
+            tracker.brain.motion.stopHeadMoves()
+            return tracker.goNow('targetTracking')
 
     elif tracker.stateTime >= TIME_TO_LOOK_TO_TARGET:
+        tracker.brain.motion.stopHeadMoves()
         return tracker.goLater('scanForTarget')
 
-    tracker.helper.lookToPoint()
+    tracker.helper.lookToPoint(tracker.target)
 
     return tracker.stay()
 
 def scanForTarget(tracker):
     """performs naive scan for target"""
     if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
-        return tracker.goNow('targetTracking')
+        print "target on"
+        if tracker.activeLocOn:
+            tracker.brain.motion.stopHeadMoves()
+            return tracker.goNow('activeTracking')
+        else:
+            tracker.brain.motion.stopHeadMoves()
+            return tracker.goNow('targetTracking')
 
     if not tracker.brain.motion.isHeadActive():
+        print "head not active"
         targetDist = tracker.target.locDist
 
         if targetDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
@@ -52,11 +65,12 @@ def targetTracking(tracker):
     """
 
     if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
         tracker.activeLocOn = False
-
-    tracker.helper.trackObject()
 
     if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goLater('lookToTarget')
+
+    tracker.helper.trackObject()
 
     return tracker.stay()
