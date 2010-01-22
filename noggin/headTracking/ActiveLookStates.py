@@ -4,7 +4,7 @@ import man.motion.HeadMoves as HeadMoves
 TIME_TO_LOOK_TO_TARGET = 1.0
 
 def lookToPoint(tracker):
-    tracker.helper.lookToPoint()
+    tracker.helper.lookToPoint(tracker.target)
     return tracker.stay()
 
 def lookToTarget(tracker):

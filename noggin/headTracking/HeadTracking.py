@@ -29,6 +29,7 @@ class HeadTracking(FSA.FSA):
         self.helper = helper.HeadTrackingHelper(self)
 
         self.lookDirection = None
+        self.target = self.brain.ball #default
 
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
@@ -93,4 +94,6 @@ class HeadTracking(FSA.FSA):
         self.target.x = goalX
         self.target.y = goalY
         self.target.height = goalHeight
-        self.switchTo('lookToPoint')
+        #allows us to update target values but not confuse FSA
+        if not self.currentState == 'lookToPoint':
+            self.switchTo('lookToPoint')
