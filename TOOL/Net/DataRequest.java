@@ -56,21 +56,26 @@ public class DataRequest {
 	public static final DataRequest OBJECTS_ONLY =
 		new DataRequest(false, false, false, false, false,
 						false, true, false, false, false);
-
+	public static final DataRequest LOC_ONLY =
+		new DataRequest(false, false, false, false, false,
+						false, false, false, true, false);
+	public static final DataRequest COMM_ONLY =
+		new DataRequest(false, false, false, false, false,
+						false, false, false, false, true);
 
     public static boolean isImplemented(DataTypes.DataType type) {
         switch (type) {
-            case INFO:         return true;
-            case JOINTS:       return true;
-            case SENSORS:      return true;
-            case IMAGE:        return true;
-            case THRESH:       return true;
-            case JPEG:         return false;
-            case OBJECTS:      return false;
-            case MOTION:       return false;
-            case LOCAL:        return false;
-            case COMM:         return false;
-            default:           return false;
+		case INFO:         return true;
+		case JOINTS:       return true;
+		case SENSORS:      return true;
+		case IMAGE:        return true;
+		case THRESH:       return true;
+		case JPEG:         return false;
+		case OBJECTS:      return true;
+		case MOTION:       return false;
+		case LOCAL:        return true;
+		case COMM:         return true;
+		default:           return false;
         }
     }
 

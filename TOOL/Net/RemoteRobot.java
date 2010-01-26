@@ -37,6 +37,8 @@ import TOOL.Data.File.FrameLoader;
 import TOOL.Image.ThresholdedImage;
 import TOOL.Image.TOOLImage;
 import TOOL.WorldController.Observation;
+import TOOL.WorldController.LocalizationPacket;
+import TOOL.WorldController.PlayerInfo;
 
 /**
  * A RemoteRobot object represents an advanced DataSet layered over a network
@@ -203,6 +205,37 @@ public class RemoteRobot extends FileSet {
 		} catch (TOOLException e) {
             NetworkModule.logError("Attempt to retrieve objects failed",
                                    e);
+			return null;
+		}
+	}
+
+	public Vector<LocalizationPacket> retrieveLocalization() {
+		try {
+			if ( !proto.isConnected())
+				connect();
+			proto.request(DataRequest.LOC_ONLY);
+			LocalizationPacket[] loc = {proto.getMyLocalization(),
+										proto.getBallLocalization() };
+			Vector<LocalizationPacket>  locInfo = new Vector<LocalizationPacket>(Arrays.asList(loc));
+			return locInfo;
+		} catch (TOOLException e) {
+			NetworkModule.logError("Attempt to retrieve localization failed",
+								   e);
+			return null;
+		}
+	}
+
+	public PlayerInfo retrieveGCInfo() {
+		try {
+			if (! proto.isConnected())
+				connect();
+			proto.request(DataRequest.COMM_ONLY);
+			PlayerInfo info = new PlayerInfo(proto.getTeam(), proto.getPlayer(),
+											 proto.getColor());
+			return info;
+		} catch(TOOLException e) {
+			NetworkModule.logError("Attempt to retrieve game controller info failed",
+								   e);
 			return null;
 		}
 	}

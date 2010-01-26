@@ -927,6 +927,31 @@ public class DebugViewer extends JFrame {
         num_landmarks = 0;
     }
 
+	public void setMyLocEstimate(double x, double y, double h,
+								 double x_uncert, double y_uncert, double h_uncert)
+	{
+		myX.setText(Float.toString((float)x));
+		myY.setText(Float.toString((float)y));
+		myH.setText(Float.toString((float)h));
+
+		myUncertX.setText(Float.toString((float)x_uncert));
+		myUncertY.setText(Float.toString((float)y_uncert));
+		myUncertH.setText(Float.toString((float)h_uncert));
+	}
+
+	public void setBallLocEstimate(double x, double y,
+								   double x_uncert, double y_uncert,
+								   double x_vel, double y_vel)
+	{
+		ballX.setText(Float.toString((float)x));
+		ballY.setText(Float.toString((float)y));
+		ballUncertX.setText(Float.toString((float)x_uncert));
+		ballUncertY.setText(Float.toString((float)y_uncert));
+		ballVelX.setText(Float.toString((float)x_vel));
+		ballVelY.setText(Float.toString((float)y_vel));
+		ballVelAbs.setText(Float.toString((float)Math.hypot(x_vel, y_vel)));
+	}
+
     public boolean isDistinctLandmarkID(int ID)
     {
         return ( (ID >= 15 && ID <= 43 && ID != 29 &&

@@ -26,6 +26,7 @@ import java.util.Vector;
 import TOOL.TOOL;
 import TOOL.Data.RobotDef;
 import TOOL.WorldController.Observation;
+import TOOL.WorldController.LocalizationPacket;
 
 public class TOOLProtocol {
 
@@ -46,6 +47,13 @@ public class TOOLProtocol {
 	private static final int NUM_POSSIBLE_OBJECTS = 120;
 	private static final float INIT_OBJECT_VALUE = -1.0f;
 
+	private static final int NUM_LOC_PACKET_VALUES = 17;
+
+	private static final int NUM_GC_VALUES = 3;
+	private static final int GC_TEAM_INDEX = 0;
+	private static final int GC_PLAYER_INDEX = 1;
+	private static final int GC_COLOR_INDEX = 2;
+
     private DataSerializer serial;
 
     private RobotDef robotDef;
@@ -60,8 +68,10 @@ public class TOOLProtocol {
     private float[] joints;
     private float[] sensors;
     private float[] objects;
+	private float[] local;
     private byte[] image;
     private byte[] thresh;
+	private int[] GCInfo;
 
     public TOOLProtocol(String remoteHost) {
         try {
@@ -86,6 +96,8 @@ public class TOOLProtocol {
         image = null;
         thresh = null;
         objects = null;
+		local = null;
+		GCInfo = null;
     }
 
     public TOOLProtocol(InetAddress remoteHost) {
@@ -105,6 +117,8 @@ public class TOOLProtocol {
         image = null;
         thresh = null;
 		objects = null;
+		local = null;
+		GCInfo = null;
     }
 
     public void connect(InetAddress host) {
@@ -225,6 +239,16 @@ public class TOOLProtocol {
 				serial.readFloats(objects,true);
 			}
 
+			if (r.local()){
+				local = new float[NUM_LOC_PACKET_VALUES];
+				serial.readFloats(local,false);
+			}
+
+			if (r.comm()){
+				GCInfo = new int[NUM_GC_VALUES];
+				serial.readInts(GCInfo);
+			}
+
         }catch (IOException e) {
             TOOL.CONSOLE.error(e);
             disconnect();
@@ -309,6 +333,47 @@ public class TOOLProtocol {
 					 obs.add(new Observation((int)objects[i], objects[++i], objects[++i]));
 			}
 			return obs;
+		}
+		return null;
+	}
+
+	public int getPlayer() {
+		if (connected)
+			return GCInfo[GC_PLAYER_INDEX];
+		return -1;
+	}
+
+	public int getTeam() {
+		if (connected)
+			return GCInfo[GC_TEAM_INDEX];
+		return -1;
+	}
+
+	public int getColor() {
+		if (connected)
+			return GCInfo[GC_COLOR_INDEX];
+		return -1;
+	}
+
+	public LocalizationPacket getMyLocalization() {
+		if (connected) {
+			LocalizationPacket myLoc =LocalizationPacket.makeEstimateAndUncertPacket(
+																					 local[0], local[1],
+																					 local[2], local[3],
+																					 local[4], local[5]);
+			return myLoc;
+		}
+		return null;
+	}
+
+	public LocalizationPacket getBallLocalization() {
+		if (connected) {
+			LocalizationPacket ballLoc =
+				LocalizationPacket.makeBallEstimateAndUncertPacket(
+																   local[6],local[7],
+																   local[8], local[9],
+																   local[10], local[11]);
+			return ballLoc;
 		}
 		return null;
 	}

@@ -16,6 +16,8 @@ public class TCPStreamHandler extends Thread {
 	private DebugViewer debugViewer;
 	private WorldControllerPainter painter;
 	private Vector<Observation> observedLandmarks;
+	private Vector<LocalizationPacket> locInfo;
+	private Robot robot;
 	private int ambiguousLandmarkCount;
 
 	public TCPStreamHandler(RobotViewModule robot_mod, DebugViewer _debug,
@@ -33,6 +35,9 @@ public class TCPStreamHandler extends Thread {
 	{
 		float startTime = 0.0f;
 		float timeSpent = 0.0f;
+
+		robot = new Robot(0,0,0);
+
 		try {
 			while (true) {
 				startTime = System.currentTimeMillis();
@@ -40,10 +45,26 @@ public class TCPStreamHandler extends Thread {
 					Thread.sleep(1000);
 					continue;
 				}
+
+				PlayerInfo info = robotModule.getSelectedRobot().retrieveGCInfo();
+
+				if (robot.getTeam() != info.team || robot.getNumber() != info.player ||
+					robot.getColor() != info.color) {
+					robot = new Robot(info.team, info.player, info.color);
+				}
+
 				observedLandmarks =
 					robotModule.getSelectedRobot().retrieveObjects();
 
+				locInfo =
+					robotModule.getSelectedRobot().retrieveLocalization();
+
+				robot.updateData(locInfo.get(0), locInfo.get(1));
+				painter.updateRobot(robot);
+
 				displayObservations();
+				displayLocalization();
+
 				timeSpent = System.currentTimeMillis() - startTime;
 				if (timeSpent < 80){
 					Thread.sleep((int)(80 - timeSpent));
@@ -52,7 +73,6 @@ public class TCPStreamHandler extends Thread {
 		} catch (InterruptedException e){
 			setReceiving(false);
 		}
-			//} catch (TOOLException e) {}
 	}
 
 	public void displayObservations()
@@ -67,6 +87,19 @@ public class TCPStreamHandler extends Thread {
 			paintLandmark(ID);
 		}
 		painter.reportEndFrame();
+	}
+
+	public void displayLocalization()
+	{
+		LocalizationPacket mine = locInfo.get(0);
+		debugViewer.setMyLocEstimate(mine.getXEst(), mine.getYEst(), mine.getHeadingEst(),
+									 mine.getXUncert(), mine.getYUncert(), mine.getHUncert());
+
+		LocalizationPacket ball = locInfo.get(1);
+		debugViewer.setBallLocEstimate(ball.getXEst(), ball.getYEst(),
+									   ball.getXUncert(), ball.getYUncert(),
+									   ball.getXVelocity(), ball.getYVelocity());
+
 	}
 
 	private void paintLandmark(int ID)
