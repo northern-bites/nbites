@@ -28,12 +28,11 @@ using namespace boost;
 // Begin class code
 //
 
-
 TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
-                          shared_ptr<Vision> v)
+                          shared_ptr<Vision> v, shared_ptr<GameController> gc)
     : Thread(_synchro, "TOOLConnect"),
       state(TOOL_REQUESTING),
-      sensors(s), vision(v),
+      sensors(s), vision(v), gameController(gc),
       loc(), ballEKF()
 {
 }
@@ -151,7 +150,6 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Robot information request
     if (r.info) {
         serial.write_byte(ROBOT_TYPE);
-        // TODO - get robot name access
         std::string name = vision->getRobotName();
         serial.write_bytes((const byte*)name.c_str(), name.size());
         // TODO - get calibration file name access
@@ -203,7 +201,7 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 			vector<Observation> obs = loc->getLastObservations();
 			vector<float> obs_values;
 
-			for (int i=0; i < obs.size() ; ++i){
+			for (unsigned int i=0; i < obs.size() ; ++i){
 				obs_values.push_back(static_cast<float>(obs[i].getID()));
 				obs_values.push_back(obs[i].getVisDistance());
 				obs_values.push_back(obs[i].getVisBearing());
@@ -217,15 +215,15 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
         vector<float> loc_values;
 
         if (loc.get()) {
-          loc_values += loc->getXEst(), loc->getYEst(),
-                        loc->getHEstDeg(), loc->getHEst(),
-                        loc->getXUncert(), loc->getYUncert(),
-                        loc->getHUncertDeg(), loc->getHUncert();
-          loc_values += ballEKF->getXEst(), ballEKF->getYEst(),
-                        ballEKF->getXVelocityEst(), ballEKF->getYVelocityEst(),
-                        ballEKF->getXUncert(), ballEKF->getYUncert(),
-                        ballEKF->getXVelocityUncert(),
-                        ballEKF->getYVelocityUncert();
+			loc_values += loc->getXEst(), loc->getYEst(),
+				loc->getHEst(), loc->getXUncert(),
+				loc->getYUncert(),
+				loc->getHUncert();
+			loc_values += ballEKF->getXEst(), ballEKF->getYEst(),
+				ballEKF->getXUncert(), ballEKF->getYUncert(),
+				ballEKF->getXVelocityEst(), ballEKF->getYVelocityEst(),
+				ballEKF->getXVelocityUncert(),
+				ballEKF->getYVelocityUncert();
           loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
                         loc->getLastOdo().deltaR;
         } else
@@ -234,6 +232,14 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 
         serial.write_floats(loc_values);
     }
+
+	if (r.comm) {
+		vector<int> gc_values;
+		gc_values += gameController->team(),
+			gameController->player(),
+			gameController->color();
+		serial.write_ints(gc_values);
+	}
 
 }
 

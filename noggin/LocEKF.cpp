@@ -526,7 +526,8 @@ float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
 	const float sinb_2 = sinb * sinb;
 	const float cosb_2 = cosb * cosb;
 
-	MeasurementMatrix s_inverse(2,2,0.0f);
+	MeasurementMatrix s_inverse =
+		boost::numeric::ublas::scalar_matrix<float>(2,2,0.0f);
 	s_inverse(0,0) = ((0.0001 + dist_sd_2*sinb_2)/
 			  (1.e-8 + (dist_sd_2*cosb_2)/10000. +
 			   (dist_sd_2*sinb_2)/10000.));
