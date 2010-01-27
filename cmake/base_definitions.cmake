@@ -4,6 +4,7 @@
 # The basic diefinitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
 
+
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
 
@@ -83,8 +84,8 @@ IF(COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 OLD)
     # CMake policy regarding excaping definitions
     CMAKE_POLICY(SET CMP0005 OLD)
-    # CMake policy regarding scoped include
-    CMAKE_POLICY(SET CMP0011 OLD)
+#     # CMake policy regarding scoped include
+#     CMAKE_POLICY(SET CMP0011 OLD)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
