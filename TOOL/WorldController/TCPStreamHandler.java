@@ -77,6 +77,7 @@ public class TCPStreamHandler extends Thread {
 
 	public void displayObservations()
 	{
+		painter.reportEndFrame();
 		ambiguousLandmarkCount = 0;
 		debugViewer.removeLandmarks();
 		for (Observation o : observedLandmarks) {
@@ -86,7 +87,6 @@ public class TCPStreamHandler extends Thread {
 			debugViewer.addLandmark(ID, o.getDistance(), o.getBearing());
 			paintLandmark(ID);
 		}
-		painter.reportEndFrame();
 	}
 
 	public void displayLocalization()
