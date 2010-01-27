@@ -632,7 +632,7 @@ void Comm::bind_gc () throw(socket_error)
     bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     // set shared UDP socket (other processes may bind this port)
-    ::setsockopt(sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+    ::setsockopt(gc_sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
 
     // bind socket to address
     if (::bind(gc_sockn, (const struct sockaddr*)&bind_addr,
