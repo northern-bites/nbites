@@ -7,7 +7,7 @@ USAGE="./sync [up-down] \nExample: $> ./sync down"
 UP_OR_DOWN=$1
 
 RSYNC=rsync
-RSYNC_OPTS=-rvcz
+RSYNC_OPTS=-rvzc
 
 if [ "$1" = "" ]; then
     echo "No push direction specified"
