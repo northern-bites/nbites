@@ -54,6 +54,7 @@ public class VisionState {
 	public final static int GREEN = 6;
 
     //images + colortable
+	private Frame frame;
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
     private ThresholdedImageOverlay thresholdedOverlay;
@@ -71,11 +72,12 @@ public class VisionState {
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
+		frame = f;
         rawImage = f.image();
         colorTable = c;
         //init the objects
         if (rawImage != null && colorTable != null)  {
-            thresholdedImage = new ProcessedImage(rawImage, colorTable);
+            thresholdedImage = new ProcessedImage(frame, colorTable);
             thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
                                                              thresholdedImage.getHeight());
         }
@@ -239,11 +241,12 @@ public class VisionState {
 	}
 
     public void newFrame(Frame f, ColorTable c) {
+		frame = f;
 		rawImage = f.image();
         colorTable = c;
         //init the objects
         if (rawImage != null && colorTable != null)  {
-            thresholdedImage = new ProcessedImage(rawImage, colorTable);
+            thresholdedImage = new ProcessedImage(frame, colorTable);
 			if (thresholdedOverlay == null)
 				thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
 																 thresholdedImage.getHeight());
@@ -258,7 +261,7 @@ public class VisionState {
 	//if the thresholdedImage is not null, process it again
         if (thresholdedImage != null)  {
             //we process the image; the visionLink updates itself with the new data from the bot
-            thresholdedImage.thresholdImage(rawImage, colorTable);
+            thresholdedImage.thresholdImage(frame, colorTable);
             //get the ball from the link
             ball = thresholdedImage.getVisionLink().getBall();
             visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
@@ -268,7 +271,7 @@ public class VisionState {
         }
 		//else the thresholdedImage is null, so initialize it
 		else {
-			thresholdedImage = new ProcessedImage(rawImage, colorTable);
+			thresholdedImage = new ProcessedImage(frame, colorTable);
 			update(silent);
 		}
     }
@@ -393,6 +396,7 @@ public class VisionState {
 
     //load frame - loads data from a frame - we're interested in the raw image
     public void loadFrame(Frame f) {
+		frame = f;
         rawImage = f.image();
     }
 
