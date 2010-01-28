@@ -749,7 +749,8 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 				static_cast<int>(bottomOfObjectX),
 				static_cast<int>(bottomOfObjectY), 0.0f).dist;
 
-			dist = chooseGoalDistance(cert, disth, distw, poseDist, bottomOfObjectY);
+			dist = chooseGoalDistance(cert, disth, distw, poseDist,
+									  static_cast<int>(bottomOfObjectY));
 	    #if defined OFFLINE && defined PRINT_VISION_INFO
 
             //print("{%g,%g},", poseDist, dist);
@@ -878,9 +879,55 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
         obj_est = pose->bodyEstimate(objPtr->getCenterX(),
                                      objPtr->getCenterY(),
                                      obj_est.dist);
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
+		if (obj_est.dist > 1500.0f) { // pose problem which happens rarely
+			objPtr->setFocDist(0.0);
+			objPtr->setDistanceWithSD(0.0);
+			objPtr->setBearingWithSD(0.0);
+			objPtr->setElevation(0.0);
+		} else {
+			objPtr->setDistanceWithSD(obj_est.dist);
+			objPtr->setBearingWithSD(obj_est.bearing);
+			objPtr->setElevation(obj_est.elevation);
+			// now let's see if we can id this guy
+			// at this point we've sorted out all of the goal post info
+			bool ylp = vision->yglp->getDistance() > 0.0f;
+			bool yrp = vision->ygrp->getDistance() > 0.0f;
+			bool blp = vision->bglp->getDistance() > 0.0f;
+			bool brp = vision->bgrp->getDistance() > 0.0f;
+			if (ylp || yrp) {
+				float dist = 0.0f;
+				// get the relevant distances
+				if (ylp) {
+					dist = vision->yglp->getDistance();
+					if (yrp)
+						dist = min(dist, vision->ygrp->getDistance());
+				} else {
+					dist = vision->ygrp->getDistance();
+				}
+				// compare the distances
+				//cout << "Compare dist " << obj_est.dist << " " << dist << endl;
+				if (fabs(obj_est.dist - dist) < 300.0) {
+					objPtr->setID(YELLOW_GOAL_CROSS);
+				} else
+					objPtr->setID(BLUE_GOAL_CROSS);
+			} else if (blp || brp) {
+				float dist = 0.0f;
+				if (blp) {
+					dist = vision->bglp->getDistance();
+					if (brp)
+						dist = min(dist, vision->bgrp->getDistance());
+				} else {
+					dist = vision->bgrp->getDistance();
+				}
+				//cout << "Compare dist " << obj_est.dist << " " << dist << endl;
+				if (fabs(obj_est.dist - dist) < 300.0)
+					objPtr->setID(BLUE_GOAL_CROSS);
+				else
+					objPtr->setID(YELLOW_GOAL_CROSS);
+			} else {
+				objPtr->setID(ABSTRACT_CROSS);
+			}
+		}
     } else {
         objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
