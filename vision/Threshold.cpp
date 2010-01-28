@@ -424,9 +424,11 @@ void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3
 	for (int i = x1; i < x2 && i < IMAGE_WIDTH; i++) {
 		if (i >= 0 && start < IMAGE_HEIGHT) {
 			int temp = max(0, (int)start);
+#ifdef OFFLINE
 			if (debugSelf) {
 				drawPoint(i, temp, BLACK);
 			}
+#endif
 			lowerBound[i] = temp;
 		}
 		start -= step;
@@ -437,9 +439,11 @@ void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3
 		if (i >= 0 && start < IMAGE_HEIGHT) {
 			int temp = max(0, (int)start);
 			lowerBound[i] = temp;
+#ifdef OFFLINE
 			if (debugSelf) {
 				drawPoint(i, temp, BLACK);
 			}
+#endif
 		}
 		start += step;
 	}
