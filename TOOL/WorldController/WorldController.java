@@ -8,6 +8,7 @@ import TOOL.WorldController.UDPServer;
 import TOOL.Data.Field;
 import TOOL.Data.LabField2009;
 import TOOL.Data.NaoField2009;
+import TOOL.Net.RobotViewModule;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,12 +57,19 @@ public class WorldController extends JPanel implements KeyListener,
     // simultaneously
     UDPServer udp_server;
 
+	// Stream object information from a robot live
+	TCPStreamHandler tcp_handler;
+
+	// Robot view module for purpose of retrieving selected robot
+	RobotViewModule robotModule;
+
     // Modes
     public static final int DO_NOTHING = -1;
     public static final int SIMULATE_OFFLINE = 0;
     public static final int VIEW_UDP_PACKETS = 1;
     public static final int VIEW_MCL_LOG = 2;
     public static final int VIEW_EKF_LOG = 3;
+	public static final int VIEW_TCP_STREAM = 4;
 
     // Speed paramaters
     public static final int ROBOT_FPS = 30;
@@ -154,6 +162,8 @@ public class WorldController extends JPanel implements KeyListener,
     public final static String DISCONNECT_STRING = "Disconnect";
     public final static String LIMIT_TEAM_STRING = "Restrict to Team:";
     public final static String DRAW_EST_STRING = "Draw Estimates";
+	public final static String START_TCP_STRING = "Start TCP Stream";
+	public final static String STOP_TCP_STRING = "Stop TCP Stream";
 
     // Button Action Commands
     public static final String SWITCH_FIELDS_ACTION = "switchfields";
@@ -168,6 +178,8 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String DISCONNECT_ACTION = "disconnectme";
     public static final String LIMIT_TEAM_ACTION = "limitteam";
     public static final String CLEAR_FIELD_ACTION = "clearfield";
+	public static final String STOP_TCP_ACTION = "stoptcpstream";
+	public static final String START_TCP_ACTION = "starttcpstream";
 
     // Menu Strings
     public static final String VIEW_ROBOT_EKF_STRING = "View Robot EKF";
@@ -176,6 +188,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String VIEW_EKF_LOG_STRING = "View EKF Log";
     public static final String VIEW_MCL_LOG_STRING = "View MCL Log";
     public static final String VIEW_UDP_PACKETS_STRING = "View UDP Packets";
+    public static final String VIEW_TCP_STRING = "View TCP Stream";
 
     // Menu Action Commands
     public static final String VIEW_ROBOT_EKF_ACTION = "view robot ekfs";
@@ -184,6 +197,7 @@ public class WorldController extends JPanel implements KeyListener,
     public static final String VIEW_EKF_LOG_ACTION = "viewekflog";
     public static final String VIEW_MCL_LOG_ACTION = "viewmcllog";
     public static final String VIEW_UDP_PACKETS_ACTION = "viewudpaction";
+	public static final String VIEW_TCP_ACTION = "viewtcpaction";
     public static final String CIRCLE_LINE_GOALIE_ACTION = "circlelinegoalie";
     public static final String GO_TO_XY_NORMAL_ACTION = "gotoxy";
     public static final String GO_TO_XY_LOOK_AT_POINT_ACTION =
@@ -234,6 +248,7 @@ public class WorldController extends JPanel implements KeyListener,
     private JButton button_view_robot_ekf;
     private JButton button_view_robot_mcl;
     private JButton button_view_udp_packets;
+	private JButton button_view_tcp;
     private JButton button_view_robot_log;
     private JButton button_view_ekf_log;
     private JButton button_view_mcl_log;
@@ -251,7 +266,7 @@ public class WorldController extends JPanel implements KeyListener,
 
     private int mode;
 
-    public WorldController(TOOL t)
+    public WorldController(TOOL t, RobotViewModule robot_mod)
     {
         this.t = t;
         labField = new LabField2009();
@@ -267,6 +282,10 @@ public class WorldController extends JPanel implements KeyListener,
         log = new LogHandler(this, painter, debugViewer);
         udp_server = new UDPServer();
         udp_server.addRobotListener(painter);
+
+		robotModule = robot_mod;
+
+		tcp_handler = new TCPStreamHandler(robotModule, debugViewer, painter);
 
         setSize((int) (the_field.getPreferredSize().getWidth() +
                        BUTTON_AREA_WIDTH),
@@ -365,6 +384,12 @@ public class WorldController extends JPanel implements KeyListener,
             startEKFLog();
         } else if (cmd.equals(VIEW_UDP_PACKETS_ACTION)) {
             startRobotUDP();
+		} else if (cmd.equals(VIEW_TCP_ACTION)) {
+			viewTCPStream();
+		} else if (cmd.equals(START_TCP_ACTION)) {
+			startTCPStream();
+		} else if (cmd.equals(STOP_TCP_ACTION)) {
+			stopTCPStream();
         } else if (cmd.equals(DISCONNECT_ACTION)) {
             udp_server.setReceiving(false);
             startDoNothing();
@@ -404,6 +429,12 @@ public class WorldController extends JPanel implements KeyListener,
         button_view_udp_packets.setActionCommand(VIEW_UDP_PACKETS_ACTION);
         button_view_udp_packets.addActionListener(this);
         button_area.add(button_view_udp_packets);
+
+		// setup tcp stream button
+		button_view_tcp = new JButton(VIEW_TCP_STRING);
+		button_view_tcp.setActionCommand(VIEW_TCP_ACTION);
+		button_view_tcp.addActionListener(this);
+		button_area.add(button_view_tcp);
 
         // setup MCL log button
         button_view_mcl_log = new JButton(VIEW_MCL_LOG_STRING);
@@ -510,6 +541,28 @@ public class WorldController extends JPanel implements KeyListener,
         field_one.setVisible(true);
     }
 
+	public void tcpButtons()
+	{
+		// Set buttons appropriately for whether
+		// TCP Streaming is active or not
+		if (tcp_handler.isReceiving()) {
+			button_one.setText(STOP_TCP_STRING);
+			button_one.setActionCommand(STOP_TCP_ACTION);
+			button_one.setVisible(true);
+			debugViewer.setVisible(true);
+		} else {
+			button_one.setText(START_TCP_STRING);
+			button_one.setActionCommand(START_TCP_ACTION);
+			button_one.setVisible(true);
+			debugViewer.setVisible(false);
+		}
+	}
+
+	// Sets up the streaming object info from robot
+	// public void startRobotObjectStream()
+	// {
+
+	// }
 
     // master method for getting robot udp working
     public void startRobotUDP()
@@ -521,6 +574,25 @@ public class WorldController extends JPanel implements KeyListener,
         mode = VIEW_UDP_PACKETS;
         painter.setPositionsToDraw(1);
     }
+
+	public void viewTCPStream()
+	{
+		nothingButtons();
+		tcpButtons();
+		mode = VIEW_TCP_STREAM;
+	}
+
+	public void startTCPStream()
+	{
+		tcp_handler.setReceiving(true);
+		tcpButtons();
+	}
+
+	public void stopTCPStream()
+	{
+		tcp_handler.setReceiving(false);
+		tcpButtons();
+	}
 
     public void startDoNothing()
     {

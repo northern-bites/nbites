@@ -104,17 +104,13 @@ public class WorldControllerPainter implements RobotListener
     // a single robot
     RobotHistory single_robot;
 
-    // because UDP currently doesn't provide heading uncertainty estimates
-    static final double ASSUMED_HEADING_UNCERT_FOR_UDP_COMMUNICATIONS = 0.0;
-    static final double ASSUMED_HEAD_PAN_FOR_UDP_COMMUNICATIONS = 0.0;
-
     // A tautological geometric constant
     private boolean draw_real, draw_est;
 
     private double by_x,by_y;
     private double yb_x,yb_y;
 
-    private float[][] seenLandmarks = new float[30][3];
+    private float[][] seenLandmarks = new float[100][3];
     private int numSeenLandmarks;
     private static final int X_INDEX = 0;
     private static final int Y_INDEX = 1;
@@ -658,6 +654,11 @@ public class WorldControllerPainter implements RobotListener
     // 0 true, 1 false
     public void sawLandmark(float x, float y, int distinct)
     {
+		// This prevents us from gathering too much of a
+		// backlog of unpainted landmarks
+		if (numSeenLandmarks > seenLandmarks.length){
+			return;
+		}
         seenLandmarks[numSeenLandmarks][X_INDEX] = x;
         seenLandmarks[numSeenLandmarks][Y_INDEX] = y;
         seenLandmarks[numSeenLandmarks][DISTINCT_INDEX] = distinct;
@@ -731,8 +732,7 @@ public class WorldControllerPainter implements RobotListener
         LocalizationPacket robot_estimate = LocalizationPacket.
             makeEstimateAndUncertPacket(d.getRobotX(),
                                         d.getRobotY(),
-                                        d.getRobotHeadingRadians(),
-                                        ASSUMED_HEAD_PAN_FOR_UDP_COMMUNICATIONS,
+                                        d.getRobotHeading(),
                                         d.getRobotUncertX(),
                                         d.getRobotUncertY(),
                                         d.getRobotUncertH());

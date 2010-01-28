@@ -24,28 +24,37 @@ public class LocalizationPacket {
 	y_velocity = at_y_velocity;
     }
 
-    public static LocalizationPacket makeFieldPointLocation(double at_x, double at_y) {
+    public static LocalizationPacket
+		makeFieldPointLocation(double at_x, double at_y) {
         return new LocalizationPacket(at_x, at_y, 0., 0., 0., 0., 0., false, 0., 0., 0., 0.);
     }
 
-    public static LocalizationPacket makeLandmarkLocation(double at_x, double at_y, double at_min_visible, double at_max_visible) {
-        return new LocalizationPacket(at_x, at_y, 0., 0., 0., 0., 0., false, at_min_visible, at_max_visible, 0., 0.);
+    public static LocalizationPacket
+		makeLandmarkLocation(double at_x, double at_y, double at_min_visible, double at_max_visible) {
+        return new LocalizationPacket(at_x, at_y, 0., 0., 0., 0., 0., false,
+									  at_min_visible, at_max_visible, 0., 0.);
     }
 
-    public static LocalizationPacket makeDogLocation(double at_x, double at_y, double at_heading, double at_pan) {
-        return new LocalizationPacket(at_x, at_y, at_heading, at_pan, 0., 0., 0., false, 0., 0., 0., 0.);
+    public static LocalizationPacket
+		makeEstimateOnlyPacket(double at_x, double at_y, double at_heading) {
+        return new LocalizationPacket(at_x, at_y, at_heading, 0., 0.,
+									  0., 0., false, 0., 0., 0., 0.);
     }
 
-    public static LocalizationPacket makeEstimateOnlyPacket(double at_x, double at_y, double at_heading) {
-        return new LocalizationPacket(at_x, at_y, at_heading, 0., 0., 0., 0., false, 0., 0., 0., 0.);
+    public static LocalizationPacket
+		makeBallEstimateAndUncertPacket(double ball_x, double ball_y,
+										double ball_x_uncert, double ball_y_uncert,
+										double ball_x_velocity, double ball_y_velocity) {
+	return new LocalizationPacket(ball_x, ball_y, 0.0, 0.0, ball_x_uncert,
+								  ball_y_uncert, 0.0, true, 0.0, 0.0, ball_x_velocity, ball_y_velocity);
     }
 
-    public static LocalizationPacket makeBallEstimateAndUncertPacket(double ball_x, double ball_y, double ball_x_uncert, double ball_y_uncert, double ball_x_velocity, double ball_y_velocity) {
-	return new LocalizationPacket(ball_x, ball_y, 0.0, 0.0, ball_x_uncert, ball_y_uncert, 0.0, true, 0.0, 0.0, ball_x_velocity, ball_y_velocity); 
-    }
-
-    public static LocalizationPacket makeEstimateAndUncertPacket(double at_x_est, double at_y_est, double at_heading_est, double at_head_pan,double at_x_uncert, double at_y_uncert, double at_heading_uncert) {
-        return new LocalizationPacket(at_x_est, at_y_est, at_heading_est, at_head_pan, at_x_uncert, at_y_uncert, at_heading_uncert, true, 0., 0., 0., 0.);
+    public static LocalizationPacket
+		makeEstimateAndUncertPacket(double at_x_est, double at_y_est,
+									double at_heading_est, double at_x_uncert,
+									double at_y_uncert, double at_heading_uncert) {
+        return new LocalizationPacket(at_x_est, at_y_est, at_heading_est, 0.0,
+									  at_x_uncert, at_y_uncert, at_heading_uncert, true, 0., 0., 0., 0.);
     }
 
     public double getXActual() {
@@ -87,7 +96,7 @@ public class LocalizationPacket {
     public double getYUncert() {
         return y_uncert;
     }
-    
+
     public double getHUncert() {
 	return heading_uncert;
     }

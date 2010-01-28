@@ -391,6 +391,16 @@ public class DataSerializer {
             data[i] = input.readFloat();
     }
 
+    public synchronized int readFloats(float[] data, boolean variableLength)
+            throws IOException {
+        int length = readArrayHeader(TYPE_FLOAT_ARRAY, data.length * SIZEOF_FLOAT,
+									 variableLength) / SIZEOF_FLOAT;
+
+        for (int i = 0; i < length; i++)
+            data[i] = input.readFloat();
+        return length;
+    }
+
     /**
      * Read a serialized double array from the input stream.  Expects the
      * message to be prepended with the standard array header giving the

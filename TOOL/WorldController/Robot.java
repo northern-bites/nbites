@@ -49,6 +49,19 @@ public class Robot {
         this.data = data;
     }
 
+	public void updateData(LocalizationPacket robotLoc,
+						   LocalizationPacket ballLoc) {
+		RobotData newData = new RobotData(0,
+										  (float)robotLoc.getXEst(), (float)robotLoc.getYEst(),
+										  (float)robotLoc.getHeadingEst(), (float)robotLoc.getXUncert(),
+										  (float)robotLoc.getYUncert(), (float)robotLoc.getHUncert(),
+										  (float)ballLoc.getXEst(), (float)ballLoc.getYEst(),
+										  (float)ballLoc.getXUncert(), (float)ballLoc.getYUncert(),
+										  (float)ballLoc.getXVelocity(), (float)ballLoc.getYVelocity(),
+										  0.0f, false, 0);
+		this.data = newData;
+	}
+
     public Integer getTeam() {
         return team;
     }
@@ -157,6 +170,7 @@ class RobotData {
         ballYVel = new Float(0);
     }
 
+	// EXPECTS HEADING AS RADIANS
     public RobotData(Integer time, Float robotX, Float robotY, Float robotHeading,
                      Float robotUncertX, Float robotUncertY, Float robotUncertH,
                      Float ballX, Float ballY,
@@ -182,12 +196,14 @@ class RobotData {
         this.calledSubRole = calledSubRole;
     }
 
+	// EXPECTS HEADING VALUES AS DEGREES! Uses Python (UDP) data, with
+	// degree heading values. Really ugly, I'm aware.
     public RobotData(long timeStamp, Vector<Float> values) {
         time = (int)timeStamp;
         // see order in man/noggin/Brain.py
         robotX        = values.get(0);
         robotY        = values.get(1);
-        robotHeading  = values.get(2);
+        robotHeading  = values.get(2)/180.0f * (float)Math.PI;
         robotUncertX  = values.get(3);
         robotUncertY  = values.get(4);
         robotUncertH  = values.get(5);
@@ -226,6 +242,7 @@ class RobotData {
         return robotY;
     }
 
+	// Should be in radians, not degrees
     public Float getRobotHeading() {
         return robotHeading;
     }
@@ -268,10 +285,6 @@ class RobotData {
 
     public Float getBallDistance() {
         return ballDist;
-    }
-
-    public double getRobotHeadingRadians() {
-        return robotHeading.intValue()/180.0 * Math.PI;
     }
 
     public Integer getCalledSubRole() {
