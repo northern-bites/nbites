@@ -23,6 +23,7 @@ class VisualCross : public VisualDetection, public VisualLandmark<crossID> {
 public:
     // Construcotrs
     VisualCross();
+	VisualCross(const crossID id);
     // copy constructor
     VisualCross(const VisualCross&);
 
@@ -83,10 +84,10 @@ private: // Class Variables
 
     // Member functions
     float robotDistanceToSD(float _distance) {
-        return 0.00000004f * std::pow(_distance,4.079f);
+        return sqrt(0.00000004f * std::pow(_distance,4.079f));
     }
     float robotBearingToSD(float _bearing) {
-        return static_cast<float>(M_PI_FLOAT) / 8.0f;
+        return sqrt(static_cast<float>(M_PI_FLOAT) / 8.0f);
     }
 
 };

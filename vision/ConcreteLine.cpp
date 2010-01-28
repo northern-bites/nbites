@@ -21,91 +21,95 @@ ConcreteLine::~ConcreteLine() {} // Nothing to delete
 ///////////////////////////////////////////////////////////////////////////////
 // Constants for absolute coordinates on the field of the specific corners.
 // (0,0) is the lower left corner of the field when BLUE goal is at the
-// bottom
+// LEFT SIDE of the field!
 ///////////////////////////////////////////////////////////////////////////////
 // Cretae static instances of the class for every possible line
 const ConcreteLine ConcreteLine::
 blue_goal_endline(FIELD_WHITE_LEFT_SIDELINE_X,
                   FIELD_WHITE_TOP_SIDELINE_Y,
-                  FIELD_WHITE_RIGHT_SIDELINE_X,
-                  FIELD_WHITE_TOP_SIDELINE_Y,
+                  FIELD_WHITE_LEFT_SIDELINE_X,
+                  FIELD_WHITE_BOTTOM_SIDELINE_Y,
                   BLUE_GOAL_ENDLINE);
 
 const ConcreteLine ConcreteLine::
-yellow_goal_endline(FIELD_WHITE_LEFT_SIDELINE_X,
-                    FIELD_WHITE_BOTTOM_SIDELINE_Y,
+yellow_goal_endline(FIELD_WHITE_RIGHT_SIDELINE_X,
+                    FIELD_WHITE_TOP_SIDELINE_Y,
                     FIELD_WHITE_RIGHT_SIDELINE_X,
                     FIELD_WHITE_BOTTOM_SIDELINE_Y,
                     YELLOW_GOAL_ENDLINE);
 
 const ConcreteLine ConcreteLine::
-blue_yellow_sideline(FIELD_WHITE_LEFT_SIDELINE_X,
-                     FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                     FIELD_WHITE_LEFT_SIDELINE_X,
+top_sideline(FIELD_WHITE_LEFT_SIDELINE_X,
                      FIELD_WHITE_TOP_SIDELINE_Y,
-                     BLUE_YELLOW_SIDELINE);
-
-const ConcreteLine ConcreteLine::
-yellow_blue_sideline(FIELD_WHITE_RIGHT_SIDELINE_X,
-                     FIELD_WHITE_BOTTOM_SIDELINE_Y,
                      FIELD_WHITE_RIGHT_SIDELINE_X,
                      FIELD_WHITE_TOP_SIDELINE_Y,
-                     YELLOW_BLUE_SIDELINE);
+                     TOP_SIDELINE);
 
 const ConcreteLine ConcreteLine::
-center_field_line(FIELD_WHITE_LEFT_SIDELINE_X,
-                  CENTER_FIELD_Y,
-                  FIELD_WHITE_RIGHT_SIDELINE_X,
-                  CENTER_FIELD_Y,
+bottom_sideline(FIELD_WHITE_LEFT_SIDELINE_X,
+                     FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                     FIELD_WHITE_RIGHT_SIDELINE_X,
+                     FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                     BOTTOM_SIDELINE);
+
+const ConcreteLine ConcreteLine::
+center_field_line(CENTER_FIELD_X,
+				  FIELD_WHITE_TOP_SIDELINE_Y,
+				  CENTER_FIELD_X,
+                  FIELD_WHITE_BOTTOM_SIDELINE_Y,
                   CENTER_FIELD_LINE);
 
+/**
+ * Goalbox lines are labeled as if looking out from within the goal.
+ * Top line is the "top" of the goalbox as the goalie sees it.
+ */
 const ConcreteLine ConcreteLine::
-blue_goalbox_top_line(BLUE_GOALBOX_LEFT_X,
+blue_goalbox_top_line(BLUE_GOALBOX_RIGHT_X,
                       BLUE_GOALBOX_TOP_Y,
                       BLUE_GOALBOX_RIGHT_X,
-                      BLUE_GOALBOX_TOP_Y,
+                      BLUE_GOALBOX_BOTTOM_Y,
                       BLUE_GOALBOX_TOP_LINE);
 
 const ConcreteLine ConcreteLine::
 blue_goalbox_left_line(BLUE_GOALBOX_LEFT_X,
-                       FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                       BLUE_GOALBOX_LEFT_X,
+					   BLUE_GOALBOX_TOP_Y,
+                       BLUE_GOALBOX_RIGHT_X,
                        BLUE_GOALBOX_TOP_Y,
                        BLUE_GOALBOX_LEFT_LINE);
 
 const ConcreteLine ConcreteLine::
-blue_goalbox_right_line(BLUE_GOALBOX_RIGHT_X,
-                        FIELD_WHITE_BOTTOM_SIDELINE_Y,
+blue_goalbox_right_line(BLUE_GOALBOX_LEFT_X,
+                        BLUE_GOALBOX_BOTTOM_Y,
                         BLUE_GOALBOX_RIGHT_X,
-                        BLUE_GOALBOX_TOP_Y,
+                        BLUE_GOALBOX_BOTTOM_Y,
                         BLUE_GOALBOX_RIGHT_LINE);
 
 const ConcreteLine ConcreteLine::
 yellow_goalbox_top_line(YELLOW_GOALBOX_LEFT_X,
-                        YELLOW_GOALBOX_BOTTOM_Y,
-                        YELLOW_GOALBOX_RIGHT_X,
+                        YELLOW_GOALBOX_TOP_Y,
+                        YELLOW_GOALBOX_LEFT_X,
                         YELLOW_GOALBOX_BOTTOM_Y,
                         YELLOW_GOALBOX_TOP_LINE);
 
 const ConcreteLine ConcreteLine::
 yellow_goalbox_left_line(YELLOW_GOALBOX_LEFT_X,
                          YELLOW_GOALBOX_BOTTOM_Y,
-                         YELLOW_GOALBOX_LEFT_X,
-                         FIELD_WHITE_TOP_SIDELINE_Y,
+                         YELLOW_GOALBOX_RIGHT_X,
+                         YELLOW_GOALBOX_BOTTOM_Y,
                          YELLOW_GOALBOX_LEFT_LINE);
 
 const ConcreteLine ConcreteLine::
-yellow_goalbox_right_line(YELLOW_GOALBOX_RIGHT_X,
-                          YELLOW_GOALBOX_BOTTOM_Y,
+yellow_goalbox_right_line(YELLOW_GOALBOX_LEFT_X,
+                          YELLOW_GOALBOX_TOP_Y,
                           YELLOW_GOALBOX_RIGHT_X,
-                          FIELD_WHITE_TOP_SIDELINE_Y,
+                          YELLOW_GOALBOX_TOP_Y,
                           YELLOW_GOALBOX_RIGHT_LINE);
 
 const ConcreteLine* ConcreteLine::concreteLineList[NUM_LINES] =
 {&blue_goal_endline,
  &yellow_goal_endline,
- &blue_yellow_sideline,
- &yellow_blue_sideline,
+ &top_sideline,
+ &bottom_sideline,
  &center_field_line,
  &blue_goalbox_top_line,
  &blue_goalbox_left_line,
@@ -126,10 +130,10 @@ const string ConcreteLine::toString() const
         return "Blue Goal Sideline";
     case YELLOW_GOAL_ENDLINE:
         return "Yellow Goal Sideline";
-    case BLUE_YELLOW_SIDELINE:
-        return "Blue-Yellow Sideline";
-    case YELLOW_BLUE_SIDELINE:
-        return "Yellow-Blue Sideline";
+    case TOP_SIDELINE:
+        return "Top Sideline";
+    case BOTTOM_SIDELINE:
+        return "Bottom Sideline";
     case CENTER_FIELD_LINE:
         return "Center Field Line";
     case BLUE_GOALBOX_TOP_LINE:

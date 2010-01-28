@@ -78,10 +78,6 @@ private:
         throw();
 
 private:
-    // TOOLConnect sub-thread controller
-    TOOLConnect tool;
-    int toolCommandState;
-
     // mutex lock for threaded data access
     pthread_mutex_t comm_mutex;
     // Sending packet data
@@ -93,6 +89,10 @@ private:
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     CommTimer timer;
     boost::shared_ptr<GameController> gc;
+
+    // TOOLConnect sub-thread controller
+    TOOLConnect tool;
+    int toolCommandState;
 
     // Socket information
     int sockn;

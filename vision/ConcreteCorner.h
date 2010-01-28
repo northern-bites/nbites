@@ -169,7 +169,6 @@ private: // Instance variables recording location on field and identifier
     cornerID id;
     shape cornerType;
 
-    // // Eventually we will have a "ConcreteLine" class just like this one
     const ConcreteLine * line1;
     const ConcreteLine * line2;
 };

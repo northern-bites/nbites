@@ -102,6 +102,10 @@ public:
     virtual const MotionModel getLastOdo() const {
         return lastOdo;
     }
+
+	virtual const vector<Observation> getLastObservations() const {
+		return lastObservations;
+	}
     // Setters
     /**
      * @param val The new estimate of the loc x position
@@ -144,7 +148,22 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
+	void incorporateCartesianMeasurement(int obsIndex,
+										   Observation z,
+										   StateMeasurementMatrix &H_k,
+										   MeasurementMatrix &R_k,
+										   MeasurementVector &V_k);
+	void incorporatePolarMeasurement(int obsIndex,
+									   Observation z,
+									   StateMeasurementMatrix &H_k,
+									   MeasurementMatrix &R_k,
+									   MeasurementVector &V_k);
+
+
     int findBestLandmark(Observation * z);
+	int findMostLikelyLine(Observation *z);
+	float getMahalanobisDistance(Observation *z, LineLandmark ll);
+	int findNearestNeighbor(Observation *z);
     float getDivergence(Observation * z, PointLandmark pt);
 
     void limitAPrioriUncert();
@@ -154,6 +173,7 @@ private:
 
     // Last odometry update
     MotionModel lastOdo;
+	vector<Observation> lastObservations;
     bool useAmbiguous;
 
     // Parameters

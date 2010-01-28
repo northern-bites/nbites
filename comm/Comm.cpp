@@ -431,9 +431,9 @@ PyMODINIT_FUNC init_comm (void)
 
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
-    : Thread(_synchro, "Comm"), tool(_synchro, s, v),
-      data(NUM_PACKET_DATA_ELEMENTS,0), latest(new list<vector<float> >),
-      sensors(s), timer(&micro_time), gc(new GameController())
+    : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
+	  latest(new list<vector<float> >), sensors(s), timer(&micro_time),
+	  gc(new GameController()), tool(_synchro, s, v, gc)
 {
     pthread_mutex_init(&comm_mutex,NULL);
     // initialize broadcast address structure
@@ -466,6 +466,10 @@ void Comm::run ()
     running = true;
     trigger->on();
 
+	struct timespec interval, remainder;
+	interval.tv_sec = 0;
+	interval.tv_nsec = SLEEP_MILLIS * 1000;
+
     try {
         bind();
 
@@ -476,7 +480,7 @@ void Comm::run ()
 
             while (running && !timer.time_for_packet()) {
                 receive();
-                usleep(SLEEP_MILLIS);
+                nanosleep(&interval, &remainder);
             }
         }
     }catch (socket_error &e) {
@@ -628,7 +632,7 @@ void Comm::bind_gc () throw(socket_error)
     bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     // set shared UDP socket (other processes may bind this port)
-    ::setsockopt(sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+    ::setsockopt(gc_sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
 
     // bind socket to address
     if (::bind(gc_sockn, (const struct sockaddr*)&bind_addr,
@@ -703,13 +707,17 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
     // send the udp message
     int result = -2;
 
+	struct timespec interval, remainder;
+	interval.tv_sec = 0;
+	interval.tv_nsec = 100000;
+
     while (result == -2) {
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
         // except if error is blocking error
         if (result == -1 && errno == EAGAIN) {
             result = -2;
-            usleep(100);
+            nanosleep(&interval, &remainder);
         }
     }
 

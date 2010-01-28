@@ -86,8 +86,8 @@ Observation::Observation(const VisualLine &_line) :
          ++theIterator) {
         LineLandmark addLine((**theIterator).getFieldX1(),
                              (**theIterator).getFieldY1(),
-                             (**theIterator).getFieldX1(),
-                             (**theIterator).getFieldY1());
+                             (**theIterator).getFieldX2(),
+                             (**theIterator).getFieldY2());
         linePossibilities.push_back(addLine);
         ++numPossibilities;
     }

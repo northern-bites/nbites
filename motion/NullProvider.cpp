@@ -87,6 +87,7 @@ void NullProvider::readNewStiffness(){
     if (freezingOff && doOnce){
         frozen = false;
         freezingOff = false;
+		freezingOn = false;
         doOnce = false;
     }
 

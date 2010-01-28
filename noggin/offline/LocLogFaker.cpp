@@ -61,7 +61,7 @@ int main(int argc, char** argv)
     try {
         inputFile.open(argv[1], ios::in);
 
-    } catch (const exception& e) {
+    } catch (ifstream::failure e) {
         cout << "Failed to open input file" << argv[1] << endl;
         return 1;
     }

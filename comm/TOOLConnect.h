@@ -15,7 +15,7 @@ class TOOLConnect; // forward reference
 #include "DataSerializer.h"
 #include "LocSystem.h"
 #include "BallEKF.h"
-
+#include "GameController.h"
 
 //
 // DataRequest struct definition
@@ -61,7 +61,8 @@ class TOOLConnect
 public:
     TOOLConnect(boost::shared_ptr<Synchro> _synchro,
                 boost::shared_ptr<Sensors> s,
-                boost::shared_ptr<Vision> v);
+                boost::shared_ptr<Vision> v,
+				boost::shared_ptr<GameController> gc);
     ~TOOLConnect();
 
     void run();
@@ -86,6 +87,7 @@ private:
     //   on the Aibo's, we have neither threads nor Sensors class
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     boost::shared_ptr<Vision> vision; // access to vision processing
+    boost::shared_ptr<GameController> gameController; // access to GameController
     boost::shared_ptr<LocSystem> loc; // access to localization data
     boost::shared_ptr<BallEKF> ballEKF; // access to localization data
 };

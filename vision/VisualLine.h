@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
 
 #include "ConcreteLine.h"
 #include "VisualLandmark.h"
@@ -15,7 +16,6 @@ enum ScanDirection {
     HORIZONTAL,
     VERTICAL
 };
-//struct linePoint;
 
 // structure for a single line point
 struct linePoint {
@@ -23,19 +23,21 @@ struct linePoint {
     int y; // y coordinate on the image screen
     float lineWidth; // the width of the line where the point was found
     float distance; // The distance pose estimates the point to be from robot's
+	float bearing;
 
     // center
     ScanDirection foundWithScan;
 
     linePoint (int _x = 0, int _y = 0, float _lineWidth = 0.0,
                float _distance = 0.0,
+			   float _bearing = 0.0,
                ScanDirection _scanFound = VERTICAL) :
         x(_x), y(_y), lineWidth(_lineWidth),
-        distance(_distance), foundWithScan(_scanFound) {
+        distance(_distance), bearing(_bearing), foundWithScan(_scanFound) {
     }
 
     linePoint(const linePoint& l) : x(l.x), y(l.y), lineWidth(l.lineWidth),
-                                    distance(l.distance),
+                                    distance(l.distance), bearing(l.bearing),
                                     foundWithScan(l.foundWithScan) {
     }
 
@@ -53,6 +55,7 @@ struct linePoint {
             y == secondLinePoint.y &&
             lineWidth == secondLinePoint.lineWidth &&
             distance == secondLinePoint.distance &&
+			bearing == secondLinePoint.bearing &&
             foundWithScan == secondLinePoint.foundWithScan;
     }
     bool operator!= (const linePoint &secondLinePoint) const {
@@ -85,6 +88,7 @@ public:
     VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
     VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
+	VisualLine(float _dist, float _bearing);
     VisualLine(const VisualLine& other);
     ~VisualLine();
 
@@ -132,6 +136,7 @@ public:
 private: // Member functions
     void init();
     void calculateWidths();
+	void calculateDistBearing();
 
     static inline const float getLength(const VisualLine& line);
     static inline const float getAngle(const VisualLine& line);

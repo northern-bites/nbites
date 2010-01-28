@@ -1,7 +1,8 @@
 
 #include "AbstractGait.h"
 #include <iostream>
-#include <string.h>
+#include "string.h"
+#include "stdio.h"
 using namespace std;
 AbstractGait::AbstractGait(){}
 AbstractGait::~AbstractGait(){}

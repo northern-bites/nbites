@@ -365,8 +365,10 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
                         // greenWhiteY is at bottom, hence higher in our
                         // coordinate system
                         int width = greenWhiteY - whiteGreenY;
-                        float distance = pose->pixEstimate(x, linePointY,
-                                                           0).dist;
+
+						const estimate pixEst = pose->pixEstimate(x, linePointY, 0);
+                        const float distance = pixEst.dist;
+						const float bearing = pixEst.bearing;
 
                         if (isReasonableVerticalWidth(x, linePointY,
 													  distance, width)) {
@@ -374,7 +376,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points) {
                             // assign x, y, lineWidth
                             linePoint point(x, linePointY,
 											static_cast<float>(width),
-											distance, VERTICAL);
+											distance, bearing, VERTICAL);
                             if (debugVertEdgeDetect) {
                                 cout << "\t\t\tPoint " << point
                                      << " passed all checks!" << endl;
@@ -565,14 +567,16 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
                         // they are up close
                         int linePointX = (whiteGreenX + greenWhiteX) / 2;
                         int width = whiteGreenX - greenWhiteX;
-                        float distance = pose->pixEstimate(linePointX, y,
-                                                           0).dist;
+						const estimate pixEst = pose->pixEstimate(linePointX,
+																  y, 0);
+                        const float distance = pixEst.dist;
+						const float bearing = pixEst.bearing;
                         if (isReasonableHorizontalWidth(linePointX, y, distance,
                                                         width)) {
                             // assign x, y, lineWidth
                             linePoint point(linePointX, y,
                                             static_cast<float>(width)
-											, distance, HORIZONTAL);
+											, distance, bearing, HORIZONTAL);
                             if (debugHorEdgeDetect) {
                                 cout << "\t\tPoint " << point << " accepted."
                                      << endl;
@@ -2142,9 +2146,13 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
             linePointX = (leftX + rightX) / 2;
             lineWidth = rightX - leftX;
         }
+		const estimate pixEst = pose->pixEstimate(linePointX, y, 0);
+		const float distance = pixEst.dist;
+		const float bearing = pixEst.bearing;
+
         linePoint newPoint(linePointX, y,
 						   static_cast<float>(lineWidth),
-						   HORIZONTAL);
+						   distance, bearing, HORIZONTAL);
         return newPoint;
     }
     // Vertical
@@ -2206,8 +2214,13 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
             linePointY = (topY + bottomY) / 2;
             lineWidth = bottomY - topY;
         }
+		const estimate pixEst = pose->pixEstimate(x, linePointY, 0);
+		const float distance = pixEst.dist;
+		const float bearing = pixEst.bearing;
+
         linePoint newPoint(x, linePointY,
-						   static_cast<float>(lineWidth), VERTICAL);
+						   static_cast<float>(lineWidth),
+						   distance, bearing, VERTICAL);
         return newPoint;
     }
 }
@@ -2787,7 +2800,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 	      }
 	    }
             corners.push_back(c);
-	    
+
             // TODO:  Should I be adding the intersection point to both lines?
             //i->addPoint
 

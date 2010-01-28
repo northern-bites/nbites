@@ -26,6 +26,7 @@ noggin/util/fakeData/*
 /corpus/TAGS
 /noggin/TAGS
 /noggin/offline/TAGS
+/noggin/offline/*.o
 /noggin/playbook/TAGS
 /noggin/players/TAGS
 /noggin/util/TAGS
@@ -37,3 +38,5 @@ noggin/util/fakeData/*
 /motion/README.toc
 /motion/README.pdf
 docs*
+/noggin/offline/c++filt
+/noggin/offline/faker

@@ -134,15 +134,28 @@ class LineLandmark
 {
 public:
     LineLandmark(float _x1, float _y1, float _x2, float _y2) :
-        x1(_x1), y1(_y2), x2(_x2), y2(_y2) {}
+        x1(_x1), y1(_y1), x2(_x2), y2(_y2),
+		dx(_x2-_x1), dy(_y2-_y1)	// Components of line unit vector
+		{
+			// We want to make dx, dy components of line's _unit_ vector,
+			// so we normalize them
+			if (dx !=0 || dy != 0) {
+				const float length = hypot(dx,dy);
+				dx = dx / length;
+				dy = dy / length;
+			}
+		}
     LineLandmark() {}
     float x1;
     float y1;
     float x2;
     float y2;
+	float dx;
+	float dy;
   friend std::ostream& operator<< (std::ostream &o, const LineLandmark &c)
   {
-      return o << c.x1 << " " << c.y1 << " " << c.x2 << " " << c.y2;
+      return o << c.x1 << " " << c.y1 << " " << c.x2 << " " <<
+		  c.y2 << " " << c.dx << " " << c.dy;
   }
 
 };

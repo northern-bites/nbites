@@ -1,6 +1,7 @@
 
 #include <algorithm>    // for sort()
 #include <cstdlib>      // git rid of overloaded abs() errors
+#include "NBMath.h"
 
 #include "VisualLine.h"
 using namespace std;
@@ -30,6 +31,15 @@ VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
 {
 
 }
+
+VisualLine::VisualLine(float _dist, float _bearing) :
+	VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+	possibleLines(ConcreteLine::concreteLines)
+{
+	setDistanceWithSD(_dist);
+	setBearingWithSD(_bearing);
+}
+
 
 
 
@@ -66,14 +76,13 @@ VisualLine::VisualLine(const VisualLine& other)
 {
 }
 
-VisualLine::~VisualLine() {
+VisualLine::~VisualLine() {}
 
-}
-
-const linePoint VisualLine::DUMMY_LINEPOINT(-1,-1,-1,VERTICAL);
+const linePoint VisualLine::DUMMY_LINEPOINT(-1,-1,-1,-1,VERTICAL);
 
 
-void VisualLine::addPoints(const list <linePoint> &additionalPoints) {
+void VisualLine::addPoints(const list <linePoint> &additionalPoints)
+{
     for (list<linePoint>::const_iterator i = additionalPoints.begin();
          i != additionalPoints.end(); i++) {
         points.push_back(*i);
@@ -82,7 +91,8 @@ void VisualLine::addPoints(const list <linePoint> &additionalPoints) {
     init();
 }
 
-void VisualLine::addPoints(const vector <linePoint> &additionalPoints) {
+void VisualLine::addPoints(const vector <linePoint> &additionalPoints)
+{
     for (vector<linePoint>::const_iterator i = additionalPoints.begin();
          i != additionalPoints.end(); i++) {
         points.push_back(*i);
@@ -93,7 +103,8 @@ void VisualLine::addPoints(const vector <linePoint> &additionalPoints) {
 }
 
 
-void VisualLine::init() {
+void VisualLine::init()
+{
     // Points are sorted by x
     left = points[0].x;
     right = points[points.size()-1].x;
@@ -154,12 +165,50 @@ void VisualLine::init() {
     length = getLength(*this);
 
     calculateWidths();
+	calculateDistBearing();
+}
+
+/**
+ * Uses the endpoints of the line to calculate the distance and
+ * the bearing to the closest point on the line.
+ */
+void VisualLine::calculateDistBearing()
+{
+    // Points are sorted by x
+    // This is a temporary measure, until a better system of
+    // getting line segment endpoints is implemented
+	const linePoint startPt = points[0];
+	const linePoint endPt = points[points.size()-1];
+
+	const float startGroundX = startPt.distance * sin(startPt.bearing);
+	const float startGroundY = startPt.distance * cos(startPt.bearing);
+
+	const float endGroundX = endPt.distance * sin(endPt.bearing);
+	const float endGroundY = endPt.distance * cos(endPt.bearing);
+
+	const float slopeX = endGroundX - startGroundX;
+	const float slopeY = endGroundY - startGroundY;
+	const float length = sqrt(slopeY*slopeY+slopeX*slopeX);
+
+	const float unitSlopeX = slopeX / length;
+	const float unitSlopeY = slopeY / length;
+
+	// Point p is the closest point on the line to the robot.
+	// Coordinates are relative to us in the global frame.
+	const float x_p = (startGroundY * unitSlopeY +
+					   startGroundX * unitSlopeX) * unitSlopeX + startGroundX;
+	const float y_p = (startGroundY * unitSlopeY +
+					   startGroundX * unitSlopeX) * unitSlopeY + startGroundY;
+
+	setDistanceWithSD( hypot(x_p, y_p));
+	setBearingWithSD( NBMath::subPIAngle(NBMath::safe_atan2(y_p, x_p)) );
 }
 
 // Loops through all of our line points and calculates the average widths in
 // the x and y direction, and assigns these widths to the avgVerticalWidth
 // and avgHorizontalWidth fields.  Also assigns the min and max for the widths
-void VisualLine::calculateWidths() {
+void VisualLine::calculateWidths()
+{
     float verticalWidthTotal = 0;
     float horizontalWidthTotal = 0;
     int numVertPoints = 0;
@@ -222,7 +271,8 @@ void VisualLine::calculateWidths() {
 }
 
 
-const float VisualLine::getLength(const VisualLine& line) {
+const float VisualLine::getLength(const VisualLine& line)
+{
     return Utility::getLength( static_cast<float>(line.start.x),
 							   static_cast<float>(line.start.y),
                                static_cast<float>(line.end.x),
@@ -230,24 +280,28 @@ const float VisualLine::getLength(const VisualLine& line) {
 }
 
 // Get the angle from horizontal (in degrees) the line makes on the screen
-const float VisualLine::getAngle(const VisualLine& line) {
+const float VisualLine::getAngle(const VisualLine& line)
+{
     return Utility::getAngle(line.start.x, line.start.y,
                              line.end.x, line.end.y);
 }
 
 // We define a line to be vertically oriented if the change in y is bigger
 // than the change in x
-const bool VisualLine::isVerticallyOriented(const VisualLine& line) {
+const bool VisualLine::isVerticallyOriented(const VisualLine& line)
+{
     return line.right - line.left < line.bottom - line.top;
 }
 
 
-const bool VisualLine::isPerfectlyVertical(const VisualLine& line) {
+const bool VisualLine::isPerfectlyVertical(const VisualLine& line)
+{
     return line.right == line.left;
 }
 
 // Return the slope of the line (returns NAN if vertical)
-const float VisualLine::getSlope() const {
+const float VisualLine::getSlope() const
+{
     return Utility::getSlope(*this);
 }
 
@@ -257,7 +311,8 @@ const float VisualLine::getSlope() const {
 // is oriented left to right.
 // Our j axis will actually increase towards the bottom of the screen
 pair<int, int> VisualLine::
-getLineComponents(const VisualLine &aLine) {
+getLineComponents(const VisualLine &aLine)
+{
     int i = aLine.right - aLine.left;
     // If y2 is above y1 in the image, y2 is smaller in image coordinates than
     // y1, so this would be a negative j value (as per our axis oriented towards
@@ -273,8 +328,9 @@ getLineComponents(const VisualLine &aLine) {
 // from http://www.efunda.com/math/leastsquares/lstsqr1dcurve.cfm
 // y = mx + b
 // we need to find m and b
-pair <float, float> VisualLine::
-	leastSquaresFit(const vector <linePoint> &thePoints) {
+pair<float,float>
+VisualLine::leastSquaresFit(const vector<linePoint> &thePoints)
+{
     // Use least squares to fit the line to the points
     // from http://www.efunda.com/math/leastsquares/lstsqr1dcurve.cfm
     // y = mx + b
@@ -309,7 +365,8 @@ pair <float, float> VisualLine::
     return pair<float, float>(m, b);
 }
 
-pair <float, float> VisualLine::leastSquaresFit(const VisualLine& l) {
+pair <float, float> VisualLine::leastSquaresFit(const VisualLine& l)
+{
     return leastSquaresFit(l.points);
 }
 

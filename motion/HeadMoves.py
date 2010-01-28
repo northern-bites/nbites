@@ -244,3 +244,8 @@ LOOK_HEADS = {'left' : PAN_LEFT_HEADS,
               'down' : PAN_DOWN_HEADS,
               'leftDown' : PAN_LEFT_DOWN_HEADS,
               'rightDown' : PAN_RIGHT_DOWN_HEADS}
+
+################### DATA COLLECTION PAN###############
+DATA_PAN = (
+    ((0.0,-45), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0, 15), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES))

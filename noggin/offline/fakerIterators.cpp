@@ -247,11 +247,21 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw,
                                                float noiseLevel)
 {
     vector<Observation> Z_t;
+
+	checkObjects(Z_t, myPos, noiseLevel);
+	checkCrosses(Z_t, myPos, noiseLevel);
+	checkCorners(Z_t, myPos, noiseLevel);
+	checkLines(Z_t, myPos);
+
+    return Z_t;
+}
+
+void checkObjects(vector<Observation> &Z_t, PoseEst myPos, float noiseLevel)
+{
     // Measurements between robot position and seen object
     float deltaX, deltaY;
     // required measurements for the added observation
     float visDist, visBearing;
-
     // Check concrete field objects
     for(int i = 0; i < ConcreteFieldObject::NUM_FIELD_OBJECTS; ++i) {
         const ConcreteFieldObject* toView = ConcreteFieldObject::
@@ -292,6 +302,43 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw,
             Z_t.push_back(seen);
         }
     }
+}
+
+void checkCrosses(vector<Observation> &Z_t, PoseEst myPos, float noiseLevel)
+{
+    for(int i = 0; i < ConcreteCross::NUM_FIELD_CROSSES; ++i) {
+		const ConcreteCross* toView = ConcreteCross::concreteCrossList[i];
+        float deltaX = toView->getFieldX() - myPos.x;
+        float deltaY = toView->getFieldY() - myPos.y;
+        float visDist = hypot(deltaX, deltaY);
+        float visBearing = subPIAngle(atan2(deltaY, deltaX) - myPos.h);
+
+        // Check if the object is viewable
+        if ((visBearing > -FOV_OFFSET && visBearing < FOV_OFFSET) &&
+            visDist < CORNER_MAX_VIEW_RANGE) {
+
+            // Get measurement variance and add noise to reading
+            if(!use_perfect_dists) {
+                visDist += sampleNormalDistribution(visDist*noiseLevel);
+            }
+
+            const crossID id = toView->getID();
+            // Build the visual corner
+            VisualCross vc = VisualCross(id);
+            vc.setDistanceWithSD(visDist);
+			vc.setBearingWithSD(visBearing);
+
+            // Build the observation
+            Observation seen(vc);
+            Z_t.push_back(seen);
+        }
+    }
+}
+
+void checkCorners(vector<Observation> &Z_t, PoseEst myPos, float noiseLevel)
+{
+    // required measurements for the added observation
+    float visDist, visBearing;
 
     // Check concrete corners
     for(int i = 0; i < ConcreteCorner::NUM_CORNERS; ++i) {
@@ -390,10 +437,78 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw,
             Z_t.push_back(seen);
         }
     }
+}
+
+void checkLines(vector<Observation> &Z_t, PoseEst myPos)
+{
 
     // Check concrete lines
+	for (int i = 0; i < ConcreteLine::NUM_LINES; ++i) {
+		const ConcreteLine *toView = ConcreteLine::concreteLineList[i];
+		LineLandmark ll(toView->getFieldX1(),
+						toView->getFieldY1(),
+						toView->getFieldX2(),
+						toView->getFieldY2());
+		std::pair<float,float> lineDelta =
+			Utility::findClosestLinePointCartesian(ll, myPos.x, myPos.y, myPos.h);
 
-    return Z_t;
+		const float distance = hypot(lineDelta.first, lineDelta.second);
+		const float bearing = subPIAngle(safe_atan2(lineDelta.second, lineDelta.first) - myPos.h);
+
+		const lineID id = toView->getID();
+		list<const ConcreteLine*> toUse;
+
+		const ConcreteLine * line;
+		switch(id) {
+		case BLUE_GOAL_ENDLINE:
+			line = &ConcreteLine::blue_goal_endline;
+			break;
+		case YELLOW_GOAL_ENDLINE:
+			line = &ConcreteLine::yellow_goal_endline;
+			break;
+		case BLUE_YELLOW_SIDELINE:
+			line = &ConcreteLine::blue_yellow_sideline;
+			break;
+		case YELLOW_BLUE_SIDELINE:
+			line = &ConcreteLine::yellow_blue_sideline;
+			break;
+		case CENTER_FIELD_LINE:
+			line = &ConcreteLine::center_field_line;
+			break;
+		case BLUE_GOALBOX_TOP_LINE:
+			line = &ConcreteLine::blue_goalbox_top_line;
+			break;
+		case BLUE_GOALBOX_LEFT_LINE:
+			line = &ConcreteLine::blue_goalbox_left_line;
+			break;
+		case BLUE_GOALBOX_RIGHT_LINE:
+			line = &ConcreteLine::blue_goalbox_right_line;
+			break;
+		case YELLOW_GOALBOX_TOP_LINE:
+			line = &ConcreteLine::yellow_goalbox_top_line;
+			break;
+		case YELLOW_GOALBOX_LEFT_LINE:
+			line = &ConcreteLine::yellow_goalbox_left_line;
+			break;
+		case YELLOW_GOALBOX_RIGHT_LINE:
+		case UNKNOWN_LINE:
+		case SIDE_OR_ENDLINE:
+		case SIDELINE_LINE:
+		case ENDLINE_LINE:
+		case GOALBOX_LINE:
+		case GOALBOX_SIDE_LINE:
+		case GOALBOX_TOP_LINE:
+		default:
+			line = &ConcreteLine::yellow_goalbox_right_line;
+			break;
+		}
+		toUse.assign(1, line);
+		VisualLine vl = VisualLine(distance, bearing);
+		vl.setPossibleLines(toUse);
+		vl.setID(id);
+		Observation seen(vl);
+		Z_t.push_back(seen);
+	}
 }
 
 /**
