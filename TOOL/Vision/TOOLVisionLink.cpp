@@ -232,7 +232,7 @@ extern "C" {
                                     cb->getRightBottomX(), cb->getRightBottomY());
             } else if (cross != NULL) {
                 env->CallVoidMethod(jobj, setFieldObjectInfo,
-                                    51,
+                                    (int)cross->getID(),
                                     cross->getWidth(), cross->getHeight(),
                                     cross->getLeftTopX(), cross->getLeftTopY(),
                                     cross->getRightTopX(), cross->getRightTopY(),

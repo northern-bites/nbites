@@ -55,6 +55,11 @@ public class VisionState {
     public final static byte POSE_HORIZON_THICKNESS = 2;
     public final static byte POSE_HORIZON_COLOR = Vision.BLUE;
     public final static byte VISION_HORIZON_COLOR = Vision.MAGENTA;
+
+	public final static byte YELLOW_CROSS_COLOR = Vision.YELLOW;
+	public final static byte BLUE_CROSS_COLOR = Vision.BLUE;
+
+
     //images + colortable
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
@@ -150,13 +155,17 @@ public class VisionState {
                     color = GOAL_RIGHT_POST_BOX_COLOR; break;
                 case VisualFieldObject.BLUE_GOAL_POST:
                 case VisualFieldObject.YELLOW_GOAL_POST:
-                    System.out.println("Drawing ambiguous goal post with id " +
-                                       obj.getID());
                     color = GOAL_POST_BOX_COLOR; break;
                 case VisualFieldObject.BLUE_GOAL_BACKSTOP:
                     color = BLUE_GOAL_BACKSTOP_COLOR; break;
                 case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
                     color = YELLOW_GOAL_BACKSTOP_COLOR; break;
+				case VisualFieldObject.YELLOW_CROSS:
+					color = YELLOW_CROSS_COLOR;
+					break;
+				case VisualFieldObject.BLUE_CROSS:
+					color = BLUE_CROSS_COLOR;
+					break;
                 default: color = Vision.BLACK; break;
                 }
                 //draw the box

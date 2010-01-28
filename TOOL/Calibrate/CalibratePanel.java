@@ -547,6 +547,15 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 		}
 	}
 
+	public void setXYText(int x, int y, int pixie[]) {
+		if (x < 0 || y < 0) {
+			XYPosition.setText("");
+		} else {
+			XYPosition.setText("(x,y): (" + x + " , " + y + ") "+pixie[0]+
+							   ", "+pixie[1]+", "+pixie[2]);
+		}
+	}
+
 	public String getXYText() {
 		return XYPosition.getText();
 	}

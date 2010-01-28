@@ -24,9 +24,9 @@ public class VisualFieldObject {
         UNKNOWN_FIELD_OBJECT = 46,
         BLUE_GOAL_BACKSTOP = 47,
         YELLOW_GOAL_BACKSTOP = 48,
-		ABSTRACT_CROSS = 51,
-		BLUE_CROSS = 52,
-		YELLOW_CROSS = 53;
+		ABSTRACT_CROSS = 82,
+		BLUE_CROSS = 80,
+		YELLOW_CROSS = 81;
 
     private int id;
     private double w, h;
