@@ -7,7 +7,7 @@ USAGE="./sync [up-down] \nExample: $> ./sync down"
 UP_OR_DOWN=$1
 
 RSYNC=rsync
-RSYNC_OPTS=-rvcz
+RSYNC_OPTS=-rvzc
 
 if [ "$1" = "" ]; then
     echo "No push direction specified"
@@ -23,11 +23,12 @@ ROBOCUP_DIR=/mnt/research/robocup
 TABLES_DIR=tables
 DEST=.
 EXCLUDE_SYNC=--exclude=sync*
-EXCLUDE_GIT=--exclude=tables.git*
+EXCLUDE_GIT="--exclude=tables.git* --exclude=.git*"
 
 
 SYNC_UP="$RSYNC $RSYNC_OPTS $EXCLUDE_SYNC $EXCLUDE_GIT $DEST/* $SERVER/$ROBOCUP_DIR/$TABLES_DIR"
 SYNC_DOWN="$RSYNC $RSYNC_OPTS $EXCLUDE_SYNC $EXCLUDE_GIT $SERVER/$ROBOCUP_DIR/$TABLES_DIR/* $DEST"
+DIFF="$RSYNC $RSYNC_OPTS -n $EXCLUDE_SYNC $EXCLUDE_GIT $DEST $SERVER/$ROBOCUP_DIR/$TABLES_DIR/"
 
 if [ "$UP_OR_DOWN" = "up" ]; then
 
@@ -40,6 +41,12 @@ elif [ "$UP_OR_DOWN" = "down" ]; then
     echo "Syncing FROM $SERVER/$ROBOCUP_DIR/$TABLES_DIR TO `pwd` "
     echo $SYNC_DOWN
     $SYNC_DOWN
+
+elif [ "$UP_OR_DOWN"="diff" ]; then
+    echo "Getting diff"
+    echo $DIFF
+    $DIFF
+
 else
 echo "Invalid parameters"
 echo $USAGE
