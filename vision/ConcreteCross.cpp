@@ -56,9 +56,9 @@ const list <const ConcreteCross*> ConcreteCross::abstractCrossList =
 const string ConcreteCross::toString() const {
     switch(id) {
     case BLUE_GOAL_CROSS:
-        return "Blue goal left post";
+        return "Blue goal field cross";
     case YELLOW_GOAL_CROSS:
-        return "Yellow goal left post";
+        return "Yellow goal field cross";
     case ABSTRACT_CROSS:
         return "Abstract field cross";
     default:
@@ -70,9 +70,9 @@ const string ConcreteCross::toString() const {
 const string ConcreteCross::getStringFromID(const crossID testID) {
     switch (testID) {
     case BLUE_GOAL_CROSS:
-        return "Blue goal left post";
+        return "Blue goal field cross";
     case YELLOW_GOAL_CROSS:
-        return "Yellow goal left post";
+        return "Yellow goal cross";
     case ABSTRACT_CROSS:
         return "Abstract field cross";
     default:

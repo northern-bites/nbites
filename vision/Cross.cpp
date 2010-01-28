@@ -19,8 +19,8 @@
 
 
 /*
- * This is where we do all major ball related processing.  For now we
- * still do run length encoding to find candidate balls.
+ * This is where we do all field cross processing.
+ * 
 */
 
 #include <iostream>
@@ -59,8 +59,8 @@ void Cross::init()
 void Cross::createObject() {
 	// TODO:  These were thrown together in an hour.  They should
 	// be more rigorously determined
-	const int maxWidth = 55;
-	const int maxHeight = 55;
+	const int maxWidth = 75;
+	const int maxHeight = 75;
 	const int minWidth = 5;
 	const int minHeight = 5;
 	const int maxRatio = 5;
@@ -81,6 +81,10 @@ void Cross::createObject() {
 	// basic size
 	for (int i = 0; i < blobs->number(); i++) {
 		Blob candidate = blobs->get(i);
+		if (CROSSDEBUG) {
+			cout << "Blob " << candidate.width() << " " << candidate.height() << endl;
+			cout << "Coords " << candidate.getLeft() << " " << candidate.getTop() << endl;
+		}
 		if (candidate.width() < maxWidth && candidate.height() < maxHeight &&
 			candidate.width() > minWidth && candidate.height() > minHeight &&
 			candidate.width() < maxRatio * candidate.height()  &&
@@ -142,6 +146,10 @@ void Cross::checkForX(Blob b) {
 				count-=3;
 			counter++;
 		} else return;
+	}
+
+	if (CROSSDEBUG) {
+		cout << "Have a candidate white blob " << x << " " << y << endl;
 	}
 
 	const int HORIZONCHECK = 15;

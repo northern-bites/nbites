@@ -1295,7 +1295,9 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
 
 /* Another post classification method.  In this one we look left and right of
  * the post trying to find a really long run of the same color.  If we find one
- * this is good evidence since it
+ * this is good evidence for the post we're looking for.  This will not work
+ * if we are over to the side of the goal as the two posts will be too close
+ * together.
  *
  * may correspond to the matching post of this color.
  * @param left       leftmost value (x dim) of the post
@@ -1321,8 +1323,9 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
             if (nextX < left - mind && nextH > MIN_GOAL_HEIGHT &&
                 nextY < horizonAt(nextX) &&
                 nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {
-                if (nextH > largel)
+                if (nextH > largel) {
                     largel = nextH;
+				}
             } else if (nextX > right + mind && nextH > MIN_GOAL_HEIGHT &&
                        nextY < horizonAt(nextX) &&
                        nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {

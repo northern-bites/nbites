@@ -58,6 +58,7 @@ public:
                             _possibleCrosses) {
         possibleCrosses = _possibleCrosses;
     }
+	void setID(crossID _id);
 
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
