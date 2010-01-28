@@ -52,10 +52,10 @@ public class ProcessedImage extends ThresholdedImage {
         colorTable = table;
         baseImage = image;
 
-        if(visionLink == null || !visionLink.isLinkActive())
+        if(visionLink == null || !visionLink.isLinkActive()) {
             // just fall back to good ol' thresholding
             super.thresholdImage(table, image);
-        else {
+        } else {
             //Get the joints from the frame if it exists
             Frame currentFrame = tool.getDataManager().activeFrame();
 
@@ -101,7 +101,82 @@ public class ProcessedImage extends ThresholdedImage {
 
             // This variable is declared in the superclass and used by its
             // getters.
-	    thresholded = visionLink.processImage(rawImage,
+			thresholded = visionLink.processImage(rawImage,
+						  image.getWidth(),
+						  image.getHeight(),
+						  joints, sensors,
+						  rawTable);
+	}
+    }
+
+    /**
+     * This method is the same as the previous method, but includes a frame.
+     * It gets called on instantiation and habitually by other modules of the
+     * TOOL.
+     * NOTE: This method assumes we are working with a NAO image. If someone
+     *       cares to fix it...be my guest. Sincerely, George.
+     */
+    public void thresholdImage(TOOLImage image, ColorTable table, Frame frame) {
+        // Grab a constant reference to the current instance of the TOOL
+        final TOOL tool = TOOL.instance;
+
+        if(table == null)
+            return;
+        // Isn't it REALLY lame that these get initialized for the first time
+        // in this method?!
+        colorTable = table;
+        baseImage = image;
+
+        if(visionLink == null || !visionLink.isLinkActive()) {
+            // just fall back to good ol' thresholding
+            super.thresholdImage(table, image);
+        } else {
+            //Get the joints from the frame if it exists
+            Frame currentFrame = frame;
+
+            float[] joints = new float[RobotDef.NAO_DEF.numJoints()];
+            if(currentFrame.hasJoints()){
+                List<Float> list_joints = currentFrame.joints();
+                joints = new float[list_joints.size()];
+                int i = 0;
+                //for(Iterator itr = list_joints.iterator(); itr.hasNext(); ){
+                for (Float value : list_joints) {
+                    joints[i++] = value;
+                }
+            }else{
+                //tool.CONSOLE.message("Warning: Processing image w/o " +
+				//                   "joint info");
+            }
+
+            float[] sensors = new float[RobotDef.NAO_DEF.numSensors()];
+            if (currentFrame.hasSensors()) {
+                List<Float> list_sensors = currentFrame.sensors();
+                sensors = new float[list_sensors.size()];
+                int i = 0;
+                for (Float value : list_sensors) {
+                    sensors[i++] = value;
+                }
+            }
+            else {
+                //tool.CONSOLE.message("Warning: Processing image w/o " +
+				//                   "sensor info");
+            }
+
+            // Convert the TOOLImage to the one-dimensional format that the C++
+            // side is used to.
+            byte[] rawImage = new byte[baseImage.rawImageSize()];
+            baseImage.writeByteArray(rawImage);
+
+            // Convert the color table to the one-dimensional format that the
+            // C++ side is used to.
+            int ct_size =  colorTable.getYDimension()*
+                colorTable.getUDimension()*colorTable.getVDimension();
+            byte[] rawTable = new byte[ct_size];
+            colorTable.writeByteArray(rawTable);
+
+            // This variable is declared in the superclass and used by its
+            // getters.
+			thresholded = visionLink.processImage(rawImage,
 						  image.getWidth(),
 						  image.getHeight(),
 						  joints, sensors,

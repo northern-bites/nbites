@@ -20,7 +20,7 @@ endif
 ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
 JAVA_OPTS = -classpath "../../."
 else
-JAVA_OPTS = -classpath "../../."
+JAVA_OPTS = -classpath "../../." 
 endif
 
 JAR = $(JCP)/jar 
@@ -47,7 +47,7 @@ ifeq  "$(PLATFORM)" "Darwin"
 JAVA_INCLUDE:=-I$(JHP)
 FINK_INCLUDE := -I/sw/include
 NATIVE_VISION_TARGET := $(META_DIR)/lib$(NATIVE_VISION_CLASS_FILE).jnilib
-VISION_SHARED_OPTS := -dynamiclib
+VISION_SHARED_OPTS := -dynamiclib -m32
 else
 JAVA_INCLUDE:= -I/usr/lib/jvm/java-1.5.0-sun/include/ -I/usr/lib/jvm/java-1.5.0-sun/include/linux/
 VISION_SHARED_OPTS := -shared -fpic

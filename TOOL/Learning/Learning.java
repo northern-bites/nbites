@@ -139,6 +139,7 @@ public class Learning implements DataListener, MouseListener,
 	private DataSet currentSet;                // which data set we're processing
 	private int goodBall, badBall;             // ball stat variables
 	private int goodCross, badCross;           // cross stat variables
+	private int okCross, falseCross;
 	private int goodBlue, badBlue, okBlue;     // blue goal stats
 	private int goodYellow, badYellow, okYellow; // yellow goal stats
 	private int goodRed, badRed;               // red robot stats
@@ -450,7 +451,7 @@ public class Learning implements DataListener, MouseListener,
 
 			overlay.generateNewEdgeImage(rawImage);
 			selector.updateImage(rawImage);
-			visionState.update(false);
+			visionState.update(false, f);
 			visionState.updateObjects();
 
 			// retrieve the frame information
@@ -568,7 +569,7 @@ public class Learning implements DataListener, MouseListener,
 			if (current.getHumanChecked()) {
 				// we have good data, so let's process the frame
 				visionState.newFrame(d, tool.getColorTable());
-				visionState.update(false);
+				visionState.update(false, d);
 				visionState.updateObjects();
 				updateBallStats();
 				updateGoalStats();
@@ -588,6 +589,7 @@ public class Learning implements DataListener, MouseListener,
 		long time depending on the amount of data contained.
 	 */
 	public void runRecursiveBatch() {
+		System.out.println("Running batch job");
 		initStats();
 		quietMode = true;
 		int framesProcessed = 0;
@@ -634,7 +636,7 @@ public class Learning implements DataListener, MouseListener,
 															current.getBlueRobots() != 0)))) {
 								// we have good data, so let's process the frame
 								visionState.newFrame(f, tool.getColorTable());
-								visionState.update(false);
+								visionState.update(false, f);
 								visionState.updateObjects();
 								updateBallStats();
 								updateGoalStats();
@@ -671,14 +673,16 @@ public class Learning implements DataListener, MouseListener,
 	 */
 	public void runRecursiveBatchLearning() {
 		initStats();
+		System.out.println("Starting color learning");
 		quietMode = true;
 		int framesProcessed = 0;
 		long t = System.currentTimeMillis();
 		String topPath = currentSet.path();
 		boolean screen = false;
-		int balls = 0, yposts = 0, bposts = 0, crosses = 0, brobots = 0, rrobots = 0;
+		int balls = 0, yposts = 0, bposts = 0, crosses = 0, brobots = 0, rrobots = 0, greens = 0;
 		// We need to get rid of the current directory
 		int end = topPath.length() - 2;
+		List<DataSet> dataList;
 		for ( ; end > -1 && !topPath.substring(end, end+1).equals(System.getProperty("file.separator"));
 			  end--) {}
 		if (end > -1) {
@@ -687,7 +691,7 @@ public class Learning implements DataListener, MouseListener,
 			// topPath should now contain the parent directory pathname
 			// now we need to start retrieving all of the data sets that contain it
 			FileSource source = (FileSource)(tool.getSourceManager().activeSource());
-			List<DataSet> dataList = source.getDataSets();
+			dataList = source.getDataSets();
 			for (DataSet d : dataList) {
 				if (d.path().startsWith(topPath)) {
 					// we have a target data set
@@ -741,6 +745,9 @@ public class Learning implements DataListener, MouseListener,
 								na = current.getBlueRobots() > 0;
 								if (re) rrobots++;
 								if (na) brobots++;
+								//if (!re && !na) {
+									greens += visionState.learnGreenWhite();
+									//}
 								visionState.updateStats(or, yell, bl, wh, re, na);
 								framesProcessed++;
 							}
@@ -757,19 +764,178 @@ public class Learning implements DataListener, MouseListener,
 					}
 				}
 			}
+			System.out.println("Processed "+framesProcessed+" with "+balls);
+			visionState.updateGreenWhite(greens);
+			// now get the general color ranges of green and white
+			int yMin = 500, yMax = -1, uMin = 500, uMax = -1, vMin = 500, vMax = -1;
+			// now do the same thing, but process green and white slightly differently
+			for (int i = 0; i < 128; i++) {
+				for (int j = 0; j < 128; j++) {
+					for (int k = 0; k < 128; k++) {
+						byte color = colorTable.getRawColor(i, j, k);
+						if (color == Vision.GREEN) {
+							yMin = Math.min(yMin, i);
+							yMax = Math.max(yMax, i);
+							uMin = Math.min(uMin, j);
+							uMax = Math.max(uMax, j);
+							vMin = Math.min(vMin, k);
+							vMax = Math.max(vMax, k);
+						}
+					}
+				}
+			}
+			boolean secondPass = true;
+			System.out.println("Values "+yMin+" "+yMax+" "+uMin+" "+uMax+" "+vMin+" "+vMax);
+			int updated = 0;
+			visionState.initStats();
+			for (DataSet d : dataList) {
+				if (d.path().startsWith(topPath) && secondPass) {
+					// we have a target data set
+					curFrame = d.path();
+					String keyName = d.path()+"KEY.KEY";
+					// See if the key exists.
+					try {
+						FileInputStream input = new FileInputStream(keyName);
+						keys.clear();
+						keys.mergeFrom(input);
+						input.close();
+						for (Frame f : d) {
+							try {
+								f.load();
+							} catch (TOOLException e) {
+								System.out.println("Couldn't load frame");
+							}
+							current = keys.getFrame(f.index());
+							curFrameIndex = f.index();
+							if (current.getHumanChecked()) {
+								// we have good data, so let's process the frame
+								visionState.newFrame(f, tool.getColorTable());
+								// we need to figure out what objects are in the frame
+								boolean or, yell, bl, wh, re, na;
+								or = current.getBall();
+								switch (current.getYellowGoal()) {
+								case NO_POST: yell = false;
+									break;
+								default:
+									yell = true;
+								}
+								switch (current.getBlueGoal()) {
+								case NO_POST: bl = false;
+									break;
+								default:
+									bl = true;
+								}
+								switch (current.getCross()) {
+								case NO_CROSS: wh = false;
+									break;
+								default:
+									wh = true;
+								}
+								re = current.getRedRobots() > 0;
+								na = current.getBlueRobots() > 0;
+								int temp = 0;
+								//if (!re && !na && !or) {
+									temp = visionState.moreLearnGreenWhite(yMin, yMax, uMin, uMax,
+																	vMin, vMax);
+									//}
+								visionState.updateStats(or, yell, bl, wh, re, na);
+								if (temp > 0) {
+									System.out.println("Updated "+temp+" valuesin frame "+curFrame+" "+curFrameIndex);
+									updated+= temp;
+								}
+							}
+							try {
+								f.unload();
+							} catch (TOOLException e) {
+								System.out.println("Problem unloading frame");
+							}
+						}
+					} catch (FileNotFoundException e) {
+						// key file doesn't exist, so skip it
+					} catch (java.io.IOException e) {
+						// something went wrong, so keep going
+					}
+				}
+			}
+			visionState.updateGreenWhite(0);
+			System.out.println("UPdated "+updated);
+			t = System.currentTimeMillis() - t;
+			quietMode = false;
+			visionState.printStats(framesProcessed, balls, yposts, bposts, crosses, rrobots, brobots, false);
+			// now let's see if we can improve on that
+			/*for (DataSet d : dataList) {
+				if (d.path().startsWith(topPath)) {
+					// we have a target data set
+					curFrame = d.path();
+					String keyName = d.path()+"KEY.KEY";
+					// See if the key exists.
+					try {
+						FileInputStream input = new FileInputStream(keyName);
+						keys.clear();
+						keys.mergeFrom(input);
+						input.close();
+						for (Frame f : d) {
+							try {
+								f.load();
+							} catch (TOOLException e) {
+								System.out.println("Couldn't load frame");
+							}
+							current = keys.getFrame(f.index());
+							curFrameIndex = f.index();
+							if (current.getHumanChecked()) {
+								// we have good data, so let's process the frame
+								visionState.newFrame(f, tool.getColorTable());
+								// we need to figure out what objects are in the frame
+								boolean or, yell, bl, wh, re, na;
+								or = current.getBall();
+								switch (current.getYellowGoal()) {
+								case NO_POST: yell = false;
+									break;
+								default:
+									yell = true;
+								}
+								switch (current.getBlueGoal()) {
+								case NO_POST: bl = false;
+									break;
+								default:
+									bl = true;
+								}
+								switch (current.getCross()) {
+								case NO_CROSS: wh = false;
+									break;
+								default:
+									wh = true;
+								}
+								re = current.getRedRobots() > 0;
+								na = current.getBlueRobots() > 0;
+								if (re) rrobots++;
+								if (na) brobots++;
+								visionState.reviseStats(or, yell, bl, wh, re, na);
+							}
+							try {
+								f.unload();
+							} catch (TOOLException e) {
+								System.out.println("Problem unloading frame");
+							}
+						}
+					} catch (FileNotFoundException e) {
+						// key file doesn't exist, so skip it
+					} catch (java.io.IOException e) {
+						// something went wrong, so keep going
+						}
+						}*/
+			System.out.println("Updating color table");
+			//visionState.printStats(framesProcessed, balls, yposts, bposts, crosses, rrobots, brobots, true);
+			System.out.println("Revision finished");
 		}
-		t = System.currentTimeMillis() - t;
-		quietMode = false;
-		System.out.println("Processed "+framesProcessed+" with "+balls);
-		visionState.printStats(framesProcessed, balls, yposts, bposts, crosses, rrobots, brobots);
 	}
 
 
 	/** Initialize all of our statistics variables
 	 */
 	public void initStats() {
-		goodBall = 0; badBall = 0; goodCross = 0; badCross = 0;
-		goodBlue = 0; badBlue = 0; goodYellow = 0; badYellow = 0;
+		goodBall = 0; badBall = 0; goodCross = 0; badCross = 0; falseCross = 0; okCross = 0;
+		goodBlue = 0; badBlue = 0; goodYellow = 0; badYellow = 0; okBlue=0; okYellow=0;
 		goodRed = 0; badRed = 0; goodBlueRobot = 0; badBlueRobot = 0;
 		missedBall = 0; missedCross = 0; missedBlue = 0; missedYellow = 0;
 		missedRed = 0; missedBlueRobot = 0;
@@ -785,7 +951,8 @@ public class Learning implements DataListener, MouseListener,
 						   okBlue+" false positives: "+badBlue+" missed: "+missedBlue);
 		System.out.println("Yellow Goal Statistics:  Good: "+goodYellow+"   Fair: "+
 						   okYellow+" false positives: "+badYellow+" missed: "+missedYellow);
-		System.out.println("Cross Statistics:        Good: "+goodCross+"    False positives: "+
+		System.out.println("Cross Statistics:        Good: "+goodCross+" OK: "+okCross+
+						   "    False positives: "+falseCross+" badID: "+
 						   badCross+" missed: "+missedCross);
 	}
 
@@ -836,14 +1003,14 @@ public class Learning implements DataListener, MouseListener,
 						break;
 					case LEFT: goodBlue++; break;
 					case RIGHT: badBlue++;
-						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+						if (learnPanel.getFalseGoals() && learnPanel.getMissedGoals())
+							System.out.println("Bad Goal Post ID in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					case UNSURE: okBlue++; break;
 					case BOTH: badBlue++;
 						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+							System.out.println("Extra Goal Post in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					}
@@ -856,25 +1023,42 @@ public class Learning implements DataListener, MouseListener,
 											   " frame "+curFrameIndex);
 						break;
 					case LEFT: badBlue++;
-						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+						if (learnPanel.getFalseGoals() && learnPanel.getMissedGoals())
+							System.out.println("Bad Goal Post ID in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					case RIGHT: goodBlue++; break;
 					case UNSURE: okBlue++; break;
 					case BOTH: badBlue++;
 						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+							System.out.println("Extra Goal Post in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					}
 					break;
 				case BOTH:
 					switch (visionState.getBlueGoalVision()) {
-					case NO_POST: missedBlue += 2; break;
-					case LEFT: missedBlue++; break;
-					case RIGHT: missedBlue++; break;
-					case UNSURE: missedBlue++; okBlue++; break;
+					case NO_POST: missedBlue += 2;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed two goals in"+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case LEFT: missedBlue++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case RIGHT: missedBlue++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						break;
+					case UNSURE: missedBlue++;
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed a Goal Post in "+curFrame+
+											   " frame "+curFrameIndex);
+						okBlue++; missedBlue++;
+						break;
 					case BOTH: goodBlue+= 2; break;
 					}
 					break;
@@ -890,7 +1074,7 @@ public class Learning implements DataListener, MouseListener,
 					case UNSURE: goodBlue++; break;
 					case BOTH: badBlue++; okBlue++;
 						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+							System.out.println("Extra Goal Post in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					}
@@ -923,14 +1107,14 @@ public class Learning implements DataListener, MouseListener,
 						break;
 					case LEFT: goodYellow++; break;
 					case RIGHT: badYellow++;
-						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+						if (learnPanel.getFalseGoals() && learnPanel.getMissedGoals())
+							System.out.println("Bad Goal Post ID in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					case UNSURE: okYellow++; break;
 					case BOTH: badYellow++;
 						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+							System.out.println("Extra Goal Post in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					}
@@ -943,15 +1127,15 @@ public class Learning implements DataListener, MouseListener,
 											   " frame "+curFrameIndex);
 						break;
 					case LEFT: badYellow++;
-						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+						if (learnPanel.getFalseGoals() && learnPanel.getMissedGoals())
+							System.out.println("Bad Goal Post ID in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					case RIGHT: goodYellow++; break;
 					case UNSURE: okYellow++; break;
 					case BOTH: badYellow++;
 						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+							System.out.println("Extra Goal Post in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					}
@@ -992,8 +1176,8 @@ public class Learning implements DataListener, MouseListener,
 					case RIGHT: okYellow++; break;
 					case UNSURE: goodYellow++; break;
 					case BOTH: badYellow++; okYellow++;
-						if (learnPanel.getFalseGoals())
-							System.out.println("False Goal Post in "+curFrame+
+						if (learnPanel.getMissedGoals())
+							System.out.println("Missed Goal Post in "+curFrame+
 											   " frame "+curFrameIndex);
 						break;
 					}
@@ -1011,12 +1195,12 @@ public class Learning implements DataListener, MouseListener,
 			case BLUE:
 			case YELLOW:
 			case UNKNOWN:
-				badCross++;
+				falseCross++;
 				if (learnPanel.getFalseCrosses())
 					System.out.println("False Cross in "+curFrame+
 									   " frame "+curFrameIndex);
 				break;
-			case DOUBLE_CROSS: badCross+=2;
+			case DOUBLE_CROSS: falseCross+=2;
 				if (learnPanel.getFalseCrosses())
 					System.out.println("Two False Crosses in "+curFrame+
 									   " frame "+curFrameIndex);
@@ -1024,7 +1208,51 @@ public class Learning implements DataListener, MouseListener,
 			}
 			break;
 		case BLUE:
+			switch (visionState.getCrossVision()) {
+			case NO_CROSS: missedCross++;
+				if (learnPanel.getMissedCrosses())
+					System.out.println("Missed Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
+			case BLUE: goodCross++;
+				break;
+			case YELLOW: badCross++;
+				if (learnPanel.getFalseCrosses())
+					System.out.println("Bad Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
+			case UNKNOWN:
+				okCross++; break;
+			case DOUBLE_CROSS: badCross++; goodCross++;
+				if (learnPanel.getFalseCrosses())
+					System.out.println("False Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
+			}
+			break;
 		case YELLOW:
+			switch (visionState.getCrossVision()) {
+			case NO_CROSS: missedCross++;
+				if (learnPanel.getMissedCrosses())
+					System.out.println("Missed Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
+			case BLUE: badCross++;
+				if (learnPanel.getFalseCrosses())
+					System.out.println("Bad Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+
+				break;
+			case YELLOW: goodCross++; break;
+			case UNKNOWN:
+				okCross++; break;
+			case DOUBLE_CROSS: badCross++; goodCross++;
+				if (learnPanel.getFalseCrosses())
+					System.out.println("False Cross in "+curFrame+
+									   " frame "+curFrameIndex);
+				break;
+			}
+			break;
 		case UNKNOWN:
 			switch (visionState.getCrossVision()) {
 			case NO_CROSS: missedCross++;
@@ -1034,6 +1262,7 @@ public class Learning implements DataListener, MouseListener,
 				break;
 			case BLUE:
 			case YELLOW:
+				okCross++; break;
 			case UNKNOWN:
 				goodCross++; break;
 			case DOUBLE_CROSS: badCross++; goodCross++;
@@ -1054,6 +1283,7 @@ public class Learning implements DataListener, MouseListener,
 			case YELLOW:
 			case UNKNOWN:
 				missedCross++;
+				goodCross++;
 				if (learnPanel.getMissedCrosses())
 					System.out.println("Missed Cross in "+curFrame+
 									   " frame "+curFrameIndex);
