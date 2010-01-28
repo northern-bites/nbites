@@ -48,7 +48,7 @@ public class DataManager implements ItemListener,
     private Vector<DataSet> dataSets;
     private int dataSetIndex;
     private int frameIndex;
-    
+
 
     private ListPanel<DataSetObject> listPanel;
     private HashSet<DataListener> listeners;
@@ -63,7 +63,7 @@ public class DataManager implements ItemListener,
     public DataManager() {
         this(MAX_CACHE_SIZE);
     }
-    
+
     public DataManager(int size_limit) {
         dataSets = new Vector<DataSet>();
         listeners = new HashSet<DataListener>();
@@ -80,7 +80,7 @@ public class DataManager implements ItemListener,
     }
 
     /**
-     * Retrieve the ListPanel that displays the cells for the available 
+     * Retrieve the ListPanel that displays the cells for the available
      * DataSets.
      *
      * @return the ListPanel object for display
@@ -132,11 +132,11 @@ public class DataManager implements ItemListener,
     public void set(int i) {
         useFrame(i);
     }
-    
-    
+
+
 
     /**
-     * Advances by amount; if at the end of the set, does NOT wrap 
+     * Advances by amount; if at the end of the set, does NOT wrap
      * around.  If amount < 0, goes to previous frame.
      */
     public void advance(int amount) {
@@ -147,7 +147,7 @@ public class DataManager implements ItemListener,
 
 
     /**
-     * Advances by amount; if at the end of the set, wraps around.  
+     * Advances by amount; if at the end of the set, wraps around.
      */
     public void skip(int amount) {
         if (activeSet() != null) {
@@ -212,13 +212,13 @@ public class DataManager implements ItemListener,
             }
         }
     }
-    
-    /** 
+
+    /**
      * @return true if and only if there are more elements after the current
      * frame
      */
     public boolean hasElementAfter() {
-        return activeSet() != null && 
+        return activeSet() != null &&
             (activeSet().dynamic() || frameIndex < activeSet().size() - 1);
     }
 
@@ -271,7 +271,7 @@ public class DataManager implements ItemListener,
             SourceHandler oldHandler = activeSet().source().getHandler();
             if (oldHandler == newHandler)
                 activeSet().store(path);
-            
+
             else {
                 DataSet d = newHandler.getSource(path).createNew(path);
                 if (d != null) {
@@ -356,7 +356,7 @@ public class DataManager implements ItemListener,
                                     "error.", e);
                 return false;
             }
-        
+
         }
 
         // if already in cache, will remove it (it will be added to the back)
@@ -379,8 +379,8 @@ public class DataManager implements ItemListener,
     }
 
 
-    /** 
-     * Register a new ColorTableListener on this DataManager.  
+    /**
+     * Register a new ColorTableListener on this DataManager.
      * ColorTableListener will be notified of changes to the current color table
      */
     public void addColorTableListener(ColorTableListener d) {
@@ -393,7 +393,7 @@ public class DataManager implements ItemListener,
     }
 
 
-    public void notifyColorTableDependants(ColorTable source, 
+    public void notifyColorTableDependants(ColorTable source,
                                            ColorTableUpdate update,
                                            ColorTableListener originator) {
         for (ColorTableListener d : colorListeners) {
@@ -469,7 +469,7 @@ public class DataManager implements ItemListener,
     //
     // SourceListener contract
     //
-    
+
     public void sourceChanged(DataSource source) {
         clear();
 

@@ -142,23 +142,25 @@ public class TOOLProtocol {
     public void processInfo() {
         gotInfo = true;
         switch (robotType) {
-            case RobotDef.AIBO:
-            case RobotDef.AIBO_ERS7:
-                robotDef = RobotDef.ERS7_DEF;
-                break;
-            case RobotDef.AIBO_220:
-                robotDef = RobotDef.ERS220_DEF;
-                break;
-            case RobotDef.NAO:
-            case RobotDef.NAO_RL:
-                robotDef = RobotDef.NAO_DEF;
-                break;
-            case RobotDef.NAO_SIM:
-                robotDef = RobotDef.NAO_SIM_DEF;
-                break;
-            default:
-                robotDef = null;
-                gotInfo = false;
+		case RobotDef.AIBO:
+		case RobotDef.AIBO_ERS7:
+			robotDef = RobotDef.ERS7_DEF;
+			break;
+		case RobotDef.AIBO_220:
+			robotDef = RobotDef.ERS220_DEF;
+			break;
+		case RobotDef.NAO:
+		case RobotDef.NAO_RL:
+		case RobotDef.NAO_VER:
+			robotDef = RobotDef.NAO_DEF_VERSIONED;
+			robotDef.setVersion(0);
+			break;
+		case RobotDef.NAO_SIM:
+			robotDef = RobotDef.NAO_SIM_DEF;
+			break;
+		default:
+			robotDef = null;
+			gotInfo = false;
         }
 
         if (robotDef != null) {
@@ -172,15 +174,18 @@ public class TOOLProtocol {
     public void request(DataRequest r) {
         if (!connected)
             return;
-        
+
         try {
-            
+
             serial.writeByte(REQUEST_MSG);
             serial.writeBytes(r.getBytes());
             serial.flush();
-    
+
             if (r.info()) {
                 robotType = serial.readByte();
+				if (robotType == RobotDef.NAO_RL || robotType == RobotDef.NAO){
+					robotType = RobotDef.NAO_VER;
+				}
                 byte buf[] = new byte[1024];
                 int length = serial.readBytes(buf, true);
                 robotName = new String(buf, 0, length, "US-ASCII");
@@ -189,16 +194,16 @@ public class TOOLProtocol {
                 calFile = new String(buf, 0, length, "US-ASCII");
                 processInfo();
             }
-    
+
             if (!gotInfo)
                 return;
-    
+
             if (r.joints())
                 serial.readFloats(joints);
-    
+
             if (r.sensors())
                 serial.readFloats(sensors);
-    
+
             if (r.image())
                 serial.readBytes(image);
 
@@ -306,5 +311,5 @@ public class TOOLProtocol {
             disconnect();
         }
     }
-        
+
 }

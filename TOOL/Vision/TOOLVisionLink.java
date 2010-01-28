@@ -36,6 +36,8 @@
  * so that it is easier to generate the native headers. If desirable
  * some work on the make file would allow you to pass in an instance of the
  * tool, allowing you to write to the tool.CONSOLE
+ *
+ * @author Octavian Neamtu
  */
 
 package TOOL.Vision;
@@ -187,6 +189,7 @@ public class TOOLVisionLink {
         try{
             System.loadLibrary("TOOLVisionLink");
             visionLinkSuccessful = true;
+	    System.out.println("TOOLVisionLink lib loaded successfuly");
         }catch(UnsatisfiedLinkError e){
             visionLinkSuccessful = false;
             System.err.print("Vision Link Failed to initialize: ");

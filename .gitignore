@@ -3,5 +3,4 @@
 *.class*
 TOOL/Vision/TOOL_Vision_TOOLVisionLink.h
 /libTOOLVisionLink.jnilib
-/robots/*
-
+\#*\#

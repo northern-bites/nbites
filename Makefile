@@ -80,6 +80,7 @@ SRCS = \
 	$(IMAGE_SRCS) \
 	$(NET_SRCS) \
 	$(VISION_SRCS) \
+	$(VISION_TESTER_SRCS) \
 	$(WORLDCONTROLLER_SRCS)
 	#$(CLASSIFIER_SRCS) \
 	#$(PEDITOR_SRCS) \
@@ -139,7 +140,11 @@ PYTHON = python2.5
 endif
 
 TRUST_STORE := trustStore
-JAVA_OPTS := -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
+ifeq "$(PLATFORM)" "Linux"
+JAVA_OPTS := -Xms512m -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./ -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel
+else
+JAVA_OPTS := -Xms512m -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
+endif
 #ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
 # JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar;."
 # else
@@ -165,6 +170,7 @@ TARGETS = \
 	$(NET_DIR) \
 	$(SQL_DIR) \
 	$(VISION_DIR) \
+	$(VISION_TESTER_DIR) \
 	$(WORLDCONTROLLER_DIR) \
 	$(LOGGING_INSTALL) \
 	$(LOGGING_CLEAN) \
@@ -172,7 +178,7 @@ TARGETS = \
 	#$(PEDITOR_DIR) \
 	#$(ZSPACE_DIR) \
 
-.PHONY: all clean clean_java clean_python clean_vision vision run prompt $(TARGETS)
+.PHONY: all clean clean_java clean_python clean_vision vision $(TARGETS)
 
 all: $(JAVA_BUILD) #$(LOGGING_INSTALL)
 
@@ -197,6 +203,7 @@ $(IMAGE_DIR): $(IMAGE_OBJS)
 $(NET_DIR): $(NET_OBJS)
 $(SQL_DIR): $(SQL_OBJS)
 $(VISION_DIR): $(VISION_OBJS)
+$(VISION_TESTER_DIR): $(VISION_TESTER_OBJS)
 $(WORLDCONTROLLER_DIR): $(WORLDCONTROLLER_OBJS)
 #$(PEDITOR_DIR): $(PEDITOR_OBJS)
 #$(ZSPACE_DIR): $(ZSPACE_OBJS)
@@ -223,13 +230,6 @@ $(LOGGING_CLEAN):
 
 %.class: %.java
 	$(JAVAC) $(JAVACFLAGS) $<
-
-run: all
-	$(JAVA) $(JAVA_OPTS) $(MAIN) #-jar $(JAR_FILE)
-	@#$(PYTHON) $(PYTHON_TOOL)
-
-prompt: all
-	@$(PYTHON) -ic "from jpype import startJVM, JArray, java; startJVM();java.net.URLClassLoader(JArray(java.net.URL)(java.net.URL('jar:file:///home/jfishman/robo/branches/TOOL/mysql-connector-java-5.1.6-bin.jar!/'))).loadClass('com.mysql.jdbc.Driver')"
 
 clean: clean_java clean_python clean_vision
 
