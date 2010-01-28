@@ -52,6 +52,7 @@
 	  maxmemory="512m">
       <sysproperty key="java.library.path" value="./"/>
       <classpath refid="tool.paths"/>
+      <arg value="-d32"/>
     </java>
   </target>
 
