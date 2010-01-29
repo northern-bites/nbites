@@ -65,6 +65,14 @@ public class Console {
         System.err.println(msg);
     }
 
+    public String formatPath(String path) {
+        return new File(path).getPath();
+    }
+
+    public boolean pathExists(String path) {
+        return new File(path).exists();
+    }
+
     public String promptOpen(String title, String curdir) {
         return openDialog(title, curdir, OPEN, BOTH);
     }
@@ -97,9 +105,19 @@ public class Console {
             if (curdir != null)
                 fd.setDirectory(curdir);
             fd.setMode(file_mode);
+
+			if (filter_mode == DIRS) {
+				System.setProperty("apple.awt.fileDialogForDirectories", "true");
+			}
+
             fd.setVisible(true);
+
+			if (filter_mode == DIRS) {
+				System.setProperty("apple.awt.fileDialogForDirectories", "false");
+			}
+
             String fullpath = fd.getDirectory() + fd.getFile();
-            fd.dispose();  
+            fd.dispose();
 
             if (fd.getFile() == null)
                 return null;

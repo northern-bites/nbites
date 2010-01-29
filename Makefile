@@ -14,6 +14,11 @@ CALIBRATE_OBJS := $(CALIBRATE_SRCS:%.java=%.class)
 # CLASSIFIER_SRCS := $(shell ls $(CLASSIFIER_DIR)/*.java)
 # CLASSIFIER_OBJS := $(CLASSIFIER_SRCS:%.java=%.class)
 
+LEARNING_DIR := $(TOOL_DIR)/Learning
+LEARNING_SRCS := $(shell ls $(LEARNING_DIR)/*.java)
+LEARNING_OBJS := $(LEARNING_SRCS:%.java=%.class)
+
+
 COLOREDIT_DIR := $(TOOL_DIR)/ColorEdit
 COLOREDIT_SRCS := $(shell ls $(COLOREDIT_DIR)/*.java)
 COLOREDIT_OBJS := $(COLOREDIT_SRCS:%.java=%.class)
@@ -71,6 +76,7 @@ SRCS = \
 	$(DATA_SRCS) \
 	$(FILE_SRCS) \
 	$(GUI_SRCS) \
+	$(LEARNING_SRCS) \
 	$(IMAGE_SRCS) \
 	$(NET_SRCS) \
 	$(VISION_SRCS) \
@@ -133,7 +139,7 @@ PYTHON = python2.5
 endif
 
 TRUST_STORE := trustStore
-JAVA_OPTS := -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
+JAVA_OPTS := -d32 -Xmx512m -Djavax.net.ssl.trustStore=$(TRUST_STORE) -Djava.library.path=./
 #ifeq "$(PLATFORM)" "CYGWIN_NT-5.1"
 # JAVA_OPTS += -classpath "mysql-connector-java-5.1.6-bin.jar;."
 # else
@@ -155,6 +161,7 @@ TARGETS = \
 	$(FILE_DIR) \
 	$(GUI_DIR) \
 	$(IMAGE_DIR) \
+	$(LEARNING_DIR) \
 	$(NET_DIR) \
 	$(SQL_DIR) \
 	$(VISION_DIR) \
@@ -180,6 +187,7 @@ $(JAR_FILE): $(OBJS)
 $(TOOL_DIR): $(TOOL_OBJS)
 $(CALIBRATE_DIR): $(CALIBRATE_OBJS)
 $(CLASSIFIER_DIR): $(CLASSIFIER_OBJS)
+$(LEARNING_DIR): $(LEARNING_OBJS)
 $(COLOREDIT_DIR): $(COLOREDIT_OBJS)
 $(CONSOLE_DIR) : $(CONSOLE_OBJS)
 $(DATA_DIR): $(DATA_OBJS)

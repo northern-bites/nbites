@@ -318,27 +318,6 @@ public class WorldController extends JPanel implements KeyListener,
 
     } // end constructor
 
-
-    // This is how WorldController used to work standalone
-    // This method would get called forever and the methods inside would
-    // sleep in order to keep the processor from being used 100%. I'm
-    // keeping this here for now, as a reference.
-    public void run()
-    {
-        while (true) {
-            // calls thread sleep for fps millis
-            delayFor(ROBOT_FPS);
-            if (mode == VIEW_UDP_PACKETS) {
-                // server is on its own thread, should work on its own
-                // We just need to tell the field that a frame has passed
-                // and that it should redraw accordingly, since it has no
-                // other way to understand the passage of time when its just
-                //listens in to the udp packets
-                painter.reportEndFrame();
-            }
-        }
-    }
-
     /**
      * Method switches between Lab and Nao fields dimensions and landmarks
      */

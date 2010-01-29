@@ -33,7 +33,7 @@ public class VisionState {
     public final static byte VISUAL_OBJECT_THICKNESS = 2;
     public final static byte GOAL_RIGHT_POST_BOX_COLOR = Vision.MAGENTA;
     public final static byte GOAL_LEFT_POST_BOX_COLOR = Vision.RED;
-    public final static byte GOAL_POST_BOX_COLOR = Vision.PINK;
+    public final static byte GOAL_POST_BOX_COLOR = Vision.BLACK;
 
     public final static byte BLUE_GOAL_BACKSTOP_COLOR = Vision.WHITE;
     public final static byte YELLOW_GOAL_BACKSTOP_COLOR = Vision.WHITE;
@@ -55,11 +55,17 @@ public class VisionState {
     public final static byte POSE_HORIZON_THICKNESS = 2;
     public final static byte POSE_HORIZON_COLOR = Vision.BLUE;
     public final static byte VISION_HORIZON_COLOR = Vision.MAGENTA;
+
+	public final static byte YELLOW_CROSS_COLOR = Vision.YELLOW;
+	public final static byte BLUE_CROSS_COLOR = Vision.BLUE;
+
+
     //images + colortable
     private TOOLImage rawImage;
     private ProcessedImage thresholdedImage;
     private ThresholdedImageOverlay thresholdedOverlay;
     private ColorTable  colorTable;
+    private Frame f;
 
     //objects - these are just pointers to the objects in the visionLink
     private Ball ball;
@@ -74,25 +80,27 @@ public class VisionState {
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
+    	this.f = f;
         rawImage = f.image();
         colorTable = c;
         //init the objects
         if (rawImage != null && colorTable != null)  {
-            thresholdedImage = new ProcessedImage(rawImage, colorTable);
+            thresholdedImage = new ProcessedImage(f, colorTable);
             thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
                                                              thresholdedImage.getHeight());
         }
     }
-
+    
     public void newFrame(Frame f, ColorTable c) {
-	rawImage = f.image();
+    	this.f = f;
+    	rawImage = f.image();
         colorTable = c;
         //init the objects
         if (rawImage != null && colorTable != null)  {
-            thresholdedImage = new ProcessedImage(rawImage, colorTable);
+            thresholdedImage = new ProcessedImage(f, colorTable);
             thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
                                                              thresholdedImage.getHeight());
-	}        
+        }        
     }
 
     //This updates the whole processed stuff
@@ -101,7 +109,7 @@ public class VisionState {
 	//if the thresholdedImage is not null, process it again
         if (thresholdedImage != null)  {
             //we process the image; the visionLink updates itself with the new data from the bot
-            thresholdedImage.thresholdImage(rawImage, colorTable);
+            thresholdedImage.thresholdImage(f, colorTable);
 	    if (!drawThreshColors) thresholdedImage.clearColoring();
             //get the ball from the link
             ball = thresholdedImage.getVisionLink().getBall();
@@ -117,7 +125,7 @@ public class VisionState {
         }
 	//else the thresholdedImage is null, so initialize it
 	else {
-	    thresholdedImage = new ProcessedImage(rawImage, colorTable);
+	    thresholdedImage = new ProcessedImage(f, colorTable);
 	    update();
 	}
     }
@@ -152,6 +160,12 @@ public class VisionState {
                     color = BLUE_GOAL_BACKSTOP_COLOR; break;
                 case VisualFieldObject.YELLOW_GOAL_BACKSTOP:
                     color = YELLOW_GOAL_BACKSTOP_COLOR; break;
+				case VisualFieldObject.YELLOW_CROSS:
+					color = YELLOW_CROSS_COLOR;
+					break;
+				case VisualFieldObject.BLUE_CROSS:
+					color = BLUE_CROSS_COLOR;
+					break;
                 default: color = Vision.BLACK; break;
                 }
                 //draw the box

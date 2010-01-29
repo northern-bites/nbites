@@ -432,6 +432,7 @@ public class Calibrate implements DataListener, MouseListener,
 
         // Make sure we can undo the overlay changes
         pushUndo(currentMove);
+
         redoStack.clear();
 
         //update the visionState
@@ -1005,12 +1006,36 @@ public class Calibrate implements DataListener, MouseListener,
         //move the marker around in the respective windows, even
         //when the mouse is not there
         if (e.getSource() == selector) {
-            displayer.setMarkerImagePosition(selector.getImageX(x),
-                                             selector.getImageY(y));
+			if (rawImage != null) {
+				displayer.setMarkerImagePosition(selector.getImageX(x),
+												 selector.getImageY(y));
+				int tempx = selector.getImageX(x);
+				int tempy = selector.getImageY(y);
+				if (tempy < rawImage.getHeight() && tempy > 0 && tempx > 0 &&
+					tempx < rawImage.getWidth()) {
+					int pixie[] = rawImage.getPixel(selector.getImageX(x),
+													selector.getImageY(y));
+					int Y_SHIFT =colorTable.getYShift();
+					int CB_SHIFT =colorTable.getCBShift();
+					int CR_SHIFT =colorTable.getCRShift();
+					pixie[0] = pixie[0] >> Y_SHIFT;
+					pixie[1] = pixie[1] >> CB_SHIFT;
+					pixie[2] = pixie[2] >> CR_SHIFT;
+					calibratePanel.setXYText(selector.getImageX(x),
+											 selector.getImageY(y), pixie);
+				}
+			} else {
+				calibratePanel.setXYText(selector.getImageX(x),
+										 selector.getImageY(y));
+			}
         }else if (e.getSource() == displayer) {
             selector.setMarkerImagePosition(displayer.getImageX(x),
                                             displayer.getImageY(y));
-        }
+			calibratePanel.setXYText(displayer.getImageX(x),
+                                            displayer.getImageY(y));
+        } else {
+			calibratePanel.setXYText(-1,-1);
+		}
     }
 
     //mouseWheelListener Methods

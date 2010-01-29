@@ -18,7 +18,7 @@ import TOOL.GUI.IncrementalSlider;
 
 
 public class ColorEditPanel extends JPanel implements KeyListener {
-       
+
     private JTextArea echo;
     private final ColorEdit editor;
 
@@ -26,13 +26,13 @@ public class ColorEditPanel extends JPanel implements KeyListener {
 
     private ColorSwatchPanel buttons;
     private JRadioButton yView, uView, vView, colorView;
-    private JButton refresh, undo, redo, fillHoles;
+    private JButton refresh, undo, redo, fillHoles, loseIslands;
     private IncrementalSlider slider;
 
     public static final String Y_STRING = "Y value";
     public static final String U_STRING = "U value";
     public static final String V_STRING = "V value";
-    
+
 
     public static final int DEFAULT_BUTTON_SIZE = 40;
 
@@ -42,28 +42,28 @@ public class ColorEditPanel extends JPanel implements KeyListener {
      * keyboard focus; if it does then our hotkeys cease to work.
      */
     public ColorEditPanel(ColorEdit editor) {
-	super();
-	this.editor = editor;
+		super();
+		this.editor = editor;
 
-	echo = new JTextArea();
+		echo = new JTextArea();
         echo.setEditable(false);
         echo.setFocusable(false);
         echo.setBackground(getBackground());
 
-	edit = new JCheckBox("Edit Mode: ");
+		edit = new JCheckBox("Edit Mode: ");
         edit.setFocusable(false);
         allView = new JCheckBox("All view: ");
 
         slider = new IncrementalSlider(editor, Y_STRING, 0, 255);
-        
+
        	buttons = new ColorSwatchPanel(editor, DEFAULT_BUTTON_SIZE);
 
-	ButtonGroup views = new ButtonGroup();
-	yView = new JRadioButton("Y view");
+		ButtonGroup views = new ButtonGroup();
+		yView = new JRadioButton("Y view");
         yView.setFocusable(false);
-	uView = new JRadioButton("U view");
+		uView = new JRadioButton("U view");
         uView.setFocusable(false);
-	vView = new JRadioButton("V view");
+		vView = new JRadioButton("V view");
         vView.setFocusable(false);
         colorView = new JRadioButton("Color entry view");
         colorView.setFocusable(false);
@@ -76,22 +76,25 @@ public class ColorEditPanel extends JPanel implements KeyListener {
         undo.setFocusable(false);
         fillHoles = new JButton("Fills holes");
         fillHoles.setFocusable(false);
+		loseIslands = new JButton("Lose islands");
+		loseIslands.setFocusable(false);
 
         yView.setSelected(true);
 
         JPanel editButtons = new JPanel();
         editButtons.add(fillHoles);
+		editButtons.add(loseIslands);
         editButtons.add(refresh);
         editButtons.add(undo);
         editButtons.add(redo);
 
-	
-	addListeners();
+
+		addListeners();
 
 
-	views.add(yView);
-	views.add(uView);
-	views.add(vView);
+		views.add(yView);
+		views.add(uView);
+		views.add(vView);
         views.add(colorView);
 
         JPanel theViews = new JPanel();
@@ -100,7 +103,7 @@ public class ColorEditPanel extends JPanel implements KeyListener {
         theViews.add(vView);
         theViews.add(allView);
         theViews.add(colorView);
-        
+
         JPanel master = new JPanel();
         master.setLayout(new BoxLayout(master, BoxLayout.PAGE_AXIS));
         master.add(echo);
@@ -111,7 +114,7 @@ public class ColorEditPanel extends JPanel implements KeyListener {
         master.add(slider);
         master.add(buttons);
         add(master);
-	
+
     }
 
 
@@ -177,6 +180,12 @@ public class ColorEditPanel extends JPanel implements KeyListener {
         fillHoles.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     editor.fillHoles();
+                }
+            });
+
+        loseIslands.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    editor.loseIslands();
                 }
             });
 

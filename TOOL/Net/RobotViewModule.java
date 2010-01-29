@@ -21,6 +21,7 @@ package TOOL.Net;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,22 +30,34 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+
+import javax.swing.JComboBox;
 
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import TOOL.TOOL;
+import TOOL.Calibrate.VisionState;
 import TOOL.Data.DataTypes;
+import TOOL.Data.Frame;
 import TOOL.Data.DataTypes.DataType;
 import TOOL.Image.ImagePanel;
+import TOOL.Image.ProcessedImage;
 import TOOL.Image.TOOLImage;
+import TOOL.Image.ThresholdedImageOverlay;
 import TOOL.Net.DataRequest;
 
 import TOOL.TOOLModule;
+import TOOL.TOOLException;
 
 public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
@@ -60,8 +73,23 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
     private RemoteRobot selectedRobot;
 
+    private Thread streamingThread;
+    private DataType streamType = DataTypes.DataType.THRESH;
+    private boolean isStreaming = false;
+    private boolean isSavingStream = false;
+    private JButton startStopButton, streamButton;
+    private JCheckBox saveStreamBox;
+
+    private String saveFramePath = null;
+
+    private TOOL tool;
+
+    private static final long FRAME_LENGTH_MILLIS = 40;
+
     public RobotViewModule(TOOL t, NetworkModule net_mod) {
         super(t);
+
+        tool = t;
 
         net = net_mod;
         displayPanel = new JPanel();
@@ -70,6 +98,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         imagePanel = new ImagePanel();
 
         selectedRobot = null;
+
+        createStreamingThread();
+        streamingThread.start();
 
         initLayout();
     }
@@ -97,16 +128,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         subPanel.add(robotMenu);
         subPanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
-        subPanel.add(new JLabel("Update:"));
-        subPanel.add(Box.createRigidArea(new Dimension(10, 10)));
-
-        for (DataType t : DataTypes.types()) {
-            JButton b = new JButton(DataTypes.title(t));
-            typeMap.put(b, t);
-            b.addActionListener(this);
-            subPanel.add(b);
-        }
-
+        createUpdateButtons(subPanel);
+        createStreamingButtons(subPanel);
         displayPanel.add(subPanel);
 
         subPanel = new JPanel();
@@ -115,7 +138,196 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         subPanel.add(imagePanel);
 
         displayPanel.add(subPanel);
+    }
 
+    private void createUpdateButtons(JPanel subPanel){
+        subPanel.add(new JLabel("Update:"));
+        subPanel.add(Box.createRigidArea(new Dimension(30, 10)));
+
+        for (DataType t : DataTypes.types()) {
+            JButton b = new JButton(DataTypes.title(t));
+            typeMap.put(b, t);
+            b.addActionListener(this);
+            subPanel.add(b);
+        }
+    }
+
+    private void createStreamingButtons(JPanel panel){
+        JPanel subPanel = new JPanel();
+        subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.PAGE_AXIS));
+        panel.add(subPanel);
+
+        subPanel.add(new JLabel("Streaming:"));
+
+
+        String streamingTypes[] = {DataTypes.title(DataTypes.DataType.THRESH),
+                                   DataTypes.title(DataTypes.DataType.IMAGE),
+                                   DataTypes.title(DataTypes.DataType.OBJECTS)};
+        JComboBox streamComboBox = new JComboBox(streamingTypes);
+
+        Dimension maxDim = new Dimension(200,40);
+        Dimension prefDim = new Dimension(200,40);
+        streamComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        streamComboBox.setMaximumSize(maxDim);
+        streamComboBox.setPreferredSize(prefDim);
+
+        streamComboBox.addActionListener( new ActionListener() {
+                public void actionPerformed(ActionEvent e){
+                    JComboBox box = (JComboBox)e.getSource();
+                    if (box.getSelectedItem() ==
+                        DataTypes.title(DataTypes.DataType.THRESH)){
+                        streamType = DataTypes.DataType.THRESH;
+                    }
+                    else if (box.getSelectedItem() ==
+                             DataTypes.title(DataTypes.DataType.IMAGE)){
+                    streamType = DataTypes.DataType.IMAGE;
+                    }
+                    else if (box.getSelectedItem() ==
+                            DataTypes.title(DataTypes.DataType.OBJECTS)){
+                        streamType = DataTypes.DataType.OBJECTS;
+                    }
+                }
+            });
+
+        subPanel.add(streamComboBox);
+
+        startStopButton = new JButton("Start");
+        startStopButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e){
+                    if (selectedRobot == null)
+                        return;
+
+                    // Assuming we are using proper directory structure,
+                    // set the default save folder to
+                    // $ROBOCUP/man/frames/stream.
+
+                    if (saveFramePath == null) {
+                        if (tool.CONSOLE.pathExists("../man/frames/stream")) {
+                            saveFramePath = tool.CONSOLE.formatPath("../man/frames/stream");
+                        } else {
+                            saveFramePath = tool.CONSOLE.promptDirOpen("Save Destination",
+                                                                       "../man/frames");
+                        }
+                    }
+
+                    if (saveFramePath == null)
+                        return;
+
+                    isStreaming = !isStreaming;
+
+                    if (isStreaming){
+                        startStopButton.setText("Stop");
+                    } else {
+                        startStopButton.setText("Start");
+                    }
+
+                }
+            });
+        subPanel.add(startStopButton);
+
+        JButton frameDestButton = new JButton("Set destination");
+        frameDestButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e){
+                    saveFramePath = tool.CONSOLE.promptDirOpen("Save Destination",
+                                                               saveFramePath);
+                }
+            });
+        subPanel.add(frameDestButton);
+
+        saveStreamBox = new JCheckBox("Save stream");
+        saveStreamBox.addItemListener( new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+
+                    if (e.getStateChange() == ItemEvent.SELECTED){
+                        isSavingStream = true;
+                    } else if (e.getStateChange() == ItemEvent.DESELECTED){
+                        isSavingStream = false;
+                    }
+
+                }
+            });
+        subPanel.add(saveStreamBox);
+    }
+
+    // Pretty tremendous hack for streaming images from Nao, probably could
+    // and should be more elegant. Oh well.
+    private void createStreamingThread() {
+
+        streamingThread = new Thread(new Runnable() {
+                public void run() {
+                    int numFramesStreamed = 0;
+
+                    long startTime = 0;
+                    long timeSpent = 0;
+
+                    VisionState visionState = null;
+
+                    try {
+                        while (true){
+                            startTime = System.currentTimeMillis();
+                            if (!isStreaming){
+                                Thread.sleep(1500);
+                                continue;
+                            }
+
+                            TOOLImage img = null;
+                            ThresholdedImageOverlay threshOverlay = null;
+                            Frame f = new Frame();
+
+                            if (streamType == DataTypes.DataType.THRESH) {
+                                img = selectedRobot.retrieveThresh();
+                                imagePanel.setOverlayImage(null);
+                            } else if (streamType == DataTypes.DataType.IMAGE) {
+                                img = selectedRobot.retrieveImage();
+                                imagePanel.setOverlayImage(null);
+                            } else if (streamType == DataTypes.DataType.OBJECTS) {
+                                selectedRobot.fillNewFrame(f);
+                                if (f != null){
+                                    if (visionState == null){
+                                        visionState = new VisionState(f,
+                                                tool.getColorTable());
+                                        img = visionState.getThreshImage();
+                                        threshOverlay =
+                                            visionState.getThreshOverlay();
+                                    }
+                                    else {
+                                        visionState.newFrame(f,
+                                                             tool.getColorTable());
+                                        //visionState.setColorTable(tool.getColorTable());
+                                        visionState.update();
+                                        img = visionState.getThreshImage();
+                                        threshOverlay =
+                                            visionState.getThreshOverlay();
+                                    }
+                                }
+                                imagePanel.setOverlayImage(threshOverlay);
+                            }
+                            if (img != null) {
+                                imagePanel.updateImage(img);
+                                //    imagePanel.setOverlayImage(null);
+                            }
+                            //if (threshOverlay != null) {
+                            //   imagePanel.setOverlayImage(threshOverlay);
+                            //}
+
+                            if (isSavingStream){
+                                // Write image to a frame
+                                Frame newFrame = selectedRobot.get(numFramesStreamed);
+                                selectedRobot.fillNewFrame(newFrame);
+                                selectedRobot.load(numFramesStreamed);
+                                selectedRobot.store(numFramesStreamed,saveFramePath);
+                                numFramesStreamed++;
+                            }
+                            timeSpent = System.currentTimeMillis() - startTime;
+                            if (timeSpent < FRAME_LENGTH_MILLIS){
+                                Thread.sleep(FRAME_LENGTH_MILLIS - timeSpent);
+                            }
+                        }
+                    } catch (InterruptedException e){
+                    } catch (TOOLException e) {}
+
+                }
+            });
     }
 
     public void retrieveType(DataType t) {
@@ -124,18 +336,18 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
         TOOLImage i;
         switch (t) {
-            case IMAGE:
-                TOOL.CONSOLE.message("Requesting a raw image");
-                i = selectedRobot.retrieveImage();
-                if (i != null)
-                    imagePanel.updateImage(i);
-                break;
-            case THRESH:
-                TOOL.CONSOLE.message("Requesting a thresholded image");
-                i = selectedRobot.retrieveThresh();
-                if (i != null)
-                    imagePanel.updateImage(i);
-                break;
+        case IMAGE:
+            TOOL.CONSOLE.message("Requesting a raw image");
+            i = selectedRobot.retrieveImage();
+            if (i != null)
+                imagePanel.updateImage(i);
+            break;
+        case THRESH:
+            TOOL.CONSOLE.message("Requesting a thresholded image");
+            i = selectedRobot.retrieveThresh();
+            if (i != null)
+                imagePanel.updateImage(i);
+            break;
         }
     }
 

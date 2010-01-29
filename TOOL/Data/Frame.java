@@ -68,7 +68,11 @@ public class Frame {
 	frame_states = null;
     }
 
-    public boolean hasImage() {
+    public Frame() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public boolean hasImage() {
         return frame_image != null;
     }
 

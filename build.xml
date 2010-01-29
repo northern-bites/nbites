@@ -1,0 +1,83 @@
+<!-- ant build file for the Northern-Bites tool -->
+<!-- @author Octavian Neamtu -->
+<project name="tool" default="run" basedir=".">
+  <description>
+    tool ant build file
+  </description>
+  <!-- set global properties for this build -->
+  <property name="classpath" location="."/>
+  
+  <!-- PATH structure that holds the classpath for the build-->
+  <path id="tool.paths">
+    <pathelement path="${classpath}"/>
+    <!-- look into folder lib and add all jars to the classpath -->
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+  
+  <target name="compile"
+          description="compile the source " >
+    <javac srcdir="." destdir="">
+      <classpath refid="tool.paths"/>
+    </javac>
+  </target>
+
+  <target name="vision.check">
+    <!-- check if we already have the TOOLVisionLink dynamic lib -->
+   <pathconvert property="vision.make" setonempty="false" pathsep=" ">
+    <path>
+      <fileset dir="."
+               includes="*TOOLVisionLink.*" />
+    </path>
+   </pathconvert>
+  </target>
+  
+  <target name="vision"
+	  depends="vision.check"
+	  unless="vision.make"
+	  description="compile the TOOLVisionLink">
+    <!-- at this point we just run an external calling make vision -->
+    <!-- TODO unify the build systems -->
+    <exec executable="make">
+      <arg value="vision"/>
+    </exec>
+  </target>
+  
+  <target name="run" 
+	  depends="compile,vision"
+	  description="runs the tool ">
+    <java classname="TOOL.TOOL"
+	  fork="true"
+	  maxmemory="512m">
+      <sysproperty key="java.library.path" value="./"/>
+      <classpath refid="tool.paths"/>
+      <arg value="-d32"/>
+    </java>
+  </target>
+
+  <!-- Clean up everything -->  
+  <target name="clean.all"
+          description="clean up everything" >
+    <delete>
+      <fileset dir="."> 
+	<include name="**/*.class"/>
+	<!-- delete the TOOLVisionLink dynamic lib -->
+	<include name="*TOOLVisionLink.*"/>
+	<!-- delete the JNI header generated for the TOOLVisionLink -->
+	<include name="TOOL/**/*.h"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <!-- Clean class files -->
+  <target name="clean"
+	  description="clean .class files" >
+    <delete>
+      <fileset dir=".">
+	<include name="**/*.class"/>
+      </fileset>
+    </delete>
+  </target>
+ 
+</project>

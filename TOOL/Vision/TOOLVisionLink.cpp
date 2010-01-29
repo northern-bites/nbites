@@ -156,11 +156,13 @@ extern "C" {
             jbyte* row = env->GetByteArrayElements(row_target,0);
 
             for(int j = 0; j < IMAGE_WIDTH; j++){
-				row[j]= vision.thresh->thresholded[i][j];
-				// uncomment the next part to see debug drawing
-				/*if (vision.thresh->debugImage[i][j] != 0) {
-					row[j]= vision.thresh->debugImage[i][j]; //thresholded[i][j];
-					}*/
+                row[j]= vision.thresh->thresholded[i][j];
+#ifdef OFFLINE
+                if (vision.thresh->debugImage[i][j] != GREY) {
+                    row[j]= vision.thresh->debugImage[i][j];
+                }
+#endif
+
             }
             env->ReleaseByteArrayElements(row_target, row, 0);
         }
@@ -201,8 +203,20 @@ extern "C" {
             default: k = -1; obj = NULL; cb = NULL; break;
             }
             if (obj != NULL) {
+                int id = (int) obj->getID();
+                if (obj->getPossibleFieldObjects()->size() > 1) {
+                    if (id == BLUE_GOAL_LEFT_POST ||
+                        id == BLUE_GOAL_RIGHT_POST ||
+                        id == BLUE_GOAL_POST) {
+                        id = BLUE_GOAL_POST;
+
+                    } else {
+                        id = YELLOW_GOAL_POST;
+                    }
+                }
+
                 env->CallVoidMethod(jobj, setFieldObjectInfo,
-                                    (int) obj->getID(),
+                                    id,
                                     obj->getWidth(), obj->getHeight(),
                                     obj->getLeftTopX(), obj->getLeftTopY(),
                                     obj->getRightTopX(), obj->getRightTopY(),
@@ -210,7 +224,7 @@ extern "C" {
                                     obj->getRightBottomX(), obj->getRightBottomY());
             } else if (cb != NULL) {
                 env->CallVoidMethod(jobj, setFieldObjectInfo,
-                                    50,
+                                    47,
                                     cb->getWidth(), cb->getHeight(),
                                     cb->getLeftTopX(), cb->getLeftTopY(),
                                     cb->getRightTopX(), cb->getRightTopY(),
@@ -218,7 +232,7 @@ extern "C" {
                                     cb->getRightBottomX(), cb->getRightBottomY());
             } else if (cross != NULL) {
                 env->CallVoidMethod(jobj, setFieldObjectInfo,
-                                    51,
+                                    (int)cross->getID(),
                                     cross->getWidth(), cross->getHeight(),
                                     cross->getLeftTopX(), cross->getLeftTopY(),
                                     cross->getRightTopX(), cross->getRightTopY(),
@@ -289,7 +303,7 @@ extern "C" {
         // make sure the array for the estimate is big enough. There
         // should be room for five things in there. (subject to change)
         if (env->GetArrayLength(estimateResult) !=
-            sizeof(estimate)/sizeof(double)) {
+            sizeof(estimate)/sizeof(float)) {
             cout << "Error: the estimateResult array had incorrect "
                 "dimensions" << endl;
             return;

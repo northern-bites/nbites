@@ -70,7 +70,7 @@ public class UDPServer extends Thread {
                 }
 		    }
 		    else {
-			System.out.println("robot is null");
+                //System.out.println("robot is null");
 		    }
 		}
 	    }catch (IOException e) {
@@ -105,7 +105,6 @@ public class UDPServer extends Thread {
      * Whether the server is currently receiving
      */
     public boolean isReceiving() {
-	//if (receiving) System.out.println("isReceiving");
 	return receiving;
     }
 
