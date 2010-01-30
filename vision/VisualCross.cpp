@@ -6,7 +6,7 @@ VisualCross::VisualCross() :
 }
 
 VisualCross::VisualCross(const crossID _id) :
-    VisualLandmark<crossID>(_id), VisualDetection()
+    VisualDetection(), VisualLandmark<crossID>(_id)
 {
     init();
 }
