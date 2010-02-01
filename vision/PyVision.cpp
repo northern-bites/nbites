@@ -1151,7 +1151,7 @@ PyVision_notifyImage (PyObject *self, PyObject *args)
             PyErr_SetObject(PyExc_ValueError,
                             PyString_FromFormat("String argument is too short for use "
                                                 "in this Vision's processing.  (length == %i, required == %i)",
-                                                PyString_Size(s), IMAGE_BYTE_SIZE));
+                                                static_cast<int>(PyString_Size(s)), IMAGE_BYTE_SIZE));
             return NULL;
         }
 
