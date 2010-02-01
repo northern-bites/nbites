@@ -136,7 +136,6 @@ public:
 private: // Member functions
     void init();
     void calculateWidths();
-	void calculateDistBearing();
 
     static inline const float getLength(const VisualLine& line);
     static inline const float getAngle(const VisualLine& line);

@@ -251,6 +251,8 @@ public:
     // points to be fit onto a line, they must pass a battery of sanity checks
     std::vector<VisualLine> createLines(std::list<linePoint> &linePoints);
 
+    void setLineCoordinates(VisualLine &aLine);
+
     // Attempts to fit the left over points that were not used within the
     // createLines function to the lines that were output from said function
     void fitUnusedPoints(std::vector<VisualLine> &lines,

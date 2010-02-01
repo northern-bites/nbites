@@ -1297,7 +1297,8 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
             VisualLine::NUM_POINTS_TO_BE_VALID_LINE)
             firstPoint++;
         else {
-            VisualLine aLine(legitimateLinePoints);
+			VisualLine aLine(legitimateLinePoints);
+			setLineCoordinates(aLine);
             if (debugCreateLines) {
                 cout << "\tSecond loop: adding line " << lines.size()
                      << " with " << legitimateLinePoints.size()
@@ -1347,6 +1348,47 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
 #endif
 
     return lines;
+}
+
+/**
+ * Construct a visual line from a list of line points.
+ * Then uses the end points of the line to set the
+ * distance and bearing of the line. Finding the locations of
+ * these actual endpoints requires a pixEstimate from the Pose,
+ * so it can't be done within VisualLine (since it has no Pose info).
+ */
+void FieldLines::setLineCoordinates(VisualLine &aLine) {
+
+	point<int> imgStart = aLine.start;
+	const estimate startEst = pose->pixEstimate(imgStart.x, imgStart.y, 0.0f);
+	linePoint startPt(imgStart.x, imgStart.y, 0.0, startEst.dist, startEst.bearing);
+
+	point<int> imgEnd = aLine.end;
+	const estimate endEst = pose->pixEstimate(imgEnd.x, imgEnd.y, 0.0f);
+	linePoint endPt(imgEnd.x, imgEnd.y, 0.0, endEst.dist, endEst.bearing);
+
+	const float startGroundX = startPt.distance * cos(startPt.bearing);
+	const float startGroundY = startPt.distance * sin(startPt.bearing);
+
+	const float endGroundX = endPt.distance * cos(endPt.bearing);
+	const float endGroundY = endPt.distance * sin(endPt.bearing);
+
+	const float slopeX = endGroundX - startGroundX;
+	const float slopeY = endGroundY - startGroundY;
+	const float length = hypot(slopeY, slopeX);
+
+	const float unitSlopeX = slopeX / length;
+	const float unitSlopeY = slopeY / length;
+
+	// Point p is the closest point on the line to the robot.
+	// Coordinates are relative to us in the global frame.
+	const float x_p = (-startGroundY * unitSlopeY +
+					   -startGroundX * unitSlopeX) * unitSlopeX + startGroundX;
+	const float y_p = (-startGroundY * unitSlopeY +
+					   -startGroundX * unitSlopeX) * unitSlopeY + startGroundY;
+
+	aLine.setDistanceWithSD( hypot(x_p, y_p));
+	aLine.setBearingWithSD( NBMath::subPIAngle(NBMath::safe_atan2(y_p, x_p)) );
 }
 
 void FieldLines::drawLinePoints(const list<linePointNode> &toDraw) const {
@@ -1753,7 +1795,10 @@ const VisualLine FieldLines::mergeLines(const VisualLine &line1,
     merge(line1.points.begin(), line1.points.end(),
           line2.points.begin(), line2.points.end(),
           linePoints.begin());
-    return VisualLine(linePoints);
+
+	VisualLine aLine(linePoints);
+	setLineCoordinates(aLine);
+	return aLine;
 }
 
 // For each line we have identified on the screen, attempts to extend the
@@ -3749,6 +3794,8 @@ float FieldLines::getEstimatedAngle(const VisualCorner &corner) const {
     return getEstimatedAngle(corner.getLine1(), corner.getLine2(),
                              corner.getX(), corner.getY());
 }
+
+
 
 
 // Estimates how long the line is on the field

@@ -165,43 +165,6 @@ void VisualLine::init()
     length = getLength(*this);
 
     calculateWidths();
-	calculateDistBearing();
-}
-
-/**
- * Uses the endpoints of the line to calculate the distance and
- * the bearing to the closest point on the line.
- */
-void VisualLine::calculateDistBearing()
-{
-    // Points are sorted by x
-    // This is a temporary measure, until a better system of
-    // getting line segment endpoints is implemented
-	const linePoint startPt = points[0];
-	const linePoint endPt = points[points.size()-1];
-
-	const float startGroundX = startPt.distance * sin(startPt.bearing);
-	const float startGroundY = startPt.distance * cos(startPt.bearing);
-
-	const float endGroundX = endPt.distance * sin(endPt.bearing);
-	const float endGroundY = endPt.distance * cos(endPt.bearing);
-
-	const float slopeX = endGroundX - startGroundX;
-	const float slopeY = endGroundY - startGroundY;
-	const float length = sqrt(slopeY*slopeY+slopeX*slopeX);
-
-	const float unitSlopeX = slopeX / length;
-	const float unitSlopeY = slopeY / length;
-
-	// Point p is the closest point on the line to the robot.
-	// Coordinates are relative to us in the global frame.
-	const float x_p = (startGroundY * unitSlopeY +
-					   startGroundX * unitSlopeX) * unitSlopeX + startGroundX;
-	const float y_p = (startGroundY * unitSlopeY +
-					   startGroundX * unitSlopeX) * unitSlopeY + startGroundY;
-
-	setDistanceWithSD( hypot(x_p, y_p));
-	setBearingWithSD( NBMath::subPIAngle(NBMath::safe_atan2(y_p, x_p)) );
 }
 
 // Loops through all of our line points and calculates the average widths in
