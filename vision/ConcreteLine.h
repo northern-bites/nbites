@@ -20,20 +20,37 @@ enum lineID {
     SIDELINE_LINE,
     ENDLINE_LINE,
     GOALBOX_LINE,
-    GOALBOX_SIDE_LINE, // 55
+    GOALBOX_SIDE_LINE,
     GOALBOX_TOP_LINE,
 
-    // Distinct lines
-    BLUE_GOAL_ENDLINE,
-    YELLOW_GOAL_ENDLINE,
-    // looking from center field out, left end is at the blue goal
-    TOP_SIDELINE,
-    BOTTOM_SIDELINE, // 60
-    CENTER_FIELD_LINE,
+    // Distinct lines:
+	// Named by looking from center field out, left end is at the blue goal
+
+	// Endlines
+    BLUE_GOAL_TOP_ENDLINE,
+    BLUE_GOAL_MID_ENDLINE,
+    BLUE_GOAL_BOTTOM_ENDLINE,
+    YELLOW_GOAL_TOP_ENDLINE,
+    YELLOW_GOAL_MID_ENDLINE,
+    YELLOW_GOAL_BOTTOM_ENDLINE,
+
+	// Sidelines
+    BLUE_GOAL_TOP_SIDELINE,
+    YELLOW_GOAL_TOP_SIDELINE,
+    BLUE_GOAL_BOTTOM_SIDELINE,
+    YELLOW_GOAL_BOTTOM_SIDELINE,
+
+	// Midlines
+    TOP_MIDLINE,
+    CENTER_MIDLINE,
+    BOTTOM_MIDLINE,
+
+	// GOALBOX LINES:
+	// Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
     BLUE_GOALBOX_TOP_LINE,
     BLUE_GOALBOX_LEFT_LINE,
     BLUE_GOALBOX_RIGHT_LINE,
-    YELLOW_GOALBOX_TOP_LINE, // 65
+    YELLOW_GOALBOX_TOP_LINE,
     YELLOW_GOALBOX_LEFT_LINE,
     YELLOW_GOALBOX_RIGHT_LINE
 };
@@ -51,7 +68,7 @@ private: //Constructors and Deconstructors
     ConcreteLine(const ConcreteLine& other);
 
 public: // Constants
-    static const int NUM_LINES = 11;
+    static const int NUM_LINES = 19;
 
 public:
     // Destructor
@@ -76,17 +93,25 @@ public:
     const float getFieldY2() const { return fieldY2; }
 
 public:
-    static const ConcreteLine blue_goal_endline,
-                    yellow_goal_endline,
-                    top_sideline,
-                    bottom_sideline,
-                    center_field_line,
-                    blue_goalbox_top_line,
-                    blue_goalbox_left_line,
-                    blue_goalbox_right_line,
-                    yellow_goalbox_top_line,
-                    yellow_goalbox_left_line,
-                    yellow_goalbox_right_line;
+    static const ConcreteLine blue_goal_top_endline,
+					blue_goal_mid_endline,
+					blue_goal_bottom_endline,
+					yellow_goal_top_endline,
+					yellow_goal_mid_endline,
+					yellow_goal_bottom_endline,
+					blue_goal_top_sideline,
+					yellow_goal_top_sideline,
+					blue_goal_bottom_sideline,
+					yellow_goal_bottom_sideline,
+					top_midline,
+					center_midline,
+					bottom_midline,
+					blue_goalbox_top_line,
+					blue_goalbox_left_line,
+					blue_goalbox_right_line,
+					yellow_goalbox_top_line,
+					yellow_goalbox_left_line,
+					yellow_goalbox_right_line;
 
     static const ConcreteLine* concreteLineList[NUM_LINES];
 
