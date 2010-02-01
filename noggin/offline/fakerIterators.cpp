@@ -466,11 +466,11 @@ void checkLines(vector<Observation> &Z_t, PoseEst myPos)
 		case YELLOW_GOAL_ENDLINE:
 			line = &ConcreteLine::yellow_goal_endline;
 			break;
-		case BLUE_YELLOW_SIDELINE:
-			line = &ConcreteLine::blue_yellow_sideline;
+		case TOP_SIDELINE:
+			line = &ConcreteLine::top_sideline;
 			break;
-		case YELLOW_BLUE_SIDELINE:
-			line = &ConcreteLine::yellow_blue_sideline;
+		case BOTTOM_SIDELINE:
+			line = &ConcreteLine::bottom_sideline;
 			break;
 		case CENTER_FIELD_LINE:
 			line = &ConcreteLine::center_field_line;

@@ -254,9 +254,7 @@ void LocEKF::incorporateMeasurement(Observation z,
 
 	if ( z.isLine() ){
 		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
-	}
-
-    else if (z.getVisDistance() < USE_CARTESIAN_DIST) {
+	} else if (z.getVisDistance() < USE_CARTESIAN_DIST) {
 		incorporateCartesianMeasurement( obsIndex, z, H_k, R_k, V_k);
     } else {
 		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
@@ -380,17 +378,24 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		const float relX_p = closestLandmarkXY.first;
 		const float relY_p = closestLandmarkXY.second;
 
-		if (relX_p == 0.0 && relY_p == 0.0)
+		// If we're standing on top of the point (can happen in rare cases
+		// such as when loc is initialized), don't process it (leads to nan)
+		if (z.getVisDistance() < 0.001 ||
+			(relX_p < 0.001 && relY_p < 0.001)) {
+			R_k(0,0) = DONT_PROCESS_KEY;
 			return;
+		}
 
 		// Jacobians for line updates
         H_k(0,0) = (-2*y_b*x_l*y_l + x_b*(-1 + pow(x_l,2) + pow(y_l,2)) - (-1 + pow(x_l,2) + pow(y_l,2))*x_r)/ (pow(x_b - x_r + x_l*(x_l*(-x_b + x_r) + y_l*(y_b + y_r)),2) + pow(y_b - y_r + y_l*(x_l*(-x_b + x_r) + y_l*(y_b + y_r)),2));
         H_k(0,1) = (2*x_l*y_l*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2*(-1 + pow(y_l,2))* (y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2)));
-        H_k(0,2) = 0;
+        H_k(0,2) = 0.0f;
 
         H_k(1,0) = -(((-1 + pow(x_l,2) + pow(y_l,2))* (y_b - y_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2)));
         H_k(1,1) = ((-1 + pow(x_l,2) + pow(y_l,2))*(x_b - x_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2));
-        H_k(1,2) = -1;
+        H_k(1,2) = -1.0f;
+
+		cout << "H_k " << H_k << endl;
 
 		MeasurementVector d_x(2);
 		d_x(0) = static_cast<float>(hypot(relX_p, relY_p));
@@ -478,7 +483,7 @@ int LocEKF::findMostLikelyLine(Observation *z)
 
 	vector<LineLandmark> possibleLines = z->getLinePossibilities();
 	int minIndex = -1;
-	float minDivergence = 1000.0f;
+	float minDivergence = 30000.0f;
 	for (unsigned int i = 0; i < possibleLines.size(); ++i) {
 		float distance = getMahalanobisDistance(z, possibleLines[i]);
 
@@ -500,14 +505,16 @@ int LocEKF::findMostLikelyLine(Observation *z)
  */
 float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
 {
-	// x,y coordinates of observed line
-	MeasurementVector z_x(2);
-	z_x(0) = z->getVisDistance() * cos(z->getVisBearing());
-	z_x(1) = z->getVisDistance() * sin(z->getVisBearing());
-
+	// Robot's current estimated position
 	const float x_r = xhat_k_bar(0);
 	const float y_r = xhat_k_bar(1);
 	const float h_r = xhat_k_bar(2);
+
+	// x,y coordinates of observed line in the field frame of reference
+	MeasurementVector z_x(2);
+	z_x(0) = x_r + z->getVisDistance() * cos(z->getVisBearing() + h_r);
+	z_x(1) = y_r + z->getVisDistance() * sin(z->getVisBearing() + h_r);
+
 	pair<float, float> line_xy =
 		Utility::findClosestLinePointCartesian(l, x_r, y_r, h_r);
 
@@ -516,9 +523,8 @@ float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
 	u(1) = line_xy.second;
 
 	const float dist_sd_2 = pow(z->getDistanceSD(), 2);
-	const float v = dist_sd_2 * sin(z->getBearingSD()) * cos(z->getBearingSD());
 
-	const float bsd = z->getBearingSD();
+	const float bsd = z->getVisBearing();
 
 	float cosb, sinb;
 	sincosf(bsd, &sinb, &cosb);

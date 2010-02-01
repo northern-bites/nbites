@@ -716,11 +716,13 @@ const string Utility::getDistCertaintyString(int _cert) {
     }
 }
 
+// Finds the closest point on a line to the robot's position.
+// Returns relative coordinates of the point, in the frame of
+// reference of the field's coordinate system.
 const std::pair<float,float>
 Utility::findClosestLinePointCartesian(LineLandmark l, float x_r,
 									   float y_r, float h_r)
 {
-	// cout << "line landmark is " << l << endl;
 	const float x_l = l.dx;
 	const float y_l = l.dy;
 
@@ -734,14 +736,5 @@ Utility::findClosestLinePointCartesian(LineLandmark l, float x_r,
 	// Relativize the closest point
 	const float relX_p = x_p - x_r;
 	const float relY_p = y_p - y_r;
-	// cout << "relx_p " << relX_p << " and rely_p " << relY_p <<
-	//   	" x_p " << x_p << " y_p "  << y_p  << endl;
 	return std::pair<float,float>(relX_p, relY_p);
 }
-
-
-
-
-
-
-
