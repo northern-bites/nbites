@@ -92,22 +92,6 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
     vision = visPtr;
     pose = posePtr;
 
-    timeInFindVerticalLinePoints = 0;
-    timeInFindHorizontalLinePoints = 0;
-    timeInSort = 0;
-    timeInMerge = 0;
-    timeInCreateLines = 0;
-    timeInExtendLines = 0;
-    timeInIntersectLines = 0;
-    timeInCenterCircleScan = 0;
-    timeInIdentifyCorners = 0;
-    timeInJoinLines = 0;
-    timeInFitUnusedPoints = 0;
-
-    timeInPercentColorBetween = timeInGetAngle = timeInVisualLineCreation = 0;
-
-    numFrames = 0;
-
     // Initialize the array of VisualFieldObject which we use for distance
     // based identification of corners
     allFieldObjects[0] = vision->bgrp;
@@ -137,124 +121,38 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
 
 // Main Line Loop. Calls all of the smaller line functions.  Order matters.
 void FieldLines::lineLoop() {
-    //long startTime;
-
-    //startTime = vision->getMillisFromStartup();
     vector<linePoint> vertLinePoints;
     findVerticalLinePoints(vertLinePoints);
-    //timeInFindVerticalLinePoints += (vision->getMillisFromStartup() - startTime);
 
-
-    //startTime = vision->getMillisFromStartup();
     vector<linePoint> horLinePoints;
     findHorizontalLinePoints(horLinePoints);
-    //timeInFindHorizontalLinePoints +=
-    //(vision->getMillisFromStartup() - startTime);
 
-
-    //startTime = vision->getMillisFromStartup();
     sort(horLinePoints.begin(), horLinePoints.end());
-    //timeInSort += (vision->getMillisFromStartup() - startTime);
 
-
-    //startTime = vision->getMillisFromStartup();
     // Must allocate enough space to fit both hor and vert points into this list
     list<linePoint> linePoints(vertLinePoints.size() + horLinePoints.size());
     merge(vertLinePoints.begin(), vertLinePoints.end(),
           horLinePoints.begin(), horLinePoints.end(),
           linePoints.begin());
-    //timeInMerge += (vision->getMillisFromStartup() - startTime);
 
-    //startTime = vision->getMillisFromStartup();
     // Creating a copy of the list, maybe not the best way but .. it'll work for now
     linesList = createLines(linePoints); // Lines is a global member of FieldLines
     // Only those linePoints which were not used in any line remain within the
     // linePoints list
-    //timeInCreateLines += (vision->getMillisFromStartup() - startTime);
 
-
-    //startTime = vision->getMillisFromStartup();
     joinLines(linesList);
-    //timeInJoinLines += (vision->getMillisFromStartup() - startTime);
-
 
     // unusedPoints is a global member of FieldLines; is used by vision to draw
     // points on the screen
     // TODO:  eliminate copying?
     unusedPointsList = linePoints;
 
-    //  startTime = vision->getMillisFromStartup();
-
     //extendLines(linesList);
 
     // Corners is a global member of FieldLines
-    //startTime = vision->getMillisFromStartup();
     cornersList = intersectLines(linesList);
-    //timeInIntersectLines += (vision->getMillisFromStartup() - startTime);
-
     ++numFrames;
-
-#ifdef LINES_PROFILING
-    int numFramesToProfile = 30;
-    if (numFrames % numFramesToProfile == 0) {
-        cout << endl << endl;
-        cout << "Average time in Find vertical points: "
-             << static_cast<float>(timeInFindVerticalLinePoints)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in Find Horizontal points: "
-             << static_cast<float>(timeInFindHorizontalLinePoints)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in sort: "
-             << static_cast<float>(timeInSort)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in merge: "
-             << static_cast<float>(timeInMerge)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in create lines: "
-             << static_cast<float>(timeInCreateLines)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in join lines: "
-             << static_cast<float>(timeInJoinLines)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in fit unused points: "
-             << static_cast<float>(timeInFitUnusedPoints)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in IntersectLines: "
-             << static_cast<float>(timeInIntersectLines)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in centerCircleScan: "
-             << static_cast<float>(timeInCenterCircleScan)
-            / numFramesToProfile << endl;
-
-        cout << "Average time in identifyCorners: "
-             << static_cast<float>(timeInIdentifyCorners)
-            / numFramesToProfile << endl;
-
-
-        timeInFindVerticalLinePoints = 0;
-        timeInFindHorizontalLinePoints = 0;
-        timeInSort = 0;
-        timeInMerge = 0;
-        timeInCreateLines = 0;
-        timeInExtendLines = 0;
-        timeInIntersectLines = 0;
-        timeInCenterCircleScan = 0;
-        timeInIdentifyCorners = 0;
-        timeInJoinLines = 0;
-        timeInFitUnusedPoints = 0;
-    }
-#endif
 }
-
-
 
 // While lineLoop is called before object recognition so that ObjectFragments
 // can make use of VisualLines and VisualCorners, the methods called from
@@ -1195,10 +1093,7 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
                 }
 
             }
-            //long startTime;
-            //startTime = vision->getMillisFromStartup();
 
-            //startTime = vision->getMillisFromStartup();
             // ANGLE CHECK:  Check to see if the horizontal angle of the line as
             // it stands now is significantly different from the horizontal
             // angle of the new segment we're adding.
@@ -1235,8 +1130,6 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
                 }
             }
 
-            //timeInGetAngle += vision->getMillisFromStartup() - startTime;
-
             // SANITY CHECK: Check to see if the segment formed by the old line
             // endpoint and the current point, has green in between.
 
@@ -1269,8 +1162,6 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
                          << "% allowed." << endl;
                 continue;
             }
-            //timeInPercentColorBetween += vision->getMillisFromStartup() -
-            // startTime;
 
             ////// SECOND LOOP MEAT /////
 
@@ -1290,7 +1181,6 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
         // We can attempt to form a line. An exception is thrown if something
         // failed. If all goes well, the points we used in the line are removed
         // from further consideration.
-        //startTime = vision->getMillisFromStartup();
 
         // Too few points
         if (legitimateLinePoints.size() <
@@ -1326,26 +1216,12 @@ vector <VisualLine> FieldLines::createLines(list <linePoint> &linePoints) {
                 drawFieldLine(aLine, aLine.color);
             }
         }
-        //timeInVisualLineCreation += vision->getMillisFromStartup() -startTime;
     }
 
     if (debugCreateLines) {
         cout << linePoints.size() << " points remain after forming "
              << lines.size() << " lines" << endl;
     }
-#ifdef LINES_PROFILING
-    if (numFrames % 30 == 0) {
-        cout << endl;
-        cout << "\ttime in percent color between: "
-             << static_cast<float>(timeInPercentColorBetween)/numFrames << endl;
-        cout << "\ttime in get angle: " << static_cast<float>(timeInGetAngle)/30
-             << endl;
-        cout << "\ttime in creating the visual lines: "
-             << static_cast<float>(timeInVisualLineCreation)/30 << endl;
-        timeInPercentColorBetween = timeInGetAngle = timeInVisualLineCreation =
-            0;
-    }
-#endif
 
     return lines;
 }
