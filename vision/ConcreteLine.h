@@ -20,7 +20,7 @@ enum lineID {
     SIDELINE_LINE,
     ENDLINE_LINE,
     GOALBOX_LINE,
-    GOALBOX_SIDE_LINE,
+    GOALBOX_SIDE_LINE,			// 55
     GOALBOX_TOP_LINE,
 
     // Distinct lines:
@@ -30,14 +30,14 @@ enum lineID {
     BLUE_GOAL_TOP_ENDLINE,
     BLUE_GOAL_MID_ENDLINE,
     BLUE_GOAL_BOTTOM_ENDLINE,
-    YELLOW_GOAL_TOP_ENDLINE,
+    YELLOW_GOAL_TOP_ENDLINE,	// 60
     YELLOW_GOAL_MID_ENDLINE,
     YELLOW_GOAL_BOTTOM_ENDLINE,
 
 	// Sidelines
     BLUE_GOAL_TOP_SIDELINE,
     YELLOW_GOAL_TOP_SIDELINE,
-    BLUE_GOAL_BOTTOM_SIDELINE,
+    BLUE_GOAL_BOTTOM_SIDELINE,	// 65
     YELLOW_GOAL_BOTTOM_SIDELINE,
 
 	// Midlines
@@ -47,12 +47,12 @@ enum lineID {
 
 	// GOALBOX LINES:
 	// Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
-    BLUE_GOALBOX_TOP_LINE,
+    BLUE_GOALBOX_TOP_LINE,		// 70
     BLUE_GOALBOX_LEFT_LINE,
     BLUE_GOALBOX_RIGHT_LINE,
     YELLOW_GOALBOX_TOP_LINE,
     YELLOW_GOALBOX_LEFT_LINE,
-    YELLOW_GOALBOX_RIGHT_LINE
+    YELLOW_GOALBOX_RIGHT_LINE	// 75
 };
 
 class ConcreteLine
@@ -69,6 +69,8 @@ private: //Constructors and Deconstructors
 
 public: // Constants
     static const int NUM_LINES = 19;
+	static const int NUM_SIDELINES = 4;
+	static const int NUM_GOALBOX_LINES = 6;
 
 public:
     // Destructor
@@ -114,9 +116,13 @@ public:
 					yellow_goalbox_right_line;
 
     static const ConcreteLine* concreteLineList[NUM_LINES];
+    static const ConcreteLine* sidelineList[NUM_SIDELINES];
+    static const ConcreteLine* goalboxLineList[NUM_GOALBOX_LINES];
 
 public:
     static const std::list <const ConcreteLine*> concreteLines;
+	static const std::list <const ConcreteLine*> goalboxLines;
+	static const std::list <const ConcreteLine*> sidelines;
 // We'll probably want to define some lists of sidelines vs goalbox lines, etc.
 // This will be implemented in accordance with analysis within fieldlines...
 

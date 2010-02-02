@@ -188,9 +188,31 @@ const ConcreteLine* ConcreteLine::concreteLineList[NUM_LINES] =
   &yellow_goalbox_left_line,
   &yellow_goalbox_right_line};
 
+const ConcreteLine* ConcreteLine::goalboxLineList[NUM_GOALBOX_LINES] =
+{ &blue_goalbox_top_line,
+  &blue_goalbox_left_line,
+  &blue_goalbox_right_line,
+  &yellow_goalbox_top_line,
+  &yellow_goalbox_left_line,
+  &yellow_goalbox_right_line};
+
+const ConcreteLine* ConcreteLine::sidelineList[NUM_SIDELINES] =
+{ &blue_goal_top_sideline,
+  &yellow_goal_top_sideline,
+  &blue_goal_bottom_sideline,
+  &yellow_goal_bottom_sideline};
+
 const list <const ConcreteLine*> ConcreteLine::concreteLines =
     list <const ConcreteLine*>( ConcreteLine::concreteLineList,
                                 &ConcreteLine::concreteLineList[NUM_LINES] );
+
+const list <const ConcreteLine*> ConcreteLine::goalboxLines =
+	list <const ConcreteLine*>(ConcreteLine::goalboxLineList,
+							   &ConcreteLine::goalboxLineList[NUM_GOALBOX_LINES] );
+
+const list <const ConcreteLine*> ConcreteLine::sidelines =
+	list <const ConcreteLine*>(ConcreteLine::sidelineList,
+							   &ConcreteLine::sidelineList[NUM_SIDELINES] );
 
 const string ConcreteLine::toString() const
 {

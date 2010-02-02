@@ -187,8 +187,8 @@ public:
         // Kalman gain matrix
         StateMeasurementMatrix K_k =
             boost::numeric::ublas::scalar_matrix<float>(numStates,
-                                        measurementSize,
-                                        0.0f);
+														measurementSize,
+														0.0f);
         // Observation jacobian
         StateMeasurementMatrix H_k =
             boost::numeric::ublas::scalar_matrix<float>(measurementSize,
