@@ -142,16 +142,13 @@ void FieldLines::lineLoop() {
 
     joinLines(linesList);
 
-    // unusedPoints is a global member of FieldLines; is used by vision to draw
-    // points on the screen
+    // unusedPoints is used by vision to draw points on the screen
     // TODO:  eliminate copying?
     unusedPointsList = linePoints;
 
     //extendLines(linesList);
 
-    // Corners is a global member of FieldLines
     cornersList = intersectLines(linesList);
-    ++numFrames;
 }
 
 // While lineLoop is called before object recognition so that ObjectFragments

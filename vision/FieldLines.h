@@ -651,14 +651,6 @@ private:
     std::list <VisualCorner> cornersList;
     std::list <linePoint> unusedPointsList;
 
-    long timeInFindVerticalLinePoints, timeInFindHorizontalLinePoints,
-        timeInSort, timeInMerge, timeInCreateLines, timeInExtendLines,
-        timeInIntersectLines, timeInCenterCircleScan, timeInIdentifyCorners,
-        timeInJoinLines, timeInFitUnusedPoints;
-
-    long timeInPercentColorBetween, timeInGetAngle, timeInVisualLineCreation;
-    int numFrames;
-
 private:
 
     // debug variables
