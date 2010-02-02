@@ -119,4 +119,11 @@ clean:
 	@$(MAKE) -C comm   clean
 	$(RM) -r install/* $(PYC_FILES)
 
-
+check:
+	@if [ -e $(CROSS_FILE) ]; then \
+		echo "Making for CROSS"; \
+	elif [ -e $(STRAIGHT_FILE) ]; then \
+		echo "Making for STRAIGHT"; \
+	elif [ -e $(WEBOTS_FILE) ]; then \
+		echo "Making for WEBOTS"; \
+	fi
