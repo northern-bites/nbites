@@ -151,17 +151,32 @@ public class DebugViewer extends JFrame {
 	public static final int GOALBOX_LINE = 54;
 	public static final int GOALBOX_SIDE_LINE = 55;
 	public static final int GOALBOX_TOP_LINE = 56;
-	public static final int BLUE_GOAL_ENDLINE = 57;
-	public static final int YELLOW_GOAL_ENDLINE = 58;
-	public static final int TOP_SIDELINE = 59;
-	public static final int BOTTOM_SIDELINE = 60;
-	public static final int CENTER_FIELD_LINE = 61;
-	public static final int BLUE_GOALBOX_TOP_LINE = 62;
-	public static final int BLUE_GOALBOX_LEFT_LINE = 63;
-	public static final int BLUE_GOALBOX_RIGHT_LINE = 64;
-	public static final int YELLOW_GOALBOX_TOP_LINE = 65;
-	public static final int YELLOW_GOALBOX_LEFT_LINE = 66;
-	public static final int YELLOW_GOALBOX_RIGHT_LINE = 67;
+
+    public static final int BLUE_GOAL_TOP_ENDLINE = 57;
+    public static final int BLUE_GOAL_MID_ENDLINE = 58;
+    public static final int BLUE_GOAL_BOTTOM_ENDLINE = 59;
+    public static final int YELLOW_GOAL_TOP_ENDLINE = 60;
+    public static final int YELLOW_GOAL_MID_ENDLINE = 61;
+    public static final int YELLOW_GOAL_BOTTOM_ENDLINE = 62;
+
+	// Sidelines
+    public static final int BLUE_GOAL_TOP_SIDELINE = 63;
+    public static final int YELLOW_GOAL_TOP_SIDELINE = 64;
+    public static final int BLUE_GOAL_BOTTOM_SIDELINE = 65;
+    public static final int YELLOW_GOAL_BOTTOM_SIDELINE = 66;
+
+	// Midlines
+    public static final int TOP_MIDLINE = 67;
+    public static final int CENTER_MIDLINE = 68;
+    public static final int BOTTOM_MIDLINE = 69;
+
+	// GOALBOX LINES:
+    public static final int BLUE_GOALBOX_TOP_LINE = 70;
+    public static final int BLUE_GOALBOX_LEFT_LINE = 71;
+    public static final int BLUE_GOALBOX_RIGHT_LINE = 72;
+    public static final int YELLOW_GOALBOX_TOP_LINE = 73;
+    public static final int YELLOW_GOALBOX_LEFT_LINE = 74;
+    public static final int YELLOW_GOALBOX_RIGHT_LIN = 75;
 
     // Visual Cross
     public static final int BLUE_GOAL_CROSS = 80;
@@ -766,20 +781,164 @@ public class DebugViewer extends JFrame {
 		lineIDStringMap.put(new Integer(54),"Goalbox Line");
 		lineIDStringMap.put(new Integer(55),"Goalbox Side Line");
 		lineIDStringMap.put(new Integer(56),"Goalbox Top Line");
-		lineIDStringMap.put(new Integer(57),"Blue Goal Endline");
-		lineIDStringMap.put(new Integer(58),"Yellow Goal Endline");
-		lineIDStringMap.put(new Integer(59),"Top Sideline");
-		lineIDStringMap.put(new Integer(60),"Bottom Sideline");
-		lineIDStringMap.put(new Integer(61),"Center Field Line");
-		lineIDStringMap.put(new Integer(62),"Blue Goalbox Top Line");
-		lineIDStringMap.put(new Integer(63),"Blue Goalbox Left Line");
-		lineIDStringMap.put(new Integer(64),"Blue Goalbox Right Line");
-		lineIDStringMap.put(new Integer(65),"Yellow Goalbox Top Line");
-		lineIDStringMap.put(new Integer(66),"Yellow Goalbox Left Line");
-		lineIDStringMap.put(new Integer(67),"Yellow Goalbox Right Line");
+		lineIDStringMap.put(new Integer(57), "Blue Goal Top Endline");
+		lineIDStringMap.put(new Integer(58), "Blue Goal Mid Endline");
+		lineIDStringMap.put(new Integer(59), "Blue Goal Bottom Endline");
+		lineIDStringMap.put(new Integer(60), "Yellow Goal Top Endline");
+		lineIDStringMap.put(new Integer(61), "Yellow Goal Mid Endline");
+		lineIDStringMap.put(new Integer(62), "Yellow Goal Bottom Endline");
+		lineIDStringMap.put(new Integer(63), "Blue Goal Top Sideline");
+		lineIDStringMap.put(new Integer(64), "Yellow Goal Top Sideline");
+		lineIDStringMap.put(new Integer(65), "Blue Goal Bottom Sideline");
+		lineIDStringMap.put(new Integer(66), "Yellow Goal Bottom");
+		lineIDStringMap.put(new Integer(67), "Top Midline");
+		lineIDStringMap.put(new Integer(68), "Center Midline");
+		lineIDStringMap.put(new Integer(69), "Bottom Midline");
+		lineIDStringMap.put(new Integer(70), "Blue Goalbox Top Line");
+		lineIDStringMap.put(new Integer(71), "Blue Goalbox Left Line");
+		lineIDStringMap.put(new Integer(72), "Blue Goalbox Right Line");
+		lineIDStringMap.put(new Integer(73), "Yellow Goalbox Top Line");
+		lineIDStringMap.put(new Integer(74), "Yellow Goalbox Left Line");
+		lineIDStringMap.put(new Integer(75), "Yellow Goalbox Right Line");
 
 		// Ambiguous line data
 		Line2D.Double emptyLine = new Line2D.Double(0.0, 0.0, 0.0, 0.0);
+		Line2D.Double blue_goal_top_endline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
+							  wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_BLUE_GOAL_TOP_POST_Y);
+
+		Line2D.Double blue_goal_mid_endline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_BLUE_GOAL_TOP_POST_Y,
+							  wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y);
+
+
+		Line2D.Double blue_goal_bottom_endline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y,
+							  wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+
+		Line2D.Double yellow_goal_top_endline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
+							  wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_YELLOW_GOAL_TOP_POST_Y);
+
+
+		Line2D.Double yellow_goal_mid_endline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_YELLOW_GOAL_TOP_POST_Y,
+							  wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y);
+
+
+		Line2D.Double yellow_goal_bottom_endline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y,
+							  wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+
+
+		Line2D.Double blue_goal_top_sideline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
+							  wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
+
+
+		Line2D.Double yellow_goal_top_sideline =
+			new Line2D.Double(wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
+							  wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
+
+
+		Line2D.Double blue_goal_bottom_sideline =
+			new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+							  wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+
+
+		Line2D.Double yellow_goal_bottom_sideline =
+			new Line2D.Double(wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+							  wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
+							  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+
+
+
+		Line2D.Double top_midline =
+			new Line2D.Double(wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
+							  wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.TOP_CC_Y);
+
+
+		Line2D.Double center_midline =
+			new Line2D.Double(wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.TOP_CC_Y,
+							  wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.BOTTOM_CC_Y);
+
+
+		Line2D.Double bottom_midline =
+			new Line2D.Double(wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.BOTTOM_CC_Y,
+							  wc.the_field.CENTER_FIELD_X,
+							  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
+
+
+		/**
+		 * Goalbox lines are labeled as if looking out from within the goal.
+		 * Top line is the "top" of the goalbox as the goalie sees it.
+		 */
+
+		Line2D.Double blue_goalbox_top_line =
+			new Line2D.Double(wc.the_field.BLUE_GOALBOX_RIGHT_X,
+							  wc.the_field.BLUE_GOALBOX_TOP_Y,
+							  wc.the_field.BLUE_GOALBOX_RIGHT_X,
+							  wc.the_field.BLUE_GOALBOX_BOTTOM_Y);
+
+
+		Line2D.Double blue_goalbox_left_line =
+			new Line2D.Double(wc.the_field.BLUE_GOALBOX_LEFT_X,
+							  wc.the_field.BLUE_GOALBOX_TOP_Y,
+							  wc.the_field.BLUE_GOALBOX_RIGHT_X,
+							  wc.the_field.BLUE_GOALBOX_TOP_Y);
+
+
+		Line2D.Double blue_goalbox_right_line =
+			new Line2D.Double(wc.the_field.BLUE_GOALBOX_LEFT_X,
+							  wc.the_field.BLUE_GOALBOX_BOTTOM_Y,
+							  wc.the_field.BLUE_GOALBOX_RIGHT_X,
+							  wc.the_field.BLUE_GOALBOX_BOTTOM_Y);
+
+
+		Line2D.Double yellow_goalbox_top_line =
+			new Line2D.Double(wc.the_field.YELLOW_GOALBOX_LEFT_X,
+							  wc.the_field.YELLOW_GOALBOX_TOP_Y,
+							  wc.the_field.YELLOW_GOALBOX_LEFT_X,
+							  wc.the_field.YELLOW_GOALBOX_BOTTOM_Y);
+
+
+		Line2D.Double yellow_goalbox_left_line =
+			new Line2D.Double(wc.the_field.YELLOW_GOALBOX_LEFT_X,
+							  wc.the_field.YELLOW_GOALBOX_BOTTOM_Y,
+							  wc.the_field.YELLOW_GOALBOX_RIGHT_X,
+							  wc.the_field.YELLOW_GOALBOX_BOTTOM_Y);
+
+
+		Line2D.Double yellow_goalbox_right_line =
+			new Line2D.Double(wc.the_field.YELLOW_GOALBOX_LEFT_X,
+							  wc.the_field.YELLOW_GOALBOX_TOP_Y,
+							  wc.the_field.YELLOW_GOALBOX_RIGHT_X,
+							  wc.the_field.YELLOW_GOALBOX_TOP_Y);
+
 		lineIDMap.put(new Integer(50), emptyLine);
 		lineIDMap.put(new Integer(51), emptyLine);
 		lineIDMap.put(new Integer(52), emptyLine);
@@ -788,62 +947,26 @@ public class DebugViewer extends JFrame {
 		lineIDMap.put(new Integer(55), emptyLine);
 		lineIDMap.put(new Integer(56), emptyLine);
 
-		// Distinct line points
-		Line2D.Double blue_goal_endline = new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
-															wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
-															wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
-															wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
-		Line2D.Double yellow_goal_endline = new Line2D.Double(wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
-															  wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
-															  wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
-															  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
-		Line2D.Double top_sideline = new Line2D.Double (wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
-														wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
-														wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
-														wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y);
-		Line2D.Double bottom_sideline = new Line2D.Double(wc.the_field.FIELD_WHITE_LEFT_SIDELINE_X,
-														  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-														  wc.the_field.FIELD_WHITE_RIGHT_SIDELINE_X,
-														  wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
-		Line2D.Double center_field_line = new Line2D.Double(wc.the_field.CENTER_FIELD_X,
-															wc.the_field.FIELD_WHITE_TOP_SIDELINE_Y,
-															wc.the_field.CENTER_FIELD_X,
-															wc.the_field.FIELD_WHITE_BOTTOM_SIDELINE_Y);
-		Line2D.Double blue_goalbox_top_line = new Line2D.Double(wc.the_field.BLUE_GOALBOX_RIGHT_X,
-																wc.the_field.BLUE_GOALBOX_TOP_Y,
-																wc.the_field.BLUE_GOALBOX_RIGHT_X,
-																wc.the_field.BLUE_GOALBOX_BOTTOM_Y);
-		Line2D.Double blue_goalbox_left_line = new Line2D.Double(wc.the_field.BLUE_GOALBOX_LEFT_X,
-																 wc.the_field.BLUE_GOALBOX_TOP_Y,
-																 wc.the_field.BLUE_GOALBOX_RIGHT_X,
-																 wc.the_field.BLUE_GOALBOX_TOP_Y);
-		Line2D.Double blue_goalbox_right_line = new Line2D.Double(wc.the_field.BLUE_GOALBOX_LEFT_X,
-																  wc.the_field.BLUE_GOALBOX_BOTTOM_Y,
-																  wc.the_field.BLUE_GOALBOX_RIGHT_X,
-																  wc.the_field.BLUE_GOALBOX_BOTTOM_Y);
-		Line2D.Double yellow_goalbox_top_line = new Line2D.Double(wc.the_field.YELLOW_GOALBOX_LEFT_X,
-																  wc.the_field.YELLOW_GOALBOX_TOP_Y,
-																  wc.the_field.YELLOW_GOALBOX_LEFT_X,
-																  wc.the_field.YELLOW_GOALBOX_BOTTOM_Y);
-		Line2D.Double yellow_goalbox_left_line = new Line2D.Double(wc.the_field.YELLOW_GOALBOX_LEFT_X,
-																   wc.the_field.YELLOW_GOALBOX_BOTTOM_Y,
-																   wc.the_field.YELLOW_GOALBOX_RIGHT_X,
-																   wc.the_field.YELLOW_GOALBOX_BOTTOM_Y);
-		Line2D.Double yellow_goalbox_right_line = new Line2D.Double(wc.the_field.YELLOW_GOALBOX_LEFT_X,
-																	wc.the_field.YELLOW_GOALBOX_TOP_Y,
-																	wc.the_field.YELLOW_GOALBOX_RIGHT_X,
-																	wc.the_field.YELLOW_GOALBOX_TOP_Y);
-		lineIDMap.put(new Integer(57), blue_goal_endline);
-		lineIDMap.put(new Integer(58), yellow_goal_endline);
-		lineIDMap.put(new Integer(59), top_sideline);
-		lineIDMap.put(new Integer(60), bottom_sideline);
-		lineIDMap.put(new Integer(61), center_field_line);
-		lineIDMap.put(new Integer(62), blue_goalbox_top_line);
-		lineIDMap.put(new Integer(63), blue_goalbox_left_line);
-		lineIDMap.put(new Integer(64), blue_goalbox_right_line);
-		lineIDMap.put(new Integer(65), yellow_goalbox_top_line);
-		lineIDMap.put(new Integer(66), yellow_goalbox_left_line);
-		lineIDMap.put(new Integer(67), yellow_goalbox_right_line);
+		// Distinct lines
+		lineIDMap.put(new Integer(57), blue_goal_top_endline);
+		lineIDMap.put(new Integer(58), blue_goal_mid_endline);
+		lineIDMap.put(new Integer(59), blue_goal_bottom_endline);
+		lineIDMap.put(new Integer(60), yellow_goal_top_endline);
+		lineIDMap.put(new Integer(61), yellow_goal_mid_endline);
+		lineIDMap.put(new Integer(62), yellow_goal_bottom_endline);
+		lineIDMap.put(new Integer(63), blue_goal_top_sideline);
+		lineIDMap.put(new Integer(64), yellow_goal_top_sideline);
+		lineIDMap.put(new Integer(65), blue_goal_bottom_sideline);
+		lineIDMap.put(new Integer(66), yellow_goal_bottom_sideline);
+		lineIDMap.put(new Integer(67), top_midline);
+		lineIDMap.put(new Integer(68), center_midline);
+		lineIDMap.put(new Integer(69), bottom_midline);
+		lineIDMap.put(new Integer(70), blue_goalbox_top_line);
+		lineIDMap.put(new Integer(71), blue_goalbox_left_line);
+		lineIDMap.put(new Integer(72), blue_goalbox_right_line);
+		lineIDMap.put(new Integer(73), yellow_goalbox_top_line);
+		lineIDMap.put(new Integer(74), yellow_goalbox_left_line);
+		lineIDMap.put(new Integer(75), yellow_goalbox_right_line);
 	}
 
 
