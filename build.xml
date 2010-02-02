@@ -6,7 +6,7 @@
   </description>
   <!-- set global properties for this build -->
   <property name="classpath" location="."/>
-  
+
   <!-- PATH structure that holds the classpath for the build-->
   <path id="tool.paths">
     <pathelement path="${classpath}"/>
@@ -15,7 +15,7 @@
       <include name="**/*.jar"/>
     </fileset>
   </path>
-  
+
   <target name="compile"
           description="compile the source " >
     <javac srcdir="." destdir="">
@@ -43,8 +43,8 @@
       <arg value="vision"/>
     </exec>
   </target>
-  
-  <target name="run" 
+
+  <target name="run"
 	  depends="compile,vision"
 	  description="runs the tool ">
     <java classname="TOOL.TOOL"
@@ -55,12 +55,16 @@
     </java>
   </target>
 
-  <!-- Clean up everything -->  
+  <!-- Clean up everything -->
   <target name="clean.all"
+	  depends="clean.vision,clean"
           description="clean up everything" >
+  </target>
+
+  <target name="clean.vision"
+	  description="clean VisionLink library">
     <delete>
-      <fileset dir="."> 
-	<include name="**/*.class"/>
+      <fileset dir=".">
 	<!-- delete the TOOLVisionLink dynamic lib -->
 	<include name="*TOOLVisionLink.*"/>
 	<!-- delete the JNI header generated for the TOOLVisionLink -->
@@ -78,5 +82,5 @@
       </fileset>
     </delete>
   </target>
- 
+
 </project>
