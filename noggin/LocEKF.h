@@ -170,6 +170,10 @@ private:
     void limitPosteriorUncert();
     void clipRobotPose();
     void deadzone(float &R, float &innovation, float CPC, float EPS);
+	std::pair<float, float> findClosestLinePointCartesian(LineLandmark l,
+														  float x_r,
+														  float y_r,
+														  float h_r);
 
     // Last odometry update
     MotionModel lastOdo;
