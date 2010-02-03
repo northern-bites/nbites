@@ -148,6 +148,8 @@ void FieldLines::lineLoop() {
 
     //extendLines(linesList);
 
+	removeDuplicateLines(linesList);
+
     cornersList = intersectLines(linesList);
 }
 
@@ -2222,42 +2224,10 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
     } // end horizontal test
 } // end method
 
-
-/*
- * Pairwise tests each line on the screen against each other, calculates
- * where the intersection occurs, and then subjects the intersection
- * to a battery of sanity checks before determining that the intersection
- * is a legitimate corner on the field.
- *
- * @param lines - the vector of visual lines that have been found after
- *                createLines, join lines, and fit unused points.
- *
- * @return a vector of VisualCorners created from the intersection points that
- *         successfully pass all sanity checks.
- */
-list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
-    list <VisualCorner> corners;
-	list <point<int> > dupeCorners;
-
-    if (debugIntersectLines) {
-        cout <<"Beginning intersectLines() with " << lines.size() << " lines.."
-             << endl;
-    }
-    // Keep track of the number of duplicate intersections (where two
-    // intersection points occur very close to each other on the screen).
-    // In places not near the center circle, there should be very few
-    // duplicates, if any.
-    int numDupes = 0;
-
-    if (standardView) {
-        for (vector <VisualLine>::iterator i = lines.begin(); i != lines.end();
-             ++i) {
-            drawSurroundingBox(*i, BLACK);
-            drawFieldLine(*i, i->color);
-        }
-    }
-
-    // first compare every pair of lines trying to remove duplicates
+// Test all the lines against each other to see if there are any very similar,
+// i.e. duplicate, lines.
+void FieldLines::removeDuplicateLines(vector<VisualLine> &lines) {
+	// first compare every pair of lines trying to remove duplicates
     for (vector <VisualLine>::iterator i = lines.begin(); i != lines.end();
          ++i) {
 
@@ -2315,11 +2285,48 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 		}
 	}
 
+}
+
+/*
+ * Pairwise tests each line on the screen against each other, calculates
+ * where the intersection occurs, and then subjects the intersection
+ * to a battery of sanity checks before determining that the intersection
+ * is a legitimate corner on the field.
+ *
+ * @param lines - the vector of visual lines that have been found after
+ *                createLines, join lines, and fit unused points.
+ *
+ * @return the VisualCorners created from the intersection points that
+ *         successfully pass all sanity checks.
+ */
+list <VisualCorner>
+FieldLines::intersectLines(const vector <VisualLine> &lines) {
+    list <VisualCorner> corners;
+	list <point<int> > dupeCorners;
+
+    if (debugIntersectLines) {
+        cout <<"Beginning intersectLines() with " << lines.size() << " lines.."
+             << endl;
+    }
+    // Keep track of the number of duplicate intersections (where two
+    // intersection points occur very close to each other on the screen).
+    // In places not near the center circle, there should be very few
+    // duplicates, if any.
+    int numDupes = 0;
+
+    if (standardView) {
+        for (vector <VisualLine>::const_iterator i = lines.begin(); i != lines.end();
+             ++i) {
+            drawSurroundingBox(*i, BLACK);
+            drawFieldLine(*i, i->color);
+        }
+    }
+
     // Compare every pair of lines
-    for (vector <VisualLine>::iterator i = lines.begin(); i != lines.end();
+    for (vector <VisualLine>::const_iterator i = lines.begin(); i != lines.end();
          ++i) {
 
-        for (vector <VisualLine>::iterator j = i+1; j != lines.end(); ++j) {
+        for (vector <VisualLine>::const_iterator j = i+1; j != lines.end(); ++j) {
             string iColor = i->colorStr;
             string jColor = j->colorStr;
             int numChecksPassed = 0;

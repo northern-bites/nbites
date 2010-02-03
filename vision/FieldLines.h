@@ -306,6 +306,8 @@ public:
     const int findEdgeFromMiddleOfLine(int x, int y, int maxPixelsToSearch,
                                        TestDirection dir) const;
 
+	void removeDuplicateLines(std::vector<VisualLine> &lines);
+
     // Pairwise tests each line on the screen against each other, calculates
     // where the intersection occurs, and then subjects the intersection
     // to a battery of sanity checks before determining that the intersection
@@ -315,7 +317,7 @@ public:
     // @return a vector of VisualCorners created from the intersection points
     // that successfully pass all sanity checks.
     //
-    std::list<VisualCorner> intersectLines(std::vector<VisualLine> &lines);
+    std::list<VisualCorner> intersectLines(const std::vector<VisualLine> &lines);
 
 	// Checks if a corner is too dangerous when it is relatively near the edge
 	// of the screen - scans the edge for a stripe of white
