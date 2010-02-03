@@ -31,11 +31,11 @@ using namespace std;
 #ifndef OFFLINE
 #define haveFound(edgeY) edgeY != NO_EDGE
 
-#define isEdgeClose(edgeLoc, newLoc) (abs(edgeLoc - newLoc) < \
+#define isEdgeClose(edgeLoc, newLoc) (abs(edgeLoc - newLoc) <			\
                                       ADJACENT_SAME_EDGE_SEPARATION)
-#define isMoreSuitableTopEdge(topEdgeY,newY,imageColumn) (topEdgeY == NO_EDGE\
-                                                          || \
-                                                          isEdgeClose(topEdgeY,\
+#define isMoreSuitableTopEdge(topEdgeY,newY,imageColumn) (topEdgeY == NO_EDGE \
+                                                          ||			\
+                                                          isEdgeClose(topEdgeY,	\
                                                                       newY))
 
 #define isMoreSuitableRightEdge(rightEdgeX,newX,y) (rightEdgeX == NO_EDGE || \
@@ -53,7 +53,7 @@ using namespace std;
                                                   >=                    \
                                                   HORIZONTAL_TRANSITION_VALUE)
 
-#define isDownhillEdge(new_y_value,old_y_value,dir)(dir == VERTICAL ? \
+#define isDownhillEdge(new_y_value,old_y_value,dir)(dir == VERTICAL ?	\
                                                     old_y_value - new_y_value \
                                                     >=                  \
                                                     VERTICAL_TRANSITION_VALUE \
@@ -68,14 +68,14 @@ using namespace std;
 #define isAtTopOfImage(y, stopValue) (y-stopValue == 1) || (y == 1)
 #define isAtRightOfImage(x, endX) (x == endX - 1)
 #define isWaitingForAnotherTopEdge(topEdgeY, currentY)(topEdgeY - currentY <= 3)
-#define isWaitingForAnotherRightEdge(rightEdgeX, currentX) (currentX - \
+#define isWaitingForAnotherRightEdge(rightEdgeX, currentX) (currentX -	\
                                                             rightEdgeX <= 3)
 
 #define isFirstUphillEdge(uphillEdgeLoc,x,y,dir) (!haveFound(uphillEdgeLoc))
-#define resetLineCounters(numWhite,numUndefined,numNonWhite) (\
+#define resetLineCounters(numWhite,numUndefined,numNonWhite) (	\
         numWhite=numUndefined=numNonWhite=0)
 #define countersHitSanityChecks(numWhite,numUndefined,numNonWhite,print) \
-    (numNonWhite > NUM_NON_WHITE_SANITY_CHECK || numUndefined > \
+    (numNonWhite > NUM_NON_WHITE_SANITY_CHECK || numUndefined >			\
      NUM_UNDEFINED_SANITY_CHECK)
 #endif
 
@@ -1568,7 +1568,7 @@ void FieldLines::joinLines(vector <VisualLine> &lines) {
                              << MAX_ANGLE_TO_JOIN_CC_LINES
                              << " for a CC line."
                              << endl;
-                    continue;
+						continue;
                     }
                 }
             }
@@ -2266,11 +2266,15 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             point<int> intersection = Utility::getIntersection(*i,*j);
             int intersectX = intersection.x;
             int intersectY = intersection.y;
+
 			const float OVERLAP = 3.0f;
             float angleOnScreen = min(fabs(i->angle - j->angle),
                                       fabs(180-(fabs(i->angle-j->angle))));
+
+			// If they are at the same angle, or have no interesection on screen
 			if (angleOnScreen < OVERLAP || intersectX == NO_INTERSECTION) {
-				// These lines may actually be the same - remove the later one
+
+				// Check if the two lines lie very close to each other
 				BoundingBox box1 = Utility::
 					getBoundingBox(*j,
 								   INTERSECT_MAX_ORTHOGONAL_EXTENSION,
@@ -2279,6 +2283,8 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 					boxContainsPoint(box1, i->start.x, i->start.y);
 				bool box1Contains2 = Utility::
 					boxContainsPoint(box1, i->end.x, i->end.y);
+
+				// These lines may actually be the same - remove the later one
 				if (box1Contains || box1Contains2) {
 					if (debugIntersectLines) {
 						cout  << "Found duplicate line - removing "
@@ -2295,6 +2301,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 						boxContainsPoint(box1, j->start.x, j->start.y);
 					bool box1Contains2 = Utility::
 						boxContainsPoint(box1, j->end.x, j->end.y);
+
 					if (box1Contains || box1Contains2) {
 						if (debugIntersectLines) {
 							cout  << "Found duplicate line 2 - removing "
@@ -2307,6 +2314,7 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
 			}
 		}
 	}
+
     // Compare every pair of lines
     for (vector <VisualLine>::iterator i = lines.begin(); i != lines.end();
          ++i) {
@@ -2349,10 +2357,6 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
             // circle where the lines form very shallow angles
             float angleOnScreen = min(fabs(i->angle - j->angle),
                                       fabs(180-(fabs(i->angle-j->angle))));
-
-            /*cout << i->colorStr << " has angle of " << i->angle << " and "
-              << j->colorStr << " has angle of " << j->angle << endl;
-            */
 
             if (angleOnScreen < MIN_ANGLE_BETWEEN_INTERSECTING_LINES) {
                 if (debugIntersectLines) {
@@ -2457,11 +2461,12 @@ list <VisualCorner> FieldLines::intersectLines(vector <VisualLine> &lines) {
                 Utility::tValueInMiddleOfLine(t_J, j->length,
                                               static_cast<float>(
                                                   MIN_CROSS_EXTEND))) {
-                if (debugIntersectLines || debugCcScan)
+                if (debugIntersectLines || debugCcScan){
                     cout <<"\t" << numChecksPassed
                          << "-Identified center circle intersection "
                          << "point was within the endpoints of both lines.  "
                          <<"Discarding all corners" << endl;
+				}
                 isCCIntersection = true;
             }
             ++numChecksPassed;
@@ -2864,7 +2869,7 @@ void FieldLines::removeRiskyCorners(//vector<VisualLine> &lines,
  * Modifies the corners passed in by calling the setPossibleCorners method;
  * in certain cases the shape of a corner might be switched too (if an L
  * corner is determined to be a T instead, its shape is changed accordingly).
-*/
+ */
 void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 
     if (debugIdentifyCorners)
@@ -3837,11 +3842,11 @@ const bool FieldLines::dupeCorner(const list<VisualCorner> &corners,
 }
 
 const bool FieldLines::dupeFakeCorner(const list<point<int> > &corners,
-                                  const int x, const int y,
+									  const int x, const int y,
 									  const int testNumber) const {
 	unsigned int counter = 1;
-	 for (list<point<int> >::const_iterator i = corners.begin();
-		  i != corners.end(); ++i, counter++) {
+	for (list<point<int> >::const_iterator i = corners.begin();
+		 i != corners.end(); ++i, counter++) {
         if (abs(x - i->x) < DUPE_MIN_X_SEPARATION &&
             abs(y - i->y) < DUPE_MIN_Y_SEPARATION && counter != corners.size()) {
             if (debugIntersectLines) {
