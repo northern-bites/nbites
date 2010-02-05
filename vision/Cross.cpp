@@ -149,12 +149,12 @@ void Cross::checkForX(Blob b) {
         point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
         plumbLineTop.x = x + w / 2; plumbLineTop.y = y;
         plumbLineBottom.x = x; plumbLineBottom.y = y + h;
-        const vector <VisualLine>* lines = vision->fieldLines->getLines();
-        for (vector <VisualLine>::const_iterator k = lines->begin();
+		const vector <boost::shared_ptr<VisualLine> >* lines = vision->fieldLines->getLines();
+        for (vector <boost::shared_ptr<VisualLine> >::const_iterator k = lines->begin();
              k != lines->end(); k++) {
             pair<int, int> foo = Utility::
                 plumbIntersection(plumbLineTop, plumbLineBottom,
-                                  k->start, k->end);
+                                  (*k)->start, (*k)->end);
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
 				if (CROSSDEBUG)
 					cout << "Throwing out blob that is part of a line" << endl;

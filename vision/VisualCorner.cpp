@@ -1,5 +1,6 @@
 #include "VisualCorner.h"
 using namespace std;
+using namespace boost;
 
 //-------------------------------
 // Static VisualCorner variables:
@@ -9,7 +10,7 @@ dogLocation(IMAGE_WIDTH/2, IMAGE_HEIGHT - 1);
 VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _distance,
                            const float _bearing,
-                           const VisualLine l1, const VisualLine l2,
+                           shared_ptr<VisualLine> l1, shared_ptr<VisualLine> l2,
                            const float _t1, const float _t2)
     : VisualDetection(_x, _y, _distance, _bearing),
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
@@ -46,12 +47,12 @@ VisualCorner::VisualCorner(const VisualCorner& other)
  * constructed in FieldLines::interesctLines()
  */
 void VisualCorner::determineCornerShape() {
-    if (Utility::tValueInMiddleOfLine(t1, line1.length, MIN_EXTEND_DIST)) {
+    if (Utility::tValueInMiddleOfLine(t1, line1->length, MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line1;
         tStem = line2;
         setID(T_CORNER);
-    } else if(Utility::tValueInMiddleOfLine(t2, line2.length,
+    } else if(Utility::tValueInMiddleOfLine(t2, line2->length,
                                             MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line2;
@@ -86,9 +87,9 @@ const shape VisualCorner::getLClassification() {
     // should point in the opposite direction (the aforementioned end/start
     // issue)
     pair <int, int> line1Basis =
-        VisualLine::getLineComponents(line1);
+        VisualLine::getLineComponents(*line1);
     pair <int, int> line2Basis =
-        VisualLine::getLineComponents(line2);
+        VisualLine::getLineComponents(*line2);
 
     // Find the line endpoint that's farther from the corner (allows us
     // to direct our line segment away from the corner)
@@ -97,17 +98,17 @@ const shape VisualCorner::getLClassification() {
     // corner is closer to start point of line 1
     if (Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line1.start.x),
-						   static_cast<float>(line1.start.y) ) <
+						   static_cast<float>(line1->start.x),
+						   static_cast<float>(line1->start.y) ) <
         Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line1.end.x),
-						   static_cast<float>(line1.end.y) )) {
-        line1End = line1.end;
+						   static_cast<float>(line1->end.x),
+						   static_cast<float>(line1->end.y) )) {
+        line1End = line1->end;
     }
     // Closer to end
     else {
-        line1End = line1.start;
+        line1End = line1->start;
         // Swap the signs on the line 1 basis
         line1Basis.first *= -1;
         line1Basis.second *= -1;
@@ -116,17 +117,17 @@ const shape VisualCorner::getLClassification() {
     // corner is closer to start point of line 2
     if (Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line2.start.x),
-						   static_cast<float>(line2.start.y) ) <
+						   static_cast<float>(line2->start.x),
+						   static_cast<float>(line2->start.y) ) <
         Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line2.end.x),
-						   static_cast<float>(line2.end.y) )) {
-        line2End = line2.end;
+						   static_cast<float>(line2->end.x),
+						   static_cast<float>(line2->end.y) )) {
+        line2End = line2->end;
     }
     // Closer to end
     else {
-        line2End = line2.start;
+        line2End = line2->start;
         // Swap the signs on the line 2 basis
         line2Basis.first *= -1;
         line2Basis.second *= -1;
@@ -143,7 +144,7 @@ const shape VisualCorner::getLClassification() {
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
     float theta = TO_DEG * NBMath::safe_acos(dotProduct/
-                                             (line1.length * line2.length));
+                                             (line1->length * line2->length));
     /*
       cout << " first line: " << line1->start << ", " << line1->end << endl;
       cout << " second line: " << line2->start << ", " << line2->end << endl;
