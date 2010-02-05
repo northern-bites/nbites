@@ -26,14 +26,6 @@ ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
-
-SET( TRUNK_REVISION r$ENV{TRUNK_REVISION} CACHE STRING "SVN Revision number" )
-IF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
-  MESSAGE( FATAL_ERROR
-    "Environment variable TRUNK_REVISION was not set.  Please ensure that your Makefile is properly exporting it."
-    )
-ENDIF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
-
 #SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ ALDEBARAN DIRECTORY
 # Ensure the AL_DIR variable is set
@@ -85,7 +77,7 @@ IF(COMMAND CMAKE_POLICY)
     # CMake policy regarding excaping definitions
     CMAKE_POLICY(SET CMP0005 OLD)
 #     # CMake policy regarding scoped include
-     # CMAKE_POLICY(SET CMP0011 OLD)
+      CMAKE_POLICY(SET CMP0011 OLD)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
@@ -132,58 +124,39 @@ SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 # Depending on the robot and whether cross-compiling, the include and
 # library prefixes must be adjusted
 
-IF( ROBOT_AIBO )
-  # Aibo
-  IF( OE_CROSS_BUILD )
+IF( AL_DIR STREQUAL "" )
+  MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
+ENDIF( AL_DIR STREQUAL "" )
 
-    SET( INCLUDE_PREFIX "${OPEN_R_SDK_ROOT}/OPEN_R/include" )
-    SET( LIB_PREFIX "${OPEN_R_SDK_ROOT}/OPEN_R/lib" )
+IF( WIN32 )
+  SET( TARGET_ARCH "windows" )
+  SET( TARGET_HOST "TARGET_HOST_WINDOWS")
+ENDIF( WIN32 )
 
-  ELSE( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "/usr/include" )
-    SET( LIB_PREFIX "/usr/lib" )
+IF( UNIX )
+  SET( TARGET_ARCH "linux")
+  SET( TARGET_HOST "TARGET_HOST_LINUX")
+  SET( PLATFORM_X86 1 )
+ENDIF( UNIX )
 
-  ENDIF( OE_CROSS_BUILD )
+IF( APPLE )
+  SET( TARGET_ARCH "macosx" )
+  SET( TARGET_HOST "TARGET_HOST_MACOSX")
+ENDIF( APPLE )
 
-ELSE( ROBOT_AIBO )
-  # Nao
-  
-  IF( AL_DIR STREQUAL "" )
-    MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
-  ENDIF( AL_DIR STREQUAL "" )
-	
-  IF( WIN32 )
-    SET( TARGET_ARCH "windows" )
-    SET( TARGET_HOST "TARGET_HOST_WINDOWS")
-  ENDIF( WIN32 )
-  
-  IF( UNIX )
-    SET( TARGET_ARCH "linux")
-    SET( TARGET_HOST "TARGET_HOST_LINUX")
-    SET( PLATFORM_X86 1 )
-  ENDIF( UNIX )
+# IF( OE_CROSS_BUILD )
+#   SET( INCLUDE_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include" )
+#   SET( LIB_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/lib" )
+# ELSE( OE_CROSS_BUILD )
+SET( INCLUDE_PREFIX "${AL_DIR}/include" )
+SET( LIB_PREFIX "${AL_DIR}/lib" )
+# ENDIF( OE_CROSS_BUILD )
 
-  IF( APPLE )
-    SET( TARGET_ARCH "macosx" )
-    SET( TARGET_HOST "TARGET_HOST_MACOSX")
-  ENDIF( APPLE )
-  
-  IF( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include" )
-    SET( LIB_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/lib" )
-  ELSE( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "${AL_DIR}/extern/c/${TARGET_ARCH}/include" )
-    SET( LIB_PREFIX "${AL_DIR}/extern/c/${TARGET_ARCH}/lib" )
-  ENDIF( OE_CROSS_BUILD )
+IF( FINAL_RELEASE )
+  ADD_DEFINITIONS(-DFINAL_RELEASE)
+ENDIF( FINAL_RELEASE )
 
-  IF( FINAL_RELEASE )
-    ADD_DEFINITIONS(-DFINAL_RELEASE)
-  ENDIF( FINAL_RELEASE )
-
-  INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
-
-ENDIF( ROBOT_AIBO )
-
+INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
 
 ########################## ADVANCED SETTINGS PREFERENCES
 # Set the cache variable that we would rather not appear on the normal

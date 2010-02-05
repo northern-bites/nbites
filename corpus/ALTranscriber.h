@@ -54,10 +54,10 @@ public:
 
 private: //Members
     AL::ALPtr<AL::ALBroker> broker;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessJoints;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessTemps;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessVision;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessJoints;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessSensors;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessTemps;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessVision;
 
     std::vector<float> jointValues;
 

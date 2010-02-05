@@ -1,6 +1,6 @@
 
-#include "alvisionimage.h"
-#include "alvisiondefinitions.h"
+#include "alvision/alimage.h"
+#include "alvision/alvisiondefinitions.h"
 
 #include "manconfig.h"
 
@@ -31,12 +31,12 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
         try{
         initCameraSettings(BOTTOM_CAMERA);
         }catch(ALError &e){
-            cout << "Failed to init the camera settings:"<<e.toString()<<endl;
+			std::cout << "Failed to init the camera settings:"<<e.toString()<<std::endl;
             camera_active = false;
         }
     }
     else
-        cout << "\tCamera is inactive!" << endl;
+		std::cout << "\tCamera is inactive!" << std::endl;
 #endif
 }
 
@@ -72,8 +72,8 @@ void ALImageTranscriber::run() {
 		lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
         if (processTime > VISION_FRAME_LENGTH_uS){
 			if (lastProcessTimeAvg > VISION_FRAME_LENGTH_PRINT_THRESH_uS)
-				cout << "Time spent in ALImageTranscriber loop longer than"
-					 << " frame length: " << processTime <<endl;
+				std::cout << "Time spent in ALImageTranscriber loop longer than"
+						  << " frame length: " << processTime <<std::endl;
             //Don't sleep at all
         } else{
 			//cout << "Sleeping for " << VISION_FRAME_LENGTH_uS
@@ -91,11 +91,11 @@ void ALImageTranscriber::run() {
 }
 
 void ALImageTranscriber::stop() {
-    cout << "Stopping ALImageTranscriber" << endl;
+	std::cout << "Stopping ALImageTranscriber" << std::endl;
     running = false;
 #ifdef USE_VISION
     if(camera_active){
-        cout << "lem_name = " << lem_name << endl;
+		std::cout << "lem_name = " << lem_name << std::endl;
         try {
             camera->callVoid("unregister", lem_name);
         }catch (ALError &e) {
@@ -136,9 +136,9 @@ void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker) {
     try {
         lem_name = camera->call<std::string>("register", lem_name, format,
                                              colorSpace, fps);
-        cout << "Registered Camera: " << lem_name << " successfully"<<endl;
+        std::cout << "Registered Camera: " << lem_name << " successfully"<<std::endl;
     } catch (ALError &e) {
-        cout << "Failed to register camera" << lem_name << endl;
+        std::cout << "Failed to register camera" << lem_name << std::endl;
         camera_active = false;
 //         SleepMs(500);
 
@@ -163,17 +163,17 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
         SleepMs(CAMERA_SLEEP_TIME);
         currentCam =  camera->call<int>( "getParam", kCameraSelectID );
         if (whichCam != currentCam){
-            cout << "Failed to switch to camera "<<whichCam
-                 <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<endl;
+            std::cout << "Failed to switch to camera "<<whichCam
+                 <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<std::endl;
             SleepMs(CAMERA_SLEEP_TIME);
             currentCam =  camera->call<int>( "getParam", kCameraSelectID );
             if (whichCam != currentCam){
-                cout << "Failed to switch to camera "<<whichCam
-                     <<" ... returning, no parameters initialized" <<endl;
+                std::cout << "Failed to switch to camera "<<whichCam
+                     <<" ... returning, no parameters initialized" <<std::endl;
                 return;
             }
         }
-        cout << "Switched to camera " << whichCam <<" successfully"<<endl;
+        std::cout << "Switched to camera " << whichCam <<" successfully"<<std::endl;
     }
 
     // Turn off auto settings
@@ -399,11 +399,11 @@ void ALImageTranscriber::waitForImage ()
         printf("Requesting local image of size %ix%i, color space %i\n",
                IMAGE_WIDTH, IMAGE_HEIGHT, NAO_COLOR_SPACE);
 #endif
-        ALVisionImage *ALimage = NULL;
+        ALImage *ALimage = NULL;
 
         // Attempt to retrieve the next image
         try {
-            ALimage = (ALVisionImage*) (camera->call<int>("getDirectRawImageLocal",lem_name));
+            ALimage = (ALImage*) (camera->call<int>("getDirectRawImageLocal",lem_name));
         }catch (ALError &e) {
             log->error("NaoMain", "Could not call the getImageLocal method of the "
                        "NaoCam module");
@@ -413,7 +413,7 @@ void ALImageTranscriber::waitForImage ()
             //image = ALimage->getFrame();
         }
         else
-            cout << "\tALVisionImage from camera was null!!" << endl;
+            std::cout << "\tALImage from camera was null!!" << std::endl;
 
 #ifdef DEBUG_IMAGE_REQUESTS
         //You can get some informations of the image.

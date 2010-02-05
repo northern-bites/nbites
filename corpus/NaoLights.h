@@ -35,7 +35,7 @@ public:
     void sendLights();
 private:
     void generateLeds();
-    void sendLightCommand(ALValue &command);
+    void sendLightCommand(AL::ALValue &command);
 private:
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     AL::ALValue leftFaceLedCommand;

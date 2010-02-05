@@ -8,18 +8,18 @@ INCLUDE( "${CMAKE_MODULE_PATH}/base_definitions.cmake" )
 
 
 ## from ${AL_DIR}/cmakemodules/FindTINYXML.cmake
-include("${AL_DIR}/cmakemodules/aldebaran.cmake")
-include("${AL_DIR}/cmakemodules/libfind.cmake")
+include("${AL_DIR}/toolchain-pc.cmake")
+#include("${AL_DIR}/lib/cmake/libfind.cmake")
 
-clean(TINYXML)
+#clean(TINYXML)
 
-set(TINYXML_INCLUDE_DIR ${AL_DIR}/extern/c/src/tinyxml)
+set(TINYXML_INCLUDE_DIR ${AL_DIR}/include/tinyxml)
 if(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
-  SET( TINYXML_LIBRARIES ${AL_DIR}/extern/c/${TARGET_ARCH}/lib/tinyxml.lib)
+  SET( TINYXML_LIBRARIES ${AL_DIR}/lib/tinyxml.lib)
 else(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
-  SET( TINYXML_LIBRARIES ${AL_DIR}/extern/c/${TARGET_ARCH}/lib/libtinyxml.a)
+  SET( TINYXML_LIBRARIES ${AL_DIR}/lib/libtinyxml.a)
 endif(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
 
-export(TINYXML)
+#export(TINYXML)
 
 

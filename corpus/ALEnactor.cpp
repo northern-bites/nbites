@@ -88,7 +88,7 @@ void ALEnactor::sendJoints(){
 #endif
 
 #ifndef NO_ACTUAL_MOTION
-    almotion->setBodyAngles(motionCommandAngles);
+    //almotion->setAngles(motionCommandAngles);
 #endif
 
 }
@@ -105,7 +105,7 @@ void ALEnactor::sendHardness(){
             = motionCommandStiffness[joint];
         const string name = JOINT_STRINGS[joint];
 #ifndef NO_ACTUAL_MOTION
-        almotion->setJointStiffness(name ,chainStiffness);
+        //almotion->setStiffness(name ,chainStiffness);
 #endif
     }
 }

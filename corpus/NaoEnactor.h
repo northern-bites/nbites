@@ -3,6 +3,7 @@
 
 #include "dcmproxy.h"
 #include "almemoryproxy.h"
+#include "almemoryfastaccess.h"
 #include "MotionEnactor.h"
 #include "albroker.h"
 #include "alptr.h"
@@ -30,8 +31,8 @@ private: // Constants
 
 private: // Members
     AL::ALPtr<AL::ALBroker> broker;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessJoints;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessJoints;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessSensors;
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;
