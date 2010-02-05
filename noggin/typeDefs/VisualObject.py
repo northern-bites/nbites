@@ -1,3 +1,4 @@
+from .. import NogginConstants as Constants
 
 class VisualObject:
     """VisualObject is a class for all objects that need general vision information
