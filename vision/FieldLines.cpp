@@ -2968,7 +2968,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
                 i->setShape(CIRCLE);
             } else {
                 i->setPossibleCorners(possibleClassifications);
-				identifyLinesInCorner(i);
+				identifyLinesInCorner(*i);
             }
             if (debugIdentifyCorners) {
                 printPossibilities(i->getPossibleCorners());
@@ -3108,6 +3108,11 @@ void FieldLines::printFieldObjectsInformation() {
          i != objs.end(); ++i) {
         cout << *i << endl;
     }
+}
+
+void identifyLinesInCorner(const VisualCorner &corner) {
+
+
 }
 
 // Last sanity checks before localization gets the IDs.  Uses the information

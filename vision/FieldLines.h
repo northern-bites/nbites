@@ -347,6 +347,8 @@ public:
     // prints their string representations
     void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
 
+	void identifyLinesInCorner(const VisualCorner &corner);
+
     // Last sanity checks before localization gets the IDs.  Uses the
     // information
     // about what is visible on the screen to throw out corners that could not
