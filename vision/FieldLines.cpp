@@ -2902,15 +2902,15 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
             ConcreteCorner::getPossibleCorners(i->getShape());
 
         list <const ConcreteCorner*> possibleClassifications =
-            getPossibleClassifications(*i, visibleObjects, possibleCorners);
+            classifyCorners(*i, visibleObjects, possibleCorners);
 
         // T's can sometimes be misclassified as L's, check them if nothing
         // matched (and the geometric tests failed)
 
-        if (!possibleClassifications.empty()) {
-            // Do a final sanity check
-            eliminateImpossibleIDs(*i, visibleObjects, possibleClassifications);
-        }
+        // if (!possibleClassifications.empty()) {
+        //     // Do a final sanity check
+        //     eliminateImpossibleIDs(*i, visibleObjects, possibleClassifications);
+        // }
 
         // Keep it completely abstract
         if (possibleClassifications.empty()) {
@@ -2968,6 +2968,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
                 i->setShape(CIRCLE);
             } else {
                 i->setPossibleCorners(possibleClassifications);
+				identifyLinesInCorner(i);
             }
             if (debugIdentifyCorners) {
                 printPossibilities(i->getPossibleCorners());
@@ -3112,6 +3113,7 @@ void FieldLines::printFieldObjectsInformation() {
 // Last sanity checks before localization gets the IDs.  Uses the information
 // about what is visible on the screen to throw out corners that could not
 // be visible.
+// TODO: Make it do something.
 void FieldLines::eliminateImpossibleIDs(VisualCorner &c,
                                         vector <const VisualFieldObject*>
                                         &visibleObjects,
@@ -3195,8 +3197,7 @@ const bool FieldLines::postOnScreen() const {
 // Given a list of concrete corners that the visual corner could possibly be,
 // weeds out the bad ones based on distances to visible objects and returns
 // those that are still in the running.
-// TODO: rename method.
-list <const ConcreteCorner*> FieldLines::getPossibleClassifications(
+list <const ConcreteCorner*> FieldLines::classifyCorners(
     const VisualCorner &corner,
     const vector <const VisualFieldObject*> &visibleObjects,
     const list <const ConcreteCorner*> &concreteCorners) const {

@@ -389,11 +389,11 @@ public:
                             const int intersectY) const;
 
     std::list <const ConcreteCorner*>
-    getPossibleClassifications(const VisualCorner &corner,
-                               const std::vector <const VisualFieldObject*>
-                               &visibleObjects,
-                               const std::list <const ConcreteCorner*>
-                               &concreteCorners) const;
+    classifyCorners(const VisualCorner &corner,
+					const std::vector <const VisualFieldObject*>
+					&visibleObjects,
+					const std::list <const ConcreteCorner*>
+					&concreteCorners) const;
 
 
     float getAllowedDistanceError(VisualFieldObject const *obj) const;
