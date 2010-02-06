@@ -35,15 +35,15 @@ ADD_DEFINITIONS( -Wno-write-strings )
 
 # Default (no release specific) build flags
 SET( CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -O2 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
+  "${CMAKE_CXX_FLAGS} -O2 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing -march=geode" )
 # Release build flags
 SET( CMAKE_CXX_FLAGS_RELEASE
-  "-O3 -DNDEBUG -Wall -Wconversion -Wno-unused -Wno-strict-aliasing -march=k6-2 -mtune=k6-2" )
+  "-O3 -DNDEBUG -Wall -Wconversion -Wno-unused -Wno-strict-aliasing -march=geode")
 SET( CMAKE_C_FLAGS_RELEASE
   "${CMAKE_CXX_FLAGS_RELEASE}" )
 # Debug build flags
 SET( CMAKE_CXX_FLAGS_DEBUG
-  " -g3 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing -march=k6-2 -mtune=k6-2" )
+  " -g3 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing -march=geode" )
 
 
 

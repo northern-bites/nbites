@@ -9,6 +9,42 @@
 using boost::shared_ptr;
 using namespace AL;
 
+const int ALImageTranscriber::TOP_CAMERA = 0;
+const int ALImageTranscriber::BOTTOM_CAMERA = 1;
+
+// Camera setup information
+const int ALImageTranscriber::CAMERA_SLEEP_TIME = 200;
+const int ALImageTranscriber::CAM_PARAM_RETRIES = 3;
+
+// Default Camera Settings
+// Basic Settings
+const int ALImageTranscriber::DEFAULT_CAMERA_RESOLUTION = 14;
+const int ALImageTranscriber::DEFAULT_CAMERA_FRAMERATE = 30;
+const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
+// Color Settings
+// Gain: 26 / Exp: 83
+// Gain: 28 / Exp: 60
+// Gain: 35 / Exp: 40
+const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 26;
+const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
+const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 128;
+const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 68;
+const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 140;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 64;
+const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 128;
+const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
+// Lens correction
+const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
+const int ALImageTranscriber::DEFAULT_CAMERA_LENSY = 0;
+// Exposure length
+const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
+const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 83;
+// Image orientation
+const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
+const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
+
+
 ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
                                        shared_ptr<Sensors> s,
                                        ALPtr<ALBroker> broker)
