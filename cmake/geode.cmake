@@ -24,7 +24,9 @@ ENDIF( NOT EXISTS ${AL_DIR} )
 
 INCLUDE( CMakeForceCompiler )
 
-SET( OE_PREFIX "i486-linux" )
+SET( OE_PREFIX "i586-linux" )
+SET( STAGING_PREFIX "geode-linux" )
+SET( GCC_VERSION "4.3.3" )
 SET( OE_CROSS_DIR "${AL_DIR}/crosstoolchain" )
 
 SET( CMAKE_CROSSCOMPILING   TRUE  )
@@ -33,7 +35,7 @@ SET( CMAKE_SYSTEM_VERSION   1     )
 SET( CMAKE_SYSTEM_PROCESSOR geode )
 
 SET( X86_BIN_PREFIX "${OE_PREFIX}-" )
-SET( X86_BIN_DIR "${OE_CROSS_DIR}/cross/bin" )
+SET( X86_BIN_DIR "${OE_CROSS_DIR}/cross/geode/bin" )
 
 SET( CMAKE_C_COMPILER "${X86_BIN_DIR}/${X86_BIN_PREFIX}gcc" )
 SET( CMAKE_CXX_COMPILER "${X86_BIN_DIR}/${X86_BIN_PREFIX}g++" )
@@ -49,14 +51,13 @@ SET( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
 ############################# MISC
 # Set other miscellaneous variables
 
-SET( X86_GCCLIB_DIR "${OE_CROSS_DIR}/cross/lib/gcc/${OE_PREFIX}/4.2.2/" )
-SET( X86_GLIBC_DIR "${OE_CROSS_DIR}/cross/${OE_PREFIX}/lib/" )
-SET( X86_LDLINUXSO_DIR "${OE_CROSS_DIR}/staging/${OE_PREFIX}/lib/" )
-SET( X86_INCLUDE_DIR "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include/" )
-#SET( X86_INCLUDE2_DIR "${OE_CROSS_DIR}/staging/${OE_PREFIX}/include/" )
-SET( X86_CPINCLUDE_DIR "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include/c++/" )
-SET( X86_GCPINCLUDE_DIR "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include/c++/${OE_PREFIX}/" )
-SET( X86_GINCLUDE_DIR "${OE_CROSS_DIR}/cross/lib/gcc/${OE_PREFIX}/4.2.2/include/" )
+SET( X86_GCCLIB_DIR "${OE_CROSS_DIR}/cross/geode/lib/gcc/${OE_PREFIX}/${GCC_VERSION}/" )
+SET( X86_GLIBC_DIR "${OE_CROSS_DIR}/cross/geode/${OE_PREFIX}/lib/" )
+SET( X86_LDLINUXSO_DIR "${OE_CROSS_DIR}/staging/${STAGING_PREFIX}/lib/" )
+SET( X86_INCLUDE_DIR "${OE_CROSS_DIR}/staging/${STAGING_PREFIX}/usr/include/" )
+SET( X86_CPINCLUDE_DIR "${OE_CROSS_DIR}/staging/${STAGING_PREFIX}/usr/include/c++/" )
+SET( X86_GCPINCLUDE_DIR "${OE_CROSS_DIR}/staging/${STAGING_PREFIX}/usr/include/c++/${OE_PREFIX}/" )
+SET( X86_GINCLUDE_DIR "${OE_CROSS_DIR}/cross/geode/lib/gcc/${OE_PREFIX}/${GCC_VERSION}/include/" )
 
 SET( X86_CRT "${X86_GCCLIB_DIR}/crtbegin.o ${X86_GCCLIB_DIR}/crtbeginS.o" )
 

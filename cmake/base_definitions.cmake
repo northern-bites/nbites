@@ -23,6 +23,10 @@ IF( NOT EXISTS ${TRUNK_PATH} )
     )
 ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
+IF ( NOT OE_CROSS_BUILD )
+  include("${AL_DIR}/toolchain-pc.cmake")
+ENDIF ( NOT OE_CROSS_BUILD )
+
 
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
@@ -170,4 +174,4 @@ MARK_AS_ADVANCED(
   AL_PERF_CALCULATION
   TINYXML_DEFINITION
   )
-  
+
