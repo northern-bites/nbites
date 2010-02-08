@@ -386,11 +386,13 @@ void Noggin::updateLocalization()
     // model for using them in the EKF.
 
     // Lines
-    // const vector<VisualLine> * lines = vision->fieldLines->getLines();
+    // const vector< shared_ptr<VisualLine> > * lines = vision->fieldLines->getLines();
     // vector <VisualLine>::const_iterator j;
     // for ( j = lines->begin(); j != lines->end(); ++j) {
-    //     Observation seen(*j);
-    //     observations.push_back(seen);
+	// 	if ( !(*j)->getCCLine() ) {
+	// 		Observation seen(**j);
+	// 		observations.push_back(seen);
+	// 	}
     // }
 
     // Process the information
