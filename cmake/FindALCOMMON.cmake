@@ -51,7 +51,7 @@ IF( WIN32 )
 ELSE( WIN32 )
     IF( OE_CROSS_BUILD )
         SET( ALCOMMON_LIBRARIES
-            ${AL_DIR}/lib/libalcommon.so
+            ${OE_CROSS_DIR}/staging/geode-linux/usr/lib/libalcommon.so
         )
     ELSE( OE_CROSS_BUILD )
         IF( APPLE )
