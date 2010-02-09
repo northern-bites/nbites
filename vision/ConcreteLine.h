@@ -2,7 +2,6 @@
 #define ConcreteLine_h_defined
 
 // Forward reference
-//class ConcreteLine;
 #include <ostream>
 #include <list>
 #include <string>
@@ -69,6 +68,9 @@ public: // Constants
     static const int NUM_LINES = 19;
 	static const int NUM_SIDELINES = 4;
 	static const int NUM_GOALBOX_LINES = 6;
+	static const int NUM_T_BAR_LINES = 11;
+	static const int NUM_T_STEM_LINES = 6;
+	static const int NUM_L_LINES = 14;
 
 public:
     // Destructor
@@ -142,6 +144,9 @@ public:
     static const ConcreteLine* concreteLineList[NUM_LINES];
     static const ConcreteLine* sidelineList[NUM_SIDELINES];
     static const ConcreteLine* goalboxLineList[NUM_GOALBOX_LINES];
+	static const ConcreteLine* tBarLineList[NUM_T_BAR_LINES];
+	static const ConcreteLine* tStemLineList[NUM_T_STEM_LINES];
+	static const ConcreteLine* lLineList[NUM_L_LINES];
 
 public:
     static const std::list <const ConcreteLine*> concreteLines;
@@ -149,6 +154,8 @@ public:
 	static const std::list <const ConcreteLine*> sidelines;
 // We'll probably want to define some lists of sidelines vs goalbox lines, etc.
 // This will be implemented in accordance with analysis within fieldlines...
+	static const std::list <const ConcreteLine*> tBarLines;
+	static const std::list <const ConcreteLine*> tStemLines;
 
 private:
     // Instance variables

@@ -51,6 +51,10 @@ public:
 	boost::shared_ptr<VisualLine> getLine1() const { return line1; }
 	boost::shared_ptr<VisualLine> getLine2() const { return line2; }
 
+	std::list<boost::shared_ptr<VisualLine> > getLines() {
+		return lines;
+	}
+
 	boost::shared_ptr<VisualLine> getTBar() const { return tBar; }
 	boost::shared_ptr<VisualLine> getTStem() const { return tStem; }
 
@@ -97,6 +101,7 @@ private:
 
 	boost::shared_ptr<VisualLine> line1;
 	boost::shared_ptr<VisualLine> line2;
+	std::list<boost::shared_ptr<VisualLine> > lines;
 
     // These indicate what distance the corner is from the startpoints of the
     // respective line (1 and 2).
