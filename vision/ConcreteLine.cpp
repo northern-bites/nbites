@@ -278,7 +278,6 @@ const string ConcreteLine::toString() const
 // Functions to guarantee initialization of concretelines
 const ConcreteLine* ConcreteLine::blueGoalTopEndline()
 {
-	ConcreteLine::blue_goalbox_top_line;
 	return &ConcreteLine::blue_goal_top_endline;
 }
 const ConcreteLine* ConcreteLine::blueGoalMidEndline()
