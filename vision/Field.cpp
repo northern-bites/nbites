@@ -429,13 +429,13 @@ void Field::setShot(VisualCrossbar* one, int color)
         point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
         plumbLineTop.x = i; plumbLineTop.y = ly;
         plumbLineBottom.x = i; plumbLineBottom.y = IMAGE_HEIGHT;
-        const vector <VisualLine>* lines = vision->fieldLines->getLines();
+        const vector <boost::shared_ptr<VisualLine> >* lines = vision->fieldLines->getLines();
         crossings = 0;
-        for (vector <VisualLine>::const_iterator k = lines->begin();
+        for (vector < shared_ptr<VisualLine> >::const_iterator k = lines->begin();
              k != lines->end(); k++) {
             pair<int, int> foo = Utility::
                 plumbIntersection(plumbLineTop, plumbLineBottom,
-                                  k->start, k->end);
+                                  (*k)->start, (*k)->end);
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
                 intersections[crossings] = foo.second;
                 crossings++;
@@ -727,7 +727,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
         }
         lastd = (int)d.dist;
     }
-    const vector <VisualLine>* lines = vision->fieldLines->getLines();
+    const vector <boost::shared_ptr<VisualLine> >* lines = vision->fieldLines->getLines();
     for (int x = SCAN_DIVISION; x < IMAGE_WIDTH - 1; x += SCAN_DIVISION) {
         bad = 0; white = 0; grey = 0; run = 0; greyrun = 0;
         open[(int)(x / SCAN_DIVISION)] = horizon;
@@ -737,11 +737,11 @@ void Field::openDirection(int horizon, NaoPose *pose)
         plumbLineTop.x = x; plumbLineTop.y = 0;
         plumbLineBottom.x = x; plumbLineBottom.y = IMAGE_HEIGHT;
         crossings = 0;
-        for (vector <VisualLine>::const_iterator k = lines->begin();
+        for (vector <shared_ptr<VisualLine> >::const_iterator k = lines->begin();
              k != lines->end(); k++) {
             pair<int, int> foo = Utility::
                 plumbIntersection(plumbLineTop, plumbLineBottom,
-                                  k->start, k->end);
+                                  (*k)->start, (*k)->end);
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
                 intersections[crossings] = foo.second;
                 crossings++;

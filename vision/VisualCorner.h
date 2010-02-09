@@ -6,6 +6,7 @@
 
 class VisualCorner;
 
+#include <boost/shared_ptr.hpp>
 #include "VisualLandmark.h"
 #include "VisualDetection.h"
 #include "VisualLine.h"
@@ -25,7 +26,8 @@ private: // Constants
 public:
     VisualCorner(const int _x, const int _y, const float _distance,
                  const float _bearing,
-                 const VisualLine l1, const VisualLine l2, const float _t1,
+                 boost::shared_ptr<VisualLine> l1,
+				 boost::shared_ptr<VisualLine> l2, const float _t1,
                  const float _t2);
     // destructor
     virtual ~VisualCorner();
@@ -46,11 +48,11 @@ public:
     ////////////////////////////////////////////////////////////
     const std::list <const ConcreteCorner *> getPossibleCorners() const {
         return possibleCorners; }
-    const VisualLine getLine1() const { return line1; }
-    const VisualLine getLine2() const { return line2; }
+	boost::shared_ptr<VisualLine> getLine1() const { return line1; }
+	boost::shared_ptr<VisualLine> getLine2() const { return line2; }
 
-    const VisualLine getTBar() const { return tBar; }
-    const VisualLine getTStem() const { return tStem; }
+	boost::shared_ptr<VisualLine> getTBar() const { return tBar; }
+	boost::shared_ptr<VisualLine> getTStem() const { return tStem; }
 
     // See FieldLines.cc intersectLines to see how this is calculated and used
     const float getT1() const { return t1; }
@@ -68,8 +70,8 @@ public:
     void setPossibleCorners(std::list <const ConcreteCorner *> _possibleCorners)
         { possibleCorners = _possibleCorners; }
     void setShape(const shape s) { cornerType = s; }
-    void setLine1(const VisualLine l1) { line1 = l1; }
-    void setLine2(const VisualLine l2) { line2 = l2; }
+    void setLine1(boost::shared_ptr<VisualLine> l1) { line1 = l1; }
+    void setLine2(boost::shared_ptr<VisualLine> l2) { line2 = l2; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     void setID(cornerID _id) { id = _id; }
@@ -93,16 +95,16 @@ private:
     std::list <const ConcreteCorner *> possibleCorners;
     shape cornerType;
 
-    VisualLine line1;
-    VisualLine line2;
+	boost::shared_ptr<VisualLine> line1;
+	boost::shared_ptr<VisualLine> line2;
 
     // These indicate what distance the corner is from the startpoints of the
     // respective line (1 and 2).
     float t1, t2;
 
     // Will not mean much unless the corner is actually a T
-    VisualLine tBar;
-    VisualLine tStem;
+    boost::shared_ptr<VisualLine> tBar;
+	boost::shared_ptr<VisualLine> tStem;
 
     // The angle between the two lines whose intersection creates this corner.
     // In the case of a T corner, we report the smaller angle (the second

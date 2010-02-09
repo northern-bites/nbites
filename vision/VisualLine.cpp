@@ -161,8 +161,8 @@ void VisualLine::init()
         }
     }
 
-    angle = getAngle(*this);
-    length = getLength(*this);
+    angle = getAngle();
+    length = getLength();
 
     calculateWidths();
 }
@@ -234,32 +234,32 @@ void VisualLine::calculateWidths()
 }
 
 
-const float VisualLine::getLength(const VisualLine& line)
+const float VisualLine::getLength()
 {
-    return Utility::getLength( static_cast<float>(line.start.x),
-							   static_cast<float>(line.start.y),
-                               static_cast<float>(line.end.x),
-							   static_cast<float>(line.end.y) );
+    return Utility::getLength( static_cast<float>(start.x),
+							   static_cast<float>(start.y),
+                               static_cast<float>(end.x),
+							   static_cast<float>(end.y) );
 }
 
 // Get the angle from horizontal (in degrees) the line makes on the screen
-const float VisualLine::getAngle(const VisualLine& line)
+const float VisualLine::getAngle()
 {
-    return Utility::getAngle(line.start.x, line.start.y,
-                             line.end.x, line.end.y);
+    return Utility::getAngle(start.x, start.y,
+                             end.x, end.y);
 }
 
 // We define a line to be vertically oriented if the change in y is bigger
 // than the change in x
-const bool VisualLine::isVerticallyOriented(const VisualLine& line)
+const bool VisualLine::isVerticallyOriented()
 {
-    return line.right - line.left < line.bottom - line.top;
+    return right - left < bottom - top;
 }
 
 
-const bool VisualLine::isPerfectlyVertical(const VisualLine& line)
+const bool VisualLine::isPerfectlyVertical()
 {
-    return line.right == line.left;
+    return right == left;
 }
 
 // Return the slope of the line (returns NAN if vertical)

@@ -101,9 +101,9 @@ public:
     const float getSlope() const;
 
     // Returns true if the line is more vertical on the screen than horizontal
-    static const bool isVerticallyOriented(const VisualLine& line);
+	const bool isVerticallyOriented();
 
-    static const bool isPerfectlyVertical(const VisualLine& line);
+	const bool isPerfectlyVertical();
 
     // Given a line, returns (a, b) where the line can be represented by
     // ai + bj (i being the unit vector parallel to the x axis, j being
@@ -137,8 +137,8 @@ private: // Member functions
     void init();
     void calculateWidths();
 
-    static inline const float getLength(const VisualLine& line);
-    static inline const float getAngle(const VisualLine& line);
+	inline const float getLength();
+	inline const float getAngle();
 
 
 
