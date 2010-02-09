@@ -48,7 +48,7 @@ public:
 	int getRightBottomX() {return rightBottom.x;}
 	int getRightBottomY() {return rightBottom.y;}
 	int getLeft() {return min(leftTop.x, leftBottom.x);}
-	int getRight() {return max(rightTop.x, rightTop.x);}
+	int getRight() {return max(rightTop.x, rightBottom.x);}
 	int getTop() {return min(leftTop.y, rightTop.y);}
 	int getBottom() {return max(leftBottom.y, rightBottom.y);}
 	int width();

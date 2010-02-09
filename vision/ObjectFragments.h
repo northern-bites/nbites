@@ -35,6 +35,7 @@ class ObjectFragments; // forward reference
 #include "ConcreteFieldObject.h"
 #include "VisualBall.h"
 #include "Vision.h"
+#include "Field.h"
 
 static const int MAX_BLOBS = 400;
 static const int MAX_POINTS = 100;
@@ -42,7 +43,7 @@ static const int MAX_POINTS = 100;
 
 class ObjectFragments {
 public:
-    ObjectFragments(Vision* vis, Threshold* thr, int _color);
+    ObjectFragments(Vision* vis, Threshold* thr, Field* fie, int _color);
     virtual ~ObjectFragments() {}
 
     // SETTERS
@@ -78,34 +79,32 @@ public:
     float correct(Blob b, int c, int c2);
 
     // main method
-    void createObject(int c);
+    void createObject();
 
     // miscelaneous goal processing  methods
     bool qualityPost(Blob b, int c);
     bool checkSize(Blob b, int c);
-    int getBigRun(int left, int right, int hor);
+    int getBigRun(int left, int right);
     bool updateObject(VisualFieldObject* a, Blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
-    distanceCertainty checkDist(int left, int right, int top, int bottom,
-								Blob pole);
+    distanceCertainty checkDist(Blob pole);
 
     // post recognition routines
     int classifyByCrossbar(Blob b);
-    int classifyByOtherRuns(int left, int right, int height, int horizon);
+    int classifyByOtherRuns(int left, int right, int height);
     int classifyByLineIntersection(Blob b);
     int classifyByCheckingCorners(Blob b);
 
     int characterizeSize(Blob b);
 
-    int classifyFirstPost(int horizon, int c, int c2,
+    int classifyFirstPost(int c, int c2,
                           VisualFieldObject* left, VisualFieldObject* right,
                           VisualCrossbar* mid, Blob pole);
 
     // the big kahuna
     void goalScan(VisualFieldObject *left, VisualFieldObject *right,
-                  VisualCrossbar *mid, int c, int c2,
-                  int horizon);
-    int grabPost(int c, int c2, int horizon, int left, int right, Blob & pole);
+                  VisualCrossbar *mid, int c, int c2);
+    int grabPost(int c, int c2, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
                          distanceCertainty dc);
@@ -115,12 +114,12 @@ public:
     bool postBigEnough(Blob b);
     bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
                          int bottom, int top);
-    bool horizonTopOk(int top, int hor);
     bool postRatiosOk(float ratio);
     bool secondPostFarEnough(point <int> l1, point <int> r1,
                              point <int> l2, point <int> r2, int p);
     bool blobOk(Blob b);
-    bool locationOk(Blob b, int hor);
+	bool badDistance(Blob b);
+    bool locationOk(Blob b);
     bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
 
     // misc.
@@ -145,6 +144,7 @@ private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
+	Field* field;
 
     int color;
     int runsize;

@@ -19,8 +19,8 @@
 
 
 /*
- * This is where we do all major ball related processing.  For now we
- * still do run length encoding to find candidate balls.
+ * This is where we do all field cross processing.
+ * 
 */
 
 #include <iostream>
@@ -35,8 +35,8 @@ static bool CROSSDEBUG = false;
 static bool CROSSDEBUG = false;
 #endif
 
-Cross::Cross(Vision* vis, Threshold* thr)
-    : vision(vis), thresh(thr)
+Cross::Cross(Vision* vis, Threshold* thr, Field* fie)
+    : vision(vis), thresh(thr), field(fie)
 {
 	const int MAX_CROSS_RUNS = 400;
 	blobs = new Blobs(MAX_CROSS_RUNS);
@@ -59,8 +59,8 @@ void Cross::init()
 void Cross::createObject() {
 	// TODO:  These were thrown together in an hour.  They should
 	// be more rigorously determined
-	const int maxWidth = 55;
-	const int maxHeight = 55;
+	const int maxWidth = 75;
+	const int maxHeight = 75;
 	const int minWidth = 5;
 	const int minHeight = 5;
 	const int maxRatio = 5;
@@ -81,6 +81,10 @@ void Cross::createObject() {
 	// basic size
 	for (int i = 0; i < blobs->number(); i++) {
 		Blob candidate = blobs->get(i);
+		if (CROSSDEBUG) {
+			cout << "Blob " << candidate.width() << " " << candidate.height() << endl;
+			cout << "Coords " << candidate.getLeft() << " " << candidate.getTop() << endl;
+		}
 		if (candidate.width() < maxWidth && candidate.height() < maxHeight &&
 			candidate.width() > minWidth && candidate.height() > minHeight &&
 			candidate.width() < maxRatio * candidate.height()  &&
@@ -143,6 +147,16 @@ void Cross::checkForX(Blob b) {
 			counter++;
 		} else return;
 	}
+
+	if (CROSSDEBUG) {
+		cout << "Have a candidate white blob " << x << " " << y << endl;
+	}
+
+	const int HORIZONCHECK = 15;
+	// make sure we aren't too close to the horizon
+	if (y - HORIZONCHECK < field->horizonAt(x) && field->horizonAt(x) > 0) return;
+	if (y - HORIZONCHECK < field->horizonAt(x+w) && field->horizonAt(x+w) > 0) return;
+
 	// if we pass the basic threshold then make sure it isn't a line
 	if (count > (float)counter * greenThreshold) {
 		// first make sure this isn't really a line

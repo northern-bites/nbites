@@ -78,8 +78,8 @@ static const bool DEBUGBALLPOINTS = false;
 //previous constants inserted from .h class
 
 
-Ball::Ball(Vision* vis, Threshold* thr, int _color)
-    : vision(vis), thresh(thr), color(_color), runsize(1)
+Ball::Ball(Vision* vis, Threshold* thr, Field* fie, int _color)
+    : vision(vis), thresh(thr), field(fie), color(_color), runsize(1)
 {
 	blobs = new Blobs(MAX_BALLS);
     init(0.0);
@@ -316,7 +316,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 		h = topBlob->height();
 		const float BALL_REAL_HEIGHT = 8.6f;
 
-		e = vision->pose->pixEstimate((topBlob->getLeftTopX() + w) / 2,
+		e = vision->pose->pixEstimate(topBlob->getLeftTopX() + (w / 2),
 									  topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
 									  BALL_REAL_HEIGHT);
 
@@ -700,8 +700,7 @@ void Ball::horizontalScan(int x, int y, int dir, int stopper, int c,
 }
 
 int Ball::horizonAt(int x) {
-	// projection code lifted from version in ObjectFragments
-	return thresh->getVisionHorizon() + ROUND2(slope * (float)(x));
+	return field->horizonAt(x);
 }
 
 

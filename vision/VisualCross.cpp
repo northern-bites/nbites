@@ -72,6 +72,24 @@ void VisualCross::updateCross(Blob *b)
 }
 
 /**
+ */
+void VisualCross::setID(crossID _id) {
+	switch (_id) {
+    case BLUE_GOAL_CROSS:
+		setPossibleCrosses(&ConcreteCross::blueGoalCrossList);
+		id = BLUE_GOAL_CROSS;
+		break;
+    case YELLOW_GOAL_CROSS:
+		setPossibleCrosses(&ConcreteCross::yellowGoalCrossList);
+		id = YELLOW_GOAL_CROSS;
+		break;
+	default:
+		id = ABSTRACT_CROSS;
+    }
+
+}
+
+/**
  * Calculate and set the standard deviation for the distance measurement.
  * Set the distance measurement.
  *

@@ -572,7 +572,7 @@ PyObject* PyGameController_get (PyGameController* self, void* closure)
         result = PyInt_FromLong(self->_gc->gameSecondaryState());
         break;
 
-    }
+	}
     Py_END_ALLOW_THREADS;
 
     return result;
@@ -640,7 +640,7 @@ int PyGameController_set (PyGameController* self, PyObject* value, void* closure
         }else
             self->_gc->setPenalty(static_cast<GCPenalty>(tmp));
         break;
-    }
+		}
     Py_END_ALLOW_THREADS;
 
     return result;
