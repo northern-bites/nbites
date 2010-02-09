@@ -97,8 +97,29 @@ public:
     const float getFieldX2() const { return fieldX2; }
     const float getFieldY2() const { return fieldY2; }
 
+	static const ConcreteLine* blueGoalTopEndline();
+	static const ConcreteLine* blueGoalMidEndline();
+	static const ConcreteLine* blueGoalBottomEndline();
+	static const ConcreteLine* yellowGoalTopEndline();
+	static const ConcreteLine* yellowGoalMidEndline();
+	static const ConcreteLine* yellowGoalBottomEndline();
+	static const ConcreteLine* blueGoalTopSideline();
+	static const ConcreteLine* yellowGoalTopSideline();
+	static const ConcreteLine* blueGoalBottomSideline();
+	static const ConcreteLine* yellowGoalBottomSideline();
+	static const ConcreteLine* blueGoalboxTopLine();
+	static const ConcreteLine* blueGoalboxLeftLine();
+	static const ConcreteLine* blueGoalboxRightLine();
+	static const ConcreteLine* yellowGoalboxTopLine();
+	static const ConcreteLine* yellowGoalboxLeftLine();
+	static const ConcreteLine* yellowGoalboxRightLine();
+	static const ConcreteLine* topMidline();
+	static const ConcreteLine* centerMidline();
+	static const ConcreteLine* bottomMidline();
+
 public:
-    static const ConcreteLine blue_goal_top_endline,
+    static const ConcreteLine
+	blue_goal_top_endline,
 					blue_goal_mid_endline,
 					blue_goal_bottom_endline,
 					yellow_goal_top_endline,
@@ -137,3 +158,7 @@ private:
 }; // class ConcreteLine
 
 #endif // ConcreteLine_h_defined
+
+
+
+

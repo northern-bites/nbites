@@ -274,3 +274,83 @@ const string ConcreteLine::toString() const
         return "Invalid Line ID";
 	};
 }
+
+// Functions to guarantee initialization of concretelines
+const ConcreteLine* ConcreteLine::blueGoalTopEndline()
+{
+	ConcreteLine::blue_goalbox_top_line;
+	return &ConcreteLine::blue_goal_top_endline;
+}
+const ConcreteLine* ConcreteLine::blueGoalMidEndline()
+{
+	return &ConcreteLine::blue_goal_mid_endline;
+}
+const ConcreteLine* ConcreteLine::blueGoalBottomEndline()
+{
+	return &ConcreteLine::blue_goal_bottom_endline;
+}
+const ConcreteLine* ConcreteLine::yellowGoalTopEndline()
+{
+	return &ConcreteLine::yellow_goal_top_endline;
+}
+const ConcreteLine* ConcreteLine::yellowGoalMidEndline()
+{
+	return &ConcreteLine::yellow_goal_mid_endline;
+}
+const ConcreteLine* ConcreteLine::yellowGoalBottomEndline()
+{
+	return &ConcreteLine::yellow_goal_bottom_endline;
+}
+const ConcreteLine* ConcreteLine::blueGoalTopSideline()
+{
+	return &ConcreteLine::blue_goal_top_sideline;
+}
+const ConcreteLine* ConcreteLine::yellowGoalTopSideline()
+{
+	return &ConcreteLine::yellow_goal_top_sideline;
+}
+const ConcreteLine* ConcreteLine::blueGoalBottomSideline()
+{
+	return &ConcreteLine::blue_goal_bottom_sideline;
+}
+const ConcreteLine* ConcreteLine::yellowGoalBottomSideline()
+{
+	return &ConcreteLine::yellow_goal_bottom_sideline;
+}
+const ConcreteLine* ConcreteLine::blueGoalboxTopLine()
+{
+	return &ConcreteLine::blue_goalbox_top_line;
+}
+const ConcreteLine* ConcreteLine::blueGoalboxLeftLine()
+{
+	return &ConcreteLine::blue_goalbox_left_line;
+}
+const ConcreteLine* ConcreteLine::blueGoalboxRightLine()
+{
+	return &ConcreteLine::blue_goalbox_right_line;
+}
+const ConcreteLine* ConcreteLine::yellowGoalboxTopLine()
+{
+	return &ConcreteLine::yellow_goalbox_top_line;
+}
+const ConcreteLine* ConcreteLine::yellowGoalboxLeftLine()
+{
+	return &ConcreteLine::yellow_goalbox_left_line;
+}
+const ConcreteLine* ConcreteLine::yellowGoalboxRightLine()
+{
+	return &ConcreteLine::yellow_goalbox_right_line;
+}
+
+const ConcreteLine* ConcreteLine::topMidline()
+{
+	return &ConcreteLine::top_midline;
+}
+const ConcreteLine* ConcreteLine::centerMidline()
+{
+	return &ConcreteLine::center_midline;
+}
+const ConcreteLine* ConcreteLine::bottomMidline()
+{
+	return &ConcreteLine::bottom_midline;
+}

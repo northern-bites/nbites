@@ -70,8 +70,11 @@ class ConcreteCorner : public ConcreteLandmark {
 private:
     ConcreteCorner(const float fieldX, const float fieldY, const cornerID _id);
     ConcreteCorner(const float _fieldX, const float _fieldY,
-                   const ConcreteLine _l1, const ConcreteLine _l2,
+                   const ConcreteLine* _l1, const ConcreteLine* _l2,
                    const cornerID _id);
+    ConcreteCorner(const float _fieldX, const float _fieldY,
+                   const ConcreteLine* _l1, const ConcreteLine* _l2,
+                   const ConcreteLine* _l3, const cornerID _id);
 
     // copy constructor
     ConcreteCorner(const ConcreteCorner&);
@@ -159,9 +162,6 @@ public:
     static const std::list <const ConcreteCorner*> yellowGoalCorners;
     static const std::list <const ConcreteCorner*> blueGoalCorners;
 
-    static const std::list <const ConcreteCorner*> yellowArcCorners;
-    static const std::list <const ConcreteCorner*> blueArcCorners;
-
     static const std::list <const ConcreteCorner*> yellowGoalTCorners;
     static const std::list <const ConcreteCorner*> blueGoalTCorners;
 
@@ -171,6 +171,8 @@ private: // Instance variables recording location on field and identifier
 
     const ConcreteLine * line1;
     const ConcreteLine * line2;
+    const ConcreteLine * line3;
+
 };
 
 class CornerOfField : public std::unary_function<const ConcreteCorner*, bool> {
