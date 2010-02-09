@@ -295,6 +295,8 @@ public:
     const int findEdgeFromMiddleOfLine(int x, int y, int maxPixelsToSearch,
                                        TestDirection dir) const;
 
+	void removeDuplicateLines();
+
     // Pairwise tests each line on the screen against each other, calculates
     // where the intersection occurs, and then subjects the intersection
     // to a battery of sanity checks before determining that the intersection
@@ -641,14 +643,6 @@ private:
     std::vector <boost::shared_ptr<VisualLine> > linesList;
     std::list <VisualCorner> cornersList;
     std::list <linePoint> unusedPointsList;
-
-    long timeInFindVerticalLinePoints, timeInFindHorizontalLinePoints,
-        timeInSort, timeInMerge, timeInCreateLines, timeInExtendLines,
-        timeInIntersectLines, timeInCenterCircleScan, timeInIdentifyCorners,
-        timeInJoinLines, timeInFitUnusedPoints;
-
-    long timeInPercentColorBetween, timeInGetAngle, timeInVisualLineCreation;
-    int numFrames;
 
 private:
 
