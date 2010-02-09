@@ -2,15 +2,13 @@
 #define ConcreteLine_h_defined
 
 // Forward reference
-class ConcreteLine;
+//class ConcreteLine;
 #include <ostream>
 #include <list>
 #include <string>
 
 // Includes
 #include "FieldConstants.h"
-
-class ConcreteLine; // Forward reference
 
 // Line ID values
 enum lineID {
@@ -80,6 +78,11 @@ public:
     {
         return o << c.toString();
     }
+
+	// Define equality to be if the ID's are equal.
+	bool operator== (const ConcreteLine &secondLine) const {
+		return getID() == secondLine.getID();
+	}
 
 
     ////////////////////////////////////////////////////////////

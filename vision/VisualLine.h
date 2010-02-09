@@ -208,9 +208,6 @@ public:
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     void setCCLine(bool _ccLine) { ccLine = _ccLine; }
-    void setPossibleLines(std::list <const ConcreteLine*> _possibles) {
-        possibleLines = _possibles;
-    }
-
+    void setPossibleLines(std::list <const ConcreteLine*> _possibles);
 };
 #endif

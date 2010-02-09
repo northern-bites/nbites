@@ -357,3 +357,30 @@ void VisualLine::setBearingWithSD(float _bearing)
     setBearingSD(lineBearingToSD(_bearing));
 }
 
+/**
+ * Takes the intersection of the current possible line list
+ * and the given possibilities to narrow down the choices.
+ * The idea is that every new list of possible lines cuts out
+ * more impossible lines and shrinks the available set.
+ */
+void VisualLine::setPossibleLines(std::list <const ConcreteLine*> newPossiblities)
+{
+	list<const ConcreteLine*> updated(0);
+
+	for (list<const ConcreteLine*>::iterator
+			 currLine = possibleLines.begin();
+		 currLine != possibleLines.end(); currLine++) {
+
+		for ( list<const ConcreteLine*>::iterator
+				  newLine = newPossiblities.begin();
+			  newLine != newPossiblities.begin(); newLine++) {
+
+			// If the line is in both sets
+			if (newLine == currLine) {
+				updated.push_back(*newLine);
+				newPossiblities.erase(newLine);
+			}
+		}
+	}
+	possibleLines = updated;
+}
