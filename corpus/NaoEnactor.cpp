@@ -71,18 +71,28 @@ void NaoEnactor::sendCommands(){
 
 }
 
-void NaoEnactor::sendJoints() {
-    // Get the angles we want to go to this frame from the switchboard
-    motionValues = switchboard->getNextJoints();
-
+void NaoEnactor::sendJoints()
+{
     // Send the array with a 25 ms delay. This delay removes the jitter.
     // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
     // a value in between that works though. Will look into it.
     joint_command[4][0] = dcmProxy->getTime(20);
+
+    // Get the angles we want to go to this frame from the switchboard
+    motionValues = switchboard->getNextJoints();
+
+    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++)
+    {
+        joint_command[5][i][0] = motionValues[i];
+    }
+
 #ifndef NO_ACTUAL_MOTION
-    try {
+    try
+    {
         dcmProxy->setAlias(joint_command);
-    } catch(AL::ALError& a) {
+    }
+    catch(AL::ALError& a)
+    {
         std::cout << "dcm value set error " << a.toString() << std::endl;
     }
 #endif
@@ -96,8 +106,8 @@ void NaoEnactor::sendHardness(){
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
         static float hardness =0.0f;
-        if (hardness != -1.0f) //-1: yet to be implemented by AL decoupled mode
-            hardness = NBMath::clip(motionHardness[i],0.0f,1.0f);
+        //if (hardness != -1.0f) //-1: yet to be implemented by AL decoupled mode
+        hardness = NBMath::clip(motionHardness[i], -1.0f, 1.0f);
 
         //sets the value for hardness
         //hardness_command[5][i].arraySetSize(1);
