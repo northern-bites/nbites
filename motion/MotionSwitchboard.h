@@ -106,6 +106,11 @@ private:
     void processJoints();
     void processStiffness();
     int  postProcess();
+    void preProcessHead();
+    void preProcessBody();
+    void processHeadJoints();
+    void processBodyJoints();
+    void clipHeadJoints(vector<float>& joints);
     void swapBodyProvider();
     void swapHeadProvider();
     int realityCheckJoints();
