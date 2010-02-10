@@ -29,9 +29,7 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
                        AL::ALPtr<AL::ALBroker> _pbroker)
     : MotionEnactor(), broker(_pbroker), sensors(s),
       transcriber(t),
-      jointValues(Kinematics::NUM_JOINTS,0.0f),  // current values of joints
       motionValues(Kinematics::NUM_JOINTS,0.0f),  // commands sent to joints
-      lastMotionCommandAngles(Kinematics::NUM_JOINTS,0.0f),
       lastMotionHardness(Kinematics::NUM_JOINTS,0.0f)
 
 {
@@ -44,10 +42,6 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
 
     initDCMAliases();
     initDCMCommands();
-
-    //Assumes the constructor of the Transcriber is updating these
-    //before this constructor is called
-    lastMotionCommandAngles = sensors->getMotionBodyAngles();
 
     // connect to dcm using the static methods declared above
     broker->getProxy("DCM")->getModule()->onPostProcess()
@@ -178,6 +172,8 @@ void NaoEnactor::postSensors(){
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
+
+    //TODO figure out if this is necessary since its done in switchboard
     sensors->setMotionBodyAngles(motionValues);
     transcriber->postMotionSensors();
 

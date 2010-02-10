@@ -35,9 +35,7 @@ private: // Members
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;
-    std::vector<float> jointValues;
     std::vector<float> motionValues;
-    std::vector<float> lastMotionCommandAngles;
     std::vector<float> motionHardness;
     std::vector<float> lastMotionHardness;
     AL::ALValue hardness_command;
