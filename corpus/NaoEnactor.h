@@ -51,7 +51,6 @@ private: // Helper methods
     void sendJoints();
     void sendUltraSound();
 
-    float SafetyCheck(float,float,float, int);
     void initDCMAliases();
     void initDCMCommands();
 };

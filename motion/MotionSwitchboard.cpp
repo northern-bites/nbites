@@ -32,13 +32,14 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
 	  nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
       nextHeadProvider(&nullHeadProvider),
-      nextJoints(s->getBodyAngles()),
+      sensorAngles(s->getBodyAngles()),
+      nextJoints(sensorAngles),
       nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
+      lastJoints(sensorAngles),
 	  running(false),
       newJoints(false),
       readyToSend(false),
       noWalkTransitionCommand(true)
-
 {
 
     //Allow safe access to the next joints
@@ -162,6 +163,7 @@ void MotionSwitchboard::processJoints()
 {
     processHeadJoints();
     processBodyJoints();
+    safetyCheckJoints();
 }
 
 /**
@@ -343,54 +345,6 @@ void MotionSwitchboard::processBodyJoints()
 #endif
 }
 
-void MotionSwitchboard::clipHeadJoints(vector<float>& joints)
-{
-    float yaw = fabs(joints[HEAD_YAW]);
-    float pitch = joints[HEAD_PITCH];
-
-    if (yaw < 0.5f)
-    {
-        if (pitch > 0.46)
-        {
-            pitch = 0.46f;
-        }
-    }
-
-    else if (yaw < 1.0f)
-    {
-        if (pitch > 0.4f)
-        {
-            pitch = 0.4f;
-        }
-    }
-
-    else if (yaw < 1.32f)
-    {
-        if (pitch > 0.42f)
-        {
-            pitch = 0.42f;
-        }
-    }
-
-    else if (yaw < 1.57f)
-    {
-        if (pitch > -0.2f)
-        {
-            pitch = -0.2f;
-        }
-    }
-
-    else if (yaw >= 1.57f)
-    {
-        if (pitch > -0.3f)
-        {
-            pitch = -0.3f;
-        }
-    }
-
-    joints[HEAD_PITCH] = pitch;
-}
-
 void MotionSwitchboard::preProcessHead()
 {
     if (curProvider != &nullHeadProvider &&
@@ -440,6 +394,87 @@ void MotionSwitchboard::preProcessBody()
             curProvider->requestStop();
         }
 	}
+}
+
+void MotionSwitchboard::clipHeadJoints(vector<float>& joints)
+{
+    float yaw = fabs(joints[HEAD_YAW]);
+    float pitch = joints[HEAD_PITCH];
+
+    if (yaw < 0.5f)
+    {
+        if (pitch > 0.46)
+        {
+            pitch = 0.46f;
+        }
+    }
+
+    else if (yaw < 1.0f)
+    {
+        if (pitch > 0.4f)
+        {
+            pitch = 0.4f;
+        }
+    }
+
+    else if (yaw < 1.32f)
+    {
+        if (pitch > 0.42f)
+        {
+            pitch = 0.42f;
+        }
+    }
+
+    else if (yaw < 1.57f)
+    {
+        if (pitch > -0.2f)
+        {
+            pitch = -0.2f;
+        }
+    }
+
+    else if (yaw >= 1.57f)
+    {
+        if (pitch > -0.3f)
+        {
+            pitch = -0.3f;
+        }
+    }
+
+    joints[HEAD_PITCH] = pitch;
+}
+
+void MotionSwitchboard::safetyCheckJoints()
+{
+    for (unsigned int i = 0; i < NUM_JOINTS; i++)
+    {
+        //We need to clip angles twice. Why? Because the sensor values are between
+        //20 and 40 ms old, so we can't strictly use the sensor reports to clip
+        // the velocity.
+        //We also can't just use the internaly held motion angles because these
+        // could be out of sync with reality, and thus allow us to send bad
+        // commands.
+        //As a balance, we clip both with respect to sensor readings which we
+        //ASSUME are 40 ms old (even if they are newer), AND we clip with respect
+        //to the internally held motion command angles, which ensures that we
+        //aren't sending commands which are in general too fast for the motors.
+        //For the sensor angles, we clip with TWICE the max speed.
+
+        const float allowedMotionDiffInRad = jointsMaxVelNoLoad[i];
+        const float allowedSensorDiffInRad = allowedMotionDiffInRad*6.0f;
+
+        //considering checking which clip is more restrictive each frame and
+        //only applying it
+        nextJoints[i] = NBMath::clip(nextJoints[i],
+                                     lastJoints[i] - allowedMotionDiffInRad,
+                                     lastJoints[i] + allowedMotionDiffInRad);
+
+        nextJoints[i] = NBMath::clip(nextJoints[i],
+                                     sensorAngles[i] - allowedSensorDiffInRad,
+                                     sensorAngles[i] + allowedSensorDiffInRad);
+
+        lastJoints[i] = nextJoints[i];
+    }
 }
 
 /**
@@ -535,7 +570,7 @@ int MotionSwitchboard::realityCheckJoints(){
     static const float head_joint_override_thresh = 0.3f;//need diff for head
 
     int changed = 0;
-    vector<float> sensorAngles = sensors->getBodyAngles();
+    sensorAngles = sensors->getBodyAngles();
     vector<float> motionAngles = sensors->getMotionBodyAngles();
 
     //HEAD ANGLES - handled separately to avoid trouble in HeadProvider
