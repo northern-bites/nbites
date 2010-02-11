@@ -16,7 +16,7 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-      possibleLines(ConcreteLine::concreteLines)
+      possibleLines(ConcreteLine::concreteLines())
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
          i != nodes.end(); i++) {
@@ -27,14 +27,14 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
 }
 
 VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-                           possibleLines(ConcreteLine::concreteLines)
+                           possibleLines(ConcreteLine::concreteLines())
 {
 
 }
 
 VisualLine::VisualLine(float _dist, float _bearing) :
 	VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-	possibleLines(ConcreteLine::concreteLines)
+	possibleLines(ConcreteLine::concreteLines())
 {
 	setDistanceWithSD(_dist);
 	setBearingWithSD(_bearing);
@@ -46,7 +46,7 @@ VisualLine::VisualLine(float _dist, float _bearing) :
 
 VisualLine::VisualLine(list<linePoint> &linePoints)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-      possibleLines(ConcreteLine::concreteLines)
+      possibleLines(ConcreteLine::concreteLines())
 {
     for (list<linePoint>::iterator i = linePoints.begin();
          i != linePoints.end(); i++) {
@@ -72,7 +72,7 @@ VisualLine::VisualLine(const VisualLine& other)
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
-      possibleLines(ConcreteLine::concreteLines)
+      possibleLines(ConcreteLine::concreteLines())
 {
 }
 
@@ -363,15 +363,16 @@ void VisualLine::setBearingWithSD(float _bearing)
  * The idea is that every new list of possible lines cuts out
  * more impossible lines and shrinks the available set.
  */
-void VisualLine::setPossibleLines(std::list <const ConcreteLine*> newPossiblities)
+void VisualLine::
+setPossibleLines( vector <const ConcreteLine*> newPossiblities)
 {
-	list<const ConcreteLine*> updated(0);
+	vector<const ConcreteLine*> updated(0);
 
-	for (list<const ConcreteLine*>::iterator
+	for (vector<const ConcreteLine*>::iterator
 			 currLine = possibleLines.begin();
 		 currLine != possibleLines.end(); currLine++) {
 
-		for ( list<const ConcreteLine*>::iterator
+		for ( vector<const ConcreteLine*>::iterator
 				  newLine = newPossiblities.begin();
 			  newLine != newPossiblities.begin(); newLine++) {
 

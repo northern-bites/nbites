@@ -3,6 +3,7 @@
 
 #include <iomanip>
 #include <cstdlib>
+#include <vector>
 
 class VisualCorner;
 
@@ -51,7 +52,8 @@ public:
 	boost::shared_ptr<VisualLine> getLine1() const { return line1; }
 	boost::shared_ptr<VisualLine> getLine2() const { return line2; }
 
-	std::list<boost::shared_ptr<VisualLine> > getLines() {
+	void identifyLinesInCorner();
+	std::vector<boost::shared_ptr<VisualLine> > getLines() {
 		return lines;
 	}
 
@@ -82,9 +84,12 @@ public:
 
 
 private: // private methods
-    void determineCornerShape(); // called on object instantiation
     const shape getLClassification();
+
     void determineCornerIDFromShape();
+    void determineCornerShape(); // called on object instantiation
+
+
     inline float cornerDistanceToSD(float _distance) {
         return sqrt(2.0f * std::max(10 + _distance*0.00125f, 250.0f));
     }
@@ -101,7 +106,7 @@ private:
 
 	boost::shared_ptr<VisualLine> line1;
 	boost::shared_ptr<VisualLine> line2;
-	std::list<boost::shared_ptr<VisualLine> > lines;
+	std::vector<boost::shared_ptr<VisualLine> > lines;
 
     // These indicate what distance the corner is from the startpoints of the
     // respective line (1 and 2).

@@ -382,14 +382,12 @@ void Noggin::updateLocalization()
 #       endif
     }
 
-    // We currently have lines turned off for localization, since we have no
-    // model for using them in the EKF.
-
     // Lines
-    // const vector< shared_ptr<VisualLine> > * lines = vision->fieldLines->getLines();
-    // vector <VisualLine>::const_iterator j;
+	// const vector< shared_ptr<VisualLine> > * lines = vision->fieldLines->getLines();
+    // vector <shared_ptr<VisualLine> >::const_iterator j;
     // for ( j = lines->begin(); j != lines->end(); ++j) {
-	// 	if ( !(*j)->getCCLine() ) {
+	// 	if ( !(*j)->getCCLine() &&
+	// 		 (*j)->getPossibleLines().size() < ConcreteLine::NUM_LINES) {
 	// 		Observation seen(**j);
 	// 		observations.push_back(seen);
 	// 	}

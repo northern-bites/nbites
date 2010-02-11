@@ -3,7 +3,7 @@
 
 // Forward reference
 #include <ostream>
-#include <list>
+#include <vector>
 #include <string>
 
 // Includes
@@ -24,32 +24,21 @@ enum lineID {
 	// Named by looking from center field out, left end is at the blue goal
 
 	// Endlines
-    BLUE_GOAL_TOP_ENDLINE,
-    BLUE_GOAL_MID_ENDLINE,
-    BLUE_GOAL_BOTTOM_ENDLINE,
-    YELLOW_GOAL_TOP_ENDLINE,	// 60
-    YELLOW_GOAL_MID_ENDLINE,
-    YELLOW_GOAL_BOTTOM_ENDLINE,
+    BLUE_GOAL_ENDLINE,
+    YELLOW_GOAL_ENDLINE,
 
-	// Sidelines
-    BLUE_GOAL_TOP_SIDELINE,
-    YELLOW_GOAL_TOP_SIDELINE,
-    BLUE_GOAL_BOTTOM_SIDELINE,	// 65
-    YELLOW_GOAL_BOTTOM_SIDELINE,
-
-	// Midlines
-    TOP_MIDLINE,
-    CENTER_MIDLINE,
-    BOTTOM_MIDLINE,
+    TOP_SIDELINE,
+    BOTTOM_SIDELINE,
+    MIDLINE,
 
 	// GOALBOX LINES:
 	// Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
-    BLUE_GOALBOX_TOP_LINE,		// 70
+    BLUE_GOALBOX_TOP_LINE,
     BLUE_GOALBOX_LEFT_LINE,
     BLUE_GOALBOX_RIGHT_LINE,
     YELLOW_GOALBOX_TOP_LINE,
     YELLOW_GOALBOX_LEFT_LINE,
-    YELLOW_GOALBOX_RIGHT_LINE	// 75
+    YELLOW_GOALBOX_RIGHT_LINE
 };
 
 class ConcreteLine
@@ -65,12 +54,12 @@ private: //Constructors and Deconstructors
     ConcreteLine(const ConcreteLine& other);
 
 public: // Constants
-    static const int NUM_LINES = 19;
+    static const int NUM_LINES = 11;
 	static const int NUM_SIDELINES = 4;
 	static const int NUM_GOALBOX_LINES = 6;
-	static const int NUM_T_BAR_LINES = 11;
-	static const int NUM_T_STEM_LINES = 6;
-	static const int NUM_L_LINES = 14;
+	static const int NUM_T_BAR_LINES = 4;
+	static const int NUM_T_STEM_LINES = 5;
+	static const int NUM_L_LINES = 10;
 
 public:
     // Destructor
@@ -99,63 +88,24 @@ public:
     const float getFieldX2() const { return fieldX2; }
     const float getFieldY2() const { return fieldY2; }
 
-	static const ConcreteLine* blueGoalTopEndline();
-	static const ConcreteLine* blueGoalMidEndline();
-	static const ConcreteLine* blueGoalBottomEndline();
-	static const ConcreteLine* yellowGoalTopEndline();
-	static const ConcreteLine* yellowGoalMidEndline();
-	static const ConcreteLine* yellowGoalBottomEndline();
-	static const ConcreteLine* blueGoalTopSideline();
-	static const ConcreteLine* yellowGoalTopSideline();
-	static const ConcreteLine* blueGoalBottomSideline();
-	static const ConcreteLine* yellowGoalBottomSideline();
-	static const ConcreteLine* blueGoalboxTopLine();
-	static const ConcreteLine* blueGoalboxLeftLine();
-	static const ConcreteLine* blueGoalboxRightLine();
-	static const ConcreteLine* yellowGoalboxTopLine();
-	static const ConcreteLine* yellowGoalboxLeftLine();
-	static const ConcreteLine* yellowGoalboxRightLine();
-	static const ConcreteLine* topMidline();
-	static const ConcreteLine* centerMidline();
-	static const ConcreteLine* bottomMidline();
+	static const ConcreteLine& blue_goal_endline();
+	static const ConcreteLine& yellow_goal_endline();
+	static const ConcreteLine& top_sideline();
+	static const ConcreteLine& bottom_sideline();
+	static const ConcreteLine& blue_goalbox_top_line();
+	static const ConcreteLine& blue_goalbox_left_line();
+	static const ConcreteLine& blue_goalbox_right_line();
+	static const ConcreteLine& yellow_goalbox_top_line();
+	static const ConcreteLine& yellow_goalbox_left_line();
+	static const ConcreteLine& yellow_goalbox_right_line();
+	static const ConcreteLine& midline();
 
 public:
-    static const ConcreteLine
-	blue_goal_top_endline,
-					blue_goal_mid_endline,
-					blue_goal_bottom_endline,
-					yellow_goal_top_endline,
-					yellow_goal_mid_endline,
-					yellow_goal_bottom_endline,
-					blue_goal_top_sideline,
-					yellow_goal_top_sideline,
-					blue_goal_bottom_sideline,
-					yellow_goal_bottom_sideline,
-					top_midline,
-					center_midline,
-					bottom_midline,
-					blue_goalbox_top_line,
-					blue_goalbox_left_line,
-					blue_goalbox_right_line,
-					yellow_goalbox_top_line,
-					yellow_goalbox_left_line,
-					yellow_goalbox_right_line;
-
-    static const ConcreteLine* concreteLineList[NUM_LINES];
-    static const ConcreteLine* sidelineList[NUM_SIDELINES];
-    static const ConcreteLine* goalboxLineList[NUM_GOALBOX_LINES];
-	static const ConcreteLine* tBarLineList[NUM_T_BAR_LINES];
-	static const ConcreteLine* tStemLineList[NUM_T_STEM_LINES];
-	static const ConcreteLine* lLineList[NUM_L_LINES];
-
-public:
-    static const std::list <const ConcreteLine*> concreteLines;
-	static const std::list <const ConcreteLine*> goalboxLines;
-	static const std::list <const ConcreteLine*> sidelines;
-// We'll probably want to define some lists of sidelines vs goalbox lines, etc.
-// This will be implemented in accordance with analysis within fieldlines...
-	static const std::list <const ConcreteLine*> tBarLines;
-	static const std::list <const ConcreteLine*> tStemLines;
+    static const std::vector <const ConcreteLine*>& concreteLines();
+	static const std::vector <const ConcreteLine*>& goalboxLines();
+	static const std::vector <const ConcreteLine*>& sidelines();
+	static const std::vector <const ConcreteLine*>& tBarLines();
+	static const std::vector <const ConcreteLine*>& tStemLines();
 
 private:
     // Instance variables

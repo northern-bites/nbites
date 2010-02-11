@@ -183,7 +183,7 @@ private: // Private member variables
     float distanceSD;
     float bearingSD;
     bool ccLine;
-    std::list <const ConcreteLine*> possibleLines;
+    std::vector <const ConcreteLine*> possibleLines;
 
 public:
     // Getters
@@ -195,7 +195,7 @@ public:
     /**
      * @return a List of all possible lines.  Currently returns all 11 lines
      */
-    const std::list <const ConcreteLine *> getPossibleLines() const {
+    const std::vector <const ConcreteLine *> getPossibleLines() const {
         return possibleLines;
     }
 
@@ -208,6 +208,10 @@ public:
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     void setCCLine(bool _ccLine) { ccLine = _ccLine; }
-    void setPossibleLines(std::list <const ConcreteLine*> _possibles);
+    void setPossibleLines(std::vector <const ConcreteLine*> _possibles);
+    void setPossibleLines(const ConcreteLine* _possible) {
+		possibleLines.clear();
+		possibleLines.push_back(_possible);
+	}
 };
 #endif

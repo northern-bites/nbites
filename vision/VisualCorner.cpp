@@ -237,6 +237,37 @@ const shape VisualCorner::getLClassification() {
 }
 
 /**
+ * Use the ID and shape of the corner to help narrow down IDs for
+ * lines within the corner.
+ */
+void VisualCorner::identifyLinesInCorner()
+{
+	// Check lines in positively identified corners
+	if (possibleCorners.size() == 1) {
+		const ConcreteCorner * corner = possibleCorners.front();
+		if (cornerType == T) {
+			tBar->setPossibleLines(corner->getTBar());
+			tStem->setPossibleLines(corner->getTStem());
+		} else {
+			line1->setPossibleLines(corner->getLines());
+			line2->setPossibleLines(corner->getLines());
+		}
+	}
+
+
+	if (cornerType == T){
+		tBar->setPossibleLines(ConcreteLine::tBarLines());
+		tStem->setPossibleLines(ConcreteLine::tStemLines());
+	}
+
+	// Use the shape of the corner to identify the lines
+	else if (cornerType== T) {
+		return;
+	}
+
+}
+
+/**
  * Calculate and set the standard deviation for the distance measurement.
  * Set the distance measurement.
  *
