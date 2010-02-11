@@ -395,8 +395,6 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
         H_k(1,1) = ((-1 + pow(x_l,2) + pow(y_l,2))*(x_b - x_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2));
         H_k(1,2) = -1.0f;
 
-		cout << "H_k " << H_k << endl;
-
 		MeasurementVector d_x(2);
 		d_x(0) = static_cast<float>(hypot(relX_p, relY_p));
 		d_x(1) = safe_atan2(relY_p, relX_p) - h_r;
