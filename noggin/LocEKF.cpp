@@ -387,13 +387,13 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		}
 
 		// Jacobians for line updates
-		H_k(0,0) = (2*(-1 + pow(x_l,2))*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2*x_l*y_l*(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2)));
-        H_k(0,1) = (2*x_l*y_l*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2*(-1 + pow(y_l,2))* (y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2)));
-        H_k(0,2) = 0.0f;
+		H_k(0,0) = (2.0f*(-1.0f + pow(x_l,2.0f))*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2.0f*x_l*y_l*(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.0f*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
+        H_k(0,1) = (2.0f*x_l*y_l*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2.0f*(-1.0f + pow(y_l,2.0f))* (y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.0f*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
+        H_k(0,2.0f) = 0.0f;
 
-        H_k(1,0) = -(((-1 + pow(x_l,2) + pow(y_l,2))*(y_b - y_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2)));
-        H_k(1,1) = ((-1 + pow(x_l,2) + pow(y_l,2))*(x_b - x_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2));
-        H_k(1,2) = -1;
+        H_k(1,0) = -(((-1.0f + pow(x_l,2.0f) + pow(y_l,2.0f))*(y_b - y_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
+        H_k(1,1) = ((-1.0f + pow(x_l,2.0f) + pow(y_l,2.0f))*(x_b - x_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f));
+        H_k(1,2) = -1.0f;
 
 		MeasurementVector d_x(2);
 		d_x(0) = static_cast<float>(hypot(relX_p, relY_p));
@@ -481,7 +481,7 @@ int LocEKF::findMostLikelyLine(Observation *z)
 
 	vector<LineLandmark> possibleLines = z->getLinePossibilities();
 	int minIndex = -1;
-	float minDivergence = 30000.0f;
+	float minDivergence = 800000.0f;
 	for (unsigned int i = 0; i < possibleLines.size(); ++i) {
 		float distance = getMahalanobisDistance(z, possibleLines[i]);
 
