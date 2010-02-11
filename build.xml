@@ -35,7 +35,6 @@
   
   <target name="vision"
 	  depends="vision.check"
-	  unless="vision.make"
 	  description="compile the TOOLVisionLink">
     <!-- at this point we just run an external calling make vision -->
     <!-- TODO unify the build systems -->
