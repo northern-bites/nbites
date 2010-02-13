@@ -102,6 +102,25 @@ const vector<const ConcreteLine*>& ConcreteLine::tStemLines()
 	return lines;
 }
 
+const vector<const ConcreteLine*>& ConcreteLine::lCornerLines()
+{
+	static const ConcreteLine* lines_array[NUM_L_LINES] =
+		{ &blue_goal_endline(),
+		  &yellow_goal_endline(),
+		  &top_sideline(),
+		  &bottom_sideline(),
+		  &blue_goalbox_top_line(),
+		  &blue_goalbox_left_line(),
+		  &blue_goalbox_right_line(),
+		  &yellow_goalbox_top_line(),
+		  &yellow_goalbox_left_line(),
+		  &yellow_goalbox_right_line()};
+	static const vector<const ConcreteLine*>
+		lines(lines_array,
+			  lines_array + sizeof(lines_array) / sizeof(lines_array[0]));
+	return lines;
+}
+
 const string ConcreteLine::toString() const
 {
 

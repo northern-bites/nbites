@@ -109,6 +109,9 @@ public:
     static const std::list <const ConcreteCorner*>
 	getPossibleCorners(shape
 					   corner_type);
+
+	static const std::list <const ConcreteCorner*> getConcreteCorners();
+
 	const std::vector<const ConcreteLine*> getLines() const {
 		return lines;
 	}
@@ -160,6 +163,7 @@ private: // These are only used internally by the getPossibleCorners method
 
 
 public:
+	static const std::list <const ConcreteCorner*> concreteCorners;
     static const std::list <const ConcreteCorner*> lCorners;
     static const std::list <const ConcreteCorner*> tCorners;
     static const std::list <const ConcreteCorner*> ccCorners;

@@ -221,6 +221,10 @@ const ConcreteCorner* ConcreteCorner::BLUE_GOAL_T_CORNERS[
 };
 
 
+const list <const ConcreteCorner*> ConcreteCorner::concreteCorners =
+	list <const ConcreteCorner*>(ConcreteCorner::concreteCornerList,
+								 &ConcreteCorner::concreteCornerList[NUM_CORNERS]);
+
 const list <const ConcreteCorner*> ConcreteCorner::lCorners =
     list <const ConcreteCorner*>( ConcreteCorner::L_CORNERS,
                                   &ConcreteCorner::L_CORNERS[NUM_L_CORNERS] );
@@ -398,29 +402,24 @@ const shape ConcreteCorner::inferCornerType(const cornerID id) {
         return UNKNOWN;
     }
 }
-
-
+/**
+ * Checks all the tBar lines to see if either of the lines in this corner
+ * are a bar. Relies on the fact that no line is both a tStem and a tBar.
+ */
 void ConcreteCorner::assignTCornerLines()
 {
 	vector<const ConcreteLine*>::const_iterator i = ConcreteLine::tBarLines().begin();
 	while ( i != ConcreteLine::tBarLines().end() ) {
 		if (*i == line1) {
 			tBar = line1;
+			tStem = line2;
 		} else if (*i == line2) {
 			tBar == line2;
+			tStem = line1;
 		}
 		i++;
 	}
 
-	vector<const ConcreteLine*>::const_iterator j = ConcreteLine::tStemLines().begin();
-	while ( j != ConcreteLine::tStemLines().end() ) {
-		if (*j == line1) {
-			tStem = line1;
-		} else if (*j == line2) {
-			tStem == line2;
-		}
-		j++;
-	}
 }
 
 
@@ -444,5 +443,10 @@ getPossibleCorners(shape corner_type) {
         // Should never be reached
         throw -1;
     }
+}
+
+const list <const ConcreteCorner*> ConcreteCorner::getConcreteCorners()
+{
+	return concreteCorners;
 }
 

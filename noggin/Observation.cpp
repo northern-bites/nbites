@@ -79,8 +79,8 @@ Observation::Observation(const VisualLine &_line) :
 {
     // Build our possibilitiy list
 
-    vector <const ConcreteLine *>::iterator theIterator;
-    vector <const ConcreteLine *> lineList = _line.getPossibleLines();
+    list <const ConcreteLine *>::iterator theIterator;
+    list <const ConcreteLine *> lineList = _line.getPossibleLines();
     for( theIterator = lineList.begin(); theIterator != lineList.end();
          ++theIterator) {
         LineLandmark addLine((**theIterator).getFieldX1(),

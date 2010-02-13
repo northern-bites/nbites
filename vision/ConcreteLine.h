@@ -106,6 +106,7 @@ public:
 	static const std::vector <const ConcreteLine*>& sidelines();
 	static const std::vector <const ConcreteLine*>& tBarLines();
 	static const std::vector <const ConcreteLine*>& tStemLines();
+	static const std::vector <const ConcreteLine*>& lCornerLines();
 
 private:
     // Instance variables
