@@ -2366,249 +2366,77 @@ list< VisualCorner > FieldLines::intersectLines() {
 
 			dupeCorners.push_back(intersection);
 
-            // Angle check: only intersect those lines that have a minimum angle
-            // between them.  This catches many bad intersections at the center
-            // circle where the lines form very shallow angles
-            float angleOnScreen = min(fabs((*i)->angle - (*j)->angle),
-                                      fabs(180-(fabs((*i)->angle- (*j)->angle))));
-
-            if (angleOnScreen < MIN_ANGLE_BETWEEN_INTERSECTING_LINES) {
-                if (debugIntersectLines) {
-                    cout << "\t" << numChecksPassed
-                         << "- Failed due to an insufficient angle between the "
-                         << "lines. Found angle of " << setprecision(2)
-                         << angleOnScreen << "; need at least "
-                         << MIN_ANGLE_BETWEEN_INTERSECTING_LINES << endl;
-                }
-                continue;
-            }
+			if (isAngleTooSmall(*i, *j, numChecksPassed))
+				continue;
             ++numChecksPassed;
 
 
-            // Off screen sanity check: only allow corners that are within image
-            // frame
-            if (!Utility::isPointOnScreen(intersection)) {
-                if (debugIntersectLines)
-                    cout << "\t" << numChecksPassed
-                         << "-Intersection point was off screen." << endl;
-                continue;
-            }
+			if (!isIntersectionOnScreen(intersection, numChecksPassed))
+				continue;
             ++numChecksPassed;
 
-            // Nao's pix estimates seem slightly better than the aibo,
-            // resulting in better angles returned.
-
-            float angleOnField = getEstimatedAngle(*i, *j, intersectX,
-                                                   intersectY);
-            //cout << "angle on field: " << angleOnField << endl;
-            // BAD_ANGLE signifies the angle could not be computed
-            if (angleOnField != BAD_ANGLE &&
-                (angleOnField < MIN_ANGLE_ON_FIELD ||
-                 angleOnField > MAX_ANGLE_ON_FIELD)) {
-                if (debugIntersectLines) {
-                    cout << "\t" << numChecksPassed
-                         << "- Failed due to an angle on the field that is too "
-                         << "far from 90 degrees. Found angle of "
-                         << setprecision(2) << angleOnField
-                         << ".  Expected angle to be between "
-                         << MIN_ANGLE_ON_FIELD << " and " << MAX_ANGLE_ON_FIELD
-                         << endl;
-                }
-                continue;
-            }
+			if (!isAngleOnFieldOkay(*i, *j,
+									intersectX, intersectY,
+									numChecksPassed))
+				continue;
             ++numChecksPassed;
 
-            // Too much green check:  Discard potential corners where the
-            // intersection point is actually in the field green rather than in
-            // a line
-            float percentGreen = percentSurrounding(intersection,
-                                                    FIELD_COLORS,
-                                                    NUM_GREEN_COLORS,
-                                                    CORNER_TEST_RADIUS);
-            if (percentGreen > MAX_GREEN_PERCENT_ALLOWED_AT_CORNER) {
-                if (debugIntersectLines)
-                    cout << "\t" << numChecksPassed
-                         << "-'Corner surrounded by green' sanity check failed:"
-                         << " Found " << setprecision(2) << percentGreen
-                         << "% green around the point; max allowed is "
-                         << MAX_GREEN_PERCENT_ALLOWED_AT_CORNER << "%"
-                         << endl;
-                continue;
-            }
+			if (tooMuchGreenAtCorner(intersection, numChecksPassed))
+				continue;
             ++numChecksPassed;
 
-            // Too small check: ensure that at least one of the line segments is
-            // long enough (if both are small it indicates we might be at the
-            // center circle)
-            int MIN_LENGTH_LINE_TO_INTERSECT = 30; // cm
-            if ((*i)->length < TWO_CORNER_LINES_MIN_LENGTH &&
-                (*j)->length < TWO_CORNER_LINES_MIN_LENGTH &&
-                getEstimatedLength(*i) < MIN_LENGTH_LINE_TO_INTERSECT &&
-                getEstimatedLength(*j) < MIN_LENGTH_LINE_TO_INTERSECT) {
-
-                if (debugIntersectLines)
-                    cout << "\t" << numChecksPassed
-                         << "-'Lines too small' sanity check failed. "
-                         << "The " << iColor << " line was " << setprecision(2)
-                         << (*i)->length << " pixels long, the " << jColor
-                         << " line was " << (*j)->length
-                         << " pixels long.  Require at least "
-                         << TWO_CORNER_LINES_MIN_LENGTH << endl;
-                continue;
-            }
+			if (areLinesTooSmall(*i, *j, numChecksPassed))
+				continue;
             ++numChecksPassed;
 
-            // Cross corner check: if the point is between the endpoints of both
-            // lines then we know it is a center circle intersection
+			const float t_I = Utility::
+				findLinePointDistanceFromStart(intersection, **i);
+			const float t_J = Utility::
+				findLinePointDistanceFromStart(intersection, **j);
 
-            // We parameterize the line such that x and y are functions of one
-            // variable t. Then we figure out what t gives us the corner's
-            // x coordinate. When t = 0, x = x1; when t = lineLength, x = x2;
-            float t_I = Utility::
-                findLinePointDistanceFromStart(intersection, **i);
-            float t_J = Utility::
-                findLinePointDistanceFromStart(intersection, **j);
-
-            if (Utility::tValueInMiddleOfLine(t_I, (*i)->length,
-                                              static_cast<float>(
-                                                  MIN_CROSS_EXTEND)) &&
-                Utility::tValueInMiddleOfLine(t_J, (*j)->length,
-                                              static_cast<float>(
-                                                  MIN_CROSS_EXTEND))) {
-                if (debugIntersectLines || debugCcScan){
-                    cout <<"\t" << numChecksPassed
-                         << "-Identified center circle intersection "
-                         << "point was within the endpoints of both lines.  "
-                         <<"Discarding all corners" << endl;
-				}
-                isCCIntersection = true;
-            }
+			if (doLinesCross(*i, *j, t_I, t_J, numChecksPassed)) {
+				isCCIntersection = true;
+			}
             ++numChecksPassed;
 
-            // Distance sanity check:  We cannot trust any corners more than
-            // around 100 cm away.  Due to deficiencies in pose, extremely far
-            // distances actually show up as negative numbers (we have a
-            // polynomial function that maxes out at around 110 and then
-            // decreases towards negative infinity)
-            estimate pixEstimate = pose->pixEstimate(intersectX, intersectY,
-                                                     LINE_HEIGHT);
-            float distance = pixEstimate.dist;
-            float bearing = pixEstimate.bearing;
-            // Ridiculously far away points have -distance due to pose problems.
-            if (distance > MAX_CORNER_DISTANCE ||
-                distance < MIN_CORNER_DISTANCE) {
-                if (debugIntersectLines)
-                    cout <<"\t" << numChecksPassed
-                         << "-'Distance' sanity check failed: estimated "
-                         <<"distance: " << distance
-                         << "cm, require distance between "
-                         << MIN_CORNER_DISTANCE << "cm and "
-                         << MAX_CORNER_DISTANCE << "cm" << endl;
-                continue;
-            }
+			// Distance sanity check:  We cannot trust any corners more than
+			// around 100 cm away.  Due to deficiencies in pose, extremely far
+			// distances actually show up as negative numbers (we have a
+			// polynomial function that maxes out at around 110 and then
+			// decreases towards negative infinity)
+			estimate pixEstimate = pose->pixEstimate(intersection.x,
+													 intersection.y,
+													 LINE_HEIGHT);
+			float distance = pixEstimate.dist;
+			float bearing = pixEstimate.bearing;
+
+			if (isCornerTooFar(distance, numChecksPassed))
+				continue;
             ++numChecksPassed;
 
-            // Lines on the screen are not perfect.  As a result, we allow our
-            // corners to be made even if the lines do not both actually reach
-            // the corner in question.  We create a box around each line that
-            // extends parallel and orthogonal to the line and then test whether
-            // both boxes contain the intersection, rather than testing whether
-            // the lines themselves both contain the intersection
-            BoundingBox box1 = Utility::
-                getBoundingBox(**j,
-                               INTERSECT_MAX_ORTHOGONAL_EXTENSION,
-                               INTERSECT_MAX_PARALLEL_EXTENSION);
-            BoundingBox box2 = Utility::
-                getBoundingBox(**i,
-                               INTERSECT_MAX_ORTHOGONAL_EXTENSION,
-                               INTERSECT_MAX_PARALLEL_EXTENSION);
-            if (debugIntersectLines) {
-                drawBox(box1, RED);
-                drawBox(box2, BLUE);
-            }
-
-            bool box1Contains = Utility::
-                boxContainsPoint(box1, intersectX, intersectY);
-            bool box2Contains = Utility::
-                boxContainsPoint(box2, intersectX, intersectY);
-            if (!(box1Contains && box2Contains)) {
-                if (debugIntersectLines) {
-                    cout <<"\t" << numChecksPassed
-                         << "-Point was not contained in both bounding boxes."
-                         << endl;
-                    cout << "\tDistance was " << distance << endl;
-                }
-                continue;
-            }
+			if (!areLineEndsCloseEnough(*i, *j, intersection,numChecksPassed))
+				continue;
             ++numChecksPassed;
 
             // Find which end of each line is closer to the potential corner
-            point<int> line1Closer;
-            point<int> line2Closer;
-
-            if (Utility::getLength(static_cast<float>(intersectX),
-								   static_cast<float>(intersectY),
-                                   static_cast<float>((*i)->start.x),
-								   static_cast<float>((*i)->start.y) ) <
-                Utility::getLength(static_cast<float>(intersectX),
-								   static_cast<float>(intersectY),
-                                   static_cast<float>((*i)->end.x),
-								   static_cast<float>((*i)->end.y)) ) {
-                line1Closer = (*i)->start;
-            }
-            else
-                line1Closer = (*i)->end;
-
-            if (Utility::getLength(static_cast<float>(intersectX),
-								   static_cast<float>(intersectY),
-                                   static_cast<float>((*j)->start.x),
-								   static_cast<float>((*j)->start.y) ) <
-                Utility::getLength(static_cast<float>(intersectX),
-								   static_cast<float>(intersectY),
-                                   static_cast<float>((*j)->end.x),
-								   static_cast<float>((*j)->end.y) )) {
-                line2Closer = (*j)->start;
-            }
-            else
-                line2Closer = (*j)->end;
+            point<int> line1Closer =
+				Utility::findCloserEndpoint(**i, intersection);
+            point<int> line2Closer =
+				Utility::findCloserEndpoint(**j, intersection);
 
             if (debugIntersectLines)
                 cout << "Corner is close to line endpoint " << line1Closer
                      << " and " << line2Closer << endl;
 
-            float percent1 = percentSurrounding((line1Closer.x + intersectX)/2,
-                                                (line1Closer.y + intersectY)/2,
-                                                FIELD_COLORS,
-                                                NUM_FIELD_COLORS,
-                                                1);
-            float percent2 = percentSurrounding((line2Closer.x + intersectX)/2,
-                                                (line2Closer.y + intersectY)/2,
-                                                FIELD_COLORS,
-                                                NUM_FIELD_COLORS,
-                                                1);
-            if (debugIntersectLines)
-                cout << "Percent green in between line 1 and corner: "
-                     << percent1 << ". between line 2 --- : " << percent2
-                     << endl;
-
-            const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 25.0f;
-            if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
-                percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
-                if (debugIntersectLines) {
-                    cout <<"\t" << numChecksPassed
-                         << "-There was too much green between the corner and"
-                        " the endpoints of the two lines." << endl;
-                    cout << "\t " << "b/w corner and line1: " << percent1
-                         << "\t " << " and line 2: " << percent2 << endl;
-                }
-                continue;
-            }
+			if (tooMuchGreenEndpointToCorner(line1Closer, line2Closer,
+											 intersection, numChecksPassed) ){
+				continue;
+			}
             ++numChecksPassed;
-
 
             // Duplicate corner check:  ensure that corner is not too close to
             // any previously found corners
-            if (dupeCorner(corners, intersectX, intersectY, numChecksPassed)) {
+            if (dupeCorner(corners, intersection, numChecksPassed)) {
                 ++numDupes;
                 if (numDupes > MAX_NUM_DUPES) {
                     if (debugIntersectLines || debugCcScan) {
@@ -2630,7 +2458,7 @@ list< VisualCorner > FieldLines::intersectLines() {
 					// it turns out that sometimes we get dupes on 45 degree lines
 					// from the goalie's perspective
 					isDupe = true;
-                    corners.clear();
+					corners.clear();
 					isCCIntersection = true;
                     //return corners;
                 }
@@ -2759,6 +2587,244 @@ list< VisualCorner > FieldLines::intersectLines() {
 
 }
 
+bool FieldLines::isAngleTooSmall(shared_ptr<VisualLine> i,
+								 shared_ptr<VisualLine> j,
+								 const int& numChecksPassed) const
+{
+	// Angle check: only intersect those lines that have a minimum angle
+	// between them.  This catches many bad intersections at the center
+	// circle where the lines form very shallow angles
+	float angleOnScreen = min(fabs(i->angle - j->angle),
+							  fabs(180-(fabs(i->angle- j->angle))));
+
+	if (angleOnScreen < MIN_ANGLE_BETWEEN_INTERSECTING_LINES) {
+		if (debugIntersectLines) {
+			cout << "\t" << numChecksPassed
+				 << "- Failed due to an insufficient angle between the "
+				 << "lines. Found angle of " << setprecision(2)
+				 << angleOnScreen << "; need at least "
+				 << MIN_ANGLE_BETWEEN_INTERSECTING_LINES << endl;
+		}
+		return true;
+	}
+	return false;
+}
+
+// Off screen sanity check: only allow corners that are within image
+// frame
+bool FieldLines::isIntersectionOnScreen(const point<int>& intersection,
+										const int& numChecksPassed) const
+{
+	if (!Utility::isPointOnScreen(intersection)) {
+		if (debugIntersectLines)
+			cout << "\t" << numChecksPassed
+				 << "-Intersection point was off screen." << endl;
+		return false;
+	}
+	return true;
+}
+
+bool FieldLines::isAngleOnFieldOkay(shared_ptr<VisualLine> i,
+									shared_ptr<VisualLine> j,
+									const int& intersectX,
+									const int& intersectY,
+									const int& numChecksPassed) const
+{
+	float angleOnField = getEstimatedAngle(i, j, intersectX,
+										   intersectY);
+	// BAD_ANGLE signifies the angle could not be computed
+	if (angleOnField != BAD_ANGLE &&
+		(angleOnField < MIN_ANGLE_ON_FIELD ||
+		 angleOnField > MAX_ANGLE_ON_FIELD)) {
+		if (debugIntersectLines) {
+			cout << "\t" << numChecksPassed
+				 << "- Failed due to an angle on the field that is too "
+				 << "far from 90 degrees. Found angle of "
+				 << setprecision(2) << angleOnField
+				 << ".  Expected angle to be between "
+				 << MIN_ANGLE_ON_FIELD << " and " << MAX_ANGLE_ON_FIELD
+				 << endl;
+		}
+		return false;
+	}
+	return true;
+}
+
+// Too much green check:  Discard potential corners where the
+// intersection point is actually in the field green rather than in
+// a line
+bool FieldLines::tooMuchGreenAtCorner(const point<int>& intersection,
+									  const int& numChecksPassed)
+{
+	float percentGreen = percentSurrounding(intersection,
+											FIELD_COLORS,
+											NUM_GREEN_COLORS,
+											CORNER_TEST_RADIUS);
+	if (percentGreen > MAX_GREEN_PERCENT_ALLOWED_AT_CORNER) {
+		if (debugIntersectLines)
+			cout << "\t" << numChecksPassed
+				 << "-'Corner surrounded by green' sanity check failed:"
+				 << " Found " << setprecision(2) << percentGreen
+				 << "% green around the point; max allowed is "
+				 << MAX_GREEN_PERCENT_ALLOWED_AT_CORNER << "%"
+				 << endl;
+		return true;
+	}
+	return false;
+}
+
+// Too small check: ensure that at least one of the line segments is
+// long enough (if both are small it indicates we might be at the
+// center circle)
+bool FieldLines::areLinesTooSmall(shared_ptr<VisualLine> i,
+								  shared_ptr<VisualLine> j,
+								  const int& numChecksPassed) const
+{
+	int MIN_LENGTH_LINE_TO_INTERSECT = 30; // cm
+	if (i->length < TWO_CORNER_LINES_MIN_LENGTH &&
+		j->length < TWO_CORNER_LINES_MIN_LENGTH &&
+		getEstimatedLength(i) < MIN_LENGTH_LINE_TO_INTERSECT &&
+		getEstimatedLength(j) < MIN_LENGTH_LINE_TO_INTERSECT) {
+
+		if (debugIntersectLines)
+			cout << "\t" << numChecksPassed
+				 << "-'Lines too small' sanity check failed. "
+				 << "The " << i->colorStr << " line was " << setprecision(2)
+				 << i->length << " pixels long, the " << j->colorStr
+				 << " line was " << j->length
+				 << " pixels long.  Require at least "
+				 << TWO_CORNER_LINES_MIN_LENGTH << endl;
+		return true;
+	}
+	return false;
+}
+
+// Cross corner check: if the point is between the endpoints of both
+// lines then we know it is a center circle intersection
+
+// We parameterize the line such that x and y are functions of one
+// variable t. Then we figure out what t gives us the corner's
+// x coordinate. When t = 0, x = x1; when t = lineLength, x = x2;
+bool FieldLines::doLinesCross(shared_ptr<VisualLine> i,
+							  shared_ptr<VisualLine> j,
+							  const float& t_I, const float& t_J,
+							  const int& numChecksPassed) const
+{
+	if (Utility::tValueInMiddleOfLine(t_I, i->length,
+									  static_cast<float>(
+										  MIN_CROSS_EXTEND)) &&
+		Utility::tValueInMiddleOfLine(t_J, j->length,
+									  static_cast<float>(
+										  MIN_CROSS_EXTEND))) {
+		if (debugIntersectLines || debugCcScan){
+			cout <<"\t" << numChecksPassed
+				 << "-Identified center circle intersection "
+				 << "point was within the endpoints of both lines.  "
+				 <<"Discarding all corners" << endl;
+		}
+		return true;
+	}
+	return false;
+}
+
+
+bool FieldLines::isCornerTooFar(const float& distance,
+								const int& numChecksPassed) const
+{
+	// Ridiculously far away points have -distance due to pose problems.
+	if (distance > MAX_CORNER_DISTANCE ||
+		distance < MIN_CORNER_DISTANCE) {
+		if (debugIntersectLines)
+			cout <<"\t" << numChecksPassed
+				 << "-'Distance' sanity check failed: estimated "
+				 <<"distance: " << distance
+				 << "cm, require distance between "
+				 << MIN_CORNER_DISTANCE << "cm and "
+				 << MAX_CORNER_DISTANCE << "cm" << endl;
+		return true;
+	}
+	return false;
+}
+
+/**
+* Lines on the screen are not perfect.  As a result, we allow our
+* corners to be made even if the lines do not both actually reach
+* the corner in question.  We create a box around each line that
+* extends parallel and orthogonal to the line and then test whether
+* both boxes contain the intersection, rather than testing whether
+* the lines themselves both contain the intersection
+*/
+bool FieldLines::areLineEndsCloseEnough(shared_ptr<VisualLine> i,
+										shared_ptr<VisualLine> j,
+										const point<int>& intersection,
+										const int& numChecksPassed) const
+{
+	BoundingBox box1 = Utility::
+		getBoundingBox(*j,
+					   INTERSECT_MAX_ORTHOGONAL_EXTENSION,
+					   INTERSECT_MAX_PARALLEL_EXTENSION);
+	BoundingBox box2 = Utility::
+		getBoundingBox(*i,
+					   INTERSECT_MAX_ORTHOGONAL_EXTENSION,
+					   INTERSECT_MAX_PARALLEL_EXTENSION);
+	if (debugIntersectLines) {
+		drawBox(box1, RED);
+		drawBox(box2, BLUE);
+	}
+
+	bool box1Contains = Utility::
+		boxContainsPoint(box1, intersection.x, intersection.y);
+	bool box2Contains = Utility::
+		boxContainsPoint(box2, intersection.x, intersection.y);
+	if (!(box1Contains && box2Contains)) {
+		if (debugIntersectLines) {
+			cout <<"\t" << numChecksPassed
+				 << "-Point was not contained in both bounding boxes."
+				 << endl;
+		}
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Ensure that there is not too much green between the endpoints of the lines
+ * and the corner itself.
+ */
+bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
+											  const point<int>& line2Closer,
+											  const point<int>& intersection,
+											  const int& numChecksPassed) const
+{
+	float percent1 = percentSurrounding((line1Closer.x + intersection.x)/2,
+										(line1Closer.y + intersection.y)/2,
+										FIELD_COLORS,
+										NUM_FIELD_COLORS,
+										1);
+	float percent2 = percentSurrounding((line2Closer.x + intersection.x)/2,
+										(line2Closer.y + intersection.y)/2,
+										FIELD_COLORS,
+										NUM_FIELD_COLORS,
+										1);
+	if (debugIntersectLines)
+		cout << "Percent green in between line 1 and corner: "
+			 << percent1 << ". between line 2 --- : " << percent2
+			 << endl;
+
+	const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 25.0f;
+	if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
+		percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
+		if (debugIntersectLines) {
+			cout <<"\t" << numChecksPassed
+				 << "-There was too much green between the corner and"
+				" the endpoints of the two lines." << endl;
+			cout << "\t " << "b/w corner and line1: " << percent1
+				 << "\t " << " and line 2: " << percent2 << endl;
+		}
+		return true;
+	}
+	return false;
+}
 // Checks if a corner is too dangerous when it is near the edge of the screen
 bool FieldLines::tooClose(int x, int y) {
 	// if it near a screen edge then it could be a center circle
@@ -3837,8 +3903,11 @@ const bool FieldLines::intersectsFieldLines(const point<int>& first,
 // normally happens with overlapping vertically/hor found lines
 // returns true if corner already exists near spot, false otherwise
 const bool FieldLines::dupeCorner(const list<VisualCorner> &corners,
-                                  const int x, const int y,
+								  const point<int>& intersection,
                                   const int testNumber) const {
+	const int x = intersection.x;
+	const int y = intersection.y;
+
     for (list<VisualCorner>::const_iterator i = corners.begin();
          i != corners.end(); ++i) {
         if (abs(x - i->getX()) < DUPE_MIN_X_SEPARATION &&

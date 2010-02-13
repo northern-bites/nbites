@@ -308,6 +308,49 @@ public:
     //
     std::list<VisualCorner> intersectLines();
 
+
+	/**
+	 * Sanity checks for field lines:
+	 */
+	bool isAngleTooSmall(boost::shared_ptr<VisualLine> i,
+						 boost::shared_ptr<VisualLine> j,
+						 const int& numChecksPassed) const;
+
+	bool isIntersectionOnScreen(const point<int>& intersection,
+								const int& numChecksPassed) const;
+
+	bool isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
+							boost::shared_ptr<VisualLine> j,
+							const int& intersectX,
+							const int& intersectY,
+							const int& numChecksPassed) const;
+
+	bool tooMuchGreenAtCorner(const point<int>& intersection,
+							  const int& numChecksPassed);
+
+	bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
+						  boost::shared_ptr<VisualLine> j,
+						  const int& numChecksPassed) const;
+
+	bool doLinesCross(boost::shared_ptr<VisualLine> i,
+					  boost::shared_ptr<VisualLine> j,
+					  const float& t_I, const float& t_J,
+					  const int& numChecksPassed)const ;
+
+	bool isCornerTooFar(const float& distance,
+						const int& numChecksPassed) const;
+
+	bool areLineEndsCloseEnough(boost::shared_ptr<VisualLine> i,
+								boost::shared_ptr<VisualLine> j,
+								const point<int>& intersection,
+								const int& numChecksPassed) const;
+
+	bool tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
+									  const point<int>& line2Closer,
+									  const point<int>& intersection,
+									  const int& numChecksPassed) const;
+
+
 	// Checks if a corner is too dangerous when it is relatively near the edge
 	// of the screen - scans the edge for a stripe of white
 	bool tooClose(int x, int y);
@@ -411,8 +454,9 @@ public:
       bool isOutOfBoundsT(corner &t, int i);
     */
 
-    const bool dupeCorner(const std::list<VisualCorner> &corners, const int x,
-                          const int y, const int testNumber) const;
+    const bool dupeCorner(const std::list<VisualCorner> &corners,
+                          const point<int>& intersection,
+						  const int testNumber) const;
 	const bool dupeFakeCorner(const std::list<point <int> > &corners,
 							  const int x, const int y, const int testNumber) const;
     const float percentColor(const int x, const int y, const TestDirection dir,

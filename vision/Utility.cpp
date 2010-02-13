@@ -716,3 +716,19 @@ const string Utility::getDistCertaintyString(int _cert) {
     }
 }
 
+const point<int> Utility::findCloserEndpoint(const VisualLine& line,
+											 const point<int>& intersection)
+{
+	if (Utility::getLength(static_cast<float>(intersection.x),
+						   static_cast<float>(intersection.y),
+						   static_cast<float>(line.start.x),
+						   static_cast<float>(line.start.y) ) <
+		Utility::getLength(static_cast<float>(intersection.x),
+						   static_cast<float>(intersection.y),
+						   static_cast<float>(line.end.x),
+						   static_cast<float>(line.end.y)) ) {
+		return line.start;
+	} else {
+		return line.end;
+	}
+}

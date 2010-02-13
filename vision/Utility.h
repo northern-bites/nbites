@@ -225,6 +225,9 @@ public:
     static const std::string getDistCertaintyString(int _cert);
 
     static const std::string getCornerIDString(int _id);
+
+	static const point<int> findCloserEndpoint(const VisualLine&,
+											   const point<int>& intersection);
 };
 
 
