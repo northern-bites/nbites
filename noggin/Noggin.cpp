@@ -383,15 +383,15 @@ void Noggin::updateLocalization()
     }
 
     // Lines
-	const vector< shared_ptr<VisualLine> > * lines = vision->fieldLines->getLines();
-    vector <shared_ptr<VisualLine> >::const_iterator j;
-    for ( j = lines->begin(); j != lines->end(); ++j) {
-		if ( !(*j)->getCCLine() &&
-			 (*j)->getPossibleLines().size() < ConcreteLine::NUM_LINES) {
-			Observation seen(**j);
-			observations.push_back(seen);
-		}
-    }
+	// const vector< shared_ptr<VisualLine> > * lines = vision->fieldLines->getLines();
+    // vector <shared_ptr<VisualLine> >::const_iterator j;
+    // for ( j = lines->begin(); j != lines->end(); ++j) {
+	// 	if ( !(*j)->getCCLine() &&
+	// 		 (*j)->getPossibleLines().size() < ConcreteLine::NUM_LINES) {
+	// 		Observation seen(**j);
+	// 		observations.push_back(seen);
+	// 	}
+    // }
 
     // Process the information
     PROF_ENTER(profiler, P_MCL);
