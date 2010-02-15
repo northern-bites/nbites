@@ -2854,7 +2854,6 @@ bool FieldLines::tooClose(int x, int y) {
 		endY = IMAGE_HEIGHT -1;
 	}
 
-	cout << startX << " " << endX << " " << startY << " " << endY << endl;
 	for (int dy = startY; dy < endY ; dy+=PIXELS_TO_SKIP){
 		for (int dx = startX; dx < endX ; dx+=PIXELS_TO_SKIP){
 			if (vision->thresh->thresholded[dy][dx] != GREEN)
