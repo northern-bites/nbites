@@ -138,12 +138,14 @@ void FieldLines::lineLoop() {
     createLines(linePoints); // Lines is a global member of FieldLines
     // Only those linePoints which were not used in any line remain within the
     // linePoints list
-
+	fitUnusedPoints(linesList, unusedPointsList);
     joinLines();
 
     // unusedPoints is used by vision to draw points on the screen
     // TODO:  eliminate copying?
     unusedPointsList = linePoints;
+
+
 
     //extendLines(linesList);
 
@@ -1578,15 +1580,6 @@ void FieldLines::joinLines() {
                     }
                 }
             }
-			// line width sanity check: the two lines should have similar widths
-			if (abs((*i)->avgVerticalWidth - (*j)->avgVerticalWidth) > 10 ||
-				abs((*i)->avgHorizontalWidth - (*j)->avgHorizontalWidth) > 10) {
-				if (debugJoinLines) {
-					cout << "Lines had different widths" << endl;
-				}
-				continue;
-			}
-
 
             // DISTANCE sanity check: even if two lines have a very small angle
             // between them, they might not be legitimately part of the same
@@ -2452,16 +2445,15 @@ list< VisualCorner > FieldLines::intersectLines() {
                     // corners after recoloring them so we can tell they are
                     // illegitimate
 					// Chown-dawg says - why not use the center corners?
-                    //drawCorners(corners, INVALIDATED_INTERSECTION_POINT_COLOR);
+
 					// clear the duplicate in case it is misclassified
 
 					// it turns out that sometimes we get dupes on 45 degree lines
 					// from the goalie's perspective
 					isDupe = true;
-					corners.clear();
+					removeDupeCorners(corners, intersection);
 					isCCIntersection = true;
-                    //return corners;
-                }
+				}
             }
             ++numChecksPassed;
 
@@ -2478,96 +2470,85 @@ list< VisualCorner > FieldLines::intersectLines() {
             // t value for line 2
             VisualCorner c(intersectX, intersectY, distance, bearing,
                            *i, *j, t_I, t_J);
-			if (isDupe) {
-				if (c.getShape() != T) {
-					isCCIntersection = false;
-					continue;
-				} else {
-					// check for a 45 degree line
-					if (debugIntersectLines)
-						cout << (*i)->angle << " " << (*j)->angle << endl;
-				}
-			}
+ 			if (isDupe) {
+ 				if (c.getShape() != T) {
+ 					isCCIntersection = false;
+ 				} else {
+ 					// check for a 45 degree line
+ 					if (debugIntersectLines)
+ 						cout << (*i)->angle << " " << (*j)->angle << endl;
+ 				}
+ 			}
             if (isCCIntersection) {
                 c.setShape(CIRCLE);
             } else if (c.getShape() == T) {
-	      if (dupeFakeCorner(dupeCorners, intersectX, intersectY, numChecksPassed)) {
-		c.setShape(CIRCLE);
-	      } else {
-		// could it really be a center circle intersection?
-		// first identify which line is the stem
-		int tX = line2Closer.x, tY = line2Closer.y;
-		if (c.getTStem()->start.x == (*i)->start.x) {
-		  tX = line1Closer.x;
-		  tY = line1Closer.y;
-		}
-		// we're going to deal with distance squared to avoid taking roots
-		// Get the distance from the stem to the intersection
-		int targetDist = (tX - intersectX) * (tX - intersectX) +
-		  (tY - intersectY) * (tY - intersectY);
-		// loop through all unused points try to find one that is close
-		// but not part of our two lines that make up the T
-		BoundingBox box1c = Utility::
-		  getBoundingBox(**j,
-				 INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
-				 INTERSECT_MAX_PARALLEL_EXTENSION -2);
-		BoundingBox box2c = Utility::
-		  getBoundingBox(**i,
-				 INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
-				 INTERSECT_MAX_PARALLEL_EXTENSION -2);
-		for (linePointNode firstPoint = unusedPointsList.begin();
-		     firstPoint != unusedPointsList.end(); firstPoint++) {
-		  int pX = firstPoint->x;
-		  int pY = firstPoint->y;
-		  bool boxContains1 = Utility::
-		    boxContainsPoint(box1c, pX, pY);
-		  bool boxContains2 = Utility::
-		    boxContainsPoint(box2c, pX, pY);
-		  if (!(boxContains1 || boxContains2)) {
-		    // get distance to the intersection
-		    int diff = (pX - intersectX) * (pX - intersectX) +
-		      (pY - intersectY) * (pY - intersectY);
-		    // get distance to the nearest point on the stem
-		    int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
-		    int distSq = static_cast<int>(firstPoint->lineWidth);
-		    //diff = abs(diff - targetDist);
-		    // idea - the point should also be about twice the distance to the line point
-		    if (debugIntersectLines) {
-		      cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
-			" " << distSq << endl;
-		      cout << "Critical vals are: " << (distSq * distSq) << endl;
-		    }
-		    if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
-			diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
-		      if (debugIntersectLines) {
-			cout << "Possible center intersection" << endl;
-		      }
-		      c.setShape(CIRCLE);
-		    }
-		  }
-		}
-	      }
-	      // if we didn't get a legit CC, worry about the edges of the screen
-	      if (c.getShape() == T) {
-		if (tooClose(intersectX, intersectY)) {
-		  if (debugIntersectLines) {
-		    cout << "Tossed a T that may be a CC near the screen edge" << endl;
-		  }
-		  continue;
-		}
-	      }
-	    } else if (c.getShape() == INNER_L || c.getShape() == OUTER_L) {
-	      if (tooClose(intersectX, intersectY)) {
-		if (debugIntersectLines) {
-		  cout << "Tossed an L that may be a CC near the screen edge" << endl;
-		}
-		continue;
-	      }
-	    }
+				if (dupeFakeCorner(dupeCorners, intersectX, intersectY, numChecksPassed)) {
+					c.setShape(CIRCLE);
+				} else {
+					// could it really be a center circle intersection?
+					// first identify which line is the stem
+					int tX = line2Closer.x, tY = line2Closer.y;
+					if (c.getTStem()->start.x == (*i)->start.x) {
+						tX = line1Closer.x;
+						tY = line1Closer.y;
+					}
+					// we're going to deal with distance squared to avoid taking roots
+					// Get the distance from the stem to the intersection
+					int targetDist = (tX - intersectX) * (tX - intersectX) +
+						(tY - intersectY) * (tY - intersectY);
+					// loop through all unused points try to find one that is close
+					// but not part of our two lines that make up the T
+					BoundingBox box1c = Utility::
+						getBoundingBox(**j,
+									   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
+									   INTERSECT_MAX_PARALLEL_EXTENSION -2);
+					BoundingBox box2c = Utility::
+						getBoundingBox(**i,
+									   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
+									   INTERSECT_MAX_PARALLEL_EXTENSION -2);
+					for (linePointNode firstPoint = unusedPointsList.begin();
+						 firstPoint != unusedPointsList.end(); firstPoint++) {
+						int pX = firstPoint->x;
+						int pY = firstPoint->y;
+						bool boxContains1 = Utility::
+							boxContainsPoint(box1c, pX, pY);
+						bool boxContains2 = Utility::
+							boxContainsPoint(box2c, pX, pY);
+						if (!(boxContains1 || boxContains2)) {
+							// get distance to the intersection
+							int diff = (pX - intersectX) * (pX - intersectX) +
+								(pY - intersectY) * (pY - intersectY);
+							// get distance to the nearest point on the stem
+							int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
+							int distSq = static_cast<int>(firstPoint->lineWidth);
+							//diff = abs(diff - targetDist);
+							// idea - the point should also be about twice the distance to the line point
+							if (debugIntersectLines) {
+								cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
+									" " << distSq << endl;
+								cout << "Critical vals are: " << (distSq * distSq) << endl;
+							}
+							if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
+								diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
+								if (debugIntersectLines) {
+									cout << "Possible center intersection" << endl;
+								}
+								c.setShape(CIRCLE);
+							}
+						}
+					}
+				}
+			}
+
+			if (tooClose(intersectX, intersectY) &&
+				c.getShape() != CIRCLE){
+				cout << "Tossed a corner that may be a CC near the screen edge" << endl;
+				continue;
+			}
+
             corners.push_back(c);
 
             // TODO:  Should I be adding the intersection point to both lines?
-            //i->addPoint
 
             if (debugIntersectLines)
                 cout <<"\tPassed all " << numChecksPassed
@@ -2719,8 +2700,7 @@ bool FieldLines::doLinesCross(shared_ptr<VisualLine> i,
 		if (debugIntersectLines || debugCcScan){
 			cout <<"\t" << numChecksPassed
 				 << "-Identified center circle intersection "
-				 << "point was within the endpoints of both lines.  "
-				 <<"Discarding all corners" << endl;
+				 << "point was within the endpoints of both lines.  " << endl;
 		}
 		return true;
 	}
@@ -2811,7 +2791,7 @@ bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
 			 << percent1 << ". between line 2 --- : " << percent2
 			 << endl;
 
-	const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 25.0f;
+	const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 50.0f;
 	if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
 		percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
 		if (debugIntersectLines) {
@@ -2825,44 +2805,71 @@ bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
 	}
 	return false;
 }
+
+
+
 // Checks if a corner is too dangerous when it is near the edge of the screen
 bool FieldLines::tooClose(int x, int y) {
-	// if it near a screen edge then it could be a center circle
-	const int NUM_PIXELS_CLOSE_TO_EDGE = 20;
-	const int DANGER_ZONE = 60;
-	const int BADCOUNT = 10;
+	const int DANGER_ZONE = 35;
+	const int BADCOUNT = 50;
+	// These are half the depth of the box we scan (avoids a division)
+	const int HALF_WIDTH_TO_SCAN = 10;
+	const int HALF_DEPTH_TO_SCAN = 10;
+
+	const int PIXELS_TO_SKIP = 2;
 
 	// if we are near any edge, but not near enough to toss the point
 	// look out for a line continuation
-	// simply scan around the edge looking for white
+	// simply scan from the point to the edge looking for white
 	int count = 0;
-	if (x < DANGER_ZONE || x > IMAGE_WIDTH - DANGER_ZONE) {
-		int xVal = 1;
-		if (x > IMAGE_WIDTH - DANGER_ZONE) {
-			xVal = IMAGE_WIDTH - 2;
-		}
-		for (int l = max(y - x, 0); l < min(IMAGE_HEIGHT - 1, y + x); l++) {
-			if (vision->thresh->thresholded[l][xVal] == WHITE) {
+	int startX = 0;
+	int startY = 0;
+	int endX = 0;
+	int endY = 0;
+
+	if (x < DANGER_ZONE){
+		startX = 0;
+		endX = x-1;
+
+		startY = y - HALF_DEPTH_TO_SCAN;
+		endY = y + HALF_DEPTH_TO_SCAN;
+
+	} else if ( x > IMAGE_WIDTH - DANGER_ZONE) {
+		startX = x+1;
+		endX = IMAGE_WIDTH-1;
+
+		startY = y - HALF_DEPTH_TO_SCAN;
+		endY = y + HALF_DEPTH_TO_SCAN;
+	} else if (y < DANGER_ZONE){
+		startX = x - HALF_WIDTH_TO_SCAN;
+		endX = x + HALF_WIDTH_TO_SCAN;
+
+		startY = 0;
+		endY = y - 1;
+	} else if(y > IMAGE_HEIGHT - DANGER_ZONE) {
+		startX = x - HALF_WIDTH_TO_SCAN;
+		endX = x + HALF_WIDTH_TO_SCAN;
+
+		startY = y + 1;
+		endY = IMAGE_HEIGHT -1;
+	}
+
+	cout << startX << " " << endX << " " << startY << " " << endY << endl;
+	for (int dy = startY; dy < endY ; dy+=PIXELS_TO_SKIP){
+		for (int dx = startX; dx < endX ; dx+=PIXELS_TO_SKIP){
+			if (vision->thresh->thresholded[dy][dx] != GREEN)
 				count++;
-			}
 		}
-		if (count > BADCOUNT) {
-			// problably a center circle, but let's just toss it
-			return true;;
+	}
+
+	int numPixelsSeen = (abs(startX - endX) * abs(startY - endY)) /
+		(PIXELS_TO_SKIP*2);
+	if (count > numPixelsSeen /2) {
+		if (debugIntersectLines){
+			cout << "Discarding point that may be near edge with count: " <<
+				count << endl;
 		}
-	} else if (y < DANGER_ZONE || y > IMAGE_HEIGHT - DANGER_ZONE) {
-		int yVal = 1;
-		if (y > IMAGE_HEIGHT - DANGER_ZONE) {
-			yVal = IMAGE_HEIGHT - 2;
-		}
-		for (int l = max(x - y, 0); l < min(IMAGE_WIDTH - 1, y + x); l++) {
-			if (vision->thresh->thresholded[yVal][l] == WHITE) {
-				count++;
-			}
-		}
-		if (count > BADCOUNT) {
-			return true;
-		}
+		return true;
 	}
 	return false;
 }
@@ -2885,8 +2892,8 @@ void FieldLines::removeRiskyCorners(list<VisualCorner> &corners) {
 
     int oldNumCorners = corners.size();
 
-    const int NUM_PIXELS_CLOSE_TO_EDGE = 20;
-    const int T_NUM_PIXELS_CLOSE_TO_EDGE = 20;
+    const int NUM_PIXELS_CLOSE_TO_EDGE = 15;
+    const int T_NUM_PIXELS_CLOSE_TO_EDGE = 15;
 
     // No field objects on screen..
     if (getVisibleFieldObjects().empty()) {
@@ -2981,6 +2988,17 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 
         list <const ConcreteCorner*> possibleClassifications =
             classifyCorners(*i, visibleObjects, possibleCorners);
+
+		// If we found nothing that time, try again with all the corners to
+		// see if possibly the corner was misidentified (e.g. saw an L, but
+		// actually a T)
+		if (possibleClassifications.empty() &&
+			i->getShape() != T ){
+			possibleClassifications =
+				classifyCorners(*i,
+								visibleObjects,
+								ConcreteCorner::getConcreteCorners());
+		}
 
         // T's can sometimes be misclassified as L's, check them if nothing
         // matched (and the geometric tests failed)
@@ -3797,42 +3815,13 @@ float FieldLines::getEstimatedDistance(const VisualCorner *c,
     bool isGoal = ConcreteFieldObject::isGoal(obj->getID());
     bool pixEstimate = false;
 
-    // With new regression, cannot trust pix estimates that are not right on
-    // the ground
-    if (isGoal && (obj->getDistance() < MAXIMUM_DIST_TO_USE_PIX_ESTIMATE ||
-                   // The corner is extremely close in the picture to the
-                   // object, use pix estimate
-                   // TODO: named constant
-                   Utility::getLength(static_cast<float>(midX),
-									  static_cast<float>(midBottomY),
-									  static_cast<float>(c->getX()),
-									  static_cast<float>(c->getY()) ) < 15)) {
-
-        typeOfEstimate = "Pose Pix Estimate";
-        pixEstimate = true;
-        // We pass in an x, y, and z (height from the ground) which we change
-        // based on the type of object
-        estimate objBottomEst =
-            pose->pixEstimate(midX, midBottomY,
-                              ConcreteFieldObject::getHeightFromGround(
-                                  obj->getID()));
-        objDist = objBottomEst.dist;
-        // Keep the bearing positive in this case as it matches the coordinate
-        // system of the corner bearing
-        objBearing = objBottomEst.bearing;// * RAD_OVER_DEG;
-    }
-
-    else {
-        typeOfEstimate = "FieldObjects getDistance()";
-        objDist = obj->getDistance();
-        // NOTE: since our corner and object coordinate systems are reversed,
-        // take the negative of the corner bearing
-        objBearing = -obj->getBearing();// * RAD_OVER_DEG;
-    }
+	typeOfEstimate = "FieldObjects getDistance()";
+	objDist = obj->getDistance();
+	objBearing = obj->getBearing();
 
     float cornerDist = c->getDistance();
     // Convert degrees to radians for the sin/cos formulas
-    float cornerBearing = c->getBearing();// * RAD_OVER_DEG;
+    float cornerBearing = c->getBearing();
 
     // We want the objY to always be Positive because it is away from your body
     float cornerX = cornerDist * sin(cornerBearing);
@@ -3922,6 +3911,21 @@ const bool FieldLines::dupeCorner(const list<VisualCorner> &corners,
     }
 
     return false;
+}
+
+void FieldLines::removeDupeCorners(std::list<VisualCorner> &corners,
+					   const point<int>& intersection)
+{
+	const int x = intersection.x;
+	const int y = intersection.y;
+
+    for (list<VisualCorner>::iterator i = corners.begin();
+         i != corners.end(); ++i) {
+        if (abs(x - i->getX()) < DUPE_MIN_X_SEPARATION &&
+            abs(y - i->getY()) < DUPE_MIN_Y_SEPARATION) {
+			corners.erase(i);
+        }
+    }
 }
 
 const bool FieldLines::dupeFakeCorner(const list<point<int> > &corners,

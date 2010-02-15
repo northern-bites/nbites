@@ -127,8 +127,15 @@
        Bottom/top T corners will have very long stem and bar. Either means it's a bottom/top.
 ***** TODO Use some ambiguous landmarks to ID corners
       A goal post can at least narrow down the choices.
+***** TODO Use other VisualCorners to identify corners
+      If there is an L corner near a T corner, then the T-corner is a goal T corner
+***** TODO Fix CC-unused point identification
+      Sees far too many CC corners because of stray points. Maybe check on opposite side of T-intersection for lots of white/try and create line points on opposite side (maybe in tighter configuration).
+**** Lines
 ***** TODO Better use corner information to identify lines
 ***** TODO Identify lines without corners
+***** TODO Extend lines?
+      Maybe scan off the end of a line for more white, then try to make more line points, tightly and add them to the line.
 ** Localization
 
 *** TODO Improve Kalman filter

@@ -134,11 +134,11 @@ private:
     // NOTE: Currently Unused
     // static const int JOIN_MAX_X_OFFSET = static_cast<int>(.35 * IMAGE_WIDTH);
     // static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
-    static const int MAX_ANGLE_TO_JOIN_LINES = 5;
+    static const int MAX_ANGLE_TO_JOIN_LINES = 9;
     static const int MIN_ANGLE_TO_JOIN_CC_LINES = 10;
     static const int MAX_ANGLE_TO_JOIN_CC_LINES = 45;
-    static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 6;
-    static const int MAX_DIST_BETWEEN_TO_JOIN_CC_LINES = 10;
+    static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 9;
+    static const int MAX_DIST_BETWEEN_TO_JOIN_CC_LINES = 12;
 
 
     ////////////////////////////////////////////////////////////
@@ -162,10 +162,10 @@ private:
     // center circle
     static const int MAX_NUM_DUPES = 0;
 
-    // The bounding box extends ~40 pixels on either side parallel to the line
+    // The bounding box extends some pixels on either side parallel to the line
     static const int INTERSECT_MAX_PARALLEL_EXTENSION =
         static_cast<int>(.15 * IMAGE_WIDTH);
-    // the bounding box extends 10 pixels on either side perpendicular to the
+    // the bounding box extends some pixels on either side perpendicular to the
     // line
     static const int INTERSECT_MAX_ORTHOGONAL_EXTENSION =
         static_cast<int>(.05 * IMAGE_WIDTH);
@@ -178,7 +178,7 @@ private:
 
     static const int CORNER_TEST_RADIUS = 1;
 
-    static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 25;
+    static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 15;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
     static const int MIN_CROSS_EXTEND = 20;
     // When estimating the angle between two lines on the field, anything less
@@ -455,8 +455,10 @@ public:
     */
 
     const bool dupeCorner(const std::list<VisualCorner> &corners,
-                          const point<int>& intersection,
-						  const int testNumber) const;
+										const point<int>& intersection,
+										const int testNumber) const;
+	void removeDupeCorners(std::list<VisualCorner> &corners,
+						   const point<int>& intersection);
 	const bool dupeFakeCorner(const std::list<point <int> > &corners,
 							  const int x, const int y, const int testNumber) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
