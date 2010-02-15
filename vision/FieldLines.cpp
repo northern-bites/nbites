@@ -138,18 +138,15 @@ void FieldLines::lineLoop() {
 
     createLines(linePoints); // Lines is a global member of FieldLines
 
+	joinLines();
+    //extendLines(linesList);
+
     // Only those linePoints which were not used in any line remain within the
     // linePoints list
+    // unusedPoints is used by vision to draw points on the screen
     unusedPointsList = linePoints;
 	fitUnusedPoints(linesList, unusedPointsList);
 
-    joinLines();
-
-    // unusedPoints is used by vision to draw points on the screen
-    // TODO:  eliminate copying?
-
-
-    //extendLines(linesList);
 
 	removeDuplicateLines();
     cornersList = intersectLines();
@@ -1302,6 +1299,7 @@ void FieldLines::drawCorners(const list<VisualCorner> &toDraw, int color) {
 
 // Attempts to fit the left over points that were not used within the
 // createLines function to the lines that were output from said function
+// CAUTION: Run after joinLines only.
 void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                                  list<linePoint> &remainingPoints) {
 
