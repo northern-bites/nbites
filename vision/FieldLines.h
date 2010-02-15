@@ -84,9 +84,9 @@ private:
     static const int NUM_LINE_COLORS = NUM_WHITE_COLORS;
 
     // Number of columns in which to search for line points
-    static const int NUM_COLS_TO_TEST = 20;
+    static const int NUM_COLS_TO_TEST = 25;
     // Number of rows in which to search for line points
-    static const int NUM_ROWS_TO_TEST = 20;
+    static const int NUM_ROWS_TO_TEST = 25;
     // Number of pixels to skip between columns in image when searching for
     // linepoints vertically
     static const int COL_SKIP = IMAGE_WIDTH / NUM_COLS_TO_TEST;
@@ -156,7 +156,7 @@ private:
     ////////////////////////////////////////////////////////////
     // Intersect Lines constants
     ////////////////////////////////////////////////////////////
-    static const int MAX_GREEN_PERCENT_ALLOWED_AT_CORNER = 65;
+    static const int MAX_GREEN_PERCENT_ALLOWED_AT_CORNER = 70;
 
     // Two many duplicate intersection points indicate we are at the
     // center circle
@@ -184,7 +184,7 @@ private:
     // When estimating the angle between two lines on the field, anything less
     // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
     // and disallowed; ideally our estimates would always be 90.0 degrees
-    static const int MIN_ANGLE_ON_FIELD = 65;
+    static const int MIN_ANGLE_ON_FIELD = 60;
     static const int MAX_ANGLE_ON_FIELD = 120;
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
 
@@ -350,6 +350,12 @@ public:
 									  const point<int>& intersection,
 									  const int& numChecksPassed) const;
 
+	const bool isTActuallyCC(const VisualCorner& c,
+							 boost::shared_ptr<VisualLine> i,
+							 boost::shared_ptr<VisualLine> j,
+							 const point<int>& intersection,
+							 const point<int>& line1Closer,
+							 const point<int>& line2Closer);
 
 	// Checks if a corner is too dangerous when it is relatively near the edge
 	// of the screen - scans the edge for a stripe of white

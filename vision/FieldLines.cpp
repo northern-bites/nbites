@@ -121,6 +121,7 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
 
 // Main Line Loop. Calls all of the smaller line functions.  Order matters.
 void FieldLines::lineLoop() {
+
     vector<linePoint> vertLinePoints;
     findVerticalLinePoints(vertLinePoints);
 
@@ -136,15 +137,16 @@ void FieldLines::lineLoop() {
           linePoints.begin());
 
     createLines(linePoints); // Lines is a global member of FieldLines
+
     // Only those linePoints which were not used in any line remain within the
     // linePoints list
+    unusedPointsList = linePoints;
 	fitUnusedPoints(linesList, unusedPointsList);
+
     joinLines();
 
     // unusedPoints is used by vision to draw points on the screen
     // TODO:  eliminate copying?
-    unusedPointsList = linePoints;
-
 
 
     //extendLines(linesList);
@@ -2487,55 +2489,9 @@ list< VisualCorner > FieldLines::intersectLines() {
 				} else {
 					// could it really be a center circle intersection?
 					// first identify which line is the stem
-					int tX = line2Closer.x, tY = line2Closer.y;
-					if (c.getTStem()->start.x == (*i)->start.x) {
-						tX = line1Closer.x;
-						tY = line1Closer.y;
-					}
-					// we're going to deal with distance squared to avoid taking roots
-					// Get the distance from the stem to the intersection
-					int targetDist = (tX - intersectX) * (tX - intersectX) +
-						(tY - intersectY) * (tY - intersectY);
-					// loop through all unused points try to find one that is close
-					// but not part of our two lines that make up the T
-					BoundingBox box1c = Utility::
-						getBoundingBox(**j,
-									   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
-									   INTERSECT_MAX_PARALLEL_EXTENSION -2);
-					BoundingBox box2c = Utility::
-						getBoundingBox(**i,
-									   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
-									   INTERSECT_MAX_PARALLEL_EXTENSION -2);
-					for (linePointNode firstPoint = unusedPointsList.begin();
-						 firstPoint != unusedPointsList.end(); firstPoint++) {
-						int pX = firstPoint->x;
-						int pY = firstPoint->y;
-						bool boxContains1 = Utility::
-							boxContainsPoint(box1c, pX, pY);
-						bool boxContains2 = Utility::
-							boxContainsPoint(box2c, pX, pY);
-						if (!(boxContains1 || boxContains2)) {
-							// get distance to the intersection
-							int diff = (pX - intersectX) * (pX - intersectX) +
-								(pY - intersectY) * (pY - intersectY);
-							// get distance to the nearest point on the stem
-							int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
-							int distSq = static_cast<int>(firstPoint->lineWidth);
-							//diff = abs(diff - targetDist);
-							// idea - the point should also be about twice the distance to the line point
-							if (debugIntersectLines) {
-								cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
-									" " << distSq << endl;
-								cout << "Critical vals are: " << (distSq * distSq) << endl;
-							}
-							if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
-								diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
-								if (debugIntersectLines) {
-									cout << "Possible center intersection" << endl;
-								}
-								c.setShape(CIRCLE);
-							}
-						}
+					if (isTActuallyCC(c, *i, *j, intersection,
+									  line1Closer, line2Closer)){
+						c.setShape(CIRCLE);
 					}
 				}
 			}
@@ -3881,7 +3837,66 @@ const bool FieldLines::intersectsFieldLines(const point<int>& first,
     return false;
 }
 
-
+const bool
+FieldLines::isTActuallyCC(const VisualCorner& c,
+						  shared_ptr<VisualLine> i,
+						  shared_ptr<VisualLine> j,
+						  const point<int>& intersection,
+						  const point<int>& line1Closer,
+						  const point<int>& line2Closer)
+{
+	int tX = line2Closer.x, tY = line2Closer.y;
+	if (c.getTStem()->start.x == i->start.x) {
+		tX = line1Closer.x;
+		tY = line1Closer.y;
+	}
+	// we're going to deal with distance squared to avoid taking roots
+	// Get the distance from the stem to the intersection
+	int targetDist = (tX - intersection.x) * (tX - intersection.x) +
+		(tY - intersection.y) * (tY - intersection.y);
+	// loop through all unused points try to find one that is close
+	// but not part of our two lines that make up the T
+	BoundingBox box1c = Utility::
+		getBoundingBox(*j,
+					   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
+					   INTERSECT_MAX_PARALLEL_EXTENSION -2);
+	BoundingBox box2c = Utility::
+		getBoundingBox(*i,
+					   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
+					   INTERSECT_MAX_PARALLEL_EXTENSION -2);
+	for (linePointNode firstPoint = unusedPointsList.begin();
+		 firstPoint != unusedPointsList.end(); firstPoint++) {
+		int pX = firstPoint->x;
+		int pY = firstPoint->y;
+		bool boxContains1 = Utility::
+			boxContainsPoint(box1c, pX, pY);
+		bool boxContains2 = Utility::
+			boxContainsPoint(box2c, pX, pY);
+		if (!(boxContains1 || boxContains2)) {
+			// get distance to the intersection
+			int diff = (pX - intersection.x) * (pX - intersection.x) +
+				(pY - intersection.y) * (pY - intersection.y);
+			// get distance to the nearest point on the stem
+			int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
+			int distSq = static_cast<int>(firstPoint->lineWidth);
+			//diff = abs(diff - targetDist);
+			// idea - the point should also be about twice the distance to the line point
+			if (debugIntersectLines) {
+				cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
+					" " << distSq << endl;
+				cout << "Critical vals are: " << (distSq * distSq) << endl;
+			}
+			if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
+				diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
+				if (debugIntersectLines) {
+					cout << "Possible center intersection" << endl;
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 /*
   FIELD LINE HELPER/SUB METHODS
@@ -3961,16 +3976,8 @@ const float FieldLines::percentSurrounding(const int x, const int y,
                                            const int numColors,
                                            const int numPixels) const {
 
-    if (!Utility::isPointOnScreen(x, y)) {
-        //cout << "("<< x << ", " << y << ")" << endl;
-        //cout << "Pixel passed to percentSurrounding was off the screen"
-        // << endl;
+    if (!Utility::isPointOnScreen(x, y) || numPixels <=0 ) {
         return 0;
-    }
-    else if (numPixels <= 0) {
-        //cout << numPixels << endl;
-        //cout << "numPixels arg in percentSurrounding must be positive, got "
-		//   << numPixels << endl;
     }
 
     // Ensure that the x values over which we iterate are on the screen

@@ -1,19 +1,19 @@
 #ifndef VisualCorner_hpp_defined
 #define VisualCorner_hpp_defined
 
-#include <iomanip>
 #include <cstdlib>
+#include <iomanip>
 #include <vector>
 
 class VisualCorner;
 
-#include <boost/shared_ptr.hpp>
-#include "VisualLandmark.h"
-#include "VisualDetection.h"
-#include "VisualLine.h"
 #include "ConcreteCorner.h"
-#include "Utility.h"
 #include "Structs.h"
+#include "Utility.h"
+#include "VisualDetection.h"
+#include "VisualLandmark.h"
+#include "VisualLine.h"
+#include <boost/shared_ptr.hpp>
 
 class VisualCorner : public VisualDetection, public VisualLandmark<cornerID> {
 private: // Constants
