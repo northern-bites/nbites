@@ -2962,11 +2962,6 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
         // T's can sometimes be misclassified as L's, check them if nothing
         // matched (and the geometric tests failed)
 
-        // if (!possibleClassifications.empty()) {
-        //     // Do a final sanity check
-        //     eliminateImpossibleIDs(*i, visibleObjects, possibleClassifications);
-        // }
-
         // Keep it completely abstract
         if (possibleClassifications.empty()) {
             i->setPossibleCorners(ConcreteCorner::getPossibleCorners(
@@ -3162,29 +3157,6 @@ void FieldLines::printFieldObjectsInformation() {
     for (vector<const VisualFieldObject*>::const_iterator i = objs.begin();
          i != objs.end(); ++i) {
         cout << *i << endl;
-    }
-}
-
-// Last sanity checks before localization gets the IDs.  Uses the information
-// about what is visible on the screen to throw out corners that could not
-// be visible.
-// TODO: Make it do something.
-void FieldLines::eliminateImpossibleIDs(VisualCorner &c,
-                                        vector <const VisualFieldObject*>
-                                        &visibleObjects,
-                                        list <const ConcreteCorner*>
-                                        &possibleClassifications)
-{
-    if (debugIdentifyCorners) {
-        cout << "Attempting to eliminate impossible corner IDs for " << c
-             << endl;
-    }
-
-    unsigned int originalSize = possibleClassifications.size();
-
-    if (debugIdentifyCorners) {
-        cout << "Removed " << (originalSize - possibleClassifications.size())
-             << " impossible corner possibilities" << endl;
     }
 }
 
