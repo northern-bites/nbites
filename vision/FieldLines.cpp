@@ -2820,7 +2820,7 @@ const bool FieldLines::tooClose(int x, int y) {
 	if (count > numPixelsSeen /2) {
 		if (debugIntersectLines){
 			cout << "Discarding point that may be near edge with count: " <<
-				count << endl;
+				count << "/" << numPixelsSeen << endl;
 		}
 		return true;
 	}
@@ -3268,37 +3268,29 @@ list <const ConcreteCorner*> FieldLines::classifyCorners(
     // For each concrete corner that's possible, calculate its distance to the
     // visible field objects on the screen as compared to the estimated
     // distance of our visual corner
-    for (list <const ConcreteCorner*>::const_iterator j =
-             concreteCorners.begin(); j != concreteCorners.end(); ++j) {
+	for (vector <const VisualFieldObject*>::const_iterator k =
+			 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
 
-        bool badPossibleCorner = false;
-        int numCorroboratingObjects = 0;
-
-        for (vector <const VisualFieldObject*>::const_iterator k =
-                 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
-
-            // Todo:  We are recalculating this over and over.  How to remember?
             float estimatedDistance = getEstimatedDistance(&corner, *k);
+
+		for (list <const ConcreteCorner*>::const_iterator j =
+				 concreteCorners.begin(); j != concreteCorners.end(); ++j) {
 
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
 			// and add all the possibilities up.
 			for (list<const ConcreteFieldObject*>::const_iterator i =
 					 (*k)->getPossibleFieldObjects()->begin();
-				 i != (*k)->getPossibleFieldObjects()->end() ; ++i)
-			{
-				// if the object and corner fit to real distance well
+				 i != (*k)->getPossibleFieldObjects()->end() ; ++i) {
+
 				if (arePointsCloseEnough(estimatedDistance, *j, *k)){
 					possibleClassifications.push_back(*j);
+
+					if (debugIdentifyCorners) {
+						cout << "Corner is possibly a " << (*j)->toString() << endl;
+					}
 				}
-				// add it to the vector of possible corners
 			}
-		}
-		// set it as the possibilities for the corner
-
-
-		if (debugIdentifyCorners) {
-			cout << "Corner is possibly a " << (*j)->toString() << endl;
 		}
 	}
 	return possibleClassifications;
