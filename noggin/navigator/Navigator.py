@@ -1,11 +1,9 @@
-
-from . import NavStates
-from ..util import FSA
-from ..util import MyMath
-import NavConstants as constants
-import man.motion as motion
-
 from math import fabs
+import man.motion as motion
+from ..util import FSA
+from . import NavStates
+from . import NavMath
+from . import NavConstants as constants
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -42,32 +40,13 @@ class Navigator(FSA.FSA):
 
         self.orbitDir = None
 
-    def chaseTarget(self, target, heading=0.0):
-        '''
-        will chase a target(ball, robot, person?)
-        heading is desired final heading (NOT IMPLEMENTED!)
-        '''
-        self.brain.CoA.setRobotDribbleGait(motion)
-        self.destX = target.x
-        self.destY = target.y
-        self.destH = 0.0
-        self.movingOmni = False
-        self.switchTo('chaseToPoint')
-
-    #NOT SAFE FOR USE
-    def dribbleGoTo(self, dest):
-        '''
-        we\'ll dribble the ball! (to give destination)
-        '''
-        pass
-        self.brain.CoA.setRobotDribbleGait(motion)
 
     def omniGoTo(self, dest):
         if len(dest) == 2:
             self.destX, self.destY = dest
             self.destH = 0.0
         elif len(dest) == 3:
-            self.destX,self.destY, self.destH = dest
+            self.destX, self.destY, self.destH = dest
         self.movingOmni = True
         self.switchTo('omniWalkToPoint')
 
@@ -83,11 +62,24 @@ class Navigator(FSA.FSA):
         if not self.currentState == 'spinToWalkHeading' and \
                 not self.currentState == 'walkStraightToPoint' and \
                 not self.currentState == 'spinToFinalHeading':
-            if not self.atHeadingGoTo(self.destH):
+            if not NavMath.atHeadingGoTo(self, self.destH):
                 self.switchTo('spinToWalkHeading')
-            elif self.atHeadingGoTo(self.destH):
+            elif NavMath.atHeadingGoTo(self, self.destH):
                 self.switchTo('walkStraightToPoint')
 
+    def isStopped(self):
+        return self.currentState == 'stopped'
+
+    def orbit(self, orbitDir):
+        self.orbitDir = orbitDir
+        self.switchTo('orbitPoint')
+
+    def orbitAngle(self, angleToOrbit):
+        self.angleToOrbit = angleToOrbit
+        self.switchTo('orbitPointThruAngle')
+
+
+#######SHOULD BE MOVED TO NavHelper.py, LEFT FOR BACKWARDS COMPATABILITY ONLY#######
     def setWalk(self, x, y, theta):
         """
         Sets a new walk command
@@ -96,7 +88,9 @@ class Navigator(FSA.FSA):
         """
         # Make sure we stop
         if (x == 0 and y == 0 and theta == 0):
-            if self.walkX == 0 and self.walkY == 0 and self.walkTheta == 0:
+            if self.walkX == 0 and \
+                   self.walkY == 0 and \
+                   self.walkTheta == 0:
                 return False
         # If the walk changes are really small, then ignore them
         elif (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
@@ -134,81 +128,3 @@ class Navigator(FSA.FSA):
         """
         steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
         self.brain.motion.sendStepCommand(steps)
-
-
-    def atDestination(self):
-        """
-        Returns true if we are at an (x, y) close enough to the one we want
-        """
-#         self.printf("X diff is " + str(self.brain.my.x - self.destX))
-#         self.printf("Y diff is " + str(self.brain.my.y - self.destY))
-        return (abs(self.brain.my.x - self.destX) < constants.CLOSE_ENOUGH_XY
-                and abs(self.brain.my.y - self.destY) < constants.CLOSE_ENOUGH_XY)
-
-    def atDestinationCloser(self):
-        """
-        Returns true if we are at an (x, y) close enough to the one we want
-        """
-#         self.printf("X diff is " + str(self.brain.my.x - self.destX))
-#         self.printf("Y diff is " + str(self.brain.my.y - self.destY))
-        return (abs(self.brain.my.x - self.destX) < constants.CLOSER_XY
-                and abs(self.brain.my.y - self.destY) < constants.CLOSER_XY)
-
-    def atDestinationGoalie(self):
-        return (abs(self.brain.my.x - self.destX) < constants.GOALIE_CLOSE_X
-                and abs(self.brain.my.y - self.destY) < constants.GOALIE_CLOSE_Y)
-
-    def atHeadingGoTo(self,targetHeading):
-        hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
-        #self.printf("H diff is " + str(hDiff))
-        return hDiff < constants.AT_HEADING_GOTO_DEG
-
-
-    def atHeading(self, targetHeading = None):
-        """
-        Returns true if we are at a heading close enough to what we want
-        """
-        if targetHeading is None:
-            targetHeading = self.destH
-        hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
-        #self.printf("H diff is " + str(hDiff))
-        return hDiff < constants.CLOSE_ENOUGH_H and \
-            self.brain.my.uncertH < constants.LOC_IS_ACTIVE_H
-
-    def notAtHeading(self, targetHeading= None):
-        if targetHeading is None:
-            targetHeading = self.destH
-        hDiff = abs(MyMath.sub180Angle(self.brain.my.h - targetHeading))
-        #self.printf("H diff is " + str(hDiff))
-        return hDiff > constants.ALMOST_CLOSE_ENOUGH_H and \
-            self.brain.my.uncertH < constants.LOC_IS_ACTIVE_H
-
-    def getRotScale(self, headingDiff):
-        absHDiff = abs(headingDiff)
-        if absHDiff < constants.HEADING_NEAR_THRESH:
-            return constants.HEADING_NEAR_SCALE
-        elif absHDiff < constants.HEADING_MEDIUM_THRESH:
-            return constants.HEADING_MEDIUM_SCALE
-        else:
-            return constants.HEADING_FAR_SCALE
-
-    def getOScale(self):
-        dist = MyMath.dist(self.brain.my.x, self.brain.my.y,
-                           self.destX, self.destY)
-        if dist < constants.POSITION_NEAR_THRESH:
-            return constants.POSITION_NEAR_SCALE
-        elif dist < constants.HEADING_MEDIUM_THRESH:
-            return constants.POSITION_MEDIUM_THRESH
-        else:
-            return constants.POSITION_FAR_SCALE
-
-    def isStopped(self):
-        return self.currentState == 'stopped'
-
-    def orbit(self, orbitDir):
-        self.orbitDir = orbitDir
-        self.switchTo('orbitPoint')
-
-    def orbitAngle(self, angleToOrbit):
-        self.angleToOrbit = angleToOrbit
-        self.switchTo('orbitPointThruAngle')

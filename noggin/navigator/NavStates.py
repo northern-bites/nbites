@@ -1,9 +1,10 @@
 """ States for finding our way on the field """
 
-from .util import MyMath
-import NavConstants as constants
-from .players import ChaseBallConstants
-from .playbook.PBConstants import GOALIE
+from ..util import MyMath
+from . import NavMath
+from . import NavConstants as constants
+from ..players import ChaseBallConstants
+from ..playbook.PBConstants import GOALIE
 from math import fabs, cos, sin, radians
 
 DEBUG = False
@@ -12,7 +13,9 @@ def spinToWalkHeading(nav):
     """
     Spin to the heading needed to walk to a specific point
     """
-    targetH = MyMath.getTargetHeading(nav.brain.my, nav.destX, nav.destY)
+    targetH = MyMath.getTargetHeading(nav.brain.my,
+                                      nav.destX,
+                                      nav.destY)
     headingDiff = fabs(nav.brain.my.h - targetH)
     newSpinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
@@ -33,7 +36,7 @@ def spinToWalkHeading(nav):
                              str(nav.brain.my.h)+
                              " and my target h: " + str(targetH))
 
-    if nav.atHeadingGoTo(targetH):
+    if NavMath.atHeadingGoTo(nav, targetH):
         nav.stopSpinToWalkCount += 1
     else :
         nav.stopSpinToWalkCount -= 1
@@ -41,11 +44,11 @@ def spinToWalkHeading(nav):
 
     if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('walkStraightToPoint')
-    if nav.atDestinationCloser():
+    if NavMath.atDestinationCloser(nav):
         return nav.goLater('spinToFinalHeading')
 
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
-        nav.getRotScale(headingDiff)
+        NavMath.getRotScale(headingDiff)
 
     if sTheta != nav.walkTheta:
         nav.setSpeed(0, 0, sTheta)
@@ -63,7 +66,7 @@ def walkStraightToPoint(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
-    if nav.atDestinationCloser():
+    if NavMath.atDestinationCloser(nav):
         nav.walkToPointCount += 1
     else :
         nav.walkToPointCount = 0
@@ -74,7 +77,7 @@ def walkStraightToPoint(nav):
     my = nav.brain.my
     targetH = MyMath.getTargetHeading(my, nav.destX, nav.destY)
 
-    if nav.notAtHeading(targetH):
+    if NavMath.notAtHeading(nav, targetH):
         nav.walkToPointSpinCount += 1
     else :
         nav.walkToPointSpinCount = 0
@@ -92,7 +95,7 @@ def walkStraightToPoint(nav):
 
     sTheta = MyMath.clip(MyMath.sign(bearing) *
                          constants.GOTO_STRAIGHT_SPIN_SPEED *
-                         nav.getRotScale(bearing),
+                         NavMath.getRotScale(bearing),
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
 
@@ -122,9 +125,9 @@ def spinToFinalHeading(nav):
                    % (targetH, headingDiff, nav.brain.my.uncertH))
     spinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
-    spin = spinDir*constants.GOTO_SPIN_SPEED*nav.getRotScale(headingDiff)
+    spin = spinDir*constants.GOTO_SPIN_SPEED*NavMath.getRotScale(headingDiff)
 
-    if nav.atHeading(targetH):
+    if NavMath.atHeading(nav, targetH):
         nav.stopSpinToWalkCount += 1
     else:
         nav.stopSpinToWalkCount = 0
@@ -139,10 +142,10 @@ def omniWalkToPoint(nav):
     if nav.firstFrame():
         nav.walkToPointCount = 0
     if nav.brain.play.isRole(GOALIE):
-        if nav.atDestinationGoalie() and nav.atHeading():
+        if NavMath.atDestinationGoalie(nav) and NavMath.atHeading(nav):
             return nav.goNow('stop')
     else:
-        if nav.atDestinationCloser() and nav.atHeading():
+        if NavMath.atDestinationCloser(nav) and NavMath.atHeading(nav):
             return nav.goNow('stop')
 
     my = nav.brain.my
@@ -184,9 +187,9 @@ def omniWalkToPoint(nav):
     if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
         sTheta = 0.0
 
-    if nav.atDestinationCloser():
+    if NavMath.atDestinationCloser(nav):
         sX = sY = 0.0
-    if nav.atHeading():
+    if NavMath.atHeading(nav):
         sTheta = 0.0
 
     if DEBUG: nav.printf("sX: %g  sY: %g  sTheta: %g" %

@@ -147,9 +147,6 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/GameStates.py
                         ${NOGGIN_INCLUDE_DIR}/FallController.py
                         ${NOGGIN_INCLUDE_DIR}/FallStates.py
-                        ${NOGGIN_INCLUDE_DIR}/NavStates.py
-                        ${NOGGIN_INCLUDE_DIR}/NavConstants.py
-                        ${NOGGIN_INCLUDE_DIR}/Navigator.py
                         ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
                         ${NOGGIN_INCLUDE_DIR}/Leds.py
                         ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
@@ -157,6 +154,7 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         )
 
 SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/headTracking
+                           ${NOGGIN_INCLUDE_DIR}/navigator
                            ${NOGGIN_INCLUDE_DIR}/playbook
                            ${NOGGIN_INCLUDE_DIR}/players
                            ${NOGGIN_INCLUDE_DIR}/robots
