@@ -3265,13 +3265,14 @@ list <const ConcreteCorner*> FieldLines::classifyCorners(
              << concreteCorners.size() << " corner possibilities" << endl
              << endl;
     }
-    // For each concrete corner that's possible, calculate its distance to the
-    // visible field objects on the screen as compared to the estimated
-    // distance of our visual corner
+
+    // For each field object that we see, calculate its real distance to
+    // each possible concrete corner and compare with the visual estimated
+    // distance. If it fits, add it to the list of possibilities.
 	for (vector <const VisualFieldObject*>::const_iterator k =
 			 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
 
-            float estimatedDistance = getEstimatedDistance(&corner, *k);
+		float estimatedDistance = getEstimatedDistance(&corner, *k);
 
 		for (list <const ConcreteCorner*>::const_iterator j =
 				 concreteCorners.begin(); j != concreteCorners.end(); ++j) {
