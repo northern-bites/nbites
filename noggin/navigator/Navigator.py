@@ -1,7 +1,7 @@
 
 from . import NavStates
-from .util import FSA
-from .util import MyMath
+from ..util import FSA
+from ..util import MyMath
 import NavConstants as constants
 import man.motion as motion
 
@@ -33,7 +33,6 @@ class Navigator(FSA.FSA):
         self.walkY = 0
         self.walkTheta = 0
         self.currentGait = None
-        self.movingOrtho = False
         self.movingOmni = False
 
         # Step controls
@@ -43,35 +42,37 @@ class Navigator(FSA.FSA):
 
         self.orbitDir = None
 
+    def chaseTarget(self, target, heading=0.0):
+        '''
+        will chase a target(ball, robot, person?)
+        heading is desired final heading (NOT IMPLEMENTED!)
+        '''
+        self.brain.CoA.setRobotDribbleGait(motion)
+        self.destX = target.x
+        self.destY = target.y
+        self.destH = 0.0
+        self.movingOmni = False
+        self.switchTo('chaseToPoint')
+
+    #NOT SAFE FOR USE
+    def dribbleGoTo(self, dest):
+        '''
+        we\'ll dribble the ball! (to give destination)
+        '''
+        pass
+        self.brain.CoA.setRobotDribbleGait(motion)
+
     def omniGoTo(self, dest):
         if len(dest) == 2:
             self.destX, self.destY = dest
             self.destH = 0.0
         elif len(dest) == 3:
             self.destX,self.destY, self.destH = dest
-        self.movingOrtho = False
         self.movingOmni = True
         self.switchTo('omniWalkToPoint')
 
-    def orthoGoTo(self, dest, oScale = -1.0, hScale = -1.0):
-        '''
-        takes in a relative bearing [-180...0...180],
-        takes in a heading to keep your heading constant (relatively)
-        '''
-        if len(dest) == 2:
-            self.destX, self.destY = dest
-            self.destH = 0.0
-        elif len(dest) == 3:
-            self.destX,self.destY, self.destH = dest
-        self.oScale = oScale
-        self.hScale = hScale
-        self.movingOrtho = True
-        self.movingOmni = False
-
-        self.switchTo('orthoWalkToPoint')
-
     def goTo(self,dest):
-        self.movingOrtho = False
+
         self.movingOmni = False
         if len(dest) == 2:
             self.destX, self.destY = dest
