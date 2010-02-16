@@ -2522,7 +2522,7 @@ list< VisualCorner > FieldLines::intersectLines() {
 
 }
 
-bool FieldLines::isAngleTooSmall(shared_ptr<VisualLine> i,
+const bool FieldLines::isAngleTooSmall(shared_ptr<VisualLine> i,
 								 shared_ptr<VisualLine> j,
 								 const int& numChecksPassed) const
 {
@@ -2547,8 +2547,8 @@ bool FieldLines::isAngleTooSmall(shared_ptr<VisualLine> i,
 
 // Off screen sanity check: only allow corners that are within image
 // frame
-bool FieldLines::isIntersectionOnScreen(const point<int>& intersection,
-										const int& numChecksPassed) const
+const bool FieldLines::isIntersectionOnScreen(const point<int>& intersection,
+											  const int& numChecksPassed) const
 {
 	if (!Utility::isPointOnScreen(intersection)) {
 		if (debugIntersectLines)
@@ -2559,7 +2559,7 @@ bool FieldLines::isIntersectionOnScreen(const point<int>& intersection,
 	return true;
 }
 
-bool FieldLines::isAngleOnFieldOkay(shared_ptr<VisualLine> i,
+const bool FieldLines::isAngleOnFieldOkay(shared_ptr<VisualLine> i,
 									shared_ptr<VisualLine> j,
 									const int& intersectX,
 									const int& intersectY,
@@ -2588,7 +2588,7 @@ bool FieldLines::isAngleOnFieldOkay(shared_ptr<VisualLine> i,
 // Too much green check:  Discard potential corners where the
 // intersection point is actually in the field green rather than in
 // a line
-bool FieldLines::tooMuchGreenAtCorner(const point<int>& intersection,
+const bool FieldLines::tooMuchGreenAtCorner(const point<int>& intersection,
 									  const int& numChecksPassed)
 {
 	float percentGreen = percentSurrounding(intersection,
@@ -2611,7 +2611,7 @@ bool FieldLines::tooMuchGreenAtCorner(const point<int>& intersection,
 // Too small check: ensure that at least one of the line segments is
 // long enough (if both are small it indicates we might be at the
 // center circle)
-bool FieldLines::areLinesTooSmall(shared_ptr<VisualLine> i,
+const bool FieldLines::areLinesTooSmall(shared_ptr<VisualLine> i,
 								  shared_ptr<VisualLine> j,
 								  const int& numChecksPassed) const
 {
@@ -2640,7 +2640,7 @@ bool FieldLines::areLinesTooSmall(shared_ptr<VisualLine> i,
 // We parameterize the line such that x and y are functions of one
 // variable t. Then we figure out what t gives us the corner's
 // x coordinate. When t = 0, x = x1; when t = lineLength, x = x2;
-bool FieldLines::doLinesCross(shared_ptr<VisualLine> i,
+const bool FieldLines::doLinesCross(shared_ptr<VisualLine> i,
 							  shared_ptr<VisualLine> j,
 							  const float& t_I, const float& t_J,
 							  const int& numChecksPassed) const
@@ -2662,7 +2662,7 @@ bool FieldLines::doLinesCross(shared_ptr<VisualLine> i,
 }
 
 
-bool FieldLines::isCornerTooFar(const float& distance,
+const bool FieldLines::isCornerTooFar(const float& distance,
 								const int& numChecksPassed) const
 {
 	// Ridiculously far away points have -distance due to pose problems.
@@ -2688,7 +2688,7 @@ bool FieldLines::isCornerTooFar(const float& distance,
 * both boxes contain the intersection, rather than testing whether
 * the lines themselves both contain the intersection
 */
-bool FieldLines::areLineEndsCloseEnough(shared_ptr<VisualLine> i,
+const bool FieldLines::areLineEndsCloseEnough(shared_ptr<VisualLine> i,
 										shared_ptr<VisualLine> j,
 										const point<int>& intersection,
 										const int& numChecksPassed) const
@@ -2725,7 +2725,7 @@ bool FieldLines::areLineEndsCloseEnough(shared_ptr<VisualLine> i,
  * Ensure that there is not too much green between the endpoints of the lines
  * and the corner itself.
  */
-bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
+const bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
 											  const point<int>& line2Closer,
 											  const point<int>& intersection,
 											  const int& numChecksPassed) const
@@ -2763,7 +2763,7 @@ bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
 
 
 // Checks if a corner is too dangerous when it is near the edge of the screen
-bool FieldLines::tooClose(int x, int y) {
+const bool FieldLines::tooClose(int x, int y) {
 	const int DANGER_ZONE = 35;
 	const int BADCOUNT = 50;
 	// These are half the depth of the box we scan (avoids a division)
@@ -2916,6 +2916,12 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
              << " corners" << endl;
 
     vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
+
+	// We prefer using SUREly identified posts, but we will use other ones if
+	// they're available
+	if (visibleObjects.empty())
+		visibleObjects = getAllVisibleFieldObjects();
+
 	int numCorners = corners.size(), numTs = 0, numLs = 0;
 	if (numCorners > 1) {
 		for (list <VisualCorner>::iterator i = corners.begin();i != corners.end(); i++){
@@ -3270,73 +3276,85 @@ list <const ConcreteCorner*> FieldLines::classifyCorners(
 
         for (vector <const VisualFieldObject*>::const_iterator k =
                  visibleObjects.begin(); k != visibleObjects.end(); ++k) {
-            float realDistance = getRealDistance(*j, *k);
+
             // Todo:  We are recalculating this over and over.  How to remember?
             float estimatedDistance = getEstimatedDistance(&corner, *k);
-            float absoluteError = fabs(realDistance - estimatedDistance);
-            float relativeError = absoluteError / realDistance * 100.0f;
 
-            // If we have already one good distance between this corner and a
-            // field object, we only require that the next objects have a small
-            // relative error.
-            const float MAX_RELATIVE_ERROR = 15.0f;
-            // For each corroborating object we find, we allow this much more
-            // percent error for subsequent objects
-            const float ERROR_ALLOWANCE_INCREASE = 5.0f;
-            float relErrorRelaxation =
-                ERROR_ALLOWANCE_INCREASE *
-				static_cast<float>(numCorroboratingObjects);
+			// The visual object might be abstract, so we should check
+			// all of its possible objects to see if we're close enough to one
+			// and add all the possibilities up.
+			for (list<const ConcreteFieldObject*>::const_iterator i =
+					 (*k)->getPossibleFieldObjects()->begin();
+				 i != (*k)->getPossibleFieldObjects()->end() ; ++i)
+			{
+				// if the object and corner fit to real distance well
+				if (arePointsCloseEnough(estimatedDistance, *j, *k)){
+					possibleClassifications.push_back(*j);
+				}
+				// add it to the vector of possible corners
+			}
+		}
+		// set it as the possibilities for the corner
 
-            if (numCorroboratingObjects > 0 &&
-                relativeError < MAX_RELATIVE_ERROR + relErrorRelaxation) {
-                if (debugIdentifyCorners) {
-                    cout << "\tDistance between " << (*j)->toString() << " and "
-                         << (*k)->toString() << " was fine! Relative error of "
-                         << relativeError
-                         << " corner pos: (" << (*j)->getFieldX() << ","
-                         << (*j)->getFieldY()
-                         << " goal pos: (" << (*k)->getFieldX() << ","
-                         << (*k)->getFieldY() << endl;
-                }
-                numCorroboratingObjects++;
-            }
 
-            else if (absoluteError > getAllowedDistanceError(*k)) {
-                if (debugIdentifyCorners) {
-                    cout << "\tDistance between " << (*j)->toString() << " and "
-                         << (*k)->toString() << " too large." << endl
-                         << "\tReal: " << realDistance
-                         << "\tEstimated: " << estimatedDistance << endl
-                         << "\tAbsolute error: " << absoluteError
-                         << "\tRelative error: " << relativeError << "%"
-                         << endl;
-                }
-                badPossibleCorner = true;
-                break;
-            }
-            else {
-                if (debugIdentifyCorners) {
-                    cout << "\tDistance between " << (*j)->toString() << " and "
-                         << (*k)->toString() << " was fine! Absolute error of "
-                         << absoluteError
-                         << " corner pos: (" << (*j)->getFieldX() << ","
-                         << (*j)->getFieldY()
-                         << " goal pos: (" << (*k)->getFieldX() << ","
-                         << (*k)->getFieldY() << endl;
-                }
-                numCorroboratingObjects++;
-            }
-        }
-        if (!badPossibleCorner) {
-            possibleClassifications.push_back(*j);
-            if (debugIdentifyCorners) {
-                cout << "Corner is possibly a " << (*j)->toString() << endl;
-            }
-        }
-    }
-    return possibleClassifications;
+		if (debugIdentifyCorners) {
+			cout << "Corner is possibly a " << (*j)->toString() << endl;
+		}
+	}
+	return possibleClassifications;
 }
 
+
+const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
+											const ConcreteCorner* j,
+											const VisualFieldObject* k) const
+{
+	const float realDistance = getRealDistance(j, k);
+	const float absoluteError = fabs(realDistance - estimatedDistance);
+	const float relativeError = absoluteError / realDistance * 100.0f;
+
+	// If we have already one good distance between this corner and a
+	// field object, we only require that the next objects have a small
+	// relative error.
+	const float MAX_RELATIVE_ERROR = 15.0f;
+	const float USE_RELATIVE_DISTANCE = 250.0f;
+
+	if ( relativeError < MAX_RELATIVE_ERROR &&
+		 k->getDistance() > USE_RELATIVE_DISTANCE ) {
+		if (debugIdentifyCorners) {
+			cout << "\tDistance between " << j->toString() << " and "
+				 << k->toString() << " was fine! Relative error of "
+				 << relativeError
+				 << " corner pos: (" << j->getFieldX() << ","
+				 << j->getFieldY()
+				 << " goal pos: (" << k->getFieldX() << ","
+				 << k->getFieldY() << endl;
+		}
+		return true;
+	} else if (absoluteError > getAllowedDistanceError(k)) {
+		if (debugIdentifyCorners) {
+			cout << "\tDistance between " << j->toString() << " and "
+				 << k->toString() << " too large." << endl
+				 << "\tReal: " << realDistance
+				 << "\tEstimated: " << estimatedDistance << endl
+				 << "\tAbsolute error: " << absoluteError
+				 << "\tRelative error: " << relativeError << "%"
+				 << endl;
+		}
+		return false;
+	} else {
+		if (debugIdentifyCorners) {
+			cout << "\tDistance between " << j->toString() << " and "
+				 << k->toString() << " was fine! Absolute error of "
+				 << absoluteError
+				 << " corner pos: (" << j->getFieldX() << ","
+				 << j->getFieldY()
+				 << " goal pos: (" << k->getFieldX() << ","
+				 << k->getFieldY() << endl;
+		}
+		return true;
+	}
+}
 
 float FieldLines::getAllowedDistanceError(VisualFieldObject const *obj) const {
     switch (obj->getID()) {
@@ -3617,6 +3635,17 @@ vector <const VisualFieldObject*> FieldLines::getVisibleFieldObjects() const {
             else {
                 visibleObjects.push_back(allFieldObjects[i]);
             }
+        }
+    }
+    return visibleObjects;
+}
+
+vector<const VisualFieldObject*> FieldLines::getAllVisibleFieldObjects() const
+{
+    vector <const VisualFieldObject*> visibleObjects;
+    for (int i = 0; i < NUM_FIELD_OBJECTS_WITH_DIST_INFO; ++i) {
+        if (allFieldObjects[i]->getDistance() > 0){
+                visibleObjects.push_back(allFieldObjects[i]);
         }
     }
     return visibleObjects;

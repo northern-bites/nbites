@@ -312,40 +312,40 @@ public:
 	/**
 	 * Sanity checks for field lines:
 	 */
-	bool isAngleTooSmall(boost::shared_ptr<VisualLine> i,
+	const bool isAngleTooSmall(boost::shared_ptr<VisualLine> i,
 						 boost::shared_ptr<VisualLine> j,
 						 const int& numChecksPassed) const;
 
-	bool isIntersectionOnScreen(const point<int>& intersection,
+	const bool isIntersectionOnScreen(const point<int>& intersection,
 								const int& numChecksPassed) const;
 
-	bool isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
+	const bool isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
 							boost::shared_ptr<VisualLine> j,
 							const int& intersectX,
 							const int& intersectY,
 							const int& numChecksPassed) const;
 
-	bool tooMuchGreenAtCorner(const point<int>& intersection,
+	const bool tooMuchGreenAtCorner(const point<int>& intersection,
 							  const int& numChecksPassed);
 
-	bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
+	const bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
 						  boost::shared_ptr<VisualLine> j,
 						  const int& numChecksPassed) const;
 
-	bool doLinesCross(boost::shared_ptr<VisualLine> i,
+	const bool doLinesCross(boost::shared_ptr<VisualLine> i,
 					  boost::shared_ptr<VisualLine> j,
 					  const float& t_I, const float& t_J,
 					  const int& numChecksPassed)const ;
 
-	bool isCornerTooFar(const float& distance,
+	const bool isCornerTooFar(const float& distance,
 						const int& numChecksPassed) const;
 
-	bool areLineEndsCloseEnough(boost::shared_ptr<VisualLine> i,
+	const bool areLineEndsCloseEnough(boost::shared_ptr<VisualLine> i,
 								boost::shared_ptr<VisualLine> j,
 								const point<int>& intersection,
 								const int& numChecksPassed) const;
 
-	bool tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
+	const bool tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
 									  const point<int>& line2Closer,
 									  const point<int>& intersection,
 									  const int& numChecksPassed) const;
@@ -359,7 +359,7 @@ public:
 
 	// Checks if a corner is too dangerous when it is relatively near the edge
 	// of the screen - scans the edge for a stripe of white
-	bool tooClose(int x, int y);
+	const bool tooClose(int x, int y);
 
     // Iterates over the corners and removes those that are too risky to
     // use for localization data
@@ -445,6 +445,10 @@ public:
 					&visibleObjects,
 					const std::list <const ConcreteCorner*>
 					&concreteCorners) const;
+
+	const bool arePointsCloseEnough(const float estimatedDistance,
+									const ConcreteCorner* j,
+									const VisualFieldObject* k) const;
 
 
     float getAllowedDistanceError(VisualFieldObject const *obj) const;
@@ -594,6 +598,8 @@ private:
     // Determines which field objects are visible on the screen and returns
     // a vector of the pointers of the objects that are visible.
     std::vector<const VisualFieldObject*> getVisibleFieldObjects() const;
+
+	vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
     // Returns whether there is a yellow post on screen that vision has not
     // identified the side of
