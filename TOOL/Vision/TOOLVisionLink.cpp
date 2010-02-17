@@ -282,7 +282,9 @@ extern "C" {
         for (list <VisualCorner>::const_iterator i = corners->begin();
              i != corners->end(); i++)
             env->CallVoidMethod(jobj, setVisualCornersInfo,
-                                i->getX(), i->getY());
+                                i->getX(), i->getY(),
+								i->getDistance(), i->getBearing(),
+								i->getShape());
         //horizon line
         jmethodID setHorizonInfo = env->GetMethodID(javaClass, "setHorizonInfo",
                                                     "(IIIII)V");
