@@ -67,6 +67,12 @@ class Navigator(FSA.FSA):
             elif NavMath.atHeadingGoTo(self, self.destH):
                 self.switchTo('walkStraightToPoint')
 
+    def stop(self):
+        if self.currentState =='stop':
+            pass
+        else:
+            self.switchTo('stop')
+
     def isStopped(self):
         return self.currentState == 'stopped'
 
@@ -78,42 +84,32 @@ class Navigator(FSA.FSA):
         self.angleToOrbit = angleToOrbit
         self.switchTo('orbitPointThruAngle')
 
-
-#######SHOULD BE MOVED TO NavHelper.py, LEFT FOR BACKWARDS COMPATABILITY ONLY#######
-    def setWalk(self, x, y, theta):
+    def walk(self, x, y, theta):
         """
-        Sets a new walk command
-        Returns False if it is the same as the current walk
-        True otherwise
+        Starts a new walk command
+        Does nothing if it is the same as the current walk
+        Switches to it otherwise
         """
         # Make sure we stop
         if (x == 0 and y == 0 and theta == 0):
             if self.walkX == 0 and \
                    self.walkY == 0 and \
                    self.walkTheta == 0:
-                return False
+                return
         # If the walk changes are really small, then ignore them
         elif (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
             fabs(self.walkY - y) < constants.STRAFE_EPSILON and
             fabs(self.walkTheta - theta) < constants.SPIN_EPSILON):
-            return False
+            return
 
         self.walkX = x
         self.walkY = y
         self.walkTheta = theta
 
         self.updatedTrajectory = True
-        return True
+        self.switchTo('walking')
 
-    def setSpeed(self,x,y,theta):
-        """
-        Wrapper method to easily change the walk vector of the robot
-        """
-        self.walkX, self.walkY, self.walkTheta = x, y, theta
-        walk = motion.WalkCommand(x=x,y=y,theta=theta)
-        self.brain.motion.setNextWalkCommand(walk)
-
-    def setSteps(self, x, y, theta, numSteps):
+    def takeSteps(self, x, y, theta, numSteps):
         """
         Set the step commands
         """
@@ -121,6 +117,16 @@ class Navigator(FSA.FSA):
         self.stepY = y
         self.stepTheta = theta
         self.numSteps = numSteps
+        self.switchTo('stepping')
+
+#######SHOULD BE MOVED TO NavHelper.py, LEFT FOR BACKWARDS COMPATABILITY ONLY#######
+    def setSpeed(self,x,y,theta):
+        """
+        Wrapper method to easily change the walk vector of the robot
+        """
+        self.walkX, self.walkY, self.walkTheta = x, y, theta
+        walk = motion.WalkCommand(x=x,y=y,theta=theta)
+        self.brain.motion.setNextWalkCommand(walk)
 
     def step(self,x,y,theta,numSteps):
         """

@@ -14,14 +14,15 @@ def gameInitial(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.gainsOn()
+        player.zeroHeads()
+        player.GAME_INITIAL_satDown = False
+
         if player.squatting:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             player.squatting = False
         else:
             player.stopWalking()
-        player.gainsOn()
-        player.zeroHeads()
-        player.GAME_INITIAL_satDown = False
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and player.motion.isBodyActive()):
@@ -35,14 +36,16 @@ def gamePenalized(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.penalizeHeads()
+
         if player.squatting:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             player.squatting = False
         else:
             player.stopWalking()
-        player.penalizeHeads()
 
-    if (player.stateTime >=
+    if (player.brain.play.isRole(GOALIE) and
+        player.stateTime >=
         SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
         player.stopWalking()
 
@@ -57,16 +60,17 @@ def gameReady(player):
         player.inKickingState = False
         player.justKicked = False
         player.brain.CoA.setRobotGait(player.brain.motion)
+
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
+        else:
+            player.standup()
+
     if player.brain.gameController.ownKickOff:
         player.hasKickedOffKick = False
     else:
         player.hasKickedOffKick = True
-
-    if player.squatting:
-        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-        player.squatting = False
-    else:
-        player.standup()
 
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
@@ -86,6 +90,7 @@ def gameSet(player):
         player.inKickingState = False
         player.justKicked = False
         player.brain.CoA.setRobotGait(player.brain.motion)
+
     if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
 

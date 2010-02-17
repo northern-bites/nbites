@@ -1,6 +1,7 @@
 from . import TrackingStates
 from . import PanningStates
 from . import ActiveLookStates
+from . import BasicStates
 from . import HeadTrackingHelper as helper
 from ..util import FSA
 
@@ -12,6 +13,7 @@ class HeadTracking(FSA.FSA):
         self.addStates(TrackingStates)
         self.addStates(PanningStates)
         self.addStates(ActiveLookStates)
+        self.addStates(BasicStates)
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
@@ -20,6 +22,7 @@ class HeadTracking(FSA.FSA):
         self.setName('headTracking')
 
         self.currentHeadScan = None
+        self.headMove = None
 
         self.activePanDir = False
         self.activeLocOn = False
@@ -40,6 +43,10 @@ class HeadTracking(FSA.FSA):
         Does not call stop head moves. In TrackingStates.py"""
         self.switchTo('neutralHead')
 
+    def performHeadMove(self, headMove):
+        self.headMove = headMove
+        self.switchTo('doHeadMove')
+
     def trackBall(self):
         """automatically tracks the ball. scans for the ball if not in view"""
         self.target = self.brain.ball
@@ -51,7 +58,6 @@ class HeadTracking(FSA.FSA):
     def locPans(self):
         """repeatedly performs quick pan"""
         self.activeLocOn = False
-        self.stopHeadMoves()
         self.switchTo('locPans')
 
     def activeLoc(self):

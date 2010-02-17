@@ -134,7 +134,7 @@ def spinToBall(player):
         player.stopWalking()
         player.currentSpinDir = MyMath.sign(turnRate)
     elif player.stoppedWalk and ball.on and player.brain.nav.isStopped():
-        player.setSpeed(x=0,y=0,theta=turnRate)
+        player.setWalk(x=0,y=0,theta=turnRate)
 
     return player.stay()
 
@@ -161,7 +161,7 @@ def spinFindBallPosition(player):
         player.stoppedWalk = True
 
     if player.firstFrame() and player.stoppedWalk:
-        player.setSpeed(0,
+        player.setWalk(0,
                         0,
                         ChaseConstants.FIND_BALL_SPIN_SPEED)
         player.brain.tracker.trackBall()
@@ -185,5 +185,5 @@ def relocalize(player):
         player.brain.tracker.locPans()
 
     if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
-        player.setSpeed(0 , 0, constants.RELOC_SPIN_SPEED)
+        player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED)
     return player.stay()

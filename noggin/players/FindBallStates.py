@@ -76,7 +76,7 @@ def spinFindBall(player):
             spinDir = MyMath.getSpinDir(my.h,
                                         my.h + ball.locBearing)
 
-        player.setSpeed(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+        player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
     return player.stay()
 

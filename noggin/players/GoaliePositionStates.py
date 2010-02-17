@@ -122,7 +122,7 @@ def goalieSpinToPosition(player):
     if not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
         spinDir = MyMath.getSpinDir(player.brain.my.h,
                                     NogginConstants.OPP_GOAL_HEADING)
-        player.setSpeed(0, 0, spinDir*10)
+        player.setWalk(0, 0, spinDir*10)
         return player.stay()
     else:
         player.stopWalking()

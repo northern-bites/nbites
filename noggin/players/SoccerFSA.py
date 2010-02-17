@@ -2,9 +2,8 @@
 # soccer-playing functionality
 #
 #
-
-import man.motion as motion
 from man.motion import HeadMoves
+import man.motion as motion
 from ..util import FSA
 from . import CoreSoccerStates
 
@@ -15,7 +14,6 @@ class SoccerFSA(FSA.FSA):
         self.addStates(CoreSoccerStates)
         self.brain = brain
         self.motion = brain.motion
-        #self.currentState = '' #handled externally by GameControllerFSA
 
         #set default behavior for soccer players - override it if you want
         self.setPrintStateChanges(True)
@@ -44,14 +42,6 @@ class SoccerFSA(FSA.FSA):
                                                position[5], #interpolation type
                                                )
 
-
-            elif len(position) == 4:
-                move = motion.HeadJointCommand(position[1] ,# time
-                                               position[0], # head pos
-                                               position[3], # chain stiffnesses
-                                               position[2], # interpolation type
-                                                   )
-
             elif len(position) == 5:
                 move = motion.BodyJointCommand(position[2], # time
                                                position[0], # chainID
@@ -64,15 +54,15 @@ class SoccerFSA(FSA.FSA):
                 self.printf("What kind of sweet ass-Move is this?")
 
             self.brain.motion.enqueue(move)
-    def setSpeed(self,x,y,theta):
+
+    def setWalk(self,x,y,theta):
         """
         Wrapper method to easily change the walk vector of the robot
         """
         if x == 0 and y == 0 and theta == 0:
             self.stopWalking()
         else:
-            if self.brain.nav.setWalk(x,y,theta):
-                self.brain.nav.switchTo('walking')
+            self.brain.nav.walk(x,y,theta)
             # else:
             #     self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) +
             #                 " is ignored")
@@ -84,38 +74,23 @@ class SoccerFSA(FSA.FSA):
         if self.brain.motion.isWalkActive():
             return False
         else:
-            self.brain.nav.stepX = x
-            self.brain.nav.stepY = y
-            self.brain.nav.stepTheta = theta
-            self.brain.nav.numSteps = numSteps
-            self.brain.nav.switchTo("stepping")
+            self.brain.nav.takeSteps(x, y, theta, numSteps)
             return True
 
     def standup(self):
-        if self.brain.motion.isWalkActive():
-            self.stopWalking()
-        else:
-            # TODO: this is not the best way to stand up
-            dummyWalk = motion.WalkCommand(x=0,y=0,theta=0)
-            self.brain.motion.setNextWalkCommand(dummyWalk)
+        self.stopWalking()
+
+    def walkPose(self):
+        """
+        we return to std walk pose when we stop walking
+        """
+        self.stopWalking()
 
     def stopWalking(self):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
-        if (self.brain.nav.currentState == 'stopped' or
-            self.brain.nav.currentState == 'stop'):
-            return
-        else:
-            self.brain.nav.setWalk(0,0,0)
-            self.brain.nav.switchTo('stop')
-
-    def setHeads(self,yawv,pitchv):
-        """
-        Wrapper method to easily specify a head destination (in degrees, obvi)
-        """
-        heads = motion.SetHeadCommand(yawv,pitchv)
-        self.brain.motion.setHead(heads)
+        self.brain.nav.stop()
 
     def gainsOff(self):
         """
@@ -135,23 +110,10 @@ class SoccerFSA(FSA.FSA):
         """
         Put head into penalized position, stop tracker
         """
-        self.brain.tracker.switchTo('stopped')
-        self.brain.motion.stopHeadMoves()
-        self.executeMove(HeadMoves.PENALIZED_HEADS)
+        self.brain.tracker.performHeadMove(HeadMoves.PENALIZED_HEADS)
 
     def zeroHeads(self):
         """
         Put heads into neutral position
         """
-        self.brain.tracker.switchTo('stopped')
-        self.brain.motion.stopHeadMoves()
-        self.executeMove(HeadMoves.ZERO_HEADS)
-
-
-    def walkPose(self):
-        """
-        We should usually not call this method from outside nav.
-        This is a quasi-hack created by Tucker
-        He can do hacks like this, you can't
-        """
-        self.brain.nav.setSpeed(0,0,0)
+        self.brain.tracker.performHeadMove(HeadMoves.ZERO_HEADS)

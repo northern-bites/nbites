@@ -24,17 +24,25 @@ def scanBall(tracker):
     return tracker.stay()
 
 def scanning(tracker):
-    if (tracker.firstFrame() or not
-        tracker.brain.motion.isHeadActive()):
+    if tracker.firstFrame():
+        tracker.stopHeadMoves()
+        tracker.helper.executeHeadMove(tracker.currentHeadScan)
+
+    if not tracker.brain.motion.isHeadActive():
         tracker.activeLocOn = False
         tracker.helper.executeHeadMove(tracker.currentHeadScan)
+
     return tracker.stay()
 
 def locPans(tracker):
-    if tracker.firstFrame() \
-            or not tracker.brain.motion.isHeadActive():
+    if tracker.firstFrame():
+        tracker.stopHeadMoves()
+        tracker.helper.executeHeadMove(HeadMoves.QUICK_PANS)
+
+    if not tracker.brain.motion.isHeadActive():
         tracker.activeLocOn = False
         tracker.helper.executeHeadMove(HeadMoves.QUICK_PANS)
+
     return tracker.stay()
 
 def panLeftOnce(tracker):

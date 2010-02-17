@@ -42,7 +42,7 @@ else:
 
 def switchgaits1(player):
     if player.firstFrame():
-        player.setSpeed(6,-4,10)
+        player.setWalk(6,-4,10)
 
     if player.counter == 140:
         return player.goLater('switchgaits2')
@@ -51,7 +51,7 @@ def switchgaits1(player):
 def switchgaits2(player):
     if player.firstFrame():
         player.brain.CoA.setRobotDribbleGait(player.brain.motion)
-        player.setSpeed(10,-10,20)
+        player.setWalk(10,-10,20)
 
     if player.counter == 240:
         return player.goLater('switchgaits3')
@@ -68,7 +68,7 @@ def switchgaits3(player):
 
 def walkleft(player):
     if player.firstFrame():
-        player.setSpeed(0,4,0)
+        player.setWalk(0,4,0)
 
     if player.counter == 100:
         return player.goLater('turnright')
@@ -76,7 +76,7 @@ def walkleft(player):
 
 def walkright(player):
     if player.firstFrame():
-        player.setSpeed(0,-4,0)
+        player.setWalk(0,-4,0)
 
     if player.counter == 100:
         return player.goLater('walkleft')
@@ -84,14 +84,14 @@ def walkright(player):
 
 def walktest(player):
     if player.firstFrame():
-        player.setSpeed(4,0,0)
+        player.setWalk(4,0,0)
 
     if player.counter  == 100:
         player.brain.motion.resetWalk()
         #player.executeMove(SweetMoves.ZERO_POS)
 
     if player.counter == 200:
-        player.setSpeed(4,0,0)
+        player.setWalk(4,0,0)
 
     if player.counter == 300:
         return player.goLater('stopwalking')
@@ -100,7 +100,7 @@ def walktest(player):
 
 def walkstraight(player):
     if player.firstFrame():
-        player.setSpeed(4,0,0)
+        player.setWalk(4,0,0)
 
     if player.counter == 200:
         return player.goLater('walkright')
@@ -109,7 +109,7 @@ def walkstraight(player):
 
 def walkstraightstop(player):
     if player.firstFrame():
-        player.setSpeed(7,0,0)
+        player.setWalk(7,0,0)
 
     if player.counter == 300:
         return player.goLater('stopwalking')
@@ -117,7 +117,7 @@ def walkstraightstop(player):
 
 def walkturnstop(player):
     if player.firstFrame():
-        player.setSpeed(0.0,0,10)
+        player.setWalk(0.0,0,10)
 
     if player.counter == 500:
         return player.goLater('stopwalking')
@@ -125,7 +125,7 @@ def walkturnstop(player):
 
 def turnleft(player):
     if player.firstFrame():
-        player.setSpeed(0,0,15)
+        player.setWalk(0,0,15)
 
     if player.counter == 180:
         return player.goLater('stopwalking')
@@ -133,7 +133,7 @@ def turnleft(player):
 
 def turnright(player):
     if player.firstFrame():
-        player.setSpeed(0,0,-15)
+        player.setWalk(0,0,-15)
     if player.counter == 180:
         return player.goLater('turnleft')
     return player.stay()
@@ -142,7 +142,7 @@ def turnright(player):
 def stopwalking(player):
     ''' Do nothing'''
     if player.firstFrame():
-        player.setSpeed(0,0,0)
+        player.setWalk(0,0,0)
 
     return player.goLater('sitdown')
 
@@ -171,7 +171,7 @@ def shutoffgains(player):
 def odotune(player):
     if player.firstFrame():
         player.brain.loc.reset()
-        player.setSpeed(6.0,0,10)
+        player.setWalk(6.0,0,10)
 
     if player.counter == 400:
         return player.goLater('odostop')
