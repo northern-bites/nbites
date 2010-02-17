@@ -251,7 +251,7 @@ extern "C" {
         jmethodID setUnusedPointsInfo = env->GetMethodID(javaClass, "setUnusedPointsInfo",
                                                          "()V");
         jmethodID setVisualCornersInfo = env->GetMethodID(javaClass, "setVisualCornersInfo",
-                                                          "(II)V");
+                                                          "(IIFFI)V");
         //push data from the lines object
         const vector<VisualLine> *lines = vision.fieldLines->getLines();
         for (vector<VisualLine>::const_iterator i = lines->begin();

@@ -197,6 +197,7 @@ public class TOOLVisionLink {
         }
 
     }
+
     //sets the ball variables
     public void setBallInfo(double width, double height, int x, int y,
                             int centerX, int centerY, double radius) {
@@ -268,8 +269,11 @@ public class TOOLVisionLink {
         pointFWS = null;
     }
     //set the corners
-    public void setVisualCornersInfo(int x, int y){
-        visualCorners.add(new VisualCorner(x,y));
+    public void setVisualCornersInfo(int x, int y,
+									 float distance, float bearing,
+									 int cornerShape){
+        visualCorners.add(new VisualCorner(x, y, distance,
+										   bearing, cornerShape));
     }
     //set the pose + vision horizon
     public void setHorizonInfo(int lx, int ly, int rx, int ry, int visHor){
