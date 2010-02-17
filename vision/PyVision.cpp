@@ -1335,7 +1335,7 @@ MODULE_INIT(vision) (void)
     //
 
     bool success = true;
-    for (int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
+    for (unsigned int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
         const ConcreteCorner *corner = ConcreteCorner::concreteCornerList[i];
         // attempt to create the static corner references
         py_concrete_corners[corner] = PyConcreteCorner_new(corner);
@@ -1346,7 +1346,7 @@ MODULE_INIT(vision) (void)
     }
     if (!success) {
         // something failed, so dereference those that succeeded, set error, return
-        for (int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
+        for (unsigned int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
             const ConcreteCorner *corner = ConcreteCorner::concreteCornerList[i];
             if (py_concrete_corners[corner] != NULL) {
                 Py_DECREF(py_concrete_corners[corner]);

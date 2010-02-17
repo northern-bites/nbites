@@ -78,17 +78,17 @@ private:
     ConcreteCorner(const ConcreteCorner&);
 
 public: // Constants
-    static const int NUM_L_CORNERS = 8;
-    static const int NUM_T_CORNERS = 6;
-    static const int NUM_CC_CORNERS = 2;
-    static const int NUM_CORNERS = NUM_L_CORNERS + NUM_T_CORNERS +
+    static const unsigned int NUM_L_CORNERS = 8;
+    static const unsigned int NUM_T_CORNERS = 6;
+    static const unsigned int NUM_CC_CORNERS = 2;
+    static const unsigned int NUM_CORNERS = NUM_L_CORNERS + NUM_T_CORNERS +
         NUM_CC_CORNERS;
-    static const int NUM_YELLOW_GOAL_CORNERS = 4;
-    static const int NUM_BLUE_GOAL_CORNERS = 4;
-    static const int NUM_GOAL_CORNERS = NUM_YELLOW_GOAL_CORNERS +
+    static const unsigned int NUM_YELLOW_GOAL_CORNERS = 4;
+    static const unsigned int NUM_BLUE_GOAL_CORNERS = 4;
+    static const unsigned int NUM_GOAL_CORNERS = NUM_YELLOW_GOAL_CORNERS +
         NUM_BLUE_GOAL_CORNERS;
-    static const int NUM_BLUE_GOAL_T_CORNERS = 2;
-    static const int NUM_YELLOW_GOAL_T_CORNERS = 2;
+    static const unsigned int NUM_BLUE_GOAL_T_CORNERS = 2;
+    static const unsigned int NUM_YELLOW_GOAL_T_CORNERS = 2;
 
 public:
     // destructor
