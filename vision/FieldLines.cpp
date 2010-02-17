@@ -147,10 +147,8 @@ void FieldLines::lineLoop() {
     unusedPointsList = linePoints;
 	fitUnusedPoints(linesList, unusedPointsList);
 
-
-	removeDuplicateLines();
+	//removeDuplicateLines();
     cornersList = intersectLines();
-
 }
 
 // While lineLoop is called before object recognition so that ObjectFragments
@@ -1308,14 +1306,15 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
     // greedy for speed and simplicity's sake
     sort(lines.begin(), lines.end());
 
-    int numPointsRemainining = static_cast<int>(remainingPoints.size());
+    int numPointsRemainining = remainingPoints.size();
 
     if (debugFitUnusedPoints)
         cout << "Beginning fitUnusedPoints with " << lines.size()
              << " lines and " << numPointsRemainining << " unused points."
              << endl;
 
-    for (vector< shared_ptr<VisualLine> >::iterator i = lines.begin(); i != lines.end(); ++i){
+    for (vector< shared_ptr<VisualLine> >::iterator i = lines.begin();
+		 i != lines.end(); ++i){
         bool foundAdditionalPoints = false;
         list <linePoint> additionalPoints;
         // We will manually increment the j counter so that we can delete points
@@ -2924,7 +2923,9 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 
 	int numCorners = corners.size(), numTs = 0, numLs = 0;
 	if (numCorners > 1) {
-		for (list <VisualCorner>::iterator i = corners.begin();i != corners.end(); i++){
+
+		list <VisualCorner>::iterator i = corners.begin();
+		for ( ; i != corners.end(); i++){
 			if (i->getShape() == T) {
 				numTs++;
 			}
@@ -2933,6 +2934,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 			}
 		}
 	}
+
     // No explicit movement of iterator; will do it manually
     for (list <VisualCorner>::iterator i = corners.begin();i != corners.end();){
 
@@ -2941,26 +2943,10 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
                  << endl << "\t" << *i << endl;
         }
 
-        // Get all the possible corners given the shape of the corner
-        const list <const ConcreteCorner*> possibleCorners =
-            ConcreteCorner::getPossibleCorners(i->getShape());
+        list <const ConcreteCorner*> possibleClassifications(0);
+		classifyCornerWithObjects(*i, visibleObjects, &possibleClassifications);
 
-        list <const ConcreteCorner*> possibleClassifications =
-            classifyCorners(*i, visibleObjects, possibleCorners);
-
-		// If we found nothing that time, try again with all the corners to
-		// see if possibly the corner was misidentified (e.g. saw an L, but
-		// actually a T)
-		if (possibleClassifications.empty() &&
-			i->getShape() != T ){
-			possibleClassifications =
-				classifyCorners(*i,
-								visibleObjects,
-								ConcreteCorner::getConcreteCorners());
-		}
-
-        // T's can sometimes be misclassified as L's, check them if nothing
-        // matched (and the geometric tests failed)
+		//		list <const ConcreteCorner*> 
 
         // Keep it completely abstract
         if (possibleClassifications.empty()) {
@@ -3221,22 +3207,56 @@ const bool FieldLines::postOnScreen() const {
          vision->ygrp->getIDCertainty() == _SURE);
 }
 
-// Given a list of concrete corners that the visual corner could possibly be,
-// weeds out the bad ones based on distances to visible objects and returns
-// those that are still in the running.
-list <const ConcreteCorner*> FieldLines::classifyCorners(
+// Compare the given VisualCorner with the objects on screen to see
+// if the distances fit any sort of ConcreteCorners
+void FieldLines::classifyCornerWithObjects(
     const VisualCorner &corner,
     const vector <const VisualFieldObject*> &visibleObjects,
-    const list <const ConcreteCorner*> &concreteCorners) const {
+	list<const ConcreteCorner*>* classifications) const {
 
-    list <const ConcreteCorner*> possibleClassifications;
+	list<const ConcreteCorner*> possibleClassifications;
+
+	// Get all the possible corners given the shape of the corner
+	list <const ConcreteCorner*> possibleCorners =
+		ConcreteCorner::getPossibleCorners(corner.getShape());
+
     if (debugIdentifyCorners) {
         cout << endl
              << "Beginning to get possible classifications for corner given "
              << visibleObjects.size() << " visible objects and "
-             << concreteCorners.size() << " corner possibilities" << endl
+             << possibleCorners.size() << " corner possibilities" << endl
              << endl;
     }
+
+	// Get all the possible corners given the shape of the corner
+	possibleClassifications = compareObjsCorners(corner,
+												 possibleCorners,
+												 visibleObjects);
+
+	// If we found nothing that time, try again with all the corners to
+	// see if possibly the corner was misidentified (e.g. saw an L, but
+	// actually a T)
+	if (possibleClassifications.empty()){
+
+		possibleCorners = ConcreteCorner::getConcreteCorners();
+		possibleClassifications =
+			compareObjsCorners(corner, possibleCorners, visibleObjects);
+	}
+
+	classifications->insert(classifications->end(),
+							possibleClassifications.begin(),
+							possibleClassifications.end());
+}
+
+// Given a list of concrete corners that the visual corner could possibly be,
+// weeds out the bad ones based on distances to visible objects and returns
+// those that are still in the running.
+list <const ConcreteCorner*> FieldLines::compareObjsCorners(
+	const VisualCorner& corner,
+	const list<const ConcreteCorner*>& possibleCorners,
+	const vector<const VisualFieldObject*>& visibleObjects) const
+{
+	list<const ConcreteCorner*> possibleClassifications;
 
     // For each field object that we see, calculate its real distance to
     // each possible concrete corner and compare with the visual estimated
@@ -3245,16 +3265,17 @@ list <const ConcreteCorner*> FieldLines::classifyCorners(
 			 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
 
 		float estimatedDistance = getEstimatedDistance(&corner, *k);
+		list <const ConcreteCorner*>::const_iterator j =
+			possibleCorners.begin();
 
-		for (list <const ConcreteCorner*>::const_iterator j =
-				 concreteCorners.begin(); j != concreteCorners.end(); ++j) {
-
+		for (; j != possibleCorners.end(); ++j) {
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
 			// and add all the possibilities up.
-			for (list<const ConcreteFieldObject*>::const_iterator i =
-					 (*k)->getPossibleFieldObjects()->begin();
-				 i != (*k)->getPossibleFieldObjects()->end() ; ++i) {
+			list<const ConcreteFieldObject*>::const_iterator i =
+				(*k)->getPossibleFieldObjects()->begin();
+
+			for (; i != (*k)->getPossibleFieldObjects()->end() ; ++i) {
 
 				if (arePointsCloseEnough(estimatedDistance, *j, *k)){
 					possibleClassifications.push_back(*j);
@@ -3276,6 +3297,9 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 {
 	const float realDistance = getRealDistance(j, k);
 	const float absoluteError = fabs(realDistance - estimatedDistance);
+
+	// TODO: Adjust relative error for distance to visual object/corner,
+	// possibly according to pose SD estimate (if it exists?)
 	const float relativeError = absoluteError / realDistance * 100.0f;
 
 	// If we have already one good distance between this corner and a
@@ -3329,7 +3353,7 @@ float FieldLines::getAllowedDistanceError(VisualFieldObject const *obj) const {
     case YELLOW_GOAL_POST:
     case YELLOW_GOAL_LEFT_POST:
     case YELLOW_GOAL_RIGHT_POST:
-        return 30;
+        return 60;
     default:
         return 0;
     }

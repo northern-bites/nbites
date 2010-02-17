@@ -184,8 +184,8 @@ private:
     // When estimating the angle between two lines on the field, anything less
     // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
     // and disallowed; ideally our estimates would always be 90.0 degrees
-    static const int MIN_ANGLE_ON_FIELD = 60;
-    static const int MAX_ANGLE_ON_FIELD = 120;
+    static const int MIN_ANGLE_ON_FIELD = 55;
+    static const int MAX_ANGLE_ON_FIELD = 115;
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
 
     ////////////////////////////////////////////////////////////
@@ -398,16 +398,6 @@ public:
     // prints their string representations
     void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
 
-    // Last sanity checks before localization gets the IDs.  Uses the
-    // information
-    // about what is visible on the screen to throw out corners that could not
-    // be visible.
-    void eliminateImpossibleIDs(VisualCorner &c,
-                                std::vector <const VisualFieldObject*>&
-                                visibleObjects,
-                                std::list <const ConcreteCorner*>&
-                                possibleClassifications);
-
     int numPixelsToHitColor(const int x, const int y, const int colors[],
                             const int numColors,
                             const TestDirection testDir) const;
@@ -439,12 +429,16 @@ public:
                             const int intersectX,
                             const int intersectY) const;
 
-    std::list <const ConcreteCorner*>
-    classifyCorners(const VisualCorner &corner,
-					const std::vector <const VisualFieldObject*>
-					&visibleObjects,
-					const std::list <const ConcreteCorner*>
-					&concreteCorners) const;
+	void classifyCornerWithObjects(
+		const VisualCorner &corner,
+		const std::vector <const VisualFieldObject*> &visibleObjects,
+		list<const ConcreteCorner*>* classifications) const;
+
+	std::list<const ConcreteCorner*>
+	compareObjsCorners(const VisualCorner& corner,
+					   const std::list<const ConcreteCorner*>& possibleCorners,
+					   const vector<const VisualFieldObject*>& visibleObjects)
+		const;
 
 	const bool arePointsCloseEnough(const float estimatedDistance,
 									const ConcreteCorner* j,
