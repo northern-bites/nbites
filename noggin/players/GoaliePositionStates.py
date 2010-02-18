@@ -46,8 +46,8 @@ def goalieAwesomePosition(player):
     else:
         bearing = NogginConstants.OPP_GOAL_HEADING
 
-    if (not nav.atDestinationGoalie() or
-        not nav.atHeading()):
+    if (not player.atDestinationGoalie() or
+        not player.atHeading()):
         if not useOmni:
             nav.goTo((position[0], position[1], my.h + bearing))
         else:
@@ -164,7 +164,7 @@ def goalieAtPosition(player):
 
     if (abs(nav.destX - position[0]) > constants.SHOULD_POSITION_DIFF or
         abs(nav.destY - position[1]) >  constants.SHOULD_POSITION_DIFF or
-        not nav.atDestinationGoalie() or
-        not nav.atHeading()):
+        not player.atDestinationGoalie() or
+        not player.atHeading()):
         return player.goNow("goalieAwesomePosition")
     return player.stay()

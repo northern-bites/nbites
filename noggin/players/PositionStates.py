@@ -95,18 +95,18 @@ def atPosition(player):
     position = player.brain.play.getPosition()
     if player.firstFrame():
         player.stopWalking()
-        player.notAtPositionCounter = 0
+    ##     player.notAtPositionCounter = 0
 
-    if not nav.atHeading(nav.destH) or not nav.atDestinationCloser() or\
-            nav.destX != position[0] or nav.destY != position[1]:
-        player.notAtPositionCounter += 1
-    else:
-        player.notAtPositionCounter = 0
+    ## if not nav.atHeading(nav.destH) or not nav.atDestinationCloser() or\
+    ##         nav.destX != position[0] or nav.destY != position[1]:
+    ##     player.notAtPositionCounter += 1
+    ## else:
+    ##     player.notAtPositionCounter = 0
 
     if (abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
         abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
-        not nav.atDestinationGoalie() or
-        not nav.atHeading()):
+        not player.atDestinationGoalie() or
+        not player.atHeading()):
         return player.goLater('playbookPosition')
 
     return player.stay()

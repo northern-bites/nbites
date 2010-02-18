@@ -92,6 +92,13 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.nav.stop()
 
+    def atDestinationGoalie(self):
+        return self.brain.nav.NavMath.atDestinationGoalie()
+
+    def atHeading(self):
+        return self.nav.brain.NavMath.atHeading()
+
+##### Direct Motion Calls
     def gainsOff(self):
         """
         Turn off the gains
@@ -106,6 +113,7 @@ class SoccerFSA(FSA.FSA):
         unFreeze = motion.UnfreezeCommand(0.85)
         self.brain.motion.sendFreezeCommand(unFreeze)
 
+##### HEAD-TRACKING Methods
     def penalizeHeads(self):
         """
         Put head into penalized position, stop tracker
@@ -117,3 +125,6 @@ class SoccerFSA(FSA.FSA):
         Put heads into neutral position
         """
         self.brain.tracker.performHeadMove(HeadMoves.ZERO_HEADS)
+
+    def kickScan(self):
+        self.brain.tracker.performHeadMove(HeadMoves.KICK_SCAN)

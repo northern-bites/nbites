@@ -23,7 +23,7 @@ def getKickInfo(player):
     if player.firstFrame():
         player.brain.tracker.switchTo('stopped')
         player.brain.motion.stopHeadMoves()
-        player.executeMove(HeadMoves.KICK_SCAN)
+        player.kickScan()
 
         player.kickDecider = KickDecider(player)
 
