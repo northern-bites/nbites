@@ -71,7 +71,9 @@ public class VisionState {
 	private CrossType seeCross;
 	private GoalType seeBlue, seeYellow;
 	private int seeRedRobots, seeBlueRobots;
+	private int seeLCorners, seeTCorners;
     private Vector<VisualFieldObject> visualFieldObjects;
+    private Vector<VisualCorner> visualCorners;
 	private int tableSize = 128;
 	private int stats[][][][] = new int[tableSize][tableSize][tableSize][7];
 
@@ -92,6 +94,8 @@ public class VisionState {
 		seeCross = CrossType.NO_CROSS;
 		seeRedRobots = 0;
 		seeBlueRobots = 0;
+		seeLCorners = 0;
+		seeTCorners = 0;
     }
 
 	/** We are going to collect stats on the pixels we see in a bunch of frames.  For any
@@ -634,6 +638,7 @@ public class VisionState {
             //get the ball from the link
             ball = thresholdedImage.getVisionLink().getBall();
             visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
+            visualCorners = thresholdedImage.getVisionLink().getVisualCorners();
             //draw the stuff onto the overlay
 			if (!silent)
 				drawObjectBoxes();
@@ -718,6 +723,14 @@ public class VisionState {
                 default: break;
                 }
             }
+        }
+        //set corners
+        VisualCorner corner;
+		int ells = 0, tees = 0;
+        for (int i = 0; i < visualCorners.size(); i++) {
+            corner = visualCorners.elementAt(i);
+			if (foo) {
+			}
         }
 	}
 
@@ -843,6 +856,8 @@ public class VisionState {
 	public GoalType getBlueGoalVision() {return seeBlue;}
 	public GoalType getYellowGoalVision() {return seeYellow;}
 	public CrossType getCrossVision() {return seeCross;}
+	public int getLCornersVision() {return seeLCorners;}
+	public int getTCornersVision() {return seeTCorners;}
 
 	public String getBlueGoalString() {
 		switch (seeBlue) {
@@ -879,6 +894,13 @@ public class VisionState {
 	}
 	public String getBlueRobotString() {
 		return ""+seeBlueRobots;
+	}
+
+	public int getLCornerString() {
+		return ""+seeLCorners;
+	}
+	public int getTCornerString() {
+		return ""+seeTCorners;
 	}
 
     //setters

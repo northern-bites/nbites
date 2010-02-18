@@ -64,11 +64,14 @@ public class KeyPanel extends JPanel implements ItemListener {
 	private JComboBox cross;
 	private JComboBox redRobots;
 	private JComboBox blueRobots;
+	private JComboBox lCorners;
+	private JComboBox tCorners;
     private Learning learn;
 
 	// labels showing what the vision system has found for this frame
 	private JTextField visionHuman, visionBall, visionYellow, visionBlue;
 	private JTextField visionCross, visionRedRobot, visionBlueRobot;
+	private JTextField visionLCorner, visionTCorner;
 
 
 	/** Create the panel and set up the listeners.
@@ -143,6 +146,31 @@ public class KeyPanel extends JPanel implements ItemListener {
 					setBlueRobotOverlay(sourceBox);
 				}});
 
+		lCorners = new JComboBox();
+		lCorners.addItem("No L Corners");
+		lCorners.addItem("One");
+		lCorners.addItem("Two");
+		lCorners.addItem("Three");
+		lCorners.addItem("Four");
+		lCorners.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JComboBox sourceBox = (JComboBox) e.getSource();
+					setLCornerOverlay(sourceBox);
+				}});
+
+		tCorners = new JComboBox();
+		tCorners.addItem("No T Corners");
+		tCorners.addItem("One");
+		tCorners.addItem("Two");
+		tCorners.addItem("Three");
+		tCorners.addItem("Four");
+		tCorners.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JComboBox sourceBox = (JComboBox) e.getSource();
+					setTCornerOverlay(sourceBox);
+				}});
+
+
 		visionHuman = new JTextField(learn.getHuman());
 		visionBall = new JTextField(learn.getBallString());
 		visionBlue = new JTextField(learn.getBlueGoalString());
@@ -150,6 +178,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 		visionCross = new JTextField(learn.getCrossString());
 		visionRedRobot = new JTextField(learn.getRedRobotString());
 		visionBlueRobot = new JTextField(learn.getBlueRobotString());
+		visionLCorner = new JTextField(learn.getLCornerString());
+		visionTCorner = new JTextField(learn.getTCornerString());
 
 		add(ball);
 		add(visionBall);
@@ -163,6 +193,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 		add(visionRedRobot);
 		add(blueRobots);
 		add(visionBlueRobot);
+		add(visionLCorner);
+		add(visionTCorner);
 		add(human);
 		add(visionHuman);
 
@@ -242,6 +274,22 @@ public class KeyPanel extends JPanel implements ItemListener {
 	 */
 	public void setBlueRobot(String s) {
 		visionBlueRobot.setText(s);
+	}
+
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the l corner field
+	 */
+	public void setLCorner(String s) {
+		visionLCorner.setText(s);
+	}
+
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the t corner field
+	 */
+	public void setTCorner(String s) {
+		visionTCorner.setText(s);
 	}
 
 	/** Sets the input device to reflect either what the Key file says of what the
@@ -324,6 +372,24 @@ public class KeyPanel extends JPanel implements ItemListener {
 	public void setBlueRobotStatus(int num) {
 		if (num > 3) num = 3;
 		blueRobots.setSelectedIndex(num);
+	}
+
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param num    how many corners
+	 */
+	public void setLCornerStatus(int num) {
+		if (num > 3) num = 3;
+		lCorners.setSelectedIndex(num);
+	}
+
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param num how many corners
+	 */
+	public void setTCornerStatus(int num) {
+		if (num > 3) num = 3;
+		tCorners.setSelectedIndex(num);
 	}
 
 	/** The user has changed the value of this overlay so tell the learning system
@@ -433,6 +499,50 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Four")) {
 			learn.setBlueRobot(4);
+		}
+	}
+
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
+	public void setLCornerOverlay(JComboBox sourceBox) {
+		if (((String) sourceBox.getSelectedItem()).equals("No L Corners")) {
+			learn.setLCorners(0);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("One")) {
+			learn.setLCorners(1);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("Two")) {
+			learn.setLCorners(2);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("Three")) {
+			learn.setLCorners(3);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("Four")) {
+			learn.setLCorners(4);
+		}
+	}
+
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
+	public void setTCornerOverlay(JComboBox sourceBox) {
+		if (((String) sourceBox.getSelectedItem()).equals("No T Corners")) {
+			learn.setTCorners(0);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("One")) {
+			learn.setTCorners(1);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("Two")) {
+			learn.setTCorners(2);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("Three")) {
+			learn.setTCorners(3);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("Four")) {
+			learn.setTCorners(4);
 		}
 	}
 
