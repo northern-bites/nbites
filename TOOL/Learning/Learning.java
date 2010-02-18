@@ -986,8 +986,8 @@ public class Learning implements DataListener, MouseListener,
 	public void updateCornerStats() {
 		int ells = current.getLCorners();
 		int tees = current.getTCorners();
-		int ellsV = visionState.getLCornerVision();
-		int teesV = visionState.getTCornerVision();
+		int ellsV = visionState.getLCornersVision();
+		int teesV = visionState.getTCornersVision();
 		if (ells > ellsV) {
 			missedL += ells - ellsV;
 			goodL += ellsV;
@@ -1472,7 +1472,7 @@ public class Learning implements DataListener, MouseListener,
 	 */
 	public void setLCorners(int ells) {
 		if (newKey != null)
-			newKey.setLCorner(ells);
+			newKey.setLCorners(ells);
 	}
 
 	/** Used to set the information in the Key file.
@@ -1480,7 +1480,7 @@ public class Learning implements DataListener, MouseListener,
 	 */
 	public void setTCorners(int tees) {
 		if (newKey != null)
-			newKey.setTCorner(tees);
+			newKey.setTCorners(tees);
 	}
 
 	/** Used to get information from vision.

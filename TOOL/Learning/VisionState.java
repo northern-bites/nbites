@@ -726,10 +726,19 @@ public class VisionState {
         }
         //set corners
         VisualCorner corner;
-		int ells = 0, tees = 0;
+		int other = 0;
+		seeLCorners = 0;
+		seeTCorners = 0;
         for (int i = 0; i < visualCorners.size(); i++) {
             corner = visualCorners.elementAt(i);
-			if (foo) {
+			VisualCorner.shape corn = corner.getShape();
+			if (corn == VisualCorner.shape.INNER_L || corn == VisualCorner.shape.OUTER_L) {
+				seeLCorners++;
+			} else if (corn == VisualCorner.shape.T) {
+				seeTCorners++;
+			} else {
+				// current covers UNKNOWN and CIRCLE it is plausible that we'll want to process these
+				other++;
 			}
         }
 	}
@@ -896,10 +905,10 @@ public class VisionState {
 		return ""+seeBlueRobots;
 	}
 
-	public int getLCornerString() {
+	public String getLCornerString() {
 		return ""+seeLCorners;
 	}
-	public int getTCornerString() {
+	public String getTCornerString() {
 		return ""+seeTCorners;
 	}
 

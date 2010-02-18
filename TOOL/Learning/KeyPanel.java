@@ -193,12 +193,14 @@ public class KeyPanel extends JPanel implements ItemListener {
 		add(visionRedRobot);
 		add(blueRobots);
 		add(visionBlueRobot);
+		add(lCorners);
 		add(visionLCorner);
+		add(tCorners);
 		add(visionTCorner);
 		add(human);
 		add(visionHuman);
 
-        setLayout(new GridLayout(7,2));
+        setLayout(new GridLayout(9,2));
 	}
 
 
