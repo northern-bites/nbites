@@ -51,6 +51,8 @@ import TOOL.TOOL;
 
 public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
+    private InputMap im;
+    private ActionMap am;
     private JTextField jumpToFrame;
 	private JButton prevImage, nextImage, jumpToButton, writeKey, runBatch,
 		useLastFrame, runRecursive, learnColor;
@@ -70,6 +72,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         super();
 		learn = aLearn;
         setupWindow();
+		setupShortcuts();
         setupListeners();
     }
 
@@ -116,7 +119,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         jumpToButton = new JButton("Jump");
         jumpToButton.setFocusable(false);
 
-		writeKey = new JButton("Write Key");
+		writeKey = new JButton("Write Key (W)");
 		writeKey.setFocusable(false);
 
 		runBatch = new JButton("Run Batch");
@@ -155,6 +158,33 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         add(navigation);
 		add(logs);
     }
+
+	private void setupShortcuts(){
+		im = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "nextImage");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "prevImage");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "writeData");
+
+		am = this.getActionMap();
+
+		am.put("prevImage", new AbstractAction("preImage"){
+				public void actionPerformed(ActionEvent e){
+					prevImage.doClick();
+				}
+			});
+		am.put("nextImage", new AbstractAction("nextImage"){
+				public void actionPerformed(ActionEvent e){
+					nextImage.doClick();
+				}
+			});
+
+		am.put("writeData", new AbstractAction("writeData"){
+				public void actionPerformed(ActionEvent e){
+					writeKey.doClick();
+				}
+			});
+	}
 
 
 	/** Sets up listeners for all of the buttons.

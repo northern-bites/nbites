@@ -81,13 +81,50 @@ public class KeyPanel extends JPanel implements ItemListener {
 		learn = aLearn;
 		setUpWindows();
 		setUpListeners();
+		setUpShortcuts();
+	}
+
+	/**
+	 * Setup the keyboard shortcuts
+	 */
+	public void setUpShortcuts(){
+		InputMap im = this.getInputMap(WHEN_IN_FOCUSED_WINDOW);
+		ActionMap am = this.getActionMap();
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "updateInfo");
+
+		am.put("updateInfo", new AbstractAction("updateInfo"){
+				public void actionPerformed(ActionEvent e){
+					human.doClick();
+				}
+			});
+
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LCorner");
+
+		am.put("LCorner", new AbstractAction("LCorner"){
+				public void actionPerformed(ActionEvent e){
+					int index = lCorners.getSelectedIndex();
+					lCorners.setSelectedIndex((lCorners.getSelectedIndex() + 1) %
+											  (lCorners.getItemCount()-1));
+				}
+			});
+
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0), "TCorner");
+
+		am.put("TCorner", new AbstractAction("TCorner"){
+				public void actionPerformed(ActionEvent e){
+					int index = tCorners.getSelectedIndex();
+					tCorners.setSelectedIndex((tCorners.getSelectedIndex() + 1) %
+											  (tCorners.getItemCount()-1));
+				}
+			});
 	}
 
 	/** Add all of the buttons and initialize to appropriate values.
 	 */
     public void setUpWindows() {
 
-		human = new JButton("Update Information");
+		human = new JButton("Update Information (U)");
 		ball = new JCheckBox("Ball");
 
 		blueGoal = new JComboBox();
