@@ -9,7 +9,7 @@ UP_OR_DOWN=$1
 REMOTE_FOLDER=${2%/} #Strip the trailing slash if any
 
 RSYNC=rsync
-RSYNC_OPTS=-rvtz
+RSYNC_OPTS=-rvz
 
 if [ "$1" = "" ]; then
     echo "No push direction specified"
