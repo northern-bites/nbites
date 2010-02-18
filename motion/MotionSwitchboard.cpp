@@ -32,13 +32,14 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
 	  nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
       nextHeadProvider(&nullHeadProvider),
-      nextJoints(s->getBodyAngles()),
+      sensorAngles(s->getBodyAngles()),
+      nextJoints(sensorAngles),
       nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
+      lastJoints(sensorAngles),
 	  running(false),
       newJoints(false),
       readyToSend(false),
       noWalkTransitionCommand(true)
-
 {
 
     //Allow safe access to the next joints
@@ -59,7 +60,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
     nullHeadProvider.setCommand(paralyze);
 
     //Very Important, ensure that we have selected a default walk parameter set
-    boost::shared_ptr<Gait>  defaultGait(new Gait(DEFAULT_GAIT));
+    boost::shared_ptr<Gait> defaultGait(new Gait(DEFAULT_GAIT));
 
     sendMotionCommand(defaultGait);
 
@@ -86,9 +87,7 @@ void MotionSwitchboard::start() {
 #endif
     fflush(stdout);
 
-
     running = true;
-
 }
 
 
@@ -119,7 +118,7 @@ void MotionSwitchboard::run() {
     //IMPORTANT Before anything else happens we need to put the correct
     //angles into sensors->motionBodyAngles:
     sensors->setMotionBodyAngles(sensors->getBodyAngles());
-    cout << "Switchboard is here..." <<endl;
+
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
     pthread_mutex_unlock(&calc_new_joints_mutex);
@@ -134,12 +133,14 @@ void MotionSwitchboard::run() {
         bool active  = postProcess();
 		PROF_EXIT(profiler, P_SWITCHBOARD);
 
-#ifdef DEBUG_JOINTS_OUTPUT
         if(active)
+        {
+            readyToSend = true;
+#ifdef DEBUG_JOINTS_OUTPUT
             updateDebugLogs();
 #endif
-        if(active)
-            readyToSend = true;
+        }
+
         pthread_mutex_lock(&calc_new_joints_mutex);
         pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
         pthread_mutex_unlock(&calc_new_joints_mutex);
@@ -148,109 +149,22 @@ void MotionSwitchboard::run() {
     cout << "Switchboard run has exited" <<endl;
 }
 
-void MotionSwitchboard::preProcess(){
+void MotionSwitchboard::preProcess()
+{
     pthread_mutex_lock(&next_provider_mutex);
 
-    if((curProvider != &nullBodyProvider && nextProvider == &nullBodyProvider) ||
-       (curHeadProvider != &nullHeadProvider && nextHeadProvider == & nullHeadProvider)){
-        headProvider.hardReset();
-        scriptedProvider.hardReset();
-        walkProvider.hardReset();
-    }
+    preProcessHead();
+    preProcessBody();
 
-    //determine the curProvider, and do any necessary swapping
-	if (curProvider != nextProvider && !curProvider->isActive()) {
-        swapBodyProvider();
-	}
-	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive()) {
-        swapHeadProvider();
-	}
-	if (curProvider != nextProvider && !curProvider->isStopping()){
-#ifdef DEBUG_SWITCHBOARD
-		cout << "Requesting stop on "<< *curProvider <<endl;
-#endif
-        curProvider->requestStop();
-    }
-	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isStopping()){
-#ifdef DEBUG_SWITCHBOARD
-		cout << "Requesting stop on "<< *curHeadProvider <<endl;
-#endif
-        curHeadProvider->requestStop();
-    }
     pthread_mutex_unlock(&next_provider_mutex);
-
 }
 
-void MotionSwitchboard::processJoints(){
-#ifdef DEBUG_SWITCHBOARD
-    static bool switchedHeadToInactive = true;
-#endif
-    if (curHeadProvider->isActive()) {
-		// Calculate the next joints and get them
-		curHeadProvider->calculateNextJointsAndStiffnesses();
-		// get headJoints from headProvider
-		vector <float > headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
-
-        for(unsigned int i = 0; i < HEAD_JOINTS;i++){
-            nextJoints[HEAD_YAW + i] = headJoints.at(i);
-        }
-#ifdef DEBUG_SWITCHBOARD
-        switchedHeadToInactive = false;
-#endif
-
-    }else{
-#ifdef DEBUG_SWITCHBOARD
-        if (!switchedHeadToInactive)
-            cout << *curHeadProvider << " is inactive" <<endl;
-        switchedHeadToInactive = true;
-#endif
-    }
-
-#ifdef DEBUG_SWITCHBOARD
-    static bool switchedToInactive;
-#endif
-    if (curProvider->isActive()){
-		//Request new joints
-		curProvider->calculateNextJointsAndStiffnesses();
-		const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
-		const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
-		const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
-
-		const vector <float > larmJoints = curProvider->getChainJoints(LARM_CHAIN);
-
-		//Copy the new values into place, and wait to be signaled.
-		pthread_mutex_lock(&next_joints_mutex);
-
-
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
-        }
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints.at(i);
-        }
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextJoints[L_SHOULDER_PITCH + i] = larmJoints.at(i);
-        }
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
-        }
-        pthread_mutex_unlock(&next_joints_mutex);
-
-#ifdef DEBUG_SWITCHBOARD
-        switchedToInactive = false;
-#endif
-
-    }else{
-#ifdef DEBUG_SWITCHBOARD
-        if (!switchedToInactive)
-            cout << *curProvider << " is inactive" <<endl;
-        switchedToInactive = true;
-#endif
-    }
-
-
+void MotionSwitchboard::processJoints()
+{
+    processHeadJoints();
+    processBodyJoints();
+    safetyCheckJoints();
 }
-
 
 /**
  * Method to process remaining stiffness requests
@@ -259,44 +173,52 @@ void MotionSwitchboard::processJoints(){
  */
 void MotionSwitchboard::processStiffness(){
     try{
-    if(curHeadProvider->isActive()){
-		const vector <float > headStiffnesses = curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
+        if(curHeadProvider->isActive()){
+            const vector <float > headStiffnesses =
+                curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
 
-		pthread_mutex_lock(&stiffness_mutex);
-        for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
-            nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
+            pthread_mutex_lock(&stiffness_mutex);
+
+            for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
+                nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
+            }
+
+            pthread_mutex_unlock(&stiffness_mutex);
         }
-		pthread_mutex_unlock(&stiffness_mutex);
 
+        if(curProvider->isActive()){
+            const vector <float > llegStiffnesses =
+                curProvider->getChainStiffnesses(LLEG_CHAIN);
+
+            const vector <float > rlegStiffnesses =
+                curProvider->getChainStiffnesses(RLEG_CHAIN);
+
+            const vector <float > rarmStiffnesses =
+                curProvider->getChainStiffnesses(RARM_CHAIN);
+
+            const vector <float > larmStiffnesses =
+                curProvider->getChainStiffnesses(LARM_CHAIN);
+
+            pthread_mutex_lock(&stiffness_mutex);
+
+            for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+                nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
+                nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
+            }
+
+            for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+                nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
+                nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
+            }
+
+            pthread_mutex_unlock(&stiffness_mutex);
+        }
     }
 
-    if(curProvider->isActive()){
-		const vector <float > llegStiffnesses = curProvider->getChainStiffnesses(LLEG_CHAIN);
-		const vector <float > rlegStiffnesses = curProvider->getChainStiffnesses(RLEG_CHAIN);
-		const vector <float > rarmStiffnesses = curProvider->getChainStiffnesses(RARM_CHAIN);
-		const vector <float > larmStiffnesses = curProvider->getChainStiffnesses(LARM_CHAIN);
-
-		pthread_mutex_lock(&stiffness_mutex);
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
-        }
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
-        }
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
-        }
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
-        }
-        pthread_mutex_unlock(&stiffness_mutex);
-    }
-    }catch(std::out_of_range & e){
+    catch(std::out_of_range & e){
         cout << "Out of range exception caught in processStiffness"<< e.what()<<endl;
         exit(0);
     }
-
-
 }
 
 
@@ -309,12 +231,16 @@ int MotionSwitchboard::postProcess(){
     //and we have the next provider ready, then we want to swap to ensure
     //that we never have an inactive provider when an active one is potentially
     //ready to take over:
-	if (curProvider != nextProvider && !curProvider->isActive()) {
+	if (curProvider != nextProvider && !curProvider->isActive())
+    {
         swapBodyProvider();
 	}
-	if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive()) {
+
+    if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
+    {
         swapHeadProvider();
 	}
+
     // Update sensors with the correct support foot because it may have
     // changed this frame.
     // TODO: This can be improved by keeping a local copy of the SupportFoot
@@ -324,11 +250,232 @@ int MotionSwitchboard::postProcess(){
 
     pthread_mutex_unlock(&next_provider_mutex);
 
-    //return if one of the enactors 
+    //return if one of the enactors
     return curProvider->isActive() ||  curHeadProvider->isActive();
-
 }
 
+
+void MotionSwitchboard::processHeadJoints()
+{
+#ifdef DEBUG_SWITCHBOARD
+    static bool switchedHeadToInactive = true;
+#endif
+
+    if (curHeadProvider->isActive())
+    {
+		// Calculate the next joints and get them
+		curHeadProvider->calculateNextJointsAndStiffnesses();
+
+		// get headJoints from headProvider
+		vector <float > headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
+
+        clipHeadJoints(headJoints);
+
+        for(unsigned int i = FIRST_HEAD_JOINT;
+            i < FIRST_HEAD_JOINT + HEAD_JOINTS; i++)
+        {
+            nextJoints[i] = headJoints.at(i);
+        }
+
+#ifdef DEBUG_SWITCHBOARD
+        switchedHeadToInactive = false;
+#endif
+    }
+
+#ifdef DEBUG_SWITCHBOARD
+    else
+    {
+        if (!switchedHeadToInactive)
+        {
+            cout << *curHeadProvider << " is inactive" <<endl;
+        }
+
+        switchedHeadToInactive = true;
+    }
+#endif
+}
+
+void MotionSwitchboard::processBodyJoints()
+{
+#ifdef DEBUG_SWITCHBOARD
+    static bool switchedToInactive;
+#endif
+    if (curProvider->isActive())
+    {
+		//Request new joints
+		curProvider->calculateNextJointsAndStiffnesses();
+		const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
+		const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
+		const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
+
+		const vector <float > larmJoints = curProvider->getChainJoints(LARM_CHAIN);
+
+		//Copy the new values into place, and wait to be signaled.
+		pthread_mutex_lock(&next_joints_mutex);
+
+        for(unsigned int i = 0; i < LEG_JOINTS; i ++)
+        {
+            nextJoints[R_HIP_YAW_PITCH + i] = rlegJoints.at(i);
+            nextJoints[L_HIP_YAW_PITCH + i] = llegJoints.at(i);
+        }
+
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++)
+        {
+            nextJoints[L_SHOULDER_PITCH + i] = larmJoints.at(i);
+            nextJoints[R_SHOULDER_PITCH + i] = rarmJoints.at(i);
+        }
+
+        pthread_mutex_unlock(&next_joints_mutex);
+
+#ifdef DEBUG_SWITCHBOARD
+        switchedToInactive = false;
+#endif
+    }
+
+#ifdef DEBUG_SWITCHBOARD
+    else
+    {
+        if (!switchedToInactive)
+        {
+            cout << *curProvider << " is inactive" <<endl;
+        }
+
+        switchedToInactive = true;
+    }
+#endif
+}
+
+void MotionSwitchboard::preProcessHead()
+{
+    if (curProvider != &nullHeadProvider &&
+        nextProvider == &nullHeadProvider)
+    {
+        headProvider.hardReset();
+    }
+
+	if (curHeadProvider != nextHeadProvider)
+    {
+        if (!curHeadProvider->isActive())
+        {
+            swapHeadProvider();
+        }
+
+        if (!curHeadProvider->isStopping())
+        {
+#ifdef DEBUG_SWITCHBOARD
+            cout << "Requesting stop on "<< *curHeadProvider <<endl;
+#endif
+            curHeadProvider->requestStop();
+        }
+	}
+}
+
+void MotionSwitchboard::preProcessBody()
+{
+    if (curProvider != &nullBodyProvider &&
+        nextProvider == &nullBodyProvider)
+    {
+        scriptedProvider.hardReset();
+        walkProvider.hardReset();
+    }
+
+    //determine the curProvider, and do any necessary swapping
+	if (curProvider != nextProvider)
+    {
+        if (!curProvider->isActive())
+        {
+            swapBodyProvider();
+        }
+
+        if (!curProvider->isStopping()){
+#ifdef DEBUG_SWITCHBOARD
+            cout << "Requesting stop on "<< *curProvider <<endl;
+#endif
+            curProvider->requestStop();
+        }
+	}
+}
+
+void MotionSwitchboard::clipHeadJoints(vector<float>& joints)
+{
+    float yaw = fabs(joints[HEAD_YAW]);
+    float pitch = joints[HEAD_PITCH];
+
+    if (yaw < 0.5f)
+    {
+        if (pitch > 0.46)
+        {
+            pitch = 0.46f;
+        }
+    }
+
+    else if (yaw < 1.0f)
+    {
+        if (pitch > 0.4f)
+        {
+            pitch = 0.4f;
+        }
+    }
+
+    else if (yaw < 1.32f)
+    {
+        if (pitch > 0.42f)
+        {
+            pitch = 0.42f;
+        }
+    }
+
+    else if (yaw < 1.57f)
+    {
+        if (pitch > -0.2f)
+        {
+            pitch = -0.2f;
+        }
+    }
+
+    else if (yaw >= 1.57f)
+    {
+        if (pitch > -0.3f)
+        {
+            pitch = -0.3f;
+        }
+    }
+
+    joints[HEAD_PITCH] = pitch;
+}
+
+void MotionSwitchboard::safetyCheckJoints()
+{
+    for (unsigned int i = 0; i < NUM_JOINTS; i++)
+    {
+        //We need to clip angles twice. Why? Because the sensor values are between
+        //20 and 40 ms old, so we can't strictly use the sensor reports to clip
+        // the velocity.
+        //We also can't just use the internaly held motion angles because these
+        // could be out of sync with reality, and thus allow us to send bad
+        // commands.
+        //As a balance, we clip both with respect to sensor readings which we
+        //ASSUME are 40 ms old (even if they are newer), AND we clip with respect
+        //to the internally held motion command angles, which ensures that we
+        //aren't sending commands which are in general too fast for the motors.
+        //For the sensor angles, we clip with TWICE the max speed.
+
+        const float allowedMotionDiffInRad = jointsMaxVelNoLoad[i];
+        const float allowedSensorDiffInRad = allowedMotionDiffInRad*6.0f;
+
+        //considering checking which clip is more restrictive each frame and
+        //only applying it
+        nextJoints[i] = NBMath::clip(nextJoints[i],
+                                     lastJoints[i] - allowedMotionDiffInRad,
+                                     lastJoints[i] + allowedMotionDiffInRad);
+
+        nextJoints[i] = NBMath::clip(nextJoints[i],
+                                     sensorAngles[i] - allowedSensorDiffInRad,
+                                     sensorAngles[i] + allowedSensorDiffInRad);
+
+        lastJoints[i] = nextJoints[i];
+    }
+}
 
 /**
  * Method handles switching providers. Also handles any special action
@@ -338,7 +485,8 @@ void MotionSwitchboard::swapBodyProvider(){
     std::vector<BodyJointCommand *> gaitSwitches;
     std::string old_provider = curProvider->getName();
 
-    switch(nextProvider->getType()){
+    switch(nextProvider->getType())
+    {
     case WALK_PROVIDER:
         //WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOARD IS BROKEN!
         //TODO/HACK: Since we overwrite Joint angles in realityCheck
@@ -359,6 +507,7 @@ void MotionSwitchboard::swapBodyProvider(){
         }
         curProvider = nextProvider;
         break;
+
     case NULL_PROVIDER:
     case SCRIPTED_PROVIDER:
     case HEAD_PROVIDER:
@@ -372,7 +521,8 @@ void MotionSwitchboard::swapBodyProvider(){
 }
 
 void MotionSwitchboard::swapHeadProvider(){
-    switch(nextHeadProvider->getType()){
+    switch(nextHeadProvider->getType())
+    {
     case HEAD_PROVIDER:
     default:
         curHeadProvider = nextHeadProvider;
@@ -420,7 +570,7 @@ int MotionSwitchboard::realityCheckJoints(){
     static const float head_joint_override_thresh = 0.3f;//need diff for head
 
     int changed = 0;
-    vector<float> sensorAngles = sensors->getBodyAngles();
+    sensorAngles = sensors->getBodyAngles();
     vector<float> motionAngles = sensors->getMotionBodyAngles();
 
     //HEAD ANGLES - handled separately to avoid trouble in HeadProvider
@@ -456,53 +606,53 @@ int MotionSwitchboard::realityCheckJoints(){
 void MotionSwitchboard::initDebugLogs(){
     joints_log = fopen("/tmp/joints_log.xls","w");
     fprintf(joints_log,"time\t"
-        "HEAD_YAW\t"
-        "HEAD_PITCH\t"
-        "L_SHOULDER_PITCH\t"
-        "L_SHOULDER_ROLL\t"
-        "L_ELBOW_YAW\t"
-        "L_ELBOW_ROLL\t"
-        "L_HIP_YAW_PITCH\t"
-        "L_HIP_ROLL\t"
-        "L_HIP_PITCH\t"
-        "L_KNEE_PITCH\t"
-        "L_ANKLE_PITCH\t"
-        "L_ANKLE_ROLL\t"
-        "R_HIP_YAW_PITCH\t"
-        "R_HIP_ROLL\t"
-        "R_HIP_PITCH\t"
-        "R_KNEE_PITCH\t"
-        "R_ANKLE_PITCH\t"
-        "R_ANKLE_ROLL\t"
-        "R_SHOULDER_PITCH\t"
-        "R_SHOULDER_ROLL\t"
-        "R_ELBOW_YAW\t"
-        "R_ELBOW_ROLL\t\n");
+            "HEAD_YAW\t"
+            "HEAD_PITCH\t"
+            "L_SHOULDER_PITCH\t"
+            "L_SHOULDER_ROLL\t"
+            "L_ELBOW_YAW\t"
+            "L_ELBOW_ROLL\t"
+            "L_HIP_YAW_PITCH\t"
+            "L_HIP_ROLL\t"
+            "L_HIP_PITCH\t"
+            "L_KNEE_PITCH\t"
+            "L_ANKLE_PITCH\t"
+            "L_ANKLE_ROLL\t"
+            "R_HIP_YAW_PITCH\t"
+            "R_HIP_ROLL\t"
+            "R_HIP_PITCH\t"
+            "R_KNEE_PITCH\t"
+            "R_ANKLE_PITCH\t"
+            "R_ANKLE_ROLL\t"
+            "R_SHOULDER_PITCH\t"
+            "R_SHOULDER_ROLL\t"
+            "R_ELBOW_YAW\t"
+            "R_ELBOW_ROLL\t\n");
 
     stiffness_log = fopen("/tmp/stiff_log.xls","w");
     fprintf(stiffness_log,"time\t"
-        "HEAD_YAW\t"
-        "HEAD_PITCH\t"
-        "L_SHOULDER_PITCH\t"
-        "L_SHOULDER_ROLL\t"
-        "L_ELBOW_YAW\t"
-        "L_ELBOW_ROLL\t"
-        "L_HIP_YAW_PITCH\t"
-        "L_HIP_ROLL\t"
-        "L_HIP_PITCH\t"
-        "L_KNEE_PITCH\t"
-        "L_ANKLE_PITCH\t"
-        "L_ANKLE_ROLL\t"
-        "R_HIP_YAW_PITCH\t"
-        "R_HIP_ROLL\t"
-        "R_HIP_PITCH\t"
-        "R_KNEE_PITCH\t"
-        "R_ANKLE_PITCH\t"
-        "R_ANKLE_ROLL\t"
-        "R_SHOULDER_PITCH\t"
-        "R_SHOULDER_ROLL\t"
-        "R_ELBOW_YAW\t"
-        "R_ELBOW_ROLL\t\n");
+            "HEAD_YAW\t"
+            "HEAD_PITCH\t"
+            "L_SHOULDER_PITCH\t"
+            "L_SHOULDER_ROLL\t"
+            "L_ELBOW_YAW\t"
+            "L_ELBOW_ROLL\t"
+            "L_HIP_YAW_PITCH\t"
+            "L_HIP_ROLL\t"
+            "L_HIP_PITCH\t"
+            "L_KNEE_PITCH\t"
+            "L_ANKLE_PITCH\t"
+            "L_ANKLE_ROLL\t"
+            "R_HIP_YAW_PITCH\t"
+            "R_HIP_ROLL\t"
+            "R_HIP_PITCH\t"
+            "R_KNEE_PITCH\t"
+            "R_ANKLE_PITCH\t"
+            "R_ANKLE_ROLL\t"
+            "R_SHOULDER_PITCH\t"
+            "R_SHOULDER_ROLL\t"
+            "R_ELBOW_YAW\t"
+            "R_ELBOW_ROLL\t\n");
 
     effector_log = fopen("/tmp/effector_log.xls","w");
     fprintf(effector_log,"time\t"

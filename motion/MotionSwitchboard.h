@@ -106,6 +106,12 @@ private:
     void processJoints();
     void processStiffness();
     int  postProcess();
+    void preProcessHead();
+    void preProcessBody();
+    void processHeadJoints();
+    void processBodyJoints();
+    void clipHeadJoints(vector<float>& joints);
+    void safetyCheckJoints();
     void swapBodyProvider();
     void swapHeadProvider();
     int realityCheckJoints();
@@ -131,8 +137,10 @@ private:
 	MotionProvider * curHeadProvider;
 	MotionProvider * nextHeadProvider;
 
+    std::vector <float> sensorAngles;
     std::vector <float> nextJoints;
     std::vector <float> nextStiffnesses;
+    std::vector <float> lastJoints;
 
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
