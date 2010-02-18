@@ -998,13 +998,13 @@ public class Learning implements DataListener, MouseListener,
 			goodL+= ells;
 		}
 		if (tees > teesV) {
-			missedL += tees - teesV;
-			goodL += teesV;
+			missedT += tees - teesV;
+			goodT += teesV;
 		} else if (teesV > tees) {
-			falseL += teesV - tees;
-			goodL += tees;
+			falseT += teesV - tees;
+			goodT += tees;
 		} else if (tees > 0) {
-			goodL+= tees;
+			goodT += tees;
 		}
 	}
 
