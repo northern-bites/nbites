@@ -84,7 +84,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
     private TOOL tool;
 
-    private static final long FRAME_LENGTH_MILLIS = 40;
+    public static final long FRAME_LENGTH_MILLIS = 40;
 
     public RobotViewModule(TOOL t, NetworkModule net_mod) {
         super(t);
@@ -406,4 +406,8 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         if (none)
             robotMenu.add("None available");
     }
+
+	public RemoteRobot getSelectedRobot() {
+		return selectedRobot;
+	}
 }

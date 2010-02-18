@@ -92,6 +92,15 @@ public abstract class Field
     public final double LANDMARK_LEFT_GOAL_BOTTOM_POST_Y =
         MIDFIELD_Y - GOAL_WIDTH / 2.0;
 
+    public final double LANDMARK_YELLOW_GOAL_TOP_POST_Y =
+        MIDFIELD_Y + GOAL_WIDTH / 2.0;
+    public final double LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y =
+        MIDFIELD_Y - GOAL_WIDTH / 2.0;
+    public final double LANDMARK_BLUE_GOAL_TOP_POST_Y =
+        MIDFIELD_Y + GOAL_WIDTH / 2.0;
+    public final double LANDMARK_BLUE_GOAL_BOTTOM_POST_Y =
+        MIDFIELD_Y - GOAL_WIDTH / 2.0;
+
     public final double GOAL_X_LEFT = MIDFIELD_X - (GOAL_WIDTH / 2.);
     public final double GOAL_X_CENTER = MIDFIELD_X;
     public final double GOALBOX_TOP_Y = MIDFIELD_Y + (GOALBOX_WIDTH / 2.);
@@ -112,6 +121,24 @@ public abstract class Field
 	public final double YELLOW_GOALBOX_LEFT_X =
 		FIELD_WHITE_RIGHT_SIDELINE_X - GOALBOX_DEPTH;
 	public final double YELLOW_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
+
+	// Crosses on the Field
+	public final double LINE_CROSS_OFFSET = 180;
+
+	public final double LANDMARK_BLUE_GOAL_CROSS_X = FIELD_WHITE_LEFT_SIDELINE_X +
+		LINE_CROSS_OFFSET;
+	public final double LANDMARK_BLUE_GOAL_CROSS_Y = MIDFIELD_Y;
+	public final double LANDMARK_YELLOW_GOAL_CROSS_X = FIELD_WHITE_RIGHT_SIDELINE_X -
+		LINE_CROSS_OFFSET;
+	public final double LANDMARK_YELLOW_GOAL_CROSS_Y = MIDFIELD_Y;
+
+	public final double CC_LINE_CROSS_X = MIDFIELD_X;
+	public final double CC_LINE_CROSS_Y = MIDFIELD_Y;
+
+	public final double TOP_CC_Y = CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS;
+	public final double TOP_CC_X = CENTER_FIELD_X;
+	public final double BOTTOM_CC_Y = CENTER_FIELD_Y - CENTER_CIRCLE_RADIUS;
+	public final double BOTTOM_CC_X = CENTER_FIELD_X;
 
     public final double DRAW_STROKE = 1.;
     public final Color FIELD_COLOR = new Color(0,200,0);//Color.GREEN;

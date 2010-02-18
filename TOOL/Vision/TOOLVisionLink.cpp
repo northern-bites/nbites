@@ -251,7 +251,7 @@ extern "C" {
         jmethodID setUnusedPointsInfo = env->GetMethodID(javaClass, "setUnusedPointsInfo",
                                                          "()V");
         jmethodID setVisualCornersInfo = env->GetMethodID(javaClass, "setVisualCornersInfo",
-                                                          "(II)V");
+                                                          "(IIFFI)V");
         //push data from the lines object
         const vector<VisualLine> *lines = vision.fieldLines->getLines();
         for (vector<VisualLine>::const_iterator i = lines->begin();
@@ -282,7 +282,9 @@ extern "C" {
         for (list <VisualCorner>::const_iterator i = corners->begin();
              i != corners->end(); i++)
             env->CallVoidMethod(jobj, setVisualCornersInfo,
-                                i->getX(), i->getY());
+                                i->getX(), i->getY(),
+								i->getDistance(), i->getBearing(),
+								i->getShape());
         //horizon line
         jmethodID setHorizonInfo = env->GetMethodID(javaClass, "setHorizonInfo",
                                                     "(IIIII)V");
