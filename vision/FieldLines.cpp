@@ -2495,7 +2495,10 @@ list< VisualCorner > FieldLines::intersectLines() {
 
 			if (tooClose(intersectX, intersectY) &&
 				c.getShape() != CIRCLE){
-				cout << "Tossed a corner that may be a CC near the screen edge" << endl;
+				if (debugIntersectLines){
+					cout << "Tossed a corner that may be a" <<
+						" CC near the screen edge" << endl;
+				}
 				continue;
 			}
 
