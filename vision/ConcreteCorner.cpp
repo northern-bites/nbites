@@ -410,12 +410,14 @@ void ConcreteCorner::assignTCornerLines()
 {
 	vector<const ConcreteLine*>::const_iterator i = ConcreteLine::tBarLines().begin();
 	while ( i != ConcreteLine::tBarLines().end() ) {
-		if (*i == line1) {
+		if (**i == *line1) {
 			tBar = line1;
 			tStem = line2;
-		} else if (*i == line2) {
+			break;
+		} else if (**i == *line2) {
 			tBar == line2;
 			tStem = line1;
+			break;
 		}
 		i++;
 	}
@@ -448,5 +450,10 @@ getPossibleCorners(shape corner_type) {
 const list <const ConcreteCorner*> ConcreteCorner::getConcreteCorners()
 {
 	return concreteCorners;
+}
+
+bool ConcreteCorner::isLineInCorner(const ConcreteLine* line) const
+{
+	return (line == line1) || (line == line2);
 }
 

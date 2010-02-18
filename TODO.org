@@ -114,28 +114,34 @@
 *** TODO Opponent recognition (also with sonar)
 *** TODO Open goal detection
 *** TODO Improve FieldLines
+**** TODO Implement TOOL-side regression testing in learning modul
 **** Corners
 ***** DONE Check edge detection
-***** TODO Improve green between line endpoints and corner sanity check
+***** TODO [#A] Improve green between line endpoints and corner sanity check
 ***** TODO Improve CC detection
 ****** TODO Improve intersection between endpoints detection
        Possibly: augment simple between(intersection,endpoint1,endpoint2) with info about where the visible line ends, how many points on each side of it.
+****** TODO When detecting a CC, label the line as CC-Lines
 ***** TODO Improve T detection
       Some of CC detection could be applied here
 ***** TODO Improve T classification
 ****** Use length of bar and stem
        Bottom/top T corners will have very long stem and bar. Either means it's a bottom/top.
-***** TODO Use some ambiguous landmarks to ID corners
+***** DONE Use some ambiguous landmarks to ID corners
       A goal post can at least narrow down the choices.
 ***** TODO Use other VisualCorners to identify corners
       If there is an L corner near a T corner, then the T-corner is a goal T corner
 ***** TODO Fix CC-unused point identification
       Sees far too many CC corners because of stray points. Maybe check on opposite side of T-intersection for lots of white/try and create line points on opposite side (maybe in tighter configuration).
+***** TODO Fix/remove field angle sanity check
+      Possibly just broaden it significantly
+***** TODO Set shape when setting possible corners
+***** TODO Loop through and remark all CC-intersections given other corners
 **** Lines
 ***** TODO Better use corner information to identify lines
 ***** TODO Identify lines without corners
 ***** TODO Extend lines?
-      Maybe scan off the end of a line for more white, then try to make more line points, tightly and add them to the line.
+      Maybe scan off the end of a line for more white, then try to make more line points, tightly and add them to the line. Debug current system.
 ** Localization
 
 *** TODO Improve Kalman filter

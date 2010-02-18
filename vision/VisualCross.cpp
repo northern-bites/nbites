@@ -94,3 +94,8 @@ void VisualCross::setBearingWithSD(float _bearing)
     setBearing(_bearing);
     setBearingSD(robotBearingToSD(_bearing));
 }
+
+const bool VisualCross::hasPositiveID()
+{
+	return possibleCrosses->size() == 1;
+}

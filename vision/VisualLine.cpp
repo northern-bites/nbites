@@ -368,7 +368,7 @@ void VisualLine::setBearingWithSD(float _bearing)
  * more impossible lines and shrinks the available set.
  */
 void VisualLine::
-setPossibleLines( list <const ConcreteLine*> newPossiblities)
+setPossibleLines( list <const ConcreteLine*> _possibleLines)
 {
 	list<const ConcreteLine*> updated(0);
 
@@ -377,22 +377,28 @@ setPossibleLines( list <const ConcreteLine*> newPossiblities)
 		 currLine != possibleLines.end(); currLine++) {
 
 		for ( list<const ConcreteLine*>::iterator
-				  newLine = newPossiblities.begin();
-			  newLine != newPossiblities.begin(); newLine++) {
+				  newLine = _possibleLines.begin();
+			  newLine != _possibleLines.begin(); newLine++) {
 
 			// If the line is in both sets
-			if (newLine == currLine) {
+			if (**newLine == **currLine) {
 				updated.push_back(*newLine);
-				newPossiblities.erase(newLine);
+				_possibleLines.erase(newLine);
 			}
 		}
 	}
 	possibleLines = updated;
 }
+
 void VisualLine::
-setPossibleLines( vector <const ConcreteLine*> newPossiblities)
+setPossibleLines( vector <const ConcreteLine*> _possibleLines)
 {
-	list<const ConcreteLine*> poss(newPossiblities.begin(),
-									 newPossiblities.end());
+	list<const ConcreteLine*> poss(_possibleLines.begin(),
+									 _possibleLines.end());
 	setPossibleLines(poss);
+}
+
+const bool VisualLine::hasPositiveID()
+{
+	return possibleLines.size() == 1;
 }

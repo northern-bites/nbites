@@ -188,13 +188,11 @@ private:
     static const int MAX_ANGLE_ON_FIELD = 115;
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
 
+    static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
+
     ////////////////////////////////////////////////////////////
     // Identify corners constants
     ////////////////////////////////////////////////////////////
-    // AIBOSPECIFIC
-    // Distance in centimeters
-    static const int MAXIMUM_DIST_TO_USE_PIX_ESTIMATE = 400;
-    static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
 
 public:
 

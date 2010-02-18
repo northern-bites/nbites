@@ -14,8 +14,9 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _t1, const float _t2)
     : VisualDetection(_x, _y, _distance, _bearing),
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
-      cornerType(UNKNOWN),
-      line1(l1), line2(l2), lines(), t1(_t1), t2(_t2),
+      possibleCorners(ConcreteCorner::getConcreteCorners()),
+	  cornerType(UNKNOWN), line1(l1), line2(l2),
+	  lines(), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
       // which we apologize. It's a hack, but the true values of tBar and tStem
       // will get assigned in determineCornerShape which is right here in the
@@ -243,28 +244,75 @@ const shape VisualCorner::getLClassification() {
 void VisualCorner::identifyLinesInCorner()
 {
 	// Check lines in positively identified corners
-	if (possibleCorners.size() == 1) {
+	if (hasPositiveID()) {
 		const ConcreteCorner * corner = possibleCorners.front();
 		if (cornerType == T) {
 			tBar->setPossibleLines(corner->getTBar());
 			tStem->setPossibleLines(corner->getTStem());
 		} else {
+			// The best we can do is say that we know it's one of
+			// the two lines in this corner
 			line1->setPossibleLines(corner->getLines());
 			line2->setPossibleLines(corner->getLines());
 		}
-	}
+		return;
+	} else if (possibleCorners.size() < ConcreteCorner::NUM_CORNERS){
+		list<const ConcreteLine*> possibilites;
+		list<const ConcreteCorner*>::const_iterator c;
+		// for (c = possibleCorners.begin();
+		// 	 c != possibleCorners.end();
+		// 	 ++c){
+		// 	possibilites.insert(possibilites.end(),
+		// 						(*c)->getLines().begin(),
+		// 						(*c)->getLines().end());
 
-
-	if (cornerType == T){
-		tBar->setPossibleLines(ConcreteLine::tBarLines());
-		tStem->setPossibleLines(ConcreteLine::tStemLines());
+		// }
+		// line1->setPossibleLines(possibilites);
+		// line2->setPossibleLines(possibilites);
 	}
 
 	// Use the shape of the corner to identify the lines
-	else if (cornerType== T) {
-		return;
+	if (cornerType == T){
+		tBar->setPossibleLines(ConcreteLine::tBarLines());
+		tStem->setPossibleLines(ConcreteLine::tStemLines());
+	} else if (cornerType == INNER_L || cornerType == OUTER_L) {
+		line1->setPossibleLines(ConcreteLine::lCornerLines());
+		line2->setPossibleLines(ConcreteLine::lCornerLines());
 	}
+}
 
+// See if any corners have a line that was positively identified,
+// and use that to limit the number of possible corners that it be
+void VisualCorner::identifyFromLines()
+{
+	if (line1->hasPositiveID())
+		IDFromLine(line1);
+	if (line2->hasPositiveID())
+		IDFromLine(line2);
+}
+
+/**
+ * Uses a positively identified line to reduce the
+ * number of possible corners
+ *
+ * @param line A line with only one possible ID
+ */
+void VisualCorner::IDFromLine(const shared_ptr<VisualLine> line)
+{
+	if (!line->hasPositiveID())
+		return;
+	const ConcreteLine* concreteLine = line->getPossibleLines().front();
+
+	const list <const ConcreteCorner*> concretes =
+		ConcreteCorner::getPossibleCorners(getShape());
+
+	list<const ConcreteCorner*> possibles;
+	list<const ConcreteCorner*>::const_iterator i = concretes.begin();
+	for ( ; i != concretes.end() ; ++i){
+		if ((*i)->isLineInCorner(concreteLine))
+			possibles.push_back(*i);
+	}
+	setPossibleCorners(possibles);
 }
 
 /**
@@ -315,3 +363,32 @@ void VisualCorner::determineCornerIDFromShape()
     }
 
 }
+
+const bool VisualCorner::hasPositiveID()
+{
+	return possibleCorners.size() == 1;
+}
+
+void VisualCorner::setPossibleCorners(
+	std::list <const ConcreteCorner *> _possibleCorners)
+{
+	list<const ConcreteCorner*> updated;
+	for (list<const ConcreteCorner*>::iterator
+			 currCorner = possibleCorners.begin();
+		 currCorner != possibleCorners.end(); currCorner++) {
+
+		for ( list<const ConcreteCorner*>::iterator
+				  newCorner = _possibleCorners.begin();
+			  newCorner != _possibleCorners.end(); newCorner++) {
+
+			// If the line is in both sets, then it's still a
+			// possible corner
+			if (**newCorner == **currCorner) {
+				updated.push_back(*newCorner);
+				_possibleCorners.erase(newCorner);
+			}
+		}
+	}
+	possibleCorners = updated;
+}
+

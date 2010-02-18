@@ -192,13 +192,11 @@ public:
     const float getDistanceSD() const { return distanceSD; }
     const float getBearingSD() const { return bearingSD; }
     const bool getCCLine() const {return ccLine; }
-    /**
-     * @return a List of all possible lines.  Currently returns all 11 lines
-     */
+
     const std::list <const ConcreteLine *> getPossibleLines() const {
         return possibleLines;
     }
-
+	virtual const bool hasPositiveID();
 
     // Setters
     void setDistance(float _distance) { distance = _distance; }

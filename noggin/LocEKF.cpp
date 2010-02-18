@@ -389,7 +389,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		// Jacobians for line updates
 		H_k(0,0) = (2.0f*(-1.0f + pow(x_l,2.0f))*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2.0f*x_l*y_l*(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.0f*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
         H_k(0,1) = (2.0f*x_l*y_l*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2.0f*(-1.0f + pow(y_l,2.0f))* (y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.0f*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
-        H_k(0,2.0f) = 0.0f;
+        H_k(0,2) = 0.0f;
 
         H_k(1,0) = -(((-1.0f + pow(x_l,2.0f) + pow(y_l,2.0f))*(y_b - y_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
         H_k(1,1) = ((-1.0f + pow(x_l,2.0f) + pow(y_l,2.0f))*(x_b - x_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f));

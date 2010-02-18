@@ -82,6 +82,7 @@ public:
         return possibleFieldObjects;
     }
 
+	virtual const bool hasPositiveID();
 
 private: // Class Variables
 

@@ -2914,13 +2914,6 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
         cout << "Beginning identifyCorners() with " << corners.size()
              << " corners" << endl;
 
-    vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
-
-	// We prefer using SUREly identified posts, but we will use other ones if
-	// they're available
-	if (visibleObjects.empty())
-		visibleObjects = getAllVisibleFieldObjects();
-
 	int numCorners = corners.size(), numTs = 0, numLs = 0;
 	if (numCorners > 1) {
 
@@ -2934,6 +2927,12 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 			}
 		}
 	}
+
+	// We prefer using SUREly identified posts, but we will use other ones if
+	// they're available
+    vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
+	if (visibleObjects.empty())
+		visibleObjects = getAllVisibleFieldObjects();
 
     // No explicit movement of iterator; will do it manually
     for (list <VisualCorner>::iterator i = corners.begin();i != corners.end();){
@@ -3012,6 +3011,16 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
             ++i;
         }
     }
+
+    for (list <VisualCorner>::iterator i = corners.begin();
+		 i != corners.end(); ++i){
+		i->identifyFromLines();
+		i->identifyLinesInCorner();
+		if (debugIdentifyCorners)
+			printPossibilities(i->getPossibleCorners());
+	}
+
+
 }
 
 // Determines if the given L corner does not geometrically make sense for its

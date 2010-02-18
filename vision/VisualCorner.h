@@ -44,6 +44,13 @@ public:
                          c.getShape());
         }
 
+	void identifyLinesInCorner();
+	std::vector<boost::shared_ptr<VisualLine> > getLines() {
+		return lines;
+	}
+
+	void identifyFromLines();
+
     ////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////
@@ -51,11 +58,6 @@ public:
         return possibleCorners; }
 	boost::shared_ptr<VisualLine> getLine1() const { return line1; }
 	boost::shared_ptr<VisualLine> getLine2() const { return line2; }
-
-	void identifyLinesInCorner();
-	std::vector<boost::shared_ptr<VisualLine> > getLines() {
-		return lines;
-	}
 
 	boost::shared_ptr<VisualLine> getTBar() const { return tBar; }
 	boost::shared_ptr<VisualLine> getTStem() const { return tStem; }
@@ -65,16 +67,17 @@ public:
     const float getT2() const { return t2; }
     const shape getShape() const { return cornerType; }
 
-
     // DO NOT USE THIS UNLESS getShape() returns inner or outer L; I have
     // not yet hooked up the angle thing for T corners
     const float getAngleBetweenLines() const { return angleBetweenLines; }
 
+	virtual const bool hasPositiveID();
+
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////
-    void setPossibleCorners(std::list <const ConcreteCorner *> _possibleCorners)
-        { possibleCorners = _possibleCorners; }
+    void setPossibleCorners(std::list <const ConcreteCorner *>
+							_possibleCorners);
     void setShape(const shape s) { cornerType = s; }
     void setLine1(boost::shared_ptr<VisualLine> l1) { line1 = l1; }
     void setLine2(boost::shared_ptr<VisualLine> l2) { line2 = l2; }
@@ -85,6 +88,8 @@ public:
 
 private: // private methods
     const shape getLClassification();
+
+	void IDFromLine(const boost::shared_ptr<VisualLine> line);
 
     void determineCornerIDFromShape();
     void determineCornerShape(); // called on object instantiation

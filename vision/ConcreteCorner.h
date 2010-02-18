@@ -99,6 +99,11 @@ public:
             return o << c.toString();
         }
 
+	bool operator== (const ConcreteCorner& secondCorner) const
+		{
+			return id == secondCorner.getID();
+		}
+
     ////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////
@@ -121,7 +126,7 @@ public:
 public:
     static const shape inferCornerType(const cornerID id);
 	void assignTCornerLines();
-    // Static member variables
+	bool isLineInCorner(const ConcreteLine* line) const;
 
 public:
     static const ConcreteCorner blue_corner_top_l,
