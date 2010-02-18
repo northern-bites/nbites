@@ -199,6 +199,20 @@ public final class Classification {
     public boolean hasBlueRobots() { return hasBlueRobots; }
     public int getBlueRobots() { return blueRobots_; }
     
+    // optional int32 tCorners = 8;
+    public static final int TCORNERS_FIELD_NUMBER = 8;
+    private boolean hasTCorners;
+    private int tCorners_ = 0;
+    public boolean hasTCorners() { return hasTCorners; }
+    public int getTCorners() { return tCorners_; }
+    
+    // optional int32 lCorners = 9;
+    public static final int LCORNERS_FIELD_NUMBER = 9;
+    private boolean hasLCorners;
+    private int lCorners_ = 0;
+    public boolean hasLCorners() { return hasLCorners; }
+    public int getLCorners() { return lCorners_; }
+    
     @Override
     public final boolean isInitialized() {
       if (!hasHumanChecked) return false;
@@ -229,6 +243,12 @@ public final class Classification {
       }
       if (hasBlueRobots()) {
         output.writeInt32(7, getBlueRobots());
+      }
+      if (hasTCorners()) {
+        output.writeInt32(8, getTCorners());
+      }
+      if (hasLCorners()) {
+        output.writeInt32(9, getLCorners());
       }
       getUnknownFields().writeTo(output);
     }
@@ -267,6 +287,14 @@ public final class Classification {
       if (hasBlueRobots()) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(7, getBlueRobots());
+      }
+      if (hasTCorners()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, getTCorners());
+      }
+      if (hasLCorners()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(9, getLCorners());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -430,6 +458,12 @@ public final class Classification {
         if (other.hasBlueRobots()) {
           setBlueRobots(other.getBlueRobots());
         }
+        if (other.hasTCorners()) {
+          setTCorners(other.getTCorners());
+        }
+        if (other.hasLCorners()) {
+          setLCorners(other.getLCorners());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -508,6 +542,14 @@ public final class Classification {
             }
             case 56: {
               setBlueRobots(input.readInt32());
+              break;
+            }
+            case 64: {
+              setTCorners(input.readInt32());
+              break;
+            }
+            case 72: {
+              setLCorners(input.readInt32());
               break;
             }
           }
@@ -647,6 +689,42 @@ public final class Classification {
       public Builder clearBlueRobots() {
         result.hasBlueRobots = false;
         result.blueRobots_ = 0;
+        return this;
+      }
+      
+      // optional int32 tCorners = 8;
+      public boolean hasTCorners() {
+        return result.hasTCorners();
+      }
+      public int getTCorners() {
+        return result.getTCorners();
+      }
+      public Builder setTCorners(int value) {
+        result.hasTCorners = true;
+        result.tCorners_ = value;
+        return this;
+      }
+      public Builder clearTCorners() {
+        result.hasTCorners = false;
+        result.tCorners_ = 0;
+        return this;
+      }
+      
+      // optional int32 lCorners = 9;
+      public boolean hasLCorners() {
+        return result.hasLCorners();
+      }
+      public int getLCorners() {
+        return result.getLCorners();
+      }
+      public Builder setLCorners(int value) {
+        result.hasLCorners = true;
+        result.lCorners_ = value;
+        return this;
+      }
+      public Builder clearLCorners() {
+        result.hasLCorners = false;
+        result.lCorners_ = 0;
         return this;
       }
     }
@@ -993,19 +1071,20 @@ public final class Classification {
       descriptor;
   static {
     java.lang.String descriptorData =
-      "\n\035tool/TOOL/Data/Classify.proto\022\016classif" +
-      "ication\"\210\003\n\010KeyFrame\022\024\n\014humanChecked\030\001 \002" +
-      "(\010\022\014\n\004ball\030\002 \002(\010\0223\n\010blueGoal\030\003 \001(\0162!.cla" +
-      "ssification.KeyFrame.GoalType\0225\n\nyellowG" +
-      "oal\030\004 \001(\0162!.classification.KeyFrame.Goal" +
-      "Type\0221\n\005cross\030\005 \001(\0162\".classification.Key" +
-      "Frame.CrossType\022\021\n\tredRobots\030\006 \001(\005\022\022\n\nbl" +
-      "ueRobots\030\007 \001(\005\"B\n\010GoalType\022\013\n\007NO_POST\020\000\022" +
-      "\t\n\005RIGHT\020\001\022\n\n\006UNSURE\020\002\022\010\n\004BOTH\020\003\022\010\n\004LEFT" +
-      "\020\004\"N\n\tCrossType\022\014\n\010NO_CROSS\020\000\022\n\n\006YELLOW\020" +
-      "\001\022\013\n\007UNKNOWN\020\002\022\020\n\014DOUBLE_CROSS\020\003\022\010\n\004BLUE" +
-      "\020\004\"/\n\004Keys\022\'\n\005frame\030\001 \003(\0132\030.classificati" +
-      "on.KeyFrameB\033\n\tTOOL.DataB\016Classification";
+      "\n\016Classify.proto\022\016classification\"\254\003\n\010Key" +
+      "Frame\022\024\n\014humanChecked\030\001 \002(\010\022\014\n\004ball\030\002 \002(" +
+      "\010\0223\n\010blueGoal\030\003 \001(\0162!.classification.Key" +
+      "Frame.GoalType\0225\n\nyellowGoal\030\004 \001(\0162!.cla" +
+      "ssification.KeyFrame.GoalType\0221\n\005cross\030\005" +
+      " \001(\0162\".classification.KeyFrame.CrossType" +
+      "\022\021\n\tredRobots\030\006 \001(\005\022\022\n\nblueRobots\030\007 \001(\005\022" +
+      "\020\n\010tCorners\030\010 \001(\005\022\020\n\010lCorners\030\t \001(\005\"B\n\010G" +
+      "oalType\022\013\n\007NO_POST\020\000\022\t\n\005RIGHT\020\001\022\n\n\006UNSUR" +
+      "E\020\002\022\010\n\004BOTH\020\003\022\010\n\004LEFT\020\004\"N\n\tCrossType\022\014\n\010" +
+      "NO_CROSS\020\000\022\n\n\006YELLOW\020\001\022\013\n\007UNKNOWN\020\002\022\020\n\014D" +
+      "OUBLE_CROSS\020\003\022\010\n\004BLUE\020\004\"/\n\004Keys\022\'\n\005frame" +
+      "\030\001 \003(\0132\030.classification.KeyFrameB\033\n\tTOOL" +
+      ".DataB\016Classification";
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
         public com.google.protobuf.ExtensionRegistry assignDescriptors(
@@ -1016,7 +1095,7 @@ public final class Classification {
           internal_static_classification_KeyFrame_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_classification_KeyFrame_descriptor,
-              new java.lang.String[] { "HumanChecked", "Ball", "BlueGoal", "YellowGoal", "Cross", "RedRobots", "BlueRobots", },
+              new java.lang.String[] { "HumanChecked", "Ball", "BlueGoal", "YellowGoal", "Cross", "RedRobots", "BlueRobots", "TCorners", "LCorners", },
               TOOL.Data.Classification.KeyFrame.class,
               TOOL.Data.Classification.KeyFrame.Builder.class);
           internal_static_classification_Keys_descriptor =

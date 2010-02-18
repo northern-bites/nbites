@@ -32,6 +32,9 @@ message KeyFrame {
 	optional int32 redRobots = 6;
 	optional int32 blueRobots = 7;
 
+	optional int32 tCorners = 8;
+	optional int32 lCorners = 9;
+
 }
 
 message Keys {
