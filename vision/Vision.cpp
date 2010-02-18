@@ -114,7 +114,7 @@ void Vision::notifyImage(const byte* image) {
 void Vision::notifyImage() {
 
     // NORMAL VISION LOOP
-    PROF_ENTER(profiler, P_VISION);
+
 
     frameNumber++;
     // counts the frameNumber
@@ -127,8 +127,6 @@ void Vision::notifyImage() {
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
-
-    PROF_EXIT(profiler, P_VISION);
 }
 
 void Vision::setImage(const byte *image) {

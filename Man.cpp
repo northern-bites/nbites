@@ -173,7 +173,9 @@ Man::processFrame ()
 	PROF_EXIT(profiler.get(), P_GETIMAGE);
 #ifdef USE_VISION
     //if(camera_active)
+	PROF_ENTER(profiler, P_VISION);
     vision->notifyImage(sensors->getImage());
+	PROF_EXIT(profiler, P_VISION);
     //vision->notifyImage();
 #endif
 

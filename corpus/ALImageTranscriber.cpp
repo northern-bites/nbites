@@ -76,13 +76,18 @@ void ALImageTranscriber::run() {
 					 << " frame length: " << processTime <<endl;
             //Don't sleep at all
         } else{
-			//cout << "Sleeping for " << VISION_FRAME_LENGTH_uS
-			//-processTime << endl;
+			const long int microSleepTime = (VISION_FRAME_LENGTH_uS -
+											 processTime);
+			const long int nanoSleepTime =
+				(microSleepTime %(1000 * 1000)) * 1000;
 
-            //nanosleep(10000000);
-			interval.tv_sec = 0;
-			interval.tv_nsec = static_cast<long long int>((VISION_FRAME_LENGTH_uS
-														   -processTime) * 1000);
+			const long int secSleepTime = microSleepTime / (1000*1000);
+
+			// cout << "Sleeping for nano: " << nanoSleepTime <<
+			// 	" and sec:" << secSleepTime << endl;
+
+			interval.tv_sec = secSleepTime;
+			interval.tv_nsec = nanoSleepTime;
 
             nanosleep(&interval, &remainder);
         }

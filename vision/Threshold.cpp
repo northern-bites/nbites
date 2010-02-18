@@ -115,14 +115,14 @@ void Threshold::visionLoop() {
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-    PROF_ENTER(vision->profiler, P_OBJECT);
+	PROF_ENTER(vision->profiler, P_LINES);
     vision->fieldLines->lineLoop();
+    PROF_EXIT(vision->profiler, P_LINES);
     // do recognition
+    PROF_ENTER(vision->profiler, P_OBJECT);
     objectRecognition();
     PROF_EXIT(vision->profiler, P_OBJECT);
 
-
-    PROF_ENTER(vision->profiler, P_LINES);
     vision->fieldLines->afterObjectFragments();
 	// For now we don't set shooting information
     if (vision->bgCrossbar->getWidth() > 0) {
@@ -133,9 +133,6 @@ void Threshold::visionLoop() {
     }
 	// for now we also don't use open field information
     //field->openDirection(horizon, pose.get());
-    PROF_EXIT(vision->profiler, P_LINES);
-
-
 
 #ifdef OFFLINE
     if (visualHorizonDebug) {
