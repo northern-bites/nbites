@@ -23,5 +23,6 @@
 **** TODO Build this
 **** TODO Develop unit tests for behaviors (maybe)
 ** TODO Unify the build systems (ant + make)
-
+** TODO [#A] Add command line args
+*** TODO [#A] Pass in a dataset and frame # to open on load
 
