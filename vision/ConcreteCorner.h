@@ -4,6 +4,7 @@
 class ConcreteCorner;
 
 #include <ostream>
+#include <iostream>
 #include <string>
 #include <list>
 #include <algorithm>
@@ -70,24 +71,24 @@ class ConcreteCorner : public ConcreteLandmark {
 private:
     ConcreteCorner(const float fieldX, const float fieldY, const cornerID _id);
     ConcreteCorner(const float _fieldX, const float _fieldY,
-                   const ConcreteLine _l1, const ConcreteLine _l2,
+                   const ConcreteLine& _l1, const ConcreteLine& _l2,
                    const cornerID _id);
 
     // copy constructor
     ConcreteCorner(const ConcreteCorner&);
 
 public: // Constants
-    static const int NUM_L_CORNERS = 8;
-    static const int NUM_T_CORNERS = 6;
-    static const int NUM_CC_CORNERS = 2;
-    static const int NUM_CORNERS = NUM_L_CORNERS + NUM_T_CORNERS +
+    static const unsigned int NUM_L_CORNERS = 8;
+    static const unsigned int NUM_T_CORNERS = 6;
+    static const unsigned int NUM_CC_CORNERS = 2;
+    static const unsigned int NUM_CORNERS = NUM_L_CORNERS + NUM_T_CORNERS +
         NUM_CC_CORNERS;
-    static const int NUM_YELLOW_GOAL_CORNERS = 4;
-    static const int NUM_BLUE_GOAL_CORNERS = 4;
-    static const int NUM_GOAL_CORNERS = NUM_YELLOW_GOAL_CORNERS +
+    static const unsigned int NUM_YELLOW_GOAL_CORNERS = 4;
+    static const unsigned int NUM_BLUE_GOAL_CORNERS = 4;
+    static const unsigned int NUM_GOAL_CORNERS = NUM_YELLOW_GOAL_CORNERS +
         NUM_BLUE_GOAL_CORNERS;
-    static const int NUM_BLUE_GOAL_T_CORNERS = 2;
-    static const int NUM_YELLOW_GOAL_T_CORNERS = 2;
+    static const unsigned int NUM_BLUE_GOAL_T_CORNERS = 2;
+    static const unsigned int NUM_YELLOW_GOAL_T_CORNERS = 2;
 
 public:
     // destructor
@@ -98,6 +99,11 @@ public:
             return o << c.toString();
         }
 
+	bool operator== (const ConcreteCorner& secondCorner) const
+		{
+			return id == secondCorner.getID();
+		}
+
     ////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////
@@ -106,14 +112,21 @@ public:
     virtual const std::string toString() const;
 
     static const std::list <const ConcreteCorner*>
-      getPossibleCorners(shape
-                         corner_type);
+	getPossibleCorners(shape
+					   corner_type);
+
+	static const std::list <const ConcreteCorner*> getConcreteCorners();
+
+	const std::vector<const ConcreteLine*> getLines() const {
+		return lines;
+	}
 
 //     // Private methods
 // private:
 public:
     static const shape inferCornerType(const cornerID id);
-    // Static member variables
+	void assignTCornerLines();
+	bool isLineInCorner(const ConcreteLine* line) const;
 
 public:
     static const ConcreteCorner blue_corner_top_l,
@@ -138,6 +151,9 @@ public:
     static const std::string cornerIDToString(const cornerID _id);
     static const ConcreteCorner* concreteCornerList[NUM_CORNERS];
 
+	const ConcreteLine* getTBar() const { return tBar; }
+	const ConcreteLine* getTStem() const { return tStem; }
+
 private: // These are only used internally by the getPossibleCorners method
 
     static const ConcreteCorner* L_CORNERS[NUM_L_CORNERS];
@@ -152,15 +168,13 @@ private: // These are only used internally by the getPossibleCorners method
 
 
 public:
+	static const std::list <const ConcreteCorner*> concreteCorners;
     static const std::list <const ConcreteCorner*> lCorners;
     static const std::list <const ConcreteCorner*> tCorners;
     static const std::list <const ConcreteCorner*> ccCorners;
 
     static const std::list <const ConcreteCorner*> yellowGoalCorners;
     static const std::list <const ConcreteCorner*> blueGoalCorners;
-
-    static const std::list <const ConcreteCorner*> yellowArcCorners;
-    static const std::list <const ConcreteCorner*> blueArcCorners;
 
     static const std::list <const ConcreteCorner*> yellowGoalTCorners;
     static const std::list <const ConcreteCorner*> blueGoalTCorners;
@@ -171,6 +185,11 @@ private: // Instance variables recording location on field and identifier
 
     const ConcreteLine * line1;
     const ConcreteLine * line2;
+	std::vector<const ConcreteLine*> lines;
+
+	const ConcreteLine * tBar;
+	const ConcreteLine * tStem;
+
 };
 
 class CornerOfField : public std::unary_function<const ConcreteCorner*, bool> {

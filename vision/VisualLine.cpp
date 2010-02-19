@@ -16,7 +16,8 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-      possibleLines(ConcreteLine::concreteLines)
+      possibleLines(ConcreteLine::concreteLines().begin(),
+					ConcreteLine::concreteLines().end())
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
          i != nodes.end(); i++) {
@@ -27,14 +28,16 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
 }
 
 VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-                           possibleLines(ConcreteLine::concreteLines)
+      possibleLines(ConcreteLine::concreteLines().begin(),
+					ConcreteLine::concreteLines().end())
 {
 
 }
 
 VisualLine::VisualLine(float _dist, float _bearing) :
 	VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-	possibleLines(ConcreteLine::concreteLines)
+      possibleLines(ConcreteLine::concreteLines().begin(),
+					ConcreteLine::concreteLines().end())
 {
 	setDistanceWithSD(_dist);
 	setBearingWithSD(_bearing);
@@ -46,7 +49,8 @@ VisualLine::VisualLine(float _dist, float _bearing) :
 
 VisualLine::VisualLine(list<linePoint> &linePoints)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
-      possibleLines(ConcreteLine::concreteLines)
+      possibleLines(ConcreteLine::concreteLines().begin(),
+					ConcreteLine::concreteLines().end())
 {
     for (list<linePoint>::iterator i = linePoints.begin();
          i != linePoints.end(); i++) {
@@ -72,7 +76,7 @@ VisualLine::VisualLine(const VisualLine& other)
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
-      possibleLines(ConcreteLine::concreteLines)
+      possibleLines(other.getPossibleLines())
 {
 }
 
@@ -161,47 +165,10 @@ void VisualLine::init()
         }
     }
 
-    angle = getAngle(*this);
-    length = getLength(*this);
+    angle = getAngle();
+    length = getLength();
 
     calculateWidths();
-	calculateDistBearing();
-}
-
-/**
- * Uses the endpoints of the line to calculate the distance and
- * the bearing to the closest point on the line.
- */
-void VisualLine::calculateDistBearing()
-{
-    // Points are sorted by x
-    // This is a temporary measure, until a better system of
-    // getting line segment endpoints is implemented
-	const linePoint startPt = points[0];
-	const linePoint endPt = points[points.size()-1];
-
-	const float startGroundX = startPt.distance * sin(startPt.bearing);
-	const float startGroundY = startPt.distance * cos(startPt.bearing);
-
-	const float endGroundX = endPt.distance * sin(endPt.bearing);
-	const float endGroundY = endPt.distance * cos(endPt.bearing);
-
-	const float slopeX = endGroundX - startGroundX;
-	const float slopeY = endGroundY - startGroundY;
-	const float length = sqrt(slopeY*slopeY+slopeX*slopeX);
-
-	const float unitSlopeX = slopeX / length;
-	const float unitSlopeY = slopeY / length;
-
-	// Point p is the closest point on the line to the robot.
-	// Coordinates are relative to us in the global frame.
-	const float x_p = (startGroundY * unitSlopeY +
-					   startGroundX * unitSlopeX) * unitSlopeX + startGroundX;
-	const float y_p = (startGroundY * unitSlopeY +
-					   startGroundX * unitSlopeX) * unitSlopeY + startGroundY;
-
-	setDistanceWithSD( hypot(x_p, y_p));
-	setBearingWithSD( NBMath::subPIAngle(NBMath::safe_atan2(y_p, x_p)) );
 }
 
 // Loops through all of our line points and calculates the average widths in
@@ -271,32 +238,32 @@ void VisualLine::calculateWidths()
 }
 
 
-const float VisualLine::getLength(const VisualLine& line)
+const float VisualLine::getLength()
 {
-    return Utility::getLength( static_cast<float>(line.start.x),
-							   static_cast<float>(line.start.y),
-                               static_cast<float>(line.end.x),
-							   static_cast<float>(line.end.y) );
+    return Utility::getLength( static_cast<float>(start.x),
+							   static_cast<float>(start.y),
+                               static_cast<float>(end.x),
+							   static_cast<float>(end.y) );
 }
 
 // Get the angle from horizontal (in degrees) the line makes on the screen
-const float VisualLine::getAngle(const VisualLine& line)
+const float VisualLine::getAngle()
 {
-    return Utility::getAngle(line.start.x, line.start.y,
-                             line.end.x, line.end.y);
+    return Utility::getAngle(start.x, start.y,
+                             end.x, end.y);
 }
 
 // We define a line to be vertically oriented if the change in y is bigger
 // than the change in x
-const bool VisualLine::isVerticallyOriented(const VisualLine& line)
+const bool VisualLine::isVerticallyOriented()
 {
-    return line.right - line.left < line.bottom - line.top;
+    return right - left < bottom - top;
 }
 
 
-const bool VisualLine::isPerfectlyVertical(const VisualLine& line)
+const bool VisualLine::isPerfectlyVertical()
 {
-    return line.right == line.left;
+    return right == left;
 }
 
 // Return the slope of the line (returns NAN if vertical)
@@ -394,3 +361,44 @@ void VisualLine::setBearingWithSD(float _bearing)
     setBearingSD(lineBearingToSD(_bearing));
 }
 
+/**
+ * Takes the intersection of the current possible line list
+ * and the given possibilities to narrow down the choices.
+ * The idea is that every new list of possible lines cuts out
+ * more impossible lines and shrinks the available set.
+ */
+void VisualLine::
+setPossibleLines( list <const ConcreteLine*> _possibleLines)
+{
+	list<const ConcreteLine*> updated(0);
+
+	for (list<const ConcreteLine*>::iterator
+			 currLine = possibleLines.begin();
+		 currLine != possibleLines.end(); currLine++) {
+
+		for ( list<const ConcreteLine*>::iterator
+				  newLine = _possibleLines.begin();
+			  newLine != _possibleLines.begin(); newLine++) {
+
+			// If the line is in both sets
+			if (**newLine == **currLine) {
+				updated.push_back(*newLine);
+				_possibleLines.erase(newLine);
+			}
+		}
+	}
+	possibleLines = updated;
+}
+
+void VisualLine::
+setPossibleLines( vector <const ConcreteLine*> _possibleLines)
+{
+	list<const ConcreteLine*> poss(_possibleLines.begin(),
+									 _possibleLines.end());
+	setPossibleLines(poss);
+}
+
+const bool VisualLine::hasPositiveID()
+{
+	return possibleLines.size() == 1;
+}

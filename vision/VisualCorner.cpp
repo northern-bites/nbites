@@ -1,5 +1,6 @@
 #include "VisualCorner.h"
 using namespace std;
+using namespace boost;
 
 //-------------------------------
 // Static VisualCorner variables:
@@ -9,19 +10,22 @@ dogLocation(IMAGE_WIDTH/2, IMAGE_HEIGHT - 1);
 VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _distance,
                            const float _bearing,
-                           const VisualLine l1, const VisualLine l2,
+                           shared_ptr<VisualLine> l1, shared_ptr<VisualLine> l2,
                            const float _t1, const float _t2)
     : VisualDetection(_x, _y, _distance, _bearing),
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
-      cornerType(UNKNOWN),
-      line1(l1), line2(l2), t1(_t1), t2(_t2),
+      possibleCorners(ConcreteCorner::getConcreteCorners()),
+	  cornerType(UNKNOWN), line1(l1), line2(l2),
+	  lines(), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
       // which we apologize. It's a hack, but the true values of tBar and tStem
       // will get assigned in determineCornerShape which is right here in the
       // constructor.
       tBar(line1), tStem(line2),
-      angleBetweenLines(0) {
-
+      angleBetweenLines(0)
+{
+	lines.push_back(line1);
+	lines.push_back(line2);
     determineCornerShape();
 
     // Calculate and set the standard deviation of the measurements
@@ -35,9 +39,11 @@ VisualCorner::VisualCorner(const VisualCorner& other)
     : VisualDetection(other), VisualLandmark<cornerID>(other),
       possibleCorners(other.possibleCorners),
       cornerType(other.cornerType),
-      line1(other.line1), line2(other.line2), t1(other.t1), t2(other.t2),
+      line1(other.line1), line2(other.line2), lines(other.lines),
+	  t1(other.t1), t2(other.t2),
       tBar(other.tBar), tStem(other.tStem),
-      angleBetweenLines(other.angleBetweenLines) {
+      angleBetweenLines(other.angleBetweenLines)
+{
 
 }
 
@@ -46,12 +52,12 @@ VisualCorner::VisualCorner(const VisualCorner& other)
  * constructed in FieldLines::interesctLines()
  */
 void VisualCorner::determineCornerShape() {
-    if (Utility::tValueInMiddleOfLine(t1, line1.length, MIN_EXTEND_DIST)) {
+    if (Utility::tValueInMiddleOfLine(t1, line1->length, MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line1;
         tStem = line2;
         setID(T_CORNER);
-    } else if(Utility::tValueInMiddleOfLine(t2, line2.length,
+    } else if(Utility::tValueInMiddleOfLine(t2, line2->length,
                                             MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line2;
@@ -86,9 +92,9 @@ const shape VisualCorner::getLClassification() {
     // should point in the opposite direction (the aforementioned end/start
     // issue)
     pair <int, int> line1Basis =
-        VisualLine::getLineComponents(line1);
+        VisualLine::getLineComponents(*line1);
     pair <int, int> line2Basis =
-        VisualLine::getLineComponents(line2);
+        VisualLine::getLineComponents(*line2);
 
     // Find the line endpoint that's farther from the corner (allows us
     // to direct our line segment away from the corner)
@@ -97,17 +103,17 @@ const shape VisualCorner::getLClassification() {
     // corner is closer to start point of line 1
     if (Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line1.start.x),
-						   static_cast<float>(line1.start.y) ) <
+						   static_cast<float>(line1->start.x),
+						   static_cast<float>(line1->start.y) ) <
         Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line1.end.x),
-						   static_cast<float>(line1.end.y) )) {
-        line1End = line1.end;
+						   static_cast<float>(line1->end.x),
+						   static_cast<float>(line1->end.y) )) {
+        line1End = line1->end;
     }
     // Closer to end
     else {
-        line1End = line1.start;
+        line1End = line1->start;
         // Swap the signs on the line 1 basis
         line1Basis.first *= -1;
         line1Basis.second *= -1;
@@ -116,17 +122,17 @@ const shape VisualCorner::getLClassification() {
     // corner is closer to start point of line 2
     if (Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line2.start.x),
-						   static_cast<float>(line2.start.y) ) <
+						   static_cast<float>(line2->start.x),
+						   static_cast<float>(line2->start.y) ) <
         Utility::getLength(static_cast<float>(cornerX),
 						   static_cast<float>(cornerY),
-						   static_cast<float>(line2.end.x),
-						   static_cast<float>(line2.end.y) )) {
-        line2End = line2.end;
+						   static_cast<float>(line2->end.x),
+						   static_cast<float>(line2->end.y) )) {
+        line2End = line2->end;
     }
     // Closer to end
     else {
-        line2End = line2.start;
+        line2End = line2->start;
         // Swap the signs on the line 2 basis
         line2Basis.first *= -1;
         line2Basis.second *= -1;
@@ -143,7 +149,7 @@ const shape VisualCorner::getLClassification() {
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
     float theta = TO_DEG * NBMath::safe_acos(dotProduct/
-                                             (line1.length * line2.length));
+                                             (line1->length * line2->length));
     /*
       cout << " first line: " << line1->start << ", " << line1->end << endl;
       cout << " second line: " << line2->start << ", " << line2->end << endl;
@@ -232,6 +238,84 @@ const shape VisualCorner::getLClassification() {
 }
 
 /**
+ * Use the ID and shape of the corner to help narrow down IDs for
+ * lines within the corner.
+ */
+void VisualCorner::identifyLinesInCorner()
+{
+	// Check lines in positively identified corners
+	if (hasPositiveID()) {
+		const ConcreteCorner * corner = possibleCorners.front();
+		if (cornerType == T) {
+			tBar->setPossibleLines(corner->getTBar());
+			tStem->setPossibleLines(corner->getTStem());
+		} else {
+			// The best we can do is say that we know it's one of
+			// the two lines in this corner
+			line1->setPossibleLines(corner->getLines());
+			line2->setPossibleLines(corner->getLines());
+		}
+		return;
+	} else if (possibleCorners.size() < ConcreteCorner::NUM_CORNERS){
+		list<const ConcreteLine*> possibilites;
+		list<const ConcreteCorner*>::const_iterator c;
+		// for (c = possibleCorners.begin();
+		// 	 c != possibleCorners.end();
+		// 	 ++c){
+		// 	possibilites.insert(possibilites.end(),
+		// 						(*c)->getLines().begin(),
+		// 						(*c)->getLines().end());
+
+		// }
+		// line1->setPossibleLines(possibilites);
+		// line2->setPossibleLines(possibilites);
+	}
+
+	// Use the shape of the corner to identify the lines
+	if (cornerType == T){
+		tBar->setPossibleLines(ConcreteLine::tBarLines());
+		tStem->setPossibleLines(ConcreteLine::tStemLines());
+	} else if (cornerType == INNER_L || cornerType == OUTER_L) {
+		line1->setPossibleLines(ConcreteLine::lCornerLines());
+		line2->setPossibleLines(ConcreteLine::lCornerLines());
+	}
+}
+
+// See if any corners have a line that was positively identified,
+// and use that to limit the number of possible corners that it be
+void VisualCorner::identifyFromLines()
+{
+	if (line1->hasPositiveID())
+		IDFromLine(line1);
+	if (line2->hasPositiveID())
+		IDFromLine(line2);
+}
+
+/**
+ * Uses a positively identified line to reduce the
+ * number of possible corners
+ *
+ * @param line A line with only one possible ID
+ */
+void VisualCorner::IDFromLine(const shared_ptr<VisualLine> line)
+{
+	if (!line->hasPositiveID())
+		return;
+	const ConcreteLine* concreteLine = line->getPossibleLines().front();
+
+	const list <const ConcreteCorner*> concretes =
+		ConcreteCorner::getPossibleCorners(getShape());
+
+	list<const ConcreteCorner*> possibles;
+	list<const ConcreteCorner*>::const_iterator i = concretes.begin();
+	for ( ; i != concretes.end() ; ++i){
+		if ((*i)->isLineInCorner(concreteLine))
+			possibles.push_back(*i);
+	}
+	setPossibleCorners(possibles);
+}
+
+/**
  * Calculate and set the standard deviation for the distance measurement.
  * Set the distance measurement.
  *
@@ -279,3 +363,32 @@ void VisualCorner::determineCornerIDFromShape()
     }
 
 }
+
+const bool VisualCorner::hasPositiveID()
+{
+	return possibleCorners.size() == 1;
+}
+
+void VisualCorner::setPossibleCorners(
+	std::list <const ConcreteCorner *> _possibleCorners)
+{
+	list<const ConcreteCorner*> updated;
+	for (list<const ConcreteCorner*>::iterator
+			 currCorner = possibleCorners.begin();
+		 currCorner != possibleCorners.end(); currCorner++) {
+
+		for ( list<const ConcreteCorner*>::iterator
+				  newCorner = _possibleCorners.begin();
+			  newCorner != _possibleCorners.end(); newCorner++) {
+
+			// If the line is in both sets, then it's still a
+			// possible corner
+			if (**newCorner == **currCorner) {
+				updated.push_back(*newCorner);
+				_possibleCorners.erase(newCorner);
+			}
+		}
+	}
+	possibleCorners = updated;
+}
+

@@ -5,12 +5,22 @@ ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
                                const cornerID _id)
     : ConcreteLandmark(_fieldX, _fieldY), id(_id) {
     cornerType = inferCornerType(_id);
+	if (cornerType == T){
+		assignTCornerLines();
+	}
 }
 ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
-                               const ConcreteLine _l1, const ConcreteLine _l2,
+                               const ConcreteLine& _l1, const ConcreteLine& _l2,
                                const cornerID _id)
-    : ConcreteLandmark(_fieldX, _fieldY), id(_id) , line1(&_l1), line2(&_l2) {
+    : ConcreteLandmark(_fieldX, _fieldY), id(_id) ,
+	  line1(&_l1), line2(&_l2), lines()
+{
     cornerType = inferCornerType(_id);
+	lines.push_back(line1);
+	lines.push_back(line2);
+	if (cornerType == T){
+		assignTCornerLines();
+	}
 }
 
 // Copy constructor - just pairwise copy the elements
@@ -29,61 +39,85 @@ ConcreteCorner::~ConcreteCorner() {}
 const ConcreteCorner ConcreteCorner::
 blue_corner_top_l(FIELD_WHITE_LEFT_SIDELINE_X,
                   FIELD_WHITE_TOP_SIDELINE_Y,
+				  ConcreteLine::blue_goal_endline(),
+				  ConcreteLine::top_sideline(),
                   BLUE_CORNER_TOP_L);
 
 const ConcreteCorner ConcreteCorner::
 blue_corner_bottom_l(FIELD_WHITE_LEFT_SIDELINE_X,
                      FIELD_WHITE_BOTTOM_SIDELINE_Y,
+					 ConcreteLine::blue_goal_endline(),
+					 ConcreteLine::bottom_sideline(),
                      BLUE_CORNER_BOTTOM_L);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_left_t(BLUE_GOALBOX_LEFT_X,
                  BLUE_GOALBOX_TOP_Y,
+				 ConcreteLine::blue_goal_endline(),
+				 ConcreteLine::blue_goalbox_left_line(),
                  BLUE_GOAL_LEFT_T);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_right_t(BLUE_GOALBOX_LEFT_X,
                   BLUE_GOALBOX_BOTTOM_Y,
+				  ConcreteLine::blue_goal_endline(),
+				  ConcreteLine::blue_goalbox_right_line(),
                   BLUE_GOAL_RIGHT_T);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_left_l(BLUE_GOALBOX_RIGHT_X,
                  BLUE_GOALBOX_TOP_Y,
+				 ConcreteLine::blue_goalbox_left_line(),
+				 ConcreteLine::blue_goalbox_top_line(),
                  BLUE_GOAL_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
 blue_goal_right_l(BLUE_GOALBOX_RIGHT_X,
                   BLUE_GOALBOX_BOTTOM_Y,
+				  ConcreteLine::blue_goalbox_right_line(),
+				  ConcreteLine::blue_goalbox_top_line(),
                   BLUE_GOAL_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_corner_bottom_l(FIELD_WHITE_RIGHT_SIDELINE_X,
                        FIELD_WHITE_BOTTOM_SIDELINE_Y,
+					   ConcreteLine::yellow_goal_endline(),
+					   ConcreteLine::bottom_sideline(),
                        YELLOW_CORNER_BOTTOM_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_corner_top_l(FIELD_WHITE_RIGHT_SIDELINE_X,
                     FIELD_WHITE_TOP_SIDELINE_Y,
+					ConcreteLine::yellow_goal_endline(),
+					ConcreteLine::top_sideline(),
                     YELLOW_CORNER_TOP_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_left_t(YELLOW_GOALBOX_RIGHT_X,
                    YELLOW_GOALBOX_BOTTOM_Y,
+				   ConcreteLine::yellow_goal_endline(),
+				   ConcreteLine::yellow_goalbox_left_line(),
                    YELLOW_GOAL_LEFT_T);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_right_t(YELLOW_GOALBOX_RIGHT_X,
                     YELLOW_GOALBOX_TOP_Y,
+					ConcreteLine::yellow_goal_endline(),
+					ConcreteLine::yellow_goalbox_right_line(),
                     YELLOW_GOAL_RIGHT_T);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_left_l(YELLOW_GOALBOX_LEFT_X,
                    YELLOW_GOALBOX_BOTTOM_Y,
+				   ConcreteLine::yellow_goalbox_left_line(),
+				   ConcreteLine::yellow_goalbox_top_line(),
                    YELLOW_GOAL_LEFT_L);
 
 const ConcreteCorner ConcreteCorner::
 yellow_goal_right_l(YELLOW_GOALBOX_LEFT_X,
                     YELLOW_GOALBOX_TOP_Y,
+					ConcreteLine::yellow_goalbox_right_line(),
+					ConcreteLine::yellow_goalbox_top_line(),
                     YELLOW_GOAL_RIGHT_L);
 
 const ConcreteCorner ConcreteCorner::
@@ -100,11 +134,15 @@ fake_cc(CENTER_FIELD_X, CENTER_FIELD_Y, CENTER_CIRCLE);
 const ConcreteCorner ConcreteCorner::
 center_bottom_t(MIDFIELD_X,
                 FIELD_WHITE_BOTTOM_SIDELINE_Y,
+				ConcreteLine::bottom_sideline(),
+				ConcreteLine::midline(),
                 CENTER_BOTTOM_T);
 
 const ConcreteCorner ConcreteCorner::
 center_top_t(MIDFIELD_X,
              FIELD_WHITE_TOP_SIDELINE_Y,
+			 ConcreteLine::top_sideline(),
+			 ConcreteLine::midline(),
              CENTER_TOP_T);
 
 const ConcreteCorner* ConcreteCorner::concreteCornerList[NUM_CORNERS] =
@@ -182,6 +220,10 @@ const ConcreteCorner* ConcreteCorner::BLUE_GOAL_T_CORNERS[
     &blue_goal_right_t
 };
 
+
+const list <const ConcreteCorner*> ConcreteCorner::concreteCorners =
+	list <const ConcreteCorner*>(ConcreteCorner::concreteCornerList,
+								 &ConcreteCorner::concreteCornerList[NUM_CORNERS]);
 
 const list <const ConcreteCorner*> ConcreteCorner::lCorners =
     list <const ConcreteCorner*>( ConcreteCorner::L_CORNERS,
@@ -360,6 +402,28 @@ const shape ConcreteCorner::inferCornerType(const cornerID id) {
         return UNKNOWN;
     }
 }
+/**
+ * Checks all the tBar lines to see if either of the lines in this corner
+ * are a bar. Relies on the fact that no line is both a tStem and a tBar.
+ */
+void ConcreteCorner::assignTCornerLines()
+{
+	vector<const ConcreteLine*>::const_iterator i = ConcreteLine::tBarLines().begin();
+	while ( i != ConcreteLine::tBarLines().end() ) {
+		if (**i == *line1) {
+			tBar = line1;
+			tStem = line2;
+			break;
+		} else if (**i == *line2) {
+			tBar == line2;
+			tStem = line1;
+			break;
+		}
+		i++;
+	}
+
+}
+
 
 /*
  * Given a shape, returns a list of all the concrete corners that this shaped
@@ -382,3 +446,14 @@ getPossibleCorners(shape corner_type) {
         throw -1;
     }
 }
+
+const list <const ConcreteCorner*> ConcreteCorner::getConcreteCorners()
+{
+	return concreteCorners;
+}
+
+bool ConcreteCorner::isLineInCorner(const ConcreteLine* line) const
+{
+	return (line == line1) || (line == line2);
+}
+

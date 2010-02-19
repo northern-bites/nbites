@@ -6,7 +6,7 @@ VisualCross::VisualCross() :
 }
 
 VisualCross::VisualCross(const crossID _id) :
-    VisualLandmark<crossID>(_id), VisualDetection()
+    VisualDetection(), VisualLandmark<crossID>(_id)
 {
     init();
 }
@@ -111,4 +111,9 @@ void VisualCross::setBearingWithSD(float _bearing)
 {
     setBearing(_bearing);
     setBearingSD(robotBearingToSD(_bearing));
+}
+
+const bool VisualCross::hasPositiveID()
+{
+	return possibleCrosses->size() == 1;
 }
