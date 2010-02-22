@@ -93,10 +93,12 @@ class SoccerFSA(FSA.FSA):
         self.brain.nav.stop()
 
     def atDestinationGoalie(self):
-        return self.brain.nav.NavMath.atDestinationGoalie()
+        nav = self.brain.nav
+        return nav.NavMath.atDestinationGoalie(nav)
 
     def atHeading(self):
-        return self.nav.brain.NavMath.atHeading()
+        nav = self.brain.nav
+        return nav.NavMath.atHeading(nav)
 
 ##### Direct Motion Calls
     def gainsOff(self):

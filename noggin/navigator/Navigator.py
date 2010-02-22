@@ -39,7 +39,7 @@ class Navigator(FSA.FSA):
         self.stepTheta = 0
 
         self.orbitDir = None
-
+        self.NavMath = NavMath
 
     def omniGoTo(self, dest):
         if len(dest) == 2:
@@ -119,7 +119,7 @@ class Navigator(FSA.FSA):
         self.numSteps = numSteps
         self.switchTo('stepping')
 
-#######SHOULD BE MOVED TO NavHelper.py, LEFT FOR BACKWARDS COMPATABILITY ONLY#######
+#######SHOULD NOT BE CALLED BY ANYTHING OUTSIDE NAVIGATOR FOLDER#######
     def setSpeed(self,x,y,theta):
         """
         Wrapper method to easily change the walk vector of the robot

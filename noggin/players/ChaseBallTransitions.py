@@ -67,7 +67,7 @@ def shouldPositionForKick(player):
 
 def shouldPositionForKickFromApproachLoc(player):
     return shouldPositionForKick(player) and \
-        player.brain.nav.atHeading()
+        player.atHeading()
 
 def shouldRepositionForKick(player):
     """
