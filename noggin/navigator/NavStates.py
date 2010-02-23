@@ -8,6 +8,20 @@ from ..playbook.PBConstants import GOALIE
 from math import fabs, cos, sin, radians
 
 DEBUG = False
+
+def doingSweetMove(nav):
+    '''executes the currently set sweetmove'''
+    if nav.firstFrame():
+        nav.setSpeed(0,0,0)
+        nav.walkX = nav.walkY = nav.walkTheta = 0
+        nav.executeMove(nav.sweetMove)
+
+    if not nav.brain.motion.isBodyActive:
+        return nav.goNow('stopped')
+
+    return nav.stay()
+
+
 # States for the standard spin - walk - spin go to
 def spinToWalkHeading(nav):
     """
@@ -240,8 +254,8 @@ def stopped(nav):
 def orbitPoint(nav):
     if nav.firstFrame():
         nav.setSpeed(0,
-                    nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
-                    nav.orbitDir*constants.ORBIT_SPIN_SPEED )
+                     nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
+                     nav.orbitDir*constants.ORBIT_SPIN_SPEED )
     return nav.stay()
 
 

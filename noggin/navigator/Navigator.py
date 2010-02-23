@@ -41,6 +41,11 @@ class Navigator(FSA.FSA):
         self.orbitDir = None
         self.NavMath = NavMath
 
+    def performSweetMove(self, move):
+        self.sweetMove = move
+        self.movingOmni = False
+        self.switchTo('doingSweetMove')
+
     def omniGoTo(self, dest):
         if len(dest) == 2:
             self.destX, self.destY = dest
@@ -134,3 +139,35 @@ class Navigator(FSA.FSA):
         """
         steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
         self.brain.motion.sendStepCommand(steps)
+
+    def executeMove(self,sweetMove):
+        """
+        Method to enqueue a SweetMove
+        Can either take in a head move or a body command
+        (see SweetMove files for descriptions of command tuples)
+        """
+
+        for position in sweetMove:
+            if len(position) == 7:
+                move = motion.BodyJointCommand(position[4], #time
+                                               position[0], #larm
+                                               position[1], #lleg
+                                               position[2], #rleg
+                                               position[3], #rarm
+                                               position[6], # Chain Stiffnesses
+                                               position[5], #interpolation type
+                                               )
+
+            elif len(position) == 5:
+                move = motion.BodyJointCommand(position[2], # time
+                                               position[0], # chainID
+                                               position[1], # chain angles
+                                               position[4], # chain stiffnesses
+                                               position[3], # interpolation type
+                                               )
+
+            else:
+                self.printf("What kind of sweet ass-Move is this?")
+
+            self.brain.motion.enqueue(move)
+
