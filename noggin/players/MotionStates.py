@@ -142,7 +142,7 @@ def turnright(player):
 def stopwalking(player):
     ''' Do nothing'''
     if player.firstFrame():
-        player.setWalk(0,0,0)
+        player.stopWalking()
 
     return player.goLater('sitdown')
 

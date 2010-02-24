@@ -26,7 +26,7 @@ def saveFrames(player):
     if player.counter % FRAME_SAVE_RATE == 0:
         player.brain.sensors.saveFrame()
     if player.counter == 800:
-        player.setWalk(0,0,0)
+        player.stopWalking()
     if player.counter > FRAME_SAVE_RATE * NUM_FRAMES_TO_SAVE:
         return player.goNow('doneState')
 
