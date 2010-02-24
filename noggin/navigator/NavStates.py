@@ -12,10 +12,11 @@ DEBUG = False
 def doingSweetMove(nav):
     '''executes the currently set sweetmove'''
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
-        nav.executeMove(nav.sweetMove)
+        nav.helper.setSpeed(0, 0, 0)
+        nav.helper.executeMove(nav.sweetMove)
 
     if not nav.brain.motion.isBodyActive():
+        del nav.sweetMove
         return nav.goNow('stopped')
 
     return nav.stay()
@@ -64,7 +65,7 @@ def spinToWalkHeading(nav):
         NavMath.getRotScale(headingDiff)
 
     if sTheta != nav.walkTheta:
-        nav.setSpeed(0, 0, sTheta)
+        nav.helper.setSpeed(0, 0, sTheta)
 
     return nav.stay()
 
@@ -119,7 +120,7 @@ def walkStraightToPoint(nav):
                      constants.WALK_TO_MIN_X_SPEED,
                      constants.WALK_TO_MAX_X_SPEED)
 
-    nav.setSpeed(sX, 0, sTheta)
+    nav.helper.setSpeed(sX, 0, sTheta)
     return nav.stay()
 
 def spinToFinalHeading(nav):
@@ -148,7 +149,7 @@ def spinToFinalHeading(nav):
     if nav.stopSpinToWalkCount > constants.CHANGE_SPIN_DIR_THRESH:
         return nav.goLater('stop')
 
-    nav.setSpeed(0, 0, spin)
+    nav.helper.setSpeed(0, 0, spin)
     return nav.stay()
 
 def omniWalkToPoint(nav):
@@ -161,53 +162,9 @@ def omniWalkToPoint(nav):
         if NavMath.atDestinationCloser(nav) and NavMath.atHeading(nav):
             return nav.goNow('stop')
 
-    my = nav.brain.my
-    bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX, nav.destY)
-    absBearing = abs(bearing)
-    sX, sY, sTheta = 0.0, 0.0, 0.0
+    sX, sY, sTheta = nav.helper.getOmniWalkParam(nav.destX, nav.destY, nav.destH)
+    nav.helper.setSpeed(sX, sY, sTheta)
 
-    distToDest = MyMath.dist(my.x, my.y, nav.destX, nav.destY)
-
-    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
-        cos(radians(bearing))
-    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
-        sin(radians(bearing))
-    spinGain = constants.GOTO_SPIN_GAIN
-
-    sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
-    sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
-
-    sX = MyMath.clip(sX,
-                     constants.OMNI_MIN_X_SPEED,
-                     constants.OMNI_MAX_X_SPEED)
-    sY = MyMath.clip(sY,
-                     constants.OMNI_MIN_Y_SPEED,
-                     constants.OMNI_MAX_Y_SPEED,)
-
-    if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
-        sY = 0
-    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
-        sX = 0
-
-
-    spinDir = MyMath.getSpinDir(my.h, nav.destH)
-    sTheta = spinDir * fabs(my.h - nav.destH) * spinGain
-
-    sTheta = MyMath.clip(sTheta,
-                         constants.OMNI_MIN_SPIN_SPEED,
-                         constants.OMNI_MAX_SPIN_SPEED)
-
-    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
-        sTheta = 0.0
-
-    if NavMath.atDestinationCloser(nav):
-        sX = sY = 0.0
-    if NavMath.atHeading(nav):
-        sTheta = 0.0
-
-    if DEBUG: nav.printf("sX: %g  sY: %g  sTheta: %g" %
-               (sX, sY, sTheta))
-    nav.setSpeed(sX, sY, sTheta)
     return nav.stay()
 
 # State to be used with standard setSpeed movement
@@ -216,7 +173,7 @@ def walking(nav):
     State to be used when setSpeed is called
     """
     if nav.firstFrame() or nav.updatedTrajectory:
-        nav.setSpeed(nav.walkX, nav.walkY, nav.walkTheta)
+        nav.helper.setSpeed(nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 
     return nav.stay()
@@ -227,7 +184,7 @@ def stepping(nav):
     This is different from walking.
     """
     if nav.firstFrame():
-        nav.step(nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+        nav.helper.step(nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
     elif not nav.brain.motion.isWalkActive():
         return nav.goNow("stopped")
     return nav.stay()
@@ -238,7 +195,9 @@ def stop(nav):
     Wait until the walk is finished.
     """
     if nav.firstFrame():
-        nav.setSpeed(0,0,0)
+        nav.helper.setSpeed(0, 0, 0)
+        nav.walkX = nav.walkY = nav.walkTheta = nav.stepX = nav.stepY \
+                    = nav.stepTheta = nav.numSteps = 0
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
@@ -246,14 +205,12 @@ def stop(nav):
     return nav.stay()
 
 def stopped(nav):
-    nav.walkX = nav.walkY = nav.walkTheta = 0
-    nav.stepX = nav.stepY = nav.stepTheta = nav.numSteps = 0
-    nav.sweetMove = None
+
     return nav.stay()
 
 def orbitPoint(nav):
     if nav.firstFrame():
-        nav.setSpeed(0,
+        helper.setSpeed(nav, 0,
                      nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
                      nav.orbitDir*constants.ORBIT_SPIN_SPEED )
     return nav.stay()
@@ -267,9 +224,9 @@ def orbitPointThruAngle(nav):
         return nav.goNow('stop')
     if nav.firstFrame():
         if nav.angleToOrbit < 0:
-            nav.orbitDir = constants.ORBIT_LEFT
+            orbitDir = constants.ORBIT_LEFT
         else:
-            nav.orbitDir = constants.ORBIT_RIGHT
+            orbitDir = constants.ORBIT_RIGHT
 
         if fabs(nav.angleToOrbit) <= constants.ORBIT_SMALL_ANGLE:
             sY = constants.ORBIT_STRAFE_SPEED * constants.ORBIT_SMALL_GAIN
@@ -286,7 +243,7 @@ def orbitPointThruAngle(nav):
             sT = constants.ORBIT_SPIN_SPEED * \
                 constants.ORBIT_LARGE_GAIN
 
-        nav.setSpeed(-0.5, nav.orbitDir*sY, nav.orbitDir*sT)
+        helper.setSpeed(nav, -0.5, orbitDir*sY, orbitDir*sT)
 
     #  (frames/second) / (degrees/second) * degrees
     framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *

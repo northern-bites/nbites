@@ -1,9 +1,9 @@
 from math import fabs
-import man.motion as motion
 from ..util import FSA
 from . import NavStates
 from . import NavMath
 from . import NavConstants as constants
+from . import NavHelper as helper
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -17,34 +17,34 @@ class Navigator(FSA.FSA):
         self.stateChangeColor = 'cyan'
 
         # Goto controls
-        self.lastDestX = 0
-        self.lastDestY = 0
-        self.lastDestH = 0
         self.destX= 0
         self.destY= 0
         self.destH = 0
-        self.oScale = -1
-        self.hScale = -1
 
         # Walk controls
-        self.walkX = 0
-        self.walkY = 0
-        self.walkTheta = 0
         self.currentGait = None
-        self.movingOmni = False
 
-        # Step controls
-        self.stepX = 0
-        self.stepY = 0
-        self.stepTheta = 0
-
-        self.orbitDir = None
-        self.NavMath = NavMath
+        self.helper = helper.NavHelper(self)
 
     def performSweetMove(self, move):
         self.sweetMove = move
-        self.movingOmni = False
         self.switchTo('doingSweetMove')
+
+    def positionReady(self, dest):
+        if len(dest) == 2:
+            self.destX, self.destY = dest
+            self.destH = 0.0
+        elif len(dest) == 3:
+            self.destX, self.destY, self.destH = dest
+        self.switchTo('positioningReady')
+
+    def positionPlaybook(self, dest):
+        if len(dest) == 2:
+            self.destX, self.destY = dest
+            self.destH = 0.0
+        elif len(dest) == 3:
+            self.destX, self.destY, self.destH = dest
+        self.switchTo('positioningPlaybook')
 
     def omniGoTo(self, dest):
         if len(dest) == 2:
@@ -52,17 +52,15 @@ class Navigator(FSA.FSA):
             self.destH = 0.0
         elif len(dest) == 3:
             self.destX, self.destY, self.destH = dest
-        self.movingOmni = True
         self.switchTo('omniWalkToPoint')
 
     def goTo(self,dest):
 
-        self.movingOmni = False
         if len(dest) == 2:
             self.destX, self.destY = dest
             self.destH = 0.0
         elif len(dest) == 3:
-            self.destX,self.destY, self.destH = dest
+            self.destX, self.destY, self.destH = dest
 
         if not self.currentState == 'spinToWalkHeading' and \
                 not self.currentState == 'walkStraightToPoint' and \
@@ -97,12 +95,10 @@ class Navigator(FSA.FSA):
         """
         # Make sure we stop
         if (x == 0 and y == 0 and theta == 0):
-            if self.walkX == 0 and \
-                   self.walkY == 0 and \
-                   self.walkTheta == 0:
-                return
+            self.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
+            return
         # If the walk changes are really small, then ignore them
-        elif (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
+        if (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
             fabs(self.walkY - y) < constants.STRAFE_EPSILON and
             fabs(self.walkTheta - theta) < constants.SPIN_EPSILON):
             return
@@ -125,49 +121,3 @@ class Navigator(FSA.FSA):
         self.switchTo('stepping')
 
 #######SHOULD NOT BE CALLED BY ANYTHING OUTSIDE NAVIGATOR FOLDER#######
-    def setSpeed(self,x,y,theta):
-        """
-        Wrapper method to easily change the walk vector of the robot
-        """
-        self.walkX, self.walkY, self.walkTheta = x, y, theta
-        walk = motion.WalkCommand(x=x,y=y,theta=theta)
-        self.brain.motion.setNextWalkCommand(walk)
-
-    def step(self,x,y,theta,numSteps):
-        """
-        Wrapper method to easily change the walk vector of the robot
-        """
-        steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
-        self.brain.motion.sendStepCommand(steps)
-
-    def executeMove(self,sweetMove):
-        """
-        Method to enqueue a SweetMove
-        Can either take in a head move or a body command
-        (see SweetMove files for descriptions of command tuples)
-        """
-
-        for position in sweetMove:
-            if len(position) == 7:
-                move = motion.BodyJointCommand(position[4], #time
-                                               position[0], #larm
-                                               position[1], #lleg
-                                               position[2], #rleg
-                                               position[3], #rarm
-                                               position[6], # Chain Stiffnesses
-                                               position[5], #interpolation type
-                                               )
-
-            elif len(position) == 5:
-                move = motion.BodyJointCommand(position[2], # time
-                                               position[0], # chainID
-                                               position[1], # chain angles
-                                               position[4], # chain stiffnesses
-                                               position[3], # interpolation type
-                                               )
-
-            else:
-                self.printf("What kind of sweet ass-Move is this?")
-
-            self.brain.motion.enqueue(move)
-

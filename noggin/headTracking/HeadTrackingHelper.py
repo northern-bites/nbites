@@ -5,7 +5,7 @@ from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
 from math import (fabs, atan, pi, hypot)
 
-class HeadTrackingHelper():
+class HeadTrackingHelper(object):
     def __init__(self, tracker):
         self.tracker = tracker
 
