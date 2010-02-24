@@ -13,10 +13,9 @@ def doingSweetMove(nav):
     '''executes the currently set sweetmove'''
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
-        nav.walkX = nav.walkY = nav.walkTheta = 0
         nav.executeMove(nav.sweetMove)
 
-    if not nav.brain.motion.isBodyActive:
+    if not nav.brain.motion.isBodyActive():
         return nav.goNow('stopped')
 
     return nav.stay()
@@ -240,7 +239,6 @@ def stop(nav):
     """
     if nav.firstFrame():
         nav.setSpeed(0,0,0)
-    nav.walkX = nav.walkY = nav.walkTheta = 0
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
@@ -249,6 +247,8 @@ def stop(nav):
 
 def stopped(nav):
     nav.walkX = nav.walkY = nav.walkTheta = 0
+    nav.stepX = nav.stepY = nav.stepTheta = nav.numSteps = 0
+    nav.sweetMove = None
     return nav.stay()
 
 def orbitPoint(nav):

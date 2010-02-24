@@ -78,19 +78,21 @@ class SoccerFSA(FSA.FSA):
             return True
 
     def standup(self):
-        self.stopWalking()
+        self.brain.nav.stop()
 
     def walkPose(self):
         """
         we return to std walk pose when we stop walking
         """
-        self.stopWalking()
+        self.brain.nav.stop()
 
     def stopWalking(self):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
-        self.brain.nav.stop()
+        nav = self.brain.nav
+        if not nav.isStopped():
+            self.brain.nav.stop()
 
     def atDestinationGoalie(self):
         nav = self.brain.nav
