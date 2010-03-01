@@ -434,8 +434,8 @@ public:
 
 	std::list<const ConcreteCorner*>
 	compareObjsCorners(const VisualCorner& corner,
-					   const std::list<const ConcreteCorner*>& possibleCorners,
-					   const vector<const VisualFieldObject*>& visibleObjects)
+					   const std::vector<const ConcreteCorner*>& possibleCorners,
+					   const std::vector<const VisualFieldObject*>& visibleObjects)
 		const;
 
 	const bool arePointsCloseEnough(const float estimatedDistance,

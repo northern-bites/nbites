@@ -390,6 +390,11 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
 	possibleLines = updated;
 }
 
+/**
+ * Another way of setting the possible lines
+ *
+ * @TODO Unify setPossibleLines so we don't copy the vector.
+ */
 void VisualLine::
 setPossibleLines( vector <const ConcreteLine*> _possibleLines)
 {
