@@ -22,61 +22,29 @@ def playbookPosition(player):
     ball = brain.ball
 
     if player.firstFrame():
-        player.changeOmniGoToCounter = 0
         if brain.gameController.currentState == 'gameReady':
             brain.tracker.locPans()
-        else :
+        else:
             brain.tracker.activeLoc()
 
-    position = brain.play.getPosition()
-    position = Location(position[0], position[1])
-
-    if brain.gameController.currentState == 'gameReady':
-        useOmniDist = constants.OMNI_POSITION_READY_DIST
+    if ball.on:
+        destHeading = my.h + ball.bearing
+    elif ball.framesOff < 30:
+        destHeading = my.h + ball.locBearing
     else:
-        useOmniDist = constants.OMNI_POSITION_DIST
+        destHeading = NogginConstants.OPP_GOAL_HEADING
 
-    distToPoint = my.dist(position)
-    useOmni = (distToPoint <= useOmniDist)
+    position = player.brain.play.getPosition()
+    position = RobotLocation(position[0], position[1], destHeading)
 
-    changedOmni = False
+    nav.positionPlaybook(position)
 
-    if useOmni != nav.movingOmni():
-        player.changeOmniGoToCounter += 1
-    else :
-        player.changeOmniGoToCounter = 0
-    if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
-        changedOmni = True
-
-    if useOmni:
-        # Get a bearing to the ball
-        if brain.gameController.currentState == 'gameReady':
-            destHeading = NogginConstants.OPP_GOAL_HEADING
-        elif ball.on:
-            destHeading = my.h + ball.bearing
-        elif ball.framesOff < 3:
-            destHeading = my.h + ball.locBearing
-        else:
-            destHeading = NogginConstants.OPP_GOAL_HEADING
-
+    if brain.my.locScore == NogginConstants.BAD_LOC:
+        player.shouldRelocalizeCounter += 1
     else:
-        destHeading = my.getTargetHeading(position)
-
-    position = RobotLocation(position.x, position.y, destHeading)
-    # Send a goto if we have changed destinations or are just starting
-    if (player.firstFrame() or
-        abs(nav.dest.x - position.x) > constants.GOTO_DEST_EPSILON or
-        abs(nav.dest.y - position.y) > constants.GOTO_DEST_EPSILON or
-        changedOmni):
-
-        if brain.my.locScore == NogginConstants.BAD_LOC:
-            player.shouldRelocalizeCounter += 1
-        else:
-            player.shouldRelocalizeCounter = 0
-        if player.shouldRelocalizeCounter > constants.SHOULD_RELOC_FRAME_THRESH:
-            return player.goLater('relocalize')
-
-        nav.omniGoTo(position)
+        player.shouldRelocalizeCounter = 0
+    if player.shouldRelocalizeCounter > constants.SHOULD_RELOC_FRAME_THRESH:
+        return player.goLater('relocalize')
 
     if transitions.shouldAvoidObstacle(player):
         return player.goNow('avoidObstacle')
@@ -93,6 +61,7 @@ def atPosition(player):
     """
     nav = player.brain.nav
     position = player.brain.play.getPosition()
+    position = Location(position[0], position[1])
     if player.firstFrame():
         player.stopWalking()
     ##     player.notAtPositionCounter = 0
@@ -105,7 +74,7 @@ def atPosition(player):
 
     if (abs(nav.dest.x - position.x) > constants.GOTO_DEST_EPSILON or
         abs(nav.dest.y - position.y) > constants.GOTO_DEST_EPSILON or
-        not player.atDestinationGoalie() or
+        not player.atDestinationCloser() or
         not player.atHeading()):
         return player.goLater('playbookPosition')
 

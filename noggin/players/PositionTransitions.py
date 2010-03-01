@@ -3,6 +3,18 @@ import ChaseBallTransitions
 
 ####### POSITIONING STUFF ##############
 
+def useFinalHeading(player, position):
+    if player.brain.gameController.currentState == 'gameReady':
+        useFinalHeadingDist = constants.OMNI_POSITION_READY_DIST
+    else:
+        useFinalHeadingDist = constants.OMNI_POSITION_DIST
+
+    distToPoint = player.brain.my.dist(position)
+
+    return (distToPoint <= useFinalHeadingDist)
+
+
+
 def shouldTurnToBall_fromAtBallPosition(player):
     """
     Should we spin towards the ball, if already at our position

@@ -3,10 +3,12 @@ from ..util import FSA
 from . import NavStates
 from . import NavConstants as constants
 from . import NavHelper as helper
-from man.noggin.typeDefs.Location import Location
+from man.noggin.typeDefs.Location import RobotLocation
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
+        """it gets you where you want to go"""
+
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
@@ -17,7 +19,7 @@ class Navigator(FSA.FSA):
         self.stateChangeColor = 'cyan'
 
         # Goto controls
-        self.dest = Location(0, 0)
+        self.dest = RobotLocation(0, 0, 0)
 
         # Walk controls
         self.currentGait = None
@@ -31,13 +33,17 @@ class Navigator(FSA.FSA):
         self.sweetMove = move
         self.switchTo('doingSweetMove')
 
-    def positionReady(self, dest):
-        self.dest = dest
-        self.switchTo('positioningReady')
-
     def positionPlaybook(self, dest):
         self.dest = dest
-        self.switchTo('positioningPlaybook')
+
+        if not self.currentState == 'positioningPlaybook':
+            self.switchTo('positioningPlaybook')
+
+    def positionReady(self, dest):
+        self.dest = dest
+
+        if not self.currentState == 'positioningReady':
+            self.switchTo('positioningReady')
 
     def omniGoTo(self, dest):
         self.dest = dest

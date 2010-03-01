@@ -99,6 +99,10 @@ class SoccerFSA(FSA.FSA):
         nav = self.brain.nav
         return helper.atDestinationGoalie(self.brain.my, nav.dest)
 
+    def atDestinationCloser(self):
+        nav = self.brain.nav
+        return helper.atDestinationCloser(self.brain.my, nav.dest)
+
     def atHeading(self):
         nav = self.brain.nav
         return helper.atHeading(self.brain.my, nav.dest.h)
