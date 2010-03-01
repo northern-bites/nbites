@@ -1,7 +1,8 @@
 from .. import NogginConstants as Constants
 from ..util.MyMath import (sub180Angle)
+from .Location import RobotLocation
 
-class MyInfo:
+class MyInfo(RobotLocation):
     """
     Class just to store important information about me, containing
     -x -- x coordinate on the field, according to ekf
@@ -17,8 +18,7 @@ class MyInfo:
     -locScore -- GOOD_LOC, OK_LOC, BAD_LOC; how good is our localization
     """
     def __init__(self):
-        self.x = 0.0
-        self.y = 0.0
+        RobotLocation.__init__(self, xP=0, yP=0, h=0)
         self.h = 0.0
         self.uncertX = 0.0
         self.uncertY = 0.0

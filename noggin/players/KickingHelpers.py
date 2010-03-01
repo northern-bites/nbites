@@ -1,6 +1,6 @@
 from .. import NogginConstants
 import KickingConstants as constants
-from ..util import MyMath
+from ..typeDefs import Location
 
 def inCenterOfField(player):
     return NogginConstants.FIELD_HEIGHT *2/3 > player.brain.my.y > \
@@ -23,8 +23,8 @@ def isFacingSideline(player):
              -(180 - constants.FACING_SIDELINE_ANGLE) )
 
 def getShotCloseAimPoint(player):
-    return (NogginConstants.FIELD_WIDTH,
-            NogginConstants.MIDFIELD_Y)
+    return Location(NogginConstants.FIELD_WIDTH,
+                    NogginConstants.MIDFIELD_Y)
 
 def getShotFarAimPoint(player):
     if player.brain.my.y < NogginConstants.MIDFIELD_Y:
@@ -47,15 +47,16 @@ def getKickObjective(player):
     if my.x < NogginConstants.FIELD_WIDTH / 2:
         return constants.OBJECTIVE_CLEAR
 
-    elif MyMath.dist(my.x, my.y,
-                   NogginConstants.OPP_GOALBOX_RIGHT_X,
-                   NogginConstants.OPP_GOALBOX_MIDDLE_Y ) > \
-                   NogginConstants.FIELD_WIDTH / 3 :
-                   return constants.OBJECTIVE_CENTER
+    elif my.dist( Location(NogginConstants.OPP_GOALBOX_RIGHT_X,
+                           NogginConstants.OPP_GOALBOX_MIDDLE_Y )) > \
+                           NogginConstants.FIELD_WIDTH / 3 :
+        return constants.OBJECTIVE_CENTER
+
     elif my.x > NogginConstants.FIELD_WIDTH * 3/4 and \
             NogginConstants.FIELD_HEIGHT/4. < my.y < \
             NogginConstants.FIELD_HEIGHT * 3./4.:
         return constants.OBJECTIVE_SHOOT_CLOSE
+
     else :
         return constants.OBJECTIVE_SHOOT_FAR
 

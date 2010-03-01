@@ -161,11 +161,11 @@ def approachBallWithLoc(player):
         player.brain.tracker.trackBall()
 
     dest = player.getApproachPosition()
-    useOmni = MyMath.dist(my.x, my.y, dest[0], dest[1]) <= \
+    useOmni = my.dist(dest) <= \
         constants.APPROACH_OMNI_DIST
     changedOmni = False
 
-    if useOmni != nav.movingOmni:
+    if useOmni != nav.movingOmni():
         player.changeOmniGoToCounter += 1
     else :
         player.changeOmniGoToCounter = 0
@@ -173,10 +173,8 @@ def approachBallWithLoc(player):
         changedOmni = True
 
     if player.firstFrame() or \
-            nav.destX != dest[0] or \
-            nav.destY != dest[1] or \
-            nav.destH != dest[2] or \
-            changedOmni:
+           nav.dest != dest or \
+           changedOmni:
         if not useOmni:
             player.brain.CoA.setRobotGait(player.brain.motion)
             nav.goTo(dest)
@@ -527,9 +525,7 @@ def orbitBeforeKick(player):
         brain.tracker.trackBall()
 
         shotPoint = KickingHelpers.getShotCloseAimPoint(player)
-        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                  shotPoint[0],
-                                                  shotPoint[1] )
+        bearingToGoal = my.getRelativeBearing(shotPoint)
         spinDir = -MyMath.sign(bearingToGoal)
         player.brain.nav.orbitAngle(spinDir * 90)
     if not player.brain.tracker.activeLocOn and \

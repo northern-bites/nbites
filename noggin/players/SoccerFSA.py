@@ -5,6 +5,7 @@
 from man.motion import HeadMoves
 import man.motion as motion
 from ..util import FSA
+from ..navigator import NavHelper as helper
 from . import CoreSoccerStates
 
 class SoccerFSA(FSA.FSA):
@@ -96,11 +97,11 @@ class SoccerFSA(FSA.FSA):
 
     def atDestinationGoalie(self):
         nav = self.brain.nav
-        return nav.NavMath.atDestinationGoalie(nav)
+        return helper.atDestinationGoalie(self.brain.my, nav.dest)
 
     def atHeading(self):
         nav = self.brain.nav
-        return nav.NavMath.atHeading(nav)
+        return helper.atHeading(self.brain.my, nav.dest)
 
 ##### Direct Motion Calls
     def gainsOff(self):

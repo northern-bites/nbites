@@ -102,8 +102,7 @@ def shouldDribble(player):
     """
     my = player.brain.my
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                            dribbleAimPoint[0], dribbleAimPoint[1])
+    goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return  (constants.USE_DRIBBLE and
              not player.penaltyKicking and
              0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
@@ -120,8 +119,7 @@ def shouldStopDribbling(player):
     """
     my = player.brain.my
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                            dribbleAimPoint[0], dribbleAimPoint[1])
+    goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (player.penaltyKicking or
             inOppGoalbox(player) or
             player.brain.ball.relX > constants.STOP_DRIBBLE_X or
@@ -262,8 +260,7 @@ def shouldStopPenaltyKickDribbling(player):
     """
     my = player.brain.my
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                            dribbleAimPoint[0], dribbleAimPoint[1])
+    goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (inPenaltyKickStrikezone(player) or
             player.brain.ball.relX > constants.STOP_DRIBBLE_X or
             abs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or

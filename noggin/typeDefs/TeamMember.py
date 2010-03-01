@@ -1,6 +1,7 @@
 
 from math import (hypot, degrees)
 
+from .Location import RobotLocation
 from .. import NogginConstants
 from ..util import MyMath
 import time
@@ -11,15 +12,14 @@ DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_CHASER_NUMBER = 3
 
 
-class TeamMember:
-    '''class for keeping track of teammates' info'''
+class TeamMember(RobotLocation):
+    """class for keeping track of teammates' info """
+
     def __init__(self,tbrain=None):
         '''variables include lots from the Packet class'''
-
+        RobotLocation.__init__()
         # things in the Packet()
         self.playerNumber = 0
-        self.x = 0
-        self.y = 0
         self.h = 0
         self.uncertX = 0
         self.uncertY = 0

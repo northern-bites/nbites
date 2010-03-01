@@ -1,19 +1,19 @@
 """ States for finding our way on the field """
 
 from ..util import MyMath
-from . import NavMath
 from . import NavConstants as constants
+from . import NavHelper as helper
 from ..players import ChaseBallConstants
 from ..playbook.PBConstants import GOALIE
-from math import fabs, cos, sin, radians
+from math import fabs
 
 DEBUG = False
 
 def doingSweetMove(nav):
     '''executes the currently set sweetmove'''
     if nav.firstFrame():
-        nav.helper.setSpeed(0, 0, 0)
-        nav.helper.executeMove(nav.sweetMove)
+        helper.setSpeed(nav, 0, 0, 0)
+        helper.executeMove(nav.sweetMove)
 
     if not nav.brain.motion.isBodyActive():
         del nav.sweetMove
@@ -27,11 +27,9 @@ def spinToWalkHeading(nav):
     """
     Spin to the heading needed to walk to a specific point
     """
-    targetH = MyMath.getTargetHeading(nav.brain.my,
-                                      nav.destX,
-                                      nav.destY)
-    headingDiff = fabs(nav.brain.my.h - targetH)
-    newSpinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
+    my = nav.brain.my
+    targetH = my.getTargetHeading(nav.dest)
+    newSpinDir = my.getSpinDir(targetH)
 
     if nav.firstFrame():
         nav.changeSpinDirCounter = 0
@@ -50,7 +48,7 @@ def spinToWalkHeading(nav):
                              str(nav.brain.my.h)+
                              " and my target h: " + str(targetH))
 
-    if NavMath.atHeadingGoTo(nav, targetH):
+    if nav.helper.atHeadingGoTo(targetH):
         nav.stopSpinToWalkCount += 1
     else :
         nav.stopSpinToWalkCount -= 1
@@ -58,11 +56,12 @@ def spinToWalkHeading(nav):
 
     if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('walkStraightToPoint')
-    if NavMath.atDestinationCloser(nav):
+    if nav.helper.atDestinationCloser():
         return nav.goLater('spinToFinalHeading')
 
+    headingDiff = fabs(nav.brain.my.h - targetH)
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
-        NavMath.getRotScale(headingDiff)
+        nav.helper.getRotScale(headingDiff)
 
     if sTheta != nav.walkTheta:
         nav.helper.setSpeed(0, 0, sTheta)
@@ -80,7 +79,7 @@ def walkStraightToPoint(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
-    if NavMath.atDestinationCloser(nav):
+    if nav.helper.atDestinationCloser():
         nav.walkToPointCount += 1
     else :
         nav.walkToPointCount = 0
@@ -89,9 +88,9 @@ def walkStraightToPoint(nav):
         return nav.goLater('spinToFinalHeading')
 
     my = nav.brain.my
-    targetH = MyMath.getTargetHeading(my, nav.destX, nav.destY)
+    targetH = nav.dest.getTargetHeading(my)
 
-    if NavMath.notAtHeading(nav, targetH):
+    if nav.helper.notAtHeading(targetH):
         nav.walkToPointSpinCount += 1
     else :
         nav.walkToPointSpinCount = 0
@@ -99,17 +98,16 @@ def walkStraightToPoint(nav):
     if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToWalkHeading')
 
-    bearing = MyMath.getRelativeBearing(my.x, my.y, my.h, nav.destX,nav.destY)
-    distToDest = MyMath.dist(my.x, my.y, nav.destX, nav.destY)
+    bearing = nav.dest.getRelativeBearing(my)
+    distToDest = my.dist(nav.dest)
     if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
-        gain = constants.GOTO_FORWARD_GAIN * MyMath.dist(my.x, my.y,
-                                                         nav.destX, nav.destY)
+        gain = constants.GOTO_FORWARD_GAIN * distToDest
     else :
         gain = 1.0
 
     sTheta = MyMath.clip(MyMath.sign(bearing) *
                          constants.GOTO_STRAIGHT_SPIN_SPEED *
-                         NavMath.getRotScale(bearing),
+                         nav.helper.getRotScale(bearing),
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
 
@@ -139,9 +137,9 @@ def spinToFinalHeading(nav):
                    % (targetH, headingDiff, nav.brain.my.uncertH))
     spinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
 
-    spin = spinDir*constants.GOTO_SPIN_SPEED*NavMath.getRotScale(headingDiff)
+    spin = spinDir*constants.GOTO_SPIN_SPEED*nav.helper.getRotScale(headingDiff)
 
-    if NavMath.atHeading(nav, targetH):
+    if nav.helper.atHeading(nav, targetH):
         nav.stopSpinToWalkCount += 1
     else:
         nav.stopSpinToWalkCount = 0
@@ -153,16 +151,18 @@ def spinToFinalHeading(nav):
     return nav.stay()
 
 def omniWalkToPoint(nav):
+    my = nav.brain.my
+    dest = nav.dest
     if nav.firstFrame():
         nav.walkToPointCount = 0
     if nav.brain.play.isRole(GOALIE):
-        if NavMath.atDestinationGoalie(nav) and NavMath.atHeading(nav):
+        if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
     else:
-        if NavMath.atDestinationCloser(nav) and NavMath.atHeading(nav):
+        if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
 
-    sX, sY, sTheta = nav.helper.getOmniWalkParam(nav.destX, nav.destY, nav.destH)
+    sX, sY, sTheta = nav.helper.getOmniWalkParam(my, dest)
     nav.helper.setSpeed(sX, sY, sTheta)
 
     return nav.stay()
@@ -210,7 +210,7 @@ def stopped(nav):
 
 def orbitPoint(nav):
     if nav.firstFrame():
-        helper.setSpeed(nav, 0,
+        nav.helper.setSpeed(nav, 0,
                      nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
                      nav.orbitDir*constants.ORBIT_SPIN_SPEED )
     return nav.stay()
@@ -243,7 +243,7 @@ def orbitPointThruAngle(nav):
             sT = constants.ORBIT_SPIN_SPEED * \
                 constants.ORBIT_LARGE_GAIN
 
-        helper.setSpeed(nav, -0.5, orbitDir*sY, orbitDir*sT)
+        nav.helper.setSpeed(nav, -0.5, orbitDir*sY, orbitDir*sT)
 
     #  (frames/second) / (degrees/second) * degrees
     framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *

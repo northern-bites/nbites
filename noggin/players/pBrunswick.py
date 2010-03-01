@@ -19,6 +19,8 @@ from ..playbook import PBConstants
 from . import ChaseBallConstants as ChaseConstants
 
 from man.motion import SweetMoves
+from man.noggin.typeDefs.Location import Location, RobotLocation
+
 from ..util import MyMath
 from math import sin, cos, radians
 
@@ -176,14 +178,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         my = self.brain.my
 
         if self.penaltyKicking:
-            destKickLocX, destKickLocY =  \
-                self.getPenaltyKickingBallDest()
-            destH = MyMath.getRelativeBearing(ball.x,
-                                              ball.y,
-                                              NogginConstants.
-                                              OPP_GOAL_HEADING,
-                                              destKickLocX,
-                                              destKickLocY)
+            destKickLoc = self.getPenaltyKickingBallDest()
+            ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
+            destH = MyMath.getRelativeBearing(destKickLoc)
+
         elif self.shouldMoveAroundBall():
             return self.getPointToMoveAroundBall()
         elif self.inFrontOfBall():
@@ -195,28 +193,21 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             cos(radians(destH))
         destY = ball.y - ChaseConstants.APPROACH_DIST_TO_BALL * \
             sin(radians(destH))
-        return destX, destY, destH
+        return RobotLocation(destX, destY, destH)
 
     def getApproachHeadingFromBehind(self):
         ball = self.brain.ball
         aimPoint = KickingHelpers.getShotFarAimPoint(self)
-        ballBearingToGoal = MyMath.getRelativeBearing(ball.x, ball.y,
-                                                      NogginConstants.
-                                                      OPP_GOAL_HEADING,
-                                                      aimPoint[0],
-                                                      aimPoint[1])
+        ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
+        ballBearingToGoal = ballLoc.getRelativeBearing(aimPoint)
         return ballBearingToGoal
 
     def getApproachHeadingFromFront(self):
         ball = self.brain.ball
         my = self.brain.my
         kickDest = KickingHelpers.getShotFarAimPoint(self)
-        ballBearingToKickDest = MyMath.getRelativeBearing(ball.x,
-                                                          ball.y,
-                                                          NogginConstants.
-                                                          OPP_GOAL_HEADING,
-                                                          kickDest[0],
-                                                          kickDest[1] )
+        ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
+        ballBearingToKickDest = ballLoc.getRelativeBearing(kickDest)
         if my.y > ball.y:
             destH = ballBearingToKickDest - 90
         else :
@@ -228,8 +219,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return (NogginConstants.FIELD_WIDTH * 3/4,
                     NogginConstants.FIELD_HEIGHT /4)
 
-        return (NogginConstants.OPP_GOAL_MIDPOINT[0],
-                NogginConstants.OPP_GOAL_MIDPOINT[1] )
+        return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
+                        NogginConstants.OPP_GOAL_MIDPOINT[1] )
 
     def ballInOppGoalBox(self):
         ball = self.brain.ball
@@ -261,7 +252,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         relY =  -ChaseConstants.ORBIT_OFFSET_DIST * \
             sin(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relY
         relTheta = ChaseConstants.ORBIT_STEP_ANGLE * 2 + self.brain.ball.bearing
-        return relX, relY, relTheta
+        return RobotLocation(relX, relY, relTheta)
 
     def shouldMoveAroundBall(self):
         return (self.brain.ball.x < self.brain.my.x
@@ -279,4 +270,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             y = self.brain.ball.y + 75.0
             destH = -90.0
 
-        return x, y, destH
+        return RobotLocation(x, y, destH)

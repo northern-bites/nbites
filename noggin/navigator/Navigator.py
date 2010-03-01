@@ -1,9 +1,9 @@
 from math import fabs
 from ..util import FSA
 from . import NavStates
-from . import NavMath
 from . import NavConstants as constants
 from . import NavHelper as helper
+from man.noggin.typeDefs.Location import Location
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -17,57 +17,36 @@ class Navigator(FSA.FSA):
         self.stateChangeColor = 'cyan'
 
         # Goto controls
-        self.destX= 0
-        self.destY= 0
-        self.destH = 0
+        self.dest = Location(0, 0)
 
         # Walk controls
         self.currentGait = None
-
-        self.helper = helper.NavHelper(self)
 
     def performSweetMove(self, move):
         self.sweetMove = move
         self.switchTo('doingSweetMove')
 
     def positionReady(self, dest):
-        if len(dest) == 2:
-            self.destX, self.destY = dest
-            self.destH = 0.0
-        elif len(dest) == 3:
-            self.destX, self.destY, self.destH = dest
+        self.dest = dest
         self.switchTo('positioningReady')
 
     def positionPlaybook(self, dest):
-        if len(dest) == 2:
-            self.destX, self.destY = dest
-            self.destH = 0.0
-        elif len(dest) == 3:
-            self.destX, self.destY, self.destH = dest
+        self.dest = dest
         self.switchTo('positioningPlaybook')
 
     def omniGoTo(self, dest):
-        if len(dest) == 2:
-            self.destX, self.destY = dest
-            self.destH = 0.0
-        elif len(dest) == 3:
-            self.destX, self.destY, self.destH = dest
+        self.dest = dest
         self.switchTo('omniWalkToPoint')
 
     def goTo(self,dest):
-
-        if len(dest) == 2:
-            self.destX, self.destY = dest
-            self.destH = 0.0
-        elif len(dest) == 3:
-            self.destX, self.destY, self.destH = dest
+        self.dest = dest
 
         if not self.currentState == 'spinToWalkHeading' and \
                 not self.currentState == 'walkStraightToPoint' and \
                 not self.currentState == 'spinToFinalHeading':
-            if not NavMath.atHeadingGoTo(self, self.destH):
+            if not helper.atHeadingGoTo(self, self.destH):
                 self.switchTo('spinToWalkHeading')
-            elif NavMath.atHeadingGoTo(self, self.destH):
+            elif helper.atHeadingGoTo(self, self.destH):
                 self.switchTo('walkStraightToPoint')
 
     def stop(self):
@@ -78,6 +57,9 @@ class Navigator(FSA.FSA):
 
     def isStopped(self):
         return self.currentState == 'stopped'
+
+    def movingOmni(self):
+        return self.currentState == 'omniWalkToPoint'
 
     def orbit(self, orbitDir):
         self.orbitDir = orbitDir

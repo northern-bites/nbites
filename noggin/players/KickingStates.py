@@ -7,6 +7,7 @@ import man.motion.HeadMoves as HeadMoves
 import man.motion.StiffnessModes as StiffnessModes
 import KickingConstants as constants
 import ChaseBallConstants
+from man.noggin.typeDefs.Location import Location, RobotLocation
 from .. import NogginConstants
 import ChaseBallTransitions
 from math import fabs
@@ -178,32 +179,17 @@ def shootBallClose(player):
     """
     my = player.brain.my
     shotAimPoint = helpers.getShotCloseAimPoint(player)
-    leftPostBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                NogginConstants.
-                                                LANDMARK_OPP_GOAL_LEFT_POST_X,
-                                                NogginConstants.
-                                                LANDMARK_OPP_GOAL_LEFT_POST_Y)
-    rightPostBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                 NogginConstants.
-                                                 LANDMARK_OPP_GOAL_RIGHT_POST_X,
-                                                 NogginConstants.
-                                                 LANDMARK_OPP_GOAL_RIGHT_POST_Y)
+    leftPostBearing = my.getRelativeBearing(player.brain.oppGoalLeftPost)
+    rightPostBearing = my.getRelativeBearing(player.brain.oppGoalRightPost)
+
     # Am I looking between the posts?
     if (rightPostBearing < -constants.KICK_STRAIGHT_POST_BEARING and
         leftPostBearing > constants.KICK_STRAIGHT_POST_BEARING):
         return player.goNow('kickBallStraight')
 
-    leftShotPointBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                     constants.
-                                                     SHOOT_AT_LEFT_AIM_POINT[0],
-                                                     constants.
-                                                     SHOOT_AT_LEFT_AIM_POINT[1])
+    leftShotPointBearing = my.getRelativeBearing(constants.SHOOT_AT_LEFT_AIM_POINT)
 
-    rightShotPointBearing = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                      constants.
-                                                      SHOOT_AT_RIGHT_AIM_POINT[0],
-                                                      constants.
-                                                      SHOOT_AT_RIGHT_AIM_POINT[1])
+    rightShotPointBearing = my.getRelativeBearing(constants.SHOOT_AT_RIGHT_AIM_POINT[1])
 
     # Turn to the closer shot point
     if fabs(rightShotPointBearing) < fabs(leftShotPointBearing):
@@ -231,9 +217,7 @@ def shootBallFar(player):
     """
     my = player.brain.my
     shotAimPoint = helpers.getShotFarAimPoint(player)
-    bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                              shotAimPoint[0],
-                                              shotAimPoint[1])
+    bearingToGoal = my.getRelativeBearing(shotAimPoint)
     if constants.DEBUG_KICKS: print "bearing to goal is ", bearingToGoal
     if constants.SHOOT_BALL_FAR_SIDE_KICK_ANGLE > abs(bearingToGoal) > \
             constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE and \
@@ -329,15 +313,12 @@ def penaltyKickBall(player):
         #return player.goLater('kickBallStraightShort')
     if not player.penaltyMadeSecondKick:
 
+        ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
 
-        ballBearingToGoal = MyMath.getRelativeBearing(ball.x,
-                                                      ball.y,
-                                                      NogginConstants.
-                                                      OPP_GOAL_HEADING,
-                                                      NogginConstants.
-                                                      OPP_GOAL_MIDPOINT[0],
-                                                      NogginConstants.
-                                                      OPP_GOAL_MIDPOINT[1] )
+        goalLoc = Location( NogginConstants.OPP_GOAL_MIDPOINT[0],
+                            NogginConstants.OPP_GOAL_MIDPOINT[1])
+
+        ballBearingToGoal = ballLoc.getRelativeBearing(goalLoc)
 
         player.angleToAlign = ballBearingToGoal - player.brain.my.h
         if player.angleToAlign < constants.ALIGN_FOR_KICK_MIN_ANGLE:

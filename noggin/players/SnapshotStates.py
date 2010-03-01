@@ -23,10 +23,9 @@ def saveFrames(player):
         ##replace <TYPE_SNAPSHOT_PAN> with any PHOTO PAN in
         ##    man/motion/HeadMoves.py
         player.standup()
-    if player.counter % FRAME_SAVE_RATE == 0:
-        player.brain.sensors.saveFrame()
-    if player.counter == 800:
-        player.stopWalking()
+    if player.brain.ball.on:
+        if player.counter % FRAME_SAVE_RATE == 0:
+            player.brain.sensors.saveFrame()
     if player.counter > FRAME_SAVE_RATE * NUM_FRAMES_TO_SAVE:
         return player.goNow('doneState')
 

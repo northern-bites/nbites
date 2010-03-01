@@ -2,6 +2,7 @@ from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
 import man.noggin.playbook.PBConstants as PBConstants
 import man.noggin.util.MyMath as MyMath
+from man.noggin.typeDefs.Location import RobotLocation
 import PositionTransitions as transitions
 import PositionConstants as constants
 
@@ -16,7 +17,6 @@ def playbookPosition(player):
     Have the robot navigate to the position reported to it from playbook
     """
     brain = player.brain
-    position = brain.play.getPosition()
     nav = brain.nav
     my = brain.my
     ball = brain.ball
@@ -38,19 +38,21 @@ def playbookPosition(player):
     else:
         destHeading = NogginConstants.OPP_GOAL_HEADING
 
-    distToPoint = MyMath.dist(my.x, my.y, position[0], position[1])
-    position = (position[0], position[1], destHeading)
+
+    position = brain.play.getPosition()
+    position = RobotLocation(position[0], position[1], destHeading)
 
     if brain.gameController.currentState == 'gameReady':
         useOmniDist = constants.OMNI_POSITION_READY_DIST
     else:
         useOmniDist = constants.OMNI_POSITION_DIST
 
-    useOmni = distToPoint <= useOmniDist
+    distToPoint = my.dist(position)
+    useOmni = (distToPoint <= useOmniDist)
 
     changedOmni = False
 
-    if useOmni != nav.movingOmni:
+    if useOmni != nav.movingOmni():
         player.changeOmniGoToCounter += 1
     else :
         player.changeOmniGoToCounter = 0
@@ -59,8 +61,8 @@ def playbookPosition(player):
 
     # Send a goto if we have changed destinations or are just starting
     if (player.firstFrame() or
-        abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
-        abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
+        abs(nav.destX - position.x) > constants.GOTO_DEST_EPSILON or
+        abs(nav.destY - position.y) > constants.GOTO_DEST_EPSILON or
         changedOmni):
 
         if brain.my.locScore == NogginConstants.BAD_LOC:

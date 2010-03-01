@@ -1,9 +1,7 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
-import GoalieTransitions as goalTrans
 from ..playbook.PBConstants import GOALIE
-import man.motion.HeadMoves as HeadMoves
-from ..util import MyMath
+from man.noggin.typeDefs.Location import RobotLocation
 
 def scanFindBall(player):
     """
@@ -73,8 +71,7 @@ def spinFindBall(player):
         else:
             my = player.brain.my
             ball = player.brain.ball
-            spinDir = MyMath.getSpinDir(my.h,
-                                        my.h + ball.locBearing)
+            spinDir = my.getSpinDir(my.h + ball.locBearing)
 
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
@@ -89,13 +86,11 @@ def walkToBallLocPos(player):
         return player.goLater('turnToBall')
 
     ball = player.brain.ball
-    destH = MyMath.getTargetHeading(player.brain.my, ball.x, ball.y)
-    dest = (ball.x, ball.y, destH)
+    destH = player.brain.my.getTargetHeading(ball)
+    dest = RobotLocation(ball.x, ball.y, destH)
 
     nav = player.brain.nav
     if player.firstFrame() or \
-            nav.destX != dest[0] or \
-            nav.destY != dest[1] or \
-            nav.destH != dest[2]:
+            nav.dest != dest:
         nav.goTo(dest)
     return player.stay()

@@ -3,6 +3,7 @@ from .. import NogginConstants
 import GoalieTransitions as helper
 import GoalieConstants as constants
 from ..util import MyMath
+from man.noggin.typeDefs.Location import RobotLocation
 
 def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
@@ -22,7 +23,6 @@ def goalieAwesomePosition(player):
     Have the robot navigate to the position reported to it from playbook
     """
     brain = player.brain
-    position = brain.play.getPosition()
     nav = brain.nav
     my = brain.my
 
@@ -46,12 +46,14 @@ def goalieAwesomePosition(player):
     else:
         bearing = NogginConstants.OPP_GOAL_HEADING
 
+    position = RobotLocation(brain.play.getPosition(), my.h + bearing)
+
     if (not player.atDestinationGoalie() or
         not player.atHeading()):
         if not useOmni:
-            nav.goTo((position[0], position[1], my.h + bearing))
+            nav.goTo(position)
         else:
-            nav.omniGoTo((position[0], position[1], my.h + bearing))
+            nav.omniGoTo(position)
     else:
         return player.goLater("goalieAtPosition")
     return player.stay()
@@ -119,9 +121,8 @@ def goalieSpinToPosition(player):
     else:
         player.brain.tracker.trackBall()
 
-    if not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
-        spinDir = MyMath.getSpinDir(player.brain.my.h,
-                                    NogginConstants.OPP_GOAL_HEADING)
+    if not player.atHeading(NogginConstants.OPP_GOAL_HEADING):
+        spinDir = player.brain.my.getSpinDir(NogginConstants.OPP_GOAL_HEADING)
         player.setWalk(0, 0, spinDir*10)
         return player.stay()
     else:
@@ -137,9 +138,9 @@ def goalieOutOfPosition(player):
     else:
         player.brain.tracker.trackBall()
 
-    position = player.brain.play.getPosition()
+    position = RobotLocation(player.brain.play.getPosition())
     if player.firstFrame() or\
-            nav.destX != position[0] or nav.destY != position[1]:
+            nav.dest.x != position.x or nav.dest.y != position.y:
         nav.omniGoTo(position)
 
     if helper.useClosePosition(player):
@@ -160,7 +161,7 @@ def goalieAtPosition(player):
         player.brain.tracker.trackBall()
 
     # Check that the position is correct
-    position = player.brain.play.getPosition()
+    position = RobotLocation(player.brain.play.getPosition())
 
     if (abs(nav.destX - position[0]) > constants.SHOULD_POSITION_DIFF or
         abs(nav.destY - position[1]) >  constants.SHOULD_POSITION_DIFF or
