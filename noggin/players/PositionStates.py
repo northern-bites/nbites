@@ -2,7 +2,7 @@ from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
 import man.noggin.playbook.PBConstants as PBConstants
 import man.noggin.util.MyMath as MyMath
-from man.noggin.typeDefs.Location import RobotLocation
+from man.noggin.typeDefs.Location import RobotLocation, Location
 import PositionTransitions as transitions
 import PositionConstants as constants
 
@@ -28,19 +28,8 @@ def playbookPosition(player):
         else :
             brain.tracker.activeLoc()
 
-    # Get a bearing to the ball
-    if brain.gameController.currentState == 'gameReady':
-        destHeading = NogginConstants.OPP_GOAL_HEADING
-    elif ball.on:
-        destHeading = my.h + ball.bearing
-    elif ball.framesOff < 3:
-        destHeading = my.h + ball.locBearing
-    else:
-        destHeading = NogginConstants.OPP_GOAL_HEADING
-
-
     position = brain.play.getPosition()
-    position = RobotLocation(position[0], position[1], destHeading)
+    position = Location(position[0], position[1])
 
     if brain.gameController.currentState == 'gameReady':
         useOmniDist = constants.OMNI_POSITION_READY_DIST
@@ -59,6 +48,21 @@ def playbookPosition(player):
     if player.changeOmniGoToCounter > constants.CHANGE_OMNI_THRESH:
         changedOmni = True
 
+    if useOmni:
+        # Get a bearing to the ball
+        if brain.gameController.currentState == 'gameReady':
+            destHeading = NogginConstants.OPP_GOAL_HEADING
+        elif ball.on:
+            destHeading = my.h + ball.bearing
+        elif ball.framesOff < 3:
+            destHeading = my.h + ball.locBearing
+        else:
+            destHeading = NogginConstants.OPP_GOAL_HEADING
+
+    else:
+        destHeading = my.getTargetHeading(position)
+
+    position = RobotLocation(position.x, position.y, destHeading)
     # Send a goto if we have changed destinations or are just starting
     if (player.firstFrame() or
         abs(nav.dest.x - position.x) > constants.GOTO_DEST_EPSILON or
@@ -72,13 +76,7 @@ def playbookPosition(player):
         if player.shouldRelocalizeCounter > constants.SHOULD_RELOC_FRAME_THRESH:
             return player.goLater('relocalize')
 
-        # Attempt to go to the point while looking at the ball
-        if (not useOmni or
-            (player.brain.play.isRole(PBConstants.DEFENDER) and
-             player.brain.ball.x < player.brain.my.x)):
-            nav.goTo(position)
-        else:
-            nav.omniGoTo(position)
+        nav.omniGoTo(position)
 
     if transitions.shouldAvoidObstacle(player):
         return player.goNow('avoidObstacle')
