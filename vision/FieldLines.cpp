@@ -3250,7 +3250,7 @@ void FieldLines::classifyCornerWithObjects(
 	// actually a T)
 	if (possibleClassifications.empty()){
 
-		possibleCorners = ConcreteCorner::getConcreteCorners();
+		possibleCorners = ConcreteCorner::concreteCorners();
 		possibleClassifications =
 			compareObjsCorners(corner, possibleCorners, visibleObjects);
 	}

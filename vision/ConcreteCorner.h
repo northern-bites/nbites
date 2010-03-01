@@ -117,8 +117,6 @@ public:
 	getPossibleCorners(shape
 					   corner_type);
 
-	static const std::vector <const ConcreteCorner*>& getConcreteCorners();
-
 	const std::vector<const ConcreteLine*> getLines() const {
 		return lines;
 	}

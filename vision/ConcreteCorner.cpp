@@ -504,11 +504,6 @@ getPossibleCorners(shape corner_type) {
     }
 }
 
-const vector <const ConcreteCorner*>& ConcreteCorner::getConcreteCorners()
-{
-	return concreteCorners();
-}
-
 bool ConcreteCorner::isLineInCorner(const ConcreteLine* line) const
 {
 	return (line == line1) || (line == line2);
