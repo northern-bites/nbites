@@ -5,7 +5,7 @@ from ..util import MyMath
 
 class Location (object):
 
-    def __init__(self, x, y, z = 0):
+    def __init__(self, x = 0, y = 0, z = 0):
         self.x = x
         self.y = y
         self.z = z
@@ -36,8 +36,8 @@ class Location (object):
 
 class RobotLocation(Location):
 
-    def __init__(self, xP, yP, h):
-        Location.__init(x=xP, y=yP)
+    def __init__(self, xP = 0, yP = 0, h = 0):
+        Location.__init__(self, xP, yP)
         self.h = h
 
     def getRelativeBearing(self, other):

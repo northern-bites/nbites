@@ -15,9 +15,9 @@ DEFAULT_CHASER_NUMBER = 3
 class TeamMember(RobotLocation):
     """class for keeping track of teammates' info """
 
-    def __init__(self,tbrain=None):
+    def __init__(self, tbrain=None):
         '''variables include lots from the Packet class'''
-        RobotLocation.__init__()
+        RobotLocation.__init__(self)
         # things in the Packet()
         self.playerNumber = 0
         self.h = 0
@@ -42,7 +42,7 @@ class TeamMember(RobotLocation):
         self.grabbing = False
         self.dribbling = False
 
-    def update(self,packet):
+    def update(self, packet):
         '''
         receives a packet, updates teammate information. packets received
         have already been verified by timestamp system, so we can assume

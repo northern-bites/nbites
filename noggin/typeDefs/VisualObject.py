@@ -7,7 +7,7 @@ class VisualObject(Location):
     dist, bearing
     """
     def __init__(self):
-        Location.__init__(0,0,0)
+        Location.__init__(self, 0,0,0)
         self.centerX = 0
         self.centerY = 0
         self.width = 0

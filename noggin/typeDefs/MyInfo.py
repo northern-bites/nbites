@@ -18,7 +18,7 @@ class MyInfo(RobotLocation):
     -locScore -- GOOD_LOC, OK_LOC, BAD_LOC; how good is our localization
     """
     def __init__(self):
-        RobotLocation.__init__(self, xP=0, yP=0, h=0)
+        RobotLocation.__init__(self)
         self.h = 0.0
         self.uncertX = 0.0
         self.uncertY = 0.0
