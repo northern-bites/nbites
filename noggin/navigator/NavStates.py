@@ -11,9 +11,11 @@ DEBUG = False
 
 def doingSweetMove(nav):
     '''executes the currently set sweetmove'''
+    motion = nav.brain.motion
     if nav.firstFrame():
-        helper.setSpeed(nav, 0, 0, 0)
-        helper.executeMove(nav.sweetMove)
+        nav.walkX, nav.walkY, nav.walkTheta = 0, 0, 0
+        helper.setSpeed(motion, 0, 0, 0)
+        helper.executeMove(motion, nav.sweetMove)
 
     if not nav.brain.motion.isBodyActive():
         del nav.sweetMove
@@ -29,7 +31,7 @@ def spinToWalkHeading(nav):
     """
     my = nav.brain.my
     targetH = my.getTargetHeading(nav.dest)
-    newSpinDir = my.getSpinDir(targetH)
+    newSpinDir = my.spinDirToHeading(targetH)
 
     if nav.firstFrame():
         nav.changeSpinDirCounter = 0
@@ -48,7 +50,7 @@ def spinToWalkHeading(nav):
                              str(nav.brain.my.h)+
                              " and my target h: " + str(targetH))
 
-    if nav.helper.atHeadingGoTo(targetH):
+    if helper.atHeadingGoTo(my, targetH):
         nav.stopSpinToWalkCount += 1
     else :
         nav.stopSpinToWalkCount -= 1
@@ -56,15 +58,17 @@ def spinToWalkHeading(nav):
 
     if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('walkStraightToPoint')
-    if nav.helper.atDestinationCloser():
+    if helper.atDestinationCloser(my, nav.dest):
         return nav.goLater('spinToFinalHeading')
 
     headingDiff = fabs(nav.brain.my.h - targetH)
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
-        nav.helper.getRotScale(headingDiff)
+        helper.getRotScale(headingDiff)
 
     if sTheta != nav.walkTheta:
-        nav.helper.setSpeed(0, 0, sTheta)
+        nav.walkX, nav.walkY = 0, 0
+        nav.walkTheta = sTheta
+        helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
 
@@ -79,7 +83,8 @@ def walkStraightToPoint(nav):
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
-    if nav.helper.atDestinationCloser():
+    my = nav.brain.my
+    if helper.atDestinationCloser(my, nav.dest):
         nav.walkToPointCount += 1
     else :
         nav.walkToPointCount = 0
@@ -87,10 +92,10 @@ def walkStraightToPoint(nav):
     if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToFinalHeading')
 
-    my = nav.brain.my
+
     targetH = nav.dest.getTargetHeading(my)
 
-    if nav.helper.notAtHeading(targetH):
+    if helper.notAtHeading(my, targetH):
         nav.walkToPointSpinCount += 1
     else :
         nav.walkToPointSpinCount = 0
@@ -106,10 +111,10 @@ def walkStraightToPoint(nav):
         gain = 1.0
 
     sTheta = MyMath.clip(MyMath.sign(bearing) *
-                         constants.GOTO_STRAIGHT_SPIN_SPEED *
-                         nav.helper.getRotScale(bearing),
-                         -constants.GOTO_STRAIGHT_SPIN_SPEED,
-                         constants.GOTO_STRAIGHT_SPIN_SPEED )
+                                constants.GOTO_STRAIGHT_SPIN_SPEED *
+                                helper.getRotScale(bearing),
+                                -constants.GOTO_STRAIGHT_SPIN_SPEED,
+                                constants.GOTO_STRAIGHT_SPIN_SPEED )
 
     if fabs(sTheta) < constants.MIN_SPIN_MAGNITUDE_WALK:
         sTheta = 0
@@ -118,7 +123,11 @@ def walkStraightToPoint(nav):
                      constants.WALK_TO_MIN_X_SPEED,
                      constants.WALK_TO_MAX_X_SPEED)
 
-    nav.helper.setSpeed(sX, 0, sTheta)
+    nav.walkY = 0
+    nav.walkX = sX
+    nav.walkTheta = sTheta
+
+    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
     return nav.stay()
 
 def spinToFinalHeading(nav):
@@ -129,17 +138,17 @@ def spinToFinalHeading(nav):
     if nav.firstFrame():
         nav.stopSpinToWalkCount = 0
 
-    targetH = nav.destH
+    targetH = nav.dest.h
 
     headingDiff = nav.brain.my.h - targetH
     if DEBUG:
         nav.printf("Need to spin to %g, heading diff is %g,heading uncert is %g"
                    % (targetH, headingDiff, nav.brain.my.uncertH))
-    spinDir = MyMath.getSpinDir(nav.brain.my.h, targetH)
+    spinDir = MyMath.spinDirToHeading(nav.brain.my.h, targetH)
 
-    spin = spinDir*constants.GOTO_SPIN_SPEED*nav.helper.getRotScale(headingDiff)
+    spin = spinDir*constants.GOTO_SPIN_SPEED*helper.getRotScale(headingDiff)
 
-    if nav.helper.atHeading(nav, targetH):
+    if helper.atHeading(nav.brain.my, targetH):
         nav.stopSpinToWalkCount += 1
     else:
         nav.stopSpinToWalkCount = 0
@@ -147,7 +156,9 @@ def spinToFinalHeading(nav):
     if nav.stopSpinToWalkCount > constants.CHANGE_SPIN_DIR_THRESH:
         return nav.goLater('stop')
 
-    nav.helper.setSpeed(0, 0, spin)
+    nav.walkX, nav.walkY = 0, 0
+    nav.walkTheta = spin
+    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
     return nav.stay()
 
 def omniWalkToPoint(nav):
@@ -162,8 +173,8 @@ def omniWalkToPoint(nav):
         if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
 
-    sX, sY, sTheta = nav.helper.getOmniWalkParam(my, dest)
-    nav.helper.setSpeed(sX, sY, sTheta)
+    nav.walkX, nav.walkY, nav.walkTheta = helper.getOmniWalkParam(my, dest)
+    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
 
@@ -172,8 +183,8 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
-    if nav.firstFrame() or nav.updatedTrajectory:
-        nav.helper.setSpeed(nav.walkX, nav.walkY, nav.walkTheta)
+    if nav.updatedTrajectory:
+        helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 
     return nav.stay()
@@ -184,7 +195,7 @@ def stepping(nav):
     This is different from walking.
     """
     if nav.firstFrame():
-        nav.helper.step(nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+        helper.step(nav.brain.motion, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
     elif not nav.brain.motion.isWalkActive():
         return nav.goNow("stopped")
     return nav.stay()
@@ -195,7 +206,7 @@ def stop(nav):
     Wait until the walk is finished.
     """
     if nav.firstFrame():
-        nav.helper.setSpeed(0, 0, 0)
+        helper.setSpeed(nav.brain.motion, 0, 0, 0)
         nav.walkX = nav.walkY = nav.walkTheta = nav.stepX = nav.stepY \
                     = nav.stepTheta = nav.numSteps = 0
 
@@ -209,10 +220,10 @@ def stopped(nav):
     return nav.stay()
 
 def orbitPoint(nav):
-    if nav.firstFrame():
-        nav.helper.setSpeed(nav, 0,
-                     nav.orbitDir*constants.ORBIT_STRAFE_SPEED,
-                     nav.orbitDir*constants.ORBIT_SPIN_SPEED )
+    if nav.updatedTrajectory:
+        helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
+        self.updatedTrajectory = False
+
     return nav.stay()
 
 
@@ -222,7 +233,7 @@ def orbitPointThruAngle(nav):
     """
     if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
         return nav.goNow('stop')
-    if nav.firstFrame():
+    if nav.updatedTrajectory:
         if nav.angleToOrbit < 0:
             orbitDir = constants.ORBIT_LEFT
         else:
@@ -243,7 +254,10 @@ def orbitPointThruAngle(nav):
             sT = constants.ORBIT_SPIN_SPEED * \
                 constants.ORBIT_LARGE_GAIN
 
-        nav.helper.setSpeed(nav, -0.5, orbitDir*sY, orbitDir*sT)
+        nav.walkX = -0.5
+        nav.walkY = orbitDir*sY
+        nav.walkTheta = orbitDir*sT
+        helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta )
 
     #  (frames/second) / (degrees/second) * degrees
     framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *

@@ -1,6 +1,6 @@
 from .. import NogginConstants
 import KickingConstants as constants
-from ..typeDefs import Location
+from ..typeDefs.Location import Location
 
 def inCenterOfField(player):
     return NogginConstants.FIELD_HEIGHT *2/3 > player.brain.my.y > \

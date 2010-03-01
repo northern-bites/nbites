@@ -3,66 +3,21 @@ from math import fabs, cos, sin, radians
 from man.noggin.util import MyMath
 import man.motion as motion
 
-
-def getOmniWalkParam(my, dest):
-
-    bearing = radians(my.getRelativeBearing(dest))
-
-    distToDest = my.dist(dest)
-
-    # calculate forward speed
-    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
-        cos(bearing)
-    sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
-    sX = MyMath.clip(sX,
-                     constants.OMNI_MIN_X_SPEED,
-                     constants.OMNI_MAX_X_SPEED)
-    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
-        sX = 0
-
-    # calculate sideways speed
-    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
-        sin(bearing)
-    sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
-    sY = MyMath.clip(sY,
-                     constants.OMNI_MIN_Y_SPEED,
-                     constants.OMNI_MAX_Y_SPEED,)
-    if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
-        sY = 0
-
-    if atDestinationCloser(my, dest.h):
-        sX = sY = 0.0
-
-    # calculate spin speed
-    spinGain = constants.GOTO_SPIN_GAIN
-    spinDir = my.getSpinDir(dest.h)
-    sTheta = spinDir * fabs(my.h - dest.h) * spinGain
-    sTheta = MyMath.clip(sTheta,
-                         constants.OMNI_MIN_SPIN_SPEED,
-                         constants.OMNI_MAX_SPIN_SPEED)
-    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
-        sTheta = 0.0
-
-    if atHeading(my, dest.h):
-        sTheta = 0.0
-
-    return (sX, sY, sTheta)
-
-def setSpeed(self, x, y, theta):
+def setSpeed(motionInst, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
-    self.brain.motion.setNextWalkCommand(walk)
+    motionInst.setNextWalkCommand(walk)
 
-def step(self, x, y, theta, numSteps):
+def step(motionInst, x, y, theta, numSteps):
     """
     Wrapper method to easily change the walk vector of the robot
     """
     steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
-    self.brain.motion.sendStepCommand(steps)
+    motionInst.sendStepCommand(steps)
 
-def executeMove(self, sweetMove):
+def executeMove(motionInst, sweetMove):
     """
     Method to enqueue a SweetMove
     Can either take in a head move or a body command
@@ -91,7 +46,51 @@ def executeMove(self, sweetMove):
         else:
             print("What kind of sweet ass-Move is this?")
 
-        self.brain.motion.enqueue(move)
+        motionInst.enqueue(move)
+
+def getOmniWalkParam(my, dest):
+
+    bearing = radians(my.getRelativeBearing(dest))
+
+    distToDest = my.dist(dest)
+
+    # calculate forward speed
+    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
+        cos(bearing)
+    sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
+    sX = MyMath.clip(sX,
+                     constants.OMNI_MIN_X_SPEED,
+                     constants.OMNI_MAX_X_SPEED)
+    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
+        sX = 0
+
+    # calculate sideways speed
+    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
+        sin(bearing)
+    sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
+    sY = MyMath.clip(sY,
+                     constants.OMNI_MIN_Y_SPEED,
+                     constants.OMNI_MAX_Y_SPEED,)
+    if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
+        sY = 0
+
+    if atDestinationCloser(my, dest):
+        sX = sY = 0.0
+
+    # calculate spin speed
+    spinGain = constants.GOTO_SPIN_GAIN
+    spinDir = my.spinDirToHeading(dest.h)
+    sTheta = spinDir * fabs(my.h - dest.h) * spinGain
+    sTheta = MyMath.clip(sTheta,
+                         constants.OMNI_MIN_SPIN_SPEED,
+                         constants.OMNI_MAX_SPIN_SPEED)
+    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+        sTheta = 0.0
+
+    if atHeading(my, dest.h):
+        sTheta = 0.0
+
+    return (sX, sY, sTheta)
 
 def atDestination(my, dest):
     """
@@ -112,7 +111,7 @@ def atDestinationGoalie(my, dest):
             fabs(my.y - dest.y) < constants.GOALIE_CLOSE_Y)
 
 def atHeadingGoTo(my, targetHeading):
-    hDiff = fabs(MyMath.sub180Angle(my - targetHeading))
+    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
     return hDiff < constants.AT_HEADING_GOTO_DEG
 
 def atHeading(my, targetHeading):

@@ -71,7 +71,7 @@ def spinFindBall(player):
         else:
             my = player.brain.my
             ball = player.brain.ball
-            spinDir = my.getSpinDir(my.h + ball.locBearing)
+            spinDir = my.spinDirToHeading(my.h + ball.locBearing)
 
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 

@@ -61,8 +61,8 @@ def playbookPosition(player):
 
     # Send a goto if we have changed destinations or are just starting
     if (player.firstFrame() or
-        abs(nav.destX - position.x) > constants.GOTO_DEST_EPSILON or
-        abs(nav.destY - position.y) > constants.GOTO_DEST_EPSILON or
+        abs(nav.dest.x - position.x) > constants.GOTO_DEST_EPSILON or
+        abs(nav.dest.y - position.y) > constants.GOTO_DEST_EPSILON or
         changedOmni):
 
         if brain.my.locScore == NogginConstants.BAD_LOC:
@@ -105,8 +105,8 @@ def atPosition(player):
     ## else:
     ##     player.notAtPositionCounter = 0
 
-    if (abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
-        abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
+    if (abs(nav.dest.x - position.x) > constants.GOTO_DEST_EPSILON or
+        abs(nav.dest.y - position.y) > constants.GOTO_DEST_EPSILON or
         not player.atDestinationGoalie() or
         not player.atHeading()):
         return player.goLater('playbookPosition')

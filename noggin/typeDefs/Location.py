@@ -29,6 +29,11 @@ class Location (object):
             return 10000
         return hypot(other.y - self.y, other.x - self.x)
 
+    def getTargetHeading(self, target):
+        '''determine the heading from one location to another'''
+        return MyMath.sub180Angle(degrees(MyMath.safe_atan2(target.y - self.y,
+                                                            target.x - self.x)))
+
     def visible():
         pass
     def inScanRange():

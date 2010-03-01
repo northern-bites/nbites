@@ -122,7 +122,7 @@ def goalieSpinToPosition(player):
         player.brain.tracker.trackBall()
 
     if not player.atHeading(NogginConstants.OPP_GOAL_HEADING):
-        spinDir = player.brain.my.getSpinDir(NogginConstants.OPP_GOAL_HEADING)
+        spinDir = player.brain.my.spinDirToHeading(NogginConstants.OPP_GOAL_HEADING)
         player.setWalk(0, 0, spinDir*10)
         return player.stay()
     else:

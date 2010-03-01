@@ -21,6 +21,11 @@ class Navigator(FSA.FSA):
 
         # Walk controls
         self.currentGait = None
+        self.walkX = 0
+        self.walkY = 0
+        self.walkTheta = 0
+        self.orbitDir = 0
+        self.angleToOrbit = 0
 
     def performSweetMove(self, move):
         self.sweetMove = move
@@ -44,9 +49,9 @@ class Navigator(FSA.FSA):
         if not self.currentState == 'spinToWalkHeading' and \
                 not self.currentState == 'walkStraightToPoint' and \
                 not self.currentState == 'spinToFinalHeading':
-            if not helper.atHeadingGoTo(self, self.destH):
+            if not helper.atHeadingGoTo(self.brain.my, self.dest.h):
                 self.switchTo('spinToWalkHeading')
-            elif helper.atHeadingGoTo(self, self.destH):
+            elif helper.atHeadingGoTo(self.brain.my, self.dest.h):
                 self.switchTo('walkStraightToPoint')
 
     def stop(self):
@@ -62,11 +67,29 @@ class Navigator(FSA.FSA):
         return self.currentState == 'omniWalkToPoint'
 
     def orbit(self, orbitDir):
+
+        # If the orbit direction is the same ignore the command
+        if (self.orbitDir == orbitDir):
+            self.updatedTrajectory = False
+            return
+
         self.orbitDir = orbitDir
+        self.walkX = 0
+        self.walkY = self.orbitDir*constants.ORBIT_STRAFE_SPEED
+        self.walkTheta = self.orbitDir*constants.ORBIT_SPIN_SPEED
+        self.updatedTrajectory = True
+
         self.switchTo('orbitPoint')
 
     def orbitAngle(self, angleToOrbit):
+
+        if (self.angleToOrbit == angleToOrbit):
+            self.updatedTrajectory = False
+            return
+
         self.angleToOrbit = angleToOrbit
+        self.updatedTrajectory = True
+
         self.switchTo('orbitPointThruAngle')
 
     def walk(self, x, y, theta):
@@ -83,6 +106,7 @@ class Navigator(FSA.FSA):
         if (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
             fabs(self.walkY - y) < constants.STRAFE_EPSILON and
             fabs(self.walkTheta - theta) < constants.SPIN_EPSILON):
+            self.updatedTrajectory = False
             return
 
         self.walkX = x
@@ -96,6 +120,7 @@ class Navigator(FSA.FSA):
         """
         Set the step commands
         """
+        self.walkX, self.walkY, self.walkTheta = 0, 0, 0
         self.stepX = x
         self.stepY = y
         self.stepTheta = theta
