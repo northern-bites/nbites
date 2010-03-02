@@ -1,4 +1,5 @@
 from . import NavConstants as constants
+from ..players import ChaseBallConstants
 from math import fabs, cos, sin, radians
 from man.noggin.util import MyMath
 import man.motion as motion
@@ -92,6 +93,33 @@ def getOmniWalkParam(my, dest):
 
     return (sX, sY, sTheta)
 
+def getWalkStraightParam(my, dest):
+
+    bearing = my.getRelativeBearing(dest)
+    distToDest = my.dist(dest)
+
+    if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
+        gain = constants.GOTO_FORWARD_GAIN * distToDest
+    else :
+        gain = 1.0
+
+    sTheta = MyMath.clip(MyMath.sign(bearing) *
+                         constants.GOTO_STRAIGHT_SPIN_SPEED *
+                         getRotScale(bearing),
+                         -constants.GOTO_STRAIGHT_SPIN_SPEED,
+                         constants.GOTO_STRAIGHT_SPIN_SPEED )
+
+    if fabs(sTheta) < constants.MIN_SPIN_MAGNITUDE_WALK:
+        sTheta = 0
+
+    sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
+                     constants.WALK_TO_MIN_X_SPEED,
+                     constants.WALK_TO_MAX_X_SPEED)
+    sY = 0
+
+    return (sX, sY, sTheta)
+
+
 def atDestination(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
@@ -138,3 +166,12 @@ def getRotScale(headingDiff):
     else:
         return constants.HEADING_FAR_SCALE
 
+def useFinalHeading(brain, position):
+    if brain.gameController.currentState == 'gameReady':
+        useFinalHeadingDist = constants.FINAL_HEADING_READY_DIST
+    else:
+        useFinalHeadingDist = constants.FINAL_HEADING_DIST
+
+    distToPoint = brain.my.dist(position)
+
+    return (distToPoint <= useFinalHeadingDist)

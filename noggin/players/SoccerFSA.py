@@ -68,6 +68,13 @@ class SoccerFSA(FSA.FSA):
             #     self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) +
             #                 " is ignored")
 
+    def getWalk(self):
+        """
+        returns a tuple of current walk parameters
+        """
+        nav = self.brain.nav
+        return (nav.walkX, nav.walkY, nav.walkTheta)
+
     def setSteps(self, x, y, theta, numSteps=1):
         """
         Have the robot walk a specified number of steps

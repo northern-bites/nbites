@@ -3,7 +3,6 @@
 from ..util import MyMath
 from . import NavConstants as constants
 from . import NavHelper as helper
-from ..players import ChaseBallConstants
 from ..playbook.PBConstants import GOALIE
 from math import fabs
 
@@ -17,13 +16,18 @@ def positioningPlaybook(nav):
     my = nav.brain.my
     dest = nav.dest
 
-    useFinalHeading = transitions.useFinalHeading(player, dest)
-
-    if useFinalHeading:
+    if helper.useFinalHeading(nav.brain, dest):
         # keep bearing to the ball
-        pass
+        nav.walkX, nav.walkY, nav.walkTheta =\
+                   helper.getOmniWalkParam(my, dest)
+
     else:
         dest.h = my.getTargetHeading(dest)
+        # need to add choice to spin only to target
+        nav.walkX, nav.walkY, nav.walkTheta =\
+                   helper.getWalkStraightParam(my, dest)
+
+    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
 
     if nav.brain.play.isRole(GOALIE):
         if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
@@ -31,9 +35,6 @@ def positioningPlaybook(nav):
     else:
         if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
-
-    nav.walkX, nav.walkY, nav.walkTheta = helper.getOmniWalkParam(my, dest)
-    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
 
@@ -45,12 +46,17 @@ def positioningReady(nav):
     my = nav.brain.my
     dest = nav.dest
 
-    useFinalHeading = transitions.useFinalHeading(player, dest)
-
-    if useFinalHeading:
-        dest.h = NogginConstants.OPP_GOAL_HEADING
+    if helper.useFinalHeading(nav.brain, dest):
+        dest.h = 0 #NogginConstants.OPP_GOAL_HEADING
+        nav.walkX, nav.walkY, nav.walkTheta =\
+                   helper.getOmniWalkParam(my, dest)
     else:
         dest.h = my.getTargetHeading(dest)
+        # need to add choice to spin only to target
+        nav.walkX, nav.walkY, nav.walkTheta =\
+                   helper.getWalkStraightParam(my, dest)
+
+    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
 
     if nav.brain.play.isRole(GOALIE):
         if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
@@ -58,9 +64,6 @@ def positioningReady(nav):
     else:
         if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
-
-    nav.walkX, nav.walkY, nav.walkTheta = helper.getOmniWalkParam(my, dest)
-    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
 
@@ -81,6 +84,43 @@ def doingSweetMove(nav):
 
 
 # States for the standard spin - walk - spin go to
+def walkStraightToPoint(nav):
+    """
+    State to walk forward w/some turning
+    until localization thinks we are close to the point
+    Stops if we get there
+    If we no longer are heading towards it change to the spin state.
+    """
+    if nav.firstFrame():
+        nav.walkToPointCount = 0
+        nav.walkToPointSpinCount = 0
+
+    my = nav.brain.my
+    if helper.atDestinationCloser(my, nav.dest):
+        nav.walkToPointCount += 1
+    else :
+        nav.walkToPointCount = 0
+
+    if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
+        return nav.goLater('spinToFinalHeading')
+
+    nav.dest.h = nav.dest.getTargetHeading(my)
+
+    if helper.notAtHeading(my, nav.dest.h):
+        nav.walkToPointSpinCount += 1
+    else :
+        nav.walkToPointSpinCount = 0
+
+    if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH:
+        return nav.goLater('spinToWalkHeading')
+
+    nav.walkY, nav.walkX, nav.walkTheta =\
+               helper.getWalkStraightParam(my, nav.dest)
+
+    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
+
+    return nav.stay()
+
 def spinToWalkHeading(nav):
     """
     Spin to the heading needed to walk to a specific point
@@ -126,64 +166,6 @@ def spinToWalkHeading(nav):
         nav.walkTheta = sTheta
         helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
 
-    return nav.stay()
-
-def walkStraightToPoint(nav):
-    """
-    State to walk forward w/some turning
-    until localization thinks we are close to the point
-    Stops if we get there
-    If we no longer are heading towards it change to the spin state.
-    """
-    if nav.firstFrame():
-        nav.walkToPointCount = 0
-        nav.walkToPointSpinCount = 0
-
-    my = nav.brain.my
-    if helper.atDestinationCloser(my, nav.dest):
-        nav.walkToPointCount += 1
-    else :
-        nav.walkToPointCount = 0
-
-    if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
-        return nav.goLater('spinToFinalHeading')
-
-
-    targetH = my.getTargetHeading(nav.dest)
-
-    if helper.notAtHeading(my, targetH):
-        nav.walkToPointSpinCount += 1
-    else :
-        nav.walkToPointSpinCount = 0
-
-    if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH:
-        return nav.goLater('spinToWalkHeading')
-
-    bearing = MyMath.sub180Angle(nav.brain.my.h - targetH)
-    distToDest = my.dist(nav.dest)
-    if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
-        gain = constants.GOTO_FORWARD_GAIN * distToDest
-    else :
-        gain = 1.0
-
-    sTheta = MyMath.clip(MyMath.sign(bearing) *
-                         constants.GOTO_STRAIGHT_SPIN_SPEED *
-                         helper.getRotScale(bearing),
-                         -constants.GOTO_STRAIGHT_SPIN_SPEED,
-                         constants.GOTO_STRAIGHT_SPIN_SPEED )
-
-    if fabs(sTheta) < constants.MIN_SPIN_MAGNITUDE_WALK:
-        sTheta = 0
-
-    sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
-                     constants.WALK_TO_MIN_X_SPEED,
-                     constants.WALK_TO_MAX_X_SPEED)
-
-    nav.walkY = 0
-    nav.walkX = sX
-    nav.walkTheta = sTheta
-
-    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
     return nav.stay()
 
 def spinToFinalHeading(nav):
