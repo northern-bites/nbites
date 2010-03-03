@@ -23,8 +23,16 @@ def positioningPlaybook(nav):
 
     else:
         dest.h = my.getTargetHeading(dest)
-        # need to add choice to spin only to target
-        nav.walkX, nav.walkY, nav.walkTheta =\
+        headingDiff = fabs(my.h - dest.h)
+
+        if headingDiff > 60:
+            sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
+                     helper.getRotScale(headingDiff)
+            nav.walkX, nav.walkY = 0, 0
+            nav.walkTheta = sTheta
+
+        else:
+            nav.walkX, nav.walkY, nav.walkTheta =\
                    helper.getWalkStraightParam(my, dest)
 
     helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
@@ -52,8 +60,16 @@ def positioningReady(nav):
                    helper.getOmniWalkParam(my, dest)
     else:
         dest.h = my.getTargetHeading(dest)
-        # need to add choice to spin only to target
-        nav.walkX, nav.walkY, nav.walkTheta =\
+        headingDiff = fabs(my.h - dest.h)
+
+        if headingDiff > 60:
+            sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
+                     helper.getRotScale(headingDiff)
+            nav.walkX, nav.walkY = 0, 0
+            nav.walkTheta = sTheta
+
+        else:
+            nav.walkX, nav.walkY, nav.walkTheta =\
                    helper.getWalkStraightParam(my, dest)
 
     helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)

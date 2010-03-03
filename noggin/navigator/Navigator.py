@@ -28,6 +28,7 @@ class Navigator(FSA.FSA):
         self.walkTheta = 0
         self.orbitDir = 0
         self.angleToOrbit = 0
+        self.curSpinDir = 0
 
     def performSweetMove(self, move):
         self.sweetMove = move
