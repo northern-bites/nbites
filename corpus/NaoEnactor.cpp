@@ -1,5 +1,6 @@
 //TODO: look into replacing DCM->getTime with local time tracking
 
+#include "alvalue/alvalue.h"
 #include "NaoEnactor.h"
 #include <iostream>
 using namespace std;
@@ -13,6 +14,8 @@ using namespace boost;
 #include "BasicWorldConstants.h"
 #include "ALNames.h"
 using namespace ALNames;
+
+
 
 #include "Kinematics.h"
 using Kinematics::jointsMaxVelNoLoad;
@@ -44,10 +47,10 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
     initDCMCommands();
 
     // connect to dcm using the static methods declared above
-    broker->getProxy("DCM")->getModule()->onPostProcess()
-        .connect(bind(staticPostSensors,this));
-    broker->getProxy("DCM")->getModule()->onPreProcess()
-        .connect(bind(staticSendCommands,this));
+
+	// TODO: Should use specialized proxy created at start
+    broker->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&staticPostSensors,this));
+    broker->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&staticSendCommands,this));
 }
 
 const int NaoEnactor::MOTION_FRAME_RATE = 50;
@@ -199,12 +202,12 @@ void NaoEnactor::postSensors(){
  * Creates the appropriate aliases with the DCM
  */
 void NaoEnactor::initDCMAliases(){
-    ALValue positionCommandsAlias;
+	AL::ALValue positionCommandsAlias;
     positionCommandsAlias.arraySetSize(3);
     positionCommandsAlias[0] = string("AllActuatorPosition");
     positionCommandsAlias[1].arraySetSize(Kinematics::NUM_JOINTS);
 
-    ALValue hardCommandsAlias;
+	AL::ALValue hardCommandsAlias;
     hardCommandsAlias.arraySetSize(3);
     hardCommandsAlias[0] = string("AllActuatorHardness");
     hardCommandsAlias[1].arraySetSize(Kinematics::NUM_JOINTS);

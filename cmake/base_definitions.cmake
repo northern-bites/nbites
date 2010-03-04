@@ -1,9 +1,7 @@
-
 # .:: Basic Definitions ::::::::::::::::::::::::::::::::::::::::::::::::
 #
 # The basic diefinitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
-
 
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
@@ -11,7 +9,7 @@
 IF( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -23,25 +21,27 @@ IF( NOT EXISTS ${TRUNK_PATH} )
     )
 ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
+IF ( NOT OE_CROSS_BUILD )
+  IF(NOT WEBOTS_BACKEND)
+    include("${AL_DIR}/toolchain-pc.cmake")
+  ENDIF( NOT WEBOTS_BACKEND)
+ENDIF ( NOT OE_CROSS_BUILD )
+
 
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
-
-SET( TRUNK_REVISION r$ENV{TRUNK_REVISION} CACHE STRING "SVN Revision number" )
-IF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
-  MESSAGE( FATAL_ERROR
-    "Environment variable TRUNK_REVISION was not set.  Please ensure that your Makefile is properly exporting it."
-    )
-ENDIF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
-
 #SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ ALDEBARAN DIRECTORY
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  SET( AL_DIR "/usr/local/nao" )
+  IF (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao-1.2" )
+  ELSE (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao" )
+  ENDIF (WEBOTS_BACKEND)
   SET( ENV{AL_DIR} ${AL_DIR} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
@@ -62,8 +62,8 @@ IF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
     MAN_INSTALL_PREFIX ${TRUNK_PATH}/install ABSOLUTE
     )
   SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
-  MESSAGE( STATUS 
-    "Environment variable MAN_INSTALL_PREFIX was not set, reseting to default ${MAN_INSTALL_PREFIX}!" )
+  MESSAGE( STATUS
+    "Environment variable MAN_INSTALL_PREFIX was not set, resetting to default ${MAN_INSTALL_PREFIX}!" )
 ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
   SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
 ENDIF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
@@ -85,7 +85,7 @@ IF(COMMAND CMAKE_POLICY)
     # CMake policy regarding excaping definitions
     CMAKE_POLICY(SET CMP0005 OLD)
 #     # CMake policy regarding scoped include
-     # CMAKE_POLICY(SET CMP0011 OLD)
+      CMAKE_POLICY(SET CMP0011 OLD)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
@@ -197,4 +197,4 @@ MARK_AS_ADVANCED(
   AL_PERF_CALCULATION
   TINYXML_DEFINITION
   )
-  
+

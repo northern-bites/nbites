@@ -25,6 +25,7 @@ PROJECT( MAN )
 
 
 ############################ VERSION
+CMAKE_POLICY(SET CMP0011 OLD)
 # Check cMake version
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
@@ -95,10 +96,8 @@ IF( APPLE )
  #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs 
  #when we want to compile just the vision/sensors libraries for the TOOL 
   FIND_PACKAGE( ALCOMMON )
-  FIND_PACKAGE( TINYXML )
 ELSE( APPLE )
   FIND_PACKAGE( ALCOMMON REQUIRED )
-  FIND_PACKAGE( TINYXML  REQUIRED )
 ENDIF( APPLE )
 ENDIF(WEBOTS_BACKEND)
 
@@ -124,10 +123,17 @@ SET( OFFLINE_NAOQI_PATH
 ############################ REMOTE INSTALLATION
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
-OPTION( REMOTE_INSTALL
+IF(WEBOTS_BACKEND)
+  OPTION( REMOTE_INSTALL
+    "Remotely install the libary or binary on the robot."
+    OFF
+    )
+ELSE(WEBOTS_BACKEND)
+  OPTION( REMOTE_INSTALL
     "Remotely install the libary or binary on the robot."
     ON
     )
+ENDIF(WEBOTS_BACKEND)
 
 SET( @REMOTE_ADDRESS@
   "192.168.0.5"
@@ -173,7 +179,6 @@ CONFIGURE_FILE(
 # Add here definition needed.
 ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
                  ${ALCOMMON_DEFINITIONS}
-		 ${TINYXML_DEFINITIONS}
                  ${PTHREAD_DEFINITIONS}
                  ${PYTHON_DEFINITIONS}
 		 ${WEBOTS_DEFINITIONS}
@@ -188,7 +193,6 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 		     ${BOOST_PYTHON_INCLUDE_DIR}
 		     ${BOOST_SIGNALS_INCLUDE_DIR}
                      ${ALCOMMON_INCLUDE_DIR}
-		     ${TINYXML_INCLUDE_DIR}
                      ${FINK_INCLUDE_DIR}
                      ${COMM_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
@@ -257,7 +261,6 @@ TARGET_LINK_LIBRARIES(
   ${BOOST_PYTHON_LIBRARIES}
   ${BOOST_SIGNALS_LIBRARIES}
   ${ALCOMMON_LIBRARIES}
-  ${TINYXML_LIBRARIES}
   ${COMM_TARGET}
   ${SENSORS_TARGET}
   ${SYNCHRO_TARGET}

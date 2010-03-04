@@ -62,21 +62,21 @@ void ALTranscriber::initSensorBodyJoints(){
 void ALTranscriber::initSyncMotionWithALMemory(){
     try{
         alfastaccessJoints =
-            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
     } catch(AL::ALError &e){
         cout << "Failed to initialize proxy to ALFastAccess for joints"<<endl;
     }
 
     try{
         alfastaccessSensors =
-            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
     } catch(AL::ALError &e){
         cout << "Failed to initialize proxy to ALFastAccess for sensors"<<endl;
     }
 
     try{
         alfastaccessTemps =
-            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
     } catch(AL::ALError &e){
         cout << "Failed to initialize proxy to ALFastAccess for temps"<<endl;
     }
@@ -235,7 +235,7 @@ void ALTranscriber::syncMotionWithALMemory() {
 void ALTranscriber::initSyncVisionWithALMemory() {
     try{
         alfastaccessVision =
-            AL::ALPtr<ALMemoryFastAccess >(new ALMemoryFastAccess());
+            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
     } catch(AL::ALError &e){
         cout << "Failed to initialize proxy to ALFastAccess"<<endl;
     }
