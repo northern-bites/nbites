@@ -163,6 +163,7 @@ void FieldLines::afterObjectFragments() {
     }
 
     identifyCorners(cornersList);
+
 #ifdef OFFLINE
     if (debugVertEdgeDetect || debugHorEdgeDetect ||
         debugSecondVertEdgeDetect || debugCreateLines ||
@@ -2227,7 +2228,9 @@ void FieldLines::removeDuplicateLines() {
     for (vector < shared_ptr<VisualLine> >::iterator i = linesList.begin();
 		 i != linesList.end(); ++i) {
 
-		for (vector < shared_ptr<VisualLine> >::iterator j = i+1; j != linesList.end(); ++j) {
+		// Manual pointer incrementing
+		for (vector < shared_ptr<VisualLine> >::iterator j = i+1;
+			 j != linesList.end(); ) {
             // get intersection
             point<int> intersection = Utility::getIntersection(**i, **j);
             int intersectX = intersection.x;
@@ -2258,7 +2261,7 @@ void FieldLines::removeDuplicateLines() {
 						cout  << "Found duplicate line - removing "
 							  << endl;
 					}
-					linesList.erase(j);
+					j = linesList.erase(j);
 					break;
 				} else {
 					BoundingBox box1 = Utility::
@@ -2275,11 +2278,14 @@ void FieldLines::removeDuplicateLines() {
 							cout  << "Found duplicate line 2 - removing "
 								  << endl;
 						}
-						linesList.erase(j);
+						j = linesList.erase(j);
 						break;
 					}
 				}
 			}
+
+			// If we don't erase a line, then we have to increment the iterator
+			++j;
 		}
 	}
 }
@@ -3965,7 +3971,7 @@ void FieldLines::removeDupeCorners(std::list<VisualCorner> &corners,
          i != corners.end(); ++i) {
         if (abs(x - i->getX()) < DUPE_MIN_X_SEPARATION &&
             abs(y - i->getY()) < DUPE_MIN_Y_SEPARATION) {
-			corners.erase(i);
+			i = corners.erase(i);
         }
     }
 }

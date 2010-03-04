@@ -378,12 +378,15 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
 
 		for ( list<const ConcreteLine*>::iterator
 				  newLine = _possibleLines.begin();
-			  newLine != _possibleLines.begin(); newLine++) {
+			  newLine != _possibleLines.begin(); ) {
 
 			// If the line is in both sets
 			if (**newLine == **currLine) {
 				updated.push_back(*newLine);
-				_possibleLines.erase(newLine);
+				newLine = _possibleLines.erase(newLine);
+			} else {
+				// Increment the iterator if we don't erase a line
+				newLine++;
 			}
 		}
 	}

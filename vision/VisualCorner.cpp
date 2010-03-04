@@ -374,7 +374,7 @@ void VisualCorner::setPossibleCorners(
 	std::list <const ConcreteCorner *> _possibleCorners)
 {
 	list<const ConcreteCorner*> updated;
-	for (list<const ConcreteCorner*>::iterator
+	for (list<const ConcreteCorner*>::const_iterator
 			 currCorner = possibleCorners.begin();
 		 currCorner != possibleCorners.end(); currCorner++) {
 
@@ -386,7 +386,10 @@ void VisualCorner::setPossibleCorners(
 			// possible corner
 			if (**newCorner == **currCorner) {
 				updated.push_back(*newCorner);
-				_possibleCorners.erase(newCorner);
+				newCorner = _possibleCorners.erase(newCorner);
+			} else {
+				// Increment the iterator if we don't erase a corner
+				newCorner++;
 			}
 		}
 	}
