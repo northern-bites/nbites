@@ -21,13 +21,6 @@ IF( NOT EXISTS ${TRUNK_PATH} )
     )
 ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
-IF ( NOT OE_CROSS_BUILD )
-  IF(NOT WEBOTS_BACKEND)
-    include("${AL_DIR}/toolchain-pc.cmake")
-  ENDIF( NOT WEBOTS_BACKEND)
-ENDIF ( NOT OE_CROSS_BUILD )
-
-
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
 #SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
@@ -132,58 +125,40 @@ SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 # Depending on the robot and whether cross-compiling, the include and
 # library prefixes must be adjusted
 
-IF( ROBOT_AIBO )
-  # Aibo
-  IF( OE_CROSS_BUILD )
-
-    SET( INCLUDE_PREFIX "${OPEN_R_SDK_ROOT}/OPEN_R/include" )
-    SET( LIB_PREFIX "${OPEN_R_SDK_ROOT}/OPEN_R/lib" )
-
-  ELSE( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "/usr/include" )
-    SET( LIB_PREFIX "/usr/lib" )
-
-  ENDIF( OE_CROSS_BUILD )
-
-ELSE( ROBOT_AIBO )
   # Nao
-  
-  IF( AL_DIR STREQUAL "" )
-    MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
-  ENDIF( AL_DIR STREQUAL "" )
-	
-  IF( WIN32 )
-    SET( TARGET_ARCH "windows" )
-    SET( TARGET_HOST "TARGET_HOST_WINDOWS")
-  ENDIF( WIN32 )
-  
-  IF( UNIX )
-    SET( TARGET_ARCH "linux")
-    SET( TARGET_HOST "TARGET_HOST_LINUX")
-    SET( PLATFORM_X86 1 )
-  ENDIF( UNIX )
+IF( AL_DIR STREQUAL "" )
+  MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
+ENDIF( AL_DIR STREQUAL "" )
 
-  IF( APPLE )
-    SET( TARGET_ARCH "macosx" )
-    SET( TARGET_HOST "TARGET_HOST_MACOSX")
-  ENDIF( APPLE )
-  
-  IF( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include" )
-    SET( LIB_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/lib" )
-  ELSE( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "${AL_DIR}/extern/c/${TARGET_ARCH}/include" )
-    SET( LIB_PREFIX "${AL_DIR}/extern/c/${TARGET_ARCH}/lib" )
-  ENDIF( OE_CROSS_BUILD )
+IF( WIN32 )
+  SET( TARGET_ARCH "windows" )
+  SET( TARGET_HOST "TARGET_HOST_WINDOWS")
+ENDIF( WIN32 )
 
-  IF( FINAL_RELEASE )
-    ADD_DEFINITIONS(-DFINAL_RELEASE)
-  ENDIF( FINAL_RELEASE )
+IF( UNIX )
+  SET( TARGET_ARCH "linux")
+  SET( TARGET_HOST "TARGET_HOST_LINUX")
+  SET( PLATFORM_X86 1 )
+ENDIF( UNIX )
 
-  INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
+IF( APPLE )
+  SET( TARGET_ARCH "macosx" )
+  SET( TARGET_HOST "TARGET_HOST_MACOSX")
+ENDIF( APPLE )
 
-ENDIF( ROBOT_AIBO )
+# IF( OE_CROSS_BUILD )
+#   SET( INCLUDE_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include" )
+#   SET( LIB_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/lib" )
+# ELSE( OE_CROSS_BUILD )
+SET( INCLUDE_PREFIX "${AL_DIR}/include" )
+SET( LIB_PREFIX "${AL_DIR}/lib" )
+# ENDIF( OE_CROSS_BUILD )
 
+IF( FINAL_RELEASE )
+  ADD_DEFINITIONS(-DFINAL_RELEASE)
+ENDIF( FINAL_RELEASE )
+
+INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
 
 ########################## ADVANCED SETTINGS PREFERENCES
 # Set the cache variable that we would rather not appear on the normal
