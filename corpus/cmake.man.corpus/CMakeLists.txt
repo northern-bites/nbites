@@ -7,7 +7,7 @@ PROJECT( CORPUS )
 
 ############################ VERSION
 # Check cMake version
-CMAKE_MINIMUM_REQUIRED( VERSION 2.2.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 
 ############################ COLORIZE MAKEFILE
