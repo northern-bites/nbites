@@ -64,10 +64,8 @@ ELSE(WEBOTS_BACKEND)
     #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
     #when we want to compile just the vision/sensors libraries for the TOOL
     FIND_PACKAGE( ALCOMMON )
-    FIND_PACKAGE( TINYXML )
   ELSE( APPLE )
     FIND_PACKAGE( ALCOMMON REQUIRED )
-    FIND_PACKAGE( TINYXML  REQUIRED )
   ENDIF( APPLE )
 ENDIF(WEBOTS_BACKEND)
 
@@ -105,10 +103,10 @@ IF(WEBOTS_BACKEND)
   ADD_DEFINITIONS( ${WEBOTS_DEFINITIONS})
 
 ELSE(WEBOTS_BACKEND)
-  INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR}
-                      ${TINYXML_INCLUDE_DIR})
-  ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS}
-                   ${TINYXML_DEFINITIONS})
+  INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR})
+
+  ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS})
+
 
 ENDIF(WEBOTS_BACKEND)
 
@@ -274,20 +272,20 @@ INSTALL(
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES( ${SENSORS_TARGET} ${NBCOMMON_LIBRARIES}
                                          ${ALCOMMON_LIBRARIES}
-                                         ${TINYXML_LIBRARIES}
+
                                          ${PTHREAD_LIBRARIES}
                                          ${PYTHON_LIBRARIES}
                                          ${VISION_LIBRARIES}
                                          )
 TARGET_LINK_LIBRARIES( ${SYNCHRO_TARGET} ${NBCOMMON_LIBRARIES}
                                          ${ALCOMMON_LIBRARIES}
-                                         ${TINYXML_LIBRARIES}
+
                                          ${PTHREAD_LIBRARIES}
                                          ${PYTHON_LIBRARIES}
                                          )
 TARGET_LINK_LIBRARIES( ${ROBOT_CONNECT_TARGET} ${NBCOMMON_LIBRARIES}
                                                ${ALCOMMON_LIBRARIES}
-                                               ${TINYXML_LIBRARIES}
+
                                                ${PTHREAD_LIBRARIES}
                                                ${PYTHON_LIBRARIES}
                                                )
