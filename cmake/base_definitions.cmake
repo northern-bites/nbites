@@ -24,7 +24,9 @@ IF( NOT EXISTS ${TRUNK_PATH} )
 ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
 IF ( NOT OE_CROSS_BUILD )
-  include("${AL_DIR}/toolchain-pc.cmake")
+  IF(NOT WEBOTS_BACKEND)
+    include("${AL_DIR}/toolchain-pc.cmake")
+  ENDIF( NOT WEBOTS_BACKEND)
 ENDIF ( NOT OE_CROSS_BUILD )
 
 
