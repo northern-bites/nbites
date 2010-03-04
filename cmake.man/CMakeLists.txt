@@ -25,6 +25,7 @@ PROJECT( MAN )
 
 
 ############################ VERSION
+CMAKE_POLICY(SET CMP0011 OLD)
 # Check cMake version
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
@@ -122,10 +123,17 @@ SET( OFFLINE_NAOQI_PATH
 ############################ REMOTE INSTALLATION
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
-OPTION( REMOTE_INSTALL
+IF(WEBOTS_BACKEND)
+  OPTION( REMOTE_INSTALL
+    "Remotely install the libary or binary on the robot."
+    OFF
+    )
+ELSE(WEBOTS_BACKEND)
+  OPTION( REMOTE_INSTALL
     "Remotely install the libary or binary on the robot."
     ON
     )
+ENDIF(WEBOTS_BACKEND)
 
 SET( @REMOTE_ADDRESS@
   "192.168.0.5"

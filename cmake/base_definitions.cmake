@@ -1,9 +1,7 @@
-
 # .:: Basic Definitions ::::::::::::::::::::::::::::::::::::::::::::::::
 #
 # The basic diefinitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
-
 
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
@@ -11,7 +9,7 @@
 IF( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -37,9 +35,13 @@ ENDIF ( NOT OE_CROSS_BUILD )
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  SET( AL_DIR "/usr/local/nao" )
+  IF (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao-1.2" )
+  ELSE (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao" )
+  ENDIF (WEBOTS_BACKEND)
   SET( ENV{AL_DIR} ${AL_DIR} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
@@ -60,8 +62,8 @@ IF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
     MAN_INSTALL_PREFIX ${TRUNK_PATH}/install ABSOLUTE
     )
   SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
-  MESSAGE( STATUS 
-    "Environment variable MAN_INSTALL_PREFIX was not set, reseting to default ${MAN_INSTALL_PREFIX}!" )
+  MESSAGE( STATUS
+    "Environment variable MAN_INSTALL_PREFIX was not set, resetting to default ${MAN_INSTALL_PREFIX}!" )
 ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
   SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
 ENDIF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
@@ -130,6 +132,7 @@ SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 # Depending on the robot and whether cross-compiling, the include and
 # library prefixes must be adjusted
 
+  # Nao
 IF( AL_DIR STREQUAL "" )
   MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
 ENDIF( AL_DIR STREQUAL "" )

@@ -4,10 +4,14 @@
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  SET( AL_DIR "/usr/local/nao" )
+  IF (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao-1.2" )
+  ELSE (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao" )
+  ENDIF (WEBOTS_BACKEND)
   SET( ENV{AL_DIR} ${AL_DIR} )
-  MESSAGE( STATUS 
-    "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
+  MESSAGE( STATUS
+    "Environment variable AL_DIR was not set, reseting to default WEBOTS  ${WEBOTS_BACKEND} ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
 ENDIF( "x$ENV{AL_DIR}x" STREQUAL "xx")
@@ -17,7 +21,6 @@ IF( NOT EXISTS ${AL_DIR} )
     "Cannot find the path to Nao directory, configuration halted."
     )
 ENDIF( NOT EXISTS ${AL_DIR} )
-
 
 ############################# CROSS-COMPILATION VARIABLES
 # Set the variable for the cross-compilation directory, cmake variables
