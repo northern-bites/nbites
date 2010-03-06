@@ -1,21 +1,21 @@
 ##############################
 #
-# WELCOME 
+# WELCOME
 #
-# This is the main cmake configuration file 
+# This is the main cmake configuration file
 # associate to your projects
 # You can define here specific compilation options
-# 
+#
 # More about cmake : www.cmake.org
 #
-# Using cmake command line : 
+# Using cmake command line :
 # 1. Create a build directory : mkdir build
 # 2. Configure cmake project : cd build; cmake ..
-#   You can also generate project with your favorite IDE : 
+#   You can also generate project with your favorite IDE :
 #   Example : Under Mac osx use "cmake .. -G XCode"
 #   see cmake help for more information
 # 3. Edit project option : ccmake .
-# 4. Build it : make 
+# 4. Build it : make
 
 
 
@@ -41,7 +41,7 @@ SET( CMAKE_COLOR_MAKEFILE TRUE )
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -91,14 +91,14 @@ ENDIF(APPLE)
 IF(WEBOTS_BACKEND)
   FIND_PACKAGE(WEBOTS)
 ELSE(WEBOTS_BACKEND)
-IF( APPLE )
-  MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
- #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs 
- #when we want to compile just the vision/sensors libraries for the TOOL 
-  FIND_PACKAGE( ALCOMMON )
-ELSE( APPLE )
-  FIND_PACKAGE( ALCOMMON REQUIRED )
-ENDIF( APPLE )
+  IF( APPLE )
+    MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
+    #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
+    #when we want to compile just the vision/sensors libraries for the TOOL
+    FIND_PACKAGE( ALCOMMON )
+  ELSE( APPLE )
+    FIND_PACKAGE( ALCOMMON REQUIRED )
+  ENDIF( APPLE )
 ENDIF(WEBOTS_BACKEND)
 
 
@@ -178,45 +178,45 @@ CONFIGURE_FILE(
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
-                 ${ALCOMMON_DEFINITIONS}
-                 ${PTHREAD_DEFINITIONS}
-                 ${PYTHON_DEFINITIONS}
-		 ${WEBOTS_DEFINITIONS}
-                 )
+  ${ALCOMMON_DEFINITIONS}
+  ${PTHREAD_DEFINITIONS}
+  ${PYTHON_DEFINITIONS}
+  ${WEBOTS_DEFINITIONS}
+  )
 
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-                     ${PTHREAD_INCLUDE_DIR}
-                     ${PYTHON_INCLUDE_DIR}
-		     ${BOOST_PYTHON_INCLUDE_DIR}
-		     ${BOOST_SIGNALS_INCLUDE_DIR}
-                     ${ALCOMMON_INCLUDE_DIR}
-                     ${FINK_INCLUDE_DIR}
-                     ${COMM_INCLUDE_DIR}
-                     ${CORPUS_INCLUDE_DIR}
-                     ${MOTION_INCLUDE_DIR}
-                     ${NOGGIN_INCLUDE_DIR}
-                     ${VISION_INCLUDE_DIR}
-                     ${MAN_INCLUDE_DIR}
-		     ${WEBOTS_INCLUDE_DIR}
-                     )
+  ${PTHREAD_INCLUDE_DIR}
+  ${PYTHON_INCLUDE_DIR}
+  ${BOOST_PYTHON_INCLUDE_DIR}
+  ${BOOST_SIGNALS_INCLUDE_DIR}
+  ${ALCOMMON_INCLUDE_DIR}
+  ${FINK_INCLUDE_DIR}
+  ${COMM_INCLUDE_DIR}
+  ${CORPUS_INCLUDE_DIR}
+  ${MOTION_INCLUDE_DIR}
+  ${NOGGIN_INCLUDE_DIR}
+  ${VISION_INCLUDE_DIR}
+  ${MAN_INCLUDE_DIR}
+  ${WEBOTS_INCLUDE_DIR}
+  )
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 
 SET( MAN_SRCS ${MAN_INCLUDE_DIR}/Man
-	      ${MAN_INCLUDE_DIR}/TMan
-              ${MAN_INCLUDE_DIR}/TTMan
-		       )
+  ${MAN_INCLUDE_DIR}/TMan
+  ${MAN_INCLUDE_DIR}/TTMan
+  )
 
 IF(WEBOTS_BACKEND)
   LIST(APPEND MAN_SRCS ${MAN_INCLUDE_DIR}/nao_soccer_player
-			)
+    )
 ELSE(WEBOTS_BACKEND)
   LIST(APPEND MAN_SRCS ${MAN_INCLUDE_DIR}/manmodule
-		       )
+    )
 ENDIF(WEBOTS_BACKEND)
 
 SET( MAN_PYTHON_SRCS ${MAN_INCLUDE_DIR}/__init__.py )

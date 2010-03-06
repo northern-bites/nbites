@@ -64,7 +64,7 @@ ELSE( WIN32 )
         IF (APPLE)
             IF(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
-                  ${AL_DIR/extern/c/aldeberan/alcommon/lib/${TARGET_ARCH}/libalcommon.a}
+                  ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/libalcommon.a
                   )
             ELSE(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
@@ -74,7 +74,7 @@ ELSE( WIN32 )
         ELSE(APPLE)
             IF(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
-                  ${AL_DIR/extern/c/aldeberan/alcommon/lib/${TARGET_ARCH}/libalcommon.so}
+                  ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/libalcommon.a
                   )
             ELSE(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
