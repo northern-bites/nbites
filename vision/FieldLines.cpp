@@ -163,6 +163,7 @@ void FieldLines::afterObjectFragments() {
     }
 
     identifyCorners(cornersList);
+
 #ifdef OFFLINE
     if (debugVertEdgeDetect || debugHorEdgeDetect ||
         debugSecondVertEdgeDetect || debugCreateLines ||
@@ -2227,7 +2228,9 @@ void FieldLines::removeDuplicateLines() {
     for (vector < shared_ptr<VisualLine> >::iterator i = linesList.begin();
 		 i != linesList.end(); ++i) {
 
-		for (vector < shared_ptr<VisualLine> >::iterator j = i+1; j != linesList.end(); ++j) {
+		// Manual pointer incrementing
+		for (vector < shared_ptr<VisualLine> >::iterator j = i+1;
+			 j != linesList.end(); ) {
             // get intersection
             point<int> intersection = Utility::getIntersection(**i, **j);
             int intersectX = intersection.x;
@@ -2258,7 +2261,7 @@ void FieldLines::removeDuplicateLines() {
 						cout  << "Found duplicate line - removing "
 							  << endl;
 					}
-					linesList.erase(j);
+					j = linesList.erase(j);
 					break;
 				} else {
 					BoundingBox box1 = Utility::
@@ -2275,11 +2278,14 @@ void FieldLines::removeDuplicateLines() {
 							cout  << "Found duplicate line 2 - removing "
 								  << endl;
 						}
-						linesList.erase(j);
+						j = linesList.erase(j);
 						break;
 					}
 				}
 			}
+
+			// If we don't erase a line, then we have to increment the iterator
+			++j;
 		}
 	}
 }
@@ -3002,7 +3008,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
             if (i->getShape() == CIRCLE ||
                 i->getLine1()->getCCLine() ||
                 i->getLine2()->getCCLine()) {
-                i->setPossibleCorners(ConcreteCorner::ccCorners);
+                i->setPossibleCorners(ConcreteCorner::ccCorners());
                 i->setShape(CIRCLE);
             } else {
                 i->setPossibleCorners(possibleClassifications);
@@ -3072,9 +3078,9 @@ const bool FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
     const {
     const float ALLOWABLE_ERROR = getAllowedDistanceError(post);
     if (post == vision->bglp || post == vision->bgrp) {
-        for (list <const ConcreteCorner*>::const_iterator i =
-                 ConcreteCorner::blueGoalTCorners.begin();
-             i != ConcreteCorner::blueGoalTCorners.end(); ++i) {
+        for (vector <const ConcreteCorner*>::const_iterator i =
+                 ConcreteCorner::blueGoalTCorners().begin();
+             i != ConcreteCorner::blueGoalTCorners().end(); ++i) {
             if (fabs(getEstimatedDistance(&corner, post) -
                      getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
                 return true;
@@ -3082,9 +3088,9 @@ const bool FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
         }
     }
     else if (post == vision->yglp || post == vision->ygrp) {
-        for (list <const ConcreteCorner*>::const_iterator i =
-                 ConcreteCorner::yellowGoalTCorners.begin();
-             i != ConcreteCorner::yellowGoalTCorners.end(); ++i) {
+        for (vector <const ConcreteCorner*>::const_iterator i =
+                 ConcreteCorner::yellowGoalTCorners().begin();
+             i != ConcreteCorner::yellowGoalTCorners().end(); ++i) {
             if (fabs(getEstimatedDistance(&corner, post) -
                      getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
                 return true;
@@ -3229,7 +3235,7 @@ void FieldLines::classifyCornerWithObjects(
 	list<const ConcreteCorner*> possibleClassifications;
 
 	// Get all the possible corners given the shape of the corner
-	list <const ConcreteCorner*> possibleCorners =
+	vector <const ConcreteCorner*> possibleCorners =
 		ConcreteCorner::getPossibleCorners(corner.getShape());
 
     if (debugIdentifyCorners) {
@@ -3250,7 +3256,7 @@ void FieldLines::classifyCornerWithObjects(
 	// actually a T)
 	if (possibleClassifications.empty()){
 
-		possibleCorners = ConcreteCorner::getConcreteCorners();
+		possibleCorners = ConcreteCorner::concreteCorners();
 		possibleClassifications =
 			compareObjsCorners(corner, possibleCorners, visibleObjects);
 	}
@@ -3265,7 +3271,7 @@ void FieldLines::classifyCornerWithObjects(
 // those that are still in the running.
 list <const ConcreteCorner*> FieldLines::compareObjsCorners(
 	const VisualCorner& corner,
-	const list<const ConcreteCorner*>& possibleCorners,
+	const vector<const ConcreteCorner*>& possibleCorners,
 	const vector<const VisualFieldObject*>& visibleObjects) const
 {
 	list<const ConcreteCorner*> possibleClassifications;
@@ -3277,7 +3283,7 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
 			 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
 
 		float estimatedDistance = getEstimatedDistance(&corner, *k);
-		list <const ConcreteCorner*>::const_iterator j =
+		vector<const ConcreteCorner*>::const_iterator j =
 			possibleCorners.begin();
 
 		for (; j != possibleCorners.end(); ++j) {
@@ -3965,7 +3971,7 @@ void FieldLines::removeDupeCorners(std::list<VisualCorner> &corners,
          i != corners.end(); ++i) {
         if (abs(x - i->getX()) < DUPE_MIN_X_SEPARATION &&
             abs(y - i->getY()) < DUPE_MIN_Y_SEPARATION) {
-			corners.erase(i);
+			i = corners.erase(i);
         }
     }
 }

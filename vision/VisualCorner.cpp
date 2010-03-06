@@ -14,7 +14,8 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _t1, const float _t2)
     : VisualDetection(_x, _y, _distance, _bearing),
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
-      possibleCorners(ConcreteCorner::getConcreteCorners()),
+      possibleCorners(ConcreteCorner::concreteCorners().begin(),
+					  ConcreteCorner::concreteCorners().end()),
 	  cornerType(UNKNOWN), line1(l1), line2(l2),
 	  lines(), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
@@ -303,11 +304,11 @@ void VisualCorner::IDFromLine(const shared_ptr<VisualLine> line)
 		return;
 	const ConcreteLine* concreteLine = line->getPossibleLines().front();
 
-	const list <const ConcreteCorner*> concretes =
+	const vector <const ConcreteCorner*> concretes =
 		ConcreteCorner::getPossibleCorners(getShape());
 
 	list<const ConcreteCorner*> possibles;
-	list<const ConcreteCorner*>::const_iterator i = concretes.begin();
+	vector<const ConcreteCorner*>::const_iterator i = concretes.begin();
 	for ( ; i != concretes.end() ; ++i){
 		if ((*i)->isLineInCorner(concreteLine))
 			possibles.push_back(*i);
@@ -373,7 +374,7 @@ void VisualCorner::setPossibleCorners(
 	std::list <const ConcreteCorner *> _possibleCorners)
 {
 	list<const ConcreteCorner*> updated;
-	for (list<const ConcreteCorner*>::iterator
+	for (list<const ConcreteCorner*>::const_iterator
 			 currCorner = possibleCorners.begin();
 		 currCorner != possibleCorners.end(); currCorner++) {
 
@@ -385,10 +386,26 @@ void VisualCorner::setPossibleCorners(
 			// possible corner
 			if (**newCorner == **currCorner) {
 				updated.push_back(*newCorner);
-				_possibleCorners.erase(newCorner);
+				newCorner = _possibleCorners.erase(newCorner);
+			} else {
+				// Increment the iterator if we don't erase a corner
+				newCorner++;
 			}
 		}
 	}
 	possibleCorners = updated;
+}
+
+/**
+ * Another way of setting the possible corners
+ *
+ * @TODO Unify setPossibleCorners so we don't copy the vector.
+ */
+void VisualCorner::
+setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
+{
+	list<const ConcreteCorner*> poss(_possibleCorners.begin(),
+									 _possibleCorners.end());
+	setPossibleCorners(poss);
 }
 

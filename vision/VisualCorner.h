@@ -78,6 +78,8 @@ public:
     ////////////////////////////////////////////////////////////
     void setPossibleCorners(std::list <const ConcreteCorner *>
 							_possibleCorners);
+    void setPossibleCorners(std::vector <const ConcreteCorner *>
+							_possibleCorners);
     void setShape(const shape s) { cornerType = s; }
     void setLine1(boost::shared_ptr<VisualLine> l1) { line1 = l1; }
     void setLine2(boost::shared_ptr<VisualLine> l2) { line2 = l2; }
