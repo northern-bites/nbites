@@ -31,7 +31,7 @@ IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
   IF (WEBOTS_BACKEND)
     SET( AL_DIR "/usr/local/nao-1.2" )
   ELSE (WEBOTS_BACKEND)
-    SET( AL_DIR "/usr/local/nao" )
+    SET( AL_DIR "/usr/local/nao-1.4" )
   ENDIF (WEBOTS_BACKEND)
   SET( ENV{AL_DIR} ${AL_DIR} )
   MESSAGE( STATUS
