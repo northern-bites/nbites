@@ -53,7 +53,6 @@ MESSAGE( STATUS "" )
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PTHREAD  REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
-FIND_PACKAGE( BOOST_PYTHON REQUIRED )
 
 IF( APPLE )
   MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
@@ -71,7 +70,6 @@ CONFIGURE_FILE(
   ${MOTION_INCLUDE_DIR}/motionconfig.h
   ESCAPE_QUOTES
   )
-
 
 ############################ DEFINITIONS
 # Add here definition needed.
