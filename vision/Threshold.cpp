@@ -492,7 +492,7 @@ void Threshold::detectSelf() {
 						  pixInImageRight + TOPRIGHT, yp - HEIGHT);
 		if (pixInImageRight + TOPRIGHT < IMAGE_WIDTH -1) {
 			for (int i = pixInImageRight + TOPRIGHT; i < IMAGE_WIDTH; i++) {
-				lowerBound[i] = yp - HEIGHT;
+				lowerBound[i] = max(0, yp - HEIGHT);
 			}
 		}
 	}
@@ -504,7 +504,7 @@ void Threshold::detectSelf() {
 						  xp, yp);
 		if (pixInImageLeft > TOPRIGHT) {
 			for (int i = 0; i < pixInImageLeft - TOPRIGHT; i++) {
-				lowerBound[i] = yp - HEIGHT;
+				lowerBound[i] = max(0, yp - HEIGHT);
 			}
 		}
 	}
