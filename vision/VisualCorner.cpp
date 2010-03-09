@@ -380,7 +380,7 @@ void VisualCorner::setPossibleCorners(
 
 		for ( list<const ConcreteCorner*>::iterator
 				  newCorner = _possibleCorners.begin();
-			  newCorner != _possibleCorners.end(); newCorner++) {
+			  newCorner != _possibleCorners.end() ; ) {
 
 			// If the line is in both sets, then it's still a
 			// possible corner
