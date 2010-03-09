@@ -741,6 +741,7 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 	const int ERROR_TOLERANCE = 6;
 	const int LEAN_THRESH = 5;
 	const int MINIMUM_SKEW = 5;
+	const int MIN_WIDTH = 16;
 
     // try and find the cross bar - start at the upper left corner
     int biggest = 0, biggest2 = 0;
@@ -749,11 +750,13 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
     int y = b.getLeftTopY();
     int h = b.height();
     int w = b.width();
+
+	if (w < MIN_WIDTH) return 0.0f;
     //int need = min(w / 2, 20);
     int need = max(w, MIN_SIZE);
 	float newSlope = 0.0f;
 	if (CORRECT) {
-		//drawBlob(b, ORANGE);
+		drawBlob(b, ORANGE);
 	}
 	stop scan;
 	// scan the left side to see how far out we can go seeing post
@@ -901,6 +904,7 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		point <int> rightTop = point<int>(topx, top);
 		point <int> leftBottom = point<int>(bottomx, bottom);
 		point <int> rightBottom = point<int>(bottomx, bottom);
+		vision->drawLine(topx, top, bottomx, bottom, BLACK);
 		// first expand the sides
 		findVerticalEdge(leftTop, leftBottom, c, c2, true);
 		findVerticalEdge(rightTop, rightBottom, c, c2, false);
