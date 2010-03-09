@@ -4,14 +4,10 @@
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  IF (WEBOTS_BACKEND)
-    SET( AL_DIR "/usr/local/nao-1.2" )
-  ELSE (WEBOTS_BACKEND)
-    SET( AL_DIR "/usr/local/nao" )
-  ENDIF (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao-1.4" )
   SET( ENV{AL_DIR} ${AL_DIR} )
   MESSAGE( STATUS
-    "Environment variable AL_DIR was not set, reseting to default WEBOTS  ${WEBOTS_BACKEND} ${AL_DIR}!" )
+    "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
 ENDIF( "x$ENV{AL_DIR}x" STREQUAL "xx")
@@ -40,6 +36,7 @@ SET( CMAKE_SYSTEM_PROCESSOR geode )
 SET( X86_BIN_PREFIX "${OE_PREFIX}-" )
 SET( X86_BIN_DIR "${OE_CROSS_DIR}/cross/geode/bin" )
 
+SET ( CMAKE_INSTALL_NAME_TOOL "${OE_CROSS_DIR}/staging/${STAGING-PREFIX}/usr/lib/install_name_tool")
 SET( CMAKE_C_COMPILER "${X86_BIN_DIR}/${X86_BIN_PREFIX}gcc" )
 SET( CMAKE_CXX_COMPILER "${X86_BIN_DIR}/${X86_BIN_PREFIX}g++" )
 CMAKE_FORCE_C_COMPILER( "${X86_BIN_DIR}/${X86_BIN_PREFIX}gcc" GNU )
@@ -72,4 +69,4 @@ SET( CMAKE_C_FLAGS "--sysroot ${OE_CROSS_DIR}/staging/${OE_PREFIX}/ -I${X86_INCL
 SET( CMAKE_CXX_FLAGS "--sysroot ${OE_CROSS_DIR}/staging/${OE_PREFIX}/ -I${X86_INCLUDE_DIR} -I${X86_GINCLUDE_DIR} -I${X86_CPINCLUDE_DIR} -I${X86_GCPINCLUDE_DIR} -march=geode" )
 SET( CMAKE_EXE_LINKER_FLAGS "-Wl,--sysroot,${OE_CROSS_DIR}/staging/${OE_PREFIX}/ -lgcc -L${X86_GLIBC_DIR} -lc -lstdc++ -ldl" )
 
-INCLUDE("/usr/local/nao/crosstoolchain/toolchain-geode.cmake")
+INCLUDE("${OE_CROSS_DIR}/toolchain-geode.cmake")
