@@ -38,6 +38,7 @@ public:
 
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
+	virtual void copyEKF(const LocEKF& other);
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();

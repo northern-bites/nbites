@@ -84,6 +84,22 @@ LocEKF::LocEKF(float initX, float initY, float initH,
 }
 
 /**
+ * Set the EKF to be identical to the given EKF
+ *
+ * @param other EKF to be copied
+ */
+void LocEKF::copyEKF(const LocEKF& other)
+{
+	setXEst(other.getXEst());
+	setYEst(other.getYEst());
+	setHEst(other.getHEst());
+	setXUncert(other.getXUncert());
+	setYUncert(other.getYUncert());
+	setHUncert(other.getHUncert());
+}
+
+
+/**
  * Reset the EKF to a starting configuration
  */
 void LocEKF::reset()
