@@ -154,8 +154,12 @@ def relocalize(player):
         pass #player.stopWalking()
     if player.brain.my.locScore == NogginConstants.GOOD_LOC or \
             player.brain.my.locScore == NogginConstants.OK_LOC:
-        return player.goLater(player.lastDiffState)
-
+        player.shouldRelocalizeCounter += 1
+        if player.shouldRelocalizeCounter > 15:
+            player.shouldRelocalizeCounter = 0
+            return player.goLater(player.lastDiffState)
+    else:
+        player.shouldRelocalizeCounter = 0
     if not player.brain.motion.isHeadActive():
         player.brain.tracker.locPans()
 

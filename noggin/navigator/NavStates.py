@@ -18,7 +18,7 @@ def positioningPlaybook(nav):
 
     if helper.useFinalHeading(nav.brain, dest):
         # keep bearing to the ball
-        nav.walkX, nav.walkY, nav.walkTheta =\
+        walkX, walkY, walkTheta =\
                    helper.getOmniWalkParam(my, dest)
 
     else:
@@ -26,16 +26,12 @@ def positioningPlaybook(nav):
         headingDiff = fabs(my.h - dest.h)
 
         if headingDiff > 60:
-            sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
-                     helper.getRotScale(headingDiff)
-            nav.walkX, nav.walkY = 0, 0
-            nav.walkTheta = sTheta
-
+            walkX, walkY, walkTheta = helper.getSpinOnlyParam(my, dest)
         else:
-            nav.walkX, nav.walkY, nav.walkTheta =\
-                   helper.getWalkStraightParam(my, dest)
+            walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
 
-    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
+    helper.setSpeed(nav.brain.motion, walkX, walkY, walkTheta)
+    nav.walkX, nav.walkY, nav.walkTheta = walkX, walkY, walkTheta
 
     if nav.brain.play.isRole(GOALIE):
         if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
@@ -56,23 +52,24 @@ def positioningReady(nav):
 
     if helper.useFinalHeading(nav.brain, dest):
         dest.h = 0 #NogginConstants.OPP_GOAL_HEADING
-        nav.walkX, nav.walkY, nav.walkTheta =\
-                   helper.getOmniWalkParam(my, dest)
+        walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
     else:
         dest.h = my.getTargetHeading(dest)
         headingDiff = fabs(my.h - dest.h)
 
-        if headingDiff > 60:
-            sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
-                     helper.getRotScale(headingDiff)
-            nav.walkX, nav.walkY = 0, 0
-            nav.walkTheta = sTheta
-
+        if headingDiff < 60:
+            nav.walkToPointCount = 0
+            walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
         else:
-            nav.walkX, nav.walkY, nav.walkTheta =\
-                   helper.getWalkStraightParam(my, dest)
+            nav.walkToPointCount += 1
+            if nav.walkToPointCount > 30:
+                walkX, walkY, walkTheta = helper.getSpinOnlyParam(my, dest)
+            else:
+                walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
 
-    helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
+    helper.setSpeed(nav.brain.motion, walkX, walkY, walkTheta)
+    nav.walkX, nav.walkY, nav.walkTheta = walkX, walkY, walkTheta
+    nav.curSpinDir = MyMath.sign(walkTheta)
 
     if nav.brain.play.isRole(GOALIE):
         if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
