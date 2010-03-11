@@ -14,15 +14,15 @@
 class LocSystem
 {
 public:
+	LocSystem() : active(false) {};
     virtual ~LocSystem() {};
     // Core Functions
     virtual void updateLocalization(MotionModel u_t,
                                     std::vector<Observation> z_t) = 0;
     virtual void reset() = 0;
-    // These should be made pure virtual and the implementing MCL class should
-    // be forced to implement them
-    virtual void blueGoalieReset() {}
-    virtual void redGoalieReset() {}
+
+    virtual void blueGoalieReset() = 0;
+    virtual void redGoalieReset() = 0;
 
     // Getters
     virtual const PoseEst getCurrentEstimate() const = 0;
@@ -37,6 +37,7 @@ public:
     virtual const float getHUncertDeg() const = 0;
     virtual const MotionModel getLastOdo() const = 0;
 	virtual const vector<Observation> getLastObservations() const = 0;
+	virtual const bool isActive() { return active;}
 
     // Setters
     virtual void setXEst(float xEst) = 0;
@@ -45,6 +46,8 @@ public:
     virtual void setXUncert(float uncertX) = 0;
     virtual void setYUncert(float uncertY) = 0;
     virtual void setHUncert(float uncertH) = 0;
+	virtual void activate() { active = true; }
+	virtual void deactivate() { active = false; }
 
     friend std::ostream& operator<< (std::ostream &o,
                                              const LocSystem &c) {
@@ -55,6 +58,8 @@ public:
                  << c.getHUncert() << ")";
 
     }
+private:
+	bool active;
 };
 
 #endif // LocSystem_h_DEFINED

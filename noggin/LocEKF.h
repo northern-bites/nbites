@@ -38,7 +38,11 @@ public:
 
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
-	virtual void copyEKF(const LocEKF& other);
+	void odometryUpdate(MotionModel u);
+	void applyObservations(vector<Observation> Z);
+	void endFrame();
+
+	void copyEKF(const LocEKF& other);
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
@@ -107,6 +111,7 @@ public:
 	virtual const vector<Observation> getLastObservations() const {
 		return lastObservations;
 	}
+
     // Setters
     /**
      * @param val The new estimate of the loc x position

@@ -59,7 +59,8 @@ const float LocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 LocEKF::LocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
-          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), lastOdo(0,0,0),
+          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), LocSystem(),
+	  lastOdo(0,0,0),
 	  lastObservations(0), useAmbiguous(true)
 {
     // ones on the diagonal
@@ -155,10 +156,29 @@ void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
         cout << "\t\t" << Z[i] <<endl;
     }
 #endif
-    // Update expected position based on odometry
+
+	odometryUpdate(u);
+	applyObservations(Z);
+	endFrame();
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+    cout << "After updates: " << *this << endl;
+    cout << endl;
+    cout << endl;
+    cout << endl;
+#endif
+}
+
+// Update expected position based on odometry
+void LocEKF::odometryUpdate(MotionModel u)
+{
     timeUpdate(u);
     limitAPrioriUncert();
     lastOdo = u;
+}
+
+void LocEKF::applyObservations(vector<Observation> Z)
+{
 	lastObservations = Z;
 
     if (! useAmbiguous) {
@@ -180,28 +200,24 @@ void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
         noCorrectionStep();
     }
     //limitPosteriorUncert();
+}
+
+/**
+ * Performs final cleanup at the end of a time step. Clips robot position
+ * to be on the field and tests fof NaN values.
+ */
+void LocEKF::endFrame()
+{
 
     // Clip values if our estimate is off the field
     clipRobotPose();
     if (testForNaNReset()) {
         cout << "LocEKF reset to: "<< *this << endl;
         cout << "\tLast odo is: " << lastOdo << endl;
-        cout << "\tObservations are: ";
-        vector<Observation>::iterator iter = Z.begin();
-        while( iter != Z.end() ) {
-            cout << endl << "\t\t" << *iter;
-            ++iter;
-        }
         cout << endl;
     }
-
-#ifdef DEBUG_LOC_EKF_INPUTS
-    cout << "After updates: " << *this << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
-#endif
 }
+
 
 /**
  * Method incorporate the expected change in loc position from the last
