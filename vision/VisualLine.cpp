@@ -378,7 +378,7 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
 
 		for ( list<const ConcreteLine*>::iterator
 				  newLine = _possibleLines.begin();
-			  newLine != _possibleLines.begin(); ) {
+			  newLine != _possibleLines.end(); ) {
 
 			// If the line is in both sets
 			if (**newLine == **currLine) {

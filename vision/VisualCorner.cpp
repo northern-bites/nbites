@@ -300,12 +300,14 @@ void VisualCorner::identifyFromLines()
  */
 void VisualCorner::IDFromLine(const shared_ptr<VisualLine> line)
 {
-	if (!line->hasPositiveID())
+	// We don't want to use an ambiguous line, or
+	// change the ID an a corner that has already been identified
+	if (!line->hasPositiveID() || hasPositiveID())
 		return;
 	const ConcreteLine* concreteLine = line->getPossibleLines().front();
 
 	const vector <const ConcreteCorner*> concretes =
-		ConcreteCorner::getPossibleCorners(getShape());
+		ConcreteCorner::concreteCorners();
 
 	list<const ConcreteCorner*> possibles;
 	vector<const ConcreteCorner*>::const_iterator i = concretes.begin();
@@ -373,7 +375,8 @@ const bool VisualCorner::hasPositiveID()
 void VisualCorner::setPossibleCorners(
 	std::list <const ConcreteCorner *> _possibleCorners)
 {
-	list<const ConcreteCorner*> updated;
+	list<const ConcreteCorner*> updated(0);
+
 	for (list<const ConcreteCorner*>::const_iterator
 			 currCorner = possibleCorners.begin();
 		 currCorner != possibleCorners.end(); currCorner++) {
@@ -393,6 +396,7 @@ void VisualCorner::setPossibleCorners(
 			}
 		}
 	}
+
 	possibleCorners = updated;
 }
 
