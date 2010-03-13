@@ -11,7 +11,7 @@
 IF( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -41,7 +41,7 @@ ENDIF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR "/usr/local/nao" )
   SET( ENV{AL_DIR} ${AL_DIR} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
@@ -62,7 +62,7 @@ IF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
     MAN_INSTALL_PREFIX ${TRUNK_PATH}/install ABSOLUTE
     )
   SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable MAN_INSTALL_PREFIX was not set, reseting to default ${MAN_INSTALL_PREFIX}!" )
 ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
   SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
@@ -147,16 +147,16 @@ IF( ROBOT_AIBO )
 
 ELSE( ROBOT_AIBO )
   # Nao
-  
+
   IF( AL_DIR STREQUAL "" )
     MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
   ENDIF( AL_DIR STREQUAL "" )
-	
+
   IF( WIN32 )
     SET( TARGET_ARCH "windows" )
     SET( TARGET_HOST "TARGET_HOST_WINDOWS")
   ENDIF( WIN32 )
-  
+
   IF( UNIX )
     SET( TARGET_ARCH "linux")
     SET( TARGET_HOST "TARGET_HOST_LINUX")
@@ -167,7 +167,7 @@ ELSE( ROBOT_AIBO )
     SET( TARGET_ARCH "macosx" )
     SET( TARGET_HOST "TARGET_HOST_MACOSX")
   ENDIF( APPLE )
-  
+
   IF( OE_CROSS_BUILD )
     SET( INCLUDE_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include" )
     SET( LIB_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/lib" )
@@ -197,4 +197,4 @@ MARK_AS_ADVANCED(
   AL_PERF_CALCULATION
   TINYXML_DEFINITION
   )
-  
+
