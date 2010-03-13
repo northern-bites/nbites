@@ -44,4 +44,9 @@ OPTION( OFFLINE
     OFF
     )
 
+# Use the smaller calibration tables
+OPTION( SMALL_TABLES
+  "Turn on/off the use of small color tables."
+    OFF
+    )
 

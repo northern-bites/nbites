@@ -1,7 +1,6 @@
 #ifndef DEBUG_H_DEFINED
 #define DEBUG_H_DEFINED
 
-#include "ifdefs.h"
 #include "Common.h"
 
 #if !defined(OFFLINE) && ROBOT(AIBO)

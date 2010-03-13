@@ -98,10 +98,10 @@ private: // private methods
 
 
     inline float cornerDistanceToSD(float _distance) {
-        return sqrt(2.0f * std::max(10 + _distance*0.00125f, 250.0f));
+        return std::sqrt(2.0f * std::max(10 + _distance*0.00125f, 250.0f));
     }
     inline float cornerBearingToSD(float _bearing) {
-        return sqrt(static_cast<float>(M_PI) / 4.0f);
+        return std::sqrt(static_cast<float>(M_PI) / 4.0f);
     }
 
 

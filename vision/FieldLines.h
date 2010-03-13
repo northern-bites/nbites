@@ -24,7 +24,6 @@ enum TestDirection {TEST_UP, TEST_DOWN, TEST_LEFT, TEST_RIGHT};
 struct linePoint;
 
 #include "Common.h" //
-#include "ifdefs.h" //
 #include "VisualFieldObject.h" //
 #include "ConcreteFieldObject.h" //
 #include "ConcreteCorner.h" //

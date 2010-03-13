@@ -6,7 +6,6 @@
 #define Common_h_DEFINED
 
 #include <math.h> // for PI
-#include "ifdefs.h"
 #include "NBMath.h"
 
 // ROBOT TYPES
