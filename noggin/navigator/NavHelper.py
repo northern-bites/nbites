@@ -4,19 +4,26 @@ from math import fabs, cos, sin, radians
 from man.noggin.util import MyMath
 import man.motion as motion
 
-def setSpeed(motionInst, x, y, theta):
+def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
-    motionInst.setNextWalkCommand(walk)
+    nav.brain.motion.setNextWalkCommand(walk)
 
-def step(motionInst, x, y, theta, numSteps):
+    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
+    nav.curSpinDir = MyMath.sign(theta)
+
+
+def step(nav, x, y, theta, numSteps):
     """
     Wrapper method to easily change the walk vector of the robot
     """
     steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
-    motionInst.sendStepCommand(steps)
+    nav.brain.motion.sendStepCommand(steps)
+
+    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
+    nav.curSpinDir = MyMath.sign(theta)
 
 def executeMove(motionInst, sweetMove):
     """
