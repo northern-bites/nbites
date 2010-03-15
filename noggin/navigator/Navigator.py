@@ -1,6 +1,7 @@
 from math import fabs
 from ..util import FSA
 from . import NavStates
+from . import PlaybookPositionStates
 from . import NavConstants as constants
 from . import NavHelper as helper
 from man.noggin.typeDefs.Location import RobotLocation
@@ -12,6 +13,7 @@ class Navigator(FSA.FSA):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
+        self.addStates(PlaybookPositionStates)
         self.currentState = 'stopped'
         self.setName('Navigator')
         self.setPrintStateChanges(True)
@@ -37,9 +39,10 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self, dest):
         self.dest = dest
 
-        if not self.currentState == 'positioningPlaybook'and \
-               not self.currentState == 'positionOmni':
-            self.switchTo('positioningPlaybook')
+        if not self.currentState == 'playbookWalk'and \
+               not self.currentState == 'playbookOmni' and \
+               not self.currentState == 'playbookSpin':
+            self.switchTo('playbookWalk')
 
     def omniGoTo(self, dest):
         self.dest = dest

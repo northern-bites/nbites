@@ -40,7 +40,7 @@ def playbookPosition(player):
     position = RobotLocation(position[0], position[1], destHeading)
 
     if gcState == 'gameReady':
-        position.h = 0
+        position.h = NogginConstants.OPP_GOAL_HEADING
 
     nav.positionPlaybook(position)
 
@@ -160,6 +160,7 @@ def relocalize(player):
             return player.goLater(player.lastDiffState)
     else:
         player.shouldRelocalizeCounter = 0
+
     if not player.brain.motion.isHeadActive():
         player.brain.tracker.locPans()
 

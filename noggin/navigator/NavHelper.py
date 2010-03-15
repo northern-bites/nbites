@@ -129,7 +129,7 @@ def getWalkStraightParam(my, dest):
 def getSpinOnlyParam(my, dest):
 
     spinDir = my.spinDirToHeading(dest.h)
-    headingDiff = fabs(my.h - dest.h)
+    headingDiff = fabs(my.getRelativeBearing(dest))
     sTheta = spinDir * constants.GOTO_SPIN_SPEED * \
              getRotScale(headingDiff)
 
