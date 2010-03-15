@@ -119,6 +119,15 @@ def getWalkStraightParam(my, dest):
 
     return (sX, sY, sTheta)
 
+def getSpinOnlyParam(my, dest):
+
+    spinDir = my.spinDirToHeading(dest.h)
+    headingDiff = fabs(my.h - dest.h)
+    sTheta = spinDir * constants.GOTO_SPIN_SPEED * \
+             getRotScale(headingDiff)
+
+    sX, sY = 0, 0
+    return (sX, sY, sTheta)
 
 def atDestination(my, dest):
     """

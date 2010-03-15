@@ -40,9 +40,9 @@ def playbookPosition(player):
     position = RobotLocation(position[0], position[1], destHeading)
 
     if gcState == 'gameReady':
-        nav.positionReady(position)
-    else:
-        nav.positionPlaybook(position)
+        position.h = 0
+
+    nav.positionPlaybook(position)
 
     if brain.my.locScore == NogginConstants.BAD_LOC:
         player.shouldRelocalizeCounter += 1

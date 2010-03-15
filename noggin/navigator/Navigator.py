@@ -37,14 +37,9 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self, dest):
         self.dest = dest
 
-        if not self.currentState == 'positioningPlaybook':
+        if not self.currentState == 'positioningPlaybook'and \
+               not self.currentState == 'positionOmni':
             self.switchTo('positioningPlaybook')
-
-    def positionReady(self, dest):
-        self.dest = dest
-
-        if not self.currentState == 'positioningReady':
-            self.switchTo('positioningReady')
 
     def omniGoTo(self, dest):
         self.dest = dest

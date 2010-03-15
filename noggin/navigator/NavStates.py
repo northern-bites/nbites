@@ -11,71 +11,65 @@ DEBUG = False
 def positioningPlaybook(nav):
     """positions us in ready state"""
     if nav.firstFrame():
-        nav.walkToPointCount = 0
-
+        nav.spinToPointCount = 0
+        nav.omniWalkToCount = 0
     my = nav.brain.my
     dest = nav.dest
 
-    if helper.useFinalHeading(nav.brain, dest):
-        # keep bearing to the ball
-        walkX, walkY, walkTheta =\
-                   helper.getOmniWalkParam(my, dest)
+    dest.h = my.getTargetHeading(dest)
+    headingDiff = fabs(my.h - dest.h)
 
+    if headingDiff < constants.HEADING_THRESHOLD_TO_SPIN:
+        nav.spinToPointCount = 0
+        walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
     else:
-        dest.h = my.getTargetHeading(dest)
-        headingDiff = fabs(my.h - dest.h)
-
-        if headingDiff > 60:
+        nav.spinToPointCount += 1
+        if nav.spinToPointCount > constants.FRAMES_THRESHHOLD_TO_SPIN:
             walkX, walkY, walkTheta = helper.getSpinOnlyParam(my, dest)
         else:
             walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
 
     helper.setSpeed(nav.brain.motion, walkX, walkY, walkTheta)
     nav.walkX, nav.walkY, nav.walkTheta = walkX, walkY, walkTheta
+    nav.curSpinDir = MyMath.sign(walkTheta)
 
-    if nav.brain.play.isRole(GOALIE):
-        if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
-            return nav.goNow('stop')
+    if helper.useFinalHeading(nav.brain, dest):
+        nav.omniWalkToCount += 1
+        if nav.omniWalkToCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
+            del nav.omniWalkToCount
+            del nav.spinToPointCount
+            return nav.goLater('positionOmni')
     else:
-        if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
-            return nav.goNow('stop')
+        nav.omniWalkToCount = 0
 
     return nav.stay()
 
-def positioningReady(nav):
-    """positions us in ready state"""
+def positionOmni(nav):
     if nav.firstFrame():
-        nav.walkToPointCount = 0
-
+        nav.stopOmniCount = 0
     my = nav.brain.my
     dest = nav.dest
 
-    if helper.useFinalHeading(nav.brain, dest):
-        dest.h = 0 #NogginConstants.OPP_GOAL_HEADING
-        walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
-    else:
-        dest.h = my.getTargetHeading(dest)
-        headingDiff = fabs(my.h - dest.h)
-
-        if headingDiff < 60:
-            nav.walkToPointCount = 0
-            walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
-        else:
-            nav.walkToPointCount += 1
-            if nav.walkToPointCount > 30:
-                walkX, walkY, walkTheta = helper.getSpinOnlyParam(my, dest)
-            else:
-                walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
+    dest.h = 0 #NogginConstants.OPP_GOAL_HEADING
+    walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
 
     helper.setSpeed(nav.brain.motion, walkX, walkY, walkTheta)
     nav.walkX, nav.walkY, nav.walkTheta = walkX, walkY, walkTheta
     nav.curSpinDir = MyMath.sign(walkTheta)
 
+    if not helper.useFinalHeading(nav.brain, dest):
+        nav.stopOmniCount += 1
+        if nav.stopOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
+            del nav.stopOmniCount
+            return nav.goLater('positioningPlaybook')
+
     if nav.brain.play.isRole(GOALIE):
         if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
+            del nav.stopOmniCount
             return nav.goNow('stop')
     else:
         if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
+            del nav.stopOmniCount
             return nav.goNow('stop')
 
     return nav.stay()
@@ -86,6 +80,7 @@ def doingSweetMove(nav):
     motion = nav.brain.motion
     if nav.firstFrame():
         nav.walkX, nav.walkY, nav.walkTheta = 0, 0, 0
+        nav.curSpinDir = 0
         helper.setSpeed(motion, 0, 0, 0)
         helper.executeMove(motion, nav.sweetMove)
 
