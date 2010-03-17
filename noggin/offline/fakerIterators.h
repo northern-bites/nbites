@@ -72,3 +72,6 @@ float sampleTriangularDistribution(float sd);
 
 #endif // obsToLoc_h_DEFINED
 
+std::pair<float,float>
+findClosestLinePointCartesian(LineLandmark l, float x_r,
+							  float y_r, float h_r);

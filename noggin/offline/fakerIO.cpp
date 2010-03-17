@@ -99,68 +99,87 @@ void readObsInputFile(fstream * inputFile,
             } else {
                 // if it's a corner
                 list <const ConcreteCorner*> toUse;
-                const ConcreteCorner * corn;
+                const ConcreteCorner* corn;
                 switch(ids[k]) {
                 case BLUE_CORNER_TOP_L:
-                    corn = &ConcreteCorner::blue_corner_top_l;
+                    corn = &ConcreteCorner::blue_corner_top_l();
                     break;
                 case BLUE_CORNER_BOTTOM_L:
-                    corn = &ConcreteCorner::blue_corner_bottom_l;
+					corn = &ConcreteCorner::blue_corner_bottom_l();
                     break;
                 case BLUE_GOAL_LEFT_T:
-                    corn = &ConcreteCorner::blue_goal_left_t;
+                    corn = &ConcreteCorner::blue_goal_left_t();
                     break;
                 case BLUE_GOAL_RIGHT_T:
-                    corn = &ConcreteCorner::blue_goal_right_t;
+                    corn = &ConcreteCorner::blue_goal_right_t();
                     break;
                 case BLUE_GOAL_LEFT_L:
-                    corn = &ConcreteCorner::blue_goal_left_l;
+                    corn = &ConcreteCorner::blue_goal_left_l();
                     break;
                 case BLUE_GOAL_RIGHT_L:
-                    corn = &ConcreteCorner::blue_goal_right_l;
+                    corn = &ConcreteCorner::blue_goal_right_l();
                     break;
                 case CENTER_TOP_T:
-                    corn = &ConcreteCorner::center_top_t;
+                    corn = &ConcreteCorner::center_top_t();
                     break;
                 case CENTER_BOTTOM_T:
-                    corn = &ConcreteCorner::center_bottom_t;
+                    corn = &ConcreteCorner::center_bottom_t();
                     break;
                 case YELLOW_CORNER_TOP_L:
-                    corn = &ConcreteCorner::yellow_corner_top_l;
+                    corn = &ConcreteCorner::yellow_corner_top_l();
                     break;
                 case YELLOW_CORNER_BOTTOM_L:
-                    corn = &ConcreteCorner::yellow_corner_bottom_l;
+                    corn = &ConcreteCorner::yellow_corner_bottom_l();
                     break;
                 case YELLOW_GOAL_LEFT_T:
-                    corn = &ConcreteCorner::yellow_goal_left_t;
+                    corn = &ConcreteCorner::yellow_goal_left_t();
                     break;
                 case YELLOW_GOAL_RIGHT_T:
-                    corn = &ConcreteCorner::yellow_goal_right_t;
+                    corn = &ConcreteCorner::yellow_goal_right_t();
                     break;
                 case YELLOW_GOAL_LEFT_L:
-                    corn = &ConcreteCorner::yellow_goal_left_l;
+                    corn = &ConcreteCorner::yellow_goal_left_l();
                     break;
                 case YELLOW_GOAL_RIGHT_L:
                     // Intentional fall through
                 default:
-                    corn = &ConcreteCorner::yellow_goal_right_l;
+                    corn = &ConcreteCorner::yellow_goal_right_l();
                     break;
                 }
                 // Append to the list
                 toUse.assign(1,corn);
 
                 VisualCorner vc(20, 20, dists[k], bearings[k],
-                                VisualLine(), VisualLine(), 10.0f, 10.0f);
+                                shared_ptr<VisualLine>(new VisualLine()),
+								shared_ptr<VisualLine>(new VisualLine()),
+								10.0f, 10.0f);
                 vc.setPossibleCorners(toUse);
 
                 // Set ID
-                if (toUse == ConcreteCorner::lCorners) {
-                    vc.setID(L_INNER_CORNER);
-                } else if (toUse == ConcreteCorner::tCorners) {
-                    vc.setID(T_CORNER);
-                } else {
-                    vc.setID((cornerID)ids[k]);
-                }
+				const vector<const ConcreteCorner*> lCorners =
+					ConcreteCorner::lCorners();
+				for (int i = 0; i < lCorners.size(); ++i){
+					const ConcreteCorner* c = lCorners[i];
+
+					if (c == corn){
+						vc.setID(L_INNER_CORNER);
+					}
+				}
+
+				if (vc.getID() != L_INNER_CORNER){
+					const vector<const ConcreteCorner*> tCorners =
+						ConcreteCorner::tCorners();
+					for (int i = 0; i < tCorners.size(); ++i){
+						const ConcreteCorner* c = tCorners[i];
+
+						if (c == corn)
+							vc.setID(T_CORNER);
+					}
+				}
+				if (vc.getID() != L_INNER_CORNER ||
+					vc.getID() != T_CORNER){
+					vc.setID((cornerID)ids[k]);
+				}
                 Observation seen(vc);
                 z_t.push_back(seen);
             }
