@@ -79,6 +79,8 @@ public:
      */
     const unsigned int getNumPossibilities() const { return numPossibilities; }
 
+	const bool isAmbiguous() const { return numPossibilities != 1; }
+
     /*
      * @return The list of possible line landmarks
      */

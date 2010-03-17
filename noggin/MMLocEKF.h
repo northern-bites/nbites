@@ -23,20 +23,38 @@ private:						// Private methods
 	void initModels();
 	void destroyModels();
 
-	void timeUpdate();
-	void correctionStep();
+	void timeUpdate(MotionModel u);
+	void correctionStep(std::vector<Observation>& Z);
 
-	void applyUnambiguousObservations();
-	void applyAmbiguousObservations();
-	void consolidateModels();
+	void applyUnambiguousObservations(std::vector<Observation>& Z);
+	void applyAmbiguousObservations(std::vector<Observation>& Z);
+	void applyObsToActiveModels(Observation& Z);
+	void applyNoCorrectionStep();
+
+	void consolidateModels(){}
 
 	void mergeModels(LocEKF * one, LocEKF * two);
+
+	void endFrame();
+
+	void setAllModelsInactive();
+	void equalizeProbabilities();
+	inline bool isModelActive(int i) const;
+	inline void setProbability(int i, double prob);
 
 
 private:						// Private variables
 	const static int MAX_MODELS = 30;
 
 	LocEKF* models[MAX_MODELS];
+	double probabilities[MAX_MODELS];
+
+	int mostLikelyModel;
+
+	inline const int getMostLikelyModel() const;
+
+	MotionModel lastOdo;
+	vector<Observation> lastObservations;
 
 public:
 	// LocSystem virtual getters
@@ -50,18 +68,26 @@ public:
     virtual const float getYUncert() const;
     virtual const float getHUncert() const;
     virtual const float getHUncertDeg() const;
-    virtual const MotionModel getLastOdo() const;
-	virtual const vector<Observation> getLastObservations() const;
+
+    virtual const MotionModel getLastOdo() const {
+        return lastOdo;
+    }
+
+	virtual const vector<Observation> getLastObservations() const {
+		return lastObservations;
+	}
+
     virtual void blueGoalieReset();
     virtual void redGoalieReset();
+    virtual void reset();
 
 	// LocSystem virtual setters
-    virtual void setXEst(float xEst);
-    virtual void setYEst(float yEst);
-    virtual void setHEst(float hEst);
-    virtual void setXUncert(float uncertX);
-    virtual void setYUncert(float uncertY);
-    virtual void setHUncert(float uncertH);
+    virtual void setXEst(float xEst){}
+    virtual void setYEst(float yEst){}
+    virtual void setHEst(float hEst){}
+    virtual void setXUncert(float uncertX){}
+    virtual void setYUncert(float uncertY){}
+    virtual void setHUncert(float uncertH){}
 
 };
 

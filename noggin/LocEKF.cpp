@@ -202,6 +202,12 @@ void LocEKF::applyObservations(vector<Observation> Z)
     //limitPosteriorUncert();
 }
 
+void LocEKF::applyObservation(Observation Z)
+{
+	correctionStep(Z);
+	updateState();
+}
+
 /**
  * Performs final cleanup at the end of a time step. Clips robot position
  * to be on the field and tests fof NaN values.

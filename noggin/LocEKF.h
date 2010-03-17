@@ -40,6 +40,7 @@ public:
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
 	void odometryUpdate(MotionModel u);
 	void applyObservations(vector<Observation> Z);
+	void applyObservation(Observation Z);
 	void endFrame();
 
 	void copyEKF(const LocEKF& other);
