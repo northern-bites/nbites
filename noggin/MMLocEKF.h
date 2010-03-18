@@ -24,10 +24,10 @@ private:						// Private methods
 	void destroyModels();
 
 	void timeUpdate(MotionModel u);
-	void correctionStep(std::vector<Observation>& Z);
+	bool correctionStep(std::vector<Observation>& Z);
 
-	void applyUnambiguousObservations(std::vector<Observation>& Z);
-	void applyAmbiguousObservations(std::vector<Observation>& Z);
+	bool applyUnambiguousObservations(std::vector<Observation>& Z);
+	bool applyAmbiguousObservations(std::vector<Observation>& Z);
 	void applyObsToActiveModels(Observation& Z);
 	void applyNoCorrectionStep();
 

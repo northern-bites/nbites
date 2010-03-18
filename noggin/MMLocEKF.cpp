@@ -42,8 +42,11 @@ void MMLocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 	// Apply time update
 	timeUpdate(u);
 
-	correctionStep(Z);
+	bool hasAppliedACorrection = correctionStep(Z);
 
+	if (!hasAppliedACorrection)
+		applyNoCorrectionStep();
+n
 	consolidateModels();
 
 	endFrame();
@@ -60,27 +63,28 @@ void MMLocEKF::timeUpdate(MotionModel u)
 		}
 }
 
-void MMLocEKF::correctionStep(vector<Observation>& Z)
+bool MMLocEKF::correctionStep(vector<Observation>& Z)
 {
-	if (Z.size() > 0){
-		applyUnambiguousObservations(Z);
-		//applyAmbiguousObservations(Z);
-	} else {
-		applyNoCorrectionStep();
-	}
+
+	bool appliedUnambiguous = applyUnambiguousObservations(Z);
+	//bool appliedAmbiguous = applyAmbiguousObservations(Z);
+	return appliedUnambiguous;
 }
 
-void MMLocEKF::applyUnambiguousObservations(vector<Observation>& Z)
+bool MMLocEKF::applyUnambiguousObservations(vector<Observation>& Z)
 {
+	bool appliedObs = false;
 	vector<Observation>::iterator obs = Z.begin();
 	while (obs != Z.end()){
 		if (!obs->isAmbiguous()){
 			applyObsToActiveModels(*obs);
 			obs = Z.erase(obs);
+			appliedObs = true;
 		} else {
 			++obs;
 		}
 	}
+	return appliedObs;
 }
 
 void MMLocEKF::applyObsToActiveModels(Observation& obs)
@@ -101,7 +105,7 @@ void MMLocEKF::applyNoCorrectionStep()
 	}
 }
 
-void MMLocEKF::applyAmbiguousObservations(vector<Observation>& Z)
+bool MMLocEKF::applyAmbiguousObservations(vector<Observation>& Z)
 {
 	// Renormalize probabilities after split
 }
