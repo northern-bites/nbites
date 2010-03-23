@@ -17,35 +17,8 @@ SET( BOOST_PYTHON_LIBRARIES "PYTHON_LIBRARIES-NOTFOUND" CACHE FILEPATH "Cleared.
 # Defined package variable
 ##
 
-IF( WIN32 )
-  IF( OE_CROSS_BUILD )
-    SET( BOOST_PYTHON_INCLUDE_DIR ${OE_CROSS_DIR}/staging/geode-linux/usr/include )
-    SET( BOOST_PYTHON_LIBRARIES ${OE_CROSS_DIR}/staging/geode-linux/usr/lib/libboost_python-mt.so )
-  ELSE( OE_CROSS_BUILD )
-    SET( BOOST_PYTHON_INCLUDE_DIR /usr/include/boost )
-    SET( BOOST_PYTHON_LIBRARIES /bin/cygboost_python-gcc-mt-1_33_1.dll )
-  ENDIF( OE_CROSS_BUILD )
-ELSE( WIN32 )
-  IF( OE_CROSS_BUILD )
-    SET( BOOST_PYTHON_INCLUDE_DIR ${OE_CROSS_DIR}/staging/geode-linux/usr/include )
-    SET( BOOST_PYTHON_LIBRARIES ${OE_CROSS_DIR}/staging/geode-linux/usr/lib/libboost_python-mt.so )
-  ELSE( OE_CROSS_BUILD )
-    IF ( APPLE )
-      SET( BOOST_PYTHON_INCLUDE_DIR /sw/include/ )
-      SET( BOOST_PYTHON_LIBRARIES /sw/lib/libboost_python.dylib )
-    ELSE ( APPLE )
-      SET( BOOST_PYTHON_INCLUDE_DIR /usr/include/ )
-
-      IF( EXISTS /usr/lib/libboost_python-py26.so )
-	SET( BOOST_PYTHON_LIBRARIES /usr/lib/libboost_python-py26.so )
-      ELSE( EXISTS /usr/lib/libboost_python-py26.so )
-	SET( BOOST_PYTHON_LIBRARIES /usr/lib/libboost_python.so )
-      ENDIF(EXISTS /usr/lib/libboost_python-py26.so )
-    ENDIF( APPLE )
-  ENDIF( OE_CROSS_BUILD )
-ENDIF( WIN32 )
-
-
+SET( BOOST_PYTHON_LIBRARIES ${OE_CROSS_DIR}/staging/geode-linux/usr/lib/libboost_python-mt.so)
+SET( BOOST_PYTHON_INCLUDE_DIR ${OE_CROSS_DIR}/staging/geode-linux/usr/include)
 
 IF( BOOST_PYTHON_INCLUDE_DIR AND BOOST_PYTHON_LIBRARIES )
   IF ( EXISTS BOOST_PYTHON_INCLUDE_DIR AND EXISTS BOOST_PYTHON_LIBRARIES )

@@ -34,8 +34,6 @@ IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
     SET( AL_DIR "/usr/local/nao-1.4" )
   ENDIF (WEBOTS_BACKEND)
   SET( ENV{AL_DIR} ${AL_DIR} )
-  MESSAGE( STATUS
-    "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
 ENDIF( "x$ENV{AL_DIR}x" STREQUAL "xx")
@@ -79,6 +77,7 @@ IF(COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0005 OLD)
 #     # CMake policy regarding scoped include
       CMAKE_POLICY(SET CMP0011 OLD)
+      CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
@@ -145,14 +144,6 @@ IF( APPLE )
   SET( TARGET_ARCH "macosx" )
   SET( TARGET_HOST "TARGET_HOST_MACOSX")
 ENDIF( APPLE )
-
-# IF( OE_CROSS_BUILD )
-#   SET( INCLUDE_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include" )
-#   SET( LIB_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/lib" )
-# ELSE( OE_CROSS_BUILD )
-SET( INCLUDE_PREFIX "${AL_DIR}/include" )
-SET( LIB_PREFIX "${AL_DIR}/lib" )
-# ENDIF( OE_CROSS_BUILD )
 
 IF( FINAL_RELEASE )
   ADD_DEFINITIONS(-DFINAL_RELEASE)
