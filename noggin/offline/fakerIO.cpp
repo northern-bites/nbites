@@ -477,8 +477,8 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                   >> initBallVelXUncert >> initBallVelYUncert;
     }
     // Initialize localization systems
-    shared_ptr<LocSystem> locEKF  = shared_ptr<LocEKF>(
-        new LocEKF(initX, initY, initH, initUncertX, initUncertY, initUncertH));
+    shared_ptr<LocSystem> locEKF  = shared_ptr<MMLocEKF>(
+        new MMLocEKF());
     shared_ptr<BallEKF> ballEKF =  shared_ptr<BallEKF>(
         new BallEKF(initBallX, initBallY, initBallVelX, initBallVelY,
                     initBallXUncert, initBallYUncert,

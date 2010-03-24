@@ -48,6 +48,7 @@
 #include "MCL.h"
 #include "BallEKF.h"
 #include "LocEKF.h"
+#include "MMLocEKF.h"
 
 void readNavInputFile(std::fstream* name, NavPath * letsGo);
 void readObsInputFile(std::fstream * inputFile,

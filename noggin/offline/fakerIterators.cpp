@@ -66,7 +66,7 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
     vector<Observation> Z_t;
     // shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL(100));
     // shared_ptr<BallEKF> MCLballEKF = shared_ptr<BallEKF>(new BallEKF());
-    shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
+    shared_ptr<LocSystem> ekfLoc = shared_ptr<LocSystem>(new MMLocEKF());
     shared_ptr<BallEKF> EKFballEKF = shared_ptr<BallEKF>(new BallEKF());
     PoseEst currentPose;
     BallPose currentBall;
