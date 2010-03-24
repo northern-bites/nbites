@@ -44,9 +44,12 @@ public:
 	void endFrame();
 
 	void copyEKF(const LocEKF& other);
+	void mergeEKF(const LocEKF& other);
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
+
+	const double getProbability() const { return probability; }
 
     // Getters
     /**
@@ -148,6 +151,9 @@ public:
      * @param _use True if we are to use ambiguous landmark observations
      */
     void setUseAmbiguous(bool _use) { useAmbiguous = _use; }
+
+	void setProbability(double p) { probability = p; }
+
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
@@ -173,6 +179,8 @@ private:
 	int findNearestNeighbor(Observation *z);
     float getDivergence(Observation * z, PointLandmark pt);
 
+	void updateProbability(const Observation& Z);
+
     void limitAPrioriUncert();
     void limitPosteriorUncert();
     void clipRobotPose();
@@ -186,6 +194,7 @@ private:
     MotionModel lastOdo;
 	vector<Observation> lastObservations;
     bool useAmbiguous;
+	double probability;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

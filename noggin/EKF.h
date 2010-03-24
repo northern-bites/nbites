@@ -143,6 +143,8 @@ public:
 
     virtual ~EKF() {}
 
+	StateVector getState() { return xhat_k; }
+
     // Core functions
     virtual void timeUpdate(UpdateModel u_k) {
         ++frameCounter;

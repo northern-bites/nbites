@@ -27,34 +27,39 @@ private:						// Private methods
 	bool correctionStep(std::vector<Observation>& Z);
 
 	bool applyUnambiguousObservations(std::vector<Observation>& Z);
-	bool applyAmbiguousObservations(std::vector<Observation>& Z);
+	bool applyAmbiguousObservations(const std::vector<Observation>& Z);
 	void applyObsToActiveModels(Observation& Z);
 	void applyNoCorrectionStep();
 
+	void splitObservation(const Observation& obs, LocEKF * model);
 	void consolidateModels(){}
 
-	void mergeModels(LocEKF * one, LocEKF * two);
+	void mergeModels();
 
 	void endFrame();
+	void normalizeProbabilities(const list<LocEKF*>& unnormalized,
+								double totalProb);
 
 	void setAllModelsInactive();
 	void equalizeProbabilities();
-	inline bool isModelActive(int i) const;
-	inline void setProbability(int i, double prob);
+	bool mergeable(LocEKF* one, LocEKF* two);
 
 
 private:						// Private variables
 	const static int MAX_MODELS = 30;
 
 	LocEKF* models[MAX_MODELS];
-	double probabilities[MAX_MODELS];
+	list<LocEKF*> modelList;
 
 	int mostLikelyModel;
 
 	inline const int getMostLikelyModel() const;
+	inline LocEKF * getInactiveModel() const;
 
 	MotionModel lastOdo;
 	vector<Observation> lastObservations;
+
+	const static double PROB_SUM = 1.0;
 
 public:
 	// LocSystem virtual getters

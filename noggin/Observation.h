@@ -103,6 +103,14 @@ public:
     void setID(int _id) { id = _id; }
     void addPointPossibility(PointLandmark p);
     void addLinePossibility(LineLandmark l);
+	void setPointPossibility(PointLandmark p){
+		pointPossibilities.clear();
+		pointPossibilities.push_back(p);
+	}
+	void setLinePossibility(LineLandmark l){
+		linePossibilities.clear();
+		linePossibilities.push_back(l);
+	}
 
     // Helper functions
     friend std::ostream& operator<< (std::ostream &o, const Observation &c) {

@@ -21,10 +21,13 @@ void MMLocEKF::initModels()
 		models[i] = new LocEKF();
 		models[i]->deactivate();
 
-		probabilities[i] = 0.0;
+		models[i]->setProbability(0.0);
+
+		modelList.push_back(models[i]);
 	}
 	models[0]->activate();
-	probabilities[0] = 1.0;
+	models[0]->setProbability(1.0);
+
 }
 
 /**
@@ -46,10 +49,17 @@ void MMLocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 
 	if (!hasAppliedACorrection)
 		applyNoCorrectionStep();
-n
-	consolidateModels();
+
+	//consolidateModels();
 
 	endFrame();
+
+	int numActive = 0;
+	for (int i=0; i<MAX_MODELS; ++i){
+		if (models[i]->isActive())
+			numActive++;
+	}
+	cout << numActive << " models active" << endl;
 
 	lastObservations = Z;
 	lastOdo = u;
@@ -67,8 +77,8 @@ bool MMLocEKF::correctionStep(vector<Observation>& Z)
 {
 
 	bool appliedUnambiguous = applyUnambiguousObservations(Z);
-	//bool appliedAmbiguous = applyAmbiguousObservations(Z);
-	return appliedUnambiguous;
+	bool appliedAmbiguous = applyAmbiguousObservations(Z);
+	return appliedUnambiguous || appliedAmbiguous;
 }
 
 bool MMLocEKF::applyUnambiguousObservations(vector<Observation>& Z)
@@ -105,16 +115,134 @@ void MMLocEKF::applyNoCorrectionStep()
 	}
 }
 
-bool MMLocEKF::applyAmbiguousObservations(vector<Observation>& Z)
+bool MMLocEKF::applyAmbiguousObservations(const vector<Observation>& Z)
 {
-	// Renormalize probabilities after split
+	bool applied = false;
+	if (!Z.empty())
+		applied = true;
+	for (int i=0; i < MAX_MODELS ; ++i){
+		vector<Observation>::const_iterator obs;
+		for (obs = Z.begin(); obs != Z.end() ; ++obs){
+			splitObservation(*obs, models[i]);
+		}
+	}
+	return applied;
 }
 
-void MMLocEKF::endFrame(){
+void MMLocEKF::splitObservation(const Observation& obs, LocEKF * model)
+{
+	const double originalProb = model->getProbability();
+	list<LocEKF*> splitModels;
+
+	for (unsigned int i=0; i < obs.getNumPossibilities(); ++i){
+		LocEKF * inactiveModel = getInactiveModel();
+		inactiveModel->copyEKF(*model);
+
+		Observation newObs(obs);
+		if (obs.isLine())
+			newObs.setLinePossibility(obs.getLinePossibilities()[i] );
+		else
+			newObs.setPointPossibility(obs.getPointPossibilities()[i] );
+
+		inactiveModel->applyObservation(newObs);
+		inactiveModel->activate();
+		splitModels.push_back(inactiveModel);
+
+		normalizeProbabilities(splitModels, originalProb);
+	}
+	model->deactivate();
+}
+
+void MMLocEKF::endFrame()
+{
 	for (int i=0; i < MAX_MODELS; ++i){
 		if (models[i]->isActive()){
 			models[i]->endFrame();
 		}
+	}
+	mergeModels();
+	normalizeProbabilities(modelList, PROB_SUM);
+}
+
+void MMLocEKF::normalizeProbabilities(const list<LocEKF*>& unnormalized,
+									  double totalProb)
+{
+	// Normalize the Probabilities so that they all sum to totalProb
+    double sumAlpha=0.0;
+	list<LocEKF*>::const_iterator model = unnormalized.begin();
+    for ( ; model != unnormalized.end() ; model++) {
+        if ((*model)->isActive()) {
+            sumAlpha += (*model)->getProbability();
+        }
+    }
+
+    if(sumAlpha == 1) return;
+
+    if (sumAlpha == 0) sumAlpha = 1e-12;
+
+	model = unnormalized.begin();
+    for ( ; model != unnormalized.end() ; model++) {
+        if ((*model)->isActive()) {
+            (*model)->setProbability((*model)->getProbability()/sumAlpha);
+        }
+    }
+
+}
+
+void MMLocEKF::mergeModels()
+{
+	for (int i=0; i < MAX_MODELS; ++i) {
+		for (int j=0; j < MAX_MODELS; ++j){
+			if (mergeable(models[i], models[j])){
+				models[i]->mergeEKF(*models[j]);
+				models[j]->deactivate();
+			}
+		}
+	}
+}
+
+bool MMLocEKF::mergeable(LocEKF* one, LocEKF* two)
+{
+	if (!one->isActive() || !two->isActive() || one == two)
+		return false;
+	const LocEKF::StateVector diff = one->getState() - two->getState();
+
+	LocEKF::StateMatrix oneUncert = one->getStateUncertainty();
+	LocEKF::StateMatrix twoUncert = two->getStateUncertainty();
+
+	LocEKF::StateMatrix uncertSum = (oneUncert * one->getProbability() +
+									 twoUncert * two->getProbability());
+
+
+	double denom = (-uncertSum(0,1) * uncertSum(1,0) +
+					uncertSum(0,0) * uncertSum(1,1));
+
+	if (denom < 0.0001)
+		denom = 1e-08;
+
+	if (isnan(denom) || isnan(one->getProbability()) || isnan(two->getProbability()))
+		return false;
+
+	LocEKF::StateMatrix uncertSumInv = uncertSum;
+
+	uncertSumInv(0,0) = uncertSum(1,1)/denom;
+	uncertSumInv(0,1) = 0;
+	uncertSumInv(1,0) = 0;
+	uncertSumInv(1,1) = uncertSum(0,0)/denom;
+
+	if (isnan(uncertSumInv(0,0))) cout << "found a nan 00" << endl;
+	if (isnan(uncertSumInv(0,1))) cout << "found a nan 01" << endl;
+	if (isnan(uncertSumInv(1,0))) cout << "found a nan 10" << endl;
+	if (isnan(uncertSumInv(1,1))) cout << "found a nan 11" << endl;
+
+	double metric = (one->getProbability() * two->getProbability()) *
+		inner_prod(trans(diff), prod(uncertSumInv, diff));
+
+	if (metric < 0.8){
+		return true;
+	} else {
+		cout << "metric is " << metric << endl;
+		return false;
 	}
 }
 
@@ -174,13 +302,24 @@ const int MMLocEKF::getMostLikelyModel() const
 {
 	double max = -1.0;
 	int index = 0;
+
 	for (int i=0; i<MAX_MODELS; ++i){
-		if (probabilities[i] > max){
-			max = probabilities[i];
+		if (models[i]->getProbability() > max &&
+			models[i]->isActive()){
+			max = models[i]->getProbability();
 			index = i;
 		}
 	}
+
 	return index;
+}
+
+LocEKF * MMLocEKF::getInactiveModel() const
+{
+	for (int i=0; i < MAX_MODELS; ++i)
+		if (!models[i]->isActive())
+			return models[i];
+	return models[MAX_MODELS -1];
 }
 
 /************** PRIVATE HELPERS ***********/
@@ -194,27 +333,16 @@ void MMLocEKF::equalizeProbabilities()
 {
 	int numActive = 0;
 	for (int i=0; i < MAX_MODELS ; ++i) {
-		if (isModelActive(i))
+		if (models[i]->isActive())
 			numActive++;
 	}
 
 	const double newProbability = 1.0/numActive;
 	for (int i=0; i < MAX_MODELS ; ++i){
-		if (isModelActive(i))
-			setProbability(i,newProbability);
+		if (models[i]->isActive())
+			models[i]->setProbability(newProbability);
 	}
 }
-
-void MMLocEKF::setProbability(int i, double prob)
-{
-	probabilities[i] = prob;
-}
-
-bool MMLocEKF::isModelActive(int i) const
-{
-	return models[i]->isActive();
-}
-
 
 /**************** RESETS *******************/
 void MMLocEKF::blueGoalieReset()

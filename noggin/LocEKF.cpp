@@ -61,7 +61,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
           LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), LocSystem(),
 	  lastOdo(0,0,0),
-	  lastObservations(0), useAmbiguous(true)
+	  lastObservations(0), useAmbiguous(true), probability(0.0)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -91,12 +91,33 @@ LocEKF::LocEKF(float initX, float initY, float initH,
  */
 void LocEKF::copyEKF(const LocEKF& other)
 {
-	setXEst(other.getXEst());
-	setYEst(other.getYEst());
-	setHEst(other.getHEst());
-	setXUncert(other.getXUncert());
-	setYUncert(other.getYUncert());
-	setHUncert(other.getHUncert());
+	if(this != &other){
+		xhat_k     = other.xhat_k;
+		xhat_k_bar = other.xhat_k_bar;
+		Q_k        = other.Q_k;
+		A_k        = other.A_k;
+		P_k        = other.P_k;
+		P_k_bar    = other.P_k_bar;
+		betas      = other.betas;
+		gammas     = other.gammas;
+	}
+	setProbability(other.getProbability());
+}
+
+void LocEKF::mergeEKF(const LocEKF& other)
+{
+	double newProbability = (probability + other.getProbability());
+
+	// @todo check for "drift" chances, that is, one small prob and one large prob.
+	// see page 6 of Quinlan pdf
+	setXEst( (1/newProbability)*(probability*getXEst() +
+								 other.getProbability() * other.getXEst()) );
+	setYEst( (1/newProbability)*(probability*getYEst() +
+								 other.getProbability() * other.getYEst()) );
+	setHEst( (1/newProbability)*(probability*getHEst() +
+								 other.getProbability() * other.getHEst()) );
+
+	// @todo set covariance matrix of new model
 }
 
 
@@ -206,7 +227,51 @@ void LocEKF::applyObservation(Observation Z)
 {
 	correctionStep(Z);
 	updateState();
+	updateProbability(Z);
 }
+
+void LocEKF::updateProbability(const Observation& Z)
+{
+
+	if (R_k(0,0) == DONT_PROCESS_KEY)
+		return;
+
+	// R_k is covariance matrix of measurement
+	// @hack we just multiply covariance by two
+	const MeasurementMatrix measurementVar = R_k;
+
+	MeasurementMatrix measurementVarInv = measurementVar;
+	const double denom = (-measurementVar(0,1) * measurementVar(1,0) +
+						  measurementVar(0,0) * measurementVar(1,1));
+
+	if (denom < 0.0001){
+		probability *= 0.0001;
+		return;
+	}
+
+	measurementVarInv(0,0) = measurementVar(1,1)/denom;
+	measurementVarInv(0,1) = -measurementVar(0,1)/denom;
+	measurementVarInv(1,0) = -measurementVar(1,0)/denom;
+	measurementVarInv(1,1) = measurementVar(0,0)/denom;
+
+	// We need the measurement innovation or invariance, aka v_k
+	const double exponent = -0.5 * inner_prod(v_k, prod(measurementVarInv, v_k));
+
+	double detMeasVar = (-measurementVar(0,1) * measurementVar(1,0) +
+						 measurementVar(0,0) * measurementVar(1,1));
+	if (detMeasVar < 0.0001)
+		detMeasVar = 1e-08;
+	const double coefficient = 1 / sqrt( pow(2 * PI, LOC_MEASUREMENT_DIMENSION) *
+										 detMeasVar );
+
+	const double outlierProb = 0.08;
+	const double probCo = (1-outlierProb)*(coefficient*pow(M_E, exponent)) + outlierProb;
+
+	probability *= probCo;
+}
+
+
+
 
 /**
  * Performs final cleanup at the end of a time step. Clips robot position
