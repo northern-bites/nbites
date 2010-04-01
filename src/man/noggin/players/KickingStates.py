@@ -82,9 +82,10 @@ def clearBall(player):
 
     # Things to do if we saw our own goal
     # Saw the opponent goal
+    my = player.brain.my
 
-    if abs(player.brain.my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
-            (helpers.inTopOfField(player) or helpers.inBottomOfField(player) ):
+    if abs(my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
+            (my.inTopOfField() or my.inBottomOfField() ):
         return player.goLater('orbitBeforeKick')
 
     if oppLeftPostBearing is not None and \
@@ -128,7 +129,7 @@ def clearBall(player):
         # use localization for kick
         my = player.brain.my
 
-        if helpers.inCenterOfField(player):
+        if my.inCenterOfField():
             if abs(my.h) <= constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter1")
                 player.bigKick = True
@@ -140,7 +141,7 @@ def clearBall(player):
                 if constants.DEBUG_KICKS: print ("\t\tcenter3")
                 return player.goLater('kickBallRight')
 
-        elif helpers.inTopOfField(player):
+        elif my.inTopOfField():
             if constants.FACING_SIDELINE_ANGLE < my.h:
                 if constants.DEBUG_KICKS: print ("\t\ttop1")
                 return player.goLater('kickBallRight')
@@ -152,7 +153,7 @@ def clearBall(player):
                 player.bigKick = True
                 return player.goLater('kickBallStraight')
 
-        elif helpers.inBottomOfField(player):
+        elif my.inBottomOfField():
             if -constants.FACING_SIDELINE_ANGLE > my.h:
                 if constants.DEBUG_KICKS: print ("\t\tbottom1")
                 return player.goLater('kickBallLeft')
@@ -268,7 +269,7 @@ def shootBall(player):
     elif myLeftPostBearing is not None and myRightPostBearing is not None:
 
         avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-        if helpers.inCenterOfField(player):
+        if my.inCenterOfField():
             if constants.DEBUG_KICKS: print ("\t\tcenterfieldkick")
             if avgMyGoalBearing > 0:
                 return player.goLater('kickBallRight')
@@ -282,7 +283,7 @@ def shootBall(player):
                 return player.goLater('kickBallLeft')
             else :
                 return player.goLater('kickBallStraight')
-        elif helpers.inBottomOfField(player):
+        elif my.inBottomOfField():
             if constants.DEBUG_KICKS: print ("\t\tbottomfieldkick")
             if -90 < avgMyGoalBearing < 30:
                 return player.goLater('kickBallRight')

@@ -2,6 +2,8 @@ from math import (degrees,
                   hypot)
 
 from ..util import MyMath
+from .. import NogginConstants
+from . import LocationConstants as constants
 
 class Location (object):
 
@@ -46,6 +48,28 @@ class Location (object):
         ##                                                  other.x, self.x)
         return MyMath.sub180Angle(degrees(MyMath.safe_atan2(other.y - self.y,
                                                             other.x - self.x)))
+    def inOppGoalBox(self):
+
+        return NogginConstants.OPP_GOALBOX_LEFT_X < self.x < \
+               NogginConstants.OPP_GOALBOX_RIGHT_X and \
+               NogginConstants.OPP_GOALBOX_TOP_Y > self.y > \
+               NogginConstants.OPP_GOALBOX_BOTTOM_Y
+
+    def inMyGoalBox(self):
+
+        return self.x < NogginConstants.MY_GOALBOX_RIGHT_X and \
+               NogginConstants.MY_GOALBOX_TOP_Y > self.y > \
+               NogginConstants.MY_GOALBOX_BOTTOM_Y
+
+    def inCenterOfField(self):
+        return NogginConstants.FIELD_HEIGHT *2/3 > self.y > \
+               NogginConstants.FIELD_HEIGHT / 3
+
+    def inTopOfField(self):
+        return NogginConstants.FIELD_HEIGHT*2/3 < self.y
+
+    def inBottomOfField(self):
+        return NogginConstants.FIELD_HEIGHT/3 > self.y
 
     def visible():
         pass
@@ -137,4 +161,13 @@ class RobotLocation(Location):
             else:
                 spinDir = RIGHT_SPIN
         return spinDir
+
+    def isFacingSideline(self):
+
+        return (self.inTopOfField() and
+                constants.FACING_SIDELINE_ANGLE > self.h >
+                180.0 - constants.FACING_SIDELINE_ANGLE ) or \
+                (self.inBottomOfField() and
+                 -constants.FACING_SIDELINE_ANGLE > self.h >
+                 -(180 - constants.FACING_SIDELINE_ANGLE) )
 
