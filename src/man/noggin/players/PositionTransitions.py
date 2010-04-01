@@ -40,11 +40,11 @@ def shouldAvoidObstacle(player):
         (player.brain.nav.currentState == 'omniWalkToPoint' or
          player.brain.nav.currentState == 'walkStraightToPoint')
 
-def shouldReposition(player, dest, position):
+def shouldReposition(player, dest, my):
     """
     are we enough out of position we should move?
     """
-    return (abs(dest.x - position.x) > constants.GOTO_DEST_EPSILON or
-            abs(dest.y - position.y) > constants.GOTO_DEST_EPSILON or
+    return (abs(dest.x - my.x) > constants.GOTO_DEST_EPSILON or
+            abs(dest.y - my.y) > constants.GOTO_DEST_EPSILON or
             not player.atDestinationCloser() or
             not player.atHeading())

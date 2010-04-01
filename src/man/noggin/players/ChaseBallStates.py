@@ -78,7 +78,7 @@ def approachBall(player):
         player.brain.tracker.trackBall()
 
     if player.penaltyKicking and \
-            player.ballInOppGoalBox():
+            player.brain.ball.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
 
     # Switch to other states if we should
@@ -322,7 +322,7 @@ def ballInMyBox(player):
                         MyMath.sign(ball.bearing) )
     elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
         player.stopWalking()
-    if not player.ballInMyGoalBox():
+    if not player.ball.inMyGoalBox():
         return player.goLater('chase')
     return player.stay()
 # TODO

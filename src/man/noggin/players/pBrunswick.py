@@ -146,16 +146,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         else :
             return ChaseConstants.TURN_LEFT
 
-
-    def inOppCorner(self):
-        my = self.brain.my
-        return my.x > KickingConstants.OPP_CORNER_LEFT_X and \
-            (my.y < KickingConstants.BOTTOM_OPP_CORNER_SLOPE * \
-                 (my.x - KickingConstants.OPP_CORNER_LEFT_X) or
-             my.y > KickingConstants.TOP_OPP_CORNER_SLOPE * \
-                 (my.x - KickingConstants.OPP_CORNER_LEFT_X) + \
-                 KickingConstants.TOP_OPP_CORNER_Y )
-
     def inFrontOfBall(self):
         ball = self.brain.ball
         my = self.brain.my
@@ -211,20 +201,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
                         NogginConstants.OPP_GOAL_MIDPOINT[1] )
-
-    def ballInOppGoalBox(self):
-        ball = self.brain.ball
-        return NogginConstants.OPP_GOALBOX_LEFT_X < ball.x < \
-            NogginConstants.OPP_GOALBOX_RIGHT_X and \
-            NogginConstants.OPP_GOALBOX_TOP_Y > ball.y > \
-            NogginConstants.OPP_GOALBOX_BOTTOM_Y
-
-    def ballInMyGoalBox(self):
-        ball = self.brain.ball
-        return NogginConstants.MY_GOALBOX_LEFT_X < ball.x < \
-            NogginConstants.MY_GOALBOX_RIGHT_X and \
-            NogginConstants.MY_GOALBOX_TOP_Y > ball.y > \
-            NogginConstants.MY_GOALBOX_BOTTOM_Y
 
     def lookPostKick(self):
         tracker = self.brain.tracker
