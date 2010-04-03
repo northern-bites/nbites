@@ -4,6 +4,8 @@ import TOOL.TOOL;
 import TOOL.TOOLException;
 import TOOL.Net.RobotViewModule;
 import java.util.Vector;
+import java.net.*;
+
 /**
  * Handles streaming landmark observation data from the robot.
  *
@@ -48,8 +50,13 @@ public class TCPStreamHandler extends Thread {
 
 				PlayerInfo info = robotModule.getSelectedRobot().retrieveGCInfo();
 
+				if (info == null){
+					setReceiving(false);
+					continue;
+				}
+
 				if (robot.getTeam() != info.team || robot.getNumber() != info.player ||
-					robot.getColor() != info.color) {
+					robot.getColor() != info.color || robot == null) {
 					robot = new Robot(info.team, info.player, info.color);
 				}
 
@@ -59,12 +66,13 @@ public class TCPStreamHandler extends Thread {
 				locInfo =
 					robotModule.getSelectedRobot().retrieveLocalization();
 
-				robot.updateData(locInfo.get(0), locInfo.get(1));
-				painter.updateRobot(robot);
+				if (locInfo != null && observedLandmarks != null){
+					robot.updateData(locInfo.get(0), locInfo.get(1));
+					painter.updateRobot(robot);
 
-				displayObservations();
-				displayLocalization();
-
+					displayObservations();
+					displayLocalization();
+				}
 				timeSpent = System.currentTimeMillis() - startTime;
 				if (timeSpent < 80){
 					Thread.sleep((int)(80 - timeSpent));
