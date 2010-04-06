@@ -59,7 +59,8 @@ void iterateNavPath(fstream * obsFile, NavPath * letsGo)
  * @param outputFile The file to have everything printed to
  * @param letsGo The robot path from which to localize
  */
-void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
+void iterateFakerPath(fstream * mclFile, fstream * ekfFile,
+					  fstream * ekfDiffFile, NavPath * letsGo,
                       float noiseLevel)
 {
     // Method variables
@@ -81,9 +82,10 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
     // Print out starting configuration
     // printOutMCLLogLine(mclFile, mclLoc, Z_t, noMove, &currentPose,
     //                  &currentBall, MCLballEKF);
-    printOutLogLine(ekfFile, ekfLoc, Z_t, noMove, &currentPose,
-                    &currentBall, EKFballEKF,
+    printOutLogLine(ekfFile, ekfLoc, Z_t, noMove, currentPose,
+                    currentBall, EKFballEKF,
                     *visBall, TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+	printOutPoseDiffs(ekfDiffFile, ekfLoc, currentPose);
 
     unsigned frameCounter = 0;
     // Iterate through the moves
@@ -128,8 +130,9 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile, NavPath * letsGo,
             //                  &currentPose, &currentBall, MCLballEKF);
             // Print the current EKF frame to file
             printOutLogLine(ekfFile, ekfLoc, Z_t, letsGo->myMoves[i].move,
-                            &currentPose, &currentBall, EKFballEKF,
+                            currentPose, currentBall, EKFballEKF,
                             *visBall, TEAM_COLOR, PLAYER_NUMBER, BALL_ID);
+			printOutPoseDiffs(ekfDiffFile, ekfLoc, currentPose);
         }
     }
 
@@ -251,7 +254,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw,
 	checkObjects(Z_t, myPos, noiseLevel);
 	checkCrosses(Z_t, myPos, noiseLevel);
 	checkCorners(Z_t, myPos, noiseLevel);
-	//checkLines(Z_t, myPos);
+	checkLines(Z_t, myPos);
 
     return Z_t;
 }

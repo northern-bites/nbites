@@ -68,16 +68,29 @@ void printOutObsLine(std::fstream* outputFile,
                      PoseEst *currentPose, BallPose * currentBall,
                      VisualBall _b, int ball_id);
 void printOutMCLLogLine(std::fstream* outputFile, boost::shared_ptr<MCL> myLoc,
-                        std::vector<Observation> sightings, MotionModel lastOdo,
-                        PoseEst * currentPose, BallPose * currentBall,
-                        boost::shared_ptr<BallEKF> ballEKF, VisualBall _b,
+                        const std::vector<Observation>& sightings,
+						const MotionModel& lastOdo,
+                        const PoseEst& currentPose,
+						const BallPose& currentBall,
+                        boost::shared_ptr<BallEKF> ballEKF,
+						const VisualBall& _b,
                         int team_color, int player_number, int ball_id);
 void printOutLogLine(std::fstream* outputFile,
                      boost::shared_ptr<LocSystem> myLoc,
-                     std::vector<Observation> sightings, MotionModel lastOdo,
-                     PoseEst *currentPose, BallPose * currentBall,
-                     boost::shared_ptr<BallEKF> ballEKF, VisualBall _b,
+                     const std::vector<Observation>& sightings,
+					 const MotionModel& lastOdo,
+                     const PoseEst& currentPose,
+					 const  BallPose& currentBall,
+                     boost::shared_ptr<BallEKF> ballEKF,
+					 const VisualBall& _b,
                      int team_color, int player_number, int ball_id);
+
+void printOutPoseDiffHeader(std::fstream* outputFile);
+
+void printOutPoseDiffs(std::fstream* outputFile,
+					   boost::shared_ptr<LocSystem> myLoc,
+					   const PoseEst& currentPose);
+
 void printCoreLogLine(std::fstream* outputFile,
                       boost::shared_ptr<LocSystem> myLoc,
                       std::vector<Observation> sightings, MotionModel lastOdo,

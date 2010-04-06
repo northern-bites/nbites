@@ -291,9 +291,10 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
  * @param lastOdo Odometery since previous frame
  */
 void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
-                        vector<Observation> sightings, MotionModel lastOdo,
-                        PoseEst *currentPose, BallPose * currentBall,
-                        shared_ptr<BallEKF> ballEKF, VisualBall _b,
+                        const vector<Observation>& sightings,
+						const MotionModel& lastOdo,
+                        const PoseEst& currentPose, const BallPose& currentBall,
+                        shared_ptr<BallEKF> ballEKF, const VisualBall& _b,
                         int team_color, int player_number, int ball_id)
 {
     // Output particle infos
@@ -320,9 +321,10 @@ void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
  * @param lastOdo Odometery since previous frame
  */
 void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
-                     vector<Observation> sightings, MotionModel lastOdo,
-                     PoseEst *currentPose, BallPose * currentBall,
-                     shared_ptr<BallEKF> ballEKF, VisualBall _b,
+                     const vector<Observation>& sightings,
+					 const MotionModel& lastOdo,
+                     const PoseEst &currentPose, const BallPose& currentBall,
+                     shared_ptr<BallEKF> ballEKF, const VisualBall& _b,
                      int team_color, int player_number, int ball_id)
 {
     // Output standard infos
@@ -355,14 +357,14 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
     *outputFile << ":";
 
     // Print the actual robot position
-    *outputFile << currentPose->x << " "
-                << currentPose->y << " "
-                << currentPose->h << " "
+    *outputFile << currentPose.x << " "
+                << currentPose.y << " "
+                << currentPose.h << " "
     // print actual ball position
-                << currentBall->x << " "
-                << currentBall->y << " "
-                << currentBall->velX << " "
-                << currentBall->velY << " ";
+                << currentBall.x << " "
+                << currentBall.y << " "
+                << currentBall.velX << " "
+                << currentBall.velY << " ";
 
     // Divide the sections with a colon
     *outputFile << ":";
@@ -382,6 +384,29 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
 
     // Close the line
     *outputFile << endl;
+}
+
+void printOutPoseDiffHeader(std::fstream* outputFile)
+{
+	*outputFile << "x y h " << endl;
+}
+
+/**
+ * Print out the differences between real pose and the
+ * loc estimated pose.
+ *
+ */
+void printOutPoseDiffs(std::fstream* outputFile,
+					   boost::shared_ptr<LocSystem> myLoc,
+					   const PoseEst& currentPose)
+{
+
+	*outputFile << setprecision(6)
+		// Print in following order:
+				<< currentPose.x - myLoc->getXEst() << " "
+				<< currentPose.y - myLoc->getYEst() << " "
+				<< currentPose.h - myLoc->getHEst() << " "
+				<< endl;
 }
 
 /**
@@ -485,7 +510,7 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                     initBallVelXUncert, initBallVelYUncert));
 
     printOutLogLine(outputFile,locEKF, sightings, lastOdo,
-                    &currentPose, &currentBall, ballEKF, *_b,
+                    currentPose, currentBall, ballEKF, *_b,
                     teamColor, playerNumber, BALL_ID);
 
     float ballDist, ballBearing;
@@ -537,7 +562,7 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
 
         // Write out the next observation line
         printOutLogLine(outputFile, locEKF, sightings, lastOdo,
-                        &currentPose, &currentBall, ballEKF, *_b,
+                        currentPose, currentBall, ballEKF, *_b,
                         teamColor, playerNumber, BALL_ID);
     }
 }
