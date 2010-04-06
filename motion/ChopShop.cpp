@@ -27,9 +27,8 @@ using namespace boost;
 
 using namespace Kinematics;
 
-ChopShop::ChopShop (shared_ptr<Sensors> s, float motionFrameLength)
-	: sensors(s),
-	  FRAME_LENGTH_S(motionFrameLength)
+ChopShop::ChopShop (shared_ptr<Sensors> s)
+	: sensors(s)
 {
 
 }
@@ -43,8 +42,8 @@ shared_ptr<ChoppedCommand>
 ChopShop::chopCommand(const JointCommand *command) {
 	shared_ptr<ChoppedCommand> chopped;
 	int numChops = 1;
-	if (command->getDuration() > FRAME_LENGTH_S) {
-		numChops = static_cast<int>(command->getDuration() / FRAME_LENGTH_S);
+	if (command->getDuration() > MOTION_FRAME_LENGTH_S) {
+		numChops = static_cast<int>(command->getDuration() / MOTION_FRAME_LENGTH_S);
 	}
 
 	vector<float> currentJoints = getCurrentJoints();

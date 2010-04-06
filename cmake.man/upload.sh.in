@@ -28,7 +28,7 @@ else
     LOCAL_DEST=/usr/local/nao-1.6/modules
 fi
 
-COLOR_TABLE_PATH=tables/lab120/jack800.mtb
+COLOR_TABLE_PATH=tables/lab120/newball.mtb
 COLOR_TABLE_DIR=install/etc
 TABLE_STD_NAME=table.mtb
 

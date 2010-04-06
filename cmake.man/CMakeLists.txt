@@ -89,7 +89,7 @@ IF ( OE_CROSS_BUILD )
   FIND_PACKAGE( BOOST_PYTHON REQUIRED )
   FIND_PACKAGE( BOOST_SIGNALS REQUIRED )
 ELSE ( OE_CROSS_BUILD )
-  find_package( Boost 1.38 COMPONENTS python signals)
+  find_package( Boost 1.35 COMPONENTS python signals)
 ENDIF ( OE_CROSS_BUILD )
 
 

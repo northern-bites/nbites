@@ -37,8 +37,7 @@
 
 class ScriptedProvider : public MotionProvider {
 public:
-    ScriptedProvider(float motionFrameLength,
-					 boost::shared_ptr<Sensors> s,
+    ScriptedProvider(boost::shared_ptr<Sensors> s,
 					 boost::shared_ptr<Profiler> p);
     virtual ~ScriptedProvider();
 
@@ -52,7 +51,6 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-	float FRAME_LENGTH_S;
 	ChopShop chopper;
 	std::vector<std::vector<float> > nextJoints;
 

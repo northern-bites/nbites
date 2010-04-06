@@ -23,9 +23,10 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
 									 shared_ptr<Profiler> p)
     : sensors(s),
 	  profiler(p),
-      walkProvider(sensors,p),
-	  scriptedProvider(1/50.0f,sensors,p), // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
-	  headProvider(1/50.0f,sensors,p),
+      walkProvider(sensors, p),
+      // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
+	  scriptedProvider(sensors, p),
+	  headProvider(sensors, p),
       nullHeadProvider(sensors, p),
       nullBodyProvider(sensors, p),
 	  curProvider(&nullBodyProvider),

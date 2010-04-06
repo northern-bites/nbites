@@ -12,6 +12,7 @@
 #include "NaoDef.h"
 #include <string>
 #include "Transcriber.h"
+#include "Common.h"
 
 class NaoEnactor : public MotionEnactor {
 
@@ -22,12 +23,6 @@ public:
     virtual ~NaoEnactor() { };
     void sendCommands();
     void postSensors();
-
-private: // Constants
-
-    static const int MOTION_FRAME_RATE;
-    static const float MOTION_FRAME_LENGTH_uS; // in microseconds
-    static const float MOTION_FRAME_LENGTH_S; // in seconds
 
 private: // Members
     AL::ALPtr<AL::ALBroker> broker;
