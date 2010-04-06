@@ -4,6 +4,7 @@ import TOOL.TOOL;
 import TOOL.TOOLException;
 import TOOL.Net.RobotViewModule;
 import java.util.Vector;
+import java.util.LinkedList;
 import java.net.*;
 
 /**
@@ -19,6 +20,7 @@ public class TCPStreamHandler extends Thread {
 	private WorldControllerPainter painter;
 	private Vector<Observation> observedLandmarks;
 	private Vector<LocalizationPacket> locInfo;
+	private Vector<LocalizationPacket> MMLocEKFInfo;
 	private Robot robot;
 	private int ambiguousLandmarkCount;
 
@@ -38,7 +40,7 @@ public class TCPStreamHandler extends Thread {
 		float startTime = 0.0f;
 		float timeSpent = 0.0f;
 
-		robot = new Robot(0,0,0);
+		robot = new Robot(0,0,0, false);
 
 		try {
 			while (true) {
@@ -55,24 +57,48 @@ public class TCPStreamHandler extends Thread {
 					continue;
 				}
 
-				if (robot.getTeam() != info.team || robot.getNumber() != info.player ||
-					robot.getColor() != info.color || robot == null) {
-					robot = new Robot(info.team, info.player, info.color);
+				if (robot.getTeam()		!= info.team	||
+					robot.getNumber()	!= info.player	||
+					robot.getColor()	!= info.color	||
+					robot				== null) {
+					robot = new Robot(info.team, info.player, info.color, false);
 				}
 
-				observedLandmarks =
-					robotModule.getSelectedRobot().retrieveObjects();
-
+				// Update localization information
 				locInfo =
 					robotModule.getSelectedRobot().retrieveLocalization();
 
-				if (locInfo != null && observedLandmarks != null){
-					robot.updateData(locInfo.get(0), locInfo.get(1));
+				if (locInfo != null){
+					robot.updateData(locInfo.get(0), locInfo.get(1), false);
 					painter.updateRobot(robot);
 
-					displayObservations();
 					displayLocalization();
 				}
+
+				// Update observations
+				observedLandmarks =
+					robotModule.getSelectedRobot().retrieveObjects();
+
+				if (observedLandmarks != null){
+					displayObservations();
+				}
+
+				// Update multimodal filter models
+				MMLocEKFInfo =
+					robotModule.getSelectedRobot().retrieveMMLocEKF();
+
+				if (MMLocEKFInfo != null && locInfo != null){
+					LinkedList<RobotModel> models =
+						new LinkedList<RobotModel>();
+					for (LocalizationPacket lp : MMLocEKFInfo){
+						RobotModel m = new RobotModel(info.team, info.player,
+													  info.color);
+						m.updateData(lp, locInfo.get(1), true);
+						models.add(m);
+					}
+					painter.updateModels(models);
+				}
+
 				timeSpent = System.currentTimeMillis() - startTime;
 				if (timeSpent < 80){
 					Thread.sleep((int)(80 - timeSpent));
@@ -100,8 +126,12 @@ public class TCPStreamHandler extends Thread {
 	public void displayLocalization()
 	{
 		LocalizationPacket mine = locInfo.get(0);
-		debugViewer.setMyLocEstimate(mine.getXEst(), mine.getYEst(), mine.getHeadingEst(),
-									 mine.getXUncert(), mine.getYUncert(), mine.getHUncert());
+		debugViewer.setMyLocEstimate(mine.getXEst(),
+									 mine.getYEst(),
+									 mine.getHeadingEst(),
+									 mine.getXUncert(),
+									 mine.getYUncert(),
+									 mine.getHUncert());
 
 		LocalizationPacket ball = locInfo.get(1);
 		debugViewer.setBallLocEstimate(ball.getXEst(), ball.getYEst(),

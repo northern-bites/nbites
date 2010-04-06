@@ -32,7 +32,7 @@ public class LogBox extends JFrame implements ActionListener, ChangeListener
     public JButton play_pause, last_frame, next_frame;
     public JButton start_frame, end_frame;
     private JLabel frameLabel1, frameLabel2;
-    public JLabel frameNumber, frameTotal;
+    public JLabel frameNumber, frameTotal, logName;
     public JPanel buttons, labels;
     public JSlider slide;
     public JSlider fps_slide;
@@ -78,6 +78,8 @@ public class LogBox extends JFrame implements ActionListener, ChangeListener
         frameNumber = new JLabel("1", JLabel.CENTER);
         frameTotal = new JLabel("1", JLabel.CENTER);
 
+		logName = new JLabel("Log Viewer");
+
         slide = new JSlider(JSlider.HORIZONTAL, 1, 2, 1);
         slide.addChangeListener(this);
 
@@ -91,6 +93,7 @@ public class LogBox extends JFrame implements ActionListener, ChangeListener
         buttons.add(play_pause);
         buttons.add(next_frame);
         buttons.add(end_frame);
+		labels.add(logName);
         labels.add(frameLabel1);
         labels.add(frameNumber);
         labels.add(frameLabel2);
@@ -144,4 +147,9 @@ public class LogBox extends JFrame implements ActionListener, ChangeListener
             log.setLogMarker(thresh);
         }
     }
+
+	public void setLogName(String newName)
+	{
+		logName.setText(newName);
+	}
 }

@@ -313,6 +313,7 @@ public class LogHandler
                 System.err.println(e3.getMessage());
                 return false;
             }
+			logBox.setLogName(logFile);
             return true;
         }
     }
