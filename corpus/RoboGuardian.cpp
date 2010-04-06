@@ -21,8 +21,8 @@ const int RoboGuardian::NO_CLICKS = -1;
 
 static const string quiet = " -q ";
 static const string sout = "aplay"+quiet;
-static const string sdir = "/opt/naoqi/data/wav/";
-static const string nbsdir = "/opt/naoqi/modules/etc/audio/";
+static const string sdir = "/opt/naoqi/share/naoqi/wav/";
+static const string nbsdir = "/home/nao/naoqi/etc/audio/";
 static const string wav = ".wav";
 static const string shutdown_wav = sdir + "shutdown" + wav;
 static const string heat_wav = sdir + "heat" + wav;

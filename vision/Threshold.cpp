@@ -78,7 +78,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     // loads the color table on the MS into memory
 #if ROBOT(NAO_RL)
 # if ! defined WEBOTS_BACKEND && ! defined OFFLINE
-    initTable("/opt/naoqi/modules/etc/table.mtb");
+    initTable("/home/nao/naoqi/etc/table.mtb");
 # elif defined WEBOTS_BACKEND
     initTable(string(string(getenv("WEBOTS_HOME"))+
                   "/projects/contests/nao_robocup/" +

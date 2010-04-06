@@ -72,7 +72,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
         }
     }
     else
-		std::cout << "\tCamera is inactive!" << std::endl;
+      std::cout << "\tCamera is inactive!" << std::endl;
 #endif
 }
 
@@ -151,7 +151,7 @@ void ALImageTranscriber::stop() {
 
 void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker) {
     try {
-        camera = broker->getProxy("NaoCam");
+        camera = broker->getProxy("ALVideoDevice");
         camera_active =true;
     }catch (ALError &e) {
         log->error("ALImageTranscriber",
@@ -175,7 +175,7 @@ void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker) {
 #endif
 
     try {
-        lem_name = camera->call<std::string>("register", lem_name, format,
+        lem_name = camera->call<std::string>("subscribe", lem_name, format,
                                              colorSpace, fps);
         std::cout << "Registered Camera: " << lem_name << " successfully"<<std::endl;
     } catch (ALError &e) {
