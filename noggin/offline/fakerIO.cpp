@@ -388,7 +388,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
 
 void printOutPoseDiffHeader(std::fstream* outputFile)
 {
-	*outputFile << "x y h " << endl;
+	*outputFile << "x y h 2d 3d" << endl;
 }
 
 /**
@@ -406,6 +406,11 @@ void printOutPoseDiffs(std::fstream* outputFile,
 				<< currentPose.x - myLoc->getXEst() << " "
 				<< currentPose.y - myLoc->getYEst() << " "
 				<< currentPose.h - myLoc->getHEst() << " "
+				<< sqrt(pow(currentPose.x - myLoc->getXEst(),2) +
+						pow(currentPose.y - myLoc->getYEst(),2) +
+						pow(currentPose.h - myLoc->getHEst(),2)) << " "
+				<< sqrt(pow(currentPose.x - myLoc->getXEst(),2) +
+						pow(currentPose.y - myLoc->getYEst(),2))
 				<< endl;
 }
 

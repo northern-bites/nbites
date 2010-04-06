@@ -254,7 +254,7 @@ vector<Observation> determineObservedLandmarks(PoseEst myPos, float neckYaw,
 	checkObjects(Z_t, myPos, noiseLevel);
 	checkCrosses(Z_t, myPos, noiseLevel);
 	checkCorners(Z_t, myPos, noiseLevel);
-	checkLines(Z_t, myPos);
+	//checkLines(Z_t, myPos);
 
     return Z_t;
 }
