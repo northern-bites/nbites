@@ -14,7 +14,7 @@
 class LocSystem
 {
 public:
-	LocSystem() : active(false) {};
+	LocSystem() : active(false), probability(0.0) {};
     virtual ~LocSystem() {};
     // Core Functions
     virtual void updateLocalization(MotionModel u_t,
@@ -37,7 +37,8 @@ public:
     virtual const float getHUncertDeg() const = 0;
     virtual const MotionModel getLastOdo() const = 0;
 	virtual const vector<Observation> getLastObservations() const = 0;
-	virtual const bool isActive() { return active;}
+	virtual const bool isActive() const { return active;}
+	const double getProbability() const { return probability; }
 
     // Setters
     virtual void setXEst(float xEst) = 0;
@@ -48,6 +49,9 @@ public:
     virtual void setHUncert(float uncertH) = 0;
 	virtual void activate() { active = true; }
 	virtual void deactivate() { active = false; }
+	void setProbability(double p) { // cout << "p: " << p << endl;
+		probability = p; }
+
 
     friend std::ostream& operator<< (std::ostream &o,
                                              const LocSystem &c) {
@@ -55,11 +59,16 @@ public:
                  << c.getHEst() << ")\t"
                  << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
                  << ", "
-                 << c.getHUncert() << ")";
+                 << c.getHUncert() << ")\t"
+				 << "Prob: " << c.getProbability();
 
     }
+
 private:
 	bool active;
+
+protected:
+	double probability;
 };
 
 #endif // LocSystem_h_DEFINED

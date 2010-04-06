@@ -1,4 +1,3 @@
-
 #ifndef TOOLConnect_H
 #define TOOLConnect_H
 
@@ -14,6 +13,7 @@ class TOOLConnect; // forward reference
 #include "CommDef.h"
 #include "DataSerializer.h"
 #include "LocSystem.h"
+#include "MMLocEKF.h"
 #include "BallEKF.h"
 #include "GameController.h"
 
@@ -21,7 +21,7 @@ class TOOLConnect; // forward reference
 // DataRequest struct definition
 //
 
-#define SIZEOF_REQUEST 10
+#define SIZEOF_REQUEST 11
 
 struct DataRequest {
     bool info;
@@ -34,6 +34,7 @@ struct DataRequest {
     bool motion;
     bool local;
     bool comm;
+    bool mmekf;
 };
 
 static void
@@ -49,6 +50,7 @@ setRequest (DataRequest &r, byte buf[SIZEOF_REQUEST])
     r.motion  = buf[7];
     r.local   = buf[8];
     r.comm    = buf[9];
+    r.mmekf    = buf[10];
 }
 
 //
@@ -70,7 +72,7 @@ public:
     std::string getRobotName();
     int getState() { return state; }
 
-    void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
+    void setLocalizationAccess(boost::shared_ptr<MMLocEKF> _loc,
                                boost::shared_ptr<BallEKF> _ballEKF);
 
 private:
@@ -88,7 +90,7 @@ private:
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     boost::shared_ptr<Vision> vision; // access to vision processing
     boost::shared_ptr<GameController> gameController; // access to GameController
-    boost::shared_ptr<LocSystem> loc; // access to localization data
+    boost::shared_ptr<MMLocEKF> loc; // access to localization data
     boost::shared_ptr<BallEKF> ballEKF; // access to localization data
 };
 

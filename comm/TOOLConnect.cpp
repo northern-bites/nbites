@@ -1,5 +1,3 @@
-
-
 #include "Common.h"
 
 #include <sys/utsname.h> // uname()
@@ -12,6 +10,7 @@ using namespace boost::assign;
 #include "CommDef.h"
 #include "Kinematics.h"
 #include "SensorDef.h"
+#include "MMLocEKF.h"
 
 using std::vector;
 using namespace boost;
@@ -41,7 +40,7 @@ TOOLConnect::~TOOLConnect ()
 {
 }
 
-void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
+void TOOLConnect::setLocalizationAccess (shared_ptr<MMLocEKF> _loc,
                                          shared_ptr<BallEKF> _ballEKF)
 {
   loc = _loc;
@@ -241,6 +240,23 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 		serial.write_ints(gc_values);
 	}
 
+	if (r.mmekf){
+		const list<LocEKF*> models = loc->getModels();
+		list<LocEKF*>::const_iterator model;
+		vector<float> mm_values;
+
+		for(model = models.begin(); model != models.end() ; ++model){
+			if (!(*model)->isActive())
+				continue;
+			mm_values += (*model)->getXEst(),
+				(*model)->getYEst(),
+				(*model)->getHEst(),
+				(*model)->getXUncert(),
+				(*model)->getYUncert(),
+				(*model)->getHUncert();
+		}
+		serial.write_floats(mm_values);
+	}
 }
 
 void
@@ -263,4 +279,3 @@ TOOLConnect::handle_command (int cmd) throw(socket_error&)
         fprintf(stderr, "Unimplemented command type");
     }
 }
-

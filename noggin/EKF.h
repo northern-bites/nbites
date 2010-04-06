@@ -143,8 +143,8 @@ public:
 
     virtual ~EKF() {}
 
-	StateVector getState() { return xhat_k; }
-	StateMatrix getStateUncertainty() { return P_k; }
+	StateVector getState() const { return xhat_k; }
+	StateMatrix getStateUncertainty() const { return P_k; }
 
     // Core functions
     virtual void timeUpdate(UpdateModel u_k) {

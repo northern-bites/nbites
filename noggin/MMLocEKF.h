@@ -8,6 +8,7 @@
 
 #include "LocEKF.h"
 #include <boost/shared_ptr.hpp>
+#include <list>
 
 class MMLocEKF : public LocSystem
 {
@@ -32,7 +33,7 @@ private:						// Private methods
 	void applyNoCorrectionStep();
 
 	void splitObservation(const Observation& obs, LocEKF * model);
-	void consolidateModels(){}
+	void consolidateModels();
 
 	void mergeModels();
 
@@ -52,14 +53,23 @@ private:						// Private variables
 	list<LocEKF*> modelList;
 
 	int mostLikelyModel;
+	int numActive;
 
 	inline const int getMostLikelyModel() const;
 	inline LocEKF * getInactiveModel() const;
+	inline void deactivateModel(LocEKF * model);
+	inline void activateModel(LocEKF * model);
 
 	MotionModel lastOdo;
 	vector<Observation> lastObservations;
+	double mergeThreshold;
 
 	const static double PROB_SUM = 1.0;
+	const static double MERGE_THRESH_INIT = 0.3f;
+	const static int MAX_ACTIVE_MODELS = 6;
+	const static double OUTLIER_PROB_LIMIT = 0.01;
+
+	int frameNum;
 
 public:
 	// LocSystem virtual getters
@@ -77,6 +87,8 @@ public:
     virtual const MotionModel getLastOdo() const {
         return lastOdo;
     }
+
+	const list<LocEKF*>  getModels() const;
 
 	virtual const vector<Observation> getLastObservations() const {
 		return lastObservations;

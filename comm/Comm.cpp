@@ -1,4 +1,3 @@
-
 #include <errno.h>       // errno
 #include <string.h>      // strerror(), memcpy()
 
@@ -212,7 +211,7 @@ static PyObject * PyComm_stopTOOL (PyObject *self, PyObject *)
     return Py_None;
 }
 
-void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
+void Comm::setLocalizationAccess(shared_ptr<MMLocEKF> _loc,
                                  shared_ptr<BallEKF> _ballEKF)
 {
     tool.setLocalizationAccess(_loc, _ballEKF);

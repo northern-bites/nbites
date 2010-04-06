@@ -78,9 +78,8 @@ public:
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
-    const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects() const {
-        return possibleFieldObjects;
-    }
+    const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects()
+		const { return possibleFieldObjects; }
 
 	virtual const bool hasPositiveID();
 

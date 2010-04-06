@@ -61,7 +61,8 @@ LocEKF::LocEKF(float initX, float initY, float initH,
     : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
           LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), LocSystem(),
 	  lastOdo(0,0,0),
-	  lastObservations(0), useAmbiguous(true), probability(0.0)
+	  lastObservations(0), useAmbiguous(true),
+	  R_pred_k(measurementSize, measurementSize, 0.0f)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -100,24 +101,58 @@ void LocEKF::copyEKF(const LocEKF& other)
 		P_k_bar    = other.P_k_bar;
 		betas      = other.betas;
 		gammas     = other.gammas;
+		setProbability(other.getProbability());
 	}
-	setProbability(other.getProbability());
+
 }
 
 void LocEKF::mergeEKF(const LocEKF& other)
 {
 	double newProbability = (probability + other.getProbability());
+	// cout << "mine: " << probability << " other: " << other.getProbability() <<endl;
+	if (newProbability < 0.00001)
+		newProbability = 1e-8;
 
 	// @todo check for "drift" chances, that is, one small prob and one large prob.
 	// see page 6 of Quinlan pdf
-	setXEst( (1/newProbability)*(probability*getXEst() +
-								 other.getProbability() * other.getXEst()) );
-	setYEst( (1/newProbability)*(probability*getYEst() +
-								 other.getProbability() * other.getYEst()) );
-	setHEst( (1/newProbability)*(probability*getHEst() +
-								 other.getProbability() * other.getHEst()) );
+	StateVector new_xhat_k(LOC_EKF_DIMENSION);
+	if ( other.getProbability() > probability * 10 ){
+		new_xhat_k = other.getState();
+	} else if ( probability <= other.getProbability() * 10 ){
+
+		new_xhat_k(0) = ( (1/newProbability)*
+						  (probability*getXEst() +
+						   other.getProbability() * other.getXEst()) );
+		new_xhat_k(1) = ( (1/newProbability)*
+						  (probability*getYEst() +
+						   other.getProbability() * other.getYEst()) );
+		new_xhat_k(2) = ( (1/newProbability)*
+						  (probability*getHEst() +
+						   other.getProbability() * other.getHEst()) );
+		// cout << "newxhatk " << new_xhat_k << "\t" ;
+		// cout << "newprob " << newProbability << endl;
+	} else {
+		new_xhat_k = xhat_k;
+	}
+
 
 	// @todo set covariance matrix of new model
+	const StateVector diffA = (xhat_k - new_xhat_k);
+	const StateMatrix a = P_k + outer_prod(diffA,
+										   trans(diffA));
+
+	const StateVector diffB = (other.getState() - new_xhat_k);
+	const StateMatrix b = (other.getStateUncertainty() +
+								 outer_prod(diffB, trans(diffB)));
+
+	const StateMatrix new_P_k = ( ((probability * a) +
+										 (other.getProbability() * b)) /
+										newProbability);
+	// cout << "\txhat: " << new_xhat_k << endl;
+	//cout << "\t\tP_k: " << new_P_k << endl;
+	setProbability(newProbability);
+	xhat_k = new_xhat_k;
+	//P_k = new_P_k;
 }
 
 
@@ -237,8 +272,10 @@ void LocEKF::updateProbability(const Observation& Z)
 		return;
 
 	// R_k is covariance matrix of measurement
-	// @hack we just multiply covariance by two
-	const MeasurementMatrix measurementVar = R_k;
+
+    // @todo must fix this to sum observation covariance with prediction covariance for
+	// a real measurement and a decent weight
+	const MeasurementMatrix measurementVar = R_k + R_pred_k;
 
 	MeasurementMatrix measurementVarInv = measurementVar;
 	const double denom = (-measurementVar(0,1) * measurementVar(1,0) +
@@ -255,7 +292,7 @@ void LocEKF::updateProbability(const Observation& Z)
 	measurementVarInv(1,1) = measurementVar(0,0)/denom;
 
 	// We need the measurement innovation or invariance, aka v_k
-	const double exponent = -0.5 * inner_prod(v_k, prod(measurementVarInv, v_k));
+	const double exponent = -0.5 * inner_prod(trans(v_k), prod(measurementVarInv, v_k));
 
 	double detMeasVar = (-measurementVar(0,1) * measurementVar(1,0) +
 						 measurementVar(0,0) * measurementVar(1,1));
@@ -266,6 +303,8 @@ void LocEKF::updateProbability(const Observation& Z)
 
 	const double outlierProb = 0.08;
 	const double probCo = (1-outlierProb)*(coefficient*pow(M_E, exponent)) + outlierProb;
+
+	// cout << "probCo= " << probCo << "\tprob:" << probability << endl;
 
 	probability *= probCo;
 }
@@ -425,12 +464,23 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
 
 	// Update the measurement covariance matrix
 	const float dist_sd_2 = pow(z.getDistanceSD(), 2);
-	const float v = dist_sd_2 * sin(z.getBearingSD()) * cos(z.getBearingSD());
+	const float v = dist_sd_2 * sin(z.getVisBearing()) * cos(z.getVisBearing());
 
-	R_k(0,0) = dist_sd_2 * pow(cos(z.getBearingSD()), 2);
+	R_k(0,0) = dist_sd_2 * pow(cos(z.getVisBearing()), 2);
 	R_k(0,1) = v;
 	R_k(1,0) = v;
-	R_k(1,1) = dist_sd_2 * pow(sin(z.getBearingSD()), 2);
+	R_k(1,1) = dist_sd_2 * pow(sin(z.getVisBearing()), 2);
+
+	const double uncertX = getXUncert();
+	const double uncertY = getYUncert();
+	const double uncertH = getHUncert();
+
+	R_pred_k(0,0) = uncertX * cosh + uncertY * sinh;
+	R_pred_k(0,1) = 0;
+	R_pred_k(1,0) = 0;
+	R_pred_k(1,1) = - uncertX * sinh + uncertY * cosh;
+
+
 
 #ifdef DEBUG_LOC_EKF_INPUTS
 	cout << "\t\t\tR vector is" << R_k << endl;
@@ -474,7 +524,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		const float y_r = xhat_k_bar(1);
 		const float h_r = xhat_k_bar(2);
 
-		pair<float, float> closestLandmarkXY =
+		const pair<float, float> closestLandmarkXY =
 			findClosestLinePointCartesian(l, x_r, y_r, h_r);
 
 		// Relativize the closest point
@@ -503,11 +553,24 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		d_x(1) = safe_atan2(relY_p, relX_p) - h_r;
 		d_x(1) = subPIAngle(d_x(1));
 
+		// Set the uncertainty of the prediction
+		// @todo double check this. Almost certainly not right... @jgm
+		const double uncertX = getXUncert();
+		const double uncertY = getYUncert();
+		const double uncertH = getHUncert();
+
+		R_pred_k(0,0) = static_cast<float>(hypot(uncertX, uncertY));
+		R_pred_k(0,1) = 0;
+		R_pred_k(1,0) = 0;
+		R_pred_k(1,1) = uncertH;
+
 		// Calculate invariance
-        V_k = z_x - d_x;
+        V_k	   = z_x - d_x;
         V_k(1) = NBMath::subPIAngle(V_k(1));
 
         R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
+		R_k(0,1) = 0;
+		R_k(1,0) = 0;
         R_k(1,1) = z.getBearingSD() * z.getBearingSD();
 
 	} else{
@@ -531,7 +594,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		d_x(1) = NBMath::subPIAngle(d_x(1));
 
         // Calculate invariance
-        V_k = z_x - d_x;
+        V_k	   = z_x - d_x;
         V_k(1) = NBMath::subPIAngle(V_k(1));
 
         // Calculate jacobians
@@ -546,6 +609,15 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
         // Update the measurement covariance matrix
         R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
         R_k(1,1) = z.getBearingSD() * z.getBearingSD();
+
+		const double uncertX = getXUncert();
+		const double uncertY = getYUncert();
+		const double uncertH = getHUncert();
+
+		R_pred_k(0,0) = static_cast<float>(hypot(uncertX, uncertY));
+		R_pred_k(0,1) = 0;
+		R_pred_k(1,0) = 0;
+		R_pred_k(1,1) = uncertH;
 
 #ifdef DEBUG_LOC_EKF_INPUTS
         cout << "\t\t\tR vector is" << R_k << endl;
@@ -616,7 +688,7 @@ float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
 	z_x(0) = x_r + z->getVisDistance() * cos(z->getVisBearing() + h_r);
 	z_x(1) = y_r + z->getVisDistance() * sin(z->getVisBearing() + h_r);
 
-	pair<float, float> line_xy =
+	const pair<float, float> line_xy =
 		findClosestLinePointCartesian(l, x_r, y_r, h_r);
 
 	MeasurementVector u(2);

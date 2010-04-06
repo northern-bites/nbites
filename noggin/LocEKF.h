@@ -49,8 +49,6 @@ public:
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
 
-	const double getProbability() const { return probability; }
-
     // Getters
     /**
      * @return The current estimate of the loc x position
@@ -152,8 +150,6 @@ public:
      */
     void setUseAmbiguous(bool _use) { useAmbiguous = _use; }
 
-	void setProbability(double p) { probability = p; }
-
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
@@ -194,7 +190,7 @@ private:
     MotionModel lastOdo;
 	vector<Observation> lastObservations;
     bool useAmbiguous;
-	double probability;
+	MeasurementMatrix R_pred_k;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;
