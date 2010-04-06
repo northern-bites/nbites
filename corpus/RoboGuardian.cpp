@@ -12,7 +12,7 @@ using namespace std;
 
 //#define DEBUG_GUARDIAN_CLICKS
 
-const int RoboGuardian::GUARDIAN_FRAME_RATE = 50;
+const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
 const float RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
     RoboGuardian::GUARDIAN_FRAME_RATE;
