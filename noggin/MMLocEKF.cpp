@@ -143,8 +143,8 @@ void MMLocEKF::splitObservation(const Observation& obs, LocEKF * model)
 			activateModel(inactiveModel);
 			splitModels.push_back(inactiveModel);
 		}
-
 	}
+
 	normalizeProbabilities(splitModels, originalProb);
 	// If every possibility is an outlier and the original model was the only
 	// model to start with, than we need to keep this model active.
@@ -206,18 +206,16 @@ void MMLocEKF::consolidateModels()
 	mergeThreshold = MERGE_THRESH_INIT;
 	int numMerges = 0;
 	const int MAX_MERGES = 4;
-	mergeModels();
 
 	bool shouldMergeAgain = true;
 	while (shouldMergeAgain && numMerges < MAX_MERGES){
 		mergeModels();
-		mergeThreshold *= 2;
+		mergeThreshold += MERGE_THRESH_STEP;
 		numMerges++;
 
 		shouldMergeAgain = (numActive > MAX_ACTIVE_MODELS );
 	}
 }
-
 
 void MMLocEKF::mergeModels()
 {

@@ -11,6 +11,8 @@ using namespace boost;
 /**
  * Method to read in a robot path from a formatted file
  *
+ * Reads in path defined by robot velocities.
+ *
  * @param inputFile The opened file containing the path information
  * @param letsGo Where the robot path is to be stored
  */
@@ -256,30 +258,31 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
     // Print the actual robot position
     *outputFile << setprecision(6) << currentPose->x << " "
                 << currentPose->y << " "
-                << NBMath::subPIAngle(currentPose->h) << " "
-    // print actual ball position
-                << currentBall->x << " "
-                << currentBall->y << " "
-                << currentBall->velX << " "
-                << currentBall->velY << " ";
-    // Odometery
-    *outputFile << lastOdo.deltaF << " " << lastOdo.deltaL << " "
-                << lastOdo.deltaR << " ";
-    // Output landmark infos
-    for(unsigned int k = 0; k < sightings.size(); ++k) {
-        *outputFile << setprecision(12) << sightings[k].getID() << " "
-                    << sightings[k].getVisDistance() << " "
-                    << sightings[k].getVisBearing() << " ";
-    }
-    // Output ball as landmark
-    if (_b.getDistance() > 0.0) {
-        *outputFile << setprecision(12) << ball_id << " "
-                    << _b.getDistance() << " "
-                    << _b.getBearing() << " ";
-    }
+                << NBMath::subPIAngle(currentPose->h) << " ";
 
-    // Close the line
-    *outputFile << endl;
+    // print actual ball position
+	*outputFile << currentBall->x << " "
+				<< currentBall->y << " "
+				<< currentBall->velX << " "
+				<< currentBall->velY << " ";
+	// Odometery
+	*outputFile << lastOdo.deltaF << " " << lastOdo.deltaL << " "
+				<< lastOdo.deltaR << " ";
+    // Output landmark infos
+	for(unsigned int k = 0; k < sightings.size(); ++k) {
+		*outputFile << setprecision(12) << sightings[k].getID() << " "
+					<< sightings[k].getVisDistance() << " "
+					<< sightings[k].getVisBearing() << " ";
+	}
+	// Output ball as landmark
+	if (_b.getDistance() > 0.0) {
+		*outputFile << setprecision(12) << ball_id << " "
+					<< _b.getDistance() << " "
+					<< _b.getBearing() << " ";
+	}
+
+	// Close the line
+	*outputFile << endl;
 }
 
 /**
@@ -328,28 +331,53 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
                      int team_color, int player_number, int ball_id)
 {
     // Output standard infos
-    *outputFile << setprecision(6) << team_color<< " " << player_number << " "
+    *outputFile << setprecision(6) << team_color<< " " << player_number << "|"
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "
                 << myLoc->getHEst() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
-                << myLoc->getHUncert() << " "
-                // X Estimate
-                << (ballEKF->getXEst()) << " "
-                // Y Estimate
+                << myLoc->getHUncert() << " ";
+
+#define USE_MM_LOC_EKF
+#ifdef USE_MM_LOC_EKF
+	shared_ptr<MMLocEKF> mmloc = boost::dynamic_pointer_cast<MMLocEKF>(myLoc);
+	const list<LocEKF*> models = mmloc->getModels();
+	list<LocEKF*>::const_iterator model;
+
+	*outputFile << ";";
+
+	for(model = models.begin(); model != models.end() ; ++model){
+		if (!(*model)->isActive())
+			continue;
+		*outputFile << (*model)->getXEst() << " " <<
+			(*model)->getYEst() << " " <<
+			(*model)->getHEst() << " " <<
+			(*model)->getXUncert() << " " <<
+			(*model)->getYUncert() << " " <<
+			(*model)->getHUncert()
+					<< ";";	// Split models with ;
+	}
+	// Split models section from ball and obs section
+	*outputFile << "|";
+#endif
+
+
+    // X Estimate
+	 *outputFile << (ballEKF->getXEst()) << " "
+		// Y Estimate
                 << (ballEKF->getYEst()) << " "
-                // X Uncert
+		// X Uncert
                 << (ballEKF->getXUncert()) << " "
-                // Y Uncert
+		// Y Uncert
                 << (ballEKF->getYUncert()) << " "
-                // X Velocity Estimate
+		// X Velocity Estimate
                 << ballEKF->getXVelocityEst() << " "
-                // Y Velocity Estimate
+		// Y Velocity Estimate
                 << ballEKF->getYVelocityEst() << " "
-                // X Velocity Uncert
+		// X Velocity Uncert
                 << ballEKF->getXVelocityUncert() << " "
-                // Y Velocity Uncert
+		// Y Velocity Uncert
                 << ballEKF->getYVelocityUncert() << " "
-                // Odometery
+		// Odometery
                 << lastOdo.deltaF << " " << lastOdo.deltaL << " "
                 << lastOdo.deltaR;
 
@@ -360,7 +388,7 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
     *outputFile << currentPose.x << " "
                 << currentPose.y << " "
                 << currentPose.h << " "
-    // print actual ball position
+		// print actual ball position
                 << currentBall.x << " "
                 << currentBall.y << " "
                 << currentBall.velX << " "

@@ -65,7 +65,8 @@ private:						// Private variables
 	double mergeThreshold;
 
 	const static double PROB_SUM = 1.0;
-	const static double MERGE_THRESH_INIT = 0.3f;
+	const static double MERGE_THRESH_INIT = 0.05f;
+	const static double MERGE_THRESH_STEP = 0.1f;
 	const static int MAX_ACTIVE_MODELS = 6;
 	const static double OUTLIER_PROB_LIMIT = 0.01;
 
