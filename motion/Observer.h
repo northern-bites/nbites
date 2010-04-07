@@ -65,8 +65,8 @@ private:
     NBMath::ufvector3 stateVector;
 
 public: //Constants
-    static const unsigned int NUM_PREVIEW_FRAMES = 35;
-    static const unsigned int NUM_AVAIL_PREVIEW_FRAMES = 60;
+    static const unsigned int NUM_PREVIEW_FRAMES = 70;
+    static const unsigned int NUM_AVAIL_PREVIEW_FRAMES = 120;
 private:
     static const float weights[NUM_AVAIL_PREVIEW_FRAMES];
     static const float A_values[9];
