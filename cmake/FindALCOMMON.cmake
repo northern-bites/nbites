@@ -12,6 +12,20 @@ IF(WEBOTS_BACKEND)
     ${AL_DIR}/modules/proxies
     )
 ELSE(WEBOTS_BACKEND)
+  IF(OE_CROSS_BUILD)
+  SET( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/alcommon/include
+    ${OE_SYSROOT}/usr/include/alcommon/interface
+    ${OE_SYSROOT}/usr/include/alcommon/soap
+    ${OE_SYSROOT}/usr/include/alproxies
+    ${OE_SYSROOT}/usr/include/alcommon
+    ${OE_SYSROOT}/usr/include/alcore
+    ${OE_SYSROOT}/usr/include/libthread
+    ${OE_SYSROOT}/usr/include/alvalue
+    ${OE_SYSROOT}/usr/include/altools
+    ${OE_SYSROOT}/usr/include/alfactory
+    ${OE_SYSROOT}/usr/include
+    )
+  ELSE(OE_CROSS_BUILD)
   SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/alcommon/include
     ${AL_DIR}/include/alcommon/interface
     ${AL_DIR}/include/alcommon/soap
@@ -24,42 +38,12 @@ ELSE(WEBOTS_BACKEND)
     ${AL_DIR}/include/alfactory
     ${AL_DIR}/include
     )
+  ENDIF(OE_CROSS_BUILD)
 ENDIF(WEBOTS_BACKEND)
 
-IF( WIN32 )
-    IF ( EXISTS "${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommond.lib" )
-        SET( ALCOMMON_LIBRARIES_RELEASE
-            ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommon.lib
-        )
-        SET( ALCOMMON_LIBRARIES_DEBUG
-            ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommond.lib
-        )
-
-        IF( CMAKE_BUILD_TYPE EQUAL DEBUG)
-            SET( ALCOMMON_LIBRARIES	${ALCOMMON_LIBRARIES_DEBUG} )
-        ELSE( CMAKE_BUILD_TYPE EQUAL DEBUG)
-            SET( ALCOMMON_LIBRARIES	${ALCOMMON_LIBRARIES_RELEASE} )
-        ENDIF( CMAKE_BUILD_TYPE EQUAL DEBUG)
-    ELSE( EXISTS "${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommond.lib" )
-        SET( ALCOMMON_LIBRARIES
-            ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommon.lib
-        )
-        SET( ALCOMMON_LIBRARIES_RELEASE
-	  ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommon.lib
-        )
-
-        SET( ALCOMMON_LIBRARIES_DEBUG
-            ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommon.lib
-        )
-    ENDIF ( EXISTS "${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/alcommond.lib" )
-
-#    MESSAGE( "ALCOMMON_LIBRARIES is set to " ${ALCOMMON_LIBRARIES} )
-
-ELSE( WIN32 )
     IF( OE_CROSS_BUILD )
         SET( ALCOMMON_LIBRARIES
-          ${OE_CROSS_DIR}/staging/geode-linux/usr/lib/libalcommon.so
-          )
+          ${OE_SYSROOT}/usr/lib/libalcommon.so )
     ELSE(OE_CROSS_BUILD )
         IF (APPLE)
             IF(WEBOTS_BACKEND)
@@ -68,8 +52,8 @@ ELSE( WIN32 )
                   )
             ELSE(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
-  	          ${AL_DIR}/lib/libalcommon.a
-	          )
+              ${AL_DIR}/lib/libalcommon.a
+              )
             ENDIF(WEBOTS_BACKEND)
         ELSE(APPLE)
             IF(WEBOTS_BACKEND)
@@ -78,14 +62,11 @@ ELSE( WIN32 )
                   )
             ELSE(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
-  	          ${AL_DIR}/lib/libalcommon.so
-	          )
+              ${AL_DIR}/lib/libalcommon.so
+              )
             ENDIF(WEBOTS_BACKEND)
         ENDIF(APPLE)
-
     ENDIF( OE_CROSS_BUILD )
-
-ENDIF( WIN32 )
 
 IF( ALCOMMON_LIBRARIES AND EXISTS ${ALCOMMON_LIBRARIES} )
     SET( ALCOMMON_FOUND TRUE )
