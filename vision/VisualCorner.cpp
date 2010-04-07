@@ -393,7 +393,8 @@ void VisualCorner::setPossibleCorners(
 			}
 		}
 	}
-	possibleCorners = updated;
+	if (updated.size() > 0)
+		possibleCorners = updated;
 }
 
 /**
@@ -408,4 +409,3 @@ setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 									 _possibleCorners.end());
 	setPossibleCorners(poss);
 }
-
