@@ -10,10 +10,10 @@ set -e
 set -o nounset
 
 #CMake configured options
-REMOTE="ON"
+REMOTE="${REMOTE_INSTALL}"
 
-WEBOTS=""
-ROBOT=trillian.local
+WEBOTS="${WEBOTS_BACKEND}"
+ROBOT=${REMOTE_ADDRESS}
 
 if [ "$WEBOTS" = "" ]; then
     WEBOTS="OFF"
@@ -25,10 +25,10 @@ if [ $WEBOTS = "ON" ]; then
 echo "Setting local install to WEBOT"
     LOCAL_DEST=$WEBOTS_HOME/$NAO_CONTROLLER
 else
-    LOCAL_DEST=/usr/local/nao-1.6/modules
+    LOCAL_DEST={OFFLINE_NAOQI_PATH}/modules
 fi
 
-COLOR_TABLE_PATH=tables/lab120/newball.mtb
+COLOR_TABLE_PATH=${COLOR_TABLE}
 COLOR_TABLE_DIR=install/etc
 TABLE_STD_NAME=table.mtb
 
