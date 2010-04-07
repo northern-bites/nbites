@@ -801,6 +801,21 @@ public class WorldControllerPainter implements RobotListener
 		}
 	}
 
+	public void updateModels(Vector<LocalizationPacket> models, int teamColor)
+	{
+		ekf_models.clear();
+		for (LocalizationPacket packet : models){
+			// If the robot is on the red team, then we need to transform its
+			// co-ordinates because it has a different (0,0) that the robots on the
+			// blue team
+			if (teamColor == RED_TEAM) {
+				transformFieldCoordinatesToRedTeamSide(packet);
+			}
+			this.ekf_models.add(packet);
+		}
+
+	}
+
     public void transformFieldCoordinatesToRedTeamSide(LocalizationPacket
                                                        loc_pack)
     {
@@ -1058,7 +1073,7 @@ public class WorldControllerPainter implements RobotListener
 										p.getYEst(),
 										p.getHeadingEst(),
 										p.getHeadPanEst(),
-										1337);
+										0);
 			drawRobotsUncertainty(g2,
 								  p.getXEst(),
 								  p.getYEst(),
