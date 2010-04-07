@@ -39,7 +39,7 @@ public:
     const boost::shared_ptr<TriggeredEvent> getTOOLTrigger() {
         return tool.getTrigger();
     }
-    void setLocalizationAccess(boost::shared_ptr<MMLocEKF> _loc,
+    void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
                                boost::shared_ptr<BallEKF> _ballEKF);
 
     void discover_broadcast();

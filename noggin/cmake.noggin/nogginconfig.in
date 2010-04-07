@@ -21,5 +21,11 @@
 #  undef  USE_NOGGIN_AUTO_HALT
 #endif
 
+#define USE_MM_LOC_EKF_${USE_MM_LOC_EKF}
+#ifdef  USE_MM_LOC_EKF_ON
+#  define USE_MM_LOC_EKF
+#else
+#  undef  USE_MM_LOC_EKF
+#endif
 
 #endif // !_nogginconfig_h

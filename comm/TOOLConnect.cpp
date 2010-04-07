@@ -40,10 +40,14 @@ TOOLConnect::~TOOLConnect ()
 {
 }
 
-void TOOLConnect::setLocalizationAccess (shared_ptr<MMLocEKF> _loc,
+void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
                                          shared_ptr<BallEKF> _ballEKF)
 {
+#ifdef USE_MM_LOC_EKF
+	loc = dynamic_pointer_cast<MMLocEKF>(_loc);
+#else
   loc = _loc;
+#endif
   ballEKF = _ballEKF;
 }
 
@@ -241,6 +245,7 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 	}
 
 	if (r.mmekf){
+#ifdef USE_MM_LOC_EKF
 		const list<LocEKF*> models = loc->getModels();
 		list<LocEKF*>::const_iterator model;
 		vector<float> mm_values;
@@ -256,6 +261,7 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 				(*model)->getHUncert();
 		}
 		serial.write_floats(mm_values);
+#endif
 	}
 }
 

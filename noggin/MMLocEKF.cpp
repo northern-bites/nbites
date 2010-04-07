@@ -3,7 +3,8 @@
 // @todo implement mostLikelyModel tracking
 
 MMLocEKF::MMLocEKF() :
-	mostLikelyModel(0), numActive(0), mergeThreshold(1.5), frameNum(0)
+	LocSystem(),mostLikelyModel(0), numActive(0),
+	mergeThreshold(1.5), frameNum(0)
 {
 	initModels();
 }

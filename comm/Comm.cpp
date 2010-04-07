@@ -211,7 +211,7 @@ static PyObject * PyComm_stopTOOL (PyObject *self, PyObject *)
     return Py_None;
 }
 
-void Comm::setLocalizationAccess(shared_ptr<MMLocEKF> _loc,
+void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
                                  shared_ptr<BallEKF> _ballEKF)
 {
     tool.setLocalizationAccess(_loc, _ballEKF);

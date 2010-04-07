@@ -128,7 +128,12 @@ void Noggin::initializeLocalization()
 #   endif
 
     // Initialize the localization modules
-    loc = shared_ptr<MMLocEKF>(new MMLocEKF());
+#ifdef USE_MM_LOC_EKF
+    loc = shared_ptr<LocSystem>(new MMLocEKF());
+#else
+    loc = shared_ptr<LocSystem>(new LocEKF());
+#endif
+
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers

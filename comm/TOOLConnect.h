@@ -72,7 +72,7 @@ public:
     std::string getRobotName();
     int getState() { return state; }
 
-    void setLocalizationAccess(boost::shared_ptr<MMLocEKF> _loc,
+    void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
                                boost::shared_ptr<BallEKF> _ballEKF);
 
 private:
@@ -90,7 +90,12 @@ private:
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     boost::shared_ptr<Vision> vision; // access to vision processing
     boost::shared_ptr<GameController> gameController; // access to GameController
-    boost::shared_ptr<MMLocEKF> loc; // access to localization data
+#ifdef USE_MM_LOC_EKF
+    boost::shared_ptr<MMLocEKF> loc; // access to localization, use MMLocEKF for
+									 // transfering model information
+#else
+    boost::shared_ptr<LocSystem> loc; // access to localization data
+#endif
     boost::shared_ptr<BallEKF> ballEKF; // access to localization data
 };
 

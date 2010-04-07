@@ -89,7 +89,7 @@ private:
 
 // Public members
 public:
-    boost::shared_ptr<MMLocEKF> loc;
+    boost::shared_ptr<LocSystem> loc;
     boost::shared_ptr<BallEKF> ballEKF;
 
 #ifdef LOG_LOCALIZATION

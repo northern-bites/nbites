@@ -390,7 +390,13 @@ void LocEKF::incorporateMeasurement(Observation z,
             R_k(0,0) = DONT_PROCESS_KEY;
             return;
         }
-    } else {
+
+    // @todo eliminate any possibility of this happening in vision,
+    // should never have zero possibilities
+    } else if (z.getNumPossibilities() == 0) {
+		R_k(0,0) = DONT_PROCESS_KEY;
+		return;
+	} else {
         obsIndex = 0;
     }
 
