@@ -18,16 +18,15 @@ SET(PTHREAD_LIBRARIES "PTHREAD_LIBRARIES-NOTFOUND" CACHE FILEPATH "Cleared." FOR
 ##
 
 IF (${ROBOT_PREFIX} STREQUAL nao)
-  IF( WIN32 )
-    SET( PTHREAD_INCLUDE_DIR ${AL_DIR}/extern/c/pthread/include/ )
-    SET( PTHREAD_LIBRARIES
-      ${AL_DIR}/extern/c/pthread/lib/${TARGET_ARCH}/pthreadVCE2.lib
-      )
-  ELSE ( WIN32 )
-    IF ( OE_CROSS_BUILD )
-      SET( PTHREAD_INCLUDE_DIR ${INCLUDE_PREFIX} )
-      SET( PTHREAD_LIBRARIES ${OE_CROSS_DIR}/staging/geode-linux/lib/libpthread.so.0 )
-    ELSE ( OE_CROSS_BUILD )
+  IF ( OE_CROSS_BUILD )
+    SET( PTHREAD_INCLUDE_DIR ${OE_CROSS_DIR}/staging/geode-linux/usr/include )
+    SET( PTHREAD_LIBRARIES ${OE_CROSS_DIR}/staging/geode-linux/lib/libpthread.so.0 )
+  ELSE ( OE_CROSS_BUILD )
+    IF( WIN32 )
+      SET( PTHREAD_INCLUDE_DIR ${AL_DIR}/extern/c/pthread/include/ )
+      SET( PTHREAD_LIBRARIES 
+          ${AL_DIR}/extern/c/pthread/lib/${TARGET_ARCH}/pthreadVCE2.lib )
+    ELSE ( WIN32 )
       SET( PTHREAD_INCLUDE_DIR /usr/include/ )
       IF ( APPLE )
         SET( PTHREAD_LIBRARIES /usr/lib/libpthread.dylib )
@@ -35,8 +34,8 @@ IF (${ROBOT_PREFIX} STREQUAL nao)
         SET( PTHREAD_LIBRARIES ${LIB_PREFIX}/libpthread.so )
         SET( PTHREAD_LIBRARIES /usr/lib/libpthread.so )
       ENDIF( APPLE )
-    ENDIF ( OE_CROSS_BUILD )
-  ENDIF( WIN32 )
+    ENDIF( WIN32 )
+  ENDIF ( OE_CROSS_BUILD )
 ENDIF (${ROBOT_PREFIX} STREQUAL nao)
 
 
