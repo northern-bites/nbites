@@ -17,8 +17,8 @@ public:
 
     bool updateCommand(const int newRgbHex);
 
-    ALValue * getAlias(){return &alias;}
-    ALValue * getCommand(){return &command;}
+	AL::ALValue * getAlias(){return &alias;}
+	AL::ALValue * getCommand(){return &command;}
 
 private:
     void makeAlias();
@@ -26,8 +26,8 @@ private:
     const float getColor(const ALNames::LedColor c, const int rgbHex);
 
 private:
-    ALValue command;
-    ALValue alias;
+    AL::ALValue command;
+    AL::ALValue alias;
     bool newValue;
     int rgbHex;
 

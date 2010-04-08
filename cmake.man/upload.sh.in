@@ -25,7 +25,7 @@ if [ $WEBOTS = "ON" ]; then
 echo "Setting local install to WEBOT"
     LOCAL_DEST=$WEBOTS_HOME/$NAO_CONTROLLER
 else
-    LOCAL_DEST=${OFFLINE_NAOQI_PATH}/modules
+    LOCAL_DEST={OFFLINE_NAOQI_PATH}/modules
 fi
 
 COLOR_TABLE_PATH=${COLOR_TABLE}
@@ -36,13 +36,13 @@ if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
 
   echo "Installing remotely"
 
-  DEST=/opt/naoqi/modules
+  DEST=/home/nao/naoqi/lib/naoqi
 
   if [ ! -n "$ROBOT" ]; then
     echo "[upload.sh] Error - no remote address specified" >&2
     exit 1
   fi
-  DEST=root@$ROBOT:$DEST
+  DEST=nao@$ROBOT:$DEST
 
 else
   echo "Installing locally"
@@ -63,9 +63,13 @@ echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt
 echo "cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME"
 cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME
 
-SRC=install/*
+SRC=install/lib/*
 
 echo "rsync -rcLv $SRC $DEST/"
 rsync -rcLv $SRC $DEST/
+
+ETC_SRC=install/etc/*
+ETC_DEST=$DEST/../../etc
+rsync -rcLv $ETC_SRC $ETC_DEST/
 #echo "scp -rv $SRC $DEST/"
 #scp -r $SRC $DEST/

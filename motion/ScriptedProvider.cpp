@@ -25,13 +25,11 @@ using namespace std;
 using namespace Kinematics;
 using boost::shared_ptr;
 
-ScriptedProvider::ScriptedProvider(float motionFrameLength,
-								   shared_ptr<Sensors> s,
+ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s,
 								   shared_ptr<Profiler> p)
-	: MotionProvider(SCRIPTED_PROVIDER,p),
+	: MotionProvider(SCRIPTED_PROVIDER, p),
 	  sensors(s),
-	  FRAME_LENGTH_S(motionFrameLength),
-	  chopper(sensors, FRAME_LENGTH_S),
+	  chopper(sensors),
 	  // INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
 	currCommand(new ChoppedCommand()),
     bodyCommandQueue()

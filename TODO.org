@@ -197,8 +197,8 @@
 ** Tools
 *** TOOL
 **** TODO Classifier.
-**** TODO Setup TCP streaming to robots
-***** TODO Be able to stream localization info, including landmark detection from a robot in real time
+**** DONE Setup TCP streaming to robots
+***** DONE Be able to stream localization info, including landmark detection from a robot in real time
 *** Trac
 **** TODO Use tickets more to manage team workflow
 *** Other

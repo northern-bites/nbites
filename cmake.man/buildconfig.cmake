@@ -38,13 +38,12 @@ SET( CMAKE_CXX_FLAGS
   "${CMAKE_CXX_FLAGS} -O2 -m32 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
 # Release build flags
 SET( CMAKE_CXX_FLAGS_RELEASE
-  "-O3 -DNDEBUG -Wall -m32 -Wconversion -Wno-unused -Wno-strict-aliasing -march=k6-2 -mtune=k6-2" )
+  "-O3 -DNDEBUG -Wall -Wconversion -Wno-unused -Wno-strict-aliasing")
 SET( CMAKE_C_FLAGS_RELEASE
   "${CMAKE_CXX_FLAGS_RELEASE}" )
 # Debug build flags
 SET( CMAKE_CXX_FLAGS_DEBUG
-  " -g3 -m32 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing -march=k6-2 -mtune=k6-2" )
-
+  " -g3 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
 
 
 ############################ Configure Options
@@ -59,6 +58,18 @@ SET( CMAKE_CXX_FLAGS_DEBUG
 #
 
 # See documentation strings for descriptions
+IF( WEBOTS_BACKEND )
+  OPTION( USING_LAB_FIELD
+    "Set field constants to use the lab field constants"
+    OFF
+    )
+ELSE( WEBOTS_BACKEND )
+  OPTION( USING_LAB_FIELD
+    "Set field constants to use the lab field constants"
+    ON
+    )
+ENDIF( WEBOTS_BACKEND )
+
 OPTION(
     MAN_IS_REMOTE_
     "Compile as a remote binary, versus a dynamic library (ON/OFF)"
@@ -116,9 +127,4 @@ OPTION(
   "Redirect the standard error to standard out in C++"
   ON
   )
-OPTION( USING_LAB_FIELD
-  "Set field constants to use the lab field constants"
-  ON
-  )
-
 

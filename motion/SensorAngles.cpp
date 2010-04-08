@@ -49,7 +49,7 @@ void SensorAngles::basic_sensor_feedback(){
     const float MAX_SENSOR_ANGLE_Y = gait->sensor[WP::MAX_ANGLE_Y];
 
     const float MAX_SENSOR_VEL = gait->sensor[WP::MAX_ANGLE_VEL]*
-        MotionConstants::MOTION_FRAME_LENGTH_S;
+        MOTION_FRAME_LENGTH_S;
 
     //calculate the new angles, take into account gait angles already
     Inertial inertial = sensors->getInertial();

@@ -53,17 +53,14 @@ MESSAGE( STATUS "" )
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PTHREAD  REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
-FIND_PACKAGE( BOOST_PYTHON REQUIRED )
 
 IF( APPLE )
   MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
  #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
  #when we want to compile just the vision/sensors libraries for the TOOL
   FIND_PACKAGE( ALCOMMON )
-  FIND_PACKAGE( TINYXML )
 ELSE( APPLE )
   FIND_PACKAGE( ALCOMMON REQUIRED )
-  FIND_PACKAGE( TINYXML  REQUIRED )
 ENDIF( APPLE )
 
 
@@ -74,12 +71,10 @@ CONFIGURE_FILE(
   ESCAPE_QUOTES
   )
 
-
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
                  ${ALCOMMON_DEFINITIONS}
-		 ${TINYXML_DEFINITIONS}
                  ${PTHREAD_DEFINITIONS}
                  ${PYTHON_DEFINITIONS}
                  )
@@ -89,7 +84,6 @@ ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${ALCOMMON_INCLUDE_DIR}
-		     ${TINYXML_INCLUDE_DIR}
                      ${PTHREAD_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
                      ${MOTION_INCLUDE_DIR}
@@ -212,7 +206,6 @@ TARGET_LINK_LIBRARIES(
   ${MOTION_TARGET}
   ${NBCOMMON_LIBRARIES}
   ${ALCOMMON_LIBRARIES}
-  ${TINYXML_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${PYTHON_LIBRARIES}
   ${SENSORS_TARGET}

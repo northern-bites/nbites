@@ -7,7 +7,7 @@ PROJECT( CORPUS )
 
 ############################ VERSION
 # Check cMake version
-CMAKE_MINIMUM_REQUIRED( VERSION 2.2.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 
 ############################ COLORIZE MAKEFILE
@@ -64,10 +64,8 @@ ELSE(WEBOTS_BACKEND)
     #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
     #when we want to compile just the vision/sensors libraries for the TOOL
     FIND_PACKAGE( ALCOMMON )
-    FIND_PACKAGE( TINYXML )
   ELSE( APPLE )
     FIND_PACKAGE( ALCOMMON REQUIRED )
-    FIND_PACKAGE( TINYXML  REQUIRED )
   ENDIF( APPLE )
 ENDIF(WEBOTS_BACKEND)
 
@@ -82,19 +80,19 @@ CONFIGURE_FILE(
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
-                 ${PTHREAD_DEFINITIONS}
-                 ${PYTHON_DEFINITIONS}
-                 )
+  ${PTHREAD_DEFINITIONS}
+  ${PYTHON_DEFINITIONS}
+  )
 
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-                     ${PTHREAD_INCLUDE_DIR}
-                     ${PYTHON_INCLUDE_DIR}
-                     ${VISION_INCLUDE_DIR}
-                     ${CORPUS_INCLUDE_DIR}
-                     )
+  ${PTHREAD_INCLUDE_DIR}
+  ${PYTHON_INCLUDE_DIR}
+  ${VISION_INCLUDE_DIR}
+  ${CORPUS_INCLUDE_DIR}
+  )
 
 
 #Possibly, don't need to include any AL or WEBOTS stuff in this directory
@@ -105,48 +103,47 @@ IF(WEBOTS_BACKEND)
   ADD_DEFINITIONS( ${WEBOTS_DEFINITIONS})
 
 ELSE(WEBOTS_BACKEND)
-  INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR}
-                      ${TINYXML_INCLUDE_DIR})
-  ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS}
-                   ${TINYXML_DEFINITIONS})
+  INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR})
+
+  ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS})
 
 ENDIF(WEBOTS_BACKEND)
 
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
 SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
-     		  ${CORPUS_INCLUDE_DIR}/PySensors
-                  ${CORPUS_INCLUDE_DIR}/NaoPose )
+  ${CORPUS_INCLUDE_DIR}/PySensors
+  ${CORPUS_INCLUDE_DIR}/NaoPose )
 
 
 ###### SYNCHRO ############
 
 SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
-                  ${CORPUS_INCLUDE_DIR}/_synchromodule
-                  ${CORPUS_INCLUDE_DIR}/messaging
-                  )
+  ${CORPUS_INCLUDE_DIR}/_synchromodule
+  ${CORPUS_INCLUDE_DIR}/messaging
+  )
 
 ########### ROBOT CONNET #########
 SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/AccEKF
-			${CORPUS_INCLUDE_DIR}/RoboGuardian
-			${CORPUS_INCLUDE_DIR}/ClickableButton
-			${CORPUS_INCLUDE_DIR}/PyRoboGuardian
-			${CORPUS_INCLUDE_DIR}/Lights
-			${CORPUS_INCLUDE_DIR}/PyLights)
+  ${CORPUS_INCLUDE_DIR}/RoboGuardian
+  ${CORPUS_INCLUDE_DIR}/ClickableButton
+  ${CORPUS_INCLUDE_DIR}/PyRoboGuardian
+  ${CORPUS_INCLUDE_DIR}/Lights
+  ${CORPUS_INCLUDE_DIR}/PyLights)
 
 IF(WEBOTS_BACKEND)
   LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/WBEnactor
-  	                          ${CORPUS_INCLUDE_DIR}/AngleEKF
-                                  ${CORPUS_INCLUDE_DIR}/WBTranscriber
-                                  ${CORPUS_INCLUDE_DIR}/WBImageTranscriber
-				 )
+    ${CORPUS_INCLUDE_DIR}/AngleEKF
+    ${CORPUS_INCLUDE_DIR}/WBTranscriber
+    ${CORPUS_INCLUDE_DIR}/WBImageTranscriber
+    )
 ELSE(WEBOTS_BACKEND)
   LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
-                                 ${CORPUS_INCLUDE_DIR}/NaoEnactor
-				 ${CORPUS_INCLUDE_DIR}/ALTranscriber
-				 ${CORPUS_INCLUDE_DIR}/ALImageTranscriber
-				 ${CORPUS_INCLUDE_DIR}/NaoLights
-				 ${CORPUS_INCLUDE_DIR}/NaoRGBLight)
+    ${CORPUS_INCLUDE_DIR}/NaoEnactor
+    ${CORPUS_INCLUDE_DIR}/ALTranscriber
+    ${CORPUS_INCLUDE_DIR}/ALImageTranscriber
+    ${CORPUS_INCLUDE_DIR}/NaoLights
+    ${CORPUS_INCLUDE_DIR}/NaoRGBLight)
 ENDIF(WEBOTS_BACKEND)
 
 
@@ -157,10 +154,10 @@ ENDIF(WEBOTS_BACKEND)
 #ENDIF( PYTHON_SHARED_CORPUS )
 
 SET( CORPUS_PYTHON_SRCS ${CORPUS_INCLUDE_DIR}/__init__.py
-                        ${CORPUS_INCLUDE_DIR}/leds.py
-                        ${CORPUS_INCLUDE_DIR}/sensors.py
-                        ${CORPUS_INCLUDE_DIR}/synchro.py
-                        )
+  ${CORPUS_INCLUDE_DIR}/leds.py
+  ${CORPUS_INCLUDE_DIR}/sensors.py
+  ${CORPUS_INCLUDE_DIR}/synchro.py
+  )
 
 SET( CORPUS_TEST_DIR ${CORPUS_INCLUDE_DIR}/test )
 
@@ -168,10 +165,10 @@ SET( CORPUS_TEST_DIR ${CORPUS_INCLUDE_DIR}/test )
 ###### NBINCLUDE STUFF ####
 
 SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
-     		    ${NBCOMMON_INCLUDE_DIR}/NBMath
-                     ${CORPUS_INCLUDE_DIR}/CoordFrame4D
-                     ${CORPUS_INCLUDE_DIR}/CoordFrame3D
-                   )
+  ${NBCOMMON_INCLUDE_DIR}/NBMath
+  ${CORPUS_INCLUDE_DIR}/CoordFrame4D
+  ${CORPUS_INCLUDE_DIR}/CoordFrame3D
+  )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -203,9 +200,9 @@ IF( PYTHON_SHARED_CORPUS )
   GET_TARGET_PROPERTY( SENSORS_TARGET_LOCATION ${SENSORS_TARGET} LOCATION )
   GET_TARGET_PROPERTY( SYNCHRO_TARGET_LOCATION   ${SYNCHRO_TARGET}   LOCATION )
   GET_TARGET_PROPERTY( ROBOT_CONNECT_TARGET_LOCATION
-                       ${ROBOT_CONNECT_TARGET}   LOCATION )
+    ${ROBOT_CONNECT_TARGET}   LOCATION )
   GET_TARGET_PROPERTY( NBINCLUDE_TARGET_LOCATION
-                       ${NBINCLUDE_TARGET}   LOCATION )
+    ${NBINCLUDE_TARGET}   LOCATION )
   # Install to TARGETmodule.so, instead of lib_TARGET.so
   INSTALL(
     FILES ${SENSORS_TARGET_LOCATION}
@@ -267,32 +264,31 @@ INSTALL(
 # For Mac's, set the target link language to use
 
 #IF( APPLE )
-  SET_TARGET_PROPERTIES( ${SENSORS_TARGET} PROPERTIES LINKER_LANGUAGE CXX )
+SET_TARGET_PROPERTIES( ${SENSORS_TARGET} PROPERTIES LINKER_LANGUAGE CXX )
 #ENDIF( APPLE )
 
 
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES( ${SENSORS_TARGET} ${NBCOMMON_LIBRARIES}
-                                         ${ALCOMMON_LIBRARIES}
-                                         ${TINYXML_LIBRARIES}
-                                         ${PTHREAD_LIBRARIES}
-                                         ${PYTHON_LIBRARIES}
-                                         ${VISION_LIBRARIES}
-                                         )
+  ${ALCOMMON_LIBRARIES}
+
+  ${PTHREAD_LIBRARIES}
+  ${PYTHON_LIBRARIES}
+  ${VISION_LIBRARIES}
+  )
 TARGET_LINK_LIBRARIES( ${SYNCHRO_TARGET} ${NBCOMMON_LIBRARIES}
-                                         ${ALCOMMON_LIBRARIES}
-                                         ${TINYXML_LIBRARIES}
-                                         ${PTHREAD_LIBRARIES}
-                                         ${PYTHON_LIBRARIES}
-                                         )
+  ${ALCOMMON_LIBRARIES}
+  ${PTHREAD_LIBRARIES}
+  ${PYTHON_LIBRARIES}
+  )
+
 TARGET_LINK_LIBRARIES( ${ROBOT_CONNECT_TARGET} ${NBCOMMON_LIBRARIES}
-                                               ${ALCOMMON_LIBRARIES}
-                                               ${TINYXML_LIBRARIES}
-                                               ${PTHREAD_LIBRARIES}
-                                               ${PYTHON_LIBRARIES}
-                                               )
+  ${ALCOMMON_LIBRARIES}
+  ${PTHREAD_LIBRARIES}
+  ${PYTHON_LIBRARIES}
+  )
 TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET} ${NBCOMMON_LIBRARIES}
-                                               )
+  )
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories (some may not actually be subdirectories) to

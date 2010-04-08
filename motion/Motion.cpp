@@ -24,7 +24,7 @@ using namespace boost;
 #include "synchro.h"
 #include "Motion.h"
 #include "PyMotion.h"
-#include "NaoEnactor.h"
+//#include "NaoEnactor.h"
 
 Motion::Motion (shared_ptr<Synchro> _synchro,
 				shared_ptr<MotionEnactor> _enactor,

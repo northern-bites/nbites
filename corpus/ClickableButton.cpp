@@ -4,13 +4,13 @@ using namespace std;
 
 //#define DEBUG_GUARDIAN_CLICKS
 
-//These assume were running 50 fps
-const int ClickableButton::SINGLE_CLICK_ACTIVE_MIN = 5;
-const int ClickableButton::SINGLE_CLICK_ACTIVE_MAX = 50;
-const int ClickableButton::SINGLE_CLICK_INACTIVE_MIN = 4;
-const int ClickableButton::SINGLE_CLICK_INACTIVE_MAX = 18;
+//These assume were running 100 fps
+const int ClickableButton::SINGLE_CLICK_ACTIVE_MIN = 10;
+const int ClickableButton::SINGLE_CLICK_ACTIVE_MAX = MOTION_FRAME_RATE;
+const int ClickableButton::SINGLE_CLICK_INACTIVE_MIN = 8;
+const int ClickableButton::SINGLE_CLICK_INACTIVE_MAX = 36;
 const float ClickableButton::PUSHED = 1.0f;
-const int ClickableButton::SHUTDOWN_THRESH = 3*50; //Three seconds
+const int ClickableButton::SHUTDOWN_THRESH = 3*MOTION_FRAME_RATE; //Three seconds
 
 const int ClickableButton::NO_CLICKS = -1;
 

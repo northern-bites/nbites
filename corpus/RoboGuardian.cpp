@@ -12,7 +12,7 @@ using namespace std;
 
 //#define DEBUG_GUARDIAN_CLICKS
 
-const int RoboGuardian::GUARDIAN_FRAME_RATE = 50;
+const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
 const float RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
     RoboGuardian::GUARDIAN_FRAME_RATE;
@@ -21,8 +21,8 @@ const int RoboGuardian::NO_CLICKS = -1;
 
 static const string quiet = " -q ";
 static const string sout = "aplay"+quiet;
-static const string sdir = "/opt/naoqi/data/wav/";
-static const string nbsdir = "/opt/naoqi/modules/etc/audio/";
+static const string sdir = "/opt/naoqi/share/naoqi/wav/";
+static const string nbsdir = "/home/nao/naoqi/etc/audio/";
 static const string wav = ".wav";
 static const string shutdown_wav = sdir + "shutdown" + wav;
 static const string heat_wav = sdir + "heat" + wav;

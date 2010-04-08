@@ -12,7 +12,7 @@ NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
     } catch(AL::ALError &e) {
-        cout << "Failed to initialize proxy to DCM" << endl;
+		std::cout << "Failed to initialize proxy to DCM" << std::endl;
     }
 
     generateLeds();
@@ -80,12 +80,12 @@ void NaoLights::generateLeds(){
                                           ALNames::NUM_RGB_LEDS[i],
                                           ALNames::LED_START_COLOR[i],
                                           ALNames::LED_END_COLOR[i]));
-        ALValue newAlias = *ledList[i]->getAlias();
+        AL::ALValue newAlias = *ledList[i]->getAlias();
         dcmProxy->createAlias(newAlias);
     }
 }
 
-void NaoLights::sendLightCommand(ALValue & command){
+void NaoLights::sendLightCommand(AL::ALValue & command){
 #ifdef DEBUG_NAOLIGHTS_COMMAND
     std::cout << "  NaoLights::sendCommand() " <<command.serializeToText()<< std::endl;
 #endif

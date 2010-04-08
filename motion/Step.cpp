@@ -30,7 +30,7 @@ Step::Step(const WalkVector &target,
         //For end steps, we are always double support, and
         //we make the length the preview period
         updateFrameLengths(static_cast<float>(Observer::NUM_PREVIEW_FRAMES) *
-                           MotionConstants::MOTION_FRAME_LENGTH_S,
+                           MOTION_FRAME_LENGTH_S,
                            1.0f);
         break;
     }
@@ -55,12 +55,10 @@ void Step::updateFrameLengths(const float duration,
                               const float dblSuppF){
     //need to calculate how many frames to spend in double, single
     stepDurationFrames =
-        static_cast<unsigned int>( duration/
-                                  MotionConstants::MOTION_FRAME_LENGTH_S);
+        static_cast<unsigned int>( duration / MOTION_FRAME_LENGTH_S);
 
     doubleSupportFrames =
-        static_cast<unsigned int>(duration *dblSuppF/
-                                  MotionConstants::MOTION_FRAME_LENGTH_S);
+        static_cast<unsigned int>(duration *dblSuppF / MOTION_FRAME_LENGTH_S);
     singleSupportFrames = stepDurationFrames - doubleSupportFrames;
 }
 
