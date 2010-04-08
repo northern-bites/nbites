@@ -2,7 +2,6 @@
 #define Blob_h_defined
 
 #include "Common.h"
-#include "ifdefs.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 #include <stdlib.h>

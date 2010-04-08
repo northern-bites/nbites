@@ -9,7 +9,6 @@
 
 class Utility;
 #include "Common.h"
-#include "ifdefs.h"
 #include "Structs.h"
 #include "VisualLine.h"
 #include "VisionDef.h"

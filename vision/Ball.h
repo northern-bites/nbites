@@ -25,8 +25,6 @@
 #include <stdlib.h>
 
 #include "Common.h"
-#include "ifdefs.h"
-//#include "NaoPose.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 #include "Blob.h"

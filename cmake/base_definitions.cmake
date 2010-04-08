@@ -34,6 +34,8 @@ IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
     SET( AL_DIR "/usr/local/nao-1.6" )
   ENDIF (WEBOTS_BACKEND)
   SET( ENV{AL_DIR} ${AL_DIR} )
+  MESSAGE( STATUS
+    "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
 ENDIF( "x$ENV{AL_DIR}x" STREQUAL "xx")
