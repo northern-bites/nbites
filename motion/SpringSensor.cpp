@@ -25,8 +25,8 @@ SpringSensor::SpringSensor(const MetaGait * _gait,
 
     //build statematrix
     A = ublas::identity_matrix<float>(3);
-    A(0,1) = A(1,2)=MotionConstants::MOTION_FRAME_LENGTH_S;
-    A(0,2)= 0.5f*std::pow(MotionConstants::MOTION_FRAME_LENGTH_S,2);
+    A(0,1) = A(1,2)= MOTION_FRAME_LENGTH_S;
+    A(0,2)= 0.5f*std::pow(MOTION_FRAME_LENGTH_S,2);
     A(2,2) = A(1,1) = 0.0f;
 
     //NOTE: might added BETA, a friction coefficient, which damps the velocity:

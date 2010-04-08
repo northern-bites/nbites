@@ -23,6 +23,7 @@
 
 
 #include "pthread.h"
+#include "Common.h"
 
 /**
  * Class to track when a button is pushed or not, and report clicks accordingly
@@ -39,7 +40,7 @@
 
 class ClickableButton {
 public:
-    ClickableButton(int fps); //Assumes 50 FPS
+    ClickableButton(int fps); //Assumes 100 FPS
     ~ClickableButton();
 
     void updateFrame(float buttonValue);
@@ -67,7 +68,7 @@ private:
 
     mutable int numClicks; //Stores the finalized 'public' number of clicks
 
-//These assume were running 50 fps
+//These assume we're running 100 fps
     static const int SINGLE_CLICK_ACTIVE_MIN;
     static const int SINGLE_CLICK_ACTIVE_MAX;
     static const int SINGLE_CLICK_INACTIVE_MIN;

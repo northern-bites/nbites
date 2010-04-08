@@ -1,13 +1,12 @@
-dt = 0.02;
+dt = 0.01;
 R = 1*10^(-6);
-N = 60;
+N = 120;
 numPreviewFrames = N;
 Qx = 0.25;  Qe = 0.3;
 Ql = [1,0,0;0,1,0;0,0,1];
 
 g = 9800;
 z_h = 260;
-dt = 0.02;
 
 A0 = [1, dt, 0; g/z_h*dt, 1, -g/z_h*dt; 0, 0, 1];
 b0 = [0; 0; dt];
@@ -42,3 +41,12 @@ end
 A = A0-b0*Gx;
 
 L = dlqr(A', c0', Ql , R)';
+
+endTime = 10;
+for time=[0:dt:endTime],
+  preview_frames = [];
+
+  for j=[1:numPreviewFrames],
+    preview_frames(j) = real( Gd(j)*(time + j*dt) );
+  end;
+end;

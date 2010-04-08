@@ -3,6 +3,7 @@
 
 #include "dcmproxy.h"
 #include "almemoryproxy.h"
+#include "almemoryfastaccess.h"
 #include "MotionEnactor.h"
 #include "albroker.h"
 #include "alptr.h"
@@ -11,6 +12,7 @@
 #include "NaoDef.h"
 #include <string>
 #include "Transcriber.h"
+#include "Common.h"
 
 class NaoEnactor : public MotionEnactor {
 
@@ -22,16 +24,10 @@ public:
     void sendCommands();
     void postSensors();
 
-private: // Constants
-
-    static const int MOTION_FRAME_RATE;
-    static const float MOTION_FRAME_LENGTH_uS; // in microseconds
-    static const float MOTION_FRAME_LENGTH_S; // in seconds
-
 private: // Members
     AL::ALPtr<AL::ALBroker> broker;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessJoints;
-    AL::ALPtr<ALMemoryFastAccess> alfastaccessSensors;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessJoints;
+    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessSensors;
     AL::ALPtr<AL::DCMProxy> dcmProxy;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;

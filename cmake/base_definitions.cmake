@@ -1,9 +1,7 @@
-
 # .:: Basic Definitions ::::::::::::::::::::::::::::::::::::::::::::::::
 #
 # The basic diefinitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
-
 
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
@@ -11,7 +9,7 @@
 IF( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -23,26 +21,19 @@ IF( NOT EXISTS ${TRUNK_PATH} )
     )
 ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
-
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
-
-SET( TRUNK_REVISION r$ENV{TRUNK_REVISION} CACHE STRING "SVN Revision number" )
-IF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
-  MESSAGE( FATAL_ERROR
-    "Environment variable TRUNK_REVISION was not set.  Please ensure that your Makefile is properly exporting it."
-    )
-ENDIF( "x${TRUNK_REVISION}x" STREQUAL "xx" )
-
 #SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ ALDEBARAN DIRECTORY
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  SET( AL_DIR "/usr/local/nao" )
+  IF (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao-1.2" )
+  ELSE (WEBOTS_BACKEND)
+    SET( AL_DIR "/usr/local/nao-1.6" )
+  ENDIF (WEBOTS_BACKEND)
   SET( ENV{AL_DIR} ${AL_DIR} )
-  MESSAGE( STATUS 
-    "Environment variable AL_DIR was not set, reseting to default ${AL_DIR}!" )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
 ENDIF( "x$ENV{AL_DIR}x" STREQUAL "xx")
@@ -62,8 +53,8 @@ IF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
     MAN_INSTALL_PREFIX ${TRUNK_PATH}/install ABSOLUTE
     )
   SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
-  MESSAGE( STATUS 
-    "Environment variable MAN_INSTALL_PREFIX was not set, reseting to default ${MAN_INSTALL_PREFIX}!" )
+  MESSAGE( STATUS
+    "Environment variable MAN_INSTALL_PREFIX was not set, resetting to default ${MAN_INSTALL_PREFIX}!" )
 ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
   SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
 ENDIF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
@@ -85,7 +76,8 @@ IF(COMMAND CMAKE_POLICY)
     # CMake policy regarding excaping definitions
     CMAKE_POLICY(SET CMP0005 OLD)
 #     # CMake policy regarding scoped include
-     # CMAKE_POLICY(SET CMP0011 OLD)
+      CMAKE_POLICY(SET CMP0011 OLD)
+      CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
@@ -132,58 +124,32 @@ SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 # Depending on the robot and whether cross-compiling, the include and
 # library prefixes must be adjusted
 
-IF( ROBOT_AIBO )
-  # Aibo
-  IF( OE_CROSS_BUILD )
-
-    SET( INCLUDE_PREFIX "${OPEN_R_SDK_ROOT}/OPEN_R/include" )
-    SET( LIB_PREFIX "${OPEN_R_SDK_ROOT}/OPEN_R/lib" )
-
-  ELSE( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "/usr/include" )
-    SET( LIB_PREFIX "/usr/lib" )
-
-  ENDIF( OE_CROSS_BUILD )
-
-ELSE( ROBOT_AIBO )
   # Nao
-  
-  IF( AL_DIR STREQUAL "" )
-    MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
-  ENDIF( AL_DIR STREQUAL "" )
-	
-  IF( WIN32 )
-    SET( TARGET_ARCH "windows" )
-    SET( TARGET_HOST "TARGET_HOST_WINDOWS")
-  ENDIF( WIN32 )
-  
-  IF( UNIX )
-    SET( TARGET_ARCH "linux")
-    SET( TARGET_HOST "TARGET_HOST_LINUX")
-    SET( PLATFORM_X86 1 )
-  ENDIF( UNIX )
+IF( AL_DIR STREQUAL "" )
+  MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
+ENDIF( AL_DIR STREQUAL "" )
 
-  IF( APPLE )
-    SET( TARGET_ARCH "macosx" )
-    SET( TARGET_HOST "TARGET_HOST_MACOSX")
-  ENDIF( APPLE )
-  
-  IF( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/include" )
-    SET( LIB_PREFIX "${OE_CROSS_DIR}/staging/${OE_PREFIX}/usr/lib" )
-  ELSE( OE_CROSS_BUILD )
-    SET( INCLUDE_PREFIX "${AL_DIR}/extern/c/${TARGET_ARCH}/include" )
-    SET( LIB_PREFIX "${AL_DIR}/extern/c/${TARGET_ARCH}/lib" )
-  ENDIF( OE_CROSS_BUILD )
+IF( WIN32 )
+  SET( TARGET_ARCH "windows" )
+  SET( TARGET_HOST "TARGET_HOST_WINDOWS")
+ENDIF( WIN32 )
 
-  IF( FINAL_RELEASE )
-    ADD_DEFINITIONS(-DFINAL_RELEASE)
-  ENDIF( FINAL_RELEASE )
+IF( UNIX )
+  SET( TARGET_ARCH "linux")
+  SET( TARGET_HOST "TARGET_HOST_LINUX")
+  SET( PLATFORM_X86 1 )
+ENDIF( UNIX )
 
-  INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
+IF( APPLE )
+  SET( TARGET_ARCH "macosx" )
+  SET( TARGET_HOST "TARGET_HOST_MACOSX")
+ENDIF( APPLE )
 
-ENDIF( ROBOT_AIBO )
+IF( FINAL_RELEASE )
+  ADD_DEFINITIONS(-DFINAL_RELEASE)
+ENDIF( FINAL_RELEASE )
 
+INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
 
 ########################## ADVANCED SETTINGS PREFERENCES
 # Set the cache variable that we would rather not appear on the normal
@@ -195,6 +161,5 @@ MARK_AS_ADVANCED(
   EXECUTABLE_OUTPUT_PATH
   LIBRARY_OUTPUT_PATH
   AL_PERF_CALCULATION
-  TINYXML_DEFINITION
   )
-  
+

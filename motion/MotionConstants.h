@@ -22,10 +22,9 @@
 #ifndef _MotionConstants_h_DEFINED
 #define _MotionConstants_h_DEFINED
 #include "Kinematics.h"
+#include "Common.h"
 
 namespace MotionConstants {
-
-    const static float MOTION_FRAME_LENGTH_S = 0.02f;
 
 	enum MotionType {
 		WALK = 0,

@@ -35,8 +35,7 @@
 
 class HeadProvider : public MotionProvider {
 public:
-    HeadProvider(float motionFrameLength,
-				 boost::shared_ptr<Sensors> s,
+    HeadProvider(boost::shared_ptr<Sensors> s,
 				 boost::shared_ptr<Profiler> p);
     virtual ~HeadProvider();
 
@@ -67,7 +66,6 @@ private:
     bool isDone();
 
     boost::shared_ptr<Sensors> sensors;
-    float FRAME_LENGTH_S;
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 

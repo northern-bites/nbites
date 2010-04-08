@@ -31,12 +31,12 @@
 #include "ChoppedCommand.h"
 #include "LinearChoppedCommand.h"
 #include "SmoothChoppedCommand.h"
-
+#include "Common.h"
 
 class ChopShop
 {
 public:
-	ChopShop(boost::shared_ptr<Sensors> s, float motionFrameLength);
+	ChopShop(boost::shared_ptr<Sensors> s);
 
     boost::shared_ptr<ChoppedCommand> chopCommand(const JointCommand *command);
 

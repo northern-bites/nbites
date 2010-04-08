@@ -27,11 +27,6 @@ using namespace AL;
 
 #include "Kinematics.h"
 using namespace Kinematics;
-const int ALEnactor::MOTION_FRAME_RATE = 50;
-// 1 second * 1000 ms/s * 1000 us/ms
-const float ALEnactor::MOTION_FRAME_LENGTH_uS = (1.0f * 1000.0f * 1000.0f /
-												 ALEnactor::MOTION_FRAME_RATE);
-const float ALEnactor::MOTION_FRAME_LENGTH_S = 1.0f / ALEnactor::MOTION_FRAME_RATE;
 
 //#define SPEEDY_ENACTOR
 
@@ -88,7 +83,7 @@ void ALEnactor::sendJoints(){
 #endif
 
 #ifndef NO_ACTUAL_MOTION
-    almotion->setBodyAngles(motionCommandAngles);
+    //almotion->setAngles(motionCommandAngles);
 #endif
 
 }
@@ -105,7 +100,7 @@ void ALEnactor::sendHardness(){
             = motionCommandStiffness[joint];
         const string name = JOINT_STRINGS[joint];
 #ifndef NO_ACTUAL_MOTION
-        almotion->setJointStiffness(name ,chainStiffness);
+        //almotion->setStiffness(name ,chainStiffness);
 #endif
     }
 }

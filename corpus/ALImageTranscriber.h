@@ -48,40 +48,31 @@ private: // member variables
 
 private: // nBites Camera Constants
     // Camera identification
-    static const int TOP_CAMERA = 0;
-    static const int BOTTOM_CAMERA = 1;
+    static const int TOP_CAMERA ;
+    static const int BOTTOM_CAMERA ;
 
     // Camera setup information
-    static const int CAMERA_SLEEP_TIME = 200;
-    static const int CAM_PARAM_RETRIES = 3;
+    static const int CAMERA_SLEEP_TIME ;
+    static const int CAM_PARAM_RETRIES ;
 
-    // Default Camera Settings
-    // Basic Settings
-    static const int DEFAULT_CAMERA_RESOLUTION = 14;
-    static const int DEFAULT_CAMERA_FRAMERATE = 30;
-    static const int DEFAULT_CAMERA_BUFFERSIZE = 16;
-    // Color Settings
-    // Gain: 26 / Exp: 83
-    // Gain: 28 / Exp: 60
-    // Gain: 35 / Exp: 40
-    static const int DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-    static const int DEFAULT_CAMERA_GAIN = 26;
-    static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-    static const int DEFAULT_CAMERA_BLUECHROMA = 128;
-    static const int DEFAULT_CAMERA_REDCHROMA = 68;
-    static const int DEFAULT_CAMERA_BRIGHTNESS = 140;
-    static const int DEFAULT_CAMERA_CONTRAST = 64;
-    static const int DEFAULT_CAMERA_SATURATION = 128;
-    static const int DEFAULT_CAMERA_HUE = 0;
-    // Lens correction
-    static const int DEFAULT_CAMERA_LENSX = 0;
-    static const int DEFAULT_CAMERA_LENSY = 0;
-    // Exposure length
-    static const int DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-    static const int DEFAULT_CAMERA_EXPOSURE = 83;
-    // Image orientation
-    static const int DEFAULT_CAMERA_HFLIP = 0;
-    static const int DEFAULT_CAMERA_VFLIP = 0;
+    static const int DEFAULT_CAMERA_RESOLUTION ;
+    static const int DEFAULT_CAMERA_FRAMERATE ;
+    static const int DEFAULT_CAMERA_BUFFERSIZE ;
+    static const int DEFAULT_CAMERA_AUTO_GAIN ;
+    static const int DEFAULT_CAMERA_GAIN ;
+    static const int DEFAULT_CAMERA_AUTO_WHITEBALANCE ;
+    static const int DEFAULT_CAMERA_BLUECHROMA ;
+    static const int DEFAULT_CAMERA_REDCHROMA ;
+    static const int DEFAULT_CAMERA_BRIGHTNESS ;
+    static const int DEFAULT_CAMERA_CONTRAST ;
+    static const int DEFAULT_CAMERA_SATURATION ;
+    static const int DEFAULT_CAMERA_HUE ;
+    static const int DEFAULT_CAMERA_LENSX ;
+    static const int DEFAULT_CAMERA_LENSY ;
+    static const int DEFAULT_CAMERA_AUTO_EXPOSITION ;
+    static const int DEFAULT_CAMERA_EXPOSURE ;
+    static const int DEFAULT_CAMERA_HFLIP ;
+    static const int DEFAULT_CAMERA_VFLIP ;
 
 };
 

@@ -62,8 +62,7 @@ void MetaGait::resetTransitioning(){
     const float maxTime = std::max(curGait.stance[WP::TRANS_TIME],
                                    nextGait.stance[WP::TRANS_TIME]);
     transitionFrames  =
-        static_cast<unsigned int>(maxTime /
-                                  MotionConstants::MOTION_FRAME_LENGTH_S);
+        static_cast<unsigned int>(maxTime / MOTION_FRAME_LENGTH_S);
 
     transitionCounter = 1;
 }

@@ -361,6 +361,7 @@ void Noggin::updateLocalization()
 #           endif
 #           ifdef DEBUG_CC_DETECTION_SAVE_FRAMES
             if (i->getShape() == CIRCLE) {
+	      cout<< "saw cc" <<endl;
                 sensors->saveFrame();
             }
 #           endif
@@ -546,7 +547,8 @@ void Noggin::modifySysPath ()
         std::string("/nao_robocup/controllers/nao_soccer_player_red/lib");
     const char *cwd = test.c_str();
 #  else //WEBOTS
-    const char *cwd = "/opt/naoqi/modules/lib";
+    //    const char *cwd = "/opt/naoqi/modules/lib";
+    const char *cwd = "/home/nao/naoqi/lib/naoqi";
 #  endif
 #endif
 #else//ROBOT(NAO)
