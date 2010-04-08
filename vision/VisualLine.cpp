@@ -401,9 +401,27 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
 void VisualLine::
 setPossibleLines( vector <const ConcreteLine*> _possibleLines)
 {
-	list<const ConcreteLine*> poss(_possibleLines.begin(),
-									 _possibleLines.end());
-	setPossibleLines(poss);
+	list<const ConcreteLine*> updated(0);
+
+	for (list<const ConcreteLine*>::iterator
+			 currLine = possibleLines.begin();
+		 currLine != possibleLines.end(); currLine++) {
+
+		for ( vector<const ConcreteLine*>::iterator
+				  newLine = _possibleLines.begin();
+			  newLine != _possibleLines.end(); ) {
+
+			// If the line is in both sets
+			if (**newLine == **currLine) {
+				updated.push_back(*newLine);
+				newLine = _possibleLines.erase(newLine);
+			} else {
+				// Increment the iterator if we don't erase a line
+				newLine++;
+			}
+		}
+	}
+	possibleLines = updated;
 }
 
 const bool VisualLine::hasPositiveID()

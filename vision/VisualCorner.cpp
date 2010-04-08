@@ -408,8 +408,24 @@ void VisualCorner::setPossibleCorners(
 void VisualCorner::
 setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 {
-	list<const ConcreteCorner*> poss(_possibleCorners.begin(),
-									 _possibleCorners.end());
-	setPossibleCorners(poss);
-}
 
+	list<const ConcreteCorner*> updated(0);
+
+	for (list<const ConcreteCorner*>::const_iterator
+			 currCorner = possibleCorners.begin();
+		 currCorner != possibleCorners.end(); currCorner++) {
+
+		for ( vector<const ConcreteCorner*>::iterator
+				  newCorner = _possibleCorners.begin();
+			  newCorner != _possibleCorners.end() ; newCorner++) {
+
+			// If the line is in both sets, then it's still a
+			// possible corner
+			if (**newCorner == **currCorner) {
+				updated.push_back(*newCorner);
+			}
+		}
+	}
+
+	possibleCorners = updated;
+}
