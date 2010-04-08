@@ -240,6 +240,8 @@ void LocEKF::incorporateMeasurement(Observation z,
 #endif
     int obsIndex;
 
+	// Hack in here for if the vision system cannot identify this observation
+	// (no possible identities)
 	if (z.getNumPossibilities() == 0){
 		R_k(0,0) = DONT_PROCESS_KEY;
 		return;
@@ -253,8 +255,6 @@ void LocEKF::incorporateMeasurement(Observation z,
         obsIndex = 0;
     }
 	// No landmark is close enough, don't attempt to use one
-	// Hack in here for if the vision system cannot identify this observation
-	// (no possible identities)
 	if (obsIndex < 0) {
 		R_k(0,0) = DONT_PROCESS_KEY;
 		return;
