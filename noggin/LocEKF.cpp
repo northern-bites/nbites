@@ -239,18 +239,27 @@ void LocEKF::incorporateMeasurement(Observation z,
     cout << "\t\t\tIncorporating measurement " << z << endl;
 #endif
     int obsIndex;
+
+	// Hack in here for if the vision system cannot identify this observation
+	// (no possible identities)
+	if (z.getNumPossibilities() == 0){
+		R_k(0,0) = DONT_PROCESS_KEY;
+		return;
+	}
+
     // Get the best fit for ambigious data
     // NOTE: this is only done, if useAmbiguous is turned to true
-    if (z.getNumPossibilities() > 1) {
+    else if (z.getNumPossibilities() > 1) {
         obsIndex = findBestLandmark(&z);
-        // No landmark is close enough, don't attempt to use one
-        if (obsIndex < 0) {
-            R_k(0,0) = DONT_PROCESS_KEY;
-            return;
-        }
     } else {
         obsIndex = 0;
     }
+	// No landmark is close enough, don't attempt to use one
+	if (obsIndex < 0) {
+		R_k(0,0) = DONT_PROCESS_KEY;
+		return;
+	}
+
 
 	if ( z.isLine() ){
 		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
@@ -414,8 +423,9 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
         z_x(1) = z.getVisBearing();
 
 		// Get expected values of the post
-		const float x_b = z.getPointPossibilities()[obsIndex].x;
-		const float y_b = z.getPointPossibilities()[obsIndex].y;
+		PointLandmark bestPossibility = z.getPointPossibilities()[obsIndex];
+		const float x_b = bestPossibility.x;
+		const float y_b = bestPossibility.y;
 		MeasurementVector d_x(2);
 
 		const float x = xhat_k_bar(0);

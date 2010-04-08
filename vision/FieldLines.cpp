@@ -2937,9 +2937,10 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 		}
 	}
 
-	// We prefer using SUREly identified posts, but we will use other ones if
-	// they're available
     vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
+
+	// We might later use uncertain objects, but they cause problems. e.g. if you see
+	// one post as 2 posts (both the left and right), you get really bad things
 	if (visibleObjects.empty())
 		visibleObjects = getAllVisibleFieldObjects();
 
@@ -2953,8 +2954,6 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 
         list <const ConcreteCorner*> possibleClassifications(0);
 		classifyCornerWithObjects(*i, visibleObjects, &possibleClassifications);
-
-		//		list <const ConcreteCorner*> 
 
         // Keep it completely abstract
         if (possibleClassifications.empty()) {
@@ -3029,7 +3028,12 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners) {
 			printPossibilities(i->getPossibleCorners());
 	}
 
-
+	// If our corners have no identity, set them to their shape possibilities
+    for (list <VisualCorner>::iterator i = corners.begin();
+		 i != corners.end(); ++i){
+		if (i->getPossibleCorners().empty())
+			i->setPossibleCorners(ConcreteCorner::getPossibleCorners(i->getShape()));
+	}
 }
 
 // Determines if the given L corner does not geometrically make sense for its
