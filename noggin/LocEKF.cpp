@@ -242,6 +242,7 @@ void LocEKF::incorporateMeasurement(Observation z,
 
 	// Hack in here for if the vision system cannot identify this observation
 	// (no possible identities)
+	// @todo this should never happen, so fix vision system to stop it from happening.
 	if (z.getNumPossibilities() == 0){
 		R_k(0,0) = DONT_PROCESS_KEY;
 		return;
