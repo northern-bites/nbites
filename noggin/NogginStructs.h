@@ -140,7 +140,7 @@ public:
 			// We want to make dx, dy components of line's _unit_ vector,
 			// so we normalize them
 			if (dx !=0 || dy != 0) {
-				const float length = hypot(dx,dy);
+				const float length = static_cast<float>(hypot(dx,dy));
 				dx = dx / length;
 				dy = dy / length;
 			}

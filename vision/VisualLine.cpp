@@ -200,7 +200,7 @@ void VisualLine::calculateDistBearing()
 	const float y_p = (startGroundY * unitSlopeY +
 					   startGroundX * unitSlopeX) * unitSlopeY + startGroundY;
 
-	setDistanceWithSD( hypot(x_p, y_p));
+	setDistanceWithSD( static_cast<float>(hypot(x_p, y_p)));
 	setBearingWithSD( NBMath::subPIAngle(NBMath::safe_atan2(y_p, x_p)) );
 }
 

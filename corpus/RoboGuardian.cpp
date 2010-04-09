@@ -14,7 +14,7 @@ using namespace std;
 
 const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
-const float RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1.0f * 1000.0f * 1000.0f /
+const int RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
     RoboGuardian::GUARDIAN_FRAME_RATE;
 
 const int RoboGuardian::NO_CLICKS = -1;

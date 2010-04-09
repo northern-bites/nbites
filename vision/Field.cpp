@@ -434,17 +434,17 @@ void Field::findConvexHull(int pH) {
 		//cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
 		int diff = convex[i].y - convex[i-1].y;
 		float step = (float)diff / (float)(convex[i].x - convex[i-1].x);
-		float cur = convex[i].y;
+		int cur = convex[i].y;
 		for (int j = convex[i].x; j > convex[i-1].x; j--) {
-			cur -= step;
-			topEdge[j] = (int)cur;
+			cur = static_cast<int>((static_cast<float>(cur) - step));
+			topEdge[j] = cur;
 			if (cur > 10) {
-				e = vision->pose->pixEstimate(j, (int)cur, 0.0f);
+				e = vision->pose->pixEstimate(j, cur, 0.0f);
 				if (e.dist > maxPix)
 					maxPix = e.dist;
 			}
 			if (debugFieldEdge)
-				thresh->drawPoint(j, (int)cur, BLACK);
+				thresh->drawPoint(j, cur, BLACK);
 		}
 		if (debugFieldEdge)
 			thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x, convex[i].y, ORANGE);
@@ -801,7 +801,7 @@ void Field::bestShot(VisualFieldObject* left,
 	middle->setRightBottomY(bottom);
 	middle->setLeftTopY(bottom - 10);
 	middle->setRightTopY(bottom - 10);
-	middle->setWidth(rightb - leftb + 1);
+	middle->setWidth(static_cast<float>(rightb - leftb + 1));
 	middle->setHeight(10);
 	setShot(middle, color);
 	/*
@@ -919,6 +919,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
     open2[0] = horizon;
     int lastd = 0;
     int sixty = IMAGE_HEIGHT - 1;
+
     for (int i = IMAGE_HEIGHT - 1; i > horizon; i--) {
         estimate d = pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0);
         //cout << "Distances " << i << " " << d.dist << endl;
@@ -930,6 +931,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
         }
         lastd = (int)d.dist;
     }
+
     const vector <VisualLine>* lines = vision->fieldLines->getLines();
     for (int x = SCAN_DIVISION; x < IMAGE_WIDTH - 1; x += SCAN_DIVISION) {
         bad = 0; white = 0; grey = 0; run = 0; greyrun = 0;
@@ -940,11 +942,13 @@ void Field::openDirection(int horizon, NaoPose *pose)
         plumbLineTop.x = x; plumbLineTop.y = 0;
         plumbLineBottom.x = x; plumbLineBottom.y = IMAGE_HEIGHT;
         crossings = 0;
+
         for (vector <VisualLine>::const_iterator k = lines->begin();
              k != lines->end(); k++) {
             pair<int, int> foo = Utility::
                 plumbIntersection(plumbLineTop, plumbLineBottom,
                                   k->start, k->end);
+
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
                 intersections[crossings] = foo.second;
                 crossings++;
@@ -953,15 +957,18 @@ void Field::openDirection(int horizon, NaoPose *pose)
                 }
             }
         }
+
         int maxH = max(0, horizonAt(x));
         //cout << "Got lines " << maxH << endl;
         for (y = IMAGE_HEIGHT - 1; y > maxH; y--) {
             pix = thresh->thresholded[y][x];
+
             if ((pix == RED || pix == NAVY)) {
                 bad++;
                 run++;
                 lineFound = false;
             } else if (pix == WHITE) {
+
                 if (!lineFound) {
                     for (int k = 0; k < crossings; k++) {
                         //cout << "Crassing at " << intersections[k] << endl;
@@ -979,6 +986,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
                     //cout << "No Intersection at " << j << endl;
                     white++;
                 }
+
             } else if (pix == GREY || pix == BLACK) {
                 grey++;
                 greyrun++;
@@ -988,6 +996,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
                 greyrun = 0;
                 lineFound = false;
             }
+
             if (greyrun == GREY_MAX) {
                 //shoot[i] = false;
                 if (open[(int)x / SCAN_DIVISION] == horizon) {
@@ -999,6 +1008,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
                 //drawPoint(x + 1, y, RED);
                 y = 0;
             }
+
             if (run == RUN_BUFFER) {
                 if (open[(int)x / SCAN_DIVISION] == horizon) {
                     open[(int)x / SCAN_DIVISION] = y + RUN_BUFFER;
@@ -1011,37 +1021,42 @@ void Field::openDirection(int horizon, NaoPose *pose)
                 //drawPoint(x - 1, y, RED);
                 //drawPoint(x + 1, y, RED);
             }
+
             if (run > MAX_RUN_SIZE && (bad > MAX_BAD_PIXELS || y < sixty)) {
                 open2[(int)x / SCAN_DIVISION] = y + run;
                 y = 0;
             }
         }
     }
+
     // OK let's see if we can say anything about how blocked we were
     // left side first
-    int index1 = 0, index2, index3, i, index12 = 0, index22, index32;
     int longs = 0, longsize = 0, longIndex = 0, minsize = horizon;
     int jumpdown = -1, lastone = horizon;
     bool vert = false;
-    for (i = 0; i < IMAGE_WIDTH / SCAN_DIVISION; i++) {
+    for (int i = 0; i < IMAGE_WIDTH / SCAN_DIVISION; i++) {
         if (i - jumpdown < JUMP_MAX && !vert && open[i] >
 			IMAGE_HEIGHT - BOTTOM_BUFFER && jumpdown != -1) {
             vert = true;
         }
+
         if (open[i] > horizon + HORIZON_TOLERANCE &&
 			lastone < horizon + HORIZON_TOLERANCE && i != 0) {
             jumpdown = i;
             vert = false;
         }
+
         if (vert && lastone > horizon + HORIZON_TOLERANCE  && open[i] <
 			horizon + HORIZON_TOLERANCE) {
             //cout << "Testing for vertical " << jumpdown << " " << i << endl;
+
             if (i - jumpdown < DOWNMAX && jumpdown != -1) {
                 point<int> midTop(jumpdown * SCAN_DIVISION,
 								  IMAGE_HEIGHT - horizon /2);
                 point<int> midBottom(i * SCAN_DIVISION,IMAGE_HEIGHT- horizon/2);
                 bool intersects = vision->fieldLines->
                     intersectsFieldLines(midTop,midBottom);
+
                 if (intersects) {
                     if (openField) {
                         cout << "VERTICAL LINE DETECTED BY OPEN FIELD*********"
@@ -1055,6 +1070,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
             }
         }
         lastone = open[i];
+
         if (open[i] - MAX_RUN_SIZE <= horizon) {
             longs++;
             if (longs > longsize) {
@@ -1064,10 +1080,13 @@ void Field::openDirection(int horizon, NaoPose *pose)
         } else {
             longs = 0;
         }
+
         if (open[i] > minsize) {
             minsize = open[i];
         }
     }
+
+    int index1 = 0, index2, index3, i, index12 = 0, index22, index32;
     for (i = 1; i < IMAGE_WIDTH / IMAGE_SECTIONS; i++) {
         if (open[i] > open[index1]) {
             index1 = i;
@@ -1076,6 +1095,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
             index12 = i;
         }
     }
+
     index2 = i; index22 = i;
     for (i++ ; i < 2 * IMAGE_WIDTH / IMAGE_SECTIONS; i++) {
         if (open[i] > open[index2]) {
@@ -1085,8 +1105,10 @@ void Field::openDirection(int horizon, NaoPose *pose)
             index22 = i;
         }
     }
-    index3 = i; index32 = i;
-    for (i++ ; i < (IMAGE_WIDTH / SCAN_DIVISION) ; i++) {
+
+    index3 = i;
+    index32 = i;
+    for (i++ ; i < (IMAGE_WIDTH / SCAN_DIVISION); i++) {
         if (open[i] > open[index3]) {
             index3 = i;
         }
@@ -1094,6 +1116,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
             index32 = i;
         }
     }
+
     // All distance estimates are to the HARD values
     estimate e;
     e = pose->pixEstimate(IMAGE_WIDTH/X_AXIS_SECTIONS, open2[index12], 0.0);

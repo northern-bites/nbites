@@ -678,21 +678,26 @@ void Ball::horizontalScan(int x, int y, int dir, int stopper, int c,
     int startY = y;
     int height = IMAGE_HEIGHT;
     // go until we hit enough bad pixels
-    for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
-              && y < height && bad < stopper; ) {
-        if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
-            // if it is either of the colors we're looking for - good
-            good++;
-            run++;
-            if (run > 1) {
-                scan.x = x;
-                scan.y = y;
+
+    //let's pull the y checks out of this
+    if (y > -1 && y < height){
+        while ( x > leftBound && x < rightBound && x < IMAGE_WIDTH &&
+                  bad < stopper) {
+            if (thresh->thresholded[y][x] == c ||
+                thresh->thresholded[y][x] == c2) {
+                // if it is either of the colors we're looking for - good
+                good++;
+                run++;
+                if (run > 1) {
+                    scan.x = x;
+                    scan.y = y;
+                }
+            } else {
+                bad++;
+                run = 0;
             }
-        } else {
-            bad++;
-            run = 0;
+            x = x + dir;
         }
-        x = x + dir;
     }
     scan.bad = bad;
     scan.good = good;
@@ -1289,7 +1294,9 @@ bool Ball::badSurround(Blob b) {
 			return true;
 		}
 	}
-	if (red > orange && greens < (w * h) * GREEN_PERCENT) {
+	if ((red > orange) &&
+        (static_cast<float>(greens) <
+         (static_cast<float>(w * h) * GREEN_PERCENT))) {
 		if (BALLDEBUG) {
 			cout << "Too much real orangered without enough green" << endl;
 		}
