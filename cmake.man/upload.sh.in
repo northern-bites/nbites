@@ -63,7 +63,7 @@ echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt
 echo "cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME"
 cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME
 
-SRC=install/lib/*
+SRC=install/*
 
 echo "rsync -rcLv $SRC $DEST/"
 rsync -rcLv $SRC $DEST/
