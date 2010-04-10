@@ -476,10 +476,10 @@ typedef struct PyVisualLine_t {
 // C++ - accessible interface
 extern PyObject *PyVisualLine_new    (PyFieldLines *fl, int i);
 extern PyObject *PyVisualLine_new    (PyFieldLines *fl, int i,
-                                      const VisualLine &line);
+                                      boost::shared_ptr<VisualLine> line);
 //jf- extern void      PyVisualLine_update (PyVisualLine *self);
 extern void      PyVisualLine_update (PyVisualLine *self,
-                                      const VisualLine &line);
+                                      boost::shared_ptr<VisualLine> line);
 // backend methods
 extern PyObject *PyVisualLine_new    (PyTypeObject *type, PyObject *args,
                                       PyObject *kwds);

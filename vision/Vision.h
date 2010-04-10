@@ -90,7 +90,7 @@ public:
     virtual void drawPoint(const linePoint &p, const int color);
     virtual void drawPoint(const VisualCorner &c, const int color);
     virtual void drawLine(int x, int y, int x1, int y1, int c);
-    virtual void drawLine(const VisualLine &line, const int color);
+    virtual void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     virtual void drawVerticalLine(int x, int c);
     virtual void drawHorizontalLine(int x, int c);
     virtual void drawDot(int x, int y, int c);

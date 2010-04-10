@@ -716,32 +716,19 @@ const string Utility::getDistCertaintyString(int _cert) {
     }
 }
 
-const std::pair<float,float>
-Utility::findClosestLinePointCartesian(LineLandmark l, float x_r,
-									   float y_r, float h_r)
+const point<int> Utility::findCloserEndpoint(const VisualLine& line,
+											 const point<int>& intersection)
 {
-	// cout << "line landmark is " << l << endl;
-	const float x_l = l.dx;
-	const float y_l = l.dy;
-
-	const float x_b = l.x1;
-	const float y_b = l.y1;
-
-	// Find closest point on the line to the robot (global frame)
-	const float x_p = ((x_r - x_b)*x_l + (y_r - y_b)*y_l)*x_l + x_b;
-	const float y_p = ((x_r - x_b)*x_l + (y_r - y_b)*y_l)*y_l + y_b;
-
-	// Relativize the closest point
-	const float relX_p = x_p - x_r;
-	const float relY_p = y_p - y_r;
-	// cout << "relx_p " << relX_p << " and rely_p " << relY_p <<
-	//   	" x_p " << x_p << " y_p "  << y_p  << endl;
-	return std::pair<float,float>(relX_p, relY_p);
+	if (Utility::getLength(static_cast<float>(intersection.x),
+						   static_cast<float>(intersection.y),
+						   static_cast<float>(line.start.x),
+						   static_cast<float>(line.start.y) ) <
+		Utility::getLength(static_cast<float>(intersection.x),
+						   static_cast<float>(intersection.y),
+						   static_cast<float>(line.end.x),
+						   static_cast<float>(line.end.y)) ) {
+		return line.start;
+	} else {
+		return line.end;
+	}
 }
-
-
-
-
-
-
-

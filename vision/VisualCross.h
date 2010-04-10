@@ -16,8 +16,6 @@
 
 // Values for the Standard Deviation calculations
 
-// This class should eventually inheret from VisualLandmark, once it is
-// cleaned a bit
 class VisualCross : public VisualDetection, public VisualLandmark<crossID> {
 
 public:
@@ -73,6 +71,7 @@ public:
     const std::list <const ConcreteCross *> * getPossibleCrosses() const {
         return possibleCrosses;
     }
+	virtual const bool hasPositiveID();
 
 private: // Class Variables
 

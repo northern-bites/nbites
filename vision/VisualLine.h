@@ -101,9 +101,9 @@ public:
     const float getSlope() const;
 
     // Returns true if the line is more vertical on the screen than horizontal
-    static const bool isVerticallyOriented(const VisualLine& line);
+	const bool isVerticallyOriented();
 
-    static const bool isPerfectlyVertical(const VisualLine& line);
+	const bool isPerfectlyVertical();
 
     // Given a line, returns (a, b) where the line can be represented by
     // ai + bj (i being the unit vector parallel to the x axis, j being
@@ -136,10 +136,9 @@ public:
 private: // Member functions
     void init();
     void calculateWidths();
-	void calculateDistBearing();
 
-    static inline const float getLength(const VisualLine& line);
-    static inline const float getAngle(const VisualLine& line);
+	inline const float getLength();
+	inline const float getAngle();
 
 
 
@@ -193,13 +192,11 @@ public:
     const float getDistanceSD() const { return distanceSD; }
     const float getBearingSD() const { return bearingSD; }
     const bool getCCLine() const {return ccLine; }
-    /**
-     * @return a List of all possible lines.  Currently returns all 11 lines
-     */
+
     const std::list <const ConcreteLine *> getPossibleLines() const {
         return possibleLines;
     }
-
+	virtual const bool hasPositiveID();
 
     // Setters
     void setDistance(float _distance) { distance = _distance; }
@@ -209,9 +206,11 @@ public:
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     void setCCLine(bool _ccLine) { ccLine = _ccLine; }
-    void setPossibleLines(std::list <const ConcreteLine*> _possibles) {
-        possibleLines = _possibles;
-    }
-
+    void setPossibleLines(std::list <const ConcreteLine*> _possibles);
+    void setPossibleLines(std::vector <const ConcreteLine*> _possibles);
+    void setPossibleLines(const ConcreteLine* _possible) {
+		possibleLines.clear();
+		possibleLines.push_back(_possible);
+	}
 };
 #endif

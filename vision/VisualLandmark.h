@@ -73,7 +73,8 @@ public:
     // Calculate and set the standard deviation of the measurement while
     // setting the distance; should be used whenever a legitimate distance
     // measurement is set
-    // pure virtual; to be defined by implementing subclass
+
+	virtual const bool hasPositiveID() = 0;
 };
 
 
