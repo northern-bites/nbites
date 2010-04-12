@@ -4,7 +4,7 @@
 
 MMLocEKF::MMLocEKF() :
 	LocSystem(),mostLikelyModel(0), numActive(0),
-	mergeThreshold(1.5), frameNum(0)
+	numFree(MAX_MODELS), frameNum(0)
 {
 	initModels();
 }
@@ -28,6 +28,7 @@ void MMLocEKF::initModels()
 		modelList.push_back(models[i]);
 	}
 	numActive = 0;
+	numFree = MAX_MODELS;
 	activateModel(models[0]);
 	models[0]->setProbability(1.0);
 
@@ -91,7 +92,7 @@ bool MMLocEKF::applyUnambiguousObservations(vector<Observation>& Z)
 	return appliedObs;
 }
 
-void MMLocEKF::applyObsToActiveModels(Observation& obs)
+void MMLocEKF::applyObsToActiveModels(const Observation& obs)
 {
 	for (int i=0; i < MAX_MODELS; ++i){
 		if (models[i]->isActive()){
@@ -128,23 +129,28 @@ void MMLocEKF::splitObservation(const Observation& obs, LocEKF * model)
 	const double originalProb = model->getProbability();
 	list<LocEKF*> splitModels;
 
+	// const int numRequiredModels = obs.getNumPossibilities() * numActive;
+	// if (numRequiredModels > numFree)
+	// 	consolidateModels(MAX_ACTIVE_MODELS);
+
 	for (unsigned int i=0; i < obs.getNumPossibilities(); ++i){
 		LocEKF * inactiveModel = getInactiveModel();
 		inactiveModel->copyEKF(*model);
 
 		Observation newObs(obs);
-		if (obs.isLine())
+		if (obs.isLine()){
 			newObs.setLinePossibility(obs.getLinePossibilities()[i] );
-		else
+		} else{
 			newObs.setPointPossibility(obs.getPointPossibilities()[i] );
-
-		inactiveModel->applyObservation(newObs);
-		if (inactiveModel->getProbability() > OUTLIER_PROB_LIMIT){
+		}
+		bool isOutlier = inactiveModel->applyObservation(newObs);
+		if (!isOutlier) {
 			activateModel(inactiveModel);
 			splitModels.push_back(inactiveModel);
 		}
 	}
 
+	consolidateModels(MAX_ACTIVE_MODELS);
 	normalizeProbabilities(splitModels, originalProb);
 	// If every possibility is an outlier and the original model was the only
 	// model to start with, than we need to keep this model active.
@@ -160,15 +166,27 @@ void MMLocEKF::endFrame()
 			models[i]->endFrame();
 		}
 	}
-	consolidateModels();
-	normalizeProbabilities(modelList, PROB_SUM);
-	// cout << "numactive: " << numActive << endl;
-	// if (frameNum > 600 && frameNum < 800)
-	// 	for(int i=0; i < MAX_MODELS; ++i){
-	// 		if (models[i]->isActive())
-	// 			cout << *models[i] << endl;
+
+	// cout << "Before MERGE: " <<endl;
+	// for (int i=0; i < MAX_MODELS; ++i){
+	// 	if (models[i]->isActive()){
+	// 		models[i]->printAfterUpdateInfo();
 	// 	}
-	// cout << "frameNum " << frameNum << endl;
+	// }
+
+	consolidateModels(MAX_ACTIVE_MODELS);
+	normalizeProbabilities(modelList, PROB_SUM);
+
+	// cout << "After MERGE: " <<endl;
+
+	// cout << "f" << frameNum;
+	// for (int i=0; i < MAX_MODELS; ++i){
+	// 	if (models[i]->isActive()){
+	// 		cout << "\t" << models[i]->getProbability();
+	// 	}
+	// }
+	// cout << endl;
+
 	frameNum++;
 }
 
@@ -201,27 +219,34 @@ void MMLocEKF::normalizeProbabilities(const list<LocEKF*>& unnormalized,
 }
 
 // @todo Tune merging and # of MAX_ACTIVE_MODELS
-void MMLocEKF::consolidateModels()
+void MMLocEKF::consolidateModels(int maxAfterMerge)
 {
-	mergeThreshold = MERGE_THRESH_INIT;
+	double mergeThreshold = MERGE_THRESH_INIT;
 	int numMerges = 0;
-	const int MAX_MERGES = 4;
+	const int MAX_MERGES = 10;
+	const double MIN_ACCEPT_PROB = 0.003;
+
+	for (int i=0; i < MAX_MODELS; ++i){
+		if (models[i]->isActive() &&
+			models[i]->getProbability() < MIN_ACCEPT_PROB){
+			deactivateModel(models[i]);
+		}
+	}
 
 	bool shouldMergeAgain = true;
-	while (shouldMergeAgain && numMerges < MAX_MERGES){
-		mergeModels();
+	while (numActive > maxAfterMerge){
 		mergeThreshold += MERGE_THRESH_STEP;
+		mergeModels(mergeThreshold);
 		numMerges++;
-
-		shouldMergeAgain = (numActive > MAX_ACTIVE_MODELS );
 	}
 }
 
-void MMLocEKF::mergeModels()
+void MMLocEKF::mergeModels(double mergeThreshold)
 {
 	for (int i=0; i < MAX_MODELS; ++i) {
 		for (int j=0; j < MAX_MODELS; ++j){
-			if (i != j && mergeable(models[i], models[j])){
+			if (i != j && mergeable(mergeThreshold,
+									models[i], models[j])){
 				models[i]->mergeEKF(*models[j]);
 				deactivateModel(models[j]);
 			}
@@ -229,7 +254,7 @@ void MMLocEKF::mergeModels()
 	}
 }
 
-bool MMLocEKF::mergeable(LocEKF* one, LocEKF* two)
+bool MMLocEKF::mergeable(double mergeThreshold, LocEKF* one, LocEKF* two)
 {
 	if (!one->isActive() || !two->isActive() || one == two)
 		return false;
@@ -320,7 +345,8 @@ const list<LocEKF*> MMLocEKF::getModels() const
 	return modelList;
 }
 
-
+// @todo implement checking to make sure index 0 isn't always called,
+// or something wrong like that, aka better fall back behavior
 const int MMLocEKF::getMostLikelyModel() const
 {
 	double max = -1.0;
@@ -342,6 +368,8 @@ LocEKF * MMLocEKF::getInactiveModel() const
 	for (int i=0; i < MAX_MODELS; ++i)
 		if (!models[i]->isActive())
 			return models[i];
+	cout << "SHIT RAN OUT OF MODELS";
+	exit(0);
 	return models[MAX_MODELS -1];
 }
 
@@ -367,6 +395,7 @@ void MMLocEKF::deactivateModel(LocEKF * model)
 		return;
 	model->deactivate();
 	numActive--;
+	numFree++;
 }
 
 void MMLocEKF::activateModel(LocEKF * model)
@@ -375,6 +404,7 @@ void MMLocEKF::activateModel(LocEKF * model)
 		return;
 	model->activate();
 	numActive++;
+	numFree--;
 }
 
 /**************** RESETS *******************/

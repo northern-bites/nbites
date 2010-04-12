@@ -1,4 +1,5 @@
 #include "fakerIterators.h"
+#include "fakerIO.h"
 using namespace std;
 using namespace boost;
 using namespace NBMath;
@@ -67,7 +68,11 @@ void iterateFakerPath(fstream * mclFile, fstream * ekfFile,
     vector<Observation> Z_t;
     // shared_ptr<MCL> mclLoc = shared_ptr<MCL>(new MCL(100));
     // shared_ptr<BallEKF> MCLballEKF = shared_ptr<BallEKF>(new BallEKF());
+#ifdef USE_MM_LOC_EKF
     shared_ptr<LocSystem> ekfLoc = shared_ptr<LocSystem>(new MMLocEKF());
+#else
+    shared_ptr<LocSystem> ekfLoc = shared_ptr<LocSystem>(new LocEKF());
+#endif
     shared_ptr<BallEKF> EKFballEKF = shared_ptr<BallEKF>(new BallEKF());
     PoseEst currentPose;
     BallPose currentBall;

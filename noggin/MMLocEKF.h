@@ -29,13 +29,13 @@ private:						// Private methods
 
 	bool applyUnambiguousObservations(std::vector<Observation>& Z);
 	bool applyAmbiguousObservations(const std::vector<Observation>& Z);
-	void applyObsToActiveModels(Observation& Z);
+	void applyObsToActiveModels(const Observation& Z);
 	void applyNoCorrectionStep();
 
 	void splitObservation(const Observation& obs, LocEKF * model);
-	void consolidateModels();
+	void consolidateModels(int maxAfterMerge);
 
-	void mergeModels();
+	void mergeModels(double mergeThreshold);
 
 	void endFrame();
 	void normalizeProbabilities(const list<LocEKF*>& unnormalized,
@@ -43,17 +43,18 @@ private:						// Private methods
 
 	void setAllModelsInactive();
 	void equalizeProbabilities();
-	bool mergeable(LocEKF* one, LocEKF* two);
+	bool mergeable(double mergeThreshold, LocEKF* one, LocEKF* two);
 
 
 private:						// Private variables
+
 	const static int MAX_MODELS = 30;
 
 	LocEKF* models[MAX_MODELS];
 	list<LocEKF*> modelList;
 
 	int mostLikelyModel;
-	int numActive;
+	int numActive, numFree;
 
 	inline const int getMostLikelyModel() const;
 	inline LocEKF * getInactiveModel() const;
@@ -62,13 +63,12 @@ private:						// Private variables
 
 	MotionModel lastOdo;
 	vector<Observation> lastObservations;
-	double mergeThreshold;
 
 	const static double PROB_SUM = 1.0;
-	const static double MERGE_THRESH_INIT = 0.05f;
-	const static double MERGE_THRESH_STEP = 0.1f;
+	const static double MERGE_THRESH_INIT = 0.01f;
+	const static double MERGE_THRESH_STEP = 0.05f;
 	const static int MAX_ACTIVE_MODELS = 6;
-	const static double OUTLIER_PROB_LIMIT = 0.01;
+	const static double OUTLIER_PROB_LIMIT = 0.005;
 
 	int frameNum;
 

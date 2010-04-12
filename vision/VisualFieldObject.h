@@ -94,11 +94,11 @@ private: // Class Variables
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 
     // Helper Methods
-    inline float postDistanceToSD(float _distance) {
+    inline static float postDistanceToSD(float _distance) {
         //return 0.0496f * exp(0.0271f * _distance);
         return sqrt(2.0f*(10 + (_distance * _distance)*0.00125f));
     }
-    inline float postBearingToSD(float _bearing) {
+    inline static float postBearingToSD(float _bearing) {
         return sqrt(static_cast<float>(M_PI) / 8.0f);
     }
     const static float BOTH_UNSURE_DISTANCE_SD;

@@ -40,11 +40,15 @@ public:
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
 	void odometryUpdate(MotionModel u);
 	void applyObservations(vector<Observation> Z);
-	void applyObservation(Observation Z);
+	bool applyObservation(Observation Z);
 	void endFrame();
 
 	void copyEKF(const LocEKF& other);
 	void mergeEKF(const LocEKF& other);
+
+	void printAfterUpdateInfo();
+	void printBeforeUpdateInfo();
+
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
@@ -175,7 +179,7 @@ private:
 	int findNearestNeighbor(Observation *z);
     float getDivergence(Observation * z, PointLandmark pt);
 
-	void updateProbability(const Observation& Z);
+	bool updateProbability(const Observation& Z);
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();

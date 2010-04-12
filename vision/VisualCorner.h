@@ -97,10 +97,10 @@ private: // private methods
     void determineCornerShape(); // called on object instantiation
 
 
-    inline float cornerDistanceToSD(float _distance) {
+    inline static float cornerDistanceToSD(float _distance) {
         return sqrt(2.0f * std::max(10 + _distance*0.00125f, 250.0f));
     }
-    inline float cornerBearingToSD(float _bearing) {
+    inline static float cornerBearingToSD(float _bearing) {
         return sqrt(static_cast<float>(M_PI) / 4.0f);
     }
 

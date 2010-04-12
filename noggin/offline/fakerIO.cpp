@@ -337,7 +337,6 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
                 << myLoc->getHUncert() << " ";
 
-#define USE_MM_LOC_EKF
 #ifdef USE_MM_LOC_EKF
 	shared_ptr<MMLocEKF> mmloc = boost::dynamic_pointer_cast<MMLocEKF>(myLoc);
 	const list<LocEKF*> models = mmloc->getModels();
@@ -357,9 +356,8 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
 					<< ";";	// Split models with ;
 	}
 	// Split models section from ball and obs section
-	*outputFile << "|";
 #endif
-
+	*outputFile << "|";
 
     // X Estimate
 	 *outputFile << (ballEKF->getXEst()) << " "

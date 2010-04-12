@@ -151,7 +151,7 @@ public:
         ++frameCounter;
         // Have the time update prediction incorporated
         // i.e. odometery, natural roll, etc.
-        StateVector deltas = associateTimeUpdate(u_k);
+        const StateVector deltas = associateTimeUpdate(u_k);
         xhat_k_bar = xhat_k + deltas;
 
         // Calculate the uncertainty growth for the current update
@@ -160,7 +160,7 @@ public:
         }
 
         // Update error covariance matrix
-        StateMatrix newP = prod(P_k, trans(A_k));
+        const StateMatrix newP = prod(P_k, trans(A_k));
         P_k_bar = prod(A_k, newP) + Q_k;
 
 #ifdef DEBUG_JACOBIAN_JUNK
@@ -215,9 +215,8 @@ public:
 			K_k = prod(pTimesHTrans,
 					   NBMath::invert2by2(prod(H_k, pTimesHTrans) + R_k));
 		}else{
-			const MeasurementMatrix temp = prod(H_k, pTimesHTrans) + R_k;
 			const MeasurementMatrix inv =
-				NBMath::solve(temp,
+				NBMath::solve(prod(H_k, pTimesHTrans) + R_k,
 							  boost::numeric::ublas::identity_matrix<float>(
 								  measurementSize));
 			K_k = prod(pTimesHTrans, inv);

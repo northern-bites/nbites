@@ -116,38 +116,41 @@ void LocEKF::mergeEKF(const LocEKF& other)
 	// @todo check for "drift" chances, that is, one small prob and one large prob.
 	// see page 6 of Quinlan pdf
 	StateVector new_xhat_k(LOC_EKF_DIMENSION);
-	if ( other.getProbability() > probability * 10 ){
-		new_xhat_k = other.getState();
-	} else if ( probability <= other.getProbability() * 10 ){
 
+	const int DRIFT_PROB_MAX_DIFF = 10;
+	if ( other.getProbability() > probability * DRIFT_PROB_MAX_DIFF ){
+		new_xhat_k = other.getState();
+		P_k = other.getStateUncertainty();
+	} else if ( probability > other.getProbability() * DRIFT_PROB_MAX_DIFF) {
+		new_xhat_k = xhat_k;
+	} else {
 		new_xhat_k(0) = ( (1/newProbability)*
-						  (probability*getXEst() +
+						  (probability * getXEst() +
 						   other.getProbability() * other.getXEst()) );
 		new_xhat_k(1) = ( (1/newProbability)*
-						  (probability*getYEst() +
+						  (probability * getYEst() +
 						   other.getProbability() * other.getYEst()) );
 		new_xhat_k(2) = ( (1/newProbability)*
-						  (probability*getHEst() +
+						  (probability * getHEst() +
 						   other.getProbability() * other.getHEst()) );
 		// cout << "newxhatk " << new_xhat_k << "\t" ;
 		// cout << "newprob " << newProbability << endl;
-	} else {
-		new_xhat_k = xhat_k;
+
+
+
+		// @todo set covariance matrix of new model
+		const StateVector diffA = (xhat_k - new_xhat_k);
+		const StateMatrix a = P_k + outer_prod(diffA,
+											   trans(diffA));
+
+		const StateVector diffB = (other.getState() - new_xhat_k);
+		const StateMatrix b = (other.getStateUncertainty() +
+							   outer_prod(diffB, trans(diffB)));
+
+		const StateMatrix new_P_k = ( ((probability * a) +
+									   (other.getProbability() * b)) /
+									  newProbability);
 	}
-
-
-	// @todo set covariance matrix of new model
-	const StateVector diffA = (xhat_k - new_xhat_k);
-	const StateMatrix a = P_k + outer_prod(diffA,
-										   trans(diffA));
-
-	const StateVector diffB = (other.getState() - new_xhat_k);
-	const StateMatrix b = (other.getStateUncertainty() +
-								 outer_prod(diffB, trans(diffB)));
-
-	const StateMatrix new_P_k = ( ((probability * a) +
-										 (other.getProbability() * b)) /
-										newProbability);
 	// cout << "\txhat: " << new_xhat_k << endl;
 	//cout << "\t\tP_k: " << new_P_k << endl;
 	setProbability(newProbability);
@@ -204,13 +207,7 @@ void LocEKF::redGoalieReset()
 void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
-    cout << "Loc update: " << endl;
-    cout << "Before updates: " << *this << endl;
-    cout << "\tOdometery is " << u <<endl;
-    cout << "\tObservations are: " << endl;
-    for(unsigned int i = 0; i < Z.size(); ++i) {
-        cout << "\t\t" << Z[i] <<endl;
-    }
+	printBeforeUpdateInfo();
 #endif
 
 	odometryUpdate(u);
@@ -218,10 +215,7 @@ void LocEKF::updateLocalization(MotionModel u, vector<Observation> Z)
 	endFrame();
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-    cout << "After updates: " << *this << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
+	printAfterUpdateInfo();
 #endif
 }
 
@@ -258,23 +252,22 @@ void LocEKF::applyObservations(vector<Observation> Z)
     //limitPosteriorUncert();
 }
 
-void LocEKF::applyObservation(Observation Z)
+bool LocEKF::applyObservation(Observation Z)
 {
+#if DEBUG_LOC_EKF_INPUTS
+	printBeforeUpdateInfo();
+#endif
 	correctionStep(Z);
 	updateState();
-	updateProbability(Z);
+	return updateProbability(Z);
 }
 
-void LocEKF::updateProbability(const Observation& Z)
+bool LocEKF::updateProbability(const Observation& Z)
 {
 
 	if (R_k(0,0) == DONT_PROCESS_KEY)
-		return;
+		return true;
 
-	// R_k is covariance matrix of measurement
-
-    // @todo must fix this to sum observation covariance with prediction covariance for
-	// a real measurement and a decent weight
 	const MeasurementMatrix measurementVar = R_k + R_pred_k;
 
 	MeasurementMatrix measurementVarInv = measurementVar;
@@ -283,7 +276,7 @@ void LocEKF::updateProbability(const Observation& Z)
 
 	if (denom < 0.0001){
 		probability *= 0.0001;
-		return;
+		return true;
 	}
 
 	measurementVarInv(0,0) = measurementVar(1,1)/denom;
@@ -291,22 +284,31 @@ void LocEKF::updateProbability(const Observation& Z)
 	measurementVarInv(1,0) = -measurementVar(1,0)/denom;
 	measurementVarInv(1,1) = measurementVar(0,0)/denom;
 
+	v_k(0) = abs(v_k(0));
+	v_k(1) = abs(v_k(1));
+	v_k(2) = abs(v_k(2));
+
 	// We need the measurement innovation or invariance, aka v_k
-	const double exponent = -0.5 * inner_prod(trans(v_k), prod(measurementVarInv, v_k));
+	const double exponent = -0.5 * inner_prod(trans(v_k),
+											  prod(measurementVarInv, v_k));
+
+	if (abs(exponent) > 2.25)
+		return true;
 
 	double detMeasVar = (-measurementVar(0,1) * measurementVar(1,0) +
 						 measurementVar(0,0) * measurementVar(1,1));
 	if (detMeasVar < 0.0001)
 		detMeasVar = 1e-08;
-	const double coefficient = 1 / sqrt( pow(2 * PI, LOC_MEASUREMENT_DIMENSION) *
+	const double coefficient = 1 / sqrt( //pow(2 * PI, LOC_MEASUREMENT_DIMENSION) *
 										 detMeasVar );
 
 	const double outlierProb = 0.08;
-	const double probCo = (1-outlierProb)*(coefficient*pow(M_E, exponent)) + outlierProb;
+	const double probCo = (1-outlierProb)*(pow(M_E, exponent)) + outlierProb;
 
 	// cout << "probCo= " << probCo << "\tprob:" << probability << endl;
 
 	probability *= probCo;
+	return false;
 }
 
 
@@ -568,7 +570,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		R_pred_k(0,0) = static_cast<float>(hypot(uncertX, uncertY));
 		R_pred_k(0,1) = 0;
 		R_pred_k(1,0) = 0;
-		R_pred_k(1,1) = uncertH;
+		R_pred_k(1,1) = .5 * uncertH;
 
 		// Calculate invariance
         V_k	   = z_x - d_x;
@@ -614,6 +616,8 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 
         // Update the measurement covariance matrix
         R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
+		R_k(0,1) = 0.0;
+		R_k(1,0) = 0.0;
         R_k(1,1) = z.getBearingSD() * z.getBearingSD();
 
 		const double uncertX = getXUncert();
@@ -623,7 +627,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		R_pred_k(0,0) = static_cast<float>(hypot(uncertX, uncertY));
 		R_pred_k(0,1) = 0;
 		R_pred_k(1,0) = 0;
-		R_pred_k(1,1) = uncertH;
+		R_pred_k(1,1) = .5 * uncertH;
 
 #ifdef DEBUG_LOC_EKF_INPUTS
         cout << "\t\t\tR vector is" << R_k << endl;
@@ -943,4 +947,23 @@ LocEKF::findClosestLinePointCartesian(LineLandmark l, float x_r,
 	const float relX_p = x_p - x_r;
 	const float relY_p = y_p - y_r;
 	return std::pair<float,float>(relX_p, relY_p);
+}
+
+void LocEKF::printBeforeUpdateInfo()
+{
+    cout << "Loc update: " << endl;
+    cout << "Before updates: " << *this << endl;
+    cout << "\tOdometery is " << lastOdo <<endl;
+    cout << "\tObservations are: " << endl;
+    for(unsigned int i = 0; i < lastObservations.size(); ++i) {
+        cout << "\t\t" << lastObservations[i] <<endl;
+    }
+}
+
+void LocEKF::printAfterUpdateInfo()
+{
+    cout << "After updates: " << *this << endl;
+    cout << endl;
+    cout << endl;
+    cout << endl;
 }

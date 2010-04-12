@@ -50,6 +50,9 @@
 #include "LocEKF.h"
 #include "MMLocEKF.h"
 
+#define USE_MM_LOC_EKF
+//#undef USE_MM_LOC_EKF
+
 void readNavInputFile(std::fstream* name, NavPath * letsGo);
 void readObsInputFile(std::fstream * inputFile,
                       std::vector<PoseEst> * realPoses,
