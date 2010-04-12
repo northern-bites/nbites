@@ -21,7 +21,6 @@ from . import ChaseBallConstants as ChaseConstants
 from man.motion import SweetMoves
 from man.noggin.typeDefs.Location import Location, RobotLocation
 
-from ..util import MyMath
 from math import sin, cos, radians
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -180,7 +179,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if self.penaltyKicking:
             destKickLoc = self.getPenaltyKickingBallDest()
             ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
-            destH = MyMath.getRelativeBearing(destKickLoc)
+            destH = my.getRelativeBearing(destKickLoc)
 
         elif self.shouldMoveAroundBall():
             return self.getPointToMoveAroundBall()

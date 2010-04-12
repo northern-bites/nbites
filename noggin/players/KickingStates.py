@@ -189,7 +189,7 @@ def shootBallClose(player):
 
     leftShotPointBearing = my.getRelativeBearing(constants.SHOOT_AT_LEFT_AIM_POINT)
 
-    rightShotPointBearing = my.getRelativeBearing(constants.SHOOT_AT_RIGHT_AIM_POINT[1])
+    rightShotPointBearing = my.getRelativeBearing(constants.SHOOT_AT_RIGHT_AIM_POINT)
 
     # Turn to the closer shot point
     if fabs(rightShotPointBearing) < fabs(leftShotPointBearing):

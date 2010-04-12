@@ -101,7 +101,7 @@ class SoccerFSA(FSA.FSA):
 
     def atHeading(self):
         nav = self.brain.nav
-        return helper.atHeading(self.brain.my, nav.dest)
+        return helper.atHeading(self.brain.my, nav.dest.h)
 
 ##### Direct Motion Calls
     def gainsOff(self):

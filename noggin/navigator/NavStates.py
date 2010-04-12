@@ -93,7 +93,7 @@ def walkStraightToPoint(nav):
         return nav.goLater('spinToFinalHeading')
 
 
-    targetH = nav.dest.getTargetHeading(my)
+    targetH = my.getTargetHeading(nav.dest)
 
     if helper.notAtHeading(my, targetH):
         nav.walkToPointSpinCount += 1
@@ -103,7 +103,7 @@ def walkStraightToPoint(nav):
     if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToWalkHeading')
 
-    bearing = nav.dest.getRelativeBearing(my)
+    bearing = MyMath.sub180Angle(nav.brain.my.h - targetH)
     distToDest = my.dist(nav.dest)
     if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
         gain = constants.GOTO_FORWARD_GAIN * distToDest
@@ -111,17 +111,17 @@ def walkStraightToPoint(nav):
         gain = 1.0
 
     sTheta = MyMath.clip(MyMath.sign(bearing) *
-                                constants.GOTO_STRAIGHT_SPIN_SPEED *
-                                helper.getRotScale(bearing),
-                                -constants.GOTO_STRAIGHT_SPIN_SPEED,
-                                constants.GOTO_STRAIGHT_SPIN_SPEED )
+                         constants.GOTO_STRAIGHT_SPIN_SPEED *
+                         helper.getRotScale(bearing),
+                         -constants.GOTO_STRAIGHT_SPIN_SPEED,
+                         constants.GOTO_STRAIGHT_SPIN_SPEED )
 
     if fabs(sTheta) < constants.MIN_SPIN_MAGNITUDE_WALK:
         sTheta = 0
 
     sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
-                     constants.WALK_TO_MIN_X_SPEED,
-                     constants.WALK_TO_MAX_X_SPEED)
+              constants.WALK_TO_MIN_X_SPEED,
+              constants.WALK_TO_MAX_X_SPEED)
 
     nav.walkY = 0
     nav.walkX = sX
@@ -140,11 +140,12 @@ def spinToFinalHeading(nav):
 
     targetH = nav.dest.h
 
-    headingDiff = nav.brain.my.h - targetH
+    #may be able to keep sign of this and eliminate spinDir
+    headingDiff = fabs(MyMath.sub180Angle(nav.brain.my.h - targetH))
     if DEBUG:
         nav.printf("Need to spin to %g, heading diff is %g,heading uncert is %g"
                    % (targetH, headingDiff, nav.brain.my.uncertH))
-    spinDir = MyMath.spinDirToHeading(nav.brain.my.h, targetH)
+    spinDir = nav.brain.my.spinDirToHeading(targetH)
 
     spin = spinDir*constants.GOTO_SPIN_SPEED*helper.getRotScale(headingDiff)
 
@@ -222,7 +223,7 @@ def stopped(nav):
 def orbitPoint(nav):
     if nav.updatedTrajectory:
         helper.setSpeed(nav.brain.motion, nav.walkX, nav.walkY, nav.walkTheta)
-        self.updatedTrajectory = False
+        nav.updatedTrajectory = False
 
     return nav.stay()
 
