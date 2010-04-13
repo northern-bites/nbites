@@ -2,15 +2,12 @@
 #define ConcreteLine_h_defined
 
 // Forward reference
-class ConcreteLine;
 #include <ostream>
-#include <list>
+#include <vector>
 #include <string>
 
 // Includes
 #include "FieldConstants.h"
-
-class ConcreteLine; // Forward reference
 
 // Line ID values
 enum lineID {
@@ -20,20 +17,26 @@ enum lineID {
     SIDELINE_LINE,
     ENDLINE_LINE,
     GOALBOX_LINE,
-    GOALBOX_SIDE_LINE, // 55
+    GOALBOX_SIDE_LINE,			// 55
     GOALBOX_TOP_LINE,
 
-    // Distinct lines
+    // Distinct lines:
+	// Named by looking from center field out, left end is at the blue goal
+
+	// Endlines
     BLUE_GOAL_ENDLINE,
     YELLOW_GOAL_ENDLINE,
-    // looking from center field out, left end is at the blue goal
+
     TOP_SIDELINE,
-    BOTTOM_SIDELINE, // 60
-    CENTER_FIELD_LINE,
+    BOTTOM_SIDELINE,
+    MIDLINE,
+
+	// GOALBOX LINES:
+	// Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
     BLUE_GOALBOX_TOP_LINE,
     BLUE_GOALBOX_LEFT_LINE,
     BLUE_GOALBOX_RIGHT_LINE,
-    YELLOW_GOALBOX_TOP_LINE, // 65
+    YELLOW_GOALBOX_TOP_LINE,
     YELLOW_GOALBOX_LEFT_LINE,
     YELLOW_GOALBOX_RIGHT_LINE
 };
@@ -52,6 +55,11 @@ private: //Constructors and Deconstructors
 
 public: // Constants
     static const int NUM_LINES = 11;
+	static const int NUM_SIDELINES = 4;
+	static const int NUM_GOALBOX_LINES = 6;
+	static const int NUM_T_BAR_LINES = 4;
+	static const int NUM_T_STEM_LINES = 5;
+	static const int NUM_L_LINES = 10;
 
 public:
     // Destructor
@@ -61,6 +69,11 @@ public:
     {
         return o << c.toString();
     }
+
+	// Define equality to be if the ID's are equal.
+	bool operator== (const ConcreteLine &secondLine) const {
+		return getID() == secondLine.getID();
+	}
 
 
     ////////////////////////////////////////////////////////////
@@ -75,25 +88,25 @@ public:
     const float getFieldX2() const { return fieldX2; }
     const float getFieldY2() const { return fieldY2; }
 
-public:
-    static const ConcreteLine blue_goal_endline,
-                    yellow_goal_endline,
-                    top_sideline,
-                    bottom_sideline,
-                    center_field_line,
-                    blue_goalbox_top_line,
-                    blue_goalbox_left_line,
-                    blue_goalbox_right_line,
-                    yellow_goalbox_top_line,
-                    yellow_goalbox_left_line,
-                    yellow_goalbox_right_line;
-
-    static const ConcreteLine* concreteLineList[NUM_LINES];
+	static const ConcreteLine& blue_goal_endline();
+	static const ConcreteLine& yellow_goal_endline();
+	static const ConcreteLine& top_sideline();
+	static const ConcreteLine& bottom_sideline();
+	static const ConcreteLine& blue_goalbox_top_line();
+	static const ConcreteLine& blue_goalbox_left_line();
+	static const ConcreteLine& blue_goalbox_right_line();
+	static const ConcreteLine& yellow_goalbox_top_line();
+	static const ConcreteLine& yellow_goalbox_left_line();
+	static const ConcreteLine& yellow_goalbox_right_line();
+	static const ConcreteLine& midline();
 
 public:
-    static const std::list <const ConcreteLine*> concreteLines;
-// We'll probably want to define some lists of sidelines vs goalbox lines, etc.
-// This will be implemented in accordance with analysis within fieldlines...
+    static const std::vector <const ConcreteLine*>& concreteLines();
+	static const std::vector <const ConcreteLine*>& goalboxLines();
+	static const std::vector <const ConcreteLine*>& sidelines();
+	static const std::vector <const ConcreteLine*>& tBarLines();
+	static const std::vector <const ConcreteLine*>& tStemLines();
+	static const std::vector <const ConcreteLine*>& lCornerLines();
 
 private:
     // Instance variables
@@ -103,3 +116,7 @@ private:
 }; // class ConcreteLine
 
 #endif // ConcreteLine_h_defined
+
+
+
+

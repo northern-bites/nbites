@@ -187,8 +187,8 @@ public:
         // Kalman gain matrix
         StateMeasurementMatrix K_k =
             boost::numeric::ublas::scalar_matrix<float>(numStates,
-                                        measurementSize,
-                                        0.0f);
+														measurementSize,
+														0.0f);
         // Observation jacobian
         StateMeasurementMatrix H_k =
             boost::numeric::ublas::scalar_matrix<float>(measurementSize,
@@ -207,15 +207,14 @@ public:
                 continue;
             }
             // Calculate the Kalman gain matrix
-            StateMeasurementMatrix pTimesHTrans = prod(P_k_bar, trans(H_k));
+            const StateMeasurementMatrix pTimesHTrans = prod(P_k_bar, trans(H_k));
 
             if(measurementSize == 2){
                 K_k = prod(pTimesHTrans,
                            NBMath::invert2by2(prod(H_k, pTimesHTrans) + R_k));
             }else{
-                MeasurementMatrix temp = prod(H_k, pTimesHTrans) + R_k;
-                MeasurementMatrix inv =
-                    NBMath::solve(temp,
+                const MeasurementMatrix inv =
+                    NBMath::solve(prod(H_k, pTimesHTrans) + R_k,
                                   boost::numeric::ublas::identity_matrix<float>(
                                       measurementSize));
                 K_k = prod(pTimesHTrans, inv);

@@ -2,7 +2,6 @@
 #define VisualBall_h_DEFINED
 
 #include "Common.h"
-#include "ifdefs.h"
 #include "Structs.h"
 #include "VisionDef.h"
 #include "VisualDetection.h"

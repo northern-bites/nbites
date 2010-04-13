@@ -418,7 +418,7 @@ PyVisualLine_new (PyFieldLines *fl, int i)
 }
 
 extern PyObject *
-PyVisualLine_new (PyFieldLines *fl, int i, const VisualLine &line)
+PyVisualLine_new (PyFieldLines *fl, int i, shared_ptr<VisualLine> line)
 {
     PyVisualLine *self;
 
@@ -427,12 +427,12 @@ PyVisualLine_new (PyFieldLines *fl, int i, const VisualLine &line)
         self->fl = fl;
         self->i = i;
 
-        self->x1 = PyInt_FromLong(line.start.x);
-        self->y1 = PyInt_FromLong(line.start.y);
-        self->x2 = PyInt_FromLong(line.end.x);
-        self->y2 = PyInt_FromLong(line.end.y);
-        self->slope = PyFloat_FromDouble(line.getSlope());
-        self->length = PyFloat_FromDouble(line.length);
+        self->x1 = PyInt_FromLong(line->start.x);
+        self->y1 = PyInt_FromLong(line->start.y);
+        self->x2 = PyInt_FromLong(line->end.x);
+        self->y2 = PyInt_FromLong(line->end.y);
+        self->slope = PyFloat_FromDouble(line->getSlope());
+        self->length = PyFloat_FromDouble(line->length);
 
         if (self->x1 == NULL || self->y1 == NULL || self->x2 == NULL ||
             self->y2 == NULL || self->slope == NULL || self->length == NULL) {
@@ -452,25 +452,25 @@ PyVisualLine_update (PyVisualLine *self)
 }
 
 extern void
-PyVisualLine_update (PyVisualLine *self, const VisualLine &line)
+PyVisualLine_update (PyVisualLine *self, shared_ptr<VisualLine> line)
 {
     Py_XDECREF(self->x1);
-    self->x1 = PyInt_FromLong(line.start.x);
+    self->x1 = PyInt_FromLong(line->start.x);
 
     Py_XDECREF(self->y1);
-    self->y1 = PyInt_FromLong(line.start.y);
+    self->y1 = PyInt_FromLong(line->start.y);
 
     Py_XDECREF(self->x2);
-    self->x2 = PyInt_FromLong(line.end.x);
+    self->x2 = PyInt_FromLong(line->end.x);
 
     Py_XDECREF(self->y2);
-    self->y2 = PyInt_FromLong(line.end.y);
+    self->y2 = PyInt_FromLong(line->end.y);
 
     Py_XDECREF(self->slope);
-    self->slope = PyFloat_FromDouble(line.getSlope());
+    self->slope = PyFloat_FromDouble(line->getSlope());
 
     Py_XDECREF(self->length);
-    self->length = PyFloat_FromDouble(line.length);
+    self->length = PyFloat_FromDouble(line->length);
 }
 
 // backend methods
@@ -529,7 +529,7 @@ PyFieldLines_new (shared_ptr<FieldLines> fl)
         self->fl = fl;
 
         const list<VisualCorner> *corners = fl->getCorners();
-        const vector<VisualLine> *lines = fl->getLines();
+		const vector< shared_ptr<VisualLine> > *lines = fl->getLines();
 
         // Corners
         self->numCorners = PyInt_FromLong(corners->size());
@@ -585,7 +585,7 @@ extern void
 PyFieldLines_update (PyFieldLines *self)
 {
     const list<VisualCorner> *corners = self->fl->getCorners();
-    const vector<VisualLine> *lines = self->fl->getLines();
+    const vector< shared_ptr<VisualLine> > *lines = self->fl->getLines();
 
     Py_XDECREF(self->numCorners);
     self->numCorners = PyInt_FromLong(corners->size());
@@ -1158,7 +1158,7 @@ PyVision_notifyImage (PyObject *self, PyObject *args)
             PyErr_SetObject(PyExc_ValueError,
                             PyString_FromFormat("String argument is too short for use "
                                                 "in this Vision's processing.  (length == %i, required == %i)",
-                                                PyString_Size(s), IMAGE_BYTE_SIZE));
+                                                static_cast<int>(PyString_Size(s)), IMAGE_BYTE_SIZE));
             return NULL;
         }
 
@@ -1342,8 +1342,8 @@ MODULE_INIT(vision) (void)
     //
 
     bool success = true;
-    for (int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
-        const ConcreteCorner *corner = ConcreteCorner::concreteCornerList[i];
+    for (unsigned int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
+        const ConcreteCorner *corner = ConcreteCorner::concreteCorners()[i];
         // attempt to create the static corner references
         py_concrete_corners[corner] = PyConcreteCorner_new(corner);
         if (py_concrete_corners[corner] == NULL) {
@@ -1353,8 +1353,8 @@ MODULE_INIT(vision) (void)
     }
     if (!success) {
         // something failed, so dereference those that succeeded, set error, return
-        for (int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
-            const ConcreteCorner *corner = ConcreteCorner::concreteCornerList[i];
+        for (unsigned int i = 0; i < ConcreteCorner::NUM_CORNERS; i++) {
+            const ConcreteCorner *corner = ConcreteCorner::concreteCorners()[i];
             if (py_concrete_corners[corner] != NULL) {
                 Py_DECREF(py_concrete_corners[corner]);
                 py_concrete_corners.erase(corner);
