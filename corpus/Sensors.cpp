@@ -61,7 +61,7 @@ Sensors::Sensors ()
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
-      FRM_FOLDER(string(getenv("HOME"))+"/frames")
+      FRM_FOLDER("/home/nao/naoqi/frames")
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
