@@ -16,20 +16,20 @@ def goalieSave(player):
     ball = brain.ball
 
     # Figure out where the ball is going and when it will be there
-    if ball.on:
-        relY = ball.relY
-    else:
-        relY = ball.locRelY
+    ## if ball.on:
+    ##     relY = ball.relY
+    ## else:
+    ##     relY = ball.locRelY
     # Decide the type of save
-    if relY > CENTER_SAVE_THRESH:
-        print "Should be saving left"
-        return player.goNow('saveLeft')
-    elif relY < -CENTER_SAVE_THRESH:
-        print "Should be saving right"
-        return player.goNow('saveRight')
-    else:
-        print "Should be saving center"
-        return player.goNow('saveCenter')
+    ## if relY > CENTER_SAVE_THRESH:
+    ##     print "Should be saving left"
+    ##     return player.goNow('saveLeft')
+    ## elif relY < -CENTER_SAVE_THRESH:
+    ##     print "Should be saving right"
+    ##     return player.goNow('saveRight')
+    ## else:
+    print "Should be saving center"
+    return player.goNow('saveCenter')
 
 def saveRight(player):
     if player.firstFrame():

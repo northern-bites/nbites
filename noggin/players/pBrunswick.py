@@ -6,7 +6,6 @@ from . import KickingStates
 from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
-from . import SquatPositionStates
 from . import BrunswickStates
 
 from . import GoalieTransitions
@@ -29,7 +28,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(PenaltyKickStates)
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieSaveStates)
-        self.addStates(SquatPositionStates)
         self.addStates(PositionStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
@@ -129,22 +127,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                self.play.isRole(PBConstants.DEFENDER) ):
             return 'playbookPosition'
         elif self.play.isRole(PBConstants.GOALIE):
-            if (self.lastDiffState == 'gamePenalized' or
-                self.lastDiffState == 'fallen'):
-                return 'goaliePosition'
-            elif self.squatting:
-                return 'squatted'
-            return 'squat'
+            return 'goaliePosition'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
         elif self.play.isRole(PBConstants.SEARCHER):
             return 'scanFindBall'
         else:
             return 'scanFindBall'
-
-
-
-
 
     ###### HELPER METHODS ######
     def getSpinDirAfterKick(self):

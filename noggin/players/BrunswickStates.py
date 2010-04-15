@@ -14,15 +14,10 @@ def gameInitial(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.stopWalking()
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
-
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.stopWalking()
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -36,18 +31,8 @@ def gamePenalized(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        player.penalizeHeads()
-
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.stopWalking()
-
-    if (player.brain.play.isRole(GOALIE) and
-        player.stateTime >=
-        SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
         player.stopWalking()
+        player.penalizeHeads()
 
     return player.stay()
 
@@ -71,6 +56,8 @@ def gameReady(player):
         player.hasKickedOffKick = False
     else:
         player.hasKickedOffKick = True
+
+    player.standup()
 
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
@@ -100,9 +87,6 @@ def gameSet(player):
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
-            if player.squatting:
-                return player.goLater('squatted')
-            return player.goLater('squat')
 
         if player.brain.play.isRole(CHASER):
             player.brain.tracker.trackBall()
@@ -149,9 +133,6 @@ def penaltyShotsGameSet(player):
             player.brain.tracker.activeLoc()
     if player.brain.play.isRole(GOALIE):
         player.brain.resetGoalieLocalization()
-        if player.squatting:
-            return player.goLater('squatted')
-        return player.goLater('squat')
 
     return player.stay()
 
@@ -172,7 +153,6 @@ def fallen(player):
     player.isChasing = False
     player.inKickingState = False
     player.justKicked = False
-    player.squatting = False
     player.brain.nav.switchTo('stopped')
     return player.stay()
 
@@ -187,11 +167,7 @@ def gameFinished(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.stopWalking()
+        player.stopWalking()
 
         player.zeroHeads()
         player.GAME_FINISHED_satDown = False

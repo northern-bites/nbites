@@ -11,13 +11,20 @@ def goalieRunChecks(player):
     setRelX(player)
     setRelY(player)
 
-    if not player.isChasing:
+    if shouldSave(player):
+        player.shouldSaveCounter+=1
+        if player.shouldSaveCounter >= 3:
+            player.isChasing = False
+            player.shouldChaseCounter = 0
+            return player.goNow('goalieSave')
+
+    elif not player.isChasing:
         if shouldChaseLoc(player):
             player.shouldChaseCounter+=1
             if DEBUG: print "should chase: ", player.shouldChaseCounter
             if player.shouldChaseCounter >= goalCon.START_CHASE_BUFFER:
                 player.shouldChaseCounter = 0
-                return 'chasePrepare'
+                return 'chase'
         else:
             player.shouldChaseCounter = 0
 
@@ -193,10 +200,9 @@ def shouldSave(player):
 def shouldHoldSave(player):
     # same as shouldSave() except for the ball.framesOn check
     # try to come up with better conditions to test
-    '''
-    if the ball is still in front of me and coming at me, hold save
-    if it's going to arrive anytime soon
-    '''
+    """    if the ball is still in front of me and coming at me, hold save
+    if it's going to arrive anytime soon  """
+
     ball = player.brain.ball
 
     relVelX = ball.relVelX
@@ -246,13 +252,14 @@ def shouldStopChaseLoc(player):
                       goalCon.END_CLEAR_BUFFER )):
             return True
 
-    '''
+    """
     elif (my.x < Constants.MY_GOALBOX_RIGHT_X
-          or my.y < Constants.MY_GOALBOX_TOP_Y
-          or my.y > Constants.MY_GOALBOX_BOTTOM_Y) and\
-          (ball.locDist >= 70 or ball.dist >= 70):
-          return True
-    '''
+    or my.y < Constants.MY_GOALBOX_TOP_Y
+    or my.y > Constants.MY_GOALBOX_BOTTOM_Y) and\
+    (ball.locDist >= 70 or ball.dist >= 70):
+    return True
+    """
+
     return False
 
 def outOfPosition(player):
@@ -277,9 +284,9 @@ def dangerousBall(player):
     return False
 
 def useOmni(player):
-    '''the '+' and '-' for y are intentionally reversed because of the
+    """the '+' and '-' for y are intentionally reversed because of the
     difficulty of using omniGoTo to get back from the points outside
-    of the goalposts'''
+    of the goalposts """
     my = player.brain.my
     if my.x < Constants.MY_GOALBOX_RIGHT_X + goalCon.BUFFER and\
             my.y < Constants.MY_GOALBOX_TOP_Y - goalCon.BUFFER and\
