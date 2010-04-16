@@ -72,7 +72,7 @@ Field::Field(Vision* vis, Threshold * thr)
 {
 #ifdef OFFLINE
 	debugHorizon = false;
-	debugFieldEdge = false;
+	debugFieldEdge = true;
 	openField = false;
 	debugShot = false;
 #else
@@ -403,7 +403,10 @@ void Field::findConvexHull(int pH) {
 	// when we apply Graham scanning as we just did, there can be problems at each end
 	int diffy = convex[2].y - convex[1].y;
 	int diffx = convex[2].x - convex[1].x;
-	float steps = (float)diffy / (float)diffx;
+	float steps = 0.0f;
+	// this shouldn't happen, but let's be sure
+	if (diffx != 0)
+	  steps = (float)diffy / (float)diffx;
 	int diffx2 = convex[1].x - convex[0].x;
 	float project = (float)convex[1].y - (float)diffx2 * steps;
 	if (convex[1].x < 50 && convex[0].y - (int)project > 5) {
@@ -415,7 +418,10 @@ void Field::findConvexHull(int pH) {
 	if (M > 3) {
 		diffx = convex[M-1].x - convex[M-2].x;
 		diffy = convex[M-1].y - convex[M-2].y;
-		steps = (float)diffy / (float)diffx;
+		if (diffx != 0)
+		  steps = (float)diffy / (float)diffx;
+		else
+		  steps = 0.0f;
 		diffx2 = convex[M].x - convex[M-1].x;
 		project = (float)convex[M-1].y + (float)diffx2 * steps;
 		if (convex[M-1].x > IMAGE_WIDTH - 1 - 50 && convex[M].y - (int)project > 5) {
@@ -433,16 +439,18 @@ void Field::findConvexHull(int pH) {
 	for (int i = 1; i <= M; i++) {
 		//cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
 		int diff = convex[i].y - convex[i-1].y;
-		float step = (float)diff / (float)(convex[i].x - convex[i-1].x);
+		float step = 0.0f;
+		if (convex[i].x != convex[i-1].x) 
+		  step = (float)diff / (float)(convex[i].x - convex[i-1].x);
 		float cur = convex[i].y;
 		for (int j = convex[i].x; j > convex[i-1].x; j--) {
 			cur -= step;
 			topEdge[j] = (int)cur;
-			if (cur > 10) {
+			/*if (cur > 10) {
 				e = vision->pose->pixEstimate(j, (int)cur, 0.0f);
 				if (e.dist > maxPix)
 					maxPix = e.dist;
-			}
+					}*/
 			if (debugFieldEdge)
 				thresh->drawPoint(j, (int)cur, BLACK);
 		}
