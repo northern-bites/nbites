@@ -904,7 +904,7 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		point <int> rightTop = point<int>(topx, top);
 		point <int> leftBottom = point<int>(bottomx, bottom);
 		point <int> rightBottom = point<int>(bottomx, bottom);
-		vision->drawLine(topx, top, bottomx, bottom, BLACK);
+		//vision->drawLine(topx, top, bottomx, bottom, BLACK);
 		// first expand the sides
 		findVerticalEdge(leftTop, leftBottom, c, c2, true);
 		findVerticalEdge(rightTop, rightBottom, c, c2, false);

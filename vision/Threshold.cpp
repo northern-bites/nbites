@@ -101,6 +101,9 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 	red = new Robots(vision, this, field, RED);
     orange = new Ball(vision, this, field, ORANGE);
     cross = new Cross(vision, this, field);
+    for (int i = 0; i < IMAGE_WIDTH; i++) {
+      lowerBound[i] = IMAGE_HEIGHT - 1;
+    }
 }
 
 /* Main vision loop, called by Vision.cc
@@ -274,7 +277,7 @@ void Threshold::threshold() {
  * balls will only be in the confines of the field).
  */
 void Threshold::runs() {
-	detectSelf();
+  //detectSelf();
     // split up the loops
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
 		int topEdge = max(0, field->horizonAt(i));
