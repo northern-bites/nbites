@@ -71,7 +71,7 @@ NUM_FIELD_OBJECT_DIST_CERTAINTIES = 4
 ##
 
 # Switch to tell us if we are using the lab field or not
-USING_LAB_FIELD = True
+USING_LAB_FIELD = False
 
 #---Landmark Constants------#
 # Notes:
@@ -141,7 +141,7 @@ if USING_LAB_FIELD:
     GOALBOX_WIDTH = 200.
 else:
     GOALBOX_DEPTH = 65.
-    GOALBOX_WIDTH = 305.
+    GOALBOX_WIDTH = 230.
 
 MIDFIELD_X = CENTER_FIELD_X
 MIDFIELD_Y = CENTER_FIELD_Y
