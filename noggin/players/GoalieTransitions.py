@@ -18,15 +18,18 @@ def goalieRunChecks(player):
             player.shouldChaseCounter = 0
             return player.goNow('goalieSave')
 
-    elif not player.isChasing:
-        if shouldChaseLoc(player):
-            player.shouldChaseCounter+=1
-            if DEBUG: print "should chase: ", player.shouldChaseCounter
-            if player.shouldChaseCounter >= goalCon.START_CHASE_BUFFER:
-                player.shouldChaseCounter = 0
-                return 'chase'
-        else:
-            player.shouldChaseCounter = 0
+    ## elif not player.isChasing:
+    ##     if shouldChaseLoc(player):
+    ##         player.shouldChaseCounter+=1
+    ##         if DEBUG: print "should chase: ", player.shouldChaseCounter
+    ##         if player.shouldChaseCounter >= goalCon.START_CHASE_BUFFER:
+    ##             player.shouldChaseCounter = 0
+    ##             return 'chase'
+    ##     else:
+    ##         player.shouldChaseCounter = 0
+    elif player.currentState == 'gamePlaying':
+        player.isChasing = False
+        return 'goaliePosition'
 
     elif player.isChasing and\
                 not chaseTran.shouldntStopChasing(player):

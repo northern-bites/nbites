@@ -108,15 +108,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if not self.brain.playbook.subRoleChanged():
-            if self.play.isRole(PBConstants.GOALIE):
-                state = GoalieTransitions.goalieRunChecks(self)
-                return state
+        if self.play.isRole(PBConstants.GOALIE):
+            state = GoalieTransitions.goalieRunChecks(self)
+            return state
+
+        elif not self.brain.playbook.subRoleChanged():
             return self.currentState
+
         # We don't stop chasing if we are in certain roles
         elif (self.play.isRole(PBConstants.CHASER) and
               ChaseBallTransitions.shouldntStopChasing(self)):
             return self.currentState
+
         else:
             return self.getRoleState()
 
@@ -126,8 +129,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif ( self.play.isRole(PBConstants.OFFENDER) or
                self.play.isRole(PBConstants.DEFENDER) ):
             return 'playbookPosition'
-        elif self.play.isRole(PBConstants.GOALIE):
-            return 'goaliePosition'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
         elif self.play.isRole(PBConstants.SEARCHER):
