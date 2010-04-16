@@ -63,7 +63,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
 	cross = new VisualCross();
 
     thresh = new Threshold(this, pose);
-    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose));
+    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose, profiler));
     thresh->setYUV(&global_image[0]);
 }
 
