@@ -409,7 +409,7 @@ string RoboGuardian::getHostName()const {
 }
 
 const string RoboGuardian::discoverIP() const{
-    int result = system("/opt/naoqi/bin/ip.sh > /tmp/ip.txt");
+    int result = system("ifconfig|grep 'inet'|cut -d':' -f2|awk '{print $1}'|grep -v 127.0.0.1 > /tmp/ip.txt");
     char ip[100];
     FILE * ipf = fopen("/tmp/ip.txt","r");
     if(ipf != NULL){
