@@ -215,8 +215,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getPenaltyKickingBallDest(self):
         if not self.penaltyMadeFirstKick:
-            return (NogginConstants.FIELD_WIDTH * 3/4,
-                    NogginConstants.FIELD_HEIGHT /4)
+            return Location(NogginConstants.FIELD_WIDTH * 3/4,
+                            NogginConstants.FIELD_HEIGHT /4)
 
         return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
                         NogginConstants.OPP_GOAL_MIDPOINT[1] )
