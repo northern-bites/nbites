@@ -9,7 +9,7 @@ def goalieSave(player):
         player.saving = True
         player.isChasing = False
         brain.motion.stopHeadMoves()
-        brain.nav.switchTo('stop')
+        player.stopWalking()
         brain.tracker.trackBall()
     if not brain.nav.isStopped():
         return player.stay()
@@ -47,9 +47,9 @@ def saveLeft(player):
 
 def saveCenter(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.SAVE_CENTER_DEBUG)
+        #player.executeMove(SweetMoves.SAVE_CENTER_DEBUG)
         player.executeMove(SweetMoves.GOALIE_SQUAT)
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SAVE_CENTER_DEBUG):
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT):
         return player.goLater('holdCenterSave')
     return player.stay()
 
@@ -77,15 +77,10 @@ def holdCenterSave(player):
 def postSave(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-    elif not player.brain.motion.isBodyActive():
-        player.standup()
 
-    #if player.brain.ball.on:
-    player.brain.tracker.trackBall()
-    #else: do not yet created postSaveScan
-    #roleState = player.getNextState()
-    player.saving = False
-    if player.nav.isStopped():
+    if player.brain.nav.isStopped():
+        player.saving = False
+        player.brain.tracker.trackBall()
         return player.goLater('goalieAtPosition')
 
     return player.stay()
