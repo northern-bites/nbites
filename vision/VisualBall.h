@@ -40,7 +40,7 @@ public:
     void setFocalDistanceFromRadius() { focDist = 100 * 24.5/(getRadius() *2); }
 #elif ROBOT(NAO_RL)
     //TODO: recompute this
-    void setFocalDistanceFromRadius() { focDist = ( 6.4/8.6) * (100.f / 83.f) * 2850 / (getRadius() * 2); }
+    void setFocalDistanceFromRadius() { focDist = ( 6.4/8.6) * (100.f / 83.f) * (50.f / 52.f ) * 2850 / (getRadius() * 2); }
 #else
     void setFocalDistanceFromRadius() {
         focDist = 2067.6f*pow(getRadius()*2.0f,-1.0595f);
