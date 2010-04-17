@@ -183,11 +183,9 @@ def shouldSave(player):
 
     # Test velocity values as to which one would work:
     relVelX = ball.relVelX
-    if (player.currentState == 'postSave' or
-        player.currentState == 'savingCenter'or
-        player.currentState == 'holdCenterSave' or
-        player.currentState == 'goalieSave'):
+    if player.saving :
         return False
+
     if relVelX < 0.0:
         timeUntilSave = player.ballRelX / -relVelX
         if DEBUG: player.printf(("relVelX = %g   timeUntilSave = %g") %

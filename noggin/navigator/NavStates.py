@@ -18,7 +18,7 @@ def doingSweetMove(nav):
         helper.executeMove(motion, nav.sweetMove)
 
     if not nav.brain.motion.isBodyActive():
-        del nav.sweetMove
+        del nav.sweetMove 
         return nav.goNow('stopped')
 
     return nav.stay()
