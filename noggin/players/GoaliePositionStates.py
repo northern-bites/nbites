@@ -74,7 +74,7 @@ def goalieAtPosition(player):
 
 def goaliePositionForSave(player):
     if player.firstFrame():
-        #player.stopWalking()
+        player.stopWalking()
         player.brain.tracker.trackBall()
 
     strafeDir = helper.strafeDirForSave(player)
